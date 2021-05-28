@@ -14,8 +14,8 @@ test-watch: build
 	node_modules/.bin/jest --forceExit --detectOpenHandles --coverage --verbose --watch
 
 build:
-	@echo "> Building: build-ecs..."
-	@cd packages/build-ecs; ../../node_modules/.bin/tsc -p tsconfig.json
+	# @echo "> Building: build-ecs..."
+	# @cd packages/build-ecs; ../../node_modules/.bin/tsc -p tsconfig.json
 
 	@echo "> Building: decentraland-amd..."
 	@cd packages/decentraland-amd; npm run build

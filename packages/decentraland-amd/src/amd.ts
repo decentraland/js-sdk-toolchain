@@ -1,13 +1,17 @@
 type Module = {
   name: string
   dclamd: 1 | 2
-  context: any
-  dependencies?: string[]
-  handlers: Function[]
+  parent: string | null
+  dependants: Set<string>
+  dependencies: Array<string>
+  handlers: ModuleLoadedHandler[]
   exports: any
 }
 
+type ModuleLoadedHandler = (module: Module) => void
+
 declare var dcl: PartialDecentralandInterface
+declare var onerror: ((err: Error) => void) | undefined
 
 // A naive attempt at getting the global `this`. Don’t use `this`!
 const getGlobalThis = function () {
@@ -18,6 +22,7 @@ const getGlobalThis = function () {
   // @ts-ignore
   if (typeof window !== 'undefined') return window
   // Note: this might still return the wrong result!
+  // @ts-ignore
   if (typeof this !== 'undefined') return this
   throw new Error('Unable to locate global `this`')
 }
@@ -30,7 +35,10 @@ namespace loader {
   const MODULE_LOADING = 1
   const MODULE_READY = 2
 
-  let anonymousQueue = []
+  let unnamedModules = 0
+
+  let anonymousQueue: any[] = []
+  let cycles: string[][] = []
 
   const settings = {
     baseUrl: ''
@@ -38,210 +46,279 @@ namespace loader {
 
   const registeredModules: Record<string, Module> = {}
 
-  export function config(config) {
+  export function config(config: Record<string, any>) {
     if (typeof config === 'object') {
       for (let x in config) {
         if (config.hasOwnProperty(x)) {
-          settings[x] = config[x]
+          ;(settings as any)[x] = config[x]
         }
       }
     }
   }
 
-  function createModule(name: string, context?: any, handlers: Function[] = []): Module {
-    return {
-      name,
-      dclamd: MODULE_LOADING,
-      handlers,
-      context,
-      exports: {}
+  export function define(factory: Function): void
+  export function define(id: string, factory: Function): void
+  export function define(dependencies: string[], factory: Function): void
+  export function define(id: string, dependencies: string[], factory: Function): void
+  export function define(
+    first: string | Function | string[],
+    second?: string[] | string | Function,
+    third?: Function | object
+  ): void {
+    let moduleToLoad: string | null = null
+    let factory: Function | object = {}
+    let dependencies: string[] | null = null
+
+    if (typeof first === 'function') {
+      factory = first
+    } else if (typeof first === 'string') {
+      moduleToLoad = first
+
+      if (typeof second === 'function') {
+        factory = second
+      } else if (second instanceof Array) {
+        dependencies = second
+        factory = third!
+      }
+    } else if (first instanceof Array) {
+      dependencies = first
+      if (typeof second === 'function') {
+        factory = second
+      }
     }
-  }
 
-  export function define(factory: any)
-  export function define(id: string, factory: any)
-  export function define(id: string, dependencies: string[], factory: any)
-  export function define(id: string, dependencies?, factory?) {
-    let argCount = arguments.length
+    dependencies = dependencies || ['require', 'exports', 'module']
 
-    if (argCount === 1) {
-      factory = id
-      dependencies = ['require', 'exports', 'module']
-      id = null
-    } else if (argCount === 2) {
-      if (settings.toString.call(id) === '[object Array]') {
-        factory = dependencies
-        dependencies = id
-        id = null
+    if (moduleToLoad === null) {
+      moduleToLoad = `unnamed-module-${unnamedModules++}`
+    }
+
+    moduleToLoad = normalizeModuleId(moduleToLoad)
+
+    function ready(deps: any[]) {
+      const module = registeredModules[moduleToLoad!]
+
+      if (!module) throw new Error('Could not access registered module ' + moduleToLoad)
+
+      let exports = module.exports
+
+      exports = typeof factory === 'function' ? factory.apply(globalObject, deps) || exports : factory
+
+      module.exports = exports
+
+      moduleReady(moduleToLoad!)
+    }
+
+    dependencies = (dependencies || []).map((dep) => resolve(moduleToLoad!, dep))
+
+    if (!registeredModules[moduleToLoad]) {
+      registeredModules[moduleToLoad] = {
+        name: moduleToLoad!,
+        parent: null,
+        dclamd: MODULE_LOADING,
+        dependencies,
+        handlers: [],
+        exports: {},
+        dependants: new Set()
+      }
+    }
+
+    registeredModules[moduleToLoad].dependencies = dependencies
+
+    require(dependencies, ready, (err: Error) => {
+      if (typeof onerror == 'function') {
+        onerror(err)
       } else {
-        factory = dependencies
-        dependencies = ['require', 'exports', 'module']
+        throw err
       }
-    }
-
-    if (!id) {
-      anonymousQueue.push([dependencies, factory])
-      return
-    }
-
-    function ready() {
-      let handlers, context
-      if (registeredModules[id]) {
-        handlers = registeredModules[id].handlers
-        context = registeredModules[id].context
-      } else {
-        registeredModules[id] = createModule(id)
-      }
-
-      let module = registeredModules[id]
-      module.exports =
-        typeof factory === 'function'
-          ? factory.apply(null, anonymousQueue.slice.call(arguments, 0)) || registeredModules[id].exports || {}
-          : factory
-
-      module.dclamd = MODULE_READY
-      module.context = context
-      for (let x = 0, xl = handlers ? handlers.length : 0; x < xl; x++) {
-        handlers[x](module.exports)
-      }
-    }
-
-    if (!registeredModules[id]) registeredModules[id] = createModule(id)
-
-    updateExistingModuleIfIndexModule(id)
-
-    registeredModules[id].dependencies = dependencies.map((dep) => _toUrl(dep, id))
-
-    require(dependencies, ready, id)
-  }
-
-  function updateExistingModuleIfIndexModule(id: string) {
-    const idParts = id.split('/')
-
-    if (idParts[idParts.length - 1] === 'index' && idParts.length > 1) {
-      idParts.pop()
-      const noIndexId = idParts.join('/')
-
-      const existingModule = registeredModules[noIndexId]
-
-      registeredModules[noIndexId] = registeredModules[id]
-
-      if (existingModule) {
-        registeredModules[noIndexId].context = existingModule.context
-        registeredModules[noIndexId].handlers.push(...existingModule.handlers)
-      }
-    }
+    }, moduleToLoad!)
   }
 
   export namespace define {
     export const amd = {}
+    export const modules = registeredModules
   }
 
-  function hasDependencyWith(moduleId: string, otherModuleId: string): boolean {
-    if (!registeredModules[moduleId] || !registeredModules[moduleId].dependencies) {
+  function moduleReady(moduleName: string) {
+    const module = registeredModules[moduleName]
+
+    if (!module) throw new Error('Could not access registered module ' + moduleName)
+
+    module.dclamd = MODULE_READY
+
+    let handlers: ModuleLoadedHandler[] = module.handlers
+
+    if (handlers && handlers.length) {
+      for (let x = 0; x < handlers.length; x++) {
+        handlers[x](registeredModules[moduleName])
+      }
+    }
+  }
+
+  /**
+   * Walks (recursively) the dependencies of 'from' in search of 'to'.
+   * Returns cycle as array.
+   */
+  function getCyclePath(fromModule: string, toModule: string, depth: number): string[] | null {
+    if (!registeredModules[fromModule]) {
+      return null
+    }
+
+    if (fromModule == toModule || depth == 50) return [fromModule]
+
+    const dependencies = registeredModules[fromModule].dependencies
+
+    for (let i = 0, len = dependencies.length; i < len; i++) {
+      let path = getCyclePath(dependencies[i], toModule, depth + 1)
+      if (path !== null) {
+        path.push(fromModule)
+        return path
+      }
+    }
+
+    return null
+  }
+
+  /**
+   * Walks (recursively) the dependencies of 'from' in search of 'to'.
+   * Returns true if there is such a path or false otherwise.
+   * @param from Module id to start at
+   * @param to Module id to look for
+   */
+  function hasDependencyPath(fromId: string, toId: string): boolean {
+    let from = registeredModules[fromId]
+    if (!from) {
       return false
     }
 
-    const directDependencies = registeredModules[moduleId].dependencies
+    let inQueue: Record<string, boolean> = {}
+    for (let i in registeredModules) {
+      inQueue[i] = false
+    }
+    let queue: Module[] = []
 
-    // Dependencies can be viewed as a graph. We keep track of the transitions between nodes that we have visited (to avoid infinite loop),
-    // and those that we want to visit next. We want to find all the nodes reachable from moduleId, to see if those inclued otherModuleId
-    const visited = [moduleId, 'require', 'exports', 'module']
+    // Insert 'from' in queue
+    queue.push(from)
+    inQueue[fromId] = true
 
-    // If the dependency is one of those automatically assumed visited, we know we have a dependency
-    if (visited.indexOf(otherModuleId) !== -1) return true
+    while (queue.length > 0) {
+      // Pop first inserted element of queue
+      let element = queue.shift()!
+      let dependencies = element.dependencies
+      if (dependencies) {
+        // Walk the element's dependencies
+        for (let i = 0, len = dependencies.length; i < len; i++) {
+          let dependency = dependencies[i]
 
-    const toVisit = directDependencies.filter((dep) => visited.indexOf(dep) === -1)
+          if (dependency === toId) {
+            // There is a path to 'to'
+            return true
+          }
 
-    while (toVisit.length > 0) {
-      // If among the nodes we want to visit we have the module, then we know we have a dependency
-      if (toVisit.indexOf(otherModuleId) !== -1) return true
-
-      const dependencyId = toVisit.shift()
-
-      visited.push(dependencyId)
-
-      const module = registeredModules[dependencyId]
-      if (module && module.dependencies) {
-        for (let i = 0; i < module.dependencies.length; i++) {
-          const moduleDependencyId = module.dependencies[i]
-          if (visited.indexOf(moduleDependencyId) === -1 && toVisit.indexOf(moduleDependencyId) === -1) {
-            toVisit.push(moduleDependencyId)
+          let dependencyModule = registeredModules[dependency]
+          if (dependencyModule && !inQueue[dependency]) {
+            // Insert 'dependency' in queue
+            inQueue[dependency] = true
+            queue.push(dependencyModule)
           }
         }
       }
     }
 
-    // If we have visited all the graph and we didn't find a dependency, then as far as we know, we don't have a dependency yet
+    // There is no path to 'to'
     return false
   }
 
-  export function require(modules: string, callback?: Function, context?: string)
-  export function require(modules: string[], callback?: Function, context?: string)
-  export function require(modules: string | string[], callback?: Function, context?: string) {
-    let loadedModulesExports: any[] = []
+  export function require(
+    dependencies: string | string[],
+    callback: (deps: any[]) => void,
+    errorCallback: Function,
+    parentModule: string
+  ) {
+    let dependenciesResults: any[] = new Array(dependencies.length).fill(null)
     let loadedCount = 0
     let hasLoaded = false
 
-    if (typeof modules === 'string') {
-      if (registeredModules[modules] && registeredModules[modules].dclamd === MODULE_READY) {
-        return registeredModules[modules]
+    if (typeof dependencies === 'string') {
+      if (registeredModules[dependencies]) {
+        if (registeredModules[dependencies].dclamd === MODULE_LOADING) {
+          throw new Error(`Trying to load ${dependencies} from ${parentModule}. The first module is still loading.`)
+        }
+        return registeredModules[dependencies]
       }
       throw new Error(
-        modules + ' has not been defined. Please include it as a dependency in ' + context + "'s define()"
+        dependencies + ' has not been defined. Please include it as a dependency in ' + parentModule + "'s define()"
       )
     }
 
-    const xl = modules.length
+    const depsLength = dependencies.length
 
-    for (let x = 0; x < xl; x++) {
-      switch (modules[x]) {
+    for (let index = 0; index < depsLength; index++) {
+      switch (dependencies[index]) {
         case 'require':
-          let _require: typeof require = function (new_module, callback) {
-            return require(new_module, callback, context)
+          let _require: typeof require = function (
+            new_module: string | string[],
+            callback: () => void,
+            errorCallback: Function
+          ) {
+            return require(new_module, callback, errorCallback, parentModule)
           } as any
           _require.toUrl = function (module) {
-            return _toUrl(module, context)
+            return toUrl(module, parentModule)
           }
-          loadedModulesExports[x] = _require
+          dependenciesResults[index] = _require
           loadedCount++
           break
         case 'exports':
-          loadedModulesExports[x] = registeredModules[context].exports
+          if (!registeredModules[parentModule]) {
+            throw new Error('Parent module ' + parentModule + ' not registered yet')
+          }
+
+          dependenciesResults[index] = registeredModules[parentModule].exports
           loadedCount++
           break
         case 'module':
-          loadedModulesExports[x] = {
-            id: context,
-            uri: _toUrl(context)
+          dependenciesResults[index] = {
+            id: parentModule,
+            uri: toUrl(parentModule)
           }
           loadedCount++
           break
-        default:
+        default: {
           // If we have a circular dependency, then we resolve the module even if it hasn't loaded yet
-          if (hasDependencyWith(modules[x], context)) {
-            loadedModulesExports[x] = registeredModules[modules[x]].exports
-            loadedCount++
-          } else {
-            load(
-              modules[x],
-              (loadedModuleExports) => {
-                loadedModulesExports[x] = loadedModuleExports
-                loadedCount++
+          const dependency = dependencies[index]
 
-                if (loadedCount === xl && callback) {
-                  hasLoaded = true
-                  callback.apply(null, loadedModulesExports)
-                }
-              },
-              context
-            )
+          const hasCycles = hasDependencyPath(dependency, parentModule)
+
+          const handleLoadedModule = () => {
+            dependenciesResults[index] = registeredModules[dependency].exports
+            loadedCount++
+            if (loadedCount === depsLength && callback) {
+              hasLoaded = true
+              callback(dependenciesResults)
+            }
           }
+
+          if (hasCycles) {
+            const cyclePath = getCyclePath(dependency, parentModule, 0)
+            if (cyclePath) {
+              cyclePath.reverse()
+              cyclePath.push(dependency)
+              cycles.push(cyclePath)
+            }
+            load(dependency, () => {}, errorCallback, parentModule)
+            handleLoadedModule()
+          } else {
+            load(dependency, handleLoadedModule, errorCallback, parentModule)
+          }
+
+          break
+        }
       }
     }
 
-    if (!hasLoaded && loadedCount === xl && callback) {
-      callback.apply(null, loadedModulesExports)
+    if (!hasLoaded && loadedCount === depsLength && callback) {
+      callback(dependenciesResults)
     }
   }
 
@@ -251,83 +328,160 @@ namespace loader {
     }
   }
 
-  function load(moduleName: string, handler: Function, context: string) {
-    moduleName = context ? _toUrl(moduleName, context) : moduleName
+  // returns: resolvedModuleName
+  function resolve(fromModule: string, toModule: string) {
+    return fromModule ? toUrl(toModule, fromModule) : toModule
+  }
 
+  function load(moduleName: string, callback: ModuleLoadedHandler, errorCallback: Function, parentModule: string) {
     if (registeredModules[moduleName]) {
-      if (registeredModules[moduleName].dclamd === MODULE_LOADING) {
-        handler && registeredModules[moduleName].handlers.push(handler)
-      } else {
-        handler && handler(registeredModules[moduleName].exports)
-      }
-    } else {
-      const module = (registeredModules[moduleName] = createModule(moduleName, context, [handler]))
-      if (moduleName.indexOf('@') === 0) {
-        if (typeof dcl !== 'undefined') {
-          dcl.loadModule(moduleName).then((descriptor: DclModuleDescriptor) => {
-            let createdModuleExports = {}
+      registeredModules[moduleName].dependants.add(parentModule)
 
+      if (registeredModules[moduleName].dclamd === MODULE_LOADING) {
+        callback && registeredModules[moduleName].handlers.push(callback)
+      } else {
+        callback && callback(registeredModules[moduleName])
+      }
+
+      return
+    } else {
+      registeredModules[moduleName] = {
+        name: moduleName,
+        parent: parentModule,
+        dclamd: MODULE_LOADING,
+        handlers: [callback],
+        dependencies: [],
+        dependants: new Set([parentModule]),
+        exports: {}
+      }
+    }
+
+    if (moduleName.indexOf('@') === 0) {
+      let exports = registeredModules[moduleName].exports
+      if (typeof dcl.loadModule === 'function') {
+        dcl
+          .loadModule(moduleName, exports)
+          .then((descriptor: DclModuleDescriptor) => {
             for (let i in descriptor.methods) {
               const method = descriptor.methods[i]
-              createdModuleExports[method.name] = createMethodHandler(descriptor.rpcHandle, method)
+              exports[method.name] = createMethodHandler(descriptor.rpcHandle, method)
             }
 
-            // This is somewhat repeated with the ready function above... Should refactor with clear head
-            module.dclamd = MODULE_READY
-            module.exports = createdModuleExports
-
-            const handlers = module.handlers
-
-            for (let i = 0; i < handlers.length; i++) {
-              handlers[i](createdModuleExports)
-            }
+            moduleReady(moduleName)
           })
-        }
+          .catch((e: any) => {
+            errorCallback(e)
+          })
+      } else {
+        throw new Error('Asynchronous modules will not work because loadModule function is not present')
       }
     }
   }
 
   if (typeof dcl !== 'undefined') {
     dcl.onStart(() => {
+      const unknownModules = new Set<string>()
       const notLoadedModules: Module[] = []
+
       for (let i in registeredModules) {
-        if (registeredModules[i] && registeredModules[i].dclamd === MODULE_LOADING) {
-          notLoadedModules.push(registeredModules[i])
+        if (registeredModules[i]) {
+          if (registeredModules[i].dclamd === MODULE_LOADING) {
+            notLoadedModules.push(registeredModules[i])
+          }
+
+          registeredModules[i].dependencies.forEach(($) => {
+            if ($ == 'require' || $ == 'exports' || $ == 'module') return
+            if (!registeredModules[$]) unknownModules.add($)
+          })
         }
       }
 
+      const errorParts: string[] = []
+
+      if (cycles.length) {
+        errorParts.push(`\n> Cyclic dependencies: ${cycles.map(($) => '\n  - ' + $.join(' -> ')).join('')}`)
+      }
+
+      if (unknownModules.size) {
+        errorParts.push(
+          `\n> Undeclared/unknown modules: ${Array.from(unknownModules)
+            .map(($) => '\n  - ' + $)
+            .join('')}`
+        )
+      }
+
       if (notLoadedModules.length) {
-        throw new Error(`These modules didn't load: ${notLoadedModules.map(($) => $.name).join(', ')}`)
+        errorParts.push(`\n> These modules didn't load: ${notLoadedModules.map(($) => '\n  - ' + $.name).join('')}.\n`)
+      }
+
+      if (errorParts.length) {
+        throw new Error(errorParts.join('\n'))
       }
     })
   }
 
-  function _toUrl(id: string, context?: string) {
-    let changed = false
-    switch (id) {
+  /**
+   * Normalize 'a/../name' to 'name', etc.
+   */
+  function normalizeModuleId(moduleId: string): string {
+    let r = moduleId,
+      pattern: RegExp
+
+    // replace /./ => /
+    pattern = /\/\.\//
+    while (pattern.test(r)) {
+      r = r.replace(pattern, '/')
+    }
+
+    // replace ^./ => nothing
+    r = r.replace(/^\.\//g, '')
+
+    // replace /aa/../ => / (BUT IGNORE /../../)
+    pattern = /\/(([^\/])|([^\/][^\/\.])|([^\/\.][^\/])|([^\/][^\/][^\/]+))\/\.\.\//
+    while (pattern.test(r)) {
+      r = r.replace(pattern, '/')
+    }
+
+    // replace ^aa/../ => nothing (BUT IGNORE ../../)
+    r = r.replace(/^(([^\/])|([^\/][^\/\.])|([^\/\.][^\/])|([^\/][^\/][^\/]+))\/\.\.\//, '')
+
+    // replace ^/ => nothing
+    r = r.replace(/^\//g, '')
+
+    return r
+  }
+
+  /**
+   * Resolve relative module ids
+   */
+  function resolveModule(moduleId: string, parentModule: string): string {
+    let result = moduleId
+
+    if (!result.startsWith('@')) {
+      if (result.startsWith('./') || result.startsWith('../')) {
+        const currentPath = parentModule.split('/')
+        currentPath.pop()
+        result = normalizeModuleId(currentPath.join('/') + '/' + result)
+      }
+    }
+
+    return result
+  }
+
+  function toUrl(moduleName: string, parentModule?: string) {
+    switch (moduleName) {
       case 'require':
       case 'exports':
       case 'module':
-        return id
+        return moduleName
     }
-    const newContext = (context || settings.baseUrl).split('/')
-    newContext.pop()
-    const idParts = id.split('/')
-    let i = idParts.length
-    while (--i) {
-      switch (idParts[0]) {
-        case '..':
-          newContext.pop()
-        case '.':
-        case '':
-          idParts.shift()
-          changed = true
-      }
+    if (parentModule) {
+      return resolveModule(moduleName, parentModule)
     }
-    return (newContext.length && changed ? newContext.join('/') + '/' : '') + idParts.join('/')
+    return normalizeModuleId(moduleName)
   }
 
-  require.toUrl = _toUrl
+  require.toUrl = toUrl
 }
 
 globalObject.define = loader.define

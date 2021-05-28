@@ -1,103 +1,136 @@
 /// <reference path="../../packages/decentraland-amd/types.d.ts" />
 
-import { IFuture } from "fp-future";
+import { IFuture } from 'fp-future'
+import { readFileSync } from 'fs'
 
-const globalContext: { dcl: PartialDecentralandInterface, define: Function } = globalThis as any;
-
-export function cleanupAmdEnv() {
-  beforeAll(() => {
-    var name = require.resolve("../../packages/decentraland-amd");
-    delete require.cache[name];
-    delete (globalContext as any).define
-    delete (globalContext as any).dcl
-    require(name);
-  });
-
-  afterAll(() => {
-    var name = require.resolve("../../packages/decentraland-amd");
-    delete require.cache[name];
-  });
+// A naive attempt at getting the global `this`. Don’t use `this`!
+const getGlobalThis = function () {
+  // @ts-ignore
+  if (typeof globalThis !== 'undefined') return globalThis
+  // @ts-ignore
+  if (typeof self !== 'undefined') return self
+  // @ts-ignore
+  if (typeof window !== 'undefined') return window
+  // Note: this might still return the wrong result!
+  // @ts-ignore
+  if (typeof this !== 'undefined') return this
+  throw new Error('Unable to locate global `this`')
 }
 
-export function resolveFutureWith<T>(f: IFuture<T>, fn: () => Promise<T>){
+const globalObject: {
+  dcl: PartialDecentralandInterface
+  define: Function & { modules: any }
+  onerror: CallableFunction
+} = (getGlobalThis as any)()
+
+export function resolveFutureWith<T>(f: IFuture<T>, fn: () => Promise<T>) {
   fn().then(f.resolve).catch(f.catch)
 }
 
-export type ModulesMock = Record<string, () => Promise<any>>;
+export type ModulesMock = Record<string, () => Promise<any>>
 
 export function mockEnvironment(modules: ModulesMock) {
-  cleanupAmdEnv();
+  const starters: CallableFunction[] = []
+  const loadedModuleDescriptors = new Map<string, DclModuleDescriptor>()
+  const loadedModulesByHandle = new Map<string, any>()
 
-  const starters: CallableFunction[] = [];
-  const loadedModuleDescriptors = new Map<string, DclModuleDescriptor>();
-  const loadedModulesByHandle = new Map<string, any>();
+  const errors: string[] = []
 
-  it("mocks the environment", () => {
-    expect(globalContext.dcl).toBeUndefined();
-    expect(globalContext.define).toBeUndefined();
+  it('mocks the environment', () => {
+    var amdModuleRequire = require.resolve('../../packages/decentraland-amd')
+    const content = readFileSync(amdModuleRequire).toString()
+    ;(globalObject as any).define = null
+    delete (globalObject as any).dcl
+    delete (globalObject as any).onerror
+
+    expect(globalObject.dcl).toBeUndefined()
+    expect(globalObject.define).toEqual(null)
+    expect(globalObject.onerror).toBeUndefined()
 
     function getModuleHandle(moduleName: string) {
-      return moduleName + "_handle";
+      return moduleName + '_handle'
     }
 
-    globalContext.dcl = {
+    globalObject.onerror = (err: Error) => {
+      errors.push(err.message)
+    }
+
+    globalObject.dcl = {
       async loadModule(moduleName: string) {
         if (loadedModuleDescriptors.has(moduleName)) {
-          return loadedModuleDescriptors.get(moduleName)!;
+          return loadedModuleDescriptors.get(moduleName)!
         }
 
         if (moduleName in modules) {
-          const rpcHandle = getModuleHandle(moduleName);
-          const moduleInstance = await modules[moduleName]();
+          const rpcHandle = getModuleHandle(moduleName)
+          const moduleInstance = await modules[moduleName]()
 
           const ret: DclModuleDescriptor = {
             rpcHandle,
             methods: Object.keys(moduleInstance)
-              .filter((key) => typeof moduleInstance[key] == "function")
+              .filter((key) => typeof moduleInstance[key] == 'function')
               .map((key) => {
-                return { name: key };
-              }),
-          };
+                return { name: key }
+              })
+          }
 
-          loadedModuleDescriptors.set(moduleName, ret);
-          loadedModulesByHandle.set(rpcHandle, moduleInstance);
+          loadedModuleDescriptors.set(moduleName, ret)
+          loadedModulesByHandle.set(rpcHandle, moduleInstance)
 
-          return ret;
+          return ret
         }
 
-        throw new Error("Unknown module " + moduleName);
+        throw new Error('Unknown module ' + moduleName)
       },
       async callRpc(moduleHandle: string, methodName: string, args: any[]) {
         if (!loadedModulesByHandle.has(moduleHandle)) {
-          throw new Error("Unknown module handle " + moduleHandle);
+          throw new Error('Unknown module handle ' + moduleHandle)
         }
 
-        const moduleInstance = loadedModulesByHandle.get(moduleHandle)!;
+        const moduleInstance = loadedModulesByHandle.get(moduleHandle)!
 
         if (!moduleInstance[methodName]) {
-          throw new Error(`Unknown method '${methodName}'`);
+          throw new Error(`Unknown method '${methodName}'`)
         }
 
-        return moduleInstance.apply(null, args);
+        return moduleInstance[methodName].apply(null, args)
       },
       onStart(cb: CallableFunction) {
-        starters.push(cb);
-      },
-    };
-  });
+        starters.push(cb)
+      }
+    }
+
+    // RUN THE AMD LOADER
+    eval(content + '//# sourceURL=' + amdModuleRequire)
+
+    expect(globalObject.dcl).not.toBeUndefined()
+    expect(globalObject.define).not.toBeUndefined()
+    expect(globalObject.onerror).not.toBeUndefined()
+  })
 
   function start() {
     for (let $ of starters) {
-      $();
+      $()
     }
   }
 
   function define(factory: any): void
+  function define(dependencies: string[], factory: any): void
   function define(id: string, factory: any): void
   function define(id: string, dependencies: string[], factory: any): void
   function define(this: any, ...args: any[]): void {
-    return globalContext.define.apply(this, args)
+    return globalObject.define.apply(this, args)
   }
 
-  return { starters, start, loadedModuleDescriptors, loadedModulesByHandle, define };
+  function getModules(): Record<
+    string,
+    {
+      name: string
+      dependencies: Array<string>
+    }
+  > {
+    return globalObject.define.modules
+  }
+
+  return { starters, start, loadedModuleDescriptors, loadedModulesByHandle, define, errors, getModules }
 }

@@ -9,7 +9,7 @@ module.exports = {
     "^.+\\.(ts|tsx)$": "ts-jest",
   },
   coverageDirectory: "coverage",
-  collectCoverageFrom: ["src/**/*.ts", "src/**/*.js"],
+  collectCoverageFrom: ["packages/decentraland-amd/dist/amd.js"],
   testMatch: ["**/*.spec.(ts)"],
   testEnvironment: "node",
 }

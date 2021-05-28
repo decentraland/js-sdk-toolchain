@@ -6,7 +6,7 @@ type DclModuleDescriptor = {
 type DclMethodDescriptor = { name: string }
 
 type PartialDecentralandInterface = {
-  loadModule(moduleName: string): PromiseLike<DclModuleDescriptor>
-  callRpc(moduleHandle: string, methodName: string, args: ArrayLike<any>): PromiseLike<any>
+  loadModule(moduleName: string, exports: any): Promise<DclModuleDescriptor>
+  callRpc(moduleHandle: string, methodName: string, args: ArrayLike<any>): Promise<any>
   onStart(cb: Function): any
 }
