@@ -1,0 +1,22 @@
+{
+  "name": "@dcl/build-ecs",
+  "version": "1.0.2",
+  "description": "",
+  "main": "index.js",
+  "bin": "index.js",
+  "scripts": {
+  },
+  "keywords": [],
+  "author": "Decentraland",
+  "license": "Apache 2.0",
+  "dependencies": {
+    "terser": "latest",
+    "typescript": "latest"
+  },
+  "files": [
+    "index.js"
+  ],
+  "devDependencies": {
+    "@types/node": "^14.17.1"
+  }
+}
