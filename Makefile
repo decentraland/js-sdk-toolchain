@@ -4,6 +4,7 @@ LOCAL_ARG = --local --verbose --diagnostics
 endif
 
 install:
+	@npm i
 	@cd packages/build-ecs; npm i
 	@cd packages/decentraland-amd; npm i
 
