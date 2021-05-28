@@ -3,9 +3,7 @@
   "version": "1.0.6",
   "description": "",
   "main": "dist/amd.js",
-  "scripts": {
-    "build": "tsc -p tsconfig.json && terser --mangle --comments some --source-map -o dist/amd.min.js dist/amd.js"
-  },
+  "scripts": {},
   "keywords": [],
   "author": "",
   "files": [
