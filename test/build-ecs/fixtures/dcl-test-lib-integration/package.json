@@ -1,0 +1,23 @@
+{
+  "name": "dcl-test-lib-integration",
+  "version": "1.0.0",
+  "description": "My new Decentraland project",
+  "main": "./bin/lib.js",
+  "typings": "./bin/lib.d.ts",
+  "scripts": {
+    "start": "dcl start",
+    "build": "../../../../packages/build-ecs/index.js",
+    "build-prod": "../../../../packages/build-ecs/index.js --production",
+    "watch": "../../../../packages/build-ecs/index.js --watch"
+  },
+  "decentralandLibrary": {},
+  "devDependencies": {
+    "decentraland-ecs": "latest"
+  },
+  "dependencies": {
+    "eth-connect": "^6.0.0"
+  },
+  "bundleDependencies": [
+    "eth-connect"
+  ]
+}

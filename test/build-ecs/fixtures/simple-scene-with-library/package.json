@@ -1,0 +1,22 @@
+{
+  "name": "dcl-project",
+  "version": "1.0.0",
+  "description": "My new Decentraland project",
+  "scripts": {
+    "start": "dcl start",
+    "build": "../../../../packages/build-ecs/index.js",
+    "build-prod": "../../../../packages/build-ecs/index.js --production",
+    "watch": "../../../../packages/build-ecs/index.js --watch"
+  },
+  "devDependencies": {
+    "decentraland-ecs": "latest",
+    "dcl-test-lib-integration": "linked"
+  },
+  "dependencies": {
+    "eth-connect": "^6.0.0"
+  },
+  "bundleDependencies": [
+    "eth-connect",
+    "dcl-test-lib-integration"
+  ]
+}

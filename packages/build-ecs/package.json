@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "bin": "index.js",
-  "scripts": {
-  },
+  "scripts": {},
   "keywords": [],
   "author": "Decentraland",
   "license": "Apache 2.0",

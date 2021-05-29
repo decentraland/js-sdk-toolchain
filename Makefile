@@ -7,6 +7,9 @@ install:
 	@npm i
 	@cd packages/build-ecs; npm i
 	@cd packages/decentraland-amd; npm i
+	@cd test/build-ecs/fixtures/simple-scene; npm ci
+	@cd test/build-ecs/fixtures/dcl-test-lib-integration; npm ci
+	@cd test/build-ecs/fixtures/simple-scene-with-library; npm ci
 
 test: build
 	node_modules/.bin/jest --forceExit --detectOpenHandles --coverage --verbose

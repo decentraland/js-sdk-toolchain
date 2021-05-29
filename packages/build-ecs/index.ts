@@ -233,9 +233,9 @@ async function emitFile(fileName: string, services: ts.LanguageService, cfg: Pro
   function loadLibOrJs(lib: string) {
     if (PRODUCTION) {
       // prefer .min.js when available for PRODUCTION builds
-      return loadDclLib(lib + '.lib') || loadJsLib(lib.replace(/\.js$/, '.min.js')) || loadJsLib(lib) || false
+      return /*loadDclLib(lib + '.lib') ||*/ loadJsLib(lib.replace(/\.js$/, '.min.js')) || loadJsLib(lib) || false
     } else {
-      return loadDclLib(lib + '.lib') || loadJsLib(lib) || false
+      return /*loadDclLib(lib + '.lib') ||*/ loadJsLib(lib) || false
     }
   }
 

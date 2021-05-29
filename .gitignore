@@ -3,3 +3,5 @@ node_modules
 temp
 tsdoc-metadata.json
 coverage
+**/.DS_Store
+test/build-ecs/fixtures/*/bin

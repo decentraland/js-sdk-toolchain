@@ -1,0 +1,16 @@
+{
+  "name": "dcl-project",
+  "version": "1.0.0",
+  "description": "My new Decentraland project",
+  "scripts": {
+    "start": "dcl start",
+    "build": "../../../../packages/build-ecs/index.js",
+    "build-prod": "../../../../packages/build-ecs/index.js --production",
+    "watch": "../../../../packages/build-ecs/index.js --watch"
+  },
+  "devDependencies": {
+    "decentraland-ecs": "latest"
+  },
+  "dependencies": {},
+  "bundleDependencies": []
+}
