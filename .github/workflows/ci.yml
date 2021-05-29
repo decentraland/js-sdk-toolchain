@@ -35,6 +35,12 @@ jobs:
           cwd: packages/decentraland-amd
           deterministic-snapshot: true
           only-update-versions: true
+      - name: update version of packages/decentraland-ecs
+        uses: menduz/oddish-action@staging
+        with:
+          cwd: packages/decentraland-ecs
+          deterministic-snapshot: true
+          only-update-versions: true
       - name: build
         run:  make build
       - name: test
