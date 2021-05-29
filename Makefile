@@ -6,6 +6,7 @@ endif
 install:
 	npm i
 	cd packages/build-ecs; npm ci
+	cd packages/@dcl/rollup-config; npm ci
 	cd packages/decentraland-amd; npm ci
 	cd packages/decentraland-ecs; npm ci
 
