@@ -19,6 +19,7 @@ test-watch: build
 build:
 	@echo "> Building: build-ecs..."
 	@cd packages/build-ecs; $(PWD)/node_modules/.bin/tsc -p tsconfig.json
+	@chmod +x packages/build-ecs/index.js
 
 	@echo "> Building: decentraland-amd..."
 	@cd packages/decentraland-amd; $(PWD)/node_modules/.bin/tsc -p tsconfig.json && $(PWD)/packages/@dcl/rollup-config/node_modules/.bin/terser --mangle --comments some --source-map -o dist/amd.min.js dist/amd.js
