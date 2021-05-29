@@ -1,44 +1,57 @@
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
-import { sync as rimraf } from 'rimraf'
-import { execute, ensureFileExists } from './compile-scene.spec'
+import { rmFolder, executeStep, ensureFileExists } from '../helpers'
 
-describe('build-ecs: build lib', () => {
-  const libCwd = resolve(__dirname, './fixtures/dcl-test-lib-integration')
+function buildEcsBuildLibFlow() {
+  const cwd = resolve(__dirname, './fixtures/dcl-test-lib-integration')
+  describe('build-ecs: build lib', () => {
+    rmFolder('./bin', cwd)
 
-  it('clean the folder', () => {
-    rimraf(resolve(libCwd, './bin'))
-  })
+    executeStep('npm install --quiet --no-progress', cwd)
+    executeStep('npm run --quiet build', cwd)
 
-  it('npm run build', async function () {
-    await execute('npm run build', libCwd)
-  }, 60000)
-
-  it('ensure files exist', () => {
-    ensureFileExists(libCwd, 'bin/lib.js')
-    ensureFileExists(libCwd, 'bin/lib.js.lib')
-    ensureFileExists(libCwd, 'bin/lib.d.ts')
-    ensureFileExists(libCwd, 'bin/lib.min.js')
-  })
-
-  it('npm link', async function () {
-    await execute('npm link', libCwd)
-  })
-
-  describe('build-ecs: build scene with library', () => {
-    const sceneCwd = resolve(__dirname, './fixtures/simple-scene-with-library')
-
-    it('clean the folder', () => {
-      rimraf(resolve(sceneCwd, './bin'))
+    it('ensure files exist', () => {
+      ensureFileExists(cwd, 'bin/lib.js')
+      ensureFileExists(cwd, 'bin/lib.js.lib')
+      ensureFileExists(cwd, 'bin/lib.d.ts')
+      ensureFileExists(cwd, 'bin/lib.min.js')
     })
+  })
+  return { cwd }
+}
 
-    it('npm link dcl-test-lib-integration', async function () {
-      await execute('npm link dcl-test-lib-integration', sceneCwd)
+function rollupBuildLibFlow() {
+  const cwd = resolve(__dirname, './fixtures/rollup-lib-integration')
+  describe('rollup: build lib', () => {
+    rmFolder('./dist', cwd)
+
+    executeStep('npm run --quiet build', cwd)
+
+    it('ensure files exist', () => {
+      ensureFileExists(cwd, 'dist/index.d.ts')
+      ensureFileExists(cwd, 'dist/index.js')
+      ensureFileExists(cwd, 'dist/index.min.js')
+      ensureFileExists(cwd, 'dist/index.min.js.map')
     })
+  })
+  return { cwd }
+}
 
-    it('npm run build', async function () {
-      await execute('npm run build', sceneCwd)
-    }, 60000)
+describe('integration flow, build libs and build scene using libs', () => {
+  const { cwd: ecsLibCwd } = buildEcsBuildLibFlow()
+  const { cwd: rollupLibCwd } = rollupBuildLibFlow()
+  const sceneCwd = resolve(__dirname, './fixtures/simple-scene-with-library')
+
+  // install libs
+  executeStep('npm install --quiet --no-progress -B ' + JSON.stringify(ecsLibCwd), sceneCwd)
+  executeStep('npm install --quiet --no-progress -B ' + JSON.stringify(rollupLibCwd), sceneCwd)
+  // install rest of dependencies, if any
+  executeStep('npm install --quiet --no-progress', sceneCwd)
+
+  describe('build-ecs: build scene with library DEBUG mode', () => {
+    rmFolder('./bin', sceneCwd)
+
+    executeStep('npm run --quiet build', sceneCwd)
 
     it('ensure files exist', () => {
       ensureFileExists(sceneCwd, 'bin/game.js')
@@ -50,24 +63,15 @@ describe('build-ecs: build lib', () => {
         ($: { path: string }) => $.path
       )
       expect(lib).toContain('../dcl-test-lib-integration/bin/lib.js')
+      expect(lib).toContain('../rollup-lib-integration/dist/index.js')
+      expect(lib).toContain('node_modules/eth-connect/eth-connect.js')
     })
   })
 
-
   describe('build-ecs: build scene with library, production mode', () => {
-    const sceneCwd = resolve(__dirname, './fixtures/simple-scene-with-library')
+    rmFolder('./bin', sceneCwd)
 
-    it('clean the folder', () => {
-      rimraf(resolve(sceneCwd, './bin'))
-    })
-
-    it('npm link dcl-test-lib-integration', async function () {
-      await execute('npm link dcl-test-lib-integration', sceneCwd)
-    })
-
-    it('npm run build-prod', async function () {
-      await execute('npm run build-prod', sceneCwd)
-    }, 60000)
+    executeStep('npm run build-prod', sceneCwd)
 
     it('ensure files exist', () => {
       ensureFileExists(sceneCwd, 'bin/game.js')
@@ -79,6 +83,7 @@ describe('build-ecs: build lib', () => {
         ($: { path: string }) => $.path
       )
       expect(lib).toContain('../dcl-test-lib-integration/bin/lib.min.js')
+      expect(lib).toContain('../rollup-lib-integration/dist/index.min.js')
     })
   })
 })

@@ -27,9 +27,9 @@
     "type": "git",
     "url": "git+https://github.com/decentraland/js-sdk-toolchain.git"
   },
+  "license": "Apache-2.0",
   "keywords": [],
   "author": "",
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/decentraland/js-sdk-toolchain/issues"
   },

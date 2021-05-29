@@ -1,6 +1,11 @@
 {
-  "name": "dcl-project",
+  "name": "simple-scene",
   "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decentraland/js-sdk-toolchain.git"
+  },
+  "license": "Apache-2.0",
   "description": "My new Decentraland project",
   "scripts": {
     "start": "dcl start",

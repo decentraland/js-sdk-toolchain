@@ -4,16 +4,13 @@ LOCAL_ARG = --local --verbose --diagnostics
 endif
 
 install:
-	@npm i
-	@cd packages/build-ecs; npm i
-	@cd packages/decentraland-amd; npm i
-	@cd test/build-ecs/fixtures/simple-scene; npm ci
-	@cd test/build-ecs/fixtures/dcl-test-lib-integration; npm ci
-	@cd test/build-ecs/fixtures/simple-scene-with-library; npm ci
+	npm i
+	cd packages/build-ecs; npm ci
+	cd packages/decentraland-amd; npm ci
+	cd packages/decentraland-ecs; npm ci
 
 test: build
 	node_modules/.bin/jest --forceExit --detectOpenHandles --coverage --verbose
-	@cd test/rollup-lib-integration; npm run build
 
 test-watch: build
 	node_modules/.bin/jest --forceExit --detectOpenHandles --coverage --verbose --watch

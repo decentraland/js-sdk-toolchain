@@ -8,6 +8,9 @@
       ],
       "dcl-test-lib-integration": [
         "../dcl-test-lib-integration/bin/lib.d.ts"
+      ],
+      "rollup-demo-decentraland-lib": [
+        "../rollup-lib-integration/dist/index.d.ts"
       ]
     },
     "baseUrl": "."

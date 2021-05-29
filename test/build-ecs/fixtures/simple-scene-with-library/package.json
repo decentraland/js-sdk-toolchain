@@ -1,7 +1,12 @@
 {
-  "name": "dcl-project",
+  "name": "simple-scene-with-library",
   "version": "1.0.0",
   "description": "My new Decentraland project",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decentraland/js-sdk-toolchain.git"
+  },
+  "license": "Apache-2.0",
   "scripts": {
     "start": "dcl start",
     "build": "../../../../packages/build-ecs/index.js",
@@ -9,14 +14,16 @@
     "watch": "../../../../packages/build-ecs/index.js --watch"
   },
   "devDependencies": {
-    "decentraland-ecs": "latest",
-    "dcl-test-lib-integration": "linked"
+    "dcl-test-lib-integration": "file:../dcl-test-lib-integration",
+    "decentraland-ecs": "latest"
   },
   "dependencies": {
-    "eth-connect": "^6.0.0"
+    "eth-connect": "^6.0.0",
+    "rollup-demo-decentraland-lib": "file:../rollup-lib-integration"
   },
   "bundleDependencies": [
     "eth-connect",
-    "dcl-test-lib-integration"
+    "dcl-test-lib-integration",
+    "rollup-demo-decentraland-lib"
   ]
 }
