@@ -30,11 +30,6 @@ import { DisposableComponent } from './ecs/Component'
 DisposableComponent.engine = engine
 
 // Initialize Decentraland interface
-/** @internal */
-import { DecentralandInterface } from './decentraland/Types'
-
-/** @internal */
-declare let dcl: DecentralandInterface | void
 if (typeof dcl !== 'undefined') {
   engine.addSystem(new DecentralandSynchronizationSystem(dcl), Infinity)
   _initEventObservables(dcl)

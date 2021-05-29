@@ -527,15 +527,12 @@ export class Quaternion {
     this.w = result.w
   }
 
-  /**
-   * Sets the euler angle representation of the rotation.
-   */
   public set eulerAngles(euler: Vector3) {
     this.setEuler(euler.x, euler.y, euler.z)
   }
 
   /**
-   * Gets the euler angle representation of the rotation.
+   * Gets or sets the euler angle representation of the rotation.
    * Implemented unity-based calculations from: https://stackoverflow.com/a/56055813
    */
   public get eulerAngles() {

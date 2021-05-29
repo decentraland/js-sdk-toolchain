@@ -181,9 +181,9 @@ export declare class Arc2 {
      */
     constructor(
     /** Defines the start point of the arc */
-    startPoint: Vector2, 
+    startPoint: Vector2,
     /** Defines the mid point of the arc */
-    midPoint: Vector2, 
+    midPoint: Vector2,
     /** Defines the end point of the arc */
     endPoint: Vector2);
 }
@@ -462,11 +462,11 @@ export declare class Color3 {
     /**
      * Defines the red component (between 0 and 1, default is 0)
      */
-    r?: number, 
+    r?: number,
     /**
      * Defines the green component (between 0 and 1, default is 0)
      */
-    g?: number, 
+    g?: number,
     /**
      * Defines the blue component (between 0 and 1, default is 0)
      */
@@ -778,15 +778,15 @@ export declare class Color4 {
     /**
      * Defines the red component (between 0 and 1, default is 0)
      */
-    r?: number, 
+    r?: number,
     /**
      * Defines the green component (between 0 and 1, default is 0)
      */
-    g?: number, 
+    g?: number,
     /**
      * Defines the blue component (between 0 and 1, default is 0)
      */
-    b?: number, 
+    b?: number,
     /**
      * Defines the alpha component (between 0 and 1, default is 1)
      */
@@ -1259,10 +1259,14 @@ export declare type DecentralandInterface = {
     log(...a: any[]): void;
     /** error function */
     error(message: string, data?: any): void;
+
     /** open external url */
+    // TODO: remove from here
     openExternalUrl(url: string): void;
     /** open nft info dialog */
+    // TODO: remove from here
     openNFTDialog(assetContractAddress: string, tokenId: string, comment: string | null): void;
+
     /** update tick */
     onUpdate(cb: (deltaTime: number) => void): void;
     /** called when it is time to wake the sandbox */
@@ -3189,11 +3193,11 @@ export declare class Observer<T> {
     /**
      * Defines the callback to call when the observer is notified
      */
-    callback: (eventData: T, eventState: ObserverEventState) => void, 
+    callback: (eventData: T, eventState: ObserverEventState) => void,
     /**
      * Defines the mask of the observer (used to filter notifications)
      */
-    mask: number, 
+    mask: number,
     /**
      * Defines the current scope used to restore the JS context
      */
@@ -3829,11 +3833,11 @@ export declare class Quaternion {
      */
     constructor(
     /** defines the first component (0 by default) */
-    x?: number, 
+    x?: number,
     /** defines the second component (0 by default) */
-    y?: number, 
+    y?: number,
     /** defines the third component (0 by default) */
-    z?: number, 
+    z?: number,
     /** defines the fourth component (1.0 by default) */
     w?: number);
     /**
@@ -5031,7 +5035,7 @@ export declare class Vector2 {
      */
     constructor(
     /** defines the first coordinate */
-    x?: number, 
+    x?: number,
     /** defines the second coordinate */
     y?: number);
     /**
@@ -5428,11 +5432,11 @@ export declare class Vector3 {
     /**
      * Defines the first coordinates (on X axis)
      */
-    x?: number, 
+    x?: number,
     /**
      * Defines the second coordinates (on Y axis)
      */
-    y?: number, 
+    y?: number,
     /**
      * Defines the third coordinates (on Z axis)
      */
@@ -6083,11 +6087,11 @@ export declare class Vector4 {
      */
     constructor(
     /** x value of the vector */
-    x: number, 
+    x: number,
     /** y value of the vector */
-    y: number, 
+    y: number,
     /** z value of the vector */
-    z: number, 
+    z: number,
     /** w value of the vector */
     w: number);
     /**

@@ -17,14 +17,25 @@ jobs:
           node-version: 14.x
       - name: install
         run:  make install
+      - name: update version of packages/@dcl/rollup-config
+        uses: menduz/oddish-action@staging
+        with:
+          cwd: packages/@dcl/rollup-config
+          deterministic-snapshot: true
+          only-update-versions: true
+      - name: update version of packages/build-ecs
+        uses: menduz/oddish-action@staging
+        with:
+          cwd: packages/build-ecs
+          deterministic-snapshot: true
+          only-update-versions: true
+      - name: update version of packages/decentraland-amd
+        uses: menduz/oddish-action@staging
+        with:
+          cwd: packages/decentraland-amd
+          deterministic-snapshot: true
+          only-update-versions: true
       - name: build
         run:  make build
       - name: test
         run:  make test
-      # - name: Publish
-      #   uses: menduz/oddish-action@master
-      #   with:
-      #     registry-url: "https://registry.npmjs.org"
-      #     access: public
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}

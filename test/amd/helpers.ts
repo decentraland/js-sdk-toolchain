@@ -1,4 +1,4 @@
-/// <reference path="../../packages/decentraland-amd/types.d.ts" />
+/// <reference path="../../packages/decentraland-ecs/node_modules/@dcl/posix/index.d.ts" />
 
 import { IFuture } from 'fp-future'
 import { readFileSync } from 'fs'
@@ -18,7 +18,7 @@ const getGlobalThis = function () {
 }
 
 const globalObject: {
-  dcl: PartialDecentralandInterface
+  dcl: Pick<DecentralandInterface, "loadModule" | "callRpc" | "onStart">
   define: Function & { modules: any }
   onerror: CallableFunction
 } = (getGlobalThis as any)()
@@ -31,7 +31,7 @@ export type ModulesMock = Record<string, () => Promise<any>>
 
 export function mockEnvironment(modules: ModulesMock) {
   const starters: CallableFunction[] = []
-  const loadedModuleDescriptors = new Map<string, DclModuleDescriptor>()
+  const loadedModuleDescriptors = new Map<string, ModuleDescriptor>()
   const loadedModulesByHandle = new Map<string, any>()
 
   const errors: string[] = []
@@ -65,7 +65,7 @@ export function mockEnvironment(modules: ModulesMock) {
           const rpcHandle = getModuleHandle(moduleName)
           const moduleInstance = await modules[moduleName]()
 
-          const ret: DclModuleDescriptor = {
+          const ret: ModuleDescriptor = {
             rpcHandle,
             methods: Object.keys(moduleInstance)
               .filter((key) => typeof moduleInstance[key] == 'function')

@@ -1,7 +1,6 @@
 let lastGeneratedId = 0
 
 declare var console: any
-declare var dcl: any
 
 /**
  * Log function. Only works in debug mode, otherwise it does nothing.
@@ -25,7 +24,7 @@ export function log(...args: any[]) {
  */
 export function error(error: string | Error, data?: any) {
   if (typeof dcl !== 'undefined') {
-    dcl.error(error, data)
+    dcl.error(error as any, data)
   } else {
     // tslint:disable-next-line:no-console
     console.error('ERROR:', error, data)
@@ -34,7 +33,7 @@ export function error(error: string | Error, data?: any) {
 
 /**
  * Generates a new prefixed id
- * @beta
+ * @public
  */
 export function newId(type: string) {
   lastGeneratedId++
@@ -68,6 +67,9 @@ export function buildArray<T>(size: number, itemBuilder: () => T): Array<T> {
   return a
 }
 
+/**
+ * @public
+ */
 export function openExternalURL(url: string) {
   if (typeof dcl !== 'undefined') {
     dcl.openExternalUrl(url)
@@ -80,6 +82,7 @@ export function openExternalURL(url: string) {
  * Popup NFT info dialog
  * @param scr - 'ethereum://contractAddress/tokenID'
  * @param comment - optional. add a comment.
+ * @public
  */
 export function openNFTDialog(scr: string, comment: string | null = null) {
   if (typeof dcl !== 'undefined') {

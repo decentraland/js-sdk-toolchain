@@ -2,8 +2,6 @@ import { ReadOnlyVector3, Vector3, Matrix } from './math'
 import { RaycastResponse } from './Events'
 import { uuid, log } from '../ecs/helpers'
 
-/** @internal */
-import { DecentralandInterface } from './Types'
 import { Camera } from './Camera'
 
 /**
@@ -104,9 +102,6 @@ export interface IPhysicsCast {
   hitAllAvatars(ray: Ray, hitCallback: (event: RaycastHitAvatars) => void): void
 }
 
-/** @internal */
-declare let dcl: DecentralandInterface | void
-
 /**
  * @public
  */
@@ -160,7 +155,9 @@ export class PhysicsCast implements IPhysicsCast {
 
     this.queries[queryId] = hitCallback as (event: RaycastHit) => void
 
-    dcl && dcl.query('raycast', { queryId, queryType: 'HitFirst', ray })
+    if (typeof dcl != 'undefined') {
+      dcl.query('raycast', { queryId, queryType: 'HitFirst', ray })
+    }
   }
 
   public hitAll(ray: Ray, hitCallback: (event: RaycastHitEntities) => void, id?: number) {
@@ -168,7 +165,9 @@ export class PhysicsCast implements IPhysicsCast {
 
     this.queries[queryId] = hitCallback as (event: RaycastHit) => void
 
-    dcl && dcl.query('raycast', { queryId, queryType: 'HitAll', ray })
+    if (typeof dcl != 'undefined') {
+      dcl.query('raycast', { queryId, queryType: 'HitAll', ray })
+    }
   }
 
   public hitFirstAvatar(ray: Ray, hitCallback: (event: RaycastHitAvatar) => void) {

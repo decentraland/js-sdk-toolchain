@@ -1,8 +1,5 @@
-import { DecentralandInterface, ModuleDescriptor, IEvents } from './Types'
 import { Observable, Observer } from '../ecs/Observable'
 import { error } from '../ecs/helpers'
-
-declare const dcl: DecentralandInterface
 
 let communicationsController: ModuleDescriptor | null = null
 let communicationsControllerPromise: PromiseLike<ModuleDescriptor> | null = null
@@ -21,7 +18,7 @@ export function getMessageObserver() {
 
 function ensureCommunicationsController() {
   if (!communicationsControllerPromise) {
-    communicationsControllerPromise = dcl.loadModule('@decentraland/CommunicationsController')
+    communicationsControllerPromise = dcl.loadModule('@decentraland/CommunicationsController', {})
 
     communicationsControllerPromise.then($ => {
       communicationsController = $

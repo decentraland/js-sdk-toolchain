@@ -1,7 +1,6 @@
 // tslint:disable:ter-indent
-// tslint:disable:ter-indent
 
-import { GlobalInputEventResult, InputEventType } from './Types'
+import { InputEventType } from './Types'
 import { Vector3 } from './math'
 import { Component, DisposableComponent } from '../ecs/Component'
 
@@ -63,7 +62,10 @@ export class GlobalPointerDown extends PointerEventComponent {}
 @Component('pointerUp')
 export class GlobalPointerUp extends PointerEventComponent {}
 
-class Subscription {
+/**
+ * @public
+ */
+export class Subscription {
   public fn: (e: LocalActionButtonEvent) => void
   public useRaycast: boolean
 
@@ -84,6 +86,7 @@ export class Input {
     return Input._instance
   }
 
+  // @internal
   private subscriptions: Record<ActionButton, Record<InputEventKind, Array<Subscription>>> = {
     [ActionButton.POINTER]: {
       BUTTON_DOWN: [],
@@ -150,9 +153,11 @@ export class Input {
     buttonId: ActionButton,
     useRaycast: boolean,
     fn: (e: LocalActionButtonEvent) => void
-  ) {
+  ): () => void {
     this.subscriptions[buttonId][eventName].push(new Subscription(fn, useRaycast))
-    return () => this.unsubscribe(eventName, buttonId, fn)
+    return () => {
+      this.unsubscribe(eventName, buttonId, fn)
+    }
   }
 
   /**
@@ -174,7 +179,7 @@ export class Input {
 
     let eventResult: LocalActionButtonEvent = {
       ...data,
-      button: button,
+      button,
       direction: new Vector3().copyFrom(data.direction),
       origin: new Vector3().copyFrom(data.origin),
       hit: undefined

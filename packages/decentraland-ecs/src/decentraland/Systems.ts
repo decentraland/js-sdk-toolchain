@@ -1,12 +1,9 @@
 import { Engine } from '../ecs/Engine'
 import { UUIDEvent, PointerEvent, RaycastResponse } from './Events'
-import { DecentralandInterface, GlobalInputEventResult } from './Types'
 import { OnUUIDEvent } from './Components'
 import { ISystem, ComponentAdded, ComponentRemoved, IEntity } from '../ecs/IEntity'
 import { Input } from './Input'
 import { PhysicsCast, RaycastHitEntity, RaycastHitEntities } from './PhysicsCast'
-
-declare var dcl: DecentralandInterface | void
 
 /**
  * @public

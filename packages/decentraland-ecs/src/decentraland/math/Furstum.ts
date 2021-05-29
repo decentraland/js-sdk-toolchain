@@ -4,7 +4,7 @@ import { Plane } from './Plane'
 
 /**
  * Reprasents a camera frustum
- * @beta
+ * @public
  */
 export class Frustum {
   /**

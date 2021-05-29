@@ -1,6 +1,6 @@
 import { EventConstructor } from '../ecs/EventManager'
 import { Observable } from '../ecs/Observable'
-import { DecentralandInterface, IEvents, RaycastResponsePayload, CameraMode } from './Types'
+import { CameraMode } from './Types'
 export { CameraMode }
 
 /**
@@ -62,7 +62,7 @@ export const onIdleStateChangedObservable = new Observable<IEvents['idleStateCha
  */
 export const onEnterSceneObservable = new Observable<IEvents['onEnterScene']>(createSubscriber('onEnterScene'))
 
-/* @deprecated Use onEnterSceneObservable instead. */
+/** @public @deprecated Use onEnterSceneObservable instead. */
 export const onEnterScene = onEnterSceneObservable
 
 /**
@@ -71,7 +71,7 @@ export const onEnterScene = onEnterSceneObservable
  */
 export const onLeaveSceneObservable = new Observable<IEvents['onLeaveScene']>(createSubscriber('onLeaveScene'))
 
-/* @deprecated Use onLeaveSceneObservable instead. */
+/** @public @deprecated Use onLeaveSceneObservable instead. */
 export const onLeaveScene = onLeaveSceneObservable
 
 /**

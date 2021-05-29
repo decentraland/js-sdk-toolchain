@@ -2,7 +2,6 @@ import { Component, ObservableComponent, DisposableComponent, getComponentId } f
 import { Vector3, Quaternion, Matrix, MathTmp, Color3, Color4 } from './math'
 import { AnimationState } from './AnimationState'
 import { newId } from '../ecs/helpers'
-import { IEvents } from './Types'
 import { ActionButton } from './Input'
 
 /** @public */
@@ -75,11 +74,13 @@ export enum CLASS_ID {
   VISIBLE_ON_EDIT = 302
 }
 
+/** @public */
 export enum AvatarModifiers {
   HIDE_AVATARS = 'HIDE_AVATARS',
   DISABLE_PASSPORTS = 'DISABLE_PASSPORTS'
 }
 
+/** @public */
 export type Area = { box: Vector3 }
 
 /**
@@ -379,30 +380,31 @@ export class GLTFShape extends Shape {
   }
 }
 
+/** @public */
 export enum PictureFrameStyle {
-  Classic = 0,
-  Baroque_Ornament,
-  Diamond_Ornament,
-  Minimal_Wide,
-  Minimal_Grey,
-  Blocky,
-  Gold_Edges,
-  Gold_Carved,
-  Gold_Wide,
-  Gold_Rounded,
-  Metal_Medium,
-  Metal_Wide,
-  Metal_Slim,
-  Metal_Rounded,
-  Pins,
-  Minimal_Black,
-  Minimal_White,
-  Tape,
-  Wood_Slim,
-  Wood_Wide,
-  Wood_Twigs,
-  Canvas,
-  None
+  CLASSIC = 0,
+  BAROQUE_ORNAMENT,
+  DIAMOND_ORNAMENT,
+  MINIMAL_WIDE,
+  MINIMAL_GREY,
+  BLOCKY,
+  GOLD_EDGES,
+  GOLD_CARVED,
+  GOLD_WIDE,
+  GOLD_ROUNDED,
+  METAL_MEDIUM,
+  METAL_WIDE,
+  METAL_SLIM,
+  METAL_ROUNDED,
+  PINS,
+  MINIMAL_BLACK,
+  MINIMAL_WHITE,
+  TAPE,
+  WOOD_SLIM,
+  WOOD_WIDE,
+  WOOD_TWIGS,
+  CANVAS,
+  NONE
 }
 
 /** @public */
@@ -433,10 +435,10 @@ export class NFTShape extends Shape {
     this.src = src
 
     let color = new Color3(0.6404918, 0.611472, 0.8584906)
-    let style = PictureFrameStyle.Classic
+    let style = PictureFrameStyle.CLASSIC
 
     // check if args is color (backwards compatibility)
-    if (args instanceof Color3) {
+    if ('r' in args) {
       color = args
     } else if (args != null) {
       if (args.color) color = args.color
@@ -610,6 +612,7 @@ export class Font extends ObservableComponent {
   }
 }
 
+/** @alpha */
 export enum Fonts {
   SanFrancisco = 'builtin:SF-UI-Text-Regular SDF',
   SanFrancisco_Heavy = 'builtin:SF-UI-Text-Heavy SDF',

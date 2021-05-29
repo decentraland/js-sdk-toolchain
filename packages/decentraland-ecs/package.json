@@ -25,7 +25,9 @@
     "docs-yaml",
     "artifacts"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "@dcl/posix": "^1.0.0-20210529225319.commit-9bde839"
+  },
   "devDependencies": {
     "@dcl/unity-renderer": "latest"
   },

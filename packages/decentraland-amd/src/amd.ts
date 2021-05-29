@@ -1,3 +1,6 @@
+/// <reference path="../../decentraland-ecs/node_modules/@dcl/posix/index.d.ts" />
+
+
 type Module = {
   name: string
   dclamd: 1 | 2
@@ -10,7 +13,6 @@ type Module = {
 
 type ModuleLoadedHandler = (module: Module) => void
 
-declare var dcl: PartialDecentralandInterface
 declare var onerror: ((err: Error) => void) | undefined
 
 // A naive attempt at getting the global `this`. Don’t use `this`!
@@ -322,7 +324,7 @@ namespace loader {
     }
   }
 
-  function createMethodHandler(rpcHandle: string, method: DclMethodDescriptor) {
+  function createMethodHandler(rpcHandle: string, method: MethodDescriptor) {
     return function () {
       return dcl.callRpc(rpcHandle, method.name, anonymousQueue.slice.call(arguments, 0))
     }
@@ -361,7 +363,7 @@ namespace loader {
       if (typeof dcl.loadModule === 'function') {
         dcl
           .loadModule(moduleName, exports)
-          .then((descriptor: DclModuleDescriptor) => {
+          .then((descriptor: ModuleDescriptor) => {
             for (let i in descriptor.methods) {
               const method = descriptor.methods[i]
               exports[method.name] = createMethodHandler(descriptor.rpcHandle, method)

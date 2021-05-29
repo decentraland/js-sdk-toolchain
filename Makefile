@@ -18,16 +18,16 @@ test-watch: build
 
 build:
 	@echo "> Building: build-ecs..."
-	@cd packages/build-ecs; ../../node_modules/.bin/tsc -p tsconfig.json
+	@cd packages/build-ecs; $(PWD)/node_modules/.bin/tsc -p tsconfig.json
 
 	@echo "> Building: decentraland-amd..."
-	@cd packages/decentraland-amd; ../../node_modules/.bin/tsc -p tsconfig.json && ../../node_modules/.bin/terser --mangle --comments some --source-map -o dist/amd.min.js dist/amd.js
+	@cd packages/decentraland-amd; $(PWD)/node_modules/.bin/tsc -p tsconfig.json && $(PWD)/packages/@dcl/rollup-config/node_modules/.bin/terser --mangle --comments some --source-map -o dist/amd.min.js dist/amd.js
 
 	@echo "> Building: @dcl/rollup-config..."
 	cd packages/@dcl/rollup-config; npm run build
 
 	@echo "> Building: decentraland-ecs..."
-	cd packages/decentraland-ecs; ../@dcl/rollup-config/node_modules/.bin/rollup -c ../@dcl/rollup-config/ecs.config.js
+	cd packages/decentraland-ecs; $(PWD)/packages/@dcl/rollup-config/node_modules/.bin/rollup -c $(PWD)/packages/@dcl/rollup-config/ecs.config.js
 	rm -rf packages/decentraland-ecs/artifacts || true
 	mkdir packages/decentraland-ecs/artifacts
 	cp packages/build-ecs/index.js packages/decentraland-ecs/artifacts/build-ecs.js

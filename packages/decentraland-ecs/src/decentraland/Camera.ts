@@ -1,7 +1,5 @@
 import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from './math'
-import { DecentralandInterface, IEvents, CameraMode } from './Types'
-
-declare let dcl: DecentralandInterface | void
+import { CameraMode } from './Types'
 
 /**
  * @public

@@ -11,7 +11,6 @@ import { Engine } from '../ecs/Engine'
 import { ComponentAdded, ComponentRemoved, IEntity, ISystem, ParentChanged } from '../ecs/IEntity'
 import { PointerEvent, RaycastResponse, UUIDEvent } from './Events'
 import { RaycastHitEntities, RaycastHitEntity } from './PhysicsCast'
-import { DecentralandInterface } from './Types'
 
 // This number is defined in the protocol ECS.SetEntityParent.3
 const ROOT_ENTITY_ID = '0'

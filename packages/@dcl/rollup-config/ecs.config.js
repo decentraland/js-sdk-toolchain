@@ -15,6 +15,7 @@ const packageJson = JSON.parse(typescript_1.sys.readFile(packageJsonPath));
 console.assert(packageJson.name, 'package.json .name must be present');
 console.assert(packageJson.main, 'package.json .main must be present');
 console.assert(packageJson.typings, 'package.json .typings must be present');
+console.assert(packageJson.decentralandLibrary, 'package.json .decentralandLibrary must be present');
 const plugins = [
     rollup_plugin_typescript2_1.default({
         verbosity: 2,
