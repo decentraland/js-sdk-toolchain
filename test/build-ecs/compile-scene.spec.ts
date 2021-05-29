@@ -2,11 +2,14 @@ import { resolve } from 'path'
 import { readFileSync } from 'fs'
 import { executeStep, ensureFileExists, rmFolder } from '../helpers'
 
+const ecsLocation = resolve(__dirname, '../../packages/decentraland-ecs')
+
 describe('build-ecs: simple scene compilation', () => {
   const cwd = resolve(__dirname, './fixtures/simple-scene')
 
   rmFolder('./bin', cwd)
 
+  executeStep('npm install --quiet --no-progress ' + ecsLocation, cwd)
   executeStep('npm install --quiet --no-progress', cwd)
   executeStep('npm run --quiet build', cwd)
 
