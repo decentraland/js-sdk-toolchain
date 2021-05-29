@@ -4,7 +4,7 @@ let modulePromise: any
 
 /**
  * teleport player to a destination
- * @param destination "coordX,coordY", "magic", "crowd"
+ * @param destination - "coordX,coordY", "magic", "crowd"
  */
 export function teleportTo(destination: string) {
   callModuleRpc('requestTeleport', [destination])

@@ -1,0 +1,10 @@
+{
+  "name": "rollup-demo-decentraland-lib",
+  "version": "1.0.0",
+  "description": "My new Decentraland project",
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "scripts": {
+    "build": "../../packages/@dcl/rollup-config/node_modules/.bin/rollup -c ../../packages/@dcl/rollup-config/libs.config.js"
+  }
+}

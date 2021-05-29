@@ -1,0 +1,25 @@
+{
+  "name": "@dcl/rollup-config",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [],
+  "author": "",
+  "bin": "index.js",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@microsoft/api-extractor": "^7.15.2",
+    "@rollup/plugin-node-resolve": "^13.0.0",
+    "glob": "^7.1.7",
+    "rollup": "^2.50.3",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "typescript": "^4.3.2"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "include": ["src"],
+	"compilerOptions": {
+	  "module": "ESNext"
+	},
+  "extends": "../../packages/decentraland-ecs/types/tsconfig.strict.json",
+  "compileOnSave": false
+}

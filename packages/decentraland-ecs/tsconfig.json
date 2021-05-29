@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
+    "target": "ES5",
+    "module": "ESNext",
     "strict": true,
     "declarationDir": "dist",
     "outDir": "dist",
@@ -10,7 +10,7 @@
     "inlineSources": true,
     "declaration": true,
     "stripInternal": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "pretty": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
@@ -19,12 +19,7 @@
     "downlevelIteration": true,
     "keyofStringsOnly": true,
     "noUnusedLocals": true,
-    "baseUrl": ".",
-    "plugins": [
-      {
-        "name": "tslint-language-service"
-      }
-    ]
+    "baseUrl": "."
   },
   "include": [
     "./src"

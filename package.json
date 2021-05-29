@@ -9,6 +9,7 @@
   "dependencies": {
     "@types/jest": "^26.0.23",
     "@types/rimraf": "^3.0.0",
+    "estrella": "^1.4.1",
     "fp-future": "^1.0.1",
     "jest": "^27.0.1",
     "rimraf": "^3.0.2",
@@ -16,7 +17,9 @@
     "ts-jest": "^27.0.1",
     "typescript": "^4.3.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "tslib": "^2.2.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -30,5 +33,8 @@
   "bugs": {
     "url": "https://github.com/decentraland/js-sdk-toolchain/issues"
   },
-  "homepage": "https://github.com/decentraland/js-sdk-toolchain#readme"
+  "homepage": "https://github.com/decentraland/js-sdk-toolchain#readme",
+  "bundleDependencies": [
+    "tslib"
+  ]
 }

@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "pretty": true,
+    "types": [
+      "node"
+    ],
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "esModuleInterop": true,
+    "strictPropertyInitialization": true,
+    "alwaysStrict": true
+  },
+  "includes": "*.ts"
+}

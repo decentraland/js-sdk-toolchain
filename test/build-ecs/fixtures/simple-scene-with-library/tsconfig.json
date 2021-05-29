@@ -15,6 +15,6 @@
   "include": [
     "*.ts"
   ],
-  "extends": "./node_modules/decentraland-ecs/types/tsconfig.json",
+  "extends": "../../../../packages/decentraland-ecs/types/tsconfig.json",
   "compileOnSave": false
 }

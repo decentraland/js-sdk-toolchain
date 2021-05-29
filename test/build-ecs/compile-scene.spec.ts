@@ -20,7 +20,7 @@ export async function execute(command: string, cwd: string): Promise<string> {
     console.log(`> ${command}`)
     exec(command, { cwd }, (error, stdout, stderr) => {
       stdout.trim().length && console.log('  ' + stdout.replace(/\n/g, '\n  '))
-      stderr.trim().length && console.error('! ' + stderr.replace(/\n/g, '\n  '))
+      stderr.trim().length && console.log('! ' + stderr.replace(/\n/g, '\n  '))
 
       if (error) {
         onError(stderr)

@@ -46,7 +46,7 @@ export function newId(type: string) {
  * @internal
  */
 export function uuid() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     let r = (Math.random() * 16) | 0
     let v = c === 'x' ? r : (r & 0x3) | 0x8
     return v.toString(16)
@@ -72,15 +72,14 @@ export function openExternalURL(url: string) {
   if (typeof dcl !== 'undefined') {
     dcl.openExternalUrl(url)
   } else {
-    // tslint:disable-next-line:no-console
-    console.error('ERROR: openExternalURL dcl is undefined')
+    error('ERROR: openExternalURL dcl is undefined')
   }
 }
 
 /**
  * Popup NFT info dialog
- * @param scr 'ethereum://contractAddress/tokenID'
- * @param comment optional. add a comment.
+ * @param scr - 'ethereum://contractAddress/tokenID'
+ * @param comment - optional. add a comment.
  */
 export function openNFTDialog(scr: string, comment: string | null = null) {
   if (typeof dcl !== 'undefined') {
@@ -93,7 +92,6 @@ export function openNFTDialog(scr: string, comment: string | null = null) {
 
     dcl.openNFTDialog(matches[1], matches[2], comment)
   } else {
-    // tslint:disable-next-line:no-console
-    console.error('ERROR: openNFTDialog dcl is undefined')
+    error('ERROR: openNFTDialog dcl is undefined')
   }
 }
