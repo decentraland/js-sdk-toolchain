@@ -10,15 +10,15 @@ install:
 	cd packages/@dcl/amd; npm ci
 
 test:
-	node_modules/.bin/jest --forceExit --detectOpenHandles --colors --coverage --verbose --roots "test"
+	node_modules/.bin/jest --detectOpenHandles --colors --roots "test"
 
 test-watch:
-	node_modules/.bin/jest --forceExit --detectOpenHandles --colors --coverage --verbose --watch --roots "test"
+	node_modules/.bin/jest --detectOpenHandles --colors --watch --roots "test"
 
 build:
-	node_modules/.bin/jest --forceExit --detectOpenHandles --colors --verbose --runInBand --runTestsByPath scripts/build.spec.ts
+	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/build.spec.ts
 
 release:
-	node_modules/.bin/jest --forceExit --detectOpenHandles --colors --verbose --runInBand --runTestsByPath scripts/prepare.spec.ts
+	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/prepare.spec.ts
 
 .PHONY: build test install

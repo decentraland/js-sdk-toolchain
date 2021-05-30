@@ -22,8 +22,8 @@ export function executeStep(command: string, cwd: string, env?: Record<string, s
     async () => {
       await new Promise<string>((onSuccess, onError) => {
         exec(command, { cwd, env }, (error, stdout, stderr) => {
-          stdout.trim().length && console.log('  ' + stdout.replace(/\n/g, '\n  '))
-          stderr.trim().length && console.log('! ' + stderr.replace(/\n/g, '\n  '))
+          stdout.trim().length && process.stdout.write('  ' + stdout.replace(/\n/g, '\n  ') + '\n')
+          stderr.trim().length && process.stderr.write('! ' + stderr.replace(/\n/g, '\n  ') + '\n')
 
           if (error) {
             onError(stderr)
