@@ -6,3 +6,4 @@ coverage
 **/.DS_Store
 test/build-ecs/fixtures/*/bin
 test/rollup-lib-integration/dist
+packages/**/*.js
