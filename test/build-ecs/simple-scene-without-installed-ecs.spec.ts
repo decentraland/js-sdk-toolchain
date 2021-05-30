@@ -17,8 +17,8 @@ describe('simple-scene-without-installed-ecs: build a scene with env vars', () =
   })
 
   it('ensure files exist', () => {
-    ensureFileExists(cwd, 'bin/game.js')
-    ensureFileExists(cwd, 'bin/game.js.lib')
+    ensureFileExists( 'bin/game.js',cwd)
+    ensureFileExists( 'bin/game.js.lib',cwd)
   })
 
   it('ensure it uses not minified versions in .lib', () => {

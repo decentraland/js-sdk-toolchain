@@ -20,8 +20,8 @@ function testLegacyEcsFlow(version: string) {
     executeStep('npm run --quiet build', cwd)
 
     it('ensure generated files exist', () => {
-      ensureFileExists(cwd, 'bin/game.js')
-      ensureFileExists(cwd, 'bin/game.js.lib')
+      ensureFileExists('bin/game.js', cwd)
+      ensureFileExists('bin/game.js.lib', cwd)
     })
 
     it('ensure it uses not minified versions in .lib', () => {

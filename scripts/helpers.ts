@@ -6,7 +6,7 @@ import { sync as rimraf } from 'rimraf'
 /**
  * @returns the resolved absolute path
  */
-export function ensureFileExists(root: string, file: string) {
+export function ensureFileExists(file: string,root: string) {
   const x = resolve(root, file.replace(/^\//, ''))
 
   if (!existsSync(x)) {

@@ -15,6 +15,12 @@ export const ROLLUP_CONFIG_PATH = resolve('packages/@dcl/dcl-rollup')
 export const ECS_PATH = resolve('packages/decentraland-ecs')
 
 export function commonChecks() {
+  test('tooling is installed', () => {
+    ensureFileExists(TSC, '')
+    ensureFileExists(TERSER, '')
+    ensureFileExists(ROLLUP, '')
+  })
+
   test('@dcl/posix is consistent across projects', () => {
     const ecsVersion = readJson('package.json', ECS_PATH).dependencies['@dcl/posix']
     const amdVersion = readJson('package.json', DECENTRALAND_AMD_PATH).devDependencies['@dcl/posix']

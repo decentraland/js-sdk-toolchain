@@ -12,10 +12,10 @@ function buildEcsBuildLibFlow() {
     executeStep('npm run --quiet build', cwd)
 
     it('ensure files exist', () => {
-      ensureFileExists(cwd, 'bin/lib.js')
-      ensureFileExists(cwd, 'bin/lib.js.lib')
-      ensureFileExists(cwd, 'bin/lib.d.ts')
-      ensureFileExists(cwd, 'bin/lib.min.js')
+      ensureFileExists('bin/lib.js', cwd)
+      ensureFileExists('bin/lib.js.lib', cwd)
+      ensureFileExists('bin/lib.d.ts', cwd)
+      ensureFileExists('bin/lib.min.js', cwd)
     })
   })
   return { cwd }
@@ -29,10 +29,10 @@ function rollupBuildLibFlow() {
     executeStep('npm run --quiet build', cwd)
 
     it('ensure files exist', () => {
-      ensureFileExists(cwd, 'dist/index.d.ts')
-      ensureFileExists(cwd, 'dist/index.js')
-      ensureFileExists(cwd, 'dist/index.min.js')
-      ensureFileExists(cwd, 'dist/index.min.js.map')
+      ensureFileExists('dist/index.d.ts', cwd)
+      ensureFileExists('dist/index.js', cwd)
+      ensureFileExists('dist/index.min.js', cwd)
+      ensureFileExists('dist/index.min.js.map', cwd)
     })
   })
   return { cwd }
@@ -56,8 +56,8 @@ describe('integration flow, build libs and build scene using libs', () => {
     executeStep('npm run --quiet build', sceneCwd)
 
     it('ensure files exist', () => {
-      ensureFileExists(sceneCwd, 'bin/game.js')
-      ensureFileExists(sceneCwd, 'bin/game.js.lib')
+      ensureFileExists('bin/game.js', sceneCwd)
+      ensureFileExists('bin/game.js.lib', sceneCwd)
     })
 
     it('ensure it uses NON MINIFIED versions in .lib', () => {
@@ -76,8 +76,8 @@ describe('integration flow, build libs and build scene using libs', () => {
     executeStep('npm run build-prod', sceneCwd)
 
     it('ensure files exist', () => {
-      ensureFileExists(sceneCwd, 'bin/game.js')
-      ensureFileExists(sceneCwd, 'bin/game.js.lib')
+      ensureFileExists('bin/game.js', sceneCwd)
+      ensureFileExists('bin/game.js.lib', sceneCwd)
     })
 
     it('ensure it uses minified versions in .lib', () => {

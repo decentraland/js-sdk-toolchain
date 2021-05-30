@@ -15,8 +15,8 @@ describe('build-ecs: simple scene compilation', () => {
   executeStep('npm run --quiet build', cwd)
 
   it('ensure files exist', () => {
-    ensureFileExists(cwd, 'bin/game.js')
-    ensureFileExists(cwd, 'bin/game.js.lib')
+    ensureFileExists('bin/game.js', cwd)
+    ensureFileExists('bin/game.js.lib', cwd)
   })
 
   it('ensure it uses not minified versions in .lib', () => {
@@ -38,8 +38,8 @@ describe('build-ecs: simple scene compilation, production mode', () => {
   executeStep('npm run --quiet build-prod', cwd)
 
   it('ensure files exist', () => {
-    ensureFileExists(cwd, 'bin/game.js')
-    ensureFileExists(cwd, 'bin/game.js.lib')
+    ensureFileExists('bin/game.js', cwd)
+    ensureFileExists('bin/game.js.lib', cwd)
   })
 
   it('ensure it uses minified versions in .lib', () => {
