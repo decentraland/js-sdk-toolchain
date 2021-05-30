@@ -1,4 +1,3 @@
-import { testSubfolder } from './subfolder/subfoldergame'
 /// --- Set up a system ---
 
 class RotatorSystem {
@@ -50,5 +49,3 @@ cube.addComponent(
     spawnCube(Math.random() * 8 + 1, Math.random() * 8, Math.random() * 8 + 1)
   })
 )
-
-testSubfolder()

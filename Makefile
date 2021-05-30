@@ -5,37 +5,21 @@ endif
 
 install:
 	npm i
-	cd packages/build-ecs; npm ci
-	cd packages/@dcl/rollup-config; npm ci
-	cd packages/decentraland-amd; npm ci
+	cd packages/@dcl/build-ecs; npm ci
+	cd packages/@dcl/dcl-rollup; npm ci
+	cd packages/@dcl/amd; npm ci
 	cd packages/decentraland-ecs; npm ci
 
 test:
-	node_modules/.bin/jest --forceExit --detectOpenHandles --coverage --verbose
+	node_modules/.bin/jest --forceExit --detectOpenHandles --colors --coverage --verbose --roots "test"
 
 test-watch:
-	node_modules/.bin/jest --forceExit --detectOpenHandles --coverage --verbose --watch
+	node_modules/.bin/jest --forceExit --detectOpenHandles --colors --coverage --verbose --watch --roots "test"
 
 build:
-	@echo "::group::Building: build-ecs..."
-	@cd packages/build-ecs; $(PWD)/node_modules/.bin/tsc -p tsconfig.json
-	@chmod +x packages/build-ecs/index.js
-	@echo "::endgroup::"
+	node_modules/.bin/jest --forceExit --detectOpenHandles --colors --verbose --runInBand --runTestsByPath scripts/build.spec.ts
 
-	@echo "::group::Building: decentraland-amd..."
-	@cd packages/decentraland-amd; $(PWD)/node_modules/.bin/tsc -p tsconfig.json && $(PWD)/packages/@dcl/rollup-config/node_modules/.bin/terser --mangle --comments some --source-map -o dist/amd.min.js dist/amd.js
-	@echo "::endgroup::"
+release:
+	node_modules/.bin/jest --forceExit --detectOpenHandles --colors --verbose --runInBand --runTestsByPath scripts/prepare.spec.ts
 
-	@echo "::group::Building: @dcl/rollup-config..."
-	cd packages/@dcl/rollup-config; npm run build
-	@echo "::endgroup::"
-
-	@echo "::group::Building: decentraland-ecs..."
-	cd packages/decentraland-ecs; $(PWD)/packages/@dcl/rollup-config/node_modules/.bin/rollup -c $(PWD)/packages/@dcl/rollup-config/ecs.config.js
-	rm -rf packages/decentraland-ecs/artifacts || true
-	mkdir packages/decentraland-ecs/artifacts
-	cp packages/build-ecs/index.js packages/decentraland-ecs/artifacts/build-ecs.js
-	cp packages/decentraland-amd/dist/* packages/decentraland-ecs/artifacts
-	@echo "::endgroup::"
-
-.PHONY: build test install build-decentraland-ecs
+.PHONY: build test install

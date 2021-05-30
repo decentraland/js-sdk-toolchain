@@ -1,10 +1,12 @@
 {
   "name": "@dcl/build-ecs",
-  "version": "1.0.2",
+  "version": "0.0.0",
   "description": "",
   "main": "index.js",
   "bin": "index.js",
-  "scripts": {},
+  "scripts": {
+    "build": "tsc"
+  },
   "keywords": [],
   "author": "Decentraland",
   "license": "Apache 2.0",

@@ -11,6 +11,6 @@
   "typings": "./dist/index.d.ts",
   "decentralandLibrary": {},
   "scripts": {
-    "build": "../../../../packages/@dcl/rollup-config/node_modules/.bin/rollup -c ../../../../packages/@dcl/rollup-config/libs.config.js"
+    "build": "../../../../packages/@dcl/dcl-rollup/node_modules/.bin/rollup -c ../../../../packages/@dcl/dcl-rollup/libs.config.js"
   }
 }

@@ -9,9 +9,9 @@
   "license": "Apache-2.0",
   "scripts": {
     "start": "dcl start",
-    "build": "../../../../packages/build-ecs/index.js",
-    "build-prod": "../../../../packages/build-ecs/index.js --production",
-    "watch": "../../../../packages/build-ecs/index.js --watch"
+    "build": "../../../../packages/@dcl/build-ecs/index.js",
+    "build-prod": "../../../../packages/@dcl/build-ecs/index.js --production",
+    "watch": "../../../../packages/@dcl/build-ecs/index.js --watch"
   },
   "devDependencies": {
     "dcl-test-lib-integration": "file:../dcl-test-lib-integration",

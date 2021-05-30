@@ -18,7 +18,8 @@
     "lib": ["es2015"],
     "outFile": "dist/amd.js",
     "baseUrl": ".",
-    "typeRoots": ["./*"]
+    "typeRoots": ["./node_modules"],
+    "types": ["@dcl/posix"]
   },
   "exclude": ["node_modules", "dist"]
 }

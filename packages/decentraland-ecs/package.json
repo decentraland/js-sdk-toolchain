@@ -1,12 +1,9 @@
 {
   "name": "decentraland-ecs",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "",
   "main": "dist/src/index.js",
   "typings": "dist/index.d.ts",
-  "bin": {
-    "build-ecs": "artifacts/build-ecs.js"
-  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "npm run build && tsc -p tsconfig.json --watch"
@@ -15,6 +12,7 @@
   "tsdoc": {
     "tsdocFlavor": "AEDoc"
   },
+  "private": true,
   "author": "Decentraland",
   "license": "Apache 2.0",
   "files": [
@@ -26,12 +24,9 @@
     "artifacts"
   ],
   "dependencies": {
-    "@dcl/posix": "^1.0.0-20210529225319.commit-9bde839"
-  },
-  "devDependencies": {
+    "@dcl/amd": "file:../@dcl/amd",
+    "@dcl/build-ecs": "file:../@dcl/build-ecs",
+    "@dcl/posix": "^1.0.0-20210529225617.commit-f7f0ee9",
     "@dcl/unity-renderer": "latest"
-  },
-  "bundleDependencies": [
-    "@dcl/unity-renderer"
-  ]
+  }
 }

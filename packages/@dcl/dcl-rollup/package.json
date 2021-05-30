@@ -1,6 +1,6 @@
 {
-  "name": "@dcl/rollup-config",
-  "version": "1.0.0",
+  "name": "@dcl/dcl-rollup",
+  "version": "0.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,9 @@
   },
   "keywords": [],
   "author": "",
-  "bin": "index.js",
+  "bin": {
+    "dcl-rollup": "index.js"
+  },
   "license": "Apache-2.0",
   "dependencies": {
     "@microsoft/api-extractor": "^7.15.2",

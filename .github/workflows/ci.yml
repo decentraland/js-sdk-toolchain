@@ -16,23 +16,23 @@ jobs:
         with:
           node-version: 14.x
       - name: install
-        run:  make install
-      - name: update version of packages/@dcl/rollup-config
+        run: make install
+      - name: update version of packages/@dcl/dcl-rollup
         uses: menduz/oddish-action@staging
         with:
-          cwd: packages/@dcl/rollup-config
+          cwd: packages/@dcl/dcl-rollup
           deterministic-snapshot: true
           only-update-versions: true
-      - name: update version of packages/build-ecs
+      - name: update version of packages/@dcl/build-ecs
         uses: menduz/oddish-action@staging
         with:
-          cwd: packages/build-ecs
+          cwd: packages/@dcl/build-ecs
           deterministic-snapshot: true
           only-update-versions: true
-      - name: update version of packages/decentraland-amd
+      - name: update version of packages/@dcl/amd
         uses: menduz/oddish-action@staging
         with:
-          cwd: packages/decentraland-amd
+          cwd: packages/@dcl/amd
           deterministic-snapshot: true
           only-update-versions: true
       - name: update version of packages/decentraland-ecs
@@ -42,6 +42,8 @@ jobs:
           deterministic-snapshot: true
           only-update-versions: true
       - name: build
-        run:  make build
+        run: make build
       - name: test
-        run:  make test
+        run: make test
+      - name: prepare releasable packages
+        run: make prepare

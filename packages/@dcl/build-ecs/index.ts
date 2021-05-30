@@ -40,6 +40,22 @@ const watchedFiles = new Set<string>()
 
 type FileMap = ts.MapLike<{ version: number }>
 
+// finds a library entry point in $(cwd)/node_modules
+function findLibraryEntryPoint(packageName: string, cwd: string): string | null {
+  try {
+    const t = require.resolve(packageName, {
+      paths: [
+        cwd,
+        cwd + '/node_modules',
+        cwd + '/node_modules/decentraland-ecs/',
+        cwd + '/node_modules/decentraland-ecs/node_modules'
+      ]
+    })
+    if (t) return t
+  } catch {}
+  return null
+}
+
 async function compile() {
   // current working directory
   let CWD = process.cwd()
@@ -59,8 +75,8 @@ async function compile() {
       }
     }
   }
-
-  console.log(`> Working directory: ${ts.sys.getCurrentDirectory()}`)
+  console.log('> dev mode: ' + !PRODUCTION)
+  console.log(`> working directory: ${ts.sys.getCurrentDirectory()}`)
 
   let packageJson: PackageJson | null = null
   let sceneJson: SceneJson | null = null
@@ -154,7 +170,7 @@ function watchFile(fileName: string, services: ts.LanguageService, files: FileMa
 
 async function minify(files: string | string[] | { [file: string]: string }) {
   const result = await terser.minify(files, {
-    ecma: 5,
+    ecma: 2020,
     nameCache,
     mangle: {
       toplevel: false,
@@ -203,7 +219,7 @@ async function emitFile(fileName: string, services: ts.LanguageService, cfg: Pro
   const loadedLibs: OutFile[] = []
 
   function loadDclLib(lib: string) {
-    const path = resolveFile(lib)
+    const path = findLibraryEntryPoint(lib, ts.sys.getCurrentDirectory()) || resolveFile(lib)
 
     if (path) {
       const json: OutFile[] = JSON.parse(loadArtifact(lib))
@@ -215,7 +231,7 @@ async function emitFile(fileName: string, services: ts.LanguageService, cfg: Pro
   }
 
   function loadJsLib(lib: string) {
-    const path = resolveFile(lib)
+    const path = findLibraryEntryPoint(lib, ts.sys.getCurrentDirectory()) || resolveFile(lib)
 
     if (path) {
       const content = loadArtifact(lib)
@@ -296,6 +312,13 @@ async function emitFile(fileName: string, services: ts.LanguageService, cfg: Pro
       // emit lib file if it is a decentraland lib
       const deps = getOutFile(file.path + '.lib')
       deps.content = JSON.stringify(loadedLibs, null, 2)
+
+      if (loadedLibs.length) {
+        console.log('> bundling:')
+        loadedLibs.forEach(($) => {
+          console.log('  - ' + $.path)
+        })
+      }
 
       if (PRODUCTION || cfg.isDecentralandLib) {
         // minify && source map
@@ -385,11 +408,6 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
   // should this project be compiled as a lib? or as a scene?
   let isDecentralandLib = false
 
-  if (tsconfig.options.target !== ts.ScriptTarget.ES5) {
-    console.error('! Error: tsconfig.json: Decentraland only allows ES5 targets')
-    hasError = true
-  }
-
   if (tsconfig.options.module !== ts.ModuleKind.AMD) {
     console.error('! Error: tsconfig.json: Decentraland only allows AMD modules')
     hasError = true
@@ -459,9 +477,22 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
 
   if (!isDecentralandLib && process.env.NO_DEFAULT_LIBS !== '1') {
     // most of the decentraland scenes require the following libraries.
-    // (order matters, do not change the order)
-    libs.unshift({ main: process.env.AMD_PATH || 'decentraland-ecs/artifacts/amd.js' }) // 2nd place
-    libs.unshift({ main: process.env.ECS_PATH || 'decentraland-ecs/dist/src/index.js' }) // 1st place
+
+    // FIRST UNSHIFT: ECS, order matters, don't change it
+    libs.unshift({
+      main:
+        process.env.ECS_PATH ||
+        findLibraryEntryPoint('decentraland-ecs', ts.sys.getCurrentDirectory()) ||
+        'decentraland-ecs/dist/index.js'
+    })
+
+    // SECOND UNSHIFT: ECS, order matters, don't change it
+    libs.unshift({
+      main:
+        process.env.AMD_PATH ||
+        findLibraryEntryPoint('@dcl/amd', ts.sys.getCurrentDirectory()) ||
+        'decentraland-ecs/artifacts/amd.js'
+    })
   }
 
   let hasCustomLibraries = false
@@ -470,7 +501,7 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
     let resolved: string | null = null
 
     try {
-      resolved = require.resolve(libName + '/package.json', { paths: [ts.sys.getCurrentDirectory()] })
+      resolved = findLibraryEntryPoint(libName + '/package.json', ts.sys.getCurrentDirectory())
     } catch (e) {
       console.error(`! Error: dependency ${libName} not found (is it installed?)`)
       hasError = true

@@ -37,7 +37,7 @@ export function mockEnvironment(modules: ModulesMock) {
   const errors: string[] = []
 
   it('mocks the environment', () => {
-    var amdModuleRequire = require.resolve('../../packages/decentraland-amd')
+    var amdModuleRequire = require.resolve('../../packages/@dcl/amd')
     const content = readFileSync(amdModuleRequire).toString()
     ;(globalObject as any).define = null
     delete (globalObject as any).dcl

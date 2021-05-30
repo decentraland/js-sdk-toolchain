@@ -1,6 +1,6 @@
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
-import { rmFolder, executeStep, ensureFileExists } from '../helpers'
+import { rmFolder, executeStep, ensureFileExists } from '../../scripts/helpers'
 
 function buildEcsBuildLibFlow() {
   const cwd = resolve(__dirname, './fixtures/dcl-test-lib-integration')
@@ -60,11 +60,11 @@ describe('integration flow, build libs and build scene using libs', () => {
 
     it('ensure it uses NON MINIFIED versions in .lib', () => {
       const lib: any[] = JSON.parse(readFileSync(resolve(sceneCwd, 'bin/game.js.lib')).toString()).map(
-        ($: { path: string }) => $.path
+        ($: { path: string }) => resolve(sceneCwd, $.path)
       )
-      expect(lib).toContain('../dcl-test-lib-integration/bin/lib.js')
-      expect(lib).toContain('../rollup-lib-integration/dist/index.js')
-      expect(lib).toContain('node_modules/eth-connect/eth-connect.js')
+      expect(lib).toContain(resolve(ecsLibCwd, 'bin/lib.js'))
+      expect(lib).toContain(resolve(rollupLibCwd, 'dist/index.js'))
+      expect(lib).toContain(resolve(sceneCwd, 'node_modules/eth-connect/eth-connect.js'))
     })
   })
 
@@ -80,10 +80,11 @@ describe('integration flow, build libs and build scene using libs', () => {
 
     it('ensure it uses minified versions in .lib', () => {
       const lib: any[] = JSON.parse(readFileSync(resolve(sceneCwd, 'bin/game.js.lib')).toString()).map(
-        ($: { path: string }) => $.path
+        ($: { path: string }) => resolve(sceneCwd, $.path)
       )
-      expect(lib).toContain('../dcl-test-lib-integration/bin/lib.min.js')
-      expect(lib).toContain('../rollup-lib-integration/dist/index.min.js')
+      expect(lib).toContain(resolve(ecsLibCwd, 'bin/lib.min.js'))
+      expect(lib).toContain(resolve(rollupLibCwd, 'dist/index.min.js'))
+      expect(lib).toContain(resolve(sceneCwd, 'node_modules/eth-connect/eth-connect.js'))
     })
   })
 })

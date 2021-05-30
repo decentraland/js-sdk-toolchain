@@ -1,0 +1,20 @@
+{
+  "name": "@dcl/amd",
+  "version": "0.0.0",
+  "description": "",
+  "main": "dist/amd.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "files": [
+    "dist",
+    "types.d.ts"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@dcl/posix": "^1.0.0-20210529225617.commit-f7f0ee9"
+  }
+}

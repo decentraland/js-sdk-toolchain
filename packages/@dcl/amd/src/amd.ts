@@ -1,6 +1,3 @@
-/// <reference path="../../decentraland-ecs/node_modules/@dcl/posix/index.d.ts" />
-
-
 type Module = {
   name: string
   dclamd: 1 | 2
