@@ -10,43 +10,51 @@ import {
   ROLLUP,
   commonChecks
 } from './common'
-import { ensureFileExists, executeStep, rmFolder } from './helpers'
+import { ensureFileExists, itExecutes, itDeletesFolder } from './helpers'
 
 flow('build-all', () => {
   commonChecks()
 
   flow('build-ecs', () => {
-    executeStep(`npm ci --quiet`, BUILD_ECS_PATH)
-    executeStep(`${TSC} -p tsconfig.json`, BUILD_ECS_PATH)
-    ensureFileExists('index.js', BUILD_ECS_PATH)
-    executeStep(`chmod +x index.js`, BUILD_ECS_PATH)
+    itExecutes(`npm ci --quiet`, BUILD_ECS_PATH)
+    itExecutes(`${TSC} -p tsconfig.json`, BUILD_ECS_PATH)
+    itExecutes(`chmod +x index.js`, BUILD_ECS_PATH)
+
+    it('check file exists', () => {
+      ensureFileExists('index.js', BUILD_ECS_PATH)
+    })
   })
 
   flow('@dcl/amd', () => {
-    executeStep(`npm ci --quiet`, DECENTRALAND_AMD_PATH)
-    rmFolder('dist', DECENTRALAND_AMD_PATH)
-    executeStep(`${TSC} -p tsconfig.json`, DECENTRALAND_AMD_PATH)
-    executeStep(`${TERSER} --mangle --comments some --source-map -o dist/amd.min.js dist/amd.js`, DECENTRALAND_AMD_PATH)
-    ensureFileExists('dist/amd.js', DECENTRALAND_AMD_PATH)
-    ensureFileExists('dist/amd.min.js', DECENTRALAND_AMD_PATH)
-    ensureFileExists('dist/amd.min.js.map', DECENTRALAND_AMD_PATH)
+    itExecutes(`npm ci --quiet`, DECENTRALAND_AMD_PATH)
+    itDeletesFolder('dist', DECENTRALAND_AMD_PATH)
+    itExecutes(`${TSC} -p tsconfig.json`, DECENTRALAND_AMD_PATH)
+    itExecutes(`${TERSER} --mangle --comments some --source-map -o dist/amd.min.js dist/amd.js`, DECENTRALAND_AMD_PATH)
+
+    it('check file exists', () => {
+      ensureFileExists('dist/amd.js', DECENTRALAND_AMD_PATH)
+      ensureFileExists('dist/amd.min.js', DECENTRALAND_AMD_PATH)
+      ensureFileExists('dist/amd.min.js.map', DECENTRALAND_AMD_PATH)
+    })
   })
 
   flow('@dcl/dcl-rollup', () => {
-    executeStep(`npm ci --quiet`, ROLLUP_CONFIG_PATH)
-    executeStep(`${TSC} -p tsconfig.json`, ROLLUP_CONFIG_PATH)
-    ensureFileExists('ecs.config.js', ROLLUP_CONFIG_PATH)
-    ensureFileExists('libs.config.js', ROLLUP_CONFIG_PATH)
+    itExecutes(`npm ci --quiet`, ROLLUP_CONFIG_PATH)
+    itExecutes(`${TSC} -p tsconfig.json`, ROLLUP_CONFIG_PATH)
+    it('check file exists', () => {
+      ensureFileExists('ecs.config.js', ROLLUP_CONFIG_PATH)
+      ensureFileExists('libs.config.js', ROLLUP_CONFIG_PATH)
+    })
   })
 
   flow('decentraland-ecs', () => {
-    executeStep(`npm ci  --quiet`, ECS_PATH)
-    rmFolder('artifacts', ECS_PATH)
+    itExecutes(`npm i --quiet`, ECS_PATH)
+    itDeletesFolder('artifacts', ECS_PATH)
     const ROLLUP_ECS_CONFIG = resolve(ROLLUP_CONFIG_PATH, 'ecs.config.js')
-    executeStep(`${ROLLUP} -c ${ROLLUP_ECS_CONFIG}`, ECS_PATH)
+    itExecutes(`${ROLLUP} -c ${ROLLUP_ECS_CONFIG}`, ECS_PATH)
 
     // install required dependencies
-    executeStep(`npm install --quiet ${BUILD_ECS_PATH}`, ECS_PATH)
-    executeStep(`npm install --quiet ${DECENTRALAND_AMD_PATH}`, ECS_PATH)
+    itExecutes(`npm install --quiet ${BUILD_ECS_PATH}`, ECS_PATH)
+    itExecutes(`npm install --quiet ${DECENTRALAND_AMD_PATH}`, ECS_PATH)
   })
 })

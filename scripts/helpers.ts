@@ -6,8 +6,8 @@ import { sync as rimraf } from 'rimraf'
 /**
  * @returns the resolved absolute path
  */
-export function ensureFileExists(file: string,root: string) {
-  const x = resolve(root, file.replace(/^\//, ''))
+export function ensureFileExists(file: string, root?: string) {
+  const x = root ? resolve(root, file) : file
 
   if (!existsSync(x)) {
     throw new Error(`${x} does not exist`)
@@ -16,11 +16,12 @@ export function ensureFileExists(file: string,root: string) {
   return x
 }
 
-export function executeStep(command: string, cwd: string, env?: Record<string, string>) {
+export function itExecutes(command: string, cwd: string, env?: Record<string, string>) {
   it(
     command,
     async () => {
       await new Promise<string>((onSuccess, onError) => {
+        process.stdout.write('∑ ' + cwd + '; ' + command + '\n')
         exec(command, { cwd, env }, (error, stdout, stderr) => {
           stdout.trim().length && process.stdout.write('  ' + stdout.replace(/\n/g, '\n  ') + '\n')
           stderr.trim().length && process.stderr.write('! ' + stderr.replace(/\n/g, '\n  ') + '\n')
@@ -37,7 +38,7 @@ export function executeStep(command: string, cwd: string, env?: Record<string, s
   )
 }
 
-export function rmFolder(folder: string, cwd: string) {
+export function itDeletesFolder(folder: string, cwd: string) {
   const path = resolve(cwd, folder)
   it('rm -rf ' + path, () => {
     rimraf(path)
@@ -53,10 +54,10 @@ export function patchJson(file: string, cwd: string, redux: (previous: any) => a
   return writeFileSync(path, JSON.stringify(redux(JSON.parse(readFileSync(path).toString())), null, 2))
 }
 
-export function installDependencyWithVersion(cwd: string, depPath: string, devDependency = false) {
+export function itInstallsADependencyFromFolderAndCopiesTheVersion(cwd: string, depPath: string, devDependency = false) {
   const dependencies = devDependency ? 'devDependencies' : 'dependencies'
 
-  executeStep(`npm install --quiet ${depPath}`, cwd)
+  itExecutes(`npm install --quiet ${depPath}`, cwd)
 
   it(`update ${dependencies} version ${depPath} in ${cwd}`, () => {
     const depPackageJson = readJson('package.json', depPath)

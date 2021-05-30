@@ -1,16 +1,16 @@
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
-import { executeStep, ensureFileExists, rmFolder } from '../../scripts/helpers'
+import { itExecutes, ensureFileExists, itDeletesFolder } from '../../scripts/helpers'
 
 describe('simple-scene-without-installed-ecs: build a scene with env vars', () => {
   const cwd = resolve(__dirname, './fixtures/simple-scene-without-installed-ecs')
 
-  rmFolder('./bin', cwd)
+  itDeletesFolder('./bin', cwd)
 
   const ECS_PATH = resolve(__dirname, '../../packages/decentraland-ecs/dist/src/index.js')
   const AMD_PATH = resolve(__dirname, '../../packages/@dcl/amd/dist/amd.js')
 
-  executeStep('npm run --quiet build', cwd, {
+  itExecutes('npm run --quiet build', cwd, {
     ...process.env,
     ECS_PATH,
     AMD_PATH

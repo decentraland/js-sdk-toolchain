@@ -1,6 +1,6 @@
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
-import { executeStep, ensureFileExists, rmFolder } from '../../scripts/helpers'
+import { itExecutes, ensureFileExists, itDeletesFolder } from '../../scripts/helpers'
 
 describe('legacy decentraland-ecs sanity checks', () => {
   testLegacyEcsFlow('6.6.3')
@@ -12,12 +12,12 @@ function testLegacyEcsFlow(version: string) {
   describe(`decentraland-ecs@${version}`, () => {
     const cwd = resolve(__dirname, './fixtures/simple-scene-old-ecs')
 
-    rmFolder('./bin', cwd)
-    rmFolder('./node_modules', cwd)
+    itDeletesFolder('./bin', cwd)
+    itDeletesFolder('./node_modules', cwd)
 
-    executeStep(`npm install decentraland-ecs@${version}`, cwd)
-    executeStep('npm install --quiet --no-progress', cwd)
-    executeStep('npm run --quiet build', cwd)
+    itExecutes(`npm install decentraland-ecs@${version}`, cwd)
+    itExecutes('npm install --quiet --no-progress', cwd)
+    itExecutes('npm run --quiet build', cwd)
 
     it('ensure generated files exist', () => {
       ensureFileExists('bin/game.js', cwd)

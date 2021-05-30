@@ -1,18 +1,18 @@
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
-import { executeStep, ensureFileExists, rmFolder } from '../../scripts/helpers'
+import { itExecutes, ensureFileExists, itDeletesFolder } from '../../scripts/helpers'
 
 const ecsLocation = resolve(__dirname, '../../packages/decentraland-ecs')
 
 describe('build-ecs: simple scene compilation', () => {
   const cwd = resolve(__dirname, './fixtures/simple-scene')
 
-  rmFolder('./bin', cwd)
-  rmFolder('./node_modules', cwd)
+  itDeletesFolder('./bin', cwd)
+  itDeletesFolder('./node_modules', cwd)
 
-  executeStep('npm install --quiet --no-progress ' + ecsLocation, cwd)
-  executeStep('npm i --quiet --no-progress', cwd)
-  executeStep('npm run --quiet build', cwd)
+  itExecutes('npm install --quiet --no-progress ' + ecsLocation, cwd)
+  itExecutes('npm i --quiet --no-progress', cwd)
+  itExecutes('npm run --quiet build', cwd)
 
   it('ensure files exist', () => {
     ensureFileExists('bin/game.js', cwd)
@@ -31,11 +31,11 @@ describe('build-ecs: simple scene compilation', () => {
 describe('build-ecs: simple scene compilation, production mode', () => {
   const cwd = resolve(__dirname, './fixtures/simple-scene')
 
-  rmFolder('./bin', cwd)
-  rmFolder('./node_modules', cwd)
+  itDeletesFolder('./bin', cwd)
+  itDeletesFolder('./node_modules', cwd)
 
-  executeStep('npm install --quiet --no-progress', cwd)
-  executeStep('npm run --quiet build-prod', cwd)
+  itExecutes('npm install --quiet --no-progress', cwd)
+  itExecutes('npm run --quiet build-prod', cwd)
 
   it('ensure files exist', () => {
     ensureFileExists('bin/game.js', cwd)

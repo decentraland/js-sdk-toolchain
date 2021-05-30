@@ -1,15 +1,15 @@
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
-import { rmFolder, executeStep, ensureFileExists } from '../../scripts/helpers'
+import { itDeletesFolder, itExecutes, ensureFileExists } from '../../scripts/helpers'
 
 function buildEcsBuildLibFlow() {
   const cwd = resolve(__dirname, './fixtures/dcl-test-lib-integration')
   describe('build-ecs: build lib', () => {
-    rmFolder('./bin', cwd)
-    rmFolder('./node_modules', cwd)
+    itDeletesFolder('./bin', cwd)
+    itDeletesFolder('./node_modules', cwd)
 
-    executeStep('npm i --quiet --no-progress', cwd)
-    executeStep('npm run --quiet build', cwd)
+    itExecutes('npm i --quiet --no-progress', cwd)
+    itExecutes('npm run --quiet build', cwd)
 
     it('ensure files exist', () => {
       ensureFileExists('bin/lib.js', cwd)
@@ -24,9 +24,9 @@ function buildEcsBuildLibFlow() {
 function rollupBuildLibFlow() {
   const cwd = resolve(__dirname, './fixtures/rollup-lib-integration')
   describe('rollup: build lib', () => {
-    rmFolder('./dist', cwd)
+    itDeletesFolder('./dist', cwd)
 
-    executeStep('npm run --quiet build', cwd)
+    itExecutes('npm run --quiet build', cwd)
 
     it('ensure files exist', () => {
       ensureFileExists('dist/index.d.ts', cwd)
@@ -44,16 +44,16 @@ describe('integration flow, build libs and build scene using libs', () => {
   const sceneCwd = resolve(__dirname, './fixtures/simple-scene-with-library')
 
   // install libs
-  rmFolder('./node_modules', sceneCwd)
-  executeStep('npm install --quiet --no-progress -B ' + JSON.stringify(ecsLibCwd), sceneCwd)
-  executeStep('npm install --quiet --no-progress -B ' + JSON.stringify(rollupLibCwd), sceneCwd)
+  itDeletesFolder('./node_modules', sceneCwd)
+  itExecutes('npm install --quiet --no-progress -B ' + JSON.stringify(ecsLibCwd), sceneCwd)
+  itExecutes('npm install --quiet --no-progress -B ' + JSON.stringify(rollupLibCwd), sceneCwd)
   // install rest of dependencies, if any
-  executeStep('npm install --quiet --no-progress', sceneCwd)
+  itExecutes('npm install --quiet --no-progress', sceneCwd)
 
   describe('build-ecs: build scene with library DEBUG mode', () => {
-    rmFolder('./bin', sceneCwd)
+    itDeletesFolder('./bin', sceneCwd)
 
-    executeStep('npm run --quiet build', sceneCwd)
+    itExecutes('npm run --quiet build', sceneCwd)
 
     it('ensure files exist', () => {
       ensureFileExists('bin/game.js', sceneCwd)
@@ -71,9 +71,9 @@ describe('integration flow, build libs and build scene using libs', () => {
   })
 
   describe('build-ecs: build scene with library, production mode', () => {
-    rmFolder('./bin', sceneCwd)
+    itDeletesFolder('./bin', sceneCwd)
 
-    executeStep('npm run build-prod', sceneCwd)
+    itExecutes('npm run build-prod', sceneCwd)
 
     it('ensure files exist', () => {
       ensureFileExists('bin/game.js', sceneCwd)
