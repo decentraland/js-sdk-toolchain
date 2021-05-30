@@ -6,12 +6,14 @@ flow('build-all', () => {
   commonChecks()
 
   flow('build-ecs', () => {
+    executeStep(`npm ci --quiet`, BUILD_ECS_PATH)
     executeStep(`${TSC} -p tsconfig.json`, BUILD_ECS_PATH)
     ensureFileExists(BUILD_ECS_PATH, 'index.js')
     executeStep(`chmod +x index.js`, BUILD_ECS_PATH)
   })
 
   flow('@dcl/amd', () => {
+    executeStep(`npm ci --quiet`, DECENTRALAND_AMD_PATH)
     rmFolder('dist', DECENTRALAND_AMD_PATH)
     executeStep(`${TSC} -p tsconfig.json`, DECENTRALAND_AMD_PATH)
     executeStep(`${TERSER} --mangle --comments some --source-map -o dist/amd.min.js dist/amd.js`, DECENTRALAND_AMD_PATH)
@@ -21,12 +23,14 @@ flow('build-all', () => {
   })
 
   flow('@dcl/dcl-rollup', () => {
+    executeStep(`npm ci --quiet`, ROLLUP_CONFIG_PATH)
     executeStep(`${TSC} -p tsconfig.json`, ROLLUP_CONFIG_PATH)
     ensureFileExists(ROLLUP_CONFIG_PATH, 'ecs.config.js')
     ensureFileExists(ROLLUP_CONFIG_PATH, 'libs.config.js')
   })
 
   flow('decentraland-ecs', () => {
+    executeStep(`npm ci  --quiet`, ECS_PATH)
     rmFolder('artifacts', ECS_PATH)
     const ROLLUP_ECS_CONFIG = resolve(ROLLUP_CONFIG_PATH, 'ecs.config.js')
     executeStep(`${ROLLUP} -c ${ROLLUP_ECS_CONFIG}`, ECS_PATH)

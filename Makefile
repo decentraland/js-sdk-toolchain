@@ -8,7 +8,6 @@ install:
 	cd packages/@dcl/build-ecs; npm ci
 	cd packages/@dcl/dcl-rollup; npm ci
 	cd packages/@dcl/amd; npm ci
-	cd packages/decentraland-ecs; npm i
 
 test:
 	node_modules/.bin/jest --forceExit --detectOpenHandles --colors --coverage --verbose --roots "test"

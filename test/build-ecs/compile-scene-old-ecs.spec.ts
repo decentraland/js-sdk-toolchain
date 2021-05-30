@@ -13,6 +13,7 @@ function testLegacyEcsFlow(version: string) {
     const cwd = resolve(__dirname, './fixtures/simple-scene-old-ecs')
 
     rmFolder('./bin', cwd)
+    rmFolder('./node_modules', cwd)
 
     executeStep(`npm install decentraland-ecs@${version}`, cwd)
     executeStep('npm install --quiet --no-progress', cwd)

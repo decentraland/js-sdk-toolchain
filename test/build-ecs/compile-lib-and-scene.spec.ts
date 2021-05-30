@@ -6,8 +6,9 @@ function buildEcsBuildLibFlow() {
   const cwd = resolve(__dirname, './fixtures/dcl-test-lib-integration')
   describe('build-ecs: build lib', () => {
     rmFolder('./bin', cwd)
+    rmFolder('./node_modules', cwd)
 
-    executeStep('npm install --quiet --no-progress', cwd)
+    executeStep('npm i --quiet --no-progress', cwd)
     executeStep('npm run --quiet build', cwd)
 
     it('ensure files exist', () => {
@@ -43,6 +44,7 @@ describe('integration flow, build libs and build scene using libs', () => {
   const sceneCwd = resolve(__dirname, './fixtures/simple-scene-with-library')
 
   // install libs
+  rmFolder('./node_modules', sceneCwd)
   executeStep('npm install --quiet --no-progress -B ' + JSON.stringify(ecsLibCwd), sceneCwd)
   executeStep('npm install --quiet --no-progress -B ' + JSON.stringify(rollupLibCwd), sceneCwd)
   // install rest of dependencies, if any

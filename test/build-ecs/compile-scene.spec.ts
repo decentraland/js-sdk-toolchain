@@ -8,9 +8,10 @@ describe('build-ecs: simple scene compilation', () => {
   const cwd = resolve(__dirname, './fixtures/simple-scene')
 
   rmFolder('./bin', cwd)
+  rmFolder('./node_modules', cwd)
 
   executeStep('npm install --quiet --no-progress ' + ecsLocation, cwd)
-  executeStep('npm install --quiet --no-progress', cwd)
+  executeStep('npm i --quiet --no-progress', cwd)
   executeStep('npm run --quiet build', cwd)
 
   it('ensure files exist', () => {
@@ -31,6 +32,7 @@ describe('build-ecs: simple scene compilation, production mode', () => {
   const cwd = resolve(__dirname, './fixtures/simple-scene')
 
   rmFolder('./bin', cwd)
+  rmFolder('./node_modules', cwd)
 
   executeStep('npm install --quiet --no-progress', cwd)
   executeStep('npm run --quiet build-prod', cwd)
