@@ -47,3 +47,9 @@ jobs:
         run: make test
       - name: prepare releasable packages
         run: make prepare
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: built-artifacts
+          path: "packages/**/*.tgz"
+          retention-days: 5

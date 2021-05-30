@@ -8,3 +8,4 @@ test/build-ecs/fixtures/*/bin
 test/rollup-lib-integration/dist
 packages/**/*.js
 packages/decentraland-ecs/package-lock.json
+**/*.tgz
