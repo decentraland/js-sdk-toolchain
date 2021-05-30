@@ -18,7 +18,7 @@ test-watch:
 build:
 	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/build.spec.ts
 
-release:
+prepare:
 	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/prepare.spec.ts
 
 .PHONY: build test install
