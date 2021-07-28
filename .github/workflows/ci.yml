@@ -53,3 +53,25 @@ jobs:
           name: built-artifacts
           path: "packages/**/*.tgz"
           retention-days: 5
+      - name: temporary rename package to publish
+        working-directory: ./packages/decentraland-ecs
+        run: node -e "let pkg=require('./package.json'); pkg.name='decentraland-ecs-wip'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
+      - name: print modified package.json
+        working-directory: ./packages/decentraland-ecs
+        run: cat package.json
+      - name: publish package
+        uses: menduz/oddish-action@master
+        with:
+          registry-url: "https://registry.npmjs.org"
+          access: public
+          cwd: ./packages/decentraland-ecs
+          ## use action runId instead of current date to generate snapshot numbers
+          deterministic-snapshot: true
+
+          ## publish every package to s3
+          s3-bucket: ${{ secrets.CDN_BUCKET }}
+          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain-wip/branch/${{ github.head_ref }}"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
