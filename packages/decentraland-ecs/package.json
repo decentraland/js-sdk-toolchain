@@ -1,5 +1,5 @@
 {
-  "name": "decentraland-ecs-wip",
+  "name": "decentraland-ecs",
   "version": "0.0.0",
   "description": "",
   "main": "dist/src/index.js",
