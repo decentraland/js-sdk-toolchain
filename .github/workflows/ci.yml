@@ -53,12 +53,6 @@ jobs:
           name: built-artifacts
           path: "packages/**/*.tgz"
           retention-days: 5
-      - name: temporary rename @dcl/dcl-rollup package to publish
-        working-directory: ./packages/@dcl/dcl-rollup
-        run: node -e "let pkg=require('./package.json'); pkg.name='@dcl/dcl-rollup-wip'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
-      - name: print modified @dcl/dcl-rollup/package.json
-        working-directory: ./packages/@dcl/dcl-rollup
-        run: cat package.json
       - name: publish @dcl/dcl-rollup package
         uses: menduz/oddish-action@master
         with:
@@ -75,12 +69,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: temporary rename @dcl/amd package to publish
-        working-directory: ./packages/@dcl/amd
-        run: node -e "let pkg=require('./package.json'); pkg.name='@dcl/amd-wip'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
-      - name: print modified @dcl/amd/package.json
-        working-directory: ./packages/@dcl/amd
-        run: cat package.json
       - name: publish @dcl/amd package
         uses: menduz/oddish-action@master
         with:
@@ -97,12 +85,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: temporary rename @dcl/build-ecs package to publish
-        working-directory: ./packages/@dcl/build-ecs
-        run: node -e "let pkg=require('./package.json'); pkg.name='@dcl/build-ecs-wip'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
-      - name: print modified @dcl/build-ecs/package.json
-        working-directory: ./packages/@dcl/build-ecs
-        run: cat package.json
       - name: publish @dcl/build-ecs package
         uses: menduz/oddish-action@master
         with:
