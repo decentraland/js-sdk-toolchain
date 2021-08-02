@@ -4,6 +4,7 @@ const fs = require('fs')
 module.exports = function (dcl, app, express) {
     const dclKernelPath = path.dirname(require.resolve('decentraland-kernel/package.json', {paths: [dcl.getWorkingDir()]}));
     const dclKernelDefaultProfilePath = path.resolve(dclKernelPath, 'default-profile');
+    const dclKernelImagesDecentralandConnect = path.resolve(dclKernelPath, 'images', 'decentraland-connect');
     const dclUnityRenderer = path.resolve(dclKernelPath, 'unity-renderer');
 
     const routeMappingPath = {
@@ -25,7 +26,8 @@ module.exports = function (dcl, app, express) {
         });
     }
     
-    createStaticRoutes(app, '/@/artifacts/unity-renderer/*', dclUnityRenderer)
+    createStaticRoutes(app, '/@/artifacts/unity-renderer/*', dclUnityRenderer);
+    createStaticRoutes(app, '/images/decentraland-connect/*', dclKernelImagesDecentralandConnect);
 
     app.use('/default-profile/', express.static(dclKernelDefaultProfilePath));
 };
