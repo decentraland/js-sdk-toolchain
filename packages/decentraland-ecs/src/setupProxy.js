@@ -4,7 +4,7 @@ const fs = require('fs')
 module.exports = function (dcl, app, express) {
     const dclKernelPath = path.resolve(dcl.getWorkingDir(), 'node_modules', 'decentraland-kernel');
     const dclKernelDefaultProfilePath = path.resolve(dclKernelPath, 'default-profile');
-    const dclUnityRenderer = path.resolve(dcl.getWorkingDir(), 'node_modules', '@dcl', 'unity-renderer');
+    const dclUnityRenderer = path.resolve(dclKernelPath, 'unity-renderer');
 
     const routeMappingPath = {
         '/': {
@@ -20,15 +20,15 @@ module.exports = function (dcl, app, express) {
             type: 'text/javascript'
         },
         '/@/artifacts/unity-renderer/unity.data.unityweb': {
-            path: path.resolve(dclUnityRenderer, 'unity.data'), 
+            path: path.resolve(dclUnityRenderer, 'unity.data.unityweb'), 
             type: 'text/plain'
         },
         '/@/artifacts/unity-renderer/unity.framework.js.unityweb':{
-            path: path.resolve(dclUnityRenderer, 'unity.framework.js'), 
+            path: path.resolve(dclUnityRenderer, 'unity.framework.js.unityweb'), 
             type: 'text/javascript'
         },
         '/@/artifacts/unity-renderer/unity.wasm.unityweb':{
-            path: path.resolve(dclUnityRenderer, 'unity.wasm'), 
+            path: path.resolve(dclUnityRenderer, 'unity.wasm.unityweb'), 
             type: 'application/wasm'
         },
     };
