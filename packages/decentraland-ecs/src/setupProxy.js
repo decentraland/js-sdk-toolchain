@@ -2,7 +2,7 @@ const path = require('path')
 const fs = require('fs')
 
 module.exports = function (dcl, app, express) {
-    const dclKernelPath = path.resolve(dcl.getWorkingDir(), 'node_modules', 'decentraland-kernel');
+    const dclKernelPath = path.dirname(require.resolve('decentraland-kernel/package.json', {paths: [dcl.getWorkingDir()]}));
     const dclKernelDefaultProfilePath = path.resolve(dclKernelPath, 'default-profile');
     const dclUnityRenderer = path.resolve(dclKernelPath, 'unity-renderer');
 
@@ -15,22 +15,6 @@ module.exports = function (dcl, app, express) {
             path: path.resolve(dclKernelPath, 'dist', 'preview.js'), 
             type: 'text/javascript'
         },
-        '/@/artifacts/unity-renderer/index.js': {
-            path: path.resolve(dclUnityRenderer, 'index.js'), 
-            type: 'text/javascript'
-        },
-        '/@/artifacts/unity-renderer/unity.data.unityweb': {
-            path: path.resolve(dclUnityRenderer, 'unity.data.unityweb'), 
-            type: 'text/plain'
-        },
-        '/@/artifacts/unity-renderer/unity.framework.js.unityweb':{
-            path: path.resolve(dclUnityRenderer, 'unity.framework.js.unityweb'), 
-            type: 'text/javascript'
-        },
-        '/@/artifacts/unity-renderer/unity.wasm.unityweb':{
-            path: path.resolve(dclUnityRenderer, 'unity.wasm.unityweb'), 
-            type: 'application/wasm'
-        },
     };
     
     for (const route in routeMappingPath){
@@ -40,6 +24,36 @@ module.exports = function (dcl, app, express) {
             res.send(contentFile);
         });
     }
+    
+    createStaticRoutes(app, '/@/artifacts/unity-renderer/*', dclUnityRenderer)
 
     app.use('/default-profile/', express.static(dclKernelDefaultProfilePath));
 };
+
+function createStaticRoutes(app, route, localFolder) {
+    app.use(route, (req, res, next) => {
+      const options = {
+        root: localFolder,
+        dotfiles: 'deny',
+        maxAge: 1,
+        cacheControl: false,
+        lastModified: true,
+        headers: {
+          'x-timestamp': Date.now(),
+          'x-sent': true,
+          etag: JSON.stringify(Date.now().toString()),
+          'cache-control': 'no-cache,private,max-age=1'
+        }
+      }
+  
+      const fileName = req.params[0]
+  
+      res.sendFile(fileName, options, (err) => {
+        if (err) {
+          next(err)
+        } else {
+          console.log(`Sending ${localFolder}/${fileName}`)
+        }
+      })
+    })
+  }
