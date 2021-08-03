@@ -1,11 +1,12 @@
 import { resolve } from 'path'
+import * as express from 'express'
+import * as supertest from 'supertest'
 
 const ecsLocation = resolve(__dirname, '../../packages/decentraland-ecs')
-const express = require('express')
 const mockDclObject = {
     getWorkingDir: () => ecsLocation
 }
-const supertest = require('supertest')
+
 
 describe('decentraland-ecs: setupProxy.js resolve endpoints successful', () => {
     const setupProxy = require(`${ecsLocation}/src/setupProxy.js`)
