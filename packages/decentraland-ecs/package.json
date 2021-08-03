@@ -27,7 +27,7 @@
     "@dcl/amd": "file:../@dcl/amd",
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
     "@dcl/posix": "^1.0.0-20210529225617.commit-f7f0ee9",
-    "@dcl/unity-renderer": "latest",
+    "@dcl/unity-renderer": "1.0.2773",
     "decentraland-kernel": "latest"
   }
 }
