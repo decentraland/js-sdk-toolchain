@@ -52,21 +52,21 @@ const plugins = [
 
 const config: RollupOptions = {
   input: './src/index.ts',
-  context: 'globalThis',
+  context: 'self',
   plugins,
   external: /@decentraland\//,
   output: [
     {
       file: packageJson.main,
       format: 'iife',
-      name: 'globalThis',
+      name: 'self',
       extend: true,
       sourcemap: 'inline'
     },
     {
       file: packageJson.main.replace(/\.js$/, '.min.js'),
       format: 'iife',
-      name: 'globalThis',
+      name: 'self',
       extend: true,
       sourcemap: 'hidden',
       compact: true,
