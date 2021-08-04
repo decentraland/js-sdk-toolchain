@@ -28,6 +28,7 @@
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
     "@dcl/kernel": "latest",
     "@dcl/posix": "^1.0.0-20210529225617.commit-f7f0ee9",
-    "@dcl/unity-renderer": "latest"
+    "@dcl/unity-renderer": "latest",
+    "http-proxy-middleware": "^2.0.1"
   }
 }
