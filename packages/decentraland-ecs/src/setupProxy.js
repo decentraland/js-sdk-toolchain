@@ -2,7 +2,7 @@ const path = require('path')
 const fs = require('fs')
 
 module.exports = function (dcl, app, express) {
-  const dclKernelPath = path.dirname(require.resolve('decentraland-kernel/package.json', {paths: [dcl.getWorkingDir()]}));
+  const dclKernelPath = path.dirname(require.resolve('@dcl/kernel/package.json', {paths: [dcl.getWorkingDir()]}));
   const dclKernelDefaultProfilePath = path.resolve(dclKernelPath, 'default-profile');
   const dclKernelImagesDecentralandConnect = path.resolve(dclKernelPath, 'images', 'decentraland-connect');
   const dclKernelLoaderPath = path.resolve(dclKernelPath, 'loader');
@@ -17,8 +17,8 @@ module.exports = function (dcl, app, express) {
           path: path.resolve(dclKernelPath, 'favicon.ico'), 
           type: 'text/html'
       },
-      '/@/artifacts/preview.js': {
-          path: path.resolve(dclKernelPath, 'dist', 'preview.js'), 
+      '/@/artifacts/index.js': {
+          path: path.resolve(dclKernelPath, 'index.js'), 
           type: 'text/javascript'
       },
   };
