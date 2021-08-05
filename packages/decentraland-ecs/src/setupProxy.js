@@ -17,10 +17,8 @@ module.exports = function (dcl, app, express) {
    * 5. link kernel using `npm link @dcll/kernel` this will use the folder from step 1
    */
 
-  const ecsPath = path.dirname(require.resolve('decentraland-ecs/package.json', { paths: [dcl.getWorkingDir()] }))
-  const dclKernelPath = path.dirname(
-    require.resolve('@dcl/kernel/package.json', { paths: [dcl.getWorkingDir(), ecsPath] })
-  )
+  const ecsPath = path.dirname(require.resolve('decentraland-ecs/package.json', { paths: [dcl.getWorkingDir(), __dirname + '/../../', __dirname + '/../'] }))
+  const dclKernelPath = path.dirname(require.resolve('@dcl/kernel/package.json', { paths: [dcl.getWorkingDir(), ecsPath] }))
   const dclKernelDefaultProfilePath = path.resolve(dclKernelPath, 'default-profile')
   const dclKernelImagesDecentralandConnect = path.resolve(dclKernelPath, 'images', 'decentraland-connect')
   const dclKernelLoaderPath = path.resolve(dclKernelPath, 'loader')
