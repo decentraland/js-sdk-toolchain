@@ -1,12 +1,12 @@
-const path = require('path')
-const fs = require('fs')
-const { createProxyMiddleware } = require('http-proxy-middleware')
-const { sync: globSync } = require('glob')
+import * as path from 'path'
+import * as fs from 'fs'
+import { createProxyMiddleware } from 'http-proxy-middleware'
+import { sync as globSync } from 'glob'
+import * as express from 'express'
 
-module.exports = function (dcl, app, express) {
+const setupProxy = (dcl: any, app: express.Application) => {
   // first resolve all dependencies in the local current working directory
   // second try to resolve dependencies in decentraland-ecs folder
-
   /**
    * to test locally with linked packages:
    *
@@ -17,8 +17,14 @@ module.exports = function (dcl, app, express) {
    * 5. link kernel using `npm link @dcll/kernel` this will use the folder from step 1
    */
 
-  const ecsPath = path.dirname(require.resolve('decentraland-ecs/package.json', { paths: [dcl.getWorkingDir(), __dirname + '/../../', __dirname + '/../'] }))
-  const dclKernelPath = path.dirname(require.resolve('@dcl/kernel/package.json', { paths: [dcl.getWorkingDir(), ecsPath] }))
+  const ecsPath = path.dirname(
+    require.resolve('decentraland-ecs/package.json', {
+      paths: [dcl.getWorkingDir(), __dirname + '/../../', __dirname + '/../']
+    })
+  )
+  const dclKernelPath = path.dirname(
+    require.resolve('@dcl/kernel/package.json', { paths: [dcl.getWorkingDir(), ecsPath] })
+  )
   const dclKernelDefaultProfilePath = path.resolve(dclKernelPath, 'default-profile')
   const dclKernelImagesDecentralandConnect = path.resolve(dclKernelPath, 'images', 'decentraland-connect')
   const dclKernelLoaderPath = path.resolve(dclKernelPath, 'loader')
@@ -28,25 +34,28 @@ module.exports = function (dcl, app, express) {
 
   mockCatalyst(app, [dcl.getWorkingDir()])
 
-  const routeMappingPath = {
-    '/': {
+  const routes = [
+    {
+      route: '/',
       path: path.resolve(dclKernelPath, 'preview.html'),
       type: 'text/html'
     },
-    '/favicon.ico': {
+    {
+      route: '/favicon.ico',
       path: path.resolve(dclKernelPath, 'favicon.ico'),
       type: 'text/html'
     },
-    '/@/artifacts/index.js': {
+    {
+      route: '/@/artifacts/index.js',
       path: path.resolve(dclKernelPath, 'index.js'),
       type: 'text/javascript'
     }
-  }
+  ]
 
-  for (const route in routeMappingPath) {
-    app.get(route, async (req, res) => {
-      res.setHeader('Content-Type', routeMappingPath[route].type)
-      const contentFile = fs.readFileSync(routeMappingPath[route].path)
+  for (const route of routes) {
+    app.get(route.route, async (req, res) => {
+      res.setHeader('Content-Type', route.type)
+      const contentFile = fs.readFileSync(route.path)
       res.send(contentFile)
     })
   }
@@ -57,7 +66,7 @@ module.exports = function (dcl, app, express) {
   createStaticRoutes(app, '/default-profile/*', dclKernelDefaultProfilePath)
 }
 
-function createStaticRoutes(app, route, localFolder) {
+const createStaticRoutes = (app: express.Application, route: string, localFolder: string) => {
   app.use(route, (req, res, next) => {
     const options = {
       root: localFolder,
@@ -83,7 +92,7 @@ function createStaticRoutes(app, route, localFolder) {
   })
 }
 
-function mockCatalyst(app, baseFolders) {
+const mockCatalyst = (app: express.Application, baseFolders: string[]) => {
   serveFolders(app, baseFolders)
   app.get('/lambdas/explore/realms', (req, res) => {
     res.json([
@@ -127,14 +136,14 @@ function mockCatalyst(app, baseFolders) {
   )
 }
 
-function entityV3FromFolder(folder) {
+const entityV3FromFolder = (folder: string) => {
   const sceneJsonPath = path.resolve(folder, './scene.json')
 
   if (fs.existsSync(sceneJsonPath)) {
-    const sceneJson = JSON.parse(fs.readFileSync(sceneJsonPath))
+    const sceneJson = JSON.parse(fs.readFileSync(sceneJsonPath).toString())
 
-    const { base, parcels } = sceneJson.scene
-    const pointers = new Set()
+    const { base, parcels } : {base: string, parcels: string[]} = sceneJson.scene
+    const pointers = new Set<string>()
     pointers.add(base)
     parcels.forEach(($) => pointers.add($))
 
@@ -143,16 +152,18 @@ function entityV3FromFolder(folder) {
       dot: false,
       ignore: ['node_modules/**/*', '.git/**/*'],
       absolute: true
-    }).map((file) => {
-      try {
-        if (!fs.statSync(file).isFile()) return
-      } catch (err) {
-        return
-      }
-      const key = file.replace(folder, '').replace(/^\/+/, '')
+    })
+      .map((file) => {
+        try {
+          if (!fs.statSync(file).isFile()) return
+        } catch (err) {
+          return
+        }
+        const key = file.replace(folder, '').replace(/^\/+/, '')
 
-      return { file: key.toLowerCase(), hash: 'b64-' + Buffer.from(file).toString('base64') }
-    }).filter($ => !!$)
+        return { file: key.toLowerCase(), hash: 'b64-' + Buffer.from(file).toString('base64') }
+      })
+      .filter(($) => !!$)
 
     return {
       version: 'v3',
@@ -168,13 +179,13 @@ function entityV3FromFolder(folder) {
   return null
 }
 
-function serveFolders(app, baseFolders) {
+const serveFolders = (app: express.Application, baseFolders: string[]) => {
   app.get('/content/contents/:hash', (req, res, next) => {
     if (req.params.hash && req.params.hash.startsWith('b64-')) {
       const fullPath = path.resolve(Buffer.from(req.params.hash.replace(/^b64-/, ''), 'base64').toString('utf8'))
 
       // only return files IF the file is within a baseFolder
-      if(!baseFolders.find($ => fullPath.startsWith($))){
+      if (!baseFolders.find(($) => fullPath.startsWith($))) {
         res.end(404)
         return
       }
@@ -206,17 +217,19 @@ function serveFolders(app, baseFolders) {
       return
     }
 
-    const requestedPointers = new Set(
-      req.query.pointer && typeof req.query.pointer == 'string' ? [req.query.pointer] : req.query.pointer
+    const requestedPointers = new Set<string>(
+      req.query.pointer && typeof req.query.pointer == 'string'
+        ? [req.query.pointer as string]
+        : (req.query.pointer as string[])
     )
 
     const resultEntities = []
 
     const allDeployments = baseFolders.map((folder) => entityV3FromFolder(folder))
 
-    for (let pointer of requestedPointers) {
+    for (let pointer of Array.from(requestedPointers)) {
       // get deployment by pointer
-      const theDeployment = allDeployments.find(($) => $.pointers.includes(pointer))
+      const theDeployment = allDeployments.find(($) => $ && $.pointers.includes(pointer))
       if (theDeployment) {
         // remove all the required pointers from the requestedPointers set
         // to prevent sending duplicated entities
@@ -230,3 +243,5 @@ function serveFolders(app, baseFolders) {
     res.json(resultEntities).end()
   })
 }
+
+module.exports = setupProxy
