@@ -1,46 +1,185 @@
 const path = require('path')
 const fs = require('fs')
+const { createProxyMiddleware } = require('http-proxy-middleware')
+const { sync: globSync } = require('glob')
 
 module.exports = function (dcl, app, express) {
-  const dclKernelPath = path.dirname(require.resolve('decentraland-kernel/package.json', {paths: [dcl.getWorkingDir()]}));
-  const dclKernelDefaultProfilePath = path.resolve(dclKernelPath, 'default-profile');
-  const dclKernelImagesDecentralandConnect = path.resolve(dclKernelPath, 'images', 'decentraland-connect');
-  const dclKernelLoaderPath = path.resolve(dclKernelPath, 'loader');
-  const dclUnityRenderer = path.dirname(require.resolve('@dcl/unity-renderer/package.json', {paths: [dcl.getWorkingDir()]}));
+  // first resolve all dependencies in the local current working directory
+  // second try to resolve dependencies in decentraland-ecs folder
+
+  /**
+   * to test locally with linked packages:
+   *
+   * 1. go to explorer/kernel/static and run `npm link`
+   * 2. in an empty folder create a test scene with `dcl init`
+   * 3. in that folder run `npm install folder-to/decentraland-ecs`
+   * 4. install whatever version of `@dcl/unity-renderer` you want to test
+   * 5. link kernel using `npm link @dcll/kernel` this will use the folder from step 1
+   */
+
+  const ecsPath = path.dirname(require.resolve('decentraland-ecs/package.json', { paths: [dcl.getWorkingDir(), __dirname + '/../../', __dirname + '/../'] }))
+  const dclKernelPath = path.dirname(require.resolve('@dcl/kernel/package.json', { paths: [dcl.getWorkingDir(), ecsPath] }))
+  const dclKernelDefaultProfilePath = path.resolve(dclKernelPath, 'default-profile')
+  const dclKernelImagesDecentralandConnect = path.resolve(dclKernelPath, 'images', 'decentraland-connect')
+  const dclKernelLoaderPath = path.resolve(dclKernelPath, 'loader')
+  const dclUnityRenderer = path.dirname(
+    require.resolve('@dcl/unity-renderer/package.json', { paths: [dcl.getWorkingDir(), ecsPath] })
+  )
+
+  mockCatalyst(app, [dcl.getWorkingDir()])
 
   const routeMappingPath = {
-      '/': {
-          path: path.resolve(dclKernelPath, 'preview.html'), 
-          type: 'text/html'
-      },
-      '/favicon.ico': {
-          path: path.resolve(dclKernelPath, 'favicon.ico'), 
-          type: 'text/html'
-      },
-      '/@/artifacts/preview.js': {
-          path: path.resolve(dclKernelPath, 'dist', 'preview.js'), 
-          type: 'text/javascript'
-      },
-  };
-  
-  for (const route in routeMappingPath){
-      app.get(route, async (req, res) => {
-          res.setHeader('Content-Type', routeMappingPath[route].type);
-          const contentFile = fs.readFileSync(routeMappingPath[route].path);
-          res.send(contentFile);
-      });
+    '/': {
+      path: path.resolve(dclKernelPath, 'preview.html'),
+      type: 'text/html'
+    },
+    '/favicon.ico': {
+      path: path.resolve(dclKernelPath, 'favicon.ico'),
+      type: 'text/html'
+    },
+    '/@/artifacts/index.js': {
+      path: path.resolve(dclKernelPath, 'index.js'),
+      type: 'text/javascript'
+    }
   }
-  
-  createStaticRoutes(app, '/images/decentraland-connect/*', dclKernelImagesDecentralandConnect);
-  createStaticRoutes(app, '/@/artifacts/unity-renderer/*', dclUnityRenderer);
-  createStaticRoutes(app, '/@/artifacts/loader/*', dclKernelLoaderPath);
-  createStaticRoutes(app, '/default-profile/*', dclKernelDefaultProfilePath);
+
+  for (const route in routeMappingPath) {
+    app.get(route, async (req, res) => {
+      res.setHeader('Content-Type', routeMappingPath[route].type)
+      const contentFile = fs.readFileSync(routeMappingPath[route].path)
+      res.send(contentFile)
+    })
+  }
+
+  createStaticRoutes(app, '/images/decentraland-connect/*', dclKernelImagesDecentralandConnect)
+  createStaticRoutes(app, '/@/artifacts/unity-renderer/*', dclUnityRenderer)
+  createStaticRoutes(app, '/@/artifacts/loader/*', dclKernelLoaderPath)
+  createStaticRoutes(app, '/default-profile/*', dclKernelDefaultProfilePath)
 }
 
 function createStaticRoutes(app, route, localFolder) {
-    app.use(route, (req, res, next) => {
+  app.use(route, (req, res, next) => {
+    const options = {
+      root: localFolder,
+      dotfiles: 'deny',
+      maxAge: 1,
+      cacheControl: false,
+      lastModified: true,
+      headers: {
+        'x-timestamp': Date.now(),
+        'x-sent': true,
+        etag: JSON.stringify(Date.now().toString()),
+        'cache-control': 'no-cache,private,max-age=1'
+      }
+    }
+
+    const fileName = req.params[0]
+
+    res.sendFile(fileName, options, (err) => {
+      if (err) {
+        next(err)
+      }
+    })
+  })
+}
+
+function mockCatalyst(app, baseFolders) {
+  serveFolders(app, baseFolders)
+  app.get('/lambdas/explore/realms', (req, res) => {
+    res.json([
+      {
+        serverName: 'localhost',
+        url: `http://${req.get('host')}`,
+        layer: 'stub',
+        usersCount: 0,
+        maxUsers: 100,
+        userParcels: []
+      }
+    ])
+  })
+
+  app.get('/lambdas/contracts/servers', (req, res) => {
+    res.json([
+      {
+        address: `http://${req.get('host')}`,
+        owner: '0x0000000000000000000000000000000000000000',
+        id: '0x0000000000000000000000000000000000000000000000000000000000000000'
+      }
+    ])
+  })
+
+  // fallback all lambdas to a real catalyst
+  app.use(
+    '/lambdas',
+    createProxyMiddleware({
+      target: 'https://peer-lb.decentraland.org/',
+      changeOrigin: true
+    })
+  )
+
+  // fallback all lambdas to a real catalyst
+  app.use(
+    '/content',
+    createProxyMiddleware({
+      target: 'https://peer-lb.decentraland.org/',
+      changeOrigin: true
+    })
+  )
+}
+
+function entityV3FromFolder(folder) {
+  const sceneJsonPath = path.resolve(folder, './scene.json')
+
+  if (fs.existsSync(sceneJsonPath)) {
+    const sceneJson = JSON.parse(fs.readFileSync(sceneJsonPath))
+
+    const { base, parcels } = sceneJson.scene
+    const pointers = new Set()
+    pointers.add(base)
+    parcels.forEach(($) => pointers.add($))
+
+    const allFiles = globSync('**/*', {
+      cwd: folder,
+      dot: false,
+      ignore: ['node_modules/**/*', '.git/**/*'],
+      absolute: true
+    }).map((file) => {
+      try {
+        if (!fs.statSync(file).isFile()) return
+      } catch (err) {
+        return
+      }
+      const key = file.replace(folder, '').replace(/^\/+/, '')
+
+      return { file: key.toLowerCase(), hash: 'b64-' + Buffer.from(file).toString('base64') }
+    }).filter($ => !!$)
+
+    return {
+      version: 'v3',
+      type: 'scene',
+      id: 'b64-' + Buffer.from(folder).toString('base64'),
+      pointers: Array.from(pointers),
+      timestamp: Date.now(),
+      metadata: sceneJson,
+      content: allFiles
+    }
+  }
+
+  return null
+}
+
+function serveFolders(app, baseFolders) {
+  app.get('/content/contents/:hash', (req, res, next) => {
+    if (req.params.hash && req.params.hash.startsWith('b64-')) {
+      const fullPath = path.resolve(Buffer.from(req.params.hash.replace(/^b64-/, ''), 'base64').toString('utf8'))
+
+      // only return files IF the file is within a baseFolder
+      if(!baseFolders.find($ => fullPath.startsWith($))){
+        res.end(404)
+        return
+      }
+
       const options = {
-        root: localFolder,
         dotfiles: 'deny',
         maxAge: 1,
         cacheControl: false,
@@ -52,15 +191,42 @@ function createStaticRoutes(app, route, localFolder) {
           'cache-control': 'no-cache,private,max-age=1'
         }
       }
-  
-      const fileName = req.params[0]
-  
-      res.sendFile(fileName, options, (err) => {
+
+      res.sendFile(fullPath, options, (err) => {
         if (err) {
           next(err)
-        } else {
-          console.log(`Sending ${localFolder}/${fileName}`)
         }
       })
-    })
-  }
+    }
+  })
+
+  app.get('/content/entities/scene', (req, res) => {
+    if (!req.query.pointer) {
+      res.json([])
+      return
+    }
+
+    const requestedPointers = new Set(
+      req.query.pointer && typeof req.query.pointer == 'string' ? [req.query.pointer] : req.query.pointer
+    )
+
+    const resultEntities = []
+
+    const allDeployments = baseFolders.map((folder) => entityV3FromFolder(folder))
+
+    for (let pointer of requestedPointers) {
+      // get deployment by pointer
+      const theDeployment = allDeployments.find(($) => $.pointers.includes(pointer))
+      if (theDeployment) {
+        // remove all the required pointers from the requestedPointers set
+        // to prevent sending duplicated entities
+        theDeployment.pointers.forEach(($) => requestedPointers.delete($))
+
+        // add the deployment to the results
+        resultEntities.push(theDeployment)
+      }
+    }
+
+    res.json(resultEntities).end()
+  })
+}
