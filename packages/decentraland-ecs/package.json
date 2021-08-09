@@ -21,7 +21,8 @@
     "LICENSE",
     "docs-yaml",
     "artifacts",
-    "src/setupProxy.js"
+    "src/setupProxy.js",
+    "src/setupExport.js"
   ],
   "dependencies": {
     "@dcl/amd": "file:../@dcl/amd",

@@ -56,5 +56,7 @@ flow('build-all', () => {
     // install required dependencies
     itExecutes(`npm install --quiet ${BUILD_ECS_PATH}`, ECS_PATH)
     itExecutes(`npm install --quiet ${DECENTRALAND_AMD_PATH}`, ECS_PATH)
+
+    itExecutes(`tsc src/setupProxy.ts src/setupExport.ts`, ECS_PATH)
   })
 })

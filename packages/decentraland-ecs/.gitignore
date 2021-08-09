@@ -5,5 +5,3 @@ docs
 docs-yaml
 artifacts
 *.tgz
-
-!src/setupProxy.js
