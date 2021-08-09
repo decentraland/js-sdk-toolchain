@@ -142,7 +142,7 @@ const entityV3FromFolder = (folder: string) => {
   if (fs.existsSync(sceneJsonPath)) {
     const sceneJson = JSON.parse(fs.readFileSync(sceneJsonPath).toString())
 
-    const { base, parcels } : {base: string, parcels: string[]} = sceneJson.scene
+    const { base, parcels }: { base: string; parcels: string[] } = sceneJson.scene
     const pointers = new Set<string>()
     pointers.add(base)
     parcels.forEach(($) => pointers.add($))
@@ -244,4 +244,4 @@ const serveFolders = (app: express.Application, baseFolders: string[]) => {
   })
 }
 
-module.exports = setupProxy
+export = setupProxy
