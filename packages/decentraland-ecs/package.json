@@ -32,5 +32,6 @@
     "@dcl/unity-renderer": "latest",
     "glob": "^7.1.7",
     "http-proxy-middleware": "^2.0.1"
-  }
+  },
+  "minCliVersion": "3.7.0"
 }
