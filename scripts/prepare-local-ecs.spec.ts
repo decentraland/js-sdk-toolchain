@@ -1,15 +1,15 @@
-import { resolve } from 'path'
+import * as fs from 'fs'
+import * as path from 'path'
 import { flow, commonChecks, ECS_PATH, BUILD_ECS_PATH, DECENTRALAND_AMD_PATH, ROLLUP_CONFIG_PATH } from './common'
 import { patchJson, runCommand } from './helpers'
-import { existsSync, readFileSync, writeFileSync } from 'fs'
 
 flow('build local ecs package', () => {
   ;``
   commonChecks()
 
-  const rootPath = resolve(__dirname, '..')
-  const ecsPackageJsonPath = resolve(ECS_PATH, 'package.json')
-  const ecsPackageLockJsonPath = resolve(ECS_PATH, 'package-lock.json')
+  const rootPath = path.resolve(__dirname, '..')
+  const ecsPackageJsonPath = path.resolve(ECS_PATH, 'package.json')
+  const ecsPackageLockJsonPath = path.resolve(ECS_PATH, 'package-lock.json')
 
   const dclAmdTgzFilename = 'local-dcl-amd.tgz'
   const dclBuildEcsTgzFilename = 'local-dcl-build-ecs.tgz'
@@ -19,9 +19,9 @@ flow('build local ecs package', () => {
     backupPackageLockJson = ''
 
   beforeAll(() => {
-    backupPackageJson = readFileSync(ecsPackageJsonPath).toString()
-    if (existsSync(ecsPackageLockJsonPath)) {
-      backupPackageLockJson = readFileSync(ecsPackageLockJsonPath).toString()
+    backupPackageJson = fs.readFileSync(ecsPackageJsonPath).toString()
+    if (fs.existsSync(ecsPackageLockJsonPath)) {
+      backupPackageLockJson = fs.readFileSync(ecsPackageLockJsonPath).toString()
     }
 
     const redux = ($: any) => ({
@@ -48,32 +48,25 @@ flow('build local ecs package', () => {
     expect(buildEcsPackJson[0]['filename']).toBeTruthy()
     expect(amdPackJson[0]['filename']).toBeTruthy()
 
-    await runCommand(
-      `cp ${resolve(DECENTRALAND_AMD_PATH, amdPackJson[0]['filename'])} ${resolve(ECS_PATH, dclAmdTgzFilename)}`,
-      rootPath
+    fs.copyFileSync(
+      path.resolve(DECENTRALAND_AMD_PATH, amdPackJson[0]['filename']),
+      path.resolve(ECS_PATH, dclAmdTgzFilename)
     )
-    await runCommand(
-      `cp ${resolve(BUILD_ECS_PATH, buildEcsPackJson[0]['filename'])} ${resolve(ECS_PATH, dclBuildEcsTgzFilename)}`,
-      rootPath
+    fs.copyFileSync(
+      path.resolve(BUILD_ECS_PATH, buildEcsPackJson[0]['filename']),
+      path.resolve(ECS_PATH, dclBuildEcsTgzFilename)
     )
 
     const ecsPackJson = JSON.parse(await runCommand('npm pack --json', ECS_PATH))
     expect(ecsPackJson[0]['filename']).toBeTruthy()
 
-    await runCommand(
-      `mv ${resolve(ECS_PATH, ecsPackJson[0]['filename'])} ${resolve(ECS_PATH, dclEcsTgzFilename)}`,
-      rootPath
-    )
+    fs.renameSync(path.resolve(ECS_PATH, ecsPackJson[0]['filename']), path.resolve(ECS_PATH, dclEcsTgzFilename))
   })
 
   afterAll(async () => {
-    // restore package.json to original version?
-    // itExecutes(`rm ${DECENTRALAND_AMD_PATH}/${dclAmdTgzFilename}`, rootPath)
-    // itExecutes(`rm ${BUILD_ECS_PATH}/${dclBuildEcsTgzFilename}`, rootPath)
-
-    writeFileSync(ecsPackageJsonPath, backupPackageJson)
+    fs.writeFileSync(ecsPackageJsonPath, backupPackageJson)
     if (backupPackageJson.length > 0) {
-      writeFileSync(ecsPackageLockJsonPath, backupPackageLockJson)
+      fs.writeFileSync(ecsPackageLockJsonPath, backupPackageLockJson)
     }
   })
 })
