@@ -137,10 +137,10 @@ jobs:
       - name: build
         run: make build
       - name: prepare local decentraland-ecs package
-        run: make prepare-pr && mv ./packages/decentraland-ecs/decentraland-ecs-0.0.0.tgz ./packages/decentraland-ecs/decentraland-ecs-local.tgz
+        run: make prepare-pr 
       - name: 'Upload Local decentraland-ecs'
         uses: actions/upload-artifact@v2
         with:
           name: local-decentraland-ecs
-          path: "packages/decentraland-ecs/decentraland-ecs-local.tgz"
+          path: "packages/decentraland-ecs/local-decentraland-ecs.tgz"
           retention-days: 5

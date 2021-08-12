@@ -1,10 +1,9 @@
 import { resolve } from 'path'
-import { readFileSync } from 'fs'
-import { runCommand, itExecutes, ensureFileExists, itDeletesFolder } from '../../scripts/helpers'
+import { runCommand, itExecutes, ensureFileExists } from '../../scripts/helpers'
 
 describe('setup local build of decentraland-ecs package', async () => {
   const workingDir = resolve(__dirname, '..', '..')
-  const generatedEcsTgzName = 'decentraland-ecs-0.0.0.tgz'
+  const generatedEcsTgzName = 'local-decentraland-ecs.tgz'
   const generatedEcsTgzPath = resolve(workingDir, 'packages', 'decentraland-ecs', generatedEcsTgzName)
 
   await runCommand('make prepare-pr', workingDir)
