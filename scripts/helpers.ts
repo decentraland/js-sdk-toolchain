@@ -16,26 +16,24 @@ export function ensureFileExists(file: string, root?: string) {
   return x
 }
 
-export function itExecutes(command: string, cwd: string, env?: Record<string, string>) {
-  it(
-    command,
-    async () => {
-      await new Promise<string>((onSuccess, onError) => {
-        process.stdout.write('∑ ' + cwd + '; ' + command + '\n')
-        exec(command, { cwd, env }, (error, stdout, stderr) => {
-          stdout.trim().length && process.stdout.write('  ' + stdout.replace(/\n/g, '\n  ') + '\n')
-          stderr.trim().length && process.stderr.write('! ' + stderr.replace(/\n/g, '\n  ') + '\n')
+export function runCommand(command: string, cwd: string, env?: Record<string, string>): Promise<string> {
+  return new Promise<string>((onSuccess, onError) => {
+    process.stdout.write('∑ ' + cwd + '; ' + command + '\n')
+    exec(command, { cwd, env }, (error, stdout, stderr) => {
+      stdout.trim().length && process.stdout.write('  ' + stdout.replace(/\n/g, '\n  ') + '\n')
+      stderr.trim().length && process.stderr.write('! ' + stderr.replace(/\n/g, '\n  ') + '\n')
 
-          if (error) {
-            onError(stderr)
-          } else {
-            onSuccess(stdout)
-          }
-        })
-      })
-    },
-    30000
-  )
+      if (error) {
+        onError(stderr)
+      } else {
+        onSuccess(stdout)
+      }
+    })
+  })
+}
+
+export function itExecutes(command: string, cwd: string, env?: Record<string, string>) {
+  it(command, async () => await runCommand(command, cwd, env), 30000)
 }
 
 export function itDeletesFolder(folder: string, cwd: string) {
