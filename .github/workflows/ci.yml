@@ -111,12 +111,19 @@ jobs:
         run: echo $BUILD_ECS_S3_URL $AMD_S3_URL
         env:
           AMD_S3_URL: ${{ steps.publish_dcl_amd.outputs.s3-bucket-key }}
-          BUILD_ECS_S3_URL: ${{ steps.publish_dcl_build_cs.outputs.s3-bucket-key }}
+          BUILD_ECS_S3_URL: ${{ steps.publish_dcl_build_ecs.outputs.s3-bucket-key }}
+      - name: (PR) change decentraland-ecs version to s3 ur;l
+        working-directory: ./packages/decentraland-ecs
+        run: node -e "let pkg=require('./package.json'); pkg.dependencies['@dcl/build-ecs']='$BUILD_ECS_S3_URL'; pkg.dependencies['@dcl/amd']='$AMD_S3_URL'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
+        env:
+          AMD_S3_URL: ${{ steps.publish_dcl_amd.outputs.s3-bucket-key }}
+          BUILD_ECS_S3_URL: ${{ steps.publish_dcl_build_ecs.outputs.s3-bucket-key }}
       - name: print modified decentraland-ecs/package.json
         working-directory: ./packages/decentraland-ecs
         run: cat package.json
       - name: publish decentraland-ecs package
         uses: menduz/oddish-action@master
+        id: publish_decentraland_ecs
         with:
           registry-url: "https://registry.npmjs.org"
           access: public
