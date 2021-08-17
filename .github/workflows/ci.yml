@@ -7,12 +7,10 @@ on:
 
 name: CI
 jobs:
-  print-debug-info:
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: hmarr/debug-action@v2
   build:
     runs-on: ubuntu-latest
+    outputs:
+      decentraland_ecs_s3_bucket_key: ${{ steps.publish_decentraland_ecs.outputs.s3-bucket-key }}
     steps:
       - uses: actions/checkout@master
       - name: Use Node.js 14.x
@@ -109,12 +107,12 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: (PR) change decentraland-ecs version to s3 ur;l
         working-directory: ./packages/decentraland-ecs
-        if: github.ref != 'refs/heads/main'
+        if: ${{ github.event_name == 'pull_request' && github.ref != 'refs/heads/main' && github.event.pull_request.number}}
         run: node -e "let pkg=require('./package.json'); pkg.dependencies['@dcl/build-ecs']='$BUILD_ECS_S3_URL'; pkg.dependencies['@dcl/amd']='$AMD_S3_URL'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
         env:
           AMD_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_amd.outputs.s3-bucket-key }}
           BUILD_ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_build_ecs.outputs.s3-bucket-key }}
-      - name: print modified decentraland-ecs/package.json
+      - name: print decentraland-ecs/package.json
         working-directory: ./packages/decentraland-ecs
         run: cat package.json
       - name: publish decentraland-ecs package
@@ -134,12 +132,35 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
-      - name: echo npm install to test
-        if: github.ref != 'refs/heads/main'
-        run: echo "Install this package with npm install \"$DECENTRALAND_ECS_S3_URL\""
-        env:
-          DECENTRALAND_ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_ecs.outputs.s3-bucket-key }}
           
+  notify_deployment:
+    needs: [build]
+    if: ${{ github.event.pull_request.number }}
+    runs-on: ubuntu-latest
+    name: Deployment Notification
+    steps:
+      - name: Find Comment
+        uses: peter-evans/find-comment@v1
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: Test this pull request
+
+      - name: Create or update comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            # Test this pull request
+            - The `decentraland-ecs` package can be tested in scenes by running
+               ```bash
+               npm install "$DECENTRALAND_ECS_S3_URL"
+               ```
+          edit-mode: replace
+        env:
+          DECENTRALAND_ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_ecs_s3_bucket_key }}
 
   local-test:
     runs-on: ubuntu-latest
