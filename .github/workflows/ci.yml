@@ -134,7 +134,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: echo npm install to test
-        run: echo "Install this package with npm install \"$DECENTRALAND_ECS_S3_URL\"
+        run: echo "Install this package with npm install \"$DECENTRALAND_ECS_S3_URL\""
         env:
           DECENTRALAND_ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_ecs.outputs.s3-bucket-key }}
           
