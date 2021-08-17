@@ -22,29 +22,29 @@ jobs:
       - name: install
         run: make install
       - name: update version of packages/@dcl/dcl-rollup
-        uses: menduz/oddish-action@staging
+        uses: menduz/oddish-action@master
         with:
           cwd: packages/@dcl/dcl-rollup
-          deterministic-snapshot: true
           only-update-versions: true
+          # deterministic-snapshot: true
       - name: update version of packages/@dcl/build-ecs
-        uses: menduz/oddish-action@staging
+        uses: menduz/oddish-action@master
         with:
           cwd: packages/@dcl/build-ecs
-          deterministic-snapshot: true
           only-update-versions: true
+          # deterministic-snapshot: true
       - name: update version of packages/@dcl/amd
-        uses: menduz/oddish-action@staging
+        uses: menduz/oddish-action@master
         with:
           cwd: packages/@dcl/amd
-          deterministic-snapshot: true
           only-update-versions: true
+          # deterministic-snapshot: true
       - name: update version of packages/decentraland-ecs
-        uses: menduz/oddish-action@staging
+        uses: menduz/oddish-action@master
         with:
           cwd: packages/decentraland-ecs
-          deterministic-snapshot: true
           only-update-versions: true
+          # deterministic-snapshot: true
       - name: build
         run: make build
       - name: test
@@ -64,47 +64,54 @@ jobs:
           access: public
           cwd: ./packages/@dcl/dcl-rollup
           ## use action runId instead of current date to generate snapshot numbers
-          deterministic-snapshot: true
+          # deterministic-snapshot: true
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain/branch/${{ github.head_ref }}/@dcl/dcl-rollup"
+          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain/branch/${{ github.ref }}/@dcl/dcl-rollup"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: publish @dcl/amd package
+        id: publish_dcl_amd
         uses: menduz/oddish-action@master
         with:
           registry-url: "https://registry.npmjs.org"
           access: public
           cwd: ./packages/@dcl/amd
           ## use action runId instead of current date to generate snapshot numbers
-          deterministic-snapshot: true
+          # deterministic-snapshot: true
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain/branch/${{ github.head_ref }}/@dcl/amd"
+          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain/branch/${{ github.ref }}/@dcl/amd"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: publish @dcl/build-ecs package
         uses: menduz/oddish-action@master
+        id: publish_dcl_build_ecs
         with:
           registry-url: "https://registry.npmjs.org"
           access: public
           cwd: ./packages/@dcl/build-ecs
           ## use action runId instead of current date to generate snapshot numbers
-          deterministic-snapshot: true
+          # deterministic-snapshot: true
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain/branch/${{ github.head_ref }}/@dcl/build-ecs"
+          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain/branch/${{ github.ref }}/@dcl/build-ecs"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+      - name: print required outputs
+        run: echo $BUILD_ECS_S3_URL $AMD_S3_URL
+        env:
+          AMD_S3_URL: ${{ steps.publish_dcl_amd.outputs.s3-bucket-key }}
+          BUILD_ECS_S3_URL: ${{ steps.publish_dcl_build_cs.outputs.s3-bucket-key }}
       - name: print modified decentraland-ecs/package.json
         working-directory: ./packages/decentraland-ecs
         run: cat package.json
@@ -115,11 +122,11 @@ jobs:
           access: public
           cwd: ./packages/decentraland-ecs
           ## use action runId instead of current date to generate snapshot numbers
-          deterministic-snapshot: true
+          # deterministic-snapshot: true
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain/branch/${{ github.head_ref }}"
+          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain/branch/${{ github.ref }}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
