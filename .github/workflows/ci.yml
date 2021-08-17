@@ -7,6 +7,10 @@ on:
 
 name: CI
 jobs:
+  print-debug-info:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: hmarr/debug-action@v2
   build:
     runs-on: ubuntu-latest
     steps:
