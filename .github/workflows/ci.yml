@@ -107,17 +107,12 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
-      - name: print required outputs
-        run: echo $BUILD_ECS_S3_URL $AMD_S3_URL
-        env:
-          AMD_S3_URL: ${{ steps.publish_dcl_amd.outputs.s3-bucket-key }}
-          BUILD_ECS_S3_URL: ${{ steps.publish_dcl_build_ecs.outputs.s3-bucket-key }}
       - name: (PR) change decentraland-ecs version to s3 ur;l
         working-directory: ./packages/decentraland-ecs
         run: node -e "let pkg=require('./package.json'); pkg.dependencies['@dcl/build-ecs']='$BUILD_ECS_S3_URL'; pkg.dependencies['@dcl/amd']='$AMD_S3_URL'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
         env:
-          AMD_S3_URL: ${{ steps.publish_dcl_amd.outputs.s3-bucket-key }}
-          BUILD_ECS_S3_URL: ${{ steps.publish_dcl_build_ecs.outputs.s3-bucket-key }}
+          AMD_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_amd.outputs.s3-bucket-key }}
+          BUILD_ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_build_ecs.outputs.s3-bucket-key }}
       - name: print modified decentraland-ecs/package.json
         working-directory: ./packages/decentraland-ecs
         run: cat package.json
@@ -138,6 +133,11 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+      - name: echo npm install to test
+        run: echo "Install this package with npm install \"$DECENTRALAND_ECS_S3_URL\"
+        env:
+          DECENTRALAND_ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_ecs.outputs.s3-bucket-key }}
+          
 
   local-test:
     runs-on: ubuntu-latest
