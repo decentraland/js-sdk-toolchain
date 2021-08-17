@@ -63,12 +63,12 @@ jobs:
           deterministic-snapshot: true
 
           ## publish every package to s3
-          s3-bucket: ${{ secrets.CDN_BUCKET }}
+          s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: "@dcl/js-sdk-toolchain-wip/branch/${{ github.head_ref }}/@dcl/dcl-rollup"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: publish @dcl/amd package
         uses: menduz/oddish-action@master
         with:
@@ -79,12 +79,12 @@ jobs:
           deterministic-snapshot: true
 
           ## publish every package to s3
-          s3-bucket: ${{ secrets.CDN_BUCKET }}
+          s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: "@dcl/js-sdk-toolchain-wip/branch/${{ github.head_ref }}/@dcl/amd"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: publish @dcl/build-ecs package
         uses: menduz/oddish-action@master
         with:
@@ -95,12 +95,12 @@ jobs:
           deterministic-snapshot: true
 
           ## publish every package to s3
-          s3-bucket: ${{ secrets.CDN_BUCKET }}
+          s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: "@dcl/js-sdk-toolchain-wip/branch/${{ github.head_ref }}/@dcl/build-ecs"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: temporary rename decentraland-ecs package to publish
         working-directory: ./packages/decentraland-ecs
         run: node -e "let pkg=require('./package.json'); pkg.name='decentraland-ecs-wip'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
@@ -117,12 +117,12 @@ jobs:
           deterministic-snapshot: true
 
           ## publish every package to s3
-          s3-bucket: ${{ secrets.CDN_BUCKET }}
+          s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: "@dcl/js-sdk-toolchain-wip/branch/${{ github.head_ref }}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
   local-test:
     runs-on: ubuntu-latest
