@@ -109,6 +109,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: (PR) change decentraland-ecs version to s3 ur;l
         working-directory: ./packages/decentraland-ecs
+        if: github.ref != 'refs/heads/main'
         run: node -e "let pkg=require('./package.json'); pkg.dependencies['@dcl/build-ecs']='$BUILD_ECS_S3_URL'; pkg.dependencies['@dcl/amd']='$AMD_S3_URL'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
         env:
           AMD_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_amd.outputs.s3-bucket-key }}
@@ -134,6 +135,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: echo npm install to test
+        if: github.ref != 'refs/heads/main'
         run: echo "Install this package with npm install \"$DECENTRALAND_ECS_S3_URL\""
         env:
           DECENTRALAND_ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_ecs.outputs.s3-bucket-key }}
