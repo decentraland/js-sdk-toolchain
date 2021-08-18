@@ -23,25 +23,25 @@ jobs:
         uses: menduz/oddish-action@master
         with:
           cwd: packages/@dcl/dcl-rollup
-          # deterministic-snapshot: true
+          deterministic-snapshot: true
           only-update-versions: true
       - name: update version of packages/@dcl/build-ecs
         uses: menduz/oddish-action@master
         with:
           cwd: packages/@dcl/build-ecs
-          # deterministic-snapshot: true
+          deterministic-snapshot: true
           only-update-versions: true
       - name: update version of packages/@dcl/amd
         uses: menduz/oddish-action@master
         with:
           cwd: packages/@dcl/amd
-          # deterministic-snapshot: true
+          deterministic-snapshot: true
           only-update-versions: true
       - name: update version of packages/decentraland-ecs
         uses: menduz/oddish-action@master
         with:
           cwd: packages/decentraland-ecs
-          # deterministic-snapshot: true
+          deterministic-snapshot: true
           only-update-versions: true
       - name: build
         run: make build
@@ -62,7 +62,7 @@ jobs:
           access: public
           cwd: ./packages/@dcl/dcl-rollup
           ## use action runId instead of current date to generate snapshot numbers
-          # deterministic-snapshot: true
+          deterministic-snapshot: true
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
@@ -79,7 +79,7 @@ jobs:
           access: public
           cwd: ./packages/@dcl/amd
           ## use action runId instead of current date to generate snapshot numbers
-          # deterministic-snapshot: true
+          deterministic-snapshot: true
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
@@ -96,7 +96,7 @@ jobs:
           access: public
           cwd: ./packages/@dcl/build-ecs
           ## use action runId instead of current date to generate snapshot numbers
-          # deterministic-snapshot: true
+          deterministic-snapshot: true
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
@@ -120,7 +120,7 @@ jobs:
           access: public
           cwd: ./packages/decentraland-ecs
           ## use action runId instead of current date to generate snapshot numbers
-          # deterministic-snapshot: true
+          deterministic-snapshot: true
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
