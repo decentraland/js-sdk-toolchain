@@ -159,7 +159,8 @@ const entityV3FromFolder = (folder: string) => {
         } catch (err) {
           return
         }
-        const key = file.replace(folder, '').replace(/^\/+/, '')
+        const _folder = folder.replace(/\\/gi, ‘/’)
+        const key = file.replace(_folder, '').replace(/^\/+/, '')
 
         return { file: key.toLowerCase(), hash: 'b64-' + Buffer.from(file).toString('base64') }
       })
