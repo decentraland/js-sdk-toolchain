@@ -1,13 +1,12 @@
 import * as path from 'path'
-import { promises } from 'fs'
-
-const fs = promises
+import * as fs from 'fs'
+import { entityV3FromFolder, copyDir, getSceneJson, ensureWriteFile, ensureCopyFile } from './setupUtils'
+import standarWearableResponse from './defaultWearablesResponse'
 
 const setupExport = async ({
   workDir,
   exportDir,
-  mappings,
-  sceneJson
+  mappings
 }: {
   workDir: string
   exportDir: string
@@ -15,6 +14,7 @@ const setupExport = async ({
   sceneJson: any
 }): Promise<void> => {
   try {
+    // 1) Path resolving
     const ecsPath = path.dirname(
       require.resolve('decentraland-ecs/package.json', {
         paths: [workDir, __dirname + '/../../', __dirname + '/../']
@@ -22,23 +22,84 @@ const setupExport = async ({
     )
     const dclKernelPath = path.dirname(require.resolve('@dcl/kernel/package.json', { paths: [workDir, ecsPath] }))
     const dclKernelDefaultProfilePath = path.resolve(dclKernelPath, 'default-profile')
+    const dclKernelLoaderPath = path.resolve(dclKernelPath, 'loader')
     const dclUnityRenderer = path.dirname(
       require.resolve('@dcl/unity-renderer/package.json', { paths: [workDir, ecsPath] })
     )
+    const lambdasPath = path.resolve(exportDir, 'lambdas')
+    const explorePath = path.resolve(lambdasPath, 'explore')
+    const contractsPath = path.resolve(lambdasPath, 'contracts')
+    const sceneContentPath = path.resolve(exportDir, 'content', 'entities')
+    const contentsContentPath = path.resolve(exportDir, 'content', 'contents')
+    const sceneJsonPath = path.resolve(workDir, './scene.json')
 
-    // Change HTML title name
-    const content = await fs.readFile(path.resolve(dclKernelPath, 'export.html'), 'utf-8')
+    // 2) Change HTML title name
+    const defaultSceneJson = { display: { title: '' }, scene: { parcels: ['0,0'] } }
+    const sceneJson = fs.existsSync(sceneJsonPath)
+      ? JSON.parse(fs.readFileSync(sceneJsonPath).toString())
+      : defaultSceneJson
+
+    const content = await fs.promises.readFile(path.resolve(dclKernelPath, 'export.html'), 'utf-8')
     const finalContent = content.replace('{{ scene.display.title }}', sceneJson.display.title)
+
+    // 3) Copy and write files
+    await ensureWriteFile(
+      path.resolve(explorePath, 'realms'),
+      JSON.stringify([
+        {
+          serverName: 'localhost',
+          url: `http://localhost`,
+          layer: 'stub',
+          usersCount: 0,
+          maxUsers: 100,
+          userParcels: []
+        }
+      ])
+    )
+
+    await ensureWriteFile(
+      path.resolve(contractsPath, 'servers'),
+      JSON.stringify([
+        {
+          address: `http://localhost`,
+          owner: '0x0000000000000000000000000000000000000000',
+          id: '0x0000000000000000000000000000000000000000000000000000000000000000'
+        }
+      ])
+    )
+
+    await ensureWriteFile(path.resolve(contractsPath, 'pois'), '')
+
+    await ensureWriteFile(
+      path.resolve(sceneContentPath, 'scene'),
+      JSON.stringify(getSceneJson({ baseFolders: [workDir], pointers: sceneJson?.scene?.parcels || ['0,0'] }))
+    )
+
+    await ensureWriteFile(path.resolve(lambdasPath, 'profiles'), JSON.stringify([]))
+    await ensureWriteFile(
+      path.resolve(lambdasPath, 'collections', 'wearables'),
+      JSON.stringify(standarWearableResponse)
+    )
+
+    const contentStatic = entityV3FromFolder({ folder: workDir, addOriginalPath: true })
+    if (contentStatic?.content) {
+      for (const $ of contentStatic?.content) {
+        if ($ && $.original_path) {
+          await ensureCopyFile(path.resolve(workDir, $.original_path), path.resolve(contentsContentPath, $.hash))
+        }
+      }
+    }
 
     await Promise.all([
       // copy project
-      fs.writeFile(path.resolve(exportDir, 'index.html'), finalContent, 'utf-8'),
-      fs.writeFile(path.resolve(exportDir, 'mappings'), JSON.stringify(mappings), 'utf-8'),
+      ensureWriteFile(path.resolve(exportDir, 'index.html'), finalContent),
+      ensureCopyFile(path.resolve(dclKernelPath, 'index.js'), path.resolve(exportDir, 'index.js')),
+      ensureCopyFile(path.resolve(dclKernelPath, 'favicon.ico'), path.resolve(exportDir, 'favicon.ico')),
 
       // copy dependencies
       copyDir(dclUnityRenderer, path.resolve(exportDir, 'unity-renderer')),
       copyDir(dclKernelDefaultProfilePath, path.resolve(exportDir, 'default-profile')),
-      fs.copyFile(path.resolve(dclKernelPath, 'index.js'), path.resolve(exportDir, 'index.js'))
+      copyDir(dclKernelLoaderPath, path.resolve(exportDir, 'loader'))
     ])
   } catch (err) {
     console.error('Export failed.', err)
@@ -47,17 +108,5 @@ const setupExport = async ({
   return
 }
 
-// instead of using fs-extra, create a custom function to no need to rollup
-async function copyDir(src: string, dest: string) {
-  await fs.mkdir(dest, { recursive: true })
-  let entries = await fs.readdir(src, { withFileTypes: true })
-
-  for (let entry of entries) {
-    let srcPath = path.join(src, entry.name)
-    let destPath = path.join(dest, entry.name)
-
-    entry.isDirectory() ? await copyDir(srcPath, destPath) : await fs.copyFile(srcPath, destPath)
-  }
-}
-
+// @ts-ignore
 export = setupExport

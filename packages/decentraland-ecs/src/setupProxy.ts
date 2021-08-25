@@ -1,8 +1,8 @@
 import * as path from 'path'
 import * as fs from 'fs'
 import { createProxyMiddleware } from 'http-proxy-middleware'
-import { sync as globSync } from 'glob'
 import * as express from 'express'
+import { getSceneJson } from './setupUtils'
 
 const setupProxy = (dcl: any, app: express.Application) => {
   // first resolve all dependencies in the local current working directory
@@ -136,50 +136,6 @@ const mockCatalyst = (app: express.Application, baseFolders: string[]) => {
   )
 }
 
-const entityV3FromFolder = (folder: string) => {
-  const sceneJsonPath = path.resolve(folder, './scene.json')
-
-  if (fs.existsSync(sceneJsonPath)) {
-    const sceneJson = JSON.parse(fs.readFileSync(sceneJsonPath).toString())
-
-    const { base, parcels }: { base: string; parcels: string[] } = sceneJson.scene
-    const pointers = new Set<string>()
-    pointers.add(base)
-    parcels.forEach(($) => pointers.add($))
-
-    const allFiles = globSync('**/*', {
-      cwd: folder,
-      dot: false,
-      ignore: ['node_modules/**/*', '.git/**/*'],
-      absolute: true
-    })
-      .map((file) => {
-        try {
-          if (!fs.statSync(file).isFile()) return
-        } catch (err) {
-          return
-        }
-        const _folder = folder.replace(/\\/gi, '/')
-        const key = file.replace(_folder, '').replace(/^\/+/, '')
-
-        return { file: key.toLowerCase(), hash: 'b64-' + Buffer.from(file).toString('base64') }
-      })
-      .filter(($) => !!$)
-
-    return {
-      version: 'v3',
-      type: 'scene',
-      id: 'b64-' + Buffer.from(folder).toString('base64'),
-      pointers: Array.from(pointers),
-      timestamp: Date.now(),
-      metadata: sceneJson,
-      content: allFiles
-    }
-  }
-
-  return null
-}
-
 const serveFolders = (app: express.Application, baseFolders: string[]) => {
   app.get('/content/contents/:hash', (req, res, next) => {
     if (req.params.hash && req.params.hash.startsWith('b64-')) {
@@ -224,25 +180,10 @@ const serveFolders = (app: express.Application, baseFolders: string[]) => {
         : (req.query.pointer as string[])
     )
 
-    const resultEntities = []
-
-    const allDeployments = baseFolders.map((folder) => entityV3FromFolder(folder))
-
-    for (let pointer of Array.from(requestedPointers)) {
-      // get deployment by pointer
-      const theDeployment = allDeployments.find(($) => $ && $.pointers.includes(pointer))
-      if (theDeployment) {
-        // remove all the required pointers from the requestedPointers set
-        // to prevent sending duplicated entities
-        theDeployment.pointers.forEach(($) => requestedPointers.delete($))
-
-        // add the deployment to the results
-        resultEntities.push(theDeployment)
-      }
-    }
-
+    const resultEntities = getSceneJson({ baseFolders, pointers: Array.from(requestedPointers) })
     res.json(resultEntities).end()
   })
 }
 
+// @ts-ignore
 export = setupProxy

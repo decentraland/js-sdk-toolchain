@@ -22,7 +22,9 @@
     "docs-yaml",
     "artifacts",
     "src/setupProxy.js",
-    "src/setupExport.js"
+    "src/setupExport.js",
+    "src/setupUtils.js",
+    "src/defaultWearablesResponse.js"
   ],
   "dependencies": {
     "@dcl/amd": "file:../@dcl/amd",
