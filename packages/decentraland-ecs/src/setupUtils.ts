@@ -104,14 +104,8 @@ export async function ensureCopyFile(fromFilePath: string, filePath: any) {
 
 export const downloadFile = async (url: string, path: string) => {
   const res = await fetch(url)
-  const fileStream = fs.createWriteStream(path)
-  await new Promise((resolve, reject) => {
-    res.body.pipe(fileStream)
-    res.body.on('error', (err) => {
-      reject(err)
-    })
-    fileStream.on('finish', function () {
-      resolve()
-    })
-  })
+  const fileStream = fs.createWriteStream(path) as any
+  if (res.body){
+    await res.body.pipeTo(fileStream)
+  }
 }
