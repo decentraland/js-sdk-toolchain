@@ -1,6 +1,8 @@
 import * as fs from 'fs'
 import { sync as globSync } from 'glob'
 import * as path from 'path'
+import * as http from 'http'
+import * as https from 'https'
 
 // instead of using fs-extra, create a custom function to no need to rollup
 export async function copyDir(src: string, dest: string) {
@@ -103,9 +105,25 @@ export async function ensureCopyFile(fromFilePath: string, filePath: any) {
 }
 
 export const downloadFile = async (url: string, path: string) => {
-  const res = await fetch(url)
-  const fileStream = fs.createWriteStream(path) as any
-  if (res.body){
-    await res.body.pipeTo(fileStream)
-  }
+  return new Promise((resolve, reject) => {
+    const file = fs.createWriteStream(path)
+
+    let schema = http
+    if (url.toLowerCase().startsWith('https:')) {
+      schema = https as any
+    }
+
+    schema
+      .get(url, function (response) {
+        response.pipe(file)
+        file.on('finish', function () {
+          file.close()
+          resolve(true)
+        })
+      })
+      .on('error', function (err) {
+        fs.unlinkSync(path)
+        reject(err)
+      })
+  })
 }
