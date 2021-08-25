@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import { sync as globSync } from 'glob'
 import * as path from 'path'
+import nodeFetch from 'node-fetch'
 
 // instead of using fs-extra, create a custom function to no need to rollup
 export async function copyDir(src: string, dest: string) {
@@ -100,4 +101,18 @@ export async function ensureCopyFile(fromFilePath: string, filePath: any) {
   }
 
   await fs.promises.copyFile(fromFilePath, filePath)
+}
+
+export const downloadFile = async (url: string, path: string) => {
+  const res = await nodeFetch(url)
+  const fileStream = fs.createWriteStream(path)
+  await new Promise((resolve, reject) => {
+    res.body.pipe(fileStream)
+    res.body.on('error', (err) => {
+      reject(err)
+    })
+    fileStream.on('finish', function () {
+      resolve(true)
+    })
+  })
 }

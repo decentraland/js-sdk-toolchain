@@ -23,8 +23,7 @@
     "artifacts",
     "src/setupProxy.js",
     "src/setupExport.js",
-    "src/setupUtils.js",
-    "src/defaultWearablesResponse.js"
+    "src/setupUtils.js"
   ],
   "dependencies": {
     "@dcl/amd": "file:../@dcl/amd",
@@ -35,5 +34,8 @@
     "glob": "^7.1.7",
     "http-proxy-middleware": "^2.0.1"
   },
-  "minCliVersion": "3.7.0"
+  "minCliVersion": "3.7.0",
+  "devDependencies": {
+    "@types/node-fetch": "^2.5.12"
+  }
 }

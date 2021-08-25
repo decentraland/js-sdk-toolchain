@@ -1,7 +1,6 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import { entityV3FromFolder, copyDir, getSceneJson, ensureWriteFile, ensureCopyFile } from './setupUtils'
-import standarWearableResponse from './defaultWearablesResponse'
+import { entityV3FromFolder, copyDir, getSceneJson, ensureWriteFile, ensureCopyFile, downloadFile } from './setupUtils'
 
 const setupExport = async ({
   workDir,
@@ -76,10 +75,7 @@ const setupExport = async ({
     )
 
     await ensureWriteFile(path.resolve(lambdasPath, 'profiles'), JSON.stringify([]))
-    await ensureWriteFile(
-      path.resolve(lambdasPath, 'collections', 'wearables'),
-      JSON.stringify(standarWearableResponse)
-    )
+    await copyWearables({ exportDir })
 
     const contentStatic = entityV3FromFolder({ folder: workDir, addOriginalPath: true })
     if (contentStatic?.content) {
@@ -101,11 +97,60 @@ const setupExport = async ({
       copyDir(dclKernelDefaultProfilePath, path.resolve(exportDir, 'default-profile')),
       copyDir(dclKernelLoaderPath, path.resolve(exportDir, 'loader'))
     ])
+
+    const copyBrVersion = ['unity.wasm', 'unity.data', 'unity.framework.js', 'unity.data']
+    for (const fileName of copyBrVersion) {
+      if (fs.existsSync(path.resolve(exportDir, 'unity-renderer', fileName))) {
+        await ensureCopyFile(
+          path.resolve(exportDir, 'unity-renderer', fileName),
+          path.resolve(exportDir, 'unity-renderer', `${fileName}.br`)
+        )
+      }
+    }
   } catch (err) {
     console.error('Export failed.', err)
     throw err
   }
   return
+}
+
+const copyWearables = async ({ exportDir }: { exportDir: string }) => {
+  const filesToDownload = new Set<string>()
+  const wearableResponsePath = path.resolve(exportDir, 'lambdas', 'collections', 'wearables')
+  const baseAvatarUrl =
+    'https://peer.decentraland.org/lambdas/collections/wearables?collectionId=urn:decentraland:off-chain:base-avatars'
+
+  await ensureWriteFile(wearableResponsePath, '')
+  await downloadFile(baseAvatarUrl, wearableResponsePath)
+
+  let response = JSON.parse(fs.readFileSync(wearableResponsePath).toString())
+
+  for (const w_i in response.wearables) {
+    // download wearable.thumbnail and copy and replace
+    filesToDownload.add(`${response.wearables[w_i].thumbnail || ''}`)
+    response.wearables[w_i].thumbnail = '.' + new URL(response.wearables[w_i].thumbnail).pathname
+
+    for (const r_j in response.wearables[w_i].data.representations) {
+      // download each contents representation mainFile,
+      for (const c_k in response.wearables[w_i].data.representations[r_j].contents) {
+        const url = response.wearables[w_i].data.representations[r_j].contents[c_k].url
+        filesToDownload.add(`${url || ''}`)
+        response.wearables[w_i].data.representations[r_j].contents[c_k].url = '.' + new URL(url).pathname
+      }
+    }
+  }
+
+  var promises = []
+
+  for (const fileUrl of Array.from(filesToDownload)) {
+    const url = new URL(fileUrl)
+    const filePath = path.resolve(exportDir, url.pathname.substr(1))
+    await ensureWriteFile(filePath, '')
+    promises.push(downloadFile(url.toString(), filePath))
+  }
+  await Promise.all(promises)
+
+  await ensureWriteFile(wearableResponsePath, JSON.stringify(response, null, 2))
 }
 
 // @ts-ignore
