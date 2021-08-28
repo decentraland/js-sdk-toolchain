@@ -22,6 +22,7 @@ const setupExport = async ({
     const dclKernelPath = path.dirname(require.resolve('@dcl/kernel/package.json', { paths: [workDir, ecsPath] }))
     const dclKernelDefaultProfilePath = path.resolve(dclKernelPath, 'default-profile')
     const dclKernelLoaderPath = path.resolve(dclKernelPath, 'loader')
+    const dclKernelImagesDecentralandConnectPath = path.resolve(dclKernelPath, 'images', 'decentraland-connect')
     const dclUnityRenderer = path.dirname(
       require.resolve('@dcl/unity-renderer/package.json', { paths: [workDir, ecsPath] })
     )
@@ -97,6 +98,10 @@ const setupExport = async ({
       copyDir(dclKernelDefaultProfilePath, path.resolve(exportDir, 'default-profile')),
       copyDir(dclKernelLoaderPath, path.resolve(exportDir, 'loader'))
     ])
+
+    if (fs.existsSync(dclKernelImagesDecentralandConnectPath)) {
+      await copyDir(dclKernelImagesDecentralandConnectPath, path.resolve(exportDir, 'images', 'decentraland-connect'))
+    }
 
     const copyBrVersion = ['unity.wasm', 'unity.data', 'unity.framework.js', 'unity.data']
     for (const fileName of copyBrVersion) {
