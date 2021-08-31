@@ -59,7 +59,8 @@ export function entityV3FromFolder({
       })
       .filter(($) => !!$) as string[]
 
-    const ig = ignore().add(ignorePattern || '')
+    const ensureIgnorePattern = (ignorePattern && ignorePattern !== '') ? ignorePattern : defaultDclIgnore()
+    const ig = ignore().add(ensureIgnorePattern)
     const filteredFiles = ig.filter(allFiles)
 
     const mappedFiles = filteredFiles
@@ -106,8 +107,6 @@ export function getSceneJson({
     let ignoreFileContent = ''
     if (fs.existsSync(dclIgnorePath)) {
       ignoreFileContent = fs.readFileSync(path.resolve(folder, '.dclignore'), 'utf-8')
-    } else {
-      ignoreFileContent = defaultDclIgnore()
     }
 
     return entityV3FromFolder({
