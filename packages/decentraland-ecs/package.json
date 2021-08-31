@@ -32,7 +32,8 @@
     "@dcl/posix": "^1.0.0-20210529225617.commit-f7f0ee9",
     "@dcl/unity-renderer": "latest",
     "glob": "^7.1.7",
-    "http-proxy-middleware": "^2.0.1"
+    "http-proxy-middleware": "^2.0.1",
+    "ignore": "^5.1.8"
   },
   "minCliVersion": "3.7.0"
 }

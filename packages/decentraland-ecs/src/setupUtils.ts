@@ -3,6 +3,8 @@ import { sync as globSync } from 'glob'
 import * as path from 'path'
 import * as http from 'http'
 import * as https from 'https'
+import * as crypto from 'crypto'
+import ignore from 'ignore'
 
 // instead of using fs-extra, create a custom function to no need to rollup
 export async function copyDir(src: string, dest: string) {
@@ -17,8 +19,20 @@ export async function copyDir(src: string, dest: string) {
   }
 }
 
-export function entityV3FromFolder({ folder, addOriginalPath }: { folder: string; addOriginalPath?: boolean }) {
+export function entityV3FromFolder({
+  folder,
+  addOriginalPath,
+  ignorePattern,
+  customHashMaker
+}: {
+  folder: string
+  addOriginalPath?: boolean
+  ignorePattern?: string
+  customHashMaker?: (str: string) => string
+}) {
   const sceneJsonPath = path.resolve(folder, './scene.json')
+  const defaultHashMaker = (str: string) => 'b64-' + Buffer.from(str).toString('base64')
+  const hashMaker = customHashMaker ? customHashMaker : defaultHashMaker
 
   if (fs.existsSync(sceneJsonPath)) {
     const sceneJson = JSON.parse(fs.readFileSync(sceneJsonPath).toString())
@@ -31,7 +45,6 @@ export function entityV3FromFolder({ folder, addOriginalPath }: { folder: string
     const allFiles = globSync('**/*', {
       cwd: folder,
       dot: false,
-      ignore: ['node_modules/**/*', '.git/**/*'],
       absolute: true
     })
       .map((file) => {
@@ -42,33 +55,66 @@ export function entityV3FromFolder({ folder, addOriginalPath }: { folder: string
         }
         const _folder = folder.replace(/\\/gi, '/')
         const key = file.replace(_folder, '').replace(/^\/+/, '')
+        return key
+      })
+      .filter(($) => !!$) as string[]
 
-        if (addOriginalPath) {
-          return { file: key.toLowerCase(), original_path: key, hash: 'b64-' + Buffer.from(file).toString('base64') }
-        } else {
-          return { file: key.toLowerCase(), hash: 'b64-' + Buffer.from(file).toString('base64') }
+    const ig = ignore().add(ignorePattern || '')
+    const filteredFiles = ig.filter(allFiles)
+
+    const mappedFiles = filteredFiles
+      .map((file) => {
+        try {
+          if (!fs.statSync(file).isFile()) return
+        } catch (err) {
+          return
         }
+        const _folder = folder.replace(/\\/gi, '/')
+        const key = file.replace(_folder, '').replace(/^\/+/, '')
+
+        return { file: key.toLowerCase(), original_path: addOriginalPath ? key : undefined, hash: hashMaker(key) }
       })
       .filter(($) => !!$)
 
     return {
       version: 'v3',
       type: 'scene',
-      id: 'b64-' + Buffer.from(folder).toString('base64'),
+      id: hashMaker(folder),
       pointers: Array.from(pointers),
       timestamp: Date.now(),
       metadata: sceneJson,
-      content: allFiles
+      content: mappedFiles
     }
   }
 
   return null
 }
 
-export function getSceneJson({ baseFolders, pointers }: { baseFolders: string[]; pointers: string[] }) {
+export function getSceneJson({
+  baseFolders,
+  pointers,
+  customHashMaker
+}: {
+  baseFolders: string[]
+  pointers: string[]
+  customHashMaker?: (str: string) => string
+}) {
   const requestedPointers = new Set<string>(pointers)
   const resultEntities = []
-  const allDeployments = baseFolders.map((folder) => entityV3FromFolder({ folder }))
+  const allDeployments = baseFolders.map((folder) => {
+    const dclIgnorePath = path.resolve(folder, '.dclignore')
+    let ignoreFileContent = ''
+    if (fs.existsSync(dclIgnorePath)) {
+      ignoreFileContent = fs.readFileSync(path.resolve(folder, '.dclignore'), 'utf-8')
+    }
+
+    return entityV3FromFolder({
+      folder,
+      addOriginalPath: false,
+      ignorePattern: ignoreFileContent,
+      customHashMaker
+    })
+  })
 
   for (let pointer of Array.from(requestedPointers)) {
     // get deployment by pointer
@@ -127,3 +173,5 @@ export const downloadFile = async (url: string, path: string) => {
       })
   })
 }
+
+export const shaHashMaker = (str: string) => crypto.createHash('sha1').update(str).digest('hex')

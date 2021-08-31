@@ -1,6 +1,14 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import { entityV3FromFolder, copyDir, getSceneJson, ensureWriteFile, ensureCopyFile, downloadFile } from './setupUtils'
+import {
+  entityV3FromFolder,
+  copyDir,
+  getSceneJson,
+  ensureWriteFile,
+  ensureCopyFile,
+  downloadFile,
+  shaHashMaker
+} from './setupUtils'
 
 const setupExport = async ({
   workDir,
@@ -72,13 +80,25 @@ const setupExport = async ({
 
     await ensureWriteFile(
       path.resolve(sceneContentPath, 'scene'),
-      JSON.stringify(getSceneJson({ baseFolders: [workDir], pointers: sceneJson?.scene?.parcels || ['0,0'] }))
+      JSON.stringify(
+        getSceneJson({
+          baseFolders: [workDir],
+          pointers: sceneJson?.scene?.parcels || ['0,0'],
+          customHashMaker: shaHashMaker
+        })
+      )
     )
 
     await ensureWriteFile(path.resolve(lambdasPath, 'profiles'), JSON.stringify([]))
     await copyWearables({ exportDir })
 
-    const contentStatic = entityV3FromFolder({ folder: workDir, addOriginalPath: true })
+    const ignoreFileContent = await fs.promises.readFile(path.resolve(workDir, '.dclignore'), 'utf-8')
+    const contentStatic = entityV3FromFolder({
+      folder: workDir,
+      addOriginalPath: true,
+      ignorePattern: ignoreFileContent,
+      customHashMaker: shaHashMaker
+    })
     if (contentStatic?.content) {
       for (const $ of contentStatic?.content) {
         if ($ && $.original_path) {
