@@ -91,7 +91,6 @@ const setupExport = async ({
     )
 
     await ensureWriteFile(path.resolve(lambdasPath, 'profiles'), JSON.stringify([]))
-    await copyWearables({ exportDir })
 
     let ignoreFileContent = ''
     if (fs.existsSync(dclIgnorePath)) {
@@ -136,6 +135,8 @@ const setupExport = async ({
         )
       }
     }
+    
+    await copyWearables({ exportDir })
   } catch (err) {
     console.error('Export failed.', err)
     throw err

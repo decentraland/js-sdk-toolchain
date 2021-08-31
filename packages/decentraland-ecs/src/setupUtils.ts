@@ -106,6 +106,8 @@ export function getSceneJson({
     let ignoreFileContent = ''
     if (fs.existsSync(dclIgnorePath)) {
       ignoreFileContent = fs.readFileSync(path.resolve(folder, '.dclignore'), 'utf-8')
+    } else {
+      ignoreFileContent = defaultDclIgnore()
     }
 
     return entityV3FromFolder({
@@ -175,3 +177,25 @@ export const downloadFile = async (url: string, path: string) => {
 }
 
 export const shaHashMaker = (str: string) => crypto.createHash('sha1').update(str).digest('hex')
+
+export const defaultDclIgnore = () =>
+  [
+    '.*',
+    'package.json',
+    'package-lock.json',
+    'yarn-lock.json',
+    'build.json',
+    'export',
+    'tsconfig.json',
+    'tslint.json',
+    'node_modules',
+    '*.ts',
+    '*.tsx',
+    'Dockerfile',
+    'dist',
+    'README.md',
+    '*.blend',
+    '*.fbx',
+    '*.zip',
+    '*.rar'
+  ].join('\n')
