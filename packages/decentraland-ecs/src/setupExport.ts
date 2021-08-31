@@ -27,6 +27,7 @@ const setupExport = async ({
         paths: [workDir, __dirname + '/../../', __dirname + '/../']
       })
     )
+    const dclIgnorePath = path.resolve(workDir, '.dclignore')
     const dclKernelPath = path.dirname(require.resolve('@dcl/kernel/package.json', { paths: [workDir, ecsPath] }))
     const dclKernelDefaultProfilePath = path.resolve(dclKernelPath, 'default-profile')
     const dclKernelLoaderPath = path.resolve(dclKernelPath, 'loader')
@@ -92,7 +93,10 @@ const setupExport = async ({
     await ensureWriteFile(path.resolve(lambdasPath, 'profiles'), JSON.stringify([]))
     await copyWearables({ exportDir })
 
-    const ignoreFileContent = await fs.promises.readFile(path.resolve(workDir, '.dclignore'), 'utf-8')
+    let ignoreFileContent = ''
+    if (fs.existsSync(dclIgnorePath)) {
+      ignoreFileContent = fs.readFileSync(path.resolve(workDir, '.dclignore'), 'utf-8')
+    }
     const contentStatic = entityV3FromFolder({
       folder: workDir,
       addOriginalPath: true,
