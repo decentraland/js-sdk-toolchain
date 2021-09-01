@@ -29,7 +29,7 @@
     "@dcl/amd": "file:../@dcl/amd",
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
     "@dcl/kernel": "1.0.0-1183126330.commit-a3dbb32",
-    "@dcl/posix": "^1.0.0-20210529225617.commit-f7f0ee9",
+    "@dcl/posix": "^1.0.0",
     "@dcl/unity-renderer": "1.0.12119-20210830195045.commit-a8be53a",
     "glob": "^7.1.7",
     "http-proxy-middleware": "^2.0.1",
