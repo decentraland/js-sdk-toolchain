@@ -382,29 +382,29 @@ export class GLTFShape extends Shape {
 
 /** @public */
 export enum PictureFrameStyle {
-  CLASSIC = 0,
-  BAROQUE_ORNAMENT,
-  DIAMOND_ORNAMENT,
-  MINIMAL_WIDE,
-  MINIMAL_GREY,
-  BLOCKY,
-  GOLD_EDGES,
-  GOLD_CARVED,
-  GOLD_WIDE,
-  GOLD_ROUNDED,
-  METAL_MEDIUM,
-  METAL_WIDE,
-  METAL_SLIM,
-  METAL_ROUNDED,
-  PINS,
-  MINIMAL_BLACK,
-  MINIMAL_WHITE,
-  TAPE,
-  WOOD_SLIM,
-  WOOD_WIDE,
-  WOOD_TWIGS,
-  CANVAS,
-  NONE
+  Classic = 0,
+  Baroque_Ornament = 1,
+  Diamond_Ornament = 2,
+  Minimal_Wide = 3,
+  Minimal_Grey = 4,
+  Blocky = 5,
+  Gold_Edges = 6,
+  Gold_Carved = 7,
+  Gold_Wide = 8,
+  Gold_Rounded = 9,
+  Metal_Medium = 10,
+  Metal_Wide = 11,
+  Metal_Slim = 12,
+  Metal_Rounded = 13,
+  Pins = 14,
+  Minimal_Black = 15,
+  Minimal_White = 16,
+  Tape = 17,
+  Wood_Slim = 18,
+  Wood_Wide = 19,
+  Wood_Twigs = 20,
+  Canvas = 21,
+  None = 22
 }
 
 /** @public */
@@ -435,7 +435,7 @@ export class NFTShape extends Shape {
     this.src = src
 
     let color = new Color3(0.6404918, 0.611472, 0.8584906)
-    let style = PictureFrameStyle.CLASSIC
+    let style = PictureFrameStyle.Classic
 
     // check if args is color (backwards compatibility)
     if ('r' in args) {
