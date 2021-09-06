@@ -1,4 +1,4 @@
-import { copyFileSync, mkdir, mkdirSync } from 'fs'
+import { mkdirSync } from 'fs'
 import { resolve } from 'path'
 import { runCommand, itExecutes, ensureFileExists } from '../../scripts/helpers'
 

@@ -16,6 +16,5 @@
   "devDependencies": {
     "decentraland-ecs": "file:../../../../packages/decentraland-ecs"
   },
-  "dependencies": {},
   "bundleDependencies": []
 }
