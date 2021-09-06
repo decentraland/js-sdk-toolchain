@@ -29,8 +29,8 @@
     "@dcl/amd": "file:../@dcl/amd",
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
     "@dcl/kernel": "1.0.0-1183126330.commit-a3dbb32",
-    "@dcl/posix": "^1.0.0",
-    "@dcl/unity-renderer": "1.0.12119-20210830195045.commit-a8be53a",
+    "@dcl/posix": "1.0.1-20210906195401.commit-17a2da7",
+    "@dcl/unity-renderer": "https://sdk-team-cdn.decentraland.org/@dcl/kernel/branch/feat/video-event-handler/dcl-kernel-1.0.0-1207005337.commit-374712b.tgz",
     "glob": "^7.1.7",
     "http-proxy-middleware": "^2.0.1",
     "ignore": "^5.1.8"
