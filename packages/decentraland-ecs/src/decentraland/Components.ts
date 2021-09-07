@@ -1094,14 +1094,9 @@ export class VideoTexture extends ObservableComponent {
   @ObservableComponent.field
   seek: number = -1
 
-  @ObservableComponent.readonly
-  position: number = -1
-
-  @ObservableComponent.readonly
-  videoLength: number = -1
-
-  @ObservableComponent.readonly
-  status: VideoStatus = VideoStatus.NONE
+  readonly position: number = -1
+  readonly videoLength: number = -1
+  readonly status: VideoStatus = VideoStatus.NONE
 
   /**
    * Is this VideoTexture playing?
@@ -1157,7 +1152,7 @@ export class VideoTexture extends ObservableComponent {
 
   update(videoEvent: IEvents['videoEvent']) {
     if (videoEvent.videoClipId == this.videoClipId) {
-      this.data['status'] = videoEvent.videoStatus as VideoStatus || VideoStatus.NONE
+      this.data['status'] = (videoEvent.videoStatus as VideoStatus) || VideoStatus.NONE
       this.data['videoLength'] = videoEvent.totalVideoLength
       this.data['position'] = videoEvent.currentOffset
     }

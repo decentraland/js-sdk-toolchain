@@ -1,6 +1,7 @@
-import { engine, VideoTexture } from 'src'
 import { EventConstructor } from '../ecs/EventManager'
 import { Observable } from '../ecs/Observable'
+import { VideoTexture} from './Components'
+import { DisposableComponent } from '../ecs/Component'
 import { CameraMode } from './Types'
 export { CameraMode }
 
@@ -129,7 +130,7 @@ export function _initEventObservables(dcl: DecentralandInterface) {
         }
         case 'videoEvent': {
           const videoData = event.data as IEvents['videoEvent']
-          const component = engine.disposableComponents[videoData.componentId] as VideoTexture
+          const component = DisposableComponent.engine.disposableComponents[videoData.componentId] as VideoTexture
           if (component) {
             component.update(videoData)
           }
