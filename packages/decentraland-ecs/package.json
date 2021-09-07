@@ -28,7 +28,7 @@
   "dependencies": {
     "@dcl/amd": "file:../@dcl/amd",
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
-    "@dcl/kernel": "https://sdk-team-cdn.decentraland.org/@dcl/kernel/branch/fix/script-error/dcl-kernel-1.0.0-1207316236.commit-2ab4fc3.tgz",
+    "@dcl/kernel": "1.0.0-1209634232.commit-f56d28f",
     "@dcl/posix": "1.0.1-20210906195401.commit-17a2da7",
     "@dcl/unity-renderer": "1.0.12717-20210906192324.commit-940c239",
     "glob": "^7.1.7",
