@@ -1,4 +1,4 @@
-import { Vector3, Quaternion, ReadOnlyVector3, ReadOnlyQuaternion } from './math'
+import { Vector3, Quaternion } from './math'
 import { CameraMode } from './Types'
 
 /**

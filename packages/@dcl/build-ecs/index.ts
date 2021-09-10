@@ -540,7 +540,13 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
         libs.push({ main, typings, name: libPackageJson.name })
         hasCustomLibraries = true
       } catch (e) {
-        console.error(`! Error in library ${libName}: ${e.message}`)
+        if (typeof e === 'object' && e) {
+          console.error(`! Error in library ${libName}: ${(e as Error).message}`)
+        } else {
+          console.error(
+            `! Error in library ${libName}: ${e ? (e as any).toString() : String.prototype.toString.apply(e)}`
+          )
+        }
         hasError = true
       }
     }

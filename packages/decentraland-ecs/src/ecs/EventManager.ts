@@ -17,7 +17,7 @@ function getEventNameFromConstructor<T>(ctor: IEventConstructor<T>): string {
   if (!(eventNameSymbol in ctor) || typeof ctor[eventNameSymbol] !== 'string') {
     throw new Error('The EventConstructor is not registered')
   }
-  return (ctor[eventNameSymbol] as any) as string
+  return ctor[eventNameSymbol] as any as string
 }
 
 type EventListener<X> = {
@@ -93,7 +93,8 @@ export class EventManager {
           const l = listeners[i]
           l.fn.call(l.listener, event)
         } catch (e) {
-          error(e)
+          // TODO: e may not be an instance of Error
+          error(e as any)
         }
       }
     }

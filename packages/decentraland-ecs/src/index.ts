@@ -41,7 +41,6 @@ import { uuidEventSystem, pointerEventSystem, raycastEventSystem } from './decen
 engine.addSystem(uuidEventSystem)
 // Initialize Pointer Events System
 engine.addSystem(pointerEventSystem)
-
 // Initialize Raycast Events System
 engine.addSystem(raycastEventSystem)
 

@@ -19,29 +19,7 @@
     "downlevelIteration": true,
     "keyofStringsOnly": true,
     "noUnusedLocals": true,
-    "baseUrl": ".",
     "noLib": true,
-    "types": [
-      "env",
-      "@dcl/posix"
-    ],
-    "typeRoots": [
-      "./node_modules",
-      "./types"
-    ]
-  },
-  "include": [
-    "./src"
-  ],
-  "exclude": [
-    "../../node_modules",
-    "../../src",
-    "../../test",
-    "../test",
-    "dist",
-    "etc",
-    "temp",
-    "types",
-    "api-docs-review/decentraland-ecs.api.ts"
-  ]
+    "types": []
+  }
 }
