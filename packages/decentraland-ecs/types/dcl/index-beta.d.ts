@@ -3120,6 +3120,17 @@ export declare class OnUUIDEvent<T extends keyof IEvents> extends ObservableComp
 /**
  * @public
  */
+export declare const onVideoEvent: Observable<{
+    componentId: string;
+    videoClipId: string;
+    videoStatus: number;
+    currentOffset: number;
+    totalVideoLength: number;
+}>;
+
+/**
+ * @public
+ */
 export declare function openExternalURL(url: string): void;
 
 /**
@@ -6150,6 +6161,16 @@ export declare class VideoClip extends ObservableComponent {
     constructor(url: string);
 }
 
+/** @public */
+export declare enum VideoStatus {
+    NONE = 0,
+    ERROR = 1,
+    LOADING = 2,
+    READY = 3,
+    PLAYING = 4,
+    BUFFERING = 5
+}
+
 /**
  * @public
  */
@@ -6177,6 +6198,9 @@ export declare class VideoTexture extends ObservableComponent {
     playbackRate: number;
     loop: boolean;
     seek: number;
+    private _position;
+    private _videoLength;
+    private _status;
     /**
      * Is this VideoTexture playing?
      */
@@ -6187,6 +6211,10 @@ export declare class VideoTexture extends ObservableComponent {
     reset(): void;
     seekTime(seconds: number): void;
     toJSON(): any;
+    update(videoEvent: IEvents['videoEvent']): void;
+    get position(): number;
+    get videoLength(): number;
+    get status(): VideoStatus;
 }
 
 /**
