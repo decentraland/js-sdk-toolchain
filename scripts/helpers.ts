@@ -1,4 +1,5 @@
 import { exec } from 'child_process'
+import { sync as globSync } from 'glob'
 import { resolve } from 'path'
 import { existsSync, readFileSync, writeFileSync, lstatSync, removeSync, copySync } from 'fs-extra'
 import { sync as rimraf } from 'rimraf'
@@ -40,6 +41,14 @@ export function itDeletesFolder(folder: string, cwd: string) {
   const path = resolve(cwd, folder)
   it('rm -rf ' + path, () => {
     rimraf(path)
+  })
+}
+export function itDeletesGlob(pattern: string, cwd: string) {
+  it(`deletes ${pattern} in ${cwd}`, () => {
+    globSync(pattern, { absolute: true, cwd }).forEach((file) => {
+      console.log(`> deleting ${file}`)
+      rimraf(file)
+    })
   })
 }
 

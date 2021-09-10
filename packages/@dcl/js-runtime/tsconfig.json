@@ -19,13 +19,7 @@
     "downlevelIteration": true,
     "keyofStringsOnly": true,
     "noUnusedLocals": true,
-    "baseUrl": ".",
     "noLib": true,
-    "types": [
-      "@dcl/posix"
-    ],
-    "typeRoots": [
-      "./node_modules",
-    ]
+    "types": []
   }
 }

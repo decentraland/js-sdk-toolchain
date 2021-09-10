@@ -10,7 +10,7 @@ import {
   ROLLUP,
   commonChecks
 } from './common'
-import { ensureFileExists, itExecutes, itDeletesFolder, copyFile } from './helpers'
+import { ensureFileExists, itExecutes, itDeletesFolder, copyFile, itDeletesGlob } from './helpers'
 
 import { readFileSync, writeFileSync } from 'fs'
 
@@ -52,8 +52,7 @@ flow('build-all', () => {
   flow('decentraland-ecs', () => {
     itExecutes(`npm i --quiet`, ECS_PATH)
 
-    itDeletesFolder('types/dcl', ECS_PATH)
-    itDeletesFolder('temp', ECS_PATH)
+    itDeletesGlob('types/dcl/*.d.ts', ECS_PATH)
 
     const ROLLUP_ECS_CONFIG = resolve(ROLLUP_CONFIG_PATH, 'ecs.config.js')
     itExecutes(`${ROLLUP} -c ${ROLLUP_ECS_CONFIG}`, ECS_PATH)
