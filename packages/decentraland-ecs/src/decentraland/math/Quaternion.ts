@@ -2,15 +2,7 @@ import { Matrix } from './Matrix'
 import { Vector3 } from './Vector3'
 import { MathTmp } from './preallocatedVariables'
 import { DEG2RAD, RAD2DEG } from './types'
-import { Scalar } from "./Scalar"
-
-/** @public */
-export type ReadOnlyQuaternion = {
-  readonly x: number
-  readonly y: number
-  readonly z: number
-  readonly w: number
-}
+import { Scalar } from './Scalar'
 
 /**
  * Class used to store quaternion data
@@ -18,7 +10,7 @@ export type ReadOnlyQuaternion = {
  * {@link http://doc.babylonjs.com/features/position,_rotation,_scaling }
  * @public
  */
-export class Quaternion {
+export class Quaternion implements ReadOnlyQuaternion {
   /**
    * Creates a new Quaternion from the given floats
    * @param x - defines the first component (0 by default)
@@ -500,7 +492,7 @@ export class Quaternion {
       // the vectors are parallel, check w to find direction
       // if w is 0 then values are opposite, and we sould rotate 180 degrees around the supplied axis
       // otherwise the vectors in the same direction and no rotation should occur
-      return (Math.abs(w) < 0.0001) ? new Quaternion(up.x, up.y, up.z, 0).normalized : Quaternion.Identity
+      return Math.abs(w) < 0.0001 ? new Quaternion(up.x, up.y, up.z, 0).normalized : Quaternion.Identity
     } else {
       return new Quaternion(a.x, a.y, a.z, w).normalized
     }
@@ -539,20 +531,23 @@ export class Quaternion {
     const out = new Vector3()
 
     // if the input quaternion is normalized, this is exactly one. Otherwise, this acts as a correction factor for the quaternion's not-normalizedness
-    const unit = (this.x * this.x) + (this.y * this.y) + (this.z * this.z) + (this.w * this.w)
+    const unit = this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w
 
     // this will have a magnitude of 0.5 or greater if and only if this is a singularity case
     const test = this.x * this.w - this.y * this.z
 
-    if (test > 0.4995 * unit) { // singularity at north pole
+    if (test > 0.4995 * unit) {
+      // singularity at north pole
       out.x = Math.PI / 2
       out.y = 2 * Math.atan2(this.y, this.x)
       out.z = 0
-    } else if (test < -0.4995 * unit) { // singularity at south pole
+    } else if (test < -0.4995 * unit) {
+      // singularity at south pole
       out.x = -Math.PI / 2
       out.y = -2 * Math.atan2(this.y, this.x)
       out.z = 0
-    } else { // no singularity - this is the majority of cases
+    } else {
+      // no singularity - this is the majority of cases
       out.x = Math.asin(2 * (this.w * this.x - this.y * this.z))
       out.y = Math.atan2(2 * this.w * this.y + 2 * this.z * this.x, 1 - 2 * (this.x * this.x + this.y * this.y))
       out.z = Math.atan2(2 * this.w * this.z + 2 * this.x * this.y, 1 - 2 * (this.z * this.z + this.x * this.x))

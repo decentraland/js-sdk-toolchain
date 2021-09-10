@@ -42,7 +42,7 @@
    *
    * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
    */
-  "mainEntryPointFilePath": "dist/index.d.ts",
+  "mainEntryPointFilePath": "dist/src/index.d.ts",
   /**
    * Determines how the TypeScript compiler engine will be invoked by API Extractor.
    */
@@ -59,24 +59,6 @@
      * DEFAULT VALUE: "<projectFolder>/tsconfig.json"
      */
     "tsconfigFilePath": "tsconfig.json",
-    /**
-     * Provides a compiler configuration that will be used instead of reading the tsconfig.json file from disk.
-     * The object must conform to the TypeScript tsconfig schema:
-     *
-     * http://json.schemastore.org/tsconfig
-     *
-     * If omitted, then the tsconfig.json file will be read from the "projectFolder".
-     *
-     * DEFAULT VALUE: no overrideTsconfig section
-     */
-    "overrideTsconfig": {
-      "types": [
-        "env"
-      ],
-      "typeRoots": [
-        "types/env"
-      ]
-    },
     /**
      * This option causes the compiler to be invoked with the --skipLibCheck option. This option is not recommended
      * and may cause API Extractor to produce incomplete or incorrect declarations, but it may be required when
@@ -321,5 +303,8 @@
       //
       // . . .
     }
-  }
+  },
+  // "bundledPackages": [
+  //   "@dcl/posix"
+  // ]
 }

@@ -2,17 +2,11 @@ import { Matrix } from './Matrix'
 import { FloatArray, Epsilon } from './types'
 import { Scalar } from './Scalar'
 
-/** @public */
-export type ReadOnlyVector2 = {
-  readonly x: number
-  readonly y: number
-}
-
 /**
  * Class representing a vector containing 2 coordinates
  * @public
  */
-export class Vector2 {
+export class Vector2 implements ReadOnlyVector2 {
   /**
    * Creates a new Vector2 from the given x and y coordinates
    * @param x - defines the first coordinate

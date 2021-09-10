@@ -1,3 +1,5 @@
+/// <reference types="@dcl/posix" />
+/// <reference types="env" />
 
 /**
  * @public
@@ -188,6 +190,7 @@ export declare class Arc2 {
     endPoint: Vector2);
 }
 
+/** @public */
 export declare type Area = {
     box: Vector3;
 };
@@ -195,6 +198,7 @@ export declare type Area = {
 /**
  * Entities can be attached to each other by using the `setParent` method. However, there are cases where we might want to attach entities
  * to other objects that are not entities created by the same scene (for example, the player's avatar). For those cases, we have this class.
+ * @public
  */
 export declare abstract class Attachable {
     /** Used to attach entities to the avatar. Entities will follow the avatar when it moves */
@@ -289,6 +293,7 @@ export declare class AvatarModifierArea extends ObservableComponent {
     });
 }
 
+/** @public */
 export declare enum AvatarModifiers {
     HIDE_AVATARS = "HIDE_AVATARS",
     DISABLE_PASSPORTS = "DISABLE_PASSPORTS"
@@ -1249,55 +1254,6 @@ export declare class CylinderShape extends Shape {
     arc: number;
 }
 
-/** @public */
-export declare type DecentralandInterface = {
-    /** are we running in debug mode? */
-    DEBUG: boolean;
-    /** update the entity shape */
-    updateEntity?: never;
-    /** log function */
-    log(...a: any[]): void;
-    /** error function */
-    error(message: string, data?: any): void;
-    /** open external url */
-    openExternalUrl(url: string): void;
-    /** open nft info dialog */
-    openNFTDialog(assetContractAddress: string, tokenId: string, comment: string | null): void;
-    /** update tick */
-    onUpdate(cb: (deltaTime: number) => void): void;
-    /** called when it is time to wake the sandbox */
-    onStart(cb: Function): void;
-    /** create the entity in the engine */
-    addEntity(entityId: string): void;
-    /** remove the entity from the engine */
-    removeEntity(entityId: string): void;
-    /** called after adding a component to the entity or after updating a component */
-    updateEntityComponent(entityId: string, componentName: string, classId: number, json: string): void;
-    /** called after adding a DisposableComponent to the entity */
-    attachEntityComponent(entityId: string, componentName: string, componentId: string): void;
-    /** called after removing a component from the entity */
-    removeEntityComponent(entityId: string, componentName: string): void;
-    /** set a new parent for the entity */
-    setParent(entityId: string, parentId: string): void;
-    query(queryType: string, payload: any): void;
-    /** called after creating a component in the kernel  */
-    componentCreated(componentId: string, componentName: string, classId: number): void;
-    /** colled after removing a component from the kernel */
-    componentDisposed(componentId: string): void;
-    /** called after globally updating a component */
-    componentUpdated(componentId: string, json: string): void;
-    /** event from the engine */
-    onEvent(cb: (event: EngineEvent) => void): void;
-    /** subscribe to specific events, events will be handled by the onEvent function */
-    subscribe(eventName: string): void;
-    /** unsubscribe to specific event */
-    unsubscribe(eventName: string): void;
-    /** load a module */
-    loadModule(moduleName: string): PromiseLike<ModuleDescriptor>;
-    /** called when calling a module method */
-    callRpc(rpcHandle: string, methodName: string, args: ArrayLike<any>): PromiseLike<any>;
-};
-
 /**
  * Constant used to convert from Euler degrees to radians
  * @public
@@ -1392,13 +1348,6 @@ export declare class Engine implements IEngine {
 
 /** @public */
 export declare const engine: Engine;
-
-/** @public */
-export declare type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = {
-    /** eventName */
-    type: T;
-    data: V;
-};
 
 /**
  * @public
@@ -1531,16 +1480,11 @@ export declare class Font extends ObservableComponent {
     constructor(src?: string);
 }
 
-export declare enum Fonts {
-    SanFrancisco = "builtin:SF-UI-Text-Regular SDF",
-    SanFrancisco_Heavy = "builtin:SF-UI-Text-Heavy SDF",
-    SanFrancisco_Semibold = "builtin:SF-UI-Text-Semibold SDF",
-    LiberationSans = "builtin:LiberationSans SDF"
-}
+/* Excluded from this release type: Fonts */
 
 /**
  * Reprasents a camera frustum
- * @beta
+ * @public
  */
 export declare class Frustum {
     /**
@@ -1610,7 +1554,7 @@ export declare function getComponentName<T extends Record<any, any> = any>(compo
 
 /**
  * Gizmo identifiers
- * @beta
+ * @public
  */
 export declare enum Gizmo {
     MOVE = "MOVE",
@@ -1619,20 +1563,9 @@ export declare enum Gizmo {
     NONE = "NONE"
 }
 
-/** @public */
-export declare type GizmoDragEndEvent = {
-    type: 'gizmoDragEnded';
-    transforms: {
-        position: ReadOnlyVector3;
-        rotation: ReadOnlyQuaternion;
-        scale: ReadOnlyVector3;
-        entityId: string;
-    }[];
-};
-
 /**
  * Enables gizmos in the entity. Gizmos only work in EDITOR, PREVIEW or DEBUG modes.
- * @beta
+ * @public
  */
 export declare class Gizmos extends ObservableComponent {
     /**
@@ -1660,18 +1593,6 @@ export declare class Gizmos extends ObservableComponent {
      */
     localReference: boolean;
 }
-
-/** @public */
-export declare type GizmoSelectedEvent = {
-    type: 'gizmoSelected';
-    gizmoType: 'MOVE' | 'ROTATE' | 'SCALE' | 'NONE';
-    entities: string[];
-};
-
-/** @public */
-export declare type GlobalInputEventResult = InputEventResult & {
-    type: InputEventType;
-};
 
 /**
  * @public
@@ -1764,206 +1685,12 @@ export declare interface IEventConstructor<T> {
     new (...args: any[]): T;
 }
 
-/** @public */
-export declare type IEventNames = keyof IEvents;
-
-/**
- * @public
- * Note: Don't use `on` prefix for IEvents to avoid redundancy with `event.on("onEventName")` syntax.
- */
-export declare interface IEvents {
-    /**
-     * `positionChanged` is triggered when the position of the camera changes
-     * This event is throttled to 10 times per second.
-     */
-    positionChanged: {
-        /** Camera position relative to the base parcel of the scene */
-        position: ReadOnlyVector3;
-        /** Camera position, this is a absolute world position */
-        cameraPosition: ReadOnlyVector3;
-        /** Eye height, in meters. */
-        playerHeight: number;
-    };
-    /**
-     * `rotationChanged` is triggered when the rotation of the camera changes.
-     * This event is throttled to 10 times per second.
-     */
-    rotationChanged: {
-        /** Degree vector. Same as entities */
-        rotation: ReadOnlyVector3;
-        /** Rotation quaternion, useful in some scenarios. */
-        quaternion: ReadOnlyQuaternion;
-    };
-    /**
-     * `cameraModeChanged` is triggered when the user changes the camera mode
-     */
-    cameraModeChanged: {
-        cameraMode: CameraMode;
-    };
-    /**
-     * `idleStateChanged` is triggered when the user not moves for a defined period of time
-     */
-    idleStateChanged: {
-        isIdle: boolean;
-    };
-    playerExpression: {
-        expressionId: string;
-    };
-    /**
-     * `pointerUp` is triggered when the user releases an input pointer.
-     * It could be a VR controller, a touch screen or the mouse.
-     */
-    pointerUp: InputEventResult;
-    /**
-     * `pointerDown` is triggered when the user press an input pointer.
-     * It could be a VR controller, a touch screen or the mouse.
-     */
-    pointerDown: InputEventResult;
-    /**
-     * `pointerEvent` is triggered when the user press or releases an input pointer.
-     * It could be a VR controller, a touch screen or the mouse.
-     */
-    pointerEvent: GlobalInputEventResult;
-    /**
-     * `raycastResponse` is triggered in response to a raycast query
-     */
-    raycastResponse: RaycastResponsePayload<any>;
-    /**
-     * `chatMessage` is triggered when the user sends a message through chat entity.
-     */
-    chatMessage: {
-        id: string;
-        sender: string;
-        message: string;
-        isCommand: boolean;
-    };
-    /**
-     * `onChange` is triggered when an entity changes its own internal state.
-     * Dispatched by the `ui-*` entities when their value is changed. It triggers a callback.
-     * Notice: Only entities with ID will be listening for click events.
-     */
-    onChange: {
-        value?: any;
-        /** ID of the pointer that triggered the event */
-        pointerId?: number;
-    };
-    /**
-     * `onEnter` is triggered when the user hits the "Enter" key from the keyboard
-     * Used principally by the Chat internal scene
-     */
-    onEnter: {};
-    /**
-     * `onAnimationEnd` is triggered when an animation clip gets finish
-     */
-    onAnimationEnd: {
-        clipName: string;
-    };
-    /**
-     * `onFocus` is triggered when an entity focus is active.
-     * Dispatched by the `ui-input` and `ui-password` entities when the value is changed.
-     * It triggers a callback.
-     *
-     * Notice: Only entities with ID will be listening for click events.
-     */
-    onFocus: {
-        /** ID of the entitiy of the event */
-        entityId: string;
-        /** ID of the pointer that triggered the event */
-        pointerId: number;
-    };
-    /**
-     * `onBlur` is triggered when an entity loses its focus.
-     * Dispatched by the `ui-input` and `ui-password` entities when the value is changed.
-     *  It triggers a callback.
-     *
-     * Notice: Only entities with ID will be listening for click events.
-     */
-    onBlur: {
-        /** ID of the entitiy of the event */
-        entityId: string;
-        /** ID of the pointer that triggered the event */
-        pointerId: number;
-    };
-    /** The onClick event is only used for UI elements */
-    onClick: {
-        entityId: string;
-    };
-    /**
-     * This event gets triggered when an entity leaves the scene fences.
-     */
-    entityOutOfScene: {
-        entityId: string;
-    };
-    /**
-     * This event gets triggered when an entity enters the scene fences.
-     */
-    entityBackInScene: {
-        entityId: string;
-    };
-    /**
-     * This event gets triggered when the user enters the scene
-     */
-    onEnterScene: {
-        userId: string;
-    };
-    /**
-     * This event gets triggered when the user leaves the scene
-     */
-    onLeaveScene: {
-        userId: string;
-    };
-    /**
-     * This event gets triggered after receiving a comms message.
-     */
-    comms: {
-        sender: string;
-        message: string;
-    };
-    /**
-     * This is triggered once the scene should start.
-     */
-    sceneStart: {};
-    /**
-     * This is triggered once the builder scene is loaded.
-     */
-    builderSceneStart: {};
-    /**
-     * This is triggered once the builder scene is unloaded.
-     */
-    builderSceneUnloaded: {};
-    /**
-     * After checking entities outside the fences, if any is outside, this event
-     * will be triggered with all the entities outside the scene.
-     */
-    entitiesOutOfBoundaries: {
-        entities: string[];
-    };
-    uuidEvent: {
-        uuid: string;
-        payload: any;
-    };
-    onTextSubmit: {
-        text: string;
-    };
-    metricsUpdate: {
-        given: Record<string, number>;
-        limit: Record<string, number>;
-    };
-    limitsExceeded: {
-        given: Record<string, number>;
-        limit: Record<string, number>;
-    };
-    /** For gizmos */
-    gizmoEvent: GizmoDragEndEvent | GizmoSelectedEvent;
-}
-
 /**
  * @public
  */
 export declare class Input {
     private static _instance;
     static get instance(): Input;
-    private subscriptions;
     private internalState;
     private constructor();
     static ensureInstance(): any;
@@ -1985,7 +1712,7 @@ export declare class Input {
      * @param useRaycast - Enables getting raycast information.
      * @param fn - A callback function to be called when the event is triggered.
      */
-    subscribe(eventName: InputEventKind, buttonId: ActionButton, useRaycast: boolean, fn: (e: LocalActionButtonEvent) => void): () => false | Subscription[];
+    subscribe(eventName: InputEventKind, buttonId: ActionButton, useRaycast: boolean, fn: (e: LocalActionButtonEvent) => void): () => void;
     /**
      * Removes an existing input event subscription.
      * @param eventName - The name of the event (see InputEventKind).
@@ -2000,31 +1727,6 @@ export declare class Input {
 
 /** @public */
 export declare type InputEventKind = 'BUTTON_DOWN' | 'BUTTON_UP';
-
-/** @public */
-export declare type InputEventResult = {
-    /** Origin of the ray, relative to the scene */
-    origin: ReadOnlyVector3;
-    /** Direction vector of the ray (normalized) */
-    direction: ReadOnlyVector3;
-    /** ID of the pointer that triggered the event */
-    buttonId: number;
-    /** Does this pointer event hit any object? */
-    hit?: {
-        /** Length of the ray */
-        length: number;
-        /** If the ray hits a mesh the intersection point will be this */
-        hitPoint: ReadOnlyVector3;
-        /** If the mesh has a name, it will be assigned to meshName */
-        meshName: string;
-        /** Normal of the hit */
-        normal: ReadOnlyVector3;
-        /** Normal of the hit, in world space */
-        worldNormal: ReadOnlyVector3;
-        /** Hit entity ID if any */
-        entityId: string;
-    };
-};
 
 /** @public */
 export declare enum InputEventType {
@@ -2077,6 +1779,7 @@ export declare interface ISystem {
     onRemoveEntity?(entity: IEntity): void;
 }
 
+/** @public */
 export declare enum LandRole {
     OWNER = "owner",
     OPERATOR = "operator"
@@ -2951,11 +2654,6 @@ export declare class MessageBus {
     private flush;
 }
 
-/** @public */
-export declare type MethodDescriptor = {
-    name: string;
-};
-
 /**
  * @public
  */
@@ -2970,12 +2668,6 @@ export declare type MinimapSceneInfo = {
         y: number;
     }[];
     isPOI: boolean;
-};
-
-/** @public */
-export declare type ModuleDescriptor = {
-    rpcHandle: string;
-    methods: MethodDescriptor[];
 };
 
 /**
@@ -3002,7 +2694,7 @@ export declare class MultiObserver<T> {
 
 /**
  * Generates a new prefixed id
- * @beta
+ * @public
  */
 export declare function newId(type: string): string;
 
@@ -3265,7 +2957,7 @@ export declare class OnBlur extends OnUUIDEvent<'onBlur'> {
  * @public
  */
 export declare const onCameraModeChangedObservable: Observable<{
-    cameraMode: CameraMode;
+    cameraMode: 0 | 1 | 2;
 }>;
 
 /**
@@ -3293,6 +2985,7 @@ export declare class OnEnter extends OnUUIDEvent<'onEnter'> {
     constructor(callback: (event: IEvents['onEnter']) => void);
 }
 
+/** @public @deprecated Use onEnterSceneObservable instead. */
 export declare const onEnterScene: Observable<{
     userId: string;
 }>;
@@ -3315,7 +3008,7 @@ export declare class OnFocus extends OnUUIDEvent<'onFocus'> {
 
 /**
  * This event is triggered after the user finalizes dragging a gizmo.
- * @beta
+ * @public
  */
 export declare class OnGizmoEvent extends OnUUIDEvent<'gizmoEvent'> {
     readonly type: string;
@@ -3329,6 +3022,7 @@ export declare const onIdleStateChangedObservable: Observable<{
     isIdle: boolean;
 }>;
 
+/** @public @deprecated Use onLeaveSceneObservable instead. */
 export declare const onLeaveScene: Observable<{
     userId: string;
 }>;
@@ -3423,12 +3117,16 @@ export declare class OnUUIDEvent<T extends keyof IEvents> extends ObservableComp
     };
 }
 
+/**
+ * @public
+ */
 export declare function openExternalURL(url: string): void;
 
 /**
  * Popup NFT info dialog
- * @param scr 'ethereum://contractAddress/tokenID'
- * @param comment optional. add a comment.
+ * @param scr - 'ethereum://contractAddress/tokenID'
+ * @param comment - optional. add a comment.
+ * @public
  */
 export declare function openNFTDialog(scr: string, comment?: string | null): void;
 
@@ -3445,11 +3143,12 @@ export declare enum Orientation {
     CCW = 1
 }
 
-export declare type ParcelsWithAccess = {
+/** @public */
+export declare type ParcelsWithAccess = Array<{
     x: number;
     y: number;
     role: LandRole;
-}[];
+}>;
 
 /**
  * @public
@@ -3609,6 +3308,7 @@ export declare class PhysicsCast implements IPhysicsCast {
     handleRaycastHitAllResponse(response: RaycastResponse<RaycastHitEntities>): void;
 }
 
+/** @public */
 export declare enum PictureFrameStyle {
     Classic = 0,
     Baroque_Ornament = 1,
@@ -3811,7 +3511,7 @@ export declare type ProfileForRenderer = {
  * {@link http://doc.babylonjs.com/features/position,_rotation,_scaling }
  * @public
  */
-export declare class Quaternion {
+export declare class Quaternion implements ReadOnlyQuaternion {
     /** defines the first component (0 by default) */
     x: number;
     /** defines the second component (0 by default) */
@@ -4027,12 +3727,9 @@ export declare class Quaternion {
      * @param up - defines the direction
      */
     setFromToRotation(from: Vector3, to: Vector3, up?: Vector3): void;
-    /**
-     * Sets the euler angle representation of the rotation.
-     */
     set eulerAngles(euler: Vector3);
     /**
-     * Gets the euler angle representation of the rotation.
+     * Gets or sets the euler angle representation of the rotation.
      * Implemented unity-based calculations from: https://stackoverflow.com/a/56055813
      */
     get eulerAngles(): Vector3;
@@ -4267,13 +3964,6 @@ export declare class RaycastResponse<T> {
     constructor(payload: RaycastResponsePayload<T>);
 }
 
-/** @public */
-export declare type RaycastResponsePayload<T> = {
-    queryId: string;
-    queryType: string;
-    payload: T;
-};
-
 /**
  * @public
  */
@@ -4282,35 +3972,6 @@ export declare type ReadOnlyColor4 = {
     readonly g: number;
     readonly b: number;
     readonly a: number;
-};
-
-/** @public */
-export declare type ReadOnlyQuaternion = {
-    readonly x: number;
-    readonly y: number;
-    readonly z: number;
-    readonly w: number;
-};
-
-/** @public */
-export declare type ReadOnlyVector2 = {
-    readonly x: number;
-    readonly y: number;
-};
-
-/** @public */
-export declare type ReadOnlyVector3 = {
-    readonly y: number;
-    readonly x: number;
-    readonly z: number;
-};
-
-/** @public */
-export declare type ReadOnlyVector4 = {
-    readonly y: number;
-    readonly x: number;
-    readonly z: number;
-    readonly w: number;
 };
 
 /**
@@ -4644,7 +4305,10 @@ export declare enum Space {
 export declare class SphereShape extends Shape {
 }
 
-declare class Subscription {
+/**
+ * @public
+ */
+export declare class Subscription {
     fn: (e: LocalActionButtonEvent) => void;
     useRaycast: boolean;
     constructor(fn: (e: LocalActionButtonEvent) => void, useRaycast: boolean);
@@ -4660,7 +4324,8 @@ export declare type TaskResult<T> = Promise<T> & {
 
 /**
  * teleport player to a destination
- * @param destination "coordX,coordY", "magic", "crowd"
+ * @param destination - "coordX,coordY", "magic", "crowd"
+ * @public
  */
 export declare function teleportTo(destination: string): void;
 
@@ -5019,7 +4684,7 @@ export declare class UUIDEventSystem implements ISystem {
  * Class representing a vector containing 2 coordinates
  * @public
  */
-export declare class Vector2 {
+export declare class Vector2 implements ReadOnlyVector2 {
     /** defines the first coordinate */
     x: number;
     /** defines the second coordinate */
@@ -5401,7 +5066,7 @@ export declare class Vector2 {
  * Reminder: Babylon.js uses a left handed forward facing system
  * @public
  */
-export declare class Vector3 {
+export declare class Vector3 implements ReadOnlyVector3 {
     /**
      * Defines the first coordinates (on X axis)
      */
@@ -6065,7 +5730,7 @@ export declare class Vector3 {
  * Vector4 class created for EulerAngle class conversion to Quaternion
  * @public
  */
-export declare class Vector4 {
+export declare class Vector4 implements ReadOnlyVector4 {
     /** x value of the vector */
     x: number;
     /** y value of the vector */

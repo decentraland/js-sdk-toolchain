@@ -1,4 +1,4 @@
-import { ReadOnlyVector3, Vector3, Matrix } from './math'
+import { Vector3, Matrix } from './math'
 import { RaycastResponse } from './Events'
 import { uuid, log } from '../ecs/helpers'
 

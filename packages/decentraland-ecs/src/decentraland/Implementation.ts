@@ -9,7 +9,7 @@ import {
 } from '../ecs/Component'
 import { Engine } from '../ecs/Engine'
 import { ComponentAdded, ComponentRemoved, IEntity, ISystem, ParentChanged } from '../ecs/IEntity'
-import { PointerEvent, RaycastResponse, UUIDEvent } from './Events'
+import { UUIDEvent, PointerEvent, RaycastResponse } from './Events'
 import { RaycastHitEntities, RaycastHitEntity } from './PhysicsCast'
 
 // This number is defined in the protocol ECS.SetEntityParent.3
@@ -36,12 +36,12 @@ export class DecentralandSynchronizationSystem implements ISystem {
 
     // TODO(agus): send disposableComponents if exist
 
-    this.dcl.onUpdate(dt => {
+    this.dcl.onUpdate((dt) => {
       engine.update(dt)
       this.presentEntities()
     })
 
-    this.dcl.onEvent(event => {
+    this.dcl.onEvent((event) => {
       const data = event.data as any
       switch (event.type) {
         case 'uuidEvent':
