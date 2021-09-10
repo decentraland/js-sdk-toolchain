@@ -3,19 +3,11 @@ import { Matrix } from './Matrix'
 import { Scalar } from './Scalar'
 import { Vector3 } from './Vector3'
 
-/** @public */
-export type ReadOnlyVector4 = {
-  readonly y: number
-  readonly x: number
-  readonly z: number
-  readonly w: number
-}
-
 /**
  * Vector4 class created for EulerAngle class conversion to Quaternion
  * @public
  */
-export class Vector4 {
+export class Vector4 implements ReadOnlyVector4 {
   /**
    * Creates a Vector4 object from the given floats.
    * @param x - x value of the vector

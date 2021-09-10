@@ -58,11 +58,11 @@ export class Engine implements IEngine {
     this.eventManager.addListener(ComponentAdded, this, this.componentAddedHandler)
     this.eventManager.addListener(ComponentRemoved, this, this.componentRemovedHandler)
     this.rootEntity = rootEntity
-    this.firstPersonCameraEntity = new Entity();
-    (this.firstPersonCameraEntity as any).uuid = 'FirstPersonCameraEntityReference'
+    this.firstPersonCameraEntity = new Entity()
+    ;(this.firstPersonCameraEntity as any).uuid = 'FirstPersonCameraEntityReference'
     this.addEntity(this.firstPersonCameraEntity)
-    this.avatarEntity = new Entity();
-    (this.avatarEntity as any).uuid = 'AvatarEntityReference'
+    this.avatarEntity = new Entity()
+    ;(this.avatarEntity as any).uuid = 'AvatarEntityReference'
     this.addEntity(this.avatarEntity)
   }
 
@@ -73,8 +73,8 @@ export class Engine implements IEngine {
       return entity
     }
 
-    entity.eventManager = this.eventManager;
-    (entity as Entity).engine = this
+    entity.eventManager = this.eventManager
+    ;(entity as Entity).engine = this
 
     this._entities[entity.uuid] = entity
 
@@ -215,7 +215,8 @@ export class Engine implements IEngine {
         try {
           system.update(dt)
         } catch (e) {
-          error(e)
+          // TODO: e may not be an Error
+          error(e as any)
         }
       }
     }
@@ -282,7 +283,7 @@ export class Engine implements IEngine {
             for (let j = 0; j < components.length; j++) {
               if (traversedComponentGroup.requires.indexOf(components[j]) === -1) break
 
-              if (j === (components.length - 1)) {
+              if (j === components.length - 1) {
                 componentGroup = traversedComponentGroup
               }
             }

@@ -10,7 +10,7 @@ import { PhysicsCast, RaycastHitEntity, RaycastHitEntities } from './PhysicsCast
  */
 export class RaycastEventSystem implements ISystem {
   activate(engine: Engine) {
-    engine.eventManager.addListener(RaycastResponse, this, event => {
+    engine.eventManager.addListener(RaycastResponse, this, (event) => {
       if (event.payload.queryType === 'HitFirst') {
         PhysicsCast.instance.handleRaycastHitFirstResponse(event as RaycastResponse<RaycastHitEntity>)
       } else if (event.payload.queryType === 'HitAll') {
@@ -30,15 +30,12 @@ export class RaycastEventSystem implements ISystem {
   }
 }
 
-/** @internal */
-export const raycastEventSystem = new RaycastEventSystem()
-
 /**
  * @public
  */
 export class PointerEventSystem implements ISystem {
   activate(engine: Engine) {
-    engine.eventManager.addListener(PointerEvent, this, event => {
+    engine.eventManager.addListener(PointerEvent, this, (event) => {
       Input.instance.handlePointerEvent(event.payload as GlobalInputEventResult)
     })
 
@@ -57,9 +54,6 @@ export class PointerEventSystem implements ISystem {
     }
   }
 }
-
-/** @internal */
-export const pointerEventSystem = new PointerEventSystem()
 
 /**
  * @public
@@ -132,6 +126,12 @@ export class UUIDEventSystem implements ISystem {
     }
   }
 }
+
+/** @internal */
+export const raycastEventSystem = new RaycastEventSystem()
+
+/** @internal */
+export const pointerEventSystem = new PointerEventSystem()
 
 /** @internal */
 export const uuidEventSystem = new UUIDEventSystem()

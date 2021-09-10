@@ -7,44 +7,44 @@ import { Extractor, ExtractorConfig, ExtractorLogLevel, IExtractorConfigPrepareO
 export async function apiExtractor(packageJsonPath: string, localBuild: boolean) {
   const cwd = path.dirname(packageJsonPath)
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath).toString())
-  const prepareOptions: IExtractorConfigPrepareOptions = {
+  console.assert(packageJson.typings, 'package.json#typings is not valid')
+  const typingsFullPath = path.resolve(packageJson.typings)
+
+  const prepareOptions: IExtractorConfigPrepareOptions = ExtractorConfig.tryLoadForFolder({ startingFolder: cwd }) || {
     configObject: {
       projectFolder: cwd,
       mainEntryPointFilePath: path.resolve(packageJson.main.replace(/\.js$/, '.d.ts')),
       compiler: {
         tsconfigFilePath: 'tsconfig.json'
-      },
-      dtsRollup: {
-        enabled: true,
-        untrimmedFilePath: packageJson.typings
-      },
-      tsdocMetadata: {
-        enabled: true,
-        tsdocMetadataFilePath: '<projectFolder>/tsdoc-metadata.json'
-      },
-      messages: {
-        compilerMessageReporting: {
-          default: {
-            logLevel: ExtractorLogLevel.Warning
-          }
-        },
-        extractorMessageReporting: {
-          default: {
-            logLevel: ExtractorLogLevel.Warning
-          }
-        },
-        tsdocMessageReporting: {
-          default: {
-            logLevel: ExtractorLogLevel.Error
-          }
-        }
       }
     },
     configObjectFullPath: undefined,
     packageJsonFullPath: packageJsonPath
   }
-  console.assert(packageJson.typings, 'package.json#typings is not valid')
-  const typingsFullPath = path.resolve(packageJson.typings)
+
+  prepareOptions.configObject.mainEntryPointFilePath = path.resolve(prepareOptions.configObject.mainEntryPointFilePath)
+
+  if (!prepareOptions.configObject.dtsRollup) {
+    prepareOptions.configObject.dtsRollup = {
+      enabled: true,
+      publicTrimmedFilePath: typingsFullPath,
+      untrimmedFilePath: path.resolve(
+        path.dirname(typingsFullPath),
+        path.basename(typingsFullPath, '.d.ts') + '-full.d.ts'
+      ),
+      betaTrimmedFilePath: path.resolve(
+        path.dirname(typingsFullPath),
+        path.basename(typingsFullPath, '.d.ts') + '-beta.d.ts'
+      )
+    }
+  }
+
+  if (!prepareOptions.configObject.tsdocMetadata) {
+    prepareOptions.configObject.tsdocMetadata = {
+      enabled: true,
+      tsdocMetadataFilePath: '<projectFolder>/tsdoc-metadata.json'
+    }
+  }
 
   let newentryPoint = null
 

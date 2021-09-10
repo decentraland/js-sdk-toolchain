@@ -4,6 +4,9 @@
 
 ```ts
 
+/// <reference types="@dcl/posix" />
+/// <reference types="env" />
+
 // @public (undocumented)
 export enum ActionButton {
     // (undocumented)
@@ -24,7 +27,7 @@ export class Angle {
     static FromDegrees(degrees: number): Angle;
     static FromRadians(radians: number): Angle;
     radians(): number;
-    }
+}
 
 // @public (undocumented)
 export type AnimationParams = {
@@ -65,8 +68,8 @@ export class Animator extends Shape {
 // @public
 export class Arc2 {
     constructor(
-    startPoint: Vector2, 
-    midPoint: Vector2, 
+    startPoint: Vector2,
+    midPoint: Vector2,
     endPoint: Vector2);
     angle: Angle;
     centerPoint: Vector2;
@@ -233,13 +236,14 @@ export class BoxShape extends Shape {
 
 // @public (undocumented)
 export class Camera {
-    static get instance(): Camera;
     constructor();
+    get cameraMode(): CameraMode;
     readonly feetPosition: Vector3;
+    // (undocumented)
+    static get instance(): Camera;
+    get playerHeight(): number;
     readonly position: Vector3;
     readonly rotation: Quaternion;
-    get playerHeight(): number;
-    get cameraMode(): CameraMode;
     readonly worldPosition: Vector3;
 }
 
@@ -264,8 +268,8 @@ export class CircleShape extends Shape {
 // @public
 export class Color3 {
     constructor(
-    r?: number, 
-    g?: number, 
+    r?: number,
+    g?: number,
     b?: number);
     add(otherColor: Color3): Color3;
     addToRef(otherColor: Color3, result: Color3): Color3;
@@ -324,9 +328,9 @@ export class Color3 {
 // @public
 export class Color4 {
     constructor(
-    r?: number, 
-    g?: number, 
-    b?: number, 
+    r?: number,
+    g?: number,
+    b?: number,
     a?: number);
     a: number;
     add(right: Color4): Color4;
@@ -413,7 +417,7 @@ export class ComponentGroup {
     readonly requires: ReadonlyArray<ComponentConstructor<any>>;
     // (undocumented)
     readonly requiresNames: ReadonlyArray<string>;
-    }
+}
 
 // @public (undocumented)
 export interface ComponentLike {
@@ -453,7 +457,7 @@ export class Curve3 {
     getPoints(): Vector3[];
     // (undocumented)
     length(): number;
-    }
+}
 
 // @public (undocumented)
 export class CylinderShape extends Shape {
@@ -465,33 +469,6 @@ export class CylinderShape extends Shape {
     segmentsHeight: number;
     segmentsRadial: number;
 }
-
-// @public (undocumented)
-export type DecentralandInterface = {
-    DEBUG: boolean;
-    updateEntity?: never;
-    log(...a: any[]): void;
-    error(message: string, data?: any): void;
-    openExternalUrl(url: string): void;
-    openNFTDialog(assetContractAddress: string, tokenId: string, comment: string | null): void;
-    onUpdate(cb: (deltaTime: number) => void): void;
-    onStart(cb: Function): void;
-    addEntity(entityId: string): void;
-    removeEntity(entityId: string): void;
-    updateEntityComponent(entityId: string, componentName: string, classId: number, json: string): void;
-    attachEntityComponent(entityId: string, componentName: string, componentId: string): void;
-    removeEntityComponent(entityId: string, componentName: string): void;
-    setParent(entityId: string, parentId: string): void;
-    query(queryType: string, payload: any): void;
-    componentCreated(componentId: string, componentName: string, classId: number): void;
-    componentDisposed(componentId: string): void;
-    componentUpdated(componentId: string, json: string): void;
-    onEvent(cb: (event: EngineEvent) => void): void;
-    subscribe(eventName: string): void;
-    unsubscribe(eventName: string): void;
-    loadModule(moduleName: string): PromiseLike<ModuleDescriptor>;
-    callRpc(rpcHandle: string, methodName: string, args: ArrayLike<any>): PromiseLike<any>;
-};
 
 // @public
 export const DEG2RAD: number;
@@ -556,10 +533,12 @@ export class Engine implements IEngine {
     addSystem(system: ISystem, priority?: number): ISystem;
     // (undocumented)
     readonly avatarEntity: IEntity;
-    get entities(): Readonly<Record<string, IEntity>>;
+    // (undocumented)
     get disposableComponents(): Readonly<Record<string, DisposableComponentLike>>;
     // (undocumented)
     disposeComponent(component: DisposableComponentLike): boolean;
+    // (undocumented)
+    get entities(): Readonly<Record<string, IEntity>>;
     // (undocumented)
     readonly eventManager: EventManager;
     // (undocumented)
@@ -588,12 +567,6 @@ export class Engine implements IEngine {
 
 // @public (undocumented)
 export const engine: Engine;
-
-// @public (undocumented)
-export type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = {
-    type: T;
-    data: V;
-};
 
 // @public (undocumented)
 export class Entity implements IEntity {
@@ -631,7 +604,6 @@ export class Entity implements IEntity {
     removeComponent<T extends object>(component: T, triggerRemovedEvent?: boolean): void;
     // (undocumented)
     removeComponent(component: ComponentConstructor<any>, triggerRemovedEvent?: boolean): void;
-    private get identifier();
     setParent(_parent: IEntity | Attachable | null): IEntity;
     // (undocumented)
     readonly uuid: string;
@@ -678,7 +650,7 @@ export class Font extends ObservableComponent {
     readonly src: string;
 }
 
-// @public (undocumented)
+// @alpha (undocumented)
 export enum Fonts {
     // (undocumented)
     LiberationSans = "builtin:LiberationSans SDF",
@@ -690,7 +662,7 @@ export enum Fonts {
     SanFrancisco_Semibold = "builtin:SF-UI-Text-Semibold SDF"
 }
 
-// @beta
+// @public
 export class Frustum {
     static GetBottomPlaneToRef(transform: Matrix, frustumPlane: Plane): void;
     static GetFarPlaneToRef(transform: Matrix, frustumPlane: Plane): void;
@@ -711,7 +683,7 @@ export function getComponentId<T extends DisposableComponentLike>(component: T):
 // @public (undocumented)
 export function getComponentName<T extends Record<any, any> = any>(component: T | ComponentConstructor<T>): string;
 
-// @beta
+// @public
 export enum Gizmo {
     // (undocumented)
     MOVE = "MOVE",
@@ -723,18 +695,7 @@ export enum Gizmo {
     SCALE = "SCALE"
 }
 
-// @public (undocumented)
-export type GizmoDragEndEvent = {
-    type: 'gizmoDragEnded';
-    transforms: {
-        position: ReadOnlyVector3;
-        rotation: ReadOnlyQuaternion;
-        scale: ReadOnlyVector3;
-        entityId: string;
-    }[];
-};
-
-// @beta
+// @public
 export class Gizmos extends ObservableComponent {
     cycle: boolean;
     localReference: boolean;
@@ -743,18 +704,6 @@ export class Gizmos extends ObservableComponent {
     scale: boolean;
     selectedGizmo?: Gizmo;
 }
-
-// @public (undocumented)
-export type GizmoSelectedEvent = {
-    type: 'gizmoSelected';
-    gizmoType: 'MOVE' | 'ROTATE' | 'SCALE' | 'NONE';
-    entities: string[];
-};
-
-// @public (undocumented)
-export type GlobalInputEventResult = InputEventResult & {
-    type: InputEventType;
-};
 
 // @public (undocumented)
 export class GlobalPointerDown extends PointerEventComponent {
@@ -862,134 +811,22 @@ export interface IEventConstructor<T> {
 }
 
 // @public (undocumented)
-export type IEventNames = keyof IEvents;
-
-// @public
-export interface IEvents {
-    builderSceneStart: {};
-    builderSceneUnloaded: {};
-    cameraModeChanged: {
-        cameraMode: CameraMode;
-    };
-    chatMessage: {
-        id: string;
-        sender: string;
-        message: string;
-        isCommand: boolean;
-    };
-    comms: {
-        sender: string;
-        message: string;
-    };
-    entitiesOutOfBoundaries: {
-        entities: string[];
-    };
-    entityBackInScene: {
-        entityId: string;
-    };
-    entityOutOfScene: {
-        entityId: string;
-    };
-    gizmoEvent: GizmoDragEndEvent | GizmoSelectedEvent;
-    idleStateChanged: {
-        isIdle: boolean;
-    };
-    // (undocumented)
-    limitsExceeded: {
-        given: Record<string, number>;
-        limit: Record<string, number>;
-    };
-    // (undocumented)
-    metricsUpdate: {
-        given: Record<string, number>;
-        limit: Record<string, number>;
-    };
-    onAnimationEnd: {
-        clipName: string;
-    };
-    onBlur: {
-        entityId: string;
-        pointerId: number;
-    };
-    onChange: {
-        value?: any;
-        pointerId?: number;
-    };
-    onClick: {
-        entityId: string;
-    };
-    onEnter: {};
-    onEnterScene: {
-        userId: string;
-    };
-    onFocus: {
-        entityId: string;
-        pointerId: number;
-    };
-    onLeaveScene: {
-        userId: string;
-    };
-    // (undocumented)
-    onTextSubmit: {
-        text: string;
-    };
-    // (undocumented)
-    playerExpression: {
-        expressionId: string;
-    };
-    pointerDown: InputEventResult;
-    pointerEvent: GlobalInputEventResult;
-    pointerUp: InputEventResult;
-    positionChanged: {
-        position: ReadOnlyVector3;
-        cameraPosition: ReadOnlyVector3;
-        playerHeight: number;
-    };
-    raycastResponse: RaycastResponsePayload<any>;
-    rotationChanged: {
-        rotation: ReadOnlyVector3;
-        quaternion: ReadOnlyQuaternion;
-    };
-    sceneStart: {};
-    // (undocumented)
-    uuidEvent: {
-        uuid: string;
-        payload: any;
-    };
-}
-
-// @public (undocumented)
 export class Input {
-    static get instance(): Input;
     // (undocumented)
     static ensureInstance(): any;
     // (undocumented)
     handlePointerEvent(data: GlobalInputEventResult): void;
+    // (undocumented)
+    static get instance(): Input;
     isButtonPressed(buttonId: ActionButton): {
         BUTTON_DOWN: boolean;
     };
-    // Warning: (ae-forgotten-export) The symbol "Subscription" needs to be exported by the entry point index.d.ts
-    subscribe(eventName: InputEventKind, buttonId: ActionButton, useRaycast: boolean, fn: (e: LocalActionButtonEvent) => void): () => false | Subscription[];
+    subscribe(eventName: InputEventKind, buttonId: ActionButton, useRaycast: boolean, fn: (e: LocalActionButtonEvent) => void): () => void;
     unsubscribe(eventName: InputEventKind, buttonId: ActionButton, fn: (e: LocalActionButtonEvent) => void): false | Subscription[];
 }
 
 // @public (undocumented)
 export type InputEventKind = 'BUTTON_DOWN' | 'BUTTON_UP';
-
-// @public (undocumented)
-export type InputEventResult = {
-    origin: ReadOnlyVector3;
-    direction: ReadOnlyVector3;
-    buttonId: number;
-    hit?: {
-        length: number;
-        hitPoint: ReadOnlyVector3;
-        meshName: string;
-        normal: ReadOnlyVector3;
-        worldNormal: ReadOnlyVector3;
-        entityId: string;
-    };
-};
 
 // @public (undocumented)
 export enum InputEventType {
@@ -1086,8 +923,6 @@ export class Material extends ObservableComponent {
 
 // @public
 export class Matrix {
-    get m(): Readonly<FloatArray>;
-    static get IdentityReadOnly(): Readonly<Matrix>;
     constructor();
     add(other: Matrix): Matrix;
     addAtIndex(index: number, value: number): Matrix;
@@ -1121,6 +956,7 @@ export class Matrix {
     getTranslation(): Vector3;
     getTranslationToRef(result: Vector3): Matrix;
     static Identity(): Matrix;
+    static get IdentityReadOnly(): Readonly<Matrix>;
     static IdentityToRef(result: Matrix): void;
     static Invert(source: Matrix): Matrix;
     invert(): Matrix;
@@ -1133,6 +969,7 @@ export class Matrix {
     static LookAtLHToRef(eye: Vector3, target: Vector3, up: Vector3, result: Matrix): void;
     static LookAtRH(eye: Vector3, target: Vector3, up: Vector3): Matrix;
     static LookAtRHToRef(eye: Vector3, target: Vector3, up: Vector3, result: Matrix): void;
+    get m(): Readonly<FloatArray>;
     multiply(other: Readonly<Matrix>): Matrix;
     multiplyAtIndex(index: number, value: number): Matrix;
     multiplyToArray(other: Readonly<Matrix>, result: FloatArray, offset: number): Matrix;
@@ -1201,11 +1038,6 @@ export class MessageBus {
 }
 
 // @public (undocumented)
-export type MethodDescriptor = {
-    name: string;
-};
-
-// @public (undocumented)
 export type MinimapSceneInfo = {
     name: string;
     owner: string;
@@ -1219,19 +1051,13 @@ export type MinimapSceneInfo = {
     isPOI: boolean;
 };
 
-// @public (undocumented)
-export type ModuleDescriptor = {
-    rpcHandle: string;
-    methods: MethodDescriptor[];
-};
-
 // @public
 export class MultiObserver<T> {
     dispose(): void;
     static Watch<T>(observables: Observable<T>[], callback: (eventData: T, eventState: ObserverEventState) => void, mask?: number, scope?: any): MultiObserver<T>;
 }
 
-// @beta
+// @public
 export function newId(type: string): string;
 
 // @public (undocumented)
@@ -1305,8 +1131,8 @@ export type ObservableComponentSubscription = (key: string, newVal: any, oldVal:
 // @public
 export class Observer<T> {
     constructor(
-    callback: (eventData: T, eventState: ObserverEventState) => void, 
-    mask: number, 
+    callback: (eventData: T, eventState: ObserverEventState) => void,
+    mask: number,
     scope?: any);
     callback: (eventData: T, eventState: ObserverEventState) => void;
     mask: number;
@@ -1341,7 +1167,7 @@ export class OnBlur extends OnUUIDEvent<'onBlur'> {
 
 // @public
 export const onCameraModeChangedObservable: Observable<{
-    cameraMode: CameraMode;
+    cameraMode: 0 | 1 | 2;
 }>;
 
 // @public (undocumented)
@@ -1366,7 +1192,7 @@ export class OnEnter extends OnUUIDEvent<'onEnter'> {
     readonly type: string;
 }
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const onEnterScene: Observable<{
     userId: string;
 }>;
@@ -1383,7 +1209,7 @@ export class OnFocus extends OnUUIDEvent<'onFocus'> {
     readonly type: string;
 }
 
-// @beta
+// @public
 export class OnGizmoEvent extends OnUUIDEvent<'gizmoEvent'> {
     // (undocumented)
     readonly type: string;
@@ -1394,7 +1220,7 @@ export const onIdleStateChangedObservable: Observable<{
     isIdle: boolean;
 }>;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const onLeaveScene: Observable<{
     userId: string;
 }>;
@@ -1495,11 +1321,11 @@ export enum Orientation {
 }
 
 // @public (undocumented)
-export type ParcelsWithAccess = {
+export type ParcelsWithAccess = Array<{
     x: number;
     y: number;
     role: LandRole;
-}[];
+}>;
 
 // @public (undocumented)
 export class ParentChanged {
@@ -1542,7 +1368,6 @@ export class PhysicsCast implements IPhysicsCast {
     static ensureInstance(): any;
     // (undocumented)
     getRayFromCamera(distance: number): Ray;
-    static get instance(): PhysicsCast;
     // (undocumented)
     getRayFromPositions(from: Vector3, to: Vector3): Ray;
     // (undocumented)
@@ -1557,7 +1382,9 @@ export class PhysicsCast implements IPhysicsCast {
     hitFirst(ray: Ray, hitCallback: (event: RaycastHitEntity) => void, id?: number): void;
     // (undocumented)
     hitFirstAvatar(ray: Ray, hitCallback: (event: RaycastHitAvatar) => void): void;
-    }
+    // (undocumented)
+    static get instance(): PhysicsCast;
+}
 
 // @public (undocumented)
 export enum PictureFrameStyle {
@@ -1682,11 +1509,11 @@ export type ProfileForRenderer = {
 };
 
 // @public
-export class Quaternion {
+export class Quaternion implements ReadOnlyQuaternion {
     constructor(
-    x?: number, 
-    y?: number, 
-    z?: number, 
+    x?: number,
+    y?: number,
+    z?: number,
     w?: number);
     static Angle(quat1: ReadOnlyQuaternion, quat2: ReadOnlyQuaternion): number;
     // (undocumented)
@@ -1702,6 +1529,8 @@ export class Quaternion {
     static Dot(left: ReadOnlyQuaternion, right: ReadOnlyQuaternion): number;
     equals(otherQuaternion: ReadOnlyQuaternion): boolean;
     static Euler(x: number, y: number, z: number): Quaternion;
+    set eulerAngles(euler: Vector3);
+    get eulerAngles(): Vector3;
     static FromArray(array: ArrayLike<number>, offset?: number): Quaternion;
     static FromEulerAnglesRef(x: number, y: number, z: number, result: Quaternion): void;
     static FromRotationMatrix(matrix: Matrix): Quaternion;
@@ -1711,9 +1540,11 @@ export class Quaternion {
     getClassName(): string;
     getHashCode(): number;
     static Hermite(value1: ReadOnlyQuaternion, tangent1: ReadOnlyQuaternion, value2: ReadOnlyQuaternion, tangent2: ReadOnlyQuaternion, amount: number): Quaternion;
+    static get Identity(): Quaternion;
     static Inverse(q: Quaternion): Quaternion;
     static IsIdentity(quaternion: ReadOnlyQuaternion): boolean;
-    static get Identity(): Quaternion;
+    get length(): number;
+    get lengthSquared(): number;
     static LookRotation(forward: Vector3, up?: Vector3): Quaternion;
     multiply(q1: ReadOnlyQuaternion): Quaternion;
     multiplyInPlace(q1: ReadOnlyQuaternion): Quaternion;
@@ -1721,11 +1552,7 @@ export class Quaternion {
     normalize(): Quaternion;
     get normalized(): Quaternion;
     static RotateTowards(from: ReadOnlyQuaternion, to: Quaternion, maxDegreesDelta: number): Quaternion;
-    set eulerAngles(euler: Vector3);
-    get eulerAngles(): Vector3;
     static RotationAlphaBetaGamma(alpha: number, beta: number, gamma: number): Quaternion;
-    get length(): number;
-    get lengthSquared(): number;
     static RotationAlphaBetaGammaToRef(alpha: number, beta: number, gamma: number, result: Quaternion): void;
     static RotationAxis(axis: Vector3, angle: number): Quaternion;
     static RotationAxisToRef(axis: Vector3, angle: number, result: Quaternion): Quaternion;
@@ -1820,47 +1647,11 @@ export class RaycastResponse<T> {
 }
 
 // @public (undocumented)
-export type RaycastResponsePayload<T> = {
-    queryId: string;
-    queryType: string;
-    payload: T;
-};
-
-// @public (undocumented)
 export type ReadOnlyColor4 = {
     readonly r: number;
     readonly g: number;
     readonly b: number;
     readonly a: number;
-};
-
-// @public (undocumented)
-export type ReadOnlyQuaternion = {
-    readonly x: number;
-    readonly y: number;
-    readonly z: number;
-    readonly w: number;
-};
-
-// @public (undocumented)
-export type ReadOnlyVector2 = {
-    readonly x: number;
-    readonly y: number;
-};
-
-// @public (undocumented)
-export type ReadOnlyVector3 = {
-    readonly y: number;
-    readonly x: number;
-    readonly z: number;
-};
-
-// @public (undocumented)
-export type ReadOnlyVector4 = {
-    readonly y: number;
-    readonly x: number;
-    readonly z: number;
-    readonly w: number;
 };
 
 // @public
@@ -1898,7 +1689,6 @@ export class Shape extends ObservableComponent {
 
 // @public
 export class Size implements ISize {
-    get surface(): number;
     constructor(width: number, height: number);
     add(otherSize: Size): Size;
     clone(): Size;
@@ -1912,6 +1702,7 @@ export class Size implements ISize {
     multiplyByFloats(w: number, h: number): Size;
     set(width: number, height: number): Size;
     subtract(otherSize: Size): Size;
+    get surface(): number;
     toString(): string;
     width: number;
     static Zero(): Size;
@@ -1926,6 +1717,15 @@ export enum Space {
 
 // @public (undocumented)
 export class SphereShape extends Shape {
+}
+
+// @public (undocumented)
+export class Subscription {
+    constructor(fn: (e: LocalActionButtonEvent) => void, useRaycast: boolean);
+    // (undocumented)
+    fn: (e: LocalActionButtonEvent) => void;
+    // (undocumented)
+    useRaycast: boolean;
 }
 
 // @public (undocumented)
@@ -2022,11 +1822,11 @@ export type TranformConstructorArgs = TransformConstructorArgs;
 // @public (undocumented)
 export class Transform extends ObservableComponent {
     constructor(args?: TransformConstructorArgs);
+    get eulerAngles(): Vector3;
     lookAt(target: Vector3, worldUp?: Vector3): this;
     // (undocumented)
     position: Vector3;
     rotate(axis: Vector3, angle: number): this;
-    get eulerAngles(): Vector3;
     // (undocumented)
     rotation: Quaternion;
     // (undocumented)
@@ -2252,6 +2052,8 @@ export abstract class UIShape extends ObservableComponent {
     // (undocumented)
     opacity: number;
     // (undocumented)
+    get parent(): UIShape | undefined;
+    // (undocumented)
     positionX: string | number;
     // (undocumented)
     positionY: string | number;
@@ -2261,7 +2063,6 @@ export abstract class UIShape extends ObservableComponent {
     visible: boolean;
     // (undocumented)
     width: string | number;
-    get parent(): UIShape | undefined;
 }
 
 // @public (undocumented)
@@ -2367,9 +2168,9 @@ export class UUIDEventSystem implements ISystem {
 }
 
 // @public
-export class Vector2 {
+export class Vector2 implements ReadOnlyVector2 {
     constructor(
-    x?: number, 
+    x?: number,
     y?: number);
     static Add(vector1: ReadOnlyVector2, vector2: ReadOnlyVector2): Vector2;
     add(otherVector: ReadOnlyVector2): Vector2;
@@ -2431,14 +2232,13 @@ export class Vector2 {
 }
 
 // @public
-export class Vector3 {
+export class Vector3 implements ReadOnlyVector3 {
     constructor(
-    x?: number, 
-    y?: number, 
+    x?: number,
+    y?: number,
     z?: number);
     static Add(vector1: ReadOnlyVector3, vector2: ReadOnlyVector3): Vector3;
     add(otherVector: ReadOnlyVector3): Vector3;
-    get isNonUniform(): boolean;
     addInPlace(otherVector: ReadOnlyVector3): Vector3;
     addInPlaceFromFloats(x: number, y: number, z: number): Vector3;
     addToRef(otherVector: ReadOnlyVector3, result: Vector3): Vector3;
@@ -2478,6 +2278,7 @@ export class Vector3 {
     static GetClipFactor(vector0: ReadOnlyVector3, vector1: ReadOnlyVector3, axis: ReadOnlyVector3, size: number): number;
     getHashCode(): number;
     static Hermite(value1: ReadOnlyVector3, tangent1: ReadOnlyVector3, value2: ReadOnlyVector3, tangent2: ReadOnlyVector3, amount: number): Vector3;
+    get isNonUniform(): boolean;
     static Left(): Vector3;
     length(): number;
     lengthSquared(): number;
@@ -2534,11 +2335,11 @@ export class Vector3 {
 }
 
 // @public
-export class Vector4 {
+export class Vector4 implements ReadOnlyVector4 {
     constructor(
-    x: number, 
-    y: number, 
-    z: number, 
+    x: number,
+    y: number,
+    z: number,
     w: number);
     static Add(vector1: ReadOnlyVector4, vector2: ReadOnlyVector4): Vector4;
     add(otherVector: ReadOnlyVector4): Vector4;
@@ -2651,7 +2452,6 @@ export type Wearable = {
 
 // @public (undocumented)
 export type WearableId = string;
-
 
 // (No @packageDocumentation comment for this package)
 

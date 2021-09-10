@@ -1,7 +1,5 @@
 import { EventConstructor } from '../ecs/EventManager'
 import { Observable } from '../ecs/Observable'
-import { CameraMode } from './Types'
-export { CameraMode }
 
 /**
  * @public

@@ -21,7 +21,4 @@ build:
 prepare:
 	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/prepare.spec.ts
 
-prepare-pr:
-	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/prepare-local-ecs.spec.ts
-
 .PHONY: build test install

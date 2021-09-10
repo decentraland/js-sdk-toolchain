@@ -1,6 +1,7 @@
 import { exec } from 'child_process'
+import { sync as globSync } from 'glob'
 import { resolve } from 'path'
-import { existsSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, readFileSync, writeFileSync, lstatSync, removeSync, copySync } from 'fs-extra'
 import { sync as rimraf } from 'rimraf'
 
 /**
@@ -42,6 +43,14 @@ export function itDeletesFolder(folder: string, cwd: string) {
     rimraf(path)
   })
 }
+export function itDeletesGlob(pattern: string, cwd: string) {
+  it(`deletes ${pattern} in ${cwd}`, () => {
+    globSync(pattern, { absolute: true, cwd }).forEach((file) => {
+      console.log(`> deleting ${file}`)
+      rimraf(file)
+    })
+  })
+}
 
 export function readJson(file: string, cwd: string): any {
   return JSON.parse(readFileSync(resolve(cwd, file)).toString())
@@ -52,7 +61,11 @@ export function patchJson(file: string, cwd: string, redux: (previous: any) => a
   return writeFileSync(path, JSON.stringify(redux(JSON.parse(readFileSync(path).toString())), null, 2))
 }
 
-export function itInstallsADependencyFromFolderAndCopiesTheVersion(cwd: string, depPath: string, devDependency = false) {
+export function itInstallsADependencyFromFolderAndCopiesTheVersion(
+  cwd: string,
+  depPath: string,
+  devDependency = false
+) {
   const dependencies = devDependency ? 'devDependencies' : 'dependencies'
 
   itExecutes(`npm install --quiet ${depPath}`, cwd)
@@ -80,4 +93,26 @@ export function itInstallsADependencyFromFolderAndCopiesTheVersion(cwd: string, 
       })
     }
   })
+}
+
+export function copyFile(from: string, to: string) {
+  console.log(`> copying ${from} to ${to}`)
+
+  if (!existsSync(from)) {
+    throw new Error(`${from} does not exist`)
+  }
+
+  // if it is not a file, remove it to avoid conflict with symbolic links
+  if (existsSync(to)) {
+    const type = lstatSync(to)
+    if (!type.isFile()) {
+      removeSync(to)
+    }
+  }
+
+  copySync(from, to)
+
+  if (!existsSync(to)) {
+    throw new Error(`${to} does not exist`)
+  }
 }

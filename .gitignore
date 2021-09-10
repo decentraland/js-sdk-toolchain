@@ -9,3 +9,4 @@ test/rollup-lib-integration/dist
 packages/**/*.js
 packages/decentraland-ecs/package-lock.json
 **/*.tgz
+test/decentraland-ecs/simple-scene

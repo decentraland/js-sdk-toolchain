@@ -4,13 +4,6 @@ import { Matrix } from './Matrix'
 import { Quaternion } from './Quaternion'
 import { Scalar } from './Scalar'
 
-/** @public */
-export type ReadOnlyVector3 = {
-  readonly y: number
-  readonly x: number
-  readonly z: number
-}
-
 /**
  * Classed used to store (x,y,z) vector representation
  * A Vector3 is the main object used in 3D geometry
@@ -18,7 +11,7 @@ export type ReadOnlyVector3 = {
  * Reminder: Babylon.js uses a left handed forward facing system
  * @public
  */
-export class Vector3 {
+export class Vector3 implements ReadOnlyVector3 {
   /**
    * Gets a boolean indicating that the vector is non uniform meaning x, y or z are not all the same
    */

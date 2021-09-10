@@ -10,7 +10,9 @@ import {
   ROLLUP,
   commonChecks
 } from './common'
-import { ensureFileExists, itExecutes, itDeletesFolder } from './helpers'
+import { ensureFileExists, itExecutes, itDeletesFolder, copyFile, itDeletesGlob } from './helpers'
+
+import { readFileSync, writeFileSync } from 'fs'
 
 flow('build-all', () => {
   commonChecks()
@@ -49,7 +51,9 @@ flow('build-all', () => {
 
   flow('decentraland-ecs', () => {
     itExecutes(`npm i --quiet`, ECS_PATH)
-    itDeletesFolder('artifacts', ECS_PATH)
+
+    itDeletesGlob('types/dcl/*.d.ts', ECS_PATH)
+
     const ROLLUP_ECS_CONFIG = resolve(ROLLUP_CONFIG_PATH, 'ecs.config.js')
     itExecutes(`${ROLLUP} -c ${ROLLUP_ECS_CONFIG}`, ECS_PATH)
 
@@ -57,6 +61,40 @@ flow('build-all', () => {
     itExecutes(`npm install --quiet ${BUILD_ECS_PATH}`, ECS_PATH)
     itExecutes(`npm install --quiet ${DECENTRALAND_AMD_PATH}`, ECS_PATH)
 
-    itExecutes(`tsc src/setupProxy.ts src/setupExport.ts`, ECS_PATH)
+    itExecutes(`${TSC} src/setupProxy.ts src/setupExport.ts`, ECS_PATH)
+
+    fixTypes()
   })
 })
+
+function fixTypes() {
+  it('fix ecs types', () => {
+    const original = ensureFileExists('dist/index.d.ts', ECS_PATH)
+
+    copyFile(original, ECS_PATH + '/types/dcl/index.d.ts')
+
+    const dtsFile = ensureFileExists('types/dcl/index.d.ts', ECS_PATH)
+    {
+      let content = readFileSync(dtsFile).toString()
+
+      content = content.replace(/^export declare/gm, 'declare')
+
+      content = content.replace(/^export \{([\s\n\r]*)\}/gm, '')
+
+      writeFileSync(dtsFile, content)
+
+      if (content.match(/\bexport\b/)) {
+        throw new Error(`The file ${dtsFile} contains exports`)
+      }
+
+      if (content.match(/\bimport\b/)) {
+        throw new Error(`The file ${dtsFile} contains imports`)
+      }
+
+      // TODO: uncomment this once @dcl/js-runtime is up and running
+      // if (content.includes('/// <ref')) {
+      //   throw new Error(`The file ${dtsFile} contains '/// <ref'`)
+      // }
+    }
+  })
+}
