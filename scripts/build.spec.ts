@@ -91,9 +91,10 @@ function fixTypes() {
         throw new Error(`The file ${dtsFile} contains imports`)
       }
 
-      if (content.includes('/// <ref')) {
-        throw new Error(`The file ${dtsFile} contains '/// <ref'`)
-      }
+      // TODO: uncomment this once @dcl/js-runtime is up and running
+      // if (content.includes('/// <ref')) {
+      //   throw new Error(`The file ${dtsFile} contains '/// <ref'`)
+      // }
     }
   })
 }
