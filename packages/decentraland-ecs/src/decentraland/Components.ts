@@ -1042,6 +1042,16 @@ export class VideoClip extends ObservableComponent {
   }
 }
 
+/** @public */
+export enum VideoStatus {
+  NONE = 0,
+  ERROR = 1,
+  LOADING = 2,
+  READY = 3,
+  PLAYING = 4,
+  BUFFERING = 5
+}
+
 /**
  * @public
  */
@@ -1083,6 +1093,10 @@ export class VideoTexture extends ObservableComponent {
 
   @ObservableComponent.field
   seek: number = -1
+
+  private _position: number = -1
+  private _videoLength: number = -1
+  private _status: VideoStatus = VideoStatus.NONE
 
   /**
    * Is this VideoTexture playing?
@@ -1134,5 +1148,25 @@ export class VideoTexture extends ObservableComponent {
     }
 
     return super.toJSON()
+  }
+
+  update(videoEvent: IEvents['videoEvent']) {
+    if (videoEvent.videoClipId == this.videoClipId) {
+      this._status = (videoEvent.videoStatus as VideoStatus) || VideoStatus.NONE
+      this._videoLength = videoEvent.totalVideoLength
+      this._position = videoEvent.currentOffset
+    }
+  }
+
+  get position() {
+    return this._position 
+  }
+
+  get videoLength() {
+    return this._videoLength 
+  }
+
+  get status() {
+    return this._status 
   }
 }

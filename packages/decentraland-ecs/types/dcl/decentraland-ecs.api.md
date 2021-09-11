@@ -1309,6 +1309,15 @@ export class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
 }
 
 // @public (undocumented)
+export const onVideoEvent: Observable<{
+    componentId: string;
+    videoClipId: string;
+    videoStatus: number;
+    currentOffset: number;
+    totalVideoLength: number;
+}>;
+
+// @public (undocumented)
 export function openExternalURL(url: string): void;
 
 // @public
@@ -2413,6 +2422,22 @@ export class VideoClip extends ObservableComponent {
 }
 
 // @public (undocumented)
+export enum VideoStatus {
+    // (undocumented)
+    BUFFERING = 5,
+    // (undocumented)
+    ERROR = 1,
+    // (undocumented)
+    LOADING = 2,
+    // (undocumented)
+    NONE = 0,
+    // (undocumented)
+    PLAYING = 4,
+    // (undocumented)
+    READY = 3
+}
+
+// @public (undocumented)
 export class VideoTexture extends ObservableComponent {
     constructor(videoClip: VideoClip, opts?: Partial<Pick<VideoTexture, 'samplingMode' | 'wrap'>>);
     // (undocumented)
@@ -2425,6 +2450,8 @@ export class VideoTexture extends ObservableComponent {
     playbackRate: number;
     playing: boolean;
     // (undocumented)
+    get position(): number;
+    // (undocumented)
     reset(): void;
     readonly samplingMode: number;
     // (undocumented)
@@ -2432,9 +2459,15 @@ export class VideoTexture extends ObservableComponent {
     // (undocumented)
     seekTime(seconds: number): void;
     // (undocumented)
+    get status(): VideoStatus;
+    // (undocumented)
     toJSON(): any;
     // (undocumented)
+    update(videoEvent: IEvents['videoEvent']): void;
+    // (undocumented)
     readonly videoClipId: string;
+    // (undocumented)
+    get videoLength(): number;
     // (undocumented)
     volume: number;
     readonly wrap: number;
