@@ -612,12 +612,18 @@ export class Font extends ObservableComponent {
   }
 }
 
-/** @alpha */
 export enum Fonts {
+  /** @deprecated */
   SanFrancisco = 'builtin:SF-UI-Text-Regular SDF',
+  /** @deprecated */
   SanFrancisco_Heavy = 'builtin:SF-UI-Text-Heavy SDF',
+  /** @deprecated */
   SanFrancisco_Semibold = 'builtin:SF-UI-Text-Semibold SDF',
-  LiberationSans = 'builtin:LiberationSans SDF'
+  LiberationSans = 'builtin:LiberationSans SDF',
+  SansSerif = 'SansSerif',
+  SansSerif_Heavy = 'SansSerif_Heavy',
+  SansSerif_Bold = 'SansSerif_Bold',
+  SansSerif_SemiBold = 'SansSerif_SemiBold'
 }
 
 /**
