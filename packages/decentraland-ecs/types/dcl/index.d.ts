@@ -1480,7 +1480,19 @@ declare class Font extends ObservableComponent {
     constructor(src?: string);
 }
 
-/* Excluded from this release type: Fonts */
+declare enum Fonts {
+    /** @deprecated */
+    SanFrancisco = "builtin:SF-UI-Text-Regular SDF",
+    /** @deprecated */
+    SanFrancisco_Heavy = "builtin:SF-UI-Text-Heavy SDF",
+    /** @deprecated */
+    SanFrancisco_Semibold = "builtin:SF-UI-Text-Semibold SDF",
+    LiberationSans = "builtin:LiberationSans SDF",
+    SansSerif = "SansSerif",
+    SansSerif_Heavy = "SansSerif_Heavy",
+    SansSerif_Bold = "SansSerif_Bold",
+    SansSerif_SemiBold = "SansSerif_SemiBold"
+}
 
 /**
  * Reprasents a camera frustum
