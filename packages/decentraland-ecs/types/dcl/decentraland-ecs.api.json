@@ -13550,7 +13550,7 @@
         {
           "kind": "Enum",
           "canonicalReference": "decentraland-ecs!Fonts:enum",
-          "docComment": "",
+          "docComment": "/**\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -13584,7 +13584,7 @@
             {
               "kind": "EnumMember",
               "canonicalReference": "decentraland-ecs!Fonts.SanFrancisco:member",
-              "docComment": "/**\n * @deprecated\n */\n",
+              "docComment": "/**\n * @deprecated\n *\n * SanFrancisco has been deprecated. Use SansSerif instead.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -13605,7 +13605,7 @@
             {
               "kind": "EnumMember",
               "canonicalReference": "decentraland-ecs!Fonts.SanFrancisco_Heavy:member",
-              "docComment": "/**\n * @deprecated\n */\n",
+              "docComment": "/**\n * @deprecated\n *\n * SanFrancisco_Heavy has been deprecated. Use SansSerif_Heavy instead.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -13626,7 +13626,7 @@
             {
               "kind": "EnumMember",
               "canonicalReference": "decentraland-ecs!Fonts.SanFrancisco_Semibold:member",
-              "docComment": "/**\n * @deprecated\n */\n",
+              "docComment": "/**\n * @deprecated\n *\n * SanFrancisco_Semibold has been deprecated. Use SansSerif_SemiBold instead.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
