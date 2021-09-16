@@ -650,16 +650,24 @@ export class Font extends ObservableComponent {
     readonly src: string;
 }
 
-// @alpha (undocumented)
+// @public (undocumented)
 export enum Fonts {
     // (undocumented)
     LiberationSans = "builtin:LiberationSans SDF",
-    // (undocumented)
+    // @deprecated (undocumented)
     SanFrancisco = "builtin:SF-UI-Text-Regular SDF",
-    // (undocumented)
+    // @deprecated (undocumented)
     SanFrancisco_Heavy = "builtin:SF-UI-Text-Heavy SDF",
+    // @deprecated (undocumented)
+    SanFrancisco_Semibold = "builtin:SF-UI-Text-Semibold SDF",
     // (undocumented)
-    SanFrancisco_Semibold = "builtin:SF-UI-Text-Semibold SDF"
+    SansSerif = "SansSerif",
+    // (undocumented)
+    SansSerif_Bold = "SansSerif_Bold",
+    // (undocumented)
+    SansSerif_Heavy = "SansSerif_Heavy",
+    // (undocumented)
+    SansSerif_SemiBold = "SansSerif_SemiBold"
 }
 
 // @public
