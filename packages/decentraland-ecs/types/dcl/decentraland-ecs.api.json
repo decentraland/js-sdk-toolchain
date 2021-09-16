@@ -13548,6 +13548,189 @@
           "implementsTokenRanges": []
         },
         {
+          "kind": "Enum",
+          "canonicalReference": "decentraland-ecs!Fonts:enum",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare enum Fonts "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "Fonts",
+          "members": [
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!Fonts.LiberationSans:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "LiberationSans = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"builtin:LiberationSans SDF\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "LiberationSans",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!Fonts.SanFrancisco:member",
+              "docComment": "/**\n * @deprecated\n *\n * SanFrancisco has been deprecated. Use SansSerif instead.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "SanFrancisco = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"builtin:SF-UI-Text-Regular SDF\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "SanFrancisco",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!Fonts.SanFrancisco_Heavy:member",
+              "docComment": "/**\n * @deprecated\n *\n * SanFrancisco_Heavy has been deprecated. Use SansSerif_Heavy instead.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "SanFrancisco_Heavy = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"builtin:SF-UI-Text-Heavy SDF\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "SanFrancisco_Heavy",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!Fonts.SanFrancisco_Semibold:member",
+              "docComment": "/**\n * @deprecated\n *\n * SanFrancisco_Semibold has been deprecated. Use SansSerif_SemiBold instead.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "SanFrancisco_Semibold = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"builtin:SF-UI-Text-Semibold SDF\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "SanFrancisco_Semibold",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!Fonts.SansSerif:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "SansSerif = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"SansSerif\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "SansSerif",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!Fonts.SansSerif_Bold:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "SansSerif_Bold = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"SansSerif_Bold\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "SansSerif_Bold",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!Fonts.SansSerif_Heavy:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "SansSerif_Heavy = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"SansSerif_Heavy\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "SansSerif_Heavy",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!Fonts.SansSerif_SemiBold:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "SansSerif_SemiBold = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"SansSerif_SemiBold\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "SansSerif_SemiBold",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ]
+        },
+        {
           "kind": "Class",
           "canonicalReference": "decentraland-ecs!Frustum:class",
           "docComment": "/**\n * Reprasents a camera frustum\n *\n * @public\n */\n",
