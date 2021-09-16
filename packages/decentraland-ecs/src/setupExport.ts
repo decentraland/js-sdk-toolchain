@@ -138,6 +138,7 @@ const setupExport = async ({
 
     await copyWearables({ exportDir })
     await copyContentStatus({ exportDir })
+    await ensureWriteFile(path.resolve(exportDir, 'content', 'available-content'), '[{"cid":"0","available":false}]')
   } catch (err) {
     console.error('Export failed.', err)
     throw err
