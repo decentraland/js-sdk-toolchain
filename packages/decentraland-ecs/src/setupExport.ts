@@ -135,8 +135,9 @@ const setupExport = async ({
         )
       }
     }
-    
+
     await copyWearables({ exportDir })
+    await copyContentStatus({ exportDir })
   } catch (err) {
     console.error('Export failed.', err)
     throw err
@@ -181,6 +182,13 @@ const copyWearables = async ({ exportDir }: { exportDir: string }) => {
   await Promise.all(promises)
 
   await ensureWriteFile(wearableResponsePath, JSON.stringify(response, null, 2))
+}
+
+const copyContentStatus = async ({ exportDir }: { exportDir: string }) => {
+  const exportContentStatusPath = path.resolve(exportDir, 'content', 'status')
+  const contentStatusUrl = 'https://peer.decentraland.org/content/status'
+  await ensureWriteFile(exportContentStatusPath, '')
+  await downloadFile(contentStatusUrl, exportContentStatusPath)
 }
 
 // @ts-ignore
