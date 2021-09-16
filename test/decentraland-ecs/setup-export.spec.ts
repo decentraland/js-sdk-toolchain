@@ -33,5 +33,5 @@ describe('decentraland-ecs: setupExport.js', () => {
     ensureFileExists('unity-renderer/unity.framework.js', exportDir)
     ensureFileExists('unity-renderer/unity.loader.js', exportDir)
     ensureFileExists('unity-renderer/index.js', exportDir)
-  }, 40000)
+  }, 80000)
 })

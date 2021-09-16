@@ -34,7 +34,7 @@ export function runCommand(command: string, cwd: string, env?: Record<string, st
 }
 
 export function itExecutes(command: string, cwd: string, env?: Record<string, string>) {
-  it(command, async () => await runCommand(command, cwd, env), 30000)
+  it(command, async () => await runCommand(command, cwd, env), 60000)
 }
 
 export function itDeletesFolder(folder: string, cwd: string) {
