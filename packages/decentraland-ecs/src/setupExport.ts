@@ -150,10 +150,16 @@ const copyWearables = async ({ exportDir }: { exportDir: string }) => {
   const filesToDownload = new Set<string>()
   const wearableResponsePath = path.resolve(exportDir, 'lambdas', 'collections', 'wearables')
   const baseAvatarUrl =
-    'https://peer.decentraland.org/lambdas/collections/wearables?collectionId=urn:decentraland:off-chain:base-avatars'
+    'https://peer-lb.decentraland.org/lambdas/collections/wearables?collectionId=urn:decentraland:off-chain:base-avatars'
 
   await ensureWriteFile(wearableResponsePath, '')
-  await downloadFile(baseAvatarUrl, wearableResponsePath)
+
+  try {
+    await downloadFile(baseAvatarUrl, wearableResponsePath)
+  } catch (err) {
+    console.error(`Couldn't fetch base avatars to serve statically. Please verify your internet connection`)
+    throw err
+  }
 
   let response = JSON.parse(fs.readFileSync(wearableResponsePath).toString())
 
@@ -180,14 +186,19 @@ const copyWearables = async ({ exportDir }: { exportDir: string }) => {
     await ensureWriteFile(filePath, '')
     promises.push(downloadFile(url.toString(), filePath))
   }
-  await Promise.all(promises)
 
+  try {
+    await Promise.all(promises)
+  } catch (err) {
+    console.error(`Couldn't fetch base avatars to serve statically. Please verify your internet connection`)
+    throw err
+  }
   await ensureWriteFile(wearableResponsePath, JSON.stringify(response, null, 2))
 }
 
 const copyContentStatus = async ({ exportDir }: { exportDir: string }) => {
   const exportContentStatusPath = path.resolve(exportDir, 'content', 'status')
-  const contentStatusUrl = 'https://peer.decentraland.org/content/status'
+  const contentStatusUrl = 'https://peer-lb.decentraland.org/content/status'
   await ensureWriteFile(
     exportContentStatusPath,
     '{"name":"","version":"v3","currentTime":1631814332458,"lastImmutableTime":0,"historySize":1173579,"synchronizationStatus":{"otherServers":[{"address":"https://peer-ec1.decentraland.org/content","connectionState":"Connected","lastDeploymentTimestamp":1631814242286},{"address":"https://interconnected.online/content","connectionState":"Connected","lastDeploymentTimestamp":1631814258357},{"address":"https://peer.uadevops.com/content","connectionState":"Connected","lastDeploymentTimestamp":1631814281355},{"address":"https://peer-eu1.decentraland.org/content","connectionState":"Connected","lastDeploymentTimestamp":1631814265837},{"address":"https://peer.decentral.games/content","connectionState":"Connected","lastDeploymentTimestamp":1631814282692},{"address":"https://peer.dclnodes.io/content","connectionState":"Connected","lastDeploymentTimestamp":1631814241548},{"address":"https://peer.kyllian.me/content","connectionState":"Connected","lastDeploymentTimestamp":1631814268853},{"address":"https://peer.melonwave.com/content","connectionState":"Connected","lastDeploymentTimestamp":1631814264357},{"address":"https://peer-wc1.decentraland.org/content","connectionState":"Connected","lastDeploymentTimestamp":1631814245952},{"address":"https://peer-ap1.decentraland.org/content","connectionState":"Connected","lastDeploymentTimestamp":1631814275187}],"lastSyncWithDAO":1631814298354,"synchronizationState":"Synced","lastSyncWithOtherServers":1631814290132},"commitHash":"5cbd6479c8df19e91559e79128c1457fc54d9478","catalystVersion":"2.1.0","ethNetwork":"mainnet"}'
@@ -195,7 +206,9 @@ const copyContentStatus = async ({ exportDir }: { exportDir: string }) => {
   try {
     await downloadFile(contentStatusUrl, exportContentStatusPath)
   } catch (err) {
-    console.warn(`Content status couldn't be fetched.`)
+    console.warn(
+      `Content status couldn't be fetched, instead it will be mocked preload status. Please verify your internet connection.`
+    )
   }
 }
 
