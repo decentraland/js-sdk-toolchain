@@ -10,7 +10,7 @@ describe('decentraland-ecs: setupExport.js', () => {
     const workDir = path.resolve(__dirname, 'simple-scene')
     const exportDir = path.resolve(workDir, 'export')
     const mappings: string[] = []
-    const sceneJson = { display: { title: 'test' } }
+    const sceneJson = { display: { title: 'test' }, scene: { base: '-3,7' } }
 
     if (fs.existsSync(workDir)) {
       await fs.promises.rmdir(workDir, { recursive: true })
