@@ -10,15 +10,15 @@
 // @public (undocumented)
 export enum ActionButton {
     // (undocumented)
+    ACTION_1 = "ACTION_1",
+    // (undocumented)
+    ACTION_2 = "ACTION_2",
+    // (undocumented)
+    ACTION_3 = "ACTION_3",
+    // (undocumented)
+    ACTION_4 = "ACTION_4",
+    // (undocumented)
     ANY = "ANY",
-    // (undocumented)
-    AUX_FOUR = "AUX_FOUR",
-    // (undocumented)
-    AUX_ONE = "AUX_ONE",
-    // (undocumented)
-    AUX_THREE = "AUX_THREE",
-    // (undocumented)
-    AUX_TWO = "AUX_TWO",
     // (undocumented)
     BACKWARD = "BACKWARD",
     // (undocumented)
