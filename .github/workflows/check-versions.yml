@@ -1,0 +1,22 @@
+on:
+  push:
+    branches:
+      - "main"
+
+name: Verify posix version
+jobs:
+  verify_version:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: verify posix version
+      working-directory: ./packages/decentraland-ecs
+      run: |
+        node -e "
+          const pkg = require('./package.json')
+          const posixVersion = pkg.dependencies['@dcl/posix']
+          const snapshotExpr = /-/ // if it contains a dash, it is a snapshot
+          if (snapshotExpr.test(posixVersion)) {
+            process.exit(1)
+          }
+        "

@@ -49,7 +49,9 @@ const setupExport = async ({
       : defaultSceneJson
 
     const content = await fs.promises.readFile(path.resolve(dclKernelPath, 'export.html'), 'utf-8')
-    const finalContent = content.replace('{{ scene.display.title }}', sceneJson.display.title)
+    const finalContent = content
+      .replace('{{ scene.display.title }}', sceneJson.display.title)
+      .replace('{{ scene.scene.base }}', sceneJson.scene.base)
 
     // 3) Copy and write files
     await ensureWriteFile(
