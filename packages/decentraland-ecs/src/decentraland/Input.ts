@@ -265,8 +265,16 @@ export class Input {
   }
 
   private getPointerById(id: number): ActionButton {
-    if (id < 0 || id >= this.buttonIdMapping.length) return ActionButton.SECONDARY
+    if (id < 0 || id >= this.buttonIdMapping.length) {
+      return ActionButton.SECONDARY
+    }
 
-    return this.buttonIdMapping[id]
+    const actionButton = this.buttonIdMapping[id]
+
+    if (actionButton === ActionButton.ANY) {
+      return ActionButton.SECONDARY
+    }
+
+    return actionButton
   }
 }
