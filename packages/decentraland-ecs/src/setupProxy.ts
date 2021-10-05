@@ -61,12 +61,19 @@ const setupProxy = (dcl: any, app: express.Application) => {
   }
 
   createStaticRoutes(app, '/images/decentraland-connect/*', dclKernelImagesDecentralandConnect)
-  createStaticRoutes(app, '/@/artifacts/unity-renderer/*', dclUnityRenderer)
+  createStaticRoutes(app, '/@/artifacts/unity-renderer/*', dclUnityRenderer, (filePath) =>
+    filePath.replace(/.br+$/, '')
+  )
   createStaticRoutes(app, '/@/artifacts/loader/*', dclKernelLoaderPath)
   createStaticRoutes(app, '/default-profile/*', dclKernelDefaultProfilePath)
 }
 
-const createStaticRoutes = (app: express.Application, route: string, localFolder: string) => {
+const createStaticRoutes = (
+  app: express.Application,
+  route: string,
+  localFolder: string,
+  mapFile: ((filePath: string) => string) | null = null
+) => {
   app.use(route, (req, res, next) => {
     const options = {
       root: localFolder,
@@ -82,7 +89,7 @@ const createStaticRoutes = (app: express.Application, route: string, localFolder
       }
     }
 
-    const fileName = req.params[0]
+    const fileName: string = mapFile ? mapFile(req.params[0]) : req.params[0]
 
     res.sendFile(fileName, options, (err) => {
       if (err) {
