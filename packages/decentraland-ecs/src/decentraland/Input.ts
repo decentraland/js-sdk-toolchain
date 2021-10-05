@@ -14,7 +14,17 @@ export enum ActionButton {
   POINTER = 'POINTER',
   PRIMARY = 'PRIMARY',
   SECONDARY = 'SECONDARY',
-  ANY = 'ANY'
+  ANY = 'ANY',
+  FORWARD = 'FORWARD',
+  BACKWARD = 'BACKWARD',
+  RIGHT = 'RIGHT',
+  LEFT = 'LEFT',
+  JUMP = 'JUMP',
+  WALK = 'WALK',
+  ACTION_1 = 'ACTION_1',
+  ACTION_2 = 'ACTION_2',
+  ACTION_3 = 'ACTION_3',
+  ACTION_4 = 'ACTION_4'
 }
 
 /** @public */
@@ -103,6 +113,46 @@ export class Input {
     [ActionButton.ANY]: {
       BUTTON_DOWN: [],
       BUTTON_UP: []
+    },
+    [ActionButton.FORWARD]: {
+      BUTTON_DOWN: [],
+      BUTTON_UP: []
+    },
+    [ActionButton.BACKWARD]: {
+      BUTTON_DOWN: [],
+      BUTTON_UP: []
+    },
+    [ActionButton.RIGHT]: {
+      BUTTON_DOWN: [],
+      BUTTON_UP: []
+    },
+    [ActionButton.LEFT]: {
+      BUTTON_DOWN: [],
+      BUTTON_UP: []
+    },
+    [ActionButton.JUMP]: {
+      BUTTON_DOWN: [],
+      BUTTON_UP: []
+    },
+    [ActionButton.WALK]: {
+      BUTTON_DOWN: [],
+      BUTTON_UP: []
+    },
+    [ActionButton.ACTION_1]: {
+      BUTTON_DOWN: [],
+      BUTTON_UP: []
+    },
+    [ActionButton.ACTION_2]: {
+      BUTTON_DOWN: [],
+      BUTTON_UP: []
+    },
+    [ActionButton.ACTION_3]: {
+      BUTTON_DOWN: [],
+      BUTTON_UP: []
+    },
+    [ActionButton.ACTION_4]: {
+      BUTTON_DOWN: [],
+      BUTTON_UP: []
     }
   }
 
@@ -117,6 +167,36 @@ export class Input {
       BUTTON_DOWN: false
     },
     [ActionButton.ANY]: {
+      BUTTON_DOWN: false
+    },
+    [ActionButton.FORWARD]: {
+      BUTTON_DOWN: false
+    },
+    [ActionButton.BACKWARD]: {
+      BUTTON_DOWN: false
+    },
+    [ActionButton.RIGHT]: {
+      BUTTON_DOWN: false
+    },
+    [ActionButton.LEFT]: {
+      BUTTON_DOWN: false
+    },
+    [ActionButton.JUMP]: {
+      BUTTON_DOWN: false
+    },
+    [ActionButton.WALK]: {
+      BUTTON_DOWN: false
+    },
+    [ActionButton.ACTION_1]: {
+      BUTTON_DOWN: false
+    },
+    [ActionButton.ACTION_2]: {
+      BUTTON_DOWN: false
+    },
+    [ActionButton.ACTION_3]: {
+      BUTTON_DOWN: false
+    },
+    [ActionButton.ACTION_4]: {
       BUTTON_DOWN: false
     }
   }

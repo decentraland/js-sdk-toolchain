@@ -12,11 +12,31 @@ export enum ActionButton {
     // (undocumented)
     ANY = "ANY",
     // (undocumented)
+    AUX_FOUR = "AUX_FOUR",
+    // (undocumented)
+    AUX_ONE = "AUX_ONE",
+    // (undocumented)
+    AUX_THREE = "AUX_THREE",
+    // (undocumented)
+    AUX_TWO = "AUX_TWO",
+    // (undocumented)
+    BACKWARD = "BACKWARD",
+    // (undocumented)
+    FORWARD = "FORWARD",
+    // (undocumented)
+    JUMP = "JUMP",
+    // (undocumented)
+    LEFT = "LEFT",
+    // (undocumented)
     POINTER = "POINTER",
     // (undocumented)
     PRIMARY = "PRIMARY",
     // (undocumented)
-    SECONDARY = "SECONDARY"
+    RIGHT = "RIGHT",
+    // (undocumented)
+    SECONDARY = "SECONDARY",
+    // (undocumented)
+    WALK = "WALK"
 }
 
 // @public
