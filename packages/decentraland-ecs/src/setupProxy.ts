@@ -72,7 +72,7 @@ const createStaticRoutes = (
   app: express.Application,
   route: string,
   localFolder: string,
-  mapFile: ((filePath: string) => string) | null = null
+  mapFile?: ((filePath: string) => string)
 ) => {
   app.use(route, (req, res, next) => {
     const options = {
