@@ -1901,7 +1901,7 @@ declare class Material extends ObservableComponent {
     /**
      * Texture applied as opacity. Default: the same texture used in albedoTexture.
      */
-    alphaTexture?: Texture;
+    alphaTexture?: Texture | VideoTexture;
     /**
      * Emissive texture.
      */
