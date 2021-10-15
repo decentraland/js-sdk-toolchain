@@ -18150,6 +18150,15 @@
                 },
                 {
                   "kind": "Content",
+                  "text": " | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "VideoTexture",
+                  "canonicalReference": "decentraland-ecs!VideoTexture:class"
+                },
+                {
+                  "kind": "Content",
                   "text": ";"
                 }
               ],
@@ -18158,7 +18167,7 @@
               "name": "alphaTexture",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 4
               },
               "isStatic": false
             },
