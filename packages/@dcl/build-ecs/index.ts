@@ -12,6 +12,7 @@ type PackageJson = {
   // only package.json
   typings?: string
 
+  bundledDependencies: string[]
   bundleDependencies: string[]
   decentralandLibrary?: any
 }
@@ -83,7 +84,12 @@ async function compile() {
 
   if (resolveFile('package.json')) {
     packageJson = JSON.parse(loadArtifact('package.json'))
-    packageJson!.bundleDependencies = packageJson!.bundleDependencies || []
+    const bundledDependencies = [
+      ...(packageJson?.bundleDependencies || []),
+      ...(packageJson?.bundledDependencies || [])
+    ]
+    packageJson!.bundleDependencies = []
+    packageJson!.bundledDependencies = bundledDependencies
   }
 
   if (resolveFile('scene.json')) {
@@ -427,19 +433,19 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
     } else {
       isDecentralandLib = false
 
-      if (packageJson.bundleDependencies instanceof Array) {
-        packageJson.bundleDependencies.forEach(($, ix) => {
+      if (packageJson.bundledDependencies instanceof Array) {
+        packageJson.bundledDependencies.forEach(($, ix) => {
           if (typeof $ == 'string') {
             bundledLibs.push($)
           } else {
             console.error(
-              `! Error: package.json .bundleDependencies must be an array of strings. The element number bundleDependencies[${ix}] is not a string.`
+              `! Error: package.json .bundledDependencies must be an array of strings. The element number bundledDependencies[${ix}] is not a string.`
             )
             hasError = true
           }
         })
-      } else if (packageJson.bundleDependencies) {
-        console.error(`! Error: package.json .bundleDependencies must be an array of strings.`)
+      } else if (packageJson.bundledDependencies) {
+        console.error(`! Error: package.json .bundledDependencies must be an array of strings.`)
         hasError = true
       }
     }
@@ -554,7 +560,7 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
 
   if (libs.length && isDecentralandLib) {
     console.log(
-      '! Error: this project of type decentralandLibrary includes bundleDependencies. bundleDependencies are only allowed in scenes.'
+      '! Error: this project of type decentralandLibrary includes bundledDependencies. bundledDependencies are only allowed in scenes.'
     )
     process.exit(1)
   }
