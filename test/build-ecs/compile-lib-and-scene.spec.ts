@@ -90,3 +90,58 @@ describe('integration flow, build libs and build scene using libs', () => {
     })
   })
 })
+
+describe('integration flow with bundledDependencies, build libs and build scene using libs', () => {
+  const { cwd: ecsLibCwd } = buildEcsBuildLibFlow()
+  const { cwd: rollupLibCwd } = rollupBuildLibFlow()
+  const sceneCwd = resolve(__dirname, './fixtures/simple-scene-with-bundled')
+
+  // install libs
+  itDeletesFolder('./node_modules', sceneCwd)
+  itExecutes('npm install --quiet --no-progress -B ' + JSON.stringify(ecsLibCwd), sceneCwd)
+  itExecutes('npm install --quiet --no-progress -B ' + JSON.stringify(rollupLibCwd), sceneCwd)
+  // install rest of dependencies, if any
+  itExecutes('npm install --quiet --no-progress', sceneCwd)
+
+  describe('build-ecs: build scene with library DEBUG mode', () => {
+    itDeletesFolder('./bin', sceneCwd)
+
+    itExecutes('npm run --quiet build', sceneCwd)
+
+    it('ensure files exist', () => {
+      ensureFileExists('bin/game.js', sceneCwd)
+      ensureFileExists('bin/game.js.lib', sceneCwd)
+    })
+
+    it('ensure it uses NON MINIFIED versions in .lib', () => {
+      const lib: any[] = JSON.parse(readFileSync(resolve(sceneCwd, 'bin/game.js.lib')).toString()).map(
+        ($: { path: string }) => resolve(sceneCwd, $.path)
+      )
+      expect(lib).toContain(resolve(sceneCwd, 'node_modules/@dcl/ecs-scene-utils/dist/index.js'))
+      expect(lib).toContain(resolve(sceneCwd, 'node_modules/eth-connect/eth-connect.js'))
+      expect(lib).toContain(resolve(ecsLibCwd, 'bin/lib.js'))
+      expect(lib).toContain(resolve(rollupLibCwd, 'dist/index.js'))
+    })
+  })
+
+  describe('build-ecs: build scene with library, production mode', () => {
+    itDeletesFolder('./bin', sceneCwd)
+
+    itExecutes('npm run build-prod', sceneCwd)
+
+    it('ensure files exist', () => {
+      ensureFileExists('bin/game.js', sceneCwd)
+      ensureFileExists('bin/game.js.lib', sceneCwd)
+    })
+
+    it('ensure it uses minified versions in .lib', () => {
+      const lib: any[] = JSON.parse(readFileSync(resolve(sceneCwd, 'bin/game.js.lib')).toString()).map(
+        ($: { path: string }) => resolve(sceneCwd, $.path)
+      )
+      expect(lib).toContain(resolve(sceneCwd, 'node_modules/eth-connect/eth-connect.js'))
+      expect(lib).toContain(resolve(sceneCwd, 'node_modules/@dcl/ecs-scene-utils/dist/index.js'))
+      expect(lib).toContain(resolve(ecsLibCwd, 'bin/lib.min.js'))
+      expect(lib).toContain(resolve(rollupLibCwd, 'dist/index.min.js'))
+    })
+  })
+})

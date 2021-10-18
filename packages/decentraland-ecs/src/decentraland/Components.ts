@@ -850,7 +850,7 @@ export class Material extends ObservableComponent {
    * Texture applied as opacity. Default: the same texture used in albedoTexture.
    */
   @ObservableComponent.component
-  alphaTexture?: Texture
+  alphaTexture?: Texture | VideoTexture
 
   /**
    * Emissive texture.

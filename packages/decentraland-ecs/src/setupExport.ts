@@ -115,6 +115,7 @@ const setupExport = async ({
     await Promise.all([
       // copy project
       ensureWriteFile(path.resolve(exportDir, 'index.html'), finalContent),
+      ensureWriteFile(path.resolve(exportDir, 'mappings'), JSON.stringify(mappings)),
       ensureCopyFile(path.resolve(dclKernelPath, 'index.js'), path.resolve(exportDir, 'index.js')),
       ensureCopyFile(path.resolve(dclKernelPath, 'favicon.ico'), path.resolve(exportDir, 'favicon.ico')),
 

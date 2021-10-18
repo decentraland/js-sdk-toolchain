@@ -28,6 +28,7 @@ describe('decentraland-ecs: setupExport.js', () => {
 
     ensureFileExists('index.js', exportDir)
     ensureFileExists('index.html', exportDir)
+    ensureFileExists('mappings', exportDir)
     ensureFileExists('unity-renderer/unity.wasm', exportDir)
     ensureFileExists('unity-renderer/unity.data', exportDir)
     ensureFileExists('unity-renderer/unity.framework.js', exportDir)

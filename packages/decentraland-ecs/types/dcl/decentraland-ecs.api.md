@@ -930,7 +930,7 @@ export class Material extends ObservableComponent {
     albedoColor?: Color4 | Color3;
     albedoTexture?: Texture | VideoTexture;
     alphaTest?: number;
-    alphaTexture?: Texture;
+    alphaTexture?: Texture | VideoTexture;
     ambientColor?: Color3;
     bumpTexture?: Texture;
     castShadows?: boolean;
