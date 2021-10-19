@@ -182,6 +182,10 @@ export class Input {
   public handlePointerEvent(data: GlobalInputEventResult) {
     const button = this.getPointerById(data.buttonId)
 
+    if (!button) {
+      return
+    }
+
     let eventResult: LocalActionButtonEvent = {
       ...data,
       button,
@@ -264,15 +268,15 @@ export class Input {
     return -1
   }
 
-  private getPointerById(id: number): ActionButton {
+  private getPointerById(id: number): ActionButton | null {
     if (id < 0 || id >= this.buttonIdMapping.length) {
-      return ActionButton.SECONDARY
+      return null
     }
 
     const actionButton = this.buttonIdMapping[id]
 
     if (actionButton === ActionButton.ANY) {
-      return ActionButton.SECONDARY
+      return null
     }
 
     return actionButton

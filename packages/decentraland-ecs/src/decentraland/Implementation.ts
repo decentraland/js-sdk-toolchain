@@ -54,7 +54,7 @@ export class DecentralandSynchronizationSystem implements ISystem {
             engine.eventManager.fireEvent(new RaycastResponse<RaycastHitEntities>(data))
           }
           break
-        case 'pointerEvent':
+        case 'actionButtonEvent':
           engine.eventManager.fireEvent(new PointerEvent(data.payload))
           break
       }
