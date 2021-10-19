@@ -1308,6 +1308,12 @@ export type OnPointerUUIDEventOptions = {
     distance?: number;
 };
 
+// @public (undocumented)
+export const onProfileChanged: Observable<{
+    ethAddress: string;
+    version: number;
+}>;
+
 // @public
 export const onSceneReadyObservable: Observable<{}>;
 

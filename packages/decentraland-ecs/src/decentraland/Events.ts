@@ -91,6 +91,11 @@ export const onPlayerExpressionObservable = new Observable<IEvents['playerExpres
 export const onVideoEvent = new Observable<IEvents['videoEvent']>(createSubscriber('videoEvent'))
 
 /**
+* @public
+*/
+export const onProfileChanged = new Observable<IEvents['profileChanged']>(createSubscriber('profileChanged'))
+
+/**
  * @internal
  * This function adds _one_ listener to the onEvent event of dcl interface.
  * Leveraging a switch to route events to the Observable handlers.
@@ -133,6 +138,10 @@ export function _initEventObservables(dcl: DecentralandInterface) {
             component.update(videoData)
           }
           onVideoEvent.notifyObservers(videoData)
+          return
+        }
+        case 'profileChanged': {
+          onProfileChanged.notifyObservers(event.data as IEvents['profileChanged'])
           return
         }
       }

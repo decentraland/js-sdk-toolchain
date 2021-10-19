@@ -3114,6 +3114,14 @@ declare type OnPointerUUIDEventOptions = {
 };
 
 /**
+ * @public
+ */
+declare const onProfileChanged: Observable<{
+    ethAddress: string;
+    version: number;
+}>;
+
+/**
  * This event is triggered after all the resources of the scene were loaded (models, textures, etc...)
  * @public
  */
