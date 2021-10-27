@@ -350,17 +350,36 @@ export class UIInputText extends UIShape {
   @ObservableComponent.field
   paddingLeft: number = 0
 
-  @OnUUIDEvent.uuidEvent
   onTextSubmit: OnTextSubmit | null = null
 
-  @OnUUIDEvent.uuidEvent
   onChanged: OnChanged | null = null
+
+  // @internal
+  @OnUUIDEvent.uuidEvent
+  onTextChanged: OnChanged
 
   @OnUUIDEvent.uuidEvent
   onFocus: OnFocus | null = null
 
   @OnUUIDEvent.uuidEvent
   onBlur: OnBlur | null = null
+
+  constructor(parent: UIShape | null) {
+    super(parent)
+    this.onTextChanged = new OnChanged((e) => {
+      const { value, isSubmit } = e.value
+
+      const isDirty = this.dirty
+      this.value = value
+      this.dirty = isDirty
+
+      if (isSubmit && this.onTextSubmit) {
+        this.onTextSubmit.callback({ text: value } as IEvents['onTextSubmit'])
+      } else if (!isSubmit && this.onChanged) {
+        this.onChanged.callback({ value, pointerId: e.pointerId } as IEvents['onChange'])
+      }
+    })
+  }
 }
 
 /**

@@ -1974,6 +1974,7 @@ export class UIImage extends UIShape {
 
 // @public (undocumented)
 export class UIInputText extends UIShape {
+    constructor(parent: UIShape | null);
     // (undocumented)
     autoStretchWidth: boolean;
     // (undocumented)
