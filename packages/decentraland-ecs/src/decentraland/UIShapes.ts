@@ -356,7 +356,7 @@ export class UIInputText extends UIShape {
 
   // @internal
   @OnUUIDEvent.uuidEvent
-  onTextChanged: OnChanged
+  protected readonly onTextChanged: OnChanged
 
   @OnUUIDEvent.uuidEvent
   onFocus: OnFocus | null = null
