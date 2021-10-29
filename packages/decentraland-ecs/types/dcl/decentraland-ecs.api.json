@@ -184,6 +184,90 @@
           "members": [
             {
               "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!ActionButton.ACTION_1:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "ACTION_1 = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"ACTION_1\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "ACTION_1",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!ActionButton.ACTION_2:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "ACTION_2 = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"ACTION_2\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "ACTION_2",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!ActionButton.ACTION_3:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "ACTION_3 = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"ACTION_3\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "ACTION_3",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!ActionButton.ACTION_4:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "ACTION_4 = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"ACTION_4\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "ACTION_4",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
               "canonicalReference": "decentraland-ecs!ActionButton.ANY:member",
               "docComment": "",
               "excerptTokens": [
@@ -198,6 +282,90 @@
               ],
               "releaseTag": "Public",
               "name": "ANY",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!ActionButton.BACKWARD:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "BACKWARD = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"BACKWARD\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "BACKWARD",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!ActionButton.FORWARD:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "FORWARD = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"FORWARD\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "FORWARD",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!ActionButton.JUMP:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "JUMP = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"JUMP\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "JUMP",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!ActionButton.LEFT:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "LEFT = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"LEFT\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "LEFT",
               "initializerTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -247,6 +415,27 @@
             },
             {
               "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!ActionButton.RIGHT:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "RIGHT = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"RIGHT\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "RIGHT",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
               "canonicalReference": "decentraland-ecs!ActionButton.SECONDARY:member",
               "docComment": "",
               "excerptTokens": [
@@ -261,6 +450,27 @@
               ],
               "releaseTag": "Public",
               "name": "SECONDARY",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!ActionButton.WALK:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "WALK = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"WALK\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "WALK",
               "initializerTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2

@@ -14,7 +14,17 @@ export enum ActionButton {
   POINTER = 'POINTER',
   PRIMARY = 'PRIMARY',
   SECONDARY = 'SECONDARY',
-  ANY = 'ANY'
+  ANY = 'ANY',
+  FORWARD = 'FORWARD',
+  BACKWARD = 'BACKWARD',
+  RIGHT = 'RIGHT',
+  LEFT = 'LEFT',
+  JUMP = 'JUMP',
+  WALK = 'WALK',
+  ACTION_1 = 'ACTION_1',
+  ACTION_2 = 'ACTION_2',
+  ACTION_3 = 'ACTION_3',
+  ACTION_4 = 'ACTION_4'
 }
 
 /** @public */
@@ -81,45 +91,40 @@ export class Subscription {
 export class Input {
   private static _instance: Input
 
+  // @internal
+  private buttonIdMapping: ActionButton[] = [
+    ActionButton.POINTER,
+    ActionButton.PRIMARY,
+    ActionButton.SECONDARY,
+    ActionButton.ANY,
+    ActionButton.FORWARD,
+    ActionButton.BACKWARD,
+    ActionButton.RIGHT,
+    ActionButton.LEFT,
+    ActionButton.JUMP,
+    ActionButton.WALK,
+    ActionButton.ACTION_1,
+    ActionButton.ACTION_2,
+    ActionButton.ACTION_3,
+    ActionButton.ACTION_4
+  ]
+
   static get instance(): Input {
     Input.ensureInstance()
     return Input._instance
   }
 
   // @internal
-  private subscriptions: Record<ActionButton, Record<InputEventKind, Array<Subscription>>> = {
-    [ActionButton.POINTER]: {
-      BUTTON_DOWN: [],
-      BUTTON_UP: []
-    },
-    [ActionButton.PRIMARY]: {
-      BUTTON_DOWN: [],
-      BUTTON_UP: []
-    },
-    [ActionButton.SECONDARY]: {
-      BUTTON_DOWN: [],
-      BUTTON_UP: []
-    },
-    [ActionButton.ANY]: {
-      BUTTON_DOWN: [],
-      BUTTON_UP: []
-    }
-  }
+  private subscriptions: Record<ActionButton, Record<InputEventKind, Array<Subscription>>> =
+    this.buttonIdMapping.reduce(
+      (acc, k) => ({ ...acc, [k]: { BUTTON_DOWN: [], BUTTON_UP: [] } }),
+      {} as Record<ActionButton, Record<InputEventKind, Array<Subscription>>>
+    )
 
-  private internalState: InputState = {
-    [ActionButton.POINTER]: {
-      BUTTON_DOWN: false
-    },
-    [ActionButton.PRIMARY]: {
-      BUTTON_DOWN: false
-    },
-    [ActionButton.SECONDARY]: {
-      BUTTON_DOWN: false
-    },
-    [ActionButton.ANY]: {
-      BUTTON_DOWN: false
-    }
-  }
+  private internalState: InputState = this.buttonIdMapping.reduce(
+    (acc, k) => ({ ...acc, [k]: { BUTTON_DOWN: false } }),
+    {} as InputState
+  )
 
   private constructor() {}
 
@@ -176,6 +181,10 @@ export class Input {
 
   public handlePointerEvent(data: GlobalInputEventResult) {
     const button = this.getPointerById(data.buttonId)
+
+    if (!button) {
+      return
+    }
 
     let eventResult: LocalActionButtonEvent = {
       ...data,
@@ -259,9 +268,17 @@ export class Input {
     return -1
   }
 
-  private getPointerById(id: number): ActionButton {
-    if (id === 0) return ActionButton.POINTER
-    else if (id === 1) return ActionButton.PRIMARY
-    return ActionButton.SECONDARY
+  private getPointerById(id: number): ActionButton | null {
+    if (id < 0 || id >= this.buttonIdMapping.length) {
+      return null
+    }
+
+    const actionButton = this.buttonIdMapping[id]
+
+    if (actionButton === ActionButton.ANY) {
+      return null
+    }
+
+    return actionButton
   }
 }
