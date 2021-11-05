@@ -4213,6 +4213,28 @@ declare class Scalar {
 /**
  * @public
  */
+declare namespace Scene {
+    /**
+     * @public
+     */
+     type OnEnterLeaveOptions = {
+        onlyCurrentUser: boolean;
+    };
+    /**
+     * TThese events are triggered after a character enters the scene.
+     * @public
+     */
+     function OnEnterScene(callback: (event: IEvents['onEnterScene']) => void, options?: OnEnterLeaveOptions): void;
+    /**
+     * These events are triggered after a character leaves the scene.
+     * @public
+     */
+     function OnLeaveScene(callback: (event: IEvents['onLeaveScene']) => void, options?: OnEnterLeaveOptions): void;
+}
+
+/**
+ * @public
+ */
 declare class Shape extends ObservableComponent {
     /**
      * Set to true to turn on the collider for the entity.
