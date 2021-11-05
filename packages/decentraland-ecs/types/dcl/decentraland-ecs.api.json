@@ -39118,6 +39118,182 @@
           "implementsTokenRanges": []
         },
         {
+          "kind": "Namespace",
+          "canonicalReference": "decentraland-ecs!Scene:namespace",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare namespace Scene "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "Scene",
+          "members": [
+            {
+              "kind": "TypeAlias",
+              "canonicalReference": "decentraland-ecs!Scene.OnEnterLeaveOptions:type",
+              "docComment": "/**\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "type OnEnterLeaveOptions = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        onlyCurrentUser: boolean;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "OnEnterLeaveOptions",
+              "typeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "Function",
+              "canonicalReference": "decentraland-ecs!Scene.OnEnterScene:function(1)",
+              "docComment": "/**\n * TThese events are triggered after a character enters the scene.\n *\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "function OnEnterScene(callback: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(event: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "IEvents",
+                  "canonicalReference": "!IEvents:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "['onEnterScene']) => void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", options?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "OnEnterLeaveOptions",
+                  "canonicalReference": "decentraland-ecs!Scene.OnEnterLeaveOptions:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "returnTypeTokenRange": {
+                "startIndex": 7,
+                "endIndex": 8
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "callback",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 4
+                  }
+                },
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  }
+                }
+              ],
+              "name": "OnEnterScene"
+            },
+            {
+              "kind": "Function",
+              "canonicalReference": "decentraland-ecs!Scene.OnLeaveScene:function(1)",
+              "docComment": "/**\n * These events are triggered after a character leaves the scene.\n *\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "function OnLeaveScene(callback: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(event: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "IEvents",
+                  "canonicalReference": "!IEvents:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "['onLeaveScene']) => void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", options?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "OnEnterLeaveOptions",
+                  "canonicalReference": "decentraland-ecs!Scene.OnEnterLeaveOptions:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "returnTypeTokenRange": {
+                "startIndex": 7,
+                "endIndex": 8
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "callback",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 4
+                  }
+                },
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  }
+                }
+              ],
+              "name": "OnLeaveScene"
+            }
+          ]
+        },
+        {
           "kind": "Class",
           "canonicalReference": "decentraland-ecs!Shape:class",
           "docComment": "/**\n * @public\n */\n",

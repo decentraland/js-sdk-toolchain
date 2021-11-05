@@ -1724,6 +1724,16 @@ export class Scalar {
 }
 
 // @public (undocumented)
+export namespace Scene {
+    // (undocumented)
+    export type OnEnterLeaveOptions = {
+        onlyCurrentUser: boolean;
+    };
+    export function OnEnterScene(callback: (event: IEvents['onEnterScene']) => void, options?: OnEnterLeaveOptions): void;
+    export function OnLeaveScene(callback: (event: IEvents['onLeaveScene']) => void, options?: OnEnterLeaveOptions): void;
+}
+
+// @public (undocumented)
 export class Shape extends ObservableComponent {
     isPointerBlocker: boolean;
     visible: boolean;

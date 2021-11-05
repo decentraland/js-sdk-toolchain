@@ -1,4 +1,4 @@
-import { onEnterSceneObservable, onLeaveSceneObservable } from 'src'
+import { onEnterSceneObservable, onLeaveSceneObservable } from './Events'
 
 /**
  * @public

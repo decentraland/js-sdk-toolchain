@@ -78,8 +78,15 @@ function fixTypes() {
       let content = readFileSync(dtsFile).toString()
 
       content = content.replace(/^export declare/gm, 'declare')
-
       content = content.replace(/^export \{([\s\n\r]*)\}/gm, '')
+
+      /* Lets explain this amazing regex 🧙‍♂️
+      * (\*\s*\@public.*) Looks for: * @public
+      * (\s*\*.*)* All the code commented: * @param fn - A cb fn
+      * (\s*\*\/)\s* The ending of the code commented: */
+      /* (export\b) The export word: export type 🎉
+      */
+      content = content.replace(/((\*\s*\@public.*)(\s*\*.*)*(\s*\*\/)\s*)export\b/gm, '$1')
 
       writeFileSync(dtsFile, content)
 
