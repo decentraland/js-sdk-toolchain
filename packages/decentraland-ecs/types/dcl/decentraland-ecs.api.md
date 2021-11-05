@@ -1272,6 +1272,9 @@ export class OnPointerDown extends OnPointerUUIDEvent<'pointerDown'> {
 }
 
 // @public (undocumented)
+export const onPointerLockedStateChange: Observable<{}>;
+
+// @public (undocumented)
 export class OnPointerUp extends OnPointerUUIDEvent<'pointerUp'> {
     constructor(callback: (event: IEvents['pointerUp']) => void);
     constructor(callback: (event: IEvents['pointerUp']) => void, options: OnPointerUUIDEventOptions);

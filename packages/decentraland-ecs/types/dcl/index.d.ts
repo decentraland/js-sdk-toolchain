@@ -3079,6 +3079,11 @@ declare class OnPointerDown extends OnPointerUUIDEvent<'pointerDown'> {
 /**
  * @public
  */
+declare const onPointerLockedStateChange: Observable<{}>;
+
+/**
+ * @public
+ */
 declare class OnPointerUp extends OnPointerUUIDEvent<'pointerUp'> {
     readonly type: string;
     constructor(callback: (event: IEvents['pointerUp']) => void);

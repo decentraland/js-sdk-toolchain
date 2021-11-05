@@ -86,6 +86,11 @@ export const onSceneReadyObservable = new Observable<IEvents['sceneStart']>(crea
 export const onPlayerExpressionObservable = new Observable<IEvents['playerExpression']>(createSubscriber('playerExpression'))
 
 /**
+ * @public
+ */
+export const onPointerLockedStateChange = new Observable<IEvents['onPointerLock']>(createSubscriber('onPointerLock'))
+
+/**
 * @public
 */
 export const onVideoEvent = new Observable<IEvents['videoEvent']>(createSubscriber('videoEvent'))
@@ -142,6 +147,10 @@ export function _initEventObservables(dcl: DecentralandInterface) {
         }
         case 'profileChanged': {
           onProfileChanged.notifyObservers(event.data as IEvents['profileChanged'])
+          return
+        }
+        case 'onPointerLock': {
+          onPointerLockedStateChange.notifyObservers(event.data as IEvents['onPointerLock'])
           return
         }
       }
