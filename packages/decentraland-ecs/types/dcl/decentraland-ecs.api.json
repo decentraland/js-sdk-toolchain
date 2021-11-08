@@ -29097,6 +29097,32 @@
           "implementsTokenRanges": []
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "decentraland-ecs!onPointerLockedStateChange:var",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onPointerLockedStateChange: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "decentraland-ecs!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    locked?: boolean | undefined;\n}>"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "onPointerLockedStateChange",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
           "kind": "Class",
           "canonicalReference": "decentraland-ecs!OnPointerUp:class",
           "docComment": "/**\n * @public\n */\n",
