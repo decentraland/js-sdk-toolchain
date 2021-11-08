@@ -29112,7 +29112,7 @@
             },
             {
               "kind": "Content",
-              "text": "<{}>"
+              "text": "<{\n    locked?: boolean | undefined;\n}>"
             }
           ],
           "releaseTag": "Public",

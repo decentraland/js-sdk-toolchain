@@ -1272,7 +1272,9 @@ export class OnPointerDown extends OnPointerUUIDEvent<'pointerDown'> {
 }
 
 // @public (undocumented)
-export const onPointerLockedStateChange: Observable<{}>;
+export const onPointerLockedStateChange: Observable<{
+    locked?: boolean | undefined;
+}>;
 
 // @public (undocumented)
 export class OnPointerUp extends OnPointerUUIDEvent<'pointerUp'> {

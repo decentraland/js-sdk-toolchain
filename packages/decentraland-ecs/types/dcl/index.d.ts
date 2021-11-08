@@ -3079,7 +3079,9 @@ declare class OnPointerDown extends OnPointerUUIDEvent<'pointerDown'> {
 /**
  * @public
  */
-declare const onPointerLockedStateChange: Observable<{}>;
+declare const onPointerLockedStateChange: Observable<{
+    locked?: boolean | undefined;
+}>;
 
 /**
  * @public
