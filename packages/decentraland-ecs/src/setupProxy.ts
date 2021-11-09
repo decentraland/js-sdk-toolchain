@@ -2,7 +2,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { createProxyMiddleware } from 'http-proxy-middleware'
 import * as express from 'express'
-import { getSceneJson } from './setupUtils'
+import { createFakeName, getSceneJson } from './setupUtils'
 
 const setupProxy = (dcl: any, app: express.Application) => {
   // first resolve all dependencies in the local current working directory
@@ -72,7 +72,7 @@ const createStaticRoutes = (
   app: express.Application,
   route: string,
   localFolder: string,
-  mapFile?: ((filePath: string) => string)
+  mapFile?: (filePath: string) => string
 ) => {
   app.use(route, (req, res, next) => {
     const options = {
@@ -122,6 +122,43 @@ const mockCatalyst = (app: express.Application, baseFolders: string[]) => {
         id: '0x0000000000000000000000000000000000000000000000000000000000000000'
       }
     ])
+  })
+
+  let users: Record<string, any> = {}
+  app.get('/lambdas/profiles', async (req, res, next) => {
+    try {
+      const userId = req.query.id as string
+      if (!userId) {
+        return next()
+      }
+      if (users[userId]) {
+        return res.json(users[userId])
+      } else {
+        const lbResponse = await (await fetch(`https://peer-lb.decentraland.org${req.originalUrl}`)).json()
+        if (lbResponse instanceof Array) {
+          if (lbResponse.length > 0) {
+            return res.json(lbResponse)
+          }
+        }
+
+        const _number = 1 + Math.round(Math.random() * 160)
+        const randomProfile = await (
+          await fetch(`https://peer-lb.decentraland.org/lambdas/profiles?id=default${_number}`)
+        ).json()
+        
+        if (randomProfile[0].avatars?.length > 0) {
+          users[userId] = randomProfile
+          users[userId][0].avatars[0].unclaimedName = createFakeName()
+          users[userId][0].avatars[0].hasClaimedName = false
+          users[userId][0].avatars[0].tutorialStep = 0
+          users[userId][0].avatars[0].version = -1
+          return res.json(users[userId])
+        }
+      }
+    } catch (err) {
+      return res.json([])
+    }
+    next()
   })
 
   // fallback all lambdas to a real catalyst
