@@ -4,6 +4,9 @@ declare module '@decentraland/PortableExperiences' {
     pid: PortableExperienceUrn
     parentCid: string // Identifier of who triggered the PE to allow to kill it only to who created it
   }
+  type PortableExperienceLoaded = {
+    portableExperiences: PortableExperienceHandle[]
+  }
 
   /**
    * Starts a portable experience.
@@ -27,4 +30,10 @@ declare module '@decentraland/PortableExperiences' {
    * Returns true if was able to kill the portable experience, false if not.
    */
   export function exit(): Promise<boolean>
+
+  /**
+   *
+   * Returns current portable experiences loaded with ids and parentCid
+   */
+  export function getPortableExperiencesLoaded(): Promise<PortableExperienceLoaded>
 }
