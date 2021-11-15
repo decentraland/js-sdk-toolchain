@@ -8,7 +8,7 @@ import {
   ensureCopyFile,
   downloadFile,
   shaHashMaker
-} from './setupUtils'
+} from './cli/setupUtils'
 
 const setupExport = async ({
   workDir,

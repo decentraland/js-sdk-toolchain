@@ -2,7 +2,8 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { createProxyMiddleware } from 'http-proxy-middleware'
 import * as express from 'express'
-import { getSceneJson } from './setupUtils'
+import { getSceneJson } from './cli/setupUtils'
+import { mockWearable } from './cli/wearables'
 
 const setupProxy = (dcl: any, app: express.Application) => {
   // first resolve all dependencies in the local current working directory
@@ -66,13 +67,38 @@ const setupProxy = (dcl: any, app: express.Application) => {
   )
   createStaticRoutes(app, '/@/artifacts/loader/*', dclKernelLoaderPath)
   createStaticRoutes(app, '/default-profile/*', dclKernelDefaultProfilePath)
+
+  app.use('/preview-wearables', async (req, res, next) => {
+    const assetPathArray: string[] = []
+    if (fs.existsSync(path.resolve(dcl.getWorkingDir(), 'asset.json'))) {
+      assetPathArray.push(path.resolve(dcl.getWorkingDir(), 'asset.json'))
+    }
+    // todo: it's poosible add more wearables in the catalog
+    //  e.g. adding a '$workDir/wearables' and for each folder look for asset.json
+
+    const baseUrl = `http://${req.get('host')}/content/contents`
+
+    const ret = []
+    for (const assetJsonPath of assetPathArray) {
+      try {
+        ret.push(mockWearable({ assetJsonPath, baseUrl }))
+      } catch (err) {
+        console.error(`Couldn't mock the asset ${assetJsonPath}. Please verify the correct format and scheme.`, err)
+      }
+    }
+
+    return res.json({
+      ok: true,
+      data: ret
+    })
+  })
 }
 
 const createStaticRoutes = (
   app: express.Application,
   route: string,
   localFolder: string,
-  mapFile?: ((filePath: string) => string)
+  mapFile?: (filePath: string) => string
 ) => {
   app.use(route, (req, res, next) => {
     const options = {

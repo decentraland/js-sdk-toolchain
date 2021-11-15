@@ -19,6 +19,57 @@ export async function copyDir(src: string, dest: string) {
   }
 }
 
+export const defaultHashMaker = (str: string) => 'b64-' + Buffer.from(str).toString('base64')
+
+export const getFilesFromFolder = ({
+  folder,
+  addOriginalPath,
+  ignorePattern,
+  customHashMaker
+}: {
+  folder: string
+  addOriginalPath?: boolean
+  ignorePattern?: string
+  customHashMaker?: (str: string) => string
+}) => {
+  const hashMaker = customHashMaker ? customHashMaker : defaultHashMaker
+
+  const allFiles = globSync('**/*', {
+    cwd: folder,
+    dot: false,
+    absolute: true
+  })
+    .map((file) => {
+      try {
+        if (!fs.statSync(file).isFile()) return
+      } catch (err) {
+        return
+      }
+      const _folder = folder.replace(/\\/gi, '/')
+      const key = file.replace(_folder, '').replace(/^\/+/, '')
+      return key
+    })
+    .filter(($) => !!$) as string[]
+
+  const ensureIgnorePattern = ignorePattern && ignorePattern !== '' ? ignorePattern : defaultDclIgnore()
+  const ig = ignore().add(ensureIgnorePattern)
+  const filteredFiles = ig.filter(allFiles) as string[]
+
+  return filteredFiles
+    .map((file) => {
+      try {
+        if (!fs.statSync(file).isFile()) return
+      } catch (err) {
+        return
+      }
+      const _folder = folder.replace(/\\/gi, '/')
+      const key = file.replace(_folder, '').replace(/^\/+/, '')
+
+      return { file: key.toLowerCase(), original_path: addOriginalPath ? key : undefined, hash: hashMaker(key) }
+    })
+    .filter(($) => !!$)
+}
+
 export function entityV3FromFolder({
   folder,
   addOriginalPath,
@@ -31,7 +82,6 @@ export function entityV3FromFolder({
   customHashMaker?: (str: string) => string
 }) {
   const sceneJsonPath = path.resolve(folder, './scene.json')
-  const defaultHashMaker = (str: string) => 'b64-' + Buffer.from(str).toString('base64')
   const hashMaker = customHashMaker ? customHashMaker : defaultHashMaker
 
   if (fs.existsSync(sceneJsonPath)) {
@@ -42,41 +92,7 @@ export function entityV3FromFolder({
     pointers.add(base)
     parcels.forEach(($) => pointers.add($))
 
-    const allFiles = globSync('**/*', {
-      cwd: folder,
-      dot: false,
-      absolute: true
-    })
-      .map((file) => {
-        try {
-          if (!fs.statSync(file).isFile()) return
-        } catch (err) {
-          return
-        }
-        const _folder = folder.replace(/\\/gi, '/')
-        const key = file.replace(_folder, '').replace(/^\/+/, '')
-        return key
-      })
-      .filter(($) => !!$) as string[]
-
-    const ensureIgnorePattern = (ignorePattern && ignorePattern !== '') ? ignorePattern : defaultDclIgnore()
-    const ig = ignore().add(ensureIgnorePattern)
-    const filteredFiles = ig.filter(allFiles)
-
-    const mappedFiles = filteredFiles
-      .map((file) => {
-        try {
-          if (!fs.statSync(file).isFile()) return
-        } catch (err) {
-          return
-        }
-        const _folder = folder.replace(/\\/gi, '/')
-        const key = file.replace(_folder, '').replace(/^\/+/, '')
-
-        return { file: key.toLowerCase(), original_path: addOriginalPath ? key : undefined, hash: hashMaker(key) }
-      })
-      .filter(($) => !!$)
-
+    const mappedFiles = getFilesFromFolder({ folder, addOriginalPath, ignorePattern, customHashMaker })
     return {
       version: 'v3',
       type: 'scene',
