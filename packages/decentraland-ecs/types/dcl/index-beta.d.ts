@@ -15,10 +15,10 @@ export declare enum ActionButton {
     LEFT = "LEFT",
     JUMP = "JUMP",
     WALK = "WALK",
-    ACTION_1 = "ACTION_1",
-    ACTION_2 = "ACTION_2",
     ACTION_3 = "ACTION_3",
-    ACTION_4 = "ACTION_4"
+    ACTION_4 = "ACTION_4",
+    ACTION_5 = "ACTION_5",
+    ACTION_6 = "ACTION_6"
 }
 
 /**

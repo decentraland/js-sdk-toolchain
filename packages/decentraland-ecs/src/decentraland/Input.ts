@@ -21,10 +21,10 @@ export enum ActionButton {
   LEFT = 'LEFT',
   JUMP = 'JUMP',
   WALK = 'WALK',
-  ACTION_1 = 'ACTION_1',
-  ACTION_2 = 'ACTION_2',
   ACTION_3 = 'ACTION_3',
-  ACTION_4 = 'ACTION_4'
+  ACTION_4 = 'ACTION_4',
+  ACTION_5 = 'ACTION_5',
+  ACTION_6 = 'ACTION_6'
 }
 
 /** @public */
@@ -103,10 +103,10 @@ export class Input {
     ActionButton.LEFT,
     ActionButton.JUMP,
     ActionButton.WALK,
-    ActionButton.ACTION_1,
-    ActionButton.ACTION_2,
     ActionButton.ACTION_3,
-    ActionButton.ACTION_4
+    ActionButton.ACTION_4,
+    ActionButton.ACTION_5,
+    ActionButton.ACTION_6
   ]
 
   static get instance(): Input {
