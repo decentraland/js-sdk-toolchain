@@ -1,4 +1,4 @@
-declare module '@decentraland/Identity' {
+declare module '@decentraland/Players' {
   export type ColorString = string
 
   export type Snapshots = {
@@ -27,12 +27,7 @@ declare module '@decentraland/Identity' {
   }
 
   /**
-   * Return the Ethereum address of the user
+   * Return the players's data
    */
-  export function getUserPublicKey(): Promise<string | null>
-
-  /**
-   * Return the user's data
-   */
-  export function getUserData(): Promise<UserData | null>
+  export function getPlayerData(opt: { userId: string }): Promise<UserData | null>
 }

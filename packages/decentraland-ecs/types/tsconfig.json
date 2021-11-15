@@ -27,7 +27,8 @@
       "@decentraland/ParcelIdentity",
       "@decentraland/PortableExperiences",
       "@decentraland/RestrictedActions",
-      "@decentraland/SignedFetch"
+      "@decentraland/SignedFetch",
+      "@decentraland/Players"
     ],
     "typeRoots": [
       "."
