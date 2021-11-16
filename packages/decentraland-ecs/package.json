@@ -23,7 +23,7 @@
     "artifacts",
     "src/setupProxy.js",
     "src/setupExport.js",
-    "src/setupUtils.js"
+    "src/cli/*.js"
   ],
   "dependencies": {
     "@dcl/amd": "file:../@dcl/amd",
