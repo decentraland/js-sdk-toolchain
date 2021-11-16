@@ -28,7 +28,7 @@
   "dependencies": {
     "@dcl/amd": "file:../@dcl/amd",
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
-    "@dcl/kernel": "^1.0.0-1435962399.commit-67d3765",
+    "@dcl/kernel": "1.0.0-1466244192.commit-75b40bb",
     "@dcl/posix": "1.0.3-20211108141117.commit-fb3dffe",
     "@dcl/unity-renderer": "1.0.18126-20211029133620.commit-42454bc",
     "glob": "^7.1.7",
