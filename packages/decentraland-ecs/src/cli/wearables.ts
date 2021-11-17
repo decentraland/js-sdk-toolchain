@@ -1,8 +1,9 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import { getFilesFromFolder } from './setupUtils'
-
+import { getDirectories, getFilesFromFolder } from './setupUtils'
+import * as express from 'express'
 type ItemAssetJson = {
+  id?: string
   name?: string
   description?: string
   category?: 'hat' | 'hair' | 'upper_body' | string
@@ -12,7 +13,15 @@ type ItemAssetJson = {
   bodyShape?: 'male' | 'female' | 'both' | string
 }
 
-export const mockWearable = ({ assetJsonPath, baseUrl }: { assetJsonPath: string; baseUrl: string }) => {
+export const serveWearable = ({
+  assetJsonPath,
+  baseUrl,
+  catalystRootFolder
+}: {
+  assetJsonPath: string
+  baseUrl: string
+  catalystRootFolder: string
+}) => {
   const wearableDir = path.dirname(assetJsonPath)
   const assetJson = require(assetJsonPath) as ItemAssetJson
 
@@ -25,7 +34,8 @@ export const mockWearable = ({ assetJsonPath, baseUrl }: { assetJsonPath: string
   const hashedFiles = getFilesFromFolder({
     folder: wearableDir,
     addOriginalPath: false,
-    ignorePattern: ignoreFileContent
+    ignorePattern: ignoreFileContent,
+    rootFolder: catalystRootFolder
   })
 
   const thumbnailFiltered = hashedFiles.filter(($) => $?.file == assetJson.thumbnail)
@@ -35,7 +45,7 @@ export const mockWearable = ({ assetJsonPath, baseUrl }: { assetJsonPath: string
   }
 
   return {
-    id: '00000000-0000-0000-0000-4af690a2328f',
+    id: assetJson.id || '00000000-0000-0000-0000-000000000000',
     rarity: assetJson.rarity,
     i18n: [{ code: 'en', text: assetJson.name }],
     description: assetJson.description,
@@ -63,4 +73,32 @@ export const mockWearable = ({ assetJsonPath, baseUrl }: { assetJsonPath: string
       ]
     }
   }
+}
+
+export const mockPreviewWearables = (app: express.Application, baseFolders: string[], catalystRootFolder: string) => {
+  app.use('/preview-wearables', async (req, res, next) => {
+    const assetPathArray: string[] = []
+    for (const wearableDir of baseFolders) {
+      const assetJsonPath = path.resolve(wearableDir, 'asset.json')
+      console.log({ assetJsonPath })
+      if (fs.existsSync(assetJsonPath)) {
+        assetPathArray.push(assetJsonPath)
+      }
+    }
+
+    const baseUrl = `http://${req.get('host')}/content/contents`
+    const ret = []
+    for (const assetJsonPath of assetPathArray) {
+      try {
+        ret.push(serveWearable({ assetJsonPath, baseUrl, catalystRootFolder }))
+      } catch (err) {
+        console.error(`Couldn't mock the asset ${assetJsonPath}. Please verify the correct format and scheme.`, err)
+      }
+    }
+
+    return res.json({
+      ok: true,
+      data: ret
+    })
+  })
 }
