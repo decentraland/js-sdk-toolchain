@@ -101,6 +101,16 @@ export const onVideoEvent = new Observable<IEvents['videoEvent']>(createSubscrib
 export const onProfileChanged = new Observable<IEvents['profileChanged']>(createSubscriber('profileChanged'))
 
 /**
+* @public
+*/
+export const onPlayerConnectedObservable = new Observable<IEvents['avatarConnected']>(createSubscriber('avatarConnected'))
+
+/**
+* @public
+*/
+export const onPlayerDisconnectedObservable = new Observable<IEvents['avatarDisconnected']>(createSubscriber('avatarDisconnected'))
+
+/**
  * @internal
  * This function adds _one_ listener to the onEvent event of dcl interface.
  * Leveraging a switch to route events to the Observable handlers.
@@ -151,6 +161,14 @@ export function _initEventObservables(dcl: DecentralandInterface) {
         }
         case 'onPointerLock': {
           onPointerLockedStateChange.notifyObservers(event.data as IEvents['onPointerLock'])
+          return
+        }
+        case 'avatarConnected': {
+          onPlayerConnectedObservable.notifyObservers(event.data as IEvents['avatarConnected'])
+          return
+        }
+        case 'avatarDisconnected': {
+          onPlayerConnectedObservable.notifyObservers(event.data as IEvents['avatarDisconnected'])
           return
         }
       }
