@@ -90,7 +90,6 @@ const getAllPreviewWearables = ({
   const assetPathArray: string[] = []
   for (const wearableDir of baseFolders) {
     const assetJsonPath = path.resolve(wearableDir, 'asset.json')
-    console.log({ assetJsonPath })
     if (fs.existsSync(assetJsonPath)) {
       assetPathArray.push(assetJsonPath)
     }
