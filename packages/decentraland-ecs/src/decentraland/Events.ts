@@ -168,7 +168,7 @@ export function _initEventObservables(dcl: DecentralandInterface) {
           return
         }
         case 'avatarDisconnected': {
-          onPlayerConnectedObservable.notifyObservers(event.data as IEvents['avatarDisconnected'])
+          onPlayerDisconnectedObservable.notifyObservers(event.data as IEvents['avatarDisconnected'])
           return
         }
       }
