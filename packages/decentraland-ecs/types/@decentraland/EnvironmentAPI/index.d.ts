@@ -1,7 +1,9 @@
 declare module '@decentraland/EnvironmentAPI' {
   export type Realm = {
     domain: string
+    /** @deprecated use room instead */
     layer: string
+    room: string
     serverName: string
     displayName: string
   }
@@ -20,7 +22,6 @@ declare module '@decentraland/EnvironmentAPI' {
    * Returns whether the scene is running in preview mode or not
    */
   export function isPreviewMode(): Promise<boolean>
-
 
   /**
    * Returns explorer configuration and environment information
