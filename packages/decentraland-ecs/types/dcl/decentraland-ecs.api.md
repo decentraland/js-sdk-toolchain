@@ -1259,6 +1259,16 @@ export const onLeaveSceneObservable: Observable<{
 }>;
 
 // @public (undocumented)
+export const onPlayerConnectedObservable: Observable<{
+    userId: string;
+}>;
+
+// @public (undocumented)
+export const onPlayerDisconnectedObservable: Observable<{
+    userId: string;
+}>;
+
+// @public (undocumented)
 export const onPlayerExpressionObservable: Observable<{
     expressionId: string;
 }>;

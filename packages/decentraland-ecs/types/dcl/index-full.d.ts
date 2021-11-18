@@ -3063,6 +3063,20 @@ export declare const onLeaveSceneObservable: Observable<{
 /**
  * @public
  */
+export declare const onPlayerConnectedObservable: Observable<{
+    userId: string;
+}>;
+
+/**
+ * @public
+ */
+export declare const onPlayerDisconnectedObservable: Observable<{
+    userId: string;
+}>;
+
+/**
+ * @public
+ */
 export declare const onPlayerExpressionObservable: Observable<{
     expressionId: string;
 }>;
