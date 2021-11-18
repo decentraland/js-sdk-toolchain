@@ -13,7 +13,7 @@ type ItemAssetJson = {
   bodyShape?: 'male' | 'female' | 'both' | string
 }
 
-export const serveWearable = ({
+const serveWearable = ({
   assetJsonPath,
   baseUrl,
   catalystRootFolder
@@ -50,11 +50,14 @@ export const serveWearable = ({
     i18n: [{ code: 'en', text: assetJson.name }],
     description: assetJson.description,
     thumbnail,
+    baseUrl,
+    name: assetJson.name || '',
     data: {
       category: assetJson.category,
       replaces: [],
       hides: [],
       tags: [],
+      scene: hashedFiles,
       representations: [
         {
           bodyShapes: ['urn:decentraland:off-chain:base-avatars:BaseMale'],
@@ -75,30 +78,52 @@ export const serveWearable = ({
   }
 }
 
+const getAllPreviewWearables = ({
+  baseFolders,
+  catalystRootFolder,
+  baseUrl
+}: {
+  baseFolders: string[]
+  catalystRootFolder: string
+  baseUrl: string
+}) => {
+  const assetPathArray: string[] = []
+  for (const wearableDir of baseFolders) {
+    const assetJsonPath = path.resolve(wearableDir, 'asset.json')
+    console.log({ assetJsonPath })
+    if (fs.existsSync(assetJsonPath)) {
+      assetPathArray.push(assetJsonPath)
+    }
+  }
+
+  const ret = []
+  for (const assetJsonPath of assetPathArray) {
+    try {
+      ret.push(serveWearable({ assetJsonPath, baseUrl, catalystRootFolder }))
+    } catch (err) {
+      console.error(`Couldn't mock the asset ${assetJsonPath}. Please verify the correct format and scheme.`, err)
+    }
+  }
+  return ret
+}
+
 export const mockPreviewWearables = (app: express.Application, baseFolders: string[], catalystRootFolder: string) => {
   app.use('/preview-wearables', async (req, res, next) => {
-    const assetPathArray: string[] = []
-    for (const wearableDir of baseFolders) {
-      const assetJsonPath = path.resolve(wearableDir, 'asset.json')
-      console.log({ assetJsonPath })
-      if (fs.existsSync(assetJsonPath)) {
-        assetPathArray.push(assetJsonPath)
-      }
-    }
-
     const baseUrl = `http://${req.get('host')}/content/contents`
-    const ret = []
-    for (const assetJsonPath of assetPathArray) {
-      try {
-        ret.push(serveWearable({ assetJsonPath, baseUrl, catalystRootFolder }))
-      } catch (err) {
-        console.error(`Couldn't mock the asset ${assetJsonPath}. Please verify the correct format and scheme.`, err)
-      }
-    }
+    return res.json({
+      ok: true,
+      data: getAllPreviewWearables({ baseUrl, baseFolders, catalystRootFolder })
+    })
+  })
+
+  app.use('/preview-wearables/:id', async (req, res, next) => {
+    const baseUrl = `http://${req.get('host')}/content/contents`
+    const wearables = getAllPreviewWearables({ baseUrl, baseFolders, catalystRootFolder })
+    const wearableId = req.params.id
 
     return res.json({
       ok: true,
-      data: ret
+      data: wearables.filter((w) => w?.id === wearableId)
     })
   })
 }

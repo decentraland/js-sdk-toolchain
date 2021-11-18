@@ -95,9 +95,10 @@ export function entityV3FromFolder({
   catalystRootFolder: string
 }) {
   const sceneJsonPath = path.resolve(folder, './scene.json')
+  const assetJsonPath = path.resolve(folder, './asset.json')
   const hashMaker = customHashMaker ? customHashMaker : defaultHashMaker
 
-  if (fs.existsSync(sceneJsonPath)) {
+  if (fs.existsSync(sceneJsonPath) && !fs.existsSync(assetJsonPath)) {
     const sceneJson = JSON.parse(fs.readFileSync(sceneJsonPath).toString())
 
     const { base, parcels }: { base: string; parcels: string[] } = sceneJson.scene

@@ -1,7 +1,7 @@
 import * as path from 'path'
 import { createProxyMiddleware } from 'http-proxy-middleware'
 import * as express from 'express'
-import { getSceneJson } from './../cli/setupUtils'
+import { getSceneJson } from '../setupUtils'
 
 export const mockCatalyst = (app: express.Application, baseFolders: string[], rootFolder: string) => {
   serveFolders(app, baseFolders, rootFolder)
@@ -79,7 +79,7 @@ const serveFolders = (app: express.Application, baseFolders: string[], catalystR
     }
   })
 
-  app.get('/content/entities/scene', (req, res) => {
+  app.get('/content/entities/scene', (req, res,next) => {
     if (!req.query.pointer) {
       res.json([])
       return

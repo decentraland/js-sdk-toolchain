@@ -2,7 +2,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import * as express from 'express'
 import { createStaticRoutes, getDirectories } from './cli/setupUtils'
-import { mockCatalyst } from './mock-catalyst'
+import { mockCatalyst } from './cli/mock-catalyst'
 import { mockPreviewWearables } from './cli/wearables'
 
 const setupProxy = (dcl: any, app: express.Application) => {
@@ -45,7 +45,7 @@ const setupProxy = (dcl: any, app: express.Application) => {
   // } catch (err) {
   //   console.error(`Couldn't get the scenes in /scenes folder`, err)
   // }
-
+  
   mockCatalyst(app, baseSceneFolders, dcl.getWorkingDir())
 
   const baseWearableFolders: string[] = [dcl.getWorkingDir()]
