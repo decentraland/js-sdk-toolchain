@@ -45,8 +45,13 @@ const setupProxy = (dcl: any, app: express.Application) => {
   // } catch (err) {
   //   console.error(`Couldn't get the scenes in /scenes folder`, err)
   // }
-  
-  mockCatalyst(app, baseSceneFolders, dcl.getWorkingDir())
+
+
+  try {
+    mockCatalyst(app, baseSceneFolders, dcl.getWorkingDir())
+  } catch (err) {
+    console.error(`Fatal error, couldn't mock the catalyst`, err)
+  }
 
   const baseWearableFolders: string[] = [dcl.getWorkingDir()]
   // try {
@@ -63,7 +68,11 @@ const setupProxy = (dcl: any, app: express.Application) => {
   //   console.error(`Couldn't get the wearables in /wearables folder`, err)
   // }
 
-  mockPreviewWearables(app, baseWearableFolders, dcl.getWorkingDir())
+  try {
+    mockPreviewWearables(app, baseWearableFolders, dcl.getWorkingDir())
+  } catch (err) {
+    console.error(`Fatal error, couldn't mock the wearables`, err)
+  }
 
   const routes = [
     {
