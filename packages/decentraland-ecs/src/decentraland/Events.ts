@@ -103,12 +103,12 @@ export const onProfileChanged = new Observable<IEvents['profileChanged']>(create
 /**
 * @public
 */
-export const onPlayerConnectedObservable = new Observable<IEvents['avatarConnected']>(createSubscriber('avatarConnected'))
+export const onPlayerConnectedObservable = new Observable<IEvents['playerConnected']>(createSubscriber('playerConnected'))
 
 /**
 * @public
 */
-export const onPlayerDisconnectedObservable = new Observable<IEvents['avatarDisconnected']>(createSubscriber('avatarDisconnected'))
+export const onPlayerDisconnectedObservable = new Observable<IEvents['playerDisconnected']>(createSubscriber('playerDisconnected'))
 
 /**
  * @internal
@@ -163,12 +163,12 @@ export function _initEventObservables(dcl: DecentralandInterface) {
           onPointerLockedStateChange.notifyObservers(event.data as IEvents['onPointerLock'])
           return
         }
-        case 'avatarConnected': {
-          onPlayerConnectedObservable.notifyObservers(event.data as IEvents['avatarConnected'])
+        case 'playerConnected': {
+          onPlayerConnectedObservable.notifyObservers(event.data as IEvents['playerConnected'])
           return
         }
-        case 'avatarDisconnected': {
-          onPlayerDisconnectedObservable.notifyObservers(event.data as IEvents['avatarDisconnected'])
+        case 'playerDisconnected': {
+          onPlayerDisconnectedObservable.notifyObservers(event.data as IEvents['playerDisconnected'])
           return
         }
       }
