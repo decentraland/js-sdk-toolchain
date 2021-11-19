@@ -23,14 +23,15 @@
     "artifacts",
     "src/setupProxy.js",
     "src/setupExport.js",
-    "src/setupUtils.js"
+    "src/cli/*.js",
+    "src/cli/**/*.js"
   ],
   "dependencies": {
     "@dcl/amd": "file:../@dcl/amd",
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
-    "@dcl/kernel": "^1.0.0-1435962399.commit-67d3765",
+    "@dcl/kernel": "https://sdk-team-cdn.decentraland.org/@dcl/kernel/branch/feat/px-hot-reloading/dcl-kernel-1.0.0-1482327114.commit-a92823a.tgz",
     "@dcl/posix": "1.0.3-20211108141117.commit-fb3dffe",
-    "@dcl/unity-renderer": "1.0.20117-20211118133842.commit-cde4e90",
+    "@dcl/unity-renderer": "1.0.20203-20211118193328.commit-db5d438",
     "glob": "^7.1.7",
     "http-proxy-middleware": "^2.0.1",
     "ignore": "^5.1.8"
