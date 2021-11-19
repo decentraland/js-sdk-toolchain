@@ -10,13 +10,33 @@
 // @public (undocumented)
 export enum ActionButton {
     // (undocumented)
+    ACTION_1 = "ACTION_1",
+    // (undocumented)
+    ACTION_2 = "ACTION_2",
+    // (undocumented)
+    ACTION_3 = "ACTION_3",
+    // (undocumented)
+    ACTION_4 = "ACTION_4",
+    // (undocumented)
     ANY = "ANY",
+    // (undocumented)
+    BACKWARD = "BACKWARD",
+    // (undocumented)
+    FORWARD = "FORWARD",
+    // (undocumented)
+    JUMP = "JUMP",
+    // (undocumented)
+    LEFT = "LEFT",
     // (undocumented)
     POINTER = "POINTER",
     // (undocumented)
     PRIMARY = "PRIMARY",
     // (undocumented)
-    SECONDARY = "SECONDARY"
+    RIGHT = "RIGHT",
+    // (undocumented)
+    SECONDARY = "SECONDARY",
+    // (undocumented)
+    WALK = "WALK"
 }
 
 // @public
@@ -1250,6 +1270,11 @@ export class OnPointerDown extends OnPointerUUIDEvent<'pointerDown'> {
     // (undocumented)
     readonly type: string;
 }
+
+// @public (undocumented)
+export const onPointerLockedStateChange: Observable<{
+    locked?: boolean | undefined;
+}>;
 
 // @public (undocumented)
 export class OnPointerUp extends OnPointerUUIDEvent<'pointerUp'> {

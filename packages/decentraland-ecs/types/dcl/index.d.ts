@@ -8,7 +8,17 @@ declare enum ActionButton {
     POINTER = "POINTER",
     PRIMARY = "PRIMARY",
     SECONDARY = "SECONDARY",
-    ANY = "ANY"
+    ANY = "ANY",
+    FORWARD = "FORWARD",
+    BACKWARD = "BACKWARD",
+    RIGHT = "RIGHT",
+    LEFT = "LEFT",
+    JUMP = "JUMP",
+    WALK = "WALK",
+    ACTION_1 = "ACTION_1",
+    ACTION_2 = "ACTION_2",
+    ACTION_3 = "ACTION_3",
+    ACTION_4 = "ACTION_4"
 }
 
 /**
@@ -3065,6 +3075,13 @@ declare class OnPointerDown extends OnPointerUUIDEvent<'pointerDown'> {
     constructor(callback: (event: IEvents['pointerDown']) => void);
     constructor(callback: (event: IEvents['pointerDown']) => void, options: OnPointerUUIDEventOptions);
 }
+
+/**
+ * @public
+ */
+declare const onPointerLockedStateChange: Observable<{
+    locked?: boolean | undefined;
+}>;
 
 /**
  * @public

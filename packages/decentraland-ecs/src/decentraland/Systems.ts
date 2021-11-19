@@ -42,7 +42,7 @@ export class PointerEventSystem implements ISystem {
     if (typeof dcl !== 'undefined') {
       dcl.subscribe('pointerUp')
       dcl.subscribe('pointerDown')
-      dcl.subscribe('pointerEvent')
+      dcl.subscribe('actionButtonEvent')
     }
   }
 
@@ -50,7 +50,7 @@ export class PointerEventSystem implements ISystem {
     if (typeof dcl !== 'undefined') {
       dcl.unsubscribe('pointerUp')
       dcl.unsubscribe('pointerDown')
-      dcl.unsubscribe('pointerEvent')
+      dcl.unsubscribe('actionButtonEvent')
     }
   }
 }
