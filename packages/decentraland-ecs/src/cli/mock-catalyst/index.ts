@@ -2,6 +2,7 @@ import * as path from 'path'
 import { createProxyMiddleware } from 'http-proxy-middleware'
 import * as express from 'express'
 import { getSceneJson } from '../setupUtils'
+import { getAllPreviewWearables } from '../wearables'
 
 export const mockCatalyst = (app: express.Application, baseFolders: string[], rootFolder: string) => {
   serveFolders(app, baseFolders, rootFolder)
@@ -26,6 +27,28 @@ export const mockCatalyst = (app: express.Application, baseFolders: string[], ro
         id: '0x0000000000000000000000000000000000000000000000000000000000000000'
       }
     ])
+  })
+
+  app.get('/lambdas/profiles', async (req, res, next) => {
+    try {
+      const previewWearables = await getAllPreviewWearables({
+        baseFolders,
+        catalystRootFolder: rootFolder,
+        baseUrl: ''
+      }).map(($) => $.id)
+
+      if (previewWearables.length === 1){
+        const deployedProfile = await (await fetch(`https://peer-lb.decentraland.org${req.originalUrl}`)).json()
+        if (!!deployedProfile) {
+          deployedProfile[0].avatars[0].avatar.wearables.push(...previewWearables)
+          return res.json(deployedProfile)
+        }
+      }
+    } catch (err) {
+      console.warn(`Failed to catch profile and fill with preview wearables.`, err)
+    }
+    
+    return next()
   })
 
   // fallback all lambdas to a real catalyst
@@ -79,7 +102,7 @@ const serveFolders = (app: express.Application, baseFolders: string[], catalystR
     }
   })
 
-  app.get('/content/entities/scene', (req, res,next) => {
+  app.get('/content/entities/scene', (req, res, next) => {
     if (!req.query.pointer) {
       res.json([])
       return

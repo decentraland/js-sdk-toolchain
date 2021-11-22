@@ -84,7 +84,7 @@ const serveWearable = ({
   }
 }
 
-const getAllPreviewWearables = ({
+export const getAllPreviewWearables = ({
   baseFolders,
   catalystRootFolder,
   baseUrl
