@@ -15,6 +15,6 @@
     "access": "public"
   },
   "devDependencies": {
-    "@dcl/posix": "1.0.3-20211108141117.commit-fb3dffe"
+    "@dcl/posix": "1.0.3-20211119173339.commit-c94b391"
   }
 }

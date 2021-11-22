@@ -28922,6 +28922,58 @@
         },
         {
           "kind": "Variable",
+          "canonicalReference": "decentraland-ecs!onPlayerConnectedObservable:var",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onPlayerConnectedObservable: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "decentraland-ecs!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    userId: string;\n}>"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "onPlayerConnectedObservable",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "decentraland-ecs!onPlayerDisconnectedObservable:var",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onPlayerDisconnectedObservable: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "decentraland-ecs!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    userId: string;\n}>"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "onPlayerDisconnectedObservable",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Variable",
           "canonicalReference": "decentraland-ecs!onPlayerExpressionObservable:var",
           "docComment": "/**\n * @public\n */\n",
           "excerptTokens": [
@@ -43151,6 +43203,41 @@
           "releaseTag": "Public",
           "name": "UIInputText",
           "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "decentraland-ecs!UIInputText:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `UIInputText` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(parent: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UIShape",
+                  "canonicalReference": "decentraland-ecs!UIShape:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | null"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "parent",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 3
+                  }
+                }
+              ]
+            },
             {
               "kind": "Property",
               "canonicalReference": "decentraland-ecs!UIInputText#autoStretchWidth:member",

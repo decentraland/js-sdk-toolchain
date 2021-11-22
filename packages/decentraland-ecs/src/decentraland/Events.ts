@@ -103,6 +103,16 @@ export const onProfileChanged = new Observable<IEvents['profileChanged']>(create
 /**
 * @public
 */
+export const onPlayerConnectedObservable = new Observable<IEvents['playerConnected']>(createSubscriber('playerConnected'))
+
+/**
+* @public
+*/
+export const onPlayerDisconnectedObservable = new Observable<IEvents['playerDisconnected']>(createSubscriber('playerDisconnected'))
+
+/**
+* @public
+*/
 export const onRealmChangedObservable = new Observable<IEvents['onRealmChanged']>(createSubscriber('onRealmChanged'))
 
 /**
@@ -158,10 +168,18 @@ export function _initEventObservables(dcl: DecentralandInterface) {
           onPointerLockedStateChange.notifyObservers(event.data as IEvents['onPointerLock'])
           return
         }
+        case 'playerConnected': {
+          onPlayerConnectedObservable.notifyObservers(event.data as IEvents['playerConnected'])
+          return
+        }
+        case 'playerDisconnected': {
+          onPlayerDisconnectedObservable.notifyObservers(event.data as IEvents['playerDisconnected'])
+          return
+        }
         case 'onRealmChanged': {
           onRealmChangedObservable.notifyObservers(event.data as IEvents['onRealmChanged'])
           return
-        }        
+        }
       }
     })
   }

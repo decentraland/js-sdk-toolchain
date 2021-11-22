@@ -3063,6 +3063,20 @@ declare const onLeaveSceneObservable: Observable<{
 /**
  * @public
  */
+declare const onPlayerConnectedObservable: Observable<{
+    userId: string;
+}>;
+
+/**
+ * @public
+ */
+declare const onPlayerDisconnectedObservable: Observable<{
+    userId: string;
+}>;
+
+/**
+ * @public
+ */
 declare const onPlayerExpressionObservable: Observable<{
     expressionId: string;
 }>;
@@ -4610,6 +4624,7 @@ declare class UIInputText extends UIShape {
     onChanged: OnChanged | null;
     onFocus: OnFocus | null;
     onBlur: OnBlur | null;
+    constructor(parent: UIShape | null);
 }
 
 /**
