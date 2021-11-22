@@ -1329,6 +1329,14 @@ export const onProfileChanged: Observable<{
     version: number;
 }>;
 
+// @public (undocumented)
+export const onRealmChangedObservable: Observable<{
+    domain: string;
+    room: string;
+    serverName: string;
+    displayName: string;
+}>;
+
 // @public
 export const onSceneReadyObservable: Observable<{}>;
 
