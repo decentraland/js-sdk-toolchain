@@ -1,16 +1,22 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import { getDirectories, getFilesFromFolder } from './setupUtils'
+import { getFilesFromFolder } from './setupUtils'
 import * as express from 'express'
-type ItemAssetJson = {
+
+export enum AssetType {
+  PORTABLE_EXPERIENCE = 'portable-experience'
+}
+
+export type ItemAssetJson = {
   id?: string
+  assetType?: AssetType | string
   name?: string
   description?: string
-  category?: 'hat' | 'hair' | 'upper_body' | string
-  rarity?: 'unique' | 'mythic' | 'legendary' | string
+  category?: string
+  rarity?: string
   thumbnail?: string
   model?: string
-  bodyShape?: 'male' | 'female' | 'both' | string
+  bodyShape?: string
 }
 
 const serveWearable = ({

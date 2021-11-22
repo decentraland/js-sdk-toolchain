@@ -1,3 +1,4 @@
+import { ItemAssetJson, AssetType } from './wearables'
 import * as fs from 'fs'
 import { sync as globSync } from 'glob'
 import * as path from 'path'
@@ -95,10 +96,23 @@ export function entityV3FromFolder({
   catalystRootFolder: string
 }) {
   const sceneJsonPath = path.resolve(folder, './scene.json')
+  let isParcelScene = true
+
   const assetJsonPath = path.resolve(folder, './asset.json')
+  if (fs.existsSync(assetJsonPath)) {
+    try {
+      const assetJson = require(assetJsonPath) as ItemAssetJson
+      if (assetJson?.assetType === AssetType.PORTABLE_EXPERIENCE) {
+        isParcelScene = false
+      }
+    } catch (err) {
+      console.error(`Unable to load asset.json properly`, err)
+    }
+  }
+
   const hashMaker = customHashMaker ? customHashMaker : defaultHashMaker
 
-  if (fs.existsSync(sceneJsonPath) && !fs.existsSync(assetJsonPath)) {
+  if (fs.existsSync(sceneJsonPath) && isParcelScene) {
     const sceneJson = JSON.parse(fs.readFileSync(sceneJsonPath).toString())
 
     const { base, parcels }: { base: string; parcels: string[] } = sceneJson.scene
