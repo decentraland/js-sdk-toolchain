@@ -43152,6 +43152,41 @@
           "name": "UIInputText",
           "members": [
             {
+              "kind": "Constructor",
+              "canonicalReference": "decentraland-ecs!UIInputText:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `UIInputText` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(parent: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UIShape",
+                  "canonicalReference": "decentraland-ecs!UIShape:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | null"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "parent",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 3
+                  }
+                }
+              ]
+            },
+            {
               "kind": "Property",
               "canonicalReference": "decentraland-ecs!UIInputText#autoStretchWidth:member",
               "docComment": "",

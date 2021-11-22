@@ -4610,6 +4610,7 @@ export declare class UIInputText extends UIShape {
     onChanged: OnChanged | null;
     onFocus: OnFocus | null;
     onBlur: OnBlur | null;
+    constructor(parent: UIShape | null);
 }
 
 /**
