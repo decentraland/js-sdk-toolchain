@@ -34,19 +34,6 @@ const setupProxy = (dcl: any, app: express.Application) => {
   )
 
   const baseSceneFolders: string[] = [dcl.getWorkingDir()]
-  // try {
-  //   const scenesDir = getDirectories(path.resolve(dcl.getWorkingDir(), 'scenes'))
-  //   for (const sceneDir of scenesDir) {
-  //     const sceneJsonPath = path.resolve(dcl.getWorkingDir(), 'scenes', sceneDir, 'scene.json')
-  //     if (fs.existsSync(sceneJsonPath)) {
-  //       baseSceneFolders.push(path.dirname(sceneJsonPath))
-  //     }
-  //   }
-  // } catch (err) {
-  //   console.error(`Couldn't get the scenes in /scenes folder`, err)
-  // }
-
-
   try {
     mockCatalyst(app, baseSceneFolders, dcl.getWorkingDir())
   } catch (err) {
@@ -54,20 +41,6 @@ const setupProxy = (dcl: any, app: express.Application) => {
   }
 
   const baseWearableFolders: string[] = [dcl.getWorkingDir()]
-  // try {
-  //   const wearablesDir = getDirectories(path.resolve(dcl.getWorkingDir(), 'wearables'))
-
-  //   for (const wearableDir of wearablesDir) {
-  //     const assetJsonPath = path.resolve(dcl.getWorkingDir(), 'wearables', wearableDir, 'asset.json')
-  //     console.log({ assetJsonPath })
-  //     if (fs.existsSync(assetJsonPath)) {
-  //       baseWearableFolders.push(path.dirname(assetJsonPath))
-  //     }
-  //   }
-  // } catch (err) {
-  //   console.error(`Couldn't get the wearables in /wearables folder`, err)
-  // }
-
   try {
     mockPreviewWearables(app, baseWearableFolders, dcl.getWorkingDir())
   } catch (err) {

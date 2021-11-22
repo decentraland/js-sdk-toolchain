@@ -35,11 +35,11 @@ export const mockCatalyst = (app: express.Application, baseFolders: string[], ro
         baseFolders,
         catalystRootFolder: rootFolder,
         baseUrl: ''
-      }).map(($) => $.id)
+      }).map((wearable) => wearable.id)
 
-      if (previewWearables.length === 1){
+      if (previewWearables.length === 1) {
         const deployedProfile = await (await fetch(`https://peer-lb.decentraland.org${req.originalUrl}`)).json()
-        if (!!deployedProfile) {
+        if (deployedProfile?.length === 1) {
           deployedProfile[0].avatars[0].avatar.wearables.push(...previewWearables)
           return res.json(deployedProfile)
         }
@@ -47,7 +47,7 @@ export const mockCatalyst = (app: express.Application, baseFolders: string[], ro
     } catch (err) {
       console.warn(`Failed to catch profile and fill with preview wearables.`, err)
     }
-    
+
     return next()
   })
 
@@ -76,7 +76,7 @@ const serveFolders = (app: express.Application, baseFolders: string[], catalystR
       const fullPath = path.resolve(Buffer.from(req.params.hash.replace(/^b64-/, ''), 'base64').toString('utf8'))
 
       // only return files IF the file is within a baseFolder
-      if (!baseFolders.find(($) => fullPath.startsWith($))) {
+      if (!baseFolders.find((folder: string) => fullPath.startsWith(folder))) {
         res.end(404)
         return
       }

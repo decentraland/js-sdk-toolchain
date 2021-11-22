@@ -45,10 +45,8 @@ const serveWearable = ({
   })
 
   const thumbnailFiltered = hashedFiles.filter(($) => $?.file == assetJson.thumbnail)
-  let thumbnail: string | undefined
-  if (thumbnailFiltered.length > 0 && thumbnailFiltered[0]?.hash) {
-    thumbnail = `${baseUrl}/${thumbnailFiltered[0].hash}`
-  }
+  const thumbnail =
+    thumbnailFiltered.length > 0 && thumbnailFiltered[0]?.hash && `${baseUrl}/${thumbnailFiltered[0].hash}`
 
   return {
     id: assetJson.id || '00000000-0000-0000-0000-000000000000',
