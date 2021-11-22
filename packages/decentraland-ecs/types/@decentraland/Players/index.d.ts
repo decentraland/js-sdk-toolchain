@@ -30,4 +30,9 @@ declare module '@decentraland/Players' {
    * Return the players's data
    */
   export function getPlayerData(opt: { userId: string }): Promise<UserData | null>
+
+  /**
+   * Return array of connected players
+   */
+  export function getConnectedPlayers(): Promise<{ userId: string }[]>
 }
