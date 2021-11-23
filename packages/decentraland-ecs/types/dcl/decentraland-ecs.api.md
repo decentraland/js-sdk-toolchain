@@ -10,13 +10,13 @@
 // @public (undocumented)
 export enum ActionButton {
     // (undocumented)
-    ACTION_1 = "ACTION_1",
-    // (undocumented)
-    ACTION_2 = "ACTION_2",
-    // (undocumented)
     ACTION_3 = "ACTION_3",
     // (undocumented)
     ACTION_4 = "ACTION_4",
+    // (undocumented)
+    ACTION_5 = "ACTION_5",
+    // (undocumented)
+    ACTION_6 = "ACTION_6",
     // (undocumented)
     ANY = "ANY",
     // (undocumented)
