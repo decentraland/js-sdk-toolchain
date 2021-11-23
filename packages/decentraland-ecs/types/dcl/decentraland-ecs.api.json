@@ -184,48 +184,6 @@
           "members": [
             {
               "kind": "EnumMember",
-              "canonicalReference": "decentraland-ecs!ActionButton.ACTION_1:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "ACTION_1 = "
-                },
-                {
-                  "kind": "Content",
-                  "text": "\"ACTION_1\""
-                }
-              ],
-              "releaseTag": "Public",
-              "name": "ACTION_1",
-              "initializerTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "EnumMember",
-              "canonicalReference": "decentraland-ecs!ActionButton.ACTION_2:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "ACTION_2 = "
-                },
-                {
-                  "kind": "Content",
-                  "text": "\"ACTION_2\""
-                }
-              ],
-              "releaseTag": "Public",
-              "name": "ACTION_2",
-              "initializerTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "EnumMember",
               "canonicalReference": "decentraland-ecs!ActionButton.ACTION_3:member",
               "docComment": "",
               "excerptTokens": [
@@ -261,6 +219,48 @@
               ],
               "releaseTag": "Public",
               "name": "ACTION_4",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!ActionButton.ACTION_5:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "ACTION_5 = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"ACTION_5\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "ACTION_5",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "decentraland-ecs!ActionButton.ACTION_6:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "ACTION_6 = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"ACTION_6\""
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "ACTION_6",
               "initializerTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
