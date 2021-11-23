@@ -8,7 +8,7 @@ import {
   ensureCopyFile,
   downloadFile,
   shaHashMaker
-} from './setupUtils'
+} from './cli/setupUtils'
 
 const setupExport = async ({
   workDir,
@@ -87,7 +87,8 @@ const setupExport = async ({
         getSceneJson({
           baseFolders: [workDir],
           pointers: sceneJson?.scene?.parcels || ['0,0'],
-          customHashMaker: shaHashMaker
+          customHashMaker: shaHashMaker,
+          catalystRootFolder: workDir
         })
       )
     )
@@ -102,7 +103,8 @@ const setupExport = async ({
       folder: workDir,
       addOriginalPath: true,
       ignorePattern: ignoreFileContent,
-      customHashMaker: shaHashMaker
+      customHashMaker: shaHashMaker,
+      catalystRootFolder: workDir
     })
     if (contentStatic?.content) {
       for (const $ of contentStatic?.content) {

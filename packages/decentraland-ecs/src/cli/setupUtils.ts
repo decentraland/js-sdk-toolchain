@@ -1,3 +1,4 @@
+import { ItemAssetJson, AssetType } from './wearables'
 import * as fs from 'fs'
 import { sync as globSync } from 'glob'
 import * as path from 'path'
@@ -5,6 +6,7 @@ import * as http from 'http'
 import * as https from 'https'
 import * as crypto from 'crypto'
 import ignore from 'ignore'
+import * as express from 'express'
 
 // instead of using fs-extra, create a custom function to no need to rollup
 export async function copyDir(src: string, dest: string) {
@@ -19,22 +21,98 @@ export async function copyDir(src: string, dest: string) {
   }
 }
 
-export function entityV3FromFolder({
+export const defaultHashMaker = (str: string) => 'b64-' + Buffer.from(str).toString('base64')
+
+export const getFilesFromFolder = ({
   folder,
   addOriginalPath,
   ignorePattern,
-  customHashMaker
+  customHashMaker,
+  rootFolder
 }: {
   folder: string
   addOriginalPath?: boolean
   ignorePattern?: string
   customHashMaker?: (str: string) => string
-}) {
-  const sceneJsonPath = path.resolve(folder, './scene.json')
-  const defaultHashMaker = (str: string) => 'b64-' + Buffer.from(str).toString('base64')
+  rootFolder?: string
+}) => {
   const hashMaker = customHashMaker ? customHashMaker : defaultHashMaker
 
-  if (fs.existsSync(sceneJsonPath)) {
+  const allFiles = globSync('**/*', {
+    cwd: folder,
+    dot: false,
+    absolute: true
+  })
+    .map((file) => {
+      try {
+        if (!fs.statSync(file).isFile()) return
+      } catch (err) {
+        return
+      }
+      const _folder = folder.replace(/\\/gi, '/')
+      const key = file.replace(_folder, '').replace(/^\/+/, '')
+      return key
+    })
+    .filter(($) => !!$) as string[]
+
+  const ensureIgnorePattern = ignorePattern && ignorePattern !== '' ? ignorePattern : defaultDclIgnore()
+  const ig = ignore().add(ensureIgnorePattern)
+  const filteredFiles = ig.filter(allFiles)
+
+  return filteredFiles
+    .map((file) => {
+      const absolutePath = path.resolve(folder, file)
+      try {
+        if (!fs.statSync(absolutePath).isFile()) return
+      } catch (err) {
+        console.log(err)
+        return
+      }
+
+      const absoluteFolder = rootFolder ? rootFolder.replace(/\\/gi, '/') : folder.replace(/\\/gi, '/')
+      const relativeFilePathToRootFolder = absolutePath.replace(absoluteFolder, '').replace(/^\/+/, '')
+      const relativeFilePathToFolder = file.replace(absoluteFolder, '').replace(/^\/+/, '')
+
+      return {
+        file: relativeFilePathToFolder.toLowerCase(),
+        original_path: addOriginalPath ? absolutePath : undefined,
+        hash: hashMaker(relativeFilePathToRootFolder)
+      }
+    })
+    .filter(($) => !!$)
+}
+
+export function entityV3FromFolder({
+  folder,
+  addOriginalPath,
+  ignorePattern,
+  customHashMaker,
+  catalystRootFolder
+}: {
+  folder: string
+  addOriginalPath?: boolean
+  ignorePattern?: string
+  customHashMaker?: (str: string) => string
+  catalystRootFolder: string
+}) {
+  const sceneJsonPath = path.resolve(folder, './scene.json')
+  let isParcelScene = true
+
+  const assetJsonPath = path.resolve(folder, './asset.json')
+  if (fs.existsSync(assetJsonPath)) {
+    try {
+      const assetJson = require(assetJsonPath) as ItemAssetJson
+      if (assetJson?.assetType === AssetType.PORTABLE_EXPERIENCE) {
+        isParcelScene = false
+      }
+    } catch (err) {
+      console.error(`Unable to load asset.json properly`, err)
+    }
+  }
+
+  const hashMaker = customHashMaker ? customHashMaker : defaultHashMaker
+
+  if (fs.existsSync(sceneJsonPath) && isParcelScene) {
     const sceneJson = JSON.parse(fs.readFileSync(sceneJsonPath).toString())
 
     const { base, parcels }: { base: string; parcels: string[] } = sceneJson.scene
@@ -42,41 +120,13 @@ export function entityV3FromFolder({
     pointers.add(base)
     parcels.forEach(($) => pointers.add($))
 
-    const allFiles = globSync('**/*', {
-      cwd: folder,
-      dot: false,
-      absolute: true
+    const mappedFiles = getFilesFromFolder({
+      folder,
+      addOriginalPath,
+      ignorePattern,
+      customHashMaker,
+      rootFolder: catalystRootFolder
     })
-      .map((file) => {
-        try {
-          if (!fs.statSync(file).isFile()) return
-        } catch (err) {
-          return
-        }
-        const _folder = folder.replace(/\\/gi, '/')
-        const key = file.replace(_folder, '').replace(/^\/+/, '')
-        return key
-      })
-      .filter(($) => !!$) as string[]
-
-    const ensureIgnorePattern = (ignorePattern && ignorePattern !== '') ? ignorePattern : defaultDclIgnore()
-    const ig = ignore().add(ensureIgnorePattern)
-    const filteredFiles = ig.filter(allFiles)
-
-    const mappedFiles = filteredFiles
-      .map((file) => {
-        try {
-          if (!fs.statSync(file).isFile()) return
-        } catch (err) {
-          return
-        }
-        const _folder = folder.replace(/\\/gi, '/')
-        const key = file.replace(_folder, '').replace(/^\/+/, '')
-
-        return { file: key.toLowerCase(), original_path: addOriginalPath ? key : undefined, hash: hashMaker(key) }
-      })
-      .filter(($) => !!$)
-
     return {
       version: 'v3',
       type: 'scene',
@@ -94,11 +144,13 @@ export function entityV3FromFolder({
 export function getSceneJson({
   baseFolders,
   pointers,
-  customHashMaker
+  customHashMaker,
+  catalystRootFolder
 }: {
   baseFolders: string[]
   pointers: string[]
   customHashMaker?: (str: string) => string
+  catalystRootFolder: string
 }) {
   const requestedPointers = new Set<string>(pointers)
   const resultEntities = []
@@ -113,7 +165,8 @@ export function getSceneJson({
       folder,
       addOriginalPath: false,
       ignorePattern: ignoreFileContent,
-      customHashMaker
+      customHashMaker,
+      catalystRootFolder
     })
   })
 
@@ -198,3 +251,43 @@ export const defaultDclIgnore = () =>
     '*.zip',
     '*.rar'
   ].join('\n')
+
+export const getDirectories = (source: string) => {
+  if (!fs.existsSync(source)) return []
+
+  return fs
+    .readdirSync(source, { withFileTypes: true })
+    .filter((dirent) => dirent.isDirectory())
+    .map((dirent) => dirent.name)
+}
+
+export const createStaticRoutes = (
+  app: express.Application,
+  route: string,
+  localFolder: string,
+  mapFile?: (filePath: string) => string
+) => {
+  app.use(route, (req, res, next) => {
+    const options = {
+      root: localFolder,
+      dotfiles: 'deny',
+      maxAge: 1,
+      cacheControl: false,
+      lastModified: true,
+      headers: {
+        'x-timestamp': Date.now(),
+        'x-sent': true,
+        etag: JSON.stringify(Date.now().toString()),
+        'cache-control': 'no-cache,private,max-age=1'
+      }
+    }
+
+    const fileName: string = mapFile ? mapFile(req.params[0]) : req.params[0]
+
+    res.sendFile(fileName, options, (err) => {
+      if (err) {
+        next(err)
+      }
+    })
+  })
+}
