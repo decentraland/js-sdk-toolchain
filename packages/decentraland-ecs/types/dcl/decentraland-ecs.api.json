@@ -29588,6 +29588,32 @@
         },
         {
           "kind": "Variable",
+          "canonicalReference": "decentraland-ecs!onRealmChangedObservable:var",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onRealmChangedObservable: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "decentraland-ecs!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    domain: string;\n    room: string;\n    serverName: string;\n    displayName: string;\n}>"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "onRealmChangedObservable",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Variable",
           "canonicalReference": "decentraland-ecs!onSceneReadyObservable:var",
           "docComment": "/**\n * This event is triggered after all the resources of the scene were loaded (models, textures, etc...)\n *\n * @public\n */\n",
           "excerptTokens": [
