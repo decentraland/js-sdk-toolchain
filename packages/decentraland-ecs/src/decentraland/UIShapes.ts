@@ -350,17 +350,41 @@ export class UIInputText extends UIShape {
   @ObservableComponent.field
   paddingLeft: number = 0
 
-  @OnUUIDEvent.uuidEvent
   onTextSubmit: OnTextSubmit | null = null
 
-  @OnUUIDEvent.uuidEvent
   onChanged: OnChanged | null = null
+
+  // @internal
+  @OnUUIDEvent.uuidEvent
+  protected readonly onTextChanged: OnChanged
 
   @OnUUIDEvent.uuidEvent
   onFocus: OnFocus | null = null
 
   @OnUUIDEvent.uuidEvent
   onBlur: OnBlur | null = null
+
+  constructor(parent: UIShape | null) {
+    super(parent)
+    this.onTextChanged = new OnChanged((e) => {
+      const { value, isSubmit } = e.value
+
+      // NOTE: here we want to keep the same `dirty` state as before changing `this.value`
+      // because changing `this.value` will set the component as `dirty` and send a message to the renderer with it value
+      // and that message is unnecesary (if the only thing that have changed is `this.value`) since that new value has come from the renderer itself
+      const isDirty = this.dirty
+      this.value = value
+      this.dirty = isDirty
+
+      if (isSubmit && this.onTextSubmit) {
+        const onSubmitValue: IEvents['onTextSubmit'] = { text: value }
+        this.onTextSubmit.callback(onSubmitValue)
+      } else if (!isSubmit && this.onChanged) {
+        const onChangeValue: IEvents['onChange'] = { value, pointerId: e.pointerId }
+        this.onChanged.callback(onChangeValue)
+      }
+    })
+  }
 }
 
 /**

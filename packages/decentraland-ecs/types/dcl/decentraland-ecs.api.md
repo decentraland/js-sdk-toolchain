@@ -1259,6 +1259,16 @@ export const onLeaveSceneObservable: Observable<{
 }>;
 
 // @public (undocumented)
+export const onPlayerConnectedObservable: Observable<{
+    userId: string;
+}>;
+
+// @public (undocumented)
+export const onPlayerDisconnectedObservable: Observable<{
+    userId: string;
+}>;
+
+// @public (undocumented)
 export const onPlayerExpressionObservable: Observable<{
     expressionId: string;
 }>;
@@ -1999,6 +2009,7 @@ export class UIImage extends UIShape {
 
 // @public (undocumented)
 export class UIInputText extends UIShape {
+    constructor(parent: UIShape | null);
     // (undocumented)
     autoStretchWidth: boolean;
     // (undocumented)

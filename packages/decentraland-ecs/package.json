@@ -30,7 +30,7 @@
     "@dcl/amd": "file:../@dcl/amd",
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
     "@dcl/kernel": "https://sdk-team-cdn.decentraland.org/@dcl/kernel/branch/feat/px-hot-reloading/dcl-kernel-1.0.0-1490157404.commit-c9dd226.tgz",
-    "@dcl/posix": "1.0.3-20211108141117.commit-fb3dffe",
+    "@dcl/posix": "1.0.3-20211119173339.commit-c94b391",
     "@dcl/unity-renderer": "1.0.20203-20211118193328.commit-db5d438",
     "glob": "^7.1.7",
     "http-proxy-middleware": "^2.0.1",
