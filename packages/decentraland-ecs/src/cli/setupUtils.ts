@@ -1,4 +1,3 @@
-import { ItemAssetJson, AssetType } from './wearables'
 import * as fs from 'fs'
 import { sync as globSync } from 'glob'
 import * as path from 'path'
@@ -7,6 +6,7 @@ import * as https from 'https'
 import * as crypto from 'crypto'
 import ignore from 'ignore'
 import * as express from 'express'
+import { sdk } from '@dcl/schemas'
 
 // instead of using fs-extra, create a custom function to no need to rollup
 export async function copyDir(src: string, dest: string) {
@@ -101,8 +101,8 @@ export function entityV3FromFolder({
   const assetJsonPath = path.resolve(folder, './asset.json')
   if (fs.existsSync(assetJsonPath)) {
     try {
-      const assetJson = require(assetJsonPath) as ItemAssetJson
-      if (assetJson?.assetType === AssetType.PORTABLE_EXPERIENCE) {
+      const assetJson = require(assetJsonPath)
+      if (sdk.AssetJson.validate(assetJson) && assetJson.assetType == sdk.ProjectType.PORTABLE_EXPERIENCE) {
         isParcelScene = false
       }
     } catch (err) {
