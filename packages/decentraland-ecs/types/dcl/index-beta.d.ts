@@ -3143,6 +3143,16 @@ export declare const onProfileChanged: Observable<{
 }>;
 
 /**
+ * @public
+ */
+export declare const onRealmChangedObservable: Observable<{
+    domain: string;
+    room: string;
+    serverName: string;
+    displayName: string;
+}>;
+
+/**
  * This event is triggered after all the resources of the scene were loaded (models, textures, etc...)
  * @public
  */

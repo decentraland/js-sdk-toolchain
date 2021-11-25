@@ -111,6 +111,11 @@ export const onPlayerConnectedObservable = new Observable<IEvents['playerConnect
 export const onPlayerDisconnectedObservable = new Observable<IEvents['playerDisconnected']>(createSubscriber('playerDisconnected'))
 
 /**
+* @public
+*/
+export const onRealmChangedObservable = new Observable<IEvents['onRealmChanged']>(createSubscriber('onRealmChanged'))
+
+/**
  * @internal
  * This function adds _one_ listener to the onEvent event of dcl interface.
  * Leveraging a switch to route events to the Observable handlers.
@@ -169,6 +174,10 @@ export function _initEventObservables(dcl: DecentralandInterface) {
         }
         case 'playerDisconnected': {
           onPlayerDisconnectedObservable.notifyObservers(event.data as IEvents['playerDisconnected'])
+          return
+        }
+        case 'onRealmChanged': {
+          onRealmChangedObservable.notifyObservers(event.data as IEvents['onRealmChanged'])
           return
         }
       }
