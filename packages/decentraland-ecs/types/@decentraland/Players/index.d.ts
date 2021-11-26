@@ -35,4 +35,9 @@ declare module '@decentraland/Players' {
    * Return array of connected players
    */
   export function getConnectedPlayers(): Promise<{ userId: string }[]>
+
+  /**
+   * Return array of players inside the scene
+   */
+  export function getPlayersInScene(): Promise<{ userId: string }[]>
 }
