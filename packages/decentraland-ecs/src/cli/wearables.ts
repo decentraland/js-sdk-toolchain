@@ -3,21 +3,7 @@ import * as fs from 'fs'
 import { getFilesFromFolder } from './setupUtils'
 import * as express from 'express'
 
-export enum AssetType {
-  PORTABLE_EXPERIENCE = 'portable-experience'
-}
-
-export type ItemAssetJson = {
-  id?: string
-  assetType?: AssetType | string
-  name?: string
-  description?: string
-  category?: string
-  rarity?: string
-  thumbnail?: string
-  model?: string
-  bodyShape?: string
-}
+import { sdk } from '@dcl/schemas'
 
 const serveWearable = ({
   assetJsonPath,
@@ -29,7 +15,11 @@ const serveWearable = ({
   catalystRootFolder: string
 }) => {
   const wearableDir = path.dirname(assetJsonPath)
-  const assetJson = require(assetJsonPath) as ItemAssetJson
+  const assetJson = require(assetJsonPath)
+  
+  if (!sdk.AssetJson.validate(assetJson)) {
+    throw new Error(`Invalid asset.json (${assetJsonPath})`)
+  }
 
   const dclIgnorePath = path.resolve(wearableDir, '.dclignore')
   let ignoreFileContent = ''
