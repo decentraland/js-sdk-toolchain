@@ -102,7 +102,7 @@ export function entityV3FromFolder({
   if (fs.existsSync(assetJsonPath)) {
     try {
       const assetJson = require(assetJsonPath)
-      if (sdk.AssetJson.validate(assetJson) && assetJson.assetType == sdk.ProjectType.PORTABLE_EXPERIENCE) {
+      if (sdk.AssetJson.validate(assetJson) && assetJson.assetType === sdk.ProjectType.PORTABLE_EXPERIENCE) {
         isParcelScene = false
       }
     } catch (err) {
