@@ -11,6 +11,7 @@ export * from './ecs/Observable'
 export * from './ecs/UIValue'
 export * from './ecs/EventManager'
 export * from './ecs/UserActions'
+export * from './decentraland/Math'
 
 import { _initEventObservables } from './decentraland/Events'
 import { DecentralandSynchronizationSystem } from './decentraland/Implementation'
@@ -45,7 +46,6 @@ engine.addSystem(pointerEventSystem)
 engine.addSystem(raycastEventSystem)
 
 // DECENTRALAND DEPENDENCIES
-export * from './decentraland/math'
 export * from './decentraland/Types'
 export * from './decentraland/Components'
 export * from './decentraland/Systems'

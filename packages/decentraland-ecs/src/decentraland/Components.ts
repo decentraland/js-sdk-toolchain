@@ -1,5 +1,6 @@
+import { Vector3, Quaternion, Matrix, MathTmp, Color3, Color4 } from '@dcl/ecs-math'
+
 import { Component, ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
-import { Vector3, Quaternion, Matrix, MathTmp, Color3, Color4 } from './math'
 import { AnimationState } from './AnimationState'
 import { newId } from '../ecs/helpers'
 import { ActionButton } from './Input'
