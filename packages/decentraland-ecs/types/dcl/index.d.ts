@@ -3277,6 +3277,72 @@ declare class Path2 {
 }
 
 /**
+ * Represents a 3D path made up of multiple 3D points
+ * @public
+ */
+declare class Path3D {
+    /**
+     * an array of Vector3, the curve axis of the Path3D
+     */
+    path: Vector3[];
+    private _curve;
+    private _distances;
+    private _tangents;
+    private _normals;
+    private _binormals;
+    private _raw;
+    /**
+     * new Path3D(path, normal, raw)
+     * Creates a Path3D. A Path3D is a logical math object, so not a mesh.
+     * please read the description in the tutorial :  http://doc.babylonjs.com/tutorials/How_to_use_Path3D
+     * @param path - an array of Vector3, the curve axis of the Path3D
+     * @param normal - (options) Vector3, the first wanted normal to the curve. Ex (0, 1, 0) for a vertical normal.
+     * @param raw - (optional, default false) : boolean, if true the returned Path3D isn't normalized. Useful to depict path acceleration or speed.
+     */
+    constructor(
+    /**
+     * an array of Vector3, the curve axis of the Path3D
+     */
+    path: Vector3[], firstNormal?: Nullable<Vector3>, raw?: boolean);
+    /**
+     * Returns the Path3D array of successive Vector3 designing its curve.
+     * @returns the Path3D array of successive Vector3 designing its curve.
+     */
+    getCurve(): Vector3[];
+    /**
+     * Returns an array populated with tangent vectors on each Path3D curve point.
+     * @returns an array populated with tangent vectors on each Path3D curve point.
+     */
+    getTangents(): Vector3[];
+    /**
+     * Returns an array populated with normal vectors on each Path3D curve point.
+     * @returns an array populated with normal vectors on each Path3D curve point.
+     */
+    getNormals(): Vector3[];
+    /**
+     * Returns an array populated with binormal vectors on each Path3D curve point.
+     * @returns an array populated with binormal vectors on each Path3D curve point.
+     */
+    getBinormals(): Vector3[];
+    /**
+     * Returns an array populated with distances (float) of the i-th point from the first curve point.
+     * @returns an array populated with distances (float) of the i-th point from the first curve point.
+     */
+    getDistances(): number[];
+    /**
+     * Forces the Path3D tangent, normal, binormal and distance recomputation.
+     * @param path - path which all values are copied into the curves points
+     * @param firstNormal - which should be projected onto the curve
+     * @returns the same object updated.
+     */
+    update(path: Vector3[], firstNormal?: Nullable<Vector3>): Path3D;
+    private _compute;
+    private _getFirstNonNullVector;
+    private _getLastNonNullVector;
+    private _normalVector;
+}
+
+/**
  * @public
  */
 declare class PhysicsCast implements IPhysicsCast {

@@ -1405,6 +1405,19 @@ export class Path2 {
     static StartingAt(x: number, y: number): Path2;
 }
 
+// @public
+export class Path3D {
+    constructor(
+    path: Vector3[], firstNormal?: Nullable<Vector3>, raw?: boolean);
+    getBinormals(): Vector3[];
+    getCurve(): Vector3[];
+    getDistances(): number[];
+    getNormals(): Vector3[];
+    getTangents(): Vector3[];
+    path: Vector3[];
+    update(path: Vector3[], firstNormal?: Nullable<Vector3>): Path3D;
+}
+
 // @public (undocumented)
 export class PhysicsCast implements IPhysicsCast {
     // (undocumented)

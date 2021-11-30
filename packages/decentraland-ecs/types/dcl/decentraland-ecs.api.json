@@ -30586,6 +30586,378 @@
         },
         {
           "kind": "Class",
+          "canonicalReference": "decentraland-ecs!Path3D:class",
+          "docComment": "/**\n * Represents a 3D path made up of multiple 3D points\n *\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare class Path3D "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "Path3D",
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "decentraland-ecs!Path3D:constructor(1)",
+              "docComment": "/**\n * new Path3D(path, normal, raw) Creates a Path3D. A Path3D is a logical math object, so not a mesh. please read the description in the tutorial : http://doc.babylonjs.com/tutorials/How_to_use_Path3D\n *\n * @param path - an array of Vector3, the curve axis of the Path3D\n *\n * @param normal - (options) Vector3, the first wanted normal to the curve. Ex (0, 1, 0) for a vertical normal.\n *\n * @param raw - (optional, default false) : boolean, if true the returned Path3D isn't normalized. Useful to depict path acceleration or speed.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(\n    path: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Vector3",
+                  "canonicalReference": "decentraland-ecs!Vector3:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", firstNormal?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "decentraland-ecs!Nullable:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Vector3",
+                  "canonicalReference": "decentraland-ecs!Vector3:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", raw?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "path",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 3
+                  }
+                },
+                {
+                  "parameterName": "firstNormal",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 4,
+                    "endIndex": 8
+                  }
+                },
+                {
+                  "parameterName": "raw",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 9,
+                    "endIndex": 10
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "decentraland-ecs!Path3D#getBinormals:member(1)",
+              "docComment": "/**\n * Returns an array populated with binormal vectors on each Path3D curve point.\n *\n * @returns an array populated with binormal vectors on each Path3D curve point.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "getBinormals(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Vector3",
+                  "canonicalReference": "decentraland-ecs!Vector3:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [],
+              "name": "getBinormals"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "decentraland-ecs!Path3D#getCurve:member(1)",
+              "docComment": "/**\n * Returns the Path3D array of successive Vector3 designing its curve.\n *\n * @returns the Path3D array of successive Vector3 designing its curve.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "getCurve(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Vector3",
+                  "canonicalReference": "decentraland-ecs!Vector3:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [],
+              "name": "getCurve"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "decentraland-ecs!Path3D#getDistances:member(1)",
+              "docComment": "/**\n * Returns an array populated with distances (float) of the i-th point from the first curve point.\n *\n * @returns an array populated with distances (float) of the i-th point from the first curve point.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "getDistances(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [],
+              "name": "getDistances"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "decentraland-ecs!Path3D#getNormals:member(1)",
+              "docComment": "/**\n * Returns an array populated with normal vectors on each Path3D curve point.\n *\n * @returns an array populated with normal vectors on each Path3D curve point.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "getNormals(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Vector3",
+                  "canonicalReference": "decentraland-ecs!Vector3:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [],
+              "name": "getNormals"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "decentraland-ecs!Path3D#getTangents:member(1)",
+              "docComment": "/**\n * Returns an array populated with tangent vectors on each Path3D curve point.\n *\n * @returns an array populated with tangent vectors on each Path3D curve point.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "getTangents(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Vector3",
+                  "canonicalReference": "decentraland-ecs!Vector3:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [],
+              "name": "getTangents"
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "decentraland-ecs!Path3D#path:member",
+              "docComment": "/**\n * an array of Vector3, the curve axis of the Path3D\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "path: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Vector3",
+                  "canonicalReference": "decentraland-ecs!Vector3:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "path",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "isStatic": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "decentraland-ecs!Path3D#update:member(1)",
+              "docComment": "/**\n * Forces the Path3D tangent, normal, binormal and distance recomputation.\n *\n * @param path - path which all values are copied into the curves points\n *\n * @param firstNormal - which should be projected onto the curve\n *\n * @returns the same object updated.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "update(path: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Vector3",
+                  "canonicalReference": "decentraland-ecs!Vector3:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", firstNormal?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "decentraland-ecs!Nullable:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Vector3",
+                  "canonicalReference": "decentraland-ecs!Vector3:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Path3D",
+                  "canonicalReference": "decentraland-ecs!Path3D:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 9,
+                "endIndex": 10
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "path",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 3
+                  }
+                },
+                {
+                  "parameterName": "firstNormal",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 4,
+                    "endIndex": 8
+                  }
+                }
+              ],
+              "name": "update"
+            }
+          ],
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Class",
           "canonicalReference": "decentraland-ecs!PhysicsCast:class",
           "docComment": "/**\n * @public\n */\n",
           "excerptTokens": [
