@@ -1564,10 +1564,10 @@ export type ProfileForRenderer = {
     parcelsWithAccess?: ParcelsWithAccess;
 };
 
-// Warning: (ae-forgotten-export) The symbol "ReadOnlyQuaternion" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "EcsMathReadOnlyQuaternion" needs to be exported by the entry point index.d.ts
 //
 // @public
-export class Quaternion implements ReadOnlyQuaternion_2 {
+export class Quaternion implements EcsMathReadOnlyQuaternion {
     constructor(
     x?: number,
     y?: number,
@@ -1577,19 +1577,19 @@ export class Quaternion implements ReadOnlyQuaternion_2 {
     add(other: Quaternion): Quaternion;
     // @internal
     addInPlace(other: Quaternion): Quaternion;
-    static Angle(quat1: ReadOnlyQuaternion_2, quat2: ReadOnlyQuaternion_2): number;
+    static Angle(quat1: EcsMathReadOnlyQuaternion, quat2: EcsMathReadOnlyQuaternion): number;
     // (undocumented)
     angleAxis(degress: number, axis: Vector3): Quaternion;
-    static AreClose(quat0: ReadOnlyQuaternion_2, quat1: ReadOnlyQuaternion_2): boolean;
+    static AreClose(quat0: EcsMathReadOnlyQuaternion, quat1: EcsMathReadOnlyQuaternion): boolean;
     asArray(): number[];
     clone(): Quaternion;
     conjugate(): Quaternion;
     conjugateInPlace(): Quaternion;
     conjugateToRef(ref: Quaternion): Quaternion;
-    copyFrom(other: ReadOnlyQuaternion_2): Quaternion;
+    copyFrom(other: EcsMathReadOnlyQuaternion): Quaternion;
     copyFromFloats(x: number, y: number, z: number, w: number): Quaternion;
-    static Dot(left: ReadOnlyQuaternion_2, right: ReadOnlyQuaternion_2): number;
-    equals(otherQuaternion: ReadOnlyQuaternion_2): boolean;
+    static Dot(left: EcsMathReadOnlyQuaternion, right: EcsMathReadOnlyQuaternion): number;
+    equals(otherQuaternion: EcsMathReadOnlyQuaternion): boolean;
     static Euler(x: number, y: number, z: number): Quaternion;
     set eulerAngles(euler: Vector3);
     get eulerAngles(): Vector3;
@@ -1601,19 +1601,19 @@ export class Quaternion implements ReadOnlyQuaternion_2 {
     static FromToRotation(from: Vector3, to: Vector3, up?: Vector3): Quaternion;
     getClassName(): string;
     getHashCode(): number;
-    static Hermite(value1: ReadOnlyQuaternion_2, tangent1: ReadOnlyQuaternion_2, value2: ReadOnlyQuaternion_2, tangent2: ReadOnlyQuaternion_2, amount: number): Quaternion;
+    static Hermite(value1: EcsMathReadOnlyQuaternion, tangent1: EcsMathReadOnlyQuaternion, value2: EcsMathReadOnlyQuaternion, tangent2: EcsMathReadOnlyQuaternion, amount: number): Quaternion;
     static get Identity(): Quaternion;
     static Inverse(q: Quaternion): Quaternion;
-    static IsIdentity(quaternion: ReadOnlyQuaternion_2): boolean;
+    static IsIdentity(quaternion: EcsMathReadOnlyQuaternion): boolean;
     get length(): number;
     get lengthSquared(): number;
     static LookRotation(forward: Vector3, up?: Vector3): Quaternion;
-    multiply(q1: ReadOnlyQuaternion_2): Quaternion;
-    multiplyInPlace(q1: ReadOnlyQuaternion_2): Quaternion;
-    multiplyToRef(q1: ReadOnlyQuaternion_2, result: Quaternion): Quaternion;
+    multiply(q1: EcsMathReadOnlyQuaternion): Quaternion;
+    multiplyInPlace(q1: EcsMathReadOnlyQuaternion): Quaternion;
+    multiplyToRef(q1: EcsMathReadOnlyQuaternion, result: Quaternion): Quaternion;
     normalize(): Quaternion;
     get normalized(): Quaternion;
-    static RotateTowards(from: ReadOnlyQuaternion_2, to: Quaternion, maxDegreesDelta: number): Quaternion;
+    static RotateTowards(from: EcsMathReadOnlyQuaternion, to: Quaternion, maxDegreesDelta: number): Quaternion;
     static RotationAlphaBetaGamma(alpha: number, beta: number, gamma: number): Quaternion;
     static RotationAlphaBetaGammaToRef(alpha: number, beta: number, gamma: number, result: Quaternion): void;
     static RotationAxis(axis: Vector3, angle: number): Quaternion;
@@ -1629,8 +1629,8 @@ export class Quaternion implements ReadOnlyQuaternion_2 {
     set(x: number, y: number, z: number, w: number): Quaternion;
     setEuler(x: number, y: number, z: number): Quaternion;
     setFromToRotation(from: Vector3, to: Vector3, up?: Vector3): void;
-    static Slerp(left: ReadOnlyQuaternion_2, right: ReadOnlyQuaternion_2, amount: number): Quaternion;
-    static SlerpToRef(left: ReadOnlyQuaternion_2, right: ReadOnlyQuaternion_2, amount: number, result: Quaternion): void;
+    static Slerp(left: EcsMathReadOnlyQuaternion, right: EcsMathReadOnlyQuaternion, amount: number): Quaternion;
+    static SlerpToRef(left: EcsMathReadOnlyQuaternion, right: EcsMathReadOnlyQuaternion, amount: number, result: Quaternion): void;
     subtract(other: Quaternion): Quaternion;
     toRotationMatrix(result: Matrix): Quaternion;
     toString(): string;
@@ -2194,108 +2194,108 @@ export class UUIDEventSystem implements ISystem {
     onRemoveEntity(entity: IEntity): void;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ReadOnlyVector2" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "EcsMathReadOnlyVector2" needs to be exported by the entry point index.d.ts
 //
 // @public
-export class Vector2 implements ReadOnlyVector2_2 {
+export class Vector2 implements EcsMathReadOnlyVector2 {
     constructor(
     x?: number,
     y?: number);
-    static Add(vector1: ReadOnlyVector2_2, vector2: ReadOnlyVector2_2): Vector2;
-    add(otherVector: ReadOnlyVector2_2): Vector2;
-    addInPlace(otherVector: ReadOnlyVector2_2): Vector2;
-    addToRef(otherVector: ReadOnlyVector2_2, result: Vector2): Vector2;
-    addVector3(otherVector: ReadOnlyVector2_2): Vector2;
+    static Add(vector1: EcsMathReadOnlyVector2, vector2: EcsMathReadOnlyVector2): Vector2;
+    add(otherVector: EcsMathReadOnlyVector2): Vector2;
+    addInPlace(otherVector: EcsMathReadOnlyVector2): Vector2;
+    addToRef(otherVector: EcsMathReadOnlyVector2, result: Vector2): Vector2;
+    addVector3(otherVector: EcsMathReadOnlyVector2): Vector2;
     asArray(): number[];
-    static CatmullRom(value1: ReadOnlyVector2_2, value2: ReadOnlyVector2_2, value3: ReadOnlyVector2_2, value4: ReadOnlyVector2_2, amount: number): Vector2;
-    static Center(value1: ReadOnlyVector2_2, value2: ReadOnlyVector2_2): Vector2;
-    static Clamp(value: ReadOnlyVector2_2, min: ReadOnlyVector2_2, max: ReadOnlyVector2_2): Vector2;
+    static CatmullRom(value1: EcsMathReadOnlyVector2, value2: EcsMathReadOnlyVector2, value3: EcsMathReadOnlyVector2, value4: EcsMathReadOnlyVector2, amount: number): Vector2;
+    static Center(value1: EcsMathReadOnlyVector2, value2: EcsMathReadOnlyVector2): Vector2;
+    static Clamp(value: EcsMathReadOnlyVector2, min: EcsMathReadOnlyVector2, max: EcsMathReadOnlyVector2): Vector2;
     clone(): Vector2;
-    copyFrom(source: ReadOnlyVector2_2): Vector2;
+    copyFrom(source: EcsMathReadOnlyVector2): Vector2;
     copyFromFloats(x: number, y: number): Vector2;
     static Distance(value1: Vector2, value2: Vector2): number;
     static DistanceOfPointFromSegment(p: Vector2, segA: Vector2, segB: Vector2): number;
-    static DistanceSquared(value1: ReadOnlyVector2_2, value2: ReadOnlyVector2_2): number;
-    divide(otherVector: ReadOnlyVector2_2): Vector2;
-    divideInPlace(otherVector: ReadOnlyVector2_2): Vector2;
-    divideToRef(otherVector: ReadOnlyVector2_2, result: Vector2): Vector2;
-    static Dot(left: ReadOnlyVector2_2, right: ReadOnlyVector2_2): number;
-    equals(otherVector: ReadOnlyVector2_2): boolean;
-    equalsWithEpsilon(otherVector: ReadOnlyVector2_2, epsilon?: number): boolean;
+    static DistanceSquared(value1: EcsMathReadOnlyVector2, value2: EcsMathReadOnlyVector2): number;
+    divide(otherVector: EcsMathReadOnlyVector2): Vector2;
+    divideInPlace(otherVector: EcsMathReadOnlyVector2): Vector2;
+    divideToRef(otherVector: EcsMathReadOnlyVector2, result: Vector2): Vector2;
+    static Dot(left: EcsMathReadOnlyVector2, right: EcsMathReadOnlyVector2): number;
+    equals(otherVector: EcsMathReadOnlyVector2): boolean;
+    equalsWithEpsilon(otherVector: EcsMathReadOnlyVector2, epsilon?: number): boolean;
     floor(): Vector2;
     fract(): Vector2;
     static FromArray(array: ArrayLike<number>, offset?: number): Vector2;
     static FromArrayToRef(array: ArrayLike<number>, offset: number, result: Vector2): void;
     getClassName(): string;
     getHashCode(): number;
-    static Hermite(value1: ReadOnlyVector2_2, tangent1: ReadOnlyVector2_2, value2: ReadOnlyVector2_2, tangent2: ReadOnlyVector2_2, amount: number): Vector2;
+    static Hermite(value1: EcsMathReadOnlyVector2, tangent1: EcsMathReadOnlyVector2, value2: EcsMathReadOnlyVector2, tangent2: EcsMathReadOnlyVector2, amount: number): Vector2;
     length(): number;
     lengthSquared(): number;
-    static Lerp(start: ReadOnlyVector2_2, end: ReadOnlyVector2_2, amount: number): Vector2;
-    static Maximize(left: ReadOnlyVector2_2, right: ReadOnlyVector2_2): Vector2;
-    static Minimize(left: ReadOnlyVector2_2, right: ReadOnlyVector2_2): Vector2;
-    multiply(otherVector: ReadOnlyVector2_2): Vector2;
+    static Lerp(start: EcsMathReadOnlyVector2, end: EcsMathReadOnlyVector2, amount: number): Vector2;
+    static Maximize(left: EcsMathReadOnlyVector2, right: EcsMathReadOnlyVector2): Vector2;
+    static Minimize(left: EcsMathReadOnlyVector2, right: EcsMathReadOnlyVector2): Vector2;
+    multiply(otherVector: EcsMathReadOnlyVector2): Vector2;
     multiplyByFloats(x: number, y: number): Vector2;
-    multiplyInPlace(otherVector: ReadOnlyVector2_2): Vector2;
-    multiplyToRef(otherVector: ReadOnlyVector2_2, result: Vector2): Vector2;
+    multiplyInPlace(otherVector: EcsMathReadOnlyVector2): Vector2;
+    multiplyToRef(otherVector: EcsMathReadOnlyVector2, result: Vector2): Vector2;
     negate(): Vector2;
-    static Normalize(vector: ReadOnlyVector2_2): Vector2;
+    static Normalize(vector: EcsMathReadOnlyVector2): Vector2;
     normalize(): Vector2;
     static One(): Vector2;
-    static PointInTriangle(p: ReadOnlyVector2_2, p0: ReadOnlyVector2_2, p1: ReadOnlyVector2_2, p2: ReadOnlyVector2_2): boolean;
+    static PointInTriangle(p: EcsMathReadOnlyVector2, p0: EcsMathReadOnlyVector2, p1: EcsMathReadOnlyVector2, p2: EcsMathReadOnlyVector2): boolean;
     scale(scale: number): Vector2;
     scaleAndAddToRef(scale: number, result: Vector2): Vector2;
     scaleInPlace(scale: number): Vector2;
     scaleToRef(scale: number, result: Vector2): Vector2;
     set(x: number, y: number): Vector2;
-    subtract(otherVector: ReadOnlyVector2_2): Vector2;
-    subtractInPlace(otherVector: ReadOnlyVector2_2): Vector2;
-    subtractToRef(otherVector: ReadOnlyVector2_2, result: Vector2): Vector2;
+    subtract(otherVector: EcsMathReadOnlyVector2): Vector2;
+    subtractInPlace(otherVector: EcsMathReadOnlyVector2): Vector2;
+    subtractToRef(otherVector: EcsMathReadOnlyVector2, result: Vector2): Vector2;
     toArray(array: FloatArray, index?: number): Vector2;
     toString(): string;
     static Transform(vector: Vector2, transformation: Matrix): Vector2;
-    static TransformToRef(vector: ReadOnlyVector2_2, transformation: Matrix, result: Vector2): void;
+    static TransformToRef(vector: EcsMathReadOnlyVector2, transformation: Matrix, result: Vector2): void;
     x: number;
     y: number;
     static Zero(): Vector2;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ReadOnlyVector3" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "EcsMathReadOnlyVector3" needs to be exported by the entry point index.d.ts
 //
 // @public
-export class Vector3 implements ReadOnlyVector3_2 {
+export class Vector3 implements EcsMathReadOnlyVector3 {
     constructor(
     x?: number,
     y?: number,
     z?: number);
-    static Add(vector1: ReadOnlyVector3_2, vector2: ReadOnlyVector3_2): Vector3;
-    add(otherVector: ReadOnlyVector3_2): Vector3;
-    addInPlace(otherVector: ReadOnlyVector3_2): Vector3;
+    static Add(vector1: EcsMathReadOnlyVector3, vector2: EcsMathReadOnlyVector3): Vector3;
+    add(otherVector: EcsMathReadOnlyVector3): Vector3;
+    addInPlace(otherVector: EcsMathReadOnlyVector3): Vector3;
     addInPlaceFromFloats(x: number, y: number, z: number): Vector3;
-    addToRef(otherVector: ReadOnlyVector3_2, result: Vector3): Vector3;
+    addToRef(otherVector: EcsMathReadOnlyVector3, result: Vector3): Vector3;
     applyMatrix4(matrix: Matrix): void;
     applyMatrix4ToRef(matrix: Matrix, result: Vector3): Vector3;
     asArray(): number[];
     static Backward(): Vector3;
-    static CatmullRom(value1: ReadOnlyVector3_2, value2: ReadOnlyVector3_2, value3: ReadOnlyVector3_2, value4: ReadOnlyVector3_2, amount: number): Vector3;
-    static Center(value1: ReadOnlyVector3_2, value2: ReadOnlyVector3_2): Vector3;
-    static Clamp(value: ReadOnlyVector3_2, min: ReadOnlyVector3_2, max: ReadOnlyVector3_2): Vector3;
-    static ClampToRef(value: ReadOnlyVector3_2, min: ReadOnlyVector3_2, max: ReadOnlyVector3_2, result: Vector3): void;
+    static CatmullRom(value1: EcsMathReadOnlyVector3, value2: EcsMathReadOnlyVector3, value3: EcsMathReadOnlyVector3, value4: EcsMathReadOnlyVector3, amount: number): Vector3;
+    static Center(value1: EcsMathReadOnlyVector3, value2: EcsMathReadOnlyVector3): Vector3;
+    static Clamp(value: EcsMathReadOnlyVector3, min: EcsMathReadOnlyVector3, max: EcsMathReadOnlyVector3): Vector3;
+    static ClampToRef(value: EcsMathReadOnlyVector3, min: EcsMathReadOnlyVector3, max: EcsMathReadOnlyVector3, result: Vector3): void;
     clone(): Vector3;
-    copyFrom(source: ReadOnlyVector3_2): Vector3;
+    copyFrom(source: EcsMathReadOnlyVector3): Vector3;
     copyFromFloats(x: number, y: number, z: number): Vector3;
-    static Cross(left: ReadOnlyVector3_2, right: ReadOnlyVector3_2): Vector3;
-    static CrossToRef(left: ReadOnlyVector3_2, right: ReadOnlyVector3_2, result: Vector3): void;
-    static Distance(value1: ReadOnlyVector3_2, value2: ReadOnlyVector3_2): number;
-    static DistanceSquared(value1: ReadOnlyVector3_2, value2: ReadOnlyVector3_2): number;
-    divide(otherVector: ReadOnlyVector3_2): Vector3;
-    divideInPlace(otherVector: ReadOnlyVector3_2): Vector3;
-    divideToRef(otherVector: ReadOnlyVector3_2, result: Vector3): Vector3;
-    static Dot(left: ReadOnlyVector3_2, right: ReadOnlyVector3_2): number;
+    static Cross(left: EcsMathReadOnlyVector3, right: EcsMathReadOnlyVector3): Vector3;
+    static CrossToRef(left: EcsMathReadOnlyVector3, right: EcsMathReadOnlyVector3, result: Vector3): void;
+    static Distance(value1: EcsMathReadOnlyVector3, value2: EcsMathReadOnlyVector3): number;
+    static DistanceSquared(value1: EcsMathReadOnlyVector3, value2: EcsMathReadOnlyVector3): number;
+    divide(otherVector: EcsMathReadOnlyVector3): Vector3;
+    divideInPlace(otherVector: EcsMathReadOnlyVector3): Vector3;
+    divideToRef(otherVector: EcsMathReadOnlyVector3, result: Vector3): Vector3;
+    static Dot(left: EcsMathReadOnlyVector3, right: EcsMathReadOnlyVector3): number;
     static Down(): Vector3;
-    equals(otherVector: ReadOnlyVector3_2): boolean;
+    equals(otherVector: EcsMathReadOnlyVector3): boolean;
     equalsToFloats(x: number, y: number, z: number): boolean;
-    equalsWithEpsilon(otherVector: ReadOnlyVector3_2, epsilon?: number): boolean;
+    equalsWithEpsilon(otherVector: EcsMathReadOnlyVector3, epsilon?: number): boolean;
     floor(): Vector3;
     static Forward(): Vector3;
     fract(): Vector3;
@@ -2304,27 +2304,27 @@ export class Vector3 implements ReadOnlyVector3_2 {
     static FromFloatArray(array: FloatArray, offset?: number): Vector3;
     static FromFloatArrayToRef(array: FloatArray, offset: number, result: Vector3): void;
     static FromFloatsToRef(x: number, y: number, z: number, result: Vector3): void;
-    static GetAngleBetweenVectors(vector0: Vector3, vector1: Vector3, normal: ReadOnlyVector3_2): number;
+    static GetAngleBetweenVectors(vector0: Vector3, vector1: Vector3, normal: EcsMathReadOnlyVector3): number;
     getClassName(): string;
-    static GetClipFactor(vector0: ReadOnlyVector3_2, vector1: ReadOnlyVector3_2, axis: ReadOnlyVector3_2, size: number): number;
+    static GetClipFactor(vector0: EcsMathReadOnlyVector3, vector1: EcsMathReadOnlyVector3, axis: EcsMathReadOnlyVector3, size: number): number;
     getHashCode(): number;
-    static Hermite(value1: ReadOnlyVector3_2, tangent1: ReadOnlyVector3_2, value2: ReadOnlyVector3_2, tangent2: ReadOnlyVector3_2, amount: number): Vector3;
+    static Hermite(value1: EcsMathReadOnlyVector3, tangent1: EcsMathReadOnlyVector3, value2: EcsMathReadOnlyVector3, tangent2: EcsMathReadOnlyVector3, amount: number): Vector3;
     get isNonUniform(): boolean;
     static Left(): Vector3;
     length(): number;
     lengthSquared(): number;
-    static Lerp(start: ReadOnlyVector3_2, end: ReadOnlyVector3_2, amount: number): Vector3;
-    static LerpToRef(start: ReadOnlyVector3_2, end: ReadOnlyVector3_2, amount: number, result: Vector3): void;
+    static Lerp(start: EcsMathReadOnlyVector3, end: EcsMathReadOnlyVector3, amount: number): Vector3;
+    static LerpToRef(start: EcsMathReadOnlyVector3, end: EcsMathReadOnlyVector3, amount: number, result: Vector3): void;
     static Maximize(left: Vector3, right: Vector3): Vector3;
-    maximizeInPlace(other: ReadOnlyVector3_2): Vector3;
+    maximizeInPlace(other: EcsMathReadOnlyVector3): Vector3;
     maximizeInPlaceFromFloats(x: number, y: number, z: number): Vector3;
-    static Minimize(left: ReadOnlyVector3_2, right: ReadOnlyVector3_2): Vector3;
-    minimizeInPlace(other: ReadOnlyVector3_2): Vector3;
+    static Minimize(left: EcsMathReadOnlyVector3, right: EcsMathReadOnlyVector3): Vector3;
+    minimizeInPlace(other: EcsMathReadOnlyVector3): Vector3;
     minimizeInPlaceFromFloats(x: number, y: number, z: number): Vector3;
-    multiply(otherVector: ReadOnlyVector3_2): Vector3;
+    multiply(otherVector: EcsMathReadOnlyVector3): Vector3;
     multiplyByFloats(x: number, y: number, z: number): Vector3;
-    multiplyInPlace(otherVector: ReadOnlyVector3_2): Vector3;
-    multiplyToRef(otherVector: ReadOnlyVector3_2, result: Vector3): Vector3;
+    multiplyInPlace(otherVector: EcsMathReadOnlyVector3): Vector3;
+    multiplyToRef(otherVector: EcsMathReadOnlyVector3, result: Vector3): Vector3;
     negate(): Vector3;
     static Normalize(vector: Vector3): Vector3;
     normalize(): Vector3;
@@ -2344,20 +2344,20 @@ export class Vector3 implements ReadOnlyVector3_2 {
     scaleToRef(scale: number, result: Vector3): Vector3;
     set(x: number, y: number, z: number): Vector3;
     setAll(v: number): Vector3;
-    subtract(otherVector: ReadOnlyVector3_2): Vector3;
+    subtract(otherVector: EcsMathReadOnlyVector3): Vector3;
     subtractFromFloats(x: number, y: number, z: number): Vector3;
     subtractFromFloatsToRef(x: number, y: number, z: number, result: Vector3): Vector3;
-    subtractInPlace(otherVector: ReadOnlyVector3_2): Vector3;
-    subtractToRef(otherVector: ReadOnlyVector3_2, result: Vector3): Vector3;
+    subtractInPlace(otherVector: EcsMathReadOnlyVector3): Vector3;
+    subtractToRef(otherVector: EcsMathReadOnlyVector3, result: Vector3): Vector3;
     toArray(array: FloatArray, index?: number): Vector3;
     toQuaternion(): Quaternion;
     toString(): string;
-    static TransformCoordinates(vector: ReadOnlyVector3_2, transformation: Matrix): Vector3;
+    static TransformCoordinates(vector: EcsMathReadOnlyVector3, transformation: Matrix): Vector3;
     static TransformCoordinatesFromFloatsToRef(x: number, y: number, z: number, transformation: Readonly<Matrix>, result: Vector3): void;
-    static TransformCoordinatesToRef(vector: ReadOnlyVector3_2, transformation: Readonly<Matrix>, result: Vector3): void;
-    static TransformNormal(vector: ReadOnlyVector3_2, transformation: Matrix): Vector3;
+    static TransformCoordinatesToRef(vector: EcsMathReadOnlyVector3, transformation: Readonly<Matrix>, result: Vector3): void;
+    static TransformNormal(vector: EcsMathReadOnlyVector3, transformation: Matrix): Vector3;
     static TransformNormalFromFloatsToRef(x: number, y: number, z: number, transformation: Readonly<Matrix>, result: Vector3): void;
-    static TransformNormalToRef(vector: ReadOnlyVector3_2, transformation: Readonly<Matrix>, result: Vector3): void;
+    static TransformNormalToRef(vector: EcsMathReadOnlyVector3, transformation: Readonly<Matrix>, result: Vector3): void;
     static Up(): Vector3;
     x: number;
     y: number;
@@ -2365,32 +2365,32 @@ export class Vector3 implements ReadOnlyVector3_2 {
     static Zero(): Vector3;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ReadOnlyVector4" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "EcsMathReadOnlyVector4" needs to be exported by the entry point index.d.ts
 //
 // @public
-export class Vector4 implements ReadOnlyVector4_2 {
+export class Vector4 implements EcsMathReadOnlyVector4 {
     constructor(
     x: number,
     y: number,
     z: number,
     w: number);
-    static Add(vector1: ReadOnlyVector4_2, vector2: ReadOnlyVector4_2): Vector4;
-    add(otherVector: ReadOnlyVector4_2): Vector4;
-    addInPlace(otherVector: ReadOnlyVector4_2): Vector4;
-    addToRef(otherVector: ReadOnlyVector4_2, result: Vector4): Vector4;
+    static Add(vector1: EcsMathReadOnlyVector4, vector2: EcsMathReadOnlyVector4): Vector4;
+    add(otherVector: EcsMathReadOnlyVector4): Vector4;
+    addInPlace(otherVector: EcsMathReadOnlyVector4): Vector4;
+    addToRef(otherVector: EcsMathReadOnlyVector4, result: Vector4): Vector4;
     asArray(): number[];
-    static Center(value1: ReadOnlyVector4_2, value2: ReadOnlyVector4_2): Vector4;
+    static Center(value1: EcsMathReadOnlyVector4, value2: EcsMathReadOnlyVector4): Vector4;
     clone(): Vector4;
-    copyFrom(source: ReadOnlyVector4_2): Vector4;
+    copyFrom(source: EcsMathReadOnlyVector4): Vector4;
     copyFromFloats(x: number, y: number, z: number, w: number): Vector4;
-    static Distance(value1: ReadOnlyVector4_2, value2: ReadOnlyVector4_2): number;
-    static DistanceSquared(value1: ReadOnlyVector4_2, value2: ReadOnlyVector4_2): number;
-    divide(otherVector: ReadOnlyVector4_2): Vector4;
-    divideInPlace(otherVector: ReadOnlyVector4_2): Vector4;
-    divideToRef(otherVector: ReadOnlyVector4_2, result: Vector4): Vector4;
-    equals(otherVector: ReadOnlyVector4_2): boolean;
+    static Distance(value1: EcsMathReadOnlyVector4, value2: EcsMathReadOnlyVector4): number;
+    static DistanceSquared(value1: EcsMathReadOnlyVector4, value2: EcsMathReadOnlyVector4): number;
+    divide(otherVector: EcsMathReadOnlyVector4): Vector4;
+    divideInPlace(otherVector: EcsMathReadOnlyVector4): Vector4;
+    divideToRef(otherVector: EcsMathReadOnlyVector4, result: Vector4): Vector4;
+    equals(otherVector: EcsMathReadOnlyVector4): boolean;
     equalsToFloats(x: number, y: number, z: number, w: number): boolean;
-    equalsWithEpsilon(otherVector: ReadOnlyVector4_2, epsilon?: number): boolean;
+    equalsWithEpsilon(otherVector: EcsMathReadOnlyVector4, epsilon?: number): boolean;
     floor(): Vector4;
     fract(): Vector4;
     static FromArray(array: ArrayLike<number>, offset?: number): Vector4;
@@ -2401,18 +2401,18 @@ export class Vector4 implements ReadOnlyVector4_2 {
     getHashCode(): number;
     length(): number;
     lengthSquared(): number;
-    static Maximize(left: ReadOnlyVector4_2, right: ReadOnlyVector4_2): Vector4;
-    maximizeInPlace(other: ReadOnlyVector4_2): Vector4;
-    static Minimize(left: ReadOnlyVector4_2, right: ReadOnlyVector4_2): Vector4;
-    minimizeInPlace(other: ReadOnlyVector4_2): Vector4;
-    multiply(otherVector: ReadOnlyVector4_2): Vector4;
+    static Maximize(left: EcsMathReadOnlyVector4, right: EcsMathReadOnlyVector4): Vector4;
+    maximizeInPlace(other: EcsMathReadOnlyVector4): Vector4;
+    static Minimize(left: EcsMathReadOnlyVector4, right: EcsMathReadOnlyVector4): Vector4;
+    minimizeInPlace(other: EcsMathReadOnlyVector4): Vector4;
+    multiply(otherVector: EcsMathReadOnlyVector4): Vector4;
     multiplyByFloats(x: number, y: number, z: number, w: number): Vector4;
-    multiplyInPlace(otherVector: ReadOnlyVector4_2): Vector4;
-    multiplyToRef(otherVector: ReadOnlyVector4_2, result: Vector4): Vector4;
+    multiplyInPlace(otherVector: EcsMathReadOnlyVector4): Vector4;
+    multiplyToRef(otherVector: EcsMathReadOnlyVector4, result: Vector4): Vector4;
     negate(): Vector4;
-    static Normalize(vector: ReadOnlyVector4_2): Vector4;
+    static Normalize(vector: EcsMathReadOnlyVector4): Vector4;
     normalize(): Vector4;
-    static NormalizeToRef(vector: ReadOnlyVector4_2, result: Vector4): void;
+    static NormalizeToRef(vector: EcsMathReadOnlyVector4, result: Vector4): void;
     static One(): Vector4;
     scale(scale: number): Vector4;
     scaleAndAddToRef(scale: number, result: Vector4): Vector4;
@@ -2420,17 +2420,17 @@ export class Vector4 implements ReadOnlyVector4_2 {
     scaleToRef(scale: number, result: Vector4): Vector4;
     set(x: number, y: number, z: number, w: number): Vector4;
     setAll(v: number): Vector4;
-    subtract(otherVector: ReadOnlyVector4_2): Vector4;
+    subtract(otherVector: EcsMathReadOnlyVector4): Vector4;
     subtractFromFloats(x: number, y: number, z: number, w: number): Vector4;
     subtractFromFloatsToRef(x: number, y: number, z: number, w: number, result: Vector4): Vector4;
-    subtractInPlace(otherVector: ReadOnlyVector4_2): Vector4;
-    subtractToRef(otherVector: ReadOnlyVector4_2, result: Vector4): Vector4;
+    subtractInPlace(otherVector: EcsMathReadOnlyVector4): Vector4;
+    subtractToRef(otherVector: EcsMathReadOnlyVector4, result: Vector4): Vector4;
     toArray(array: FloatArray, index?: number): Vector4;
     toString(): string;
     toVector3(): Vector3;
-    static TransformNormal(vector: ReadOnlyVector4_2, transformation: Matrix): Vector4;
+    static TransformNormal(vector: EcsMathReadOnlyVector4, transformation: Matrix): Vector4;
     static TransformNormalFromFloatsToRef(x: number, y: number, z: number, w: number, transformation: Matrix, result: Vector4): void;
-    static TransformNormalToRef(vector: ReadOnlyVector4_2, transformation: Matrix, result: Vector4): void;
+    static TransformNormalToRef(vector: EcsMathReadOnlyVector4, transformation: Matrix, result: Vector4): void;
     w: number;
     x: number;
     y: number;

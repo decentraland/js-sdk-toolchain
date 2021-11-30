@@ -33367,8 +33367,8 @@
             },
             {
               "kind": "Reference",
-              "text": "ReadOnlyQuaternion",
-              "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+              "text": "EcsMathReadOnlyQuaternion",
+              "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
             },
             {
               "kind": "Content",
@@ -33464,8 +33464,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -33473,8 +33473,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -33588,8 +33588,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -33597,8 +33597,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -33816,8 +33816,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -33954,8 +33954,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -33963,8 +33963,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -34016,8 +34016,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -34629,8 +34629,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -34638,8 +34638,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -34647,8 +34647,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -34656,8 +34656,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -34814,8 +34814,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -34977,8 +34977,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -35024,8 +35024,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -35071,8 +35071,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -35192,8 +35192,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -36378,8 +36378,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -36387,8 +36387,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -36456,8 +36456,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -36465,8 +36465,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyQuaternion",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyQuaternion:type"
+                  "text": "EcsMathReadOnlyQuaternion",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyQuaternion:type"
                 },
                 {
                   "kind": "Content",
@@ -45460,8 +45460,8 @@
             },
             {
               "kind": "Reference",
-              "text": "ReadOnlyVector2",
-              "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+              "text": "EcsMathReadOnlyVector2",
+              "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
             },
             {
               "kind": "Content",
@@ -45527,8 +45527,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -45574,8 +45574,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -45583,8 +45583,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -45637,8 +45637,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -45684,8 +45684,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -45747,8 +45747,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -45823,8 +45823,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -45832,8 +45832,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -45841,8 +45841,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -45850,8 +45850,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -45933,8 +45933,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -45942,8 +45942,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -45996,8 +45996,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -46005,8 +46005,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -46014,8 +46014,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -46105,8 +46105,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -46353,8 +46353,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -46362,8 +46362,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -46415,8 +46415,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -46462,8 +46462,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -46509,8 +46509,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -46572,8 +46572,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -46581,8 +46581,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -46634,8 +46634,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -46680,8 +46680,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47006,8 +47006,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47015,8 +47015,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47024,8 +47024,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47033,8 +47033,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47174,8 +47174,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47183,8 +47183,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47252,8 +47252,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47261,8 +47261,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47315,8 +47315,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47324,8 +47324,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47378,8 +47378,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47486,8 +47486,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47533,8 +47533,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47656,8 +47656,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47733,8 +47733,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47742,8 +47742,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47751,8 +47751,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -47760,8 +47760,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -48104,8 +48104,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -48151,8 +48151,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -48198,8 +48198,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -48415,8 +48415,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector2",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector2:type"
+                  "text": "EcsMathReadOnlyVector2",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector2:type"
                 },
                 {
                   "kind": "Content",
@@ -48585,8 +48585,8 @@
             },
             {
               "kind": "Reference",
-              "text": "ReadOnlyVector3",
-              "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+              "text": "EcsMathReadOnlyVector3",
+              "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
             },
             {
               "kind": "Content",
@@ -48667,8 +48667,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -48714,8 +48714,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -48723,8 +48723,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -48777,8 +48777,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -48900,8 +48900,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49131,8 +49131,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49140,8 +49140,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49149,8 +49149,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49158,8 +49158,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49241,8 +49241,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49250,8 +49250,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49304,8 +49304,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49313,8 +49313,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49322,8 +49322,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49383,8 +49383,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49392,8 +49392,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49401,8 +49401,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49507,8 +49507,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49630,8 +49630,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49639,8 +49639,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49693,8 +49693,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49702,8 +49702,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49771,8 +49771,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49780,8 +49780,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49833,8 +49833,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49842,8 +49842,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49895,8 +49895,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49942,8 +49942,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -49989,8 +49989,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -50052,8 +50052,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -50061,8 +50061,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -50144,8 +50144,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -50265,8 +50265,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -50811,8 +50811,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -50900,8 +50900,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -50909,8 +50909,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -50918,8 +50918,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -51022,8 +51022,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -51031,8 +51031,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -51040,8 +51040,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -51049,8 +51049,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -51247,8 +51247,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -51256,8 +51256,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -51325,8 +51325,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -51334,8 +51334,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -51481,8 +51481,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -51604,8 +51604,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -51613,8 +51613,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -51667,8 +51667,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -51790,8 +51790,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -51913,8 +51913,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -51960,8 +51960,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -52996,8 +52996,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -53211,8 +53211,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -53258,8 +53258,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -53442,8 +53442,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -53625,8 +53625,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -53716,8 +53716,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -53899,8 +53899,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector3",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector3:type"
+                  "text": "EcsMathReadOnlyVector3",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector3:type"
                 },
                 {
                   "kind": "Content",
@@ -54139,8 +54139,8 @@
             },
             {
               "kind": "Reference",
-              "text": "ReadOnlyVector4",
-              "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+              "text": "EcsMathReadOnlyVector4",
+              "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
             },
             {
               "kind": "Content",
@@ -54236,8 +54236,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -54283,8 +54283,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -54292,8 +54292,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -54346,8 +54346,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -54393,8 +54393,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -54485,8 +54485,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -54494,8 +54494,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -54578,8 +54578,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -54716,8 +54716,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -54725,8 +54725,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -54778,8 +54778,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -54787,8 +54787,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -54840,8 +54840,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -54887,8 +54887,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -54934,8 +54934,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -54997,8 +54997,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -55133,8 +55133,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -55700,8 +55700,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -55709,8 +55709,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -55763,8 +55763,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -55810,8 +55810,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -55819,8 +55819,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -55873,8 +55873,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -55920,8 +55920,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -56058,8 +56058,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -56105,8 +56105,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -56228,8 +56228,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -56275,8 +56275,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -56720,8 +56720,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -56965,8 +56965,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -57012,8 +57012,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -57196,8 +57196,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
@@ -57381,8 +57381,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadOnlyVector4",
-                  "canonicalReference": "decentraland-ecs!~ReadOnlyVector4:type"
+                  "text": "EcsMathReadOnlyVector4",
+                  "canonicalReference": "decentraland-ecs!EcsMathReadOnlyVector4:type"
                 },
                 {
                   "kind": "Content",
