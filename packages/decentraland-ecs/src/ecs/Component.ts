@@ -270,7 +270,9 @@ export type ObservableComponentSubscription = (key: string, newVal: any, oldVal:
  * @public
  */
 export class ObservableComponent {
+  // @internal
   dirty: boolean = false
+  // @internal
   data: any = {}
   private subscriptions: Array<ObservableComponentSubscription> = []
 

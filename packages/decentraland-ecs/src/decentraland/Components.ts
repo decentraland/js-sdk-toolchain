@@ -881,8 +881,10 @@ export class BasicMaterial extends ObservableComponent {
  * @public
  */
 export class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
+  // @internal
   readonly type: string | undefined
 
+  // @internal
   readonly uuid: string = newId('UUID')
 
   @ObservableComponent.field
