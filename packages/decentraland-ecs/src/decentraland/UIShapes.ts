@@ -276,13 +276,7 @@ export class UIInputText extends UIShape {
   color: Color4 = Color4.Clear()
 
   @ObservableComponent.field
-  thickness: number = 1
-
-  @ObservableComponent.field
   fontSize: number = 10
-
-  @ObservableComponent.field
-  fontWeight: string = 'normal'
 
   @ObservableComponent.component
   font?: Font
@@ -291,28 +285,16 @@ export class UIInputText extends UIShape {
   value: string = ''
 
   @ObservableComponent.field
-  placeholderColor: Color4 = Color4.White()
-
-  @ObservableComponent.field
   placeholder: string = ''
 
   @ObservableComponent.field
   margin: number = 10
 
   @ObservableComponent.field
-  maxWidth: number = 100
-
-  @ObservableComponent.field
   hTextAlign: string = 'left'
 
   @ObservableComponent.field
   vTextAlign: string = 'bottom'
-
-  @ObservableComponent.field
-  autoStretchWidth: boolean = true
-
-  @ObservableComponent.field
-  background: Color4 = Color4.Black()
 
   @ObservableComponent.field
   focusedBackground: Color4 = Color4.Black()
