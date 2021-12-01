@@ -99,7 +99,7 @@ export type OnPointerUUIDEventOptions = {
 }
 
 /**
- * @public
+ * @public @deprecated use `OnPointerDown` instead
  */
 @Component('engine.onClick', CLASS_ID.UUID_CALLBACK)
 export class OnClick extends OnPointerUUIDEvent<'onClick'> {
