@@ -18,6 +18,14 @@ const serveWearable = ({
   const assetJson = require(assetJsonPath)
   
   if (!sdk.AssetJson.validate(assetJson)) {
+    const errors = (sdk.AssetJson.validate.errors || [])
+      .map((a) => `${a.dataPath} ${a.message}`)
+      .join('')
+      
+    console.error(
+      `Unable to validate asset.json properly, please check it.`,
+      errors
+    )
     throw new Error(`Invalid asset.json (${assetJsonPath})`)
   }
 
