@@ -646,9 +646,6 @@ export class TextShape extends ObservableComponent {
   @ObservableComponent.field
   fontSize: number = 10
 
-  @ObservableComponent.field
-  fontWeight: string = 'normal'
-
   @ObservableComponent.component
   font?: Font
 
@@ -665,9 +662,6 @@ export class TextShape extends ObservableComponent {
   lineCount: number = 0
 
   @ObservableComponent.field
-  resizeToFit: boolean = false
-
-  @ObservableComponent.field
   textWrapping: boolean = false
 
   @ObservableComponent.field
@@ -681,9 +675,6 @@ export class TextShape extends ObservableComponent {
 
   @ObservableComponent.field
   shadowColor: Color3 = new Color3(1, 1, 1)
-
-  @ObservableComponent.field
-  zIndex: number = 0
 
   @ObservableComponent.field
   hTextAlign: string = 'center'
@@ -708,9 +699,6 @@ export class TextShape extends ObservableComponent {
 
   @ObservableComponent.field
   paddingLeft: number = 0
-
-  @ObservableComponent.field
-  isPickable: boolean = false
 
   @ObservableComponent.field
   billboard: boolean = false
@@ -781,20 +769,6 @@ export class Material extends ObservableComponent {
   roughness?: number
 
   /**
-   * AKA Diffuse Color in other nomenclature.
-   * Defaults to black.
-   */
-  @ObservableComponent.field
-  ambientColor?: Color3
-
-  /**
-   * The color reflected from the material.
-   * Defaults to white.
-   */
-  @ObservableComponent.field
-  reflectionColor?: Color3
-
-  /**
    * AKA Specular Color in other nomenclature.
    * Defaults to white.
    */
@@ -823,14 +797,6 @@ export class Material extends ObservableComponent {
    */
   @ObservableComponent.field
   emissiveIntensity?: number
-
-  /**
-   * Intensity of the environment e.g. how much the environment will light the object
-   * either through harmonics for rough material or through the refelction for shiny ones.
-   * Defaults to 1.
-   */
-  @ObservableComponent.field
-  environmentIntensity?: number
 
   /**
    * This is a special control allowing the reduction of the specular highlights coming from the
@@ -863,12 +829,6 @@ export class Material extends ObservableComponent {
    */
   @ObservableComponent.component
   bumpTexture?: Texture
-
-  /**
-   * Stores the refracted light information in a texture.
-   */
-  @ObservableComponent.component
-  refractionTexture?: Texture
 
   /**
    * Allow the material to cast shadows over other objects
@@ -921,8 +881,10 @@ export class BasicMaterial extends ObservableComponent {
  * @public
  */
 export class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
+  // @internal
   readonly type: string | undefined
 
+  // @internal
   readonly uuid: string = newId('UUID')
 
   @ObservableComponent.field
@@ -1168,14 +1130,14 @@ export class VideoTexture extends ObservableComponent {
   }
 
   get position() {
-    return this._position 
+    return this._position
   }
 
   get videoLength() {
-    return this._videoLength 
+    return this._videoLength
   }
 
   get status() {
-    return this._status 
+    return this._status
   }
 }

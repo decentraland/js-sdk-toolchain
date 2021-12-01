@@ -97,12 +97,6 @@ export class UICanvas extends UIShape {
 @DisposableComponent('engine.shape', CLASS_ID.UI_CONTAINER_RECT)
 export class UIContainerRect extends UIShape {
   @ObservableComponent.field
-  adaptWidth: boolean = false
-
-  @ObservableComponent.field
-  adaptHeight: boolean = false
-
-  @ObservableComponent.field
   thickness: number = 0
 
   @ObservableComponent.field
@@ -212,9 +206,6 @@ export class UIText extends UIShape {
   @ObservableComponent.field
   fontAutoSize: boolean = false
 
-  @ObservableComponent.field
-  fontWeight: string = 'normal'
-
   @ObservableComponent.component
   font?: Font
 
@@ -282,13 +273,7 @@ export class UIInputText extends UIShape {
   color: Color4 = Color4.Clear()
 
   @ObservableComponent.field
-  thickness: number = 1
-
-  @ObservableComponent.field
   fontSize: number = 10
-
-  @ObservableComponent.field
-  fontWeight: string = 'normal'
 
   @ObservableComponent.component
   font?: Font
@@ -297,28 +282,16 @@ export class UIInputText extends UIShape {
   value: string = ''
 
   @ObservableComponent.field
-  placeholderColor: Color4 = Color4.White()
-
-  @ObservableComponent.field
   placeholder: string = ''
 
   @ObservableComponent.field
   margin: number = 10
 
   @ObservableComponent.field
-  maxWidth: number = 100
-
-  @ObservableComponent.field
   hTextAlign: string = 'left'
 
   @ObservableComponent.field
   vTextAlign: string = 'bottom'
-
-  @ObservableComponent.field
-  autoStretchWidth: boolean = true
-
-  @ObservableComponent.field
-  background: Color4 = Color4.Black()
 
   @ObservableComponent.field
   focusedBackground: Color4 = Color4.Black()
@@ -441,9 +414,6 @@ export class UIScrollRect extends UIShape {
 
   @ObservableComponent.field
   valueY: number = 0
-
-  @ObservableComponent.field
-  borderColor: Color4 = Color4.White()
 
   @ObservableComponent.field
   backgroundColor: Color4 = Color4.Clear()

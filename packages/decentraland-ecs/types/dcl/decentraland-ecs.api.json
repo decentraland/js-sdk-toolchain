@@ -18383,34 +18383,6 @@
             },
             {
               "kind": "Property",
-              "canonicalReference": "decentraland-ecs!Material#ambientColor:member",
-              "docComment": "/**\n * AKA Diffuse Color in other nomenclature. Defaults to black.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "ambientColor?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Color3",
-                  "canonicalReference": "decentraland-ecs!Color3:class"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "ambientColor",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
               "canonicalReference": "decentraland-ecs!Material#bumpTexture:member",
               "docComment": "/**\n * Stores surface normal data used to displace a mesh in a texture.\n */\n",
               "excerptTokens": [
@@ -18585,33 +18557,6 @@
             },
             {
               "kind": "Property",
-              "canonicalReference": "decentraland-ecs!Material#environmentIntensity:member",
-              "docComment": "/**\n * Intensity of the environment e.g. how much the environment will light the object either through harmonics for rough material or through the refelction for shiny ones. Defaults to 1.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "environmentIntensity?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "number"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "environmentIntensity",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
               "canonicalReference": "decentraland-ecs!Material#metallic:member",
               "docComment": "/**\n * Specifies the metallic scalar of the metallic/roughness workflow. Can also be used to scale the metalness values of the metallic texture. Defaults to 0.5.\n */\n",
               "excerptTokens": [
@@ -18666,34 +18611,6 @@
             },
             {
               "kind": "Property",
-              "canonicalReference": "decentraland-ecs!Material#reflectionColor:member",
-              "docComment": "/**\n * The color reflected from the material. Defaults to white.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "reflectionColor?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Color3",
-                  "canonicalReference": "decentraland-ecs!Color3:class"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "reflectionColor",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
               "canonicalReference": "decentraland-ecs!Material#reflectivityColor:member",
               "docComment": "/**\n * AKA Specular Color in other nomenclature. Defaults to white.\n */\n",
               "excerptTokens": [
@@ -18714,34 +18631,6 @@
               "isOptional": true,
               "releaseTag": "Public",
               "name": "reflectivityColor",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "decentraland-ecs!Material#refractionTexture:member",
-              "docComment": "/**\n * Stores the refracted light information in a texture.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "refractionTexture?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Texture",
-                  "canonicalReference": "decentraland-ecs!Texture:class"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "refractionTexture",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -27224,60 +27113,6 @@
               "name": "component"
             },
             {
-              "kind": "Property",
-              "canonicalReference": "decentraland-ecs!ObservableComponent#data:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "data: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "any"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "data",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "decentraland-ecs!ObservableComponent#dirty:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "dirty: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "dirty",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
               "kind": "Method",
               "canonicalReference": "decentraland-ecs!ObservableComponent.field:member(1)",
               "docComment": "",
@@ -28397,7 +28232,7 @@
         {
           "kind": "Class",
           "canonicalReference": "decentraland-ecs!OnClick:class",
-          "docComment": "/**\n * @public\n */\n",
+          "docComment": "/**\n * @deprecated\n *\n * use `OnPointerDown` instead\n *\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -29875,60 +29710,6 @@
               "overloadIndex": 1,
               "parameters": [],
               "name": "toJSON"
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "decentraland-ecs!OnUUIDEvent#type:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly type: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string | undefined"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "type",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "decentraland-ecs!OnUUIDEvent#uuid:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly uuid: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "uuid",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
             },
             {
               "kind": "Method",
@@ -40579,33 +40360,6 @@
             },
             {
               "kind": "Property",
-              "canonicalReference": "decentraland-ecs!TextShape#fontWeight:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "fontWeight: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "fontWeight",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
               "canonicalReference": "decentraland-ecs!TextShape#height:member",
               "docComment": "",
               "excerptTokens": [
@@ -40652,33 +40406,6 @@
               "isOptional": false,
               "releaseTag": "Public",
               "name": "hTextAlign",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "decentraland-ecs!TextShape#isPickable:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "isPickable: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "isPickable",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -40931,33 +40658,6 @@
             },
             {
               "kind": "Property",
-              "canonicalReference": "decentraland-ecs!TextShape#resizeToFit:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "resizeToFit: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "resizeToFit",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
               "canonicalReference": "decentraland-ecs!TextShape#shadowBlur:member",
               "docComment": "",
               "excerptTokens": [
@@ -41194,33 +40894,6 @@
               "isOptional": false,
               "releaseTag": "Public",
               "name": "width",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "decentraland-ecs!TextShape#zIndex:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "zIndex: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "number"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "zIndex",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -42520,60 +42193,6 @@
           "members": [
             {
               "kind": "Property",
-              "canonicalReference": "decentraland-ecs!UIContainerRect#adaptHeight:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "adaptHeight: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "adaptHeight",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "decentraland-ecs!UIContainerRect#adaptWidth:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "adaptWidth: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "adaptWidth",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
               "canonicalReference": "decentraland-ecs!UIContainerRect#alignmentUsesSize:member",
               "docComment": "",
               "excerptTokens": [
@@ -43266,61 +42885,6 @@
             },
             {
               "kind": "Property",
-              "canonicalReference": "decentraland-ecs!UIInputText#autoStretchWidth:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "autoStretchWidth: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "autoStretchWidth",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "decentraland-ecs!UIInputText#background:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "background: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Color4",
-                  "canonicalReference": "decentraland-ecs!Color4:class"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "background",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
               "canonicalReference": "decentraland-ecs!UIInputText#color:member",
               "docComment": "",
               "excerptTokens": [
@@ -43432,33 +42996,6 @@
             },
             {
               "kind": "Property",
-              "canonicalReference": "decentraland-ecs!UIInputText#fontWeight:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "fontWeight: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "fontWeight",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
               "canonicalReference": "decentraland-ecs!UIInputText#hTextAlign:member",
               "docComment": "",
               "excerptTokens": [
@@ -43505,33 +43042,6 @@
               "isOptional": false,
               "releaseTag": "Public",
               "name": "margin",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "decentraland-ecs!UIInputText#maxWidth:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "maxWidth: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "number"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "maxWidth",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -43858,34 +43368,6 @@
             },
             {
               "kind": "Property",
-              "canonicalReference": "decentraland-ecs!UIInputText#placeholderColor:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "placeholderColor: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Color4",
-                  "canonicalReference": "decentraland-ecs!Color4:class"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "placeholderColor",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
               "canonicalReference": "decentraland-ecs!UIInputText#shadowBlur:member",
               "docComment": "",
               "excerptTokens": [
@@ -44022,33 +43504,6 @@
             },
             {
               "kind": "Property",
-              "canonicalReference": "decentraland-ecs!UIInputText#thickness:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "thickness: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "number"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "thickness",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
               "canonicalReference": "decentraland-ecs!UIInputText#value:member",
               "docComment": "",
               "excerptTokens": [
@@ -44152,34 +43607,6 @@
               "isOptional": false,
               "releaseTag": "Public",
               "name": "backgroundColor",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "decentraland-ecs!UIScrollRect#borderColor:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "borderColor: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Color4",
-                  "canonicalReference": "decentraland-ecs!Color4:class"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "borderColor",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -45044,33 +44471,6 @@
               "isOptional": false,
               "releaseTag": "Public",
               "name": "fontSize",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "decentraland-ecs!UIText#fontWeight:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "fontWeight: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "fontWeight",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
