@@ -206,9 +206,6 @@ export class UIText extends UIShape {
   @ObservableComponent.field
   fontAutoSize: boolean = false
 
-  @ObservableComponent.field
-  fontWeight: string = 'normal'
-
   @ObservableComponent.component
   font?: Font
 
