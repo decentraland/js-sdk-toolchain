@@ -769,20 +769,6 @@ export class Material extends ObservableComponent {
   roughness?: number
 
   /**
-   * AKA Diffuse Color in other nomenclature.
-   * Defaults to black.
-   */
-  @ObservableComponent.field
-  ambientColor?: Color3
-
-  /**
-   * The color reflected from the material.
-   * Defaults to white.
-   */
-  @ObservableComponent.field
-  reflectionColor?: Color3
-
-  /**
    * AKA Specular Color in other nomenclature.
    * Defaults to white.
    */
@@ -811,14 +797,6 @@ export class Material extends ObservableComponent {
    */
   @ObservableComponent.field
   emissiveIntensity?: number
-
-  /**
-   * Intensity of the environment e.g. how much the environment will light the object
-   * either through harmonics for rough material or through the refelction for shiny ones.
-   * Defaults to 1.
-   */
-  @ObservableComponent.field
-  environmentIntensity?: number
 
   /**
    * This is a special control allowing the reduction of the specular highlights coming from the
@@ -851,12 +829,6 @@ export class Material extends ObservableComponent {
    */
   @ObservableComponent.component
   bumpTexture?: Texture
-
-  /**
-   * Stores the refracted light information in a texture.
-   */
-  @ObservableComponent.component
-  refractionTexture?: Texture
 
   /**
    * Allow the material to cast shadows over other objects
