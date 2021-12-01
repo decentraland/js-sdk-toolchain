@@ -419,9 +419,6 @@ export class UIScrollRect extends UIShape {
   valueY: number = 0
 
   @ObservableComponent.field
-  borderColor: Color4 = Color4.White()
-
-  @ObservableComponent.field
   backgroundColor: Color4 = Color4.Clear()
 
   @ObservableComponent.field
