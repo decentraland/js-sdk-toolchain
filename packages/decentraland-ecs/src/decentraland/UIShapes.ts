@@ -97,12 +97,6 @@ export class UICanvas extends UIShape {
 @DisposableComponent('engine.shape', CLASS_ID.UI_CONTAINER_RECT)
 export class UIContainerRect extends UIShape {
   @ObservableComponent.field
-  adaptWidth: boolean = false
-
-  @ObservableComponent.field
-  adaptHeight: boolean = false
-
-  @ObservableComponent.field
   thickness: number = 0
 
   @ObservableComponent.field
