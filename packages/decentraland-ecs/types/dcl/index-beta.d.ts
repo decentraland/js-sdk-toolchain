@@ -1861,16 +1861,6 @@ export declare class Material extends ObservableComponent {
      */
     roughness?: number;
     /**
-     * AKA Diffuse Color in other nomenclature.
-     * Defaults to black.
-     */
-    ambientColor?: Color3;
-    /**
-     * The color reflected from the material.
-     * Defaults to white.
-     */
-    reflectionColor?: Color3;
-    /**
      * AKA Specular Color in other nomenclature.
      * Defaults to white.
      */
@@ -1893,12 +1883,6 @@ export declare class Material extends ObservableComponent {
      */
     emissiveIntensity?: number;
     /**
-     * Intensity of the environment e.g. how much the environment will light the object
-     * either through harmonics for rough material or through the refelction for shiny ones.
-     * Defaults to 1.
-     */
-    environmentIntensity?: number;
-    /**
      * This is a special control allowing the reduction of the specular highlights coming from the
      * four lights of the scene. Those highlights may not be needed in full environment lighting.
      * Defaults to 1.
@@ -1920,10 +1904,6 @@ export declare class Material extends ObservableComponent {
      * Stores surface normal data used to displace a mesh in a texture.
      */
     bumpTexture?: Texture;
-    /**
-     * Stores the refracted light information in a texture.
-     */
-    refractionTexture?: Texture;
     /**
      * Allow the material to cast shadows over other objects
      */
@@ -2859,8 +2839,6 @@ export declare class Observable<T> {
  * @public
  */
 export declare class ObservableComponent {
-    dirty: boolean;
-    data: any;
     private subscriptions;
     static component(target: ObservableComponent, propertyKey: string): void;
     static field(target: ObservableComponent, propertyKey: string): void;
@@ -2994,7 +2972,7 @@ export declare class OnChanged extends OnUUIDEvent<'onChange'> {
 }
 
 /**
- * @public
+ * @public @deprecated use `OnPointerDown` instead
  */
 export declare class OnClick extends OnPointerUUIDEvent<'onClick'> {
     readonly type: string;
@@ -3170,8 +3148,6 @@ export declare class OnTextSubmit extends OnUUIDEvent<'onTextSubmit'> {
  * @public
  */
 export declare class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
-    readonly type: string | undefined;
-    readonly uuid: string;
     callback: (event: any) => void;
     constructor(callback: (event: IEvents[T]) => void);
     static uuidEvent(target: ObservableComponent, propertyKey: string): void;
@@ -4412,19 +4388,16 @@ export declare class TextShape extends ObservableComponent {
     outlineColor: Color3;
     color: Color3;
     fontSize: number;
-    fontWeight: string;
     font?: Font;
     opacity: number;
     value: string;
     lineSpacing: string;
     lineCount: number;
-    resizeToFit: boolean;
     textWrapping: boolean;
     shadowBlur: number;
     shadowOffsetX: number;
     shadowOffsetY: number;
     shadowColor: Color3;
-    zIndex: number;
     hTextAlign: string;
     vTextAlign: string;
     width: number;
@@ -4433,7 +4406,6 @@ export declare class TextShape extends ObservableComponent {
     paddingRight: number;
     paddingBottom: number;
     paddingLeft: number;
-    isPickable: boolean;
     billboard: boolean;
     visible: boolean;
     constructor(value?: string);
@@ -4564,8 +4536,6 @@ export declare class UICanvas extends UIShape {
  * @public
  */
 export declare class UIContainerRect extends UIShape {
-    adaptWidth: boolean;
-    adaptHeight: boolean;
     thickness: number;
     color: Color4;
     alignmentUsesSize: boolean;
@@ -4607,19 +4577,13 @@ export declare class UIInputText extends UIShape {
     outlineWidth: number;
     outlineColor: Color4;
     color: Color4;
-    thickness: number;
     fontSize: number;
-    fontWeight: string;
     font?: Font;
     value: string;
-    placeholderColor: Color4;
     placeholder: string;
     margin: number;
-    maxWidth: number;
     hTextAlign: string;
     vTextAlign: string;
-    autoStretchWidth: boolean;
-    background: Color4;
     focusedBackground: Color4;
     textWrapping: boolean;
     shadowBlur: number;
@@ -4643,7 +4607,6 @@ export declare class UIInputText extends UIShape {
 export declare class UIScrollRect extends UIShape {
     valueX: number;
     valueY: number;
-    borderColor: Color4;
     backgroundColor: Color4;
     isHorizontal: boolean;
     isVertical: boolean;
@@ -4693,7 +4656,6 @@ export declare class UIText extends UIShape {
     color: Color4;
     fontSize: number;
     fontAutoSize: boolean;
-    fontWeight: string;
     font?: Font;
     value: string;
     lineSpacing: number;

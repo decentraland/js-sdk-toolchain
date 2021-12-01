@@ -931,19 +931,15 @@ export class Material extends ObservableComponent {
     albedoTexture?: Texture | VideoTexture;
     alphaTest?: number;
     alphaTexture?: Texture | VideoTexture;
-    ambientColor?: Color3;
     bumpTexture?: Texture;
     castShadows?: boolean;
     directIntensity?: number;
     emissiveColor?: Color3;
     emissiveIntensity?: number;
     emissiveTexture?: Texture | VideoTexture;
-    environmentIntensity?: number;
     metallic?: number;
     microSurface?: number;
-    reflectionColor?: Color3;
     reflectivityColor?: Color3;
-    refractionTexture?: Texture;
     roughness?: number;
     specularIntensity?: number;
     transparencyMode: TransparencyMode;
@@ -1138,10 +1134,6 @@ export class ObservableComponent {
     // (undocumented)
     static component(target: ObservableComponent, propertyKey: string): void;
     // (undocumented)
-    data: any;
-    // (undocumented)
-    dirty: boolean;
-    // (undocumented)
     static field(target: ObservableComponent, propertyKey: string): void;
     // (undocumented)
     onChange(fn: ObservableComponentSubscription): this;
@@ -1205,7 +1197,7 @@ export class OnChanged extends OnUUIDEvent<'onChange'> {
     readonly type: string;
 }
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export class OnClick extends OnPointerUUIDEvent<'onClick'> {
     constructor(callback: (event: IEvents['onClick']) => void);
     constructor(callback: (event: IEvents['onClick']) => void, options: OnPointerUUIDEventOptions);
@@ -1357,10 +1349,6 @@ export class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
         uuid: string;
         type: string | undefined;
     };
-    // (undocumented)
-    readonly type: string | undefined;
-    // (undocumented)
-    readonly uuid: string;
     // (undocumented)
     static uuidEvent(target: ObservableComponent, propertyKey: string): void;
 }
@@ -1817,13 +1805,9 @@ export class TextShape extends ObservableComponent {
     // (undocumented)
     fontSize: number;
     // (undocumented)
-    fontWeight: string;
-    // (undocumented)
     height: number;
     // (undocumented)
     hTextAlign: string;
-    // (undocumented)
-    isPickable: boolean;
     // (undocumented)
     lineCount: number;
     // (undocumented)
@@ -1843,8 +1827,6 @@ export class TextShape extends ObservableComponent {
     // (undocumented)
     paddingTop: number;
     // (undocumented)
-    resizeToFit: boolean;
-    // (undocumented)
     shadowBlur: number;
     // (undocumented)
     shadowColor: Color3;
@@ -1862,8 +1844,6 @@ export class TextShape extends ObservableComponent {
     vTextAlign: string;
     // (undocumented)
     width: number;
-    // (undocumented)
-    zIndex: number;
 }
 
 // @public (undocumented)
@@ -1963,10 +1943,6 @@ export class UICanvas extends UIShape {
 // @public (undocumented)
 export class UIContainerRect extends UIShape {
     // (undocumented)
-    adaptHeight: boolean;
-    // (undocumented)
-    adaptWidth: boolean;
-    // (undocumented)
     alignmentUsesSize: boolean;
     // (undocumented)
     color: Color4;
@@ -2019,10 +1995,6 @@ export class UIImage extends UIShape {
 export class UIInputText extends UIShape {
     constructor(parent: UIShape | null);
     // (undocumented)
-    autoStretchWidth: boolean;
-    // (undocumented)
-    background: Color4;
-    // (undocumented)
     color: Color4;
     // (undocumented)
     focusedBackground: Color4;
@@ -2031,13 +2003,9 @@ export class UIInputText extends UIShape {
     // (undocumented)
     fontSize: number;
     // (undocumented)
-    fontWeight: string;
-    // (undocumented)
     hTextAlign: string;
     // (undocumented)
     margin: number;
-    // (undocumented)
-    maxWidth: number;
     // (undocumented)
     onBlur: OnBlur | null;
     // (undocumented)
@@ -2061,8 +2029,6 @@ export class UIInputText extends UIShape {
     // (undocumented)
     placeholder: string;
     // (undocumented)
-    placeholderColor: Color4;
-    // (undocumented)
     shadowBlur: number;
     // (undocumented)
     shadowColor: Color4;
@@ -2073,8 +2039,6 @@ export class UIInputText extends UIShape {
     // (undocumented)
     textWrapping: boolean;
     // (undocumented)
-    thickness: number;
-    // (undocumented)
     value: string;
     // (undocumented)
     vTextAlign: string;
@@ -2084,8 +2048,6 @@ export class UIInputText extends UIShape {
 export class UIScrollRect extends UIShape {
     // (undocumented)
     backgroundColor: Color4;
-    // (undocumented)
-    borderColor: Color4;
     // (undocumented)
     isHorizontal: boolean;
     // (undocumented)
@@ -2154,8 +2116,6 @@ export class UIText extends UIShape {
     fontAutoSize: boolean;
     // (undocumented)
     fontSize: number;
-    // (undocumented)
-    fontWeight: string;
     // (undocumented)
     hTextAlign: string;
     // (undocumented)
