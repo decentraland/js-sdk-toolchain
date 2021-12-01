@@ -646,9 +646,6 @@ export class TextShape extends ObservableComponent {
   @ObservableComponent.field
   fontSize: number = 10
 
-  @ObservableComponent.field
-  fontWeight: string = 'normal'
-
   @ObservableComponent.component
   font?: Font
 
@@ -665,9 +662,6 @@ export class TextShape extends ObservableComponent {
   lineCount: number = 0
 
   @ObservableComponent.field
-  resizeToFit: boolean = false
-
-  @ObservableComponent.field
   textWrapping: boolean = false
 
   @ObservableComponent.field
@@ -681,9 +675,6 @@ export class TextShape extends ObservableComponent {
 
   @ObservableComponent.field
   shadowColor: Color3 = new Color3(1, 1, 1)
-
-  @ObservableComponent.field
-  zIndex: number = 0
 
   @ObservableComponent.field
   hTextAlign: string = 'center'
@@ -708,9 +699,6 @@ export class TextShape extends ObservableComponent {
 
   @ObservableComponent.field
   paddingLeft: number = 0
-
-  @ObservableComponent.field
-  isPickable: boolean = false
 
   @ObservableComponent.field
   billboard: boolean = false
@@ -1168,14 +1156,14 @@ export class VideoTexture extends ObservableComponent {
   }
 
   get position() {
-    return this._position 
+    return this._position
   }
 
   get videoLength() {
-    return this._videoLength 
+    return this._videoLength
   }
 
   get status() {
-    return this._status 
+    return this._status
   }
 }
