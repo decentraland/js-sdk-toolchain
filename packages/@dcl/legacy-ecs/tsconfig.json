@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "pretty": true,
+    "outDir": "dist",
+    "types": ["@dcl/posix", "env"],
+    "typeRoots": [
+      "./node_modules",
+      "../../decentraland-ecs/types"
+    ],
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "downlevelIteration": true,
+    "keyofStringsOnly": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
+    "noLib": true,
+    "alwaysStrict": true
+  },
+  "include": ["src/"]
+}

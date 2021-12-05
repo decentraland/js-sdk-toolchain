@@ -154,7 +154,7 @@ export function DisposableComponent(componentName: string, classId: number) {
       throw new Error(`classId: ${classId} is an invalid integer`)
     }
 
-    const extendedClass = target as any
+    const extendedClass = target
 
     const RegisteredComponent: any = function RegisteredComponent() {
       if (!DisposableComponent.engine) {
@@ -162,7 +162,7 @@ export function DisposableComponent(componentName: string, classId: number) {
       }
 
       const args = Array.prototype.slice.call(arguments)
-      const ret = new extendedClass(...args)
+      const ret = new extendedClass(...args as any)
       const id = newId('C')
 
       Object.defineProperty(ret, componentSymbol, {

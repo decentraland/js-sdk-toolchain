@@ -8,7 +8,8 @@ import {
   ROLLUP_CONFIG_PATH,
   ECS_PATH,
   ROLLUP,
-  commonChecks
+  commonChecks,
+  LEGACY_ECS_PATH
 } from './common'
 import { ensureFileExists, itExecutes, itDeletesFolder, copyFile, itDeletesGlob } from './helpers'
 
@@ -55,21 +56,35 @@ flow('build-all', () => {
     itDeletesGlob('types/dcl/*.d.ts', ECS_PATH)
 
     const ROLLUP_ECS_CONFIG = resolve(ROLLUP_CONFIG_PATH, 'ecs.config.js')
-    itExecutes(`${ROLLUP} -c ${ROLLUP_ECS_CONFIG}`, ECS_PATH)
+    itExecutes(`${ROLLUP} -c ${ROLLUP_ECS_CONFIG}`, LEGACY_ECS_PATH)
 
     // install required dependencies
     itExecutes(`npm install --quiet ${BUILD_ECS_PATH}`, ECS_PATH)
     itExecutes(`npm install --quiet ${DECENTRALAND_AMD_PATH}`, ECS_PATH)
 
     itExecutes(`${TSC} src/setupProxy.ts src/setupExport.ts`, ECS_PATH)
-
+    copyLegacyEcs()
     fixTypes()
   })
 })
 
+function copyLegacyEcs() {
+  it('copy legacy ecs iife to decentraland-ecs', () => {
+    const filesToCopy = [
+      'dist/src/index.js',
+      'dist/src/index.min.js',
+      'dist/src/index.min.js.map'
+    ]
+    for (const file of filesToCopy) {
+      const filePath = ensureFileExists(file, LEGACY_ECS_PATH)
+      copyFile(filePath, `${ECS_PATH}/${file}`)
+    }
+  })
+}
+
 function fixTypes() {
   it('fix ecs types', () => {
-    const original = ensureFileExists('dist/index.d.ts', ECS_PATH)
+    const original = ensureFileExists('dist/src/index.d.ts', LEGACY_ECS_PATH)
 
     copyFile(original, ECS_PATH + '/types/dcl/index.d.ts')
 
