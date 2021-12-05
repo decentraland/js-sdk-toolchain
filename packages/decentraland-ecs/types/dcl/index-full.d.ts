@@ -74,7 +74,6 @@ export declare type AnimationParams = {
  * @public
  */
 export declare class AnimationState extends ObservableComponent {
-    isAnimationClip: boolean;
     /**
      * Name of the animation in the model
      */
@@ -99,12 +98,10 @@ export declare class AnimationState extends ObservableComponent {
      * The animation speed
      */
     speed: number;
-    readonly name: string;
     /**
      * Layering allows you to have two or more levels of animation on an object's parameters at the same time
      */
     layer: number;
-    owner?: Animator;
     constructor(clip: string, params?: AnimationParams);
     /**
      * Sets the clip parameters
@@ -218,8 +215,6 @@ export declare abstract class Attachable {
     static readonly AVATAR: Attachable;
     /** Used to attach entities to the camera. When in first person mode, the attached entities will also rotate with the camera */
     static readonly FIRST_PERSON_CAMERA: Attachable;
-    /** Entities must be attached to entities, so in this case, each attachable object must return the entity used to present it */
-    abstract getEntityRepresentation(engine: IEngine): IEntity;
 }
 
 /**
@@ -231,7 +226,6 @@ export declare class AudioClip extends ObservableComponent {
      * Is this clip looping by default?
      */
     loop: boolean;
-    loadingCompleteEventId?: string;
     /**
      * Clip's master volume. This volume affects all the AudioSources.
      * Valid ranges from 0 to 1
@@ -284,8 +278,6 @@ export declare class AudioStream extends ObservableComponent {
     volume: number;
     constructor(url: string);
 }
-
-export declare const AVATAR_OBSERVABLE = "AVATAR_OBSERVABLE";
 
 /**
  * @public
@@ -424,19 +416,9 @@ export declare class BoxShape extends Shape {
 }
 
 /**
- * Returns an array of the given size filled with element built from the given constructor and the paramters
- * @param size - the number of element to construct and put in the array
- * @param itemBuilder - a callback responsible for creating new instance of item. Called once per array entry.
- * @returns a new array filled with new objects
- * @internal
- */
-export declare function buildArray<T>(size: number, itemBuilder: () => T): Array<T>;
-
-/**
  * @public
  */
 export declare class Camera {
-    private static _instance;
     static get instance(): Camera;
     /** Camera position, relative to the parcel. */
     readonly position: Vector3;
@@ -450,15 +432,7 @@ export declare class Camera {
     get playerHeight(): number;
     /** Get Camera Mode. */
     get cameraMode(): CameraMode;
-    private lastEventPosition;
-    private lastEventWorldPosition;
-    private lastEventRotation;
-    private _playerHeight;
-    private _cameraMode;
     constructor();
-    private positionChanged;
-    private rotationChanged;
-    private cameraModeChanged;
 }
 
 /** @public */
@@ -474,55 +448,6 @@ export declare enum CameraMode {
 export declare class CircleShape extends Shape {
     segments?: number;
     arc?: number;
-}
-
-/**
- * @internal
- */
-export declare enum CLASS_ID {
-    TRANSFORM = 1,
-    UUID_CALLBACK = 8,
-    BOX_SHAPE = 16,
-    SPHERE_SHAPE = 17,
-    PLANE_SHAPE = 18,
-    CONE_SHAPE = 19,
-    CYLINDER_SHAPE = 20,
-    TEXT_SHAPE = 21,
-    NFT_SHAPE = 22,
-    UI_WORLD_SPACE_SHAPE = 23,
-    UI_SCREEN_SPACE_SHAPE = 24,
-    UI_CONTAINER_RECT = 25,
-    UI_CONTAINER_STACK = 26,
-    UI_TEXT_SHAPE = 27,
-    UI_INPUT_TEXT_SHAPE = 28,
-    UI_IMAGE_SHAPE = 29,
-    UI_SLIDER_SHAPE = 30,
-    CIRCLE_SHAPE = 31,
-    BILLBOARD = 32,
-    ANIMATION = 33,
-    FONT = 34,
-    UI_FULLSCREEN_SHAPE = 40,
-    UI_BUTTON_SHAPE = 41,
-    GLTF_SHAPE = 54,
-    OBJ_SHAPE = 55,
-    AVATAR_SHAPE = 56,
-    BASIC_MATERIAL = 64,
-    PBR_MATERIAL = 65,
-    HIGHLIGHT_ENTITY = 66,
-    /** @deprecated */
-    SOUND = 67,
-    TEXTURE = 68,
-    VIDEO_CLIP = 70,
-    VIDEO_TEXTURE = 71,
-    AUDIO_CLIP = 200,
-    AUDIO_SOURCE = 201,
-    AUDIO_STREAM = 202,
-    GIZMOS = 203,
-    SMART_ITEM = 204,
-    AVATAR_MODIFIER_AREA = 205,
-    NAME = 300,
-    LOCKED_ON_EDIT = 301,
-    VISIBLE_ON_EDIT = 302
 }
 
 /**
@@ -1155,14 +1080,10 @@ export declare class ComponentAdded {
     constructor(entity: IEntity, componentName: string, classId: number | null);
 }
 
-declare const componentClassIdSymbol = "__classId__symbol_";
-
 /**
  * @public
  */
 export declare interface ComponentConstructor<T extends ComponentLike> {
-    [componentSymbol]?: string;
-    [componentClassIdSymbol]?: number;
     isComponent?: boolean;
     originalClassName?: string;
     new (...args: any[]): T;
@@ -1179,22 +1100,12 @@ export declare class ComponentGroup {
     private _requiresNames;
     constructor(...requires: ComponentConstructor<any>[]);
     hasEntity(entity: IEntity): boolean;
-    addEntity(entity: IEntity): void;
-    removeEntity(entity: IEntity): void;
-    componentRemoved(entity: IEntity, component: string): void;
-    meetsRequirements(entity: IEntity): boolean;
 }
-
-declare const componentIdSymbol = "__component__id_";
 
 /**
  * @public
  */
 export declare interface ComponentLike {
-    [componentSymbol]?: string;
-    [componentClassIdSymbol]?: number;
-    addedToEntity?(entity: any): void;
-    removedFromEntity?(entity: any): void;
 }
 
 /**
@@ -1206,8 +1117,6 @@ export declare class ComponentRemoved {
     component: ComponentLike;
     constructor(entity: IEntity, componentName: string, component: ComponentLike);
 }
-
-declare const componentSymbol = "__name__symbol_";
 
 /**
  * @public
@@ -1366,18 +1275,10 @@ export declare const DEG2RAD: number;
  */
 export declare function DisposableComponent(componentName: string, classId: number): <TFunction extends DisposableComponentConstructor<any>>(target: TFunction) => void | TFunction;
 
-/** @internal */
-export declare namespace DisposableComponent {
-    /** @internal */
-    let engine: any;
-}
-
 /**
  * @public
  */
 export declare interface DisposableComponentConstructor<T extends DisposableComponentLike> {
-    [componentSymbol]?: string;
-    [componentClassIdSymbol]?: number;
     isComponent?: boolean;
     isDisposableComponent?: true;
     originalClassName?: string;
@@ -1398,7 +1299,6 @@ export declare class DisposableComponentCreated {
  * @public
  */
 export declare interface DisposableComponentLike extends ComponentLike {
-    [componentIdSymbol]?: string;
     onDispose?(): void;
 }
 
@@ -1425,7 +1325,7 @@ export declare type double = number;
 /**
  * @public
  */
-declare type EcsMathReadOnlyQuaternion = {
+export declare type EcsMathReadOnlyQuaternion = {
     readonly x: number;
     readonly y: number;
     readonly z: number;
@@ -1435,7 +1335,7 @@ declare type EcsMathReadOnlyQuaternion = {
 /**
  * @public
  */
-declare type EcsMathReadOnlyVector2 = {
+export declare type EcsMathReadOnlyVector2 = {
     readonly y: number;
     readonly x: number;
 };
@@ -1443,7 +1343,7 @@ declare type EcsMathReadOnlyVector2 = {
 /**
  * @public
  */
-declare type EcsMathReadOnlyVector3 = {
+export declare type EcsMathReadOnlyVector3 = {
     readonly y: number;
     readonly x: number;
     readonly z: number;
@@ -1452,7 +1352,7 @@ declare type EcsMathReadOnlyVector3 = {
 /**
  * @public
  */
-declare type EcsMathReadOnlyVector4 = {
+export declare type EcsMathReadOnlyVector4 = {
     readonly x: number;
     readonly y: number;
     readonly z: number;
@@ -1467,9 +1367,6 @@ export declare class Engine implements IEngine {
     readonly rootEntity: IEntity;
     readonly firstPersonCameraEntity: IEntity;
     readonly avatarEntity: IEntity;
-    readonly systems: SystemEntry[];
-    readonly entityLists: Record<string, Record<string, IEntity>>;
-    readonly addedSystems: ISystem[];
     private readonly _entities;
     private readonly _disposableComponents;
     private readonly _componentGroups;
@@ -1509,8 +1406,6 @@ export declare class Entity implements IEntity {
     alive: boolean;
     readonly uuid: string;
     readonly components: Record<string, any>;
-    engine: IEngine | null;
-    private _parent;
     constructor(name?: string | undefined);
     /**
      * Adds or replaces a component in the entity.
@@ -1602,8 +1497,6 @@ export declare class EventManager {
     removeListener<X>(listener: X, eventClass: IEventConstructor<any>): boolean;
     fireEvent<T extends object>(event: T): this;
 }
-
-declare const eventNameSymbol = "__event_name__";
 
 /**
  * Executes an asynchronous task
@@ -1720,14 +1613,6 @@ export declare function getComponentId<T extends DisposableComponentLike>(compon
  * @public
  */
 export declare function getComponentName<T extends Record<any, any> = any>(component: T | ComponentConstructor<T>): string;
-
-/**
- * @internal
- */
-export declare function getMessageObserver(): Observable<{
-    sender: string;
-    message: string;
-}>;
 
 /**
  * Gizmo identifiers
@@ -1859,25 +1744,15 @@ export declare interface IEntity {
  * @public
  */
 export declare interface IEventConstructor<T> {
-    [eventNameSymbol]?: string;
     new (...args: any[]): T;
 }
-
-/**
- * @internal
- * This function adds _one_ listener to the onEvent event of dcl interface.
- * Leveraging a switch to route events to the Observable handlers.
- */
-export declare function _initEventObservables(dcl: DecentralandInterface): void;
 
 /**
  * @public
  */
 export declare class Input {
     private static _instance;
-    private buttonIdMapping;
     static get instance(): Input;
-    private subscriptions;
     private internalState;
     private constructor();
     static ensureInstance(): any;
@@ -1932,10 +1807,6 @@ export declare type InputState = Record<ActionButton, {
 export declare interface IPhysicsCast {
     hitFirst(ray: Ray, hitCallback: (event: RaycastHitEntity) => void, id?: number): void;
     hitAll(ray: Ray, hitCallback: (event: RaycastHitEntities) => void, id?: number): void;
-    /** @internal */
-    hitFirstAvatar(ray: Ray, hitCallback: (event: RaycastHitAvatar) => void): void;
-    /** @internal */
-    hitAllAvatars(ray: Ray, hitCallback: (event: RaycastHitAvatars) => void): void;
 }
 
 /**
@@ -2825,7 +2696,6 @@ export declare class MessageBus {
     private flushing;
     constructor();
     on(message: string, callback: (value: any, sender: string) => void): Observer<IEvents['comms']>;
-    sendRaw(message: string): void;
     emit(message: string, payload: Record<any, any>): void;
     private flush;
 }
@@ -3237,13 +3107,6 @@ export declare class OnPointerDown extends OnPointerUUIDEvent<'pointerDown'> {
     readonly type: string;
     constructor(callback: (event: IEvents['pointerDown']) => void);
     constructor(callback: (event: IEvents['pointerDown']) => void, options: OnPointerUUIDEventOptions);
-}
-
-/**
- * @internal
- */
-export declare class OnPointerLock extends OnUUIDEvent<'onPointerLock'> {
-    readonly type: string;
 }
 
 /**
@@ -3714,9 +3577,6 @@ export declare class PointerEventSystem implements ISystem {
     deactivate(): void;
 }
 
-/** @internal */
-export declare const pointerEventSystem: PointerEventSystem;
-
 /**
  * @public
  */
@@ -4164,9 +4024,6 @@ export declare class RaycastEventSystem implements ISystem {
     deactivate(): void;
 }
 
-/** @internal */
-export declare const raycastEventSystem: RaycastEventSystem;
-
 /**
  * @public
  */
@@ -4206,15 +4063,6 @@ export declare interface RaycastHitEntity extends RaycastHit {
 }
 
 /**
- * @internal
- */
-export declare interface RaycastQuery {
-    queryId: string;
-    queryType: QueryType;
-    ray: Ray;
-}
-
-/**
  * @public
  */
 export declare class RaycastResponse<T> {
@@ -4225,7 +4073,7 @@ export declare class RaycastResponse<T> {
 /**
  * @public
  */
-declare type ReadOnlyColor4 = {
+export declare type ReadOnlyColor4 = {
     readonly r: number;
     readonly g: number;
     readonly b: number;
@@ -4545,12 +4393,6 @@ export declare class Size implements ISize {
 }
 
 /**
- * @internal
- */
-export declare class SmartItem extends ObservableComponent {
-}
-
-/**
  * Defines supported spaces
  * @public
  */
@@ -4577,14 +4419,6 @@ export declare class Subscription {
     useRaycast: boolean;
     constructor(fn: (e: LocalActionButtonEvent) => void, useRaycast: boolean);
 }
-
-/**
- * @internal
- */
-declare type SystemEntry = {
-    system: ISystem;
-    priority: number;
-};
 
 /** @public */
 export declare type TaskResult<T> = Promise<T> & {
@@ -4774,14 +4608,6 @@ export declare class UIContainerStack extends UIShape {
 }
 
 /**
- * @internal
- * NOTE(Brian): this should be deprecated
- */
-export declare class UIFullScreen extends UIShape {
-    constructor();
-}
-
-/**
  * @public
  */
 export declare class UIImage extends UIShape {
@@ -4825,7 +4651,6 @@ export declare class UIInputText extends UIShape {
     paddingLeft: number;
     onTextSubmit: OnTextSubmit | null;
     onChanged: OnChanged | null;
-    protected readonly onTextChanged: OnChanged;
     onFocus: OnFocus | null;
     onBlur: OnBlur | null;
     constructor(parent: UIShape | null);
@@ -4867,7 +4692,6 @@ export declare abstract class UIShape extends ObservableComponent {
     private _parent?;
     constructor(parent: UIShape | null);
     get parent(): UIShape | undefined;
-    get parentComponent(): string | undefined;
 }
 
 /**
@@ -4925,19 +4749,6 @@ export declare enum UIValueType {
 }
 
 /**
- * @internal
- * NOTE(Brian): this should be deprecated
- */
-export declare class UIWorldSpace extends UIShape {
-    constructor();
-}
-
-/**
- * @internal
- */
-export declare function uuid(): string;
-
-/**
  * @public
  */
 export declare class UUIDEvent<T = any> {
@@ -4961,9 +4772,6 @@ export declare class UUIDEventSystem implements ISystem {
     private componentRemoved;
     private handleEvent;
 }
-
-/** @internal */
-export declare const uuidEventSystem: UUIDEventSystem;
 
 /**
  * Class representing a vector containing 2 coordinates

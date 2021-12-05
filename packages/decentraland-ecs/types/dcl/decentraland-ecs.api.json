@@ -859,33 +859,6 @@
             },
             {
               "kind": "Property",
-              "canonicalReference": "@dcl/legacy-ecs!AnimationState#isAnimationClip:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "isAnimationClip: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "isAnimationClip",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
               "canonicalReference": "@dcl/legacy-ecs!AnimationState#layer:member",
               "docComment": "/**\n * Layering allows you to have two or more levels of animation on an object's parameters at the same time\n */\n",
               "excerptTokens": [
@@ -932,61 +905,6 @@
               "isOptional": false,
               "releaseTag": "Public",
               "name": "looping",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "@dcl/legacy-ecs!AnimationState#name:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly name: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "name",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "@dcl/legacy-ecs!AnimationState#owner:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "owner?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Animator",
-                  "canonicalReference": "@dcl/legacy-ecs!Animator:class"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "owner",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -1993,53 +1911,6 @@
                 "endIndex": 2
               },
               "isStatic": true
-            },
-            {
-              "kind": "Method",
-              "canonicalReference": "@dcl/legacy-ecs!Attachable#getEntityRepresentation:member(1)",
-              "docComment": "/**\n * Entities must be attached to entities, so in this case, each attachable object must return the entity used to present it\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "abstract getEntityRepresentation(engine: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "IEngine",
-                  "canonicalReference": "@dcl/legacy-ecs!IEngine:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "isStatic": false,
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "engine",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  }
-                }
-              ],
-              "name": "getEntityRepresentation"
             }
           ],
           "implementsTokenRanges": []
@@ -2095,33 +1966,6 @@
                   }
                 }
               ]
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "@dcl/legacy-ecs!AudioClip#loadingCompleteEventId:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "loadingCompleteEventId?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "loadingCompleteEventId",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
             },
             {
               "kind": "Property",
@@ -2629,23 +2473,6 @@
             "endIndex": 3
           },
           "implementsTokenRanges": []
-        },
-        {
-          "kind": "Variable",
-          "canonicalReference": "@dcl/legacy-ecs!AVATAR_OBSERVABLE:var",
-          "docComment": "",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "AVATAR_OBSERVABLE = \"AVATAR_OBSERVABLE\""
-            }
-          ],
-          "releaseTag": "Public",
-          "name": "AVATAR_OBSERVABLE",
-          "variableTypeTokenRange": {
-            "startIndex": 0,
-            "endIndex": 0
-          }
         },
         {
           "kind": "TypeAlias",
@@ -9036,76 +8863,6 @@
           "name": "ComponentConstructor",
           "members": [
             {
-              "kind": "PropertySignature",
-              "canonicalReference": "@dcl/legacy-ecs!ComponentConstructor#__classId__symbol_:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "["
-                },
-                {
-                  "kind": "Reference",
-                  "text": "componentClassIdSymbol",
-                  "canonicalReference": "@dcl/legacy-ecs!~componentClassIdSymbol"
-                },
-                {
-                  "kind": "Content",
-                  "text": "]?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "number"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "__classId__symbol_",
-              "propertyTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@dcl/legacy-ecs!ComponentConstructor#__name__symbol_:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "["
-                },
-                {
-                  "kind": "Reference",
-                  "text": "componentSymbol",
-                  "canonicalReference": "@dcl/legacy-ecs!~componentSymbol"
-                },
-                {
-                  "kind": "Content",
-                  "text": "]?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "__name__symbol_",
-              "propertyTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              }
-            },
-            {
               "kind": "ConstructSignature",
               "canonicalReference": "@dcl/legacy-ecs!ComponentConstructor:new(1)",
               "docComment": "",
@@ -9278,113 +9035,6 @@
               "isStatic": false
             },
             {
-              "kind": "Method",
-              "canonicalReference": "@dcl/legacy-ecs!ComponentGroup#addEntity:member(1)",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "addEntity(entity: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Content",
-                  "text": "void"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "isStatic": false,
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "entity",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  }
-                }
-              ],
-              "name": "addEntity"
-            },
-            {
-              "kind": "Method",
-              "canonicalReference": "@dcl/legacy-ecs!ComponentGroup#componentRemoved:member(1)",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "componentRemoved(entity: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", component: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Content",
-                  "text": "void"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "isStatic": false,
-              "returnTypeTokenRange": {
-                "startIndex": 5,
-                "endIndex": 6
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "entity",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  }
-                },
-                {
-                  "parameterName": "component",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 3,
-                    "endIndex": 4
-                  }
-                }
-              ],
-              "name": "componentRemoved"
-            },
-            {
               "kind": "Property",
               "canonicalReference": "@dcl/legacy-ecs!ComponentGroup#entities:member",
               "docComment": "",
@@ -9470,98 +9120,6 @@
                 }
               ],
               "name": "hasEntity"
-            },
-            {
-              "kind": "Method",
-              "canonicalReference": "@dcl/legacy-ecs!ComponentGroup#meetsRequirements:member(1)",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "meetsRequirements(entity: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Content",
-                  "text": "boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "isStatic": false,
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "entity",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  }
-                }
-              ],
-              "name": "meetsRequirements"
-            },
-            {
-              "kind": "Method",
-              "canonicalReference": "@dcl/legacy-ecs!ComponentGroup#removeEntity:member(1)",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "removeEntity(entity: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Content",
-                  "text": "void"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "isStatic": false,
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "entity",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  }
-                }
-              ],
-              "name": "removeEntity"
             },
             {
               "kind": "Property",
@@ -9651,166 +9209,7 @@
           ],
           "releaseTag": "Public",
           "name": "ComponentLike",
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@dcl/legacy-ecs!ComponentLike#__classId__symbol_:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "["
-                },
-                {
-                  "kind": "Reference",
-                  "text": "componentClassIdSymbol",
-                  "canonicalReference": "@dcl/legacy-ecs!~componentClassIdSymbol"
-                },
-                {
-                  "kind": "Content",
-                  "text": "]?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "number"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "__classId__symbol_",
-              "propertyTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@dcl/legacy-ecs!ComponentLike#__name__symbol_:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "["
-                },
-                {
-                  "kind": "Reference",
-                  "text": "componentSymbol",
-                  "canonicalReference": "@dcl/legacy-ecs!~componentSymbol"
-                },
-                {
-                  "kind": "Content",
-                  "text": "]?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "__name__symbol_",
-              "propertyTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              }
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!ComponentLike#addedToEntity:member(1)",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "addedToEntity?(entity: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "any"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Content",
-                  "text": "void"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": true,
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "entity",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  }
-                }
-              ],
-              "name": "addedToEntity"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!ComponentLike#removedFromEntity:member(1)",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "removedFromEntity?(entity: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "any"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Content",
-                  "text": "void"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": true,
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "entity",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  }
-                }
-              ],
-              "name": "removedFromEntity"
-            }
-          ],
+          "members": [],
           "extendsTokenRanges": []
         },
         {
@@ -11090,76 +10489,6 @@
           "name": "DisposableComponentConstructor",
           "members": [
             {
-              "kind": "PropertySignature",
-              "canonicalReference": "@dcl/legacy-ecs!DisposableComponentConstructor#__classId__symbol_:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "["
-                },
-                {
-                  "kind": "Reference",
-                  "text": "componentClassIdSymbol",
-                  "canonicalReference": "@dcl/legacy-ecs!~componentClassIdSymbol"
-                },
-                {
-                  "kind": "Content",
-                  "text": "]?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "number"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "__classId__symbol_",
-              "propertyTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@dcl/legacy-ecs!DisposableComponentConstructor#__name__symbol_:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "["
-                },
-                {
-                  "kind": "Reference",
-                  "text": "componentSymbol",
-                  "canonicalReference": "@dcl/legacy-ecs!~componentSymbol"
-                },
-                {
-                  "kind": "Content",
-                  "text": "]?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "__name__symbol_",
-              "propertyTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              }
-            },
-            {
               "kind": "ConstructSignature",
               "canonicalReference": "@dcl/legacy-ecs!DisposableComponentConstructor:new(1)",
               "docComment": "",
@@ -11462,41 +10791,6 @@
           "name": "DisposableComponentLike",
           "members": [
             {
-              "kind": "PropertySignature",
-              "canonicalReference": "@dcl/legacy-ecs!DisposableComponentLike#__component__id_:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "["
-                },
-                {
-                  "kind": "Reference",
-                  "text": "componentIdSymbol",
-                  "canonicalReference": "@dcl/legacy-ecs!~componentIdSymbol"
-                },
-                {
-                  "kind": "Content",
-                  "text": "]?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "__component__id_",
-              "propertyTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              }
-            },
-            {
               "kind": "MethodSignature",
               "canonicalReference": "@dcl/legacy-ecs!DisposableComponentLike#onDispose:member(1)",
               "docComment": "",
@@ -11748,6 +11042,106 @@
           }
         },
         {
+          "kind": "TypeAlias",
+          "canonicalReference": "@dcl/legacy-ecs!EcsMathReadOnlyQuaternion:type",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type EcsMathReadOnlyQuaternion = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    readonly x: number;\n    readonly y: number;\n    readonly z: number;\n    readonly w: number;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "EcsMathReadOnlyQuaternion",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@dcl/legacy-ecs!EcsMathReadOnlyVector2:type",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type EcsMathReadOnlyVector2 = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    readonly y: number;\n    readonly x: number;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "EcsMathReadOnlyVector2",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@dcl/legacy-ecs!EcsMathReadOnlyVector3:type",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type EcsMathReadOnlyVector3 = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    readonly y: number;\n    readonly x: number;\n    readonly z: number;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "EcsMathReadOnlyVector3",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@dcl/legacy-ecs!EcsMathReadOnlyVector4:type",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type EcsMathReadOnlyVector4 = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    readonly x: number;\n    readonly y: number;\n    readonly z: number;\n    readonly w: number;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "EcsMathReadOnlyVector4",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "Class",
           "canonicalReference": "@dcl/legacy-ecs!Engine:class",
           "docComment": "/**\n * @public\n */\n",
@@ -11799,38 +11193,6 @@
                   }
                 }
               ]
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "@dcl/legacy-ecs!Engine#addedSystems:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly addedSystems: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ISystem",
-                  "canonicalReference": "@dcl/legacy-ecs!ISystem:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "addedSystems",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 3
-              },
-              "isStatic": false
             },
             {
               "kind": "Method",
@@ -12109,56 +11471,6 @@
               "isOptional": false,
               "releaseTag": "Public",
               "name": "entities",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 7
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "@dcl/legacy-ecs!Engine#entityLists:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly entityLists: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "entityLists",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 7
@@ -12599,38 +11911,6 @@
               "isStatic": false
             },
             {
-              "kind": "Property",
-              "canonicalReference": "@dcl/legacy-ecs!Engine#systems:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly systems: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "SystemEntry",
-                  "canonicalReference": "@dcl/legacy-ecs!~SystemEntry:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "systems",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 3
-              },
-              "isStatic": false
-            },
-            {
               "kind": "Method",
               "canonicalReference": "@dcl/legacy-ecs!Engine#update:member(1)",
               "docComment": "",
@@ -13029,38 +12309,6 @@
               "isOptional": false,
               "releaseTag": "Public",
               "name": "components",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 3
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "@dcl/legacy-ecs!Entity#engine:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "engine: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "IEngine",
-                  "canonicalReference": "@dcl/legacy-ecs!IEngine:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": " | null"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "engine",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 3
@@ -17808,41 +17056,6 @@
           ],
           "name": "IEventConstructor",
           "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEventConstructor#__event_name__:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "["
-                },
-                {
-                  "kind": "Reference",
-                  "text": "eventNameSymbol",
-                  "canonicalReference": "@dcl/legacy-ecs!~eventNameSymbol"
-                },
-                {
-                  "kind": "Content",
-                  "text": "]?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "__event_name__",
-              "propertyTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              }
-            },
             {
               "kind": "ConstructSignature",
               "canonicalReference": "@dcl/legacy-ecs!IEventConstructor:new(1)",
@@ -26620,51 +25833,6 @@
                 }
               ],
               "name": "on"
-            },
-            {
-              "kind": "Method",
-              "canonicalReference": "@dcl/legacy-ecs!MessageBus#sendRaw:member(1)",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "sendRaw(message: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Content",
-                  "text": "void"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "isStatic": false,
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "message",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  }
-                }
-              ],
-              "name": "sendRaw"
             }
           ],
           "implementsTokenRanges": []
@@ -38688,6 +37856,31 @@
           "implementsTokenRanges": []
         },
         {
+          "kind": "TypeAlias",
+          "canonicalReference": "@dcl/legacy-ecs!ReadOnlyColor4:type",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type ReadOnlyColor4 = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    readonly r: number;\n    readonly g: number;\n    readonly b: number;\n    readonly a: number;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "ReadOnlyColor4",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "Class",
           "canonicalReference": "@dcl/legacy-ecs!Scalar:class",
           "docComment": "/**\n * Scalar computation library\n *\n * @public\n */\n",
@@ -44608,34 +43801,6 @@
             },
             {
               "kind": "Property",
-              "canonicalReference": "@dcl/legacy-ecs!UIInputText#onTextChanged:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "protected readonly onTextChanged: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "OnChanged",
-                  "canonicalReference": "@dcl/legacy-ecs!OnChanged:class"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "onTextChanged",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
               "canonicalReference": "@dcl/legacy-ecs!UIInputText#onTextSubmit:member",
               "docComment": "",
               "excerptTokens": [
@@ -45674,33 +44839,6 @@
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 3
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "@dcl/legacy-ecs!UIShape#parentComponent:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "get parentComponent(): "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string | undefined"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "parentComponent",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
               },
               "isStatic": false
             },

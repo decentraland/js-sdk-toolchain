@@ -61,14 +61,8 @@ export type AnimationParams = {
 export class AnimationState extends ObservableComponent {
     constructor(clip: string, params?: AnimationParams);
     readonly clip: string;
-    // (undocumented)
-    isAnimationClip: boolean;
     layer: number;
     looping: boolean;
-    // (undocumented)
-    readonly name: string;
-    // (undocumented)
-    owner?: Animator;
     pause(): void;
     play(reset?: boolean): void;
     playing: boolean;
@@ -116,14 +110,11 @@ export type Area = {
 export abstract class Attachable {
     static readonly AVATAR: Attachable;
     static readonly FIRST_PERSON_CAMERA: Attachable;
-    abstract getEntityRepresentation(engine: IEngine): IEntity;
 }
 
 // @public (undocumented)
 export class AudioClip extends ObservableComponent {
     constructor(url: string);
-    // (undocumented)
-    loadingCompleteEventId?: string;
     loop: boolean;
     // (undocumented)
     readonly url: string;
@@ -155,9 +146,6 @@ export class AudioStream extends ObservableComponent {
     // (undocumented)
     volume: number;
 }
-
-// @public (undocumented)
-export const AVATAR_OBSERVABLE = "AVATAR_OBSERVABLE";
 
 // @public (undocumented)
 export type AvatarForRenderer = {
@@ -266,11 +254,6 @@ export class BoxShape extends Shape {
     uvs?: number[];
 }
 
-// Warning: (ae-internal-missing-underscore) The name "buildArray" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal
-export function buildArray<T>(size: number, itemBuilder: () => T): Array<T>;
-
 // @public (undocumented)
 export class Camera {
     constructor();
@@ -300,96 +283,6 @@ export class CircleShape extends Shape {
     arc?: number;
     // (undocumented)
     segments?: number;
-}
-
-// Warning: (ae-internal-missing-underscore) The name "CLASS_ID" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal (undocumented)
-export enum CLASS_ID {
-    // (undocumented)
-    ANIMATION = 33,
-    // (undocumented)
-    AUDIO_CLIP = 200,
-    // (undocumented)
-    AUDIO_SOURCE = 201,
-    // (undocumented)
-    AUDIO_STREAM = 202,
-    // (undocumented)
-    AVATAR_MODIFIER_AREA = 205,
-    // (undocumented)
-    AVATAR_SHAPE = 56,
-    // (undocumented)
-    BASIC_MATERIAL = 64,
-    // (undocumented)
-    BILLBOARD = 32,
-    // (undocumented)
-    BOX_SHAPE = 16,
-    // (undocumented)
-    CIRCLE_SHAPE = 31,
-    // (undocumented)
-    CONE_SHAPE = 19,
-    // (undocumented)
-    CYLINDER_SHAPE = 20,
-    // (undocumented)
-    FONT = 34,
-    // (undocumented)
-    GIZMOS = 203,
-    // (undocumented)
-    GLTF_SHAPE = 54,
-    // (undocumented)
-    HIGHLIGHT_ENTITY = 66,
-    // (undocumented)
-    LOCKED_ON_EDIT = 301,
-    // (undocumented)
-    NAME = 300,
-    // (undocumented)
-    NFT_SHAPE = 22,
-    // (undocumented)
-    OBJ_SHAPE = 55,
-    // (undocumented)
-    PBR_MATERIAL = 65,
-    // (undocumented)
-    PLANE_SHAPE = 18,
-    // (undocumented)
-    SMART_ITEM = 204,
-    // @deprecated (undocumented)
-    SOUND = 67,
-    // (undocumented)
-    SPHERE_SHAPE = 17,
-    // (undocumented)
-    TEXT_SHAPE = 21,
-    // (undocumented)
-    TEXTURE = 68,
-    // (undocumented)
-    TRANSFORM = 1,
-    // (undocumented)
-    UI_BUTTON_SHAPE = 41,
-    // (undocumented)
-    UI_CONTAINER_RECT = 25,
-    // (undocumented)
-    UI_CONTAINER_STACK = 26,
-    // (undocumented)
-    UI_FULLSCREEN_SHAPE = 40,
-    // (undocumented)
-    UI_IMAGE_SHAPE = 29,
-    // (undocumented)
-    UI_INPUT_TEXT_SHAPE = 28,
-    // (undocumented)
-    UI_SCREEN_SPACE_SHAPE = 24,
-    // (undocumented)
-    UI_SLIDER_SHAPE = 30,
-    // (undocumented)
-    UI_TEXT_SHAPE = 27,
-    // (undocumented)
-    UI_WORLD_SPACE_SHAPE = 23,
-    // (undocumented)
-    UUID_CALLBACK = 8,
-    // (undocumented)
-    VIDEO_CLIP = 70,
-    // (undocumented)
-    VIDEO_TEXTURE = 71,
-    // (undocumented)
-    VISIBLE_ON_EDIT = 302
 }
 
 // @public
@@ -523,14 +416,6 @@ export class ComponentAdded {
 
 // @public (undocumented)
 export interface ComponentConstructor<T extends ComponentLike> {
-    // Warning: (ae-forgotten-export) The symbol "componentClassIdSymbol" needs to be exported by the entry point 0.0897847324600971index.d.ts
-    //
-    // (undocumented)
-    [componentClassIdSymbol]?: number;
-    // Warning: (ae-forgotten-export) The symbol "componentSymbol" needs to be exported by the entry point 0.0897847324600971index.d.ts
-    //
-    // (undocumented)
-    [componentSymbol]?: string;
     // (undocumented)
     new (...args: any[]): T;
     // (undocumented)
@@ -545,17 +430,9 @@ export class ComponentGroup {
     // (undocumented)
     active: boolean;
     // (undocumented)
-    addEntity(entity: IEntity): void;
-    // (undocumented)
-    componentRemoved(entity: IEntity, component: string): void;
-    // (undocumented)
     readonly entities: ReadonlyArray<IEntity>;
     // (undocumented)
     hasEntity(entity: IEntity): boolean;
-    // (undocumented)
-    meetsRequirements(entity: IEntity): boolean;
-    // (undocumented)
-    removeEntity(entity: IEntity): void;
     // (undocumented)
     readonly requires: ReadonlyArray<ComponentConstructor<any>>;
     // (undocumented)
@@ -564,14 +441,6 @@ export class ComponentGroup {
 
 // @public (undocumented)
 export interface ComponentLike {
-    // (undocumented)
-    [componentClassIdSymbol]?: number;
-    // (undocumented)
-    [componentSymbol]?: string;
-    // (undocumented)
-    addedToEntity?(entity: any): void;
-    // (undocumented)
-    removedFromEntity?(entity: any): void;
 }
 
 // @public (undocumented)
@@ -624,23 +493,11 @@ export class CylinderShape extends Shape {
 // @public
 export const DEG2RAD: number;
 
-// Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "DisposableComponent" because one of its declarations is marked as @internal
-//
 // @public (undocumented)
 export function DisposableComponent(componentName: string, classId: number): <TFunction extends DisposableComponentConstructor<any>>(target: TFunction) => void | TFunction;
 
-// @internal (undocumented)
-export namespace DisposableComponent {
-    let // (undocumented)
-    engine: any;
-}
-
 // @public (undocumented)
 export interface DisposableComponentConstructor<T extends DisposableComponentLike> {
-    // (undocumented)
-    [componentClassIdSymbol]?: number;
-    // (undocumented)
-    [componentSymbol]?: string;
     // (undocumented)
     new (...args: any[]): T;
     // (undocumented)
@@ -664,10 +521,6 @@ export class DisposableComponentCreated {
 
 // @public (undocumented)
 export interface DisposableComponentLike extends ComponentLike {
-    // Warning: (ae-forgotten-export) The symbol "componentIdSymbol" needs to be exported by the entry point 0.0897847324600971index.d.ts
-    //
-    // (undocumented)
-    [componentIdSymbol]?: string;
     // (undocumented)
     onDispose?(): void;
 }
@@ -692,10 +545,37 @@ export class DisposableComponentUpdated {
 export type double = number;
 
 // @public (undocumented)
+export type EcsMathReadOnlyQuaternion = {
+    readonly x: number;
+    readonly y: number;
+    readonly z: number;
+    readonly w: number;
+};
+
+// @public (undocumented)
+export type EcsMathReadOnlyVector2 = {
+    readonly y: number;
+    readonly x: number;
+};
+
+// @public (undocumented)
+export type EcsMathReadOnlyVector3 = {
+    readonly y: number;
+    readonly x: number;
+    readonly z: number;
+};
+
+// @public (undocumented)
+export type EcsMathReadOnlyVector4 = {
+    readonly x: number;
+    readonly y: number;
+    readonly z: number;
+    readonly w: number;
+};
+
+// @public (undocumented)
 export class Engine implements IEngine {
     constructor(rootEntity: IEntity);
-    // (undocumented)
-    readonly addedSystems: ISystem[];
     // (undocumented)
     addEntity(entity: IEntity): IEntity;
     // (undocumented)
@@ -708,8 +588,6 @@ export class Engine implements IEngine {
     disposeComponent(component: DisposableComponentLike): boolean;
     // (undocumented)
     get entities(): Readonly<Record<string, IEntity>>;
-    // (undocumented)
-    readonly entityLists: Record<string, Record<string, IEntity>>;
     // (undocumented)
     readonly eventManager: EventManager;
     // (undocumented)
@@ -730,10 +608,6 @@ export class Engine implements IEngine {
     removeSystem(system: ISystem): boolean;
     // (undocumented)
     readonly rootEntity: IEntity;
-    // Warning: (ae-forgotten-export) The symbol "SystemEntry" needs to be exported by the entry point 0.0897847324600971index.d.ts
-    //
-    // (undocumented)
-    readonly systems: SystemEntry[];
     // (undocumented)
     update(dt: number): this;
     // (undocumented)
@@ -754,8 +628,6 @@ export class Entity implements IEntity {
     children: Record<string, IEntity>;
     // (undocumented)
     readonly components: Record<string, any>;
-    // (undocumented)
-    engine: IEngine | null;
     // (undocumented)
     eventManager: EventManager | null;
     getComponent<T = any>(component: string): T;
@@ -867,14 +739,6 @@ export function getComponentId<T extends DisposableComponentLike>(component: T):
 
 // @public (undocumented)
 export function getComponentName<T extends Record<any, any> = any>(component: T | ComponentConstructor<T>): string;
-
-// Warning: (ae-internal-missing-underscore) The name "getMessageObserver" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal (undocumented)
-export function getMessageObserver(): Observable<{
-    sender: string;
-    message: string;
-}>;
 
 // @public
 export enum Gizmo {
@@ -999,16 +863,9 @@ export interface IEntity {
 
 // @public (undocumented)
 export interface IEventConstructor<T> {
-    // Warning: (ae-forgotten-export) The symbol "eventNameSymbol" needs to be exported by the entry point 0.0897847324600971index.d.ts
-    //
-    // (undocumented)
-    [eventNameSymbol]?: string;
     // (undocumented)
     new (...args: any[]): T;
 }
-
-// @internal
-export function _initEventObservables(dcl: DecentralandInterface): void;
 
 // @public (undocumented)
 export class Input {
@@ -1045,12 +902,8 @@ export type InputState = Record<ActionButton, {
 export interface IPhysicsCast {
     // (undocumented)
     hitAll(ray: Ray, hitCallback: (event: RaycastHitEntities) => void, id?: number): void;
-    // @internal (undocumented)
-    hitAllAvatars(ray: Ray, hitCallback: (event: RaycastHitAvatars) => void): void;
     // (undocumented)
     hitFirst(ray: Ray, hitCallback: (event: RaycastHitEntity) => void, id?: number): void;
-    // @internal (undocumented)
-    hitFirstAvatar(ray: Ray, hitCallback: (event: RaycastHitAvatar) => void): void;
 }
 
 // @public (undocumented)
@@ -1237,8 +1090,6 @@ export class MessageBus {
     emit(message: string, payload: Record<any, any>): void;
     // (undocumented)
     on(message: string, callback: (value: any, sender: string) => void): Observer<IEvents['comms']>;
-    // (undocumented)
-    sendRaw(message: string): void;
 }
 
 // @public (undocumented)
@@ -1449,14 +1300,6 @@ export const onPlayerExpressionObservable: Observable<{
 export class OnPointerDown extends OnPointerUUIDEvent<'pointerDown'> {
     constructor(callback: (event: IEvents['pointerDown']) => void);
     constructor(callback: (event: IEvents['pointerDown']) => void, options: OnPointerUUIDEventOptions);
-    // (undocumented)
-    readonly type: string;
-}
-
-// Warning: (ae-internal-missing-underscore) The name "OnPointerLock" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal (undocumented)
-export class OnPointerLock extends OnUUIDEvent<'onPointerLock'> {
     // (undocumented)
     readonly type: string;
 }
@@ -1732,11 +1575,6 @@ export class PointerEventSystem implements ISystem {
     deactivate(): void;
 }
 
-// Warning: (ae-internal-missing-underscore) The name "pointerEventSystem" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal (undocumented)
-export const pointerEventSystem: PointerEventSystem;
-
 // @public (undocumented)
 export type ProfileForRenderer = {
     userId: string;
@@ -1755,8 +1593,6 @@ export type ProfileForRenderer = {
     parcelsWithAccess?: ParcelsWithAccess;
 };
 
-// Warning: (ae-forgotten-export) The symbol "EcsMathReadOnlyQuaternion" needs to be exported by the entry point 0.0897847324600971index.d.ts
-//
 // @public
 export class Quaternion implements EcsMathReadOnlyQuaternion {
     constructor(
@@ -1856,11 +1692,6 @@ export class RaycastEventSystem implements ISystem {
     deactivate(): void;
 }
 
-// Warning: (ae-internal-missing-underscore) The name "raycastEventSystem" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal (undocumented)
-export const raycastEventSystem: RaycastEventSystem;
-
 // @public (undocumented)
 export interface RaycastHit {
     // (undocumented)
@@ -1897,24 +1728,20 @@ export interface RaycastHitEntity extends RaycastHit {
     entity: HitEntityInfo;
 }
 
-// Warning: (ae-internal-missing-underscore) The name "RaycastQuery" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal (undocumented)
-export interface RaycastQuery {
-    // (undocumented)
-    queryId: string;
-    // (undocumented)
-    queryType: QueryType;
-    // (undocumented)
-    ray: Ray;
-}
-
 // @public (undocumented)
 export class RaycastResponse<T> {
     constructor(payload: RaycastResponsePayload<T>);
     // (undocumented)
     readonly payload: RaycastResponsePayload<T>;
 }
+
+// @public (undocumented)
+export type ReadOnlyColor4 = {
+    readonly r: number;
+    readonly g: number;
+    readonly b: number;
+    readonly a: number;
+};
 
 // @public
 export class Scalar {
@@ -1968,12 +1795,6 @@ export class Size implements ISize {
     toString(): string;
     width: number;
     static Zero(): Size;
-}
-
-// Warning: (ae-internal-missing-underscore) The name "SmartItem" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal (undocumented)
-export class SmartItem extends ObservableComponent {
 }
 
 // @public
@@ -2178,13 +1999,6 @@ export class UIContainerStack extends UIShape {
     stackOrientation: UIStackOrientation;
 }
 
-// Warning: (ae-internal-missing-underscore) The name "UIFullScreen" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal
-export class UIFullScreen extends UIShape {
-    constructor();
-}
-
 // @public (undocumented)
 export class UIImage extends UIShape {
     constructor(parent: UIShape, source: Texture);
@@ -2233,8 +2047,6 @@ export class UIInputText extends UIShape {
     onChanged: OnChanged | null;
     // (undocumented)
     onFocus: OnFocus | null;
-    // (undocumented)
-    protected readonly onTextChanged: OnChanged;
     // (undocumented)
     onTextSubmit: OnTextSubmit | null;
     // (undocumented)
@@ -2305,8 +2117,6 @@ export abstract class UIShape extends ObservableComponent {
     opacity: number;
     // (undocumented)
     get parent(): UIShape | undefined;
-    // (undocumented)
-    get parentComponent(): string | undefined;
     // (undocumented)
     positionX: string | number;
     // (undocumented)
@@ -2394,18 +2204,6 @@ export enum UIValueType {
     PIXELS = 1
 }
 
-// Warning: (ae-internal-missing-underscore) The name "UIWorldSpace" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal
-export class UIWorldSpace extends UIShape {
-    constructor();
-}
-
-// Warning: (ae-internal-missing-underscore) The name "uuid" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal (undocumented)
-export function uuid(): string;
-
 // @public (undocumented)
 export class UUIDEvent<T = any> {
     constructor(uuid: string, payload: T);
@@ -2431,13 +2229,6 @@ export class UUIDEventSystem implements ISystem {
     onRemoveEntity(entity: IEntity): void;
 }
 
-// Warning: (ae-internal-missing-underscore) The name "uuidEventSystem" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal (undocumented)
-export const uuidEventSystem: UUIDEventSystem;
-
-// Warning: (ae-forgotten-export) The symbol "EcsMathReadOnlyVector2" needs to be exported by the entry point 0.0897847324600971index.d.ts
-//
 // @public
 export class Vector2 implements EcsMathReadOnlyVector2 {
     constructor(
@@ -2502,8 +2293,6 @@ export class Vector2 implements EcsMathReadOnlyVector2 {
     static Zero(): Vector2;
 }
 
-// Warning: (ae-forgotten-export) The symbol "EcsMathReadOnlyVector3" needs to be exported by the entry point 0.0897847324600971index.d.ts
-//
 // @public
 export class Vector3 implements EcsMathReadOnlyVector3 {
     constructor(
@@ -2607,8 +2396,6 @@ export class Vector3 implements EcsMathReadOnlyVector3 {
     static Zero(): Vector3;
 }
 
-// Warning: (ae-forgotten-export) The symbol "EcsMathReadOnlyVector4" needs to be exported by the entry point 0.0897847324600971index.d.ts
-//
 // @public
 export class Vector4 implements EcsMathReadOnlyVector4 {
     constructor(
@@ -2751,10 +2538,6 @@ export type Wearable = {
 
 // @public (undocumented)
 export type WearableId = string;
-
-// Warnings were encountered during analysis:
-//
-// src/decentraland/Types.ts:29:3 - (ae-forgotten-export) The symbol "ReadOnlyColor4" needs to be exported by the entry point 0.0897847324600971index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

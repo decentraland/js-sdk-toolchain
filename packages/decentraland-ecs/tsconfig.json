@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es5",
     "module": "ESNext",
     "strict": true,
     "declarationDir": "dist",
@@ -40,7 +40,7 @@
     "dist",
     "etc",
     "temp",
-    "types/**",
+    "types",
     "api-docs-review/decentraland-ecs.api.ts"
   ]
 }

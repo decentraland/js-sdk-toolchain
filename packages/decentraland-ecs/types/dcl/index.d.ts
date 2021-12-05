@@ -74,7 +74,6 @@ declare type AnimationParams = {
  * @public
  */
 declare class AnimationState extends ObservableComponent {
-    isAnimationClip: boolean;
     /**
      * Name of the animation in the model
      */
@@ -99,12 +98,10 @@ declare class AnimationState extends ObservableComponent {
      * The animation speed
      */
     speed: number;
-    readonly name: string;
     /**
      * Layering allows you to have two or more levels of animation on an object's parameters at the same time
      */
     layer: number;
-    owner?: Animator;
     constructor(clip: string, params?: AnimationParams);
     /**
      * Sets the clip parameters
@@ -218,8 +215,6 @@ declare abstract class Attachable {
     static readonly AVATAR: Attachable;
     /** Used to attach entities to the camera. When in first person mode, the attached entities will also rotate with the camera */
     static readonly FIRST_PERSON_CAMERA: Attachable;
-    /** Entities must be attached to entities, so in this case, each attachable object must return the entity used to present it */
-    abstract getEntityRepresentation(engine: IEngine): IEntity;
 }
 
 /**
@@ -231,7 +226,6 @@ declare class AudioClip extends ObservableComponent {
      * Is this clip looping by default?
      */
     loop: boolean;
-    loadingCompleteEventId?: string;
     /**
      * Clip's master volume. This volume affects all the AudioSources.
      * Valid ranges from 0 to 1
@@ -284,8 +278,6 @@ declare class AudioStream extends ObservableComponent {
     volume: number;
     constructor(url: string);
 }
-
-declare const AVATAR_OBSERVABLE = "AVATAR_OBSERVABLE";
 
 /**
  * @public
@@ -423,13 +415,10 @@ declare class BoxShape extends Shape {
     uvs?: number[];
 }
 
-/* Excluded from this release type: buildArray */
-
 /**
  * @public
  */
 declare class Camera {
-    private static _instance;
     static get instance(): Camera;
     /** Camera position, relative to the parcel. */
     readonly position: Vector3;
@@ -443,15 +432,7 @@ declare class Camera {
     get playerHeight(): number;
     /** Get Camera Mode. */
     get cameraMode(): CameraMode;
-    private lastEventPosition;
-    private lastEventWorldPosition;
-    private lastEventRotation;
-    private _playerHeight;
-    private _cameraMode;
     constructor();
-    private positionChanged;
-    private rotationChanged;
-    private cameraModeChanged;
 }
 
 /** @public */
@@ -468,8 +449,6 @@ declare class CircleShape extends Shape {
     segments?: number;
     arc?: number;
 }
-
-/* Excluded from this release type: CLASS_ID */
 
 /**
  * Class used to hold a RBG color
@@ -1101,14 +1080,10 @@ declare class ComponentAdded {
     constructor(entity: IEntity, componentName: string, classId: number | null);
 }
 
-declare const componentClassIdSymbol = "__classId__symbol_";
-
 /**
  * @public
  */
 declare interface ComponentConstructor<T extends ComponentLike> {
-    [componentSymbol]?: string;
-    [componentClassIdSymbol]?: number;
     isComponent?: boolean;
     originalClassName?: string;
     new (...args: any[]): T;
@@ -1125,22 +1100,12 @@ declare class ComponentGroup {
     private _requiresNames;
     constructor(...requires: ComponentConstructor<any>[]);
     hasEntity(entity: IEntity): boolean;
-    addEntity(entity: IEntity): void;
-    removeEntity(entity: IEntity): void;
-    componentRemoved(entity: IEntity, component: string): void;
-    meetsRequirements(entity: IEntity): boolean;
 }
-
-declare const componentIdSymbol = "__component__id_";
 
 /**
  * @public
  */
 declare interface ComponentLike {
-    [componentSymbol]?: string;
-    [componentClassIdSymbol]?: number;
-    addedToEntity?(entity: any): void;
-    removedFromEntity?(entity: any): void;
 }
 
 /**
@@ -1152,8 +1117,6 @@ declare class ComponentRemoved {
     component: ComponentLike;
     constructor(entity: IEntity, componentName: string, component: ComponentLike);
 }
-
-declare const componentSymbol = "__name__symbol_";
 
 /**
  * @public
@@ -1312,14 +1275,10 @@ declare const DEG2RAD: number;
  */
 declare function DisposableComponent(componentName: string, classId: number): <TFunction extends DisposableComponentConstructor<any>>(target: TFunction) => void | TFunction;
 
-/* Excluded declaration from this release type: DisposableComponent */
-
 /**
  * @public
  */
 declare interface DisposableComponentConstructor<T extends DisposableComponentLike> {
-    [componentSymbol]?: string;
-    [componentClassIdSymbol]?: number;
     isComponent?: boolean;
     isDisposableComponent?: true;
     originalClassName?: string;
@@ -1340,7 +1299,6 @@ declare class DisposableComponentCreated {
  * @public
  */
 declare interface DisposableComponentLike extends ComponentLike {
-    [componentIdSymbol]?: string;
     onDispose?(): void;
 }
 
@@ -1409,9 +1367,6 @@ declare class Engine implements IEngine {
     readonly rootEntity: IEntity;
     readonly firstPersonCameraEntity: IEntity;
     readonly avatarEntity: IEntity;
-    readonly systems: SystemEntry[];
-    readonly entityLists: Record<string, Record<string, IEntity>>;
-    readonly addedSystems: ISystem[];
     private readonly _entities;
     private readonly _disposableComponents;
     private readonly _componentGroups;
@@ -1451,8 +1406,6 @@ declare class Entity implements IEntity {
     alive: boolean;
     readonly uuid: string;
     readonly components: Record<string, any>;
-    engine: IEngine | null;
-    private _parent;
     constructor(name?: string | undefined);
     /**
      * Adds or replaces a component in the entity.
@@ -1544,8 +1497,6 @@ declare class EventManager {
     removeListener<X>(listener: X, eventClass: IEventConstructor<any>): boolean;
     fireEvent<T extends object>(event: T): this;
 }
-
-declare const eventNameSymbol = "__event_name__";
 
 /**
  * Executes an asynchronous task
@@ -1662,8 +1613,6 @@ declare function getComponentId<T extends DisposableComponentLike>(component: T)
  * @public
  */
 declare function getComponentName<T extends Record<any, any> = any>(component: T | ComponentConstructor<T>): string;
-
-/* Excluded from this release type: getMessageObserver */
 
 /**
  * Gizmo identifiers
@@ -1795,20 +1744,15 @@ declare interface IEntity {
  * @public
  */
 declare interface IEventConstructor<T> {
-    [eventNameSymbol]?: string;
     new (...args: any[]): T;
 }
-
-/* Excluded from this release type: _initEventObservables */
 
 /**
  * @public
  */
 declare class Input {
     private static _instance;
-    private buttonIdMapping;
     static get instance(): Input;
-    private subscriptions;
     private internalState;
     private constructor();
     static ensureInstance(): any;
@@ -1863,8 +1807,6 @@ declare type InputState = Record<ActionButton, {
 declare interface IPhysicsCast {
     hitFirst(ray: Ray, hitCallback: (event: RaycastHitEntity) => void, id?: number): void;
     hitAll(ray: Ray, hitCallback: (event: RaycastHitEntities) => void, id?: number): void;
-    /* Excluded from this release type: hitFirstAvatar */
-    /* Excluded from this release type: hitAllAvatars */
 }
 
 /**
@@ -2752,7 +2694,6 @@ declare class MessageBus {
     private flushing;
     constructor();
     on(message: string, callback: (value: any, sender: string) => void): Observer<IEvents['comms']>;
-    sendRaw(message: string): void;
     emit(message: string, payload: Record<any, any>): void;
     private flush;
 }
@@ -3165,8 +3106,6 @@ declare class OnPointerDown extends OnPointerUUIDEvent<'pointerDown'> {
     constructor(callback: (event: IEvents['pointerDown']) => void);
     constructor(callback: (event: IEvents['pointerDown']) => void, options: OnPointerUUIDEventOptions);
 }
-
-/* Excluded from this release type: OnPointerLock */
 
 /**
  * @public
@@ -3636,8 +3575,6 @@ declare class PointerEventSystem implements ISystem {
     deactivate(): void;
 }
 
-/* Excluded from this release type: pointerEventSystem */
-
 /**
  * @public
  */
@@ -4073,8 +4010,6 @@ declare class RaycastEventSystem implements ISystem {
     deactivate(): void;
 }
 
-/* Excluded from this release type: raycastEventSystem */
-
 /**
  * @public
  */
@@ -4112,8 +4047,6 @@ declare interface RaycastHitEntities extends RaycastHit {
 declare interface RaycastHitEntity extends RaycastHit {
     entity: HitEntityInfo;
 }
-
-/* Excluded from this release type: RaycastQuery */
 
 /**
  * @public
@@ -4445,8 +4378,6 @@ declare class Size implements ISize {
     subtract(otherSize: Size): Size;
 }
 
-/* Excluded from this release type: SmartItem */
-
 /**
  * Defines supported spaces
  * @public
@@ -4474,8 +4405,6 @@ declare class Subscription {
     useRaycast: boolean;
     constructor(fn: (e: LocalActionButtonEvent) => void, useRaycast: boolean);
 }
-
-/* Excluded from this release type: SystemEntry */
 
 /** @public */
 declare type TaskResult<T> = Promise<T> & {
@@ -4664,8 +4593,6 @@ declare class UIContainerStack extends UIShape {
     spacing: Number;
 }
 
-/* Excluded from this release type: UIFullScreen */
-
 /**
  * @public
  */
@@ -4710,7 +4637,6 @@ declare class UIInputText extends UIShape {
     paddingLeft: number;
     onTextSubmit: OnTextSubmit | null;
     onChanged: OnChanged | null;
-    protected readonly onTextChanged: OnChanged;
     onFocus: OnFocus | null;
     onBlur: OnBlur | null;
     constructor(parent: UIShape | null);
@@ -4752,7 +4678,6 @@ declare abstract class UIShape extends ObservableComponent {
     private _parent?;
     constructor(parent: UIShape | null);
     get parent(): UIShape | undefined;
-    get parentComponent(): string | undefined;
 }
 
 /**
@@ -4809,10 +4734,6 @@ declare enum UIValueType {
     PIXELS = 1
 }
 
-/* Excluded from this release type: UIWorldSpace */
-
-/* Excluded from this release type: uuid */
-
 /**
  * @public
  */
@@ -4837,8 +4758,6 @@ declare class UUIDEventSystem implements ISystem {
     private componentRemoved;
     private handleEvent;
 }
-
-/* Excluded from this release type: uuidEventSystem */
 
 /**
  * Class representing a vector containing 2 coordinates

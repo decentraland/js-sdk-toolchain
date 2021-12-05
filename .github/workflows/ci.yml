@@ -43,6 +43,12 @@ jobs:
           cwd: packages/@dcl/js-runtime
           deterministic-snapshot: true
           only-update-versions: true
+      - name: update version of packages/@dcl/legacy-ecs
+        uses: menduz/oddish-action@master
+        with:
+          cwd: packages/@dcl/legacy-ecs
+          deterministic-snapshot: true
+          only-update-versions: true
       - name: update version of packages/decentraland-ecs
         uses: menduz/oddish-action@master
         with:

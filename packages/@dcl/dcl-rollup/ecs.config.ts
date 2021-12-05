@@ -11,7 +11,7 @@ const PROD = !!process.env.CI || process.env.NODE_ENV == 'production'
 console.log(`production: ${PROD}`)
 const packageJsonPath = sys.resolvePath('./package.json')
 const packageJson = JSON.parse(sys.readFile(packageJsonPath)!)
-console.log(packageJsonPath, packageJson)
+
 console.assert(packageJson.name, 'package.json .name must be present')
 console.assert(packageJson.main, 'package.json .main must be present')
 console.assert(packageJson.typings, 'package.json .typings must be present')

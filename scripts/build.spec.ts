@@ -66,6 +66,16 @@ flow('build-all', () => {
     copyLegacyEcs()
     fixTypes()
   })
+
+  flow('legacy-ecs', () => {
+    // This legacy-ecs flow should be always after decentrland-ecs.
+    // Why? First we bundle legacy-ecs as an iife file (rollout), and move it to decentraland-ecs.
+    // And then we build legacy-ecs with TS and publish it to npm so we can use it like a normal module.
+
+    itExecutes(`npm ci --quiet`, LEGACY_ECS_PATH)
+    itDeletesFolder('dist', LEGACY_ECS_PATH)
+    itExecutes(`${TSC} -p tsconfig.json`, LEGACY_ECS_PATH)
+  })
 })
 
 function copyLegacyEcs() {
@@ -86,6 +96,7 @@ function fixTypes() {
   it('fix ecs types', () => {
     const original = ensureFileExists('dist/src/index.d.ts', LEGACY_ECS_PATH)
 
+    copyFile(original, ECS_PATH + '/dist/index.d.ts')
     copyFile(original, ECS_PATH + '/types/dcl/index.d.ts')
 
     const dtsFile = ensureFileExists('types/dcl/index.d.ts', ECS_PATH)
