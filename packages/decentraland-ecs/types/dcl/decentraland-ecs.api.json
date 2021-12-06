@@ -4159,6 +4159,903 @@
           "implementsTokenRanges": []
         },
         {
+          "kind": "Enum",
+          "canonicalReference": "@dcl/legacy-ecs!CLASS_ID:enum",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare enum CLASS_ID "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "CLASS_ID",
+          "members": [
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.ANIMATION:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "ANIMATION = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "33"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "ANIMATION",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.AUDIO_CLIP:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "AUDIO_CLIP = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "200"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "AUDIO_CLIP",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.AUDIO_SOURCE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "AUDIO_SOURCE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "201"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "AUDIO_SOURCE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.AUDIO_STREAM:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "AUDIO_STREAM = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "202"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "AUDIO_STREAM",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.AVATAR_MODIFIER_AREA:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "AVATAR_MODIFIER_AREA = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "205"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "AVATAR_MODIFIER_AREA",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.AVATAR_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "AVATAR_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "56"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "AVATAR_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.BASIC_MATERIAL:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "BASIC_MATERIAL = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "64"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "BASIC_MATERIAL",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.BILLBOARD:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "BILLBOARD = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "32"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "BILLBOARD",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.BOX_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "BOX_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "16"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "BOX_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.CIRCLE_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "CIRCLE_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "31"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "CIRCLE_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.CONE_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "CONE_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "19"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "CONE_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.CYLINDER_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "CYLINDER_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "20"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "CYLINDER_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.FONT:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "FONT = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "34"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "FONT",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.GIZMOS:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "GIZMOS = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "203"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "GIZMOS",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.GLTF_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "GLTF_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "54"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "GLTF_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.HIGHLIGHT_ENTITY:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "HIGHLIGHT_ENTITY = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "66"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "HIGHLIGHT_ENTITY",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.LOCKED_ON_EDIT:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "LOCKED_ON_EDIT = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "301"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "LOCKED_ON_EDIT",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.NAME:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "NAME = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "300"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "NAME",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.NFT_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "NFT_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "22"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "NFT_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.OBJ_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "OBJ_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "55"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "OBJ_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.PBR_MATERIAL:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "PBR_MATERIAL = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "65"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "PBR_MATERIAL",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.PLANE_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "PLANE_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "18"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "PLANE_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.SMART_ITEM:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "SMART_ITEM = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "204"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "SMART_ITEM",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.SOUND:member",
+              "docComment": "/**\n * @deprecated\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "SOUND = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "67"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "SOUND",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.SPHERE_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "SPHERE_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "17"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "SPHERE_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.TEXT_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "TEXT_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "21"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "TEXT_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.TEXTURE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "TEXTURE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "68"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "TEXTURE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.TRANSFORM:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "TRANSFORM = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "1"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "TRANSFORM",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.UI_BUTTON_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "UI_BUTTON_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "41"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "UI_BUTTON_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.UI_CONTAINER_RECT:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "UI_CONTAINER_RECT = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "25"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "UI_CONTAINER_RECT",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.UI_CONTAINER_STACK:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "UI_CONTAINER_STACK = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "26"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "UI_CONTAINER_STACK",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.UI_FULLSCREEN_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "UI_FULLSCREEN_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "40"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "UI_FULLSCREEN_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.UI_IMAGE_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "UI_IMAGE_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "29"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "UI_IMAGE_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.UI_INPUT_TEXT_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "UI_INPUT_TEXT_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "28"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "UI_INPUT_TEXT_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.UI_SCREEN_SPACE_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "UI_SCREEN_SPACE_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "24"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "UI_SCREEN_SPACE_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.UI_SLIDER_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "UI_SLIDER_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "30"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "UI_SLIDER_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.UI_TEXT_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "UI_TEXT_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "27"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "UI_TEXT_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.UI_WORLD_SPACE_SHAPE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "UI_WORLD_SPACE_SHAPE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "23"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "UI_WORLD_SPACE_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.UUID_CALLBACK:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "UUID_CALLBACK = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "8"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "UUID_CALLBACK",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.VIDEO_CLIP:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "VIDEO_CLIP = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "70"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "VIDEO_CLIP",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.VIDEO_TEXTURE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "VIDEO_TEXTURE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "71"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "VIDEO_TEXTURE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.VISIBLE_ON_EDIT:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "VISIBLE_ON_EDIT = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "302"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "VISIBLE_ON_EDIT",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ]
+        },
+        {
           "kind": "Class",
           "canonicalReference": "@dcl/legacy-ecs!Color3:class",
           "docComment": "/**\n * Class used to hold a RBG color\n *\n * @public\n */\n",

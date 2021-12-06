@@ -285,6 +285,94 @@ export class CircleShape extends Shape {
     segments?: number;
 }
 
+// @public (undocumented)
+export enum CLASS_ID {
+    // (undocumented)
+    ANIMATION = 33,
+    // (undocumented)
+    AUDIO_CLIP = 200,
+    // (undocumented)
+    AUDIO_SOURCE = 201,
+    // (undocumented)
+    AUDIO_STREAM = 202,
+    // (undocumented)
+    AVATAR_MODIFIER_AREA = 205,
+    // (undocumented)
+    AVATAR_SHAPE = 56,
+    // (undocumented)
+    BASIC_MATERIAL = 64,
+    // (undocumented)
+    BILLBOARD = 32,
+    // (undocumented)
+    BOX_SHAPE = 16,
+    // (undocumented)
+    CIRCLE_SHAPE = 31,
+    // (undocumented)
+    CONE_SHAPE = 19,
+    // (undocumented)
+    CYLINDER_SHAPE = 20,
+    // (undocumented)
+    FONT = 34,
+    // (undocumented)
+    GIZMOS = 203,
+    // (undocumented)
+    GLTF_SHAPE = 54,
+    // (undocumented)
+    HIGHLIGHT_ENTITY = 66,
+    // (undocumented)
+    LOCKED_ON_EDIT = 301,
+    // (undocumented)
+    NAME = 300,
+    // (undocumented)
+    NFT_SHAPE = 22,
+    // (undocumented)
+    OBJ_SHAPE = 55,
+    // (undocumented)
+    PBR_MATERIAL = 65,
+    // (undocumented)
+    PLANE_SHAPE = 18,
+    // (undocumented)
+    SMART_ITEM = 204,
+    // @deprecated (undocumented)
+    SOUND = 67,
+    // (undocumented)
+    SPHERE_SHAPE = 17,
+    // (undocumented)
+    TEXT_SHAPE = 21,
+    // (undocumented)
+    TEXTURE = 68,
+    // (undocumented)
+    TRANSFORM = 1,
+    // (undocumented)
+    UI_BUTTON_SHAPE = 41,
+    // (undocumented)
+    UI_CONTAINER_RECT = 25,
+    // (undocumented)
+    UI_CONTAINER_STACK = 26,
+    // (undocumented)
+    UI_FULLSCREEN_SHAPE = 40,
+    // (undocumented)
+    UI_IMAGE_SHAPE = 29,
+    // (undocumented)
+    UI_INPUT_TEXT_SHAPE = 28,
+    // (undocumented)
+    UI_SCREEN_SPACE_SHAPE = 24,
+    // (undocumented)
+    UI_SLIDER_SHAPE = 30,
+    // (undocumented)
+    UI_TEXT_SHAPE = 27,
+    // (undocumented)
+    UI_WORLD_SPACE_SHAPE = 23,
+    // (undocumented)
+    UUID_CALLBACK = 8,
+    // (undocumented)
+    VIDEO_CLIP = 70,
+    // (undocumented)
+    VIDEO_TEXTURE = 71,
+    // (undocumented)
+    VISIBLE_ON_EDIT = 302
+}
+
 // @public
 export class Color3 {
     constructor(

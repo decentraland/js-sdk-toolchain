@@ -1,4 +1,6 @@
+import { readFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
+
 import {
   flow,
   TSC,
@@ -13,7 +15,6 @@ import {
 } from './common'
 import { ensureFileExists, itExecutes, itDeletesFolder, copyFile, itDeletesGlob } from './helpers'
 
-import { readFileSync, writeFileSync } from 'fs'
 
 flow('build-all', () => {
   commonChecks()

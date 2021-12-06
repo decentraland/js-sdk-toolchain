@@ -451,6 +451,55 @@ export declare class CircleShape extends Shape {
 }
 
 /**
+ * @public
+ */
+export declare enum CLASS_ID {
+    TRANSFORM = 1,
+    UUID_CALLBACK = 8,
+    BOX_SHAPE = 16,
+    SPHERE_SHAPE = 17,
+    PLANE_SHAPE = 18,
+    CONE_SHAPE = 19,
+    CYLINDER_SHAPE = 20,
+    TEXT_SHAPE = 21,
+    NFT_SHAPE = 22,
+    UI_WORLD_SPACE_SHAPE = 23,
+    UI_SCREEN_SPACE_SHAPE = 24,
+    UI_CONTAINER_RECT = 25,
+    UI_CONTAINER_STACK = 26,
+    UI_TEXT_SHAPE = 27,
+    UI_INPUT_TEXT_SHAPE = 28,
+    UI_IMAGE_SHAPE = 29,
+    UI_SLIDER_SHAPE = 30,
+    CIRCLE_SHAPE = 31,
+    BILLBOARD = 32,
+    ANIMATION = 33,
+    FONT = 34,
+    UI_FULLSCREEN_SHAPE = 40,
+    UI_BUTTON_SHAPE = 41,
+    GLTF_SHAPE = 54,
+    OBJ_SHAPE = 55,
+    AVATAR_SHAPE = 56,
+    BASIC_MATERIAL = 64,
+    PBR_MATERIAL = 65,
+    HIGHLIGHT_ENTITY = 66,
+    /** @deprecated */
+    SOUND = 67,
+    TEXTURE = 68,
+    VIDEO_CLIP = 70,
+    VIDEO_TEXTURE = 71,
+    AUDIO_CLIP = 200,
+    AUDIO_SOURCE = 201,
+    AUDIO_STREAM = 202,
+    GIZMOS = 203,
+    SMART_ITEM = 204,
+    AVATAR_MODIFIER_AREA = 205,
+    NAME = 300,
+    LOCKED_ON_EDIT = 301,
+    VISIBLE_ON_EDIT = 302
+}
+
+/**
  * Class used to hold a RBG color
  * @public
  */
