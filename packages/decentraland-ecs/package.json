@@ -33,7 +33,6 @@
     "@dcl/posix": "1.0.3",
     "@dcl/schemas": "2.2.3-20211130152647.commit-cbda2b3",
     "@dcl/unity-renderer": "1.0.21238-20211201163856.commit-2cd2027",
-    "@dcl/ecs-math": "^1.0.0-20211129201230.commit-9a85c89",
     "glob": "^7.1.7",
     "http-proxy-middleware": "^2.0.1",
     "ignore": "^5.1.8"
