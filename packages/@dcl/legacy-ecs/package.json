@@ -2,8 +2,8 @@
   "name": "@dcl/legacy-ecs",
   "version": "0.0.0",
   "description": "Decentraland ECS Legacy",
-  "main": "dist/src/index.js",
-  "typings": "dist/src/index.d.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "watch": "tsc -p tsconfig.json --watch",
     "build": "tsc -p tsconfig.json",

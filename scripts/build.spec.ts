@@ -82,20 +82,20 @@ flow('build-all', () => {
 function copyLegacyEcs() {
   it('copy legacy ecs iife to decentraland-ecs', () => {
     const filesToCopy = [
-      'dist/src/index.js',
-      'dist/src/index.min.js',
-      'dist/src/index.min.js.map'
+      'index.js',
+      'index.min.js',
+      'index.min.js.map'
     ]
     for (const file of filesToCopy) {
-      const filePath = ensureFileExists(file, LEGACY_ECS_PATH)
-      copyFile(filePath, `${ECS_PATH}/${file}`)
+      const filePath = ensureFileExists(`dist/${file}`, LEGACY_ECS_PATH)
+      copyFile(filePath, `${ECS_PATH}/dist/src/${file}`)
     }
   })
 }
 
 function fixTypes() {
   it('fix ecs types', () => {
-    const original = ensureFileExists('dist/src/index.d.ts', LEGACY_ECS_PATH)
+    const original = ensureFileExists('dist/index.d.ts', LEGACY_ECS_PATH)
 
     copyFile(original, ECS_PATH + '/dist/index.d.ts')
     copyFile(original, ECS_PATH + '/types/dcl/index.d.ts')
