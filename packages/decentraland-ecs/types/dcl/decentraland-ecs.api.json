@@ -4657,7 +4657,7 @@
             {
               "kind": "EnumMember",
               "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.SOUND:member",
-              "docComment": "/**\n * @deprecated\n */\n",
+              "docComment": "/**\n * @deprecated\n *\n * Sound has been deprecataed\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",

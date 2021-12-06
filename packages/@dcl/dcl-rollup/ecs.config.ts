@@ -55,7 +55,7 @@ const config: RollupOptions = {
   input: './src/index.ts',
   context: 'self',
   plugins,
-  external: [/@decentraland\//],
+  external: /@decentraland\//,
   output: [
     {
       file: packageJson.main,

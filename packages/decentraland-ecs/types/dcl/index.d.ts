@@ -483,7 +483,7 @@ declare enum CLASS_ID {
     BASIC_MATERIAL = 64,
     PBR_MATERIAL = 65,
     HIGHLIGHT_ENTITY = 66,
-    /** @deprecated */
+    /** @deprecated Sound has been deprecataed */
     SOUND = 67,
     TEXTURE = 68,
     VIDEO_CLIP = 70,

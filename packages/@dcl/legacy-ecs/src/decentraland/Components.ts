@@ -55,7 +55,7 @@ export enum CLASS_ID {
 
   HIGHLIGHT_ENTITY = 66,
 
-  /** @deprecated */
+  /** @deprecated Sound has been deprecataed */
   SOUND = 67,
   TEXTURE = 68,
 
