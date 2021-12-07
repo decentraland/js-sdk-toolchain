@@ -1,4 +1,5 @@
-import { Vector3, Quaternion } from './math'
+import { Vector3, Quaternion } from '@dcl/ecs-math'
+
 import { CameraMode } from './Types'
 
 /**

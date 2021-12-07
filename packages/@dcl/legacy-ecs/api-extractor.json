@@ -42,7 +42,7 @@
    *
    * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
    */
-  "mainEntryPointFilePath": "dist/src/index.d.ts",
+  "mainEntryPointFilePath": "dist/index.d.ts",
   /**
    * Determines how the TypeScript compiler engine will be invoked by API Extractor.
    */
@@ -86,7 +86,7 @@
      * SUPPORTED TOKENS: <packageName>, <unscopedPackageName>
      * DEFAULT VALUE: "<unscopedPackageName>.api.md"
      */
-    // "reportFileName": "<unscopedPackageName>.api.md",
+    "reportFileName": "decentraland-ecs.api.md",
     /**
      * Specifies the folder where the API report file is written.  The file name portion is determined by
      * the "reportFileName" setting.
@@ -100,7 +100,7 @@
      * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
      * DEFAULT VALUE: "<projectFolder>/etc/"
      */
-    "reportFolder": "<projectFolder>/types/dcl/",
+    "reportFolder": "../../decentraland-ecs/types/dcl/",
     /**
      * Specifies the folder where the temporary report file is written.  The file name portion is determined by
      * the "reportFileName" setting.
@@ -133,7 +133,7 @@
      * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
      * DEFAULT VALUE: "<projectFolder>/temp/<unscopedPackageName>.api.json"
      */
-    "apiJsonFilePath": "types/dcl/decentraland-ecs.api.json"
+    "apiJsonFilePath": "../../decentraland-ecs/types/dcl/decentraland-ecs.api.json"
   },
   /**
    * Configures how the .d.ts rollup file will be generated.
@@ -156,7 +156,7 @@
      * DEFAULT VALUE: "<projectFolder>/dist/<unscopedPackageName>.d.ts"
      */
     // "untrimmedFilePath": "<projectFolder>/dist/<unscopedPackageName>.d.ts",
-    "untrimmedFilePath": "types/dcl/index-full.d.ts",
+    "untrimmedFilePath": "../../decentraland-ecs/types/dcl/index-full.d.ts",
     /**
     // "untrimmedFilePath": "<projectFolder>/dist/<unscopedPackageName>.d.ts",
      * Specifies the output path for a .d.ts rollup file to be generated with trimming for a "beta" release.
@@ -169,7 +169,7 @@
      * DEFAULT VALUE: ""
      */
     // "betaTrimmedFilePath": "<projectFolder>/dist/<unscopedPackageName>-beta.d.ts",
-    "betaTrimmedFilePath": "types/dcl/index-beta.d.ts",
+    "betaTrimmedFilePath": "../../decentraland-ecs/types/dcl/index-beta.d.ts",
     /**
      * Specifies the output path for a .d.ts rollup file to be generated with trimming for a "public" release.
      * This file will include only declarations that are marked as "@public".
@@ -304,7 +304,7 @@
       // . . .
     }
   },
-  // "bundledPackages": [
-  //   "@dcl/posix"
-  // ]
+  "bundledPackages": [
+    "@dcl/ecs-math"
+  ]
 }

@@ -1,7 +1,8 @@
+import { ReadOnlyColor4 } from '@dcl/ecs-math'
+
 import { WearableId } from '../decentraland/Types'
 import { Component, ObservableComponent } from '../ecs/Component'
 import { CLASS_ID } from './Components'
-import { ReadOnlyColor4 } from './math'
 
 /**
  * @public

@@ -1,7 +1,8 @@
 // tslint:disable:ter-indent
 
+import { Vector3 } from '@dcl/ecs-math'
+
 import { InputEventType } from './Types'
-import { Vector3 } from './math'
 import { Component, DisposableComponent } from '../ecs/Component'
 
 /** @public */

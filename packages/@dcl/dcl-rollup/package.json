@@ -17,6 +17,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@microsoft/api-extractor": "^7.18.7",
+    "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^13.0.4",
     "glob": "^7.1.7",
     "rollup": "^2.56.3",

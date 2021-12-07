@@ -1,7 +1,7 @@
 import * as path from 'path'
 import * as fs from 'fs'
 import * as express from 'express'
-import { createStaticRoutes, getDirectories } from './cli/setupUtils'
+import { createStaticRoutes } from './cli/setupUtils'
 import { mockCatalyst } from './cli/mock-catalyst'
 import { mockPreviewWearables } from './cli/wearables'
 

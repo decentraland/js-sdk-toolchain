@@ -20,6 +20,7 @@ export const BUILD_ECS_PATH = resolve(process.cwd(), './packages/@dcl/build-ecs'
 export const DECENTRALAND_AMD_PATH = resolve(process.cwd(), './packages/@dcl/amd')
 export const ROLLUP_CONFIG_PATH = resolve(process.cwd(), './packages/@dcl/dcl-rollup')
 export const ECS_PATH = resolve(process.cwd(), './packages/decentraland-ecs')
+export const LEGACY_ECS_PATH = resolve(process.cwd(), './packages/@dcl/legacy-ecs')
 
 export function commonChecks() {
   test('tooling is installed', () => {

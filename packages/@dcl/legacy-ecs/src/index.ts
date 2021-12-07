@@ -45,7 +45,7 @@ engine.addSystem(pointerEventSystem)
 engine.addSystem(raycastEventSystem)
 
 // DECENTRALAND DEPENDENCIES
-export * from './decentraland/math'
+export * from './decentraland/Math'
 export * from './decentraland/Types'
 export * from './decentraland/Components'
 export * from './decentraland/Systems'

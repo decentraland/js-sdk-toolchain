@@ -8,6 +8,7 @@ install:
 	cd packages/@dcl/build-ecs; npm ci
 	cd packages/@dcl/dcl-rollup; npm ci
 	cd packages/@dcl/amd; npm ci
+	cd packages/@dcl/legacy-ecs; npm ci
 
 test:
 	node_modules/.bin/jest --detectOpenHandles --colors --roots "test"

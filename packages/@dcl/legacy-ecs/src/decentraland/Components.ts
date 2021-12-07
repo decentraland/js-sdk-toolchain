@@ -1,5 +1,6 @@
+import { Vector3, Quaternion, Matrix, MathTmp, Color3, Color4 } from '@dcl/ecs-math'
+
 import { Component, ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
-import { Vector3, Quaternion, Matrix, MathTmp, Color3, Color4 } from './math'
 import { AnimationState } from './AnimationState'
 import { newId } from '../ecs/helpers'
 import { ActionButton } from './Input'
@@ -15,7 +16,7 @@ export type TransformConstructorArgs = {
 }
 
 /**
- * @internal
+ * @public
  */
 export enum CLASS_ID {
   TRANSFORM = 1,
@@ -54,7 +55,7 @@ export enum CLASS_ID {
 
   HIGHLIGHT_ENTITY = 66,
 
-  /** @deprecated */
+  /** @deprecated Sound has been deprecataed */
   SOUND = 67,
   TEXTURE = 68,
 

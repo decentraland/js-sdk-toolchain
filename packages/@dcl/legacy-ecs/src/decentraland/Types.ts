@@ -1,4 +1,4 @@
-import { ReadOnlyColor4 } from './math'
+import { ReadOnlyColor4 } from '@dcl/ecs-math'
 
 /** @public */
 export enum InputEventType {

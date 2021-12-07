@@ -1,4 +1,5 @@
-import { Vector3, Matrix } from './math'
+import { Vector3, Matrix } from '@dcl/ecs-math'
+
 import { RaycastResponse } from './Events'
 import { uuid, log } from '../ecs/helpers'
 
