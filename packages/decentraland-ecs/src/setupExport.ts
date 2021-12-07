@@ -10,6 +10,8 @@ import {
   shaHashMaker
 } from './cli/setupUtils'
 
+declare var URL: any
+
 const setupExport = async ({
   workDir,
   exportDir,

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ESNext",
     "module": "ESNext",
     "strict": true,
     "declarationDir": "dist",
@@ -19,6 +19,7 @@
     "downlevelIteration": true,
     "keyofStringsOnly": true,
     "noUnusedLocals": true,
+    "skipLibCheck": true,
     "baseUrl": ".",
     "types": [
       "env",
@@ -31,16 +32,5 @@
   },
   "include": [
     "./src"
-  ],
-  "exclude": [
-    "../../node_modules",
-    "../../src",
-    "../../test",
-    "../test",
-    "dist",
-    "etc",
-    "temp",
-    "types",
-    "api-docs-review/decentraland-ecs.api.ts"
   ]
 }

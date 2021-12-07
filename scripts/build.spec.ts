@@ -52,6 +52,7 @@ flow('build-all', () => {
   })
 
   flow('decentraland-ecs', () => {
+    itDeletesFolder('dist', ECS_PATH)
     itExecutes(`npm i --quiet`, ECS_PATH)
 
     itDeletesGlob('types/dcl/*.d.ts', ECS_PATH)
