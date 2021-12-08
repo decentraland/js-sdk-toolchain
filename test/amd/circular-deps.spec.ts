@@ -2,14 +2,14 @@ import future from 'fp-future'
 import { mockEnvironment } from './helpers'
 
 describe('simple circular deps', () => {
-  const { starters, define, errors, getModules } = mockEnvironment({})
+  const { starters, define, errors } = mockEnvironment({})
 
   it('defines two circular deps', async () => {
-    define('dep-a', ['exports', './dep-b'], (exports: any, b: any) => {
+    define('dep-a', ['exports', './dep-b'], (exports: any, _b: any) => {
       exports.a = 1
     })
 
-    define('dep-b', ['exports', './dep-a'], (exports: any, a: any) => {
+    define('dep-b', ['exports', './dep-a'], (exports: any, _a: any) => {
       exports.b = 1
     })
 
@@ -18,7 +18,11 @@ describe('simple circular deps', () => {
     const resolvedImmediate = new Promise((resolve) => {
       define('a/b/c', ['../../dep-a', 'dep-b'], (depA: any, depB: any) => {
         resolve(JSON.parse(JSON.stringify({ depA, depB })))
-        setTimeout(() => resolvedTimeout.resolve(JSON.parse(JSON.stringify({ depA, depB }))), 100)
+        setTimeout(
+          () =>
+            resolvedTimeout.resolve(JSON.parse(JSON.stringify({ depA, depB }))),
+          100
+        )
       })
     })
 
@@ -35,7 +39,9 @@ describe('simple circular deps', () => {
 
   it('starters must not throw', () => {
     expect(starters.length).toBeGreaterThan(0)
-    expect(() => starters.forEach(($) => $())).toThrow('dep-a -> dep-b -> dep-a')
+    expect(() => starters.forEach(($) => $())).toThrow(
+      'dep-a -> dep-b -> dep-a'
+    )
     expect(errors).toEqual([])
   })
 })

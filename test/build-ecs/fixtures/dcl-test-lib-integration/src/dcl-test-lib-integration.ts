@@ -1,4 +1,4 @@
-import {toJsonRpcRequest} from 'eth-connect'
+import { toJsonRpcRequest } from 'eth-connect'
 
 export function test() {
   return toJsonRpcRequest

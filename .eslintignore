@@ -1,4 +1,3 @@
 packages/@dcl/js-runtime
 *.js
 *.d.ts
-test/

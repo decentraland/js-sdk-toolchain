@@ -22,27 +22,31 @@ describe('file structure and path normalization tests', () => {
   testFileStructure(
     'recursive case',
     {
-      a: ['b','c'],
-      b: ['c','a'],
-      c: ['a','b'],
+      a: ['b', 'c'],
+      b: ['c', 'a'],
+      c: ['a', 'b'],
       '': ['a', 'b']
     },
     {
-      a: ['b','c'],
-      b: ['c','a'],
-      c: ['a','b'],
+      a: ['b', 'c'],
+      b: ['c', 'a'],
+      c: ['a', 'b'],
       'unnamed-module-0': ['a', 'b']
     }
   )
 })
 
-function testFileStructure(name: string, defines: Record<string, string[]>, result: Record<string, string[]>) {
+function testFileStructure(
+  name: string,
+  defines: Record<string, string[]>,
+  result: Record<string, string[]>
+) {
   describe(name, () => {
     const { starters, define, errors, getModules } = mockEnvironment({})
     function prettyDependencies() {
-      let ret: Record<string, string[]> = {}
-      let modules = getModules()
-      for (let i in modules) {
+      const ret: Record<string, string[]> = {}
+      const modules = getModules()
+      for (const i in modules) {
         ret[i] = modules[i].dependencies
       }
       return ret
@@ -52,8 +56,8 @@ function testFileStructure(name: string, defines: Record<string, string[]>, resu
     const inc = () => i++
 
     it('define files and validates final structure', async () => {
-      for (let i in defines) {
-        if (i != '') {
+      for (const i in defines) {
+        if (i !== '') {
           define(i, defines[i], inc)
         } else {
           define(defines[i], inc)

@@ -7,7 +7,8 @@
       "packages/@dcl/dcl-rollup/tsconfig.json",
       "packages/@dcl/amd/tsconfig.json",
       "packages/decentraland-ecs/tsconfig.json",
-      "scripts/tsconfig.json"
+      "scripts/tsconfig.json",
+      "test/tsconfig.json"
     ]
   },
   "rules": {
