@@ -59,6 +59,8 @@ jobs:
         run: make build
       - name: test
         run: make test
+      - name: lint
+        run: make lint
       - name: prepare releasable packages
         run: make prepare
       - name: 'Upload Artifact'
