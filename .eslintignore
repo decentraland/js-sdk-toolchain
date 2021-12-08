@@ -1,4 +1,3 @@
-packages/@dcl/amd
 packages/@dcl/dcl-rollup
 packages/@dcl/js-runtime
 *.js

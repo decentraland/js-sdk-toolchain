@@ -4,6 +4,7 @@
     "project": [
       "packages/@dcl/legacy-ecs/tsconfig.json",
       "packages/@dcl/build-ecs/tsconfig.json",
+      "packages/@dcl/amd/tsconfig.json",
       "packages/decentraland-ecs/tsconfig.json",
       "scripts/tsconfig.json"
     ]
