@@ -3443,8 +3443,8 @@ export declare class PhysicsCast implements IPhysicsCast {
     getRayFromPositions(from: Vector3, to: Vector3): Ray;
     hitFirst(ray: Ray, hitCallback: (event: RaycastHitEntity) => void, id?: number): void;
     hitAll(ray: Ray, hitCallback: (event: RaycastHitEntities) => void, id?: number): void;
-    hitFirstAvatar(ray: Ray, hitCallback: (event: RaycastHitAvatar) => void): void;
-    hitAllAvatars(ray: Ray, hitCallback: (event: RaycastHitAvatars) => void): void;
+    hitFirstAvatar(_ray: Ray, _hitCallback: (event: RaycastHitAvatar) => void): void;
+    hitAllAvatars(_ray: Ray, _hitCallback: (event: RaycastHitAvatars) => void): void;
     handleRaycastHitFirstResponse(response: RaycastResponse<RaycastHitEntity>): void;
     handleRaycastHitAllResponse(response: RaycastResponse<RaycastHitEntities>): void;
 }
@@ -4653,7 +4653,7 @@ export declare class UIContainerStack extends UIShape {
     adaptHeight: boolean;
     color: Color4;
     stackOrientation: UIStackOrientation;
-    spacing: Number;
+    spacing: number;
 }
 
 /**

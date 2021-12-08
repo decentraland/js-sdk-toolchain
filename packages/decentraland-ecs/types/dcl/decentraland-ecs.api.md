@@ -1550,11 +1550,11 @@ export class PhysicsCast implements IPhysicsCast {
     // (undocumented)
     hitAll(ray: Ray, hitCallback: (event: RaycastHitEntities) => void, id?: number): void;
     // (undocumented)
-    hitAllAvatars(ray: Ray, hitCallback: (event: RaycastHitAvatars) => void): void;
+    hitAllAvatars(_ray: Ray, _hitCallback: (event: RaycastHitAvatars) => void): void;
     // (undocumented)
     hitFirst(ray: Ray, hitCallback: (event: RaycastHitEntity) => void, id?: number): void;
     // (undocumented)
-    hitFirstAvatar(ray: Ray, hitCallback: (event: RaycastHitAvatar) => void): void;
+    hitFirstAvatar(_ray: Ray, _hitCallback: (event: RaycastHitAvatar) => void): void;
     // (undocumented)
     static get instance(): PhysicsCast;
 }
@@ -2082,7 +2082,7 @@ export class UIContainerStack extends UIShape {
     // (undocumented)
     color: Color4;
     // (undocumented)
-    spacing: Number;
+    spacing: number;
     // (undocumented)
     stackOrientation: UIStackOrientation;
 }
