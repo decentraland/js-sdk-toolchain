@@ -1,4 +1,9 @@
-import { DisposableComponent, ObservableComponent, Component, getComponentId } from '../ecs/Component'
+import {
+  DisposableComponent,
+  ObservableComponent,
+  Component,
+  getComponentId
+} from '../ecs/Component'
 import { CLASS_ID } from './Components'
 
 /**
@@ -74,7 +79,9 @@ export class AudioSource extends ObservableComponent {
   constructor(public readonly audioClip: AudioClip) {
     super()
     if (!(audioClip instanceof AudioClip)) {
-      throw new Error(`Trying to create AudioSource(AudioClip) with an invalid AudioClip`)
+      throw new Error(
+        `Trying to create AudioSource(AudioClip) with an invalid AudioClip`
+      )
     }
     this.audioClipId = getComponentId(audioClip as any)
   }

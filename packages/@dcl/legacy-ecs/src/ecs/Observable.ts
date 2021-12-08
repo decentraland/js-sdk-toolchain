@@ -1,6 +1,6 @@
 import { executeTask } from './Task'
 
-declare var Promise: any
+declare let Promise: any
 
 /**
  * A class serves as a medium between the observable and its observers
@@ -40,7 +40,12 @@ export class ObserverEventState {
    * @param target - defines the original target of the state
    * @param currentTarget - defines the current target of the state
    */
-  constructor(mask: number, skipNextObservers = false, target?: any, currentTarget?: any) {
+  constructor(
+    mask: number,
+    skipNextObservers = false,
+    target?: any,
+    currentTarget?: any
+  ) {
     this.initalize(mask, skipNextObservers, target, currentTarget)
   }
 
@@ -52,7 +57,12 @@ export class ObserverEventState {
    * @param currentTarget - defines the current target of the state
    * @returns the current event state
    */
-  public initalize(mask: number, skipNextObservers = false, target?: any, currentTarget?: any): ObserverEventState {
+  public initalize(
+    mask: number,
+    skipNextObservers = false,
+    target?: any,
+    currentTarget?: any
+  ): ObserverEventState {
     this.mask = mask
     this.skipNextObservers = skipNextObservers
     this.target = target
@@ -118,13 +128,13 @@ export class MultiObserver<T> {
     mask: number = -1,
     scope: any = null
   ): MultiObserver<T> {
-    let result = new MultiObserver<T>()
+    const result = new MultiObserver<T>()
 
     result._observers = new Array<Observer<T>>()
     result._observables = observables
 
-    for (let observable of observables) {
-      let observer = observable.add(callback, mask, false, scope)
+    for (const observable of observables) {
+      const observer = observable.add(callback, mask, false, scope)
       if (observer) {
         result._observers.push(observer)
       }
@@ -197,7 +207,7 @@ export class Observable<T> {
       return null
     }
 
-    let observer = new Observer(callback, mask, scope)
+    const observer = new Observer(callback, mask, scope)
     observer.unregisterOnNextCall = unregisterOnFirstCall
 
     if (insertFirst) {
@@ -218,7 +228,9 @@ export class Observable<T> {
    * @param callback - the callback that will be executed for that Observer
    * @returns the new observer created for the callback
    */
-  public addOnce(callback: (eventData: T, eventState: ObserverEventState) => void): null | Observer<T> {
+  public addOnce(
+    callback: (eventData: T, eventState: ObserverEventState) => void
+  ): null | Observer<T> {
     return this.add(callback, undefined, undefined, undefined, true)
   }
 
@@ -232,7 +244,7 @@ export class Observable<T> {
       return false
     }
 
-    let index = this._observers.indexOf(observer)
+    const index = this._observers.indexOf(observer)
 
     if (index !== -1) {
       this._deferUnregister(observer)
@@ -248,9 +260,15 @@ export class Observable<T> {
    * @param scope - optional scope. If used only the callbacks with this scope will be removed
    * @returns false if it doesn't belong to this Observable
    */
-  public removeCallback(callback: (eventData: T, eventState: ObserverEventState) => void, scope?: any): boolean {
+  public removeCallback(
+    callback: (eventData: T, eventState: ObserverEventState) => void,
+    scope?: any
+  ): boolean {
     for (let index = 0; index < this._observers.length; index++) {
-      if (this._observers[index].callback === callback && (!scope || scope === this._observers[index].scope)) {
+      if (
+        this._observers[index].callback === callback &&
+        (!scope || scope === this._observers[index].scope)
+      ) {
         this._deferUnregister(this._observers[index])
         return true
       }
@@ -268,26 +286,34 @@ export class Observable<T> {
    * @param currentTarget - defines the current target of the state
    * @returns false if the complete observer chain was not processed (because one observer set the skipNextObservers to true)
    */
-  public notifyObservers(eventData: T, mask: number = -1, target?: any, currentTarget?: any): boolean {
+  public notifyObservers(
+    eventData: T,
+    mask: number = -1,
+    target?: any,
+    currentTarget?: any
+  ): boolean {
     if (!this._observers.length) {
       return true
     }
 
-    let state = this._eventState
+    const state = this._eventState
     state.mask = mask
     state.target = target
     state.currentTarget = currentTarget
     state.skipNextObservers = false
     state.lastReturnValue = eventData
 
-    for (let obs of this._observers) {
+    for (const obs of this._observers) {
       if (obs._willBeUnregistered) {
         continue
       }
 
       if (obs.mask & mask) {
         if (obs.scope) {
-          state.lastReturnValue = obs.callback.apply(obs.scope, [eventData, state])
+          state.lastReturnValue = obs.callback.apply(obs.scope, [
+            eventData,
+            state
+          ])
         } else {
           state.lastReturnValue = obs.callback(eventData, state)
         }
@@ -316,7 +342,12 @@ export class Observable<T> {
    * @param currentTarget - defines he current object in the bubbling phase
    * @returns will return a Promise than resolves when all callbacks executed successfully.
    */
-  public notifyObserversWithPromise(eventData: T, mask: number = -1, target?: any, currentTarget?: any): Promise<T> {
+  public notifyObserversWithPromise(
+    eventData: T,
+    mask: number = -1,
+    target?: any,
+    currentTarget?: any
+  ): Promise<T> {
     // create an empty promise
     let p: Promise<any> = Promise.resolve(eventData)
 
@@ -325,14 +356,14 @@ export class Observable<T> {
       return p
     }
 
-    let state = this._eventState
+    const state = this._eventState
     state.mask = mask
     state.target = target
     state.currentTarget = currentTarget
     state.skipNextObservers = false
 
     // execute one callback after another (not using Promise.all, the order is important)
-    this._observers.forEach(obs => {
+    this._observers.forEach((obs) => {
       if (state.skipNextObservers) {
         return
       }
@@ -341,12 +372,12 @@ export class Observable<T> {
       }
       if (obs.mask & mask) {
         if (obs.scope) {
-          p = p.then(lastReturnedValue => {
+          p = p.then((lastReturnedValue) => {
             state.lastReturnValue = lastReturnedValue
             return obs.callback.apply(obs.scope, [eventData, state])
           })
         } else {
-          p = p.then(lastReturnedValue => {
+          p = p.then((lastReturnedValue) => {
             state.lastReturnValue = lastReturnedValue
             return obs.callback(eventData, state)
           })
@@ -369,8 +400,12 @@ export class Observable<T> {
    * @param eventData - defines the data to be sent to each callback
    * @param mask - is used to filter observers defaults to -1
    */
-  public notifyObserver(observer: Observer<T>, eventData: T, mask: number = -1): void {
-    let state = this._eventState
+  public notifyObserver(
+    observer: Observer<T>,
+    eventData: T,
+    mask: number = -1
+  ): void {
+    const state = this._eventState
     state.mask = mask
     state.skipNextObservers = false
 
@@ -398,7 +433,7 @@ export class Observable<T> {
    * @returns a new observable
    */
   public clone(): Observable<T> {
-    let result = new Observable<T>()
+    const result = new Observable<T>()
 
     result._observers = this._observers.slice(0)
 
@@ -411,7 +446,7 @@ export class Observable<T> {
    * @returns whether or not one observer registered with the given mask is handeled
    */
   public hasSpecificMask(mask: number = -1): boolean {
-    for (let obs of this._observers) {
+    for (const obs of this._observers) {
       if (obs.mask & mask || obs.mask === mask) {
         return true
       }
@@ -422,7 +457,7 @@ export class Observable<T> {
   private _deferUnregister(observer: Observer<T>): void {
     observer.unregisterOnNextCall = false
     observer._willBeUnregistered = true
-    executeTask(async () => this._remove(observer))
+    void executeTask(async () => this._remove(observer))
   }
 
   // This should only be called when not iterating over _observers to avoid callback skipping.
@@ -432,7 +467,7 @@ export class Observable<T> {
       return false
     }
 
-    let index = this._observers.indexOf(observer)
+    const index = this._observers.indexOf(observer)
 
     if (index !== -1) {
       this._observers.splice(index, 1)

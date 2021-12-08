@@ -1,6 +1,6 @@
 import { error } from './helpers'
 
-declare var Promise: any
+declare let Promise: any
 
 /** @public */
 export type TaskResult<T> = Promise<T> & {
@@ -23,12 +23,12 @@ export function executeTask<T>(task: () => Promise<T>): TaskResult<T> {
   result.isComplete = false
 
   result
-    .then($ => {
+    .then(($) => {
       result.isComplete = true
       result.result = $
       result.didFail = false
     })
-    .catch($ => {
+    .catch(($) => {
       result.isComplete = true
       result.error = $
       result.didFail = true

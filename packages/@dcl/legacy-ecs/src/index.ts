@@ -27,6 +27,8 @@ const entity = new Entity('scene')
 const engine = new Engine(entity)
 
 import { DisposableComponent } from './ecs/Component'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 DisposableComponent.engine = engine
 
 // Initialize Decentraland interface
@@ -35,7 +37,11 @@ if (typeof dcl !== 'undefined') {
   _initEventObservables(dcl)
 }
 
-import { uuidEventSystem, pointerEventSystem, raycastEventSystem } from './decentraland/Systems'
+import {
+  uuidEventSystem,
+  pointerEventSystem,
+  raycastEventSystem
+} from './decentraland/Systems'
 
 // Initialize UUID Events system
 engine.addSystem(uuidEventSystem)

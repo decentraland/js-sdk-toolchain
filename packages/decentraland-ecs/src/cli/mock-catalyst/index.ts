@@ -4,7 +4,11 @@ import * as express from 'express'
 import { getSceneJson } from '../setupUtils'
 import { getAllPreviewWearables } from '../wearables'
 
-export const mockCatalyst = (app: express.Application, baseFolders: string[], rootFolder: string) => {
+export const mockCatalyst = (
+  app: express.Application,
+  baseFolders: string[],
+  rootFolder: string
+) => {
   serveFolders(app, baseFolders, rootFolder)
   app.get('/lambdas/explore/realms', (req, res) => {
     res.json([
@@ -38,14 +42,21 @@ export const mockCatalyst = (app: express.Application, baseFolders: string[], ro
       }).map((wearable) => wearable.id)
 
       if (previewWearables.length === 1) {
-        const deployedProfile = await (await fetch(`https://peer-lb.decentraland.org${req.originalUrl}`)).json()
+        const deployedProfile = await (
+          await fetch(`https://peer-lb.decentraland.org${req.originalUrl}`)
+        ).json()
         if (deployedProfile?.length === 1) {
-          deployedProfile[0].avatars[0].avatar.wearables.push(...previewWearables)
+          deployedProfile[0].avatars[0].avatar.wearables.push(
+            ...previewWearables
+          )
           return res.json(deployedProfile)
         }
       }
     } catch (err) {
-      console.warn(`Failed to catch profile and fill with preview wearables.`, err)
+      console.warn(
+        `Failed to catch profile and fill with preview wearables.`,
+        err
+      )
     }
 
     return next()
@@ -70,10 +81,18 @@ export const mockCatalyst = (app: express.Application, baseFolders: string[], ro
   )
 }
 
-const serveFolders = (app: express.Application, baseFolders: string[], catalystRootFolder: string) => {
+const serveFolders = (
+  app: express.Application,
+  baseFolders: string[],
+  catalystRootFolder: string
+) => {
   app.get('/content/contents/:hash', (req, res, next) => {
     if (req.params.hash && req.params.hash.startsWith('b64-')) {
-      const fullPath = path.resolve(Buffer.from(req.params.hash.replace(/^b64-/, ''), 'base64').toString('utf8'))
+      const fullPath = path.resolve(
+        Buffer.from(req.params.hash.replace(/^b64-/, ''), 'base64').toString(
+          'utf8'
+        )
+      )
 
       // only return files IF the file is within a baseFolder
       if (!baseFolders.find((folder: string) => fullPath.startsWith(folder))) {
@@ -102,14 +121,14 @@ const serveFolders = (app: express.Application, baseFolders: string[], catalystR
     }
   })
 
-  app.get('/content/entities/scene', (req, res, next) => {
+  app.get('/content/entities/scene', (req, res) => {
     if (!req.query.pointer) {
       res.json([])
       return
     }
 
     const requestedPointers = new Set<string>(
-      req.query.pointer && typeof req.query.pointer == 'string'
+      req.query.pointer && typeof req.query.pointer === 'string'
         ? [req.query.pointer as string]
         : (req.query.pointer as string[])
     )

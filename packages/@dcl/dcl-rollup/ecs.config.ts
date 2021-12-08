@@ -2,11 +2,11 @@ import resolve from '@rollup/plugin-node-resolve'
 import { RollupOptions } from 'rollup'
 import { terser } from 'rollup-plugin-terser'
 import typescript from 'rollup-plugin-typescript2'
-import commonjs from '@rollup/plugin-commonjs';
+import commonjs from '@rollup/plugin-commonjs'
 import { sys } from 'typescript'
 import { apiExtractor } from './api-extractor'
 
-const PROD = !!process.env.CI || process.env.NODE_ENV == 'production'
+const PROD = !!process.env.CI || process.env.NODE_ENV === 'production'
 
 console.log(`production: ${PROD}`)
 const packageJsonPath = sys.resolvePath('./package.json')
@@ -62,7 +62,7 @@ const config: RollupOptions = {
       format: 'iife',
       name: 'self',
       extend: true,
-      sourcemap: 'inline',
+      sourcemap: 'inline'
     },
     {
       file: packageJson.main.replace(/\.js$/, '.min.js'),
@@ -71,7 +71,7 @@ const config: RollupOptions = {
       extend: true,
       sourcemap: 'hidden',
       compact: true,
-      plugins: [terser({})],
+      plugins: [terser({})]
     }
   ]
 }

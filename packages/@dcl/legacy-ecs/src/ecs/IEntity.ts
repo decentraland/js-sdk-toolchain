@@ -58,7 +58,7 @@ export interface IEntity {
   getComponentOrNull<T>(component: ComponentConstructor<T>): T | null
   getComponentOrNull<T>(component: ComponentConstructor<T> | string): T | null
 
-  getComponentOrCreate<T>(component: ComponentConstructor<T> & { new(): T }): T
+  getComponentOrCreate<T>(component: ComponentConstructor<T> & { new (): T }): T
 
   /**
    * Adds a component. If the component already exist, it throws an Error.
@@ -69,10 +69,21 @@ export interface IEntity {
   addComponentOrReplace<T extends object>(component: T): void
 
   removeComponent(component: string, triggerRemovedEvent?: boolean): void
-  removeComponent<T extends object>(component: T, triggerRemovedEvent?: boolean): void
-  removeComponent(component: ComponentConstructor<any>, triggerRemovedEvent?: boolean): void
-  removeComponent(component: object | string | Function, triggerRemovedEvent: any): void
+  removeComponent<T extends object>(
+    component: T,
+    triggerRemovedEvent?: boolean
+  ): void
+  removeComponent(
+    component: ComponentConstructor<any>,
+    triggerRemovedEvent?: boolean
+  ): void
+  removeComponent(
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    component: object | string | Function,
+    triggerRemovedEvent: any
+  ): void
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   hasComponent<T = any>(component: string): boolean
   hasComponent<T>(component: ComponentConstructor<T>): boolean
   hasComponent<T extends object>(component: T): boolean
@@ -84,7 +95,11 @@ export interface IEntity {
  */
 @EventConstructor()
 export class ComponentRemoved {
-  constructor(public entity: IEntity, public componentName: string, public component: ComponentLike) {
+  constructor(
+    public entity: IEntity,
+    public componentName: string,
+    public component: ComponentLike
+  ) {
     // stub
   }
 }
@@ -94,7 +109,11 @@ export class ComponentRemoved {
  */
 @EventConstructor()
 export class ComponentAdded {
-  constructor(public entity: IEntity, public componentName: string, public classId: number | null) {
+  constructor(
+    public entity: IEntity,
+    public componentName: string,
+    public classId: number | null
+  ) {
     // stub
   }
 }

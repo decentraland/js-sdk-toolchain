@@ -11,17 +11,20 @@ import { sdk } from '@dcl/schemas'
 // instead of using fs-extra, create a custom function to no need to rollup
 export async function copyDir(src: string, dest: string) {
   await fs.promises.mkdir(dest, { recursive: true })
-  let entries = await fs.promises.readdir(src, { withFileTypes: true })
+  const entries = await fs.promises.readdir(src, { withFileTypes: true })
 
-  for (let entry of entries) {
-    let srcPath = path.join(src, entry.name)
-    let destPath = path.join(dest, entry.name)
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name)
+    const destPath = path.join(dest, entry.name)
 
-    entry.isDirectory() ? await copyDir(srcPath, destPath) : await fs.promises.copyFile(srcPath, destPath)
+    entry.isDirectory()
+      ? await copyDir(srcPath, destPath)
+      : await fs.promises.copyFile(srcPath, destPath)
   }
 }
 
-export const defaultHashMaker = (str: string) => 'b64-' + Buffer.from(str).toString('base64')
+export const defaultHashMaker = (str: string) =>
+  'b64-' + Buffer.from(str).toString('base64')
 
 export const getFilesFromFolder = ({
   folder,
@@ -55,7 +58,8 @@ export const getFilesFromFolder = ({
     })
     .filter(($) => !!$) as string[]
 
-  const ensureIgnorePattern = ignorePattern && ignorePattern !== '' ? ignorePattern : defaultDclIgnore()
+  const ensureIgnorePattern =
+    ignorePattern && ignorePattern !== '' ? ignorePattern : defaultDclIgnore()
   const ig = ignore().add(ensureIgnorePattern)
   const filteredFiles = ig.filter(allFiles)
 
@@ -69,9 +73,15 @@ export const getFilesFromFolder = ({
         return
       }
 
-      const absoluteFolder = rootFolder ? rootFolder.replace(/\\/gi, '/') : folder.replace(/\\/gi, '/')
-      const relativeFilePathToRootFolder = absolutePath.replace(absoluteFolder, '').replace(/^\/+/, '')
-      const relativeFilePathToFolder = file.replace(absoluteFolder, '').replace(/^\/+/, '')
+      const absoluteFolder = rootFolder
+        ? rootFolder.replace(/\\/gi, '/')
+        : folder.replace(/\\/gi, '/')
+      const relativeFilePathToRootFolder = absolutePath
+        .replace(absoluteFolder, '')
+        .replace(/^\/+/, '')
+      const relativeFilePathToFolder = file
+        .replace(absoluteFolder, '')
+        .replace(/^\/+/, '')
 
       return {
         file: relativeFilePathToFolder.toLowerCase(),
@@ -101,8 +111,12 @@ export function entityV3FromFolder({
   const assetJsonPath = path.resolve(folder, './asset.json')
   if (fs.existsSync(assetJsonPath)) {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const assetJson = require(assetJsonPath)
-      if (sdk.AssetJson.validate(assetJson) && assetJson.assetType === sdk.ProjectType.PORTABLE_EXPERIENCE) {
+      if (
+        sdk.AssetJson.validate(assetJson) &&
+        assetJson.assetType === sdk.ProjectType.PORTABLE_EXPERIENCE
+      ) {
         isParcelScene = false
       }
     } catch (err) {
@@ -115,7 +129,8 @@ export function entityV3FromFolder({
   if (fs.existsSync(sceneJsonPath) && isParcelScene) {
     const sceneJson = JSON.parse(fs.readFileSync(sceneJsonPath).toString())
 
-    const { base, parcels }: { base: string; parcels: string[] } = sceneJson.scene
+    const { base, parcels }: { base: string; parcels: string[] } =
+      sceneJson.scene
     const pointers = new Set<string>()
     pointers.add(base)
     parcels.forEach(($) => pointers.add($))
@@ -158,7 +173,10 @@ export function getSceneJson({
     const dclIgnorePath = path.resolve(folder, '.dclignore')
     let ignoreFileContent = ''
     if (fs.existsSync(dclIgnorePath)) {
-      ignoreFileContent = fs.readFileSync(path.resolve(folder, '.dclignore'), 'utf-8')
+      ignoreFileContent = fs.readFileSync(
+        path.resolve(folder, '.dclignore'),
+        'utf-8'
+      )
     }
 
     return entityV3FromFolder({
@@ -170,9 +188,11 @@ export function getSceneJson({
     })
   })
 
-  for (let pointer of Array.from(requestedPointers)) {
+  for (const pointer of Array.from(requestedPointers)) {
     // get deployment by pointer
-    const theDeployment = allDeployments.find(($) => $ && $.pointers.includes(pointer))
+    const theDeployment = allDeployments.find(
+      ($) => $ && $.pointers.includes(pointer)
+    )
     if (theDeployment) {
       // remove all the required pointers from the requestedPointers set
       // to prevent sending duplicated entities
@@ -228,7 +248,8 @@ export const downloadFile = async (url: string, path: string) => {
   })
 }
 
-export const shaHashMaker = (str: string) => crypto.createHash('sha1').update(str).digest('hex')
+export const shaHashMaker = (str: string) =>
+  crypto.createHash('sha1').update(str).digest('hex')
 
 export const defaultDclIgnore = () =>
   [

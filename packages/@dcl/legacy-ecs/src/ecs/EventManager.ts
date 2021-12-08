@@ -31,7 +31,11 @@ type EventListener<X> = {
 export class EventManager {
   private listeners: Record<string, Array<EventListener<any>>> = {}
 
-  addListener<T, X>(eventClass: IEventConstructor<T>, listener: X, listenerFunction: (this: X, event: T) => void) {
+  addListener<T, X>(
+    eventClass: IEventConstructor<T>,
+    listener: X,
+    listenerFunction: (this: X, event: T) => void
+  ) {
     if (!eventClass || typeof (eventClass as any) !== 'function') {
       throw new Error('Invalid EventConstructor')
     }
@@ -65,7 +69,7 @@ export class EventManager {
 
     const eventName = getEventNameFromConstructor(eventClass)
 
-    let listeners = this.listeners[eventName]
+    const listeners = this.listeners[eventName]
 
     if (!listeners) {
       return false
@@ -85,7 +89,7 @@ export class EventManager {
   fireEvent<T extends object>(event: T) {
     const eventName = getEventNameFromConstructor((event as any).constructor)
 
-    let listeners = this.listeners[eventName]
+    const listeners = this.listeners[eventName]
 
     if (listeners) {
       for (let i = 0; i < listeners.length; i++) {
@@ -115,8 +119,8 @@ export function EventConstructor(): ClassDecorator {
 
   takenEventNames.push(eventName)
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   return <TFunction extends Function>(target: TFunction): TFunction | void => {
-    // tslint:disable-next-line:semicolon
     ;(target as any)[eventNameSymbol] = eventName
     return target
   }

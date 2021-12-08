@@ -1,5 +1,3 @@
-// tslint:disable:ter-indent
-
 import { Vector3 } from '@dcl/ecs-math'
 
 import { InputEventType } from './Types'
@@ -52,11 +50,12 @@ export type LocalActionButtonEvent = GlobalInputEventResult & {
  * @public
  */
 export class PointerEventComponent {
-  constructor(public readonly callback: (event: LocalActionButtonEvent) => void) {
+  constructor(
+    public readonly callback: (event: LocalActionButtonEvent) => void
+  ) {
     if (!callback || !('apply' in callback) || !('call' in callback)) {
       throw new Error('Callback is not a function')
     }
-    // tslint:disable-next-line:no-use-before-declare
     Input.ensureInstance()
   }
 }
@@ -116,11 +115,13 @@ export class Input {
   }
 
   // @internal
-  private subscriptions: Record<ActionButton, Record<InputEventKind, Array<Subscription>>> =
-    this.buttonIdMapping.reduce(
-      (acc, k) => ({ ...acc, [k]: { BUTTON_DOWN: [], BUTTON_UP: [] } }),
-      {} as Record<ActionButton, Record<InputEventKind, Array<Subscription>>>
-    )
+  private subscriptions: Record<
+    ActionButton,
+    Record<InputEventKind, Array<Subscription>>
+  > = this.buttonIdMapping.reduce(
+    (acc, k) => ({ ...acc, [k]: { BUTTON_DOWN: [], BUTTON_UP: [] } }),
+    {} as Record<ActionButton, Record<InputEventKind, Array<Subscription>>>
+  )
 
   private internalState: InputState = this.buttonIdMapping.reduce(
     (acc, k) => ({ ...acc, [k]: { BUTTON_DOWN: false } }),
@@ -160,7 +161,9 @@ export class Input {
     useRaycast: boolean,
     fn: (e: LocalActionButtonEvent) => void
   ): () => void {
-    this.subscriptions[buttonId][eventName].push(new Subscription(fn, useRaycast))
+    this.subscriptions[buttonId][eventName].push(
+      new Subscription(fn, useRaycast)
+    )
     return () => {
       this.unsubscribe(eventName, buttonId, fn)
     }
@@ -172,7 +175,11 @@ export class Input {
    * @param buttonId - The id of the button.
    * @param fn - The callback function used when subscribing to the event.
    */
-  public unsubscribe(eventName: InputEventKind, buttonId: ActionButton, fn: (e: LocalActionButtonEvent) => void) {
+  public unsubscribe(
+    eventName: InputEventKind,
+    buttonId: ActionButton,
+    fn: (e: LocalActionButtonEvent) => void
+  ) {
     const index = this.getSubscriptionId(eventName, buttonId, fn)
     if (index > -1) {
       return this.subscriptions[buttonId][eventName].splice(index, 1)
@@ -187,7 +194,7 @@ export class Input {
       return
     }
 
-    let eventResult: LocalActionButtonEvent = {
+    const eventResult: LocalActionButtonEvent = {
       ...data,
       button,
       direction: new Vector3().copyFrom(data.direction),
@@ -207,8 +214,12 @@ export class Input {
     if (data.type === InputEventType.DOWN) {
       this.internalState[button].BUTTON_DOWN = true
 
-      for (let i = 0; i < this.subscriptions[button]['BUTTON_DOWN'].length; i++) {
-        let subscription = this.subscriptions[button]['BUTTON_DOWN'][i]
+      for (
+        let i = 0;
+        i < this.subscriptions[button]['BUTTON_DOWN'].length;
+        i++
+      ) {
+        const subscription = this.subscriptions[button]['BUTTON_DOWN'][i]
 
         // remove hit information when raycast is disabled
         if (subscription.useRaycast) {
@@ -232,7 +243,7 @@ export class Input {
       this.internalState[button].BUTTON_DOWN = false
 
       for (let i = 0; i < this.subscriptions[button]['BUTTON_UP'].length; i++) {
-        let subscription = this.subscriptions[button]['BUTTON_UP'][i]
+        const subscription = this.subscriptions[button]['BUTTON_UP'][i]
 
         // remove hit information when raycast is disabled
         if (subscription.useRaycast) {

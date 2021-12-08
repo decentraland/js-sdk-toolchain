@@ -24,13 +24,24 @@ const setupProxy = (dcl: any, app: express.Application) => {
     })
   )
   const dclKernelPath = path.dirname(
-    require.resolve('@dcl/kernel/package.json', { paths: [dcl.getWorkingDir(), ecsPath] })
+    require.resolve('@dcl/kernel/package.json', {
+      paths: [dcl.getWorkingDir(), ecsPath]
+    })
   )
-  const dclKernelDefaultProfilePath = path.resolve(dclKernelPath, 'default-profile')
-  const dclKernelImagesDecentralandConnect = path.resolve(dclKernelPath, 'images', 'decentraland-connect')
+  const dclKernelDefaultProfilePath = path.resolve(
+    dclKernelPath,
+    'default-profile'
+  )
+  const dclKernelImagesDecentralandConnect = path.resolve(
+    dclKernelPath,
+    'images',
+    'decentraland-connect'
+  )
   const dclKernelLoaderPath = path.resolve(dclKernelPath, 'loader')
   const dclUnityRenderer = path.dirname(
-    require.resolve('@dcl/unity-renderer/package.json', { paths: [dcl.getWorkingDir(), ecsPath] })
+    require.resolve('@dcl/unity-renderer/package.json', {
+      paths: [dcl.getWorkingDir(), ecsPath]
+    })
   )
 
   const baseSceneFolders: string[] = [dcl.getWorkingDir()]
@@ -73,13 +84,21 @@ const setupProxy = (dcl: any, app: express.Application) => {
     })
   }
 
-  createStaticRoutes(app, '/images/decentraland-connect/*', dclKernelImagesDecentralandConnect)
-  createStaticRoutes(app, '/@/artifacts/unity-renderer/*', dclUnityRenderer, (filePath) =>
-    filePath.replace(/.br+$/, '')
+  createStaticRoutes(
+    app,
+    '/images/decentraland-connect/*',
+    dclKernelImagesDecentralandConnect
+  )
+  createStaticRoutes(
+    app,
+    '/@/artifacts/unity-renderer/*',
+    dclUnityRenderer,
+    (filePath) => filePath.replace(/.br+$/, '')
   )
   createStaticRoutes(app, '/@/artifacts/loader/*', dclKernelLoaderPath)
   createStaticRoutes(app, '/default-profile/*', dclKernelDefaultProfilePath)
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export = setupProxy

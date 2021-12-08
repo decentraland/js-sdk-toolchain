@@ -1,4 +1,10 @@
-import { IEngine, ISystem, IEntity, ComponentAdded, ComponentRemoved } from './IEntity'
+import {
+  IEngine,
+  ISystem,
+  IEntity,
+  ComponentAdded,
+  ComponentRemoved
+} from './IEntity'
 
 import {
   getComponentName,
@@ -40,7 +46,10 @@ export class Engine implements IEngine {
   readonly addedSystems: ISystem[] = []
 
   private readonly _entities: Record<string, IEntity> = {}
-  private readonly _disposableComponents: Record<string, DisposableComponentLike> = {}
+  private readonly _disposableComponents: Record<
+    string,
+    DisposableComponentLike
+  > = {}
   private readonly _componentGroups: Record<string, ComponentGroup[]> = {}
 
   // systems that doesn't require any component or handle their own logic
@@ -51,15 +60,26 @@ export class Engine implements IEngine {
   }
 
   get disposableComponents() {
-    return this._disposableComponents as Readonly<Record<string, DisposableComponentLike>>
+    return this._disposableComponents as Readonly<
+      Record<string, DisposableComponentLike>
+    >
   }
 
   constructor(rootEntity: IEntity) {
-    this.eventManager.addListener(ComponentAdded, this, this.componentAddedHandler)
-    this.eventManager.addListener(ComponentRemoved, this, this.componentRemovedHandler)
+    this.eventManager.addListener(
+      ComponentAdded,
+      this,
+      this.componentAddedHandler
+    )
+    this.eventManager.addListener(
+      ComponentRemoved,
+      this,
+      this.componentRemovedHandler
+    )
     this.rootEntity = rootEntity
     this.firstPersonCameraEntity = new Entity()
-    ;(this.firstPersonCameraEntity as any).uuid = 'FirstPersonCameraEntityReference'
+    ;(this.firstPersonCameraEntity as any).uuid =
+      'FirstPersonCameraEntityReference'
     this.addEntity(this.firstPersonCameraEntity)
     this.avatarEntity = new Entity()
     ;(this.avatarEntity as any).uuid = 'AvatarEntityReference'
@@ -84,13 +104,16 @@ export class Engine implements IEngine {
       entity.setParent(this.rootEntity)
     } else {
       if (!parent.isAddedToEngine() && parent !== this.rootEntity) {
-        log('Engine: warning, added an entity with a parent not present in the engine. Parent id: ' + parent.uuid)
+        log(
+          'Engine: warning, added an entity with a parent not present in the engine. Parent id: ' +
+            parent.uuid
+        )
       }
     }
 
     entity.alive = true
 
-    for (let i in entity.children) {
+    for (const i in entity.children) {
       const child = entity.children[i]
       if (child) {
         if (!child.isAddedToEngine()) {
@@ -106,11 +129,11 @@ export class Engine implements IEngine {
     const id = entity.uuid
 
     if (entity.isAddedToEngine()) {
-      for (let componentName in entity.components) {
+      for (const componentName in entity.components) {
         const componentGroups = this._componentGroups[componentName]
 
         if (componentGroups) {
-          for (let groupIndex in componentGroups) {
+          for (const groupIndex in componentGroups) {
             componentGroups[groupIndex].removeEntity(entity)
           }
         }
@@ -126,7 +149,7 @@ export class Engine implements IEngine {
         }
       }
 
-      for (let i in entity.children) {
+      for (const i in entity.children) {
         const child = entity.children[i]
         if (child) {
           this.removeEntity(child)
@@ -142,12 +165,14 @@ export class Engine implements IEngine {
     } else {
       log('Engine: Trying to remove non existent entity from engine.')
       if (!entity.isAddedToEngine()) {
-        log(`Engine: Entity "${entity.uuid}" has not been added to any engine yet.`)
+        log(
+          `Engine: Entity "${entity.uuid}" has not been added to any engine yet.`
+        )
       } else {
         log('Engine: Entity id: ' + id)
       }
       log("Engine: Entity's components:")
-      for (let componentName in entity.components) {
+      for (const componentName in entity.components) {
         log(componentName)
       }
       return false
@@ -209,7 +234,7 @@ export class Engine implements IEngine {
   }
 
   update(dt: number) {
-    for (let i in this.systems) {
+    for (const i in this.systems) {
       const system = this.systems[i].system
       if (system.active && system.update) {
         try {
@@ -224,9 +249,14 @@ export class Engine implements IEngine {
   }
 
   getEntitiesWithComponent(component: string): Record<string, any>
-  getEntitiesWithComponent(component: ComponentConstructor<any>): Record<string, IEntity>
-  getEntitiesWithComponent(component: ComponentConstructor<any> | string): Record<string, IEntity> {
-    const componentName = typeof component === 'string' ? component : getComponentName(component)
+  getEntitiesWithComponent(
+    component: ComponentConstructor<any>
+  ): Record<string, IEntity>
+  getEntitiesWithComponent(
+    component: ComponentConstructor<any> | string
+  ): Record<string, IEntity> {
+    const componentName =
+      typeof component === 'string' ? component : getComponentName(component)
 
     if (componentName in this.entityLists) {
       return this.entityLists[componentName]
@@ -241,7 +271,9 @@ export class Engine implements IEngine {
     const classId = getComponentClassId(component)
     this._disposableComponents[id] = component
     if (classId !== null) {
-      this.eventManager.fireEvent(new DisposableComponentCreated(id, name, classId))
+      this.eventManager.fireEvent(
+        new DisposableComponentCreated(id, name, classId)
+      )
       this.eventManager.fireEvent(new DisposableComponentUpdated(id, component))
     }
   }
@@ -261,7 +293,9 @@ export class Engine implements IEngine {
   }
 
   updateComponent(component: DisposableComponentLike) {
-    this.eventManager.fireEvent(new DisposableComponentUpdated(getComponentId(component), component))
+    this.eventManager.fireEvent(
+      new DisposableComponentUpdated(getComponentId(component), component)
+    )
   }
 
   getComponentGroup(...requires: ComponentConstructor<any>[]) {
@@ -270,7 +304,8 @@ export class Engine implements IEngine {
     // Return an already created component-group if it already exists
     if (requires.length > 0) {
       // 1. get component groups for first require
-      let componentGroups = this._componentGroups[getComponentName(requires[0])]
+      const componentGroups =
+        this._componentGroups[getComponentName(requires[0])]
 
       if (componentGroups) {
         const components = requires.slice()
@@ -281,7 +316,10 @@ export class Engine implements IEngine {
 
           if (components.length === traversedComponentGroup.requires.length) {
             for (let j = 0; j < components.length; j++) {
-              if (traversedComponentGroup.requires.indexOf(components[j]) === -1) break
+              if (
+                traversedComponentGroup.requires.indexOf(components[j]) === -1
+              )
+                break
 
               if (j === components.length - 1) {
                 componentGroup = traversedComponentGroup
@@ -320,7 +358,7 @@ export class Engine implements IEngine {
       }
     }
 
-    for (let entityId in this._entities) {
+    for (const entityId in this._entities) {
       this.checkRequirements(this._entities[entityId], componentGroup)
     }
 
@@ -334,7 +372,7 @@ export class Engine implements IEngine {
       for (let i = 0; i < requiresNames.length; i++) {
         const componentName = requiresNames[i]
 
-        let componentGroups = this._componentGroups[componentName]
+        const componentGroups = this._componentGroups[componentName]
 
         if (componentGroups) {
           const idx = componentGroups.indexOf(componentGroup)
@@ -361,7 +399,7 @@ export class Engine implements IEngine {
   private checkRequirementsAndAdd(entity: IEntity) {
     if (!entity.isAddedToEngine()) return
 
-    for (let componentName in entity.components) {
+    for (const componentName in entity.components) {
       if (!(componentName in this.entityLists)) {
         this.entityLists[componentName] = {}
       }
@@ -371,7 +409,7 @@ export class Engine implements IEngine {
       const componentGroups = this._componentGroups[componentName]
 
       if (componentGroups) {
-        for (let systemIndex in componentGroups) {
+        for (const systemIndex in componentGroups) {
           this.checkRequirements(entity, componentGroups[systemIndex])
         }
       }
@@ -412,7 +450,7 @@ export class Engine implements IEngine {
     const componentGroups = this._componentGroups[componentName]
 
     if (componentGroups) {
-      for (let i in componentGroups) {
+      for (const i in componentGroups) {
         this.checkRequirements(entity, componentGroups[i])
       }
     }
@@ -430,7 +468,7 @@ export class Engine implements IEngine {
     const componentGroups = this._componentGroups[componentName]
 
     if (componentGroups) {
-      for (let i in componentGroups) {
+      for (const i in componentGroups) {
         this.checkRequirements(entity, componentGroups[i])
       }
     }

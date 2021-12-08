@@ -32323,7 +32323,7 @@
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "hitAllAvatars(ray: "
+                  "text": "hitAllAvatars(_ray: "
                 },
                 {
                   "kind": "Reference",
@@ -32332,7 +32332,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": ", hitCallback: "
+                  "text": ", _hitCallback: "
                 },
                 {
                   "kind": "Content",
@@ -32370,14 +32370,14 @@
               "overloadIndex": 1,
               "parameters": [
                 {
-                  "parameterName": "ray",
+                  "parameterName": "_ray",
                   "parameterTypeTokenRange": {
                     "startIndex": 1,
                     "endIndex": 2
                   }
                 },
                 {
-                  "parameterName": "hitCallback",
+                  "parameterName": "_hitCallback",
                   "parameterTypeTokenRange": {
                     "startIndex": 3,
                     "endIndex": 6
@@ -32478,7 +32478,7 @@
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "hitFirstAvatar(ray: "
+                  "text": "hitFirstAvatar(_ray: "
                 },
                 {
                   "kind": "Reference",
@@ -32487,7 +32487,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": ", hitCallback: "
+                  "text": ", _hitCallback: "
                 },
                 {
                   "kind": "Content",
@@ -32525,14 +32525,14 @@
               "overloadIndex": 1,
               "parameters": [
                 {
-                  "parameterName": "ray",
+                  "parameterName": "_ray",
                   "parameterTypeTokenRange": {
                     "startIndex": 1,
                     "endIndex": 2
                   }
                 },
                 {
-                  "parameterName": "hitCallback",
+                  "parameterName": "_hitCallback",
                   "parameterTypeTokenRange": {
                     "startIndex": 3,
                     "endIndex": 6
@@ -43391,9 +43391,8 @@
                   "text": "spacing: "
                 },
                 {
-                  "kind": "Reference",
-                  "text": "Number",
-                  "canonicalReference": "!Number:interface"
+                  "kind": "Content",
+                  "text": "number"
                 },
                 {
                   "kind": "Content",

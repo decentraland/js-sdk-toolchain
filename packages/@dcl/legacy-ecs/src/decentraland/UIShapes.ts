@@ -1,6 +1,10 @@
 import { Color4 } from '@dcl/ecs-math'
 
-import { ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
+import {
+  ObservableComponent,
+  DisposableComponent,
+  getComponentId
+} from '../ecs/Component'
 import { CLASS_ID, OnUUIDEvent, Texture, Font } from './Components'
 import { OnTextSubmit, OnBlur, OnChanged, OnClick, OnFocus } from './UIEvents'
 /**
@@ -133,7 +137,7 @@ export class UIContainerStack extends UIShape {
   stackOrientation: UIStackOrientation = UIStackOrientation.VERTICAL
 
   @ObservableComponent.field
-  spacing: Number = 0
+  spacing: number = 0
 }
 
 /**
@@ -354,7 +358,10 @@ export class UIInputText extends UIShape {
         const onSubmitValue: IEvents['onTextSubmit'] = { text: value }
         this.onTextSubmit.callback(onSubmitValue)
       } else if (!isSubmit && this.onChanged) {
-        const onChangeValue: IEvents['onChange'] = { value, pointerId: e.pointerId }
+        const onChangeValue: IEvents['onChange'] = {
+          value,
+          pointerId: e.pointerId
+        }
         this.onChanged.callback(onChangeValue)
       }
     })

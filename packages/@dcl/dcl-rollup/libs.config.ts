@@ -6,14 +6,17 @@ import { sys } from 'typescript'
 import { apiExtractor } from './api-extractor'
 import { RollupOptions } from 'rollup'
 
-const PROD = !!process.env.CI || process.env.NODE_ENV == 'production'
+const PROD = !!process.env.CI || process.env.NODE_ENV === 'production'
 
 console.log(`production: ${PROD}`)
 const packageJsonPath = sys.resolvePath('./package.json')
 const packageJson = JSON.parse(sys.readFile(packageJsonPath)!)
 
 console.assert(packageJson.name, 'package.json .name must be present')
-console.assert(packageJson.decentralandLibrary, 'package.json .decentralandLibrary must be an object')
+console.assert(
+  packageJson.decentralandLibrary,
+  'package.json .decentralandLibrary must be an object'
+)
 console.assert(packageJson.main, 'package.json .main must be present')
 console.assert(packageJson.typings, 'package.json .typings must be present')
 

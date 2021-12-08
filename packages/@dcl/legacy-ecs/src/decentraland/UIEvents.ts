@@ -107,7 +107,10 @@ export class OnClick extends OnPointerUUIDEvent<'onClick'> {
   readonly type: string = 'onClick'
 
   constructor(callback: (event: IEvents['onClick']) => void)
-  constructor(callback: (event: IEvents['onClick']) => void, options: OnPointerUUIDEventOptions)
+  constructor(
+    callback: (event: IEvents['onClick']) => void,
+    options: OnPointerUUIDEventOptions
+  )
   constructor(callback: (event: IEvents['onClick']) => void, options?: any) {
     super(callback)
     // This injection is necessary ONLY in events that are ALWAYS turned on and are
@@ -143,8 +146,14 @@ export class OnPointerDown extends OnPointerUUIDEvent<'pointerDown'> {
   readonly type: string = 'pointerDown'
 
   constructor(callback: (event: IEvents['pointerDown']) => void)
-  constructor(callback: (event: IEvents['pointerDown']) => void, options: OnPointerUUIDEventOptions)
-  constructor(callback: (event: IEvents['pointerDown']) => void, options?: any) {
+  constructor(
+    callback: (event: IEvents['pointerDown']) => void,
+    options: OnPointerUUIDEventOptions
+  )
+  constructor(
+    callback: (event: IEvents['pointerDown']) => void,
+    options?: any
+  ) {
     super(callback)
     // This injection is necessary ONLY in events that are ALWAYS turned on and are
     // not assignable to entities. Like events for the UI elements
@@ -179,7 +188,10 @@ export class OnPointerUp extends OnPointerUUIDEvent<'pointerUp'> {
   readonly type: string = 'pointerUp'
 
   constructor(callback: (event: IEvents['pointerUp']) => void)
-  constructor(callback: (event: IEvents['pointerUp']) => void, options: OnPointerUUIDEventOptions)
+  constructor(
+    callback: (event: IEvents['pointerUp']) => void,
+    options: OnPointerUUIDEventOptions
+  )
   constructor(callback: (event: IEvents['pointerUp']) => void, options?: any) {
     super(callback)
     // This injection is necessary ONLY in events that are ALWAYS turned on and are

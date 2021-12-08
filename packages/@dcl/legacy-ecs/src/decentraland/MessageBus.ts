@@ -18,9 +18,12 @@ export function getMessageObserver() {
 
 function ensureCommunicationsController() {
   if (!communicationsControllerPromise) {
-    communicationsControllerPromise = dcl.loadModule('@decentraland/CommunicationsController', {})
+    communicationsControllerPromise = dcl.loadModule(
+      '@decentraland/CommunicationsController',
+      {}
+    )
 
-    communicationsControllerPromise.then(($) => {
+    void communicationsControllerPromise.then(($) => {
       communicationsController = $
     })
 
@@ -45,22 +48,28 @@ export class MessageBus {
   private flushing = false
 
   constructor() {
-    ensureCommunicationsController().then(($) => {
+    void ensureCommunicationsController().then(() => {
       this.connected = true
       this.flush()
     })
   }
 
-  on(message: string, callback: (value: any, sender: string) => void): Observer<IEvents['comms']> {
+  on(
+    message: string,
+    callback: (value: any, sender: string) => void
+  ): Observer<IEvents['comms']> {
     return getMessageObserver().add((e) => {
       try {
-        let m = JSON.parse(e.message)
+        const m = JSON.parse(e.message)
 
         if (m.message === message) {
           callback(m.payload, e.sender)
         }
       } catch (e) {
-        dcl.error('Error parsing comms message ' + ((e as Error).message || ''), e)
+        dcl.error(
+          'Error parsing comms message ' + ((e as Error).message || ''),
+          e
+        )
       }
     })!
   }
@@ -77,7 +86,10 @@ export class MessageBus {
   emit(message: string, payload: Record<any, any>) {
     const messageToSend = JSON.stringify({ message, payload })
     this.sendRaw(messageToSend)
-    getMessageObserver().notifyObservers({ message: messageToSend, sender: 'self' })
+    getMessageObserver().notifyObservers({
+      message: messageToSend,
+      sender: 'self'
+    })
   }
 
   private flush() {

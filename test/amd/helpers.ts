@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/triple-slash-reference */
+/* eslint-disable @typescript-eslint/ban-types */
 /// <reference path="../../packages/decentraland-ecs/node_modules/@dcl/posix/index.d.ts" />
 
 import { IFuture } from 'fp-future'
@@ -18,7 +21,7 @@ const getGlobalThis = function () {
 }
 
 const globalObject: {
-  dcl: Pick<DecentralandInterface, "loadModule" | "callRpc" | "onStart">
+  dcl: Pick<DecentralandInterface, 'loadModule' | 'callRpc' | 'onStart'>
   define: Function & { modules: any }
   onerror: CallableFunction
 } = (getGlobalThis as any)()
@@ -37,7 +40,7 @@ export function mockEnvironment(modules: ModulesMock) {
   const errors: string[] = []
 
   it('mocks the environment', () => {
-    var amdModuleRequire = require.resolve('../../packages/@dcl/amd')
+    const amdModuleRequire = require.resolve('../../packages/@dcl/amd')
     const content = readFileSync(amdModuleRequire).toString()
     ;(globalObject as any).define = null
     delete (globalObject as any).dcl
@@ -68,7 +71,7 @@ export function mockEnvironment(modules: ModulesMock) {
           const ret: ModuleDescriptor = {
             rpcHandle,
             methods: Object.keys(moduleInstance)
-              .filter((key) => typeof moduleInstance[key] == 'function')
+              .filter((key) => typeof moduleInstance[key] === 'function')
               .map((key) => {
                 return { name: key }
               })
@@ -109,7 +112,7 @@ export function mockEnvironment(modules: ModulesMock) {
   })
 
   function start() {
-    for (let $ of starters) {
+    for (const $ of starters) {
       $()
     }
   }
@@ -132,5 +135,13 @@ export function mockEnvironment(modules: ModulesMock) {
     return globalObject.define.modules
   }
 
-  return { starters, start, loadedModuleDescriptors, loadedModulesByHandle, define, errors, getModules }
+  return {
+    starters,
+    start,
+    loadedModuleDescriptors,
+    loadedModulesByHandle,
+    define,
+    errors,
+    getModules
+  }
 }

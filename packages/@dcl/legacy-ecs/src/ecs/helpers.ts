@@ -1,6 +1,6 @@
 let lastGeneratedId = 0
 
-declare var console: any
+declare let console: any
 
 /**
  * Log function. Only works in debug mode, otherwise it does nothing.
@@ -11,7 +11,6 @@ export function log(...args: any[]) {
   if (typeof dcl !== 'undefined') {
     dcl.log(...args)
   } else {
-    // tslint:disable-next-line:no-console
     console.log('DEBUG:', ...args)
   }
 }
@@ -26,7 +25,6 @@ export function error(error: string | Error, data?: any) {
   if (typeof dcl !== 'undefined') {
     dcl.error(error as any, data)
   } else {
-    // tslint:disable-next-line:no-console
     console.error('ERROR:', error, data)
   }
 }
@@ -37,7 +35,8 @@ export function error(error: string | Error, data?: any) {
  */
 export function newId(type: string) {
   lastGeneratedId++
-  if (type.length === 0) throw new Error('newId(type: string): type cannot be empty')
+  if (type.length === 0)
+    throw new Error('newId(type: string): type cannot be empty')
   return type + lastGeneratedId.toString(36)
 }
 
@@ -46,8 +45,8 @@ export function newId(type: string) {
  */
 export function uuid() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    let r = (Math.random() * 16) | 0
-    let v = c === 'x' ? r : (r & 0x3) | 0x8
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
     return v.toString(16)
   })
 }
