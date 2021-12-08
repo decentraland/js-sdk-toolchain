@@ -10,7 +10,9 @@ export type AnimationParams = {
   layer?: number
 }
 
-const defaultParams: Required<Pick<AnimationParams, 'looping' | 'speed' | 'weight' | 'layer'>> = {
+const defaultParams: Required<
+  Pick<AnimationParams, 'looping' | 'speed' | 'weight' | 'layer'>
+> = {
   looping: true,
   speed: 1.0,
   weight: 1.0,
@@ -21,7 +23,6 @@ const defaultParams: Required<Pick<AnimationParams, 'looping' | 'speed' | 'weigh
  * @public
  */
 export class AnimationState extends ObservableComponent {
-
   // @internal
   public isAnimationClip: boolean = true
 

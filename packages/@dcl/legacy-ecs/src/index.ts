@@ -35,7 +35,11 @@ if (typeof dcl !== 'undefined') {
   _initEventObservables(dcl)
 }
 
-import { uuidEventSystem, pointerEventSystem, raycastEventSystem } from './decentraland/Systems'
+import {
+  uuidEventSystem,
+  pointerEventSystem,
+  raycastEventSystem
+} from './decentraland/Systems'
 
 // Initialize UUID Events system
 engine.addSystem(uuidEventSystem)

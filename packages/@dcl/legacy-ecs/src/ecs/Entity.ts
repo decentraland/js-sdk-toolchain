@@ -1,10 +1,19 @@
-import { getComponentName, ComponentConstructor, getComponentClassId, ComponentLike } from './Component'
-import { IEngine, IEntity, ComponentAdded, ComponentRemoved, ParentChanged } from './IEntity'
+import {
+  getComponentName,
+  ComponentConstructor,
+  getComponentClassId,
+  ComponentLike
+} from './Component'
+import {
+  IEngine,
+  IEntity,
+  ComponentAdded,
+  ComponentRemoved,
+  ParentChanged
+} from './IEntity'
 import { EventManager } from './EventManager'
 import { newId, log } from './helpers'
 import { Attachable } from './Attachable'
-
-// tslint:disable:no-use-before-declare
 
 /**
  * @public
@@ -33,11 +42,15 @@ export class Entity implements IEntity {
    */
   addComponentOrReplace<T extends object>(component: T): T {
     if (typeof component === 'function') {
-      throw new Error('You passed a function or class as a component, an instance of component is expected')
+      throw new Error(
+        'You passed a function or class as a component, an instance of component is expected'
+      )
     }
 
     if (typeof component !== 'object') {
-      throw new Error(`You passed a ${typeof component}, an instance of component is expected`)
+      throw new Error(
+        `You passed a ${typeof component}, an instance of component is expected`
+      )
     }
 
     const componentName = getComponentName(component)
@@ -56,19 +69,29 @@ export class Entity implements IEntity {
    * Returns a boolean indicating if a component is present in the entity.
    * @param component - component class, instance or name
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   hasComponent<T = any>(component: string): boolean
   hasComponent<T>(component: ComponentConstructor<T>): boolean
   hasComponent<T extends object>(component: T): boolean
   hasComponent<T>(component: ComponentConstructor<T> | string): boolean {
     const typeOfComponent = typeof component
 
-    if (typeOfComponent !== 'string' && typeOfComponent !== 'object' && typeOfComponent !== 'function') {
-      throw new Error('Entity#has(component): component is not a class, name or instance')
+    if (
+      typeOfComponent !== 'string' &&
+      typeOfComponent !== 'object' &&
+      typeOfComponent !== 'function'
+    ) {
+      throw new Error(
+        'Entity#has(component): component is not a class, name or instance'
+      )
     }
 
-    if ((component as any) == null) return false
+    if ((component as any) === null) return false
 
-    const componentName = typeOfComponent === 'string' ? (component as string) : getComponentName(component as any)
+    const componentName =
+      typeOfComponent === 'string'
+        ? (component as string)
+        : getComponentName(component as any)
 
     const storedComponent = this.components[componentName]
 
@@ -100,19 +123,26 @@ export class Entity implements IEntity {
       throw new Error('Entity#get(component): component is not a class or name')
     }
 
-    const componentName = typeOfComponent === 'string' ? (component as string) : getComponentName(component as any)
+    const componentName =
+      typeOfComponent === 'string'
+        ? (component as string)
+        : getComponentName(component as any)
 
     const storedComponent = this.components[componentName]
 
     if (!storedComponent) {
-      throw new Error(`Can not get component "${componentName}" from entity "${this.identifier}"`)
+      throw new Error(
+        `Can not get component "${componentName}" from entity "${this.identifier}"`
+      )
     }
 
     if (typeOfComponent === 'function') {
       if (storedComponent instanceof (component as ComponentConstructor<T>)) {
         return storedComponent
       } else {
-        throw new Error(`Can not get component "${componentName}" from entity "${this.identifier}" (by instance)`)
+        throw new Error(
+          `Can not get component "${componentName}" from entity "${this.identifier}" (by instance)`
+        )
       }
     }
 
@@ -129,10 +159,15 @@ export class Entity implements IEntity {
     const typeOfComponent = typeof component
 
     if (typeOfComponent !== 'string' && typeOfComponent !== 'function') {
-      throw new Error('Entity#getOrNull(component): component is not a class or name')
+      throw new Error(
+        'Entity#getOrNull(component): component is not a class or name'
+      )
     }
 
-    const componentName = typeOfComponent === 'string' ? (component as string) : getComponentName(component as any)
+    const componentName =
+      typeOfComponent === 'string'
+        ? (component as string)
+        : getComponentName(component as any)
 
     const storedComponent = this.components[componentName]
 
@@ -155,7 +190,9 @@ export class Entity implements IEntity {
    * Gets a component, if it doesn't exist, it creates the component and returns it.
    * @param component - component class
    */
-  getComponentOrCreate<T>(component: ComponentConstructor<T> & { new(): T }): T {
+  getComponentOrCreate<T>(
+    component: ComponentConstructor<T> & { new (): T }
+  ): T {
     if (typeof (component as any) !== 'function') {
       throw new Error('Entity#getOrCreate(component): component is not a class')
     }
@@ -187,13 +224,17 @@ export class Entity implements IEntity {
     const classId = getComponentClassId(component)
 
     if (this.components[componentName]) {
-      throw new Error(`A component of type "${componentName}" is already present in entity "${this.identifier}"`)
+      throw new Error(
+        `A component of type "${componentName}" is already present in entity "${this.identifier}"`
+      )
     }
 
     this.components[componentName] = component
 
     if (this.eventManager) {
-      this.eventManager.fireEvent(new ComponentAdded(this, componentName, classId))
+      this.eventManager.fireEvent(
+        new ComponentAdded(this, componentName, classId)
+      )
     }
 
     const storedComponent = component as ComponentLike
@@ -210,21 +251,44 @@ export class Entity implements IEntity {
    * @param triggerRemovedEvent - should this action trigger an event?
    */
   removeComponent(component: string, triggerRemovedEvent?: boolean): void
-  removeComponent<T extends object>(component: T, triggerRemovedEvent?: boolean): void
-  removeComponent(component: ComponentConstructor<any>, triggerRemovedEvent?: boolean): void
-  removeComponent(component: object | string | Function, triggerRemovedEvent = true): void {
+  removeComponent<T extends object>(
+    component: T,
+    triggerRemovedEvent?: boolean
+  ): void
+  removeComponent(
+    component: ComponentConstructor<any>,
+    triggerRemovedEvent?: boolean
+  ): void
+  removeComponent(
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    component: object | string | Function,
+    triggerRemovedEvent = true
+  ): void {
     const typeOfComponent = typeof component
 
-    if (typeOfComponent !== 'string' && typeOfComponent !== 'function' && typeOfComponent !== 'object') {
-      throw new Error('Entity#remove(component): component is not a class, class or name')
+    if (
+      typeOfComponent !== 'string' &&
+      typeOfComponent !== 'function' &&
+      typeOfComponent !== 'object'
+    ) {
+      throw new Error(
+        'Entity#remove(component): component is not a class, class or name'
+      )
     }
 
-    const componentName = typeOfComponent === 'string' ? (component as string) : getComponentName(component as any)
+    const componentName =
+      typeOfComponent === 'string'
+        ? (component as string)
+        : getComponentName(component as any)
 
-    const storedComponent = this.components[componentName] as ComponentLike | void
+    const storedComponent = this.components[
+      componentName
+    ] as ComponentLike | void
 
     if (!storedComponent) {
-      log(`Entity Warning: Trying to remove inexisting component "${componentName}" from entity "${this.identifier}"`)
+      log(
+        `Entity Warning: Trying to remove inexisting component "${componentName}" from entity "${this.identifier}"`
+      )
       return
     }
 
@@ -234,7 +298,9 @@ export class Entity implements IEntity {
 
         if (storedComponent) {
           if (triggerRemovedEvent && this.eventManager) {
-            this.eventManager.fireEvent(new ComponentRemoved(this, componentName, storedComponent))
+            this.eventManager.fireEvent(
+              new ComponentRemoved(this, componentName, storedComponent)
+            )
           }
 
           if (typeof storedComponent.removedFromEntity === 'function') {
@@ -254,7 +320,9 @@ export class Entity implements IEntity {
 
     if (storedComponent) {
       if (triggerRemovedEvent && this.eventManager) {
-        this.eventManager.fireEvent(new ComponentRemoved(this, componentName, storedComponent))
+        this.eventManager.fireEvent(
+          new ComponentRemoved(this, componentName, storedComponent)
+        )
       }
 
       if (typeof storedComponent.removedFromEntity === 'function') {
@@ -270,7 +338,10 @@ export class Entity implements IEntity {
    * Returns false if no engine was defined.
    */
   isAddedToEngine(): boolean {
-    if (this.engine && (this.uuid in this.engine.entities || this.engine.rootEntity === this)) {
+    if (
+      this.engine &&
+      (this.uuid in this.engine.entities || this.engine.rootEntity === this)
+    ) {
       return true
     }
 
@@ -286,14 +357,15 @@ export class Entity implements IEntity {
     // Check if parent is of type Attachable
     if (_parent && 'getEntityRepresentation' in _parent) {
       if (!this.engine) {
-        throw new Error(`In order to set an attachable as parent, you first need to add the entity to the engine.`)
+        throw new Error(
+          `In order to set an attachable as parent, you first need to add the entity to the engine.`
+        )
       }
       newParent = _parent.getEntityRepresentation(this.engine)
     } else {
-      // @ts-ignore
       newParent = !_parent && this.engine ? this.engine.rootEntity : _parent
     }
-    let currentParent = this.getParent()
+    const currentParent = this.getParent()
 
     if (newParent === this) {
       throw new Error(
@@ -320,12 +392,10 @@ export class Entity implements IEntity {
     // Make sure that the parent and child are both on the engine, or off the engine, together
     if (newParent !== null && newParent.uuid !== '0') {
       if (!newParent.isAddedToEngine() && this.isAddedToEngine()) {
-        // tslint:disable-next-line:semicolon
         this.engine!.removeEntity(this)
       }
       if (newParent.isAddedToEngine() && !this.isAddedToEngine()) {
-        // tslint:disable-next-line:semicolon
-        (newParent as Entity).engine!.addEntity(this)
+        ;(newParent as Entity).engine!.addEntity(this)
       }
     }
 

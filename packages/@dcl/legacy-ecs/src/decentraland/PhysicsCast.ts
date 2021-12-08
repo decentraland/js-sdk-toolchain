@@ -8,7 +8,11 @@ import { Camera } from './Camera'
 /**
  * @public
  */
-export type QueryType = 'HitFirst' | 'HitAll' | 'HitFirstAvatar' | 'HitAllAvatars'
+export type QueryType =
+  | 'HitFirst'
+  | 'HitAll'
+  | 'HitFirstAvatar'
+  | 'HitAllAvatars'
 
 /**
  * @internal
@@ -95,8 +99,16 @@ export interface RaycastHitAvatars extends RaycastHit {
  * @public
  */
 export interface IPhysicsCast {
-  hitFirst(ray: Ray, hitCallback: (event: RaycastHitEntity) => void, id?: number): void
-  hitAll(ray: Ray, hitCallback: (event: RaycastHitEntities) => void, id?: number): void
+  hitFirst(
+    ray: Ray,
+    hitCallback: (event: RaycastHitEntity) => void,
+    id?: number
+  ): void
+  hitAll(
+    ray: Ray,
+    hitCallback: (event: RaycastHitEntities) => void,
+    id?: number
+  ): void
   /** @internal */
   hitFirstAvatar(ray: Ray, hitCallback: (event: RaycastHitAvatar) => void): void
   /** @internal */
@@ -124,10 +136,13 @@ export class PhysicsCast implements IPhysicsCast {
   }
 
   public getRayFromCamera(distance: number) {
-    let rotation = Camera.instance.rotation
-    let rotationMat: Matrix = Matrix.Identity()
+    const rotation = Camera.instance.rotation
+    const rotationMat: Matrix = Matrix.Identity()
     rotation.toRotationMatrix(rotationMat)
-    let direction = Vector3.TransformCoordinates(Vector3.Forward(), rotationMat)
+    const direction = Vector3.TransformCoordinates(
+      Vector3.Forward(),
+      rotationMat
+    )
 
     const ray: Ray = {
       origin: Camera.instance.position,
@@ -151,40 +166,58 @@ export class PhysicsCast implements IPhysicsCast {
     return ray
   }
 
-  public hitFirst(ray: Ray, hitCallback: (event: RaycastHitEntity) => void, id?: number) {
+  public hitFirst(
+    ray: Ray,
+    hitCallback: (event: RaycastHitEntity) => void,
+    id?: number
+  ) {
     const queryId = typeof id === 'number' ? QueryPrefix.HitFirst + id : uuid()
 
     this.queries[queryId] = hitCallback as (event: RaycastHit) => void
 
-    if (typeof dcl != 'undefined') {
+    if (typeof dcl !== 'undefined') {
       dcl.query('raycast', { queryId, queryType: 'HitFirst', ray })
     }
   }
 
-  public hitAll(ray: Ray, hitCallback: (event: RaycastHitEntities) => void, id?: number) {
+  public hitAll(
+    ray: Ray,
+    hitCallback: (event: RaycastHitEntities) => void,
+    id?: number
+  ) {
     const queryId = typeof id === 'number' ? QueryPrefix.HitAll + id : uuid()
 
     this.queries[queryId] = hitCallback as (event: RaycastHit) => void
 
-    if (typeof dcl != 'undefined') {
+    if (typeof dcl !== 'undefined') {
       dcl.query('raycast', { queryId, queryType: 'HitAll', ray })
     }
   }
 
-  public hitFirstAvatar(ray: Ray, hitCallback: (event: RaycastHitAvatar) => void) {
+  public hitFirstAvatar(
+    _ray: Ray,
+    _hitCallback: (event: RaycastHitAvatar) => void
+  ) {
     log('not implemented yet')
   }
 
-  public hitAllAvatars(ray: Ray, hitCallback: (event: RaycastHitAvatars) => void) {
+  public hitAllAvatars(
+    _ray: Ray,
+    _hitCallback: (event: RaycastHitAvatars) => void
+  ) {
     log('not implemented yet')
   }
 
-  public handleRaycastHitFirstResponse(response: RaycastResponse<RaycastHitEntity>) {
+  public handleRaycastHitFirstResponse(
+    response: RaycastResponse<RaycastHitEntity>
+  ) {
     this.queries[response.payload.queryId](response.payload.payload)
     delete this.queries[response.payload.queryId]
   }
 
-  public handleRaycastHitAllResponse(response: RaycastResponse<RaycastHitEntities>) {
+  public handleRaycastHitAllResponse(
+    response: RaycastResponse<RaycastHitEntities>
+  ) {
     this.queries[response.payload.queryId](response.payload.payload)
     delete this.queries[response.payload.queryId]
   }

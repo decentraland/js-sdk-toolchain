@@ -46,7 +46,9 @@ export interface ComponentConstructor<T extends ComponentLike> {
 /**
  * @public
  */
-export interface DisposableComponentConstructor<T extends DisposableComponentLike> {
+export interface DisposableComponentConstructor<
+  T extends DisposableComponentLike
+> {
   // @internal
   [componentSymbol]?: string
   // @internal
@@ -62,7 +64,11 @@ export interface DisposableComponentConstructor<T extends DisposableComponentLik
  */
 @EventConstructor()
 export class DisposableComponentCreated {
-  constructor(public componentId: string, public componentName: string, public classId: number) {
+  constructor(
+    public componentId: string,
+    public componentName: string,
+    public classId: number
+  ) {
     // stub
   }
 }
@@ -82,7 +88,10 @@ export class DisposableComponentRemoved {
  */
 @EventConstructor()
 export class DisposableComponentUpdated {
-  constructor(public componentId: string, public component: DisposableComponentLike) {
+  constructor(
+    public componentId: string,
+    public component: DisposableComponentLike
+  ) {
     // stub
   }
 }
@@ -91,7 +100,9 @@ export class DisposableComponentUpdated {
  * @public
  */
 export function Component(componentName: string, classId?: number) {
-  return function<TFunction extends ComponentConstructor<any>>(target: TFunction): TFunction | void {
+  return function <TFunction extends ComponentConstructor<any>>(
+    target: TFunction
+  ): TFunction | void {
     if (target.isComponent) {
       throw new TypeError(
         `You cannot extend a component. Trying to extend ${target.originalClassName} with: ${componentName}`
@@ -101,6 +112,7 @@ export function Component(componentName: string, classId?: number) {
     const extendedClass = target as any
 
     const RegisteredComponent: any = function RegisteredComponent() {
+      // eslint-disable-next-line prefer-rest-params
       const args = Array.prototype.slice.call(arguments)
       const ret = new extendedClass(...args)
 
@@ -143,7 +155,9 @@ export function Component(componentName: string, classId?: number) {
  */
 
 export function DisposableComponent(componentName: string, classId: number) {
-  return function<TFunction extends DisposableComponentConstructor<any>>(target: TFunction): TFunction | void {
+  return function <TFunction extends DisposableComponentConstructor<any>>(
+    target: TFunction
+  ): TFunction | void {
     if (target.isComponent) {
       throw new TypeError(
         `You cannot extend a component. Trying to extend ${target.originalClassName} with: ${componentName}`
@@ -158,11 +172,14 @@ export function DisposableComponent(componentName: string, classId: number) {
 
     const RegisteredComponent: any = function RegisteredComponent() {
       if (!DisposableComponent.engine) {
-        throw new Error('You need to set a DisposableComponent.engine before creating disposable components')
+        throw new Error(
+          'You need to set a DisposableComponent.engine before creating disposable components'
+        )
       }
 
+      // eslint-disable-next-line prefer-rest-params
       const args = Array.prototype.slice.call(arguments)
-      const ret = new extendedClass(...args as any)
+      const ret = new extendedClass(...(args as any))
       const id = newId('C')
 
       Object.defineProperty(ret, componentSymbol, {
@@ -214,14 +231,15 @@ export function DisposableComponent(componentName: string, classId: number) {
 /** @internal */
 export namespace DisposableComponent {
   /** @internal */
-  // tslint:disable-next-line:whitespace
-  export let engine: any = null
+  export const engine: any = null
 }
 
 /**
  * @public
  */
-export function getComponentName<T extends Record<any, any> = any>(component: T | ComponentConstructor<T>): string {
+export function getComponentName<T extends Record<any, any> = any>(
+  component: T | ComponentConstructor<T>
+): string {
   if (!component) {
     throw new TypeError(component + ' is not a component.')
   }
@@ -253,18 +271,24 @@ export function getComponentClassId<T extends Record<any, any> = any>(
 /**
  * @public
  */
-export function getComponentId<T extends DisposableComponentLike>(component: T): string {
+export function getComponentId<T extends DisposableComponentLike>(
+  component: T
+): string {
   if (!component) {
     throw new TypeError(component + ' is not a component.')
   }
   if (component[componentIdSymbol]) {
-    return (component[componentIdSymbol] as any) as string
+    return component[componentIdSymbol] as any as string
   }
   throw new TypeError(component + ' is not a registered disposable component.')
 }
 
 /** @public */
-export type ObservableComponentSubscription = (key: string, newVal: any, oldVal: any) => void
+export type ObservableComponentSubscription = (
+  key: string,
+  newVal: any,
+  oldVal: any
+) => void
 
 /**
  * @public
@@ -287,10 +311,10 @@ export class ObservableComponent {
       })
 
       Object.defineProperty(target, propertyKey.toString(), {
-        get: function() {
+        get: function () {
           return this[componentSymbol]
         },
-        set: function(value) {
+        set: function (value) {
           const oldValue = this[componentSymbol]
 
           if (value) {
@@ -317,10 +341,10 @@ export class ObservableComponent {
   static field(target: ObservableComponent, propertyKey: string) {
     if (delete (target as any)[propertyKey]) {
       Object.defineProperty(target, propertyKey.toString(), {
-        get: function(this: ObservableComponent) {
+        get: function (this: ObservableComponent) {
           return this.data[propertyKey]
         },
-        set: function(this: ObservableComponent, value) {
+        set: function (this: ObservableComponent, value) {
           const oldValue = this.data[propertyKey]
           this.data[propertyKey] = value
 
@@ -340,10 +364,10 @@ export class ObservableComponent {
   static uiValue(target: ObservableComponent, propertyKey: string) {
     if (delete (target as any)[propertyKey]) {
       Object.defineProperty(target, propertyKey.toString(), {
-        get: function(this: ObservableComponent): string | number {
+        get: function (this: ObservableComponent): string | number {
           return this.data[propertyKey].toString()
         },
-        set: function(this: ObservableComponent, value: string | number) {
+        set: function (this: ObservableComponent, value: string | number) {
           const oldValue = this.data[propertyKey]
 
           const finalValue = new UIValue(value)
@@ -366,13 +390,13 @@ export class ObservableComponent {
   static readonly(target: ObservableComponent, propertyKey: string) {
     if (delete (target as any)[propertyKey]) {
       Object.defineProperty(target, propertyKey.toString(), {
-        get: function(this: ObservableComponent) {
+        get: function (this: ObservableComponent) {
           if (propertyKey in this.data === false) {
             throw new Error(`The field ${propertyKey} is uninitialized`)
           }
           return this.data[propertyKey]
         },
-        set: function(this: ObservableComponent, value) {
+        set: function (this: ObservableComponent, value) {
           if (propertyKey in this.data) {
             throw new Error(`The field ${propertyKey} is readonly`)
           }

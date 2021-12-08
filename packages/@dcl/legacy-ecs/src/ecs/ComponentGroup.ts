@@ -23,13 +23,13 @@ export class ComponentGroup {
     }
 
     Object.defineProperty(this, 'requires', {
-      get: function() {
+      get: function () {
         return requires.slice()
       }
     })
 
     Object.defineProperty(this, 'requiresNames', {
-      get: function() {
+      get: function () {
         return this._requiresNames.slice()
       }
     })
@@ -39,7 +39,9 @@ export class ComponentGroup {
       let name: string | null = null
 
       if (!component) {
-        throw new Error(`ComponentGroup: the required component at location ${ix} is invalid`)
+        throw new Error(
+          `ComponentGroup: the required component at location ${ix} is invalid`
+        )
       }
 
       try {
@@ -50,8 +52,10 @@ export class ComponentGroup {
         )
       }
 
-      if (this._requiresNames.some($ => $ === name)) {
-        throw new Error(`ComponentGroup: the required component list has a repeated name ${name}`)
+      if (this._requiresNames.some(($) => $ === name)) {
+        throw new Error(
+          `ComponentGroup: the required component list has a repeated name ${name}`
+        )
       }
 
       this._requiresNames.push(name)
@@ -67,11 +71,12 @@ export class ComponentGroup {
   // @internal
   addEntity(entity: IEntity) {
     if (!entity.isAddedToEngine()) {
-      throw new TypeError('ComponentGroup: Cannot add a entity that is not added to the engine')
+      throw new TypeError(
+        'ComponentGroup: Cannot add a entity that is not added to the engine'
+      )
     }
 
     if (this.entities.indexOf(entity) === -1) {
-      // tslint:disable-next-line:semicolon
       ;(this.entities as IEntity[]).push(entity)
     }
   }
@@ -81,7 +86,6 @@ export class ComponentGroup {
     const id = this.entities.indexOf(entity)
 
     if (id !== -1) {
-      // tslint:disable-next-line:semicolon
       ;(this.entities as IEntity[]).splice(id, 1)
     }
   }

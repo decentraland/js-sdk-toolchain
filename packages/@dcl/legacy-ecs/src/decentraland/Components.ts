@@ -1,6 +1,18 @@
-import { Vector3, Quaternion, Matrix, MathTmp, Color3, Color4 } from '@dcl/ecs-math'
+import {
+  Vector3,
+  Quaternion,
+  Matrix,
+  MathTmp,
+  Color3,
+  Color4
+} from '@dcl/ecs-math'
 
-import { Component, ObservableComponent, DisposableComponent, getComponentId } from '../ecs/Component'
+import {
+  Component,
+  ObservableComponent,
+  DisposableComponent,
+  getComponentId
+} from '../ecs/Component'
 import { AnimationState } from './AnimationState'
 import { newId } from '../ecs/helpers'
 import { ActionButton } from './Input'
@@ -441,7 +453,7 @@ export class NFTShape extends Shape {
     // check if args is color (backwards compatibility)
     if ('r' in args) {
       color = args
-    } else if (args != null) {
+    } else if (args !== null) {
       if (args.color) color = args.color
       if (args.style) style = args.style
     }
@@ -487,12 +499,15 @@ export class Texture extends ObservableComponent {
   @ObservableComponent.readonly
   readonly hasAlpha!: boolean
 
-  constructor(src: string, opts?: Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>) {
+  constructor(
+    src: string,
+    opts?: Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>
+  ) {
     super()
     this.src = src
 
     if (opts) {
-      for (let i in opts) {
+      for (const i in opts) {
         const that = this as any
         that[i as 'samplingMode' | 'wrap' | 'hasAlpha'] = (opts as any)[i]
       }
@@ -951,7 +966,9 @@ export class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
 /**
  * @public
  */
-export class OnPointerUUIDEvent<T extends keyof IEvents> extends OnUUIDEvent<T> {
+export class OnPointerUUIDEvent<
+  T extends keyof IEvents
+> extends OnUUIDEvent<T> {
   @ObservableComponent.field
   button: ActionButton = ActionButton.ANY
 
@@ -1076,16 +1093,21 @@ export class VideoTexture extends ObservableComponent {
   @ObservableComponent.field
   playing: boolean = false
 
-  constructor(videoClip: VideoClip, opts?: Partial<Pick<VideoTexture, 'samplingMode' | 'wrap'>>) {
+  constructor(
+    videoClip: VideoClip,
+    opts?: Partial<Pick<VideoTexture, 'samplingMode' | 'wrap'>>
+  ) {
     super()
 
     if (!(videoClip instanceof VideoClip)) {
-      throw new Error(`Trying to create VideoTexture(VideoClip) with an invalid VideoClip`)
+      throw new Error(
+        `Trying to create VideoTexture(VideoClip) with an invalid VideoClip`
+      )
     }
     this.videoClipId = getComponentId(videoClip as any)
 
     if (opts) {
-      for (let i in opts) {
+      for (const i in opts) {
         const that = this as any
         that[i as 'samplingMode' | 'wrap'] = (opts as any)[i]
       }
@@ -1123,7 +1145,7 @@ export class VideoTexture extends ObservableComponent {
   }
 
   update(videoEvent: IEvents['videoEvent']) {
-    if (videoEvent.videoClipId == this.videoClipId) {
+    if (videoEvent.videoClipId === this.videoClipId) {
       this._status = (videoEvent.videoStatus as VideoStatus) || VideoStatus.NONE
       this._videoLength = videoEvent.totalVideoLength
       this._position = videoEvent.currentOffset

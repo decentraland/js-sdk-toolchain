@@ -1,4 +1,4 @@
-import { IEntity, IEngine } from "./IEntity"
+import { IEntity, IEngine } from './IEntity'
 
 /**
  * Entities can be attached to each other by using the `setParent` method. However, there are cases where we might want to attach entities
@@ -6,11 +6,14 @@ import { IEntity, IEngine } from "./IEntity"
  * @public
  */
 export abstract class Attachable {
-
   /** Used to attach entities to the avatar. Entities will follow the avatar when it moves */
-  static readonly AVATAR: Attachable = { getEntityRepresentation: (engine: IEngine) => engine.avatarEntity } as const
+  static readonly AVATAR: Attachable = {
+    getEntityRepresentation: (engine: IEngine) => engine.avatarEntity
+  } as const
   /** Used to attach entities to the camera. When in first person mode, the attached entities will also rotate with the camera */
-  static readonly FIRST_PERSON_CAMERA: Attachable = { getEntityRepresentation: (engine: IEngine) => engine.firstPersonCameraEntity } as const
+  static readonly FIRST_PERSON_CAMERA: Attachable = {
+    getEntityRepresentation: (engine: IEngine) => engine.firstPersonCameraEntity
+  } as const
 
   // @internal
   /** Entities must be attached to entities, so in this case, each attachable object must return the entity used to present it */

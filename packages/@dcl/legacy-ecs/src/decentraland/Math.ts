@@ -33,7 +33,7 @@ import {
   ToLinearSpace,
   Vector2,
   Vector3,
-  Vector4,
+  Vector4
 } from '@dcl/ecs-math'
 
 export {
@@ -71,5 +71,5 @@ export {
   ToLinearSpace,
   Vector2,
   Vector3,
-  Vector4,
+  Vector4
 }

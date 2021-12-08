@@ -25,7 +25,7 @@ function ensureModule(): boolean {
 function callModuleRpc(methodName: string, args: any[]): void {
   if (ensureModule()) {
     modulePromise.then(($: any) => {
-      dcl.callRpc($.rpcHandle, methodName, args)
+      void dcl.callRpc($.rpcHandle, methodName, args)
     })
   }
 }

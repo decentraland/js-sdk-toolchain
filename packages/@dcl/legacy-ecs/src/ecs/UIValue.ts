@@ -17,7 +17,7 @@ export class UIValue {
     this.type = UIValueType.PIXELS
 
     if (typeof value === 'string') {
-      let valueAsString: string = value
+      const valueAsString: string = value
       if (valueAsString.indexOf('px') > -1) {
         this.type = UIValueType.PIXELS
       } else if (valueAsString.indexOf('%') > -1) {

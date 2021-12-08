@@ -55,7 +55,7 @@ export class Camera {
       dcl.subscribe('rotationChanged')
       dcl.subscribe('cameraModeChanged')
 
-      dcl.onEvent(event => {
+      dcl.onEvent((event) => {
         switch (event.type) {
           case 'positionChanged':
             this.positionChanged(event.data as any)

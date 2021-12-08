@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-// tslint:disable:no-console
 import * as ts from 'typescript'
 import * as terser from 'terser'
 import { inspect } from 'util'

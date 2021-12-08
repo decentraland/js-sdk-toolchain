@@ -1,9 +1,18 @@
 import { Engine } from '../ecs/Engine'
 import { UUIDEvent, PointerEvent, RaycastResponse } from './Events'
 import { OnUUIDEvent } from './Components'
-import { ISystem, ComponentAdded, ComponentRemoved, IEntity } from '../ecs/IEntity'
+import {
+  ISystem,
+  ComponentAdded,
+  ComponentRemoved,
+  IEntity
+} from '../ecs/IEntity'
 import { Input } from './Input'
-import { PhysicsCast, RaycastHitEntity, RaycastHitEntities } from './PhysicsCast'
+import {
+  PhysicsCast,
+  RaycastHitEntity,
+  RaycastHitEntities
+} from './PhysicsCast'
 
 /**
  * @public
@@ -12,9 +21,13 @@ export class RaycastEventSystem implements ISystem {
   activate(engine: Engine) {
     engine.eventManager.addListener(RaycastResponse, this, (event) => {
       if (event.payload.queryType === 'HitFirst') {
-        PhysicsCast.instance.handleRaycastHitFirstResponse(event as RaycastResponse<RaycastHitEntity>)
+        PhysicsCast.instance.handleRaycastHitFirstResponse(
+          event as RaycastResponse<RaycastHitEntity>
+        )
       } else if (event.payload.queryType === 'HitAll') {
-        PhysicsCast.instance.handleRaycastHitAllResponse(event as RaycastResponse<RaycastHitEntities>)
+        PhysicsCast.instance.handleRaycastHitAllResponse(
+          event as RaycastResponse<RaycastHitEntities>
+        )
       }
     })
 
@@ -64,7 +77,11 @@ export class UUIDEventSystem implements ISystem {
   activate(engine: Engine) {
     engine.eventManager.addListener(UUIDEvent, this, this.handleEvent)
     engine.eventManager.addListener(ComponentAdded, this, this.componentAdded)
-    engine.eventManager.addListener(ComponentRemoved, this, this.componentRemoved)
+    engine.eventManager.addListener(
+      ComponentRemoved,
+      this,
+      this.componentRemoved
+    )
 
     if (typeof dcl !== 'undefined') {
       dcl.subscribe('uuidEvent')
@@ -78,7 +95,7 @@ export class UUIDEventSystem implements ISystem {
   }
 
   onAddEntity(entity: IEntity) {
-    for (let componentName in entity.components) {
+    for (const componentName in entity.components) {
       const component = entity.components[componentName]
 
       if (component instanceof OnUUIDEvent) {
@@ -88,7 +105,7 @@ export class UUIDEventSystem implements ISystem {
   }
 
   onRemoveEntity(entity: IEntity) {
-    for (let componentName in entity.components) {
+    for (const componentName in entity.components) {
       const component = entity.components[componentName]
 
       if (component instanceof OnUUIDEvent) {

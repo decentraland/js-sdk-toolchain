@@ -8,7 +8,13 @@ import {
   ObservableComponent
 } from '../ecs/Component'
 import { Engine } from '../ecs/Engine'
-import { ComponentAdded, ComponentRemoved, IEntity, ISystem, ParentChanged } from '../ecs/IEntity'
+import {
+  ComponentAdded,
+  ComponentRemoved,
+  IEntity,
+  ISystem,
+  ParentChanged
+} from '../ecs/IEntity'
 import { UUIDEvent, PointerEvent, RaycastResponse } from './Events'
 import { RaycastHitEntities, RaycastHitEntity } from './PhysicsCast'
 
@@ -24,10 +30,26 @@ export class DecentralandSynchronizationSystem implements ISystem {
   activate(engine: Engine) {
     this.engine = engine
     engine.eventManager.addListener(ComponentAdded, this, this.componentAdded)
-    engine.eventManager.addListener(ComponentRemoved, this, this.componentRemoved)
-    engine.eventManager.addListener(DisposableComponentCreated, this, this.disposableComponentCreated)
-    engine.eventManager.addListener(DisposableComponentRemoved, this, this.disposableComponentRemoved)
-    engine.eventManager.addListener(DisposableComponentUpdated, this, this.disposableComponentUpdated)
+    engine.eventManager.addListener(
+      ComponentRemoved,
+      this,
+      this.componentRemoved
+    )
+    engine.eventManager.addListener(
+      DisposableComponentCreated,
+      this,
+      this.disposableComponentCreated
+    )
+    engine.eventManager.addListener(
+      DisposableComponentRemoved,
+      this,
+      this.disposableComponentRemoved
+    )
+    engine.eventManager.addListener(
+      DisposableComponentUpdated,
+      this,
+      this.disposableComponentUpdated
+    )
     engine.eventManager.addListener(ParentChanged, this, this.parentChanged)
 
     const rootId = engine.rootEntity.uuid
@@ -49,9 +71,13 @@ export class DecentralandSynchronizationSystem implements ISystem {
           break
         case 'raycastResponse':
           if (data.queryType === 'HitFirst') {
-            engine.eventManager.fireEvent(new RaycastResponse<RaycastHitEntity>(data))
+            engine.eventManager.fireEvent(
+              new RaycastResponse<RaycastHitEntity>(data)
+            )
           } else if (data.queryType === 'HitAll') {
-            engine.eventManager.fireEvent(new RaycastResponse<RaycastHitEntities>(data))
+            engine.eventManager.fireEvent(
+              new RaycastResponse<RaycastHitEntities>(data)
+            )
           }
           break
         case 'actionButtonEvent':
@@ -85,19 +111,28 @@ export class DecentralandSynchronizationSystem implements ISystem {
 
       // this iterator sends the current components of te engine at the moment
       // of addition
-      for (let componentName in entity.components) {
+      for (const componentName in entity.components) {
         const component = entity.components[componentName]
         const classId = getComponentClassId(component)
 
         if (classId !== null) {
           if (isDisposableComponent(component)) {
             // Send the attach component signal
-            this.dcl.attachEntityComponent(entity.uuid, componentName, getComponentId(component))
+            this.dcl.attachEntityComponent(
+              entity.uuid,
+              componentName,
+              getComponentId(component)
+            )
           } else {
             const componentJson: string = JSON.stringify(component)
 
             // Send the updated component
-            this.dcl.updateEntityComponent(entityId, componentName, classId, componentJson)
+            this.dcl.updateEntityComponent(
+              entityId,
+              componentName,
+              classId,
+              componentJson
+            )
 
             // Update the cached copy of the sent component
             this.cachedComponents[entityId][componentName] = componentJson
@@ -128,25 +163,39 @@ export class DecentralandSynchronizationSystem implements ISystem {
    * It finds and sends updates in components of the engine entities.
    */
   private presentEntities() {
-    for (let i in this.engine.entities) {
+    for (const i in this.engine.entities) {
       const entity = this.engine.entities[i]
 
-      for (let componentName in entity.components) {
+      for (const componentName in entity.components) {
         const component = entity.components[componentName]
         const classId = getComponentClassId(component)
 
         if (classId !== null && !isDisposableComponent(component)) {
-          const jsonRepresentation = this.getJsonIfDirty(entity.uuid, componentName, component)
+          const jsonRepresentation = this.getJsonIfDirty(
+            entity.uuid,
+            componentName,
+            component
+          )
           if (jsonRepresentation) {
             // Send the updated component
-            this.dcl.updateEntityComponent(entity.uuid, componentName, classId, jsonRepresentation)
-            this.clearDirty(entity.uuid, componentName, component, jsonRepresentation)
+            this.dcl.updateEntityComponent(
+              entity.uuid,
+              componentName,
+              classId,
+              jsonRepresentation
+            )
+            this.clearDirty(
+              entity.uuid,
+              componentName,
+              component,
+              jsonRepresentation
+            )
           }
         }
       }
     }
 
-    for (let id in this.engine.disposableComponents) {
+    for (const id in this.engine.disposableComponents) {
       const component = this.engine.disposableComponents[id]
       if (component instanceof ObservableComponent && component.dirty) {
         this.dcl.componentUpdated(id, JSON.stringify(component))
@@ -165,15 +214,25 @@ export class DecentralandSynchronizationSystem implements ISystem {
       const component = event.entity.components[event.componentName]
 
       if (isDisposableComponent(component)) {
-        this.dcl.attachEntityComponent(event.entity.uuid, event.componentName, getComponentId(component))
+        this.dcl.attachEntityComponent(
+          event.entity.uuid,
+          event.componentName,
+          getComponentId(component)
+        )
       } else if (event.classId !== null) {
         const componentJson: string = JSON.stringify(component)
 
         // Send the updated component
-        this.dcl.updateEntityComponent(event.entity.uuid, event.componentName, event.classId, componentJson)
+        this.dcl.updateEntityComponent(
+          event.entity.uuid,
+          event.componentName,
+          event.classId,
+          componentJson
+        )
 
         // Update the cached copy of the sent component
-        this.cachedComponents[event.entity.uuid][event.componentName] = componentJson
+        this.cachedComponents[event.entity.uuid][event.componentName] =
+          componentJson
       }
     }
   }
@@ -196,7 +255,11 @@ export class DecentralandSynchronizationSystem implements ISystem {
    * created component is fired immediatly after.
    */
   private disposableComponentCreated(event: DisposableComponentCreated) {
-    this.dcl.componentCreated(event.componentId, event.componentName, event.classId)
+    this.dcl.componentCreated(
+      event.componentId,
+      event.componentName,
+      event.classId
+    )
   }
 
   /**
@@ -215,22 +278,40 @@ export class DecentralandSynchronizationSystem implements ISystem {
    * it remains attached to some entities?
    */
   private disposableComponentUpdated(event: DisposableComponentUpdated) {
-    this.dcl.componentUpdated(event.componentId, JSON.stringify(event.component))
+    this.dcl.componentUpdated(
+      event.componentId,
+      JSON.stringify(event.component)
+    )
   }
 
   /**
    * This method is called when a parent changes in an entity.
    */
   private parentChanged(event: ParentChanged) {
-    this.dcl.setParent(event.entity.uuid, event.parent ? event.parent.uuid : ROOT_ENTITY_ID)
+    this.dcl.setParent(
+      event.entity.uuid,
+      event.parent ? event.parent.uuid : ROOT_ENTITY_ID
+    )
   }
 
-  private getJsonIfDirty(entityId: string, componentName: string, component: any): false | string {
+  private getJsonIfDirty(
+    entityId: string,
+    componentName: string,
+    component: any
+  ): false | string {
     const jsonRepresentation = JSON.stringify(component)
-    return jsonRepresentation !== this.cachedComponents[entityId][componentName] && jsonRepresentation
+    return (
+      jsonRepresentation !== this.cachedComponents[entityId][componentName] &&
+      jsonRepresentation
+    )
   }
 
-  private clearDirty(entityId: string, componentName: string, component: any, jsonRepresentation: string) {
+  private clearDirty(
+    entityId: string,
+    componentName: string,
+    component: any,
+    jsonRepresentation: string
+  ) {
     this.cachedComponents[entityId][componentName] = jsonRepresentation
   }
 }
