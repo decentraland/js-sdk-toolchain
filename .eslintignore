@@ -2,7 +2,6 @@ packages/@dcl/amd
 packages/@dcl/build-ecs
 packages/@dcl/dcl-rollup
 packages/@dcl/js-runtime
-packages/decentraland-ecs
 *.js
 *.d.ts
 scripts/

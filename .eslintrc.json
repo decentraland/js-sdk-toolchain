@@ -2,7 +2,11 @@
   "extends": "@dcl/eslint-config/sdk",
   "parserOptions": {
     "project": [
-      "packages/@dcl/legacy-ecs/tsconfig.json"
+      "packages/@dcl/legacy-ecs/tsconfig.json",
+      "packages/decentraland-ecs/tsconfig.json"
     ]
+  },
+  "rules": {
+    "no-param-reassign": "warn"
   }
 }

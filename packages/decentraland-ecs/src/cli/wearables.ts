@@ -15,13 +15,14 @@ const serveWearable = ({
   catalystRootFolder: string
 }) => {
   const wearableDir = path.dirname(assetJsonPath)
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const assetJson = require(assetJsonPath)
-  
+
   if (!sdk.AssetJson.validate(assetJson)) {
     const errors = (sdk.AssetJson.validate.errors || [])
       .map((a) => `${a.dataPath} ${a.message}`)
       .join('')
-      
+
     console.error(
       `Unable to validate asset.json properly, please check it.`,
       errors
@@ -32,7 +33,10 @@ const serveWearable = ({
   const dclIgnorePath = path.resolve(wearableDir, '.dclignore')
   let ignoreFileContent = ''
   if (fs.existsSync(dclIgnorePath)) {
-    ignoreFileContent = fs.readFileSync(path.resolve(wearableDir, '.dclignore'), 'utf-8')
+    ignoreFileContent = fs.readFileSync(
+      path.resolve(wearableDir, '.dclignore'),
+      'utf-8'
+    )
   }
 
   const hashedFiles = getFilesFromFolder({
@@ -42,9 +46,13 @@ const serveWearable = ({
     rootFolder: catalystRootFolder
   })
 
-  const thumbnailFiltered = hashedFiles.filter(($) => $?.file == assetJson.thumbnail)
+  const thumbnailFiltered = hashedFiles.filter(
+    ($) => $?.file === assetJson.thumbnail
+  )
   const thumbnail =
-    thumbnailFiltered.length > 0 && thumbnailFiltered[0]?.hash && `${baseUrl}/${thumbnailFiltered[0].hash}`
+    thumbnailFiltered.length > 0 &&
+    thumbnailFiltered[0]?.hash &&
+    `${baseUrl}/${thumbnailFiltered[0].hash}`
 
   return {
     id: assetJson.id || '00000000-0000-0000-0000-000000000000',
@@ -64,14 +72,20 @@ const serveWearable = ({
         {
           bodyShapes: ['urn:decentraland:off-chain:base-avatars:BaseMale'],
           mainFile: `male/${assetJson.model}`,
-          contents: hashedFiles.map(($) => ({ key: `male/${$?.file}`, url: `${baseUrl}/${$?.hash}` })),
+          contents: hashedFiles.map(($) => ({
+            key: `male/${$?.file}`,
+            url: `${baseUrl}/${$?.hash}`
+          })),
           overrideHides: [],
           overrideReplaces: []
         },
         {
           bodyShapes: ['urn:decentraland:off-chain:base-avatars:BaseFemale'],
           mainFile: `female/${assetJson.model}`,
-          contents: hashedFiles.map(($) => ({ key: `female/${$?.file}`, url: `${baseUrl}/${$?.hash}` })),
+          contents: hashedFiles.map(($) => ({
+            key: `female/${$?.file}`,
+            url: `${baseUrl}/${$?.hash}`
+          })),
           overrideHides: [],
           overrideReplaces: []
         }
@@ -102,14 +116,21 @@ export const getAllPreviewWearables = ({
     try {
       ret.push(serveWearable({ assetJsonPath, baseUrl, catalystRootFolder }))
     } catch (err) {
-      console.error(`Couldn't mock the asset ${assetJsonPath}. Please verify the correct format and scheme.`, err)
+      console.error(
+        `Couldn't mock the asset ${assetJsonPath}. Please verify the correct format and scheme.`,
+        err
+      )
     }
   }
   return ret
 }
 
-export const mockPreviewWearables = (app: express.Application, baseFolders: string[], catalystRootFolder: string) => {
-  app.use('/preview-wearables', async (req, res, next) => {
+export const mockPreviewWearables = (
+  app: express.Application,
+  baseFolders: string[],
+  catalystRootFolder: string
+) => {
+  app.use('/preview-wearables', async (req, res) => {
     const baseUrl = `http://${req.get('host')}/content/contents`
     return res.json({
       ok: true,
@@ -117,9 +138,13 @@ export const mockPreviewWearables = (app: express.Application, baseFolders: stri
     })
   })
 
-  app.use('/preview-wearables/:id', async (req, res, next) => {
+  app.use('/preview-wearables/:id', async (req, res) => {
     const baseUrl = `http://${req.get('host')}/content/contents`
-    const wearables = getAllPreviewWearables({ baseUrl, baseFolders, catalystRootFolder })
+    const wearables = getAllPreviewWearables({
+      baseUrl,
+      baseFolders,
+      catalystRootFolder
+    })
     const wearableId = req.params.id
 
     return res.json({
