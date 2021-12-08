@@ -13,8 +13,13 @@ import {
   commonChecks,
   LEGACY_ECS_PATH
 } from './common'
-import { ensureFileExists, itExecutes, itDeletesFolder, copyFile, itDeletesGlob } from './helpers'
-
+import {
+  ensureFileExists,
+  itExecutes,
+  itDeletesFolder,
+  copyFile,
+  itDeletesGlob
+} from './helpers'
 
 flow('build-all', () => {
   commonChecks()
@@ -33,7 +38,10 @@ flow('build-all', () => {
     itExecutes(`npm ci --quiet`, DECENTRALAND_AMD_PATH)
     itDeletesFolder('dist', DECENTRALAND_AMD_PATH)
     itExecutes(`${TSC} -p tsconfig.json`, DECENTRALAND_AMD_PATH)
-    itExecutes(`${TERSER} --mangle --comments some --source-map -o dist/amd.min.js dist/amd.js`, DECENTRALAND_AMD_PATH)
+    itExecutes(
+      `${TERSER} --mangle --comments some --source-map -o dist/amd.min.js dist/amd.js`,
+      DECENTRALAND_AMD_PATH
+    )
 
     it('check file exists', () => {
       ensureFileExists('dist/amd.js', DECENTRALAND_AMD_PATH)
@@ -82,11 +90,7 @@ flow('build-all', () => {
 
 function copyLegacyEcs() {
   it('copy legacy ecs iife to decentraland-ecs', () => {
-    const filesToCopy = [
-      'index.js',
-      'index.min.js',
-      'index.min.js.map'
-    ]
+    const filesToCopy = ['index.js', 'index.min.js', 'index.min.js.map']
     for (const file of filesToCopy) {
       const filePath = ensureFileExists(`dist/${file}`, LEGACY_ECS_PATH)
       copyFile(filePath, `${ECS_PATH}/dist/src/${file}`)

@@ -1,8 +1,6 @@
 packages/@dcl/amd
-packages/@dcl/build-ecs
 packages/@dcl/dcl-rollup
 packages/@dcl/js-runtime
 *.js
 *.d.ts
-scripts/
 test/
