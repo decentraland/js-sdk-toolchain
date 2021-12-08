@@ -231,7 +231,8 @@ export function DisposableComponent(componentName: string, classId: number) {
 /** @internal */
 export namespace DisposableComponent {
   /** @internal */
-  export const engine: any = null
+  // eslint-disable-next-line prefer-const
+  export let engine: any = null
 }
 
 /**
