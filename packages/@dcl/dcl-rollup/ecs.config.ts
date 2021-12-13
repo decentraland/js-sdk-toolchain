@@ -2,10 +2,11 @@ import resolve from '@rollup/plugin-node-resolve'
 import { RollupOptions } from 'rollup'
 import { terser } from 'rollup-plugin-terser'
 import typescript from 'rollup-plugin-typescript2'
+import commonjs from '@rollup/plugin-commonjs'
 import { sys } from 'typescript'
 import { apiExtractor } from './api-extractor'
 
-const PROD = !!process.env.CI || process.env.NODE_ENV == 'production'
+const PROD = !!process.env.CI || process.env.NODE_ENV === 'production'
 
 console.log(`production: ${PROD}`)
 const packageJsonPath = sys.resolvePath('./package.json')
@@ -41,7 +42,7 @@ const plugins = [
     browser: true,
     preferBuiltins: false
   }),
-
+  commonjs(),
   {
     name: 'api-extractor',
     writeBundle() {
@@ -70,7 +71,7 @@ const config: RollupOptions = {
       extend: true,
       sourcemap: 'hidden',
       compact: true,
-      plugins: [terser({})],
+      plugins: [terser({})]
     }
   ]
 }

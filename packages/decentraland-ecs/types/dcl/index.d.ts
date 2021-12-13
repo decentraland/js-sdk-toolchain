@@ -193,9 +193,9 @@ declare class Arc2 {
      */
     constructor(
     /** Defines the start point of the arc */
-    startPoint: Vector2, 
+    startPoint: Vector2,
     /** Defines the mid point of the arc */
-    midPoint: Vector2, 
+    midPoint: Vector2,
     /** Defines the end point of the arc */
     endPoint: Vector2);
 }
@@ -451,6 +451,55 @@ declare class CircleShape extends Shape {
 }
 
 /**
+ * @public
+ */
+declare enum CLASS_ID {
+    TRANSFORM = 1,
+    UUID_CALLBACK = 8,
+    BOX_SHAPE = 16,
+    SPHERE_SHAPE = 17,
+    PLANE_SHAPE = 18,
+    CONE_SHAPE = 19,
+    CYLINDER_SHAPE = 20,
+    TEXT_SHAPE = 21,
+    NFT_SHAPE = 22,
+    UI_WORLD_SPACE_SHAPE = 23,
+    UI_SCREEN_SPACE_SHAPE = 24,
+    UI_CONTAINER_RECT = 25,
+    UI_CONTAINER_STACK = 26,
+    UI_TEXT_SHAPE = 27,
+    UI_INPUT_TEXT_SHAPE = 28,
+    UI_IMAGE_SHAPE = 29,
+    UI_SLIDER_SHAPE = 30,
+    CIRCLE_SHAPE = 31,
+    BILLBOARD = 32,
+    ANIMATION = 33,
+    FONT = 34,
+    UI_FULLSCREEN_SHAPE = 40,
+    UI_BUTTON_SHAPE = 41,
+    GLTF_SHAPE = 54,
+    OBJ_SHAPE = 55,
+    AVATAR_SHAPE = 56,
+    BASIC_MATERIAL = 64,
+    PBR_MATERIAL = 65,
+    HIGHLIGHT_ENTITY = 66,
+    /** @deprecated Sound has been deprecataed */
+    SOUND = 67,
+    TEXTURE = 68,
+    VIDEO_CLIP = 70,
+    VIDEO_TEXTURE = 71,
+    AUDIO_CLIP = 200,
+    AUDIO_SOURCE = 201,
+    AUDIO_STREAM = 202,
+    GIZMOS = 203,
+    SMART_ITEM = 204,
+    AVATAR_MODIFIER_AREA = 205,
+    NAME = 300,
+    LOCKED_ON_EDIT = 301,
+    VISIBLE_ON_EDIT = 302
+}
+
+/**
  * Class used to hold a RBG color
  * @public
  */
@@ -477,11 +526,11 @@ declare class Color3 {
     /**
      * Defines the red component (between 0 and 1, default is 0)
      */
-    r?: number, 
+    r?: number,
     /**
      * Defines the green component (between 0 and 1, default is 0)
      */
-    g?: number, 
+    g?: number,
     /**
      * Defines the blue component (between 0 and 1, default is 0)
      */
@@ -793,15 +842,15 @@ declare class Color4 {
     /**
      * Defines the red component (between 0 and 1, default is 0)
      */
-    r?: number, 
+    r?: number,
     /**
      * Defines the green component (between 0 and 1, default is 0)
      */
-    g?: number, 
+    g?: number,
     /**
      * Defines the blue component (between 0 and 1, default is 0)
      */
-    b?: number, 
+    b?: number,
     /**
      * Defines the alpha component (between 0 and 1, default is 1)
      */
@@ -1321,6 +1370,43 @@ declare class DisposableComponentUpdated {
 
 /** @public */
 declare type double = number;
+
+/**
+ * @public
+ */
+declare type EcsMathReadOnlyQuaternion = {
+    readonly x: number;
+    readonly y: number;
+    readonly z: number;
+    readonly w: number;
+};
+
+/**
+ * @public
+ */
+declare type EcsMathReadOnlyVector2 = {
+    readonly y: number;
+    readonly x: number;
+};
+
+/**
+ * @public
+ */
+declare type EcsMathReadOnlyVector3 = {
+    readonly y: number;
+    readonly x: number;
+    readonly z: number;
+};
+
+/**
+ * @public
+ */
+declare type EcsMathReadOnlyVector4 = {
+    readonly x: number;
+    readonly y: number;
+    readonly z: number;
+    readonly w: number;
+};
 
 /**
  * @public
@@ -1861,16 +1947,6 @@ declare class Material extends ObservableComponent {
      */
     roughness?: number;
     /**
-     * AKA Diffuse Color in other nomenclature.
-     * Defaults to black.
-     */
-    ambientColor?: Color3;
-    /**
-     * The color reflected from the material.
-     * Defaults to white.
-     */
-    reflectionColor?: Color3;
-    /**
      * AKA Specular Color in other nomenclature.
      * Defaults to white.
      */
@@ -1893,12 +1969,6 @@ declare class Material extends ObservableComponent {
      */
     emissiveIntensity?: number;
     /**
-     * Intensity of the environment e.g. how much the environment will light the object
-     * either through harmonics for rough material or through the refelction for shiny ones.
-     * Defaults to 1.
-     */
-    environmentIntensity?: number;
-    /**
      * This is a special control allowing the reduction of the specular highlights coming from the
      * four lights of the scene. Those highlights may not be needed in full environment lighting.
      * Defaults to 1.
@@ -1920,10 +1990,6 @@ declare class Material extends ObservableComponent {
      * Stores surface normal data used to displace a mesh in a texture.
      */
     bumpTexture?: Texture;
-    /**
-     * Stores the refracted light information in a texture.
-     */
-    refractionTexture?: Texture;
     /**
      * Allow the material to cast shadows over other objects
      */
@@ -2419,6 +2485,7 @@ declare class Matrix {
      * @param result - defines the target matrix
      */
     static FromQuaternionToRef(quat: Quaternion, result: Matrix): void;
+    /* Excluded from this release type: _markAsUpdated */
     /**
      * Check if the current matrix is identity
      * @returns true is the matrix is the identity matrix
@@ -2664,6 +2731,7 @@ declare class Matrix {
      * Toggles projection matrix from being right handed to left handed in place and vice versa
      */
     toggleProjectionMatrixHandInPlace(): void;
+    /* Excluded from this release type: _updateIdentityStatus */
 }
 
 /**
@@ -2859,8 +2927,6 @@ declare class Observable<T> {
  * @public
  */
 declare class ObservableComponent {
-    dirty: boolean;
-    data: any;
     private subscriptions;
     static component(target: ObservableComponent, propertyKey: string): void;
     static field(target: ObservableComponent, propertyKey: string): void;
@@ -2906,11 +2972,11 @@ declare class Observer<T> {
     /**
      * Defines the callback to call when the observer is notified
      */
-    callback: (eventData: T, eventState: ObserverEventState) => void, 
+    callback: (eventData: T, eventState: ObserverEventState) => void,
     /**
      * Defines the mask of the observer (used to filter notifications)
      */
-    mask: number, 
+    mask: number,
     /**
      * Defines the current scope used to restore the JS context
      */
@@ -2994,7 +3060,7 @@ declare class OnChanged extends OnUUIDEvent<'onChange'> {
 }
 
 /**
- * @public
+ * @public @deprecated use `OnPointerDown` instead
  */
 declare class OnClick extends OnPointerUUIDEvent<'onClick'> {
     readonly type: string;
@@ -3170,8 +3236,6 @@ declare class OnTextSubmit extends OnUUIDEvent<'onTextSubmit'> {
  * @public
  */
 declare class OnUUIDEvent<T extends keyof IEvents> extends ObservableComponent {
-    readonly type: string | undefined;
-    readonly uuid: string;
     callback: (event: any) => void;
     constructor(callback: (event: IEvents[T]) => void);
     static uuidEvent(target: ObservableComponent, propertyKey: string): void;
@@ -3377,8 +3441,8 @@ declare class PhysicsCast implements IPhysicsCast {
     getRayFromPositions(from: Vector3, to: Vector3): Ray;
     hitFirst(ray: Ray, hitCallback: (event: RaycastHitEntity) => void, id?: number): void;
     hitAll(ray: Ray, hitCallback: (event: RaycastHitEntities) => void, id?: number): void;
-    hitFirstAvatar(ray: Ray, hitCallback: (event: RaycastHitAvatar) => void): void;
-    hitAllAvatars(ray: Ray, hitCallback: (event: RaycastHitAvatars) => void): void;
+    hitFirstAvatar(_ray: Ray, _hitCallback: (event: RaycastHitAvatar) => void): void;
+    hitAllAvatars(_ray: Ray, _hitCallback: (event: RaycastHitAvatars) => void): void;
     handleRaycastHitFirstResponse(response: RaycastResponse<RaycastHitEntity>): void;
     handleRaycastHitAllResponse(response: RaycastResponse<RaycastHitEntities>): void;
 }
@@ -3586,7 +3650,7 @@ declare type ProfileForRenderer = {
  * {@link http://doc.babylonjs.com/features/position,_rotation,_scaling }
  * @public
  */
-declare class Quaternion implements ReadOnlyQuaternion {
+declare class Quaternion implements EcsMathReadOnlyQuaternion {
     /** defines the first component (0 by default) */
     x: number;
     /** defines the second component (0 by default) */
@@ -3604,11 +3668,11 @@ declare class Quaternion implements ReadOnlyQuaternion {
      */
     constructor(
     /** defines the first component (0 by default) */
-    x?: number, 
+    x?: number,
     /** defines the second component (0 by default) */
-    y?: number, 
+    y?: number,
     /** defines the third component (0 by default) */
-    z?: number, 
+    z?: number,
     /** defines the fourth component (1.0 by default) */
     w?: number);
     /**
@@ -3629,14 +3693,14 @@ declare class Quaternion implements ReadOnlyQuaternion {
      * @param right - defines the right operand
      * @returns the dot product
      */
-    static Dot(left: ReadOnlyQuaternion, right: ReadOnlyQuaternion): number;
+    static Dot(left: EcsMathReadOnlyQuaternion, right: EcsMathReadOnlyQuaternion): number;
     /**
      * Checks if the two quaternions are close to each other
      * @param quat0 - defines the first quaternion to check
      * @param quat1 - defines the second quaternion to check
      * @returns true if the two quaternions are close to each other
      */
-    static AreClose(quat0: ReadOnlyQuaternion, quat1: ReadOnlyQuaternion): boolean;
+    static AreClose(quat0: EcsMathReadOnlyQuaternion, quat1: EcsMathReadOnlyQuaternion): boolean;
     /**
      * Creates an empty quaternion
      * @returns a new quaternion set to (0.0, 0.0, 0.0)
@@ -3653,7 +3717,7 @@ declare class Quaternion implements ReadOnlyQuaternion {
      * @param quaternion - defines the quaternion to check
      * @returns true if the quaternion is identity
      */
-    static IsIdentity(quaternion: ReadOnlyQuaternion): boolean;
+    static IsIdentity(quaternion: EcsMathReadOnlyQuaternion): boolean;
     /**
      * Creates a quaternion from a rotation around an axis
      * @param axis - defines the axis to use
@@ -3735,7 +3799,7 @@ declare class Quaternion implements ReadOnlyQuaternion {
      * @param amount - defines the gradient to use
      * @returns the new interpolated quaternion
      */
-    static Slerp(left: ReadOnlyQuaternion, right: ReadOnlyQuaternion, amount: number): Quaternion;
+    static Slerp(left: EcsMathReadOnlyQuaternion, right: EcsMathReadOnlyQuaternion, amount: number): Quaternion;
     /**
      * Interpolates between two quaternions and stores it into a target quaternion
      * @param left - defines first quaternion
@@ -3743,7 +3807,7 @@ declare class Quaternion implements ReadOnlyQuaternion {
      * @param amount - defines the gradient to use
      * @param result - defines the target quaternion
      */
-    static SlerpToRef(left: ReadOnlyQuaternion, right: ReadOnlyQuaternion, amount: number, result: Quaternion): void;
+    static SlerpToRef(left: EcsMathReadOnlyQuaternion, right: EcsMathReadOnlyQuaternion, amount: number, result: Quaternion): void;
     /**
      * Interpolate between two quaternions using Hermite interpolation
      * @param value1 - defines first quaternion
@@ -3753,7 +3817,7 @@ declare class Quaternion implements ReadOnlyQuaternion {
      * @param amount - defines the target quaternion
      * @returns the new interpolated quaternion
      */
-    static Hermite(value1: ReadOnlyQuaternion, tangent1: ReadOnlyQuaternion, value2: ReadOnlyQuaternion, tangent2: ReadOnlyQuaternion, amount: number): Quaternion;
+    static Hermite(value1: EcsMathReadOnlyQuaternion, tangent1: EcsMathReadOnlyQuaternion, value2: EcsMathReadOnlyQuaternion, tangent2: EcsMathReadOnlyQuaternion, amount: number): Quaternion;
     /**
      * Creates an identity quaternion
      * @returns - the identity quaternion
@@ -3764,7 +3828,7 @@ declare class Quaternion implements ReadOnlyQuaternion {
      * @param quat1 - defines the first quaternion
      * @param quat2 - defines the second quaternion
      */
-    static Angle(quat1: ReadOnlyQuaternion, quat2: ReadOnlyQuaternion): number;
+    static Angle(quat1: EcsMathReadOnlyQuaternion, quat2: EcsMathReadOnlyQuaternion): number;
     /**
      * Returns a rotation that rotates z degrees around the z axis, x degrees around the x axis, and y degrees around the y axis.
      * @param x - the rotation on the x axis in euler degrees
@@ -3784,7 +3848,7 @@ declare class Quaternion implements ReadOnlyQuaternion {
      * @param to - defines the second quaternion
      * @param maxDegreesDelta - the interval step
      */
-    static RotateTowards(from: ReadOnlyQuaternion, to: Quaternion, maxDegreesDelta: number): Quaternion;
+    static RotateTowards(from: EcsMathReadOnlyQuaternion, to: Quaternion, maxDegreesDelta: number): Quaternion;
     /**
      * Creates a rotation which rotates from fromDirection to toDirection.
      * @param from - defines the first direction Vector
@@ -3843,7 +3907,7 @@ declare class Quaternion implements ReadOnlyQuaternion {
      * @param otherQuaternion - defines the second operand
      * @returns true if the current quaternion and the given one coordinates are strictly equals
      */
-    equals(otherQuaternion: ReadOnlyQuaternion): boolean;
+    equals(otherQuaternion: EcsMathReadOnlyQuaternion): boolean;
     /**
      * Clone the current quaternion
      * @returns a new quaternion copied from the current one
@@ -3854,7 +3918,7 @@ declare class Quaternion implements ReadOnlyQuaternion {
      * @param other - defines the other quaternion
      * @returns the updated current quaternion
      */
-    copyFrom(other: ReadOnlyQuaternion): Quaternion;
+    copyFrom(other: EcsMathReadOnlyQuaternion): Quaternion;
     /**
      * Updates the current quaternion with the given float coordinates
      * @param x - defines the x coordinate
@@ -3878,6 +3942,8 @@ declare class Quaternion implements ReadOnlyQuaternion {
      * @returns the updated current quaternion
      */
     setEuler(x: number, y: number, z: number): Quaternion;
+    /* Excluded from this release type: add */
+    /* Excluded from this release type: addInPlace */
     /**
      * Subtract two quaternions
      * @param other - defines the second operand
@@ -3915,20 +3981,20 @@ declare class Quaternion implements ReadOnlyQuaternion {
      * @param q1 - defines the second operand
      * @returns a new quaternion set as the multiplication result of the current one with the given one "q1"
      */
-    multiply(q1: ReadOnlyQuaternion): Quaternion;
+    multiply(q1: EcsMathReadOnlyQuaternion): Quaternion;
     /**
      * Sets the given "result" as the the multiplication result of the current one with the given one "q1"
      * @param q1 - defines the second operand
      * @param result - defines the target quaternion
      * @returns the current quaternion
      */
-    multiplyToRef(q1: ReadOnlyQuaternion, result: Quaternion): Quaternion;
+    multiplyToRef(q1: EcsMathReadOnlyQuaternion, result: Quaternion): Quaternion;
     /**
      * Updates the current quaternion with the multiplication of itself with the given one "q1"
      * @param q1 - defines the second operand
      * @returns the currentupdated quaternion
      */
-    multiplyInPlace(q1: ReadOnlyQuaternion): Quaternion;
+    multiplyInPlace(q1: EcsMathReadOnlyQuaternion): Quaternion;
     /**
      * Conjugates (1-q) the current quaternion and stores the result in the given quaternion
      * @param ref - defines the target quaternion
@@ -4412,19 +4478,16 @@ declare class TextShape extends ObservableComponent {
     outlineColor: Color3;
     color: Color3;
     fontSize: number;
-    fontWeight: string;
     font?: Font;
     opacity: number;
     value: string;
     lineSpacing: string;
     lineCount: number;
-    resizeToFit: boolean;
     textWrapping: boolean;
     shadowBlur: number;
     shadowOffsetX: number;
     shadowOffsetY: number;
     shadowColor: Color3;
-    zIndex: number;
     hTextAlign: string;
     vTextAlign: string;
     width: number;
@@ -4433,7 +4496,6 @@ declare class TextShape extends ObservableComponent {
     paddingRight: number;
     paddingBottom: number;
     paddingLeft: number;
-    isPickable: boolean;
     billboard: boolean;
     visible: boolean;
     constructor(value?: string);
@@ -4564,8 +4626,6 @@ declare class UICanvas extends UIShape {
  * @public
  */
 declare class UIContainerRect extends UIShape {
-    adaptWidth: boolean;
-    adaptHeight: boolean;
     thickness: number;
     color: Color4;
     alignmentUsesSize: boolean;
@@ -4579,7 +4639,7 @@ declare class UIContainerStack extends UIShape {
     adaptHeight: boolean;
     color: Color4;
     stackOrientation: UIStackOrientation;
-    spacing: Number;
+    spacing: number;
 }
 
 /**
@@ -4607,19 +4667,13 @@ declare class UIInputText extends UIShape {
     outlineWidth: number;
     outlineColor: Color4;
     color: Color4;
-    thickness: number;
     fontSize: number;
-    fontWeight: string;
     font?: Font;
     value: string;
-    placeholderColor: Color4;
     placeholder: string;
     margin: number;
-    maxWidth: number;
     hTextAlign: string;
     vTextAlign: string;
-    autoStretchWidth: boolean;
-    background: Color4;
     focusedBackground: Color4;
     textWrapping: boolean;
     shadowBlur: number;
@@ -4643,7 +4697,6 @@ declare class UIInputText extends UIShape {
 declare class UIScrollRect extends UIShape {
     valueX: number;
     valueY: number;
-    borderColor: Color4;
     backgroundColor: Color4;
     isHorizontal: boolean;
     isVertical: boolean;
@@ -4693,7 +4746,6 @@ declare class UIText extends UIShape {
     color: Color4;
     fontSize: number;
     fontAutoSize: boolean;
-    fontWeight: string;
     font?: Font;
     value: string;
     lineSpacing: number;
@@ -4760,7 +4812,7 @@ declare class UUIDEventSystem implements ISystem {
  * Class representing a vector containing 2 coordinates
  * @public
  */
-declare class Vector2 implements ReadOnlyVector2 {
+declare class Vector2 implements EcsMathReadOnlyVector2 {
     /** defines the first coordinate */
     x: number;
     /** defines the second coordinate */
@@ -4772,7 +4824,7 @@ declare class Vector2 implements ReadOnlyVector2 {
      */
     constructor(
     /** defines the first coordinate */
-    x?: number, 
+    x?: number,
     /** defines the second coordinate */
     y?: number);
     /**
@@ -4791,7 +4843,7 @@ declare class Vector2 implements ReadOnlyVector2 {
      * @param vector2 - the second vector
      * @returns the resulting vector
      */
-    static Add(vector1: ReadOnlyVector2, vector2: ReadOnlyVector2): Vector2;
+    static Add(vector1: EcsMathReadOnlyVector2, vector2: EcsMathReadOnlyVector2): Vector2;
     /**
      * Gets a new Vector2 set from the given index element of the given array
      * @param array - defines the data source
@@ -4815,7 +4867,7 @@ declare class Vector2 implements ReadOnlyVector2 {
      * @param amount - defines the interpolation factor
      * @returns a new Vector2
      */
-    static CatmullRom(value1: ReadOnlyVector2, value2: ReadOnlyVector2, value3: ReadOnlyVector2, value4: ReadOnlyVector2, amount: number): Vector2;
+    static CatmullRom(value1: EcsMathReadOnlyVector2, value2: EcsMathReadOnlyVector2, value3: EcsMathReadOnlyVector2, value4: EcsMathReadOnlyVector2, amount: number): Vector2;
     /**
      * Returns a new Vector2 set with same the coordinates than "value" ones if the vector "value" is in the square defined by "min" and "max".
      * If a coordinate of "value" is lower than "min" coordinates, the returned Vector2 is given this "min" coordinate.
@@ -4825,7 +4877,7 @@ declare class Vector2 implements ReadOnlyVector2 {
      * @param max - defines the upper limit
      * @returns a new Vector2
      */
-    static Clamp(value: ReadOnlyVector2, min: ReadOnlyVector2, max: ReadOnlyVector2): Vector2;
+    static Clamp(value: EcsMathReadOnlyVector2, min: EcsMathReadOnlyVector2, max: EcsMathReadOnlyVector2): Vector2;
     /**
      * Returns a new Vector2 located for "amount" (float) on the Hermite spline defined by the vectors "value1", "value3", "tangent1", "tangent2"
      * @param value1 - defines the 1st control point
@@ -4835,7 +4887,7 @@ declare class Vector2 implements ReadOnlyVector2 {
      * @param amount - defines the interpolation factor
      * @returns a new Vector2
      */
-    static Hermite(value1: ReadOnlyVector2, tangent1: ReadOnlyVector2, value2: ReadOnlyVector2, tangent2: ReadOnlyVector2, amount: number): Vector2;
+    static Hermite(value1: EcsMathReadOnlyVector2, tangent1: EcsMathReadOnlyVector2, value2: EcsMathReadOnlyVector2, tangent2: EcsMathReadOnlyVector2, amount: number): Vector2;
     /**
      * Returns a new Vector2 located for "amount" (float) on the linear interpolation between the vector "start" adn the vector "end".
      * @param start - defines the start vector
@@ -4843,34 +4895,34 @@ declare class Vector2 implements ReadOnlyVector2 {
      * @param amount - defines the interpolation factor
      * @returns a new Vector2
      */
-    static Lerp(start: ReadOnlyVector2, end: ReadOnlyVector2, amount: number): Vector2;
+    static Lerp(start: EcsMathReadOnlyVector2, end: EcsMathReadOnlyVector2, amount: number): Vector2;
     /**
      * Gets the dot product of the vector "left" and the vector "right"
      * @param left - defines first vector
      * @param right - defines second vector
      * @returns the dot product (float)
      */
-    static Dot(left: ReadOnlyVector2, right: ReadOnlyVector2): number;
+    static Dot(left: EcsMathReadOnlyVector2, right: EcsMathReadOnlyVector2): number;
     /**
      * Returns a new Vector2 equal to the normalized given vector
      * @param vector - defines the vector to normalize
      * @returns a new Vector2
      */
-    static Normalize(vector: ReadOnlyVector2): Vector2;
+    static Normalize(vector: EcsMathReadOnlyVector2): Vector2;
     /**
      * Gets a new Vector2 set with the minimal coordinate values from the "left" and "right" vectors
      * @param left - defines 1st vector
      * @param right - defines 2nd vector
      * @returns a new Vector2
      */
-    static Minimize(left: ReadOnlyVector2, right: ReadOnlyVector2): Vector2;
+    static Minimize(left: EcsMathReadOnlyVector2, right: EcsMathReadOnlyVector2): Vector2;
     /**
      * Gets a new Vecto2 set with the maximal coordinate values from the "left" and "right" vectors
      * @param left - defines 1st vector
      * @param right - defines 2nd vector
      * @returns a new Vector2
      */
-    static Maximize(left: ReadOnlyVector2, right: ReadOnlyVector2): Vector2;
+    static Maximize(left: EcsMathReadOnlyVector2, right: EcsMathReadOnlyVector2): Vector2;
     /**
      * Gets a new Vector2 set with the transformed coordinates of the given vector by the given transformation matrix
      * @param vector - defines the vector to transform
@@ -4884,7 +4936,7 @@ declare class Vector2 implements ReadOnlyVector2 {
      * @param transformation - defines the matrix to apply
      * @param result - defines the target vector
      */
-    static TransformToRef(vector: ReadOnlyVector2, transformation: Matrix, result: Vector2): void;
+    static TransformToRef(vector: EcsMathReadOnlyVector2, transformation: Matrix, result: Vector2): void;
     /**
      * Determines if a given vector is included in a triangle
      * @param p - defines the vector to test
@@ -4893,7 +4945,7 @@ declare class Vector2 implements ReadOnlyVector2 {
      * @param p2 - defines 3rd triangle point
      * @returns true if the point "p" is in the triangle defined by the vertors "p0", "p1", "p2"
      */
-    static PointInTriangle(p: ReadOnlyVector2, p0: ReadOnlyVector2, p1: ReadOnlyVector2, p2: ReadOnlyVector2): boolean;
+    static PointInTriangle(p: EcsMathReadOnlyVector2, p0: EcsMathReadOnlyVector2, p1: EcsMathReadOnlyVector2, p2: EcsMathReadOnlyVector2): boolean;
     /**
      * Gets the distance between the vectors "value1" and "value2"
      * @param value1 - defines first vector
@@ -4907,14 +4959,14 @@ declare class Vector2 implements ReadOnlyVector2 {
      * @param value2 - defines second vector
      * @returns the squared distance between vectors
      */
-    static DistanceSquared(value1: ReadOnlyVector2, value2: ReadOnlyVector2): number;
+    static DistanceSquared(value1: EcsMathReadOnlyVector2, value2: EcsMathReadOnlyVector2): number;
     /**
      * Gets a new Vector2 located at the center of the vectors "value1" and "value2"
      * @param value1 - defines first vector
      * @param value2 - defines second vector
      * @returns a new Vector2
      */
-    static Center(value1: ReadOnlyVector2, value2: ReadOnlyVector2): Vector2;
+    static Center(value1: EcsMathReadOnlyVector2, value2: EcsMathReadOnlyVector2): Vector2;
     /**
      * Gets the shortest distance (float) between the point "p" and the segment defined by the two points "segA" and "segB".
      * @param p - defines the middle point
@@ -4955,7 +5007,7 @@ declare class Vector2 implements ReadOnlyVector2 {
      * @param source - defines the source Vector2
      * @returns the current updated Vector2
      */
-    copyFrom(source: ReadOnlyVector2): Vector2;
+    copyFrom(source: EcsMathReadOnlyVector2): Vector2;
     /**
      * Sets the Vector2 coordinates with the given floats
      * @param x - defines the first coordinate
@@ -4975,64 +5027,64 @@ declare class Vector2 implements ReadOnlyVector2 {
      * @param otherVector - defines the other vector
      * @returns a new Vector2 set with the addition of the current Vector2 and the given one coordinates
      */
-    add(otherVector: ReadOnlyVector2): Vector2;
+    add(otherVector: EcsMathReadOnlyVector2): Vector2;
     /**
      * Sets the "result" coordinates with the addition of the current Vector2 and the given one coordinates
      * @param otherVector - defines the other vector
      * @param result - defines the target vector
      * @returns the unmodified current Vector2
      */
-    addToRef(otherVector: ReadOnlyVector2, result: Vector2): Vector2;
+    addToRef(otherVector: EcsMathReadOnlyVector2, result: Vector2): Vector2;
     /**
      * Set the Vector2 coordinates by adding the given Vector2 coordinates
      * @param otherVector - defines the other vector
      * @returns the current updated Vector2
      */
-    addInPlace(otherVector: ReadOnlyVector2): Vector2;
+    addInPlace(otherVector: EcsMathReadOnlyVector2): Vector2;
     /**
      * Gets a new Vector2 by adding the current Vector2 coordinates to the given Vector3 x, y coordinates
      * @param otherVector - defines the other vector
      * @returns a new Vector2
      */
-    addVector3(otherVector: ReadOnlyVector2): Vector2;
+    addVector3(otherVector: EcsMathReadOnlyVector2): Vector2;
     /**
      * Gets a new Vector2 set with the subtracted coordinates of the given one from the current Vector2
      * @param otherVector - defines the other vector
      * @returns a new Vector2
      */
-    subtract(otherVector: ReadOnlyVector2): Vector2;
+    subtract(otherVector: EcsMathReadOnlyVector2): Vector2;
     /**
      * Sets the "result" coordinates with the subtraction of the given one from the current Vector2 coordinates.
      * @param otherVector - defines the other vector
      * @param result - defines the target vector
      * @returns the unmodified current Vector2
      */
-    subtractToRef(otherVector: ReadOnlyVector2, result: Vector2): Vector2;
+    subtractToRef(otherVector: EcsMathReadOnlyVector2, result: Vector2): Vector2;
     /**
      * Sets the current Vector2 coordinates by subtracting from it the given one coordinates
      * @param otherVector - defines the other vector
      * @returns the current updated Vector2
      */
-    subtractInPlace(otherVector: ReadOnlyVector2): Vector2;
+    subtractInPlace(otherVector: EcsMathReadOnlyVector2): Vector2;
     /**
      * Multiplies in place the current Vector2 coordinates by the given ones
      * @param otherVector - defines the other vector
      * @returns the current updated Vector2
      */
-    multiplyInPlace(otherVector: ReadOnlyVector2): Vector2;
+    multiplyInPlace(otherVector: EcsMathReadOnlyVector2): Vector2;
     /**
      * Returns a new Vector2 set with the multiplication of the current Vector2 and the given one coordinates
      * @param otherVector - defines the other vector
      * @returns a new Vector2
      */
-    multiply(otherVector: ReadOnlyVector2): Vector2;
+    multiply(otherVector: EcsMathReadOnlyVector2): Vector2;
     /**
      * Sets "result" coordinates with the multiplication of the current Vector2 and the given one coordinates
      * @param otherVector - defines the other vector
      * @param result - defines the target vector
      * @returns the unmodified current Vector2
      */
-    multiplyToRef(otherVector: ReadOnlyVector2, result: Vector2): Vector2;
+    multiplyToRef(otherVector: EcsMathReadOnlyVector2, result: Vector2): Vector2;
     /**
      * Gets a new Vector2 set with the Vector2 coordinates multiplied by the given floats
      * @param x - defines the first coordinate
@@ -5045,20 +5097,20 @@ declare class Vector2 implements ReadOnlyVector2 {
      * @param otherVector - defines the other vector
      * @returns a new Vector2
      */
-    divide(otherVector: ReadOnlyVector2): Vector2;
+    divide(otherVector: EcsMathReadOnlyVector2): Vector2;
     /**
      * Sets the "result" coordinates with the Vector2 divided by the given one coordinates
      * @param otherVector - defines the other vector
      * @param result - defines the target vector
      * @returns the unmodified current Vector2
      */
-    divideToRef(otherVector: ReadOnlyVector2, result: Vector2): Vector2;
+    divideToRef(otherVector: EcsMathReadOnlyVector2, result: Vector2): Vector2;
     /**
      * Divides the current Vector2 coordinates by the given ones
      * @param otherVector - defines the other vector
      * @returns the current updated Vector2
      */
-    divideInPlace(otherVector: ReadOnlyVector2): Vector2;
+    divideInPlace(otherVector: EcsMathReadOnlyVector2): Vector2;
     /**
      * Gets a new Vector2 with current Vector2 negated coordinates
      * @returns a new Vector2
@@ -5095,14 +5147,14 @@ declare class Vector2 implements ReadOnlyVector2 {
      * @param otherVector - defines the other vector
      * @returns true if the given vector coordinates strictly equal the current Vector2 ones
      */
-    equals(otherVector: ReadOnlyVector2): boolean;
+    equals(otherVector: EcsMathReadOnlyVector2): boolean;
     /**
      * Gets a boolean if two vectors are equals (using an epsilon value)
      * @param otherVector - defines the other vector
      * @param epsilon - defines the minimal distance to consider equality
      * @returns true if the given vector coordinates are close to the current ones by a distance of epsilon.
      */
-    equalsWithEpsilon(otherVector: ReadOnlyVector2, epsilon?: number): boolean;
+    equalsWithEpsilon(otherVector: EcsMathReadOnlyVector2, epsilon?: number): boolean;
     /**
      * Gets a new Vector2 from current Vector2 floored values
      * @returns a new Vector2
@@ -5142,7 +5194,7 @@ declare class Vector2 implements ReadOnlyVector2 {
  * Reminder: Babylon.js uses a left handed forward facing system
  * @public
  */
-declare class Vector3 implements ReadOnlyVector3 {
+declare class Vector3 implements EcsMathReadOnlyVector3 {
     /**
      * Defines the first coordinates (on X axis)
      */
@@ -5169,11 +5221,11 @@ declare class Vector3 implements ReadOnlyVector3 {
     /**
      * Defines the first coordinates (on X axis)
      */
-    x?: number, 
+    x?: number,
     /**
      * Defines the second coordinates (on Y axis)
      */
-    y?: number, 
+    y?: number,
     /**
      * Defines the third coordinates (on Z axis)
      */
@@ -5184,7 +5236,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param vector2 - the second vector
      * @returns the resulting vector
      */
-    static Add(vector1: ReadOnlyVector3, vector2: ReadOnlyVector3): Vector3;
+    static Add(vector1: EcsMathReadOnlyVector3, vector2: EcsMathReadOnlyVector3): Vector3;
     /**
      * Get the clip factor between two vectors
      * @param vector0 - defines the first operand
@@ -5193,7 +5245,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param size - defines the size along the axis
      * @returns the clip factor
      */
-    static GetClipFactor(vector0: ReadOnlyVector3, vector1: ReadOnlyVector3, axis: ReadOnlyVector3, size: number): number;
+    static GetClipFactor(vector0: EcsMathReadOnlyVector3, vector1: EcsMathReadOnlyVector3, axis: EcsMathReadOnlyVector3, size: number): number;
     /**
      * Get angle between two vectors
      * @param vector0 - angle between vector0 and vector1
@@ -5201,7 +5253,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param normal - direction of the normal
      * @returns the angle between vector0 and vector1
      */
-    static GetAngleBetweenVectors(vector0: Vector3, vector1: Vector3, normal: ReadOnlyVector3): number;
+    static GetAngleBetweenVectors(vector0: Vector3, vector1: Vector3, normal: EcsMathReadOnlyVector3): number;
     /**
      * Returns a new Vector3 set from the index "offset" of the given array
      * @param array - defines the source array
@@ -5287,7 +5339,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param transformation - defines the transformation matrix
      * @returns the transformed Vector3
      */
-    static TransformCoordinates(vector: ReadOnlyVector3, transformation: Matrix): Vector3;
+    static TransformCoordinates(vector: EcsMathReadOnlyVector3, transformation: Matrix): Vector3;
     /**
      * Sets the given vector "result" coordinates with the result of the transformation by the given matrix of the given vector
      * This method computes tranformed coordinates only, not transformed direction vectors (ie. it takes translation in account)
@@ -5295,7 +5347,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param transformation - defines the transformation matrix
      * @param result - defines the Vector3 where to store the result
      */
-    static TransformCoordinatesToRef(vector: ReadOnlyVector3, transformation: Readonly<Matrix>, result: Vector3): void;
+    static TransformCoordinatesToRef(vector: EcsMathReadOnlyVector3, transformation: Readonly<Matrix>, result: Vector3): void;
     /**
      * Sets the given vector "result" coordinates with the result of the transformation by the given matrix of the given floats (x, y, z)
      * This method computes tranformed coordinates only, not transformed direction vectors
@@ -5313,7 +5365,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param transformation - defines the transformation matrix
      * @returns the new Vector3
      */
-    static TransformNormal(vector: ReadOnlyVector3, transformation: Matrix): Vector3;
+    static TransformNormal(vector: EcsMathReadOnlyVector3, transformation: Matrix): Vector3;
     /**
      * Sets the given vector "result" with the result of the normal transformation by the given matrix of the given vector
      * This methods computes transformed normalized direction vectors only (ie. it does not apply translation)
@@ -5321,7 +5373,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param transformation - defines the transformation matrix
      * @param result - defines the Vector3 where to store the result
      */
-    static TransformNormalToRef(vector: ReadOnlyVector3, transformation: Readonly<Matrix>, result: Vector3): void;
+    static TransformNormalToRef(vector: EcsMathReadOnlyVector3, transformation: Readonly<Matrix>, result: Vector3): void;
     /**
      * Sets the given vector "result" with the result of the normal transformation by the given matrix of the given floats (x, y, z)
      * This methods computes transformed normalized direction vectors only (ie. it does not apply translation)
@@ -5341,7 +5393,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param amount - defines the amount on the spline to use
      * @returns the new Vector3
      */
-    static CatmullRom(value1: ReadOnlyVector3, value2: ReadOnlyVector3, value3: ReadOnlyVector3, value4: ReadOnlyVector3, amount: number): Vector3;
+    static CatmullRom(value1: EcsMathReadOnlyVector3, value2: EcsMathReadOnlyVector3, value3: EcsMathReadOnlyVector3, value4: EcsMathReadOnlyVector3, amount: number): Vector3;
     /**
      * Returns a new Vector3 set with the coordinates of "value", if the vector "value" is in the cube defined by the vectors "min" and "max"
      * If a coordinate value of "value" is lower than one of the "min" coordinate, then this "value" coordinate is set with the "min" one
@@ -5351,7 +5403,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param max - defines the upper range value
      * @returns the new Vector3
      */
-    static Clamp(value: ReadOnlyVector3, min: ReadOnlyVector3, max: ReadOnlyVector3): Vector3;
+    static Clamp(value: EcsMathReadOnlyVector3, min: EcsMathReadOnlyVector3, max: EcsMathReadOnlyVector3): Vector3;
     /**
      * Sets the given vector "result" with the coordinates of "value", if the vector "value" is in the cube defined by the vectors "min" and "max"
      * If a coordinate value of "value" is lower than one of the "min" coordinate, then this "value" coordinate is set with the "min" one
@@ -5361,7 +5413,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param max - defines the upper range value
      * @param result - defines the Vector3 where to store the result
      */
-    static ClampToRef(value: ReadOnlyVector3, min: ReadOnlyVector3, max: ReadOnlyVector3, result: Vector3): void;
+    static ClampToRef(value: EcsMathReadOnlyVector3, min: EcsMathReadOnlyVector3, max: EcsMathReadOnlyVector3, result: Vector3): void;
     /**
      * Returns a new Vector3 located for "amount" (float) on the Hermite interpolation spline defined by the vectors "value1", "tangent1", "value2", "tangent2"
      * @param value1 - defines the first control point
@@ -5371,7 +5423,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param amount - defines the amount on the interpolation spline (between 0 and 1)
      * @returns the new Vector3
      */
-    static Hermite(value1: ReadOnlyVector3, tangent1: ReadOnlyVector3, value2: ReadOnlyVector3, tangent2: ReadOnlyVector3, amount: number): Vector3;
+    static Hermite(value1: EcsMathReadOnlyVector3, tangent1: EcsMathReadOnlyVector3, value2: EcsMathReadOnlyVector3, tangent2: EcsMathReadOnlyVector3, amount: number): Vector3;
     /**
      * Returns a new Vector3 located for "amount" (float) on the linear interpolation between the vectors "start" and "end"
      * @param start - defines the start value
@@ -5379,7 +5431,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param amount - max defines amount between both (between 0 and 1)
      * @returns the new Vector3
      */
-    static Lerp(start: ReadOnlyVector3, end: ReadOnlyVector3, amount: number): Vector3;
+    static Lerp(start: EcsMathReadOnlyVector3, end: EcsMathReadOnlyVector3, amount: number): Vector3;
     /**
      * Sets the given vector "result" with the result of the linear interpolation from the vector "start" for "amount" to the vector "end"
      * @param start - defines the start value
@@ -5387,14 +5439,14 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param amount - max defines amount between both (between 0 and 1)
      * @param result - defines the Vector3 where to store the result
      */
-    static LerpToRef(start: ReadOnlyVector3, end: ReadOnlyVector3, amount: number, result: Vector3): void;
+    static LerpToRef(start: EcsMathReadOnlyVector3, end: EcsMathReadOnlyVector3, amount: number, result: Vector3): void;
     /**
      * Returns the dot product (float) between the vectors "left" and "right"
      * @param left - defines the left operand
      * @param right - defines the right operand
      * @returns the dot product
      */
-    static Dot(left: ReadOnlyVector3, right: ReadOnlyVector3): number;
+    static Dot(left: EcsMathReadOnlyVector3, right: EcsMathReadOnlyVector3): number;
     /**
      * Returns a new Vector3 as the cross product of the vectors "left" and "right"
      * The cross product is then orthogonal to both "left" and "right"
@@ -5402,7 +5454,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param right - defines the right operand
      * @returns the cross product
      */
-    static Cross(left: ReadOnlyVector3, right: ReadOnlyVector3): Vector3;
+    static Cross(left: EcsMathReadOnlyVector3, right: EcsMathReadOnlyVector3): Vector3;
     /**
      * Sets the given vector "result" with the cross product of "left" and "right"
      * The cross product is then orthogonal to both "left" and "right"
@@ -5410,7 +5462,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param right - defines the right operand
      * @param result - defines the Vector3 where to store the result
      */
-    static CrossToRef(left: ReadOnlyVector3, right: ReadOnlyVector3, result: Vector3): void;
+    static CrossToRef(left: EcsMathReadOnlyVector3, right: EcsMathReadOnlyVector3, result: Vector3): void;
     /**
      * Returns a new Vector3 as the normalization of the given vector
      * @param vector - defines the Vector3 to normalize
@@ -5429,7 +5481,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param right - defines the second operand
      * @returns the new Vector3
      */
-    static Minimize(left: ReadOnlyVector3, right: ReadOnlyVector3): Vector3;
+    static Minimize(left: EcsMathReadOnlyVector3, right: EcsMathReadOnlyVector3): Vector3;
     /**
      * Gets the maximal coordinate values between two Vector3
      * @param left - defines the first operand
@@ -5443,21 +5495,21 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param value2 - defines the second operand
      * @returns the distance
      */
-    static Distance(value1: ReadOnlyVector3, value2: ReadOnlyVector3): number;
+    static Distance(value1: EcsMathReadOnlyVector3, value2: EcsMathReadOnlyVector3): number;
     /**
      * Returns the squared distance between the vectors "value1" and "value2"
      * @param value1 - defines the first operand
      * @param value2 - defines the second operand
      * @returns the squared distance
      */
-    static DistanceSquared(value1: ReadOnlyVector3, value2: ReadOnlyVector3): number;
+    static DistanceSquared(value1: EcsMathReadOnlyVector3, value2: EcsMathReadOnlyVector3): number;
     /**
      * Returns a new Vector3 located at the center between "value1" and "value2"
      * @param value1 - defines the first operand
      * @param value2 - defines the second operand
      * @returns the new Vector3
      */
-    static Center(value1: ReadOnlyVector3, value2: ReadOnlyVector3): Vector3;
+    static Center(value1: EcsMathReadOnlyVector3, value2: EcsMathReadOnlyVector3): Vector3;
     /**
      * Given three orthogonal normalized left-handed oriented Vector3 axis in space (target system),
      * RotationFromAxis() returns the rotation Euler angles (ex : rotation.x, rotation.y, rotation.z) to apply
@@ -5514,7 +5566,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param otherVector - defines the second operand
      * @returns the current updated Vector3
      */
-    addInPlace(otherVector: ReadOnlyVector3): Vector3;
+    addInPlace(otherVector: EcsMathReadOnlyVector3): Vector3;
     /**
      * Adds the given coordinates to the current Vector3
      * @param x - defines the x coordinate of the operand
@@ -5528,33 +5580,33 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param otherVector - defines the second operand
      * @returns the resulting Vector3
      */
-    add(otherVector: ReadOnlyVector3): Vector3;
+    add(otherVector: EcsMathReadOnlyVector3): Vector3;
     /**
      * Adds the current Vector3 to the given one and stores the result in the vector "result"
      * @param otherVector - defines the second operand
      * @param result - defines the Vector3 object where to store the result
      * @returns the current Vector3
      */
-    addToRef(otherVector: ReadOnlyVector3, result: Vector3): Vector3;
+    addToRef(otherVector: EcsMathReadOnlyVector3, result: Vector3): Vector3;
     /**
      * Subtract the given vector from the current Vector3
      * @param otherVector - defines the second operand
      * @returns the current updated Vector3
      */
-    subtractInPlace(otherVector: ReadOnlyVector3): Vector3;
+    subtractInPlace(otherVector: EcsMathReadOnlyVector3): Vector3;
     /**
      * Returns a new Vector3, result of the subtraction of the given vector from the current Vector3
      * @param otherVector - defines the second operand
      * @returns the resulting Vector3
      */
-    subtract(otherVector: ReadOnlyVector3): Vector3;
+    subtract(otherVector: EcsMathReadOnlyVector3): Vector3;
     /**
      * Subtracts the given vector from the current Vector3 and stores the result in the vector "result".
      * @param otherVector - defines the second operand
      * @param result - defines the Vector3 object where to store the result
      * @returns the current Vector3
      */
-    subtractToRef(otherVector: ReadOnlyVector3, result: Vector3): Vector3;
+    subtractToRef(otherVector: EcsMathReadOnlyVector3, result: Vector3): Vector3;
     /**
      * Returns a new Vector3 set with the subtraction of the given floats from the current Vector3 coordinates
      * @param x - defines the x coordinate of the operand
@@ -5633,14 +5685,14 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param otherVector - defines the second operand
      * @returns true if both vectors are equals
      */
-    equals(otherVector: ReadOnlyVector3): boolean;
+    equals(otherVector: EcsMathReadOnlyVector3): boolean;
     /**
      * Returns true if the current Vector3 and the given vector coordinates are distant less than epsilon
      * @param otherVector - defines the second operand
      * @param epsilon - defines the minimal distance to define values as equals
      * @returns true if both vectors are distant less than epsilon
      */
-    equalsWithEpsilon(otherVector: ReadOnlyVector3, epsilon?: number): boolean;
+    equalsWithEpsilon(otherVector: EcsMathReadOnlyVector3, epsilon?: number): boolean;
     /**
      * Returns true if the current Vector3 coordinates equals the given floats
      * @param x - defines the x coordinate of the operand
@@ -5654,20 +5706,20 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param otherVector - defines the second operand
      * @returns the current updated Vector3
      */
-    multiplyInPlace(otherVector: ReadOnlyVector3): Vector3;
+    multiplyInPlace(otherVector: EcsMathReadOnlyVector3): Vector3;
     /**
      * Returns a new Vector3, result of the multiplication of the current Vector3 by the given vector
      * @param otherVector - defines the second operand
      * @returns the new Vector3
      */
-    multiply(otherVector: ReadOnlyVector3): Vector3;
+    multiply(otherVector: EcsMathReadOnlyVector3): Vector3;
     /**
      * Multiplies the current Vector3 by the given one and stores the result in the given vector "result"
      * @param otherVector - defines the second operand
      * @param result - defines the Vector3 object where to store the result
      * @returns the current Vector3
      */
-    multiplyToRef(otherVector: ReadOnlyVector3, result: Vector3): Vector3;
+    multiplyToRef(otherVector: EcsMathReadOnlyVector3, result: Vector3): Vector3;
     /**
      * Returns a new Vector3 set with the result of the mulliplication of the current Vector3 coordinates by the given floats
      * @param x - defines the x coordinate of the operand
@@ -5681,32 +5733,32 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param otherVector - defines the second operand
      * @returns the new Vector3
      */
-    divide(otherVector: ReadOnlyVector3): Vector3;
+    divide(otherVector: EcsMathReadOnlyVector3): Vector3;
     /**
      * Divides the current Vector3 coordinates by the given ones and stores the result in the given vector "result"
      * @param otherVector - defines the second operand
      * @param result - defines the Vector3 object where to store the result
      * @returns the current Vector3
      */
-    divideToRef(otherVector: ReadOnlyVector3, result: Vector3): Vector3;
+    divideToRef(otherVector: EcsMathReadOnlyVector3, result: Vector3): Vector3;
     /**
      * Divides the current Vector3 coordinates by the given ones.
      * @param otherVector - defines the second operand
      * @returns the current updated Vector3
      */
-    divideInPlace(otherVector: ReadOnlyVector3): Vector3;
+    divideInPlace(otherVector: EcsMathReadOnlyVector3): Vector3;
     /**
      * Updates the current Vector3 with the minimal coordinate values between its and the given vector ones
      * @param other - defines the second operand
      * @returns the current updated Vector3
      */
-    minimizeInPlace(other: ReadOnlyVector3): Vector3;
+    minimizeInPlace(other: EcsMathReadOnlyVector3): Vector3;
     /**
      * Updates the current Vector3 with the maximal coordinate values between its and the given vector ones.
      * @param other - defines the second operand
      * @returns the current updated Vector3
      */
-    maximizeInPlace(other: ReadOnlyVector3): Vector3;
+    maximizeInPlace(other: EcsMathReadOnlyVector3): Vector3;
     /**
      * Updates the current Vector3 with the minimal coordinate values between its and the given coordinates
      * @param x - defines the x coordinate of the operand
@@ -5777,7 +5829,7 @@ declare class Vector3 implements ReadOnlyVector3 {
      * @param source - defines the source Vector3
      * @returns the current updated Vector3
      */
-    copyFrom(source: ReadOnlyVector3): Vector3;
+    copyFrom(source: EcsMathReadOnlyVector3): Vector3;
     /**
      * Copies the given floats to the current Vector3 coordinates
      * @param x - defines the x coordinate of the operand
@@ -5806,7 +5858,7 @@ declare class Vector3 implements ReadOnlyVector3 {
  * Vector4 class created for EulerAngle class conversion to Quaternion
  * @public
  */
-declare class Vector4 implements ReadOnlyVector4 {
+declare class Vector4 implements EcsMathReadOnlyVector4 {
     /** x value of the vector */
     x: number;
     /** y value of the vector */
@@ -5824,11 +5876,11 @@ declare class Vector4 implements ReadOnlyVector4 {
      */
     constructor(
     /** x value of the vector */
-    x: number, 
+    x: number,
     /** y value of the vector */
-    y: number, 
+    y: number,
     /** z value of the vector */
-    z: number, 
+    z: number,
     /** w value of the vector */
     w: number);
     /**
@@ -5837,7 +5889,7 @@ declare class Vector4 implements ReadOnlyVector4 {
      * @param vector2 - the second vector
      * @returns the resulting vector
      */
-    static Add(vector1: ReadOnlyVector4, vector2: ReadOnlyVector4): Vector4;
+    static Add(vector1: EcsMathReadOnlyVector4, vector2: EcsMathReadOnlyVector4): Vector4;
     /**
      * Returns a new Vector4 set from the starting index of the given array.
      * @param array - the array to pull values from
@@ -5883,48 +5935,48 @@ declare class Vector4 implements ReadOnlyVector4 {
      * @param vector - the vector to normalize
      * @returns the vector
      */
-    static Normalize(vector: ReadOnlyVector4): Vector4;
+    static Normalize(vector: EcsMathReadOnlyVector4): Vector4;
     /**
      * Updates the given vector "result" from the normalization of the given one.
      * @param vector - the vector to normalize
      * @param result - the vector to store the result in
      */
-    static NormalizeToRef(vector: ReadOnlyVector4, result: Vector4): void;
+    static NormalizeToRef(vector: EcsMathReadOnlyVector4, result: Vector4): void;
     /**
      * Returns a vector with the minimum values from the left and right vectors
      * @param left - left vector to minimize
      * @param right - right vector to minimize
      * @returns a new vector with the minimum of the left and right vector values
      */
-    static Minimize(left: ReadOnlyVector4, right: ReadOnlyVector4): Vector4;
+    static Minimize(left: EcsMathReadOnlyVector4, right: EcsMathReadOnlyVector4): Vector4;
     /**
      * Returns a vector with the maximum values from the left and right vectors
      * @param left - left vector to maximize
      * @param right - right vector to maximize
      * @returns a new vector with the maximum of the left and right vector values
      */
-    static Maximize(left: ReadOnlyVector4, right: ReadOnlyVector4): Vector4;
+    static Maximize(left: EcsMathReadOnlyVector4, right: EcsMathReadOnlyVector4): Vector4;
     /**
      * Returns the distance (float) between the vectors "value1" and "value2".
      * @param value1 - value to calulate the distance between
      * @param value2 - value to calulate the distance between
      * @returns the distance between the two vectors
      */
-    static Distance(value1: ReadOnlyVector4, value2: ReadOnlyVector4): number;
+    static Distance(value1: EcsMathReadOnlyVector4, value2: EcsMathReadOnlyVector4): number;
     /**
      * Returns the squared distance (float) between the vectors "value1" and "value2".
      * @param value1 - value to calulate the distance between
      * @param value2 - value to calulate the distance between
      * @returns the distance between the two vectors squared
      */
-    static DistanceSquared(value1: ReadOnlyVector4, value2: ReadOnlyVector4): number;
+    static DistanceSquared(value1: EcsMathReadOnlyVector4, value2: EcsMathReadOnlyVector4): number;
     /**
      * Returns a new Vector4 located at the center between the vectors "value1" and "value2".
      * @param value1 - value to calulate the center between
      * @param value2 - value to calulate the center between
      * @returns the center between the two vectors
      */
-    static Center(value1: ReadOnlyVector4, value2: ReadOnlyVector4): Vector4;
+    static Center(value1: EcsMathReadOnlyVector4, value2: EcsMathReadOnlyVector4): Vector4;
     /**
      * Returns a new Vector4 set with the result of the normal transformation by the given matrix of the given vector.
      * This methods computes transformed normalized direction vectors only.
@@ -5932,7 +5984,7 @@ declare class Vector4 implements ReadOnlyVector4 {
      * @param transformation - the transformation matrix to apply
      * @returns the new vector
      */
-    static TransformNormal(vector: ReadOnlyVector4, transformation: Matrix): Vector4;
+    static TransformNormal(vector: EcsMathReadOnlyVector4, transformation: Matrix): Vector4;
     /**
      * Sets the given vector "result" with the result of the normal transformation by the given matrix of the given vector.
      * This methods computes transformed normalized direction vectors only.
@@ -5940,7 +5992,7 @@ declare class Vector4 implements ReadOnlyVector4 {
      * @param transformation - the transformation matrix to apply
      * @param result - the vector to store the result in
      */
-    static TransformNormalToRef(vector: ReadOnlyVector4, transformation: Matrix, result: Vector4): void;
+    static TransformNormalToRef(vector: EcsMathReadOnlyVector4, transformation: Matrix, result: Vector4): void;
     /**
      * Sets the given vector "result" with the result of the normal transformation by the given matrix of the given floats (x, y, z, w).
      * This methods computes transformed normalized direction vectors only.
@@ -5984,39 +6036,39 @@ declare class Vector4 implements ReadOnlyVector4 {
      * @param otherVector - the vector to add
      * @returns the updated Vector4.
      */
-    addInPlace(otherVector: ReadOnlyVector4): Vector4;
+    addInPlace(otherVector: EcsMathReadOnlyVector4): Vector4;
     /**
      * Returns a new Vector4 as the result of the addition of the current Vector4 and the given one.
      * @param otherVector - the vector to add
      * @returns the resulting vector
      */
-    add(otherVector: ReadOnlyVector4): Vector4;
+    add(otherVector: EcsMathReadOnlyVector4): Vector4;
     /**
      * Updates the given vector "result" with the result of the addition of the current Vector4 and the given one.
      * @param otherVector - the vector to add
      * @param result - the vector to store the result
      * @returns the current Vector4.
      */
-    addToRef(otherVector: ReadOnlyVector4, result: Vector4): Vector4;
+    addToRef(otherVector: EcsMathReadOnlyVector4, result: Vector4): Vector4;
     /**
      * Subtract in place the given vector from the current Vector4.
      * @param otherVector - the vector to subtract
      * @returns the updated Vector4.
      */
-    subtractInPlace(otherVector: ReadOnlyVector4): Vector4;
+    subtractInPlace(otherVector: EcsMathReadOnlyVector4): Vector4;
     /**
      * Returns a new Vector4 with the result of the subtraction of the given vector from the current Vector4.
      * @param otherVector - the vector to add
      * @returns the new vector with the result
      */
-    subtract(otherVector: ReadOnlyVector4): Vector4;
+    subtract(otherVector: EcsMathReadOnlyVector4): Vector4;
     /**
      * Sets the given vector "result" with the result of the subtraction of the given vector from the current Vector4.
      * @param otherVector - the vector to subtract
      * @param result - the vector to store the result
      * @returns the current Vector4.
      */
-    subtractToRef(otherVector: ReadOnlyVector4, result: Vector4): Vector4;
+    subtractToRef(otherVector: EcsMathReadOnlyVector4, result: Vector4): Vector4;
     /**
      * Returns a new Vector4 set with the result of the subtraction of the given floats from the current Vector4 coordinates.
      */
@@ -6075,14 +6127,14 @@ declare class Vector4 implements ReadOnlyVector4 {
      * @param otherVector - the vector to compare against
      * @returns true if they are equal
      */
-    equals(otherVector: ReadOnlyVector4): boolean;
+    equals(otherVector: EcsMathReadOnlyVector4): boolean;
     /**
      * Boolean : True if the current Vector4 coordinates are each beneath the distance "epsilon" from the given vector ones.
      * @param otherVector - vector to compare against
      * @param epsilon - (Default: very small number)
      * @returns true if they are equal
      */
-    equalsWithEpsilon(otherVector: ReadOnlyVector4, epsilon?: number): boolean;
+    equalsWithEpsilon(otherVector: EcsMathReadOnlyVector4, epsilon?: number): boolean;
     /**
      * Boolean : True if the given floats are strictly equal to the current Vector4 coordinates.
      * @param x - x value to compare against
@@ -6097,20 +6149,20 @@ declare class Vector4 implements ReadOnlyVector4 {
      * @param otherVector - vector to multiple with
      * @returns the updated Vector4.
      */
-    multiplyInPlace(otherVector: ReadOnlyVector4): Vector4;
+    multiplyInPlace(otherVector: EcsMathReadOnlyVector4): Vector4;
     /**
      * Returns a new Vector4 set with the multiplication result of the current Vector4 and the given one.
      * @param otherVector - vector to multiple with
      * @returns resulting new vector
      */
-    multiply(otherVector: ReadOnlyVector4): Vector4;
+    multiply(otherVector: EcsMathReadOnlyVector4): Vector4;
     /**
      * Updates the given vector "result" with the multiplication result of the current Vector4 and the given one.
      * @param otherVector - vector to multiple with
      * @param result - vector to store the result
      * @returns the current Vector4.
      */
-    multiplyToRef(otherVector: ReadOnlyVector4, result: Vector4): Vector4;
+    multiplyToRef(otherVector: EcsMathReadOnlyVector4, result: Vector4): Vector4;
     /**
      * Returns a new Vector4 set with the multiplication result of the given floats and the current Vector4 coordinates.
      * @param x - x value multiply with
@@ -6125,32 +6177,32 @@ declare class Vector4 implements ReadOnlyVector4 {
      * @param otherVector - vector to devide with
      * @returns resulting new vector
      */
-    divide(otherVector: ReadOnlyVector4): Vector4;
+    divide(otherVector: EcsMathReadOnlyVector4): Vector4;
     /**
      * Updates the given vector "result" with the division result of the current Vector4 by the given one.
      * @param otherVector - vector to devide with
      * @param result - vector to store the result
      * @returns the current Vector4.
      */
-    divideToRef(otherVector: ReadOnlyVector4, result: Vector4): Vector4;
+    divideToRef(otherVector: EcsMathReadOnlyVector4, result: Vector4): Vector4;
     /**
      * Divides the current Vector3 coordinates by the given ones.
      * @param otherVector - vector to devide with
      * @returns the updated Vector3.
      */
-    divideInPlace(otherVector: ReadOnlyVector4): Vector4;
+    divideInPlace(otherVector: EcsMathReadOnlyVector4): Vector4;
     /**
      * Updates the Vector4 coordinates with the minimum values between its own and the given vector ones
      * @param other - defines the second operand
      * @returns the current updated Vector4
      */
-    minimizeInPlace(other: ReadOnlyVector4): Vector4;
+    minimizeInPlace(other: EcsMathReadOnlyVector4): Vector4;
     /**
      * Updates the Vector4 coordinates with the maximum values between its own and the given vector ones
      * @param other - defines the second operand
      * @returns the current updated Vector4
      */
-    maximizeInPlace(other: ReadOnlyVector4): Vector4;
+    maximizeInPlace(other: EcsMathReadOnlyVector4): Vector4;
     /**
      * Gets a new Vector4 from current Vector4 floored values
      * @returns a new Vector4
@@ -6191,7 +6243,7 @@ declare class Vector4 implements ReadOnlyVector4 {
      * @param source - the source vector to copy from
      * @returns the updated Vector4.
      */
-    copyFrom(source: ReadOnlyVector4): Vector4;
+    copyFrom(source: EcsMathReadOnlyVector4): Vector4;
     /**
      * Updates the current Vector4 coordinates with the given floats.
      * @param x - float to copy from

@@ -1,7 +1,7 @@
 import { mockEnvironment } from './helpers'
 
 describe('simple test with external module', () => {
-  const { starters, define, errors, getModules } = mockEnvironment({
+  const { starters, define, errors } = mockEnvironment({
     ['@dcl/test']: async () => ({
       async xxx(...args: number[]) {
         return args.reduce((a, c) => a + c, 0)
@@ -11,7 +11,9 @@ describe('simple test with external module', () => {
   })
 
   it('defines a module that loads other module that loads @dcl/test', (done) => {
-    define('test', ['a-module-that-takes-its-time-to-load'], (asyncModule: any) => {
+    define('test', ['a-module-that-takes-its-time-to-load'], (
+      asyncModule: any
+    ) => {
       try {
         expect(asyncModule.exportedTestDCL).toHaveProperty('xxx')
         expect(asyncModule.exportedTestDCL).toHaveProperty('yyy')
@@ -32,7 +34,10 @@ describe('simple test with external module', () => {
 
     setTimeout(() => {
       // define the "a-module-that-takes-its-time-to-load"
-      define('a-module-that-takes-its-time-to-load', ['exports', '@dcl/test'], (exports: any, testDCL: any) => {
+      define('a-module-that-takes-its-time-to-load', ['exports', '@dcl/test'], (
+        exports: any,
+        testDCL: any
+      ) => {
         if (!testDCL) {
           done('testDCL is null')
         } else {

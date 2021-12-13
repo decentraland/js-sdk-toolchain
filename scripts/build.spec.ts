@@ -1,4 +1,6 @@
+import { readFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
+
 import {
   flow,
   TSC,
@@ -8,11 +10,16 @@ import {
   ROLLUP_CONFIG_PATH,
   ECS_PATH,
   ROLLUP,
-  commonChecks
+  commonChecks,
+  LEGACY_ECS_PATH
 } from './common'
-import { ensureFileExists, itExecutes, itDeletesFolder, copyFile, itDeletesGlob } from './helpers'
-
-import { readFileSync, writeFileSync } from 'fs'
+import {
+  ensureFileExists,
+  itExecutes,
+  itDeletesFolder,
+  copyFile,
+  itDeletesGlob
+} from './helpers'
 
 flow('build-all', () => {
   commonChecks()
@@ -31,7 +38,10 @@ flow('build-all', () => {
     itExecutes(`npm ci --quiet`, DECENTRALAND_AMD_PATH)
     itDeletesFolder('dist', DECENTRALAND_AMD_PATH)
     itExecutes(`${TSC} -p tsconfig.json`, DECENTRALAND_AMD_PATH)
-    itExecutes(`${TERSER} --mangle --comments some --source-map -o dist/amd.min.js dist/amd.js`, DECENTRALAND_AMD_PATH)
+    itExecutes(
+      `${TERSER} --mangle --comments some --source-map -o dist/amd.min.js dist/amd.js`,
+      DECENTRALAND_AMD_PATH
+    )
 
     it('check file exists', () => {
       ensureFileExists('dist/amd.js', DECENTRALAND_AMD_PATH)
@@ -50,27 +60,49 @@ flow('build-all', () => {
   })
 
   flow('decentraland-ecs', () => {
+    itDeletesFolder('dist', ECS_PATH)
     itExecutes(`npm i --quiet`, ECS_PATH)
 
     itDeletesGlob('types/dcl/*.d.ts', ECS_PATH)
 
     const ROLLUP_ECS_CONFIG = resolve(ROLLUP_CONFIG_PATH, 'ecs.config.js')
-    itExecutes(`${ROLLUP} -c ${ROLLUP_ECS_CONFIG}`, ECS_PATH)
+    itExecutes(`${ROLLUP} -c ${ROLLUP_ECS_CONFIG}`, LEGACY_ECS_PATH)
 
     // install required dependencies
     itExecutes(`npm install --quiet ${BUILD_ECS_PATH}`, ECS_PATH)
     itExecutes(`npm install --quiet ${DECENTRALAND_AMD_PATH}`, ECS_PATH)
 
     itExecutes(`${TSC} src/setupProxy.ts src/setupExport.ts`, ECS_PATH)
-
+    copyLegacyEcs()
     fixTypes()
+  })
+
+  flow('legacy-ecs', () => {
+    // This legacy-ecs flow should be always after decentrland-ecs.
+    // Why? First we bundle legacy-ecs as an iife file (rollout), and move it to decentraland-ecs.
+    // And then we build legacy-ecs with TS and publish it to npm so we can use it like a normal module.
+
+    itExecutes(`npm ci --quiet`, LEGACY_ECS_PATH)
+    itDeletesFolder('dist', LEGACY_ECS_PATH)
+    itExecutes(`${TSC} -p tsconfig.json`, LEGACY_ECS_PATH)
   })
 })
 
+function copyLegacyEcs() {
+  it('copy legacy ecs iife to decentraland-ecs', () => {
+    const filesToCopy = ['index.js', 'index.min.js', 'index.min.js.map']
+    for (const file of filesToCopy) {
+      const filePath = ensureFileExists(`dist/${file}`, LEGACY_ECS_PATH)
+      copyFile(filePath, `${ECS_PATH}/dist/src/${file}`)
+    }
+  })
+}
+
 function fixTypes() {
   it('fix ecs types', () => {
-    const original = ensureFileExists('dist/index.d.ts', ECS_PATH)
+    const original = ensureFileExists('dist/index.d.ts', LEGACY_ECS_PATH)
 
+    copyFile(original, ECS_PATH + '/dist/index.d.ts')
     copyFile(original, ECS_PATH + '/types/dcl/index.d.ts')
 
     const dtsFile = ensureFileExists('types/dcl/index.d.ts', ECS_PATH)

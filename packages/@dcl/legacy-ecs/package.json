@@ -1,0 +1,22 @@
+{
+  "name": "@dcl/legacy-ecs",
+  "version": "0.0.0",
+  "description": "Decentraland ECS Legacy",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "watch": "tsc -p tsconfig.json --watch",
+    "build": "tsc -p tsconfig.json",
+    "start": "npm run build && tsc -p tsconfig.json --watch"
+  },
+  "keywords": [],
+  "author": "Decentraland",
+  "license": "Apache-2.0",
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@dcl/ecs-math": "^1.0.1-20211130194043.commit-c994f71",
+    "@dcl/posix": "^1.0.3"
+  }
+}

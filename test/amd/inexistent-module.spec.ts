@@ -14,16 +14,24 @@ describe('simple test with external module that doesnt exist and throw', () => {
   })
 
   it('defines a module that loads other module that loads @throw/test', async () => {
-    define('asyncModule', ['exports', '@throw/test', '@throw/test2', '@throw/tes3'], (exports: any, testDCL: any) => {
+    define('asyncModule', [
+      'exports',
+      '@throw/test',
+      '@throw/test2',
+      '@throw/tes3'
+    ], (exports: any, testDCL: any) => {
       exports.exportedTestDCL = testDCL
     })
 
-    define(['asyncModule'], (asyncModule: any) => {})
+    define(['asyncModule'], (_asyncModule: any) => {})
   })
 
   it('starters must not throw', () => {
     expect(starters.length).toBeGreaterThan(0)
-    expect(errors).toEqual(['Unknown module @throw/test2', 'Unknown module @throw/tes3'])
+    expect(errors).toEqual([
+      'Unknown module @throw/test2',
+      'Unknown module @throw/tes3'
+    ])
     expect(() => starters.forEach(($) => $())).toThrow()
   })
 })

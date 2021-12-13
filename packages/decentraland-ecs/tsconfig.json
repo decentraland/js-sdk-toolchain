@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES5",
+    "target": "ESNext",
     "module": "ESNext",
     "strict": true,
     "declarationDir": "dist",
@@ -10,7 +10,7 @@
     "inlineSources": true,
     "declaration": true,
     "stripInternal": true,
-    "moduleResolution": "Node",
+    "moduleResolution": "node",
     "pretty": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
@@ -19,8 +19,8 @@
     "downlevelIteration": true,
     "keyofStringsOnly": true,
     "noUnusedLocals": true,
+    "skipLibCheck": true,
     "baseUrl": ".",
-    "noLib": true,
     "types": [
       "env",
       "@dcl/posix"
@@ -32,16 +32,5 @@
   },
   "include": [
     "./src"
-  ],
-  "exclude": [
-    "../../node_modules",
-    "../../src",
-    "../../test",
-    "../test",
-    "dist",
-    "etc",
-    "temp",
-    "types",
-    "api-docs-review/decentraland-ecs.api.ts"
   ]
 }

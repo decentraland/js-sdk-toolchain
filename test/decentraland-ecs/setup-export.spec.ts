@@ -5,6 +5,7 @@ import { ensureFileExists } from '../../scripts/helpers'
 const ecsLocation = path.resolve(__dirname, '../../packages/decentraland-ecs')
 
 describe('decentraland-ecs: setupExport.js', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const setupExport = require(`${ecsLocation}/src/setupExport.js`)
   test(`export fake project`, async () => {
     const workDir = path.resolve(__dirname, 'simple-scene')

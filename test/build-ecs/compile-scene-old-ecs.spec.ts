@@ -1,6 +1,10 @@
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
-import { itExecutes, ensureFileExists, itDeletesFolder } from '../../scripts/helpers'
+import {
+  itExecutes,
+  ensureFileExists,
+  itDeletesFolder
+} from '../../scripts/helpers'
 
 describe('legacy decentraland-ecs sanity checks', () => {
   testLegacyEcsFlow('6.6.3')
@@ -25,11 +29,15 @@ function testLegacyEcsFlow(version: string) {
     })
 
     it('ensure it uses not minified versions in .lib', () => {
-      const lib: any[] = JSON.parse(readFileSync(resolve(cwd, 'bin/game.js.lib')).toString()).map(
-        ($: { path: string }) => resolve(cwd, $.path)
+      const lib: any[] = JSON.parse(
+        readFileSync(resolve(cwd, 'bin/game.js.lib')).toString()
+      ).map(($: { path: string }) => resolve(cwd, $.path))
+      expect(lib).toContain(
+        resolve(cwd, 'node_modules/decentraland-ecs/artifacts/amd.js')
       )
-      expect(lib).toContain(resolve(cwd, 'node_modules/decentraland-ecs/artifacts/amd.js'))
-      expect(lib).toContain(resolve(cwd, 'node_modules/decentraland-ecs/dist/src/index.js'))
+      expect(lib).toContain(
+        resolve(cwd, 'node_modules/decentraland-ecs/dist/src/index.js')
+      )
     })
   })
 }

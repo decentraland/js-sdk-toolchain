@@ -13,10 +13,10 @@ jobs:
       decentraland_ecs_s3_bucket_key: ${{ steps.publish_decentraland_ecs.outputs.s3-bucket-key }}
     steps:
       - uses: actions/checkout@master
-      - name: Use Node.js 14.x
+      - name: Use Node.js 16.x
         uses: actions/setup-node@v1
         with:
-          node-version: 14.x
+          node-version: 16.x
       - name: install
         run: make install
       - name: update version of packages/@dcl/dcl-rollup
@@ -43,6 +43,12 @@ jobs:
           cwd: packages/@dcl/js-runtime
           deterministic-snapshot: true
           only-update-versions: true
+      - name: update version of packages/@dcl/legacy-ecs
+        uses: menduz/oddish-action@master
+        with:
+          cwd: packages/@dcl/legacy-ecs
+          deterministic-snapshot: true
+          only-update-versions: true
       - name: update version of packages/decentraland-ecs
         uses: menduz/oddish-action@master
         with:
@@ -53,6 +59,8 @@ jobs:
         run: make build
       - name: test
         run: make test
+      - name: lint
+        run: make lint
       - name: prepare releasable packages
         run: make prepare
       - name: 'Upload Artifact'
@@ -73,6 +81,22 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/dcl-rollup'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+      - name: publish @dcl/legacy-ecs package
+        uses: menduz/oddish-action@master
+        with:
+          registry-url: 'https://registry.npmjs.org'
+          access: public
+          cwd: ./packages/@dcl/legacy-ecs
+          ## use action runId instead of current date to generate snapshot numbers
+          deterministic-snapshot: true
+
+          ## publish every package to s3
+          s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/legacy-ecs'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}

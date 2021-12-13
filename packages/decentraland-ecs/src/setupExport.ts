@@ -10,6 +10,8 @@ import {
   shaHashMaker
 } from './cli/setupUtils'
 
+declare let URL: any
+
 const setupExport = async ({
   workDir,
   exportDir,
@@ -28,12 +30,23 @@ const setupExport = async ({
       })
     )
     const dclIgnorePath = path.resolve(workDir, '.dclignore')
-    const dclKernelPath = path.dirname(require.resolve('@dcl/kernel/package.json', { paths: [workDir, ecsPath] }))
-    const dclKernelDefaultProfilePath = path.resolve(dclKernelPath, 'default-profile')
+    const dclKernelPath = path.dirname(
+      require.resolve('@dcl/kernel/package.json', { paths: [workDir, ecsPath] })
+    )
+    const dclKernelDefaultProfilePath = path.resolve(
+      dclKernelPath,
+      'default-profile'
+    )
     const dclKernelLoaderPath = path.resolve(dclKernelPath, 'loader')
-    const dclKernelImagesDecentralandConnectPath = path.resolve(dclKernelPath, 'images', 'decentraland-connect')
+    const dclKernelImagesDecentralandConnectPath = path.resolve(
+      dclKernelPath,
+      'images',
+      'decentraland-connect'
+    )
     const dclUnityRenderer = path.dirname(
-      require.resolve('@dcl/unity-renderer/package.json', { paths: [workDir, ecsPath] })
+      require.resolve('@dcl/unity-renderer/package.json', {
+        paths: [workDir, ecsPath]
+      })
     )
     const lambdasPath = path.resolve(exportDir, 'lambdas')
     const explorePath = path.resolve(lambdasPath, 'explore')
@@ -43,12 +56,18 @@ const setupExport = async ({
     const sceneJsonPath = path.resolve(workDir, './scene.json')
 
     // 2) Change HTML title name
-    const defaultSceneJson = { display: { title: '' }, scene: { parcels: ['0,0'] } }
+    const defaultSceneJson = {
+      display: { title: '' },
+      scene: { parcels: ['0,0'] }
+    }
     const sceneJson = fs.existsSync(sceneJsonPath)
       ? JSON.parse(fs.readFileSync(sceneJsonPath).toString())
       : defaultSceneJson
 
-    const content = await fs.promises.readFile(path.resolve(dclKernelPath, 'export.html'), 'utf-8')
+    const content = await fs.promises.readFile(
+      path.resolve(dclKernelPath, 'export.html'),
+      'utf-8'
+    )
     const finalContent = content
       .replace('{{ scene.display.title }}', sceneJson.display.title)
       .replace('{{ scene.scene.base }}', sceneJson.scene.base)
@@ -93,11 +112,17 @@ const setupExport = async ({
       )
     )
 
-    await ensureWriteFile(path.resolve(lambdasPath, 'profiles'), JSON.stringify([]))
+    await ensureWriteFile(
+      path.resolve(lambdasPath, 'profiles'),
+      JSON.stringify([])
+    )
 
     let ignoreFileContent = ''
     if (fs.existsSync(dclIgnorePath)) {
-      ignoreFileContent = fs.readFileSync(path.resolve(workDir, '.dclignore'), 'utf-8')
+      ignoreFileContent = fs.readFileSync(
+        path.resolve(workDir, '.dclignore'),
+        'utf-8'
+      )
     }
     const contentStatic = entityV3FromFolder({
       folder: workDir,
@@ -109,7 +134,10 @@ const setupExport = async ({
     if (contentStatic?.content) {
       for (const $ of contentStatic?.content) {
         if ($ && $.original_path) {
-          await ensureCopyFile(path.resolve(workDir, $.original_path), path.resolve(contentsContentPath, $.hash))
+          await ensureCopyFile(
+            path.resolve(workDir, $.original_path),
+            path.resolve(contentsContentPath, $.hash)
+          )
         }
       }
     }
@@ -117,21 +145,41 @@ const setupExport = async ({
     await Promise.all([
       // copy project
       ensureWriteFile(path.resolve(exportDir, 'index.html'), finalContent),
-      ensureWriteFile(path.resolve(exportDir, 'mappings'), JSON.stringify(mappings)),
-      ensureCopyFile(path.resolve(dclKernelPath, 'index.js'), path.resolve(exportDir, 'index.js')),
-      ensureCopyFile(path.resolve(dclKernelPath, 'favicon.ico'), path.resolve(exportDir, 'favicon.ico')),
+      ensureWriteFile(
+        path.resolve(exportDir, 'mappings'),
+        JSON.stringify(mappings)
+      ),
+      ensureCopyFile(
+        path.resolve(dclKernelPath, 'index.js'),
+        path.resolve(exportDir, 'index.js')
+      ),
+      ensureCopyFile(
+        path.resolve(dclKernelPath, 'favicon.ico'),
+        path.resolve(exportDir, 'favicon.ico')
+      ),
 
       // copy dependencies
       copyDir(dclUnityRenderer, path.resolve(exportDir, 'unity-renderer')),
-      copyDir(dclKernelDefaultProfilePath, path.resolve(exportDir, 'default-profile')),
+      copyDir(
+        dclKernelDefaultProfilePath,
+        path.resolve(exportDir, 'default-profile')
+      ),
       copyDir(dclKernelLoaderPath, path.resolve(exportDir, 'loader'))
     ])
 
     if (fs.existsSync(dclKernelImagesDecentralandConnectPath)) {
-      await copyDir(dclKernelImagesDecentralandConnectPath, path.resolve(exportDir, 'images', 'decentraland-connect'))
+      await copyDir(
+        dclKernelImagesDecentralandConnectPath,
+        path.resolve(exportDir, 'images', 'decentraland-connect')
+      )
     }
 
-    const copyBrVersion = ['unity.wasm', 'unity.data', 'unity.framework.js', 'unity.data']
+    const copyBrVersion = [
+      'unity.wasm',
+      'unity.data',
+      'unity.framework.js',
+      'unity.data'
+    ]
     for (const fileName of copyBrVersion) {
       if (fs.existsSync(path.resolve(exportDir, 'unity-renderer', fileName))) {
         await ensureCopyFile(
@@ -143,7 +191,10 @@ const setupExport = async ({
 
     await copyWearables({ exportDir })
     await copyContentStatus({ exportDir })
-    await ensureWriteFile(path.resolve(exportDir, 'content', 'available-content'), '[{"cid":"0","available":false}]')
+    await ensureWriteFile(
+      path.resolve(exportDir, 'content', 'available-content'),
+      '[{"cid":"0","available":false}]'
+    )
   } catch (err) {
     console.error('Export failed.', err)
     throw err
@@ -153,7 +204,12 @@ const setupExport = async ({
 
 const copyWearables = async ({ exportDir }: { exportDir: string }) => {
   const filesToDownload = new Set<string>()
-  const wearableResponsePath = path.resolve(exportDir, 'lambdas', 'collections', 'wearables')
+  const wearableResponsePath = path.resolve(
+    exportDir,
+    'lambdas',
+    'collections',
+    'wearables'
+  )
   const baseAvatarUrl =
     'https://peer-lb.decentraland.org/lambdas/collections/wearables?collectionId=urn:decentraland:off-chain:base-avatars'
 
@@ -162,28 +218,34 @@ const copyWearables = async ({ exportDir }: { exportDir: string }) => {
   try {
     await downloadFile(baseAvatarUrl, wearableResponsePath)
   } catch (err) {
-    console.error(`Couldn't fetch base avatars to serve statically. Please verify your internet connection`)
+    console.error(
+      `Couldn't fetch base avatars to serve statically. Please verify your internet connection`
+    )
     throw err
   }
 
-  let response = JSON.parse(fs.readFileSync(wearableResponsePath).toString())
+  const response = JSON.parse(fs.readFileSync(wearableResponsePath).toString())
 
   for (const w_i in response.wearables) {
     // download wearable.thumbnail and copy and replace
     filesToDownload.add(`${response.wearables[w_i].thumbnail || ''}`)
-    response.wearables[w_i].thumbnail = '.' + new URL(response.wearables[w_i].thumbnail).pathname
+    response.wearables[w_i].thumbnail =
+      '.' + new URL(response.wearables[w_i].thumbnail).pathname
 
     for (const r_j in response.wearables[w_i].data.representations) {
       // download each contents representation mainFile,
-      for (const c_k in response.wearables[w_i].data.representations[r_j].contents) {
-        const url = response.wearables[w_i].data.representations[r_j].contents[c_k].url
+      for (const c_k in response.wearables[w_i].data.representations[r_j]
+        .contents) {
+        const url =
+          response.wearables[w_i].data.representations[r_j].contents[c_k].url
         filesToDownload.add(`${url || ''}`)
-        response.wearables[w_i].data.representations[r_j].contents[c_k].url = '.' + new URL(url).pathname
+        response.wearables[w_i].data.representations[r_j].contents[c_k].url =
+          '.' + new URL(url).pathname
       }
     }
   }
 
-  var promises = []
+  const promises = []
 
   for (const fileUrl of Array.from(filesToDownload)) {
     const url = new URL(fileUrl)
@@ -195,7 +257,9 @@ const copyWearables = async ({ exportDir }: { exportDir: string }) => {
   try {
     await Promise.all(promises)
   } catch (err) {
-    console.error(`Couldn't fetch base avatars to serve statically. Please verify your internet connection`)
+    console.error(
+      `Couldn't fetch base avatars to serve statically. Please verify your internet connection`
+    )
     throw err
   }
   await ensureWriteFile(wearableResponsePath, JSON.stringify(response, null, 2))
@@ -217,5 +281,6 @@ const copyContentStatus = async ({ exportDir }: { exportDir: string }) => {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export = setupExport

@@ -1,6 +1,10 @@
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
-import { itExecutes, ensureFileExists, itDeletesFolder } from '../../scripts/helpers'
+import {
+  itExecutes,
+  ensureFileExists,
+  itDeletesFolder
+} from '../../scripts/helpers'
 
 const ecsLocation = resolve(__dirname, '../../packages/decentraland-ecs')
 
@@ -20,11 +24,13 @@ describe('build-ecs: simple scene compilation', () => {
   })
 
   it('ensure it uses not minified versions in .lib', () => {
-    const lib: any[] = JSON.parse(readFileSync(resolve(cwd, 'bin/game.js.lib')).toString()).map(($: { path: string }) =>
-      resolve(cwd, $.path)
-    )
+    const lib: any[] = JSON.parse(
+      readFileSync(resolve(cwd, 'bin/game.js.lib')).toString()
+    ).map(($: { path: string }) => resolve(cwd, $.path))
     expect(lib).toContain(resolve('packages/@dcl/amd/dist/amd.js'))
-    expect(lib).toContain(resolve('packages/decentraland-ecs/dist/src/index.js'))
+    expect(lib).toContain(
+      resolve('packages/decentraland-ecs/dist/src/index.js')
+    )
   })
 })
 
@@ -43,10 +49,12 @@ describe('build-ecs: simple scene compilation, production mode', () => {
   })
 
   it('ensure it uses minified versions in .lib', () => {
-    const lib: any[] = JSON.parse(readFileSync(resolve(cwd, 'bin/game.js.lib')).toString()).map(($: { path: string }) =>
-      resolve(cwd, $.path)
-    )
+    const lib: any[] = JSON.parse(
+      readFileSync(resolve(cwd, 'bin/game.js.lib')).toString()
+    ).map(($: { path: string }) => resolve(cwd, $.path))
     expect(lib).toContain(resolve('packages/@dcl/amd/dist/amd.min.js'))
-    expect(lib).toContain(resolve('packages/decentraland-ecs/dist/src/index.min.js'))
+    expect(lib).toContain(
+      resolve('packages/decentraland-ecs/dist/src/index.min.js')
+    )
   })
 })

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/ban-types */
 type Module = {
   name: string
   dclamd: 1 | 2
@@ -10,7 +12,7 @@ type Module = {
 
 type ModuleLoadedHandler = (module: Module) => void
 
-declare var onerror: ((err: Error) => void) | undefined
+declare let onerror: ((err: Error) => void) | undefined
 
 // A naive attempt at getting the global `this`. Don’t use `this`!
 const getGlobalThis = function () {
@@ -36,8 +38,8 @@ namespace loader {
 
   let unnamedModules = 0
 
-  let anonymousQueue: any[] = []
-  let cycles: string[][] = []
+  const anonymousQueue: any[] = []
+  const cycles: string[][] = []
 
   const settings = {
     baseUrl: ''
@@ -47,7 +49,7 @@ namespace loader {
 
   export function config(config: Record<string, any>) {
     if (typeof config === 'object') {
-      for (let x in config) {
+      for (const x in config) {
         if (config.hasOwnProperty(x)) {
           ;(settings as any)[x] = config[x]
         }
@@ -58,7 +60,11 @@ namespace loader {
   export function define(factory: Function): void
   export function define(id: string, factory: Function): void
   export function define(dependencies: string[], factory: Function): void
-  export function define(id: string, dependencies: string[], factory: Function): void
+  export function define(
+    id: string,
+    dependencies: string[],
+    factory: Function
+  ): void
   export function define(
     first: string | Function | string[],
     second?: string[] | string | Function,
@@ -97,18 +103,24 @@ namespace loader {
     function ready(deps: any[]) {
       const module = registeredModules[moduleToLoad!]
 
-      if (!module) throw new Error('Could not access registered module ' + moduleToLoad)
+      if (!module)
+        throw new Error('Could not access registered module ' + moduleToLoad)
 
       let exports = module.exports
 
-      exports = typeof factory === 'function' ? factory.apply(globalObject, deps) || exports : factory
+      exports =
+        typeof factory === 'function'
+          ? factory.apply(globalObject, deps) || exports
+          : factory
 
       module.exports = exports
 
       moduleReady(moduleToLoad!)
     }
 
-    dependencies = (dependencies || []).map((dep) => resolve(moduleToLoad!, dep))
+    dependencies = (dependencies || []).map((dep) =>
+      resolve(moduleToLoad!, dep)
+    )
 
     if (!registeredModules[moduleToLoad]) {
       registeredModules[moduleToLoad] = {
@@ -125,7 +137,7 @@ namespace loader {
     registeredModules[moduleToLoad].dependencies = dependencies
 
     require(dependencies, ready, (err: Error) => {
-      if (typeof onerror == 'function') {
+      if (typeof onerror === 'function') {
         onerror(err)
       } else {
         throw err
@@ -141,11 +153,12 @@ namespace loader {
   function moduleReady(moduleName: string) {
     const module = registeredModules[moduleName]
 
-    if (!module) throw new Error('Could not access registered module ' + moduleName)
+    if (!module)
+      throw new Error('Could not access registered module ' + moduleName)
 
     module.dclamd = MODULE_READY
 
-    let handlers: ModuleLoadedHandler[] = module.handlers
+    const handlers: ModuleLoadedHandler[] = module.handlers
 
     if (handlers && handlers.length) {
       for (let x = 0; x < handlers.length; x++) {
@@ -158,17 +171,21 @@ namespace loader {
    * Walks (recursively) the dependencies of 'from' in search of 'to'.
    * Returns cycle as array.
    */
-  function getCyclePath(fromModule: string, toModule: string, depth: number): string[] | null {
+  function getCyclePath(
+    fromModule: string,
+    toModule: string,
+    depth: number
+  ): string[] | null {
     if (!registeredModules[fromModule]) {
       return null
     }
 
-    if (fromModule == toModule || depth == 50) return [fromModule]
+    if (fromModule === toModule || depth === 50) return [fromModule]
 
     const dependencies = registeredModules[fromModule].dependencies
 
     for (let i = 0, len = dependencies.length; i < len; i++) {
-      let path = getCyclePath(dependencies[i], toModule, depth + 1)
+      const path = getCyclePath(dependencies[i], toModule, depth + 1)
       if (path !== null) {
         path.push(fromModule)
         return path
@@ -185,16 +202,16 @@ namespace loader {
    * @param to Module id to look for
    */
   function hasDependencyPath(fromId: string, toId: string): boolean {
-    let from = registeredModules[fromId]
+    const from = registeredModules[fromId]
     if (!from) {
       return false
     }
 
-    let inQueue: Record<string, boolean> = {}
-    for (let i in registeredModules) {
+    const inQueue: Record<string, boolean> = {}
+    for (const i in registeredModules) {
       inQueue[i] = false
     }
-    let queue: Module[] = []
+    const queue: Module[] = []
 
     // Insert 'from' in queue
     queue.push(from)
@@ -202,19 +219,19 @@ namespace loader {
 
     while (queue.length > 0) {
       // Pop first inserted element of queue
-      let element = queue.shift()!
-      let dependencies = element.dependencies
+      const element = queue.shift()!
+      const dependencies = element.dependencies
       if (dependencies) {
         // Walk the element's dependencies
         for (let i = 0, len = dependencies.length; i < len; i++) {
-          let dependency = dependencies[i]
+          const dependency = dependencies[i]
 
           if (dependency === toId) {
             // There is a path to 'to'
             return true
           }
 
-          let dependencyModule = registeredModules[dependency]
+          const dependencyModule = registeredModules[dependency]
           if (dependencyModule && !inQueue[dependency]) {
             // Insert 'dependency' in queue
             inQueue[dependency] = true
@@ -234,19 +251,24 @@ namespace loader {
     errorCallback: Function,
     parentModule: string
   ) {
-    let dependenciesResults: any[] = new Array(dependencies.length).fill(null)
+    const dependenciesResults: any[] = new Array(dependencies.length).fill(null)
     let loadedCount = 0
     let hasLoaded = false
 
     if (typeof dependencies === 'string') {
       if (registeredModules[dependencies]) {
         if (registeredModules[dependencies].dclamd === MODULE_LOADING) {
-          throw new Error(`Trying to load ${dependencies} from ${parentModule}. The first module is still loading.`)
+          throw new Error(
+            `Trying to load ${dependencies} from ${parentModule}. The first module is still loading.`
+          )
         }
         return registeredModules[dependencies]
       }
       throw new Error(
-        dependencies + ' has not been defined. Please include it as a dependency in ' + parentModule + "'s define()"
+        dependencies +
+          ' has not been defined. Please include it as a dependency in ' +
+          parentModule +
+          "'s define()"
       )
     }
 
@@ -255,7 +277,7 @@ namespace loader {
     for (let index = 0; index < depsLength; index++) {
       switch (dependencies[index]) {
         case 'require':
-          let _require: typeof require = function (
+          const _require: typeof require = function (
             new_module: string | string[],
             callback: () => void,
             errorCallback: Function
@@ -270,7 +292,9 @@ namespace loader {
           break
         case 'exports':
           if (!registeredModules[parentModule]) {
-            throw new Error('Parent module ' + parentModule + ' not registered yet')
+            throw new Error(
+              'Parent module ' + parentModule + ' not registered yet'
+            )
           }
 
           dependenciesResults[index] = registeredModules[parentModule].exports
@@ -323,7 +347,12 @@ namespace loader {
 
   function createMethodHandler(rpcHandle: string, method: MethodDescriptor) {
     return function () {
-      return dcl.callRpc(rpcHandle, method.name, anonymousQueue.slice.call(arguments, 0))
+      return dcl.callRpc(
+        rpcHandle,
+        method.name,
+        // eslint-disable-next-line prefer-rest-params
+        anonymousQueue.slice.call(arguments, 0)
+      )
     }
   }
 
@@ -332,7 +361,12 @@ namespace loader {
     return fromModule ? toUrl(toModule, fromModule) : toModule
   }
 
-  function load(moduleName: string, callback: ModuleLoadedHandler, errorCallback: Function, parentModule: string) {
+  function load(
+    moduleName: string,
+    callback: ModuleLoadedHandler,
+    errorCallback: Function,
+    parentModule: string
+  ) {
     if (registeredModules[moduleName]) {
       registeredModules[moduleName].dependants.add(parentModule)
 
@@ -356,14 +390,17 @@ namespace loader {
     }
 
     if (moduleName.indexOf('@') === 0) {
-      let exports = registeredModules[moduleName].exports
+      const exports = registeredModules[moduleName].exports
       if (typeof dcl.loadModule === 'function') {
         dcl
           .loadModule(moduleName, exports)
           .then((descriptor: ModuleDescriptor) => {
-            for (let i in descriptor.methods) {
+            for (const i in descriptor.methods) {
               const method = descriptor.methods[i]
-              exports[method.name] = createMethodHandler(descriptor.rpcHandle, method)
+              exports[method.name] = createMethodHandler(
+                descriptor.rpcHandle,
+                method
+              )
             }
 
             moduleReady(moduleName)
@@ -372,7 +409,9 @@ namespace loader {
             errorCallback(e)
           })
       } else {
-        throw new Error('Asynchronous modules will not work because loadModule function is not present')
+        throw new Error(
+          'Asynchronous modules will not work because loadModule function is not present'
+        )
       }
     }
   }
@@ -382,14 +421,14 @@ namespace loader {
       const unknownModules = new Set<string>()
       const notLoadedModules: Module[] = []
 
-      for (let i in registeredModules) {
+      for (const i in registeredModules) {
         if (registeredModules[i]) {
           if (registeredModules[i].dclamd === MODULE_LOADING) {
             notLoadedModules.push(registeredModules[i])
           }
 
           registeredModules[i].dependencies.forEach(($) => {
-            if ($ == 'require' || $ == 'exports' || $ == 'module') return
+            if ($ === 'require' || $ === 'exports' || $ === 'module') return
             if (!registeredModules[$]) unknownModules.add($)
           })
         }
@@ -398,7 +437,11 @@ namespace loader {
       const errorParts: string[] = []
 
       if (cycles.length) {
-        errorParts.push(`\n> Cyclic dependencies: ${cycles.map(($) => '\n  - ' + $.join(' -> ')).join('')}`)
+        errorParts.push(
+          `\n> Cyclic dependencies: ${cycles
+            .map(($) => '\n  - ' + $.join(' -> '))
+            .join('')}`
+        )
       }
 
       if (unknownModules.size) {
@@ -410,7 +453,11 @@ namespace loader {
       }
 
       if (notLoadedModules.length) {
-        errorParts.push(`\n> These modules didn't load: ${notLoadedModules.map(($) => '\n  - ' + $.name).join('')}.\n`)
+        errorParts.push(
+          `\n> These modules didn't load: ${notLoadedModules
+            .map(($) => '\n  - ' + $.name)
+            .join('')}.\n`
+        )
       }
 
       if (errorParts.length) {
@@ -436,13 +483,17 @@ namespace loader {
     r = r.replace(/^\.\//g, '')
 
     // replace /aa/../ => / (BUT IGNORE /../../)
-    pattern = /\/(([^\/])|([^\/][^\/\.])|([^\/\.][^\/])|([^\/][^\/][^\/]+))\/\.\.\//
+    pattern =
+      /\/(([^\/])|([^\/][^\/\.])|([^\/\.][^\/])|([^\/][^\/][^\/]+))\/\.\.\//
     while (pattern.test(r)) {
       r = r.replace(pattern, '/')
     }
 
     // replace ^aa/../ => nothing (BUT IGNORE ../../)
-    r = r.replace(/^(([^\/])|([^\/][^\/\.])|([^\/\.][^\/])|([^\/][^\/][^\/]+))\/\.\.\//, '')
+    r = r.replace(
+      /^(([^\/])|([^\/][^\/\.])|([^\/\.][^\/])|([^\/][^\/][^\/]+))\/\.\.\//,
+      ''
+    )
 
     // replace ^/ => nothing
     r = r.replace(/^\//g, '')
