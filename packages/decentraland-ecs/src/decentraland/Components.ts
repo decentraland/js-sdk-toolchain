@@ -67,6 +67,7 @@ export enum CLASS_ID {
   GIZMOS = 203,
   SMART_ITEM = 204,
   AVATAR_MODIFIER_AREA = 205,
+  AVATAR_ATTACH = 206,
 
   // For state sync only
   NAME = 300,
@@ -161,6 +162,37 @@ export class Transform extends ObservableComponent {
     return this
   }
 }
+
+/** @public */
+export enum AttachToAvatarAnchorPointId {
+  NameTag = 0,
+  LeftHand,
+  RightHand
+}
+
+/** @public */
+export type AttachToAvatarConstructorArgs = {
+  avatarId?: string
+  anchorPointId?: AttachToAvatarAnchorPointId  
+}
+
+/**
+ * @public
+ */
+ @Component('engine.transform', CLASS_ID.AVATAR_ATTACH)
+ export class AttachToAvatar extends ObservableComponent {
+   @ObservableComponent.field
+   avatarId!: string
+
+   @ObservableComponent.field
+   anchorPointId!: AttachToAvatarAnchorPointId
+ 
+   constructor(args: AttachToAvatarConstructorArgs = {}) {
+     super()
+     this.avatarId = args.avatarId || ""
+     this.anchorPointId = args.anchorPointId || AttachToAvatarAnchorPointId.NameTag
+   }
+ }
 
 /**
  * Billboard defines a behavior that makes the entity face the camera in any moment.
