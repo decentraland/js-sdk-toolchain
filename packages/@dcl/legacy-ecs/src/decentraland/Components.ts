@@ -186,26 +186,27 @@ export enum AttachToAvatarAnchorPointId {
 /** @public */
 export type AttachToAvatarConstructorArgs = {
   avatarId?: string
-  anchorPointId?: AttachToAvatarAnchorPointId  
+  anchorPointId?: AttachToAvatarAnchorPointId
 }
 
 /**
  * @public
  */
- @Component('engine.transform', CLASS_ID.AVATAR_ATTACH)
- export class AttachToAvatar extends ObservableComponent {
-   @ObservableComponent.field
-   avatarId!: string
+@Component('engine.transform', CLASS_ID.AVATAR_ATTACH)
+export class AttachToAvatar extends ObservableComponent {
+  @ObservableComponent.field
+  avatarId!: string
 
-   @ObservableComponent.field
-   anchorPointId!: AttachToAvatarAnchorPointId
- 
-   constructor(args: AttachToAvatarConstructorArgs = {}) {
-     super()
-     this.avatarId = args.avatarId || ""
-     this.anchorPointId = args.anchorPointId || AttachToAvatarAnchorPointId.NameTag
-   }
- }
+  @ObservableComponent.field
+  anchorPointId!: AttachToAvatarAnchorPointId
+
+  constructor(args: AttachToAvatarConstructorArgs = {}) {
+    super()
+    this.avatarId = args.avatarId || ''
+    this.anchorPointId =
+      args.anchorPointId || AttachToAvatarAnchorPointId.NameTag
+  }
+}
 
 /**
  * Billboard defines a behavior that makes the entity face the camera in any moment.
