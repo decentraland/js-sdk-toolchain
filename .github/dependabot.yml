@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/packages/decentraland-ecs"
+    schedule:
+      interval: daily
+    allow:
+      - dependency-name: "@dcl/kernel"
+      - dependency-name: "@dcl/posix"
+      - dependency-name: "@dcl/schemas"
+      - dependency-name: "@dcl/unity-renderer"
+    versioning-strategy: increase
+
+  - package-ecosystem: npm
+    directory: "/packages/legacy-ecs"
+    schedule:
+      interval: daily
+    allow:
+      - dependency-name: "@dcl/*"
+    versioning-strategy: increase
