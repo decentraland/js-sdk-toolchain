@@ -200,6 +200,9 @@ export class AttachToAvatar extends ObservableComponent {
   @ObservableComponent.field
   anchorPointId!: AttachToAvatarAnchorPointId
 
+  @ObservableComponent.field
+  avatarSceneId!: 'dcl-gs-avatars'
+
   constructor(args: AttachToAvatarConstructorArgs = {}) {
     super()
     this.avatarId = args.avatarId || ''
