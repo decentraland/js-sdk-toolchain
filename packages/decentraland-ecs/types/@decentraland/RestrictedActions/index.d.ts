@@ -36,6 +36,12 @@ declare module '@decentraland/RestrictedActions' {
     SHRUG = 'shrug',
     DISCO = 'disco',
     DAB = 'dab',
-    HEAD_EXPLODDE = 'headexplode'
+    HEAD_EXPLODDE = 'headexplode',
+    DANCE = 'dance',
+    SNOWFALL = 'snowfall',
+    HOHOHO = 'hohoho',
+    CRAFTING = 'crafting',
+    SNOWBALL_HIT = 'snowballhit',
+    SNOWBALL_THROW = 'snowballthrow'
   }
 }
