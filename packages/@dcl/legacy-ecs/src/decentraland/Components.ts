@@ -176,14 +176,14 @@ export class Transform extends ObservableComponent {
   }
 }
 
-/** @alpha */
+/** @public */
 export type AttachToAvatarConstructorArgs = {
   avatarId?: string
   anchorPointId?: AttachToAvatarAnchorPointId
 }
 
 /**
- * @alpha
+ * @public
  */
 @Component('engine.transform', CLASS_ID.AVATAR_ATTACH)
 export class AttachToAvatar extends ObservableComponent {

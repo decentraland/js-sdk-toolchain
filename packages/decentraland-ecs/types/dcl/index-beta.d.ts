@@ -217,9 +217,21 @@ export declare abstract class Attachable {
     static readonly FIRST_PERSON_CAMERA: Attachable;
 }
 
-/* Excluded from this release type: AttachToAvatar */
+/**
+ * @public
+ */
+export declare class AttachToAvatar extends ObservableComponent {
+    avatarId: string;
+    anchorPointId: AttachToAvatarAnchorPointId;
+    avatarSceneId: 'dcl-gs-avatars';
+    constructor(args?: AttachToAvatarConstructorArgs);
+}
 
-/* Excluded from this release type: AttachToAvatarConstructorArgs */
+/** @public */
+export declare type AttachToAvatarConstructorArgs = {
+    avatarId?: string;
+    anchorPointId?: AttachToAvatarAnchorPointId;
+};
 
 /**
  * @public

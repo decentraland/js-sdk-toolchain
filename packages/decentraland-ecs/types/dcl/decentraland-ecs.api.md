@@ -112,7 +112,7 @@ export abstract class Attachable {
     static readonly FIRST_PERSON_CAMERA: Attachable;
 }
 
-// @alpha (undocumented)
+// @public (undocumented)
 export class AttachToAvatar extends ObservableComponent {
     constructor(args?: AttachToAvatarConstructorArgs);
     // (undocumented)
@@ -123,7 +123,7 @@ export class AttachToAvatar extends ObservableComponent {
     avatarSceneId: 'dcl-gs-avatars';
 }
 
-// @alpha (undocumented)
+// @public (undocumented)
 export type AttachToAvatarConstructorArgs = {
     avatarId?: string;
     anchorPointId?: AttachToAvatarAnchorPointId;
