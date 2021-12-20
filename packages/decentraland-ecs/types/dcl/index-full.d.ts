@@ -218,19 +218,13 @@ export declare abstract class Attachable {
 }
 
 /**
- * @public
+ * @alpha
  */
 export declare class AttachToAvatar extends ObservableComponent {
     avatarId: string;
     anchorPointId: AttachToAvatarAnchorPointId;
+    avatarSceneId: 'dcl-gs-avatars';
     constructor(args?: AttachToAvatarConstructorArgs);
-}
-
-/** @public */
-export declare enum AttachToAvatarAnchorPointId {
-    NameTag = 0,
-    LeftHand = 1,
-    RightHand = 2
 }
 
 /** @public */

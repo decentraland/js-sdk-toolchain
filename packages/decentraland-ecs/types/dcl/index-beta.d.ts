@@ -217,21 +217,7 @@ export declare abstract class Attachable {
     static readonly FIRST_PERSON_CAMERA: Attachable;
 }
 
-/**
- * @public
- */
-export declare class AttachToAvatar extends ObservableComponent {
-    avatarId: string;
-    anchorPointId: AttachToAvatarAnchorPointId;
-    constructor(args?: AttachToAvatarConstructorArgs);
-}
-
-/** @public */
-export declare enum AttachToAvatarAnchorPointId {
-    NameTag = 0,
-    LeftHand = 1,
-    RightHand = 2
-}
+/* Excluded from this release type: AttachToAvatar */
 
 /** @public */
 export declare type AttachToAvatarConstructorArgs = {

@@ -177,20 +177,13 @@ export class Transform extends ObservableComponent {
 }
 
 /** @public */
-export enum AttachToAvatarAnchorPointId {
-  NameTag = 0,
-  LeftHand,
-  RightHand
-}
-
-/** @public */
 export type AttachToAvatarConstructorArgs = {
   avatarId?: string
   anchorPointId?: AttachToAvatarAnchorPointId
 }
 
 /**
- * @public
+ * @alpha
  */
 @Component('engine.transform', CLASS_ID.AVATAR_ATTACH)
 export class AttachToAvatar extends ObservableComponent {
@@ -207,7 +200,7 @@ export class AttachToAvatar extends ObservableComponent {
     super()
     this.avatarId = args.avatarId || ''
     this.anchorPointId =
-      args.anchorPointId || AttachToAvatarAnchorPointId.NameTag
+      args.anchorPointId || AttachToAvatarAnchorPointId.Position
   }
 }
 
