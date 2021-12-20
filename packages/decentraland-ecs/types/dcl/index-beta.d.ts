@@ -219,11 +219,7 @@ export declare abstract class Attachable {
 
 /* Excluded from this release type: AttachToAvatar */
 
-/** @public */
-export declare type AttachToAvatarConstructorArgs = {
-    avatarId?: string;
-    anchorPointId?: AttachToAvatarAnchorPointId;
-};
+/* Excluded from this release type: AttachToAvatarConstructorArgs */
 
 /**
  * @public

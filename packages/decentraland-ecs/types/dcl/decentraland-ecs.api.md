@@ -123,7 +123,7 @@ export class AttachToAvatar extends ObservableComponent {
     avatarSceneId: 'dcl-gs-avatars';
 }
 
-// @public (undocumented)
+// @alpha (undocumented)
 export type AttachToAvatarConstructorArgs = {
     avatarId?: string;
     anchorPointId?: AttachToAvatarAnchorPointId;

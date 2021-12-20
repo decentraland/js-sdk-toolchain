@@ -227,7 +227,7 @@ export declare class AttachToAvatar extends ObservableComponent {
     constructor(args?: AttachToAvatarConstructorArgs);
 }
 
-/** @public */
+/** @alpha */
 export declare type AttachToAvatarConstructorArgs = {
     avatarId?: string;
     anchorPointId?: AttachToAvatarAnchorPointId;

@@ -176,7 +176,7 @@ export class Transform extends ObservableComponent {
   }
 }
 
-/** @public */
+/** @alpha */
 export type AttachToAvatarConstructorArgs = {
   avatarId?: string
   anchorPointId?: AttachToAvatarAnchorPointId
