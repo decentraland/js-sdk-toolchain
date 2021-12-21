@@ -1980,7 +1980,7 @@
                 {
                   "kind": "Reference",
                   "text": "AttachToAvatarAnchorPointId",
-                  "canonicalReference": "!AttachToAvatarAnchorPointId:enum"
+                  "canonicalReference": "@dcl/legacy-ecs!AttachToAvatarAnchorPointId:enum"
                 },
                 {
                   "kind": "Content",
@@ -2058,6 +2058,105 @@
           "implementsTokenRanges": []
         },
         {
+          "kind": "Enum",
+          "canonicalReference": "@dcl/legacy-ecs!AttachToAvatarAnchorPointId:enum",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare enum AttachToAvatarAnchorPointId "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "AttachToAvatarAnchorPointId",
+          "members": [
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!AttachToAvatarAnchorPointId.LeftHand:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "LeftHand = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "2"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "LeftHand",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!AttachToAvatarAnchorPointId.NameTag:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "NameTag = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "1"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "NameTag",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!AttachToAvatarAnchorPointId.Position:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "Position = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "0"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "Position",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!AttachToAvatarAnchorPointId.RightHand:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "RightHand = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "3"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "RightHand",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ]
+        },
+        {
           "kind": "TypeAlias",
           "canonicalReference": "@dcl/legacy-ecs!AttachToAvatarConstructorArgs:type",
           "docComment": "/**\n * @public\n */\n",
@@ -2073,7 +2172,7 @@
             {
               "kind": "Reference",
               "text": "AttachToAvatarAnchorPointId",
-              "canonicalReference": "!AttachToAvatarAnchorPointId:enum"
+              "canonicalReference": "@dcl/legacy-ecs!AttachToAvatarAnchorPointId:enum"
             },
             {
               "kind": "Content",

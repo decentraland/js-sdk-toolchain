@@ -177,6 +177,14 @@ export class Transform extends ObservableComponent {
 }
 
 /** @public */
+export enum AttachToAvatarAnchorPointId {
+  Position = 0,
+  NameTag = 1,
+  LeftHand = 2,
+  RightHand = 3
+}
+
+/** @public */
 export type AttachToAvatarConstructorArgs = {
   avatarId?: string
   anchorPointId?: AttachToAvatarAnchorPointId
