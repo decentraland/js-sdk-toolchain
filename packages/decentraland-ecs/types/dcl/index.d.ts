@@ -193,9 +193,9 @@ declare class Arc2 {
      */
     constructor(
     /** Defines the start point of the arc */
-    startPoint: Vector2,
+    startPoint: Vector2, 
     /** Defines the mid point of the arc */
-    midPoint: Vector2,
+    midPoint: Vector2, 
     /** Defines the end point of the arc */
     endPoint: Vector2);
 }
@@ -216,6 +216,22 @@ declare abstract class Attachable {
     /** Used to attach entities to the camera. When in first person mode, the attached entities will also rotate with the camera */
     static readonly FIRST_PERSON_CAMERA: Attachable;
 }
+
+/**
+ * @public
+ */
+declare class AttachToAvatar extends ObservableComponent {
+    avatarId: string;
+    anchorPointId: AttachToAvatarAnchorPointId;
+    avatarSceneId: 'dcl-gs-avatars';
+    constructor(args?: AttachToAvatarConstructorArgs);
+}
+
+/** @public */
+declare type AttachToAvatarConstructorArgs = {
+    avatarId?: string;
+    anchorPointId?: AttachToAvatarAnchorPointId;
+};
 
 /**
  * @public
@@ -494,6 +510,7 @@ declare enum CLASS_ID {
     GIZMOS = 203,
     SMART_ITEM = 204,
     AVATAR_MODIFIER_AREA = 205,
+    AVATAR_ATTACH = 206,
     NAME = 300,
     LOCKED_ON_EDIT = 301,
     VISIBLE_ON_EDIT = 302
@@ -526,11 +543,11 @@ declare class Color3 {
     /**
      * Defines the red component (between 0 and 1, default is 0)
      */
-    r?: number,
+    r?: number, 
     /**
      * Defines the green component (between 0 and 1, default is 0)
      */
-    g?: number,
+    g?: number, 
     /**
      * Defines the blue component (between 0 and 1, default is 0)
      */
@@ -842,15 +859,15 @@ declare class Color4 {
     /**
      * Defines the red component (between 0 and 1, default is 0)
      */
-    r?: number,
+    r?: number, 
     /**
      * Defines the green component (between 0 and 1, default is 0)
      */
-    g?: number,
+    g?: number, 
     /**
      * Defines the blue component (between 0 and 1, default is 0)
      */
-    b?: number,
+    b?: number, 
     /**
      * Defines the alpha component (between 0 and 1, default is 1)
      */
@@ -2972,11 +2989,11 @@ declare class Observer<T> {
     /**
      * Defines the callback to call when the observer is notified
      */
-    callback: (eventData: T, eventState: ObserverEventState) => void,
+    callback: (eventData: T, eventState: ObserverEventState) => void, 
     /**
      * Defines the mask of the observer (used to filter notifications)
      */
-    mask: number,
+    mask: number, 
     /**
      * Defines the current scope used to restore the JS context
      */
@@ -3668,11 +3685,11 @@ declare class Quaternion implements EcsMathReadOnlyQuaternion {
      */
     constructor(
     /** defines the first component (0 by default) */
-    x?: number,
+    x?: number, 
     /** defines the second component (0 by default) */
-    y?: number,
+    y?: number, 
     /** defines the third component (0 by default) */
-    z?: number,
+    z?: number, 
     /** defines the fourth component (1.0 by default) */
     w?: number);
     /**
@@ -4824,7 +4841,7 @@ declare class Vector2 implements EcsMathReadOnlyVector2 {
      */
     constructor(
     /** defines the first coordinate */
-    x?: number,
+    x?: number, 
     /** defines the second coordinate */
     y?: number);
     /**
@@ -5221,11 +5238,11 @@ declare class Vector3 implements EcsMathReadOnlyVector3 {
     /**
      * Defines the first coordinates (on X axis)
      */
-    x?: number,
+    x?: number, 
     /**
      * Defines the second coordinates (on Y axis)
      */
-    y?: number,
+    y?: number, 
     /**
      * Defines the third coordinates (on Z axis)
      */
@@ -5876,11 +5893,11 @@ declare class Vector4 implements EcsMathReadOnlyVector4 {
      */
     constructor(
     /** x value of the vector */
-    x: number,
+    x: number, 
     /** y value of the vector */
-    y: number,
+    y: number, 
     /** z value of the vector */
-    z: number,
+    z: number, 
     /** w value of the vector */
     w: number);
     /**

@@ -80,6 +80,7 @@ export enum CLASS_ID {
   GIZMOS = 203,
   SMART_ITEM = 204,
   AVATAR_MODIFIER_AREA = 205,
+  AVATAR_ATTACH = 206,
 
   // For state sync only
   NAME = 300,
@@ -172,6 +173,34 @@ export class Transform extends ObservableComponent {
   translate(vec: Vector3) {
     this.position.addInPlace(vec)
     return this
+  }
+}
+
+/** @public */
+export type AttachToAvatarConstructorArgs = {
+  avatarId?: string
+  anchorPointId?: AttachToAvatarAnchorPointId
+}
+
+/**
+ * @public
+ */
+@Component('engine.transform', CLASS_ID.AVATAR_ATTACH)
+export class AttachToAvatar extends ObservableComponent {
+  @ObservableComponent.field
+  avatarId!: string
+
+  @ObservableComponent.field
+  anchorPointId!: AttachToAvatarAnchorPointId
+
+  @ObservableComponent.field
+  avatarSceneId!: 'dcl-gs-avatars'
+
+  constructor(args: AttachToAvatarConstructorArgs = {}) {
+    super()
+    this.avatarId = args.avatarId || ''
+    this.anchorPointId =
+      args.anchorPointId || AttachToAvatarAnchorPointId.Position
   }
 }
 

@@ -113,6 +113,23 @@ export abstract class Attachable {
 }
 
 // @public (undocumented)
+export class AttachToAvatar extends ObservableComponent {
+    constructor(args?: AttachToAvatarConstructorArgs);
+    // (undocumented)
+    anchorPointId: AttachToAvatarAnchorPointId;
+    // (undocumented)
+    avatarId: string;
+    // (undocumented)
+    avatarSceneId: 'dcl-gs-avatars';
+}
+
+// @public (undocumented)
+export type AttachToAvatarConstructorArgs = {
+    avatarId?: string;
+    anchorPointId?: AttachToAvatarAnchorPointId;
+};
+
+// @public (undocumented)
 export class AudioClip extends ObservableComponent {
     constructor(url: string);
     loop: boolean;
@@ -295,6 +312,8 @@ export enum CLASS_ID {
     AUDIO_SOURCE = 201,
     // (undocumented)
     AUDIO_STREAM = 202,
+    // (undocumented)
+    AVATAR_ATTACH = 206,
     // (undocumented)
     AVATAR_MODIFIER_AREA = 205,
     // (undocumented)

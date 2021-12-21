@@ -220,6 +220,22 @@ export declare abstract class Attachable {
 /**
  * @public
  */
+export declare class AttachToAvatar extends ObservableComponent {
+    avatarId: string;
+    anchorPointId: AttachToAvatarAnchorPointId;
+    avatarSceneId: 'dcl-gs-avatars';
+    constructor(args?: AttachToAvatarConstructorArgs);
+}
+
+/** @public */
+export declare type AttachToAvatarConstructorArgs = {
+    avatarId?: string;
+    anchorPointId?: AttachToAvatarAnchorPointId;
+};
+
+/**
+ * @public
+ */
 export declare class AudioClip extends ObservableComponent {
     readonly url: string;
     /**
@@ -494,6 +510,7 @@ export declare enum CLASS_ID {
     GIZMOS = 203,
     SMART_ITEM = 204,
     AVATAR_MODIFIER_AREA = 205,
+    AVATAR_ATTACH = 206,
     NAME = 300,
     LOCKED_ON_EDIT = 301,
     VISIBLE_ON_EDIT = 302
