@@ -12,7 +12,7 @@ updates:
     versioning-strategy: increase
 
   - package-ecosystem: npm
-    directory: "/packages/legacy-ecs"
+    directory: "/packages/@dcl/legacy-ecs"
     schedule:
       interval: daily
     allow:
