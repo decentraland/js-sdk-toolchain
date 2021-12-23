@@ -20,37 +20,37 @@ jobs:
       - name: install
         run: make install
       - name: update version of packages/@dcl/dcl-rollup
-        uses: menduz/oddish-action@staging
+        uses: menduz/oddish-action@master
         with:
           cwd: packages/@dcl/dcl-rollup
           deterministic-snapshot: true
           only-update-versions: true
       - name: update version of packages/@dcl/build-ecs
-        uses: menduz/oddish-action@staging
+        uses: menduz/oddish-action@master
         with:
           cwd: packages/@dcl/build-ecs
           deterministic-snapshot: true
           only-update-versions: true
       - name: update version of packages/@dcl/amd
-        uses: menduz/oddish-action@staging
+        uses: menduz/oddish-action@master
         with:
           cwd: packages/@dcl/amd
           deterministic-snapshot: true
           only-update-versions: true
       - name: update version of packages/@dcl/js-runtime
-        uses: menduz/oddish-action@staging
+        uses: menduz/oddish-action@master
         with:
           cwd: packages/@dcl/js-runtime
           deterministic-snapshot: true
           only-update-versions: true
       - name: update version of packages/@dcl/legacy-ecs
-        uses: menduz/oddish-action@staging
+        uses: menduz/oddish-action@master
         with:
           cwd: packages/@dcl/legacy-ecs
           deterministic-snapshot: true
           only-update-versions: true
       - name: update version of packages/decentraland-ecs
-        uses: menduz/oddish-action@staging
+        uses: menduz/oddish-action@master
         with:
           cwd: packages/decentraland-ecs
           deterministic-snapshot: true
@@ -70,7 +70,7 @@ jobs:
           path: 'packages/**/*.tgz'
           retention-days: 5
       - name: publish @dcl/dcl-rollup package
-        uses: menduz/oddish-action@staging
+        uses: menduz/oddish-action@master
         with:
           registry-url: 'https://registry.npmjs.org'
           access: public
@@ -86,7 +86,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: publish @dcl/legacy-ecs package
-        uses: menduz/oddish-action@staging
+        uses: menduz/oddish-action@master
         with:
           registry-url: 'https://registry.npmjs.org'
           access: public
@@ -103,7 +103,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: publish @dcl/amd package
         id: publish_dcl_amd
-        uses: menduz/oddish-action@staging
+        uses: menduz/oddish-action@master
         with:
           registry-url: 'https://registry.npmjs.org'
           access: public
@@ -120,7 +120,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: publish @dcl/js-runtime package
         id: publish_dcl_js_runtime
-        uses: menduz/oddish-action@staging
+        uses: menduz/oddish-action@master
         with:
           registry-url: 'https://registry.npmjs.org'
           access: public
@@ -136,7 +136,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: publish @dcl/build-ecs package
-        uses: menduz/oddish-action@staging
+        uses: menduz/oddish-action@master
         id: publish_dcl_build_ecs
         with:
           registry-url: 'https://registry.npmjs.org'
@@ -160,7 +160,7 @@ jobs:
           AMD_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_amd.outputs.s3-bucket-key }}
           BUILD_ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_build_ecs.outputs.s3-bucket-key }}
       - name: publish decentraland-ecs package
-        uses: menduz/oddish-action@staging
+        uses: menduz/oddish-action@master
         id: publish_decentraland_ecs
         with:
           registry-url: 'https://registry.npmjs.org'
