@@ -8,7 +8,7 @@ import { DisposableComponent } from '../ecs/Component'
  */
 @EventConstructor()
 export class UUIDEvent<T = any> {
-  constructor(public readonly uuid: string, public readonly payload: T) {}
+  constructor(public readonly uuid: string, public readonly payload: T) { }
 }
 
 /**
@@ -16,7 +16,7 @@ export class UUIDEvent<T = any> {
  */
 @EventConstructor()
 export class RaycastResponse<T> {
-  constructor(public readonly payload: RaycastResponsePayload<T>) {}
+  constructor(public readonly payload: RaycastResponsePayload<T>) { }
 }
 
 /**
@@ -24,7 +24,7 @@ export class RaycastResponse<T> {
  */
 @EventConstructor()
 export class PointerEvent<GlobalInputEventResult> {
-  constructor(public readonly payload: GlobalInputEventResult) {}
+  constructor(public readonly payload: GlobalInputEventResult) { }
 }
 
 let internalDcl: DecentralandInterface | void
@@ -138,6 +138,13 @@ export const onRealmChangedObservable = new Observable<
 >(createSubscriber('onRealmChanged'))
 
 /**
+ * @public
+ */
+export const onPlayerClickedObservable = new Observable<
+  IEvents['playerClicked']
+>(createSubscriber('playerClicked'))
+
+/**
  * @internal
  * This function adds _one_ listener to the onEvent event of dcl interface.
  * Leveraging a switch to route events to the Observable handlers.
@@ -223,6 +230,12 @@ export function _initEventObservables(dcl: DecentralandInterface) {
         case 'onRealmChanged': {
           onRealmChangedObservable.notifyObservers(
             event.data as IEvents['onRealmChanged']
+          )
+          return
+        }
+        case 'playerClicked': {
+          onPlayerClickedObservable.notifyObservers(
+            event.data as IEvents['playerClicked']
           )
           return
         }

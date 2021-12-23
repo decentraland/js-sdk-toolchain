@@ -30050,6 +30050,32 @@
         },
         {
           "kind": "Variable",
+          "canonicalReference": "@dcl/legacy-ecs!onPlayerClickedObservable:var",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onPlayerClickedObservable: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "@dcl/legacy-ecs!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    userId: string;\n    ray: {\n        origin: number;\n        direction: number;\n        distance: number;\n    };\n}>"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "onPlayerClickedObservable",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Variable",
           "canonicalReference": "@dcl/legacy-ecs!onPlayerConnectedObservable:var",
           "docComment": "/**\n * @public\n */\n",
           "excerptTokens": [

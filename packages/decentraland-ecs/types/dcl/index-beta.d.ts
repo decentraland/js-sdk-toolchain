@@ -3154,6 +3154,18 @@ export declare const onLeaveSceneObservable: Observable<{
 /**
  * @public
  */
+export declare const onPlayerClickedObservable: Observable<{
+    userId: string;
+    ray: {
+        origin: number;
+        direction: number;
+        distance: number;
+    };
+}>;
+
+/**
+ * @public
+ */
 export declare const onPlayerConnectedObservable: Observable<{
     userId: string;
 }>;
