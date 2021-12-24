@@ -30064,14 +30064,32 @@
             },
             {
               "kind": "Content",
-              "text": "<{\n    userId: string;\n    ray: {\n        origin: number;\n        direction: number;\n        distance: number;\n    };\n}>"
+              "text": "<{\n    userId: string;\n    ray: {\n        origin: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReadOnlyVector3",
+              "canonicalReference": "!ReadOnlyVector3:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        direction: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReadOnlyVector3",
+              "canonicalReference": "!ReadOnlyVector3:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        distance: number;\n    };\n}>"
             }
           ],
           "releaseTag": "Public",
           "name": "onPlayerClickedObservable",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 3
+            "endIndex": 7
           }
         },
         {

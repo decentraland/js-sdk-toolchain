@@ -1404,8 +1404,8 @@ export const onLeaveSceneObservable: Observable<{
 export const onPlayerClickedObservable: Observable<{
     userId: string;
     ray: {
-        origin: number;
-        direction: number;
+        origin: ReadOnlyVector3;
+        direction: ReadOnlyVector3;
         distance: number;
     };
 }>;
