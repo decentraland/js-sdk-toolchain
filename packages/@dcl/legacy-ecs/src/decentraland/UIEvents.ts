@@ -217,3 +217,74 @@ export class OnPointerUp extends OnPointerUUIDEvent<'pointerUp'> {
     }
   }
 }
+
+/**
+ * @public
+ */
+export type OnPointerHoverUUIDEventOptions = {
+  distance?: number
+}
+
+/**
+ * @public
+ */
+@Component('engine.pointerHoverEnter', CLASS_ID.UUID_CALLBACK)
+export class OnPointerHoverEnter extends OnPointerUUIDEvent<'pointerHoverEnter'> {
+  @ObservableComponent.readonly
+  readonly type: string = 'pointerHoverEnter'
+
+  constructor(callback: (event: IEvents['pointerHoverEnter']) => void)
+  constructor(
+    callback: (event: IEvents['pointerHoverEnter']) => void,
+    options: OnPointerHoverUUIDEventOptions
+  )
+  constructor(
+    callback: (event: IEvents['pointerHoverEnter']) => void,
+    options?: any
+  ) {
+    super(callback)
+    // This injection is necessary ONLY in events that are ALWAYS turned on and are
+    // not assignable to entities. Like events for the UI elements
+
+    // TODO(Brian): This will be removed when UI gets back to the entity parenting.
+    uuidEventSystem.handlerMap[this.uuid] = this
+
+    if (options) {
+      if (options.distance) {
+        this.distance = options.distance
+      }
+    }
+  }
+}
+
+/**
+ * @public
+ */
+@Component('engine.pointerHoverExit', CLASS_ID.UUID_CALLBACK)
+export class OnPointerHoverExit extends OnPointerUUIDEvent<'pointerHoverExit'> {
+  @ObservableComponent.readonly
+  readonly type: string = 'pointerHoverExit'
+
+  constructor(callback: (event: IEvents['pointerHoverExit']) => void)
+  constructor(
+    callback: (event: IEvents['pointerHoverExit']) => void,
+    options: OnPointerHoverUUIDEventOptions
+  )
+  constructor(
+    callback: (event: IEvents['pointerHoverExit']) => void,
+    options?: any
+  ) {
+    super(callback)
+    // This injection is necessary ONLY in events that are ALWAYS turned on and are
+    // not assignable to entities. Like events for the UI elements
+
+    // TODO(Brian): This will be removed when UI gets back to the entity parenting.
+    uuidEventSystem.handlerMap[this.uuid] = this
+
+    if (options) {
+      if (options.distance) {
+        this.distance = options.distance
+      }
+    }
+  }
+}
