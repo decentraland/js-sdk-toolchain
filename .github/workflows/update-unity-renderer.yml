@@ -1,0 +1,26 @@
+on:
+  schedule:
+    - cron: '0 10 * * 1-5'
+
+name: verify-unity-renderer-version
+jobs:
+  check_unity_renderer_version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+      - uses: actions/checkout@v2
+      - name: Udpate unity-renderer
+        run: npm i @dcl/unity-renderer@latest
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: Update @dcl/unity-renderer
+          title: 'chore(deps): bump @dcl/unity-renderer'
+          body: >
+            Bumps [@dcl/unity-renderer](https://github.com/decentraland/unity-renderer) to the latest version
+          labels: dependencies
+          base: main
+          branch: cron/unity-renderer-version
