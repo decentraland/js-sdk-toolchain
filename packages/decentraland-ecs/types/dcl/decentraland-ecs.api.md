@@ -1401,6 +1401,16 @@ export const onLeaveSceneObservable: Observable<{
 }>;
 
 // @public (undocumented)
+export const onPlayerClickedObservable: Observable<{
+    userId: string;
+    ray: {
+        origin: ReadOnlyVector3;
+        direction: ReadOnlyVector3;
+        distance: number;
+    };
+}>;
+
+// @public (undocumented)
 export const onPlayerConnectedObservable: Observable<{
     userId: string;
 }>;
