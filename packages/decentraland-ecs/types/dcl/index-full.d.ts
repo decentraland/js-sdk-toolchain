@@ -462,8 +462,19 @@ export declare class Camera {
 /** @public */
 export declare enum CameraMode {
     FirstPerson = 0,
-    ThirdPerson = 1,
-    BuildingToolGodMode = 2
+    ThirdPerson = 1
+}
+
+/**
+ * @public
+ */
+export declare class CameraModeArea extends ObservableComponent {
+    area: Area;
+    cameraMode: CameraMode;
+    constructor(args: {
+        area: Area;
+        cameraMode: CameraMode;
+    });
 }
 
 /**
@@ -519,6 +530,7 @@ export declare enum CLASS_ID {
     SMART_ITEM = 204,
     AVATAR_MODIFIER_AREA = 205,
     AVATAR_ATTACH = 206,
+    CAMERA_MODE_AREA = 207,
     NAME = 300,
     LOCKED_ON_EDIT = 301,
     VISIBLE_ON_EDIT = 302
