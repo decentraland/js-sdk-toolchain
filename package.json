@@ -7,6 +7,7 @@
     "test": "tests"
   },
   "dependencies": {
+    "@dcl/unity-renderer": "^1.0.23767-20220104173406.commit-c6926e1",
     "@types/fs-extra": "^9.0.12",
     "@types/jest": "^26.0.23",
     "@types/rimraf": "^3.0.0",
