@@ -18,7 +18,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
-          commit-message: Update @dcl/unity-renderer
+          commit-message: 'chore(deps): bump @dcl/unity-renderer'
           title: 'chore(deps): bump @dcl/unity-renderer'
           body: >
             Bumps [@dcl/unity-renderer](https://github.com/decentraland/unity-renderer) to the latest version
