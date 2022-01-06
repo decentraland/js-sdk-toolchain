@@ -9,6 +9,8 @@ install:
 	cd packages/@dcl/dcl-rollup; npm ci
 	cd packages/@dcl/amd; npm ci
 	cd packages/@dcl/legacy-ecs; npm ci
+	cd packages/decentraland-ecs; npm i
+	cd packages/decentraland-ecs; npm i @dcl/unity-renderer@latest
 
 lint:
 	node_modules/.bin/eslint . --ext .ts
