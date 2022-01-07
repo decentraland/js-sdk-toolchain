@@ -4077,7 +4077,7 @@
             {
               "kind": "Property",
               "canonicalReference": "@dcl/legacy-ecs!Camera#cameraMode:member",
-              "docComment": "/**\n * Get Camera Mode.\n */\n",
+              "docComment": "/**\n * @deprecated\n *\n * Use onCameraModeChangedObservable Observable instead.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
