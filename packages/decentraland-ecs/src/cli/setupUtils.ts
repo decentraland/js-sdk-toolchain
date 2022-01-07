@@ -128,7 +128,7 @@ export function entityV3FromFolder({
 
   if (fs.existsSync(sceneJsonPath) && isParcelScene) {
     const sceneJson = JSON.parse(fs.readFileSync(sceneJsonPath).toString())
-
+    console.log({sceneJsonPath})
     const { base, parcels }: { base: string; parcels: string[] } =
       sceneJson.scene
     const pointers = new Set<string>()
