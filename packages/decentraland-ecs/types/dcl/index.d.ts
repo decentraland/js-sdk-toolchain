@@ -352,6 +352,36 @@ declare class AvatarShape extends ObservableComponent {
 }
 
 /**
+ * @public
+ */
+declare class AvatarTexture extends ObservableComponent {
+    readonly ethAddress: string;
+    /**
+     * Enables crisper images based on the provided sampling mode.
+     * | Value | Type      |
+     * |-------|-----------|
+     * |     0 | NEAREST   |
+     * |     1 | BILINEAR  |
+     * |     2 | TRILINEAR |
+     */
+    readonly samplingMode: number;
+    /**
+     * Enables texture wrapping for this material.
+     * | Value | Type      |
+     * |-------|-----------|
+     * |     0 | CLAMP     |
+     * |     1 | WRAP      |
+     * |     2 | MIRROR    |
+     */
+    readonly wrap: number;
+    /**
+     * Defines if this texture has an alpha channel
+     */
+    readonly hasAlpha: boolean;
+    constructor(ethAddress: string, opts?: Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>);
+}
+
+/**
  * Defines the 3 main axes
  * @public
  */
@@ -512,6 +542,7 @@ declare enum CLASS_ID {
     TEXTURE = 68,
     VIDEO_CLIP = 70,
     VIDEO_TEXTURE = 71,
+    AVATAR_TEXTURE = 72,
     AUDIO_CLIP = 200,
     AUDIO_SOURCE = 201,
     AUDIO_STREAM = 202,
