@@ -286,6 +286,7 @@ export class BoxShape extends Shape {
 // @public (undocumented)
 export class Camera {
     constructor();
+    // @deprecated (undocumented)
     get cameraMode(): CameraMode;
     readonly feetPosition: Vector3;
     // (undocumented)
@@ -1398,6 +1399,16 @@ export const onLeaveScene: Observable<{
 // @public
 export const onLeaveSceneObservable: Observable<{
     userId: string;
+}>;
+
+// @public (undocumented)
+export const onPlayerClickedObservable: Observable<{
+    userId: string;
+    ray: {
+        origin: ReadOnlyVector3;
+        direction: ReadOnlyVector3;
+        distance: number;
+    };
 }>;
 
 // @public (undocumented)

@@ -4077,7 +4077,7 @@
             {
               "kind": "Property",
               "canonicalReference": "@dcl/legacy-ecs!Camera#cameraMode:member",
-              "docComment": "/**\n * Get Camera Mode.\n */\n",
+              "docComment": "/**\n * @deprecated\n *\n * Use onCameraModeChangedObservable Observable instead.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -30046,6 +30046,50 @@
           "variableTypeTokenRange": {
             "startIndex": 1,
             "endIndex": 3
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@dcl/legacy-ecs!onPlayerClickedObservable:var",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onPlayerClickedObservable: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "@dcl/legacy-ecs!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    userId: string;\n    ray: {\n        origin: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReadOnlyVector3",
+              "canonicalReference": "!ReadOnlyVector3:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        direction: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReadOnlyVector3",
+              "canonicalReference": "!ReadOnlyVector3:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        distance: number;\n    };\n}>"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "onPlayerClickedObservable",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 7
           }
         },
         {

@@ -454,7 +454,7 @@ export declare class Camera {
     readonly worldPosition: Vector3;
     /** Player height. */
     get playerHeight(): number;
-    /** Get Camera Mode. */
+    /** @deprecated Use onCameraModeChangedObservable Observable instead. */
     get cameraMode(): CameraMode;
     constructor();
 }
@@ -3151,6 +3151,18 @@ export declare const onLeaveScene: Observable<{
  */
 export declare const onLeaveSceneObservable: Observable<{
     userId: string;
+}>;
+
+/**
+ * @public
+ */
+export declare const onPlayerClickedObservable: Observable<{
+    userId: string;
+    ray: {
+        origin: ReadOnlyVector3;
+        direction: ReadOnlyVector3;
+        distance: number;
+    };
 }>;
 
 /**
