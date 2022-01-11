@@ -17,6 +17,6 @@
   ],
   "dependencies": {
     "@dcl/ecs-math": "^1.0.1-20211130194043.commit-c994f71",
-    "@dcl/posix": "^1.0.4-20211224173438.commit-5a9fc94"
+    "@dcl/posix": "^1.0.4-20220111144532.commit-f90a5d3"
   }
 }
