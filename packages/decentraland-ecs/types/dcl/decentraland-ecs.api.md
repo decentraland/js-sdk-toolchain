@@ -331,8 +331,6 @@ export enum CLASS_ID {
     // (undocumented)
     AVATAR_SHAPE = 56,
     // (undocumented)
-    AVATAR_TEXTURE = 72,
-    // (undocumented)
     BASIC_MATERIAL = 64,
     // (undocumented)
     BILLBOARD = 32,

@@ -512,7 +512,6 @@ declare enum CLASS_ID {
     TEXTURE = 68,
     VIDEO_CLIP = 70,
     VIDEO_TEXTURE = 71,
-    AVATAR_TEXTURE = 72,
     AUDIO_CLIP = 200,
     AUDIO_SOURCE = 201,
     AUDIO_STREAM = 202,

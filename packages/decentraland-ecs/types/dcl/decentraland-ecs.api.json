@@ -4595,27 +4595,6 @@
             },
             {
               "kind": "EnumMember",
-              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.AVATAR_TEXTURE:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "AVATAR_TEXTURE = "
-                },
-                {
-                  "kind": "Content",
-                  "text": "72"
-                }
-              ],
-              "releaseTag": "Public",
-              "name": "AVATAR_TEXTURE",
-              "initializerTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "EnumMember",
               "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.BASIC_MATERIAL:member",
               "docComment": "",
               "excerptTokens": [
