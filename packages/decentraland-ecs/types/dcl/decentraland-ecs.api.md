@@ -233,16 +233,6 @@ export class AvatarShape extends ObservableComponent {
     wearables: WearableId[];
 }
 
-// @public (undocumented)
-export class AvatarTexture extends ObservableComponent {
-    constructor(ethAddress: string, opts?: Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>);
-    // (undocumented)
-    readonly ethAddress: string;
-    readonly hasAlpha: boolean;
-    readonly samplingMode: number;
-    readonly wrap: number;
-}
-
 // @public
 export class Axis {
     static X: Vector3;
