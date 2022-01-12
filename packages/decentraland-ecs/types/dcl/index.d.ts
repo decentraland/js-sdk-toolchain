@@ -230,9 +230,7 @@ declare class AttachToAvatar extends ObservableComponent {
 /** @public */
 declare enum AttachToAvatarAnchorPointId {
     Position = 0,
-    NameTag = 1,
-    LeftHand = 2,
-    RightHand = 3
+    NameTag = 1
 }
 
 /** @public */
