@@ -2072,27 +2072,6 @@
           "members": [
             {
               "kind": "EnumMember",
-              "canonicalReference": "@dcl/legacy-ecs!AttachToAvatarAnchorPointId.LeftHand:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "LeftHand = "
-                },
-                {
-                  "kind": "Content",
-                  "text": "2"
-                }
-              ],
-              "releaseTag": "Public",
-              "name": "LeftHand",
-              "initializerTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "EnumMember",
               "canonicalReference": "@dcl/legacy-ecs!AttachToAvatarAnchorPointId.NameTag:member",
               "docComment": "",
               "excerptTokens": [
@@ -2128,27 +2107,6 @@
               ],
               "releaseTag": "Public",
               "name": "Position",
-              "initializerTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "EnumMember",
-              "canonicalReference": "@dcl/legacy-ecs!AttachToAvatarAnchorPointId.RightHand:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "RightHand = "
-                },
-                {
-                  "kind": "Content",
-                  "text": "3"
-                }
-              ],
-              "releaseTag": "Public",
-              "name": "RightHand",
               "initializerTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
