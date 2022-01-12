@@ -30367,8 +30367,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "OnPointerHoverUUIDEventOptions",
-                  "canonicalReference": "@dcl/legacy-ecs!OnPointerHoverUUIDEventOptions:type"
+                  "text": "OnPointerHoverEnterUUIDEventOptions",
+                  "canonicalReference": "@dcl/legacy-ecs!OnPointerHoverEnterUUIDEventOptions:type"
                 },
                 {
                   "kind": "Content",
@@ -30427,6 +30427,31 @@
             "endIndex": 3
           },
           "implementsTokenRanges": []
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@dcl/legacy-ecs!OnPointerHoverEnterUUIDEventOptions:type",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type OnPointerHoverEnterUUIDEventOptions = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    distance?: number;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "OnPointerHoverEnterUUIDEventOptions",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
         },
         {
           "kind": "Class",
@@ -30490,61 +30515,6 @@
               ]
             },
             {
-              "kind": "Constructor",
-              "canonicalReference": "@dcl/legacy-ecs!OnPointerHoverExit:constructor(2)",
-              "docComment": "/**\n * Constructs a new instance of the `OnPointerHoverExit` class\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "constructor(callback: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(event: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "IEvents",
-                  "canonicalReference": "!IEvents:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "['pointerHoverExit']) => void"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", options: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "OnPointerHoverUUIDEventOptions",
-                  "canonicalReference": "@dcl/legacy-ecs!OnPointerHoverUUIDEventOptions:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ");"
-                }
-              ],
-              "releaseTag": "Public",
-              "overloadIndex": 2,
-              "parameters": [
-                {
-                  "parameterName": "callback",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 4
-                  }
-                },
-                {
-                  "parameterName": "options",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 5,
-                    "endIndex": 6
-                  }
-                }
-              ]
-            },
-            {
               "kind": "Property",
               "canonicalReference": "@dcl/legacy-ecs!OnPointerHoverExit#type:member",
               "docComment": "",
@@ -30577,31 +30547,6 @@
             "endIndex": 3
           },
           "implementsTokenRanges": []
-        },
-        {
-          "kind": "TypeAlias",
-          "canonicalReference": "@dcl/legacy-ecs!OnPointerHoverUUIDEventOptions:type",
-          "docComment": "/**\n * @public\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export declare type OnPointerHoverUUIDEventOptions = "
-            },
-            {
-              "kind": "Content",
-              "text": "{\n    distance?: number;\n}"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
-            }
-          ],
-          "releaseTag": "Public",
-          "name": "OnPointerHoverUUIDEventOptions",
-          "typeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
-          }
         },
         {
           "kind": "Variable",

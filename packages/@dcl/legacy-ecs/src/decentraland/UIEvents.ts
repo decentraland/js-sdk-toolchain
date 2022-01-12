@@ -221,7 +221,7 @@ export class OnPointerUp extends OnPointerUUIDEvent<'pointerUp'> {
 /**
  * @public
  */
-export type OnPointerHoverUUIDEventOptions = {
+export type OnPointerHoverEnterUUIDEventOptions = {
   distance?: number
 }
 
@@ -236,7 +236,7 @@ export class OnPointerHoverEnter extends OnPointerUUIDEvent<'pointerHoverEnter'>
   constructor(callback: (event: IEvents['pointerHoverEnter']) => void)
   constructor(
     callback: (event: IEvents['pointerHoverEnter']) => void,
-    options: OnPointerHoverUUIDEventOptions
+    options: OnPointerHoverEnterUUIDEventOptions
   )
   constructor(
     callback: (event: IEvents['pointerHoverEnter']) => void,
@@ -265,15 +265,7 @@ export class OnPointerHoverExit extends OnPointerUUIDEvent<'pointerHoverExit'> {
   @ObservableComponent.readonly
   readonly type: string = 'pointerHoverExit'
 
-  constructor(callback: (event: IEvents['pointerHoverExit']) => void)
-  constructor(
-    callback: (event: IEvents['pointerHoverExit']) => void,
-    options: OnPointerHoverUUIDEventOptions
-  )
-  constructor(
-    callback: (event: IEvents['pointerHoverExit']) => void,
-    options?: any
-  ) {
+  constructor(callback: (event: IEvents['pointerHoverExit']) => void) {
     super(callback)
     // This injection is necessary ONLY in events that are ALWAYS turned on and are
     // not assignable to entities. Like events for the UI elements
@@ -281,10 +273,8 @@ export class OnPointerHoverExit extends OnPointerUUIDEvent<'pointerHoverExit'> {
     // TODO(Brian): This will be removed when UI gets back to the entity parenting.
     uuidEventSystem.handlerMap[this.uuid] = this
 
-    if (options) {
-      if (options.distance) {
-        this.distance = options.distance
-      }
-    }
+    // Changed default distance value for this component because in most cases we probably
+    // don't want for the hover exit event to be limited by a distance, and it default value was too small.
+    this.distance = 160
   }
 }
