@@ -544,7 +544,9 @@ export class Texture extends ObservableComponent {
 
     const base64Test = new RegExp('data:[a-z-]+/[a-z-]+;base64')
     if (src.length > 2048 || base64Test.test(src)) {
-      log('Base64 textures will be deprecated in version 7 of decentraland-ecs')
+      log(
+        '⚠️🚨 Base64 textures will be deprecated in version 7 of decentraland-ecs'
+      )
     }
 
     this.src = src
