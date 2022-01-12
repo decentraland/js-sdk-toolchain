@@ -296,11 +296,21 @@ export class Camera {
 // @public (undocumented)
 export enum CameraMode {
     // (undocumented)
-    BuildingToolGodMode = 2,
-    // (undocumented)
     FirstPerson = 0,
     // (undocumented)
     ThirdPerson = 1
+}
+
+// @public (undocumented)
+export class CameraModeArea extends ObservableComponent {
+    constructor(args: {
+        area: Area;
+        cameraMode: CameraMode;
+    });
+    // (undocumented)
+    area: Area;
+    // (undocumented)
+    cameraMode: CameraMode;
 }
 
 // @public (undocumented)
@@ -333,6 +343,8 @@ export enum CLASS_ID {
     BILLBOARD = 32,
     // (undocumented)
     BOX_SHAPE = 16,
+    // (undocumented)
+    CAMERA_MODE_AREA = 207,
     // (undocumented)
     CIRCLE_SHAPE = 31,
     // (undocumented)
