@@ -286,6 +286,7 @@ export class BoxShape extends Shape {
 // @public (undocumented)
 export class Camera {
     constructor();
+    // @deprecated (undocumented)
     get cameraMode(): CameraMode;
     readonly feetPosition: Vector3;
     // (undocumented)

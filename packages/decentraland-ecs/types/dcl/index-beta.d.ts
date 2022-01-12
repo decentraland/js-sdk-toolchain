@@ -454,7 +454,7 @@ export declare class Camera {
     readonly worldPosition: Vector3;
     /** Player height. */
     get playerHeight(): number;
-    /** Get Camera Mode. */
+    /** @deprecated Use onCameraModeChangedObservable Observable instead. */
     get cameraMode(): CameraMode;
     constructor();
 }
