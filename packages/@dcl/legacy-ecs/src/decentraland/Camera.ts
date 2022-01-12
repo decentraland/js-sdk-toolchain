@@ -31,7 +31,7 @@ export class Camera {
     return this._playerHeight
   }
 
-  /** Get Camera Mode. */
+  /** @deprecated Use onCameraModeChangedObservable Observable instead. */
   get cameraMode(): CameraMode {
     return this._cameraMode
   }
@@ -47,7 +47,7 @@ export class Camera {
   // @internal
   private _playerHeight: number = 1.6
   // @internal
-  private _cameraMode: CameraMode = CameraMode.FirstPerson
+  private _cameraMode: CameraMode = CameraMode.ThirdPerson
 
   constructor() {
     if (typeof dcl !== 'undefined') {
