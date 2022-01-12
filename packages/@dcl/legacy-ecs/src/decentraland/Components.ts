@@ -182,7 +182,9 @@ export class Transform extends ObservableComponent {
 export enum AttachToAvatarAnchorPointId {
   Position = 0,
   NameTag = 1,
+  /** @internal */
   LeftHand = 2,
+  /** @internal */
   RightHand = 3
 }
 
