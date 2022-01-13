@@ -13,7 +13,7 @@ declare module '@decentraland/EnvironmentAPI' {
     configurations: Record<string, string | number | boolean>
   }
 
-  export enum Platform {
+  export const enum Platform {
     DESKTOP = 'desktop',
     BROWSER = 'browser'
   }
