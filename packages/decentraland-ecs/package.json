@@ -29,7 +29,7 @@
   "dependencies": {
     "@dcl/amd": "file:../@dcl/amd",
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
-    "@dcl/kernel": "1.0.0-1611794749.commit-aa12e6f",
+    "@dcl/kernel": "1.0.0-1692945184.commit-4d9fcfd",
     "@dcl/posix": "^1.0.4-20211224173438.commit-5a9fc94",
     "@dcl/schemas": "3.1.1",
     "@dcl/unity-renderer": "^1.0.24406-20220112194022.commit-cad874d",

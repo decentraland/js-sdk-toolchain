@@ -13,6 +13,11 @@ declare module '@decentraland/EnvironmentAPI' {
     configurations: Record<string, string | number | boolean>
   }
 
+  export enum Platform {
+    DESKTOP = 'desktop',
+    BROWSER = 'browser'
+  }
+
   /**
    * Returns the current connected realm
    */
@@ -27,4 +32,9 @@ declare module '@decentraland/EnvironmentAPI' {
    * Returns explorer configuration and environment information
    */
   export function getExplorerConfiguration(): Promise<ExplorerConfiguration>
+
+  /**
+   * Returns what platform is running the scene
+   */
+  export function getPlatform(): Promise<Platform>
 }
