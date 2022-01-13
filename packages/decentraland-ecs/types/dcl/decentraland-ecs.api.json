@@ -30412,6 +30412,276 @@
           "implementsTokenRanges": []
         },
         {
+          "kind": "Class",
+          "canonicalReference": "@dcl/legacy-ecs!OnPointerHoverEnter:class",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare class OnPointerHoverEnter extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "OnPointerUUIDEvent",
+              "canonicalReference": "@dcl/legacy-ecs!OnPointerUUIDEvent:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<'pointerHoverEnter'> "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "OnPointerHoverEnter",
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "@dcl/legacy-ecs!OnPointerHoverEnter:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `OnPointerHoverEnter` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(callback: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(event: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "IEvents",
+                  "canonicalReference": "!IEvents:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "['pointerHoverEnter']) => void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "callback",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 4
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "Constructor",
+              "canonicalReference": "@dcl/legacy-ecs!OnPointerHoverEnter:constructor(2)",
+              "docComment": "/**\n * Constructs a new instance of the `OnPointerHoverEnter` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(callback: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(event: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "IEvents",
+                  "canonicalReference": "!IEvents:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "['pointerHoverEnter']) => void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "OnPointerHoverEnterUUIDEventOptions",
+                  "canonicalReference": "@dcl/legacy-ecs!OnPointerHoverEnterUUIDEventOptions:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "overloadIndex": 2,
+              "parameters": [
+                {
+                  "parameterName": "callback",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 4
+                  }
+                },
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@dcl/legacy-ecs!OnPointerHoverEnter#type:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly type: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "type",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          },
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@dcl/legacy-ecs!OnPointerHoverEnterUUIDEventOptions:type",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type OnPointerHoverEnterUUIDEventOptions = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    distance?: number;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "OnPointerHoverEnterUUIDEventOptions",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Class",
+          "canonicalReference": "@dcl/legacy-ecs!OnPointerHoverExit:class",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare class OnPointerHoverExit extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "OnPointerUUIDEvent",
+              "canonicalReference": "@dcl/legacy-ecs!OnPointerUUIDEvent:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<'pointerHoverExit'> "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "OnPointerHoverExit",
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "@dcl/legacy-ecs!OnPointerHoverExit:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `OnPointerHoverExit` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(callback: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(event: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "IEvents",
+                  "canonicalReference": "!IEvents:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "['pointerHoverExit']) => void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "callback",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 4
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@dcl/legacy-ecs!OnPointerHoverExit#type:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly type: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "type",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          },
+          "implementsTokenRanges": []
+        },
+        {
           "kind": "Variable",
           "canonicalReference": "@dcl/legacy-ecs!onPointerLockedStateChange:var",
           "docComment": "/**\n * @public\n */\n",

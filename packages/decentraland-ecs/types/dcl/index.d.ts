@@ -3206,6 +3206,30 @@ declare class OnPointerDown extends OnPointerUUIDEvent<'pointerDown'> {
 /**
  * @public
  */
+declare class OnPointerHoverEnter extends OnPointerUUIDEvent<'pointerHoverEnter'> {
+    readonly type: string;
+    constructor(callback: (event: IEvents['pointerHoverEnter']) => void);
+    constructor(callback: (event: IEvents['pointerHoverEnter']) => void, options: OnPointerHoverEnterUUIDEventOptions);
+}
+
+/**
+ * @public
+ */
+declare type OnPointerHoverEnterUUIDEventOptions = {
+    distance?: number;
+};
+
+/**
+ * @public
+ */
+declare class OnPointerHoverExit extends OnPointerUUIDEvent<'pointerHoverExit'> {
+    readonly type: string;
+    constructor(callback: (event: IEvents['pointerHoverExit']) => void);
+}
+
+/**
+ * @public
+ */
 declare const onPointerLockedStateChange: Observable<{
     locked?: boolean | undefined;
 }>;
