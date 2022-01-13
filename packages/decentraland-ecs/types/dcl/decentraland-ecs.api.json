@@ -4245,27 +4245,6 @@
           "members": [
             {
               "kind": "EnumMember",
-              "canonicalReference": "@dcl/legacy-ecs!CameraMode.BuildingToolGodMode:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "BuildingToolGodMode = "
-                },
-                {
-                  "kind": "Content",
-                  "text": "2"
-                }
-              ],
-              "releaseTag": "Public",
-              "name": "BuildingToolGodMode",
-              "initializerTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "EnumMember",
               "canonicalReference": "@dcl/legacy-ecs!CameraMode.FirstPerson:member",
               "docComment": "",
               "excerptTokens": [
@@ -4307,6 +4286,139 @@
               }
             }
           ]
+        },
+        {
+          "kind": "Class",
+          "canonicalReference": "@dcl/legacy-ecs!CameraModeArea:class",
+          "docComment": "/**\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare class CameraModeArea extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "ObservableComponent",
+              "canonicalReference": "@dcl/legacy-ecs!ObservableComponent:class"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "CameraModeArea",
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "@dcl/legacy-ecs!CameraModeArea:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `CameraModeArea` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(args: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        area: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Area",
+                  "canonicalReference": "@dcl/legacy-ecs!Area:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";\n        cameraMode: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "CameraMode",
+                  "canonicalReference": "@dcl/legacy-ecs!CameraMode:enum"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "args",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 6
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@dcl/legacy-ecs!CameraModeArea#area:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "area: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Area",
+                  "canonicalReference": "@dcl/legacy-ecs!Area:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "area",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@dcl/legacy-ecs!CameraModeArea#cameraMode:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "cameraMode: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "CameraMode",
+                  "canonicalReference": "@dcl/legacy-ecs!CameraMode:enum"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "cameraMode",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          },
+          "implementsTokenRanges": []
         },
         {
           "kind": "Class",
@@ -4609,6 +4721,27 @@
               ],
               "releaseTag": "Public",
               "name": "BOX_SHAPE",
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "@dcl/legacy-ecs!CLASS_ID.CAMERA_MODE_AREA:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "CAMERA_MODE_AREA = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "207"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "CAMERA_MODE_AREA",
               "initializerTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
