@@ -75,6 +75,8 @@ export enum CLASS_ID {
   VIDEO_CLIP = 70,
   VIDEO_TEXTURE = 71,
 
+  AVATAR_TEXTURE = 72,
+
   AUDIO_CLIP = 200,
   AUDIO_SOURCE = 201,
   AUDIO_STREAM = 202,
@@ -1229,5 +1231,59 @@ export class CameraModeArea extends ObservableComponent {
     super()
     this.area = args.area
     this.cameraMode = args.cameraMode
+  }
+}
+
+
+/**
+ * @public
+ */
+@DisposableComponent('engine.texture', CLASS_ID.AVATAR_TEXTURE)
+export class AvatarTexture extends ObservableComponent {
+  @ObservableComponent.readonly
+  readonly userId!: string
+
+  /**
+   * Enables crisper images based on the provided sampling mode.
+   * | Value | Type      |
+   * |-------|-----------|
+   * |     0 | NEAREST   |
+   * |     1 | BILINEAR  |
+   * |     2 | TRILINEAR |
+   */
+  @ObservableComponent.readonly
+  readonly samplingMode!: number
+
+  /**
+   * Enables texture wrapping for this material.
+   * | Value | Type      |
+   * |-------|-----------|
+   * |     0 | CLAMP     |
+   * |     1 | WRAP      |
+   * |     2 | MIRROR    |
+   */
+  @ObservableComponent.readonly
+  readonly wrap!: number
+
+  /**
+   * Defines if this texture has an alpha channel
+   */
+  @ObservableComponent.readonly
+  readonly hasAlpha!: boolean
+
+  constructor(
+    userId: string,
+    opts?: Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>
+  ) {
+    super()
+
+    this.userId = userId
+
+    if (opts) {
+      for (const i in opts) {
+        const that = this as any
+        that[i as 'samplingMode' | 'wrap' | 'hasAlpha'] = (opts as any)[i]
+      }
+    }
   }
 }

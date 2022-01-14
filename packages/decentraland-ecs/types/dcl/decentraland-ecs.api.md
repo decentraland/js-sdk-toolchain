@@ -229,6 +229,16 @@ export class AvatarShape extends ObservableComponent {
     wearables: WearableId[];
 }
 
+// @public (undocumented)
+export class AvatarTexture extends ObservableComponent {
+    constructor(userId: string, opts?: Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>);
+    readonly hasAlpha: boolean;
+    readonly samplingMode: number;
+    // (undocumented)
+    readonly userId: string;
+    readonly wrap: number;
+}
+
 // @public
 export class Axis {
     static X: Vector3;
@@ -337,6 +347,8 @@ export enum CLASS_ID {
     AVATAR_MODIFIER_AREA = 205,
     // (undocumented)
     AVATAR_SHAPE = 56,
+    // (undocumented)
+    AVATAR_TEXTURE = 72,
     // (undocumented)
     BASIC_MATERIAL = 64,
     // (undocumented)
