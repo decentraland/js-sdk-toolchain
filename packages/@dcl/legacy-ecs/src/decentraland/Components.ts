@@ -1234,7 +1234,6 @@ export class CameraModeArea extends ObservableComponent {
   }
 }
 
-
 /**
  * @public
  */
