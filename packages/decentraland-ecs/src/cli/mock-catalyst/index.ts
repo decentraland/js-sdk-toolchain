@@ -6,10 +6,9 @@ import { getAllPreviewWearables } from '../wearables'
 
 export const mockCatalyst = (
   app: express.Application,
-  baseFolders: string[],
-  rootFolder: string
+  baseFolders: string[]
 ) => {
-  serveFolders(app, baseFolders, rootFolder)
+  serveFolders(app, baseFolders)
   app.get('/lambdas/explore/realms', (req, res) => {
     res.json([
       {
@@ -37,7 +36,6 @@ export const mockCatalyst = (
     try {
       const previewWearables = await getAllPreviewWearables({
         baseFolders,
-        catalystRootFolder: rootFolder,
         baseUrl: ''
       }).map((wearable) => wearable.id)
 
@@ -81,11 +79,7 @@ export const mockCatalyst = (
   )
 }
 
-const serveFolders = (
-  app: express.Application,
-  baseFolders: string[],
-  catalystRootFolder: string
-) => {
+const serveFolders = (app: express.Application, baseFolders: string[]) => {
   app.get('/content/contents/:hash', (req, res, next) => {
     if (req.params.hash && req.params.hash.startsWith('b64-')) {
       const fullPath = path.resolve(
@@ -96,7 +90,7 @@ const serveFolders = (
 
       // only return files IF the file is within a baseFolder
       if (!baseFolders.find((folder: string) => fullPath.startsWith(folder))) {
-        res.end(404)
+        next()
         return
       }
 
@@ -135,8 +129,7 @@ const serveFolders = (
 
     const resultEntities = getSceneJson({
       baseFolders,
-      pointers: Array.from(requestedPointers),
-      catalystRootFolder
+      pointers: Array.from(requestedPointers)
     })
     res.json(resultEntities).end()
   })

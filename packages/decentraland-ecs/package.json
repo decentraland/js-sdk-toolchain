@@ -37,5 +37,5 @@
     "http-proxy-middleware": "^2.0.1",
     "ignore": "^5.1.8"
   },
-  "minCliVersion": "3.7.0"
+  "minCliVersion": "3.8.1"
 }

@@ -7,12 +7,10 @@ import { sdk } from '@dcl/schemas'
 
 const serveWearable = ({
   assetJsonPath,
-  baseUrl,
-  catalystRootFolder
+  baseUrl
 }: {
   assetJsonPath: string
   baseUrl: string
-  catalystRootFolder: string
 }) => {
   const wearableDir = path.dirname(assetJsonPath)
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -42,8 +40,7 @@ const serveWearable = ({
   const hashedFiles = getFilesFromFolder({
     folder: wearableDir,
     addOriginalPath: false,
-    ignorePattern: ignoreFileContent,
-    rootFolder: catalystRootFolder
+    ignorePattern: ignoreFileContent
   })
 
   const thumbnailFiltered = hashedFiles.filter(
@@ -96,11 +93,9 @@ const serveWearable = ({
 
 export const getAllPreviewWearables = ({
   baseFolders,
-  catalystRootFolder,
   baseUrl
 }: {
   baseFolders: string[]
-  catalystRootFolder: string
   baseUrl: string
 }) => {
   const assetPathArray: string[] = []
@@ -114,7 +109,7 @@ export const getAllPreviewWearables = ({
   const ret = []
   for (const assetJsonPath of assetPathArray) {
     try {
-      ret.push(serveWearable({ assetJsonPath, baseUrl, catalystRootFolder }))
+      ret.push(serveWearable({ assetJsonPath, baseUrl }))
     } catch (err) {
       console.error(
         `Couldn't mock the asset ${assetJsonPath}. Please verify the correct format and scheme.`,
@@ -127,14 +122,13 @@ export const getAllPreviewWearables = ({
 
 export const mockPreviewWearables = (
   app: express.Application,
-  baseFolders: string[],
-  catalystRootFolder: string
+  baseFolders: string[]
 ) => {
   app.use('/preview-wearables', async (req, res) => {
     const baseUrl = `http://${req.get('host')}/content/contents`
     return res.json({
       ok: true,
-      data: getAllPreviewWearables({ baseUrl, baseFolders, catalystRootFolder })
+      data: getAllPreviewWearables({ baseUrl, baseFolders })
     })
   })
 
@@ -142,8 +136,7 @@ export const mockPreviewWearables = (
     const baseUrl = `http://${req.get('host')}/content/contents`
     const wearables = getAllPreviewWearables({
       baseUrl,
-      baseFolders,
-      catalystRootFolder
+      baseFolders
     })
     const wearableId = req.params.id
 

@@ -128,8 +128,7 @@ const setupExport = async ({
       folder: workDir,
       addOriginalPath: true,
       ignorePattern: ignoreFileContent,
-      customHashMaker: shaHashMaker,
-      catalystRootFolder: workDir
+      customHashMaker: shaHashMaker
     })
     if (contentStatic?.content) {
       for (const $ of contentStatic?.content) {

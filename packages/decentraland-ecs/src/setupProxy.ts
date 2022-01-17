@@ -48,41 +48,39 @@ const setupProxy = (dcl: any, app: express.Application) => {
   let baseSceneFolders: string[] = [dcl.getWorkingDir()]
   let baseWearableFolders: string[] = [dcl.getWorkingDir()]
 
-  type Project = {
-    sceneType: sdk.ProjectType
-    sceneId: string
-    projectPath: string
-  }
-  if (dcl.project && dcl.project.getWorkspaceProjects) {
-    const projects = dcl.project.getWorkspaceProjects() as any[]
+  if (dcl.workspace) {
+    const projects = dcl.workspace.getAllProjects()
     if (projects && projects.length > 0) {
       baseSceneFolders = projects
         .filter(
-          (project: Project) => project.sceneType === sdk.ProjectType.SCENE
+          (project: any) =>
+            project.getInfo().sceneType === sdk.ProjectType.SCENE
         )
-        .map((project) => project.projectPath)
+        .map((project) => project.getProjectWorkingDir())
       baseWearableFolders = projects
         .filter(
-          (project: Project) =>
-            project.sceneType === sdk.ProjectType.PORTABLE_EXPERIENCE
+          (project: any) =>
+            project.getInfo().sceneType === sdk.ProjectType.PORTABLE_EXPERIENCE
         )
-        .map((project) => project.projectPath)
+        .map((project) => project.getProjectWorkingDir())
     }
   }
 
-  console.log({ baseSceneFolders, baseWearableFolders })
-
   try {
-    mockCatalyst(app, baseSceneFolders, dcl.getWorkingDir())
+    mockCatalyst(app, [...baseSceneFolders, ...baseWearableFolders])
   } catch (err) {
     console.error(`Fatal error, couldn't mock the catalyst`, err)
   }
 
   try {
-    mockPreviewWearables(app, baseWearableFolders, dcl.getWorkingDir())
+    mockPreviewWearables(app, baseWearableFolders)
   } catch (err) {
     console.error(`Fatal error, couldn't mock the wearables`, err)
   }
+
+  app.get('/content/contents/:hash', (_req, res) => {
+    return res.end(404)
+  })
 
   const routes = [
     {
