@@ -231,7 +231,7 @@ export class AvatarShape extends ObservableComponent {
 
 // @public (undocumented)
 export class AvatarTexture extends ObservableComponent {
-    constructor(userId: string, opts?: Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>);
+    constructor(userId: string, opts?: Partial<Pick<AvatarTexture, 'samplingMode' | 'wrap' | 'hasAlpha'>>);
     readonly hasAlpha: boolean;
     readonly samplingMode: number;
     // (undocumented)
@@ -258,7 +258,7 @@ export interface BasicAvatarInfo {
 export class BasicMaterial extends ObservableComponent {
     alphaTest: number;
     castShadows?: boolean;
-    texture?: Texture | VideoTexture;
+    texture?: Texture | VideoTexture | AvatarTexture;
 }
 
 // @public
@@ -1097,15 +1097,15 @@ export function log(...args: any[]): void;
 // @public (undocumented)
 export class Material extends ObservableComponent {
     albedoColor?: Color4 | Color3;
-    albedoTexture?: Texture | VideoTexture;
+    albedoTexture?: Texture | VideoTexture | AvatarTexture;
     alphaTest?: number;
-    alphaTexture?: Texture | VideoTexture;
-    bumpTexture?: Texture;
+    alphaTexture?: Texture | VideoTexture | AvatarTexture;
+    bumpTexture?: Texture | AvatarTexture;
     castShadows?: boolean;
     directIntensity?: number;
     emissiveColor?: Color3;
     emissiveIntensity?: number;
-    emissiveTexture?: Texture | VideoTexture;
+    emissiveTexture?: Texture | VideoTexture | AvatarTexture;
     metallic?: number;
     microSurface?: number;
     reflectivityColor?: Color3;

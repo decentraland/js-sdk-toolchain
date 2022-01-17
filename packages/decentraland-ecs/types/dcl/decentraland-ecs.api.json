@@ -3395,8 +3395,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Texture",
-                  "canonicalReference": "@dcl/legacy-ecs!Texture:class"
+                  "text": "AvatarTexture",
+                  "canonicalReference": "@dcl/legacy-ecs!AvatarTexture:class"
                 },
                 {
                   "kind": "Content",
@@ -3810,6 +3810,15 @@
                 },
                 {
                   "kind": "Content",
+                  "text": " | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AvatarTexture",
+                  "canonicalReference": "@dcl/legacy-ecs!AvatarTexture:class"
+                },
+                {
+                  "kind": "Content",
                   "text": ";"
                 }
               ],
@@ -3818,7 +3827,7 @@
               "name": "texture",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 4
+                "endIndex": 6
               },
               "isStatic": false
             }
@@ -19915,6 +19924,15 @@
                 },
                 {
                   "kind": "Content",
+                  "text": " | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AvatarTexture",
+                  "canonicalReference": "@dcl/legacy-ecs!AvatarTexture:class"
+                },
+                {
+                  "kind": "Content",
                   "text": ";"
                 }
               ],
@@ -19923,7 +19941,7 @@
               "name": "albedoTexture",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 4
+                "endIndex": 6
               },
               "isStatic": false
             },
@@ -19979,6 +19997,15 @@
                 },
                 {
                   "kind": "Content",
+                  "text": " | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AvatarTexture",
+                  "canonicalReference": "@dcl/legacy-ecs!AvatarTexture:class"
+                },
+                {
+                  "kind": "Content",
                   "text": ";"
                 }
               ],
@@ -19987,7 +20014,7 @@
               "name": "alphaTexture",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 4
+                "endIndex": 6
               },
               "isStatic": false
             },
@@ -20007,6 +20034,15 @@
                 },
                 {
                   "kind": "Content",
+                  "text": " | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AvatarTexture",
+                  "canonicalReference": "@dcl/legacy-ecs!AvatarTexture:class"
+                },
+                {
+                  "kind": "Content",
                   "text": ";"
                 }
               ],
@@ -20015,7 +20051,7 @@
               "name": "bumpTexture",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 4
               },
               "isStatic": false
             },
@@ -20153,6 +20189,15 @@
                 },
                 {
                   "kind": "Content",
+                  "text": " | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AvatarTexture",
+                  "canonicalReference": "@dcl/legacy-ecs!AvatarTexture:class"
+                },
+                {
+                  "kind": "Content",
                   "text": ";"
                 }
               ],
@@ -20161,7 +20206,7 @@
               "name": "emissiveTexture",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 4
+                "endIndex": 6
               },
               "isStatic": false
             },

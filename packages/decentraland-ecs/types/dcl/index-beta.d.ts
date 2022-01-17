@@ -376,7 +376,7 @@ export declare class AvatarTexture extends ObservableComponent {
      * Defines if this texture has an alpha channel
      */
     readonly hasAlpha: boolean;
-    constructor(userId: string, opts?: Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>);
+    constructor(userId: string, opts?: Partial<Pick<AvatarTexture, 'samplingMode' | 'wrap' | 'hasAlpha'>>);
 }
 
 /**
@@ -407,7 +407,7 @@ export declare class BasicMaterial extends ObservableComponent {
     /**
      * The source of the texture image.
      */
-    texture?: Texture | VideoTexture;
+    texture?: Texture | VideoTexture | AvatarTexture;
     /**
      * A number between 0 and 1.
      * Any pixel with an alpha lower than this value will be shown as transparent.
@@ -2043,19 +2043,19 @@ export declare class Material extends ObservableComponent {
     /**
      * Texture applied as material.
      */
-    albedoTexture?: Texture | VideoTexture;
+    albedoTexture?: Texture | VideoTexture | AvatarTexture;
     /**
      * Texture applied as opacity. Default: the same texture used in albedoTexture.
      */
-    alphaTexture?: Texture | VideoTexture;
+    alphaTexture?: Texture | VideoTexture | AvatarTexture;
     /**
      * Emissive texture.
      */
-    emissiveTexture?: Texture | VideoTexture;
+    emissiveTexture?: Texture | VideoTexture | AvatarTexture;
     /**
      * Stores surface normal data used to displace a mesh in a texture.
      */
-    bumpTexture?: Texture;
+    bumpTexture?: Texture | AvatarTexture;
     /**
      * Allow the material to cast shadows over other objects
      */

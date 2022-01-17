@@ -877,25 +877,25 @@ export class Material extends ObservableComponent {
    * Texture applied as material.
    */
   @ObservableComponent.component
-  albedoTexture?: Texture | VideoTexture
+  albedoTexture?: Texture | VideoTexture | AvatarTexture
 
   /**
    * Texture applied as opacity. Default: the same texture used in albedoTexture.
    */
   @ObservableComponent.component
-  alphaTexture?: Texture | VideoTexture
+  alphaTexture?: Texture | VideoTexture | AvatarTexture
 
   /**
    * Emissive texture.
    */
   @ObservableComponent.component
-  emissiveTexture?: Texture | VideoTexture
+  emissiveTexture?: Texture | VideoTexture | AvatarTexture
 
   /**
    * Stores surface normal data used to displace a mesh in a texture.
    */
   @ObservableComponent.component
-  bumpTexture?: Texture
+  bumpTexture?: Texture | AvatarTexture
 
   /**
    * Allow the material to cast shadows over other objects
@@ -928,7 +928,7 @@ export class BasicMaterial extends ObservableComponent {
    * The source of the texture image.
    */
   @ObservableComponent.component
-  texture?: Texture | VideoTexture
+  texture?: Texture | VideoTexture | AvatarTexture
 
   /**
    * A number between 0 and 1.
@@ -1272,7 +1272,7 @@ export class AvatarTexture extends ObservableComponent {
 
   constructor(
     userId: string,
-    opts?: Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>
+    opts?: Partial<Pick<AvatarTexture, 'samplingMode' | 'wrap' | 'hasAlpha'>>
   ) {
     super()
 
