@@ -230,9 +230,7 @@ declare class AttachToAvatar extends ObservableComponent {
 /** @public */
 declare enum AttachToAvatarAnchorPointId {
     Position = 0,
-    NameTag = 1,
-    LeftHand = 2,
-    RightHand = 3
+    NameTag = 1
 }
 
 /** @public */
@@ -454,7 +452,7 @@ declare class Camera {
     readonly worldPosition: Vector3;
     /** Player height. */
     get playerHeight(): number;
-    /** Get Camera Mode. */
+    /** @deprecated Use onCameraModeChangedObservable Observable instead. */
     get cameraMode(): CameraMode;
     constructor();
 }
@@ -462,8 +460,19 @@ declare class Camera {
 /** @public */
 declare enum CameraMode {
     FirstPerson = 0,
-    ThirdPerson = 1,
-    BuildingToolGodMode = 2
+    ThirdPerson = 1
+}
+
+/**
+ * @public
+ */
+declare class CameraModeArea extends ObservableComponent {
+    area: Area;
+    cameraMode: CameraMode;
+    constructor(args: {
+        area: Area;
+        cameraMode: CameraMode;
+    });
 }
 
 /**
@@ -519,6 +528,7 @@ declare enum CLASS_ID {
     SMART_ITEM = 204,
     AVATAR_MODIFIER_AREA = 205,
     AVATAR_ATTACH = 206,
+    CAMERA_MODE_AREA = 207,
     NAME = 300,
     LOCKED_ON_EDIT = 301,
     VISIBLE_ON_EDIT = 302
@@ -3191,6 +3201,30 @@ declare class OnPointerDown extends OnPointerUUIDEvent<'pointerDown'> {
     readonly type: string;
     constructor(callback: (event: IEvents['pointerDown']) => void);
     constructor(callback: (event: IEvents['pointerDown']) => void, options: OnPointerUUIDEventOptions);
+}
+
+/**
+ * @public
+ */
+declare class OnPointerHoverEnter extends OnPointerUUIDEvent<'pointerHoverEnter'> {
+    readonly type: string;
+    constructor(callback: (event: IEvents['pointerHoverEnter']) => void);
+    constructor(callback: (event: IEvents['pointerHoverEnter']) => void, options: OnPointerHoverEnterUUIDEventOptions);
+}
+
+/**
+ * @public
+ */
+declare type OnPointerHoverEnterUUIDEventOptions = {
+    distance?: number;
+};
+
+/**
+ * @public
+ */
+declare class OnPointerHoverExit extends OnPointerUUIDEvent<'pointerHoverExit'> {
+    readonly type: string;
+    constructor(callback: (event: IEvents['pointerHoverExit']) => void);
 }
 
 /**

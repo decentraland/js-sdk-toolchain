@@ -14,8 +14,9 @@ import {
   getComponentId
 } from '../ecs/Component'
 import { AnimationState } from './AnimationState'
-import { newId } from '../ecs/helpers'
+import { log, newId } from '../ecs/helpers'
 import { ActionButton } from './Input'
+import { CameraMode } from './Types'
 
 /** @public */
 export type TranformConstructorArgs = TransformConstructorArgs
@@ -81,6 +82,7 @@ export enum CLASS_ID {
   SMART_ITEM = 204,
   AVATAR_MODIFIER_AREA = 205,
   AVATAR_ATTACH = 206,
+  CAMERA_MODE_AREA = 207,
 
   // For state sync only
   NAME = 300,
@@ -180,7 +182,9 @@ export class Transform extends ObservableComponent {
 export enum AttachToAvatarAnchorPointId {
   Position = 0,
   NameTag = 1,
+  /** @internal */
   LeftHand = 2,
+  /** @internal */
   RightHand = 3
 }
 
@@ -541,6 +545,14 @@ export class Texture extends ObservableComponent {
     opts?: Partial<Pick<Texture, 'samplingMode' | 'wrap' | 'hasAlpha'>>
   ) {
     super()
+
+    const base64Test = new RegExp('data:[a-z-]+/[a-z-]+;base64')
+    if (src.length > 2048 || base64Test.test(src)) {
+      log(
+        '⚠️🚨 Base64 textures will be deprecated in version 7 of decentraland-ecs'
+      )
+    }
+
     this.src = src
 
     if (opts) {
@@ -1199,5 +1211,23 @@ export class VideoTexture extends ObservableComponent {
 
   get status() {
     return this._status
+  }
+}
+
+/**
+ * @public
+ */
+@Component('engine.cameraModeArea', CLASS_ID.CAMERA_MODE_AREA)
+export class CameraModeArea extends ObservableComponent {
+  @ObservableComponent.field
+  area!: Area
+
+  @ObservableComponent.field
+  cameraMode!: CameraMode
+
+  constructor(args: { area: Area; cameraMode: CameraMode }) {
+    super()
+    this.area = args.area
+    this.cameraMode = args.cameraMode
   }
 }

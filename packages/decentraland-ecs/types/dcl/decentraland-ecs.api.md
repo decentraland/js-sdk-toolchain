@@ -126,13 +126,9 @@ export class AttachToAvatar extends ObservableComponent {
 // @public (undocumented)
 export enum AttachToAvatarAnchorPointId {
     // (undocumented)
-    LeftHand = 2,
-    // (undocumented)
     NameTag = 1,
     // (undocumented)
-    Position = 0,
-    // (undocumented)
-    RightHand = 3
+    Position = 0
 }
 
 // @public (undocumented)
@@ -286,6 +282,7 @@ export class BoxShape extends Shape {
 // @public (undocumented)
 export class Camera {
     constructor();
+    // @deprecated (undocumented)
     get cameraMode(): CameraMode;
     readonly feetPosition: Vector3;
     // (undocumented)
@@ -299,11 +296,21 @@ export class Camera {
 // @public (undocumented)
 export enum CameraMode {
     // (undocumented)
-    BuildingToolGodMode = 2,
-    // (undocumented)
     FirstPerson = 0,
     // (undocumented)
     ThirdPerson = 1
+}
+
+// @public (undocumented)
+export class CameraModeArea extends ObservableComponent {
+    constructor(args: {
+        area: Area;
+        cameraMode: CameraMode;
+    });
+    // (undocumented)
+    area: Area;
+    // (undocumented)
+    cameraMode: CameraMode;
 }
 
 // @public (undocumented)
@@ -336,6 +343,8 @@ export enum CLASS_ID {
     BILLBOARD = 32,
     // (undocumented)
     BOX_SHAPE = 16,
+    // (undocumented)
+    CAMERA_MODE_AREA = 207,
     // (undocumented)
     CIRCLE_SHAPE = 31,
     // (undocumented)
@@ -1429,6 +1438,26 @@ export const onPlayerExpressionObservable: Observable<{
 export class OnPointerDown extends OnPointerUUIDEvent<'pointerDown'> {
     constructor(callback: (event: IEvents['pointerDown']) => void);
     constructor(callback: (event: IEvents['pointerDown']) => void, options: OnPointerUUIDEventOptions);
+    // (undocumented)
+    readonly type: string;
+}
+
+// @public (undocumented)
+export class OnPointerHoverEnter extends OnPointerUUIDEvent<'pointerHoverEnter'> {
+    constructor(callback: (event: IEvents['pointerHoverEnter']) => void);
+    constructor(callback: (event: IEvents['pointerHoverEnter']) => void, options: OnPointerHoverEnterUUIDEventOptions);
+    // (undocumented)
+    readonly type: string;
+}
+
+// @public (undocumented)
+export type OnPointerHoverEnterUUIDEventOptions = {
+    distance?: number;
+};
+
+// @public (undocumented)
+export class OnPointerHoverExit extends OnPointerUUIDEvent<'pointerHoverExit'> {
+    constructor(callback: (event: IEvents['pointerHoverExit']) => void);
     // (undocumented)
     readonly type: string;
 }

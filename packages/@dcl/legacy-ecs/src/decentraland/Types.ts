@@ -8,9 +8,10 @@ export enum InputEventType {
 
 /** @public */
 export enum CameraMode {
-  FirstPerson,
-  ThirdPerson,
-  BuildingToolGodMode
+  FirstPerson = 0,
+  ThirdPerson = 1,
+  // @internal
+  BuildingToolGodMode = 2
 }
 
 // @internal
