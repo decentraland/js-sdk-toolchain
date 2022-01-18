@@ -67,7 +67,14 @@ export const mockCatalyst = (
     '/lambdas',
     createProxyMiddleware({
       target: 'https://peer-lb.decentraland.org/',
-      changeOrigin: true
+      changeOrigin: true,
+      timeout: 25 * 1000,
+      proxyTimeout: 25 * 1000,
+      onError: (err, req_, res) => {
+        console.warn(`Oops, it seems the catalyst isn't working well.`)
+        res.writeHead(500)
+        res.end('')
+      }
     })
   )
 
@@ -76,7 +83,14 @@ export const mockCatalyst = (
     '/content',
     createProxyMiddleware({
       target: 'https://peer-lb.decentraland.org/',
-      changeOrigin: true
+      changeOrigin: true,
+      timeout: 25 * 1000,
+      proxyTimeout: 25 * 1000,
+      onError: (err, req_, res) => {
+        console.warn(`Oops, it seems the content server isn't working well.`)
+        res.writeHead(500)
+        res.end('')
+      }
     })
   )
 }
