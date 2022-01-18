@@ -350,6 +350,36 @@ declare class AvatarShape extends ObservableComponent {
 }
 
 /**
+ * @public
+ */
+declare class AvatarTexture extends ObservableComponent {
+    readonly userId: string;
+    /**
+     * Enables crisper images based on the provided sampling mode.
+     * | Value | Type      |
+     * |-------|-----------|
+     * |     0 | NEAREST   |
+     * |     1 | BILINEAR  |
+     * |     2 | TRILINEAR |
+     */
+    readonly samplingMode: number;
+    /**
+     * Enables texture wrapping for this material.
+     * | Value | Type      |
+     * |-------|-----------|
+     * |     0 | CLAMP     |
+     * |     1 | WRAP      |
+     * |     2 | MIRROR    |
+     */
+    readonly wrap: number;
+    /**
+     * Defines if this texture has an alpha channel
+     */
+    readonly hasAlpha: boolean;
+    constructor(userId: string, opts?: Partial<Pick<AvatarTexture, 'samplingMode' | 'wrap' | 'hasAlpha'>>);
+}
+
+/**
  * Defines the 3 main axes
  * @public
  */
@@ -377,7 +407,7 @@ declare class BasicMaterial extends ObservableComponent {
     /**
      * The source of the texture image.
      */
-    texture?: Texture | VideoTexture;
+    texture?: Texture | VideoTexture | AvatarTexture;
     /**
      * A number between 0 and 1.
      * Any pixel with an alpha lower than this value will be shown as transparent.
@@ -521,6 +551,7 @@ declare enum CLASS_ID {
     TEXTURE = 68,
     VIDEO_CLIP = 70,
     VIDEO_TEXTURE = 71,
+    AVATAR_TEXTURE = 72,
     AUDIO_CLIP = 200,
     AUDIO_SOURCE = 201,
     AUDIO_STREAM = 202,
@@ -2012,19 +2043,19 @@ declare class Material extends ObservableComponent {
     /**
      * Texture applied as material.
      */
-    albedoTexture?: Texture | VideoTexture;
+    albedoTexture?: Texture | VideoTexture | AvatarTexture;
     /**
      * Texture applied as opacity. Default: the same texture used in albedoTexture.
      */
-    alphaTexture?: Texture | VideoTexture;
+    alphaTexture?: Texture | VideoTexture | AvatarTexture;
     /**
      * Emissive texture.
      */
-    emissiveTexture?: Texture | VideoTexture;
+    emissiveTexture?: Texture | VideoTexture | AvatarTexture;
     /**
      * Stores surface normal data used to displace a mesh in a texture.
      */
-    bumpTexture?: Texture;
+    bumpTexture?: Texture | AvatarTexture;
     /**
      * Allow the material to cast shadows over other objects
      */
