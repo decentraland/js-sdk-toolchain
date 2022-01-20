@@ -30,9 +30,9 @@
     "@dcl/amd": "file:../@dcl/amd",
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
     "@dcl/kernel": "1.0.0-1692945184.commit-4d9fcfd",
-    "@dcl/posix": "^1.0.4-20220111144532.commit-f90a5d3",
-    "@dcl/schemas": "3.1.1",
-    "@dcl/unity-renderer": "^1.0.24406-20220112194022.commit-cad874d",
+    "@dcl/posix": "^1.0.4",
+    "@dcl/schemas": "3.5.0",
+    "@dcl/unity-renderer": "^1.0.24915-20220118144533.commit-4bfe660",
     "glob": "^7.1.7",
     "http-proxy-middleware": "^2.0.1",
     "ignore": "^5.1.8"
