@@ -106,8 +106,7 @@ const setupExport = async ({
         getSceneJson({
           baseFolders: [workDir],
           pointers: sceneJson?.scene?.parcels || ['0,0'],
-          customHashMaker: shaHashMaker,
-          catalystRootFolder: workDir
+          customHashMaker: shaHashMaker
         })
       )
     )
