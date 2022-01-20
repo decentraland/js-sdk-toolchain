@@ -31,6 +31,6 @@
     ]
   },
   "include": [
-    "dist/src/src"
+    "./src"
   ]
 }
