@@ -29,10 +29,10 @@
   "dependencies": {
     "@dcl/amd": "file:../@dcl/amd",
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
-    "@dcl/kernel": "1.0.0-1692945184.commit-4d9fcfd",
+    "@dcl/kernel": "https://sdk-team-cdn.decentraland.org/@dcl/kernel/branch/feat/workspaces/dcl-kernel-1.0.0-1723452657.commit-31b0850.tgz",
     "@dcl/posix": "^1.0.4",
     "@dcl/schemas": "3.5.0",
-    "@dcl/unity-renderer": "^1.0.24915-20220118144533.commit-4bfe660",
+    "@dcl/unity-renderer": "^1.0.25397-20220121122726.commit-deb1f07",
     "glob": "^7.1.7",
     "http-proxy-middleware": "^2.0.1",
     "ignore": "^5.1.8"
