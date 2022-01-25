@@ -82,6 +82,10 @@ const setupProxy = (dcl: any, app: express.Application) => {
     return res.end(404)
   })
 
+  app.get('/scene.json', (_req, res) => {
+    return res.send('')
+  })
+
   const routes = [
     {
       route: '/',
