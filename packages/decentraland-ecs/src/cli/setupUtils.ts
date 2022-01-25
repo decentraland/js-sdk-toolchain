@@ -211,7 +211,11 @@ export async function ensureCopyFile(fromFilePath: string, filePath: any) {
   await fs.promises.copyFile(fromFilePath, filePath)
 }
 
-export const downloadFile = async (url: string, path: string, timeout_seg: number = 15) => {
+export const downloadFile = async (
+  url: string,
+  path: string,
+  timeout_seg: number = 15
+) => {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(path)
 
