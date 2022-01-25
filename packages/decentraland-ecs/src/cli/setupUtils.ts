@@ -211,7 +211,7 @@ export async function ensureCopyFile(fromFilePath: string, filePath: any) {
   await fs.promises.copyFile(fromFilePath, filePath)
 }
 
-export const downloadFile = async (url: string, path: string) => {
+export const downloadFile = async (url: string, path: string, timeout_seg: number = 15) => {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(path)
 
@@ -220,18 +220,28 @@ export const downloadFile = async (url: string, path: string) => {
       schema = https as any
     }
 
-    schema
+    let finished = false
+    const request = schema
       .get(url, function (response) {
         response.pipe(file)
         file.on('finish', function () {
           file.close()
+          finished = true
           resolve(true)
         })
       })
       .on('error', function (err) {
         fs.unlinkSync(path)
+        finished = true
         reject(err)
       })
+
+    setTimeout(() => {
+      if (!finished) {
+        request.destroy()
+        reject(new Error(`Timeout ${url}`))
+      }
+    }, timeout_seg * 1000)
   })
 }
 
