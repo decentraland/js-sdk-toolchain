@@ -48,21 +48,24 @@ const setupProxy = (dcl: any, app: express.Application) => {
   let baseSceneFolders: string[] = [dcl.getWorkingDir()]
   let baseWearableFolders: string[] = [dcl.getWorkingDir()]
 
+  // TODO: merge types from github.com/decentraland/cli
   if (dcl.workspace) {
     const projects = dcl.workspace.getAllProjects()
-    if (projects && projects.length > 0) {
-      baseSceneFolders = projects
-        .filter(
-          (project: any) =>
-            project.getInfo().sceneType === sdk.ProjectType.SCENE
-        )
-        .map((project) => project.getProjectWorkingDir())
-      baseWearableFolders = projects
-        .filter(
-          (project: any) =>
-            project.getInfo().sceneType === sdk.ProjectType.PORTABLE_EXPERIENCE
-        )
-        .map((project) => project.getProjectWorkingDir())
+    if (!!projects?.length) {
+      const { wearables, scenes } = projects.reduce(
+        (acc: { wearables: string[]; scenes: string[] }, project: any) => {
+          const projectType = project.getInfo().sceneType
+          const projectDir = project.getprojectWorkingdir()
+          if (projectType === sdk.ProjectType.SCENE) acc.scenes.push(projectDir)
+          if (projectType === sdk.ProjectType.PORTABLE_EXPERIENCE)
+            acc.wearables.push(projectDir)
+          return acc
+        },
+        { wearables: [], scenes: [] }
+      )
+
+      baseSceneFolders = scenes
+      baseWearableFolders = wearables
     }
   }
 
@@ -77,14 +80,6 @@ const setupProxy = (dcl: any, app: express.Application) => {
   } catch (err) {
     console.error(`Fatal error, couldn't mock the wearables`, err)
   }
-
-  app.get('/content/contents/:hash', (_req, res) => {
-    return res.end(404)
-  })
-
-  app.get('/scene.json', (_req, res) => {
-    return res.send('')
-  })
 
   const routes = [
     {

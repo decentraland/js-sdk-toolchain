@@ -29,7 +29,7 @@
   "dependencies": {
     "@dcl/amd": "file:../@dcl/amd",
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
-    "@dcl/kernel": "https://sdk-team-cdn.decentraland.org/@dcl/kernel/branch/feat/workspaces/dcl-kernel-1.0.0-1742024640.commit-f5ba92d.tgz",
+    "@dcl/kernel": "1.0.0-1752637577.commit-039d162",
     "@dcl/posix": "^1.0.4",
     "@dcl/schemas": "3.5.0",
     "@dcl/unity-renderer": "^1.0.25467-20220121232645.commit-3974cfb",
