@@ -32,7 +32,7 @@
     "@dcl/kernel": "https://sdk-team-cdn.decentraland.org/@dcl/kernel/branch/feat/workspaces/dcl-kernel-1.0.0-1742024640.commit-f5ba92d.tgz",
     "@dcl/posix": "^1.0.4",
     "@dcl/schemas": "3.5.0",
-    "@dcl/unity-renderer": "^1.0.25467-20220121232645.commit-3974cfb",
+    "@dcl/unity-renderer": "^1.0.25716-20220125223212.commit-509834f",
     "glob": "^7.1.7",
     "http-proxy-middleware": "^2.0.1",
     "ignore": "^5.1.8"
