@@ -62,6 +62,7 @@ flow('build-all', () => {
   flow('decentraland-ecs', () => {
     itDeletesFolder('dist', ECS_PATH)
     itExecutes(`npm i --quiet`, ECS_PATH)
+    itExecutes(`npm link @dcl/posix`, LEGACY_ECS_PATH)
 
     itDeletesGlob('types/dcl/*.d.ts', ECS_PATH)
 
@@ -83,6 +84,7 @@ flow('build-all', () => {
     // And then we build legacy-ecs with TS and publish it to npm so we can use it like a normal module.
 
     itExecutes(`npm ci --quiet`, LEGACY_ECS_PATH)
+    itExecutes(`npm link @dcl/posix`, LEGACY_ECS_PATH)
     itDeletesFolder('dist', LEGACY_ECS_PATH)
     itExecutes(`${TSC} -p tsconfig.json`, LEGACY_ECS_PATH)
   })

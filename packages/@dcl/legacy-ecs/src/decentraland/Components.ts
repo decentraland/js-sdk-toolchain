@@ -113,10 +113,18 @@ export class AvatarModifierArea extends ObservableComponent {
   @ObservableComponent.field
   modifiers!: AvatarModifiers[]
 
-  constructor(args: { area: Area; modifiers: AvatarModifiers[] }) {
+  @ObservableComponent.field
+  excludeIds?: string[]
+
+  constructor(args: {
+    area: Area
+    modifiers: AvatarModifiers[]
+    excludeIds?: string[]
+  }) {
     super()
     this.area = args.area
     this.modifiers = args.modifiers
+    this.excludeIds = args.excludeIds
   }
 }
 
