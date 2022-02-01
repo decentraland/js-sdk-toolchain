@@ -124,25 +124,25 @@ export const mockPreviewWearables = (
   app: express.Application,
   baseFolders: string[]
 ) => {
-  app.use('/preview-wearables', async (req, res) => {
-    const baseUrl = `http://${req.get('host')}/content/contents`
-    return res.json({
-      ok: true,
-      data: getAllPreviewWearables({ baseUrl, baseFolders })
-    })
-  })
-
   app.use('/preview-wearables/:id', async (req, res) => {
-    const baseUrl = `http://${req.get('host')}/content/contents`
+    const baseUrl = `${req.protocol}://${req.get('host')}/content/contents`
     const wearables = getAllPreviewWearables({
       baseUrl,
-      baseFolders
+      baseFolders,
+      catalystRootFolder
     })
     const wearableId = req.params.id
-
     return res.json({
       ok: true,
       data: wearables.filter((w) => w?.id === wearableId)
+    })
+  })
+
+  app.use('/preview-wearables', async (req, res) => {
+    const baseUrl = `${req.protocol}://${req.get('host')}/content/contents`
+    return res.json({
+      ok: true,
+      data: getAllPreviewWearables({ baseUrl, baseFolders, catalystRootFolder })
     })
   })
 }
