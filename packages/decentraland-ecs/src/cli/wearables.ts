@@ -128,8 +128,7 @@ export const mockPreviewWearables = (
     const baseUrl = `${req.protocol}://${req.get('host')}/content/contents`
     const wearables = getAllPreviewWearables({
       baseUrl,
-      baseFolders,
-      catalystRootFolder
+      baseFolders
     })
     const wearableId = req.params.id
     return res.json({
@@ -142,7 +141,7 @@ export const mockPreviewWearables = (
     const baseUrl = `${req.protocol}://${req.get('host')}/content/contents`
     return res.json({
       ok: true,
-      data: getAllPreviewWearables({ baseUrl, baseFolders, catalystRootFolder })
+      data: getAllPreviewWearables({ baseUrl, baseFolders })
     })
   })
 }
