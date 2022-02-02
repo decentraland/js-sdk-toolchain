@@ -106,8 +106,7 @@ const setupExport = async ({
         getSceneJson({
           baseFolders: [workDir],
           pointers: sceneJson?.scene?.parcels || ['0,0'],
-          customHashMaker: shaHashMaker,
-          catalystRootFolder: workDir
+          customHashMaker: shaHashMaker
         })
       )
     )
@@ -128,8 +127,7 @@ const setupExport = async ({
       folder: workDir,
       addOriginalPath: true,
       ignorePattern: ignoreFileContent,
-      customHashMaker: shaHashMaker,
-      catalystRootFolder: workDir
+      customHashMaker: shaHashMaker
     })
     if (contentStatic?.content) {
       for (const $ of contentStatic?.content) {
