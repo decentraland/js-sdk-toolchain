@@ -4,6 +4,7 @@ import * as express from 'express'
 import { createStaticRoutes } from './cli/setupUtils'
 import { mockCatalyst } from './cli/mock-catalyst'
 import { mockPreviewWearables } from './cli/wearables'
+import { sdk } from '@dcl/schemas'
 
 const setupProxy = (dcl: any, app: express.Application) => {
   // first resolve all dependencies in the local current working directory
@@ -44,16 +45,38 @@ const setupProxy = (dcl: any, app: express.Application) => {
     })
   )
 
-  const baseSceneFolders: string[] = [dcl.getWorkingDir()]
+  let baseSceneFolders: string[] = [dcl.getWorkingDir()]
+  let baseWearableFolders: string[] = [dcl.getWorkingDir()]
+
+  // TODO: merge types from github.com/decentraland/cli
+  if (dcl.workspace) {
+    const projects = dcl.workspace.getAllProjects()
+    if (!!projects?.length) {
+      const { wearables, scenes } = projects.reduce(
+        (acc: { wearables: string[]; scenes: string[] }, project: any) => {
+          const projectType = project.getInfo().sceneType
+          const projectDir = project.getProjectWorkingDir()
+          if (projectType === sdk.ProjectType.SCENE) acc.scenes.push(projectDir)
+          if (projectType === sdk.ProjectType.PORTABLE_EXPERIENCE)
+            acc.wearables.push(projectDir)
+          return acc
+        },
+        { wearables: [], scenes: [] }
+      )
+
+      baseSceneFolders = scenes
+      baseWearableFolders = wearables
+    }
+  }
+
   try {
-    mockCatalyst(app, baseSceneFolders, dcl.getWorkingDir())
+    mockCatalyst(app, [...baseSceneFolders, ...baseWearableFolders])
   } catch (err) {
     console.error(`Fatal error, couldn't mock the catalyst`, err)
   }
 
-  const baseWearableFolders: string[] = [dcl.getWorkingDir()]
   try {
-    mockPreviewWearables(app, baseWearableFolders, dcl.getWorkingDir())
+    mockPreviewWearables(app, baseWearableFolders)
   } catch (err) {
     console.error(`Fatal error, couldn't mock the wearables`, err)
   }
