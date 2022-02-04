@@ -18,7 +18,10 @@ console.assert(
   'package.json .decentralandLibrary must be an object'
 )
 console.assert(packageJson.main, 'package.json .main must be present')
-console.assert(packageJson.typings, 'package.json .typings must be present')
+console.assert(
+  packageJson.typings || packageJson.types,
+  'package.json .typings or .types must be present'
+)
 
 const plugins = [
   typescript({

@@ -14,8 +14,11 @@ export async function apiExtractor(
 ) {
   const cwd = path.dirname(packageJsonPath)
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath).toString())
-  console.assert(packageJson.typings, 'package.json#typings is not valid')
-  const typingsFullPath = path.resolve(packageJson.typings)
+  console.assert(
+    packageJson.typings || packageJson.types,
+    'package.json#typings or package.json#types is not valid'
+  )
+  const typingsFullPath = path.resolve(packageJson.typings || packageJson.types)
 
   const prepareOptions: IExtractorConfigPrepareOptions =
     ExtractorConfig.tryLoadForFolder({ startingFolder: cwd }) || {
