@@ -41,7 +41,7 @@ export const mockCatalyst = (
 
       if (previewWearables.length === 1) {
         const deployedProfile = await (
-          await fetch(`https://peer-lb.decentraland.org${req.originalUrl}`)
+          await fetch(`https://peer.decentraland.org${req.originalUrl}`)
         ).json()
         if (deployedProfile?.length === 1) {
           deployedProfile[0].avatars[0].avatar.wearables.push(
