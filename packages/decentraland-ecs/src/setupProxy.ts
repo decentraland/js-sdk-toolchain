@@ -120,6 +120,14 @@ const setupProxy = (dcl: any, app: express.Application) => {
   )
   createStaticRoutes(app, '/@/artifacts/loader/*', dclKernelLoaderPath)
   createStaticRoutes(app, '/default-profile/*', dclKernelDefaultProfilePath)
+
+  app.get('/feature-flags/:file', async (req, res) => {
+    const featureFlagResponse = await fetch(
+      `https://feature-flags.decentraland.zone/${req.params.file}`
+    )
+    const featureFlagBody = await featureFlagResponse.json()
+    return res.json(featureFlagBody)
+  })
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
