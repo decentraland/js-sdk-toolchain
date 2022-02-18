@@ -2,10 +2,12 @@ declare module '@decentraland/Players' {
   export type ColorString = string
 
   export type Snapshots = {
+    // @deprecated
     face: string
     face256: string
     face128: string
     body: string
+    donotmerge: true
   }
 
   export type AvatarForUserData = {
