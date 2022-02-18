@@ -2,9 +2,13 @@ declare module '@decentraland/Identity' {
   export type ColorString = string
 
   export type Snapshots = {
+    // @deprecated
     face: string
+    // @deprecated
     face256: string
+    // @deprecated
     face128: string
+    // @deprecated
     body: string
   }
 
