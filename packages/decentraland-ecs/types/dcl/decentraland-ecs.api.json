@@ -2828,7 +2828,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "[];\n    }"
+                  "text": "[];\n        excludeIds?: string[];\n    }"
                 },
                 {
                   "kind": "Content",
@@ -2869,6 +2869,33 @@
               "isOptional": false,
               "releaseTag": "Public",
               "name": "area",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@dcl/legacy-ecs!AvatarModifierArea#excludeIds:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "excludeIds?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "excludeIds",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2

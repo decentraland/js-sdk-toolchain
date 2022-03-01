@@ -186,9 +186,12 @@ export class AvatarModifierArea extends ObservableComponent {
     constructor(args: {
         area: Area;
         modifiers: AvatarModifiers[];
+        excludeIds?: string[];
     });
     // (undocumented)
     area: Area;
+    // (undocumented)
+    excludeIds?: string[];
     // (undocumented)
     modifiers: AvatarModifiers[];
 }
