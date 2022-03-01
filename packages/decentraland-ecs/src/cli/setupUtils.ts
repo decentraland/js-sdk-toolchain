@@ -30,14 +30,12 @@ export const getFilesFromFolder = ({
   folder,
   addOriginalPath,
   ignorePattern,
-  customHashMaker,
-  rootFolder
+  customHashMaker
 }: {
   folder: string
   addOriginalPath?: boolean
   ignorePattern?: string
   customHashMaker?: (str: string) => string
-  rootFolder?: string
 }) => {
   const hashMaker = customHashMaker ? customHashMaker : defaultHashMaker
 
@@ -73,12 +71,8 @@ export const getFilesFromFolder = ({
         return
       }
 
-      const absoluteFolder = rootFolder
-        ? rootFolder.replace(/\\/gi, '/')
-        : folder.replace(/\\/gi, '/')
-      const relativeFilePathToRootFolder = absolutePath
-        .replace(absoluteFolder, '')
-        .replace(/^\/+/, '')
+      const absoluteFolder = folder.replace(/\\/gi, '/')
+
       const relativeFilePathToFolder = file
         .replace(absoluteFolder, '')
         .replace(/^\/+/, '')
@@ -86,7 +80,7 @@ export const getFilesFromFolder = ({
       return {
         file: relativeFilePathToFolder.toLowerCase(),
         original_path: addOriginalPath ? absolutePath : undefined,
-        hash: hashMaker(relativeFilePathToRootFolder)
+        hash: hashMaker(absolutePath)
       }
     })
     .filter(($) => !!$)
@@ -96,14 +90,12 @@ export function entityV3FromFolder({
   folder,
   addOriginalPath,
   ignorePattern,
-  customHashMaker,
-  catalystRootFolder
+  customHashMaker
 }: {
   folder: string
   addOriginalPath?: boolean
   ignorePattern?: string
   customHashMaker?: (str: string) => string
-  catalystRootFolder: string
 }) {
   const sceneJsonPath = path.resolve(folder, './scene.json')
   let isParcelScene = true
@@ -128,7 +120,6 @@ export function entityV3FromFolder({
 
   if (fs.existsSync(sceneJsonPath) && isParcelScene) {
     const sceneJson = JSON.parse(fs.readFileSync(sceneJsonPath).toString())
-
     const { base, parcels }: { base: string; parcels: string[] } =
       sceneJson.scene
     const pointers = new Set<string>()
@@ -139,8 +130,7 @@ export function entityV3FromFolder({
       folder,
       addOriginalPath,
       ignorePattern,
-      customHashMaker,
-      rootFolder: catalystRootFolder
+      customHashMaker
     })
     return {
       version: 'v3',
@@ -159,13 +149,11 @@ export function entityV3FromFolder({
 export function getSceneJson({
   baseFolders,
   pointers,
-  customHashMaker,
-  catalystRootFolder
+  customHashMaker
 }: {
   baseFolders: string[]
   pointers: string[]
   customHashMaker?: (str: string) => string
-  catalystRootFolder: string
 }) {
   const requestedPointers = new Set<string>(pointers)
   const resultEntities = []
@@ -183,8 +171,7 @@ export function getSceneJson({
       folder,
       addOriginalPath: false,
       ignorePattern: ignoreFileContent,
-      customHashMaker,
-      catalystRootFolder
+      customHashMaker
     })
   })
 
@@ -224,7 +211,11 @@ export async function ensureCopyFile(fromFilePath: string, filePath: any) {
   await fs.promises.copyFile(fromFilePath, filePath)
 }
 
-export const downloadFile = async (url: string, path: string) => {
+export const downloadFile = async (
+  url: string,
+  path: string,
+  timeout_seg: number = 15
+) => {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(path)
 
@@ -233,18 +224,28 @@ export const downloadFile = async (url: string, path: string) => {
       schema = https as any
     }
 
-    schema
+    let finished = false
+    const request = schema
       .get(url, function (response) {
         response.pipe(file)
         file.on('finish', function () {
           file.close()
+          finished = true
           resolve(true)
         })
       })
       .on('error', function (err) {
         fs.unlinkSync(path)
+        finished = true
         reject(err)
       })
+
+    setTimeout(() => {
+      if (!finished) {
+        request.destroy()
+        reject(new Error(`Timeout ${url}`))
+      }
+    }, timeout_seg * 1000)
   })
 }
 

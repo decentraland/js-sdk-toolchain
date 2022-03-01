@@ -106,8 +106,7 @@ const setupExport = async ({
         getSceneJson({
           baseFolders: [workDir],
           pointers: sceneJson?.scene?.parcels || ['0,0'],
-          customHashMaker: shaHashMaker,
-          catalystRootFolder: workDir
+          customHashMaker: shaHashMaker
         })
       )
     )
@@ -128,8 +127,7 @@ const setupExport = async ({
       folder: workDir,
       addOriginalPath: true,
       ignorePattern: ignoreFileContent,
-      customHashMaker: shaHashMaker,
-      catalystRootFolder: workDir
+      customHashMaker: shaHashMaker
     })
     if (contentStatic?.content) {
       for (const $ of contentStatic?.content) {
@@ -211,7 +209,7 @@ const copyWearables = async ({ exportDir }: { exportDir: string }) => {
     'wearables'
   )
   const baseAvatarUrl =
-    'https://peer-lb.decentraland.org/lambdas/collections/wearables?collectionId=urn:decentraland:off-chain:base-avatars'
+    'https://peer.decentraland.org/lambdas/collections/wearables?collectionId=urn:decentraland:off-chain:base-avatars'
 
   await ensureWriteFile(wearableResponsePath, '')
 
@@ -267,7 +265,7 @@ const copyWearables = async ({ exportDir }: { exportDir: string }) => {
 
 const copyContentStatus = async ({ exportDir }: { exportDir: string }) => {
   const exportContentStatusPath = path.resolve(exportDir, 'content', 'status')
-  const contentStatusUrl = 'https://peer-lb.decentraland.org/content/status'
+  const contentStatusUrl = 'https://peer.decentraland.org/content/status'
   await ensureWriteFile(
     exportContentStatusPath,
     '{"name":"","version":"v3","currentTime":1631814332458,"lastImmutableTime":0,"historySize":1173579,"synchronizationStatus":{"otherServers":[{"address":"https://peer-ec1.decentraland.org/content","connectionState":"Connected","lastDeploymentTimestamp":1631814242286},{"address":"https://interconnected.online/content","connectionState":"Connected","lastDeploymentTimestamp":1631814258357},{"address":"https://peer.uadevops.com/content","connectionState":"Connected","lastDeploymentTimestamp":1631814281355},{"address":"https://peer-eu1.decentraland.org/content","connectionState":"Connected","lastDeploymentTimestamp":1631814265837},{"address":"https://peer.decentral.games/content","connectionState":"Connected","lastDeploymentTimestamp":1631814282692},{"address":"https://peer.dclnodes.io/content","connectionState":"Connected","lastDeploymentTimestamp":1631814241548},{"address":"https://peer.kyllian.me/content","connectionState":"Connected","lastDeploymentTimestamp":1631814268853},{"address":"https://peer.melonwave.com/content","connectionState":"Connected","lastDeploymentTimestamp":1631814264357},{"address":"https://peer-wc1.decentraland.org/content","connectionState":"Connected","lastDeploymentTimestamp":1631814245952},{"address":"https://peer-ap1.decentraland.org/content","connectionState":"Connected","lastDeploymentTimestamp":1631814275187}],"lastSyncWithDAO":1631814298354,"synchronizationState":"Synced","lastSyncWithOtherServers":1631814290132},"commitHash":"5cbd6479c8df19e91559e79128c1457fc54d9478","catalystVersion":"2.1.0","ethNetwork":"mainnet"}'
