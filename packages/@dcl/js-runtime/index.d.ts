@@ -358,8 +358,10 @@ interface Response {
   json(): Promise<any>
   text(): Promise<string>
 }
-
-declare function fetch(url: string, init?: RequestInit): Promise<Response>
+interface FetchOpts {
+  timeout?: number
+}
+declare function fetch(url: string, init?: RequestInit, opts?: FetchOpts): Promise<Response>
 
 /// --- WebSocket ---
 
