@@ -319,9 +319,11 @@ declare type AvatarForRenderer = {
 declare class AvatarModifierArea extends ObservableComponent {
     area: Area;
     modifiers: AvatarModifiers[];
+    excludeIds?: string[];
     constructor(args: {
         area: Area;
         modifiers: AvatarModifiers[];
+        excludeIds?: string[];
     });
 }
 
