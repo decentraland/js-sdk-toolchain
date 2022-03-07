@@ -37,4 +37,9 @@ declare module '@decentraland/EnvironmentAPI' {
    * Returns what platform is running the scene
    */
   export function getPlatform(): Promise<Platform>
+
+  /**
+   * Returns Decentraland's time
+   */
+  export function getDecentralandTime(): Promise<{ seconds: number }>
 }
