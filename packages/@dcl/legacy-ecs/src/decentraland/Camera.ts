@@ -1,26 +1,58 @@
 import { Vector3, Quaternion } from '@dcl/ecs-math'
-
+import future from 'fp-future'
 import { CameraMode } from './Types'
+
+type CameraState = {
+  /** Camera position, relative to the parcel. */
+  position: { x: number; y: number; z: number }
+  /** Camera rotation */
+  rotation: { x: number; y: number; z: number; w: number }
+  /** Camera position, absolute. */
+  worldPosition: { x: number; y: number; z: number }
+  /** Player height. */
+  playerHeight: number
+  /** Camera Mode. */
+  cameraMode: CameraMode
+}
+
+let cameraInstance: Camera
+let cameraPromise: Promise<Camera>
+const cameraDefaultState: CameraState = {
+  position: new Vector3(),
+  rotation: new Quaternion(),
+  worldPosition: new Vector3(),
+  playerHeight: 1.16,
+  cameraMode: CameraMode.ThirdPerson
+}
 
 /**
  * @public
  */
 export class Camera {
-  // @internal
-  private static _instance: Camera
-
+  /** @deprecated Use Camera.getCamera() instead. */
   static get instance(): Camera {
-    if (!Camera._instance) {
-      Camera._instance = new Camera()
+    if (!cameraInstance) {
+      const cameraState: CameraState = { ...cameraDefaultState }
+      subscribeCameraState(cameraState).catch(() => {})
+      cameraInstance = new Camera(cameraState)
     }
-    return Camera._instance
+    return cameraInstance
+  }
+
+  static getCamera(): Promise<Camera> {
+    if (!cameraPromise) {
+      cameraPromise = createCamera().then((camera) => {
+        cameraInstance = camera
+        return Promise.resolve(cameraInstance)
+      })
+    }
+    return cameraPromise
   }
 
   /** Camera position, relative to the parcel. */
   public readonly position: Vector3 = new Vector3()
   /** Camera rotation */
   public readonly rotation: Quaternion = new Quaternion()
-
   /** Feet position, relative to the parcel.  */
   public readonly feetPosition: Vector3 = new Vector3()
   /** Camera position, absolute. */
@@ -28,115 +60,135 @@ export class Camera {
 
   /** Player height. */
   get playerHeight(): number {
-    return this._playerHeight
+    return this.state.playerHeight
   }
 
-  /** @deprecated Use onCameraModeChangedObservable Observable instead. */
+  /** Camera Mode. */
   get cameraMode(): CameraMode {
-    return this._cameraMode
+    return this.state.cameraMode
   }
 
   // @internal
-  private lastEventPosition: ReadOnlyVector3 = { x: 0, y: 0, z: 0 }
-  // @internal
-  private lastEventWorldPosition: ReadOnlyVector3 = { x: 0, y: 0, z: 0 }
+  private state: CameraState
 
   // @internal
-  private lastEventRotation: ReadOnlyQuaternion = { x: 0, y: 0, z: 0, w: 1.0 }
-
-  // @internal
-  private _playerHeight: number = 1.6
-  // @internal
-  private _cameraMode: CameraMode = CameraMode.ThirdPerson
-
-  constructor() {
-    if (typeof dcl !== 'undefined') {
-      dcl.subscribe('positionChanged')
-      dcl.subscribe('rotationChanged')
-      dcl.subscribe('cameraModeChanged')
-
-      dcl.onEvent((event) => {
-        switch (event.type) {
-          case 'positionChanged':
-            this.positionChanged(event.data as any)
-            break
-          case 'rotationChanged':
-            this.rotationChanged(event.data as any)
-            break
-          case 'cameraModeChanged':
-            this.cameraModeChanged(event.data as any)
-            break
-        }
-      })
-    }
+  constructor(cameraState: CameraState) {
+    this.state = cameraState
 
     Object.defineProperty(this.position, 'x', {
-      get: () => this.lastEventPosition.x
+      get: () => cameraState.position.x
     })
 
     Object.defineProperty(this.position, 'y', {
-      get: () => this.lastEventPosition.y
+      get: () => cameraState.position.y
     })
 
     Object.defineProperty(this.position, 'z', {
-      get: () => this.lastEventPosition.z
+      get: () => cameraState.position.z
     })
 
     Object.defineProperty(this.worldPosition, 'x', {
-      get: () => this.lastEventWorldPosition.x
+      get: () => cameraState.worldPosition.x
     })
 
     Object.defineProperty(this.worldPosition, 'y', {
-      get: () => this.lastEventWorldPosition.y
+      get: () => cameraState.worldPosition.y
     })
 
     Object.defineProperty(this.worldPosition, 'z', {
-      get: () => this.lastEventWorldPosition.z
+      get: () => cameraState.worldPosition.z
     })
 
     Object.defineProperty(this.feetPosition, 'x', {
-      get: () => this.lastEventPosition.x
+      get: () => cameraState.position.x
     })
 
     Object.defineProperty(this.feetPosition, 'y', {
-      get: () => this.lastEventPosition.y - this.playerHeight
+      get: () => cameraState.position.y - cameraState.playerHeight
     })
 
     Object.defineProperty(this.feetPosition, 'z', {
-      get: () => this.lastEventPosition.z
+      get: () => cameraState.position.z
     })
 
     Object.defineProperty(this.rotation, 'x', {
-      get: () => this.lastEventRotation.x
+      get: () => cameraState.rotation.x
     })
 
     Object.defineProperty(this.rotation, 'y', {
-      get: () => this.lastEventRotation.y
+      get: () => cameraState.rotation.y
     })
 
     Object.defineProperty(this.rotation, 'z', {
-      get: () => this.lastEventRotation.z
+      get: () => cameraState.rotation.z
     })
 
     Object.defineProperty(this.rotation, 'w', {
-      get: () => this.lastEventRotation.w
+      get: () => cameraState.rotation.w
     })
   }
+}
 
-  // @internal
-  private positionChanged(e: IEvents['positionChanged']) {
-    this.lastEventPosition = e.position
-    this.lastEventWorldPosition = e.cameraPosition
-    this._playerHeight = e.playerHeight
-  }
+// it returns a promise of a camera which will be resolved
+// when all the properties for the camera state are set
+function createCamera(): Promise<Camera> {
+  const cameraState: CameraState = { ...cameraDefaultState }
+  return subscribeCameraState(cameraState).then(() => {
+    return new Camera(cameraState)
+  })
+}
 
-  // @internal
-  private rotationChanged(e: IEvents['rotationChanged']) {
-    this.lastEventRotation = e.quaternion
-  }
+// subscribes and update a camera state to the events for properties changes
+// it returns a promise that will be resolved when every property is set
+function subscribeCameraState(cameraState: CameraState): Promise<void> {
+  const positionSet = future()
+  const rotationSet = future()
+  const cameraModeSet = future()
 
-  // @internal
-  private cameraModeChanged(e: IEvents['cameraModeChanged']) {
-    this._cameraMode = e.cameraMode
+  subscribeEvents({
+    positionChanged: (ev) => {
+      cameraState.position = ev.position
+      cameraState.worldPosition = ev.cameraPosition
+      cameraState.playerHeight = ev.playerHeight
+      positionSet.resolve(true)
+    },
+    rotationChanged: (ev) => {
+      cameraState.rotation = ev.quaternion
+      rotationSet.resolve(true)
+    },
+    cameraModeChanged: (ev) => {
+      cameraState.cameraMode = ev.cameraMode
+      cameraModeSet.resolve(true)
+    }
+  })
+
+  return Promise.all([positionSet, rotationSet, cameraModeSet]).then(() =>
+    Promise.resolve()
+  )
+}
+
+function subscribeEvents(opts: {
+  positionChanged: (ev: IEvents['positionChanged']) => void
+  rotationChanged: (ev: IEvents['rotationChanged']) => void
+  cameraModeChanged: (ev: IEvents['cameraModeChanged']) => void
+}) {
+  if (typeof dcl !== 'undefined') {
+    dcl.subscribe('positionChanged')
+    dcl.subscribe('rotationChanged')
+    dcl.subscribe('cameraModeChanged')
+
+    dcl.onEvent((event) => {
+      switch (event.type) {
+        case 'positionChanged':
+          opts.positionChanged(event.data as IEvents['positionChanged'])
+          break
+        case 'rotationChanged':
+          opts.rotationChanged(event.data as IEvents['rotationChanged'])
+          break
+        case 'cameraModeChanged':
+          opts.cameraModeChanged(event.data as IEvents['cameraModeChanged'])
+          break
+      }
+    })
   }
 }

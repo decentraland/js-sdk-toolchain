@@ -473,7 +473,9 @@ declare class BoxShape extends Shape {
  * @public
  */
 declare class Camera {
+    /** @deprecated Use Camera.getCamera() instead. */
     static get instance(): Camera;
+    static getCamera(): Promise<Camera>;
     /** Camera position, relative to the parcel. */
     readonly position: Vector3;
     /** Camera rotation */
@@ -484,9 +486,8 @@ declare class Camera {
     readonly worldPosition: Vector3;
     /** Player height. */
     get playerHeight(): number;
-    /** @deprecated Use onCameraModeChangedObservable Observable instead. */
+    /** Camera Mode. */
     get cameraMode(): CameraMode;
-    constructor();
 }
 
 /** @public */

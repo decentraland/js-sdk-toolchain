@@ -4260,23 +4260,9 @@
           "name": "Camera",
           "members": [
             {
-              "kind": "Constructor",
-              "canonicalReference": "@dcl/legacy-ecs!Camera:constructor(1)",
-              "docComment": "/**\n * Constructs a new instance of the `Camera` class\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "constructor();"
-                }
-              ],
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": []
-            },
-            {
               "kind": "Property",
               "canonicalReference": "@dcl/legacy-ecs!Camera#cameraMode:member",
-              "docComment": "/**\n * @deprecated\n *\n * Use onCameraModeChangedObservable Observable instead.\n */\n",
+              "docComment": "/**\n * Camera Mode.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -4330,9 +4316,52 @@
               "isStatic": false
             },
             {
+              "kind": "Method",
+              "canonicalReference": "@dcl/legacy-ecs!Camera.getCamera:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "static getCamera(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Camera",
+                  "canonicalReference": "@dcl/legacy-ecs!Camera:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "isStatic": true,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [],
+              "name": "getCamera"
+            },
+            {
               "kind": "Property",
               "canonicalReference": "@dcl/legacy-ecs!Camera.instance:member",
-              "docComment": "",
+              "docComment": "/**\n * @deprecated\n *\n * Use Camera.getCamera() instead.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
