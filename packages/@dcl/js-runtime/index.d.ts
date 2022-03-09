@@ -338,6 +338,9 @@ interface RequestInit {
   headers?: { [index: string]: string }
   method?: string
   redirect?: RequestRedirect
+
+  // custom DCL property
+  timeout?: number
 }
 
 interface ReadOnlyHeaders {
@@ -358,10 +361,8 @@ interface Response {
   json(): Promise<any>
   text(): Promise<string>
 }
-interface FetchOpts {
-  timeout?: number
-}
-declare function fetch(url: string, init?: RequestInit, opts?: FetchOpts): Promise<Response>
+
+declare function fetch(url: string, init?: RequestInit): Promise<Response>
 
 /// --- WebSocket ---
 
