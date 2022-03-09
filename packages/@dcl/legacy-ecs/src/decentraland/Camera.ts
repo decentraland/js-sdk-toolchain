@@ -35,6 +35,9 @@ export class Camera {
       const cameraState: CameraState = { ...cameraDefaultState }
       subscribeCameraState(cameraState).catch(() => {})
       cameraInstance = new Camera(cameraState)
+      if (!cameraPromise) {
+        cameraPromise = Promise.resolve(cameraInstance)
+      }
     }
     return cameraInstance
   }
@@ -42,7 +45,9 @@ export class Camera {
   static getCamera(): Promise<Camera> {
     if (!cameraPromise) {
       cameraPromise = createCamera().then((camera) => {
-        cameraInstance = camera
+        if (!cameraInstance) {
+          cameraInstance = camera
+        }
         return Promise.resolve(cameraInstance)
       })
     }
