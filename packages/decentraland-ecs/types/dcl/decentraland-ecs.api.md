@@ -2174,7 +2174,7 @@ export class UIContainerStack extends UIShape {
 
 // @public (undocumented)
 export class UIImage extends UIShape {
-    constructor(parent: UIShape, source: Texture);
+    constructor(parent: UIShape, source: Texture | AvatarTexture);
     // (undocumented)
     onClick: OnClick | null;
     // (undocumented)
@@ -2188,7 +2188,7 @@ export class UIImage extends UIShape {
     // (undocumented)
     sizeInPixels: boolean;
     // (undocumented)
-    source?: Texture;
+    source?: Texture | AvatarTexture;
     // (undocumented)
     sourceHeight: number;
     // (undocumented)
