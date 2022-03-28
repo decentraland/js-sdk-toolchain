@@ -1,11 +1,16 @@
 import { Color4 } from '@dcl/ecs-math'
-
 import {
   ObservableComponent,
   DisposableComponent,
   getComponentId
 } from '../ecs/Component'
-import { CLASS_ID, OnUUIDEvent, Texture, Font } from './Components'
+import {
+  CLASS_ID,
+  OnUUIDEvent,
+  Texture,
+  AvatarTexture,
+  Font
+} from './Components'
 import { OnTextSubmit, OnBlur, OnChanged, OnClick, OnFocus } from './UIEvents'
 /**
  * @public
@@ -386,7 +391,7 @@ export class UIImage extends UIShape {
   sourceHeight: number = 1
 
   @ObservableComponent.component
-  source?: Texture
+  source?: Texture | AvatarTexture
 
   @ObservableComponent.field
   paddingTop: number = 0
@@ -406,7 +411,7 @@ export class UIImage extends UIShape {
   @OnUUIDEvent.uuidEvent
   onClick: OnClick | null = null
 
-  constructor(parent: UIShape, source: Texture) {
+  constructor(parent: UIShape, source: Texture | AvatarTexture) {
     super(parent)
     this.source = source
   }

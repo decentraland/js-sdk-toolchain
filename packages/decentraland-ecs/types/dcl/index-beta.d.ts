@@ -4755,14 +4755,14 @@ export declare class UIImage extends UIShape {
     sourceTop: number;
     sourceWidth: number;
     sourceHeight: number;
-    source?: Texture;
+    source?: Texture | AvatarTexture;
     paddingTop: number;
     paddingRight: number;
     paddingBottom: number;
     paddingLeft: number;
     sizeInPixels: boolean;
     onClick: OnClick | null;
-    constructor(parent: UIShape, source: Texture);
+    constructor(parent: UIShape, source: Texture | AvatarTexture);
 }
 
 /**

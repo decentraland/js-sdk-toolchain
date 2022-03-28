@@ -44518,6 +44518,15 @@
                 },
                 {
                   "kind": "Content",
+                  "text": " | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AvatarTexture",
+                  "canonicalReference": "@dcl/legacy-ecs!AvatarTexture:class"
+                },
+                {
+                  "kind": "Content",
                   "text": ");"
                 }
               ],
@@ -44535,7 +44544,7 @@
                   "parameterName": "source",
                   "parameterTypeTokenRange": {
                     "startIndex": 3,
-                    "endIndex": 4
+                    "endIndex": 6
                   }
                 }
               ]
@@ -44723,6 +44732,15 @@
                 },
                 {
                   "kind": "Content",
+                  "text": " | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AvatarTexture",
+                  "canonicalReference": "@dcl/legacy-ecs!AvatarTexture:class"
+                },
+                {
+                  "kind": "Content",
                   "text": ";"
                 }
               ],
@@ -44731,7 +44749,7 @@
               "name": "source",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 4
               },
               "isStatic": false
             },
