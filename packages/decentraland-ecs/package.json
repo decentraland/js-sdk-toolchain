@@ -31,7 +31,7 @@
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
     "@dcl/kernel": "^1.0.0-1959721167.commit-e8e7260",
     "@dcl/posix": "^1.0.4",
-    "@dcl/schemas": "^3.8.0",
+    "@dcl/schemas": "^4.1.0",
     "@dcl/unity-renderer": "^1.0.31824-20220330201254.commit-c617627",
     "glob": "^7.1.7",
     "http-proxy-middleware": "^2.0.3",
