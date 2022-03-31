@@ -16,7 +16,7 @@
     "dist"
   ],
   "dependencies": {
-    "@dcl/ecs-math": "^1.0.1-20211130194043.commit-c994f71",
+    "@dcl/ecs-math": "^2.0.0",
     "@dcl/posix": "^1.0.4"
   }
 }
