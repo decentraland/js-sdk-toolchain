@@ -32,7 +32,7 @@
     "@dcl/kernel": "^1.0.0-1959721167.commit-e8e7260",
     "@dcl/posix": "^1.0.4",
     "@dcl/schemas": "^3.8.0",
-    "@dcl/unity-renderer": "^1.0.28548-20220301152044.commit-c70047e",
+    "@dcl/unity-renderer": "^1.0.31824-20220330201254.commit-c617627",
     "glob": "^7.1.7",
     "http-proxy-middleware": "^2.0.3",
     "ignore": "^5.1.8"
