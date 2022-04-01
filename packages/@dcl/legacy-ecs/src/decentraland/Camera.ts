@@ -21,7 +21,7 @@ const cameraDefaultState: CameraState = {
   position: new Vector3(),
   rotation: new Quaternion(),
   worldPosition: new Vector3(),
-  playerHeight: 1.16,
+  playerHeight: 1.6,
   cameraMode: CameraMode.ThirdPerson
 }
 
@@ -155,15 +155,15 @@ function subscribeCameraState(cameraState: CameraState): Promise<void> {
       cameraState.position = ev.position
       cameraState.worldPosition = ev.cameraPosition
       cameraState.playerHeight = ev.playerHeight
-      positionSet.resolve(true)
+      if (positionSet.isPending) positionSet.resolve(true)
     },
     rotationChanged: (ev) => {
       cameraState.rotation = ev.quaternion
-      rotationSet.resolve(true)
+      if (rotationSet.isPending) rotationSet.resolve(true)
     },
     cameraModeChanged: (ev) => {
       cameraState.cameraMode = ev.cameraMode
-      cameraModeSet.resolve(true)
+      if (cameraModeSet.isPending) cameraModeSet.resolve(true)
     }
   })
 
