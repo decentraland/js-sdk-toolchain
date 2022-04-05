@@ -29,13 +29,13 @@
   "dependencies": {
     "@dcl/amd": "file:../@dcl/amd",
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
-    "@dcl/kernel": "^1.0.0-1959721167.commit-e8e7260",
+    "@dcl/kernel": "^1.0.0-2098105974.commit-9253e83",
     "@dcl/posix": "^1.0.4",
-    "@dcl/schemas": "^4.1.0",
-    "@dcl/unity-renderer": "^1.0.31824-20220330201254.commit-c617627",
+    "@dcl/schemas": "^4.2.0",
+    "@dcl/unity-renderer": "^1.0.32047-20220404204241.commit-82bb156",
     "glob": "^7.1.7",
     "http-proxy-middleware": "^2.0.3",
     "ignore": "^5.1.8"
   },
-  "minCliVersion": "3.9.0"
+  "minCliVersion": "3.10.0"
 }
