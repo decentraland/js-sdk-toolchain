@@ -72,7 +72,7 @@ export type ProfileForRenderer = {
   email: string
   avatar: AvatarForRenderer
   snapshots: {
-    face: string
+    face256: string
     body: string
   }
   version: number
