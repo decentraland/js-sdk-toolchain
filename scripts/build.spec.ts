@@ -72,7 +72,7 @@ flow('build-all', () => {
     itExecutes(`npm install --quiet ${BUILD_ECS_PATH}`, ECS_PATH)
     itExecutes(`npm install --quiet ${DECENTRALAND_AMD_PATH}`, ECS_PATH)
 
-    itExecutes(`${TSC} src/setupProxy.ts src/setupExport.ts`, ECS_PATH)
+    itExecutes(`${TSC} src/setupProxy.ts`, ECS_PATH)
     copyLegacyEcs()
     fixTypes()
   })
