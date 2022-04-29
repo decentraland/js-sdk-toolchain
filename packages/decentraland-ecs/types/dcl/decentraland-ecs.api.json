@@ -35329,7 +35329,7 @@
             },
             {
               "kind": "Content",
-              "text": ";\n    snapshots: {\n        face: string;\n        body: string;\n    };\n    version: number;\n    hasConnectedWeb3: boolean;\n    updatedAt?: number;\n    createdAt?: number;\n    parcelsWithAccess?: "
+              "text": ";\n    snapshots: {\n        face256: string;\n        body: string;\n    };\n    version: number;\n    hasConnectedWeb3: boolean;\n    updatedAt?: number;\n    createdAt?: number;\n    parcelsWithAccess?: "
             },
             {
               "kind": "Reference",
