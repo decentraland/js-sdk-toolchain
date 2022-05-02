@@ -14,7 +14,7 @@
     "removeComments": false,
     "inlineSources": true,
     "useDefineForClassFields": false,
-    "noLib": true,
+    "lib": ["ES2020"],
     "allowJs": true,
     "types": [
       "env",

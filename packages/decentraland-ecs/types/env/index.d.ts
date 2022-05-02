@@ -1,4 +1,6 @@
 /// <reference path="./es5.d.ts" />
+/// <reference path="./symbol.es2015.d.ts" />
+/// <reference path="./iterable.es2015.d.ts" />
 
 interface PromiseConstructor {
   /**
