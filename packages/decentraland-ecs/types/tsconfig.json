@@ -24,6 +24,7 @@
       "@decentraland/Identity",
       "@decentraland/web3-provider",
       "@decentraland/EnvironmentAPI",
+      "@decentraland/ExperimentalAPI",
       "@decentraland/ParcelIdentity",
       "@decentraland/PortableExperiences",
       "@decentraland/RestrictedActions",
