@@ -100,19 +100,19 @@ export function entityV3FromFolder({
   const sceneJsonPath = path.resolve(folder, './scene.json')
   let isParcelScene = true
 
-  const assetJsonPath = path.resolve(folder, './asset.json')
-  if (fs.existsSync(assetJsonPath)) {
+  const wearableJsonPath = path.resolve(folder, './wearable.json')
+  if (fs.existsSync(wearableJsonPath)) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const assetJson = require(assetJsonPath)
+      const wearableJson = require(wearableJsonPath)
       if (
-        sdk.AssetJson.validate(assetJson) &&
-        assetJson.assetType === sdk.ProjectType.PORTABLE_EXPERIENCE
+        sdk.AssetJson.validate(wearableJson) &&
+        wearableJson.assetType === sdk.ProjectType.PORTABLE_EXPERIENCE
       ) {
         isParcelScene = false
       }
     } catch (err) {
-      console.error(`Unable to load asset.json properly`, err)
+      console.error(`Unable to load wearable.json properly`, err)
     }
   }
 

@@ -6,26 +6,26 @@ import * as express from 'express'
 import { sdk } from '@dcl/schemas'
 
 const serveWearable = ({
-  assetJsonPath,
+  wearableJsonPath,
   baseUrl
 }: {
-  assetJsonPath: string
+  wearableJsonPath: string
   baseUrl: string
 }) => {
-  const wearableDir = path.dirname(assetJsonPath)
+  const wearableDir = path.dirname(wearableJsonPath)
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const assetJson = require(assetJsonPath)
+  const wearableJson = require(wearableJsonPath)
 
-  if (!sdk.AssetJson.validate(assetJson)) {
+  if (!sdk.AssetJson.validate(wearableJson)) {
     const errors = (sdk.AssetJson.validate.errors || [])
       .map((a) => `${a.dataPath} ${a.message}`)
       .join('')
 
     console.error(
-      `Unable to validate asset.json properly, please check it.`,
+      `Unable to validate wearable.json properly, please check it.`,
       errors
     )
-    throw new Error(`Invalid asset.json (${assetJsonPath})`)
+    throw new Error(`Invalid wearable.json (${wearableJson})`)
   }
 
   const dclIgnorePath = path.resolve(wearableDir, '.dclignore')
@@ -44,7 +44,7 @@ const serveWearable = ({
   })
 
   const thumbnailFiltered = hashedFiles.filter(
-    ($) => $?.file === assetJson.thumbnail
+    ($) => $?.file === wearableJson.thumbnail
   )
   const thumbnail =
     thumbnailFiltered.length > 0 &&
@@ -52,15 +52,15 @@ const serveWearable = ({
     `${baseUrl}/${thumbnailFiltered[0].hash}`
 
   return {
-    id: assetJson.id || '00000000-0000-0000-0000-000000000000',
-    rarity: assetJson.rarity,
-    i18n: [{ code: 'en', text: assetJson.name }],
-    description: assetJson.description,
+    id: wearableJson.id || '00000000-0000-0000-0000-000000000000',
+    rarity: wearableJson.rarity,
+    i18n: [{ code: 'en', text: wearableJson.name }],
+    description: wearableJson.description,
     thumbnail,
     baseUrl,
-    name: assetJson.name || '',
+    name: wearableJson.name || '',
     data: {
-      category: assetJson.category,
+      category: wearableJson.category,
       replaces: [],
       hides: [],
       tags: [],
@@ -68,7 +68,7 @@ const serveWearable = ({
       representations: [
         {
           bodyShapes: ['urn:decentraland:off-chain:base-avatars:BaseMale'],
-          mainFile: `male/${assetJson.model}`,
+          mainFile: `male/${wearableJson.model}`,
           contents: hashedFiles.map(($) => ({
             key: `male/${$?.file}`,
             url: `${baseUrl}/${$?.hash}`
@@ -78,7 +78,7 @@ const serveWearable = ({
         },
         {
           bodyShapes: ['urn:decentraland:off-chain:base-avatars:BaseFemale'],
-          mainFile: `female/${assetJson.model}`,
+          mainFile: `female/${wearableJson.model}`,
           contents: hashedFiles.map(($) => ({
             key: `female/${$?.file}`,
             url: `${baseUrl}/${$?.hash}`
@@ -98,21 +98,21 @@ export const getAllPreviewWearables = ({
   baseFolders: string[]
   baseUrl: string
 }) => {
-  const assetPathArray: string[] = []
+  const wearablePathArray: string[] = []
   for (const wearableDir of baseFolders) {
-    const assetJsonPath = path.resolve(wearableDir, 'asset.json')
-    if (fs.existsSync(assetJsonPath)) {
-      assetPathArray.push(assetJsonPath)
+    const wearableJsonPath = path.resolve(wearableDir, 'wearable.json')
+    if (fs.existsSync(wearableJsonPath)) {
+      wearablePathArray.push(wearableJsonPath)
     }
   }
 
   const ret = []
-  for (const assetJsonPath of assetPathArray) {
+  for (const wearableJsonPath of wearablePathArray) {
     try {
-      ret.push(serveWearable({ assetJsonPath, baseUrl }))
+      ret.push(serveWearable({ wearableJsonPath, baseUrl }))
     } catch (err) {
       console.error(
-        `Couldn't mock the asset ${assetJsonPath}. Please verify the correct format and scheme.`,
+        `Couldn't mock the wearable ${wearableJsonPath}. Please verify the correct format and scheme.`,
         err
       )
     }
