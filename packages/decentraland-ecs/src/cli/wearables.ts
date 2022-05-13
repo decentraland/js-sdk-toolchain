@@ -3,7 +3,10 @@ import * as fs from 'fs'
 import { getFilesFromFolder } from './setupUtils'
 import * as express from 'express'
 
-import { sdk } from '@dcl/schemas'
+import { generateValidator, Wearable } from '@dcl/schemas'
+import { readJsonSync } from 'fs-extra'
+
+const wearableValidator = generateValidator(Wearable.schema)
 
 const serveWearable = ({
   wearableJsonPath,
@@ -13,19 +16,24 @@ const serveWearable = ({
   baseUrl: string
 }) => {
   const wearableDir = path.dirname(wearableJsonPath)
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const wearableJson = require(wearableJsonPath)
+  const wearableJson = readJsonSync(wearableJsonPath)
 
-  if (!sdk.AssetJson.validate(wearableJson)) {
-    const errors = (sdk.AssetJson.validate.errors || [])
+  if (!wearableValidator(wearableJson)) {
+    const errors = (wearableValidator.errors || [])
       .map((a) => `${a.dataPath} ${a.message}`)
       .join('')
 
-    console.error(
-      `Unable to validate wearable.json properly, please check it.`,
-      errors
-    )
+    if (errors.length > 0) {
+      console.error(
+        `Unable to validate '${wearableJsonPath}' properly, please check it: ${errors}`
+      )
+    } else {
+      console.error(
+        `Unable to validate '${wearableJsonPath}' properly, please check it.`
+      )
+    }
     throw new Error(`Invalid wearable.json (${wearableJson})`)
+  } else {
   }
 
   const dclIgnorePath = path.resolve(wearableDir, '.dclignore')
@@ -52,20 +60,13 @@ const serveWearable = ({
     `${baseUrl}/${thumbnailFiltered[0].hash}`
 
   return {
-    id: wearableJson.id || '00000000-0000-0000-0000-000000000000',
-    rarity: wearableJson.rarity,
-    i18n: [{ code: 'en', text: wearableJson.name }],
-    description: wearableJson.description,
-    thumbnail,
-    baseUrl,
-    name: wearableJson.name || '',
+    ...wearableJson,
     data: {
-      category: wearableJson.category,
-      replaces: [],
-      hides: [],
-      tags: [],
+      ...wearableJson.data,
       scene: hashedFiles,
-      representations: [
+      representations: 
+      
+      [
         {
           bodyShapes: ['urn:decentraland:off-chain:base-avatars:BaseMale'],
           mainFile: `male/${wearableJson.model}`,
