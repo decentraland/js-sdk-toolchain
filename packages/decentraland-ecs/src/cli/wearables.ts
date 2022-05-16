@@ -3,7 +3,11 @@ import * as fs from 'fs'
 import { getFilesFromFolder } from './setupUtils'
 import * as express from 'express'
 
-import { generateValidator, Wearable } from '@dcl/schemas'
+import {
+  generateValidator,
+  Wearable,
+  WearableRepresentation
+} from '@dcl/schemas'
 import { readJsonSync } from 'fs-extra'
 
 const wearableValidator = generateValidator(Wearable.schema)
@@ -51,45 +55,27 @@ const serveWearable = ({
     ignorePattern: ignoreFileContent
   })
 
-  const thumbnailFiltered = hashedFiles.filter(
-    ($) => $?.file === wearableJson.thumbnail
-  )
-  const thumbnail =
-    thumbnailFiltered.length > 0 &&
-    thumbnailFiltered[0]?.hash &&
-    `${baseUrl}/${thumbnailFiltered[0].hash}`
-
-  return {
+  const wearableJsonWithContents = {
     ...wearableJson,
+    baseUrl,
     data: {
       ...wearableJson.data,
       scene: hashedFiles,
-      representations: 
-      
-      [
-        {
-          bodyShapes: ['urn:decentraland:off-chain:base-avatars:BaseMale'],
-          mainFile: `male/${wearableJson.model}`,
-          contents: hashedFiles.map(($) => ({
-            key: `male/${$?.file}`,
-            url: `${baseUrl}/${$?.hash}`
-          })),
-          overrideHides: [],
-          overrideReplaces: []
-        },
-        {
-          bodyShapes: ['urn:decentraland:off-chain:base-avatars:BaseFemale'],
-          mainFile: `female/${wearableJson.model}`,
-          contents: hashedFiles.map(($) => ({
-            key: `female/${$?.file}`,
-            url: `${baseUrl}/${$?.hash}`
-          })),
-          overrideHides: [],
-          overrideReplaces: []
-        }
-      ]
+      representations: wearableJson.data.representations.map(
+        (representation) => ({
+          ...representation,
+          contents: hashedFiles.map((file) => ({
+            key: `female/${file?.file}`,
+            url: `${baseUrl}/${file?.hash}`
+          }))
+        })
+      )
     }
   }
+
+  console.log(JSON.stringify({ wearableJsonWithContents }, null, 2))
+
+  return wearableJsonWithContents
 }
 
 export const getAllPreviewWearables = ({
