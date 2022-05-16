@@ -19,6 +19,7 @@ const serveWearable = ({
   wearableJsonPath: string
   baseUrl: string
 }) => {
+  debugger
   const wearableDir = path.dirname(wearableJsonPath)
   const wearableJson = readJsonSync(wearableJsonPath)
 
@@ -55,11 +56,21 @@ const serveWearable = ({
     ignorePattern: ignoreFileContent
   })
 
+  const thumbnailFiltered = hashedFiles.filter(
+    ($) => $?.file === wearableJson.thumbnail
+  )
+  const thumbnail =
+    thumbnailFiltered.length > 0 &&
+    thumbnailFiltered[0]?.hash &&
+    `${baseUrl}/${thumbnailFiltered[0].hash}`
+
   const wearableJsonWithContents = {
     ...wearableJson,
     baseUrl,
+    thumbnail,
     data: {
       ...wearableJson.data,
+      thumbnail,
       scene: hashedFiles,
       baseUrl,
       representations: wearableJson.data.representations.map(
@@ -112,6 +123,7 @@ export const mockPreviewWearables = (
 ) => {
   app.use('/preview-wearables/:id', async (req, res) => {
     const baseUrl = `${req.protocol}://${req.get('host')}/content/contents`
+    console.log(JSON.stringify({ baseUrl }, null, 2))
     const wearables = getAllPreviewWearables({
       baseUrl,
       baseFolders
@@ -125,6 +137,7 @@ export const mockPreviewWearables = (
 
   app.use('/preview-wearables', async (req, res) => {
     const baseUrl = `${req.protocol}://${req.get('host')}/content/contents`
+    console.log(JSON.stringify({ baseUrl }, null, 2))
     return res.json({
       ok: true,
       data: getAllPreviewWearables({ baseUrl, baseFolders })
