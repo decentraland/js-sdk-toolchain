@@ -3,14 +3,10 @@ import * as fs from 'fs'
 import { getFilesFromFolder } from './setupUtils'
 import * as express from 'express'
 
-import {
-  generateValidator,
-  Wearable,
-  WearableRepresentation
-} from '@dcl/schemas'
+import { generateValidator, Wearable } from '@dcl/schemas'
 import { readJsonSync } from 'fs-extra'
 
-const wearableValidator = generateValidator(Wearable.schema)
+export const wearableValidator = generateValidator(Wearable.schema)
 
 const serveWearable = ({
   wearableJsonPath,
@@ -19,7 +15,6 @@ const serveWearable = ({
   wearableJsonPath: string
   baseUrl: string
 }) => {
-  debugger
   const wearableDir = path.dirname(wearableJsonPath)
   const wearableJson = readJsonSync(wearableJsonPath)
 
@@ -77,7 +72,7 @@ const serveWearable = ({
         (representation) => ({
           ...representation,
           contents: hashedFiles.map((file) => ({
-            key: `female/${file?.file}`,
+            key: `${file?.file}`,
             url: `${baseUrl}/${file?.hash}`
           }))
         })
@@ -123,7 +118,6 @@ export const mockPreviewWearables = (
 ) => {
   app.use('/preview-wearables/:id', async (req, res) => {
     const baseUrl = `${req.protocol}://${req.get('host')}/content/contents`
-    console.log(JSON.stringify({ baseUrl }, null, 2))
     const wearables = getAllPreviewWearables({
       baseUrl,
       baseFolders
@@ -137,7 +131,6 @@ export const mockPreviewWearables = (
 
   app.use('/preview-wearables', async (req, res) => {
     const baseUrl = `${req.protocol}://${req.get('host')}/content/contents`
-    console.log(JSON.stringify({ baseUrl }, null, 2))
     return res.json({
       ok: true,
       data: getAllPreviewWearables({ baseUrl, baseFolders })
