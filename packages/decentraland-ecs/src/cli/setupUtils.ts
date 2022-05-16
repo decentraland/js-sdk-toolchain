@@ -6,7 +6,6 @@ import * as https from 'https'
 import * as crypto from 'crypto'
 import ignore from 'ignore'
 import * as express from 'express'
-import { sdk } from '@dcl/schemas'
 import { readJsonSync } from 'fs-extra'
 import { wearableValidator } from './wearables'
 
@@ -101,8 +100,9 @@ export function entityV3FromFolder({
 }) {
   const sceneJsonPath = path.resolve(folder, './scene.json')
   const wearableJsonPath = path.resolve(folder, './wearable.json')
-  const wearableJson = readJsonSync(wearableJsonPath)
-  const isParcelScene = !wearableValidator(wearableJson)
+  const wearableJson =
+    fs.existsSync(wearableJsonPath) && readJsonSync(wearableJsonPath)
+  const isParcelScene = !wearableJson || !wearableValidator(wearableJson)
 
   const hashMaker = customHashMaker ? customHashMaker : defaultHashMaker
 
