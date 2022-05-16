@@ -6,7 +6,6 @@ import * as https from 'https'
 import * as crypto from 'crypto'
 import ignore from 'ignore'
 import * as express from 'express'
-import { readJsonSync } from 'fs-extra'
 import { wearableValidator } from './wearables'
 
 // instead of using fs-extra, create a custom function to no need to rollup
@@ -101,7 +100,8 @@ export function entityV3FromFolder({
   const sceneJsonPath = path.resolve(folder, './scene.json')
   const wearableJsonPath = path.resolve(folder, './wearable.json')
   const wearableJson =
-    fs.existsSync(wearableJsonPath) && readJsonSync(wearableJsonPath)
+    fs.existsSync(wearableJsonPath) &&
+    JSON.parse(fs.readFileSync(wearableJsonPath).toString())
   const isParcelScene = !wearableJson || !wearableValidator(wearableJson)
 
   const hashMaker = customHashMaker ? customHashMaker : defaultHashMaker

@@ -4,7 +4,6 @@ import { getFilesFromFolder } from './setupUtils'
 import * as express from 'express'
 
 import { generateValidator, Wearable } from '@dcl/schemas'
-import { readJsonSync } from 'fs-extra'
 
 export const wearableValidator = generateValidator(Wearable.schema)
 
@@ -16,7 +15,7 @@ const serveWearable = ({
   baseUrl: string
 }) => {
   const wearableDir = path.dirname(wearableJsonPath)
-  const wearableJson = readJsonSync(wearableJsonPath)
+  const wearableJson = JSON.parse(fs.readFileSync(wearableJsonPath).toString())
 
   if (!wearableValidator(wearableJson)) {
     const errors = (wearableValidator.errors || [])
