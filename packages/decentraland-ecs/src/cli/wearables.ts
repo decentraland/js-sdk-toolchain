@@ -61,6 +61,7 @@ const serveWearable = ({
     data: {
       ...wearableJson.data,
       scene: hashedFiles,
+      baseUrl,
       representations: wearableJson.data.representations.map(
         (representation) => ({
           ...representation,
@@ -72,8 +73,6 @@ const serveWearable = ({
       )
     }
   }
-
-  console.log(JSON.stringify({ wearableJsonWithContents }, null, 2))
 
   return wearableJsonWithContents
 }
