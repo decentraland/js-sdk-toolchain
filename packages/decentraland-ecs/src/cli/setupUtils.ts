@@ -6,7 +6,7 @@ import * as https from 'https'
 import * as crypto from 'crypto'
 import ignore from 'ignore'
 import * as express from 'express'
-import { sdk } from '@dcl/schemas'
+import { wearableValidator } from './wearables'
 
 // instead of using fs-extra, create a custom function to no need to rollup
 export async function copyDir(src: string, dest: string) {
@@ -98,23 +98,11 @@ export function entityV3FromFolder({
   customHashMaker?: (str: string) => string
 }) {
   const sceneJsonPath = path.resolve(folder, './scene.json')
-  let isParcelScene = true
-
-  const assetJsonPath = path.resolve(folder, './asset.json')
-  if (fs.existsSync(assetJsonPath)) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const assetJson = require(assetJsonPath)
-      if (
-        sdk.AssetJson.validate(assetJson) &&
-        assetJson.assetType === sdk.ProjectType.PORTABLE_EXPERIENCE
-      ) {
-        isParcelScene = false
-      }
-    } catch (err) {
-      console.error(`Unable to load asset.json properly`, err)
-    }
-  }
+  const wearableJsonPath = path.resolve(folder, './wearable.json')
+  const wearableJson =
+    fs.existsSync(wearableJsonPath) &&
+    JSON.parse(fs.readFileSync(wearableJsonPath).toString())
+  const isParcelScene = !wearableJson || !wearableValidator(wearableJson)
 
   const hashMaker = customHashMaker ? customHashMaker : defaultHashMaker
 

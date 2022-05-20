@@ -56,7 +56,11 @@ const setupProxy = (dcl: any, app: express.Application) => {
         (acc: { wearables: string[]; scenes: string[] }, project: any) => {
           const projectType = project.getInfo().sceneType
           const projectDir = project.getProjectWorkingDir()
-          if (projectType === sdk.ProjectType.SCENE) acc.scenes.push(projectDir)
+          if (
+            projectType === sdk.ProjectType.SCENE ||
+            projectType === sdk.ProjectType.SMART_ITEM
+          )
+            acc.scenes.push(projectDir)
           if (projectType === sdk.ProjectType.PORTABLE_EXPERIENCE)
             acc.wearables.push(projectDir)
           return acc

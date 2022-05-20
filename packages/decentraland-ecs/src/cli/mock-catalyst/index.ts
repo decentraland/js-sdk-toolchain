@@ -33,10 +33,11 @@ export const mockCatalyst = (
   })
 
   app.get('/lambdas/profiles', async (req, res, next) => {
+    const baseUrl = `${req.protocol}://${req.get('host')}/content/contents`
     try {
       const previewWearables = await getAllPreviewWearables({
         baseFolders,
-        baseUrl: ''
+        baseUrl
       }).map((wearable) => wearable.id)
 
       if (previewWearables.length === 1) {

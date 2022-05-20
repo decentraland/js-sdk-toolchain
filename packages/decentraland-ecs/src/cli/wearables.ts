@@ -3,29 +3,36 @@ import * as fs from 'fs'
 import { getFilesFromFolder } from './setupUtils'
 import * as express from 'express'
 
-import { sdk } from '@dcl/schemas'
+import { generateValidator, Wearable } from '@dcl/schemas'
+
+export const wearableValidator = generateValidator(Wearable.schema)
 
 const serveWearable = ({
-  assetJsonPath,
+  wearableJsonPath,
   baseUrl
 }: {
-  assetJsonPath: string
+  wearableJsonPath: string
   baseUrl: string
 }) => {
-  const wearableDir = path.dirname(assetJsonPath)
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const assetJson = require(assetJsonPath)
+  const wearableDir = path.dirname(wearableJsonPath)
+  const wearableJson = JSON.parse(fs.readFileSync(wearableJsonPath).toString())
 
-  if (!sdk.AssetJson.validate(assetJson)) {
-    const errors = (sdk.AssetJson.validate.errors || [])
+  if (!wearableValidator(wearableJson)) {
+    const errors = (wearableValidator.errors || [])
       .map((a) => `${a.dataPath} ${a.message}`)
       .join('')
 
-    console.error(
-      `Unable to validate asset.json properly, please check it.`,
-      errors
-    )
-    throw new Error(`Invalid asset.json (${assetJsonPath})`)
+    if (errors.length > 0) {
+      console.error(
+        `Unable to validate '${wearableJsonPath}' properly, please check it: ${errors}`
+      )
+    } else {
+      console.error(
+        `Unable to validate '${wearableJsonPath}' properly, please check it.`
+      )
+    }
+    throw new Error(`Invalid wearable.json (${wearableJson})`)
+  } else {
   }
 
   const dclIgnorePath = path.resolve(wearableDir, '.dclignore')
@@ -44,51 +51,35 @@ const serveWearable = ({
   })
 
   const thumbnailFiltered = hashedFiles.filter(
-    ($) => $?.file === assetJson.thumbnail
+    ($) => $?.file === wearableJson.thumbnail
   )
   const thumbnail =
     thumbnailFiltered.length > 0 &&
     thumbnailFiltered[0]?.hash &&
     `${baseUrl}/${thumbnailFiltered[0].hash}`
 
-  return {
-    id: assetJson.id || '00000000-0000-0000-0000-000000000000',
-    rarity: assetJson.rarity,
-    i18n: [{ code: 'en', text: assetJson.name }],
-    description: assetJson.description,
-    thumbnail,
+  const wearableJsonWithContents = {
+    ...wearableJson,
     baseUrl,
-    name: assetJson.name || '',
+    thumbnail,
     data: {
-      category: assetJson.category,
-      replaces: [],
-      hides: [],
-      tags: [],
+      ...wearableJson.data,
+      thumbnail,
       scene: hashedFiles,
-      representations: [
-        {
-          bodyShapes: ['urn:decentraland:off-chain:base-avatars:BaseMale'],
-          mainFile: `male/${assetJson.model}`,
-          contents: hashedFiles.map(($) => ({
-            key: `male/${$?.file}`,
-            url: `${baseUrl}/${$?.hash}`
-          })),
-          overrideHides: [],
-          overrideReplaces: []
-        },
-        {
-          bodyShapes: ['urn:decentraland:off-chain:base-avatars:BaseFemale'],
-          mainFile: `female/${assetJson.model}`,
-          contents: hashedFiles.map(($) => ({
-            key: `female/${$?.file}`,
-            url: `${baseUrl}/${$?.hash}`
-          })),
-          overrideHides: [],
-          overrideReplaces: []
-        }
-      ]
+      baseUrl,
+      representations: wearableJson.data.representations.map(
+        (representation) => ({
+          ...representation,
+          contents: hashedFiles.map((file) => ({
+            key: `${file?.file}`,
+            url: `${baseUrl}/${file?.hash}`
+          }))
+        })
+      )
     }
   }
+
+  return wearableJsonWithContents
 }
 
 export const getAllPreviewWearables = ({
@@ -98,21 +89,21 @@ export const getAllPreviewWearables = ({
   baseFolders: string[]
   baseUrl: string
 }) => {
-  const assetPathArray: string[] = []
+  const wearablePathArray: string[] = []
   for (const wearableDir of baseFolders) {
-    const assetJsonPath = path.resolve(wearableDir, 'asset.json')
-    if (fs.existsSync(assetJsonPath)) {
-      assetPathArray.push(assetJsonPath)
+    const wearableJsonPath = path.resolve(wearableDir, 'wearable.json')
+    if (fs.existsSync(wearableJsonPath)) {
+      wearablePathArray.push(wearableJsonPath)
     }
   }
 
   const ret = []
-  for (const assetJsonPath of assetPathArray) {
+  for (const wearableJsonPath of wearablePathArray) {
     try {
-      ret.push(serveWearable({ assetJsonPath, baseUrl }))
+      ret.push(serveWearable({ wearableJsonPath, baseUrl }))
     } catch (err) {
       console.error(
-        `Couldn't mock the asset ${assetJsonPath}. Please verify the correct format and scheme.`,
+        `Couldn't mock the wearable ${wearableJsonPath}. Please verify the correct format and scheme.`,
         err
       )
     }
