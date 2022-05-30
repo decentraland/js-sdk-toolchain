@@ -30,7 +30,6 @@
       "./types"
     ]
   },
-  "include": [
-    "./src"
-  ]
+  "exclude": [],
+  "include": ["src/*.ts"]
 }
