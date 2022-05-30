@@ -6,6 +6,7 @@
     "pretty": true,
     "inlineSourceMap": true,
     "outDir": "dist/",
+    "declarationDir": "dist/",
     "inlineSources": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
@@ -29,5 +30,6 @@
       "../../decentraland-ecs/types"
     ]
   },
-  "include": ["src/"]
+  "include": ["src/"],
+  "exclude": ["dist"]
 }

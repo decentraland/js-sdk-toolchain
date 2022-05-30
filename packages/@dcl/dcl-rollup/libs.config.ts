@@ -27,7 +27,7 @@ const config: RollupOptions = {
       tsconfig: tsconfigPath,
       compilerOptions: {
         declaration: true,
-        declarationDir: 'types'
+        outDir: 'dist'
       }
     }),
     ...basicRollupConfig.plugins!
@@ -36,8 +36,6 @@ const config: RollupOptions = {
     {
       file: packageJson.main,
       format: 'amd',
-      name: 'self',
-      extend: true,
       sourcemap: 'inline',
       amd: {
         id: packageJson.name
@@ -46,10 +44,8 @@ const config: RollupOptions = {
     {
       file: packageJson.main.replace(/\.js$/, '.min.js'),
       format: 'amd',
-      name: 'self',
-      extend: true,
-      sourcemap: 'hidden',
       compact: true,
+      sourcemap: 'hidden',
       plugins: [terser({ format: { comments: false } })],
       amd: {
         id: packageJson.name

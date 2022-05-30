@@ -35,17 +35,6 @@ export async function apiExtractorConfig(
   prepareOptions.configObject.mainEntryPointFilePath = path.resolve(
     prepareOptions.configObject.mainEntryPointFilePath
   )
-  const entryPoint = prepareOptions.configObject.mainEntryPointFilePath
-  if (!entryPoint.includes('/types/')) {
-    if (entryPoint.endsWith('/')) {
-      entryPoint.slice(0, entryPoint.length)
-    }
-    const lastPath = entryPoint.lastIndexOf('/')
-    prepareOptions.configObject.mainEntryPointFilePath =
-      entryPoint.substring(0, lastPath) +
-      '/types/' +
-      entryPoint.substring(lastPath + 1)
-  }
 
   if (!prepareOptions.configObject.dtsRollup) {
     prepareOptions.configObject.dtsRollup = {

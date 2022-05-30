@@ -62,8 +62,9 @@ const ecsConfig: RollupOptions = {
     typescript({
       tsconfig: './tsconfig.json',
       compilerOptions: {
-        declarationDir: 'types'
-      }
+        declarationDir: '.'
+      },
+      tslib: require.resolve('tslib')
     }),
     ...basicRollupConfig.plugins!
   ]
