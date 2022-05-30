@@ -1166,6 +1166,8 @@ export class Matrix {
     static LookAtRH(eye: Vector3, target: Vector3, up: Vector3): Matrix;
     static LookAtRHToRef(eye: Vector3, target: Vector3, up: Vector3, result: Matrix): void;
     get m(): Readonly<FloatArray>;
+    // @internal (undocumented)
+    _markAsUpdated(): void;
     multiply(other: Readonly<Matrix>): Matrix;
     multiplyAtIndex(index: number, value: number): Matrix;
     multiplyToArray(other: Readonly<Matrix>, result: FloatArray, offset: number): Matrix;
@@ -1222,7 +1224,6 @@ export class Matrix {
     transposeToRef(result: Matrix): Matrix;
     updateFlag: number;
     static Zero(): Matrix;
-    /* Excluded from this release type: _updateIdentityStatus */
 }
 
 // @public (undocumented)
@@ -1772,6 +1773,10 @@ export class Quaternion implements EcsMathReadOnlyQuaternion {
     y?: number,
     z?: number,
     w?: number);
+    // @internal
+    add(other: Quaternion): Quaternion;
+    // @internal
+    addInPlace(other: Quaternion): Quaternion;
     static Angle(quat1: EcsMathReadOnlyQuaternion, quat2: EcsMathReadOnlyQuaternion): number;
     // (undocumented)
     angleAxis(degress: number, axis: Vector3): Quaternion;
