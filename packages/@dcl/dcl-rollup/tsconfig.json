@@ -9,12 +9,10 @@
     ],
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "strictNullChecks": true,
-    "strictBindCallApply": true,
-    "strictFunctionTypes": true,
     "esModuleInterop": true,
     "strictPropertyInitialization": true,
-    "alwaysStrict": true
+    "alwaysStrict": true,
+    "outDir": "dist"
   },
   "includes": "*.ts"
 }

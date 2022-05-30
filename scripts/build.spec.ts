@@ -54,8 +54,8 @@ flow('build-all', () => {
     itExecutes(`npm ci --quiet`, ROLLUP_CONFIG_PATH)
     itExecutes(`${TSC} -p tsconfig.json`, ROLLUP_CONFIG_PATH)
     it('check file exists', () => {
-      ensureFileExists('ecs.config.js', ROLLUP_CONFIG_PATH)
-      ensureFileExists('libs.config.js', ROLLUP_CONFIG_PATH)
+      ensureFileExists('dist/ecs.config.js', ROLLUP_CONFIG_PATH)
+      ensureFileExists('dist/libs.config.js', ROLLUP_CONFIG_PATH)
     })
   })
 
@@ -65,7 +65,11 @@ flow('build-all', () => {
 
     itDeletesGlob('types/dcl/*.d.ts', ECS_PATH)
 
-    const ROLLUP_ECS_CONFIG = resolve(ROLLUP_CONFIG_PATH, 'ecs.config.js')
+    const ROLLUP_ECS_CONFIG = resolve(
+      ROLLUP_CONFIG_PATH,
+      'dist',
+      'ecs.config.js'
+    )
     itExecutes(`${ROLLUP} -c ${ROLLUP_ECS_CONFIG}`, LEGACY_ECS_PATH)
 
     // install required dependencies
