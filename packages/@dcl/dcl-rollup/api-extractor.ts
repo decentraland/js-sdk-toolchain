@@ -1,17 +1,12 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { glob } from 'glob'
 
 import {
-  Extractor,
   ExtractorConfig,
   IExtractorConfigPrepareOptions
 } from '@microsoft/api-extractor'
 
-export async function apiExtractorConfig(
-  packageJsonPath: string,
-  localBuild: boolean
-) {
+export function apiExtractorConfig(packageJsonPath: string) {
   const cwd = path.dirname(packageJsonPath)
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath).toString())
   console.assert(packageJson.typings, 'package.json#typings is not valid')
@@ -74,30 +69,5 @@ export async function apiExtractorConfig(
     prepareOptions.configObject.mainEntryPointFilePath = newentryPoint
   }
 
-  const extractorConfig = ExtractorConfig.prepare(prepareOptions)
-
-  // Invoke API Extractor
-  const extractorResult = Extractor.invoke(extractorConfig, {
-    // Equivalent to the "--local" command-line parameter
-    localBuild: localBuild,
-
-    // Equivalent to the "--verbose" command-line parameter
-    showVerboseMessages: true
-  })
-
-  glob
-    .sync(path.dirname(packageJson.main) + '/**/*.d.ts', { absolute: true })
-    .forEach((file) => {
-      if (file !== typingsFullPath) {
-        fs.unlinkSync(file)
-      }
-    })
-
-  if (extractorResult.succeeded) {
-    console.log(`API Extractor completed successfully`)
-  } else {
-    throw new Error(
-      `API Extractor completed with ${extractorResult.errorCount} errors and ${extractorResult.warningCount} warnings`
-    )
-  }
+  return prepareOptions.configObject
 }

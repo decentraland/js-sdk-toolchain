@@ -5,6 +5,7 @@ import { sys } from 'typescript'
 import { terser } from 'rollup-plugin-terser'
 import { RollupOptions } from 'rollup'
 import { apiExtractorConfig } from './api-extractor'
+import { apiExtractor } from 'rollup-plugin-api-extractor'
 
 const PROD = !!process.env.CI || process.env.NODE_ENV === 'production'
 
@@ -47,12 +48,12 @@ export const basicRollupConfig: RollupOptions = {
       exclude: 'node_modules',
       ignoreGlobal: true
     }),
-    {
-      name: 'api-extractor',
-      writeBundle() {
-        return apiExtractorConfig(packageJsonPath, !PROD)
-      }
-    }
+    apiExtractor({
+      configFile: './api-extractor.json',
+      configuration: apiExtractorConfig(packageJsonPath),
+      local: !PROD,
+      cleanUpRollup: false
+    })
   ]
 }
 
