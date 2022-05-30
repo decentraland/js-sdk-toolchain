@@ -6,7 +6,6 @@
     "pretty": true,
     "inlineSourceMap": true,
     "outDir": "dist/",
-    "declarationDir": "types/",
     "inlineSources": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
