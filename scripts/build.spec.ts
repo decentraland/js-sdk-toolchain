@@ -27,10 +27,10 @@ flow('build-all', () => {
   flow('build-ecs', () => {
     itExecutes(`npm ci --quiet`, BUILD_ECS_PATH)
     itExecutes(`${TSC} -p tsconfig.json`, BUILD_ECS_PATH)
-    itExecutes(`chmod +x index.js`, BUILD_ECS_PATH)
+    itExecutes(`chmod +x index.js`, BUILD_ECS_PATH + '/dist')
 
     it('check file exists', () => {
-      ensureFileExists('index.js', BUILD_ECS_PATH)
+      ensureFileExists('index.js', BUILD_ECS_PATH + '/dist')
     })
   })
 
