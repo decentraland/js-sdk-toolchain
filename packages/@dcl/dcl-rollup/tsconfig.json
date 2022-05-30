@@ -14,5 +14,6 @@
     "alwaysStrict": true,
     "outDir": "dist"
   },
-  "includes": "*.ts"
+  "include": ["*.ts"],
+  "exclude": ["dist"]
 }

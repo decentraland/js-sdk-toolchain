@@ -1,8 +1,10 @@
 import typescript from '@rollup/plugin-typescript'
 import { sys } from 'typescript'
 import { terser } from 'rollup-plugin-terser'
-import { basicRollupConfig } from './ecs.config'
+import path from 'path'
 import { RollupOptions } from 'rollup'
+
+import { basicRollupConfig } from './ecs.config'
 
 const PROD = !!process.env.CI || process.env.NODE_ENV === 'production'
 
@@ -18,7 +20,12 @@ console.assert(
 console.assert(packageJson.main, 'package.json .main must be present')
 console.assert(packageJson.typings, 'package.json .typings must be present')
 
-const tsconfigPath = sys.resolvePath('./package.json')
+const tsconfigPath = sys.resolvePath('./tsconfig.json')
+const tsconfig = JSON.parse(sys.readFile(tsconfigPath)!)
+const excludeDist = path.dirname(packageJson.main)
+tsconfig.exclude = tsconfig.exclude ?? [excludeDist]
+
+sys.writeFile(tsconfigPath, JSON.stringify(tsconfig, null, 2))
 
 const config: RollupOptions = {
   ...basicRollupConfig,
@@ -27,7 +34,7 @@ const config: RollupOptions = {
       tsconfig: tsconfigPath,
       compilerOptions: {
         declaration: true,
-        outDir: 'dist'
+        declarationDir: '.'
       }
     }),
     ...basicRollupConfig.plugins!
