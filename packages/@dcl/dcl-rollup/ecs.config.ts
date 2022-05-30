@@ -4,7 +4,7 @@ import typescript from '@rollup/plugin-typescript'
 import { apiExtractor } from 'rollup-plugin-api-extractor'
 import { sys } from 'typescript'
 import { terser } from 'rollup-plugin-terser'
-import { rollup, RollupOptions } from 'rollup'
+import { RollupOptions } from 'rollup'
 
 const PROD = !!process.env.CI || process.env.NODE_ENV === 'production'
 

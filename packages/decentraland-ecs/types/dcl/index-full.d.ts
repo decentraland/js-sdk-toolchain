@@ -2553,7 +2553,8 @@ export declare class Matrix {
      * @param result - defines the target matrix
      */
     static FromQuaternionToRef(quat: Quaternion, result: Matrix): void;
-    /* Excluded from this release type: _markAsUpdated */
+    /** @internal */
+    _markAsUpdated(): void;
     /**
      * Check if the current matrix is identity
      * @returns true is the matrix is the identity matrix
@@ -2799,7 +2800,8 @@ export declare class Matrix {
      * Toggles projection matrix from being right handed to left handed in place and vice versa
      */
     toggleProjectionMatrixHandInPlace(): void;
-    /* Excluded from this release type: _updateIdentityStatus */
+    /** @internal */
+    private _updateIdentityStatus;
 }
 
 /**
@@ -4046,8 +4048,20 @@ export declare class Quaternion implements EcsMathReadOnlyQuaternion {
      * @returns the updated current quaternion
      */
     setEuler(x: number, y: number, z: number): Quaternion;
-    /* Excluded from this release type: add */
-    /* Excluded from this release type: addInPlace */
+    /**
+     * @internal
+     * Adds two quaternions
+     * @param other - defines the second operand
+     * @returns a new quaternion as the addition result of the given one and the current quaternion
+     */
+    add(other: Quaternion): Quaternion;
+    /**
+     * @internal
+     * Add a quaternion to the current one
+     * @param other - defines the quaternion to add
+     * @returns the current quaternion
+     */
+    addInPlace(other: Quaternion): Quaternion;
     /**
      * Subtract two quaternions
      * @param other - defines the second operand

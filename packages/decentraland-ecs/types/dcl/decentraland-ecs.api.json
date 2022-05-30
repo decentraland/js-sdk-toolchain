@@ -3701,7 +3701,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface BasicAvatarInfo "
+              "text": "export interface BasicAvatarInfo "
             }
           ],
           "releaseTag": "Public",
@@ -10520,7 +10520,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface ComponentConstructor<T extends "
+              "text": "export interface ComponentConstructor<T extends "
             },
             {
               "kind": "Reference",
@@ -10893,7 +10893,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface ComponentLike "
+              "text": "export interface ComponentLike "
             }
           ],
           "releaseTag": "Public",
@@ -12173,7 +12173,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface DisposableComponentConstructor<T extends "
+              "text": "export interface DisposableComponentConstructor<T extends "
             },
             {
               "kind": "Reference",
@@ -12492,7 +12492,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface DisposableComponentLike extends "
+              "text": "export interface DisposableComponentLike extends "
             },
             {
               "kind": "Reference",
@@ -17003,7 +17003,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface HitEntityInfo "
+              "text": "export interface HitEntityInfo "
             }
           ],
           "releaseTag": "Public",
@@ -17097,7 +17097,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface IEngine "
+              "text": "export interface IEngine "
             }
           ],
           "releaseTag": "Public",
@@ -17443,7 +17443,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface IEntity "
+              "text": "export interface IEntity "
             }
           ],
           "releaseTag": "Public",
@@ -18845,7 +18845,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface IEventConstructor<T> "
+              "text": "export interface IEventConstructor<T> "
             }
           ],
           "releaseTag": "Public",
@@ -19408,7 +19408,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface IPhysicsCast "
+              "text": "export interface IPhysicsCast "
             }
           ],
           "releaseTag": "Public",
@@ -19643,7 +19643,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface ISize "
+              "text": "export interface ISize "
             }
           ],
           "releaseTag": "Public",
@@ -19711,7 +19711,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface ISystem "
+              "text": "export interface ISystem "
             }
           ],
           "releaseTag": "Public",
@@ -39603,7 +39603,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface Ray "
+              "text": "export interface Ray "
             }
           ],
           "releaseTag": "Public",
@@ -39805,7 +39805,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface RaycastHit "
+              "text": "export interface RaycastHit "
             }
           ],
           "releaseTag": "Public",
@@ -39928,7 +39928,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface RaycastHitAvatar extends "
+              "text": "export interface RaycastHitAvatar extends "
             },
             {
               "kind": "Reference",
@@ -39985,7 +39985,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface RaycastHitAvatars extends "
+              "text": "export interface RaycastHitAvatars extends "
             },
             {
               "kind": "Reference",
@@ -40046,7 +40046,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface RaycastHitEntities extends "
+              "text": "export interface RaycastHitEntities extends "
             },
             {
               "kind": "Reference",
@@ -40107,7 +40107,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare interface RaycastHitEntity extends "
+              "text": "export interface RaycastHitEntity extends "
             },
             {
               "kind": "Reference",
