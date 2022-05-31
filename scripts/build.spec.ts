@@ -28,9 +28,14 @@ flow('build-all', () => {
     itExecutes(`npm ci --quiet`, BUILD_ECS_PATH)
     itExecutes(`${TSC} -p tsconfig.json`, BUILD_ECS_PATH)
     itExecutes(`chmod +x index.js`, BUILD_ECS_PATH + '/dist')
+    copyFile(
+      BUILD_ECS_PATH + '/package.json',
+      BUILD_ECS_PATH + '/dist/package.json'
+    )
 
     it('check file exists', () => {
       ensureFileExists('index.js', BUILD_ECS_PATH + '/dist')
+      ensureFileExists('package.json', BUILD_ECS_PATH + '/dist')
     })
   })
 
@@ -53,7 +58,12 @@ flow('build-all', () => {
   flow('@dcl/dcl-rollup', () => {
     itExecutes(`npm ci --quiet`, ROLLUP_CONFIG_PATH)
     itExecutes(`${TSC} -p tsconfig.json`, ROLLUP_CONFIG_PATH)
+    copyFile(
+      ROLLUP_CONFIG_PATH + '/package.json',
+      ROLLUP_CONFIG_PATH + '/dist/package.json'
+    )
     it('check file exists', () => {
+      ensureFileExists('dist/package.json', ROLLUP_CONFIG_PATH)
       ensureFileExists('dist/ecs.config.js', ROLLUP_CONFIG_PATH)
       ensureFileExists('dist/libs.config.js', ROLLUP_CONFIG_PATH)
     })
