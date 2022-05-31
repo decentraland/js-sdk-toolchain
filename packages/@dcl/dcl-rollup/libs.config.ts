@@ -29,6 +29,7 @@ sys.writeFile(tsconfigPath, JSON.stringify(tsconfig, null, 2))
 
 const config: RollupOptions = {
   ...basicRollupConfig,
+  context: 'globalThis',
   plugins: [
     typescript({
       tsconfig: tsconfigPath,

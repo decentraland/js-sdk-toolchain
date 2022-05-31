@@ -19,7 +19,6 @@ console.assert(packageJson.typings, 'package.json .typings must be present')
 
 export const basicRollupConfig: RollupOptions = {
   input: 'src/index.ts',
-  context: 'globalThis',
   external: [/@decentraland\//],
   output: [
     {
@@ -45,8 +44,7 @@ export const basicRollupConfig: RollupOptions = {
       browser: true
     }),
     commonjs({
-      exclude: 'node_modules',
-      ignoreGlobal: true
+      strictRequires: true
     }),
     apiExtractor({
       configFile: './api-extractor.json',
@@ -59,13 +57,15 @@ export const basicRollupConfig: RollupOptions = {
 
 const ecsConfig: RollupOptions = {
   ...basicRollupConfig,
+  context: 'self',
   plugins: [
     typescript({
       tsconfig: './tsconfig.json',
       compilerOptions: {
+        module: 'ESNext',
         declarationDir: '.'
       },
-      tslib: require.resolve('tslib')
+      typescript: require('typescript')
     }),
     ...basicRollupConfig.plugins!
   ]
