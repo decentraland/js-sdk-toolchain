@@ -11,7 +11,8 @@ import {
   ECS_PATH,
   ROLLUP,
   commonChecks,
-  LEGACY_ECS_PATH
+  LEGACY_ECS_PATH,
+  ECS7_PATH
 } from './common'
 import {
   ensureFileExists,
@@ -24,7 +25,7 @@ import {
 flow('build-all', () => {
   commonChecks()
 
-  flow('build-ecs', () => {
+  flow('@dcl/build-ecs', () => {
     itExecutes(`npm ci --quiet`, BUILD_ECS_PATH)
     itExecutes(`${TSC} -p tsconfig.json`, BUILD_ECS_PATH)
     itExecutes(`chmod +x index.js`, BUILD_ECS_PATH + '/dist')
@@ -91,7 +92,34 @@ flow('build-all', () => {
     fixTypes()
   })
 
-  flow('legacy-ecs', () => {
+  flow('@dcl/ecs7', () => {
+    itExecutes('make build', ECS7_PATH)
+
+    it('check file exists', () => {
+      ensureFileExists('dist/index.js', ECS7_PATH)
+      ensureFileExists('dist/index.min.js', ECS7_PATH)
+      ensureFileExists('dist/proto-definitions', ECS7_PATH)
+    })
+    it('copy ecs7 to decentraland-ecs pkg', () => {
+      const filesToCopy = [
+        'index.js',
+        'index.d.ts',
+        'index.min.js',
+        'index.min.js.map',
+        'proto-definitions'
+      ]
+      for (const file of filesToCopy) {
+        const filePath = ensureFileExists(`dist/${file}`, ECS7_PATH)
+        copyFile(filePath, `${ECS_PATH}/dist/ecs7/${file}`)
+
+        if (file === 'index.d.ts') {
+          copyFile(filePath, ECS_PATH + '/types/ecs7/index.d.ts')
+        }
+      }
+    })
+  })
+
+  flow('@dcl/legacy-ecs', () => {
     // This legacy-ecs flow should be always after decentrland-ecs.
     // Why? First we bundle legacy-ecs as an iife file (rollout), and move it to decentraland-ecs.
     // And then we build legacy-ecs with TS and publish it to npm so we can use it like a normal module.

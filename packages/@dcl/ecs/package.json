@@ -1,0 +1,49 @@
+{
+  "name": "@dcl/ecs",
+  "version": "1.0.0",
+  "description": "Decentraland ECS",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decentraland/ecs.git"
+  },
+  "keywords": [
+    "dcl",
+    "ecs",
+    "decentraland-ecs"
+  ],
+  "author": "DCL",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/decentraland/ecs/issues"
+  },
+  "homepage": "https://github.com/decentraland/ecs#readme",
+  "devDependencies": {
+    "@dcl/dcl-rollup": "^6.11.1-2420975861.commit-4673308",
+    "@dcl/eslint-config": "^1.0.3",
+    "@microsoft/api-extractor": "^7.23.1",
+    "@types/fs-extra": "^9.0.13",
+    "@types/jest": "^27.5.0",
+    "fs-extra": "^10.1.0",
+    "jest": "^27.5.1",
+    "jest-matcher-deep-close-to": "^3.0.2",
+    "node-fetch": "^2.6.7",
+    "proto-compatibility-tool": "^1.0.0",
+    "ts-jest": "^27.1.4",
+    "ts-proto": "^1.112.0",
+    "typescript": "^4.6.4"
+  },
+  "dependencies": {
+    "@dcl/crdt": "^1.0.0-20220412150438.commit-965dc72",
+    "@dcl/ecs-math": "^2.0.1-20220526123120.commit-dab2aff"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/index.d.ts",
+    "dist/index.min.js",
+    "dist/index.min.js.map",
+    "proto-definitions"
+  ]
+}

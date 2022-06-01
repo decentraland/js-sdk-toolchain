@@ -1,0 +1,6 @@
+dist
+node_modules
+temp
+tsdoc-metadata.json
+coverage
+src/components/generated

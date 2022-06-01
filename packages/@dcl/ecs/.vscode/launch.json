@@ -1,0 +1,54 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
+      "runtimeArgs": ["--async-stack-traces"],
+      "args": ["-i"],
+      "skipFiles": ["<node_internals>/**/*.js", "node_modules/**/*.js"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "protocol": "inspector",
+      "autoAttachChildProcesses": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest current file",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
+      "runtimeArgs": ["--async-stack-traces"],
+      "args": ["${fileBasename}", "--verbose", "--no-cache", "-i"],
+      "skipFiles": ["<node_internals>/**/*.js", "node_modules/**/*.js"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "protocol": "inspector",
+      "autoAttachChildProcesses": true
+    },      
+    {
+      "type": "node",
+      "name": "Debug tool protocol-buffer-generation",
+      "request": "launch",
+      "program": "${workspaceFolder}/tools/dist/protocol-buffer-generation/index.js",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal", 
+      "args": ["test", "--component-path", "${workspaceFolder}/src/components"],
+      "preLaunchTask": "Build tools"
+    },      
+    {
+      "type": "node",
+      "name": "Debug tool check-proto-compatibility",
+      "request": "launch",
+      "program": "${workspaceFolder}/tools/dist/check-proto-compatibility/index.js",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal", 
+      "args": ["--definitions-path", "${workspaceFolder}/src/components/definitions"],
+      "preLaunchTask": "Build tools"
+    }
+  ]
+}
