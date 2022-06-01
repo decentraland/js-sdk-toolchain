@@ -1,10 +1,11 @@
 import resolve from '@rollup/plugin-node-resolve'
-import { RollupOptions } from 'rollup'
-import { terser } from 'rollup-plugin-terser'
-import typescript from 'rollup-plugin-typescript2'
 import commonjs from '@rollup/plugin-commonjs'
+import typescript from '@rollup/plugin-typescript'
 import { sys } from 'typescript'
-import { apiExtractor } from './api-extractor'
+import { terser } from 'rollup-plugin-terser'
+import { RollupOptions } from 'rollup'
+import { apiExtractorConfig } from './api-extractor'
+import { apiExtractor } from 'rollup-plugin-api-extractor'
 
 const PROD = !!process.env.CI || process.env.NODE_ENV === 'production'
 
@@ -16,46 +17,9 @@ console.assert(packageJson.name, 'package.json .name must be present')
 console.assert(packageJson.main, 'package.json .main must be present')
 console.assert(packageJson.typings, 'package.json .typings must be present')
 
-const plugins = [
-  typescript({
-    verbosity: 2,
-    clean: true,
-    tsconfigDefaults: {
-      include: ['src'],
-      compilerOptions: {
-        module: 'ESNext',
-        sourceMap: true,
-        declaration: true
-      }
-    },
-    tsconfig: 'tsconfig.json',
-    tsconfigOverride: {
-      declaration: true,
-      declarationMap: true,
-      sourceMap: false,
-      inlineSourceMap: true,
-      inlineSources: true
-    },
-    typescript: require('typescript')
-  }),
-  resolve({
-    browser: true,
-    preferBuiltins: false
-  }),
-  commonjs(),
-  {
-    name: 'api-extractor',
-    writeBundle() {
-      return apiExtractor(packageJsonPath, !PROD)
-    }
-  }
-]
-
-const config: RollupOptions = {
-  input: './src/index.ts',
-  context: 'self',
-  plugins,
-  external: /@decentraland\//,
+export const basicRollupConfig: RollupOptions = {
+  input: 'src/index.ts',
+  external: [/@decentraland\//],
   output: [
     {
       file: packageJson.main,
@@ -71,9 +35,40 @@ const config: RollupOptions = {
       extend: true,
       sourcemap: 'hidden',
       compact: true,
-      plugins: [terser({})]
+      plugins: [terser({ format: { comments: false } })]
     }
+  ],
+  plugins: [
+    resolve({
+      preferBuiltins: false,
+      browser: true
+    }),
+    commonjs({
+      strictRequires: true
+    }),
+    apiExtractor({
+      configFile: './api-extractor.json',
+      configuration: apiExtractorConfig(packageJsonPath),
+      local: !PROD,
+      cleanUpRollup: false
+    })
   ]
 }
 
-export default config
+const ecsConfig: RollupOptions = {
+  ...basicRollupConfig,
+  context: 'self',
+  plugins: [
+    typescript({
+      tsconfig: './tsconfig.json',
+      compilerOptions: {
+        module: 'ESNext',
+        declarationDir: '.'
+      },
+      typescript: require('typescript')
+    }),
+    ...basicRollupConfig.plugins!
+  ]
+}
+
+export default ecsConfig

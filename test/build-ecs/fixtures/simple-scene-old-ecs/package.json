@@ -8,9 +8,9 @@
   "license": "Apache-2.0",
   "scripts": {
     "start": "dcl start",
-    "build": "../../../../packages/@dcl/build-ecs/index.js",
-    "build-prod": "../../../../packages/@dcl/build-ecs/index.js --production",
-    "watch": "../../../../packages/@dcl/build-ecs/index.js --watch"
+    "build": "../../../../packages/@dcl/build-ecs/dist/index.js",
+    "build-prod": "../../../../packages/@dcl/build-ecs/dist/index.js --production",
+    "watch": "../../../../packages/@dcl/build-ecs/dist/index.js --watch"
   },
   "dependencies": {
     "decentraland-ecs": "^6.6.5"

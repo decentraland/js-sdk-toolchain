@@ -11,9 +11,9 @@
   "typings": "./bin/lib.d.ts",
   "scripts": {
     "start": "dcl start",
-    "build": "../../../../packages/@dcl/build-ecs/index.js",
-    "build-prod": "../../../../packages/@dcl/build-ecs/index.js --production",
-    "watch": "../../../../packages/@dcl/build-ecs/index.js --watch"
+    "build": "../../../../packages/@dcl/build-ecs/dist/index.js",
+    "build-prod": "../../../../packages/@dcl/build-ecs/dist/index.js --production",
+    "watch": "../../../../packages/@dcl/build-ecs/dist/index.js --watch"
   },
   "decentralandLibrary": {},
   "devDependencies": {
