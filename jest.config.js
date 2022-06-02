@@ -8,6 +8,9 @@ module.exports = {
   transform: {
     "^.+\\.(ts|tsx)$": "ts-jest",
   },
+  transformIgnorePatterns: [
+    "<rootDir>/packages/@dcl/ecs",
+  ],
   coverageDirectory: "coverage",
   verbose: true,
   testMatch: ["**/*.spec.(ts)"],
