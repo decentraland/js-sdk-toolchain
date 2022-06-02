@@ -7,10 +7,6 @@
 // @public (undocumented)
 export function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>>;
 
-// @public (undocumented)
-const Boolean_2: EcsType<boolean>;
-export { Boolean_2 as Boolean }
-
 // Warning: (ae-forgotten-export) The symbol "createByteBuffer" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
@@ -56,6 +52,12 @@ export const DEG2RAD: number;
 
 // @public (undocumented)
 export type double = number;
+
+// @public (undocumented)
+export const EcsBoolean: EcsType<boolean>;
+
+// @public (undocumented)
+export const EcsString: EcsType<string>;
 
 // @public (undocumented)
 export type EcsType<T = any> = {
@@ -207,10 +209,6 @@ export interface Spec {
     // (undocumented)
     [key: string]: EcsType;
 }
-
-// @public (undocumented)
-const String_2: EcsType<string>;
-export { String_2 as String }
 
 // @public
 export const ToGammaSpace: number;

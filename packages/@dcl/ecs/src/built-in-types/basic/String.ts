@@ -16,4 +16,4 @@ export const FlatString: EcsType<string> = {
 /**
  * @public
  */
-export const String = FlatString
+export const EcsString = FlatString

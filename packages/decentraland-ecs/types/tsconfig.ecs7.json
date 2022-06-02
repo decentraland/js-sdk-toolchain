@@ -14,10 +14,11 @@
     "removeComments": true,
     "inlineSources": true,
     "useDefineForClassFields": false,
-    "noLib": true,
     "allowJs": true,
+    "noLib": true,
     "types": [
       "env",
+      "ecs7-env",
       "ecs7"
     ],
     "typeRoots": [

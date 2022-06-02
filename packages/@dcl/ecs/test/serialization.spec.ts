@@ -8,9 +8,9 @@ import {
   Int64,
   Int8,
   MapType,
-  String,
+  EcsString,
   Optional,
-  Boolean,
+  EcsBoolean,
   Enum
 } from '../src/built-in-types'
 import { Engine } from '../src/engine'
@@ -78,7 +78,7 @@ describe('Serialization Types', () => {
 
     const FloatComponent = engine.defineComponent(
       COMPONENT_ID++,
-      MapType({ value: String })
+      MapType({ value: EcsString })
     )
     const myFloat = FloatComponent.create(entity, { value: testValue })
     expect(myFloat.value).toBe(testValue)
@@ -97,12 +97,12 @@ describe('Serialization Types', () => {
 
     const ItemType = MapType({
       itemId: Int32,
-      name: String,
+      name: EcsString,
       enchantingIds: ArrayType(
         MapType({
           itemId: Int32,
           itemAmount: Int32,
-          description: String
+          description: EcsString
         })
       )
     })
@@ -110,8 +110,8 @@ describe('Serialization Types', () => {
     const PlayerComponent = engine.defineComponent(
       COMPONENT_ID,
       MapType({
-        name: String,
-        description: String,
+        name: EcsString,
+        description: EcsString,
         level: Int32,
         hp: Float32,
         position: Vector3,
@@ -181,7 +181,7 @@ describe('Serialization Types', () => {
             b: Float32
           })
         ),
-        hasAlpha: Boolean
+        hasAlpha: EcsBoolean
       })
     )
 
@@ -212,9 +212,9 @@ describe('Serialization Types', () => {
     const TestComponent = engine.defineComponent(
       COMPONENT_ID,
       MapType({
-        optionalColor: Optional(Boolean),
-        visible: Optional(Boolean),
-        notVisible: Boolean
+        optionalColor: Optional(EcsBoolean),
+        visible: Optional(EcsBoolean),
+        notVisible: EcsBoolean
       })
     )
 
@@ -283,7 +283,7 @@ describe('Serialization Types', () => {
 
     const TestComponent = engine.defineComponent(
       COMPONENT_ID,
-      Enum<ColorToString>(String)
+      Enum<ColorToString>(EcsString)
     )
 
     // const value1 = TestComponent.create(entity, {})

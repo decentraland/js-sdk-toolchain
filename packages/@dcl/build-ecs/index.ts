@@ -18,6 +18,7 @@ type PackageJson = {
 
 type SceneJson = {
   main: string
+  ecs7?: boolean
 }
 
 type DecentralandLib = {
@@ -565,14 +566,18 @@ function getConfiguration(
     // most of the decentraland scenes require the following libraries.
 
     // FIRST UNSHIFT: ECS, order matters, don't change it
+    const newEcs = !!sceneJson!.ecs7
+    const decentralandEntryPoint =
+      process.env.ECS_PATH ||
+      findLibraryEntryPoint('decentraland-ecs', ts.sys.getCurrentDirectory()) ||
+      'decentraland-ecs/dist/index.js'
+
+    const getEcs7Path = () => {
+      return dirname(decentralandEntryPoint) + '/ecs7/index.js'
+    }
+
     libs.unshift({
-      main:
-        process.env.ECS_PATH ||
-        findLibraryEntryPoint(
-          'decentraland-ecs',
-          ts.sys.getCurrentDirectory()
-        ) ||
-        'decentraland-ecs/dist/index.js'
+      main: newEcs ? getEcs7Path() : decentralandEntryPoint
     })
 
     // SECOND UNSHIFT: ECS, order matters, don't change it
@@ -727,7 +732,6 @@ function getConfiguration(
       ts.sys.writeFile(tsconfigPath, JSON.stringify(tsconfig.raw, null, 2))
     }
   }
-
   return Object.assign(tsconfig, { libs, isDecentralandLib })
 }
 

@@ -18,8 +18,8 @@ lint-fix:
 	node_modules/.bin/eslint . --ext .ts --fix
 
 test:
-	node_modules/.bin/jest --detectOpenHandles --colors --roots "test"
-	cd packages/@dcl/ecs; make test
+	node_modules/.bin/jest --detectOpenHandles --colors --roots
+	node_modules/.bin/jest -c packages/@dcl/ecs/jest.config.js --detectOpenHandles --colors
 
 test-watch:
 	node_modules/.bin/jest --detectOpenHandles --colors --watch --roots "test"

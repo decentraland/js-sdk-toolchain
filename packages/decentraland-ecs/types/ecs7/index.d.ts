@@ -1,23 +1,17 @@
 /**
  * @public
  */
-export declare function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>>;
+declare function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>>;
 
 /**
  * @public
  */
-declare const Boolean_2: EcsType<boolean>;
-export { Boolean_2 as Boolean }
+declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
 
 /**
  * @public
  */
-export declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
-
-/**
- * @public
- */
-export declare type ComponentDefinition<T extends EcsType = EcsType<any>> = {
+declare type ComponentDefinition<T extends EcsType = EcsType<any>> = {
     _id: number;
     has(entity: Entity): boolean;
     getFrom(entity: Entity): DeepReadonly<ComponentType<T>>;
@@ -39,14 +33,14 @@ export declare type ComponentDefinition<T extends EcsType = EcsType<any>> = {
 /**
  * @public
  */
-export declare type ComponentEcsType<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
+declare type ComponentEcsType<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
     [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['mutable']> : never;
 };
 
 /**
  * @public
  */
-export declare type ComponentType<T extends EcsType> = EcsResult<T>;
+declare type ComponentType<T extends EcsType> = EcsResult<T>;
 
 /**
  * ByteBuffer is a wrapper of DataView which also adds a read and write offset.
@@ -180,7 +174,7 @@ declare interface CreateByteBufferOptions {
  * Make each field readonly deeply
  * @public
  */
-export declare type DeepReadonly<T> = {
+declare type DeepReadonly<T> = {
     readonly [P in keyof T]: DeepReadonly<T[P]>;
 };
 
@@ -198,10 +192,15 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
  * Constant used to convert from Euler degrees to radians
  * @public
  */
-export declare const DEG2RAD: number;
+declare const DEG2RAD: number;
 
 /** @public */
-export declare type double = number;
+declare type double = number;
+
+/**
+ * @public
+ */
+declare const EcsBoolean: EcsType<boolean>;
 
 /**
  * @public
@@ -211,7 +210,12 @@ declare type EcsResult<T extends EcsType> = T extends EcsType ? ReturnType<T['de
 /**
  * @public
  */
-export declare type EcsType<T = any> = {
+declare const EcsString: EcsType<string>;
+
+/**
+ * @public
+ */
+declare type EcsType<T = any> = {
     serialize(value: T, builder: ByteBuffer): void;
     deserialize(reader: ByteBuffer): T;
 };
@@ -219,12 +223,12 @@ export declare type EcsType<T = any> = {
 /**
  * @public
  */
-export declare function Engine(): IEngine;
+declare function Engine(): IEngine;
 
 /**
  * @public
  */
-export declare type Entity = number & {
+declare type Entity = number & {
     [entitySymbol]: true;
 };
 
@@ -233,13 +237,13 @@ declare const entitySymbol: unique symbol;
 /**
  * @public
  */
-export declare function Enum<T>(type: EcsType<any>): EcsType<T>;
+declare function Enum<T>(type: EcsType<any>): EcsType<T>;
 
 /**
  * Constant used to define the minimal number value in Babylon.js
  * @public
  */
-export declare const Epsilon = 0.000001;
+declare const Epsilon = 0.000001;
 
 /** Excludes property keys from T where the property is assignable to U */
 declare type ExcludeUndefined<T> = {
@@ -249,28 +253,28 @@ declare type ExcludeUndefined<T> = {
 /**
  * @public
  */
-export declare const FlatString: EcsType<string>;
+declare const FlatString: EcsType<string>;
 
 /** @public */
-export declare type float = number;
+declare type float = number;
 
 /**
  * @public
  */
-export declare const Float32: EcsType<number>;
+declare const Float32: EcsType<number>;
 
 /**
  * @public
  */
-export declare const Float64: EcsType<number>;
+declare const Float64: EcsType<number>;
 
 /** @public */
-export declare type FloatArray = number[];
+declare type FloatArray = number[];
 
 /**
  * @public
  */
-export declare type IEngine = {
+declare type IEngine = {
     addEntity(dynamic?: boolean): Entity;
     addDynamicEntity(): Entity;
     removeEntity(entity: Entity): void;
@@ -291,28 +295,28 @@ declare type IncludeUndefined<T> = {
 /**
  * @public
  */
-export declare const Int16: EcsType<number>;
+declare const Int16: EcsType<number>;
 
 /**
  * @public
  */
-export declare const Int32: EcsType<number>;
+declare const Int32: EcsType<number>;
 
 /**
  * @public
  */
-export declare const Int64: EcsType<number>;
+declare const Int64: EcsType<number>;
 
 /**
  * @public
  */
-export declare const Int8: EcsType<number>;
+declare const Int8: EcsType<number>;
 
 /**
  * Interface for the size containing width and height
  * @public
  */
-export declare interface ISize {
+declare interface ISize {
     /**
      * Width
      */
@@ -326,7 +330,7 @@ export declare interface ISize {
 /**
  * @public
  */
-export declare function MapType<T extends Spec>(spec: T): EcsType<Result<T>>;
+declare function MapType<T extends Spec>(spec: T): EcsType<Result<T>>;
 
 /**
  * Class used to store matrix data (4x4)
@@ -1048,7 +1052,7 @@ declare namespace Matrix {
 }
 
 /** @public */
-export declare type Nullable<T> = T | null;
+declare type Nullable<T> = T | null;
 
 declare type OnlyNonUndefinedTypes<T> = {
     [K in ExcludeUndefined<T>]: T[K];
@@ -1061,13 +1065,13 @@ declare type OnlyOptionalUndefinedTypes<T> = {
 /**
  * @public
  */
-export declare function Optional<T>(spec: EcsType<T>): EcsType<T | undefined>;
+declare function Optional<T>(spec: EcsType<T>): EcsType<T | undefined>;
 
 /**
  * Defines potential orientation for back face culling
  * @public
  */
-export declare enum Orientation {
+declare enum Orientation {
     /**
      * Clockwise
      */
@@ -1231,7 +1235,7 @@ declare namespace Plane {
 /**
  * @public
  */
-export declare namespace Quaternion {
+declare namespace Quaternion {
     /**
      * @public
      */
@@ -1396,25 +1400,25 @@ export declare namespace Quaternion {
  * Constant used to convert from radians to Euler degrees
  * @public
  */
-export declare const RAD2DEG: number;
+declare const RAD2DEG: number;
 
 /**
  * @public
  */
-export declare type Result<T extends Spec> = ToOptional<{
+declare type Result<T extends Spec> = ToOptional<{
     [K in keyof T]: T[K] extends EcsType ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? Result<T[K]> : never;
 }>;
 
 /**
  * @public
  */
-export declare type SdkComponetns = ReturnType<typeof defineSdkComponents>;
+declare type SdkComponetns = ReturnType<typeof defineSdkComponents>;
 
 /**
  * Defines supported spaces
  * @public
  */
-export declare enum Space {
+declare enum Space {
     /** Local (object) space */
     LOCAL = 0,
     /** World space */
@@ -1426,27 +1430,21 @@ export declare enum Space {
 /**
  * @public
  */
-export declare interface Spec {
+declare interface Spec {
     [key: string]: EcsType;
 }
-
-/**
- * @public
- */
-declare const String_2: EcsType<string>;
-export { String_2 as String }
 
 /**
  * Constant used to convert a value to gamma space
  * @public
  */
-export declare const ToGammaSpace: number;
+declare const ToGammaSpace: number;
 
 /**
  * Constant used to convert a value to linear space
  * @public
  */
-export declare const ToLinearSpace = 2.2;
+declare const ToLinearSpace = 2.2;
 
 declare type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
@@ -1465,17 +1463,17 @@ declare const Transform: EcsType<Transform>;
 /**
  * @public
  */
-export declare type Unpacked<T> = T extends (infer U)[] ? U : T;
+declare type Unpacked<T> = T extends (infer U)[] ? U : T;
 
 /**
  * @public
  */
-export declare type Update = (dt: number) => void;
+declare type Update = (dt: number) => void;
 
 /**
  * @public
  */
-export declare namespace Vector3 {
+declare namespace Vector3 {
     /**
      * @public
      */
@@ -1675,4 +1673,4 @@ export declare namespace Vector3 {
     export function Left(): MutableVector3;
 }
 
-export { }
+

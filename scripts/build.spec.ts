@@ -89,7 +89,6 @@ flow('build-all', () => {
 
     itExecutes(`${TSC} src/setupProxy.ts src/setupExport.ts`, ECS_PATH)
     copyLegacyEcs()
-    fixTypes()
   })
 
   flow('@dcl/ecs7', () => {
@@ -113,7 +112,9 @@ flow('build-all', () => {
         copyFile(filePath, `${ECS_PATH}/dist/ecs7/${file}`)
 
         if (file === 'index.d.ts') {
+          const typePath = ECS_PATH + '/types/ecs7/index.d.ts'
           copyFile(filePath, ECS_PATH + '/types/ecs7/index.d.ts')
+          fixTypes(typePath, { ignoreExportError: true })
         }
       }
     })
@@ -132,43 +133,44 @@ flow('build-all', () => {
 
 function copyLegacyEcs() {
   it('copy legacy ecs iife to decentraland-ecs', () => {
+    // Copy Types
+    const original = ensureFileExists('dist/index.d.ts', LEGACY_ECS_PATH)
+    const legacyTypesPath = ECS_PATH + '/types/dcl/index.d.ts'
+    copyFile(original, ECS_PATH + '/dist/index.d.ts')
+    copyFile(original, legacyTypesPath)
+
+    fixTypes(legacyTypesPath)
+    // Copy code
     const filesToCopy = ['index.js', 'index.min.js', 'index.min.js.map']
     for (const file of filesToCopy) {
       const filePath = ensureFileExists(`dist/${file}`, LEGACY_ECS_PATH)
-      copyFile(filePath, `${ECS_PATH}/dist/src/${file}`)
+      copyFile(filePath, `${ECS_PATH}/dist/${file}`)
     }
   })
 }
 
-function fixTypes() {
-  it('fix ecs types', () => {
-    const original = ensureFileExists('dist/index.d.ts', LEGACY_ECS_PATH)
+function fixTypes(
+  pathToDts: string,
+  { ignoreExportError } = { ignoreExportError: false }
+) {
+  let content = readFileSync(pathToDts).toString()
 
-    copyFile(original, ECS_PATH + '/dist/index.d.ts')
-    copyFile(original, ECS_PATH + '/types/dcl/index.d.ts')
+  content = content.replace(/^export declare/gm, 'declare')
 
-    const dtsFile = ensureFileExists('types/dcl/index.d.ts', ECS_PATH)
-    {
-      let content = readFileSync(dtsFile).toString()
+  content = content.replace(/^export \{([\s\n\r]*)\}/gm, '')
 
-      content = content.replace(/^export declare/gm, 'declare')
+  writeFileSync(pathToDts, content)
 
-      content = content.replace(/^export \{([\s\n\r]*)\}/gm, '')
+  if (!ignoreExportError && content.match(/\bexport\b/)) {
+    throw new Error(`The file ${pathToDts} contains exports`)
+  }
 
-      writeFileSync(dtsFile, content)
+  if (content.match(/\bimport\b/)) {
+    throw new Error(`The file ${pathToDts} contains imports`)
+  }
 
-      if (content.match(/\bexport\b/)) {
-        throw new Error(`The file ${dtsFile} contains exports`)
-      }
-
-      if (content.match(/\bimport\b/)) {
-        throw new Error(`The file ${dtsFile} contains imports`)
-      }
-
-      // TODO: uncomment this once @dcl/js-runtime is up and running
-      // if (content.includes('/// <ref')) {
-      //   throw new Error(`The file ${dtsFile} contains '/// <ref'`)
-      // }
-    }
-  })
+  // TODO: uncomment this once @dcl/js-runtime is up and running
+  // if (content.includes('/// <ref')) {
+  //   throw new Error(`The file ${dtsFile} contains '/// <ref'`)
+  // }
 }
