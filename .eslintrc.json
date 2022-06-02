@@ -2,11 +2,11 @@
   "extends": "@dcl/eslint-config/sdk",
   "parserOptions": {
     "project": [
+      "packages/decentraland-ecs/tsconfig.json",
       "packages/@dcl/legacy-ecs/tsconfig.json",
       "packages/@dcl/build-ecs/tsconfig.json",
       "packages/@dcl/dcl-rollup/tsconfig.json",
       "packages/@dcl/amd/tsconfig.json",
-      "packages/decentraland-ecs/tsconfig.json",
       "scripts/tsconfig.json",
       "test/tsconfig.json"
     ]

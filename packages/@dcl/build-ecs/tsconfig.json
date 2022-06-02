@@ -17,7 +17,8 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
-    "alwaysStrict": true
+    "alwaysStrict": true,
+    "outDir": "dist"
   },
   "includes": "*.ts"
 }

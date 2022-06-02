@@ -33,10 +33,11 @@ export const mockCatalyst = (
   })
 
   app.get('/lambdas/profiles', async (req, res, next) => {
+    const baseUrl = `${req.protocol}://${req.get('host')}/content/contents`
     try {
       const previewWearables = await getAllPreviewWearables({
         baseFolders,
-        baseUrl: ''
+        baseUrl
       }).map((wearable) => wearable.id)
 
       if (previewWearables.length === 1) {
@@ -64,7 +65,7 @@ export const mockCatalyst = (
   app.use(
     '/lambdas',
     createProxyMiddleware({
-      target: 'https://peer-lb.decentraland.org/',
+      target: 'https://peer.decentraland.org/',
       changeOrigin: true,
       timeout: 25 * 1000,
       proxyTimeout: 25 * 1000,
@@ -80,7 +81,7 @@ export const mockCatalyst = (
   app.use(
     '/content',
     createProxyMiddleware({
-      target: 'https://peer-lb.decentraland.org/',
+      target: 'https://peer.decentraland.org/',
       changeOrigin: true,
       timeout: 25 * 1000,
       proxyTimeout: 25 * 1000,

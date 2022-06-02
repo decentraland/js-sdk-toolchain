@@ -1,10 +1,10 @@
-import resolve from '@rollup/plugin-node-resolve'
-import commonjs from '@rollup/plugin-commonjs'
-import { terser } from 'rollup-plugin-terser'
-import typescript from 'rollup-plugin-typescript2'
+import typescript from '@rollup/plugin-typescript'
 import { sys } from 'typescript'
-import { apiExtractor } from './api-extractor'
+import { terser } from 'rollup-plugin-terser'
+import path from 'path'
 import { RollupOptions } from 'rollup'
+
+import { basicRollupConfig } from './ecs.config'
 
 const PROD = !!process.env.CI || process.env.NODE_ENV === 'production'
 
@@ -20,52 +20,30 @@ console.assert(
 console.assert(packageJson.main, 'package.json .main must be present')
 console.assert(packageJson.typings, 'package.json .typings must be present')
 
-const plugins = [
-  typescript({
-    verbosity: 2,
-    clean: true,
-    tsconfigDefaults: {
-      include: ['src'],
-      compilerOptions: {
-        module: 'ESNext',
-        sourceMap: true,
-        declaration: true
-      }
-      // extends: './node_modules/decentraland-ecs/types/tsconfig.json'
-    },
-    tsconfig: 'tsconfig.json',
-    tsconfigOverride: {
-      declaration: true,
-      declarationMap: true,
-      sourceMap: false,
-      inlineSourceMap: true,
-      inlineSources: true
-    },
-    typescript: require('typescript')
-  }),
-  resolve({
-    browser: true,
-    preferBuiltins: false
-  }),
-  commonjs(),
-  {
-    name: 'api-extractor',
-    writeBundle() {
-      return apiExtractor(packageJsonPath, !PROD)
-    }
-  }
-]
+const tsconfigPath = sys.resolvePath('./tsconfig.json')
+const tsconfig = JSON.parse(sys.readFile(tsconfigPath)!)
+const excludeDist = path.dirname(packageJson.main)
+tsconfig.exclude = tsconfig.exclude ?? [excludeDist]
+
+sys.writeFile(tsconfigPath, JSON.stringify(tsconfig, null, 2))
 
 const config: RollupOptions = {
-  input: './src/index.ts',
+  ...basicRollupConfig,
   context: 'globalThis',
-  plugins,
-  external: /@decentraland\//,
+  plugins: [
+    typescript({
+      tsconfig: tsconfigPath,
+      compilerOptions: {
+        declaration: true,
+        declarationDir: '.'
+      }
+    }),
+    ...basicRollupConfig.plugins!
+  ],
   output: [
     {
       file: packageJson.main,
       format: 'amd',
-      name: packageJson.name,
       sourcemap: 'inline',
       amd: {
         id: packageJson.name
@@ -74,14 +52,14 @@ const config: RollupOptions = {
     {
       file: packageJson.main.replace(/\.js$/, '.min.js'),
       format: 'amd',
-      name: packageJson.name,
-      sourcemap: 'hidden',
       compact: true,
+      sourcemap: 'hidden',
+      plugins: [terser({ format: { comments: false } })],
       amd: {
         id: packageJson.name
-      },
-      plugins: [terser({})]
+      }
     }
   ]
 }
+
 export default config
