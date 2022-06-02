@@ -15,7 +15,6 @@
     "inlineSources": true,
     "useDefineForClassFields": false,
     "allowJs": true,
-    "noLib": true,
     "types": [
       "env",
       "ecs7-env",

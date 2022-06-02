@@ -8,8 +8,8 @@ module.exports = {
   transform: {
     "^.+\\.(ts|tsx)$": "ts-jest",
   },
-  transformIgnorePatterns: [
-    "<rootDir>/packages/@dcl/ecs",
+  testPathIgnorePatterns: [
+    "<rootDir>/packages/@dcl/ecs/test",
   ],
   coverageDirectory: "coverage",
   verbose: true,
