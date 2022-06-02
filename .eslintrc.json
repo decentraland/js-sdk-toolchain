@@ -6,12 +6,24 @@
       "packages/@dcl/legacy-ecs/tsconfig.json",
       "packages/@dcl/build-ecs/tsconfig.json",
       "packages/@dcl/dcl-rollup/tsconfig.json",
+      "packages/@dcl/ecs/tsconfig.json",
+      "packages/@dcl/ecs/tools/tsconfig.json",
+      "packages/@dcl/ecs/test/tsconfig.json",
       "packages/@dcl/amd/tsconfig.json",
       "scripts/tsconfig.json",
       "test/tsconfig.json"
     ]
   },
   "rules": {
-    "no-param-reassign": "warn"
+    "no-param-reassign": "warn",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "ignoreRestSiblings": true,
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ]
   }
 }
