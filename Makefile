@@ -19,8 +19,7 @@ lint-fix:
 
 test:
 	node_modules/.bin/jest --detectOpenHandles --colors --roots "test"
-# TODO: run tests for ecs
-# node_modules/.bin/jest -c packages/@dcl/ecs/jest.config.js --detectOpenHandles --colors --roots "test"
+	cd packages/@dcl/ecs; make test
 
 test-watch:
 	node_modules/.bin/jest --detectOpenHandles --colors --watch --roots "test"

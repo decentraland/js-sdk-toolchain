@@ -7,6 +7,7 @@ coverage
 test/build-ecs/fixtures/*/bin
 test/rollup-lib-integration/dist
 packages/**/*.js
+!packages/@dcl/ecs/jest.config.js
 packages/decentraland-ecs/package-lock.json
 **/*.tgz
 test/decentraland-ecs/simple-scene
