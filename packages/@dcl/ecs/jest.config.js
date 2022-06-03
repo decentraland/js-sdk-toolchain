@@ -21,6 +21,9 @@ module.exports = {
       functions: 70,
       lines: 70,
       statements: 70
+    },
+    "src/Math": {
+      functions: 0
     }
   },
   verbose: true,
