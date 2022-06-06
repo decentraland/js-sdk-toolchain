@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-// ComponentDefinition.ComponentID=13;
+// ComponentDefinition.ComponentID=1013;
 // This parameter is processed by the tool
 
 package decentraland.ecs;
