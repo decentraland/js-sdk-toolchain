@@ -33,6 +33,8 @@ export const LEGACY_ECS_PATH = resolve(
   './packages/@dcl/legacy-ecs'
 )
 
+export const ECS7_PATH = resolve(process.cwd(), './packages/@dcl/ecs')
+
 export function commonChecks() {
   test('tooling is installed', () => {
     ensureFileExists(TSC)

@@ -16,7 +16,7 @@ describe('simple-scene-without-installed-ecs: build a scene with env vars', () =
 
   const ECS_PATH = resolve(
     __dirname,
-    '../../packages/decentraland-ecs/dist/src/index.js'
+    '../../packages/decentraland-ecs/dist/index.js'
   )
   const AMD_PATH = resolve(__dirname, '../../packages/@dcl/amd/dist/amd.js')
 

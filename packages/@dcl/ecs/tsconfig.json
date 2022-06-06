@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "stripInternal": true,
+    "downlevelIteration": true,
+    "outDir": "dist"
+  },
+  "include": [
+    "src",
+    "temp-protocolbuffers"
+  ],
+  "files": ["node_modules/protobufjs/minimal.d.ts"],
+  "exclude": ["dist"]
+}

@@ -1,0 +1,25 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Clean tools build",
+      "type": "process",
+      "command": "rm",
+      "args": ["-rf", "${workspaceFolder}/tools/dist"]
+    },
+    {
+      "label": "Build tools typescript",
+      "type": "process",
+      "command": "${workspaceFolder}/node_modules/.bin/tsc",
+      "args": ["-p", "${workspaceFolder}/tools/tsconfig.json"]
+    },
+    {
+      "label": "Build tools",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Clean tools build", "Build tools typescript"],
+      "type": "process",
+      "command": "chmod",
+      "args": ["+x", "${workspaceFolder}/tools/dist/protocol-buffer-generation/index.js"]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "contributor": [
+    {
+      "name": "SDK",
+      "children": [
+        {
+          "name": "New ECS",
+          "children": [
+            {
+              "name": "Component definition",
+              "slug": "/contributor/sdk/new-ecs/component-definition"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
