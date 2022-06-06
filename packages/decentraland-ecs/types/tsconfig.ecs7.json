@@ -18,7 +18,17 @@
     "types": [
       "env",
       "ecs7-env",
-      "ecs7"
+      "ecs7",
+      "@decentraland/EthereumController",
+      "@decentraland/SocialController",
+      "@decentraland/Identity",
+      "@decentraland/web3-provider",
+      "@decentraland/EnvironmentAPI",
+      "@decentraland/ParcelIdentity",
+      "@decentraland/PortableExperiences",
+      "@decentraland/RestrictedActions",
+      "@decentraland/SignedFetch",
+      "@decentraland/Players"
     ],
     "typeRoots": [
       "."

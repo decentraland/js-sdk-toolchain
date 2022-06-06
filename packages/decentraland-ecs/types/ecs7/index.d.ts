@@ -223,7 +223,9 @@ declare type EcsType<T = any> = {
 /**
  * @public
  */
-declare function Engine(): IEngine;
+declare function Engine({ transports }?: {
+    transports?: Transport[];
+}): IEngine;
 
 /**
  * @public
@@ -1402,6 +1404,15 @@ declare namespace Quaternion {
  */
 declare const RAD2DEG: number;
 
+declare type ReceiveMessage = {
+    entity: Entity;
+    componentId: number;
+    timestamp: number;
+    transportType?: string;
+    data: Uint8Array;
+    messageBuffer: Uint8Array;
+};
+
 /**
  * @public
  */
@@ -1459,6 +1470,15 @@ declare type Transform = {
 };
 
 declare const Transform: EcsType<Transform>;
+
+declare type Transport = {
+    type: string;
+    send(message: Uint8Array): void;
+    onmessage?(message: MessageEvent<Uint8Array>): void;
+    filter(message: TransportMessage): boolean;
+};
+
+declare type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
 /**
  * @public
