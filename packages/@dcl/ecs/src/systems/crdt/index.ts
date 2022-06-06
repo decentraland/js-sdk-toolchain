@@ -43,7 +43,6 @@ export function crdtSceneSystem({
      * @param chunkMessage A chunk of binary messages
      */
     return function parseChunkMessage(chunkMessage: Uint8Array) {
-      if (!chunkMessage.byteLength) return
       const buffer = createByteBuffer({
         reading: { buffer: chunkMessage, currentOffset: 0 }
       })
