@@ -170,15 +170,11 @@ describe('CRDT tests', () => {
     )
     jest.resetAllMocks()
     const spyWrite = jest.spyOn(PutComponentOperation, 'write')
-    transports[0].onmessage!({ data: buffer.toBinary() } as MessageEvent<any>)
+    transports[0].onmessage!(buffer.toBinary())
     engine.update(1)
 
     expect(spySend).toBeCalledTimes(1)
     expect(spyWrite).toBeCalledTimes(1)
-
-    jest.resetAllMocks()
-    transports[0].onmessage!({} as MessageEvent<any>)
-    expect(spySend).toBeCalledTimes(0)
   })
 
   it('should test transports', () => {

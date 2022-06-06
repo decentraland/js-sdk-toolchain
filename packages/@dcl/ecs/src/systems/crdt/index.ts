@@ -42,10 +42,10 @@ export function crdtSceneSystem({
      * Component Operation Messages at messages queue
      * @param chunkMessage A chunk of binary messages
      */
-    return function parseChunkMessage(chunkMessage: MessageEvent<Uint8Array>) {
-      if (!chunkMessage.data?.length) return
+    return function parseChunkMessage(chunkMessage: Uint8Array) {
+      if (!chunkMessage.byteLength) return
       const buffer = createByteBuffer({
-        reading: { buffer: chunkMessage.data, currentOffset: 0 }
+        reading: { buffer: chunkMessage, currentOffset: 0 }
       })
 
       while (WireMessage.validate(buffer)) {
