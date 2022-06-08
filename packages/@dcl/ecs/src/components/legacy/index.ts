@@ -1,5 +1,5 @@
 import type { IEngine } from '../../engine/types'
-import { defineProtocolBufferComponents } from '../generated/index'
+import { defineProtocolBufferComponents } from '../generated/index.gen'
 import { Transform as LegacyTransform } from './Transform'
 import { LEGACY_COMPONENT_ID as ID } from './types'
 

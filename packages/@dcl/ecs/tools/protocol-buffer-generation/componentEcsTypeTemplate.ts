@@ -1,6 +1,6 @@
 const ecsFileProtocolBuffer = `import { EcsType } from '../../built-in-types/EcsType'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
-import { PBComponent } from './pb/Component'
+import { PBComponent } from './pb/Component.gen'
 
 /**
  * @internal

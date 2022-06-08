@@ -1,10 +1,8 @@
 syntax = "proto3";
-
-// ComponentDefinition.ComponentID=13;
-// This parameter is processed by the tool
-
 package decentraland.ecs;
-option csharp_namespace = "DCL.ECSComponents";
+
+import "common/id.proto";
+option (ecs_component_id) = 1013;
 
 message PBBoxShape {  
   bool with_collisions = 1;
