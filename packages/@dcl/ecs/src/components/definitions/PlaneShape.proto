@@ -1,5 +1,4 @@
 ﻿syntax = "proto3";
-package decentraland.ecs;
 
 import "common/id.proto";
 option (ecs_component_id) = 1014;

@@ -2,6 +2,7 @@ import path from 'path'
 import fs from 'fs-extra'
 import { FileDescriptorStandardOption, runCommand } from '../utils/shellCommand'
 import { Component } from './generateComponent'
+import { getFilePathsSync } from '../utils/getFilePathsSync'
 
 export async function generateProtocolBuffer(params: {
   components: Component[]
@@ -15,6 +16,10 @@ export async function generateProtocolBuffer(params: {
 
   fs.removeSync(pbGeneratedPath)
   fs.mkdirSync(pbGeneratedPath, { recursive: true })
+
+  const protoFiles = components
+    .map((item) => path.resolve(definitionsPath, `${item.componentName}.proto`))
+    .join(' ')
 
   try {
     await runCommand({
@@ -37,13 +42,19 @@ export async function generateProtocolBuffer(params: {
         `--ts_proto_opt=fileSuffix=.gen`,
         `--ts_proto_out=${pbGeneratedPath}`,
         `--proto_path=${definitionsPath}`,
-        path.resolve(definitionsPath, '*.proto')
+        protoFiles
       ],
       fdStandards: FileDescriptorStandardOption.ONLY_IF_THROW
     })
+
+    const generatedFiles = getFilePathsSync(pbGeneratedPath, true)
+    for (const generatedFile of generatedFiles) {
+      fixTsGeneratedByProto(path.resolve(pbGeneratedPath, generatedFile))
+    }
+
     ret = true
   } catch (err) {
-    console.error(`Couldn't run protoc command.`, err)
+    console.error(`Couldn't run protoc command properly.`, err)
   }
 
   return ret
@@ -65,3 +76,28 @@ export function getComponentId(protoContent: string) {
   }
   return parseInt(componentIdLine[0].split('=')[1])
 }
+
+function fixTsGeneratedByProto(filePath: string) {
+  let content = fs.readFileSync(filePath, 'utf8')
+
+  /**
+   * Remove the `import type` and replace with just `import`
+   * The `tsc` compile won't fail
+   */
+  content = content.replace(/^import type/gm, 'import')
+
+  /**
+   * Read the generated pb component and add @internal comments to exported methods
+   * So we dont add this types to the final .d.ts build
+   */
+  content = content.replace(/export const/g, internalComment)
+
+  fs.removeSync(filePath)
+  fs.writeFileSync(filePath, content)
+}
+
+const internalComment = `
+/**
+ * @internal
+ */
+export const`
