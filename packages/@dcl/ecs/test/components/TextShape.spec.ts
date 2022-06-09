@@ -1,5 +1,4 @@
 import { Engine } from '../../src/engine'
-import {Color} from "../../dist/components/generated/pb/TextShape";
 
 describe('Generated BoxShape ProtoBuf', () => {
   it('should serialize/deserialize BoxShape', () => {
@@ -13,26 +12,26 @@ describe('Generated BoxShape ProtoBuf', () => {
       visible: true,
       font: 'test',
       opacity: 1,
-      font_Size: 5,
-      font_autoSize: true,
-      h_text_align: 'horizontal',
-      v_text_align: 'vertical',
+      fontSize: 5,
+      fontAutoSize: true,
+      hTextAlign: 'horizontal',
+      vTextAlign: 'vertical',
       width: 100,
       height: 100,
-      padding_top: 11,
-      padding_right: 12,
-      padding_bottom: 13,
-      padding_left: 14,
-      line_spacing: 15,
-      line_count: 16,
-      text_wrapping: true,
-      shadow_blur: 18,
-      shadow_offsetX: 19,
-      shadow_offsetY: 20,
-      outline_width: 21,
-      shadow_color: { red:1, green:1, blue:1 },
-      outline_color: { red:1, green:1, blue:1 },
-      text_color: { red:1, green:1, blue:1 },
+      paddingTop: 11,
+      paddingRight: 12,
+      paddingBottom: 13,
+      paddingLeft: 14,
+      lineSpacing: 15,
+      lineCount: 16,
+      textWrapping: true,
+      shadowBlur: 18,
+      shadowOffsetX: 19,
+      shadowOffsetY: 20,
+      outlineWidth: 21,
+      shadowColor: { r: 1, g: 1, b: 1 },
+      outlineColor: { r: 1, g: 1, b: 1 },
+      textColor: { r: 1, g: 1, b: 1 }
     })
 
     TextShape.create(entityB, {
@@ -40,30 +39,35 @@ describe('Generated BoxShape ProtoBuf', () => {
       visible: false,
       font: 'false',
       opacity: 0,
-      font_Size: 15,
-      font_autoSize: false,
-      h_text_align: 'vertical',
-      v_text_align: 'horizontal',
+      fontSize: 15,
+      fontAutoSize: false,
+      hTextAlign: 'vertical',
+      vTextAlign: 'horizontal',
       width: 200,
       height: 200,
-      padding_top: 211,
-      padding_right: 212,
-      padding_bottom: 213,
-      padding_left: 214,
-      line_spacing: 215,
-      line_count: 216,
-      text_wrapping: false,
-      shadow_blur: 218,
-      shadow_offsetX: 219,
-      shadow_offsetY: 220,
-      outline_width: 221,
-      shadow_color: { red:1, green:1, blue:1 },
-      outline_color: { red:1, green:1, blue:1 },
-      text_color: { red:1, green:1, blue:1 },
+      paddingTop: 211,
+      paddingRight: 212,
+      paddingBottom: 213,
+      paddingLeft: 214,
+      lineSpacing: 215,
+      lineCount: 216,
+      textWrapping: false,
+      shadowBlur: 218,
+      shadowOffsetX: 219,
+      shadowOffsetY: 220,
+      outlineWidth: 221,
+      shadowColor: { r: 1, g: 1, b: 1 },
+      outlineColor: { r: 1, g: 1, b: 1 },
+      textColor: { r: 1, g: 1, b: 1 }
     })
     const buffer = TextShape.toBinary(entity)
     TextShape.updateFromBinary(entityB, buffer)
 
-    expect(_textShape).toBeDeepCloseTo({ ...TextShape.mutable(entityB) })
+    // TODO: toBeDeepCloseTo has a error type implementation, should make an own toBeDeepCloseTo
+    //  or fix with a PR this one
+    const otherTextShape = TextShape.mutable(entityB)
+    expect(_textShape).toBeDeepCloseTo({
+      ...(otherTextShape as any)
+    })
   })
 })

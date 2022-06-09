@@ -4,6 +4,8 @@
 
 ```ts
 
+import * as _m0 from 'protobufjs/minimal';
+
 // @public (undocumented)
 export function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>>;
 

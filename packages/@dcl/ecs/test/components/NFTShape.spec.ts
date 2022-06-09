@@ -11,9 +11,9 @@ describe('Generated BoxShape ProtoBuf', () => {
       isPointerBlocker: true,
       visible: true,
       withCollisions: true,
-      color: { red:1, green:1, blue:1 },
+      color: { r: 1, g: 1, b: 1 },
       src: 'testSrc',
-      asset_id: 'asset',
+      assetId: 'asset',
       style: 5
     })
 
@@ -21,14 +21,17 @@ describe('Generated BoxShape ProtoBuf', () => {
       isPointerBlocker: false,
       visible: false,
       withCollisions: false,
-      color: { red:0, green:0, blue:0 },
+      color: { r: 0, g: 0, b: 0 },
       src: 'NotestSrc',
-      asset_id: 'Noasset',
+      assetId: 'Noasset',
       style: 2
     })
     const buffer = NFTShape.toBinary(entity)
     NFTShape.updateFromBinary(entityB, buffer)
 
-    expect(_nftShape).toBeDeepCloseTo({ ...NFTShape.mutable(entityB) })
+    // TODO: toBeDeepCloseTo has a error type implementation, should make an own toBeDeepCloseTo
+    //  or fix with a PR this one
+    const otherNFTShape = NFTShape.mutable(entityB)
+    expect(_nftShape).toBeDeepCloseTo({ ...(otherNFTShape as any) })
   })
 })

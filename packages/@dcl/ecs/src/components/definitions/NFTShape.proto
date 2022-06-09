@@ -1,10 +1,9 @@
 syntax = "proto3";
 
-// ComponentDefinition.ComponentID=13;
-// This parameter is processed by the tool
+import "common/id.proto";
+option (ecs_component_id) = 1040;
 
-package decentraland.ecs;
-option csharp_namespace = "DCL.ECSComponents";
+import "common/Color3.proto";
 
 message PBNFTShape {
   bool with_collisions = 1;
@@ -14,10 +13,4 @@ message PBNFTShape {
   string asset_id = 5;
   int32 style = 6;
   Color3 color = 7;
-}
-
-message Color3 {
-  float r = 1;
-  float g = 2;
-  float b = 3;
 }
