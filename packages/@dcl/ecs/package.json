@@ -36,7 +36,8 @@
   },
   "dependencies": {
     "@dcl/crdt": "^1.0.0-20220412150438.commit-965dc72",
-    "@dcl/ecs-math": "^2.0.1-20220526123120.commit-dab2aff"
+    "@dcl/ecs-math": "^2.0.1-20220526123120.commit-dab2aff",
+    "@dcl/posix": "^1.0.4"
   },
   "files": [
     "dist/index.js",

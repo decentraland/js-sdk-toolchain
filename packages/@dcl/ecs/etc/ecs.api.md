@@ -70,6 +70,9 @@ export function Engine({ transports }?: {
     transports?: Transport[];
 }): IEngine;
 
+// @alpha
+export const engine: IEngine;
+
 // @public (undocumented)
 export type Entity = number & {
     [entitySymbol]: true;
