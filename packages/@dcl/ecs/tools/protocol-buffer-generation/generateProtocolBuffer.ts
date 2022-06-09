@@ -49,7 +49,7 @@ export async function generateProtocolBuffer(params: {
 
     const generatedFiles = getFilePathsSync(pbGeneratedPath, true)
     for (const generatedFile of generatedFiles) {
-      removeImportType(path.resolve(pbGeneratedPath, generatedFile))
+      fixTsGeneratedByProto(path.resolve(pbGeneratedPath, generatedFile))
     }
 
     ret = true
@@ -77,9 +77,27 @@ export function getComponentId(protoContent: string) {
   return parseInt(componentIdLine[0].split('=')[1])
 }
 
-function removeImportType(filePath: string) {
-  let content = fs.readFileSync(filePath).toString()
+function fixTsGeneratedByProto(filePath: string) {
+  let content = fs.readFileSync(filePath, 'utf8')
+
+  /**
+   * Remove the `import type` and replace with just `import`
+   * The `tsc` compile won't fail
+   */
   content = content.replace(/^import type/gm, 'import')
+
+  /**
+   * Read the generated pb component and add @internal comments to exported methods
+   * So we dont add this types to the final .d.ts build
+   */
+  content = content.replace(/export const/g, internalComment)
+
   fs.removeSync(filePath)
   fs.writeFileSync(filePath, content)
 }
+
+const internalComment = `
+/**
+ * @internal
+ */
+export const`
