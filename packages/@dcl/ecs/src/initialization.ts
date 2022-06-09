@@ -36,10 +36,12 @@ function createRendererTransport() {
     type: 'renderer',
     send(message: Uint8Array): void {
       if (ExperimentalAPI) {
-        dcl.callRpc('ExperimentalAPI', 'sendToRenderer', [{ data: message }])
+        dcl
+          .callRpc('ExperimentalAPI', 'sendToRenderer', [{ data: message }])
+          .catch(dcl.error)
       }
     },
-    onmessage(message: Uint8Array): void {},
+    onmessage(_message: Uint8Array): void {},
     filter(message: TransportMessage): boolean {
       // Echo message, ignore them
       if (message.transportType === 'renderer') {
