@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { Component } from './generateComponent'
 
 const indexTemplate = `$componentImports
 import type { IEngine } from '../../engine/types'
@@ -9,25 +10,25 @@ export function defineProtocolBufferComponents({
 }: Pick<IEngine, 'defineComponent'>) {
 
   return {
-    $componentReturns
+$componentReturns
   }
 }
 `
-function importComponent(component: string) {
-  return `import * as ${component} from './${component}'`
+function importComponent(component: Component) {
+  return `import * as ${component.componentName} from './${component.componentName}.gen'`
 }
 
-function defineComponent(component: string) {
-  return `${component}: defineComponent(${component}.COMPONENT_ID, ${component}.${component})`
+function defineComponent(component: Component) {
+  return `${component.componentName}: defineComponent(${component.componentName}.COMPONENT_ID, ${component.componentName}.${component.componentName})`
 }
 
 export function generateIndex(param: {
-  components: string[]
+  components: Component[]
   generatedPath: string
 }) {
   const { components, generatedPath } = param
   const componentWithoutIndex = components.filter(
-    (component) => component !== 'index'
+    (component) => component.componentName !== 'index'
   )
 
   const indexContent = indexTemplate
@@ -40,5 +41,5 @@ export function generateIndex(param: {
       componentWithoutIndex.map(defineComponent).join(',\n')
     )
 
-  fs.writeFileSync(path.resolve(generatedPath, 'index.ts'), indexContent)
+  fs.writeFileSync(path.resolve(generatedPath, 'index.gen.ts'), indexContent)
 }

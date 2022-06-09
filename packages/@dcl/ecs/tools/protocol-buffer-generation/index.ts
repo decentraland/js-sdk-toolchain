@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 
-import { copySync, mkdirSync, removeSync } from 'fs-extra'
+import { copySync, mkdirSync, readFileSync, removeSync } from 'fs-extra'
 import path from 'path'
 import { compareFolders } from '../utils/compareFolder'
 import { getFilePathsSync } from '../utils/getFilePathsSync'
-import { FileDescriptorStandardOption, runCommand } from '../utils/shellCommand'
-import { generateComponent } from './generateComponent'
-import { generateProtocolBuffer } from './generateProtocolBuffer'
+import { Component, generateComponent } from './generateComponent'
+import {
+  generateProtocolBuffer,
+  getComponentId
+} from './generateProtocolBuffer'
 import { generateIndex } from './generateIndex'
 
 function getParam(key: string) {
@@ -51,9 +53,30 @@ async function main() {
     `Decentraland > Gen dir: ${generatedPath} - definitions dir: ${definitionsPath}`
   )
 
-  const components = getFilePathsSync(definitionsPath, false)
+  const componentsFile = getFilePathsSync(definitionsPath, false)
     .filter((filePath) => filePath.toLowerCase().endsWith('.proto'))
-    .map((filePath) => filePath.substring(0, filePath.length - 6))
+    .map((filePath) => filePath.substring(0, filePath.length - '.proto'.length))
+
+  const components = componentsFile.map((componentName) => {
+    const protoFileContent = readFileSync(
+      path.resolve(definitionsPath, `${componentName}.proto`)
+    ).toString()
+
+    let componentId: number = -1
+    try {
+      componentId = getComponentId(protoFileContent)
+    } catch (error) {
+      console.error(error)
+      throw new Error(
+        `Couldn't get the component id in component ${componentName}.proto, please check the line with "option (ecs_component_id) = XXXX;" is well formated and it exists.`
+      )
+    }
+
+    return {
+      componentId,
+      componentName
+    }
+  }) as Component[]
 
   if (
     !(await generateProtocolBuffer({
