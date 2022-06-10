@@ -37,7 +37,9 @@ function createRendererTransport() {
     send(message: Uint8Array): void {
       if (ExperimentalAPI) {
         dcl
-          .callRpc('ExperimentalAPI', 'sendToRenderer', [{ data: message }])
+          .callRpc('@decentraland/ExperimentalAPI', 'sendToRenderer', [
+            { data: message }
+          ])
           .catch(dcl.error)
       }
     },
