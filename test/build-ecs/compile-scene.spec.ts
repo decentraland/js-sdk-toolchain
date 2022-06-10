@@ -6,7 +6,7 @@ import {
   itDeletesFolder
 } from '../../scripts/helpers'
 
-const ecsLocation = resolve(__dirname, '../../packages/decentraland-ecs')
+const ecsLocation = resolve(__dirname, '../../packages/@dcl/sdk')
 
 describe('build-ecs: simple scene compilation', () => {
   const cwd = resolve(__dirname, './fixtures/simple-scene')
@@ -28,7 +28,7 @@ describe('build-ecs: simple scene compilation', () => {
       readFileSync(resolve(cwd, 'bin/game.js.lib')).toString()
     ).map(($: { path: string }) => resolve(cwd, $.path))
     expect(lib).toContain(resolve('packages/@dcl/amd/dist/amd.js'))
-    expect(lib).toContain(resolve('packages/decentraland-ecs/dist/index.js'))
+    expect(lib).toContain(resolve('packages/@dcl/sdk/dist/index.js'))
   })
 })
 
@@ -52,7 +52,7 @@ describe('build-ecs: simple scene compilation, production mode', () => {
     ).map(($: { path: string }) => resolve(cwd, $.path))
     expect(lib).toContain(resolve('packages/@dcl/amd/dist/amd.min.js'))
     expect(lib).toContain(
-      resolve('packages/decentraland-ecs/dist/index.min.js')
+      resolve('packages/@dcl/sdk/dist/index.min.js')
     )
   })
 })

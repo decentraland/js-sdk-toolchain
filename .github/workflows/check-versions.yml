@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: verify posix version
-      working-directory: ./packages/decentraland-ecs
+      working-directory: ./packages/@dcl/sdk
       run: |
         node -e "
           const pkg = require('./package.json')

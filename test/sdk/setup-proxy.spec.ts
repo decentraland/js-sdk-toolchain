@@ -2,12 +2,12 @@ import { resolve } from 'path'
 import * as express from 'express'
 import * as supertest from 'supertest'
 
-const ecsLocation = resolve(__dirname, '../../packages/decentraland-ecs')
+const ecsLocation = resolve(__dirname, '../../packages/@dcl/sdk')
 const mockDclObject = {
   getWorkingDir: () => ecsLocation
 }
 
-describe('decentraland-ecs: setupProxy.js resolve endpoints successful', () => {
+describe('@dcl/sdk: setupProxy.js resolve endpoints successful', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const setupProxy = require(`${ecsLocation}/src/setupProxy.js`)
 
