@@ -3,9 +3,11 @@
 import "common/id.proto";
 option (ecs_component_id) = 1014;
 
-message PBPlaneShape {  
+message PBPlaneShape {
   bool with_collisions = 1;
   bool is_pointer_blocker = 2;
+  // TODO: should visible be another component? that maybe affects all the entities
   bool visible = 3;
+  // TODO: this could be better serialized as u00 v00 u01 v01 u10 v10 u11 v11 for speed
   repeated float uvs = 4;
 }

@@ -8,6 +8,12 @@ declare function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>>;
  */
 declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
 
+declare interface Color3 {
+    r: number;
+    g: number;
+    b: number;
+}
+
 /**
  * @public
  */
@@ -16,9 +22,9 @@ declare type ComponentDefinition<T extends EcsType = EcsType<any>> = {
     has(entity: Entity): boolean;
     getFrom(entity: Entity): DeepReadonly<ComponentType<T>>;
     getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
-    create(entity: Entity, val: ComponentType<T>): ComponentType<T>;
+    create(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
     mutable(entity: Entity): ComponentType<T>;
-    createOrReplace(entity: Entity, val: ComponentType<T>): ComponentType<T>;
+    createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
     deleteFrom(entity: Entity): ComponentType<T> | null;
     upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
     updateFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
@@ -183,8 +189,11 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
     AudioStream: ComponentDefinition<EcsType<PBAudioStream>>;
     BoxShape: ComponentDefinition<EcsType<PBBoxShape>>;
     CylinderShape: ComponentDefinition<EcsType<PBCylinderShape>>;
+    NFTShape: ComponentDefinition<EcsType<PBNFTShape>>;
     PlaneShape: ComponentDefinition<EcsType<PBPlaneShape>>;
     SphereShape: ComponentDefinition<EcsType<PBSphereShape>>;
+    TextShape: ComponentDefinition<EcsType<PBTextShape>>;
+    UiTransform: ComponentDefinition<EcsType<PBUiTransform>>;
     Transform: ComponentDefinition<EcsType<Transform>>;
 };
 
@@ -218,6 +227,7 @@ declare const EcsString: EcsType<string>;
 declare type EcsType<T = any> = {
     serialize(value: T, builder: ByteBuffer): void;
     deserialize(reader: ByteBuffer): T;
+    create(): T;
 };
 
 /**
@@ -1098,6 +1108,7 @@ declare interface PBAudioStream {
 declare interface PBBoxShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
+    /** TODO: should visible be another component? that maybe affects all the entities */
     visible: boolean;
     uvs: number[];
 }
@@ -1105,15 +1116,29 @@ declare interface PBBoxShape {
 declare interface PBCylinderShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
+    /** TODO: should visible be another component? that maybe affects all the entities */
     visible: boolean;
     radiusTop: number;
     radiusBottom: number;
 }
 
+declare interface PBNFTShape {
+    withCollisions: boolean;
+    isPointerBlocker: boolean;
+    /** TODO: should visible be another component? that maybe affects all the entities */
+    visible: boolean;
+    src: string;
+    assetId: string;
+    style: number;
+    color: Color3 | undefined;
+}
+
 declare interface PBPlaneShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
+    /** TODO: should visible be another component? that maybe affects all the entities */
     visible: boolean;
+    /** TODO: this could be better serialized as u00 v00 u01 v01 u10 v10 u11 v11 for speed */
     uvs: number[];
 }
 
@@ -1121,6 +1146,93 @@ declare interface PBSphereShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
     visible: boolean;
+}
+
+declare interface PBTextShape {
+    text: string;
+    /** this should be removed */
+    visible: boolean;
+    font: string;
+    opacity: number;
+    fontSize: number;
+    fontAutoSize: boolean;
+    hTextAlign: string;
+    vTextAlign: string;
+    width: number;
+    height: number;
+    paddingTop: number;
+    paddingRight: number;
+    paddingBottom: number;
+    paddingLeft: number;
+    lineSpacing: number;
+    lineCount: number;
+    textWrapping: boolean;
+    shadowBlur: number;
+    shadowOffsetX: number;
+    shadowOffsetY: number;
+    outlineWidth: number;
+    shadowColor: Color3 | undefined;
+    outlineColor: Color3 | undefined;
+    textColor: Color3 | undefined;
+}
+
+declare interface PBUiTransform {
+    positionType: YGPositionType;
+    alignContent: YGAlign;
+    alignItems: YGAlign;
+    alignSelf: YGAlign;
+    flexDirection: YGFlexDirection;
+    flexGrap: YGWrap;
+    justifyContent: YGJustify;
+    overflow: YGOverflow;
+    display: YGDisplay;
+    direction: YGDirection;
+    flex: number;
+    flexBasisUnit: YGUnit;
+    flexBasis: number;
+    flexGrow: number;
+    flexShrink: number;
+    widthUnit: YGUnit;
+    width: number;
+    heightUnit: YGUnit;
+    height: number;
+    minWidthUnit: YGUnit;
+    minWidth: number;
+    minHeightUnit: YGUnit;
+    minHeight: number;
+    maxWidthUnit: YGUnit;
+    maxWidth: number;
+    maxHeightUnit: YGUnit;
+    maxHeight: number;
+    positionLeftUnit: YGUnit;
+    positionLeft: number;
+    positionTopUnit: YGUnit;
+    positionTop: number;
+    positionRightUnit: YGUnit;
+    positionRight: number;
+    positionBottomUnit: YGUnit;
+    positionBottom: number;
+    /** margin */
+    marginLeftUnit: YGUnit;
+    marginLeft: number;
+    marginTopUnit: YGUnit;
+    marginTop: number;
+    marginRightUnit: YGUnit;
+    marginRight: number;
+    marginBottomUnit: YGUnit;
+    marginBottom: number;
+    paddingLeftUnit: YGUnit;
+    paddingLeft: number;
+    paddingTopUnit: YGUnit;
+    paddingTop: number;
+    paddingRightUnit: YGUnit;
+    paddingRight: number;
+    paddingBottomUnit: YGUnit;
+    paddingBottom: number;
+    borderLeft: number;
+    borderTop: number;
+    borderRight: number;
+    borderBottom: number;
 }
 
 /**
@@ -1671,6 +1783,78 @@ declare namespace Vector3 {
      * @returns a new left Vector3
      */
     export function Left(): MutableVector3;
+}
+
+declare enum YGAlign {
+    YGAlignAuto = 0,
+    YGAlignFlexStart = 1,
+    YGAlignCenter = 2,
+    YGAlignFlexEnd = 3,
+    YGAlignStretch = 4,
+    YGAlignBaseline = 5,
+    YGAlignSpaceBetween = 6,
+    YGAlignSpaceAround = 7,
+    UNRECOGNIZED = -1
+}
+
+declare enum YGDirection {
+    YGDirectionInherit = 0,
+    YGDirectionLTR = 1,
+    YGDirectionRTL = 2,
+    UNRECOGNIZED = -1
+}
+
+declare enum YGDisplay {
+    YGDisplayFlex = 0,
+    YGDisplayNone = 1,
+    UNRECOGNIZED = -1
+}
+
+declare enum YGFlexDirection {
+    YGFlexDirectionColumn = 0,
+    YGFlexDirectionColumnReverse = 1,
+    YGFlexDirectionRow = 2,
+    YGFlexDirectionRowReverse = 3,
+    UNRECOGNIZED = -1
+}
+
+declare enum YGJustify {
+    YGJustifyFlexStart = 0,
+    YGJustifyCenter = 1,
+    YGJustifyFlexEnd = 2,
+    YGJustifySpaceBetween = 3,
+    YGJustifySpaceAround = 4,
+    YGJustifySpaceEvenly = 5,
+    UNRECOGNIZED = -1
+}
+
+declare enum YGOverflow {
+    YGOverflowVisible = 0,
+    YGOverflowHidden = 1,
+    YGOverflowScroll = 2,
+    UNRECOGNIZED = -1
+}
+
+declare enum YGPositionType {
+    YGPositionTypeStatic = 0,
+    YGPositionTypeRelative = 1,
+    YGPositionTypeAbsolute = 2,
+    UNRECOGNIZED = -1
+}
+
+declare enum YGUnit {
+    YGUnitUndefined = 0,
+    YGUnitPoint = 1,
+    YGUnitPercent = 2,
+    YGUnitAuto = 3,
+    UNRECOGNIZED = -1
+}
+
+declare enum YGWrap {
+    YGWrapNoWrap = 0,
+    YGWrapWrap = 1,
+    YGWrapWrapReverse = 2,
+    UNRECOGNIZED = -1
 }
 
 

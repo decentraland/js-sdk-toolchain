@@ -32,15 +32,8 @@ build:
 build-ecs:
 	./node_modules/.bin/rollup -c ./node_modules/@dcl/dcl-rollup/ecs.config.js
 
-
 watch:
 	./node_modules/.bin/tsc -p tsconfig.json -w
-
-lint:
-	./node_modules/.bin/eslint . --ext .ts
-
-lint-fix:
-	./node_modules/.bin/eslint . --ext .ts --fix
 
 install_protobuffer_compiler:
 	curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v$(PROTOBUF_VERSION)/$(PROTOBUF_ZIP)
