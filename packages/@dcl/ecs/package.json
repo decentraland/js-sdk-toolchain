@@ -12,7 +12,7 @@
   "keywords": [
     "dcl",
     "ecs",
-    "decentraland-ecs"
+    "@dcl/sdk"
   ],
   "author": "DCL",
   "license": "Apache-2.0",

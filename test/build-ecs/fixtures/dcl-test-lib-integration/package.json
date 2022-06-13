@@ -17,7 +17,7 @@
   },
   "decentralandLibrary": {},
   "devDependencies": {
-    "decentraland-ecs": "latest"
+    "@dcl/sdk": "./../../../../packages/@dcl/sdk"
   },
   "dependencies": {
     "eth-connect": "^6.0.0"

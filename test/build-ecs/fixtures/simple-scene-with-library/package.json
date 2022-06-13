@@ -14,8 +14,8 @@
     "watch": "../../../../packages/@dcl/build-ecs/dist/index.js --watch"
   },
   "devDependencies": {
-    "dcl-test-lib-integration": "file:../dcl-test-lib-integration",
-    "decentraland-ecs": "latest"
+    "@dcl/sdk": "./../../../../packages/@dcl/sdk",
+    "dcl-test-lib-integration": "file:../dcl-test-lib-integration"
   },
   "dependencies": {
     "eth-connect": "^6.0.0",

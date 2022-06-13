@@ -8,6 +8,6 @@
   "include": [
     "*.ts"
   ],
-  "extends": "../../../../packages/@dcl/sdk/types/tsconfig.json",
+  "extends": "../../../../packages/@dcl/sdk/types/tsconfig.ecs7.json",
   "compileOnSave": false
 }
