@@ -294,11 +294,11 @@ export class BoxShape extends Shape {
 
 // @public (undocumented)
 export class Camera {
-    constructor();
-    // @deprecated (undocumented)
     get cameraMode(): CameraMode;
     readonly feetPosition: Vector3;
     // (undocumented)
+    static getCamera(): Promise<Camera>;
+    // @deprecated (undocumented)
     static get instance(): Camera;
     get playerHeight(): number;
     readonly position: Vector3;
