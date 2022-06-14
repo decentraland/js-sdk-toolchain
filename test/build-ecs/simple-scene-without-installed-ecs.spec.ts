@@ -16,7 +16,7 @@ describe('simple-scene-without-installed-ecs: build a scene with env vars', () =
 
   const SDK_PATH = resolve(
     __dirname,
-    '../../packages/@dcl/sdk/dist/index.js'
+    '../../packages/@dcl/sdk/dist/ecs7/index.js'
   )
   const AMD_PATH = resolve(__dirname, '../../packages/@dcl/amd/dist/amd.js')
 

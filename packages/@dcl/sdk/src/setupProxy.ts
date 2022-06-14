@@ -21,7 +21,12 @@ const setupProxy = (dcl: any, app: express.Application) => {
 
   const ecsPath = path.dirname(
     require.resolve('@dcl/sdk/package.json', {
-      paths: [dcl.getWorkingDir(), __dirname + '/../../', __dirname + '/../']
+      paths: [
+        dcl.getWorkingDir(),
+        __dirname + '/../../',
+        __dirname + '/../../../',
+        __dirname + '/../'
+      ]
     })
   )
   const dclKernelPath = path.dirname(
