@@ -1,5 +1,4 @@
 import { readFileSync, writeFileSync } from 'fs'
-import { resolve } from 'path'
 
 import {
   flow,
@@ -9,7 +8,6 @@ import {
   TERSER,
   ROLLUP_CONFIG_PATH,
   SDK_PATH,
-  ROLLUP,
   commonChecks,
   ECS7_PATH
 } from './common'
@@ -110,7 +108,6 @@ flow('build-all', () => {
       }
     })
   })
-
 })
 
 function fixTypes(
