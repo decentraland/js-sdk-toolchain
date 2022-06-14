@@ -1,6 +1,6 @@
 {
   "name": "@dcl/ecs",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Decentraland ECS",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/decentraland/ecs#readme",
   "devDependencies": {
-    "@dcl/dcl-rollup": "^6.11.1-2420975861.commit-4673308",
     "@microsoft/api-extractor": "^7.23.1",
     "@types/fs-extra": "^9.0.13",
     "@types/jest": "^27.5.0",
