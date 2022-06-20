@@ -34,6 +34,6 @@ describe('Generated BoxShape ProtoBuf', () => {
     const buffer = Animator.toBinary(entity)
     Animator.updateFromBinary(entityB, buffer)
 
-    expect(_animator).toBeDeepCloseTo({ ...Animator.mutable(entityB) })
+    expect(_animator).toBeDeepCloseTo({ ...Animator.mutable(entityB) as any})
   })
 })
