@@ -19,6 +19,9 @@ export function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>> {
         newArray.push(type.deserialize(reader))
       }
       return newArray
+    },
+    create() {
+      return []
     }
   }
 }

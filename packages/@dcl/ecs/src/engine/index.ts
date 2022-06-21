@@ -1,4 +1,4 @@
-import { defineSdkComponents, SdkComponetns } from '../components'
+import { defineSdkComponents, SdkComponents } from '../components'
 import { crdtSceneSystem } from '../systems/crdt'
 import { Entity, EntityContainer } from './entity'
 import {
@@ -11,8 +11,15 @@ import type { DeepReadonly } from '../Math'
 import type { EcsType } from '../built-in-types/EcsType'
 import { IEngine } from './types'
 import { ByteBuffer } from '../serialization/ByteBuffer'
+import { Transport } from '../systems/crdt/transport'
 
-export { ComponentType, Entity, ByteBuffer, SdkComponetns, ComponentDefinition }
+export {
+  ComponentType,
+  Entity,
+  ByteBuffer,
+  SdkComponents as SdkComponetns,
+  ComponentDefinition
+}
 export * from './types'
 
 function preEngine() {
@@ -142,9 +149,14 @@ export type PreEngine = ReturnType<typeof preEngine>
 /**
  * @public
  */
-export function Engine(): IEngine {
+export function Engine({
+  transports
+}: { transports?: Transport[] } = {}): IEngine {
   const engine = preEngine()
-  const crdtSystem = crdtSceneSystem(engine)
+  const crdtSystem = crdtSceneSystem({
+    engine,
+    availableTransports: transports
+  })
   const baseComponents = defineSdkComponents(engine)
 
   function update(dt: number) {

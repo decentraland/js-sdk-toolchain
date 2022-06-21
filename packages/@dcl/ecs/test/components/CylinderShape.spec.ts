@@ -26,5 +26,9 @@ describe('Generated Cylinder ProtoBuf', () => {
     CylinderShape.updateFromBinary(entityB, buffer)
 
     expect(_shape).toBeDeepCloseTo({ ...CylinderShape.mutable(entityB) })
+
+    expect(CylinderShape.createOrReplace(entityB)).not.toBeDeepCloseTo({
+      ...CylinderShape.mutable(entity)
+    })
   })
 })

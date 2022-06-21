@@ -43,22 +43,16 @@ jobs:
           cwd: packages/@dcl/js-runtime
           deterministic-snapshot: true
           only-update-versions: true
-      - name: update version of packages/@dcl/legacy-ecs
-        uses: menduz/oddish-action@master
-        with:
-          cwd: packages/@dcl/legacy-ecs
-          deterministic-snapshot: true
-          only-update-versions: true
       - name: update version of packages/@dcl/ecs
         uses: menduz/oddish-action@master
         with:
           cwd: packages/@dcl/ecs
           deterministic-snapshot: true
           only-update-versions: true
-      - name: update version of packages/decentraland-ecs
+      - name: update version of packages/@dcl/sdk
         uses: menduz/oddish-action@master
         with:
-          cwd: packages/decentraland-ecs
+          cwd: packages/@dcl/sdk
           deterministic-snapshot: true
           only-update-versions: true
       - name: build
@@ -87,22 +81,6 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/dcl-rollup'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
-      - name: publish @dcl/legacy-ecs package
-        uses: menduz/oddish-action@master
-        with:
-          registry-url: 'https://registry.npmjs.org'
-          access: public
-          cwd: ./packages/@dcl/legacy-ecs
-          ## use action runId instead of current date to generate snapshot numbers
-          deterministic-snapshot: true
-
-          ## publish every package to s3
-          s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/legacy-ecs'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
@@ -174,20 +152,20 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
-      - name: (PR) change decentraland-ecs version to s3 url
-        working-directory: ./packages/decentraland-ecs
+      - name: (PR) change @dcl/sdk version to s3 url
+        working-directory: ./packages/@dcl/sdk
         if: ${{ github.event.pull_request.number }}
         run: node -e "let pkg=require('./package.json'); pkg.dependencies['@dcl/build-ecs']='$BUILD_ECS_S3_URL'; pkg.dependencies['@dcl/amd']='$AMD_S3_URL'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
         env:
           AMD_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_amd.outputs.s3-bucket-key }}
           BUILD_ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_build_ecs.outputs.s3-bucket-key }}
-      - name: publish decentraland-ecs package
+      - name: publish @dcl/sdk package
         uses: menduz/oddish-action@master
         id: publish_decentraland_ecs
         with:
           registry-url: 'https://registry.npmjs.org'
           access: public
-          cwd: ./packages/decentraland-ecs
+          cwd: ./packages/@dcl/sdk
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
 
@@ -226,7 +204,7 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             # Test this pull request
-            - The `decentraland-ecs` package can be tested in scenes by running
+            - The `@dcl/sdk` package can be tested in scenes by running
                ```bash
                npm install "${{ steps.url-generator.outputs.body }}"
                ```

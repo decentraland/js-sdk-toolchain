@@ -10,6 +10,9 @@ export const FlatString: EcsType<string> = {
   },
   deserialize(reader: ByteBuffer): string {
     return new TextDecoder().decode(reader.readBuffer())
+  },
+  create() {
+    return ''
   }
 }
 

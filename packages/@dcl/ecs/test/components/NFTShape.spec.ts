@@ -29,9 +29,9 @@ describe('Generated BoxShape ProtoBuf', () => {
     const buffer = NFTShape.toBinary(entity)
     NFTShape.updateFromBinary(entityB, buffer)
 
-    // TODO: toBeDeepCloseTo has a error type implementation, should make an own toBeDeepCloseTo
-    //  or fix with a PR this one
-    const otherNFTShape = NFTShape.mutable(entityB)
-    expect(_nftShape).toBeDeepCloseTo({ ...(otherNFTShape as any) })
+    expect(_nftShape).toBeDeepCloseTo({ ...NFTShape.getFrom(entityB) })
+    expect(NFTShape.createOrReplace(entityB)).not.toBeDeepCloseTo({
+      ...NFTShape.getFrom(entity)
+    })
   })
 })

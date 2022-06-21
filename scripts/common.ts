@@ -27,11 +27,7 @@ export const ROLLUP_CONFIG_PATH = resolve(
   process.cwd(),
   './packages/@dcl/dcl-rollup'
 )
-export const ECS_PATH = resolve(process.cwd(), './packages/decentraland-ecs')
-export const LEGACY_ECS_PATH = resolve(
-  process.cwd(),
-  './packages/@dcl/legacy-ecs'
-)
+export const SDK_PATH = resolve(process.cwd(), './packages/@dcl/sdk')
 
 export const ECS7_PATH = resolve(process.cwd(), './packages/@dcl/ecs')
 
@@ -43,7 +39,7 @@ export function commonChecks() {
   })
 
   test('@dcl/posix is consistent across projects', () => {
-    const ecsVersion = readJson('package.json', ECS_PATH).dependencies[
+    const ecsVersion = readJson('package.json', SDK_PATH).dependencies[
       '@dcl/posix'
     ]
     const amdVersion = readJson('package.json', DECENTRALAND_AMD_PATH)
@@ -55,7 +51,7 @@ export function commonChecks() {
   test('@dcl/posix snapshot are not used for releases', () => {
     // we only validate ECS version, previous step validates consistenty
     const dclPosixVersion: string =
-      readJson('package.json', ECS_PATH).dependencies['@dcl/posix'] || ''
+      readJson('package.json', SDK_PATH).dependencies['@dcl/posix'] || ''
 
     const ref: string = (process.env.GITHUB_REF || '').split(/\//g).pop()!
 
@@ -69,7 +65,7 @@ export function commonChecks() {
     if (snapshotExpr.test(dclPosixVersion)) {
       console.error(
         `::error file=${resolve(
-          ECS_PATH,
+          SDK_PATH,
           'package.json'
         )},line=0,col=0::Using a snapshot version of @dcl/posix if you create a release with the snapshot it will fail`
       )
