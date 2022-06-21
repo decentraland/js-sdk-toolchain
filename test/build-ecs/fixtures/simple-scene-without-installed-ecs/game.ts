@@ -1,51 +1,41 @@
-/// --- Set up a system ---
+const engine = Engine()
 
-class RotatorSystem {
-  // this group will contain every entity that has a Transform component
-  group = engine.getComponentGroup(Transform)
+function circularSystem() {
+  let t = 0.0
+  const sdk = engine.baseComponents
+  return (dt: number) => {
+    t += 2 * Math.PI * dt
 
-  update(dt: number) {
-    // iterate over the entities of the group
-    for (const entity of this.group.entities) {
-      // get the Transform component of the entity
-      const transform = entity.getComponent(Transform)
-
-      // mutate the rotation
-      transform.rotate(Vector3.Up(), dt * 10)
+    const group = engine.groupOf(sdk.BoxShape)
+    for (const [entity] of group) {
+      const transform = sdk.Transform.mutable(entity)
+      if (transform) {
+        transform.position.x = 8 + 2 * Math.cos(t)
+        transform.position.z = 8 + 2 * Math.sin(t)
+      }
     }
   }
 }
 
-// Add a new instance of the system to the engine
-engine.addSystem(new RotatorSystem())
+function createCube(x: number, y: number, z: number) {
+  const sdk = engine.baseComponents
+  const myEntity = engine.addEntity()
 
-/// --- Spawner function ---
+  sdk.Transform.create(myEntity, {
+    position: { x, y, z },
+    scale: { x: 1, y: 1, z: 1 },
+    rotation: { x: 0, y: 0, z: 0, w: 1 }
+  })
 
-function spawnCube(x: number, y: number, z: number) {
-  // create the entity
-  const cube = new Entity()
+  sdk.BoxShape.create(myEntity, {
+    withCollisions: true,
+    isPointerBlocker: true,
+    visible: true,
+    uvs: []
+  })
 
-  // add a transform to the entity
-  cube.addComponent(new Transform({ position: new Vector3(x, y, z) }))
-
-  // add a shape to the entity
-  cube.addComponent(new BoxShape())
-
-  // add the entity to the engine
-  engine.addEntity(cube)
-
-  return cube
+  return myEntity
 }
 
-/// --- Spawn a cube ---
-
-const cube = spawnCube(8, 1, 8)
-
-cube.addComponent(
-  new OnClick(() => {
-    cube.getComponent(Transform).scale.z *= 1.1
-    cube.getComponent(Transform).scale.x *= 0.9
-
-    spawnCube(Math.random() * 8 + 1, Math.random() * 8, Math.random() * 8 + 1)
-  })
-)
+createCube(8, 2, 8)
+engine.addSystem(circularSystem())

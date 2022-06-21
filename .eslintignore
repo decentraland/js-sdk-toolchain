@@ -1,6 +1,6 @@
 packages/@dcl/js-runtime
 *.js
 *.d.ts
-test/decentraland-ecs/simple-scene
+test/sdk/simple-scene
 packages/@dcl/ecs/dist/
 packages/@dcl/ecs/src/components/generated

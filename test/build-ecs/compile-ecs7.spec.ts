@@ -20,16 +20,10 @@ describe('build-ecs: simple scene compilation', () => {
     ensureFileExists('bin/game.js.lib', cwd)
     const fileText = readFileSync(binPath, 'utf8')
     const ecs7Included = fileText.includes(
-      'packages/decentraland-ecs/dist/ecs7/index.js'
-    )
-    const legacyEcsIncluded = fileText.includes(
-      'packages/decentraland-ecs/dist/index.js'
+      'packages/@dcl/sdk/dist/ecs7/index.js'
     )
     if (!ecs7Included) {
       throw new Error('ECS 7 not loaded correctly')
-    }
-    if (legacyEcsIncluded) {
-      throw new Error('Bundled legacy ecs.')
     }
   })
 })

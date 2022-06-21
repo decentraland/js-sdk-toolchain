@@ -8,6 +8,12 @@ declare function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>>;
  */
 declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
 
+declare interface Color3 {
+    r: number;
+    g: number;
+    b: number;
+}
+
 /**
  * @public
  */
@@ -183,8 +189,10 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
     AudioStream: ComponentDefinition<EcsType<PBAudioStream>>;
     BoxShape: ComponentDefinition<EcsType<PBBoxShape>>;
     CylinderShape: ComponentDefinition<EcsType<PBCylinderShape>>;
+    NFTShape: ComponentDefinition<EcsType<PBNFTShape>>;
     PlaneShape: ComponentDefinition<EcsType<PBPlaneShape>>;
     SphereShape: ComponentDefinition<EcsType<PBSphereShape>>;
+    TextShape: ComponentDefinition<EcsType<PBTextShape>>;
     Transform: ComponentDefinition<EcsType<Transform>>;
 };
 
@@ -1110,6 +1118,16 @@ declare interface PBCylinderShape {
     radiusBottom: number;
 }
 
+declare interface PBNFTShape {
+    withCollisions: boolean;
+    isPointerBlocker: boolean;
+    visible: boolean;
+    src: string;
+    assetId: string;
+    style: number;
+    color: Color3 | undefined;
+}
+
 declare interface PBPlaneShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
@@ -1121,6 +1139,33 @@ declare interface PBSphereShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
     visible: boolean;
+}
+
+declare interface PBTextShape {
+    text: string;
+    visible: boolean;
+    font: string;
+    opacity: number;
+    fontSize: number;
+    fontAutoSize: boolean;
+    hTextAlign: string;
+    vTextAlign: string;
+    width: number;
+    height: number;
+    paddingTop: number;
+    paddingRight: number;
+    paddingBottom: number;
+    paddingLeft: number;
+    lineSpacing: number;
+    lineCount: number;
+    textWrapping: boolean;
+    shadowBlur: number;
+    shadowOffsetX: number;
+    shadowOffsetY: number;
+    outlineWidth: number;
+    shadowColor: Color3 | undefined;
+    outlineColor: Color3 | undefined;
+    textColor: Color3 | undefined;
 }
 
 /**

@@ -1,4 +1,5 @@
 {
+  "ecs7": true,
   "display": {
     "title": "interactive-text",
     "favicon": "favicon_asset"
