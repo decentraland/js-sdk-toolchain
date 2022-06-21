@@ -8,20 +8,25 @@ import { sdk } from '@dcl/schemas'
 
 const setupProxy = (dcl: any, app: express.Application) => {
   // first resolve all dependencies in the local current working directory
-  // second try to resolve dependencies in decentraland-ecs folder
+  // second try to resolve dependencies in @dcl/sdk folder
   /**
    * to test locally with linked packages:
    *
    * 1. go to explorer/kernel/static and run `npm link`
    * 2. in an empty folder create a test scene with `dcl init`
-   * 3. in that folder run `npm install folder-to/decentraland-ecs`
+   * 3. in that folder run `npm install folder-to/@dcl/sdk`
    * 4. install whatever version of `@dcl/unity-renderer` you want to test
    * 5. link kernel using `npm link @dcll/kernel` this will use the folder from step 1
    */
 
   const ecsPath = path.dirname(
-    require.resolve('decentraland-ecs/package.json', {
-      paths: [dcl.getWorkingDir(), __dirname + '/../../', __dirname + '/../']
+    require.resolve('@dcl/sdk/package.json', {
+      paths: [
+        dcl.getWorkingDir(),
+        __dirname + '/../../',
+        __dirname + '/../../../',
+        __dirname + '/../'
+      ]
     })
   )
   const dclKernelPath = path.dirname(
