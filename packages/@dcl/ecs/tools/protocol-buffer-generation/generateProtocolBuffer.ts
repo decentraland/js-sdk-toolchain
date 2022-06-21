@@ -12,10 +12,13 @@ export async function generateProtocolBuffer(params: {
 }) {
   const { definitionsPath, generatedPath, components } = params
   const pbGeneratedPath = path.resolve(generatedPath, 'pb')
+  const csharppbGeneratedPath = path.resolve(generatedPath, 'c-sharp-pb')
   let ret = false
 
   fs.removeSync(pbGeneratedPath)
   fs.mkdirSync(pbGeneratedPath, { recursive: true })
+  fs.removeSync(csharppbGeneratedPath)
+  fs.mkdirSync(csharppbGeneratedPath, { recursive: true })
 
   const protoFiles = components
     .map((item) => path.resolve(definitionsPath, `${item.componentName}.proto`))
@@ -40,6 +43,7 @@ export async function generateProtocolBuffer(params: {
         `--ts_proto_opt=onlyTypes=true`,
         `--ts_proto_opt=outputPartialMethods=false`,
         `--ts_proto_opt=fileSuffix=.gen`,
+        `--ts_proto_opt=useOptionals=all`,
         `--ts_proto_out=${pbGeneratedPath}`,
         `--proto_path=${definitionsPath}`,
         protoFiles
@@ -52,6 +56,11 @@ export async function generateProtocolBuffer(params: {
       fixTsGeneratedByProto(path.resolve(pbGeneratedPath, generatedFile))
     }
 
+    await generateCSharpCode({
+      pbGeneratedPath: csharppbGeneratedPath,
+      definitionsPath,
+      protoFiles
+    })
     ret = true
   } catch (err) {
     console.error(`Couldn't run protoc command properly.`, err)
@@ -101,3 +110,28 @@ const internalComment = `
  * @internal
  */
 export const`
+
+async function generateCSharpCode(params: {
+  pbGeneratedPath: string
+  definitionsPath: string
+  protoFiles: string
+}) {
+  const { pbGeneratedPath, definitionsPath, protoFiles } = params
+  await runCommand({
+    command: path.resolve(
+      process.cwd(),
+      'node_modules',
+      '.bin',
+      'protobuf',
+      'bin',
+      'protoc'
+    ),
+    workingDir: process.cwd(),
+    args: [
+      `--csharp_out=${pbGeneratedPath}`,
+      `--proto_path=${definitionsPath}`,
+      protoFiles
+    ],
+    fdStandards: FileDescriptorStandardOption.ONLY_IF_THROW
+  })
+}
