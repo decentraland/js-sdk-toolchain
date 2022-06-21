@@ -189,6 +189,7 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
     AudioStream: ComponentDefinition<EcsType<PBAudioStream>>;
     BoxShape: ComponentDefinition<EcsType<PBBoxShape>>;
     CylinderShape: ComponentDefinition<EcsType<PBCylinderShape>>;
+    GLTFShape: ComponentDefinition<EcsType<PBGLTFShape>>;
     NFTShape: ComponentDefinition<EcsType<PBNFTShape>>;
     PlaneShape: ComponentDefinition<EcsType<PBPlaneShape>>;
     SphereShape: ComponentDefinition<EcsType<PBSphereShape>>;
@@ -1128,6 +1129,13 @@ declare interface PBCylinderShape {
     visible: boolean;
     radiusTop: number;
     radiusBottom: number;
+}
+
+declare interface PBGLTFShape {
+    withCollisions: boolean;
+    isPointerBlocker: boolean;
+    visible: boolean;
+    src: string;
 }
 
 declare interface PBNFTShape {
