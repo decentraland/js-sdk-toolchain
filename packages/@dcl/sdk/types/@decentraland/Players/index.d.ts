@@ -1,6 +1,8 @@
 declare module '@decentraland/Players' {
   export type ColorString = string
 
+  export type WearableId = string
+
   export type Snapshots = {
     // @deprecated
     face: string

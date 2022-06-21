@@ -14,11 +14,10 @@ export const Component: EcsType<PBComponent> = {
   serialize(value: PBComponent, builder: ByteBuffer): void {
     const writer = PBComponent.encode(value)
     const buffer = new Uint8Array(writer.finish(), 0, writer.len)
-    builder.writeBuffer(buffer)
+    builder.writeBuffer(buffer, false)
   },
   deserialize(reader: ByteBuffer): PBComponent {
-    const buf = reader.readBuffer()
-    return PBComponent.decode(buf, buf.length)
+    return PBComponent.decode(reader.buffer(), reader.remainingBytes())
   }
 }
 `

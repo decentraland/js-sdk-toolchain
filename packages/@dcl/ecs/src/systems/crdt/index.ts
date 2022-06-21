@@ -6,11 +6,17 @@ import EntityUtils from '../../engine/entity-utils'
 import { createByteBuffer } from '../../serialization/ByteBuffer'
 import { PutComponentOperation as Message } from '../../serialization/crdt/componentOperation'
 import WireMessage from '../../serialization/wireMessage'
-import { getTransports } from './transport'
+import { getTransports, Transport } from './transport'
 import { ReceiveMessage, TransportMessage } from './types'
 import CrdtUtils from './utils'
 
-export function crdtSceneSystem(engine: PreEngine) {
+export function crdtSceneSystem({
+  engine,
+  availableTransports
+}: {
+  engine: PreEngine
+  availableTransports?: Transport[]
+}) {
   // CRDT Client
   const crdtClient = crdtProtocol<Uint8Array>()
   // Messages that we received at transport.onMessage waiting to be processed
@@ -20,7 +26,7 @@ export function crdtSceneSystem(engine: PreEngine) {
   // Map of entities already processed at least once
   const crdtEntities = new Map<Entity, boolean>()
 
-  const transports = getTransports()
+  const transports = [...getTransports(), ...(availableTransports || [])]
   transports.forEach(
     (transport) => (transport.onmessage = parseChunkMessage(transport.type))
   )
@@ -36,10 +42,9 @@ export function crdtSceneSystem(engine: PreEngine) {
      * Component Operation Messages at messages queue
      * @param chunkMessage A chunk of binary messages
      */
-    return function parseChunkMessage(chunkMessage: MessageEvent<Uint8Array>) {
-      if (!chunkMessage.data?.length) return
+    return function parseChunkMessage(chunkMessage: Uint8Array) {
       const buffer = createByteBuffer({
-        reading: { buffer: chunkMessage.data, currentOffset: 0 }
+        reading: { buffer: chunkMessage, currentOffset: 0 }
       })
 
       while (WireMessage.validate(buffer)) {

@@ -58,7 +58,7 @@ export namespace SandBox {
             .map((c) => c.transports.find((t) => t.type === transport.type))
             .forEach(async (clientTransport) => {
               await wait(WS_SEND_DELAY)
-              clientTransport?.onmessage!({ data } as MessageEvent)
+              clientTransport?.onmessage!(data)
             })
         }
       }

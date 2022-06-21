@@ -11,12 +11,19 @@
     "declaration": true,
     "stripInternal": true,
     "downlevelIteration": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "types": [
+      "@dcl/posix"
+    ]
   },
   "include": [
     "src",
     "temp-protocolbuffers"
   ],
-  "files": ["node_modules/protobufjs/minimal.d.ts"],
-  "exclude": ["dist"]
+  "files": [
+    "node_modules/protobufjs/minimal.d.ts"
+  ],
+  "exclude": [
+    "dist"
+  ]
 }
