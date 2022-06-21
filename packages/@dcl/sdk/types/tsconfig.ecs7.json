@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "amd",
+    "moduleResolution": "classic",
+    "pretty": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "downlevelIteration": true,
+    "keyofStringsOnly": true,
+    "inlineSourceMap": true,
+    "sourceMap": false,
+    "removeComments": true,
+    "inlineSources": true,
+    "useDefineForClassFields": false,
+    "allowJs": true,
+    "types": [
+      "env",
+      "ecs7-env",
+      "ecs7",
+      "@decentraland/EthereumController",
+      "@decentraland/SocialController",
+      "@decentraland/Identity",
+      "@decentraland/web3-provider",
+      "@decentraland/EnvironmentAPI",
+      "@decentraland/ParcelIdentity",
+      "@decentraland/PortableExperiences",
+      "@decentraland/RestrictedActions",
+      "@decentraland/SignedFetch",
+      "@decentraland/Players"
+    ],
+    "typeRoots": [
+      "."
+    ]
+  }
+}

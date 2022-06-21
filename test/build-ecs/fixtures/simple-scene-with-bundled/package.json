@@ -14,8 +14,8 @@
     "watch": "../../../../packages/@dcl/build-ecs/dist/index.js --watch"
   },
   "devDependencies": {
-    "dcl-test-lib-integration": "file:../dcl-test-lib-integration",
-    "decentraland-ecs": "latest"
+    "@dcl/sdk": "./../../../../packages/@dcl/sdk",
+    "dcl-test-lib-integration": "file:../dcl-test-lib-integration"
   },
   "dependencies": {
     "@dcl/ecs-scene-utils": "^1.7.5",

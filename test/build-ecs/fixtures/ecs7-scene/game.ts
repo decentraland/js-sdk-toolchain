@@ -34,8 +34,5 @@ function createCube(x: number, y: number, z: number) {
 
   return myEntity
 }
-const engine = Engine()
-
 createCube(8, 2, 8)
-
 engine.addSystem(circularSystem())

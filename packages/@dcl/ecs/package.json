@@ -1,6 +1,6 @@
 {
   "name": "@dcl/ecs",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Decentraland ECS",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -12,7 +12,7 @@
   "keywords": [
     "dcl",
     "ecs",
-    "decentraland-ecs"
+    "@dcl/sdk"
   ],
   "author": "DCL",
   "license": "Apache-2.0",
@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/decentraland/ecs#readme",
   "devDependencies": {
-    "@dcl/dcl-rollup": "^6.11.1-2420975861.commit-4673308",
     "@microsoft/api-extractor": "^7.23.1",
     "@types/fs-extra": "^9.0.13",
     "@types/jest": "^27.5.0",
@@ -36,7 +35,8 @@
   },
   "dependencies": {
     "@dcl/crdt": "^1.0.0-20220412150438.commit-965dc72",
-    "@dcl/ecs-math": "^2.0.1-20220526123120.commit-dab2aff"
+    "@dcl/ecs-math": "^2.0.1-20220526123120.commit-dab2aff",
+    "@dcl/posix": "^1.0.4"
   },
   "files": [
     "dist/index.js",

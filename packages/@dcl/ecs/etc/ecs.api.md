@@ -66,7 +66,12 @@ export type EcsType<T = any> = {
 };
 
 // @public (undocumented)
-export function Engine(): IEngine;
+export function Engine({ transports }?: {
+    transports?: Transport[];
+}): IEngine;
+
+// @alpha
+export const engine: IEngine;
 
 // @public (undocumented)
 export type Entity = number & {
@@ -265,6 +270,10 @@ export namespace Vector3 {
     export function Up(): MutableVector3;
     export function Zero(): MutableVector3;
 }
+
+// Warnings were encountered during analysis:
+//
+// dist/engine/index.d.ts:13:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
