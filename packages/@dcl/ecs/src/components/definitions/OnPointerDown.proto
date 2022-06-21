@@ -4,8 +4,10 @@ import "common/id.proto";
 option (ecs_component_id) = 1013;
 
 message PBOnPointerDown {
-  string button = 1;
-  string hover_text = 2;
-  float distance = 3;
-  bool show_feedback = 4;
+  string type = 1;
+  string identifier = 2;
+  string button = 3;
+  string hover_text = 4;
+  float distance = 5;
+  bool show_feedback = 6;
 }

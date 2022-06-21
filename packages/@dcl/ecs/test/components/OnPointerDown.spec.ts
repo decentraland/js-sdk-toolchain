@@ -8,6 +8,8 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     const entityB = newEngine.addEntity()
 
     const _onPointerDown = OnPointerDown.create(entity, {
+      type: "Down",
+      identifier: "98352439-fdsfds",
       button: "PRIMARY",
       hoverText: "Tap to run",
       distance: 10,
@@ -15,6 +17,8 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     })
 
     OnPointerDown.create(entityB, {
+      type: "Up",
+      identifier: "fg98352439-fdsfds",
       button: "D",
       hoverText: "TCker",
       distance: 5,
