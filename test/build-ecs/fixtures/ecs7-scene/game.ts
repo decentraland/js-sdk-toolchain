@@ -1,5 +1,3 @@
-const engine = Engine()
-
 function circularSystem() {
   let t = 0.0
   const sdk = engine.baseComponents
