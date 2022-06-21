@@ -1,4 +1,4 @@
-import { defineSdkComponents, SdkComponetns } from '../components'
+import { defineSdkComponents, SdkComponents } from '../components'
 import { crdtSceneSystem } from '../systems/crdt'
 import { Entity, EntityContainer } from './entity'
 import {
@@ -13,7 +13,13 @@ import { IEngine } from './types'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { Transport } from '../systems/crdt/transport'
 
-export { ComponentType, Entity, ByteBuffer, SdkComponetns, ComponentDefinition }
+export {
+  ComponentType,
+  Entity,
+  ByteBuffer,
+  SdkComponents as SdkComponetns,
+  ComponentDefinition
+}
 export * from './types'
 
 function preEngine() {

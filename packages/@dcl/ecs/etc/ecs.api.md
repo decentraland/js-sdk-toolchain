@@ -18,9 +18,9 @@ export type ComponentDefinition<T extends EcsType = EcsType<any>> = {
     has(entity: Entity): boolean;
     getFrom(entity: Entity): DeepReadonly<ComponentType<T>>;
     getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
-    create(entity: Entity, val: ComponentType<T>): ComponentType<T>;
+    create(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
     mutable(entity: Entity): ComponentType<T>;
-    createOrReplace(entity: Entity, val: ComponentType<T>): ComponentType<T>;
+    createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
     deleteFrom(entity: Entity): ComponentType<T> | null;
     upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
     updateFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
@@ -63,6 +63,7 @@ export const EcsString: EcsType<string>;
 export type EcsType<T = any> = {
     serialize(value: T, builder: ByteBuffer): void;
     deserialize(reader: ByteBuffer): T;
+    create(): T;
 };
 
 // @public (undocumented)

@@ -41,6 +41,8 @@ describe('Serialization Types', () => {
         buffer
       )
       expect(updatedInteger!.value).toBe(33)
+
+      expect(t.create()).toEqual(0)
     }
   })
 
@@ -66,6 +68,9 @@ describe('Serialization Types', () => {
       const updatedFloat = FloatComponent.updateFromBinary(entityCopied, buffer)
       expect(updatedFloat!.value).toBe(testValue)
     }
+
+    expect(Vector3.create()).toEqual({ x: 0, y: 0, z: 0 })
+    expect(Float64.create()).toEqual(0.0)
   })
 
   it('should serialize Strings', () => {
@@ -106,6 +111,10 @@ describe('Serialization Types', () => {
         })
       )
     })
+
+    const defaultValue = ItemType.create()
+
+    expect(defaultValue).toEqual({ itemId: 0, name: '', enchantingIds: [] })
 
     const PlayerComponent = engine.defineComponent(
       COMPONENT_ID,
@@ -171,19 +180,23 @@ describe('Serialization Types', () => {
     const entity = engine.addEntity()
     const COMPONENT_ID = 888
 
-    const TestComponent = engine.defineComponent(
-      COMPONENT_ID,
-      MapType({
-        optionalColor: Optional(
-          MapType({
-            r: Float32,
-            g: Float32,
-            b: Float32
-          })
-        ),
-        hasAlpha: EcsBoolean
-      })
-    )
+    const definition = MapType({
+      optionalColor: Optional(
+        MapType({
+          r: Float32,
+          g: Float32,
+          b: Float32
+        })
+      ),
+      hasAlpha: EcsBoolean
+    })
+
+    const TestComponent = engine.defineComponent(COMPONENT_ID, definition)
+
+    expect(definition.create()).toEqual({
+      optionalColor: undefined,
+      hasAlpha: false
+    })
 
     TestComponent.create(entity, {
       hasAlpha: true
@@ -245,6 +258,7 @@ describe('Serialization Types', () => {
     const COMPONENT_ID = 888
 
     enum ColorToNumber {
+      Default = 0,
       Red = 2,
       Green = 0x33,
       Pink = 0xff290323
@@ -255,7 +269,7 @@ describe('Serialization Types', () => {
       Enum<ColorToNumber>(Int64)
     )
 
-    // const value1 = TestComponent.create(entity, {})
+    expect(TestComponent.create(entity)).toEqual(0)
     TestComponent.create(entity, ColorToNumber.Pink)
 
     const entity2 = engine.addEntity()
@@ -287,6 +301,7 @@ describe('Serialization Types', () => {
     )
 
     // const value1 = TestComponent.create(entity, {})
+    expect(TestComponent.create(entity)).toEqual('')
     TestComponent.create(entity, ColorToString.Pink)
 
     const entity2 = engine.addEntity()

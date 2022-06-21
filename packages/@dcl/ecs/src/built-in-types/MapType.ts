@@ -38,6 +38,14 @@ export function MapType<T extends Spec>(spec: T): EcsType<Result<T>> {
         ;(newValue as any)[key] = spec[key].deserialize(reader)
       }
       return newValue
+    },
+    create() {
+      const newValue: Result<T> = {} as any
+      for (const key in spec) {
+        // TODO: as any
+        ;(newValue as any)[key] = spec[key].create()
+      }
+      return newValue
     }
   }
 }

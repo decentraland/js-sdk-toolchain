@@ -11,6 +11,9 @@ export function Enum<T>(type: EcsType<any>): EcsType<T> {
     },
     deserialize(reader: ByteBuffer): T {
       return type.deserialize(reader)
+    },
+    create() {
+      return type.create()
     }
   }
 }

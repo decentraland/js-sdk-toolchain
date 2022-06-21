@@ -35,12 +35,6 @@ build-ecs:
 watch:
 	./node_modules/.bin/tsc -p tsconfig.json -w
 
-lint:
-	./node_modules/.bin/eslint . --ext .ts
-
-lint-fix:
-	./node_modules/.bin/eslint . --ext .ts --fix
-
 install_protobuffer_compiler:
 	curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v$(PROTOBUF_VERSION)/$(PROTOBUF_ZIP)
 	unzip -o $(PROTOBUF_ZIP) -d node_modules/.bin/protobuf
