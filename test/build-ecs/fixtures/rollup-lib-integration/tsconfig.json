@@ -5,7 +5,7 @@
   "compilerOptions": {
     "module": "ESNext"
   },
-  "extends": "../../../../packages/@dcl/sdk/types/tsconfig.strict.json",
+  "extends": "../../../../packages/@dcl/sdk/types/tsconfig.ecs7.strict.json",
   "compileOnSave": false,
   "exclude": [
     "./dist"
