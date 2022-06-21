@@ -3,7 +3,7 @@
 import "common/id.proto";
 option (ecs_component_id) = 1015;
 
-message PBSphereShape {  
+message PBSphereShape {
   bool with_collisions = 1;
   bool is_pointer_blocker = 2;
   bool visible = 3;

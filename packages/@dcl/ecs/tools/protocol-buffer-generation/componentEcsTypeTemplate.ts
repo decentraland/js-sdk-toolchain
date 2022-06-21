@@ -18,6 +18,10 @@ export const Component: EcsType<PBComponent> = {
   },
   deserialize(reader: ByteBuffer): PBComponent {
     return PBComponent.decode(reader.buffer(), reader.remainingBytes())
+  },
+  create(): PBComponent {
+    // TODO: this is a hack.
+    return PBComponent.decode(new Uint8Array())
   }
 }
 `

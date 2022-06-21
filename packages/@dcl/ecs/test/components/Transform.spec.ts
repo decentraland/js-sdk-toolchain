@@ -83,4 +83,40 @@ describe('Transform component', () => {
     // optional parent serialize as 0
     expect(Transform.getFrom(entityB).parent).toBe(0)
   })
+
+  it('should create a valid empty transform component if no value argument is passed', () => {
+    const newEngine = Engine()
+    const { Transform } = newEngine.baseComponents
+    const entity = newEngine.addEntity()
+
+    const t1 = Transform.create(entity)
+
+    expect(t1).toEqual({
+      position: { x: 0, y: 0, z: 0 },
+      scale: { x: 1, y: 1, z: 1 },
+      rotation: { x: 0, y: 0, z: 0, w: 1 }
+    })
+  })
+
+  it('should create a valid empty transform component if no value argument is passed in getOrCreate', () => {
+    const newEngine = Engine()
+    const { Transform } = newEngine.baseComponents
+    const entity = newEngine.addEntity()
+
+    Transform.create(entity, {
+      position: Vector3.One(),
+      rotation: Quaternion.Identity(),
+      scale: Vector3.Down(),
+      parent: 3333 as Entity
+    })
+
+    const t1 = Transform.createOrReplace(entity)
+
+    expect(t1).toEqual({
+      position: { x: 0, y: 0, z: 0 },
+      scale: { x: 1, y: 1, z: 1 },
+      rotation: { x: 0, y: 0, z: 0, w: 1 },
+      parent: undefined
+    })
+  })
 })

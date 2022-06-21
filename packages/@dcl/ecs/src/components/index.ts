@@ -12,4 +12,4 @@ export function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>) {
 /**
  * @public
  */
-export type SdkComponetns = ReturnType<typeof defineSdkComponents>
+export type SdkComponents = ReturnType<typeof defineSdkComponents>

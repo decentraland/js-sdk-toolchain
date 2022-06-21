@@ -22,5 +22,8 @@ describe('Generated SphereShape ProtoBuf', () => {
     SphereShape.updateFromBinary(entityB, buffer)
 
     expect(_sphereShape).toBeDeepCloseTo({ ...SphereShape.mutable(entityB) })
+    expect(SphereShape.createOrReplace(entityB)).not.toBeDeepCloseTo({
+      ...SphereShape.mutable(entity)
+    })
   })
 })

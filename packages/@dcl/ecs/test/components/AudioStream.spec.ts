@@ -22,5 +22,9 @@ describe('Generated AudioStream ProtoBuf', () => {
     AudioStream.updateFromBinary(entityB, buffer)
 
     expect(_audioStream).toBeDeepCloseTo({ ...AudioStream.mutable(entityB) })
+
+    expect(AudioStream.createOrReplace(entityB)).not.toBeDeepCloseTo({
+      ...AudioStream.mutable(entity)
+    })
   })
 })
