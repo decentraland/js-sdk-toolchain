@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/triple-slash-reference */
 /* eslint-disable @typescript-eslint/ban-types */
-/// <reference path="../../packages/decentraland-ecs/node_modules/@dcl/posix/index.d.ts" />
+/// <reference path="../../packages/@dcl/sdk/node_modules/@dcl/posix/index.d.ts" />
 
 import { IFuture } from 'fp-future'
 import { readFileSync } from 'fs'

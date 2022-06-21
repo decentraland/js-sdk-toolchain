@@ -1,7 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: npm
-    directory: "/packages/decentraland-ecs"
+    directory: "/packages/@dcl/sdk"
     schedule:
       interval: daily
     allow:
@@ -10,11 +10,3 @@ updates:
       - dependency-name: "@dcl/schemas"
       - dependency-name: "@dcl/unity-renderer"
     versioning-strategy: auto
-
-  - package-ecosystem: npm
-    directory: "/packages/@dcl/legacy-ecs"
-    schedule:
-      interval: daily
-    allow:
-      - dependency-name: "@dcl/*"
-    versioning-strategy: increase
