@@ -9,7 +9,8 @@ import {
   ROLLUP_CONFIG_PATH,
   SDK_PATH,
   commonChecks,
-  ECS7_PATH
+  ECS7_PATH,
+  JS_RUNTIME
 } from './common'
 import {
   ensureFileExists,
@@ -78,6 +79,11 @@ flow('build-all', () => {
     itExecutes(`npm install --quiet ${DECENTRALAND_AMD_PATH}`, SDK_PATH)
 
     itExecutes(`${TSC} src/setupProxy.ts src/setupExport.ts`, SDK_PATH)
+  })
+
+  flow('@dcl/js-runtime', () => {
+    const filePath = ensureFileExists('index.d.ts', JS_RUNTIME)
+    copyFile(filePath, SDK_PATH + '/types/env/index.d.ts')
   })
 
   flow('@dcl/ecs7', () => {

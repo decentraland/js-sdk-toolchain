@@ -5,3 +5,4 @@ docs
 docs-yaml
 artifacts
 *.tgz
+types/env/index.d.ts
