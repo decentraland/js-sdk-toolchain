@@ -7,7 +7,7 @@ describe('Generated BoxShape ProtoBuf', () => {
     const { Animator } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
-
+    Animator.create(newEngine.addEntity())
     const _animator = Animator.create(entity, {
       states: [{
         name: 'test',
