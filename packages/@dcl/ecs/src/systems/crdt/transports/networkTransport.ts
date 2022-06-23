@@ -3,8 +3,8 @@ import { Transport } from './types'
 
 export function createNetworkTransport(): Transport {
   // const rpc = new RpcTransport()
-  function send(...args: any[]) {
-    console.log('NetworkMessage Sent: ', ...args)
+  function send(..._args: any[]) {
+    // console.log('NetworkMessage Sent: ', ...args)
   }
 
   const type = 'network-transport'

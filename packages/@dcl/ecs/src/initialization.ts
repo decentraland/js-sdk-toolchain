@@ -7,8 +7,6 @@ import { Engine } from './engine'
 import { createRendererTransport } from './systems/crdt/transports/rendererTransport'
 import { createNetworkTransport } from './systems/crdt/transports/networkTransport'
 
-declare const dcl: DecentralandInterface
-
 export const engine = Engine({
   transports: [createRendererTransport(), createNetworkTransport()]
 })

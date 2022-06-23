@@ -11,7 +11,7 @@ import type { DeepReadonly } from '../Math'
 import type { EcsType } from '../built-in-types/EcsType'
 import { IEngine } from './types'
 import { ByteBuffer } from '../serialization/ByteBuffer'
-import { Transport } from '../systems/crdt/transport'
+import { Transport } from '../systems/crdt/transports/types'
 
 export {
   ComponentType,
