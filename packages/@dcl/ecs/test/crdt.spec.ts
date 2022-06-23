@@ -174,5 +174,4 @@ describe('CRDT tests', () => {
     expect(spySend).toBeCalledTimes(1)
     expect(spyWrite).toBeCalledTimes(1)
   })
-
 })
