@@ -9,7 +9,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 
-    const _onPointerDown = OnPointerDown.create(entity, {
+    const onPointerDown = OnPointerDown.create(entity, {
       identifier: "98352439-fdsfds",
       button: "PRIMARY",
       hoverText: "Tap to run",
@@ -27,7 +27,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     const buffer = OnPointerDown.toBinary(entity)
     OnPointerDown.updateFromBinary(entityB, buffer)
 
-    expect(_onPointerDown).toBeDeepCloseTo({ ...OnPointerDown.mutable(entityB) })
+    expect(onPointerDown).toEqual({ ...OnPointerDown.mutable(entityB) })
   })
 
 
