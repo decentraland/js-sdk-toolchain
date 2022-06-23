@@ -1,9 +1,9 @@
 ﻿syntax = "proto3";
 
 import "common/id.proto";
-option (ecs_component_id) = 1060;
+option (ecs_component_id) = 1061;
 
-message PBOnPointerDown {
+message PBOnPointerUp {
   string identifier = 2;
   string button = 3;
   string hover_text = 4;
