@@ -69,5 +69,9 @@ describe('Generated BoxShape ProtoBuf', () => {
     expect(_textShape).toBeDeepCloseTo({
       ...(otherTextShape as any)
     })
+
+    expect(TextShape.createOrReplace(entityB)).not.toBeDeepCloseTo({
+      ...TextShape.getFrom(entity)
+    })
   })
 })

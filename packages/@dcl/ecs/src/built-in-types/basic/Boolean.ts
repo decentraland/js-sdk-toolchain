@@ -10,5 +10,8 @@ export const EcsBoolean: EcsType<boolean> = {
   },
   deserialize(reader: ByteBuffer): boolean {
     return reader.readInt8() === 1
+  },
+  create() {
+    return false
   }
 }

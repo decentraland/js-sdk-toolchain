@@ -19,6 +19,9 @@ export function Optional<T>(spec: EcsType<T>): EcsType<T | undefined> {
       if (exists) {
         return spec.deserialize(reader)
       }
+    },
+    create() {
+      return undefined
     }
   }
 }
