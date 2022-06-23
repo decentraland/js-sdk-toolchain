@@ -68,7 +68,7 @@ export type EcsType<T = any> = {
 
 // @public (undocumented)
 export function Engine({ transports }?: {
-    transports?: Transport[];
+    transports: Transport[];
 }): IEngine;
 
 // @alpha

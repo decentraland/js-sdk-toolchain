@@ -149,14 +149,11 @@ export type PreEngine = ReturnType<typeof preEngine>
 /**
  * @public
  */
-export function Engine({
-  transports
-}: { transports?: Transport[] } = {}): IEngine {
+export function Engine(
+  { transports }: { transports: Transport[] } = { transports: [] }
+): IEngine {
   const engine = preEngine()
-  const crdtSystem = crdtSceneSystem({
-    engine,
-    availableTransports: transports
-  })
+  const crdtSystem = crdtSceneSystem({ engine, transports })
   const baseComponents = defineSdkComponents(engine)
 
   function update(dt: number) {
