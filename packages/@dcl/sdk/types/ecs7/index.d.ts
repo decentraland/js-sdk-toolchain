@@ -191,6 +191,9 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
     CylinderShape: ComponentDefinition<EcsType<PBCylinderShape>>;
     GLTFShape: ComponentDefinition<EcsType<PBGLTFShape>>;
     NFTShape: ComponentDefinition<EcsType<PBNFTShape>>;
+    OnPointerDown: ComponentDefinition<EcsType<PBOnPointerDown>>;
+    OnPointerResult: ComponentDefinition<EcsType<PBOnPointerResult>>;
+    OnPointerUp: ComponentDefinition<EcsType<PBOnPointerUp>>;
     PlaneShape: ComponentDefinition<EcsType<PBPlaneShape>>;
     SphereShape: ComponentDefinition<EcsType<PBSphereShape>>;
     TextShape: ComponentDefinition<EcsType<PBTextShape>>;
@@ -1149,6 +1152,34 @@ declare interface PBNFTShape {
     color: Color3 | undefined;
 }
 
+declare interface PBOnPointerDown {
+    identifier: string;
+    button: string;
+    hoverText: string;
+    distance: number;
+    showFeedback: boolean;
+}
+
+declare interface PBOnPointerResult {
+    identifier: string;
+    entityId: number;
+    button: string;
+    meshName: string;
+    origin: Vector3_2 | undefined;
+    direction: Vector3_2 | undefined;
+    point: Vector3_2 | undefined;
+    normal: Vector3_2 | undefined;
+    distance: number;
+}
+
+declare interface PBOnPointerUp {
+    identifier: string;
+    button: string;
+    hoverText: string;
+    distance: number;
+    showFeedback: boolean;
+}
+
 declare interface PBPlaneShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
@@ -1817,6 +1848,12 @@ declare namespace Vector3 {
      * @returns a new left Vector3
      */
     export function Left(): MutableVector3;
+}
+
+declare interface Vector3_2 {
+    x: number;
+    y: number;
+    z: number;
 }
 
 declare enum YGAlign {
