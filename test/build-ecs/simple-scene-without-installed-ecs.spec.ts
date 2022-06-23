@@ -14,15 +14,15 @@ describe('simple-scene-without-installed-ecs: build a scene with env vars', () =
 
   itDeletesFolder('./bin', cwd)
 
-  const ECS_PATH = resolve(
+  const SDK_PATH = resolve(
     __dirname,
-    '../../packages/decentraland-ecs/dist/index.js'
+    '../../packages/@dcl/sdk/dist/ecs7/index.js'
   )
   const AMD_PATH = resolve(__dirname, '../../packages/@dcl/amd/dist/amd.js')
 
   itExecutes('npm run --quiet build', cwd, {
     ...process.env,
-    ECS_PATH,
+    SDK_PATH,
     AMD_PATH
   })
 
@@ -35,7 +35,7 @@ describe('simple-scene-without-installed-ecs: build a scene with env vars', () =
     const lib: any[] = JSON.parse(
       readFileSync(resolve(cwd, 'bin/game.js.lib')).toString()
     ).map(($: { path: string }) => resolve(cwd, $.path))
-    expect(lib).toContain(ECS_PATH)
+    expect(lib).toContain(SDK_PATH)
     expect(lib).toContain(AMD_PATH)
   })
 })

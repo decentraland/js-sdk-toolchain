@@ -26,11 +26,11 @@ export type ComponentDefinition<T extends EcsType = EcsType<any>> = {
   getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null
 
   // adds this component to the list "to be reviewed next frame"
-  create(entity: Entity, val: ComponentType<T>): ComponentType<T>
+  create(entity: Entity, val?: ComponentType<T>): ComponentType<T>
 
   // adds this component to the list "to be reviewed next frame"
   mutable(entity: Entity): ComponentType<T>
-  createOrReplace(entity: Entity, val: ComponentType<T>): ComponentType<T>
+  createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>
   deleteFrom(entity: Entity): ComponentType<T> | null
 
   upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null
@@ -87,7 +87,7 @@ export function defineComponent<T extends EcsType>(
     },
     create: function (
       entity: Entity,
-      value: ComponentType<T>
+      value?: ComponentType<T>
     ): ComponentType<T> {
       const component = data.get(entity)
       if (component) {
@@ -95,17 +95,19 @@ export function defineComponent<T extends EcsType>(
           `[create] Component ${componentId} for ${entity} already exists`
         )
       }
-      data.set(entity, value)
+      const usedValue = value === undefined ? spec.create() : value
+      data.set(entity, usedValue)
       dirtyIterator.add(entity)
-      return value
+      return usedValue
     },
     createOrReplace: function (
       entity: Entity,
-      value: ComponentType<T>
+      value?: ComponentType<T>
     ): ComponentType<T> {
-      data.set(entity, value)
+      const usedValue = value === undefined ? spec.create() : value
+      data.set(entity, usedValue!)
       dirtyIterator.add(entity)
-      return value
+      return usedValue!
     },
     mutable: function (entity: Entity): ComponentType<T> {
       const component = data.get(entity)

@@ -10,6 +10,9 @@ export const Float32: EcsType<number> = {
   },
   deserialize(reader: ByteBuffer): number {
     return reader.readFloat32()
+  },
+  create() {
+    return 0.0
   }
 }
 
@@ -22,5 +25,8 @@ export const Float64: EcsType<number> = {
   },
   deserialize(reader: ByteBuffer): number {
     return reader.readFloat64()
+  },
+  create() {
+    return 0.0
   }
 }

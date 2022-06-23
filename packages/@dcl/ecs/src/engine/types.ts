@@ -1,5 +1,5 @@
 import type { EcsType } from '../built-in-types/EcsType'
-import { SdkComponetns } from '../components'
+import { SdkComponents } from '../components'
 import { ComponentDefinition as CompDef } from './component'
 import { Entity } from './entity'
 import type { DeepReadonly } from './utils'
@@ -37,5 +37,5 @@ export type IEngine = {
   ): Iterable<[Entity, ...DeepReadonly<ComponentEcsType<T>>]>
   getComponent<T extends EcsType>(componentId: number): CompDef<T>
   update(dt: number): void
-  baseComponents: SdkComponetns
+  baseComponents: SdkComponents
 }

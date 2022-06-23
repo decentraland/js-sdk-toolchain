@@ -18,7 +18,6 @@ type PackageJson = {
 
 type SceneJson = {
   main: string
-  ecs7?: boolean
 }
 
 type DecentralandLib = {
@@ -58,8 +57,8 @@ function findLibraryEntryPoint(
       paths: [
         cwd,
         cwd + '/node_modules',
-        cwd + '/node_modules/decentraland-ecs/',
-        cwd + '/node_modules/decentraland-ecs/node_modules'
+        cwd + '/node_modules/@dcl/sdk/',
+        cwd + '/node_modules/@dcl/sdk/node_modules'
       ]
     })
     if (t) return t
@@ -566,18 +565,13 @@ function getConfiguration(
     // most of the decentraland scenes require the following libraries.
 
     // FIRST UNSHIFT: ECS, order matters, don't change it
-    const newEcs = !!sceneJson!.ecs7
     const decentralandEntryPoint =
-      process.env.ECS_PATH ||
-      findLibraryEntryPoint('decentraland-ecs', ts.sys.getCurrentDirectory()) ||
-      'decentraland-ecs/dist/index.js'
-
-    const getEcs7Path = () => {
-      return dirname(decentralandEntryPoint) + '/ecs7/index.js'
-    }
+      process.env.SDK_PATH ||
+      findLibraryEntryPoint('@dcl/sdk', ts.sys.getCurrentDirectory()) ||
+      '@dcl/sdk/dist/ecs7/index.js'
 
     libs.unshift({
-      main: newEcs ? getEcs7Path() : decentralandEntryPoint
+      main: decentralandEntryPoint
     })
 
     // SECOND UNSHIFT: ECS, order matters, don't change it
@@ -585,7 +579,7 @@ function getConfiguration(
       main:
         process.env.AMD_PATH ||
         findLibraryEntryPoint('@dcl/amd', ts.sys.getCurrentDirectory()) ||
-        'decentraland-ecs/artifacts/amd.js'
+        '@dcl/sdk/artifacts/amd.js'
     })
   }
 
