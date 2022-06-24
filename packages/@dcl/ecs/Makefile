@@ -25,6 +25,7 @@ test-watch:
 
 build:
 	rm -rf dist/
+	rm -rf src/components/generated
 	make generate-components
 	make build-ecs
 	cp -r src/components/definitions dist/proto-definitions

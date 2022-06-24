@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES5",
+    "target": "ES2018",
     "module": "ESNext",
     "strict": true,
     "declarationDir": "dist",
@@ -19,7 +19,7 @@
     "downlevelIteration": true,
     "keyofStringsOnly": true,
     "noUnusedLocals": true,
-    "noLib": true,
+    "lib": ["ES2020"],
     "types": []
   }
 }
