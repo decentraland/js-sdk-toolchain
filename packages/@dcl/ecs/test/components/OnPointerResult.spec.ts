@@ -15,7 +15,6 @@ describe('Generated OnPointerDown ProtoBuf', () => {
       direction: { x: 1, y: 2, z: 3 },
       normal: { x: 1, y: 2, z: 3 },
       origin: { x: 1, y: 2, z: 3 },
-      entityId: 5,
       meshName: 'mesh'
     })
 
@@ -27,7 +26,6 @@ describe('Generated OnPointerDown ProtoBuf', () => {
       direction: { x: 1, y: 2, z: 3 },
       normal: { x: 1, y: 2, z: 3 },
       origin: { x: 1, y: 2, z: 3 },
-      entityId: 5,
       meshName: 'mesh'
     })
     const buffer = OnPointerResult.toBinary(entity)
