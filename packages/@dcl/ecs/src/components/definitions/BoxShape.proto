@@ -7,6 +7,8 @@ message PBBoxShape {
   bool with_collisions = 1;
   bool is_pointer_blocker = 2;
   // TODO: should visible be another component? that maybe affects all the entities
+  // Note (Adrian): No, it shouldn't be another component. I think that we should make the components has as less dependencys from other as possible
+  // Imagine the gigantic switch that we should have to handle the differents possibilities of visibility, for a boxShape, NFT, GLTF...etc
   bool visible = 3;
   repeated float uvs = 4;
 }
