@@ -31,6 +31,8 @@ export const SDK_PATH = resolve(process.cwd(), './packages/@dcl/sdk')
 
 export const ECS7_PATH = resolve(process.cwd(), './packages/@dcl/ecs')
 
+export const JS_RUNTIME = resolve(process.cwd(), './packages/@dcl/js-runtime')
+
 export function commonChecks() {
   test('tooling is installed', () => {
     ensureFileExists(TSC)

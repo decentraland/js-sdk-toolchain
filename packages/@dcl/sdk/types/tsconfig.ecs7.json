@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2020",
+    "target": "es2018",
     "module": "amd",
     "moduleResolution": "classic",
     "pretty": true,
@@ -15,9 +15,9 @@
     "inlineSources": true,
     "useDefineForClassFields": false,
     "allowJs": true,
+    "lib": ["ES2020"],
     "types": [
       "env",
-      "ecs7-env",
       "ecs7",
       "@decentraland/EthereumController",
       "@decentraland/SocialController",
