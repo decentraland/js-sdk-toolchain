@@ -1,10 +1,9 @@
 ﻿import { Engine } from '../../src/engine'
-import {PBAnimationState} from "../../src/components/generated/pb/Animator.gen";
 
 describe('Generated BoxShape ProtoBuf', () => {
   it('should serialize/deserialize BoxShape', () => {
     const newEngine = Engine()
-    const { Animator } = newEngine.baseComponents
+    const {Animator} = newEngine.baseComponents
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
     Animator.create(newEngine.addEntity())
@@ -34,6 +33,6 @@ describe('Generated BoxShape ProtoBuf', () => {
     const buffer = Animator.toBinary(entity)
     Animator.updateFromBinary(entityB, buffer)
 
-    expect(_animator).toEqual({ ...Animator.mutable(entityB)})
+    expect(_animator).toEqual({...Animator.mutable(entityB)})
   })
 })
