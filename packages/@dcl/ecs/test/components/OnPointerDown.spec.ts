@@ -44,7 +44,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     })
 
     // wait a tick to receive a response
-    newEngine.update(1/30)
+    newEngine.update(1 / 30)
 
     // We receive an OnPointerResult
     const onPointerResult = OnPointerResult.create(entity, {
