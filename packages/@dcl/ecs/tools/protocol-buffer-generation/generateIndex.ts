@@ -5,6 +5,10 @@ import { Component } from './generateComponent'
 const indexTemplate = `$componentImports
 import type { IEngine } from '../../engine/types'
 
+export enum ComponentIds {
+  $enumComponentIds
+}
+
 export function defineProtocolBufferComponents({
   defineComponent
 }: Pick<IEngine, 'defineComponent'>) {
@@ -14,6 +18,11 @@ $componentReturns
   }
 }
 `
+
+function enumTemplate({ componentName, componentId }: Component) {
+  return `${componentName} = ${componentId},`
+}
+
 function importComponent(component: Component) {
   return `import * as ${component.componentName} from './${component.componentName}.gen'`
 }
@@ -27,6 +36,7 @@ export function generateIndex(param: {
   generatedPath: string
 }) {
   const { components, generatedPath } = param
+
   const componentWithoutIndex = components.filter(
     (component) => component.componentName !== 'index'
   )
@@ -39,6 +49,10 @@ export function generateIndex(param: {
     .replace(
       '$componentReturns',
       componentWithoutIndex.map(defineComponent).join(',\n')
+    )
+    .replace(
+      '$enumComponentIds',
+      componentWithoutIndex.map(enumTemplate).join('\n')
     )
 
   fs.writeFileSync(path.resolve(generatedPath, 'index.gen.ts'), indexContent)
