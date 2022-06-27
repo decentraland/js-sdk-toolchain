@@ -8,8 +8,8 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     const entityB = newEngine.addEntity()
     OnPointerResult.create(newEngine.addEntity())
     const onPointerResult = OnPointerResult.create(entity, {
-      identifier: '98352439-fdsfds',
-      button: 'PRIMARY',
+      identifier: 1,
+      button: 1,
       point: { x: 1, y: 2, z: 3 },
       distance: 10,
       direction: { x: 1, y: 2, z: 3 },
@@ -19,8 +19,8 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     })
 
     OnPointerResult.create(entityB, {
-      identifier: '98352439-fdsfds',
-      button: 'PRIMARY',
+      identifier: 2,
+      button: 3,
       point: { x: 1, y: 2, z: 3 },
       distance: 10,
       direction: { x: 1, y: 2, z: 3 },
