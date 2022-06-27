@@ -36,7 +36,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
 
     // We create an onPointerDownEvent
     const onPointerDown = OnPointerDown.create(entity, {
-      identifier: 1,
+      identifier: 2,
       button: 1,
       hoverText: 'Tap to run',
       distance: 10,
@@ -48,7 +48,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
 
     // We receive an OnPointerResult
     const onPointerResult = OnPointerResult.create(entity, {
-      identifier: 1,
+      identifier: 2,
       button: 1,
       point: { x: 1, y: 2, z: 3 },
       distance: 10,

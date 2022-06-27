@@ -1,7 +1,7 @@
 ﻿import { Engine } from '../../src/engine'
 
 describe('Generated OnPointerDown ProtoBuf', () => {
-  it('should serialize/deserialize OnPointerDown', () => {
+  it('should serialize/deserialize OnPointerUp', () => {
     const newEngine = Engine()
     const { OnPointerUp } = newEngine.baseComponents
     const entity = newEngine.addEntity()
@@ -48,7 +48,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
 
     // We receive an OnPointerResult
     const onPointerResult = OnPointerResult.create(entity, {
-      identifier: 2,
+      identifier: 1,
       button: 3,
       point: { x: 1, y: 2, z: 3 },
       distance: 10,
