@@ -129,24 +129,33 @@ export function crdtSceneSystem({
     for (const [entity, componentsId] of dirtyMap) {
       for (const componentId of componentsId) {
         const component = engine.getComponent(componentId)
+        const entityComponent = component.has(entity)
+          ? component.toBinary(entity).toBinary()
+          : // TODO: If the component is not found, then it was deleted.
+            new Uint8Array()
         const event = crdtClient.createEvent(
           CrdtUtils.getKey(entity, componentId),
-          component.toBinary(entity).toBinary()
+          entityComponent
         )
         const offset = buffer.currentWriteOffset()
 
         // There is no need to create messages for the static entities the first time they are created
         // They are part of the scene loading. Send only updates.
         if (!EntityUtils.isStaticEntity(entity) || crdtEntities.has(entity)) {
-          Message.write(entity, event.timestamp, component, buffer)
-          crdtMessages.push({
+          const transportMessage: Omit<TransportMessage, 'messageBuffer'> = {
             componentId,
             entity,
-            timestamp: event.timestamp,
-            messageBuffer: buffer
-              .buffer()
-              .subarray(offset, buffer.currentWriteOffset())
-          })
+            timestamp: event.timestamp
+          }
+          if (transports.some((t) => t.filter(transportMessage))) {
+            Message.write(entity, event.timestamp, component, buffer)
+            crdtMessages.push({
+              ...transportMessage,
+              messageBuffer: buffer
+                .buffer()
+                .subarray(offset, buffer.currentWriteOffset())
+            })
+          }
         }
       }
       crdtEntities.set(entity, true)

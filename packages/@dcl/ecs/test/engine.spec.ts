@@ -1,3 +1,4 @@
+import { Vector3 } from '@dcl/ecs-math'
 import { Float32, MapType } from '../src/built-in-types'
 import { Engine } from '../src/engine'
 import { createByteBuffer } from '../src/serialization/ByteBuffer'
@@ -327,5 +328,58 @@ describe('Engine tests', () => {
     expect(() =>
       engine.baseComponents.BoxShape.writeToByteBuffer(entityA, buf)
     ).toThrowError('')
+  })
+
+  it('should remove component when using deleteFrom', () => {
+    const engine = Engine()
+    const MoveTransportData = MapType({
+      duration: Float32,
+      speed: Float32
+    })
+    engine.defineComponent(888, MoveTransportData)
+    const zombie = engine.addEntity()
+
+    const MoveTransformComponent = engine.defineComponent(46, MoveTransportData)
+
+    let moves = 0
+
+    function moveSystem(_dt: number) {
+      moves++
+      for (const [entity, move] of engine.mutableGroupOf(
+        MoveTransformComponent
+      )) {
+        move.speed += 1
+        engine.baseComponents.Transform.mutable(entity).position =
+          Vector3.Zero()
+        if (moves === 2) {
+          MoveTransformComponent.deleteFrom(entity)
+        }
+      }
+    }
+
+    MoveTransformComponent.create(zombie, {
+      duration: 10,
+      speed: 1
+    })
+
+    engine.baseComponents.Transform.create(zombie, {
+      position: { x: 12, y: 1, z: 3 },
+      scale: { x: 1, y: 1, z: 1 },
+      rotation: { x: 0, y: 0, z: 0, w: 1 }
+    })
+
+    engine.addSystem(moveSystem)
+
+    expect(MoveTransformComponent.getFrom(zombie)).toStrictEqual({
+      duration: 10,
+      speed: 1
+    })
+    engine.update(1)
+    expect(MoveTransformComponent.getFrom(zombie)).toStrictEqual({
+      speed: 2,
+      duration: 10
+    })
+    engine.update(1)
+    expect(MoveTransformComponent.getOrNull(zombie)).toStrictEqual(null)
   })
 })
