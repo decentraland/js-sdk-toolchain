@@ -9,6 +9,7 @@ describe('Generated Avatar ModifierArea ProtoBuf', () => {
     const entityB = newEngine.addEntity()
 
     const avatarModifierArea = AvatarModifierArea.create(entity, {
+      area: { x: 1, y: 2, z: 3 },
       modifiers: [
         PBAvatarModifierArea_Modifier.DISABLE_PASSPORTS,
         PBAvatarModifierArea_Modifier.HIDE_AVATARS
@@ -17,17 +18,18 @@ describe('Generated Avatar ModifierArea ProtoBuf', () => {
     })
 
     AvatarModifierArea.create(entityB, {
+      area: { x: 3, y: 4, z: 5 },
       modifiers: [PBAvatarModifierArea_Modifier.UNRECOGNIZED],
       excludeIds: ['exclude_this', 'testId', '12837127371']
     })
     const buffer = AvatarModifierArea.toBinary(entity)
     AvatarModifierArea.updateFromBinary(entityB, buffer)
 
-    expect(avatarModifierArea).toBeDeepCloseTo({
+    expect(avatarModifierArea).toEqual({
       ...AvatarModifierArea.mutable(entityB)
     })
 
-    expect(AvatarModifierArea.createOrReplace(entityB)).not.toBeDeepCloseTo({
+    expect(AvatarModifierArea.createOrReplace(entityB)).not.toEqual({
       ...AvatarModifierArea.mutable(entity)
     })
   })
