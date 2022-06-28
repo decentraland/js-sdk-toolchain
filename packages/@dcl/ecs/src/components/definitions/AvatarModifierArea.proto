@@ -1,0 +1,13 @@
+﻿syntax = "proto3";
+
+import "common/id.proto";
+option (ecs_component_id) = 1070;
+
+message PBAvatarModifierArea {
+  repeated string exclude_ids = 1;
+  repeated Modifier modifiers = 2;
+  enum Modifier {
+    HIDE_AVATARS = 0;
+    DISABLE_PASSPORTS = 1;
+  }
+}
