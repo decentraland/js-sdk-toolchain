@@ -1,14 +1,14 @@
 ﻿import {Engine} from '../../src/engine'
 import {PBAvatarModifierArea_Modifier} from "../../src/components/generated/pb/AvatarModifierArea.gen";
 
-describe('Generated BoxShape ProtoBuf', () => {
-  it('should serialize/deserialize BoxShape', () => {
+describe('Generated Avatar ModifierArea ProtoBuf', () => {
+  it('should serialize/deserialize Avatar Modifier Area', () => {
     const newEngine = Engine()
     const { AvatarModifierArea } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 
-    const _boxShape = AvatarModifierArea.create(entity, {
+    const avatarModifierArea = AvatarModifierArea.create(entity, {
       modifiers: [PBAvatarModifierArea_Modifier.DISABLE_PASSPORTS,PBAvatarModifierArea_Modifier.HIDE_AVATARS],
       excludeIds: ["exclude", "testIdReal", "numberAndString12837127371"]
     })
@@ -20,7 +20,7 @@ describe('Generated BoxShape ProtoBuf', () => {
     const buffer = AvatarModifierArea.toBinary(entity)
     AvatarModifierArea.updateFromBinary(entityB, buffer)
 
-    expect(_boxShape).toBeDeepCloseTo({ ...AvatarModifierArea.mutable(entityB) })
+    expect(avatarModifierArea).toBeDeepCloseTo({ ...AvatarModifierArea.mutable(entityB) })
 
     expect(AvatarModifierArea.createOrReplace(entityB)).not.toBeDeepCloseTo({
       ...AvatarModifierArea.mutable(entity)
