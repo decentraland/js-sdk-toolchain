@@ -2,6 +2,7 @@ import { Vector3 } from '@dcl/ecs-math'
 import { Float32, MapType } from '../src/built-in-types'
 import { Engine } from '../src/engine'
 import { createByteBuffer } from '../src/serialization/ByteBuffer'
+import { createRendererTransport } from '../src/systems/crdt/transports/rendererTransport'
 
 const PositionType = MapType({
   x: Float32
@@ -381,5 +382,41 @@ describe('Engine tests', () => {
     })
     engine.update(1)
     expect(MoveTransformComponent.getOrNull(zombie)).toStrictEqual(null)
+  })
+
+  it.only('should remove transofmr component and send throught the network', () => {
+    const engine = Engine({ transports: [createRendererTransport()] })
+    const entity = engine.addEntity()
+
+    let moves = 0
+    const { Transform } = engine.baseComponents
+
+    function moveSystem(_dt: number) {
+      moves++
+      for (const [ent, transform] of engine.mutableGroupOf(Transform)) {
+        transform.position.x += 1
+        if (moves === 2) {
+          Transform.deleteFrom(ent)
+        }
+      }
+    }
+
+    Transform.create(entity, {
+      position: { x: 12, y: 1, z: 3 },
+      scale: { x: 1, y: 1, z: 1 },
+      rotation: { x: 0, y: 0, z: 0, w: 1 }
+    })
+
+    engine.addSystem(moveSystem)
+
+    expect(Transform.getFrom(entity)).toStrictEqual({
+      position: { x: 12, y: 1, z: 3 },
+      scale: { x: 1, y: 1, z: 1 },
+      rotation: { x: 0, y: 0, z: 0, w: 1 }
+    })
+    engine.update(1)
+    expect(Transform.getFrom(entity).position.x).toStrictEqual(13)
+    engine.update(1)
+    expect(Transform.getOrNull(entity)).toStrictEqual(null)
   })
 })

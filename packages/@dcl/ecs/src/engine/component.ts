@@ -132,7 +132,9 @@ export function defineComponent<T extends EcsType>(
     toBinary(entity: Entity): ByteBuffer {
       const component = data.get(entity)
       if (!component) {
-        throw new Error(`Component ${componentId} for ${entity} not found`)
+        throw new Error(
+          `[toBinary] Component ${componentId} for ${entity} not found`
+        )
       }
 
       const writeBuffer = createByteBuffer()
@@ -141,9 +143,10 @@ export function defineComponent<T extends EcsType>(
     },
     writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void {
       const component = data.get(entity)
+      // TODO: if the component not exists, then its a delete. We should send null maybe?
       if (!component) {
         throw new Error(
-          `[toBinary] Component ${componentId} for ${entity} not found`
+          `[writeToByteBuffer] Component ${componentId} for ${entity} not found`
         )
       }
 

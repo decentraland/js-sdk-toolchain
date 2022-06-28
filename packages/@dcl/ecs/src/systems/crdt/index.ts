@@ -131,8 +131,7 @@ export function crdtSceneSystem({
         const component = engine.getComponent(componentId)
         const entityComponent = component.has(entity)
           ? component.toBinary(entity).toBinary()
-          : // TODO: If the component is not found, then it was deleted.
-            new Uint8Array()
+          : null
         const event = crdtClient.createEvent(
           CrdtUtils.getKey(entity, componentId),
           entityComponent
@@ -148,6 +147,8 @@ export function crdtSceneSystem({
             timestamp: event.timestamp
           }
           if (transports.some((t) => t.filter(transportMessage))) {
+            // TODO: If the component is not found, then it was deleted.
+            // This should be another message or just sent null data ?
             Message.write(entity, event.timestamp, component, buffer)
             crdtMessages.push({
               ...transportMessage,
