@@ -29,7 +29,6 @@ if (dcl) {
     )
 
     if (response.data?.length) {
-      dcl.log(response)
       if (rendererTransport.onmessage) {
         for (const byteArray of response.data) {
           rendererTransport.onmessage(byteArray)
