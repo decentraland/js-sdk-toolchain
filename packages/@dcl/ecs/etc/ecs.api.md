@@ -67,9 +67,7 @@ export type EcsType<T = any> = {
 };
 
 // @public (undocumented)
-export function Engine({ transports }?: {
-    transports?: Transport[];
-}): IEngine;
+export function Engine({ transports }: IEngineParams): IEngine;
 
 // @alpha
 export const engine: IEngine;
@@ -112,6 +110,11 @@ export type IEngine = {
     getComponent<T extends EcsType>(componentId: number): ComponentDefinition<T>;
     update(dt: number): void;
     baseComponents: SdkComponetns;
+};
+
+// @public (undocumented)
+export type IEngineParams = {
+    transports?: Transport[];
 };
 
 // @public (undocumented)
@@ -274,7 +277,7 @@ export namespace Vector3 {
 
 // Warnings were encountered during analysis:
 //
-// dist/engine/index.d.ts:13:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:40:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

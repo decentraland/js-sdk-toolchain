@@ -16,3 +16,7 @@ beforeAll(() => {
 afterAll(() => {
   globalThis.WebSocket = _WebSocket
 })
+
+globalThis.dcl = {
+  callRpc: async (..._args: any[]) => {}
+} as DecentralandInterface

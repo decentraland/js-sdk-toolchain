@@ -1,10 +1,8 @@
 import { Vector3 } from '@dcl/ecs-math'
-import { Engine } from '../src/engine'
 import { Entity } from '../src/engine/entity'
 import EntityUtils from '../src/engine/entity-utils'
 import { createByteBuffer } from '../src/serialization/ByteBuffer'
 import { PutComponentOperation } from '../src/serialization/crdt/componentOperation'
-import * as transport from '../src/systems/crdt/transport'
 import { wait, SandBox } from './utils'
 
 describe('CRDT tests', () => {
@@ -175,18 +173,5 @@ describe('CRDT tests', () => {
 
     expect(spySend).toBeCalledTimes(1)
     expect(spyWrite).toBeCalledTimes(1)
-  })
-
-  it('should test transports', () => {
-    const transports = transport.getTransports()
-    jest.spyOn(transport, 'getTransports').mockReturnValue(transports)
-    const sendSpy = jest.spyOn(transports[0], 'send')
-
-    const engine = Engine()
-    const entity = engine.addDynamicEntity()
-    engine.baseComponents.Transform.create(entity, SandBox.DEFAULT_POSITION)
-    engine.update(1)
-
-    expect(sendSpy).toBeCalledTimes(1)
   })
 })

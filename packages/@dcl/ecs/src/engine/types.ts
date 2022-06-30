@@ -1,5 +1,6 @@
 import type { EcsType } from '../built-in-types/EcsType'
 import { SdkComponents } from '../components'
+import { Transport } from '../systems/crdt/transports/types'
 import { ComponentDefinition as CompDef } from './component'
 import { Entity } from './entity'
 import type { DeepReadonly } from './utils'
@@ -38,4 +39,11 @@ export type IEngine = {
   getComponent<T extends EcsType>(componentId: number): CompDef<T>
   update(dt: number): void
   baseComponents: SdkComponents
+}
+
+/**
+ * @public
+ */
+export type IEngineParams = {
+  transports?: Transport[]
 }
