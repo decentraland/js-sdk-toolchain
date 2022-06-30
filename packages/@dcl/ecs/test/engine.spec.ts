@@ -384,7 +384,7 @@ describe('Engine tests', () => {
     expect(MoveTransformComponent.getOrNull(zombie)).toStrictEqual(null)
   })
 
-  it.only('should remove transofmr component and send throught the network', () => {
+  it('should remove Transform component and send it throught the network', () => {
     const engine = Engine({ transports: [createRendererTransport()] })
     const entity = engine.addEntity()
 

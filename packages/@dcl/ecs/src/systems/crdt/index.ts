@@ -4,7 +4,7 @@ import type { PreEngine } from '../../engine'
 import { Entity } from '../../engine/entity'
 import EntityUtils from '../../engine/entity-utils'
 import { createByteBuffer } from '../../serialization/ByteBuffer'
-import { PutComponentOperation as Message } from '../../serialization/crdt/componentOperation'
+import { ComponentOperation as Message } from '../../serialization/crdt/componentOperation'
 import WireMessage from '../../serialization/wireMessage'
 import { Transport } from './transports/types'
 import { ReceiveMessage, TransportMessage } from './types'
@@ -50,8 +50,9 @@ export function crdtSceneSystem({
         const offset = buffer.currentReadOffset()
         const message = Message.read(buffer)!
 
-        const { entity, componentId, data, timestamp } = message
+        const { type, entity, componentId, data, timestamp } = message
         receivedMessages.push({
+          type,
           entity,
           componentId,
           data,
@@ -84,28 +85,35 @@ export function crdtSceneSystem({
     for (const transport of transports) {
       const buffer = createByteBuffer()
       for (const message of messagesToProcess) {
-        const { data, timestamp, componentId, entity } = message
+        const { data, timestamp, componentId, entity, type } = message
         const crdtMessage: CrdtMessage<Uint8Array> = {
           key: CrdtUtils.getKey(entity, componentId),
-          data: data,
+          data: data || null,
           timestamp: timestamp
         }
         const component = engine.getComponent(componentId)
-        const currentMessage = crdtClient.processMessage(crdtMessage)
-
+        const current = crdtClient.processMessage(crdtMessage)
         // CRDT outdated message. Resend this message through the wire
         // TODO: perf transactor
-        if (crdtMessage !== currentMessage) {
+        if (crdtMessage !== current) {
           // CRDT outdated message. Resend this message through the wire
-          Message.write(entity, currentMessage.timestamp, component, buffer)
+          const type = component.has(entity)
+            ? WireMessage.Enum.PUT_COMPONENT
+            : WireMessage.Enum.DELETE_COMPONENT
+          Message.write(type, entity, current.timestamp, component, buffer)
         } else {
-          const opts = { reading: { buffer: message.data, currentOffset: 0 } }
-          const bb = createByteBuffer(opts)
+          if (type === WireMessage.Enum.DELETE_COMPONENT) {
+            component.deleteFrom(entity)
+          } else {
+            const opts = {
+              reading: { buffer: message.data!, currentOffset: 0 }
+            }
+            const bb = createByteBuffer(opts)
 
-          // Update engine component
-          component.upsertFromBinary(message.entity, bb)
-          component.clearDirty()
-
+            // Update engine component
+            component.upsertFromBinary(message.entity, bb)
+            component.clearDirty()
+          }
           // Add message to transport queue to be processed by others transports
           transportMessages.push(message)
         }
@@ -141,7 +149,11 @@ export function crdtSceneSystem({
         // There is no need to create messages for the static entities the first time they are created
         // They are part of the scene loading. Send only updates.
         if (!EntityUtils.isStaticEntity(entity) || crdtEntities.has(entity)) {
+          const type = component.has(entity)
+            ? WireMessage.Enum.PUT_COMPONENT
+            : WireMessage.Enum.DELETE_COMPONENT
           const transportMessage: Omit<TransportMessage, 'messageBuffer'> = {
+            type,
             componentId,
             entity,
             timestamp: event.timestamp
@@ -149,7 +161,7 @@ export function crdtSceneSystem({
           if (transports.some((t) => t.filter(transportMessage))) {
             // TODO: If the component is not found, then it was deleted.
             // This should be another message or just sent null data ?
-            Message.write(entity, event.timestamp, component, buffer)
+            Message.write(type, entity, event.timestamp, component, buffer)
             crdtMessages.push({
               ...transportMessage,
               messageBuffer: buffer
