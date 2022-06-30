@@ -24,7 +24,7 @@ if (dcl) {
   async function pullRendererMessages() {
     const response = await dcl.callRpc(
       '@decentraland/ExperimentalAPI',
-      'MessageFromRenderer',
+      'messageFromRenderer',
       []
     )
 
