@@ -7,8 +7,10 @@ import { Engine } from './engine'
 import { createRendererTransport } from './systems/crdt/transports/rendererTransport'
 import { createNetworkTransport } from './systems/crdt/transports/networkTransport'
 
+const rendererTransport = createRendererTransport()
+
 export const engine = Engine({
-  transports: [createRendererTransport(), createNetworkTransport()]
+  transports: [rendererTransport, createNetworkTransport()]
 })
 
 if (dcl) {
@@ -19,7 +21,24 @@ if (dcl) {
     )
   })
 
+  async function pullRendererMessages() {
+    const response = await dcl.callRpc(
+      '@decentraland/ExperimentalAPI',
+      'MessageFromRenderer',
+      []
+    )
+
+    if (response.data?.length) {
+      dcl.log(response)
+      if (rendererTransport.onmessage) {
+        for (const byteArray of response.data) {
+          rendererTransport.onmessage(byteArray)
+        }
+      }
+    }
+  }
+
   dcl.onUpdate((dt: number) => {
-    engine.update(dt)
+    pullRendererMessages().finally(() => engine.update(dt))
   })
 }

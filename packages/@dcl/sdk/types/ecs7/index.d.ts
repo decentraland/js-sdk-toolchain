@@ -185,6 +185,7 @@ declare type DeepReadonly<T> = {
 };
 
 declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): {
+    Animator: ComponentDefinition<EcsType<PBAnimator>>;
     AudioSource: ComponentDefinition<EcsType<PBAudioSource>>;
     AudioStream: ComponentDefinition<EcsType<PBAudioStream>>;
     BoxShape: ComponentDefinition<EcsType<PBBoxShape>>;
@@ -237,9 +238,7 @@ declare type EcsType<T = any> = {
 /**
  * @public
  */
-declare function Engine({ transports }?: {
-    transports?: Transport[];
-}): IEngine;
+declare function Engine({ transports }?: IEngineParams): IEngine;
 
 /**
  * @alpha * This file initialization is an alpha one. This is based on the old-ecs
@@ -307,6 +306,13 @@ declare type IEngine = {
     getComponent<T extends EcsType>(componentId: number): ComponentDefinition<T>;
     update(dt: number): void;
     baseComponents: SdkComponetns;
+};
+
+/**
+ * @public
+ */
+declare type IEngineParams = {
+    transports?: Transport[];
 };
 
 /** Include property keys from T where the property is assignable to U */
@@ -1100,6 +1106,20 @@ declare enum Orientation {
     CW = 0,
     /** Counter clockwise */
     CCW = 1
+}
+
+declare interface PBAnimationState {
+    name: string;
+    clip: string;
+    playing: boolean;
+    weight: number;
+    speed: number;
+    loop: boolean;
+    shouldReset: boolean;
+}
+
+declare interface PBAnimator {
+    states: PBAnimationState[];
 }
 
 declare interface PBAudioSource {
