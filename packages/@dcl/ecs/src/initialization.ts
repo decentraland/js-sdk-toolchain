@@ -14,14 +14,28 @@ export const engine = Engine({
 })
 
 if (dcl) {
-  dcl.loadModule('@decentraland/ExperimentalAPI', {}).catch((err: any) => {
-    dcl.error(
-      `ExperimentalAPI couldn't be loaded, the message to renderer can't be sent without this API.`,
-      err
-    )
-  })
+  // TODO: remove this when the method is in main kernel
+  let hasMessageFromRendererMethod = false
+
+  dcl
+    .loadModule('@decentraland/ExperimentalAPI', {})
+    .then((loadedModule) => {
+      if (
+        loadedModule.methods.find((item) => item.name === 'messageFromRenderer')
+      ) {
+        hasMessageFromRendererMethod = true
+      }
+    })
+    .catch((err: any) => {
+      dcl.error(
+        `ExperimentalAPI couldn't be loaded, the message to renderer can't be sent without this API.`,
+        err
+      )
+    })
 
   async function pullRendererMessages() {
+    if (!hasMessageFromRendererMethod) return
+
     const response = await dcl.callRpc(
       '@decentraland/ExperimentalAPI',
       'messageFromRenderer',
