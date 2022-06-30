@@ -143,7 +143,6 @@ export function defineComponent<T extends EcsType>(
     },
     writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void {
       const component = data.get(entity)
-      // TODO: if the component not exists, then its a delete. We should send null maybe?
       if (!component) {
         throw new Error(
           `[writeToByteBuffer] Component ${componentId} for ${entity} not found`

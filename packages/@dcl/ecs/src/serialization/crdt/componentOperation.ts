@@ -85,6 +85,4 @@ export namespace ComponentOperation {
       data: buf.readBuffer()
     }
   }
-
-  // export function isPutMessage(message: IPutComponent | IDeleteComponent)
 }

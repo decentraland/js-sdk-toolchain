@@ -93,15 +93,15 @@ export function crdtSceneSystem({
         }
         const component = engine.getComponent(componentId)
         const current = crdtClient.processMessage(crdtMessage)
+
         // CRDT outdated message. Resend this message through the wire
-        // TODO: perf transactor
         if (crdtMessage !== current) {
-          // CRDT outdated message. Resend this message through the wire
           const type = component.has(entity)
             ? WireMessage.Enum.PUT_COMPONENT
             : WireMessage.Enum.DELETE_COMPONENT
           Message.write(type, entity, current.timestamp, component, buffer)
         } else {
+          // Process CRDT Message
           if (type === WireMessage.Enum.DELETE_COMPONENT) {
             component.deleteFrom(entity)
           } else {
@@ -159,8 +159,6 @@ export function crdtSceneSystem({
             timestamp: event.timestamp
           }
           if (transports.some((t) => t.filter(transportMessage))) {
-            // TODO: If the component is not found, then it was deleted.
-            // This should be another message or just sent null data ?
             Message.write(type, entity, event.timestamp, component, buffer)
             crdtMessages.push({
               ...transportMessage,
