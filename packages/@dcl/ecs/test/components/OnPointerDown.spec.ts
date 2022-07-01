@@ -33,7 +33,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     OnPointerDown.create(newEngine.addEntity())
 
     // We create an onPointerDownEvent
-    const onPointerDown = OnPointerDown.create(entity, {
+    OnPointerDown.create(entity, {
       button: 1,
       hoverText: 'Tap to run',
       distance: 10,
@@ -44,7 +44,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     newEngine.update(1 / 30)
 
     // We receive an OnPointerResult
-    const onPointerResult = OnPointerDownResult.create(entity, {
+    OnPointerDownResult.create(entity, {
       button: 1,
       point: { x: 1, y: 2, z: 3 },
       distance: 10,
