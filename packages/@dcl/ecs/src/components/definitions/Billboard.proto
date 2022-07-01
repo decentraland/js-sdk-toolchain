@@ -4,7 +4,7 @@ import "common/id.proto";
 option (ecs_component_id) = 1080;
 
 message PBBillboard {
-  float x = 1;
-  float y = 2;
-  float z = 3;
+  bool x = 1;
+  bool y = 2;
+  bool z = 3;
 }

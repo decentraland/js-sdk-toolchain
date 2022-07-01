@@ -8,15 +8,15 @@ describe('Generated Billboard ProtoBuf', () => {
     const entityB = newEngine.addEntity()
 
     const billboard = Billboard.create(entity, {
-      x: 0,
-      y: 1,
-      z: 3
+      x: true,
+      y: true,
+      z: true
     })
 
     Billboard.create(entityB, {
-      x: 4,
-      y: 5,
-      z: 6
+      x: false,
+      y: false,
+      z: false
     })
     const buffer = Billboard.toBinary(entity)
     Billboard.updateFromBinary(entityB, buffer)
