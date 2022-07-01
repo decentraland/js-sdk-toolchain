@@ -2,7 +2,6 @@ import { crdtProtocol, Message as CrdtMessage } from '@dcl/crdt'
 
 import type { PreEngine } from '../../engine'
 import { Entity } from '../../engine/entity'
-import EntityUtils from '../../engine/entity-utils'
 import { createByteBuffer } from '../../serialization/ByteBuffer'
 import { ComponentOperation as Message } from '../../serialization/crdt/componentOperation'
 import WireMessage from '../../serialization/wireMessage'
@@ -24,7 +23,6 @@ export function crdtSceneSystem({
   // Messages already processed by the engine but that we need to broadcast to other transports.
   const transportMessages: TransportMessage[] = []
   // Map of entities already processed at least once
-  const crdtEntities = new Map<Entity, boolean>()
 
   transports.forEach(
     (transport) => (transport.onmessage = parseChunkMessage(transport.type))
@@ -145,31 +143,25 @@ export function crdtSceneSystem({
           entityComponent
         )
         const offset = buffer.currentWriteOffset()
-
-        // There is no need to create messages for the static entities the first time they are created
-        // They are part of the scene loading. Send only updates.
-        if (!EntityUtils.isStaticEntity(entity) || crdtEntities.has(entity)) {
-          const type = component.has(entity)
-            ? WireMessage.Enum.PUT_COMPONENT
-            : WireMessage.Enum.DELETE_COMPONENT
-          const transportMessage: Omit<TransportMessage, 'messageBuffer'> = {
-            type,
-            componentId,
-            entity,
-            timestamp: event.timestamp
-          }
-          if (transports.some((t) => t.filter(transportMessage))) {
-            Message.write(type, entity, event.timestamp, component, buffer)
-            crdtMessages.push({
-              ...transportMessage,
-              messageBuffer: buffer
-                .buffer()
-                .subarray(offset, buffer.currentWriteOffset())
-            })
-          }
+        const type = component.has(entity)
+          ? WireMessage.Enum.PUT_COMPONENT
+          : WireMessage.Enum.DELETE_COMPONENT
+        const transportMessage: Omit<TransportMessage, 'messageBuffer'> = {
+          type,
+          componentId,
+          entity,
+          timestamp: event.timestamp
+        }
+        if (transports.some((t) => t.filter(transportMessage))) {
+          Message.write(type, entity, event.timestamp, component, buffer)
+          crdtMessages.push({
+            ...transportMessage,
+            messageBuffer: buffer
+              .buffer()
+              .subarray(offset, buffer.currentWriteOffset())
+          })
         }
       }
-      crdtEntities.set(entity, true)
     }
 
     // Send messages to transports
