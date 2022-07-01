@@ -132,7 +132,9 @@ export function defineComponent<T extends EcsType>(
     toBinary(entity: Entity): ByteBuffer {
       const component = data.get(entity)
       if (!component) {
-        throw new Error(`Component ${componentId} for ${entity} not found`)
+        throw new Error(
+          `[toBinary] Component ${componentId} for ${entity} not found`
+        )
       }
 
       const writeBuffer = createByteBuffer()
@@ -143,7 +145,7 @@ export function defineComponent<T extends EcsType>(
       const component = data.get(entity)
       if (!component) {
         throw new Error(
-          `[toBinary] Component ${componentId} for ${entity} not found`
+          `[writeToByteBuffer] Component ${componentId} for ${entity} not found`
         )
       }
 

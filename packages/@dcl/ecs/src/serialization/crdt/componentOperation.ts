@@ -3,18 +3,24 @@ import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../ByteBuffer'
 import WireMessage from '../wireMessage'
 
-export namespace PutComponentOperation {
+export namespace ComponentOperation {
   /**
    * @param entity - Uint32 number of the entity
    * @param componentId - Uint32 number of id
    * @param timestamp - Uint64 Lamport timestamp
    * @param data - Uint8[] data of component
    */
-  export type Type = {
+  export type IPutComponent = {
     entity: Entity
     componentId: number
     timestamp: number
     data: Uint8Array
+  }
+  export type IDeleteComponent = {
+    entity: Entity
+    componentId: number
+    timestamp: number
+    data?: undefined
   }
 
   export const MESSAGE_HEADER_LENGTH = 20
@@ -23,6 +29,7 @@ export namespace PutComponentOperation {
    *  already allocated
    */
   export function write(
+    type: WireMessage.Enum,
     entity: Entity,
     timestamp: number,
     componentDefinition: ComponentDefinition,
@@ -34,12 +41,14 @@ export namespace PutComponentOperation {
     )
 
     // write body
-    componentDefinition.writeToByteBuffer(entity, buf)
+    if (type === WireMessage.Enum.PUT_COMPONENT) {
+      componentDefinition.writeToByteBuffer(entity, buf)
+    }
     const messageLength = buf.size() - startMessageOffset
 
     // Write WireMessage header
     buf.setUint32(startMessageOffset, messageLength)
-    buf.setUint32(startMessageOffset + 4, WireMessage.Enum.PUT_COMPONENT)
+    buf.setUint32(startMessageOffset + 4, type)
 
     // Write ComponentOperation header
     buf.setUint32(startMessageOffset + 8, entity)
@@ -51,18 +60,28 @@ export namespace PutComponentOperation {
     )
   }
 
-  export function read(buf: ByteBuffer): (WireMessage.Header & Type) | null {
+  export function read(
+    buf: ByteBuffer
+  ): (WireMessage.Header & (IPutComponent | IDeleteComponent)) | null {
     const header = WireMessage.readHeader(buf)
 
     if (!header) {
       return null
     }
 
-    return {
+    const common = {
       ...header,
       entity: buf.readUint32() as Entity,
       componentId: buf.readInt32(),
-      timestamp: Number(buf.readUint64()),
+      timestamp: Number(buf.readUint64())
+    }
+
+    if (header.type === WireMessage.Enum.DELETE_COMPONENT) {
+      return common
+    }
+
+    return {
+      ...common,
       data: buf.readBuffer()
     }
   }
