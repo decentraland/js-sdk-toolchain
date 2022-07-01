@@ -32,6 +32,8 @@ if (dcl) {
   }
 
   dcl.onUpdate((dt: number) => {
-    pullRendererMessages().finally(() => engine.update(dt))
+    pullRendererMessages()
+      .catch(dcl.error)
+      .finally(() => engine.update(dt))
   })
 }
