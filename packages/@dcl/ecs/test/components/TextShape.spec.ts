@@ -63,8 +63,6 @@ describe('Generated BoxShape ProtoBuf', () => {
     const buffer = TextShape.toBinary(entity)
     TextShape.updateFromBinary(entityB, buffer)
 
-    // TODO: toBeDeepCloseTo has a error type implementation, should make an own toBeDeepCloseTo
-    //  or fix with a PR this one
     const otherTextShape = TextShape.mutable(entityB)
     expect(_textShape).toBeDeepCloseTo({
       ...(otherTextShape as any)

@@ -50,13 +50,12 @@ function preEngine() {
   }
 
   function removeEntity(entity: Entity) {
-    // TODO: Remove all the components of that entity
     for (const [, component] of componentsDefinition) {
       if (component.has(entity)) {
         component.deleteFrom(entity)
       }
     }
-    // entitiesComponent.delete(entity)
+
     return entityContainer.removeEntity(entity)
   }
 

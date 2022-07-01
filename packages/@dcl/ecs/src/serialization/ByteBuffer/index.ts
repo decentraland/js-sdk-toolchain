@@ -211,7 +211,6 @@ export function createByteBuffer(options: CreateByteBufferOptions = {}) {
         this.writeUint32(value.byteLength)
       }
 
-      // TODO: lean
       const o = woAdd(value.byteLength)
       buffer.set(value, o)
     },
