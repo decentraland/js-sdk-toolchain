@@ -3,35 +3,35 @@
 describe('Generated OnPointerDown ProtoBuf', () => {
   it('should serialize/deserialize OnPointerDown', () => {
     const newEngine = Engine()
-    const { OnPointerResult } = newEngine.baseComponents
+    const { OnPointerDownResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
-    OnPointerResult.create(newEngine.addEntity())
-    const onPointerResult = OnPointerResult.create(entity, {
-      identifier: 1,
+    OnPointerDownResult.create(newEngine.addEntity())
+    const onPointerResult = OnPointerDownResult.create(entity, {
       button: 1,
       point: { x: 1, y: 2, z: 3 },
       distance: 10,
       direction: { x: 1, y: 2, z: 3 },
       normal: { x: 1, y: 2, z: 3 },
       origin: { x: 1, y: 2, z: 3 },
-      meshName: 'mesh'
+      meshName: 'mesh',
+      timestamp: 23432
     })
 
-    OnPointerResult.create(entityB, {
-      identifier: 2,
+    OnPointerDownResult.create(entityB, {
       button: 3,
       point: { x: 1, y: 2, z: 3 },
       distance: 10,
       direction: { x: 1, y: 2, z: 3 },
       normal: { x: 1, y: 2, z: 3 },
       origin: { x: 1, y: 2, z: 3 },
-      meshName: 'mesh'
+      meshName: 'mesh',
+      timestamp: 23432
     })
-    const buffer = OnPointerResult.toBinary(entity)
-    OnPointerResult.updateFromBinary(entityB, buffer)
+    const buffer = OnPointerDownResult.toBinary(entity)
+    OnPointerDownResult.updateFromBinary(entityB, buffer)
 
-    const result = { ...OnPointerResult.mutable(entityB) }
+    const result = { ...OnPointerDownResult.mutable(entityB) }
 
     expect(onPointerResult).toEqual(result)
   })
