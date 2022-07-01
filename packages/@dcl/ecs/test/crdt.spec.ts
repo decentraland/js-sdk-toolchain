@@ -12,7 +12,7 @@ describe('CRDT tests', () => {
     jest.restoreAllMocks()
   })
 
-  it('should not send static entities, only updates', () => {
+  it('should send static entities', () => {
     const { engine, spySend } = SandBox.create({ length: 1 })[0]
     const entityA = engine.addEntity()
     const { Transform } = engine.baseComponents
@@ -24,7 +24,7 @@ describe('CRDT tests', () => {
 
     // Tick update and verify that both messages are being sent through ws.send
     engine.update(1 / 30)
-    expect(spySend).toBeCalledTimes(0)
+    expect(spySend).toBeCalledTimes(1)
 
     // Reset ws.send called times
     jest.resetAllMocks()
