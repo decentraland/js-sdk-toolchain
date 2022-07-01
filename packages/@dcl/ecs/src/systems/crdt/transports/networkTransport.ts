@@ -17,6 +17,8 @@ export function createNetworkTransport(): Transport {
         return false
       }
 
+      // TODO: Static entities & Network components
+
       return !!message // validComponents.includes(componentId)
     }
   }

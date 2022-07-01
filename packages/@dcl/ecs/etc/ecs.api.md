@@ -67,7 +67,7 @@ export type EcsType<T = any> = {
 };
 
 // @public (undocumented)
-export function Engine({ transports }: IEngineParams): IEngine;
+export function Engine({ transports }?: IEngineParams): IEngine;
 
 // @alpha
 export const engine: IEngine;
