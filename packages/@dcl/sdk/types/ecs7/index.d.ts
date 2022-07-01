@@ -193,8 +193,9 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
     GLTFShape: ComponentDefinition<EcsType<PBGLTFShape>>;
     NFTShape: ComponentDefinition<EcsType<PBNFTShape>>;
     OnPointerDown: ComponentDefinition<EcsType<PBOnPointerDown>>;
-    OnPointerResult: ComponentDefinition<EcsType<PBOnPointerResult>>;
+    OnPointerDownResult: ComponentDefinition<EcsType<PBOnPointerDownResult>>;
     OnPointerUp: ComponentDefinition<EcsType<PBOnPointerUp>>;
+    OnPointerUpResult: ComponentDefinition<EcsType<PBOnPointerUpResult>>;
     PlaneShape: ComponentDefinition<EcsType<PBPlaneShape>>;
     SphereShape: ComponentDefinition<EcsType<PBSphereShape>>;
     TextShape: ComponentDefinition<EcsType<PBTextShape>>;
@@ -1173,31 +1174,39 @@ declare interface PBNFTShape {
 }
 
 declare interface PBOnPointerDown {
-    identifier: string;
-    button: string;
+    button: number;
     hoverText: string;
     distance: number;
     showFeedback: boolean;
 }
 
-declare interface PBOnPointerResult {
-    identifier: string;
-    entityId: number;
-    button: string;
+declare interface PBOnPointerDownResult {
+    button: number;
     meshName: string;
     origin: Vector3_2 | undefined;
     direction: Vector3_2 | undefined;
     point: Vector3_2 | undefined;
     normal: Vector3_2 | undefined;
     distance: number;
+    timestamp: number;
 }
 
 declare interface PBOnPointerUp {
-    identifier: string;
-    button: string;
+    button: number;
     hoverText: string;
     distance: number;
     showFeedback: boolean;
+}
+
+declare interface PBOnPointerUpResult {
+    button: number;
+    meshName: string;
+    origin: Vector3_2 | undefined;
+    direction: Vector3_2 | undefined;
+    point: Vector3_2 | undefined;
+    normal: Vector3_2 | undefined;
+    distance: number;
+    timestamp: number;
 }
 
 declare interface PBPlaneShape {
@@ -1582,11 +1591,12 @@ declare namespace Quaternion {
 declare const RAD2DEG: number;
 
 declare type ReceiveMessage = {
+    type: WireMessage.Enum;
     entity: Entity;
     componentId: number;
     timestamp: number;
     transportType?: string;
-    data: Uint8Array;
+    data?: Uint8Array;
     messageBuffer: Uint8Array;
 };
 
@@ -1652,10 +1662,12 @@ declare type Transport = {
     type: string;
     send(message: Uint8Array): void;
     onmessage?(message: Uint8Array): void;
-    filter(message: TransportMessage): boolean;
+    filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
 };
 
 declare type TransportMessage = Omit<ReceiveMessage, 'data'>;
+
+declare type Uint32 = number;
 
 /**
  * @public
@@ -1874,6 +1886,30 @@ declare interface Vector3_2 {
     x: number;
     y: number;
     z: number;
+}
+
+declare namespace WireMessage {
+    enum Enum {
+        RESERVED = 0,
+        PUT_COMPONENT = 1,
+        DELETE_COMPONENT = 2,
+        MAX_MESSAGE_TYPE = 3
+    }
+    /**
+     * @param length - Uint32 the length of all message (including the header)
+     * @param type - define the function which handles the data
+     */
+    type Header = {
+        length: Uint32;
+        type: Uint32;
+    };
+    const HEADER_LENGTH = 8;
+    /**
+     * Validate if the message incoming is completed
+     * @param buf
+     */
+    function validate(buf: ByteBuffer): boolean;
+    function readHeader(buf: ByteBuffer): Header | null;
 }
 
 declare enum YGAlign {

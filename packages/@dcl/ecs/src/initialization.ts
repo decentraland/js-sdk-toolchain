@@ -8,34 +8,14 @@ import { createRendererTransport } from './systems/crdt/transports/rendererTrans
 import { createNetworkTransport } from './systems/crdt/transports/networkTransport'
 
 const rendererTransport = createRendererTransport()
-
 export const engine = Engine({
   transports: [rendererTransport, createNetworkTransport()]
 })
 
 if (dcl) {
-  // TODO: remove this when the method is in main kernel
-  let hasMessageFromRendererMethod = false
-
-  dcl
-    .loadModule('@decentraland/ExperimentalAPI', {})
-    .then((loadedModule) => {
-      if (
-        loadedModule.methods.find((item) => item.name === 'messageFromRenderer')
-      ) {
-        hasMessageFromRendererMethod = true
-      }
-    })
-    .catch((err: any) => {
-      dcl.error(
-        `ExperimentalAPI couldn't be loaded, the message to renderer can't be sent without this API.`,
-        err
-      )
-    })
+  dcl.loadModule('@decentraland/ExperimentalAPI', {}).catch(dcl.error)
 
   async function pullRendererMessages() {
-    if (!hasMessageFromRendererMethod) return
-
     const response = await dcl.callRpc(
       '@decentraland/ExperimentalAPI',
       'messageFromRenderer',
