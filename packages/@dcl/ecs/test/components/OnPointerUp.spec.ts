@@ -8,7 +8,6 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     const entityB = newEngine.addEntity()
     OnPointerUp.create(newEngine.addEntity())
     const onPointerUp = OnPointerUp.create(entity, {
-      identifier: 1,
       button: 1,
       hoverText: 'Tap to run',
       distance: 10,
@@ -16,7 +15,6 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     })
 
     OnPointerUp.create(entityB, {
-      identifier: 2,
       button: 3,
       hoverText: 'TCker',
       distance: 5,
@@ -30,13 +28,12 @@ describe('Generated OnPointerDown ProtoBuf', () => {
 
   it('should receive OnPointerResult', () => {
     const newEngine = Engine()
-    const { OnPointerUp, OnPointerResult } = newEngine.baseComponents
+    const { OnPointerUp, OnPointerUpResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     OnPointerUp.create(newEngine.addEntity())
 
     // We create an onPointerDownEvent
     const onPointerUp = OnPointerUp.create(entity, {
-      identifier: 1,
       button: 1,
       hoverText: 'Tap to run',
       distance: 10,
@@ -47,8 +44,8 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     newEngine.update(1 / 30)
 
     // We receive an OnPointerResult
-    const onPointerResult = OnPointerResult.create(entity, {
-      identifier: 1,
+    const onPointerUpResult = OnPointerUpResult.create(entity, {
+      timestamp: 1,
       button: 3,
       point: { x: 1, y: 2, z: 3 },
       distance: 10,
@@ -58,7 +55,6 @@ describe('Generated OnPointerDown ProtoBuf', () => {
       meshName: 'mesh'
     })
 
-    expect(onPointerUp.identifier).toEqual(onPointerResult.identifier)
-    expect(OnPointerResult.has(entity))
+    expect(OnPointerUpResult.has(entity))
   })
 })
