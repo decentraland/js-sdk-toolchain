@@ -3,7 +3,7 @@
 import "common/id.proto";
 option (ecs_component_id) = 1080;
 
-message PBBilliboard {
+message PBBillboard {
   float x = 1;
   float y = 2;
   float z = 3;
