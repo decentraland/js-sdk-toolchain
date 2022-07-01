@@ -4,7 +4,7 @@ import { Float32, Int8, MapType } from '../src/built-in-types'
 import { Transform } from '../src/components/legacy/Transform'
 import { Engine } from '../src/engine'
 import { Entity } from '../src/engine/entity'
-import * as transport from '../src/systems/crdt/transport'
+import * as transport from '../src/systems/crdt/transports/networkTransport'
 
 export function wait(ms: number) {
   return new Promise<void>((resolve) => setTimeout(() => resolve(), ms))
@@ -27,14 +27,9 @@ export namespace SandBox {
    * between two engines. WebSocket A <-> WebSocket B
    */
   export function create({ length }: { length: number }) {
-    const transports = transport
-      .getTransports()
-      .map((transport) => ({ ...transport }))
     const clients = Array.from({ length }).map((_, index) => {
-      const clientTransport = transports.map((t) => ({ ...t }))
-      jest.spyOn(transport, 'getTransports').mockReturnValue(clientTransport)
-
-      const engine = Engine()
+      const clientTransport = transport.createNetworkTransport()
+      const engine = Engine({ transports: [clientTransport] })
       const Position = engine.defineComponent(
         SandBox.Position.id,
         SandBox.Position.type
@@ -44,9 +39,9 @@ export namespace SandBox {
       return {
         id: index,
         engine,
-        transports: clientTransport,
+        transports: [clientTransport],
         components: { Door, Position },
-        spySend: jest.spyOn(clientTransport[0], 'send')
+        spySend: jest.spyOn(clientTransport, 'send')
       }
     })
 

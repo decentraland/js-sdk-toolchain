@@ -6,16 +6,16 @@ import EntityUtils from '../../engine/entity-utils'
 import { createByteBuffer } from '../../serialization/ByteBuffer'
 import { PutComponentOperation as Message } from '../../serialization/crdt/componentOperation'
 import WireMessage from '../../serialization/wireMessage'
-import { getTransports, Transport } from './transport'
+import { Transport } from './transports/types'
 import { ReceiveMessage, TransportMessage } from './types'
 import CrdtUtils from './utils'
 
 export function crdtSceneSystem({
   engine,
-  availableTransports
+  transports
 }: {
   engine: PreEngine
-  availableTransports?: Transport[]
+  transports: Transport[]
 }) {
   // CRDT Client
   const crdtClient = crdtProtocol<Uint8Array>()
@@ -26,7 +26,6 @@ export function crdtSceneSystem({
   // Map of entities already processed at least once
   const crdtEntities = new Map<Entity, boolean>()
 
-  const transports = [...getTransports(), ...(availableTransports || [])]
   transports.forEach(
     (transport) => (transport.onmessage = parseChunkMessage(transport.type))
   )
