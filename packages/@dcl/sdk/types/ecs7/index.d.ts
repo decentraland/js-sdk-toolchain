@@ -188,7 +188,9 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
     Animator: ComponentDefinition<EcsType<PBAnimator>>;
     AudioSource: ComponentDefinition<EcsType<PBAudioSource>>;
     AudioStream: ComponentDefinition<EcsType<PBAudioStream>>;
+    AvatarModifierArea: ComponentDefinition<EcsType<PBAvatarModifierArea>>;
     BoxShape: ComponentDefinition<EcsType<PBBoxShape>>;
+    CameraModeArea: ComponentDefinition<EcsType<PBCameraModeArea>>;
     CylinderShape: ComponentDefinition<EcsType<PBCylinderShape>>;
     GLTFShape: ComponentDefinition<EcsType<PBGLTFShape>>;
     NFTShape: ComponentDefinition<EcsType<PBNFTShape>>;
@@ -1138,18 +1140,39 @@ declare interface PBAudioStream {
     url: string;
 }
 
+declare interface PBAvatarModifierArea {
+    area: Vector3_2 | undefined;
+    excludeIds: string[];
+    modifiers: PBAvatarModifierArea_Modifier[];
+}
+
+declare enum PBAvatarModifierArea_Modifier {
+    HIDE_AVATARS = 0,
+    DISABLE_PASSPORTS = 1,
+    UNRECOGNIZED = -1
+}
+
 declare interface PBBoxShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
-    /** TODO: should visible be another component? that maybe affects all the entities */
     visible: boolean;
     uvs: number[];
+}
+
+declare interface PBCameraModeArea {
+    area: Vector3_2 | undefined;
+    mode: PBCameraModeArea_CameraMode;
+}
+
+declare enum PBCameraModeArea_CameraMode {
+    FIRST_PERSON = 0,
+    THIRD_PERSON = 1,
+    UNRECOGNIZED = -1
 }
 
 declare interface PBCylinderShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
-    /** TODO: should visible be another component? that maybe affects all the entities */
     visible: boolean;
     radiusTop: number;
     radiusBottom: number;
@@ -1165,7 +1188,6 @@ declare interface PBGLTFShape {
 declare interface PBNFTShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
-    /** TODO: should visible be another component? that maybe affects all the entities */
     visible: boolean;
     src: string;
     assetId: string;
@@ -1212,9 +1234,7 @@ declare interface PBOnPointerUpResult {
 declare interface PBPlaneShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
-    /** TODO: should visible be another component? that maybe affects all the entities */
     visible: boolean;
-    /** TODO: this could be better serialized as u00 v00 u01 v01 u10 v10 u11 v11 for speed */
     uvs: number[];
 }
 
@@ -1226,7 +1246,6 @@ declare interface PBSphereShape {
 
 declare interface PBTextShape {
     text: string;
-    /** this should be removed */
     visible: boolean;
     font: string;
     opacity: number;
