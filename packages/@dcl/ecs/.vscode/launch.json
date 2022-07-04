@@ -47,7 +47,7 @@
       "program": "${workspaceFolder}/tools/dist/check-proto-compatibility/index.js",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal", 
-      "args": ["--definitions-path", "${workspaceFolder}/src/components/definitions"],
+      "args": ["--definitions-path", "${workspaceFolder}/node_modules/@dcl/protocol/ecs/components"],
       "preLaunchTask": "Build tools"
     }
   ]

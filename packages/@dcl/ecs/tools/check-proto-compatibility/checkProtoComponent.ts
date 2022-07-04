@@ -15,7 +15,7 @@ export async function checkProtoComponent(
   component: string
 ): Promise<ReturnValue> {
   const remoteComponentBasePath =
-    'https://raw.githubusercontent.com/decentraland/ecs/main/src/components/definitions/'
+    'https://raw.githubusercontent.com/decentraland/protocol/main/ecs/components/'
 
   const remoteComponentPath = `${remoteComponentBasePath}${component}.proto`
   const localComponentPath = path.resolve(definitionsPath, `${component}.proto`)
