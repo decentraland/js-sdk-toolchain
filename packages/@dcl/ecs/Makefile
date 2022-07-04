@@ -28,7 +28,7 @@ build:
 	rm -rf src/components/generated
 	make generate-components
 	make build-ecs
-	cp -r src/components/definitions dist/proto-definitions
+	cp -r ${PWD}/node_modules/@dcl/protocol/ecs/components dist/proto-definitions
 
 build-ecs:
 	./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/dist/ecs.config.js
@@ -53,6 +53,6 @@ generate-components:
 	./tools/dist/protocol-buffer-generation/index.js --component-path ${PWD}/src/components
 
 test-components-compatibility:
-	./tools/dist/check-proto-compatibility/index.js --definitions-path ${PWD}/src/components/definitions
+	./tools/dist/check-proto-compatibility/index.js --definitions-path ${PWD}/node_modules/@dcl/protocol/ecs/components
 
 .PHONY: build test
