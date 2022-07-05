@@ -333,6 +333,7 @@ describe('Engine tests', () => {
 
   it('should remove component when using deleteFrom', () => {
     const engine = Engine()
+
     const MoveTransportData = MapType({
       duration: Float32,
       speed: Float32

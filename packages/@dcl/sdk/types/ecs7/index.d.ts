@@ -199,6 +199,7 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
     PlaneShape: ComponentDefinition<EcsType<PBPlaneShape>>;
     SphereShape: ComponentDefinition<EcsType<PBSphereShape>>;
     TextShape: ComponentDefinition<EcsType<PBTextShape>>;
+    UiText: ComponentDefinition<EcsType<PBUiText>>;
     UiTransform: ComponentDefinition<EcsType<PBUiTransform>>;
     Transform: ComponentDefinition<EcsType<Transform>>;
 };
@@ -1250,6 +1251,10 @@ declare interface PBTextShape {
     shadowColor: Color3 | undefined;
     outlineColor: Color3 | undefined;
     textColor: Color3 | undefined;
+}
+
+declare interface PBUiText {
+    text: string;
 }
 
 declare interface PBUiTransform {
