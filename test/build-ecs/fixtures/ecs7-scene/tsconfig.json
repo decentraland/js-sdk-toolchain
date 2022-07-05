@@ -5,7 +5,8 @@
     "baseUrl": "."
   },
   "include": [
-    "*.ts"
+    "*.ts",
+    "*.tsx"
   ],
   "extends": "../../../../packages/@dcl/sdk/types/tsconfig.ecs7.json",
   "compileOnSave": false

@@ -1,3 +1,5 @@
+import { ui } from './ui'
+
 function circularSystem() {
   let t = 0.0
   return (dt: number) => {
@@ -32,3 +34,4 @@ function createCube(x: number, y: number, z: number) {
 }
 createCube(8, 2, 8)
 engine.addSystem(circularSystem())
+engine.renderUI(ui())

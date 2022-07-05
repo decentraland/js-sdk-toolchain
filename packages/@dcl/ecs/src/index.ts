@@ -11,3 +11,6 @@ export * from './components/generated/global.gen'
 export * from './components/generated/global.namespace.gen'
 
 export * from './runtime/types'
+export * from './built-in-types'
+export * from './initialization'
+export * from './engine/jsx'

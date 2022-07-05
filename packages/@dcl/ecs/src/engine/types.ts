@@ -4,6 +4,7 @@ import { Result, Spec } from '../schemas/Map'
 import { Transport } from '../systems/crdt/transports/types'
 import { ComponentDefinition as CompDef, ComponentType } from './component'
 import { Entity } from './entity'
+import { JsxTree } from './jsx/types'
 import { Update } from './systems'
 import { ReadonlyComponentSchema } from './readonly'
 
@@ -152,6 +153,7 @@ export type IEngine = {
   removeComponentDefinition(componentId: number): void
 
   baseComponents: SdkComponents
+  renderUI(tree: JsxTree): void
 }
 
 /**

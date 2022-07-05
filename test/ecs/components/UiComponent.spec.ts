@@ -7,16 +7,17 @@ import {
   YGOverflow,
   YGPositionType,
   YGUnit
+  // YGUnit
 } from '../../src/components/generated/pb/UiTransform.gen'
 import { Engine } from '../../src/engine'
 
-describe.skip('UiTransform component', () => {
+describe('UiTransform component', () => {
   it('should serialize', () => {
     const newEngine = Engine()
     const { UiTransform } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-
-    const uiTransform = UiTransform.create(entity, {
+    UiTransform.create(entity, {
+      parentEntity: 0,
       alignContent: YGAlign.YGAlignCenter,
       alignItems: YGAlign.YGAlignFlexEnd,
       alignSelf: YGAlign.YGAlignFlexStart,
@@ -73,7 +74,7 @@ describe.skip('UiTransform component', () => {
       width: 1,
       widthUnit: YGUnit.YGUnitPoint
     })
-    uiTransform.marginBottomUnit = YGUnit.YGUnitPercent
+    // uiTransform.marginBottomUnit = YGUnit.YGUnitPercent
 
     const buffer = UiTransform.toBinary(entity)
     UiTransform.upsertFromBinary(entity, buffer)

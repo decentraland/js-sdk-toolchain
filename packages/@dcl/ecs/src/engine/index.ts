@@ -11,9 +11,11 @@ import {
 } from './component'
 import { Entity, EntityContainer } from './entity'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
-import type { IEngineParams } from './types'
-import { IEngine } from './types'
+import type { IEngineParams, IEngine } from './types'
 import { ReadonlyComponentSchema } from './readonly'
+
+import { JsxTree } from './jsx/types'
+import { render } from './jsx/renderer'
 
 export * from './readonly'
 export * from './types'
@@ -177,6 +179,10 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
   const crdtSystem = crdtSceneSystem({ engine, transports: transports || [] })
   const baseComponents = defineSdkComponents(engine)
 
+  function renderUI(tree: JsxTree) {
+    return render({ baseComponents, addEntity: engine.addEntity })(tree)
+  }
+
   function update(dt: number) {
     crdtSystem.receiveMessages()
 
@@ -230,6 +236,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     getComponent: engine.getComponent,
     removeComponentDefinition: engine.removeComponentDefinition,
     update,
+    renderUI,
     baseComponents
   }
 }

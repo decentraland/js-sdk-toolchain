@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 declare const enum ActionButton {
     POINTER = 0,
     PRIMARY = 1,
@@ -2500,3 +2501,5 @@ declare namespace WireMessage {
 }
 
 
+=======
+>>>>>>> 7359561 (proto ui)

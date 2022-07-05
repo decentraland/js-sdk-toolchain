@@ -197,9 +197,110 @@ export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 export const DEG2RAD: number;
 
 // @public (undocumented)
+export interface DivProps {
+    // (undocumented)
+    alignContent: YGAlign;
+    // Warning: (ae-forgotten-export) The symbol "YGAlign" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    alignItems: YGAlign;
+    // (undocumented)
+    alignSelf: YGAlign;
+    // (undocumented)
+    border: Position;
+    // Warning: (ae-forgotten-export) The symbol "YGDirection" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    direction: YGDirection;
+    // Warning: (ae-forgotten-export) The symbol "YGDisplay" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    display: YGDisplay;
+    // (undocumented)
+    flex: number;
+    // (undocumented)
+    flexBasis: number;
+    // Warning: (ae-forgotten-export) The symbol "YGFlexDirection" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    flexDirection: YGFlexDirection;
+    // (undocumented)
+    flexGrow: number;
+    // (undocumented)
+    flexShrink: number;
+    // Warning: (ae-forgotten-export) The symbol "YGWrap" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    flexWrap: YGWrap;
+    // (undocumented)
+    height: number;
+    // Warning: (ae-forgotten-export) The symbol "YGJustify" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    justifyContent: YGJustify;
+    // (undocumented)
+    margin: Position;
+    // (undocumented)
+    maxHeight: number;
+    // (undocumented)
+    maxWidth: number;
+    // (undocumented)
+    minHeight: number;
+    // (undocumented)
+    minWidth: number;
+    // Warning: (ae-forgotten-export) The symbol "YGOverflow" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    overflow: YGOverflow;
+    // (undocumented)
+    padding: Position;
+    // (undocumented)
+    position: Position;
+    // Warning: (ae-forgotten-export) The symbol "YGPositionType" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    positionType: YGPositionType;
+    // (undocumented)
+    width: number;
+}
+
+// @public (undocumented)
+export type DivTag = {
+    tag: 'divui';
+    attributes: DivProps;
+};
+
+// @public (undocumented)
+export function DivUi(props: Partial<DivProps>, ...children: any[]): JsxTree;
+
+// @public (undocumented)
 export type double = number;
 
 // @public (undocumented)
+<<<<<<< HEAD
+=======
+export const EcsBoolean: EcsType<boolean>;
+
+// @public (undocumented)
+export namespace EcsJsx {
+    // (undocumented)
+    export function createElement(tag: JsxTree['tag'] | ((attributes: any, children: any) => JsxTree), attributes: {
+        [key: string]: any;
+    } | null, ...args: any[]): JsxTree;
+}
+
+// @public (undocumented)
+export const EcsString: EcsType<string>;
+
+// @public (undocumented)
+export type EcsType<T = any> = {
+    serialize(value: T, builder: ByteBuffer): void;
+    deserialize(reader: ByteBuffer): T;
+    create(): T;
+};
+
+// @public (undocumented)
+>>>>>>> a098bb8 (proto ui)
 export function Engine({ transports }?: IEngineParams): IEngine;
 
 // Warning: (ae-missing-release-tag) "engine" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -241,6 +342,7 @@ export type IEngine = {
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     baseComponents: SdkComponents;
+    renderUI(tree: JsxTree): void;
 };
 
 // @public (undocumented)
@@ -264,6 +366,7 @@ export interface ISize {
 // Warning: (ae-missing-release-tag) "log" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
+<<<<<<< HEAD
 export const log: (...a: any[]) => void;
 
 // @public (undocumented)
@@ -277,6 +380,14 @@ export const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<
 
 // @public (undocumented)
 export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
+=======
+export type JsxTree = (DivTag | TextTag) & {
+    children: (JsxTree | null)[];
+};
+
+// @public (undocumented)
+export function MapType<T extends Spec>(spec: T): EcsType<Result<T>>;
+>>>>>>> a098bb8 (proto ui)
 
 // @public (undocumented)
 export type Nullable<T> = T | null;
@@ -300,6 +411,7 @@ export enum Orientation {
 }
 
 // @public (undocumented)
+<<<<<<< HEAD
 export const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
 
 // @public (undocumented)
@@ -309,6 +421,14 @@ export const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerL
 //
 // @public (undocumented)
 export type PreEngine = ReturnType<typeof preEngine>;
+=======
+export type Position = {
+    top: number | string;
+    right: number | string;
+    bottom: number | string;
+    left: number | string;
+};
+>>>>>>> a098bb8 (proto ui)
 
 // @public (undocumented)
 export namespace Quaternion {
@@ -430,10 +550,32 @@ export interface Spec {
 }
 
 // @public (undocumented)
+<<<<<<< HEAD
 export const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
 
 // @public (undocumented)
 export const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+=======
+export interface TextProps {
+    // (undocumented)
+    textColor: {
+        r: number;
+        g: number;
+        b: number;
+    };
+    // (undocumented)
+    value: string;
+}
+
+// @public (undocumented)
+export type TextTag = {
+    tag: 'textui';
+    attributes: TextProps;
+};
+
+// @public (undocumented)
+export function TextUi(props: TextProps, ...children: any[]): JsxTree;
+>>>>>>> a098bb8 (proto ui)
 
 // @public
 export const ToGammaSpace: number;
@@ -442,6 +584,7 @@ export const ToGammaSpace: number;
 export const ToLinearSpace = 2.2;
 
 // @public (undocumented)
+<<<<<<< HEAD
 export const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
 
 // Warning: (ae-missing-release-tag) "Transport" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -463,6 +606,13 @@ export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 // @public (undocumented)
 export const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
 
+=======
+export type Tree = JsxTree & {
+    _id: number;
+    entityId: number;
+};
+
+>>>>>>> a098bb8 (proto ui)
 // @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;
 
@@ -518,6 +668,7 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 
 // Warnings were encountered during analysis:
 //
+<<<<<<< HEAD
 // dist/engine/component.d.ts:24:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/component.d.ts:37:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/component.d.ts:38:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
@@ -568,6 +719,10 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 // dist/engine/types.d.ts:95:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
 // dist/engine/types.d.ts:104:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/types.d.ts:105:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+=======
+// dist/engine/types.d.ts:26:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:40:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
+>>>>>>> a098bb8 (proto ui)
 
 // (No @packageDocumentation comment for this package)
 
