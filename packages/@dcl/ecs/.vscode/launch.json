@@ -39,16 +39,6 @@
       "console": "integratedTerminal", 
       "args": ["test", "--component-path", "${workspaceFolder}/src/components"],
       "preLaunchTask": "Build tools"
-    },      
-    {
-      "type": "node",
-      "name": "Debug tool check-proto-compatibility",
-      "request": "launch",
-      "program": "${workspaceFolder}/tools/dist/check-proto-compatibility/index.js",
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal", 
-      "args": ["--definitions-path", "${workspaceFolder}/node_modules/@dcl/protocol/ecs/components"],
-      "preLaunchTask": "Build tools"
     }
   ]
 }

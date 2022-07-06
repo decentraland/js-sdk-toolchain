@@ -45,14 +45,10 @@ install_protobuffer_compiler:
 build-tools:
 	rm -rf tools/dist/
 	./node_modules/.bin/tsc -p tools/tsconfig.json
-	chmod +x ./tools/dist/check-proto-compatibility/index.js
 	chmod +x ./tools/dist/protocol-buffer-generation/index.js
 
 generate-components:
 	make build-tools
 	./tools/dist/protocol-buffer-generation/index.js --component-path ${PWD}/src/components --definitions-path ${PWD}/node_modules/@dcl/protocol/ecs/components
-
-test-components-compatibility:
-	./tools/dist/check-proto-compatibility/index.js --definitions-path ${PWD}/node_modules/@dcl/protocol/ecs/components
 
 .PHONY: build test
