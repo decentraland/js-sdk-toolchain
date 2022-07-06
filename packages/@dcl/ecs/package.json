@@ -34,7 +34,7 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
-    "@dcl/crdt": "^1.0.0-20220628173122.commit-5581606",
+    "@dcl/crdt": "^1.0.0-20220706193331.commit-71f1ea0",
     "@dcl/ecs-math": "^2.0.1-20220526123120.commit-dab2aff",
     "@dcl/posix": "^1.0.4"
   },
