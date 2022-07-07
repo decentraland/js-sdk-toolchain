@@ -118,7 +118,7 @@ export function crdtSceneSystem({
       }
 
       if (buffer.size()) {
-        transport.send(buffer.toBinary())
+        transport.send(buffer.toCopiedBinary())
       }
     }
   }
@@ -174,7 +174,7 @@ export function crdtSceneSystem({
         }
       }
       if (transportBuffer.size()) {
-        transport.send(transportBuffer.toBinary())
+        transport.send(transportBuffer.toCopiedBinary())
       }
     }
   }
