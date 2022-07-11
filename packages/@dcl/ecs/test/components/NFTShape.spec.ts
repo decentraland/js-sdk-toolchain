@@ -1,7 +1,7 @@
 import { Engine } from '../../src/engine'
 
-describe('Generated BoxShape ProtoBuf', () => {
-  it('should serialize/deserialize BoxShape', () => {
+describe('Generated NFTShape ProtoBuf', () => {
+  it('should serialize/deserialize NFTShape', () => {
     const newEngine = Engine()
     const { NFTShape } = newEngine.baseComponents
     const entity = newEngine.addEntity()
