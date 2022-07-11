@@ -1,6 +1,5 @@
-﻿import {Engine} from '../../src/engine'
-import {PBAvatarModifierArea_Modifier} from '../../src/components/generated/pb/AvatarModifierArea.gen'
-import {PBCameraModeArea_CameraMode} from "../../src/components/generated/pb/CameraModeArea.gen";
+﻿import { Engine } from '../../src/engine'
+import { PBCameraModeArea_CameraMode } from '../../src/components/generated/pb/CameraModeArea.gen'
 
 describe('Generated CameraModifierArea ProtoBuf', () => {
   it('should serialize/deserialize CameraModifierArea', () => {
