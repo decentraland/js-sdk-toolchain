@@ -28,7 +28,7 @@ build:
 	rm -rf src/components/generated
 	make generate-components
 	make build-ecs
-	cp -r src/components/definitions dist/proto-definitions
+	cp -r node_modules/@dcl/protocol/ecs/components dist/proto-definitions
 
 build-ecs:
 	./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/dist/ecs.config.js
@@ -45,14 +45,10 @@ install_protobuffer_compiler:
 build-tools:
 	rm -rf tools/dist/
 	./node_modules/.bin/tsc -p tools/tsconfig.json
-	chmod +x ./tools/dist/check-proto-compatibility/index.js
 	chmod +x ./tools/dist/protocol-buffer-generation/index.js
 
 generate-components:
 	make build-tools
-	./tools/dist/protocol-buffer-generation/index.js --component-path ${PWD}/src/components
-
-test-components-compatibility:
-	./tools/dist/check-proto-compatibility/index.js --definitions-path ${PWD}/src/components/definitions
+	./tools/dist/protocol-buffer-generation/index.js --component-path ${PWD}/src/components --definitions-path ${PWD}/node_modules/@dcl/protocol/ecs/components
 
 .PHONY: build test
