@@ -3,8 +3,10 @@ import { TRANSFORM_LENGTH } from '../src/components/legacy/Transform'
 import { Engine } from '../src/engine'
 import { Entity } from '../src/engine/entity'
 import { createByteBuffer } from '../src/serialization/ByteBuffer'
-import { PutComponentOperation } from '../src/serialization/crdt/componentOperation'
+import { ComponentOperation } from '../src/serialization/crdt/componentOperation'
 import WireMessage from '../src/serialization/wireMessage'
+
+const putType = WireMessage.Enum.PUT_COMPONENT
 
 describe('Component operation tests', () => {
   it('validate corrupt message', () => {
@@ -37,18 +39,24 @@ describe('Component operation tests', () => {
 
     const bb = createByteBuffer()
 
-    PutComponentOperation.write(entityA, timestamp, sdk.Transform, bb)
+    ComponentOperation.write(
+      WireMessage.Enum.PUT_COMPONENT,
+      entityA,
+      timestamp,
+      sdk.Transform,
+      bb
+    )
 
     mutableTransform.position.x = 31.3
     timestamp++
 
-    PutComponentOperation.write(entityA, timestamp, sdk.Transform, bb)
+    ComponentOperation.write(putType, entityA, timestamp, sdk.Transform, bb)
 
     while (WireMessage.validate(bb)) {
-      const msgOne = PutComponentOperation.read(bb)!
+      const msgOne = ComponentOperation.read(bb)!
       expect(msgOne.length).toBe(
         TRANSFORM_LENGTH +
-          PutComponentOperation.MESSAGE_HEADER_LENGTH +
+          ComponentOperation.MESSAGE_HEADER_LENGTH +
           WireMessage.HEADER_LENGTH
       )
       expect(msgOne.type).toBe(WireMessage.Enum.PUT_COMPONENT)
@@ -58,6 +66,6 @@ describe('Component operation tests', () => {
 
   it('should return null if it has an invalid header', () => {
     const buf = createByteBuffer()
-    expect(PutComponentOperation.read(buf)).toBe(null)
+    expect(ComponentOperation.read(buf)).toBe(null)
   })
 })

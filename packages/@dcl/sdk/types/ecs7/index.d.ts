@@ -185,12 +185,19 @@ declare type DeepReadonly<T> = {
 };
 
 declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): {
+    Animator: ComponentDefinition<EcsType<PBAnimator>>;
     AudioSource: ComponentDefinition<EcsType<PBAudioSource>>;
     AudioStream: ComponentDefinition<EcsType<PBAudioStream>>;
+    AvatarModifierArea: ComponentDefinition<EcsType<PBAvatarModifierArea>>;
     BoxShape: ComponentDefinition<EcsType<PBBoxShape>>;
+    CameraModeArea: ComponentDefinition<EcsType<PBCameraModeArea>>;
     CylinderShape: ComponentDefinition<EcsType<PBCylinderShape>>;
     GLTFShape: ComponentDefinition<EcsType<PBGLTFShape>>;
     NFTShape: ComponentDefinition<EcsType<PBNFTShape>>;
+    OnPointerDown: ComponentDefinition<EcsType<PBOnPointerDown>>;
+    OnPointerDownResult: ComponentDefinition<EcsType<PBOnPointerDownResult>>;
+    OnPointerUp: ComponentDefinition<EcsType<PBOnPointerUp>>;
+    OnPointerUpResult: ComponentDefinition<EcsType<PBOnPointerUpResult>>;
     PlaneShape: ComponentDefinition<EcsType<PBPlaneShape>>;
     SphereShape: ComponentDefinition<EcsType<PBSphereShape>>;
     TextShape: ComponentDefinition<EcsType<PBTextShape>>;
@@ -234,9 +241,7 @@ declare type EcsType<T = any> = {
 /**
  * @public
  */
-declare function Engine({ transports }?: {
-    transports?: Transport[];
-}): IEngine;
+declare function Engine({ transports }?: IEngineParams): IEngine;
 
 /**
  * @alpha * This file initialization is an alpha one. This is based on the old-ecs
@@ -304,6 +309,13 @@ declare type IEngine = {
     getComponent<T extends EcsType>(componentId: number): ComponentDefinition<T>;
     update(dt: number): void;
     baseComponents: SdkComponetns;
+};
+
+/**
+ * @public
+ */
+declare type IEngineParams = {
+    transports?: Transport[];
 };
 
 /** Include property keys from T where the property is assignable to U */
@@ -1099,6 +1111,20 @@ declare enum Orientation {
     CCW = 1
 }
 
+declare interface PBAnimationState {
+    name: string;
+    clip: string;
+    playing: boolean;
+    weight: number;
+    speed: number;
+    loop: boolean;
+    shouldReset: boolean;
+}
+
+declare interface PBAnimator {
+    states: PBAnimationState[];
+}
+
 declare interface PBAudioSource {
     playing: boolean;
     volume: number;
@@ -1114,18 +1140,39 @@ declare interface PBAudioStream {
     url: string;
 }
 
+declare interface PBAvatarModifierArea {
+    area: Vector3_2 | undefined;
+    excludeIds: string[];
+    modifiers: PBAvatarModifierArea_Modifier[];
+}
+
+declare enum PBAvatarModifierArea_Modifier {
+    HIDE_AVATARS = 0,
+    DISABLE_PASSPORTS = 1,
+    UNRECOGNIZED = -1
+}
+
 declare interface PBBoxShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
-    /** TODO: should visible be another component? that maybe affects all the entities */
     visible: boolean;
     uvs: number[];
+}
+
+declare interface PBCameraModeArea {
+    area: Vector3_2 | undefined;
+    mode: PBCameraModeArea_CameraMode;
+}
+
+declare enum PBCameraModeArea_CameraMode {
+    FIRST_PERSON = 0,
+    THIRD_PERSON = 1,
+    UNRECOGNIZED = -1
 }
 
 declare interface PBCylinderShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
-    /** TODO: should visible be another component? that maybe affects all the entities */
     visible: boolean;
     radiusTop: number;
     radiusBottom: number;
@@ -1141,7 +1188,6 @@ declare interface PBGLTFShape {
 declare interface PBNFTShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
-    /** TODO: should visible be another component? that maybe affects all the entities */
     visible: boolean;
     src: string;
     assetId: string;
@@ -1149,12 +1195,46 @@ declare interface PBNFTShape {
     color: Color3 | undefined;
 }
 
+declare interface PBOnPointerDown {
+    button: number;
+    hoverText: string;
+    distance: number;
+    showFeedback: boolean;
+}
+
+declare interface PBOnPointerDownResult {
+    button: number;
+    meshName: string;
+    origin: Vector3_2 | undefined;
+    direction: Vector3_2 | undefined;
+    point: Vector3_2 | undefined;
+    normal: Vector3_2 | undefined;
+    distance: number;
+    timestamp: number;
+}
+
+declare interface PBOnPointerUp {
+    button: number;
+    hoverText: string;
+    distance: number;
+    showFeedback: boolean;
+}
+
+declare interface PBOnPointerUpResult {
+    button: number;
+    meshName: string;
+    origin: Vector3_2 | undefined;
+    direction: Vector3_2 | undefined;
+    point: Vector3_2 | undefined;
+    normal: Vector3_2 | undefined;
+    distance: number;
+    timestamp: number;
+}
+
 declare interface PBPlaneShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
-    /** TODO: should visible be another component? that maybe affects all the entities */
     visible: boolean;
-    /** TODO: this could be better serialized as u00 v00 u01 v01 u10 v10 u11 v11 for speed */
     uvs: number[];
 }
 
@@ -1166,7 +1246,6 @@ declare interface PBSphereShape {
 
 declare interface PBTextShape {
     text: string;
-    /** this should be removed */
     visible: boolean;
     font: string;
     opacity: number;
@@ -1531,11 +1610,12 @@ declare namespace Quaternion {
 declare const RAD2DEG: number;
 
 declare type ReceiveMessage = {
+    type: WireMessage.Enum;
     entity: Entity;
     componentId: number;
     timestamp: number;
     transportType?: string;
-    data: Uint8Array;
+    data?: Uint8Array;
     messageBuffer: Uint8Array;
 };
 
@@ -1601,10 +1681,12 @@ declare type Transport = {
     type: string;
     send(message: Uint8Array): void;
     onmessage?(message: Uint8Array): void;
-    filter(message: TransportMessage): boolean;
+    filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
 };
 
 declare type TransportMessage = Omit<ReceiveMessage, 'data'>;
+
+declare type Uint32 = number;
 
 /**
  * @public
@@ -1817,6 +1899,36 @@ declare namespace Vector3 {
      * @returns a new left Vector3
      */
     export function Left(): MutableVector3;
+}
+
+declare interface Vector3_2 {
+    x: number;
+    y: number;
+    z: number;
+}
+
+declare namespace WireMessage {
+    enum Enum {
+        RESERVED = 0,
+        PUT_COMPONENT = 1,
+        DELETE_COMPONENT = 2,
+        MAX_MESSAGE_TYPE = 3
+    }
+    /**
+     * @param length - Uint32 the length of all message (including the header)
+     * @param type - define the function which handles the data
+     */
+    type Header = {
+        length: Uint32;
+        type: Uint32;
+    };
+    const HEADER_LENGTH = 8;
+    /**
+     * Validate if the message incoming is completed
+     * @param buf
+     */
+    function validate(buf: ByteBuffer): boolean;
+    function readHeader(buf: ByteBuffer): Header | null;
 }
 
 declare enum YGAlign {
