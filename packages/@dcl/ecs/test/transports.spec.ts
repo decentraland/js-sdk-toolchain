@@ -1,5 +1,6 @@
 import { Int8, MapType } from '../src/built-in-types'
 import { Engine } from '../src/engine'
+import WireMessage from '../src/serialization/wireMessage'
 import { createNetworkTransport } from '../src/systems/crdt/transports/networkTransport'
 import { createRendererTransport } from '../src/systems/crdt/transports/rendererTransport'
 import { TransportMessage } from '../src/systems/crdt/types'
@@ -15,6 +16,7 @@ describe('Transport tests', () => {
     const engine = Engine({ transports: [transport] })
     const entity = engine.addEntity()
     const message: TransportMessage = {
+      type: WireMessage.Enum.PUT_COMPONENT,
       entity,
       componentId: engine.baseComponents.Transform._id,
       timestamp: Date.now(),
