@@ -7,19 +7,33 @@ import { Engine } from './engine'
 import { createRendererTransport } from './systems/crdt/transports/rendererTransport'
 import { createNetworkTransport } from './systems/crdt/transports/networkTransport'
 
+const rendererTransport = createRendererTransport()
 export const engine = Engine({
-  transports: [createRendererTransport(), createNetworkTransport()]
+  transports: [rendererTransport, createNetworkTransport()]
 })
 
 if (dcl) {
-  dcl.loadModule('@decentraland/ExperimentalAPI', {}).catch((err: any) => {
-    dcl.error(
-      `ExperimentalAPI couldn't be loaded, the message to renderer can't be sent without this API.`,
-      err
+  dcl.loadModule('@decentraland/ExperimentalAPI', {}).catch(dcl.error)
+
+  async function pullRendererMessages() {
+    const response = await dcl.callRpc(
+      '@decentraland/ExperimentalAPI',
+      'messageFromRenderer',
+      []
     )
-  })
+
+    if (response.data?.length) {
+      if (rendererTransport.onmessage) {
+        for (const byteArray of response.data) {
+          rendererTransport.onmessage(byteArray)
+        }
+      }
+    }
+  }
 
   dcl.onUpdate((dt: number) => {
-    engine.update(dt)
+    pullRendererMessages()
+      .catch(dcl.error)
+      .finally(() => engine.update(dt))
   })
 }

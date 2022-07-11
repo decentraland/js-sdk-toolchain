@@ -149,5 +149,30 @@ describe('ByteBuffer tests', () => {
     expect(position.getUint64(readOffset + 34)).toBe(18446744073709551615n)
     expect(position.currentReadOffset()).toBe(12)
   })
+
+  it('should change toBinary() buffer and not change toCopiedBinary()', () => {
+    const testValueA = [123, 123, 123, 123, 123]
+    const testValueB = [77, 77, 77, 77, 77]
+
+    const bb = createByteBuffer()
+
+    for (const value of testValueA) {
+      bb.writeUint8(value)
+    }
+
+    const copiedBuffer = bb.toCopiedBinary()
+    const referenceBuffer = bb.toBinary()
+
+    expect(copiedBuffer[0]).toBe(testValueA[0])
+    expect(referenceBuffer[0]).toBe(testValueA[0])
+
+    bb.resetBuffer()
+    for (const value of testValueB) {
+      bb.writeUint8(value)
+    }
+
+    expect(copiedBuffer[0]).toBe(testValueA[0])
+    expect(referenceBuffer[0]).toBe(testValueB[0])
+  })
 })
 // getInt64
