@@ -29,9 +29,15 @@ function getParam(key: string) {
  */
 async function main() {
   const componentPathParam = getParam('--component-path')
+  const definitionsPath = getParam('--definitions-path')
   const test = process.argv.findIndex((item) => item === 'test') !== -1
   if (!componentPathParam) {
     console.error('Arg --component-path is required.')
+    process.exit(2)
+  }
+
+  if (!definitionsPath) {
+    console.error('Arg --definitions-path is required.')
     process.exit(2)
   }
 
@@ -39,7 +45,6 @@ async function main() {
     ? path.resolve(process.cwd(), 'temp-protocolbuffers')
     : componentPathParam
   const generatedPath = path.resolve(componentPath, 'generated')
-  const definitionsPath = path.resolve(componentPath, 'definitions')
 
   if (test) {
     removeSync(componentPath)
