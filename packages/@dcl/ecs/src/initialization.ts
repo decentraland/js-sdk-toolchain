@@ -4,53 +4,36 @@
  */
 
 import { Engine } from './engine'
-import { TransportMessage } from './systems/crdt/types'
+import { createRendererTransport } from './systems/crdt/transports/rendererTransport'
+import { createNetworkTransport } from './systems/crdt/transports/networkTransport'
 
-declare const dcl: DecentralandInterface
-let ExperimentalAPI: any | undefined = undefined
-
+const rendererTransport = createRendererTransport()
 export const engine = Engine({
-  transports: [createRendererTransport()]
+  transports: [rendererTransport, createNetworkTransport()]
 })
 
 if (dcl) {
-  dcl
-    .loadModule('@decentraland/ExperimentalAPI', {})
-    .then((module: any) => {
-      ExperimentalAPI = module
-    })
-    .catch((err: any) => {
-      dcl.error(
-        `ExperimentalAPI couldn't be loaded, the message to renderer can't be sent without this API.`,
-        err
-      )
-    })
+  dcl.loadModule('@decentraland/ExperimentalAPI', {}).catch(dcl.error)
 
-  dcl.onUpdate((dt: number) => {
-    engine.update(dt)
-  })
-}
+  async function pullRendererMessages() {
+    const response = await dcl.callRpc(
+      '@decentraland/ExperimentalAPI',
+      'messageFromRenderer',
+      []
+    )
 
-function createRendererTransport() {
-  return {
-    type: 'renderer',
-    send(message: Uint8Array): void {
-      if (ExperimentalAPI) {
-        dcl
-          .callRpc('@decentraland/ExperimentalAPI', 'sendToRenderer', [
-            { data: message }
-          ])
-          .catch(dcl.error)
+    if (response.data?.length) {
+      if (rendererTransport.onmessage) {
+        for (const byteArray of response.data) {
+          rendererTransport.onmessage(byteArray)
+        }
       }
-    },
-    onmessage(_message: Uint8Array): void {},
-    filter(message: TransportMessage): boolean {
-      // Echo message, ignore them
-      if (message.transportType === 'renderer') {
-        return false
-      }
-
-      return !!message
     }
   }
+
+  dcl.onUpdate((dt: number) => {
+    pullRendererMessages()
+      .catch(dcl.error)
+      .finally(() => engine.update(dt))
+  })
 }

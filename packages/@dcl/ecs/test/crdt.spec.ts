@@ -1,10 +1,9 @@
 import { Vector3 } from '@dcl/ecs-math'
-import { Engine } from '../src/engine'
 import { Entity } from '../src/engine/entity'
 import EntityUtils from '../src/engine/entity-utils'
 import { createByteBuffer } from '../src/serialization/ByteBuffer'
-import { PutComponentOperation } from '../src/serialization/crdt/componentOperation'
-import * as transport from '../src/systems/crdt/transport'
+import { ComponentOperation } from '../src/serialization/crdt/componentOperation'
+import WireMessage from '../src/serialization/wireMessage'
 import { wait, SandBox } from './utils'
 
 describe('CRDT tests', () => {
@@ -13,7 +12,7 @@ describe('CRDT tests', () => {
     jest.restoreAllMocks()
   })
 
-  it('should not send static entities, only updates', () => {
+  it('should send static entities', () => {
     const { engine, spySend } = SandBox.create({ length: 1 })[0]
     const entityA = engine.addEntity()
     const { Transform } = engine.baseComponents
@@ -25,7 +24,7 @@ describe('CRDT tests', () => {
 
     // Tick update and verify that both messages are being sent through ws.send
     engine.update(1 / 30)
-    expect(spySend).toBeCalledTimes(0)
+    expect(spySend).toBeCalledTimes(1)
 
     // Reset ws.send called times
     jest.resetAllMocks()
@@ -162,14 +161,15 @@ describe('CRDT tests', () => {
     engine.baseComponents.Transform.mutable(entity).position.x = 8
     engine.update(1)
     const buffer = createByteBuffer()
-    PutComponentOperation.write(
+    ComponentOperation.write(
+      WireMessage.Enum.PUT_COMPONENT,
       entity,
       0,
       engine.baseComponents.Transform,
       buffer
     )
     jest.resetAllMocks()
-    const spyWrite = jest.spyOn(PutComponentOperation, 'write')
+    const spyWrite = jest.spyOn(ComponentOperation, 'write')
     transports[0].onmessage!(buffer.toBinary())
     engine.update(1)
 
@@ -177,16 +177,50 @@ describe('CRDT tests', () => {
     expect(spyWrite).toBeCalledTimes(1)
   })
 
-  it('should test transports', () => {
-    const transports = transport.getTransports()
-    jest.spyOn(transport, 'getTransports').mockReturnValue(transports)
-    const sendSpy = jest.spyOn(transports[0], 'send')
-
-    const engine = Engine()
-    const entity = engine.addDynamicEntity()
-    engine.baseComponents.Transform.create(entity, SandBox.DEFAULT_POSITION)
+  it('should resend a crdt delete message if its outdated', () => {
+    const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
+    const entity = engine.addEntity()
+    const { Transform } = engine.baseComponents
+    Transform.create(entity, SandBox.DEFAULT_POSITION)
+    engine.update(1)
+    const buffer = createByteBuffer()
+    ComponentOperation.write(
+      WireMessage.Enum.PUT_COMPONENT,
+      entity,
+      0,
+      Transform,
+      buffer
+    )
+    Transform.deleteFrom(entity)
+    engine.update(1)
+    jest.resetAllMocks()
+    const spyWrite = jest.spyOn(ComponentOperation, 'write')
+    transports[0].onmessage!(buffer.toBinary())
     engine.update(1)
 
-    expect(sendSpy).toBeCalledTimes(1)
+    expect(spySend).toBeCalledTimes(1)
+    expect(spyWrite).toBeCalledTimes(1)
+  })
+
+  it('should remove a component if we receive a DELETE_COMPONENT operation message', () => {
+    const [{ engine, transports }] = SandBox.create({ length: 1 })
+    const [transport] = transports
+    const entity = engine.addEntity()
+    const { Transform } = engine.baseComponents
+
+    Transform.create(entity, SandBox.DEFAULT_POSITION)
+    engine.update(1)
+
+    const buffer = createByteBuffer()
+    ComponentOperation.write(
+      WireMessage.Enum.DELETE_COMPONENT,
+      entity,
+      2,
+      engine.baseComponents.Transform,
+      buffer
+    )
+    transport.onmessage!(buffer.toBinary())
+    engine.update(1)
+    expect(Transform.getOrNull(entity)).toBe(null)
   })
 })

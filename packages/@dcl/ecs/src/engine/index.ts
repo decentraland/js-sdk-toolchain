@@ -6,12 +6,11 @@ import {
   ComponentDefinition,
   defineComponent as defComponent
 } from './component'
-import type { ComponentEcsType, Update } from './types'
+import type { ComponentEcsType, IEngineParams, Update } from './types'
 import type { DeepReadonly } from '../Math'
 import type { EcsType } from '../built-in-types/EcsType'
 import { IEngine } from './types'
 import { ByteBuffer } from '../serialization/ByteBuffer'
-import { Transport } from '../systems/crdt/transport'
 
 export {
   ComponentType,
@@ -51,13 +50,12 @@ function preEngine() {
   }
 
   function removeEntity(entity: Entity) {
-    // TODO: Remove all the components of that entity
     for (const [, component] of componentsDefinition) {
       if (component.has(entity)) {
         component.deleteFrom(entity)
       }
     }
-    // entitiesComponent.delete(entity)
+
     return entityContainer.removeEntity(entity)
   }
 
@@ -149,14 +147,9 @@ export type PreEngine = ReturnType<typeof preEngine>
 /**
  * @public
  */
-export function Engine({
-  transports
-}: { transports?: Transport[] } = {}): IEngine {
+export function Engine({ transports }: IEngineParams = {}): IEngine {
   const engine = preEngine()
-  const crdtSystem = crdtSceneSystem({
-    engine,
-    availableTransports: transports
-  })
+  const crdtSystem = crdtSceneSystem({ engine, transports: transports || [] })
   const baseComponents = defineSdkComponents(engine)
 
   function update(dt: number) {
