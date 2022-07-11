@@ -201,17 +201,30 @@ export function createByteBuffer(options: CreateByteBufferOptions = {}) {
       return woffset
     },
     /**
-     * @returns The subarray from 0 to offset.
+     * Take care using this function, if you modify the data after, the
+     * returned subarray will change too. If you'll modify the content of the
+     * bytebuffer, maybe you want to use toCopiedBinary()
+     *
+     * @returns The subarray from 0 to offset as reference.
      */
     toBinary() {
       return buffer.subarray(0, woffset)
     },
+
+    /**
+     * Safe copied buffer of the current data of ByteBuffer
+     *
+     * @returns The subarray from 0 to offset.
+     */
+    toCopiedBinary() {
+      return new Uint8Array(this.toBinary())
+    },
+
     writeBuffer(value: Uint8Array, writeLength: boolean = true) {
       if (writeLength) {
         this.writeUint32(value.byteLength)
       }
 
-      // TODO: lean
       const o = woAdd(value.byteLength)
       buffer.set(value, o)
     },

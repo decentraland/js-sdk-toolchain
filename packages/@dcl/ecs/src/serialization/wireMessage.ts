@@ -24,7 +24,6 @@ export namespace WireMessage {
     PUT_COMPONENT = 1,
     DELETE_COMPONENT = 2,
 
-    // TODO: ?
     MAX_MESSAGE_TYPE
   }
 

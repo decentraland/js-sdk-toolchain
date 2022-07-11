@@ -2,9 +2,8 @@ import { crdtProtocol, Message as CrdtMessage } from '@dcl/crdt'
 
 import type { PreEngine } from '../../engine'
 import { Entity } from '../../engine/entity'
-import EntityUtils from '../../engine/entity-utils'
 import { createByteBuffer } from '../../serialization/ByteBuffer'
-import { PutComponentOperation as Message } from '../../serialization/crdt/componentOperation'
+import { ComponentOperation as Message } from '../../serialization/crdt/componentOperation'
 import WireMessage from '../../serialization/wireMessage'
 import { Transport } from './transports/types'
 import { ReceiveMessage, TransportMessage } from './types'
@@ -24,7 +23,6 @@ export function crdtSceneSystem({
   // Messages already processed by the engine but that we need to broadcast to other transports.
   const transportMessages: TransportMessage[] = []
   // Map of entities already processed at least once
-  const crdtEntities = new Map<Entity, boolean>()
 
   transports.forEach(
     (transport) => (transport.onmessage = parseChunkMessage(transport.type))
@@ -50,8 +48,9 @@ export function crdtSceneSystem({
         const offset = buffer.currentReadOffset()
         const message = Message.read(buffer)!
 
-        const { entity, componentId, data, timestamp } = message
+        const { type, entity, componentId, data, timestamp } = message
         receivedMessages.push({
+          type,
           entity,
           componentId,
           data,
@@ -84,28 +83,35 @@ export function crdtSceneSystem({
     for (const transport of transports) {
       const buffer = createByteBuffer()
       for (const message of messagesToProcess) {
-        const { data, timestamp, componentId, entity } = message
+        const { data, timestamp, componentId, entity, type } = message
         const crdtMessage: CrdtMessage<Uint8Array> = {
           key: CrdtUtils.getKey(entity, componentId),
-          data: data,
+          data: data || null,
           timestamp: timestamp
         }
         const component = engine.getComponent(componentId)
-        const currentMessage = crdtClient.processMessage(crdtMessage)
+        const current = crdtClient.processMessage(crdtMessage)
 
         // CRDT outdated message. Resend this message through the wire
-        // TODO: perf transactor
-        if (crdtMessage !== currentMessage) {
-          // CRDT outdated message. Resend this message through the wire
-          Message.write(entity, currentMessage.timestamp, component, buffer)
+        if (crdtMessage !== current) {
+          const type = component.has(entity)
+            ? WireMessage.Enum.PUT_COMPONENT
+            : WireMessage.Enum.DELETE_COMPONENT
+          Message.write(type, entity, current.timestamp, component, buffer)
         } else {
-          const opts = { reading: { buffer: message.data, currentOffset: 0 } }
-          const bb = createByteBuffer(opts)
+          // Process CRDT Message
+          if (type === WireMessage.Enum.DELETE_COMPONENT) {
+            component.deleteFrom(entity)
+          } else {
+            const opts = {
+              reading: { buffer: message.data!, currentOffset: 0 }
+            }
+            const bb = createByteBuffer(opts)
 
-          // Update engine component
-          component.upsertFromBinary(message.entity, bb)
-          component.clearDirty()
-
+            // Update engine component
+            component.upsertFromBinary(message.entity, bb)
+            component.clearDirty()
+          }
           // Add message to transport queue to be processed by others transports
           transportMessages.push(message)
         }
@@ -129,27 +135,33 @@ export function crdtSceneSystem({
     for (const [entity, componentsId] of dirtyMap) {
       for (const componentId of componentsId) {
         const component = engine.getComponent(componentId)
+        const entityComponent = component.has(entity)
+          ? component.toBinary(entity).toBinary()
+          : null
         const event = crdtClient.createEvent(
           CrdtUtils.getKey(entity, componentId),
-          component.toBinary(entity).toBinary()
+          entityComponent
         )
         const offset = buffer.currentWriteOffset()
-
-        // There is no need to create messages for the static entities the first time they are created
-        // They are part of the scene loading. Send only updates.
-        if (!EntityUtils.isStaticEntity(entity) || crdtEntities.has(entity)) {
-          Message.write(entity, event.timestamp, component, buffer)
+        const type = component.has(entity)
+          ? WireMessage.Enum.PUT_COMPONENT
+          : WireMessage.Enum.DELETE_COMPONENT
+        const transportMessage: Omit<TransportMessage, 'messageBuffer'> = {
+          type,
+          componentId,
+          entity,
+          timestamp: event.timestamp
+        }
+        if (transports.some((t) => t.filter(transportMessage))) {
+          Message.write(type, entity, event.timestamp, component, buffer)
           crdtMessages.push({
-            componentId,
-            entity,
-            timestamp: event.timestamp,
+            ...transportMessage,
             messageBuffer: buffer
               .buffer()
               .subarray(offset, buffer.currentWriteOffset())
           })
         }
       }
-      crdtEntities.set(entity, true)
     }
 
     // Send messages to transports

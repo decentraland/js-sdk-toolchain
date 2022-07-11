@@ -16,7 +16,7 @@ export function createRendererTransport(): Transport {
       // TODO: replace with new rpc
       dcl
         .callRpc('@decentraland/ExperimentalAPI', 'sendToRenderer', [
-          { data: message }
+          { data: new Uint8Array(message) }
         ])
         .catch(dcl.error)
     },
