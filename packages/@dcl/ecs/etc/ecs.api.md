@@ -103,7 +103,8 @@ export type IEngine = {
     addEntity(dynamic?: boolean): Entity;
     addDynamicEntity(): Entity;
     removeEntity(entity: Entity): void;
-    addSystem(system: Update): void;
+    addSystem(system: Update, priority?: number): number;
+    removeSystem(id: SystemId): boolean;
     defineComponent<T extends EcsType>(componentId: number, spec: T): ComponentDefinition<T>;
     mutableGroupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ComponentEcsType<T>]>;
     groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentEcsType<T>>]>;
@@ -229,9 +230,6 @@ export const ToLinearSpace = 2.2;
 export type Unpacked<T> = T extends (infer U)[] ? U : T;
 
 // @public (undocumented)
-export type Update = (dt: number) => void;
-
-// @public (undocumented)
 export namespace Vector3 {
     export function add(vector1: ReadonlyVector3, vector2: ReadonlyVector3): MutableVector3;
     export function Backward(): MutableVector3;
@@ -277,7 +275,9 @@ export namespace Vector3 {
 
 // Warnings were encountered during analysis:
 //
-// dist/engine/types.d.ts:40:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:25:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:26:5 - (ae-forgotten-export) The symbol "SystemId" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:38:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

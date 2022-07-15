@@ -6,11 +6,17 @@ import {
   ComponentDefinition,
   defineComponent as defComponent
 } from './component'
-import type { ComponentEcsType, IEngineParams, Update } from './types'
+import type { ComponentEcsType, IEngineParams } from './types'
 import type { DeepReadonly } from '../Math'
 import type { EcsType } from '../built-in-types/EcsType'
 import { IEngine } from './types'
 import { ByteBuffer } from '../serialization/ByteBuffer'
+import {
+  SystemContainer,
+  SystemId,
+  SYSTEMS_REGULAR_PRIORITY,
+  Update
+} from './systems'
 
 export {
   ComponentType,
@@ -30,13 +36,14 @@ function preEngine() {
     number,
     Set<ComponentDefinition<any>['_id']>
   >()
-  const systems = new Set<Update>()
+  const systems = SystemContainer()
 
-  function addSystem(fn: Update) {
-    if (systems.has(fn)) {
-      throw new Error('System already added')
-    }
-    systems.add(fn)
+  function addSystem(fn: Update, priority: number = SYSTEMS_REGULAR_PRIORITY) {
+    return systems.add(fn, priority)
+  }
+
+  function removeSystem(id: SystemId) {
+    return systems.remove(id)
   }
 
   function addEntity(dynamic: boolean = false) {
@@ -124,14 +131,19 @@ function preEngine() {
     }
   }
 
+  function getSystems() {
+    return systems.getSystems()
+  }
+
   return {
     entitiesComponent,
     componentsDefinition,
-    systems,
     addEntity,
     addDynamicEntity,
     removeEntity,
     addSystem,
+    getSystems,
+    removeSystem,
     defineComponent,
     mutableGroupOf,
     groupOf,
@@ -155,9 +167,13 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
   function update(dt: number) {
     crdtSystem.receiveMessages()
 
-    for (const system of engine.systems) {
-      system(dt)
+    // oneshot-components
+
+    for (const system of engine.getSystems()) {
+      system.fn(dt)
     }
+
+    // delete oneshot-components
 
     // TODO: Perf tip
     // Should we add some dirtyIteratorSet at engine level so we dont have
@@ -183,6 +199,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     addDynamicEntity: engine.addDynamicEntity,
     removeEntity: engine.removeEntity,
     addSystem: engine.addSystem,
+    removeSystem: engine.removeSystem,
     defineComponent: engine.defineComponent,
     mutableGroupOf: engine.mutableGroupOf,
     groupOf: engine.groupOf,

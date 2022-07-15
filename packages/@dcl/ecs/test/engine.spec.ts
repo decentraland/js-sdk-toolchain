@@ -419,4 +419,53 @@ describe('Engine tests', () => {
     engine.update(1)
     expect(Transform.getOrNull(entity)).toStrictEqual(null)
   })
+
+  it('should run in the order', () => {
+    const array: string[] = []
+    const engine = Engine()
+    function systemA() {
+      array.push('A')
+    }
+    function systemB() {
+      array.push('B')
+    }
+    function systemC() {
+      array.push('C')
+    }
+
+    engine.addSystem(systemA, 200e3)
+    engine.addSystem(systemB, 10)
+    engine.addSystem(systemC)
+
+    engine.update(0)
+    expect(array).toStrictEqual(['A', 'C', 'B'])
+  })
+
+  it('should remove system', () => {
+    let array: string[] = []
+    const engine = Engine()
+    function systemA() {
+      array.push('A')
+    }
+    function systemB() {
+      array.push('B')
+    }
+    function systemC() {
+      array.push('C')
+    }
+
+    engine.addSystem(systemA, 200e3)
+    const systemBId = engine.addSystem(systemB, 10)
+    engine.addSystem(systemC)
+
+    engine.update(0)
+    expect(array).toStrictEqual(['A', 'C', 'B'])
+
+    array = []
+    expect(engine.removeSystem(systemBId)).toBe(true)
+    expect(engine.removeSystem(123)).toBe(false)
+
+    engine.update(0)
+    expect(array).toStrictEqual(['A', 'C'])
+  })
 })
