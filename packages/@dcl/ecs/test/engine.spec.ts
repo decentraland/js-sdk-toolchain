@@ -481,4 +481,12 @@ describe('Engine tests', () => {
     engine.update(0)
     expect(array).toStrictEqual(['C'])
   })
+
+  it('should remove the component after the update', () => {
+    const engine = Engine()
+    const entity = engine.addEntity()
+    engine.baseComponents.OnPointerDownResult.create(entity)
+    engine.update(1 / 30)
+    expect(engine.baseComponents.OnPointerDownResult.has(entity)).toBe(false)
+  })
 })
