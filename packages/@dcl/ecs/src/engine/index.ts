@@ -6,11 +6,12 @@ import {
   ComponentDefinition,
   defineComponent as defComponent
 } from './component'
-import type { ComponentEcsType, IEngineParams, Update } from './types'
+import type { ComponentEcsType, IEngineParams } from './types'
 import type { DeepReadonly } from '../Math'
 import type { EcsType } from '../built-in-types/EcsType'
 import { IEngine } from './types'
 import { ByteBuffer } from '../serialization/ByteBuffer'
+import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
 
 export {
   ComponentType,
@@ -30,13 +31,18 @@ function preEngine() {
     number,
     Set<ComponentDefinition<any>['_id']>
   >()
-  const systems = new Set<Update>()
+  const systems = SystemContainer()
 
-  function addSystem(fn: Update) {
-    if (systems.has(fn)) {
-      throw new Error('System already added')
-    }
-    systems.add(fn)
+  function addSystem(
+    fn: Update,
+    priority: number = SYSTEMS_REGULAR_PRIORITY,
+    name?: string
+  ) {
+    systems.add(fn, priority, name)
+  }
+
+  function removeSystem(selector: string | Update) {
+    return systems.remove(selector)
   }
 
   function addEntity(dynamic: boolean = false) {
@@ -124,14 +130,19 @@ function preEngine() {
     }
   }
 
+  function getSystems() {
+    return systems.getSystems()
+  }
+
   return {
     entitiesComponent,
     componentsDefinition,
-    systems,
     addEntity,
     addDynamicEntity,
     removeEntity,
     addSystem,
+    getSystems,
+    removeSystem,
     defineComponent,
     mutableGroupOf,
     groupOf,
@@ -155,8 +166,21 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
   function update(dt: number) {
     crdtSystem.receiveMessages()
 
-    for (const system of engine.systems) {
-      system(dt)
+    for (const system of engine.getSystems()) {
+      system.fn(dt)
+    }
+
+    // Selected components that only exist one frame
+    //  then, they are deleted but their crdt state keeps
+    const removeSelectedComponents = [
+      baseComponents.OnPointerDownResult,
+      baseComponents.OnPointerUpResult
+    ]
+    const excludeComponentIds = removeSelectedComponents.map((item) => item._id)
+    for (const componentDef of removeSelectedComponents) {
+      for (const [entity] of engine.groupOf(componentDef)) {
+        componentDef.deleteFrom(entity)
+      }
     }
 
     // TODO: Perf tip
@@ -164,6 +188,8 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     // to iterate all the component definitions to get the dirty ones ?
     const dirtySet = new Map<Entity, Set<number>>()
     for (const [componentId, definition] of engine.componentsDefinition) {
+      if (excludeComponentIds.includes(componentId)) continue
+
       for (const entity of definition.dirtyIterator()) {
         if (!dirtySet.has(entity)) {
           dirtySet.set(entity, new Set())
@@ -183,6 +209,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     addDynamicEntity: engine.addDynamicEntity,
     removeEntity: engine.removeEntity,
     addSystem: engine.addSystem,
+    removeSystem: engine.removeSystem,
     defineComponent: engine.defineComponent,
     mutableGroupOf: engine.mutableGroupOf,
     groupOf: engine.groupOf,

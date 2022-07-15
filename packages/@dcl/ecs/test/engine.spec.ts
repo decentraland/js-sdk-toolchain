@@ -1,6 +1,7 @@
 import { Vector3 } from '@dcl/ecs-math'
 import { Float32, MapType } from '../src/built-in-types'
 import { Engine } from '../src/engine'
+import { SYSTEMS_REGULAR_PRIORITY } from '../src/engine/systems'
 import EntityUtils from '../src/engine/entity-utils'
 import { createByteBuffer } from '../src/serialization/ByteBuffer'
 import { createRendererTransport } from '../src/systems/crdt/transports/rendererTransport'
@@ -57,6 +58,13 @@ describe('Engine tests', () => {
     const system = () => {}
     engine.addSystem(system)
     expect(() => engine.addSystem(system)).toThrowError()
+
+    const systemA = () => {}
+    const systemA2 = () => {}
+    engine.addSystem(systemA, SYSTEMS_REGULAR_PRIORITY, 'systemA')
+    expect(() =>
+      engine.addSystem(systemA2, SYSTEMS_REGULAR_PRIORITY, 'systemA')
+    ).toThrowError()
   })
 
   it('should replace existing component with the new one', () => {
@@ -419,5 +427,67 @@ describe('Engine tests', () => {
     expect(Transform.getFrom(entity).position.x).toStrictEqual(13)
     engine.update(1)
     expect(Transform.getOrNull(entity)).toStrictEqual(null)
+  })
+
+  it('should run in the order', () => {
+    const array: string[] = []
+    const engine = Engine()
+    function systemA() {
+      array.push('A')
+    }
+    function systemB() {
+      array.push('B')
+    }
+    function systemC() {
+      array.push('C')
+    }
+
+    engine.addSystem(systemA, 200e3)
+    engine.addSystem(systemB, 10)
+    engine.addSystem(systemC)
+
+    engine.update(0)
+    expect(array).toStrictEqual(['A', 'C', 'B'])
+  })
+
+  it('should remove system', () => {
+    let array: string[] = []
+    const engine = Engine()
+    function systemA() {
+      array.push('A')
+    }
+    function systemB() {
+      array.push('B')
+    }
+    function systemC() {
+      array.push('C')
+    }
+
+    engine.addSystem(systemA, 200e3)
+    engine.addSystem(systemB, 10, 'systemB')
+    engine.addSystem(systemC)
+
+    engine.update(0)
+    expect(array).toStrictEqual(['A', 'C', 'B'])
+
+    array = []
+    expect(engine.removeSystem('systemB')).toBe(true)
+    expect(engine.removeSystem('inexistingSystem')).toBe(false)
+
+    engine.update(0)
+    expect(array).toStrictEqual(['A', 'C'])
+
+    array = []
+    expect(engine.removeSystem(systemA)).toBe(true)
+    engine.update(0)
+    expect(array).toStrictEqual(['C'])
+  })
+
+  it('should remove the component after the update', () => {
+    const engine = Engine()
+    const entity = engine.addEntity()
+    engine.baseComponents.OnPointerDownResult.create(entity)
+    engine.update(1 / 30)
+    expect(engine.baseComponents.OnPointerDownResult.has(entity)).toBe(false)
   })
 })

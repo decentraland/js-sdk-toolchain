@@ -113,9 +113,19 @@ declare function createByteBuffer(options?: CreateByteBufferOptions): {
      */
     size(): number;
     /**
-     * @returns The subarray from 0 to offset.
+     * Take care using this function, if you modify the data after, the
+     * returned subarray will change too. If you'll modify the content of the
+     * bytebuffer, maybe you want to use toCopiedBinary()
+     *
+     * @returns The subarray from 0 to offset as reference.
      */
     toBinary(): Uint8Array;
+    /**
+     * Safe copied buffer of the current data of ByteBuffer
+     *
+     * @returns The subarray from 0 to offset.
+     */
+    toCopiedBinary(): Uint8Array;
     writeBuffer(value: Uint8Array, writeLength?: boolean): void;
     writeFloat32(value: number): void;
     writeFloat64(value: number): void;
@@ -188,7 +198,10 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
     Animator: ComponentDefinition<EcsType<PBAnimator>>;
     AudioSource: ComponentDefinition<EcsType<PBAudioSource>>;
     AudioStream: ComponentDefinition<EcsType<PBAudioStream>>;
+    AvatarAttach: ComponentDefinition<EcsType<PBAvatarAttach>>;
     AvatarModifierArea: ComponentDefinition<EcsType<PBAvatarModifierArea>>;
+    AvatarShape: ComponentDefinition<EcsType<PBAvatarShape>>;
+    Billboard: ComponentDefinition<EcsType<PBBillboard>>;
     BoxShape: ComponentDefinition<EcsType<PBBoxShape>>;
     CameraModeArea: ComponentDefinition<EcsType<PBCameraModeArea>>;
     CylinderShape: ComponentDefinition<EcsType<PBCylinderShape>>;
@@ -302,7 +315,8 @@ declare type IEngine = {
     addEntity(dynamic?: boolean): Entity;
     addDynamicEntity(): Entity;
     removeEntity(entity: Entity): void;
-    addSystem(system: Update): void;
+    addSystem(system: Update, priority?: number): number;
+    removeSystem(id: SystemId): boolean;
     defineComponent<T extends EcsType>(componentId: number, spec: T): ComponentDefinition<T>;
     mutableGroupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ComponentEcsType<T>]>;
     groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentEcsType<T>>]>;
@@ -1140,6 +1154,11 @@ declare interface PBAudioStream {
     url: string;
 }
 
+declare interface PBAvatarAttach {
+    avatarId: string;
+    anchorPointId: number;
+}
+
 declare interface PBAvatarModifierArea {
     area: Vector3_2 | undefined;
     excludeIds: string[];
@@ -1150,6 +1169,27 @@ declare enum PBAvatarModifierArea_Modifier {
     HIDE_AVATARS = 0,
     DISABLE_PASSPORTS = 1,
     UNRECOGNIZED = -1
+}
+
+declare interface PBAvatarShape {
+    id: string;
+    name: string;
+    bodyShape: string;
+    skinColor: Color3 | undefined;
+    hairColor: Color3 | undefined;
+    eyeColor: Color3 | undefined;
+    wearables: string[];
+    expressionTriggerId: string;
+    expressionTriggerTimestamp: number;
+    stickerTriggerId: string;
+    stickerTriggerTimestamp: number;
+    talking: boolean;
+}
+
+declare interface PBBillboard {
+    x: boolean;
+    y: boolean;
+    z: boolean;
 }
 
 declare interface PBBoxShape {
@@ -1650,6 +1690,8 @@ declare enum Space {
 declare interface Spec {
     [key: string]: EcsType;
 }
+
+declare type SystemId = number;
 
 /**
  * Constant used to convert a value to gamma space
