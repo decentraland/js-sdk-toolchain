@@ -1,6 +1,7 @@
 import { Vector3 } from '@dcl/ecs-math'
 import { Float32, MapType } from '../src/built-in-types'
 import { Engine } from '../src/engine'
+import { SYSTEMS_REGULAR_PRIORITY } from '../src/engine/systems'
 import { createByteBuffer } from '../src/serialization/ByteBuffer'
 import { createRendererTransport } from '../src/systems/crdt/transports/rendererTransport'
 
@@ -56,6 +57,13 @@ describe('Engine tests', () => {
     const system = () => {}
     engine.addSystem(system)
     expect(() => engine.addSystem(system)).toThrowError()
+
+    const systemA = () => {}
+    const systemA2 = () => {}
+    engine.addSystem(systemA, SYSTEMS_REGULAR_PRIORITY, 'systemA')
+    expect(() =>
+      engine.addSystem(systemA2, SYSTEMS_REGULAR_PRIORITY, 'systemA')
+    ).toThrowError()
   })
 
   it('should replace existing component with the new one', () => {
@@ -455,17 +463,22 @@ describe('Engine tests', () => {
     }
 
     engine.addSystem(systemA, 200e3)
-    const systemBId = engine.addSystem(systemB, 10)
+    engine.addSystem(systemB, 10, 'systemB')
     engine.addSystem(systemC)
 
     engine.update(0)
     expect(array).toStrictEqual(['A', 'C', 'B'])
 
     array = []
-    expect(engine.removeSystem(systemBId)).toBe(true)
-    expect(engine.removeSystem(123)).toBe(false)
+    expect(engine.removeSystem('systemB')).toBe(true)
+    expect(engine.removeSystem('inexistingSystem')).toBe(false)
 
     engine.update(0)
     expect(array).toStrictEqual(['A', 'C'])
+
+    array = []
+    expect(engine.removeSystem(systemA)).toBe(true)
+    engine.update(0)
+    expect(array).toStrictEqual(['C'])
   })
 })

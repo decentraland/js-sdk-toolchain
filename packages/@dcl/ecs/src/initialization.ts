@@ -37,17 +37,3 @@ if (dcl) {
       .finally(() => engine.update(dt))
   })
 }
-
-const selectedComponents = [
-  engine.baseComponents.OnPointerDownResult,
-  engine.baseComponents.OnPointerUpResult
-]
-function removeSelectedComponent() {
-  for (const componentDef of selectedComponents) {
-    for (const [entity] of engine.groupOf(componentDef)) {
-      componentDef.deleteFrom(entity)
-    }
-  }
-}
-
-engine.addSystem(removeSelectedComponent, 0)

@@ -3,7 +3,7 @@ import { SdkComponents } from '../components'
 import { Transport } from '../systems/crdt/transports/types'
 import { ComponentDefinition as CompDef } from './component'
 import { Entity } from './entity'
-import { SystemId, Update } from './systems'
+import { Update } from './systems'
 import type { DeepReadonly } from './utils'
 
 /**
@@ -25,8 +25,8 @@ export type IEngine = {
   addEntity(dynamic?: boolean): Entity
   addDynamicEntity(): Entity
   removeEntity(entity: Entity): void
-  addSystem(system: Update, priority?: number): number
-  removeSystem(id: SystemId): boolean
+  addSystem(system: Update, priority?: number, name?: string): void
+  removeSystem(selector: string | Update): boolean
   defineComponent<T extends EcsType>(componentId: number, spec: T): CompDef<T>
   mutableGroupOf<T extends [CompDef, ...CompDef[]]>(
     ...components: T
