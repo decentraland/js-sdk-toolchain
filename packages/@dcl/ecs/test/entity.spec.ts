@@ -1,50 +1,80 @@
-import { EntityContainer } from '../src/engine/entity'
-import * as entityUtils from '../src/engine/entity-utils'
+import { Entity, EntityContainer } from '../src/engine/entity'
+import EntityUtils from '../src/engine/entity-utils'
 
 describe('Entity container', () => {
-  it('generates new entities', () => {
+  it('generates new static entities', () => {
     const entityContainer = EntityContainer()
     const entityA = entityContainer.generateEntity()
-    expect(entityA).toBe(0)
-    expect(entityContainer.getUsedEntities().has(entityA)).toBe(true)
-    expect(entityContainer.getUnusedEntities().has(entityA)).toBe(false)
+    expect(entityA).toBe(EntityUtils.STATIC_ENTITIES_RANGE[0])
+    expect(entityContainer.isEntityExists(entityA)).toBe(true)
   })
 
   it('destroy entities', () => {
     const entityContainer = EntityContainer()
     const entityA = entityContainer.generateEntity()
-    entityContainer.removeEntity(entityA)
-    expect(entityContainer.getUsedEntities().has(entityA)).toBe(false)
-    expect(entityContainer.getUnusedEntities().has(entityA)).toBe(true)
+    expect(entityContainer.removeEntity(entityA)).toBe(true)
+    expect(entityContainer.isEntityExists(entityA)).toBe(false)
   })
 
-  it('generates entities and reuse unused', () => {
+  it('generates new entities', () => {
     const entityContainer = EntityContainer()
+
+    const rootEntity = 0 as Entity
     const entityA = entityContainer.generateEntity()
-    const entityB = entityContainer.generateEntity()
-    expect(entityA).toBe(0)
-    expect(entityB).toBe(1)
-    entityContainer.removeEntity(entityA)
-    expect(entityContainer.getUnusedEntities().has(entityA)).toBe(true)
-    expect(entityContainer.generateEntity()).toBe(entityA)
-    expect(entityContainer.getUsedEntities().has(entityA)).toBe(true)
-    expect(entityContainer.getUnusedEntities().has(entityA)).toBe(false)
+    const dynEntityA = entityContainer.generateEntity(true)
+
+    expect(entityA).toBe(EntityUtils.STATIC_ENTITIES_RANGE[0])
+    expect(dynEntityA).toBe(EntityUtils.DYNAMIC_ENTITIES_RANGE[0])
+
+    expect(entityContainer.isEntityExists(entityA)).toBe(true)
+
+    expect(EntityUtils.isReservedEntity(rootEntity)).toBe(true)
+    expect(EntityUtils.isStaticEntity(rootEntity)).toBe(false)
+    expect(EntityUtils.isDynamicEntity(rootEntity)).toBe(false)
+
+    expect(EntityUtils.isReservedEntity(entityA)).toBe(false)
+    expect(EntityUtils.isStaticEntity(entityA)).toBe(true)
+    expect(EntityUtils.isDynamicEntity(entityA)).toBe(false)
+
+    expect(EntityUtils.isReservedEntity(dynEntityA)).toBe(false)
+    expect(EntityUtils.isStaticEntity(dynEntityA)).toBe(false)
+    expect(EntityUtils.isDynamicEntity(dynEntityA)).toBe(true)
+
+    expect(dynEntityA).toBe(EntityUtils.DYNAMIC_ENTITIES_RANGE[0])
+
+    expect(Array.from(entityContainer.getExistingEntities())).toStrictEqual([
+      entityA,
+      dynEntityA
+    ])
   })
 
-  it('rate limit', () => {
+  it('trying to remove arbitrary entity', () => {
     const entityContainer = EntityContainer()
-    for (let i = 0; i < entityUtils.EntityUtils.MAX_ENTITIES; i++) {
+    expect(entityContainer.removeEntity(1 as Entity)).toBe(false)
+  })
+
+  it('should fail with creating entity out of range', () => {
+    const realValue = EntityUtils.STATIC_ENTITIES_RANGE[1]
+
+    function changeRange(value: number) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      EntityUtils.STATIC_ENTITIES_RANGE[1] = value
+    }
+
+    changeRange(600)
+
+    const entityContainer = EntityContainer()
+    const RangeMock = EntityUtils.STATIC_ENTITIES_RANGE
+
+    for (let i = RangeMock[0]; i < RangeMock[1]; i++) {
       entityContainer.generateEntity()
     }
-    expect(entityContainer.generateEntity).toThrowError()
-  })
 
-  it('generates dynamic entities', () => {
-    jest.spyOn(entityUtils.EntityUtils, 'getOffset').mockReturnValue(20000)
-    const entityContainer = EntityContainer()
-    const staticEntity = entityContainer.generateEntity()
-    const dynamicEntity = entityContainer.generateEntity(true)
-    expect(staticEntity).toBe(0)
-    expect(dynamicEntity).toBe(20000)
+    expect(() => {
+      entityContainer.generateEntity()
+    }).toThrowError()
+
+    changeRange(realValue)
   })
 })
