@@ -1,6 +1,7 @@
 import { Vector3 } from '@dcl/ecs-math'
 import { Float32, MapType } from '../src/built-in-types'
 import { Engine } from '../src/engine'
+import EntityUtils from '../src/engine/entity-utils'
 import { createByteBuffer } from '../src/serialization/ByteBuffer'
 import { createRendererTransport } from '../src/systems/crdt/transports/rendererTransport'
 
@@ -17,8 +18,8 @@ describe('Engine tests', () => {
     const engine = Engine()
     const entityA = engine.addEntity()
     const entityB = engine.addEntity()
-    expect(entityA).toBe(0)
-    expect(entityB).toBe(1)
+    expect(entityA).toBe(EntityUtils.STATIC_ENTITIES_RANGE[0])
+    expect(entityB).toBe(EntityUtils.STATIC_ENTITIES_RANGE[0] + 1)
   })
 
   it('should not allow u to create same component to an existing entitiy', () => {

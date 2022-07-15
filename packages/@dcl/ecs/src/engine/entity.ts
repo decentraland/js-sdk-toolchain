@@ -7,79 +7,65 @@ declare const entitySymbol: unique symbol
 export type Entity = number & { [entitySymbol]: true }
 
 export function EntityContainer() {
-  const staticEntity = Entity()
-  const dynamicEntity = Entity(true)
+  const staticEntity = Entity(EntityUtils.STATIC_ENTITIES_RANGE)
+  const dynamicEntity = Entity(EntityUtils.DYNAMIC_ENTITIES_RANGE)
   return {
     generateEntity(dynamic: boolean = false): Entity {
-      if (dynamic) return dynamicEntity.generateEntity()
-      return staticEntity.generateEntity()
+      if (dynamic) {
+        return dynamicEntity.generateEntity()
+      } else {
+        return staticEntity.generateEntity()
+      }
     },
-    removeEntity(entity: Entity): void {
-      staticEntity.removeEntity(entity)
-      dynamicEntity.removeEntity(entity)
+    removeEntity(entity: Entity): boolean {
+      return (
+        staticEntity.removeEntity(entity) || dynamicEntity.removeEntity(entity)
+      )
     },
-    getUnusedEntities(): Set<Entity> {
+    isEntityExists(entity: Entity): boolean {
+      return (
+        EntityUtils.isReservedEntity(entity) ||
+        staticEntity.getExistingEntities().has(entity) ||
+        dynamicEntity.getExistingEntities().has(entity)
+      )
+    },
+    getExistingEntities(): Set<Entity> {
       return new Set([
-        ...staticEntity.getUnusedEntities(),
-        ...dynamicEntity.getUnusedEntities()
-      ])
-    },
-    getUsedEntities(): Set<Entity> {
-      return new Set([
-        ...staticEntity.getUsedEntities(),
-        ...dynamicEntity.getUsedEntities()
+        ...staticEntity.getExistingEntities(),
+        ...dynamicEntity.getExistingEntities()
       ])
     }
   }
 }
 
-function Entity(withOffset: boolean = false) {
+function Entity(range: EntityUtils.EntityRange) {
   function createEntity(entity: number): Entity {
     return entity as Entity
   }
 
-  // TODO: getoffset from a server?
-  const offset = withOffset ? EntityUtils.getOffset() : 0
+  let entityCounter = range[0]
   const usedEntities: Set<Entity> = new Set()
-  const unusedEntities: Set<Entity> = new Set()
 
   function generateEntity(): Entity {
-    if (!unusedEntities.size && !usedEntities.size) {
-      const entity = createEntity(offset)
-      usedEntities.add(entity)
-      return entity
+    if (entityCounter >= range[1]) {
+      throw new Error(
+        `It fails trying to generate an entity out of range [${range[0]}, ${range[1]}].`
+      )
     }
 
-    // TODO: what happens if we delete an entity
-    // and creates a new one in the same tick
-    const iterator = unusedEntities[Symbol.iterator]().next()
-    if (iterator.done) {
-      const entity = createEntity(Math.max(...usedEntities.values()) + 1)
-      if (entity >= EntityUtils.MAX_ENTITIES + offset) {
-        throw new Error('Entity rate limit exceed')
-      }
-      usedEntities.add(entity)
-      return entity
-    }
+    const entity = createEntity(entityCounter)
+    entityCounter++
 
-    const entity = iterator.value
-    unusedEntities.delete(entity)
     usedEntities.add(entity)
-
     return entity
   }
 
   function removeEntity(entity: Entity) {
-    if (!usedEntities.has(entity)) return
-    usedEntities.delete(entity)
-    unusedEntities.add(entity)
+    return usedEntities.delete(entity)
   }
 
   return {
-    getUnusedEntities() {
-      return new Set(unusedEntities)
-    },
-    getUsedEntities() {
+    getExistingEntities() {
       return new Set(usedEntities)
     },
     generateEntity,
