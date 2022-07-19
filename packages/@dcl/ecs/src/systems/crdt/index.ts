@@ -7,7 +7,6 @@ import { ComponentOperation as Message } from '../../serialization/crdt/componen
 import WireMessage from '../../serialization/wireMessage'
 import { Transport } from './transports/types'
 import { ReceiveMessage, TransportMessage } from './types'
-import CrdtUtils from './utils'
 
 export function crdtSceneSystem({
   engine,
@@ -85,7 +84,7 @@ export function crdtSceneSystem({
       for (const message of messagesToProcess) {
         const { data, timestamp, componentId, entity, type } = message
         const crdtMessage: CrdtMessage<Uint8Array> = {
-          key1: entity, 
+          key1: entity,
           key2: componentId,
           data: data || null,
           timestamp: timestamp
@@ -140,7 +139,8 @@ export function crdtSceneSystem({
           ? component.toBinary(entity).toBinary()
           : null
         const event = crdtClient.createEvent(
-          entity, componentId,
+          entity,
+          componentId,
           entityComponent
         )
         const offset = buffer.currentWriteOffset()

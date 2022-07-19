@@ -1,5 +1,4 @@
 import { ComponentDefinition } from '../../engine/component'
-import { Entity } from '../../engine/entity'
 
 export namespace CrdtUtils {
   export type ComponentID = ComponentDefinition['_id']

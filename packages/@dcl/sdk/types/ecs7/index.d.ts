@@ -315,8 +315,8 @@ declare type IEngine = {
     addEntity(dynamic?: boolean): Entity;
     addDynamicEntity(): Entity;
     removeEntity(entity: Entity): void;
-    addSystem(system: Update, priority?: number): number;
-    removeSystem(id: SystemId): boolean;
+    addSystem(system: Update, priority?: number, name?: string): void;
+    removeSystem(selector: string | Update): boolean;
     defineComponent<T extends EcsType>(componentId: number, spec: T): ComponentDefinition<T>;
     mutableGroupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ComponentEcsType<T>]>;
     groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentEcsType<T>>]>;
@@ -1144,7 +1144,6 @@ declare interface PBAudioSource {
     volume: number;
     loop: boolean;
     pitch: number;
-    playedAtTimestamp: number;
     audioClipUrl: string;
 }
 
@@ -1690,8 +1689,6 @@ declare enum Space {
 declare interface Spec {
     [key: string]: EcsType;
 }
-
-declare type SystemId = number;
 
 /**
  * Constant used to convert a value to gamma space
