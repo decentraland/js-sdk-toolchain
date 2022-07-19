@@ -12,7 +12,6 @@ describe('Generated AudioSource ProtoBuf', () => {
       loop: true,
       volume: 1,
       pitch: 1,
-      playedAtTimestamp: 1,
       audioClipUrl: 'FakeUrl'
     })
 
@@ -21,7 +20,6 @@ describe('Generated AudioSource ProtoBuf', () => {
       loop: false,
       volume: 0,
       pitch: 0,
-      playedAtTimestamp: 0,
       audioClipUrl: 'FakeUrl2'
     })
     const buffer = AudioSource.toBinary(entity)
