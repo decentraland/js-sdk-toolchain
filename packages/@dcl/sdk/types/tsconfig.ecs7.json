@@ -14,8 +14,11 @@
     "removeComments": true,
     "inlineSources": true,
     "useDefineForClassFields": false,
+    "preserveConstEnums": true,
     "allowJs": true,
-    "lib": ["ES2020"],
+    "lib": [
+      "ES2020"
+    ],
     "types": [
       "env",
       "ecs7",
