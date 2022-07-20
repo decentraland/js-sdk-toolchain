@@ -10,6 +10,7 @@ type PackageJson = {
 
   // only package.json
   typings?: string
+  types?: string
 
   bundledDependencies: string[]
   bundleDependencies: string[]
@@ -626,12 +627,15 @@ function getConfiguration(
           }
         }
 
-        if (!libPackageJson.typings) {
-          throw new Error(`field "typings" is missing in package.json`)
+        if (!libPackageJson.typings && !libPackageJson.types) {
+          throw new Error(`field "typings" or "types" is missing in package.json`)
         } else {
           typings = resolve(
             dirname(resolved),
-            decentralandLibrary.typings || libPackageJson.typings
+            decentralandLibrary.typings
+              || decentralandLibrary.types
+              || libPackageJson.typings
+              || libPackageJson.types
           )
           if (!ts.sys.fileExists(typings)) {
             throw new Error(`typings file ${typings} not found`)
@@ -822,14 +826,16 @@ function validatePackageJsonForLibrary(
     }
   }
 
-  if (!packageJson.typings) {
-    throw new Error(`field "typings" in package.json is missing.`)
+  if (!packageJson.typings && !packageJson.types) {
+    throw new Error(`field "typings" or "types" in package.json is missing.`)
   } else {
-    const typingsFile = ts.sys.resolvePath(packageJson.typings)
+    const typingsFile = ts.sys.resolvePath(
+      (packageJson.typings || packageJson.types) as string
+    )
 
     if (!typingsFile) {
       throw new Error(
-        `! Error: field "typings" in package.json cannot be resolved.`
+        `! Error: field "typings" or "types" in package.json cannot be resolved.`
       )
     }
 
@@ -840,7 +846,7 @@ function validatePackageJsonForLibrary(
         ''
       )} != ${typingsFile.replace(ts.sys.getCurrentDirectory(), '')})`
       throw new Error(
-        `! Error: package.json .typings does not match the emited file\n       ${help}`
+        `! Error: package.json .typings or .types does not match the emitted file\n       ${help}`
       )
     }
   }

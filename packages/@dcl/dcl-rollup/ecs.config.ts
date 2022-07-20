@@ -15,7 +15,10 @@ const packageJson = JSON.parse(sys.readFile(packageJsonPath)!)
 
 console.assert(packageJson.name, 'package.json .name must be present')
 console.assert(packageJson.main, 'package.json .main must be present')
-console.assert(packageJson.typings, 'package.json .typings must be present')
+console.assert(
+  packageJson.typings || packageJson.types,
+  'package.json .typings or .types must be present'
+)
 
 export const basicRollupConfig: RollupOptions = {
   input: 'src/index.ts',
