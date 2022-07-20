@@ -1,6 +1,6 @@
 ﻿import { Engine } from '../../src/engine'
 
-describe('Generated AudioStream ProtoBuf', () => {
+describe.skip('Generated AudioStream ProtoBuf', () => {
   it('should serialize/deserialize BoxShape', () => {
     const newEngine = Engine()
     const { AudioStream } = newEngine.baseComponents

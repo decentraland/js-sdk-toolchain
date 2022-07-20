@@ -1,6 +1,6 @@
 ﻿import { Engine } from '../../src/engine'
 
-describe('Generated Billboard ProtoBuf', () => {
+describe.skip('Generated Billboard ProtoBuf', () => {
   it('should serialize/deserialize Billboard', () => {
     const newEngine = Engine()
     const { Billboard } = newEngine.baseComponents

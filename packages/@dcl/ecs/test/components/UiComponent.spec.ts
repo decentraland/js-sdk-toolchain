@@ -10,7 +10,7 @@ import {
 } from '../../src/components/generated/pb/UiTransform.gen'
 import { Engine } from '../../src/engine'
 
-describe('UiTransform component', () => {
+describe.skip('UiTransform component', () => {
   it('should serialize', () => {
     const newEngine = Engine()
     const { UiTransform } = newEngine.baseComponents
