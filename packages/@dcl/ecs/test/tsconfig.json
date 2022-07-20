@@ -14,6 +14,8 @@
     "skipLibCheck": true, /* Skip type checking of declaration files. */
     "forceConsistentCasingInFileNames": true, /* Disallow inconsistently-cased references to the same file. */
     "noEmit": true,
-    "strict": true
+    "strict": true,
+    "jsx": "react",
+    "jsxFactory": "Ecs.jsx"
   }
 }
