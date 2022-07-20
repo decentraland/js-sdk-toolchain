@@ -11,12 +11,12 @@ import {
 } from './generateProtocolBuffer'
 import { generateIndex } from './generateIndex'
 
-const PROTO_BLACKLIST = [
+const NON_EXPOSED_LIST = [
   1090, // Billboard
   1050, // UiTransform
   1070, // AvatarModifierArea,
   1071, // CameraModeArea
-  1021, // AudioStream
+  1021 // AudioStream
 ]
 
 function getParam(key: string) {
@@ -70,26 +70,28 @@ async function main() {
     .filter((filePath) => filePath.toLowerCase().endsWith('.proto'))
     .map((filePath) => filePath.substring(0, filePath.length - '.proto'.length))
 
-  const components: Component[] = componentsFile.map((componentName) => {
-    const protoFileContent = readFileSync(
-      path.resolve(definitionsPath, `${componentName}.proto`)
-    ).toString()
+  const components: Component[] = componentsFile
+    .map((componentName) => {
+      const protoFileContent = readFileSync(
+        path.resolve(definitionsPath, `${componentName}.proto`)
+      ).toString()
 
-    let componentId: number = -1
-    try {
-      componentId = getComponentId(protoFileContent)
-    } catch (error) {
-      console.error(error)
-      throw new Error(
-        `Couldn't get the component id in component ${componentName}.proto, please check the line with "option (ecs_component_id) = XXXX;" is well formated and it exists.`
-      )
-    }
+      let componentId: number = -1
+      try {
+        componentId = getComponentId(protoFileContent)
+      } catch (error) {
+        console.error(error)
+        throw new Error(
+          `Couldn't get the component id in component ${componentName}.proto, please check the line with "option (ecs_component_id) = XXXX;" is well formated and it exists.`
+        )
+      }
 
-    return {
-      componentId,
-      componentName
-    }
-  }).filter(({ componentId }) => !PROTO_BLACKLIST.includes(componentId))
+      return {
+        componentId,
+        componentName
+      }
+    })
+    .filter(({ componentId }) => !NON_EXPOSED_LIST.includes(componentId))
 
   if (
     !(await generateProtocolBuffer({

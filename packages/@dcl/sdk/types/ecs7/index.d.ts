@@ -227,13 +227,9 @@ declare type DeepReadonly<T> = {
 declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): {
     Animator: ComponentDefinition<EcsType<PBAnimator>>;
     AudioSource: ComponentDefinition<EcsType<PBAudioSource>>;
-    AudioStream: ComponentDefinition<EcsType<PBAudioStream>>;
     AvatarAttach: ComponentDefinition<EcsType<PBAvatarAttach>>;
-    AvatarModifierArea: ComponentDefinition<EcsType<PBAvatarModifierArea>>;
     AvatarShape: ComponentDefinition<EcsType<PBAvatarShape>>;
-    Billboard: ComponentDefinition<EcsType<PBBillboard>>;
     BoxShape: ComponentDefinition<EcsType<PBBoxShape>>;
-    CameraModeArea: ComponentDefinition<EcsType<PBCameraModeArea>>;
     CylinderShape: ComponentDefinition<EcsType<PBCylinderShape>>;
     GLTFShape: ComponentDefinition<EcsType<PBGLTFShape>>;
     NFTShape: ComponentDefinition<EcsType<PBNFTShape>>;
@@ -244,7 +240,6 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
     PlaneShape: ComponentDefinition<EcsType<PBPlaneShape>>;
     SphereShape: ComponentDefinition<EcsType<PBSphereShape>>;
     TextShape: ComponentDefinition<EcsType<PBTextShape>>;
-    UiTransform: ComponentDefinition<EcsType<PBUiTransform>>;
     Transform: ComponentDefinition<EcsType<Transform>>;
 };
 
@@ -352,7 +347,7 @@ declare type IEngine = {
     groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentEcsType<T>>]>;
     getComponent<T extends EcsType>(componentId: number): ComponentDefinition<T>;
     update(dt: number): void;
-    baseComponents: SdkComponetns;
+    baseComponents: SdkComponents;
 };
 
 /**
@@ -1177,23 +1172,20 @@ declare interface PBAudioSource {
     audioClipUrl: string;
 }
 
-declare interface PBAudioStream {
-    playing: boolean;
-    volume: number;
-    url: string;
-}
-
 declare interface PBAvatarAttach {
     avatarId: string;
     anchorPointId: number;
 }
 
+<<<<<<< HEAD
 declare interface PBAvatarModifierArea {
     area: Vector3_2 | undefined;
     excludeIds: string[];
     modifiers: AvatarModifier[];
 }
 
+=======
+>>>>>>> 68ebe82 (update types)
 declare interface PBAvatarShape {
     id: string;
     name: string;
@@ -1209,12 +1201,6 @@ declare interface PBAvatarShape {
     talking: boolean;
 }
 
-declare interface PBBillboard {
-    x: boolean;
-    y: boolean;
-    z: boolean;
-}
-
 declare interface PBBoxShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
@@ -1222,11 +1208,14 @@ declare interface PBBoxShape {
     uvs: number[];
 }
 
+<<<<<<< HEAD
 declare interface PBCameraModeArea {
     area: Vector3_2 | undefined;
     mode: CameraMode;
 }
 
+=======
+>>>>>>> 68ebe82 (update types)
 declare interface PBCylinderShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
@@ -1326,65 +1315,6 @@ declare interface PBTextShape {
     shadowColor: Color3 | undefined;
     outlineColor: Color3 | undefined;
     textColor: Color3 | undefined;
-}
-
-declare interface PBUiTransform {
-    positionType: YGPositionType;
-    alignContent: YGAlign;
-    alignItems: YGAlign;
-    alignSelf: YGAlign;
-    flexDirection: YGFlexDirection;
-    flexWrap: YGWrap;
-    justifyContent: YGJustify;
-    overflow: YGOverflow;
-    display: YGDisplay;
-    direction: YGDirection;
-    flex: number;
-    flexBasisUnit: YGUnit;
-    flexBasis: number;
-    flexGrow: number;
-    flexShrink: number;
-    widthUnit: YGUnit;
-    width: number;
-    heightUnit: YGUnit;
-    height: number;
-    minWidthUnit: YGUnit;
-    minWidth: number;
-    minHeightUnit: YGUnit;
-    minHeight: number;
-    maxWidthUnit: YGUnit;
-    maxWidth: number;
-    maxHeightUnit: YGUnit;
-    maxHeight: number;
-    positionLeftUnit: YGUnit;
-    positionLeft: number;
-    positionTopUnit: YGUnit;
-    positionTop: number;
-    positionRightUnit: YGUnit;
-    positionRight: number;
-    positionBottomUnit: YGUnit;
-    positionBottom: number;
-    /** margin */
-    marginLeftUnit: YGUnit;
-    marginLeft: number;
-    marginTopUnit: YGUnit;
-    marginTop: number;
-    marginRightUnit: YGUnit;
-    marginRight: number;
-    marginBottomUnit: YGUnit;
-    marginBottom: number;
-    paddingLeftUnit: YGUnit;
-    paddingLeft: number;
-    paddingTopUnit: YGUnit;
-    paddingTop: number;
-    paddingRightUnit: YGUnit;
-    paddingRight: number;
-    paddingBottomUnit: YGUnit;
-    paddingBottom: number;
-    borderLeft: number;
-    borderTop: number;
-    borderRight: number;
-    borderBottom: number;
 }
 
 /**
@@ -1686,7 +1616,7 @@ declare type Result<T extends Spec> = ToOptional<{
 /**
  * @public
  */
-declare type SdkComponetns = ReturnType<typeof defineSdkComponents>;
+declare type SdkComponents = ReturnType<typeof defineSdkComponents>;
 
 /**
  * Defines supported spaces
@@ -1982,12 +1912,13 @@ declare namespace WireMessage {
     const HEADER_LENGTH = 8;
     /**
      * Validate if the message incoming is completed
-     * @param buf
+     * @param buf - ByteBuffer
      */
     function validate(buf: ByteBuffer): boolean;
     function readHeader(buf: ByteBuffer): Header | null;
 }
 
+<<<<<<< HEAD
 declare const enum YGAlign {
     YGAlignAuto = 0,
     YGAlignFlexStart = 1,
@@ -2060,4 +1991,6 @@ declare const enum YGWrap {
     UNRECOGNIZED = -1
 }
 
+=======
+>>>>>>> 68ebe82 (update types)
 
