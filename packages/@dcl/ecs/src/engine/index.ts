@@ -17,7 +17,7 @@ export {
   ComponentType,
   Entity,
   ByteBuffer,
-  SdkComponents as SdkComponetns,
+  SdkComponents,
   ComponentDefinition
 }
 export * from './types'

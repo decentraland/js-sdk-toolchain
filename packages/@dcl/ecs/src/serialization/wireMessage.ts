@@ -39,7 +39,7 @@ export namespace WireMessage {
   export const HEADER_LENGTH = 8
   /**
    * Validate if the message incoming is completed
-   * @param buf
+   * @param buf - ByteBuffer
    */
   export function validate(buf: ByteBuffer) {
     const rem = buf.remainingBytes()
