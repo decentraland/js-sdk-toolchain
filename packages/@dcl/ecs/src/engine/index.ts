@@ -13,13 +13,7 @@ import { IEngine } from './types'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
 
-export {
-  ComponentType,
-  Entity,
-  ByteBuffer,
-  SdkComponents,
-  ComponentDefinition
-}
+export { ComponentType, Entity, ByteBuffer, SdkComponents, ComponentDefinition }
 export * from './types'
 
 function preEngine() {
