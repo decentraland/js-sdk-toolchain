@@ -70,28 +70,26 @@ async function main() {
     .filter((filePath) => filePath.toLowerCase().endsWith('.proto'))
     .map((filePath) => filePath.substring(0, filePath.length - '.proto'.length))
 
-  const components: Component[] = componentsFile
-    .map((componentName) => {
-      const protoFileContent = readFileSync(
-        path.resolve(definitionsPath, `${componentName}.proto`)
-      ).toString()
+  const components: Component[] = componentsFile.map((componentName) => {
+    const protoFileContent = readFileSync(
+      path.resolve(definitionsPath, `${componentName}.proto`)
+    ).toString()
 
-      let componentId: number = -1
-      try {
-        componentId = getComponentId(protoFileContent)
-      } catch (error) {
-        console.error(error)
-        throw new Error(
-          `Couldn't get the component id in component ${componentName}.proto, please check the line with "option (ecs_component_id) = XXXX;" is well formated and it exists.`
-        )
-      }
+    let componentId: number = -1
+    try {
+      componentId = getComponentId(protoFileContent)
+    } catch (error) {
+      console.error(error)
+      throw new Error(
+        `Couldn't get the component id in component ${componentName}.proto, please check the line with "option (ecs_component_id) = XXXX;" is well formated and it exists.`
+      )
+    }
 
-      return {
-        componentId,
-        componentName
-      }
-    })
-    .filter(({ componentId }) => !NON_EXPOSED_LIST.includes(componentId))
+    return {
+      componentId,
+      componentName
+    }
+  })
 
   if (
     !(await generateProtocolBuffer({
@@ -111,8 +109,10 @@ async function main() {
       definitionsPath
     })
   }
-
-  await generateIndex({ components, generatedPath })
+  const filteredComponents = components.filter(
+    ({ componentId }) => !NON_EXPOSED_LIST.includes(componentId)
+  )
+  generateIndex({ components: filteredComponents, generatedPath })
   // await runCommand({/
   //   command: path.resolve(process.cwd(), 'node_modules', '.bin', 'eslint'),
   //   args: [generatedPath, '--ext', '.ts', '--fix'],
