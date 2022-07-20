@@ -1,42 +1,12 @@
-declare const enum ActionButton {
-    POINTER = 0,
-    PRIMARY = 1,
-    SECONDARY = 2,
-    ANY = 3,
-    FORWARD = 4,
-    BACKWARD = 5,
-    RIGHT = 6,
-    LEFT = 7,
-    JUMP = 8,
-    WALK = 9,
-    ACTION_3 = 10,
-    ACTION_4 = 11,
-    ACTION_5 = 12,
-    ACTION_6 = 13,
-    UNRECOGNIZED = -1
-}
-
 /**
  * @public
  */
 declare function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>>;
 
-declare const enum AvatarModifier {
-    HIDE_AVATARS = 0,
-    DISABLE_PASSPORTS = 1,
-    UNRECOGNIZED = -1
-}
-
 /**
  * @public
  */
 declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
-
-declare const enum CameraMode {
-    FIRST_PERSON = 0,
-    THIRD_PERSON = 1,
-    UNRECOGNIZED = -1
-}
 
 declare interface Color3 {
     r: number;
@@ -1177,15 +1147,6 @@ declare interface PBAvatarAttach {
     anchorPointId: number;
 }
 
-<<<<<<< HEAD
-declare interface PBAvatarModifierArea {
-    area: Vector3_2 | undefined;
-    excludeIds: string[];
-    modifiers: AvatarModifier[];
-}
-
-=======
->>>>>>> 68ebe82 (update types)
 declare interface PBAvatarShape {
     id: string;
     name: string;
@@ -1208,14 +1169,6 @@ declare interface PBBoxShape {
     uvs: number[];
 }
 
-<<<<<<< HEAD
-declare interface PBCameraModeArea {
-    area: Vector3_2 | undefined;
-    mode: CameraMode;
-}
-
-=======
->>>>>>> 68ebe82 (update types)
 declare interface PBCylinderShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
@@ -1242,14 +1195,14 @@ declare interface PBNFTShape {
 }
 
 declare interface PBOnPointerDown {
-    button: ActionButton;
+    button: number;
     hoverText: string;
     distance: number;
     showFeedback: boolean;
 }
 
 declare interface PBOnPointerDownResult {
-    button: ActionButton;
+    button: number;
     meshName: string;
     origin: Vector3_2 | undefined;
     direction: Vector3_2 | undefined;
@@ -1260,14 +1213,14 @@ declare interface PBOnPointerDownResult {
 }
 
 declare interface PBOnPointerUp {
-    button: ActionButton;
+    button: number;
     hoverText: string;
     distance: number;
     showFeedback: boolean;
 }
 
 declare interface PBOnPointerUpResult {
-    button: ActionButton;
+    button: number;
     meshName: string;
     origin: Vector3_2 | undefined;
     direction: Vector3_2 | undefined;
@@ -1918,79 +1871,4 @@ declare namespace WireMessage {
     function readHeader(buf: ByteBuffer): Header | null;
 }
 
-<<<<<<< HEAD
-declare const enum YGAlign {
-    YGAlignAuto = 0,
-    YGAlignFlexStart = 1,
-    YGAlignCenter = 2,
-    YGAlignFlexEnd = 3,
-    YGAlignStretch = 4,
-    YGAlignBaseline = 5,
-    YGAlignSpaceBetween = 6,
-    YGAlignSpaceAround = 7,
-    UNRECOGNIZED = -1
-}
-
-declare const enum YGDirection {
-    YGDirectionInherit = 0,
-    YGDirectionLTR = 1,
-    YGDirectionRTL = 2,
-    UNRECOGNIZED = -1
-}
-
-declare const enum YGDisplay {
-    YGDisplayFlex = 0,
-    YGDisplayNone = 1,
-    UNRECOGNIZED = -1
-}
-
-declare const enum YGFlexDirection {
-    YGFlexDirectionColumn = 0,
-    YGFlexDirectionColumnReverse = 1,
-    YGFlexDirectionRow = 2,
-    YGFlexDirectionRowReverse = 3,
-    UNRECOGNIZED = -1
-}
-
-declare const enum YGJustify {
-    YGJustifyFlexStart = 0,
-    YGJustifyCenter = 1,
-    YGJustifyFlexEnd = 2,
-    YGJustifySpaceBetween = 3,
-    YGJustifySpaceAround = 4,
-    YGJustifySpaceEvenly = 5,
-    UNRECOGNIZED = -1
-}
-
-declare const enum YGOverflow {
-    YGOverflowVisible = 0,
-    YGOverflowHidden = 1,
-    YGOverflowScroll = 2,
-    UNRECOGNIZED = -1
-}
-
-declare const enum YGPositionType {
-    YGPositionTypeStatic = 0,
-    YGPositionTypeRelative = 1,
-    YGPositionTypeAbsolute = 2,
-    UNRECOGNIZED = -1
-}
-
-declare const enum YGUnit {
-    YGUnitUndefined = 0,
-    YGUnitPoint = 1,
-    YGUnitPercent = 2,
-    YGUnitAuto = 3,
-    UNRECOGNIZED = -1
-}
-
-declare const enum YGWrap {
-    YGWrapNoWrap = 0,
-    YGWrapWrap = 1,
-    YGWrapWrapReverse = 2,
-    UNRECOGNIZED = -1
-}
-
-=======
->>>>>>> 68ebe82 (update types)
 
