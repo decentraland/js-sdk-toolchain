@@ -110,7 +110,7 @@ export type IEngine = {
     groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentEcsType<T>>]>;
     getComponent<T extends EcsType>(componentId: number): ComponentDefinition<T>;
     update(dt: number): void;
-    baseComponents: SdkComponetns;
+    baseComponents: SdkComponents;
 };
 
 // @public (undocumented)
@@ -205,7 +205,7 @@ export type Result<T extends Spec> = ToOptional<{
 // Warning: (ae-forgotten-export) The symbol "defineSdkComponents" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export type SdkComponetns = ReturnType<typeof defineSdkComponents>;
+export type SdkComponents = ReturnType<typeof defineSdkComponents>;
 
 // @public
 export enum Space {

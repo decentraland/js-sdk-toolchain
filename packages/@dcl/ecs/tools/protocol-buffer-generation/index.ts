@@ -11,6 +11,14 @@ import {
 } from './generateProtocolBuffer'
 import { generateIndex } from './generateIndex'
 
+const NON_EXPOSED_LIST = [
+  1090, // Billboard
+  1050, // UiTransform
+  1070, // AvatarModifierArea,
+  1071, // CameraModeArea
+  1021 // AudioStream
+]
+
 function getParam(key: string) {
   const index = process.argv.findIndex((item) => item === key)
   return index !== -1 && process.argv.length > index && process.argv[index + 1]
@@ -62,7 +70,7 @@ async function main() {
     .filter((filePath) => filePath.toLowerCase().endsWith('.proto'))
     .map((filePath) => filePath.substring(0, filePath.length - '.proto'.length))
 
-  const components = componentsFile.map((componentName) => {
+  const components: Component[] = componentsFile.map((componentName) => {
     const protoFileContent = readFileSync(
       path.resolve(definitionsPath, `${componentName}.proto`)
     ).toString()
@@ -81,7 +89,7 @@ async function main() {
       componentId,
       componentName
     }
-  }) as Component[]
+  })
 
   if (
     !(await generateProtocolBuffer({
@@ -101,8 +109,10 @@ async function main() {
       definitionsPath
     })
   }
-
-  await generateIndex({ components, generatedPath })
+  const filteredComponents = components.filter(
+    ({ componentId }) => !NON_EXPOSED_LIST.includes(componentId)
+  )
+  generateIndex({ components: filteredComponents, generatedPath })
   // await runCommand({/
   //   command: path.resolve(process.cwd(), 'node_modules', '.bin', 'eslint'),
   //   args: [generatedPath, '--ext', '.ts', '--fix'],
