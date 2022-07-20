@@ -11,6 +11,7 @@
     "declaration": true,
     "stripInternal": true,
     "downlevelIteration": true,
+    "preserveConstEnums": true,
     "outDir": "dist",
     "types": [
       "@dcl/posix"

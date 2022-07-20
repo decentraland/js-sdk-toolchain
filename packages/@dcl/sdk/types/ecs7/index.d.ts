@@ -1,12 +1,42 @@
+declare const enum ActionButton {
+    POINTER = 0,
+    PRIMARY = 1,
+    SECONDARY = 2,
+    ANY = 3,
+    FORWARD = 4,
+    BACKWARD = 5,
+    RIGHT = 6,
+    LEFT = 7,
+    JUMP = 8,
+    WALK = 9,
+    ACTION_3 = 10,
+    ACTION_4 = 11,
+    ACTION_5 = 12,
+    ACTION_6 = 13,
+    UNRECOGNIZED = -1
+}
+
 /**
  * @public
  */
 declare function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>>;
 
+declare const enum AvatarModifier {
+    HIDE_AVATARS = 0,
+    DISABLE_PASSPORTS = 1,
+    UNRECOGNIZED = -1
+}
+
 /**
  * @public
  */
 declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
+
+declare const enum CameraMode {
+    FIRST_PERSON = 0,
+    THIRD_PERSON = 1,
+    UNRECOGNIZED = -1
+}
 
 declare interface Color3 {
     r: number;
@@ -315,8 +345,8 @@ declare type IEngine = {
     addEntity(dynamic?: boolean): Entity;
     addDynamicEntity(): Entity;
     removeEntity(entity: Entity): void;
-    addSystem(system: Update, priority?: number): number;
-    removeSystem(id: SystemId): boolean;
+    addSystem(system: Update, priority?: number, name?: string): void;
+    removeSystem(selector: string | Update): boolean;
     defineComponent<T extends EcsType>(componentId: number, spec: T): ComponentDefinition<T>;
     mutableGroupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ComponentEcsType<T>]>;
     groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentEcsType<T>>]>;
@@ -1144,7 +1174,6 @@ declare interface PBAudioSource {
     volume: number;
     loop: boolean;
     pitch: number;
-    playedAtTimestamp: number;
     audioClipUrl: string;
 }
 
@@ -1162,13 +1191,7 @@ declare interface PBAvatarAttach {
 declare interface PBAvatarModifierArea {
     area: Vector3_2 | undefined;
     excludeIds: string[];
-    modifiers: PBAvatarModifierArea_Modifier[];
-}
-
-declare enum PBAvatarModifierArea_Modifier {
-    HIDE_AVATARS = 0,
-    DISABLE_PASSPORTS = 1,
-    UNRECOGNIZED = -1
+    modifiers: AvatarModifier[];
 }
 
 declare interface PBAvatarShape {
@@ -1201,13 +1224,7 @@ declare interface PBBoxShape {
 
 declare interface PBCameraModeArea {
     area: Vector3_2 | undefined;
-    mode: PBCameraModeArea_CameraMode;
-}
-
-declare enum PBCameraModeArea_CameraMode {
-    FIRST_PERSON = 0,
-    THIRD_PERSON = 1,
-    UNRECOGNIZED = -1
+    mode: CameraMode;
 }
 
 declare interface PBCylinderShape {
@@ -1236,14 +1253,14 @@ declare interface PBNFTShape {
 }
 
 declare interface PBOnPointerDown {
-    button: number;
+    button: ActionButton;
     hoverText: string;
     distance: number;
     showFeedback: boolean;
 }
 
 declare interface PBOnPointerDownResult {
-    button: number;
+    button: ActionButton;
     meshName: string;
     origin: Vector3_2 | undefined;
     direction: Vector3_2 | undefined;
@@ -1254,14 +1271,14 @@ declare interface PBOnPointerDownResult {
 }
 
 declare interface PBOnPointerUp {
-    button: number;
+    button: ActionButton;
     hoverText: string;
     distance: number;
     showFeedback: boolean;
 }
 
 declare interface PBOnPointerUpResult {
-    button: number;
+    button: ActionButton;
     meshName: string;
     origin: Vector3_2 | undefined;
     direction: Vector3_2 | undefined;
@@ -1691,8 +1708,6 @@ declare interface Spec {
     [key: string]: EcsType;
 }
 
-declare type SystemId = number;
-
 /**
  * Constant used to convert a value to gamma space
  * @public
@@ -1973,7 +1988,7 @@ declare namespace WireMessage {
     function readHeader(buf: ByteBuffer): Header | null;
 }
 
-declare enum YGAlign {
+declare const enum YGAlign {
     YGAlignAuto = 0,
     YGAlignFlexStart = 1,
     YGAlignCenter = 2,
@@ -1985,20 +2000,20 @@ declare enum YGAlign {
     UNRECOGNIZED = -1
 }
 
-declare enum YGDirection {
+declare const enum YGDirection {
     YGDirectionInherit = 0,
     YGDirectionLTR = 1,
     YGDirectionRTL = 2,
     UNRECOGNIZED = -1
 }
 
-declare enum YGDisplay {
+declare const enum YGDisplay {
     YGDisplayFlex = 0,
     YGDisplayNone = 1,
     UNRECOGNIZED = -1
 }
 
-declare enum YGFlexDirection {
+declare const enum YGFlexDirection {
     YGFlexDirectionColumn = 0,
     YGFlexDirectionColumnReverse = 1,
     YGFlexDirectionRow = 2,
@@ -2006,7 +2021,7 @@ declare enum YGFlexDirection {
     UNRECOGNIZED = -1
 }
 
-declare enum YGJustify {
+declare const enum YGJustify {
     YGJustifyFlexStart = 0,
     YGJustifyCenter = 1,
     YGJustifyFlexEnd = 2,
@@ -2016,21 +2031,21 @@ declare enum YGJustify {
     UNRECOGNIZED = -1
 }
 
-declare enum YGOverflow {
+declare const enum YGOverflow {
     YGOverflowVisible = 0,
     YGOverflowHidden = 1,
     YGOverflowScroll = 2,
     UNRECOGNIZED = -1
 }
 
-declare enum YGPositionType {
+declare const enum YGPositionType {
     YGPositionTypeStatic = 0,
     YGPositionTypeRelative = 1,
     YGPositionTypeAbsolute = 2,
     UNRECOGNIZED = -1
 }
 
-declare enum YGUnit {
+declare const enum YGUnit {
     YGUnitUndefined = 0,
     YGUnitPoint = 1,
     YGUnitPercent = 2,
@@ -2038,7 +2053,7 @@ declare enum YGUnit {
     UNRECOGNIZED = -1
 }
 
-declare enum YGWrap {
+declare const enum YGWrap {
     YGWrapNoWrap = 0,
     YGWrapWrap = 1,
     YGWrapWrapReverse = 2,
