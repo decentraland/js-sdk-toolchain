@@ -39,7 +39,7 @@ function Entity(withOffset: boolean = false) {
   }
 
   // TODO: getoffset from a server?
-  const offset = withOffset ? EntityUtils.getOffset() : 0
+  const offset = withOffset ? EntityUtils.getOffset() : EntityUtils.MIN_ENTITY
   const usedEntities: Set<Entity> = new Set()
   const unusedEntities: Set<Entity> = new Set()
 

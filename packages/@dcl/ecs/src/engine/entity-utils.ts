@@ -2,7 +2,7 @@ import { Entity } from './entity'
 
 export namespace EntityUtils {
   export const MAX_ENTITIES = 10000
-
+  export const MIN_ENTITY = 10
   let offset: number = MAX_ENTITIES
   export function getOffset() {
     const off = offset + 1
@@ -10,7 +10,7 @@ export namespace EntityUtils {
     return off
   }
 
-  const STATIC_ENTITIES = [0, MAX_ENTITIES]
+  const STATIC_ENTITIES = [MIN_ENTITY, MAX_ENTITIES]
   export function isStaticEntity(entity: Entity) {
     const [min, max] = STATIC_ENTITIES
     return entity >= min && entity <= max

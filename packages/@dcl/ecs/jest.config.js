@@ -4,7 +4,7 @@ module.exports = {
       tsconfig: "test/tsconfig.json",
     },
   },
-  moduleFileExtensions: ["ts", "js"],
+  moduleFileExtensions: ["ts", "js", "tsx"],
   transform: {
     "^.+\\.(ts|tsx)$": "ts-jest",
   },
@@ -27,7 +27,7 @@ module.exports = {
     }
   },
   verbose: true,
-  testMatch: ["**/*.spec.(ts)"],
+  testMatch: ["**/*.spec.(ts|tsx)"],
   testEnvironment: "node",
   setupFilesAfterEnv: ['./test/setup.ts']
 }

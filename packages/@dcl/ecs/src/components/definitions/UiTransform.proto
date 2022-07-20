@@ -79,81 +79,83 @@ enum YGEdge {
 }
 
 message PBUiTransform {
-  YGPositionType position_type = 1;
-
-  YGAlign align_content = 2;
+  int32 parent = 1;
+  YGDisplay display = 2;
   YGAlign align_items = 3;
-  YGAlign align_self = 4;
-  YGFlexDirection flex_direction = 5;
-  YGWrap flex_wrap = 6;
-  YGJustify justify_content = 7;
+  YGJustify justify_content = 4;
+  // YGPositionType position_type = 2;
 
-  YGOverflow overflow = 8;
-  YGDisplay display = 9;
-  YGDirection direction = 10;
+  // YGAlign align_content = 3;
+  // YGAlign align_items = 4;
+  // YGAlign align_self = 5;
+  // YGFlexDirection flex_direction = 6;
+  // YGWrap flex_wrap = 7;
+  // YGJustify justify_content = 8;
 
-  float flex = 11;
+  // YGOverflow overflow = 9;
+  // YGDisplay display = 10;
+  // YGDirection direction = 11;
 
-  YGUnit flex_basis_unit = 13;
-  float flex_basis = 14;
+  // float flex = 12;
 
-  float flex_grow = 15;
-  float flex_shrink = 16;
+  // YGUnit flex_basis_unit = 13;
+  // float flex_basis = 14;
 
-  YGUnit width_unit = 17;
-  float width = 18;
-  YGUnit height_unit = 19;
-  float height = 20;
+  // float flex_grow = 15;
+  // float flex_shrink = 16;
 
-  YGUnit min_width_unit = 21;
-  float min_width = 22;
-  YGUnit min_height_unit = 23;
-  float min_height = 24;
+  // YGUnit width_unit = 17;
+  // float width = 18;
+  // YGUnit height_unit = 19;
+  // float height = 20;
 
-  YGUnit max_width_unit = 31;
-  float max_width = 32;
-  YGUnit max_height_unit = 33;
-  float max_height = 34;
+  // YGUnit min_width_unit = 21;
+  // float min_width = 22;
+  // YGUnit min_height_unit = 23;
+  // float min_height = 24;
 
-  // non-standard
-  reserved 40; // float aspect_ratio = 40;
+  // YGUnit max_width_unit = 31;
+  // float max_width = 32;
+  // YGUnit max_height_unit = 33;
+  // float max_height = 34;
 
-  YGUnit position_left_unit = 41;
-  float position_left = 42;
-  YGUnit position_top_unit = 43;
-  float position_top = 44;
-  YGUnit position_right_unit = 45;
-  float position_right = 46;
-  YGUnit position_bottom_unit = 47;
-  float position_bottom = 48;
+  // // non-standard
+  // reserved 40; // float aspect_ratio = 40;
 
-  // margin
-  YGUnit margin_left_unit = 51;
-  float margin_left = 52;
-  YGUnit margin_top_unit = 53;
-  float margin_top = 54;
-  YGUnit margin_right_unit = 55;
-  float margin_right = 56;
-  YGUnit margin_bottom_unit = 57;
-  float margin_bottom = 58;
+  // YGUnit position_left_unit = 41;
+  // float position_left = 42;
+  // YGUnit position_top_unit = 43;
+  // float position_top = 44;
+  // YGUnit position_right_unit = 45;
+  // float position_right = 46;
+  // YGUnit position_bottom_unit = 47;
+  // float position_bottom = 48;
 
-  YGUnit padding_left_unit = 61;
-  float padding_left = 62;
-  YGUnit padding_top_unit = 63;
-  float padding_top = 64;
-  YGUnit padding_right_unit = 65;
-  float padding_right = 66;
-  YGUnit padding_bottom_unit = 67;
-  float padding_bottom = 68;
+  // // margin
+  // YGUnit margin_left_unit = 51;
+  // float margin_left = 52;
+  // YGUnit margin_top_unit = 53;
+  // float margin_top = 54;
+  // YGUnit margin_right_unit = 55;
+  // float margin_right = 56;
+  // YGUnit margin_bottom_unit = 57;
+  // float margin_bottom = 58;
 
-  reserved 71; // YGUnit border_left_unit = 71;
-  float border_left = 72;
-  reserved 73; // YGUnit border_top_unit = 73;
-  float border_top = 74;
-  reserved 75; // YGUnit border_right_unit = 75;
-  float border_right = 76;
-  reserved 77; // YGUnit border_bottom_unit = 77;
-  float border_bottom = 78;
+  // YGUnit padding_left_unit = 61;
+  // float padding_left = 62;
+  // YGUnit padding_top_unit = 63;
+  // float padding_top = 64;
+  // YGUnit padding_right_unit = 65;
+  // float padding_right = 66;
+  // YGUnit padding_bottom_unit = 67;
+  // float padding_bottom = 68;
+
+  // reserved 71; // YGUnit border_left_unit = 71;
+  // float border_left = 72;
+  // reserved 73; // YGUnit border_top_unit = 73;
+  // float border_top = 74;
+  // reserved 75; // YGUnit border_right_unit = 75;
+  // float border_right = 76;
+  // reserved 77; // YGUnit border_bottom_unit = 77;
+  // float border_bottom = 78;
 }
-
-
