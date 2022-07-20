@@ -197,13 +197,9 @@ declare type DeepReadonly<T> = {
 declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): {
     Animator: ComponentDefinition<EcsType<PBAnimator>>;
     AudioSource: ComponentDefinition<EcsType<PBAudioSource>>;
-    AudioStream: ComponentDefinition<EcsType<PBAudioStream>>;
     AvatarAttach: ComponentDefinition<EcsType<PBAvatarAttach>>;
-    AvatarModifierArea: ComponentDefinition<EcsType<PBAvatarModifierArea>>;
     AvatarShape: ComponentDefinition<EcsType<PBAvatarShape>>;
-    Billboard: ComponentDefinition<EcsType<PBBillboard>>;
     BoxShape: ComponentDefinition<EcsType<PBBoxShape>>;
-    CameraModeArea: ComponentDefinition<EcsType<PBCameraModeArea>>;
     CylinderShape: ComponentDefinition<EcsType<PBCylinderShape>>;
     GLTFShape: ComponentDefinition<EcsType<PBGLTFShape>>;
     NFTShape: ComponentDefinition<EcsType<PBNFTShape>>;
@@ -214,7 +210,6 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
     PlaneShape: ComponentDefinition<EcsType<PBPlaneShape>>;
     SphereShape: ComponentDefinition<EcsType<PBSphereShape>>;
     TextShape: ComponentDefinition<EcsType<PBTextShape>>;
-    UiTransform: ComponentDefinition<EcsType<PBUiTransform>>;
     Transform: ComponentDefinition<EcsType<Transform>>;
 };
 
@@ -315,14 +310,14 @@ declare type IEngine = {
     addEntity(dynamic?: boolean): Entity;
     addDynamicEntity(): Entity;
     removeEntity(entity: Entity): void;
-    addSystem(system: Update, priority?: number): number;
-    removeSystem(id: SystemId): boolean;
+    addSystem(system: Update, priority?: number, name?: string): void;
+    removeSystem(selector: string | Update): boolean;
     defineComponent<T extends EcsType>(componentId: number, spec: T): ComponentDefinition<T>;
     mutableGroupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ComponentEcsType<T>]>;
     groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentEcsType<T>>]>;
     getComponent<T extends EcsType>(componentId: number): ComponentDefinition<T>;
     update(dt: number): void;
-    baseComponents: SdkComponetns;
+    baseComponents: SdkComponents;
 };
 
 /**
@@ -1144,31 +1139,12 @@ declare interface PBAudioSource {
     volume: number;
     loop: boolean;
     pitch: number;
-    playedAtTimestamp: number;
     audioClipUrl: string;
-}
-
-declare interface PBAudioStream {
-    playing: boolean;
-    volume: number;
-    url: string;
 }
 
 declare interface PBAvatarAttach {
     avatarId: string;
     anchorPointId: number;
-}
-
-declare interface PBAvatarModifierArea {
-    area: Vector3_2 | undefined;
-    excludeIds: string[];
-    modifiers: PBAvatarModifierArea_Modifier[];
-}
-
-declare enum PBAvatarModifierArea_Modifier {
-    HIDE_AVATARS = 0,
-    DISABLE_PASSPORTS = 1,
-    UNRECOGNIZED = -1
 }
 
 declare interface PBAvatarShape {
@@ -1186,28 +1162,11 @@ declare interface PBAvatarShape {
     talking: boolean;
 }
 
-declare interface PBBillboard {
-    x: boolean;
-    y: boolean;
-    z: boolean;
-}
-
 declare interface PBBoxShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
     visible: boolean;
     uvs: number[];
-}
-
-declare interface PBCameraModeArea {
-    area: Vector3_2 | undefined;
-    mode: PBCameraModeArea_CameraMode;
-}
-
-declare enum PBCameraModeArea_CameraMode {
-    FIRST_PERSON = 0,
-    THIRD_PERSON = 1,
-    UNRECOGNIZED = -1
 }
 
 declare interface PBCylinderShape {
@@ -1309,65 +1268,6 @@ declare interface PBTextShape {
     shadowColor: Color3 | undefined;
     outlineColor: Color3 | undefined;
     textColor: Color3 | undefined;
-}
-
-declare interface PBUiTransform {
-    positionType: YGPositionType;
-    alignContent: YGAlign;
-    alignItems: YGAlign;
-    alignSelf: YGAlign;
-    flexDirection: YGFlexDirection;
-    flexWrap: YGWrap;
-    justifyContent: YGJustify;
-    overflow: YGOverflow;
-    display: YGDisplay;
-    direction: YGDirection;
-    flex: number;
-    flexBasisUnit: YGUnit;
-    flexBasis: number;
-    flexGrow: number;
-    flexShrink: number;
-    widthUnit: YGUnit;
-    width: number;
-    heightUnit: YGUnit;
-    height: number;
-    minWidthUnit: YGUnit;
-    minWidth: number;
-    minHeightUnit: YGUnit;
-    minHeight: number;
-    maxWidthUnit: YGUnit;
-    maxWidth: number;
-    maxHeightUnit: YGUnit;
-    maxHeight: number;
-    positionLeftUnit: YGUnit;
-    positionLeft: number;
-    positionTopUnit: YGUnit;
-    positionTop: number;
-    positionRightUnit: YGUnit;
-    positionRight: number;
-    positionBottomUnit: YGUnit;
-    positionBottom: number;
-    /** margin */
-    marginLeftUnit: YGUnit;
-    marginLeft: number;
-    marginTopUnit: YGUnit;
-    marginTop: number;
-    marginRightUnit: YGUnit;
-    marginRight: number;
-    marginBottomUnit: YGUnit;
-    marginBottom: number;
-    paddingLeftUnit: YGUnit;
-    paddingLeft: number;
-    paddingTopUnit: YGUnit;
-    paddingTop: number;
-    paddingRightUnit: YGUnit;
-    paddingRight: number;
-    paddingBottomUnit: YGUnit;
-    paddingBottom: number;
-    borderLeft: number;
-    borderTop: number;
-    borderRight: number;
-    borderBottom: number;
 }
 
 /**
@@ -1669,7 +1569,7 @@ declare type Result<T extends Spec> = ToOptional<{
 /**
  * @public
  */
-declare type SdkComponetns = ReturnType<typeof defineSdkComponents>;
+declare type SdkComponents = ReturnType<typeof defineSdkComponents>;
 
 /**
  * Defines supported spaces
@@ -1690,8 +1590,6 @@ declare enum Space {
 declare interface Spec {
     [key: string]: EcsType;
 }
-
-declare type SystemId = number;
 
 /**
  * Constant used to convert a value to gamma space
@@ -1967,82 +1865,10 @@ declare namespace WireMessage {
     const HEADER_LENGTH = 8;
     /**
      * Validate if the message incoming is completed
-     * @param buf
+     * @param buf - ByteBuffer
      */
     function validate(buf: ByteBuffer): boolean;
     function readHeader(buf: ByteBuffer): Header | null;
-}
-
-declare enum YGAlign {
-    YGAlignAuto = 0,
-    YGAlignFlexStart = 1,
-    YGAlignCenter = 2,
-    YGAlignFlexEnd = 3,
-    YGAlignStretch = 4,
-    YGAlignBaseline = 5,
-    YGAlignSpaceBetween = 6,
-    YGAlignSpaceAround = 7,
-    UNRECOGNIZED = -1
-}
-
-declare enum YGDirection {
-    YGDirectionInherit = 0,
-    YGDirectionLTR = 1,
-    YGDirectionRTL = 2,
-    UNRECOGNIZED = -1
-}
-
-declare enum YGDisplay {
-    YGDisplayFlex = 0,
-    YGDisplayNone = 1,
-    UNRECOGNIZED = -1
-}
-
-declare enum YGFlexDirection {
-    YGFlexDirectionColumn = 0,
-    YGFlexDirectionColumnReverse = 1,
-    YGFlexDirectionRow = 2,
-    YGFlexDirectionRowReverse = 3,
-    UNRECOGNIZED = -1
-}
-
-declare enum YGJustify {
-    YGJustifyFlexStart = 0,
-    YGJustifyCenter = 1,
-    YGJustifyFlexEnd = 2,
-    YGJustifySpaceBetween = 3,
-    YGJustifySpaceAround = 4,
-    YGJustifySpaceEvenly = 5,
-    UNRECOGNIZED = -1
-}
-
-declare enum YGOverflow {
-    YGOverflowVisible = 0,
-    YGOverflowHidden = 1,
-    YGOverflowScroll = 2,
-    UNRECOGNIZED = -1
-}
-
-declare enum YGPositionType {
-    YGPositionTypeStatic = 0,
-    YGPositionTypeRelative = 1,
-    YGPositionTypeAbsolute = 2,
-    UNRECOGNIZED = -1
-}
-
-declare enum YGUnit {
-    YGUnitUndefined = 0,
-    YGUnitPoint = 1,
-    YGUnitPercent = 2,
-    YGUnitAuto = 3,
-    UNRECOGNIZED = -1
-}
-
-declare enum YGWrap {
-    YGWrapNoWrap = 0,
-    YGWrapWrap = 1,
-    YGWrapWrapReverse = 2,
-    UNRECOGNIZED = -1
 }
 
 
