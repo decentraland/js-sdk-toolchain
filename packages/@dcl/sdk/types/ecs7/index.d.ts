@@ -1,4 +1,4 @@
-declare enum ActionButton {
+declare const enum ActionButton {
     POINTER = 0,
     PRIMARY = 1,
     SECONDARY = 2,
@@ -21,7 +21,7 @@ declare enum ActionButton {
  */
 declare function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>>;
 
-declare enum AvatarModifier {
+declare const enum AvatarModifier {
     HIDE_AVATARS = 0,
     DISABLE_PASSPORTS = 1,
     UNRECOGNIZED = -1
@@ -32,7 +32,7 @@ declare enum AvatarModifier {
  */
 declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
 
-declare enum CameraMode {
+declare const enum CameraMode {
     FIRST_PERSON = 0,
     THIRD_PERSON = 1,
     UNRECOGNIZED = -1
@@ -1988,7 +1988,7 @@ declare namespace WireMessage {
     function readHeader(buf: ByteBuffer): Header | null;
 }
 
-declare enum YGAlign {
+declare const enum YGAlign {
     YGAlignAuto = 0,
     YGAlignFlexStart = 1,
     YGAlignCenter = 2,
@@ -2000,20 +2000,20 @@ declare enum YGAlign {
     UNRECOGNIZED = -1
 }
 
-declare enum YGDirection {
+declare const enum YGDirection {
     YGDirectionInherit = 0,
     YGDirectionLTR = 1,
     YGDirectionRTL = 2,
     UNRECOGNIZED = -1
 }
 
-declare enum YGDisplay {
+declare const enum YGDisplay {
     YGDisplayFlex = 0,
     YGDisplayNone = 1,
     UNRECOGNIZED = -1
 }
 
-declare enum YGFlexDirection {
+declare const enum YGFlexDirection {
     YGFlexDirectionColumn = 0,
     YGFlexDirectionColumnReverse = 1,
     YGFlexDirectionRow = 2,
@@ -2021,7 +2021,7 @@ declare enum YGFlexDirection {
     UNRECOGNIZED = -1
 }
 
-declare enum YGJustify {
+declare const enum YGJustify {
     YGJustifyFlexStart = 0,
     YGJustifyCenter = 1,
     YGJustifyFlexEnd = 2,
@@ -2031,21 +2031,21 @@ declare enum YGJustify {
     UNRECOGNIZED = -1
 }
 
-declare enum YGOverflow {
+declare const enum YGOverflow {
     YGOverflowVisible = 0,
     YGOverflowHidden = 1,
     YGOverflowScroll = 2,
     UNRECOGNIZED = -1
 }
 
-declare enum YGPositionType {
+declare const enum YGPositionType {
     YGPositionTypeStatic = 0,
     YGPositionTypeRelative = 1,
     YGPositionTypeAbsolute = 2,
     UNRECOGNIZED = -1
 }
 
-declare enum YGUnit {
+declare const enum YGUnit {
     YGUnitUndefined = 0,
     YGUnitPoint = 1,
     YGUnitPercent = 2,
@@ -2053,7 +2053,7 @@ declare enum YGUnit {
     UNRECOGNIZED = -1
 }
 
-declare enum YGWrap {
+declare const enum YGWrap {
     YGWrapNoWrap = 0,
     YGWrapWrap = 1,
     YGWrapWrapReverse = 2,

@@ -92,6 +92,11 @@ function fixTsGeneratedByProto(filePath: string) {
    */
   content = content.replace(/export const/g, internalComment)
 
+  /**
+   * Convert all `enum` to `const enum`
+   */
+  content = content.replace(/export enum/g, 'export const enum')
+
   fs.removeSync(filePath)
   fs.writeFileSync(filePath, content)
 }

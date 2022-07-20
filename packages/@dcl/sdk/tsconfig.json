@@ -21,6 +21,7 @@
     "noUnusedLocals": true,
     "skipLibCheck": true,
     "baseUrl": ".",
+    "preserveConstEnums": true,
     "types": [
       "env",
       "@dcl/posix"
@@ -31,5 +32,7 @@
     ]
   },
   "exclude": [],
-  "include": ["src/*.ts"]
+  "include": [
+    "src/*.ts"
+  ]
 }
