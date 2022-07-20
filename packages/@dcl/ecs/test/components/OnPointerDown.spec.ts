@@ -1,4 +1,5 @@
-﻿import { Engine } from '../../src/engine'
+﻿import { ActionButton } from '../../src/components/generated/pb/common/ActionButton.gen'
+import { Engine } from '../../src/engine'
 
 describe('Generated OnPointerDown ProtoBuf', () => {
   it('should serialize/deserialize OnPointerDown', () => {
@@ -8,14 +9,14 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     const entityB = newEngine.addEntity()
     OnPointerDown.create(newEngine.addEntity())
     const onPointerDown = OnPointerDown.create(entity, {
-      button: 1,
+      button: ActionButton.PRIMARY,
       hoverText: 'Tap to run',
       distance: 10,
       showFeedback: true
     })
 
     OnPointerDown.create(entityB, {
-      button: 2,
+      button: ActionButton.SECONDARY,
       hoverText: 'TCker',
       distance: 5,
       showFeedback: false
@@ -34,7 +35,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
 
     // We create an onPointerDownEvent
     OnPointerDown.create(entity, {
-      button: 1,
+      button: ActionButton.PRIMARY,
       hoverText: 'Tap to run',
       distance: 10,
       showFeedback: true
@@ -45,7 +46,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
 
     // We receive an OnPointerResult
     OnPointerDownResult.create(entity, {
-      button: 1,
+      button: ActionButton.PRIMARY,
       point: { x: 1, y: 2, z: 3 },
       distance: 10,
       direction: { x: 1, y: 2, z: 3 },
