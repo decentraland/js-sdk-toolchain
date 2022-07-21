@@ -7,6 +7,20 @@ import { mockPreviewWearables } from './cli/wearables'
 import { sdk } from '@dcl/schemas'
 
 const setupProxy = (dcl: any, app: express.Application) => {
+  const proxySetupPath = path.resolve(dcl.getWorkingDir(), 'setupProxy.js')
+  if (fs.existsSync(proxySetupPath)) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const setupProxy = require(proxySetupPath)
+      setupProxy(dcl, app)
+    } catch (err) {
+      console.log(
+        `User ${proxySetupPath} found but it couldn't be loaded properly`,
+        err
+      )
+    }
+  }
+
   // first resolve all dependencies in the local current working directory
   // second try to resolve dependencies in @dcl/sdk folder
   /**
