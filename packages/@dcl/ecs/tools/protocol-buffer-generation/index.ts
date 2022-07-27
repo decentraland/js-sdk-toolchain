@@ -13,7 +13,6 @@ import { generateIndex } from './generateIndex'
 
 const NON_EXPOSED_LIST = [
   1090, // Billboard
-  1050, // UiTransform
   1070, // AvatarModifierArea,
   1021 // AudioStream
 ]
