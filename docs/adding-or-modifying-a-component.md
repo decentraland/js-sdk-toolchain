@@ -19,7 +19,7 @@ To define a component, we need to create a PR in the [protocol repository](https
 The component behavior refers to how the data of the component is deserialized, interpreted and used by systems.
 As an example, we are going to use the [unity renderer repository](https://github.com/decentraland/unity-renderer), that uses multiple components to manage the rendering of the world.
 
-In `unity-renderer` it is possible to update definitions from the `@dcl/protocol` package version `next`. This version corresponds to the latest commit merged into `main` of that repository. You can also choose the package from a specific PR, using the constant `FIXED_NPM_PACKAGE_LINK` (you can do a global search to find the commit you need). The source of what is supplied in the PR `npm install XXXXX` is copied, leaving `FIXED_NPM_PACKAGE_LINK = " xxxx"`.
+In `unity-renderer` it is possible to update definitions from the `@dcl/protocol` package version `next`. This version corresponds to the latest commit merged into `main` of that repository. You can also choose the package from a specific PR, using the constant `FIXED_NPM_PACKAGE_LINK` (you can do a global search to find this constant definition). The source of what is supplied in the PR `npm install XXXXX` is copied, leaving `FIXED_NPM_PACKAGE_LINK = " xxxx"`.
 
 With the protocol definitions already acquired, the code is generated. Now you can use it in the local environment of `unity-renderer`. The building of a scene with this same local environment will be replicated in the next subsection.
 
