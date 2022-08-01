@@ -10,6 +10,7 @@ describe('UiTransform component', () => {
       text: 'Test Text'
     })
 
+
     const buffer = UiText.toBinary(entity)
     UiText.upsertFromBinary(entity, buffer)
     const entityB = newEngine.addEntity()
