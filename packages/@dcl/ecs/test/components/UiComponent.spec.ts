@@ -71,7 +71,7 @@ describe('UiTransform component', () => {
       positionTopUnit: YGUnit.YGUnitPoint,
       positionType: YGPositionType.YGPositionTypeRelative,
       width: 1,
-      widthUnit: YGUnit.YGUnitPoint
+      widthUnit: YGUnit.YGUnitPoint,
     })
     uiTransform.marginBottomUnit = YGUnit.YGUnitPercent
 
