@@ -12,6 +12,7 @@ function jsx(
   if (typeof tag === 'function') {
     return tag(attributes ?? {}, children ?? undefined)
   }
+
   return { tag, attributes, children }
 }
 

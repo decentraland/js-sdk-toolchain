@@ -6,12 +6,13 @@ import {
 } from '../src/components/generated/pb/UiTransform.gen'
 import { PBUiText } from '../src/components/generated/pb/UiText.gen'
 import { Engine, Entity } from '../src/engine'
-import { ui } from './ui'
+import { ui } from './jsx/ui'
 
 type DivOpts = Partial<Omit<PBUiTransform, 'parent'>>
 type TextOpts = Partial<Omit<PBUiText, 'text'>>
 
 type Component = (parent: Entity) => Entity
+
 const divDefaults: Required<DivOpts> = {
   display: YGDisplay.YGDisplayFlex,
   justifyContent: YGJustify.UNRECOGNIZED,

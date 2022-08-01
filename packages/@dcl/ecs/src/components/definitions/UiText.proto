@@ -6,5 +6,3 @@ option (ecs_component_id) = 1051;
 message PBUiText {
   string text = 1;
 }
-
-
