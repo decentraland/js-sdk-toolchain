@@ -236,11 +236,6 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
     PlaneShape: ComponentDefinition<EcsType<PBPlaneShape>>;
     SphereShape: ComponentDefinition<EcsType<PBSphereShape>>;
     TextShape: ComponentDefinition<EcsType<PBTextShape>>;
-<<<<<<< HEAD
-=======
-    UiText: ComponentDefinition<EcsType<PBUiText>>;
-    UiTransform: ComponentDefinition<EcsType<PBUiTransform>>;
->>>>>>> 5d2a88b (proto ui)
     Transform: ComponentDefinition<EcsType<Transform>>;
 };
 
@@ -1312,72 +1307,6 @@ declare interface PBTextShape {
     textColor: Color3 | undefined;
 }
 
-<<<<<<< HEAD
-=======
-declare interface PBUiText {
-    text: string;
-}
-
-declare interface PBUiTransform {
-    positionType: YGPositionType;
-    alignContent: YGAlign;
-    alignItems: YGAlign;
-    alignSelf: YGAlign;
-    flexDirection: YGFlexDirection;
-    flexWrap: YGWrap;
-    justifyContent: YGJustify;
-    overflow: YGOverflow;
-    display: YGDisplay;
-    direction: YGDirection;
-    flex: number;
-    flexBasisUnit: YGUnit;
-    flexBasis: number;
-    flexGrow: number;
-    flexShrink: number;
-    widthUnit: YGUnit;
-    width: number;
-    heightUnit: YGUnit;
-    height: number;
-    minWidthUnit: YGUnit;
-    minWidth: number;
-    minHeightUnit: YGUnit;
-    minHeight: number;
-    maxWidthUnit: YGUnit;
-    maxWidth: number;
-    maxHeightUnit: YGUnit;
-    maxHeight: number;
-    positionLeftUnit: YGUnit;
-    positionLeft: number;
-    positionTopUnit: YGUnit;
-    positionTop: number;
-    positionRightUnit: YGUnit;
-    positionRight: number;
-    positionBottomUnit: YGUnit;
-    positionBottom: number;
-    /** margin */
-    marginLeftUnit: YGUnit;
-    marginLeft: number;
-    marginTopUnit: YGUnit;
-    marginTop: number;
-    marginRightUnit: YGUnit;
-    marginRight: number;
-    marginBottomUnit: YGUnit;
-    marginBottom: number;
-    paddingLeftUnit: YGUnit;
-    paddingLeft: number;
-    paddingTopUnit: YGUnit;
-    paddingTop: number;
-    paddingRightUnit: YGUnit;
-    paddingRight: number;
-    paddingBottomUnit: YGUnit;
-    paddingBottom: number;
-    borderLeft: number;
-    borderTop: number;
-    borderRight: number;
-    borderBottom: number;
-}
-
->>>>>>> 5d2a88b (proto ui)
 /**
  * Represens a plane by the equation ax + by + cz + d = 0
  * @public
