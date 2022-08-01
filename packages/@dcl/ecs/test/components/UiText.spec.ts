@@ -7,7 +7,8 @@ describe('UiTransform component', () => {
     const entity = newEngine.addEntity()
 
     const uiTransform = UiText.create(entity, {
-      text: 'Test Text'
+      text: 'Test Text',
+      textColor: {r:0, g:0, b: 0}
     })
 
 
