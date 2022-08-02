@@ -15,7 +15,7 @@ install:
 	make install_protobuffer_compiler
 
 test:
-	./node_modules/.bin/jest --testPathIgnorePatterns test/performance.spec.ts --detectOpenHandles --coverage --silent=false --verbose --colors --runInBand $(TESTARGS)
+	./node_modules/.bin/jest --testPathIgnorePatterns test/performance.spec.ts --detectOpenHandles --silent=false --verbose --colors --runInBand $(TESTARGS)
 
 
 benchmark:

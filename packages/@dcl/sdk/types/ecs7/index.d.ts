@@ -296,7 +296,7 @@ declare type DivTag = {
 /**
  * @public
  */
-declare function DivUi(props: Partial<DivProps>, ...children: Node[]): JsxTree;
+declare function DivUi(props: Partial<DivProps>, ...children: any[]): JsxTree;
 
 /** @public */
 declare type double = number;
@@ -1796,7 +1796,7 @@ declare type TextTag = {
 /**
  * @public
  */
-declare function TextUi(props: TextProps, ...children: Node[]): JsxTree;
+declare function TextUi(props: TextProps, ...children: any[]): JsxTree;
 
 /**
  * Constant used to convert a value to gamma space

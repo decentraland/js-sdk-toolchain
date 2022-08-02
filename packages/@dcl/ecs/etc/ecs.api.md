@@ -125,7 +125,7 @@ export type DivTag = {
 };
 
 // @public (undocumented)
-export function DivUi(props: Partial<DivProps>, ...children: Node[]): JsxTree;
+export function DivUi(props: Partial<DivProps>, ...children: any[]): JsxTree;
 
 // @public (undocumented)
 export type double = number;
@@ -338,7 +338,7 @@ export type TextTag = {
 };
 
 // @public (undocumented)
-export function TextUi(props: TextProps, ...children: Node[]): JsxTree;
+export function TextUi(props: TextProps, ...children: any[]): JsxTree;
 
 // @public
 export const ToGammaSpace: number;
