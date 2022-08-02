@@ -21,6 +21,14 @@ declare const enum ActionButton {
  */
 declare function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>>;
 
+declare const enum AvatarAnchorPoint {
+    POSITION = 0,
+    NAME_TAG = 1,
+    LEFT_HAND = 2,
+    RIGHT_HAND = 3,
+    UNRECOGNIZED = -1
+}
+
 /**
  * @public
  */
@@ -235,6 +243,7 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
     PlaneShape: ComponentDefinition<EcsType<PBPlaneShape>>;
     SphereShape: ComponentDefinition<EcsType<PBSphereShape>>;
     TextShape: ComponentDefinition<EcsType<PBTextShape>>;
+    UiText: ComponentDefinition<EcsType<PBUiText>>;
     UiTransform: ComponentDefinition<EcsType<PBUiTransform>>;
     Transform: ComponentDefinition<EcsType<Transform>>;
 };
@@ -1170,7 +1179,7 @@ declare interface PBAudioSource {
 
 declare interface PBAvatarAttach {
     avatarId: string;
-    anchorPointId: number;
+    anchorPointId: AvatarAnchorPoint;
 }
 
 declare interface PBAvatarShape {
@@ -1301,6 +1310,11 @@ declare interface PBTextShape {
     textColor: Color3 | undefined;
 }
 
+declare interface PBUiText {
+    text: string;
+    textColor: Color3 | undefined;
+}
+
 declare interface PBUiTransform {
     positionType: YGPositionType;
     alignContent: YGAlign;
@@ -1358,6 +1372,7 @@ declare interface PBUiTransform {
     borderTop: number;
     borderRight: number;
     borderBottom: number;
+    parentEntity: number;
 }
 
 /**
