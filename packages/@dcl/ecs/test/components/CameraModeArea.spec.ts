@@ -1,7 +1,7 @@
 import { CameraMode } from '../../src/components/generated/pb/CameraModeArea.gen'
 import { Engine } from '../../src/engine'
 
-describe.skip('Generated CameraModifierArea ProtoBuf', () => {
+describe('Generated CameraModifierArea ProtoBuf', () => {
   it('should serialize/deserialize CameraModifierArea', () => {
     const newEngine = Engine()
     const { CameraModeArea } = newEngine.baseComponents

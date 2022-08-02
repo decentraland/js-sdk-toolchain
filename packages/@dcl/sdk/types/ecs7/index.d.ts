@@ -1,3 +1,21 @@
+declare const enum ActionButton {
+    POINTER = 0,
+    PRIMARY = 1,
+    SECONDARY = 2,
+    ANY = 3,
+    FORWARD = 4,
+    BACKWARD = 5,
+    RIGHT = 6,
+    LEFT = 7,
+    JUMP = 8,
+    WALK = 9,
+    ACTION_3 = 10,
+    ACTION_4 = 11,
+    ACTION_5 = 12,
+    ACTION_6 = 13,
+    UNRECOGNIZED = -1
+}
+
 /**
  * @public
  */
@@ -7,6 +25,12 @@ declare function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>>;
  * @public
  */
 declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
+
+declare const enum CameraMode {
+    FIRST_PERSON = 0,
+    THIRD_PERSON = 1,
+    UNRECOGNIZED = -1
+}
 
 declare interface Color3 {
     r: number;
@@ -199,7 +223,9 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
     AudioSource: ComponentDefinition<EcsType<PBAudioSource>>;
     AvatarAttach: ComponentDefinition<EcsType<PBAvatarAttach>>;
     AvatarShape: ComponentDefinition<EcsType<PBAvatarShape>>;
+    Billboard: ComponentDefinition<EcsType<PBBillboard>>;
     BoxShape: ComponentDefinition<EcsType<PBBoxShape>>;
+    CameraModeArea: ComponentDefinition<EcsType<PBCameraModeArea>>;
     CylinderShape: ComponentDefinition<EcsType<PBCylinderShape>>;
     GLTFShape: ComponentDefinition<EcsType<PBGLTFShape>>;
     NFTShape: ComponentDefinition<EcsType<PBNFTShape>>;
@@ -1162,11 +1188,22 @@ declare interface PBAvatarShape {
     talking: boolean;
 }
 
+declare interface PBBillboard {
+    x: boolean;
+    y: boolean;
+    z: boolean;
+}
+
 declare interface PBBoxShape {
     withCollisions: boolean;
     isPointerBlocker: boolean;
     visible: boolean;
     uvs: number[];
+}
+
+declare interface PBCameraModeArea {
+    area: Vector3_2 | undefined;
+    mode: CameraMode;
 }
 
 declare interface PBCylinderShape {
@@ -1195,14 +1232,14 @@ declare interface PBNFTShape {
 }
 
 declare interface PBOnPointerDown {
-    button: number;
+    button: ActionButton;
     hoverText: string;
     distance: number;
     showFeedback: boolean;
 }
 
 declare interface PBOnPointerDownResult {
-    button: number;
+    button: ActionButton;
     meshName: string;
     origin: Vector3_2 | undefined;
     direction: Vector3_2 | undefined;
@@ -1213,14 +1250,14 @@ declare interface PBOnPointerDownResult {
 }
 
 declare interface PBOnPointerUp {
-    button: number;
+    button: ActionButton;
     hoverText: string;
     distance: number;
     showFeedback: boolean;
 }
 
 declare interface PBOnPointerUpResult {
-    button: number;
+    button: ActionButton;
     meshName: string;
     origin: Vector3_2 | undefined;
     direction: Vector3_2 | undefined;
