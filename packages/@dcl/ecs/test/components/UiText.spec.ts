@@ -8,7 +8,7 @@ describe('UiTransform component', () => {
 
     UiText.create(entity, {
       text: 'Test Text',
-      textColor: {r:0, g:0, b: 0}
+      textColor: { r: 1, g: 1, b: 1 }
     })
 
     const buffer = UiText.toBinary(entity)
