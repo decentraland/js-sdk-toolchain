@@ -287,6 +287,8 @@ declare type DivTag = {
     attributes: DivProps;
 };
 
+declare function DivUi(props: Partial<DivProps>, ...children: Node[]): JsxTree;
+
 /** @public */
 declare type double = number;
 
@@ -294,6 +296,12 @@ declare type double = number;
  * @public
  */
 declare const EcsBoolean: EcsType<boolean>;
+
+declare namespace EcsJsx {
+    export function createElement(tag: JsxTree['tag'] | ((attributes: any, children: any) => JsxTree), attributes: {
+        [key: string]: any;
+    } | null, ...args: any[]): JsxTree;
+}
 
 /**
  * @public
@@ -1756,6 +1764,8 @@ declare type TextTag = {
     tag: 'textui';
     attributes: TextProps;
 };
+
+declare function TextUi(props: TextProps, ...children: Node[]): JsxTree;
 
 /**
  * Constant used to convert a value to gamma space

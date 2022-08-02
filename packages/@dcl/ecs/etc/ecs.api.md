@@ -109,10 +109,21 @@ export type DivTag = {
 };
 
 // @public (undocumented)
+export function DivUi(props: Partial<DivProps>, ...children: Node[]): JsxTree;
+
+// @public (undocumented)
 export type double = number;
 
 // @public (undocumented)
 export const EcsBoolean: EcsType<boolean>;
+
+// @public (undocumented)
+export namespace EcsJsx {
+    // (undocumented)
+    export function createElement(tag: JsxTree['tag'] | ((attributes: any, children: any) => JsxTree), attributes: {
+        [key: string]: any;
+    } | null, ...args: any[]): JsxTree;
+}
 
 // @public (undocumented)
 export const EcsString: EcsType<string>;
@@ -430,6 +441,9 @@ export type TextTag = {
     tag: 'textui';
     attributes: TextProps;
 };
+
+// @public (undocumented)
+export function TextUi(props: TextProps, ...children: Node[]): JsxTree;
 
 // @public
 export const ToGammaSpace: number;
