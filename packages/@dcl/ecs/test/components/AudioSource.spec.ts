@@ -32,4 +32,3 @@ describe('Generated AudioSource ProtoBuf', () => {
     })
   })
 })
-
