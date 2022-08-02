@@ -255,6 +255,9 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
  */
 declare const DEG2RAD: number;
 
+/**
+ * @public
+ */
 declare interface DivProps {
     display: YGDisplay;
     flex: number;
@@ -282,11 +285,17 @@ declare interface DivProps {
     overflow: YGOverflow;
 }
 
+/**
+ * @public
+ */
 declare type DivTag = {
     tag: 'divui';
     attributes: DivProps;
 };
 
+/**
+ * @public
+ */
 declare function DivUi(props: Partial<DivProps>, ...children: Node[]): JsxTree;
 
 /** @public */
@@ -297,6 +306,9 @@ declare type double = number;
  */
 declare const EcsBoolean: EcsType<boolean>;
 
+/**
+ * @public
+ */
 declare namespace EcsJsx {
     export function createElement(tag: JsxTree['tag'] | ((attributes: any, children: any) => JsxTree), attributes: {
         [key: string]: any;
@@ -444,6 +456,9 @@ declare interface ISize {
     height: number;
 }
 
+/**
+ * @public
+ */
 declare type JsxTree = (DivTag | TextTag) & {
     children: (JsxTree | null)[];
 };
@@ -1536,6 +1551,9 @@ declare namespace Plane {
     function signedDistanceTo(plane: ReadonlyPlane, point: Vector3.ReadonlyVector3): number;
 }
 
+/**
+ * @public
+ */
 declare type Position = {
     top: number | string;
     right: number | string;
@@ -1755,16 +1773,29 @@ declare interface Spec {
     [key: string]: EcsType;
 }
 
-declare type TextProps = {
-    id?: string;
+/**
+ * @public
+ */
+declare interface TextProps {
     value: string;
-};
+    textColor: {
+        r: number;
+        g: number;
+        b: number;
+    };
+}
 
+/**
+ * @public
+ */
 declare type TextTag = {
     tag: 'textui';
     attributes: TextProps;
 };
 
+/**
+ * @public
+ */
 declare function TextUi(props: TextProps, ...children: Node[]): JsxTree;
 
 /**
@@ -1802,6 +1833,9 @@ declare type Transport = {
 
 declare type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
+/**
+ * @public
+ */
 declare type Tree = JsxTree & {
     _id: number;
     entityId: number;

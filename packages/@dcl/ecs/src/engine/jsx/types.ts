@@ -1,5 +1,4 @@
 import { PBUiText } from '../../components/generated/pb/UiText.gen'
-import { PBUiTransform } from '../../components/generated/pb/UiTransform.gen'
 import {
   YGDisplay,
   YGJustify,
@@ -11,19 +10,9 @@ import {
   YGOverflow
 } from '../../components/generated/pb/UiTransform.gen'
 
-export {
-  YGDisplay,
-  YGJustify,
-  YGPositionType,
-  YGAlign,
-  YGFlexDirection,
-  YGDirection,
-  YGWrap,
-  YGOverflow,
-  PBUiTransform,
-  PBUiText
-}
-
+/**
+ * @public
+ */
 export type Position = {
   top: number | string
   right: number | string
@@ -31,6 +20,17 @@ export type Position = {
   left: number | string
 }
 
+/**
+ * @public
+ */
+export interface TextProps {
+  value: string
+  textColor: { r: number; g: number; b: number }
+}
+
+/**
+ * @public
+ */
 export interface DivProps {
   display: YGDisplay
   flex: number
@@ -59,29 +59,35 @@ export interface DivProps {
   // aspectRatio: number | undefined
 }
 
-export type TextProps = {
-  id?: string
-  value: string
-}
-
+/**
+ * @public
+ */
 export type DivTag = {
   tag: 'divui'
   attributes: DivProps
 }
+/**
+ * @public
+ */
 export type TextTag = {
   tag: 'textui'
   attributes: TextProps
 }
 
+/**
+ * @public
+ */
 export type JsxTree = (DivTag | TextTag) & {
   children: (JsxTree | null)[]
 }
+/**
+ * @public
+ */
 export type Tree = JsxTree & {
   _id: number
   entityId: number
 }
 
-type DivOpts = Partial<Omit<PBUiTransform, 'parent'>>
 type TextOpts = Partial<Omit<PBUiText, 'text'>>
 
 declare global {
@@ -90,7 +96,7 @@ declare global {
     type Element = JsxTree
 
     interface HTMLElementTagNameMap {
-      divui: DivOpts
+      divui: DivProps
       textui: TextOpts
     }
 

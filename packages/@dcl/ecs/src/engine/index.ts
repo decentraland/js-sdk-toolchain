@@ -13,7 +13,7 @@ import { IEngine } from './types'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
 import { JsxTree } from './jsx/types'
-import { render } from './jsx'
+import { render } from './jsx/renderer'
 
 export { ComponentType, Entity, ByteBuffer, SdkComponents, ComponentDefinition }
 export * from './types'

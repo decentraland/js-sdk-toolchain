@@ -54,30 +54,42 @@ export const DEG2RAD: number;
 export interface DivProps {
     // (undocumented)
     alignContent: YGAlign;
+    // Warning: (ae-forgotten-export) The symbol "YGAlign" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     alignItems: YGAlign;
     // (undocumented)
     alignSelf: YGAlign;
     // (undocumented)
     border: Position;
+    // Warning: (ae-forgotten-export) The symbol "YGDirection" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     direction: YGDirection;
+    // Warning: (ae-forgotten-export) The symbol "YGDisplay" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     display: YGDisplay;
     // (undocumented)
     flex: number;
     // (undocumented)
     flexBasis: number;
+    // Warning: (ae-forgotten-export) The symbol "YGFlexDirection" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     flexDirection: YGFlexDirection;
     // (undocumented)
     flexGrow: number;
     // (undocumented)
     flexShrink: number;
+    // Warning: (ae-forgotten-export) The symbol "YGWrap" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     flexWrap: YGWrap;
     // (undocumented)
     height: number;
+    // Warning: (ae-forgotten-export) The symbol "YGJustify" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     justifyContent: YGJustify;
     // (undocumented)
@@ -90,12 +102,16 @@ export interface DivProps {
     minHeight: number;
     // (undocumented)
     minWidth: number;
+    // Warning: (ae-forgotten-export) The symbol "YGOverflow" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     overflow: YGOverflow;
     // (undocumented)
     padding: Position;
     // (undocumented)
     position: Position;
+    // Warning: (ae-forgotten-export) The symbol "YGPositionType" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     positionType: YGPositionType;
     // (undocumented)
@@ -227,133 +243,6 @@ export enum Orientation {
 }
 
 // @public (undocumented)
-export interface PBUiText {
-    // (undocumented)
-    text: string;
-    // Warning: (ae-forgotten-export) The symbol "Color3" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    textColor: Color3 | undefined;
-}
-
-// @public (undocumented)
-export interface PBUiTransform {
-    // (undocumented)
-    alignContent: YGAlign;
-    // (undocumented)
-    alignItems: YGAlign;
-    // (undocumented)
-    alignSelf: YGAlign;
-    // (undocumented)
-    borderBottom: number;
-    // (undocumented)
-    borderLeft: number;
-    // (undocumented)
-    borderRight: number;
-    // (undocumented)
-    borderTop: number;
-    // (undocumented)
-    direction: YGDirection;
-    // (undocumented)
-    display: YGDisplay;
-    // (undocumented)
-    flex: number;
-    // (undocumented)
-    flexBasis: number;
-    // Warning: (ae-forgotten-export) The symbol "YGUnit" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    flexBasisUnit: YGUnit;
-    // (undocumented)
-    flexDirection: YGFlexDirection;
-    // (undocumented)
-    flexGrow: number;
-    // (undocumented)
-    flexShrink: number;
-    // (undocumented)
-    flexWrap: YGWrap;
-    // (undocumented)
-    height: number;
-    // (undocumented)
-    heightUnit: YGUnit;
-    // (undocumented)
-    justifyContent: YGJustify;
-    // (undocumented)
-    marginBottom: number;
-    // (undocumented)
-    marginBottomUnit: YGUnit;
-    // (undocumented)
-    marginLeft: number;
-    marginLeftUnit: YGUnit;
-    // (undocumented)
-    marginRight: number;
-    // (undocumented)
-    marginRightUnit: YGUnit;
-    // (undocumented)
-    marginTop: number;
-    // (undocumented)
-    marginTopUnit: YGUnit;
-    // (undocumented)
-    maxHeight: number;
-    // (undocumented)
-    maxHeightUnit: YGUnit;
-    // (undocumented)
-    maxWidth: number;
-    // (undocumented)
-    maxWidthUnit: YGUnit;
-    // (undocumented)
-    minHeight: number;
-    // (undocumented)
-    minHeightUnit: YGUnit;
-    // (undocumented)
-    minWidth: number;
-    // (undocumented)
-    minWidthUnit: YGUnit;
-    // (undocumented)
-    overflow: YGOverflow;
-    // (undocumented)
-    paddingBottom: number;
-    // (undocumented)
-    paddingBottomUnit: YGUnit;
-    // (undocumented)
-    paddingLeft: number;
-    // (undocumented)
-    paddingLeftUnit: YGUnit;
-    // (undocumented)
-    paddingRight: number;
-    // (undocumented)
-    paddingRightUnit: YGUnit;
-    // (undocumented)
-    paddingTop: number;
-    // (undocumented)
-    paddingTopUnit: YGUnit;
-    // (undocumented)
-    parentEntity: number;
-    // (undocumented)
-    positionBottom: number;
-    // (undocumented)
-    positionBottomUnit: YGUnit;
-    // (undocumented)
-    positionLeft: number;
-    // (undocumented)
-    positionLeftUnit: YGUnit;
-    // (undocumented)
-    positionRight: number;
-    // (undocumented)
-    positionRightUnit: YGUnit;
-    // (undocumented)
-    positionTop: number;
-    // (undocumented)
-    positionTopUnit: YGUnit;
-    // (undocumented)
-    positionType: YGPositionType;
-    // (undocumented)
-    width: number;
-    // (undocumented)
-    widthUnit: YGUnit;
-}
-
-// @public (undocumented)
 export type Position = {
     top: number | string;
     right: number | string;
@@ -431,10 +320,16 @@ export interface Spec {
 }
 
 // @public (undocumented)
-export type TextProps = {
-    id?: string;
+export interface TextProps {
+    // (undocumented)
+    textColor: {
+        r: number;
+        g: number;
+        b: number;
+    };
+    // (undocumented)
     value: string;
-};
+}
 
 // @public (undocumented)
 export type TextTag = {
@@ -502,118 +397,6 @@ export namespace Vector3 {
     export function subtractToRef(minuend: ReadonlyVector3, subtrahend: ReadonlyVector3, result: MutableVector3): void;
     export function Up(): MutableVector3;
     export function Zero(): MutableVector3;
-}
-
-// @public (undocumented)
-export const enum YGAlign {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGAlignAuto = 0,
-    // (undocumented)
-    YGAlignBaseline = 5,
-    // (undocumented)
-    YGAlignCenter = 2,
-    // (undocumented)
-    YGAlignFlexEnd = 3,
-    // (undocumented)
-    YGAlignFlexStart = 1,
-    // (undocumented)
-    YGAlignSpaceAround = 7,
-    // (undocumented)
-    YGAlignSpaceBetween = 6,
-    // (undocumented)
-    YGAlignStretch = 4
-}
-
-// @public (undocumented)
-export const enum YGDirection {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGDirectionInherit = 0,
-    // (undocumented)
-    YGDirectionLTR = 1,
-    // (undocumented)
-    YGDirectionRTL = 2
-}
-
-// @public (undocumented)
-export const enum YGDisplay {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGDisplayFlex = 0,
-    // (undocumented)
-    YGDisplayNone = 1
-}
-
-// @public (undocumented)
-export const enum YGFlexDirection {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGFlexDirectionColumn = 0,
-    // (undocumented)
-    YGFlexDirectionColumnReverse = 1,
-    // (undocumented)
-    YGFlexDirectionRow = 2,
-    // (undocumented)
-    YGFlexDirectionRowReverse = 3
-}
-
-// @public (undocumented)
-export const enum YGJustify {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGJustifyCenter = 1,
-    // (undocumented)
-    YGJustifyFlexEnd = 2,
-    // (undocumented)
-    YGJustifyFlexStart = 0,
-    // (undocumented)
-    YGJustifySpaceAround = 4,
-    // (undocumented)
-    YGJustifySpaceBetween = 3,
-    // (undocumented)
-    YGJustifySpaceEvenly = 5
-}
-
-// @public (undocumented)
-export const enum YGOverflow {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGOverflowHidden = 1,
-    // (undocumented)
-    YGOverflowScroll = 2,
-    // (undocumented)
-    YGOverflowVisible = 0
-}
-
-// @public (undocumented)
-export const enum YGPositionType {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGPositionTypeAbsolute = 2,
-    // (undocumented)
-    YGPositionTypeRelative = 1,
-    // (undocumented)
-    YGPositionTypeStatic = 0
-}
-
-// @public (undocumented)
-export const enum YGWrap {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGWrapNoWrap = 0,
-    // (undocumented)
-    YGWrapWrap = 1,
-    // (undocumented)
-    YGWrapWrapReverse = 2
 }
 
 // Warnings were encountered during analysis:
