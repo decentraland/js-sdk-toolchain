@@ -223,6 +223,7 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
     AudioSource: ComponentDefinition<EcsType<PBAudioSource>>;
     AvatarAttach: ComponentDefinition<EcsType<PBAvatarAttach>>;
     AvatarShape: ComponentDefinition<EcsType<PBAvatarShape>>;
+    Billboard: ComponentDefinition<EcsType<PBBillboard>>;
     BoxShape: ComponentDefinition<EcsType<PBBoxShape>>;
     CameraModeArea: ComponentDefinition<EcsType<PBCameraModeArea>>;
     CylinderShape: ComponentDefinition<EcsType<PBCylinderShape>>;
@@ -1185,6 +1186,12 @@ declare interface PBAvatarShape {
     stickerTriggerId: string;
     stickerTriggerTimestamp: number;
     talking: boolean;
+}
+
+declare interface PBBillboard {
+    x: boolean;
+    y: boolean;
+    z: boolean;
 }
 
 declare interface PBBoxShape {
