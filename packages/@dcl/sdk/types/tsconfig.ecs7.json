@@ -16,6 +16,8 @@
     "useDefineForClassFields": false,
     "preserveConstEnums": true,
     "allowJs": true,
+    "jsx": "react",
+    "jsxFactory": "EcsJsx.createElement",
     "lib": [
       "ES2020"
     ],

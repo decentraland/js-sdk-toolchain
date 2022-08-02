@@ -12,6 +12,8 @@ import type { EcsType } from '../built-in-types/EcsType'
 import { IEngine } from './types'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
+import { JsxTree } from './jsx/types'
+import { render } from './jsx'
 
 export { ComponentType, Entity, ByteBuffer, SdkComponents, ComponentDefinition }
 export * from './types'
@@ -157,6 +159,10 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
   const crdtSystem = crdtSceneSystem({ engine, transports: transports || [] })
   const baseComponents = defineSdkComponents(engine)
 
+  function renderUI(tree: JsxTree) {
+    return render({ baseComponents, addEntity: engine.addEntity })(tree)
+  }
+
   function update(dt: number) {
     crdtSystem.receiveMessages()
 
@@ -209,6 +215,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     groupOf: engine.groupOf,
     getComponent: engine.getComponent,
     update,
+    renderUI,
     baseComponents
   }
 }

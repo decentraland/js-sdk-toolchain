@@ -51,6 +51,64 @@ export type DeepReadonly<T> = {
 export const DEG2RAD: number;
 
 // @public (undocumented)
+export interface DivProps {
+    // (undocumented)
+    alignContent: YGAlign;
+    // (undocumented)
+    alignItems: YGAlign;
+    // (undocumented)
+    alignSelf: YGAlign;
+    // (undocumented)
+    border: Position;
+    // (undocumented)
+    direction: YGDirection;
+    // (undocumented)
+    display: YGDisplay;
+    // (undocumented)
+    flex: number;
+    // (undocumented)
+    flexBasis: number;
+    // (undocumented)
+    flexDirection: YGFlexDirection;
+    // (undocumented)
+    flexGrow: number;
+    // (undocumented)
+    flexShrink: number;
+    // (undocumented)
+    flexWrap: YGWrap;
+    // (undocumented)
+    height: number;
+    // (undocumented)
+    justifyContent: YGJustify;
+    // (undocumented)
+    margin: Position;
+    // (undocumented)
+    maxHeight: number;
+    // (undocumented)
+    maxWidth: number;
+    // (undocumented)
+    minHeight: number;
+    // (undocumented)
+    minWidth: number;
+    // (undocumented)
+    overflow: YGOverflow;
+    // (undocumented)
+    padding: Position;
+    // (undocumented)
+    position: Position;
+    // (undocumented)
+    positionType: YGPositionType;
+    // (undocumented)
+    width: number;
+}
+
+// @public (undocumented)
+export type DivTag = {
+    tag: 'divui';
+    attributes: DivProps;
+};
+
+// @public (undocumented)
 export type double = number;
 
 // @public (undocumented)
@@ -111,6 +169,7 @@ export type IEngine = {
     getComponent<T extends EcsType>(componentId: number): ComponentDefinition<T>;
     update(dt: number): void;
     baseComponents: SdkComponents;
+    renderUI(tree: JsxTree): void;
 };
 
 // @public (undocumented)
@@ -137,6 +196,11 @@ export interface ISize {
 }
 
 // @public (undocumented)
+export type JsxTree = (DivTag | TextTag) & {
+    children: (JsxTree | null)[];
+};
+
+// @public (undocumented)
 export function MapType<T extends Spec>(spec: T): EcsType<Result<T>>;
 
 // @public (undocumented)
@@ -150,6 +214,141 @@ export enum Orientation {
     CCW = 1,
     CW = 0
 }
+
+// @public (undocumented)
+export interface PBUiText {
+    // (undocumented)
+    text: string;
+    // Warning: (ae-forgotten-export) The symbol "Color3" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    textColor: Color3 | undefined;
+}
+
+// @public (undocumented)
+export interface PBUiTransform {
+    // (undocumented)
+    alignContent: YGAlign;
+    // (undocumented)
+    alignItems: YGAlign;
+    // (undocumented)
+    alignSelf: YGAlign;
+    // (undocumented)
+    borderBottom: number;
+    // (undocumented)
+    borderLeft: number;
+    // (undocumented)
+    borderRight: number;
+    // (undocumented)
+    borderTop: number;
+    // (undocumented)
+    direction: YGDirection;
+    // (undocumented)
+    display: YGDisplay;
+    // (undocumented)
+    flex: number;
+    // (undocumented)
+    flexBasis: number;
+    // Warning: (ae-forgotten-export) The symbol "YGUnit" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    flexBasisUnit: YGUnit;
+    // (undocumented)
+    flexDirection: YGFlexDirection;
+    // (undocumented)
+    flexGrow: number;
+    // (undocumented)
+    flexShrink: number;
+    // (undocumented)
+    flexWrap: YGWrap;
+    // (undocumented)
+    height: number;
+    // (undocumented)
+    heightUnit: YGUnit;
+    // (undocumented)
+    justifyContent: YGJustify;
+    // (undocumented)
+    marginBottom: number;
+    // (undocumented)
+    marginBottomUnit: YGUnit;
+    // (undocumented)
+    marginLeft: number;
+    marginLeftUnit: YGUnit;
+    // (undocumented)
+    marginRight: number;
+    // (undocumented)
+    marginRightUnit: YGUnit;
+    // (undocumented)
+    marginTop: number;
+    // (undocumented)
+    marginTopUnit: YGUnit;
+    // (undocumented)
+    maxHeight: number;
+    // (undocumented)
+    maxHeightUnit: YGUnit;
+    // (undocumented)
+    maxWidth: number;
+    // (undocumented)
+    maxWidthUnit: YGUnit;
+    // (undocumented)
+    minHeight: number;
+    // (undocumented)
+    minHeightUnit: YGUnit;
+    // (undocumented)
+    minWidth: number;
+    // (undocumented)
+    minWidthUnit: YGUnit;
+    // (undocumented)
+    overflow: YGOverflow;
+    // (undocumented)
+    paddingBottom: number;
+    // (undocumented)
+    paddingBottomUnit: YGUnit;
+    // (undocumented)
+    paddingLeft: number;
+    // (undocumented)
+    paddingLeftUnit: YGUnit;
+    // (undocumented)
+    paddingRight: number;
+    // (undocumented)
+    paddingRightUnit: YGUnit;
+    // (undocumented)
+    paddingTop: number;
+    // (undocumented)
+    paddingTopUnit: YGUnit;
+    // (undocumented)
+    parentEntity: number;
+    // (undocumented)
+    positionBottom: number;
+    // (undocumented)
+    positionBottomUnit: YGUnit;
+    // (undocumented)
+    positionLeft: number;
+    // (undocumented)
+    positionLeftUnit: YGUnit;
+    // (undocumented)
+    positionRight: number;
+    // (undocumented)
+    positionRightUnit: YGUnit;
+    // (undocumented)
+    positionTop: number;
+    // (undocumented)
+    positionTopUnit: YGUnit;
+    // (undocumented)
+    positionType: YGPositionType;
+    // (undocumented)
+    width: number;
+    // (undocumented)
+    widthUnit: YGUnit;
+}
+
+// @public (undocumented)
+export type Position = {
+    top: number | string;
+    right: number | string;
+    bottom: number | string;
+    left: number | string;
+};
 
 // @public (undocumented)
 export namespace Quaternion {
@@ -220,11 +419,29 @@ export interface Spec {
     [key: string]: EcsType;
 }
 
+// @public (undocumented)
+export type TextProps = {
+    id?: string;
+    value: string;
+};
+
+// @public (undocumented)
+export type TextTag = {
+    tag: 'textui';
+    attributes: TextProps;
+};
+
 // @public
 export const ToGammaSpace: number;
 
 // @public
 export const ToLinearSpace = 2.2;
+
+// @public (undocumented)
+export type Tree = JsxTree & {
+    _id: number;
+    entityId: number;
+};
 
 // @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;
@@ -273,10 +490,122 @@ export namespace Vector3 {
     export function Zero(): MutableVector3;
 }
 
+// @public (undocumented)
+export const enum YGAlign {
+    // (undocumented)
+    UNRECOGNIZED = -1,
+    // (undocumented)
+    YGAlignAuto = 0,
+    // (undocumented)
+    YGAlignBaseline = 5,
+    // (undocumented)
+    YGAlignCenter = 2,
+    // (undocumented)
+    YGAlignFlexEnd = 3,
+    // (undocumented)
+    YGAlignFlexStart = 1,
+    // (undocumented)
+    YGAlignSpaceAround = 7,
+    // (undocumented)
+    YGAlignSpaceBetween = 6,
+    // (undocumented)
+    YGAlignStretch = 4
+}
+
+// @public (undocumented)
+export const enum YGDirection {
+    // (undocumented)
+    UNRECOGNIZED = -1,
+    // (undocumented)
+    YGDirectionInherit = 0,
+    // (undocumented)
+    YGDirectionLTR = 1,
+    // (undocumented)
+    YGDirectionRTL = 2
+}
+
+// @public (undocumented)
+export const enum YGDisplay {
+    // (undocumented)
+    UNRECOGNIZED = -1,
+    // (undocumented)
+    YGDisplayFlex = 0,
+    // (undocumented)
+    YGDisplayNone = 1
+}
+
+// @public (undocumented)
+export const enum YGFlexDirection {
+    // (undocumented)
+    UNRECOGNIZED = -1,
+    // (undocumented)
+    YGFlexDirectionColumn = 0,
+    // (undocumented)
+    YGFlexDirectionColumnReverse = 1,
+    // (undocumented)
+    YGFlexDirectionRow = 2,
+    // (undocumented)
+    YGFlexDirectionRowReverse = 3
+}
+
+// @public (undocumented)
+export const enum YGJustify {
+    // (undocumented)
+    UNRECOGNIZED = -1,
+    // (undocumented)
+    YGJustifyCenter = 1,
+    // (undocumented)
+    YGJustifyFlexEnd = 2,
+    // (undocumented)
+    YGJustifyFlexStart = 0,
+    // (undocumented)
+    YGJustifySpaceAround = 4,
+    // (undocumented)
+    YGJustifySpaceBetween = 3,
+    // (undocumented)
+    YGJustifySpaceEvenly = 5
+}
+
+// @public (undocumented)
+export const enum YGOverflow {
+    // (undocumented)
+    UNRECOGNIZED = -1,
+    // (undocumented)
+    YGOverflowHidden = 1,
+    // (undocumented)
+    YGOverflowScroll = 2,
+    // (undocumented)
+    YGOverflowVisible = 0
+}
+
+// @public (undocumented)
+export const enum YGPositionType {
+    // (undocumented)
+    UNRECOGNIZED = -1,
+    // (undocumented)
+    YGPositionTypeAbsolute = 2,
+    // (undocumented)
+    YGPositionTypeRelative = 1,
+    // (undocumented)
+    YGPositionTypeStatic = 0
+}
+
+// @public (undocumented)
+export const enum YGWrap {
+    // (undocumented)
+    UNRECOGNIZED = -1,
+    // (undocumented)
+    YGWrapNoWrap = 0,
+    // (undocumented)
+    YGWrapWrap = 1,
+    // (undocumented)
+    YGWrapWrapReverse = 2
+}
+
 // Warnings were encountered during analysis:
 //
-// dist/engine/types.d.ts:25:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
-// dist/engine/types.d.ts:38:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:26:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:40:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

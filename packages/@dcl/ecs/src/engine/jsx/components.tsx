@@ -1,9 +1,4 @@
-/*
- * @jsx ecsJsx
- */
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import ecsJsx from '.'
+import EcsJsx from '.'
 
 import { DivProps, JsxTree, TextProps } from './types'
 

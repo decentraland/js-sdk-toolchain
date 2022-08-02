@@ -1,9 +1,4 @@
-/*
- * @jsx ecsJsx
- */
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import ecsJsx, { DivUi } from '../jsx'
+import EcsJsx, { DivUi } from '../../src/engine/jsx'
 
 import {
   YGFlexDirection,

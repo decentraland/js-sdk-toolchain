@@ -20,7 +20,7 @@
       {
         "ignoreRestSiblings": true,
         "argsIgnorePattern": "^_",
-        "varsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_|EcsJsx",
         "caughtErrorsIgnorePattern": "^_"
       }
     ]

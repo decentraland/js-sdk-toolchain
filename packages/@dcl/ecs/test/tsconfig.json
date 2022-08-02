@@ -16,6 +16,6 @@
     "noEmit": true,
     "strict": true,
     "jsx": "react",
-    "jsxFactory": "ecsJsx"
+    "jsxFactory": "EcsJsx.createElement"
   }
 }

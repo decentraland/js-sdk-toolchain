@@ -21,6 +21,14 @@ declare const enum ActionButton {
  */
 declare function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>>;
 
+declare const enum AvatarAnchorPoint {
+    POSITION = 0,
+    NAME_TAG = 1,
+    LEFT_HAND = 2,
+    RIGHT_HAND = 3,
+    UNRECOGNIZED = -1
+}
+
 /**
  * @public
  */
@@ -236,6 +244,8 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
     PlaneShape: ComponentDefinition<EcsType<PBPlaneShape>>;
     SphereShape: ComponentDefinition<EcsType<PBSphereShape>>;
     TextShape: ComponentDefinition<EcsType<PBTextShape>>;
+    UiText: ComponentDefinition<EcsType<PBUiText>>;
+    UiTransform: ComponentDefinition<EcsType<PBUiTransform>>;
     Transform: ComponentDefinition<EcsType<Transform>>;
 };
 
@@ -244,6 +254,38 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
  * @public
  */
 declare const DEG2RAD: number;
+
+declare interface DivProps {
+    display: YGDisplay;
+    flex: number;
+    justifyContent: YGJustify;
+    positionType: YGPositionType;
+    alignItems: YGAlign;
+    alignSelf: YGAlign;
+    alignContent: YGAlign;
+    flexDirection: YGFlexDirection;
+    position: Position;
+    padding: Position;
+    margin: Position;
+    border: Position;
+    direction: YGDirection;
+    width: number;
+    height: number;
+    minWidth: number;
+    maxWidth: number;
+    minHeight: number;
+    maxHeight: number;
+    flexWrap: YGWrap;
+    flexBasis: number;
+    flexGrow: number;
+    flexShrink: number;
+    overflow: YGOverflow;
+}
+
+declare type DivTag = {
+    tag: 'divui';
+    attributes: DivProps;
+};
 
 /** @public */
 declare type double = number;
@@ -344,6 +386,7 @@ declare type IEngine = {
     getComponent<T extends EcsType>(componentId: number): ComponentDefinition<T>;
     update(dt: number): void;
     baseComponents: SdkComponents;
+    renderUI(tree: JsxTree): void;
 };
 
 /**
@@ -392,6 +435,10 @@ declare interface ISize {
      */
     height: number;
 }
+
+declare type JsxTree = (DivTag | TextTag) & {
+    children: (JsxTree | null)[];
+};
 
 /**
  * @public
@@ -1170,7 +1217,7 @@ declare interface PBAudioSource {
 
 declare interface PBAvatarAttach {
     avatarId: string;
-    anchorPointId: number;
+    anchorPointId: AvatarAnchorPoint;
 }
 
 declare interface PBAvatarShape {
@@ -1307,6 +1354,71 @@ declare interface PBTextShape {
     textColor: Color3 | undefined;
 }
 
+declare interface PBUiText {
+    text: string;
+    textColor: Color3 | undefined;
+}
+
+declare interface PBUiTransform {
+    positionType: YGPositionType;
+    alignContent: YGAlign;
+    alignItems: YGAlign;
+    alignSelf: YGAlign;
+    flexDirection: YGFlexDirection;
+    flexWrap: YGWrap;
+    justifyContent: YGJustify;
+    overflow: YGOverflow;
+    display: YGDisplay;
+    direction: YGDirection;
+    flex: number;
+    flexBasisUnit: YGUnit;
+    flexBasis: number;
+    flexGrow: number;
+    flexShrink: number;
+    widthUnit: YGUnit;
+    width: number;
+    heightUnit: YGUnit;
+    height: number;
+    minWidthUnit: YGUnit;
+    minWidth: number;
+    minHeightUnit: YGUnit;
+    minHeight: number;
+    maxWidthUnit: YGUnit;
+    maxWidth: number;
+    maxHeightUnit: YGUnit;
+    maxHeight: number;
+    positionLeftUnit: YGUnit;
+    positionLeft: number;
+    positionTopUnit: YGUnit;
+    positionTop: number;
+    positionRightUnit: YGUnit;
+    positionRight: number;
+    positionBottomUnit: YGUnit;
+    positionBottom: number;
+    /** margin */
+    marginLeftUnit: YGUnit;
+    marginLeft: number;
+    marginTopUnit: YGUnit;
+    marginTop: number;
+    marginRightUnit: YGUnit;
+    marginRight: number;
+    marginBottomUnit: YGUnit;
+    marginBottom: number;
+    paddingLeftUnit: YGUnit;
+    paddingLeft: number;
+    paddingTopUnit: YGUnit;
+    paddingTop: number;
+    paddingRightUnit: YGUnit;
+    paddingRight: number;
+    paddingBottomUnit: YGUnit;
+    paddingBottom: number;
+    borderLeft: number;
+    borderTop: number;
+    borderRight: number;
+    borderBottom: number;
+    parentEntity: number;
+}
+
 /**
  * Represens a plane by the equation ax + by + cz + d = 0
  * @public
@@ -1415,6 +1527,13 @@ declare namespace Plane {
      */
     function signedDistanceTo(plane: ReadonlyPlane, point: Vector3.ReadonlyVector3): number;
 }
+
+declare type Position = {
+    top: number | string;
+    right: number | string;
+    bottom: number | string;
+    left: number | string;
+};
 
 /**
  * @public
@@ -1628,6 +1747,16 @@ declare interface Spec {
     [key: string]: EcsType;
 }
 
+declare type TextProps = {
+    id?: string;
+    value: string;
+};
+
+declare type TextTag = {
+    tag: 'textui';
+    attributes: TextProps;
+};
+
 /**
  * Constant used to convert a value to gamma space
  * @public
@@ -1662,6 +1791,11 @@ declare type Transport = {
 };
 
 declare type TransportMessage = Omit<ReceiveMessage, 'data'>;
+
+declare type Tree = JsxTree & {
+    _id: number;
+    entityId: number;
+};
 
 declare type Uint32 = number;
 
@@ -1906,6 +2040,78 @@ declare namespace WireMessage {
      */
     function validate(buf: ByteBuffer): boolean;
     function readHeader(buf: ByteBuffer): Header | null;
+}
+
+declare const enum YGAlign {
+    YGAlignAuto = 0,
+    YGAlignFlexStart = 1,
+    YGAlignCenter = 2,
+    YGAlignFlexEnd = 3,
+    YGAlignStretch = 4,
+    YGAlignBaseline = 5,
+    YGAlignSpaceBetween = 6,
+    YGAlignSpaceAround = 7,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGDirection {
+    YGDirectionInherit = 0,
+    YGDirectionLTR = 1,
+    YGDirectionRTL = 2,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGDisplay {
+    YGDisplayFlex = 0,
+    YGDisplayNone = 1,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGFlexDirection {
+    YGFlexDirectionColumn = 0,
+    YGFlexDirectionColumnReverse = 1,
+    YGFlexDirectionRow = 2,
+    YGFlexDirectionRowReverse = 3,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGJustify {
+    YGJustifyFlexStart = 0,
+    YGJustifyCenter = 1,
+    YGJustifyFlexEnd = 2,
+    YGJustifySpaceBetween = 3,
+    YGJustifySpaceAround = 4,
+    YGJustifySpaceEvenly = 5,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGOverflow {
+    YGOverflowVisible = 0,
+    YGOverflowHidden = 1,
+    YGOverflowScroll = 2,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGPositionType {
+    YGPositionTypeStatic = 0,
+    YGPositionTypeRelative = 1,
+    YGPositionTypeAbsolute = 2,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGUnit {
+    YGUnitUndefined = 0,
+    YGUnitPoint = 1,
+    YGUnitPercent = 2,
+    YGUnitAuto = 3,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGWrap {
+    YGWrapNoWrap = 0,
+    YGWrapWrap = 1,
+    YGWrapWrapReverse = 2,
+    UNRECOGNIZED = -1
 }
 
 

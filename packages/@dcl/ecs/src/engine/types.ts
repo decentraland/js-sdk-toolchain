@@ -3,6 +3,7 @@ import { SdkComponents } from '../components'
 import { Transport } from '../systems/crdt/transports/types'
 import { ComponentDefinition as CompDef } from './component'
 import { Entity } from './entity'
+import { JsxTree } from './jsx/types'
 import { Update } from './systems'
 import type { DeepReadonly } from './utils'
 
@@ -37,6 +38,7 @@ export type IEngine = {
   getComponent<T extends EcsType>(componentId: number): CompDef<T>
   update(dt: number): void
   baseComponents: SdkComponents
+  renderUI(tree: JsxTree): void
 }
 
 /**

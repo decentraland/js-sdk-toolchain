@@ -1,5 +1,5 @@
-import { PBUiText } from '../../src/components/generated/pb/UiText.gen'
-import { PBUiTransform } from '../../src/components/generated/pb/UiTransform.gen'
+import { PBUiText } from '../../components/generated/pb/UiText.gen'
+import { PBUiTransform } from '../../components/generated/pb/UiTransform.gen'
 import {
   YGDisplay,
   YGJustify,
@@ -9,7 +9,20 @@ import {
   YGDirection,
   YGWrap,
   YGOverflow
-} from '../../src/components/generated/pb/UiTransform.gen'
+} from '../../components/generated/pb/UiTransform.gen'
+
+export {
+  YGDisplay,
+  YGJustify,
+  YGPositionType,
+  YGAlign,
+  YGFlexDirection,
+  YGDirection,
+  YGWrap,
+  YGOverflow,
+  PBUiTransform,
+  PBUiText
+}
 
 export type Position = {
   top: number | string
