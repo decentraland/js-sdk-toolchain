@@ -12,7 +12,7 @@ import {
 } from '../../components/generated/pb/UiTransform.gen'
 import { Position } from './types'
 
-export const CANVAS_ROOT_ENTITY = 7
+export const CANVAS_ROOT_ENTITY = 0
 
 export const defaultPosition = (pos?: Position) => ({
   top: pos?.top ?? 0,
