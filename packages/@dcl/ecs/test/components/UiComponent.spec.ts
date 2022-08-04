@@ -17,7 +17,7 @@ describe('UiTransform component', () => {
     const { UiTransform } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     UiTransform.create(entity, {
-      parentEntity: 0,
+      parent: 0,
       alignContent: YGAlign.YGAlignCenter,
       alignItems: YGAlign.YGAlignFlexEnd,
       alignSelf: YGAlign.YGAlignFlexStart,
