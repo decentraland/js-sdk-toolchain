@@ -1157,13 +1157,13 @@ declare enum Orientation {
 }
 
 declare interface PBAnimationState {
-    name: string;
-    clip: string;
-    playing: boolean;
-    weight: number;
-    speed: number;
-    loop: boolean;
-    shouldReset: boolean;
+    name?: string | undefined;
+    clip?: string | undefined;
+    playing?: boolean | undefined;
+    weight?: number | undefined;
+    speed?: number | undefined;
+    loop?: boolean | undefined;
+    shouldReset?: boolean | undefined;
 }
 
 declare interface PBAnimator {
@@ -1171,43 +1171,43 @@ declare interface PBAnimator {
 }
 
 declare interface PBAudioSource {
-    playing: boolean;
-    volume: number;
-    loop: boolean;
-    pitch: number;
-    audioClipUrl: string;
+    playing?: boolean | undefined;
+    volume?: number | undefined;
+    loop?: boolean | undefined;
+    pitch?: number | undefined;
+    audioClipUrl?: string | undefined;
 }
 
 declare interface PBAvatarAttach {
-    avatarId: string;
-    anchorPointId: AvatarAnchorPoint;
+    avatarId?: string | undefined;
+    anchorPointId?: AvatarAnchorPoint | undefined;
 }
 
 declare interface PBAvatarShape {
-    id: string;
-    name: string;
-    bodyShape: string;
-    skinColor: Color3 | undefined;
-    hairColor: Color3 | undefined;
-    eyeColor: Color3 | undefined;
+    id?: string | undefined;
+    name?: string | undefined;
+    bodyShape?: string | undefined;
+    skinColor?: Color3 | undefined;
+    hairColor?: Color3 | undefined;
+    eyeColor?: Color3 | undefined;
     wearables: string[];
-    expressionTriggerId: string;
-    expressionTriggerTimestamp: number;
-    stickerTriggerId: string;
-    stickerTriggerTimestamp: number;
-    talking: boolean;
+    expressionTriggerId?: string | undefined;
+    expressionTriggerTimestamp?: number | undefined;
+    stickerTriggerId?: string | undefined;
+    stickerTriggerTimestamp?: number | undefined;
+    talking?: boolean | undefined;
 }
 
 declare interface PBBillboard {
-    x: boolean;
-    y: boolean;
-    z: boolean;
+    x?: boolean | undefined;
+    y?: boolean | undefined;
+    z?: boolean | undefined;
 }
 
 declare interface PBBoxShape {
-    withCollisions: boolean;
-    isPointerBlocker: boolean;
-    visible: boolean;
+    withCollisions?: boolean | undefined;
+    isPointerBlocker?: boolean | undefined;
+    visible?: boolean | undefined;
     uvs: number[];
 }
 
@@ -1216,75 +1216,75 @@ declare interface PBCameraMode {
 }
 
 declare interface PBCameraModeArea {
-    area: Vector3_2 | undefined;
-    mode: CameraModeValue;
+    area?: Vector3_2 | undefined;
+    mode?: CameraModeValue | undefined;
 }
 
 declare interface PBCylinderShape {
-    withCollisions: boolean;
-    isPointerBlocker: boolean;
-    visible: boolean;
-    radiusTop: number;
-    radiusBottom: number;
+    withCollisions?: boolean | undefined;
+    isPointerBlocker?: boolean | undefined;
+    visible?: boolean | undefined;
+    radiusTop?: number | undefined;
+    radiusBottom?: number | undefined;
 }
 
 declare interface PBGLTFShape {
-    withCollisions: boolean;
-    isPointerBlocker: boolean;
-    visible: boolean;
-    src: string;
+    withCollisions?: boolean | undefined;
+    isPointerBlocker?: boolean | undefined;
+    visible?: boolean | undefined;
+    src?: string | undefined;
 }
 
 declare interface PBNFTShape {
-    withCollisions: boolean;
-    isPointerBlocker: boolean;
-    visible: boolean;
-    src: string;
-    assetId: string;
-    style: number;
-    color: Color3 | undefined;
+    withCollisions?: boolean | undefined;
+    isPointerBlocker?: boolean | undefined;
+    visible?: boolean | undefined;
+    src?: string | undefined;
+    assetId?: string | undefined;
+    style?: number | undefined;
+    color?: Color3 | undefined;
 }
 
 declare interface PBOnPointerDown {
-    button: ActionButton;
-    hoverText: string;
-    distance: number;
-    showFeedback: boolean;
+    button?: ActionButton | undefined;
+    hoverText?: string | undefined;
+    distance?: number | undefined;
+    showFeedback?: boolean | undefined;
 }
 
 declare interface PBOnPointerDownResult {
-    button: ActionButton;
-    meshName: string;
-    origin: Vector3_2 | undefined;
-    direction: Vector3_2 | undefined;
-    point: Vector3_2 | undefined;
-    normal: Vector3_2 | undefined;
-    distance: number;
-    timestamp: number;
+    button?: ActionButton | undefined;
+    meshName?: string | undefined;
+    origin?: Vector3_2 | undefined;
+    direction?: Vector3_2 | undefined;
+    point?: Vector3_2 | undefined;
+    normal?: Vector3_2 | undefined;
+    distance?: number | undefined;
+    timestamp?: number | undefined;
 }
 
 declare interface PBOnPointerUp {
-    button: ActionButton;
-    hoverText: string;
-    distance: number;
-    showFeedback: boolean;
+    button?: ActionButton | undefined;
+    hoverText?: string | undefined;
+    distance?: number | undefined;
+    showFeedback?: boolean | undefined;
 }
 
 declare interface PBOnPointerUpResult {
-    button: ActionButton;
-    meshName: string;
-    origin: Vector3_2 | undefined;
-    direction: Vector3_2 | undefined;
-    point: Vector3_2 | undefined;
-    normal: Vector3_2 | undefined;
-    distance: number;
-    timestamp: number;
+    button?: ActionButton | undefined;
+    meshName?: string | undefined;
+    origin?: Vector3_2 | undefined;
+    direction?: Vector3_2 | undefined;
+    point?: Vector3_2 | undefined;
+    normal?: Vector3_2 | undefined;
+    distance?: number | undefined;
+    timestamp?: number | undefined;
 }
 
 declare interface PBPlaneShape {
-    withCollisions: boolean;
-    isPointerBlocker: boolean;
-    visible: boolean;
+    withCollisions?: boolean | undefined;
+    isPointerBlocker?: boolean | undefined;
+    visible?: boolean | undefined;
     uvs: number[];
 }
 
@@ -1293,36 +1293,36 @@ declare interface PBPointerLock {
 }
 
 declare interface PBSphereShape {
-    withCollisions: boolean;
-    isPointerBlocker: boolean;
-    visible: boolean;
+    withCollisions?: boolean | undefined;
+    isPointerBlocker?: boolean | undefined;
+    visible?: boolean | undefined;
 }
 
 declare interface PBTextShape {
-    text: string;
-    visible: boolean;
-    font: string;
-    opacity: number;
-    fontSize: number;
-    fontAutoSize: boolean;
-    hTextAlign: string;
-    vTextAlign: string;
-    width: number;
-    height: number;
-    paddingTop: number;
-    paddingRight: number;
-    paddingBottom: number;
-    paddingLeft: number;
-    lineSpacing: number;
-    lineCount: number;
-    textWrapping: boolean;
-    shadowBlur: number;
-    shadowOffsetX: number;
-    shadowOffsetY: number;
-    outlineWidth: number;
-    shadowColor: Color3 | undefined;
-    outlineColor: Color3 | undefined;
-    textColor: Color3 | undefined;
+    text?: string | undefined;
+    visible?: boolean | undefined;
+    font?: string | undefined;
+    opacity?: number | undefined;
+    fontSize?: number | undefined;
+    fontAutoSize?: boolean | undefined;
+    hTextAlign?: string | undefined;
+    vTextAlign?: string | undefined;
+    width?: number | undefined;
+    height?: number | undefined;
+    paddingTop?: number | undefined;
+    paddingRight?: number | undefined;
+    paddingBottom?: number | undefined;
+    paddingLeft?: number | undefined;
+    lineSpacing?: number | undefined;
+    lineCount?: number | undefined;
+    textWrapping?: boolean | undefined;
+    shadowBlur?: number | undefined;
+    shadowOffsetX?: number | undefined;
+    shadowOffsetY?: number | undefined;
+    outlineWidth?: number | undefined;
+    shadowColor?: Color3 | undefined;
+    outlineColor?: Color3 | undefined;
+    textColor?: Color3 | undefined;
 }
 
 /**
