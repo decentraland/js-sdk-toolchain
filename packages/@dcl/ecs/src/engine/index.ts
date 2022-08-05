@@ -11,6 +11,7 @@ import { IEngine } from './types'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
 import { ISchema } from '../schemas/ISchema'
+import { defineLibraryComponents } from './../components/generated/index.gen'
 
 export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
 export * from './types'
@@ -154,7 +155,7 @@ export type PreEngine = ReturnType<typeof preEngine>
 export function Engine({ transports }: IEngineParams = {}): IEngine {
   const engine = preEngine()
   const crdtSystem = crdtSceneSystem({ engine, transports: transports || [] })
-  // const baseComponents = defineSdkComponents(engine)
+  const baseComponents = defineLibraryComponents(engine)
 
   function update(dt: number) {
     crdtSystem.receiveMessages()
@@ -165,23 +166,23 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
 
     // Selected components that only exist one frame
     //  then, they are deleted but their crdt state keeps
-    // const removeSelectedComponents = [
-    //   baseComponents.OnPointerDownResult,
-    //   baseComponents.OnPointerUpResult
-    // ]
-    // const excludeComponentIds = removeSelectedComponents.map((item) => item._id)
-    // for (const componentDef of removeSelectedComponents) {
-    //   for (const [entity] of engine.groupOf(componentDef)) {
-    //     componentDef.deleteFrom(entity)
-    //   }
-    // }
+    const removeSelectedComponents = [
+      baseComponents.OnPointerDownResult,
+      baseComponents.OnPointerUpResult
+    ]
+    const excludeComponentIds = removeSelectedComponents.map((item) => item._id)
+    for (const componentDef of removeSelectedComponents) {
+      for (const [entity] of engine.groupOf(componentDef)) {
+        componentDef.deleteFrom(entity)
+      }
+    }
 
     // TODO: Perf tip
     // Should we add some dirtyIteratorSet at engine level so we dont have
     // to iterate all the component definitions to get the dirty ones ?
     const dirtySet = new Map<Entity, Set<number>>()
     for (const [componentId, definition] of engine.componentsDefinition) {
-      // if (excludeComponentIds.includes(componentId)) continue
+      if (excludeComponentIds.includes(componentId)) continue
 
       for (const entity of definition.dirtyIterator()) {
         if (!dirtySet.has(entity)) {
@@ -207,6 +208,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     mutableGroupOf: engine.mutableGroupOf,
     groupOf: engine.groupOf,
     getComponent: engine.getComponent,
-    update
+    update,
+    baseComponents
   }
 }

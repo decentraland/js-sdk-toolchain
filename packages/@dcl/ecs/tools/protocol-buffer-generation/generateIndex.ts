@@ -11,7 +11,7 @@ function importComponent(component: Component) {
 }
 
 function defineComponent(component: Component) {
-  return `${component.componentName} = engine.defineComponent(${component.componentName}Schema.COMPONENT_ID, ${component.componentName}Schema.${component.componentName}Schema)`
+  return `\t\t${component.componentName}: engine.defineComponent(${component.componentName}Schema.COMPONENT_ID, ${component.componentName}Schema.${component.componentName}Schema),`
 }
 
 function useDefinedComponent(component: Component) {
@@ -30,8 +30,14 @@ $componentImports
 
 declare const engine: IEngine
 
+export function defineLibraryComponents({
+  defineComponent
+}: Pick<IEngine, 'defineComponent'>) {
+  return {
 ${defineComponent(TransformComponent)}
 $componentReturns
+  }
+}
 `
 
 const globalTemplate = `import type { IEngine } from '../../engine/types'
@@ -63,6 +69,18 @@ export function generateIndex(param: {
   const componentWithoutIndex = components.filter(
     (component) => component.componentName !== 'index'
   )
+
+  const indexContent = indexTemplate
+    .replace(
+      '$componentReturns',
+      componentWithoutIndex.map(defineComponent).join('\n')
+    )
+    .replace(
+      '$componentImports',
+      componentWithoutIndex.map(importComponent).join('\n')
+    )
+
+  fs.writeFileSync(path.resolve(generatedPath, 'index.gen.ts'), indexContent)
 
   const globalContent = globalTemplate.replace(
     '$componentReturns',

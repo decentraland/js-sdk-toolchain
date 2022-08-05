@@ -184,6 +184,7 @@ export type IEngine = {
     groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
     update(dt: number): void;
+    baseComponents: SdkComponents;
 };
 
 // @public (undocumented)
@@ -287,6 +288,8 @@ export namespace Schemas {
     const // (undocumented)
     Int: ISchema<number>;
     const // (undocumented)
+    Int64: ISchema<number>;
+    const // (undocumented)
     Number: ISchema<number>;
     const // Warning: (ae-forgotten-export) The symbol "IEnum" needs to be exported by the entry point index.d.ts
     //
@@ -325,10 +328,8 @@ export const ToGammaSpace: number;
 // @public
 export const ToLinearSpace = 2.2;
 
-// Warning: (ae-forgotten-export) The symbol "TransformSchema" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
-export const Transform: ComponentDefinition<ISchema<TransformSchema.Transform>>;
+export const Transform: ComponentDefinition<ISchema<Transform_2>>;
 
 // @public (undocumented)
 type Transform_2 = {
@@ -393,8 +394,9 @@ export namespace Vector3 {
 
 // Warnings were encountered during analysis:
 //
-// dist/engine/types.d.ts:24:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
-// dist/engine/types.d.ts:36:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:25:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:32:5 - (ae-forgotten-export) The symbol "SdkComponents" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:38:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

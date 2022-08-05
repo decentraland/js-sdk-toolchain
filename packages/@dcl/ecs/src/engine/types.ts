@@ -1,3 +1,4 @@
+import { SdkComponents } from '../components/types'
 import type { ISchema } from '../schemas/ISchema'
 import { Transport } from '../systems/crdt/transports/types'
 import { ComponentDefinition as CompDef } from './component'
@@ -35,6 +36,7 @@ export type IEngine = {
   ): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>
   getComponent<T extends ISchema>(componentId: number): CompDef<T>
   update(dt: number): void
+  baseComponents: SdkComponents
 }
 
 /**
