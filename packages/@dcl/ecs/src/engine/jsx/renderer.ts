@@ -52,9 +52,7 @@ export function render(engine: Pick<IEngine, 'baseComponents' | 'addEntity'>) {
         parent
         // order,
       })
-      console.log(
-        `<Div parent=${parent} entity=${entity} order=${order} />`
-      )
+      console.log(`<Div parent=${parent} entity=${entity} order=${order} />`)
     }
 
     for (const [index, child] of children.entries()) {
