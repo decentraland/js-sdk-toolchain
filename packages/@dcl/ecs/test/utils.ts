@@ -1,6 +1,5 @@
 import { Quaternion, Vector3 } from '@dcl/ecs-math'
 
-import { Transform } from '../src/components/legacy/Transform'
 import { Engine } from '../src/engine'
 import { Entity } from '../src/engine/entity'
 import { Schemas } from '../src/schemas'
@@ -18,7 +17,7 @@ export namespace SandBox {
   }
   export const Door = { id: 888, type: Schemas.Map({ open: Schemas.Byte }) }
 
-  export const DEFAULT_POSITION: Transform = {
+  export const DEFAULT_POSITION = {
     position: Vector3.create(0, 1, 2),
     scale: Vector3.One(),
     rotation: Quaternion.Identity(),

@@ -15,11 +15,11 @@ function defineComponent(component: Component) {
 }
 
 function useDefinedComponent(component: Component) {
-  return `export const ${component.componentName} = engine.baseComponents.${component.componentName}`
+  return `/** @public */\nexport const ${component.componentName} = engine.baseComponents.${component.componentName}`
 }
 
 function namespaceComponent(component: Component) {
-  return `\texport const ${component.componentName} = ComponentDefinitions.${component.componentName}`
+  return `\t/** @public */\n\texport const ${component.componentName} = ComponentDefinitions.${component.componentName}`
 }
 
 const TransformComponent = { componentId: 1, componentName: 'Transform' }
@@ -48,13 +48,15 @@ $componentReturns
 `
 
 const globalNamespaceTemplate = `import * as ComponentDefinitions from './global.gen'
+/** @public */
 export namespace Components {
 ${namespaceComponent(TransformComponent)}
 $componentNamespace
 }
 `
 
-const idsTemplate = `export enum ECSComponentIDs {
+const idsTemplate = `/** @public */
+export enum ECSComponentIDs {
 ${enumTemplate(TransformComponent)}
 $enumComponentIds
 }

@@ -4,12 +4,15 @@ import { IEnum } from './basic/Enum'
 import { Float32, Float64 } from './basic/Float'
 import { Int16, Int32, Int8, Int64 as iInt64 } from './basic/Integer'
 import { EcsString } from './basic/String'
-import { ISchema as SchemaType } from './ISchema'
+import { ISchema } from './ISchema'
 import { IMap } from './Map'
 import { IOptional } from './Optional'
 
+/**
+ * @public
+ */
 export namespace Schemas {
-  export type ISchema = SchemaType
+  export type SchemaType = ISchema
 
   export const Boolean = Bool
 

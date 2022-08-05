@@ -16,8 +16,10 @@ declare const enum ActionButton {
     UNRECOGNIZED = -1
 }
 
+/** @public */
 declare const Animator: ComponentDefinition<ISchema<PBAnimator>>;
 
+/** @public */
 declare const AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
 
 declare const enum AvatarAnchorPoint {
@@ -28,12 +30,16 @@ declare const enum AvatarAnchorPoint {
     UNRECOGNIZED = -1
 }
 
+/** @public */
 declare const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
 
+/** @public */
 declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
 
+/** @public */
 declare const Billboard: ComponentDefinition<ISchema<PBBillboard>>;
 
+/** @public */
 declare const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
 
 /**
@@ -41,8 +47,10 @@ declare const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
  */
 declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
 
+/** @public */
 declare const CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
 
+/** @public */
 declare const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
 
 declare const enum CameraModeValue {
@@ -79,26 +87,65 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>> = {
     isDirty(entity: Entity): boolean;
 };
 
+/** @public */
 declare namespace Components {
-    const Transform: ComponentDefinition<ISchema<Transform_2>>;
+    /** @public */
+    const Transform: ComponentDefinition<ISchema<    {
+    position: {
+    x: number;
+    y: number;
+    z: number;
+    };
+    rotation: {
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+    };
+    scale: {
+    x: number;
+    y: number;
+    z: number;
+    };
+    parent?: Entity | undefined;
+    }>>;
+    /** @public */
     const Animator: ComponentDefinition<ISchema<PBAnimator>>;
+    /** @public */
     const AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
+    /** @public */
     const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+    /** @public */
     const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+    /** @public */
     const Billboard: ComponentDefinition<ISchema<PBBillboard>>;
+    /** @public */
     const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
+    /** @public */
     const CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
+    /** @public */
     const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
+    /** @public */
     const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
+    /** @public */
     const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+    /** @public */
     const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+    /** @public */
     const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+    /** @public */
     const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+    /** @public */
     const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+    /** @public */
     const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
+    /** @public */
     const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+    /** @public */
     const PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
+    /** @public */
     const SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
+    /** @public */
     const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
 }
 
@@ -252,6 +299,7 @@ declare interface CreateByteBufferOptions {
     initialCapacity?: number;
 }
 
+/** @public */
 declare const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
 
 /**
@@ -263,7 +311,25 @@ declare type DeepReadonly<T> = {
 };
 
 declare function defineLibraryComponents({ defineComponent }: Pick<IEngine, 'defineComponent'>): {
-    Transform: ComponentDefinition<ISchema<TransformSchema.Transform>>;
+    Transform: ComponentDefinition<ISchema<    {
+    position: {
+    x: number;
+    y: number;
+    z: number;
+    };
+    rotation: {
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+    };
+    scale: {
+    x: number;
+    y: number;
+    z: number;
+    };
+    parent?: Entity | undefined;
+    }>>;
     Animator: ComponentDefinition<ISchema<PBAnimator>>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
     AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
@@ -336,6 +402,7 @@ declare type float = number;
 /** @public */
 declare type FloatArray = number[];
 
+/** @public */
 declare const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
 
 /**
@@ -1130,6 +1197,7 @@ declare namespace Matrix {
     function toggleProjectionMatrixHandInPlace(self: MutableMatrix): void;
 }
 
+/** @public */
 declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
 
 /** @public */
@@ -1143,12 +1211,16 @@ declare type OnlyOptionalUndefinedTypes<T> = {
     [K in IncludeUndefined<T>]?: T[K];
 };
 
+/** @public */
 declare const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
 
+/** @public */
 declare const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
 
+/** @public */
 declare const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
 
+/** @public */
 declare const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
 
 /**
@@ -1442,8 +1514,10 @@ declare namespace Plane {
     function signedDistanceTo(plane: ReadonlyPlane, point: Vector3.ReadonlyVector3): number;
 }
 
+/** @public */
 declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
 
+/** @public */
 declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
 
 /**
@@ -1633,8 +1707,11 @@ declare type Result<T extends Spec> = ToOptional<{
     [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? Result<T[K]> : never;
 }>;
 
+/**
+ * @public
+ */
 declare namespace Schemas {
-    export type ISchema = ISchema;
+    export type SchemaType = ISchema;
     const Boolean: ISchema<boolean>;
     const String: ISchema<string>;
     const Float: ISchema<number>;
@@ -1675,8 +1752,10 @@ declare interface Spec {
     [key: string]: ISchema;
 }
 
+/** @public */
 declare const SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
 
+/** @public */
 declare const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
 
 /**
@@ -1693,29 +1772,26 @@ declare const ToLinearSpace = 2.2;
 
 declare type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
-declare const Transform: ComponentDefinition<ISchema<Transform_2>>;
-
-/**
- * @public
- */
-declare type Transform_2 = {
-    position: Vector3.MutableVector3;
-    rotation: Quaternion.MutableQuaternion;
-    scale: Vector3.MutableVector3;
-    parent?: Entity;
+/** @public */
+declare const Transform: ComponentDefinition<ISchema<    {
+position: {
+x: number;
+y: number;
+z: number;
 };
-
-declare const TRANSFORM_LENGTH = 44;
-
-declare namespace TransformSchema {
-    export {
-        Transform_2 as Transform,
-        TRANSFORM_LENGTH,
-        TransformSchema_2 as TransformSchema
-    }
-}
-
-declare const TransformSchema_2: ISchema<Transform_2>;
+rotation: {
+x: number;
+y: number;
+z: number;
+w: number;
+};
+scale: {
+x: number;
+y: number;
+z: number;
+};
+parent?: Entity | undefined;
+}>>;
 
 declare type Transport = {
     type: string;

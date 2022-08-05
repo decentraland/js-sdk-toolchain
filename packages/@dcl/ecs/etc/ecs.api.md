@@ -73,7 +73,25 @@ export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
 // @public (undocumented)
 export namespace Components {
     const // (undocumented)
-    Transform: ComponentDefinition<ISchema<Transform_2>>;
+    Transform: ComponentDefinition<ISchema<    {
+    position: {
+    x: number;
+    y: number;
+    z: number;
+    };
+    rotation: {
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+    };
+    scale: {
+    x: number;
+    y: number;
+    z: number;
+    };
+    parent?: Entity | undefined;
+    }>>;
     const // (undocumented)
     Animator: ComponentDefinition<ISchema<PBAnimator>>;
     const // (undocumented)
@@ -286,7 +304,7 @@ export const RAD2DEG: number;
 // @public (undocumented)
 export namespace Schemas {
     // (undocumented)
-    export type ISchema = ISchema;
+    export type SchemaType = ISchema;
     const // (undocumented)
     Boolean: ISchema<boolean>;
     const // (undocumented)
@@ -343,21 +361,25 @@ export const ToGammaSpace: number;
 export const ToLinearSpace = 2.2;
 
 // @public (undocumented)
-export const Transform: ComponentDefinition<ISchema<Transform_2>>;
-
-// @public (undocumented)
-type Transform_2 = {
-    position: Vector3.MutableVector3;
-    rotation: Quaternion.MutableQuaternion;
-    scale: Vector3.MutableVector3;
-    parent?: Entity;
+export const Transform: ComponentDefinition<ISchema<    {
+position: {
+x: number;
+y: number;
+z: number;
 };
-
-// @public (undocumented)
-const TRANSFORM_LENGTH = 44;
-
-// @public (undocumented)
-const TransformSchema_2: ISchema<Transform_2>;
+rotation: {
+x: number;
+y: number;
+z: number;
+w: number;
+};
+scale: {
+x: number;
+y: number;
+z: number;
+};
+parent?: Entity | undefined;
+}>>;
 
 // @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;

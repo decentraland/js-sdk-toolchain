@@ -1,4 +1,3 @@
-import { Quaternion, Vector3 } from '../../Math'
 import type { ISchema } from '../../schemas/ISchema'
 import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
@@ -9,20 +8,21 @@ import { ByteBuffer } from '../../serialization/ByteBuffer'
 export const COMPONENT_ID = 1
 
 /**
- * @public
+ * @internal
  */
-export type Transform = {
-  position: Vector3.MutableVector3
-  rotation: Quaternion.MutableQuaternion
-  scale: Vector3.MutableVector3
+type TransformType = {
+  position: { x: number; y: number; z: number }
+  rotation: { x: number; y: number; z: number; w: number }
+  scale: { x: number; y: number; z: number }
   parent?: Entity
 }
 
+/** @internal */
 export const TRANSFORM_LENGTH = 44
 
-// This transform can be optimized with Float32Array for example
-export const TransformSchema: ISchema<Transform> = {
-  serialize(value: Transform, builder: ByteBuffer): void {
+/** @internal */
+export const TransformSchema: ISchema<TransformType> = {
+  serialize(value: TransformType, builder: ByteBuffer): void {
     const ptr = builder.incrementWriteOffset(TRANSFORM_LENGTH)
     builder.setFloat32(ptr, value.position.x)
     builder.setFloat32(ptr + 4, value.position.y)
@@ -36,29 +36,29 @@ export const TransformSchema: ISchema<Transform> = {
     builder.setFloat32(ptr + 36, value.scale.z)
     builder.setUint32(ptr + 40, value.parent || 0)
   },
-  deserialize(reader: ByteBuffer): Transform {
+  deserialize(reader: ByteBuffer): TransformType {
     const ptr = reader.incrementReadOffset(TRANSFORM_LENGTH)
     return {
-      position: Vector3.create(
-        reader.getFloat32(ptr),
-        reader.getFloat32(ptr + 4),
-        reader.getFloat32(ptr + 8)
-      ),
-      rotation: Quaternion.create(
-        reader.getFloat32(ptr + 12),
-        reader.getFloat32(ptr + 16),
-        reader.getFloat32(ptr + 20),
-        reader.getFloat32(ptr + 24)
-      ),
-      scale: Vector3.create(
-        reader.getFloat32(ptr + 28),
-        reader.getFloat32(ptr + 32),
-        reader.getFloat32(ptr + 36)
-      ),
+      position: {
+        x: reader.getFloat32(ptr),
+        y: reader.getFloat32(ptr + 4),
+        z: reader.getFloat32(ptr + 8)
+      },
+      rotation: {
+        x: reader.getFloat32(ptr + 12),
+        y: reader.getFloat32(ptr + 16),
+        z: reader.getFloat32(ptr + 20),
+        w: reader.getFloat32(ptr + 24)
+      },
+      scale: {
+        x: reader.getFloat32(ptr + 28),
+        y: reader.getFloat32(ptr + 32),
+        z: reader.getFloat32(ptr + 36)
+      },
       parent: reader.getUint32(ptr + 40) as Entity
     }
   },
-  create() {
+  create(): TransformType {
     return {
       position: { x: 0, y: 0, z: 0 },
       scale: { x: 1, y: 1, z: 1 },
