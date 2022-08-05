@@ -1,19 +1,16 @@
 import { Quaternion, Vector3 } from '@dcl/ecs-math'
 import { TRANSFORM_LENGTH } from '../../src/components/legacy/Transform'
+import { Engine } from '../../src/engine'
 import { Entity } from '../../src/engine/entity'
-import { ensureEngineAndComponents } from './utils'
 
 describe('Transform component', () => {
   it('should transform length 44 bytes ', () => {
     expect(TRANSFORM_LENGTH).toBe(44)
   })
 
-  it('should serialize Transform with 44 bytes', async () => {
-    const {
-      engine: newEngine,
-      components: { Transform }
-    } = await ensureEngineAndComponents()
-
+  it('should serialize Transform with 44 bytes', () => {
+    const newEngine = Engine()
+    const { Transform } = newEngine.baseComponents
     const entity = newEngine.addEntity()
 
     Transform.create(entity, {
@@ -32,12 +29,9 @@ describe('Transform component', () => {
     expect(buffer.toBinary().length).toBe(TRANSFORM_LENGTH)
   })
 
-  it('should serialize/deserialize Transform', async () => {
-    const {
-      engine: newEngine,
-      components: { Transform }
-    } = await ensureEngineAndComponents()
-
+  it('should serialize/deserialize Transform', () => {
+    const newEngine = Engine()
+    const { Transform } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 
@@ -61,11 +55,9 @@ describe('Transform component', () => {
     expect(t1).toBeDeepCloseTo(Transform.getFrom(entityB) as any)
   })
 
-  it('should serialize/deserialize Transform without parent', async () => {
-    const {
-      engine: newEngine,
-      components: { Transform }
-    } = await ensureEngineAndComponents()
+  it('should serialize/deserialize Transform without parent', () => {
+    const newEngine = Engine()
+    const { Transform } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 
@@ -92,11 +84,9 @@ describe('Transform component', () => {
     expect(Transform.getFrom(entityB).parent).toBe(0)
   })
 
-  it('should create a valid empty transform component if no value argument is passed', async () => {
-    const {
-      engine: newEngine,
-      components: { Transform }
-    } = await ensureEngineAndComponents()
+  it('should create a valid empty transform component if no value argument is passed', () => {
+    const newEngine = Engine()
+    const { Transform } = newEngine.baseComponents
     const entity = newEngine.addEntity()
 
     const t1 = Transform.create(entity)
@@ -108,11 +98,9 @@ describe('Transform component', () => {
     })
   })
 
-  it('should create a valid empty transform component if no value argument is passed in getOrCreate', async () => {
-    const {
-      engine: newEngine,
-      components: { Transform }
-    } = await ensureEngineAndComponents()
+  it('should create a valid empty transform component if no value argument is passed in getOrCreate', () => {
+    const newEngine = Engine()
+    const { Transform } = newEngine.baseComponents
     const entity = newEngine.addEntity()
 
     Transform.create(entity, {

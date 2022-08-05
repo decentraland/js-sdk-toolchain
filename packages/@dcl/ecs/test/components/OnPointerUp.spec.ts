@@ -1,12 +1,9 @@
-﻿import { ensureEngineAndComponents } from './utils'
+﻿import { Engine } from '../../src/engine'
 
 describe('Generated OnPointerDown ProtoBuf', () => {
-  it('should serialize/deserialize OnPointerUp', async () => {
-    const {
-      engine: newEngine,
-      components: { OnPointerUp }
-    } = await ensureEngineAndComponents()
-
+  it('should serialize/deserialize OnPointerUp', () => {
+    const newEngine = Engine()
+    const { OnPointerUp } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
     OnPointerUp.create(newEngine.addEntity())
@@ -29,11 +26,9 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     expect(onPointerUp).toBeDeepCloseTo({ ...OnPointerUp.mutable(entityB) })
   })
 
-  it('should receive OnPointerResult', async () => {
-    const {
-      engine: newEngine,
-      components: { OnPointerUp, OnPointerUpResult }
-    } = await ensureEngineAndComponents()
+  it('should receive OnPointerResult', () => {
+    const newEngine = Engine()
+    const { OnPointerUp, OnPointerUpResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     OnPointerUp.create(newEngine.addEntity())
 

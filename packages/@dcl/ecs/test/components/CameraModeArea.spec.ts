@@ -1,13 +1,10 @@
 import { CameraMode } from '../../src/components/generated/pb/CameraModeArea.gen'
-import { ensureEngineAndComponents } from './utils'
+import { Engine } from '../../src/engine'
 
 describe('Generated CameraModifierArea ProtoBuf', () => {
-  it('should serialize/deserialize CameraModifierArea', async () => {
-    const {
-      engine: newEngine,
-      components: { CameraModeArea }
-    } = await ensureEngineAndComponents()
-
+  it('should serialize/deserialize CameraModifierArea', () => {
+    const newEngine = Engine()
+    const { CameraModeArea } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

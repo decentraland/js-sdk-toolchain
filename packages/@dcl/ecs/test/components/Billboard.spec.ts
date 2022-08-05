@@ -1,12 +1,9 @@
-﻿import { ensureEngineAndComponents } from './utils'
+﻿import { Engine } from '../../src/engine'
 
 describe('Generated Billboard ProtoBuf', () => {
-  it('should serialize/deserialize Billboard', async () => {
-    const {
-      engine: newEngine,
-      components: { Billboard }
-    } = await ensureEngineAndComponents()
-
+  it('should serialize/deserialize Billboard', () => {
+    const newEngine = Engine()
+    const { Billboard } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

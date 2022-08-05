@@ -1,11 +1,9 @@
-﻿import { ensureEngineAndComponents } from './utils'
-describe('Generated OnPointerDown ProtoBuf', () => {
-  it('should serialize/deserialize OnPointerDown', async () => {
-    const {
-      engine: newEngine,
-      components: { OnPointerDownResult }
-    } = await ensureEngineAndComponents()
+﻿import { Engine } from '../../src/engine'
 
+describe('Generated OnPointerDown ProtoBuf', () => {
+  it('should serialize/deserialize OnPointerDown', () => {
+    const newEngine = Engine()
+    const { OnPointerDownResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
     OnPointerDownResult.create(newEngine.addEntity())

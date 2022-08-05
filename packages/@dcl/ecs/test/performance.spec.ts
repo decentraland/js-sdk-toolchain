@@ -1,9 +1,9 @@
 import { SandBox } from './utils'
 
 describe('Performance.', () => {
-  it('should run 10k iterations', async () => {
-    const { engine, components, sdk } = (await SandBox.create({ length: 1 }))[0]
-    const { Transform } = sdk
+  it('should run 10k iterations', () => {
+    const { engine, components } = SandBox.create({ length: 1 })[0]
+    const { Transform } = engine.baseComponents
     const NUM_ENTITIES = 1000
     const NUM_ITERATIONS = 1000
 

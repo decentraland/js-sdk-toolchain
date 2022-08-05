@@ -1,12 +1,11 @@
 import { Quaternion, Vector3 } from '@dcl/ecs-math'
 import { Engine } from '../../src/engine'
 import { Entity } from '../../src/engine/entity'
-import { ensureComponentsFromEngine } from './utils'
 
 describe('Legacy component tests', () => {
-  it('cube example scene', async () => {
+  it('cube example scene', () => {
     const engine = Engine()
-    const sdk = await ensureComponentsFromEngine(engine)
+    const sdk = engine.baseComponents
 
     function spawnCube(x: number, y: number, z: number) {
       const newCubeEntity = engine.addEntity()

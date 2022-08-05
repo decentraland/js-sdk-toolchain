@@ -1,12 +1,9 @@
-import { ensureEngineAndComponents } from './utils'
+import { Engine } from '../../src/engine'
 
 describe('Generated BoxShape ProtoBuf', () => {
-  it('should serialize/deserialize BoxShape', async () => {
-    const {
-      engine: newEngine,
-      components: { TextShape }
-    } = await ensureEngineAndComponents()
-
+  it('should serialize/deserialize BoxShape', () => {
+    const newEngine = Engine()
+    const { TextShape } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

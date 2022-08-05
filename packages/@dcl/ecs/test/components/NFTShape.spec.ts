@@ -1,11 +1,9 @@
-import { ensureEngineAndComponents } from './utils'
-describe('Generated NFTShape ProtoBuf', () => {
-  it('should serialize/deserialize NFTShape', async () => {
-    const {
-      engine: newEngine,
-      components: { NFTShape }
-    } = await ensureEngineAndComponents()
+import { Engine } from '../../src/engine'
 
+describe('Generated NFTShape ProtoBuf', () => {
+  it('should serialize/deserialize NFTShape', () => {
+    const newEngine = Engine()
+    const { NFTShape } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

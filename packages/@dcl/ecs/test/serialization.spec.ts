@@ -1,25 +1,34 @@
-import { ComponentSchema, Engine } from '../src/engine'
-import { Schemas } from '../src/schemas'
-import { ISchema } from '../src/schemas/ISchema'
+import {
+  ArrayType,
+  EcsType,
+  Float32,
+  Float64,
+  Int16,
+  Int32,
+  Int64,
+  Int8,
+  MapType,
+  EcsString,
+  Optional,
+  EcsBoolean,
+  Enum
+} from '../src/built-in-types'
+import { Engine } from '../src/engine'
 
-const Vector3 = Schemas.Map({
-  x: Schemas.Float,
-  y: Schemas.Float,
-  z: Schemas.Float
-})
+const Vector3 = MapType({ x: Float32, y: Float32, z: Float32 })
 
 describe('Serialization Types', () => {
   it('should serialize Ints', () => {
     const engine = Engine()
     const entity = engine.addEntity()
     const entityCopied = engine.addEntity()
-    const toTest = [Schemas.Short, Schemas.Int, Schemas.Byte]
+    const toTest = [Int16, Int32, Int8]
     let COMPONENT_ID = 888
 
     for (const t of toTest) {
       const IntegerComponent = engine.defineComponent(
         COMPONENT_ID++,
-        Schemas.Map({ value: t })
+        MapType({ value: t })
       )
       const myInteger = IntegerComponent.create(entity, { value: 33 })
       expect(myInteger.value).toBe(33)
@@ -41,14 +50,14 @@ describe('Serialization Types', () => {
     const engine = Engine()
     const entity = engine.addEntity()
     const entityCopied = engine.addEntity()
-    const toTest = [Schemas.Float, Schemas.Double]
+    const toTest = [Float32, Float64]
     let COMPONENT_ID = 888
     const testValue = 2.0
 
     for (const t of toTest) {
       const FloatComponent = engine.defineComponent(
         COMPONENT_ID++,
-        Schemas.Map({ value: t })
+        MapType({ value: t })
       )
       const myFloat = FloatComponent.create(entity, { value: testValue })
       expect(myFloat.value).toBe(testValue)
@@ -61,7 +70,7 @@ describe('Serialization Types', () => {
     }
 
     expect(Vector3.create()).toEqual({ x: 0, y: 0, z: 0 })
-    expect(Schemas.Double.create()).toEqual(0.0)
+    expect(Float64.create()).toEqual(0.0)
   })
 
   it('should serialize Strings', () => {
@@ -74,7 +83,7 @@ describe('Serialization Types', () => {
 
     const FloatComponent = engine.defineComponent(
       COMPONENT_ID++,
-      Schemas.Map({ value: Schemas.String })
+      MapType({ value: EcsString })
     )
     const myFloat = FloatComponent.create(entity, { value: testValue })
     expect(myFloat.value).toBe(testValue)
@@ -86,19 +95,19 @@ describe('Serialization Types', () => {
     expect(updatedFloat!.value).toBe(testValue)
   })
 
-  it('should serialize Schemas.Maps', () => {
+  it('should serialize MapTypes', () => {
     const engine = Engine()
     const myEntity = engine.addEntity()
     const COMPONENT_ID = 888
 
-    const ItemType = Schemas.Map({
-      itemId: Schemas.Int,
-      name: Schemas.String,
-      enchantingIds: Schemas.Array(
-        Schemas.Map({
-          itemId: Schemas.Int,
-          itemAmount: Schemas.Int,
-          description: Schemas.String
+    const ItemType = MapType({
+      itemId: Int32,
+      name: EcsString,
+      enchantingIds: ArrayType(
+        MapType({
+          itemId: Int32,
+          itemAmount: Int32,
+          description: EcsString
         })
       )
     })
@@ -109,14 +118,14 @@ describe('Serialization Types', () => {
 
     const PlayerComponent = engine.defineComponent(
       COMPONENT_ID,
-      Schemas.Map({
-        name: Schemas.String,
-        description: Schemas.String,
-        level: Schemas.Int,
-        hp: Schemas.Float,
+      MapType({
+        name: EcsString,
+        description: EcsString,
+        level: Int32,
+        hp: Float32,
         position: Vector3,
-        targets: Schemas.Array(Vector3),
-        items: Schemas.Array(ItemType)
+        targets: ArrayType(Vector3),
+        items: ArrayType(ItemType)
       })
     )
 
@@ -166,20 +175,20 @@ describe('Serialization Types', () => {
     expect(modifiedFromBinaryPlayer).toBeDeepCloseTo(originalPlayer)
   })
 
-  it('should serialize Schemas.Optional & Boolean without value (undefined)', () => {
+  it('should serialize Optional & Boolean without value (undefined)', () => {
     const engine = Engine()
     const entity = engine.addEntity()
     const COMPONENT_ID = 888
 
-    const definition = Schemas.Map({
-      optionalColor: Schemas.Optional(
-        Schemas.Map({
-          r: Schemas.Float,
-          g: Schemas.Float,
-          b: Schemas.Float
+    const definition = MapType({
+      optionalColor: Optional(
+        MapType({
+          r: Float32,
+          g: Float32,
+          b: Float32
         })
       ),
-      hasAlpha: Schemas.Boolean
+      hasAlpha: EcsBoolean
     })
 
     const TestComponent = engine.defineComponent(COMPONENT_ID, definition)
@@ -208,17 +217,17 @@ describe('Serialization Types', () => {
     expect(value2.optionalColor).toBeUndefined()
   })
 
-  it('should serialize Schemas.Optional & Boolean with value', () => {
+  it('should serialize Optional & Boolean with value', () => {
     const engine = Engine()
     const entity = engine.addEntity()
     const COMPONENT_ID = 888
 
     const TestComponent = engine.defineComponent(
       COMPONENT_ID,
-      Schemas.Map({
-        optionalColor: Schemas.Optional(Schemas.Boolean),
-        visible: Schemas.Optional(Schemas.Boolean),
-        notVisible: Schemas.Boolean
+      MapType({
+        optionalColor: Optional(EcsBoolean),
+        visible: Optional(EcsBoolean),
+        notVisible: EcsBoolean
       })
     )
 
@@ -243,7 +252,7 @@ describe('Serialization Types', () => {
     )
   })
 
-  it('should serialize Int Schemas.Enums', () => {
+  it('should serialize Int Enums', () => {
     const engine = Engine()
     const entity = engine.addEntity()
     const COMPONENT_ID = 888
@@ -257,7 +266,7 @@ describe('Serialization Types', () => {
 
     const TestComponent = engine.defineComponent(
       COMPONENT_ID,
-      Schemas.Enum<ColorToNumber>(Schemas.Int64)
+      Enum<ColorToNumber>(Int64)
     )
 
     expect(TestComponent.create(entity)).toEqual(0)
@@ -275,7 +284,7 @@ describe('Serialization Types', () => {
     expect(value2).toBe(ColorToNumber.Pink)
   })
 
-  it('should serialize String Schemas.Enum', () => {
+  it('should serialize String Enum', () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
     const COMPONENT_ID = 888
@@ -288,7 +297,7 @@ describe('Serialization Types', () => {
 
     const TestComponent = engine.defineComponent(
       COMPONENT_ID,
-      Schemas.Enum<ColorToString>(Schemas.String)
+      Enum<ColorToString>(EcsString)
     )
 
     // const value1 = TestComponent.create(entity, {})
@@ -315,11 +324,11 @@ describe('Serialization Types', () => {
 
     const TestComponentType = engine.defineComponent(
       COMPONENT_ID,
-      Schemas.Map({
-        a: Schemas.Int,
-        b: Schemas.Int,
-        c: Schemas.Array(Schemas.Int),
-        d: Schemas.Int64
+      MapType({
+        a: Int32,
+        b: Int32,
+        c: ArrayType(Int32),
+        d: Int64
       })
     )
     const myComponent = TestComponentType.create(entityFilled, {
@@ -353,19 +362,19 @@ describe('Serialization Types', () => {
 
     let i = 0
     const A = 'abcdefghijkl'
-    const vectorType: Record<string, ISchema<number>> = {}
+    const vectorType: Record<string, EcsType<number>> = {}
     const objectValues: Record<string, number> = {}
     const zeroObjectValues: Record<string, number> = {}
 
     for (i = 0; i < A.length; i++) {
       const COMPONENT_ID = 888 + i + 1
       const key = A[i]
-      vectorType[key] = Schemas.Int
+      vectorType[key] = Int32
       objectValues[key] = 50 + i
       zeroObjectValues[key] = 0
       const TestComponentType = engine.defineComponent(
         COMPONENT_ID,
-        Schemas.Map(vectorType)
+        MapType(vectorType)
       )
 
       TestComponentType.create(entity, objectValues)

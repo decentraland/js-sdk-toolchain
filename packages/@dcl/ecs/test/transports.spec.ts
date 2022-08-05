@@ -1,10 +1,9 @@
+import { Int8, MapType } from '../src/built-in-types'
 import { Engine } from '../src/engine'
-import { Schemas } from '../src/schemas'
 import WireMessage from '../src/serialization/wireMessage'
 import { createNetworkTransport } from '../src/systems/crdt/transports/networkTransport'
 import { createRendererTransport } from '../src/systems/crdt/transports/rendererTransport'
 import { TransportMessage } from '../src/systems/crdt/types'
-import { ensureComponentsFromEngine } from './components/utils'
 
 describe('Transport tests', () => {
   beforeEach(() => {
@@ -12,15 +11,14 @@ describe('Transport tests', () => {
     jest.restoreAllMocks()
   })
 
-  it('should avoid echo messages', async () => {
+  it('should avoid echo messages', () => {
     const transport = createRendererTransport()
     const engine = Engine({ transports: [transport] })
-    const sdk = await ensureComponentsFromEngine(engine)
     const entity = engine.addEntity()
     const message: TransportMessage = {
       type: WireMessage.Enum.PUT_COMPONENT,
       entity,
-      componentId: sdk.Transform._id,
+      componentId: engine.baseComponents.Transform._id,
       timestamp: Date.now(),
       transportType: 'renderer',
       messageBuffer: new Uint8Array()
@@ -28,20 +26,16 @@ describe('Transport tests', () => {
     expect(transport.filter(message)).toBe(false)
   })
 
-  it('should test transports', async () => {
+  it('should test transports', () => {
     const transports = [createNetworkTransport(), createRendererTransport()]
     const networkSpy = jest.spyOn(transports[0], 'send')
     const rendererSpy = jest.spyOn(transports[1], 'send')
     const engine = Engine({ transports })
-    const sdk = await ensureComponentsFromEngine(engine)
     const entity = engine.addDynamicEntity()
-    const UserComponent = engine.defineComponent(
-      8888,
-      Schemas.Map({ x: Schemas.Byte })
-    )
+    const UserComponent = engine.defineComponent(8888, MapType({ x: Int8 }))
 
     // Transform component should be sent to renderer transport
-    sdk.Transform.create(entity)
+    engine.baseComponents.Transform.create(entity)
     engine.update(1)
 
     expect(networkSpy).toBeCalledTimes(1)
@@ -49,7 +43,7 @@ describe('Transport tests', () => {
     jest.resetAllMocks()
 
     // BoxShape component should be sent to renderer transport
-    sdk.BoxShape.create(entity)
+    engine.baseComponents.BoxShape.create(entity)
     engine.update(1)
 
     expect(networkSpy).toBeCalledTimes(1)
