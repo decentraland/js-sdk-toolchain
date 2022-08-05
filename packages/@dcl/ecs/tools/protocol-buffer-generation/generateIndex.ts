@@ -11,7 +11,11 @@ function importComponent(component: Component) {
 }
 
 function defineComponent(component: Component) {
-  return `export const ${component.componentName} = engine.defineComponent(${component.componentName}Schema.COMPONENT_ID, ${component.componentName}Schema.${component.componentName})`
+  return `${component.componentName} = engine.defineComponent(${component.componentName}Schema.COMPONENT_ID, ${component.componentName}Schema.${component.componentName}Schema)`
+}
+
+function useDefinedComponent(component: Component) {
+  return `export const ${component.componentName} = engine.baseComponents.${component.componentName}`
 }
 
 function namespaceComponent(component: Component) {
@@ -26,19 +30,27 @@ $componentImports
 
 declare const engine: IEngine
 
-export enum ECSComponentIDs {
-${enumTemplate(TransformComponent)}
-$enumComponentIds
-}
-
 ${defineComponent(TransformComponent)}
 $componentReturns
 `
 
-const namespaceTemplate = `import * as ComponentDefinitions from './index.gen'
+const globalTemplate = `import type { IEngine } from '../../engine/types'
+declare const engine: IEngine
+
+${useDefinedComponent(TransformComponent)}
+$componentReturns
+`
+
+const globalNamespaceTemplate = `import * as ComponentDefinitions from './global.gen'
 export namespace Components {
 ${namespaceComponent(TransformComponent)}
 $componentNamespace
+}
+`
+
+const idsTemplate = `export enum ECSComponentIDs {
+${enumTemplate(TransformComponent)}
+$enumComponentIds
 }
 `
 
@@ -52,29 +64,27 @@ export function generateIndex(param: {
     (component) => component.componentName !== 'index'
   )
 
-  const indexContent = indexTemplate
-    .replace(
-      '$componentImports',
-      componentWithoutIndex.map(importComponent).join('\n')
-    )
-    .replace(
-      '$componentReturns',
-      componentWithoutIndex.map(defineComponent).join('\n')
-    )
-    .replace(
-      '$enumComponentIds',
-      componentWithoutIndex.map(enumTemplate).join('\n')
-    )
+  const globalContent = globalTemplate.replace(
+    '$componentReturns',
+    componentWithoutIndex.map(useDefinedComponent).join('\n')
+  )
 
-  fs.writeFileSync(path.resolve(generatedPath, 'index.gen.ts'), indexContent)
+  fs.writeFileSync(path.resolve(generatedPath, 'global.gen.ts'), globalContent)
 
-  const namespaceContent = namespaceTemplate.replace(
+  const namespaceContent = globalNamespaceTemplate.replace(
     '$componentNamespace',
     componentWithoutIndex.map(namespaceComponent).join('\n')
   )
 
   fs.writeFileSync(
-    path.resolve(generatedPath, 'index.namespace.gen.ts'),
+    path.resolve(generatedPath, 'global.namespace.gen.ts'),
     namespaceContent
   )
+
+  const idsContent = idsTemplate.replace(
+    '$enumComponentIds',
+    componentWithoutIndex.map(enumTemplate).join('\n')
+  )
+
+  fs.writeFileSync(path.resolve(generatedPath, 'ids.gen.ts'), idsContent)
 }

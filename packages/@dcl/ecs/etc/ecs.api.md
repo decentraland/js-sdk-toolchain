@@ -150,46 +150,6 @@ export const DEG2RAD: number;
 export type double = number;
 
 // @public (undocumented)
-export enum ECSComponentIDs {
-    // (undocumented)
-    Animator = 1042,
-    // (undocumented)
-    AudioSource = 1020,
-    // (undocumented)
-    AvatarAttach = 1073,
-    // (undocumented)
-    AvatarShape = 1080,
-    // (undocumented)
-    Billboard = 1090,
-    // (undocumented)
-    BoxShape = 1013,
-    // (undocumented)
-    CameraModeArea = 1071,
-    // (undocumented)
-    CylinderShape = 1016,
-    // (undocumented)
-    GLTFShape = 1041,
-    // (undocumented)
-    NFTShape = 1040,
-    // (undocumented)
-    OnPointerDown = 1060,
-    // (undocumented)
-    OnPointerDownResult = 1066,
-    // (undocumented)
-    OnPointerUp = 1061,
-    // (undocumented)
-    OnPointerUpResult = 1065,
-    // (undocumented)
-    PlaneShape = 1014,
-    // (undocumented)
-    SphereShape = 1015,
-    // (undocumented)
-    TextShape = 1030,
-    // (undocumented)
-    Transform = 1
-}
-
-// @public (undocumented)
 export function Engine({ transports }?: IEngineParams): IEngine;
 
 // @alpha
@@ -379,10 +339,10 @@ type Transform_2 = {
 };
 
 // @public (undocumented)
-const Transform_2: ISchema<Transform_2>;
+const TRANSFORM_LENGTH = 44;
 
 // @public (undocumented)
-const TRANSFORM_LENGTH = 44;
+const TransformSchema_2: ISchema<Transform_2>;
 
 // @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;

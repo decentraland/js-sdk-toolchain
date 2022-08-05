@@ -1,10 +1,11 @@
 import { Quaternion, Vector3 } from '@dcl/ecs-math'
 
-import { Float32, Int8, MapType } from '../src/built-in-types'
+import { Schemas } from '../src/schemas'
 import { Transform } from '../src/components/legacy/Transform'
 import { Engine } from '../src/engine'
 import { Entity } from '../src/engine/entity'
 import * as transport from '../src/systems/crdt/transports/networkTransport'
+import { ensureComponentsFromEngine } from './components/utils'
 
 export function wait(ms: number) {
   return new Promise<void>((resolve) => setTimeout(() => resolve(), ms))
@@ -12,10 +13,13 @@ export function wait(ms: number) {
 
 export namespace SandBox {
   export const WS_SEND_DELAY = 30
-  export const Position = { id: 88, type: MapType({ x: Float32, y: Float32 }) }
-  export const Door = { id: 888, type: MapType({ open: Int8 }) }
+  export const Position = {
+    id: 88,
+    type: Schemas.Map({ x: Schemas.Float, y: Schemas.Float })
+  }
+  export const Door = { id: 888, type: Schemas.Map({ open: Schemas.Byte }) }
 
-  export const DEFAULT_POSITION: ReturnType<typeof Transform['deserialize']> = {
+  export const DEFAULT_POSITION: Transform = {
     position: Vector3.create(0, 1, 2),
     scale: Vector3.One(),
     rotation: Quaternion.Identity(),
@@ -26,10 +30,11 @@ export namespace SandBox {
    * Mock websocket transport so we can fake communication
    * between two engines. WebSocket A <-> WebSocket B
    */
-  export function create({ length }: { length: number }) {
-    const clients = Array.from({ length }).map((_, index) => {
+  export async function create({ length }: { length: number }) {
+    async function createClient(id: number) {
       const clientTransport = transport.createNetworkTransport()
       const engine = Engine({ transports: [clientTransport] })
+      const sdk = await ensureComponentsFromEngine(engine)
       const Position = engine.defineComponent(
         SandBox.Position.id,
         SandBox.Position.type
@@ -37,13 +42,19 @@ export namespace SandBox {
       const Door = engine.defineComponent(SandBox.Door.id, SandBox.Door.type)
 
       return {
-        id: index,
+        id,
         engine,
         transports: [clientTransport],
         components: { Door, Position },
-        spySend: jest.spyOn(clientTransport, 'send')
+        spySend: jest.spyOn(clientTransport, 'send'),
+        sdk
       }
-    })
+    }
+
+    const clientPromises = Array.from({ length }).map(async (_, index) =>
+      createClient(index)
+    )
+    const clients = await Promise.all(clientPromises)
 
     for (const client of clients) {
       for (const transport of client.transports) {

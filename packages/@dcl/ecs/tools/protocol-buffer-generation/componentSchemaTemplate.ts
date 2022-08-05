@@ -10,7 +10,7 @@ export const COMPONENT_ID = INVALID_COMPONENT_ID
 /**
  * @internal
  */
-export const Component: ISchema<PBComponent> = {
+export const ComponentSchema: ISchema<PBComponent> = {
   serialize(value: PBComponent, builder: ByteBuffer): void {
     const writer = PBComponent.encode(value)
     const buffer = new Uint8Array(writer.finish(), 0, writer.len)

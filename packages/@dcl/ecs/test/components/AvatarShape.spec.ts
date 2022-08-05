@@ -1,9 +1,12 @@
-﻿import { Engine } from '../../src/engine'
+﻿import { ensureEngineAndComponents } from './utils'
 
 describe('Generated AvatarShape ProtoBuf', () => {
-  it('should serialize/deserialize AvatarShape', () => {
-    const newEngine = Engine()
-    const { AvatarShape } = newEngine.baseComponents
+  it('should serialize/deserialize AvatarShape', async () => {
+    const {
+      engine: newEngine,
+      components: { AvatarShape }
+    } = await ensureEngineAndComponents()
+
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

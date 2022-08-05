@@ -1,9 +1,12 @@
-﻿import { Engine } from '../../src/engine'
+﻿import { ensureEngineAndComponents } from './utils'
 
-describe('Generated BoxShape ProtoBuf', () => {
-  it('should serialize/deserialize BoxShape', () => {
-    const newEngine = Engine()
-    const { AvatarAttach } = newEngine.baseComponents
+describe('Generated AvatarAttach ProtoBuf', () => {
+  it('should serialize/deserialize AvatarAttach', async () => {
+    const {
+      engine: newEngine,
+      components: { AvatarAttach }
+    } = await ensureEngineAndComponents()
+
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

@@ -5,6 +5,7 @@ import { Entity } from '../src/engine/entity'
 import { createByteBuffer } from '../src/serialization/ByteBuffer'
 import { ComponentOperation } from '../src/serialization/crdt/componentOperation'
 import WireMessage from '../src/serialization/wireMessage'
+import { ensureEngineAndComponents } from './components/utils'
 
 const putType = WireMessage.Enum.PUT_COMPONENT
 
@@ -22,9 +23,9 @@ describe('Component operation tests', () => {
     expect(WireMessage.validate(buf)).toBe(false)
   })
 
-  it('serialize and process two PutComenentOperation message', () => {
-    const newEngine = Engine()
-    const sdk = newEngine.baseComponents
+  it('serialize and process two PutComenentOperation message', async () => {
+    const { engine: newEngine, components: sdk } =
+      await ensureEngineAndComponents()
     const entityA = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

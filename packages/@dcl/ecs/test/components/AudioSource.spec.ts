@@ -1,9 +1,11 @@
-﻿import { Engine } from '../../src/engine'
+﻿import { ensureEngineAndComponents } from './utils'
 
 describe('Generated AudioSource ProtoBuf', () => {
-  it('should serialize/deserialize BoxShape', () => {
-    const newEngine = Engine()
-    const { AudioSource } = newEngine.baseComponents
+  it('should serialize/deserialize AudioSource', async () => {
+    const {
+      engine: newEngine,
+      components: { AudioSource }
+    } = await ensureEngineAndComponents()
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

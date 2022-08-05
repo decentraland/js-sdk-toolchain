@@ -1,6 +1,6 @@
 import { TransportMessage } from '../types'
 import { Transport } from './types'
-import { ECSComponentIDs } from '../../../components/generated/index.gen'
+import { ECSComponentIDs } from '../../../components/generated/ids.gen'
 
 const componentIds = Object.values(ECSComponentIDs)
   .filter((a) => typeof a === 'number')

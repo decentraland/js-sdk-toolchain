@@ -21,7 +21,7 @@ export type Transform = {
 export const TRANSFORM_LENGTH = 44
 
 // This transform can be optimized with Float32Array for example
-export const Transform: ISchema<Transform> = {
+export const TransformSchema: ISchema<Transform> = {
   serialize(value: Transform, builder: ByteBuffer): void {
     const ptr = builder.incrementWriteOffset(TRANSFORM_LENGTH)
     builder.setFloat32(ptr, value.position.x)

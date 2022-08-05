@@ -1,10 +1,13 @@
 ﻿import { ActionButton } from '../../src/components/generated/pb/common/ActionButton.gen'
-import { Engine } from '../../src/engine'
+import { ensureEngineAndComponents } from './utils'
 
 describe('Generated OnPointerDown ProtoBuf', () => {
-  it('should serialize/deserialize OnPointerDown', () => {
-    const newEngine = Engine()
-    const { OnPointerDown } = newEngine.baseComponents
+  it('should serialize/deserialize OnPointerDown', async () => {
+    const {
+      engine: newEngine,
+      components: { OnPointerDown }
+    } = await ensureEngineAndComponents()
+
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
     OnPointerDown.create(newEngine.addEntity())
@@ -27,9 +30,12 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     expect(onPointerDown).toEqual({ ...OnPointerDown.mutable(entityB) })
   })
 
-  it('should receive OnPointerResult', () => {
-    const newEngine = Engine()
-    const { OnPointerDown, OnPointerDownResult } = newEngine.baseComponents
+  it('should receive OnPointerResult', async () => {
+    const {
+      engine: newEngine,
+      components: { OnPointerDownResult, OnPointerDown }
+    } = await ensureEngineAndComponents()
+
     const entity = newEngine.addEntity()
     OnPointerDown.create(newEngine.addEntity())
 
