@@ -11,7 +11,7 @@ function importComponent(component: Component) {
 }
 
 function defineComponent(component: Component) {
-  return `\t\t${component.componentName}: engine.defineComponent(${component.componentName}Schema.COMPONENT_ID, ${component.componentName}Schema.${component.componentName}Schema),`
+  return `\t\t${component.componentName}: defineComponent(${component.componentName}Schema.COMPONENT_ID, ${component.componentName}Schema.${component.componentName}Schema),`
 }
 
 function useDefinedComponent(component: Component) {
