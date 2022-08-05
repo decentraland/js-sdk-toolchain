@@ -40,6 +40,11 @@ export const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
 // @public (undocumented)
 export type ByteBuffer = ReturnType<typeof createByteBuffer>;
 
+// Warning: (ae-forgotten-export) The symbol "PBCameraMode" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export const CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
+
 // Warning: (ae-forgotten-export) The symbol "PBCameraModeArea" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
@@ -82,6 +87,8 @@ export namespace Components {
     const // (undocumented)
     BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
     const // (undocumented)
+    CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
+    const // (undocumented)
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
     const // Warning: (ae-forgotten-export) The symbol "PBCylinderShape" needs to be exported by the entry point index.d.ts
     //
@@ -115,6 +122,10 @@ export namespace Components {
     //
     // (undocumented)
     PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBPointerLock" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
     const // Warning: (ae-forgotten-export) The symbol "PBSphereShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -224,6 +235,9 @@ export enum Orientation {
 
 // @public (undocumented)
 export const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+
+// @public (undocumented)
+export const PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
 
 // @public (undocumented)
 export namespace Quaternion {
