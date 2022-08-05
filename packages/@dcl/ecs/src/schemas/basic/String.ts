@@ -1,10 +1,10 @@
 import { ByteBuffer } from '../../serialization/ByteBuffer'
-import { EcsType } from '../EcsType'
+import { ISchema } from '../ISchema'
 
 /**
  * @public
  */
-export const FlatString: EcsType<string> = {
+export const FlatString: ISchema<string> = {
   serialize(value: string, builder: ByteBuffer): void {
     builder.writeBuffer(new TextEncoder().encode(value))
   },

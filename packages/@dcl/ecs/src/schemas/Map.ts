@@ -1,19 +1,19 @@
 import { ByteBuffer } from '../serialization/ByteBuffer'
-import { EcsType } from './EcsType'
+import { ISchema } from './ISchema'
 import { ToOptional } from './typing'
 
 /**
  * @public
  */
 export interface Spec {
-  [key: string]: EcsType
+  [key: string]: ISchema
 }
 
 /**
  * @public
  */
 export type Result<T extends Spec> = ToOptional<{
-  [K in keyof T]: T[K] extends EcsType
+  [K in keyof T]: T[K] extends ISchema
     ? ReturnType<T[K]['deserialize']>
     : T[K] extends Spec
     ? Result<T[K]>
@@ -23,7 +23,7 @@ export type Result<T extends Spec> = ToOptional<{
 /**
  * @public
  */
-export function MapType<T extends Spec>(spec: T): EcsType<Result<T>> {
+export function IMap<T extends Spec>(spec: T): ISchema<Result<T>> {
   return {
     serialize(value: Result<T>, builder: ByteBuffer): void {
       for (const key in spec) {

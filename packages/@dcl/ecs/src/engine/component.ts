@@ -1,4 +1,4 @@
-import type { EcsType } from '../built-in-types/EcsType'
+import type { ISchema } from '../schemas/ISchema'
 import { ByteBuffer, createByteBuffer } from '../serialization/ByteBuffer'
 import { Entity } from './entity'
 import { deepReadonly, DeepReadonly } from './utils'
@@ -6,19 +6,19 @@ import { deepReadonly, DeepReadonly } from './utils'
 /**
  * @public
  */
-export type EcsResult<T extends EcsType> = T extends EcsType
+export type EcsResult<T extends ISchema> = T extends ISchema
   ? ReturnType<T['deserialize']>
   : never
 
 /**
  * @public
  */
-export type ComponentType<T extends EcsType> = EcsResult<T>
+export type ComponentType<T extends ISchema> = EcsResult<T>
 
 /**
  * @public
  */
-export type ComponentDefinition<T extends EcsType = EcsType<any>> = {
+export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
   _id: number
   has(entity: Entity): boolean
   getFrom(entity: Entity): DeepReadonly<ComponentType<T>>
@@ -48,7 +48,7 @@ export type ComponentDefinition<T extends EcsType = EcsType<any>> = {
   isDirty(entity: Entity): boolean
 }
 
-export function defineComponent<T extends EcsType>(
+export function defineComponent<T extends ISchema>(
   componentId: number,
   spec: T
   // meta: { syncFlags }

@@ -2,34 +2,45 @@ import fs from 'fs'
 import path from 'path'
 import { Component } from './generateComponent'
 
-const indexTemplate = `$componentImports
-import type { IEngine } from '../../engine/types'
-
-export enum ComponentIds {
-  $enumComponentIds
-}
-
-export function defineProtocolBufferComponents({
-  defineComponent
-}: Pick<IEngine, 'defineComponent'>) {
-
-  return {
-$componentReturns
-  }
-}
-`
-
 function enumTemplate({ componentName, componentId }: Component) {
-  return `${componentName} = ${componentId},`
+  return `\t${componentName} = ${componentId},`
 }
 
 function importComponent(component: Component) {
-  return `import * as ${component.componentName} from './${component.componentName}.gen'`
+  return `import * as ${component.componentName}Schema from './${component.componentName}.gen'`
 }
 
 function defineComponent(component: Component) {
-  return `${component.componentName}: defineComponent(${component.componentName}.COMPONENT_ID, ${component.componentName}.${component.componentName})`
+  return `export const ${component.componentName} = engine.defineComponent(${component.componentName}Schema.COMPONENT_ID, ${component.componentName}Schema.${component.componentName})`
 }
+
+function namespaceComponent(component: Component) {
+  return `\texport const ${component.componentName} = ComponentDefinitions.${component.componentName}`
+}
+
+const TransformComponent = { componentId: 1, componentName: 'Transform' }
+
+const indexTemplate = `import type { IEngine } from '../../engine/types'
+import * as TransformSchema from './../legacy/Transform'
+$componentImports
+
+declare const engine: IEngine
+
+export enum ECSComponentIDs {
+${enumTemplate(TransformComponent)}
+$enumComponentIds
+}
+
+${defineComponent(TransformComponent)}
+$componentReturns
+`
+
+const namespaceTemplate = `import * as ComponentDefinitions from './index.gen'
+export namespace Components {
+${namespaceComponent(TransformComponent)}
+$componentNamespace
+}
+`
 
 export function generateIndex(param: {
   components: Component[]
@@ -48,7 +59,7 @@ export function generateIndex(param: {
     )
     .replace(
       '$componentReturns',
-      componentWithoutIndex.map(defineComponent).join(',\n')
+      componentWithoutIndex.map(defineComponent).join('\n')
     )
     .replace(
       '$enumComponentIds',
@@ -56,4 +67,14 @@ export function generateIndex(param: {
     )
 
   fs.writeFileSync(path.resolve(generatedPath, 'index.gen.ts'), indexContent)
+
+  const namespaceContent = namespaceTemplate.replace(
+    '$componentNamespace',
+    componentWithoutIndex.map(namespaceComponent).join('\n')
+  )
+
+  fs.writeFileSync(
+    path.resolve(generatedPath, 'index.namespace.gen.ts'),
+    namespaceContent
+  )
 }

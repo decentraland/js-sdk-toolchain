@@ -4,16 +4,49 @@
 
 ```ts
 
+// Warning: (ae-forgotten-export) The symbol "ISchema" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "PBAnimator" needs to be exported by the entry point index.d.ts
+//
 // @public (undocumented)
-export function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>>;
+export const Animator: ComponentDefinition<ISchema<PBAnimator>>;
+
+// Warning: (ae-forgotten-export) The symbol "PBAudioSource" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export const AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
+
+// Warning: (ae-forgotten-export) The symbol "PBAvatarAttach" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+
+// Warning: (ae-forgotten-export) The symbol "PBAvatarShape" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+
+// Warning: (ae-forgotten-export) The symbol "PBBillboard" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export const Billboard: ComponentDefinition<ISchema<PBBillboard>>;
+
+// Warning: (ae-forgotten-export) The symbol "PBBoxShape" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
 
 // Warning: (ae-forgotten-export) The symbol "createByteBuffer" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export type ByteBuffer = ReturnType<typeof createByteBuffer>;
 
+// Warning: (ae-forgotten-export) The symbol "PBCameraModeArea" needs to be exported by the entry point index.d.ts
+//
 // @public (undocumented)
-export type ComponentDefinition<T extends EcsType = EcsType<any>> = {
+export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
+
+// @public (undocumented)
+export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
     _id: number;
     has(entity: Entity): boolean;
     getFrom(entity: Entity): DeepReadonly<ComponentType<T>>;
@@ -33,14 +66,77 @@ export type ComponentDefinition<T extends EcsType = EcsType<any>> = {
 };
 
 // @public (undocumented)
-export type ComponentEcsType<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
+export namespace Components {
+    const // (undocumented)
+    Transform: ComponentDefinition<ISchema<Transform_2>>;
+    const // (undocumented)
+    Animator: ComponentDefinition<ISchema<PBAnimator>>;
+    const // (undocumented)
+    AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
+    const // (undocumented)
+    AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+    const // (undocumented)
+    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+    const // (undocumented)
+    Billboard: ComponentDefinition<ISchema<PBBillboard>>;
+    const // (undocumented)
+    BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
+    const // (undocumented)
+    CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBCylinderShape" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBGLTFShape" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBNFTShape" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerDown" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerDownResult" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUp" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUpResult" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBPlaneShape" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBSphereShape" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBTextShape" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    TextShape: ComponentDefinition<ISchema<PBTextShape>>;
+}
+
+// @public (undocumented)
+export type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
     [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['mutable']> : never;
 };
 
 // Warning: (ae-forgotten-export) The symbol "EcsResult" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export type ComponentType<T extends EcsType> = EcsResult<T>;
+export type ComponentType<T extends ISchema> = EcsResult<T>;
+
+// @public (undocumented)
+export const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
 
 // @public
 export type DeepReadonly<T> = {
@@ -54,17 +150,44 @@ export const DEG2RAD: number;
 export type double = number;
 
 // @public (undocumented)
-export const EcsBoolean: EcsType<boolean>;
-
-// @public (undocumented)
-export const EcsString: EcsType<string>;
-
-// @public (undocumented)
-export type EcsType<T = any> = {
-    serialize(value: T, builder: ByteBuffer): void;
-    deserialize(reader: ByteBuffer): T;
-    create(): T;
-};
+export enum ECSComponentIDs {
+    // (undocumented)
+    Animator = 1042,
+    // (undocumented)
+    AudioSource = 1020,
+    // (undocumented)
+    AvatarAttach = 1073,
+    // (undocumented)
+    AvatarShape = 1080,
+    // (undocumented)
+    Billboard = 1090,
+    // (undocumented)
+    BoxShape = 1013,
+    // (undocumented)
+    CameraModeArea = 1071,
+    // (undocumented)
+    CylinderShape = 1016,
+    // (undocumented)
+    GLTFShape = 1041,
+    // (undocumented)
+    NFTShape = 1040,
+    // (undocumented)
+    OnPointerDown = 1060,
+    // (undocumented)
+    OnPointerDownResult = 1066,
+    // (undocumented)
+    OnPointerUp = 1061,
+    // (undocumented)
+    OnPointerUpResult = 1065,
+    // (undocumented)
+    PlaneShape = 1014,
+    // (undocumented)
+    SphereShape = 1015,
+    // (undocumented)
+    TextShape = 1030,
+    // (undocumented)
+    Transform = 1
+}
 
 // @public (undocumented)
 export function Engine({ transports }?: IEngineParams): IEngine;
@@ -77,26 +200,17 @@ export type Entity = number & {
     [entitySymbol]: true;
 };
 
-// @public (undocumented)
-export function Enum<T>(type: EcsType<any>): EcsType<T>;
-
 // @public
 export const Epsilon = 0.000001;
-
-// @public (undocumented)
-export const FlatString: EcsType<string>;
 
 // @public (undocumented)
 export type float = number;
 
 // @public (undocumented)
-export const Float32: EcsType<number>;
-
-// @public (undocumented)
-export const Float64: EcsType<number>;
-
-// @public (undocumented)
 export type FloatArray = number[];
+
+// @public (undocumented)
+export const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
 
 // @public (undocumented)
 export type IEngine = {
@@ -105,30 +219,17 @@ export type IEngine = {
     removeEntity(entity: Entity): void;
     addSystem(system: Update, priority?: number, name?: string): void;
     removeSystem(selector: string | Update): boolean;
-    defineComponent<T extends EcsType>(componentId: number, spec: T): ComponentDefinition<T>;
-    mutableGroupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ComponentEcsType<T>]>;
-    groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentEcsType<T>>]>;
-    getComponent<T extends EcsType>(componentId: number): ComponentDefinition<T>;
+    defineComponent<T extends ISchema>(componentId: number, spec: T): ComponentDefinition<T>;
+    mutableGroupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ComponentSchema<T>]>;
+    groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
+    getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
     update(dt: number): void;
-    baseComponents: SdkComponents;
 };
 
 // @public (undocumented)
 export type IEngineParams = {
     transports?: Transport[];
 };
-
-// @public (undocumented)
-export const Int16: EcsType<number>;
-
-// @public (undocumented)
-export const Int32: EcsType<number>;
-
-// @public (undocumented)
-export const Int64: EcsType<number>;
-
-// @public (undocumented)
-export const Int8: EcsType<number>;
 
 // @public
 export interface ISize {
@@ -137,19 +238,31 @@ export interface ISize {
 }
 
 // @public (undocumented)
-export function MapType<T extends Spec>(spec: T): EcsType<Result<T>>;
+export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
 
 // @public (undocumented)
 export type Nullable<T> = T | null;
 
 // @public (undocumented)
-export function Optional<T>(spec: EcsType<T>): EcsType<T | undefined>;
+export const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+
+// @public (undocumented)
+export const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+
+// @public (undocumented)
+export const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+
+// @public (undocumented)
+export const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
 
 // @public
 export enum Orientation {
     CCW = 1,
     CW = 0
 }
+
+// @public (undocumented)
+export const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
 
 // @public (undocumented)
 export namespace Quaternion {
@@ -195,17 +308,43 @@ export namespace Quaternion {
 // @public
 export const RAD2DEG: number;
 
-// Warning: (ae-forgotten-export) The symbol "ToOptional" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
-export type Result<T extends Spec> = ToOptional<{
-    [K in keyof T]: T[K] extends EcsType ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? Result<T[K]> : never;
-}>;
-
-// Warning: (ae-forgotten-export) The symbol "defineSdkComponents" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
-export type SdkComponents = ReturnType<typeof defineSdkComponents>;
+export namespace Schemas {
+    // (undocumented)
+    export type ISchema = ISchema;
+    const // (undocumented)
+    Boolean: ISchema<boolean>;
+    const // (undocumented)
+    String: ISchema<string>;
+    const // (undocumented)
+    Float: ISchema<number>;
+    const // (undocumented)
+    Double: ISchema<number>;
+    const // (undocumented)
+    Byte: ISchema<number>;
+    const // (undocumented)
+    Short: ISchema<number>;
+    const // (undocumented)
+    Int: ISchema<number>;
+    const // (undocumented)
+    Number: ISchema<number>;
+    const // Warning: (ae-forgotten-export) The symbol "IEnum" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    Enum: typeof IEnum;
+    const // Warning: (ae-forgotten-export) The symbol "IArray" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    Array: typeof IArray;
+    const // Warning: (ae-forgotten-export) The symbol "IMap" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    Map: typeof IMap;
+    const // Warning: (ae-forgotten-export) The symbol "IOptional" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    Optional: typeof IOptional;
+}
 
 // @public
 export enum Space {
@@ -215,16 +354,35 @@ export enum Space {
 }
 
 // @public (undocumented)
-export interface Spec {
-    // (undocumented)
-    [key: string]: EcsType;
-}
+export const SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
+
+// @public (undocumented)
+export const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
 
 // @public
 export const ToGammaSpace: number;
 
 // @public
 export const ToLinearSpace = 2.2;
+
+// Warning: (ae-forgotten-export) The symbol "TransformSchema" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export const Transform: ComponentDefinition<ISchema<TransformSchema.Transform>>;
+
+// @public (undocumented)
+type Transform_2 = {
+    position: Vector3.MutableVector3;
+    rotation: Quaternion.MutableQuaternion;
+    scale: Vector3.MutableVector3;
+    parent?: Entity;
+};
+
+// @public (undocumented)
+const Transform_2: ISchema<Transform_2>;
+
+// @public (undocumented)
+const TRANSFORM_LENGTH = 44;
 
 // @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;
@@ -275,8 +433,8 @@ export namespace Vector3 {
 
 // Warnings were encountered during analysis:
 //
-// dist/engine/types.d.ts:25:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
-// dist/engine/types.d.ts:38:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:24:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:36:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

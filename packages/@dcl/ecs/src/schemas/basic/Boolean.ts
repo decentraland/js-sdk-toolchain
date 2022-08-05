@@ -1,10 +1,10 @@
 import { ByteBuffer } from '../../serialization/ByteBuffer'
-import { EcsType } from '../EcsType'
+import { ISchema } from '../ISchema'
 
 /**
  * @public
  */
-export const EcsBoolean: EcsType<boolean> = {
+export const Bool: ISchema<boolean> = {
   serialize(value: boolean, builder: ByteBuffer): void {
     builder.writeInt8(value ? 1 : 0)
   },

@@ -1,4 +1,3 @@
-import { defineSdkComponents, SdkComponents } from '../components'
 import { crdtSceneSystem } from '../systems/crdt'
 import { Entity, EntityContainer } from './entity'
 import {
@@ -6,14 +5,14 @@ import {
   ComponentDefinition,
   defineComponent as defComponent
 } from './component'
-import type { ComponentEcsType, IEngineParams } from './types'
+import type { ComponentSchema, IEngineParams } from './types'
 import type { DeepReadonly } from '../Math'
-import type { EcsType } from '../built-in-types/EcsType'
 import { IEngine } from './types'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
+import { ISchema } from '../schemas/ISchema'
 
-export { ComponentType, Entity, ByteBuffer, SdkComponents, ComponentDefinition }
+export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
 export * from './types'
 
 function preEngine() {
@@ -59,7 +58,7 @@ function preEngine() {
     return entityContainer.removeEntity(entity)
   }
 
-  function defineComponent<T extends EcsType>(
+  function defineComponent<T extends ISchema>(
     componentId: number,
     spec: T
   ): ComponentDefinition<T> {
@@ -71,7 +70,7 @@ function preEngine() {
     return newComponent
   }
 
-  function getComponent<T extends EcsType>(
+  function getComponent<T extends ISchema>(
     componentId: number
   ): ComponentDefinition<T> {
     const component = componentsDefinition.get(componentId)
@@ -85,22 +84,22 @@ function preEngine() {
 
   function* mutableGroupOf<
     T extends [ComponentDefinition, ...ComponentDefinition[]]
-  >(...components: T): Iterable<[Entity, ...ComponentEcsType<T>]> {
+  >(...components: T): Iterable<[Entity, ...ComponentSchema<T>]> {
     for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
       yield [entity, ...groupComp.map((c) => c.mutable(entity))] as [
         Entity,
-        ...ComponentEcsType<T>
+        ...ComponentSchema<T>
       ]
     }
   }
 
   function* groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(
     ...components: T
-  ): Iterable<[Entity, ...DeepReadonly<ComponentEcsType<T>>]> {
+  ): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]> {
     for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
       yield [entity, ...groupComp.map((c) => c.getFrom(entity))] as [
         Entity,
-        ...DeepReadonly<ComponentEcsType<T>>
+        ...DeepReadonly<ComponentSchema<T>>
       ]
     }
   }
@@ -155,7 +154,7 @@ export type PreEngine = ReturnType<typeof preEngine>
 export function Engine({ transports }: IEngineParams = {}): IEngine {
   const engine = preEngine()
   const crdtSystem = crdtSceneSystem({ engine, transports: transports || [] })
-  const baseComponents = defineSdkComponents(engine)
+  // const baseComponents = defineSdkComponents(engine)
 
   function update(dt: number) {
     crdtSystem.receiveMessages()
@@ -166,23 +165,23 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
 
     // Selected components that only exist one frame
     //  then, they are deleted but their crdt state keeps
-    const removeSelectedComponents = [
-      baseComponents.OnPointerDownResult,
-      baseComponents.OnPointerUpResult
-    ]
-    const excludeComponentIds = removeSelectedComponents.map((item) => item._id)
-    for (const componentDef of removeSelectedComponents) {
-      for (const [entity] of engine.groupOf(componentDef)) {
-        componentDef.deleteFrom(entity)
-      }
-    }
+    // const removeSelectedComponents = [
+    //   baseComponents.OnPointerDownResult,
+    //   baseComponents.OnPointerUpResult
+    // ]
+    // const excludeComponentIds = removeSelectedComponents.map((item) => item._id)
+    // for (const componentDef of removeSelectedComponents) {
+    //   for (const [entity] of engine.groupOf(componentDef)) {
+    //     componentDef.deleteFrom(entity)
+    //   }
+    // }
 
     // TODO: Perf tip
     // Should we add some dirtyIteratorSet at engine level so we dont have
     // to iterate all the component definitions to get the dirty ones ?
     const dirtySet = new Map<Entity, Set<number>>()
     for (const [componentId, definition] of engine.componentsDefinition) {
-      if (excludeComponentIds.includes(componentId)) continue
+      // if (excludeComponentIds.includes(componentId)) continue
 
       for (const entity of definition.dirtyIterator()) {
         if (!dirtySet.has(entity)) {
@@ -208,7 +207,6 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     mutableGroupOf: engine.mutableGroupOf,
     groupOf: engine.groupOf,
     getComponent: engine.getComponent,
-    update,
-    baseComponents
+    update
   }
 }

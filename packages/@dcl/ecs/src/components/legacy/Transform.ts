@@ -1,7 +1,12 @@
 import { Quaternion, Vector3 } from '../../Math'
-import type { EcsType } from '../../built-in-types/EcsType'
+import type { ISchema } from '../../schemas/ISchema'
 import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
+
+/**
+ * @internal
+ */
+export const COMPONENT_ID = 1
 
 /**
  * @public
@@ -16,7 +21,7 @@ export type Transform = {
 export const TRANSFORM_LENGTH = 44
 
 // This transform can be optimized with Float32Array for example
-export const Transform: EcsType<Transform> = {
+export const Transform: ISchema<Transform> = {
   serialize(value: Transform, builder: ByteBuffer): void {
     const ptr = builder.incrementWriteOffset(TRANSFORM_LENGTH)
     builder.setFloat32(ptr, value.position.x)

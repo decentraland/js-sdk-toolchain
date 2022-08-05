@@ -1,6 +1,6 @@
 import {
   ArrayType,
-  EcsType,
+  ComponentSchema,
   Float32,
   Float64,
   Int16,
@@ -362,7 +362,7 @@ describe('Serialization Types', () => {
 
     let i = 0
     const A = 'abcdefghijkl'
-    const vectorType: Record<string, EcsType<number>> = {}
+    const vectorType: Record<string, ComponentSchema<number>> = {}
     const objectValues: Record<string, number> = {}
     const zeroObjectValues: Record<string, number> = {}
 
