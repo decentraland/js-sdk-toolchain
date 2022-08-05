@@ -21,12 +21,20 @@ declare const enum ActionButton {
  */
 declare function ArrayType<T>(type: ComponentSchema<T>): ComponentSchema<Array<T>>;
 
+declare const enum AvatarAnchorPoint {
+    POSITION = 0,
+    NAME_TAG = 1,
+    LEFT_HAND = 2,
+    RIGHT_HAND = 3,
+    UNRECOGNIZED = -1
+}
+
 /**
  * @public
  */
 declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
 
-declare const enum CameraMode {
+declare const enum CameraModeValue {
     FIRST_PERSON = 0,
     THIRD_PERSON = 1,
     UNRECOGNIZED = -1
@@ -219,6 +227,7 @@ declare type DeepReadonly<T> = {
 };
 
 declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): {
+<<<<<<< HEAD
     Animator: ComponentDefinition<ComponentSchema<PBAnimator>>;
     AudioSource: ComponentDefinition<ComponentSchema<PBAudioSource>>;
     AvatarAttach: ComponentDefinition<ComponentSchema<PBAvatarAttach>>;
@@ -237,6 +246,28 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): 
     SphereShape: ComponentDefinition<ComponentSchema<PBSphereShape>>;
     TextShape: ComponentDefinition<ComponentSchema<PBTextShape>>;
     Transform: ComponentDefinition<ComponentSchema<Transform>>;
+=======
+    Animator: ComponentDefinition<EcsType<PBAnimator>>;
+    AudioSource: ComponentDefinition<EcsType<PBAudioSource>>;
+    AvatarAttach: ComponentDefinition<EcsType<PBAvatarAttach>>;
+    AvatarShape: ComponentDefinition<EcsType<PBAvatarShape>>;
+    Billboard: ComponentDefinition<EcsType<PBBillboard>>;
+    BoxShape: ComponentDefinition<EcsType<PBBoxShape>>;
+    CameraMode: ComponentDefinition<EcsType<PBCameraMode>>;
+    CameraModeArea: ComponentDefinition<EcsType<PBCameraModeArea>>;
+    CylinderShape: ComponentDefinition<EcsType<PBCylinderShape>>;
+    GLTFShape: ComponentDefinition<EcsType<PBGLTFShape>>;
+    NFTShape: ComponentDefinition<EcsType<PBNFTShape>>;
+    OnPointerDown: ComponentDefinition<EcsType<PBOnPointerDown>>;
+    OnPointerDownResult: ComponentDefinition<EcsType<PBOnPointerDownResult>>;
+    OnPointerUp: ComponentDefinition<EcsType<PBOnPointerUp>>;
+    OnPointerUpResult: ComponentDefinition<EcsType<PBOnPointerUpResult>>;
+    PlaneShape: ComponentDefinition<EcsType<PBPlaneShape>>;
+    PointerLock: ComponentDefinition<EcsType<PBPointerLock>>;
+    SphereShape: ComponentDefinition<EcsType<PBSphereShape>>;
+    TextShape: ComponentDefinition<EcsType<PBTextShape>>;
+    Transform: ComponentDefinition<EcsType<Transform>>;
+>>>>>>> main
 };
 
 /**
@@ -1170,7 +1201,7 @@ declare interface PBAudioSource {
 
 declare interface PBAvatarAttach {
     avatarId: string;
-    anchorPointId: number;
+    anchorPointId: AvatarAnchorPoint;
 }
 
 declare interface PBAvatarShape {
@@ -1201,9 +1232,13 @@ declare interface PBBoxShape {
     uvs: number[];
 }
 
+declare interface PBCameraMode {
+    mode: CameraModeValue;
+}
+
 declare interface PBCameraModeArea {
     area: Vector3_2 | undefined;
-    mode: CameraMode;
+    mode: CameraModeValue;
 }
 
 declare interface PBCylinderShape {
@@ -1272,6 +1307,10 @@ declare interface PBPlaneShape {
     isPointerBlocker: boolean;
     visible: boolean;
     uvs: number[];
+}
+
+declare interface PBPointerLock {
+    isPointerLocked: boolean;
 }
 
 declare interface PBSphereShape {
