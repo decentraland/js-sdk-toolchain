@@ -1,5 +1,5 @@
-import { Engine } from '../../src/engine'
 import { CameraModeValue } from '../../src/components/generated/pb/common/CameraModeValue.gen'
+import { Engine } from '../../src/engine'
 
 describe('Generated CameraModifierArea ProtoBuf', () => {
   it('should serialize/deserialize CameraModifierArea', () => {
