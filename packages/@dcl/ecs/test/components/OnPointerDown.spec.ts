@@ -11,14 +11,14 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     const onPointerDown = OnPointerDown.create(entity, {
       button: ActionButton.PRIMARY,
       hoverText: 'Tap to run',
-      distance: 10,
+      maxDistance: 10,
       showFeedback: true
     })
 
     OnPointerDown.create(entityB, {
       button: ActionButton.SECONDARY,
       hoverText: 'TCker',
-      distance: 5,
+      maxDistance: 5,
       showFeedback: false
     })
     const buffer = OnPointerDown.toBinary(entity)
@@ -37,7 +37,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     OnPointerDown.create(entity, {
       button: ActionButton.PRIMARY,
       hoverText: 'Tap to run',
-      distance: 10,
+      maxDistance: 10,
       showFeedback: true
     })
 
