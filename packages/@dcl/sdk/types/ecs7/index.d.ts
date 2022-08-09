@@ -1159,11 +1159,14 @@ declare enum Orientation {
 declare interface PBAnimationState {
     name: string;
     clip: string;
-    playing: boolean;
-    weight: number;
-    speed: number;
-    loop: boolean;
-    shouldReset: boolean;
+    playing?: boolean | undefined;
+    /** default=1.0s */
+    weight?: number | undefined;
+    /** default=1.0 */
+    speed?: number | undefined;
+    /** default=true */
+    loop?: boolean | undefined;
+    shouldReset?: boolean | undefined;
 }
 
 declare interface PBAnimator {
@@ -1171,10 +1174,12 @@ declare interface PBAnimator {
 }
 
 declare interface PBAudioSource {
-    playing: boolean;
-    volume: number;
-    loop: boolean;
-    pitch: number;
+    playing?: boolean | undefined;
+    /** default=1.0f */
+    volume?: number | undefined;
+    loop?: boolean | undefined;
+    /** default=1.0f */
+    pitch?: number | undefined;
     audioClipUrl: string;
 }
 
@@ -1185,29 +1190,35 @@ declare interface PBAvatarAttach {
 
 declare interface PBAvatarShape {
     id: string;
-    name: string;
-    bodyShape: string;
-    skinColor: Color3 | undefined;
-    hairColor: Color3 | undefined;
-    eyeColor: Color3 | undefined;
+    name?: string | undefined;
+    bodyShape?: string | undefined;
+    skinColor?: Color3 | undefined;
+    hairColor?: Color3 | undefined;
+    eyeColor?: Color3 | undefined;
     wearables: string[];
-    expressionTriggerId: string;
-    expressionTriggerTimestamp: number;
-    stickerTriggerId: string;
-    stickerTriggerTimestamp: number;
-    talking: boolean;
+    expressionTriggerId?: string | undefined;
+    expressionTriggerTimestamp?: number | undefined;
+    stickerTriggerId?: string | undefined;
+    stickerTriggerTimestamp?: number | undefined;
+    talking?: boolean | undefined;
 }
 
 declare interface PBBillboard {
-    x: boolean;
-    y: boolean;
-    z: boolean;
+    /** default=true */
+    x?: boolean | undefined;
+    /** default=true */
+    y?: boolean | undefined;
+    /** default=true */
+    z?: boolean | undefined;
 }
 
 declare interface PBBoxShape {
-    withCollisions: boolean;
-    isPointerBlocker: boolean;
-    visible: boolean;
+    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
+    withCollisions?: boolean | undefined;
+    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
+    isPointerBlocker?: boolean | undefined;
+    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
+    visible?: boolean | undefined;
     uvs: number[];
 }
 
@@ -1221,35 +1232,50 @@ declare interface PBCameraModeArea {
 }
 
 declare interface PBCylinderShape {
-    withCollisions: boolean;
-    isPointerBlocker: boolean;
-    visible: boolean;
-    radiusTop: number;
-    radiusBottom: number;
+    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
+    withCollisions?: boolean | undefined;
+    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
+    isPointerBlocker?: boolean | undefined;
+    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
+    visible?: boolean | undefined;
+    /** default=1.0 */
+    radiusTop?: number | undefined;
+    /** default=1.0 */
+    radiusBottom?: number | undefined;
 }
 
 declare interface PBGLTFShape {
-    withCollisions: boolean;
-    isPointerBlocker: boolean;
-    visible: boolean;
+    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
+    withCollisions?: boolean | undefined;
+    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
+    isPointerBlocker?: boolean | undefined;
+    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
+    visible?: boolean | undefined;
     src: string;
 }
 
 declare interface PBNFTShape {
-    withCollisions: boolean;
-    isPointerBlocker: boolean;
-    visible: boolean;
+    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
+    withCollisions?: boolean | undefined;
+    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
+    isPointerBlocker?: boolean | undefined;
+    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
+    visible?: boolean | undefined;
     src: string;
-    assetId: string;
-    style: number;
-    color: Color3 | undefined;
+    assetId?: string | undefined;
+    style?: number | undefined;
+    color?: Color3 | undefined;
 }
 
 declare interface PBOnPointerDown {
-    button: ActionButton;
-    hoverText: string;
-    distance: number;
-    showFeedback: boolean;
+    /** default=ActionButton.ANY */
+    button?: ActionButton | undefined;
+    /** default='Interact' */
+    hoverText?: string | undefined;
+    /** default=10 */
+    maxDistance?: number | undefined;
+    /** default=true */
+    showFeedback?: boolean | undefined;
 }
 
 declare interface PBOnPointerDownResult {
@@ -1264,10 +1290,14 @@ declare interface PBOnPointerDownResult {
 }
 
 declare interface PBOnPointerUp {
-    button: ActionButton;
-    hoverText: string;
-    distance: number;
-    showFeedback: boolean;
+    /** default=ActionButton.ANY */
+    button?: ActionButton | undefined;
+    /** default='Interact' */
+    hoverText?: string | undefined;
+    /** default=10 */
+    maxDistance?: number | undefined;
+    /** default=true */
+    showFeedback?: boolean | undefined;
 }
 
 declare interface PBOnPointerUpResult {
@@ -1282,9 +1312,12 @@ declare interface PBOnPointerUpResult {
 }
 
 declare interface PBPlaneShape {
-    withCollisions: boolean;
-    isPointerBlocker: boolean;
-    visible: boolean;
+    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
+    withCollisions?: boolean | undefined;
+    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
+    isPointerBlocker?: boolean | undefined;
+    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
+    visible?: boolean | undefined;
     uvs: number[];
 }
 
@@ -1293,36 +1326,49 @@ declare interface PBPointerLock {
 }
 
 declare interface PBSphereShape {
-    withCollisions: boolean;
-    isPointerBlocker: boolean;
-    visible: boolean;
+    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
+    withCollisions?: boolean | undefined;
+    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
+    isPointerBlocker?: boolean | undefined;
+    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
+    visible?: boolean | undefined;
 }
 
 declare interface PBTextShape {
     text: string;
-    visible: boolean;
-    font: string;
-    opacity: number;
-    fontSize: number;
-    fontAutoSize: boolean;
-    hTextAlign: string;
-    vTextAlign: string;
-    width: number;
-    height: number;
-    paddingTop: number;
-    paddingRight: number;
-    paddingBottom: number;
-    paddingLeft: number;
-    lineSpacing: number;
-    lineCount: number;
-    textWrapping: boolean;
-    shadowBlur: number;
-    shadowOffsetX: number;
-    shadowOffsetY: number;
-    outlineWidth: number;
-    shadowColor: Color3 | undefined;
-    outlineColor: Color3 | undefined;
-    textColor: Color3 | undefined;
+    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
+    visible?: boolean | undefined;
+    font?: string | undefined;
+    /** default=1.0f */
+    opacity?: number | undefined;
+    /** default=10 */
+    fontSize?: number | undefined;
+    fontAutoSize?: boolean | undefined;
+    /** default='center' */
+    hTextAlign?: string | undefined;
+    /** default='center' */
+    vTextAlign?: string | undefined;
+    /** default=1 */
+    width?: number | undefined;
+    /** default=1 */
+    height?: number | undefined;
+    paddingTop?: number | undefined;
+    paddingRight?: number | undefined;
+    paddingBottom?: number | undefined;
+    paddingLeft?: number | undefined;
+    lineSpacing?: number | undefined;
+    lineCount?: number | undefined;
+    textWrapping?: boolean | undefined;
+    shadowBlur?: number | undefined;
+    shadowOffsetX?: number | undefined;
+    shadowOffsetY?: number | undefined;
+    outlineWidth?: number | undefined;
+    /** default=(1.0,1.0,1.0) */
+    shadowColor?: Color3 | undefined;
+    /** default=(1.0,1.0,1.0) */
+    outlineColor?: Color3 | undefined;
+    /** default=(1.0,1.0,1.0) */
+    textColor?: Color3 | undefined;
 }
 
 /**
