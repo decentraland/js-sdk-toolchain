@@ -153,7 +153,6 @@ const serveFolders = (app: express.Application, baseFolders: string[]) => {
   })
 
   app.post('/content/entities/active', (req, res) => {
-    console.log(`POINTERS ${JSON.stringify(req.body)}`)
     return res.json(pointerRequestHandler(req.body.pointers)).end()
   })
 }
