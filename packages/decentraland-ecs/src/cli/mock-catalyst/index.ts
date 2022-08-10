@@ -129,22 +129,30 @@ const serveFolders = (app: express.Application, baseFolders: string[]) => {
     }
   })
 
-  app.get('/content/entities/scene', (req, res) => {
-    if (!req.query.pointer) {
-      res.json([])
-      return
+  function pointerRequestHandler(pointers: unknown) {
+    if (!pointers) {
+      return []
     }
 
     const requestedPointers = new Set<string>(
-      req.query.pointer && typeof req.query.pointer === 'string'
-        ? [req.query.pointer as string]
-        : (req.query.pointer as string[])
+      pointers && typeof pointers === 'string'
+        ? [pointers as string]
+        : (pointers as string[])
     )
 
     const resultEntities = getSceneJson({
       baseFolders,
       pointers: Array.from(requestedPointers)
     })
-    res.json(resultEntities).end()
+
+    return resultEntities
+  }
+
+  app.get('/content/entities/scene', (req, res) => {
+    return res.json(pointerRequestHandler(req.query.pointer)).end()
+  })
+
+  app.post('/content/entities/active', (req, res) => {
+    return res.json(pointerRequestHandler(req.body.pointers)).end()
   })
 }

@@ -69,6 +69,8 @@ const setupProxy = (dcl: any, app: express.Application) => {
     }
   }
 
+  app.use(express.json())
+
   try {
     mockCatalyst(app, [...baseSceneFolders, ...baseWearableFolders])
   } catch (err) {
