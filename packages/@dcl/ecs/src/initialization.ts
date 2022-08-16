@@ -37,8 +37,3 @@ if (dcl) {
       .finally(() => engine.update(dt))
   })
 }
-
-;(globalThis as any).engine = engine
-
-export * from './components/generated/global.gen'
-export * from './components/generated/global.namespace.gen'

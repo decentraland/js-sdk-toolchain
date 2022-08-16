@@ -105,6 +105,7 @@ declare namespace Components {
     scale: {
     x: number;
     y: number;
+    /** @public */
     z: number;
     };
     parent?: Entity | undefined;

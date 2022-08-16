@@ -19,7 +19,7 @@ function useDefinedComponent(component: Component) {
 }
 
 function namespaceComponent(component: Component) {
-  return `\t/** @public */\n\texport const ${component.componentName} = ComponentDefinitions.${component.componentName}`
+  return `\t/** @public */\n\texport const ${component.componentName} = engine.baseComponents.${component.componentName}`
 }
 
 const TransformComponent = { componentId: 1, componentName: 'Transform' }
@@ -40,14 +40,13 @@ $componentReturns
 }
 `
 
-const globalTemplate = `import type { IEngine } from '../../engine/types'
-declare const engine: IEngine
+const globalTemplate = `import { engine } from '../../initialization'
 
 ${useDefinedComponent(TransformComponent)}
 $componentReturns
 `
 
-const globalNamespaceTemplate = `import * as ComponentDefinitions from './global.gen'
+const globalNamespaceTemplate = `import { engine } from '../../initialization'
 /** @public */
 export namespace Components {
 ${namespaceComponent(TransformComponent)}
