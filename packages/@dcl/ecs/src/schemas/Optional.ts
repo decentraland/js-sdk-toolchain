@@ -1,10 +1,10 @@
 import { ByteBuffer } from '../serialization/ByteBuffer'
-import { EcsType } from './EcsType'
+import { ISchema } from './ISchema'
 
 /**
  * @public
  */
-export function Optional<T>(spec: EcsType<T>): EcsType<T | undefined> {
+export function IOptional<T>(spec: ISchema<T>): ISchema<T | undefined> {
   return {
     serialize(value: T | undefined, builder: ByteBuffer): void {
       if (value) {

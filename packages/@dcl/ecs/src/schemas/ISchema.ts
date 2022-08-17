@@ -3,7 +3,7 @@ import { ByteBuffer } from '../serialization/ByteBuffer'
 /**
  * @public
  */
-export type EcsType<T = any> = {
+export type ISchema<T = any> = {
   serialize(value: T, builder: ByteBuffer): void
   deserialize(reader: ByteBuffer): T
   create(): T

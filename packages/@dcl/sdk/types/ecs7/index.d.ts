@@ -16,10 +16,11 @@ declare const enum ActionButton {
     UNRECOGNIZED = -1
 }
 
-/**
- * @public
- */
-declare function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>>;
+/** @public */
+declare const Animator: ComponentDefinition<ISchema<PBAnimator>>;
+
+/** @public */
+declare const AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
 
 declare const enum AvatarAnchorPoint {
     POSITION = 0,
@@ -29,10 +30,28 @@ declare const enum AvatarAnchorPoint {
     UNRECOGNIZED = -1
 }
 
+/** @public */
+declare const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+
+/** @public */
+declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+
+/** @public */
+declare const Billboard: ComponentDefinition<ISchema<PBBillboard>>;
+
+/** @public */
+declare const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
+
 /**
  * @public
  */
 declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
+
+/** @public */
+declare const CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
+
+/** @public */
+declare const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
 
 declare const enum CameraModeValue {
     FIRST_PERSON = 0,
@@ -49,7 +68,7 @@ declare interface Color3 {
 /**
  * @public
  */
-declare type ComponentDefinition<T extends EcsType = EcsType<any>> = {
+declare type ComponentDefinition<T extends ISchema = ISchema<any>> = {
     _id: number;
     has(entity: Entity): boolean;
     getFrom(entity: Entity): DeepReadonly<ComponentType<T>>;
@@ -68,17 +87,80 @@ declare type ComponentDefinition<T extends EcsType = EcsType<any>> = {
     isDirty(entity: Entity): boolean;
 };
 
+/** @public */
+declare namespace Components {
+    /** @public */
+    const Transform: ComponentDefinition<ISchema<    {
+    position: {
+    x: number;
+    y: number;
+    z: number;
+    };
+    rotation: {
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+    };
+    scale: {
+    x: number;
+    y: number;
+    /** @public */
+    z: number;
+    };
+    parent?: Entity | undefined;
+    }>>;
+    /** @public */
+    const Animator: ComponentDefinition<ISchema<PBAnimator>>;
+    /** @public */
+    const AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
+    /** @public */
+    const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+    /** @public */
+    const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+    /** @public */
+    const Billboard: ComponentDefinition<ISchema<PBBillboard>>;
+    /** @public */
+    const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
+    /** @public */
+    const CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
+    /** @public */
+    const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
+    /** @public */
+    const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
+    /** @public */
+    const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+    /** @public */
+    const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+    /** @public */
+    const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+    /** @public */
+    const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+    /** @public */
+    const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+    /** @public */
+    const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
+    /** @public */
+    const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+    /** @public */
+    const PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
+    /** @public */
+    const SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
+    /** @public */
+    const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
+}
+
 /**
  * @public
  */
-declare type ComponentEcsType<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
+declare type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
     [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['mutable']> : never;
 };
 
 /**
  * @public
  */
-declare type ComponentType<T extends EcsType> = EcsResult<T>;
+declare type ComponentType<T extends ISchema> = EcsResult<T>;
 
 /**
  * ByteBuffer is a wrapper of DataView which also adds a read and write offset.
@@ -218,6 +300,9 @@ declare interface CreateByteBufferOptions {
     initialCapacity?: number;
 }
 
+/** @public */
+declare const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
+
 /**
  * Make each field readonly deeply
  * @public
@@ -226,27 +311,45 @@ declare type DeepReadonly<T> = {
     readonly [P in keyof T]: DeepReadonly<T[P]>;
 };
 
-declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): {
-    Animator: ComponentDefinition<EcsType<PBAnimator>>;
-    AudioSource: ComponentDefinition<EcsType<PBAudioSource>>;
-    AvatarAttach: ComponentDefinition<EcsType<PBAvatarAttach>>;
-    AvatarShape: ComponentDefinition<EcsType<PBAvatarShape>>;
-    Billboard: ComponentDefinition<EcsType<PBBillboard>>;
-    BoxShape: ComponentDefinition<EcsType<PBBoxShape>>;
-    CameraMode: ComponentDefinition<EcsType<PBCameraMode>>;
-    CameraModeArea: ComponentDefinition<EcsType<PBCameraModeArea>>;
-    CylinderShape: ComponentDefinition<EcsType<PBCylinderShape>>;
-    GLTFShape: ComponentDefinition<EcsType<PBGLTFShape>>;
-    NFTShape: ComponentDefinition<EcsType<PBNFTShape>>;
-    OnPointerDown: ComponentDefinition<EcsType<PBOnPointerDown>>;
-    OnPointerDownResult: ComponentDefinition<EcsType<PBOnPointerDownResult>>;
-    OnPointerUp: ComponentDefinition<EcsType<PBOnPointerUp>>;
-    OnPointerUpResult: ComponentDefinition<EcsType<PBOnPointerUpResult>>;
-    PlaneShape: ComponentDefinition<EcsType<PBPlaneShape>>;
-    PointerLock: ComponentDefinition<EcsType<PBPointerLock>>;
-    SphereShape: ComponentDefinition<EcsType<PBSphereShape>>;
-    TextShape: ComponentDefinition<EcsType<PBTextShape>>;
-    Transform: ComponentDefinition<EcsType<Transform>>;
+declare function defineLibraryComponents({ defineComponent }: Pick<IEngine, 'defineComponent'>): {
+    Transform: ComponentDefinition<ISchema<    {
+    position: {
+    x: number;
+    y: number;
+    z: number;
+    };
+    rotation: {
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+    };
+    scale: {
+    x: number;
+    y: number;
+    z: number;
+    };
+    parent?: Entity | undefined;
+    }>>;
+    Animator: ComponentDefinition<ISchema<PBAnimator>>;
+    AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
+    AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+    Billboard: ComponentDefinition<ISchema<PBBillboard>>;
+    BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
+    CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
+    CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
+    CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
+    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+    NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
+    PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+    PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
+    SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
+    TextShape: ComponentDefinition<ISchema<PBTextShape>>;
 };
 
 /**
@@ -261,26 +364,7 @@ declare type double = number;
 /**
  * @public
  */
-declare const EcsBoolean: EcsType<boolean>;
-
-/**
- * @public
- */
-declare type EcsResult<T extends EcsType> = T extends EcsType ? ReturnType<T['deserialize']> : never;
-
-/**
- * @public
- */
-declare const EcsString: EcsType<string>;
-
-/**
- * @public
- */
-declare type EcsType<T = any> = {
-    serialize(value: T, builder: ByteBuffer): void;
-    deserialize(reader: ByteBuffer): T;
-    create(): T;
-};
+declare type EcsResult<T extends ISchema> = T extends ISchema ? ReturnType<T['deserialize']> : never;
 
 /**
  * @public
@@ -303,11 +387,6 @@ declare type Entity = number & {
 declare const entitySymbol: unique symbol;
 
 /**
- * @public
- */
-declare function Enum<T>(type: EcsType<any>): EcsType<T>;
-
-/**
  * Constant used to define the minimal number value in Babylon.js
  * @public
  */
@@ -318,26 +397,19 @@ declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
 }[keyof T];
 
-/**
- * @public
- */
-declare const FlatString: EcsType<string>;
-
 /** @public */
 declare type float = number;
 
-/**
- * @public
- */
-declare const Float32: EcsType<number>;
-
-/**
- * @public
- */
-declare const Float64: EcsType<number>;
-
 /** @public */
 declare type FloatArray = number[];
+
+/** @public */
+declare const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+
+/**
+ * @public
+ */
+declare function IArray<T>(type: ISchema<T>): ISchema<Array<T>>;
 
 /**
  * @public
@@ -348,10 +420,10 @@ declare type IEngine = {
     removeEntity(entity: Entity): void;
     addSystem(system: Update, priority?: number, name?: string): void;
     removeSystem(selector: string | Update): boolean;
-    defineComponent<T extends EcsType>(componentId: number, spec: T): ComponentDefinition<T>;
-    mutableGroupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ComponentEcsType<T>]>;
-    groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentEcsType<T>>]>;
-    getComponent<T extends EcsType>(componentId: number): ComponentDefinition<T>;
+    defineComponent<T extends ISchema>(componentId: number, spec: T): ComponentDefinition<T>;
+    mutableGroupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ComponentSchema<T>]>;
+    groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
+    getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
     update(dt: number): void;
     baseComponents: SdkComponents;
 };
@@ -363,6 +435,16 @@ declare type IEngineParams = {
     transports?: Transport[];
 };
 
+/**
+ * @public
+ */
+declare function IEnum<T>(type: ISchema<any>): ISchema<T>;
+
+/**
+ * @public
+ */
+declare function IMap<T extends Spec>(spec: T): ISchema<Result<T>>;
+
 /** Include property keys from T where the property is assignable to U */
 declare type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
@@ -371,22 +453,16 @@ declare type IncludeUndefined<T> = {
 /**
  * @public
  */
-declare const Int16: EcsType<number>;
+declare function IOptional<T>(spec: ISchema<T>): ISchema<T | undefined>;
 
 /**
  * @public
  */
-declare const Int32: EcsType<number>;
-
-/**
- * @public
- */
-declare const Int64: EcsType<number>;
-
-/**
- * @public
- */
-declare const Int8: EcsType<number>;
+declare type ISchema<T = any> = {
+    serialize(value: T, builder: ByteBuffer): void;
+    deserialize(reader: ByteBuffer): T;
+    create(): T;
+};
 
 /**
  * Interface for the size containing width and height
@@ -402,11 +478,6 @@ declare interface ISize {
      */
     height: number;
 }
-
-/**
- * @public
- */
-declare function MapType<T extends Spec>(spec: T): EcsType<Result<T>>;
 
 /**
  * Class used to store matrix data (4x4)
@@ -1128,6 +1199,9 @@ declare namespace Matrix {
 }
 
 /** @public */
+declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+
+/** @public */
 declare type Nullable<T> = T | null;
 
 declare type OnlyNonUndefinedTypes<T> = {
@@ -1138,10 +1212,17 @@ declare type OnlyOptionalUndefinedTypes<T> = {
     [K in IncludeUndefined<T>]?: T[K];
 };
 
-/**
- * @public
- */
-declare function Optional<T>(spec: EcsType<T>): EcsType<T | undefined>;
+/** @public */
+declare const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+
+/** @public */
+declare const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+
+/** @public */
+declare const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+
+/** @public */
+declare const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
 
 /**
  * Defines potential orientation for back face culling
@@ -1480,6 +1561,12 @@ declare namespace Plane {
     function signedDistanceTo(plane: ReadonlyPlane, point: Vector3.ReadonlyVector3): number;
 }
 
+/** @public */
+declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+
+/** @public */
+declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
+
 /**
  * @public
  */
@@ -1664,13 +1751,33 @@ declare type ReceiveMessage = {
  * @public
  */
 declare type Result<T extends Spec> = ToOptional<{
-    [K in keyof T]: T[K] extends EcsType ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? Result<T[K]> : never;
+    [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? Result<T[K]> : never;
 }>;
 
 /**
  * @public
  */
-declare type SdkComponents = ReturnType<typeof defineSdkComponents>;
+declare namespace Schemas {
+    export type SchemaType = ISchema;
+    const Boolean: ISchema<boolean>;
+    const String: ISchema<string>;
+    const Float: ISchema<number>;
+    const Double: ISchema<number>;
+    const Byte: ISchema<number>;
+    const Short: ISchema<number>;
+    const Int: ISchema<number>;
+    const Int64: ISchema<number>;
+    const Number: ISchema<number>;
+    const Enum: typeof IEnum;
+    const Array: typeof IArray;
+    const Map: typeof IMap;
+    const Optional: typeof IOptional;
+}
+
+/**
+ * @public
+ */
+declare type SdkComponents = ReturnType<typeof defineLibraryComponents>;
 
 /**
  * Defines supported spaces
@@ -1689,8 +1796,14 @@ declare enum Space {
  * @public
  */
 declare interface Spec {
-    [key: string]: EcsType;
+    [key: string]: ISchema;
 }
+
+/** @public */
+declare const SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
+
+/** @public */
+declare const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
 
 /**
  * Constant used to convert a value to gamma space
@@ -1706,17 +1819,26 @@ declare const ToLinearSpace = 2.2;
 
 declare type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
-/**
- * @public
- */
-declare type Transform = {
-    position: Vector3.MutableVector3;
-    rotation: Quaternion.MutableQuaternion;
-    scale: Vector3.MutableVector3;
-    parent?: Entity;
+/** @public */
+declare const Transform: ComponentDefinition<ISchema<    {
+position: {
+x: number;
+y: number;
+z: number;
 };
-
-declare const Transform: EcsType<Transform>;
+rotation: {
+x: number;
+y: number;
+z: number;
+w: number;
+};
+scale: {
+x: number;
+y: number;
+z: number;
+};
+parent?: Entity | undefined;
+}>>;
 
 declare type Transport = {
     type: string;

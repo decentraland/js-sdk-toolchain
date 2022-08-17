@@ -1,10 +1,10 @@
 import { ByteBuffer } from '../../serialization/ByteBuffer'
-import { EcsType } from '../EcsType'
+import { ISchema } from '../ISchema'
 
 /**
  * @public
  */
-export function Enum<T>(type: EcsType<any>): EcsType<T> {
+export function IEnum<T>(type: ISchema<any>): ISchema<T> {
   return {
     serialize(value: T, builder: ByteBuffer): void {
       type.serialize(value, builder)

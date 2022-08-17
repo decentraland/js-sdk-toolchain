@@ -1,5 +1,5 @@
-import type { EcsType } from '../built-in-types/EcsType'
-import { SdkComponents } from '../components'
+import { SdkComponents } from '../components/types'
+import type { ISchema } from '../schemas/ISchema'
 import { Transport } from '../systems/crdt/transports/types'
 import { ComponentDefinition as CompDef } from './component'
 import { Entity } from './entity'
@@ -14,7 +14,7 @@ export type Unpacked<T> = T extends (infer U)[] ? U : T
 /**
  * @public
  */
-export type ComponentEcsType<T extends [CompDef, ...CompDef[]]> = {
+export type ComponentSchema<T extends [CompDef, ...CompDef[]]> = {
   [K in keyof T]: T[K] extends CompDef ? ReturnType<T[K]['mutable']> : never
 }
 
@@ -27,14 +27,14 @@ export type IEngine = {
   removeEntity(entity: Entity): void
   addSystem(system: Update, priority?: number, name?: string): void
   removeSystem(selector: string | Update): boolean
-  defineComponent<T extends EcsType>(componentId: number, spec: T): CompDef<T>
+  defineComponent<T extends ISchema>(componentId: number, spec: T): CompDef<T>
   mutableGroupOf<T extends [CompDef, ...CompDef[]]>(
     ...components: T
-  ): Iterable<[Entity, ...ComponentEcsType<T>]>
+  ): Iterable<[Entity, ...ComponentSchema<T>]>
   groupOf<T extends [CompDef, ...CompDef[]]>(
     ...components: T
-  ): Iterable<[Entity, ...DeepReadonly<ComponentEcsType<T>>]>
-  getComponent<T extends EcsType>(componentId: number): CompDef<T>
+  ): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>
+  getComponent<T extends ISchema>(componentId: number): CompDef<T>
   update(dt: number): void
   baseComponents: SdkComponents
 }

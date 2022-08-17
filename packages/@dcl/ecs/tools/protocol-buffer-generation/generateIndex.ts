@@ -2,34 +2,64 @@ import fs from 'fs'
 import path from 'path'
 import { Component } from './generateComponent'
 
-const indexTemplate = `$componentImports
-import type { IEngine } from '../../engine/types'
-
-export enum ComponentIds {
-  $enumComponentIds
+function enumTemplate({ componentName, componentId }: Component) {
+  return `\t${componentName} = ${componentId},`
 }
 
-export function defineProtocolBufferComponents({
+function importComponent(component: Component) {
+  return `import * as ${component.componentName}Schema from './${component.componentName}.gen'`
+}
+
+function defineComponent(component: Component) {
+  return `\t\t${component.componentName}: defineComponent(${component.componentName}Schema.COMPONENT_ID, ${component.componentName}Schema.${component.componentName}Schema),`
+}
+
+function useDefinedComponent(component: Component) {
+  return `/** @public */\nexport const ${component.componentName} = engine.baseComponents.${component.componentName}`
+}
+
+function namespaceComponent(component: Component) {
+  return `\t/** @public */\n\texport const ${component.componentName} = engine.baseComponents.${component.componentName}`
+}
+
+const TransformComponent = { componentId: 1, componentName: 'Transform' }
+
+const indexTemplate = `import type { IEngine } from '../../engine/types'
+import * as TransformSchema from './../legacy/Transform'
+$componentImports
+
+declare const engine: IEngine
+
+export function defineLibraryComponents({
   defineComponent
 }: Pick<IEngine, 'defineComponent'>) {
-
   return {
+${defineComponent(TransformComponent)}
 $componentReturns
   }
 }
 `
 
-function enumTemplate({ componentName, componentId }: Component) {
-  return `${componentName} = ${componentId},`
-}
+const globalTemplate = `import { engine } from '../../initialization'
 
-function importComponent(component: Component) {
-  return `import * as ${component.componentName} from './${component.componentName}.gen'`
-}
+${useDefinedComponent(TransformComponent)}
+$componentReturns
+`
 
-function defineComponent(component: Component) {
-  return `${component.componentName}: defineComponent(${component.componentName}.COMPONENT_ID, ${component.componentName}.${component.componentName})`
+const globalNamespaceTemplate = `import { engine } from '../../initialization'
+/** @public */
+export namespace Components {
+${namespaceComponent(TransformComponent)}
+$componentNamespace
 }
+`
+
+const idsTemplate = `/** @public */
+export enum ECSComponentIDs {
+${enumTemplate(TransformComponent)}
+$enumComponentIds
+}
+`
 
 export function generateIndex(param: {
   components: Component[]
@@ -43,17 +73,37 @@ export function generateIndex(param: {
 
   const indexContent = indexTemplate
     .replace(
+      '$componentReturns',
+      componentWithoutIndex.map(defineComponent).join('\n')
+    )
+    .replace(
       '$componentImports',
       componentWithoutIndex.map(importComponent).join('\n')
     )
-    .replace(
-      '$componentReturns',
-      componentWithoutIndex.map(defineComponent).join(',\n')
-    )
-    .replace(
-      '$enumComponentIds',
-      componentWithoutIndex.map(enumTemplate).join('\n')
-    )
 
   fs.writeFileSync(path.resolve(generatedPath, 'index.gen.ts'), indexContent)
+
+  const globalContent = globalTemplate.replace(
+    '$componentReturns',
+    componentWithoutIndex.map(useDefinedComponent).join('\n')
+  )
+
+  fs.writeFileSync(path.resolve(generatedPath, 'global.gen.ts'), globalContent)
+
+  const namespaceContent = globalNamespaceTemplate.replace(
+    '$componentNamespace',
+    componentWithoutIndex.map(namespaceComponent).join('\n')
+  )
+
+  fs.writeFileSync(
+    path.resolve(generatedPath, 'global.namespace.gen.ts'),
+    namespaceContent
+  )
+
+  const idsContent = idsTemplate.replace(
+    '$enumComponentIds',
+    componentWithoutIndex.map(enumTemplate).join('\n')
+  )
+
+  fs.writeFileSync(path.resolve(generatedPath, 'ids.gen.ts'), idsContent)
 }
