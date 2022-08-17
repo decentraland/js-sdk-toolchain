@@ -1,46 +1,20 @@
-declare const enum ActionButton {
-    POINTER = 0,
-    PRIMARY = 1,
-    SECONDARY = 2,
-    ANY = 3,
-    FORWARD = 4,
-    BACKWARD = 5,
-    RIGHT = 6,
-    LEFT = 7,
-    JUMP = 8,
-    WALK = 9,
-    ACTION_3 = 10,
-    ACTION_4 = 11,
-    ACTION_5 = 12,
-    ACTION_6 = 13,
-    UNRECOGNIZED = -1
-}
+/** @public */
+declare const Animator: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /** @public */
-declare const Animator: ComponentDefinition<ISchema<PBAnimator>>;
+declare const AudioSource: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /** @public */
-declare const AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
-
-declare const enum AvatarAnchorPoint {
-    POSITION = 0,
-    NAME_TAG = 1,
-    LEFT_HAND = 2,
-    RIGHT_HAND = 3,
-    UNRECOGNIZED = -1
-}
+declare const AvatarAttach: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /** @public */
-declare const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+declare const AvatarShape: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /** @public */
-declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+declare const Billboard: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /** @public */
-declare const Billboard: ComponentDefinition<ISchema<PBBillboard>>;
-
-/** @public */
-declare const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
+declare const BoxShape: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /**
  * @public
@@ -48,22 +22,10 @@ declare const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
 declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
 
 /** @public */
-declare const CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
+declare const CameraMode: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /** @public */
-declare const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
-
-declare const enum CameraModeValue {
-    FIRST_PERSON = 0,
-    THIRD_PERSON = 1,
-    UNRECOGNIZED = -1
-}
-
-declare interface Color3 {
-    r: number;
-    g: number;
-    b: number;
-}
+declare const CameraModeArea: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /**
  * @public
@@ -71,12 +33,13 @@ declare interface Color3 {
 declare type ComponentDefinition<T extends ISchema = ISchema<any>> = {
     _id: number;
     has(entity: Entity): boolean;
-    getFrom(entity: Entity): DeepReadonly<ComponentType<T>>;
+    get(entity: Entity): DeepReadonly<ComponentType<T>>;
     getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
     create(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
-    mutable(entity: Entity): ComponentType<T>;
     createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
     deleteFrom(entity: Entity): ComponentType<T> | null;
+    getModifiable(entity: Entity): ComponentType<T>;
+    getModifiableOrNull(entity: Entity): ComponentType<T> | null;
     upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
     updateFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
     toBinary(entity: Entity): ByteBuffer;
@@ -90,71 +53,52 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>> = {
 /** @public */
 declare namespace Components {
     /** @public */
-    const Transform: ComponentDefinition<ISchema<    {
-    position: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    rotation: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    };
-    scale: {
-    x: number;
-    y: number;
+    const Transform: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    z: number;
-    };
-    parent?: Entity | undefined;
-    }>>;
+    const Animator: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const Animator: ComponentDefinition<ISchema<PBAnimator>>;
+    const AudioSource: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
+    const AvatarAttach: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+    const AvatarShape: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+    const Billboard: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const Billboard: ComponentDefinition<ISchema<PBBillboard>>;
+    const BoxShape: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
+    const CameraMode: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
+    const CameraModeArea: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
+    const CylinderShape: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
+    const GLTFShape: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+    const NFTShape: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+    const OnPointerDown: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+    const OnPointerDownResult: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+    const OnPointerUp: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+    const OnPointerUpResult: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
+    const PlaneShape: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+    const PointerLock: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
+    const SphereShape: ComponentDefinition<ISchema<Result<Spec>>>;
     /** @public */
-    const SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
-    /** @public */
-    const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
+    const TextShape: ComponentDefinition<ISchema<Result<Spec>>>;
 }
 
 /**
  * @public
  */
 declare type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
-    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['mutable']> : never;
+    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['getModifiable']> : never;
 };
 
 /**
@@ -301,7 +245,7 @@ declare interface CreateByteBufferOptions {
 }
 
 /** @public */
-declare const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
+declare const CylinderShape: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /**
  * Make each field readonly deeply
@@ -312,44 +256,26 @@ declare type DeepReadonly<T> = {
 };
 
 declare function defineLibraryComponents({ defineComponent }: Pick<IEngine, 'defineComponent'>): {
-    Transform: ComponentDefinition<ISchema<    {
-    position: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    rotation: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    };
-    scale: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    parent?: Entity | undefined;
-    }>>;
-    Animator: ComponentDefinition<ISchema<PBAnimator>>;
-    AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
-    AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
-    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
-    Billboard: ComponentDefinition<ISchema<PBBillboard>>;
-    BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
-    CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
-    CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
-    CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
-    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
-    NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
-    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
-    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
-    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
-    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
-    PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
-    PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
-    SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
-    TextShape: ComponentDefinition<ISchema<PBTextShape>>;
+    Transform: ComponentDefinition<ISchema<Result<Spec>>>;
+    Animator: ComponentDefinition<ISchema<Result<Spec>>>;
+    AudioSource: ComponentDefinition<ISchema<Result<Spec>>>;
+    AvatarAttach: ComponentDefinition<ISchema<Result<Spec>>>;
+    AvatarShape: ComponentDefinition<ISchema<Result<Spec>>>;
+    Billboard: ComponentDefinition<ISchema<Result<Spec>>>;
+    BoxShape: ComponentDefinition<ISchema<Result<Spec>>>;
+    CameraMode: ComponentDefinition<ISchema<Result<Spec>>>;
+    CameraModeArea: ComponentDefinition<ISchema<Result<Spec>>>;
+    CylinderShape: ComponentDefinition<ISchema<Result<Spec>>>;
+    GLTFShape: ComponentDefinition<ISchema<Result<Spec>>>;
+    NFTShape: ComponentDefinition<ISchema<Result<Spec>>>;
+    OnPointerDown: ComponentDefinition<ISchema<Result<Spec>>>;
+    OnPointerDownResult: ComponentDefinition<ISchema<Result<Spec>>>;
+    OnPointerUp: ComponentDefinition<ISchema<Result<Spec>>>;
+    OnPointerUpResult: ComponentDefinition<ISchema<Result<Spec>>>;
+    PlaneShape: ComponentDefinition<ISchema<Result<Spec>>>;
+    PointerLock: ComponentDefinition<ISchema<Result<Spec>>>;
+    SphereShape: ComponentDefinition<ISchema<Result<Spec>>>;
+    TextShape: ComponentDefinition<ISchema<Result<Spec>>>;
 };
 
 /**
@@ -404,7 +330,7 @@ declare type float = number;
 declare type FloatArray = number[];
 
 /** @public */
-declare const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+declare const GLTFShape: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /**
  * @public
@@ -420,10 +346,10 @@ declare type IEngine = {
     removeEntity(entity: Entity): void;
     addSystem(system: Update, priority?: number, name?: string): void;
     removeSystem(selector: string | Update): boolean;
-    defineComponent<T extends ISchema>(componentId: number, spec: T): ComponentDefinition<T>;
-    mutableGroupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ComponentSchema<T>]>;
-    groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
+    defineComponent<T extends Spec>(spec: Spec, componentId?: number): ComponentDefinition<ISchema<Result<T>>>;
+    defineComponentFromSchema<T extends ISchema>(spec: T, componentId?: number): ComponentDefinition<T>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
+    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
     update(dt: number): void;
     baseComponents: SdkComponents;
 };
@@ -478,6 +404,8 @@ declare interface ISize {
      */
     height: number;
 }
+
+declare const log: (...a: any[]) => void;
 
 /**
  * Class used to store matrix data (4x4)
@@ -1199,7 +1127,7 @@ declare namespace Matrix {
 }
 
 /** @public */
-declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+declare const NFTShape: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /** @public */
 declare type Nullable<T> = T | null;
@@ -1213,16 +1141,16 @@ declare type OnlyOptionalUndefinedTypes<T> = {
 };
 
 /** @public */
-declare const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+declare const OnPointerDown: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /** @public */
-declare const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+declare const OnPointerDownResult: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /** @public */
-declare const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+declare const OnPointerUp: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /** @public */
-declare const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
+declare const OnPointerUpResult: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /**
  * Defines potential orientation for back face culling
@@ -1235,221 +1163,6 @@ declare enum Orientation {
     CW = 0,
     /** Counter clockwise */
     CCW = 1
-}
-
-declare interface PBAnimationState {
-    name: string;
-    clip: string;
-    playing?: boolean | undefined;
-    /** default=1.0s */
-    weight?: number | undefined;
-    /** default=1.0 */
-    speed?: number | undefined;
-    /** default=true */
-    loop?: boolean | undefined;
-    shouldReset?: boolean | undefined;
-}
-
-declare interface PBAnimator {
-    states: PBAnimationState[];
-}
-
-declare interface PBAudioSource {
-    playing?: boolean | undefined;
-    /** default=1.0f */
-    volume?: number | undefined;
-    loop?: boolean | undefined;
-    /** default=1.0f */
-    pitch?: number | undefined;
-    audioClipUrl: string;
-}
-
-declare interface PBAvatarAttach {
-    avatarId: string;
-    anchorPointId: AvatarAnchorPoint;
-}
-
-declare interface PBAvatarShape {
-    id: string;
-    name?: string | undefined;
-    bodyShape?: string | undefined;
-    skinColor?: Color3 | undefined;
-    hairColor?: Color3 | undefined;
-    eyeColor?: Color3 | undefined;
-    wearables: string[];
-    expressionTriggerId?: string | undefined;
-    expressionTriggerTimestamp?: number | undefined;
-    stickerTriggerId?: string | undefined;
-    stickerTriggerTimestamp?: number | undefined;
-    talking?: boolean | undefined;
-}
-
-declare interface PBBillboard {
-    /** default=true */
-    x?: boolean | undefined;
-    /** default=true */
-    y?: boolean | undefined;
-    /** default=true */
-    z?: boolean | undefined;
-}
-
-declare interface PBBoxShape {
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    withCollisions?: boolean | undefined;
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    isPointerBlocker?: boolean | undefined;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
-    uvs: number[];
-}
-
-declare interface PBCameraMode {
-    mode: CameraModeValue;
-}
-
-declare interface PBCameraModeArea {
-    area: Vector3_2 | undefined;
-    mode: CameraModeValue;
-}
-
-declare interface PBCylinderShape {
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    withCollisions?: boolean | undefined;
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    isPointerBlocker?: boolean | undefined;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
-    /** default=1.0 */
-    radiusTop?: number | undefined;
-    /** default=1.0 */
-    radiusBottom?: number | undefined;
-}
-
-declare interface PBGLTFShape {
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    withCollisions?: boolean | undefined;
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    isPointerBlocker?: boolean | undefined;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
-    src: string;
-}
-
-declare interface PBNFTShape {
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    withCollisions?: boolean | undefined;
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    isPointerBlocker?: boolean | undefined;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
-    src: string;
-    assetId?: string | undefined;
-    style?: number | undefined;
-    color?: Color3 | undefined;
-}
-
-declare interface PBOnPointerDown {
-    /** default=ActionButton.ANY */
-    button?: ActionButton | undefined;
-    /** default='Interact' */
-    hoverText?: string | undefined;
-    /** default=10 */
-    maxDistance?: number | undefined;
-    /** default=true */
-    showFeedback?: boolean | undefined;
-}
-
-declare interface PBOnPointerDownResult {
-    button: ActionButton;
-    meshName: string;
-    origin: Vector3_2 | undefined;
-    direction: Vector3_2 | undefined;
-    point: Vector3_2 | undefined;
-    normal: Vector3_2 | undefined;
-    distance: number;
-    timestamp: number;
-}
-
-declare interface PBOnPointerUp {
-    /** default=ActionButton.ANY */
-    button?: ActionButton | undefined;
-    /** default='Interact' */
-    hoverText?: string | undefined;
-    /** default=10 */
-    maxDistance?: number | undefined;
-    /** default=true */
-    showFeedback?: boolean | undefined;
-}
-
-declare interface PBOnPointerUpResult {
-    button: ActionButton;
-    meshName: string;
-    origin: Vector3_2 | undefined;
-    direction: Vector3_2 | undefined;
-    point: Vector3_2 | undefined;
-    normal: Vector3_2 | undefined;
-    distance: number;
-    timestamp: number;
-}
-
-declare interface PBPlaneShape {
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    withCollisions?: boolean | undefined;
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    isPointerBlocker?: boolean | undefined;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
-    uvs: number[];
-}
-
-declare interface PBPointerLock {
-    isPointerLocked: boolean;
-}
-
-declare interface PBSphereShape {
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    withCollisions?: boolean | undefined;
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    isPointerBlocker?: boolean | undefined;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
-}
-
-declare interface PBTextShape {
-    text: string;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
-    font?: string | undefined;
-    /** default=1.0f */
-    opacity?: number | undefined;
-    /** default=10 */
-    fontSize?: number | undefined;
-    fontAutoSize?: boolean | undefined;
-    /** default='center' */
-    hTextAlign?: string | undefined;
-    /** default='center' */
-    vTextAlign?: string | undefined;
-    /** default=1 */
-    width?: number | undefined;
-    /** default=1 */
-    height?: number | undefined;
-    paddingTop?: number | undefined;
-    paddingRight?: number | undefined;
-    paddingBottom?: number | undefined;
-    paddingLeft?: number | undefined;
-    lineSpacing?: number | undefined;
-    lineCount?: number | undefined;
-    textWrapping?: boolean | undefined;
-    shadowBlur?: number | undefined;
-    shadowOffsetX?: number | undefined;
-    shadowOffsetY?: number | undefined;
-    outlineWidth?: number | undefined;
-    /** default=(1.0,1.0,1.0) */
-    shadowColor?: Color3 | undefined;
-    /** default=(1.0,1.0,1.0) */
-    outlineColor?: Color3 | undefined;
-    /** default=(1.0,1.0,1.0) */
-    textColor?: Color3 | undefined;
 }
 
 /**
@@ -1562,10 +1275,10 @@ declare namespace Plane {
 }
 
 /** @public */
-declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+declare const PlaneShape: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /** @public */
-declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
+declare const PointerLock: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /**
  * @public
@@ -1800,10 +1513,10 @@ declare interface Spec {
 }
 
 /** @public */
-declare const SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
+declare const SphereShape: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /** @public */
-declare const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
+declare const TextShape: ComponentDefinition<ISchema<Result<Spec>>>;
 
 /**
  * Constant used to convert a value to gamma space
@@ -1820,25 +1533,7 @@ declare const ToLinearSpace = 2.2;
 declare type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
 /** @public */
-declare const Transform: ComponentDefinition<ISchema<    {
-position: {
-x: number;
-y: number;
-z: number;
-};
-rotation: {
-x: number;
-y: number;
-z: number;
-w: number;
-};
-scale: {
-x: number;
-y: number;
-z: number;
-};
-parent?: Entity | undefined;
-}>>;
+declare const Transform: ComponentDefinition<ISchema<Result<Spec>>>;
 
 declare type Transport = {
     type: string;
@@ -2062,12 +1757,6 @@ declare namespace Vector3 {
      * @returns a new left Vector3
      */
     export function Left(): MutableVector3;
-}
-
-declare interface Vector3_2 {
-    x: number;
-    y: number;
-    z: number;
 }
 
 declare namespace WireMessage {

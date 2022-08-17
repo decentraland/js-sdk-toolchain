@@ -79,7 +79,7 @@ describe.skip('UiTransform component', () => {
     UiTransform.upsertFromBinary(entity, buffer)
     const entityB = newEngine.addEntity()
     expect(UiTransform.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...UiTransform.getFrom(entity)
+      ...UiTransform.get(entity)
     })
   })
 })

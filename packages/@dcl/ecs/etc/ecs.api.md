@@ -54,12 +54,13 @@ export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
 export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
     _id: number;
     has(entity: Entity): boolean;
-    getFrom(entity: Entity): DeepReadonly<ComponentType<T>>;
+    get(entity: Entity): DeepReadonly<ComponentType<T>>;
     getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
     create(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
-    mutable(entity: Entity): ComponentType<T>;
     createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
     deleteFrom(entity: Entity): ComponentType<T> | null;
+    getModifiable(entity: Entity): ComponentType<T>;
+    getModifiableOrNull(entity: Entity): ComponentType<T> | null;
     upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
     updateFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
     toBinary(entity: Entity): ByteBuffer;
@@ -156,7 +157,7 @@ export namespace Components {
 
 // @public (undocumented)
 export type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
-    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['mutable']> : never;
+    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['getModifiable']> : never;
 };
 
 // Warning: (ae-forgotten-export) The symbol "EcsResult" needs to be exported by the entry point index.d.ts
@@ -193,6 +194,9 @@ export type Entity = number & {
 export const Epsilon = 0.000001;
 
 // @public (undocumented)
+export const error: (message: string | Error, data?: any) => void;
+
+// @public (undocumented)
 export type float = number;
 
 // @public (undocumented)
@@ -208,10 +212,10 @@ export type IEngine = {
     removeEntity(entity: Entity): void;
     addSystem(system: Update, priority?: number, name?: string): void;
     removeSystem(selector: string | Update): boolean;
-    defineComponent<T extends ISchema>(componentId: number, spec: T): ComponentDefinition<T>;
-    mutableGroupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ComponentSchema<T>]>;
-    groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
+    defineComponent<T extends Spec>(spec: Spec, componentId?: number): ComponentDefinition<ISchema<Result<T>>>;
+    defineComponentFromSchema<T extends ISchema>(spec: T, componentId?: number): ComponentDefinition<T>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
+    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
     update(dt: number): void;
     baseComponents: SdkComponents;
 };
@@ -226,6 +230,9 @@ export interface ISize {
     height: number;
     width: number;
 }
+
+// @public (undocumented)
+export const log: (...a: any[]) => void;
 
 // @public (undocumented)
 export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
@@ -430,9 +437,11 @@ export namespace Vector3 {
 
 // Warnings were encountered during analysis:
 //
-// dist/engine/types.d.ts:25:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
-// dist/engine/types.d.ts:32:5 - (ae-forgotten-export) The symbol "SdkComponents" needs to be exported by the entry point index.d.ts
-// dist/engine/types.d.ts:38:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:26:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:28:5 - (ae-forgotten-export) The symbol "Spec" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:28:5 - (ae-forgotten-export) The symbol "Result" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:33:5 - (ae-forgotten-export) The symbol "SdkComponents" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:39:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

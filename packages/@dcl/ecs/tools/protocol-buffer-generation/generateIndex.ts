@@ -11,7 +11,7 @@ function importComponent(component: Component) {
 }
 
 function defineComponent(component: Component) {
-  return `\t\t${component.componentName}: defineComponent(${component.componentName}Schema.COMPONENT_ID, ${component.componentName}Schema.${component.componentName}Schema),`
+  return `\t\t${component.componentName}: defineComponentFromSchema(${component.componentName}Schema.${component.componentName}Schema, ${component.componentName}Schema.COMPONENT_ID),`
 }
 
 function useDefinedComponent(component: Component) {
@@ -31,8 +31,8 @@ $componentImports
 declare const engine: IEngine
 
 export function defineLibraryComponents({
-  defineComponent
-}: Pick<IEngine, 'defineComponent'>) {
+  defineComponentFromSchema
+}: Pick<IEngine, 'defineComponentFromSchema'>) {
   return {
 ${defineComponent(TransformComponent)}
 $componentReturns

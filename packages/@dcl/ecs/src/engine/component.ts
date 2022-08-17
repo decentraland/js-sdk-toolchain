@@ -21,17 +21,19 @@ export type ComponentType<T extends ISchema> = EcsResult<T>
 export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
   _id: number
   has(entity: Entity): boolean
-  getFrom(entity: Entity): DeepReadonly<ComponentType<T>>
 
+  get(entity: Entity): DeepReadonly<ComponentType<T>>
   getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null
 
   // adds this component to the list "to be reviewed next frame"
   create(entity: Entity, val?: ComponentType<T>): ComponentType<T>
+  createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>
+
+  deleteFrom(entity: Entity): ComponentType<T> | null
 
   // adds this component to the list "to be reviewed next frame"
-  mutable(entity: Entity): ComponentType<T>
-  createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>
-  deleteFrom(entity: Entity): ComponentType<T> | null
+  getModifiable(entity: Entity): ComponentType<T>
+  getModifiableOrNull(entity: Entity): ComponentType<T> | null
 
   upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null
   updateFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null
@@ -76,7 +78,7 @@ export function defineComponent<T extends ISchema>(
       const component = data.get(entity)
       return component ? deepReadonly(component) : null
     },
-    getFrom: function (entity: Entity): DeepReadonly<ComponentType<T>> {
+    get: function (entity: Entity): DeepReadonly<ComponentType<T>> {
       const component = data.get(entity)
       if (!component) {
         throw new Error(
@@ -109,14 +111,21 @@ export function defineComponent<T extends ISchema>(
       dirtyIterator.add(entity)
       return usedValue!
     },
-    mutable: function (entity: Entity): ComponentType<T> {
+    getModifiableOrNull: function (entity: Entity): ComponentType<T> | null {
       const component = data.get(entity)
       if (!component) {
+        return null
+      }
+      dirtyIterator.add(entity)
+      return component
+    },
+    getModifiable: function (entity: Entity): ComponentType<T> {
+      const component = this.getModifiableOrNull(entity)
+      if (component === null) {
         throw new Error(
           `[mutable] Component ${componentId} for ${entity} not found`
         )
       }
-      dirtyIterator.add(entity)
       return component
     },
     iterator: function* (): Iterable<[Entity, ComponentType<T>]> {

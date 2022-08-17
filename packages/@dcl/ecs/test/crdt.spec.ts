@@ -29,7 +29,7 @@ describe('CRDT tests', () => {
     // Reset ws.send called times
     jest.resetAllMocks()
 
-    Transform.mutable(entityA).position.x = 10
+    Transform.getModifiable(entityA).position.x = 10
     engine.update(1 / 30)
     expect(spySend).toBeCalledTimes(1)
   })
@@ -52,7 +52,7 @@ describe('CRDT tests', () => {
     jest.resetAllMocks()
 
     // Update a component and verify that's being sent through the crdt system
-    Transform.mutable(entityA).position.x = 10
+    Transform.getModifiable(entityA).position.x = 10
     engine.update(1 / 30)
     expect(spySend).toBeCalledTimes(1)
 
@@ -85,10 +85,8 @@ describe('CRDT tests', () => {
     await wait(SandBox.WS_SEND_DELAY)
     clientB.engine.update(1 / 30)
 
-    expect(SandBox.DEFAULT_POSITION).toBeDeepCloseTo(
-      TransformB.getFrom(entityA)
-    )
-    expect(posA).toBeDeepCloseTo(PositionB.getFrom(entityA))
+    expect(SandBox.DEFAULT_POSITION).toBeDeepCloseTo(TransformB.get(entityA))
+    expect(posA).toBeDeepCloseTo(PositionB.get(entityA))
     expect(clientA.spySend).toBeCalledTimes(1)
     expect(clientB.spySend).toBeCalledTimes(0)
   })
@@ -122,7 +120,7 @@ describe('CRDT tests', () => {
     const DoorComponent = clientA.components.Door
     // Upate Transform from static entity
     const entity = (clientA.engine.addEntity() - 1) as Entity
-    Transform.mutable(entity).position.x = 10
+    Transform.getModifiable(entity).position.x = 10
 
     // Create a dynamic entity
     const dynamicEntity = clientA.engine.addDynamicEntity()
@@ -133,9 +131,11 @@ describe('CRDT tests', () => {
       const isRandomGuy = randomGuyWin === index
 
       function doorSystem(_dt: number) {
-        for (const [entity, door] of engine.mutableGroupOf(DoorComponent)) {
+        for (const [entity, _readOnlyDoor] of engine.getEntitiesWith(
+          DoorComponent
+        )) {
           if (EntityUtils.isStaticEntity(entity)) continue
-          door.open = isRandomGuy
+          DoorComponent.getModifiable(entity).open = isRandomGuy
             ? DOOR_VALUE
             : Math.max(Math.random(), DOOR_VALUE) // Some random value < DOOR_VALUE
         }
@@ -149,7 +149,7 @@ describe('CRDT tests', () => {
     await wait(UPDATE_MS)
 
     clients.forEach(({ components }) => {
-      const doorValue = components.Door.getFrom(dynamicEntity).open
+      const doorValue = components.Door.get(dynamicEntity).open
       expect(doorValue).toBe(DOOR_VALUE)
     })
   })
@@ -158,7 +158,7 @@ describe('CRDT tests', () => {
     const entity = engine.addEntity()
     engine.baseComponents.Transform.create(entity, SandBox.DEFAULT_POSITION)
     engine.update(1)
-    engine.baseComponents.Transform.mutable(entity).position.x = 8
+    engine.baseComponents.Transform.getModifiable(entity).position.x = 8
     engine.update(1)
     const buffer = createByteBuffer()
     ComponentOperation.write(

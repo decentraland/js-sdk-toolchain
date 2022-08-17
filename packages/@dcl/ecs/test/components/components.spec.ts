@@ -1,4 +1,5 @@
 import { Quaternion, Vector3 } from '@dcl/ecs-math'
+import { PBBoxShape } from '../../src/components/generated/pb/BoxShape.gen'
 import { Engine } from '../../src/engine'
 import { Entity } from '../../src/engine/entity'
 
@@ -28,7 +29,7 @@ describe('Legacy component tests', () => {
     }
 
     function rotatorSystem(dt: number) {
-      const group = engine.mutableGroupOf(sdk.Transform)
+      const group = engine.getEntitiesWith(sdk.Transform)
       for (const [entity, component] of group) {
         Quaternion.multiplyToRef(
           component.rotation,
@@ -45,10 +46,11 @@ describe('Legacy component tests', () => {
         expect(transformReceveid).toBeDeepCloseTo(transformOriginal)
       }
 
-      const groupBoxShape = engine.mutableGroupOf(sdk.BoxShape)
+      const groupBoxShape = engine.getEntitiesWith(sdk.BoxShape)
       for (const [entity, component] of groupBoxShape) {
         const boxShapeData = sdk.BoxShape.toBinary(entity)
-        const boxShapeOriginal = { ...component }
+        // TODO: see this
+        const boxShapeOriginal = { ...component } as any 
         const boxShapeReceveid = sdk.BoxShape.updateFromBinary(
           entity,
           boxShapeData

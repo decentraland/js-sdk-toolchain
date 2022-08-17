@@ -23,10 +23,10 @@ describe('Generated BoxShape ProtoBuf', () => {
     const buffer = BoxShape.toBinary(entity)
     BoxShape.updateFromBinary(entityB, buffer)
 
-    expect(_boxShape).toBeDeepCloseTo({ ...BoxShape.mutable(entityB) })
+    expect(_boxShape).toBeDeepCloseTo({ ...BoxShape.getModifiable(entityB) })
 
     expect(BoxShape.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...BoxShape.mutable(entity)
+      ...BoxShape.getModifiable(entity)
     })
   })
 })

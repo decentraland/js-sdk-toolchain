@@ -12,6 +12,8 @@ import { ByteBuffer } from '../serialization/ByteBuffer'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
 import { ISchema } from '../schemas/ISchema'
 import { defineLibraryComponents } from './../components/generated/index.gen'
+import { Result, Spec } from '../schemas/Map'
+import { Schemas } from '../schemas'
 
 export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
 export * from './types'
@@ -59,16 +61,36 @@ function preEngine() {
     return entityContainer.removeEntity(entity)
   }
 
-  function defineComponent<T extends ISchema>(
-    componentId: number,
-    spec: T
+  function ensureComponentId(componentId?: number) {
+    if (!componentId) {
+      const CUSTOM_COMPONENTS_START_AT = 10e3
+      let i = CUSTOM_COMPONENTS_START_AT
+      while (componentsDefinition.get(i)) {
+        i++
+      }
+      return i
+    }
+    return componentId
+  }
+
+  function defineComponentFromSchema<T extends ISchema>(
+    spec: T,
+    componentIdDefined?: number
   ): ComponentDefinition<T> {
+    const componentId = ensureComponentId(componentIdDefined)
     if (componentsDefinition.get(componentId)) {
       throw new Error(`Component ${componentId} already declared`)
     }
     const newComponent = defComponent<T>(componentId, spec)
     componentsDefinition.set(componentId, newComponent)
     return newComponent
+  }
+
+  function defineComponent<T extends Spec>(
+    spec: Spec,
+    componentIdDefined?: number
+  ): ComponentDefinition<ISchema<Result<T>>> {
+    return defineComponentFromSchema(Schemas.Map(spec), componentIdDefined)
   }
 
   function getComponent<T extends ISchema>(
@@ -83,22 +105,11 @@ function preEngine() {
     return component
   }
 
-  function* mutableGroupOf<
+  function* getEntitiesWith<
     T extends [ComponentDefinition, ...ComponentDefinition[]]
-  >(...components: T): Iterable<[Entity, ...ComponentSchema<T>]> {
+  >(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]> {
     for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
-      yield [entity, ...groupComp.map((c) => c.mutable(entity))] as [
-        Entity,
-        ...ComponentSchema<T>
-      ]
-    }
-  }
-
-  function* groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(
-    ...components: T
-  ): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]> {
-    for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
-      yield [entity, ...groupComp.map((c) => c.getFrom(entity))] as [
+      yield [entity, ...groupComp.map((c) => c.get(entity))] as [
         Entity,
         ...DeepReadonly<ComponentSchema<T>>
       ]
@@ -138,8 +149,8 @@ function preEngine() {
     getSystems,
     removeSystem,
     defineComponent,
-    mutableGroupOf,
-    groupOf,
+    defineComponentFromSchema,
+    getEntitiesWith,
     getComponent
   }
 }
@@ -172,7 +183,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     ]
     const excludeComponentIds = removeSelectedComponents.map((item) => item._id)
     for (const componentDef of removeSelectedComponents) {
-      for (const [entity] of engine.groupOf(componentDef)) {
+      for (const [entity] of engine.getEntitiesWith(componentDef)) {
         componentDef.deleteFrom(entity)
       }
     }
@@ -205,8 +216,8 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     addSystem: engine.addSystem,
     removeSystem: engine.removeSystem,
     defineComponent: engine.defineComponent,
-    mutableGroupOf: engine.mutableGroupOf,
-    groupOf: engine.groupOf,
+    defineComponentFromSchema: engine.defineComponentFromSchema,
+    getEntitiesWith: engine.getEntitiesWith,
     getComponent: engine.getComponent,
     update,
     baseComponents

@@ -17,10 +17,12 @@ describe('Generated PointerLock ProtoBuf', () => {
     const buffer = PointerLock.toBinary(entity)
     PointerLock.updateFromBinary(entityB, buffer)
 
-    expect(_pointerLock).toBeDeepCloseTo({ ...PointerLock.mutable(entityB) })
+    expect(_pointerLock).toBeDeepCloseTo({
+      ...PointerLock.getModifiable(entityB)
+    })
 
     expect(PointerLock.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...PointerLock.mutable(entity)
+      ...PointerLock.getModifiable(entity)
     })
   })
 })

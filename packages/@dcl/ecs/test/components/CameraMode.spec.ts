@@ -18,10 +18,12 @@ describe('Generated CameraMode ProtoBuf', () => {
     const buffer = CameraMode.toBinary(entity)
     CameraMode.updateFromBinary(entityB, buffer)
 
-    expect(_cameraMode).toBeDeepCloseTo({ ...CameraMode.mutable(entityB) })
+    expect(_cameraMode).toBeDeepCloseTo({
+      ...CameraMode.getModifiable(entityB)
+    })
 
     expect(CameraMode.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...CameraMode.mutable(entity)
+      ...CameraMode.getModifiable(entity)
     })
   })
 })
