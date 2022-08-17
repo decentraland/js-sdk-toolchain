@@ -88,7 +88,7 @@ describe('Engine tests', () => {
       expect(position).toStrictEqual({ x: 10 })
     }
 
-    for (const [ent, readOnlyPosition] of engine.getEntitiesWith(Position)) {
+    for (const [ent, _readOnlyPosition] of engine.getEntitiesWith(Position)) {
       const position = Position.getModifiable(ent)
       expect(ent).toBe(entity)
       expect(position).toStrictEqual({ x: 10 })
@@ -273,7 +273,9 @@ describe('Engine tests', () => {
     // avoid dirty iterators
     engine.update(0)
 
-    for (const [entity, readonlyPosition] of engine.getEntitiesWith(Position)) {
+    for (const [entity, _readonlyPosition] of engine.getEntitiesWith(
+      Position
+    )) {
       const position = Position.getModifiable(entity)
       expect(entity).toBe(entityA)
       expect(position).toStrictEqual({ x: 0 })
@@ -382,7 +384,7 @@ describe('Engine tests', () => {
 
     function moveSystem(_dt: number) {
       moves++
-      for (const [entity, readonlyMove] of engine.getEntitiesWith(
+      for (const [entity, _readonlyMove] of engine.getEntitiesWith(
         MoveTransformComponent
       )) {
         const move = MoveTransformComponent.getModifiable(entity)

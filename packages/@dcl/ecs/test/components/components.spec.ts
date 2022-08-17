@@ -1,5 +1,4 @@
 import { Quaternion, Vector3 } from '@dcl/ecs-math'
-import { PBBoxShape } from '../../src/components/generated/pb/BoxShape.gen'
 import { Engine } from '../../src/engine'
 import { Entity } from '../../src/engine/entity'
 
@@ -50,7 +49,7 @@ describe('Legacy component tests', () => {
       for (const [entity, component] of groupBoxShape) {
         const boxShapeData = sdk.BoxShape.toBinary(entity)
         // TODO: see this
-        const boxShapeOriginal = { ...component } as any 
+        const boxShapeOriginal = { ...component } as any
         const boxShapeReceveid = sdk.BoxShape.updateFromBinary(
           entity,
           boxShapeData
