@@ -5,6 +5,7 @@ import EntityUtils from '../src/engine/entity-utils'
 import { createByteBuffer } from '../src/serialization/ByteBuffer'
 import { createRendererTransport } from '../src/systems/crdt/transports/rendererTransport'
 import { Schemas } from '../src/schemas'
+import { TransformSchema } from '../src/components/legacy/Transform'
 
 const PositionSchema = {
   x: Schemas.Float
@@ -55,12 +56,12 @@ describe('Engine tests', () => {
 
   it('should fail when trying to add the same system twice', () => {
     const engine = Engine()
-    const system = () => { }
+    const system = () => {}
     engine.addSystem(system)
     expect(() => engine.addSystem(system)).toThrowError()
 
-    const systemA = () => { }
-    const systemA2 = () => { }
+    const systemA = () => {}
+    const systemA2 = () => {}
     engine.addSystem(systemA, SYSTEMS_REGULAR_PRIORITY, 'systemA')
     expect(() =>
       engine.addSystem(systemA2, SYSTEMS_REGULAR_PRIORITY, 'systemA')
@@ -124,8 +125,8 @@ describe('Engine tests', () => {
   it('define two custom components multiple components without ids', () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
-    const Position = engine.defineComponent(PositionSchema)
-    const Velocity = engine.defineComponent(VelocitySchema)
+    const Position = engine.defineComponent(PositionSchema, 123)
+    const Velocity = engine.defineComponent(VelocitySchema, 124)
     const posComponent = Position.create(entity, { x: 10 })
     const velComponent = Velocity.create(entity, { y: 20 })
 
@@ -519,5 +520,12 @@ describe('Engine tests', () => {
     engine.baseComponents.OnPointerDownResult.create(entity)
     engine.update(1 / 30)
     expect(engine.baseComponents.OnPointerDownResult.has(entity)).toBe(false)
+  })
+
+  it('should return the default component of the transform', () => {
+    const engine = Engine()
+    expect(TransformSchema.create()).toBeDeepCloseTo(
+      engine.baseComponents.Transform.default()
+    )
   })
 })

@@ -118,9 +118,8 @@ export type IEngine = {
    * Get a iterator of entities that has all the component requested.
    * @param components a list of component definitions
    * @return An iterator of an array with the [entity, component1, component2, ...]
-   * ```ts
-   * const StateComponentId = 10023
-   * const StateComponent = engine.getComponent(StateComponentId)
+   *
+   * Example:
    * ```ts
    * for (const [entity, boxShape, transform] of engine.getEntitiesWith(BoxShape, Transform)) {
    * // the properties of boxShape and transform are read only

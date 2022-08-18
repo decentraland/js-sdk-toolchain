@@ -53,6 +53,7 @@ export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
 // @public (undocumented)
 export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
     _id: number;
+    default(): DeepReadonly<ComponentType<T>>;
     has(entity: Entity): boolean;
     get(entity: Entity): DeepReadonly<ComponentType<T>>;
     getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
@@ -61,14 +62,7 @@ export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
     deleteFrom(entity: Entity): ComponentType<T> | null;
     getMutable(entity: Entity): ComponentType<T>;
     getMutableOrNull(entity: Entity): ComponentType<T> | null;
-    upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
-    updateFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
-    toBinary(entity: Entity): ByteBuffer;
     writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void;
-    iterator(): Iterable<[Entity, ComponentType<T>]>;
-    dirtyIterator(): Iterable<Entity>;
-    clearDirty(): void;
-    isDirty(entity: Entity): boolean;
 };
 
 // @public (undocumented)
@@ -212,11 +206,10 @@ export type IEngine = {
     removeEntity(entity: Entity): void;
     addSystem(system: Update, priority?: number, name?: string): void;
     removeSystem(selector: string | Update): boolean;
-    defineComponent<T extends Spec>(spec: Spec, componentId?: number): ComponentDefinition<ISchema<Result<T>>>;
-    defineComponentFromSchema<T extends ISchema>(spec: T, componentId?: number): ComponentDefinition<T>;
+    defineComponent<T extends Spec>(spec: Spec, componentId: number): ComponentDefinition<ISchema<Result<T>>>;
+    defineComponentFromSchema<T extends ISchema>(spec: T, componentId: number): ComponentDefinition<T>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
-    update(dt: number): void;
     baseComponents: SdkComponents;
 };
 
@@ -437,11 +430,11 @@ export namespace Vector3 {
 
 // Warnings were encountered during analysis:
 //
-// dist/engine/types.d.ts:26:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
-// dist/engine/types.d.ts:28:5 - (ae-forgotten-export) The symbol "Spec" needs to be exported by the entry point index.d.ts
-// dist/engine/types.d.ts:28:5 - (ae-forgotten-export) The symbol "Result" needs to be exported by the entry point index.d.ts
-// dist/engine/types.d.ts:33:5 - (ae-forgotten-export) The symbol "SdkComponents" needs to be exported by the entry point index.d.ts
-// dist/engine/types.d.ts:39:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:55:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:77:5 - (ae-forgotten-export) The symbol "Spec" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:77:5 - (ae-forgotten-export) The symbol "Result" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:113:5 - (ae-forgotten-export) The symbol "SdkComponents" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:119:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

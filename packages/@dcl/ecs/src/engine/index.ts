@@ -61,23 +61,10 @@ function preEngine() {
     return entityContainer.removeEntity(entity)
   }
 
-  function ensureComponentId(componentId?: number) {
-    if (!componentId) {
-      const CUSTOM_COMPONENTS_START_AT = 10e3
-      let i = CUSTOM_COMPONENTS_START_AT
-      while (componentsDefinition.get(i)) {
-        i++
-      }
-      return i
-    }
-    return componentId
-  }
-
   function defineComponentFromSchema<T extends ISchema>(
     spec: T,
-    componentIdDefined?: number
+    componentId: number
   ): ComponentDefinition<T> {
-    const componentId = ensureComponentId(componentIdDefined)
     if (componentsDefinition.get(componentId)) {
       throw new Error(`Component ${componentId} already declared`)
     }
@@ -88,9 +75,9 @@ function preEngine() {
 
   function defineComponent<T extends Spec>(
     spec: Spec,
-    componentIdDefined?: number
+    componentId: number
   ): ComponentDefinition<ISchema<Result<T>>> {
-    return defineComponentFromSchema(Schemas.Map(spec), componentIdDefined)
+    return defineComponentFromSchema(Schemas.Map(spec), componentId)
   }
 
   function getComponent<T extends ISchema>(
