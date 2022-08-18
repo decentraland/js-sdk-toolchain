@@ -301,6 +301,13 @@ export namespace Quaternion {
 // @public
 export const RAD2DEG: number;
 
+// Warning: (ae-forgotten-export) The symbol "ToOptional" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type Result<T extends Spec> = ToOptional<{
+    [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? Result<T[K]> : never;
+}>;
+
 // @public (undocumented)
 export namespace Schemas {
     // (undocumented)
@@ -341,11 +348,22 @@ export namespace Schemas {
     Optional: typeof IOptional;
 }
 
+// Warning: (ae-forgotten-export) The symbol "defineLibraryComponents" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type SdkComponents = ReturnType<typeof defineLibraryComponents>;
+
 // @public
 export enum Space {
     BONE = 2,
     LOCAL = 0,
     WORLD = 1
+}
+
+// @public (undocumented)
+export interface Spec {
+    // (undocumented)
+    [key: string]: ISchema;
 }
 
 // @public (undocumented)
@@ -382,7 +400,23 @@ parent?: Entity | undefined;
 }>>;
 
 // @public (undocumented)
+export type Transport = {
+    type: string;
+    send(message: Uint8Array): void;
+    onmessage?(message: Uint8Array): void;
+    filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
+};
+
+// Warning: (ae-forgotten-export) The symbol "ReceiveMessage" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type TransportMessage = Omit<ReceiveMessage, 'data'>;
+
+// @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;
+
+// @public (undocumented)
+export type Update = (dt: number) => void;
 
 // @public (undocumented)
 export namespace Vector3 {
@@ -427,14 +461,6 @@ export namespace Vector3 {
     export function Up(): MutableVector3;
     export function Zero(): MutableVector3;
 }
-
-// Warnings were encountered during analysis:
-//
-// dist/engine/types.d.ts:55:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
-// dist/engine/types.d.ts:77:5 - (ae-forgotten-export) The symbol "Spec" needs to be exported by the entry point index.d.ts
-// dist/engine/types.d.ts:77:5 - (ae-forgotten-export) The symbol "Result" needs to be exported by the entry point index.d.ts
-// dist/engine/types.d.ts:113:5 - (ae-forgotten-export) The symbol "SdkComponents" needs to be exported by the entry point index.d.ts
-// dist/engine/types.d.ts:119:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
