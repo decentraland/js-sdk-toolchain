@@ -24,7 +24,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     const buffer = OnPointerDown.toBinary(entity)
     OnPointerDown.updateFromBinary(entityB, buffer)
 
-    expect(onPointerDown).toEqual({ ...OnPointerDown.getModifiable(entityB) })
+    expect(onPointerDown).toEqual({ ...OnPointerDown.getMutable(entityB) })
   })
 
   it('should receive OnPointerResult', () => {

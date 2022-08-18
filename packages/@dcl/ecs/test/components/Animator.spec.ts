@@ -37,6 +37,6 @@ describe('Generated BoxShape ProtoBuf', () => {
     const buffer = Animator.toBinary(entity)
     Animator.updateFromBinary(entityB, buffer)
 
-    expect(_animator).toEqual({ ...Animator.getModifiable(entityB) })
+    expect(_animator).toEqual({ ...Animator.getMutable(entityB) })
   })
 })

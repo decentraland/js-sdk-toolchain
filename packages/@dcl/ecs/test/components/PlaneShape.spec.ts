@@ -24,11 +24,11 @@ describe('Generated PlaneShape ProtoBuf', () => {
     PlaneShape.updateFromBinary(entityB, buffer)
 
     expect(_planeShape).toBeDeepCloseTo({
-      ...PlaneShape.getModifiable(entityB)
+      ...PlaneShape.getMutable(entityB)
     })
 
     expect(PlaneShape.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...PlaneShape.getModifiable(entity)
+      ...PlaneShape.getMutable(entity)
     })
   })
 })

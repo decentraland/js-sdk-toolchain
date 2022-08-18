@@ -21,11 +21,11 @@ describe('Generated BoxShape ProtoBuf', () => {
     AvatarAttach.updateFromBinary(entityB, buffer)
 
     expect(avatarAttach).toBeDeepCloseTo({
-      ...AvatarAttach.getModifiable(entityB)
+      ...AvatarAttach.getMutable(entityB)
     })
 
     expect(AvatarAttach.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...AvatarAttach.getModifiable(entity)
+      ...AvatarAttach.getMutable(entity)
     })
   })
 })

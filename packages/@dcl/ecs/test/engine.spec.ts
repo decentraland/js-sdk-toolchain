@@ -36,7 +36,7 @@ describe('Engine tests', () => {
     const Position = engine.defineComponent(PositionSchema, 888)
     const entity = engine.addEntity()
     const entityB = engine.addEntity()
-    expect(() => Position.getModifiable(entity)).toThrowError()
+    expect(() => Position.getMutable(entity)).toThrowError()
     expect(() => Position.toBinary(entity)).toThrowError()
     Position.create(entityB, { x: 10 })
     const binary = Position.toBinary(entityB)
@@ -55,12 +55,12 @@ describe('Engine tests', () => {
 
   it('should fail when trying to add the same system twice', () => {
     const engine = Engine()
-    const system = () => {}
+    const system = () => { }
     engine.addSystem(system)
     expect(() => engine.addSystem(system)).toThrowError()
 
-    const systemA = () => {}
-    const systemA2 = () => {}
+    const systemA = () => { }
+    const systemA2 = () => { }
     engine.addSystem(systemA, SYSTEMS_REGULAR_PRIORITY, 'systemA')
     expect(() =>
       engine.addSystem(systemA2, SYSTEMS_REGULAR_PRIORITY, 'systemA')
@@ -89,7 +89,7 @@ describe('Engine tests', () => {
     }
 
     for (const [ent, _readOnlyPosition] of engine.getEntitiesWith(Position)) {
-      const position = Position.getModifiable(ent)
+      const position = Position.getMutable(ent)
       expect(ent).toBe(entity)
       expect(position).toStrictEqual({ x: 10 })
       position.x = 80
@@ -202,13 +202,13 @@ describe('Engine tests', () => {
     expect(Velocity).toThrowError()
   })
 
-  it('should return mutable obj if use component.getModifiable()', () => {
+  it('should return mutable obj if use component.getMutable()', () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
     const COMPONENT_ID = 888
     const Position = engine.defineComponent(PositionSchema, COMPONENT_ID)
     Position.create(entity, { x: 10 })
-    Position.getModifiable(entity).x = 8888
+    Position.getMutable(entity).x = 8888
     expect(Position.get(entity)).toStrictEqual({ x: 8888 })
   })
 
@@ -276,7 +276,7 @@ describe('Engine tests', () => {
     for (const [entity, _readonlyPosition] of engine.getEntitiesWith(
       Position
     )) {
-      const position = Position.getModifiable(entity)
+      const position = Position.getMutable(entity)
       expect(entity).toBe(entityA)
       expect(position).toStrictEqual({ x: 0 })
       expect(Velocity.get(entity)).toStrictEqual({ y: 1 })
@@ -306,8 +306,8 @@ describe('Engine tests', () => {
       engine.getEntitiesWith(Position, Velocity)
     ).map(([entity]) => [
       entity,
-      Position.getModifiable(entity),
-      Velocity.getModifiable(entity)
+      Position.getMutable(entity),
+      Velocity.getMutable(entity)
     ])
 
     expect(component1).toStrictEqual([entityA, { x: 0 }, { y: 0 }])
@@ -356,7 +356,7 @@ describe('Engine tests', () => {
     expect(engine.baseComponents.BoxShape.isDirty(entityA)).toBe(true)
     engine.update(1)
     expect(engine.baseComponents.BoxShape.isDirty(entityA)).toBe(false)
-    engine.baseComponents.BoxShape.getModifiable(entityA)
+    engine.baseComponents.BoxShape.getMutable(entityA)
     expect(engine.baseComponents.BoxShape.isDirty(entityA)).toBe(true)
   })
 
@@ -387,9 +387,9 @@ describe('Engine tests', () => {
       for (const [entity, _readonlyMove] of engine.getEntitiesWith(
         MoveTransformComponent
       )) {
-        const move = MoveTransformComponent.getModifiable(entity)
+        const move = MoveTransformComponent.getMutable(entity)
         move.speed += 1
-        engine.baseComponents.Transform.getModifiable(entity).position =
+        engine.baseComponents.Transform.getMutable(entity).position =
           Vector3.Zero()
         if (moves === 2) {
           MoveTransformComponent.deleteFrom(entity)
@@ -433,7 +433,7 @@ describe('Engine tests', () => {
     function moveSystem(_dt: number) {
       moves++
       for (const [ent] of engine.getEntitiesWith(Transform)) {
-        Transform.getModifiable(ent).position.x += 1
+        Transform.getMutable(ent).position.x += 1
         if (moves === 2) {
           Transform.deleteFrom(ent)
         }

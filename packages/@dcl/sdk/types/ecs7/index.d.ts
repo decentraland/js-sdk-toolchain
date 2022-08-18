@@ -76,8 +76,8 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>> = {
     create(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
     createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
     deleteFrom(entity: Entity): ComponentType<T> | null;
-    getModifiable(entity: Entity): ComponentType<T>;
-    getModifiableOrNull(entity: Entity): ComponentType<T> | null;
+    getMutable(entity: Entity): ComponentType<T>;
+    getMutableOrNull(entity: Entity): ComponentType<T> | null;
     upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
     updateFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
     toBinary(entity: Entity): ByteBuffer;
@@ -91,25 +91,25 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>> = {
 /** @public */
 declare namespace Components {
     /** @public */
-    const Transform: ComponentDefinition<ISchema<    {
-    position: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    rotation: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    };
-    scale: {
-    x: number;
-    y: number;
-    /** @public */
-    z: number;
-    };
-    parent?: Entity | undefined;
+    const Transform: ComponentDefinition<ISchema<{
+        position: {
+            x: number;
+            y: number;
+            z: number;
+        };
+        rotation: {
+            x: number;
+            y: number;
+            z: number;
+            w: number;
+        };
+        scale: {
+            x: number;
+            y: number;
+            /** @public */
+            z: number;
+        };
+        parent?: Entity | undefined;
     }>>;
     /** @public */
     const Animator: ComponentDefinition<ISchema<PBAnimator>>;
@@ -155,7 +155,7 @@ declare namespace Components {
  * @public
  */
 declare type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
-    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['getModifiable']> : never;
+    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['getMutable']> : never;
 };
 
 /**
@@ -313,24 +313,24 @@ declare type DeepReadonly<T> = {
 };
 
 declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEngine, 'defineComponentFromSchema'>): {
-    Transform: ComponentDefinition<ISchema<    {
-    position: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    rotation: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    };
-    scale: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    parent?: Entity | undefined;
+    Transform: ComponentDefinition<ISchema<{
+        position: {
+            x: number;
+            y: number;
+            z: number;
+        };
+        rotation: {
+            x: number;
+            y: number;
+            z: number;
+            w: number;
+        };
+        scale: {
+            x: number;
+            y: number;
+            z: number;
+        };
+        parent?: Entity | undefined;
     }>>;
     Animator: ComponentDefinition<ISchema<PBAnimator>>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
@@ -490,22 +490,22 @@ declare const log: (...a: any[]) => void;
  */
 declare namespace Matrix {
     type Matrix4x4 = [
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number
     ];
     type MutableMatrix = {
         /**
@@ -1597,14 +1597,14 @@ declare namespace Quaternion {
      * @param w - defines the fourth component (1.0 by default)
      */
     export function create(
-    /** defines the first component (0 by default) */
-    x?: number, 
-    /** defines the second component (0 by default) */
-    y?: number, 
-    /** defines the third component (0 by default) */
-    z?: number, 
-    /** defines the fourth component (1.0 by default) */
-    w?: number): MutableQuaternion;
+        /** defines the first component (0 by default) */
+        x?: number,
+        /** defines the second component (0 by default) */
+        y?: number,
+        /** defines the third component (0 by default) */
+        z?: number,
+        /** defines the fourth component (1.0 by default) */
+        w?: number): MutableQuaternion;
     /**
      * Returns a new Quaternion as the result of the addition of the two given quaternions.
      * @param q1 - the first quaternion
@@ -1825,24 +1825,24 @@ declare const ToLinearSpace = 2.2;
 declare type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
 /** @public */
-declare const Transform: ComponentDefinition<ISchema<    {
-position: {
-x: number;
-y: number;
-z: number;
-};
-rotation: {
-x: number;
-y: number;
-z: number;
-w: number;
-};
-scale: {
-x: number;
-y: number;
-z: number;
-};
-parent?: Entity | undefined;
+declare const Transform: ComponentDefinition<ISchema<{
+    position: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    rotation: {
+        x: number;
+        y: number;
+        z: number;
+        w: number;
+    };
+    scale: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    parent?: Entity | undefined;
 }>>;
 
 declare type Transport = {
@@ -1889,18 +1889,18 @@ declare namespace Vector3 {
      * @param z - defines the third coordinates (on Z axis)
      */
     export function create(
-    /**
-     * Defines the first coordinates (on X axis)
-     */
-    x?: number, 
-    /**
-     * Defines the second coordinates (on Y axis)
-     */
-    y?: number, 
-    /**
-     * Defines the third coordinates (on Z axis)
-     */
-    z?: number): MutableVector3;
+        /**
+         * Defines the first coordinates (on X axis)
+         */
+        x?: number,
+        /**
+         * Defines the second coordinates (on Y axis)
+         */
+        y?: number,
+        /**
+         * Defines the third coordinates (on Z axis)
+         */
+        z?: number): MutableVector3;
     /**
      * Returns a new Vector3 as the result of the addition of the two given vectors.
      * @param vector1 - the first vector

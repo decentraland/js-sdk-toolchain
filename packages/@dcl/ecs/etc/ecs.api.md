@@ -59,8 +59,8 @@ export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
     create(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
     createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
     deleteFrom(entity: Entity): ComponentType<T> | null;
-    getModifiable(entity: Entity): ComponentType<T>;
-    getModifiableOrNull(entity: Entity): ComponentType<T> | null;
+    getMutable(entity: Entity): ComponentType<T>;
+    getMutableOrNull(entity: Entity): ComponentType<T> | null;
     upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
     updateFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
     toBinary(entity: Entity): ByteBuffer;
@@ -157,7 +157,7 @@ export namespace Components {
 
 // @public (undocumented)
 export type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
-    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['getModifiable']> : never;
+    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['getMutable']> : never;
 };
 
 // Warning: (ae-forgotten-export) The symbol "EcsResult" needs to be exported by the entry point index.d.ts

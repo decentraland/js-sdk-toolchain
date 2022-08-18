@@ -23,10 +23,10 @@ describe('Generated BoxShape ProtoBuf', () => {
     const buffer = GLTFShape.toBinary(entity)
     GLTFShape.updateFromBinary(entityB, buffer)
 
-    expect(_shape).toBeDeepCloseTo({ ...GLTFShape.getModifiable(entityB) })
+    expect(_shape).toBeDeepCloseTo({ ...GLTFShape.getMutable(entityB) })
 
     expect(GLTFShape.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...GLTFShape.getModifiable(entity)
+      ...GLTFShape.getMutable(entity)
     })
   })
 })

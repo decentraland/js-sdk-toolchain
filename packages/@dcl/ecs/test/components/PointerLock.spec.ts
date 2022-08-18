@@ -18,11 +18,11 @@ describe('Generated PointerLock ProtoBuf', () => {
     PointerLock.updateFromBinary(entityB, buffer)
 
     expect(_pointerLock).toBeDeepCloseTo({
-      ...PointerLock.getModifiable(entityB)
+      ...PointerLock.getMutable(entityB)
     })
 
     expect(PointerLock.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...PointerLock.getModifiable(entity)
+      ...PointerLock.getMutable(entity)
     })
   })
 })

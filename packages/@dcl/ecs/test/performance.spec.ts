@@ -32,7 +32,7 @@ describe('Performance.', () => {
 
     function doorSystem() {
       for (const [entity] of engine.getEntitiesWith(components.Door)) {
-        components.Door.getModifiable(entity).open = Math.random() * 10
+        components.Door.getMutable(entity).open = Math.random() * 10
       }
     }
 
@@ -43,9 +43,9 @@ describe('Performance.', () => {
         readonlyTransform
       ] of engine.getEntitiesWith(components.Position, Transform)) {
         // TODO: see this
-        Transform.getModifiable(entity).position.x =
+        Transform.getMutable(entity).position.x =
           (readonlyPosition.x as any as number) + Math.random() * 10
-        components.Position.getModifiable(entity).y =
+        components.Position.getMutable(entity).y =
           readonlyTransform.position.y + Math.random() * 10
       }
     }

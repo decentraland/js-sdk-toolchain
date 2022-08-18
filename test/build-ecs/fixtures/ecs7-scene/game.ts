@@ -5,7 +5,7 @@ function circularSystem() {
 
     const group = engine.getEntitiesWith(BoxShape)
     for (const [entity] of group) {
-      const transform = Transform.getModifiableOrNull(entity)
+      const transform = Transform.getMutableOrNull(entity)
       if (transform) {
         transform.position.x = 8 + 2 * Math.cos(t)
         transform.position.z = 8 + 2 * Math.sin(t)

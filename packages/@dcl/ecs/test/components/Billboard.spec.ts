@@ -21,10 +21,10 @@ describe('Generated Billboard ProtoBuf', () => {
     const buffer = Billboard.toBinary(entity)
     Billboard.updateFromBinary(entityB, buffer)
 
-    expect(billboard).toBeDeepCloseTo({ ...Billboard.getModifiable(entityB) })
+    expect(billboard).toBeDeepCloseTo({ ...Billboard.getMutable(entityB) })
 
     expect(Billboard.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...Billboard.getModifiable(entity)
+      ...Billboard.getMutable(entity)
     })
   })
 })

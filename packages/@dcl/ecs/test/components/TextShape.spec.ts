@@ -63,7 +63,7 @@ describe('Generated BoxShape ProtoBuf', () => {
     const buffer = TextShape.toBinary(entity)
     TextShape.updateFromBinary(entityB, buffer)
 
-    const otherTextShape = TextShape.getModifiable(entityB)
+    const otherTextShape = TextShape.getMutable(entityB)
     expect(_textShape).toBeDeepCloseTo({
       ...(otherTextShape as any)
     })

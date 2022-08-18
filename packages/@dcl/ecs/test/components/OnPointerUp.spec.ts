@@ -24,7 +24,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     OnPointerUp.updateFromBinary(entityB, buffer)
 
     expect(onPointerUp).toBeDeepCloseTo({
-      ...OnPointerUp.getModifiable(entityB)
+      ...OnPointerUp.getMutable(entityB)
     })
   })
 

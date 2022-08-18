@@ -29,7 +29,7 @@ describe('CRDT tests', () => {
     // Reset ws.send called times
     jest.resetAllMocks()
 
-    Transform.getModifiable(entityA).position.x = 10
+    Transform.getMutable(entityA).position.x = 10
     engine.update(1 / 30)
     expect(spySend).toBeCalledTimes(1)
   })
@@ -52,7 +52,7 @@ describe('CRDT tests', () => {
     jest.resetAllMocks()
 
     // Update a component and verify that's being sent through the crdt system
-    Transform.getModifiable(entityA).position.x = 10
+    Transform.getMutable(entityA).position.x = 10
     engine.update(1 / 30)
     expect(spySend).toBeCalledTimes(1)
 
@@ -120,7 +120,7 @@ describe('CRDT tests', () => {
     const DoorComponent = clientA.components.Door
     // Upate Transform from static entity
     const entity = (clientA.engine.addEntity() - 1) as Entity
-    Transform.getModifiable(entity).position.x = 10
+    Transform.getMutable(entity).position.x = 10
 
     // Create a dynamic entity
     const dynamicEntity = clientA.engine.addDynamicEntity()
@@ -135,7 +135,7 @@ describe('CRDT tests', () => {
           DoorComponent
         )) {
           if (EntityUtils.isStaticEntity(entity)) continue
-          DoorComponent.getModifiable(entity).open = isRandomGuy
+          DoorComponent.getMutable(entity).open = isRandomGuy
             ? DOOR_VALUE
             : Math.max(Math.random(), DOOR_VALUE) // Some random value < DOOR_VALUE
         }
@@ -158,7 +158,7 @@ describe('CRDT tests', () => {
     const entity = engine.addEntity()
     engine.baseComponents.Transform.create(entity, SandBox.DEFAULT_POSITION)
     engine.update(1)
-    engine.baseComponents.Transform.getModifiable(entity).position.x = 8
+    engine.baseComponents.Transform.getMutable(entity).position.x = 8
     engine.update(1)
     const buffer = createByteBuffer()
     ComponentOperation.write(

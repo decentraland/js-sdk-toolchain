@@ -21,11 +21,11 @@ describe('Generated CameraModifierArea ProtoBuf', () => {
     CameraModeArea.updateFromBinary(entityB, buffer)
 
     expect(avatarModifierArea).toEqual({
-      ...CameraModeArea.getModifiable(entityB)
+      ...CameraModeArea.getMutable(entityB)
     })
 
     expect(CameraModeArea.createOrReplace(entityB)).not.toEqual({
-      ...CameraModeArea.getModifiable(entity)
+      ...CameraModeArea.getMutable(entity)
     })
   })
 })
