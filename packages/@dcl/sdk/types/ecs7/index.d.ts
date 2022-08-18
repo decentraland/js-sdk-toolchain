@@ -70,21 +70,125 @@ declare interface Color3 {
  */
 declare type ComponentDefinition<T extends ISchema = ISchema<any>> = {
     _id: number;
+    /**
+     * Return the default value of the current component
+     */
+    default(): DeepReadonly<ComponentType<T>>;
+    /**
+     * Get if the entity has this component
+     * @param entity
+     *
+     * Example:
+     * ```ts
+     * const myEntity = engine.addEntity()
+     * Transform.has(myEntity) // return false
+     * Transform.create(myEntity)
+     * Transform.has(myEntity) // return true
+     * ```
+     */
     has(entity: Entity): boolean;
-    getFrom(entity: Entity): DeepReadonly<ComponentType<T>>;
+    /**
+     * Get the readonly component of the entity (to mutate it, use getMutable instead), throw an error if the entity doesn't have the component.
+     * @param entity
+     * @return
+     * Example:
+     * ```ts
+     * const myEntity = engine.addEntity()
+     * Transform.create(myEntity)
+     * const transform = Transform.get(myEntity) // return true
+     * log(transform.position.x === 0) // log 'true'
+     *
+     * transform.position.y = 10 // illegal statement, to mutate the component use getMutable
+     * ```
+     *
+     * ```ts
+     * const otherEntity = engine.addEntity()
+     * Transform.get(otherEntity) // throw an error!!
+     * ```
+     */
+    get(entity: Entity): DeepReadonly<ComponentType<T>>;
+    /**
+     * Get the readonly component of the entity (to mutate it, use getMutable instead), or null if the entity doesn't have the component.
+     * @param entity
+     * @return
+     *
+     * Example:
+     * ```ts
+     * const otherEntity = engine.addEntity()
+     * log(Transform.get(otherEntity) === null) // log 'true'
+     * ```
+     */
     getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
+    /**
+     * Add the current component to an entity, throw an error if the component already exists (use `createOrReplace` instead).
+     * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
+     * @param entity
+     * @param val The initial value
+     *
+     * Example:
+     * ```ts
+     * const myEntity = engine.addEntity()
+     * Transform.create(myEntity, { ...Transform.default(), position: {x: 4, y: 0, z: 4} }) // ok!
+     * Transform.create(myEntity) // throw an error, the `Transform` component already exists in `myEntity`
+     * ````
+     */
     create(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
-    mutable(entity: Entity): ComponentType<T>;
+    /**
+     * Add the current component to an entity or replace the content if the entity already has the component
+     * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
+     * @param entity
+     * @param val The initial or new value
+     *
+     * Example:
+     * ```ts
+     * const myEntity = engine.addEntity()
+     * Transform.create(myEntity) // ok!
+     * Transform.createOrReplace(myEntity, { ...Transform.default(), position: {x: 4, y: 0, z: 4} }) // ok!
+     * ````
+     */
     createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
+    /**
+     * Delete the current component to an entity, return null if the entity doesn't have the current component.
+     * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
+     * @param entity
+     *
+     * Example:
+     * ```ts
+     * const myEntity = engine.addEntity()
+     * Transform.create(myEntity) // ok!
+     * Transform.deleteFrom(myEntity) // return the component
+     * Transform.deleteFrom(myEntity) // return null
+     * ````
+     */
     deleteFrom(entity: Entity): ComponentType<T> | null;
-    upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
-    updateFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
-    toBinary(entity: Entity): ByteBuffer;
+    /**
+     * Get the mutable component of the entity, throw an error if the entity doesn't have the component.
+     * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
+     * @param entity
+     *
+     * Example:
+     * ```ts
+     * const myEntity = engine.addEntity()
+     * Transform.create(myEntity)
+     * Transform.getMutable(myEntity).position = {x: 4, y: 0, z: 4}
+     * ````
+     */
+    getMutable(entity: Entity): ComponentType<T>;
+    /**
+     * Get the mutable component of the entity, return null if the entity doesn't have the component.
+     * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
+     * @param entity
+     *
+     * Example:
+     * ```ts
+     * const transform = Transform.getMutableOrNull(myEntity)
+     * if (transform) {
+     *   transform.position = {x: 4, y: 0, z: 4}
+     * }
+     * ````
+     */
+    getMutableOrNull(entity: Entity): ComponentType<T> | null;
     writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void;
-    iterator(): Iterable<[Entity, ComponentType<T>]>;
-    dirtyIterator(): Iterable<Entity>;
-    clearDirty(): void;
-    isDirty(entity: Entity): boolean;
 };
 
 /** @public */
@@ -154,7 +258,7 @@ declare namespace Components {
  * @public
  */
 declare type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
-    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['mutable']> : never;
+    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['getMutable']> : never;
 };
 
 /**
@@ -311,7 +415,7 @@ declare type DeepReadonly<T> = {
     readonly [P in keyof T]: DeepReadonly<T[P]>;
 };
 
-declare function defineLibraryComponents({ defineComponent }: Pick<IEngine, 'defineComponent'>): {
+declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEngine, 'defineComponentFromSchema'>): {
     Transform: ComponentDefinition<ISchema<    {
     position: {
     x: number;
@@ -392,6 +496,8 @@ declare const entitySymbol: unique symbol;
  */
 declare const Epsilon = 0.000001;
 
+declare const error: (message: string | Error, data?: any) => void;
+
 /** Excludes property keys from T where the property is assignable to U */
 declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
@@ -415,16 +521,96 @@ declare function IArray<T>(type: ISchema<T>): ISchema<Array<T>>;
  * @public
  */
 declare type IEngine = {
+    /**
+     * Increment the used entity counter and return the next one.
+     * @param dynamic
+     * @return the next entity unused
+     */
     addEntity(dynamic?: boolean): Entity;
+    /**
+     * An alias of engine.addEntity(true)
+     */
     addDynamicEntity(): Entity;
+    /**
+     * Remove all components of an entity
+     * @param entity
+     */
     removeEntity(entity: Entity): void;
+    /**
+     * Add the system to the engine. It will be called every tick updated.
+     * @param system function that receives the delta time between last tick and current one.
+     * @param priority a number with the priority, big number are called before smaller ones
+     * @param name optional: a unique name to identify it
+     *
+     * Example:
+     * ```ts
+     * function mySystem(dt: number) {
+     *   const entitiesWithBoxShapes = engine.getEntitiesWith(BoxShape, Transform)
+     *   for (const [entity, _boxShape, _transform] of engine.getEntitiesWith(BoxShape, Transform)) {
+     *     // do stuffs
+     *   }
+     * }
+     * engine.addSystem(mySystem, 10)
+     * ```
+     */
     addSystem(system: Update, priority?: number, name?: string): void;
+    /**
+     * Remove a system from the engine.
+     * @param selector the function or the unique name to identify
+     * @returns if it was found and removed
+     */
     removeSystem(selector: string | Update): boolean;
-    defineComponent<T extends ISchema>(componentId: number, spec: T): ComponentDefinition<T>;
-    mutableGroupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ComponentSchema<T>]>;
-    groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
+    /**
+     * Define a component and add it to the engine.
+     * @param spec An object with schema fields
+     * @param componentId unique id to identify the component, if the component id already exist, it will fail.
+     * @return The component definition
+     *
+     * ```ts
+     * const DoorComponentId = 10017
+     * const Door = engine.defineComponent({
+     *   id: Schemas.Int,
+     *   name: Schemas.String
+     * }, DoorComponentId)
+     *
+     * ```
+     */
+    defineComponent<T extends Spec>(spec: Spec, componentId: number): ComponentDefinition<ISchema<Result<T>>>;
+    /**
+     * Define a component and add it to the engine.
+     * @param spec An object with schema fields
+     * @param componentId unique id to identify the component, if the component id already exist, it will fail.
+     * @return The component definition
+     *
+     * ```ts
+     * const StateComponentId = 10023
+     * const StateComponent = engine.defineComponent(Schemas.Bool, VisibleComponentId)
+     * ```
+     */
+    defineComponentFromSchema<T extends ISchema>(spec: T, componentId: number): ComponentDefinition<T>;
+    /**
+     * Get the component definition from the component id.
+     * @param componentId
+     * @return the component definition, throw an error if it doesn't exist
+     * ```ts
+     * const StateComponentId = 10023
+     * const StateComponent = engine.getComponent(StateComponentId)
+     * ```
+     */
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
-    update(dt: number): void;
+    /**
+     * Get a iterator of entities that has all the component requested.
+     * @param components a list of component definitions
+     * @return An iterator of an array with the [entity, component1, component2, ...]
+     *
+     * Example:
+     * ```ts
+     * for (const [entity, boxShape, transform] of engine.getEntitiesWith(BoxShape, Transform)) {
+     * // the properties of boxShape and transform are read only
+     * }
+     * ```
+     */
+    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
     baseComponents: SdkComponents;
 };
 
@@ -478,6 +664,8 @@ declare interface ISize {
      */
     height: number;
 }
+
+declare const log: (...a: any[]) => void;
 
 /**
  * Class used to store matrix data (4x4)

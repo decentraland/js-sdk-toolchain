@@ -33,8 +33,9 @@ describe('Transport tests', () => {
     const engine = Engine({ transports })
     const entity = engine.addDynamicEntity()
     const UserComponent = engine.defineComponent(
-      8888,
-      Schemas.Map({ x: Schemas.Byte })
+      { x: Schemas.Byte },
+
+      8888
     )
 
     // Transform component should be sent to renderer transport

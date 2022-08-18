@@ -29,9 +29,9 @@ describe('Generated NFTShape ProtoBuf', () => {
     const buffer = NFTShape.toBinary(entity)
     NFTShape.updateFromBinary(entityB, buffer)
 
-    expect(_nftShape).toBeDeepCloseTo({ ...NFTShape.getFrom(entityB) })
+    expect(_nftShape).toBeDeepCloseTo({ ...NFTShape.get(entityB) })
     expect(NFTShape.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...NFTShape.getFrom(entity)
+      ...NFTShape.get(entity)
     })
   })
 })

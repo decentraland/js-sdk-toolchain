@@ -53,21 +53,16 @@ export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
 // @public (undocumented)
 export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
     _id: number;
+    default(): DeepReadonly<ComponentType<T>>;
     has(entity: Entity): boolean;
-    getFrom(entity: Entity): DeepReadonly<ComponentType<T>>;
+    get(entity: Entity): DeepReadonly<ComponentType<T>>;
     getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
     create(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
-    mutable(entity: Entity): ComponentType<T>;
     createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
     deleteFrom(entity: Entity): ComponentType<T> | null;
-    upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
-    updateFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
-    toBinary(entity: Entity): ByteBuffer;
+    getMutable(entity: Entity): ComponentType<T>;
+    getMutableOrNull(entity: Entity): ComponentType<T> | null;
     writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void;
-    iterator(): Iterable<[Entity, ComponentType<T>]>;
-    dirtyIterator(): Iterable<Entity>;
-    clearDirty(): void;
-    isDirty(entity: Entity): boolean;
 };
 
 // @public (undocumented)
@@ -156,7 +151,7 @@ export namespace Components {
 
 // @public (undocumented)
 export type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
-    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['mutable']> : never;
+    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['getMutable']> : never;
 };
 
 // Warning: (ae-forgotten-export) The symbol "EcsResult" needs to be exported by the entry point index.d.ts
@@ -193,6 +188,9 @@ export type Entity = number & {
 export const Epsilon = 0.000001;
 
 // @public (undocumented)
+export const error: (message: string | Error, data?: any) => void;
+
+// @public (undocumented)
 export type float = number;
 
 // @public (undocumented)
@@ -208,11 +206,10 @@ export type IEngine = {
     removeEntity(entity: Entity): void;
     addSystem(system: Update, priority?: number, name?: string): void;
     removeSystem(selector: string | Update): boolean;
-    defineComponent<T extends ISchema>(componentId: number, spec: T): ComponentDefinition<T>;
-    mutableGroupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ComponentSchema<T>]>;
-    groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
+    defineComponent<T extends Spec>(spec: Spec, componentId: number): ComponentDefinition<ISchema<Result<T>>>;
+    defineComponentFromSchema<T extends ISchema>(spec: T, componentId: number): ComponentDefinition<T>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
-    update(dt: number): void;
+    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
     baseComponents: SdkComponents;
 };
 
@@ -226,6 +223,9 @@ export interface ISize {
     height: number;
     width: number;
 }
+
+// @public (undocumented)
+export const log: (...a: any[]) => void;
 
 // @public (undocumented)
 export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
@@ -301,6 +301,13 @@ export namespace Quaternion {
 // @public
 export const RAD2DEG: number;
 
+// Warning: (ae-forgotten-export) The symbol "ToOptional" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type Result<T extends Spec> = ToOptional<{
+    [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? Result<T[K]> : never;
+}>;
+
 // @public (undocumented)
 export namespace Schemas {
     // (undocumented)
@@ -341,11 +348,22 @@ export namespace Schemas {
     Optional: typeof IOptional;
 }
 
+// Warning: (ae-forgotten-export) The symbol "defineLibraryComponents" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type SdkComponents = ReturnType<typeof defineLibraryComponents>;
+
 // @public
 export enum Space {
     BONE = 2,
     LOCAL = 0,
     WORLD = 1
+}
+
+// @public (undocumented)
+export interface Spec {
+    // (undocumented)
+    [key: string]: ISchema;
 }
 
 // @public (undocumented)
@@ -382,7 +400,23 @@ parent?: Entity | undefined;
 }>>;
 
 // @public (undocumented)
+export type Transport = {
+    type: string;
+    send(message: Uint8Array): void;
+    onmessage?(message: Uint8Array): void;
+    filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
+};
+
+// Warning: (ae-forgotten-export) The symbol "ReceiveMessage" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type TransportMessage = Omit<ReceiveMessage, 'data'>;
+
+// @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;
+
+// @public (undocumented)
+export type Update = (dt: number) => void;
 
 // @public (undocumented)
 export namespace Vector3 {
@@ -427,12 +461,6 @@ export namespace Vector3 {
     export function Up(): MutableVector3;
     export function Zero(): MutableVector3;
 }
-
-// Warnings were encountered during analysis:
-//
-// dist/engine/types.d.ts:25:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
-// dist/engine/types.d.ts:32:5 - (ae-forgotten-export) The symbol "SdkComponents" needs to be exported by the entry point index.d.ts
-// dist/engine/types.d.ts:38:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

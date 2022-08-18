@@ -13,9 +13,9 @@ export namespace SandBox {
   export const WS_SEND_DELAY = 30
   export const Position = {
     id: 88,
-    type: Schemas.Map({ x: Schemas.Float, y: Schemas.Float })
+    type: { x: Schemas.Float, y: Schemas.Float }
   }
-  export const Door = { id: 888, type: Schemas.Map({ open: Schemas.Byte }) }
+  export const Door = { id: 888, type: { open: Schemas.Byte } }
 
   export const DEFAULT_POSITION = {
     position: Vector3.create(0, 1, 2),
@@ -33,10 +33,10 @@ export namespace SandBox {
       const clientTransport = transport.createNetworkTransport()
       const engine = Engine({ transports: [clientTransport] })
       const Position = engine.defineComponent(
-        SandBox.Position.id,
-        SandBox.Position.type
+        SandBox.Position.type,
+        SandBox.Position.id
       )
-      const Door = engine.defineComponent(SandBox.Door.id, SandBox.Door.type)
+      const Door = engine.defineComponent(SandBox.Door.type, SandBox.Door.id)
 
       return {
         id: index,
