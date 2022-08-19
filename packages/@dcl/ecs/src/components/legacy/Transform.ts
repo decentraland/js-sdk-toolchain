@@ -1,6 +1,7 @@
 import type { ISchema } from '../../schemas/ISchema'
 import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
+import { ComponentDefinition } from '../../engine'
 
 /**
  * @internal
@@ -62,8 +63,31 @@ export const TransformSchema: ISchema<TransformType> = {
     return {
       position: { x: 0, y: 0, z: 0 },
       scale: { x: 1, y: 1, z: 1 },
-      rotation: { x: 0, y: 0, z: 0, w: 1 },
-      parent: undefined
+      rotation: { x: 0, y: 0, z: 0, w: 1 }
+    }
+  }
+}
+
+/**
+ * @internal
+ */
+type TransformTypeWithOptionals = {
+  position?: { x: number; y: number; z: number }
+  rotation?: { x: number; y: number; z: number; w: number }
+  scale?: { x: number; y: number; z: number }
+  parent?: Entity
+}
+
+export function wrapTransformDefinition(
+  def: ComponentDefinition<ISchema<TransformType>>
+) {
+  return {
+    ...def,
+
+    create(entity: Entity, val?: TransformTypeWithOptionals): TransformType {
+      const defaultTransform = { ...def.default() } as TransformType
+      const value = { ...defaultTransform, ...(val || {}) }
+      return def.create(entity, value)
     }
   }
 }
