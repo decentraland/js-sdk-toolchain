@@ -1,12 +1,10 @@
 import { TransportMessage } from '../types'
 import { Transport } from './types'
-import { ComponentIds } from '../../../components/generated/index.gen'
-import { LEGACY_COMPONENT_ID } from '../../../components/legacy/types'
+import { ECSComponentIDs } from '../../../components/generated/ids.gen'
 
-const componentIds = Object.values(ComponentIds)
+const componentIds = Object.values(ECSComponentIDs)
   .filter((a) => typeof a === 'number')
   .map(Number)
-const rendererComponentIds = componentIds.concat(LEGACY_COMPONENT_ID.TRANSFORM)
 
 export function createRendererTransport(): Transport {
   const type = 'renderer'
@@ -27,7 +25,7 @@ export function createRendererTransport(): Transport {
       }
 
       // Only send renderer components (Proto Generated)
-      if (!rendererComponentIds.includes(message.componentId)) {
+      if (!componentIds.includes(message.componentId)) {
         return false
       }
 

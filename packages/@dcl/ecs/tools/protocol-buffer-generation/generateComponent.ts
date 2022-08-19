@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import componentEcsTypeTemplate from './componentEcsTypeTemplate'
+import componentSchemaTemplate from './componentSchemaTemplate'
 
 export type Component = {
   componentId: number
@@ -18,7 +18,7 @@ export async function generateComponent(params: {
     generatedPath,
     `${component.componentName}.gen.ts`
   )
-  const componentContent = componentEcsTypeTemplate
+  const componentContent = componentSchemaTemplate
     .replace(/Component.gen/g, `${component.componentName}.gen`)
     .replace(/Component/g, component.componentName)
     .replace('INVALID_COMPONENT_ID', component.componentId.toString())

@@ -1,4 +1,3 @@
-import { defineSdkComponents, SdkComponents } from '../components'
 import { crdtSceneSystem } from '../systems/crdt'
 import { Entity, EntityContainer } from './entity'
 import {
@@ -6,14 +5,17 @@ import {
   ComponentDefinition,
   defineComponent as defComponent
 } from './component'
-import type { ComponentEcsType, IEngineParams } from './types'
+import type { ComponentSchema, IEngineParams } from './types'
 import type { DeepReadonly } from '../Math'
-import type { EcsType } from '../built-in-types/EcsType'
 import { IEngine } from './types'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
+import { ISchema } from '../schemas/ISchema'
+import { defineLibraryComponents } from './../components/generated/index.gen'
+import { Result, Spec } from '../schemas/Map'
+import { Schemas } from '../schemas'
 
-export { ComponentType, Entity, ByteBuffer, SdkComponents, ComponentDefinition }
+export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
 export * from './types'
 
 function preEngine() {
@@ -59,9 +61,9 @@ function preEngine() {
     return entityContainer.removeEntity(entity)
   }
 
-  function defineComponent<T extends EcsType>(
-    componentId: number,
-    spec: T
+  function defineComponentFromSchema<T extends ISchema>(
+    spec: T,
+    componentId: number
   ): ComponentDefinition<T> {
     if (componentsDefinition.get(componentId)) {
       throw new Error(`Component ${componentId} already declared`)
@@ -71,7 +73,14 @@ function preEngine() {
     return newComponent
   }
 
-  function getComponent<T extends EcsType>(
+  function defineComponent<T extends Spec>(
+    spec: Spec,
+    componentId: number
+  ): ComponentDefinition<ISchema<Result<T>>> {
+    return defineComponentFromSchema(Schemas.Map(spec), componentId)
+  }
+
+  function getComponent<T extends ISchema>(
     componentId: number
   ): ComponentDefinition<T> {
     const component = componentsDefinition.get(componentId)
@@ -83,24 +92,13 @@ function preEngine() {
     return component
   }
 
-  function* mutableGroupOf<
+  function* getEntitiesWith<
     T extends [ComponentDefinition, ...ComponentDefinition[]]
-  >(...components: T): Iterable<[Entity, ...ComponentEcsType<T>]> {
+  >(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]> {
     for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
-      yield [entity, ...groupComp.map((c) => c.mutable(entity))] as [
+      yield [entity, ...groupComp.map((c) => c.get(entity))] as [
         Entity,
-        ...ComponentEcsType<T>
-      ]
-    }
-  }
-
-  function* groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(
-    ...components: T
-  ): Iterable<[Entity, ...DeepReadonly<ComponentEcsType<T>>]> {
-    for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
-      yield [entity, ...groupComp.map((c) => c.getFrom(entity))] as [
-        Entity,
-        ...DeepReadonly<ComponentEcsType<T>>
+        ...DeepReadonly<ComponentSchema<T>>
       ]
     }
   }
@@ -138,8 +136,8 @@ function preEngine() {
     getSystems,
     removeSystem,
     defineComponent,
-    mutableGroupOf,
-    groupOf,
+    defineComponentFromSchema,
+    getEntitiesWith,
     getComponent
   }
 }
@@ -155,7 +153,7 @@ export type PreEngine = ReturnType<typeof preEngine>
 export function Engine({ transports }: IEngineParams = {}): IEngine {
   const engine = preEngine()
   const crdtSystem = crdtSceneSystem({ engine, transports: transports || [] })
-  const baseComponents = defineSdkComponents(engine)
+  const baseComponents = defineLibraryComponents(engine)
 
   function update(dt: number) {
     crdtSystem.receiveMessages()
@@ -172,7 +170,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     ]
     const excludeComponentIds = removeSelectedComponents.map((item) => item._id)
     for (const componentDef of removeSelectedComponents) {
-      for (const [entity] of engine.groupOf(componentDef)) {
+      for (const [entity] of engine.getEntitiesWith(componentDef)) {
         componentDef.deleteFrom(entity)
       }
     }
@@ -205,8 +203,8 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     addSystem: engine.addSystem,
     removeSystem: engine.removeSystem,
     defineComponent: engine.defineComponent,
-    mutableGroupOf: engine.mutableGroupOf,
-    groupOf: engine.groupOf,
+    defineComponentFromSchema: engine.defineComponentFromSchema,
+    getEntitiesWith: engine.getEntitiesWith,
     getComponent: engine.getComponent,
     update,
     baseComponents

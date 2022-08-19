@@ -21,10 +21,10 @@ describe.skip('Generated AudioStream ProtoBuf', () => {
     const buffer = AudioStream.toBinary(entity)
     AudioStream.updateFromBinary(entityB, buffer)
 
-    expect(_audioStream).toBeDeepCloseTo({ ...AudioStream.mutable(entityB) })
+    expect(_audioStream).toBeDeepCloseTo({ ...AudioStream.getMutable(entityB) })
 
     expect(AudioStream.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...AudioStream.mutable(entity)
+      ...AudioStream.getMutable(entity)
     })
   })
 })
