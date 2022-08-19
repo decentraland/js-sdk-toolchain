@@ -1,6 +1,6 @@
 # Add or modify components in SDK 7
 
-Adding a new component to the SDK is an important change, because it will need to be supported in the future. This also must contemplaye avoiding breaking existing components by mistake.
+Adding a new component to the SDK is an important change, because it will need to be supported in the future. This also must contemplated avoiding breaking existing components by mistake.
 
 This is why adding or modifying a component introduces some friction, to make sure it will always work. 
 
@@ -14,6 +14,9 @@ The development of any component needs to cover three stages:
 
 To define a component, we need to create a PR in the [protocol repository](https://github.com/decentraland/protocol). This repository only publishes the definitions of the interfaces used for messages. During the build process of this PR, if all goes well (backward compatibility is not broken), the CI will throw us a command that we can use to run a local installation of the `@dcl/protocol` package in the project where we want to use the definitions.
 
+### Adding optional behavior
+At the protocol level, each component field can be serialized or deduced. For primitives types like numbers, strings, or arrays the default values taken are the [protocol buffer defaults](https://developers.google.com/protocol-buffers/docs/proto3#default). Suppose we need to explicit a custom behavior when the field is not serialized (because maybe it wasn't defined). In that case, we can add the `optional` key, and explicitly the default value must be taken in this case.
+
 ## Component behavior
 
 The component behavior refers to how the data of the component is deserialized, interpreted and used by systems.
@@ -22,6 +25,10 @@ As an example, we are going to use the [unity renderer repository](https://githu
 In `unity-renderer` it is possible to update definitions from the `@dcl/protocol` package version `next`. This version corresponds to the latest commit merged into `main` of that repository. You can also choose the package from a specific PR, using the constant `FIXED_NPM_PACKAGE_LINK` (you can do a global search to find this constant definition). The source of what is supplied in the PR `npm install XXXXX` is copied, leaving `FIXED_NPM_PACKAGE_LINK = " xxxx"`.
 
 With the protocol definitions already acquired, the code is generated. Now you can use it in the local environment of `unity-renderer`. The building of a scene with this same local environment will be replicated in the next subsection.
+
+To get more information you can visit the [unity-renderer guide](https://github.com/decentraland/unity-renderer/blob/dev/docs/ecs7-component-creation.md), it's more focused on the unity side.
+
+
 
 ## Add the component to the SDK
 
