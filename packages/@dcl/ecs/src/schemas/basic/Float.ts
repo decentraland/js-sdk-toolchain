@@ -1,10 +1,10 @@
 import { ByteBuffer } from '../../serialization/ByteBuffer'
-import { EcsType } from '../EcsType'
+import { ISchema } from '../ISchema'
 
 /**
  * @public
  */
-export const Float32: EcsType<number> = {
+export const Float32: ISchema<number> = {
   serialize(value: number, builder: ByteBuffer): void {
     builder.writeFloat32(value)
   },
@@ -19,7 +19,7 @@ export const Float32: EcsType<number> = {
 /**
  * @public
  */
-export const Float64: EcsType<number> = {
+export const Float64: ISchema<number> = {
   serialize(value: number, builder: ByteBuffer): void {
     builder.writeFloat64(value)
   },

@@ -1,6 +1,6 @@
 ﻿import { Engine } from '../../src/engine'
 
-describe.skip('Generated Billboard ProtoBuf', () => {
+describe('Generated Billboard ProtoBuf', () => {
   it('should serialize/deserialize Billboard', () => {
     const newEngine = Engine()
     const { Billboard } = newEngine.baseComponents
@@ -21,10 +21,10 @@ describe.skip('Generated Billboard ProtoBuf', () => {
     const buffer = Billboard.toBinary(entity)
     Billboard.updateFromBinary(entityB, buffer)
 
-    expect(billboard).toBeDeepCloseTo({ ...Billboard.mutable(entityB) })
+    expect(billboard).toBeDeepCloseTo({ ...Billboard.getMutable(entityB) })
 
     expect(Billboard.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...Billboard.mutable(entity)
+      ...Billboard.getMutable(entity)
     })
   })
 })

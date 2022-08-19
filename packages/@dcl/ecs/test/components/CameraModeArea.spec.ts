@@ -1,4 +1,4 @@
-import { CameraMode } from '../../src/components/generated/pb/CameraModeArea.gen'
+import { CameraModeValue } from '../../src/components/generated/pb/common/CameraModeValue.gen'
 import { Engine } from '../../src/engine'
 
 describe('Generated CameraModifierArea ProtoBuf', () => {
@@ -10,22 +10,22 @@ describe('Generated CameraModifierArea ProtoBuf', () => {
 
     const avatarModifierArea = CameraModeArea.create(entity, {
       area: { x: 1, y: 2, z: 3 },
-      mode: CameraMode.FIRST_PERSON
+      mode: CameraModeValue.FIRST_PERSON
     })
 
     CameraModeArea.create(entityB, {
       area: { x: 3, y: 4, z: 5 },
-      mode: CameraMode.THIRD_PERSON
+      mode: CameraModeValue.THIRD_PERSON
     })
     const buffer = CameraModeArea.toBinary(entity)
     CameraModeArea.updateFromBinary(entityB, buffer)
 
     expect(avatarModifierArea).toEqual({
-      ...CameraModeArea.mutable(entityB)
+      ...CameraModeArea.getMutable(entityB)
     })
 
     expect(CameraModeArea.createOrReplace(entityB)).not.toEqual({
-      ...CameraModeArea.mutable(entity)
+      ...CameraModeArea.getMutable(entity)
     })
   })
 })

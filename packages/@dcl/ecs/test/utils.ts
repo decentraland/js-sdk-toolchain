@@ -1,9 +1,8 @@
 import { Quaternion, Vector3 } from '@dcl/ecs-math'
 
-import { Float32, Int8, MapType } from '../src/built-in-types'
-import { Transform } from '../src/components/legacy/Transform'
 import { Engine } from '../src/engine'
 import { Entity } from '../src/engine/entity'
+import { Schemas } from '../src/schemas'
 import * as transport from '../src/systems/crdt/transports/networkTransport'
 
 export function wait(ms: number) {
@@ -12,10 +11,13 @@ export function wait(ms: number) {
 
 export namespace SandBox {
   export const WS_SEND_DELAY = 30
-  export const Position = { id: 88, type: MapType({ x: Float32, y: Float32 }) }
-  export const Door = { id: 888, type: MapType({ open: Int8 }) }
+  export const Position = {
+    id: 88,
+    type: { x: Schemas.Float, y: Schemas.Float }
+  }
+  export const Door = { id: 888, type: { open: Schemas.Byte } }
 
-  export const DEFAULT_POSITION: ReturnType<typeof Transform['deserialize']> = {
+  export const DEFAULT_POSITION = {
     position: Vector3.create(0, 1, 2),
     scale: Vector3.One(),
     rotation: Quaternion.Identity(),
@@ -31,10 +33,10 @@ export namespace SandBox {
       const clientTransport = transport.createNetworkTransport()
       const engine = Engine({ transports: [clientTransport] })
       const Position = engine.defineComponent(
-        SandBox.Position.id,
-        SandBox.Position.type
+        SandBox.Position.type,
+        SandBox.Position.id
       )
-      const Door = engine.defineComponent(SandBox.Door.id, SandBox.Door.type)
+      const Door = engine.defineComponent(SandBox.Door.type, SandBox.Door.id)
 
       return {
         id: index,

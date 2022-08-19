@@ -1,10 +1,10 @@
 import { ByteBuffer } from '../../serialization/ByteBuffer'
-import { EcsType } from '../EcsType'
+import { ISchema } from '../ISchema'
 
 /**
  * @public
  */
-export const Int64: EcsType<number> = {
+export const Int64: ISchema<number> = {
   serialize(value: number, builder: ByteBuffer): void {
     builder.writeInt64(BigInt(value))
   },
@@ -19,7 +19,7 @@ export const Int64: EcsType<number> = {
 /**
  * @public
  */
-export const Int32: EcsType<number> = {
+export const Int32: ISchema<number> = {
   serialize(value: number, builder: ByteBuffer): void {
     builder.writeInt32(value)
   },
@@ -34,7 +34,7 @@ export const Int32: EcsType<number> = {
 /**
  * @public
  */
-export const Int16: EcsType<number> = {
+export const Int16: ISchema<number> = {
   serialize(value: number, builder: ByteBuffer): void {
     builder.writeInt16(value)
   },
@@ -49,7 +49,7 @@ export const Int16: EcsType<number> = {
 /**
  * @public
  */
-export const Int8: EcsType<number> = {
+export const Int8: ISchema<number> = {
   serialize(value: number, builder: ByteBuffer): void {
     builder.writeInt8(value)
   },

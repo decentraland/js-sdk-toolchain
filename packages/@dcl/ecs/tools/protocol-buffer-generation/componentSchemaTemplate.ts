@@ -1,4 +1,4 @@
-const ecsFileProtocolBuffer = `import { EcsType } from '../../built-in-types/EcsType'
+const ecsFileProtocolBuffer = `import { ISchema } from '../../schemas/ISchema'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
 import { PBComponent } from './pb/Component.gen'
 
@@ -10,7 +10,7 @@ export const COMPONENT_ID = INVALID_COMPONENT_ID
 /**
  * @internal
  */
-export const Component: EcsType<PBComponent> = {
+export const ComponentSchema: ISchema<PBComponent> = {
   serialize(value: PBComponent, builder: ByteBuffer): void {
     const writer = PBComponent.encode(value)
     const buffer = new Uint8Array(writer.finish(), 0, writer.len)

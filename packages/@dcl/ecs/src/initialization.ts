@@ -37,3 +37,6 @@ if (dcl) {
       .finally(() => engine.update(dt))
   })
 }
+
+export const log = dcl.log
+export const error = dcl.error

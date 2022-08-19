@@ -25,10 +25,12 @@ describe('Generated AudioSource ProtoBuf', () => {
     const buffer = AudioSource.toBinary(entity)
     AudioSource.updateFromBinary(entityB, buffer)
 
-    expect(_audioSource).toBeDeepCloseTo({ ...AudioSource.mutable(entityB) })
+    expect(_audioSource).toBeDeepCloseTo({
+      ...AudioSource.getMutable(entityB)
+    })
 
     expect(AudioSource.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...AudioSource.mutable(entity)
+      ...AudioSource.getMutable(entity)
     })
   })
 })
