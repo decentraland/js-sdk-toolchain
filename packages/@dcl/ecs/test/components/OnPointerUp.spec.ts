@@ -10,20 +10,22 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     const onPointerUp = OnPointerUp.create(entity, {
       button: 1,
       hoverText: 'Tap to run',
-      distance: 10,
+      maxDistance: 10,
       showFeedback: true
     })
 
     OnPointerUp.create(entityB, {
       button: 3,
       hoverText: 'TCker',
-      distance: 5,
+      maxDistance: 5,
       showFeedback: false
     })
     const buffer = OnPointerUp.toBinary(entity)
     OnPointerUp.updateFromBinary(entityB, buffer)
 
-    expect(onPointerUp).toBeDeepCloseTo({ ...OnPointerUp.mutable(entityB) })
+    expect(onPointerUp).toBeDeepCloseTo({
+      ...OnPointerUp.getMutable(entityB)
+    })
   })
 
   it('should receive OnPointerResult', () => {
@@ -36,7 +38,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     OnPointerUp.create(entity, {
       button: 1,
       hoverText: 'Tap to run',
-      distance: 10,
+      maxDistance: 10,
       showFeedback: true
     })
 

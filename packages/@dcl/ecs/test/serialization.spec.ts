@@ -1,34 +1,25 @@
-import {
-  ArrayType,
-  EcsType,
-  Float32,
-  Float64,
-  Int16,
-  Int32,
-  Int64,
-  Int8,
-  MapType,
-  EcsString,
-  Optional,
-  EcsBoolean,
-  Enum
-} from '../src/built-in-types'
 import { Engine } from '../src/engine'
+import { Schemas } from '../src/schemas'
+import { ISchema } from '../src/schemas/ISchema'
 
-const Vector3 = MapType({ x: Float32, y: Float32, z: Float32 })
+const Vector3 = Schemas.Map({
+  x: Schemas.Float,
+  y: Schemas.Float,
+  z: Schemas.Float
+})
 
 describe('Serialization Types', () => {
   it('should serialize Ints', () => {
     const engine = Engine()
     const entity = engine.addEntity()
     const entityCopied = engine.addEntity()
-    const toTest = [Int16, Int32, Int8]
+    const toTest = [Schemas.Short, Schemas.Int, Schemas.Byte]
     let COMPONENT_ID = 888
 
     for (const t of toTest) {
       const IntegerComponent = engine.defineComponent(
-        COMPONENT_ID++,
-        MapType({ value: t })
+        { value: t },
+        COMPONENT_ID++
       )
       const myInteger = IntegerComponent.create(entity, { value: 33 })
       expect(myInteger.value).toBe(33)
@@ -50,14 +41,14 @@ describe('Serialization Types', () => {
     const engine = Engine()
     const entity = engine.addEntity()
     const entityCopied = engine.addEntity()
-    const toTest = [Float32, Float64]
+    const toTest = [Schemas.Float, Schemas.Double]
     let COMPONENT_ID = 888
     const testValue = 2.0
 
     for (const t of toTest) {
       const FloatComponent = engine.defineComponent(
-        COMPONENT_ID++,
-        MapType({ value: t })
+        { value: t },
+        COMPONENT_ID++
       )
       const myFloat = FloatComponent.create(entity, { value: testValue })
       expect(myFloat.value).toBe(testValue)
@@ -70,7 +61,7 @@ describe('Serialization Types', () => {
     }
 
     expect(Vector3.create()).toEqual({ x: 0, y: 0, z: 0 })
-    expect(Float64.create()).toEqual(0.0)
+    expect(Schemas.Double.create()).toEqual(0.0)
   })
 
   it('should serialize Strings', () => {
@@ -82,8 +73,8 @@ describe('Serialization Types', () => {
     const testValue = 'testing an string'
 
     const FloatComponent = engine.defineComponent(
-      COMPONENT_ID++,
-      MapType({ value: EcsString })
+      { value: Schemas.String },
+      COMPONENT_ID++
     )
     const myFloat = FloatComponent.create(entity, { value: testValue })
     expect(myFloat.value).toBe(testValue)
@@ -95,19 +86,19 @@ describe('Serialization Types', () => {
     expect(updatedFloat!.value).toBe(testValue)
   })
 
-  it('should serialize MapTypes', () => {
+  it('should serialize Schemas.Maps', () => {
     const engine = Engine()
     const myEntity = engine.addEntity()
     const COMPONENT_ID = 888
 
-    const ItemType = MapType({
-      itemId: Int32,
-      name: EcsString,
-      enchantingIds: ArrayType(
-        MapType({
-          itemId: Int32,
-          itemAmount: Int32,
-          description: EcsString
+    const ItemType = Schemas.Map({
+      itemId: Schemas.Int,
+      name: Schemas.String,
+      enchantingIds: Schemas.Array(
+        Schemas.Map({
+          itemId: Schemas.Int,
+          itemAmount: Schemas.Int,
+          description: Schemas.String
         })
       )
     })
@@ -117,16 +108,16 @@ describe('Serialization Types', () => {
     expect(defaultValue).toEqual({ itemId: 0, name: '', enchantingIds: [] })
 
     const PlayerComponent = engine.defineComponent(
-      COMPONENT_ID,
-      MapType({
-        name: EcsString,
-        description: EcsString,
-        level: Int32,
-        hp: Float32,
+      {
+        name: Schemas.String,
+        description: Schemas.String,
+        level: Schemas.Int,
+        hp: Schemas.Float,
         position: Vector3,
-        targets: ArrayType(Vector3),
-        items: ArrayType(ItemType)
-      })
+        targets: Schemas.Array(Vector3),
+        items: Schemas.Array(ItemType)
+      },
+      COMPONENT_ID
     )
 
     const defaultPlayer = {
@@ -141,7 +132,7 @@ describe('Serialization Types', () => {
 
     const myPlayer = PlayerComponent.create(myEntity, defaultPlayer)
 
-    expect(PlayerComponent.getFrom(myEntity)).toStrictEqual(defaultPlayer)
+    expect(PlayerComponent.get(myEntity)).toStrictEqual(defaultPlayer)
 
     myPlayer.hp = 8349.2
     myPlayer.position.x += 1.0
@@ -168,30 +159,33 @@ describe('Serialization Types', () => {
     PlayerComponent.create(otherEntity, defaultPlayer)
     PlayerComponent.updateFromBinary(otherEntity, buffer)
 
-    const originalPlayer = PlayerComponent.getFrom(myEntity)
-    const modifiedFromBinaryPlayer = PlayerComponent.getFrom(otherEntity)
+    const originalPlayer = PlayerComponent.get(myEntity)
+    const modifiedFromBinaryPlayer = PlayerComponent.get(otherEntity)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     expect(modifiedFromBinaryPlayer).toBeDeepCloseTo(originalPlayer)
   })
 
-  it('should serialize Optional & Boolean without value (undefined)', () => {
+  it('should serialize Schemas.Optional & Boolean without value (undefined)', () => {
     const engine = Engine()
     const entity = engine.addEntity()
     const COMPONENT_ID = 888
 
-    const definition = MapType({
-      optionalColor: Optional(
-        MapType({
-          r: Float32,
-          g: Float32,
-          b: Float32
+    const definition = Schemas.Map({
+      optionalColor: Schemas.Optional(
+        Schemas.Map({
+          r: Schemas.Float,
+          g: Schemas.Float,
+          b: Schemas.Float
         })
       ),
-      hasAlpha: EcsBoolean
+      hasAlpha: Schemas.Boolean
     })
 
-    const TestComponent = engine.defineComponent(COMPONENT_ID, definition)
+    const TestComponent = engine.defineComponentFromSchema(
+      definition,
+      COMPONENT_ID
+    )
 
     expect(definition.create()).toEqual({
       optionalColor: undefined,
@@ -217,18 +211,18 @@ describe('Serialization Types', () => {
     expect(value2.optionalColor).toBeUndefined()
   })
 
-  it('should serialize Optional & Boolean with value', () => {
+  it('should serialize Schemas.Optional & Boolean with value', () => {
     const engine = Engine()
     const entity = engine.addEntity()
     const COMPONENT_ID = 888
 
     const TestComponent = engine.defineComponent(
-      COMPONENT_ID,
-      MapType({
-        optionalColor: Optional(EcsBoolean),
-        visible: Optional(EcsBoolean),
-        notVisible: EcsBoolean
-      })
+      {
+        optionalColor: Schemas.Optional(Schemas.Boolean),
+        visible: Schemas.Optional(Schemas.Boolean),
+        notVisible: Schemas.Boolean
+      },
+      COMPONENT_ID
     )
 
     TestComponent.create(entity, { optionalColor: true, notVisible: false })
@@ -236,7 +230,7 @@ describe('Serialization Types', () => {
     expect(TestComponent.toBinary(entity).toBinary()).toStrictEqual(
       new Uint8Array([1, 1, 0, 0])
     )
-    expect(TestComponent.getFrom(entity).optionalColor).toBe(true)
+    expect(TestComponent.get(entity).optionalColor).toBe(true)
 
     // Deserialize and update new optional
     const newEntity = engine.addEntity()
@@ -252,7 +246,7 @@ describe('Serialization Types', () => {
     )
   })
 
-  it('should serialize Int Enums', () => {
+  it('should serialize Int Schemas.Enums', () => {
     const engine = Engine()
     const entity = engine.addEntity()
     const COMPONENT_ID = 888
@@ -264,9 +258,9 @@ describe('Serialization Types', () => {
       Pink = 0xff290323
     }
 
-    const TestComponent = engine.defineComponent(
-      COMPONENT_ID,
-      Enum<ColorToNumber>(Int64)
+    const TestComponent = engine.defineComponentFromSchema(
+      Schemas.Enum<ColorToNumber>(Schemas.Int64),
+      COMPONENT_ID
     )
 
     expect(TestComponent.create(entity)).toEqual(0)
@@ -284,7 +278,7 @@ describe('Serialization Types', () => {
     expect(value2).toBe(ColorToNumber.Pink)
   })
 
-  it('should serialize String Enum', () => {
+  it('should serialize String Schemas.Enum', () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
     const COMPONENT_ID = 888
@@ -295,9 +289,10 @@ describe('Serialization Types', () => {
       Pink = '0xff290323'
     }
 
-    const TestComponent = engine.defineComponent(
-      COMPONENT_ID,
-      Enum<ColorToString>(EcsString)
+    const TestComponent = engine.defineComponentFromSchema(
+      Schemas.Enum<ColorToString>(Schemas.String),
+
+      COMPONENT_ID
     )
 
     // const value1 = TestComponent.create(entity, {})
@@ -323,13 +318,14 @@ describe('Serialization Types', () => {
     const COMPONENT_ID = 888
 
     const TestComponentType = engine.defineComponent(
-      COMPONENT_ID,
-      MapType({
-        a: Int32,
-        b: Int32,
-        c: ArrayType(Int32),
-        d: Int64
-      })
+      {
+        a: Schemas.Int,
+        b: Schemas.Int,
+        c: Schemas.Array(Schemas.Int),
+        d: Schemas.Int64
+      },
+
+      COMPONENT_ID
     )
     const myComponent = TestComponentType.create(entityFilled, {
       a: 2331,
@@ -348,7 +344,7 @@ describe('Serialization Types', () => {
     const buffer = TestComponentType.toBinary(entityFilled)
     TestComponentType.updateFromBinary(entityEmpty, buffer)
 
-    const modifiedComponent = TestComponentType.getFrom(entityEmpty)
+    const modifiedComponent = TestComponentType.get(entityEmpty)
     expect(modifiedComponent.a).toBe(myComponent.a)
     expect(modifiedComponent.b).toBe(myComponent.b)
     expect(modifiedComponent.c).toEqual(myComponent.c)
@@ -362,27 +358,24 @@ describe('Serialization Types', () => {
 
     let i = 0
     const A = 'abcdefghijkl'
-    const vectorType: Record<string, EcsType<number>> = {}
+    const vectorType: Record<string, ISchema<number>> = {}
     const objectValues: Record<string, number> = {}
     const zeroObjectValues: Record<string, number> = {}
 
     for (i = 0; i < A.length; i++) {
       const COMPONENT_ID = 888 + i + 1
       const key = A[i]
-      vectorType[key] = Int32
+      vectorType[key] = Schemas.Int
       objectValues[key] = 50 + i
       zeroObjectValues[key] = 0
-      const TestComponentType = engine.defineComponent(
-        COMPONENT_ID,
-        MapType(vectorType)
-      )
+      const TestComponentType = engine.defineComponent(vectorType, COMPONENT_ID)
 
       TestComponentType.create(entity, objectValues)
       TestComponentType.create(entityCopied, zeroObjectValues)
       const buffer = TestComponentType.toBinary(entity)
       TestComponentType.updateFromBinary(entityCopied, buffer)
-      expect(TestComponentType.getFrom(entity)).toStrictEqual(
-        TestComponentType.getFrom(entityCopied)
+      expect(TestComponentType.get(entity)).toStrictEqual(
+        TestComponentType.get(entityCopied)
       )
     }
   })

@@ -52,7 +52,7 @@ describe('Transform component', () => {
     const buffer = Transform.toBinary(entity)
     Transform.updateFromBinary(entityB, buffer)
 
-    expect(t1).toBeDeepCloseTo(Transform.getFrom(entityB) as any)
+    expect(t1).toBeDeepCloseTo(Transform.get(entityB) as any)
   })
 
   it('should serialize/deserialize Transform without parent', () => {
@@ -77,11 +77,9 @@ describe('Transform component', () => {
     const buffer = Transform.toBinary(entity)
     Transform.updateFromBinary(entityB, buffer)
 
-    expect({ ...t1, parent: 0 }).toBeDeepCloseTo(
-      Transform.getFrom(entityB) as any
-    )
+    expect({ ...t1, parent: 0 }).toBeDeepCloseTo(Transform.get(entityB) as any)
     // optional parent serialize as 0
-    expect(Transform.getFrom(entityB).parent).toBe(0)
+    expect(Transform.get(entityB).parent).toBe(0)
   })
 
   it('should create a valid empty transform component if no value argument is passed', () => {

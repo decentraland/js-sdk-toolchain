@@ -1,4 +1,4 @@
-import { Int8, MapType } from '../src/built-in-types'
+import { Schemas } from '../src/schemas'
 import { Engine } from '../src/engine'
 import WireMessage from '../src/serialization/wireMessage'
 import { createNetworkTransport } from '../src/systems/crdt/transports/networkTransport'
@@ -32,7 +32,11 @@ describe('Transport tests', () => {
     const rendererSpy = jest.spyOn(transports[1], 'send')
     const engine = Engine({ transports })
     const entity = engine.addDynamicEntity()
-    const UserComponent = engine.defineComponent(8888, MapType({ x: Int8 }))
+    const UserComponent = engine.defineComponent(
+      { x: Schemas.Byte },
+
+      8888
+    )
 
     // Transform component should be sent to renderer transport
     engine.baseComponents.Transform.create(entity)

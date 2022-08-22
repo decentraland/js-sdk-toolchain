@@ -20,10 +20,12 @@ describe('Generated BoxShape ProtoBuf', () => {
     const buffer = AvatarAttach.toBinary(entity)
     AvatarAttach.updateFromBinary(entityB, buffer)
 
-    expect(avatarAttach).toBeDeepCloseTo({ ...AvatarAttach.mutable(entityB) })
+    expect(avatarAttach).toBeDeepCloseTo({
+      ...AvatarAttach.getMutable(entityB)
+    })
 
     expect(AvatarAttach.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...AvatarAttach.mutable(entity)
+      ...AvatarAttach.getMutable(entity)
     })
   })
 })

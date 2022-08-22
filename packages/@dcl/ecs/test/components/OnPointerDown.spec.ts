@@ -11,20 +11,20 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     const onPointerDown = OnPointerDown.create(entity, {
       button: ActionButton.PRIMARY,
       hoverText: 'Tap to run',
-      distance: 10,
+      maxDistance: 10,
       showFeedback: true
     })
 
     OnPointerDown.create(entityB, {
       button: ActionButton.SECONDARY,
       hoverText: 'TCker',
-      distance: 5,
+      maxDistance: 5,
       showFeedback: false
     })
     const buffer = OnPointerDown.toBinary(entity)
     OnPointerDown.updateFromBinary(entityB, buffer)
 
-    expect(onPointerDown).toEqual({ ...OnPointerDown.mutable(entityB) })
+    expect(onPointerDown).toEqual({ ...OnPointerDown.getMutable(entityB) })
   })
 
   it('should receive OnPointerResult', () => {
@@ -37,7 +37,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     OnPointerDown.create(entity, {
       button: ActionButton.PRIMARY,
       hoverText: 'Tap to run',
-      distance: 10,
+      maxDistance: 10,
       showFeedback: true
     })
 

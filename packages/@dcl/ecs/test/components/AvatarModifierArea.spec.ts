@@ -26,11 +26,11 @@ describe('Generated Avatar ModifierArea ProtoBuf', () => {
     AvatarModifierArea.updateFromBinary(entityB, buffer)
 
     expect(avatarModifierArea).toEqual({
-      ...AvatarModifierArea.mutable(entityB)
+      ...AvatarModifierArea.getMutable(entityB)
     })
 
     expect(AvatarModifierArea.createOrReplace(entityB)).not.toEqual({
-      ...AvatarModifierArea.mutable(entity)
+      ...AvatarModifierArea.getMutable(entity)
     })
   })
 })
