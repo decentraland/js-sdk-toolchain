@@ -85,7 +85,8 @@ export function crdtSceneSystem({
       for (const message of messagesToProcess) {
         const { data, timestamp, componentId, entity, type } = message
         const crdtMessage: CrdtMessage<Uint8Array> = {
-          key: CrdtUtils.getKey(entity, componentId),
+          key1: entity,
+          key2: componentId,
           data: data || null,
           timestamp: timestamp
         }
@@ -139,7 +140,8 @@ export function crdtSceneSystem({
           ? component.toBinary(entity).toBinary()
           : null
         const event = crdtClient.createEvent(
-          CrdtUtils.getKey(entity, componentId),
+          entity,
+          componentId,
           entityComponent
         )
         const offset = buffer.currentWriteOffset()
