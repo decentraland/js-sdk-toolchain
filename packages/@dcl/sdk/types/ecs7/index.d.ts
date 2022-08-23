@@ -33,6 +33,15 @@ declare const enum AvatarAnchorPoint {
 /** @public */
 declare const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
 
+declare const enum AvatarModifier {
+    HIDE_AVATARS = 0,
+    DISABLE_PASSPORTS = 1,
+    UNRECOGNIZED = -1
+}
+
+/** @public */
+declare const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
+
 /** @public */
 declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
 
@@ -221,6 +230,8 @@ declare namespace Components {
     /** @public */
     const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
     /** @public */
+    const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
+    /** @public */
     const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
     /** @public */
     const Billboard: ComponentDefinition<ISchema<PBBillboard>>;
@@ -236,6 +247,8 @@ declare namespace Components {
     const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
     /** @public */
     const Material: ComponentDefinition<ISchema<PBMaterial>>;
+    /** @public */
+    const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
     /** @public */
     const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
     /** @public */
@@ -254,6 +267,8 @@ declare namespace Components {
     const SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
     /** @public */
     const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
+    /** @public */
+    const UiText: ComponentDefinition<ISchema<PBUiText>>;
 }
 
 /**
@@ -440,6 +455,7 @@ declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEn
     Animator: ComponentDefinition<ISchema<PBAnimator>>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
     AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+    AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
     AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
     Billboard: ComponentDefinition<ISchema<PBBillboard>>;
     BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
@@ -448,6 +464,7 @@ declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEn
     CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
     GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
     Material: ComponentDefinition<ISchema<PBMaterial>>;
+    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
     OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
     OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
@@ -457,6 +474,7 @@ declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEn
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
     SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
     TextShape: ComponentDefinition<ISchema<PBTextShape>>;
+    UiText: ComponentDefinition<ISchema<PBUiText>>;
 };
 
 /**
@@ -1400,6 +1418,9 @@ declare namespace Matrix {
 }
 
 /** @public */
+declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
+
+/** @public */
 declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
 
 /** @public */
@@ -1468,6 +1489,12 @@ declare interface PBAudioSource {
 declare interface PBAvatarAttach {
     avatarId: string;
     anchorPointId: AvatarAnchorPoint;
+}
+
+declare interface PBAvatarModifierArea {
+    area: Vector3_2 | undefined;
+    excludeIds: string[];
+    modifiers: AvatarModifier[];
 }
 
 declare interface PBAvatarShape {
@@ -1577,6 +1604,31 @@ declare interface PBMaterial_Texture {
     wrapMode?: TextureWrapMode | undefined;
     /** default = FilterMode.Bilinear */
     filterMode?: FilterMode | undefined;
+}
+
+declare interface PBMeshRenderer {
+    box: PBMeshRenderer_BoxMesh | undefined;
+    sphere: PBMeshRenderer_SphereMesh | undefined;
+    cylinder: PBMeshRenderer_CylinderMesh | undefined;
+    plane: PBMeshRenderer_PlaneMesh | undefined;
+}
+
+declare interface PBMeshRenderer_BoxMesh {
+    uvs: number[];
+}
+
+declare interface PBMeshRenderer_CylinderMesh {
+    /** default=1.0 */
+    radiusTop?: number | undefined;
+    /** default=1.0 */
+    radiusBottom?: number | undefined;
+}
+
+declare interface PBMeshRenderer_PlaneMesh {
+    uvs: number[];
+}
+
+declare interface PBMeshRenderer_SphereMesh {
 }
 
 declare interface PBNFTShape {
@@ -1694,6 +1746,11 @@ declare interface PBTextShape {
     outlineColor?: Color3 | undefined;
     /** default=(1.0,1.0,1.0) */
     textColor?: Color3 | undefined;
+}
+
+declare interface PBUiText {
+    text: string;
+    textColor: Color3 | undefined;
 }
 
 /**
@@ -2111,6 +2168,9 @@ declare type Transport = {
 declare type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
 declare type Uint32 = number;
+
+/** @public */
+declare const UiText: ComponentDefinition<ISchema<PBUiText>>;
 
 /**
  * @public
