@@ -31,7 +31,11 @@
     "@dcl/crdt": "^1.0.0-20220819145912.commit-35069cd",
     "@dcl/ecs-math": "^2.0.1-20220526123120.commit-dab2aff",
     "@dcl/posix": "^1.0.4",
-    "@dcl/protocol": "^1.0.0-2978349925.commit-5ecc2f5"
+    "@dcl/protocol": "^1.0.0-2951957767.commit-5cf29ab",
+    "@types/react": "^18.0.17",
+    "@types/react-reconciler": "^0.28.0",
+    "react": "^18.2.0",
+    "react-reconciler": "^0.29.0"
   },
   "files": [
     "dist/index.js",

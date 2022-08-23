@@ -56,36 +56,8 @@ export interface DivProps {
   flexGrow: number
   flexShrink: number
   overflow: YGOverflow
+  children: any //TODO :Remove
   // aspectRatio: number | undefined
-}
-
-/**
- * @public
- */
-export type DivTag = {
-  tag: 'divui'
-  attributes: DivProps
-}
-/**
- * @public
- */
-export type TextTag = {
-  tag: 'textui'
-  attributes: TextProps
-}
-
-/**
- * @public
- */
-export type JsxTree = (DivTag | TextTag) & {
-  children: (JsxTree | null)[]
-}
-/**
- * @public
- */
-export type Tree = JsxTree & {
-  _id: number
-  entityId: number
 }
 
 type TextOpts = Partial<Omit<PBUiText, 'text'>>
@@ -93,25 +65,13 @@ type TextOpts = Partial<Omit<PBUiText, 'text'>>
 declare global {
   namespace JSX {
     // The return type of our JSX Factory
-    type Element = JsxTree
-
-    interface HTMLElementTagNameMap {
-      divui: DivProps
-      textui: TextOpts
-    }
+    type Element = any
 
     // IntrinsicElementMap grabs all the standard HTML tags in the TS DOM lib.
-    type IntrinsicElements = IntrinsicElementMap
-
-    // The following are custom types, not part of TS's known JSX namespace:
-    type IntrinsicElementMap = {
-      [K in keyof HTMLElementTagNameMap]: {
-        [k: string]: any
-      }
+    type IntrinsicElements = {
+      divui: Partial<DivProps>
+      textui: Partial<TextOpts>
     }
-
-    type Tag = keyof JSX.IntrinsicElements
-
     // eslint-disable-next-line @typescript-eslint/no-empty-interface
     interface Component {}
   }

@@ -1,6 +1,7 @@
 import { IEngine } from '../types'
-import { JsxTree } from './types'
 import { CANVAS_ROOT_ENTITY, defaultDiv } from './utils'
+
+type JsxTree = any
 
 /**
  * @public

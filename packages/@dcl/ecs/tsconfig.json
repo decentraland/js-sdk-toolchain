@@ -16,8 +16,7 @@
     "types": [
       "@dcl/posix"
     ],
-    "jsx": "react",
-    "jsxFactory": "EcsJsx.createElement"
+    "jsx": "react-jsx"
   },
   "include": [
     "src",

@@ -13,8 +13,6 @@ import { Entity, EntityContainer } from './entity'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
 import type { IEngineParams, IEngine } from './types'
 import { ReadonlyComponentSchema } from './readonly'
-
-import { JsxTree } from './jsx/types'
 import { render } from './jsx/renderer'
 
 export * from './readonly'
@@ -179,7 +177,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
   const crdtSystem = crdtSceneSystem({ engine, transports: transports || [] })
   const baseComponents = defineSdkComponents(engine)
 
-  function renderUI(tree: JsxTree) {
+  function renderUI(tree: any) {
     return render({ baseComponents, addEntity: engine.addEntity })(tree)
   }
 
