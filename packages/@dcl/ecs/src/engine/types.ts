@@ -2,7 +2,7 @@ import { SdkComponents } from '../components/types'
 import type { ISchema } from '../schemas/ISchema'
 import { Result, Spec } from '../schemas/Map'
 import { Transport } from '../systems/crdt/transports/types'
-import { ComponentDefinition as CompDef } from './component'
+import { ComponentDefinition as CompDef, ComponentType } from './component'
 import { Entity } from './entity'
 import { Update } from './systems'
 import type { DeepReadonly } from './utils'
@@ -98,10 +98,11 @@ export type IEngine = {
    * const StateComponent = engine.defineComponent(Schemas.Bool, VisibleComponentId)
    * ```
    */
-  defineComponentFromSchema<T extends ISchema>(
+  defineComponentFromSchema<T extends ISchema, T2 = ComponentType<T>>(
     spec: T,
-    componentId: number
-  ): CompDef<T>
+    componentId: number,
+    constructorDefault?: ComponentType<T>
+  ): CompDef<T, T2>
 
   /**
    * Get the component definition from the component id.

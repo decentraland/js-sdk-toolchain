@@ -61,14 +61,15 @@ function preEngine() {
     return entityContainer.removeEntity(entity)
   }
 
-  function defineComponentFromSchema<T extends ISchema>(
+  function defineComponentFromSchema<T extends ISchema, T2 = ComponentType<T>>(
     spec: T,
-    componentId: number
+    componentId: number,
+    constructorDefault?: ComponentType<T>
   ): ComponentDefinition<T> {
     if (componentsDefinition.get(componentId)) {
       throw new Error(`Component ${componentId} already declared`)
     }
-    const newComponent = defComponent<T>(componentId, spec)
+    const newComponent = defComponent<T>(componentId, spec, constructorDefault)
     componentsDefinition.set(componentId, newComponent)
     return newComponent
   }

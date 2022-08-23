@@ -1,7 +1,7 @@
 import type { ISchema } from '../../schemas/ISchema'
 import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
-import { ComponentDefinition } from '../../engine'
+import { ComponentDefinition, IEngine } from '../../engine'
 
 /**
  * @internal
@@ -78,16 +78,8 @@ type TransformTypeWithOptionals = {
   parent?: Entity
 }
 
-export function wrapTransformDefinition(
-  def: ComponentDefinition<ISchema<TransformType>>
-) {
-  return {
-    ...def,
-
-    create(entity: Entity, val?: TransformTypeWithOptionals): TransformType {
-      const defaultTransform = { ...def.default() } as TransformType
-      const value = { ...defaultTransform, ...(val || {}) }
-      return def.create(entity, value)
-    }
-  }
+export function defineTransformComponent({
+  defineComponentFromSchema
+}: Pick<IEngine, 'defineComponentFromSchema'>): ComponentDefinition<ISchema<TransformType>, TransformTypeWithOptionals> {
+  return defineComponentFromSchema<ISchema<TransformType>, TransformTypeWithOptionals>(TransformSchema, COMPONENT_ID)
 }

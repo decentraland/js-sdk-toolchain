@@ -8,32 +8,32 @@
 // Warning: (ae-forgotten-export) The symbol "PBAnimator" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const Animator: ComponentDefinition<ISchema<PBAnimator>>;
+export const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
 
 // Warning: (ae-forgotten-export) The symbol "PBAudioSource" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
+export const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
 
 // Warning: (ae-forgotten-export) The symbol "PBAvatarAttach" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+export const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
 
 // Warning: (ae-forgotten-export) The symbol "PBAvatarShape" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+export const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
 
 // Warning: (ae-forgotten-export) The symbol "PBBillboard" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const Billboard: ComponentDefinition<ISchema<PBBillboard>>;
+export const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
 
 // Warning: (ae-forgotten-export) The symbol "PBBoxShape" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
+export const BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
 
 // Warning: (ae-forgotten-export) The symbol "createByteBuffer" needs to be exported by the entry point index.d.ts
 //
@@ -43,21 +43,21 @@ export type ByteBuffer = ReturnType<typeof createByteBuffer>;
 // Warning: (ae-forgotten-export) The symbol "PBCameraMode" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
+export const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
 
 // Warning: (ae-forgotten-export) The symbol "PBCameraModeArea" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
+export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
 
 // @public (undocumented)
-export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
+export type ComponentDefinition<T extends ISchema = ISchema<any>, T2 = ComponentType<T>> = {
     _id: number;
     default(): DeepReadonly<ComponentType<T>>;
     has(entity: Entity): boolean;
     get(entity: Entity): DeepReadonly<ComponentType<T>>;
     getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
-    create(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
+    create(entity: Entity, val?: T2): ComponentType<T>;
     createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
     deleteFrom(entity: Entity): ComponentType<T> | null;
     getMutable(entity: Entity): ComponentType<T>;
@@ -68,536 +68,103 @@ export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
 // @public (undocumented)
 export namespace Components {
     const // (undocumented)
-    Transform: {
-        create(entity: Entity, val?: {
-            position?: {
-                x: number;
-                y: number;
-                z: number;
-            } | undefined;
-            rotation?: {
-                x: number;
-                y: number;
-                z: number;
-                w: number;
-            } | undefined;
-            scale?: {
-                x: number;
-                y: number;
-                z: number;
-            } | undefined;
-            parent?: Entity | undefined;
-        } | undefined): {
-            position: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            rotation: {
-                x: number;
-                y: number;
-                z: number;
-                w: number;
-            };
-            scale: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            parent?: Entity | undefined;
-        };
-        _id: number;
-        default(): DeepReadonly<    {
-        position: {
-        x: number;
-        y: number;
-        z: number;
-        };
-        rotation: {
-        x: number;
-        y: number;
-        z: number;
-        w: number;
-        };
-        scale: {
-        x: number;
-        y: number;
-        z: number;
-        };
-        parent?: Entity | undefined;
-        }>;
-        has(entity: Entity): boolean;
-        get(entity: Entity): DeepReadonly<    {
-        position: {
-        x: number;
-        y: number;
-        z: number;
-        };
-        rotation: {
-        x: number;
-        y: number;
-        z: number;
-        w: number;
-        };
-        scale: {
-        x: number;
-        y: number;
-        z: number;
-        };
-        parent?: Entity | undefined;
-        }>;
-        getOrNull(entity: Entity): DeepReadonly<    {
-        position: {
-        x: number;
-        y: number;
-        z: number;
-        };
-        rotation: {
-        x: number;
-        y: number;
-        z: number;
-        w: number;
-        };
-        scale: {
-        x: number;
-        y: number;
-        z: number;
-        };
-        parent?: Entity | undefined;
-        }> | null;
-        createOrReplace(entity: Entity, val?: {
-            position: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            rotation: {
-                x: number;
-                y: number;
-                z: number;
-                w: number;
-            };
-            scale: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            parent?: Entity | undefined;
-        } | undefined): {
-            position: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            rotation: {
-                x: number;
-                y: number;
-                z: number;
-                w: number;
-            };
-            scale: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            parent?: Entity | undefined;
-        };
-        deleteFrom(entity: Entity): {
-            position: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            rotation: {
-                x: number;
-                y: number;
-                z: number;
-                w: number;
-            };
-            scale: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            parent?: Entity | undefined;
-        } | null;
-        getMutable(entity: Entity): {
-            position: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            rotation: {
-                x: number;
-                y: number;
-                z: number;
-                w: number;
-            };
-            scale: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            parent?: Entity | undefined;
-        };
-        getMutableOrNull(entity: Entity): {
-            position: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            rotation: {
-                x: number;
-                y: number;
-                z: number;
-                w: number;
-            };
-            scale: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            parent?: Entity | undefined;
-        } | null;
-        upsertFromBinary(entity: Entity, data: {
-            buffer(): Uint8Array;
-            bufferLength(): number;
-            resetBuffer(): void;
-            currentReadOffset(): number;
-            currentWriteOffset(): number;
-            incrementReadOffset(amount: number): number;
-            remainingBytes(): number;
-            readFloat32(): number;
-            readFloat64(): number;
-            readInt8(): number;
-            readInt16(): number;
-            readInt32(): number;
-            readInt64(): bigint;
-            readUint8(): number;
-            readUint16(): number;
-            readUint32(): number;
-            readUint64(): bigint;
-            readBuffer(): Uint8Array;
-            incrementWriteOffset(amount: number): number;
-            size(): number;
-            toBinary(): Uint8Array;
-            toCopiedBinary(): Uint8Array;
-            writeBuffer(value: Uint8Array, writeLength?: boolean): void;
-            writeFloat32(value: number): void;
-            writeFloat64(value: number): void;
-            writeInt8(value: number): void;
-            writeInt16(value: number): void;
-            writeInt32(value: number): void;
-            writeInt64(value: bigint): void;
-            writeUint8(value: number): void;
-            writeUint16(value: number): void;
-            writeUint32(value: number): void;
-            writeUint64(value: bigint): void;
-            getFloat32(offset: number): number;
-            getFloat64(offset: number): number;
-            getInt8(offset: number): number;
-            getInt16(offset: number): number;
-            getInt32(offset: number): number;
-            getInt64(offset: number): bigint;
-            getUint8(offset: number): number;
-            getUint16(offset: number): number;
-            getUint32(offset: number): number;
-            getUint64(offset: number): bigint;
-            setFloat32(offset: number, value: number): void;
-            setFloat64(offset: number, value: number): void;
-            setInt8(offset: number, value: number): void;
-            setInt16(offset: number, value: number): void;
-            setInt32(offset: number, value: number): void;
-            setInt64(offset: number, value: bigint): void;
-            setUint8(offset: number, value: number): void;
-            setUint16(offset: number, value: number): void;
-            setUint32(offset: number, value: number): void;
-            setUint64(offset: number, value: bigint): void;
-        }): {
-            position: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            rotation: {
-                x: number;
-                y: number;
-                z: number;
-                w: number;
-            };
-            scale: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            parent?: Entity | undefined;
-        } | null;
-        updateFromBinary(entity: Entity, data: {
-            buffer(): Uint8Array;
-            bufferLength(): number;
-            resetBuffer(): void;
-            currentReadOffset(): number;
-            currentWriteOffset(): number;
-            incrementReadOffset(amount: number): number;
-            remainingBytes(): number;
-            readFloat32(): number;
-            readFloat64(): number;
-            readInt8(): number;
-            readInt16(): number;
-            readInt32(): number;
-            readInt64(): bigint;
-            readUint8(): number;
-            readUint16(): number;
-            readUint32(): number;
-            readUint64(): bigint;
-            readBuffer(): Uint8Array;
-            incrementWriteOffset(amount: number): number;
-            size(): number;
-            toBinary(): Uint8Array;
-            toCopiedBinary(): Uint8Array;
-            writeBuffer(value: Uint8Array, writeLength?: boolean): void;
-            writeFloat32(value: number): void;
-            writeFloat64(value: number): void;
-            writeInt8(value: number): void;
-            writeInt16(value: number): void;
-            writeInt32(value: number): void;
-            writeInt64(value: bigint): void;
-            writeUint8(value: number): void;
-            writeUint16(value: number): void;
-            writeUint32(value: number): void;
-            writeUint64(value: bigint): void;
-            getFloat32(offset: number): number;
-            getFloat64(offset: number): number;
-            getInt8(offset: number): number;
-            getInt16(offset: number): number;
-            getInt32(offset: number): number;
-            getInt64(offset: number): bigint;
-            getUint8(offset: number): number;
-            getUint16(offset: number): number;
-            getUint32(offset: number): number;
-            getUint64(offset: number): bigint;
-            setFloat32(offset: number, value: number): void;
-            setFloat64(offset: number, value: number): void;
-            setInt8(offset: number, value: number): void;
-            setInt16(offset: number, value: number): void;
-            setInt32(offset: number, value: number): void;
-            setInt64(offset: number, value: bigint): void;
-            setUint8(offset: number, value: number): void;
-            setUint16(offset: number, value: number): void;
-            setUint32(offset: number, value: number): void;
-            setUint64(offset: number, value: bigint): void;
-        }): {
-            position: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            rotation: {
-                x: number;
-                y: number;
-                z: number;
-                w: number;
-            };
-            scale: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            parent?: Entity | undefined;
-        } | null;
-        toBinary(entity: Entity): {
-            buffer(): Uint8Array;
-            bufferLength(): number;
-            resetBuffer(): void;
-            currentReadOffset(): number;
-            currentWriteOffset(): number;
-            incrementReadOffset(amount: number): number;
-            remainingBytes(): number;
-            readFloat32(): number;
-            readFloat64(): number;
-            readInt8(): number;
-            readInt16(): number;
-            readInt32(): number;
-            readInt64(): bigint;
-            readUint8(): number;
-            readUint16(): number;
-            readUint32(): number;
-            readUint64(): bigint;
-            readBuffer(): Uint8Array;
-            incrementWriteOffset(amount: number): number;
-            size(): number;
-            toBinary(): Uint8Array;
-            toCopiedBinary(): Uint8Array;
-            writeBuffer(value: Uint8Array, writeLength?: boolean): void;
-            writeFloat32(value: number): void;
-            writeFloat64(value: number): void;
-            writeInt8(value: number): void;
-            writeInt16(value: number): void;
-            writeInt32(value: number): void;
-            writeInt64(value: bigint): void;
-            writeUint8(value: number): void;
-            writeUint16(value: number): void;
-            writeUint32(value: number): void;
-            writeUint64(value: bigint): void;
-            getFloat32(offset: number): number;
-            getFloat64(offset: number): number;
-            getInt8(offset: number): number;
-            getInt16(offset: number): number;
-            getInt32(offset: number): number;
-            getInt64(offset: number): bigint;
-            getUint8(offset: number): number;
-            getUint16(offset: number): number;
-            getUint32(offset: number): number;
-            getUint64(offset: number): bigint;
-            setFloat32(offset: number, value: number): void;
-            setFloat64(offset: number, value: number): void;
-            setInt8(offset: number, value: number): void;
-            setInt16(offset: number, value: number): void;
-            setInt32(offset: number, value: number): void;
-            setInt64(offset: number, value: bigint): void;
-            setUint8(offset: number, value: number): void;
-            setUint16(offset: number, value: number): void;
-            setUint32(offset: number, value: number): void;
-            setUint64(offset: number, value: bigint): void;
-        };
-        writeToByteBuffer(entity: Entity, buffer: {
-            buffer(): Uint8Array;
-            bufferLength(): number;
-            resetBuffer(): void;
-            currentReadOffset(): number;
-            currentWriteOffset(): number;
-            incrementReadOffset(amount: number): number;
-            remainingBytes(): number;
-            readFloat32(): number;
-            readFloat64(): number;
-            readInt8(): number;
-            readInt16(): number;
-            readInt32(): number;
-            readInt64(): bigint;
-            readUint8(): number;
-            readUint16(): number;
-            readUint32(): number;
-            readUint64(): bigint;
-            readBuffer(): Uint8Array;
-            incrementWriteOffset(amount: number): number;
-            size(): number;
-            toBinary(): Uint8Array;
-            toCopiedBinary(): Uint8Array;
-            writeBuffer(value: Uint8Array, writeLength?: boolean): void;
-            writeFloat32(value: number): void;
-            writeFloat64(value: number): void;
-            writeInt8(value: number): void;
-            writeInt16(value: number): void;
-            writeInt32(value: number): void;
-            writeInt64(value: bigint): void;
-            writeUint8(value: number): void;
-            writeUint16(value: number): void;
-            writeUint32(value: number): void;
-            writeUint64(value: bigint): void;
-            getFloat32(offset: number): number;
-            getFloat64(offset: number): number;
-            getInt8(offset: number): number;
-            getInt16(offset: number): number;
-            getInt32(offset: number): number;
-            getInt64(offset: number): bigint;
-            getUint8(offset: number): number;
-            getUint16(offset: number): number;
-            getUint32(offset: number): number;
-            getUint64(offset: number): bigint;
-            setFloat32(offset: number, value: number): void;
-            setFloat64(offset: number, value: number): void;
-            setInt8(offset: number, value: number): void;
-            setInt16(offset: number, value: number): void;
-            setInt32(offset: number, value: number): void;
-            setInt64(offset: number, value: bigint): void;
-            setUint8(offset: number, value: number): void;
-            setUint16(offset: number, value: number): void;
-            setUint32(offset: number, value: number): void;
-            setUint64(offset: number, value: bigint): void;
-        }): void;
-        iterator(): Iterable<[Entity, {
-            position: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            rotation: {
-                x: number;
-                y: number;
-                z: number;
-                w: number;
-            };
-            scale: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            parent?: Entity | undefined;
-        }]>;
-        dirtyIterator(): Iterable<Entity>;
-        clearDirty(): void;
-        isDirty(entity: Entity): boolean;
+    Transform: ComponentDefinition<ISchema<    {
+    position: {
+    x: number;
+    y: number;
+    z: number;
     };
+    rotation: {
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+    };
+    scale: {
+    x: number;
+    y: number;
+    z: number;
+    };
+    parent?: Entity | undefined;
+    }>, {
+    position?: {
+    x: number;
+    y: number;
+    z: number;
+    } | undefined;
+    rotation?: {
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+    } | undefined;
+    scale?: {
+    x: number;
+    y: number;
+    z: number;
+    } | undefined;
+    parent?: Entity | undefined;
+    }>;
     const // (undocumented)
-    Animator: ComponentDefinition<ISchema<PBAnimator>>;
+    Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     const // (undocumented)
-    AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
+    AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     const // (undocumented)
-    AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+    AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
     const // (undocumented)
-    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
     const // (undocumented)
-    Billboard: ComponentDefinition<ISchema<PBBillboard>>;
+    Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
     const // (undocumented)
-    BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
+    BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
     const // (undocumented)
-    CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
+    CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
     const // (undocumented)
-    CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
+    CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
     const // Warning: (ae-forgotten-export) The symbol "PBCylinderShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
+    CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
     const // Warning: (ae-forgotten-export) The symbol "PBGLTFShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
     const // Warning: (ae-forgotten-export) The symbol "PBNFTShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+    NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
     const // Warning: (ae-forgotten-export) The symbol "PBOnPointerDown" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
     const // Warning: (ae-forgotten-export) The symbol "PBOnPointerDownResult" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
     const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUp" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
     const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUpResult" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
+    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
     const // Warning: (ae-forgotten-export) The symbol "PBPlaneShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+    PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
     const // Warning: (ae-forgotten-export) The symbol "PBPointerLock" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
+    PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
     const // Warning: (ae-forgotten-export) The symbol "PBSphereShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
+    SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     const // Warning: (ae-forgotten-export) The symbol "PBTextShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    TextShape: ComponentDefinition<ISchema<PBTextShape>>;
+    TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 }
 
 // @public (undocumented)
@@ -611,7 +178,7 @@ export type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefiniti
 export type ComponentType<T extends ISchema> = EcsResult<T>;
 
 // @public (undocumented)
-export const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
+export const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
 
 // @public
 export type DeepReadonly<T> = {
@@ -648,7 +215,7 @@ export type float = number;
 export type FloatArray = number[];
 
 // @public (undocumented)
-export const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+export const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
 
 // @public (undocumented)
 export type IEngine = {
@@ -658,7 +225,7 @@ export type IEngine = {
     addSystem(system: Update, priority?: number, name?: string): void;
     removeSystem(selector: string | Update): boolean;
     defineComponent<T extends Spec>(spec: Spec, componentId: number): ComponentDefinition<ISchema<Result<T>>>;
-    defineComponentFromSchema<T extends ISchema>(spec: T, componentId: number): ComponentDefinition<T>;
+    defineComponentFromSchema<T extends ISchema, T2 = ComponentType<T>>(spec: T, componentId: number, constructorDefault?: ComponentType<T>): ComponentDefinition<T, T2>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
     baseComponents: SdkComponents;
@@ -679,22 +246,22 @@ export interface ISize {
 export const log: (...a: any[]) => void;
 
 // @public (undocumented)
-export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
 
 // @public (undocumented)
 export type Nullable<T> = T | null;
 
 // @public (undocumented)
-export const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+export const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
 
 // @public (undocumented)
-export const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+export const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
 
 // @public (undocumented)
-export const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+export const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
 
 // @public (undocumented)
-export const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
+export const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
 
 // @public
 export enum Orientation {
@@ -703,10 +270,10 @@ export enum Orientation {
 }
 
 // @public (undocumented)
-export const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+export const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
 
 // @public (undocumented)
-export const PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
+export const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
 
 // @public (undocumented)
 export namespace Quaternion {
@@ -818,10 +385,10 @@ export interface Spec {
 }
 
 // @public (undocumented)
-export const SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
+export const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
 
 // @public (undocumented)
-export const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
+export const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 
 // @public
 export const ToGammaSpace: number;
@@ -830,476 +397,43 @@ export const ToGammaSpace: number;
 export const ToLinearSpace = 2.2;
 
 // @public (undocumented)
-export const Transform: {
-    create(entity: Entity, val?: {
-        position?: {
-            x: number;
-            y: number;
-            z: number;
-        } | undefined;
-        rotation?: {
-            x: number;
-            y: number;
-            z: number;
-            w: number;
-        } | undefined;
-        scale?: {
-            x: number;
-            y: number;
-            z: number;
-        } | undefined;
-        parent?: Entity | undefined;
-    } | undefined): {
-        position: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        rotation: {
-            x: number;
-            y: number;
-            z: number;
-            w: number;
-        };
-        scale: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        parent?: Entity | undefined;
-    };
-    _id: number;
-    default(): DeepReadonly<    {
-    position: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    rotation: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    };
-    scale: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    parent?: Entity | undefined;
-    }>;
-    has(entity: Entity): boolean;
-    get(entity: Entity): DeepReadonly<    {
-    position: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    rotation: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    };
-    scale: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    parent?: Entity | undefined;
-    }>;
-    getOrNull(entity: Entity): DeepReadonly<    {
-    position: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    rotation: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    };
-    scale: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    parent?: Entity | undefined;
-    }> | null;
-    createOrReplace(entity: Entity, val?: {
-        position: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        rotation: {
-            x: number;
-            y: number;
-            z: number;
-            w: number;
-        };
-        scale: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        parent?: Entity | undefined;
-    } | undefined): {
-        position: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        rotation: {
-            x: number;
-            y: number;
-            z: number;
-            w: number;
-        };
-        scale: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        parent?: Entity | undefined;
-    };
-    deleteFrom(entity: Entity): {
-        position: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        rotation: {
-            x: number;
-            y: number;
-            z: number;
-            w: number;
-        };
-        scale: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        parent?: Entity | undefined;
-    } | null;
-    getMutable(entity: Entity): {
-        position: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        rotation: {
-            x: number;
-            y: number;
-            z: number;
-            w: number;
-        };
-        scale: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        parent?: Entity | undefined;
-    };
-    getMutableOrNull(entity: Entity): {
-        position: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        rotation: {
-            x: number;
-            y: number;
-            z: number;
-            w: number;
-        };
-        scale: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        parent?: Entity | undefined;
-    } | null;
-    upsertFromBinary(entity: Entity, data: {
-        buffer(): Uint8Array;
-        bufferLength(): number;
-        resetBuffer(): void;
-        currentReadOffset(): number;
-        currentWriteOffset(): number;
-        incrementReadOffset(amount: number): number;
-        remainingBytes(): number;
-        readFloat32(): number;
-        readFloat64(): number;
-        readInt8(): number;
-        readInt16(): number;
-        readInt32(): number;
-        readInt64(): bigint;
-        readUint8(): number;
-        readUint16(): number;
-        readUint32(): number;
-        readUint64(): bigint;
-        readBuffer(): Uint8Array;
-        incrementWriteOffset(amount: number): number;
-        size(): number;
-        toBinary(): Uint8Array;
-        toCopiedBinary(): Uint8Array;
-        writeBuffer(value: Uint8Array, writeLength?: boolean): void;
-        writeFloat32(value: number): void;
-        writeFloat64(value: number): void;
-        writeInt8(value: number): void;
-        writeInt16(value: number): void;
-        writeInt32(value: number): void;
-        writeInt64(value: bigint): void;
-        writeUint8(value: number): void;
-        writeUint16(value: number): void;
-        writeUint32(value: number): void;
-        writeUint64(value: bigint): void;
-        getFloat32(offset: number): number;
-        getFloat64(offset: number): number;
-        getInt8(offset: number): number;
-        getInt16(offset: number): number;
-        getInt32(offset: number): number;
-        getInt64(offset: number): bigint;
-        getUint8(offset: number): number;
-        getUint16(offset: number): number;
-        getUint32(offset: number): number;
-        getUint64(offset: number): bigint;
-        setFloat32(offset: number, value: number): void;
-        setFloat64(offset: number, value: number): void;
-        setInt8(offset: number, value: number): void;
-        setInt16(offset: number, value: number): void;
-        setInt32(offset: number, value: number): void;
-        setInt64(offset: number, value: bigint): void;
-        setUint8(offset: number, value: number): void;
-        setUint16(offset: number, value: number): void;
-        setUint32(offset: number, value: number): void;
-        setUint64(offset: number, value: bigint): void;
-    }): {
-        position: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        rotation: {
-            x: number;
-            y: number;
-            z: number;
-            w: number;
-        };
-        scale: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        parent?: Entity | undefined;
-    } | null;
-    updateFromBinary(entity: Entity, data: {
-        buffer(): Uint8Array;
-        bufferLength(): number;
-        resetBuffer(): void;
-        currentReadOffset(): number;
-        currentWriteOffset(): number;
-        incrementReadOffset(amount: number): number;
-        remainingBytes(): number;
-        readFloat32(): number;
-        readFloat64(): number;
-        readInt8(): number;
-        readInt16(): number;
-        readInt32(): number;
-        readInt64(): bigint;
-        readUint8(): number;
-        readUint16(): number;
-        readUint32(): number;
-        readUint64(): bigint;
-        readBuffer(): Uint8Array;
-        incrementWriteOffset(amount: number): number;
-        size(): number;
-        toBinary(): Uint8Array;
-        toCopiedBinary(): Uint8Array;
-        writeBuffer(value: Uint8Array, writeLength?: boolean): void;
-        writeFloat32(value: number): void;
-        writeFloat64(value: number): void;
-        writeInt8(value: number): void;
-        writeInt16(value: number): void;
-        writeInt32(value: number): void;
-        writeInt64(value: bigint): void;
-        writeUint8(value: number): void;
-        writeUint16(value: number): void;
-        writeUint32(value: number): void;
-        writeUint64(value: bigint): void;
-        getFloat32(offset: number): number;
-        getFloat64(offset: number): number;
-        getInt8(offset: number): number;
-        getInt16(offset: number): number;
-        getInt32(offset: number): number;
-        getInt64(offset: number): bigint;
-        getUint8(offset: number): number;
-        getUint16(offset: number): number;
-        getUint32(offset: number): number;
-        getUint64(offset: number): bigint;
-        setFloat32(offset: number, value: number): void;
-        setFloat64(offset: number, value: number): void;
-        setInt8(offset: number, value: number): void;
-        setInt16(offset: number, value: number): void;
-        setInt32(offset: number, value: number): void;
-        setInt64(offset: number, value: bigint): void;
-        setUint8(offset: number, value: number): void;
-        setUint16(offset: number, value: number): void;
-        setUint32(offset: number, value: number): void;
-        setUint64(offset: number, value: bigint): void;
-    }): {
-        position: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        rotation: {
-            x: number;
-            y: number;
-            z: number;
-            w: number;
-        };
-        scale: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        parent?: Entity | undefined;
-    } | null;
-    toBinary(entity: Entity): {
-        buffer(): Uint8Array;
-        bufferLength(): number;
-        resetBuffer(): void;
-        currentReadOffset(): number;
-        currentWriteOffset(): number;
-        incrementReadOffset(amount: number): number;
-        remainingBytes(): number;
-        readFloat32(): number;
-        readFloat64(): number;
-        readInt8(): number;
-        readInt16(): number;
-        readInt32(): number;
-        readInt64(): bigint;
-        readUint8(): number;
-        readUint16(): number;
-        readUint32(): number;
-        readUint64(): bigint;
-        readBuffer(): Uint8Array;
-        incrementWriteOffset(amount: number): number;
-        size(): number;
-        toBinary(): Uint8Array;
-        toCopiedBinary(): Uint8Array;
-        writeBuffer(value: Uint8Array, writeLength?: boolean): void;
-        writeFloat32(value: number): void;
-        writeFloat64(value: number): void;
-        writeInt8(value: number): void;
-        writeInt16(value: number): void;
-        writeInt32(value: number): void;
-        writeInt64(value: bigint): void;
-        writeUint8(value: number): void;
-        writeUint16(value: number): void;
-        writeUint32(value: number): void;
-        writeUint64(value: bigint): void;
-        getFloat32(offset: number): number;
-        getFloat64(offset: number): number;
-        getInt8(offset: number): number;
-        getInt16(offset: number): number;
-        getInt32(offset: number): number;
-        getInt64(offset: number): bigint;
-        getUint8(offset: number): number;
-        getUint16(offset: number): number;
-        getUint32(offset: number): number;
-        getUint64(offset: number): bigint;
-        setFloat32(offset: number, value: number): void;
-        setFloat64(offset: number, value: number): void;
-        setInt8(offset: number, value: number): void;
-        setInt16(offset: number, value: number): void;
-        setInt32(offset: number, value: number): void;
-        setInt64(offset: number, value: bigint): void;
-        setUint8(offset: number, value: number): void;
-        setUint16(offset: number, value: number): void;
-        setUint32(offset: number, value: number): void;
-        setUint64(offset: number, value: bigint): void;
-    };
-    writeToByteBuffer(entity: Entity, buffer: {
-        buffer(): Uint8Array;
-        bufferLength(): number;
-        resetBuffer(): void;
-        currentReadOffset(): number;
-        currentWriteOffset(): number;
-        incrementReadOffset(amount: number): number;
-        remainingBytes(): number;
-        readFloat32(): number;
-        readFloat64(): number;
-        readInt8(): number;
-        readInt16(): number;
-        readInt32(): number;
-        readInt64(): bigint;
-        readUint8(): number;
-        readUint16(): number;
-        readUint32(): number;
-        readUint64(): bigint;
-        readBuffer(): Uint8Array;
-        incrementWriteOffset(amount: number): number;
-        size(): number;
-        toBinary(): Uint8Array;
-        toCopiedBinary(): Uint8Array;
-        writeBuffer(value: Uint8Array, writeLength?: boolean): void;
-        writeFloat32(value: number): void;
-        writeFloat64(value: number): void;
-        writeInt8(value: number): void;
-        writeInt16(value: number): void;
-        writeInt32(value: number): void;
-        writeInt64(value: bigint): void;
-        writeUint8(value: number): void;
-        writeUint16(value: number): void;
-        writeUint32(value: number): void;
-        writeUint64(value: bigint): void;
-        getFloat32(offset: number): number;
-        getFloat64(offset: number): number;
-        getInt8(offset: number): number;
-        getInt16(offset: number): number;
-        getInt32(offset: number): number;
-        getInt64(offset: number): bigint;
-        getUint8(offset: number): number;
-        getUint16(offset: number): number;
-        getUint32(offset: number): number;
-        getUint64(offset: number): bigint;
-        setFloat32(offset: number, value: number): void;
-        setFloat64(offset: number, value: number): void;
-        setInt8(offset: number, value: number): void;
-        setInt16(offset: number, value: number): void;
-        setInt32(offset: number, value: number): void;
-        setInt64(offset: number, value: bigint): void;
-        setUint8(offset: number, value: number): void;
-        setUint16(offset: number, value: number): void;
-        setUint32(offset: number, value: number): void;
-        setUint64(offset: number, value: bigint): void;
-    }): void;
-    iterator(): Iterable<[Entity, {
-        position: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        rotation: {
-            x: number;
-            y: number;
-            z: number;
-            w: number;
-        };
-        scale: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        parent?: Entity | undefined;
-    }]>;
-    dirtyIterator(): Iterable<Entity>;
-    clearDirty(): void;
-    isDirty(entity: Entity): boolean;
+export const Transform: ComponentDefinition<ISchema<    {
+position: {
+x: number;
+y: number;
+z: number;
 };
+rotation: {
+x: number;
+y: number;
+z: number;
+w: number; /** @public */
+};
+scale: {
+x: number;
+y: number;
+z: number;
+};
+parent?: Entity | undefined;
+}>, {
+position?: {
+x: number;
+y: number;
+z: number;
+} | undefined;
+rotation?: {
+x: number;
+y: number;
+z: number;
+w: number;
+} | undefined;
+scale?: {
+x: number;
+y: number;
+z: number;
+} | undefined;
+parent?: Entity | undefined;
+}>;
 
 // @public (undocumented)
 export type Transport = {
