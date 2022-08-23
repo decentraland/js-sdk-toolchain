@@ -235,6 +235,8 @@ declare namespace Components {
     /** @public */
     const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
     /** @public */
+    const Material: ComponentDefinition<ISchema<PBMaterial>>;
+    /** @public */
     const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
     /** @public */
     const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
@@ -445,6 +447,7 @@ declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEn
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
     CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
     GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+    Material: ComponentDefinition<ISchema<PBMaterial>>;
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
     OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
     OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
@@ -502,6 +505,13 @@ declare const error: (message: string | Error, data?: any) => void;
 declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
 }[keyof T];
+
+declare const enum FilterMode {
+    Point = 0,
+    Bilinear = 1,
+    Trilinear = 2,
+    UNRECOGNIZED = -1
+}
 
 /** @public */
 declare type float = number;
@@ -666,6 +676,9 @@ declare interface ISize {
 }
 
 declare const log: (...a: any[]) => void;
+
+/** @public */
+declare const Material: ComponentDefinition<ISchema<PBMaterial>>;
 
 /**
  * Class used to store matrix data (4x4)
@@ -1523,6 +1536,49 @@ declare interface PBGLTFShape {
     src: string;
 }
 
+declare interface PBMaterial {
+    /** default = null */
+    texture?: PBMaterial_Texture | undefined;
+    /** default = 0.5. range value: from 0 to 1 */
+    alphaTest?: number | undefined;
+    /** default =  true */
+    castShadows?: boolean | undefined;
+    /** default = null */
+    alphaTexture?: PBMaterial_Texture | undefined;
+    /** default = null */
+    emissiveTexture?: PBMaterial_Texture | undefined;
+    /** default = null */
+    bumpTexture?: PBMaterial_Texture | undefined;
+    /** default = white; */
+    albedoColor?: Color3 | undefined;
+    /** default = black; */
+    emissiveColor?: Color3 | undefined;
+    /** default = white; */
+    reflectivityColor?: Color3 | undefined;
+    /** default = TransparencyMode.Auto */
+    transparencyMode?: TransparencyMode | undefined;
+    /** default = 0.5 */
+    metallic?: number | undefined;
+    /** default = 0.5 */
+    roughness?: number | undefined;
+    /** default = 1 */
+    glossiness?: number | undefined;
+    /** default = 1 */
+    specularIntensity?: number | undefined;
+    /** default = 2 */
+    emissiveIntensity?: number | undefined;
+    /** default = 1 */
+    directIntensity?: number | undefined;
+}
+
+declare interface PBMaterial_Texture {
+    src: string;
+    /** default = TextureWrapMode.Clamp */
+    wrapMode?: TextureWrapMode | undefined;
+    /** default = FilterMode.Bilinear */
+    filterMode?: FilterMode | undefined;
+}
+
 declare interface PBNFTShape {
     /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
     withCollisions?: boolean | undefined;
@@ -1993,6 +2049,14 @@ declare const SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
 /** @public */
 declare const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
 
+declare const enum TextureWrapMode {
+    Repeat = 0,
+    Clamp = 1,
+    Mirror = 2,
+    MirrorOnce = 3,
+    UNRECOGNIZED = -1
+}
+
 /**
  * Constant used to convert a value to gamma space
  * @public
@@ -2027,6 +2091,15 @@ z: number;
 };
 parent?: Entity | undefined;
 }>>;
+
+declare const enum TransparencyMode {
+    Opaque = 0,
+    AlphaTest = 1,
+    AlphaBlend = 2,
+    AlphaTestAndAlphaBlend = 3,
+    Auto = 4,
+    UNRECOGNIZED = -1
+}
 
 declare type Transport = {
     type: string;

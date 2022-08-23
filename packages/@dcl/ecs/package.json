@@ -34,10 +34,10 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
-    "@dcl/crdt": "^1.0.0-20220706193331.commit-71f1ea0",
+    "@dcl/crdt": "^1.0.0-20220819145912.commit-35069cd",
     "@dcl/ecs-math": "^2.0.1-20220526123120.commit-dab2aff",
     "@dcl/posix": "^1.0.4",
-    "@dcl/protocol": "1.0.0-2825359340.commit-a339b67"
+    "@dcl/protocol": "1.0.0-2891196094.commit-6b15eaa"
   },
   "files": [
     "dist/index.js",

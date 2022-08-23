@@ -111,6 +111,10 @@ export namespace Components {
     //
     // (undocumented)
     GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBMaterial" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    Material: ComponentDefinition<ISchema<PBMaterial>>;
     const // Warning: (ae-forgotten-export) The symbol "PBNFTShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -226,6 +230,9 @@ export interface ISize {
 
 // @public (undocumented)
 export const log: (...a: any[]) => void;
+
+// @public (undocumented)
+export const Material: ComponentDefinition<ISchema<PBMaterial>>;
 
 // @public (undocumented)
 export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
