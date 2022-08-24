@@ -31,7 +31,7 @@ export function render(engine: Pick<IEngine, 'baseComponents' | 'addEntity'>) {
    */
   return function createStaticTree(
     jsx: JsxTree,
-    parentEntity: number = CANVAS_ROOT_ENTITY,
+    parent: number = CANVAS_ROOT_ENTITY,
     order: number = 0
   ) {
     const { tag, children, attributes } = jsx
@@ -42,20 +42,18 @@ export function render(engine: Pick<IEngine, 'baseComponents' | 'addEntity'>) {
         text: attributes.value,
         textColor: { r: 0, g: 0, b: 0 }
       })
-      UiTransform.create(entity, { ...defaultDiv, parentEntity })
+      UiTransform.create(entity, { ...defaultDiv, parent })
       console.log(
-        `<Div parent=${parentEntity} entity=${entity} order=${order}><Text /></Div>`
+        `<Div parent=${parent} entity=${entity} order=${order}><Text /></Div>`
       )
     } else if (tag === 'divui') {
       UiTransform.create(entity, {
         ...defaultDiv,
         ...attributes,
-        parentEntity
+        parent
         // order,
       })
-      console.log(
-        `<Div parent=${parentEntity} entity=${entity} order=${order} />`
-      )
+      console.log(`<Div parent=${parent} entity=${entity} order=${order} />`)
     }
 
     for (const [index, child] of children.entries()) {

@@ -22,7 +22,8 @@ export const defaultPosition = (pos?: Position) => ({
 })
 
 export const defaultDiv: PBUiTransform = {
-  parentEntity: CANVAS_ROOT_ENTITY,
+  parent: CANVAS_ROOT_ENTITY,
+  rightOf: 0,
   display: YGDisplay.YGDisplayFlex,
   flexBasis: NaN,
   width: NaN,

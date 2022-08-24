@@ -9,7 +9,7 @@ export type Instance = {
   entity: Entity
   componentId: number
   parent?: Entity
-  nextTo?: Entity
+  rightOf?: Entity
   _child: Instance[]
 }
 export type TextInstance = unknown

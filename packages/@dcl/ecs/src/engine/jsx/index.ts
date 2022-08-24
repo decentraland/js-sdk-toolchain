@@ -1,6 +1,6 @@
 import EcsJsx from './renderer'
 
-export { DivUi, TextUi } from './components'
+export { DivUi } from './components'
 export { EcsJsx } from './renderer'
 export * from './types'
 

@@ -62,7 +62,7 @@ export interface DivProps {
 
 type TextOpts = Partial<Omit<PBUiText, 'text'>>
 
-declare global {
+declare module 'react' {
   namespace JSX {
     // The return type of our JSX Factory
     type Element = any

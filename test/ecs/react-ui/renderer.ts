@@ -42,11 +42,12 @@ export function createRenderer(engine: IEngine) {
   const { UiTransform } = engine.baseComponents
 
   function updateComponentTree(instance: Instance) {
+    console.log(instance)
     const comp = engine
       .getComponent(instance.componentId)
       .mutable(instance.entity)
-    comp.nextTo = instance.nextTo
-    comp.parentEntity = instance.parent
+    comp.rightOf = instance.rightOf
+    comp.parent = instance.parent
   }
 
   function updateComponentProps(instance: Instance, props: Partial<DivProps>) {
@@ -63,15 +64,18 @@ export function createRenderer(engine: IEngine) {
   function removeComponent(instance: Instance) {
     // TODO: we should remove the component or remove the entity ?
     engine.getComponent(instance.componentId).deleteFrom(instance.entity)
+    for (const child of instance._child) {
+      removeComponent(child)
+    }
   }
 
   function appendChild(parent: Instance, child: Instance): void {
-    if (!Object.keys(parent).length) return
+    if (!child || !Object.keys(parent).length) return
 
     console.log('append-child', { parent, child })
 
     child.parent = parent.entity
-    child.nextTo = parent._child[parent._child.length - 1]?.entity
+    child.rightOf = parent._child[parent._child.length - 1]?.entity
     parent._child.push(child)
 
     updateComponentTree(child)
@@ -81,12 +85,13 @@ export function createRenderer(engine: IEngine) {
     console.log('removeChid', { parentInstance, child })
 
     const childIndex = parentInstance._child.findIndex(
-      (c: any) => c.entityId === child.entity
+      (c) => c.entity === child.entity
     )
 
     const childToModify = parentInstance._child[childIndex + 1]
+
     if (childToModify) {
-      childToModify.nextTo = child.entity
+      childToModify.rightOf = child.rightOf
       updateComponentTree(childToModify)
     }
 
@@ -124,7 +129,7 @@ export function createRenderer(engine: IEngine) {
       UiTransform.create(entity, {
         ...defaultDiv,
         ...divProps,
-        parentEntity: 0
+        parent: 0
       })
 
       return { entity, componentId: UiTransform._id, _child: [] }
@@ -136,7 +141,7 @@ export function createRenderer(engine: IEngine) {
     removeChild: removeChild,
     removeChildFromContainer: () => {
       // TODO: wtf
-      // console.log('removechildereta')
+      console.log('removechildereta')
       // removeChild(args)
     },
 
@@ -175,15 +180,16 @@ export function createRenderer(engine: IEngine) {
       console.log('insertbefore', { parentInstance, child, beforeChild })
 
       const beforeChildIndex = parentInstance._child.findIndex(
-        (c: any) => c.entityId === beforeChild.entity
+        (c) => c.entity === beforeChild.entity
       )
       parentInstance._child = [
         ...parentInstance._child.slice(0, beforeChildIndex),
         child,
         ...parentInstance._child.slice(beforeChildIndex)
       ]
-      child.nextTo = beforeChild.nextTo
-      beforeChild.nextTo = child.entity
+
+      child.rightOf = beforeChild.rightOf
+      beforeChild.rightOf = child.entity
       child.parent = parentInstance.entity
 
       updateComponentTree(child)
@@ -198,8 +204,8 @@ export function createRenderer(engine: IEngine) {
     },
 
     detachDeletedInstance: function (node: Instance): void {
-      console.log('detahDeletedInstance')
-      console.log({ node })
+      // console.log('detahDeletedInstance')
+      // console.log({ node })
     }
   }
 
@@ -215,7 +221,7 @@ export function createRenderer(engine: IEngine) {
     null
   )
   return {
-    update: function (component: any) {
+    update: function (component: JSX.Element) {
       console.log('--------------------UPDATE------------------------')
       return reconciler.updateContainer(component, root, null)
     }

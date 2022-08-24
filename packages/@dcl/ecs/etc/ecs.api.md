@@ -208,6 +208,8 @@ export interface DivProps {
     alignSelf: YGAlign;
     // (undocumented)
     border: Position;
+    // (undocumented)
+    children: any;
     // Warning: (ae-forgotten-export) The symbol "YGDirection" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -265,13 +267,7 @@ export interface DivProps {
 }
 
 // @public (undocumented)
-export type DivTag = {
-    tag: 'divui';
-    attributes: DivProps;
-};
-
-// @public (undocumented)
-export function DivUi(props: Partial<DivProps>, ...children: any[]): JsxTree;
+export function DivUi(props: Partial<DivProps>): JSX.Element;
 
 // @public (undocumented)
 export type double = number;
@@ -283,6 +279,8 @@ export const EcsBoolean: EcsType<boolean>;
 
 // @public (undocumented)
 export namespace EcsJsx {
+    // Warning: (ae-forgotten-export) The symbol "JsxTree" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     export function createElement(tag: JsxTree['tag'] | ((attributes: any, children: any) => JsxTree), attributes: {
         [key: string]: any;
@@ -342,7 +340,7 @@ export type IEngine = {
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     baseComponents: SdkComponents;
-    renderUI(tree: JsxTree): void;
+    renderUI(tree: any): void;
 };
 
 // @public (undocumented)
@@ -379,6 +377,7 @@ export const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCo
 export const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
 
 // @public (undocumented)
+<<<<<<< HEAD
 export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
 =======
 export type JsxTree = (DivTag | TextTag) & {
@@ -386,6 +385,8 @@ export type JsxTree = (DivTag | TextTag) & {
 };
 
 // @public (undocumented)
+=======
+>>>>>>> 67ea711 (add rightOf prop to div elements)
 export function MapType<T extends Spec>(spec: T): EcsType<Result<T>>;
 >>>>>>> a098bb8 (proto ui)
 
@@ -567,6 +568,7 @@ export interface TextProps {
     value: string;
 }
 
+<<<<<<< HEAD
 // @public (undocumented)
 export type TextTag = {
     tag: 'textui';
@@ -577,6 +579,8 @@ export type TextTag = {
 export function TextUi(props: TextProps, ...children: any[]): JsxTree;
 >>>>>>> a098bb8 (proto ui)
 
+=======
+>>>>>>> 67ea711 (add rightOf prop to div elements)
 // @public
 export const ToGammaSpace: number;
 
@@ -584,6 +588,7 @@ export const ToGammaSpace: number;
 export const ToLinearSpace = 2.2;
 
 // @public (undocumented)
+<<<<<<< HEAD
 <<<<<<< HEAD
 export const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
 
@@ -614,6 +619,8 @@ export type Tree = JsxTree & {
 
 >>>>>>> a098bb8 (proto ui)
 // @public (undocumented)
+=======
+>>>>>>> 67ea711 (add rightOf prop to div elements)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;
 
 // @public (undocumented)
@@ -669,6 +676,7 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 // Warnings were encountered during analysis:
 //
 <<<<<<< HEAD
+<<<<<<< HEAD
 // dist/engine/component.d.ts:24:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/component.d.ts:37:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/component.d.ts:38:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
@@ -723,6 +731,10 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 // dist/engine/types.d.ts:26:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
 // dist/engine/types.d.ts:40:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
 >>>>>>> a098bb8 (proto ui)
+=======
+// dist/engine/types.d.ts:25:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
+// dist/engine/types.d.ts:39:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
+>>>>>>> 67ea711 (add rightOf prop to div elements)
 
 // (No @packageDocumentation comment for this package)
 
