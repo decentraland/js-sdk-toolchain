@@ -111,6 +111,10 @@ export namespace Components {
     //
     // (undocumented)
     GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBHidden" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    Hidden: ComponentDefinition<ISchema<PBHidden>>;
     const // Warning: (ae-forgotten-export) The symbol "PBMaterial" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -202,6 +206,9 @@ export type FloatArray = number[];
 
 // @public (undocumented)
 export const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+
+// @public (undocumented)
+export const Hidden: ComponentDefinition<ISchema<PBHidden>>;
 
 // @public (undocumented)
 export type IEngine = {

@@ -235,6 +235,8 @@ declare namespace Components {
     /** @public */
     const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
     /** @public */
+    const Hidden: ComponentDefinition<ISchema<PBHidden>>;
+    /** @public */
     const Material: ComponentDefinition<ISchema<PBMaterial>>;
     /** @public */
     const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
@@ -447,6 +449,7 @@ declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEn
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
     CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
     GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+    Hidden: ComponentDefinition<ISchema<PBHidden>>;
     Material: ComponentDefinition<ISchema<PBMaterial>>;
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
     OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
@@ -521,6 +524,9 @@ declare type FloatArray = number[];
 
 /** @public */
 declare const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+
+/** @public */
+declare const Hidden: ComponentDefinition<ISchema<PBHidden>>;
 
 /**
  * @public
@@ -1534,6 +1540,9 @@ declare interface PBGLTFShape {
     /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
     visible?: boolean | undefined;
     src: string;
+}
+
+declare interface PBHidden {
 }
 
 declare interface PBMaterial {
