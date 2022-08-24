@@ -9,7 +9,7 @@ import { ComponentDefinition } from '../../engine'
 export const COMPONENT_ID = 1
 
 /**
- * @internal
+ * @public
  */
 type TransformType = {
   position: { x: number; y: number; z: number }
@@ -68,23 +68,12 @@ export const TransformSchema: ISchema<TransformType> = {
   }
 }
 
-/**
- * @internal
- */
-type TransformTypeWithOptionals = {
-  position?: { x: number; y: number; z: number }
-  rotation?: { x: number; y: number; z: number; w: number }
-  scale?: { x: number; y: number; z: number }
-  parent?: Entity
-}
-
 export function wrapTransformDefinition(
   def: ComponentDefinition<ISchema<TransformType>>
-) {
+): ComponentDefinition<ISchema<TransformType>, Partial<TransformType>> {
   return {
     ...def,
-
-    create(entity: Entity, val?: TransformTypeWithOptionals): TransformType {
+    create(entity: Entity, val?: Partial<TransformType>): TransformType {
       const defaultTransform = { ...def.default() } as TransformType
       const value = { ...defaultTransform, ...(val || {}) }
       return def.create(entity, value)

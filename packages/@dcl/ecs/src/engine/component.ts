@@ -18,7 +18,10 @@ export type ComponentType<T extends ISchema> = EcsResult<T>
 /**
  * @public
  */
-export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
+export type ComponentDefinition<
+  T extends ISchema = ISchema<any>,
+  ConstructorType = ComponentType<T>
+> = {
   _id: number
 
   /**
@@ -87,7 +90,7 @@ export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
    * Transform.create(myEntity) // throw an error, the `Transform` component already exists in `myEntity`
    * ````
    */
-  create(entity: Entity, val?: ComponentType<T>): ComponentType<T>
+  create(entity: Entity, val?: ConstructorType): ComponentType<T>
   /**
    * Add the current component to an entity or replace the content if the entity already has the component
    * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
@@ -101,7 +104,7 @@ export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
    * Transform.createOrReplace(myEntity, { ...Transform.default(), position: {x: 4, y: 0, z: 4} }) // ok!
    * ````
    */
-  createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>
+  createOrReplace(entity: Entity, val?: ConstructorType): ComponentType<T>
 
   /**
    * Delete the current component to an entity, return null if the entity doesn't have the current component.
@@ -191,7 +194,10 @@ export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
   isDirty(entity: Entity): boolean
 }
 
-export function defineComponent<T extends ISchema>(
+export function defineComponent<
+  T extends ISchema,
+  ConstructorType = ComponentType<T>
+>(
   componentId: number,
   spec: T
   // meta: { syncFlags }
@@ -233,7 +239,7 @@ export function defineComponent<T extends ISchema>(
     },
     create: function (
       entity: Entity,
-      value?: ComponentType<T>
+      value?: ConstructorType
     ): ComponentType<T> {
       const component = data.get(entity)
       if (component) {
@@ -248,7 +254,7 @@ export function defineComponent<T extends ISchema>(
     },
     createOrReplace: function (
       entity: Entity,
-      value?: ComponentType<T>
+      value?: ConstructorType
     ): ComponentType<T> {
       const usedValue = value === undefined ? spec.create() : value
       data.set(entity, usedValue!)

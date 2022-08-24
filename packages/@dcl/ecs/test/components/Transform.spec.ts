@@ -117,4 +117,18 @@ describe('Transform component', () => {
       parent: undefined
     })
   })
+
+  it('should create a prefilled empty transform component if only the position argument is passed', () => {
+    const newEngine = Engine()
+    const { Transform } = newEngine.baseComponents
+    const entity = newEngine.addEntity()
+
+    const t1 = Transform.create(entity, { position: { x: 22, y: 23, z: 24 } })
+
+    expect(t1).toEqual({
+      position: { x: 22, y: 23, z: 24 },
+      scale: { x: 1, y: 1, z: 1 },
+      rotation: { x: 0, y: 0, z: 0, w: 1 }
+    })
+  })
 })
