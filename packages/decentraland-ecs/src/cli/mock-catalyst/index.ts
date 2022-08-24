@@ -1,13 +1,10 @@
 import * as path from 'path'
 import { createProxyMiddleware } from 'http-proxy-middleware'
-import * as express from 'express'
+import type { Application } from 'express'
 import { getSceneJson } from '../setupUtils'
 import { getAllPreviewWearables } from '../wearables'
 
-export const mockCatalyst = (
-  app: express.Application,
-  baseFolders: string[]
-) => {
+export const mockCatalyst = (app: Application, baseFolders: string[]) => {
   serveFolders(app, baseFolders)
   app.get('/lambdas/explore/realms', (req, res) => {
     res.json([
@@ -93,7 +90,7 @@ export const mockCatalyst = (
   )
 }
 
-const serveFolders = (app: express.Application, baseFolders: string[]) => {
+const serveFolders = (app: Application, baseFolders: string[]) => {
   app.get('/content/contents/:hash', (req, res, next) => {
     if (req.params.hash && req.params.hash.startsWith('b64-')) {
       const fullPath = path.resolve(
