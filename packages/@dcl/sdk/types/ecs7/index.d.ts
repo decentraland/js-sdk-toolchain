@@ -33,6 +33,15 @@ declare const enum AvatarAnchorPoint {
 /** @public */
 declare const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
 
+declare const enum AvatarModifier {
+    HIDE_AVATARS = 0,
+    DISABLE_PASSPORTS = 1,
+    UNRECOGNIZED = -1
+}
+
+/** @public */
+declare const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
+
 /** @public */
 declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
 
@@ -240,7 +249,13 @@ declare namespace Components {
     /** @public */
     const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
     /** @public */
+<<<<<<< HEAD
     const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
+=======
+    const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
+    /** @public */
+    const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+>>>>>>> main
     /** @public */
     const BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
     /** @public */
@@ -254,7 +269,15 @@ declare namespace Components {
     /** @public */
     const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     /** @public */
+<<<<<<< HEAD
     const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
+=======
+    const Material: ComponentDefinition<ISchema<PBMaterial>>;
+    /** @public */
+    const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
+    /** @public */
+    const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+>>>>>>> main
     /** @public */
     const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
     /** @public */
@@ -270,7 +293,13 @@ declare namespace Components {
     /** @public */
     const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     /** @public */
+<<<<<<< HEAD
     const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+=======
+    const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
+    /** @public */
+    const UiText: ComponentDefinition<ISchema<PBUiText>>;
+>>>>>>> main
 }
 
 /**
@@ -453,6 +482,7 @@ declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEn
     z: number;
     };
     parent?: Entity | undefined;
+<<<<<<< HEAD
     }>, {
     position?: {
     x: number;
@@ -492,6 +522,32 @@ declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEn
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
     SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+=======
+    }>>;
+    Animator: ComponentDefinition<ISchema<PBAnimator>>;
+    AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
+    AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+    AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
+    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+    Billboard: ComponentDefinition<ISchema<PBBillboard>>;
+    BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
+    CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
+    CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
+    CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
+    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+    Material: ComponentDefinition<ISchema<PBMaterial>>;
+    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
+    NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
+    PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+    PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
+    SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
+    TextShape: ComponentDefinition<ISchema<PBTextShape>>;
+    UiText: ComponentDefinition<ISchema<PBUiText>>;
+>>>>>>> main
 };
 
 /**
@@ -713,7 +769,11 @@ declare interface ISize {
 declare const log: (...a: any[]) => void;
 
 /** @public */
+<<<<<<< HEAD
 declare const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+=======
+declare const Material: ComponentDefinition<ISchema<PBMaterial>>;
+>>>>>>> main
 
 /**
  * Class used to store matrix data (4x4)
@@ -1435,7 +1495,14 @@ declare namespace Matrix {
 }
 
 /** @public */
+<<<<<<< HEAD
 declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
+=======
+declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
+
+/** @public */
+declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+>>>>>>> main
 
 /** @public */
 declare type Nullable<T> = T | null;
@@ -1503,6 +1570,12 @@ declare interface PBAudioSource {
 declare interface PBAvatarAttach {
     avatarId: string;
     anchorPointId: AvatarAnchorPoint;
+}
+
+declare interface PBAvatarModifierArea {
+    area: Vector3_2 | undefined;
+    excludeIds: string[];
+    modifiers: AvatarModifier[];
 }
 
 declare interface PBAvatarShape {
@@ -1614,6 +1687,34 @@ declare interface PBMaterial_Texture {
     filterMode?: FilterMode | undefined;
 }
 
+<<<<<<< HEAD
+=======
+declare interface PBMeshRenderer {
+    box: PBMeshRenderer_BoxMesh | undefined;
+    sphere: PBMeshRenderer_SphereMesh | undefined;
+    cylinder: PBMeshRenderer_CylinderMesh | undefined;
+    plane: PBMeshRenderer_PlaneMesh | undefined;
+}
+
+declare interface PBMeshRenderer_BoxMesh {
+    uvs: number[];
+}
+
+declare interface PBMeshRenderer_CylinderMesh {
+    /** default=1.0 */
+    radiusTop?: number | undefined;
+    /** default=1.0 */
+    radiusBottom?: number | undefined;
+}
+
+declare interface PBMeshRenderer_PlaneMesh {
+    uvs: number[];
+}
+
+declare interface PBMeshRenderer_SphereMesh {
+}
+
+>>>>>>> main
 declare interface PBNFTShape {
     /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
     withCollisions?: boolean | undefined;
@@ -1729,6 +1830,11 @@ declare interface PBTextShape {
     outlineColor?: Color3 | undefined;
     /** default=(1.0,1.0,1.0) */
     textColor?: Color3 | undefined;
+}
+
+declare interface PBUiText {
+    text: string;
+    textColor: Color3 | undefined;
 }
 
 /**
@@ -2092,6 +2198,14 @@ declare const enum TextureWrapMode {
     UNRECOGNIZED = -1
 }
 
+declare const enum TextureWrapMode {
+    Repeat = 0,
+    Clamp = 1,
+    Mirror = 2,
+    MirrorOnce = 3,
+    UNRECOGNIZED = -1
+}
+
 /**
  * Constant used to convert a value to gamma space
  * @public
@@ -2154,6 +2268,15 @@ declare const enum TransparencyMode {
     UNRECOGNIZED = -1
 }
 
+declare const enum TransparencyMode {
+    Opaque = 0,
+    AlphaTest = 1,
+    AlphaBlend = 2,
+    AlphaTestAndAlphaBlend = 3,
+    Auto = 4,
+    UNRECOGNIZED = -1
+}
+
 declare type Transport = {
     type: string;
     send(message: Uint8Array): void;
@@ -2164,6 +2287,9 @@ declare type Transport = {
 declare type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
 declare type Uint32 = number;
+
+/** @public */
+declare const UiText: ComponentDefinition<ISchema<PBUiText>>;
 
 /**
  * @public

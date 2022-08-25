@@ -1,7 +1,7 @@
 ﻿import { AvatarModifier } from '../../src/components/generated/pb/AvatarModifierArea.gen'
 import { Engine } from '../../src/engine'
 
-describe.skip('Generated Avatar ModifierArea ProtoBuf', () => {
+describe('Generated Avatar ModifierArea ProtoBuf', () => {
   it('should serialize/deserialize Avatar Modifier Area', () => {
     const newEngine = Engine()
     const { AvatarModifierArea } = newEngine.baseComponents
