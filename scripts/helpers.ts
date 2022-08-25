@@ -1,14 +1,7 @@
 import { exec } from 'child_process'
 import { sync as globSync } from 'glob'
 import { resolve } from 'path'
-import {
-  existsSync,
-  readFileSync,
-  writeFileSync,
-  lstatSync,
-  removeSync,
-  copySync
-} from 'fs-extra'
+import { existsSync, readFileSync, writeFileSync, lstatSync, removeSync, copySync } from 'fs-extra'
 import { sync as rimraf } from 'rimraf'
 
 /**
@@ -24,18 +17,12 @@ export function ensureFileExists(file: string, root?: string) {
   return x
 }
 
-export function runCommand(
-  command: string,
-  cwd: string,
-  env?: Record<string, string>
-): Promise<string> {
+export function runCommand(command: string, cwd: string, env?: Record<string, string>): Promise<string> {
   return new Promise<string>((onSuccess, onError) => {
     process.stdout.write('∑ ' + cwd + '; ' + command + '\n')
     exec(command, { cwd, env }, (error, stdout, stderr) => {
-      stdout.trim().length &&
-        process.stdout.write('  ' + stdout.replace(/\n/g, '\n  ') + '\n')
-      stderr.trim().length &&
-        process.stderr.write('! ' + stderr.replace(/\n/g, '\n  ') + '\n')
+      stdout.trim().length && process.stdout.write('  ' + stdout.replace(/\n/g, '\n  ') + '\n')
+      stderr.trim().length && process.stderr.write('! ' + stderr.replace(/\n/g, '\n  ') + '\n')
 
       if (error) {
         onError(stderr)
@@ -46,11 +33,7 @@ export function runCommand(
   })
 }
 
-export function itExecutes(
-  command: string,
-  cwd: string,
-  env?: Record<string, string>
-) {
+export function itExecutes(command: string, cwd: string, env?: Record<string, string>) {
   it(command, async () => await runCommand(command, cwd, env), 60000)
 }
 
@@ -73,16 +56,9 @@ export function readJson(file: string, cwd: string): any {
   return JSON.parse(readFileSync(resolve(cwd, file)).toString())
 }
 
-export function patchJson(
-  file: string,
-  cwd: string,
-  redux: (previous: any) => any
-): any {
+export function patchJson(file: string, cwd: string, redux: (previous: any) => any): any {
   const path = resolve(cwd, file)
-  return writeFileSync(
-    path,
-    JSON.stringify(redux(JSON.parse(readFileSync(path).toString())), null, 2)
-  )
+  return writeFileSync(path, JSON.stringify(redux(JSON.parse(readFileSync(path).toString())), null, 2))
 }
 
 export function itInstallsADependencyFromFolderAndCopiesTheVersion(
@@ -134,7 +110,7 @@ export function copyFile(from: string, to: string) {
     }
   }
 
-  copySync(from, to)
+  copySync(from, to, { recursive: true })
 
   if (!existsSync(to)) {
     throw new Error(`${to} does not exist`)

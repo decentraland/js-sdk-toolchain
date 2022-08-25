@@ -12,25 +12,17 @@ import {
   ECS7_PATH,
   JS_RUNTIME
 } from './common'
-import {
-  ensureFileExists,
-  itExecutes,
-  itDeletesFolder,
-  copyFile,
-  itDeletesGlob
-} from './helpers'
+import { ensureFileExists, itExecutes, itDeletesFolder, copyFile, itDeletesGlob } from './helpers'
+import { compileEcsComponents } from './protocol-buffer-generation'
 
 flow('build-all', () => {
   commonChecks()
 
   flow('@dcl/build-ecs', () => {
-    itExecutes(`npm ci --quiet`, BUILD_ECS_PATH)
+    itExecutes(`npm i --quiet`, BUILD_ECS_PATH)
     itExecutes(`${TSC} -p tsconfig.json`, BUILD_ECS_PATH)
     itExecutes(`chmod +x index.js`, BUILD_ECS_PATH + '/dist')
-    copyFile(
-      BUILD_ECS_PATH + '/package.json',
-      BUILD_ECS_PATH + '/dist/package.json'
-    )
+    copyFile(BUILD_ECS_PATH + '/package.json', BUILD_ECS_PATH + '/dist/package.json')
 
     it('check file exists', () => {
       ensureFileExists('index.js', BUILD_ECS_PATH + '/dist')
@@ -39,13 +31,10 @@ flow('build-all', () => {
   })
 
   flow('@dcl/amd', () => {
-    itExecutes(`npm ci --quiet`, DECENTRALAND_AMD_PATH)
+    itExecutes(`npm i --quiet`, DECENTRALAND_AMD_PATH)
     itDeletesFolder('dist', DECENTRALAND_AMD_PATH)
     itExecutes(`${TSC} -p tsconfig.json`, DECENTRALAND_AMD_PATH)
-    itExecutes(
-      `${TERSER} --mangle --comments some --source-map -o dist/amd.min.js dist/amd.js`,
-      DECENTRALAND_AMD_PATH
-    )
+    itExecutes(`${TERSER} --mangle --comments some --source-map -o dist/amd.min.js dist/amd.js`, DECENTRALAND_AMD_PATH)
 
     it('check file exists', () => {
       ensureFileExists('dist/amd.js', DECENTRALAND_AMD_PATH)
@@ -55,12 +44,9 @@ flow('build-all', () => {
   })
 
   flow('@dcl/dcl-rollup', () => {
-    itExecutes(`npm ci --quiet`, ROLLUP_CONFIG_PATH)
+    itExecutes(`npm i --quiet`, ROLLUP_CONFIG_PATH)
     itExecutes(`${TSC} -p tsconfig.json`, ROLLUP_CONFIG_PATH)
-    copyFile(
-      ROLLUP_CONFIG_PATH + '/package.json',
-      ROLLUP_CONFIG_PATH + '/dist/package.json'
-    )
+    copyFile(ROLLUP_CONFIG_PATH + '/package.json', ROLLUP_CONFIG_PATH + '/dist/package.json')
     it('check file exists', () => {
       ensureFileExists('dist/package.json', ROLLUP_CONFIG_PATH)
       ensureFileExists('dist/ecs.config.js', ROLLUP_CONFIG_PATH)
@@ -87,7 +73,10 @@ flow('build-all', () => {
   })
 
   flow('@dcl/ecs7', () => {
-    itExecutes('make build', ECS7_PATH)
+    itExecutes('npm i --quiet', ECS7_PATH)
+    compileEcsComponents(`${ECS7_PATH}/src/components`, `${ECS7_PATH}/node_modules/@dcl/protocol/ecs/components`)
+    itExecutes('npm run build', ECS7_PATH)
+    copyFile(`${ECS7_PATH}/node_modules/@dcl/protocol/ecs/components`, `${ECS7_PATH}/dist/proto-definitions`)
 
     it('check file exists', () => {
       ensureFileExists('dist/index.js', ECS7_PATH)
@@ -95,13 +84,7 @@ flow('build-all', () => {
       ensureFileExists('dist/proto-definitions', ECS7_PATH)
     })
     it('copy ecs7 to @dcl/sdk pkg', () => {
-      const filesToCopy = [
-        'index.js',
-        'index.d.ts',
-        'index.min.js',
-        'index.min.js.map',
-        'proto-definitions'
-      ]
+      const filesToCopy = ['index.js', 'index.d.ts', 'index.min.js', 'index.min.js.map', 'proto-definitions']
       for (const file of filesToCopy) {
         const filePath = ensureFileExists(`dist/${file}`, ECS7_PATH)
         copyFile(filePath, `${SDK_PATH}/dist/ecs7/${file}`)
@@ -116,10 +99,7 @@ flow('build-all', () => {
   })
 })
 
-function fixTypes(
-  pathToDts: string,
-  { ignoreExportError } = { ignoreExportError: false }
-) {
+function fixTypes(pathToDts: string, { ignoreExportError } = { ignoreExportError: false }) {
   let content = readFileSync(pathToDts).toString()
 
   content = content.replace(/^export declare/gm, 'declare')

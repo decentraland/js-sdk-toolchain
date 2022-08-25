@@ -1,6 +1,6 @@
 import { resolve } from 'path'
-import * as express from 'express'
-import * as supertest from 'supertest'
+import express from 'express'
+import supertest from 'supertest'
 
 const ecsLocation = resolve(__dirname, '../../packages/@dcl/sdk')
 const mockDclObject = {
