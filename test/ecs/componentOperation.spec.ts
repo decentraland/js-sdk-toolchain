@@ -1,7 +1,6 @@
 import { TRANSFORM_LENGTH } from '../../packages/@dcl/ecs/src/components/legacy/Transform'
 import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import { Quaternion, Vector3 } from '../../packages/@dcl/ecs/src/runtime/Math'
-
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt/componentOperation'
 import WireMessage from '../../packages/@dcl/ecs/src/serialization/wireMessage'

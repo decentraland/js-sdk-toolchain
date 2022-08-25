@@ -433,23 +433,23 @@ declare type DeepReadonly<T> = {
 
 declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEngine, 'defineComponentFromSchema'>): {
     Transform: ComponentDefinition<ISchema<    {
-    position: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    rotation: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    };
-    scale: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    parent?: Entity | undefined;
+        position: {
+            x: number;
+            y: number;
+            z: number;
+        };
+        rotation: {
+            x: number;
+            y: number;
+            z: number;
+            w: number;
+        };
+        scale: {
+            x: number;
+            y: number;
+            z: number;
+        };
+        parent?: Entity | undefined;
     }>>;
     Animator: ComponentDefinition<ISchema<PBAnimator>>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
@@ -1889,11 +1889,11 @@ declare namespace Quaternion {
      */
     export function create(
     /** defines the first component (0 by default) */
-    x?: number, 
+    x?: number,
     /** defines the second component (0 by default) */
-    y?: number, 
+    y?: number,
     /** defines the third component (0 by default) */
-    z?: number, 
+    z?: number,
     /** defines the fourth component (1.0 by default) */
     w?: number): MutableQuaternion;
     /**
@@ -2125,23 +2125,23 @@ declare type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTyp
 
 /** @public */
 declare const Transform: ComponentDefinition<ISchema<    {
-position: {
-x: number;
-y: number;
-z: number;
-};
-rotation: {
-x: number;
-y: number;
-z: number;
-w: number;
-};
-scale: {
-x: number;
-y: number;
-z: number;
-};
-parent?: Entity | undefined;
+    position: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    rotation: {
+        x: number;
+        y: number;
+        z: number;
+        w: number;
+    };
+    scale: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    parent?: Entity | undefined;
 }>>;
 
 declare const enum TransparencyMode {
@@ -2203,11 +2203,11 @@ declare namespace Vector3 {
     /**
      * Defines the first coordinates (on X axis)
      */
-    x?: number, 
+    x?: number,
     /**
      * Defines the second coordinates (on Y axis)
      */
-    y?: number, 
+    y?: number,
     /**
      * Defines the third coordinates (on Z axis)
      */
