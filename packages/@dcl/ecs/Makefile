@@ -10,8 +10,9 @@ else
 PROTOBUF_ZIP = protoc-$(PROTOBUF_VERSION)-linux-x86_64.zip
 endif
 
-install: node_modules/.bin/protobuf/bin/protoc
+install:
 	npm install
+	make node_modules/.bin/protobuf/bin/protoc
 
 test:
 	./node_modules/.bin/jest --testPathIgnorePatterns test/performance.spec.ts --detectOpenHandles --coverage --silent=false --verbose --colors --runInBand $(TESTARGS)
