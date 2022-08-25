@@ -154,6 +154,14 @@ export namespace Components {
     //
     // (undocumented)
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBRaycast" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    Raycast: ComponentDefinition<ISchema<PBRaycast>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBRaycastResult" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>>;
     const // Warning: (ae-forgotten-export) The symbol "PBSphereShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -325,6 +333,12 @@ export namespace Quaternion {
 
 // @public
 export const RAD2DEG: number;
+
+// @public (undocumented)
+export const Raycast: ComponentDefinition<ISchema<PBRaycast>>;
+
+// @public (undocumented)
+export const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>>;
 
 // Warning: (ae-forgotten-export) The symbol "ToOptional" needs to be exported by the entry point index.d.ts
 //
