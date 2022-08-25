@@ -80,6 +80,12 @@ type TransformTypeWithOptionals = {
 
 export function defineTransformComponent({
   defineComponentFromSchema
-}: Pick<IEngine, 'defineComponentFromSchema'>): ComponentDefinition<ISchema<TransformType>, TransformTypeWithOptionals> {
-  return defineComponentFromSchema<ISchema<TransformType>, TransformTypeWithOptionals>(TransformSchema, COMPONENT_ID)
+}: Pick<IEngine, 'defineComponentFromSchema'>): ComponentDefinition<
+  ISchema<TransformType>,
+  TransformTypeWithOptionals
+> {
+  return defineComponentFromSchema<
+    ISchema<TransformType>,
+    TransformTypeWithOptionals
+  >(TransformSchema, COMPONENT_ID)
 }

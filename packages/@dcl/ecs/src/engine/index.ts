@@ -14,6 +14,7 @@ import { ISchema } from '../schemas/ISchema'
 import { defineLibraryComponents } from './../components/generated/index.gen'
 import { Result, Spec } from '../schemas/Map'
 import { Schemas } from '../schemas'
+import { defineSdkComponents } from '../components'
 
 export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
 export * from './types'
@@ -61,7 +62,10 @@ function preEngine() {
     return entityContainer.removeEntity(entity)
   }
 
-  function defineComponentFromSchema<T extends ISchema, T2 = ComponentType<T>>(
+  function defineComponentFromSchema<
+    T extends ISchema,
+    ConstructorType = ComponentType<T>
+  >(
     spec: T,
     componentId: number,
     constructorDefault?: ComponentType<T>
@@ -69,7 +73,11 @@ function preEngine() {
     if (componentsDefinition.get(componentId)) {
       throw new Error(`Component ${componentId} already declared`)
     }
-    const newComponent = defComponent<T>(componentId, spec, constructorDefault)
+    const newComponent = defComponent<T, ConstructorType>(
+      componentId,
+      spec,
+      constructorDefault
+    )
     componentsDefinition.set(componentId, newComponent)
     return newComponent
   }
@@ -154,7 +162,7 @@ export type PreEngine = ReturnType<typeof preEngine>
 export function Engine({ transports }: IEngineParams = {}): IEngine {
   const engine = preEngine()
   const crdtSystem = crdtSceneSystem({ engine, transports: transports || [] })
-  const baseComponents = defineLibraryComponents(engine)
+  const baseComponents = defineSdkComponents(engine)
 
   function update(dt: number) {
     crdtSystem.receiveMessages()

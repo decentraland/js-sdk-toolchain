@@ -28,16 +28,12 @@ function namespaceComponent(component: Component) {
 }
 
 const indexTemplate = `import type { IEngine } from '../../engine/types'
-import * as TransformSchema from './../legacy/Transform'
 $componentImports
-
-declare const engine: IEngine
 
 export function defineLibraryComponents({
   defineComponentFromSchema
 }: Pick<IEngine, 'defineComponentFromSchema'>) {
   return {
-${defineComponent(TransformComponent)}
 $componentReturns
   }
 }

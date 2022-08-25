@@ -1,4 +1,4 @@
-import { SdkComponents } from '../components/types'
+import { SdkComponents } from '../components'
 import type { ISchema } from '../schemas/ISchema'
 import { Result, Spec } from '../schemas/Map'
 import { Transport } from '../systems/crdt/transports/types'

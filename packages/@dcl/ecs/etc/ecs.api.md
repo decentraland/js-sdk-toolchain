@@ -23,7 +23,7 @@ export const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatar
 // Warning: (ae-forgotten-export) The symbol "PBAvatarModifierArea" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
+export const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
 
 // Warning: (ae-forgotten-export) The symbol "PBAvatarShape" needs to be exported by the entry point index.d.ts
 //
@@ -117,13 +117,9 @@ export namespace Components {
     const // (undocumented)
     AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
     const // (undocumented)
-<<<<<<< HEAD
-    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
-=======
-    AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
+    AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
     const // (undocumented)
-    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
->>>>>>> main
+    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
     const // (undocumented)
     Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
     const // (undocumented)
@@ -139,19 +135,7 @@ export namespace Components {
     const // Warning: (ae-forgotten-export) The symbol "PBGLTFShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-<<<<<<< HEAD
     GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
-=======
-    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBMaterial" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    Material: ComponentDefinition<ISchema<PBMaterial>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBMeshRenderer" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
->>>>>>> main
     const // Warning: (ae-forgotten-export) The symbol "PBNFTShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -187,15 +171,7 @@ export namespace Components {
     const // Warning: (ae-forgotten-export) The symbol "PBTextShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-<<<<<<< HEAD
     TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
-=======
-    TextShape: ComponentDefinition<ISchema<PBTextShape>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBUiText" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    UiText: ComponentDefinition<ISchema<PBUiText>>;
->>>>>>> main
 }
 
 // @public (undocumented)
@@ -277,17 +253,7 @@ export interface ISize {
 export const log: (...a: any[]) => void;
 
 // @public (undocumented)
-<<<<<<< HEAD
 export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
-=======
-export const Material: ComponentDefinition<ISchema<PBMaterial>>;
-
-// @public (undocumented)
-export const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
-
-// @public (undocumented)
-export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
->>>>>>> main
 
 // @public (undocumented)
 export type Nullable<T> = T | null;
@@ -407,10 +373,10 @@ export namespace Schemas {
     Optional: typeof IOptional;
 }
 
-// Warning: (ae-forgotten-export) The symbol "defineLibraryComponents" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "defineSdkComponents" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export type SdkComponents = ReturnType<typeof defineLibraryComponents>;
+export type SdkComponents = ReturnType<typeof defineSdkComponents>;
 
 // @public
 export enum Space {
@@ -448,7 +414,7 @@ rotation: {
 x: number;
 y: number;
 z: number;
-w: number; /** @public */
+w: number;
 };
 scale: {
 x: number;
@@ -488,9 +454,6 @@ export type Transport = {
 //
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
-
-// @public (undocumented)
-export const UiText: ComponentDefinition<ISchema<PBUiText>>;
 
 // @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;
