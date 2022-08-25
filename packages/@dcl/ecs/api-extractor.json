@@ -317,8 +317,12 @@
      */
     "extractorMessageReporting": {
       "default": {
-        "logLevel": "warning"
-        // "addToApiReportFile": false
+        "logLevel": "warning",
+        "addToApiReportFile": true
+      },
+      "ae-forgotten-export": {
+        "logLevel": "error",
+        "addToApiReportFile": true
       }
       // "ae-extra-release-tag": {
       //   "logLevel": "warning",
@@ -336,8 +340,8 @@
      */
     "tsdocMessageReporting": {
       "default": {
-        "logLevel": "warning"
-        // "addToApiReportFile": false
+        "logLevel": "warning",
+        "addToApiReportFile": true
       }
       // "tsdoc-link-tag-unescaped-text": {
       //   "logLevel": "warning",

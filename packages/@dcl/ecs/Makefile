@@ -10,9 +10,8 @@ else
 PROTOBUF_ZIP = protoc-$(PROTOBUF_VERSION)-linux-x86_64.zip
 endif
 
-install:
+install: node_modules/.bin/protobuf/bin/protoc
 	npm install
-	make install_protobuffer_compiler
 
 test:
 	./node_modules/.bin/jest --testPathIgnorePatterns test/performance.spec.ts --detectOpenHandles --coverage --silent=false --verbose --colors --runInBand $(TESTARGS)
@@ -23,11 +22,11 @@ benchmark:
 test-watch:
 	./node_modules/.bin/jest --detectOpenHandles --colors --runInBand --watch $(TESTARGS)
 
-build:
+clean:
 	rm -rf dist/
 	rm -rf src/components/generated
-	make generate-components
-	make build-ecs
+
+build: | clean install generate-components build-ecs
 	cp -r node_modules/@dcl/protocol/ecs/components dist/proto-definitions
 
 build-ecs:
@@ -36,7 +35,7 @@ build-ecs:
 watch:
 	./node_modules/.bin/tsc -p tsconfig.json -w
 
-install_protobuffer_compiler:
+node_modules/.bin/protobuf/bin/protoc:
 	curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v$(PROTOBUF_VERSION)/$(PROTOBUF_ZIP)
 	unzip -o $(PROTOBUF_ZIP) -d node_modules/.bin/protobuf
 	rm $(PROTOBUF_ZIP)
@@ -47,8 +46,7 @@ build-tools:
 	./node_modules/.bin/tsc -p tools/tsconfig.json
 	chmod +x ./tools/dist/protocol-buffer-generation/index.js
 
-generate-components:
-	make build-tools
+generate-components: build-tools
 	./tools/dist/protocol-buffer-generation/index.js --component-path ${PWD}/src/components --definitions-path ${PWD}/node_modules/@dcl/protocol/ecs/components
 
-.PHONY: build test
+.PHONY: build test clean
