@@ -270,7 +270,7 @@ declare namespace Components {
     /** @public */
     const UiText: ComponentDefinition<ISchema<PBUiText>>;
     /** @public */
-    const Visibility: ComponentDefinition<ISchema<PBVisibility>>;
+    const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>>;
 }
 
 /**
@@ -477,7 +477,7 @@ declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEn
     SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
     TextShape: ComponentDefinition<ISchema<PBTextShape>>;
     UiText: ComponentDefinition<ISchema<PBUiText>>;
-    Visibility: ComponentDefinition<ISchema<PBVisibility>>;
+    VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>>;
 };
 
 /**
@@ -1756,7 +1756,7 @@ declare interface PBUiText {
     textColor: Color3 | undefined;
 }
 
-declare interface PBVisibility {
+declare interface PBVisibilityComponent {
     /** default=true */
     visible?: boolean | undefined;
 }
@@ -2400,7 +2400,7 @@ declare interface Vector3_2 {
 }
 
 /** @public */
-declare const Visibility: ComponentDefinition<ISchema<PBVisibility>>;
+declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>>;
 
 declare namespace WireMessage {
     enum Enum {

@@ -166,10 +166,10 @@ export namespace Components {
     //
     // (undocumented)
     UiText: ComponentDefinition<ISchema<PBUiText>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBVisibility" needs to be exported by the entry point index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBVisibilityComponent" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    Visibility: ComponentDefinition<ISchema<PBVisibility>>;
+    VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>>;
 }
 
 // @public (undocumented)
@@ -495,7 +495,7 @@ export namespace Vector3 {
 }
 
 // @public (undocumented)
-export const Visibility: ComponentDefinition<ISchema<PBVisibility>>;
+export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>>;
 
 // (No @packageDocumentation comment for this package)
 
