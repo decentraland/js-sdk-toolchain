@@ -9,9 +9,9 @@ import { ComponentDefinition, IEngine } from '../../engine'
 export const COMPONENT_ID = 1
 
 /**
- * @internal
+ * @public
  */
-type TransformType = {
+export type TransformType = {
   position: { x: number; y: number; z: number }
   rotation: { x: number; y: number; z: number; w: number }
   scale: { x: number; y: number; z: number }
@@ -68,24 +68,11 @@ export const TransformSchema: ISchema<TransformType> = {
   }
 }
 
-/**
- * @internal
- */
-type TransformTypeWithOptionals = {
-  position?: { x: number; y: number; z: number }
-  rotation?: { x: number; y: number; z: number; w: number }
-  scale?: { x: number; y: number; z: number }
-  parent?: Entity
-}
-
 export function defineTransformComponent({
   defineComponentFromSchema
 }: Pick<IEngine, 'defineComponentFromSchema'>): ComponentDefinition<
   ISchema<TransformType>,
-  TransformTypeWithOptionals
+  Partial<TransformType>
 > {
-  return defineComponentFromSchema<
-    ISchema<TransformType>,
-    TransformTypeWithOptionals
-  >(TransformSchema, COMPONENT_ID)
+  return defineComponentFromSchema(TransformSchema, COMPONENT_ID)
 }
