@@ -227,15 +227,7 @@ export function defineComponent<
   }
 
   function prefillValue(value: ConstructorType) {
-    if (typeof value === 'object') {
-      if (Array.isArray(value)) {
-        return value
-      } else {
-        return { ...getDefaultValue(), ...value }
-      }
-    } else {
-      return value
-    }
+    return { ...getDefaultValue(), ...value }
   }
 
   return {

@@ -258,24 +258,26 @@ describe('Serialization Types', () => {
       Pink = 0xff290323
     }
 
-    const TestComponent = engine.defineComponentFromSchema(
-      Schemas.Enum<ColorToNumber>(Schemas.Int64),
+    const TestComponent = engine.defineComponent(
+      { testEnum: Schemas.Enum<ColorToNumber>(Schemas.Int64) },
       COMPONENT_ID
     )
 
-    expect(TestComponent.create(entity)).toEqual(0)
-    TestComponent.create(entity, ColorToNumber.Pink)
+    expect(TestComponent.create(entity)).toStrictEqual({ testEnum: 0 })
+    TestComponent.createOrReplace(entity, { testEnum: ColorToNumber.Pink })
 
     const entity2 = engine.addEntity()
-    const initialValue = TestComponent.create(entity2, ColorToNumber.Green)
-    expect(initialValue).toBe(ColorToNumber.Green)
+    const initialValue = TestComponent.create(entity2, {
+      testEnum: ColorToNumber.Green
+    })
+    expect(initialValue).toStrictEqual({ testEnum: ColorToNumber.Green })
 
     const value2 = TestComponent.updateFromBinary(
       entity2,
       TestComponent.toBinary(entity)
     )!
 
-    expect(value2).toBe(ColorToNumber.Pink)
+    expect(value2).toStrictEqual({ testEnum: ColorToNumber.Pink })
   })
 
   it('should serialize String Schemas.Enum', () => {
@@ -289,26 +291,27 @@ describe('Serialization Types', () => {
       Pink = '0xff290323'
     }
 
-    const TestComponent = engine.defineComponentFromSchema(
-      Schemas.Enum<ColorToString>(Schemas.String),
-
+    const TestComponent = engine.defineComponent(
+      { testEnum: Schemas.Enum<ColorToString>(Schemas.String) },
       COMPONENT_ID
     )
 
     // const value1 = TestComponent.create(entity, {})
-    expect(TestComponent.create(entity)).toEqual('')
-    TestComponent.create(entity, ColorToString.Pink)
+    expect(TestComponent.create(entity)).toStrictEqual({ testEnum: '' })
+    TestComponent.createOrReplace(entity, { testEnum: ColorToString.Pink })
 
     const entity2 = engine.addEntity()
-    const initialValue = TestComponent.create(entity2, ColorToString.Green)
-    expect(initialValue).toBe(ColorToString.Green)
+    const initialValue = TestComponent.create(entity2, {
+      testEnum: ColorToString.Green
+    })
+    expect(initialValue).toStrictEqual({ testEnum: ColorToString.Green })
 
     const value2 = TestComponent.updateFromBinary(
       entity2,
       TestComponent.toBinary(entity)
     )!
 
-    expect(value2).toBe(ColorToString.Pink)
+    expect(value2).toStrictEqual({ testEnum: ColorToString.Pink })
   })
 
   it('should deserialize and serialize component from binary', () => {
@@ -424,26 +427,5 @@ describe('Serialization Types', () => {
       c: [11, 22, 33],
       d: 12
     })
-  })
-
-  it('should prefill with default value with arrays', () => {
-    const engine = Engine()
-    const entityWithDefault = engine.addEntity() // 0
-    const entityEmpty = engine.addEntity() // 1
-    const COMPONENT_ID = 888
-
-    const TestSchema = Schemas.Array(Schemas.Int)
-    type TestType = ComponentType<typeof TestSchema>
-
-    const TestComponentType = engine.defineComponentFromSchema<
-      typeof TestSchema,
-      Partial<TestType>
-    >(TestSchema, COMPONENT_ID, [12, 13])
-
-    TestComponentType.create(entityEmpty, [1, 2])
-    TestComponentType.create(entityWithDefault)
-
-    expect(TestComponentType.get(entityEmpty)).toStrictEqual([1, 2])
-    expect(TestComponentType.get(entityWithDefault)).toStrictEqual([12, 13])
   })
 })

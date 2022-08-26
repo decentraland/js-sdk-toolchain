@@ -4,9 +4,7 @@ export type { DeepReadonly }
 export function deepReadonly<T extends Record<string, unknown>>(
   val: T
 ): DeepReadonly<T> {
-  return typeof val === 'object' && !Array.isArray(val)
-    ? Object.freeze({ ...val })
-    : val
+  return Object.freeze({ ...val })
 }
 
 export function isNotUndefined<T>(val: T | undefined): val is T {

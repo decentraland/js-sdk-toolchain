@@ -98,7 +98,10 @@ export type IEngine = {
    * const StateComponent = engine.defineComponent(Schemas.Bool, VisibleComponentId)
    * ```
    */
-  defineComponentFromSchema<T extends ISchema, T2 = ComponentType<T>>(
+  defineComponentFromSchema<
+    T extends ISchema<Record<string, any>>,
+    T2 = ComponentType<T>
+  >(
     spec: T,
     componentId: number,
     constructorDefault?: ComponentType<T>

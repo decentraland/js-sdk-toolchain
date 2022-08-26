@@ -56,13 +56,13 @@ export const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode
 export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
 
 // @public (undocumented)
-export type ComponentDefinition<T extends ISchema = ISchema<any>, T2 = ComponentType<T>> = {
+export type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorType = ComponentType<T>> = {
     _id: number;
     default(): DeepReadonly<ComponentType<T>>;
     has(entity: Entity): boolean;
     get(entity: Entity): DeepReadonly<ComponentType<T>>;
     getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
-    create(entity: Entity, val?: T2): ComponentType<T>;
+    create(entity: Entity, val?: ConstructorType): ComponentType<T>;
     createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
     deleteFrom(entity: Entity): ComponentType<T> | null;
     getMutable(entity: Entity): ComponentType<T>;
@@ -244,7 +244,7 @@ export type IEngine = {
     addSystem(system: Update, priority?: number, name?: string): void;
     removeSystem(selector: string | Update): boolean;
     defineComponent<T extends Spec>(spec: Spec, componentId: number): ComponentDefinition<ISchema<Result<T>>>;
-    defineComponentFromSchema<T extends ISchema, T2 = ComponentType<T>>(spec: T, componentId: number, constructorDefault?: ComponentType<T>): ComponentDefinition<T, T2>;
+    defineComponentFromSchema<T extends ISchema<Record<string, any>>, T2 = ComponentType<T>>(spec: T, componentId: number, constructorDefault?: ComponentType<T>): ComponentDefinition<T, T2>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
     baseComponents: SdkComponents;
@@ -299,6 +299,11 @@ export const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape
 
 // @public (undocumented)
 export const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+
+// Warning: (ae-forgotten-export) The symbol "preEngine" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type PreEngine = ReturnType<typeof preEngine>;
 
 // @public (undocumented)
 export namespace Quaternion {

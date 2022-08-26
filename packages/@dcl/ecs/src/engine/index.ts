@@ -156,7 +156,7 @@ function preEngine() {
 }
 
 /**
- * @internal
+ * @public
  */
 export type PreEngine = ReturnType<typeof preEngine>
 
