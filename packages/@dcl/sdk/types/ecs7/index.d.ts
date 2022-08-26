@@ -246,8 +246,6 @@ declare namespace Components {
     /** @public */
     const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
     /** @public */
-    const Hidden: ComponentDefinition<ISchema<PBHidden>>;
-    /** @public */
     const Material: ComponentDefinition<ISchema<PBMaterial>>;
     /** @public */
     const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
@@ -271,6 +269,8 @@ declare namespace Components {
     const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
     /** @public */
     const UiText: ComponentDefinition<ISchema<PBUiText>>;
+    /** @public */
+    const Visibility: ComponentDefinition<ISchema<PBVisibility>>;
 }
 
 /**
@@ -465,7 +465,6 @@ declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEn
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
     CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
     GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
-    Hidden: ComponentDefinition<ISchema<PBHidden>>;
     Material: ComponentDefinition<ISchema<PBMaterial>>;
     MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
@@ -478,6 +477,7 @@ declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEn
     SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
     TextShape: ComponentDefinition<ISchema<PBTextShape>>;
     UiText: ComponentDefinition<ISchema<PBUiText>>;
+    Visibility: ComponentDefinition<ISchema<PBVisibility>>;
 };
 
 /**
@@ -542,9 +542,6 @@ declare type FloatArray = number[];
 
 /** @public */
 declare const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
-
-/** @public */
-declare const Hidden: ComponentDefinition<ISchema<PBHidden>>;
 
 /**
  * @public
@@ -1569,9 +1566,6 @@ declare interface PBGLTFShape {
     src: string;
 }
 
-declare interface PBHidden {
-}
-
 declare interface PBMaterial {
     /** default = null */
     texture?: PBMaterial_Texture | undefined;
@@ -1760,6 +1754,11 @@ declare interface PBTextShape {
 declare interface PBUiText {
     text: string;
     textColor: Color3 | undefined;
+}
+
+declare interface PBVisibility {
+    /** default=true */
+    visible?: boolean | undefined;
 }
 
 /**
@@ -2399,6 +2398,9 @@ declare interface Vector3_2 {
     y: number;
     z: number;
 }
+
+/** @public */
+declare const Visibility: ComponentDefinition<ISchema<PBVisibility>>;
 
 declare namespace WireMessage {
     enum Enum {

@@ -118,10 +118,6 @@ export namespace Components {
     //
     // (undocumented)
     GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBHidden" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    Hidden: ComponentDefinition<ISchema<PBHidden>>;
     const // Warning: (ae-forgotten-export) The symbol "PBMaterial" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -170,6 +166,10 @@ export namespace Components {
     //
     // (undocumented)
     UiText: ComponentDefinition<ISchema<PBUiText>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBVisibility" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    Visibility: ComponentDefinition<ISchema<PBVisibility>>;
 }
 
 // @public (undocumented)
@@ -221,9 +221,6 @@ export type FloatArray = number[];
 
 // @public (undocumented)
 export const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
-
-// @public (undocumented)
-export const Hidden: ComponentDefinition<ISchema<PBHidden>>;
 
 // @public (undocumented)
 export type IEngine = {
@@ -496,6 +493,9 @@ export namespace Vector3 {
     export function Up(): MutableVector3;
     export function Zero(): MutableVector3;
 }
+
+// @public (undocumented)
+export const Visibility: ComponentDefinition<ISchema<PBVisibility>>;
 
 // (No @packageDocumentation comment for this package)
 
