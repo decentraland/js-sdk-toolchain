@@ -72,44 +72,10 @@ export type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTyp
 
 // @public (undocumented)
 export namespace Components {
-    const // (undocumented)
-    Transform: ComponentDefinition<ISchema<    {
-    position: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    rotation: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    };
-    scale: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    parent?: Entity | undefined;
-    }>, {
-    position?: {
-    x: number;
-    y: number;
-    z: number;
-    } | undefined;
-    rotation?: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    } | undefined;
-    scale?: {
-    x: number;
-    y: number;
-    z: number;
-    } | undefined;
-    parent?: Entity | undefined;
-    }>;
+    const // Warning: (ae-forgotten-export) The symbol "TransformType" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     const // (undocumented)
     Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     const // (undocumented)
@@ -427,43 +393,7 @@ export const ToGammaSpace: number;
 export const ToLinearSpace = 2.2;
 
 // @public (undocumented)
-export const Transform: ComponentDefinition<ISchema<    {
-position: {
-x: number;
-y: number;
-z: number;
-};
-rotation: {
-x: number;
-y: number;
-z: number;
-w: number;
-};
-scale: {
-x: number;
-y: number;
-z: number;
-};
-parent?: Entity | undefined;
-}>, {
-position?: {
-x: number;
-y: number;
-z: number;
-} | undefined;
-rotation?: {
-x: number;
-y: number;
-z: number;
-w: number;
-} | undefined;
-scale?: {
-x: number;
-y: number;
-z: number;
-} | undefined;
-parent?: Entity | undefined;
-}>;
+export const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
 
 // @public (undocumented)
 export type Transport = {

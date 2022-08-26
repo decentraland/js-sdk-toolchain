@@ -203,44 +203,7 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTy
 /** @public */
 declare namespace Components {
     /** @public */
-    const Transform: ComponentDefinition<ISchema<    {
-    /** @public */
-    position: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    rotation: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    };
-    scale: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    parent?: Entity | undefined;
-    }>, {
-    position?: {
-    x: number;
-    y: number;
-    z: number;
-    } | undefined;
-    rotation?: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    } | undefined;
-    scale?: {
-    x: number;
-    y: number;
-    z: number;
-    } | undefined;
-    parent?: Entity | undefined;
-    }>;
+    const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     /** @public */
     const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     /** @public */
@@ -451,45 +414,7 @@ declare type DeepReadonly<T> = {
 };
 
 declare function defineSdkComponents(engine: PreEngine): {
-    Transform: ComponentDefinition<ISchema<{
-    position: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    rotation: {
-    x: number; /**
-    * @public
-    */
-    y: number;
-    z: number;
-    w: number;
-    };
-    scale: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    parent?: Entity | undefined;
-    }>, {
-    position?: {
-    x: number;
-    y: number;
-    z: number;
-    } | undefined;
-    rotation?: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    } | undefined;
-    scale?: {
-    x: number;
-    y: number;
-    z: number;
-    } | undefined;
-    parent?: Entity | undefined;
-    }>;
+    Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
     Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
@@ -2193,44 +2118,30 @@ declare const ToLinearSpace = 2.2;
 declare type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
 /** @public */
-declare const Transform: ComponentDefinition<ISchema<    {
-position: {
-x: number;
-y: number;
-z: number;
+declare const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
+
+/**
+ * @public
+ */
+declare type TransformType = {
+    position: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    rotation: {
+        x: number;
+        y: number;
+        z: number;
+        w: number;
+    };
+    scale: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    parent?: Entity;
 };
-rotation: {
-x: number;
-y: number;
-z: number;
-w: number;
-};
-scale: {
-/** @public */
-x: number;
-y: number;
-z: number;
-};
-parent?: Entity | undefined;
-}>, {
-position?: {
-x: number;
-y: number;
-z: number;
-} | undefined;
-rotation?: {
-x: number;
-y: number;
-z: number;
-w: number;
-} | undefined;
-scale?: {
-x: number;
-y: number;
-z: number;
-} | undefined;
-parent?: Entity | undefined;
-}>;
 
 declare const enum TransparencyMode {
     Opaque = 0,
