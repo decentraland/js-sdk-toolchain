@@ -9,47 +9,47 @@
 // @public (undocumented)
 export const Animator: ComponentDefinition<ISchema<PBAnimator>>;
 
-// Warning: (ae-forgotten-export) The symbol "PBAudioSource" needs to be exported by the entry point 0.9580633443849058index.d.ts
+// Warning: (ae-forgotten-export) The symbol "PBAudioSource" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export const AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
 
-// Warning: (ae-forgotten-export) The symbol "PBAvatarAttach" needs to be exported by the entry point 0.9580633443849058index.d.ts
+// Warning: (ae-forgotten-export) The symbol "PBAvatarAttach" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
 
-// Warning: (ae-forgotten-export) The symbol "PBAvatarModifierArea" needs to be exported by the entry point 0.9580633443849058index.d.ts
+// Warning: (ae-forgotten-export) The symbol "PBAvatarModifierArea" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
 
-// Warning: (ae-forgotten-export) The symbol "PBAvatarShape" needs to be exported by the entry point 0.9580633443849058index.d.ts
+// Warning: (ae-forgotten-export) The symbol "PBAvatarShape" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
 
-// Warning: (ae-forgotten-export) The symbol "PBBillboard" needs to be exported by the entry point 0.9580633443849058index.d.ts
+// Warning: (ae-forgotten-export) The symbol "PBBillboard" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export const Billboard: ComponentDefinition<ISchema<PBBillboard>>;
 
-// Warning: (ae-forgotten-export) The symbol "PBBoxShape" needs to be exported by the entry point 0.9580633443849058index.d.ts
+// Warning: (ae-forgotten-export) The symbol "PBBoxShape" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
 
-// Warning: (ae-forgotten-export) The symbol "createByteBuffer" needs to be exported by the entry point 0.9580633443849058index.d.ts
+// Warning: (ae-forgotten-export) The symbol "createByteBuffer" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export type ByteBuffer = ReturnType<typeof createByteBuffer>;
 
-// Warning: (ae-forgotten-export) The symbol "PBCameraMode" needs to be exported by the entry point 0.9580633443849058index.d.ts
+// Warning: (ae-forgotten-export) The symbol "PBCameraMode" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export const CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
 
-// Warning: (ae-forgotten-export) The symbol "PBCameraModeArea" needs to be exported by the entry point 0.9580633443849058index.d.ts
+// Warning: (ae-forgotten-export) The symbol "PBCameraModeArea" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
@@ -109,59 +109,59 @@ export namespace Components {
     CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
     const // (undocumented)
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBCylinderShape" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBCylinderShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBGLTFShape" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBGLTFShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBMaterial" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBMaterial" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     Material: ComponentDefinition<ISchema<PBMaterial>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBMeshRenderer" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBMeshRenderer" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBNFTShape" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBNFTShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerDown" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerDown" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerDownResult" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerDownResult" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUp" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUp" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUpResult" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUpResult" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBPlaneShape" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBPlaneShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBPointerLock" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBPointerLock" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBSphereShape" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBSphereShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBTextShape" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBTextShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     TextShape: ComponentDefinition<ISchema<PBTextShape>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBUiText" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBUiText" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     UiText: ComponentDefinition<ISchema<PBUiText>>;
@@ -172,7 +172,7 @@ export type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefiniti
     [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['getMutable']> : never;
 };
 
-// Warning: (ae-forgotten-export) The symbol "EcsResult" needs to be exported by the entry point 0.9580633443849058index.d.ts
+// Warning: (ae-forgotten-export) The symbol "EcsResult" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export type ComponentType<T extends ISchema> = EcsResult<T>;
@@ -308,7 +308,7 @@ export namespace Quaternion {
     export function dot(left: ReadonlyQuaternion, right: ReadonlyQuaternion): number;
     export function euler(x: number, y: number, z: number): MutableQuaternion;
     export function eulerAngles(q: MutableQuaternion): Vector3.MutableVector3;
-    // Warning: (ae-forgotten-export) The symbol "Matrix" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    // Warning: (ae-forgotten-export) The symbol "Matrix" needs to be exported by the entry point index.d.ts
     export function fromRotationMatrixToRef(matrix: Matrix.ReadonlyMatrix, result: Quaternion.MutableQuaternion): void;
     export function fromToRotation(from: Vector3.ReadonlyVector3, to: Vector3.ReadonlyVector3, up?: Vector3.ReadonlyVector3): MutableQuaternion;
     export function Identity(): MutableQuaternion;
@@ -338,7 +338,7 @@ export namespace Quaternion {
 // @public
 export const RAD2DEG: number;
 
-// Warning: (ae-forgotten-export) The symbol "ToOptional" needs to be exported by the entry point 0.9580633443849058index.d.ts
+// Warning: (ae-forgotten-export) The symbol "ToOptional" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export type Result<T extends Spec> = ToOptional<{
@@ -367,25 +367,25 @@ export namespace Schemas {
     Int64: ISchema<number>;
     const // (undocumented)
     Number: ISchema<number>;
-    const // Warning: (ae-forgotten-export) The symbol "IEnum" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "IEnum" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     Enum: typeof IEnum;
-    const // Warning: (ae-forgotten-export) The symbol "IArray" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "IArray" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     Array: typeof IArray;
-    const // Warning: (ae-forgotten-export) The symbol "IMap" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "IMap" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     Map: typeof IMap;
-    const // Warning: (ae-forgotten-export) The symbol "IOptional" needs to be exported by the entry point 0.9580633443849058index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "IOptional" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     Optional: typeof IOptional;
 }
 
-// Warning: (ae-forgotten-export) The symbol "defineLibraryComponents" needs to be exported by the entry point 0.9580633443849058index.d.ts
+// Warning: (ae-forgotten-export) The symbol "defineLibraryComponents" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export type SdkComponents = ReturnType<typeof defineLibraryComponents>;
@@ -417,23 +417,23 @@ export const ToLinearSpace = 2.2;
 
 // @public (undocumented)
 export const Transform: ComponentDefinition<ISchema<    {
-    position: {
-        x: number;
-        y: number;
-        z: number;
-    };
-    rotation: {
-        x: number;
-        y: number;
-        z: number;
-        w: number;
-    };
-    scale: {
-        x: number;
-        y: number;
-        z: number;
-    };
-    parent?: Entity | undefined;
+position: {
+x: number;
+y: number;
+z: number;
+};
+rotation: {
+x: number;
+y: number;
+z: number;
+w: number;
+};
+scale: {
+x: number;
+y: number;
+z: number;
+};
+parent?: Entity | undefined;
 }>>;
 
 // Warning: (ae-missing-release-tag) "Transport" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -446,7 +446,7 @@ export type Transport = {
     filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
 };
 
-// Warning: (ae-forgotten-export) The symbol "ReceiveMessage" needs to be exported by the entry point 0.9580633443849058index.d.ts
+// Warning: (ae-forgotten-export) The symbol "ReceiveMessage" needs to be exported by the entry point index.d.ts
 // Warning: (ae-missing-release-tag) "TransportMessage" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
