@@ -1,27 +1,27 @@
 const ecsFileProtocolBuffer = `import { ISchema } from '../../schemas/ISchema'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
-import { PBComponent } from './pb/Component.gen'
+import { PB$\{ComponentName\} } from './pb/$\{ComponentName\}.gen'
 
 /**
  * @internal
  */
-export const COMPONENT_ID = INVALID_COMPONENT_ID
+export const COMPONENT_ID = $\{ComponentId\}
 
 /**
  * @internal
  */
-export const ComponentSchema: ISchema<PBComponent> = {
-  serialize(value: PBComponent, builder: ByteBuffer): void {
-    const writer = PBComponent.encode(value)
+export const $\{ComponentName\}Schema: ISchema<PB$\{ComponentName\}> = {
+  serialize(value: PB$\{ComponentName\}, builder: ByteBuffer): void {
+    const writer = PB$\{ComponentName\}.encode(value)
     const buffer = new Uint8Array(writer.finish(), 0, writer.len)
     builder.writeBuffer(buffer, false)
   },
-  deserialize(reader: ByteBuffer): PBComponent {
-    return PBComponent.decode(reader.buffer(), reader.remainingBytes())
+  deserialize(reader: ByteBuffer): PB$\{ComponentName\} {
+    return PB$\{ComponentName\}.decode(reader.buffer(), reader.remainingBytes())
   },
-  create(): PBComponent {
+  create(): PB$\{ComponentName\} {
     // TODO: this is a hack.
-    return PBComponent.decode(new Uint8Array())
+    return PB$\{ComponentName\}.decode(new Uint8Array())
   }
 }
 `
