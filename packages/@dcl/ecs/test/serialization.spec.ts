@@ -1,4 +1,4 @@
-import { ComponentType, Engine } from '../src/engine'
+import { Engine } from '../src/engine'
 import { Schemas } from '../src/schemas'
 import { ISchema } from '../src/schemas/ISchema'
 
@@ -389,23 +389,21 @@ describe('Serialization Types', () => {
     const entityEmpty = engine.addEntity() // 1
     const COMPONENT_ID = 888
 
-    const TestSchema = Schemas.Map({
-      a: Schemas.Int,
-      b: Schemas.Int,
-      c: Schemas.Array(Schemas.Int),
-      d: Schemas.Int64
-    })
-    type TestType = ComponentType<typeof TestSchema>
-
-    const TestComponentType = engine.defineComponentFromSchema<
-      typeof TestSchema,
-      Partial<TestType>
-    >(TestSchema, COMPONENT_ID, {
-      a: 123,
-      b: 123,
-      c: [11, 22, 33],
-      d: 12
-    })
+    const TestComponentType = engine.defineComponent(
+      {
+        a: Schemas.Int,
+        b: Schemas.Int,
+        c: Schemas.Array(Schemas.Int),
+        d: Schemas.Int64
+      },
+      COMPONENT_ID,
+      {
+        a: 123,
+        b: 123,
+        c: [11, 22, 33],
+        d: 12
+      }
+    )
 
     TestComponentType.create(entityEmpty, {
       a: 0,

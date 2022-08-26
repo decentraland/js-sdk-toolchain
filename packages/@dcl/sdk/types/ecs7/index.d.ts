@@ -630,6 +630,7 @@ declare type IEngine = {
      * Define a component and add it to the engine.
      * @param spec An object with schema fields
      * @param componentId unique id to identify the component, if the component id already exist, it will fail.
+     * @param constructorDefault the initial value prefilled when a component is created without a value
      * @return The component definition
      *
      * ```ts
@@ -641,7 +642,7 @@ declare type IEngine = {
      *
      * ```
      */
-    defineComponent<T extends Spec>(spec: Spec, componentId: number): ComponentDefinition<ISchema<Result<T>>>;
+    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: Spec, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
     /**
      * Define a component and add it to the engine.
      * @param spec An object with schema fields
@@ -653,7 +654,7 @@ declare type IEngine = {
      * const StateComponent = engine.defineComponent(Schemas.Bool, VisibleComponentId)
      * ```
      */
-    defineComponentFromSchema<T extends ISchema<Record<string, any>>, T2 = ComponentType<T>>(spec: T, componentId: number, constructorDefault?: ComponentType<T>): ComponentDefinition<T, T2>;
+    defineComponentFromSchema<T extends ISchema<Record<string, any>>, ConstructorType = ComponentType<T>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
     /**
      * Get the component definition from the component id.
      * @param componentId
@@ -1924,8 +1925,8 @@ declare function preEngine(): {
         name?: string | undefined;
     }[];
     removeSystem: (selector: string | Update) => boolean;
-    defineComponent: <T extends Spec>(spec: Spec, componentId: number) => ComponentDefinition<ISchema<Result<T>>, Result<T>>;
-    defineComponentFromSchema: <T_1 extends ISchema<any>, ConstructorType = EcsResult<T_1>>(spec: T_1, componentId: number, constructorDefault?: EcsResult<T_1> | undefined) => ComponentDefinition<T_1, ConstructorType>;
+    defineComponent: <T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType | undefined) => ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    defineComponentFromSchema: <T_1 extends ISchema<any>, ConstructorType_1 = EcsResult<T_1>>(spec: T_1, componentId: number, constructorDefault?: ConstructorType_1 | undefined) => ComponentDefinition<T_1, ConstructorType_1>;
     getEntitiesWith: <T_2 extends [ComponentDefinition<ISchema<any>, any>, ...ComponentDefinition<ISchema<any>, any>[]]>(...components: T_2) => Iterable<[Entity, ...DeepReadonly<ComponentSchema<T_2>>]>;
     getComponent: <T_3 extends ISchema<any>>(componentId: number) => ComponentDefinition<T_3, EcsResult<T_3>>;
     removeComponentDefinition: (componentId: number) => void;

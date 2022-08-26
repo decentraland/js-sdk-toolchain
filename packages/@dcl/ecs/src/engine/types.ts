@@ -71,6 +71,7 @@ export type IEngine = {
    * Define a component and add it to the engine.
    * @param spec An object with schema fields
    * @param componentId unique id to identify the component, if the component id already exist, it will fail.
+   * @param constructorDefault the initial value prefilled when a component is created without a value
    * @return The component definition
    *
    * ```ts
@@ -82,10 +83,11 @@ export type IEngine = {
    *
    * ```
    */
-  defineComponent<T extends Spec>(
+  defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(
     spec: Spec,
-    componentId: number
-  ): CompDef<ISchema<Result<T>>>
+    componentId: number,
+    constructorDefault?: Partial<Result<T>>
+  ): CompDef<ISchema<Result<T>>, ConstructorType>
 
   /**
    * Define a component and add it to the engine.
@@ -100,12 +102,12 @@ export type IEngine = {
    */
   defineComponentFromSchema<
     T extends ISchema<Record<string, any>>,
-    T2 = ComponentType<T>
+    ConstructorType = ComponentType<T>
   >(
     spec: T,
     componentId: number,
-    constructorDefault?: ComponentType<T>
-  ): CompDef<T, T2>
+    constructorDefault?: ConstructorType
+  ): CompDef<T, ConstructorType>
 
   /**
    * Get the component definition from the component id.

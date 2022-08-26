@@ -67,7 +67,7 @@ function preEngine() {
   >(
     spec: T,
     componentId: number,
-    constructorDefault?: ComponentType<T>
+    constructorDefault?: ConstructorType
   ): ComponentDefinition<T, ConstructorType> {
     if (componentsDefinition.get(componentId)) {
       throw new Error(`Component ${componentId} already declared`)
@@ -81,11 +81,19 @@ function preEngine() {
     return newComponent
   }
 
-  function defineComponent<T extends Spec>(
-    spec: Spec,
-    componentId: number
-  ): ComponentDefinition<ISchema<Result<T>>> {
-    return defineComponentFromSchema(Schemas.Map(spec), componentId)
+  function defineComponent<
+    T extends Spec,
+    ConstructorType = Partial<Result<T>>
+  >(
+    spec: T,
+    componentId: number,
+    constructorDefault?: ConstructorType
+  ): ComponentDefinition<ISchema<Result<T>>, ConstructorType> {
+    return defineComponentFromSchema(
+      Schemas.Map(spec),
+      componentId,
+      constructorDefault
+    )
   }
 
   function getComponent<T extends ISchema>(

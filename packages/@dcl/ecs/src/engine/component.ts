@@ -200,7 +200,7 @@ export function defineComponent<
 >(
   componentId: number,
   spec: T,
-  constructorDefault?: ComponentType<T>
+  constructorDefault?: ConstructorType
   // meta: { syncFlags }
 ): ComponentDefinition<T, ConstructorType> {
   const data = new Map<Entity, ComponentType<T>>()
