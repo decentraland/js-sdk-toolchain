@@ -1,9 +1,14 @@
-import { Engine } from '../../../packages/@dcl/ecs/src'
-import { Entity } from '../../../packages/@dcl/ecs/src'
-import { Quaternion, Vector3 } from '../../../packages/@dcl/ecs/src'
+import { Engine, Entity } from '../../../packages/@dcl/ecs/src/engine'
+import { Quaternion, Vector3 } from '../../../packages/@dcl/ecs/src/runtime/Math'
 import { TRANSFORM_LENGTH } from '../../../packages/@dcl/ecs/src/components/legacy/Transform'
+import { setupDclInterfaceForThisSuite, testingExperimentalAPI } from '../utils'
 
 describe('Transform component', () => {
+  const engineApi = testingExperimentalAPI()
+  setupDclInterfaceForThisSuite({
+    ...engineApi.modules
+  })
+
   it('should transform length 44 bytes ', () => {
     expect(TRANSFORM_LENGTH).toBe(44)
   })
@@ -22,9 +27,8 @@ describe('Transform component', () => {
 
     const buffer = Transform.toBinary(entity)
     expect(Array.from(buffer.toBinary())).toStrictEqual([
-      64, 73, 15, 219, 64, 19, 93, 142, 63, 53, 4, 243, 64, 73, 15, 219, 64, 45,
-      248, 84, 0, 0, 0, 0, 63, 53, 4, 243, 64, 73, 15, 219, 64, 45, 248, 84, 64,
-      19, 93, 142, 7, 91, 205, 21
+      64, 73, 15, 219, 64, 19, 93, 142, 63, 53, 4, 243, 64, 73, 15, 219, 64, 45, 248, 84, 0, 0, 0, 0, 63, 53, 4, 243,
+      64, 73, 15, 219, 64, 45, 248, 84, 64, 19, 93, 142, 7, 91, 205, 21
     ])
     expect(buffer.toBinary().length).toBe(TRANSFORM_LENGTH)
   })

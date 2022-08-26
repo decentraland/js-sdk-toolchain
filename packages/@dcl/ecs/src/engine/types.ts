@@ -7,6 +7,8 @@ import { Entity } from './entity'
 import { Update } from './systems'
 import type { DeepReadonly } from './utils'
 
+export { ISchema } from '../schemas/ISchema'
+
 /**
  * @public
  */
@@ -122,7 +124,7 @@ export type IEngine = {
    * Example:
    * ```ts
    * for (const [entity, boxShape, transform] of engine.getEntitiesWith(BoxShape, Transform)) {
-   * // the properties of boxShape and transform are read only
+   *   // the properties of boxShape and transform are read only
    * }
    * ```
    */

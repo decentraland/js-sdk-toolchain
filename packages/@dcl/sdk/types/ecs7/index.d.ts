@@ -204,24 +204,23 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>> = {
 declare namespace Components {
     /** @public */
     const Transform: ComponentDefinition<ISchema<    {
-        position: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        rotation: {
-            x: number;
-            y: number;
-            z: number;
-            w: number;
-        };
-        scale: {
-            x: number;
-            y: number;
-            /** @public */
-            z: number;
-        };
-        parent?: Entity | undefined;
+    position: {
+    x: number;
+    y: number;
+    z: number;
+    };
+    rotation: {
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+    };
+    scale: {
+    x: number;
+    y: number;
+    z: number; /** @public */
+    };
+    parent?: Entity | undefined;
     }>>;
     /** @public */
     const Animator: ComponentDefinition<ISchema<PBAnimator>>;
@@ -434,23 +433,23 @@ declare type DeepReadonly<T> = {
 
 declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEngine, 'defineComponentFromSchema'>): {
     Transform: ComponentDefinition<ISchema<    {
-        position: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        rotation: {
-            x: number;
-            y: number;
-            z: number;
-            w: number;
-        };
-        scale: {
-            x: number;
-            y: number;
-            z: number;
-        };
-        parent?: Entity | undefined;
+    position: {
+    x: number;
+    y: number;
+    z: number;
+    };
+    rotation: {
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+    };
+    scale: {
+    x: number;
+    y: number;
+    z: number;
+    };
+    parent?: Entity | undefined;
     }>>;
     Animator: ComponentDefinition<ISchema<PBAnimator>>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
@@ -496,10 +495,6 @@ declare type EcsResult<T extends ISchema> = T extends ISchema ? ReturnType<T['de
  */
 declare function Engine({ transports }?: IEngineParams): IEngine;
 
-/**
- * @alpha * This file initialization is an alpha one. This is based on the old-ecs
- * init and it'll be changing.
- */
 declare const engine: IEngine;
 
 /**
@@ -634,7 +629,7 @@ declare type IEngine = {
      * Example:
      * ```ts
      * for (const [entity, boxShape, transform] of engine.getEntitiesWith(BoxShape, Transform)) {
-     * // the properties of boxShape and transform are read only
+     *   // the properties of boxShape and transform are read only
      * }
      * ```
      */
@@ -2130,23 +2125,23 @@ declare type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTyp
 
 /** @public */
 declare const Transform: ComponentDefinition<ISchema<    {
-    position: {
-        x: number;
-        y: number;
-        z: number;
-    };
-    rotation: {
-        x: number;
-        y: number;
-        z: number;
-        w: number;
-    };
-    scale: {
-        x: number;
-        y: number;
-        z: number;
-    };
-    parent?: Entity | undefined;
+position: {
+x: number;
+y: number;
+z: number;
+};
+rotation: {
+x: number;
+y: number;
+z: number;
+w: number;
+};
+scale: {
+x: number;
+y: number;
+z: number;
+};
+parent?: Entity | undefined;
 }>>;
 
 declare const enum TransparencyMode {

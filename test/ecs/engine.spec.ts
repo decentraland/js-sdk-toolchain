@@ -5,7 +5,8 @@ import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/Byte
 import { createRendererTransport } from '../../packages/@dcl/ecs/src/systems/crdt/transports/rendererTransport'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { TransformSchema } from '../../packages/@dcl/ecs/src/components/legacy/Transform'
-import { Vector3 } from '../../packages/@dcl/ecs/src/Math'
+import { Vector3 } from '../../packages/@dcl/ecs/src/runtime/Math'
+import { setupDclInterfaceForThisSuite, testingExperimentalAPI } from './utils'
 
 const PositionSchema = {
   x: Schemas.Float
@@ -16,8 +17,9 @@ const VelocitySchema = {
 }
 
 describe('Engine tests', () => {
-  beforeEach(() => {
-    globalThis.dcl = { callRpc: async () => {} } as any
+  const engineApi = testingExperimentalAPI()
+  setupDclInterfaceForThisSuite({
+    ...engineApi.modules
   })
 
   it('generates new entities', () => {
@@ -67,9 +69,7 @@ describe('Engine tests', () => {
     const systemA = () => {}
     const systemA2 = () => {}
     engine.addSystem(systemA, SYSTEMS_REGULAR_PRIORITY, 'systemA')
-    expect(() =>
-      engine.addSystem(systemA2, SYSTEMS_REGULAR_PRIORITY, 'systemA')
-    ).toThrowError()
+    expect(() => engine.addSystem(systemA2, SYSTEMS_REGULAR_PRIORITY, 'systemA')).toThrowError()
   })
 
   it('should replace existing component with the new one', () => {
@@ -251,12 +251,11 @@ describe('Engine tests', () => {
     Velocity.create(entityA, { y: 1 })
     Velocity.create(entityB, { y: 1 })
 
-    for (const [
-      entity,
-      readonlyVelocity,
-      readonlyPosition,
-      readonlyPosition2
-    ] of engine.getEntitiesWith(Velocity, Position, Position2)) {
+    for (const [entity, readonlyVelocity, readonlyPosition, readonlyPosition2] of engine.getEntitiesWith(
+      Velocity,
+      Position,
+      Position2
+    )) {
       expect(entity).toBe(entityA)
       expect(readonlyVelocity).toStrictEqual({ y: 1 })
       expect(readonlyPosition).toStrictEqual({ x: 0 })
@@ -278,9 +277,7 @@ describe('Engine tests', () => {
     // avoid dirty iterators
     engine.update(0)
 
-    for (const [entity, _readonlyPosition] of engine.getEntitiesWith(
-      Position
-    )) {
+    for (const [entity, _readonlyPosition] of engine.getEntitiesWith(Position)) {
       const position = Position.getMutable(entity)
       expect(entity).toBe(entityA)
       expect(position).toStrictEqual({ x: 0 })
@@ -307,13 +304,9 @@ describe('Engine tests', () => {
     // avoid dirty iterators
     engine.update(0)
 
-    const [component1, component2, component3] = Array.from(
-      engine.getEntitiesWith(Position, Velocity)
-    ).map(([entity]) => [
-      entity,
-      Position.getMutable(entity),
-      Velocity.getMutable(entity)
-    ])
+    const [component1, component2, component3] = Array.from(engine.getEntitiesWith(Position, Velocity)).map(
+      ([entity]) => [entity, Position.getMutable(entity), Velocity.getMutable(entity)]
+    )
 
     expect(component1).toStrictEqual([entityA, { x: 0 }, { y: 0 }])
     expect(component2).toStrictEqual([entityB, { x: 1 }, { y: 1 }])
@@ -339,9 +332,7 @@ describe('Engine tests', () => {
     // avoid dirty iterators
     engine.update(0)
 
-    const [component1, component2, component3] = Array.from(
-      engine.getEntitiesWith(Position, Velocity)
-    )
+    const [component1, component2, component3] = Array.from(engine.getEntitiesWith(Position, Velocity))
     expect(component1).toStrictEqual([entityA, { x: 0 }, { y: 0 }])
     expect(component2).toStrictEqual([entityB, { x: 1 }, { y: 1 }])
     expect(component3).toBe(undefined)
@@ -369,9 +360,7 @@ describe('Engine tests', () => {
     const engine = Engine()
     const entityA = engine.addEntity()
     const buf = createByteBuffer()
-    expect(() =>
-      engine.baseComponents.BoxShape.writeToByteBuffer(entityA, buf)
-    ).toThrowError('')
+    expect(() => engine.baseComponents.BoxShape.writeToByteBuffer(entityA, buf)).toThrowError('')
   })
 
   it('should remove component when using deleteFrom', () => {
@@ -389,13 +378,10 @@ describe('Engine tests', () => {
 
     function moveSystem(_dt: number) {
       moves++
-      for (const [entity, _readonlyMove] of engine.getEntitiesWith(
-        MoveTransformComponent
-      )) {
+      for (const [entity, _readonlyMove] of engine.getEntitiesWith(MoveTransformComponent)) {
         const move = MoveTransformComponent.getMutable(entity)
         move.speed += 1
-        engine.baseComponents.Transform.getMutable(entity).position =
-          Vector3.Zero()
+        engine.baseComponents.Transform.getMutable(entity).position = Vector3.Zero()
         if (moves === 2) {
           MoveTransformComponent.deleteFrom(entity)
         }
@@ -528,8 +514,6 @@ describe('Engine tests', () => {
 
   it('should return the default component of the transform', () => {
     const engine = Engine()
-    expect(TransformSchema.create()).toBeDeepCloseTo(
-      engine.baseComponents.Transform.default()
-    )
+    expect(TransformSchema.create()).toBeDeepCloseTo(engine.baseComponents.Transform.default())
   })
 })

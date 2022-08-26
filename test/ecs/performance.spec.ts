@@ -1,6 +1,11 @@
-import { SandBox } from './utils'
+import { SandBox, setupDclInterfaceForThisSuite, testingExperimentalAPI } from './utils'
 
 describe.skip('Performance.', () => {
+  const engineApi = testingExperimentalAPI()
+  setupDclInterfaceForThisSuite({
+    ...engineApi.modules
+  })
+
   it('should run 10k iterations', () => {
     const { engine, components } = SandBox.create({ length: 1 })[0]
     const { Transform } = engine.baseComponents

@@ -25,10 +25,8 @@ function namespaceComponent(component: Component) {
 const TransformComponent = { componentId: 1, componentName: 'Transform' }
 
 const indexTemplate = `import type { IEngine } from '../../engine/types'
-import * as TransformSchema from './../legacy/Transform'
+import * as TransformSchema from '../legacy/Transform'
 $componentImports
-
-declare const engine: IEngine
 
 export function defineLibraryComponents({
   defineComponentFromSchema
@@ -40,13 +38,13 @@ $componentReturns
 }
 `
 
-const globalTemplate = `import { engine } from '../../initialization'
+const globalTemplate = `import { engine } from '../../runtime/initialization'
 
 ${useDefinedComponent(TransformComponent)}
 $componentReturns
 `
 
-const globalNamespaceTemplate = `import { engine } from '../../initialization'
+const globalNamespaceTemplate = `import { engine } from '../../runtime/initialization'
 /** @public */
 export namespace Components {
 ${namespaceComponent(TransformComponent)}

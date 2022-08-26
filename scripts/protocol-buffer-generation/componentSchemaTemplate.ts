@@ -1,7 +1,6 @@
 const ecsFileProtocolBuffer = `import { ISchema } from '../../schemas/ISchema'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
 import { PBComponent } from './pb/Component.gen'
-export { PBComponent }
 
 /**
  * @internal

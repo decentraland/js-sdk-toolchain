@@ -1,18 +1,24 @@
 import { TRANSFORM_LENGTH } from '../../packages/@dcl/ecs/src/components/legacy/Transform'
-import { Engine, Quaternion, Vector3, Entity } from '../../packages/@dcl/ecs/src'
+import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
+import { Quaternion, Vector3 } from '../../packages/@dcl/ecs/src/runtime/Math'
+
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt/componentOperation'
 import WireMessage from '../../packages/@dcl/ecs/src/serialization/wireMessage'
+import { setupDclInterfaceForThisSuite, testingExperimentalAPI } from './utils'
 
 const putType = WireMessage.Enum.PUT_COMPONENT
 
 describe('Component operation tests', () => {
+  const engineApi = testingExperimentalAPI()
+  setupDclInterfaceForThisSuite({
+    ...engineApi.modules
+  })
+
   it('validate corrupt message', () => {
     const buf = createByteBuffer({
       reading: {
-        buffer: new Uint8Array([
-          255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
-        ]),
+        buffer: new Uint8Array([255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]),
         currentOffset: 0
       }
     })
@@ -37,13 +43,7 @@ describe('Component operation tests', () => {
 
     const bb = createByteBuffer()
 
-    ComponentOperation.write(
-      WireMessage.Enum.PUT_COMPONENT,
-      entityA,
-      timestamp,
-      sdk.Transform,
-      bb
-    )
+    ComponentOperation.write(WireMessage.Enum.PUT_COMPONENT, entityA, timestamp, sdk.Transform, bb)
 
     mutableTransform.position.x = 31.3
     timestamp++
@@ -53,9 +53,7 @@ describe('Component operation tests', () => {
     while (WireMessage.validate(bb)) {
       const msgOne = ComponentOperation.read(bb)!
       expect(msgOne.length).toBe(
-        TRANSFORM_LENGTH +
-          ComponentOperation.MESSAGE_HEADER_LENGTH +
-          WireMessage.HEADER_LENGTH
+        TRANSFORM_LENGTH + ComponentOperation.MESSAGE_HEADER_LENGTH + WireMessage.HEADER_LENGTH
       )
       expect(msgOne.type).toBe(WireMessage.Enum.PUT_COMPONENT)
       sdk.Transform.upsertFromBinary(entityB, bb)

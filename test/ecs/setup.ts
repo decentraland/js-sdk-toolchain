@@ -16,10 +16,3 @@ beforeAll(() => {
 afterAll(() => {
   globalThis.WebSocket = _WebSocket
 })
-
-// globalThis.dcl = {
-//   async loadModule(moduleName: string, exportsRef: any): Promise<ModuleDescriptor> {
-//     return { methods: [], rpcHandle: moduleName }
-//   },
-//   callRpc: async (..._args: any[]) => {}
-// } as DecentralandInterface

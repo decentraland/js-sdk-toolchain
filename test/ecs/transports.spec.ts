@@ -4,12 +4,17 @@ import WireMessage from '../../packages/@dcl/ecs/src/serialization/wireMessage'
 import { createNetworkTransport } from '../../packages/@dcl/ecs/src/systems/crdt/transports/networkTransport'
 import { createRendererTransport } from '../../packages/@dcl/ecs/src/systems/crdt/transports/rendererTransport'
 import { TransportMessage } from '../../packages/@dcl/ecs/src/systems/crdt/types'
+import { setupDclInterfaceForThisSuite, testingExperimentalAPI } from './utils'
 
 describe('Transport tests', () => {
   beforeEach(() => {
     jest.resetAllMocks()
     jest.restoreAllMocks()
-    globalThis.dcl = { callRpc: async () => {} } as any
+  })
+
+  const engineApi = testingExperimentalAPI()
+  setupDclInterfaceForThisSuite({
+    ...engineApi.modules
   })
 
   it('should avoid echo messages', () => {

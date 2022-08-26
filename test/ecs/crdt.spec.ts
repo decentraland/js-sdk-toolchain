@@ -1,15 +1,20 @@
-import { Vector3 } from '../../packages/@dcl/ecs/src'
+import { Vector3 } from '../../packages/@dcl/ecs/src/runtime/Math'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt/componentOperation'
 import WireMessage from '../../packages/@dcl/ecs/src/serialization/wireMessage'
-import { wait, SandBox } from './utils'
+import { wait, SandBox, setupDclInterfaceForThisSuite, testingExperimentalAPI } from './utils'
 
 describe('CRDT tests', () => {
   beforeEach(() => {
     jest.resetAllMocks()
     jest.restoreAllMocks()
+  })
+
+  const engineApi = testingExperimentalAPI()
+  setupDclInterfaceForThisSuite({
+    ...engineApi.modules
   })
 
   it('should send static entities', () => {

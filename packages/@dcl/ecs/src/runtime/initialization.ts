@@ -5,9 +5,9 @@
  * init and it'll be changing.
  */
 
-import { Engine } from './engine'
-import { createRendererTransport } from './systems/crdt/transports/rendererTransport'
-import { createNetworkTransport } from './systems/crdt/transports/networkTransport'
+import { Engine } from '../engine'
+import { createRendererTransport } from '../systems/crdt/transports/rendererTransport'
+import { createNetworkTransport } from '../systems/crdt/transports/networkTransport'
 
 const rendererTransport = createRendererTransport()
 export const engine = Engine({
