@@ -136,6 +136,14 @@ export namespace Components {
     //
     // (undocumented)
     GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
+    const // Warning: (ae-forgotten-export) The symbol "PBMaterial" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    const // Warning: (ae-forgotten-export) The symbol "PBMeshRenderer" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
     const // Warning: (ae-forgotten-export) The symbol "PBNFTShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -172,6 +180,10 @@ export namespace Components {
     //
     // (undocumented)
     TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+    const // Warning: (ae-forgotten-export) The symbol "PBUiText" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
 }
 
 // @public (undocumented)
@@ -251,6 +263,12 @@ export interface ISize {
 
 // @public (undocumented)
 export const log: (...a: any[]) => void;
+
+// @public (undocumented)
+export const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+
+// @public (undocumented)
+export const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
 
 // @public (undocumented)
 export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
@@ -454,6 +472,9 @@ export type Transport = {
 //
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
+
+// @public (undocumented)
+export const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
 
 // @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;

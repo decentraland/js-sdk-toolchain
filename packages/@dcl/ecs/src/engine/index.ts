@@ -11,7 +11,6 @@ import { IEngine } from './types'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
 import { ISchema } from '../schemas/ISchema'
-import { defineLibraryComponents } from './../components/generated/index.gen'
 import { Result, Spec } from '../schemas/Map'
 import { Schemas } from '../schemas'
 import { defineSdkComponents } from '../components'
@@ -69,7 +68,7 @@ function preEngine() {
     spec: T,
     componentId: number,
     constructorDefault?: ComponentType<T>
-  ): ComponentDefinition<T> {
+  ): ComponentDefinition<T, ConstructorType> {
     if (componentsDefinition.get(componentId)) {
       throw new Error(`Component ${componentId} already declared`)
     }
@@ -135,6 +134,10 @@ function preEngine() {
     return systems.getSystems()
   }
 
+  function removeComponentDefinition(componentId: number) {
+    componentsDefinition.delete(componentId)
+  }
+
   return {
     entitiesComponent,
     componentsDefinition,
@@ -147,7 +150,8 @@ function preEngine() {
     defineComponent,
     defineComponentFromSchema,
     getEntitiesWith,
-    getComponent
+    getComponent,
+    removeComponentDefinition
   }
 }
 
@@ -215,6 +219,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     defineComponentFromSchema: engine.defineComponentFromSchema,
     getEntitiesWith: engine.getEntitiesWith,
     getComponent: engine.getComponent,
+    removeComponentDefinition: engine.removeComponentDefinition,
     update,
     baseComponents
   }

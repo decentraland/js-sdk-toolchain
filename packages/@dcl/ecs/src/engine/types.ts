@@ -138,6 +138,12 @@ export type IEngine = {
    */
   update(dt: number): void
 
+  /**
+   * @internal
+   * @param componentId
+   */
+  removeComponentDefinition(componentId: number): void
+
   baseComponents: SdkComponents
 }
 

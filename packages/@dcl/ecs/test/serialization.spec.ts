@@ -394,16 +394,15 @@ describe('Serialization Types', () => {
     })
     type TestType = ComponentType<typeof TestSchema>
 
-    const TestComponentType = engine.defineComponentFromSchema<typeof TestSchema, Partial<TestType>>(
-      TestSchema,
-      COMPONENT_ID,
-      {
-        a: 123,
-        b: 123,
-        c: [11, 22, 33],
-        d: 12
-      }
-    )
+    const TestComponentType = engine.defineComponentFromSchema<
+      typeof TestSchema,
+      Partial<TestType>
+    >(TestSchema, COMPONENT_ID, {
+      a: 123,
+      b: 123,
+      c: [11, 22, 33],
+      d: 12
+    })
 
     TestComponentType.create(entityEmpty, {
       a: 0,
@@ -412,22 +411,39 @@ describe('Serialization Types', () => {
 
     TestComponentType.create(entityWithDefault)
 
-    expect(TestComponentType.get(entityEmpty)).toStrictEqual(
-      {
-        a: 0,
-        b: 0,
-        c: [11, 22, 33],
-        d: 12
-      }
-    )
+    expect(TestComponentType.get(entityEmpty)).toStrictEqual({
+      a: 0,
+      b: 0,
+      c: [11, 22, 33],
+      d: 12
+    })
 
-    expect(TestComponentType.get(entityWithDefault)).toStrictEqual(
-      {
-        a: 123,
-        b: 123,
-        c: [11, 22, 33],
-        d: 12
-      }
-    )
+    expect(TestComponentType.get(entityWithDefault)).toStrictEqual({
+      a: 123,
+      b: 123,
+      c: [11, 22, 33],
+      d: 12
+    })
+  })
+
+  it('should prefill with default value with arrays', () => {
+    const engine = Engine()
+    const entityWithDefault = engine.addEntity() // 0
+    const entityEmpty = engine.addEntity() // 1
+    const COMPONENT_ID = 888
+
+    const TestSchema = Schemas.Array(Schemas.Int)
+    type TestType = ComponentType<typeof TestSchema>
+
+    const TestComponentType = engine.defineComponentFromSchema<
+      typeof TestSchema,
+      Partial<TestType>
+    >(TestSchema, COMPONENT_ID, [12, 13])
+
+    TestComponentType.create(entityEmpty, [1, 2])
+    TestComponentType.create(entityWithDefault)
+
+    expect(TestComponentType.get(entityEmpty)).toStrictEqual([1, 2])
+    expect(TestComponentType.get(entityWithDefault)).toStrictEqual([12, 13])
   })
 })
