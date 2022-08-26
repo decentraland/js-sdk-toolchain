@@ -17,8 +17,6 @@ describe('Generated AvatarShape ProtoBuf', () => {
       wearables: ['wearable1', 'wearable2'],
       expressionTriggerId: 'id',
       expressionTriggerTimestamp: 0,
-      stickerTriggerId: 'id2',
-      stickerTriggerTimestamp: 0,
       talking: true
     })
 
@@ -32,8 +30,6 @@ describe('Generated AvatarShape ProtoBuf', () => {
       wearables: ['wearable12', 'wearable22'],
       expressionTriggerId: 'id2',
       expressionTriggerTimestamp: 1,
-      stickerTriggerId: 'id22',
-      stickerTriggerTimestamp: 1,
       talking: false
     })
     const buffer = AvatarShape.toBinary(entity)
