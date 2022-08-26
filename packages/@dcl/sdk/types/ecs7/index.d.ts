@@ -68,6 +68,15 @@ declare const enum CameraModeValue {
     UNRECOGNIZED = -1
 }
 
+declare const enum ColliderLayer {
+    None = 0,
+    Pointer = 1,
+    Physics = 2,
+    /** PhysicsAndPointer - Physics | Pointer; */
+    PhysicsAndPointer = 3,
+    UNRECOGNIZED = -1
+}
+
 declare interface Color3 {
     r: number;
     g: number;
@@ -247,6 +256,8 @@ declare namespace Components {
     const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
     /** @public */
     const Material: ComponentDefinition<ISchema<PBMaterial>>;
+    /** @public */
+    const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>>;
     /** @public */
     const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
     /** @public */
@@ -464,6 +475,7 @@ declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEn
     CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
     GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
     Material: ComponentDefinition<ISchema<PBMaterial>>;
+    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>>;
     MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
     OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
@@ -1418,6 +1430,9 @@ declare namespace Matrix {
 }
 
 /** @public */
+declare const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>>;
+
+/** @public */
 declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
 
 /** @public */
@@ -1604,6 +1619,31 @@ declare interface PBMaterial_Texture {
     wrapMode?: TextureWrapMode | undefined;
     /** default = FilterMode.Bilinear */
     filterMode?: FilterMode | undefined;
+}
+
+declare interface PBMeshCollider {
+    /** default = ColliderLayer.PhysicsAndPointer */
+    collisionMask?: ColliderLayer | undefined;
+    box: PBMeshCollider_BoxMesh | undefined;
+    sphere: PBMeshCollider_SphereMesh | undefined;
+    cylinder: PBMeshCollider_CylinderMesh | undefined;
+    plane: PBMeshCollider_PlaneMesh | undefined;
+}
+
+declare interface PBMeshCollider_BoxMesh {
+}
+
+declare interface PBMeshCollider_CylinderMesh {
+    /** default=1.0 */
+    radiusTop?: number | undefined;
+    /** default=1.0 */
+    radiusBottom?: number | undefined;
+}
+
+declare interface PBMeshCollider_PlaneMesh {
+}
+
+declare interface PBMeshCollider_SphereMesh {
 }
 
 declare interface PBMeshRenderer {

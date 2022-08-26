@@ -122,6 +122,10 @@ export namespace Components {
     //
     // (undocumented)
     Material: ComponentDefinition<ISchema<PBMaterial>>;
+    const // Warning: (ae-forgotten-export) The symbol "PBMeshCollider" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>>;
     const // Warning: (ae-forgotten-export) The symbol "PBMeshRenderer" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -248,6 +252,9 @@ export const log: (...a: any[]) => void;
 
 // @public (undocumented)
 export const Material: ComponentDefinition<ISchema<PBMaterial>>;
+
+// @public (undocumented)
+export const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>>;
 
 // @public (undocumented)
 export const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
