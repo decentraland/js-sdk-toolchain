@@ -19,7 +19,8 @@ export async function generateComponent(params: {
     `${component.componentName}.gen.ts`
   )
   const componentContent = componentSchemaTemplate
-    .replace(/\$\{ComponentName\}/g, component.componentName)
-    .replace(/\$\{ComponentId\}/g, component.componentId.toString())
+    .replace(/Component.gen/g, `${component.componentName}.gen`)
+    .replace(/Component/g, component.componentName)
+    .replace('INVALID_COMPONENT_ID', component.componentId.toString())
   fs.writeFileSync(componentFilePath, componentContent)
 }
