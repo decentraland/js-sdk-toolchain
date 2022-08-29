@@ -2,8 +2,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { getFilesFromFolder } from './setupUtils'
 import type { Application } from 'express'
-
-import { SmartWearable } from './smartWearableSchema'
+import { WearableJson } from '@dcl/schemas/dist/sdk'
 
 const serveWearable = ({
   wearableJsonPath,
@@ -15,8 +14,8 @@ const serveWearable = ({
   const wearableDir = path.dirname(wearableJsonPath)
   const wearableJson = JSON.parse(fs.readFileSync(wearableJsonPath).toString())
 
-  if (!SmartWearable.validate(wearableJson)) {
-    const errors = (SmartWearable.validate.errors || [])
+  if (!WearableJson.validate(wearableJson)) {
+    const errors = (WearableJson.validate.errors || [])
       .map((a) => `${a.data} ${a.message}`)
       .join('')
 

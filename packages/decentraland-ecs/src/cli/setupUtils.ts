@@ -1,3 +1,4 @@
+import { WearableJson } from '@dcl/schemas/dist/sdk'
 import * as crypto from 'crypto'
 import type { Application } from 'express'
 import * as fs from 'fs'
@@ -6,7 +7,6 @@ import * as http from 'http'
 import * as https from 'https'
 import ignore from 'ignore'
 import * as path from 'path'
-import { SmartWearable } from './smartWearableSchema'
 
 // instead of using fs-extra, create a custom function to no need to rollup
 export async function copyDir(src: string, dest: string) {
@@ -106,8 +106,8 @@ export function entityV3FromFolder({
       const wearableJson = JSON.parse(
         fs.readFileSync(wearableJsonPath).toString()
       )
-      if (!SmartWearable.validate(wearableJson)) {
-        const errors = (SmartWearable.validate.errors || [])
+      if (!WearableJson.validate(wearableJson)) {
+        const errors = (WearableJson.validate.errors || [])
           .map((a) => `${a.data} ${a.message}`)
           .join('')
 
