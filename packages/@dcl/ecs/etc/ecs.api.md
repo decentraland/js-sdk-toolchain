@@ -60,8 +60,8 @@ export type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTyp
     _id: number;
     default(): DeepReadonly<ComponentType<T>>;
     has(entity: Entity): boolean;
-    get(entity: Entity): DeepReadonly<ComponentType<T>>;
-    getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
+    get(entity: DeepReadonly<Entity> | Entity): DeepReadonly<ComponentType<T>>;
+    getOrNull(entity: DeepReadonly<Entity> | Entity): DeepReadonly<ComponentType<T>> | null;
     create(entity: Entity, val?: ConstructorType): ComponentType<T>;
     createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
     deleteFrom(entity: Entity): ComponentType<T> | null;

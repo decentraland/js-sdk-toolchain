@@ -115,7 +115,7 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTy
      * Transform.get(otherEntity) // throw an error!!
      * ```
      */
-    get(entity: Entity): DeepReadonly<ComponentType<T>>;
+    get(entity: DeepReadonly<Entity> | Entity): DeepReadonly<ComponentType<T>>;
     /**
      * Get the readonly component of the entity (to mutate it, use getMutable instead), or null if the entity doesn't have the component.
      * @param entity
@@ -127,7 +127,7 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTy
      * log(Transform.get(otherEntity) === null) // log 'true'
      * ```
      */
-    getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
+    getOrNull(entity: DeepReadonly<Entity> | Entity): DeepReadonly<ComponentType<T>> | null;
     /**
      * Add the current component to an entity, throw an error if the component already exists (use `createOrReplace` instead).
      * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
