@@ -1,12 +1,12 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import * as express from 'express'
+import type { Application } from 'express'
 import { createStaticRoutes } from './cli/setupUtils'
 import { mockCatalyst } from './cli/mock-catalyst'
 import { mockPreviewWearables } from './cli/wearables'
 import { sdk } from '@dcl/schemas'
 
-const setupProxy = (dcl: any, app: express.Application) => {
+const setupProxy = (dcl: any, app: Application) => {
   // first resolve all dependencies in the local current working directory
   // second try to resolve dependencies in decentraland-ecs folder
   /**
@@ -68,8 +68,6 @@ const setupProxy = (dcl: any, app: express.Application) => {
       baseWearableFolders = wearables
     }
   }
-
-  app.use(express.json())
 
   try {
     mockCatalyst(app, [...baseSceneFolders, ...baseWearableFolders])

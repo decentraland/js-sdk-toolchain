@@ -1,12 +1,12 @@
+import { WearableJson } from '@dcl/schemas/dist/sdk'
+import * as crypto from 'crypto'
+import type { Application } from 'express'
 import * as fs from 'fs'
 import { sync as globSync } from 'glob'
-import * as path from 'path'
 import * as http from 'http'
 import * as https from 'https'
-import * as crypto from 'crypto'
 import ignore from 'ignore'
-import * as express from 'express'
-import { sdk } from '@dcl/schemas'
+import * as path from 'path'
 
 // instead of using fs-extra, create a custom function to no need to rollup
 export async function copyDir(src: string, dest: string) {
@@ -100,19 +100,27 @@ export function entityV3FromFolder({
   const sceneJsonPath = path.resolve(folder, './scene.json')
   let isParcelScene = true
 
-  const assetJsonPath = path.resolve(folder, './asset.json')
-  if (fs.existsSync(assetJsonPath)) {
+  const wearableJsonPath = path.resolve(folder, './wearable.json')
+  if (fs.existsSync(wearableJsonPath)) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const assetJson = require(assetJsonPath)
-      if (
-        sdk.AssetJson.validate(assetJson) &&
-        assetJson.assetType === sdk.ProjectType.PORTABLE_EXPERIENCE
-      ) {
+      const wearableJson = JSON.parse(
+        fs.readFileSync(wearableJsonPath).toString()
+      )
+      if (!WearableJson.validate(wearableJson)) {
+        const errors = (WearableJson.validate.errors || [])
+          .map((a) => `${a.data} ${a.message}`)
+          .join('')
+
+        console.error(
+          `Unable to validate wearable.json properly, please check it.`,
+          errors
+        )
+        console.error(`Invalid wearable.json (${wearableJsonPath})`)
+      } else {
         isParcelScene = false
       }
     } catch (err) {
-      console.error(`Unable to load asset.json properly`, err)
+      console.error(`Unable to load wearable.json properly`, err)
     }
   }
 
@@ -284,7 +292,7 @@ export const getDirectories = (source: string) => {
 }
 
 export const createStaticRoutes = (
-  app: express.Application,
+  app: Application,
   route: string,
   localFolder: string,
   mapFile?: (filePath: string) => string
