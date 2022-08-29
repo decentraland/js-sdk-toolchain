@@ -31,11 +31,11 @@
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
     "@dcl/kernel": "1.0.0-2834435888.commit-c38a5ef",
     "@dcl/posix": "^1.0.4",
-    "@dcl/schemas": "^5.13.2-20220829174510.commit-a539bbf",
+    "@dcl/schemas": "^5.14.0",
     "@dcl/unity-renderer": "1.0.48346-20220810145514.commit-57fa34e",
     "glob": "^7.1.7",
     "http-proxy-middleware": "^2.0.3",
     "ignore": "^5.1.8"
   },
-  "minCliVersion": "3.11.0"
+  "minCliVersion": "3.12.0"
 }
