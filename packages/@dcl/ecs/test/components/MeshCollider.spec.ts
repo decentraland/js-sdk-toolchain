@@ -21,7 +21,7 @@ describe('Generated MeshCollider ProtoBuf', () => {
       box: undefined,
       cylinder: undefined,
       plane: {},
-      collisionMask: ColliderLayer.PhysicsAndPointer
+      collisionMask: ColliderLayer.Physics
     })
     const buffer = MeshCollider.toBinary(entity)
     MeshCollider.updateFromBinary(entityB, buffer)
