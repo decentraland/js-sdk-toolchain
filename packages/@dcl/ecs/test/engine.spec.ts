@@ -532,9 +532,10 @@ describe('Engine tests', () => {
   it('should log the error of cyclic parenting', () => {
     const originalDcl = (globalThis as any).dcl
     const errorFunc = jest.fn()
-    const errorString = (e: Entity) => 'There is a cyclic parent with entity ' + e
-    ;(globalThis as any).dcl = { error:  errorFunc }
-    
+    const errorString = (e: Entity) =>
+      'There is a cyclic parent with entity ' + e
+    ;(globalThis as any).dcl = { error: errorFunc }
+
     const engine = Engine()
     const e0 = engine.addEntity()
     const e1 = engine.addEntity()
@@ -545,23 +546,21 @@ describe('Engine tests', () => {
     engine.baseComponents.Transform.create(e1).parent = e0
     engine.baseComponents.Transform.create(e2).parent = e1
     engine.baseComponents.Transform.create(e3).parent = e2
-    engine.update(1/30)
+    engine.update(1 / 30)
     expect(errorFunc.mock.calls.length).toBe(0)
-    console.log({ calls: errorFunc.mock.calls })
-    
+
     engine.baseComponents.Transform.getMutable(e3).parent = e3
-    engine.update(1.0/30.0)
+    engine.update(1.0 / 30.0)
     expect(errorFunc.mock.calls.length).toBe(1)
     expect(errorFunc.mock.calls[0][0]).toBe(errorString(e3))
     errorFunc.mock.calls = []
 
     engine.baseComponents.Transform.getMutable(e3).parent = e2
     engine.baseComponents.Transform.getMutable(e0).parent = e3
-    engine.update(1.0/30.0)
+    engine.update(1.0 / 30.0)
     expect(errorFunc.mock.calls.length).toBe(2)
     expect(errorFunc.mock.calls[0][0]).toBe(errorString(e3))
     expect(errorFunc.mock.calls[1][0]).toBe(errorString(e0))
-    
     ;(globalThis as any).dcl = originalDcl
   })
 })

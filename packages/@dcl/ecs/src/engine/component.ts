@@ -75,7 +75,9 @@ export type ComponentDefinition<
    * log(Transform.get(otherEntity) === null) // log 'true'
    * ```
    */
-  getOrNull(entity: DeepReadonly<Entity> | Entity): DeepReadonly<ComponentType<T>> | null
+  getOrNull(
+    entity: DeepReadonly<Entity> | Entity
+  ): DeepReadonly<ComponentType<T>> | null
 
   /**
    * Add the current component to an entity, throw an error if the component already exists (use `createOrReplace` instead).
