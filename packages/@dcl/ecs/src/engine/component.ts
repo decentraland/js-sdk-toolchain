@@ -18,7 +18,10 @@ export type ComponentType<T extends ISchema> = EcsResult<T>
 /**
  * @public
  */
-export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
+export type ComponentDefinition<
+  T extends ISchema = ISchema<any>,
+  ConstructorType = ComponentType<T>
+> = {
   _id: number
 
   /**
@@ -87,7 +90,7 @@ export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
    * Transform.create(myEntity) // throw an error, the `Transform` component already exists in `myEntity`
    * ````
    */
-  create(entity: Entity, val?: ComponentType<T>): ComponentType<T>
+  create(entity: Entity, val?: ConstructorType): ComponentType<T>
   /**
    * Add the current component to an entity or replace the content if the entity already has the component
    * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
@@ -191,18 +194,46 @@ export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
   isDirty(entity: Entity): boolean
 }
 
-export function defineComponent<T extends ISchema>(
+export function defineComponent<
+  T extends ISchema,
+  ConstructorType = ComponentType<T>
+>(
   componentId: number,
-  spec: T
+  spec: T,
+  constructorDefault?: ConstructorType
   // meta: { syncFlags }
-): ComponentDefinition<T> {
+): ComponentDefinition<T, ConstructorType> {
   const data = new Map<Entity, ComponentType<T>>()
   const dirtyIterator = new Set<Entity>()
+
+  const defaultBuffer = createByteBuffer()
+  if (constructorDefault) {
+    spec.serialize(constructorDefault, defaultBuffer)
+  }
+
+  function getDefaultValue() {
+    if (constructorDefault) {
+      return spec.deserialize(
+        createByteBuffer({
+          writing: {
+            buffer: defaultBuffer.buffer(),
+            currentOffset: defaultBuffer.currentWriteOffset()
+          }
+        })
+      )
+    } else {
+      return spec.create()
+    }
+  }
+
+  function prefillValue(value: ConstructorType) {
+    return { ...getDefaultValue(), ...value }
+  }
 
   return {
     _id: componentId,
     default: function () {
-      return spec.create()
+      return getDefaultValue()
     },
     isDirty: function (entity: Entity): boolean {
       return dirtyIterator.has(entity)
@@ -233,7 +264,7 @@ export function defineComponent<T extends ISchema>(
     },
     create: function (
       entity: Entity,
-      value?: ComponentType<T>
+      value?: ConstructorType
     ): ComponentType<T> {
       const component = data.get(entity)
       if (component) {
@@ -241,16 +272,18 @@ export function defineComponent<T extends ISchema>(
           `[create] Component ${componentId} for ${entity} already exists`
         )
       }
-      const usedValue = value === undefined ? spec.create() : value
+      const usedValue =
+        value === undefined ? getDefaultValue() : prefillValue(value)
       data.set(entity, usedValue)
       dirtyIterator.add(entity)
       return usedValue
     },
     createOrReplace: function (
       entity: Entity,
-      value?: ComponentType<T>
+      value?: ConstructorType
     ): ComponentType<T> {
-      const usedValue = value === undefined ? spec.create() : value
+      const usedValue =
+        value === undefined ? getDefaultValue() : prefillValue(value)
       data.set(entity, usedValue!)
       dirtyIterator.add(entity)
       return usedValue!

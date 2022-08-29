@@ -31,4 +31,15 @@ describe('Generated MeshRenderer ProtoBuf', () => {
       ...MeshRenderer.getMutable(entity)
     } as any)
   })
+
+  it('should create a Mesh with default constructor (a prefilled undefined)', () => {
+    const newEngine = Engine()
+    const { MeshRenderer } = newEngine.baseComponents
+    const entity = newEngine.addEntity()
+
+    const meshRenderer = MeshRenderer.create(entity, {
+      box: { uvs: [] }
+    })
+    expect(meshRenderer.box).toStrictEqual({ uvs: [] })
+  })
 })

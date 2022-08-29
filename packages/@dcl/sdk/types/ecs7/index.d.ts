@@ -17,10 +17,10 @@ declare const enum ActionButton {
 }
 
 /** @public */
-declare const Animator: ComponentDefinition<ISchema<PBAnimator>>;
+declare const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
 
 /** @public */
-declare const AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
+declare const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
 
 declare const enum AvatarAnchorPoint {
     POSITION = 0,
@@ -31,7 +31,7 @@ declare const enum AvatarAnchorPoint {
 }
 
 /** @public */
-declare const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+declare const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
 
 declare const enum AvatarModifier {
     HIDE_AVATARS = 0,
@@ -40,16 +40,16 @@ declare const enum AvatarModifier {
 }
 
 /** @public */
-declare const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
+declare const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
 
 /** @public */
-declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
 
 /** @public */
-declare const Billboard: ComponentDefinition<ISchema<PBBillboard>>;
+declare const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
 
 /** @public */
-declare const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
+declare const BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
 
 /**
  * @public
@@ -57,10 +57,10 @@ declare const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
 declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
 
 /** @public */
-declare const CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
+declare const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
 
 /** @public */
-declare const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
+declare const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
 
 declare const enum CameraModeValue {
     FIRST_PERSON = 0,
@@ -77,7 +77,7 @@ declare interface Color3 {
 /**
  * @public
  */
-declare type ComponentDefinition<T extends ISchema = ISchema<any>> = {
+declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorType = ComponentType<T>> = {
     _id: number;
     /**
      * Return the default value of the current component
@@ -141,7 +141,7 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>> = {
      * Transform.create(myEntity) // throw an error, the `Transform` component already exists in `myEntity`
      * ````
      */
-    create(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
+    create(entity: Entity, val?: ConstructorType): ComponentType<T>;
     /**
      * Add the current component to an entity or replace the content if the entity already has the component
      * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
@@ -203,74 +203,53 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>> = {
 /** @public */
 declare namespace Components {
     /** @public */
-    const Transform: ComponentDefinition<ISchema<    {
-    position: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    rotation: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    };
-    scale: {
-    x: number;
-    y: number;
+    const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     /** @public */
-    z: number;
-    };
-    parent?: Entity | undefined;
-    }>>;
+    const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     /** @public */
-    const Animator: ComponentDefinition<ISchema<PBAnimator>>;
+    const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     /** @public */
-    const AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
+    const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
     /** @public */
-    const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+    const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
     /** @public */
-    const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
+    const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
     /** @public */
-    const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+    const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
     /** @public */
-    const Billboard: ComponentDefinition<ISchema<PBBillboard>>;
+    const BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
     /** @public */
-    const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
+    const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
     /** @public */
-    const CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
+    const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
     /** @public */
-    const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
+    const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
     /** @public */
-    const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
+    const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
     /** @public */
-    const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+    const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     /** @public */
-    const Material: ComponentDefinition<ISchema<PBMaterial>>;
+    const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
     /** @public */
-    const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
+    const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
     /** @public */
-    const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+    const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
     /** @public */
-    const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+    const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
     /** @public */
-    const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+    const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
     /** @public */
-    const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+    const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
     /** @public */
-    const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
+    const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
     /** @public */
-    const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+    const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
     /** @public */
-    const PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
+    const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     /** @public */
-    const SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
+    const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
     /** @public */
-    const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
-    /** @public */
-    const UiText: ComponentDefinition<ISchema<PBUiText>>;
-    /** @public */
-    const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>>;
+    const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
 }
 
 /**
@@ -424,7 +403,7 @@ declare interface CreateByteBufferOptions {
 }
 
 /** @public */
-declare const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
+declare const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
 
 /**
  * Make each field readonly deeply
@@ -434,50 +413,31 @@ declare type DeepReadonly<T> = {
     readonly [P in keyof T]: DeepReadonly<T[P]>;
 };
 
-declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEngine, 'defineComponentFromSchema'>): {
-    Transform: ComponentDefinition<ISchema<    {
-    position: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    rotation: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    };
-    scale: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    parent?: Entity | undefined;
-    }>>;
-    Animator: ComponentDefinition<ISchema<PBAnimator>>;
-    AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
-    AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
-    AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
-    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
-    Billboard: ComponentDefinition<ISchema<PBBillboard>>;
-    BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
-    CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
-    CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
-    CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
-    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
-    Material: ComponentDefinition<ISchema<PBMaterial>>;
-    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
-    NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
-    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
-    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
-    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
-    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
-    PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
-    PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
-    SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
-    TextShape: ComponentDefinition<ISchema<PBTextShape>>;
-    UiText: ComponentDefinition<ISchema<PBUiText>>;
-    VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>>;
+declare function defineSdkComponents(engine: PreEngine): {
+    Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
+    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
+    Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+    AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
+    AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
+    AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
+    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
+    Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
+    BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
+    CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
+    CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
+    CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
+    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
+    Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
+    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
+    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
+    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
+    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
+    PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+    PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
+    TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+    UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
 };
 
 /**
@@ -541,7 +501,7 @@ declare type float = number;
 declare type FloatArray = number[];
 
 /** @public */
-declare const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+declare const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
 
 /**
  * @public
@@ -595,6 +555,7 @@ declare type IEngine = {
      * Define a component and add it to the engine.
      * @param spec An object with schema fields
      * @param componentId unique id to identify the component, if the component id already exist, it will fail.
+     * @param constructorDefault the initial value prefilled when a component is created without a value
      * @return The component definition
      *
      * ```ts
@@ -606,7 +567,7 @@ declare type IEngine = {
      *
      * ```
      */
-    defineComponent<T extends Spec>(spec: Spec, componentId: number): ComponentDefinition<ISchema<Result<T>>>;
+    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: Spec, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
     /**
      * Define a component and add it to the engine.
      * @param spec An object with schema fields
@@ -618,7 +579,7 @@ declare type IEngine = {
      * const StateComponent = engine.defineComponent(Schemas.Bool, VisibleComponentId)
      * ```
      */
-    defineComponentFromSchema<T extends ISchema>(spec: T, componentId: number): ComponentDefinition<T>;
+    defineComponentFromSchema<T extends ISchema<Record<string, any>>, ConstructorType = ComponentType<T>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
     /**
      * Get the component definition from the component id.
      * @param componentId
@@ -699,7 +660,7 @@ declare interface ISize {
 declare const log: (...a: any[]) => void;
 
 /** @public */
-declare const Material: ComponentDefinition<ISchema<PBMaterial>>;
+declare const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
 
 /**
  * Class used to store matrix data (4x4)
@@ -1421,10 +1382,10 @@ declare namespace Matrix {
 }
 
 /** @public */
-declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
+declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
 
 /** @public */
-declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
 
 /** @public */
 declare type Nullable<T> = T | null;
@@ -1438,16 +1399,16 @@ declare type OnlyOptionalUndefinedTypes<T> = {
 };
 
 /** @public */
-declare const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+declare const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
 
 /** @public */
-declare const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+declare const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
 
 /** @public */
-declare const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+declare const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
 
 /** @public */
-declare const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
+declare const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
 
 /**
  * Defines potential orientation for back face culling
@@ -1756,11 +1717,6 @@ declare interface PBUiText {
     textColor: Color3 | undefined;
 }
 
-declare interface PBVisibilityComponent {
-    /** default=true */
-    visible?: boolean | undefined;
-}
-
 /**
  * Represens a plane by the equation ax + by + cz + d = 0
  * @public
@@ -1871,10 +1827,35 @@ declare namespace Plane {
 }
 
 /** @public */
-declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
 
 /** @public */
-declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
+declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+
+/**
+ * @public
+ */
+declare type PreEngine = ReturnType<typeof preEngine>;
+
+declare function preEngine(): {
+    entitiesComponent: Map<number, Set<number>>;
+    componentsDefinition: Map<number, ComponentDefinition<any, any>>;
+    addEntity: (dynamic?: boolean) => Entity;
+    addDynamicEntity: () => Entity;
+    removeEntity: (entity: Entity) => boolean;
+    addSystem: (fn: Update, priority?: number, name?: string | undefined) => void;
+    getSystems: () => {
+        fn: Update;
+        priority: number;
+        name?: string | undefined;
+    }[];
+    removeSystem: (selector: string | Update) => boolean;
+    defineComponent: <T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType | undefined) => ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    defineComponentFromSchema: <T_1 extends ISchema<any>, ConstructorType_1 = EcsResult<T_1>>(spec: T_1, componentId: number, constructorDefault?: ConstructorType_1 | undefined) => ComponentDefinition<T_1, ConstructorType_1>;
+    getEntitiesWith: <T_2 extends [ComponentDefinition<ISchema<any>, any>, ...ComponentDefinition<ISchema<any>, any>[]]>(...components: T_2) => Iterable<[Entity, ...DeepReadonly<ComponentSchema<T_2>>]>;
+    getComponent: <T_3 extends ISchema<any>>(componentId: number) => ComponentDefinition<T_3, EcsResult<T_3>>;
+    removeComponentDefinition: (componentId: number) => void;
+};
 
 /**
  * @public
@@ -2086,7 +2067,7 @@ declare namespace Schemas {
 /**
  * @public
  */
-declare type SdkComponents = ReturnType<typeof defineLibraryComponents>;
+declare type SdkComponents = ReturnType<typeof defineSdkComponents>;
 
 /**
  * Defines supported spaces
@@ -2109,10 +2090,10 @@ declare interface Spec {
 }
 
 /** @public */
-declare const SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
+declare const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
 
 /** @public */
-declare const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
+declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 
 declare const enum TextureWrapMode {
     Repeat = 0,
@@ -2137,25 +2118,30 @@ declare const ToLinearSpace = 2.2;
 declare type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
 /** @public */
-declare const Transform: ComponentDefinition<ISchema<    {
-position: {
-x: number;
-y: number;
-z: number;
+declare const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
+
+/**
+ * @public
+ */
+declare type TransformType = {
+    position: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    rotation: {
+        x: number;
+        y: number;
+        z: number;
+        w: number;
+    };
+    scale: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    parent?: Entity;
 };
-rotation: {
-x: number;
-y: number;
-z: number;
-w: number;
-};
-scale: {
-x: number;
-y: number;
-z: number;
-};
-parent?: Entity | undefined;
-}>>;
 
 declare const enum TransparencyMode {
     Opaque = 0,
@@ -2178,7 +2164,7 @@ declare type TransportMessage = Omit<ReceiveMessage, 'data'>;
 declare type Uint32 = number;
 
 /** @public */
-declare const UiText: ComponentDefinition<ISchema<PBUiText>>;
+declare const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
 
 /**
  * @public
@@ -2398,9 +2384,6 @@ declare interface Vector3_2 {
     y: number;
     z: number;
 }
-
-/** @public */
-declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>>;
 
 declare namespace WireMessage {
     enum Enum {

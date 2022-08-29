@@ -2,6 +2,8 @@ import fs from 'fs'
 import path from 'path'
 import { Component } from './generateComponent'
 
+const TransformComponent = { componentId: 1, componentName: 'Transform' }
+
 function enumTemplate({ componentName, componentId }: Component) {
   return `\t${componentName} = ${componentId},`
 }
@@ -11,6 +13,9 @@ function importComponent(component: Component) {
 }
 
 function defineComponent(component: Component) {
+  if (component.componentId === TransformComponent.componentId) {
+    return `\t\t${component.componentName}: TransformSchema.defineTransformComponent({ defineComponentFromSchema }),`
+  }
   return `\t\t${component.componentName}: defineComponentFromSchema(${component.componentName}Schema.${component.componentName}Schema, ${component.componentName}Schema.COMPONENT_ID),`
 }
 
@@ -22,19 +27,13 @@ function namespaceComponent(component: Component) {
   return `\t/** @public */\n\texport const ${component.componentName} = engine.baseComponents.${component.componentName}`
 }
 
-const TransformComponent = { componentId: 1, componentName: 'Transform' }
-
 const indexTemplate = `import type { IEngine } from '../../engine/types'
-import * as TransformSchema from './../legacy/Transform'
 $componentImports
-
-declare const engine: IEngine
 
 export function defineLibraryComponents({
   defineComponentFromSchema
 }: Pick<IEngine, 'defineComponentFromSchema'>) {
   return {
-${defineComponent(TransformComponent)}
 $componentReturns
   }
 }
