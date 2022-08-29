@@ -18,9 +18,7 @@ function createCube(x: number, y: number, z: number) {
   const myEntity = engine.addEntity()
 
   Transform.create(myEntity, {
-    position: { x, y, z },
-    scale: { x: 1, y: 1, z: 1 },
-    rotation: { x: 0, y: 0, z: 0, w: 1 }
+    position: { x, y, z }
   })
 
   BoxShape.create(myEntity, {
