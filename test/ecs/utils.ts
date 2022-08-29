@@ -90,18 +90,23 @@ export function setupDclInterfaceForThisSuite(
     onStart: (fn) => startFns.push(fn as any),
     // modules
     async callRpc(moduleName, method, args) {
-      if (!modules[moduleName]) throw new Error(`Module ${moduleName} not found`)
-      if (!modules[moduleName][method]) throw new Error(`Method ${moduleName}.${method} not found`)
+      if (!modules[moduleName])
+        throw new Error(`Module ${moduleName} not found`)
+      if (!modules[moduleName][method])
+        throw new Error(`Method ${moduleName}.${method} not found`)
       return modules[moduleName][method].apply(null, args as any)
     },
     async loadModule(moduleName, exportsObj) {
-      if (!modules[moduleName]) throw new Error(`Module ${moduleName} not found`)
+      if (!modules[moduleName])
+        throw new Error(`Module ${moduleName} not found`)
       const ret: ModuleDescriptor = {
         rpcHandle: moduleName,
         methods: []
       }
-      for (let methodName in modules[moduleName]) {
-        exportsObj[methodName] = modules[moduleName][moduleName].bind(modules[moduleName])
+      for (const methodName in modules[moduleName]) {
+        exportsObj[methodName] = modules[moduleName][moduleName].bind(
+          modules[moduleName]
+        )
         ret.methods.push({ name: methodName })
       }
       return ret
@@ -146,7 +151,10 @@ export namespace SandBox {
     const clients = Array.from({ length }).map((_, index) => {
       const clientTransport = transport.createNetworkTransport()
       const engine = Engine({ transports: [clientTransport] })
-      const Position = engine.defineComponent(SandBox.Position.type, SandBox.Position.id)
+      const Position = engine.defineComponent(
+        SandBox.Position.type,
+        SandBox.Position.id
+      )
       const Door = engine.defineComponent(SandBox.Door.type, SandBox.Door.id)
 
       return {

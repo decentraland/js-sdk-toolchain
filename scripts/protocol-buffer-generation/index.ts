@@ -3,18 +3,16 @@ import { resolve } from 'path'
 import { compareFolders } from '../utils/compareFolder'
 import { getFilePathsSync } from '../utils/getFilePathsSync'
 import { Component, generateComponent } from './generateComponent'
-import { generateProtocolBuffer, getComponentId } from './generateProtocolBuffer'
+import {
+  generateProtocolBuffer,
+  getComponentId
+} from './generateProtocolBuffer'
 import { generateIndex } from './generateIndex'
 
 const NON_EXPOSED_LIST = [
   1050, // UiTransform
   1021 // AudioStream
 ]
-
-function getParam(key: string) {
-  const index = process.argv.findIndex((item) => item === key)
-  return index !== -1 && process.argv.length > index && process.argv[index + 1]
-}
 
 /**
  * @param componentPath - Argument of execution '--component-path'
@@ -27,9 +25,15 @@ function getParam(key: string) {
  *  integration is also generated.
  *
  */
-export function compileEcsComponents(componentPathParam: string, definitionsPath: string, test = false) {
+export function compileEcsComponents(
+  componentPathParam: string,
+  definitionsPath: string,
+  test = false
+) {
   it('compiles components for folder ' + componentPathParam, async () => {
-    const componentPath = test ? resolve(process.cwd(), 'temp-protocolbuffers') : componentPathParam
+    const componentPath = test
+      ? resolve(process.cwd(), 'temp-protocolbuffers')
+      : componentPathParam
     const generatedPath = resolve(componentPath, 'generated')
 
     if (test) {
@@ -40,14 +44,20 @@ export function compileEcsComponents(componentPathParam: string, definitionsPath
       })
     }
 
-    console.log(`Decentraland > Gen dir: ${generatedPath} - definitions dir: ${definitionsPath}`)
+    console.log(
+      `Decentraland > Gen dir: ${generatedPath} - definitions dir: ${definitionsPath}`
+    )
 
     const componentsFile = getFilePathsSync(definitionsPath, false)
       .filter((filePath) => filePath.toLowerCase().endsWith('.proto'))
-      .map((filePath) => filePath.substring(0, filePath.length - '.proto'.length))
+      .map((filePath) =>
+        filePath.substring(0, filePath.length - '.proto'.length)
+      )
 
     const components: Component[] = componentsFile.map((componentName) => {
-      const protoFileContent = readFileSync(resolve(definitionsPath, `${componentName}.proto`)).toString()
+      const protoFileContent = readFileSync(
+        resolve(definitionsPath, `${componentName}.proto`)
+      ).toString()
 
       let componentId: number = -1
       try {
@@ -83,7 +93,9 @@ export function compileEcsComponents(componentPathParam: string, definitionsPath
         definitionsPath
       })
     }
-    const filteredComponents = components.filter(({ componentId }) => !NON_EXPOSED_LIST.includes(componentId))
+    const filteredComponents = components.filter(
+      ({ componentId }) => !NON_EXPOSED_LIST.includes(componentId)
+    )
     generateIndex({ components: filteredComponents, generatedPath })
     // await runCommand({/
     //   command: resolve(process.cwd(), 'node_modules', '.bin', 'eslint'),
@@ -93,7 +105,10 @@ export function compileEcsComponents(componentPathParam: string, definitionsPath
     // })
 
     if (test) {
-      const result = compareFolders(generatedPath, resolve(componentPathParam, 'generated'))
+      const result = compareFolders(
+        generatedPath,
+        resolve(componentPathParam, 'generated')
+      )
       removeSync(componentPath)
 
       if (!result) {
