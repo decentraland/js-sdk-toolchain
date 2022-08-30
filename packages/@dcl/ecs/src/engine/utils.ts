@@ -1,4 +1,4 @@
-import type { DeepReadonly } from '../Math'
+import type { DeepReadonly } from '../runtime/Math'
 export type { DeepReadonly }
 
 export function deepReadonly<T extends Record<string, unknown>>(

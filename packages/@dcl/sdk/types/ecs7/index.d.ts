@@ -462,10 +462,6 @@ declare type EcsResult<T extends ISchema> = T extends ISchema ? ReturnType<T['de
  */
 declare function Engine({ transports }?: IEngineParams): IEngine;
 
-/**
- * @alpha * This file initialization is an alpha one. This is based on the old-ecs
- * init and it'll be changing.
- */
 declare const engine: IEngine;
 
 /**
@@ -601,7 +597,7 @@ declare type IEngine = {
      * Example:
      * ```ts
      * for (const [entity, boxShape, transform] of engine.getEntitiesWith(BoxShape, Transform)) {
-     * // the properties of boxShape and transform are read only
+     *   // the properties of boxShape and transform are read only
      * }
      * ```
      */

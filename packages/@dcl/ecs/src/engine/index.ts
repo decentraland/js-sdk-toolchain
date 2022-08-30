@@ -6,7 +6,7 @@ import {
   defineComponent as defComponent
 } from './component'
 import type { ComponentSchema, IEngineParams } from './types'
-import type { DeepReadonly } from '../Math'
+import type { DeepReadonly } from '../runtime/Math'
 import { IEngine } from './types'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
