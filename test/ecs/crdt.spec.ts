@@ -4,7 +4,12 @@ import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt/componentOperation'
 import WireMessage from '../../packages/@dcl/ecs/src/serialization/wireMessage'
-import { wait, SandBox, setupDclInterfaceForThisSuite, testingExperimentalAPI } from './utils'
+import {
+  wait,
+  SandBox,
+  setupDclInterfaceForThisSuite,
+  testingExperimentalAPI
+} from './utils'
 
 describe('CRDT tests', () => {
   beforeEach(() => {

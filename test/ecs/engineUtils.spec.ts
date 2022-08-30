@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { deepReadonly, isNotUndefined } from '../../packages/@dcl/ecs/src/engine/utils'
+import {
+  deepReadonly,
+  isNotUndefined
+} from '../../packages/@dcl/ecs/src/engine/utils'
 
 describe('Engine utils', () => {
   it('Should fail if you try to update a readonly prop', () => {

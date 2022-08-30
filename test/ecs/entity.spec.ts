@@ -1,4 +1,7 @@
-import { Entity, EntityContainer } from '../../packages/@dcl/ecs/src/engine/entity'
+import {
+  Entity,
+  EntityContainer
+} from '../../packages/@dcl/ecs/src/engine/entity'
 import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 
 describe('Entity container', () => {
