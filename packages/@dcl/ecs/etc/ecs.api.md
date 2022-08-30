@@ -203,6 +203,11 @@ export type float = number;
 // @public (undocumented)
 export type FloatArray = number[];
 
+// Warning: (ae-forgotten-export) The symbol "PBPointerEventsResult_PointerCommand" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export function getPointerEvents(): Iterable<[Entity, PBPointerEventsResult_PointerCommand]>;
+
 // @public (undocumented)
 export const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
 

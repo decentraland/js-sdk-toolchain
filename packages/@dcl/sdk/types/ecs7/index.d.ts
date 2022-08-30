@@ -235,15 +235,15 @@ declare namespace Components {
     /** @public */
     const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
     /** @public */
-    const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-    /** @public */
     const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-    /** @public */
-    const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
     /** @public */
     const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
     /** @public */
+    const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+    /** @public */
     const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    /** @public */
+    const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
     /** @public */
     const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     /** @public */
@@ -432,11 +432,11 @@ declare function defineSdkComponents(engine: PreEngine): {
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
     OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
     OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
     PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+    PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
     SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
     UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
@@ -502,6 +502,8 @@ declare type float = number;
 
 /** @public */
 declare type FloatArray = number[];
+
+declare function getPointerEvents(): Iterable<[Entity, PBPointerEventsResult_PointerCommand]>;
 
 /** @public */
 declare const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
@@ -1405,13 +1407,7 @@ declare type OnlyOptionalUndefinedTypes<T> = {
 declare const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
 
 /** @public */
-declare const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-
-/** @public */
 declare const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-
-/** @public */
-declare const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
 
 /**
  * Defines potential orientation for back face culling
@@ -1622,17 +1618,6 @@ declare interface PBOnPointerDown {
     showFeedback?: boolean | undefined;
 }
 
-declare interface PBOnPointerDownResult {
-    button: ActionButton;
-    meshName: string;
-    origin: Vector3_2 | undefined;
-    direction: Vector3_2 | undefined;
-    point: Vector3_2 | undefined;
-    normal: Vector3_2 | undefined;
-    distance: number;
-    timestamp: number;
-}
-
 declare interface PBOnPointerUp {
     /** default=ActionButton.ANY */
     button?: ActionButton | undefined;
@@ -1642,17 +1627,6 @@ declare interface PBOnPointerUp {
     maxDistance?: number | undefined;
     /** default=true */
     showFeedback?: boolean | undefined;
-}
-
-declare interface PBOnPointerUpResult {
-    button: ActionButton;
-    meshName: string;
-    origin: Vector3_2 | undefined;
-    direction: Vector3_2 | undefined;
-    point: Vector3_2 | undefined;
-    normal: Vector3_2 | undefined;
-    distance: number;
-    timestamp: number;
 }
 
 declare interface PBPlaneShape {
@@ -1665,8 +1639,33 @@ declare interface PBPlaneShape {
     uvs: number[];
 }
 
+/** the renderer will set this component to the root entity once per frame with all the events */
+declare interface PBPointerEventsResult {
+    /** a list of the last N pointer commands (from the engine) */
+    commands: PBPointerEventsResult_PointerCommand[];
+}
+
+/** this message represents a pointer event, used both for UP and DOWN actions */
+declare interface PBPointerEventsResult_PointerCommand {
+    /** identifier of the input */
+    button: ActionButton;
+    hit: RaycastHit | undefined;
+    state: PointerEventType;
+    /** could be a Lamport timestamp */
+    timestamp: number;
+    /** if the input is analog then we store it here */
+    analog?: number | undefined;
+}
+
 declare interface PBPointerLock {
     isPointerLocked: boolean;
+}
+
+declare interface PBRaycastResult {
+    timestamp: number;
+    origin: Vector3_2 | undefined;
+    direction: Vector3_2 | undefined;
+    hits: RaycastHit[];
 }
 
 declare interface PBSphereShape {
@@ -1836,6 +1835,17 @@ declare namespace Plane {
 
 /** @public */
 declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+
+/** @public */
+declare const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+
+declare const enum PointerEventType {
+    UP = 0,
+    DOWN = 1,
+    HOVER_ENTER = 2,
+    HOVER_LEAVE = 3,
+    UNRECOGNIZED = -1
+}
 
 /** @public */
 declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
@@ -2034,6 +2044,20 @@ declare namespace Quaternion {
  * @public
  */
 declare const RAD2DEG: number;
+
+/** Position will be relative to the scene */
+declare interface RaycastHit {
+    position: Vector3_2 | undefined;
+    origin: Vector3_2 | undefined;
+    direction: Vector3_2 | undefined;
+    normalHit: Vector3_2 | undefined;
+    length: number;
+    meshName?: string | undefined;
+    entityId?: number | undefined;
+}
+
+/** @public */
+declare const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
 
 declare type ReceiveMessage = {
     type: WireMessage.Enum;
