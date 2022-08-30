@@ -17,6 +17,7 @@ import { defineSdkComponents } from '../components'
 
 export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
 export * from './types'
+export * from './events'
 
 function preEngine() {
   const entityContainer = EntityContainer()
