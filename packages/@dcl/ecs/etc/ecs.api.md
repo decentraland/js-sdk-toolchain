@@ -149,6 +149,10 @@ export namespace Components {
     //
     // (undocumented)
     UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    const // Warning: (ae-forgotten-export) The symbol "PBVisibilityComponent" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 }
 
 // @public (undocumented)
@@ -528,6 +532,8 @@ export namespace Vector3 {
 // dist/engine/types.d.ts:95:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
 // dist/engine/types.d.ts:104:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/types.d.ts:105:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// @public (undocumented)
+export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 
 // (No @packageDocumentation comment for this package)
 

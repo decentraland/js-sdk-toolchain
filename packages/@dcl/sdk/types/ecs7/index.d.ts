@@ -250,6 +250,8 @@ declare namespace Components {
     const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
     /** @public */
     const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    /** @public */
+    const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 }
 
 /**
@@ -438,6 +440,7 @@ declare function defineSdkComponents(engine: PreEngine): {
     SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
     UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 };
 
 /**
@@ -1713,6 +1716,11 @@ declare interface PBUiText {
     textColor: Color3 | undefined;
 }
 
+declare interface PBVisibilityComponent {
+    /** default=true */
+    visible?: boolean | undefined;
+}
+
 /**
  * Represens a plane by the equation ax + by + cz + d = 0
  * @public
@@ -2380,6 +2388,9 @@ declare interface Vector3_2 {
     y: number;
     z: number;
 }
+
+/** @public */
+declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 
 declare namespace WireMessage {
     enum Enum {
