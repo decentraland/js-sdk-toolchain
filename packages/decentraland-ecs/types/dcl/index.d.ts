@@ -1534,25 +1534,25 @@ declare class Entity implements IEntity {
      * @param component - component class, instance or name
      */
     hasComponent<T = any>(component: string): boolean;
-    hasComponent<T>(component: ComponentConstructor<T>): boolean;
+    hasComponent<T extends ComponentLike>(component: ComponentConstructor<T>): boolean;
     hasComponent<T extends object>(component: T): boolean;
     /**
      * Gets a component, if it doesn't exist, it throws an Error.
      * @param component - component class or name
      */
     getComponent<T = any>(component: string): T;
-    getComponent<T>(component: ComponentConstructor<T>): T;
+    getComponent<T extends ComponentLike>(component: ComponentConstructor<T>): T;
     /**
      * Gets a component, if it doesn't exist, it returns null.
      * @param component - component class or name
      */
     getComponentOrNull<T = any>(component: string): T | null;
-    getComponentOrNull<T>(component: ComponentConstructor<T>): T | null;
+    getComponentOrNull<T extends ComponentLike>(component: ComponentConstructor<T>): T | null;
     /**
      * Gets a component, if it doesn't exist, it creates the component and returns it.
      * @param component - component class
      */
-    getComponentOrCreate<T>(component: ComponentConstructor<T> & {
+    getComponentOrCreate<T extends ComponentLike>(component: ComponentConstructor<T> & {
         new (): T;
     }): T;
     /**
@@ -1829,16 +1829,16 @@ declare interface IEntity {
     getParent(): IEntity | null;
     setParent(e: IEntity | Attachable | null): void;
     getComponent<T = any>(component: string): T;
-    getComponent<T>(component: ComponentConstructor<T>): T;
-    getComponent<T>(component: ComponentConstructor<T> | string): T;
+    getComponent<T extends ComponentLike>(component: ComponentConstructor<T>): T;
+    getComponent<T extends ComponentLike>(component: ComponentConstructor<T> | string): T;
     /**
      * Gets a component, if it doesn't exist, it returns null.
      * @param component - component class or name
      */
     getComponentOrNull<T = any>(component: string): T | null;
-    getComponentOrNull<T>(component: ComponentConstructor<T>): T | null;
-    getComponentOrNull<T>(component: ComponentConstructor<T> | string): T | null;
-    getComponentOrCreate<T>(component: ComponentConstructor<T> & {
+    getComponentOrNull<T extends ComponentLike>(component: ComponentConstructor<T>): T | null;
+    getComponentOrNull<T extends ComponentLike>(component: ComponentConstructor<T> | string): T | null;
+    getComponentOrCreate<T extends ComponentLike>(component: ComponentConstructor<T> & {
         new (): T;
     }): T;
     /**
@@ -1852,9 +1852,9 @@ declare interface IEntity {
     removeComponent(component: ComponentConstructor<any>, triggerRemovedEvent?: boolean): void;
     removeComponent(component: object | string | Function, triggerRemovedEvent: any): void;
     hasComponent<T = any>(component: string): boolean;
-    hasComponent<T>(component: ComponentConstructor<T>): boolean;
+    hasComponent<T extends ComponentLike>(component: ComponentConstructor<T>): boolean;
     hasComponent<T extends object>(component: T): boolean;
-    hasComponent<T>(component: ComponentConstructor<T> | string): boolean;
+    hasComponent<T extends ComponentLike>(component: ComponentConstructor<T> | string): boolean;
 }
 
 /**
