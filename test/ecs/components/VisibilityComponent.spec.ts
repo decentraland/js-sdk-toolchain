@@ -1,4 +1,4 @@
-﻿import { Engine } from '../../src/engine'
+﻿import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated VisibilityComponent ProtoBuf', () => {
   it('should serialize/deserialize VisibilityComponent', () => {
