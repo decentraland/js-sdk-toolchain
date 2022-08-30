@@ -517,9 +517,9 @@ describe('Engine tests', () => {
   it('should remove the component after the update', () => {
     const engine = Engine()
     const entity = engine.addEntity()
-    engine.baseComponents.OnPointerDownResult.create(entity)
+    engine.baseComponents.PointerEventsResult.create(entity)
     engine.update(1 / 30)
-    expect(engine.baseComponents.OnPointerDownResult.has(entity)).toBe(false)
+    expect(engine.baseComponents.PointerEventsResult.has(entity)).toBe(false)
   })
 
   it('should return the default component of the transform', () => {

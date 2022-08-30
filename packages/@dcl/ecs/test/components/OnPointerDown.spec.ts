@@ -1,5 +1,6 @@
 ﻿import { ActionButton } from '../../src/components/generated/pb/common/ActionButton.gen'
 import { Engine } from '../../src/engine'
+import {PointerEventType} from "../../src/components/generated/pb/PointerEventsResult.gen";
 
 describe('Generated OnPointerDown ProtoBuf', () => {
   it('should serialize/deserialize OnPointerDown', () => {
@@ -29,7 +30,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
 
   it('should receive OnPointerResult', () => {
     const newEngine = Engine()
-    const { OnPointerDown, OnPointerDownResult } = newEngine.baseComponents
+    const { OnPointerDown, PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     OnPointerDown.create(newEngine.addEntity())
 
@@ -45,17 +46,24 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     newEngine.update(1 / 30)
 
     // We receive an OnPointerResult
-    OnPointerDownResult.create(entity, {
-      button: ActionButton.PRIMARY,
-      point: { x: 1, y: 2, z: 3 },
-      distance: 10,
-      direction: { x: 1, y: 2, z: 3 },
-      normal: { x: 1, y: 2, z: 3 },
-      origin: { x: 1, y: 2, z: 3 },
-      meshName: 'mesh',
-      timestamp: 243
+    PointerEventsResult.create(entity, {
+      commands: [
+        {
+          button: ActionButton.ACTION_3,
+          timestamp: 5,
+          hit: {
+            position: { x: 1, y: 2, z: 3 },
+            length: 10,
+            direction: { x: 1, y: 2, z: 3 },
+            normalHit: { x: 1, y: 2, z: 3 },
+            origin: { x: 1, y: 2, z: 3 },
+            meshName: 'mesh'
+          },
+          state: PointerEventType.DOWN
+        }
+      ]
     })
 
-    expect(OnPointerDownResult.has(entity))
+    expect(PointerEventsResult.has(entity))
   })
 })
