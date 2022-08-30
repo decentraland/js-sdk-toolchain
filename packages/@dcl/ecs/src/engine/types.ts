@@ -1,8 +1,8 @@
-import { SdkComponents } from '../components/types'
+import { SdkComponents } from '../components'
 import type { ISchema } from '../schemas/ISchema'
 import { Result, Spec } from '../schemas/Map'
 import { Transport } from '../systems/crdt/transports/types'
-import { ComponentDefinition as CompDef } from './component'
+import { ComponentDefinition as CompDef, ComponentType } from './component'
 import { Entity } from './entity'
 import { Update } from './systems'
 import type { DeepReadonly } from './utils'
@@ -73,6 +73,7 @@ export type IEngine = {
    * Define a component and add it to the engine.
    * @param spec An object with schema fields
    * @param componentId unique id to identify the component, if the component id already exist, it will fail.
+   * @param constructorDefault the initial value prefilled when a component is created without a value
    * @return The component definition
    *
    * ```ts
@@ -84,10 +85,11 @@ export type IEngine = {
    *
    * ```
    */
-  defineComponent<T extends Spec>(
+  defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(
     spec: Spec,
-    componentId: number
-  ): CompDef<ISchema<Result<T>>>
+    componentId: number,
+    constructorDefault?: Partial<Result<T>>
+  ): CompDef<ISchema<Result<T>>, ConstructorType>
 
   /**
    * Define a component and add it to the engine.
@@ -100,10 +102,14 @@ export type IEngine = {
    * const StateComponent = engine.defineComponent(Schemas.Bool, VisibleComponentId)
    * ```
    */
-  defineComponentFromSchema<T extends ISchema>(
+  defineComponentFromSchema<
+    T extends ISchema<Record<string, any>>,
+    ConstructorType = ComponentType<T>
+  >(
     spec: T,
-    componentId: number
-  ): CompDef<T>
+    componentId: number,
+    constructorDefault?: ConstructorType
+  ): CompDef<T, ConstructorType>
 
   /**
    * Get the component definition from the component id.
@@ -138,6 +144,12 @@ export type IEngine = {
    * @param dt
    */
   update(dt: number): void
+
+  /**
+   * @internal
+   * @param componentId
+   */
+  removeComponentDefinition(componentId: number): void
 
   baseComponents: SdkComponents
 }
