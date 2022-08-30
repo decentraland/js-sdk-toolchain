@@ -162,6 +162,9 @@ export type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefiniti
 // @public (undocumented)
 export type ComponentType<T extends ISchema> = EcsResult<T>;
 
+// @public
+export function cyclicParentingChecker(engine: IEngine): () => void;
+
 // @public (undocumented)
 export const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
 

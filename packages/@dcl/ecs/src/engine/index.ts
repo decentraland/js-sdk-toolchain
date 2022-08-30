@@ -196,20 +196,6 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
       }
     }
 
-    // Transform parenting: cyclic dependency checker
-    // It checks only in modified Transforms
-    for (const entity of baseComponents.Transform.dirtyIterator()) {
-      let transform = baseComponents.Transform.getOrNull(entity)
-      while (transform && transform.parent) {
-        if (transform.parent === entity) {
-          dcl.error(`There is a cyclic parent with entity ${entity}`)
-          break
-        } else {
-          transform = baseComponents.Transform.getOrNull(transform.parent)
-        }
-      }
-    }
-
     // TODO: Perf tip
     // Should we add some dirtyIteratorSet at engine level so we dont have
     // to iterate all the component definitions to get the dirty ones ?

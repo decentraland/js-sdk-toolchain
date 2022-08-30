@@ -6,6 +6,7 @@ import { createByteBuffer } from '../src/serialization/ByteBuffer'
 import { createRendererTransport } from '../src/systems/crdt/transports/rendererTransport'
 import { Schemas } from '../src/schemas'
 import { TransformSchema } from '../src/components/legacy/Transform'
+import { cyclicParentingChecker } from './../src/systems/cyclicParentingChecker'
 
 const PositionSchema = {
   x: Schemas.Float
@@ -541,6 +542,8 @@ describe('Engine tests', () => {
     const e1 = engine.addEntity()
     const e2 = engine.addEntity()
     const e3 = engine.addEntity()
+
+    engine.addSystem(cyclicParentingChecker(engine))
 
     engine.baseComponents.Transform.create(e0)
     engine.baseComponents.Transform.create(e1).parent = e0
