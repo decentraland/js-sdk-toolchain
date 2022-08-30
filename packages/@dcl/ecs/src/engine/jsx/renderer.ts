@@ -1,67 +1,312 @@
+import Reconciler, { HostConfig } from 'react-reconciler'
 import { IEngine } from '../types'
-import { CANVAS_ROOT_ENTITY, defaultDiv } from './utils'
+import { DivProps } from './types'
+import { defaultDiv } from './utils'
+import {
+  Instance,
+  OpaqueHandle,
+  Type,
+  Props,
+  Container,
+  TextInstance,
+  SuspenseInstance,
+  HydratableInstance,
+  PublicInstance,
+  HostContext,
+  UpdatePayload,
+  _ChildSet,
+  TimeoutHandle,
+  NoTimeout
+} from './types'
+import { Entity } from '../entity'
 
-type JsxTree = any
-
-/**
- * @public
- */
-export namespace EcsJsx {
-  export function createElement(
-    tag: JsxTree['tag'] | ((attributes: any, children: any) => JsxTree),
-    attributes: { [key: string]: any } | null,
-    ...args: any[]
-  ): JsxTree {
-    const children: any[] | null = args.length ? [].concat(...args) : null
-
-    if (typeof tag === 'function') {
-      return tag(attributes ?? {}, children ?? undefined)
-    }
-
-    return { tag, attributes, children } as JsxTree
+function propsChanged(
+  prevProps: Partial<DivProps>,
+  nextProps: Partial<DivProps>
+) {
+  if (Object.keys(prevProps).length !== Object.keys(nextProps).length) {
+    return true
   }
+
+  for (const key in prevProps) {
+    if (key === 'children') continue
+    const propKey = key as keyof DivProps
+    if (prevProps[propKey] !== nextProps[propKey]) {
+      return true
+    }
+  }
+  return false
 }
 
-export function render(engine: Pick<IEngine, 'baseComponents' | 'addEntity'>) {
-  const { UiTransform, UiText } = engine.baseComponents
+export function createRenderer(
+  engine: Pick<IEngine, 'baseComponents' | 'getComponent' | 'addEntity'>
+) {
+  const { UiTransform } = engine.baseComponents
+  const entities = new Set<Entity>()
 
-  /**
-   * For now we create a _static_ tree.
-   * NO updates.
-   */
-  return function createStaticTree(
-    jsx: JsxTree,
-    parent: number = CANVAS_ROOT_ENTITY,
-    order: number = 0
-  ) {
-    const { tag, children, attributes } = jsx
-    const entity = engine.addEntity()
+  function updateComponentTree(instance: Instance) {
+    console.log(instance)
+    const comp = engine
+      .getComponent(instance.componentId)
+      .mutable(instance.entity)
+    comp.rightOf = instance.rightOf
+    comp.parent = instance.parent
+  }
 
-    if (tag === 'textui') {
-      UiText.create(entity, {
-        text: attributes.value,
-        textColor: { r: 0, g: 0, b: 0 }
-      })
-      UiTransform.create(entity, { ...defaultDiv, parent })
-      console.log(
-        `<Div parent=${parent} entity=${entity} order=${order}><Text /></Div>`
-      )
-    } else if (tag === 'divui') {
+  function updateComponentProps(instance: Instance, props: Partial<DivProps>) {
+    const comp = engine
+      .getComponent(instance.componentId)
+      .mutable(instance.entity)
+
+    for (const propKey in props) {
+      const key = propKey as keyof DivProps
+      comp[key] = props[key]
+    }
+  }
+
+  function removeComponent(instance: Instance) {
+    // TODO: we should remove the component or remove the entity ?
+    engine.getComponent(instance.componentId).deleteFrom(instance.entity)
+    for (const child of instance._child) {
+      removeComponent(child)
+    }
+  }
+
+  function appendChild(parent: Instance, child: Instance): void {
+    if (!child || !Object.keys(parent).length) return
+
+    console.log('append-child', { parent, child })
+
+    child.parent = parent.entity
+    child.rightOf = parent._child[parent._child.length - 1]?.entity
+    parent._child.push(child)
+
+    updateComponentTree(child)
+  }
+
+  function removeChild(parentInstance: Instance, child: Instance): void {
+    console.log('removeChid', { parentInstance, child })
+
+    const childIndex = parentInstance._child.findIndex(
+      (c) => c.entity === child.entity
+    )
+
+    const childToModify = parentInstance._child[childIndex + 1]
+
+    if (childToModify) {
+      childToModify.rightOf = child.rightOf
+      updateComponentTree(childToModify)
+    }
+
+    // Mutate 💀
+    parentInstance._child.splice(childIndex, 1)
+    removeComponent(child)
+  }
+
+  const hostConfig: HostConfig<
+    Type,
+    Props,
+    Container,
+    Instance,
+    TextInstance,
+    SuspenseInstance,
+    HydratableInstance,
+    PublicInstance,
+    HostContext,
+    UpdatePayload,
+    _ChildSet,
+    TimeoutHandle,
+    NoTimeout
+  > = {
+    ...noopConfig,
+    supportsMutation: true,
+    supportsPersistence: false,
+    noTimeout: -1,
+    isPrimaryRenderer: true,
+    supportsHydration: false,
+
+    createInstance(type: Type, props: Props): Instance {
+      console.log('in createInstance', { type, props })
+      const entity = engine.addEntity()
+      entities.add(entity)
+      const { children, ...divProps } = props
+
       UiTransform.create(entity, {
         ...defaultDiv,
-        ...attributes,
-        parent
-        // order,
+        ...divProps,
+        parent: 0
       })
-      console.log(`<Div parent=${parent} entity=${entity} order=${order} />`)
-    }
 
-    for (const [index, child] of children.entries()) {
-      if (child) {
-        createStaticTree(child, entity, index)
-      }
+      return { entity, componentId: UiTransform._id, _child: [] }
+    },
+    appendChild,
+    appendChildToContainer: appendChild,
+    appendInitialChild: appendChild,
+
+    removeChild: removeChild,
+    removeChildFromContainer: () => {
+      // TODO: wtf
+      console.log('removechildereta')
+      // removeChild(args)
+    },
+
+    prepareUpdate(
+      _instance: Instance,
+      _type: Type,
+      oldProps: Props,
+      newProps: Props
+    ): UpdatePayload | null {
+      return propsChanged(oldProps, newProps)
+    },
+
+    commitUpdate(
+      instance: Instance,
+      updatePayload: UpdatePayload,
+      type: Type,
+      prevProps: Props,
+      nextProps: Props,
+      _internalHandle: OpaqueHandle
+    ): void {
+      console.log('commitupdate', {
+        instance,
+        updatePayload,
+        type,
+        prevProps,
+        nextProps
+      })
+      if (!updatePayload) return
+      updateComponentProps(instance, nextProps)
+    },
+    insertBefore(
+      parentInstance: Instance,
+      child: Instance,
+      beforeChild: Instance
+    ): void {
+      console.log('insertbefore', { parentInstance, child, beforeChild })
+
+      const beforeChildIndex = parentInstance._child.findIndex(
+        (c) => c.entity === beforeChild.entity
+      )
+      parentInstance._child = [
+        ...parentInstance._child.slice(0, beforeChildIndex),
+        child,
+        ...parentInstance._child.slice(beforeChildIndex)
+      ]
+
+      child.rightOf = beforeChild.rightOf
+      beforeChild.rightOf = child.entity
+      child.parent = parentInstance.entity
+
+      updateComponentTree(child)
+      updateComponentTree(beforeChild)
+    },
+    insertInContainerBefore(
+      _container: Container,
+      _child: Instance | TextInstance,
+      _beforeChild: Instance | TextInstance | SuspenseInstance
+    ): void {
+      console.log('insertIncontainerBefore TODO')
+    },
+
+    detachDeletedInstance: function (node: Instance): void {
+      // console.log('detahDeletedInstance')
+      // console.log({ node })
     }
+  }
+
+  const reconciler = Reconciler(hostConfig)
+  const root: Container = reconciler.createContainer(
+    {},
+    0,
+    null,
+    false,
+    null,
+    '',
+    () => {},
+    null
+  )
+  return {
+    update: function (component: JSX.Element) {
+      console.log('--------------------UPDATE------------------------')
+      return reconciler.updateContainer(component, root, null)
+    },
+    getEntities: () => Array.from(entities)
   }
 }
 
-export default EcsJsx
+export const noopConfig = {
+  hideInstance(_instance: Instance): void {},
+  hideTextInstance(_textInstance: TextInstance): void {},
+  unhideInstance(_instance: Instance, _props: Props): void {},
+  unhideTextInstance(_textInstance: TextInstance, _text: string): void {},
+  clearContainer(_container: Container): void {},
+  getCurrentEventPriority: function (): number {
+    return 0
+  },
+  getInstanceFromNode: function (_node: Instance): null | undefined {
+    return null
+  },
+  beforeActiveInstanceBlur: function (): void {},
+  afterActiveInstanceBlur: function (): void {},
+  prepareScopeUpdate: function (
+    _scopeInstance: any,
+    _instance: Instance
+  ): void {},
+  getInstanceFromScope: function (_scopeInstance: Instance): Instance | null {
+    return null
+  },
+  commitMount(
+    _instance: Instance,
+    _type: Type,
+    _props: Props,
+    _internalInstanceHandle: OpaqueHandle
+  ): void {},
+  resetTextContent(_instance: Instance): void {},
+  commitTextUpdate(
+    _textInstance: TextInstance,
+    _oldText: string,
+    _newText: string
+  ): void {},
+  prepareForCommit(_containerInfo: Container): Record<string, any> | null {
+    return null
+  },
+  resetAfterCommit(_containerInfo: Container): void {},
+  preparePortalMount(_containerInfo: Container): void {},
+  createTextInstance(
+    _text: string,
+    _rootContainer: Container,
+    _hostContext: HostContext,
+    _internalHandle: OpaqueHandle
+  ): TextInstance {
+    return {} as TextInstance
+  },
+  scheduleTimeout(_fn: any, _delay?: number): TimeoutHandle {},
+  cancelTimeout(_id: TimeoutHandle): void {},
+  shouldSetTextContent(_type: Type, _props: Props): boolean {
+    return false
+  },
+  getRootHostContext(_rootContainer: Container): HostContext | null {
+    return null
+  },
+  getChildHostContext(
+    _parentHostContext: HostContext,
+    _type: Type,
+    _rootContainer: Container
+  ): HostContext {
+    return null
+  },
+  getPublicInstance(instance: Instance | TextInstance): PublicInstance {
+    return instance
+  },
+  finalizeInitialChildren(
+    _instance: Instance,
+    _type: Type,
+    _props: Props,
+    _rootContainer: Container,
+    _hostContext: HostContext
+  ): boolean {
+    return false
+  }
+}
+
+export default createRenderer

@@ -256,6 +256,8 @@ export interface DivProps {
     overflow: YGOverflow;
     // (undocumented)
     padding: Position;
+    // Warning: (ae-forgotten-export) The symbol "Position" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     position: Position;
     // Warning: (ae-forgotten-export) The symbol "YGPositionType" needs to be exported by the entry point index.d.ts
@@ -267,7 +269,9 @@ export interface DivProps {
 }
 
 // @public (undocumented)
-export function DivUi(props: Partial<DivProps>): JSX.Element;
+export function DivUi(props: Partial<DivProps> & {
+    key?: string | number;
+}): JSX.Element;
 
 // @public (undocumented)
 export type double = number;
@@ -276,16 +280,6 @@ export type double = number;
 <<<<<<< HEAD
 =======
 export const EcsBoolean: EcsType<boolean>;
-
-// @public (undocumented)
-export namespace EcsJsx {
-    // Warning: (ae-forgotten-export) The symbol "JsxTree" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    export function createElement(tag: JsxTree['tag'] | ((attributes: any, children: any) => JsxTree), attributes: {
-        [key: string]: any;
-    } | null, ...args: any[]): JsxTree;
-}
 
 // @public (undocumented)
 export const EcsString: EcsType<string>;
@@ -340,7 +334,8 @@ export type IEngine = {
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     baseComponents: SdkComponents;
-    renderUI(tree: any): void;
+    renderUI(renderTree: () => JSX.Element): number;
+    removeUI(ui: number): void;
 };
 
 // @public (undocumented)
@@ -413,6 +408,7 @@ export enum Orientation {
 
 // @public (undocumented)
 <<<<<<< HEAD
+<<<<<<< HEAD
 export const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
 
 // @public (undocumented)
@@ -432,6 +428,8 @@ export type Position = {
 >>>>>>> a098bb8 (proto ui)
 
 // @public (undocumented)
+=======
+>>>>>>> ed028fa (move react-reconciler to engine)
 export namespace Quaternion {
     export function add(q1: ReadonlyQuaternion, q2: ReadonlyQuaternion): MutableQuaternion;
     export function angle(quat1: ReadonlyQuaternion, quat2: ReadonlyQuaternion): number;
@@ -550,6 +548,7 @@ export interface Spec {
     [key: string]: ISchema;
 }
 
+<<<<<<< HEAD
 // @public (undocumented)
 <<<<<<< HEAD
 export const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
@@ -581,6 +580,8 @@ export function TextUi(props: TextProps, ...children: any[]): JsxTree;
 
 =======
 >>>>>>> 67ea711 (add rightOf prop to div elements)
+=======
+>>>>>>> ed028fa (move react-reconciler to engine)
 // @public
 export const ToGammaSpace: number;
 
@@ -733,8 +734,12 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 >>>>>>> a098bb8 (proto ui)
 =======
 // dist/engine/types.d.ts:25:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
+<<<<<<< HEAD
 // dist/engine/types.d.ts:39:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
 >>>>>>> 67ea711 (add rightOf prop to div elements)
+=======
+// dist/engine/types.d.ts:40:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
+>>>>>>> ed028fa (move react-reconciler to engine)
 
 // (No @packageDocumentation comment for this package)
 

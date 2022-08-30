@@ -1,4 +1,3 @@
-import { PBUiText } from '../../components/generated/pb/UiText.gen'
 import {
   YGDisplay,
   YGJustify,
@@ -8,7 +7,9 @@ import {
   YGDirection,
   YGWrap,
   YGOverflow
-} from '../../components/generated/pb/UiTransform.gen'
+} from '../../../components/generated/pb/UiTransform.gen'
+
+import { Entity } from '../../entity'
 
 /**
  * @public
@@ -60,19 +61,24 @@ export interface DivProps {
   // aspectRatio: number | undefined
 }
 
-type TextOpts = Partial<Omit<PBUiText, 'text'>>
-
-declare module 'react' {
-  namespace JSX {
-    // The return type of our JSX Factory
-    type Element = any
-
-    // IntrinsicElementMap grabs all the standard HTML tags in the TS DOM lib.
-    type IntrinsicElements = {
-      divui: Partial<DivProps>
-      textui: Partial<TextOpts>
-    }
-    // eslint-disable-next-line @typescript-eslint/no-empty-interface
-    interface Component {}
-  }
+// React-Reconciler Types
+export type OpaqueHandle = any
+export type Type = string
+export type Props = Partial<DivProps>
+export type Container = Document | Instance | any
+export type Instance = {
+  entity: Entity
+  componentId: number
+  parent?: Entity
+  rightOf?: Entity
+  _child: Instance[]
 }
+export type TextInstance = unknown
+export type SuspenseInstance = any
+export type HydratableInstance = any
+export type PublicInstance = any
+export type HostContext = any
+export type UpdatePayload = any
+export type _ChildSet = any
+export type TimeoutHandle = any
+export type NoTimeout = number

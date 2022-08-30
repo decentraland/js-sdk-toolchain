@@ -152,7 +152,8 @@ export type IEngine = {
   removeComponentDefinition(componentId: number): void
 
   baseComponents: SdkComponents
-  renderUI(tree: any): void
+  renderUI(renderTree: () => JSX.Element): number
+  removeUI(ui: number): void
 }
 
 /**

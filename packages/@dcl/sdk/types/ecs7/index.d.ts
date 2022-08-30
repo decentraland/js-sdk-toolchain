@@ -1,4 +1,8 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> c1913cb (move react-reconciler to engine)
 declare const enum ActionButton {
     POINTER = 0,
     PRIMARY = 1,
@@ -17,11 +21,18 @@ declare const enum ActionButton {
     UNRECOGNIZED = -1
 }
 
+<<<<<<< HEAD
 /** @public */
 declare const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
 
 /** @public */
 declare const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
+=======
+/**
+ * @public
+ */
+declare function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>>;
+>>>>>>> c1913cb (move react-reconciler to engine)
 
 declare const enum AvatarAnchorPoint {
     POSITION = 0,
@@ -31,6 +42,7 @@ declare const enum AvatarAnchorPoint {
     UNRECOGNIZED = -1
 }
 
+<<<<<<< HEAD
 /** @public */
 declare const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
 
@@ -52,17 +64,22 @@ declare const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
 /** @public */
 declare const BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
 
+=======
+>>>>>>> c1913cb (move react-reconciler to engine)
 /**
  * @public
  */
 declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
 
+<<<<<<< HEAD
 /** @public */
 declare const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
 
 /** @public */
 declare const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
 
+=======
+>>>>>>> c1913cb (move react-reconciler to engine)
 declare const enum CameraModeValue {
     FIRST_PERSON = 0,
     THIRD_PERSON = 1,
@@ -78,6 +95,7 @@ declare interface Color3 {
 /**
  * @public
  */
+<<<<<<< HEAD
 declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorType = ComponentType<T>> = {
     _id: number;
     /**
@@ -262,12 +280,42 @@ declare namespace Components {
  */
 declare type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
     [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['getMutable']> : never;
+=======
+declare type ComponentDefinition<T extends EcsType = EcsType<any>> = {
+    _id: number;
+    has(entity: Entity): boolean;
+    getFrom(entity: Entity): DeepReadonly<ComponentType<T>>;
+    getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
+    create(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
+    mutable(entity: Entity): ComponentType<T>;
+    createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
+    deleteFrom(entity: Entity): ComponentType<T> | null;
+    upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
+    updateFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
+    toBinary(entity: Entity): ByteBuffer;
+    writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void;
+    iterator(): Iterable<[Entity, ComponentType<T>]>;
+    dirtyIterator(): Iterable<Entity>;
+    clearDirty(): void;
+    isDirty(entity: Entity): boolean;
 };
 
 /**
  * @public
  */
+declare type ComponentEcsType<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
+    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['mutable']> : never;
+>>>>>>> c1913cb (move react-reconciler to engine)
+};
+
+/**
+ * @public
+ */
+<<<<<<< HEAD
 declare type ComponentType<T extends ISchema> = EcsResult<T>;
+=======
+declare type ComponentType<T extends EcsType> = EcsResult<T>;
+>>>>>>> c1913cb (move react-reconciler to engine)
 
 /**
  * ByteBuffer is a wrapper of DataView which also adds a read and write offset.
@@ -408,6 +456,7 @@ declare interface CreateByteBufferOptions {
 }
 
 /**
+<<<<<<< HEAD
  * Transform parenting: cyclic dependency checker
  * It checks only in modified Transforms
  *
@@ -439,22 +488,107 @@ declare type DeepReadonly<T> = T extends ReadonlyPrimitive ? T : T extends Map<i
 declare type DeepReadonly_2<T> = {
     readonly [P in keyof T]: DeepReadonly_2<T[P]>;
 };
-
-/**
+=======
+ * Make each field readonly deeply
  * @public
  */
-declare type DeepReadonlyMap<K, V> = ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>;
+declare type DeepReadonly<T> = {
+    readonly [P in keyof T]: DeepReadonly<T[P]>;
+};
 
-/**
- * @public
- */
-declare type DeepReadonlyObject<T> = {
-    readonly [K in keyof T]: DeepReadonly<T[K]>;
+declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): {
+    Animator: ComponentDefinition<EcsType<PBAnimator>>;
+    AudioSource: ComponentDefinition<EcsType<PBAudioSource>>;
+    AvatarAttach: ComponentDefinition<EcsType<PBAvatarAttach>>;
+    AvatarShape: ComponentDefinition<EcsType<PBAvatarShape>>;
+    Billboard: ComponentDefinition<EcsType<PBBillboard>>;
+    BoxShape: ComponentDefinition<EcsType<PBBoxShape>>;
+    CameraMode: ComponentDefinition<EcsType<PBCameraMode>>;
+    CameraModeArea: ComponentDefinition<EcsType<PBCameraModeArea>>;
+    CylinderShape: ComponentDefinition<EcsType<PBCylinderShape>>;
+    GLTFShape: ComponentDefinition<EcsType<PBGLTFShape>>;
+    Material: ComponentDefinition<EcsType<PBMaterial>>;
+    NFTShape: ComponentDefinition<EcsType<PBNFTShape>>;
+    OnPointerDown: ComponentDefinition<EcsType<PBOnPointerDown>>;
+    OnPointerDownResult: ComponentDefinition<EcsType<PBOnPointerDownResult>>;
+    OnPointerUp: ComponentDefinition<EcsType<PBOnPointerUp>>;
+    OnPointerUpResult: ComponentDefinition<EcsType<PBOnPointerUpResult>>;
+    PlaneShape: ComponentDefinition<EcsType<PBPlaneShape>>;
+    PointerLock: ComponentDefinition<EcsType<PBPointerLock>>;
+    SphereShape: ComponentDefinition<EcsType<PBSphereShape>>;
+    TextShape: ComponentDefinition<EcsType<PBTextShape>>;
+    UiText: ComponentDefinition<EcsType<PBUiText>>;
+    UiTransform: ComponentDefinition<EcsType<PBUiTransform>>;
+    Transform: ComponentDefinition<EcsType<Transform>>;
 };
 
 /**
+ * Constant used to convert from Euler degrees to radians
  * @public
  */
+declare const DEG2RAD: number;
+
+/**
+ * @public
+ */
+declare interface DivProps {
+    display: YGDisplay;
+    flex: number;
+    justifyContent: YGJustify;
+    positionType: YGPositionType;
+    alignItems: YGAlign;
+    alignSelf: YGAlign;
+    alignContent: YGAlign;
+    flexDirection: YGFlexDirection;
+    position: Position;
+    padding: Position;
+    margin: Position;
+    border: Position;
+    direction: YGDirection;
+    width: number;
+    height: number;
+    minWidth: number;
+    maxWidth: number;
+    minHeight: number;
+    maxHeight: number;
+    flexWrap: YGWrap;
+    flexBasis: number;
+    flexGrow: number;
+    flexShrink: number;
+    overflow: YGOverflow;
+    children: any;
+}
+>>>>>>> c1913cb (move react-reconciler to engine)
+
+/**
+ * @public
+ */
+<<<<<<< HEAD
+declare type DeepReadonlyMap<K, V> = ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>;
+=======
+declare function DivUi(props: Partial<DivProps> & {
+    key?: string | number;
+}): JSX.Element;
+
+/** @public */
+declare type double = number;
+>>>>>>> c1913cb (move react-reconciler to engine)
+
+/**
+ * @public
+ */
+<<<<<<< HEAD
+declare type DeepReadonlyObject<T> = {
+    readonly [K in keyof T]: DeepReadonly<T[K]>;
+};
+=======
+declare const EcsBoolean: EcsType<boolean>;
+>>>>>>> c1913cb (move react-reconciler to engine)
+
+/**
+ * @public
+ */
+<<<<<<< HEAD
 declare type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 
 declare function defineSdkComponents(engine: PreEngine): {
@@ -494,17 +628,40 @@ declare const DEG2RAD: number;
 
 /** @public */
 declare type double = number;
+=======
+declare type EcsResult<T extends EcsType> = T extends EcsType ? ReturnType<T['deserialize']> : never;
 
 /**
  * @public
  */
+declare const EcsString: EcsType<string>;
+>>>>>>> c1913cb (move react-reconciler to engine)
+
+/**
+ * @public
+ */
+<<<<<<< HEAD
 declare type EcsResult<T extends ISchema> = T extends ISchema ? ReturnType<T['deserialize']> : never;
+=======
+declare type EcsType<T = any> = {
+    serialize(value: T, builder: ByteBuffer): void;
+    deserialize(reader: ByteBuffer): T;
+    create(): T;
+};
+>>>>>>> c1913cb (move react-reconciler to engine)
 
 /**
  * @public
  */
 declare function Engine({ transports }?: IEngineParams): IEngine;
 
+<<<<<<< HEAD
+=======
+/**
+ * @alpha * This file initialization is an alpha one. This is based on the old-ecs
+ * init and it'll be changing.
+ */
+>>>>>>> c1913cb (move react-reconciler to engine)
 declare const engine: IEngine;
 
 /**
@@ -517,13 +674,24 @@ declare type Entity = number & {
 declare const entitySymbol: unique symbol;
 
 /**
+<<<<<<< HEAD
+=======
+ * @public
+ */
+declare function Enum<T>(type: EcsType<any>): EcsType<T>;
+
+/**
+>>>>>>> c1913cb (move react-reconciler to engine)
  * Constant used to define the minimal number value in Babylon.js
  * @public
  */
 declare const Epsilon = 0.000001;
 
+<<<<<<< HEAD
 declare const error: (message: string | Error, data?: any) => void;
 
+=======
+>>>>>>> c1913cb (move react-reconciler to engine)
 /** Excludes property keys from T where the property is assignable to U */
 declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
@@ -536,6 +704,7 @@ declare const enum FilterMode {
     UNRECOGNIZED = -1
 }
 
+<<<<<<< HEAD
 /** @public */
 declare type float = number;
 
@@ -544,16 +713,38 @@ declare type FloatArray = number[];
 
 /** @public */
 declare const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
+=======
+/**
+ * @public
+ */
+declare const FlatString: EcsType<string>;
+
+/** @public */
+declare type float = number;
 
 /**
  * @public
  */
+declare const Float32: EcsType<number>;
+>>>>>>> c1913cb (move react-reconciler to engine)
+
+/**
+ * @public
+ */
+<<<<<<< HEAD
 declare function IArray<T>(type: ISchema<T>): ISchema<Array<T>>;
+=======
+declare const Float64: EcsType<number>;
+
+/** @public */
+declare type FloatArray = number[];
+>>>>>>> c1913cb (move react-reconciler to engine)
 
 /**
  * @public
  */
 declare type IEngine = {
+<<<<<<< HEAD
     /**
      * Increment the used entity counter and return the next one.
      * @param dynamic
@@ -646,6 +837,21 @@ declare type IEngine = {
      */
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     baseComponents: SdkComponents;
+=======
+    addEntity(dynamic?: boolean): Entity;
+    addDynamicEntity(): Entity;
+    removeEntity(entity: Entity): void;
+    addSystem(system: Update, priority?: number, name?: string): void;
+    removeSystem(selector: string | Update): boolean;
+    defineComponent<T extends EcsType>(componentId: number, spec: T): ComponentDefinition<T>;
+    mutableGroupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ComponentEcsType<T>]>;
+    groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentEcsType<T>>]>;
+    getComponent<T extends EcsType>(componentId: number): ComponentDefinition<T>;
+    update(dt: number): void;
+    baseComponents: SdkComponents;
+    renderUI(renderTree: () => JSX.Element): number;
+    removeUI(ui: number): void;
+>>>>>>> c1913cb (move react-reconciler to engine)
 };
 
 /**
@@ -655,16 +861,12 @@ declare type IEngineParams = {
     transports?: Transport[];
 };
 
+<<<<<<< HEAD
 /**
  * @public
  */
 declare function IEnum<T>(type: ISchema<any>): ISchema<T>;
-
-/**
- * @public
- */
-declare function IMap<T extends Spec>(spec: T): ISchema<Result<T>>;
-
+=======
 /** Include property keys from T where the property is assignable to U */
 declare type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
@@ -673,16 +875,44 @@ declare type IncludeUndefined<T> = {
 /**
  * @public
  */
-declare function IOptional<T>(spec: ISchema<T>): ISchema<T | undefined>;
+declare const Int16: EcsType<number>;
+>>>>>>> c1913cb (move react-reconciler to engine)
 
 /**
  * @public
  */
+<<<<<<< HEAD
+declare function IMap<T extends Spec>(spec: T): ISchema<Result<T>>;
+
+/** Include property keys from T where the property is assignable to U */
+declare type IncludeUndefined<T> = {
+    [P in keyof T]: undefined extends T[P] ? P : never;
+}[keyof T];
+=======
+declare const Int32: EcsType<number>;
+>>>>>>> c1913cb (move react-reconciler to engine)
+
+/**
+ * @public
+ */
+<<<<<<< HEAD
+declare function IOptional<T>(spec: ISchema<T>): ISchema<T | undefined>;
+=======
+declare const Int64: EcsType<number>;
+>>>>>>> c1913cb (move react-reconciler to engine)
+
+/**
+ * @public
+ */
+<<<<<<< HEAD
 declare type ISchema<T = any> = {
     serialize(value: T, builder: ByteBuffer): void;
     deserialize(reader: ByteBuffer): T;
     create(): T;
 };
+=======
+declare const Int8: EcsType<number>;
+>>>>>>> c1913cb (move react-reconciler to engine)
 
 /**
  * Interface for the size containing width and height
@@ -699,10 +929,17 @@ declare interface ISize {
     height: number;
 }
 
+<<<<<<< HEAD
 declare const log: (...a: any[]) => void;
 
 /** @public */
 declare const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+=======
+/**
+ * @public
+ */
+declare function MapType<T extends Spec>(spec: T): EcsType<Result<T>>;
+>>>>>>> c1913cb (move react-reconciler to engine)
 
 /**
  * Class used to store matrix data (4x4)
@@ -740,7 +977,11 @@ declare namespace Matrix {
         _isIdentity3x2Dirty: boolean;
         _m: Matrix4x4;
     };
+<<<<<<< HEAD
     type ReadonlyMatrix = DeepReadonly_2<MutableMatrix>;
+=======
+    type ReadonlyMatrix = DeepReadonly<MutableMatrix>;
+>>>>>>> c1913cb (move react-reconciler to engine)
     /**
      * Gets the internal data of the matrix
      */
@@ -1424,6 +1665,7 @@ declare namespace Matrix {
 }
 
 /** @public */
+<<<<<<< HEAD
 declare const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
 
 /** @public */
@@ -1433,6 +1675,8 @@ declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial
 declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
 
 /** @public */
+=======
+>>>>>>> c1913cb (move react-reconciler to engine)
 declare type Nullable<T> = T | null;
 
 declare type OnlyNonUndefinedTypes<T> = {
@@ -1443,6 +1687,7 @@ declare type OnlyOptionalUndefinedTypes<T> = {
     [K in IncludeUndefined<T>]?: T[K];
 };
 
+<<<<<<< HEAD
 /** @public */
 declare const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
 
@@ -1454,6 +1699,12 @@ declare const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPoint
 
 /** @public */
 declare const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
+=======
+/**
+ * @public
+ */
+declare function Optional<T>(spec: EcsType<T>): EcsType<T | undefined>;
+>>>>>>> c1913cb (move react-reconciler to engine)
 
 /**
  * Defines potential orientation for back face culling
@@ -1492,7 +1743,10 @@ declare interface PBAudioSource {
     loop?: boolean | undefined;
     /** default=1.0f */
     pitch?: number | undefined;
+<<<<<<< HEAD
     /** default = [ "urn:decentraland:off-chain:base-avatars:f_eyes_00", */
+=======
+>>>>>>> c1913cb (move react-reconciler to engine)
     audioClipUrl: string;
 }
 
@@ -1501,12 +1755,15 @@ declare interface PBAvatarAttach {
     anchorPointId: AvatarAnchorPoint;
 }
 
+<<<<<<< HEAD
 declare interface PBAvatarModifierArea {
     area: Vector3_2 | undefined;
     excludeIds: string[];
     modifiers: AvatarModifier[];
 }
 
+=======
+>>>>>>> c1913cb (move react-reconciler to engine)
 declare interface PBAvatarShape {
     id: string;
     name?: string | undefined;
@@ -1616,6 +1873,7 @@ declare interface PBMaterial_Texture {
     filterMode?: FilterMode | undefined;
 }
 
+<<<<<<< HEAD
 declare interface PBMeshCollider {
     /** default = ColliderLayer.Physics | ColliderLayer.Pointer */
     collisionMask?: number | undefined;
@@ -1666,6 +1924,8 @@ declare interface PBMeshRenderer_PlaneMesh {
 declare interface PBMeshRenderer_SphereMesh {
 }
 
+=======
+>>>>>>> c1913cb (move react-reconciler to engine)
 declare interface PBNFTShape {
     /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
     withCollisions?: boolean | undefined;
@@ -1788,9 +2048,71 @@ declare interface PBUiText {
     textColor: Color3 | undefined;
 }
 
+<<<<<<< HEAD
 declare interface PBVisibilityComponent {
     /** default=true */
     visible?: boolean | undefined;
+=======
+declare interface PBUiTransform {
+    parent: number;
+    rightOf: number;
+    positionType: YGPositionType;
+    alignContent: YGAlign;
+    alignItems: YGAlign;
+    alignSelf: YGAlign;
+    flexDirection: YGFlexDirection;
+    flexWrap: YGWrap;
+    justifyContent: YGJustify;
+    overflow: YGOverflow;
+    display: YGDisplay;
+    direction: YGDirection;
+    flex: number;
+    flexBasisUnit: YGUnit;
+    flexBasis: number;
+    flexGrow: number;
+    flexShrink: number;
+    widthUnit: YGUnit;
+    width: number;
+    heightUnit: YGUnit;
+    height: number;
+    minWidthUnit: YGUnit;
+    minWidth: number;
+    minHeightUnit: YGUnit;
+    minHeight: number;
+    maxWidthUnit: YGUnit;
+    maxWidth: number;
+    maxHeightUnit: YGUnit;
+    maxHeight: number;
+    positionLeftUnit: YGUnit;
+    positionLeft: number;
+    positionTopUnit: YGUnit;
+    positionTop: number;
+    positionRightUnit: YGUnit;
+    positionRight: number;
+    positionBottomUnit: YGUnit;
+    positionBottom: number;
+    /** margin */
+    marginLeftUnit: YGUnit;
+    marginLeft: number;
+    marginTopUnit: YGUnit;
+    marginTop: number;
+    marginRightUnit: YGUnit;
+    marginRight: number;
+    marginBottomUnit: YGUnit;
+    marginBottom: number;
+    paddingLeftUnit: YGUnit;
+    paddingLeft: number;
+    paddingTopUnit: YGUnit;
+    paddingTop: number;
+    paddingRightUnit: YGUnit;
+    paddingRight: number;
+    paddingBottomUnit: YGUnit;
+    paddingBottom: number;
+    borderLeft: number;
+    borderTop: number;
+    borderRight: number;
+    borderBottom: number;
+>>>>>>> c1913cb (move react-reconciler to engine)
 }
 
 /**
@@ -1808,7 +2130,11 @@ declare namespace Plane {
          */
         d: number;
     };
+<<<<<<< HEAD
     type ReadonlyPlane = DeepReadonly_2<MutablePlane>;
+=======
+    type ReadonlyPlane = DeepReadonly<MutablePlane>;
+>>>>>>> c1913cb (move react-reconciler to engine)
     /**
      * Creates a Plane object according to the given floats a, b, c, d and the plane equation : ax + by + cz + d = 0
      * @param a - a component of the plane
@@ -1902,6 +2228,7 @@ declare namespace Plane {
     function signedDistanceTo(plane: ReadonlyPlane, point: Vector3.ReadonlyVector3): number;
 }
 
+<<<<<<< HEAD
 /** @public */
 declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
 
@@ -1931,6 +2258,16 @@ declare function preEngine(): {
     getEntitiesWith: <T_2 extends [ComponentDefinition<ISchema<any>, any>, ...ComponentDefinition<ISchema<any>, any>[]]>(...components: T_2) => Iterable<[Entity, ...ReadonlyComponentSchema<T_2>]>;
     getComponent: <T_3 extends ISchema<any>>(componentId: number) => ComponentDefinition<T_3, EcsResult<T_3>>;
     removeComponentDefinition: (componentId: number) => void;
+=======
+/**
+ * @public
+ */
+declare type Position = {
+    top: number | string;
+    right: number | string;
+    bottom: number | string;
+    left: number | string;
+>>>>>>> c1913cb (move react-reconciler to engine)
 };
 
 /**
@@ -1949,7 +2286,11 @@ declare namespace Quaternion {
     /**
      * @public
      */
+<<<<<<< HEAD
     export type ReadonlyQuaternion = DeepReadonly_2<MutableQuaternion>;
+=======
+    export type ReadonlyQuaternion = DeepReadonly<MutableQuaternion>;
+>>>>>>> c1913cb (move react-reconciler to engine)
     /**
      * Creates a new Quaternion from the given floats
      * @param x - defines the first component (0 by default)
@@ -2103,6 +2444,7 @@ declare namespace Quaternion {
  */
 declare const RAD2DEG: number;
 
+<<<<<<< HEAD
 /**
  * @public
  */
@@ -2115,6 +2457,8 @@ declare type ReadonlyComponentSchema<T extends [ComponentDefinition, ...Componen
  */
 declare type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
 
+=======
+>>>>>>> c1913cb (move react-reconciler to engine)
 declare type ReceiveMessage = {
     type: WireMessage.Enum;
     entity: Entity;
@@ -2129,12 +2473,17 @@ declare type ReceiveMessage = {
  * @public
  */
 declare type Result<T extends Spec> = ToOptional<{
+<<<<<<< HEAD
     [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? Result<T[K]> : never;
+=======
+    [K in keyof T]: T[K] extends EcsType ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? Result<T[K]> : never;
+>>>>>>> c1913cb (move react-reconciler to engine)
 }>;
 
 /**
  * @public
  */
+<<<<<<< HEAD
 declare namespace Schemas {
     export type SchemaType = ISchema;
     const Boolean: ISchema<boolean>;
@@ -2155,6 +2504,8 @@ declare namespace Schemas {
 /**
  * @public
  */
+=======
+>>>>>>> c1913cb (move react-reconciler to engine)
 declare type SdkComponents = ReturnType<typeof defineSdkComponents>;
 
 /**
@@ -2174,6 +2525,7 @@ declare enum Space {
  * @public
  */
 declare interface Spec {
+<<<<<<< HEAD
     [key: string]: ISchema;
 }
 
@@ -2183,6 +2535,11 @@ declare const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereS
 /** @public */
 declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 
+=======
+    [key: string]: EcsType;
+}
+
+>>>>>>> c1913cb (move react-reconciler to engine)
 declare const enum TextureWrapMode {
     Repeat = 0,
     Clamp = 1,
@@ -2205,6 +2562,7 @@ declare const ToLinearSpace = 2.2;
 
 declare type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
+<<<<<<< HEAD
 /** @public */
 declare const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
 
@@ -2231,6 +2589,20 @@ declare type TransformType = {
     parent?: Entity;
 };
 
+=======
+/**
+ * @public
+ */
+declare type Transform = {
+    position: Vector3.MutableVector3;
+    rotation: Quaternion.MutableQuaternion;
+    scale: Vector3.MutableVector3;
+    parent?: Entity;
+};
+
+declare const Transform: EcsType<Transform>;
+
+>>>>>>> c1913cb (move react-reconciler to engine)
 declare const enum TransparencyMode {
     Opaque = 0,
     AlphaTest = 1,
@@ -2251,9 +2623,12 @@ declare type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
 declare type Uint32 = number;
 
+<<<<<<< HEAD
 /** @public */
 declare const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
 
+=======
+>>>>>>> c1913cb (move react-reconciler to engine)
 /**
  * @public
  */
@@ -2279,7 +2654,11 @@ declare namespace Vector3 {
     /**
      * @public
      */
+<<<<<<< HEAD
     export type ReadonlyVector3 = DeepReadonly_2<MutableVector3>;
+=======
+    export type ReadonlyVector3 = DeepReadonly<MutableVector3>;
+>>>>>>> c1913cb (move react-reconciler to engine)
     /**
      * Creates a new Vector3 object from the given x, y, z (floats) coordinates.
      * @param x - defines the first coordinates (on X axis)
@@ -2473,9 +2852,12 @@ declare interface Vector3_2 {
     z: number;
 }
 
+<<<<<<< HEAD
 /** @public */
 declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 
+=======
+>>>>>>> c1913cb (move react-reconciler to engine)
 declare namespace WireMessage {
     enum Enum {
         RESERVED = 0,
@@ -2500,6 +2882,83 @@ declare namespace WireMessage {
     function readHeader(buf: ByteBuffer): Header | null;
 }
 
+<<<<<<< HEAD
 
 =======
 >>>>>>> 7359561 (proto ui)
+=======
+declare const enum YGAlign {
+    YGAlignAuto = 0,
+    YGAlignFlexStart = 1,
+    YGAlignCenter = 2,
+    YGAlignFlexEnd = 3,
+    YGAlignStretch = 4,
+    YGAlignBaseline = 5,
+    YGAlignSpaceBetween = 6,
+    YGAlignSpaceAround = 7,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGDirection {
+    YGDirectionInherit = 0,
+    YGDirectionLTR = 1,
+    YGDirectionRTL = 2,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGDisplay {
+    YGDisplayFlex = 0,
+    YGDisplayNone = 1,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGFlexDirection {
+    YGFlexDirectionColumn = 0,
+    YGFlexDirectionColumnReverse = 1,
+    YGFlexDirectionRow = 2,
+    YGFlexDirectionRowReverse = 3,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGJustify {
+    YGJustifyFlexStart = 0,
+    YGJustifyCenter = 1,
+    YGJustifyFlexEnd = 2,
+    YGJustifySpaceBetween = 3,
+    YGJustifySpaceAround = 4,
+    YGJustifySpaceEvenly = 5,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGOverflow {
+    YGOverflowVisible = 0,
+    YGOverflowHidden = 1,
+    YGOverflowScroll = 2,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGPositionType {
+    YGPositionTypeStatic = 0,
+    YGPositionTypeRelative = 1,
+    YGPositionTypeAbsolute = 2,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGUnit {
+    YGUnitUndefined = 0,
+    YGUnitPoint = 1,
+    YGUnitPercent = 2,
+    YGUnitAuto = 3,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGWrap {
+    YGWrapNoWrap = 0,
+    YGWrapWrap = 1,
+    YGWrapWrapReverse = 2,
+    UNRECOGNIZED = -1
+}
+
+
+>>>>>>> ed028fa (move react-reconciler to engine)
+>>>>>>> c1913cb (move react-reconciler to engine)

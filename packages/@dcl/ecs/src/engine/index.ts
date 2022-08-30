@@ -13,7 +13,7 @@ import { Entity, EntityContainer } from './entity'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
 import type { IEngineParams, IEngine } from './types'
 import { ReadonlyComponentSchema } from './readonly'
-import { render } from './jsx/renderer'
+import createRenderer from './jsx/renderer'
 
 export * from './readonly'
 export * from './types'
@@ -177,8 +177,29 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
   const crdtSystem = crdtSceneSystem({ engine, transports: transports || [] })
   const baseComponents = defineSdkComponents(engine)
 
-  function renderUI(tree: any) {
-    return render({ baseComponents, addEntity: engine.addEntity })(tree)
+  const uiContainer: { getEntities: () => Entity[]; update: () => void }[] = []
+
+  function renderUI(renderTree: () => JSX.Element): number {
+    const renderer = createRenderer({
+      baseComponents,
+      addEntity: engine.addEntity,
+      getComponent: engine.getComponent
+    })
+    function update() {
+      renderer.update(renderTree())
+    }
+    return uiContainer.push({ update, getEntities: renderer.getEntities })
+  }
+
+  function removeUI(index: number) {
+    const ui = uiContainer[index]
+    if (!ui) return
+
+    for (const entity of ui.getEntities()) {
+      engine.removeEntity(entity)
+    }
+
+    uiContainer.splice(index, 1)
   }
 
   function update(dt: number) {
@@ -186,6 +207,11 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
 
     for (const system of engine.getSystems()) {
       system.fn(dt)
+    }
+
+    // TODO: this should be updated on every frame ?
+    for (const ui of uiContainer) {
+      ui.update()
     }
 
     // Selected components that only exist one frame
@@ -235,6 +261,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     removeComponentDefinition: engine.removeComponentDefinition,
     update,
     renderUI,
+    removeUI,
     baseComponents
   }
 }
