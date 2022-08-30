@@ -31,9 +31,7 @@
     "@dcl/crdt": "^1.0.0-20220819145912.commit-35069cd",
     "@dcl/ecs-math": "^2.0.1-20220526123120.commit-dab2aff",
     "@dcl/posix": "^1.0.4",
-    "@types/react": "^18.0.17",
-    "@types/react-reconciler": "^0.28.0",
-    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-2919890449.commit-e5e8131.tgz",
+    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-2959567993.commit-7adf20a.tgz",
     "react": "^18.2.0",
     "react-reconciler": "^0.29.0"
   },

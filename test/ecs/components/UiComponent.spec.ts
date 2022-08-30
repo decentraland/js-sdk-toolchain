@@ -8,8 +8,8 @@ import {
   YGPositionType,
   YGUnit
   // YGUnit
-} from '../../src/components/generated/pb/UiTransform.gen'
-import { Engine } from '../../src/engine'
+} from '../../../packages/@dcl/ecs/src/components/generated/pb/UiTransform.gen'
+import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('UiTransform component', () => {
   it('should serialize', () => {
@@ -17,7 +17,8 @@ describe('UiTransform component', () => {
     const { UiTransform } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     UiTransform.create(entity, {
-      parentEntity: 0,
+      parent: 0,
+      rightOf: 0,
       alignContent: YGAlign.YGAlignCenter,
       alignItems: YGAlign.YGAlignFlexEnd,
       alignSelf: YGAlign.YGAlignFlexStart,

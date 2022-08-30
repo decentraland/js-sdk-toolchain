@@ -48,7 +48,7 @@ export function createRenderer(
     console.log(instance)
     const comp = engine
       .getComponent(instance.componentId)
-      .mutable(instance.entity)
+      .getMutable(instance.entity)
     comp.rightOf = instance.rightOf
     comp.parent = instance.parent
   }
@@ -56,7 +56,7 @@ export function createRenderer(
   function updateComponentProps(instance: Instance, props: Partial<DivProps>) {
     const comp = engine
       .getComponent(instance.componentId)
-      .mutable(instance.entity)
+      .getMutable(instance.entity)
 
     for (const propKey in props) {
       const key = propKey as keyof DivProps
@@ -208,7 +208,7 @@ export function createRenderer(
       console.log('insertIncontainerBefore TODO')
     },
 
-    detachDeletedInstance: function (node: Instance): void {
+    detachDeletedInstance: function (_node: Instance): void {
       // console.log('detahDeletedInstance')
       // console.log({ node })
     }

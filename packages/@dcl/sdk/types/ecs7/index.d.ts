@@ -1,8 +1,11 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+>>>>>>> d694000 (fix rebase)
 declare const enum ActionButton {
     POINTER = 0,
     PRIMARY = 1,
@@ -22,17 +25,23 @@ declare const enum ActionButton {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d694000 (fix rebase)
 /** @public */
 declare const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
 
 /** @public */
 declare const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
+<<<<<<< HEAD
 =======
 /**
  * @public
  */
 declare function ArrayType<T>(type: EcsType<T>): EcsType<Array<T>>;
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+>>>>>>> d694000 (fix rebase)
 
 declare const enum AvatarAnchorPoint {
     POSITION = 0,
@@ -43,6 +52,9 @@ declare const enum AvatarAnchorPoint {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d694000 (fix rebase)
 /** @public */
 declare const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
 
@@ -64,22 +76,31 @@ declare const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
 /** @public */
 declare const BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
 
+<<<<<<< HEAD
 =======
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+>>>>>>> d694000 (fix rebase)
 /**
  * @public
  */
 declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d694000 (fix rebase)
 /** @public */
 declare const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
 
 /** @public */
 declare const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
 
+<<<<<<< HEAD
 =======
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+>>>>>>> d694000 (fix rebase)
 declare const enum CameraModeValue {
     FIRST_PERSON = 0,
     THIRD_PERSON = 1,
@@ -95,6 +116,7 @@ declare interface Color3 {
 /**
  * @public
  */
+<<<<<<< HEAD
 <<<<<<< HEAD
 declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorType = ComponentType<T>> = {
     _id: number;
@@ -282,40 +304,212 @@ declare type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefinit
     [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['getMutable']> : never;
 =======
 declare type ComponentDefinition<T extends EcsType = EcsType<any>> = {
+=======
+declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorType = ComponentType<T>> = {
+>>>>>>> d694000 (fix rebase)
     _id: number;
+    /**
+     * Return the default value of the current component
+     */
+    default(): DeepReadonly<ComponentType<T>>;
+    /**
+     * Get if the entity has this component
+     * @param entity
+     *
+     * Example:
+     * ```ts
+     * const myEntity = engine.addEntity()
+     * Transform.has(myEntity) // return false
+     * Transform.create(myEntity)
+     * Transform.has(myEntity) // return true
+     * ```
+     */
     has(entity: Entity): boolean;
-    getFrom(entity: Entity): DeepReadonly<ComponentType<T>>;
+    /**
+     * Get the readonly component of the entity (to mutate it, use getMutable instead), throw an error if the entity doesn't have the component.
+     * @param entity
+     * @return
+     * Example:
+     * ```ts
+     * const myEntity = engine.addEntity()
+     * Transform.create(myEntity)
+     * const transform = Transform.get(myEntity) // return true
+     * log(transform.position.x === 0) // log 'true'
+     *
+     * transform.position.y = 10 // illegal statement, to mutate the component use getMutable
+     * ```
+     *
+     * ```ts
+     * const otherEntity = engine.addEntity()
+     * Transform.get(otherEntity) // throw an error!!
+     * ```
+     */
+    get(entity: Entity): DeepReadonly<ComponentType<T>>;
+    /**
+     * Get the readonly component of the entity (to mutate it, use getMutable instead), or null if the entity doesn't have the component.
+     * @param entity
+     * @return
+     *
+     * Example:
+     * ```ts
+     * const otherEntity = engine.addEntity()
+     * log(Transform.get(otherEntity) === null) // log 'true'
+     * ```
+     */
     getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
-    create(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
-    mutable(entity: Entity): ComponentType<T>;
+    /**
+     * Add the current component to an entity, throw an error if the component already exists (use `createOrReplace` instead).
+     * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
+     * @param entity
+     * @param val The initial value
+     *
+     * Example:
+     * ```ts
+     * const myEntity = engine.addEntity()
+     * Transform.create(myEntity, { ...Transform.default(), position: {x: 4, y: 0, z: 4} }) // ok!
+     * Transform.create(myEntity) // throw an error, the `Transform` component already exists in `myEntity`
+     * ````
+     */
+    create(entity: Entity, val?: ConstructorType): ComponentType<T>;
+    /**
+     * Add the current component to an entity or replace the content if the entity already has the component
+     * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
+     * @param entity
+     * @param val The initial or new value
+     *
+     * Example:
+     * ```ts
+     * const myEntity = engine.addEntity()
+     * Transform.create(myEntity) // ok!
+     * Transform.createOrReplace(myEntity, { ...Transform.default(), position: {x: 4, y: 0, z: 4} }) // ok!
+     * ````
+     */
     createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
+    /**
+     * Delete the current component to an entity, return null if the entity doesn't have the current component.
+     * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
+     * @param entity
+     *
+     * Example:
+     * ```ts
+     * const myEntity = engine.addEntity()
+     * Transform.create(myEntity) // ok!
+     * Transform.deleteFrom(myEntity) // return the component
+     * Transform.deleteFrom(myEntity) // return null
+     * ````
+     */
     deleteFrom(entity: Entity): ComponentType<T> | null;
-    upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
-    updateFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null;
-    toBinary(entity: Entity): ByteBuffer;
+    /**
+     * Get the mutable component of the entity, throw an error if the entity doesn't have the component.
+     * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
+     * @param entity
+     *
+     * Example:
+     * ```ts
+     * const myEntity = engine.addEntity()
+     * Transform.create(myEntity)
+     * Transform.getMutable(myEntity).position = {x: 4, y: 0, z: 4}
+     * ````
+     */
+    getMutable(entity: Entity): ComponentType<T>;
+    /**
+     * Get the mutable component of the entity, return null if the entity doesn't have the component.
+     * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
+     * @param entity
+     *
+     * Example:
+     * ```ts
+     * const transform = Transform.getMutableOrNull(myEntity)
+     * if (transform) {
+     *   transform.position = {x: 4, y: 0, z: 4}
+     * }
+     * ````
+     */
+    getMutableOrNull(entity: Entity): ComponentType<T> | null;
     writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void;
-    iterator(): Iterable<[Entity, ComponentType<T>]>;
-    dirtyIterator(): Iterable<Entity>;
-    clearDirty(): void;
-    isDirty(entity: Entity): boolean;
 };
+
+/** @public */
+declare namespace Components {
+    /** @public */
+    const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
+    /** @public */
+    const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+    /** @public */
+    const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
+    /** @public */
+    const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
+    /** @public */
+    const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
+    /** @public */
+    const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
+    /** @public */
+    const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
+    /** @public */
+    const BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
+    /** @public */
+    const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
+    /** @public */
+    const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
+    /** @public */
+    const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
+    /** @public */
+    const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
+    /** @public */
+    const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    /** @public */
+    const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
+    /** @public */
+    const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
+    /** @public */
+    const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
+    /** @public */
+    const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
+    /** @public */
+    const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
+    /** @public */
+    const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
+    /** @public */
+    const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+    /** @public */
+    const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    /** @public */
+    const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
+    /** @public */
+    const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+    /** @public */
+    const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    /** @public */
+    const UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
+    /** @public */
+    const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
+}
 
 /**
  * @public
  */
+<<<<<<< HEAD
 declare type ComponentEcsType<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
     [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['mutable']> : never;
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+declare type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
+    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['getMutable']> : never;
+>>>>>>> d694000 (fix rebase)
 };
 
 /**
  * @public
  */
 <<<<<<< HEAD
+<<<<<<< HEAD
 declare type ComponentType<T extends ISchema> = EcsResult<T>;
 =======
 declare type ComponentType<T extends EcsType> = EcsResult<T>;
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+declare type ComponentType<T extends ISchema> = EcsResult<T>;
+>>>>>>> d694000 (fix rebase)
 
 /**
  * ByteBuffer is a wrapper of DataView which also adds a read and write offset.
@@ -455,6 +649,9 @@ declare interface CreateByteBufferOptions {
     initialCapacity?: number;
 }
 
+/** @public */
+declare const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
+
 /**
 <<<<<<< HEAD
  * Transform parenting: cyclic dependency checker
@@ -496,30 +693,33 @@ declare type DeepReadonly<T> = {
     readonly [P in keyof T]: DeepReadonly<T[P]>;
 };
 
-declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponent'>): {
-    Animator: ComponentDefinition<EcsType<PBAnimator>>;
-    AudioSource: ComponentDefinition<EcsType<PBAudioSource>>;
-    AvatarAttach: ComponentDefinition<EcsType<PBAvatarAttach>>;
-    AvatarShape: ComponentDefinition<EcsType<PBAvatarShape>>;
-    Billboard: ComponentDefinition<EcsType<PBBillboard>>;
-    BoxShape: ComponentDefinition<EcsType<PBBoxShape>>;
-    CameraMode: ComponentDefinition<EcsType<PBCameraMode>>;
-    CameraModeArea: ComponentDefinition<EcsType<PBCameraModeArea>>;
-    CylinderShape: ComponentDefinition<EcsType<PBCylinderShape>>;
-    GLTFShape: ComponentDefinition<EcsType<PBGLTFShape>>;
-    Material: ComponentDefinition<EcsType<PBMaterial>>;
-    NFTShape: ComponentDefinition<EcsType<PBNFTShape>>;
-    OnPointerDown: ComponentDefinition<EcsType<PBOnPointerDown>>;
-    OnPointerDownResult: ComponentDefinition<EcsType<PBOnPointerDownResult>>;
-    OnPointerUp: ComponentDefinition<EcsType<PBOnPointerUp>>;
-    OnPointerUpResult: ComponentDefinition<EcsType<PBOnPointerUpResult>>;
-    PlaneShape: ComponentDefinition<EcsType<PBPlaneShape>>;
-    PointerLock: ComponentDefinition<EcsType<PBPointerLock>>;
-    SphereShape: ComponentDefinition<EcsType<PBSphereShape>>;
-    TextShape: ComponentDefinition<EcsType<PBTextShape>>;
-    UiText: ComponentDefinition<EcsType<PBUiText>>;
-    UiTransform: ComponentDefinition<EcsType<PBUiTransform>>;
-    Transform: ComponentDefinition<EcsType<Transform>>;
+declare function defineSdkComponents(engine: PreEngine): {
+    Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
+    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
+    Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+    AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
+    AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
+    AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
+    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
+    Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
+    BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
+    CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
+    CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
+    CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
+    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
+    Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
+    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
+    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
+    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
+    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
+    PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+    PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
+    TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+    UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
+    VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 };
 
 /**
@@ -577,6 +777,7 @@ declare type double = number;
 /**
  * @public
  */
+<<<<<<< HEAD
 <<<<<<< HEAD
 declare type DeepReadonlyObject<T> = {
     readonly [K in keyof T]: DeepReadonly<T[K]>;
@@ -649,6 +850,9 @@ declare type EcsType<T = any> = {
     create(): T;
 };
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+declare type EcsResult<T extends ISchema> = T extends ISchema ? ReturnType<T['deserialize']> : never;
+>>>>>>> d694000 (fix rebase)
 
 /**
  * @public
@@ -656,12 +860,15 @@ declare type EcsType<T = any> = {
 declare function Engine({ transports }?: IEngineParams): IEngine;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 /**
  * @alpha * This file initialization is an alpha one. This is based on the old-ecs
  * init and it'll be changing.
  */
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+>>>>>>> d694000 (fix rebase)
 declare const engine: IEngine;
 
 /**
@@ -675,6 +882,7 @@ declare const entitySymbol: unique symbol;
 
 /**
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
  * @public
  */
@@ -682,16 +890,23 @@ declare function Enum<T>(type: EcsType<any>): EcsType<T>;
 
 /**
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+>>>>>>> d694000 (fix rebase)
  * Constant used to define the minimal number value in Babylon.js
  * @public
  */
 declare const Epsilon = 0.000001;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 declare const error: (message: string | Error, data?: any) => void;
 
 =======
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+declare const error: (message: string | Error, data?: any) => void;
+
+>>>>>>> d694000 (fix rebase)
 /** Excludes property keys from T where the property is assignable to U */
 declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
@@ -704,6 +919,7 @@ declare const enum FilterMode {
     UNRECOGNIZED = -1
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 /** @public */
 declare type float = number;
@@ -727,10 +943,21 @@ declare type float = number;
  */
 declare const Float32: EcsType<number>;
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+/** @public */
+declare type float = number;
+
+/** @public */
+declare type FloatArray = number[];
+
+/** @public */
+declare const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
+>>>>>>> d694000 (fix rebase)
 
 /**
  * @public
  */
+<<<<<<< HEAD
 <<<<<<< HEAD
 declare function IArray<T>(type: ISchema<T>): ISchema<Array<T>>;
 =======
@@ -739,17 +966,24 @@ declare const Float64: EcsType<number>;
 /** @public */
 declare type FloatArray = number[];
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+declare function IArray<T>(type: ISchema<T>): ISchema<Array<T>>;
+>>>>>>> d694000 (fix rebase)
 
 /**
  * @public
  */
 declare type IEngine = {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d694000 (fix rebase)
     /**
      * Increment the used entity counter and return the next one.
      * @param dynamic
      * @return the next entity unused
      */
+<<<<<<< HEAD
     addEntity(dynamic?: boolean): Entity;
     /**
      * An alias of engine.addEntity(true)
@@ -838,16 +1072,94 @@ declare type IEngine = {
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     baseComponents: SdkComponents;
 =======
+=======
+>>>>>>> d694000 (fix rebase)
     addEntity(dynamic?: boolean): Entity;
+    /**
+     * An alias of engine.addEntity(true)
+     */
     addDynamicEntity(): Entity;
+    /**
+     * Remove all components of an entity
+     * @param entity
+     */
     removeEntity(entity: Entity): void;
+    /**
+     * Add the system to the engine. It will be called every tick updated.
+     * @param system function that receives the delta time between last tick and current one.
+     * @param priority a number with the priority, big number are called before smaller ones
+     * @param name optional: a unique name to identify it
+     *
+     * Example:
+     * ```ts
+     * function mySystem(dt: number) {
+     *   const entitiesWithBoxShapes = engine.getEntitiesWith(BoxShape, Transform)
+     *   for (const [entity, _boxShape, _transform] of engine.getEntitiesWith(BoxShape, Transform)) {
+     *     // do stuffs
+     *   }
+     * }
+     * engine.addSystem(mySystem, 10)
+     * ```
+     */
     addSystem(system: Update, priority?: number, name?: string): void;
+    /**
+     * Remove a system from the engine.
+     * @param selector the function or the unique name to identify
+     * @returns if it was found and removed
+     */
     removeSystem(selector: string | Update): boolean;
-    defineComponent<T extends EcsType>(componentId: number, spec: T): ComponentDefinition<T>;
-    mutableGroupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ComponentEcsType<T>]>;
-    groupOf<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentEcsType<T>>]>;
-    getComponent<T extends EcsType>(componentId: number): ComponentDefinition<T>;
-    update(dt: number): void;
+    /**
+     * Define a component and add it to the engine.
+     * @param spec An object with schema fields
+     * @param componentId unique id to identify the component, if the component id already exist, it will fail.
+     * @param constructorDefault the initial value prefilled when a component is created without a value
+     * @return The component definition
+     *
+     * ```ts
+     * const DoorComponentId = 10017
+     * const Door = engine.defineComponent({
+     *   id: Schemas.Int,
+     *   name: Schemas.String
+     * }, DoorComponentId)
+     *
+     * ```
+     */
+    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: Spec, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    /**
+     * Define a component and add it to the engine.
+     * @param spec An object with schema fields
+     * @param componentId unique id to identify the component, if the component id already exist, it will fail.
+     * @return The component definition
+     *
+     * ```ts
+     * const StateComponentId = 10023
+     * const StateComponent = engine.defineComponent(Schemas.Bool, VisibleComponentId)
+     * ```
+     */
+    defineComponentFromSchema<T extends ISchema<Record<string, any>>, ConstructorType = ComponentType<T>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
+    /**
+     * Get the component definition from the component id.
+     * @param componentId
+     * @return the component definition, throw an error if it doesn't exist
+     * ```ts
+     * const StateComponentId = 10023
+     * const StateComponent = engine.getComponent(StateComponentId)
+     * ```
+     */
+    getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
+    /**
+     * Get a iterator of entities that has all the component requested.
+     * @param components a list of component definitions
+     * @return An iterator of an array with the [entity, component1, component2, ...]
+     *
+     * Example:
+     * ```ts
+     * for (const [entity, boxShape, transform] of engine.getEntitiesWith(BoxShape, Transform)) {
+     *   // the properties of boxShape and transform are read only
+     * }
+     * ```
+     */
+    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
     baseComponents: SdkComponents;
     renderUI(renderTree: () => JSX.Element): number;
     removeUI(ui: number): void;
@@ -861,6 +1173,7 @@ declare type IEngineParams = {
     transports?: Transport[];
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 /**
  * @public
@@ -877,42 +1190,64 @@ declare type IncludeUndefined<T> = {
  */
 declare const Int16: EcsType<number>;
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+/**
+ * @public
+ */
+declare function IEnum<T>(type: ISchema<any>): ISchema<T>;
+>>>>>>> d694000 (fix rebase)
 
 /**
  * @public
  */
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d694000 (fix rebase)
 declare function IMap<T extends Spec>(spec: T): ISchema<Result<T>>;
 
 /** Include property keys from T where the property is assignable to U */
 declare type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
 }[keyof T];
+<<<<<<< HEAD
 =======
 declare const Int32: EcsType<number>;
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+>>>>>>> d694000 (fix rebase)
 
 /**
  * @public
  */
+<<<<<<< HEAD
 <<<<<<< HEAD
 declare function IOptional<T>(spec: ISchema<T>): ISchema<T | undefined>;
 =======
 declare const Int64: EcsType<number>;
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+declare function IOptional<T>(spec: ISchema<T>): ISchema<T | undefined>;
+>>>>>>> d694000 (fix rebase)
 
 /**
  * @public
  */
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d694000 (fix rebase)
 declare type ISchema<T = any> = {
     serialize(value: T, builder: ByteBuffer): void;
     deserialize(reader: ByteBuffer): T;
     create(): T;
 };
+<<<<<<< HEAD
 =======
 declare const Int8: EcsType<number>;
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+>>>>>>> d694000 (fix rebase)
 
 /**
  * Interface for the size containing width and height
@@ -930,16 +1265,22 @@ declare interface ISize {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d694000 (fix rebase)
 declare const log: (...a: any[]) => void;
 
 /** @public */
 declare const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+<<<<<<< HEAD
 =======
 /**
  * @public
  */
 declare function MapType<T extends Spec>(spec: T): EcsType<Result<T>>;
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+>>>>>>> d694000 (fix rebase)
 
 /**
  * Class used to store matrix data (4x4)
@@ -1666,17 +2007,23 @@ declare namespace Matrix {
 
 /** @public */
 <<<<<<< HEAD
+<<<<<<< HEAD
 declare const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
 
 /** @public */
+=======
+>>>>>>> d694000 (fix rebase)
 declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
 
 /** @public */
 declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
 
 /** @public */
+<<<<<<< HEAD
 =======
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+>>>>>>> d694000 (fix rebase)
 declare type Nullable<T> = T | null;
 
 declare type OnlyNonUndefinedTypes<T> = {
@@ -1688,6 +2035,9 @@ declare type OnlyOptionalUndefinedTypes<T> = {
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d694000 (fix rebase)
 /** @public */
 declare const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
 
@@ -1699,12 +2049,15 @@ declare const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPoint
 
 /** @public */
 declare const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
+<<<<<<< HEAD
 =======
 /**
  * @public
  */
 declare function Optional<T>(spec: EcsType<T>): EcsType<T | undefined>;
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+>>>>>>> d694000 (fix rebase)
 
 /**
  * Defines potential orientation for back face culling
@@ -1756,14 +2109,20 @@ declare interface PBAvatarAttach {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d694000 (fix rebase)
 declare interface PBAvatarModifierArea {
     area: Vector3_2 | undefined;
     excludeIds: string[];
     modifiers: AvatarModifier[];
 }
 
+<<<<<<< HEAD
 =======
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+>>>>>>> d694000 (fix rebase)
 declare interface PBAvatarShape {
     id: string;
     name?: string | undefined;
@@ -1874,6 +2233,7 @@ declare interface PBMaterial_Texture {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 declare interface PBMeshCollider {
     /** default = ColliderLayer.Physics | ColliderLayer.Pointer */
     collisionMask?: number | undefined;
@@ -1899,6 +2259,8 @@ declare interface PBMeshCollider_PlaneMesh {
 declare interface PBMeshCollider_SphereMesh {
 }
 
+=======
+>>>>>>> d694000 (fix rebase)
 declare interface PBMeshRenderer {
     box: PBMeshRenderer_BoxMesh | undefined;
     sphere: PBMeshRenderer_SphereMesh | undefined;
@@ -1924,8 +2286,11 @@ declare interface PBMeshRenderer_PlaneMesh {
 declare interface PBMeshRenderer_SphereMesh {
 }
 
+<<<<<<< HEAD
 =======
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+>>>>>>> d694000 (fix rebase)
 declare interface PBNFTShape {
     /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
     withCollisions?: boolean | undefined;
@@ -2115,6 +2480,11 @@ declare interface PBUiTransform {
 >>>>>>> c1913cb (move react-reconciler to engine)
 }
 
+declare interface PBVisibilityComponent {
+    /** default=true */
+    visible?: boolean | undefined;
+}
+
 /**
  * Represens a plane by the equation ax + by + cz + d = 0
  * @public
@@ -2229,12 +2599,16 @@ declare namespace Plane {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d694000 (fix rebase)
 /** @public */
 declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
 
 /** @public */
 declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
 
+<<<<<<< HEAD
 /**
  * @public
  */
@@ -2259,6 +2633,8 @@ declare function preEngine(): {
     getComponent: <T_3 extends ISchema<any>>(componentId: number) => ComponentDefinition<T_3, EcsResult<T_3>>;
     removeComponentDefinition: (componentId: number) => void;
 =======
+=======
+>>>>>>> d694000 (fix rebase)
 /**
  * @public
  */
@@ -2268,6 +2644,31 @@ declare type Position = {
     bottom: number | string;
     left: number | string;
 >>>>>>> c1913cb (move react-reconciler to engine)
+};
+
+/**
+ * @public
+ */
+declare type PreEngine = ReturnType<typeof preEngine>;
+
+declare function preEngine(): {
+    entitiesComponent: Map<number, Set<number>>;
+    componentsDefinition: Map<number, ComponentDefinition<any, any>>;
+    addEntity: (dynamic?: boolean) => Entity;
+    addDynamicEntity: () => Entity;
+    removeEntity: (entity: Entity) => boolean;
+    addSystem: (fn: Update, priority?: number, name?: string | undefined) => void;
+    getSystems: () => {
+        fn: Update;
+        priority: number;
+        name?: string | undefined;
+    }[];
+    removeSystem: (selector: string | Update) => boolean;
+    defineComponent: <T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType | undefined) => ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    defineComponentFromSchema: <T_1 extends ISchema<any>, ConstructorType_1 = EcsResult<T_1>>(spec: T_1, componentId: number, constructorDefault?: ConstructorType_1 | undefined) => ComponentDefinition<T_1, ConstructorType_1>;
+    getEntitiesWith: <T_2 extends [ComponentDefinition<ISchema<any>, any>, ...ComponentDefinition<ISchema<any>, any>[]]>(...components: T_2) => Iterable<[Entity, ...DeepReadonly<ComponentSchema<T_2>>]>;
+    getComponent: <T_3 extends ISchema<any>>(componentId: number) => ComponentDefinition<T_3, EcsResult<T_3>>;
+    removeComponentDefinition: (componentId: number) => void;
 };
 
 /**
@@ -2474,16 +2875,23 @@ declare type ReceiveMessage = {
  */
 declare type Result<T extends Spec> = ToOptional<{
 <<<<<<< HEAD
+<<<<<<< HEAD
     [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? Result<T[K]> : never;
 =======
     [K in keyof T]: T[K] extends EcsType ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? Result<T[K]> : never;
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+    [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? Result<T[K]> : never;
+>>>>>>> d694000 (fix rebase)
 }>;
 
 /**
  * @public
  */
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d694000 (fix rebase)
 declare namespace Schemas {
     export type SchemaType = ISchema;
     const Boolean: ISchema<boolean>;
@@ -2504,8 +2912,11 @@ declare namespace Schemas {
 /**
  * @public
  */
+<<<<<<< HEAD
 =======
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+>>>>>>> d694000 (fix rebase)
 declare type SdkComponents = ReturnType<typeof defineSdkComponents>;
 
 /**
@@ -2526,6 +2937,7 @@ declare enum Space {
  */
 declare interface Spec {
 <<<<<<< HEAD
+<<<<<<< HEAD
     [key: string]: ISchema;
 }
 
@@ -2540,6 +2952,17 @@ declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 }
 
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+    [key: string]: ISchema;
+}
+
+/** @public */
+declare const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
+
+/** @public */
+declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+
+>>>>>>> d694000 (fix rebase)
 declare const enum TextureWrapMode {
     Repeat = 0,
     Clamp = 1,
@@ -2562,6 +2985,7 @@ declare const ToLinearSpace = 2.2;
 
 declare type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 /** @public */
 declare const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
@@ -2590,19 +3014,40 @@ declare type TransformType = {
 };
 
 =======
+=======
+/** @public */
+declare const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
+
+>>>>>>> d694000 (fix rebase)
 /**
  * @public
  */
-declare type Transform = {
-    position: Vector3.MutableVector3;
-    rotation: Quaternion.MutableQuaternion;
-    scale: Vector3.MutableVector3;
+declare type TransformType = {
+    position: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    rotation: {
+        x: number;
+        y: number;
+        z: number;
+        w: number;
+    };
+    scale: {
+        x: number;
+        y: number;
+        z: number;
+    };
     parent?: Entity;
 };
 
+<<<<<<< HEAD
 declare const Transform: EcsType<Transform>;
 
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+>>>>>>> d694000 (fix rebase)
 declare const enum TransparencyMode {
     Opaque = 0,
     AlphaTest = 1,
@@ -2624,11 +3069,20 @@ declare type TransportMessage = Omit<ReceiveMessage, 'data'>;
 declare type Uint32 = number;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 /** @public */
 declare const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
 
 =======
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+/** @public */
+declare const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+
+/** @public */
+declare const UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
+
+>>>>>>> d694000 (fix rebase)
 /**
  * @public
  */
@@ -2853,11 +3307,17 @@ declare interface Vector3_2 {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 /** @public */
 declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 
 =======
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+/** @public */
+declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
+
+>>>>>>> d694000 (fix rebase)
 declare namespace WireMessage {
     enum Enum {
         RESERVED = 0,
@@ -2960,5 +3420,8 @@ declare const enum YGWrap {
 }
 
 
+<<<<<<< HEAD
 >>>>>>> ed028fa (move react-reconciler to engine)
 >>>>>>> c1913cb (move react-reconciler to engine)
+=======
+>>>>>>> d694000 (fix rebase)

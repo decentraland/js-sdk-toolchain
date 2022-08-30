@@ -153,6 +153,10 @@ export namespace Components {
     //
     // (undocumented)
     UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    const // Warning: (ae-forgotten-export) The symbol "PBUiTransform" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
     const // Warning: (ae-forgotten-export) The symbol "PBVisibilityComponent" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -277,22 +281,6 @@ export function DivUi(props: Partial<DivProps> & {
 export type double = number;
 
 // @public (undocumented)
-<<<<<<< HEAD
-=======
-export const EcsBoolean: EcsType<boolean>;
-
-// @public (undocumented)
-export const EcsString: EcsType<string>;
-
-// @public (undocumented)
-export type EcsType<T = any> = {
-    serialize(value: T, builder: ByteBuffer): void;
-    deserialize(reader: ByteBuffer): T;
-    create(): T;
-};
-
-// @public (undocumented)
->>>>>>> a098bb8 (proto ui)
 export function Engine({ transports }?: IEngineParams): IEngine;
 
 // Warning: (ae-missing-release-tag) "engine" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -359,7 +347,6 @@ export interface ISize {
 // Warning: (ae-missing-release-tag) "log" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-<<<<<<< HEAD
 export const log: (...a: any[]) => void;
 
 // @public (undocumented)
@@ -372,18 +359,7 @@ export const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCo
 export const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
 
 // @public (undocumented)
-<<<<<<< HEAD
 export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
-=======
-export type JsxTree = (DivTag | TextTag) & {
-    children: (JsxTree | null)[];
-};
-
-// @public (undocumented)
-=======
->>>>>>> 67ea711 (add rightOf prop to div elements)
-export function MapType<T extends Spec>(spec: T): EcsType<Result<T>>;
->>>>>>> a098bb8 (proto ui)
 
 // @public (undocumented)
 export type Nullable<T> = T | null;
@@ -407,8 +383,6 @@ export enum Orientation {
 }
 
 // @public (undocumented)
-<<<<<<< HEAD
-<<<<<<< HEAD
 export const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
 
 // @public (undocumented)
@@ -418,18 +392,8 @@ export const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerL
 //
 // @public (undocumented)
 export type PreEngine = ReturnType<typeof preEngine>;
-=======
-export type Position = {
-    top: number | string;
-    right: number | string;
-    bottom: number | string;
-    left: number | string;
-};
->>>>>>> a098bb8 (proto ui)
 
 // @public (undocumented)
-=======
->>>>>>> ed028fa (move react-reconciler to engine)
 export namespace Quaternion {
     export function add(q1: ReadonlyQuaternion, q2: ReadonlyQuaternion): MutableQuaternion;
     export function angle(quat1: ReadonlyQuaternion, quat2: ReadonlyQuaternion): number;
@@ -548,40 +512,12 @@ export interface Spec {
     [key: string]: ISchema;
 }
 
-<<<<<<< HEAD
 // @public (undocumented)
-<<<<<<< HEAD
 export const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
 
 // @public (undocumented)
 export const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
-=======
-export interface TextProps {
-    // (undocumented)
-    textColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    // (undocumented)
-    value: string;
-}
 
-<<<<<<< HEAD
-// @public (undocumented)
-export type TextTag = {
-    tag: 'textui';
-    attributes: TextProps;
-};
-
-// @public (undocumented)
-export function TextUi(props: TextProps, ...children: any[]): JsxTree;
->>>>>>> a098bb8 (proto ui)
-
-=======
->>>>>>> 67ea711 (add rightOf prop to div elements)
-=======
->>>>>>> ed028fa (move react-reconciler to engine)
 // @public
 export const ToGammaSpace: number;
 
@@ -589,8 +525,6 @@ export const ToGammaSpace: number;
 export const ToLinearSpace = 2.2;
 
 // @public (undocumented)
-<<<<<<< HEAD
-<<<<<<< HEAD
 export const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
 
 // Warning: (ae-missing-release-tag) "Transport" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -612,16 +546,10 @@ export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 // @public (undocumented)
 export const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
 
-=======
-export type Tree = JsxTree & {
-    _id: number;
-    entityId: number;
-};
-
->>>>>>> a098bb8 (proto ui)
 // @public (undocumented)
-=======
->>>>>>> 67ea711 (add rightOf prop to div elements)
+export const UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
+
+// @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;
 
 // @public (undocumented)
@@ -676,8 +604,6 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 
 // Warnings were encountered during analysis:
 //
-<<<<<<< HEAD
-<<<<<<< HEAD
 // dist/engine/component.d.ts:24:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/component.d.ts:37:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/component.d.ts:38:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
@@ -728,18 +654,6 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 // dist/engine/types.d.ts:95:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
 // dist/engine/types.d.ts:104:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/types.d.ts:105:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-=======
-// dist/engine/types.d.ts:26:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
-// dist/engine/types.d.ts:40:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
->>>>>>> a098bb8 (proto ui)
-=======
-// dist/engine/types.d.ts:25:5 - (ae-forgotten-export) The symbol "Update" needs to be exported by the entry point index.d.ts
-<<<<<<< HEAD
-// dist/engine/types.d.ts:39:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
->>>>>>> 67ea711 (add rightOf prop to div elements)
-=======
-// dist/engine/types.d.ts:40:5 - (ae-forgotten-export) The symbol "Transport" needs to be exported by the entry point index.d.ts
->>>>>>> ed028fa (move react-reconciler to engine)
 
 // (No @packageDocumentation comment for this package)
 

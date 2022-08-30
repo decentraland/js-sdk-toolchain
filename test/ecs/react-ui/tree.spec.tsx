@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { Engine, Entity } from '../../src/engine'
-import { DivUi } from '../../src/engine/jsx/components'
+import { Engine, Entity } from '../../../packages/@dcl/ecs/src/engine'
+import { DivUi } from '../../../packages/@dcl/ecs/src/engine/jsx/components'
 
 describe('UI Mockup', () => {
   it('should generate a UI and update the width of a div', async () => {
@@ -15,7 +15,7 @@ describe('UI Mockup', () => {
     const divBEntity = (entityIndex + 3) as Entity
     const rootDivEntity = (entityIndex + 4) as Entity
 
-    const getDiv = (entity: Entity) => UiTransform.getFrom(entity)
+    const getDiv = (entity: Entity) => UiTransform.get(entity)
 
     let width = 222
 
@@ -73,18 +73,19 @@ describe('UI Mockup', () => {
     const divBEntity = (entityIndex + 2) as Entity
     const divAddedEntity = (entityIndex + 4) as Entity
 
-    const getDiv = (entity: Entity) => UiTransform.getFrom(entity)
+    const getDiv = (entity: Entity) => UiTransform.get(entity)
     let addChild = false
     const ui = () => {
-      console.log({ addChild })
-      return <DivUi width={111}>
-        {addChild && <DivUi width={333} />}
-        {/* // Root */}
-        <DivUi width={888} />
-        {/* DivA */}
-        <DivUi width={999} />
-        {/* DivB */}
-      </DivUi>
+      return (
+        <DivUi width={111}>
+          {addChild && <DivUi width={333} />}
+          {/* // Root */}
+          <DivUi width={888} />
+          {/* DivA */}
+          <DivUi width={999} />
+          {/* DivB */}
+        </DivUi>
+      )
     }
 
     engine.renderUI(ui)
@@ -165,7 +166,7 @@ describe('UI Mockup', () => {
     const divBEntity = (entityIndex + 2) as Entity
     const divAddedEntity = (entityIndex + 4) as Entity
 
-    const getDiv = (entity: Entity) => UiTransform.getFrom(entity)
+    const getDiv = (entity: Entity) => UiTransform.get(entity)
     let addChild = false
     const ui = () => (
       <DivUi width={111}>
@@ -253,7 +254,7 @@ describe('UI Mockup', () => {
     const divBEntity = (entityIndex + 2) as Entity
     const divAddedEntity = (entityIndex + 4) as Entity
 
-    const getDiv = (entity: Entity) => UiTransform.getFrom(entity)
+    const getDiv = (entity: Entity) => UiTransform.get(entity)
 
     let addChild = false
     const ui = () => (
@@ -295,17 +296,33 @@ describe('UI Mockup', () => {
     })
 
     // Divs must not change
-    expect(getDiv(divBEntity)).toMatchObject({ parent: rootDivEntity, rightOf: divAEntity, width: 999 })
+    expect(getDiv(divBEntity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: divAEntity,
+      width: 999
+    })
     expect(getDiv(rootDivEntity)).toMatchObject({ parent: 0, rightOf: 0 })
-    expect(getDiv(divAEntity)).toMatchObject({ parent: rootDivEntity, rightOf: undefined, width: 888 })
+    expect(getDiv(divAEntity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: undefined,
+      width: 888
+    })
 
     // Remove divAdded and check that all goes back to the first iteration
     addChild = false
     engine.update(1)
 
-    expect(getDiv(divBEntity)).toMatchObject({ parent: rootDivEntity, rightOf: divAEntity, width: 999 })
+    expect(getDiv(divBEntity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: divAEntity,
+      width: 999
+    })
     expect(getDiv(rootDivEntity)).toMatchObject({ parent: 0, rightOf: 0 })
-    expect(getDiv(divAEntity)).toMatchObject({ parent: rootDivEntity, rightOf: undefined, width: 888 })
+    expect(getDiv(divAEntity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: undefined,
+      width: 888
+    })
     expect(UiTransform.getOrNull(divAddedEntity)).toBe(null)
   })
   it('should add a child at the middle with multiple childs and then remove it', async () => {
@@ -322,7 +339,7 @@ describe('UI Mockup', () => {
     const divAddedBEntity = (entityIndex + 6) as Entity
     const divAddedRootEntity = (entityIndex + 7) as Entity
 
-    const getDiv = (entity: Entity) => UiTransform.getFrom(entity)
+    const getDiv = (entity: Entity) => UiTransform.get(entity)
     let width = 333.2
     let addChild = false
     const ui = () => (
@@ -350,23 +367,55 @@ describe('UI Mockup', () => {
     engine.update(1)
 
     // Add child divs
-    expect(getDiv(divAddedRootEntity)).toMatchObject({ parent: rootDivEntity, rightOf: divAEntity, width: 333 })
-    expect(getDiv(divAddedAEntity)).toMatchObject({ parent: divAddedRootEntity, rightOf: undefined,width: 333.1 })
-    expect(getDiv(divAddedAChildEntity)).toMatchObject({ parent: divAddedAEntity, rightOf: undefined,width: 333.11 })
-    expect(getDiv(divAddedBEntity)).toMatchObject({ parent: divAddedRootEntity, rightOf: divAddedAEntity,width: 333.2 })
+    expect(getDiv(divAddedRootEntity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: divAEntity,
+      width: 333
+    })
+    expect(getDiv(divAddedAEntity)).toMatchObject({
+      parent: divAddedRootEntity,
+      rightOf: undefined,
+      width: 333.1
+    })
+    expect(getDiv(divAddedAChildEntity)).toMatchObject({
+      parent: divAddedAEntity,
+      rightOf: undefined,
+      width: 333.11
+    })
+    expect(getDiv(divAddedBEntity)).toMatchObject({
+      parent: divAddedRootEntity,
+      rightOf: divAddedAEntity,
+      width: 333.2
+    })
 
     // DivB must be updated with rightOf
-    expect(getDiv(divBEntity)).toMatchObject({ parent: rootDivEntity, rightOf: divAddedRootEntity,width: 999 })
+    expect(getDiv(divBEntity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: divAddedRootEntity,
+      width: 999
+    })
     // Root div doesn't have to change
-    expect(getDiv(rootDivEntity)).toMatchObject({ parent: 0, rightOf: 0, width: 111 })
+    expect(getDiv(rootDivEntity)).toMatchObject({
+      parent: 0,
+      rightOf: 0,
+      width: 111
+    })
     // Div A doesn't have to change
-    expect(getDiv(divAEntity)).toMatchObject({ parent: rootDivEntity, rightOf: undefined, width: 888 })
+    expect(getDiv(divAEntity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: undefined,
+      width: 888
+    })
 
     // Remove divAdded and check that all goes back to the first iteration
     width = 333.22
     addChild = false
     engine.update(1)
-    expect(getDiv(divBEntity)).toMatchObject({ parent: rootDivEntity, rightOf: divAEntity, width: 999 })
+    expect(getDiv(divBEntity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: divAEntity,
+      width: 999
+    })
     expect(UiTransform.getOrNull(divAddedRootEntity)).toBe(null)
     expect(UiTransform.getOrNull(divAddedAEntity)).toBe(null)
     expect(UiTransform.getOrNull(divAddedBEntity)).toBe(null)
@@ -387,7 +436,7 @@ describe('UI Mockup', () => {
     const div2Entity = (entityIndex + 2) as Entity
     const div3Entity = (entityIndex + 3) as Entity
 
-    const getDiv = (entity: number) => UiTransform.getFrom(entity as Entity)
+    const getDiv = (entity: number) => UiTransform.get(entity as Entity)
     const ui = () => (
       <DivUi width={111}>
         {divArray.map((div) => (
@@ -398,10 +447,26 @@ describe('UI Mockup', () => {
     engine.renderUI(ui)
     engine.update(1)
 
-    expect(getDiv(div1Entity)).toMatchObject({ parent: rootDivEntity, rightOf: undefined, width: 1 })
-    expect(getDiv(div2Entity)).toMatchObject({ parent: rootDivEntity, rightOf: div1Entity, width: 2 })
-    expect(getDiv(div3Entity)).toMatchObject({ parent: rootDivEntity, rightOf: div2Entity, width: 3 })
-    expect(getDiv(rootDivEntity)).toMatchObject({ parent: 0, rightOf: 0, width: 111 })
+    expect(getDiv(div1Entity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: undefined,
+      width: 1
+    })
+    expect(getDiv(div2Entity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: div1Entity,
+      width: 2
+    })
+    expect(getDiv(div3Entity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: div2Entity,
+      width: 3
+    })
+    expect(getDiv(rootDivEntity)).toMatchObject({
+      parent: 0,
+      rightOf: 0,
+      width: 111
+    })
 
     // Add an element to the array
     divArray.push({ id: 4, value: 4 })
@@ -409,12 +474,32 @@ describe('UI Mockup', () => {
 
     const div4Entity = (rootDivEntity + 1) as Entity
     // Divs doesnt change
-    expect(getDiv(div1Entity)).toMatchObject({ parent: rootDivEntity, rightOf: undefined, width: 1 })
-    expect(getDiv(div2Entity)).toMatchObject({ parent: rootDivEntity, rightOf: div1Entity, width: 2 })
-    expect(getDiv(div3Entity)).toMatchObject({ parent: rootDivEntity, rightOf: div2Entity, width: 3 })
-    expect(getDiv(rootDivEntity)).toMatchObject({ parent: 0, rightOf: 0, width: 111 })
+    expect(getDiv(div1Entity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: undefined,
+      width: 1
+    })
+    expect(getDiv(div2Entity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: div1Entity,
+      width: 2
+    })
+    expect(getDiv(div3Entity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: div2Entity,
+      width: 3
+    })
+    expect(getDiv(rootDivEntity)).toMatchObject({
+      parent: 0,
+      rightOf: 0,
+      width: 111
+    })
     // Add div4
-    expect(getDiv(div4Entity)).toMatchObject({ parent: rootDivEntity, rightOf: div3Entity, width: 4 })
+    expect(getDiv(div4Entity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: div3Entity,
+      width: 4
+    })
 
     // Update first elemnt of the array
     divArray[0] = { ...divArray[0], value: 111 }
@@ -435,10 +520,25 @@ describe('UI Mockup', () => {
     const newDivEntity = (div4Entity + 1) as Entity
     // Divs doesnt change
 
-    expect(getDiv(div1Entity)).toMatchObject({ parent: rootDivEntity, rightOf: newDivEntity, width: 111 })
-    expect(getDiv(rootDivEntity)).toMatchObject({ parent: 0, rightOf: 0, width: 111 })
-    expect(getDiv(div4Entity)).toMatchObject({ parent: rootDivEntity, rightOf: div1Entity, width: 4 })
-    expect(getDiv(newDivEntity)).toMatchObject({ parent: rootDivEntity, rightOf: undefined, width: 8 })
-
+    expect(getDiv(div1Entity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: newDivEntity,
+      width: 111
+    })
+    expect(getDiv(rootDivEntity)).toMatchObject({
+      parent: 0,
+      rightOf: 0,
+      width: 111
+    })
+    expect(getDiv(div4Entity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: div1Entity,
+      width: 4
+    })
+    expect(getDiv(newDivEntity)).toMatchObject({
+      parent: rootDivEntity,
+      rightOf: undefined,
+      width: 8
+    })
   })
 })

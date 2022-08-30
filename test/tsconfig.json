@@ -22,7 +22,8 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
-    "alwaysStrict": true
+    "alwaysStrict": true,
+    "jsx": "react-jsx"
   },
   "includes": "*.ts"
 }

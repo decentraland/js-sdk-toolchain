@@ -24,7 +24,7 @@ export declare global {
     // eslint-disable-next-line @typescript-eslint/no-empty-interface
     interface Element extends ReactElement<any, any> {}
 
-    type IntrinsicElements = {
+    interface IntrinsicElements {
       divui: Partial<DivProps>
       textui: Partial<TextOpts>
     }
