@@ -480,6 +480,9 @@ export namespace Vector3 {
     export function Zero(): MutableVector3;
 }
 
+// @public (undocumented)
+export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
+
 // Warnings were encountered during analysis:
 //
 // dist/engine/component.d.ts:24:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
@@ -532,8 +535,6 @@ export namespace Vector3 {
 // dist/engine/types.d.ts:95:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
 // dist/engine/types.d.ts:104:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/types.d.ts:105:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// @public (undocumented)
-export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 
 // (No @packageDocumentation comment for this package)
 
