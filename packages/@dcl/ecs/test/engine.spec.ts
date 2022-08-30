@@ -6,6 +6,7 @@ import { createByteBuffer } from '../src/serialization/ByteBuffer'
 import { createRendererTransport } from '../src/systems/crdt/transports/rendererTransport'
 import { Schemas } from '../src/schemas'
 import { TransformSchema } from '../src/components/legacy/Transform'
+import { Entity } from '../src'
 
 const PositionSchema = {
   x: Schemas.Float
@@ -516,10 +517,10 @@ describe('Engine tests', () => {
 
   it('should remove the component after the update', () => {
     const engine = Engine()
-    const entity = engine.addEntity()
-    engine.baseComponents.PointerEventsResult.create(entity)
+    const rootentiy = (0 as Entity)
+    engine.baseComponents.PointerEventsResult.create(rootentiy)
     engine.update(1 / 30)
-    expect(engine.baseComponents.PointerEventsResult.has(entity)).toBe(false)
+    expect(engine.baseComponents.PointerEventsResult.has(rootentiy)).toBe(false)
   })
 
   it('should return the default component of the transform', () => {
