@@ -20,9 +20,11 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             direction: { x: 1, y: 2, z: 3 },
             normalHit: { x: 1, y: 2, z: 3 },
             origin: { x: 1, y: 2, z: 3 },
-            meshName: 'mesh'
+            meshName: 'mesh',
+            entityId: 515
           },
-          state: PointerEventType.DOWN
+          state: PointerEventType.DOWN,
+          analog: 5
         }
       ]
     })
@@ -38,9 +40,11 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             direction: { x: 3, y: 4, z: 5 },
             normalHit: { x: 3, y: 4, z: 5 },
             origin: { x: 3, y: 4, z: 5 },
-            meshName: 'meshNew'
+            meshName: 'meshNew',
+            entityId: 5154
           },
-          state: PointerEventType.UP
+          state: PointerEventType.UP,
+          analog: 55
         },
         {
           button: ActionButton.ACTION_5,
@@ -53,7 +57,8 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             origin: { x: 3, y: 4, z: 5 },
             meshName: 'meshNew'
           },
-          state: PointerEventType.UP
+          state: PointerEventType.UP,
+          analog: 523
         }
       ]
     })
