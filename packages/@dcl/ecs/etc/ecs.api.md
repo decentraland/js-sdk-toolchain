@@ -118,26 +118,26 @@ export namespace Components {
     //
     // (undocumented)
     OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerDownResult" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
     const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUp" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUpResult" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
     const // Warning: (ae-forgotten-export) The symbol "PBPlaneShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+    const // Warning: (ae-forgotten-export) The symbol "PBPointerEventsResult" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
     const // Warning: (ae-forgotten-export) The symbol "PBPointerLock" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    const // Warning: (ae-forgotten-export) The symbol "PBRaycastResult" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
     const // Warning: (ae-forgotten-export) The symbol "PBSphereShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -150,6 +150,10 @@ export namespace Components {
     //
     // (undocumented)
     UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    const // Warning: (ae-forgotten-export) The symbol "PBVisibilityComponent" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 }
 
 // @public (undocumented)
@@ -246,13 +250,7 @@ export type Nullable<T> = T | null;
 export const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
 
 // @public (undocumented)
-export const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-
-// @public (undocumented)
 export const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-
-// @public (undocumented)
-export const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
 
 // @public
 export enum Orientation {
@@ -262,6 +260,9 @@ export enum Orientation {
 
 // @public (undocumented)
 export const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+
+// @public (undocumented)
+export const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
 
 // @public (undocumented)
 export const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
@@ -314,6 +315,9 @@ export namespace Quaternion {
 
 // @public
 export const RAD2DEG: number;
+
+// @public (undocumented)
+export const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
 
 // Warning: (ae-forgotten-export) The symbol "ToOptional" needs to be exported by the entry point index.d.ts
 //
@@ -460,6 +464,9 @@ export namespace Vector3 {
     export function Up(): MutableVector3;
     export function Zero(): MutableVector3;
 }
+
+// @public (undocumented)
+export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 
 // (No @packageDocumentation comment for this package)
 
