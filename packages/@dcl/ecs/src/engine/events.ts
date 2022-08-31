@@ -1,5 +1,5 @@
-import {Entity} from "./entity";
-import {engine} from "../initialization";
+import { Entity } from "./entity";
+import { engine } from "../runtime/initialization";
 import {
   PBPointerEventsResult_PointerCommand
 } from "../components/generated/pb/PointerEventsResult.gen";
