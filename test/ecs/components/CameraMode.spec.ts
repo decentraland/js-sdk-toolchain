@@ -18,6 +18,12 @@ describe('Generated CameraMode ProtoBuf', () => {
     const buffer = CameraMode.toBinary(entity)
     CameraMode.updateFromBinary(entityB, buffer)
 
+    const immutableCameraMode = CameraMode.get(entity)
+    switch (immutableCameraMode.mode) {
+      case CameraModeValue.FIRST_PERSON:
+        break
+    }
+
     expect(_cameraMode).toBeDeepCloseTo({
       ...CameraMode.getMutable(entityB)
     })
