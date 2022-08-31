@@ -10,10 +10,10 @@ describe('Generated MeshCollider ProtoBuf', () => {
 
     const _meshCollider = MeshCollider.create(entity, {
       box: {},
-      sphere: undefined,
+      sphere: {},
       cylinder: { radiusBottom: 1, radiusTop: 2 },
-      plane: undefined,
-      collisionMask: undefined
+      plane: {},
+      collisionMask: ColliderLayer.Pointer
     })
 
     MeshCollider.create(entityB, {
