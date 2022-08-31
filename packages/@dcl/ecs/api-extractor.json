@@ -182,7 +182,10 @@
      * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
      * DEFAULT VALUE: "<projectFolder>/dist/<unscopedPackageName>.d.ts"
      */
-    "untrimmedFilePath": "<projectFolder>/dist/index.d.ts",
+    // "untrimmedFilePath": "<projectFolder>/dist/index.d.ts",
+    "publicTrimmedFilePath": "<projectFolder>/dist/index.d.ts",
+    "alphaTrimmedFilePath": "<projectFolder>/dist/alpha.d.ts",
+    "betaTrimmedFilePath": "<projectFolder>/dist/beta.d.ts",
     /**
      * Specifies the output path for a .d.ts rollup file to be generated with trimming for an "alpha" release.
      * This file will include only declarations that are marked as "@public", "@beta", or "@alpha".
@@ -317,8 +320,12 @@
      */
     "extractorMessageReporting": {
       "default": {
-        "logLevel": "warning"
-        // "addToApiReportFile": false
+        "logLevel": "warning",
+        "addToApiReportFile": true
+      },
+      "ae-forgotten-export": {
+        "logLevel": "error",
+        "addToApiReportFile": true
       }
       // "ae-extra-release-tag": {
       //   "logLevel": "warning",
@@ -336,8 +343,8 @@
      */
     "tsdocMessageReporting": {
       "default": {
-        "logLevel": "warning"
-        // "addToApiReportFile": false
+        "logLevel": "warning",
+        "addToApiReportFile": true
       }
       // "tsdoc-link-tag-unescaped-text": {
       //   "logLevel": "warning",
