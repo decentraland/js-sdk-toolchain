@@ -1,24 +1,24 @@
 import { ComponentDefinition } from './component'
 
 /**
- * @internal
+ * @public
  */
 export type DeepReadonlyMap<K, V> = ReadonlyMap<
   DeepReadonly<K>,
   DeepReadonly<V>
 >
 /**
- * @internal
+ * @public
  */
 export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>
 /**
- * @internal
+ * @public
  */
 export type DeepReadonlyObject<T> = {
   readonly [K in keyof T]: DeepReadonly<T[K]>
 }
 /**
- * @internal
+ * @public
  */
 export type ReadonlyPrimitive =
   | number
@@ -29,7 +29,7 @@ export type ReadonlyPrimitive =
   | boolean[]
 
 /**
- * @internal
+ * @public
  */
 export type ReadonlyComponentSchema<
   T extends [ComponentDefinition, ...ComponentDefinition[]]
@@ -40,7 +40,7 @@ export type ReadonlyComponentSchema<
 }
 
 /**
- * @internal
+ * @public
  */
 export type DeepReadonly<T> = T extends ReadonlyPrimitive
   ? T

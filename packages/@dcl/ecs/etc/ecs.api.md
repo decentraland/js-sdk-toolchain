@@ -168,19 +168,19 @@ export type ComponentType<T extends ISchema> = EcsResult<T>;
 // @public (undocumented)
 export const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
 
-// Warning: (ae-forgotten-export) The symbol "ReadonlyPrimitive" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "DeepReadonlyMap" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "DeepReadonlySet" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "DeepReadonlyObject" needs to be exported by the entry point index.d.ts
-// Warning: (ae-missing-release-tag) "DeepReadonly" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type DeepReadonly<T> = T extends ReadonlyPrimitive ? T : T extends Map<infer K, infer V> ? DeepReadonlyMap<K, V> : T extends Set<infer M> ? DeepReadonlySet<M> : DeepReadonlyObject<T>;
 
-// Warning: (ae-missing-release-tag) "deepReadonly" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
-export function deepReadonly<T extends Record<string, unknown>>(val: T): DeepReadonly<T>;
+export type DeepReadonlyMap<K, V> = ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>;
+
+// @public (undocumented)
+export type DeepReadonlyObject<T> = {
+    readonly [K in keyof T]: DeepReadonly<T[K]>;
+};
+
+// @public (undocumented)
+export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 
 // @public
 export const DEG2RAD: number;
@@ -342,12 +342,13 @@ export namespace Quaternion {
 // @public
 export const RAD2DEG: number;
 
-// Warning: (ae-missing-release-tag) "ReadonlyComponentSchema" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type ReadonlyComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
     [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['get']> : never;
 };
+
+// @public (undocumented)
+export type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
 
 // Warning: (ae-forgotten-export) The symbol "ToOptional" needs to be exported by the entry point index.d.ts
 //

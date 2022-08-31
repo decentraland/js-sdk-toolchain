@@ -407,9 +407,10 @@ declare interface CreateByteBufferOptions {
 /** @public */
 declare const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
 
+/**
+ * @public
+ */
 declare type DeepReadonly<T> = T extends ReadonlyPrimitive ? T : T extends Map<infer K, infer V> ? DeepReadonlyMap<K, V> : T extends Set<infer M> ? DeepReadonlySet<M> : DeepReadonlyObject<T>;
-
-declare function deepReadonly<T extends Record<string, unknown>>(val: T): DeepReadonly<T>;
 
 /**
  * Make each field readonly deeply
@@ -419,12 +420,21 @@ declare type DeepReadonly_2<T> = {
     readonly [P in keyof T]: DeepReadonly_2<T[P]>;
 };
 
+/**
+ * @public
+ */
 declare type DeepReadonlyMap<K, V> = ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>;
 
+/**
+ * @public
+ */
 declare type DeepReadonlyObject<T> = {
     readonly [K in keyof T]: DeepReadonly<T[K]>;
 };
 
+/**
+ * @public
+ */
 declare type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 
 declare function defineSdkComponents(engine: PreEngine): {
@@ -2043,10 +2053,16 @@ declare namespace Quaternion {
  */
 declare const RAD2DEG: number;
 
+/**
+ * @public
+ */
 declare type ReadonlyComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
     [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['get']> : never;
 };
 
+/**
+ * @public
+ */
 declare type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
 
 declare type ReceiveMessage = {
