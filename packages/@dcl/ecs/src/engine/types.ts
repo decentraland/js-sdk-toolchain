@@ -5,7 +5,7 @@ import { Transport } from '../systems/crdt/transports/types'
 import { ComponentDefinition as CompDef, ComponentType } from './component'
 import { Entity } from './entity'
 import { Update } from './systems'
-import type { DeepReadonly } from './utils'
+import { ReadonlyComponentSchema } from './readonly'
 
 export { ISchema } from '../schemas/ISchema'
 
@@ -136,7 +136,7 @@ export type IEngine = {
    */
   getEntitiesWith<T extends [CompDef, ...CompDef[]]>(
     ...components: T
-  ): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>
+  ): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>
 
   /**
    * @internal
