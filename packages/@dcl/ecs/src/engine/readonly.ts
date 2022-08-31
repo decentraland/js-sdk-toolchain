@@ -1,9 +1,26 @@
 import { ComponentDefinition } from './component'
 
-type DeepReadonlyMap<K, V> = ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>
-type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>
-type DeepReadonlyObject<T> = { readonly [K in keyof T]: DeepReadonly<T[K]> }
-type ReadonlyPrimitive =
+/**
+ * @internal
+ */
+export type DeepReadonlyMap<K, V> = ReadonlyMap<
+  DeepReadonly<K>,
+  DeepReadonly<V>
+>
+/**
+ * @internal
+ */
+export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>
+/**
+ * @internal
+ */
+export type DeepReadonlyObject<T> = {
+  readonly [K in keyof T]: DeepReadonly<T[K]>
+}
+/**
+ * @internal
+ */
+export type ReadonlyPrimitive =
   | number
   | string
   | number[]
@@ -11,6 +28,9 @@ type ReadonlyPrimitive =
   | boolean
   | boolean[]
 
+/**
+ * @internal
+ */
 export type ReadonlyComponentSchema<
   T extends [ComponentDefinition, ...ComponentDefinition[]]
 > = {
@@ -19,6 +39,9 @@ export type ReadonlyComponentSchema<
     : never
 }
 
+/**
+ * @internal
+ */
 export type DeepReadonly<T> = T extends ReadonlyPrimitive
   ? T
   : T extends Map<infer K, infer V>
@@ -27,6 +50,9 @@ export type DeepReadonly<T> = T extends ReadonlyPrimitive
   ? DeepReadonlySet<M>
   : DeepReadonlyObject<T>
 
+/**
+ * @internal
+ */
 export function deepReadonly<T extends Record<string, unknown>>(
   val: T
 ): DeepReadonly<T> {
