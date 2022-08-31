@@ -431,6 +431,7 @@ describe('UI Mockup', () => {
       { id: 2, value: 2 },
       { id: 3, value: 3 }
     ]
+
     const rootDivEntity = (entityIndex + divArray.length + 1) as Entity
     const div1Entity = (entityIndex + 1) as Entity
     const div2Entity = (entityIndex + 2) as Entity

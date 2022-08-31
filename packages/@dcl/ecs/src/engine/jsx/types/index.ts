@@ -8,7 +8,6 @@ import {
   YGWrap,
   YGOverflow
 } from '../../../components/generated/pb/UiTransform.gen'
-
 import { Entity } from '../../entity'
 
 /**

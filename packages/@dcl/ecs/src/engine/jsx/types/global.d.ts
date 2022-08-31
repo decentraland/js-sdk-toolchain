@@ -1,6 +1,3 @@
-import { DivProps } from '..'
-import { PBUiText } from '../../../components/generated/pb/UiText.gen'
-
 export type Key = string | number
 export interface ReactElement<
   P = any,
@@ -17,16 +14,14 @@ export type JSXElementConstructor<P> = (
   props: P
 ) => ReactElement<any, any> | null
 
-export type TextOpts = Partial<Omit<PBUiText, 'text'>>
-
 export declare global {
   export namespace JSX {
     // eslint-disable-next-line @typescript-eslint/no-empty-interface
     interface Element extends ReactElement<any, any> {}
 
     interface IntrinsicElements {
-      divui: Partial<DivProps>
-      textui: Partial<TextOpts>
+      divui: unknown
+      textui: unknown
     }
 
     // eslint-disable-next-line @typescript-eslint/no-empty-interface
