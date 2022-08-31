@@ -229,6 +229,8 @@ declare namespace Components {
     /** @public */
     const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     /** @public */
+    const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+    /** @public */
     const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
     /** @public */
     const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
@@ -452,6 +454,7 @@ declare function defineSdkComponents(engine: PreEngine): {
     CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
     GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
     OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
     OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
@@ -1403,6 +1406,9 @@ declare namespace Matrix {
 }
 
 /** @public */
+declare const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+
+/** @public */
 declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
 
 /** @public */
@@ -1589,6 +1595,31 @@ declare interface PBMaterial_Texture {
     wrapMode?: TextureWrapMode | undefined;
     /** default = FilterMode.Bilinear */
     filterMode?: FilterMode | undefined;
+}
+
+declare interface PBMeshCollider {
+    /** default = ColliderLayer.Physics | ColliderLayer.Pointer */
+    collisionMask?: number | undefined;
+    box: PBMeshCollider_BoxMesh | undefined;
+    sphere: PBMeshCollider_SphereMesh | undefined;
+    cylinder: PBMeshCollider_CylinderMesh | undefined;
+    plane: PBMeshCollider_PlaneMesh | undefined;
+}
+
+declare interface PBMeshCollider_BoxMesh {
+}
+
+declare interface PBMeshCollider_CylinderMesh {
+    /** default=1.0 */
+    radiusTop?: number | undefined;
+    /** default=1.0 */
+    radiusBottom?: number | undefined;
+}
+
+declare interface PBMeshCollider_PlaneMesh {
+}
+
+declare interface PBMeshCollider_SphereMesh {
 }
 
 declare interface PBMeshRenderer {
