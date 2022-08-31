@@ -775,17 +775,17 @@ export class Entity implements IEntity {
     eventManager: EventManager | null;
     getComponent<T = any>(component: string): T;
     // (undocumented)
-    getComponent<T>(component: ComponentConstructor<T>): T;
-    getComponentOrCreate<T>(component: ComponentConstructor<T> & {
+    getComponent<T extends ComponentLike>(component: ComponentConstructor<T>): T;
+    getComponentOrCreate<T extends ComponentLike>(component: ComponentConstructor<T> & {
         new (): T;
     }): T;
     getComponentOrNull<T = any>(component: string): T | null;
     // (undocumented)
-    getComponentOrNull<T>(component: ComponentConstructor<T>): T | null;
+    getComponentOrNull<T extends ComponentLike>(component: ComponentConstructor<T>): T | null;
     getParent(): IEntity | null;
     hasComponent<T = any>(component: string): boolean;
     // (undocumented)
-    hasComponent<T>(component: ComponentConstructor<T>): boolean;
+    hasComponent<T extends ComponentLike>(component: ComponentConstructor<T>): boolean;
     // (undocumented)
     hasComponent<T extends object>(component: T): boolean;
     isAddedToEngine(): boolean;
@@ -966,28 +966,28 @@ export interface IEntity {
     // (undocumented)
     getComponent<T = any>(component: string): T;
     // (undocumented)
-    getComponent<T>(component: ComponentConstructor<T>): T;
+    getComponent<T extends ComponentLike>(component: ComponentConstructor<T>): T;
     // (undocumented)
-    getComponent<T>(component: ComponentConstructor<T> | string): T;
+    getComponent<T extends ComponentLike>(component: ComponentConstructor<T> | string): T;
     // (undocumented)
-    getComponentOrCreate<T>(component: ComponentConstructor<T> & {
+    getComponentOrCreate<T extends ComponentLike>(component: ComponentConstructor<T> & {
         new (): T;
     }): T;
     getComponentOrNull<T = any>(component: string): T | null;
     // (undocumented)
-    getComponentOrNull<T>(component: ComponentConstructor<T>): T | null;
+    getComponentOrNull<T extends ComponentLike>(component: ComponentConstructor<T>): T | null;
     // (undocumented)
-    getComponentOrNull<T>(component: ComponentConstructor<T> | string): T | null;
+    getComponentOrNull<T extends ComponentLike>(component: ComponentConstructor<T> | string): T | null;
     // (undocumented)
     getParent(): IEntity | null;
     // (undocumented)
     hasComponent<T = any>(component: string): boolean;
     // (undocumented)
-    hasComponent<T>(component: ComponentConstructor<T>): boolean;
+    hasComponent<T extends ComponentLike>(component: ComponentConstructor<T>): boolean;
     // (undocumented)
     hasComponent<T extends object>(component: T): boolean;
     // (undocumented)
-    hasComponent<T>(component: ComponentConstructor<T> | string): boolean;
+    hasComponent<T extends ComponentLike>(component: ComponentConstructor<T> | string): boolean;
     // (undocumented)
     isAddedToEngine(): boolean;
     // (undocumented)

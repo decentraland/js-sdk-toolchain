@@ -11,8 +11,8 @@
   "author": "Decentraland",
   "license": "Apache 2.0",
   "dependencies": {
-    "terser": "^5.7.2",
-    "typescript": "^4.4.2"
+    "terser": "^5.15.0",
+    "typescript": "^4.8.2"
   },
   "files": [
     "index.js"

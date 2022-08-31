@@ -47,18 +47,26 @@ export interface IEntity {
   setParent(e: IEntity | Attachable | null): void
 
   getComponent<T = any>(component: string): T
-  getComponent<T>(component: ComponentConstructor<T>): T
-  getComponent<T>(component: ComponentConstructor<T> | string): T
+  getComponent<T extends ComponentLike>(component: ComponentConstructor<T>): T
+  getComponent<T extends ComponentLike>(
+    component: ComponentConstructor<T> | string
+  ): T
 
   /**
    * Gets a component, if it doesn't exist, it returns null.
    * @param component - component class or name
    */
   getComponentOrNull<T = any>(component: string): T | null
-  getComponentOrNull<T>(component: ComponentConstructor<T>): T | null
-  getComponentOrNull<T>(component: ComponentConstructor<T> | string): T | null
+  getComponentOrNull<T extends ComponentLike>(
+    component: ComponentConstructor<T>
+  ): T | null
+  getComponentOrNull<T extends ComponentLike>(
+    component: ComponentConstructor<T> | string
+  ): T | null
 
-  getComponentOrCreate<T>(component: ComponentConstructor<T> & { new (): T }): T
+  getComponentOrCreate<T extends ComponentLike>(
+    component: ComponentConstructor<T> & { new (): T }
+  ): T
 
   /**
    * Adds a component. If the component already exist, it throws an Error.
@@ -85,9 +93,13 @@ export interface IEntity {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   hasComponent<T = any>(component: string): boolean
-  hasComponent<T>(component: ComponentConstructor<T>): boolean
+  hasComponent<T extends ComponentLike>(
+    component: ComponentConstructor<T>
+  ): boolean
   hasComponent<T extends object>(component: T): boolean
-  hasComponent<T>(component: ComponentConstructor<T> | string): boolean
+  hasComponent<T extends ComponentLike>(
+    component: ComponentConstructor<T> | string
+  ): boolean
 }
 
 /**
