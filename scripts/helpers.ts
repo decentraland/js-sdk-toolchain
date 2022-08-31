@@ -134,7 +134,7 @@ export function copyFile(from: string, to: string) {
     }
   }
 
-  copySync(from, to)
+  copySync(from, to, { recursive: true })
 
   if (!existsSync(to)) {
     throw new Error(`${to} does not exist`)

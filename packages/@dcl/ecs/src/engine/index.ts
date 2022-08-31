@@ -1,22 +1,23 @@
-import { crdtSceneSystem } from '../systems/crdt'
-import { Entity, EntityContainer } from './entity'
-import {
-  ComponentType,
-  ComponentDefinition,
-  defineComponent as defComponent
-} from './component'
-import type { ComponentSchema, IEngineParams } from './types'
-import type { DeepReadonly } from '../Math'
-import { IEngine } from './types'
-import { ByteBuffer } from '../serialization/ByteBuffer'
-import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
+import { defineSdkComponents } from '../components'
+import { Schemas } from '../schemas'
 import { ISchema } from '../schemas/ISchema'
 import { Result, Spec } from '../schemas/Map'
-import { Schemas } from '../schemas'
-import { defineSdkComponents } from '../components'
+import { ByteBuffer } from '../serialization/ByteBuffer'
+import { crdtSceneSystem } from '../systems/crdt'
+import {
+  ComponentDefinition,
+  ComponentType,
+  defineComponent as defComponent
+} from './component'
+import { Entity, EntityContainer } from './entity'
+import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
+import type { IEngineParams } from './types'
+import { IEngine } from './types'
+import { ReadonlyComponentSchema } from './readonly'
 
-export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
+export * from './readonly'
 export * from './types'
+export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
 
 function preEngine() {
   const entityContainer = EntityContainer()
@@ -110,11 +111,11 @@ function preEngine() {
 
   function* getEntitiesWith<
     T extends [ComponentDefinition, ...ComponentDefinition[]]
-  >(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]> {
+  >(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]> {
     for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
       yield [entity, ...groupComp.map((c) => c.get(entity))] as [
         Entity,
-        ...DeepReadonly<ComponentSchema<T>>
+        ...ReadonlyComponentSchema<T>
       ]
     }
   }

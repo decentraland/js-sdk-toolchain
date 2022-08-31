@@ -5,7 +5,9 @@ import { Transport } from '../systems/crdt/transports/types'
 import { ComponentDefinition as CompDef, ComponentType } from './component'
 import { Entity } from './entity'
 import { Update } from './systems'
-import type { DeepReadonly } from './utils'
+import { ReadonlyComponentSchema } from './readonly'
+
+export { ISchema } from '../schemas/ISchema'
 
 /**
  * @public
@@ -84,7 +86,7 @@ export type IEngine = {
    * ```
    */
   defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(
-    spec: Spec,
+    spec: T,
     componentId: number,
     constructorDefault?: Partial<Result<T>>
   ): CompDef<ISchema<Result<T>>, ConstructorType>
@@ -128,13 +130,13 @@ export type IEngine = {
    * Example:
    * ```ts
    * for (const [entity, boxShape, transform] of engine.getEntitiesWith(BoxShape, Transform)) {
-   * // the properties of boxShape and transform are read only
+   *   // the properties of boxShape and transform are read only
    * }
    * ```
    */
   getEntitiesWith<T extends [CompDef, ...CompDef[]]>(
     ...components: T
-  ): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>
+  ): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>
 
   /**
    * @internal
