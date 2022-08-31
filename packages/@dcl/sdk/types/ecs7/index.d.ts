@@ -588,7 +588,7 @@ declare type IEngine = {
      *
      * ```
      */
-    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: Spec, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
     /**
      * Define a component and add it to the engine.
      * @param spec An object with schema fields

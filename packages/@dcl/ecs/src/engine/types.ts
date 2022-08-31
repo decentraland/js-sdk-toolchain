@@ -86,7 +86,7 @@ export type IEngine = {
    * ```
    */
   defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(
-    spec: Spec,
+    spec: T,
     componentId: number,
     constructorDefault?: Partial<Result<T>>
   ): CompDef<ISchema<Result<T>>, ConstructorType>

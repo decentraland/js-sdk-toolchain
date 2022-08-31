@@ -225,7 +225,7 @@ export type IEngine = {
     removeEntity(entity: Entity): void;
     addSystem(system: Update, priority?: number, name?: string): void;
     removeSystem(selector: string | Update): boolean;
-    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: Spec, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
     defineComponentFromSchema<T extends ISchema<Record<string, any>>, ConstructorType = ComponentType<T>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
