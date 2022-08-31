@@ -1,23 +1,8 @@
-export type Key = string | number
-export interface ReactElement<
-  P = any,
-  T extends string | JSXElementConstructor<any> =
-    | string
-    | JSXElementConstructor<any>
-> {
-  type: T
-  props: P
-  key: Key | null
-}
-
-export type JSXElementConstructor<P> = (
-  props: P
-) => ReactElement<any, any> | null
-
 export declare global {
+  import React from 'react'
   export namespace JSX {
     // eslint-disable-next-line @typescript-eslint/no-empty-interface
-    interface Element extends ReactElement<any, any> {}
+    interface Element extends React.ReactElement<any, any> {}
 
     interface IntrinsicElements {
       divui: unknown

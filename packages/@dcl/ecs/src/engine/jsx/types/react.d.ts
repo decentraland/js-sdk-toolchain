@@ -1,8 +1,25 @@
 declare module 'react' {
-  export const react: unknown
-  export type Component<_T = any, _K = any> = any
-  export type ReactNode = any
+  export namespace react {
+    export type Component<_T = any, _K = any> = any
+    export type ReactNode = any
+    export type Key = string | number
+    export interface ReactElement<
+      P = any,
+      T extends string | JSXElementConstructor<any> =
+        | string
+        | JSXElementConstructor<any>
+    > {
+      type: T
+      props: P
+      key: Key | null
+    }
+
+    export type JSXElementConstructor<P> = (
+      props: P
+    ) => ReactElement<any, any> | null
+  }
   export default react
+  export = react
 }
 
 declare module 'react/jsx-runtime' {
