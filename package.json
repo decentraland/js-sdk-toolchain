@@ -7,7 +7,6 @@
     "test": "tests"
   },
   "dependencies": {
-    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-2936953955.commit-0235648.tgz",
     "@types/fs-extra": "^9.0.12",
     "@types/jest": "^28.1.8",
     "@types/rimraf": "^3.0.0",
