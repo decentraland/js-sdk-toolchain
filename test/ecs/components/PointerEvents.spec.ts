@@ -1,6 +1,6 @@
-import {Engine} from '../../../packages/@dcl/ecs/src/engine'
-import {ActionButton} from "../../../packages/@dcl/ecs/src/components/generated/pb/common/ActionButton.gen";
-import {PointerEventType} from "../../../packages/@dcl/ecs/src/components/generated/pb/PointerEvents.gen";
+import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+import { ActionButton } from "../../../packages/@dcl/ecs/src/components/generated/pb/common/ActionButton.gen";
+import { PointerEventType } from "../../../packages/@dcl/ecs/src/components/generated/pb/PointerEvents.gen";
 
 describe('Generated OnPointerDown ProtoBuf', () => {
   it('should serialize/deserialize OnPointerUp', () => {
