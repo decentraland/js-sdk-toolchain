@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "target": "es2020",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "emitDeclarationOnly": true,
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "allowSyntheticDefaultImports": true,
+        "declaration": true,
+        "stripInternal": true,
+        "downlevelIteration": true,
+        "preserveConstEnums": true,
+        "outFile": "index.js"
+    },
+    "include": [
+        "index.gen.ts"
+    ],
+    "exclude": []
+}
