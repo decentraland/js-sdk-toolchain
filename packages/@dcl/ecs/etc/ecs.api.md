@@ -105,6 +105,10 @@ export namespace Components {
     //
     // (undocumented)
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    const // Warning: (ae-forgotten-export) The symbol "PBMeshCollider" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
     const // Warning: (ae-forgotten-export) The symbol "PBMeshRenderer" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -113,18 +117,14 @@ export namespace Components {
     //
     // (undocumented)
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
-    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerDown" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUp" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
     const // Warning: (ae-forgotten-export) The symbol "PBPlaneShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+    const // Warning: (ae-forgotten-export) The symbol "PBPointerEvents" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     const // Warning: (ae-forgotten-export) The symbol "PBPointerEventsResult" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -207,6 +207,7 @@ export type float = number;
 export type FloatArray = number[];
 
 // Warning: (ae-forgotten-export) The symbol "PBPointerEventsResult_PointerCommand" needs to be exported by the entry point index.d.ts
+// Warning: (ae-missing-release-tag) "getPointerEvents" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export function getPointerEvents(): Iterable<[Entity, PBPointerEventsResult_PointerCommand]>;
@@ -255,6 +256,9 @@ export const log: (...a: any[]) => void;
 export const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
 
 // @public (undocumented)
+export const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+
+// @public (undocumented)
 export const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
 
 // @public (undocumented)
@@ -262,12 +266,6 @@ export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
 
 // @public (undocumented)
 export type Nullable<T> = T | null;
-
-// @public (undocumented)
-export const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-
-// @public (undocumented)
-export const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
 
 // @public
 export enum Orientation {
@@ -277,6 +275,9 @@ export enum Orientation {
 
 // @public (undocumented)
 export const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+
+// @public (undocumented)
+export const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
 
 // @public (undocumented)
 export const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;

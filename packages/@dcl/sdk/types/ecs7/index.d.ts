@@ -229,15 +229,15 @@ declare namespace Components {
     /** @public */
     const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     /** @public */
+    const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+    /** @public */
     const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
     /** @public */
     const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
     /** @public */
-    const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-    /** @public */
-    const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-    /** @public */
     const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+    /** @public */
+    const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     /** @public */
     const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
     /** @public */
@@ -430,10 +430,10 @@ declare function defineSdkComponents(engine: PreEngine): {
     CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
     GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
-    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
     PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+    PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
     RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
@@ -462,10 +462,6 @@ declare type EcsResult<T extends ISchema> = T extends ISchema ? ReturnType<T['de
  */
 declare function Engine({ transports }?: IEngineParams): IEngine;
 
-/**
- * @alpha * This file initialization is an alpha one. This is based on the old-ecs
- * init and it'll be changing.
- */
 declare const engine: IEngine;
 
 /**
@@ -603,7 +599,7 @@ declare type IEngine = {
      * Example:
      * ```ts
      * for (const [entity, boxShape, transform] of engine.getEntitiesWith(BoxShape, Transform)) {
-     * // the properties of boxShape and transform are read only
+     *   // the properties of boxShape and transform are read only
      * }
      * ```
      */
@@ -1387,6 +1383,9 @@ declare namespace Matrix {
 }
 
 /** @public */
+declare const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+
+/** @public */
 declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
 
 /** @public */
@@ -1402,12 +1401,6 @@ declare type OnlyNonUndefinedTypes<T> = {
 declare type OnlyOptionalUndefinedTypes<T> = {
     [K in IncludeUndefined<T>]?: T[K];
 };
-
-/** @public */
-declare const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-
-/** @public */
-declare const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
 
 /**
  * Defines potential orientation for back face culling
@@ -1569,6 +1562,31 @@ declare interface PBMaterial_Texture {
     filterMode?: FilterMode | undefined;
 }
 
+declare interface PBMeshCollider {
+    /** default = ColliderLayer.Physics | ColliderLayer.Pointer */
+    collisionMask?: number | undefined;
+    box: PBMeshCollider_BoxMesh | undefined;
+    sphere: PBMeshCollider_SphereMesh | undefined;
+    cylinder: PBMeshCollider_CylinderMesh | undefined;
+    plane: PBMeshCollider_PlaneMesh | undefined;
+}
+
+declare interface PBMeshCollider_BoxMesh {
+}
+
+declare interface PBMeshCollider_CylinderMesh {
+    /** default=1.0 */
+    radiusTop?: number | undefined;
+    /** default=1.0 */
+    radiusBottom?: number | undefined;
+}
+
+declare interface PBMeshCollider_PlaneMesh {
+}
+
+declare interface PBMeshCollider_SphereMesh {
+}
+
 declare interface PBMeshRenderer {
     box: PBMeshRenderer_BoxMesh | undefined;
     sphere: PBMeshRenderer_SphereMesh | undefined;
@@ -1607,28 +1625,6 @@ declare interface PBNFTShape {
     color?: Color3 | undefined;
 }
 
-declare interface PBOnPointerDown {
-    /** default=ActionButton.ANY */
-    button?: ActionButton | undefined;
-    /** default='Interact' */
-    hoverText?: string | undefined;
-    /** default=10 */
-    maxDistance?: number | undefined;
-    /** default=true */
-    showFeedback?: boolean | undefined;
-}
-
-declare interface PBOnPointerUp {
-    /** default=ActionButton.ANY */
-    button?: ActionButton | undefined;
-    /** default='Interact' */
-    hoverText?: string | undefined;
-    /** default=10 */
-    maxDistance?: number | undefined;
-    /** default=true */
-    showFeedback?: boolean | undefined;
-}
-
 declare interface PBPlaneShape {
     /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
     withCollisions?: boolean | undefined;
@@ -1637,6 +1633,10 @@ declare interface PBPlaneShape {
     /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
     visible?: boolean | undefined;
     uvs: number[];
+}
+
+declare interface PBPointerEvents {
+    pointerEvents: PointerEventEntry[];
 }
 
 /** the renderer will set this component to the root entity once per frame with all the events */
@@ -1835,6 +1835,25 @@ declare namespace Plane {
 
 /** @public */
 declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+
+declare interface PointerEvent_2 {
+    /** default=ActionButton.ANY */
+    button?: ActionButton | undefined;
+    /** default='Interact' */
+    hoverText?: string | undefined;
+    /** default=10 */
+    maxDistance?: number | undefined;
+    /** default=true */
+    showFeedback?: boolean | undefined;
+}
+
+declare interface PointerEventEntry {
+    eventType: PointerEventType;
+    eventInfo: PointerEvent_2 | undefined;
+}
+
+/** @public */
+declare const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
 
 /** @public */
 declare const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
