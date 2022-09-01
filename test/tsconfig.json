@@ -23,7 +23,8 @@
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
     "alwaysStrict": true,
-    "jsx": "react-jsx"
+    "jsx": "react",
+    "jsxFactory": "ReactEcs.createElement"
   },
   "includes": "*.ts"
 }

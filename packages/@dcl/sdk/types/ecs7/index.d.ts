@@ -728,6 +728,7 @@ declare function defineSdkComponents(engine: PreEngine): {
  */
 declare const DEG2RAD: number;
 
+<<<<<<< HEAD
 /**
  * @public
  */
@@ -770,6 +771,8 @@ declare function DivUi(props: Partial<DivProps> & {
     key?: string | number;
 }): JSX.Element;
 
+=======
+>>>>>>> 8483007 (move react to @dcl/react-ecs package)
 /** @public */
 declare type double = number;
 >>>>>>> c1913cb (move react-reconciler to engine)
@@ -1161,7 +1164,7 @@ declare type IEngine = {
      */
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
     baseComponents: SdkComponents;
-    renderUI(renderTree: () => JSX.Element): number;
+    renderUI(renderTree: () => any): number;
     removeUI(ui: number): void;
 >>>>>>> c1913cb (move react-reconciler to engine)
 };
@@ -2638,6 +2641,7 @@ declare function preEngine(): {
 /**
  * @public
  */
+<<<<<<< HEAD
 declare type Position = {
     top: number | string;
     right: number | string;
@@ -2649,6 +2653,8 @@ declare type Position = {
 /**
  * @public
  */
+=======
+>>>>>>> 8483007 (move react to @dcl/react-ecs package)
 declare type PreEngine = ReturnType<typeof preEngine>;
 
 declare function preEngine(): {

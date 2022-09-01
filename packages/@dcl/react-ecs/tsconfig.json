@@ -13,18 +13,12 @@
     "downlevelIteration": true,
     "preserveConstEnums": true,
     "outDir": "dist",
-    "types": [
-      "@dcl/posix"
-    ],
     "jsx": "react",
-    "jsxFactory": "ReactEcs.createElement"
+    "jsxFactory": "ReactEcs.createElement",
+    "rootDir": "src"
   },
   "include": [
-    "src",
-    "temp-protocolbuffers"
-  ],
-  "files": [
-    "node_modules/protobufjs/minimal.d.ts"
+    "src"
   ],
   "exclude": [
     "dist"

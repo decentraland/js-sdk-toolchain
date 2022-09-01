@@ -11,4 +11,11 @@ export * from './components/generated/global.gen'
 export * from './components/generated/global.namespace.gen'
 
 export * from './runtime/types'
-export * from './engine/jsx'
+
+declare global {
+  namespace JSX {
+    type Element = any
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    interface IntrinsicElements {}
+  }
+}

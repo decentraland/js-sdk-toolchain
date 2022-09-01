@@ -1,5 +1,4 @@
 import {
-  PBUiTransform,
   YGAlign,
   YGDirection,
   YGDisplay,
@@ -9,10 +8,14 @@ import {
   YGPositionType,
   YGUnit,
   YGWrap
-} from '../../components/generated/pb/UiTransform.gen'
-import { Position } from './types'
+} from './types'
 
-export const CANVAS_ROOT_ENTITY = 7
+type Position = {
+  top: number
+  right: number
+  bottom: number
+  left: number
+}
 
 export const defaultPosition = (pos?: Position) => ({
   top: pos?.top ?? 0,
@@ -21,7 +24,9 @@ export const defaultPosition = (pos?: Position) => ({
   left: pos?.left ?? 0
 })
 
-export const defaultDiv: PBUiTransform = {
+const CANVAS_ROOT_ENTITY = 7
+
+export const defaultDiv = {
   parent: CANVAS_ROOT_ENTITY,
   rightOf: 0,
   display: YGDisplay.YGDisplayFlex,

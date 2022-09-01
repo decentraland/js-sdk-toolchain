@@ -1,7 +1,6 @@
-import React from 'react'
-
 import { Engine, Entity } from '../../../packages/@dcl/ecs/src/engine'
-import { DivUi } from '../../../packages/@dcl/ecs/src/engine/jsx/components'
+import { DivUi, ReactEcs } from '../../../packages/@dcl/react-ecs/src'
+;(globalThis as any).ReactEcs = ReactEcs
 
 describe('UI Mockup', () => {
   it('should generate a UI and update the width of a div', async () => {

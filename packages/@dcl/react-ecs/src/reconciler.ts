@@ -1,24 +1,10 @@
 import Reconciler, { HostConfig } from 'react-reconciler'
-import { IEngine } from '../types'
-import { DivProps } from './types'
-import { defaultDiv } from './utils'
-import {
-  Instance,
-  OpaqueHandle,
-  Type,
-  Props,
-  Container,
-  TextInstance,
-  SuspenseInstance,
-  HydratableInstance,
-  PublicInstance,
-  HostContext,
-  UpdatePayload,
-  _ChildSet,
-  TimeoutHandle,
-  NoTimeout
-} from './types'
-import { Entity } from '../entity'
+import { JSX } from '.'
+// import { IEngine } from '../types'
+type IEngine = any
+type Entity = number
+import { DivProps } from './components/div'
+import { defaultDiv } from './components/div/utils'
 
 function propsChanged(
   prevProps: Partial<DivProps>,
@@ -38,7 +24,7 @@ function propsChanged(
   return false
 }
 
-export function createRenderer(
+export function createReconciler(
   engine: Pick<IEngine, 'baseComponents' | 'getComponent' | 'addEntity'>
 ) {
   const { UiTransform } = engine.baseComponents
@@ -228,7 +214,7 @@ export function createRenderer(
   return {
     update: function (component: JSX.Element) {
       console.log('--------------------UPDATE------------------------')
-      return reconciler.updateContainer(component, root, null)
+      return reconciler.updateContainer(component as any, root, null)
     },
     getEntities: () => Array.from(entities)
   }
@@ -309,4 +295,25 @@ export const noopConfig = {
   }
 }
 
-export default createRenderer
+type OpaqueHandle = any
+type Type = string
+type Props = Partial<DivProps>
+type Container = Document | Instance | any
+type Instance = {
+  entity: number
+  componentId: number
+  parent?: number
+  rightOf?: number
+  _child: Instance[]
+}
+type TextInstance = unknown
+type SuspenseInstance = any
+type HydratableInstance = any
+type PublicInstance = any
+type HostContext = any
+type UpdatePayload = any
+type _ChildSet = any
+type TimeoutHandle = any
+type NoTimeout = number
+
+export default createReconciler

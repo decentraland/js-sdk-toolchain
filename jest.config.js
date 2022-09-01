@@ -4,7 +4,7 @@ module.exports = {
       tsconfig: "test/tsconfig.json",
     },
   },
-  moduleFileExtensions: ["ts", "js"],
+  moduleFileExtensions: ["ts", "js", "tsx"],
   transform: {
     "^.+\\.(ts|tsx)$": "ts-jest",
   },
@@ -36,7 +36,7 @@ module.exports = {
     "packages/@dcl/sdk/src/cli/mock-catalyst",
   ],
   verbose: true,
-  testMatch: ["**/*.spec.(ts)"],
+  testMatch: ["**/*.spec.(ts|tsx)"],
   testEnvironment: "node",
   setupFilesAfterEnv: ['./test/ecs/setup.ts']
 }

@@ -30,7 +30,7 @@ lint-fix:
 	node_modules/.bin/eslint . --ext .ts --fix
 
 test:
-	node_modules/.bin/jest --detectOpenHandles --coverage  --colors --roots "test" $(TESTARGS)
+	node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS)
 
 node_modules/.bin/protobuf/bin/protoc:
 	curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v$(PROTOBUF_VERSION)/$(PROTOBUF_ZIP)

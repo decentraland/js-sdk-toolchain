@@ -14,7 +14,8 @@
     "watch": "../../../../packages/@dcl/build-ecs/dist/index.js --watch"
   },
   "devDependencies": {
-    "@dcl/sdk": "file:../../../../packages/@dcl/sdk"
+    "@dcl/sdk": "file:../../../../packages/@dcl/sdk",
+    "@dcl/react-ecs": "file:../../../../packages/@dcl/react-ecs"
   },
-  "bundleDependencies": []
+  "bundledDependencies": ["@dcl/react-ecs"]
 }

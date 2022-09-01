@@ -2,7 +2,12 @@
   "compilerOptions": {
     "outFile": "./bin/game.js",
     "allowJs": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@dcl/react-ecs": [
+        "../../../../packages/@dcl/react-ecs/dist/index.d.ts"
+      ]
+    }
   },
   "include": [
     "*.ts",

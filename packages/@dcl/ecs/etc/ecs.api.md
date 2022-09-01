@@ -201,83 +201,6 @@ export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 export const DEG2RAD: number;
 
 // @public (undocumented)
-export interface DivProps {
-    // (undocumented)
-    alignContent: YGAlign;
-    // Warning: (ae-forgotten-export) The symbol "YGAlign" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    alignItems: YGAlign;
-    // (undocumented)
-    alignSelf: YGAlign;
-    // (undocumented)
-    border: Position;
-    // (undocumented)
-    children: any;
-    // Warning: (ae-forgotten-export) The symbol "YGDirection" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    direction: YGDirection;
-    // Warning: (ae-forgotten-export) The symbol "YGDisplay" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    display: YGDisplay;
-    // (undocumented)
-    flex: number;
-    // (undocumented)
-    flexBasis: number;
-    // Warning: (ae-forgotten-export) The symbol "YGFlexDirection" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    flexDirection: YGFlexDirection;
-    // (undocumented)
-    flexGrow: number;
-    // (undocumented)
-    flexShrink: number;
-    // Warning: (ae-forgotten-export) The symbol "YGWrap" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    flexWrap: YGWrap;
-    // (undocumented)
-    height: number;
-    // Warning: (ae-forgotten-export) The symbol "YGJustify" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    justifyContent: YGJustify;
-    // (undocumented)
-    margin: Position;
-    // (undocumented)
-    maxHeight: number;
-    // (undocumented)
-    maxWidth: number;
-    // (undocumented)
-    minHeight: number;
-    // (undocumented)
-    minWidth: number;
-    // Warning: (ae-forgotten-export) The symbol "YGOverflow" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    overflow: YGOverflow;
-    // (undocumented)
-    padding: Position;
-    // Warning: (ae-forgotten-export) The symbol "Position" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    position: Position;
-    // Warning: (ae-forgotten-export) The symbol "YGPositionType" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    positionType: YGPositionType;
-    // (undocumented)
-    width: number;
-}
-
-// @public (undocumented)
-export function DivUi(props: Partial<DivProps> & {
-    key?: string | number;
-}): JSX.Element;
-
-// @public (undocumented)
 export type double = number;
 
 // @public (undocumented)
@@ -322,7 +245,7 @@ export type IEngine = {
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     baseComponents: SdkComponents;
-    renderUI(renderTree: () => JSX.Element): number;
+    renderUI(renderTree: () => any): number;
     removeUI(ui: number): void;
 };
 

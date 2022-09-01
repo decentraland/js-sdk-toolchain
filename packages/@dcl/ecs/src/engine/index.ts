@@ -13,11 +13,23 @@ import { Entity, EntityContainer } from './entity'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
 import type { IEngineParams, IEngine } from './types'
 import { ReadonlyComponentSchema } from './readonly'
-import createRenderer from './jsx/renderer'
 
 export * from './readonly'
 export * from './types'
 export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
+
+declare const ReactEcs: {
+  createRenderer(
+    engine: Pick<IEngine, 'baseComponents' | 'getComponent' | 'addEntity'>
+  ): {
+    update(renderTree: () => JSX.Element): void
+    getEntities(): Entity[]
+  }
+}
+
+namespace JSX {
+  export type Element = any
+}
 
 function preEngine() {
   const entityContainer = EntityContainer()
@@ -180,7 +192,10 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
   const uiContainer: { getEntities: () => Entity[]; update: () => void }[] = []
 
   function renderUI(renderTree: () => JSX.Element): number {
-    const renderer = createRenderer({
+    if (!ReactEcs || !ReactEcs.createRenderer) {
+      throw new Error('ReactEcs not found')
+    }
+    const renderer = ReactEcs.createRenderer({
       baseComponents,
       addEntity: engine.addEntity,
       getComponent: engine.getComponent
