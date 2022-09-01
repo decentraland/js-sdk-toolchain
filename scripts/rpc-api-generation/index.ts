@@ -152,5 +152,8 @@ function processDeclarations(apiName: string, filePath: string) {
   const content = blocks
     .join('\n// ########### BLOCK \n')
     .replace(/import /g, '// import')
-  writeFileSync(filePath, `declare module "~rpc/${apiName}" {\n${content}\n}`)
+  writeFileSync(
+    filePath,
+    `declare module "~system/${apiName}" {\n${content}\n}`
+  )
 }

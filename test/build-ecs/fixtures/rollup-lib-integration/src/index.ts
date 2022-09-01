@@ -1,4 +1,4 @@
-import { getUserData } from '~rpc/UserIdentity'
+import { getUserData } from '~system/UserIdentity'
 
 export { aaa } from './folder/test3'
 export { test2 } from './test2'

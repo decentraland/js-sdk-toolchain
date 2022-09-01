@@ -15,11 +15,11 @@ export const engine = Engine({
 })
 
 if (typeof dcl !== 'undefined') {
-  dcl.loadModule('~rpc/ExperimentalAPI', {}).catch(dcl.error)
+  dcl.loadModule('~system/ExperimentalAPI', {}).catch(dcl.error)
 
   async function pullRendererMessages() {
     const response = await dcl.callRpc(
-      '~rpc/ExperimentalAPI',
+      '~system/ExperimentalAPI',
       'messageFromRenderer',
       []
     )
