@@ -7,7 +7,6 @@ import { ComponentOperation as Message } from '../../serialization/crdt/componen
 import WireMessage from '../../serialization/wireMessage'
 import { Transport } from './transports/types'
 import { ReceiveMessage, TransportMessage } from './types'
-import CrdtUtils from './utils'
 
 export function crdtSceneSystem({
   engine,

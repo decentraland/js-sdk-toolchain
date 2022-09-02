@@ -7,6 +7,13 @@ const componentIds = Object.values(ECSComponentIDs)
   .map(Number)
 
 export function createRendererTransport(): Transport {
+  if (typeof dcl === 'undefined') {
+    // TODO: replace with new rpc
+    throw new Error(
+      'Cannot create createRendererTransport without global dcl object'
+    )
+  }
+
   const type = 'renderer'
   return {
     type,
