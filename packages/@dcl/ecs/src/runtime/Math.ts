@@ -12,8 +12,7 @@ import {
   Space,
   ToGammaSpace,
   ToLinearSpace,
-  Vector3,
-  DeepReadonly
+  Vector3
 } from '@dcl/ecs-math'
 
 export {
@@ -30,6 +29,5 @@ export {
   Space,
   ToGammaSpace,
   ToLinearSpace,
-  Vector3,
-  DeepReadonly
+  Vector3
 }

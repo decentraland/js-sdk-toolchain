@@ -408,12 +408,34 @@ declare interface CreateByteBufferOptions {
 declare const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
 
 /**
+ * @public
+ */
+declare type DeepReadonly<T> = T extends ReadonlyPrimitive ? T : T extends Map<infer K, infer V> ? DeepReadonlyMap<K, V> : T extends Set<infer M> ? DeepReadonlySet<M> : DeepReadonlyObject<T>;
+
+/**
  * Make each field readonly deeply
  * @public
  */
-declare type DeepReadonly<T> = {
-    readonly [P in keyof T]: DeepReadonly<T[P]>;
+declare type DeepReadonly_2<T> = {
+    readonly [P in keyof T]: DeepReadonly_2<T[P]>;
 };
+
+/**
+ * @public
+ */
+declare type DeepReadonlyMap<K, V> = ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>;
+
+/**
+ * @public
+ */
+declare type DeepReadonlyObject<T> = {
+    readonly [K in keyof T]: DeepReadonly<T[K]>;
+};
+
+/**
+ * @public
+ */
+declare type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 
 declare function defineSdkComponents(engine: PreEngine): {
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
@@ -568,7 +590,7 @@ declare type IEngine = {
      *
      * ```
      */
-    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: Spec, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
     /**
      * Define a component and add it to the engine.
      * @param spec An object with schema fields
@@ -603,7 +625,7 @@ declare type IEngine = {
      * }
      * ```
      */
-    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
+    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     baseComponents: SdkComponents;
 };
 
@@ -699,7 +721,7 @@ declare namespace Matrix {
         _isIdentity3x2Dirty: boolean;
         _m: Matrix4x4;
     };
-    type ReadonlyMatrix = DeepReadonly<MutableMatrix>;
+    type ReadonlyMatrix = DeepReadonly_2<MutableMatrix>;
     /**
      * Gets the internal data of the matrix
      */
@@ -1739,7 +1761,7 @@ declare namespace Plane {
          */
         d: number;
     };
-    type ReadonlyPlane = DeepReadonly<MutablePlane>;
+    type ReadonlyPlane = DeepReadonly_2<MutablePlane>;
     /**
      * Creates a Plane object according to the given floats a, b, c, d and the plane equation : ax + by + cz + d = 0
      * @param a - a component of the plane
@@ -1889,7 +1911,7 @@ declare function preEngine(): {
     removeSystem: (selector: string | Update) => boolean;
     defineComponent: <T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType | undefined) => ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
     defineComponentFromSchema: <T_1 extends ISchema<any>, ConstructorType_1 = EcsResult<T_1>>(spec: T_1, componentId: number, constructorDefault?: ConstructorType_1 | undefined) => ComponentDefinition<T_1, ConstructorType_1>;
-    getEntitiesWith: <T_2 extends [ComponentDefinition<ISchema<any>, any>, ...ComponentDefinition<ISchema<any>, any>[]]>(...components: T_2) => Iterable<[Entity, ...DeepReadonly<ComponentSchema<T_2>>]>;
+    getEntitiesWith: <T_2 extends [ComponentDefinition<ISchema<any>, any>, ...ComponentDefinition<ISchema<any>, any>[]]>(...components: T_2) => Iterable<[Entity, ...ReadonlyComponentSchema<T_2>]>;
     getComponent: <T_3 extends ISchema<any>>(componentId: number) => ComponentDefinition<T_3, EcsResult<T_3>>;
     removeComponentDefinition: (componentId: number) => void;
 };
@@ -1910,7 +1932,7 @@ declare namespace Quaternion {
     /**
      * @public
      */
-    export type ReadonlyQuaternion = DeepReadonly<MutableQuaternion>;
+    export type ReadonlyQuaternion = DeepReadonly_2<MutableQuaternion>;
     /**
      * Creates a new Quaternion from the given floats
      * @param x - defines the first component (0 by default)
@@ -1920,11 +1942,11 @@ declare namespace Quaternion {
      */
     export function create(
     /** defines the first component (0 by default) */
-    x?: number, 
+    x?: number,
     /** defines the second component (0 by default) */
-    y?: number, 
+    y?: number,
     /** defines the third component (0 by default) */
-    z?: number, 
+    z?: number,
     /** defines the fourth component (1.0 by default) */
     w?: number): MutableQuaternion;
     /**
@@ -2077,6 +2099,18 @@ declare interface RaycastHit {
 
 /** @public */
 declare const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
+
+/**
+ * @public
+ */
+declare type ReadonlyComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
+    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['get']> : never;
+};
+
+/**
+ * @public
+ */
+declare type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
 
 declare type ReceiveMessage = {
     type: WireMessage.Enum;
@@ -2242,7 +2276,7 @@ declare namespace Vector3 {
     /**
      * @public
      */
-    export type ReadonlyVector3 = DeepReadonly<MutableVector3>;
+    export type ReadonlyVector3 = DeepReadonly_2<MutableVector3>;
     /**
      * Creates a new Vector3 object from the given x, y, z (floats) coordinates.
      * @param x - defines the first coordinates (on X axis)
@@ -2253,11 +2287,11 @@ declare namespace Vector3 {
     /**
      * Defines the first coordinates (on X axis)
      */
-    x?: number, 
+    x?: number,
     /**
      * Defines the second coordinates (on Y axis)
      */
-    y?: number, 
+    y?: number,
     /**
      * Defines the third coordinates (on Z axis)
      */

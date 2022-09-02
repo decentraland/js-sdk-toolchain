@@ -168,10 +168,19 @@ export type ComponentType<T extends ISchema> = EcsResult<T>;
 // @public (undocumented)
 export const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
 
-// @public
-export type DeepReadonly<T> = {
-    readonly [P in keyof T]: DeepReadonly<T[P]>;
+// @public (undocumented)
+export type DeepReadonly<T> = T extends ReadonlyPrimitive ? T : T extends Map<infer K, infer V> ? DeepReadonlyMap<K, V> : T extends Set<infer M> ? DeepReadonlySet<M> : DeepReadonlyObject<T>;
+
+// @public (undocumented)
+export type DeepReadonlyMap<K, V> = ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>;
+
+// @public (undocumented)
+export type DeepReadonlyObject<T> = {
+    readonly [K in keyof T]: DeepReadonly<T[K]>;
 };
+
+// @public (undocumented)
+export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 
 // @public
 export const DEG2RAD: number;
@@ -222,10 +231,10 @@ export type IEngine = {
     removeEntity(entity: Entity): void;
     addSystem(system: Update, priority?: number, name?: string): void;
     removeSystem(selector: string | Update): boolean;
-    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: Spec, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
     defineComponentFromSchema<T extends ISchema<Record<string, any>>, ConstructorType = ComponentType<T>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
-    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
+    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     baseComponents: SdkComponents;
 };
 
@@ -321,8 +330,10 @@ export namespace Quaternion {
         w: number;
     };
     export function normalize(q: ReadonlyQuaternion): MutableQuaternion;
+    // Warning: (ae-forgotten-export) The symbol "DeepReadonly" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
-    export type ReadonlyQuaternion = DeepReadonly<MutableQuaternion>;
+    export type ReadonlyQuaternion = DeepReadonly_2<MutableQuaternion>;
     export function rotateTowards(from: ReadonlyQuaternion, to: ReadonlyQuaternion, maxDegreesDelta: number): MutableQuaternion;
     export function rotationYawPitchRoll(yaw: number, pitch: number, roll: number): MutableQuaternion;
     export function rotationYawPitchRollToRef(yaw: number, pitch: number, roll: number, result: Quaternion.MutableQuaternion): void;
@@ -336,6 +347,14 @@ export const RAD2DEG: number;
 
 // @public (undocumented)
 export const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
+
+// @public (undocumented)
+export type ReadonlyComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
+    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['get']> : never;
+};
+
+// @public (undocumented)
+export type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
 
 // Warning: (ae-forgotten-export) The symbol "ToOptional" needs to be exported by the entry point index.d.ts
 //
@@ -475,7 +494,7 @@ export namespace Vector3 {
     export function One(): MutableVector3;
     export function opposite(value: ReadonlyVector3): MutableVector3;
     // (undocumented)
-    export type ReadonlyVector3 = DeepReadonly<MutableVector3>;
+    export type ReadonlyVector3 = DeepReadonly_2<MutableVector3>;
     export function Right(): MutableVector3;
     export function rotate(vector: ReadonlyVector3, q: Quaternion.ReadonlyQuaternion): MutableVector3;
     export function scale(vector: ReadonlyVector3, scale: number): MutableVector3;
