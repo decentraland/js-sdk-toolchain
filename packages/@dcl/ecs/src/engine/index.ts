@@ -186,9 +186,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
 
     // Selected components that only exist one frame
     //  then, they are deleted but their crdt state keeps
-    const removeSelectedComponents = [
-      baseComponents.PointerEventsResult,
-    ]
+    const removeSelectedComponents = [baseComponents.PointerEventsResult]
     const excludeComponentIds = removeSelectedComponents.map((item) => item._id)
     for (const componentDef of removeSelectedComponents) {
       for (const [entity] of engine.getEntitiesWith(componentDef)) {

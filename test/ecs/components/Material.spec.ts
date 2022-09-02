@@ -28,7 +28,7 @@ describe('Generated Material ProtoBuf', () => {
       glossiness: 1,
       metallic: 1,
       roughness: 1,
-      specularIntensity: 0,
+      specularIntensity: 0
     })
 
     Material.create(entityB, {

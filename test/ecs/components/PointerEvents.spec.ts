@@ -1,6 +1,6 @@
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
-import { ActionButton } from "../../../packages/@dcl/ecs/src/components/generated/pb/common/ActionButton.gen";
-import { PointerEventType } from "../../../packages/@dcl/ecs/src/components/generated/pb/PointerEvents.gen";
+import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/common/ActionButton.gen'
+import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/PointerEvents.gen'
 
 describe('Generated OnPointerDown ProtoBuf', () => {
   it('should serialize/deserialize OnPointerUp', () => {
@@ -11,24 +11,30 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     PointerEvents.create(newEngine.addEntity())
     const pointerEvents = PointerEvents.create(entity, {
       pointerEvents: [
-      { eventType: PointerEventType.UP,
-        eventInfo:{
-          button: 1,
-          hoverText: 'Tap to run',
-          maxDistance: 10,
-          showFeedback: true
-        }}]
+        {
+          eventType: PointerEventType.UP,
+          eventInfo: {
+            button: 1,
+            hoverText: 'Tap to run',
+            maxDistance: 10,
+            showFeedback: true
+          }
+        }
+      ]
     })
 
     PointerEvents.create(entityB, {
       pointerEvents: [
-        { eventType: PointerEventType.DOWN,
-          eventInfo:{
+        {
+          eventType: PointerEventType.DOWN,
+          eventInfo: {
             button: ActionButton.ACTION_4,
             hoverText: 'Run to tap',
             maxDistance: 5,
             showFeedback: false
-          }}]
+          }
+        }
+      ]
     })
 
     const buffer = PointerEvents.toBinary(entity)
@@ -47,13 +53,16 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     // We create an onPointerDownEvent
     PointerEvents.create(entity, {
       pointerEvents: [
-        { eventType: PointerEventType.DOWN,
-          eventInfo:{
+        {
+          eventType: PointerEventType.DOWN,
+          eventInfo: {
             button: ActionButton.ACTION_4,
             hoverText: 'Run to tap',
             maxDistance: 5,
             showFeedback: false
-          }}]
+          }
+        }
+      ]
     })
 
     // wait a tick to receive a response

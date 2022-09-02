@@ -522,7 +522,7 @@ describe('Engine tests', () => {
 
   it('should remove the component after the update', () => {
     const engine = Engine()
-    const rootentiy = (0 as Entity)
+    const rootentiy = 0 as Entity
     engine.baseComponents.PointerEventsResult.create(rootentiy)
     engine.update(1 / 30)
     expect(engine.baseComponents.PointerEventsResult.has(rootentiy)).toBe(false)
