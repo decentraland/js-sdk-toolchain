@@ -178,7 +178,26 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
-
+      - name: make @dcl/sdk .zip
+        working-directory: ./packages/@dcl/sdk
+        run: tar xzf $(find dcl-sdk-*.tgz) && zip dcl-sdk.zip $(tar tf $(find dcl-sdk-*.tgz))
+      - uses: shallwefootball/s3-upload-action@master
+        with:
+          aws_key_id: ${{ secrets.SDK_TEAM_AWS_ID }}
+          aws_secret_access_key: ${{ secrets.SDK_TEAM_AWS_SECRET}}
+          aws_bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
+          source_dir: './packages/@dcl/sdk/dcl-sdk.zip'
+          destination_dir: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/dcl-sdk.zip'
+      - name: make @dcl/amd .zip
+        working-directory: ./packages/@dcl/amd
+        run: tar xzf $(find dcl-amd-*.tgz) && zip dcl-amd.zip $(tar tf $(find dcl-amd-*.tgz))
+      - uses: shallwefootball/s3-upload-action@master
+        with:
+          aws_key_id: ${{ secrets.SDK_TEAM_AWS_ID }}
+          aws_secret_access_key: ${{ secrets.SDK_TEAM_AWS_SECRET}}
+          aws_bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
+          source_dir: './packages/@dcl/amd/dcl-amd.zip'
+          destination_dir: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/dcl-amd.zip'
   notify_deployment:
     needs: [build]
     if: ${{ github.event.pull_request.number }}
