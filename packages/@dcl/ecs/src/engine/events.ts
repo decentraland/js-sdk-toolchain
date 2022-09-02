@@ -20,7 +20,7 @@ export function wasEntityClicked(
   actionButton: ActionButton
 ): boolean {
   const commands =
-    engine.baseComponents.PointerEventsResult.get(entity).commands
+    engine.baseComponents.PointerEventsResult.get((0 as Entity)).commands
   // We search the last DOWN command sorted by timestamp
   const down = findLastAction(commands, PointerEventType.DOWN, actionButton)
   // We search the last UP command sorted by timestamp
@@ -62,7 +62,7 @@ export function isPointerEventActive(
   pointerEventType: PointerEventType
 ): boolean {
   const commands =
-    engine.baseComponents.PointerEventsResult.get(entity).commands
+    engine.baseComponents.PointerEventsResult.get((0 as Entity)).commands
   // We search the last pointer Event command sorted by timestamp
   const command = findLastAction(commands, pointerEventType, actionButton)
 
