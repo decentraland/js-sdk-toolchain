@@ -184,13 +184,8 @@ jobs:
           cp packages/@dcl/sdk/dist/ecs7/index.min.js ./playground
           cp packages/@dcl/sdk/types/ecs7/index.d.ts ./playground
           cp packages/@dcl/amd/dist/amd.min.js ./playground
-      - uses: shallwefootball/s3-upload-action@master
-        with:
-          aws_key_id: ${{ secrets.SDK_TEAM_AWS_ID }}
-          aws_secret_access_key: ${{ secrets.SDK_TEAM_AWS_SECRET}}
-          aws_bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          source_dir: './playground'
-          destination_dir: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/playground'
+      - name: playground upload to s3
+        run: npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder $(pwd)/playground --bucket-folder '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/playground'
   notify_deployment:
     needs: [build]
     if: ${{ github.event.pull_request.number }}
