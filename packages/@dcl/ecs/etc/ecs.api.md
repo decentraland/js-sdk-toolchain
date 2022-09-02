@@ -59,8 +59,8 @@ export type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTyp
     _id: number;
     default(): DeepReadonly<ComponentType<T>>;
     has(entity: Entity): boolean;
-    get(entity: DeepReadonly<Entity> | Entity): DeepReadonly<ComponentType<T>>;
-    getOrNull(entity: DeepReadonly<Entity> | Entity): DeepReadonly<ComponentType<T>> | null;
+    get(entity: Entity): DeepReadonly<ComponentType<T>>;
+    getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
     create(entity: Entity, val?: ConstructorType): ComponentType<T>;
     createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
     deleteFrom(entity: Entity): ComponentType<T> | null;
@@ -165,6 +165,10 @@ export type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefiniti
 // @public (undocumented)
 export type ComponentType<T extends ISchema> = EcsResult<T>;
 
+// Warning: (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// Warning: (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@params" is not defined in this configuration
+//
 // @public
 export function cyclicParentingChecker(engine: IEngine): () => void;
 

@@ -62,7 +62,7 @@ export type ComponentDefinition<
    * Transform.get(otherEntity) // throw an error!!
    * ```
    */
-  get(entity: DeepReadonly<Entity> | Entity): DeepReadonly<ComponentType<T>>
+  get(entity: Entity): DeepReadonly<ComponentType<T>>
 
   /**
    * Get the readonly component of the entity (to mutate it, use getMutable instead), or null if the entity doesn't have the component.
@@ -75,9 +75,7 @@ export type ComponentDefinition<
    * log(Transform.get(otherEntity) === null) // log 'true'
    * ```
    */
-  getOrNull(
-    entity: DeepReadonly<Entity> | Entity
-  ): DeepReadonly<ComponentType<T>> | null
+  getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null
 
   /**
    * Add the current component to an entity, throw an error if the component already exists (use `createOrReplace` instead).
