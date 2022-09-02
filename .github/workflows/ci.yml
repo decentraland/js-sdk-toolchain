@@ -59,17 +59,6 @@ jobs:
           only-update-versions: true
       - name: build
         run: make build
-      - name: make playground
-        run: | 
-          mkdir playground
-          cp packages/@dcl/sdk/dist/ecs7/index.min.js ./playground
-          cp packages/@dcl/sdk/types/ecs7/index.d.ts ./playground
-          cp packages/@dcl/amd/dist/amd.min.js ./playground
-      - name: playground upload to s3
-        run: npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder $(pwd)/playground --bucket-folder '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/playground'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: test
         run: make test
       - name: lint
@@ -187,6 +176,17 @@ jobs:
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+      - name: make playground
+        run: | 
+          mkdir playground
+          cp packages/@dcl/sdk/dist/ecs7/index.min.js ./playground
+          cp packages/@dcl/sdk/types/ecs7/index.d.ts ./playground
+          cp packages/@dcl/amd/dist/amd.min.js ./playground
+      - name: playground upload to s3
+        run: npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder $(pwd)/playground --bucket-folder '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/playground'
+        env:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
   notify_deployment:
