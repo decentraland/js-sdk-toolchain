@@ -215,12 +215,6 @@ export type float = number;
 // @public (undocumented)
 export type FloatArray = number[];
 
-// Warning: (ae-forgotten-export) The symbol "PBPointerEventsResult_PointerCommand" needs to be exported by the entry point index.d.ts
-// Warning: (ae-missing-release-tag) "getPointerEvents" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function getPointerEvents(): Iterable<[Entity, PBPointerEventsResult_PointerCommand]>;
-
 // @public (undocumented)
 export const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
 
@@ -255,6 +249,13 @@ export interface ISize {
     height: number;
     width: number;
 }
+
+// Warning: (ae-forgotten-export) The symbol "ActionButton" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "PointerEventType" needs to be exported by the entry point index.d.ts
+// Warning: (ae-missing-release-tag) "isPointerEventActive" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function isPointerEventActive(entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType): boolean;
 
 // Warning: (ae-missing-release-tag) "log" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -507,6 +508,11 @@ export namespace Vector3 {
 
 // @public (undocumented)
 export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
+
+// Warning: (ae-missing-release-tag) "wasEntityClicked" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function wasEntityClicked(entity: Entity, actionButton: ActionButton): boolean;
 
 // Warnings were encountered during analysis:
 //

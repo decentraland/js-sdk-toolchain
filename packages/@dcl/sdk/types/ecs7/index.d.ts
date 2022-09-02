@@ -521,8 +521,6 @@ declare type float = number;
 /** @public */
 declare type FloatArray = number[];
 
-declare function getPointerEvents(): Iterable<[Entity, PBPointerEventsResult_PointerCommand]>;
-
 /** @public */
 declare const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
 
@@ -679,6 +677,8 @@ declare interface ISize {
      */
     height: number;
 }
+
+declare function isPointerEventActive(entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType): boolean;
 
 declare const log: (...a: any[]) => void;
 
@@ -1657,8 +1657,24 @@ declare interface PBPlaneShape {
     uvs: number[];
 }
 
+declare interface PBPointerEvent {
+    /** default=ActionButton.ANY */
+    button?: ActionButton | undefined;
+    /** default='Interact' */
+    hoverText?: string | undefined;
+    /** default=10 */
+    maxDistance?: number | undefined;
+    /** default=true */
+    showFeedback?: boolean | undefined;
+}
+
+declare interface PBPointerEventEntry {
+    eventType: PointerEventType;
+    eventInfo: PBPointerEvent | undefined;
+}
+
 declare interface PBPointerEvents {
-    pointerEvents: PointerEventEntry[];
+    pointerEvents: PBPointerEventEntry[];
 }
 
 /** the renderer will set this component to the root entity once per frame with all the events */
@@ -1858,22 +1874,6 @@ declare namespace Plane {
 /** @public */
 declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
 
-declare interface PointerEvent_2 {
-    /** default=ActionButton.ANY */
-    button?: ActionButton | undefined;
-    /** default='Interact' */
-    hoverText?: string | undefined;
-    /** default=10 */
-    maxDistance?: number | undefined;
-    /** default=true */
-    showFeedback?: boolean | undefined;
-}
-
-declare interface PointerEventEntry {
-    eventType: PointerEventType;
-    eventInfo: PointerEvent_2 | undefined;
-}
-
 /** @public */
 declare const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
 
@@ -1942,11 +1942,11 @@ declare namespace Quaternion {
      */
     export function create(
     /** defines the first component (0 by default) */
-    x?: number,
+    x?: number, 
     /** defines the second component (0 by default) */
-    y?: number,
+    y?: number, 
     /** defines the third component (0 by default) */
-    z?: number,
+    z?: number, 
     /** defines the fourth component (1.0 by default) */
     w?: number): MutableQuaternion;
     /**
@@ -2287,11 +2287,11 @@ declare namespace Vector3 {
     /**
      * Defines the first coordinates (on X axis)
      */
-    x?: number,
+    x?: number, 
     /**
      * Defines the second coordinates (on Y axis)
      */
-    y?: number,
+    y?: number, 
     /**
      * Defines the third coordinates (on Z axis)
      */
@@ -2472,6 +2472,8 @@ declare interface Vector3_2 {
 
 /** @public */
 declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
+
+declare function wasEntityClicked(entity: Entity, actionButton: ActionButton): boolean;
 
 declare namespace WireMessage {
     enum Enum {
