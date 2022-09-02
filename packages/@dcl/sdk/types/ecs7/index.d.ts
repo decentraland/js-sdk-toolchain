@@ -406,6 +406,23 @@ declare interface CreateByteBufferOptions {
     initialCapacity?: number;
 }
 
+/**
+ * Transform parenting: cyclic dependency checker
+ * It checks only in modified Transforms
+ *
+ * Add this system with:
+ * ```ts
+ *  engine.addSystem(cyclicParentingChecker(engine))
+ * ````
+ * And then it will check every tick the parenting.
+ *
+ * @public
+ *
+ * @params engine
+ * @returns a system
+ */
+declare function cyclicParentingChecker(engine: IEngine): () => void;
+
 /** @public */
 declare const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
 
@@ -1474,6 +1491,7 @@ declare interface PBAudioSource {
     loop?: boolean | undefined;
     /** default=1.0f */
     pitch?: number | undefined;
+    /** default = [ "urn:decentraland:off-chain:base-avatars:f_eyes_00", */
     audioClipUrl: string;
 }
 
