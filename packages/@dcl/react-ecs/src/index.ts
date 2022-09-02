@@ -4,7 +4,7 @@ import { ReactEcs } from './react-ecs'
 export { ReactEcs }
 export * from './components/div'
 
-type DivElements = {
+export type DivElements = {
   divui: unknown
 }
 

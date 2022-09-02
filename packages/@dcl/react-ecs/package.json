@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/dist/libs.config.js"
+    "build": "./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/dist/react.config.js"
   },
   "repository": {
     "type": "git",

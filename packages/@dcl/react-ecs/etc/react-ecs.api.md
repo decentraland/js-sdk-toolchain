@@ -4,6 +4,13 @@
 
 ```ts
 
+// Warning: (ae-missing-release-tag) "DivElements" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type DivElements = {
+    divui: unknown;
+};
+
 // @public (undocumented)
 export interface DivProps {
     // (undocumented)
@@ -73,8 +80,6 @@ namespace JSX_2 {
     // (undocumented)
     interface Element {
     }
-    // Warning: (ae-forgotten-export) The symbol "DivElements" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     interface IntrinsicElements extends DivElements {
     }
