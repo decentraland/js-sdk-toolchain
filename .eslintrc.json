@@ -6,8 +6,6 @@
       "packages/@dcl/build-ecs/tsconfig.json",
       "packages/@dcl/dcl-rollup/tsconfig.json",
       "packages/@dcl/ecs/tsconfig.json",
-      "packages/@dcl/ecs/tools/tsconfig.json",
-      "packages/@dcl/ecs/test/tsconfig.json",
       "packages/@dcl/amd/tsconfig.json",
       "scripts/tsconfig.json",
       "test/tsconfig.json"

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2015",
+    "target": "es2020",
     "diagnostics": false,
     // only emit inline source maps
     "inlineSourceMap": true,
@@ -15,7 +15,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "noUnusedLocals": true,
-    "lib": ["es2015"],
+    "lib": ["es2020"],
     "outFile": "dist/amd.js",
     "baseUrl": ".",
     "typeRoots": ["./node_modules"],

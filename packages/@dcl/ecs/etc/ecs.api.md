@@ -4,7 +4,6 @@
 
 ```ts
 
-// Warning: (ae-forgotten-export) The symbol "ISchema" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "PBAnimator" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
@@ -150,6 +149,10 @@ export namespace Components {
     //
     // (undocumented)
     UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    const // Warning: (ae-forgotten-export) The symbol "PBVisibilityComponent" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 }
 
 // @public (undocumented)
@@ -168,10 +171,19 @@ export function cyclicParentingChecker(engine: IEngine): () => void;
 // @public (undocumented)
 export const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
 
-// @public
-export type DeepReadonly<T> = {
-    readonly [P in keyof T]: DeepReadonly<T[P]>;
+// @public (undocumented)
+export type DeepReadonly<T> = T extends ReadonlyPrimitive ? T : T extends Map<infer K, infer V> ? DeepReadonlyMap<K, V> : T extends Set<infer M> ? DeepReadonlySet<M> : DeepReadonlyObject<T>;
+
+// @public (undocumented)
+export type DeepReadonlyMap<K, V> = ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>;
+
+// @public (undocumented)
+export type DeepReadonlyObject<T> = {
+    readonly [K in keyof T]: DeepReadonly<T[K]>;
 };
+
+// @public (undocumented)
+export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 
 // @public
 export const DEG2RAD: number;
@@ -182,7 +194,9 @@ export type double = number;
 // @public (undocumented)
 export function Engine({ transports }?: IEngineParams): IEngine;
 
-// @alpha
+// Warning: (ae-missing-release-tag) "engine" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
 export const engine: IEngine;
 
 // @public (undocumented)
@@ -193,6 +207,8 @@ export type Entity = number & {
 // @public
 export const Epsilon = 0.000001;
 
+// Warning: (ae-missing-release-tag) "error" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
 export const error: (message: string | Error, data?: any) => void;
 
@@ -212,10 +228,10 @@ export type IEngine = {
     removeEntity(entity: Entity): void;
     addSystem(system: Update, priority?: number, name?: string): void;
     removeSystem(selector: string | Update): boolean;
-    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: Spec, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
     defineComponentFromSchema<T extends ISchema<Record<string, any>>, ConstructorType = ComponentType<T>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
-    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
+    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     baseComponents: SdkComponents;
 };
 
@@ -224,12 +240,21 @@ export type IEngineParams = {
     transports?: Transport[];
 };
 
+// @public (undocumented)
+export type ISchema<T = any> = {
+    serialize(value: T, builder: ByteBuffer): void;
+    deserialize(reader: ByteBuffer): T;
+    create(): T;
+};
+
 // @public
 export interface ISize {
     height: number;
     width: number;
 }
 
+// Warning: (ae-missing-release-tag) "log" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
 export const log: (...a: any[]) => void;
 
@@ -305,8 +330,10 @@ export namespace Quaternion {
         w: number;
     };
     export function normalize(q: ReadonlyQuaternion): MutableQuaternion;
+    // Warning: (ae-forgotten-export) The symbol "DeepReadonly" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
-    export type ReadonlyQuaternion = DeepReadonly<MutableQuaternion>;
+    export type ReadonlyQuaternion = DeepReadonly_2<MutableQuaternion>;
     export function rotateTowards(from: ReadonlyQuaternion, to: ReadonlyQuaternion, maxDegreesDelta: number): MutableQuaternion;
     export function rotationYawPitchRoll(yaw: number, pitch: number, roll: number): MutableQuaternion;
     export function rotationYawPitchRollToRef(yaw: number, pitch: number, roll: number, result: Quaternion.MutableQuaternion): void;
@@ -317,6 +344,14 @@ export namespace Quaternion {
 
 // @public
 export const RAD2DEG: number;
+
+// @public (undocumented)
+export type ReadonlyComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
+    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['get']> : never;
+};
+
+// @public (undocumented)
+export type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
 
 // Warning: (ae-forgotten-export) The symbol "ToOptional" needs to be exported by the entry point index.d.ts
 //
@@ -398,6 +433,8 @@ export const ToLinearSpace = 2.2;
 // @public (undocumented)
 export const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
 
+// Warning: (ae-missing-release-tag) "Transport" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
 export type Transport = {
     type: string;
@@ -407,6 +444,7 @@ export type Transport = {
 };
 
 // Warning: (ae-forgotten-export) The symbol "ReceiveMessage" needs to be exported by the entry point index.d.ts
+// Warning: (ae-missing-release-tag) "TransportMessage" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
@@ -453,7 +491,7 @@ export namespace Vector3 {
     export function One(): MutableVector3;
     export function opposite(value: ReadonlyVector3): MutableVector3;
     // (undocumented)
-    export type ReadonlyVector3 = DeepReadonly<MutableVector3>;
+    export type ReadonlyVector3 = DeepReadonly_2<MutableVector3>;
     export function Right(): MutableVector3;
     export function rotate(vector: ReadonlyVector3, q: Quaternion.ReadonlyQuaternion): MutableVector3;
     export function scale(vector: ReadonlyVector3, scale: number): MutableVector3;
@@ -463,6 +501,62 @@ export namespace Vector3 {
     export function Up(): MutableVector3;
     export function Zero(): MutableVector3;
 }
+
+// @public (undocumented)
+export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
+
+// Warnings were encountered during analysis:
+//
+// dist/engine/component.d.ts:24:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:37:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:38:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/component.d.ts:57:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:58:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/component.d.ts:69:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// dist/engine/component.d.ts:69:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
+// dist/engine/component.d.ts:70:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:71:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:78:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// dist/engine/component.d.ts:78:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// dist/engine/component.d.ts:83:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// dist/engine/component.d.ts:83:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
+// dist/engine/component.d.ts:84:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:85:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:92:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// dist/engine/component.d.ts:92:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// dist/engine/component.d.ts:97:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// dist/engine/component.d.ts:97:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
+// dist/engine/component.d.ts:98:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:106:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// dist/engine/component.d.ts:106:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// dist/engine/component.d.ts:111:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// dist/engine/component.d.ts:111:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
+// dist/engine/component.d.ts:112:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:119:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// dist/engine/component.d.ts:119:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// dist/engine/component.d.ts:124:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// dist/engine/component.d.ts:124:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
+// dist/engine/component.d.ts:125:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:133:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// dist/engine/component.d.ts:133:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// dist/engine/types.d.ts:26:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:27:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/types.d.ts:36:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:41:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:42:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:43:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:59:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:65:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:66:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:67:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:68:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/types.d.ts:82:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:83:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:84:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/types.d.ts:94:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:95:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/types.d.ts:104:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:105:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
 
 // (No @packageDocumentation comment for this package)
 

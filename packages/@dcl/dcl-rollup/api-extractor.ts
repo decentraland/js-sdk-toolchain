@@ -53,21 +53,5 @@ export function apiExtractorConfig(packageJsonPath: string) {
     }
   }
 
-  let newentryPoint = null
-
-  if (
-    fs.existsSync(typingsFullPath) &&
-    typingsFullPath ===
-      path.resolve(prepareOptions.configObject.mainEntryPointFilePath)
-  ) {
-    newentryPoint = path.resolve(
-      path.dirname(typingsFullPath),
-      Math.random() + path.basename(typingsFullPath)
-    )
-    fs.copyFileSync(typingsFullPath, newentryPoint)
-    fs.unlinkSync(typingsFullPath)
-    prepareOptions.configObject.mainEntryPointFilePath = newentryPoint
-  }
-
   return prepareOptions.configObject
 }

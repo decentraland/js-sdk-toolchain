@@ -1,7 +1,7 @@
 import type { ISchema } from '../schemas/ISchema'
 import { ByteBuffer, createByteBuffer } from '../serialization/ByteBuffer'
 import { Entity } from './entity'
-import { deepReadonly, DeepReadonly } from './utils'
+import { deepReadonly, DeepReadonly } from './readonly'
 
 /**
  * @public
