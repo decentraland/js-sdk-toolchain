@@ -1,8 +1,8 @@
 import { Entity } from './entity'
-import { engine } from '../runtime/initialization'
 import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/PointerEventsResult.gen'
 import { PointerEventType } from '../components/generated/pb/PointerEvents.gen'
 import { ActionButton } from '../components/generated/pb/common/ActionButton.gen'
+import { IEngine } from './types'
 
 type EventEntityTypeKey = {
   entityId: number
@@ -15,89 +15,97 @@ const entityClikedMap: Map<EventEntityTypeKey, number> = new Map<
   number
 >()
 
-export function wasEntityClicked(
-  entity: Entity,
-  actionButton: ActionButton
-): boolean {
-  const component = engine.baseComponents.PointerEventsResult.getOrNull(
-    0 as Entity
-  )
+export function wasEntityClickedGenerator(engine: IEngine) {
+  return function(entity:Entity, actionButton: ActionButton) {
+    const component = engine.baseComponents.PointerEventsResult.getOrNull(
+      0 as Entity
+    )
 
-  if (!component) return false
+    if (!component) return false
 
-  const commands = component.commands
+    const commands = component.commands
 
-  // We search the last DOWN command sorted by timestamp
-  const down = findLastAction(commands, PointerEventType.DOWN, actionButton)
-  // We search the last UP command sorted by timestamp
-  const up = findLastAction(commands, PointerEventType.UP, actionButton)
+    // We search the last DOWN command sorted by timestamp
+    const down = findLastAction(commands, PointerEventType.DOWN, actionButton)
+    // We search the last UP command sorted by timestamp
+    const up = findLastAction(commands, PointerEventType.UP, actionButton)
 
-  if (!down) return false
-  if (!up) return false
+    if (!down) return false
+    if (!up) return false
 
-  const entityClickedLastCheckTimestamp = getLastTimestamp(
-    entityClikedMap,
-    entity,
-    actionButton,
-    PointerEventType.UP
-  )
-  // If the DOWN command has happen before the UP commands, it means that that a clicked has happen
-  if (
-    down.timestamp < up.timestamp &&
-    up.timestamp > entityClickedLastCheckTimestamp
-  ) {
-    setLastTimestamp(
+    const entityClickedLastCheckTimestamp = getLastTimestamp(
       entityClikedMap,
       entity,
       actionButton,
-      PointerEventType.UP,
-      up.timestamp
+      PointerEventType.UP
     )
-    return true // clicked
+    // If the DOWN command has happen before the UP commands, it means that that a clicked has happen
+    if (
+      down.timestamp < up.timestamp &&
+      up.timestamp > entityClickedLastCheckTimestamp
+    ) {
+      setLastTimestamp(
+        entityClikedMap,
+        entity,
+        actionButton,
+        PointerEventType.UP,
+        up.timestamp
+      )
+      return true // clicked
+    }
+    return false
   }
-  return false
 }
+
+// export function wasEntityClicked(
+//   entity: Entity,
+//   actionButton: ActionButton
+// ): boolean {
+//
+// }
 
 const entityPointerActiveMap: Map<EventEntityTypeKey, number> = new Map<
   EventEntityTypeKey,
   number
 >()
-export function isPointerEventActive(
-  entity: Entity,
-  actionButton: ActionButton,
-  pointerEventType: PointerEventType
-): boolean {
-  const component = engine.baseComponents.PointerEventsResult.getOrNull(
-    0 as Entity
-  )
 
-  if (!component) return false
+export function isPointerEventActiveGenerator(engine: IEngine) {
+  return function(  entity: Entity,
+                    actionButton: ActionButton,
+                    pointerEventType: PointerEventType) {
 
-  const commands = component.commands
+    const component = engine.baseComponents.PointerEventsResult.getOrNull(
+      0 as Entity
+    )
 
-  // We search the last pointer Event command sorted by timestamp
-  const command = findLastAction(commands, pointerEventType, actionButton)
+    if (!component) return false
 
-  if (!command) return false
+    const commands = component.commands
 
-  const entityClickedLastCheckTimestamp = getLastTimestamp(
-    entityPointerActiveMap,
-    entity,
-    actionButton,
-    PointerEventType.UP
-  )
+    // We search the last pointer Event command sorted by timestamp
+    const command = findLastAction(commands, pointerEventType, actionButton)
 
-  if (command.timestamp > entityClickedLastCheckTimestamp) {
-    setLastTimestamp(
+    if (!command) return false
+
+    const entityClickedLastCheckTimestamp = getLastTimestamp(
       entityPointerActiveMap,
       entity,
       actionButton,
-      PointerEventType.UP,
-      command.timestamp
+      PointerEventType.UP
     )
-    return true // up component is from an old click
-  } else {
-    return false
+
+    if (command.timestamp > entityClickedLastCheckTimestamp) {
+      setLastTimestamp(
+        entityPointerActiveMap,
+        entity,
+        actionButton,
+        PointerEventType.UP,
+        command.timestamp
+      )
+      return true // up component is from an old click
+    } else {
+      return false
+    }
   }
 }
 

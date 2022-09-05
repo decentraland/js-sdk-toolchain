@@ -1,14 +1,16 @@
 import { Entity } from '../../../packages/@dcl/ecs/src/engine/entity'
-import { Engine } from '../../../packages/@dcl/ecs/src'
 import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/PointerEvents.gen'
 import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/common/ActionButton.gen'
-import { isPointerEventActive } from '../../../packages/@dcl/ecs/src/engine/events'
+import { isPointerEventActiveGenerator } from '../../../packages/@dcl/ecs/src/engine/events'
+import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+
 
 describe('Events helpers isPointerEventActive', () => {
   it('detect pointerEvent', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
+    const isPointerEventActive = isPointerEventActiveGenerator(newEngine)
 
     PointerEventsResult.create(0 as Entity, {
       commands: [createTestPointerDownCommand(entity, 4, PointerEventType.DOWN)]
@@ -29,7 +31,7 @@ describe('Events helpers isPointerEventActive', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-
+    const isPointerEventActive = isPointerEventActiveGenerator(newEngine)
     PointerEventsResult.create(0 as Entity, {
       commands: [createTestPointerDownCommand(entity, 4, PointerEventType.DOWN)]
     })
@@ -37,6 +39,8 @@ describe('Events helpers isPointerEventActive', () => {
     expect(
       isPointerEventActive(entity, ActionButton.POINTER, PointerEventType.DOWN)
     ).toBe(true)
+
+    newEngine.update(0)
     expect(
       isPointerEventActive(entity, ActionButton.POINTER, PointerEventType.DOWN)
     ).toBe(false)
