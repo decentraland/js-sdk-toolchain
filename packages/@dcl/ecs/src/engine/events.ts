@@ -13,16 +13,17 @@ type EventEntityTypeKey = {
 const entityClikedMap: Map<EventEntityTypeKey, number> = new Map<
   EventEntityTypeKey,
   number
-  >()
+>()
 
 export function wasEntityClicked(
   entity: Entity,
   actionButton: ActionButton
 ): boolean {
-  const component = engine.baseComponents.PointerEventsResult.getOrNull((0 as Entity))
+  const component = engine.baseComponents.PointerEventsResult.getOrNull(
+    0 as Entity
+  )
 
-  if(!component)
-    return false
+  if (!component) return false
 
   const commands = component.commands
 
@@ -60,16 +61,17 @@ export function wasEntityClicked(
 const entityPointerActiveMap: Map<EventEntityTypeKey, number> = new Map<
   EventEntityTypeKey,
   number
-  >()
+>()
 export function isPointerEventActive(
   entity: Entity,
   actionButton: ActionButton,
   pointerEventType: PointerEventType
 ): boolean {
-  const component = engine.baseComponents.PointerEventsResult.getOrNull((0 as Entity))
+  const component = engine.baseComponents.PointerEventsResult.getOrNull(
+    0 as Entity
+  )
 
-  if(!component)
-    return false
+  if (!component) return false
 
   const commands = component.commands
 
