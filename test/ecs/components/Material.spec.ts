@@ -3,7 +3,7 @@ import {
   TextureWrapMode,
   TransparencyMode
 } from '../../../packages/@dcl/ecs/src/components/generated/pb/Material.gen'
-import {Engine} from '../../../packages/@dcl/ecs/src/engine'
+import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated Material ProtoBuf', () => {
   it('should serialize/deserialize Material', () => {
