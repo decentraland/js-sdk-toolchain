@@ -1,4 +1,5 @@
-import { Engine } from '../../packages/@dcl/ecs/src/engine'
+import { cyclicParentingChecker } from '../../packages/@dcl/ecs/src/systems/cyclicParentingChecker'
+import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import { SYSTEMS_REGULAR_PRIORITY } from '../../packages/@dcl/ecs/src/engine/systems'
 import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
@@ -533,5 +534,42 @@ describe('Engine tests', () => {
     expect(TransformSchema.create()).toBeDeepCloseTo(
       engine.baseComponents.Transform.default()
     )
+  })
+
+  it('should log the error of cyclic parenting', () => {
+    const originalDcl = (globalThis as any).dcl
+    const errorFunc = jest.fn()
+    const errorString = (e: Entity) =>
+      'There is a cyclic parent with entity ' + e
+    ;(globalThis as any).dcl = { error: errorFunc }
+
+    const engine = Engine()
+    const e0 = engine.addEntity()
+    const e1 = engine.addEntity()
+    const e2 = engine.addEntity()
+    const e3 = engine.addEntity()
+
+    engine.addSystem(cyclicParentingChecker(engine))
+
+    engine.baseComponents.Transform.create(e0)
+    engine.baseComponents.Transform.create(e1).parent = e0
+    engine.baseComponents.Transform.create(e2).parent = e1
+    engine.baseComponents.Transform.create(e3).parent = e2
+    engine.update(1 / 30)
+    expect(errorFunc.mock.calls.length).toBe(0)
+
+    engine.baseComponents.Transform.getMutable(e3).parent = e3
+    engine.update(1.0 / 30.0)
+    expect(errorFunc.mock.calls.length).toBe(1)
+    expect(errorFunc.mock.calls[0][0]).toBe(errorString(e3))
+    errorFunc.mock.calls = []
+
+    engine.baseComponents.Transform.getMutable(e3).parent = e2
+    engine.baseComponents.Transform.getMutable(e0).parent = e3
+    engine.update(1.0 / 30.0)
+    expect(errorFunc.mock.calls.length).toBe(2)
+    expect(errorFunc.mock.calls[0][0]).toBe(errorString(e3))
+    expect(errorFunc.mock.calls[1][0]).toBe(errorString(e0))
+    ;(globalThis as any).dcl = originalDcl
   })
 })

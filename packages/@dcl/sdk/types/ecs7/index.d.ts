@@ -404,6 +404,23 @@ declare interface CreateByteBufferOptions {
     initialCapacity?: number;
 }
 
+/**
+ * Transform parenting: cyclic dependency checker
+ * It checks only in modified Transforms
+ *
+ * Add this system with:
+ * ```ts
+ *  engine.addSystem(cyclicParentingChecker(engine))
+ * ````
+ * And then it will check every tick the parenting.
+ *
+ * @public
+ *
+ * @params engine
+ * @returns a system
+ */
+declare function cyclicParentingChecker(engine: IEngine): () => void;
+
 /** @public */
 declare const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
 
@@ -1461,6 +1478,7 @@ declare interface PBAudioSource {
     loop?: boolean | undefined;
     /** default=1.0f */
     pitch?: number | undefined;
+    /** default = [ "urn:decentraland:off-chain:base-avatars:f_eyes_00", */
     audioClipUrl: string;
 }
 
@@ -1942,11 +1960,11 @@ declare namespace Quaternion {
      */
     export function create(
     /** defines the first component (0 by default) */
-    x?: number, 
+    x?: number,
     /** defines the second component (0 by default) */
-    y?: number, 
+    y?: number,
     /** defines the third component (0 by default) */
-    z?: number, 
+    z?: number,
     /** defines the fourth component (1.0 by default) */
     w?: number): MutableQuaternion;
     /**
@@ -2287,11 +2305,11 @@ declare namespace Vector3 {
     /**
      * Defines the first coordinates (on X axis)
      */
-    x?: number, 
+    x?: number,
     /**
      * Defines the second coordinates (on Y axis)
      */
-    y?: number, 
+    y?: number,
     /**
      * Defines the third coordinates (on Z axis)
      */
