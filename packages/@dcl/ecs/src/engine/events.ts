@@ -13,14 +13,19 @@ type EventEntityTypeKey = {
 const entityClikedMap: Map<EventEntityTypeKey, number> = new Map<
   EventEntityTypeKey,
   number
->()
+  >()
 
 export function wasEntityClicked(
   entity: Entity,
   actionButton: ActionButton
 ): boolean {
-  const commands =
-    engine.baseComponents.PointerEventsResult.get((0 as Entity)).commands
+  const component = engine.baseComponents.PointerEventsResult.getOrNull((0 as Entity))
+
+  if(!component)
+    return false
+
+  const commands = component.commands
+
   // We search the last DOWN command sorted by timestamp
   const down = findLastAction(commands, PointerEventType.DOWN, actionButton)
   // We search the last UP command sorted by timestamp
@@ -55,14 +60,19 @@ export function wasEntityClicked(
 const entityPointerActiveMap: Map<EventEntityTypeKey, number> = new Map<
   EventEntityTypeKey,
   number
->()
+  >()
 export function isPointerEventActive(
   entity: Entity,
   actionButton: ActionButton,
   pointerEventType: PointerEventType
 ): boolean {
-  const commands =
-    engine.baseComponents.PointerEventsResult.get((0 as Entity)).commands
+  const component = engine.baseComponents.PointerEventsResult.getOrNull((0 as Entity))
+
+  if(!component)
+    return false
+
+  const commands = component.commands
+
   // We search the last pointer Event command sorted by timestamp
   const command = findLastAction(commands, pointerEventType, actionButton)
 
