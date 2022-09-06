@@ -6,3 +6,4 @@ docs-yaml
 artifacts
 *.tgz
 types/env/index.d.ts
+rpc-modules/
