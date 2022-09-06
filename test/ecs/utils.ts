@@ -12,7 +12,7 @@ export function testingExperimentalAPI() {
   const sentMessages: Uint8Array[] = []
   const messagesFromRenderer: Uint8Array[] = []
   const modules = {
-    '@decentraland/ExperimentalAPI': {
+    '~system/ExperimentalAPI': {
       async sendToRenderer(arg: { data: Uint8Array }) {
         sentMessages.push(arg.data)
       },

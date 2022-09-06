@@ -389,7 +389,7 @@ namespace loader {
       }
     }
 
-    if (moduleName.indexOf('@') === 0) {
+    if (moduleName.indexOf('@') === 0 || moduleName.indexOf('~') === 0) {
       const exports = registeredModules[moduleName].exports
       if (typeof dcl.loadModule === 'function') {
         dcl
@@ -507,7 +507,7 @@ namespace loader {
   function resolveModule(moduleId: string, parentModule: string): string {
     let result = moduleId
 
-    if (!result.startsWith('@')) {
+    if (!result.startsWith('@') && !result.startsWith('~')) {
       if (result.startsWith('./') || result.startsWith('../')) {
         const currentPath = parentModule.split('/')
         currentPath.pop()

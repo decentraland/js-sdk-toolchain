@@ -19,7 +19,7 @@ console.assert(packageJson.typings, 'package.json .typings must be present')
 
 export const basicRollupConfig: RollupOptions = {
   input: 'src/index.ts',
-  external: [/@decentraland\//],
+  external: [/@decentraland\//, /~system\//],
   output: [
     {
       file: packageJson.main,
