@@ -5,13 +5,16 @@
  * init and it'll be changing.
  */
 
-import { Engine } from '../engine'
+import {Engine, Entity} from '../engine'
 import { createRendererTransport } from '../systems/crdt/transports/rendererTransport'
 import { createNetworkTransport } from '../systems/crdt/transports/networkTransport'
 import {
   isPointerEventActiveGenerator,
   wasEntityClickedGenerator
 } from '../engine/events'
+import {Schemas} from "../schemas";
+import {ActionButton} from "../components/generated/pb/common/ActionButton.gen";
+import {PointerEventType} from "../components/generated/pb/PointerEvents.gen";
 
 const rendererTransport = createRendererTransport()
 export const engine = Engine({

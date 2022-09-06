@@ -3,6 +3,8 @@ import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb
 import { PointerEventType } from '../components/generated/pb/PointerEvents.gen'
 import { ActionButton } from '../components/generated/pb/common/ActionButton.gen'
 import { IEngine } from './types'
+import { Schemas } from '../schemas'
+import {engine} from "../runtime/initialization";
 
 type EventEntityTypeKey = {
   entityId: number
@@ -15,7 +17,16 @@ const entityClikedMap: Map<EventEntityTypeKey, number> = new Map<
   number
 >()
 
+
 export function wasEntityClickedGenerator(engine: IEngine) {
+
+  const myComponent = engine.defineComponent({ value:Schemas.Array(Schemas.Map({ entityId: Schemas.Number,
+      actionButton:  Schemas.Enum<ActionButton>(Schemas.Number),
+      pointerEventType: Schemas.Enum<PointerEventType>(Schemas.Number),
+      timestamp: Schemas.Number}))} , 1069)
+
+  myComponent.create((0 as Entity))
+
   return function (entity: Entity, actionButton: ActionButton) {
     const component = engine.baseComponents.PointerEventsResult.getOrNull(
       0 as Entity
@@ -39,6 +50,7 @@ export function wasEntityClickedGenerator(engine: IEngine) {
       actionButton,
       PointerEventType.UP
     )
+    console.log( "up timestamp: " + up.timestamp + "      entityClicked " + entityClickedLastCheckTimestamp)
     // If the DOWN command has happen before the UP commands, it means that that a clicked has happen
     if (
       down.timestamp < up.timestamp &&
@@ -70,6 +82,14 @@ const entityPointerActiveMap: Map<EventEntityTypeKey, number> = new Map<
 >()
 
 export function isPointerEventActiveGenerator(engine: IEngine) {
+
+  const myComponent = engine.defineComponent({ value:Schemas.Array(Schemas.Map({ entityId: Schemas.Number,
+      actionButton:  Schemas.Enum<ActionButton>(Schemas.Number),
+      pointerEventType: Schemas.Enum<PointerEventType>(Schemas.Number),
+      timestamp: Schemas.Number}))} , 1068)
+
+  myComponent.create((0 as Entity))
+
   return function (
     entity: Entity,
     actionButton: ActionButton,
