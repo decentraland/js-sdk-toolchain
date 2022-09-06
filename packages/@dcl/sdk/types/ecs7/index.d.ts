@@ -229,6 +229,8 @@ declare namespace Components {
     /** @public */
     const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     /** @public */
+    const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+    /** @public */
     const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
     /** @public */
     const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
@@ -471,6 +473,7 @@ declare function defineSdkComponents(engine: PreEngine): {
     CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
     GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
     OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
     OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
@@ -1425,6 +1428,9 @@ declare namespace Matrix {
 }
 
 /** @public */
+declare const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+
+/** @public */
 declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
 
 /** @public */
@@ -1506,17 +1512,30 @@ declare interface PBAvatarModifierArea {
 
 declare interface PBAvatarShape {
     id: string;
+    /** default = NPC */
     name?: string | undefined;
+    /** default = urn:decentraland:off-chain:base-avatars:BaseFemale */
     bodyShape?: string | undefined;
+    /** default = Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
     skinColor?: Color3 | undefined;
+    /** default = Color3(R = 0.283f, G = 0.142f, B = 0f) */
     hairColor?: Color3 | undefined;
+    /** default = Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
     eyeColor?: Color3 | undefined;
-    wearables: string[];
     expressionTriggerId?: string | undefined;
+    /** default = timestamp */
     expressionTriggerTimestamp?: number | undefined;
-    stickerTriggerId?: string | undefined;
-    stickerTriggerTimestamp?: number | undefined;
     talking?: boolean | undefined;
+    /**
+     * default = ["urn:decentraland:off-chain:base-avatars:f_eyes_00",
+     *  "urn:decentraland:off-chain:base-avatars:f_eyebrows_00",
+     *  "urn:decentraland:off-chain:base-avatars:f_mouth_00"
+     *  "urn:decentraland:off-chain:base-avatars:standard_hair",
+     *  "urn:decentraland:off-chain:base-avatars:f_simple_yellow_tshirt",
+     *  "urn:decentraland:off-chain:base-avatars:f_brown_trousers",
+     *  "urn:decentraland:off-chain:base-avatars:bun_shoes"]
+     */
+    wearables: string[];
 }
 
 declare interface PBBillboard {
@@ -1611,6 +1630,31 @@ declare interface PBMaterial_Texture {
     wrapMode?: TextureWrapMode | undefined;
     /** default = FilterMode.Bilinear */
     filterMode?: FilterMode | undefined;
+}
+
+declare interface PBMeshCollider {
+    /** default = ColliderLayer.Physics | ColliderLayer.Pointer */
+    collisionMask?: number | undefined;
+    box: PBMeshCollider_BoxMesh | undefined;
+    sphere: PBMeshCollider_SphereMesh | undefined;
+    cylinder: PBMeshCollider_CylinderMesh | undefined;
+    plane: PBMeshCollider_PlaneMesh | undefined;
+}
+
+declare interface PBMeshCollider_BoxMesh {
+}
+
+declare interface PBMeshCollider_CylinderMesh {
+    /** default=1.0 */
+    radiusTop?: number | undefined;
+    /** default=1.0 */
+    radiusBottom?: number | undefined;
+}
+
+declare interface PBMeshCollider_PlaneMesh {
+}
+
+declare interface PBMeshCollider_SphereMesh {
 }
 
 declare interface PBMeshRenderer {
@@ -1763,6 +1807,7 @@ declare interface PBUiText {
 declare interface PBUiTransform {
     parent: number;
     rightOf: number;
+    backgroundColor: Color3 | undefined;
     positionType: YGPositionType;
     alignContent: YGAlign;
     alignItems: YGAlign;

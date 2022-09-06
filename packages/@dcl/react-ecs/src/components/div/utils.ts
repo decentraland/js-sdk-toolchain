@@ -28,6 +28,7 @@ const CANVAS_ROOT_ENTITY = 7
 
 export const defaultDiv = {
   parent: CANVAS_ROOT_ENTITY,
+  backgroundColor: { r: 0, g: 0, b: 0 },
   rightOf: 0,
   display: YGDisplay.YGDisplayFlex,
   flexBasis: NaN,

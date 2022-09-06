@@ -32,5 +32,3 @@ function createCube(x: number, y: number, z: number) {
 }
 createCube(8, 2, 8)
 engine.addSystem(circularSystem())
-
-engine.renderUI(ui)

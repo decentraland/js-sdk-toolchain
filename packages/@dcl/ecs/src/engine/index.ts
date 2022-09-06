@@ -193,7 +193,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
 
   function renderUI(renderTree: () => JSX.Element): number {
     if (!ReactEcs || !ReactEcs.createRenderer) {
-      throw new Error('ReactEcs not found')
+      throw new Error('ReactEcs library not found')
     }
     const renderer = ReactEcs.createRenderer({
       baseComponents,

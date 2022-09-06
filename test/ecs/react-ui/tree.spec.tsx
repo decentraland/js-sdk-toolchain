@@ -359,6 +359,7 @@ describe('UI Mockup', () => {
         {/* DivB */}
       </DivUi>
     )
+
     engine.renderUI(ui)
     engine.update(1)
 
