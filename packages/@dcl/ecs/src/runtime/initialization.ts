@@ -19,11 +19,11 @@ export const engine = Engine({
 })
 
 if (typeof dcl !== 'undefined') {
-  dcl.loadModule('@decentraland/ExperimentalAPI', {}).catch(dcl.error)
+  dcl.loadModule('~system/ExperimentalAPI', {}).catch(dcl.error)
 
   async function pullRendererMessages() {
     const response = await dcl.callRpc(
-      '@decentraland/ExperimentalAPI',
+      '~system/ExperimentalAPI',
       'messageFromRenderer',
       []
     )

@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from 'fs'
+import { copySync, mkdirSync, removeSync } from 'fs-extra'
 
 import {
   flow,
@@ -17,9 +18,13 @@ import {
   itExecutes,
   itDeletesFolder,
   copyFile,
-  itDeletesGlob
+  itDeletesGlob,
+  runCommand
 } from './helpers'
 import { compileEcsComponents } from './protocol-buffer-generation'
+
+import * as path from 'path'
+import { compileProtoApi } from './rpc-api-generation'
 
 flow('build-all', () => {
   commonChecks()
@@ -123,6 +128,30 @@ flow('build-all', () => {
         }
       }
     })
+  })
+
+  flow('rpc api generation', () => {
+    it('compile protos', async () => {
+      const rpcProtoPath = path.resolve(
+        __dirname,
+        'rpc-api-generation',
+        'src',
+        'proto'
+      )
+      removeSync(rpcProtoPath)
+      mkdirSync(rpcProtoPath)
+      writeFileSync(path.resolve(rpcProtoPath, 'README.md'), '# Generated code')
+
+      await runCommand(`make compile_apis`, path.resolve(__dirname, '..'))
+      await compileProtoApi()
+
+      copySync(
+        path.resolve(__dirname, 'rpc-api-generation/src/modules'),
+        path.resolve(SDK_PATH, 'types', 'rpc-modules')
+      )
+
+      expect(true).toBe(true)
+    }, 60000)
   })
 })
 
