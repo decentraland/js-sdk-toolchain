@@ -3,7 +3,7 @@ import { wasEntityClickedGenerator } from '../../../packages/@dcl/ecs/src/engine
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/PointerEvents.gen'
 import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/common/ActionButton.gen'
-import {setupDclInterfaceForThisSuite, testingExperimentalAPI} from "../utils";
+import { setupDclInterfaceForThisSuite, testingExperimentalAPI } from '../utils'
 
 describe('Events helpers wasEntityClicked', () => {
   it('detect entity click', () => {
@@ -11,7 +11,6 @@ describe('Events helpers wasEntityClicked', () => {
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     const wasEntityClicked = wasEntityClickedGenerator(newEngine)
-
 
     PointerEventsResult.create(0 as Entity, {
       commands: [
