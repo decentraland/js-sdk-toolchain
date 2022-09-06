@@ -4,32 +4,36 @@ import { PointerEventType } from '../components/generated/pb/PointerEvents.gen'
 import { ActionButton } from '../components/generated/pb/common/ActionButton.gen'
 import { IEngine } from './types'
 import { Schemas } from '../schemas'
-import {engine} from "../runtime/initialization";
 
-type EventEntityTypeKey = {
-  entityId: number
-  actionButton: ActionButton
-  pointerEventType: PointerEventType
+const UpdateTimestampStateSchema = {
+  timestampLastUpdate: Schemas.Number,
+  currentTimestamp: Schemas.Number
 }
 
-const entityClikedMap: Map<EventEntityTypeKey, number> = new Map<
-  EventEntityTypeKey,
-  number
->()
-
+const WasEntityClickComponentID = 1500
+const IsPointerEventActiveComponentID = 1501
+const EventSystemPriority = 1 << 20
 
 export function wasEntityClickedGenerator(engine: IEngine) {
+  const WasEntityClickComponentState = engine.defineComponent(
+    UpdateTimestampStateSchema,
+    WasEntityClickComponentID
+  )
 
-  const myComponent = engine.defineComponent({ value:Schemas.Array(Schemas.Map({ entityId: Schemas.Number,
-      actionButton:  Schemas.Enum<ActionButton>(Schemas.Number),
-      pointerEventType: Schemas.Enum<PointerEventType>(Schemas.Number),
-      timestamp: Schemas.Number}))} , 1069)
+  WasEntityClickComponentState.create(engine.RootEntity)
 
-  myComponent.create((0 as Entity))
+  engine.addSystem(() => {
+    const state = WasEntityClickComponentState.get(engine.RootEntity)
+    if (state.currentTimestamp > state.timestampLastUpdate) {
+      WasEntityClickComponentState.getMutable(
+        engine.RootEntity
+      ).timestampLastUpdate = state.currentTimestamp
+    }
+  }, EventSystemPriority)
 
   return function (entity: Entity, actionButton: ActionButton) {
-    const component = engine.baseComponents.PointerEventsResult.getOrNull(
-      0 as Entity
+    const component = engine.baseComponents.PointerEventsResult.get(
+      engine.RootEntity
     )
 
     if (!component) return false
@@ -37,58 +41,55 @@ export function wasEntityClickedGenerator(engine: IEngine) {
     const commands = component.commands
 
     // We search the last DOWN command sorted by timestamp
-    const down = findLastAction(commands, PointerEventType.DOWN, actionButton)
+    const down = findLastAction(
+      commands,
+      PointerEventType.DOWN,
+      actionButton,
+      entity
+    )
     // We search the last UP command sorted by timestamp
-    const up = findLastAction(commands, PointerEventType.UP, actionButton)
+    const up = findLastAction(
+      commands,
+      PointerEventType.UP,
+      actionButton,
+      entity
+    )
 
     if (!down) return false
     if (!up) return false
 
-    const entityClickedLastCheckTimestamp = getLastTimestamp(
-      entityClikedMap,
-      entity,
-      actionButton,
-      PointerEventType.UP
-    )
-    console.log( "up timestamp: " + up.timestamp + "      entityClicked " + entityClickedLastCheckTimestamp)
+    const state = WasEntityClickComponentState.get(engine.RootEntity)
+
     // If the DOWN command has happen before the UP commands, it means that that a clicked has happen
     if (
       down.timestamp < up.timestamp &&
-      up.timestamp > entityClickedLastCheckTimestamp
+      up.timestamp > state.timestampLastUpdate
     ) {
-      setLastTimestamp(
-        entityClikedMap,
-        entity,
-        actionButton,
-        PointerEventType.UP,
-        up.timestamp
-      )
+      WasEntityClickComponentState.getMutable(
+        engine.RootEntity
+      ).currentTimestamp = Math.max(up.timestamp, state.currentTimestamp)
       return true // clicked
     }
     return false
   }
 }
 
-// export function wasEntityClicked(
-//   entity: Entity,
-//   actionButton: ActionButton
-// ): boolean {
-//
-// }
-
-const entityPointerActiveMap: Map<EventEntityTypeKey, number> = new Map<
-  EventEntityTypeKey,
-  number
->()
-
 export function isPointerEventActiveGenerator(engine: IEngine) {
+  const IsPointerEventActiveComponentState = engine.defineComponent(
+    UpdateTimestampStateSchema,
+    IsPointerEventActiveComponentID
+  )
 
-  const myComponent = engine.defineComponent({ value:Schemas.Array(Schemas.Map({ entityId: Schemas.Number,
-      actionButton:  Schemas.Enum<ActionButton>(Schemas.Number),
-      pointerEventType: Schemas.Enum<PointerEventType>(Schemas.Number),
-      timestamp: Schemas.Number}))} , 1068)
+  IsPointerEventActiveComponentState.create(engine.RootEntity)
 
-  myComponent.create((0 as Entity))
+  engine.addSystem(() => {
+    const state = IsPointerEventActiveComponentState.get(engine.RootEntity)
+    if (state.currentTimestamp > state.timestampLastUpdate) {
+      IsPointerEventActiveComponentState.getMutable(
+        engine.RootEntity
+      ).timestampLastUpdate = state.currentTimestamp
+    }
+  }, EventSystemPriority)
 
   return function (
     entity: Entity,
@@ -104,25 +105,21 @@ export function isPointerEventActiveGenerator(engine: IEngine) {
     const commands = component.commands
 
     // We search the last pointer Event command sorted by timestamp
-    const command = findLastAction(commands, pointerEventType, actionButton)
+    const command = findLastAction(
+      commands,
+      pointerEventType,
+      actionButton,
+      entity
+    )
 
     if (!command) return false
 
-    const entityClickedLastCheckTimestamp = getLastTimestamp(
-      entityPointerActiveMap,
-      entity,
-      actionButton,
-      PointerEventType.UP
-    )
+    const state = IsPointerEventActiveComponentState.get(engine.RootEntity)
 
-    if (command.timestamp > entityClickedLastCheckTimestamp) {
-      setLastTimestamp(
-        entityPointerActiveMap,
-        entity,
-        actionButton,
-        PointerEventType.UP,
-        command.timestamp
-      )
+    if (command.timestamp > state.timestampLastUpdate) {
+      IsPointerEventActiveComponentState.getMutable(
+        engine.RootEntity
+      ).currentTimestamp = Math.max(command.timestamp, state.currentTimestamp)
       return true // up component is from an old click
     } else {
       return false
@@ -130,48 +127,38 @@ export function isPointerEventActiveGenerator(engine: IEngine) {
   }
 }
 
-function setLastTimestamp(
-  map: Map<EventEntityTypeKey, number>,
-  entityId: number,
-  actionButton: ActionButton,
-  pointerEventType: PointerEventType,
-  timestamp: number
-) {
-  const eventKey: EventEntityTypeKey = {
-    entityId: entityId,
-    actionButton: actionButton,
-    pointerEventType: pointerEventType
-  }
-  map.set(eventKey, timestamp)
-}
-
-function getLastTimestamp(
-  map: Map<EventEntityTypeKey, number>,
-  entityId: number,
-  actionButton: ActionButton,
-  pointerEventType: PointerEventType
-) {
-  const eventKey: EventEntityTypeKey = {
-    entityId: entityId,
-    actionButton: actionButton,
-    pointerEventType: pointerEventType
-  }
-  const timestamp = map.get(eventKey)
-  if (timestamp) return timestamp
-  else return -1
-}
-
 function findLastAction(
   commands: readonly PBPointerEventsResult_PointerCommand[],
   pointerEventType: PointerEventType,
-  actionButton: ActionButton
+  actionButton: ActionButton,
+  entity?: Entity
 ): PBPointerEventsResult_PointerCommand | undefined {
-  let commandToReturn: PBPointerEventsResult_PointerCommand | undefined
-  commands.forEach((command) => {
-    if (command.button === actionButton && command.state === pointerEventType) {
-      if (!commandToReturn || command.timestamp >= commandToReturn.timestamp)
-        commandToReturn = command
+  let commandToReturn: PBPointerEventsResult_PointerCommand | undefined =
+    undefined
+
+  if (entity) {
+    for (const command of commands) {
+      if (
+        command.button === actionButton &&
+        command.state === pointerEventType &&
+        command.hit &&
+        entity === command.hit.entityId
+      ) {
+        if (!commandToReturn || command.timestamp >= commandToReturn.timestamp)
+          commandToReturn = command
+      }
     }
-  })
+  } else {
+    for (const command of commands) {
+      if (
+        command.button === actionButton &&
+        command.state === pointerEventType
+      ) {
+        if (!commandToReturn || command.timestamp >= commandToReturn.timestamp)
+          commandToReturn = command
+      }
+    }
+  }
+
   return commandToReturn !== undefined ? commandToReturn : undefined
 }

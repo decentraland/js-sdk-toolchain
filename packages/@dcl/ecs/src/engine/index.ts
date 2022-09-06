@@ -82,14 +82,11 @@ function preEngine() {
     return newComponent
   }
 
-  function defineComponent<
-    T extends Spec,
-    ConstructorType = Partial<Result<T>>
-  >(
+  function defineComponent<T extends Spec>(
     spec: T,
     componentId: number,
-    constructorDefault?: ConstructorType
-  ): ComponentDefinition<ISchema<Result<T>>, ConstructorType> {
+    constructorDefault?: Partial<Result<T>>
+  ): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>> {
     return defineComponentFromSchema(
       Schemas.Map(spec),
       componentId,
@@ -189,7 +186,6 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     // to iterate all the component definitions to get the dirty ones ?
     const dirtySet = new Map<Entity, Set<number>>()
     for (const [componentId, definition] of engine.componentsDefinition) {
-
       for (const entity of definition.dirtyIterator()) {
         if (!dirtySet.has(entity)) {
           dirtySet.set(entity, new Set())
@@ -216,6 +212,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     getComponent: engine.getComponent,
     removeComponentDefinition: engine.removeComponentDefinition,
     update,
+    RootEntity: 0 as Entity,
     baseComponents
   }
 }

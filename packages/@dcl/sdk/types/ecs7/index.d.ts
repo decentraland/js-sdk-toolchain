@@ -605,7 +605,7 @@ declare type IEngine = {
      *
      * ```
      */
-    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>;
     /**
      * Define a component and add it to the engine.
      * @param spec An object with schema fields
@@ -641,6 +641,7 @@ declare type IEngine = {
      * ```
      */
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
+    RootEntity: Entity;
     baseComponents: SdkComponents;
 };
 
@@ -695,7 +696,9 @@ declare interface ISize {
     height: number;
 }
 
-declare function isPointerEventActive(entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType): boolean;
+declare const isPointerEventActive: (entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType) => boolean;
+
+declare function isPointerEventActiveGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType) => boolean;
 
 declare const log: (...a: any[]) => void;
 
@@ -1478,7 +1481,6 @@ declare interface PBAudioSource {
     loop?: boolean | undefined;
     /** default=1.0f */
     pitch?: number | undefined;
-    /** default = [ "urn:decentraland:off-chain:base-avatars:f_eyes_00", */
     audioClipUrl: string;
 }
 
@@ -1675,24 +1677,8 @@ declare interface PBPlaneShape {
     uvs: number[];
 }
 
-declare interface PBPointerEvent {
-    /** default=ActionButton.ANY */
-    button?: ActionButton | undefined;
-    /** default='Interact' */
-    hoverText?: string | undefined;
-    /** default=10 */
-    maxDistance?: number | undefined;
-    /** default=true */
-    showFeedback?: boolean | undefined;
-}
-
-declare interface PBPointerEventEntry {
-    eventType: PointerEventType;
-    eventInfo: PBPointerEvent | undefined;
-}
-
 declare interface PBPointerEvents {
-    pointerEvents: PBPointerEventEntry[];
+    pointerEvents: PointerEventEntry[];
 }
 
 /** the renderer will set this component to the root entity once per frame with all the events */
@@ -1892,6 +1878,22 @@ declare namespace Plane {
 /** @public */
 declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
 
+declare interface PointerEvent_2 {
+    /** default=ActionButton.ANY */
+    button?: ActionButton | undefined;
+    /** default='Interact' */
+    hoverText?: string | undefined;
+    /** default=10 */
+    maxDistance?: number | undefined;
+    /** default=true */
+    showFeedback?: boolean | undefined;
+}
+
+declare interface PointerEventEntry {
+    eventType: PointerEventType;
+    eventInfo: PointerEvent_2 | undefined;
+}
+
 /** @public */
 declare const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
 
@@ -1927,8 +1929,8 @@ declare function preEngine(): {
         name?: string | undefined;
     }[];
     removeSystem: (selector: string | Update) => boolean;
-    defineComponent: <T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType | undefined) => ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
-    defineComponentFromSchema: <T_1 extends ISchema<any>, ConstructorType_1 = EcsResult<T_1>>(spec: T_1, componentId: number, constructorDefault?: ConstructorType_1 | undefined) => ComponentDefinition<T_1, ConstructorType_1>;
+    defineComponent: <T extends Spec>(spec: T, componentId: number, constructorDefault?: Partial<Result<T>> | undefined) => ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>;
+    defineComponentFromSchema: <T_1 extends ISchema<any>, ConstructorType = EcsResult<T_1>>(spec: T_1, componentId: number, constructorDefault?: ConstructorType | undefined) => ComponentDefinition<T_1, ConstructorType>;
     getEntitiesWith: <T_2 extends [ComponentDefinition<ISchema<any>, any>, ...ComponentDefinition<ISchema<any>, any>[]]>(...components: T_2) => Iterable<[Entity, ...ReadonlyComponentSchema<T_2>]>;
     getComponent: <T_3 extends ISchema<any>>(componentId: number) => ComponentDefinition<T_3, EcsResult<T_3>>;
     removeComponentDefinition: (componentId: number) => void;
@@ -1960,11 +1962,11 @@ declare namespace Quaternion {
      */
     export function create(
     /** defines the first component (0 by default) */
-    x?: number,
+    x?: number, 
     /** defines the second component (0 by default) */
-    y?: number,
+    y?: number, 
     /** defines the third component (0 by default) */
-    z?: number,
+    z?: number, 
     /** defines the fourth component (1.0 by default) */
     w?: number): MutableQuaternion;
     /**
@@ -2305,11 +2307,11 @@ declare namespace Vector3 {
     /**
      * Defines the first coordinates (on X axis)
      */
-    x?: number,
+    x?: number, 
     /**
      * Defines the second coordinates (on Y axis)
      */
-    y?: number,
+    y?: number, 
     /**
      * Defines the third coordinates (on Z axis)
      */
@@ -2491,7 +2493,9 @@ declare interface Vector3_2 {
 /** @public */
 declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 
-declare function wasEntityClicked(entity: Entity, actionButton: ActionButton): boolean;
+declare const wasEntityClicked: (entity: Entity, actionButton: ActionButton) => boolean;
+
+declare function wasEntityClickedGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton) => boolean;
 
 declare namespace WireMessage {
     enum Enum {

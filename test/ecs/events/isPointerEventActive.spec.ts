@@ -11,7 +11,7 @@ describe('Events helpers isPointerEventActive', () => {
     const entity = newEngine.addEntity()
     const isPointerEventActive = isPointerEventActiveGenerator(newEngine)
 
-    PointerEventsResult.create(0 as Entity, {
+    PointerEventsResult.create(newEngine.RootEntity, {
       commands: [createTestPointerDownCommand(entity, 4, PointerEventType.DOWN)]
     })
 
@@ -26,12 +26,12 @@ describe('Events helpers isPointerEventActive', () => {
     ).toBe(false)
   })
 
-  it('dont detect pointerEvent twice', () => {
+  it('dont detect pointerEventActive after update', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     const isPointerEventActive = isPointerEventActiveGenerator(newEngine)
-    PointerEventsResult.create(0 as Entity, {
+    PointerEventsResult.create(newEngine.RootEntity, {
       commands: [createTestPointerDownCommand(entity, 4, PointerEventType.DOWN)]
     })
 
