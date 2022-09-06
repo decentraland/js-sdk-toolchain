@@ -8,7 +8,10 @@
 import { Engine } from '../engine'
 import { createRendererTransport } from '../systems/crdt/transports/rendererTransport'
 import { createNetworkTransport } from '../systems/crdt/transports/networkTransport'
-import {isPointerEventActiveGenerator, wasEntityClickedGenerator} from "../engine/events";
+import {
+  isPointerEventActiveGenerator,
+  wasEntityClickedGenerator
+} from '../engine/events'
 
 const rendererTransport = createRendererTransport()
 export const engine = Engine({

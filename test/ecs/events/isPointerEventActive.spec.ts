@@ -4,7 +4,6 @@ import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generate
 import { isPointerEventActiveGenerator } from '../../../packages/@dcl/ecs/src/engine/events'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
-
 describe('Events helpers isPointerEventActive', () => {
   it('detect pointerEvent', () => {
     const newEngine = Engine()

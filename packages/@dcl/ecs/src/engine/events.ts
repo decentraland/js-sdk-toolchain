@@ -16,7 +16,7 @@ const entityClikedMap: Map<EventEntityTypeKey, number> = new Map<
 >()
 
 export function wasEntityClickedGenerator(engine: IEngine) {
-  return function(entity:Entity, actionButton: ActionButton) {
+  return function (entity: Entity, actionButton: ActionButton) {
     const component = engine.baseComponents.PointerEventsResult.getOrNull(
       0 as Entity
     )
@@ -70,10 +70,11 @@ const entityPointerActiveMap: Map<EventEntityTypeKey, number> = new Map<
 >()
 
 export function isPointerEventActiveGenerator(engine: IEngine) {
-  return function(  entity: Entity,
-                    actionButton: ActionButton,
-                    pointerEventType: PointerEventType) {
-
+  return function (
+    entity: Entity,
+    actionButton: ActionButton,
+    pointerEventType: PointerEventType
+  ) {
     const component = engine.baseComponents.PointerEventsResult.getOrNull(
       0 as Entity
     )
