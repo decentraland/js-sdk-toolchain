@@ -14,6 +14,7 @@ import {
 } from '../engine/events'
 import { createNetworkTransport } from '../systems/crdt/transports/networkTransport'
 import { createRendererTransport } from '../systems/crdt/transports/rendererTransport'
+import { _initEventObservables } from './observables'
 
 const rendererTransport = createRendererTransport()
 export const engine = Engine({
@@ -44,6 +45,8 @@ if (typeof dcl !== 'undefined') {
       .catch(dcl.error)
       .finally(() => engine.update(dt))
   })
+
+  _initEventObservables()
 }
 
 export const log = dcl.log
