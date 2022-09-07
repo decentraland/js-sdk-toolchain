@@ -142,19 +142,15 @@ export namespace Components {
     const // Warning: (ae-forgotten-export) The symbol "PBPointerLock" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
+    PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
     const // Warning: (ae-forgotten-export) The symbol "PBRaycast" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    Raycast: ComponentDefinition<ISchema<PBRaycast>>;
+    Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
     const // Warning: (ae-forgotten-export) The symbol "PBRaycastResult" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>>;
-    //
-    // (undocumented)
-    PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
-    
+    RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
     const // Warning: (ae-forgotten-export) The symbol "PBSphereShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -503,17 +499,18 @@ export namespace Quaternion {
 export const RAD2DEG: number;
 
 // @public (undocumented)
-export const Raycast: ComponentDefinition<ISchema<PBRaycast>>;
+export const Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
 
 // @public (undocumented)
-export const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>>;
+export const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
+
+// @public (undocumented)
 export type ReadonlyComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
     [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['get']> : never;
 };
 
 // @public (undocumented)
 export type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
-
 
 // Warning: (ae-forgotten-export) The symbol "ToOptional" needs to be exported by the entry point index.d.ts
 //

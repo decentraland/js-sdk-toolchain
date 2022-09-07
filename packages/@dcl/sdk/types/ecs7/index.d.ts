@@ -249,6 +249,10 @@ declare namespace Components {
     /** @public */
     const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
     /** @public */
+    const Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
+    /** @public */
+    const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
+    /** @public */
     const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     /** @public */
     const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
@@ -481,6 +485,8 @@ declare function defineSdkComponents(engine: PreEngine): {
     OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
     PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
+    RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
     SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
     UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
@@ -1819,7 +1825,6 @@ declare interface PBAudioSource {
     loop?: boolean | undefined;
     /** default=1.0f */
     pitch?: number | undefined;
-    /** default = [ "urn:decentraland:off-chain:base-avatars:f_eyes_00", */
     audioClipUrl: string;
 }
 
@@ -1836,17 +1841,30 @@ declare interface PBAvatarModifierArea {
 
 declare interface PBAvatarShape {
     id: string;
+    /** default = NPC */
     name?: string | undefined;
+    /** default = urn:decentraland:off-chain:base-avatars:BaseFemale */
     bodyShape?: string | undefined;
+    /** default = Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
     skinColor?: Color3 | undefined;
+    /** default = Color3(R = 0.283f, G = 0.142f, B = 0f) */
     hairColor?: Color3 | undefined;
+    /** default = Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
     eyeColor?: Color3 | undefined;
-    wearables: string[];
     expressionTriggerId?: string | undefined;
+    /** default = timestamp */
     expressionTriggerTimestamp?: number | undefined;
-    stickerTriggerId?: string | undefined;
-    stickerTriggerTimestamp?: number | undefined;
     talking?: boolean | undefined;
+    /**
+     * default = ["urn:decentraland:off-chain:base-avatars:f_eyes_00",
+     *  "urn:decentraland:off-chain:base-avatars:f_eyebrows_00",
+     *  "urn:decentraland:off-chain:base-avatars:f_mouth_00"
+     *  "urn:decentraland:off-chain:base-avatars:standard_hair",
+     *  "urn:decentraland:off-chain:base-avatars:f_simple_yellow_tshirt",
+     *  "urn:decentraland:off-chain:base-avatars:f_brown_trousers",
+     *  "urn:decentraland:off-chain:base-avatars:bun_shoes"]
+     */
+    wearables: string[];
 }
 
 declare interface PBBillboard {
@@ -2062,6 +2080,21 @@ declare interface PBPlaneShape {
 
 declare interface PBPointerLock {
     isPointerLocked: boolean;
+}
+
+declare interface PBRaycast {
+    timestamp: number;
+    origin: Vector3_2 | undefined;
+    direction: Vector3_2 | undefined;
+    maxDistance: number;
+    queryType: QueryType;
+}
+
+declare interface PBRaycastResult {
+    timestamp: number;
+    origin: Vector3_2 | undefined;
+    direction: Vector3_2 | undefined;
+    hits: RaycastHit[];
 }
 
 declare interface PBSphereShape {
@@ -2424,11 +2457,32 @@ declare namespace Quaternion {
     export function Zero(): MutableQuaternion;
 }
 
+declare const enum QueryType {
+    HIT_FIRST = 0,
+    QUERY_ALL = 1,
+    UNRECOGNIZED = -1
+}
+
 /**
  * Constant used to convert from radians to Euler degrees
  * @public
  */
 declare const RAD2DEG: number;
+
+/** @public */
+declare const Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
+
+declare interface RaycastHit {
+    worldPosition: Vector3_2 | undefined;
+    origin: Vector3_2 | undefined;
+    meshName?: string | undefined;
+    entityId: number;
+    worldNormalHit: Vector3_2 | undefined;
+    length: number;
+}
+
+/** @public */
+declare const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
 
 /**
  * @public
