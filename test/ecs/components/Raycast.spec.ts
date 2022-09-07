@@ -1,5 +1,5 @@
-﻿import { QueryType } from '../../src/components/generated/pb/Raycast.gen'
-import { Engine } from '../../src/engine'
+﻿import { QueryType } from '../../../packages/@dcl/ecs/src/components/generated/pb/Raycast.gen'
+import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated Raycast ProtoBuf', () => {
   it('should serialize/deserialize Raycast', () => {
