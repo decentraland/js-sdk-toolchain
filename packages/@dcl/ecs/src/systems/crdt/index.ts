@@ -102,6 +102,28 @@ export function crdtSceneSystem({
           // Process CRDT Message
           if (type === WireMessage.Enum.DELETE_COMPONENT) {
             component.deleteFrom(entity)
+          } else if (type === WireMessage.Enum.APPEND_DATA_COMPONENT) {
+            const opts = {
+              reading: { buffer: message.data!, currentOffset: 0 }
+            }
+            const bb = createByteBuffer(opts)
+
+            // Update engine component
+            const appendValue = component.schema().deserialize(buffer)
+            const mutable = component.getMutableOrNull(message.entity)
+            if (mutable) {
+              for (const key in appendValue) {
+                if (
+                  Array.isArray(appendValue[key]) &&
+                  appendValue[key].length > 0
+                ) {
+                  mutable[key].push(...appendValue[key])
+                }
+              }
+            } else {
+              component.upsertFromBinary(message.entity, bb)
+            }
+            component.clearDirty()
           } else {
             const opts = {
               reading: { buffer: message.data!, currentOffset: 0 }

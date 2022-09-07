@@ -23,6 +23,7 @@ export namespace WireMessage {
     // Component Operation
     PUT_COMPONENT = 1,
     DELETE_COMPONENT = 2,
+    APPEND_DATA_COMPONENT = 3,
 
     MAX_MESSAGE_TYPE
   }

@@ -192,6 +192,8 @@ export type ComponentDefinition<
    * @internal
    */
   isDirty(entity: Entity): boolean
+
+  schema(): T
 }
 
 export function defineComponent<
@@ -360,6 +362,9 @@ export function defineComponent<
     },
     clearDirty: function () {
       dirtyIterator.clear()
+    },
+    schema: function () {
+      return spec
     }
   }
 }
