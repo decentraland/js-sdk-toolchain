@@ -4,6 +4,18 @@
 
 ```ts
 
+// Warning: (ae-missing-release-tag) "Color3" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface Color3 {
+    // (undocumented)
+    b: number;
+    // (undocumented)
+    g: number;
+    // (undocumented)
+    r: number;
+}
+
 // Warning: (ae-missing-release-tag) "DivElements" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -19,6 +31,8 @@ export interface DivProps {
     alignItems: YGAlign;
     // (undocumented)
     alignSelf: YGAlign;
+    // (undocumented)
+    backgroundColor: Color3;
     // (undocumented)
     border: Position;
     // (undocumented)
@@ -107,18 +121,6 @@ namespace ReactEcs {
 }
 export { ReactEcs }
 export default ReactEcs;
-
-// @public (undocumented)
-export interface TextProps {
-    // (undocumented)
-    textColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
-    // (undocumented)
-    value: string;
-}
 
 // Warning: (ae-missing-release-tag) "YGAlign" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -232,22 +234,6 @@ export enum YGPositionType {
     YGPositionTypeRelative = 1,
     // (undocumented)
     YGPositionTypeStatic = 0
-}
-
-// Warning: (ae-missing-release-tag) "YGUnit" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export enum YGUnit {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGUnitAuto = 3,
-    // (undocumented)
-    YGUnitPercent = 2,
-    // (undocumented)
-    YGUnitPoint = 1,
-    // (undocumented)
-    YGUnitUndefined = 0
 }
 
 // Warning: (ae-missing-release-tag) "YGWrap" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)

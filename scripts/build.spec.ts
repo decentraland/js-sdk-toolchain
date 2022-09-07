@@ -26,6 +26,7 @@ import { compileEcsComponents } from './protocol-buffer-generation'
 
 import * as path from 'path'
 import { compileProtoApi } from './rpc-api-generation'
+import { createProtoTypes } from './protocol-buffer-generation/generateProtocolTypes'
 
 flow('build-all', () => {
   commonChecks()
@@ -94,6 +95,13 @@ flow('build-all', () => {
   })
   flow('@dcl/react-ecs', () => {
     itExecutes('npm i --quiet', REACT_ECS)
+    it('Copy proto files', async () => {
+      await createProtoTypes(
+        `${ECS7_PATH}/node_modules/@dcl/protocol/ecs/components`,
+        `${REACT_ECS}/src/types`,
+        ['UiTransform.proto']
+      )
+    })
     itExecutes('npm run build', REACT_ECS)
 
     it('check file exists', () => {
