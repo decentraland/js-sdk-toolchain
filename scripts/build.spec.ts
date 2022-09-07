@@ -96,9 +96,13 @@ flow('build-all', () => {
   flow('@dcl/react-ecs', () => {
     itExecutes('npm i --quiet', REACT_ECS)
     it('Copy proto files', async () => {
+      const protoTypesPath = `${REACT_ECS}/src/generated`
+      removeSync(protoTypesPath)
+      mkdirSync(protoTypesPath)
+
       await createProtoTypes(
         `${ECS7_PATH}/node_modules/@dcl/protocol/ecs/components`,
-        `${REACT_ECS}/src/generated`,
+        protoTypesPath,
         ['UiTransform.proto']
       )
     })

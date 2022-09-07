@@ -9,7 +9,6 @@ export async function createProtoTypes(
   const protoFiles = files
     .map((item) => path.resolve(definitionsPath, item))
     .join(' ')
-
   await runCommand({
     command: path.resolve(
       process.cwd(),
