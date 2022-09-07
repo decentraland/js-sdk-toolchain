@@ -18,6 +18,10 @@ export * from './readonly'
 export * from './types'
 export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
 
+namespace JSX {
+  export type Element = any
+}
+
 declare const ReactEcs: {
   createRenderer(
     engine: Pick<IEngine, 'baseComponents' | 'getComponent' | 'addEntity'>
@@ -25,10 +29,6 @@ declare const ReactEcs: {
     update(renderTree: () => JSX.Element): void
     getEntities(): Entity[]
   }
-}
-
-namespace JSX {
-  export type Element = any
 }
 
 function preEngine() {
@@ -192,7 +192,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
   const uiContainer: { getEntities: () => Entity[]; update: () => void }[] = []
 
   function renderUI(renderTree: () => JSX.Element): number {
-    if (!ReactEcs || !ReactEcs.createRenderer) {
+    if (typeof ReactEcs === 'undefined') {
       throw new Error('ReactEcs library not found')
     }
     const renderer = ReactEcs.createRenderer({
@@ -203,7 +203,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     function update() {
       renderer.update(renderTree())
     }
-    return uiContainer.push({ update, getEntities: renderer.getEntities })
+    return uiContainer.push({ update, getEntities: renderer.getEntities }) - 1
   }
 
   function removeUI(index: number) {

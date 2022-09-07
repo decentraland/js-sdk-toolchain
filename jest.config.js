@@ -9,19 +9,12 @@ module.exports = {
     "^.+\\.(ts|tsx)$": "ts-jest",
   },
   coverageDirectory: "coverage",
-  // coverageProvider: 'v8',
   coverageThreshold: {
     "packages/@dcl/ecs/src/components/generated/pb": {
       branches: 70,
       functions: 70,
       lines: 70,
       statements: 70
-    },
-    "packages/@dcl/ecs/src": {
-      branches: 75,
-      functions: 95,
-      lines: 90,
-      statements: 90
     },
     "packages/@dcl/sdk/src/cli": {
       branches: 0,
@@ -34,6 +27,7 @@ module.exports = {
     "scripts",
     "test",
     "packages/@dcl/sdk/src/cli/mock-catalyst",
+    "packages/@dcl/react-ecs"
   ],
   verbose: true,
   testMatch: ["**/*.spec.(ts|tsx)"],

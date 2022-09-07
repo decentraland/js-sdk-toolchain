@@ -32,6 +32,9 @@ lint-fix:
 test:
 	node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS)
 
+test-coverage:
+	node_modules/.bin/jest --detectOpenHandles --colors --coverage $(TESTARGS)
+
 node_modules/.bin/protobuf/bin/protoc:
 	curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v$(PROTOBUF_VERSION)/$(PROTOBUF_ZIP)
 	unzip -o $(PROTOBUF_ZIP) -d node_modules/.bin/protobuf
@@ -58,6 +61,6 @@ scripts/rpc-api-generation/src/proto/%.gen.ts: packages/@dcl/ecs/node_modules/@d
 			-I="$(PWD)/packages/@dcl/ecs/node_modules/@dcl/protocol/kernel/apis" \
 			"$(PWD)/packages/@dcl/ecs/node_modules/@dcl/protocol/kernel/apis/$*.proto";
 
-compile_apis: ${PBS_TS} 
+compile_apis: ${PBS_TS}
 
 .PHONY: build test install

@@ -60,7 +60,7 @@ jobs:
       - name: build
         run: make build
       - name: test
-        run: make test
+        run: make test-coverage
       - name: lint
         run: make lint
       - name: prepare releasable packages
@@ -196,7 +196,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: make playground
-        run: | 
+        run: |
           mkdir playground
           cp packages/@dcl/sdk/dist/ecs7/index.min.js ./playground
           cp packages/@dcl/sdk/types/ecs7/index.d.ts ./playground
