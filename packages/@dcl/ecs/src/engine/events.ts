@@ -32,7 +32,7 @@ export function wasEntityClickedGenerator(engine: IEngine) {
   }, EventSystemPriority)
 
   return function (entity: Entity, actionButton: ActionButton) {
-    const component = engine.baseComponents.PointerEventsResult.get(
+    const component = engine.baseComponents.PointerEventsResult.getOrNull(
       engine.RootEntity
     )
 
@@ -97,7 +97,7 @@ export function isPointerEventActiveGenerator(engine: IEngine) {
     pointerEventType: PointerEventType
   ) {
     const component = engine.baseComponents.PointerEventsResult.getOrNull(
-      0 as Entity
+      engine.RootEntity
     )
 
     if (!component) return false
@@ -136,29 +136,16 @@ function findLastAction(
   let commandToReturn: PBPointerEventsResult_PointerCommand | undefined =
     undefined
 
-  if (entity) {
-    for (const command of commands) {
-      if (
-        command.button === actionButton &&
-        command.state === pointerEventType &&
-        command.hit &&
-        entity === command.hit.entityId
-      ) {
-        if (!commandToReturn || command.timestamp >= commandToReturn.timestamp)
-          commandToReturn = command
-      }
-    }
-  } else {
-    for (const command of commands) {
-      if (
-        command.button === actionButton &&
-        command.state === pointerEventType
-      ) {
-        if (!commandToReturn || command.timestamp >= commandToReturn.timestamp)
-          commandToReturn = command
-      }
+  for (const command of commands) {
+    if (
+      command.button === actionButton &&
+      command.state === pointerEventType &&
+      (!entity || (command.hit && entity === command.hit.entityId))
+    ) {
+      if (!commandToReturn || command.timestamp >= commandToReturn.timestamp)
+        commandToReturn = command
     }
   }
 
-  return commandToReturn !== undefined ? commandToReturn : undefined
+  return commandToReturn
 }

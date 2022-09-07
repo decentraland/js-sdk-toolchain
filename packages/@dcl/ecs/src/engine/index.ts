@@ -82,11 +82,14 @@ function preEngine() {
     return newComponent
   }
 
-  function defineComponent<T extends Spec>(
+  function defineComponent<
+    T extends Spec,
+    ConstructorType = Partial<Result<T>>
+  >(
     spec: T,
     componentId: number,
-    constructorDefault?: Partial<Result<T>>
-  ): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>> {
+    constructorDefault?: ConstructorType
+  ): ComponentDefinition<ISchema<Result<T>>, ConstructorType> {
     return defineComponentFromSchema(
       Schemas.Map(spec),
       componentId,

@@ -5,7 +5,9 @@
  * init and it'll be changing.
  */
 
-import { Engine } from '../engine'
+import { ActionButton } from '../components/generated/pb/common/ActionButton.gen'
+import { PointerEventType } from '../components/generated/pb/PointerEvents.gen'
+import { Engine, Entity } from '../engine'
 import {
   isPointerEventActiveGenerator,
   wasEntityClickedGenerator
@@ -47,5 +49,45 @@ if (typeof dcl !== 'undefined') {
 export const log = dcl.log
 export const error = dcl.error
 
-export const wasEntityClicked = wasEntityClickedGenerator(engine)
-export const isPointerEventActive = isPointerEventActiveGenerator(engine)
+let wasEntityClickedFunc:
+  | ((entity: Entity, actionButton: ActionButton) => boolean)
+  | null = null
+
+/**
+ * Check if an entity emitted a clicked event
+ * @param entity the entity to query, for global clicks use `engine.RootEntity`
+ * @param actionButton
+ * @returns true if the entity was clicked in the last tick-update
+ */
+export function wasEntityClicked(entity: Entity, actionButton: ActionButton) {
+  if (!wasEntityClickedFunc) {
+    wasEntityClickedFunc = wasEntityClickedGenerator(engine)
+  }
+  return wasEntityClickedFunc(entity, actionButton)
+}
+
+let isPointerEventActiveFunc:
+  | ((
+      entity: Entity,
+      actionButton: ActionButton,
+      pointerEventType: PointerEventType
+    ) => boolean)
+  | null = null
+
+/**
+ * Check if a pointer event has been emited in the last tick-update.
+ * @param entity the entity to query, for global clicks use `engine.RootEntity`
+ * @param actionButton
+ * @param pointerEventType
+ * @returns
+ */
+export function isPointerEventActive(
+  entity: Entity,
+  actionButton: ActionButton,
+  pointerEventType: PointerEventType
+) {
+  if (!isPointerEventActiveFunc) {
+    isPointerEventActiveFunc = isPointerEventActiveGenerator(engine)
+  }
+  return isPointerEventActiveFunc(entity, actionButton, pointerEventType)
+}

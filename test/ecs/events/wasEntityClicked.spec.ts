@@ -5,6 +5,12 @@ import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/gene
 import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/common/ActionButton.gen'
 
 describe('Events helpers wasEntityClicked', () => {
+  it('should detect no events', () => {
+    const newEngine = Engine()
+    const wasEntityClicked = wasEntityClickedGenerator(newEngine)
+    expect(wasEntityClicked(newEngine.RootEntity, ActionButton.ANY)).toBe(false)
+  })
+
   it('detect global click', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
@@ -112,6 +118,37 @@ describe('Events helpers wasEntityClicked', () => {
 
     expect(wasEntityClicked(entity, ActionButton.POINTER)).toBe(false)
     expect(wasEntityClicked(entity, ActionButton.ACTION_3)).toBe(false)
+  })
+
+  it('should detect click, then no click, then other click', () => {
+    const newEngine = Engine()
+    const { PointerEventsResult } = newEngine.baseComponents
+    const entity = newEngine.addEntity()
+
+    PointerEventsResult.create(newEngine.RootEntity, {
+      commands: [
+        createTestPointerDownCommand(entity, 4, PointerEventType.UP),
+        createTestPointerDownCommand(entity, 3, PointerEventType.DOWN)
+      ]
+    })
+    const wasEntityClicked = wasEntityClickedGenerator(newEngine)
+
+    expect(wasEntityClicked(entity, ActionButton.POINTER)).toBe(true)
+    newEngine.update(0)
+    expect(wasEntityClicked(entity, ActionButton.POINTER)).toBe(false)
+
+    PointerEventsResult.createOrReplace(newEngine.RootEntity, {
+      commands: [
+        createTestPointerDownCommand(entity, 4, PointerEventType.UP),
+        createTestPointerDownCommand(entity, 3, PointerEventType.DOWN),
+        createTestPointerDownCommand(entity, 8, PointerEventType.UP),
+        createTestPointerDownCommand(entity, 5, PointerEventType.DOWN)
+      ]
+    })
+
+    expect(wasEntityClicked(entity, ActionButton.POINTER)).toBe(true)
+    newEngine.update(0)
+    expect(wasEntityClicked(entity, ActionButton.POINTER)).toBe(false)
   })
 })
 

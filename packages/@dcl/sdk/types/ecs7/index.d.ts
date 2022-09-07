@@ -696,7 +696,14 @@ declare interface ISize {
     height: number;
 }
 
-declare const isPointerEventActive: (entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType) => boolean;
+/**
+ * Check if a pointer event has been emited in the last tick-update.
+ * @param entity the entity to query, for global clicks use `engine.RootEntity`
+ * @param actionButton
+ * @param pointerEventType
+ * @returns
+ */
+declare function isPointerEventActive(entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType): boolean;
 
 declare function isPointerEventActiveGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType) => boolean;
 
@@ -1929,8 +1936,8 @@ declare function preEngine(): {
         name?: string | undefined;
     }[];
     removeSystem: (selector: string | Update) => boolean;
-    defineComponent: <T extends Spec>(spec: T, componentId: number, constructorDefault?: Partial<Result<T>> | undefined) => ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>;
-    defineComponentFromSchema: <T_1 extends ISchema<any>, ConstructorType = EcsResult<T_1>>(spec: T_1, componentId: number, constructorDefault?: ConstructorType | undefined) => ComponentDefinition<T_1, ConstructorType>;
+    defineComponent: <T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType | undefined) => ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    defineComponentFromSchema: <T_1 extends ISchema<any>, ConstructorType_1 = EcsResult<T_1>>(spec: T_1, componentId: number, constructorDefault?: ConstructorType_1 | undefined) => ComponentDefinition<T_1, ConstructorType_1>;
     getEntitiesWith: <T_2 extends [ComponentDefinition<ISchema<any>, any>, ...ComponentDefinition<ISchema<any>, any>[]]>(...components: T_2) => Iterable<[Entity, ...ReadonlyComponentSchema<T_2>]>;
     getComponent: <T_3 extends ISchema<any>>(componentId: number) => ComponentDefinition<T_3, EcsResult<T_3>>;
     removeComponentDefinition: (componentId: number) => void;
@@ -2493,7 +2500,13 @@ declare interface Vector3_2 {
 /** @public */
 declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 
-declare const wasEntityClicked: (entity: Entity, actionButton: ActionButton) => boolean;
+/**
+ * Check if an entity emitted a clicked event
+ * @param entity the entity to query, for global clicks use `engine.RootEntity`
+ * @param actionButton
+ * @returns true if the entity was clicked in the last tick-update
+ */
+declare function wasEntityClicked(entity: Entity, actionButton: ActionButton): boolean;
 
 declare function wasEntityClickedGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton) => boolean;
 

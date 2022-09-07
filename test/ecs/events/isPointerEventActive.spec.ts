@@ -5,6 +5,18 @@ import { isPointerEventActiveGenerator } from '../../../packages/@dcl/ecs/src/en
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Events helpers isPointerEventActive', () => {
+  it('should detect no events', () => {
+    const newEngine = Engine()
+    const isPointerEventActive = isPointerEventActiveGenerator(newEngine)
+    expect(
+      isPointerEventActive(
+        newEngine.RootEntity,
+        ActionButton.ANY,
+        PointerEventType.DOWN
+      )
+    ).toBe(false)
+  })
+
   it('detect pointerEvent', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
