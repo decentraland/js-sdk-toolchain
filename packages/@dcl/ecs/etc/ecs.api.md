@@ -4,6 +4,8 @@
 
 ```ts
 
+/// <reference types="@dcl/posix" />
+
 // Warning: (ae-forgotten-export) The symbol "PBAnimator" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
@@ -287,17 +289,149 @@ export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
 // @public (undocumented)
 export type Nullable<T> = T | null;
 
+// Warning: (ae-missing-release-tag) "Observable" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public @deprecated
+export class Observable<T> {
+    constructor(onObserverAdded?: (observer: Observer<T>) => void);
+    add(callback: (eventData: T, eventState: ObserverEventState) => void, mask?: number, insertFirst?: boolean, scope?: any, unregisterOnFirstCall?: boolean): null | Observer<T>;
+    addOnce(callback: (eventData: T, eventState: ObserverEventState) => void): null | Observer<T>;
+    clear(): void;
+    clone(): Observable<T>;
+    hasObservers(): boolean;
+    hasSpecificMask(mask?: number): boolean;
+    notifyObserver(observer: Observer<T>, eventData: T, mask?: number): void;
+    notifyObservers(eventData: T, mask?: number, target?: any, currentTarget?: any): boolean;
+    notifyObserversWithPromise(eventData: T, mask?: number, target?: any, currentTarget?: any): Promise<T>;
+    remove(observer: null | Observer<T>): boolean;
+    removeCallback(callback: (eventData: T, eventState: ObserverEventState) => void, scope?: any): boolean;
+}
+
+// Warning: (ae-missing-release-tag) "Observer" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public @deprecated
+export class Observer<T> {
+    constructor(
+    callback: (eventData: T, eventState: ObserverEventState) => void,
+    mask: number,
+    scope?: any);
+    callback: (eventData: T, eventState: ObserverEventState) => void;
+    mask: number;
+    scope: any;
+    unregisterOnNextCall: boolean;
+    _willBeUnregistered: boolean;
+}
+
+// Warning: (ae-missing-release-tag) "ObserverEventState" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public @deprecated
+export class ObserverEventState {
+    constructor(mask: number, skipNextObservers?: boolean, target?: any, currentTarget?: any);
+    currentTarget?: any;
+    initalize(mask: number, skipNextObservers?: boolean, target?: any, currentTarget?: any): ObserverEventState;
+    lastReturnValue?: any;
+    mask: number;
+    skipNextObservers: boolean;
+    target?: any;
+}
+
+// @public @deprecated
+export const onCameraModeChangedObservable: Observable<{
+    cameraMode: 0 | 1 | 2;
+}>;
+
+// @public @deprecated (undocumented)
+export const onEnterScene: Observable<{
+    userId: string;
+}>;
+
+// @public @deprecated
+export const onEnterSceneObservable: Observable<{
+    userId: string;
+}>;
+
+// @public @deprecated
+export const onIdleStateChangedObservable: Observable<{
+    isIdle: boolean;
+}>;
+
+// @public @deprecated (undocumented)
+export const onLeaveScene: Observable<{
+    userId: string;
+}>;
+
+// @public @deprecated
+export const onLeaveSceneObservable: Observable<{
+    userId: string;
+}>;
+
+// @public @deprecated (undocumented)
+export const onPlayerClickedObservable: Observable<{
+    userId: string;
+    ray: {
+        origin: ReadOnlyVector3;
+        direction: ReadOnlyVector3;
+        distance: number;
+    };
+}>;
+
+// @public @deprecated (undocumented)
+export const onPlayerConnectedObservable: Observable<{
+    userId: string;
+}>;
+
+// @public @deprecated (undocumented)
+export const onPlayerDisconnectedObservable: Observable<{
+    userId: string;
+}>;
+
+// @public @deprecated (undocumented)
+export const onPlayerExpressionObservable: Observable<{
+    expressionId: string;
+}>;
+
 // @public (undocumented)
 export const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
 
 // @public (undocumented)
 export const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
 
+// @public @deprecated (undocumented)
+export const onPointerLockedStateChange: Observable<{
+    locked?: boolean | undefined;
+}>;
+
 // @public (undocumented)
 export const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
 
 // @public (undocumented)
 export const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
+
+// @public @deprecated (undocumented)
+export const onProfileChanged: Observable<{
+    ethAddress: string;
+    version: number;
+}>;
+
+// @public @deprecated (undocumented)
+export const onRealmChangedObservable: Observable<{
+    domain: string;
+    room: string;
+    serverName: string;
+    displayName: string;
+}>;
+
+// @public @deprecated
+export const onSceneReadyObservable: Observable<{}>;
+
+// @public @deprecated (undocumented)
+export const onVideoEvent: Observable<{
+    componentId: string;
+    videoClipId: string;
+    videoStatus: number;
+    currentOffset: number;
+    totalVideoLength: number;
+}>;
 
 // @public
 export enum Orientation {
