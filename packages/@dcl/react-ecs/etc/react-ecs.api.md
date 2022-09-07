@@ -100,6 +100,127 @@ namespace JSX_2 {
 }
 export { JSX_2 as JSX }
 
+// Warning: (ae-missing-release-tag) "PBUiTransform" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBUiTransform {
+    // (undocumented)
+    alignContent: YGAlign;
+    // (undocumented)
+    alignItems: YGAlign;
+    // (undocumented)
+    alignSelf: YGAlign;
+    // (undocumented)
+    backgroundColor: Color3 | undefined;
+    // (undocumented)
+    borderBottom: number;
+    // (undocumented)
+    borderLeft: number;
+    // (undocumented)
+    borderRight: number;
+    // (undocumented)
+    borderTop: number;
+    // (undocumented)
+    direction: YGDirection;
+    // (undocumented)
+    display: YGDisplay;
+    // (undocumented)
+    flex: number;
+    // (undocumented)
+    flexBasis: number;
+    // (undocumented)
+    flexBasisUnit: YGUnit;
+    // (undocumented)
+    flexDirection: YGFlexDirection;
+    // (undocumented)
+    flexGrow: number;
+    // (undocumented)
+    flexShrink: number;
+    // (undocumented)
+    flexWrap: YGWrap;
+    // (undocumented)
+    height: number;
+    // (undocumented)
+    heightUnit: YGUnit;
+    // (undocumented)
+    justifyContent: YGJustify;
+    // (undocumented)
+    marginBottom: number;
+    // (undocumented)
+    marginBottomUnit: YGUnit;
+    // (undocumented)
+    marginLeft: number;
+    marginLeftUnit: YGUnit;
+    // (undocumented)
+    marginRight: number;
+    // (undocumented)
+    marginRightUnit: YGUnit;
+    // (undocumented)
+    marginTop: number;
+    // (undocumented)
+    marginTopUnit: YGUnit;
+    // (undocumented)
+    maxHeight: number;
+    // (undocumented)
+    maxHeightUnit: YGUnit;
+    // (undocumented)
+    maxWidth: number;
+    // (undocumented)
+    maxWidthUnit: YGUnit;
+    // (undocumented)
+    minHeight: number;
+    // (undocumented)
+    minHeightUnit: YGUnit;
+    // (undocumented)
+    minWidth: number;
+    // (undocumented)
+    minWidthUnit: YGUnit;
+    // (undocumented)
+    overflow: YGOverflow;
+    // (undocumented)
+    paddingBottom: number;
+    // (undocumented)
+    paddingBottomUnit: YGUnit;
+    // (undocumented)
+    paddingLeft: number;
+    // (undocumented)
+    paddingLeftUnit: YGUnit;
+    // (undocumented)
+    paddingRight: number;
+    // (undocumented)
+    paddingRightUnit: YGUnit;
+    // (undocumented)
+    paddingTop: number;
+    // (undocumented)
+    paddingTopUnit: YGUnit;
+    // (undocumented)
+    parent: number;
+    // (undocumented)
+    positionBottom: number;
+    // (undocumented)
+    positionBottomUnit: YGUnit;
+    // (undocumented)
+    positionLeft: number;
+    // (undocumented)
+    positionLeftUnit: YGUnit;
+    // (undocumented)
+    positionRight: number;
+    // (undocumented)
+    positionRightUnit: YGUnit;
+    // (undocumented)
+    positionTop: number;
+    // (undocumented)
+    positionTopUnit: YGUnit;
+    // (undocumented)
+    positionType: YGPositionType;
+    // (undocumented)
+    rightOf: number;
+    // (undocumented)
+    width: number;
+    // (undocumented)
+    widthUnit: YGUnit;
+}
+
 // @public (undocumented)
 export type Position = {
     top: number | string;
@@ -234,6 +355,22 @@ export enum YGPositionType {
     YGPositionTypeRelative = 1,
     // (undocumented)
     YGPositionTypeStatic = 0
+}
+
+// Warning: (ae-missing-release-tag) "YGUnit" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export enum YGUnit {
+    // (undocumented)
+    UNRECOGNIZED = -1,
+    // (undocumented)
+    YGUnitAuto = 3,
+    // (undocumented)
+    YGUnitPercent = 2,
+    // (undocumented)
+    YGUnitPoint = 1,
+    // (undocumented)
+    YGUnitUndefined = 0
 }
 
 // Warning: (ae-missing-release-tag) "YGWrap" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)

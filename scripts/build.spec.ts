@@ -98,7 +98,7 @@ flow('build-all', () => {
     it('Copy proto files', async () => {
       await createProtoTypes(
         `${ECS7_PATH}/node_modules/@dcl/protocol/ecs/components`,
-        `${REACT_ECS}/src/types`,
+        `${REACT_ECS}/src/generated`,
         ['UiTransform.proto']
       )
     })

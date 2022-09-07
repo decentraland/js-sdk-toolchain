@@ -10,8 +10,6 @@ export async function createProtoTypes(
     .map((item) => path.resolve(definitionsPath, item))
     .join(' ')
 
-  console.log({ protoFiles })
-
   await runCommand({
     command: path.resolve(
       process.cwd(),

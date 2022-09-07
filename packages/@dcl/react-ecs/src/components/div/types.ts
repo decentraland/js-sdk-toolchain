@@ -1,4 +1,4 @@
-import { Color3 } from '../../types/common/Color3.gen'
+import { Color3 } from '../../generated/common/Color3.gen'
 import {
   YGAlign,
   YGDirection,
@@ -8,7 +8,7 @@ import {
   YGOverflow,
   YGPositionType,
   YGWrap
-} from '../../types/UiTransform.gen'
+} from '../../generated/UiTransform.gen'
 
 export {
   YGAlign,
@@ -18,9 +18,11 @@ export {
   YGJustify,
   YGOverflow,
   YGPositionType,
-  YGWrap
-} from '../../types/UiTransform.gen'
-export { Color3 } from '../../types/common/Color3.gen'
+  YGWrap,
+  PBUiTransform,
+  YGUnit
+} from '../../generated/UiTransform.gen'
+export { Color3 } from '../../generated/common/Color3.gen'
 
 /**
  * @public

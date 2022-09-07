@@ -9,14 +9,8 @@ import {
   YGPositionType,
   YGUnit,
   YGWrap
-} from '../../types/UiTransform.gen'
-
-type Position = {
-  top: number
-  right: number
-  bottom: number
-  left: number
-}
+} from './types'
+import { Position } from './types'
 
 export const defaultPosition = (pos?: Position) => ({
   top: pos?.top ?? 0,
