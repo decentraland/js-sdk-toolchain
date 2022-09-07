@@ -1,22 +1,23 @@
+import { defineSdkComponents } from '../components'
+import { Schemas } from '../schemas'
+import { ISchema } from '../schemas/ISchema'
+import { Result, Spec } from '../schemas/Map'
+import { ByteBuffer } from '../serialization/ByteBuffer'
 import { crdtSceneSystem } from '../systems/crdt'
-import { Entity, EntityContainer } from './entity'
 import {
-  ComponentType,
   ComponentDefinition,
+  ComponentType,
   defineComponent as defComponent
 } from './component'
-import type { ComponentSchema, IEngineParams } from './types'
-import type { DeepReadonly } from '../Math'
-import { IEngine } from './types'
-import { ByteBuffer } from '../serialization/ByteBuffer'
+import { Entity, EntityContainer } from './entity'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
-import { ISchema } from '../schemas/ISchema'
-import { defineLibraryComponents } from './../components/generated/index.gen'
-import { Result, Spec } from '../schemas/Map'
-import { Schemas } from '../schemas'
+import type { IEngineParams } from './types'
+import { IEngine } from './types'
+import { ReadonlyComponentSchema } from './readonly'
 
-export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
+export * from './readonly'
 export * from './types'
+export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
 
 function preEngine() {
   const entityContainer = EntityContainer()
@@ -61,23 +62,39 @@ function preEngine() {
     return entityContainer.removeEntity(entity)
   }
 
-  function defineComponentFromSchema<T extends ISchema>(
+  function defineComponentFromSchema<
+    T extends ISchema,
+    ConstructorType = ComponentType<T>
+  >(
     spec: T,
-    componentId: number
-  ): ComponentDefinition<T> {
+    componentId: number,
+    constructorDefault?: ConstructorType
+  ): ComponentDefinition<T, ConstructorType> {
     if (componentsDefinition.get(componentId)) {
       throw new Error(`Component ${componentId} already declared`)
     }
-    const newComponent = defComponent<T>(componentId, spec)
+    const newComponent = defComponent<T, ConstructorType>(
+      componentId,
+      spec,
+      constructorDefault
+    )
     componentsDefinition.set(componentId, newComponent)
     return newComponent
   }
 
-  function defineComponent<T extends Spec>(
-    spec: Spec,
-    componentId: number
-  ): ComponentDefinition<ISchema<Result<T>>> {
-    return defineComponentFromSchema(Schemas.Map(spec), componentId)
+  function defineComponent<
+    T extends Spec,
+    ConstructorType = Partial<Result<T>>
+  >(
+    spec: T,
+    componentId: number,
+    constructorDefault?: ConstructorType
+  ): ComponentDefinition<ISchema<Result<T>>, ConstructorType> {
+    return defineComponentFromSchema(
+      Schemas.Map(spec),
+      componentId,
+      constructorDefault
+    )
   }
 
   function getComponent<T extends ISchema>(
@@ -94,11 +111,11 @@ function preEngine() {
 
   function* getEntitiesWith<
     T extends [ComponentDefinition, ...ComponentDefinition[]]
-  >(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]> {
+  >(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]> {
     for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
       yield [entity, ...groupComp.map((c) => c.get(entity))] as [
         Entity,
-        ...DeepReadonly<ComponentSchema<T>>
+        ...ReadonlyComponentSchema<T>
       ]
     }
   }
@@ -126,6 +143,10 @@ function preEngine() {
     return systems.getSystems()
   }
 
+  function removeComponentDefinition(componentId: number) {
+    componentsDefinition.delete(componentId)
+  }
+
   return {
     entitiesComponent,
     componentsDefinition,
@@ -138,12 +159,13 @@ function preEngine() {
     defineComponent,
     defineComponentFromSchema,
     getEntitiesWith,
-    getComponent
+    getComponent,
+    removeComponentDefinition
   }
 }
 
 /**
- * @internal
+ * @public
  */
 export type PreEngine = ReturnType<typeof preEngine>
 
@@ -153,7 +175,7 @@ export type PreEngine = ReturnType<typeof preEngine>
 export function Engine({ transports }: IEngineParams = {}): IEngine {
   const engine = preEngine()
   const crdtSystem = crdtSceneSystem({ engine, transports: transports || [] })
-  const baseComponents = defineLibraryComponents(engine)
+  const baseComponents = defineSdkComponents(engine)
 
   function update(dt: number) {
     crdtSystem.receiveMessages()
@@ -206,6 +228,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     defineComponentFromSchema: engine.defineComponentFromSchema,
     getEntitiesWith: engine.getEntitiesWith,
     getComponent: engine.getComponent,
+    removeComponentDefinition: engine.removeComponentDefinition,
     update,
     baseComponents
   }

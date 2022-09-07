@@ -20,6 +20,8 @@ export type Result<T extends Spec> = ToOptional<{
     : never
 }>
 
+export type MapSchemaType<T extends Spec> = ISchema<Result<T>>
+
 /**
  * @public
  */

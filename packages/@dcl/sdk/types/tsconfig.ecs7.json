@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2018",
+    "target": "es2020",
     "module": "amd",
     "moduleResolution": "classic",
     "pretty": true,
@@ -22,16 +22,20 @@
     "types": [
       "env",
       "ecs7",
-      "@decentraland/EthereumController",
-      "@decentraland/SocialController",
-      "@decentraland/Identity",
-      "@decentraland/web3-provider",
-      "@decentraland/EnvironmentAPI",
-      "@decentraland/ParcelIdentity",
-      "@decentraland/PortableExperiences",
-      "@decentraland/RestrictedActions",
-      "@decentraland/SignedFetch",
-      "@decentraland/Players"
+      "rpc-modules/CommunicationsController",
+      "rpc-modules/DevTools",
+      "rpc-modules/EngineAPI",
+      "rpc-modules/EnvironmentAPI",
+      "rpc-modules/EthereumController",
+      "rpc-modules/ExperimentalAPI",
+      "rpc-modules/ParcelIdentity",
+      "rpc-modules/Permissions",
+      "rpc-modules/Players",
+      "rpc-modules/PortableExperiences",
+      "rpc-modules/SignedFetch",
+      "rpc-modules/SocialController",
+      "rpc-modules/UserActionModule",
+      "rpc-modules/UserIdentity"
     ],
     "typeRoots": [
       "."

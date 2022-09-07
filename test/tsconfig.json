@@ -1,17 +1,19 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2020",
     "module": "commonjs",
     "moduleResolution": "node",
     "pretty": true,
     "types": [
       "node",
-      "jest"
+      "jest",
+      "packages/@dcl/ecs/node_modules/@dcl/posix/index.d.ts"
     ],
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
     "declaration": false,
     "downlevelIteration": true,
     "keyofStringsOnly": true,

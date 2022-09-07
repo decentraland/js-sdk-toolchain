@@ -4,41 +4,42 @@
 
 ```ts
 
-// Warning: (ae-forgotten-export) The symbol "ISchema" needs to be exported by the entry point index.d.ts
+/// <reference types="@dcl/posix" />
+
 // Warning: (ae-forgotten-export) The symbol "PBAnimator" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const Animator: ComponentDefinition<ISchema<PBAnimator>>;
+export const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
 
 // Warning: (ae-forgotten-export) The symbol "PBAudioSource" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
+export const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
 
 // Warning: (ae-forgotten-export) The symbol "PBAvatarAttach" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+export const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
 
 // Warning: (ae-forgotten-export) The symbol "PBAvatarModifierArea" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
+export const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
 
 // Warning: (ae-forgotten-export) The symbol "PBAvatarShape" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+export const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
 
 // Warning: (ae-forgotten-export) The symbol "PBBillboard" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const Billboard: ComponentDefinition<ISchema<PBBillboard>>;
+export const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
 
 // Warning: (ae-forgotten-export) The symbol "PBBoxShape" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
+export const BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
 
 // Warning: (ae-forgotten-export) The symbol "createByteBuffer" needs to be exported by the entry point index.d.ts
 //
@@ -48,21 +49,21 @@ export type ByteBuffer = ReturnType<typeof createByteBuffer>;
 // Warning: (ae-forgotten-export) The symbol "PBCameraMode" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
+export const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
 
 // Warning: (ae-forgotten-export) The symbol "PBCameraModeArea" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
+export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
 
 // @public (undocumented)
-export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
+export type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorType = ComponentType<T>> = {
     _id: number;
     default(): DeepReadonly<ComponentType<T>>;
     has(entity: Entity): boolean;
     get(entity: Entity): DeepReadonly<ComponentType<T>>;
     getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
-    create(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
+    create(entity: Entity, val?: ConstructorType): ComponentType<T>;
     createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
     deleteFrom(entity: Entity): ComponentType<T> | null;
     getMutable(entity: Entity): ComponentType<T>;
@@ -72,84 +73,72 @@ export type ComponentDefinition<T extends ISchema = ISchema<any>> = {
 
 // @public (undocumented)
 export namespace Components {
+    const // Warning: (ae-forgotten-export) The symbol "TransformType" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     const // (undocumented)
-    Transform: ComponentDefinition<ISchema<    {
-    position: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    rotation: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    };
-    scale: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    parent?: Entity | undefined;
-    }>>;
+    Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     const // (undocumented)
-    Animator: ComponentDefinition<ISchema<PBAnimator>>;
+    AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     const // (undocumented)
-    AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
+    AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
     const // (undocumented)
-    AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+    AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
     const // (undocumented)
-    AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
+    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
     const // (undocumented)
-    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+    Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
     const // (undocumented)
-    Billboard: ComponentDefinition<ISchema<PBBillboard>>;
+    BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
     const // (undocumented)
-    BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
+    CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
     const // (undocumented)
-    CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
-    const // (undocumented)
-    CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
+    CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
     const // Warning: (ae-forgotten-export) The symbol "PBCylinderShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
+    CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
     const // Warning: (ae-forgotten-export) The symbol "PBGLTFShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
     const // Warning: (ae-forgotten-export) The symbol "PBMaterial" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    Material: ComponentDefinition<ISchema<PBMaterial>>;
+    Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    const // Warning: (ae-forgotten-export) The symbol "PBMeshCollider" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
     const // Warning: (ae-forgotten-export) The symbol "PBMeshRenderer" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
+    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
     const // Warning: (ae-forgotten-export) The symbol "PBNFTShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+    NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
     const // Warning: (ae-forgotten-export) The symbol "PBOnPointerDown" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
     const // Warning: (ae-forgotten-export) The symbol "PBOnPointerDownResult" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
     const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUp" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
     const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUpResult" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
+    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
     const // Warning: (ae-forgotten-export) The symbol "PBPlaneShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+    PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
     const // Warning: (ae-forgotten-export) The symbol "PBPointerLock" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -162,18 +151,26 @@ export namespace Components {
     //
     // (undocumented)
     RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>>;
+    //
+    // (undocumented)
+    PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    
     const // Warning: (ae-forgotten-export) The symbol "PBSphereShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
+    SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     const // Warning: (ae-forgotten-export) The symbol "PBTextShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    TextShape: ComponentDefinition<ISchema<PBTextShape>>;
+    TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
     const // Warning: (ae-forgotten-export) The symbol "PBUiText" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    UiText: ComponentDefinition<ISchema<PBUiText>>;
+    UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    const // Warning: (ae-forgotten-export) The symbol "PBVisibilityComponent" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 }
 
 // @public (undocumented)
@@ -186,13 +183,29 @@ export type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefiniti
 // @public (undocumented)
 export type ComponentType<T extends ISchema> = EcsResult<T>;
 
-// @public (undocumented)
-export const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
-
+// Warning: (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// Warning: (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@params" is not defined in this configuration
+//
 // @public
-export type DeepReadonly<T> = {
-    readonly [P in keyof T]: DeepReadonly<T[P]>;
+export function cyclicParentingChecker(engine: IEngine): () => void;
+
+// @public (undocumented)
+export const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
+
+// @public (undocumented)
+export type DeepReadonly<T> = T extends ReadonlyPrimitive ? T : T extends Map<infer K, infer V> ? DeepReadonlyMap<K, V> : T extends Set<infer M> ? DeepReadonlySet<M> : DeepReadonlyObject<T>;
+
+// @public (undocumented)
+export type DeepReadonlyMap<K, V> = ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>;
+
+// @public (undocumented)
+export type DeepReadonlyObject<T> = {
+    readonly [K in keyof T]: DeepReadonly<T[K]>;
 };
+
+// @public (undocumented)
+export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 
 // @public
 export const DEG2RAD: number;
@@ -203,7 +216,9 @@ export type double = number;
 // @public (undocumented)
 export function Engine({ transports }?: IEngineParams): IEngine;
 
-// @alpha
+// Warning: (ae-missing-release-tag) "engine" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
 export const engine: IEngine;
 
 // @public (undocumented)
@@ -214,6 +229,8 @@ export type Entity = number & {
 // @public
 export const Epsilon = 0.000001;
 
+// Warning: (ae-missing-release-tag) "error" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
 export const error: (message: string | Error, data?: any) => void;
 
@@ -224,7 +241,7 @@ export type float = number;
 export type FloatArray = number[];
 
 // @public (undocumented)
-export const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+export const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
 
 // @public (undocumented)
 export type IEngine = {
@@ -233,10 +250,10 @@ export type IEngine = {
     removeEntity(entity: Entity): void;
     addSystem(system: Update, priority?: number, name?: string): void;
     removeSystem(selector: string | Update): boolean;
-    defineComponent<T extends Spec>(spec: Spec, componentId: number): ComponentDefinition<ISchema<Result<T>>>;
-    defineComponentFromSchema<T extends ISchema>(spec: T, componentId: number): ComponentDefinition<T>;
+    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    defineComponentFromSchema<T extends ISchema<Record<string, any>>, ConstructorType = ComponentType<T>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
-    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
+    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     baseComponents: SdkComponents;
 };
 
@@ -245,38 +262,182 @@ export type IEngineParams = {
     transports?: Transport[];
 };
 
+// @public (undocumented)
+export type ISchema<T = any> = {
+    serialize(value: T, builder: ByteBuffer): void;
+    deserialize(reader: ByteBuffer): T;
+    create(): T;
+};
+
 // @public
 export interface ISize {
     height: number;
     width: number;
 }
 
+// Warning: (ae-missing-release-tag) "log" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
 export const log: (...a: any[]) => void;
 
 // @public (undocumented)
-export const Material: ComponentDefinition<ISchema<PBMaterial>>;
+export const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
 
 // @public (undocumented)
-export const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
+export const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
 
 // @public (undocumented)
-export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+export const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
+
+// @public (undocumented)
+export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
 
 // @public (undocumented)
 export type Nullable<T> = T | null;
 
-// @public (undocumented)
-export const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+// Warning: (ae-missing-release-tag) "Observable" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public @deprecated
+export class Observable<T> {
+    constructor(onObserverAdded?: (observer: Observer<T>) => void);
+    add(callback: (eventData: T, eventState: ObserverEventState) => void, mask?: number, insertFirst?: boolean, scope?: any, unregisterOnFirstCall?: boolean): null | Observer<T>;
+    addOnce(callback: (eventData: T, eventState: ObserverEventState) => void): null | Observer<T>;
+    clear(): void;
+    clone(): Observable<T>;
+    hasObservers(): boolean;
+    hasSpecificMask(mask?: number): boolean;
+    notifyObserver(observer: Observer<T>, eventData: T, mask?: number): void;
+    notifyObservers(eventData: T, mask?: number, target?: any, currentTarget?: any): boolean;
+    notifyObserversWithPromise(eventData: T, mask?: number, target?: any, currentTarget?: any): Promise<T>;
+    remove(observer: null | Observer<T>): boolean;
+    removeCallback(callback: (eventData: T, eventState: ObserverEventState) => void, scope?: any): boolean;
+}
+
+// Warning: (ae-missing-release-tag) "Observer" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public @deprecated
+export class Observer<T> {
+    constructor(
+    callback: (eventData: T, eventState: ObserverEventState) => void,
+    mask: number,
+    scope?: any);
+    callback: (eventData: T, eventState: ObserverEventState) => void;
+    mask: number;
+    scope: any;
+    unregisterOnNextCall: boolean;
+    _willBeUnregistered: boolean;
+}
+
+// Warning: (ae-missing-release-tag) "ObserverEventState" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public @deprecated
+export class ObserverEventState {
+    constructor(mask: number, skipNextObservers?: boolean, target?: any, currentTarget?: any);
+    currentTarget?: any;
+    initalize(mask: number, skipNextObservers?: boolean, target?: any, currentTarget?: any): ObserverEventState;
+    lastReturnValue?: any;
+    mask: number;
+    skipNextObservers: boolean;
+    target?: any;
+}
+
+// @public @deprecated
+export const onCameraModeChangedObservable: Observable<{
+    cameraMode: 0 | 1 | 2;
+}>;
+
+// @public @deprecated (undocumented)
+export const onEnterScene: Observable<{
+    userId: string;
+}>;
+
+// @public @deprecated
+export const onEnterSceneObservable: Observable<{
+    userId: string;
+}>;
+
+// @public @deprecated
+export const onIdleStateChangedObservable: Observable<{
+    isIdle: boolean;
+}>;
+
+// @public @deprecated (undocumented)
+export const onLeaveScene: Observable<{
+    userId: string;
+}>;
+
+// @public @deprecated
+export const onLeaveSceneObservable: Observable<{
+    userId: string;
+}>;
+
+// @public @deprecated (undocumented)
+export const onPlayerClickedObservable: Observable<{
+    userId: string;
+    ray: {
+        origin: ReadOnlyVector3;
+        direction: ReadOnlyVector3;
+        distance: number;
+    };
+}>;
+
+// @public @deprecated (undocumented)
+export const onPlayerConnectedObservable: Observable<{
+    userId: string;
+}>;
+
+// @public @deprecated (undocumented)
+export const onPlayerDisconnectedObservable: Observable<{
+    userId: string;
+}>;
+
+// @public @deprecated (undocumented)
+export const onPlayerExpressionObservable: Observable<{
+    expressionId: string;
+}>;
 
 // @public (undocumented)
-export const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+export const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
 
 // @public (undocumented)
-export const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+export const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
+
+// @public @deprecated (undocumented)
+export const onPointerLockedStateChange: Observable<{
+    locked?: boolean | undefined;
+}>;
 
 // @public (undocumented)
-export const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
+export const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
+
+// @public (undocumented)
+export const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
+
+// @public @deprecated (undocumented)
+export const onProfileChanged: Observable<{
+    ethAddress: string;
+    version: number;
+}>;
+
+// @public @deprecated (undocumented)
+export const onRealmChangedObservable: Observable<{
+    domain: string;
+    room: string;
+    serverName: string;
+    displayName: string;
+}>;
+
+// @public @deprecated
+export const onSceneReadyObservable: Observable<{}>;
+
+// @public @deprecated (undocumented)
+export const onVideoEvent: Observable<{
+    componentId: string;
+    videoClipId: string;
+    videoStatus: number;
+    currentOffset: number;
+    totalVideoLength: number;
+}>;
 
 // @public
 export enum Orientation {
@@ -285,10 +446,15 @@ export enum Orientation {
 }
 
 // @public (undocumented)
-export const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+export const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
 
 // @public (undocumented)
-export const PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
+export const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+
+// Warning: (ae-forgotten-export) The symbol "preEngine" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type PreEngine = ReturnType<typeof preEngine>;
 
 // @public (undocumented)
 export namespace Quaternion {
@@ -321,8 +487,10 @@ export namespace Quaternion {
         w: number;
     };
     export function normalize(q: ReadonlyQuaternion): MutableQuaternion;
+    // Warning: (ae-forgotten-export) The symbol "DeepReadonly" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
-    export type ReadonlyQuaternion = DeepReadonly<MutableQuaternion>;
+    export type ReadonlyQuaternion = DeepReadonly_2<MutableQuaternion>;
     export function rotateTowards(from: ReadonlyQuaternion, to: ReadonlyQuaternion, maxDegreesDelta: number): MutableQuaternion;
     export function rotationYawPitchRoll(yaw: number, pitch: number, roll: number): MutableQuaternion;
     export function rotationYawPitchRollToRef(yaw: number, pitch: number, roll: number, result: Quaternion.MutableQuaternion): void;
@@ -339,6 +507,13 @@ export const Raycast: ComponentDefinition<ISchema<PBRaycast>>;
 
 // @public (undocumented)
 export const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>>;
+export type ReadonlyComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
+    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['get']> : never;
+};
+
+// @public (undocumented)
+export type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
+
 
 // Warning: (ae-forgotten-export) The symbol "ToOptional" needs to be exported by the entry point index.d.ts
 //
@@ -387,10 +562,10 @@ export namespace Schemas {
     Optional: typeof IOptional;
 }
 
-// Warning: (ae-forgotten-export) The symbol "defineLibraryComponents" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "defineSdkComponents" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export type SdkComponents = ReturnType<typeof defineLibraryComponents>;
+export type SdkComponents = ReturnType<typeof defineSdkComponents>;
 
 // @public
 export enum Space {
@@ -406,10 +581,10 @@ export interface Spec {
 }
 
 // @public (undocumented)
-export const SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
+export const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
 
 // @public (undocumented)
-export const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
+export const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 
 // @public
 export const ToGammaSpace: number;
@@ -418,26 +593,10 @@ export const ToGammaSpace: number;
 export const ToLinearSpace = 2.2;
 
 // @public (undocumented)
-export const Transform: ComponentDefinition<ISchema<    {
-position: {
-x: number;
-y: number;
-z: number;
-};
-rotation: {
-x: number;
-y: number;
-z: number;
-w: number;
-};
-scale: {
-x: number;
-y: number;
-z: number;
-};
-parent?: Entity | undefined;
-}>>;
+export const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
 
+// Warning: (ae-missing-release-tag) "Transport" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
 export type Transport = {
     type: string;
@@ -447,12 +606,13 @@ export type Transport = {
 };
 
 // Warning: (ae-forgotten-export) The symbol "ReceiveMessage" needs to be exported by the entry point index.d.ts
+// Warning: (ae-missing-release-tag) "TransportMessage" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
 // @public (undocumented)
-export const UiText: ComponentDefinition<ISchema<PBUiText>>;
+export const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
 
 // @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;
@@ -493,7 +653,7 @@ export namespace Vector3 {
     export function One(): MutableVector3;
     export function opposite(value: ReadonlyVector3): MutableVector3;
     // (undocumented)
-    export type ReadonlyVector3 = DeepReadonly<MutableVector3>;
+    export type ReadonlyVector3 = DeepReadonly_2<MutableVector3>;
     export function Right(): MutableVector3;
     export function rotate(vector: ReadonlyVector3, q: Quaternion.ReadonlyQuaternion): MutableVector3;
     export function scale(vector: ReadonlyVector3, scale: number): MutableVector3;
@@ -503,6 +663,62 @@ export namespace Vector3 {
     export function Up(): MutableVector3;
     export function Zero(): MutableVector3;
 }
+
+// @public (undocumented)
+export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
+
+// Warnings were encountered during analysis:
+//
+// dist/engine/component.d.ts:24:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:37:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:38:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/component.d.ts:57:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:58:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/component.d.ts:69:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// dist/engine/component.d.ts:69:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
+// dist/engine/component.d.ts:70:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:71:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:78:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// dist/engine/component.d.ts:78:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// dist/engine/component.d.ts:83:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// dist/engine/component.d.ts:83:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
+// dist/engine/component.d.ts:84:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:85:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:92:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// dist/engine/component.d.ts:92:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// dist/engine/component.d.ts:97:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// dist/engine/component.d.ts:97:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
+// dist/engine/component.d.ts:98:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:106:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// dist/engine/component.d.ts:106:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// dist/engine/component.d.ts:111:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// dist/engine/component.d.ts:111:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
+// dist/engine/component.d.ts:112:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:119:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// dist/engine/component.d.ts:119:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// dist/engine/component.d.ts:124:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// dist/engine/component.d.ts:124:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
+// dist/engine/component.d.ts:125:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/component.d.ts:133:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// dist/engine/component.d.ts:133:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// dist/engine/types.d.ts:26:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:27:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/types.d.ts:36:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:41:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:42:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:43:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:59:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:65:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:66:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:67:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:68:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/types.d.ts:82:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:83:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:84:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/types.d.ts:94:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:95:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/types.d.ts:104:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:105:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
 
 // (No @packageDocumentation comment for this package)
 

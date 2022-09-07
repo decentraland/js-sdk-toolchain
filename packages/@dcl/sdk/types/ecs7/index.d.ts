@@ -1,3 +1,5 @@
+/// <reference types="@dcl/posix" />
+
 declare const enum ActionButton {
     POINTER = 0,
     PRIMARY = 1,
@@ -17,10 +19,10 @@ declare const enum ActionButton {
 }
 
 /** @public */
-declare const Animator: ComponentDefinition<ISchema<PBAnimator>>;
+declare const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
 
 /** @public */
-declare const AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
+declare const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
 
 declare const enum AvatarAnchorPoint {
     POSITION = 0,
@@ -31,7 +33,7 @@ declare const enum AvatarAnchorPoint {
 }
 
 /** @public */
-declare const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+declare const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
 
 declare const enum AvatarModifier {
     HIDE_AVATARS = 0,
@@ -40,16 +42,16 @@ declare const enum AvatarModifier {
 }
 
 /** @public */
-declare const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
+declare const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
 
 /** @public */
-declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
 
 /** @public */
-declare const Billboard: ComponentDefinition<ISchema<PBBillboard>>;
+declare const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
 
 /** @public */
-declare const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
+declare const BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
 
 /**
  * @public
@@ -57,10 +59,10 @@ declare const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
 declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
 
 /** @public */
-declare const CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
+declare const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
 
 /** @public */
-declare const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
+declare const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
 
 declare const enum CameraModeValue {
     FIRST_PERSON = 0,
@@ -77,7 +79,7 @@ declare interface Color3 {
 /**
  * @public
  */
-declare type ComponentDefinition<T extends ISchema = ISchema<any>> = {
+declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorType = ComponentType<T>> = {
     _id: number;
     /**
      * Return the default value of the current component
@@ -141,7 +143,7 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>> = {
      * Transform.create(myEntity) // throw an error, the `Transform` component already exists in `myEntity`
      * ````
      */
-    create(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
+    create(entity: Entity, val?: ConstructorType): ComponentType<T>;
     /**
      * Add the current component to an entity or replace the content if the entity already has the component
      * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
@@ -203,72 +205,57 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>> = {
 /** @public */
 declare namespace Components {
     /** @public */
-    const Transform: ComponentDefinition<ISchema<    {
-    position: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    rotation: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    };
-    scale: {
-    x: number;
-    y: number;
+    const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     /** @public */
-    z: number;
-    };
-    parent?: Entity | undefined;
-    }>>;
+    const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     /** @public */
-    const Animator: ComponentDefinition<ISchema<PBAnimator>>;
+    const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     /** @public */
-    const AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
+    const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
     /** @public */
-    const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
+    const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
     /** @public */
-    const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
+    const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
     /** @public */
-    const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
+    const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
     /** @public */
-    const Billboard: ComponentDefinition<ISchema<PBBillboard>>;
+    const BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
     /** @public */
-    const BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
+    const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
     /** @public */
-    const CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
+    const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
     /** @public */
-    const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
+    const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
     /** @public */
-    const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
+    const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
     /** @public */
-    const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+    const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     /** @public */
-    const Material: ComponentDefinition<ISchema<PBMaterial>>;
+    const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
     /** @public */
-    const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
+    const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
     /** @public */
-    const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+    const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
     /** @public */
-    const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+    const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
     /** @public */
-    const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+    const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
     /** @public */
-    const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+    const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
     /** @public */
-    const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
+    const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
     /** @public */
-    const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+    const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
     /** @public */
-    const PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
+    const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
     /** @public */
-    const SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
+    const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     /** @public */
-    const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
+    const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
     /** @public */
-    const UiText: ComponentDefinition<ISchema<PBUiText>>;
+    const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    /** @public */
+    const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 }
 
 /**
@@ -421,60 +408,83 @@ declare interface CreateByteBufferOptions {
     initialCapacity?: number;
 }
 
+/**
+ * Transform parenting: cyclic dependency checker
+ * It checks only in modified Transforms
+ *
+ * Add this system with:
+ * ```ts
+ *  engine.addSystem(cyclicParentingChecker(engine))
+ * ````
+ * And then it will check every tick the parenting.
+ *
+ * @public
+ *
+ * @params engine
+ * @returns a system
+ */
+declare function cyclicParentingChecker(engine: IEngine): () => void;
+
 /** @public */
-declare const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
+declare const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
+
+/**
+ * @public
+ */
+declare type DeepReadonly<T> = T extends ReadonlyPrimitive ? T : T extends Map<infer K, infer V> ? DeepReadonlyMap<K, V> : T extends Set<infer M> ? DeepReadonlySet<M> : DeepReadonlyObject<T>;
 
 /**
  * Make each field readonly deeply
  * @public
  */
-declare type DeepReadonly<T> = {
-    readonly [P in keyof T]: DeepReadonly<T[P]>;
+declare type DeepReadonly_2<T> = {
+    readonly [P in keyof T]: DeepReadonly_2<T[P]>;
 };
 
-declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEngine, 'defineComponentFromSchema'>): {
-    Transform: ComponentDefinition<ISchema<    {
-    position: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    rotation: {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    };
-    scale: {
-    x: number;
-    y: number;
-    z: number;
-    };
-    parent?: Entity | undefined;
-    }>>;
-    Animator: ComponentDefinition<ISchema<PBAnimator>>;
-    AudioSource: ComponentDefinition<ISchema<PBAudioSource>>;
-    AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>>;
-    AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>>;
-    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>>;
-    Billboard: ComponentDefinition<ISchema<PBBillboard>>;
-    BoxShape: ComponentDefinition<ISchema<PBBoxShape>>;
-    CameraMode: ComponentDefinition<ISchema<PBCameraMode>>;
-    CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>>;
-    CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>>;
-    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
-    Material: ComponentDefinition<ISchema<PBMaterial>>;
-    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
-    NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
-    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
-    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
-    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
-    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
-    PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
-    PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
-    SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
-    TextShape: ComponentDefinition<ISchema<PBTextShape>>;
-    UiText: ComponentDefinition<ISchema<PBUiText>>;
+/**
+ * @public
+ */
+declare type DeepReadonlyMap<K, V> = ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>;
+
+/**
+ * @public
+ */
+declare type DeepReadonlyObject<T> = {
+    readonly [K in keyof T]: DeepReadonly<T[K]>;
+};
+
+/**
+ * @public
+ */
+declare type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
+
+declare function defineSdkComponents(engine: PreEngine): {
+    Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
+    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
+    Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+    AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
+    AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
+    AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
+    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
+    Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
+    BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
+    CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
+    CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
+    CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
+    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
+    Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+    NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
+    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
+    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
+    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
+    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
+    PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+    PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
+    TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+    UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 };
 
 /**
@@ -496,10 +506,6 @@ declare type EcsResult<T extends ISchema> = T extends ISchema ? ReturnType<T['de
  */
 declare function Engine({ transports }?: IEngineParams): IEngine;
 
-/**
- * @alpha * This file initialization is an alpha one. This is based on the old-ecs
- * init and it'll be changing.
- */
 declare const engine: IEngine;
 
 /**
@@ -538,7 +544,7 @@ declare type float = number;
 declare type FloatArray = number[];
 
 /** @public */
-declare const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>>;
+declare const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
 
 /**
  * @public
@@ -592,6 +598,7 @@ declare type IEngine = {
      * Define a component and add it to the engine.
      * @param spec An object with schema fields
      * @param componentId unique id to identify the component, if the component id already exist, it will fail.
+     * @param constructorDefault the initial value prefilled when a component is created without a value
      * @return The component definition
      *
      * ```ts
@@ -603,7 +610,7 @@ declare type IEngine = {
      *
      * ```
      */
-    defineComponent<T extends Spec>(spec: Spec, componentId: number): ComponentDefinition<ISchema<Result<T>>>;
+    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
     /**
      * Define a component and add it to the engine.
      * @param spec An object with schema fields
@@ -615,7 +622,7 @@ declare type IEngine = {
      * const StateComponent = engine.defineComponent(Schemas.Bool, VisibleComponentId)
      * ```
      */
-    defineComponentFromSchema<T extends ISchema>(spec: T, componentId: number): ComponentDefinition<T>;
+    defineComponentFromSchema<T extends ISchema<Record<string, any>>, ConstructorType = ComponentType<T>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
     /**
      * Get the component definition from the component id.
      * @param componentId
@@ -634,11 +641,11 @@ declare type IEngine = {
      * Example:
      * ```ts
      * for (const [entity, boxShape, transform] of engine.getEntitiesWith(BoxShape, Transform)) {
-     * // the properties of boxShape and transform are read only
+     *   // the properties of boxShape and transform are read only
      * }
      * ```
      */
-    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...DeepReadonly<ComponentSchema<T>>]>;
+    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     baseComponents: SdkComponents;
 };
 
@@ -696,7 +703,7 @@ declare interface ISize {
 declare const log: (...a: any[]) => void;
 
 /** @public */
-declare const Material: ComponentDefinition<ISchema<PBMaterial>>;
+declare const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
 
 /**
  * Class used to store matrix data (4x4)
@@ -734,7 +741,7 @@ declare namespace Matrix {
         _isIdentity3x2Dirty: boolean;
         _m: Matrix4x4;
     };
-    type ReadonlyMatrix = DeepReadonly<MutableMatrix>;
+    type ReadonlyMatrix = DeepReadonly_2<MutableMatrix>;
     /**
      * Gets the internal data of the matrix
      */
@@ -1418,13 +1425,258 @@ declare namespace Matrix {
 }
 
 /** @public */
-declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>>;
+declare const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
 
 /** @public */
-declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>>;
+declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
+
+/** @public */
+declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
 
 /** @public */
 declare type Nullable<T> = T | null;
+
+/**
+ * The Observable class is a simple implementation of the Observable pattern.
+ *
+ * There's one slight particularity though: a given Observable can notify its observer using a particular mask value, only the Observers registered with this mask value will be notified.
+ * This enable a more fine grained execution without having to rely on multiple different Observable objects.
+ * For instance you may have a given Observable that have four different types of notifications: Move (mask = 0x01), Stop (mask = 0x02), Turn Right (mask = 0X04), Turn Left (mask = 0X08).
+ * A given observer can register itself with only Move and Stop (mask = 0x03), then it will only be notified when one of these two occurs and will never be for Turn Left/Right.
+ *
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed
+ */
+declare class Observable<T> {
+    private _observers;
+    private _eventState;
+    private _onObserverAdded;
+    /**
+     * Creates a new observable
+     * @param onObserverAdded - defines a callback to call when a new observer is added
+     */
+    constructor(onObserverAdded?: (observer: Observer<T>) => void);
+    /**
+     * Create a new Observer with the specified callback
+     * @param callback - the callback that will be executed for that Observer
+     * @param mask - the mask used to filter observers
+     * @param insertFirst - if true the callback will be inserted at the first position, hence executed before the others ones. If false (default behavior) the callback will be inserted at the last position, executed after all the others already present.
+     * @param scope - optional scope for the callback to be called from
+     * @param unregisterOnFirstCall - defines if the observer as to be unregistered after the next notification
+     * @returns the new observer created for the callback
+     */
+    add(callback: (eventData: T, eventState: ObserverEventState) => void, mask?: number, insertFirst?: boolean, scope?: any, unregisterOnFirstCall?: boolean): null | Observer<T>;
+    /**
+     * Create a new Observer with the specified callback and unregisters after the next notification
+     * @param callback - the callback that will be executed for that Observer
+     * @returns the new observer created for the callback
+     */
+    addOnce(callback: (eventData: T, eventState: ObserverEventState) => void): null | Observer<T>;
+    /**
+     * Remove an Observer from the Observable object
+     * @param observer - the instance of the Observer to remove
+     * @returns false if it doesn't belong to this Observable
+     */
+    remove(observer: null | Observer<T>): boolean;
+    /**
+     * Remove a callback from the Observable object
+     * @param callback - the callback to remove
+     * @param scope - optional scope. If used only the callbacks with this scope will be removed
+     * @returns false if it doesn't belong to this Observable
+     */
+    removeCallback(callback: (eventData: T, eventState: ObserverEventState) => void, scope?: any): boolean;
+    /**
+     * Notify all Observers by calling their respective callback with the given data
+     * Will return true if all observers were executed, false if an observer set skipNextObservers to true, then prevent the subsequent ones to execute
+     * @param eventData - defines the data to send to all observers
+     * @param mask - defines the mask of the current notification (observers with incompatible mask (ie mask & observer.mask === 0) will not be notified)
+     * @param target - defines the original target of the state
+     * @param currentTarget - defines the current target of the state
+     * @returns false if the complete observer chain was not processed (because one observer set the skipNextObservers to true)
+     */
+    notifyObservers(eventData: T, mask?: number, target?: any, currentTarget?: any): boolean;
+    /**
+     * Calling this will execute each callback, expecting it to be a promise or return a value.
+     * If at any point in the chain one function fails, the promise will fail and the execution will not continue.
+     * This is useful when a chain of events (sometimes async events) is needed to initialize a certain object
+     * and it is crucial that all callbacks will be executed.
+     * The order of the callbacks is kept, callbacks are not executed parallel.
+     *
+     * @param eventData - The data to be sent to each callback
+     * @param mask - is used to filter observers defaults to -1
+     * @param target - defines the callback target (see EventState)
+     * @param currentTarget - defines he current object in the bubbling phase
+     * @returns will return a Promise than resolves when all callbacks executed successfully.
+     */
+    notifyObserversWithPromise(eventData: T, mask?: number, target?: any, currentTarget?: any): Promise<T>;
+    /**
+     * Notify a specific observer
+     * @param observer - defines the observer to notify
+     * @param eventData - defines the data to be sent to each callback
+     * @param mask - is used to filter observers defaults to -1
+     */
+    notifyObserver(observer: Observer<T>, eventData: T, mask?: number): void;
+    /**
+     * Gets a boolean indicating if the observable has at least one observer
+     * @returns true is the Observable has at least one Observer registered
+     */
+    hasObservers(): boolean;
+    /**
+     * Clear the list of observers
+     */
+    clear(): void;
+    /**
+     * Clone the current observable
+     * @returns a new observable
+     */
+    clone(): Observable<T>;
+    /**
+     * Does this observable handles observer registered with a given mask
+     * @param mask - defines the mask to be tested
+     * @returns whether or not one observer registered with the given mask is handeled
+     */
+    hasSpecificMask(mask?: number): boolean;
+    private _deferUnregister;
+    private _remove;
+}
+
+/**
+ * Represent an Observer registered to a given Observable object.
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed
+ */
+declare class Observer<T> {
+    /**
+     * Defines the callback to call when the observer is notified
+     */
+    callback: (eventData: T, eventState: ObserverEventState) => void;
+    /**
+     * Defines the mask of the observer (used to filter notifications)
+     */
+    mask: number;
+    /**
+     * Defines the current scope used to restore the JS context
+     */
+    scope: any;
+    /**
+     * Gets or sets a property defining that the observer as to be unregistered after the next notification
+     */
+    unregisterOnNextCall: boolean;
+    /** For internal usage */
+    _willBeUnregistered: boolean;
+    /**
+     * Creates a new observer
+     * @param callback - defines the callback to call when the observer is notified
+     * @param mask - defines the mask of the observer (used to filter notifications)
+     * @param scope - defines the current scope used to restore the JS context
+     */
+    constructor(
+    /**
+     * Defines the callback to call when the observer is notified
+     */
+    callback: (eventData: T, eventState: ObserverEventState) => void, 
+    /**
+     * Defines the mask of the observer (used to filter notifications)
+     */
+    mask: number, 
+    /**
+     * Defines the current scope used to restore the JS context
+     */
+    scope?: any);
+}
+
+/**
+ * A class serves as a medium between the observable and its observers
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed
+ */
+declare class ObserverEventState {
+    /**
+     * An Observer can set this property to true to prevent subsequent observers of being notified
+     */
+    skipNextObservers: boolean;
+    /**
+     * Get the mask value that were used to trigger the event corresponding to this EventState object
+     */
+    mask: number;
+    /**
+     * The object that originally notified the event
+     */
+    target?: any;
+    /**
+     * The current object in the bubbling phase
+     */
+    currentTarget?: any;
+    /**
+     * This will be populated with the return value of the last function that was executed.
+     * If it is the first function in the callback chain it will be the event data.
+     */
+    lastReturnValue?: any;
+    /**
+     * Create a new EventState
+     * @param mask - defines the mask associated with this state
+     * @param skipNextObservers - defines a flag which will instruct the observable to skip following observers when set to true
+     * @param target - defines the original target of the state
+     * @param currentTarget - defines the current target of the state
+     */
+    constructor(mask: number, skipNextObservers?: boolean, target?: any, currentTarget?: any);
+    /**
+     * Initialize the current event state
+     * @param mask - defines the mask associated with this state
+     * @param skipNextObservers - defines a flag which will instruct the observable to skip following observers when set to true
+     * @param target - defines the original target of the state
+     * @param currentTarget - defines the current target of the state
+     * @returns the current event state
+     */
+    initalize(mask: number, skipNextObservers?: boolean, target?: any, currentTarget?: any): ObserverEventState;
+}
+
+/**
+ * This event is triggered when you change your camera between 1st and 3rd person
+ * @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ */
+declare const onCameraModeChangedObservable: Observable<{
+    cameraMode: 0 | 1 | 2;
+}>;
+
+/** @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed. Use onEnterSceneObservable instead. */
+declare const onEnterScene: Observable<{
+    userId: string;
+}>;
+
+/**
+ * These events are triggered after your character enters the scene.
+ * @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ */
+declare const onEnterSceneObservable: Observable<{
+    userId: string;
+}>;
+
+/**
+ * This event is triggered when you change your camera between 1st and 3rd person
+ * @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ */
+declare const onIdleStateChangedObservable: Observable<{
+    isIdle: boolean;
+}>;
+
+/** @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed. Use onLeaveSceneObservable instead. */
+declare const onLeaveScene: Observable<{
+    userId: string;
+}>;
+
+/**
+ * These events are triggered after your character leaves the scene.
+ * @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ */
+declare const onLeaveSceneObservable: Observable<{
+    userId: string;
+}>;
 
 declare type OnlyNonUndefinedTypes<T> = {
     [K in ExcludeUndefined<T>]: T[K];
@@ -1434,17 +1686,101 @@ declare type OnlyOptionalUndefinedTypes<T> = {
     [K in IncludeUndefined<T>]?: T[K];
 };
 
-/** @public */
-declare const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>>;
+/**
+ * @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ */
+declare const onPlayerClickedObservable: Observable<{
+    userId: string;
+    ray: {
+        origin: ReadOnlyVector3;
+        direction: ReadOnlyVector3;
+        distance: number;
+    };
+}>;
+
+/**
+ * @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ */
+declare const onPlayerConnectedObservable: Observable<{
+    userId: string;
+}>;
+
+/**
+ * @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ */
+declare const onPlayerDisconnectedObservable: Observable<{
+    userId: string;
+}>;
+
+/**
+ * @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ */
+declare const onPlayerExpressionObservable: Observable<{
+    expressionId: string;
+}>;
 
 /** @public */
-declare const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>>;
+declare const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
 
 /** @public */
-declare const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>>;
+declare const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
+
+/**
+ * @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ */
+declare const onPointerLockedStateChange: Observable<{
+    locked?: boolean | undefined;
+}>;
 
 /** @public */
-declare const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>>;
+declare const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
+
+/** @public */
+declare const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
+
+/**
+ * @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ */
+declare const onProfileChanged: Observable<{
+    ethAddress: string;
+    version: number;
+}>;
+
+/**
+ * @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ */
+declare const onRealmChangedObservable: Observable<{
+    domain: string;
+    room: string;
+    serverName: string;
+    displayName: string;
+}>;
+
+/**
+ * This event is triggered after all the resources of the scene were loaded (models, textures, etc...)
+ * @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ */
+declare const onSceneReadyObservable: Observable<{}>;
+
+/**
+ * @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ */
+declare const onVideoEvent: Observable<{
+    componentId: string;
+    videoClipId: string;
+    videoStatus: number;
+    currentOffset: number;
+    totalVideoLength: number;
+}>;
 
 /**
  * Defines potential orientation for back face culling
@@ -1483,6 +1819,7 @@ declare interface PBAudioSource {
     loop?: boolean | undefined;
     /** default=1.0f */
     pitch?: number | undefined;
+    /** default = [ "urn:decentraland:off-chain:base-avatars:f_eyes_00", */
     audioClipUrl: string;
 }
 
@@ -1604,6 +1941,31 @@ declare interface PBMaterial_Texture {
     wrapMode?: TextureWrapMode | undefined;
     /** default = FilterMode.Bilinear */
     filterMode?: FilterMode | undefined;
+}
+
+declare interface PBMeshCollider {
+    /** default = ColliderLayer.Physics | ColliderLayer.Pointer */
+    collisionMask?: number | undefined;
+    box: PBMeshCollider_BoxMesh | undefined;
+    sphere: PBMeshCollider_SphereMesh | undefined;
+    cylinder: PBMeshCollider_CylinderMesh | undefined;
+    plane: PBMeshCollider_PlaneMesh | undefined;
+}
+
+declare interface PBMeshCollider_BoxMesh {
+}
+
+declare interface PBMeshCollider_CylinderMesh {
+    /** default=1.0 */
+    radiusTop?: number | undefined;
+    /** default=1.0 */
+    radiusBottom?: number | undefined;
+}
+
+declare interface PBMeshCollider_PlaneMesh {
+}
+
+declare interface PBMeshCollider_SphereMesh {
 }
 
 declare interface PBMeshRenderer {
@@ -1753,6 +2115,11 @@ declare interface PBUiText {
     textColor: Color3 | undefined;
 }
 
+declare interface PBVisibilityComponent {
+    /** default=true */
+    visible?: boolean | undefined;
+}
+
 /**
  * Represens a plane by the equation ax + by + cz + d = 0
  * @public
@@ -1768,7 +2135,7 @@ declare namespace Plane {
          */
         d: number;
     };
-    type ReadonlyPlane = DeepReadonly<MutablePlane>;
+    type ReadonlyPlane = DeepReadonly_2<MutablePlane>;
     /**
      * Creates a Plane object according to the given floats a, b, c, d and the plane equation : ax + by + cz + d = 0
      * @param a - a component of the plane
@@ -1863,10 +2230,35 @@ declare namespace Plane {
 }
 
 /** @public */
-declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>>;
+declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
 
 /** @public */
-declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>>;
+declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+
+/**
+ * @public
+ */
+declare type PreEngine = ReturnType<typeof preEngine>;
+
+declare function preEngine(): {
+    entitiesComponent: Map<number, Set<number>>;
+    componentsDefinition: Map<number, ComponentDefinition<any, any>>;
+    addEntity: (dynamic?: boolean) => Entity;
+    addDynamicEntity: () => Entity;
+    removeEntity: (entity: Entity) => boolean;
+    addSystem: (fn: Update, priority?: number, name?: string | undefined) => void;
+    getSystems: () => {
+        fn: Update;
+        priority: number;
+        name?: string | undefined;
+    }[];
+    removeSystem: (selector: string | Update) => boolean;
+    defineComponent: <T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType | undefined) => ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    defineComponentFromSchema: <T_1 extends ISchema<any>, ConstructorType_1 = EcsResult<T_1>>(spec: T_1, componentId: number, constructorDefault?: ConstructorType_1 | undefined) => ComponentDefinition<T_1, ConstructorType_1>;
+    getEntitiesWith: <T_2 extends [ComponentDefinition<ISchema<any>, any>, ...ComponentDefinition<ISchema<any>, any>[]]>(...components: T_2) => Iterable<[Entity, ...ReadonlyComponentSchema<T_2>]>;
+    getComponent: <T_3 extends ISchema<any>>(componentId: number) => ComponentDefinition<T_3, EcsResult<T_3>>;
+    removeComponentDefinition: (componentId: number) => void;
+};
 
 /**
  * @public
@@ -1884,7 +2276,7 @@ declare namespace Quaternion {
     /**
      * @public
      */
-    export type ReadonlyQuaternion = DeepReadonly<MutableQuaternion>;
+    export type ReadonlyQuaternion = DeepReadonly_2<MutableQuaternion>;
     /**
      * Creates a new Quaternion from the given floats
      * @param x - defines the first component (0 by default)
@@ -2038,6 +2430,18 @@ declare namespace Quaternion {
  */
 declare const RAD2DEG: number;
 
+/**
+ * @public
+ */
+declare type ReadonlyComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
+    [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['get']> : never;
+};
+
+/**
+ * @public
+ */
+declare type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
+
 declare type ReceiveMessage = {
     type: WireMessage.Enum;
     entity: Entity;
@@ -2078,7 +2482,7 @@ declare namespace Schemas {
 /**
  * @public
  */
-declare type SdkComponents = ReturnType<typeof defineLibraryComponents>;
+declare type SdkComponents = ReturnType<typeof defineSdkComponents>;
 
 /**
  * Defines supported spaces
@@ -2101,10 +2505,10 @@ declare interface Spec {
 }
 
 /** @public */
-declare const SphereShape: ComponentDefinition<ISchema<PBSphereShape>>;
+declare const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
 
 /** @public */
-declare const TextShape: ComponentDefinition<ISchema<PBTextShape>>;
+declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 
 declare const enum TextureWrapMode {
     Repeat = 0,
@@ -2129,25 +2533,30 @@ declare const ToLinearSpace = 2.2;
 declare type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
 /** @public */
-declare const Transform: ComponentDefinition<ISchema<    {
-position: {
-x: number;
-y: number;
-z: number;
+declare const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
+
+/**
+ * @public
+ */
+declare type TransformType = {
+    position: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    rotation: {
+        x: number;
+        y: number;
+        z: number;
+        w: number;
+    };
+    scale: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    parent?: Entity;
 };
-rotation: {
-x: number;
-y: number;
-z: number;
-w: number;
-};
-scale: {
-x: number;
-y: number;
-z: number;
-};
-parent?: Entity | undefined;
-}>>;
 
 declare const enum TransparencyMode {
     Opaque = 0,
@@ -2170,7 +2579,7 @@ declare type TransportMessage = Omit<ReceiveMessage, 'data'>;
 declare type Uint32 = number;
 
 /** @public */
-declare const UiText: ComponentDefinition<ISchema<PBUiText>>;
+declare const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
 
 /**
  * @public
@@ -2197,7 +2606,7 @@ declare namespace Vector3 {
     /**
      * @public
      */
-    export type ReadonlyVector3 = DeepReadonly<MutableVector3>;
+    export type ReadonlyVector3 = DeepReadonly_2<MutableVector3>;
     /**
      * Creates a new Vector3 object from the given x, y, z (floats) coordinates.
      * @param x - defines the first coordinates (on X axis)
@@ -2390,6 +2799,9 @@ declare interface Vector3_2 {
     y: number;
     z: number;
 }
+
+/** @public */
+declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 
 declare namespace WireMessage {
     enum Enum {
