@@ -18,10 +18,6 @@ export * from './readonly'
 export * from './types'
 export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
 
-namespace JSX {
-  export type Element = any
-}
-
 declare const ReactEcs: {
   createRenderer(
     engine: Pick<IEngine, 'baseComponents' | 'getComponent' | 'addEntity'>
