@@ -396,22 +396,10 @@ export const onPlayerExpressionObservable: Observable<{
     expressionId: string;
 }>;
 
-// @public (undocumented)
-export const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-
-// @public (undocumented)
-export const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-
 // @public @deprecated (undocumented)
 export const onPointerLockedStateChange: Observable<{
     locked?: boolean | undefined;
 }>;
-
-// @public (undocumented)
-export const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-
-// @public (undocumented)
-export const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
 
 // @public @deprecated (undocumented)
 export const onProfileChanged: Observable<{
@@ -438,6 +426,7 @@ export const onVideoEvent: Observable<{
     currentOffset: number;
     totalVideoLength: number;
 }>;
+
 // @public
 export enum Orientation {
     CCW = 1,

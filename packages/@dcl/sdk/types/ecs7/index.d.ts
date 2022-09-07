@@ -1732,12 +1732,6 @@ declare const onPlayerExpressionObservable: Observable<{
     expressionId: string;
 }>;
 
-/** @public */
-declare const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-
-/** @public */
-declare const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-
 /**
  * @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
@@ -1745,12 +1739,6 @@ declare const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownRe
 declare const onPointerLockedStateChange: Observable<{
     locked?: boolean | undefined;
 }>;
-
-/** @public */
-declare const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-
-/** @public */
-declare const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
 
 /**
  * @public
