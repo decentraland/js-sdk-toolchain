@@ -2093,7 +2093,16 @@ declare interface PBPlaneShape {
     uvs: number[];
 }
 
-declare interface PBPointerEvent {
+declare interface PBPointerEvents {
+    pointerEvents: PBPointerEvents_Entry[];
+}
+
+declare interface PBPointerEvents_Entry {
+    eventType: PointerEventType;
+    eventInfo: PBPointerEvents_Info | undefined;
+}
+
+declare interface PBPointerEvents_Info {
     /** default=ActionButton.ANY */
     button?: ActionButton | undefined;
     /** default='Interact' */
@@ -2102,15 +2111,6 @@ declare interface PBPointerEvent {
     maxDistance?: number | undefined;
     /** default=true */
     showFeedback?: boolean | undefined;
-}
-
-declare interface PBPointerEventEntry {
-    eventType: PointerEventType;
-    eventInfo: PBPointerEvent | undefined;
-}
-
-declare interface PBPointerEvents {
-    pointerEvents: PBPointerEventEntry[];
 }
 
 /** the renderer will set this component to the root entity once per frame with all the events */
