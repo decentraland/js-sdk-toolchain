@@ -230,6 +230,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     getComponent: engine.getComponent,
     removeComponentDefinition: engine.removeComponentDefinition,
     update,
+    RootEntity: 0 as Entity,
     baseComponents
   }
 }
