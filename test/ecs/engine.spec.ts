@@ -529,6 +529,15 @@ describe('Engine tests', () => {
     expect(engine.baseComponents.OnPointerDownResult.has(entity)).toBe(false)
   })
 
+  it('should not remove the component after the update', () => {
+    const engine = Engine()
+    engine.baseComponents.PointerEventsResult.create(engine.RootEntity)
+    engine.update(1 / 30)
+    expect(
+      engine.baseComponents.PointerEventsResult.has(engine.RootEntity)
+    ).toBe(true)
+  })
+
   it('should return the default component of the transform', () => {
     const engine = Engine()
     expect(TransformSchema.create()).toBeDeepCloseTo(

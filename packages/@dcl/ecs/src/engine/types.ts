@@ -89,8 +89,8 @@ export type IEngine = {
   defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(
     spec: T,
     componentId: number,
-    constructorDefault?: Partial<Result<T>>
-  ): CompDef<ISchema<Result<T>>, ConstructorType>
+    constructorDefault?: ConstructorType
+  ): CompDef<ISchema<Result<T>>, Partial<Result<T>>>
 
   /**
    * Define a component and add it to the engine.
@@ -152,6 +152,7 @@ export type IEngine = {
    */
   removeComponentDefinition(componentId: number): void
 
+  RootEntity: Entity
   baseComponents: SdkComponents
   renderUI(renderTree: () => JSX.Element): number
   removeUI(ui: number): void

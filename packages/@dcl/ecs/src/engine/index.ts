@@ -191,7 +191,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
 
   const uiContainer: { getEntities: () => IEntity[]; update: () => void }[] = []
 
-  function renderUI(renderTree: () => JSX.Element): number {
+  function renderUI(renderTree: () => JS3X.Element): number {
     if (typeof ReactEcs === 'undefined') {
       throw new Error('ReactEcs library not found')
     }
@@ -278,6 +278,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     update,
     renderUI,
     removeUI,
+    RootEntity: 0 as IEntity,
     baseComponents
   }
 }

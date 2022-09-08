@@ -139,10 +139,22 @@ export namespace Components {
     //
     // (undocumented)
     PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+    const // Warning: (ae-forgotten-export) The symbol "PBPointerEvents" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
+    const // Warning: (ae-forgotten-export) The symbol "PBPointerEventsResult" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
     const // Warning: (ae-forgotten-export) The symbol "PBPointerLock" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    const // Warning: (ae-forgotten-export) The symbol "PBRaycastResult" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
     const // Warning: (ae-forgotten-export) The symbol "PBSphereShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -275,6 +287,21 @@ export interface ISize {
     height: number;
     width: number;
 }
+
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (ae-forgotten-export) The symbol "ActionButton" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "PointerEventType" needs to be exported by the entry point index.d.ts
+// Warning: (ae-missing-release-tag) "isPointerEventActive" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export function isPointerEventActive(entity: IEntity, actionButton: ActionButton, pointerEventType: PointerEventType): boolean;
+
+// Warning: (ae-missing-release-tag) "isPointerEventActiveGenerator" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function isPointerEventActiveGenerator(engine: IEngine): (entity: IEntity, actionButton: ActionButton, pointerEventType: PointerEventType) => boolean;
 
 // Warning: (ae-missing-release-tag) "JSX" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -464,6 +491,12 @@ export enum Orientation {
 export const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
 
 // @public (undocumented)
+export const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
+
+// @public (undocumented)
+export const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+
+// @public (undocumented)
 export const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
 
 // Warning: (ae-forgotten-export) The symbol "preEngine" needs to be exported by the entry point index.d.ts
@@ -516,6 +549,9 @@ export namespace Quaternion {
 
 // @public
 export const RAD2DEG: number;
+
+// @public (undocumented)
+export const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
 
 // @public (undocumented)
 export type ReadonlyComponentSchema<T extends [ComponentDefinition, ...ComponentDefinition[]]> = {
@@ -679,6 +715,18 @@ export namespace Vector3 {
 
 // @public (undocumented)
 export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
+
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (ae-missing-release-tag) "wasEntityClicked" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export function wasEntityClicked(entity: IEntity, actionButton: ActionButton): boolean;
+
+// Warning: (ae-missing-release-tag) "wasEntityClickedGenerator" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function wasEntityClickedGenerator(engine: IEngine): (entity: IEntity, actionButton: ActionButton) => boolean;
 
 // Warnings were encountered during analysis:
 //

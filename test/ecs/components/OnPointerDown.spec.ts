@@ -1,4 +1,4 @@
-﻿import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/common/ActionButton.gen'
+import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/common/ActionButton.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated OnPointerDown ProtoBuf', () => {

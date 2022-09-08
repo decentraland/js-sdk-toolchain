@@ -247,7 +247,13 @@ declare namespace Components {
     /** @public */
     const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
     /** @public */
+    const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
+    /** @public */
+    const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+    /** @public */
     const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    /** @public */
+    const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
     /** @public */
     const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     /** @public */
@@ -482,7 +488,10 @@ declare function defineSdkComponents(engine: PreEngine): {
     OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
     OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
     PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+    PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
+    PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
     SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
     UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
@@ -708,6 +717,17 @@ declare interface ISize {
      */
     height: number;
 }
+
+/**
+ * Check if a pointer event has been emited in the last tick-update.
+ * @param entity the entity to query, for global clicks use `engine.RootEntity`
+ * @param actionButton
+ * @param pointerEventType
+ * @returns
+ */
+declare function isPointerEventActive(entity: IEntity, actionButton: ActionButton, pointerEventType: PointerEventType): boolean;
+
+declare function isPointerEventActiveGenerator(engine: IEngine): (entity: IEntity, actionButton: ActionButton, pointerEventType: PointerEventType) => boolean;
 
 declare namespace JSX {
     export type Element = any;
@@ -2089,8 +2109,53 @@ declare interface PBPlaneShape {
     uvs: number[];
 }
 
+declare interface PBPointerEvents {
+    pointerEvents: PBPointerEvents_Entry[];
+}
+
+declare interface PBPointerEvents_Entry {
+    eventType: PointerEventType;
+    eventInfo: PBPointerEvents_Info | undefined;
+}
+
+declare interface PBPointerEvents_Info {
+    /** default=ActionButton.ANY */
+    button?: ActionButton | undefined;
+    /** default='Interact' */
+    hoverText?: string | undefined;
+    /** default=10 */
+    maxDistance?: number | undefined;
+    /** default=true */
+    showFeedback?: boolean | undefined;
+}
+
+/** the renderer will set this component to the root entity once per frame with all the events */
+declare interface PBPointerEventsResult {
+    /** a list of the last N pointer commands (from the engine) */
+    commands: PBPointerEventsResult_PointerCommand[];
+}
+
+/** this message represents a pointer event, used both for UP and DOWN actions */
+declare interface PBPointerEventsResult_PointerCommand {
+    /** identifier of the input */
+    button: ActionButton;
+    hit: RaycastHit | undefined;
+    state: PointerEventType;
+    /** could be a Lamport timestamp */
+    timestamp: number;
+    /** if the input is analog then we store it here */
+    analog?: number | undefined;
+}
+
 declare interface PBPointerLock {
     isPointerLocked: boolean;
+}
+
+declare interface PBRaycastResult {
+    timestamp: number;
+    origin: Vector3_2 | undefined;
+    direction: Vector3_2 | undefined;
+    hits: RaycastHit[];
 }
 
 declare interface PBSphereShape {
@@ -2147,7 +2212,6 @@ declare interface PBUiText {
 declare interface PBUiTransform {
     parent: number;
     rightOf: number;
-    backgroundColor: Color3 | undefined;
     positionType: YGPositionType;
     alignContent: YGAlign;
     alignItems: YGAlign;
@@ -2322,6 +2386,20 @@ declare namespace Plane {
 
 /** @public */
 declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+
+/** @public */
+declare const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
+
+/** @public */
+declare const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+
+declare const enum PointerEventType {
+    UP = 0,
+    DOWN = 1,
+    HOVER_ENTER = 2,
+    HOVER_LEAVE = 3,
+    UNRECOGNIZED = -1
+}
 
 /** @public */
 declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
@@ -2520,6 +2598,20 @@ declare namespace Quaternion {
  * @public
  */
 declare const RAD2DEG: number;
+
+/** Position will be relative to the scene */
+declare interface RaycastHit {
+    position: Vector3_2 | undefined;
+    origin: Vector3_2 | undefined;
+    direction: Vector3_2 | undefined;
+    normalHit: Vector3_2 | undefined;
+    length: number;
+    meshName?: string | undefined;
+    entityId?: number | undefined;
+}
+
+/** @public */
+declare const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
 
 /**
  * @public
@@ -2896,6 +2988,16 @@ declare interface Vector3_2 {
 
 /** @public */
 declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
+
+/**
+ * Check if an entity emitted a clicked event
+ * @param entity the entity to query, for global clicks use `engine.RootEntity`
+ * @param actionButton
+ * @returns true if the entity was clicked in the last tick-update
+ */
+declare function wasEntityClicked(entity: IEntity, actionButton: ActionButton): boolean;
+
+declare function wasEntityClickedGenerator(engine: IEngine): (entity: IEntity, actionButton: ActionButton) => boolean;
 
 declare namespace WireMessage {
     enum Enum {

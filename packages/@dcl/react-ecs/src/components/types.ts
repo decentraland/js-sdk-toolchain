@@ -1,4 +1,4 @@
-import { UiTransformProps } from './uiTransform'
+import { UiTransformProps } from './uiTransform/types'
 
 /**
  * @public
