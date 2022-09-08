@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
 // The order of the following imports matters. Please do not auto-sort
 
 export * from './runtime/Math'
@@ -14,10 +15,12 @@ export * from './runtime/types'
 export * from './runtime/observables'
 export * from './runtime/temp-fp/Observable'
 
-declare global {
-  namespace JSX {
-    type Element = any
-    // eslint-disable-next-line @typescript-eslint/no-empty-interface
-    interface IntrinsicElements {}
-  }
+export type EcsElements = {
+  entity: unknown
+}
+
+export namespace JSX {
+  export type Element = any
+  export interface IntrinsicElements extends EcsElements {}
+  export interface Component {}
 }

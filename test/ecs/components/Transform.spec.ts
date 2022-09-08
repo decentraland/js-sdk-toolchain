@@ -1,4 +1,4 @@
-import { Engine, Entity } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, IEntity } from '../../../packages/@dcl/ecs/src/engine'
 import {
   Quaternion,
   Vector3
@@ -25,7 +25,7 @@ describe('Transform component', () => {
       position: Vector3.create(Math.PI, Math.LN10, Math.SQRT1_2),
       rotation: Quaternion.create(Math.PI, Math.E, 0.0, Math.SQRT1_2),
       scale: Vector3.create(Math.PI, Math.E, Math.LN10),
-      parent: 123456789 as Entity
+      parent: 123456789 as IEntity
     })
 
     const buffer = Transform.toBinary(entity)
@@ -47,14 +47,14 @@ describe('Transform component', () => {
       position: Vector3.create(Math.PI, Math.LN10, Math.SQRT1_2),
       rotation: Quaternion.create(Math.PI, Math.E, 0.0, Math.SQRT1_2),
       scale: Vector3.create(Math.PI, Math.E, Math.LN10),
-      parent: 123456789 as Entity
+      parent: 123456789 as IEntity
     })
 
     Transform.create(entityB, {
       position: Vector3.One(),
       rotation: Quaternion.Identity(),
       scale: Vector3.Zero(),
-      parent: 3333 as Entity
+      parent: 3333 as IEntity
     })
 
     const buffer = Transform.toBinary(entity)
@@ -79,7 +79,7 @@ describe('Transform component', () => {
       position: Vector3.One(),
       rotation: Quaternion.Identity(),
       scale: Vector3.Zero(),
-      parent: 3333 as Entity
+      parent: 3333 as IEntity
     })
 
     const buffer = Transform.toBinary(entity)
@@ -113,7 +113,7 @@ describe('Transform component', () => {
       position: Vector3.One(),
       rotation: Quaternion.Identity(),
       scale: Vector3.Down(),
-      parent: 3333 as Entity
+      parent: 3333 as IEntity
     })
 
     const t1 = Transform.createOrReplace(entity)

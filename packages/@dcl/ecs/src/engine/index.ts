@@ -9,21 +9,25 @@ import {
   ComponentType,
   defineComponent as defComponent
 } from './component'
-import { Entity, EntityContainer } from './entity'
+import { IEntity, EntityContainer } from './entity'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
 import type { IEngineParams, IEngine } from './types'
 import { ReadonlyComponentSchema } from './readonly'
+import { JSX } from '..'
 
 export * from './readonly'
 export * from './types'
-export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
+export { ComponentType, IEntity, ByteBuffer, ComponentDefinition }
 
 declare const ReactEcs: {
   createRenderer(
-    engine: Pick<IEngine, 'baseComponents' | 'getComponent' | 'addEntity'>
+    engine: Pick<
+      IEngine,
+      'baseComponents' | 'getComponent' | 'addEntity' | 'removeEntity'
+    >
   ): {
     update(renderTree: () => JSX.Element): void
-    getEntities(): Entity[]
+    getEntities(): IEntity[]
   }
 }
 
@@ -60,7 +64,7 @@ function preEngine() {
     return addEntity(true)
   }
 
-  function removeEntity(entity: Entity) {
+  function removeEntity(entity: IEntity) {
     for (const [, component] of componentsDefinition) {
       if (component.has(entity)) {
         component.deleteFrom(entity)
@@ -111,7 +115,7 @@ function preEngine() {
     const component = componentsDefinition.get(componentId)
     if (!component) {
       throw new Error(
-        'Component not found. You need to declare the components at the beginnig of the engine declaration'
+        `Component ${componentId} not found. You need to declare the components at the beginnig of the engine declaration`
       )
     }
     return component
@@ -119,10 +123,10 @@ function preEngine() {
 
   function* getEntitiesWith<
     T extends [ComponentDefinition, ...ComponentDefinition[]]
-  >(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]> {
+  >(...components: T): Iterable<[IEntity, ...ReadonlyComponentSchema<T>]> {
     for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
       yield [entity, ...groupComp.map((c) => c.get(entity))] as [
-        Entity,
+        IEntity,
         ...ReadonlyComponentSchema<T>
       ]
     }
@@ -130,7 +134,7 @@ function preEngine() {
 
   function* getComponentDefGroup<T extends ComponentDefinition[]>(
     ...args: T
-  ): Iterable<[Entity, ...T]> {
+  ): Iterable<[IEntity, ...T]> {
     const [firstComponentDef, ...componentDefinitions] = args
     for (const [entity] of firstComponentDef.iterator()) {
       let matches = true
@@ -185,7 +189,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
   const crdtSystem = crdtSceneSystem({ engine, transports: transports || [] })
   const baseComponents = defineSdkComponents(engine)
 
-  const uiContainer: { getEntities: () => Entity[]; update: () => void }[] = []
+  const uiContainer: { getEntities: () => IEntity[]; update: () => void }[] = []
 
   function renderUI(renderTree: () => JSX.Element): number {
     if (typeof ReactEcs === 'undefined') {
@@ -194,6 +198,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     const renderer = ReactEcs.createRenderer({
       baseComponents,
       addEntity: engine.addEntity,
+      removeEntity: engine.removeEntity,
       getComponent: engine.getComponent
     })
     function update() {
@@ -241,7 +246,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     // TODO: Perf tip
     // Should we add some dirtyIteratorSet at engine level so we dont have
     // to iterate all the component definitions to get the dirty ones ?
-    const dirtySet = new Map<Entity, Set<number>>()
+    const dirtySet = new Map<IEntity, Set<number>>()
     for (const [componentId, definition] of engine.componentsDefinition) {
       if (excludeComponentIds.includes(componentId)) continue
 

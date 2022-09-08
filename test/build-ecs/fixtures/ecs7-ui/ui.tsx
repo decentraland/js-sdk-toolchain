@@ -1,8 +1,8 @@
-import ReactEcs, { DivUi } from '@dcl/react-ecs'
+import ReactEcs, { Container } from '@dcl/react-ecs'
 
 export const ui = () => (
-  <DivUi width={500}>
-    <DivUi width={100} />
-    <DivUi width={200} />
-  </DivUi>
+  <Container width={500}>
+    <Container width={100} />
+    <Container width={200} />
+  </Container>
 )

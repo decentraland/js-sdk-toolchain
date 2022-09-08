@@ -1,5 +1,5 @@
 import {
-  Entity,
+  IEntity,
   EntityContainer
 } from '../../packages/@dcl/ecs/src/engine/entity'
 import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
@@ -22,7 +22,7 @@ describe('Entity container', () => {
   it('generates new entities', () => {
     const entityContainer = EntityContainer()
 
-    const rootEntity = 0 as Entity
+    const rootEntity = 0 as IEntity
     const entityA = entityContainer.generateEntity()
     const dynEntityA = entityContainer.generateEntity(true)
 
@@ -53,7 +53,7 @@ describe('Entity container', () => {
 
   it('trying to remove arbitrary entity', () => {
     const entityContainer = EntityContainer()
-    expect(entityContainer.removeEntity(1 as Entity)).toBe(false)
+    expect(entityContainer.removeEntity(1 as IEntity)).toBe(false)
   })
 
   it('should fail with creating entity out of range', () => {

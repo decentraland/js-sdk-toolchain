@@ -8,31 +8,36 @@ import {
   YGOverflow,
   YGPositionType,
   YGUnit,
-  YGWrap
+  YGWrap,
+  UiTransformProps
 } from './types'
-import { Position } from './types'
 
-export const defaultPosition = (pos?: Position) => ({
-  top: pos?.top ?? 0,
-  right: pos?.right ?? 0,
-  bottom: pos?.bottom ?? 0,
-  left: pos?.left ?? 0
-})
+export const CANVAS_ROOT_ENTITY = 7
 
-const CANVAS_ROOT_ENTITY = 7
+/**
+ * @public
+ */
+export function parseUiTransform(
+  props: UiTransformProps | undefined
+): PBUiTransform {
+  return {
+    ...defaultDiv,
+    ...(props || {})
+  }
+}
 
 export const defaultDiv: PBUiTransform = {
   parent: CANVAS_ROOT_ENTITY,
   backgroundColor: { r: 0, g: 0, b: 0 },
   rightOf: 0,
   display: YGDisplay.YGDisplayFlex,
-  flexBasis: NaN,
-  width: NaN,
-  height: NaN,
-  minWidth: NaN,
-  minHeight: NaN,
-  maxWidth: NaN,
-  maxHeight: NaN,
+  flexBasis: 0,
+  width: 0,
+  height: 0,
+  minWidth: 0,
+  minHeight: 0,
+  maxWidth: 0,
+  maxHeight: 0,
   justifyContent: YGJustify.YGJustifyFlexStart,
   alignItems: YGAlign.YGAlignStretch,
   alignSelf: YGAlign.YGAlignAuto,

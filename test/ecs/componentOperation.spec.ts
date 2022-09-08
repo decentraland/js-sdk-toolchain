@@ -1,5 +1,5 @@
 import { TRANSFORM_LENGTH } from '../../packages/@dcl/ecs/src/components/legacy/Transform'
-import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
+import { Engine, IEntity } from '../../packages/@dcl/ecs/src/engine'
 import { Quaternion, Vector3 } from '../../packages/@dcl/ecs/src/runtime/Math'
 
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
@@ -40,7 +40,7 @@ describe('Component operation tests', () => {
       position: Vector3.create(1, 1, 1),
       scale: Vector3.create(1, 1, 1),
       rotation: Quaternion.create(1, 1, 1, 1),
-      parent: 0 as Entity
+      parent: 0 as IEntity
     })
 
     const bb = createByteBuffer()

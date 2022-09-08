@@ -1,5 +1,5 @@
 import type { ISchema } from '../../schemas/ISchema'
-import { Entity } from '../../engine/entity'
+import { IEntity } from '../../engine/entity'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
 import { ComponentDefinition, IEngine } from '../../engine'
 
@@ -15,7 +15,7 @@ export type TransformType = {
   position: { x: number; y: number; z: number }
   rotation: { x: number; y: number; z: number; w: number }
   scale: { x: number; y: number; z: number }
-  parent?: Entity
+  parent?: IEntity
 }
 
 /** @internal */
@@ -56,7 +56,7 @@ export const TransformSchema: ISchema<TransformType> = {
         y: reader.getFloat32(ptr + 32),
         z: reader.getFloat32(ptr + 36)
       },
-      parent: reader.getUint32(ptr + 40) as Entity
+      parent: reader.getUint32(ptr + 40) as IEntity
     }
   },
   create(): TransformType {

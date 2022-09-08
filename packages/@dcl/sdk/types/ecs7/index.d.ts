@@ -97,7 +97,7 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTy
      * Transform.has(myEntity) // return true
      * ```
      */
-    has(entity: Entity): boolean;
+    has(entity: IEntity): boolean;
     /**
      * Get the readonly component of the entity (to mutate it, use getMutable instead), throw an error if the entity doesn't have the component.
      * @param entity
@@ -117,7 +117,7 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTy
      * Transform.get(otherEntity) // throw an error!!
      * ```
      */
-    get(entity: Entity): DeepReadonly<ComponentType<T>>;
+    get(entity: IEntity): DeepReadonly<ComponentType<T>>;
     /**
      * Get the readonly component of the entity (to mutate it, use getMutable instead), or null if the entity doesn't have the component.
      * @param entity
@@ -129,7 +129,7 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTy
      * log(Transform.get(otherEntity) === null) // log 'true'
      * ```
      */
-    getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
+    getOrNull(entity: IEntity): DeepReadonly<ComponentType<T>> | null;
     /**
      * Add the current component to an entity, throw an error if the component already exists (use `createOrReplace` instead).
      * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
@@ -143,7 +143,7 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTy
      * Transform.create(myEntity) // throw an error, the `Transform` component already exists in `myEntity`
      * ````
      */
-    create(entity: Entity, val?: ConstructorType): ComponentType<T>;
+    create(entity: IEntity, val?: ConstructorType): ComponentType<T>;
     /**
      * Add the current component to an entity or replace the content if the entity already has the component
      * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
@@ -157,7 +157,7 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTy
      * Transform.createOrReplace(myEntity, { ...Transform.default(), position: {x: 4, y: 0, z: 4} }) // ok!
      * ````
      */
-    createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
+    createOrReplace(entity: IEntity, val?: ComponentType<T>): ComponentType<T>;
     /**
      * Delete the current component to an entity, return null if the entity doesn't have the current component.
      * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
@@ -171,7 +171,7 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTy
      * Transform.deleteFrom(myEntity) // return null
      * ````
      */
-    deleteFrom(entity: Entity): ComponentType<T> | null;
+    deleteFrom(entity: IEntity): ComponentType<T> | null;
     /**
      * Get the mutable component of the entity, throw an error if the entity doesn't have the component.
      * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
@@ -184,7 +184,7 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTy
      * Transform.getMutable(myEntity).position = {x: 4, y: 0, z: 4}
      * ````
      */
-    getMutable(entity: Entity): ComponentType<T>;
+    getMutable(entity: IEntity): ComponentType<T>;
     /**
      * Get the mutable component of the entity, return null if the entity doesn't have the component.
      * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
@@ -198,8 +198,8 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTy
      * }
      * ````
      */
-    getMutableOrNull(entity: Entity): ComponentType<T> | null;
-    writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void;
+    getMutableOrNull(entity: IEntity): ComponentType<T> | null;
+    writeToByteBuffer(entity: IEntity, buffer: ByteBuffer): void;
 };
 
 /** @public */
@@ -499,6 +499,10 @@ declare const DEG2RAD: number;
 /** @public */
 declare type double = number;
 
+declare type EcsElements = {
+    entity: unknown;
+};
+
 /**
  * @public
  */
@@ -510,13 +514,6 @@ declare type EcsResult<T extends ISchema> = T extends ISchema ? ReturnType<T['de
 declare function Engine({ transports }?: IEngineParams): IEngine;
 
 declare const engine: IEngine;
-
-/**
- * @public
- */
-declare type Entity = number & {
-    [entitySymbol]: true;
-};
 
 declare const entitySymbol: unique symbol;
 
@@ -563,16 +560,16 @@ declare type IEngine = {
      * @param dynamic
      * @return the next entity unused
      */
-    addEntity(dynamic?: boolean): Entity;
+    addEntity(dynamic?: boolean): IEntity;
     /**
      * An alias of engine.addEntity(true)
      */
-    addDynamicEntity(): Entity;
+    addDynamicEntity(): IEntity;
     /**
      * Remove all components of an entity
      * @param entity
      */
-    removeEntity(entity: Entity): void;
+    removeEntity(entity: IEntity): void;
     /**
      * Add the system to the engine. It will be called every tick updated.
      * @param system function that receives the delta time between last tick and current one.
@@ -648,9 +645,9 @@ declare type IEngine = {
      * }
      * ```
      */
-    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
+    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[IEntity, ...ReadonlyComponentSchema<T>]>;
     baseComponents: SdkComponents;
-    renderUI(renderTree: () => any): number;
+    renderUI(renderTree: () => JSX.Element): number;
     removeUI(ui: number): void;
 };
 
@@ -659,6 +656,13 @@ declare type IEngine = {
  */
 declare type IEngineParams = {
     transports?: Transport[];
+};
+
+/**
+ * @public
+ */
+declare type IEntity = number & {
+    [entitySymbol]: true;
 };
 
 /**
@@ -703,6 +707,14 @@ declare interface ISize {
      * Heighht
      */
     height: number;
+}
+
+declare namespace JSX {
+    export type Element = any;
+    export interface IntrinsicElements extends EcsElements {
+    }
+    export interface Component {
+    }
 }
 
 declare const log: (...a: any[]) => void;
@@ -2322,9 +2334,9 @@ declare type PreEngine = ReturnType<typeof preEngine>;
 declare function preEngine(): {
     entitiesComponent: Map<number, Set<number>>;
     componentsDefinition: Map<number, ComponentDefinition<any, any>>;
-    addEntity: (dynamic?: boolean) => Entity;
-    addDynamicEntity: () => Entity;
-    removeEntity: (entity: Entity) => boolean;
+    addEntity: (dynamic?: boolean) => IEntity;
+    addDynamicEntity: () => IEntity;
+    removeEntity: (entity: IEntity) => boolean;
     addSystem: (fn: Update, priority?: number, name?: string | undefined) => void;
     getSystems: () => {
         fn: Update;
@@ -2334,7 +2346,7 @@ declare function preEngine(): {
     removeSystem: (selector: string | Update) => boolean;
     defineComponent: <T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType | undefined) => ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
     defineComponentFromSchema: <T_1 extends ISchema<any>, ConstructorType_1 = EcsResult<T_1>>(spec: T_1, componentId: number, constructorDefault?: ConstructorType_1 | undefined) => ComponentDefinition<T_1, ConstructorType_1>;
-    getEntitiesWith: <T_2 extends [ComponentDefinition<ISchema<any>, any>, ...ComponentDefinition<ISchema<any>, any>[]]>(...components: T_2) => Iterable<[Entity, ...ReadonlyComponentSchema<T_2>]>;
+    getEntitiesWith: <T_2 extends [ComponentDefinition<ISchema<any>, any>, ...ComponentDefinition<ISchema<any>, any>[]]>(...components: T_2) => Iterable<[IEntity, ...ReadonlyComponentSchema<T_2>]>;
     getComponent: <T_3 extends ISchema<any>>(componentId: number) => ComponentDefinition<T_3, EcsResult<T_3>>;
     removeComponentDefinition: (componentId: number) => void;
 };
@@ -2523,7 +2535,7 @@ declare type ReadonlyPrimitive = number | string | number[] | string[] | boolean
 
 declare type ReceiveMessage = {
     type: WireMessage.Enum;
-    entity: Entity;
+    entity: IEntity;
     componentId: number;
     timestamp: number;
     transportType?: string;
@@ -2634,7 +2646,7 @@ declare type TransformType = {
         y: number;
         z: number;
     };
-    parent?: Entity;
+    parent?: IEntity;
 };
 
 declare const enum TransparencyMode {

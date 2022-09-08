@@ -1,22 +1,29 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
+import { PBUiTransform } from './generated/UiTransform.gen'
 import { ReactEcs } from './react-ecs'
 
 export { ReactEcs }
-export * from './components/div'
+export * from './components'
 
-export type DivElements = {
-  divui: unknown
+export type EcsElements = {
+  entity: EntityComponents
+}
+
+export type EntityComponents = {
+  uiTransform?: PBUiTransform
+  pepe?: string
 }
 
 declare global {
   namespace JSX {
-    interface IntrinsicElements extends DivElements {}
+    type Element = any
+    interface IntrinsicElements extends EcsElements {}
   }
 }
 
 export namespace JSX {
   export interface Element {}
-  export interface IntrinsicElements extends DivElements {}
+  export interface IntrinsicElements extends EcsElements {}
   export interface Component {}
 }
 

@@ -93,27 +93,7 @@ flow('build-all', () => {
     const filePath = ensureFileExists('index.d.ts', JS_RUNTIME)
     copyFile(filePath, SDK_PATH + '/types/env/index.d.ts')
   })
-  flow('@dcl/react-ecs', () => {
-    itExecutes('npm i --quiet', REACT_ECS)
-    it('Copy proto files', async () => {
-      const protoTypesPath = `${REACT_ECS}/src/generated`
-      removeSync(protoTypesPath)
-      mkdirSync(protoTypesPath)
 
-      await createProtoTypes(
-        `${ECS7_PATH}/node_modules/@dcl/protocol/ecs/components`,
-        protoTypesPath,
-        ['UiTransform.proto']
-      )
-    })
-    itExecutes('npm run build', REACT_ECS)
-
-    it('check file exists', () => {
-      ensureFileExists('dist/index.js', REACT_ECS)
-      ensureFileExists('dist/index.min.js', REACT_ECS)
-      ensureFileExists('dist/index.d.ts', REACT_ECS)
-    })
-  })
   flow('@dcl/ecs7', () => {
     itExecutes('npm i --quiet', ECS7_PATH)
     compileEcsComponents(
@@ -150,6 +130,27 @@ flow('build-all', () => {
           fixTypes(typePath, { ignoreExportError: true })
         }
       }
+    })
+  })
+  flow('@dcl/react-ecs', () => {
+    itExecutes('npm i --quiet', REACT_ECS)
+    it('Copy proto files', async () => {
+      const protoTypesPath = `${REACT_ECS}/src/generated`
+      removeSync(protoTypesPath)
+      mkdirSync(protoTypesPath)
+
+      await createProtoTypes(
+        `${ECS7_PATH}/node_modules/@dcl/protocol/ecs/components`,
+        protoTypesPath,
+        ['UiTransform.proto']
+      )
+    })
+    itExecutes('npm run build', REACT_ECS)
+
+    it('check file exists', () => {
+      ensureFileExists('dist/index.js', REACT_ECS)
+      ensureFileExists('dist/index.min.js', REACT_ECS)
+      ensureFileExists('dist/index.d.ts', REACT_ECS)
     })
   })
 

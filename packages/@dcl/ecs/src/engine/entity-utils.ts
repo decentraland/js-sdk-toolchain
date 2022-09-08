@@ -1,4 +1,4 @@
-import { Entity } from './entity'
+import { IEntity } from './entity'
 
 export namespace EntityUtils {
   /**
@@ -26,19 +26,19 @@ export namespace EntityUtils {
     MAX_ENTITIES
   ]
 
-  function isInRange(entity: Entity, range: EntityRange): boolean {
+  function isInRange(entity: IEntity, range: EntityRange): boolean {
     return entity >= range[0] && entity <= range[1]
   }
 
-  export function isDynamicEntity(entity: Entity) {
+  export function isDynamicEntity(entity: IEntity) {
     return isInRange(entity, DYNAMIC_ENTITIES_RANGE)
   }
 
-  export function isStaticEntity(entity: Entity) {
+  export function isStaticEntity(entity: IEntity) {
     return isInRange(entity, STATIC_ENTITIES_RANGE)
   }
 
-  export function isReservedEntity(entity: Entity) {
+  export function isReservedEntity(entity: IEntity) {
     return isInRange(entity, RESERVED_ENTITIES_RANGE)
   }
 }

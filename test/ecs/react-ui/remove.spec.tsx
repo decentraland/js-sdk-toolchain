@@ -1,14 +1,14 @@
-import { Engine, Entity } from '../../../packages/@dcl/ecs/src/engine'
-import { DivUi, ReactEcs } from '../../../packages/@dcl/react-ecs/src'
+import { Engine, IEntity } from '../../../packages/@dcl/ecs/src/engine'
+import { Entity, ReactEcs } from '../../../packages/@dcl/react-ecs/src'
 
 describe('Remove UI', () => {
   it('should remove the ui and the entities', () => {
-    const ui = () => <DivUi width={1} />
+    const ui = () => <Entity uiTransform={{ width: 1 }} />
     const engine = Engine()
     const { UiTransform } = engine.baseComponents
     const entityIndex = engine.addEntity()
-    const getDiv = (entity: Entity) => UiTransform.getOrNull(entity)
-    const divEntity = (entityIndex + 1) as Entity
+    const getDiv = (entity: IEntity) => UiTransform.getOrNull(entity)
+    const divEntity = (entityIndex + 1) as IEntity
 
     const uiIndex = engine.renderUI(ui)
     engine.update(1)

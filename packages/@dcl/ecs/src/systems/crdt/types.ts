@@ -1,9 +1,9 @@
-import { Entity } from '../../engine/entity'
+import { IEntity } from '../../engine/entity'
 import WireMessage from '../../serialization/wireMessage'
 
 export type ReceiveMessage = {
   type: WireMessage.Enum
-  entity: Entity
+  entity: IEntity
   componentId: number
   timestamp: number
   transportType?: string

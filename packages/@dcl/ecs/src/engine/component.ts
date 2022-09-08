@@ -1,6 +1,6 @@
 import type { ISchema } from '../schemas/ISchema'
 import { ByteBuffer, createByteBuffer } from '../serialization/ByteBuffer'
-import { Entity } from './entity'
+import { IEntity } from './entity'
 import { deepReadonly, DeepReadonly } from './readonly'
 
 /**
@@ -41,7 +41,7 @@ export type ComponentDefinition<
    * Transform.has(myEntity) // return true
    * ```
    */
-  has(entity: Entity): boolean
+  has(entity: IEntity): boolean
 
   /**
    * Get the readonly component of the entity (to mutate it, use getMutable instead), throw an error if the entity doesn't have the component.
@@ -62,7 +62,7 @@ export type ComponentDefinition<
    * Transform.get(otherEntity) // throw an error!!
    * ```
    */
-  get(entity: Entity): DeepReadonly<ComponentType<T>>
+  get(entity: IEntity): DeepReadonly<ComponentType<T>>
 
   /**
    * Get the readonly component of the entity (to mutate it, use getMutable instead), or null if the entity doesn't have the component.
@@ -75,7 +75,7 @@ export type ComponentDefinition<
    * log(Transform.get(otherEntity) === null) // log 'true'
    * ```
    */
-  getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null
+  getOrNull(entity: IEntity): DeepReadonly<ComponentType<T>> | null
 
   /**
    * Add the current component to an entity, throw an error if the component already exists (use `createOrReplace` instead).
@@ -90,7 +90,7 @@ export type ComponentDefinition<
    * Transform.create(myEntity) // throw an error, the `Transform` component already exists in `myEntity`
    * ````
    */
-  create(entity: Entity, val?: ConstructorType): ComponentType<T>
+  create(entity: IEntity, val?: ConstructorType): ComponentType<T>
   /**
    * Add the current component to an entity or replace the content if the entity already has the component
    * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
@@ -104,7 +104,7 @@ export type ComponentDefinition<
    * Transform.createOrReplace(myEntity, { ...Transform.default(), position: {x: 4, y: 0, z: 4} }) // ok!
    * ````
    */
-  createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>
+  createOrReplace(entity: IEntity, val?: ComponentType<T>): ComponentType<T>
 
   /**
    * Delete the current component to an entity, return null if the entity doesn't have the current component.
@@ -119,7 +119,7 @@ export type ComponentDefinition<
    * Transform.deleteFrom(myEntity) // return null
    * ````
    */
-  deleteFrom(entity: Entity): ComponentType<T> | null
+  deleteFrom(entity: IEntity): ComponentType<T> | null
 
   /**
    * Get the mutable component of the entity, throw an error if the entity doesn't have the component.
@@ -133,7 +133,7 @@ export type ComponentDefinition<
    * Transform.getMutable(myEntity).position = {x: 4, y: 0, z: 4}
    * ````
    */
-  getMutable(entity: Entity): ComponentType<T>
+  getMutable(entity: IEntity): ComponentType<T>
 
   /**
    * Get the mutable component of the entity, return null if the entity doesn't have the component.
@@ -148,42 +148,42 @@ export type ComponentDefinition<
    * }
    * ````
    */
-  getMutableOrNull(entity: Entity): ComponentType<T> | null
+  getMutableOrNull(entity: IEntity): ComponentType<T> | null
 
   /**
    * @internal
    * @param entity
    * @param data
    */
-  upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null
+  upsertFromBinary(entity: IEntity, data: ByteBuffer): ComponentType<T> | null
   /**
    * @internal
    * @param entity
    * @param data
    */
-  updateFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null
+  updateFromBinary(entity: IEntity, data: ByteBuffer): ComponentType<T> | null
 
   // allocates a buffer and returns new buffer
   /**
    * @internal
    * @param entity
    */
-  toBinary(entity: Entity): ByteBuffer
+  toBinary(entity: IEntity): ByteBuffer
 
   // writes to a pre-allocated buffer
-  writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void
+  writeToByteBuffer(entity: IEntity, buffer: ByteBuffer): void
 
   /**
    * @internal Use engine.getEntitiesWith(Component) instead.
    * Get the iterator to every entity has the component
    */
-  iterator(): Iterable<[Entity, ComponentType<T>]>
+  iterator(): Iterable<[IEntity, ComponentType<T>]>
 
   // Dirty
   /**
    * @internal
    */
-  dirtyIterator(): Iterable<Entity>
+  dirtyIterator(): Iterable<IEntity>
   /**
    * @internal
    */
@@ -191,7 +191,7 @@ export type ComponentDefinition<
   /**
    * @internal
    */
-  isDirty(entity: Entity): boolean
+  isDirty(entity: IEntity): boolean
 }
 
 export function defineComponent<
@@ -203,8 +203,8 @@ export function defineComponent<
   constructorDefault?: ConstructorType
   // meta: { syncFlags }
 ): ComponentDefinition<T, ConstructorType> {
-  const data = new Map<Entity, ComponentType<T>>()
-  const dirtyIterator = new Set<Entity>()
+  const data = new Map<IEntity, ComponentType<T>>()
+  const dirtyIterator = new Set<IEntity>()
 
   const defaultBuffer = createByteBuffer()
   if (constructorDefault) {
@@ -235,25 +235,25 @@ export function defineComponent<
     default: function () {
       return getDefaultValue()
     },
-    isDirty: function (entity: Entity): boolean {
+    isDirty: function (entity: IEntity): boolean {
       return dirtyIterator.has(entity)
     },
-    has: function (entity: Entity): boolean {
+    has: function (entity: IEntity): boolean {
       return data.has(entity)
     },
-    deleteFrom: function (entity: Entity): ComponentType<T> | null {
+    deleteFrom: function (entity: IEntity): ComponentType<T> | null {
       const component = data.get(entity)
       data.delete(entity)
       dirtyIterator.add(entity)
       return component || null
     },
     getOrNull: function (
-      entity: Entity
+      entity: IEntity
     ): DeepReadonly<ComponentType<T>> | null {
       const component = data.get(entity)
       return component ? deepReadonly(component) : null
     },
-    get: function (entity: Entity): DeepReadonly<ComponentType<T>> {
+    get: function (entity: IEntity): DeepReadonly<ComponentType<T>> {
       const component = data.get(entity)
       if (!component) {
         throw new Error(
@@ -263,7 +263,7 @@ export function defineComponent<
       return deepReadonly(component)
     },
     create: function (
-      entity: Entity,
+      entity: IEntity,
       value?: ConstructorType
     ): ComponentType<T> {
       const component = data.get(entity)
@@ -279,7 +279,7 @@ export function defineComponent<
       return usedValue
     },
     createOrReplace: function (
-      entity: Entity,
+      entity: IEntity,
       value?: ConstructorType
     ): ComponentType<T> {
       const usedValue =
@@ -288,7 +288,7 @@ export function defineComponent<
       dirtyIterator.add(entity)
       return usedValue!
     },
-    getMutableOrNull: function (entity: Entity): ComponentType<T> | null {
+    getMutableOrNull: function (entity: IEntity): ComponentType<T> | null {
       const component = data.get(entity)
       if (!component) {
         return null
@@ -296,7 +296,7 @@ export function defineComponent<
       dirtyIterator.add(entity)
       return component
     },
-    getMutable: function (entity: Entity): ComponentType<T> {
+    getMutable: function (entity: IEntity): ComponentType<T> {
       const component = this.getMutableOrNull(entity)
       if (component === null) {
         throw new Error(
@@ -305,17 +305,17 @@ export function defineComponent<
       }
       return component
     },
-    iterator: function* (): Iterable<[Entity, ComponentType<T>]> {
-      for (const [entity, component] of data) {
-        yield [entity, component]
+    iterator: function* (): Iterable<[IEntity, ComponentType<T>]> {
+      for (const [Ientity, component] of data) {
+        yield [Ientity, component]
       }
     },
-    dirtyIterator: function* (): Iterable<Entity> {
+    dirtyIterator: function* (): Iterable<IEntity> {
       for (const entity of dirtyIterator) {
         yield entity
       }
     },
-    toBinary(entity: Entity): ByteBuffer {
+    toBinary(entity: IEntity): ByteBuffer {
       const component = data.get(entity)
       if (!component) {
         throw new Error(
@@ -327,7 +327,7 @@ export function defineComponent<
       spec.serialize(component, writeBuffer)
       return writeBuffer
     },
-    writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void {
+    writeToByteBuffer(entity: IEntity, buffer: ByteBuffer): void {
       const component = data.get(entity)
       if (!component) {
         throw new Error(
@@ -338,7 +338,7 @@ export function defineComponent<
       spec.serialize(component, buffer)
     },
     updateFromBinary(
-      entity: Entity,
+      entity: IEntity,
       buffer: ByteBuffer
     ): ComponentType<T> | null {
       const component = data.get(entity)
@@ -350,7 +350,7 @@ export function defineComponent<
       return this.upsertFromBinary(entity, buffer)
     },
     upsertFromBinary(
-      entity: Entity,
+      entity: IEntity,
       buffer: ByteBuffer
     ): ComponentType<T> | null {
       const newValue = spec.deserialize(buffer)

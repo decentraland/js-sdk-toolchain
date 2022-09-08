@@ -4,85 +4,39 @@
 
 ```ts
 
-// Warning: (ae-missing-release-tag) "Color3" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "Container" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export interface Color3 {
-    // (undocumented)
-    b: number;
-    // (undocumented)
-    g: number;
-    // (undocumented)
-    r: number;
-}
+export function Container({ width, height, children }: ContainerPropTypes): any;
 
-// Warning: (ae-missing-release-tag) "DivElements" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-forgotten-export) The symbol "CommonProps" needs to be exported by the entry point index.d.ts
+// Warning: (ae-missing-release-tag) "ContainerPropTypes" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type DivElements = {
-    divui: unknown;
+export type ContainerPropTypes = CommonProps & {
+    width?: number;
+    height?: number;
 };
 
+// Warning: (ae-missing-release-tag) "EcsElements" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export interface DivProps {
-    // (undocumented)
-    alignContent: YGAlign;
-    // (undocumented)
-    alignItems: YGAlign;
-    // (undocumented)
-    alignSelf: YGAlign;
-    // (undocumented)
-    backgroundColor: Color3;
-    // (undocumented)
-    border: Position;
-    // (undocumented)
-    children: any;
-    // (undocumented)
-    direction: YGDirection;
-    // (undocumented)
-    display: YGDisplay;
-    // (undocumented)
-    flex: number;
-    // (undocumented)
-    flexBasis: number;
-    // (undocumented)
-    flexDirection: YGFlexDirection;
-    // (undocumented)
-    flexGrow: number;
-    // (undocumented)
-    flexShrink: number;
-    // (undocumented)
-    flexWrap: YGWrap;
-    // (undocumented)
-    height: number;
-    // (undocumented)
-    justifyContent: YGJustify;
-    // (undocumented)
-    margin: Position;
-    // (undocumented)
-    maxHeight: number;
-    // (undocumented)
-    maxWidth: number;
-    // (undocumented)
-    minHeight: number;
-    // (undocumented)
-    minWidth: number;
-    // (undocumented)
-    overflow: YGOverflow;
-    // (undocumented)
-    padding: Position;
-    // (undocumented)
-    position: Position;
-    // (undocumented)
-    positionType: YGPositionType;
-    // (undocumented)
-    width: number;
-}
+export type EcsElements = {
+    entity: EntityComponents;
+};
 
+// Warning: (ae-forgotten-export) The symbol "EntityPropTypes" needs to be exported by the entry point index.d.ts
+//
 // @public (undocumented)
-export function DivUi(props: Partial<DivProps> & {
-    key?: string | number;
-}): any;
+export function Entity(props: EntityPropTypes & CommonProps): any;
+
+// Warning: (ae-missing-release-tag) "EntityComponents" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type EntityComponents = {
+    uiTransform?: PBUiTransform;
+    pepe?: string;
+};
 
 // Warning: (ae-missing-release-tag) "JSX" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -95,139 +49,10 @@ namespace JSX_2 {
     interface Element {
     }
     // (undocumented)
-    interface IntrinsicElements extends DivElements {
+    interface IntrinsicElements extends EcsElements {
     }
 }
 export { JSX_2 as JSX }
-
-// Warning: (ae-missing-release-tag) "PBUiTransform" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export interface PBUiTransform {
-    // (undocumented)
-    alignContent: YGAlign;
-    // (undocumented)
-    alignItems: YGAlign;
-    // (undocumented)
-    alignSelf: YGAlign;
-    // (undocumented)
-    backgroundColor: Color3 | undefined;
-    // (undocumented)
-    borderBottom: number;
-    // (undocumented)
-    borderLeft: number;
-    // (undocumented)
-    borderRight: number;
-    // (undocumented)
-    borderTop: number;
-    // (undocumented)
-    direction: YGDirection;
-    // (undocumented)
-    display: YGDisplay;
-    // (undocumented)
-    flex: number;
-    // (undocumented)
-    flexBasis: number;
-    // (undocumented)
-    flexBasisUnit: YGUnit;
-    // (undocumented)
-    flexDirection: YGFlexDirection;
-    // (undocumented)
-    flexGrow: number;
-    // (undocumented)
-    flexShrink: number;
-    // (undocumented)
-    flexWrap: YGWrap;
-    // (undocumented)
-    height: number;
-    // (undocumented)
-    heightUnit: YGUnit;
-    // (undocumented)
-    justifyContent: YGJustify;
-    // (undocumented)
-    marginBottom: number;
-    // (undocumented)
-    marginBottomUnit: YGUnit;
-    // (undocumented)
-    marginLeft: number;
-    marginLeftUnit: YGUnit;
-    // (undocumented)
-    marginRight: number;
-    // (undocumented)
-    marginRightUnit: YGUnit;
-    // (undocumented)
-    marginTop: number;
-    // (undocumented)
-    marginTopUnit: YGUnit;
-    // (undocumented)
-    maxHeight: number;
-    // (undocumented)
-    maxHeightUnit: YGUnit;
-    // (undocumented)
-    maxWidth: number;
-    // (undocumented)
-    maxWidthUnit: YGUnit;
-    // (undocumented)
-    minHeight: number;
-    // (undocumented)
-    minHeightUnit: YGUnit;
-    // (undocumented)
-    minWidth: number;
-    // (undocumented)
-    minWidthUnit: YGUnit;
-    // (undocumented)
-    overflow: YGOverflow;
-    // (undocumented)
-    paddingBottom: number;
-    // (undocumented)
-    paddingBottomUnit: YGUnit;
-    // (undocumented)
-    paddingLeft: number;
-    // (undocumented)
-    paddingLeftUnit: YGUnit;
-    // (undocumented)
-    paddingRight: number;
-    // (undocumented)
-    paddingRightUnit: YGUnit;
-    // (undocumented)
-    paddingTop: number;
-    // (undocumented)
-    paddingTopUnit: YGUnit;
-    // (undocumented)
-    parent: number;
-    // (undocumented)
-    positionBottom: number;
-    // (undocumented)
-    positionBottomUnit: YGUnit;
-    // (undocumented)
-    positionLeft: number;
-    // (undocumented)
-    positionLeftUnit: YGUnit;
-    // (undocumented)
-    positionRight: number;
-    // (undocumented)
-    positionRightUnit: YGUnit;
-    // (undocumented)
-    positionTop: number;
-    // (undocumented)
-    positionTopUnit: YGUnit;
-    // (undocumented)
-    positionType: YGPositionType;
-    // (undocumented)
-    rightOf: number;
-    // (undocumented)
-    width: number;
-    // (undocumented)
-    widthUnit: YGUnit;
-}
-
-// @public (undocumented)
-export type Position = {
-    top: number | string;
-    right: number | string;
-    bottom: number | string;
-    left: number | string;
-};
 
 // Warning: (ae-missing-release-tag) "ReactEcs" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -243,149 +68,9 @@ namespace ReactEcs {
 export { ReactEcs }
 export default ReactEcs;
 
-// Warning: (ae-missing-release-tag) "YGAlign" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warnings were encountered during analysis:
 //
-// @public (undocumented)
-export enum YGAlign {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGAlignAuto = 0,
-    // (undocumented)
-    YGAlignBaseline = 5,
-    // (undocumented)
-    YGAlignCenter = 2,
-    // (undocumented)
-    YGAlignFlexEnd = 3,
-    // (undocumented)
-    YGAlignFlexStart = 1,
-    // (undocumented)
-    YGAlignSpaceAround = 7,
-    // (undocumented)
-    YGAlignSpaceBetween = 6,
-    // (undocumented)
-    YGAlignStretch = 4
-}
-
-// Warning: (ae-missing-release-tag) "YGDirection" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export enum YGDirection {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGDirectionInherit = 0,
-    // (undocumented)
-    YGDirectionLTR = 1,
-    // (undocumented)
-    YGDirectionRTL = 2
-}
-
-// Warning: (ae-missing-release-tag) "YGDisplay" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export enum YGDisplay {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGDisplayFlex = 0,
-    // (undocumented)
-    YGDisplayNone = 1
-}
-
-// Warning: (ae-missing-release-tag) "YGFlexDirection" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export enum YGFlexDirection {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGFlexDirectionColumn = 0,
-    // (undocumented)
-    YGFlexDirectionColumnReverse = 1,
-    // (undocumented)
-    YGFlexDirectionRow = 2,
-    // (undocumented)
-    YGFlexDirectionRowReverse = 3
-}
-
-// Warning: (ae-missing-release-tag) "YGJustify" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export enum YGJustify {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGJustifyCenter = 1,
-    // (undocumented)
-    YGJustifyFlexEnd = 2,
-    // (undocumented)
-    YGJustifyFlexStart = 0,
-    // (undocumented)
-    YGJustifySpaceAround = 4,
-    // (undocumented)
-    YGJustifySpaceBetween = 3,
-    // (undocumented)
-    YGJustifySpaceEvenly = 5
-}
-
-// Warning: (ae-missing-release-tag) "YGOverflow" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export enum YGOverflow {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGOverflowHidden = 1,
-    // (undocumented)
-    YGOverflowScroll = 2,
-    // (undocumented)
-    YGOverflowVisible = 0
-}
-
-// Warning: (ae-missing-release-tag) "YGPositionType" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export enum YGPositionType {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGPositionTypeAbsolute = 2,
-    // (undocumented)
-    YGPositionTypeRelative = 1,
-    // (undocumented)
-    YGPositionTypeStatic = 0
-}
-
-// Warning: (ae-missing-release-tag) "YGUnit" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export enum YGUnit {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGUnitAuto = 3,
-    // (undocumented)
-    YGUnitPercent = 2,
-    // (undocumented)
-    YGUnitPoint = 1,
-    // (undocumented)
-    YGUnitUndefined = 0
-}
-
-// Warning: (ae-missing-release-tag) "YGWrap" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export enum YGWrap {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGWrapNoWrap = 0,
-    // (undocumented)
-    YGWrapWrap = 1,
-    // (undocumented)
-    YGWrapWrapReverse = 2
-}
+// dist/index.d.ts:9:5 - (ae-forgotten-export) The symbol "PBUiTransform" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

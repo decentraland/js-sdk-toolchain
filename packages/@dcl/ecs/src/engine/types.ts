@@ -3,9 +3,10 @@ import type { ISchema } from '../schemas/ISchema'
 import { Result, Spec } from '../schemas/Map'
 import { Transport } from '../systems/crdt/transports/types'
 import { ComponentDefinition as CompDef, ComponentType } from './component'
-import { Entity } from './entity'
+import { IEntity } from './entity'
 import { Update } from './systems'
 import { ReadonlyComponentSchema } from './readonly'
+import { JSX } from '..'
 
 export { ISchema } from '../schemas/ISchema'
 
@@ -30,18 +31,18 @@ export type IEngine = {
    * @param dynamic
    * @return the next entity unused
    */
-  addEntity(dynamic?: boolean): Entity
+  addEntity(dynamic?: boolean): IEntity
 
   /**
    * An alias of engine.addEntity(true)
    */
-  addDynamicEntity(): Entity
+  addDynamicEntity(): IEntity
 
   /**
    * Remove all components of an entity
    * @param entity
    */
-  removeEntity(entity: Entity): void
+  removeEntity(entity: IEntity): void
 
   /**
    * Add the system to the engine. It will be called every tick updated.
@@ -136,7 +137,7 @@ export type IEngine = {
    */
   getEntitiesWith<T extends [CompDef, ...CompDef[]]>(
     ...components: T
-  ): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>
+  ): Iterable<[IEntity, ...ReadonlyComponentSchema<T>]>
 
   /**
    * @internal
@@ -152,7 +153,7 @@ export type IEngine = {
   removeComponentDefinition(componentId: number): void
 
   baseComponents: SdkComponents
-  renderUI(renderTree: () => any): number
+  renderUI(renderTree: () => JSX.Element): number
   removeUI(ui: number): void
 }
 

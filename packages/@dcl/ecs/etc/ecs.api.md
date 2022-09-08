@@ -60,15 +60,15 @@ export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCa
 export type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorType = ComponentType<T>> = {
     _id: number;
     default(): DeepReadonly<ComponentType<T>>;
-    has(entity: Entity): boolean;
-    get(entity: Entity): DeepReadonly<ComponentType<T>>;
-    getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
-    create(entity: Entity, val?: ConstructorType): ComponentType<T>;
-    createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
-    deleteFrom(entity: Entity): ComponentType<T> | null;
-    getMutable(entity: Entity): ComponentType<T>;
-    getMutableOrNull(entity: Entity): ComponentType<T> | null;
-    writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void;
+    has(entity: IEntity): boolean;
+    get(entity: IEntity): DeepReadonly<ComponentType<T>>;
+    getOrNull(entity: IEntity): DeepReadonly<ComponentType<T>> | null;
+    create(entity: IEntity, val?: ConstructorType): ComponentType<T>;
+    createOrReplace(entity: IEntity, val?: ComponentType<T>): ComponentType<T>;
+    deleteFrom(entity: IEntity): ComponentType<T> | null;
+    getMutable(entity: IEntity): ComponentType<T>;
+    getMutableOrNull(entity: IEntity): ComponentType<T> | null;
+    writeToByteBuffer(entity: IEntity, buffer: ByteBuffer): void;
 };
 
 // @public (undocumented)
@@ -205,6 +205,13 @@ export const DEG2RAD: number;
 // @public (undocumented)
 export type double = number;
 
+// Warning: (ae-missing-release-tag) "EcsElements" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type EcsElements = {
+    entity: unknown;
+};
+
 // @public (undocumented)
 export function Engine({ transports }?: IEngineParams): IEngine;
 
@@ -212,11 +219,6 @@ export function Engine({ transports }?: IEngineParams): IEngine;
 //
 // @public (undocumented)
 export const engine: IEngine;
-
-// @public (undocumented)
-export type Entity = number & {
-    [entitySymbol]: true;
-};
 
 // @public
 export const Epsilon = 0.000001;
@@ -237,23 +239,28 @@ export const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
 
 // @public (undocumented)
 export type IEngine = {
-    addEntity(dynamic?: boolean): Entity;
-    addDynamicEntity(): Entity;
-    removeEntity(entity: Entity): void;
+    addEntity(dynamic?: boolean): IEntity;
+    addDynamicEntity(): IEntity;
+    removeEntity(entity: IEntity): void;
     addSystem(system: Update, priority?: number, name?: string): void;
     removeSystem(selector: string | Update): boolean;
     defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
     defineComponentFromSchema<T extends ISchema<Record<string, any>>, ConstructorType = ComponentType<T>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
-    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
+    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[IEntity, ...ReadonlyComponentSchema<T>]>;
     baseComponents: SdkComponents;
-    renderUI(renderTree: () => any): number;
+    renderUI(renderTree: () => JSX.Element): number;
     removeUI(ui: number): void;
 };
 
 // @public (undocumented)
 export type IEngineParams = {
     transports?: Transport[];
+};
+
+// @public (undocumented)
+export type IEntity = number & {
+    [entitySymbol]: true;
 };
 
 // @public (undocumented)
@@ -267,6 +274,20 @@ export type ISchema<T = any> = {
 export interface ISize {
     height: number;
     width: number;
+}
+
+// Warning: (ae-missing-release-tag) "JSX" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export namespace JSX {
+    // (undocumented)
+    export interface Component {
+    }
+    // (undocumented)
+    export type Element = any;
+    // (undocumented)
+    export interface IntrinsicElements extends EcsElements {
+    }
 }
 
 // Warning: (ae-missing-release-tag) "log" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -693,24 +714,24 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 // dist/engine/component.d.ts:125:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/component.d.ts:133:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
 // dist/engine/component.d.ts:133:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
-// dist/engine/types.d.ts:26:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:27:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// dist/engine/types.d.ts:36:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:41:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:27:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:28:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/types.d.ts:37:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/types.d.ts:42:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/types.d.ts:43:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:59:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:65:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:44:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:60:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/types.d.ts:66:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/types.d.ts:67:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:68:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// dist/engine/types.d.ts:82:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:68:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:69:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
 // dist/engine/types.d.ts:83:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:84:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// dist/engine/types.d.ts:94:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:95:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// dist/engine/types.d.ts:104:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:105:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/types.d.ts:84:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:85:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/types.d.ts:95:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:96:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/types.d.ts:105:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:106:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
 
 // (No @packageDocumentation comment for this package)
 

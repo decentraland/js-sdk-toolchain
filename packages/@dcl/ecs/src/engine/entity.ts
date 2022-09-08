@@ -4,32 +4,32 @@ declare const entitySymbol: unique symbol
 /**
  * @public
  */
-export type Entity = number & { [entitySymbol]: true }
+export type IEntity = number & { [entitySymbol]: true }
 
 export function EntityContainer() {
   const staticEntity = Entity(EntityUtils.STATIC_ENTITIES_RANGE)
   const dynamicEntity = Entity(EntityUtils.DYNAMIC_ENTITIES_RANGE)
   return {
-    generateEntity(dynamic: boolean = false): Entity {
+    generateEntity(dynamic: boolean = false): IEntity {
       if (dynamic) {
         return dynamicEntity.generateEntity()
       } else {
         return staticEntity.generateEntity()
       }
     },
-    removeEntity(entity: Entity): boolean {
+    removeEntity(entity: IEntity): boolean {
       return (
         staticEntity.removeEntity(entity) || dynamicEntity.removeEntity(entity)
       )
     },
-    isEntityExists(entity: Entity): boolean {
+    isEntityExists(entity: IEntity): boolean {
       return (
         EntityUtils.isReservedEntity(entity) ||
         staticEntity.getExistingEntities().has(entity) ||
         dynamicEntity.getExistingEntities().has(entity)
       )
     },
-    getExistingEntities(): Set<Entity> {
+    getExistingEntities(): Set<IEntity> {
       return new Set([
         ...staticEntity.getExistingEntities(),
         ...dynamicEntity.getExistingEntities()
@@ -39,14 +39,14 @@ export function EntityContainer() {
 }
 
 function Entity(range: EntityUtils.EntityRange) {
-  function createEntity(entity: number): Entity {
-    return entity as Entity
+  function createEntity(entity: number): IEntity {
+    return entity as IEntity
   }
 
   let entityCounter = range[0]
-  const usedEntities: Set<Entity> = new Set()
+  const usedEntities: Set<IEntity> = new Set()
 
-  function generateEntity(): Entity {
+  function generateEntity(): IEntity {
     if (entityCounter >= range[1]) {
       throw new Error(
         `It fails trying to generate an entity out of range [${range[0]}, ${range[1]}].`
@@ -60,7 +60,7 @@ function Entity(range: EntityUtils.EntityRange) {
     return entity
   }
 
-  function removeEntity(entity: Entity) {
+  function removeEntity(entity: IEntity) {
     return usedEntities.delete(entity)
   }
 

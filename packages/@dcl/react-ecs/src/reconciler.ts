@@ -1,61 +1,102 @@
 import Reconciler, { HostConfig } from 'react-reconciler'
-import { JSX } from '.'
-// import { IEngine } from '../types'
-type IEngine = any
-type Entity = number
-import { DivProps } from './components/div'
-import { defaultDiv } from './components/div/utils'
+import { EntityComponents, JSX } from '.'
 
-function propsChanged(
-  prevProps: Partial<DivProps>,
-  nextProps: Partial<DivProps>
-) {
-  if (Object.keys(prevProps).length !== Object.keys(nextProps).length) {
-    return true
+// TODO: Fix this types
+type IEntity = number
+type IEngine = any
+
+const isNotUndefined = <T>(val: T | undefined): val is T => {
+  return !!val
+}
+
+type Changes<K extends keyof EntityComponents = keyof EntityComponents> = {
+  type: 'delete' | 'add' | 'put'
+  props?: Partial<EntityComponents[K]>
+  component: K
+}
+
+function propsChanged<K extends keyof EntityComponents>(
+  component: K,
+  prevProps: Partial<EntityComponents[K]>,
+  nextProps: Partial<EntityComponents[K]>
+): Changes<K> | undefined {
+  if (prevProps && !nextProps) {
+    return { type: 'delete', component }
   }
 
-  for (const key in prevProps) {
-    if (key === 'children') continue
-    const propKey = key as keyof DivProps
+  if (!nextProps) {
+    return
+  }
+
+  if (!prevProps && nextProps) {
+    return { type: 'add', props: nextProps, component }
+  }
+
+  const changes: Partial<EntityComponents[K]> = {}
+
+  // TODO: array and object types. For now only primitives
+  for (const k in prevProps) {
+    const propKey = k as keyof typeof prevProps
     if (prevProps[propKey] !== nextProps[propKey]) {
-      return true
+      changes[propKey] = nextProps[propKey]
     }
   }
-  return false
+
+  if (!Object.keys(changes).length) {
+    return
+  }
+
+  return { type: 'put', props: changes, component }
 }
 
 export function createReconciler(
-  engine: Pick<IEngine, 'baseComponents' | 'getComponent' | 'addEntity'>
+  engine: Pick<
+    IEngine,
+    'baseComponents' | 'getComponent' | 'addEntity' | 'removeEntity'
+  >
 ) {
-  const { UiTransform } = engine.baseComponents
-  const entities = new Set<Entity>()
+  const entities = new Set<IEntity>()
 
-  function updateComponentTree(instance: Instance) {
-    console.log(instance)
-    const comp = engine
-      .getComponent(instance.componentId)
-      .getMutable(instance.entity)
-    comp.rightOf = instance.rightOf
-    comp.parent = instance.parent
+  function updateTree(
+    instance: Instance,
+    props: Partial<{ rightOf: IEntity; parent: IEntity }>
+  ) {
+    upsertComponent(instance, props, 'uiTransform')
   }
 
-  function updateComponentProps(instance: Instance, props: Partial<DivProps>) {
-    const comp = engine
-      .getComponent(instance.componentId)
-      .getMutable(instance.entity)
+  function removeComponent(
+    instance: Instance,
+    component: keyof EntityComponents
+  ) {
+    const Component = engine.getComponent(getComponentId[component])
+    Component.deleteFrom(instance.entity)
+  }
 
-    for (const propKey in props) {
-      const key = propKey as keyof DivProps
-      comp[key] = props[key]
+  function upsertComponent<K extends keyof EntityComponents>(
+    instance: Instance,
+    props: Partial<EntityComponents[K]>,
+    component: K
+  ) {
+    const componentId = getComponentId[component]
+    const Component = engine.getComponent(componentId)
+    const transform =
+      Component.getMutableOrNull(instance.entity) ||
+      Component.create(instance.entity)
+
+    for (const key in props) {
+      const keyProp = key as keyof EntityComponents[K]
+      transform[keyProp] = props[keyProp]
     }
   }
 
-  function removeComponent(instance: Instance) {
-    // TODO: we should remove the component or remove the entity ?
-    engine.getComponent(instance.componentId).deleteFrom(instance.entity)
+  function removeChildEntity(instance: Instance) {
+    engine.removeEntity(instance.entity)
     for (const child of instance._child) {
-      removeComponent(child)
+      removeChildEntity(child)
     }
+  }
+  const getComponentId: { [key in keyof EntityComponents]: number } = {
+    uiTransform: engine.baseComponents.UiTransform._id
   }
 
   function appendChild(parent: Instance, child: Instance): void {
@@ -67,7 +108,7 @@ export function createReconciler(
     child.rightOf = parent._child[parent._child.length - 1]?.entity
     parent._child.push(child)
 
-    updateComponentTree(child)
+    updateTree(child, { rightOf: child.rightOf, parent: parent.entity })
   }
 
   function removeChild(parentInstance: Instance, child: Instance): void {
@@ -81,12 +122,12 @@ export function createReconciler(
 
     if (childToModify) {
       childToModify.rightOf = child.rightOf
-      updateComponentTree(childToModify)
+      updateTree(childToModify, { rightOf: child.rightOf })
     }
 
     // Mutate 💀
     parentInstance._child.splice(childIndex, 1)
-    removeComponent(child)
+    removeChildEntity(child)
   }
 
   const hostConfig: HostConfig<
@@ -112,18 +153,18 @@ export function createReconciler(
     supportsHydration: false,
 
     createInstance(type: Type, props: Props): Instance {
-      console.log('in createInstance', { type, props })
+      console.log('create instance', type)
       const entity = engine.addEntity()
       entities.add(entity)
-      const { children, ...divProps } = props
+      const instance: Instance = { entity, _child: [] }
 
-      UiTransform.create(entity, {
-        ...defaultDiv,
-        ...divProps,
-        parent: 0
-      })
+      for (const key in props) {
+        if (key === 'children') continue
+        const component: keyof EntityComponents = key as keyof EntityComponents
+        upsertComponent(instance, props[component], component)
+      }
 
-      return { entity, componentId: UiTransform._id, _child: [] }
+      return instance
     },
     appendChild,
     appendChildToContainer: appendChild,
@@ -132,7 +173,6 @@ export function createReconciler(
     removeChild: removeChild,
     removeChildFromContainer: () => {
       // TODO: wtf
-      console.log('removechildereta')
       // removeChild(args)
     },
 
@@ -141,35 +181,37 @@ export function createReconciler(
       _type: Type,
       oldProps: Props,
       newProps: Props
-    ): UpdatePayload | null {
-      return propsChanged(oldProps, newProps)
+    ): UpdatePayload {
+      const components: (keyof EntityComponents)[] = ['uiTransform']
+      return components
+        .map((component) =>
+          propsChanged(component, oldProps[component], newProps[component])
+        )
+        .filter(isNotUndefined)
     },
 
     commitUpdate(
       instance: Instance,
       updatePayload: UpdatePayload,
-      type: Type,
-      prevProps: Props,
-      nextProps: Props,
+      _type: Type,
+      _prevPropsProps: Props,
+      _nextProps: Props,
       _internalHandle: OpaqueHandle
     ): void {
-      console.log('commitupdate', {
-        instance,
-        updatePayload,
-        type,
-        prevProps,
-        nextProps
-      })
-      if (!updatePayload) return
-      updateComponentProps(instance, nextProps)
+      console.log(updatePayload)
+      for (const update of updatePayload) {
+        if (update.type === 'delete') {
+          removeComponent(instance, update.component)
+        } else {
+          upsertComponent(instance, update.props!, update.component)
+        }
+      }
     },
     insertBefore(
       parentInstance: Instance,
       child: Instance,
       beforeChild: Instance
     ): void {
-      console.log('insertbefore', { parentInstance, child, beforeChild })
-
       const beforeChildIndex = parentInstance._child.findIndex(
         (c) => c.entity === beforeChild.entity
       )
@@ -183,15 +225,15 @@ export function createReconciler(
       beforeChild.rightOf = child.entity
       child.parent = parentInstance.entity
 
-      updateComponentTree(child)
-      updateComponentTree(beforeChild)
+      updateTree(child, { rightOf: child.rightOf, parent: child.parent })
+      updateTree(beforeChild, { rightOf: beforeChild.rightOf })
     },
     insertInContainerBefore(
       _container: Container,
       _child: Instance | TextInstance,
       _beforeChild: Instance | TextInstance | SuspenseInstance
     ): void {
-      console.log('insertIncontainerBefore TODO')
+      // console.log('insertIncontainerBefore TODO')
     },
 
     detachDeletedInstance: function (_node: Instance): void {
@@ -296,14 +338,13 @@ export const noopConfig = {
 }
 
 type OpaqueHandle = any
-type Type = string
-type Props = Partial<DivProps>
+type Type = 'divui' | 'textui' | 'imageui' | 'entity'
+type Props = EntityComponents
 type Container = Document | Instance | any
 type Instance = {
-  entity: number
-  componentId: number
-  parent?: number
-  rightOf?: number
+  entity: IEntity
+  parent?: IEntity
+  rightOf?: IEntity
   _child: Instance[]
 }
 type TextInstance = unknown
@@ -311,7 +352,7 @@ type SuspenseInstance = any
 type HydratableInstance = any
 type PublicInstance = any
 type HostContext = any
-type UpdatePayload = any
+type UpdatePayload = Changes[]
 type _ChildSet = any
 type TimeoutHandle = any
 type NoTimeout = number
