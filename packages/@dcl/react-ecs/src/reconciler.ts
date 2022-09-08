@@ -1,5 +1,5 @@
 import Reconciler, { HostConfig } from 'react-reconciler'
-import { EntityComponents, JSX } from '.'
+import { EntityComponents, JSX } from './react-ecs'
 
 // TODO: Fix this types
 type IEntity = number

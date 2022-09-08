@@ -24,7 +24,8 @@
     "strictPropertyInitialization": true,
     "alwaysStrict": true,
     "jsx": "react",
-    "jsxFactory": "ReactEcs.createElement"
+    "jsxFactory": "ReactEcs.createElement",
+    "skipLibCheck": true
   },
   "includes": "*.ts"
 }

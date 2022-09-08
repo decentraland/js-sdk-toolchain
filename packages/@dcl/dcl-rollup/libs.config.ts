@@ -35,7 +35,8 @@ const config: RollupOptions = {
       tsconfig: tsconfigPath,
       compilerOptions: {
         declaration: true,
-        declarationDir: '.'
+        declarationDir: '.',
+        skipLibCheck: true
       }
     }),
     ...basicRollupConfig.plugins!
