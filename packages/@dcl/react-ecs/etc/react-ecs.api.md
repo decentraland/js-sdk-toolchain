@@ -39,7 +39,7 @@ export type ContainerPropTypes = CommonProps & {
 //
 // @public (undocumented)
 export type EcsElements = {
-    entity: EntityComponents;
+    entity: Partial<EntityComponents>;
 };
 
 // @public (undocumented)
@@ -49,8 +49,7 @@ export function Entity(props: EntityPropTypes & CommonProps): any;
 //
 // @public (undocumented)
 export type EntityComponents = {
-    uiTransform?: PBUiTransform;
-    pepe?: string;
+    uiTransform: PBUiTransform;
 };
 
 // @public (undocumented)

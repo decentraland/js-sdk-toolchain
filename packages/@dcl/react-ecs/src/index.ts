@@ -6,12 +6,11 @@ export { ReactEcs }
 export * from './components'
 
 export type EcsElements = {
-  entity: EntityComponents
+  entity: Partial<EntityComponents>
 }
 
 export type EntityComponents = {
-  uiTransform?: PBUiTransform
-  pepe?: string
+  uiTransform: PBUiTransform
 }
 
 declare global {

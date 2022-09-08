@@ -19,7 +19,7 @@
       {
         "ignoreRestSiblings": true,
         "argsIgnorePattern": "^_",
-        "varsIgnorePattern": "^_|React",
+        "varsIgnorePattern": "^_|ReactEcs",
         "caughtErrorsIgnorePattern": "^_"
       }
     ]

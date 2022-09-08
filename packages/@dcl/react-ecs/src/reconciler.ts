@@ -182,7 +182,9 @@ export function createReconciler(
       oldProps: Props,
       newProps: Props
     ): UpdatePayload {
-      const components: (keyof EntityComponents)[] = ['uiTransform']
+      const components = Object.keys(
+        getComponentId
+      ) as (keyof EntityComponents)[]
       return components
         .map((component) =>
           propsChanged(component, oldProps[component], newProps[component])
