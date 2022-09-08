@@ -1,4 +1,4 @@
-import { Entity } from '../../../packages/@dcl/ecs/src/engine/entity'
+import { IEntity } from '../../../packages/@dcl/ecs/src/engine/entity'
 import { wasEntityClickedGenerator } from '../../../packages/@dcl/ecs/src/engine/events'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/PointerEvents.gen'
@@ -153,7 +153,7 @@ describe('Events helpers wasEntityClicked', () => {
 })
 
 function createTestPointerDownCommand(
-  entity: Entity,
+  entity: IEntity,
   timestamp: number,
   state: PointerEventType
 ) {

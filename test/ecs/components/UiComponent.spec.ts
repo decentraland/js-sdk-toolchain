@@ -19,7 +19,6 @@ describe('UiTransform component', () => {
     UiTransform.create(entity, {
       parent: 0,
       rightOf: 0,
-      backgroundColor: { r: 0, g: 0, b: 0 },
       alignContent: YGAlign.YGAlignCenter,
       alignItems: YGAlign.YGAlignFlexEnd,
       alignSelf: YGAlign.YGAlignFlexStart,

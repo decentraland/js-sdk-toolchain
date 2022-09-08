@@ -619,7 +619,7 @@ declare type IEngine = {
      *
      * ```
      */
-    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>;
     /**
      * Define a component and add it to the engine.
      * @param spec An object with schema fields
@@ -655,6 +655,7 @@ declare type IEngine = {
      * ```
      */
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[IEntity, ...ReadonlyComponentSchema<T>]>;
+    RootEntity: IEntity;
     baseComponents: SdkComponents;
     renderUI(renderTree: () => JSX.Element): number;
     removeUI(ui: number): void;

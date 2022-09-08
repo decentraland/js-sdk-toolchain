@@ -28,7 +28,6 @@ export function parseUiTransform(
 
 export const defaultDiv: PBUiTransform = {
   parent: CANVAS_ROOT_ENTITY,
-  backgroundColor: { r: 0, g: 0, b: 0 },
   rightOf: 0,
   display: YGDisplay.YGDisplayFlex,
   flexBasis: 0,

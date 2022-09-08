@@ -152,7 +152,7 @@ export type IEngine = {
    */
   removeComponentDefinition(componentId: number): void
 
-  RootEntity: Entity
+  RootEntity: IEntity
   baseComponents: SdkComponents
   renderUI(renderTree: () => JSX.Element): number
   removeUI(ui: number): void

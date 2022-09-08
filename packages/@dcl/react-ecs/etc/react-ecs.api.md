@@ -14,18 +14,6 @@ export const CANVAS_ROOT_ENTITY = 7;
 // @public (undocumented)
 export type Children = any;
 
-// Warning: (ae-missing-release-tag) "Color3" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export interface Color3 {
-    // (undocumented)
-    b: number;
-    // (undocumented)
-    g: number;
-    // (undocumented)
-    r: number;
-}
-
 // Warning: (ae-missing-release-tag) "CommonProps" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -101,8 +89,6 @@ export interface PBUiTransform {
     alignItems: YGAlign;
     // (undocumented)
     alignSelf: YGAlign;
-    // (undocumented)
-    backgroundColor: Color3 | undefined;
     // (undocumented)
     borderBottom: number;
     // (undocumented)
@@ -242,8 +228,6 @@ export interface UiTransformProps {
     alignItems?: YGAlign;
     // (undocumented)
     alignSelf?: YGAlign;
-    // (undocumented)
-    backgroundColor?: Color3;
     // (undocumented)
     border?: Position;
     // (undocumented)

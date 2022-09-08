@@ -1,4 +1,3 @@
-import { Color3 } from '../../generated/common/Color3.gen'
 import {
   PBUiTransform,
   YGAlign,
@@ -22,8 +21,7 @@ export {
   YGOverflow,
   YGPositionType,
   YGUnit,
-  YGWrap,
-  Color3
+  YGWrap
 }
 
 /**
@@ -43,7 +41,6 @@ export const CANVAS_ROOT_ENTITY = 7
  */
 export interface UiTransformProps {
   display?: YGDisplay
-  backgroundColor?: Color3
   flex?: number
   justifyContent?: YGJustify
   positionType?: YGPositionType
