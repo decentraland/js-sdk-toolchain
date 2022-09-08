@@ -184,11 +184,26 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
       system.fn(dt)
     }
 
+    // Selected components that only exist one frame
+    //  then, they are deleted but their crdt state keeps
+    const removeSelectedComponents = [
+      baseComponents.OnPointerDownResult,
+      baseComponents.OnPointerUpResult
+    ]
+    const excludeComponentIds = removeSelectedComponents.map((item) => item._id)
+    for (const componentDef of removeSelectedComponents) {
+      for (const [entity] of engine.getEntitiesWith(componentDef)) {
+        componentDef.deleteFrom(entity)
+      }
+    }
+
     // TODO: Perf tip
     // Should we add some dirtyIteratorSet at engine level so we dont have
     // to iterate all the component definitions to get the dirty ones ?
     const dirtySet = new Map<Entity, Set<number>>()
     for (const [componentId, definition] of engine.componentsDefinition) {
+      if (excludeComponentIds.includes(componentId)) continue
+
       for (const entity of definition.dirtyIterator()) {
         if (!dirtySet.has(entity)) {
           dirtySet.set(entity, new Set())

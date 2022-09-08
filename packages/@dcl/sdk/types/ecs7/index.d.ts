@@ -237,6 +237,14 @@ declare namespace Components {
     /** @public */
     const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
     /** @public */
+    const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
+    /** @public */
+    const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
+    /** @public */
+    const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
+    /** @public */
+    const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
+    /** @public */
     const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
     /** @public */
     const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
@@ -473,6 +481,10 @@ declare function defineSdkComponents(engine: PreEngine): {
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
+    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
+    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
+    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
+    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
     PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
     PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
@@ -1732,6 +1744,12 @@ declare const onPlayerExpressionObservable: Observable<{
     expressionId: string;
 }>;
 
+/** @public */
+declare const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
+
+/** @public */
+declare const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
+
 /**
  * @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
@@ -1739,6 +1757,12 @@ declare const onPlayerExpressionObservable: Observable<{
 declare const onPointerLockedStateChange: Observable<{
     locked?: boolean | undefined;
 }>;
+
+/** @public */
+declare const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
+
+/** @public */
+declare const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
 
 /**
  * @public
@@ -1832,17 +1856,30 @@ declare interface PBAvatarModifierArea {
 
 declare interface PBAvatarShape {
     id: string;
+    /** default = NPC */
     name?: string | undefined;
+    /** default = urn:decentraland:off-chain:base-avatars:BaseFemale */
     bodyShape?: string | undefined;
+    /** default = Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
     skinColor?: Color3 | undefined;
+    /** default = Color3(R = 0.283f, G = 0.142f, B = 0f) */
     hairColor?: Color3 | undefined;
+    /** default = Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
     eyeColor?: Color3 | undefined;
-    wearables: string[];
     expressionTriggerId?: string | undefined;
+    /** default = timestamp */
     expressionTriggerTimestamp?: number | undefined;
-    stickerTriggerId?: string | undefined;
-    stickerTriggerTimestamp?: number | undefined;
     talking?: boolean | undefined;
+    /**
+     * default = ["urn:decentraland:off-chain:base-avatars:f_eyes_00",
+     *  "urn:decentraland:off-chain:base-avatars:f_eyebrows_00",
+     *  "urn:decentraland:off-chain:base-avatars:f_mouth_00"
+     *  "urn:decentraland:off-chain:base-avatars:standard_hair",
+     *  "urn:decentraland:off-chain:base-avatars:f_simple_yellow_tshirt",
+     *  "urn:decentraland:off-chain:base-avatars:f_brown_trousers",
+     *  "urn:decentraland:off-chain:base-avatars:bun_shoes"]
+     */
+    wearables: string[];
 }
 
 declare interface PBBillboard {
@@ -2002,6 +2039,50 @@ declare interface PBNFTShape {
     color?: Color3 | undefined;
 }
 
+declare interface PBOnPointerDown {
+    /** default=ActionButton.ANY */
+    button?: ActionButton | undefined;
+    /** default='Interact' */
+    hoverText?: string | undefined;
+    /** default=10 */
+    maxDistance?: number | undefined;
+    /** default=true */
+    showFeedback?: boolean | undefined;
+}
+
+declare interface PBOnPointerDownResult {
+    button: ActionButton;
+    meshName: string;
+    origin: Vector3_2 | undefined;
+    direction: Vector3_2 | undefined;
+    point: Vector3_2 | undefined;
+    normal: Vector3_2 | undefined;
+    distance: number;
+    timestamp: number;
+}
+
+declare interface PBOnPointerUp {
+    /** default=ActionButton.ANY */
+    button?: ActionButton | undefined;
+    /** default='Interact' */
+    hoverText?: string | undefined;
+    /** default=10 */
+    maxDistance?: number | undefined;
+    /** default=true */
+    showFeedback?: boolean | undefined;
+}
+
+declare interface PBOnPointerUpResult {
+    button: ActionButton;
+    meshName: string;
+    origin: Vector3_2 | undefined;
+    direction: Vector3_2 | undefined;
+    point: Vector3_2 | undefined;
+    normal: Vector3_2 | undefined;
+    distance: number;
+    timestamp: number;
+}
+
 declare interface PBPlaneShape {
     /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
     withCollisions?: boolean | undefined;
@@ -2012,8 +2093,24 @@ declare interface PBPlaneShape {
     uvs: number[];
 }
 
+declare interface PBPointerEvent {
+    /** default=ActionButton.ANY */
+    button?: ActionButton | undefined;
+    /** default='Interact' */
+    hoverText?: string | undefined;
+    /** default=10 */
+    maxDistance?: number | undefined;
+    /** default=true */
+    showFeedback?: boolean | undefined;
+}
+
+declare interface PBPointerEventEntry {
+    eventType: PointerEventType;
+    eventInfo: PBPointerEvent | undefined;
+}
+
 declare interface PBPointerEvents {
-    pointerEvents: PointerEventEntry[];
+    pointerEvents: PBPointerEventEntry[];
 }
 
 /** the renderer will set this component to the root entity once per frame with all the events */
@@ -2212,22 +2309,6 @@ declare namespace Plane {
 
 /** @public */
 declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
-
-declare interface PointerEvent_2 {
-    /** default=ActionButton.ANY */
-    button?: ActionButton | undefined;
-    /** default='Interact' */
-    hoverText?: string | undefined;
-    /** default=10 */
-    maxDistance?: number | undefined;
-    /** default=true */
-    showFeedback?: boolean | undefined;
-}
-
-declare interface PointerEventEntry {
-    eventType: PointerEventType;
-    eventInfo: PointerEvent_2 | undefined;
-}
 
 /** @public */
 declare const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
