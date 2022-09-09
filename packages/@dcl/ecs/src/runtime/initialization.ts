@@ -7,7 +7,7 @@
 
 import { ActionButton } from '../components/generated/pb/common/ActionButton.gen'
 import { PointerEventType } from '../components/generated/pb/PointerEvents.gen'
-import { Engine, IEntity } from '../engine'
+import { Engine, Entity } from '../engine'
 import {
   isPointerEventActiveGenerator,
   wasEntityClickedGenerator
@@ -53,7 +53,7 @@ export const log = dcl.log
 export const error = dcl.error
 
 let wasEntityClickedFunc:
-  | ((entity: IEntity, actionButton: ActionButton) => boolean)
+  | ((entity: Entity, actionButton: ActionButton) => boolean)
   | null = null
 
 /**
@@ -62,7 +62,7 @@ let wasEntityClickedFunc:
  * @param actionButton
  * @returns true if the entity was clicked in the last tick-update
  */
-export function wasEntityClicked(entity: IEntity, actionButton: ActionButton) {
+export function wasEntityClicked(entity: Entity, actionButton: ActionButton) {
   if (!wasEntityClickedFunc) {
     wasEntityClickedFunc = wasEntityClickedGenerator(engine)
   }
@@ -71,7 +71,7 @@ export function wasEntityClicked(entity: IEntity, actionButton: ActionButton) {
 
 let isPointerEventActiveFunc:
   | ((
-      entity: IEntity,
+      entity: Entity,
       actionButton: ActionButton,
       pointerEventType: PointerEventType
     ) => boolean)
@@ -85,7 +85,7 @@ let isPointerEventActiveFunc:
  * @returns
  */
 export function isPointerEventActive(
-  entity: IEntity,
+  entity: Entity,
   actionButton: ActionButton,
   pointerEventType: PointerEventType
 ) {

@@ -1,4 +1,4 @@
-import type { IEntity, IEngine } from '@dcl/ecs'
+import type { Entity, IEngine } from '@dcl/ecs'
 import Reconciler, { HostConfig } from 'react-reconciler'
 import { EntityComponents, JSX } from '../react-ecs'
 import {
@@ -60,11 +60,11 @@ export function createReconciler(
     'baseComponents' | 'getComponent' | 'addEntity' | 'removeEntity'
   >
 ) {
-  const entities = new Set<IEntity>()
+  const entities = new Set<Entity>()
 
   function updateTree(
     instance: Instance,
-    props: Partial<{ rightOf: IEntity; parent: IEntity }>
+    props: Partial<{ rightOf: Entity; parent: Entity }>
   ) {
     upsertComponent(instance, props, 'uiTransform')
   }

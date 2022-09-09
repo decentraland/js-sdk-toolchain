@@ -1,4 +1,4 @@
-import type { IEntity } from '@dcl/ecs'
+import type { Entity } from '@dcl/ecs'
 import type { EntityComponents } from '../react-ecs'
 
 export type OpaqueHandle = any
@@ -6,9 +6,9 @@ export type Type = 'entity'
 export type Props = EntityComponents
 export type Container = Document | Instance | any
 export type Instance = {
-  entity: IEntity
-  parent?: IEntity
-  rightOf?: IEntity
+  entity: Entity
+  parent?: Entity
+  rightOf?: Entity
   _child: Instance[]
 }
 export type TextInstance = never

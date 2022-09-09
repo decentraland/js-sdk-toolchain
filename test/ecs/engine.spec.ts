@@ -1,5 +1,5 @@
 import { cyclicParentingChecker } from '../../packages/@dcl/ecs/src/systems/cyclicParentingChecker'
-import { Engine, IEntity } from '../../packages/@dcl/ecs/src/engine'
+import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import { SYSTEMS_REGULAR_PRIORITY } from '../../packages/@dcl/ecs/src/engine/systems'
 import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
@@ -548,7 +548,7 @@ describe('Engine tests', () => {
   it('should log the error of cyclic parenting', () => {
     const originalDcl = (globalThis as any).dcl
     const errorFunc = jest.fn()
-    const errorString = (e: IEntity) =>
+    const errorString = (e: Entity) =>
       'There is a cyclic parent with entity ' + e
     ;(globalThis as any).dcl = { error: errorFunc }
 

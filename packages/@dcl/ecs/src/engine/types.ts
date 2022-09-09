@@ -3,7 +3,7 @@ import type { ISchema } from '../schemas/ISchema'
 import { Result, Spec } from '../schemas/Map'
 import { Transport } from '../systems/crdt/transports/types'
 import { ComponentDefinition as CompDef, ComponentType } from './component'
-import { IEntity } from './entity'
+import { Entity } from './entity'
 import { SystemFn } from './systems'
 import { ReadonlyComponentSchema } from './readonly'
 
@@ -30,18 +30,18 @@ export type IEngine = {
    * @param dynamic
    * @return the next entity unused
    */
-  addEntity(dynamic?: boolean): IEntity
+  addEntity(dynamic?: boolean): Entity
 
   /**
    * An alias of engine.addEntity(true)
    */
-  addDynamicEntity(): IEntity
+  addDynamicEntity(): Entity
 
   /**
    * Remove all components of an entity
    * @param entity
    */
-  removeEntity(entity: IEntity): void
+  removeEntity(entity: Entity): void
 
   /**
    * Add the system to the engine. It will be called every tick updated.
@@ -136,7 +136,7 @@ export type IEngine = {
    */
   getEntitiesWith<T extends [CompDef, ...CompDef[]]>(
     ...components: T
-  ): Iterable<[IEntity, ...ReadonlyComponentSchema<T>]>
+  ): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>
 
   /**
    * @internal
@@ -151,7 +151,7 @@ export type IEngine = {
    */
   removeComponentDefinition(componentId: number): void
 
-  RootEntity: IEntity
+  RootEntity: Entity
   baseComponents: SdkComponents
 }
 

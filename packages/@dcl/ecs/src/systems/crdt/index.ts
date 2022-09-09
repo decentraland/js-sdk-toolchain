@@ -1,7 +1,7 @@
 import { crdtProtocol, Message as CrdtMessage } from '@dcl/crdt'
 
 import type { PreEngine } from '../../engine'
-import { IEntity } from '../../engine/entity'
+import { Entity } from '../../engine/entity'
 import { createByteBuffer } from '../../serialization/ByteBuffer'
 import { ComponentOperation as Message } from '../../serialization/crdt/componentOperation'
 import WireMessage from '../../serialization/wireMessage'
@@ -127,7 +127,7 @@ export function crdtSceneSystem({
    * Iterates the dirty map and generates crdt messages to be send
    * @param dirtyMap a map of { entities: [componentId] }
    */
-  function createMessages(dirtyMap: Map<IEntity, Set<number>>) {
+  function createMessages(dirtyMap: Map<Entity, Set<number>>) {
     // CRDT Messages will be the merge between the recieved transport messages and the new crdt messages
     const crdtMessages = getMessages(transportMessages)
     const buffer = createByteBuffer()

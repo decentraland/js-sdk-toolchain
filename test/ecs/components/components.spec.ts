@@ -2,7 +2,7 @@ import {
   Quaternion,
   Vector3
 } from '../../../packages/@dcl/ecs/src/runtime/Math'
-import { Engine, IEntity } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, Entity } from '../../../packages/@dcl/ecs/src/engine'
 import { setupDclInterfaceForThisSuite, testingExperimentalAPI } from '../utils'
 
 describe('Legacy component tests', () => {
@@ -29,7 +29,7 @@ describe('Legacy component tests', () => {
         position: Vector3.create(x, y, z),
         scale: Vector3.One(),
         rotation: Quaternion.Identity(),
-        parent: 0 as IEntity
+        parent: 0 as Entity
       })
 
       return newCubeEntity

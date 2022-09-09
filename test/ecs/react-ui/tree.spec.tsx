@@ -1,10 +1,9 @@
-import { Engine, IEngine, IEntity } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, IEngine, Entity } from '../../../packages/@dcl/ecs/src/engine'
 import {
   Container,
   ReactEcs,
   renderUi
 } from '../../../packages/@dcl/react-ecs/src'
-// ;(globalThis as any).ReactEcs = ReactEcs
 
 const CANVAS_ROOT_ENTITY = 7
 declare const engine: IEngine
@@ -19,12 +18,12 @@ describe('RectEcs UI ✨', () => {
     const entityIndex = engine.addEntity()
 
     // Helpers
-    const divAChildEntity = (entityIndex + 1) as IEntity
-    const divAEntity = (entityIndex + 2) as IEntity
-    const divBEntity = (entityIndex + 3) as IEntity
-    const rootDivEntity = (entityIndex + 4) as IEntity
+    const divAChildEntity = (entityIndex + 1) as Entity
+    const divAEntity = (entityIndex + 2) as Entity
+    const divBEntity = (entityIndex + 3) as Entity
+    const rootDivEntity = (entityIndex + 4) as Entity
 
-    const getDiv = (entity: IEntity) => UiTransform.get(entity)
+    const getDiv = (entity: Entity) => UiTransform.get(entity)
 
     let width = 222
 
@@ -76,12 +75,12 @@ describe('RectEcs UI ✨', () => {
     const entityIndex = engine.addEntity()
 
     // Helpers
-    const rootDivEntity = (entityIndex + 3) as IEntity
-    const divAEntity = (entityIndex + 1) as IEntity
-    const divBEntity = (entityIndex + 2) as IEntity
-    const divAddedEntity = (entityIndex + 4) as IEntity
+    const rootDivEntity = (entityIndex + 3) as Entity
+    const divAEntity = (entityIndex + 1) as Entity
+    const divBEntity = (entityIndex + 2) as Entity
+    const divAddedEntity = (entityIndex + 4) as Entity
 
-    const getDiv = (entity: IEntity) => UiTransform.get(entity)
+    const getDiv = (entity: Entity) => UiTransform.get(entity)
     let addChild = false
     const ui = () => {
       return (
@@ -168,12 +167,12 @@ describe('RectEcs UI ✨', () => {
     const entityIndex = engine.addEntity()
 
     // Helpers
-    const rootDivEntity = (entityIndex + 3) as IEntity
-    const divAEntity = (entityIndex + 1) as IEntity
-    const divBEntity = (entityIndex + 2) as IEntity
-    const divAddedEntity = (entityIndex + 4) as IEntity
+    const rootDivEntity = (entityIndex + 3) as Entity
+    const divAEntity = (entityIndex + 1) as Entity
+    const divBEntity = (entityIndex + 2) as Entity
+    const divAddedEntity = (entityIndex + 4) as Entity
 
-    const getDiv = (entity: IEntity) => UiTransform.get(entity)
+    const getDiv = (entity: Entity) => UiTransform.get(entity)
     let addChild = false
     const ui = () => (
       <Container width={111}>
@@ -255,12 +254,12 @@ describe('RectEcs UI ✨', () => {
     const entityIndex = engine.addEntity()
 
     // Helpers
-    const rootDivEntity = (entityIndex + 3) as IEntity
-    const divAEntity = (entityIndex + 1) as IEntity
-    const divBEntity = (entityIndex + 2) as IEntity
-    const divAddedEntity = (entityIndex + 4) as IEntity
+    const rootDivEntity = (entityIndex + 3) as Entity
+    const divAEntity = (entityIndex + 1) as Entity
+    const divBEntity = (entityIndex + 2) as Entity
+    const divAddedEntity = (entityIndex + 4) as Entity
 
-    const getDiv = (entity: IEntity) => UiTransform.get(entity)
+    const getDiv = (entity: Entity) => UiTransform.get(entity)
 
     let addChild = false
     const ui = () => (
@@ -342,15 +341,15 @@ describe('RectEcs UI ✨', () => {
     const entityIndex = engine.addEntity()
 
     // Helpers
-    const rootDivEntity = (entityIndex + 3) as IEntity
-    const divAEntity = (entityIndex + 1) as IEntity
-    const divBEntity = (entityIndex + 2) as IEntity
-    const divAddedAChildEntity = (entityIndex + 4) as IEntity
-    const divAddedAEntity = (entityIndex + 5) as IEntity
-    const divAddedBEntity = (entityIndex + 6) as IEntity
-    const divAddedRootEntity = (entityIndex + 7) as IEntity
+    const rootDivEntity = (entityIndex + 3) as Entity
+    const divAEntity = (entityIndex + 1) as Entity
+    const divBEntity = (entityIndex + 2) as Entity
+    const divAddedAChildEntity = (entityIndex + 4) as Entity
+    const divAddedAEntity = (entityIndex + 5) as Entity
+    const divAddedBEntity = (entityIndex + 6) as Entity
+    const divAddedRootEntity = (entityIndex + 7) as Entity
 
-    const getDiv = (entity: IEntity) => UiTransform.get(entity)
+    const getDiv = (entity: Entity) => UiTransform.get(entity)
     let width = 333.2
     let addChild = false
     const ui = () => (
@@ -443,12 +442,12 @@ describe('RectEcs UI ✨', () => {
       { id: 3, value: 3 }
     ]
 
-    const rootDivEntity = (entityIndex + divArray.length + 1) as IEntity
-    const div1Entity = (entityIndex + 1) as IEntity
-    const div2Entity = (entityIndex + 2) as IEntity
-    const div3Entity = (entityIndex + 3) as IEntity
+    const rootDivEntity = (entityIndex + divArray.length + 1) as Entity
+    const div1Entity = (entityIndex + 1) as Entity
+    const div2Entity = (entityIndex + 2) as Entity
+    const div3Entity = (entityIndex + 3) as Entity
 
-    const getDiv = (entity: number) => UiTransform.get(entity as IEntity)
+    const getDiv = (entity: number) => UiTransform.get(entity as Entity)
     const ui = () => (
       <Container width={111}>
         {divArray.map((div) => (
@@ -484,7 +483,7 @@ describe('RectEcs UI ✨', () => {
     divArray.push({ id: 4, value: 4 })
     engine.update(1)
 
-    const div4Entity = (rootDivEntity + 1) as IEntity
+    const div4Entity = (rootDivEntity + 1) as Entity
     // Divs doesnt change
     expect(getDiv(div1Entity)).toMatchObject({
       parent: rootDivEntity,
@@ -529,7 +528,7 @@ describe('RectEcs UI ✨', () => {
     // Add an element at the beginning of the array
     divArray.unshift({ id: 8, value: 8 })
     engine.update(1)
-    const newDivEntity = (div4Entity + 1) as IEntity
+    const newDivEntity = (div4Entity + 1) as Entity
     // Divs doesnt change
 
     expect(getDiv(div1Entity)).toMatchObject({

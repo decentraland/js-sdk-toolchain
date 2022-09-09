@@ -9,14 +9,14 @@ import {
   ComponentType,
   defineComponent as defComponent
 } from './component'
-import { IEntity, EntityContainer } from './entity'
+import { Entity, EntityContainer } from './entity'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, SystemFn } from './systems'
 import type { IEngineParams, IEngine } from './types'
 import { ReadonlyComponentSchema } from './readonly'
 
 export * from './readonly'
 export * from './types'
-export { ComponentType, IEntity, ByteBuffer, ComponentDefinition }
+export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
 
 function preEngine() {
   const entityContainer = EntityContainer()
@@ -51,7 +51,7 @@ function preEngine() {
     return addEntity(true)
   }
 
-  function removeEntity(entity: IEntity) {
+  function removeEntity(entity: Entity) {
     for (const [, component] of componentsDefinition) {
       if (component.has(entity)) {
         component.deleteFrom(entity)
@@ -110,10 +110,10 @@ function preEngine() {
 
   function* getEntitiesWith<
     T extends [ComponentDefinition, ...ComponentDefinition[]]
-  >(...components: T): Iterable<[IEntity, ...ReadonlyComponentSchema<T>]> {
+  >(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]> {
     for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
       yield [entity, ...groupComp.map((c) => c.get(entity))] as [
-        IEntity,
+        Entity,
         ...ReadonlyComponentSchema<T>
       ]
     }
@@ -121,7 +121,7 @@ function preEngine() {
 
   function* getComponentDefGroup<T extends ComponentDefinition[]>(
     ...args: T
-  ): Iterable<[IEntity, ...T]> {
+  ): Iterable<[Entity, ...T]> {
     const [firstComponentDef, ...componentDefinitions] = args
     for (const [entity] of firstComponentDef.iterator()) {
       let matches = true
@@ -199,7 +199,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     // TODO: Perf tip
     // Should we add some dirtyIteratorSet at engine level so we dont have
     // to iterate all the component definitions to get the dirty ones ?
-    const dirtySet = new Map<IEntity, Set<number>>()
+    const dirtySet = new Map<Entity, Set<number>>()
     for (const [componentId, definition] of engine.componentsDefinition) {
       if (excludeComponentIds.includes(componentId)) continue
 
@@ -229,7 +229,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     getComponent: engine.getComponent,
     removeComponentDefinition: engine.removeComponentDefinition,
     update,
-    RootEntity: 0 as IEntity,
+    RootEntity: 0 as Entity,
     baseComponents
   }
 }

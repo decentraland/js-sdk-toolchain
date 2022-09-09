@@ -1,4 +1,4 @@
-import { IEntity } from './entity'
+import { Entity } from './entity'
 import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/PointerEventsResult.gen'
 import { PointerEventType } from '../components/generated/pb/PointerEvents.gen'
 import { ActionButton } from '../components/generated/pb/common/ActionButton.gen'
@@ -31,7 +31,7 @@ export function wasEntityClickedGenerator(engine: IEngine) {
     }
   }, EventSystemPriority)
 
-  return function (entity: IEntity, actionButton: ActionButton) {
+  return function (entity: Entity, actionButton: ActionButton) {
     const component = engine.baseComponents.PointerEventsResult.getOrNull(
       engine.RootEntity
     )
@@ -92,7 +92,7 @@ export function isPointerEventActiveGenerator(engine: IEngine) {
   }, EventSystemPriority)
 
   return function (
-    entity: IEntity,
+    entity: Entity,
     actionButton: ActionButton,
     pointerEventType: PointerEventType
   ) {
@@ -131,7 +131,7 @@ function findLastAction(
   commands: readonly PBPointerEventsResult_PointerCommand[],
   pointerEventType: PointerEventType,
   actionButton: ActionButton,
-  entity?: IEntity
+  entity?: Entity
 ): PBPointerEventsResult_PointerCommand | undefined {
   let commandToReturn: PBPointerEventsResult_PointerCommand | undefined =
     undefined

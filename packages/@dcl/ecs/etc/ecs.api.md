@@ -60,15 +60,15 @@ export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCa
 export type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorType = ComponentType<T>> = {
     _id: number;
     default(): DeepReadonly<ComponentType<T>>;
-    has(entity: IEntity): boolean;
-    get(entity: IEntity): DeepReadonly<ComponentType<T>>;
-    getOrNull(entity: IEntity): DeepReadonly<ComponentType<T>> | null;
-    create(entity: IEntity, val?: ConstructorType): ComponentType<T>;
-    createOrReplace(entity: IEntity, val?: ComponentType<T>): ComponentType<T>;
-    deleteFrom(entity: IEntity): ComponentType<T> | null;
-    getMutable(entity: IEntity): ComponentType<T>;
-    getMutableOrNull(entity: IEntity): ComponentType<T> | null;
-    writeToByteBuffer(entity: IEntity, buffer: ByteBuffer): void;
+    has(entity: Entity): boolean;
+    get(entity: Entity): DeepReadonly<ComponentType<T>>;
+    getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
+    create(entity: Entity, val?: ConstructorType): ComponentType<T>;
+    createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
+    deleteFrom(entity: Entity): ComponentType<T> | null;
+    getMutable(entity: Entity): ComponentType<T>;
+    getMutableOrNull(entity: Entity): ComponentType<T> | null;
+    writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void;
 };
 
 // @public (undocumented)
@@ -225,6 +225,11 @@ export function Engine({ transports }?: IEngineParams): IEngine;
 // @public (undocumented)
 export const engine: IEngine;
 
+// @public (undocumented)
+export type Entity = number & {
+    [entitySymbol]: true;
+};
+
 // @public
 export const Epsilon = 0.000001;
 
@@ -244,27 +249,22 @@ export const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
 
 // @public (undocumented)
 export type IEngine = {
-    addEntity(dynamic?: boolean): IEntity;
-    addDynamicEntity(): IEntity;
-    removeEntity(entity: IEntity): void;
+    addEntity(dynamic?: boolean): Entity;
+    addDynamicEntity(): Entity;
+    removeEntity(entity: Entity): void;
     addSystem(system: SystemFn, priority?: number, name?: string): void;
     removeSystem(selector: string | SystemFn): boolean;
     defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>;
     defineComponentFromSchema<T extends ISchema<Record<string, any>>, ConstructorType = ComponentType<T>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
-    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[IEntity, ...ReadonlyComponentSchema<T>]>;
-    RootEntity: IEntity;
+    getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
+    RootEntity: Entity;
     baseComponents: SdkComponents;
 };
 
 // @public (undocumented)
 export type IEngineParams = {
     transports?: Transport[];
-};
-
-// @public (undocumented)
-export type IEntity = number & {
-    [entitySymbol]: true;
 };
 
 // @public (undocumented)
@@ -288,12 +288,12 @@ export interface ISize {
 // Warning: (ae-missing-release-tag) "isPointerEventActive" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public
-export function isPointerEventActive(entity: IEntity, actionButton: ActionButton, pointerEventType: PointerEventType): boolean;
+export function isPointerEventActive(entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType): boolean;
 
 // Warning: (ae-missing-release-tag) "isPointerEventActiveGenerator" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export function isPointerEventActiveGenerator(engine: IEngine): (entity: IEntity, actionButton: ActionButton, pointerEventType: PointerEventType) => boolean;
+export function isPointerEventActiveGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType) => boolean;
 
 // Warning: (ae-missing-release-tag) "log" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -699,12 +699,12 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 // Warning: (ae-missing-release-tag) "wasEntityClicked" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public
-export function wasEntityClicked(entity: IEntity, actionButton: ActionButton): boolean;
+export function wasEntityClicked(entity: Entity, actionButton: ActionButton): boolean;
 
 // Warning: (ae-missing-release-tag) "wasEntityClickedGenerator" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export function wasEntityClickedGenerator(engine: IEngine): (entity: IEntity, actionButton: ActionButton) => boolean;
+export function wasEntityClickedGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton) => boolean;
 
 // Warnings were encountered during analysis:
 //

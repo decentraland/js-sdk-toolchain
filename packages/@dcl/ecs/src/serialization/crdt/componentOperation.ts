@@ -1,5 +1,5 @@
 import { ComponentDefinition } from '../../engine/component'
-import { IEntity } from '../../engine/entity'
+import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../ByteBuffer'
 import WireMessage from '../wireMessage'
 
@@ -11,13 +11,13 @@ export namespace ComponentOperation {
    * @param data - Uint8[] data of component
    */
   export type IPutComponent = {
-    entity: IEntity
+    entity: Entity
     componentId: number
     timestamp: number
     data: Uint8Array
   }
   export type IDeleteComponent = {
-    entity: IEntity
+    entity: Entity
     componentId: number
     timestamp: number
     data?: undefined
@@ -30,7 +30,7 @@ export namespace ComponentOperation {
    */
   export function write(
     type: WireMessage.Enum,
-    entity: IEntity,
+    entity: Entity,
     timestamp: number,
     componentDefinition: ComponentDefinition,
     buf: ByteBuffer
@@ -71,7 +71,7 @@ export namespace ComponentOperation {
 
     const common = {
       ...header,
-      entity: buf.readUint32() as IEntity,
+      entity: buf.readUint32() as Entity,
       componentId: buf.readInt32(),
       timestamp: Number(buf.readUint64())
     }

@@ -1,6 +1,6 @@
 import { Quaternion, Vector3 } from '../../packages/@dcl/ecs/src/runtime/Math'
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
-import { IEntity } from '../../packages/@dcl/ecs/src/engine/entity'
+import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import * as transport from '../../packages/@dcl/ecs/src/systems/crdt/transports/networkTransport'
 
@@ -140,7 +140,7 @@ export namespace SandBox {
     position: Vector3.create(0, 1, 2),
     scale: Vector3.One(),
     rotation: Quaternion.Identity(),
-    parent: 0 as IEntity
+    parent: 0 as Entity
   }
 
   /**

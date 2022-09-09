@@ -1,4 +1,4 @@
-import { Engine, IEngine, IEntity } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, IEngine, Entity } from '../../../packages/@dcl/ecs/src/engine'
 import {
   UiEntity,
   ReactEcs,
@@ -17,8 +17,8 @@ describe('Render UI System', () => {
     const ui = () => <UiEntity uiTransform={{ width: 1 }} />
     const { UiTransform } = engine.baseComponents
     const entityIndex = engine.addEntity()
-    const getDiv = (entity: IEntity) => UiTransform.getOrNull(entity)
-    const divEntity = (entityIndex + 1) as IEntity
+    const getDiv = (entity: Entity) => UiTransform.getOrNull(entity)
+    const divEntity = (entityIndex + 1) as Entity
 
     const uiIndex = renderUi(ui)
     engine.update(1)

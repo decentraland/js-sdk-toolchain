@@ -1,4 +1,4 @@
-import { IEntity } from '../../../packages/@dcl/ecs/src/engine/entity'
+import { Entity } from '../../../packages/@dcl/ecs/src/engine/entity'
 import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/PointerEvents.gen'
 import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/common/ActionButton.gen'
 import { isPointerEventActiveGenerator } from '../../../packages/@dcl/ecs/src/engine/events'
@@ -59,7 +59,7 @@ describe('Events helpers isPointerEventActive', () => {
 })
 
 function createTestPointerDownCommand(
-  entity: IEntity,
+  entity: Entity,
   timestamp: number,
   state: PointerEventType
 ) {

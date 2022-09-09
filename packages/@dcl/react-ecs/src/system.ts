@@ -1,4 +1,4 @@
-import type { IEngine, IEntity } from '@dcl/ecs'
+import type { IEngine, Entity } from '@dcl/ecs'
 
 import type { JSX } from './react-ecs'
 import { createReconciler } from './reconciler'
@@ -6,7 +6,7 @@ import { createReconciler } from './reconciler'
 declare const engine: IEngine
 
 export type UiComponent = () => JSX.Element
-const uiContainer: { getEntities: () => IEntity[]; update: () => void }[] = []
+const uiContainer: { getEntities: () => Entity[]; update: () => void }[] = []
 
 export function renderUi(ui: UiComponent) {
   const renderer = createReconciler(engine)
