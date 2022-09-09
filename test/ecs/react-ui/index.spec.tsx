@@ -1,6 +1,6 @@
 import { Engine, IEngine, IEntity } from '../../../packages/@dcl/ecs/src/engine'
 import {
-  Entity,
+  UiEntity,
   ReactEcs,
   renderUi,
   removeUi
@@ -14,7 +14,7 @@ describe('Render UI System', () => {
   })
 
   it('should remove the ui and the entities', () => {
-    const ui = () => <Entity uiTransform={{ width: 1 }} />
+    const ui = () => <UiEntity uiTransform={{ width: 1 }} />
     const { UiTransform } = engine.baseComponents
     const entityIndex = engine.addEntity()
     const getDiv = (entity: IEntity) => UiTransform.getOrNull(entity)
