@@ -8,13 +8,14 @@ export * from './uiTransform/types'
 /**
  * @public
  */
-export function UiEntity(props: EntityPropTypes & CommonProps) {
+export function UiEntity(props: EntityPropTypes & Partial<CommonProps>) {
   const { uiTransform, ...otherProps } = props
   const uiTransformProps = parseUiTransform(uiTransform)
   return <entity uiTransform={uiTransformProps} {...otherProps} />
 }
 
-export type ContainerPropTypes = CommonProps & EntityPropTypes['uiTransform']
+export type ContainerPropTypes = Partial<CommonProps> &
+  EntityPropTypes['uiTransform']
 export function Container({ width, height, children }: ContainerPropTypes) {
   return (
     <UiEntity uiTransform={{ width, height, display: YGDisplay.YGDisplayFlex }}>

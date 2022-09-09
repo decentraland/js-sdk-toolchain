@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import React from 'react'
-import { PBUiTransform } from './components/types'
+import { CommonProps, PBUiTransform } from './components/types'
 
 export type EcsElements = {
-  entity: Partial<EntityComponents>
+  entity: Partial<EntityComponents & CommonProps>
 }
 
 export type EntityComponents = {

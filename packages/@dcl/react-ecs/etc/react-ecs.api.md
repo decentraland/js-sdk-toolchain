@@ -18,8 +18,8 @@ export type Children = any;
 //
 // @public (undocumented)
 export type CommonProps = {
-    key?: Key;
-    children?: Children;
+    key: Key;
+    children: Children;
 };
 
 // Warning: (ae-missing-release-tag) "Container" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -30,7 +30,7 @@ export function Container({ width, height, children }: ContainerPropTypes): Reac
 // Warning: (ae-missing-release-tag) "ContainerPropTypes" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type ContainerPropTypes = CommonProps & EntityPropTypes['uiTransform'];
+export type ContainerPropTypes = Partial<CommonProps> & EntityPropTypes['uiTransform'];
 
 // @public (undocumented)
 export type EntityPropTypes = {
@@ -209,7 +209,7 @@ export function renderUi(ui: UiComponent): number;
 export type UiComponent = () => JSX.Element;
 
 // @public (undocumented)
-export function UiEntity(props: EntityPropTypes & CommonProps): ReactEcs.JSX.Element;
+export function UiEntity(props: EntityPropTypes & Partial<CommonProps>): ReactEcs.JSX.Element;
 
 // @public (undocumented)
 export interface UiTransformProps {

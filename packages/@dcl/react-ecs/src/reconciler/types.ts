@@ -1,9 +1,10 @@
 import type { Entity } from '@dcl/ecs'
+import { CommonProps } from '../components'
 import type { EntityComponents } from '../react-ecs'
 
 export type OpaqueHandle = any
 export type Type = 'entity'
-export type Props = EntityComponents
+export type Props = EntityComponents & CommonProps
 export type Container = Document | Instance | any
 export type Instance = {
   entity: Entity
