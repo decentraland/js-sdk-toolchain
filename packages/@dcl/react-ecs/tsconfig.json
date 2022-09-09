@@ -5,7 +5,6 @@
     "moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "declaration": true,
@@ -15,7 +14,10 @@
     "outDir": "dist",
     "jsx": "react",
     "jsxFactory": "ReactEcs.createElement",
-    "rootDir": "src"
+    "rootDir": "src",
+    "types": [
+      "@dcl/ecs"
+    ]
   },
   "include": [
     "src"

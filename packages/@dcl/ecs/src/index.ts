@@ -16,13 +16,3 @@ export * from './runtime/types'
 export * from './engine/events'
 export * from './runtime/observables'
 export * from './runtime/temp-fp/Observable'
-
-export type EcsElements = {
-  entity: unknown
-}
-
-export namespace JSX {
-  export type Element = any
-  export interface IntrinsicElements extends EcsElements {}
-  export interface Component {}
-}

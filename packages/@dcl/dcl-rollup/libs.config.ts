@@ -5,6 +5,7 @@ import path from 'path'
 import { RollupOptions } from 'rollup'
 
 import { basicRollupConfig } from './ecs.config'
+import replace from '@rollup/plugin-replace'
 
 const PROD = !!process.env.CI || process.env.NODE_ENV === 'production'
 
@@ -35,9 +36,13 @@ const config: RollupOptions = {
       tsconfig: tsconfigPath,
       compilerOptions: {
         declaration: true,
-        declarationDir: '.',
-        skipLibCheck: true
+        declarationDir: '.'
       }
+    }),
+    replace({
+      'process.env.NODE_ENV': JSON.stringify(
+        PROD ? 'production' : 'development'
+      )
     }),
     ...basicRollupConfig.plugins!
   ],

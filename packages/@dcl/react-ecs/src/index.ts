@@ -3,5 +3,6 @@ import { ReactEcs } from './react-ecs'
 
 export { ReactEcs }
 export * from './components'
+export * from './system'
 
 export default ReactEcs

@@ -1,19 +1,24 @@
+import type { IEntity, IEngine } from '@dcl/ecs'
 import Reconciler, { HostConfig } from 'react-reconciler'
-import { EntityComponents, JSX } from './react-ecs'
-
-// TODO: Fix this types
-type IEntity = number
-type IEngine = any
-
-const isNotUndefined = <T>(val: T | undefined): val is T => {
-  return !!val
-}
-
-type Changes<K extends keyof EntityComponents = keyof EntityComponents> = {
-  type: 'delete' | 'add' | 'put'
-  props?: Partial<EntityComponents[K]>
-  component: K
-}
+import { EntityComponents, JSX } from '../react-ecs'
+import {
+  Changes,
+  Type,
+  Props,
+  Container,
+  Instance,
+  TextInstance,
+  SuspenseInstance,
+  HydratableInstance,
+  PublicInstance,
+  HostContext,
+  UpdatePayload,
+  _ChildSet,
+  TimeoutHandle,
+  NoTimeout,
+  OpaqueHandle
+} from './types'
+import { isNotUndefined, noopConfig } from './utils'
 
 function propsChanged<K extends keyof EntityComponents>(
   component: K,
@@ -146,11 +151,6 @@ export function createReconciler(
     NoTimeout
   > = {
     ...noopConfig,
-    supportsMutation: true,
-    supportsPersistence: false,
-    noTimeout: -1,
-    isPrimaryRenderer: true,
-    supportsHydration: false,
 
     createInstance(type: Type, props: Props): Instance {
       console.log('create instance', type)
@@ -171,10 +171,6 @@ export function createReconciler(
     appendInitialChild: appendChild,
 
     removeChild: removeChild,
-    removeChildFromContainer: () => {
-      // TODO: wtf
-      // removeChild(args)
-    },
 
     prepareUpdate(
       _instance: Instance,
@@ -229,18 +225,6 @@ export function createReconciler(
 
       updateTree(child, { rightOf: child.rightOf, parent: child.parent })
       updateTree(beforeChild, { rightOf: beforeChild.rightOf })
-    },
-    insertInContainerBefore(
-      _container: Container,
-      _child: Instance | TextInstance,
-      _beforeChild: Instance | TextInstance | SuspenseInstance
-    ): void {
-      // console.log('insertIncontainerBefore TODO')
-    },
-
-    detachDeletedInstance: function (_node: Instance): void {
-      // console.log('detahDeletedInstance')
-      // console.log({ node })
     }
   }
 
@@ -263,100 +247,3 @@ export function createReconciler(
     getEntities: () => Array.from(entities)
   }
 }
-
-export const noopConfig = {
-  hideInstance(_instance: Instance): void {},
-  hideTextInstance(_textInstance: TextInstance): void {},
-  unhideInstance(_instance: Instance, _props: Props): void {},
-  unhideTextInstance(_textInstance: TextInstance, _text: string): void {},
-  clearContainer(_container: Container): void {},
-  getCurrentEventPriority: function (): number {
-    return 0
-  },
-  getInstanceFromNode: function (_node: Instance): null | undefined {
-    return null
-  },
-  beforeActiveInstanceBlur: function (): void {},
-  afterActiveInstanceBlur: function (): void {},
-  prepareScopeUpdate: function (
-    _scopeInstance: any,
-    _instance: Instance
-  ): void {},
-  getInstanceFromScope: function (_scopeInstance: Instance): Instance | null {
-    return null
-  },
-  commitMount(
-    _instance: Instance,
-    _type: Type,
-    _props: Props,
-    _internalInstanceHandle: OpaqueHandle
-  ): void {},
-  resetTextContent(_instance: Instance): void {},
-  commitTextUpdate(
-    _textInstance: TextInstance,
-    _oldText: string,
-    _newText: string
-  ): void {},
-  prepareForCommit(_containerInfo: Container): Record<string, any> | null {
-    return null
-  },
-  resetAfterCommit(_containerInfo: Container): void {},
-  preparePortalMount(_containerInfo: Container): void {},
-  createTextInstance(
-    _text: string,
-    _rootContainer: Container,
-    _hostContext: HostContext,
-    _internalHandle: OpaqueHandle
-  ): TextInstance {
-    return {} as TextInstance
-  },
-  scheduleTimeout(_fn: any, _delay?: number): TimeoutHandle {},
-  cancelTimeout(_id: TimeoutHandle): void {},
-  shouldSetTextContent(_type: Type, _props: Props): boolean {
-    return false
-  },
-  getRootHostContext(_rootContainer: Container): HostContext | null {
-    return null
-  },
-  getChildHostContext(
-    _parentHostContext: HostContext,
-    _type: Type,
-    _rootContainer: Container
-  ): HostContext {
-    return null
-  },
-  getPublicInstance(instance: Instance | TextInstance): PublicInstance {
-    return instance
-  },
-  finalizeInitialChildren(
-    _instance: Instance,
-    _type: Type,
-    _props: Props,
-    _rootContainer: Container,
-    _hostContext: HostContext
-  ): boolean {
-    return false
-  }
-}
-
-type OpaqueHandle = any
-type Type = 'divui' | 'textui' | 'imageui' | 'entity'
-type Props = EntityComponents
-type Container = Document | Instance | any
-type Instance = {
-  entity: IEntity
-  parent?: IEntity
-  rightOf?: IEntity
-  _child: Instance[]
-}
-type TextInstance = unknown
-type SuspenseInstance = any
-type HydratableInstance = any
-type PublicInstance = any
-type HostContext = any
-type UpdatePayload = Changes[]
-type _ChildSet = any
-type TimeoutHandle = any
-type NoTimeout = number
-
-export default createReconciler

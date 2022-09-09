@@ -10,26 +10,13 @@ import {
   defineComponent as defComponent
 } from './component'
 import { IEntity, EntityContainer } from './entity'
-import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
+import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, SystemFn } from './systems'
 import type { IEngineParams, IEngine } from './types'
 import { ReadonlyComponentSchema } from './readonly'
-import { JSX } from '..'
 
 export * from './readonly'
 export * from './types'
 export { ComponentType, IEntity, ByteBuffer, ComponentDefinition }
-
-declare const ReactEcs: {
-  createRenderer(
-    engine: Pick<
-      IEngine,
-      'baseComponents' | 'getComponent' | 'addEntity' | 'removeEntity'
-    >
-  ): {
-    update(renderTree: () => JSX.Element): void
-    getEntities(): IEntity[]
-  }
-}
 
 function preEngine() {
   const entityContainer = EntityContainer()
@@ -43,14 +30,14 @@ function preEngine() {
   const systems = SystemContainer()
 
   function addSystem(
-    fn: Update,
+    fn: SystemFn,
     priority: number = SYSTEMS_REGULAR_PRIORITY,
     name?: string
   ) {
     systems.add(fn, priority, name)
   }
 
-  function removeSystem(selector: string | Update) {
+  function removeSystem(selector: string | SystemFn) {
     return systems.remove(selector)
   }
 
@@ -189,45 +176,11 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
   const crdtSystem = crdtSceneSystem({ engine, transports: transports || [] })
   const baseComponents = defineSdkComponents(engine)
 
-  const uiContainer: { getEntities: () => IEntity[]; update: () => void }[] = []
-
-  function renderUI(renderTree: () => JSX.Element): number {
-    if (typeof ReactEcs === 'undefined') {
-      throw new Error('ReactEcs library not found')
-    }
-    const renderer = ReactEcs.createRenderer({
-      baseComponents,
-      addEntity: engine.addEntity,
-      removeEntity: engine.removeEntity,
-      getComponent: engine.getComponent
-    })
-    function update() {
-      renderer.update(renderTree())
-    }
-    return uiContainer.push({ update, getEntities: renderer.getEntities }) - 1
-  }
-
-  function removeUI(index: number) {
-    const ui = uiContainer[index]
-    if (!ui) return
-
-    for (const entity of ui.getEntities()) {
-      engine.removeEntity(entity)
-    }
-
-    uiContainer.splice(index, 1)
-  }
-
   function update(dt: number) {
     crdtSystem.receiveMessages()
 
     for (const system of engine.getSystems()) {
       system.fn(dt)
-    }
-
-    // TODO: this should be updated on every frame ?
-    for (const ui of uiContainer) {
-      ui.update()
     }
 
     // Selected components that only exist one frame
@@ -276,8 +229,6 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     getComponent: engine.getComponent,
     removeComponentDefinition: engine.removeComponentDefinition,
     update,
-    renderUI,
-    removeUI,
     RootEntity: 0 as IEntity,
     baseComponents
   }

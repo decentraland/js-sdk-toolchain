@@ -1,12 +1,20 @@
-import { Engine, IEntity } from '../../../packages/@dcl/ecs/src/engine'
-import { Container, ReactEcs } from '../../../packages/@dcl/react-ecs/src'
-;(globalThis as any).ReactEcs = ReactEcs
+import { Engine, IEngine, IEntity } from '../../../packages/@dcl/ecs/src/engine'
+import {
+  Container,
+  ReactEcs,
+  renderUi
+} from '../../../packages/@dcl/react-ecs/src'
+// ;(globalThis as any).ReactEcs = ReactEcs
 
 const CANVAS_ROOT_ENTITY = 7
+declare const engine: IEngine
 
 describe('RectEcs UI ✨', () => {
+  beforeEach(() => {
+    ;(globalThis as any).engine = Engine()
+  })
+
   it('should generate a UI and update the width of a div', async () => {
-    const engine = Engine()
     const { UiTransform } = engine.baseComponents
     const entityIndex = engine.addEntity()
 
@@ -31,7 +39,7 @@ describe('RectEcs UI ✨', () => {
         {/* DivB */}
       </Container>
     )
-    engine.renderUI(ui)
+    renderUi(ui)
     engine.update(1)
     expect(getDiv(rootDivEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
@@ -64,7 +72,6 @@ describe('RectEcs UI ✨', () => {
     expect(getDiv(divAEntity).width).toBe(400)
   })
   it('should add a child at the beggining and then remove it', async () => {
-    const engine = Engine()
     const { UiTransform } = engine.baseComponents
     const entityIndex = engine.addEntity()
 
@@ -89,7 +96,7 @@ describe('RectEcs UI ✨', () => {
       )
     }
 
-    engine.renderUI(ui)
+    renderUi(ui)
     engine.update(1)
 
     expect(getDiv(rootDivEntity)).toMatchObject({
@@ -157,7 +164,6 @@ describe('RectEcs UI ✨', () => {
     expect(UiTransform.getOrNull(divAddedEntity)).toBe(null)
   })
   it('should add a child at the middle and then remove it', async () => {
-    const engine = Engine()
     const { UiTransform } = engine.baseComponents
     const entityIndex = engine.addEntity()
 
@@ -180,7 +186,7 @@ describe('RectEcs UI ✨', () => {
         {/* DivB */}
       </Container>
     )
-    engine.renderUI(ui)
+    renderUi(ui)
     engine.update(1)
 
     expect(getDiv(divAEntity)).toMatchObject({
@@ -245,7 +251,6 @@ describe('RectEcs UI ✨', () => {
     expect(UiTransform.getOrNull(divAddedEntity)).toBe(null)
   })
   it('should add a child at the end and then remove it', async () => {
-    const engine = Engine()
     const { UiTransform } = engine.baseComponents
     const entityIndex = engine.addEntity()
 
@@ -269,7 +274,7 @@ describe('RectEcs UI ✨', () => {
         {/* DivAdded */}
       </Container>
     )
-    engine.renderUI(ui)
+    renderUi(ui)
     engine.update(1)
     expect(getDiv(rootDivEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
@@ -333,7 +338,6 @@ describe('RectEcs UI ✨', () => {
     expect(UiTransform.getOrNull(divAddedEntity)).toBe(null)
   })
   it('should add a child at the middle with multiple childs and then remove it', async () => {
-    const engine = Engine()
     const { UiTransform } = engine.baseComponents
     const entityIndex = engine.addEntity()
 
@@ -368,7 +372,7 @@ describe('RectEcs UI ✨', () => {
       </Container>
     )
 
-    engine.renderUI(ui)
+    renderUi(ui)
     engine.update(1)
 
     addChild = true
@@ -429,7 +433,6 @@ describe('RectEcs UI ✨', () => {
     expect(UiTransform.getOrNull(divAddedBEntity)).toBe(null)
   })
   it('should iterate the array on every tick and update values', async () => {
-    const engine = Engine()
     const { UiTransform } = engine.baseComponents
     const entityIndex = engine.addEntity()
 
@@ -453,7 +456,7 @@ describe('RectEcs UI ✨', () => {
         ))}
       </Container>
     )
-    engine.renderUI(ui)
+    renderUi(ui)
     engine.update(1)
 
     expect(getDiv(div1Entity)).toMatchObject({

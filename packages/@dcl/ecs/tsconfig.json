@@ -15,9 +15,7 @@
     "outDir": "dist",
     "types": [
       "@dcl/posix"
-    ],
-    "jsx": "react",
-    "jsxFactory": "ReactEcs.createElement"
+    ]
   },
   "include": [
     "src",

@@ -508,10 +508,6 @@ declare const DEG2RAD: number;
 /** @public */
 declare type double = number;
 
-declare type EcsElements = {
-    entity: unknown;
-};
-
 /**
  * @public
  */
@@ -596,13 +592,13 @@ declare type IEngine = {
      * engine.addSystem(mySystem, 10)
      * ```
      */
-    addSystem(system: Update, priority?: number, name?: string): void;
+    addSystem(system: SystemFn, priority?: number, name?: string): void;
     /**
      * Remove a system from the engine.
      * @param selector the function or the unique name to identify
      * @returns if it was found and removed
      */
-    removeSystem(selector: string | Update): boolean;
+    removeSystem(selector: string | SystemFn): boolean;
     /**
      * Define a component and add it to the engine.
      * @param spec An object with schema fields
@@ -657,8 +653,6 @@ declare type IEngine = {
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[IEntity, ...ReadonlyComponentSchema<T>]>;
     RootEntity: IEntity;
     baseComponents: SdkComponents;
-    renderUI(renderTree: () => JSX.Element): number;
-    removeUI(ui: number): void;
 };
 
 /**
@@ -729,14 +723,6 @@ declare interface ISize {
 declare function isPointerEventActive(entity: IEntity, actionButton: ActionButton, pointerEventType: PointerEventType): boolean;
 
 declare function isPointerEventActiveGenerator(engine: IEngine): (entity: IEntity, actionButton: ActionButton, pointerEventType: PointerEventType) => boolean;
-
-declare namespace JSX {
-    export type Element = any;
-    export interface IntrinsicElements extends EcsElements {
-    }
-    export interface Component {
-    }
-}
 
 declare const log: (...a: any[]) => void;
 
@@ -2416,13 +2402,13 @@ declare function preEngine(): {
     addEntity: (dynamic?: boolean) => IEntity;
     addDynamicEntity: () => IEntity;
     removeEntity: (entity: IEntity) => boolean;
-    addSystem: (fn: Update, priority?: number, name?: string | undefined) => void;
+    addSystem: (fn: SystemFn, priority?: number, name?: string | undefined) => void;
     getSystems: () => {
-        fn: Update;
+        fn: SystemFn;
         priority: number;
         name?: string | undefined;
     }[];
-    removeSystem: (selector: string | Update) => boolean;
+    removeSystem: (selector: string | SystemFn) => boolean;
     defineComponent: <T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType | undefined) => ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
     defineComponentFromSchema: <T_1 extends ISchema<any>, ConstructorType_1 = EcsResult<T_1>>(spec: T_1, componentId: number, constructorDefault?: ConstructorType_1 | undefined) => ComponentDefinition<T_1, ConstructorType_1>;
     getEntitiesWith: <T_2 extends [ComponentDefinition<ISchema<any>, any>, ...ComponentDefinition<ISchema<any>, any>[]]>(...components: T_2) => Iterable<[IEntity, ...ReadonlyComponentSchema<T_2>]>;
@@ -2691,6 +2677,11 @@ declare interface Spec {
 /** @public */
 declare const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
 
+/**
+ * @public
+ */
+declare type SystemFn = (dt: number) => void;
+
 /** @public */
 declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 
@@ -2772,11 +2763,6 @@ declare const UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTrans
  * @public
  */
 declare type Unpacked<T> = T extends (infer U)[] ? U : T;
-
-/**
- * @public
- */
-declare type Update = (dt: number) => void;
 
 /**
  * @public

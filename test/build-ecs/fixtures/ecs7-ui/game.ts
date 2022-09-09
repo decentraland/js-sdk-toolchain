@@ -1,3 +1,4 @@
+import { renderUi } from '@dcl/react-ecs'
 import { ui } from './ui'
 
-engine.renderUI(ui)
+renderUi(ui)

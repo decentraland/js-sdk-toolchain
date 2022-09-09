@@ -25,7 +25,7 @@ export type CommonProps = {
 // Warning: (ae-missing-release-tag) "Container" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export function Container({ width, height, children }: ContainerPropTypes): any;
+export function Container({ width, height, children }: ContainerPropTypes): ReactEcs.JSX.Element;
 
 // Warning: (ae-missing-release-tag) "ContainerPropTypes" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -35,43 +35,13 @@ export type ContainerPropTypes = CommonProps & {
     height?: number;
 };
 
-// Warning: (ae-missing-release-tag) "EcsElements" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
-export type EcsElements = {
-    entity: Partial<EntityComponents>;
-};
-
-// @public (undocumented)
-export function Entity(props: EntityPropTypes & CommonProps): any;
-
-// Warning: (ae-missing-release-tag) "EntityComponents" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type EntityComponents = {
-    uiTransform: PBUiTransform;
-};
+export function Entity(props: EntityPropTypes & CommonProps): ReactEcs.JSX.Element;
 
 // @public (undocumented)
 export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
 };
-
-// Warning: (ae-missing-release-tag) "JSX" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-namespace JSX_2 {
-    // (undocumented)
-    interface Component {
-    }
-    // (undocumented)
-    interface Element {
-    }
-    // (undocumented)
-    interface IntrinsicElements extends EcsElements {
-    }
-}
-export { JSX_2 as JSX }
 
 // Warning: (ae-missing-release-tag) "Key" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -209,15 +179,40 @@ export type Position = {
 //
 // @public (undocumented)
 namespace ReactEcs {
-    const // Warning: (ae-forgotten-export) The symbol "createReconciler" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
-    createRenderer: typeof createReconciler;
+    namespace JSX {
+        // (undocumented)
+        interface Component {
+        }
+        // (undocumented)
+        interface Element {
+        }
+        // Warning: (ae-forgotten-export) The symbol "EcsElements" needs to be exported by the entry point index.d.ts
+        //
+        // (undocumented)
+        type IntrinsicElements = EcsElements;
+    }
     const // (undocumented)
     createElement: any;
 }
 export { ReactEcs }
 export default ReactEcs;
+
+// Warning: (ae-missing-release-tag) "removeUi" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function removeUi(index: number): void;
+
+// Warning: (ae-missing-release-tag) "renderUi" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function renderUi(ui: UiComponent): number;
+
+// Warning: (ae-forgotten-export) The symbol "JSX" needs to be exported by the entry point index.d.ts
+// Warning: (ae-missing-release-tag) "UiComponent" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type UiComponent = () => JSX.Element;
 
 // @public (undocumented)
 export interface UiTransformProps {
