@@ -1457,6 +1457,20 @@ declare const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshC
 /** @public */
 declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
 
+/**
+ * @public
+ * @deprecated
+ */
+declare class MessageBus {
+    private messageQueue;
+    private connected;
+    private flushing;
+    constructor();
+    on(message: string, callback: (value: any, sender: string) => void): Observer<IEvents['comms']>;
+    emit(message: string, payload: Record<any, any>): void;
+    private flush;
+}
+
 /** @public */
 declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
 
@@ -1655,15 +1669,6 @@ declare class ObserverEventState {
     initalize(mask: number, skipNextObservers?: boolean, target?: any, currentTarget?: any): ObserverEventState;
 }
 
-/**
- * This event is triggered when you change your camera between 1st and 3rd person
- * @public
- * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
- */
-declare const onCameraModeChangedObservable: Observable<{
-    cameraMode: 0 | 1 | 2;
-}>;
-
 /** @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed. Use onEnterSceneObservable instead. */
@@ -1678,15 +1683,6 @@ declare const onEnterScene: Observable<{
  */
 declare const onEnterSceneObservable: Observable<{
     userId: string;
-}>;
-
-/**
- * This event is triggered when you change your camera between 1st and 3rd person
- * @public
- * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
- */
-declare const onIdleStateChangedObservable: Observable<{
-    isIdle: boolean;
 }>;
 
 /** @public
@@ -1755,14 +1751,6 @@ declare const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnP
 
 /** @public */
 declare const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-
-/**
- * @public
- * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
- */
-declare const onPointerLockedStateChange: Observable<{
-    locked?: boolean | undefined;
-}>;
 
 /** @public */
 declare const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
