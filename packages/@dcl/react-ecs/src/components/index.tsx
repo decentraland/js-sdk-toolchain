@@ -4,6 +4,7 @@ import { parseUiTransform } from './uiTransform'
 
 export * from './types'
 export * from './uiTransform/types'
+export * from './uiText/types'
 
 /**
  * @public
@@ -11,6 +12,7 @@ export * from './uiTransform/types'
 export function UiEntity(props: EntityPropTypes & Partial<CommonProps>) {
   const { uiTransform, ...otherProps } = props
   const uiTransformProps = parseUiTransform(uiTransform)
+
   return <entity uiTransform={uiTransformProps} {...otherProps} />
 }
 
