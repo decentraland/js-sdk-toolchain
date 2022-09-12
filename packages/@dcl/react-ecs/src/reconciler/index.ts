@@ -63,7 +63,8 @@ export function createReconciler(
   const entities = new Set<Entity>()
 
   const getComponentId: { [key in keyof EntityComponents]: number } = {
-    uiTransform: engine.baseComponents.UiTransform._id
+    uiTransform: engine.baseComponents.UiTransform._id,
+    uiText: engine.baseComponents.UiText._id
   }
 
   function updateTree(
@@ -84,17 +85,18 @@ export function createReconciler(
   function upsertComponent<K extends keyof EntityComponents>(
     instance: Instance,
     props: Partial<EntityComponents[K]>,
-    component: K
+    componentName: K
   ) {
-    const componentId = getComponentId[component]
+    const componentId = getComponentId[componentName]
     const Component = engine.getComponent(componentId)
-    const transform =
+
+    const component =
       Component.getMutableOrNull(instance.entity) ||
       Component.create(instance.entity)
 
     for (const key in props) {
       const keyProp = key as keyof EntityComponents[K]
-      transform[keyProp] = props[keyProp]
+      component[keyProp] = props[keyProp]
     }
   }
 

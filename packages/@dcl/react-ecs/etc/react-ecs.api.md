@@ -14,6 +14,18 @@ export const CANVAS_ROOT_ENTITY = 7;
 // @public (undocumented)
 export type Children = any;
 
+// Warning: (ae-missing-release-tag) "Color3" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface Color3 {
+    // (undocumented)
+    b: number;
+    // (undocumented)
+    g: number;
+    // (undocumented)
+    r: number;
+}
+
 // Warning: (ae-missing-release-tag) "CommonProps" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -35,12 +47,37 @@ export type ContainerPropTypes = Partial<CommonProps> & EntityPropTypes['uiTrans
 // @public (undocumented)
 export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
+    uiText?: UiTextProps;
 };
+
+// Warning: (ae-missing-release-tag) "Font" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export enum Font {
+    // (undocumented)
+    LiberationSans = 0,
+    // (undocumented)
+    SansSerif = 1,
+    // (undocumented)
+    UNRECOGNIZED = -1
+}
 
 // Warning: (ae-missing-release-tag) "Key" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export type Key = number | string;
+
+// Warning: (ae-missing-release-tag) "PBUiText" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBUiText {
+    color?: Color3 | undefined;
+    font?: Font | undefined;
+    fontSize?: number | undefined;
+    textAlign?: TextAlign | undefined;
+    // (undocumented)
+    value: string;
+}
 
 // Warning: (ae-missing-release-tag) "PBUiTransform" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -202,6 +239,20 @@ export function removeUi(index: number): void;
 // @public (undocumented)
 export function renderUi(ui: UiComponent): number;
 
+// Warning: (ae-missing-release-tag) "TextAlign" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export enum TextAlign {
+    // (undocumented)
+    Center = 0,
+    // (undocumented)
+    Left = 1,
+    // (undocumented)
+    Right = 2,
+    // (undocumented)
+    UNRECOGNIZED = -1
+}
+
 // Warning: (ae-forgotten-export) The symbol "JSX" needs to be exported by the entry point index.d.ts
 // Warning: (ae-missing-release-tag) "UiComponent" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -210,6 +261,11 @@ export type UiComponent = () => JSX.Element;
 
 // @public (undocumented)
 export function UiEntity(props: EntityPropTypes & Partial<CommonProps>): ReactEcs.JSX.Element;
+
+// Warning: (ae-missing-release-tag) "UiTextProps" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type UiTextProps = PBUiText;
 
 // @public (undocumented)
 export interface UiTransformProps {
