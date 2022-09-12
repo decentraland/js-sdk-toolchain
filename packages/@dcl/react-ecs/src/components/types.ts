@@ -1,3 +1,4 @@
+import { UiTextProps } from './uiText/types'
 import { UiTransformProps } from './uiTransform/types'
 
 /**
@@ -5,7 +6,9 @@ import { UiTransformProps } from './uiTransform/types'
  */
 export type EntityPropTypes = {
   uiTransform?: UiTransformProps
+  uiText?: UiTextProps
 }
+
 export type Key = number | string
 export type Children = any
 export type CommonProps = {
