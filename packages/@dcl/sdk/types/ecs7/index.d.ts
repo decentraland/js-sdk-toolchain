@@ -253,6 +253,8 @@ declare namespace Components {
     /** @public */
     const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
     /** @public */
+    const Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
+    /** @public */
     const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
     /** @public */
     const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
@@ -491,6 +493,7 @@ declare function defineSdkComponents(engine: PreEngine): {
     PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
     RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
     SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
@@ -2138,6 +2141,14 @@ declare interface PBPointerLock {
     isPointerLocked: boolean;
 }
 
+declare interface PBRaycast {
+    timestamp: number;
+    origin: Vector3_2 | undefined;
+    direction: Vector3_2 | undefined;
+    maxDistance: number;
+    queryType: RaycastQueryType;
+}
+
 declare interface PBRaycastResult {
     timestamp: number;
     origin: Vector3_2 | undefined;
@@ -2586,6 +2597,9 @@ declare namespace Quaternion {
  */
 declare const RAD2DEG: number;
 
+/** @public */
+declare const Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
+
 /** Position will be relative to the scene */
 declare interface RaycastHit {
     position: Vector3_2 | undefined;
@@ -2595,6 +2609,12 @@ declare interface RaycastHit {
     length: number;
     meshName?: string | undefined;
     entityId?: number | undefined;
+}
+
+declare const enum RaycastQueryType {
+    HIT_FIRST = 0,
+    QUERY_ALL = 1,
+    UNRECOGNIZED = -1
 }
 
 /** @public */

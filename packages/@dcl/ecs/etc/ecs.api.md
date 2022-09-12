@@ -151,6 +151,10 @@ export namespace Components {
     //
     // (undocumented)
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    const // Warning: (ae-forgotten-export) The symbol "PBRaycast" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
     const // Warning: (ae-forgotten-export) The symbol "PBRaycastResult" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -527,6 +531,9 @@ export namespace Quaternion {
 
 // @public
 export const RAD2DEG: number;
+
+// @public (undocumented)
+export const Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
 
 // @public (undocumented)
 export const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
