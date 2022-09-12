@@ -558,6 +558,12 @@ declare type float = number;
 /** @public */
 declare type FloatArray = number[];
 
+declare const enum Font {
+    LiberationSans = 0,
+    SansSerif = 1,
+    UNRECOGNIZED = -1
+}
+
 /** @public */
 declare const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
 
@@ -2191,8 +2197,15 @@ declare interface PBTextShape {
 }
 
 declare interface PBUiText {
-    text: string;
-    textColor: Color3 | undefined;
+    value: string;
+    /** default=(1.0,1.0,1.0) */
+    color?: Color3 | undefined;
+    /** default='center' */
+    textAlign?: TextAlign | undefined;
+    /** default=0 */
+    font?: Font | undefined;
+    /** default=10 */
+    fontSize?: number | undefined;
 }
 
 declare interface PBUiTransform {
@@ -2689,6 +2702,13 @@ declare const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereS
  * @public
  */
 declare type SystemFn = (dt: number) => void;
+
+declare const enum TextAlign {
+    Center = 0,
+    Left = 1,
+    Right = 2,
+    UNRECOGNIZED = -1
+}
 
 /** @public */
 declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;

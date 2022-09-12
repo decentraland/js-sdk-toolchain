@@ -142,7 +142,7 @@ flow('build-all', () => {
       await createProtoTypes(
         `${ECS7_PATH}/node_modules/@dcl/protocol/ecs/components`,
         protoTypesPath,
-        ['UiTransform.proto']
+        ['UiTransform.proto', 'UiText.proto']
       )
     })
     itExecutes('npm run build', REACT_ECS)
