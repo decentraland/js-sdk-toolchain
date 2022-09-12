@@ -18,7 +18,7 @@ export function getMessageObserver() {
 function ensureCommunicationsController() {
   if (!communicationsControllerPromise) {
     communicationsControllerPromise = dcl.loadModule(
-      '@decentraland/CommunicationsController',
+      '~system/CommunicationsController',
       {}
     )
 
