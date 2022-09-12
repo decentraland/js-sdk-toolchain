@@ -247,6 +247,10 @@ declare namespace Components {
     /** @public */
     const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
     /** @public */
+    const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
+    /** @public */
+    const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+    /** @public */
     const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
     /** @public */
     const Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
@@ -258,6 +262,8 @@ declare namespace Components {
     const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
     /** @public */
     const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    /** @public */
+    const UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
     /** @public */
     const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 }
@@ -484,12 +490,15 @@ declare function defineSdkComponents(engine: PreEngine): {
     OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
     OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
     PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
+    PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
+    PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
     Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
     RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
     SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
     UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
     VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 };
 
@@ -593,13 +602,13 @@ declare type IEngine = {
      * engine.addSystem(mySystem, 10)
      * ```
      */
-    addSystem(system: Update, priority?: number, name?: string): void;
+    addSystem(system: SystemFn, priority?: number, name?: string): void;
     /**
      * Remove a system from the engine.
      * @param selector the function or the unique name to identify
      * @returns if it was found and removed
      */
-    removeSystem(selector: string | Update): boolean;
+    removeSystem(selector: string | SystemFn): boolean;
     /**
      * Define a component and add it to the engine.
      * @param spec An object with schema fields
@@ -616,7 +625,7 @@ declare type IEngine = {
      *
      * ```
      */
-    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: Partial<Result<T>>): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>;
     /**
      * Define a component and add it to the engine.
      * @param spec An object with schema fields
@@ -652,6 +661,7 @@ declare type IEngine = {
      * ```
      */
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
+    RootEntity: Entity;
     baseComponents: SdkComponents;
 };
 
@@ -705,6 +715,17 @@ declare interface ISize {
      */
     height: number;
 }
+
+/**
+ * Check if a pointer event has been emited in the last tick-update.
+ * @param entity the entity to query, for global clicks use `engine.RootEntity`
+ * @param actionButton
+ * @param pointerEventType
+ * @returns
+ */
+declare function isPointerEventActive(entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType): boolean;
+
+declare function isPointerEventActiveGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType) => boolean;
 
 declare const log: (...a: any[]) => void;
 
@@ -2078,6 +2099,44 @@ declare interface PBPlaneShape {
     uvs: number[];
 }
 
+declare interface PBPointerEvents {
+    pointerEvents: PBPointerEvents_Entry[];
+}
+
+declare interface PBPointerEvents_Entry {
+    eventType: PointerEventType;
+    eventInfo: PBPointerEvents_Info | undefined;
+}
+
+declare interface PBPointerEvents_Info {
+    /** default=ActionButton.ANY */
+    button?: ActionButton | undefined;
+    /** default='Interact' */
+    hoverText?: string | undefined;
+    /** default=10 */
+    maxDistance?: number | undefined;
+    /** default=true */
+    showFeedback?: boolean | undefined;
+}
+
+/** the renderer will set this component to the root entity once per frame with all the events */
+declare interface PBPointerEventsResult {
+    /** a list of the last N pointer commands (from the engine) */
+    commands: PBPointerEventsResult_PointerCommand[];
+}
+
+/** this message represents a pointer event, used both for UP and DOWN actions */
+declare interface PBPointerEventsResult_PointerCommand {
+    /** identifier of the input */
+    button: ActionButton;
+    hit: RaycastHit | undefined;
+    state: PointerEventType;
+    /** could be a Lamport timestamp */
+    timestamp: number;
+    /** if the input is analog then we store it here */
+    analog?: number | undefined;
+}
+
 declare interface PBPointerLock {
     isPointerLocked: boolean;
 }
@@ -2089,7 +2148,6 @@ declare interface PBRaycast {
     maxDistance: number;
     queryType: QueryType;
 }
-
 declare interface PBRaycastResult {
     timestamp: number;
     origin: Vector3_2 | undefined;
@@ -2146,6 +2204,67 @@ declare interface PBTextShape {
 declare interface PBUiText {
     text: string;
     textColor: Color3 | undefined;
+}
+
+declare interface PBUiTransform {
+    parent: number;
+    rightOf: number;
+    positionType: YGPositionType;
+    alignContent: YGAlign;
+    alignItems: YGAlign;
+    alignSelf: YGAlign;
+    flexDirection: YGFlexDirection;
+    flexWrap: YGWrap;
+    justifyContent: YGJustify;
+    overflow: YGOverflow;
+    display: YGDisplay;
+    direction: YGDirection;
+    flex: number;
+    flexBasisUnit: YGUnit;
+    flexBasis: number;
+    flexGrow: number;
+    flexShrink: number;
+    widthUnit: YGUnit;
+    width: number;
+    heightUnit: YGUnit;
+    height: number;
+    minWidthUnit: YGUnit;
+    minWidth: number;
+    minHeightUnit: YGUnit;
+    minHeight: number;
+    maxWidthUnit: YGUnit;
+    maxWidth: number;
+    maxHeightUnit: YGUnit;
+    maxHeight: number;
+    positionLeftUnit: YGUnit;
+    positionLeft: number;
+    positionTopUnit: YGUnit;
+    positionTop: number;
+    positionRightUnit: YGUnit;
+    positionRight: number;
+    positionBottomUnit: YGUnit;
+    positionBottom: number;
+    /** margin */
+    marginLeftUnit: YGUnit;
+    marginLeft: number;
+    marginTopUnit: YGUnit;
+    marginTop: number;
+    marginRightUnit: YGUnit;
+    marginRight: number;
+    marginBottomUnit: YGUnit;
+    marginBottom: number;
+    paddingLeftUnit: YGUnit;
+    paddingLeft: number;
+    paddingTopUnit: YGUnit;
+    paddingTop: number;
+    paddingRightUnit: YGUnit;
+    paddingRight: number;
+    paddingBottomUnit: YGUnit;
+    paddingBottom: number;
+    borderLeft: number;
+    borderTop: number;
+    borderRight: number;
+    borderBottom: number;
 }
 
 declare interface PBVisibilityComponent {
@@ -2266,6 +2385,20 @@ declare namespace Plane {
 declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
 
 /** @public */
+declare const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
+
+/** @public */
+declare const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+
+declare const enum PointerEventType {
+    UP = 0,
+    DOWN = 1,
+    HOVER_ENTER = 2,
+    HOVER_LEAVE = 3,
+    UNRECOGNIZED = -1
+}
+
+/** @public */
 declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
 
 /**
@@ -2279,13 +2412,13 @@ declare function preEngine(): {
     addEntity: (dynamic?: boolean) => Entity;
     addDynamicEntity: () => Entity;
     removeEntity: (entity: Entity) => boolean;
-    addSystem: (fn: Update, priority?: number, name?: string | undefined) => void;
+    addSystem: (fn: SystemFn, priority?: number, name?: string | undefined) => void;
     getSystems: () => {
-        fn: Update;
+        fn: SystemFn;
         priority: number;
         name?: string | undefined;
     }[];
-    removeSystem: (selector: string | Update) => boolean;
+    removeSystem: (selector: string | SystemFn) => boolean;
     defineComponent: <T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType | undefined) => ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
     defineComponentFromSchema: <T_1 extends ISchema<any>, ConstructorType_1 = EcsResult<T_1>>(spec: T_1, componentId: number, constructorDefault?: ConstructorType_1 | undefined) => ComponentDefinition<T_1, ConstructorType_1>;
     getEntitiesWith: <T_2 extends [ComponentDefinition<ISchema<any>, any>, ...ComponentDefinition<ISchema<any>, any>[]]>(...components: T_2) => Iterable<[Entity, ...ReadonlyComponentSchema<T_2>]>;
@@ -2561,6 +2694,11 @@ declare interface Spec {
 /** @public */
 declare const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
 
+/**
+ * @public
+ */
+declare type SystemFn = (dt: number) => void;
+
 /** @public */
 declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 
@@ -2635,15 +2773,13 @@ declare type Uint32 = number;
 /** @public */
 declare const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
 
-/**
- * @public
- */
-declare type Unpacked<T> = T extends (infer U)[] ? U : T;
+/** @public */
+declare const UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
 
 /**
  * @public
  */
-declare type Update = (dt: number) => void;
+declare type Unpacked<T> = T extends (infer U)[] ? U : T;
 
 /**
  * @public
@@ -2857,6 +2993,16 @@ declare interface Vector3_2 {
 /** @public */
 declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 
+/**
+ * Check if an entity emitted a clicked event
+ * @param entity the entity to query, for global clicks use `engine.RootEntity`
+ * @param actionButton
+ * @returns true if the entity was clicked in the last tick-update
+ */
+declare function wasEntityClicked(entity: Entity, actionButton: ActionButton): boolean;
+
+declare function wasEntityClickedGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton) => boolean;
+
 declare namespace WireMessage {
     enum Enum {
         RESERVED = 0,
@@ -2879,6 +3025,78 @@ declare namespace WireMessage {
      */
     function validate(buf: ByteBuffer): boolean;
     function readHeader(buf: ByteBuffer): Header | null;
+}
+
+declare const enum YGAlign {
+    YGAlignAuto = 0,
+    YGAlignFlexStart = 1,
+    YGAlignCenter = 2,
+    YGAlignFlexEnd = 3,
+    YGAlignStretch = 4,
+    YGAlignBaseline = 5,
+    YGAlignSpaceBetween = 6,
+    YGAlignSpaceAround = 7,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGDirection {
+    YGDirectionInherit = 0,
+    YGDirectionLTR = 1,
+    YGDirectionRTL = 2,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGDisplay {
+    YGDisplayFlex = 0,
+    YGDisplayNone = 1,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGFlexDirection {
+    YGFlexDirectionColumn = 0,
+    YGFlexDirectionColumnReverse = 1,
+    YGFlexDirectionRow = 2,
+    YGFlexDirectionRowReverse = 3,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGJustify {
+    YGJustifyFlexStart = 0,
+    YGJustifyCenter = 1,
+    YGJustifyFlexEnd = 2,
+    YGJustifySpaceBetween = 3,
+    YGJustifySpaceAround = 4,
+    YGJustifySpaceEvenly = 5,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGOverflow {
+    YGOverflowVisible = 0,
+    YGOverflowHidden = 1,
+    YGOverflowScroll = 2,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGPositionType {
+    YGPositionTypeStatic = 0,
+    YGPositionTypeRelative = 1,
+    YGPositionTypeAbsolute = 2,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGUnit {
+    YGUnitUndefined = 0,
+    YGUnitPoint = 1,
+    YGUnitPercent = 2,
+    YGUnitAuto = 3,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGWrap {
+    YGWrapNoWrap = 0,
+    YGWrapWrap = 1,
+    YGWrapWrapReverse = 2,
+    UNRECOGNIZED = -1
 }
 
 

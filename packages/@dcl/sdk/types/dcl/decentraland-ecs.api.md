@@ -548,13 +548,13 @@ export function Component(componentName: string, classId?: number): <TFunction e
 
 // @public (undocumented)
 export class ComponentAdded {
-    constructor(entity: IEntity, componentName: string, classId: number | null);
+    constructor(entity: Entity, componentName: string, classId: number | null);
     // (undocumented)
     classId: number | null;
     // (undocumented)
     componentName: string;
     // (undocumented)
-    entity: IEntity;
+    entity: Entity;
 }
 
 // @public (undocumented)
@@ -573,9 +573,9 @@ export class ComponentGroup {
     // (undocumented)
     active: boolean;
     // (undocumented)
-    readonly entities: ReadonlyArray<IEntity>;
+    readonly entities: ReadonlyArray<Entity>;
     // (undocumented)
-    hasEntity(entity: IEntity): boolean;
+    hasEntity(entity: Entity): boolean;
     // (undocumented)
     readonly requires: ReadonlyArray<ComponentConstructor<any>>;
     // (undocumented)
@@ -588,13 +588,13 @@ export interface ComponentLike {
 
 // @public (undocumented)
 export class ComponentRemoved {
-    constructor(entity: IEntity, componentName: string, component: ComponentLike);
+    constructor(entity: Entity, componentName: string, component: ComponentLike);
     // (undocumented)
     component: ComponentLike;
     // (undocumented)
     componentName: string;
     // (undocumented)
-    entity: IEntity;
+    entity: Entity;
 }
 
 // @public (undocumented)
@@ -718,39 +718,39 @@ export type EcsMathReadOnlyVector4 = {
 
 // @public (undocumented)
 export class Engine implements IEngine {
-    constructor(rootEntity: IEntity);
+    constructor(rootEntity: Entity);
     // (undocumented)
-    addEntity(entity: IEntity): IEntity;
+    addEntity(entity: Entity): Entity;
     // (undocumented)
     addSystem(system: ISystem, priority?: number): ISystem;
     // (undocumented)
-    readonly avatarEntity: IEntity;
+    readonly avatarEntity: Entity;
     // (undocumented)
     get disposableComponents(): Readonly<Record<string, DisposableComponentLike>>;
     // (undocumented)
     disposeComponent(component: DisposableComponentLike): boolean;
     // (undocumented)
-    get entities(): Readonly<Record<string, IEntity>>;
+    get entities(): Readonly<Record<string, Entity>>;
     // (undocumented)
     readonly eventManager: EventManager;
     // (undocumented)
-    readonly firstPersonCameraEntity: IEntity;
+    readonly firstPersonCameraEntity: Entity;
     // (undocumented)
     getComponentGroup(...requires: ComponentConstructor<any>[]): ComponentGroup;
     // (undocumented)
     getEntitiesWithComponent(component: string): Record<string, any>;
     // (undocumented)
-    getEntitiesWithComponent(component: ComponentConstructor<any>): Record<string, IEntity>;
+    getEntitiesWithComponent(component: ComponentConstructor<any>): Record<string, Entity>;
     // (undocumented)
     registerComponent(component: DisposableComponentLike): void;
     // (undocumented)
     removeComponentGroup(componentGroup: ComponentGroup): boolean;
     // (undocumented)
-    removeEntity(entity: IEntity): boolean;
+    removeEntity(entity: Entity): boolean;
     // (undocumented)
     removeSystem(system: ISystem): boolean;
     // (undocumented)
-    readonly rootEntity: IEntity;
+    readonly rootEntity: Entity;
     // (undocumented)
     update(dt: number): this;
     // (undocumented)
@@ -761,14 +761,14 @@ export class Engine implements IEngine {
 export const engine: Engine;
 
 // @public (undocumented)
-export class Entity implements IEntity {
+export class Entity implements Entity {
     constructor(name?: string | undefined);
     addComponent<T extends object>(component: T): T;
     addComponentOrReplace<T extends object>(component: T): T;
     // (undocumented)
     alive: boolean;
     // (undocumented)
-    children: Record<string, IEntity>;
+    children: Record<string, Entity>;
     // (undocumented)
     readonly components: Record<string, any>;
     // (undocumented)
@@ -782,7 +782,7 @@ export class Entity implements IEntity {
     getComponentOrNull<T = any>(component: string): T | null;
     // (undocumented)
     getComponentOrNull<T>(component: ComponentConstructor<T>): T | null;
-    getParent(): IEntity | null;
+    getParent(): Entity | null;
     hasComponent<T = any>(component: string): boolean;
     // (undocumented)
     hasComponent<T>(component: ComponentConstructor<T>): boolean;
@@ -796,7 +796,7 @@ export class Entity implements IEntity {
     removeComponent<T extends object>(component: T, triggerRemovedEvent?: boolean): void;
     // (undocumented)
     removeComponent(component: ComponentConstructor<any>, triggerRemovedEvent?: boolean): void;
-    setParent(_parent: IEntity | Attachable | null): IEntity;
+    setParent(_parent: Entity | Attachable | null): Entity;
     // (undocumented)
     readonly uuid: string;
 }
@@ -933,32 +933,32 @@ export interface HitEntityInfo {
 // @public (undocumented)
 export interface IEngine {
     // (undocumented)
-    addEntity(entity: IEntity): void;
+    addEntity(entity: Entity): void;
     // (undocumented)
     addSystem(system: ISystem, priority: number): void;
     // (undocumented)
-    readonly avatarEntity: IEntity;
+    readonly avatarEntity: Entity;
     // (undocumented)
-    readonly entities: Readonly<Record<string, IEntity>>;
+    readonly entities: Readonly<Record<string, Entity>>;
     // (undocumented)
-    readonly firstPersonCameraEntity: IEntity;
+    readonly firstPersonCameraEntity: Entity;
     // (undocumented)
-    removeEntity(entity: IEntity): void;
+    removeEntity(entity: Entity): void;
     // (undocumented)
     removeSystem(system: ISystem): void;
     // (undocumented)
-    rootEntity: IEntity;
+    rootEntity: Entity;
 }
 
 // @public (undocumented)
-export interface IEntity {
+export interface Entity {
     addComponent<T extends object>(component: T): void;
     // (undocumented)
     addComponentOrReplace<T extends object>(component: T): void;
     // (undocumented)
     alive: boolean;
     // (undocumented)
-    children: Record<string, IEntity>;
+    children: Record<string, Entity>;
     // (undocumented)
     readonly components: Record<string, any>;
     // (undocumented)
@@ -979,7 +979,7 @@ export interface IEntity {
     // (undocumented)
     getComponentOrNull<T>(component: ComponentConstructor<T> | string): T | null;
     // (undocumented)
-    getParent(): IEntity | null;
+    getParent(): Entity | null;
     // (undocumented)
     hasComponent<T = any>(component: string): boolean;
     // (undocumented)
@@ -999,7 +999,7 @@ export interface IEntity {
     // (undocumented)
     removeComponent(component: object | string | Function, triggerRemovedEvent: any): void;
     // (undocumented)
-    setParent(e: IEntity | Attachable | null): void;
+    setParent(e: Entity | Attachable | null): void;
     // (undocumented)
     readonly uuid: string;
 }
@@ -1067,9 +1067,9 @@ export interface ISystem {
     // (undocumented)
     deactivate?(): void;
     // (undocumented)
-    onAddEntity?(entity: IEntity): void;
+    onAddEntity?(entity: Entity): void;
     // (undocumented)
-    onRemoveEntity?(entity: IEntity): void;
+    onRemoveEntity?(entity: Entity): void;
     // (undocumented)
     update?(dt: number): void;
 }
@@ -1587,11 +1587,11 @@ export type ParcelsWithAccess = Array<{
 
 // @public (undocumented)
 export class ParentChanged {
-    constructor(entity: IEntity, parent: IEntity | null);
+    constructor(entity: Entity, parent: Entity | null);
     // (undocumented)
-    entity: IEntity;
+    entity: Entity;
     // (undocumented)
-    parent: IEntity | null;
+    parent: Entity | null;
 }
 
 // @public
@@ -2397,9 +2397,9 @@ export class UUIDEventSystem implements ISystem {
         [uuid: string]: OnUUIDEvent<any>;
     };
     // (undocumented)
-    onAddEntity(entity: IEntity): void;
+    onAddEntity(entity: Entity): void;
     // (undocumented)
-    onRemoveEntity(entity: IEntity): void;
+    onRemoveEntity(entity: Entity): void;
 }
 
 // @public

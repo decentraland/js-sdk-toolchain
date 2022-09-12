@@ -6,6 +6,7 @@
       "packages/@dcl/build-ecs/tsconfig.json",
       "packages/@dcl/dcl-rollup/tsconfig.json",
       "packages/@dcl/ecs/tsconfig.json",
+      "packages/@dcl/react-ecs/tsconfig.json",
       "packages/@dcl/amd/tsconfig.json",
       "scripts/tsconfig.json",
       "test/tsconfig.json"
@@ -18,7 +19,7 @@
       {
         "ignoreRestSiblings": true,
         "argsIgnorePattern": "^_",
-        "varsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_|ReactEcs",
         "caughtErrorsIgnorePattern": "^_"
       }
     ]

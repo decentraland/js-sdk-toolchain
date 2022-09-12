@@ -1,4 +1,5 @@
 import resolve from '@rollup/plugin-node-resolve'
+import analyze from 'rollup-plugin-analyzer'
 import commonjs from '@rollup/plugin-commonjs'
 import typescript from '@rollup/plugin-typescript'
 import { sys } from 'typescript'
@@ -51,6 +52,10 @@ export const basicRollupConfig: RollupOptions = {
       configuration: apiExtractorConfig(packageJsonPath),
       local: !PROD,
       cleanUpRollup: false
+    }),
+    analyze({
+      hideDeps: true,
+      summaryOnly: true
     })
   ]
 }

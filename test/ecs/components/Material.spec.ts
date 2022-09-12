@@ -23,7 +23,19 @@ describe('Generated Material ProtoBuf', () => {
         wrapMode: TextureWrapMode.UNRECOGNIZED,
         filterMode: undefined,
         src: 'not-casla'
-      }
+      },
+      castShadows: true,
+      glossiness: 1,
+      metallic: 1,
+      roughness: 1,
+      specularIntensity: 0,
+      albedoColor: { r: 0, g: 1, b: 1 },
+      alphaTest: 0,
+      directIntensity: 1,
+      emissiveIntensity: 1,
+      emissiveColor: { r: 0, g: 1, b: 1 },
+      reflectivityColor: { r: 0, g: 1, b: 1 },
+      transparencyMode: TransparencyMode.AlphaBlend
     })
 
     Material.create(entityB, {

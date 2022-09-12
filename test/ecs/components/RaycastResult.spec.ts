@@ -1,4 +1,4 @@
-﻿import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated RaycastResult ProtoBuf', () => {
   it('should serialize/deserialize RaycastResult', () => {
@@ -13,12 +13,13 @@ describe('Generated RaycastResult ProtoBuf', () => {
       direction: { x: 1, y: 2, z: 4 },
       hits: [
         {
-          worldPosition: { x: 1, z: 2, y: 3 },
+          position: { x: 1, z: 2, y: 3 },
           origin: { x: 1, z: 2, y: 3 },
           meshName: '{ x: 1, z: 2, y: 3 }',
           entityId: 123,
-          worldNormalHit: { x: 1, z: 2, y: 3 },
-          length: 2
+          normalHit: { x: 1, z: 2, y: 3 },
+          length: 2,
+          direction: { x: 1, z: 2, y: 3 }
         }
       ]
     })

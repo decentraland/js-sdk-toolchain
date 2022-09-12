@@ -1,4 +1,4 @@
-﻿import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated OnPointerDown ProtoBuf', () => {
   it('should serialize/deserialize OnPointerUp', () => {
