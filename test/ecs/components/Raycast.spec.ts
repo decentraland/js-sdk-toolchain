@@ -1,4 +1,4 @@
-﻿import { QueryType } from '../../../packages/@dcl/ecs/src/components/generated/pb/Raycast.gen'
+﻿import { RaycastQueryType } from '../../../packages/@dcl/ecs/src/components/generated/pb/Raycast.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated Raycast ProtoBuf', () => {
@@ -13,7 +13,7 @@ describe('Generated Raycast ProtoBuf', () => {
       origin: undefined,
       direction: undefined,
       maxDistance: 100,
-      queryType: QueryType.HIT_FIRST
+      queryType: RaycastQueryType.HIT_FIRST
     })
 
     Raycast.create(entityB, {
@@ -21,7 +21,7 @@ describe('Generated Raycast ProtoBuf', () => {
       origin: undefined,
       direction: undefined,
       maxDistance: Infinity,
-      queryType: QueryType.HIT_FIRST
+      queryType: RaycastQueryType.HIT_FIRST
     })
     const buffer = Raycast.toBinary(entity)
     Raycast.updateFromBinary(entityB, buffer)

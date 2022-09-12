@@ -2146,8 +2146,9 @@ declare interface PBRaycast {
     origin: Vector3_2 | undefined;
     direction: Vector3_2 | undefined;
     maxDistance: number;
-    queryType: QueryType;
+    queryType: RaycastQueryType;
 }
+
 declare interface PBRaycastResult {
     timestamp: number;
     origin: Vector3_2 | undefined;
@@ -2590,12 +2591,6 @@ declare namespace Quaternion {
     export function Zero(): MutableQuaternion;
 }
 
-declare const enum QueryType {
-    HIT_FIRST = 0,
-    QUERY_ALL = 1,
-    UNRECOGNIZED = -1
-}
-
 /**
  * Constant used to convert from radians to Euler degrees
  * @public
@@ -2605,13 +2600,21 @@ declare const RAD2DEG: number;
 /** @public */
 declare const Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
 
+/** Position will be relative to the scene */
 declare interface RaycastHit {
-    worldPosition: Vector3_2 | undefined;
+    position: Vector3_2 | undefined;
     origin: Vector3_2 | undefined;
-    meshName?: string | undefined;
-    entityId: number;
-    worldNormalHit: Vector3_2 | undefined;
+    direction: Vector3_2 | undefined;
+    normalHit: Vector3_2 | undefined;
     length: number;
+    meshName?: string | undefined;
+    entityId?: number | undefined;
+}
+
+declare const enum RaycastQueryType {
+    HIT_FIRST = 0,
+    QUERY_ALL = 1,
+    UNRECOGNIZED = -1
 }
 
 /** @public */
