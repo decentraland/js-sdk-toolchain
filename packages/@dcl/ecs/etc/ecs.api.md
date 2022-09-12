@@ -167,6 +167,10 @@ export namespace Components {
     //
     // (undocumented)
     UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    const // Warning: (ae-forgotten-export) The symbol "PBUiTransform" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
     const // Warning: (ae-forgotten-export) The symbol "PBVisibilityComponent" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -248,8 +252,8 @@ export type IEngine = {
     addEntity(dynamic?: boolean): Entity;
     addDynamicEntity(): Entity;
     removeEntity(entity: Entity): void;
-    addSystem(system: Update, priority?: number, name?: string): void;
-    removeSystem(selector: string | Update): boolean;
+    addSystem(system: SystemFn, priority?: number, name?: string): void;
+    removeSystem(selector: string | SystemFn): boolean;
     defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>;
     defineComponentFromSchema<T extends ISchema<Record<string, any>>, ConstructorType = ComponentType<T>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
@@ -604,6 +608,9 @@ export interface Spec {
 export const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
 
 // @public (undocumented)
+export type SystemFn = (dt: number) => void;
+
+// @public (undocumented)
 export const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 
 // @public
@@ -635,10 +642,10 @@ export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 export const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
 
 // @public (undocumented)
-export type Unpacked<T> = T extends (infer U)[] ? U : T;
+export const UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
 
 // @public (undocumented)
-export type Update = (dt: number) => void;
+export type Unpacked<T> = T extends (infer U)[] ? U : T;
 
 // @public (undocumented)
 export namespace Vector3 {

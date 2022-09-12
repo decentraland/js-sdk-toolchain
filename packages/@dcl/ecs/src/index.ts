@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
 // The order of the following imports matters. Please do not auto-sort
 
 export * from './runtime/Math'

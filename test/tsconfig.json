@@ -22,7 +22,10 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
-    "alwaysStrict": true
+    "alwaysStrict": true,
+    "jsx": "react",
+    "jsxFactory": "ReactEcs.createElement",
+    "skipLibCheck": true
   },
   "includes": "*.ts"
 }

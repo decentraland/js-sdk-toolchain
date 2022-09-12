@@ -10,9 +10,8 @@ import {
   defineComponent as defComponent
 } from './component'
 import { Entity, EntityContainer } from './entity'
-import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, Update } from './systems'
-import type { IEngineParams } from './types'
-import { IEngine } from './types'
+import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, SystemFn } from './systems'
+import type { IEngineParams, IEngine } from './types'
 import { ReadonlyComponentSchema } from './readonly'
 
 export * from './readonly'
@@ -31,14 +30,14 @@ function preEngine() {
   const systems = SystemContainer()
 
   function addSystem(
-    fn: Update,
+    fn: SystemFn,
     priority: number = SYSTEMS_REGULAR_PRIORITY,
     name?: string
   ) {
     systems.add(fn, priority, name)
   }
 
-  function removeSystem(selector: string | Update) {
+  function removeSystem(selector: string | SystemFn) {
     return systems.remove(selector)
   }
 
@@ -103,7 +102,7 @@ function preEngine() {
     const component = componentsDefinition.get(componentId)
     if (!component) {
       throw new Error(
-        'Component not found. You need to declare the components at the beginnig of the engine declaration'
+        `Component ${componentId} not found. You need to declare the components at the beginnig of the engine declaration`
       )
     }
     return component

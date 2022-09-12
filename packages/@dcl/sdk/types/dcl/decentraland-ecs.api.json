@@ -10375,8 +10375,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -10493,8 +10493,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -10742,8 +10742,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -10774,8 +10774,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -10925,8 +10925,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -11045,8 +11045,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -12894,8 +12894,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -12926,8 +12926,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -12935,8 +12935,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -13038,8 +13038,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -13181,8 +13181,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -13241,8 +13241,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -13394,8 +13394,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -13531,8 +13531,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -13625,8 +13625,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -13776,8 +13776,8 @@
             },
             {
               "kind": "Reference",
-              "text": "IEntity",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+              "text": "Entity",
+              "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
             },
             {
               "kind": "Content",
@@ -13999,8 +13999,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -14421,8 +14421,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -14921,8 +14921,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -14943,8 +14943,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -17114,8 +17114,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -17222,8 +17222,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -17267,8 +17267,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -17298,8 +17298,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -17325,8 +17325,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -17417,8 +17417,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -17438,20 +17438,20 @@
         },
         {
           "kind": "Interface",
-          "canonicalReference": "@dcl/legacy-ecs!IEntity:interface",
+          "canonicalReference": "@dcl/legacy-ecs!Entity:interface",
           "docComment": "/**\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export interface IEntity "
+              "text": "export interface Entity "
             }
           ],
           "releaseTag": "Public",
-          "name": "IEntity",
+          "name": "Entity",
           "members": [
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#addComponent:member(1)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#addComponent:member(1)",
               "docComment": "/**\n * Adds a component. If the component already exist, it throws an Error.\n *\n * @param component - component instance.\n */\n",
               "excerptTokens": [
                 {
@@ -17517,7 +17517,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#addComponentOrReplace:member(1)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#addComponentOrReplace:member(1)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -17583,7 +17583,7 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#alive:member",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#alive:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -17609,7 +17609,7 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#children:member",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#children:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -17627,8 +17627,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -17649,7 +17649,7 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#components:member",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#components:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -17680,7 +17680,7 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#eventManager:member",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#eventManager:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -17711,7 +17711,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#getComponent:member(1)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#getComponent:member(1)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -17777,7 +17777,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#getComponent:member(2)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#getComponent:member(2)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -17840,7 +17840,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#getComponent:member(3)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#getComponent:member(3)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -17903,7 +17903,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#getComponentOrCreate:member(1)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#getComponentOrCreate:member(1)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -17966,7 +17966,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#getComponentOrNull:member(1)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#getComponentOrNull:member(1)",
               "docComment": "/**\n * Gets a component, if it doesn't exist, it returns null.\n *\n * @param component - component class or name\n */\n",
               "excerptTokens": [
                 {
@@ -18032,7 +18032,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#getComponentOrNull:member(2)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#getComponentOrNull:member(2)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -18095,7 +18095,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#getComponentOrNull:member(3)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#getComponentOrNull:member(3)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -18158,7 +18158,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#getParent:member(1)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#getParent:member(1)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -18167,8 +18167,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -18191,7 +18191,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#hasComponent:member(1)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#hasComponent:member(1)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -18257,7 +18257,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#hasComponent:member(2)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#hasComponent:member(2)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -18320,7 +18320,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#hasComponent:member(3)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#hasComponent:member(3)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -18386,7 +18386,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#hasComponent:member(4)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#hasComponent:member(4)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -18449,7 +18449,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#isAddedToEngine:member(1)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#isAddedToEngine:member(1)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -18477,7 +18477,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#removeComponent:member(1)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#removeComponent:member(1)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -18538,7 +18538,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#removeComponent:member(2)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#removeComponent:member(2)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -18620,7 +18620,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#removeComponent:member(3)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#removeComponent:member(3)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -18686,7 +18686,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#removeComponent:member(4)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#removeComponent:member(4)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -18752,7 +18752,7 @@
             },
             {
               "kind": "MethodSignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#setParent:member(1)",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#setParent:member(1)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -18761,8 +18761,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -18811,7 +18811,7 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "@dcl/legacy-ecs!IEntity#uuid:member",
+              "canonicalReference": "@dcl/legacy-ecs!Entity#uuid:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -19828,8 +19828,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -19874,8 +19874,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -32622,8 +32622,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -32631,8 +32631,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -32675,8 +32675,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -32703,8 +32703,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -48235,8 +48235,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",
@@ -48282,8 +48282,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "IEntity",
-                  "canonicalReference": "@dcl/legacy-ecs!IEntity:interface"
+                  "text": "Entity",
+                  "canonicalReference": "@dcl/legacy-ecs!Entity:interface"
                 },
                 {
                   "kind": "Content",

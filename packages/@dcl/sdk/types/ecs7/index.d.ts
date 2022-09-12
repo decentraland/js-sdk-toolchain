@@ -261,6 +261,8 @@ declare namespace Components {
     /** @public */
     const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
     /** @public */
+    const UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
+    /** @public */
     const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 }
 
@@ -493,6 +495,7 @@ declare function defineSdkComponents(engine: PreEngine): {
     SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
     UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
     VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 };
 
@@ -596,13 +599,13 @@ declare type IEngine = {
      * engine.addSystem(mySystem, 10)
      * ```
      */
-    addSystem(system: Update, priority?: number, name?: string): void;
+    addSystem(system: SystemFn, priority?: number, name?: string): void;
     /**
      * Remove a system from the engine.
      * @param selector the function or the unique name to identify
      * @returns if it was found and removed
      */
-    removeSystem(selector: string | Update): boolean;
+    removeSystem(selector: string | SystemFn): boolean;
     /**
      * Define a component and add it to the engine.
      * @param spec An object with schema fields
@@ -2193,6 +2196,67 @@ declare interface PBUiText {
     textColor: Color3 | undefined;
 }
 
+declare interface PBUiTransform {
+    parent: number;
+    rightOf: number;
+    positionType: YGPositionType;
+    alignContent: YGAlign;
+    alignItems: YGAlign;
+    alignSelf: YGAlign;
+    flexDirection: YGFlexDirection;
+    flexWrap: YGWrap;
+    justifyContent: YGJustify;
+    overflow: YGOverflow;
+    display: YGDisplay;
+    direction: YGDirection;
+    flex: number;
+    flexBasisUnit: YGUnit;
+    flexBasis: number;
+    flexGrow: number;
+    flexShrink: number;
+    widthUnit: YGUnit;
+    width: number;
+    heightUnit: YGUnit;
+    height: number;
+    minWidthUnit: YGUnit;
+    minWidth: number;
+    minHeightUnit: YGUnit;
+    minHeight: number;
+    maxWidthUnit: YGUnit;
+    maxWidth: number;
+    maxHeightUnit: YGUnit;
+    maxHeight: number;
+    positionLeftUnit: YGUnit;
+    positionLeft: number;
+    positionTopUnit: YGUnit;
+    positionTop: number;
+    positionRightUnit: YGUnit;
+    positionRight: number;
+    positionBottomUnit: YGUnit;
+    positionBottom: number;
+    /** margin */
+    marginLeftUnit: YGUnit;
+    marginLeft: number;
+    marginTopUnit: YGUnit;
+    marginTop: number;
+    marginRightUnit: YGUnit;
+    marginRight: number;
+    marginBottomUnit: YGUnit;
+    marginBottom: number;
+    paddingLeftUnit: YGUnit;
+    paddingLeft: number;
+    paddingTopUnit: YGUnit;
+    paddingTop: number;
+    paddingRightUnit: YGUnit;
+    paddingRight: number;
+    paddingBottomUnit: YGUnit;
+    paddingBottom: number;
+    borderLeft: number;
+    borderTop: number;
+    borderRight: number;
+    borderBottom: number;
+}
+
 declare interface PBVisibilityComponent {
     /** default=true */
     visible?: boolean | undefined;
@@ -2338,13 +2402,13 @@ declare function preEngine(): {
     addEntity: (dynamic?: boolean) => Entity;
     addDynamicEntity: () => Entity;
     removeEntity: (entity: Entity) => boolean;
-    addSystem: (fn: Update, priority?: number, name?: string | undefined) => void;
+    addSystem: (fn: SystemFn, priority?: number, name?: string | undefined) => void;
     getSystems: () => {
-        fn: Update;
+        fn: SystemFn;
         priority: number;
         name?: string | undefined;
     }[];
-    removeSystem: (selector: string | Update) => boolean;
+    removeSystem: (selector: string | SystemFn) => boolean;
     defineComponent: <T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType | undefined) => ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
     defineComponentFromSchema: <T_1 extends ISchema<any>, ConstructorType_1 = EcsResult<T_1>>(spec: T_1, componentId: number, constructorDefault?: ConstructorType_1 | undefined) => ComponentDefinition<T_1, ConstructorType_1>;
     getEntitiesWith: <T_2 extends [ComponentDefinition<ISchema<any>, any>, ...ComponentDefinition<ISchema<any>, any>[]]>(...components: T_2) => Iterable<[Entity, ...ReadonlyComponentSchema<T_2>]>;
@@ -2613,6 +2677,11 @@ declare interface Spec {
 /** @public */
 declare const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
 
+/**
+ * @public
+ */
+declare type SystemFn = (dt: number) => void;
+
 /** @public */
 declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 
@@ -2687,15 +2756,13 @@ declare type Uint32 = number;
 /** @public */
 declare const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
 
-/**
- * @public
- */
-declare type Unpacked<T> = T extends (infer U)[] ? U : T;
+/** @public */
+declare const UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
 
 /**
  * @public
  */
-declare type Update = (dt: number) => void;
+declare type Unpacked<T> = T extends (infer U)[] ? U : T;
 
 /**
  * @public
@@ -2941,6 +3008,78 @@ declare namespace WireMessage {
      */
     function validate(buf: ByteBuffer): boolean;
     function readHeader(buf: ByteBuffer): Header | null;
+}
+
+declare const enum YGAlign {
+    YGAlignAuto = 0,
+    YGAlignFlexStart = 1,
+    YGAlignCenter = 2,
+    YGAlignFlexEnd = 3,
+    YGAlignStretch = 4,
+    YGAlignBaseline = 5,
+    YGAlignSpaceBetween = 6,
+    YGAlignSpaceAround = 7,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGDirection {
+    YGDirectionInherit = 0,
+    YGDirectionLTR = 1,
+    YGDirectionRTL = 2,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGDisplay {
+    YGDisplayFlex = 0,
+    YGDisplayNone = 1,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGFlexDirection {
+    YGFlexDirectionColumn = 0,
+    YGFlexDirectionColumnReverse = 1,
+    YGFlexDirectionRow = 2,
+    YGFlexDirectionRowReverse = 3,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGJustify {
+    YGJustifyFlexStart = 0,
+    YGJustifyCenter = 1,
+    YGJustifyFlexEnd = 2,
+    YGJustifySpaceBetween = 3,
+    YGJustifySpaceAround = 4,
+    YGJustifySpaceEvenly = 5,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGOverflow {
+    YGOverflowVisible = 0,
+    YGOverflowHidden = 1,
+    YGOverflowScroll = 2,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGPositionType {
+    YGPositionTypeStatic = 0,
+    YGPositionTypeRelative = 1,
+    YGPositionTypeAbsolute = 2,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGUnit {
+    YGUnitUndefined = 0,
+    YGUnitPoint = 1,
+    YGUnitPercent = 2,
+    YGUnitAuto = 3,
+    UNRECOGNIZED = -1
+}
+
+declare const enum YGWrap {
+    YGWrapNoWrap = 0,
+    YGWrapWrap = 1,
+    YGWrapWrapReverse = 2,
+    UNRECOGNIZED = -1
 }
 
 

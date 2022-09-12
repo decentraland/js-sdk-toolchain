@@ -1,24 +1,24 @@
 /**
  * @public
  */
-export type Update = (dt: number) => void
+export type SystemFn = (dt: number) => void
 
 export const SYSTEMS_REGULAR_PRIORITY = 100e3
 
-type SystemItem = {
-  fn: Update
+type System = {
+  fn: SystemFn
   priority: number
   name?: string
 }
 
 export function SystemContainer() {
-  const systems: SystemItem[] = []
+  const systems: System[] = []
 
   function sort() {
     systems.sort((a, b) => b.priority - a.priority)
   }
 
-  function add(fn: Update, priority: number, name?: string): void {
+  function add(fn: SystemFn, priority: number, name?: string): void {
     if (systems.find((item) => item.fn === fn)) {
       throw new Error('System already added')
     } else if (name && systems.find((item) => item.name === name)) {
@@ -33,7 +33,7 @@ export function SystemContainer() {
     sort()
   }
 
-  function remove(selector: string | Update) {
+  function remove(selector: string | SystemFn) {
     let index = -1
 
     if (typeof selector === 'string') {

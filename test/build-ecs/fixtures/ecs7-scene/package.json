@@ -15,6 +15,5 @@
   },
   "devDependencies": {
     "@dcl/sdk": "file:../../../../packages/@dcl/sdk"
-  },
-  "bundleDependencies": []
+  }
 }

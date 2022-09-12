@@ -4,7 +4,7 @@ import { Result, Spec } from '../schemas/Map'
 import { Transport } from '../systems/crdt/transports/types'
 import { ComponentDefinition as CompDef, ComponentType } from './component'
 import { Entity } from './entity'
-import { Update } from './systems'
+import { SystemFn } from './systems'
 import { ReadonlyComponentSchema } from './readonly'
 
 export { ISchema } from '../schemas/ISchema'
@@ -60,14 +60,14 @@ export type IEngine = {
    * engine.addSystem(mySystem, 10)
    * ```
    */
-  addSystem(system: Update, priority?: number, name?: string): void
+  addSystem(system: SystemFn, priority?: number, name?: string): void
 
   /**
    * Remove a system from the engine.
    * @param selector the function or the unique name to identify
    * @returns if it was found and removed
    */
-  removeSystem(selector: string | Update): boolean
+  removeSystem(selector: string | SystemFn): boolean
 
   /**
    * Define a component and add it to the engine.
