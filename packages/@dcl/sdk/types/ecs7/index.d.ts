@@ -444,14 +444,6 @@ declare const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCyl
 declare type DeepReadonly<T> = T extends ReadonlyPrimitive ? T : T extends Map<infer K, infer V> ? DeepReadonlyMap<K, V> : T extends Set<infer M> ? DeepReadonlySet<M> : DeepReadonlyObject<T>;
 
 /**
- * Make each field readonly deeply
- * @public
- */
-declare type DeepReadonly_2<T> = {
-    readonly [P in keyof T]: DeepReadonly_2<T[P]>;
-};
-
-/**
  * @public
  */
 declare type DeepReadonlyMap<K, V> = ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>;
@@ -508,9 +500,6 @@ declare function defineSdkComponents(engine: PreEngine): {
  */
 declare const DEG2RAD: number;
 
-/** @public */
-declare type double = number;
-
 /**
  * @public
  */
@@ -532,12 +521,6 @@ declare type Entity = number & {
 
 declare const entitySymbol: unique symbol;
 
-/**
- * Constant used to define the minimal number value in Babylon.js
- * @public
- */
-declare const Epsilon = 0.000001;
-
 declare const error: (message: string | Error, data?: any) => void;
 
 /** Excludes property keys from T where the property is assignable to U */
@@ -551,9 +534,6 @@ declare const enum FilterMode {
     Trilinear = 2,
     UNRECOGNIZED = -1
 }
-
-/** @public */
-declare type float = number;
 
 /** @public */
 declare type FloatArray = number[];
@@ -708,21 +688,6 @@ declare type ISchema<T = any> = {
 };
 
 /**
- * Interface for the size containing width and height
- * @public
- */
-declare interface ISize {
-    /**
-     * Width
-     */
-    width: number;
-    /**
-     * Heighht
-     */
-    height: number;
-}
-
-/**
  * Check if a pointer event has been emited in the last tick-update.
  * @param entity the entity to query, for global clicks use `engine.RootEntity`
  * @param actionButton
@@ -774,11 +739,23 @@ declare namespace Matrix {
         _isIdentity3x2Dirty: boolean;
         _m: Matrix4x4;
     };
-    type ReadonlyMatrix = DeepReadonly_2<MutableMatrix>;
+    type ReadonlyMatrix = {
+        /**
+         * Gets the update flag of the matrix which is an unique number for the matrix.
+         * It will be incremented every time the matrix data change.
+         * You can use it to speed the comparison between two versions of the same matrix.
+         */
+        readonly updateFlag: number;
+        readonly isIdentity: boolean;
+        readonly isIdentity3x2: boolean;
+        readonly _isIdentityDirty: boolean;
+        readonly _isIdentity3x2Dirty: boolean;
+        readonly _m: Matrix4x4;
+    };
     /**
      * Gets the internal data of the matrix
      */
-    function m(self: MutableMatrix): Readonly<Matrix4x4>;
+    function m(self: MutableMatrix): Matrix4x4;
     /**
      * Gets an identity matrix that must not be updated
      */
@@ -793,14 +770,14 @@ declare namespace Matrix {
      * @param offset - defines an offset in the source array
      * @returns a new Matrix set from the starting index of the given array
      */
-    function fromArray(array: ArrayLike<number>, offset?: number): MutableMatrix;
+    function fromArray(array: Matrix4x4, offset?: number): MutableMatrix;
     /**
      * Copy the content of an array into a given matrix
      * @param array - defines the source array
      * @param offset - defines an offset in the source array
      * @param result - defines the target matrix
      */
-    function fromArrayToRef(array: ArrayLike<number>, offset: number, result: MutableMatrix): void;
+    function fromArrayToRef(array: Matrix4x4, offset: number, result: MutableMatrix): void;
     /**
      * Stores an array into a matrix after having multiplied each component by a given factor
      * @param array - defines the source array
@@ -1246,12 +1223,12 @@ declare namespace Matrix {
      * Returns the matrix as a FloatArray
      * @returns the matrix underlying array
      */
-    function toArray(self: ReadonlyMatrix): Readonly<FloatArray>;
+    function toArray(self: ReadonlyMatrix): Matrix4x4;
     /**
      * Returns the matrix as a FloatArray
      * @returns the matrix underlying array.
      */
-    function asArray(self: ReadonlyMatrix): Readonly<FloatArray>;
+    function asArray(self: ReadonlyMatrix): Matrix4x4;
     /**
      * Sets all the matrix elements to zero
      * @returns the current matrix
@@ -1465,9 +1442,6 @@ declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial
 
 /** @public */
 declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
-
-/** @public */
-declare type Nullable<T> = T | null;
 
 /**
  * The Observable class is a simple implementation of the Observable pattern.
@@ -1814,19 +1788,6 @@ declare const onVideoEvent: Observable<{
     currentOffset: number;
     totalVideoLength: number;
 }>;
-
-/**
- * Defines potential orientation for back face culling
- * @public
- */
-declare enum Orientation {
-    /**
-     * Clockwise
-     */
-    CW = 0,
-    /** Counter clockwise */
-    CCW = 1
-}
 
 declare interface PBAnimationState {
     name: string;
@@ -2301,7 +2262,16 @@ declare namespace Plane {
          */
         d: number;
     };
-    type ReadonlyPlane = DeepReadonly_2<MutablePlane>;
+    type ReadonlyPlane = {
+        /**
+         * Normal of the plane (a,b,c)
+         */
+        normal: Vector3.ReadonlyVector3;
+        /**
+         * d component of the plane
+         */
+        d: number;
+    };
     /**
      * Creates a Plane object according to the given floats a, b, c, d and the plane equation : ax + by + cz + d = 0
      * @param a - a component of the plane
@@ -2318,7 +2288,7 @@ declare namespace Plane {
      * @param array - the array to create a plane from
      * @returns a new Plane from the given array.
      */
-    function fromArray(array: ArrayLike<number>): MutablePlane;
+    function fromArray(array: number[]): MutablePlane;
     /**
      * Creates a plane from three points
      * @param point1 - point used to create the plane
@@ -2456,7 +2426,12 @@ declare namespace Quaternion {
     /**
      * @public
      */
-    export type ReadonlyQuaternion = DeepReadonly_2<MutableQuaternion>;
+    export type ReadonlyQuaternion = {
+        readonly y: number;
+        readonly x: number;
+        readonly z: number;
+        readonly w: number;
+    };
     /**
      * Creates a new Quaternion from the given floats
      * @param x - defines the first component (0 by default)
@@ -2599,6 +2574,22 @@ declare namespace Quaternion {
     export function multiplyToRef(self: ReadonlyQuaternion, q1: ReadonlyQuaternion, result: MutableQuaternion): void;
     export function angleAxis(degress: number, axis: Vector3.ReadonlyVector3): MutableQuaternion;
     /**
+     * Creates a new quaternion containing the rotation value to reach the target (axis1, axis2, axis3) orientation as a rotated XYZ system (axis1, axis2 and axis3 are normalized during this operation)
+     * @param axis1 - defines the first axis
+     * @param axis2 - defines the second axis
+     * @param axis3 - defines the third axis
+     * @returns the new quaternion
+     */
+    export function rotationQuaternionFromAxis(axis1: Vector3.ReadonlyVector3, axis2: Vector3.ReadonlyVector3, axis3: Vector3.ReadonlyVector3): MutableQuaternion;
+    /**
+     * Creates a rotation value to reach the target (axis1, axis2, axis3) orientation as a rotated XYZ system (axis1, axis2 and axis3 are normalized during this operation) and stores it in the target quaternion
+     * @param axis1 - defines the first axis
+     * @param axis2 - defines the second axis
+     * @param axis3 - defines the third axis
+     * @param ref - defines the target quaternion
+     */
+    export function rotationQuaternionFromAxisToRef(axis1: Vector3.ReadonlyVector3, axis2: Vector3.ReadonlyVector3, axis3: Vector3.ReadonlyVector3, ref: MutableQuaternion): void;
+    /**
      * Returns a zero filled quaternion
      */
     export function Zero(): MutableQuaternion;
@@ -2688,19 +2679,6 @@ declare namespace Schemas {
 declare type SdkComponents = ReturnType<typeof defineSdkComponents>;
 
 /**
- * Defines supported spaces
- * @public
- */
-declare enum Space {
-    /** Local (object) space */
-    LOCAL = 0,
-    /** World space */
-    WORLD = 1,
-    /** Bone space */
-    BONE = 2
-}
-
-/**
  * @public
  */
 declare interface Spec {
@@ -2732,18 +2710,6 @@ declare const enum TextureWrapMode {
     MirrorOnce = 3,
     UNRECOGNIZED = -1
 }
-
-/**
- * Constant used to convert a value to gamma space
- * @public
- */
-declare const ToGammaSpace: number;
-
-/**
- * Constant used to convert a value to linear space
- * @public
- */
-declare const ToLinearSpace = 2.2;
 
 declare type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
@@ -2812,14 +2778,23 @@ declare namespace Vector3 {
      * @public
      */
     export type MutableVector3 = {
-        y: number;
         x: number;
+        y: number;
         z: number;
     };
     /**
      * @public
      */
-    export type ReadonlyVector3 = DeepReadonly_2<MutableVector3>;
+    export type ReadonlyVector3 = {
+        readonly x: number;
+        readonly y: number;
+        readonly z: number;
+    };
+    /**
+     * Gets a boolean indicating that the vector is non uniform meaning x, y or z are not all the same
+     * @param vector - vector to check
+     */
+    export function isNonUniform(vector: ReadonlyVector3): boolean;
     /**
      * Creates a new Vector3 object from the given x, y, z (floats) coordinates.
      * @param x - defines the first coordinates (on X axis)
@@ -2847,30 +2822,99 @@ declare namespace Vector3 {
      */
     export function add(vector1: ReadonlyVector3, vector2: ReadonlyVector3): MutableVector3;
     /**
-     * Returns a new Vector3 as the result of the substraction of the two given vectors.
-     * @returns the resulting vector
+     * Add component by component the vector2 into dest
+     * @param dest - the first vector and destination of addition
+     * @param vector2 - the second vector
      */
-    export function subtract(minuend: ReadonlyVector3, subtrahend: ReadonlyVector3): MutableVector3;
+    export function addToRef(vector1: ReadonlyVector3, vector2: ReadonlyVector3, result: MutableVector3): void;
     /**
      * Returns a new Vector3 as the result of the substraction of the two given vectors.
      * @returns the resulting vector
      */
-    export function subtractToRef(minuend: ReadonlyVector3, subtrahend: ReadonlyVector3, result: MutableVector3): void;
+    export function subtract(vector1: ReadonlyVector3, vector2: ReadonlyVector3): MutableVector3;
+    /**
+     * Returns a new Vector3 as the result of the substraction of the two given vectors.
+     * @returns the resulting vector
+     */
+    export function subtractToRef(vector1: ReadonlyVector3, vector2: ReadonlyVector3, result: MutableVector3): void;
+    /**
+     * Subtracts the given floats from the current Vector3 coordinates and set the given vector "result" with this result
+     * @param x - defines the x coordinate of the operand
+     * @param y - defines the y coordinate of the operand
+     * @param z - defines the z coordinate of the operand
+     * @param result - defines the Vector3 object where to store the result
+     */
+    export function subtractFromFloatsToRef(vector1: ReadonlyVector3, x: number, y: number, z: number, result: MutableVector3): void;
     /**
      * Returns a new Vector3 with the other sign
      * @returns the resulting vector
      */
-    export function opposite(value: ReadonlyVector3): MutableVector3;
+    export function negate(value: ReadonlyVector3): MutableVector3;
     /**
      * Copy source into dest
      *
      */
     export function copy(source: ReadonlyVector3, dest: MutableVector3): void;
     /**
+     * Sets the given vector "dest" with the given floats.
+     * @param x - defines the x coordinate of the source
+     * @param y - defines the y coordinate of the source
+     * @param z - defines the z coordinate of the source
+     * @param dest - defines the Vector3 where to store the result
+     */
+    export function copyFromFloats(x: number, y: number, z: number, dest: MutableVector3): void;
+    /**
      * Returns a new Vector3 with the same value
      * @returns the resulting vector
      */
     export function clone(source: ReadonlyVector3): MutableVector3;
+    /**
+     * Get the clip factor between two vectors
+     * @param vector0 - defines the first operand
+     * @param vector1 - defines the second operand
+     * @param axis - defines the axis to use
+     * @param size - defines the size along the axis
+     * @returns the clip factor
+     */
+    export function getClipFactor(vector0: ReadonlyVector3, vector1: ReadonlyVector3, axis: ReadonlyVector3, size: number): number;
+    /**
+     * Get angle between two vectors
+     * @param vector0 - angle between vector0 and vector1
+     * @param vector1 - angle between vector0 and vector1
+     * @param normal - direction of the normal
+     * @returns the angle between vector0 and vector1
+     */
+    export function getAngleBetweenVectors(vector0: ReadonlyVector3, vector1: ReadonlyVector3, normal: ReadonlyVector3): number;
+    /**
+     * Returns a new Vector3 set from the index "offset" of the given array
+     * @param array - defines the source array
+     * @param offset - defines the offset in the source array
+     * @returns the new Vector3
+     */
+    export function fromArray(array: FloatArray, offset?: number): MutableVector3;
+    /**
+     * Returns a new Vector3 set from the index "offset" of the given FloatArray
+     * This function is deprecated.  Use FromArray instead
+     * @param array - defines the source array
+     * @param offset - defines the offset in the source array
+     * @returns the new Vector3
+     */
+    export function fromFloatArray(array: FloatArray, offset?: number): MutableVector3;
+    /**
+     * Sets the given vector "result" with the element values from the index "offset" of the given array
+     * @param array - defines the source array
+     * @param offset - defines the offset in the source array
+     * @param result - defines the Vector3 where to store the result
+     */
+    export function fromArrayToRef(array: number[], offset: number, result: MutableVector3): void;
+    /**
+     * Sets the given vector "result" with the element values from the index "offset" of the given FloatArray
+     * This function is deprecated.  Use FromArrayToRef instead.
+     * @param array - defines the source array
+     * @param offset - defines the offset in the source array
+     * @param result - defines the Vector3 where to store the result
+     */
+    export function fromFloatArrayToRef(array: FloatArray, offset: number, result: MutableVector3): void;
     /**
      * Gets the length of the Vector3
      * @returns the length of the Vecto3
@@ -2927,12 +2971,30 @@ declare namespace Vector3 {
      */
     export function dot(left: ReadonlyVector3, right: ReadonlyVector3): number;
     /**
+     * Multiplies this vector (with an implicit 1 in the 4th dimension) and m, and divides by perspective
+     * @param matrix - The transformation matrix
+     * @returns result Vector3
+     */
+    export function applyMatrix4(vector: ReadonlyVector3, matrix: Matrix.ReadonlyMatrix): MutableVector3;
+    /**
+     * Multiplies this vector (with an implicit 1 in the 4th dimension) and m, and divides by perspective and set the given vector "result" with this result
+     * @param matrix - The transformation matrix
+     * @param result - defines the Vector3 object where to store the result
+     */
+    export function applyMatrix4ToRef(vector: ReadonlyVector3, matrix: Matrix.ReadonlyMatrix, result: MutableVector3): void;
+    /**
+     * Rotates the current Vector3 based on the given quaternion
+     * @param q - defines the Quaternion
+     * @returns the current Vector3
+     */
+    export function rotate(vector: ReadonlyVector3, q: Quaternion.ReadonlyQuaternion): MutableVector3;
+    /**
      * Rotates current Vector3 based on the given quaternion, but applies the rotation to target Vector3.
      * @param q - defines the Quaternion
      * @param result - defines the target Vector3
      * @returns the current Vector3
      */
-    export function rotate(vector: ReadonlyVector3, q: Quaternion.ReadonlyQuaternion): MutableVector3;
+    export function rotateToRef(vector: ReadonlyVector3, q: Quaternion.ReadonlyQuaternion, result: MutableVector3): void;
     /**
      * Returns a new Vector3 located for "amount" (float) on the linear interpolation between the vectors "start" and "end"
      * @param start - defines the start value
@@ -2965,6 +3027,253 @@ declare namespace Vector3 {
      * @param result - defines the Vector3 where to store the result
      */
     export function crossToRef(left: ReadonlyVector3, right: ReadonlyVector3, result: MutableVector3): void;
+    /**
+     * Returns a new Vector3 set with the result of the transformation by the given matrix of the given vector.
+     * This method computes tranformed coordinates only, not transformed direction vectors (ie. it takes translation in account)
+     * @param vector - defines the Vector3 to transform
+     * @param transformation - defines the transformation matrix
+     * @returns the transformed Vector3
+     */
+    export function transformCoordinates(vector: ReadonlyVector3, transformation: Matrix.ReadonlyMatrix): MutableVector3;
+    /**
+     * Sets the given vector "result" coordinates with the result of the transformation by the given matrix of the given vector
+     * This method computes tranformed coordinates only, not transformed direction vectors (ie. it takes translation in account)
+     * @param vector - defines the Vector3 to transform
+     * @param transformation - defines the transformation matrix
+     * @param result - defines the Vector3 where to store the result
+     */
+    export function transformCoordinatesToRef(vector: ReadonlyVector3, transformation: Matrix.ReadonlyMatrix, result: MutableVector3): void;
+    /**
+     * Sets the given vector "result" coordinates with the result of the transformation by the given matrix of the given floats (x, y, z)
+     * This method computes tranformed coordinates only, not transformed direction vectors
+     * @param x - define the x coordinate of the source vector
+     * @param y - define the y coordinate of the source vector
+     * @param z - define the z coordinate of the source vector
+     * @param transformation - defines the transformation matrix
+     * @param result - defines the Vector3 where to store the result
+     */
+    export function transformCoordinatesFromFloatsToRef(x: number, y: number, z: number, transformation: Matrix.ReadonlyMatrix, result: MutableVector3): void;
+    /**
+     * Returns a new Vector3 set with the result of the normal transformation by the given matrix of the given vector
+     * This methods computes transformed normalized direction vectors only (ie. it does not apply translation)
+     * @param vector - defines the Vector3 to transform
+     * @param transformation - defines the transformation matrix
+     * @returns the new Vector3
+     */
+    export function transformNormal(vector: ReadonlyVector3, transformation: Matrix.ReadonlyMatrix): MutableVector3;
+    /**
+     * Sets the given vector "result" with the result of the normal transformation by the given matrix of the given vector
+     * This methods computes transformed normalized direction vectors only (ie. it does not apply translation)
+     * @param vector - defines the Vector3 to transform
+     * @param transformation - defines the transformation matrix
+     * @param result - defines the Vector3 where to store the result
+     */
+    export function transformNormalToRef(vector: ReadonlyVector3, transformation: Matrix.ReadonlyMatrix, result: MutableVector3): void;
+    /**
+     * Sets the given vector "result" with the result of the normal transformation by the given matrix of the given floats (x, y, z)
+     * This methods computes transformed normalized direction vectors only (ie. it does not apply translation)
+     * @param x - define the x coordinate of the source vector
+     * @param y - define the y coordinate of the source vector
+     * @param z - define the z coordinate of the source vector
+     * @param transformation - defines the transformation matrix
+     * @param result - defines the Vector3 where to store the result
+     */
+    export function transformNormalFromFloatsToRef(x: number, y: number, z: number, transformation: Matrix.ReadonlyMatrix, result: MutableVector3): void;
+    /**
+     * Returns a new Vector3 located for "amount" on the CatmullRom interpolation spline defined by the vectors "value1", "value2", "value3", "value4"
+     * @param value1 - defines the first control point
+     * @param value2 - defines the second control point
+     * @param value3 - defines the third control point
+     * @param value4 - defines the fourth control point
+     * @param amount - defines the amount on the spline to use
+     * @returns the new Vector3
+     */
+    export function catmullRom(value1: ReadonlyVector3, value2: ReadonlyVector3, value3: ReadonlyVector3, value4: ReadonlyVector3, amount: number): MutableVector3;
+    /**
+     * Returns a new Vector3 set with the coordinates of "value", if the vector "value" is in the cube defined by the vectors "min" and "max"
+     * If a coordinate value of "value" is lower than one of the "min" coordinate, then this "value" coordinate is set with the "min" one
+     * If a coordinate value of "value" is greater than one of the "max" coordinate, then this "value" coordinate is set with the "max" one
+     * @param value - defines the current value
+     * @param min - defines the lower range value
+     * @param max - defines the upper range value
+     * @returns the new Vector3
+     */
+    export function clamp(value: ReadonlyVector3, min: ReadonlyVector3, max: ReadonlyVector3): MutableVector3;
+    /**
+     * Sets the given vector "result" with the coordinates of "value", if the vector "value" is in the cube defined by the vectors "min" and "max"
+     * If a coordinate value of "value" is lower than one of the "min" coordinate, then this "value" coordinate is set with the "min" one
+     * If a coordinate value of "value" is greater than one of the "max" coordinate, then this "value" coordinate is set with the "max" one
+     * @param value - defines the current value
+     * @param min - defines the lower range value
+     * @param max - defines the upper range value
+     * @param result - defines the Vector3 where to store the result
+     */
+    export function clampToRef(value: ReadonlyVector3, min: ReadonlyVector3, max: ReadonlyVector3, result: MutableVector3): void;
+    /**
+     * Returns a new Vector3 located for "amount" (float) on the Hermite interpolation spline defined by the vectors "value1", "tangent1", "value2", "tangent2"
+     * @param value1 - defines the first control point
+     * @param tangent1 - defines the first tangent vector
+     * @param value2 - defines the second control point
+     * @param tangent2 - defines the second tangent vector
+     * @param amount - defines the amount on the interpolation spline (between 0 and 1)
+     * @returns the new Vector3
+     */
+    export function hermite(value1: ReadonlyVector3, tangent1: ReadonlyVector3, value2: ReadonlyVector3, tangent2: ReadonlyVector3, amount: number): MutableVector3;
+    /**
+     * Gets the minimal coordinate values between two Vector3
+     * @param left - defines the first operand
+     * @param right - defines the second operand
+     * @returns the new Vector3
+     */
+    export function minimize(left: ReadonlyVector3, right: ReadonlyVector3): MutableVector3;
+    /**
+     * Gets the maximal coordinate values between two Vector3
+     * @param left - defines the first operand
+     * @param right - defines the second operand
+     * @returns the new Vector3
+     */
+    export function maximize(left: MutableVector3, right: MutableVector3): MutableVector3;
+    /**
+     * Returns the distance between the vectors "value1" and "value2"
+     * @param value1 - defines the first operand
+     * @param value2 - defines the second operand
+     * @returns the distance
+     */
+    export function distance(value1: ReadonlyVector3, value2: ReadonlyVector3): number;
+    /**
+     * Returns the squared distance between the vectors "value1" and "value2"
+     * @param value1 - defines the first operand
+     * @param value2 - defines the second operand
+     * @returns the squared distance
+     */
+    export function distanceSquared(value1: ReadonlyVector3, value2: ReadonlyVector3): number;
+    /**
+     * Returns a new Vector3 located at the center between "value1" and "value2"
+     * @param value1 - defines the first operand
+     * @param value2 - defines the second operand
+     * @returns the new Vector3
+     */
+    export function center(value1: ReadonlyVector3, value2: ReadonlyVector3): MutableVector3;
+    /**
+     * Given three orthogonal normalized left-handed oriented Vector3 axis in space (target system),
+     * RotationFromAxis() returns the rotation Euler angles (ex : rotation.x, rotation.y, rotation.z) to apply
+     * to something in order to rotate it from its local system to the given target system
+     * Note: axis1, axis2 and axis3 are normalized during this operation
+     * @param axis1 - defines the first axis
+     * @param axis2 - defines the second axis
+     * @param axis3 - defines the third axis
+     * @returns a new Vector3
+     */
+    export function rotationFromAxis(axis1: MutableVector3, axis2: MutableVector3, axis3: MutableVector3): MutableVector3;
+    /**
+     * The same than RotationFromAxis but updates the given ref Vector3 parameter instead of returning a new Vector3
+     * @param axis1 - defines the first axis
+     * @param axis2 - defines the second axis
+     * @param axis3 - defines the third axis
+     * @param ref - defines the Vector3 where to store the result
+     */
+    export function rotationFromAxisToRef(axis1: MutableVector3, axis2: MutableVector3, axis3: MutableVector3, result: MutableVector3): void;
+    /**
+     * Creates a string representation of the Vector3
+     * @returns a string with the Vector3 coordinates.
+     */
+    export function toString(vector: ReadonlyVector3): string;
+    /**
+     * Creates the Vector3 hash code
+     * @returns a number which tends to be unique between Vector3 instances
+     */
+    export function getHashCode(vector: ReadonlyVector3): number;
+    /**
+     * Returns true if the vector1 and the vector2 coordinates are strictly equal
+     * @param vector1 - defines the first operand
+     * @param vector2 - defines the second operand
+     * @returns true if both vectors are equals
+     */
+    export function equals(vector1: ReadonlyVector3, vector2: ReadonlyVector3): boolean;
+    /**
+     * Returns true if the current Vector3 and the given vector coordinates are distant less than epsilon
+     * @param otherVector - defines the second operand
+     * @param epsilon - defines the minimal distance to define values as equals
+     * @returns true if both vectors are distant less than epsilon
+     */
+    export function equalsWithEpsilon(vector1: ReadonlyVector3, vector2: ReadonlyVector3, epsilon?: number): boolean;
+    /**
+     * Returns true if the current Vector3 coordinates equals the given floats
+     * @param x - defines the x coordinate of the operand
+     * @param y - defines the y coordinate of the operand
+     * @param z - defines the z coordinate of the operand
+     * @returns true if both vectors are equals
+     */
+    export function equalsToFloats(vector: ReadonlyVector3, x: number, y: number, z: number): boolean;
+    /**
+     * Returns a new Vector3, result of the multiplication of vector1 by the vector2
+     * @param vector1 - defines the first operand
+     * @param vector2 - defines the second operand
+     * @returns the new Vector3
+     */
+    export function multiply(vector1: ReadonlyVector3, vector2: ReadonlyVector3): MutableVector3;
+    /**
+     * Multiplies the current Vector3 by the given one and stores the result in the given vector "result"
+     * @param otherVector - defines the second operand
+     * @param result - defines the Vector3 object where to store the result
+     * @returns the current Vector3
+     */
+    export function multiplyToRef(vector1: ReadonlyVector3, vector2: ReadonlyVector3, result: MutableVector3): void;
+    /**
+     * Returns a new Vector3 set with the result of the mulliplication of the current Vector3 coordinates by the given floats
+     * @param x - defines the x coordinate of the operand
+     * @param y - defines the y coordinate of the operand
+     * @param z - defines the z coordinate of the operand
+     * @returns the new Vector3
+     */
+    export function multiplyByFloatsToRef(vector1: ReadonlyVector3, x: number, y: number, z: number, result: MutableVector3): void;
+    /**
+     * Returns a new Vector3 set with the result of the mulliplication of the current Vector3 coordinates by the given floats
+     * @param x - defines the x coordinate of the operand
+     * @param y - defines the y coordinate of the operand
+     * @param z - defines the z coordinate of the operand
+     * @returns the new Vector3
+     */
+    export function multiplyByFloats(vector1: ReadonlyVector3, x: number, y: number, z: number): MutableVector3;
+    /**
+     * Returns a new Vector3 set with the result of the division of the current Vector3 coordinates by the given ones
+     * @param otherVector - defines the second operand
+     * @returns the new Vector3
+     */
+    export function divide(vector1: ReadonlyVector3, vector2: ReadonlyVector3): MutableVector3;
+    /**
+     * Divides the current Vector3 coordinates by the given ones and stores the result in the given vector "result"
+     * @param otherVector - defines the second operand
+     * @param result - defines the Vector3 object where to store the result
+     * @returns the current Vector3
+     */
+    export function divideToRef(vector1: ReadonlyVector3, vector2: ReadonlyVector3, result: MutableVector3): void;
+    /**
+     * Set result Vector3 with the maximal coordinate values between vector1 and the given coordinates
+     * @param x - defines the x coordinate of the operand
+     * @param y - defines the y coordinate of the operand
+     * @param z - defines the z coordinate of the operand
+     * @param result - the set Vector3
+     */
+    export function maximizeInPlaceFromFloatsToRef(vector1: ReadonlyVector3, x: number, y: number, z: number, result: MutableVector3): void;
+    /**
+     * Set result Vector3 with the minimal coordinate values between vector1 and the given coordinates
+     * @param x - defines the x coordinate of the operand
+     * @param y - defines the y coordinate of the operand
+     * @param z - defines the z coordinate of the operand
+     * @param result - the set Vector3
+     */
+    export function minimizeInPlaceFromFloatsToRef(vector1: ReadonlyVector3, x: number, y: number, z: number, result: MutableVector3): void;
+    /**
+     * Gets a new Vector3 from vector1 floored values
+     * @returns a new Vector3
+     */
+    export function floor(vector1: ReadonlyVector3): MutableVector3;
+    /**
+     * Gets a new Vector3 from vector1 floored values
+     * @returns a new Vector3
+     */
+    export function fract(vector1: ReadonlyVector3): MutableVector3;
     /**
      * Returns a new Vector3 set to (0.0, 0.0, 0.0)
      * @returns a new empty Vector3
@@ -3005,6 +3314,11 @@ declare namespace Vector3 {
      * @returns a new left Vector3
      */
     export function Left(): MutableVector3;
+    /**
+     * Returns a new random Vector3
+     * @returns a random Vector3
+     */
+    export function Random(): MutableVector3;
 }
 
 declare interface Vector3_2 {
