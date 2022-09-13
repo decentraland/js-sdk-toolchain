@@ -3220,6 +3220,35 @@
             },
             {
               "kind": "Property",
+              "canonicalReference": "@dcl/legacy-ecs!AvatarShape#emotes:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "emotes: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "emotes",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false
+            },
+            {
+              "kind": "Property",
               "canonicalReference": "@dcl/legacy-ecs!AvatarShape#expressionTriggerId:member",
               "docComment": "",
               "excerptTokens": [
