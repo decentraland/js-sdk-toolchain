@@ -219,9 +219,6 @@ export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 export const DEG2RAD: number;
 
 // @public (undocumented)
-export type double = number;
-
-// @public (undocumented)
 export function Engine({ transports }?: IEngineParams): IEngine;
 
 // Warning: (ae-missing-release-tag) "engine" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -234,19 +231,10 @@ export type Entity = number & {
     [entitySymbol]: true;
 };
 
-// @public
-export const Epsilon = 0.000001;
-
 // Warning: (ae-missing-release-tag) "error" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export const error: (message: string | Error, data?: any) => void;
-
-// @public (undocumented)
-export type float = number;
-
-// @public (undocumented)
-export type FloatArray = number[];
 
 // @public (undocumented)
 export const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
@@ -277,12 +265,6 @@ export type ISchema<T = any> = {
     deserialize(reader: ByteBuffer): T;
     create(): T;
 };
-
-// @public
-export interface ISize {
-    height: number;
-    width: number;
-}
 
 // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
@@ -315,9 +297,6 @@ export const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<
 
 // @public (undocumented)
 export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
-
-// @public (undocumented)
-export type Nullable<T> = T | null;
 
 // Warning: (ae-missing-release-tag) "Observable" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -463,12 +442,6 @@ export const onVideoEvent: Observable<{
     totalVideoLength: number;
 }>;
 
-// @public
-export enum Orientation {
-    CCW = 1,
-    CW = 0
-}
-
 // @public (undocumented)
 export const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
 
@@ -603,13 +576,6 @@ export namespace Schemas {
 // @public (undocumented)
 export type SdkComponents = ReturnType<typeof defineSdkComponents>;
 
-// @public
-export enum Space {
-    BONE = 2,
-    LOCAL = 0,
-    WORLD = 1
-}
-
 // @public (undocumented)
 export interface Spec {
     // (undocumented)
@@ -624,12 +590,6 @@ export type SystemFn = (dt: number) => void;
 
 // @public (undocumented)
 export const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
-
-// @public
-export const ToGammaSpace: number;
-
-// @public
-export const ToLinearSpace = 2.2;
 
 // @public (undocumented)
 export const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
@@ -691,6 +651,7 @@ export namespace Vector3 {
     export function floor(vector1: ReadonlyVector3): MutableVector3;
     export function Forward(): MutableVector3;
     export function fract(vector1: ReadonlyVector3): MutableVector3;
+    // Warning: (ae-forgotten-export) The symbol "FloatArray" needs to be exported by the entry point index.d.ts
     export function fromArray(array: FloatArray, offset?: number): MutableVector3;
     export function fromArrayToRef(array: number[], offset: number, result: MutableVector3): void;
     export function fromFloatArray(array: FloatArray, offset?: number): MutableVector3;

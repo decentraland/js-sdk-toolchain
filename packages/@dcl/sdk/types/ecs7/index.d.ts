@@ -500,9 +500,6 @@ declare function defineSdkComponents(engine: PreEngine): {
  */
 declare const DEG2RAD: number;
 
-/** @public */
-declare type double = number;
-
 /**
  * @public
  */
@@ -524,12 +521,6 @@ declare type Entity = number & {
 
 declare const entitySymbol: unique symbol;
 
-/**
- * Constant used to define the minimal number value in Babylon.js
- * @public
- */
-declare const Epsilon = 0.000001;
-
 declare const error: (message: string | Error, data?: any) => void;
 
 /** Excludes property keys from T where the property is assignable to U */
@@ -543,9 +534,6 @@ declare const enum FilterMode {
     Trilinear = 2,
     UNRECOGNIZED = -1
 }
-
-/** @public */
-declare type float = number;
 
 /** @public */
 declare type FloatArray = number[];
@@ -698,21 +686,6 @@ declare type ISchema<T = any> = {
     deserialize(reader: ByteBuffer): T;
     create(): T;
 };
-
-/**
- * Interface for the size containing width and height
- * @public
- */
-declare interface ISize {
-    /**
-     * Width
-     */
-    width: number;
-    /**
-     * Heighht
-     */
-    height: number;
-}
 
 /**
  * Check if a pointer event has been emited in the last tick-update.
@@ -1470,9 +1443,6 @@ declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial
 /** @public */
 declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
 
-/** @public */
-declare type Nullable<T> = T | null;
-
 /**
  * The Observable class is a simple implementation of the Observable pattern.
  *
@@ -1818,19 +1788,6 @@ declare const onVideoEvent: Observable<{
     currentOffset: number;
     totalVideoLength: number;
 }>;
-
-/**
- * Defines potential orientation for back face culling
- * @public
- */
-declare enum Orientation {
-    /**
-     * Clockwise
-     */
-    CW = 0,
-    /** Counter clockwise */
-    CCW = 1
-}
 
 declare interface PBAnimationState {
     name: string;
@@ -2722,19 +2679,6 @@ declare namespace Schemas {
 declare type SdkComponents = ReturnType<typeof defineSdkComponents>;
 
 /**
- * Defines supported spaces
- * @public
- */
-declare enum Space {
-    /** Local (object) space */
-    LOCAL = 0,
-    /** World space */
-    WORLD = 1,
-    /** Bone space */
-    BONE = 2
-}
-
-/**
  * @public
  */
 declare interface Spec {
@@ -2766,18 +2710,6 @@ declare const enum TextureWrapMode {
     MirrorOnce = 3,
     UNRECOGNIZED = -1
 }
-
-/**
- * Constant used to convert a value to gamma space
- * @public
- */
-declare const ToGammaSpace: number;
-
-/**
- * Constant used to convert a value to linear space
- * @public
- */
-declare const ToLinearSpace = 2.2;
 
 declare type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
