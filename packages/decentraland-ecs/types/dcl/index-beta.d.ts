@@ -343,6 +343,7 @@ export declare class AvatarShape extends ObservableComponent {
     expressionTriggerTimestamp: number;
     bodyShape: WearableId;
     wearables: WearableId[];
+    emotes: string[];
     skinColor: ReadOnlyColor4;
     hairColor: ReadOnlyColor4;
     eyeColor: ReadOnlyColor4;
