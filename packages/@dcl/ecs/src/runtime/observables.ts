@@ -12,24 +12,6 @@ function createSubscriber(eventName: keyof IEvents) {
 }
 
 /**
- * This event is triggered when you change your camera between 1st and 3rd person
- * @public
- * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
- */
-export const onCameraModeChangedObservable = new Observable<
-  IEvents['cameraModeChanged']
->(createSubscriber('cameraModeChanged'))
-
-/**
- * This event is triggered when you change your camera between 1st and 3rd person
- * @public
- * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
- */
-export const onIdleStateChangedObservable = new Observable<
-  IEvents['idleStateChanged']
->(createSubscriber('idleStateChanged'))
-
-/**
  * These events are triggered after your character enters the scene.
  * @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
@@ -73,14 +55,6 @@ export const onSceneReadyObservable = new Observable<IEvents['sceneStart']>(
 export const onPlayerExpressionObservable = new Observable<
   IEvents['playerExpression']
 >(createSubscriber('playerExpression'))
-
-/**
- * @public
- * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
- */
-export const onPointerLockedStateChange = new Observable<
-  IEvents['onPointerLock']
->(createSubscriber('onPointerLock'))
 
 /**
  * @public
@@ -151,18 +125,6 @@ export function _initEventObservables() {
           )
           return
         }
-        case 'cameraModeChanged': {
-          onCameraModeChangedObservable.notifyObservers(
-            event.data as IEvents['cameraModeChanged']
-          )
-          return
-        }
-        case 'idleStateChanged': {
-          onIdleStateChangedObservable.notifyObservers(
-            event.data as IEvents['idleStateChanged']
-          )
-          return
-        }
         case 'sceneStart': {
           onSceneReadyObservable.notifyObservers(
             event.data as IEvents['sceneStart']
@@ -183,12 +145,6 @@ export function _initEventObservables() {
         case 'profileChanged': {
           onProfileChanged.notifyObservers(
             event.data as IEvents['profileChanged']
-          )
-          return
-        }
-        case 'onPointerLock': {
-          onPointerLockedStateChange.notifyObservers(
-            event.data as IEvents['onPointerLock']
           )
           return
         }

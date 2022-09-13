@@ -295,6 +295,17 @@ export const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<
 // @public (undocumented)
 export const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
 
+// Warning: (tsdoc-missing-deprecation-message) The @deprecated block must include a deprecation message, e.g. describing the recommended alternative
+//
+// @public @deprecated (undocumented)
+export class MessageBus {
+    constructor();
+    // (undocumented)
+    emit(message: string, payload: Record<any, any>): void;
+    // (undocumented)
+    on(message: string, callback: (value: any, sender: string) => void): Observer<IEvents['comms']>;
+}
+
 // @public (undocumented)
 export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
 
@@ -344,11 +355,6 @@ export class ObserverEventState {
     target?: any;
 }
 
-// @public @deprecated
-export const onCameraModeChangedObservable: Observable<{
-    cameraMode: 0 | 1 | 2;
-}>;
-
 // @public @deprecated (undocumented)
 export const onEnterScene: Observable<{
     userId: string;
@@ -357,11 +363,6 @@ export const onEnterScene: Observable<{
 // @public @deprecated
 export const onEnterSceneObservable: Observable<{
     userId: string;
-}>;
-
-// @public @deprecated
-export const onIdleStateChangedObservable: Observable<{
-    isIdle: boolean;
 }>;
 
 // @public @deprecated (undocumented)
@@ -404,11 +405,6 @@ export const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPo
 
 // @public (undocumented)
 export const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-
-// @public @deprecated (undocumented)
-export const onPointerLockedStateChange: Observable<{
-    locked?: boolean | undefined;
-}>;
 
 // @public (undocumented)
 export const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
