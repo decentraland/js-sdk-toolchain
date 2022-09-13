@@ -1,33 +1,3 @@
-import {
-  DEG2RAD,
-  double,
-  Epsilon,
-  float,
-  FloatArray,
-  ISize,
-  Nullable,
-  Orientation,
-  Quaternion,
-  RAD2DEG,
-  Space,
-  ToGammaSpace,
-  ToLinearSpace,
-  Vector3
-} from '@dcl/ecs-math'
+import { DEG2RAD, Quaternion, RAD2DEG, Vector3 } from '@dcl/ecs-math'
 
-export {
-  DEG2RAD,
-  double,
-  Epsilon,
-  float,
-  FloatArray,
-  ISize,
-  Nullable,
-  Orientation,
-  Quaternion,
-  RAD2DEG,
-  Space,
-  ToGammaSpace,
-  ToLinearSpace,
-  Vector3
-}
+export { DEG2RAD, RAD2DEG, Quaternion, Vector3 }
