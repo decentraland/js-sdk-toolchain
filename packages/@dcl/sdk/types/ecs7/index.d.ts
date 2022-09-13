@@ -231,7 +231,7 @@ declare namespace Components {
     /** @public */
     const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     /** @public */
-    const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+    const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
     /** @public */
     const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
     /** @public */
@@ -471,6 +471,7 @@ declare type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 declare function defineSdkComponents(engine: PreEngine): {
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
+    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
     Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
@@ -483,7 +484,6 @@ declare function defineSdkComponents(engine: PreEngine): {
     CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
     GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
-    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
     OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
     OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
@@ -1458,7 +1458,7 @@ declare namespace Matrix {
 }
 
 /** @public */
-declare const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+declare const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
 
 /** @public */
 declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
