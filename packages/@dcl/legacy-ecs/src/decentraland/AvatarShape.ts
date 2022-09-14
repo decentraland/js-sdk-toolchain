@@ -28,7 +28,10 @@ export class AvatarShape extends ObservableComponent {
   wearables!: WearableId[]
 
   @ObservableComponent.field
-  emotes!: string[]
+  emotes!: {
+    slot: number
+    urn: string
+  }[]
 
   @ObservableComponent.field
   skinColor!: ReadOnlyColor4
