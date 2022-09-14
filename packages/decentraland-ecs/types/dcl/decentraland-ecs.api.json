@@ -3229,7 +3229,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "string[]"
+                  "text": "{\n        slot: number;\n        urn: string;\n    }[]"
                 },
                 {
                   "kind": "Content",

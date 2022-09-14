@@ -211,7 +211,10 @@ export class AvatarShape extends ObservableComponent {
     // (undocumented)
     static Dummy(): AvatarShape;
     // (undocumented)
-    emotes: string[];
+    emotes: {
+        slot: number;
+        urn: string;
+    }[];
     // (undocumented)
     expressionTriggerId: string;
     // (undocumented)
