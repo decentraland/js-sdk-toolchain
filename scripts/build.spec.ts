@@ -185,46 +185,53 @@ flow('build-all', () => {
       expect(true).toBe(true)
     }, 60000)
   })
-  flow('build playground folder', () => {
-    const PLAYGORUND_INFO_JSON = 'info.json'
-    const snippetsPath = path.resolve(process.cwd(), 'test', 'ecs', 'snippets')
-    const sdkDistPath = path.resolve(SDK_PATH, 'dist')
-    const playgroundDistPath = path.resolve(SDK_PATH, 'dist', 'playground')
+  flow('playground copy files', () => {
+    it('playground copy snippets', async () => {
+      const PLAYGORUND_INFO_JSON = 'info.json'
+      const snippetsPath = path.resolve(
+        process.cwd(),
+        'test',
+        'ecs',
+        'snippets'
+      )
+      const playgroundDistPath = path.resolve(SDK_PATH, 'dist', 'playground')
 
-    // Clean last build
-    if (!existsSync(sdkDistPath)) mkdirSync(sdkDistPath)
-    removeSync(playgroundDistPath)
-    mkdirSync(playgroundDistPath)
+      // Clean last build
+      removeSync(playgroundDistPath)
+      mkdirSync(playgroundDistPath)
 
-    // Copy snippets
-    const snippetsFiles = getFilePathsSync(snippetsPath).filter((item) =>
-      item.toLocaleLowerCase().endsWith('.ts')
-    )
+      // Copy snippets
+      const snippetsFiles = getFilePathsSync(snippetsPath).filter((item) =>
+        item.toLocaleLowerCase().endsWith('.ts')
+      )
 
-    const distSnippetsPath = path.resolve(playgroundDistPath, 'snippets')
-    mkdirSync(distSnippetsPath)
+      const distSnippetsPath = path.resolve(playgroundDistPath, 'snippets')
+      mkdirSync(distSnippetsPath)
 
-    for (const fileName of snippetsFiles) {
-      const filePath = ensureFileExists(fileName, snippetsPath)
-      const fileContent = readFileSync(filePath).toString()
+      for (const fileName of snippetsFiles) {
+        const filePath = ensureFileExists(fileName, snippetsPath)
+        const fileContent = readFileSync(filePath).toString()
 
-      // Remove the unnecesary 'export {}', the only purposes of this is to compile all files in one step and test it
-      const finalContent = fileContent.replace('export {}', '')
+        // Remove the unnecesary 'export {}', the only purposes of this is to compile all files in one step and test it
+        const finalContent = fileContent.replace('export {}', '')
 
-      const distPlaygroundPath = path.resolve(distSnippetsPath, fileName)
-      writeFileSync(distPlaygroundPath, finalContent)
-    }
+        const distPlaygroundPath = path.resolve(distSnippetsPath, fileName)
+        writeFileSync(distPlaygroundPath, finalContent)
+      }
 
-    // Create a JSON with the path of every snippet, this can be read by playground or CLI
-    const listContent = {
-      content: snippetsFiles.map((item) => ({ path: item }))
-    }
-    writeFileSync(
-      path.resolve(distSnippetsPath, PLAYGORUND_INFO_JSON),
-      JSON.stringify(listContent)
-    )
+      // Create a JSON with the path of every snippet, this can be read by playground or CLI
+      const listContent = {
+        content: snippetsFiles.map((item) => ({ path: item }))
+      }
+      writeFileSync(
+        path.resolve(distSnippetsPath, PLAYGORUND_INFO_JSON),
+        JSON.stringify(listContent)
+      )
+    })
 
-    it('copy minified files', async () => {
+    it('playground copy minified files', async () => {
+      const playgroundDistPath = path.resolve(SDK_PATH, 'dist', 'playground')
+
       // Copy minified ecs
       const filesToCopy = [
         path.resolve(DECENTRALAND_AMD_PATH, 'dist', 'amd.min.js'),
@@ -244,11 +251,13 @@ flow('build-all', () => {
         )
       }
 
+      const distPlaygroundSdkPath = path.resolve(playgroundDistPath, 'sdk')
+      mkdirSync(distPlaygroundSdkPath)
       for (const file of filesToCopy) {
         const filePath = ensureFileExists(file)
         const destPath = path.resolve(
-          playgroundDistPath,
-          path.basename(filePath)
+          distPlaygroundSdkPath,
+          `${path.basename(filePath)}`
         )
         copyFileSync(filePath, destPath)
       }
