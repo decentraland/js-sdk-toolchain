@@ -1,32 +1,40 @@
 import { readFileSync, writeFileSync } from 'fs'
-import { copySync, mkdirSync, removeSync } from 'fs-extra'
+import {
+  copyFileSync,
+  copySync,
+  existsSync,
+  mkdirSync,
+  removeSync
+} from 'fs-extra'
 
 import {
-  flow,
-  TSC,
   BUILD_ECS_PATH,
+  commonChecks,
   DECENTRALAND_AMD_PATH,
-  TERSER,
+  ECS7_PATH,
+  flow,
+  JS_RUNTIME,
+  REACT_ECS,
   ROLLUP_CONFIG_PATH,
   SDK_PATH,
-  commonChecks,
-  ECS7_PATH,
-  JS_RUNTIME,
-  REACT_ECS
+  TERSER,
+  TSC
 } from './common'
 import {
-  ensureFileExists,
-  itExecutes,
-  itDeletesFolder,
   copyFile,
+  ensureFileExists,
+  itDeletesFolder,
   itDeletesGlob,
-  runCommand
+  itExecutes,
+  runCommand,
+  waitForFileExist
 } from './helpers'
 import { compileEcsComponents } from './protocol-buffer-generation'
 
 import * as path from 'path'
-import { compileProtoApi } from './rpc-api-generation'
 import { createProtoTypes } from './protocol-buffer-generation/generateProtocolTypes'
+import { compileProtoApi } from './rpc-api-generation'
+import { getFilePathsSync } from './utils/getFilePathsSync'
 
 flow('build-all', () => {
   commonChecks()
@@ -176,6 +184,100 @@ flow('build-all', () => {
 
       expect(true).toBe(true)
     }, 60000)
+  })
+  flow('playground copy files', () => {
+    it('playground copy snippets', async () => {
+      const PLAYGORUND_INFO_JSON = 'info.json'
+      const snippetsPath = path.resolve(
+        process.cwd(),
+        'test',
+        'ecs',
+        'snippets'
+      )
+      const playgroundDistPath = path.resolve(SDK_PATH, 'dist', 'playground')
+
+      // Clean last build
+      removeSync(playgroundDistPath)
+      mkdirSync(playgroundDistPath)
+
+      // Copy snippets
+      const snippetsFiles = getFilePathsSync(snippetsPath).filter((item) =>
+        item.toLocaleLowerCase().endsWith('.ts')
+      )
+
+      const distSnippetsPath = path.resolve(playgroundDistPath, 'snippets')
+      mkdirSync(distSnippetsPath)
+
+      for (const fileName of snippetsFiles) {
+        const filePath = ensureFileExists(fileName, snippetsPath)
+        const fileContent = readFileSync(filePath).toString()
+
+        // Remove the unnecesary 'export {}', the only purposes of this is to compile all files in one step and test it
+        const finalContent = fileContent.replace('export {}', '')
+
+        const distPlaygroundPath = path.resolve(distSnippetsPath, fileName)
+        writeFileSync(distPlaygroundPath, finalContent)
+      }
+
+      // Create a JSON with the path of every snippet, this can be read by playground or CLI
+      const listContent = {
+        content: snippetsFiles.map((item) => ({ path: item }))
+      }
+      writeFileSync(
+        path.resolve(distSnippetsPath, PLAYGORUND_INFO_JSON),
+        JSON.stringify(listContent)
+      )
+    })
+
+    it('playground copy minified files', async () => {
+      const playgroundDistPath = path.resolve(SDK_PATH, 'dist', 'playground')
+
+      // Copy minified ecs
+      const filesToCopy = [
+        {
+          from: path.resolve(DECENTRALAND_AMD_PATH, 'dist', 'amd.min.js'),
+          fileName: 'amd.min.js'
+        },
+        {
+          from: path.resolve(SDK_PATH, 'dist', 'ecs7', 'index.min.js'),
+          fileName: 'index.min.js'
+        },
+        {
+          from: path.resolve(SDK_PATH, 'dist', 'ecs7', 'index.d.ts'),
+          fileName: 'index.d.ts'
+        },
+        {
+          from: path.resolve(REACT_ECS, 'dist', 'index.min.js'),
+          fileName: 'react-ecs.index.min.js'
+        },
+        {
+          from: path.resolve(REACT_ECS, 'dist', 'index.d.ts'),
+          fileName: 'react-ecs.index.d.ts'
+        }
+      ]
+
+      // Wait until ecs is built
+      const timeoutExists = 180 * 1000
+      const result = await Promise.all(
+        filesToCopy.map((filePath) =>
+          waitForFileExist(filePath.from, timeoutExists)
+        )
+      )
+
+      if (result.some((item) => item === true)) {
+        throw new Error(
+          'Timeout waiting for the files in the playground folder build.'
+        )
+      }
+
+      const distPlaygroundSdkPath = path.resolve(playgroundDistPath, 'sdk')
+      mkdirSync(distPlaygroundSdkPath)
+      for (const file of filesToCopy) {
+        const filePath = ensureFileExists(file.from)
+        const destPath = path.resolve(distPlaygroundSdkPath, file.fileName)
+        copyFileSync(filePath, destPath)
+      }
+    })
   })
 })
 

@@ -178,6 +178,13 @@ jobs:
         env:
           AMD_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_amd.outputs.s3-bucket-key }}
           BUILD_ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_build_ecs.outputs.s3-bucket-key }}
+      - name: playground upload to s3
+        run: npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder $(pwd)/packages/@dcl/sdk/dist/playground --bucket-folder '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/playground'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+      - name: remove duplicated files @dcl/sdk
+        run: rm -rf ./packages/@dcl/sdk/dist/playground/sdk
       - name: publish @dcl/sdk package
         uses: menduz/oddish-action@master
         id: publish_decentraland_ecs
@@ -193,17 +200,6 @@ jobs:
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
-      - name: make playground
-        run: |
-          mkdir playground
-          cp packages/@dcl/sdk/dist/ecs7/index.min.js ./playground
-          cp packages/@dcl/sdk/types/ecs7/index.d.ts ./playground
-          cp packages/@dcl/amd/dist/amd.min.js ./playground
-      - name: playground upload to s3
-        run: npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder $(pwd)/playground --bucket-folder '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/playground'
-        env:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
   notify_deployment:

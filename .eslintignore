@@ -4,3 +4,4 @@ packages/@dcl/js-runtime
 test/sdk/simple-scene
 packages/@dcl/ecs/dist/
 packages/@dcl/ecs/src/components/generated
+packages/@dcl/sdk/dist/
