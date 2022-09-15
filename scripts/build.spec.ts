@@ -234,15 +234,34 @@ flow('build-all', () => {
 
       // Copy minified ecs
       const filesToCopy = [
-        path.resolve(DECENTRALAND_AMD_PATH, 'dist', 'amd.min.js'),
-        path.resolve(SDK_PATH, 'dist', 'ecs7', 'index.min.js'),
-        path.resolve(SDK_PATH, 'dist', 'ecs7', 'index.d.ts')
+        {
+          from: path.resolve(DECENTRALAND_AMD_PATH, 'dist', 'amd.min.js'),
+          fileName: 'amd.min.js'
+        },
+        {
+          from: path.resolve(SDK_PATH, 'dist', 'ecs7', 'index.min.js'),
+          fileName: 'index.min.js'
+        },
+        {
+          from: path.resolve(SDK_PATH, 'dist', 'ecs7', 'index.d.ts'),
+          fileName: 'index.d.ts'
+        },
+        {
+          from: path.resolve(REACT_ECS, 'dist', 'index.min.js'),
+          fileName: 'react-ecs.index.min.js'
+        },
+        {
+          from: path.resolve(REACT_ECS, 'dist', 'index.d.ts'),
+          fileName: 'react-ecs.index.d.ts'
+        }
       ]
 
       // Wait until ecs is built
       const timeoutExists = 180 * 1000
       const result = await Promise.all(
-        filesToCopy.map((filePath) => waitForFileExist(filePath, timeoutExists))
+        filesToCopy.map((filePath) =>
+          waitForFileExist(filePath.from, timeoutExists)
+        )
       )
 
       if (result.some((item) => item === true)) {
@@ -254,11 +273,8 @@ flow('build-all', () => {
       const distPlaygroundSdkPath = path.resolve(playgroundDistPath, 'sdk')
       mkdirSync(distPlaygroundSdkPath)
       for (const file of filesToCopy) {
-        const filePath = ensureFileExists(file)
-        const destPath = path.resolve(
-          distPlaygroundSdkPath,
-          `${path.basename(filePath)}`
-        )
+        const filePath = ensureFileExists(file.from)
+        const destPath = path.resolve(distPlaygroundSdkPath, file.fileName)
         copyFileSync(filePath, destPath)
       }
     })
