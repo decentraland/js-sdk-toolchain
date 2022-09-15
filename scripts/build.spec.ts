@@ -181,11 +181,13 @@ flow('build-all', () => {
   })
 
   it('build playground folder', async () => {
-    const distPath = path.resolve(SDK_PATH, 'dist', 'playgound')
+    const PLAYGORUND_INFO_JSON = 'info.json'
+    const snippetsPath = path.resolve(process.cwd(), 'test', 'ecs', 'snippets')
+    const playgroundDistPath = path.resolve(SDK_PATH, 'dist', 'playground')
 
     // Clean last build
-    removeSync(distPath)
-    mkdirSync(distPath)
+    removeSync(playgroundDistPath)
+    mkdirSync(playgroundDistPath)
 
     // Copy minified ecs
     const filesToCopy = [
@@ -202,17 +204,16 @@ flow('build-all', () => {
 
     for (const file of filesToCopy) {
       const filePath = ensureFileExists(file)
-      const destPath = path.resolve(distPath, path.basename(filePath))
+      const destPath = path.resolve(playgroundDistPath, path.basename(filePath))
       copyFileSync(filePath, destPath)
     }
 
     // Copy snippets
-    const snippetsPath = path.resolve(process.cwd(), 'test', 'ecs', 'snippets')
     const snippetsFiles = getFilePathsSync(snippetsPath).filter((item) =>
       item.toLocaleLowerCase().endsWith('.ts')
     )
 
-    const distSnippetsPath = path.resolve(distPath, 'snippets')
+    const distSnippetsPath = path.resolve(playgroundDistPath, 'snippets')
     mkdirSync(distSnippetsPath)
 
     for (const fileName of snippetsFiles) {
@@ -231,7 +232,7 @@ flow('build-all', () => {
       content: snippetsFiles.map((item) => ({ path: item }))
     }
     writeFileSync(
-      path.resolve(distSnippetsPath, 'info.json'),
+      path.resolve(distSnippetsPath, PLAYGORUND_INFO_JSON),
       JSON.stringify(listContent)
     )
   })
