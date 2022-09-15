@@ -140,3 +140,19 @@ export function copyFile(from: string, to: string) {
     throw new Error(`${to} does not exist`)
   }
 }
+
+export async function delay(timeMs: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, timeMs))
+}
+
+export async function waitForFileExist(
+  filePath: string,
+  timeout: number = 120000
+) {
+  const stepMs = 1000
+  let remaining = timeout
+  while (remaining > 0 && !existsSync(filePath)) {
+    await delay(stepMs)
+    remaining -= stepMs
+  }
+}

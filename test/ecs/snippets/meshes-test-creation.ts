@@ -1,0 +1,56 @@
+enum Mesh {
+  BOX,
+  CYLINDER,
+  SPHERE,
+  CONE
+}
+
+function createMesh(
+  x: number,
+  y: number,
+  z: number,
+  mesh: Mesh,
+  withCollider: boolean = false
+) {
+  const meshEntity = engine.addEntity()
+  Transform.create(meshEntity, { position: { x, y, z } })
+
+  switch (mesh) {
+    case Mesh.BOX:
+      MeshRenderer.create(meshEntity, { box: { uvs: [] } })
+      if (withCollider) MeshCollider.create(meshEntity, { box: {} })
+      break
+    case Mesh.SPHERE:
+      MeshRenderer.create(meshEntity, { sphere: {} })
+      if (withCollider) MeshCollider.create(meshEntity, { sphere: {} })
+      break
+    case Mesh.CONE:
+    case Mesh.CYLINDER:
+      MeshRenderer.create(meshEntity, {
+        cylinder: {
+          radiusBottom: 1,
+          radiusTop: mesh === Mesh.CONE ? 0 : 1
+        }
+      })
+      if (withCollider)
+        MeshCollider.create(meshEntity, {
+          cylinder: {
+            radiusBottom: 1,
+            radiusTop: mesh === Mesh.CONE ? 0 : 1
+          }
+        })
+      break
+  }
+  return meshEntity
+}
+
+createMesh(15, 1, 15, Mesh.BOX)
+createMesh(12, 1, 15, Mesh.CONE)
+createMesh(9, 1, 15, Mesh.SPHERE)
+createMesh(6, 1, 15, Mesh.CYLINDER)
+createMesh(15, 1, 1, Mesh.BOX, true)
+createMesh(12, 1, 1, Mesh.CONE, true)
+createMesh(9, 1, 1, Mesh.SPHERE, true)
+createMesh(6, 1, 1, Mesh.CYLINDER, true)
+
+export {}

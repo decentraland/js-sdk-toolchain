@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "outFile": "./dist/game.js",
+        "allowJs": true,
+        "strict": true
+    },
+    "include": [
+        "*.ts"
+    ],
+    "extends": "../../../packages/@dcl/sdk/types/tsconfig.ecs7.json",
+}
