@@ -1,33 +1,39 @@
 import { readFileSync, writeFileSync } from 'fs'
-import { copyFileSync, copySync, mkdirSync, removeSync } from 'fs-extra'
+import {
+  copyFileSync,
+  copySync,
+  existsSync,
+  mkdirSync,
+  removeSync
+} from 'fs-extra'
 
 import {
-  flow,
-  TSC,
   BUILD_ECS_PATH,
+  commonChecks,
   DECENTRALAND_AMD_PATH,
-  TERSER,
+  ECS7_PATH,
+  flow,
+  JS_RUNTIME,
+  REACT_ECS,
   ROLLUP_CONFIG_PATH,
   SDK_PATH,
-  commonChecks,
-  ECS7_PATH,
-  JS_RUNTIME,
-  REACT_ECS
+  TERSER,
+  TSC
 } from './common'
 import {
-  ensureFileExists,
-  itExecutes,
-  itDeletesFolder,
   copyFile,
+  ensureFileExists,
+  itDeletesFolder,
   itDeletesGlob,
+  itExecutes,
   runCommand,
   waitForFileExist
 } from './helpers'
 import { compileEcsComponents } from './protocol-buffer-generation'
 
 import * as path from 'path'
-import { compileProtoApi } from './rpc-api-generation'
 import { createProtoTypes } from './protocol-buffer-generation/generateProtocolTypes'
+import { compileProtoApi } from './rpc-api-generation'
 import { getFilePathsSync } from './utils/getFilePathsSync'
 
 flow('build-all', () => {
@@ -179,34 +185,16 @@ flow('build-all', () => {
       expect(true).toBe(true)
     }, 60000)
   })
-
-  it('build playground folder', async () => {
+  flow('build playground folder', () => {
     const PLAYGORUND_INFO_JSON = 'info.json'
     const snippetsPath = path.resolve(process.cwd(), 'test', 'ecs', 'snippets')
+    const sdkDistPath = path.resolve(SDK_PATH, 'dist')
     const playgroundDistPath = path.resolve(SDK_PATH, 'dist', 'playground')
 
     // Clean last build
+    if (!existsSync(sdkDistPath)) mkdirSync(sdkDistPath)
     removeSync(playgroundDistPath)
     mkdirSync(playgroundDistPath)
-
-    // Copy minified ecs
-    const filesToCopy = [
-      path.resolve(DECENTRALAND_AMD_PATH, 'dist', 'amd.min.js'),
-      path.resolve(SDK_PATH, 'dist', 'ecs7', 'index.min.js'),
-      path.resolve(SDK_PATH, 'dist', 'ecs7', 'index.d.ts')
-    ]
-
-    // Wait until ecs is built
-    const timeoutExists = 120 * 1000
-    await Promise.all(
-      filesToCopy.map((filePath) => waitForFileExist(filePath, timeoutExists))
-    )
-
-    for (const file of filesToCopy) {
-      const filePath = ensureFileExists(file)
-      const destPath = path.resolve(playgroundDistPath, path.basename(filePath))
-      copyFileSync(filePath, destPath)
-    }
 
     // Copy snippets
     const snippetsFiles = getFilePathsSync(snippetsPath).filter((item) =>
@@ -235,6 +223,36 @@ flow('build-all', () => {
       path.resolve(distSnippetsPath, PLAYGORUND_INFO_JSON),
       JSON.stringify(listContent)
     )
+
+    it('copy minified files', async () => {
+      // Copy minified ecs
+      const filesToCopy = [
+        path.resolve(DECENTRALAND_AMD_PATH, 'dist', 'amd.min.js'),
+        path.resolve(SDK_PATH, 'dist', 'ecs7', 'index.min.js'),
+        path.resolve(SDK_PATH, 'dist', 'ecs7', 'index.d.ts')
+      ]
+
+      // Wait until ecs is built
+      const timeoutExists = 180 * 1000
+      const result = await Promise.all(
+        filesToCopy.map((filePath) => waitForFileExist(filePath, timeoutExists))
+      )
+
+      if (result.some((item) => item === true)) {
+        throw new Error(
+          'Timeout waiting for the files in the playground folder build.'
+        )
+      }
+
+      for (const file of filesToCopy) {
+        const filePath = ensureFileExists(file)
+        const destPath = path.resolve(
+          playgroundDistPath,
+          path.basename(filePath)
+        )
+        copyFileSync(filePath, destPath)
+      }
+    })
   })
 })
 

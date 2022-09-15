@@ -147,12 +147,14 @@ export async function delay(timeMs: number) {
 
 export async function waitForFileExist(
   filePath: string,
-  timeout: number = 120000
+  timeoutMs: number = 120000
 ) {
   const stepMs = 1000
-  let remaining = timeout
+  let remaining = timeoutMs
   while (remaining > 0 && !existsSync(filePath)) {
     await delay(stepMs)
     remaining -= stepMs
   }
+  const isTimeout = remaining < 1
+  return isTimeout
 }
