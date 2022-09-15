@@ -9,7 +9,8 @@
       "packages/@dcl/react-ecs/tsconfig.json",
       "packages/@dcl/amd/tsconfig.json",
       "scripts/tsconfig.json",
-      "test/tsconfig.json"
+      "test/tsconfig.json",
+      "test/ecs/snippets/tsconfig.json"
     ]
   },
   "rules": {
