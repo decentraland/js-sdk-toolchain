@@ -70,6 +70,13 @@ declare const enum CameraModeValue {
     UNRECOGNIZED = -1
 }
 
+declare const enum ColliderLayer {
+    None = 0,
+    Pointer = 1,
+    Physics = 2,
+    UNRECOGNIZED = -1
+}
+
 declare interface Color3 {
     r: number;
     g: number;
@@ -699,6 +706,25 @@ declare function isPointerEventActive(entity: Entity, actionButton: ActionButton
 declare function isPointerEventActiveGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType) => boolean;
 
 declare const log: (...a: any[]) => void;
+
+/**
+ * @public
+ * Make the collision mask with some collider layers
+ * @param layers a array layers to be assigned
+ * @returns collisionMask to be used in the MeshCollider field
+ * @example
+ * ```ts
+ * // Physics and Pointer are the defaults
+ * MeshCollider.create(entity, {
+ *  collisionMask: makeCollisionMask(
+ *    ColliderLayer.Physics,
+ *    ColliderLayer.Pointer
+ *   ),
+ *  box: {}
+ * })
+ * ```
+ */
+declare function makeCollisionMask(...layers: ColliderLayer[]): number;
 
 /** @public */
 declare const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;

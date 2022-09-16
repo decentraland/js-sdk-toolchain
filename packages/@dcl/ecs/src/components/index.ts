@@ -4,7 +4,7 @@ import { ISchema } from '../schemas/ISchema'
 import { defineLibraryComponents } from './generated/index.gen'
 import * as MeshRendererSchema from './generated/MeshRenderer.gen'
 import * as MeshColliderSchema from './generated/MeshCollider.gen'
-import { PBMeshCollider } from './generated/pb/MeshCollider.gen'
+import { ColliderLayer, PBMeshCollider } from './generated/pb/MeshCollider.gen'
 import { PBMeshRenderer } from './generated/pb/MeshRenderer.gen'
 import { defineTransformComponent } from './legacy/Transform'
 
@@ -36,4 +36,25 @@ export function defineSdkComponents(engine: PreEngine) {
       Partial<PBMeshCollider>
     >(MeshColliderSchema.MeshColliderSchema, MeshColliderSchema.COMPONENT_ID)
   }
+}
+
+/**
+ * @public
+ * Make the collision mask with some collider layers
+ * @param layers a array layers to be assigned
+ * @returns collisionMask to be used in the MeshCollider field
+ * @example
+ * ```ts
+ * // Physics and Pointer are the defaults
+ * MeshCollider.create(entity, {
+ *  collisionMask: makeCollisionMask(
+ *    ColliderLayer.Physics,
+ *    ColliderLayer.Pointer
+ *   ),
+ *  box: {}
+ * })
+ * ```
+ */
+export function makeCollisionMask(...layers: ColliderLayer[]): number {
+  return layers.reduce((item, currentValue) => item | currentValue)
 }

@@ -56,6 +56,20 @@ export const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode
 // @public (undocumented)
 export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
 
+// Warning: (ae-missing-release-tag) "ColliderLayer" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum ColliderLayer {
+    // (undocumented)
+    None = 0,
+    // (undocumented)
+    Physics = 2,
+    // (undocumented)
+    Pointer = 1,
+    // (undocumented)
+    UNRECOGNIZED = -1
+}
+
 // @public (undocumented)
 export type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorType = ComponentType<T>> = {
     _id: number;
@@ -285,6 +299,11 @@ export function isPointerEventActiveGenerator(engine: IEngine): (entity: Entity,
 //
 // @public (undocumented)
 export const log: (...a: any[]) => void;
+
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+//
+// @public
+export function makeCollisionMask(...layers: ColliderLayer[]): number;
 
 // @public (undocumented)
 export const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
