@@ -1841,6 +1841,8 @@ declare interface PBAvatarShape {
      *  "urn:decentraland:off-chain:base-avatars:bun_shoes"]
      */
     wearables: string[];
+    /** default = [] */
+    emotes: string[];
 }
 
 declare interface PBBillboard {
@@ -1988,16 +1990,36 @@ declare interface PBMeshRenderer_SphereMesh {
 }
 
 declare interface PBNFTShape {
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    withCollisions?: boolean | undefined;
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    isPointerBlocker?: boolean | undefined;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
     src: string;
-    assetId?: string | undefined;
-    style?: number | undefined;
+    style?: PBNFTShape_PictureFrameStyle | undefined;
     color?: Color3 | undefined;
+}
+
+declare const enum PBNFTShape_PictureFrameStyle {
+    Classic = 0,
+    Baroque_Ornament = 1,
+    Diamond_Ornament = 2,
+    Minimal_Wide = 3,
+    Minimal_Grey = 4,
+    Blocky = 5,
+    Gold_Edges = 6,
+    Gold_Carved = 7,
+    Gold_Wide = 8,
+    Gold_Rounded = 9,
+    Metal_Medium = 10,
+    Metal_Wide = 11,
+    Metal_Slim = 12,
+    Metal_Rounded = 13,
+    Pins = 14,
+    Minimal_Black = 15,
+    Minimal_White = 16,
+    Tape = 17,
+    Wood_Slim = 18,
+    Wood_Wide = 19,
+    Wood_Twigs = 20,
+    Canvas = 21,
+    None = 22,
+    UNRECOGNIZED = -1
 }
 
 declare interface PBOnPointerDown {
