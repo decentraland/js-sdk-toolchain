@@ -107,7 +107,7 @@ export class MessageBus {
         this.flushing = false
         this.flush()
       },
-      (e) => {
+      (_) => {
         this.flushing = false
       }
     )
