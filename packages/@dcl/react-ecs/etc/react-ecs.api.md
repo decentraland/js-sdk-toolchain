@@ -26,6 +26,20 @@ export interface Color3 {
     r: number;
 }
 
+// Warning: (ae-missing-release-tag) "Color4" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface Color4 {
+    // (undocumented)
+    a: number;
+    // (undocumented)
+    b: number;
+    // (undocumented)
+    g: number;
+    // (undocumented)
+    r: number;
+}
+
 // Warning: (ae-missing-release-tag) "CommonProps" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -57,12 +71,14 @@ export type EcsElements = {
 export type EntityComponents = {
     uiTransform: PBUiTransform;
     uiText: PBUiText;
+    uiStyles: PBUiStyles;
 };
 
 // @public (undocumented)
 export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
     uiText?: UiTextProps;
+    uiStyles?: UiStylesProps;
 };
 
 // Warning: (ae-missing-release-tag) "Font" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -95,6 +111,13 @@ export namespace JSX {
 //
 // @public (undocumented)
 export type Key = number | string;
+
+// Warning: (ae-missing-release-tag) "PBUiStyles" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBUiStyles {
+    backgroundColor?: Color4 | undefined;
+}
 
 // Warning: (ae-missing-release-tag) "PBUiText" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -287,6 +310,11 @@ export type UiComponent = () => JSX.Element;
 
 // @public (undocumented)
 export function UiEntity(props: EntityPropTypes & Partial<CommonProps>): ReactEcs.JSX.Element;
+
+// Warning: (ae-missing-release-tag) "UiStylesProps" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type UiStylesProps = PBUiStyles;
 
 // Warning: (ae-missing-release-tag) "UiTextProps" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
