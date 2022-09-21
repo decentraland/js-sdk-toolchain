@@ -17,7 +17,8 @@ describe('Generated AvatarShape ProtoBuf', () => {
       wearables: ['wearable1', 'wearable2'],
       expressionTriggerId: 'id',
       expressionTriggerTimestamp: 0,
-      talking: true
+      talking: true,
+      emotes: ['some_emote']
     })
 
     AvatarShape.create(entityB, {
@@ -30,7 +31,8 @@ describe('Generated AvatarShape ProtoBuf', () => {
       wearables: ['wearable12', 'wearable22'],
       expressionTriggerId: 'id2',
       expressionTriggerTimestamp: 1,
-      talking: false
+      talking: false,
+      emotes: ['some_emote']
     })
     const buffer = AvatarShape.toBinary(entity)
     AvatarShape.updateFromBinary(entityB, buffer)
