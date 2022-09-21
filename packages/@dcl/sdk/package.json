@@ -27,8 +27,8 @@
     "src/cli/**/*.js"
   ],
   "dependencies": {
-    "@dcl/amd": "0.0.0",
-    "@dcl/build-ecs": "0.0.0",
+    "@dcl/amd": "file:../amd",
+    "@dcl/build-ecs": "file:../build-ecs",
     "@dcl/kernel": "1.0.0-2994874542.commit-c3ae489",
     "@dcl/posix": "^1.0.4",
     "@dcl/schemas": "4.8.0",
