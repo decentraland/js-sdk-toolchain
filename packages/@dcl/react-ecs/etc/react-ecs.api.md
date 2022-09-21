@@ -238,21 +238,23 @@ export type Position = {
 // Warning: (ae-missing-release-tag) "ReactEcs" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export namespace ReactEcs {
+namespace ReactEcs {
     // (undocumented)
-    export namespace JSX {
+    namespace JSX {
         // (undocumented)
-        export interface Component {
+        interface Component {
         }
         // (undocumented)
-        export interface Element {
+        interface Element {
         }
         // (undocumented)
-        export type IntrinsicElements = EcsElements;
+        type IntrinsicElements = EcsElements;
     }
     const // (undocumented)
     createElement: any;
 }
+export { ReactEcs }
+export default ReactEcs;
 
 // Warning: (ae-missing-release-tag) "removeUi" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
