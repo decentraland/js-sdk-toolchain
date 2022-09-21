@@ -44,6 +44,21 @@ export function Container({ width, height, children }: ContainerPropTypes): Reac
 // @public (undocumented)
 export type ContainerPropTypes = Partial<CommonProps> & EntityPropTypes['uiTransform'];
 
+// Warning: (ae-missing-release-tag) "EcsElements" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type EcsElements = {
+    entity: Partial<EntityComponents & CommonProps>;
+};
+
+// Warning: (ae-missing-release-tag) "EntityComponents" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type EntityComponents = {
+    uiTransform: PBUiTransform;
+    uiText: PBUiText;
+};
+
 // @public (undocumented)
 export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
@@ -60,6 +75,20 @@ export enum Font {
     SansSerif = 1,
     // (undocumented)
     UNRECOGNIZED = -1
+}
+
+// Warning: (ae-missing-release-tag) "JSX" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export namespace JSX {
+    // (undocumented)
+    export interface Component {
+    }
+    // (undocumented)
+    export interface Element {
+    }
+    // (undocumented)
+    export type IntrinsicElements = EcsElements;
 }
 
 // Warning: (ae-missing-release-tag) "Key" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -218,8 +247,6 @@ namespace ReactEcs {
         // (undocumented)
         interface Element {
         }
-        // Warning: (ae-forgotten-export) The symbol "EcsElements" needs to be exported by the entry point index.d.ts
-        //
         // (undocumented)
         type IntrinsicElements = EcsElements;
     }
@@ -253,7 +280,6 @@ export enum TextAlign {
     UNRECOGNIZED = -1
 }
 
-// Warning: (ae-forgotten-export) The symbol "JSX" needs to be exported by the entry point index.d.ts
 // Warning: (ae-missing-release-tag) "UiComponent" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)

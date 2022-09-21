@@ -1,11 +1,5 @@
 import { readFileSync, writeFileSync } from 'fs'
-import {
-  copyFileSync,
-  copySync,
-  existsSync,
-  mkdirSync,
-  removeSync
-} from 'fs-extra'
+import { copySync, mkdirSync, removeSync } from 'fs-extra'
 
 import {
   BUILD_ECS_PATH,
@@ -26,8 +20,7 @@ import {
   itDeletesFolder,
   itDeletesGlob,
   itExecutes,
-  runCommand,
-  waitForFileExist
+  runCommand
 } from './helpers'
 import { compileEcsComponents } from './protocol-buffer-generation'
 
@@ -243,7 +236,7 @@ flow('build-all', () => {
           fileName: 'index.min.js'
         },
         {
-          from: path.resolve(SDK_PATH, 'dist', 'ecs7', 'index.d.ts'),
+          from: path.resolve(SDK_PATH, 'types', 'ecs7', 'index.d.ts'),
           fileName: 'index.d.ts'
         },
         {
@@ -255,27 +248,11 @@ flow('build-all', () => {
           fileName: 'react-ecs.index.d.ts'
         }
       ]
-
-      // Wait until ecs is built
-      const timeoutExists = 180 * 1000
-      const result = await Promise.all(
-        filesToCopy.map((filePath) =>
-          waitForFileExist(filePath.from, timeoutExists)
-        )
-      )
-
-      if (result.some((item) => item === true)) {
-        throw new Error(
-          'Timeout waiting for the files in the playground folder build.'
-        )
-      }
-
       const distPlaygroundSdkPath = path.resolve(playgroundDistPath, 'sdk')
-      mkdirSync(distPlaygroundSdkPath)
       for (const file of filesToCopy) {
         const filePath = ensureFileExists(file.from)
         const destPath = path.resolve(distPlaygroundSdkPath, file.fileName)
-        copyFileSync(filePath, destPath)
+        copyFile(filePath, destPath)
       }
     })
   })
