@@ -167,6 +167,10 @@ export namespace Components {
     //
     // (undocumented)
     TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+    const // Warning: (ae-forgotten-export) The symbol "PBUiStyles" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    UiStyles: ComponentDefinition<ISchema<PBUiStyles>, PBUiStyles>;
     const // Warning: (ae-forgotten-export) The symbol "PBUiText" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -605,6 +609,9 @@ export type Transport = {
 //
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
+
+// @public (undocumented)
+export const UiStyles: ComponentDefinition<ISchema<PBUiStyles>, PBUiStyles>;
 
 // @public (undocumented)
 export const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;

@@ -76,6 +76,13 @@ declare interface Color3 {
     b: number;
 }
 
+declare interface Color4 {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+}
+
 /**
  * @public
  */
@@ -260,6 +267,8 @@ declare namespace Components {
     const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     /** @public */
     const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+    /** @public */
+    const UiStyles: ComponentDefinition<ISchema<PBUiStyles>, PBUiStyles>;
     /** @public */
     const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
     /** @public */
@@ -489,6 +498,7 @@ declare function defineSdkComponents(engine: PreEngine): {
     RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
     SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+    UiStyles: ComponentDefinition<ISchema<PBUiStyles>, PBUiStyles>;
     UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
     UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
     VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
@@ -1841,6 +1851,8 @@ declare interface PBAvatarShape {
      *  "urn:decentraland:off-chain:base-avatars:bun_shoes"]
      */
     wearables: string[];
+    /** default = [] */
+    emotes: string[];
 }
 
 declare interface PBBillboard {
@@ -2155,6 +2167,11 @@ declare interface PBTextShape {
     outlineColor?: Color3 | undefined;
     /** default=(1.0,1.0,1.0) */
     textColor?: Color3 | undefined;
+}
+
+declare interface PBUiStyles {
+    /** default=(0.0, 0.0, 0.0, 0.0) */
+    backgroundColor?: Color4 | undefined;
 }
 
 declare interface PBUiText {
@@ -2746,6 +2763,9 @@ declare type Transport = {
 declare type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
 declare type Uint32 = number;
+
+/** @public */
+declare const UiStyles: ComponentDefinition<ISchema<PBUiStyles>, PBUiStyles>;
 
 /** @public */
 declare const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;

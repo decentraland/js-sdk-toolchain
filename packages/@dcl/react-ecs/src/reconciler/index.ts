@@ -64,7 +64,8 @@ export function createReconciler(
 
   const getComponentId: { [key in keyof EntityComponents]: number } = {
     uiTransform: engine.baseComponents.UiTransform._id,
-    uiText: engine.baseComponents.UiText._id
+    uiText: engine.baseComponents.UiText._id,
+    uiStyles: engine.baseComponents.UiStyles._id
   }
 
   function updateTree(

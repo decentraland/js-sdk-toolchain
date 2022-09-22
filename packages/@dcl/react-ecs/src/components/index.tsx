@@ -1,10 +1,12 @@
 import { ReactEcs } from '../react-ecs'
-import { CommonProps, EntityPropTypes, YGDisplay } from './types'
+import { CommonProps, EntityPropTypes } from './types'
 import { parseUiTransform } from './uiTransform'
+import { YGDisplay } from './uiTransform/types'
 
 export * from './types'
 export * from './uiTransform/types'
 export * from './uiText/types'
+export * from './uiStyles/types'
 
 /**
  * @public
