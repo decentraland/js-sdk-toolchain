@@ -5,7 +5,7 @@
         "strict": true
     },
     "include": [
-        "*.ts"
+        "**/*.ts"
     ],
     "extends": "../../../packages/@dcl/sdk/types/tsconfig.ecs7.json",
 }
