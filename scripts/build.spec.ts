@@ -1,3 +1,4 @@
+import * as path from 'path'
 import { readFileSync, writeFileSync } from 'fs'
 import { copySync, mkdirSync, removeSync } from 'fs-extra'
 
@@ -17,6 +18,7 @@ import {
 import {
   copyFile,
   ensureFileExists,
+  ensureFileExistsSilent,
   itDeletesFolder,
   itDeletesGlob,
   itExecutes,
@@ -24,10 +26,9 @@ import {
 } from './helpers'
 import { compileEcsComponents } from './protocol-buffer-generation'
 
-import * as path from 'path'
 import { createProtoTypes } from './protocol-buffer-generation/generateProtocolTypes'
 import { compileProtoApi } from './rpc-api-generation'
-import { getFilePathsSync } from './utils/getFilePathsSync'
+import { getSnippetsfile } from './utils/getFilePathsSync'
 
 flow('build-all', () => {
   commonChecks()
@@ -178,6 +179,7 @@ flow('build-all', () => {
       expect(true).toBe(true)
     }, 60000)
   })
+
   flow('playground copy files', () => {
     it('playground copy snippets', async () => {
       const PLAYGORUND_INFO_JSON = 'info.json'
@@ -194,31 +196,44 @@ flow('build-all', () => {
       mkdirSync(playgroundDistPath)
 
       // Copy snippets
-      const snippetsFiles = getFilePathsSync(snippetsPath).filter((item) =>
-        item.toLocaleLowerCase().endsWith('.ts')
-      )
+      const snippetsFiles = getSnippetsfile(snippetsPath)
 
       const distSnippetsPath = path.resolve(playgroundDistPath, 'snippets')
       mkdirSync(distSnippetsPath)
 
-      for (const fileName of snippetsFiles) {
-        const filePath = ensureFileExists(fileName, snippetsPath)
+      const snippetInfo = []
+      for (const snippet of snippetsFiles) {
+        const filePath =
+          ensureFileExistsSilent(snippet + '/index.ts', snippetsPath) ||
+          ensureFileExists(snippet + '/index.tsx', snippetsPath)!
+        const infoJson = ensureFileExists(snippet + '/info.json', snippetsPath)
+
+        if (!filePath || !infoJson) continue
+        const extension = filePath.endsWith('tsx') ? '.tsx' : '.ts'
+        const fileName = snippet + extension
         const fileContent = readFileSync(filePath).toString()
+        const fileInfo = JSON.parse(readFileSync(infoJson).toString())
+
+        const info = {
+          name: fileInfo.name,
+          category: fileInfo.category,
+          path: fileName
+        }
+
+        snippetInfo.push(info)
 
         // Remove the unnecesary 'export {}', the only purposes of this is to compile all files in one step and test it
         const finalContent = fileContent.replace('export {}', '')
 
         const distPlaygroundPath = path.resolve(distSnippetsPath, fileName)
+        console.log({ distPlaygroundPath })
         writeFileSync(distPlaygroundPath, finalContent)
       }
 
-      // Create a JSON with the path of every snippet, this can be read by playground or CLI
-      const listContent = {
-        content: snippetsFiles.map((item) => ({ path: item }))
-      }
+      // // Create a JSON with the path of every snippet, this can be read by playground or CLI
       writeFileSync(
         path.resolve(distSnippetsPath, PLAYGORUND_INFO_JSON),
-        JSON.stringify(listContent)
+        JSON.stringify(snippetInfo)
       )
     })
 
