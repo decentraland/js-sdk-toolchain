@@ -18,6 +18,7 @@ import {
 import {
   copyFile,
   ensureFileExists,
+  ensureFileExistsSilent,
   itDeletesFolder,
   itDeletesGlob,
   itExecutes,
@@ -27,7 +28,7 @@ import { compileEcsComponents } from './protocol-buffer-generation'
 
 import { createProtoTypes } from './protocol-buffer-generation/generateProtocolTypes'
 import { compileProtoApi } from './rpc-api-generation'
-import { getFilePathsSync, getSnippetsfile } from './utils/getFilePathsSync'
+import { getSnippetsfile } from './utils/getFilePathsSync'
 
 flow('build-all', () => {
   commonChecks()
@@ -196,25 +197,27 @@ flow('build-all', () => {
 
       // Copy snippets
       const snippetsFiles = getSnippetsfile(snippetsPath)
-      console.log({ snippetsFiles })
 
       const distSnippetsPath = path.resolve(playgroundDistPath, 'snippets')
       mkdirSync(distSnippetsPath)
 
       const snippetInfo = []
-      for (const fileName of snippetsFiles) {
-        const filePath = ensureFileExists(fileName + '/index.ts', snippetsPath)
-        const infoJson = ensureFileExists(fileName + '/info.json', snippetsPath)
+      for (const snippet of snippetsFiles) {
+        const filePath =
+          ensureFileExistsSilent(snippet + '/index.ts', snippetsPath) ||
+          ensureFileExists(snippet + '/index.tsx', snippetsPath)!
+        const infoJson = ensureFileExists(snippet + '/info.json', snippetsPath)
 
-        if (!infoJson || !infoJson) continue
-
+        if (!filePath || !infoJson) continue
+        const extension = filePath.endsWith('tsx') ? '.tsx' : '.ts'
+        const fileName = snippet + extension
         const fileContent = readFileSync(filePath).toString()
         const fileInfo = JSON.parse(readFileSync(infoJson).toString())
 
         const info = {
           name: fileInfo.name,
           category: fileInfo.category,
-          path: fileName + '.ts'
+          path: fileName
         }
 
         snippetInfo.push(info)
@@ -222,10 +225,8 @@ flow('build-all', () => {
         // Remove the unnecesary 'export {}', the only purposes of this is to compile all files in one step and test it
         const finalContent = fileContent.replace('export {}', '')
 
-        const distPlaygroundPath = path.resolve(
-          distSnippetsPath,
-          fileName + '.ts'
-        )
+        const distPlaygroundPath = path.resolve(distSnippetsPath, fileName)
+        console.log({ distPlaygroundPath })
         writeFileSync(distPlaygroundPath, finalContent)
       }
 

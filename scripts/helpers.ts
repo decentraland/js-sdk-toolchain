@@ -24,6 +24,11 @@ export function ensureFileExists(file: string, root?: string) {
   return x
 }
 
+export function ensureFileExistsSilent(file: string, root?: string) {
+  const x = root ? resolve(root, file) : file
+  return existsSync(x) ? x : false
+}
+
 export function runCommand(
   command: string,
   cwd: string,
