@@ -2001,7 +2001,9 @@ declare interface PBMeshRenderer_SphereMesh {
 
 declare interface PBNFTShape {
     src: string;
+    /** default = PictureFrameStyle.Classic */
     style?: PBNFTShape_PictureFrameStyle | undefined;
+    /** default = Color3(0.6404918, 0.611472, 0.8584906) */
     color?: Color3 | undefined;
 }
 
