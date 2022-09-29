@@ -1,5 +1,6 @@
 import type { Entity, IEngine } from '@dcl/ecs'
 import Reconciler, { HostConfig } from 'react-reconciler'
+import { CANVAS_ROOT_ENTITY } from '../components'
 import { EntityComponents, JSX } from '../react-ecs'
 import {
   Changes,
@@ -19,6 +20,46 @@ import {
   OpaqueHandle
 } from './types'
 import { isNotUndefined, noopConfig } from './utils'
+
+function isEqual<T = unknown>(val1: T, val2: T): boolean {
+  if (!val1 || !val2) {
+    return val1 === val2
+  }
+
+  if (val1 === val2) {
+    return true
+  }
+
+  if (typeof val1 !== typeof val2) {
+    return false
+  }
+
+  if (typeof val1 !== 'object') {
+    return val1 === val2
+  }
+
+  if (Array.isArray(val1) && Array.isArray(val2)) {
+    if (val1.length !== val2.length) {
+      return false
+    }
+  }
+
+  if (Object.keys(val1).length !== Object.keys(val2).length) {
+    return false
+  }
+
+  if (JSON.stringify(val1) === JSON.stringify(val2)) {
+    return true
+  }
+
+  for (const key in val1) {
+    if (!isEqual(val1[key]!, val2[key]!)) {
+      return false
+    }
+  }
+
+  return true
+}
 
 function propsChanged<K extends keyof EntityComponents>(
   component: K,
@@ -42,7 +83,7 @@ function propsChanged<K extends keyof EntityComponents>(
   // TODO: array and object types. For now only primitives
   for (const k in prevProps) {
     const propKey = k as keyof typeof prevProps
-    if (prevProps[propKey] !== nextProps[propKey]) {
+    if (!isEqual(prevProps[propKey], nextProps[propKey])) {
       changes[propKey] = nextProps[propKey]
     }
   }
@@ -160,7 +201,12 @@ export function createReconciler(
       console.log('create instance', type)
       const entity = engine.addEntity()
       entities.add(entity)
-      const instance: Instance = { entity, _child: [] }
+      const instance: Instance = {
+        entity,
+        _child: [],
+        parent: CANVAS_ROOT_ENTITY as Entity,
+        rightOf: undefined
+      }
 
       for (const key in props) {
         const keyTyped: keyof Props = key as keyof Props
