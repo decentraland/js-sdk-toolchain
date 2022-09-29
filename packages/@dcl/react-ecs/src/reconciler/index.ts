@@ -1,5 +1,6 @@
 import type { Entity, IEngine } from '@dcl/ecs'
 import Reconciler, { HostConfig } from 'react-reconciler'
+import { CANVAS_ROOT_ENTITY } from '../components'
 import { EntityComponents, JSX } from '../react-ecs'
 import {
   Changes,
@@ -200,7 +201,12 @@ export function createReconciler(
       console.log('create instance', type)
       const entity = engine.addEntity()
       entities.add(entity)
-      const instance: Instance = { entity, _child: [] }
+      const instance: Instance = {
+        entity,
+        _child: [],
+        parent: CANVAS_ROOT_ENTITY as Entity,
+        rightOf: undefined
+      }
 
       for (const key in props) {
         const keyTyped: keyof Props = key as keyof Props
