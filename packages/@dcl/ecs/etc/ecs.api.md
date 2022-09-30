@@ -99,10 +99,10 @@ export namespace Components {
     //
     // (undocumented)
     CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
-    const // Warning: (ae-forgotten-export) The symbol "PBGLTFShape" needs to be exported by the entry point index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBGltfContainer" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
+    GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     const // Warning: (ae-forgotten-export) The symbol "PBMaterial" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -241,7 +241,7 @@ export type Entity = number & {
 export const error: (message: string | Error, data?: any) => void;
 
 // @public (undocumented)
-export const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
+export const GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
 
 // @public (undocumented)
 export type IEngine = {

@@ -234,7 +234,7 @@ declare namespace Components {
     /** @public */
     const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
     /** @public */
-    const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
+    const GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     /** @public */
     const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     /** @public */
@@ -483,7 +483,7 @@ declare function defineSdkComponents(engine: PreEngine): {
     CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
     CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
-    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
+    GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
     OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
@@ -555,7 +555,7 @@ declare const enum Font {
 }
 
 /** @public */
-declare const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
+declare const GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
 
 /**
  * @public
@@ -1896,13 +1896,8 @@ declare interface PBCylinderShape {
     radiusBottom?: number | undefined;
 }
 
-declare interface PBGLTFShape {
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    withCollisions?: boolean | undefined;
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    isPointerBlocker?: boolean | undefined;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
+declare interface PBGltfContainer {
+    /** which file to load */
     src: string;
 }
 
