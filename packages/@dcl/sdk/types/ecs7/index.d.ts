@@ -657,7 +657,21 @@ declare type IEngine = {
      * ```
      */
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
+    /**
+     * @public
+     * Refer to the root of the scene, all Transforms without a parent are parenting with RootEntity.
+     */
     RootEntity: Entity;
+    /**
+     * @public
+     * The current player entity
+     */
+    PlayerEntity: Entity;
+    /**
+     * @public
+     * Camera entity of current player.
+     */
+    CameraEntity: Entity;
     baseComponents: SdkComponents;
 };
 

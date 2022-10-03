@@ -255,6 +255,8 @@ export type IEngine = {
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     RootEntity: Entity;
+    PlayerEntity: Entity;
+    CameraEntity: Entity;
     baseComponents: SdkComponents;
 };
 
