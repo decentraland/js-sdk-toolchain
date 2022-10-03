@@ -83,6 +83,13 @@ declare interface Color3 {
     b: number;
 }
 
+declare interface Color4 {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+}
+
 /**
  * @public
  */
@@ -234,7 +241,7 @@ declare namespace Components {
     /** @public */
     const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
     /** @public */
-    const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
+    const GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     /** @public */
     const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     /** @public */
@@ -267,6 +274,8 @@ declare namespace Components {
     const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     /** @public */
     const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+    /** @public */
+    const UiStyles: ComponentDefinition<ISchema<PBUiStyles>, PBUiStyles>;
     /** @public */
     const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
     /** @public */
@@ -481,7 +490,7 @@ declare function defineSdkComponents(engine: PreEngine): {
     CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
     CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
-    GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
+    GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
     OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
@@ -496,6 +505,7 @@ declare function defineSdkComponents(engine: PreEngine): {
     RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
     SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+    UiStyles: ComponentDefinition<ISchema<PBUiStyles>, PBUiStyles>;
     UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
     UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
     VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
@@ -552,7 +562,7 @@ declare const enum Font {
 }
 
 /** @public */
-declare const GLTFShape: ComponentDefinition<ISchema<PBGLTFShape>, PBGLTFShape>;
+declare const GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
 
 /**
  * @public
@@ -1867,6 +1877,8 @@ declare interface PBAvatarShape {
      *  "urn:decentraland:off-chain:base-avatars:bun_shoes"]
      */
     wearables: string[];
+    /** default = [] */
+    emotes: string[];
 }
 
 declare interface PBBillboard {
@@ -1910,13 +1922,8 @@ declare interface PBCylinderShape {
     radiusBottom?: number | undefined;
 }
 
-declare interface PBGLTFShape {
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    withCollisions?: boolean | undefined;
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    isPointerBlocker?: boolean | undefined;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
+declare interface PBGltfContainer {
+    /** which file to load */
     src: string;
 }
 
@@ -2014,16 +2021,38 @@ declare interface PBMeshRenderer_SphereMesh {
 }
 
 declare interface PBNFTShape {
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    withCollisions?: boolean | undefined;
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    isPointerBlocker?: boolean | undefined;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
     src: string;
-    assetId?: string | undefined;
-    style?: number | undefined;
+    /** default = PictureFrameStyle.Classic */
+    style?: PBNFTShape_PictureFrameStyle | undefined;
+    /** default = Color3(0.6404918, 0.611472, 0.8584906) */
     color?: Color3 | undefined;
+}
+
+declare const enum PBNFTShape_PictureFrameStyle {
+    Classic = 0,
+    Baroque_Ornament = 1,
+    Diamond_Ornament = 2,
+    Minimal_Wide = 3,
+    Minimal_Grey = 4,
+    Blocky = 5,
+    Gold_Edges = 6,
+    Gold_Carved = 7,
+    Gold_Wide = 8,
+    Gold_Rounded = 9,
+    Metal_Medium = 10,
+    Metal_Wide = 11,
+    Metal_Slim = 12,
+    Metal_Rounded = 13,
+    Pins = 14,
+    Minimal_Black = 15,
+    Minimal_White = 16,
+    Tape = 17,
+    Wood_Slim = 18,
+    Wood_Wide = 19,
+    Wood_Twigs = 20,
+    Canvas = 21,
+    None = 22,
+    UNRECOGNIZED = -1
 }
 
 declare interface PBOnPointerDown {
@@ -2181,6 +2210,11 @@ declare interface PBTextShape {
     outlineColor?: Color3 | undefined;
     /** default=(1.0,1.0,1.0) */
     textColor?: Color3 | undefined;
+}
+
+declare interface PBUiStyles {
+    /** default=(0.0, 0.0, 0.0, 0.0) */
+    backgroundColor?: Color4 | undefined;
 }
 
 declare interface PBUiText {
@@ -2772,6 +2806,9 @@ declare type Transport = {
 declare type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
 declare type Uint32 = number;
+
+/** @public */
+declare const UiStyles: ComponentDefinition<ISchema<PBUiStyles>, PBUiStyles>;
 
 /** @public */
 declare const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;

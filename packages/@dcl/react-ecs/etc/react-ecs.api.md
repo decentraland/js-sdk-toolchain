@@ -26,6 +26,20 @@ export interface Color3 {
     r: number;
 }
 
+// Warning: (ae-missing-release-tag) "Color4" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface Color4 {
+    // (undocumented)
+    a: number;
+    // (undocumented)
+    b: number;
+    // (undocumented)
+    g: number;
+    // (undocumented)
+    r: number;
+}
+
 // Warning: (ae-missing-release-tag) "CommonProps" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -44,10 +58,27 @@ export function Container({ width, height, children }: ContainerPropTypes): Reac
 // @public (undocumented)
 export type ContainerPropTypes = Partial<CommonProps> & EntityPropTypes['uiTransform'];
 
+// Warning: (ae-missing-release-tag) "EcsElements" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type EcsElements = {
+    entity: Partial<EntityComponents & CommonProps>;
+};
+
+// Warning: (ae-missing-release-tag) "EntityComponents" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type EntityComponents = {
+    uiTransform: PBUiTransform;
+    uiText: PBUiText;
+    uiStyles: PBUiStyles;
+};
+
 // @public (undocumented)
 export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
     uiText?: UiTextProps;
+    uiStyles?: UiStylesProps;
 };
 
 // Warning: (ae-missing-release-tag) "Font" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -62,10 +93,31 @@ export enum Font {
     UNRECOGNIZED = -1
 }
 
+// Warning: (ae-missing-release-tag) "JSX" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export namespace JSX {
+    // (undocumented)
+    export interface Component {
+    }
+    // (undocumented)
+    export interface Element {
+    }
+    // (undocumented)
+    export type IntrinsicElements = EcsElements;
+}
+
 // Warning: (ae-missing-release-tag) "Key" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export type Key = number | string;
+
+// Warning: (ae-missing-release-tag) "PBUiStyles" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBUiStyles {
+    backgroundColor?: Color4 | undefined;
+}
 
 // Warning: (ae-missing-release-tag) "PBUiText" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -218,8 +270,6 @@ namespace ReactEcs {
         // (undocumented)
         interface Element {
         }
-        // Warning: (ae-forgotten-export) The symbol "EcsElements" needs to be exported by the entry point index.d.ts
-        //
         // (undocumented)
         type IntrinsicElements = EcsElements;
     }
@@ -253,7 +303,6 @@ export enum TextAlign {
     UNRECOGNIZED = -1
 }
 
-// Warning: (ae-forgotten-export) The symbol "JSX" needs to be exported by the entry point index.d.ts
 // Warning: (ae-missing-release-tag) "UiComponent" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -261,6 +310,11 @@ export type UiComponent = () => JSX.Element;
 
 // @public (undocumented)
 export function UiEntity(props: EntityPropTypes & Partial<CommonProps>): ReactEcs.JSX.Element;
+
+// Warning: (ae-missing-release-tag) "UiStylesProps" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type UiStylesProps = PBUiStyles;
 
 // Warning: (ae-missing-release-tag) "UiTextProps" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

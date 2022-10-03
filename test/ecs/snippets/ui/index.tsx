@@ -1,11 +1,12 @@
 import ReactEcs, {
+  renderUi,
   UiEntity,
+  YGAlign,
   YGDisplay,
-  YGJustify,
-  YGAlign
+  YGJustify
 } from '@dcl/react-ecs'
 
-export const ui = () => (
+export const uiComponent = () => (
   <UiEntity
     uiTransform={{
       width: 500,
@@ -32,3 +33,5 @@ export const ui = () => (
     </UiEntity>
   </UiEntity>
 )
+
+renderUi(uiComponent)
