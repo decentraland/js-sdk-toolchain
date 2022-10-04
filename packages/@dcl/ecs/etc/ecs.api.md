@@ -36,11 +36,6 @@ export const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarSh
 // @public (undocumented)
 export const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
 
-// Warning: (ae-forgotten-export) The symbol "PBBoxShape" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
-export const BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
-
 // Warning: (ae-forgotten-export) The symbol "createByteBuffer" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
@@ -90,15 +85,9 @@ export namespace Components {
     const // (undocumented)
     Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
     const // (undocumented)
-    BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
-    const // (undocumented)
     CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
     const // (undocumented)
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
-    const // Warning: (ae-forgotten-export) The symbol "PBCylinderShape" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
     const // Warning: (ae-forgotten-export) The symbol "PBGltfContainer" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -135,10 +124,6 @@ export namespace Components {
     //
     // (undocumented)
     OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
-    const // Warning: (ae-forgotten-export) The symbol "PBPlaneShape" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
     const // Warning: (ae-forgotten-export) The symbol "PBPointerEvents" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -159,10 +144,6 @@ export namespace Components {
     //
     // (undocumented)
     RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
-    const // Warning: (ae-forgotten-export) The symbol "PBSphereShape" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     const // Warning: (ae-forgotten-export) The symbol "PBTextShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -201,9 +182,6 @@ export type ComponentType<T extends ISchema> = EcsResult<T>;
 //
 // @public
 export function cyclicParentingChecker(engine: IEngine): () => void;
-
-// @public (undocumented)
-export const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
 
 // @public (undocumented)
 export type DeepReadonly<T> = T extends ReadonlyPrimitive ? T : T extends Map<infer K, infer V> ? DeepReadonlyMap<K, V> : T extends Set<infer M> ? DeepReadonlySet<M> : DeepReadonlyObject<T>;
@@ -445,9 +423,6 @@ export const onVideoEvent: Observable<{
 }>;
 
 // @public (undocumented)
-export const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
-
-// @public (undocumented)
 export const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
 
 // @public (undocumented)
@@ -583,9 +558,6 @@ export interface Spec {
     // (undocumented)
     [key: string]: ISchema;
 }
-
-// @public (undocumented)
-export const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
 
 // @public (undocumented)
 export type SystemFn = (dt: number) => void;
