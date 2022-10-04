@@ -64,7 +64,7 @@ export type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTyp
     get(entity: Entity): DeepReadonly<ComponentType<T>>;
     getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
     create(entity: Entity, val?: ConstructorType): ComponentType<T>;
-    createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
+    createOrReplace(entity: Entity, val?: ConstructorType): ComponentType<T>;
     deleteFrom(entity: Entity): ComponentType<T> | null;
     getMutable(entity: Entity): ComponentType<T>;
     getMutableOrNull(entity: Entity): ComponentType<T> | null;
