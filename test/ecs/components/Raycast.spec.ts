@@ -1,4 +1,4 @@
-﻿import { RaycastQueryType } from '../../../packages/@dcl/ecs/src/components/generated/pb/Raycast.gen'
+﻿import { RaycastQueryType } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/Raycast.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated Raycast ProtoBuf', () => {

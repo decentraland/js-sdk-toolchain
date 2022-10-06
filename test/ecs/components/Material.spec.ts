@@ -2,7 +2,7 @@ import {
   FilterMode,
   TextureWrapMode,
   TransparencyMode
-} from '../../../packages/@dcl/ecs/src/components/generated/pb/Material.gen'
+} from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/Material.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated Material ProtoBuf', () => {

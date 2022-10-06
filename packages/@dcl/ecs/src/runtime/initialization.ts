@@ -5,8 +5,8 @@
  * init and it'll be changing.
  */
 
-import { ActionButton } from '../components/generated/pb/common/ActionButton.gen'
-import { PointerEventType } from '../components/generated/pb/PointerEvents.gen'
+import { ActionButton } from '../components/generated/pb/ecs/components/common/ActionButton.gen'
+import { PointerEventType } from '../components/generated/pb/ecs/components/PointerEvents.gen'
 import { Engine, Entity } from '../engine'
 import {
   isPointerEventActiveGenerator,

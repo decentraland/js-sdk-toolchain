@@ -8,7 +8,7 @@ import {
   YGPositionType,
   YGUnit
   // YGUnit
-} from '../../../packages/@dcl/ecs/src/components/generated/pb/UiTransform.gen'
+} from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/UiTransform.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('UiTransform component', () => {

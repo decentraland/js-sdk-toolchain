@@ -1,6 +1,6 @@
 import { Entity } from '../../../packages/@dcl/ecs/src/engine/entity'
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/PointerEvents.gen'
-import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/common/ActionButton.gen'
+import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/PointerEvents.gen'
+import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/common/ActionButton.gen'
 import { isPointerEventActiveGenerator } from '../../../packages/@dcl/ecs/src/engine/events'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 

@@ -1,7 +1,7 @@
 import { Entity } from './entity'
-import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/PointerEventsResult.gen'
-import { PointerEventType } from '../components/generated/pb/PointerEvents.gen'
-import { ActionButton } from '../components/generated/pb/common/ActionButton.gen'
+import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/ecs/components/PointerEventsResult.gen'
+import { PointerEventType } from '../components/generated/pb/ecs/components/PointerEvents.gen'
+import { ActionButton } from '../components/generated/pb/ecs/components/common/ActionButton.gen'
 import { IEngine } from './types'
 import { Schemas } from '../schemas'
 

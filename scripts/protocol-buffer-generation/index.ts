@@ -28,6 +28,7 @@ const NON_EXPOSED_LIST = [
 export function compileEcsComponents(
   componentPathParam: string,
   definitionsPath: string,
+  protocolPath: string,
   test = false
 ) {
   it('compiles components for folder ' + componentPathParam, async () => {
@@ -80,7 +81,8 @@ export function compileEcsComponents(
         components,
         componentPath,
         definitionsPath,
-        generatedPath
+        generatedPath,
+        protocolPath
       }))
     ) {
       throw new Error('Failed to generate protocol buffer')
