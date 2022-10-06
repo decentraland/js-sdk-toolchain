@@ -12,7 +12,7 @@ import {
   UiTransformProps
 } from './types'
 
-export const CANVAS_ROOT_ENTITY = 7
+export const CANVAS_ROOT_ENTITY = 0
 
 /**
  * @public
@@ -30,13 +30,13 @@ export const defaultDiv: PBUiTransform = {
   parent: CANVAS_ROOT_ENTITY,
   rightOf: 0,
   display: YGDisplay.YGDisplayFlex,
-  flexBasis: 0,
+  flexBasis: NaN,
   width: 0,
   height: 0,
   minWidth: 0,
   minHeight: 0,
-  maxWidth: 0,
-  maxHeight: 0,
+  maxWidth: NaN,
+  maxHeight: NaN,
   justifyContent: YGJustify.YGJustifyFlexStart,
   alignItems: YGAlign.YGAlignStretch,
   alignSelf: YGAlign.YGAlignAuto,
