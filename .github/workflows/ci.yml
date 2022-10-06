@@ -9,6 +9,24 @@ on:
 
 name: CI
 jobs:
+  test: 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - name: install
+        run: make install
+      - name: build
+        run: make build
+      - name: test
+        run: make test-coverage
+      - name: lint
+        run: make lint
+      - name: prepare releasable packages
+        run: make prepare
   build:
     runs-on: ubuntu-latest
     outputs:
@@ -59,8 +77,6 @@ jobs:
           only-update-versions: true
       - name: build
         run: make build
-      - name: test
-        run: make test-coverage
       - name: lint
         run: make lint
       - name: prepare releasable packages
