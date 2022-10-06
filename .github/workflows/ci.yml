@@ -249,4 +249,6 @@ jobs:
                ```bash
                npm install "${{ steps.url-generator.outputs.body }}"
                ```
+            - You can preview this build entering:
+              https://decentraland.github.io/sdk-playground/?&sdk-branch=${{ github.head_ref || github.ref }}
           edit-mode: replace
