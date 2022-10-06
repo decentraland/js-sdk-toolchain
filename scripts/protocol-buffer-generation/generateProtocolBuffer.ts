@@ -9,8 +9,9 @@ export async function generateProtocolBuffer(params: {
   definitionsPath: string
   generatedPath: string
   componentPath: string
+  protocolPath: string
 }) {
-  const { definitionsPath, generatedPath, components } = params
+  const { definitionsPath, generatedPath, components, protocolPath } = params
   const pbGeneratedPath = path.resolve(generatedPath, 'pb')
   let ret = false
 
@@ -21,29 +22,35 @@ export async function generateProtocolBuffer(params: {
     .map((item) => path.resolve(definitionsPath, `${item.componentName}.proto`))
     .join(' ')
 
+  const protoCompilerPath = path.resolve(
+    process.cwd(),
+    'node_modules/.bin/protobuf/bin/protoc'
+  )
+
+  const tsProtoPluginPath = path.resolve(
+    process.cwd(),
+    'node_modules/.bin/protoc-gen-ts_proto'
+  )
+
+  const protoCommandArgs: string[] = [
+    `--plugin=${tsProtoPluginPath}`,
+    `--ts_proto_opt=esModuleInterop=true`,
+    `--ts_proto_opt=outputJsonMethods=false`,
+    `--ts_proto_opt=forceLong=false`,
+    `--ts_proto_opt=outputPartialMethods=false`,
+    `--ts_proto_opt=fileSuffix=.gen`,
+    `--ts_proto_out=${pbGeneratedPath}`,
+    `--proto_path=${protocolPath}`,
+    protoFiles
+  ]
+  const commandWorkingDir = process.cwd()
+  console.log(`Command is ${protoCompilerPath} ${protoCommandArgs.join(' ')}`)
+
   try {
     await runCommand({
-      command: path.resolve(
-        process.cwd(),
-        'node_modules',
-        '.bin',
-        'protobuf',
-        'bin',
-        'protoc'
-      ),
-      workingDir: process.cwd(),
-      args: [
-        '--plugin=./node_modules/.bin/protoc-gen-ts_proto',
-        '--ts_proto_opt=esModuleInterop=true',
-        `--ts_proto_opt=outputJsonMethods=false`,
-        `--ts_proto_opt=forceLong=false`,
-        // `--ts_proto_opt=onlyTypes=true`,
-        `--ts_proto_opt=outputPartialMethods=false`,
-        `--ts_proto_opt=fileSuffix=.gen`,
-        `--ts_proto_out=${pbGeneratedPath}`,
-        `--proto_path=${definitionsPath}`,
-        protoFiles
-      ],
+      command: protoCompilerPath,
+      workingDir: commandWorkingDir,
+      args: protoCommandArgs,
       fdStandards: FileDescriptorStandardOption.ONLY_IF_THROW
     })
 
