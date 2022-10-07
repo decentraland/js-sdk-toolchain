@@ -104,7 +104,7 @@ export type ComponentDefinition<
    * Transform.createOrReplace(myEntity, { ...Transform.default(), position: {x: 4, y: 0, z: 4} }) // ok!
    * ````
    */
-  createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>
+  createOrReplace(entity: Entity, val?: ConstructorType): ComponentType<T>
 
   /**
    * Delete the current component to an entity, return null if the entity doesn't have the current component.

@@ -1,4 +1,4 @@
-﻿import { AvatarModifier } from '../../../packages/@dcl/ecs/src/components/generated/pb/AvatarModifierArea.gen'
+﻿import { AvatarModifier } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/AvatarModifierArea.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated Avatar ModifierArea ProtoBuf', () => {

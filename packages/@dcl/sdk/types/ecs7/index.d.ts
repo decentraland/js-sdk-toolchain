@@ -171,7 +171,7 @@ declare type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTy
      * Transform.createOrReplace(myEntity, { ...Transform.default(), position: {x: 4, y: 0, z: 4} }) // ok!
      * ````
      */
-    createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>;
+    createOrReplace(entity: Entity, val?: ConstructorType): ComponentType<T>;
     /**
      * Delete the current component to an entity, return null if the entity doesn't have the current component.
      * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
@@ -664,7 +664,21 @@ declare type IEngine = {
      * ```
      */
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
+    /**
+     * @public
+     * Refer to the root of the scene, all Transforms without a parent are parenting with RootEntity.
+     */
     RootEntity: Entity;
+    /**
+     * @public
+     * The current player entity
+     */
+    PlayerEntity: Entity;
+    /**
+     * @public
+     * Camera entity of current player.
+     */
+    CameraEntity: Entity;
     baseComponents: SdkComponents;
 };
 

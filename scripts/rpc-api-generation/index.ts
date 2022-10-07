@@ -40,7 +40,7 @@ export async function compileProtoApi() {
 async function internalCompile() {
   const outModulesPath = path.resolve(__dirname, 'src', 'modules')
   const apiArray = await preprocessProtoGeneration(
-    path.resolve(__dirname, 'src', 'proto')
+    path.resolve(__dirname, 'src', 'proto', 'kernel', 'apis')
   )
 
   removeSync(outModulesPath)
@@ -67,7 +67,7 @@ async function internalCompile() {
     let indexContent = ''
     indexContent += `import type {${Array.from(types).join(
       ', '
-    )}} from './../../proto/${api.name}.gen'\n`
+    )}} from './../../proto/kernel/apis/${api.name}.gen'\n`
     indexContent += functions.join('\n')
 
     writeFileSync(path.resolve(apiModuleDirPath, `index.gen.ts`), indexContent)
@@ -92,7 +92,10 @@ async function preprocessProtoGeneration(protoPath: string) {
 
   const apis = []
   for (const item of apiFiles) {
-    const filePath = path.resolve(__dirname, `./src/proto/${item}.gen.ts`)
+    const filePath = path.resolve(
+      __dirname,
+      `./src/proto/kernel/apis/${item}.gen.ts`
+    )
     const typesTextContent = readFileSync(filePath).toString()
 
     const textContent = typesTextContent

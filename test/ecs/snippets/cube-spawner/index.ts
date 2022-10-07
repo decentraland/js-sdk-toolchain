@@ -24,8 +24,11 @@ function createCube(x: number, y: number, z: number, spawner = true): Entity {
 
 // Systems
 function circularSystem(dt: number) {
-  const entitiesWithBoxShapes = engine.getEntitiesWith(BoxShape, Transform)
-  for (const [entity, _boxShape, _transform] of entitiesWithBoxShapes) {
+  const entitiesWithMeshRenderer = engine.getEntitiesWith(
+    MeshRenderer,
+    Transform
+  )
+  for (const [entity, _meshRenderer, _transform] of entitiesWithMeshRenderer) {
     const mutableTransform = Transform.getMutable(entity)
 
     mutableTransform.rotation = Quaternion.multiply(

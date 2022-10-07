@@ -58,7 +58,7 @@ scripts/rpc-api-generation/src/proto/%.gen.ts: packages/@dcl/ecs/node_modules/@d
 			--ts_proto_opt=onlyTypes=true \
 			--ts_proto_out="$(PWD)/scripts/rpc-api-generation/src/proto" \
 			-I="$(PWD)/scripts/rpc-api-generation/src/proto" \
-			-I="$(PWD)/packages/@dcl/ecs/node_modules/@dcl/protocol/kernel/apis" \
+			-I="$(PWD)/packages/@dcl/ecs/node_modules/@dcl/protocol/" \
 			"$(PWD)/packages/@dcl/ecs/node_modules/@dcl/protocol/kernel/apis/$*.proto";
 
 compile_apis: ${PBS_TS}

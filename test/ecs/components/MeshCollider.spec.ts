@@ -1,4 +1,4 @@
-import { ColliderLayer } from '../../../packages/@dcl/ecs/src/components/generated/pb/MeshCollider.gen'
+import { ColliderLayer } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/MeshCollider.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 import { makeCollisionMask } from '../../../packages/@dcl/ecs/src/components'
 

@@ -230,6 +230,8 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     removeComponentDefinition: engine.removeComponentDefinition,
     update,
     RootEntity: 0 as Entity,
+    PlayerEntity: 1 as Entity,
+    CameraEntity: 2 as Entity,
     baseComponents
   }
 }

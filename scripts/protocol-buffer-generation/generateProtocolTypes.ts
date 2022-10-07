@@ -4,7 +4,8 @@ import { FileDescriptorStandardOption, runCommand } from '../utils/shellCommand'
 export async function createProtoTypes(
   definitionsPath: string,
   output: string,
-  files: string[]
+  files: string[],
+  protocolPath: string
 ) {
   const protoFiles = files
     .map((item) => path.resolve(definitionsPath, item))
@@ -28,7 +29,7 @@ export async function createProtoTypes(
       `--ts_proto_opt=outputPartialMethods=false`,
       `--ts_proto_opt=fileSuffix=.gen`,
       `--ts_proto_out=${output}`,
-      `--proto_path=${definitionsPath}`,
+      `--proto_path=${protocolPath}`,
       protoFiles
     ],
     fdStandards: FileDescriptorStandardOption.ONLY_IF_THROW
