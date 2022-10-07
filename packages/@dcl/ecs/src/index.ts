@@ -16,3 +16,5 @@ export * from './engine/events'
 export * from './runtime/observables'
 export * from './runtime/temp-fp/Observable'
 export * from './runtime/MessageBus'
+
+export { makeCollisionMask } from './components'
