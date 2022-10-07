@@ -9,23 +9,26 @@ import {
 const CANVAS_ROOT_ENTITY = 0
 declare const engine: IEngine
 
-describe('UiText React Ecs', () => {
+describe('UiBackground React Ecs', () => {
   beforeEach(() => {
     ;(globalThis as any).engine = Engine()
   })
 
   it('should generate a UI and update the width of a div', async () => {
-    const { UiTransform, UiStyles } = engine.baseComponents
+    const { UiTransform, UiBackground } = engine.baseComponents
     const entityIndex = engine.addEntity()
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
     const getDiv = (entity: Entity) => UiTransform.get(entity)
-    const getStyles = (entity: Entity) => UiStyles.get(entity)
+    const getBackground = (entity: Entity) => UiBackground.get(entity)
     let backgroundColor: Color4 | undefined = { r: 0, g: 1, b: 2, a: 0 }
 
     const ui = () => (
-      <UiEntity uiTransform={{ width: 100 }} uiStyles={{ backgroundColor }} />
+      <UiEntity
+        uiTransform={{ width: 100 }}
+        uiBackground={{ backgroundColor }}
+      />
     )
 
     renderUi(ui)
@@ -37,7 +40,7 @@ describe('UiText React Ecs', () => {
       width: 100
     })
 
-    expect(getStyles(rootDivEntity)).toMatchObject({
+    expect(getBackground(rootDivEntity)).toMatchObject({
       backgroundColor: { r: 0, g: 1, b: 2, a: 0 }
     })
 
@@ -45,13 +48,13 @@ describe('UiText React Ecs', () => {
     backgroundColor.g = 20.8
 
     engine.update(1)
-    expect(getStyles(rootDivEntity)).toMatchObject({
+    expect(getBackground(rootDivEntity)).toMatchObject({
       backgroundColor: { r: 0, g: 20.8, b: 2 }
     })
 
     backgroundColor = undefined
     engine.update(1)
-    expect(getStyles(rootDivEntity)).toMatchObject({
+    expect(getBackground(rootDivEntity)).toMatchObject({
       backgroundColor: undefined
     })
   })

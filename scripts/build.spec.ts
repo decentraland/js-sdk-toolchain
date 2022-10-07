@@ -145,7 +145,7 @@ flow('build-all', () => {
       await createProtoTypes(
         `${ECS7_PATH}/node_modules/@dcl/protocol/ecs/components`,
         protoTypesPath,
-        ['UiTransform.proto', 'UiText.proto', 'UiStyles.proto'],
+        ['UiTransform.proto', 'UiText.proto', 'UiBackground.proto'],
         `${ECS7_PATH}/node_modules/@dcl/protocol`
       )
     })

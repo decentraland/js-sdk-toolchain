@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import React from 'react'
-import { PBUiText, PBUiTransform, PBUiStyles } from './components'
+import { PBUiText, PBUiTransform, PBUiBackground } from './components'
 import { CommonProps } from './components/types'
 
 export type EcsElements = {
@@ -10,7 +10,7 @@ export type EcsElements = {
 export type EntityComponents = {
   uiTransform: PBUiTransform
   uiText: PBUiText
-  uiStyles: PBUiStyles
+  uiBackground: PBUiBackground
 }
 
 export namespace JSX {
