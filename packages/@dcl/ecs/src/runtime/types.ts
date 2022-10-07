@@ -6,7 +6,7 @@ import { TransportMessage } from '../systems/crdt/types'
 
 // ColliderLayer is not used in the .pb definition because the field value is a number
 //   and it can have multiple values of this enum. It needs to be exposed here.
-import { ColliderLayer } from '../components/generated/pb/MeshCollider.gen'
+import { ColliderLayer } from '../components/generated/pb/ecs/components/MeshCollider.gen'
 
 export type {
   Spec,
