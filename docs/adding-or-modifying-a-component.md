@@ -40,7 +40,7 @@ In order for a component to be used in the creation of a scene, it is necessary 
 
 If all goes well, we can now create our PR. If you are adding a new component, you should create a test to make sure that the serialization and deserialization are working well. For this:
 
-1. Copy and paste an existing component test, for example `BoxShape.spec.ts` found in `packages/@dcl/ecs/test/components/`
+1. Copy and paste an existing component test, for example `MeshRenderer.spec.ts` found in `packages/@dcl/ecs/test/components/`
 2. Adapt it to test our new component
 
 If you are modifying an existing component, it's probable that the test doesn't need any modifications.

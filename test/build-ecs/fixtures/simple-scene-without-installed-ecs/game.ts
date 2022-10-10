@@ -3,7 +3,7 @@ function circularSystem() {
   return (dt: number) => {
     t += 2 * Math.PI * dt
 
-    const group = engine.getEntitiesWith(BoxShape)
+    const group = engine.getEntitiesWith(MeshRenderer)
     for (const [entity] of group) {
       const transform = Transform.getMutableOrNull(entity)
       if (transform) {
@@ -23,11 +23,8 @@ function createCube(x: number, y: number, z: number) {
     rotation: { x: 0, y: 0, z: 0, w: 1 }
   })
 
-  BoxShape.create(myEntity, {
-    withCollisions: true,
-    isPointerBlocker: true,
-    visible: true,
-    uvs: []
+  MeshRenderer.create(myEntity, {
+    box: { uvs: [] }
   })
 
   return myEntity

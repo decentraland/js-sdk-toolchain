@@ -50,9 +50,6 @@ declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarS
 /** @public */
 declare const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
 
-/** @public */
-declare const BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
-
 /**
  * @public
  */
@@ -233,13 +230,9 @@ declare namespace Components {
     /** @public */
     const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
     /** @public */
-    const BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
-    /** @public */
     const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
     /** @public */
     const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
-    /** @public */
-    const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
     /** @public */
     const GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     /** @public */
@@ -259,8 +252,6 @@ declare namespace Components {
     /** @public */
     const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
     /** @public */
-    const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
-    /** @public */
     const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     /** @public */
     const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
@@ -270,8 +261,6 @@ declare namespace Components {
     const Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
     /** @public */
     const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
-    /** @public */
-    const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     /** @public */
     const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
     /** @public */
@@ -451,9 +440,6 @@ declare interface CreateByteBufferOptions {
  */
 declare function cyclicParentingChecker(engine: IEngine): () => void;
 
-/** @public */
-declare const CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
-
 /**
  * @public
  */
@@ -486,10 +472,8 @@ declare function defineSdkComponents(engine: PreEngine): {
     AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
     AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
     Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
-    BoxShape: ComponentDefinition<ISchema<PBBoxShape>, PBBoxShape>;
     CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
-    CylinderShape: ComponentDefinition<ISchema<PBCylinderShape>, PBCylinderShape>;
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
@@ -497,13 +481,11 @@ declare function defineSdkComponents(engine: PreEngine): {
     OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
     OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
     OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
-    PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
     PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
     Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
     RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
-    SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
     TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
     UiBackground: ComponentDefinition<ISchema<PBUiBackground>, PBUiBackground>;
     UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
@@ -597,8 +579,8 @@ declare type IEngine = {
      * Example:
      * ```ts
      * function mySystem(dt: number) {
-     *   const entitiesWithBoxShapes = engine.getEntitiesWith(BoxShape, Transform)
-     *   for (const [entity, _boxShape, _transform] of engine.getEntitiesWith(BoxShape, Transform)) {
+     *   const entitiesWithMeshRenderer = engine.getEntitiesWith(MeshRenderer, Transform)
+     *   for (const [entity, _meshRenderer, _transform] of engine.getEntitiesWith(MeshRenderer, Transform)) {
      *     // do stuffs
      *   }
      * }
@@ -658,8 +640,8 @@ declare type IEngine = {
      *
      * Example:
      * ```ts
-     * for (const [entity, boxShape, transform] of engine.getEntitiesWith(BoxShape, Transform)) {
-     *   // the properties of boxShape and transform are read only
+     * for (const [entity, meshRenderer, transform] of engine.getEntitiesWith(MeshRenderer, Transform)) {
+     *   // the properties of meshRenderer and transform are read only
      * }
      * ```
      */
@@ -1904,16 +1886,6 @@ declare interface PBBillboard {
     z?: boolean | undefined;
 }
 
-declare interface PBBoxShape {
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    withCollisions?: boolean | undefined;
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    isPointerBlocker?: boolean | undefined;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
-    uvs: number[];
-}
-
 declare interface PBCameraMode {
     mode: CameraModeValue;
 }
@@ -1921,19 +1893,6 @@ declare interface PBCameraMode {
 declare interface PBCameraModeArea {
     area: Vector3_2 | undefined;
     mode: CameraModeValue;
-}
-
-declare interface PBCylinderShape {
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    withCollisions?: boolean | undefined;
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    isPointerBlocker?: boolean | undefined;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
-    /** default=1.0 */
-    radiusTop?: number | undefined;
-    /** default=1.0 */
-    radiusBottom?: number | undefined;
 }
 
 declare interface PBGltfContainer {
@@ -2113,16 +2072,6 @@ declare interface PBOnPointerUpResult {
     timestamp: number;
 }
 
-declare interface PBPlaneShape {
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    withCollisions?: boolean | undefined;
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    isPointerBlocker?: boolean | undefined;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
-    uvs: number[];
-}
-
 declare interface PBPointerEvents {
     pointerEvents: PBPointerEvents_Entry[];
 }
@@ -2178,15 +2127,6 @@ declare interface PBRaycastResult {
     origin: Vector3_2 | undefined;
     direction: Vector3_2 | undefined;
     hits: RaycastHit[];
-}
-
-declare interface PBSphereShape {
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    withCollisions?: boolean | undefined;
-    /** @deprecated use MeshCollider instead https://github.com/decentraland/sdk/issues/366 */
-    isPointerBlocker?: boolean | undefined;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
 }
 
 declare interface PBTextShape {
@@ -2426,9 +2366,6 @@ declare namespace Plane {
      */
     function signedDistanceTo(plane: ReadonlyPlane, point: Vector3.ReadonlyVector3): number;
 }
-
-/** @public */
-declare const PlaneShape: ComponentDefinition<ISchema<PBPlaneShape>, PBPlaneShape>;
 
 /** @public */
 declare const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
@@ -2746,9 +2683,6 @@ declare type SdkComponents = ReturnType<typeof defineSdkComponents>;
 declare interface Spec {
     [key: string]: ISchema;
 }
-
-/** @public */
-declare const SphereShape: ComponentDefinition<ISchema<PBSphereShape>, PBSphereShape>;
 
 /**
  * @public
