@@ -18,11 +18,8 @@ describe('Legacy component tests', () => {
     function spawnCube(x: number, y: number, z: number) {
       const newCubeEntity = engine.addEntity()
 
-      sdk.BoxShape.create(newCubeEntity, {
-        isPointerBlocker: true,
-        visible: true,
-        withCollisions: true,
-        uvs: [0, 0, 0, 0]
+      sdk.MeshRenderer.create(newCubeEntity, {
+        box: { uvs: [0, 0, 0, 0] }
       })
 
       sdk.Transform.create(newCubeEntity, {
@@ -53,12 +50,12 @@ describe('Legacy component tests', () => {
         expect(transformReceveid).toBeDeepCloseTo(transformOriginal)
       }
 
-      const groupBoxShape = engine.getEntitiesWith(sdk.BoxShape)
+      const groupBoxShape = engine.getEntitiesWith(sdk.MeshRenderer)
       for (const [entity, component] of groupBoxShape) {
-        const boxShapeData = sdk.BoxShape.toBinary(entity)
+        const boxShapeData = sdk.MeshRenderer.toBinary(entity)
         // TODO: see this
         const boxShapeOriginal = { ...component } as any
-        const boxShapeReceveid = sdk.BoxShape.updateFromBinary(
+        const boxShapeReceveid = sdk.MeshRenderer.updateFromBinary(
           entity,
           boxShapeData
         )

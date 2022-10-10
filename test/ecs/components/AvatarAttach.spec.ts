@@ -1,7 +1,7 @@
 ﻿import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
-describe('Generated BoxShape ProtoBuf', () => {
-  it('should serialize/deserialize BoxShape', () => {
+describe('Generated AvatarAttach ProtoBuf', () => {
+  it('should serialize/deserialize AvatarAttach', () => {
     const newEngine = Engine()
     const { AvatarAttach } = newEngine.baseComponents
     const entity = newEngine.addEntity()

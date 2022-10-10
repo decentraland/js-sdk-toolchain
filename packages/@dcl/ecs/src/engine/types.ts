@@ -52,8 +52,8 @@ export type IEngine = {
    * Example:
    * ```ts
    * function mySystem(dt: number) {
-   *   const entitiesWithBoxShapes = engine.getEntitiesWith(BoxShape, Transform)
-   *   for (const [entity, _boxShape, _transform] of engine.getEntitiesWith(BoxShape, Transform)) {
+   *   const entitiesWithMeshRenderer = engine.getEntitiesWith(MeshRenderer, Transform)
+   *   for (const [entity, _meshRenderer, _transform] of engine.getEntitiesWith(MeshRenderer, Transform)) {
    *     // do stuffs
    *   }
    * }
@@ -129,8 +129,8 @@ export type IEngine = {
    *
    * Example:
    * ```ts
-   * for (const [entity, boxShape, transform] of engine.getEntitiesWith(BoxShape, Transform)) {
-   *   // the properties of boxShape and transform are read only
+   * for (const [entity, meshRenderer, transform] of engine.getEntitiesWith(MeshRenderer, Transform)) {
+   *   // the properties of meshRenderer and transform are read only
    * }
    * ```
    */

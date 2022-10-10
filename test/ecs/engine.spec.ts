@@ -355,17 +355,14 @@ describe('Engine tests', () => {
   it('should return isDirty if we mutate the component', () => {
     const engine = Engine()
     const entityA = engine.addEntity()
-    engine.baseComponents.BoxShape.create(entityA, {
-      withCollisions: false,
-      isPointerBlocker: true,
-      visible: false,
-      uvs: []
+    engine.baseComponents.MeshRenderer.create(entityA, {
+      box: { uvs: [] }
     })
-    expect(engine.baseComponents.BoxShape.isDirty(entityA)).toBe(true)
+    expect(engine.baseComponents.MeshRenderer.isDirty(entityA)).toBe(true)
     engine.update(1)
-    expect(engine.baseComponents.BoxShape.isDirty(entityA)).toBe(false)
-    engine.baseComponents.BoxShape.getMutable(entityA)
-    expect(engine.baseComponents.BoxShape.isDirty(entityA)).toBe(true)
+    expect(engine.baseComponents.MeshRenderer.isDirty(entityA)).toBe(false)
+    engine.baseComponents.MeshRenderer.getMutable(entityA)
+    expect(engine.baseComponents.MeshRenderer.isDirty(entityA)).toBe(true)
   })
 
   it('should fail to write to byte buffer if the entity not exists', () => {
@@ -373,7 +370,7 @@ describe('Engine tests', () => {
     const entityA = engine.addEntity()
     const buf = createByteBuffer()
     expect(() =>
-      engine.baseComponents.BoxShape.writeToByteBuffer(entityA, buf)
+      engine.baseComponents.MeshRenderer.writeToByteBuffer(entityA, buf)
     ).toThrowError('')
   })
 
