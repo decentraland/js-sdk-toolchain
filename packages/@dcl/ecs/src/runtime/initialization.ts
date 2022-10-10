@@ -8,10 +8,7 @@
 import { ActionButton } from '../components/generated/pb/ecs/components/common/ActionButton.gen'
 import { PointerEventType } from '../components/generated/pb/ecs/components/PointerEvents.gen'
 import { Engine, Entity } from '../engine'
-import {
-  isPointerEventActiveGenerator,
-  wasEntityClickedGenerator
-} from '../engine/events'
+import { createInput } from '../engine/input'
 import { createNetworkTransport } from '../systems/crdt/transports/networkTransport'
 import { createRendererTransport } from '../systems/crdt/transports/rendererTransport'
 import { _initEventObservables } from './observables'
@@ -52,9 +49,7 @@ if (typeof dcl !== 'undefined') {
 export const log = dcl.log
 export const error = dcl.error
 
-let wasEntityClickedFunc:
-  | ((entity: Entity, actionButton: ActionButton) => boolean)
-  | null = null
+export const Input = createInput(engine)
 
 /**
  * Check if an entity emitted a clicked event
@@ -63,19 +58,8 @@ let wasEntityClickedFunc:
  * @returns true if the entity was clicked in the last tick-update
  */
 export function wasEntityClicked(entity: Entity, actionButton: ActionButton) {
-  if (!wasEntityClickedFunc) {
-    wasEntityClickedFunc = wasEntityClickedGenerator(engine)
-  }
-  return wasEntityClickedFunc(entity, actionButton)
+  return Input.isClicked(actionButton, entity)
 }
-
-let isPointerEventActiveFunc:
-  | ((
-      entity: Entity,
-      actionButton: ActionButton,
-      pointerEventType: PointerEventType
-    ) => boolean)
-  | null = null
 
 /**
  * Check if a pointer event has been emited in the last tick-update.
@@ -89,8 +73,5 @@ export function isPointerEventActive(
   actionButton: ActionButton,
   pointerEventType: PointerEventType
 ) {
-  if (!isPointerEventActiveFunc) {
-    isPointerEventActiveFunc = isPointerEventActiveGenerator(engine)
-  }
-  return isPointerEventActiveFunc(entity, actionButton, pointerEventType)
+  return Input.isInputActive(actionButton, pointerEventType, entity)
 }

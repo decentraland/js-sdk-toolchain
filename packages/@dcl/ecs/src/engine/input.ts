@@ -5,33 +5,69 @@ import { ActionButton } from '../components/generated/pb/ecs/components/common/A
 import { IEngine } from './types'
 import { Schemas } from '../schemas'
 
-const UpdateTimestampStateSchema = {
+const InternalInputStateSchema = {
   timestampLastUpdate: Schemas.Number,
-  currentTimestamp: Schemas.Number
+  currentTimestamp: Schemas.Number,
+  buttonState: Schemas.Array(
+    Schemas.Map({
+      value: Schemas.Boolean,
+      ts: Schemas.Number
+    })
+  )
 }
 
-const WasEntityClickComponentID = 1500
-const IsPointerEventActiveComponentID = 1501
-const EventSystemPriority = 1 << 20
+const LastActionButton = ActionButton.ACTION_6
 
-export function wasEntityClickedGenerator(engine: IEngine) {
-  const WasEntityClickComponentState = engine.defineComponent(
-    UpdateTimestampStateSchema,
-    WasEntityClickComponentID
+const InternalInputStateComponentId = 1500
+const TimestampUpdateSystemPriority = 1 << 20
+const ButtonStateUpdateSystemPriority = 0
+
+export function createInput(engine: IEngine) {
+  const InternalInputStateComponent = engine.defineComponent(
+    InternalInputStateSchema,
+    InternalInputStateComponentId
   )
 
-  WasEntityClickComponentState.create(engine.RootEntity)
+  InternalInputStateComponent.create(engine.RootEntity, {
+    buttonState: Array.from({ length: LastActionButton + 1 }, () => ({
+      ts: 0,
+      value: false
+    }))
+  })
 
-  engine.addSystem(() => {
-    const state = WasEntityClickComponentState.get(engine.RootEntity)
+  function timestampUpdateSystem() {
+    const state = InternalInputStateComponent.get(engine.RootEntity)
     if (state.currentTimestamp > state.timestampLastUpdate) {
-      WasEntityClickComponentState.getMutable(
+      InternalInputStateComponent.getMutable(
         engine.RootEntity
       ).timestampLastUpdate = state.currentTimestamp
     }
-  }, EventSystemPriority)
+  }
 
-  return function (entity: Entity, actionButton: ActionButton) {
+  function buttonStateUpdateSystem() {
+    const component = engine.baseComponents.PointerEventsResult.getOrNull(
+      engine.RootEntity
+    )
+
+    if (!component) return
+
+    const state = InternalInputStateComponent.getMutable(engine.RootEntity)
+
+    for (const command of component.commands) {
+      if (command.timestamp > state.buttonState[command.button].ts) {
+        if (command.state === PointerEventType.DOWN) {
+          state.buttonState[command.button].value = true
+        } else if (command.state === PointerEventType.UP) {
+          state.buttonState[command.button].value = false
+        }
+      }
+    }
+  }
+
+  engine.addSystem(buttonStateUpdateSystem, ButtonStateUpdateSystemPriority)
+  engine.addSystem(timestampUpdateSystem, TimestampUpdateSystemPriority)
+
+  function isClicked(actionButton: ActionButton, entity?: Entity) {
     const component = engine.baseComponents.PointerEventsResult.getOrNull(
       engine.RootEntity
     )
@@ -58,72 +94,61 @@ export function wasEntityClickedGenerator(engine: IEngine) {
     if (!down) return false
     if (!up) return false
 
-    const state = WasEntityClickComponentState.get(engine.RootEntity)
+    const state = InternalInputStateComponent.get(engine.RootEntity)
 
     // If the DOWN command has happen before the UP commands, it means that that a clicked has happen
     if (
       down.timestamp < up.timestamp &&
       up.timestamp > state.timestampLastUpdate
     ) {
-      WasEntityClickComponentState.getMutable(
+      InternalInputStateComponent.getMutable(
         engine.RootEntity
       ).currentTimestamp = Math.max(up.timestamp, state.currentTimestamp)
       return true // clicked
     }
     return false
   }
-}
 
-export function isPointerEventActiveGenerator(engine: IEngine) {
-  const IsPointerEventActiveComponentState = engine.defineComponent(
-    UpdateTimestampStateSchema,
-    IsPointerEventActiveComponentID
-  )
-
-  IsPointerEventActiveComponentState.create(engine.RootEntity)
-
-  engine.addSystem(() => {
-    const state = IsPointerEventActiveComponentState.get(engine.RootEntity)
-    if (state.currentTimestamp > state.timestampLastUpdate) {
-      IsPointerEventActiveComponentState.getMutable(
-        engine.RootEntity
-      ).timestampLastUpdate = state.currentTimestamp
-    }
-  }, EventSystemPriority)
-
-  return function (
-    entity: Entity,
+  function isInputActive(
     actionButton: ActionButton,
-    pointerEventType: PointerEventType
+    pointerEventType: PointerEventType,
+    entity?: Entity
   ) {
     const component = engine.baseComponents.PointerEventsResult.getOrNull(
       engine.RootEntity
     )
-
     if (!component) return false
-
-    const commands = component.commands
 
     // We search the last pointer Event command sorted by timestamp
     const command = findLastAction(
-      commands,
+      component.commands,
       pointerEventType,
       actionButton,
       entity
     )
-
     if (!command) return false
 
-    const state = IsPointerEventActiveComponentState.get(engine.RootEntity)
-
+    const state = InternalInputStateComponent.get(engine.RootEntity)
     if (command.timestamp > state.timestampLastUpdate) {
-      IsPointerEventActiveComponentState.getMutable(
+      InternalInputStateComponent.getMutable(
         engine.RootEntity
       ).currentTimestamp = Math.max(command.timestamp, state.currentTimestamp)
       return true // up component is from an old click
     } else {
       return false
     }
+  }
+
+  function isActionDown(actionButton: ActionButton) {
+    return InternalInputStateComponent.get(engine.RootEntity).buttonState[
+      actionButton
+    ].value
+  }
+
+  return {
+    isActionDown,
+    isClicked,
+    isInputActive
   }
 }
 
