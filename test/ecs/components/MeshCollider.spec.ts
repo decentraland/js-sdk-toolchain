@@ -1,5 +1,6 @@
-import { ColliderLayer } from '../../../packages/@dcl/ecs/src/components/generated/pb/MeshCollider.gen'
+import { ColliderLayer } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/MeshCollider.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+import { makeCollisionMask } from '../../../packages/@dcl/ecs/src/components'
 
 describe('Generated MeshCollider ProtoBuf', () => {
   it('should serialize/deserialize MeshCollider', () => {
@@ -21,7 +22,10 @@ describe('Generated MeshCollider ProtoBuf', () => {
       box: undefined,
       cylinder: undefined,
       plane: {},
-      collisionMask: ColliderLayer.Physics
+      collisionMask: makeCollisionMask(
+        ColliderLayer.Physics,
+        ColliderLayer.Pointer
+      )
     })
     const buffer = MeshCollider.toBinary(entity)
     MeshCollider.updateFromBinary(entityB, buffer)

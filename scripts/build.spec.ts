@@ -100,7 +100,8 @@ flow('build-all', () => {
     itExecutes('npm i --quiet', ECS7_PATH)
     compileEcsComponents(
       `${ECS7_PATH}/src/components`,
-      `${ECS7_PATH}/node_modules/@dcl/protocol/ecs/components`
+      `${ECS7_PATH}/node_modules/@dcl/protocol/ecs/components`,
+      `${ECS7_PATH}/node_modules/@dcl/protocol/`
     )
     itExecutes('npm run build', ECS7_PATH)
     copyFile(
@@ -144,7 +145,8 @@ flow('build-all', () => {
       await createProtoTypes(
         `${ECS7_PATH}/node_modules/@dcl/protocol/ecs/components`,
         protoTypesPath,
-        ['UiTransform.proto', 'UiText.proto', 'UiStyles.proto']
+        ['UiTransform.proto', 'UiText.proto', 'UiStyles.proto'],
+        `${ECS7_PATH}/node_modules/@dcl/protocol`
       )
     })
     itExecutes('npm run build', REACT_ECS)

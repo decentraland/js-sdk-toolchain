@@ -1,5 +1,5 @@
-import { PBUiStyles } from '../../generated/UiStyles.gen'
-import { Color4 } from '../../generated/common/Color4.gen'
+import { PBUiStyles } from '../../generated/ecs/components/UiStyles.gen'
+import { Color4 } from '../../generated/ecs/components/common/Color4.gen'
 
 export { PBUiStyles, Color4 }
 

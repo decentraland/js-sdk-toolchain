@@ -9,7 +9,7 @@ import {
   YGPositionType,
   YGUnit,
   YGWrap
-} from '../../generated/UiTransform.gen'
+} from '../../generated/ecs/components/UiTransform.gen'
 
 export {
   PBUiTransform,

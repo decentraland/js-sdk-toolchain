@@ -1,4 +1,4 @@
-import { CameraModeValue } from '../../../packages/@dcl/ecs/src/components/generated/pb/common/CameraModeValue.gen'
+import { CameraModeValue } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/common/CameraModeValue.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated CameraMode ProtoBuf', () => {

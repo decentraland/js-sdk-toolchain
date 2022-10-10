@@ -5,7 +5,7 @@ import {
   renderUi
 } from '../../../packages/@dcl/react-ecs/src'
 
-const CANVAS_ROOT_ENTITY = 7
+const CANVAS_ROOT_ENTITY = 0
 declare const engine: IEngine
 
 describe('RectEcs UI ✨', () => {
