@@ -50,6 +50,12 @@ declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarS
 /** @public */
 declare const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
 
+declare const enum BillboardMode {
+    AllAxes = 0,
+    YAxe = 1,
+    UNRECOGNIZED = -1
+}
+
 /**
  * @public
  */
@@ -1878,12 +1884,10 @@ declare interface PBAvatarShape {
 }
 
 declare interface PBBillboard {
-    /** default=true */
-    x?: boolean | undefined;
-    /** default=true */
-    y?: boolean | undefined;
-    /** default=true */
-    z?: boolean | undefined;
+    /** default=AllAxes */
+    billboardMode?: BillboardMode | undefined;
+    /** default=false */
+    oppositeDirection?: boolean | undefined;
 }
 
 declare interface PBCameraMode {

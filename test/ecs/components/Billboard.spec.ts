@@ -1,4 +1,5 @@
 ﻿import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+import { BillboardMode } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/Billboard.gen'
 
 describe('Generated Billboard ProtoBuf', () => {
   it('should serialize/deserialize Billboard', () => {
@@ -8,16 +9,11 @@ describe('Generated Billboard ProtoBuf', () => {
     const entityB = newEngine.addEntity()
 
     const billboard = Billboard.create(entity, {
-      x: true,
-      y: true,
-      z: true
+      billboardMode: BillboardMode.YAxe,
+      oppositeDirection: false
     })
 
-    Billboard.create(entityB, {
-      x: false,
-      y: false,
-      z: false
-    })
+    Billboard.create(entityB)
     const buffer = Billboard.toBinary(entity)
     Billboard.updateFromBinary(entityB, buffer)
 
