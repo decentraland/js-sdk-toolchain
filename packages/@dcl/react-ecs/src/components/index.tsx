@@ -6,7 +6,7 @@ import { YGDisplay } from './uiTransform/types'
 export * from './types'
 export * from './uiTransform/types'
 export * from './uiText/types'
-export * from './uiStyles/types'
+export * from './uiBackground/types'
 
 /**
  * @public

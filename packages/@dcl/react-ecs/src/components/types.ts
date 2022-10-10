@@ -1,4 +1,4 @@
-import { UiStylesProps } from './uiStyles/types'
+import { UiBackgroundProps } from './uiBackground/types'
 import { UiTextProps } from './uiText/types'
 import { UiTransformProps } from './uiTransform/types'
 
@@ -8,7 +8,7 @@ import { UiTransformProps } from './uiTransform/types'
 export type EntityPropTypes = {
   uiTransform?: UiTransformProps
   uiText?: UiTextProps
-  uiStyles?: UiStylesProps
+  uiBackground?: UiBackgroundProps
 }
 
 export type Key = number | string

@@ -264,7 +264,7 @@ declare namespace Components {
     /** @public */
     const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
     /** @public */
-    const UiStyles: ComponentDefinition<ISchema<PBUiStyles>, PBUiStyles>;
+    const UiBackground: ComponentDefinition<ISchema<PBUiBackground>, PBUiBackground>;
     /** @public */
     const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
     /** @public */
@@ -487,7 +487,7 @@ declare function defineSdkComponents(engine: PreEngine): {
     Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
     RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
     TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
-    UiStyles: ComponentDefinition<ISchema<PBUiStyles>, PBUiStyles>;
+    UiBackground: ComponentDefinition<ISchema<PBUiBackground>, PBUiBackground>;
     UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
     UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
     VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
@@ -2166,7 +2166,7 @@ declare interface PBTextShape {
     textColor?: Color3 | undefined;
 }
 
-declare interface PBUiStyles {
+declare interface PBUiBackground {
     /** default=(0.0, 0.0, 0.0, 0.0) */
     backgroundColor?: Color4 | undefined;
 }
@@ -2753,10 +2753,10 @@ declare type Transport = {
 
 declare type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
-declare type Uint32 = number;
-
 /** @public */
-declare const UiStyles: ComponentDefinition<ISchema<PBUiStyles>, PBUiStyles>;
+declare const UiBackground: ComponentDefinition<ISchema<PBUiBackground>, PBUiBackground>;
+
+declare type Uint32 = number;
 
 /** @public */
 declare const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;

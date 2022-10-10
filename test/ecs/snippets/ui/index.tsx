@@ -13,7 +13,7 @@ export const uiComponent = () => (
       height: 500,
       padding: { top: 10, right: 10, bottom: 10, left: 10 }
     }}
-    uiStyles={{ backgroundColor: { r: 10, g: 10, b: 10, a: 0.2 } }}
+    uiBackground={{ backgroundColor: { r: 10, g: 10, b: 10, a: 0.2 } }}
   >
     <UiEntity
       uiTransform={{
@@ -23,12 +23,12 @@ export const uiComponent = () => (
         justifyContent: YGJustify.YGJustifyCenter,
         alignItems: YGAlign.YGAlignCenter
       }}
-      uiStyles={{ backgroundColor: { r: 255, g: 45, b: 85, a: 0.2 } }}
+      uiBackground={{ backgroundColor: { r: 255, g: 45, b: 85, a: 0.2 } }}
     >
       <UiEntity
         uiTransform={{ width: 80, height: 20 }}
         uiText={{ value: 'Boedo', textAlign: 0, fontSize: 12 }}
-        uiStyles={{ backgroundColor: { r: 255, g: 45, b: 85, a: 1 } }}
+        uiBackground={{ backgroundColor: { r: 255, g: 45, b: 85, a: 1 } }}
       />
     </UiEntity>
   </UiEntity>
