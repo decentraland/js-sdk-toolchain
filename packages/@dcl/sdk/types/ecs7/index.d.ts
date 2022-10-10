@@ -686,6 +686,12 @@ declare type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
 }[keyof T];
 
+declare const Input: {
+    isActionDown: (actionButton: ActionButton) => boolean;
+    isClicked: (actionButton: ActionButton, entity?: Entity | undefined) => boolean;
+    isInputActive: (actionButton: ActionButton, pointerEventType: PointerEventType, entity?: Entity | undefined) => boolean;
+};
+
 /**
  * @public
  */
@@ -708,8 +714,6 @@ declare type ISchema<T = any> = {
  * @returns
  */
 declare function isPointerEventActive(entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType): boolean;
-
-declare function isPointerEventActiveGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType) => boolean;
 
 declare const log: (...a: any[]) => void;
 
@@ -3336,8 +3340,6 @@ declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompo
  * @returns true if the entity was clicked in the last tick-update
  */
 declare function wasEntityClicked(entity: Entity, actionButton: ActionButton): boolean;
-
-declare function wasEntityClickedGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton) => boolean;
 
 declare namespace WireMessage {
     enum Enum {

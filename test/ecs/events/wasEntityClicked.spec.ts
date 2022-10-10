@@ -1,20 +1,20 @@
 import { Entity } from '../../../packages/@dcl/ecs/src/engine/entity'
-import { wasEntityClickedGenerator } from '../../../packages/@dcl/ecs/src/engine/events'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/PointerEvents.gen'
 import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/common/ActionButton.gen'
+import { createInput } from '../../../packages/@dcl/ecs/src/engine/input'
 
 describe('Events helpers wasEntityClicked', () => {
   it('should detect no events', () => {
     const newEngine = Engine()
-    const wasEntityClicked = wasEntityClickedGenerator(newEngine)
-    expect(wasEntityClicked(newEngine.RootEntity, ActionButton.ANY)).toBe(false)
+    const wasEntityClicked = createInput(newEngine).isClicked
+    expect(wasEntityClicked(ActionButton.ANY, newEngine.RootEntity)).toBe(false)
   })
 
   it('detect global click', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
-    const wasEntityClicked = wasEntityClickedGenerator(newEngine)
+    const wasEntityClicked = createInput(newEngine).isClicked
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -31,10 +31,10 @@ describe('Events helpers wasEntityClicked', () => {
       ]
     })
 
-    expect(wasEntityClicked(newEngine.RootEntity, ActionButton.POINTER)).toBe(
+    expect(wasEntityClicked(ActionButton.POINTER, newEngine.RootEntity)).toBe(
       true
     )
-    expect(wasEntityClicked(newEngine.RootEntity, ActionButton.ACTION_3)).toBe(
+    expect(wasEntityClicked(ActionButton.ACTION_3, newEngine.RootEntity)).toBe(
       false
     )
   })
@@ -43,7 +43,7 @@ describe('Events helpers wasEntityClicked', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const wasEntityClicked = wasEntityClickedGenerator(newEngine)
+    const wasEntityClicked = createInput(newEngine).isClicked
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -52,15 +52,15 @@ describe('Events helpers wasEntityClicked', () => {
       ]
     })
 
-    expect(wasEntityClicked(entity, ActionButton.POINTER)).toBe(true)
-    expect(wasEntityClicked(entity, ActionButton.ACTION_3)).toBe(false)
+    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(true)
+    expect(wasEntityClicked(ActionButton.ACTION_3, entity)).toBe(false)
   })
 
   it('dont detect entity click after update', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const wasEntityClicked = wasEntityClickedGenerator(newEngine)
+    const wasEntityClicked = createInput(newEngine).isClicked
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -69,17 +69,17 @@ describe('Events helpers wasEntityClicked', () => {
       ]
     })
 
-    expect(wasEntityClicked(entity, ActionButton.POINTER)).toBe(true)
-    expect(wasEntityClicked(entity, ActionButton.POINTER)).toBe(true)
+    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(true)
+    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(true)
     newEngine.update(0)
-    expect(wasEntityClicked(entity, ActionButton.POINTER)).toBe(false)
+    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(false)
   })
 
   it('dont detect entity click if pointer up is older', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const wasEntityClicked = wasEntityClickedGenerator(newEngine)
+    const wasEntityClicked = createInput(newEngine).isClicked
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -88,22 +88,22 @@ describe('Events helpers wasEntityClicked', () => {
       ]
     })
 
-    expect(wasEntityClicked(entity, ActionButton.POINTER)).toBe(false)
-    expect(wasEntityClicked(entity, ActionButton.ACTION_3)).toBe(false)
+    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(false)
+    expect(wasEntityClicked(ActionButton.ACTION_3, entity)).toBe(false)
   })
 
   it('dont detect entity click if pointer up doesnt exists', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const wasEntityClicked = wasEntityClickedGenerator(newEngine)
+    const wasEntityClicked = createInput(newEngine).isClicked
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [createTestPointerDownCommand(entity, 4, PointerEventType.DOWN)]
     })
 
-    expect(wasEntityClicked(entity, ActionButton.POINTER)).toBe(false)
-    expect(wasEntityClicked(entity, ActionButton.ACTION_3)).toBe(false)
+    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(false)
+    expect(wasEntityClicked(ActionButton.ACTION_3, entity)).toBe(false)
   })
 
   it('dont detect entity click if pointer down doesnt exists', () => {
@@ -114,10 +114,10 @@ describe('Events helpers wasEntityClicked', () => {
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [createTestPointerDownCommand(entity, 4, PointerEventType.UP)]
     })
-    const wasEntityClicked = wasEntityClickedGenerator(newEngine)
+    const wasEntityClicked = createInput(newEngine).isClicked
 
-    expect(wasEntityClicked(entity, ActionButton.POINTER)).toBe(false)
-    expect(wasEntityClicked(entity, ActionButton.ACTION_3)).toBe(false)
+    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(false)
+    expect(wasEntityClicked(ActionButton.ACTION_3, entity)).toBe(false)
   })
 
   it('should detect click, then no click, then other click', () => {
@@ -131,11 +131,11 @@ describe('Events helpers wasEntityClicked', () => {
         createTestPointerDownCommand(entity, 3, PointerEventType.DOWN)
       ]
     })
-    const wasEntityClicked = wasEntityClickedGenerator(newEngine)
+    const wasEntityClicked = createInput(newEngine).isClicked
 
-    expect(wasEntityClicked(entity, ActionButton.POINTER)).toBe(true)
+    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(true)
     newEngine.update(0)
-    expect(wasEntityClicked(entity, ActionButton.POINTER)).toBe(false)
+    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(false)
 
     PointerEventsResult.createOrReplace(newEngine.RootEntity, {
       commands: [
@@ -146,9 +146,9 @@ describe('Events helpers wasEntityClicked', () => {
       ]
     })
 
-    expect(wasEntityClicked(entity, ActionButton.POINTER)).toBe(true)
+    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(true)
     newEngine.update(0)
-    expect(wasEntityClicked(entity, ActionButton.POINTER)).toBe(false)
+    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(false)
   })
 })
 

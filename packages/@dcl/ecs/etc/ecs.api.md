@@ -257,6 +257,15 @@ export type IEngineParams = {
     transports?: Transport[];
 };
 
+// Warning: (ae-missing-release-tag) "Input" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const Input: {
+    isActionDown: (actionButton: ActionButton) => boolean;
+    isClicked: (actionButton: ActionButton, entity?: Entity | undefined) => boolean;
+    isInputActive: (actionButton: ActionButton, pointerEventType: PointerEventType, entity?: Entity | undefined) => boolean;
+};
+
 // @public (undocumented)
 export type ISchema<T = any> = {
     serialize(value: T, builder: ByteBuffer): void;
@@ -267,17 +276,10 @@ export type ISchema<T = any> = {
 // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (ae-forgotten-export) The symbol "ActionButton" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "PointerEventType" needs to be exported by the entry point index.d.ts
 // Warning: (ae-missing-release-tag) "isPointerEventActive" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public
 export function isPointerEventActive(entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType): boolean;
-
-// Warning: (ae-missing-release-tag) "isPointerEventActiveGenerator" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function isPointerEventActiveGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType) => boolean;
 
 // Warning: (ae-missing-release-tag) "log" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -720,11 +722,6 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 // @public
 export function wasEntityClicked(entity: Entity, actionButton: ActionButton): boolean;
 
-// Warning: (ae-missing-release-tag) "wasEntityClickedGenerator" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function wasEntityClickedGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton) => boolean;
-
 // Warnings were encountered during analysis:
 //
 // dist/engine/component.d.ts:24:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
@@ -777,6 +774,8 @@ export function wasEntityClickedGenerator(engine: IEngine): (entity: Entity, act
 // dist/engine/types.d.ts:95:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
 // dist/engine/types.d.ts:104:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/types.d.ts:105:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/runtime/initialization.d.ts:12:5 - (ae-forgotten-export) The symbol "ActionButton" needs to be exported by the entry point index.d.ts
+// dist/runtime/initialization.d.ts:14:5 - (ae-forgotten-export) The symbol "PointerEventType" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
