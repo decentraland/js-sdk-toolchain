@@ -244,14 +244,6 @@ declare namespace Components {
     /** @public */
     const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
     /** @public */
-    const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-    /** @public */
-    const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-    /** @public */
-    const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-    /** @public */
-    const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
-    /** @public */
     const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     /** @public */
     const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
@@ -477,10 +469,6 @@ declare function defineSdkComponents(engine: PreEngine): {
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
-    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
     PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
@@ -1758,18 +1746,6 @@ declare const onPlayerExpressionObservable: Observable<{
     expressionId: string;
 }>;
 
-/** @public */
-declare const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-
-/** @public */
-declare const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-
-/** @public */
-declare const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-
-/** @public */
-declare const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
-
 /**
  * @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
@@ -2026,50 +2002,6 @@ declare const enum PBNFTShape_PictureFrameStyle {
     Canvas = 21,
     None = 22,
     UNRECOGNIZED = -1
-}
-
-declare interface PBOnPointerDown {
-    /** default=ActionButton.ANY */
-    button?: ActionButton | undefined;
-    /** default='Interact' */
-    hoverText?: string | undefined;
-    /** default=10 */
-    maxDistance?: number | undefined;
-    /** default=true */
-    showFeedback?: boolean | undefined;
-}
-
-declare interface PBOnPointerDownResult {
-    button: ActionButton;
-    meshName: string;
-    origin: Vector3_2 | undefined;
-    direction: Vector3_2 | undefined;
-    point: Vector3_2 | undefined;
-    normal: Vector3_2 | undefined;
-    distance: number;
-    timestamp: number;
-}
-
-declare interface PBOnPointerUp {
-    /** default=ActionButton.ANY */
-    button?: ActionButton | undefined;
-    /** default='Interact' */
-    hoverText?: string | undefined;
-    /** default=10 */
-    maxDistance?: number | undefined;
-    /** default=true */
-    showFeedback?: boolean | undefined;
-}
-
-declare interface PBOnPointerUpResult {
-    button: ActionButton;
-    meshName: string;
-    origin: Vector3_2 | undefined;
-    direction: Vector3_2 | undefined;
-    point: Vector3_2 | undefined;
-    normal: Vector3_2 | undefined;
-    distance: number;
-    timestamp: number;
 }
 
 declare interface PBPointerEvents {

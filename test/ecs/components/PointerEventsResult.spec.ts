@@ -2,8 +2,8 @@
 import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/common/ActionButton.gen'
 import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/PointerEvents.gen'
 
-describe('Generated OnPointerDown ProtoBuf', () => {
-  it('should serialize/deserialize OnPointerDown', () => {
+describe('Generated PointerEventsResult ProtoBuf', () => {
+  it('should serialize/deserialize PointerEventsResult', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
