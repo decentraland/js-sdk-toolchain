@@ -39,6 +39,7 @@ export async function generateProtocolBuffer(params: {
     `--ts_proto_opt=forceLong=false`,
     `--ts_proto_opt=outputPartialMethods=false`,
     `--ts_proto_opt=fileSuffix=.gen`,
+    `--ts_proto_opt=unrecognizedEnum=false`,
     `--ts_proto_out=${pbGeneratedPath}`,
     `--proto_path=${protocolPath}`,
     protoFiles

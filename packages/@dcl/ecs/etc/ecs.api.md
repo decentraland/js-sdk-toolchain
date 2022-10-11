@@ -60,9 +60,7 @@ export const enum ColliderLayer {
     // (undocumented)
     Physics = 2,
     // (undocumented)
-    Pointer = 1,
-    // (undocumented)
-    UNRECOGNIZED = -1
+    Pointer = 1
 }
 
 // @public (undocumented)
