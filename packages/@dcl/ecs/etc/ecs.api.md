@@ -122,22 +122,6 @@ export namespace Components {
     //
     // (undocumented)
     NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
-    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerDown" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerDownResult" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUp" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUpResult" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
     const // Warning: (ae-forgotten-export) The symbol "PBPointerEvents" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -402,18 +386,6 @@ export const onPlayerDisconnectedObservable: Observable<{
 export const onPlayerExpressionObservable: Observable<{
     expressionId: string;
 }>;
-
-// @public (undocumented)
-export const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-
-// @public (undocumented)
-export const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-
-// @public (undocumented)
-export const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-
-// @public (undocumented)
-export const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
 
 // @public @deprecated (undocumented)
 export const onProfileChanged: Observable<{
