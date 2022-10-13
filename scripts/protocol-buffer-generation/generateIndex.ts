@@ -2,29 +2,33 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { Component } from './generateComponent'
 
-const TransformComponent = { componentId: 1, componentName: 'Transform' }
+const TransformComponent = {
+  componentId: 1,
+  componentPascalName: 'Transform',
+  componentFile: 'none'
+}
 
-function enumTemplate({ componentName, componentId }: Component) {
-  return `\t${componentName} = ${componentId},`
+function enumTemplate({ componentPascalName, componentId }: Component) {
+  return `\t${componentPascalName} = ${componentId},`
 }
 
 function importComponent(component: Component) {
-  return `import * as ${component.componentName}Schema from './${component.componentName}.gen'`
+  return `import * as ${component.componentPascalName}Schema from './${component.componentPascalName}.gen'`
 }
 
 function defineComponent(component: Component) {
   if (component.componentId === TransformComponent.componentId) {
-    return `\t\t${component.componentName}: TransformSchema.defineTransformComponent({ defineComponentFromSchema }),`
+    return `\t\t${component.componentPascalName}: TransformSchema.defineTransformComponent({ defineComponentFromSchema }),`
   }
-  return `\t\t${component.componentName}: defineComponentFromSchema(${component.componentName}Schema.${component.componentName}Schema, ${component.componentName}Schema.COMPONENT_ID),`
+  return `\t\t${component.componentPascalName}: defineComponentFromSchema(${component.componentPascalName}Schema.${component.componentPascalName}Schema, ${component.componentPascalName}Schema.COMPONENT_ID),`
 }
 
 function useDefinedComponent(component: Component) {
-  return `/** @public */\nexport const ${component.componentName} = engine.baseComponents.${component.componentName}`
+  return `/** @public */\nexport const ${component.componentPascalName} = engine.baseComponents.${component.componentPascalName}`
 }
 
 function namespaceComponent(component: Component) {
-  return `\t/** @public */\n\texport const ${component.componentName} = engine.baseComponents.${component.componentName}`
+  return `\t/** @public */\n\texport const ${component.componentPascalName} = engine.baseComponents.${component.componentPascalName}`
 }
 
 const indexTemplate = `import type { IEngine } from '../../engine/types'
@@ -50,7 +54,7 @@ const globalNamespaceTemplate = `import { engine } from '../../runtime/initializ
 /** @public */
 export namespace Components {
 ${namespaceComponent(TransformComponent)}
-$componentNamespace
+$componentPascalNamespace
 }
 `
 
@@ -68,7 +72,7 @@ export function generateIndex(param: {
   const { components, generatedPath } = param
 
   const componentWithoutIndex = components.filter(
-    (component) => component.componentName !== 'index'
+    (component) => component.componentPascalName !== 'index'
   )
 
   const indexContent = indexTemplate
@@ -91,7 +95,7 @@ export function generateIndex(param: {
   fs.writeFileSync(path.resolve(generatedPath, 'global.gen.ts'), globalContent)
 
   const namespaceContent = globalNamespaceTemplate.replace(
-    '$componentNamespace',
+    '$componentPascalNamespace',
     componentWithoutIndex.map(namespaceComponent).join('\n')
   )
 

@@ -5,8 +5,8 @@
  * init and it'll be changing.
  */
 
-import { ActionButton } from '../components/generated/pb/ecs/components/common/ActionButton.gen'
-import { PointerEventType } from '../components/generated/pb/ecs/components/PointerEvents.gen'
+import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
+import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_events.gen'
 import { Engine, Entity } from '../engine'
 import {
   isPointerEventActiveGenerator,
@@ -22,11 +22,11 @@ export const engine = Engine({
 })
 
 if (typeof dcl !== 'undefined') {
-  dcl.loadModule('~system/ExperimentalAPI', {}).catch(dcl.error)
+  dcl.loadModule('~system/ExperimentalApi', {}).catch(dcl.error)
 
   async function pullRendererMessages() {
     const response = await dcl.callRpc(
-      '~system/ExperimentalAPI',
+      '~system/ExperimentalApi',
       'messageFromRenderer',
       []
     )
@@ -53,7 +53,7 @@ export const log = dcl.log
 export const error = dcl.error
 
 let wasEntityClickedFunc:
-  | ((entity: Entity, actionButton: ActionButton) => boolean)
+  | ((entity: Entity, actionButton: InputAction) => boolean)
   | null = null
 
 /**
@@ -62,7 +62,7 @@ let wasEntityClickedFunc:
  * @param actionButton
  * @returns true if the entity was clicked in the last tick-update
  */
-export function wasEntityClicked(entity: Entity, actionButton: ActionButton) {
+export function wasEntityClicked(entity: Entity, actionButton: InputAction) {
   if (!wasEntityClickedFunc) {
     wasEntityClickedFunc = wasEntityClickedGenerator(engine)
   }
@@ -72,7 +72,7 @@ export function wasEntityClicked(entity: Entity, actionButton: ActionButton) {
 let isPointerEventActiveFunc:
   | ((
       entity: Entity,
-      actionButton: ActionButton,
+      actionButton: InputAction,
       pointerEventType: PointerEventType
     ) => boolean)
   | null = null
@@ -86,7 +86,7 @@ let isPointerEventActiveFunc:
  */
 export function isPointerEventActive(
   entity: Entity,
-  actionButton: ActionButton,
+  actionButton: InputAction,
   pointerEventType: PointerEventType
 ) {
   if (!isPointerEventActiveFunc) {

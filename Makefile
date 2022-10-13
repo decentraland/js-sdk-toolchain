@@ -11,8 +11,8 @@ PROTOBUF_ZIP = protoc-$(PROTOBUF_VERSION)-linux-x86_64.zip
 endif
 
 PROTOC = node_modules/.bin/protobuf/bin/protoc
-SCENE_PROTO_FILES := $(wildcard packages/@dcl/ecs/node_modules/@dcl/protocol/kernel/apis/*.proto)
-PBS_TS = $(SCENE_PROTO_FILES:packages/@dcl/ecs/node_modules/@dcl/protocol/kernel/apis/%.proto=scripts/rpc-api-generation/src/proto/%.gen.ts)
+SCENE_PROTO_FILES := $(wildcard packages/@dcl/ecs/node_modules/@dcl/protocol/proto/decentraland/kernel/apis/*.proto)
+PBS_TS = $(SCENE_PROTO_FILES:packages/@dcl/ecs/node_modules/@dcl/protocol/proto/decentraland/kernel/apis/%.proto=scripts/rpc-api-generation/src/proto/%.gen.ts)
 
 
 install:
@@ -30,10 +30,10 @@ lint-fix:
 	node_modules/.bin/eslint . --ext .ts --fix
 
 test:
-	node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS)
+	node_modules/.bin/jest --detectOpenHandles --colors test/ $(TESTARGS)
 
 test-coverage:
-	node_modules/.bin/jest --detectOpenHandles --colors --coverage $(TESTARGS)
+	node_modules/.bin/jest --detectOpenHandles --colors --coverage test/ $(TESTARGS)
 
 node_modules/.bin/protobuf/bin/protoc:
 	curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v$(PROTOBUF_VERSION)/$(PROTOBUF_ZIP)
@@ -50,7 +50,7 @@ build:
 prepare:
 	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/prepare.spec.ts
 
-scripts/rpc-api-generation/src/proto/%.gen.ts: packages/@dcl/ecs/node_modules/@dcl/protocol/kernel/apis/%.proto node_modules/.bin/protobuf/bin/protoc
+scripts/rpc-api-generation/src/proto/%.gen.ts: packages/@dcl/ecs/node_modules/@dcl/protocol/proto/decentraland/kernel/apis/%.proto node_modules/.bin/protobuf/bin/protoc
 	${PROTOC}  \
 			--plugin=./node_modules/.bin/protoc-gen-ts_proto \
 			--ts_proto_opt=esModuleInterop=true,returnObservable=false,outputServices=generic-definitions \
@@ -58,8 +58,8 @@ scripts/rpc-api-generation/src/proto/%.gen.ts: packages/@dcl/ecs/node_modules/@d
 			--ts_proto_opt=onlyTypes=true \
 			--ts_proto_out="$(PWD)/scripts/rpc-api-generation/src/proto" \
 			-I="$(PWD)/scripts/rpc-api-generation/src/proto" \
-			-I="$(PWD)/packages/@dcl/ecs/node_modules/@dcl/protocol/" \
-			"$(PWD)/packages/@dcl/ecs/node_modules/@dcl/protocol/kernel/apis/$*.proto";
+			-I="$(PWD)/packages/@dcl/ecs/node_modules/@dcl/protocol/proto/" \
+			"$(PWD)/packages/@dcl/ecs/node_modules/@dcl/protocol/proto/decentraland/kernel/apis/$*.proto";
 
 compile_apis: ${PBS_TS}
 

@@ -27,7 +27,7 @@ Raycast.createOrReplace(engine.addEntity(), {
   origin: Vector3.create(8, 1, 0),
   direction: Vector3.create(0, 0, 1),
   maxDistance: 16,
-  queryType: RaycastQueryType.QUERY_ALL
+  queryType: RaycastQueryType.RQT_QUERY_ALL
 })
 
 export {}
