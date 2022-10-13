@@ -20,9 +20,9 @@ describe('Generated Material ProtoBuf', () => {
         src: 'not-casla'
       },
       alphaTexture: {
-        wrapMode: TextureWrapMode.UNRECOGNIZED,
         filterMode: undefined,
-        src: 'not-casla'
+        src: 'not-casla',
+        wrapMode: undefined
       },
       castShadows: true,
       glossiness: 1,
@@ -58,7 +58,6 @@ describe('Generated Material ProtoBuf', () => {
       },
       texture: {
         wrapMode: TextureWrapMode.TWM_REPEAT,
-        filterMode: TextureFilterMode.UNRECOGNIZED,
         src: 'not-casla'
       },
       castShadows: true,
