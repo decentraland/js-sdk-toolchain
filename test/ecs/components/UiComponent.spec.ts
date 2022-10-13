@@ -71,7 +71,7 @@ describe('UiTransform component', () => {
       positionRightUnit: YGUnit.YGU_POINT,
       positionTop: 1,
       positionTopUnit: YGUnit.YGU_POINT,
-      positionType: YGPositionType.YGP_RELATIVE,
+      positionType: YGPositionType.YGPT_RELATIVE,
       width: 1,
       widthUnit: YGUnit.YGU_POINT
     })

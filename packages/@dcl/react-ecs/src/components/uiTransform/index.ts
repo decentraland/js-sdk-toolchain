@@ -42,7 +42,7 @@ export const defaultDiv: PBUiTransform = {
   alignSelf: YGAlign.YGA_AUTO,
   alignContent: YGAlign.YGA_STRETCH,
   flexDirection: YGFlexDirection.YGFD_ROW,
-  positionType: YGPositionType.YGP_RELATIVE,
+  positionType: YGPositionType.YGPT_RELATIVE,
   direction: YGDirection.YGD_INHERIT,
   flexWrap: YGWrap.YGW_WRAP,
   flexGrow: 0,

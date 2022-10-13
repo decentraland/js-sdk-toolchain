@@ -1,48 +1,30 @@
 /// <reference types="@dcl/posix" />
 
-declare const enum ActionButton {
-    AB_POINTER = 0,
-    AB_PRIMARY = 1,
-    AB_SECONDARY = 2,
-    AB_ANY = 3,
-    AB_FORWARD = 4,
-    AB_BACKWARD = 5,
-    AB_RIGHT = 6,
-    AB_LEFT = 7,
-    AB_JUMP = 8,
-    AB_WALK = 9,
-    AB_ACTION_3 = 10,
-    AB_ACTION_4 = 11,
-    AB_ACTION_5 = 12,
-    AB_ACTION_6 = 13,
-    UNRECOGNIZED = -1
-}
-
 /** @public */
 declare const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
 
 /** @public */
 declare const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
 
-declare const enum AvatarAnchorPoint {
-    AAP_POSITION = 0,
-    AAP_NAME_TAG = 1,
-    AAP_LEFT_HAND = 2,
-    AAP_RIGHT_HAND = 3,
+declare const enum AvatarAnchorPointType {
+    AAPT_POSITION = 0,
+    AAPT_NAME_TAG = 1,
+    AAPT_LEFT_HAND = 2,
+    AAPT_RIGHT_HAND = 3,
     UNRECOGNIZED = -1
 }
 
 /** @public */
 declare const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
 
-declare const enum AvatarModifier {
-    AM_HIDE_AVATARS = 0,
-    AM_DISABLE_PASSPORTS = 1,
-    UNRECOGNIZED = -1
-}
-
 /** @public */
 declare const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
+
+declare const enum AvatarModifierType {
+    AMT_HIDE_AVATARS = 0,
+    AMT_DISABLE_PASSPORTS = 1,
+    UNRECOGNIZED = -1
+}
 
 /** @public */
 declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
@@ -61,9 +43,9 @@ declare const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMod
 /** @public */
 declare const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
 
-declare const enum CameraModeValue {
-    CMV_FIRST_PERSON = 0,
-    CMV_THIRD_PERSON = 1,
+declare const enum CameraType {
+    CT_FIRST_PERSON = 0,
+    CT_THIRD_PERSON = 1,
     UNRECOGNIZED = -1
 }
 
@@ -242,7 +224,7 @@ declare namespace Components {
     /** @public */
     const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
     /** @public */
-    const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
+    const NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     /** @public */
     const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     /** @public */
@@ -468,7 +450,7 @@ declare function defineSdkComponents(engine: PreEngine): {
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
-    NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
+    NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
@@ -514,13 +496,6 @@ declare const error: (message: string | Error, data?: any) => void;
 declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
 }[keyof T];
-
-declare const enum FilterMode {
-    FM_POINT = 0,
-    FM_BILINEAR = 1,
-    FM_TRILINEAR = 2,
-    UNRECOGNIZED = -1
-}
 
 /** @public */
 declare type FloatArray = number[];
@@ -674,6 +649,24 @@ declare type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
 }[keyof T];
 
+declare const enum InputAction {
+    IA_POINTER = 0,
+    IA_PRIMARY = 1,
+    IA_SECONDARY = 2,
+    IA_ANY = 3,
+    IA_FORWARD = 4,
+    IA_BACKWARD = 5,
+    IA_RIGHT = 6,
+    IA_LEFT = 7,
+    IA_JUMP = 8,
+    IA_WALK = 9,
+    IA_ACTION_3 = 10,
+    IA_ACTION_4 = 11,
+    IA_ACTION_5 = 12,
+    IA_ACTION_6 = 13,
+    UNRECOGNIZED = -1
+}
+
 /**
  * @public
  */
@@ -695,9 +688,9 @@ declare type ISchema<T = any> = {
  * @param pointerEventType
  * @returns
  */
-declare function isPointerEventActive(entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType): boolean;
+declare function isPointerEventActive(entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType): boolean;
 
-declare function isPointerEventActiveGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType) => boolean;
+declare function isPointerEventActiveGenerator(engine: IEngine): (entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType) => boolean;
 
 declare const log: (...a: any[]) => void;
 
@@ -722,6 +715,15 @@ declare function makeCollisionMask(...layers: ColliderLayer[]): number;
 
 /** @public */
 declare const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+
+declare const enum MaterialTransparencyMode {
+    MTM_OPAQUE = 0,
+    MTM_ALPHA_TEST = 1,
+    MTM_ALPHA_BLEND = 2,
+    MTM_ALPHA_TEST_AND_ALPHA_BLEND = 3,
+    MTM_AUTO = 4,
+    UNRECOGNIZED = -1
+}
 
 /**
  * Class used to store matrix data (4x4)
@@ -1474,8 +1476,35 @@ declare class MessageBus {
     private flush;
 }
 
+declare const enum NftFrameType {
+    NFT_CLASSIC = 0,
+    NFT_BAROQUE_ORNAMENT = 1,
+    NFT_DIAMOND_ORNAMENT = 2,
+    NFT_MINIMAL_WIDE = 3,
+    NFT_MINIMAL_GREY = 4,
+    NFT_BLOCKY = 5,
+    NFT_GOLD_EDGES = 6,
+    NFT_GOLD_CARVED = 7,
+    NFT_GOLD_WIDE = 8,
+    NFT_GOLD_ROUNDED = 9,
+    NFT_METAL_MEDIUM = 10,
+    NFT_METAL_WIDE = 11,
+    NFT_METAL_SLIM = 12,
+    NFT_METAL_ROUNDED = 13,
+    NFT_PINS = 14,
+    NFT_MINIMAL_BLACK = 15,
+    NFT_MINIMAL_WHITE = 16,
+    NFT_TAPE = 17,
+    NFT_WOOD_SLIM = 18,
+    NFT_WOOD_WIDE = 19,
+    NFT_WOOD_TWIGS = 20,
+    NFT_CANVAS = 21,
+    NFT_NONE = 22,
+    UNRECOGNIZED = -1
+}
+
 /** @public */
-declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
+declare const NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
 
 /**
  * The Observable class is a simple implementation of the Observable pattern.
@@ -1814,13 +1843,13 @@ declare interface PBAudioSource {
 
 declare interface PBAvatarAttach {
     avatarId: string;
-    anchorPointId: AvatarAnchorPoint;
+    anchorPointId: AvatarAnchorPointType;
 }
 
 declare interface PBAvatarModifierArea {
     area: Vector3_2 | undefined;
     excludeIds: string[];
-    modifiers: AvatarModifier[];
+    modifiers: AvatarModifierType[];
 }
 
 declare interface PBAvatarShape {
@@ -1863,12 +1892,12 @@ declare interface PBBillboard {
 }
 
 declare interface PBCameraMode {
-    mode: CameraModeValue;
+    mode: CameraType;
 }
 
 declare interface PBCameraModeArea {
     area: Vector3_2 | undefined;
-    mode: CameraModeValue;
+    mode: CameraType;
 }
 
 declare interface PBGltfContainer {
@@ -1896,7 +1925,7 @@ declare interface PBMaterial {
     /** default = white; */
     reflectivityColor?: Color3 | undefined;
     /** default = TransparencyMode.Auto */
-    transparencyMode?: TransparencyMode | undefined;
+    transparencyMode?: MaterialTransparencyMode | undefined;
     /** default = 0.5 */
     metallic?: number | undefined;
     /** default = 0.5 */
@@ -1916,7 +1945,7 @@ declare interface PBMaterial_Texture {
     /** default = TextureWrapMode.Clamp */
     wrapMode?: TextureWrapMode | undefined;
     /** default = FilterMode.Bilinear */
-    filterMode?: FilterMode | undefined;
+    filterMode?: TextureFilterMode | undefined;
 }
 
 declare interface PBMeshCollider {
@@ -1969,10 +1998,10 @@ declare interface PBMeshRenderer_PlaneMesh {
 declare interface PBMeshRenderer_SphereMesh {
 }
 
-declare interface PBNFTShape {
+declare interface PBNftShape {
     src: string;
     /** default = PictureFrameStyle.Classic */
-    style?: PictureFrameStyle | undefined;
+    style?: NftFrameType | undefined;
     /** default = decentraland.common.Color3(0.6404918, 0.611472, 0.8584906) */
     color?: Color3 | undefined;
 }
@@ -1987,8 +2016,8 @@ declare interface PBPointerEvents_Entry {
 }
 
 declare interface PBPointerEvents_Info {
-    /** default=ActionButton.ANY */
-    button?: ActionButton | undefined;
+    /** default=InputAction.ANY */
+    button?: InputAction | undefined;
     /** default='Interact' */
     hoverText?: string | undefined;
     /** default=10 */
@@ -2006,7 +2035,7 @@ declare interface PBPointerEventsResult {
 /** this message represents a pointer event, used both for UP and DOWN actions */
 declare interface PBPointerEventsResult_PointerCommand {
     /** identifier of the input */
-    button: ActionButton;
+    button: InputAction;
     hit: RaycastHit | undefined;
     state: PointerEventType;
     /** could be a Lamport timestamp */
@@ -2081,7 +2110,7 @@ declare interface PBUiText {
     /** default=(1.0,1.0,1.0) */
     color?: Color3 | undefined;
     /** default='center' */
-    textAlign?: TextAlign | undefined;
+    textAlign?: TextAlignMode | undefined;
     /** default=0 */
     font?: Font | undefined;
     /** default=10 */
@@ -2152,33 +2181,6 @@ declare interface PBUiTransform {
 declare interface PBVisibilityComponent {
     /** default=true */
     visible?: boolean | undefined;
-}
-
-declare const enum PictureFrameStyle {
-    PFS_CLASSIC = 0,
-    PFS_BAROQUE_ORNAMENT = 1,
-    PFS_DIAMOND_ORNAMENT = 2,
-    PFS_MINIMAL_WIDE = 3,
-    PFS_MINIMAL_GREY = 4,
-    PFS_BLOCKY = 5,
-    PFS_GOLD_EDGES = 6,
-    PFS_GOLD_CARVED = 7,
-    PFS_GOLD_WIDE = 8,
-    PFS_GOLD_ROUNDED = 9,
-    PFS_METAL_MEDIUM = 10,
-    PFS_METAL_WIDE = 11,
-    PFS_METAL_SLIM = 12,
-    PFS_METAL_ROUNDED = 13,
-    PFS_PINS = 14,
-    PFS_MINIMAL_BLACK = 15,
-    PFS_MINIMAL_WHITE = 16,
-    PFS_TAPE = 17,
-    PFS_WOOD_SLIM = 18,
-    PFS_WOOD_WIDE = 19,
-    PFS_WOOD_TWIGS = 20,
-    PFS_CANVAS = 21,
-    PFS_NONE = 22,
-    UNRECOGNIZED = -1
 }
 
 /**
@@ -2621,15 +2623,22 @@ declare interface Spec {
  */
 declare type SystemFn = (dt: number) => void;
 
-declare const enum TextAlign {
-    TA_CENTER = 0,
-    TA_LEFT = 1,
-    TA_RIGHT = 2,
+declare const enum TextAlignMode {
+    TAM_CENTER = 0,
+    TAM_LEFT = 1,
+    TAM_RIGHT = 2,
     UNRECOGNIZED = -1
 }
 
 /** @public */
 declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+
+declare const enum TextureFilterMode {
+    TFM_POINT = 0,
+    TFM_BILINEAR = 1,
+    TFM_TRILINEAR = 2,
+    UNRECOGNIZED = -1
+}
 
 declare const enum TextureWrapMode {
     TWM_REPEAT = 0,
@@ -2666,15 +2675,6 @@ declare type TransformType = {
     };
     parent?: Entity;
 };
-
-declare const enum TransparencyMode {
-    TM_OPAQUE = 0,
-    TM_ALPHA_TEST = 1,
-    TM_ALPHA_BLEND = 2,
-    TM_ALPHA_TEST_AND_ALPHA_BLEND = 3,
-    TM_AUTO = 4,
-    UNRECOGNIZED = -1
-}
 
 declare type Transport = {
     type: string;
@@ -3267,9 +3267,9 @@ declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompo
  * @param actionButton
  * @returns true if the entity was clicked in the last tick-update
  */
-declare function wasEntityClicked(entity: Entity, actionButton: ActionButton): boolean;
+declare function wasEntityClicked(entity: Entity, actionButton: InputAction): boolean;
 
-declare function wasEntityClickedGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton) => boolean;
+declare function wasEntityClickedGenerator(engine: IEngine): (entity: Entity, actionButton: InputAction) => boolean;
 
 declare namespace WireMessage {
     enum Enum {
@@ -3346,9 +3346,9 @@ declare const enum YGOverflow {
 }
 
 declare const enum YGPositionType {
-    YGP_STATIC = 0,
-    YGP_RELATIVE = 1,
-    YGP_ABSOLUTE = 2,
+    YGPT_STATIC = 0,
+    YGPT_RELATIVE = 1,
+    YGPT_ABSOLUTE = 2,
     UNRECOGNIZED = -1
 }
 

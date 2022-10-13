@@ -19,7 +19,7 @@ Material.create(createSphere(13, 1, 15), {
   roughness: 0.8,
 
   alphaTest: 0.2,
-  transparencyMode: TransparencyMode.TM_ALPHA_TEST
+  transparencyMode: MaterialTransparencyMode.MTM_ALPHA_TEST
 })
 
 Material.create(createSphere(11, 1, 15), {

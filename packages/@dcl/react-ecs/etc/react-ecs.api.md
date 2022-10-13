@@ -126,7 +126,7 @@ export interface PBUiText {
     color?: Color3 | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
-    textAlign?: TextAlign | undefined;
+    textAlign?: TextAlignMode | undefined;
     // (undocumented)
     value: string;
 }
@@ -289,16 +289,16 @@ export function removeUi(index: number): void;
 // @public (undocumented)
 export function renderUi(ui: UiComponent): number;
 
-// Warning: (ae-missing-release-tag) "TextAlign" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "TextAlignMode" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export enum TextAlign {
+export enum TextAlignMode {
     // (undocumented)
-    TA_CENTER = 0,
+    TAM_CENTER = 0,
     // (undocumented)
-    TA_LEFT = 1,
+    TAM_LEFT = 1,
     // (undocumented)
-    TA_RIGHT = 2,
+    TAM_RIGHT = 2,
     // (undocumented)
     UNRECOGNIZED = -1
 }
@@ -480,11 +480,11 @@ export enum YGPositionType {
     // (undocumented)
     UNRECOGNIZED = -1,
     // (undocumented)
-    YGP_ABSOLUTE = 2,
+    YGPT_ABSOLUTE = 2,
     // (undocumented)
-    YGP_RELATIVE = 1,
+    YGPT_RELATIVE = 1,
     // (undocumented)
-    YGP_STATIC = 0
+    YGPT_STATIC = 0
 }
 
 // Warning: (ae-missing-release-tag) "YGUnit" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)

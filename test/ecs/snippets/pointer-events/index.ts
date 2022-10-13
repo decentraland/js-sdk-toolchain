@@ -17,7 +17,7 @@ createCube(15, 1, 15, [
   {
     eventType: PointerEventType.PET_DOWN,
     eventInfo: {
-      button: ActionButton.AB_PRIMARY,
+      button: InputAction.IA_PRIMARY,
       hoverText: 'PrimaryDown',
       maxDistance: 5,
       showFeedback: true
@@ -29,7 +29,7 @@ createCube(13, 1, 15, [
   {
     eventType: PointerEventType.PET_UP,
     eventInfo: {
-      button: ActionButton.AB_SECONDARY,
+      button: InputAction.IA_SECONDARY,
       hoverText: 'Secondary Up',
       maxDistance: 5,
       showFeedback: true
@@ -41,7 +41,7 @@ createCube(11, 1, 15, [
   {
     eventType: PointerEventType.PET_HOVER_ENTER,
     eventInfo: {
-      button: ActionButton.AB_ANY,
+      button: InputAction.IA_ANY,
       hoverText: 'Infinity Hover',
       maxDistance: 10000000,
       showFeedback: true

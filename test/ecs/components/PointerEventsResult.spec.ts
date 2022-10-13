@@ -1,5 +1,5 @@
 ﻿import { Engine } from '../../../packages/@dcl/ecs/src/engine'
-import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/action_button.gen'
+import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_events.gen'
 
 describe('Generated PointerEventsResult ProtoBuf', () => {
@@ -12,7 +12,7 @@ describe('Generated PointerEventsResult ProtoBuf', () => {
     const onPointerResult = PointerEventsResult.create(entity, {
       commands: [
         {
-          button: ActionButton.AB_ACTION_3,
+          button: InputAction.IA_ACTION_3,
           timestamp: 5,
           hit: {
             position: { x: 1, y: 2, z: 3 },
@@ -32,7 +32,7 @@ describe('Generated PointerEventsResult ProtoBuf', () => {
     PointerEventsResult.create(entityB, {
       commands: [
         {
-          button: ActionButton.AB_ACTION_5,
+          button: InputAction.IA_ACTION_5,
           timestamp: 15,
           hit: {
             position: { x: 3, y: 4, z: 5 },
@@ -47,7 +47,7 @@ describe('Generated PointerEventsResult ProtoBuf', () => {
           analog: 55
         },
         {
-          button: ActionButton.AB_ACTION_5,
+          button: InputAction.IA_ACTION_5,
           timestamp: 15,
           hit: {
             position: { x: 3, y: 4, z: 5 },

@@ -1,6 +1,6 @@
 import { Entity } from '../../../packages/@dcl/ecs/src/engine/entity'
 import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_events.gen'
-import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/action_button.gen'
+import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { isPointerEventActiveGenerator } from '../../../packages/@dcl/ecs/src/engine/events'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
@@ -11,7 +11,7 @@ describe('Events helpers isPointerEventActive', () => {
     expect(
       isPointerEventActive(
         newEngine.RootEntity,
-        ActionButton.AB_ANY,
+        InputAction.IA_ANY,
         PointerEventType.PET_DOWN
       )
     ).toBe(false)
@@ -32,21 +32,21 @@ describe('Events helpers isPointerEventActive', () => {
     expect(
       isPointerEventActive(
         entity,
-        ActionButton.AB_POINTER,
+        InputAction.IA_POINTER,
         PointerEventType.PET_DOWN
       )
     ).toBe(true)
     expect(
       isPointerEventActive(
         entity,
-        ActionButton.AB_POINTER,
+        InputAction.IA_POINTER,
         PointerEventType.PET_UP
       )
     ).toBe(false)
     expect(
       isPointerEventActive(
         entity,
-        ActionButton.AB_ACTION_3,
+        InputAction.IA_ACTION_3,
         PointerEventType.PET_UP
       )
     ).toBe(false)
@@ -66,7 +66,7 @@ describe('Events helpers isPointerEventActive', () => {
     expect(
       isPointerEventActive(
         entity,
-        ActionButton.AB_POINTER,
+        InputAction.IA_POINTER,
         PointerEventType.PET_DOWN
       )
     ).toBe(true)
@@ -75,7 +75,7 @@ describe('Events helpers isPointerEventActive', () => {
     expect(
       isPointerEventActive(
         entity,
-        ActionButton.AB_POINTER,
+        InputAction.IA_POINTER,
         PointerEventType.PET_DOWN
       )
     ).toBe(false)
@@ -88,7 +88,7 @@ function createTestPointerDownCommand(
   state: PointerEventType
 ) {
   return {
-    button: ActionButton.AB_POINTER,
+    button: InputAction.IA_POINTER,
     timestamp: timestamp,
     hit: {
       position: { x: 1, y: 2, z: 3 },

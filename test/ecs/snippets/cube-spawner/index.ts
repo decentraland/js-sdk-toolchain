@@ -10,7 +10,7 @@ function createCube(x: number, y: number, z: number, spawner = true): Entity {
         {
           eventType: PointerEventType.PET_DOWN,
           eventInfo: {
-            button: ActionButton.AB_PRIMARY,
+            button: InputAction.IA_PRIMARY,
             hoverText: 'Press E to spawn',
             maxDistance: 100,
             showFeedback: true
@@ -41,7 +41,7 @@ function circularSystem(dt: number) {
 function spawnerSystem() {
   const clickedCubes = engine.getEntitiesWith(PointerEvents)
   for (const [entity] of clickedCubes) {
-    if (wasEntityClicked(entity, ActionButton.AB_PRIMARY)) {
+    if (wasEntityClicked(entity, InputAction.IA_PRIMARY)) {
       createCube(
         1 + Math.random() * 8,
         Math.random() * 8,

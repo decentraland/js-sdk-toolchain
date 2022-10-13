@@ -1,5 +1,5 @@
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
-import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/action_button.gen'
+import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_events.gen'
 
 describe('Generated OnPointerDown ProtoBuf', () => {
@@ -28,7 +28,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
         {
           eventType: PointerEventType.PET_DOWN,
           eventInfo: {
-            button: ActionButton.AB_ACTION_4,
+            button: InputAction.IA_ACTION_4,
             hoverText: 'Run to tap',
             maxDistance: 5,
             showFeedback: false
@@ -56,7 +56,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
         {
           eventType: PointerEventType.PET_DOWN,
           eventInfo: {
-            button: ActionButton.AB_ACTION_4,
+            button: InputAction.IA_ACTION_4,
             hoverText: 'Run to tap',
             maxDistance: 5,
             showFeedback: false
@@ -72,7 +72,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     PointerEventsResult.create(entity, {
       commands: [
         {
-          button: ActionButton.AB_ACTION_3,
+          button: InputAction.IA_ACTION_3,
           timestamp: 5,
           hit: {
             position: { x: 1, y: 2, z: 3 },

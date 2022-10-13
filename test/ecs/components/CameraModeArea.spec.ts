@@ -1,4 +1,4 @@
-import { CameraModeValue } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/camera_mode_value.gen'
+import { CameraType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/camera_type.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated CameraModifierArea ProtoBuf', () => {
@@ -10,12 +10,12 @@ describe('Generated CameraModifierArea ProtoBuf', () => {
 
     const avatarModifierArea = CameraModeArea.create(entity, {
       area: { x: 1, y: 2, z: 3 },
-      mode: CameraModeValue.CMV_FIRST_PERSON
+      mode: CameraType.CT_FIRST_PERSON
     })
 
     CameraModeArea.create(entityB, {
       area: { x: 3, y: 4, z: 5 },
-      mode: CameraModeValue.CMV_THIRD_PERSON
+      mode: CameraType.CT_THIRD_PERSON
     })
     const buffer = CameraModeArea.toBinary(entity)
     CameraModeArea.updateFromBinary(entityB, buffer)

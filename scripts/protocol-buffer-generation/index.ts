@@ -71,10 +71,7 @@ export function compileEcsComponents(
         )
       }
 
-      const componentName = snakeToPascal(componentFile).replace(
-        'NftShape',
-        'NFTShape'
-      )
+      const componentName = snakeToPascal(componentFile)
       return {
         componentId,
         componentPascalName: componentName,

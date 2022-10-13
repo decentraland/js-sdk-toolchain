@@ -1,7 +1,7 @@
 import { Entity } from './entity'
 import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
 import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_events.gen'
-import { ActionButton } from '../components/generated/pb/decentraland/sdk/components/common/action_button.gen'
+import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { IEngine } from './types'
 import { Schemas } from '../schemas'
 
@@ -31,7 +31,7 @@ export function wasEntityClickedGenerator(engine: IEngine) {
     }
   }, EventSystemPriority)
 
-  return function (entity: Entity, actionButton: ActionButton) {
+  return function (entity: Entity, actionButton: InputAction) {
     const component = engine.baseComponents.PointerEventsResult.getOrNull(
       engine.RootEntity
     )
@@ -93,7 +93,7 @@ export function isPointerEventActiveGenerator(engine: IEngine) {
 
   return function (
     entity: Entity,
-    actionButton: ActionButton,
+    actionButton: InputAction,
     pointerEventType: PointerEventType
   ) {
     const component = engine.baseComponents.PointerEventsResult.getOrNull(
@@ -130,7 +130,7 @@ export function isPointerEventActiveGenerator(engine: IEngine) {
 function findLastAction(
   commands: readonly PBPointerEventsResult_PointerCommand[],
   pointerEventType: PointerEventType,
-  actionButton: ActionButton,
+  actionButton: InputAction,
   entity?: Entity
 ): PBPointerEventsResult_PointerCommand | undefined {
   let commandToReturn: PBPointerEventsResult_PointerCommand | undefined =

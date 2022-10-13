@@ -1,4 +1,4 @@
-import { CameraModeValue } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/camera_mode_value.gen'
+import { CameraType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/camera_type.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated CameraMode ProtoBuf', () => {
@@ -9,18 +9,18 @@ describe('Generated CameraMode ProtoBuf', () => {
     const entityB = newEngine.addEntity()
 
     const _cameraMode = CameraMode.create(entity, {
-      mode: CameraModeValue.CMV_THIRD_PERSON
+      mode: CameraType.CT_THIRD_PERSON
     })
 
     CameraMode.create(entityB, {
-      mode: CameraModeValue.CMV_FIRST_PERSON
+      mode: CameraType.CT_FIRST_PERSON
     })
     const buffer = CameraMode.toBinary(entity)
     CameraMode.updateFromBinary(entityB, buffer)
 
     const immutableCameraMode = CameraMode.get(entity)
     switch (immutableCameraMode.mode) {
-      case CameraModeValue.CMV_FIRST_PERSON:
+      case CameraType.CT_FIRST_PERSON:
         break
     }
 

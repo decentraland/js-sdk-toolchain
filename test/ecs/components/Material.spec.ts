@@ -1,7 +1,7 @@
 import {
-  FilterMode,
+  TextureFilterMode,
   TextureWrapMode,
-  TransparencyMode
+  MaterialTransparencyMode
 } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/material.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
@@ -35,7 +35,7 @@ describe('Generated Material ProtoBuf', () => {
       emissiveIntensity: 1,
       emissiveColor: { r: 0, g: 1, b: 1 },
       reflectivityColor: { r: 0, g: 1, b: 1 },
-      transparencyMode: TransparencyMode.TM_ALPHA_BLEND
+      transparencyMode: MaterialTransparencyMode.MTM_ALPHA_BLEND
     })
 
     Material.create(entityB, {
@@ -43,22 +43,22 @@ describe('Generated Material ProtoBuf', () => {
       alphaTest: 1,
       alphaTexture: {
         wrapMode: TextureWrapMode.TWM_CLAMP,
-        filterMode: FilterMode.FM_BILINEAR,
+        filterMode: TextureFilterMode.TFM_BILINEAR,
         src: 'not-casla'
       },
       bumpTexture: {
         wrapMode: TextureWrapMode.TWM_MIRROR,
-        filterMode: FilterMode.FM_POINT,
+        filterMode: TextureFilterMode.TFM_POINT,
         src: 'not-casla'
       },
       emissiveTexture: {
         wrapMode: TextureWrapMode.TWM_MIRROR_ONCE,
-        filterMode: FilterMode.FM_TRILINEAR,
+        filterMode: TextureFilterMode.TFM_TRILINEAR,
         src: 'not-casla'
       },
       texture: {
         wrapMode: TextureWrapMode.TWM_REPEAT,
-        filterMode: FilterMode.UNRECOGNIZED,
+        filterMode: TextureFilterMode.UNRECOGNIZED,
         src: 'not-casla'
       },
       castShadows: true,
@@ -70,7 +70,7 @@ describe('Generated Material ProtoBuf', () => {
       metallic: 1,
       roughness: 1,
       specularIntensity: 0,
-      transparencyMode: TransparencyMode.TM_ALPHA_BLEND
+      transparencyMode: MaterialTransparencyMode.MTM_ALPHA_BLEND
     })
     const buffer = Material.toBinary(entity)
     Material.updateFromBinary(entityB, buffer)

@@ -104,7 +104,7 @@ async function preprocessProtoGeneration(protoPath: string) {
     writeFileSync(filePath, textContent)
     const content = await import(filePath)
 
-    const item = snakeToPascal(fileName).replace('Api', 'API')
+    const item = snakeToPascal(fileName)
 
     const defBlock = getBlock(
       textContent,
