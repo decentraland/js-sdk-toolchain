@@ -45,7 +45,7 @@ export function defineSdkComponents(engine: PreEngine) {
     Material: engine.defineComponentFromSchema<
       ISchema<PBMaterial>,
       Partial<PBMaterial>
-      >(MaterialSchema.MaterialSchema, MaterialSchema.COMPONENT_ID)
+    >(MaterialSchema.MaterialSchema, MaterialSchema.COMPONENT_ID)
   }
 }
 
