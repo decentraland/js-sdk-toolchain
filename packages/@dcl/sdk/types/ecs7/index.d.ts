@@ -10,8 +10,7 @@ declare const enum AvatarAnchorPointType {
     AAPT_POSITION = 0,
     AAPT_NAME_TAG = 1,
     AAPT_LEFT_HAND = 2,
-    AAPT_RIGHT_HAND = 3,
-    UNRECOGNIZED = -1
+    AAPT_RIGHT_HAND = 3
 }
 
 /** @public */
@@ -22,8 +21,7 @@ declare const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierAr
 
 declare const enum AvatarModifierType {
     AMT_HIDE_AVATARS = 0,
-    AMT_DISABLE_PASSPORTS = 1,
-    UNRECOGNIZED = -1
+    AMT_DISABLE_PASSPORTS = 1
 }
 
 /** @public */
@@ -45,15 +43,13 @@ declare const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBC
 
 declare const enum CameraType {
     CT_FIRST_PERSON = 0,
-    CT_THIRD_PERSON = 1,
-    UNRECOGNIZED = -1
+    CT_THIRD_PERSON = 1
 }
 
 declare const enum ColliderLayer {
     CL_NONE = 0,
     CL_POINTER = 1,
-    CL_PHYSICS = 2,
-    UNRECOGNIZED = -1
+    CL_PHYSICS = 2
 }
 
 declare interface Color3 {
@@ -502,8 +498,7 @@ declare type FloatArray = number[];
 
 declare const enum Font {
     F_LIBERATION_SANS = 0,
-    F_SANS_SERIF = 1,
-    UNRECOGNIZED = -1
+    F_SANS_SERIF = 1
 }
 
 /** @public */
@@ -663,8 +658,7 @@ declare const enum InputAction {
     IA_ACTION_3 = 10,
     IA_ACTION_4 = 11,
     IA_ACTION_5 = 12,
-    IA_ACTION_6 = 13,
-    UNRECOGNIZED = -1
+    IA_ACTION_6 = 13
 }
 
 /**
@@ -721,8 +715,7 @@ declare const enum MaterialTransparencyMode {
     MTM_ALPHA_TEST = 1,
     MTM_ALPHA_BLEND = 2,
     MTM_ALPHA_TEST_AND_ALPHA_BLEND = 3,
-    MTM_AUTO = 4,
-    UNRECOGNIZED = -1
+    MTM_AUTO = 4
 }
 
 /**
@@ -1499,8 +1492,7 @@ declare const enum NftFrameType {
     NFT_WOOD_WIDE = 19,
     NFT_WOOD_TWIGS = 20,
     NFT_CANVAS = 21,
-    NFT_NONE = 22,
-    UNRECOGNIZED = -1
+    NFT_NONE = 22
 }
 
 /** @public */
@@ -2311,8 +2303,7 @@ declare const enum PointerEventType {
     PET_UP = 0,
     PET_DOWN = 1,
     PET_HOVER_ENTER = 2,
-    PET_HOVER_LEAVE = 3,
-    UNRECOGNIZED = -1
+    PET_HOVER_LEAVE = 3
 }
 
 /** @public */
@@ -2550,8 +2541,7 @@ declare interface RaycastHit {
 
 declare const enum RaycastQueryType {
     RQT_HIT_FIRST = 0,
-    RQT_QUERY_ALL = 1,
-    UNRECOGNIZED = -1
+    RQT_QUERY_ALL = 1
 }
 
 /** @public */
@@ -2626,8 +2616,7 @@ declare type SystemFn = (dt: number) => void;
 declare const enum TextAlignMode {
     TAM_CENTER = 0,
     TAM_LEFT = 1,
-    TAM_RIGHT = 2,
-    UNRECOGNIZED = -1
+    TAM_RIGHT = 2
 }
 
 /** @public */
@@ -2636,16 +2625,14 @@ declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 declare const enum TextureFilterMode {
     TFM_POINT = 0,
     TFM_BILINEAR = 1,
-    TFM_TRILINEAR = 2,
-    UNRECOGNIZED = -1
+    TFM_TRILINEAR = 2
 }
 
 declare const enum TextureWrapMode {
     TWM_REPEAT = 0,
     TWM_CLAMP = 1,
     TWM_MIRROR = 2,
-    TWM_MIRROR_ONCE = 3,
-    UNRECOGNIZED = -1
+    TWM_MIRROR_ONCE = 3
 }
 
 declare type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
@@ -3303,29 +3290,25 @@ declare const enum YGAlign {
     YGA_STRETCH = 4,
     YGA_BASELINE = 5,
     YGA_SPACE_BETWEEN = 6,
-    YGA_SPACE_AROUND = 7,
-    UNRECOGNIZED = -1
+    YGA_SPACE_AROUND = 7
 }
 
 declare const enum YGDirection {
     YGD_INHERIT = 0,
     YGD_LTR = 1,
-    YGD_RTL = 2,
-    UNRECOGNIZED = -1
+    YGD_RTL = 2
 }
 
 declare const enum YGDisplay {
     YGD_FLEX = 0,
-    YGD_NONE = 1,
-    UNRECOGNIZED = -1
+    YGD_NONE = 1
 }
 
 declare const enum YGFlexDirection {
     YGFD_COLUMN = 0,
     YGFD_COLUMN_REVERSE = 1,
     YGFD_ROW = 2,
-    YGFD_ROW_REVERSE = 3,
-    UNRECOGNIZED = -1
+    YGFD_ROW_REVERSE = 3
 }
 
 declare const enum YGJustify {
@@ -3334,37 +3317,32 @@ declare const enum YGJustify {
     YGJ_FLEX_END = 2,
     YGJ_SPACE_BETWEEN = 3,
     YGJ_SPACE_AROUND = 4,
-    YGJ_SPACE_EVENLY = 5,
-    UNRECOGNIZED = -1
+    YGJ_SPACE_EVENLY = 5
 }
 
 declare const enum YGOverflow {
     YGO_VISIBLE = 0,
     YGO_HIDDEN = 1,
-    YGO_SCROLL = 2,
-    UNRECOGNIZED = -1
+    YGO_SCROLL = 2
 }
 
 declare const enum YGPositionType {
     YGPT_STATIC = 0,
     YGPT_RELATIVE = 1,
-    YGPT_ABSOLUTE = 2,
-    UNRECOGNIZED = -1
+    YGPT_ABSOLUTE = 2
 }
 
 declare const enum YGUnit {
     YGU_UNDEFINED = 0,
     YGU_POINT = 1,
     YGU_PERCENT = 2,
-    YGU_AUTO = 3,
-    UNRECOGNIZED = -1
+    YGU_AUTO = 3
 }
 
 declare const enum YGWrap {
     YGW_NO_WRAP = 0,
     YGW_WRAP = 1,
-    YGW_WRAP_REVERSE = 2,
-    UNRECOGNIZED = -1
+    YGW_WRAP_REVERSE = 2
 }
 
 

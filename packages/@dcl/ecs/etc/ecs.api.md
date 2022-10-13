@@ -60,7 +60,7 @@ export const enum ColliderLayer {
     // (undocumented)
     CL_PHYSICS = 2,
     // (undocumented)
-    CL_POINTER = 1,
+    CL_POINTER = 1
 }
 
 // @public (undocumented)
