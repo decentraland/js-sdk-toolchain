@@ -214,7 +214,7 @@ declare namespace Components {
     /** @public */
     const GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     /** @public */
-    const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    const Material: ComponentDefinition<ISchema<PBMaterial>, Partial<PBMaterial>>;
     /** @public */
     const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
     /** @public */
@@ -436,6 +436,7 @@ declare function defineSdkComponents(engine: PreEngine): {
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
     MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
+    Material: ComponentDefinition<ISchema<PBMaterial>, Partial<PBMaterial>>;
     Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
@@ -445,7 +446,6 @@ declare function defineSdkComponents(engine: PreEngine): {
     CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
-    Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
@@ -708,7 +708,7 @@ declare const log: (...a: any[]) => void;
 declare function makeCollisionMask(...layers: ColliderLayer[]): number;
 
 /** @public */
-declare const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+declare const Material: ComponentDefinition<ISchema<PBMaterial>, Partial<PBMaterial>>;
 
 declare const enum MaterialTransparencyMode {
     MTM_OPAQUE = 0,
@@ -1899,7 +1899,7 @@ declare interface PBGltfContainer {
 
 declare interface PBMaterial {
     /** default = null */
-    srcTexture: PBMaterial_Texture | undefined;
+    texture: PBMaterial_Texture | undefined;
     /** default = null */
     avatarTexture: PBMaterial_AvatarTexture | undefined;
     /** default = 0.5. range value: from 0 to 1 */
