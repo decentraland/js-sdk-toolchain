@@ -1,11 +1,11 @@
 import {
   SandBox,
   setupDclInterfaceForThisSuite,
-  testingExperimentalAPI
+  testingExperimentalApi
 } from './utils'
 
 describe.skip('Performance.', () => {
-  const engineApi = testingExperimentalAPI()
+  const engineApi = testingExperimentalApi()
   setupDclInterfaceForThisSuite({
     ...engineApi.modules
   })
