@@ -4,7 +4,8 @@ import componentSchemaTemplate from './componentSchemaTemplate'
 
 export type Component = {
   componentId: number
-  componentName: string
+  componentPascalName: string
+  componentFile: string
 }
 
 export async function generateComponent(params: {
@@ -16,10 +17,11 @@ export async function generateComponent(params: {
 
   const componentFilePath = path.resolve(
     generatedPath,
-    `${component.componentName}.gen.ts`
+    `${component.componentPascalName}.gen.ts`
   )
   const componentContent = componentSchemaTemplate
-    .replace(/\$\{ComponentName\}/g, component.componentName)
+    .replace(/\$\{ComponentName\}/g, component.componentPascalName)
+    .replace(/\$\{ComponentFile\}/g, component.componentFile)
     .replace(/\$\{ComponentId\}/g, component.componentId.toString())
   fs.writeFileSync(componentFilePath, componentContent)
 }

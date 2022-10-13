@@ -86,9 +86,9 @@ export type EntityPropTypes = {
 // @public (undocumented)
 export enum Font {
     // (undocumented)
-    LiberationSans = 0,
+    F_LIBERATION_SANS = 0,
     // (undocumented)
-    SansSerif = 1,
+    F_SANS_SERIF = 1,
     // (undocumented)
     UNRECOGNIZED = -1
 }
@@ -126,7 +126,7 @@ export interface PBUiText {
     color?: Color3 | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
-    textAlign?: TextAlign | undefined;
+    textAlign?: TextAlignMode | undefined;
     // (undocumented)
     value: string;
 }
@@ -289,16 +289,16 @@ export function removeUi(index: number): void;
 // @public (undocumented)
 export function renderUi(ui: UiComponent): number;
 
-// Warning: (ae-missing-release-tag) "TextAlign" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "TextAlignMode" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export enum TextAlign {
+export enum TextAlignMode {
     // (undocumented)
-    Center = 0,
+    TAM_CENTER = 0,
     // (undocumented)
-    Left = 1,
+    TAM_LEFT = 1,
     // (undocumented)
-    Right = 2,
+    TAM_RIGHT = 2,
     // (undocumented)
     UNRECOGNIZED = -1
 }
@@ -380,21 +380,21 @@ export enum YGAlign {
     // (undocumented)
     UNRECOGNIZED = -1,
     // (undocumented)
-    YGAlignAuto = 0,
+    YGA_AUTO = 0,
     // (undocumented)
-    YGAlignBaseline = 5,
+    YGA_BASELINE = 5,
     // (undocumented)
-    YGAlignCenter = 2,
+    YGA_CENTER = 2,
     // (undocumented)
-    YGAlignFlexEnd = 3,
+    YGA_FLEX_END = 3,
     // (undocumented)
-    YGAlignFlexStart = 1,
+    YGA_FLEX_START = 1,
     // (undocumented)
-    YGAlignSpaceAround = 7,
+    YGA_SPACE_AROUND = 7,
     // (undocumented)
-    YGAlignSpaceBetween = 6,
+    YGA_SPACE_BETWEEN = 6,
     // (undocumented)
-    YGAlignStretch = 4
+    YGA_STRETCH = 4
 }
 
 // Warning: (ae-missing-release-tag) "YGDirection" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -404,11 +404,11 @@ export enum YGDirection {
     // (undocumented)
     UNRECOGNIZED = -1,
     // (undocumented)
-    YGDirectionInherit = 0,
+    YGD_INHERIT = 0,
     // (undocumented)
-    YGDirectionLTR = 1,
+    YGD_LTR = 1,
     // (undocumented)
-    YGDirectionRTL = 2
+    YGD_RTL = 2
 }
 
 // Warning: (ae-missing-release-tag) "YGDisplay" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -418,9 +418,9 @@ export enum YGDisplay {
     // (undocumented)
     UNRECOGNIZED = -1,
     // (undocumented)
-    YGDisplayFlex = 0,
+    YGD_FLEX = 0,
     // (undocumented)
-    YGDisplayNone = 1
+    YGD_NONE = 1
 }
 
 // Warning: (ae-missing-release-tag) "YGFlexDirection" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -430,13 +430,13 @@ export enum YGFlexDirection {
     // (undocumented)
     UNRECOGNIZED = -1,
     // (undocumented)
-    YGFlexDirectionColumn = 0,
+    YGFD_COLUMN = 0,
     // (undocumented)
-    YGFlexDirectionColumnReverse = 1,
+    YGFD_COLUMN_REVERSE = 1,
     // (undocumented)
-    YGFlexDirectionRow = 2,
+    YGFD_ROW = 2,
     // (undocumented)
-    YGFlexDirectionRowReverse = 3
+    YGFD_ROW_REVERSE = 3
 }
 
 // Warning: (ae-missing-release-tag) "YGJustify" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -446,17 +446,17 @@ export enum YGJustify {
     // (undocumented)
     UNRECOGNIZED = -1,
     // (undocumented)
-    YGJustifyCenter = 1,
+    YGJ_CENTER = 1,
     // (undocumented)
-    YGJustifyFlexEnd = 2,
+    YGJ_FLEX_END = 2,
     // (undocumented)
-    YGJustifyFlexStart = 0,
+    YGJ_FLEX_START = 0,
     // (undocumented)
-    YGJustifySpaceAround = 4,
+    YGJ_SPACE_AROUND = 4,
     // (undocumented)
-    YGJustifySpaceBetween = 3,
+    YGJ_SPACE_BETWEEN = 3,
     // (undocumented)
-    YGJustifySpaceEvenly = 5
+    YGJ_SPACE_EVENLY = 5
 }
 
 // Warning: (ae-missing-release-tag) "YGOverflow" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -466,11 +466,11 @@ export enum YGOverflow {
     // (undocumented)
     UNRECOGNIZED = -1,
     // (undocumented)
-    YGOverflowHidden = 1,
+    YGO_HIDDEN = 1,
     // (undocumented)
-    YGOverflowScroll = 2,
+    YGO_SCROLL = 2,
     // (undocumented)
-    YGOverflowVisible = 0
+    YGO_VISIBLE = 0
 }
 
 // Warning: (ae-missing-release-tag) "YGPositionType" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -480,11 +480,11 @@ export enum YGPositionType {
     // (undocumented)
     UNRECOGNIZED = -1,
     // (undocumented)
-    YGPositionTypeAbsolute = 2,
+    YGPT_ABSOLUTE = 2,
     // (undocumented)
-    YGPositionTypeRelative = 1,
+    YGPT_RELATIVE = 1,
     // (undocumented)
-    YGPositionTypeStatic = 0
+    YGPT_STATIC = 0
 }
 
 // Warning: (ae-missing-release-tag) "YGUnit" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -494,13 +494,13 @@ export enum YGUnit {
     // (undocumented)
     UNRECOGNIZED = -1,
     // (undocumented)
-    YGUnitAuto = 3,
+    YGU_AUTO = 3,
     // (undocumented)
-    YGUnitPercent = 2,
+    YGU_PERCENT = 2,
     // (undocumented)
-    YGUnitPoint = 1,
+    YGU_POINT = 1,
     // (undocumented)
-    YGUnitUndefined = 0
+    YGU_UNDEFINED = 0
 }
 
 // Warning: (ae-missing-release-tag) "YGWrap" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -510,11 +510,11 @@ export enum YGWrap {
     // (undocumented)
     UNRECOGNIZED = -1,
     // (undocumented)
-    YGWrapNoWrap = 0,
+    YGW_NO_WRAP = 0,
     // (undocumented)
-    YGWrapWrap = 1,
+    YGW_WRAP = 1,
     // (undocumented)
-    YGWrapWrapReverse = 2
+    YGW_WRAP_REVERSE = 2
 }
 
 // (No @packageDocumentation comment for this package)

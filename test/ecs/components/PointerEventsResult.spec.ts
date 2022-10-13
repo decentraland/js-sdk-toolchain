@@ -1,9 +1,9 @@
 ﻿import { Engine } from '../../../packages/@dcl/ecs/src/engine'
-import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/common/ActionButton.gen'
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/PointerEvents.gen'
+import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
+import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_events.gen'
 
-describe('Generated OnPointerDown ProtoBuf', () => {
-  it('should serialize/deserialize OnPointerDown', () => {
+describe('Generated PointerEventsResult ProtoBuf', () => {
+  it('should serialize/deserialize PointerEventsResult', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
@@ -12,7 +12,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     const onPointerResult = PointerEventsResult.create(entity, {
       commands: [
         {
-          button: ActionButton.ACTION_3,
+          button: InputAction.IA_ACTION_3,
           timestamp: 5,
           hit: {
             position: { x: 1, y: 2, z: 3 },
@@ -23,7 +23,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             meshName: 'mesh',
             entityId: 515
           },
-          state: PointerEventType.DOWN,
+          state: PointerEventType.PET_DOWN,
           analog: 5
         }
       ]
@@ -32,7 +32,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     PointerEventsResult.create(entityB, {
       commands: [
         {
-          button: ActionButton.ACTION_5,
+          button: InputAction.IA_ACTION_5,
           timestamp: 15,
           hit: {
             position: { x: 3, y: 4, z: 5 },
@@ -43,11 +43,11 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             meshName: 'meshNew',
             entityId: 5154
           },
-          state: PointerEventType.UP,
+          state: PointerEventType.PET_UP,
           analog: 55
         },
         {
-          button: ActionButton.ACTION_5,
+          button: InputAction.IA_ACTION_5,
           timestamp: 15,
           hit: {
             position: { x: 3, y: 4, z: 5 },
@@ -57,7 +57,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             origin: { x: 3, y: 4, z: 5 },
             meshName: 'meshNew'
           },
-          state: PointerEventType.UP,
+          state: PointerEventType.PET_UP,
           analog: 523
         }
       ]

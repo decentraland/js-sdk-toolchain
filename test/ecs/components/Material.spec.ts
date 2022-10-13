@@ -1,8 +1,8 @@
 import {
-  FilterMode,
+  TextureFilterMode,
   TextureWrapMode,
-  TransparencyMode
-} from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/Material.gen'
+  MaterialTransparencyMode
+} from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/material.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated Material ProtoBuf', () => {
@@ -15,7 +15,7 @@ describe('Generated Material ProtoBuf', () => {
     const _material = Material.create(entity, {
       ...Material.default(),
       texture: {
-        wrapMode: TextureWrapMode.Clamp,
+        wrapMode: TextureWrapMode.TWM_CLAMP,
         filterMode: undefined,
         src: 'not-casla'
       },
@@ -35,30 +35,30 @@ describe('Generated Material ProtoBuf', () => {
       emissiveIntensity: 1,
       emissiveColor: { r: 0, g: 1, b: 1 },
       reflectivityColor: { r: 0, g: 1, b: 1 },
-      transparencyMode: TransparencyMode.AlphaBlend
+      transparencyMode: MaterialTransparencyMode.MTM_ALPHA_BLEND
     })
 
     Material.create(entityB, {
       albedoColor: { r: 0, g: 1, b: 1 },
       alphaTest: 1,
       alphaTexture: {
-        wrapMode: TextureWrapMode.Clamp,
-        filterMode: FilterMode.Bilinear,
+        wrapMode: TextureWrapMode.TWM_CLAMP,
+        filterMode: TextureFilterMode.TFM_BILINEAR,
         src: 'not-casla'
       },
       bumpTexture: {
-        wrapMode: TextureWrapMode.Mirror,
-        filterMode: FilterMode.Point,
+        wrapMode: TextureWrapMode.TWM_MIRROR,
+        filterMode: TextureFilterMode.TFM_POINT,
         src: 'not-casla'
       },
       emissiveTexture: {
-        wrapMode: TextureWrapMode.MirrorOnce,
-        filterMode: FilterMode.Trilinear,
+        wrapMode: TextureWrapMode.TWM_MIRROR_ONCE,
+        filterMode: TextureFilterMode.TFM_TRILINEAR,
         src: 'not-casla'
       },
       texture: {
-        wrapMode: TextureWrapMode.Repeat,
-        filterMode: FilterMode.UNRECOGNIZED,
+        wrapMode: TextureWrapMode.TWM_REPEAT,
+        filterMode: TextureFilterMode.UNRECOGNIZED,
         src: 'not-casla'
       },
       castShadows: true,
@@ -70,7 +70,7 @@ describe('Generated Material ProtoBuf', () => {
       metallic: 1,
       roughness: 1,
       specularIntensity: 0,
-      transparencyMode: TransparencyMode.AlphaBlend
+      transparencyMode: MaterialTransparencyMode.MTM_ALPHA_BLEND
     })
     const buffer = Material.toBinary(entity)
     Material.updateFromBinary(entityB, buffer)

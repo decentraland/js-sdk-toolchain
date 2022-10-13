@@ -3,10 +3,10 @@ import {
   Vector3
 } from '../../../packages/@dcl/ecs/src/runtime/Math'
 import { Engine, Entity } from '../../../packages/@dcl/ecs/src/engine'
-import { setupDclInterfaceForThisSuite, testingExperimentalAPI } from '../utils'
+import { setupDclInterfaceForThisSuite, testingExperimentalApi } from '../utils'
 
 describe('Legacy component tests', () => {
-  const engineApi = testingExperimentalAPI()
+  const engineApi = testingExperimentalApi()
   setupDclInterfaceForThisSuite({
     ...engineApi.modules
   })

@@ -8,11 +8,11 @@ export function wait(ms: number) {
   return new Promise<void>((resolve) => setTimeout(() => resolve(), ms))
 }
 
-export function testingExperimentalAPI() {
+export function testingExperimentalApi() {
   const sentMessages: Uint8Array[] = []
   const messagesFromRenderer: Uint8Array[] = []
   const modules = {
-    '~system/ExperimentalAPI': {
+    '~system/ExperimentalApi': {
       async sendToRenderer(arg: { data: Uint8Array }) {
         sentMessages.push(arg.data)
       },

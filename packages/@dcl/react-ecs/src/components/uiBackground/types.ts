@@ -1,5 +1,5 @@
-import { PBUiBackground } from '../../generated/ecs/components/UiBackground.gen'
-import { Color4 } from '../../generated/ecs/components/common/Color4.gen'
+import { PBUiBackground } from '../../generated/decentraland/sdk/components/ui_background.gen'
+import { Color4 } from '../../generated/decentraland/common/colors.gen'
 
 export { PBUiBackground, Color4 }
 
