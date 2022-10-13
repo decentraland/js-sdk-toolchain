@@ -19,7 +19,7 @@ describe('Generated Avatar ModifierArea ProtoBuf', () => {
 
     AvatarModifierArea.create(entityB, {
       area: { x: 3, y: 4, z: 5 },
-      modifiers: [AvatarModifierType.UNRECOGNIZED],
+      modifiers: [],
       excludeIds: ['exclude_this', 'testId', '12837127371']
     })
     const buffer = AvatarModifierArea.toBinary(entity)
