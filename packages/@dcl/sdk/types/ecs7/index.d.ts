@@ -1899,7 +1899,9 @@ declare interface PBGltfContainer {
 
 declare interface PBMaterial {
     /** default = null */
-    texture?: PBMaterial_Texture | undefined;
+    srcTexture: PBMaterial_Texture | undefined;
+    /** default = null */
+    avatarTexture: PBMaterial_AvatarTexture | undefined;
     /** default = 0.5. range value: from 0 to 1 */
     alphaTest?: number | undefined;
     /** default =  true */
@@ -1930,6 +1932,14 @@ declare interface PBMaterial {
     emissiveIntensity?: number | undefined;
     /** default = 1 */
     directIntensity?: number | undefined;
+}
+
+declare interface PBMaterial_AvatarTexture {
+    userId: string;
+    /** default = TextureWrapMode.Clamp */
+    wrapMode?: TextureWrapMode | undefined;
+    /** default = FilterMode.Bilinear */
+    filterMode?: TextureFilterMode | undefined;
 }
 
 declare interface PBMaterial_Texture {
