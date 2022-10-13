@@ -1,20 +1,20 @@
 /// <reference types="@dcl/posix" />
 
 declare const enum ActionButton {
-    POINTER = 0,
-    PRIMARY = 1,
-    SECONDARY = 2,
-    ANY = 3,
-    FORWARD = 4,
-    BACKWARD = 5,
-    RIGHT = 6,
-    LEFT = 7,
-    JUMP = 8,
-    WALK = 9,
-    ACTION_3 = 10,
-    ACTION_4 = 11,
-    ACTION_5 = 12,
-    ACTION_6 = 13,
+    AB_POINTER = 0,
+    AB_PRIMARY = 1,
+    AB_SECONDARY = 2,
+    AB_ANY = 3,
+    AB_FORWARD = 4,
+    AB_BACKWARD = 5,
+    AB_RIGHT = 6,
+    AB_LEFT = 7,
+    AB_JUMP = 8,
+    AB_WALK = 9,
+    AB_ACTION_3 = 10,
+    AB_ACTION_4 = 11,
+    AB_ACTION_5 = 12,
+    AB_ACTION_6 = 13,
     UNRECOGNIZED = -1
 }
 
@@ -25,10 +25,10 @@ declare const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
 declare const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
 
 declare const enum AvatarAnchorPoint {
-    POSITION = 0,
-    NAME_TAG = 1,
-    LEFT_HAND = 2,
-    RIGHT_HAND = 3,
+    AAP_POSITION = 0,
+    AAP_NAME_TAG = 1,
+    AAP_LEFT_HAND = 2,
+    AAP_RIGHT_HAND = 3,
     UNRECOGNIZED = -1
 }
 
@@ -36,8 +36,8 @@ declare const enum AvatarAnchorPoint {
 declare const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
 
 declare const enum AvatarModifier {
-    HIDE_AVATARS = 0,
-    DISABLE_PASSPORTS = 1,
+    AM_HIDE_AVATARS = 0,
+    AM_DISABLE_PASSPORTS = 1,
     UNRECOGNIZED = -1
 }
 
@@ -62,15 +62,15 @@ declare const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMod
 declare const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
 
 declare const enum CameraModeValue {
-    FIRST_PERSON = 0,
-    THIRD_PERSON = 1,
+    CMV_FIRST_PERSON = 0,
+    CMV_THIRD_PERSON = 1,
     UNRECOGNIZED = -1
 }
 
 declare const enum ColliderLayer {
-    None = 0,
-    Pointer = 1,
-    Physics = 2,
+    CL_NONE = 0,
+    CL_POINTER = 1,
+    CL_PHYSICS = 2,
     UNRECOGNIZED = -1
 }
 
@@ -516,9 +516,9 @@ declare type ExcludeUndefined<T> = {
 }[keyof T];
 
 declare const enum FilterMode {
-    Point = 0,
-    Bilinear = 1,
-    Trilinear = 2,
+    FM_POINT = 0,
+    FM_BILINEAR = 1,
+    FM_TRILINEAR = 2,
     UNRECOGNIZED = -1
 }
 
@@ -526,8 +526,8 @@ declare const enum FilterMode {
 declare type FloatArray = number[];
 
 declare const enum Font {
-    LiberationSans = 0,
-    SansSerif = 1,
+    F_LIBERATION_SANS = 0,
+    F_SANS_SERIF = 1,
     UNRECOGNIZED = -1
 }
 
@@ -1829,11 +1829,11 @@ declare interface PBAvatarShape {
     name?: string | undefined;
     /** default = urn:decentraland:off-chain:base-avatars:BaseFemale */
     bodyShape?: string | undefined;
-    /** default = Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
+    /** default = decentraland.common.Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
     skinColor?: Color3 | undefined;
-    /** default = Color3(R = 0.283f, G = 0.142f, B = 0f) */
+    /** default = decentraland.common.Color3(R = 0.283f, G = 0.142f, B = 0f) */
     hairColor?: Color3 | undefined;
-    /** default = Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
+    /** default = decentraland.common.Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
     eyeColor?: Color3 | undefined;
     expressionTriggerId?: string | undefined;
     /** default = timestamp */
@@ -1972,36 +1972,9 @@ declare interface PBMeshRenderer_SphereMesh {
 declare interface PBNFTShape {
     src: string;
     /** default = PictureFrameStyle.Classic */
-    style?: PBNFTShape_PictureFrameStyle | undefined;
-    /** default = Color3(0.6404918, 0.611472, 0.8584906) */
+    style?: PictureFrameStyle | undefined;
+    /** default = decentraland.common.Color3(0.6404918, 0.611472, 0.8584906) */
     color?: Color3 | undefined;
-}
-
-declare const enum PBNFTShape_PictureFrameStyle {
-    Classic = 0,
-    Baroque_Ornament = 1,
-    Diamond_Ornament = 2,
-    Minimal_Wide = 3,
-    Minimal_Grey = 4,
-    Blocky = 5,
-    Gold_Edges = 6,
-    Gold_Carved = 7,
-    Gold_Wide = 8,
-    Gold_Rounded = 9,
-    Metal_Medium = 10,
-    Metal_Wide = 11,
-    Metal_Slim = 12,
-    Metal_Rounded = 13,
-    Pins = 14,
-    Minimal_Black = 15,
-    Minimal_White = 16,
-    Tape = 17,
-    Wood_Slim = 18,
-    Wood_Wide = 19,
-    Wood_Twigs = 20,
-    Canvas = 21,
-    None = 22,
-    UNRECOGNIZED = -1
 }
 
 declare interface PBPointerEvents {
@@ -2181,6 +2154,33 @@ declare interface PBVisibilityComponent {
     visible?: boolean | undefined;
 }
 
+declare const enum PictureFrameStyle {
+    PFS_CLASSIC = 0,
+    PFS_BAROQUE_ORNAMENT = 1,
+    PFS_DIAMOND_ORNAMENT = 2,
+    PFS_MINIMAL_WIDE = 3,
+    PFS_MINIMAL_GREY = 4,
+    PFS_BLOCKY = 5,
+    PFS_GOLD_EDGES = 6,
+    PFS_GOLD_CARVED = 7,
+    PFS_GOLD_WIDE = 8,
+    PFS_GOLD_ROUNDED = 9,
+    PFS_METAL_MEDIUM = 10,
+    PFS_METAL_WIDE = 11,
+    PFS_METAL_SLIM = 12,
+    PFS_METAL_ROUNDED = 13,
+    PFS_PINS = 14,
+    PFS_MINIMAL_BLACK = 15,
+    PFS_MINIMAL_WHITE = 16,
+    PFS_TAPE = 17,
+    PFS_WOOD_SLIM = 18,
+    PFS_WOOD_WIDE = 19,
+    PFS_WOOD_TWIGS = 20,
+    PFS_CANVAS = 21,
+    PFS_NONE = 22,
+    UNRECOGNIZED = -1
+}
+
 /**
  * Represens a plane by the equation ax + by + cz + d = 0
  * @public
@@ -2306,10 +2306,10 @@ declare const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPoi
 declare const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
 
 declare const enum PointerEventType {
-    UP = 0,
-    DOWN = 1,
-    HOVER_ENTER = 2,
-    HOVER_LEAVE = 3,
+    PET_UP = 0,
+    PET_DOWN = 1,
+    PET_HOVER_ENTER = 2,
+    PET_HOVER_LEAVE = 3,
     UNRECOGNIZED = -1
 }
 
@@ -2547,8 +2547,8 @@ declare interface RaycastHit {
 }
 
 declare const enum RaycastQueryType {
-    HIT_FIRST = 0,
-    QUERY_ALL = 1,
+    RQT_HIT_FIRST = 0,
+    RQT_QUERY_ALL = 1,
     UNRECOGNIZED = -1
 }
 
@@ -2622,9 +2622,9 @@ declare interface Spec {
 declare type SystemFn = (dt: number) => void;
 
 declare const enum TextAlign {
-    Center = 0,
-    Left = 1,
-    Right = 2,
+    TA_CENTER = 0,
+    TA_LEFT = 1,
+    TA_RIGHT = 2,
     UNRECOGNIZED = -1
 }
 
@@ -2632,10 +2632,10 @@ declare const enum TextAlign {
 declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 
 declare const enum TextureWrapMode {
-    Repeat = 0,
-    Clamp = 1,
-    Mirror = 2,
-    MirrorOnce = 3,
+    TWM_REPEAT = 0,
+    TWM_CLAMP = 1,
+    TWM_MIRROR = 2,
+    TWM_MIRROR_ONCE = 3,
     UNRECOGNIZED = -1
 }
 
@@ -2668,11 +2668,11 @@ declare type TransformType = {
 };
 
 declare const enum TransparencyMode {
-    Opaque = 0,
-    AlphaTest = 1,
-    AlphaBlend = 2,
-    AlphaTestAndAlphaBlend = 3,
-    Auto = 4,
+    TM_OPAQUE = 0,
+    TM_ALPHA_TEST = 1,
+    TM_ALPHA_BLEND = 2,
+    TM_ALPHA_TEST_AND_ALPHA_BLEND = 3,
+    TM_AUTO = 4,
     UNRECOGNIZED = -1
 }
 
@@ -3296,74 +3296,74 @@ declare namespace WireMessage {
 }
 
 declare const enum YGAlign {
-    YGAlignAuto = 0,
-    YGAlignFlexStart = 1,
-    YGAlignCenter = 2,
-    YGAlignFlexEnd = 3,
-    YGAlignStretch = 4,
-    YGAlignBaseline = 5,
-    YGAlignSpaceBetween = 6,
-    YGAlignSpaceAround = 7,
+    YGA_AUTO = 0,
+    YGA_FLEX_START = 1,
+    YGA_CENTER = 2,
+    YGA_FLEX_END = 3,
+    YGA_STRETCH = 4,
+    YGA_BASELINE = 5,
+    YGA_SPACE_BETWEEN = 6,
+    YGA_SPACE_AROUND = 7,
     UNRECOGNIZED = -1
 }
 
 declare const enum YGDirection {
-    YGDirectionInherit = 0,
-    YGDirectionLTR = 1,
-    YGDirectionRTL = 2,
+    YGD_INHERIT = 0,
+    YGD_LTR = 1,
+    YGD_RTL = 2,
     UNRECOGNIZED = -1
 }
 
 declare const enum YGDisplay {
-    YGDisplayFlex = 0,
-    YGDisplayNone = 1,
+    YGD_FLEX = 0,
+    YGD_NONE = 1,
     UNRECOGNIZED = -1
 }
 
 declare const enum YGFlexDirection {
-    YGFlexDirectionColumn = 0,
-    YGFlexDirectionColumnReverse = 1,
-    YGFlexDirectionRow = 2,
-    YGFlexDirectionRowReverse = 3,
+    YGFD_COLUMN = 0,
+    YGFD_COLUMN_REVERSE = 1,
+    YGFD_ROW = 2,
+    YGFD_ROW_REVERSE = 3,
     UNRECOGNIZED = -1
 }
 
 declare const enum YGJustify {
-    YGJustifyFlexStart = 0,
-    YGJustifyCenter = 1,
-    YGJustifyFlexEnd = 2,
-    YGJustifySpaceBetween = 3,
-    YGJustifySpaceAround = 4,
-    YGJustifySpaceEvenly = 5,
+    YGJ_FLEX_START = 0,
+    YGJ_CENTER = 1,
+    YGJ_FLEX_END = 2,
+    YGJ_SPACE_BETWEEN = 3,
+    YGJ_SPACE_AROUND = 4,
+    YGJ_SPACE_EVENLY = 5,
     UNRECOGNIZED = -1
 }
 
 declare const enum YGOverflow {
-    YGOverflowVisible = 0,
-    YGOverflowHidden = 1,
-    YGOverflowScroll = 2,
+    YGO_VISIBLE = 0,
+    YGO_HIDDEN = 1,
+    YGO_SCROLL = 2,
     UNRECOGNIZED = -1
 }
 
 declare const enum YGPositionType {
-    YGPositionTypeStatic = 0,
-    YGPositionTypeRelative = 1,
-    YGPositionTypeAbsolute = 2,
+    YGP_STATIC = 0,
+    YGP_RELATIVE = 1,
+    YGP_ABSOLUTE = 2,
     UNRECOGNIZED = -1
 }
 
 declare const enum YGUnit {
-    YGUnitUndefined = 0,
-    YGUnitPoint = 1,
-    YGUnitPercent = 2,
-    YGUnitAuto = 3,
+    YGU_UNDEFINED = 0,
+    YGU_POINT = 1,
+    YGU_PERCENT = 2,
+    YGU_AUTO = 3,
     UNRECOGNIZED = -1
 }
 
 declare const enum YGWrap {
-    YGWrapNoWrap = 0,
-    YGWrapWrap = 1,
-    YGWrapWrapReverse = 2,
+    YGW_NO_WRAP = 0,
+    YGW_WRAP = 1,
+    YGW_WRAP_REVERSE = 2,
     UNRECOGNIZED = -1
 }
 

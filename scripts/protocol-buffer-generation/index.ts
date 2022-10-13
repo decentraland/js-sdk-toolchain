@@ -8,6 +8,7 @@ import {
   getComponentId
 } from './generateProtocolBuffer'
 import { generateIndex } from './generateIndex'
+import { snakeToPascal } from '../utils/snakeToPascal'
 
 const NON_EXPOSED_LIST = [
   // 1050, // UiTransform
@@ -55,9 +56,9 @@ export function compileEcsComponents(
         filePath.substring(0, filePath.length - '.proto'.length)
       )
 
-    const components: Component[] = componentsFile.map((componentName) => {
+    const components: Component[] = componentsFile.map((componentFile) => {
       const protoFileContent = readFileSync(
-        resolve(definitionsPath, `${componentName}.proto`)
+        resolve(definitionsPath, `${componentFile}.proto`)
       ).toString()
 
       let componentId: number = -1
@@ -66,13 +67,18 @@ export function compileEcsComponents(
       } catch (error) {
         console.error(error)
         throw new Error(
-          `Couldn't get the component id in component ${componentName}.proto, please check the line with "option (ecs_component_id) = XXXX;" is well formated and it exists.`
+          `Couldn't get the component id in component ${componentFile}.proto, please check the line with "option (ecs_component_id) = XXXX;" is well formated and it exists.`
         )
       }
 
+      const componentName = snakeToPascal(componentFile).replace(
+        'NftShape',
+        'NFTShape'
+      )
       return {
         componentId,
-        componentName
+        componentPascalName: componentName,
+        componentFile
       }
     })
 

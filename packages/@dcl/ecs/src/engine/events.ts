@@ -1,7 +1,7 @@
 import { Entity } from './entity'
-import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/ecs/components/PointerEventsResult.gen'
-import { PointerEventType } from '../components/generated/pb/ecs/components/PointerEvents.gen'
-import { ActionButton } from '../components/generated/pb/ecs/components/common/ActionButton.gen'
+import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
+import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_events.gen'
+import { ActionButton } from '../components/generated/pb/decentraland/sdk/components/common/action_button.gen'
 import { IEngine } from './types'
 import { Schemas } from '../schemas'
 
@@ -43,14 +43,14 @@ export function wasEntityClickedGenerator(engine: IEngine) {
     // We search the last DOWN command sorted by timestamp
     const down = findLastAction(
       commands,
-      PointerEventType.DOWN,
+      PointerEventType.PET_DOWN,
       actionButton,
       entity
     )
     // We search the last UP command sorted by timestamp
     const up = findLastAction(
       commands,
-      PointerEventType.UP,
+      PointerEventType.PET_UP,
       actionButton,
       entity
     )

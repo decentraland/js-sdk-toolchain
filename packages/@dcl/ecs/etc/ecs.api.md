@@ -56,11 +56,11 @@ export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCa
 // @public (undocumented)
 export const enum ColliderLayer {
     // (undocumented)
-    None = 0,
+    CL_NONE = 0,
     // (undocumented)
-    Physics = 2,
+    CL_PHYSICS = 2,
     // (undocumented)
-    Pointer = 1,
+    CL_POINTER = 1,
     // (undocumented)
     UNRECOGNIZED = -1
 }

@@ -7,8 +7,8 @@ import * as MeshColliderSchema from './generated/MeshCollider.gen'
 import {
   ColliderLayer,
   PBMeshCollider
-} from './generated/pb/ecs/components/MeshCollider.gen'
-import { PBMeshRenderer } from './generated/pb/ecs/components/MeshRenderer.gen'
+} from './generated/pb/decentraland/sdk/components/mesh_collider.gen'
+import { PBMeshRenderer } from './generated/pb/decentraland/sdk/components/mesh_renderer.gen'
 
 import { defineTransformComponent } from './legacy/Transform'
 

@@ -19,7 +19,7 @@ export async function generateProtocolBuffer(params: {
   fs.mkdirSync(pbGeneratedPath, { recursive: true })
 
   const protoFiles = components
-    .map((item) => path.resolve(definitionsPath, `${item.componentName}.proto`))
+    .map((item) => path.resolve(definitionsPath, `${item.componentFile}.proto`))
     .join(' ')
 
   const protoCompilerPath = path.resolve(

@@ -1,4 +1,4 @@
-﻿import { AvatarModifier } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/AvatarModifierArea.gen'
+﻿import { AvatarModifier } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/avatar_modifier_area.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated Avatar ModifierArea ProtoBuf', () => {
@@ -11,8 +11,8 @@ describe('Generated Avatar ModifierArea ProtoBuf', () => {
     const avatarModifierArea = AvatarModifierArea.create(entity, {
       area: { x: 1, y: 2, z: 3 },
       modifiers: [
-        AvatarModifier.DISABLE_PASSPORTS,
-        AvatarModifier.HIDE_AVATARS
+        AvatarModifier.AM_DISABLE_PASSPORTS,
+        AvatarModifier.AM_HIDE_AVATARS
       ],
       excludeIds: ['exclude', 'testIdReal', 'numberAndString12837127371']
     })

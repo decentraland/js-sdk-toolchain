@@ -10,6 +10,7 @@ import * as path from 'path'
 import { TSC } from '../common'
 import { runCommand } from '../helpers'
 import { getFilePathsSync } from '../utils/getFilePathsSync'
+import { snakeToPascal } from '../utils/snakeToPascal'
 import { getBlock } from '../utils/stringParser'
 
 type ProtoServiceDefinition = {
@@ -40,7 +41,7 @@ export async function compileProtoApi() {
 async function internalCompile() {
   const outModulesPath = path.resolve(__dirname, 'src', 'modules')
   const apiArray = await preprocessProtoGeneration(
-    path.resolve(__dirname, 'src', 'proto', 'kernel', 'apis')
+    path.resolve(__dirname, 'src', 'proto', 'decentraland', 'kernel', 'apis')
   )
 
   removeSync(outModulesPath)
@@ -67,7 +68,7 @@ async function internalCompile() {
     let indexContent = ''
     indexContent += `import type {${Array.from(types).join(
       ', '
-    )}} from './../../proto/kernel/apis/${api.name}.gen'\n`
+    )}} from './../../proto/decentraland/kernel/apis/${api.fileName}.gen'\n`
     indexContent += functions.join('\n')
 
     writeFileSync(path.resolve(apiModuleDirPath, `index.gen.ts`), indexContent)
@@ -91,20 +92,19 @@ async function preprocessProtoGeneration(protoPath: string) {
     .map((item) => item.replace('.gen.ts', ''))
 
   const apis = []
-  for (const item of apiFiles) {
-    const filePath = path.resolve(
-      __dirname,
-      `./src/proto/kernel/apis/${item}.gen.ts`
-    )
+  for (const fileName of apiFiles) {
+    const filePath = path.resolve(protoPath, `${fileName}.gen.ts`)
     const typesTextContent = readFileSync(filePath).toString()
 
     const textContent = typesTextContent
       .replace(/requestType: *([a-zA-Z]+)/g, `requestType: '$1'`)
       .replace(/responseType: *([a-zA-Z]+)/g, `responseType: '$1'`)
-      .replace(`export const protobufPackage = ''`, '')
+      .replace(`export const protobufPackage = `, '// protobufPackage = ')
 
     writeFileSync(filePath, textContent)
     const content = await import(filePath)
+
+    const item = snakeToPascal(fileName).replace('Api', 'API')
 
     const defBlock = getBlock(
       textContent,
@@ -123,7 +123,8 @@ async function preprocessProtoGeneration(protoPath: string) {
     apis.push({
       name: item,
       def: content[`${item}ServiceDefinition`] as ProtoServiceDefinition,
-      content
+      content,
+      fileName
     })
   }
   return apis
