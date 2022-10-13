@@ -19,9 +19,9 @@ export const uiComponent = () => (
       uiTransform={{
         width: 100,
         height: 100,
-        display: YGDisplay.YGDisplayFlex,
-        justifyContent: YGJustify.YGJustifyCenter,
-        alignItems: YGAlign.YGAlignCenter
+        display: YGDisplay.YGD_FLEX,
+        justifyContent: YGJustify.YGJ_CENTER,
+        alignItems: YGAlign.YGA_CENTER
       }}
       uiBackground={{ backgroundColor: { r: 255, g: 45, b: 85, a: 0.2 } }}
     >

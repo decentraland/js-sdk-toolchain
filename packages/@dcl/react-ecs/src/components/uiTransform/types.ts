@@ -9,7 +9,7 @@ import {
   YGPositionType,
   YGUnit,
   YGWrap
-} from '../../generated/ecs/components/UiTransform.gen'
+} from '../../generated/decentraland/sdk/components/ui_transform.gen'
 
 export {
   PBUiTransform,

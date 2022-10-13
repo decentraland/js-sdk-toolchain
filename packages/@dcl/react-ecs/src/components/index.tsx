@@ -22,7 +22,7 @@ export type ContainerPropTypes = Partial<CommonProps> &
   EntityPropTypes['uiTransform']
 export function Container({ width, height, children }: ContainerPropTypes) {
   return (
-    <UiEntity uiTransform={{ width, height, display: YGDisplay.YGDisplayFlex }}>
+    <UiEntity uiTransform={{ width, height, display: YGDisplay.YGD_FLEX }}>
       {children}
     </UiEntity>
   )

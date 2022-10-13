@@ -1,10 +1,10 @@
+import { PBUiText } from '../../generated/decentraland/sdk/components/ui_text.gen'
+import { Color3 } from '../../generated/decentraland/common/colors.gen'
 import {
-  PBUiText,
   Font,
-  TextAlign
-} from '../../generated/ecs/components/UiText.gen'
-import { Color3 } from '../../generated/ecs/components/common/Color3.gen'
+  TextAlignMode
+} from '../../generated/decentraland/sdk/components/common/texts.gen'
 
-export { PBUiText, Font, TextAlign, Color3 }
+export { PBUiText, Font, TextAlignMode, Color3 }
 
 export type UiTextProps = PBUiText

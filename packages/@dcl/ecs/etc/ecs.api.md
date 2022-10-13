@@ -56,13 +56,11 @@ export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCa
 // @public (undocumented)
 export const enum ColliderLayer {
     // (undocumented)
-    None = 0,
+    CL_NONE = 0,
     // (undocumented)
-    Physics = 2,
+    CL_PHYSICS = 2,
     // (undocumented)
-    Pointer = 1,
-    // (undocumented)
-    UNRECOGNIZED = -1
+    CL_POINTER = 1
 }
 
 // @public (undocumented)
@@ -118,10 +116,10 @@ export namespace Components {
     //
     // (undocumented)
     MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBNFTShape" needs to be exported by the entry point index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBNftShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
+    NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     const // Warning: (ae-forgotten-export) The symbol "PBPointerEvents" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -251,17 +249,17 @@ export type ISchema<T = any> = {
 // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (ae-forgotten-export) The symbol "ActionButton" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "InputAction" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "PointerEventType" needs to be exported by the entry point index.d.ts
 // Warning: (ae-missing-release-tag) "isPointerEventActive" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public
-export function isPointerEventActive(entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType): boolean;
+export function isPointerEventActive(entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType): boolean;
 
 // Warning: (ae-missing-release-tag) "isPointerEventActiveGenerator" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export function isPointerEventActiveGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType) => boolean;
+export function isPointerEventActiveGenerator(engine: IEngine): (entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType) => boolean;
 
 // Warning: (ae-missing-release-tag) "log" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -294,7 +292,7 @@ export class MessageBus {
 }
 
 // @public (undocumented)
-export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
+export const NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
 
 // Warning: (ae-missing-release-tag) "Observable" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -690,12 +688,12 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 // Warning: (ae-missing-release-tag) "wasEntityClicked" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public
-export function wasEntityClicked(entity: Entity, actionButton: ActionButton): boolean;
+export function wasEntityClicked(entity: Entity, actionButton: InputAction): boolean;
 
 // Warning: (ae-missing-release-tag) "wasEntityClickedGenerator" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export function wasEntityClickedGenerator(engine: IEngine): (entity: Entity, actionButton: ActionButton) => boolean;
+export function wasEntityClickedGenerator(engine: IEngine): (entity: Entity, actionButton: InputAction) => boolean;
 
 // Warnings were encountered during analysis:
 //

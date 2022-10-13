@@ -20,7 +20,7 @@ export function createRendererTransport(): Transport {
     send(message: Uint8Array): void {
       // TODO: replace with new rpc
       dcl
-        .callRpc('~system/ExperimentalAPI', 'sendToRenderer', [
+        .callRpc('~system/ExperimentalApi', 'sendToRenderer', [
           { data: new Uint8Array(message) }
         ])
         .catch(dcl.error)

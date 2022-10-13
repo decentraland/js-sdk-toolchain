@@ -100,12 +100,12 @@ flow('build-all', () => {
     itExecutes('npm i --quiet', ECS7_PATH)
     compileEcsComponents(
       `${ECS7_PATH}/src/components`,
-      `${ECS7_PATH}/node_modules/@dcl/protocol/ecs/components`,
-      `${ECS7_PATH}/node_modules/@dcl/protocol/`
+      `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
+      `${ECS7_PATH}/node_modules/@dcl/protocol/proto/`
     )
     itExecutes('npm run build', ECS7_PATH)
     copyFile(
-      `${ECS7_PATH}/node_modules/@dcl/protocol/ecs/components`,
+      `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
       `${ECS7_PATH}/dist/proto-definitions`
     )
 
@@ -143,10 +143,10 @@ flow('build-all', () => {
       mkdirSync(protoTypesPath)
 
       await createProtoTypes(
-        `${ECS7_PATH}/node_modules/@dcl/protocol/ecs/components`,
+        `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
         protoTypesPath,
-        ['UiTransform.proto', 'UiText.proto', 'UiBackground.proto'],
-        `${ECS7_PATH}/node_modules/@dcl/protocol`
+        ['ui_transform.proto', 'ui_text.proto', 'ui_background.proto'],
+        `${ECS7_PATH}/node_modules/@dcl/protocol/proto`
       )
     })
     itExecutes('npm run build', REACT_ECS)
