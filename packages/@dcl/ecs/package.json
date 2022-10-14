@@ -31,7 +31,7 @@
     "@dcl/crdt": "^1.0.0-20220819145912.commit-35069cd",
     "@dcl/ecs-math": "^2.0.1-20220913124856.commit-79247c3",
     "@dcl/posix": "^1.0.4",
-    "@dcl/protocol": "^1.0.0-3243753014.commit-161bbc8"
+    "@dcl/protocol": "^1.0.0-3250759085.commit-6cf3623"
   },
   "files": [
     "dist/index.js",
