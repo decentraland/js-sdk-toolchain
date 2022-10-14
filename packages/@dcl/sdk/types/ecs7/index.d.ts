@@ -6,6 +6,9 @@ declare const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
 /** @public */
 declare const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
 
+/** @public */
+declare const AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
+
 declare const enum AvatarAnchorPointType {
     AAPT_POSITION = 0,
     AAPT_NAME_TAG = 1,
@@ -199,6 +202,8 @@ declare namespace Components {
     const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     /** @public */
     const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
+    /** @public */
+    const AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
     /** @public */
     const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
     /** @public */
@@ -438,6 +443,7 @@ declare function defineSdkComponents(engine: PreEngine): {
     MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
     Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
+    AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
     AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
     AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
     AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
@@ -1831,6 +1837,13 @@ declare interface PBAudioSource {
     /** default=1.0f */
     pitch?: number | undefined;
     audioClipUrl: string;
+}
+
+declare interface PBAudioStream {
+    playing?: boolean | undefined;
+    /** default=1.0f */
+    volume?: number | undefined;
+    url: string;
 }
 
 declare interface PBAvatarAttach {
