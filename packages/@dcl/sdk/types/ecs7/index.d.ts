@@ -30,6 +30,11 @@ declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarS
 /** @public */
 declare const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
 
+declare const enum BillboardMode {
+    BM_ALL_AXES = 0,
+    BM_Y_AXE = 1
+}
+
 /**
  * @public
  */
@@ -1875,12 +1880,10 @@ declare interface PBAvatarShape {
 }
 
 declare interface PBBillboard {
-    /** default=true */
-    x?: boolean | undefined;
-    /** default=true */
-    y?: boolean | undefined;
-    /** default=true */
-    z?: boolean | undefined;
+    /** default=BM_ALL_AXES */
+    billboardMode?: BillboardMode | undefined;
+    /** default=false */
+    oppositeDirection?: boolean | undefined;
 }
 
 declare interface PBCameraMode {
@@ -2057,18 +2060,13 @@ declare interface PBRaycastResult {
 
 declare interface PBTextShape {
     text: string;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
-    font?: string | undefined;
-    /** default=1.0f */
-    opacity?: number | undefined;
+    /** default=F_SANS_SERIF */
+    font?: Font | undefined;
     /** default=10 */
     fontSize?: number | undefined;
     fontAutoSize?: boolean | undefined;
-    /** default='center' */
-    hTextAlign?: string | undefined;
-    /** default='center' */
-    vTextAlign?: string | undefined;
+    /** default=TAM_CENTER_CENTER */
+    textAlign?: TextAlignMode | undefined;
     /** default=1 */
     width?: number | undefined;
     /** default=1 */
@@ -2089,7 +2087,7 @@ declare interface PBTextShape {
     /** default=(1.0,1.0,1.0) */
     outlineColor?: Color3 | undefined;
     /** default=(1.0,1.0,1.0) */
-    textColor?: Color3 | undefined;
+    textColor?: Color4 | undefined;
 }
 
 declare interface PBUiBackground {
@@ -2614,9 +2612,15 @@ declare interface Spec {
 declare type SystemFn = (dt: number) => void;
 
 declare const enum TextAlignMode {
-    TAM_CENTER = 0,
-    TAM_LEFT = 1,
-    TAM_RIGHT = 2
+    TAM_TOP_LEFT = 0,
+    TAM_TOP_CENTER = 1,
+    TAM_TOP_RIGHT = 2,
+    TAM_MIDDLE_LEFT = 3,
+    TAM_MIDDLE_CENTER = 4,
+    TAM_MIDDLE_RIGHT = 5,
+    TAM_BOTTOM_LEFT = 6,
+    TAM_BOTTOM_CENTER = 7,
+    TAM_BOTTOM_RIGHT = 8
 }
 
 /** @public */
