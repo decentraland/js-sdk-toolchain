@@ -1,4 +1,8 @@
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+import {
+  Font,
+  TextAlignMode
+} from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/texts.gen'
 
 describe('Generated TextShape ProtoBuf', () => {
   it('should serialize/deserialize TextShape', () => {
@@ -9,13 +13,10 @@ describe('Generated TextShape ProtoBuf', () => {
 
     const _textShape = TextShape.create(entity, {
       text: 'true',
-      visible: true,
-      font: 'test',
-      opacity: 1,
+      font: Font.F_LIBERATION_SANS,
+      textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
       fontSize: 5,
       fontAutoSize: true,
-      hTextAlign: 'horizontal',
-      vTextAlign: 'vertical',
       width: 100,
       height: 100,
       paddingTop: 11,
@@ -31,18 +32,14 @@ describe('Generated TextShape ProtoBuf', () => {
       outlineWidth: 21,
       shadowColor: { r: 1, g: 1, b: 1 },
       outlineColor: { r: 1, g: 1, b: 1 },
-      textColor: { r: 1, g: 1, b: 1 }
+      textColor: { r: 1, g: 1, b: 1, a: 1 }
     })
 
     TextShape.create(entityB, {
       text: 'false',
-      visible: false,
-      font: 'false',
-      opacity: 0,
       fontSize: 15,
       fontAutoSize: false,
-      hTextAlign: 'vertical',
-      vTextAlign: 'horizontal',
+      textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
       width: 200,
       height: 200,
       paddingTop: 211,
@@ -58,7 +55,7 @@ describe('Generated TextShape ProtoBuf', () => {
       outlineWidth: 221,
       shadowColor: { r: 1, g: 1, b: 1 },
       outlineColor: { r: 1, g: 1, b: 1 },
-      textColor: { r: 1, g: 1, b: 1 }
+      textColor: { r: 1, g: 1, b: 1, a: 1 }
     })
     const buffer = TextShape.toBinary(entity)
     TextShape.updateFromBinary(entityB, buffer)

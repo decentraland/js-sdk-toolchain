@@ -294,11 +294,23 @@ export function renderUi(ui: UiComponent): number;
 // @public (undocumented)
 export enum TextAlignMode {
     // (undocumented)
-    TAM_CENTER = 0,
+    TAM_BOTTOM_CENTER = 7,
     // (undocumented)
-    TAM_LEFT = 1,
+    TAM_BOTTOM_LEFT = 6,
     // (undocumented)
-    TAM_RIGHT = 2,
+    TAM_BOTTOM_RIGHT = 8,
+    // (undocumented)
+    TAM_MIDDLE_CENTER = 4,
+    // (undocumented)
+    TAM_MIDDLE_LEFT = 3,
+    // (undocumented)
+    TAM_MIDDLE_RIGHT = 5,
+    // (undocumented)
+    TAM_TOP_CENTER = 1,
+    // (undocumented)
+    TAM_TOP_LEFT = 0,
+    // (undocumented)
+    TAM_TOP_RIGHT = 2,
     // (undocumented)
     UNRECOGNIZED = -1
 }
