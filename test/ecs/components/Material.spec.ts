@@ -19,6 +19,11 @@ describe('Generated Material ProtoBuf', () => {
         filterMode: undefined,
         src: 'not-casla'
       },
+      avatarTexture: {
+        userId: 'user-id-dummy',
+        wrapMode: TextureWrapMode.TWM_CLAMP,
+        filterMode: undefined
+      },
       alphaTexture: {
         filterMode: undefined,
         src: 'not-casla',
@@ -59,6 +64,11 @@ describe('Generated Material ProtoBuf', () => {
       texture: {
         wrapMode: TextureWrapMode.TWM_REPEAT,
         src: 'not-casla'
+      },
+      avatarTexture: {
+        userId: '',
+        wrapMode: TextureWrapMode.TWM_REPEAT,
+        filterMode: undefined
       },
       castShadows: true,
       directIntensity: 1,
