@@ -16,6 +16,11 @@ export const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
 // @public (undocumented)
 export const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
 
+// Warning: (ae-forgotten-export) The symbol "PBAudioStream" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export const AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
+
 // Warning: (ae-forgotten-export) The symbol "PBAvatarAttach" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
@@ -88,6 +93,8 @@ export namespace Components {
     Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     const // (undocumented)
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
+    const // (undocumented)
+    AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
     const // (undocumented)
     AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
     const // (undocumented)

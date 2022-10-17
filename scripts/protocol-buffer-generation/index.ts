@@ -10,10 +10,7 @@ import {
 import { generateIndex } from './generateIndex'
 import { snakeToPascal } from '../utils/snakeToPascal'
 
-const NON_EXPOSED_LIST = [
-  // 1050, // UiTransform
-  1021 // AudioStream
-]
+const NON_EXPOSED_LIST: number[] = []
 
 /**
  * @param componentPath - Argument of execution '--component-path'
