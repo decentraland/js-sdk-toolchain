@@ -23,7 +23,7 @@ function isPoint(val: PositionUnit) {
   return typeof val === 'string' && val.endsWith('px')
 }
 
-function parsePositionUnit(val: PositionUnit): [number, YGUnit] {
+function parsePositionUnit(val: PositionUnit): [number | undefined, YGUnit] {
   function getValue(key: 'px' | '%') {
     if (typeof val !== 'string') return 0
     return Number(val.slice(0, val.indexOf(key)))
@@ -41,7 +41,7 @@ function parsePositionUnit(val: PositionUnit): [number, YGUnit] {
     return [getValue('px'), YGUnit.YGU_POINT]
   }
 
-  return [NaN, YGUnit.YGU_UNDEFINED]
+  return [undefined, YGUnit.YGU_UNDEFINED]
 }
 
 // position: { top: '1px' } => { positionTop: 1, positionTopUnit: YGUnit.YGU_Point }
@@ -55,6 +55,7 @@ export function parsePosition<T extends PropName>(
     const propKey: PropKey = `${prop}${capitalize(typedKey)}`
     const propKeyUnit: PropKeyUnit = `${prop}${capitalize(typedKey)}Unit`
     const [value, unit] = parsePositionUnit(position[typedKey]!)
+    if (value === undefined) continue
     obj[propKeyUnit] = unit
     obj[propKey] = value
   }

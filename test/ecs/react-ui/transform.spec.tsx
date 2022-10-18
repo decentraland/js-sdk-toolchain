@@ -27,7 +27,7 @@ describe('UiTransform React Ecs', () => {
       top: '1px',
       left: '2px',
       right: '3%',
-      bottom: '4px'
+      bottom: 4
     }
 
     const ui = () => <UiEntity uiTransform={{ width: 100, position }} />
