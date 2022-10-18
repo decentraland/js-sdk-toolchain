@@ -122,7 +122,7 @@ describe('UiTransform React Ecs', () => {
       maxWidth: 88,
       maxWidthUnit: YGUnit.YGU_PERCENT,
       maxHeight: 88,
-      maxHeightUnit: YGUnit.YGU_POINT,
+      maxHeightUnit: YGUnit.YGU_POINT
     })
 
     width = 110
