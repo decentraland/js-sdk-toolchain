@@ -69,6 +69,137 @@ export const enum ColliderLayer {
 }
 
 // @public (undocumented)
+export namespace Color3 {
+    export function add(value: ReadOnlyColor3, otherColor: ReadOnlyColor3): MutableColor3;
+    export function addToRef(value: ReadOnlyColor3, otherColor: ReadOnlyColor3, result: MutableColor3): void;
+    export function asArray(value: ReadOnlyColor3): number[];
+    export function Black(): MutableColor3;
+    export function Blue(): MutableColor3;
+    export function clampToRef(value: ReadOnlyColor3, min: number | undefined, max: number | undefined, result: MutableColor3): void;
+    export function clone(value: ReadOnlyColor3): MutableColor3;
+    export function copyFrom(source: ReadOnlyColor3, dest: MutableColor3): void;
+    export function copyFromFloats(r: number, g: number, b: number, dest: MutableColor3): void;
+    export function create(
+    r?: number,
+    g?: number,
+    b?: number): {
+        r: number;
+        g: number;
+        b: number;
+    };
+    export function equals(value: ReadOnlyColor3, otherColor: ReadOnlyColor3): boolean;
+    export function equalsFloats(value: ReadOnlyColor3, r: number, g: number, b: number): boolean;
+    export function fromArray(array: ArrayLike<number>, offset?: number): MutableColor3;
+    export function fromHexString(hex: string): MutableColor3;
+    export function fromInts(r: number, g: number, b: number): MutableColor3;
+    export function getHashCode(value: ReadOnlyColor3): number;
+    export function Gray(): MutableColor3;
+    export function Green(): MutableColor3;
+    export function lerp(start: ReadOnlyColor3, end: ReadOnlyColor3, amount: number): MutableColor3;
+    export function lerpToRef(left: ReadOnlyColor3, right: ReadOnlyColor3, amount: number, result: MutableColor3): void;
+    export function Magenta(): MutableColor3;
+    export function multiply(value: ReadOnlyColor3, otherColor: ReadOnlyColor3): MutableColor3;
+    export function multiplyToRef(value: ReadOnlyColor3, otherColor: ReadOnlyColor3, result: MutableColor3): void;
+    // (undocumented)
+    export type MutableColor3 = {
+        r: number;
+        g: number;
+        b: number;
+    };
+    export function Purple(): MutableColor3;
+    export function Random(): MutableColor3;
+    // (undocumented)
+    export type ReadOnlyColor3 = {
+        readonly r: number;
+        readonly g: number;
+        readonly b: number;
+    };
+    export function Red(): MutableColor3;
+    export function scale(value: ReadOnlyColor3, scale: number): MutableColor3;
+    export function scaleAndAddToRef(value: ReadOnlyColor3, scale: number, result: MutableColor3): void;
+    export function scaleToRef(value: ReadOnlyColor3, scale: number, result: MutableColor3): void;
+    export function set(value: MutableColor3, r: number, g: number, b: number): void;
+    export function subtract(value: ReadOnlyColor3, otherColor: ReadOnlyColor3): MutableColor3;
+    export function subtractToRef(value: ReadOnlyColor3, otherColor: ReadOnlyColor3, result: MutableColor3): void;
+    export function Teal(): MutableColor3;
+    // Warning: (ae-forgotten-export) The symbol "FloatArray" needs to be exported by the entry point index.d.ts
+    export function toArray(value: ReadOnlyColor3, array: FloatArray, index?: number): void;
+    export function toColor4(value: ReadOnlyColor3, alpha?: number): Color4.MutableColor4;
+    export function toGammaSpace(value: ReadOnlyColor3): ReadOnlyColor3;
+    export function toGammaSpaceToRef(value: ReadOnlyColor3, convertedColor: MutableColor3): void;
+    export function toHexString(value: ReadOnlyColor3): string;
+    export function toLinearSpace(value: ReadOnlyColor3): MutableColor3;
+    export function toLinearSpaceToRef(value: ReadOnlyColor3, convertedColor: MutableColor3): void;
+    export function toLuminance(value: ReadOnlyColor3): number;
+    export function toString(value: ReadOnlyColor3): string;
+    export function White(): MutableColor3;
+    export function Yellow(): MutableColor3;
+}
+
+// @public (undocumented)
+export namespace Color4 {
+    export function add(value: ReadOnlyColor4, right: ReadOnlyColor4): MutableColor4;
+    export function addToRef(a: ReadOnlyColor4, b: ReadOnlyColor4, ref: MutableColor4): void;
+    export function Black(): MutableColor4;
+    export function Blue(): MutableColor4;
+    export function checkColors4(colors: number[], count: number): number[];
+    export function clampToRef(value: ReadOnlyColor4, min: number | undefined, max: number | undefined, result: MutableColor4): void;
+    export function Clear(): MutableColor4;
+    export function clone(value: ReadOnlyColor4): MutableColor4;
+    export function copyFrom(source: ReadOnlyColor4, dest: MutableColor4): void;
+    export function copyFromFloats(r: number, g: number, b: number, a: number, dest: MutableColor4): void;
+    export function create(
+    r?: number,
+    g?: number,
+    b?: number,
+    a?: number): MutableColor4;
+    export function fromArray(array: ArrayLike<number>, offset?: number): ReadOnlyColor4;
+    export function fromColor3(color3: Color3.ReadOnlyColor3, alpha?: number): MutableColor4;
+    export function fromHexString(hex: string): MutableColor4;
+    export function fromInts(r: number, g: number, b: number, a: number): MutableColor4;
+    export function getHashCode(value: ReadOnlyColor4): number;
+    export function Gray(): MutableColor4;
+    export function Green(): MutableColor4;
+    export function lerp(left: ReadOnlyColor4, right: ReadOnlyColor4, amount: number): MutableColor4;
+    export function lerpToRef(left: ReadOnlyColor4, right: ReadOnlyColor4, amount: number, result: MutableColor4): void;
+    export function Magenta(): MutableColor4;
+    export function multiply(value: ReadOnlyColor4, color: ReadOnlyColor4): ReadOnlyColor4;
+    export function multiplyToRef(value: ReadOnlyColor4, color: ReadOnlyColor4, result: MutableColor4): void;
+    // (undocumented)
+    export type MutableColor4 = {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    };
+    export function Purple(): MutableColor4;
+    // (undocumented)
+    export type ReadOnlyColor4 = {
+        readonly r: number;
+        readonly g: number;
+        readonly b: number;
+        readonly a: number;
+    };
+    export function Red(): MutableColor4;
+    export function scale(value: ReadOnlyColor4, scale: number): ReadOnlyColor4;
+    export function scaleAndAddToRef(value: ReadOnlyColor4, scale: number, result: MutableColor4): void;
+    export function scaleToRef(value: ReadOnlyColor4, scale: number, result: MutableColor4): void;
+    export function set(r: number, g: number, b: number, a: number, dest: MutableColor4): void;
+    export function subtract(value: ReadOnlyColor4, right: ReadOnlyColor4): ReadOnlyColor4;
+    export function subtractToRef(a: ReadOnlyColor4, b: ReadOnlyColor4, result: MutableColor4): void;
+    export function Teal(): MutableColor4;
+    export function toArray(value: ReadOnlyColor4, array: number[], index?: number): void;
+    export function toGammaSpace(value: ReadOnlyColor4): ReadOnlyColor4;
+    export function toGammaSpaceToRef(value: ReadOnlyColor4, convertedColor: MutableColor4): void;
+    export function toHexString(value: ReadOnlyColor4): string;
+    export function toLinearSpace(value: ReadOnlyColor4): MutableColor4;
+    export function toLinearSpaceToRef(value: ReadOnlyColor4, ref: MutableColor4): void;
+    export function toString(value: ReadOnlyColor4): string;
+    export function White(): MutableColor4;
+    export function Yellow(): MutableColor4;
+}
+
+// @public (undocumented)
 export type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorType = ComponentType<T>> = {
     _id: number;
     default(): DeepReadonly<ComponentType<T>>;
@@ -624,7 +755,6 @@ export namespace Vector3 {
     export function floor(vector1: ReadonlyVector3): MutableVector3;
     export function Forward(): MutableVector3;
     export function fract(vector1: ReadonlyVector3): MutableVector3;
-    // Warning: (ae-forgotten-export) The symbol "FloatArray" needs to be exported by the entry point index.d.ts
     export function fromArray(array: FloatArray, offset?: number): MutableVector3;
     export function fromArrayToRef(array: number[], offset: number, result: MutableVector3): void;
     export function fromFloatArray(array: FloatArray, offset?: number): MutableVector3;

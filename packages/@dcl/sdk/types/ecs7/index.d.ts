@@ -60,13 +60,613 @@ declare const enum ColliderLayer {
     CL_PHYSICS = 2
 }
 
-declare interface Color3 {
+/**
+ * @public
+ */
+declare namespace Color3 {
+    /**
+     * @public
+     */
+    export type ReadOnlyColor3 = {
+        readonly r: number;
+        readonly g: number;
+        readonly b: number;
+    };
+    /**
+     * @public
+     */
+    export type MutableColor3 = {
+        r: number;
+        g: number;
+        b: number;
+    };
+    /**
+     * Creates a create object from red, green, blue values, all between 0 and 1
+     * @param r - defines the red component (between 0 and 1, default is 0)
+     * @param g - defines the green component (between 0 and 1, default is 0)
+     * @param b - defines the blue component (between 0 and 1, default is 0)
+     */
+    export function create(
+    /**
+     * Defines the red component (between 0 and 1, default is 0)
+     */
+    r?: number, 
+    /**
+     * Defines the green component (between 0 and 1, default is 0)
+     */
+    g?: number, 
+    /**
+     * Defines the blue component (between 0 and 1, default is 0)
+     */
+    b?: number): {
+        r: number;
+        g: number;
+        b: number;
+    };
+    /**
+     * Creates a create from the string containing valid hexadecimal values
+     * @param hex - defines a string containing valid hexadecimal values
+     * @returns a create object
+     */
+    export function fromHexString(hex: string): MutableColor3;
+    /**
+     * Creates a new Vector3 from the starting index of the given array
+     * @param array - defines the source array
+     * @param offset - defines an offset in the source array
+     * @returns a create object
+     */
+    export function fromArray(array: ArrayLike<number>, offset?: number): MutableColor3;
+    /**
+     * Creates a create from integer values (less than 256)
+     * @param r - defines the red component to read from (value between 0 and 255)
+     * @param g - defines the green component to read from (value between 0 and 255)
+     * @param b - defines the blue component to read from (value between 0 and 255)
+     * @returns a create object
+     */
+    export function fromInts(r: number, g: number, b: number): MutableColor3;
+    /**
+     * Creates a create with values linearly interpolated of "amount" between the start Color3 and the end Color3
+     * @param start - defines the start Color3 value
+     * @param end - defines the end Color3 value
+     * @param amount - defines the gradient value between start and end
+     * @returns a create object
+     */
+    export function lerp(start: ReadOnlyColor3, end: ReadOnlyColor3, amount: number): MutableColor3;
+    /**
+     * Creates a create with values linearly interpolated of "amount" between the start Color3 and the end Color3
+     * @param left - defines the start value
+     * @param right - defines the end value
+     * @param amount - defines the gradient factor
+     * @param result - defines the Color3 object where to store the result
+     */
+    export function lerpToRef(left: ReadOnlyColor3, right: ReadOnlyColor3, amount: number, result: MutableColor3): void;
+    /**
+     * Returns a Color3 value containing a red color
+     * @returns a create object
+     */
+    export function Red(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a green color
+     * @returns a create object
+     */
+    export function Green(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a blue color
+     * @returns a create object
+     */
+    export function Blue(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a black color
+     * @returns a create object
+     */
+    export function Black(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a white color
+     * @returns a create object
+     */
+    export function White(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a purple color
+     * @returns a create object
+     */
+    export function Purple(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a magenta color
+     * @returns a create object
+     */
+    export function Magenta(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a yellow color
+     * @returns a create object
+     */
+    export function Yellow(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a gray color
+     * @returns a create object
+     */
+    export function Gray(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a teal color
+     * @returns a create object
+     */
+    export function Teal(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a random color
+     * @returns a create object
+     */
+    export function Random(): MutableColor3;
+    /**
+     * Creates a string with the Color3 current values
+     * @returns the string representation of the Color3 object
+     */
+    export function toString(value: ReadOnlyColor3): string;
+    /**
+     * Compute the Color3 hash code
+     * @returns an unique number that can be used to hash Color3 objects
+     */
+    export function getHashCode(value: ReadOnlyColor3): number;
+    /**
+     * Stores in the given array from the given starting index the red, green, blue values as successive elements
+     * @param array - defines the array where to store the r,g,b components
+     * @param index - defines an optional index in the target array to define where to start storing values
+     *
+     */
+    export function toArray(value: ReadOnlyColor3, array: FloatArray, index?: number): void;
+    /**
+     * Returns a new Color4 object from the current Color3 and the given alpha
+     * @param alpha - defines the alpha component on the new Color4 object (default is 1)
+     * @returns a new Color4 object
+     */
+    export function toColor4(value: ReadOnlyColor3, alpha?: number): Color4.MutableColor4;
+    /**
+     * Returns a new array populated with 3 numeric elements : red, green and blue values
+     * @returns the new array
+     */
+    export function asArray(value: ReadOnlyColor3): number[];
+    /**
+     * Returns the luminance value
+     * @returns a float value
+     */
+    export function toLuminance(value: ReadOnlyColor3): number;
+    /**
+     * Multiply each Color3 rgb values by the given Color3 rgb values in a create object
+     * @param otherColor - defines the second operand
+     * @returns the create object
+     */
+    export function multiply(value: ReadOnlyColor3, otherColor: ReadOnlyColor3): MutableColor3;
+    /**
+     * Multiply the rgb values of the Color3 and the given Color3 and stores the result in the object "result"
+     * @param otherColor - defines the second operand
+     * @param result - defines the Color3 object where to store the result
+     * @returns the current Color3
+     */
+    export function multiplyToRef(value: ReadOnlyColor3, otherColor: ReadOnlyColor3, result: MutableColor3): void;
+    /**
+     * Determines equality between Color3 objects
+     * @param otherColor - defines the second operand
+     * @returns true if the rgb values are equal to the given ones
+     */
+    export function equals(value: ReadOnlyColor3, otherColor: ReadOnlyColor3): boolean;
+    /**
+     * Determines equality between the current Color3 object and a set of r,b,g values
+     * @param r - defines the red component to check
+     * @param g - defines the green component to check
+     * @param b - defines the blue component to check
+     * @returns true if the rgb values are equal to the given ones
+     */
+    export function equalsFloats(value: ReadOnlyColor3, r: number, g: number, b: number): boolean;
+    /**
+     * Multiplies in place each rgb value by scale
+     * @param scale - defines the scaling factor
+     * @returns the updated Color3
+     */
+    export function scale(value: ReadOnlyColor3, scale: number): MutableColor3;
+    /**
+     * Multiplies the rgb values by scale and stores the result into "result"
+     * @param scale - defines the scaling factor
+     * @param result - defines the Color3 object where to store the result
+     * @returns the unmodified current Color3
+     */
+    export function scaleToRef(value: ReadOnlyColor3, scale: number, result: MutableColor3): void;
+    /**
+     * Scale the current Color3 values by a factor and add the result to a given Color3
+     * @param scale - defines the scale factor
+     * @param result - defines color to store the result into
+     * @returns the unmodified current Color3
+     */
+    export function scaleAndAddToRef(value: ReadOnlyColor3, scale: number, result: MutableColor3): void;
+    /**
+     * Clamps the rgb values by the min and max values and stores the result into "result"
+     * @param min - defines minimum clamping value (default is 0)
+     * @param max - defines maximum clamping value (default is 1)
+     * @param result - defines color to store the result into
+     * @returns the original Color3
+     */
+    export function clampToRef(value: ReadOnlyColor3, min: number | undefined, max: number | undefined, result: MutableColor3): void;
+    /**
+     * Creates a create set with the added values of the current Color3 and of the given one
+     * @param otherColor - defines the second operand
+     * @returns the create
+     */
+    export function add(value: ReadOnlyColor3, otherColor: ReadOnlyColor3): MutableColor3;
+    /**
+     * Stores the result of the addition of the current Color3 and given one rgb values into "result"
+     * @param otherColor - defines the second operand
+     * @param result - defines Color3 object to store the result into
+     * @returns the unmodified current Color3
+     */
+    export function addToRef(value: ReadOnlyColor3, otherColor: ReadOnlyColor3, result: MutableColor3): void;
+    /**
+     * Returns a create set with the subtracted values of the given one from the current Color3
+     * @param otherColor - defines the second operand
+     * @returns the create
+     */
+    export function subtract(value: ReadOnlyColor3, otherColor: ReadOnlyColor3): MutableColor3;
+    /**
+     * Stores the result of the subtraction of given one from the current Color3 rgb values into "result"
+     * @param otherColor - defines the second operand
+     * @param result - defines Color3 object to store the result into
+     * @returns the unmodified current Color3
+     */
+    export function subtractToRef(value: ReadOnlyColor3, otherColor: ReadOnlyColor3, result: MutableColor3): void;
+    /**
+     * Copy the current object
+     * @returns a create copied the current one
+     */
+    export function clone(value: ReadOnlyColor3): MutableColor3;
+    /**
+     * Copies the rgb values from the source in the current Color3
+     * @param source - defines the source Color3 object
+     * @returns the updated Color3 object
+     */
+    export function copyFrom(source: ReadOnlyColor3, dest: MutableColor3): void;
+    /**
+     * Updates the Color3 rgb values from the given floats
+     * @param r - defines the red component to read from
+     * @param g - defines the green component to read from
+     * @param b - defines the blue component to read from
+     * @returns the current Color3 object
+     */
+    export function copyFromFloats(r: number, g: number, b: number, dest: MutableColor3): void;
+    /**
+     * Updates the Color3 rgb values from the given floats
+     * @param r - defines the red component to read from
+     * @param g - defines the green component to read from
+     * @param b - defines the blue component to read from
+     * @returns
+     */
+    export function set(value: MutableColor3, r: number, g: number, b: number): void;
+    /**
+     * Compute the Color3 hexadecimal code as a string
+     * @returns a string containing the hexadecimal representation of the Color3 object
+     */
+    export function toHexString(value: ReadOnlyColor3): string;
+    /**
+     * Computes a create converted from the current one to linear space
+     * @returns a create object
+     */
+    export function toLinearSpace(value: ReadOnlyColor3): MutableColor3;
+    /**
+     * Converts the Color3 values to linear space and stores the result in "convertedColor"
+     * @param convertedColor - defines the Color3 object where to store the linear space version
+     * @returns the unmodified Color3
+     */
+    export function toLinearSpaceToRef(value: ReadOnlyColor3, convertedColor: MutableColor3): void;
+    /**
+     * Computes a create converted from the current one to gamma space
+     * @returns a create object
+     */
+    export function toGammaSpace(value: ReadOnlyColor3): ReadOnlyColor3;
+    /**
+     * Converts the Color3 values to gamma space and stores the result in "convertedColor"
+     * @param convertedColor - defines the Color3 object where to store the gamma space version
+     * @returns the unmodified Color3
+     */
+    export function toGammaSpaceToRef(value: ReadOnlyColor3, convertedColor: MutableColor3): void;
+}
+
+declare interface Color3_2 {
     r: number;
     g: number;
     b: number;
 }
 
-declare interface Color4 {
+/**
+ * @public
+ */
+declare namespace Color4 {
+    /**
+     * @public
+     */
+    export type ReadOnlyColor4 = {
+        readonly r: number;
+        readonly g: number;
+        readonly b: number;
+        readonly a: number;
+    };
+    /**
+     * @public
+     */
+    export type MutableColor4 = {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    };
+    /**
+     * Creates create mutable Color4 from red, green, blue values, all between 0 and 1
+     * @param r - defines the red component (between 0 and 1, default is 0)
+     * @param g - defines the green component (between 0 and 1, default is 0)
+     * @param b - defines the blue component (between 0 and 1, default is 0)
+     * @param a - defines the alpha component (between 0 and 1, default is 1)
+     */
+    export function create(
+    /**
+     * Defines the red component (between 0 and 1, default is 0)
+     */
+    r?: number, 
+    /**
+     * Defines the green component (between 0 and 1, default is 0)
+     */
+    g?: number, 
+    /**
+     * Defines the blue component (between 0 and 1, default is 0)
+     */
+    b?: number, 
+    /**
+     * Defines the alpha component (between 0 and 1, default is 1)
+     */
+    a?: number): MutableColor4;
+    /**
+     * Creates a create from the string containing valid hexadecimal values
+     * @param hex - defines a string containing valid hexadecimal values
+     * @returns create mutable Color4
+     */
+    export function fromHexString(hex: string): MutableColor4;
+    /**
+     * Creates create mutable Color4  set with the linearly interpolated values of "amount" between the left Color4 object and the right Color4 object
+     * @param left - defines the start value
+     * @param right - defines the end value
+     * @param amount - defines the gradient factor
+     * @returns create mutable Color4
+     */
+    export function lerp(left: ReadOnlyColor4, right: ReadOnlyColor4, amount: number): MutableColor4;
+    /**
+     * Set the given "result" with the linearly interpolated values of "amount" between the left Color4 object and the right Color4 object
+     * @param left - defines the start value
+     * @param right - defines the end value
+     * @param amount - defines the gradient factor
+     * @param result - defines the Color4 object where to store data
+     */
+    export function lerpToRef(left: ReadOnlyColor4, right: ReadOnlyColor4, amount: number, result: MutableColor4): void;
+    /**
+     * Returns a Color4 value containing a red color
+     * @returns a new Color4
+     */
+    export function Red(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a green color
+     * @returns create mutable Color4
+     */
+    export function Green(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a blue color
+     * @returns create mutable Color4
+     */
+    export function Blue(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a black color
+     * @returns create mutable Color4
+     */
+    export function Black(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a white color
+     * @returns create mutable Color4
+     */
+    export function White(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a purple color
+     * @returns create mutable Color4
+     */
+    export function Purple(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a magenta color
+     * @returns create mutable Color4
+     */
+    export function Magenta(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a yellow color
+     * @returns create mutable Color4
+     */
+    export function Yellow(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a gray color
+     * @returns create mutable Color4
+     */
+    export function Gray(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a teal color
+     * @returns create mutable Color4
+     */
+    export function Teal(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a transparent color
+     * @returns create mutable Color4
+     */
+    export function Clear(): MutableColor4;
+    /**
+     * Creates a create from a Color3 and an alpha value
+     * @param color3 - defines the source Color3 to read from
+     * @param alpha - defines the alpha component (1.0 by default)
+     * @returns create mutable Color4
+     */
+    export function fromColor3(color3: Color3.ReadOnlyColor3, alpha?: number): MutableColor4;
+    /**
+     * Creates a create from the starting index element of the given array
+     * @param array - defines the source array to read from
+     * @param offset - defines the offset in the source array
+     * @returns create mutable Color4
+     */
+    export function fromArray(array: ArrayLike<number>, offset?: number): ReadOnlyColor4;
+    /**
+     * Creates a new Color3 from integer values (less than 256)
+     * @param r - defines the red component to read from (value between 0 and 255)
+     * @param g - defines the green component to read from (value between 0 and 255)
+     * @param b - defines the blue component to read from (value between 0 and 255)
+     * @param a - defines the alpha component to read from (value between 0 and 255)
+     * @returns a new Color4
+     */
+    export function fromInts(r: number, g: number, b: number, a: number): MutableColor4;
+    /**
+     * Check the content of a given array and convert it to an array containing RGBA data
+     * If the original array was already containing count * 4 values then it is returned directly
+     * @param colors - defines the array to check
+     * @param count - defines the number of RGBA data to expect
+     * @returns an array containing count * 4 values (RGBA)
+     */
+    export function checkColors4(colors: number[], count: number): number[];
+    /**
+     * Adds  the given Color4 values to the ref Color4 object
+     * @param a - defines the first operand
+     * @param b - defines the second operand
+     * @param ref - defines the result rference
+     * @returns
+     */
+    export function addToRef(a: ReadOnlyColor4, b: ReadOnlyColor4, ref: MutableColor4): void;
+    /**
+     * Stores from the starting index in the given array the Color4 successive values
+     * @param array - defines the array where to store the r,g,b components
+     * @param index - defines an optional index in the target array to define where to start storing values
+     * @returns the current Color4 object
+     */
+    export function toArray(value: ReadOnlyColor4, array: number[], index?: number): void;
+    /**
+     * Creates a create set with the added values of the current Color4 and of the given one
+     * @param right - defines the second operand
+     * @returns create mutable Color4
+     */
+    export function add(value: ReadOnlyColor4, right: ReadOnlyColor4): MutableColor4;
+    /**
+     * Creates a create set with the subtracted values of the given one from the current Color4
+     * @param right - defines the second operand
+     * @returns create mutable Color4
+     */
+    export function subtract(value: ReadOnlyColor4, right: ReadOnlyColor4): ReadOnlyColor4;
+    /**
+     * Subtracts the given ones from the current Color4 values and stores the results in "result"
+     * @param right - defines the second operand
+     * @param result - defines the Color4 object where to store the result
+     * @returns the current Color4 object
+     */
+    export function subtractToRef(a: ReadOnlyColor4, b: ReadOnlyColor4, result: MutableColor4): void;
+    /**
+     * Creates a create with the current Color4 values multiplied by scale
+     * @param scale - defines the scaling factor to apply
+     * @returns create mutable Color4
+     */
+    export function scale(value: ReadOnlyColor4, scale: number): ReadOnlyColor4;
+    /**
+     * Multiplies the current Color4 values by scale and stores the result in "result"
+     * @param scale - defines the scaling factor to apply
+     * @param result - defines the Color4 object where to store the result
+     */
+    export function scaleToRef(value: ReadOnlyColor4, scale: number, result: MutableColor4): void;
+    /**
+     * Scale the current Color4 values by a factor and add the result to a given Color4
+     * @param scale - defines the scale factor
+     * @param result - defines the Color4 object where to store the result
+     */
+    export function scaleAndAddToRef(value: ReadOnlyColor4, scale: number, result: MutableColor4): void;
+    /**
+     * Clamps the rgb values by the min and max values and stores the result into "result"
+     * @param min - defines minimum clamping value (default is 0)
+     * @param max - defines maximum clamping value (default is 1)
+     * @param result - defines color to store the result into.
+     */
+    export function clampToRef(value: ReadOnlyColor4, min: number | undefined, max: number | undefined, result: MutableColor4): void;
+    /**
+     * Multipy an Color4 value by another and return create mutable Color4
+     * @param color - defines the Color4 value to multiply by
+     * @returns create mutable Color4
+     */
+    export function multiply(value: ReadOnlyColor4, color: ReadOnlyColor4): ReadOnlyColor4;
+    /**
+     * Multipy a Color4 value by another and push the result in a reference value
+     * @param color - defines the Color4 value to multiply by
+     * @param result - defines the Color4 to fill the result in
+     * @returns the result Color4
+     */
+    export function multiplyToRef(value: ReadOnlyColor4, color: ReadOnlyColor4, result: MutableColor4): void;
+    /**
+     * Creates a string with the Color4 current values
+     * @returns the string representation of the Color4 object
+     */
+    export function toString(value: ReadOnlyColor4): string;
+    /**
+     * Compute the Color4 hash code
+     * @returns an unique number that can be used to hash Color4 objects
+     */
+    export function getHashCode(value: ReadOnlyColor4): number;
+    /**
+     * Creates a create copied from the current one
+     * @returns create mutable Color4
+     */
+    export function clone(value: ReadOnlyColor4): MutableColor4;
+    /**
+     * Copies the given Color4 values into the destination
+     * @param source - defines the source Color4 object
+     * @param dest - defines the destination Color4 object
+     * @returns
+     */
+    export function copyFrom(source: ReadOnlyColor4, dest: MutableColor4): void;
+    /**
+     * Copies the given float values into the current one
+     * @param r - defines the red component to read from
+     * @param g - defines the green component to read from
+     * @param b - defines the blue component to read from
+     * @param a - defines the alpha component to read from
+     * @returns the current updated Color4 object
+     */
+    export function copyFromFloats(r: number, g: number, b: number, a: number, dest: MutableColor4): void;
+    /**
+     * Copies the given float values into the current one
+     * @param r - defines the red component to read from
+     * @param g - defines the green component to read from
+     * @param b - defines the blue component to read from
+     * @param a - defines the alpha component to read from
+     * @returns the current updated Color4 object
+     */
+    export function set(r: number, g: number, b: number, a: number, dest: MutableColor4): void;
+    /**
+     * Compute the Color4 hexadecimal code as a string
+     * @returns a string containing the hexadecimal representation of the Color4 object
+     */
+    export function toHexString(value: ReadOnlyColor4): string;
+    /**
+     * Computes a create converted from the current one to linear space
+     * @returns create mutable Color4
+     */
+    export function toLinearSpace(value: ReadOnlyColor4): MutableColor4;
+    /**
+     * Converts the Color4 values to linear space and stores the result in "convertedColor"
+     * @param convertedColor - defines the Color4 object where to store the linear space version
+     * @returns the unmodified Color4
+     */
+    export function toLinearSpaceToRef(value: ReadOnlyColor4, ref: MutableColor4): void;
+    /**
+     * Computes a create converted from the current one to gamma space
+     * @returns create mutable Color4
+     */
+    export function toGammaSpace(value: ReadOnlyColor4): ReadOnlyColor4;
+    /**
+     * Converts the Color4 values to gamma space and stores the result in "convertedColor"
+     * @param convertedColor - defines the Color4 object where to store the gamma space version
+     * @returns the unmodified Color4
+     */
+    export function toGammaSpaceToRef(value: ReadOnlyColor4, convertedColor: MutableColor4): void;
+}
+
+declare interface Color4_2 {
     r: number;
     g: number;
     b: number;
@@ -1869,11 +2469,11 @@ declare interface PBAvatarShape {
     /** default = urn:decentraland:off-chain:base-avatars:BaseFemale */
     bodyShape?: string | undefined;
     /** default = decentraland.common.Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
-    skinColor?: Color3 | undefined;
+    skinColor?: Color3_2 | undefined;
     /** default = decentraland.common.Color3(R = 0.283f, G = 0.142f, B = 0f) */
-    hairColor?: Color3 | undefined;
+    hairColor?: Color3_2 | undefined;
     /** default = decentraland.common.Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
-    eyeColor?: Color3 | undefined;
+    eyeColor?: Color3_2 | undefined;
     expressionTriggerId?: string | undefined;
     /** default = timestamp */
     expressionTriggerTimestamp?: number | undefined;
@@ -1927,11 +2527,11 @@ declare interface PBMaterial {
     /** default = null */
     bumpTexture?: PBMaterial_Texture | undefined;
     /** default = white; */
-    albedoColor?: Color3 | undefined;
+    albedoColor?: Color3_2 | undefined;
     /** default = black; */
-    emissiveColor?: Color3 | undefined;
+    emissiveColor?: Color3_2 | undefined;
     /** default = white; */
-    reflectivityColor?: Color3 | undefined;
+    reflectivityColor?: Color3_2 | undefined;
     /** default = TransparencyMode.Auto */
     transparencyMode?: MaterialTransparencyMode | undefined;
     /** default = 0.5 */
@@ -2011,7 +2611,7 @@ declare interface PBNftShape {
     /** default = PictureFrameStyle.Classic */
     style?: NftFrameType | undefined;
     /** default = decentraland.common.Color3(0.6404918, 0.611472, 0.8584906) */
-    color?: Color3 | undefined;
+    color?: Color3_2 | undefined;
 }
 
 declare interface PBPointerEvents {
@@ -2096,22 +2696,22 @@ declare interface PBTextShape {
     shadowOffsetY?: number | undefined;
     outlineWidth?: number | undefined;
     /** default=(1.0,1.0,1.0) */
-    shadowColor?: Color3 | undefined;
+    shadowColor?: Color3_2 | undefined;
     /** default=(1.0,1.0,1.0) */
-    outlineColor?: Color3 | undefined;
+    outlineColor?: Color3_2 | undefined;
     /** default=(1.0,1.0,1.0) */
-    textColor?: Color4 | undefined;
+    textColor?: Color4_2 | undefined;
 }
 
 declare interface PBUiBackground {
     /** default=(0.0, 0.0, 0.0, 0.0) */
-    backgroundColor?: Color4 | undefined;
+    backgroundColor?: Color4_2 | undefined;
 }
 
 declare interface PBUiText {
     value: string;
     /** default=(1.0,1.0,1.0) */
-    color?: Color3 | undefined;
+    color?: Color3_2 | undefined;
     /** default='center' */
     textAlign?: TextAlignMode | undefined;
     /** default=0 */
