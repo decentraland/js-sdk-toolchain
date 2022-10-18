@@ -11,7 +11,7 @@ export const uiComponent = () => (
     uiTransform={{
       width: 500,
       height: 500,
-      padding: { top: 10, right: 10, bottom: 10, left: 10 }
+      padding: { top: '10px', left: '10px' }
     }}
     uiBackground={{ backgroundColor: { r: 10, g: 10, b: 10, a: 0.2 } }}
   >
