@@ -22,6 +22,10 @@ import {
 import { isNotUndefined, noopConfig } from './utils'
 
 function isEqual<T = unknown>(val1: T, val2: T): boolean {
+  if (!val1 && !val2) {
+    return true
+  }
+
   if (!val1 || !val2) {
     return val1 === val2
   }
@@ -152,8 +156,6 @@ export function createReconciler(
   function appendChild(parent: Instance, child: Instance): void {
     if (!child || !Object.keys(parent).length) return
 
-    console.log('append-child', { parent, child })
-
     child.parent = parent.entity
     child.rightOf = parent._child[parent._child.length - 1]?.entity
     parent._child.push(child)
@@ -162,8 +164,6 @@ export function createReconciler(
   }
 
   function removeChild(parentInstance: Instance, child: Instance): void {
-    console.log('removeChid', { parentInstance, child })
-
     const childIndex = parentInstance._child.findIndex(
       (c) => c.entity === child.entity
     )
@@ -198,7 +198,6 @@ export function createReconciler(
     ...noopConfig,
 
     createInstance(type: Type, props: Props): Instance {
-      console.log('create instance', type)
       const entity = engine.addEntity()
       entities.add(entity)
       const instance: Instance = {
@@ -246,8 +245,8 @@ export function createReconciler(
       _nextProps: Props,
       _internalHandle: OpaqueHandle
     ): void {
-      console.log(updatePayload)
       for (const update of updatePayload) {
+        console.log(update)
         if (update.type === 'delete') {
           removeComponent(instance, update.component)
         } else {
@@ -291,7 +290,6 @@ export function createReconciler(
   )
   return {
     update: function (component: JSX.Element) {
-      console.log('--------------------UPDATE------------------------')
       return reconciler.updateContainer(component as any, root, null)
     },
     getEntities: () => Array.from(entities)
