@@ -17,23 +17,31 @@ type PositionParsed = {
 }
 
 function isPercent(val: PositionUnit) {
-  return val.endsWith('%')
+  return typeof val === 'string' && val.endsWith('%')
 }
 function isPoint(val: PositionUnit) {
-  return val.endsWith('px')
+  return typeof val === 'string' && val.endsWith('px')
 }
 
 function parsePositionUnit(val: PositionUnit): [number, YGUnit] {
   function getValue(key: 'px' | '%') {
+    if (typeof val !== 'string') return 0
     return Number(val.slice(0, val.indexOf(key)))
   }
+
+  if (typeof val === 'number') {
+    return [Number(val), YGUnit.YGU_POINT]
+  }
+
   if (isPercent(val)) {
     return [getValue('%'), YGUnit.YGU_PERCENT]
   }
+
   if (isPoint(val)) {
     return [getValue('px'), YGUnit.YGU_POINT]
   }
-  return [0, YGUnit.YGU_UNDEFINED]
+
+  return [NaN, YGUnit.YGU_UNDEFINED]
 }
 
 // position: { top: '1px' } => { positionTop: 1, positionTopUnit: YGUnit.YGU_Point }

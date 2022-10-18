@@ -71,5 +71,15 @@ describe('UiTransform React Ecs', () => {
       positionRight: 0,
       positionRightUnit: YGUnit.YGU_UNDEFINED
     })
+
+    position.right = {} as any
+    position.left = '10%'
+    engine.update(1)
+    expect(getDiv(rootDivEntity)).toMatchObject({
+      positionRight: 0,
+      positionRightUnit: YGUnit.YGU_UNDEFINED,
+      positionLeft: 10,
+      positionLeftUnit: YGUnit.YGU_PERCENT
+    })
   })
 })

@@ -261,7 +261,7 @@ export type Position = {
 // Warning: (ae-missing-release-tag) "PositionUnit" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type PositionUnit = `${number}px` | `${number}%`;
+export type PositionUnit = `${number}px` | `${number}%` | number;
 
 // Warning: (ae-missing-release-tag) "ReactEcs" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

@@ -24,7 +24,7 @@ export {
   YGWrap
 }
 
-export type PositionUnit = `${number}px` | `${number}%`
+export type PositionUnit = `${number}px` | `${number}%` | number
 /**
  * @public
  */
