@@ -1,4 +1,4 @@
-import { parsePosition } from './position'
+import { parsePosition, parseSize } from './utils'
 import {
   PBUiTransform,
   YGAlign,
@@ -19,13 +19,30 @@ export const CANVAS_ROOT_ENTITY = 0
  * @public
  */
 export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
-  const { position, padding, margin, ...otherProps } = props
+  const {
+    position,
+    padding,
+    margin,
+    height,
+    minHeight,
+    maxHeight,
+    width,
+    maxWidth,
+    minWidth,
+    ...otherProps
+  } = props
   return {
     ...defaultDiv,
+    ...(otherProps || {}),
     ...parsePosition(position, 'position'),
     ...parsePosition(margin, 'margin'),
     ...parsePosition(padding, 'padding'),
-    ...(otherProps || {})
+    ...parseSize(height, 'height'),
+    ...parseSize(minHeight, 'minHeight'),
+    ...parseSize(maxHeight, 'maxHeight'),
+    ...parseSize(width, 'width'),
+    ...parseSize(minWidth, 'minWidth'),
+    ...parseSize(maxWidth, 'maxWidth')
   }
 }
 

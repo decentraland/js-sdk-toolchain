@@ -363,19 +363,19 @@ export interface UiTransformProps {
     // (undocumented)
     flexWrap?: YGWrap;
     // (undocumented)
-    height?: number;
+    height?: PositionUnit;
     // (undocumented)
     justifyContent?: YGJustify;
     // (undocumented)
     margin?: Partial<Position>;
     // (undocumented)
-    maxHeight?: number;
+    maxHeight?: PositionUnit;
     // (undocumented)
-    maxWidth?: number;
+    maxWidth?: PositionUnit;
     // (undocumented)
-    minHeight?: number;
+    minHeight?: PositionUnit;
     // (undocumented)
-    minWidth?: number;
+    minWidth?: PositionUnit;
     // (undocumented)
     overflow?: YGOverflow;
     // (undocumented)
@@ -385,7 +385,7 @@ export interface UiTransformProps {
     // (undocumented)
     positionType?: YGPositionType;
     // (undocumented)
-    width?: number;
+    width?: PositionUnit;
 }
 
 // Warning: (ae-missing-release-tag) "YGAlign" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)

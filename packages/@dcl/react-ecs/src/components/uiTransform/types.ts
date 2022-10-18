@@ -53,12 +53,12 @@ export interface UiTransformProps {
   padding?: Partial<Position>
   margin?: Partial<Position>
   direction?: YGDirection
-  width?: number
-  height?: number
-  minWidth?: number
-  maxWidth?: number
-  minHeight?: number
-  maxHeight?: number
+  width?: PositionUnit
+  height?: PositionUnit
+  minWidth?: PositionUnit
+  maxWidth?: PositionUnit
+  minHeight?: PositionUnit
+  maxHeight?: PositionUnit
   flexWrap?: YGWrap
   flexBasis?: number
   flexGrow?: number
