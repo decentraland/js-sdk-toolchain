@@ -5,23 +5,9 @@ import { InputAction } from '../components/generated/pb/decentraland/sdk/compone
 import { IEngine } from './types'
 import { Schemas } from '../schemas'
 
-const InternalInputStateSchema = {
-  timestampLastUpdate: Schemas.Number,
-  currentTimestamp: Schemas.Number,
-  buttonState: Schemas.Array(
-    Schemas.Map({
-      value: Schemas.Boolean,
-      ts: Schemas.Number
-    })
-  )
-}
-
-const LastInputAction = InputAction.IA_ACTION_6
-
-const InternalInputStateComponentId = 1500
-const TimestampUpdateSystemPriority = 1 << 20
-const ButtonStateUpdateSystemPriority = 0
-
+/**
+ * @public
+ */
 export type IInput = {
   /**
    * Check if a click was emmited in the current tick for the input action.
@@ -52,6 +38,23 @@ export type IInput = {
    */
   isActionDown: (inputAction: InputAction) => boolean
 }
+
+const InternalInputStateSchema = {
+  timestampLastUpdate: Schemas.Number,
+  currentTimestamp: Schemas.Number,
+  buttonState: Schemas.Array(
+    Schemas.Map({
+      value: Schemas.Boolean,
+      ts: Schemas.Number
+    })
+  )
+}
+
+const LastInputAction = InputAction.IA_ACTION_6
+
+const InternalInputStateComponentId = 1500
+const TimestampUpdateSystemPriority = 1 << 20
+const ButtonStateUpdateSystemPriority = 0
 
 export function createInput(engine: IEngine): IInput {
   const InternalInputStateComponent = engine.defineComponent(

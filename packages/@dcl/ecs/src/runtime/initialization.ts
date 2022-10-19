@@ -46,7 +46,17 @@ if (typeof dcl !== 'undefined') {
   _initEventObservables()
 }
 
+/**
+ * @public
+ */
 export const log = dcl.log
+
+/**
+ * @public
+ */
 export const error = dcl.error
 
+/**
+ * @public
+ */
 export const Input = createInput(engine)
