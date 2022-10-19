@@ -50,28 +50,3 @@ export const log = dcl.log
 export const error = dcl.error
 
 export const Input = createInput(engine)
-
-/**
- * Check if an entity emitted a clicked event
- * @param entity the entity to query, for global clicks use `engine.RootEntity`
- * @param inputAction
- * @returns true if the entity was clicked in the last tick-update
- */
-export function wasEntityClicked(entity: Entity, inputAction: InputAction) {
-  return Input.isClicked(inputAction, entity)
-}
-
-/**
- * Check if a pointer event has been emited in the last tick-update.
- * @param entity the entity to query, for global clicks use `engine.RootEntity`
- * @param inputAction
- * @param pointerEventType
- * @returns
- */
-export function isPointerEventActive(
-  entity: Entity,
-  inputAction: InputAction,
-  pointerEventType: PointerEventType
-) {
-  return Input.isInputActive(inputAction, pointerEventType, entity)
-}

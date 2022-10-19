@@ -7,7 +7,7 @@ import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated
 describe('Events helpers wasEntityClicked', () => {
   it('should detect no events', () => {
     const newEngine = Engine()
-    const wasEntityClicked = createInput(newEngine).isClicked
+    const wasEntityClicked = createInput(newEngine).wasJustClicked
     expect(wasEntityClicked(InputAction.IA_ANY, newEngine.RootEntity)).toBe(
       false
     )
@@ -16,7 +16,7 @@ describe('Events helpers wasEntityClicked', () => {
   it('detect global click', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
-    const wasEntityClicked = createInput(newEngine).isClicked
+    const wasEntityClicked = createInput(newEngine).wasJustClicked
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -45,7 +45,7 @@ describe('Events helpers wasEntityClicked', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const wasEntityClicked = createInput(newEngine).isClicked
+    const wasEntityClicked = createInput(newEngine).wasJustClicked
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -62,7 +62,7 @@ describe('Events helpers wasEntityClicked', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const wasEntityClicked = createInput(newEngine).isClicked
+    const wasEntityClicked = createInput(newEngine).wasJustClicked
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -81,7 +81,7 @@ describe('Events helpers wasEntityClicked', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const wasEntityClicked = createInput(newEngine).isClicked
+    const wasEntityClicked = createInput(newEngine).wasJustClicked
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -98,7 +98,7 @@ describe('Events helpers wasEntityClicked', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const wasEntityClicked = createInput(newEngine).isClicked
+    const wasEntityClicked = createInput(newEngine).wasJustClicked
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -120,7 +120,7 @@ describe('Events helpers wasEntityClicked', () => {
         createTestPointerDownCommand(entity, 4, PointerEventType.PET_UP)
       ]
     })
-    const wasEntityClicked = createInput(newEngine).isClicked
+    const wasEntityClicked = createInput(newEngine).wasJustClicked
 
     expect(wasEntityClicked(InputAction.IA_POINTER, entity)).toBe(false)
     expect(wasEntityClicked(InputAction.IA_ACTION_3, entity)).toBe(false)
@@ -137,7 +137,7 @@ describe('Events helpers wasEntityClicked', () => {
         createTestPointerDownCommand(entity, 3, PointerEventType.PET_DOWN)
       ]
     })
-    const wasEntityClicked = createInput(newEngine).isClicked
+    const wasEntityClicked = createInput(newEngine).wasJustClicked
 
     expect(wasEntityClicked(InputAction.IA_POINTER, entity)).toBe(true)
     newEngine.update(0)

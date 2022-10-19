@@ -7,7 +7,7 @@ import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 describe('Events helpers isPointerEventActive', () => {
   it('should detect no events', () => {
     const newEngine = Engine()
-    const isPointerEventActive = createInput(newEngine).isInputActive
+    const isPointerEventActive = createInput(newEngine).wasInputJustActive
     expect(
       isPointerEventActive(
         InputAction.IA_ANY,
@@ -21,7 +21,7 @@ describe('Events helpers isPointerEventActive', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const isPointerEventActive = createInput(newEngine).isInputActive
+    const isPointerEventActive = createInput(newEngine).wasInputJustActive
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -56,7 +56,7 @@ describe('Events helpers isPointerEventActive', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const isPointerEventActive = createInput(newEngine).isInputActive
+    const isPointerEventActive = createInput(newEngine).wasInputJustActive
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
         createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)
