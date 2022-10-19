@@ -1,7 +1,7 @@
 import { Entity } from './entity'
-import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/ecs/components/PointerEventsResult.gen'
-import { PointerEventType } from '../components/generated/pb/ecs/components/PointerEvents.gen'
-import { ActionButton } from '../components/generated/pb/ecs/components/common/ActionButton.gen'
+import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
+import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_events.gen'
+import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { IEngine } from './types'
 import { Schemas } from '../schemas'
 
@@ -16,7 +16,7 @@ const InternalInputStateSchema = {
   )
 }
 
-const LastActionButton = ActionButton.ACTION_6
+const LastInputAction = InputAction.IA_ACTION_6
 
 const InternalInputStateComponentId = 1500
 const TimestampUpdateSystemPriority = 1 << 20
@@ -29,7 +29,7 @@ export function createInput(engine: IEngine) {
   )
 
   InternalInputStateComponent.create(engine.RootEntity, {
-    buttonState: Array.from({ length: LastActionButton + 1 }, () => ({
+    buttonState: Array.from({ length: LastInputAction + 1 }, () => ({
       ts: 0,
       value: false
     }))
@@ -55,9 +55,9 @@ export function createInput(engine: IEngine) {
 
     for (const command of component.commands) {
       if (command.timestamp > state.buttonState[command.button].ts) {
-        if (command.state === PointerEventType.DOWN) {
+        if (command.state === PointerEventType.PET_DOWN) {
           state.buttonState[command.button].value = true
-        } else if (command.state === PointerEventType.UP) {
+        } else if (command.state === PointerEventType.PET_UP) {
           state.buttonState[command.button].value = false
         }
       }
@@ -67,7 +67,7 @@ export function createInput(engine: IEngine) {
   engine.addSystem(buttonStateUpdateSystem, ButtonStateUpdateSystemPriority)
   engine.addSystem(timestampUpdateSystem, TimestampUpdateSystemPriority)
 
-  function isClicked(actionButton: ActionButton, entity?: Entity) {
+  function isClicked(inputAction: InputAction, entity?: Entity) {
     const component = engine.baseComponents.PointerEventsResult.getOrNull(
       engine.RootEntity
     )
@@ -79,15 +79,15 @@ export function createInput(engine: IEngine) {
     // We search the last DOWN command sorted by timestamp
     const down = findLastAction(
       commands,
-      PointerEventType.DOWN,
-      actionButton,
+      PointerEventType.PET_DOWN,
+      inputAction,
       entity
     )
     // We search the last UP command sorted by timestamp
     const up = findLastAction(
       commands,
-      PointerEventType.UP,
-      actionButton,
+      PointerEventType.PET_UP,
+      inputAction,
       entity
     )
 
@@ -110,7 +110,7 @@ export function createInput(engine: IEngine) {
   }
 
   function isInputActive(
-    actionButton: ActionButton,
+    inputAction: InputAction,
     pointerEventType: PointerEventType,
     entity?: Entity
   ) {
@@ -123,7 +123,7 @@ export function createInput(engine: IEngine) {
     const command = findLastAction(
       component.commands,
       pointerEventType,
-      actionButton,
+      inputAction,
       entity
     )
     if (!command) return false
@@ -139,9 +139,9 @@ export function createInput(engine: IEngine) {
     }
   }
 
-  function isActionDown(actionButton: ActionButton) {
+  function isActionDown(inputAction: InputAction) {
     return InternalInputStateComponent.get(engine.RootEntity).buttonState[
-      actionButton
+      inputAction
     ].value
   }
 
@@ -155,7 +155,7 @@ export function createInput(engine: IEngine) {
 function findLastAction(
   commands: readonly PBPointerEventsResult_PointerCommand[],
   pointerEventType: PointerEventType,
-  actionButton: ActionButton,
+  inputAction: InputAction,
   entity?: Entity
 ): PBPointerEventsResult_PointerCommand | undefined {
   let commandToReturn: PBPointerEventsResult_PointerCommand | undefined =
@@ -163,7 +163,7 @@ function findLastAction(
 
   for (const command of commands) {
     if (
-      command.button === actionButton &&
+      command.button === inputAction &&
       command.state === pointerEventType &&
       (!entity || (command.hit && entity === command.hit.entityId))
     ) {

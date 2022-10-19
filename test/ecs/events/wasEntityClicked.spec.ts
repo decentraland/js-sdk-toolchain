@@ -1,14 +1,16 @@
 import { Entity } from '../../../packages/@dcl/ecs/src/engine/entity'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/PointerEvents.gen'
-import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/common/ActionButton.gen'
 import { createInput } from '../../../packages/@dcl/ecs/src/engine/input'
+import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_events.gen'
+import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 
 describe('Events helpers wasEntityClicked', () => {
   it('should detect no events', () => {
     const newEngine = Engine()
     const wasEntityClicked = createInput(newEngine).isClicked
-    expect(wasEntityClicked(ActionButton.ANY, newEngine.RootEntity)).toBe(false)
+    expect(wasEntityClicked(InputAction.IA_ANY, newEngine.RootEntity)).toBe(
+      false
+    )
   })
 
   it('detect global click', () => {
@@ -21,22 +23,22 @@ describe('Events helpers wasEntityClicked', () => {
         createTestPointerDownCommand(
           newEngine.RootEntity,
           4,
-          PointerEventType.DOWN
+          PointerEventType.PET_DOWN
         ),
         createTestPointerDownCommand(
           newEngine.RootEntity,
           5,
-          PointerEventType.UP
+          PointerEventType.PET_UP
         )
       ]
     })
 
-    expect(wasEntityClicked(ActionButton.POINTER, newEngine.RootEntity)).toBe(
+    expect(wasEntityClicked(InputAction.IA_POINTER, newEngine.RootEntity)).toBe(
       true
     )
-    expect(wasEntityClicked(ActionButton.ACTION_3, newEngine.RootEntity)).toBe(
-      false
-    )
+    expect(
+      wasEntityClicked(InputAction.IA_ACTION_3, newEngine.RootEntity)
+    ).toBe(false)
   })
 
   it('detect entity click', () => {
@@ -47,13 +49,13 @@ describe('Events helpers wasEntityClicked', () => {
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
-        createTestPointerDownCommand(entity, 4, PointerEventType.DOWN),
-        createTestPointerDownCommand(entity, 5, PointerEventType.UP)
+        createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN),
+        createTestPointerDownCommand(entity, 5, PointerEventType.PET_UP)
       ]
     })
 
-    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(true)
-    expect(wasEntityClicked(ActionButton.ACTION_3, entity)).toBe(false)
+    expect(wasEntityClicked(InputAction.IA_POINTER, entity)).toBe(true)
+    expect(wasEntityClicked(InputAction.IA_ACTION_3, entity)).toBe(false)
   })
 
   it('dont detect entity click after update', () => {
@@ -64,15 +66,15 @@ describe('Events helpers wasEntityClicked', () => {
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
-        createTestPointerDownCommand(entity, 4, PointerEventType.DOWN),
-        createTestPointerDownCommand(entity, 5, PointerEventType.UP)
+        createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN),
+        createTestPointerDownCommand(entity, 5, PointerEventType.PET_UP)
       ]
     })
 
-    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(true)
-    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(true)
+    expect(wasEntityClicked(InputAction.IA_POINTER, entity)).toBe(true)
+    expect(wasEntityClicked(InputAction.IA_POINTER, entity)).toBe(true)
     newEngine.update(0)
-    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(false)
+    expect(wasEntityClicked(InputAction.IA_POINTER, entity)).toBe(false)
   })
 
   it('dont detect entity click if pointer up is older', () => {
@@ -83,13 +85,13 @@ describe('Events helpers wasEntityClicked', () => {
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
-        createTestPointerDownCommand(entity, 4, PointerEventType.DOWN),
-        createTestPointerDownCommand(entity, 3, PointerEventType.UP)
+        createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN),
+        createTestPointerDownCommand(entity, 3, PointerEventType.PET_UP)
       ]
     })
 
-    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(false)
-    expect(wasEntityClicked(ActionButton.ACTION_3, entity)).toBe(false)
+    expect(wasEntityClicked(InputAction.IA_POINTER, entity)).toBe(false)
+    expect(wasEntityClicked(InputAction.IA_ACTION_3, entity)).toBe(false)
   })
 
   it('dont detect entity click if pointer up doesnt exists', () => {
@@ -99,11 +101,13 @@ describe('Events helpers wasEntityClicked', () => {
     const wasEntityClicked = createInput(newEngine).isClicked
 
     PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [createTestPointerDownCommand(entity, 4, PointerEventType.DOWN)]
+      commands: [
+        createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)
+      ]
     })
 
-    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(false)
-    expect(wasEntityClicked(ActionButton.ACTION_3, entity)).toBe(false)
+    expect(wasEntityClicked(InputAction.IA_POINTER, entity)).toBe(false)
+    expect(wasEntityClicked(InputAction.IA_ACTION_3, entity)).toBe(false)
   })
 
   it('dont detect entity click if pointer down doesnt exists', () => {
@@ -112,12 +116,14 @@ describe('Events helpers wasEntityClicked', () => {
     const entity = newEngine.addEntity()
 
     PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [createTestPointerDownCommand(entity, 4, PointerEventType.UP)]
+      commands: [
+        createTestPointerDownCommand(entity, 4, PointerEventType.PET_UP)
+      ]
     })
     const wasEntityClicked = createInput(newEngine).isClicked
 
-    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(false)
-    expect(wasEntityClicked(ActionButton.ACTION_3, entity)).toBe(false)
+    expect(wasEntityClicked(InputAction.IA_POINTER, entity)).toBe(false)
+    expect(wasEntityClicked(InputAction.IA_ACTION_3, entity)).toBe(false)
   })
 
   it('should detect click, then no click, then other click', () => {
@@ -127,28 +133,28 @@ describe('Events helpers wasEntityClicked', () => {
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
-        createTestPointerDownCommand(entity, 4, PointerEventType.UP),
-        createTestPointerDownCommand(entity, 3, PointerEventType.DOWN)
+        createTestPointerDownCommand(entity, 4, PointerEventType.PET_UP),
+        createTestPointerDownCommand(entity, 3, PointerEventType.PET_DOWN)
       ]
     })
     const wasEntityClicked = createInput(newEngine).isClicked
 
-    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(true)
+    expect(wasEntityClicked(InputAction.IA_POINTER, entity)).toBe(true)
     newEngine.update(0)
-    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(false)
+    expect(wasEntityClicked(InputAction.IA_POINTER, entity)).toBe(false)
 
     PointerEventsResult.createOrReplace(newEngine.RootEntity, {
       commands: [
-        createTestPointerDownCommand(entity, 4, PointerEventType.UP),
-        createTestPointerDownCommand(entity, 3, PointerEventType.DOWN),
-        createTestPointerDownCommand(entity, 8, PointerEventType.UP),
-        createTestPointerDownCommand(entity, 5, PointerEventType.DOWN)
+        createTestPointerDownCommand(entity, 4, PointerEventType.PET_UP),
+        createTestPointerDownCommand(entity, 3, PointerEventType.PET_DOWN),
+        createTestPointerDownCommand(entity, 8, PointerEventType.PET_UP),
+        createTestPointerDownCommand(entity, 5, PointerEventType.PET_DOWN)
       ]
     })
 
-    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(true)
+    expect(wasEntityClicked(InputAction.IA_POINTER, entity)).toBe(true)
     newEngine.update(0)
-    expect(wasEntityClicked(ActionButton.POINTER, entity)).toBe(false)
+    expect(wasEntityClicked(InputAction.IA_POINTER, entity)).toBe(false)
   })
 })
 
@@ -158,7 +164,7 @@ function createTestPointerDownCommand(
   state: PointerEventType
 ) {
   return {
-    button: ActionButton.POINTER,
+    button: InputAction.IA_POINTER,
     timestamp: timestamp,
     hit: {
       position: { x: 1, y: 2, z: 3 },

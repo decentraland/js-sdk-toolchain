@@ -16,6 +16,11 @@ export const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
 // @public (undocumented)
 export const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
 
+// Warning: (ae-forgotten-export) The symbol "PBAudioStream" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export const AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
+
 // Warning: (ae-forgotten-export) The symbol "PBAvatarAttach" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
@@ -56,13 +61,11 @@ export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCa
 // @public (undocumented)
 export const enum ColliderLayer {
     // (undocumented)
-    None = 0,
+    CL_NONE = 0,
     // (undocumented)
-    Physics = 2,
+    CL_PHYSICS = 2,
     // (undocumented)
-    Pointer = 1,
-    // (undocumented)
-    UNRECOGNIZED = -1
+    CL_POINTER = 1
 }
 
 // @public (undocumented)
@@ -91,6 +94,8 @@ export namespace Components {
     const // (undocumented)
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     const // (undocumented)
+    AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
+    const // (undocumented)
     AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
     const // (undocumented)
     AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
@@ -118,26 +123,10 @@ export namespace Components {
     //
     // (undocumented)
     MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
-    const // Warning: (ae-forgotten-export) The symbol "PBNFTShape" needs to be exported by the entry point index.d.ts
+    const // Warning: (ae-forgotten-export) The symbol "PBNftShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
-    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerDown" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerDownResult" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUp" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-    const // Warning: (ae-forgotten-export) The symbol "PBOnPointerUpResult" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
+    NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     const // Warning: (ae-forgotten-export) The symbol "PBPointerEvents" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -261,9 +250,9 @@ export type IEngineParams = {
 //
 // @public (undocumented)
 export const Input: {
-    isActionDown: (actionButton: ActionButton) => boolean;
-    isClicked: (actionButton: ActionButton, entity?: Entity | undefined) => boolean;
-    isInputActive: (actionButton: ActionButton, pointerEventType: PointerEventType, entity?: Entity | undefined) => boolean;
+    isActionDown: (inputAction: InputAction) => boolean;
+    isClicked: (inputAction: InputAction, entity?: Entity | undefined) => boolean;
+    isInputActive: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity | undefined) => boolean;
 };
 
 // @public (undocumented)
@@ -279,7 +268,7 @@ export type ISchema<T = any> = {
 // Warning: (ae-missing-release-tag) "isPointerEventActive" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public
-export function isPointerEventActive(entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType): boolean;
+export function isPointerEventActive(entity: Entity, inputAction: InputAction, pointerEventType: PointerEventType): boolean;
 
 // Warning: (ae-missing-release-tag) "log" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -312,7 +301,7 @@ export class MessageBus {
 }
 
 // @public (undocumented)
-export const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
+export const NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
 
 // Warning: (ae-missing-release-tag) "Observable" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -404,18 +393,6 @@ export const onPlayerDisconnectedObservable: Observable<{
 export const onPlayerExpressionObservable: Observable<{
     expressionId: string;
 }>;
-
-// @public (undocumented)
-export const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-
-// @public (undocumented)
-export const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-
-// @public (undocumented)
-export const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-
-// @public (undocumented)
-export const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
 
 // @public @deprecated (undocumented)
 export const onProfileChanged: Observable<{
@@ -720,7 +697,7 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 // Warning: (ae-missing-release-tag) "wasEntityClicked" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public
-export function wasEntityClicked(entity: Entity, actionButton: ActionButton): boolean;
+export function wasEntityClicked(entity: Entity, inputAction: InputAction): boolean;
 
 // Warnings were encountered during analysis:
 //
@@ -774,7 +751,7 @@ export function wasEntityClicked(entity: Entity, actionButton: ActionButton): bo
 // dist/engine/types.d.ts:95:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
 // dist/engine/types.d.ts:104:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/types.d.ts:105:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// dist/runtime/initialization.d.ts:12:5 - (ae-forgotten-export) The symbol "ActionButton" needs to be exported by the entry point index.d.ts
+// dist/runtime/initialization.d.ts:12:5 - (ae-forgotten-export) The symbol "InputAction" needs to be exported by the entry point index.d.ts
 // dist/runtime/initialization.d.ts:14:5 - (ae-forgotten-export) The symbol "PointerEventType" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)

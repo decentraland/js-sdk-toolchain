@@ -1,6 +1,6 @@
-﻿import { Engine } from '../../src/engine'
+﻿import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
-describe.skip('Generated AudioStream ProtoBuf', () => {
+describe('Generated AudioStream ProtoBuf', () => {
   it('should serialize/deserialize AudioStream', () => {
     const newEngine = Engine()
     const { AudioStream } = newEngine.baseComponents

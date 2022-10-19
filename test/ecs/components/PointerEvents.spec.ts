@@ -1,6 +1,6 @@
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
-import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/common/ActionButton.gen'
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/PointerEvents.gen'
+import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
+import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_events.gen'
 
 describe('Generated OnPointerDown ProtoBuf', () => {
   it('should serialize/deserialize OnPointerUp', () => {
@@ -12,7 +12,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     const pointerEvents = PointerEvents.create(entity, {
       pointerEvents: [
         {
-          eventType: PointerEventType.UP,
+          eventType: PointerEventType.PET_UP,
           eventInfo: {
             button: 1,
             hoverText: 'Tap to run',
@@ -26,9 +26,9 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     PointerEvents.create(entityB, {
       pointerEvents: [
         {
-          eventType: PointerEventType.DOWN,
+          eventType: PointerEventType.PET_DOWN,
           eventInfo: {
-            button: ActionButton.ACTION_4,
+            button: InputAction.IA_ACTION_4,
             hoverText: 'Run to tap',
             maxDistance: 5,
             showFeedback: false
@@ -54,9 +54,9 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     PointerEvents.create(entity, {
       pointerEvents: [
         {
-          eventType: PointerEventType.DOWN,
+          eventType: PointerEventType.PET_DOWN,
           eventInfo: {
-            button: ActionButton.ACTION_4,
+            button: InputAction.IA_ACTION_4,
             hoverText: 'Run to tap',
             maxDistance: 5,
             showFeedback: false
@@ -72,7 +72,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     PointerEventsResult.create(entity, {
       commands: [
         {
-          button: ActionButton.ACTION_3,
+          button: InputAction.IA_ACTION_3,
           timestamp: 5,
           hit: {
             position: { x: 1, y: 2, z: 3 },
@@ -82,7 +82,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             origin: { x: 1, y: 2, z: 3 },
             meshName: 'mesh'
           },
-          state: PointerEventType.DOWN
+          state: PointerEventType.PET_DOWN
         }
       ]
     })

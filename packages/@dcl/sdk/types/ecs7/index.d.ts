@@ -1,54 +1,42 @@
 /// <reference types="@dcl/posix" />
 
-declare const enum ActionButton {
-    POINTER = 0,
-    PRIMARY = 1,
-    SECONDARY = 2,
-    ANY = 3,
-    FORWARD = 4,
-    BACKWARD = 5,
-    RIGHT = 6,
-    LEFT = 7,
-    JUMP = 8,
-    WALK = 9,
-    ACTION_3 = 10,
-    ACTION_4 = 11,
-    ACTION_5 = 12,
-    ACTION_6 = 13,
-    UNRECOGNIZED = -1
-}
-
 /** @public */
 declare const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
 
 /** @public */
 declare const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
 
-declare const enum AvatarAnchorPoint {
-    POSITION = 0,
-    NAME_TAG = 1,
-    LEFT_HAND = 2,
-    RIGHT_HAND = 3,
-    UNRECOGNIZED = -1
+/** @public */
+declare const AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
+
+declare const enum AvatarAnchorPointType {
+    AAPT_POSITION = 0,
+    AAPT_NAME_TAG = 1,
+    AAPT_LEFT_HAND = 2,
+    AAPT_RIGHT_HAND = 3
 }
 
 /** @public */
 declare const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
 
-declare const enum AvatarModifier {
-    HIDE_AVATARS = 0,
-    DISABLE_PASSPORTS = 1,
-    UNRECOGNIZED = -1
-}
-
 /** @public */
 declare const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
+
+declare const enum AvatarModifierType {
+    AMT_HIDE_AVATARS = 0,
+    AMT_DISABLE_PASSPORTS = 1
+}
 
 /** @public */
 declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
 
 /** @public */
 declare const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
+
+declare const enum BillboardMode {
+    BM_ALL_AXES = 0,
+    BM_Y_AXE = 1
+}
 
 /**
  * @public
@@ -61,17 +49,15 @@ declare const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMod
 /** @public */
 declare const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
 
-declare const enum CameraModeValue {
-    FIRST_PERSON = 0,
-    THIRD_PERSON = 1,
-    UNRECOGNIZED = -1
+declare const enum CameraType {
+    CT_FIRST_PERSON = 0,
+    CT_THIRD_PERSON = 1
 }
 
 declare const enum ColliderLayer {
-    None = 0,
-    Pointer = 1,
-    Physics = 2,
-    UNRECOGNIZED = -1
+    CL_NONE = 0,
+    CL_POINTER = 1,
+    CL_PHYSICS = 2
 }
 
 declare interface Color3 {
@@ -222,6 +208,8 @@ declare namespace Components {
     /** @public */
     const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     /** @public */
+    const AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
+    /** @public */
     const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
     /** @public */
     const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
@@ -242,15 +230,7 @@ declare namespace Components {
     /** @public */
     const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
     /** @public */
-    const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
-    /** @public */
-    const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-    /** @public */
-    const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-    /** @public */
-    const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-    /** @public */
-    const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
+    const NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     /** @public */
     const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     /** @public */
@@ -468,6 +448,7 @@ declare function defineSdkComponents(engine: PreEngine): {
     MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
     Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
+    AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
     AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
     AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
     AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
@@ -476,11 +457,7 @@ declare function defineSdkComponents(engine: PreEngine): {
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
-    NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
-    OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-    OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-    OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-    OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
+    NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
@@ -527,20 +504,12 @@ declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
 }[keyof T];
 
-declare const enum FilterMode {
-    Point = 0,
-    Bilinear = 1,
-    Trilinear = 2,
-    UNRECOGNIZED = -1
-}
-
 /** @public */
 declare type FloatArray = number[];
 
 declare const enum Font {
-    LiberationSans = 0,
-    SansSerif = 1,
-    UNRECOGNIZED = -1
+    F_LIBERATION_SANS = 0,
+    F_SANS_SERIF = 1
 }
 
 /** @public */
@@ -687,10 +656,27 @@ declare type IncludeUndefined<T> = {
 }[keyof T];
 
 declare const Input: {
-    isActionDown: (actionButton: ActionButton) => boolean;
-    isClicked: (actionButton: ActionButton, entity?: Entity | undefined) => boolean;
-    isInputActive: (actionButton: ActionButton, pointerEventType: PointerEventType, entity?: Entity | undefined) => boolean;
+    isActionDown: (inputAction: InputAction) => boolean;
+    isClicked: (inputAction: InputAction, entity?: Entity | undefined) => boolean;
+    isInputActive: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity | undefined) => boolean;
 };
+
+declare const enum InputAction {
+    IA_POINTER = 0,
+    IA_PRIMARY = 1,
+    IA_SECONDARY = 2,
+    IA_ANY = 3,
+    IA_FORWARD = 4,
+    IA_BACKWARD = 5,
+    IA_RIGHT = 6,
+    IA_LEFT = 7,
+    IA_JUMP = 8,
+    IA_WALK = 9,
+    IA_ACTION_3 = 10,
+    IA_ACTION_4 = 11,
+    IA_ACTION_5 = 12,
+    IA_ACTION_6 = 13
+}
 
 /**
  * @public
@@ -709,11 +695,11 @@ declare type ISchema<T = any> = {
 /**
  * Check if a pointer event has been emited in the last tick-update.
  * @param entity the entity to query, for global clicks use `engine.RootEntity`
- * @param actionButton
+ * @param inputAction
  * @param pointerEventType
  * @returns
  */
-declare function isPointerEventActive(entity: Entity, actionButton: ActionButton, pointerEventType: PointerEventType): boolean;
+declare function isPointerEventActive(entity: Entity, inputAction: InputAction, pointerEventType: PointerEventType): boolean;
 
 declare const log: (...a: any[]) => void;
 
@@ -738,6 +724,14 @@ declare function makeCollisionMask(...layers: ColliderLayer[]): number;
 
 /** @public */
 declare const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+
+declare const enum MaterialTransparencyMode {
+    MTM_OPAQUE = 0,
+    MTM_ALPHA_TEST = 1,
+    MTM_ALPHA_BLEND = 2,
+    MTM_ALPHA_TEST_AND_ALPHA_BLEND = 3,
+    MTM_AUTO = 4
+}
 
 /**
  * Class used to store matrix data (4x4)
@@ -1490,8 +1484,34 @@ declare class MessageBus {
     private flush;
 }
 
+declare const enum NftFrameType {
+    NFT_CLASSIC = 0,
+    NFT_BAROQUE_ORNAMENT = 1,
+    NFT_DIAMOND_ORNAMENT = 2,
+    NFT_MINIMAL_WIDE = 3,
+    NFT_MINIMAL_GREY = 4,
+    NFT_BLOCKY = 5,
+    NFT_GOLD_EDGES = 6,
+    NFT_GOLD_CARVED = 7,
+    NFT_GOLD_WIDE = 8,
+    NFT_GOLD_ROUNDED = 9,
+    NFT_METAL_MEDIUM = 10,
+    NFT_METAL_WIDE = 11,
+    NFT_METAL_SLIM = 12,
+    NFT_METAL_ROUNDED = 13,
+    NFT_PINS = 14,
+    NFT_MINIMAL_BLACK = 15,
+    NFT_MINIMAL_WHITE = 16,
+    NFT_TAPE = 17,
+    NFT_WOOD_SLIM = 18,
+    NFT_WOOD_WIDE = 19,
+    NFT_WOOD_TWIGS = 20,
+    NFT_CANVAS = 21,
+    NFT_NONE = 22
+}
+
 /** @public */
-declare const NFTShape: ComponentDefinition<ISchema<PBNFTShape>, PBNFTShape>;
+declare const NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
 
 /**
  * The Observable class is a simple implementation of the Observable pattern.
@@ -1762,18 +1782,6 @@ declare const onPlayerExpressionObservable: Observable<{
     expressionId: string;
 }>;
 
-/** @public */
-declare const OnPointerDown: ComponentDefinition<ISchema<PBOnPointerDown>, PBOnPointerDown>;
-
-/** @public */
-declare const OnPointerDownResult: ComponentDefinition<ISchema<PBOnPointerDownResult>, PBOnPointerDownResult>;
-
-/** @public */
-declare const OnPointerUp: ComponentDefinition<ISchema<PBOnPointerUp>, PBOnPointerUp>;
-
-/** @public */
-declare const OnPointerUpResult: ComponentDefinition<ISchema<PBOnPointerUpResult>, PBOnPointerUpResult>;
-
 /**
  * @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
@@ -1840,15 +1848,22 @@ declare interface PBAudioSource {
     audioClipUrl: string;
 }
 
+declare interface PBAudioStream {
+    playing?: boolean | undefined;
+    /** default=1.0f */
+    volume?: number | undefined;
+    url: string;
+}
+
 declare interface PBAvatarAttach {
     avatarId: string;
-    anchorPointId: AvatarAnchorPoint;
+    anchorPointId: AvatarAnchorPointType;
 }
 
 declare interface PBAvatarModifierArea {
     area: Vector3_2 | undefined;
     excludeIds: string[];
-    modifiers: AvatarModifier[];
+    modifiers: AvatarModifierType[];
 }
 
 declare interface PBAvatarShape {
@@ -1857,11 +1872,11 @@ declare interface PBAvatarShape {
     name?: string | undefined;
     /** default = urn:decentraland:off-chain:base-avatars:BaseFemale */
     bodyShape?: string | undefined;
-    /** default = Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
+    /** default = decentraland.common.Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
     skinColor?: Color3 | undefined;
-    /** default = Color3(R = 0.283f, G = 0.142f, B = 0f) */
+    /** default = decentraland.common.Color3(R = 0.283f, G = 0.142f, B = 0f) */
     hairColor?: Color3 | undefined;
-    /** default = Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
+    /** default = decentraland.common.Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
     eyeColor?: Color3 | undefined;
     expressionTriggerId?: string | undefined;
     /** default = timestamp */
@@ -1882,21 +1897,19 @@ declare interface PBAvatarShape {
 }
 
 declare interface PBBillboard {
-    /** default=true */
-    x?: boolean | undefined;
-    /** default=true */
-    y?: boolean | undefined;
-    /** default=true */
-    z?: boolean | undefined;
+    /** default=BM_ALL_AXES */
+    billboardMode?: BillboardMode | undefined;
+    /** default=false */
+    oppositeDirection?: boolean | undefined;
 }
 
 declare interface PBCameraMode {
-    mode: CameraModeValue;
+    mode: CameraType;
 }
 
 declare interface PBCameraModeArea {
     area: Vector3_2 | undefined;
-    mode: CameraModeValue;
+    mode: CameraType;
 }
 
 declare interface PBGltfContainer {
@@ -1924,7 +1937,7 @@ declare interface PBMaterial {
     /** default = white; */
     reflectivityColor?: Color3 | undefined;
     /** default = TransparencyMode.Auto */
-    transparencyMode?: TransparencyMode | undefined;
+    transparencyMode?: MaterialTransparencyMode | undefined;
     /** default = 0.5 */
     metallic?: number | undefined;
     /** default = 0.5 */
@@ -1944,7 +1957,7 @@ declare interface PBMaterial_Texture {
     /** default = TextureWrapMode.Clamp */
     wrapMode?: TextureWrapMode | undefined;
     /** default = FilterMode.Bilinear */
-    filterMode?: FilterMode | undefined;
+    filterMode?: TextureFilterMode | undefined;
 }
 
 declare interface PBMeshCollider {
@@ -1997,83 +2010,12 @@ declare interface PBMeshRenderer_PlaneMesh {
 declare interface PBMeshRenderer_SphereMesh {
 }
 
-declare interface PBNFTShape {
+declare interface PBNftShape {
     src: string;
     /** default = PictureFrameStyle.Classic */
-    style?: PBNFTShape_PictureFrameStyle | undefined;
-    /** default = Color3(0.6404918, 0.611472, 0.8584906) */
+    style?: NftFrameType | undefined;
+    /** default = decentraland.common.Color3(0.6404918, 0.611472, 0.8584906) */
     color?: Color3 | undefined;
-}
-
-declare const enum PBNFTShape_PictureFrameStyle {
-    Classic = 0,
-    Baroque_Ornament = 1,
-    Diamond_Ornament = 2,
-    Minimal_Wide = 3,
-    Minimal_Grey = 4,
-    Blocky = 5,
-    Gold_Edges = 6,
-    Gold_Carved = 7,
-    Gold_Wide = 8,
-    Gold_Rounded = 9,
-    Metal_Medium = 10,
-    Metal_Wide = 11,
-    Metal_Slim = 12,
-    Metal_Rounded = 13,
-    Pins = 14,
-    Minimal_Black = 15,
-    Minimal_White = 16,
-    Tape = 17,
-    Wood_Slim = 18,
-    Wood_Wide = 19,
-    Wood_Twigs = 20,
-    Canvas = 21,
-    None = 22,
-    UNRECOGNIZED = -1
-}
-
-declare interface PBOnPointerDown {
-    /** default=ActionButton.ANY */
-    button?: ActionButton | undefined;
-    /** default='Interact' */
-    hoverText?: string | undefined;
-    /** default=10 */
-    maxDistance?: number | undefined;
-    /** default=true */
-    showFeedback?: boolean | undefined;
-}
-
-declare interface PBOnPointerDownResult {
-    button: ActionButton;
-    meshName: string;
-    origin: Vector3_2 | undefined;
-    direction: Vector3_2 | undefined;
-    point: Vector3_2 | undefined;
-    normal: Vector3_2 | undefined;
-    distance: number;
-    timestamp: number;
-}
-
-declare interface PBOnPointerUp {
-    /** default=ActionButton.ANY */
-    button?: ActionButton | undefined;
-    /** default='Interact' */
-    hoverText?: string | undefined;
-    /** default=10 */
-    maxDistance?: number | undefined;
-    /** default=true */
-    showFeedback?: boolean | undefined;
-}
-
-declare interface PBOnPointerUpResult {
-    button: ActionButton;
-    meshName: string;
-    origin: Vector3_2 | undefined;
-    direction: Vector3_2 | undefined;
-    point: Vector3_2 | undefined;
-    normal: Vector3_2 | undefined;
-    distance: number;
-    timestamp: number;
 }
 
 declare interface PBPointerEvents {
@@ -2086,8 +2028,8 @@ declare interface PBPointerEvents_Entry {
 }
 
 declare interface PBPointerEvents_Info {
-    /** default=ActionButton.ANY */
-    button?: ActionButton | undefined;
+    /** default=InputAction.ANY */
+    button?: InputAction | undefined;
     /** default='Interact' */
     hoverText?: string | undefined;
     /** default=10 */
@@ -2105,7 +2047,7 @@ declare interface PBPointerEventsResult {
 /** this message represents a pointer event, used both for UP and DOWN actions */
 declare interface PBPointerEventsResult_PointerCommand {
     /** identifier of the input */
-    button: ActionButton;
+    button: InputAction;
     hit: RaycastHit | undefined;
     state: PointerEventType;
     /** could be a Lamport timestamp */
@@ -2135,18 +2077,13 @@ declare interface PBRaycastResult {
 
 declare interface PBTextShape {
     text: string;
-    /** @deprecated use HiddenComponent instead https://github.com/decentraland/sdk/issues/353 */
-    visible?: boolean | undefined;
-    font?: string | undefined;
-    /** default=1.0f */
-    opacity?: number | undefined;
+    /** default=F_SANS_SERIF */
+    font?: Font | undefined;
     /** default=10 */
     fontSize?: number | undefined;
     fontAutoSize?: boolean | undefined;
-    /** default='center' */
-    hTextAlign?: string | undefined;
-    /** default='center' */
-    vTextAlign?: string | undefined;
+    /** default=TAM_CENTER_CENTER */
+    textAlign?: TextAlignMode | undefined;
     /** default=1 */
     width?: number | undefined;
     /** default=1 */
@@ -2167,7 +2104,7 @@ declare interface PBTextShape {
     /** default=(1.0,1.0,1.0) */
     outlineColor?: Color3 | undefined;
     /** default=(1.0,1.0,1.0) */
-    textColor?: Color3 | undefined;
+    textColor?: Color4 | undefined;
 }
 
 declare interface PBUiBackground {
@@ -2180,7 +2117,7 @@ declare interface PBUiText {
     /** default=(1.0,1.0,1.0) */
     color?: Color3 | undefined;
     /** default='center' */
-    textAlign?: TextAlign | undefined;
+    textAlign?: TextAlignMode | undefined;
     /** default=0 */
     font?: Font | undefined;
     /** default=10 */
@@ -2378,11 +2315,10 @@ declare const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPoi
 declare const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
 
 declare const enum PointerEventType {
-    UP = 0,
-    DOWN = 1,
-    HOVER_ENTER = 2,
-    HOVER_LEAVE = 3,
-    UNRECOGNIZED = -1
+    PET_UP = 0,
+    PET_DOWN = 1,
+    PET_HOVER_ENTER = 2,
+    PET_HOVER_LEAVE = 3
 }
 
 /** @public */
@@ -2619,9 +2555,8 @@ declare interface RaycastHit {
 }
 
 declare const enum RaycastQueryType {
-    HIT_FIRST = 0,
-    QUERY_ALL = 1,
-    UNRECOGNIZED = -1
+    RQT_HIT_FIRST = 0,
+    RQT_QUERY_ALL = 1
 }
 
 /** @public */
@@ -2693,22 +2628,32 @@ declare interface Spec {
  */
 declare type SystemFn = (dt: number) => void;
 
-declare const enum TextAlign {
-    Center = 0,
-    Left = 1,
-    Right = 2,
-    UNRECOGNIZED = -1
+declare const enum TextAlignMode {
+    TAM_TOP_LEFT = 0,
+    TAM_TOP_CENTER = 1,
+    TAM_TOP_RIGHT = 2,
+    TAM_MIDDLE_LEFT = 3,
+    TAM_MIDDLE_CENTER = 4,
+    TAM_MIDDLE_RIGHT = 5,
+    TAM_BOTTOM_LEFT = 6,
+    TAM_BOTTOM_CENTER = 7,
+    TAM_BOTTOM_RIGHT = 8
 }
 
 /** @public */
 declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 
+declare const enum TextureFilterMode {
+    TFM_POINT = 0,
+    TFM_BILINEAR = 1,
+    TFM_TRILINEAR = 2
+}
+
 declare const enum TextureWrapMode {
-    Repeat = 0,
-    Clamp = 1,
-    Mirror = 2,
-    MirrorOnce = 3,
-    UNRECOGNIZED = -1
+    TWM_REPEAT = 0,
+    TWM_CLAMP = 1,
+    TWM_MIRROR = 2,
+    TWM_MIRROR_ONCE = 3
 }
 
 declare type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
@@ -2738,15 +2683,6 @@ declare type TransformType = {
     };
     parent?: Entity;
 };
-
-declare const enum TransparencyMode {
-    Opaque = 0,
-    AlphaTest = 1,
-    AlphaBlend = 2,
-    AlphaTestAndAlphaBlend = 3,
-    Auto = 4,
-    UNRECOGNIZED = -1
-}
 
 declare type Transport = {
     type: string;
@@ -3336,10 +3272,10 @@ declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompo
 /**
  * Check if an entity emitted a clicked event
  * @param entity the entity to query, for global clicks use `engine.RootEntity`
- * @param actionButton
+ * @param inputAction
  * @returns true if the entity was clicked in the last tick-update
  */
-declare function wasEntityClicked(entity: Entity, actionButton: ActionButton): boolean;
+declare function wasEntityClicked(entity: Entity, inputAction: InputAction): boolean;
 
 declare namespace WireMessage {
     enum Enum {
@@ -3366,75 +3302,66 @@ declare namespace WireMessage {
 }
 
 declare const enum YGAlign {
-    YGAlignAuto = 0,
-    YGAlignFlexStart = 1,
-    YGAlignCenter = 2,
-    YGAlignFlexEnd = 3,
-    YGAlignStretch = 4,
-    YGAlignBaseline = 5,
-    YGAlignSpaceBetween = 6,
-    YGAlignSpaceAround = 7,
-    UNRECOGNIZED = -1
+    YGA_AUTO = 0,
+    YGA_FLEX_START = 1,
+    YGA_CENTER = 2,
+    YGA_FLEX_END = 3,
+    YGA_STRETCH = 4,
+    YGA_BASELINE = 5,
+    YGA_SPACE_BETWEEN = 6,
+    YGA_SPACE_AROUND = 7
 }
 
 declare const enum YGDirection {
-    YGDirectionInherit = 0,
-    YGDirectionLTR = 1,
-    YGDirectionRTL = 2,
-    UNRECOGNIZED = -1
+    YGD_INHERIT = 0,
+    YGD_LTR = 1,
+    YGD_RTL = 2
 }
 
 declare const enum YGDisplay {
-    YGDisplayFlex = 0,
-    YGDisplayNone = 1,
-    UNRECOGNIZED = -1
+    YGD_FLEX = 0,
+    YGD_NONE = 1
 }
 
 declare const enum YGFlexDirection {
-    YGFlexDirectionColumn = 0,
-    YGFlexDirectionColumnReverse = 1,
-    YGFlexDirectionRow = 2,
-    YGFlexDirectionRowReverse = 3,
-    UNRECOGNIZED = -1
+    YGFD_COLUMN = 0,
+    YGFD_COLUMN_REVERSE = 1,
+    YGFD_ROW = 2,
+    YGFD_ROW_REVERSE = 3
 }
 
 declare const enum YGJustify {
-    YGJustifyFlexStart = 0,
-    YGJustifyCenter = 1,
-    YGJustifyFlexEnd = 2,
-    YGJustifySpaceBetween = 3,
-    YGJustifySpaceAround = 4,
-    YGJustifySpaceEvenly = 5,
-    UNRECOGNIZED = -1
+    YGJ_FLEX_START = 0,
+    YGJ_CENTER = 1,
+    YGJ_FLEX_END = 2,
+    YGJ_SPACE_BETWEEN = 3,
+    YGJ_SPACE_AROUND = 4,
+    YGJ_SPACE_EVENLY = 5
 }
 
 declare const enum YGOverflow {
-    YGOverflowVisible = 0,
-    YGOverflowHidden = 1,
-    YGOverflowScroll = 2,
-    UNRECOGNIZED = -1
+    YGO_VISIBLE = 0,
+    YGO_HIDDEN = 1,
+    YGO_SCROLL = 2
 }
 
 declare const enum YGPositionType {
-    YGPositionTypeStatic = 0,
-    YGPositionTypeRelative = 1,
-    YGPositionTypeAbsolute = 2,
-    UNRECOGNIZED = -1
+    YGPT_STATIC = 0,
+    YGPT_RELATIVE = 1,
+    YGPT_ABSOLUTE = 2
 }
 
 declare const enum YGUnit {
-    YGUnitUndefined = 0,
-    YGUnitPoint = 1,
-    YGUnitPercent = 2,
-    YGUnitAuto = 3,
-    UNRECOGNIZED = -1
+    YGU_UNDEFINED = 0,
+    YGU_POINT = 1,
+    YGU_PERCENT = 2,
+    YGU_AUTO = 3
 }
 
 declare const enum YGWrap {
-    YGWrapNoWrap = 0,
-    YGWrapWrap = 1,
-    YGWrapWrapReverse = 2,
-    UNRECOGNIZED = -1
+    YGW_NO_WRAP = 0,
+    YGW_WRAP = 1,
+    YGW_WRAP_REVERSE = 2
 }
 
 

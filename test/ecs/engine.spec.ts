@@ -7,7 +7,7 @@ import { createRendererTransport } from '../../packages/@dcl/ecs/src/systems/crd
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { TransformSchema } from '../../packages/@dcl/ecs/src/components/legacy/Transform'
 import { Vector3 } from '../../packages/@dcl/ecs/src/runtime/Math'
-import { setupDclInterfaceForThisSuite, testingExperimentalAPI } from './utils'
+import { setupDclInterfaceForThisSuite, testingExperimentalApi } from './utils'
 
 const PositionSchema = {
   x: Schemas.Float
@@ -18,7 +18,7 @@ const VelocitySchema = {
 }
 
 describe('Engine tests', () => {
-  const engineApi = testingExperimentalAPI()
+  const engineApi = testingExperimentalApi()
   setupDclInterfaceForThisSuite({
     ...engineApi.modules
   })
@@ -516,14 +516,6 @@ describe('Engine tests', () => {
     expect(engine.removeSystem(systemA)).toBe(true)
     engine.update(0)
     expect(array).toStrictEqual(['C'])
-  })
-
-  it('should remove the component after the update', () => {
-    const engine = Engine()
-    const entity = engine.addEntity()
-    engine.baseComponents.OnPointerDownResult.create(entity)
-    engine.update(1 / 30)
-    expect(engine.baseComponents.OnPointerDownResult.has(entity)).toBe(false)
   })
 
   it('should not remove the component after the update', () => {

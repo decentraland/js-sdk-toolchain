@@ -5,8 +5,8 @@
  * init and it'll be changing.
  */
 
-import { ActionButton } from '../components/generated/pb/ecs/components/common/ActionButton.gen'
-import { PointerEventType } from '../components/generated/pb/ecs/components/PointerEvents.gen'
+import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
+import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_events.gen'
 import { Engine, Entity } from '../engine'
 import { createInput } from '../engine/input'
 import { createNetworkTransport } from '../systems/crdt/transports/networkTransport'
@@ -19,11 +19,11 @@ export const engine = Engine({
 })
 
 if (typeof dcl !== 'undefined') {
-  dcl.loadModule('~system/ExperimentalAPI', {}).catch(dcl.error)
+  dcl.loadModule('~system/ExperimentalApi', {}).catch(dcl.error)
 
   async function pullRendererMessages() {
     const response = await dcl.callRpc(
-      '~system/ExperimentalAPI',
+      '~system/ExperimentalApi',
       'messageFromRenderer',
       []
     )
@@ -54,24 +54,24 @@ export const Input = createInput(engine)
 /**
  * Check if an entity emitted a clicked event
  * @param entity the entity to query, for global clicks use `engine.RootEntity`
- * @param actionButton
+ * @param inputAction
  * @returns true if the entity was clicked in the last tick-update
  */
-export function wasEntityClicked(entity: Entity, actionButton: ActionButton) {
-  return Input.isClicked(actionButton, entity)
+export function wasEntityClicked(entity: Entity, inputAction: InputAction) {
+  return Input.isClicked(inputAction, entity)
 }
 
 /**
  * Check if a pointer event has been emited in the last tick-update.
  * @param entity the entity to query, for global clicks use `engine.RootEntity`
- * @param actionButton
+ * @param inputAction
  * @param pointerEventType
  * @returns
  */
 export function isPointerEventActive(
   entity: Entity,
-  actionButton: ActionButton,
+  inputAction: InputAction,
   pointerEventType: PointerEventType
 ) {
-  return Input.isInputActive(actionButton, pointerEventType, entity)
+  return Input.isInputActive(inputAction, pointerEventType, entity)
 }

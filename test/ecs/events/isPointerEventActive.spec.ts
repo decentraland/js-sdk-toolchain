@@ -1,7 +1,7 @@
 import { Entity } from '../../../packages/@dcl/ecs/src/engine/entity'
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/PointerEvents.gen'
-import { ActionButton } from '../../../packages/@dcl/ecs/src/components/generated/pb/ecs/components/common/ActionButton.gen'
 import { createInput } from '../../../packages/@dcl/ecs/src/engine/input'
+import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_events.gen'
+import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Events helpers isPointerEventActive', () => {
@@ -10,8 +10,8 @@ describe('Events helpers isPointerEventActive', () => {
     const isPointerEventActive = createInput(newEngine).isInputActive
     expect(
       isPointerEventActive(
-        ActionButton.ANY,
-        PointerEventType.DOWN,
+        InputAction.IA_ANY,
+        PointerEventType.PET_DOWN,
         newEngine.RootEntity
       )
     ).toBe(false)
@@ -24,17 +24,31 @@ describe('Events helpers isPointerEventActive', () => {
     const isPointerEventActive = createInput(newEngine).isInputActive
 
     PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [createTestPointerDownCommand(entity, 4, PointerEventType.DOWN)]
+      commands: [
+        createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)
+      ]
     })
 
     expect(
-      isPointerEventActive(ActionButton.POINTER, PointerEventType.DOWN, entity)
+      isPointerEventActive(
+        InputAction.IA_POINTER,
+        PointerEventType.PET_DOWN,
+        entity
+      )
     ).toBe(true)
     expect(
-      isPointerEventActive(ActionButton.POINTER, PointerEventType.UP, entity)
+      isPointerEventActive(
+        InputAction.IA_POINTER,
+        PointerEventType.PET_UP,
+        entity
+      )
     ).toBe(false)
     expect(
-      isPointerEventActive(ActionButton.ACTION_3, PointerEventType.UP, entity)
+      isPointerEventActive(
+        InputAction.IA_ACTION_3,
+        PointerEventType.PET_UP,
+        entity
+      )
     ).toBe(false)
   })
 
@@ -44,16 +58,26 @@ describe('Events helpers isPointerEventActive', () => {
     const entity = newEngine.addEntity()
     const isPointerEventActive = createInput(newEngine).isInputActive
     PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [createTestPointerDownCommand(entity, 4, PointerEventType.DOWN)]
+      commands: [
+        createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)
+      ]
     })
 
     expect(
-      isPointerEventActive(ActionButton.POINTER, PointerEventType.DOWN, entity)
+      isPointerEventActive(
+        InputAction.IA_POINTER,
+        PointerEventType.PET_DOWN,
+        entity
+      )
     ).toBe(true)
 
     newEngine.update(0)
     expect(
-      isPointerEventActive(ActionButton.POINTER, PointerEventType.DOWN, entity)
+      isPointerEventActive(
+        InputAction.IA_POINTER,
+        PointerEventType.PET_DOWN,
+        entity
+      )
     ).toBe(false)
   })
 
@@ -63,15 +87,17 @@ describe('Events helpers isPointerEventActive', () => {
     const entity = newEngine.addEntity()
     const isActionDown = createInput(newEngine).isActionDown
     PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [createTestPointerDownCommand(entity, 4, PointerEventType.DOWN)]
+      commands: [
+        createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)
+      ]
     })
 
     newEngine.update(0)
-    expect(isActionDown(ActionButton.POINTER)).toBe(true)
+    expect(isActionDown(InputAction.IA_POINTER)).toBe(true)
 
     // See this keep the true value after the update
     newEngine.update(0)
-    expect(isActionDown(ActionButton.POINTER)).toBe(true)
+    expect(isActionDown(InputAction.IA_POINTER)).toBe(true)
   })
 })
 
@@ -81,7 +107,7 @@ function createTestPointerDownCommand(
   state: PointerEventType
 ) {
   return {
-    button: ActionButton.POINTER,
+    button: InputAction.IA_POINTER,
     timestamp: timestamp,
     hit: {
       position: { x: 1, y: 2, z: 3 },
