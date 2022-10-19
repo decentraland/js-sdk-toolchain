@@ -106,7 +106,7 @@ function circularSystem(dt: number) {
 
     mutableTransform.rotation = Quaternion.multiply(
       mutableTransform.rotation,
-      Quaternion.angleAxis(dt * 10, Vector3.Up())
+      Quaternion.fromAngleAxis(dt * 10, Vector3.Up())
     )
   }
 }
