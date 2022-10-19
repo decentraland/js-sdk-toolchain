@@ -1,9 +1,9 @@
-import { Entity } from './entity'
-import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
-import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_events.gen'
 import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
-import { IEngine } from './types'
+import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_events.gen'
+import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
 import { Schemas } from '../schemas'
+import { Entity } from './entity'
+import { IEngine } from './types'
 
 /**
  * @public
@@ -12,8 +12,8 @@ export type IInput = {
   /**
    * Check if a click was emmited in the current tick for the input action.
    * This is defined when an UP event is triggered with a previously DOWN state.
-   * @param inputAction the input action to query
-   * @param entity the entity to query, ignore for global events.
+   * @param inputAction - the input action to query
+   * @param entity - the entity to query, ignore for global events.
    * @returns true if the entity was clicked in the last tick-update
    */
   wasJustClicked: (inputAction: InputAction, entity?: Entity) => boolean
@@ -37,6 +37,34 @@ export type IInput = {
    * @returns true if the input action is being pressed
    */
   isActionDown: (inputAction: InputAction) => boolean
+
+  /**
+   * Get the click info if a click was emmited in the current tick for the input action.
+   * This is defined when an UP event is triggered with a previously DOWN state.
+   * @param inputAction - the input action to query
+   * @param entity - the entity to query, ignore for global events.
+   * @returns the click info or undefined if there is no command in the last tick-update
+   */
+  getClick: (
+    inputAction: InputAction,
+    entity?: Entity
+  ) => {
+    up: PBPointerEventsResult_PointerCommand
+    down: PBPointerEventsResult_PointerCommand
+  } | null
+
+  /**
+   * Get the input command info if a pointer event has been emited in the last tick-update.
+   * @param inputAction - the input action to query
+   * @param pointerEventType - the pointer event type to query
+   * @param entity - the entity to query, ignore for global
+   * @returns the input command info or undefined if there is no command in the last tick-update
+   */
+  getInputCommand: (
+    inputAction: InputAction,
+    pointerEventType: PointerEventType,
+    entity?: Entity
+  ) => PBPointerEventsResult_PointerCommand | null
 }
 
 const InternalInputStateSchema = {
@@ -101,12 +129,12 @@ export function createInput(engine: IEngine): IInput {
   engine.addSystem(buttonStateUpdateSystem, ButtonStateUpdateSystemPriority)
   engine.addSystem(timestampUpdateSystem, TimestampUpdateSystemPriority)
 
-  function wasJustClicked(inputAction: InputAction, entity?: Entity) {
+  function getClick(inputAction: InputAction, entity?: Entity) {
     const component = engine.baseComponents.PointerEventsResult.getOrNull(
       engine.RootEntity
     )
 
-    if (!component) return false
+    if (!component) return null
 
     const commands = component.commands
 
@@ -125,8 +153,8 @@ export function createInput(engine: IEngine): IInput {
       entity
     )
 
-    if (!down) return false
-    if (!up) return false
+    if (!down) return null
+    if (!up) return null
 
     const state = InternalInputStateComponent.get(engine.RootEntity)
 
@@ -138,12 +166,12 @@ export function createInput(engine: IEngine): IInput {
       InternalInputStateComponent.getMutable(
         engine.RootEntity
       ).currentTimestamp = Math.max(up.timestamp, state.currentTimestamp)
-      return true // clicked
+      return { up, down }
     }
-    return false
+    return null
   }
 
-  function wasInputJustActive(
+  function getInputCommand(
     inputAction: InputAction,
     pointerEventType: PointerEventType,
     entity?: Entity
@@ -151,7 +179,7 @@ export function createInput(engine: IEngine): IInput {
     const component = engine.baseComponents.PointerEventsResult.getOrNull(
       engine.RootEntity
     )
-    if (!component) return false
+    if (!component) return null
 
     // We search the last pointer Event command sorted by timestamp
     const command = findLastAction(
@@ -160,17 +188,29 @@ export function createInput(engine: IEngine): IInput {
       inputAction,
       entity
     )
-    if (!command) return false
+    if (!command) return null
 
     const state = InternalInputStateComponent.get(engine.RootEntity)
     if (command.timestamp > state.timestampLastUpdate) {
       InternalInputStateComponent.getMutable(
         engine.RootEntity
       ).currentTimestamp = Math.max(command.timestamp, state.currentTimestamp)
-      return true // up component is from an old click
+      return command
     } else {
-      return false
+      return null
     }
+  }
+
+  function wasJustClicked(inputAction: InputAction, entity?: Entity) {
+    return getClick(inputAction, entity) !== null
+  }
+
+  function wasInputJustActive(
+    inputAction: InputAction,
+    pointerEventType: PointerEventType,
+    entity?: Entity
+  ) {
+    return getInputCommand(inputAction, pointerEventType, entity) !== null
   }
 
   function isActionDown(inputAction: InputAction) {
@@ -181,6 +221,8 @@ export function createInput(engine: IEngine): IInput {
 
   return {
     isActionDown,
+    getClick,
+    getInputCommand,
     wasJustClicked,
     wasInputJustActive
   }
