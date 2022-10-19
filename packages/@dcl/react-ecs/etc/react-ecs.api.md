@@ -252,11 +252,16 @@ export interface PBUiTransform {
 
 // @public (undocumented)
 export type Position = {
-    top: number | string;
-    right: number | string;
-    bottom: number | string;
-    left: number | string;
+    top: PositionUnit;
+    right: PositionUnit;
+    bottom: PositionUnit;
+    left: PositionUnit;
 };
+
+// Warning: (ae-missing-release-tag) "PositionUnit" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type PositionUnit = `${number}px` | `${number}%` | number;
 
 // Warning: (ae-missing-release-tag) "ReactEcs" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -342,8 +347,6 @@ export interface UiTransformProps {
     // (undocumented)
     alignSelf?: YGAlign;
     // (undocumented)
-    border?: Position;
-    // (undocumented)
     direction?: YGDirection;
     // (undocumented)
     display?: YGDisplay;
@@ -360,29 +363,29 @@ export interface UiTransformProps {
     // (undocumented)
     flexWrap?: YGWrap;
     // (undocumented)
-    height?: number;
+    height?: PositionUnit;
     // (undocumented)
     justifyContent?: YGJustify;
     // (undocumented)
-    margin?: Position;
+    margin?: Partial<Position>;
     // (undocumented)
-    maxHeight?: number;
+    maxHeight?: PositionUnit;
     // (undocumented)
-    maxWidth?: number;
+    maxWidth?: PositionUnit;
     // (undocumented)
-    minHeight?: number;
+    minHeight?: PositionUnit;
     // (undocumented)
-    minWidth?: number;
+    minWidth?: PositionUnit;
     // (undocumented)
     overflow?: YGOverflow;
     // (undocumented)
-    padding?: Position;
+    padding?: Partial<Position>;
     // (undocumented)
-    position?: Position;
+    position?: Partial<Position>;
     // (undocumented)
     positionType?: YGPositionType;
     // (undocumented)
-    width?: number;
+    width?: PositionUnit;
 }
 
 // Warning: (ae-missing-release-tag) "YGAlign" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)

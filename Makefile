@@ -29,8 +29,9 @@ lint:
 lint-fix:
 	node_modules/.bin/eslint . --ext .ts --fix
 
+TESTARGS ?= test/
 test:
-	node_modules/.bin/jest --detectOpenHandles --colors test/ $(TESTARGS)
+	node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS)
 
 test-coverage:
 	node_modules/.bin/jest --detectOpenHandles --colors --coverage test/ $(TESTARGS)
