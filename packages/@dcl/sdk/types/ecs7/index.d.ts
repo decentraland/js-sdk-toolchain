@@ -30,6 +30,14 @@ declare const enum AvatarModifierType {
 /** @public */
 declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
 
+declare interface AvatarTexture {
+    userId: string;
+    /** default = TextureWrapMode.Clamp */
+    wrapMode?: TextureWrapMode | undefined;
+    /** default = FilterMode.Bilinear */
+    filterMode?: TextureFilterMode | undefined;
+}
+
 /** @public */
 declare const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
 
@@ -2601,19 +2609,17 @@ declare interface PBGltfContainer {
 
 declare interface PBMaterial {
     /** default = null */
-    texture: PBMaterial_Texture | undefined;
-    /** default = null */
-    avatarTexture: PBMaterial_AvatarTexture | undefined;
+    texture?: Texture | undefined;
     /** default = 0.5. range value: from 0 to 1 */
     alphaTest?: number | undefined;
     /** default =  true */
     castShadows?: boolean | undefined;
     /** default = null */
-    alphaTexture?: PBMaterial_Texture | undefined;
+    alphaTexture?: SRCTexture | undefined;
     /** default = null */
-    emissiveTexture?: PBMaterial_Texture | undefined;
+    emissiveTexture?: SRCTexture | undefined;
     /** default = null */
-    bumpTexture?: PBMaterial_Texture | undefined;
+    bumpTexture?: SRCTexture | undefined;
     /** default = white; */
     albedoColor?: Color3_2 | undefined;
     /** default = black; */
@@ -2634,22 +2640,6 @@ declare interface PBMaterial {
     emissiveIntensity?: number | undefined;
     /** default = 1 */
     directIntensity?: number | undefined;
-}
-
-declare interface PBMaterial_AvatarTexture {
-    userId: string;
-    /** default = TextureWrapMode.Clamp */
-    wrapMode?: TextureWrapMode | undefined;
-    /** default = FilterMode.Bilinear */
-    filterMode?: TextureFilterMode | undefined;
-}
-
-declare interface PBMaterial_Texture {
-    src: string;
-    /** default = TextureWrapMode.Clamp */
-    wrapMode?: TextureWrapMode | undefined;
-    /** default = FilterMode.Bilinear */
-    filterMode?: TextureFilterMode | undefined;
 }
 
 declare interface PBMeshCollider {
@@ -3569,6 +3559,14 @@ declare interface Spec {
     [key: string]: ISchema;
 }
 
+declare interface SRCTexture {
+    src: string;
+    /** default = TextureWrapMode.Clamp */
+    wrapMode?: TextureWrapMode | undefined;
+    /** default = FilterMode.Bilinear */
+    filterMode?: TextureFilterMode | undefined;
+}
+
 /**
  * @public
  */
@@ -3588,6 +3586,13 @@ declare const enum TextAlignMode {
 
 /** @public */
 declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+
+declare interface Texture {
+    /** default = null */
+    srcTexture: SRCTexture | undefined;
+    /** default = null */
+    avatarTexture: AvatarTexture | undefined;
+}
 
 declare const enum TextureFilterMode {
     TFM_POINT = 0,

@@ -1,8 +1,10 @@
 import {
-  TextureFilterMode,
-  TextureWrapMode,
   MaterialTransparencyMode
 } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/material.gen'
+import {
+  TextureFilterMode,
+  TextureWrapMode
+} from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/common/texture.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated Material ProtoBuf', () => {
@@ -15,14 +17,16 @@ describe('Generated Material ProtoBuf', () => {
     const _material = Material.create(entity, {
       ...Material.default(),
       texture: {
-        wrapMode: TextureWrapMode.TWM_CLAMP,
-        filterMode: undefined,
-        src: 'not-casla'
-      },
-      avatarTexture: {
-        userId: 'user-id-dummy',
-        wrapMode: TextureWrapMode.TWM_CLAMP,
-        filterMode: undefined
+        srcTexture: {
+          wrapMode: TextureWrapMode.TWM_CLAMP,
+          filterMode: undefined,
+          src: 'not-casla'
+        },
+        avatarTexture: {
+          userId: 'user-id-dummy',
+          wrapMode: TextureWrapMode.TWM_CLAMP,
+          filterMode: undefined
+        }
       },
       alphaTexture: {
         filterMode: undefined,
@@ -62,13 +66,15 @@ describe('Generated Material ProtoBuf', () => {
         src: 'not-casla'
       },
       texture: {
-        wrapMode: TextureWrapMode.TWM_REPEAT,
-        src: 'not-casla'
-      },
-      avatarTexture: {
-        userId: '',
-        wrapMode: TextureWrapMode.TWM_REPEAT,
-        filterMode: undefined
+        srcTexture: {
+          wrapMode: TextureWrapMode.TWM_REPEAT,
+          src: 'not-casla'
+        },
+        avatarTexture: {
+          userId: '',
+          wrapMode: TextureWrapMode.TWM_REPEAT,
+          filterMode: undefined
+        }
       },
       castShadows: true,
       directIntensity: 1,
