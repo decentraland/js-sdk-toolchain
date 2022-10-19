@@ -24,14 +24,15 @@ export {
   YGWrap
 }
 
+export type PositionUnit = `${number}px` | `${number}%` | number
 /**
  * @public
  */
 export type Position = {
-  top: number | string
-  right: number | string
-  bottom: number | string
-  left: number | string
+  top: PositionUnit
+  right: PositionUnit
+  bottom: PositionUnit
+  left: PositionUnit
 }
 
 export const CANVAS_ROOT_ENTITY = 7
@@ -48,17 +49,16 @@ export interface UiTransformProps {
   alignSelf?: YGAlign
   alignContent?: YGAlign
   flexDirection?: YGFlexDirection
-  position?: Position
-  padding?: Position
-  margin?: Position
-  border?: Position
+  position?: Partial<Position>
+  padding?: Partial<Position>
+  margin?: Partial<Position>
   direction?: YGDirection
-  width?: number
-  height?: number
-  minWidth?: number
-  maxWidth?: number
-  minHeight?: number
-  maxHeight?: number
+  width?: PositionUnit
+  height?: PositionUnit
+  minWidth?: PositionUnit
+  maxWidth?: PositionUnit
+  minHeight?: PositionUnit
+  maxHeight?: PositionUnit
   flexWrap?: YGWrap
   flexBasis?: number
   flexGrow?: number
