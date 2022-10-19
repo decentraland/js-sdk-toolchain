@@ -1,3 +1,4 @@
+import { parsePosition, parseSize } from './utils'
 import {
   PBUiTransform,
   YGAlign,
@@ -17,12 +18,31 @@ export const CANVAS_ROOT_ENTITY = 0
 /**
  * @public
  */
-export function parseUiTransform(
-  props: UiTransformProps | undefined
-): PBUiTransform {
+export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
+  const {
+    position,
+    padding,
+    margin,
+    height,
+    minHeight,
+    maxHeight,
+    width,
+    maxWidth,
+    minWidth,
+    ...otherProps
+  } = props
   return {
     ...defaultDiv,
-    ...(props || {})
+    ...(otherProps || {}),
+    ...parsePosition(position, 'position'),
+    ...parsePosition(margin, 'margin'),
+    ...parsePosition(padding, 'padding'),
+    ...parseSize(height, 'height'),
+    ...parseSize(minHeight, 'minHeight'),
+    ...parseSize(maxHeight, 'maxHeight'),
+    ...parseSize(width, 'width'),
+    ...parseSize(minWidth, 'minWidth'),
+    ...parseSize(maxWidth, 'maxWidth')
   }
 }
 
@@ -49,37 +69,37 @@ export const defaultDiv: PBUiTransform = {
   flexShrink: 1,
   flex: 1,
   marginBottom: 0,
-  marginBottomUnit: YGUnit.YGU_POINT,
+  marginBottomUnit: YGUnit.YGU_UNDEFINED,
   marginLeft: 0,
-  marginLeftUnit: YGUnit.YGU_POINT,
+  marginLeftUnit: YGUnit.YGU_UNDEFINED,
   marginRight: 0,
-  marginRightUnit: YGUnit.YGU_POINT,
+  marginRightUnit: YGUnit.YGU_UNDEFINED,
   marginTop: 0,
-  marginTopUnit: YGUnit.YGU_POINT,
-  maxHeightUnit: YGUnit.YGU_POINT,
-  maxWidthUnit: YGUnit.YGU_POINT,
-  minHeightUnit: YGUnit.YGU_POINT,
-  minWidthUnit: YGUnit.YGU_POINT,
+  marginTopUnit: YGUnit.YGU_UNDEFINED,
+  maxHeightUnit: YGUnit.YGU_UNDEFINED,
+  maxWidthUnit: YGUnit.YGU_UNDEFINED,
+  minHeightUnit: YGUnit.YGU_UNDEFINED,
+  minWidthUnit: YGUnit.YGU_UNDEFINED,
   overflow: YGOverflow.YGO_VISIBLE,
   paddingBottom: 0,
   paddingBottomUnit: YGUnit.YGU_PERCENT,
   paddingLeft: 0,
   paddingLeftUnit: YGUnit.YGU_UNDEFINED,
-  paddingTopUnit: YGUnit.YGU_POINT,
+  paddingTopUnit: YGUnit.YGU_UNDEFINED,
   paddingRight: 0,
-  paddingRightUnit: YGUnit.YGU_POINT,
+  paddingRightUnit: YGUnit.YGU_UNDEFINED,
   paddingTop: 0,
   positionBottom: 0,
-  positionBottomUnit: YGUnit.YGU_POINT,
+  positionBottomUnit: YGUnit.YGU_UNDEFINED,
   positionLeft: 0,
-  positionLeftUnit: YGUnit.YGU_POINT,
+  positionLeftUnit: YGUnit.YGU_UNDEFINED,
   positionRight: 0,
-  positionRightUnit: YGUnit.YGU_POINT,
+  positionRightUnit: YGUnit.YGU_UNDEFINED,
   positionTop: 0,
-  positionTopUnit: YGUnit.YGU_POINT,
-  flexBasisUnit: YGUnit.YGU_POINT,
-  widthUnit: YGUnit.YGU_POINT,
-  heightUnit: YGUnit.YGU_POINT,
+  positionTopUnit: YGUnit.YGU_UNDEFINED,
+  flexBasisUnit: YGUnit.YGU_UNDEFINED,
+  widthUnit: YGUnit.YGU_UNDEFINED,
+  heightUnit: YGUnit.YGU_UNDEFINED,
   borderBottom: 0,
   borderLeft: 0,
   borderRight: 0,

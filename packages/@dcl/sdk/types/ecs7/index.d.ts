@@ -60,13 +60,699 @@ declare const enum ColliderLayer {
     CL_PHYSICS = 2
 }
 
-declare interface Color3 {
+/**
+ * @public
+ * Color3 is a type and a namespace.
+ * - The namespace contains all types and functions to operates with Color3
+ * - The type Color3 is an alias to Color3.ReadonlyColor3
+ * ```
+ *
+ * // Namespace usage example
+ * Color3.add(blue, red) // sum component by component resulting pink
+ *
+ * // Type usage example
+ * const readonlyBlue: Color3 = Color3.Blue()
+ * readonlyBlue.r = 0.1 // this FAILS
+ *
+ * // For mutable usage, use `Color3.Mutable`
+ * const blue: Color3.Mutable = Color3.Blue()
+ * blue.r = 0.1 // this WORKS
+ * ```
+ */
+declare type Color3 = Color3.ReadonlyColor3;
+
+/**
+ * @public
+ * Color3 is a type and a namespace.
+ * ```
+ * // The namespace contains all types and functions to operates with Color3
+ * Color3.add(blue, red) // sum component by component resulting pink
+ * // The type Color3 is an alias to Color3.ReadonlyColor3
+ * const readonlyBlue: Color3 = Color3.Blue()
+ * readonlyBlue.r = 0.1 // this FAILS
+ *
+ * // For mutable usage, use `Color3.Mutable`
+ * const blue: Color3.Mutable = Color3.Blue()
+ * blue.r = 0.1 // this WORKS
+ * ```
+ */
+declare namespace Color3 {
+    /**
+     * @public
+     * For external use, type with `Color3`, e.g. `const blackColor: Color3 = Color3.Black()`.
+     * For mutable typing, use `Color3.Mutable`, e.g. `const redColor: Color3.Mutable = Color3.Red()`.
+     */
+    export type ReadonlyColor3 = {
+        readonly r: number;
+        readonly g: number;
+        readonly b: number;
+    };
+    /**
+     * @public
+     * For external usage, type with `Color3`, e.g. `const blackColor: Color3 = Color3.Black()`.
+     * For mutable typing, use `Color3.Mutable`, e.g. `const redColor: Color3.Mutable = Color3.Red()`.
+     */
+    export type MutableColor3 = {
+        r: number;
+        g: number;
+        b: number;
+    };
+    /**
+     * @public
+     * Type with `Color3` for readonly usage, e.g. `const blackColor: Color3 = Color3.Black()`.
+     * For mutable, use `Color3.Mutable`, e.g. `const redColor: Color3.Mutable = Color3.Red()`.
+     */
+    export type Mutable = MutableColor3;
+    /**
+     * Creates Color3 object from red, green, blue values, all between 0 and 1
+     * @param r - defines the red component (between 0 and 1, default is 0)
+     * @param g - defines the green component (between 0 and 1, default is 0)
+     * @param b - defines the blue component (between 0 and 1, default is 0)
+     */
+    export function create(
+    /**
+     * Defines the red component (between 0 and 1, default is 0)
+     */
+    r?: number, 
+    /**
+     * Defines the green component (between 0 and 1, default is 0)
+     */
+    g?: number, 
+    /**
+     * Defines the blue component (between 0 and 1, default is 0)
+     */
+    b?: number): {
+        r: number;
+        g: number;
+        b: number;
+    };
+    /**
+     * Creates a Vector3 from the string containing valid hexadecimal values
+     * @param hex - defines a string containing valid hexadecimal values
+     * @returns a new Vector3
+     */
+    export function fromHexString(hex: string): MutableColor3;
+    /**
+     * Creates a new Vector3 from the starting index of the given array
+     * @param array - defines the source array
+     * @param offset - defines an offset in the source array
+     * @returns a new Vector3
+     */
+    export function fromArray(array: ArrayLike<number>, offset?: number): MutableColor3;
+    /**
+     * Creates a Vector3 from integer values (less than 256)
+     * @param r - defines the red component to read from (value between 0 and 255)
+     * @param g - defines the green component to read from (value between 0 and 255)
+     * @param b - defines the blue component to read from (value between 0 and 255)
+     * @returns a new Vector3
+     */
+    export function fromInts(r: number, g: number, b: number): MutableColor3;
+    /**
+     * Creates a Vector3 with values linearly interpolated of "amount" between the start Color3 and the end Color3
+     * @param start - defines the start Color3 value
+     * @param end - defines the end Color3 value
+     * @param amount - defines the gradient value between start and end
+     * @returns a new Vector3
+     */
+    export function lerp(start: ReadonlyColor3, end: ReadonlyColor3, amount: number): MutableColor3;
+    /**
+     * Creates a Vector3 with values linearly interpolated of "amount" between the start Color3 and the end Color3
+     * @param left - defines the start value
+     * @param right - defines the end value
+     * @param amount - defines the gradient factor
+     * @param result - defines the Color3 object where to store the result
+     */
+    export function lerpToRef(left: ReadonlyColor3, right: ReadonlyColor3, amount: number, result: MutableColor3): void;
+    /**
+     * Returns a Color3 value containing a red color
+     * @returns a new Vector3
+     */
+    export function Red(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a green color
+     * @returns a new Vector3
+     */
+    export function Green(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a blue color
+     * @returns a new Vector3
+     */
+    export function Blue(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a black color
+     * @returns a new Vector3
+     */
+    export function Black(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a white color
+     * @returns a new Vector3
+     */
+    export function White(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a purple color
+     * @returns a new Vector3
+     */
+    export function Purple(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a magenta color
+     * @returns a new Vector3
+     */
+    export function Magenta(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a yellow color
+     * @returns a new Vector3
+     */
+    export function Yellow(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a gray color
+     * @returns a new Vector3
+     */
+    export function Gray(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a teal color
+     * @returns a new Vector3
+     */
+    export function Teal(): MutableColor3;
+    /**
+     * Returns a Color3 value containing a random color
+     * @returns a new Vector3
+     */
+    export function Random(): MutableColor3;
+    /**
+     * Creates a string with the Color3 current values
+     * @returns the string representation of the Color3 object
+     */
+    export function toString(value: ReadonlyColor3): string;
+    /**
+     * Compute the Color3 hash code
+     * @returns an unique number that can be used to hash Color3 objects
+     */
+    export function getHashCode(value: ReadonlyColor3): number;
+    /**
+     * Stores in the given array from the given starting index the red, green, blue values as successive elements
+     * @param array - defines the array where to store the r,g,b components
+     * @param index - defines an optional index in the target array to define where to start storing values
+     *
+     */
+    export function toArray(value: ReadonlyColor3, array: FloatArray, index?: number): void;
+    /**
+     * Returns a new Color4 object from the current Color3 and the given alpha
+     * @param alpha - defines the alpha component on the new Color4 object (default is 1)
+     * @returns a new Color4 object
+     */
+    export function toColor4(value: ReadonlyColor3, alpha?: number): Color4.MutableColor4;
+    /**
+     * Returns a new array populated with 3 numeric elements : red, green and blue values
+     * @returns the new array
+     */
+    export function asArray(value: ReadonlyColor3): number[];
+    /**
+     * Returns the luminance value
+     * @returns a float value
+     */
+    export function toLuminance(value: ReadonlyColor3): number;
+    /**
+     * Multiply each Color3 rgb values by the given Color3 rgb values in Color3 object
+     * @param otherColor - defines the second operand
+     * @returns the create object
+     */
+    export function multiply(value: ReadonlyColor3, otherColor: ReadonlyColor3): MutableColor3;
+    /**
+     * Multiply the rgb values of the Color3 and the given Color3 and stores the result in the object "result"
+     * @param otherColor - defines the second operand
+     * @param result - defines the Color3 object where to store the result
+     * @returns the current Color3
+     */
+    export function multiplyToRef(value: ReadonlyColor3, otherColor: ReadonlyColor3, result: MutableColor3): void;
+    /**
+     * Determines equality between Color3 objects
+     * @param otherColor - defines the second operand
+     * @returns true if the rgb values are equal to the given ones
+     */
+    export function equals(value: ReadonlyColor3, otherColor: ReadonlyColor3): boolean;
+    /**
+     * Determines equality between the current Color3 object and a set of r,b,g values
+     * @param r - defines the red component to check
+     * @param g - defines the green component to check
+     * @param b - defines the blue component to check
+     * @returns true if the rgb values are equal to the given ones
+     */
+    export function equalsFloats(value: ReadonlyColor3, r: number, g: number, b: number): boolean;
+    /**
+     * Multiplies in place each rgb value by scale
+     * @param scale - defines the scaling factor
+     * @returns the updated Color3
+     */
+    export function scale(value: ReadonlyColor3, scale: number): MutableColor3;
+    /**
+     * Multiplies the rgb values by scale and stores the result into "result"
+     * @param scale - defines the scaling factor
+     * @param result - defines the Color3 object where to store the result
+     * @returns the unmodified current Color3
+     */
+    export function scaleToRef(value: ReadonlyColor3, scale: number, result: MutableColor3): void;
+    /**
+     * Scale the current Color3 values by a factor and add the result to a given Color3
+     * @param scale - defines the scale factor
+     * @param result - defines color to store the result into
+     * @returns the unmodified current Color3
+     */
+    export function scaleAndAddToRef(value: ReadonlyColor3, scale: number, result: MutableColor3): void;
+    /**
+     * Clamps the rgb values by the min and max values and stores the result into "result"
+     * @param min - defines minimum clamping value (default is 0)
+     * @param max - defines maximum clamping value (default is 1)
+     * @param result - defines color to store the result into
+     * @returns the original Color3
+     */
+    export function clampToRef(value: ReadonlyColor3, min: number | undefined, max: number | undefined, result: MutableColor3): void;
+    /**
+     * Clamps the rgb values by the min and max values and returns the result
+     * @param min - defines minimum clamping value (default is 0)
+     * @param max - defines maximum clamping value (default is 1)
+     * @returns result
+     */
+    export function clamp(value: ReadonlyColor3, min?: number, max?: number): MutableColor3;
+    /**
+     * Creates Color3 set with the added values of the current Color3 and of the given one
+     * @param otherColor - defines the second operand
+     * @returns the create
+     */
+    export function add(value: ReadonlyColor3, otherColor: ReadonlyColor3): MutableColor3;
+    /**
+     * Stores the result of the addition of the current Color3 and given one rgb values into "result"
+     * @param otherColor - defines the second operand
+     * @param result - defines Color3 object to store the result into
+     * @returns the unmodified current Color3
+     */
+    export function addToRef(value: ReadonlyColor3, otherColor: ReadonlyColor3, result: MutableColor3): void;
+    /**
+     * Returns Color3 set with the subtracted values of the given one from the current Color3
+     * @param otherColor - defines the second operand
+     * @returns the create
+     */
+    export function subtract(value: ReadonlyColor3, otherColor: ReadonlyColor3): MutableColor3;
+    /**
+     * Stores the result of the subtraction of given one from the current Color3 rgb values into "result"
+     * @param otherColor - defines the second operand
+     * @param result - defines Color3 object to store the result into
+     * @returns the unmodified current Color3
+     */
+    export function subtractToRef(value: ReadonlyColor3, otherColor: ReadonlyColor3, result: MutableColor3): void;
+    /**
+     * Copy the current object
+     * @returns Color3 copied the current one
+     */
+    export function clone(value: ReadonlyColor3): MutableColor3;
+    /**
+     * Copies the rgb values from the source in the current Color3
+     * @param source - defines the source Color3 object
+     * @returns the updated Color3 object
+     */
+    export function copyFrom(source: ReadonlyColor3, dest: MutableColor3): void;
+    /**
+     * Updates the Color3 rgb values from the given floats
+     * @param dest -
+     * @param r - defines the red component to read from
+     * @param g - defines the green component to read from
+     * @param b - defines the blue component to read from
+     * @returns
+     */
+    export function set(dest: MutableColor3, r: number, g: number, b: number): void;
+    /**
+     * Compute the Color3 hexadecimal code as a string
+     * @returns a string containing the hexadecimal representation of the Color3 object
+     */
+    export function toHexString(value: ReadonlyColor3): string;
+    /**
+     * Computes Color3 converted from the current one to linear space
+     * @returns a new Vector3
+     */
+    export function toLinearSpace(value: ReadonlyColor3): MutableColor3;
+    /**
+     * Converts the Color3 values to linear space and stores the result in "convertedColor"
+     * @param convertedColor - defines the Color3 object where to store the linear space version
+     * @returns the unmodified Color3
+     */
+    export function toLinearSpaceToRef(value: ReadonlyColor3, convertedColor: MutableColor3): void;
+    /**
+     * Computes Color3 converted from the current one to gamma space
+     * @returns a new Vector3
+     */
+    export function toGammaSpace(value: ReadonlyColor3): ReadonlyColor3;
+    /**
+     * Converts the Color3 values to gamma space and stores the result in "convertedColor"
+     * @param convertedColor - defines the Color3 object where to store the gamma space version
+     * @returns the unmodified Color3
+     */
+    export function toGammaSpaceToRef(value: ReadonlyColor3, convertedColor: MutableColor3): void;
+}
+
+declare interface Color3_2 {
     r: number;
     g: number;
     b: number;
 }
 
-declare interface Color4 {
+/**
+ * @public
+ * Color4 is a type and a namespace.
+ * - The namespace contains all types and functions to operates with Color4
+ * - The type Color4 is an alias to Color4.ReadonlyColor4
+ * ```
+ *
+ * // Namespace usage example
+ * Color4.add(blue, red) // sum component by component resulting pink
+ *
+ * // Type usage example
+ * const readonlyBlue: Color4 = Color4.Blue()
+ * readonlyBlue.a = 0.1 // this FAILS
+ *
+ * // For mutable usage, use `Color4.Mutable`
+ * const blue: Color4.Mutable = Color4.Blue()
+ * blue.a = 0.1 // this WORKS
+ * ```
+ */
+declare type Color4 = Color4.ReadonlyColor4;
+
+/**
+ * @public
+ * Color4 is a type and a namespace.
+ * ```
+ * // The namespace contains all types and functions to operates with Color4
+ * Color4.add(blue, red) // sum component by component resulting pink
+ * // The type Color4 is an alias to Color4.ReadonlyColor4
+ * const readonlyBlue: Color4 = Color4.Blue()
+ * readonlyBlue.a = 0.1 // this FAILS
+ *
+ * // For mutable usage, use `Color4.Mutable`
+ * const blue: Color4.Mutable = Color4.Blue()
+ * blue.a = 0.1 // this WORKS
+ * ```
+ */
+declare namespace Color4 {
+    /**
+     * @public
+     * For external use, type with `Color4`, e.g. `const blackColor: Color4 = Color4.Black()`.
+     * For mutable typing, use `Color4.Mutable`, e.g. `const redColor: Color4.Mutable = Color4.Red()`.
+     */
+    export type ReadonlyColor4 = {
+        readonly r: number;
+        readonly g: number;
+        readonly b: number;
+        readonly a: number;
+    };
+    /**
+     * @public
+     * For external usage, type with `Color4`, e.g. `const blackColor: Color4 = Color4.Black()`.
+     * For mutable typing, use `Color4.Mutable`, e.g. `const redColor: Color4.Mutable = Color4.Red()`.
+     */
+    export type MutableColor4 = {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    };
+    /**
+     * @public
+     * Type with `Color4` for readonly usage, e.g. `const blackColor: Color4 = Color4.Black()`.
+     * For mutable, use `Color4.Mutable`, e.g. `const redColor: Color4.Mutable = Color4.Red()`.
+     */
+    export type Mutable = MutableColor4;
+    /**
+     * Creates create mutable Color4 from red, green, blue values, all between 0 and 1
+     * @param r - defines the red component (between 0 and 1, default is 0)
+     * @param g - defines the green component (between 0 and 1, default is 0)
+     * @param b - defines the blue component (between 0 and 1, default is 0)
+     * @param a - defines the alpha component (between 0 and 1, default is 1)
+     */
+    export function create(
+    /**
+     * Defines the red component (between 0 and 1, default is 0)
+     */
+    r?: number, 
+    /**
+     * Defines the green component (between 0 and 1, default is 0)
+     */
+    g?: number, 
+    /**
+     * Defines the blue component (between 0 and 1, default is 0)
+     */
+    b?: number, 
+    /**
+     * Defines the alpha component (between 0 and 1, default is 1)
+     */
+    a?: number): MutableColor4;
+    /**
+     * Creates a Color4 from the string containing valid hexadecimal values
+     * @param hex - defines a string containing valid hexadecimal values
+     * @returns create mutable Color4
+     */
+    export function fromHexString(hex: string): MutableColor4;
+    /**
+     * Creates create mutable Color4  set with the linearly interpolated values of "amount" between the left Color4 object and the right Color4 object
+     * @param left - defines the start value
+     * @param right - defines the end value
+     * @param amount - defines the gradient factor
+     * @returns create mutable Color4
+     */
+    export function lerp(left: ReadonlyColor4, right: ReadonlyColor4, amount: number): MutableColor4;
+    /**
+     * Set the given "result" with the linearly interpolated values of "amount" between the left Color4 object and the right Color4 object
+     * @param left - defines the start value
+     * @param right - defines the end value
+     * @param amount - defines the gradient factor
+     * @param result - defines the Color4 object where to store data
+     */
+    export function lerpToRef(left: ReadonlyColor4, right: ReadonlyColor4, amount: number, result: MutableColor4): void;
+    /**
+     * Returns a Color4 value containing a red color
+     * @returns a new Color4
+     */
+    export function Red(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a green color
+     * @returns create mutable Color4
+     */
+    export function Green(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a blue color
+     * @returns create mutable Color4
+     */
+    export function Blue(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a black color
+     * @returns create mutable Color4
+     */
+    export function Black(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a white color
+     * @returns create mutable Color4
+     */
+    export function White(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a purple color
+     * @returns create mutable Color4
+     */
+    export function Purple(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a magenta color
+     * @returns create mutable Color4
+     */
+    export function Magenta(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a yellow color
+     * @returns create mutable Color4
+     */
+    export function Yellow(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a gray color
+     * @returns create mutable Color4
+     */
+    export function Gray(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a teal color
+     * @returns create mutable Color4
+     */
+    export function Teal(): MutableColor4;
+    /**
+     * Returns a Color4 value containing a transparent color
+     * @returns create mutable Color4
+     */
+    export function Clear(): MutableColor4;
+    /**
+     * Creates a Color4 from a Color3 and an alpha value
+     * @param color3 - defines the source Color3 to read from
+     * @param alpha - defines the alpha component (1.0 by default)
+     * @returns create mutable Color4
+     */
+    export function fromColor3(color3: Color3.ReadonlyColor3, alpha?: number): MutableColor4;
+    /**
+     * Creates a Color4 from the starting index element of the given array
+     * @param array - defines the source array to read from
+     * @param offset - defines the offset in the source array
+     * @returns create mutable Color4
+     */
+    export function fromArray(array: ArrayLike<number>, offset?: number): ReadonlyColor4;
+    /**
+     * Creates a new Color3 from integer values (less than 256)
+     * @param r - defines the red component to read from (value between 0 and 255)
+     * @param g - defines the green component to read from (value between 0 and 255)
+     * @param b - defines the blue component to read from (value between 0 and 255)
+     * @param a - defines the alpha component to read from (value between 0 and 255)
+     * @returns a new Color4
+     */
+    export function fromInts(r: number, g: number, b: number, a: number): MutableColor4;
+    /**
+     * Check the content of a given array and convert it to an array containing RGBA data
+     * If the original array was already containing count * 4 values then it is returned directly
+     * @param colors - defines the array to check
+     * @param count - defines the number of RGBA data to expect
+     * @returns an array containing count * 4 values (RGBA)
+     */
+    export function checkColors4(colors: number[], count: number): number[];
+    /**
+     * Adds  the given Color4 values to the ref Color4 object
+     * @param a - defines the first operand
+     * @param b - defines the second operand
+     * @param ref - defines the result rference
+     * @returns
+     */
+    export function addToRef(a: ReadonlyColor4, b: ReadonlyColor4, ref: MutableColor4): void;
+    /**
+     * Stores from the starting index in the given array the Color4 successive values
+     * @param array - defines the array where to store the r,g,b components
+     * @param index - defines an optional index in the target array to define where to start storing values
+     * @returns the current Color4 object
+     */
+    export function toArray(value: ReadonlyColor4, array: number[], index?: number): void;
+    /**
+     * Creates a Color4 set with the added values of the current Color4 and of the given one
+     * @param right - defines the second operand
+     * @returns create mutable Color4
+     */
+    export function add(value: ReadonlyColor4, right: ReadonlyColor4): MutableColor4;
+    /**
+     * Creates a Color4 set with the subtracted values of the given one from the current Color4
+     * @param right - defines the second operand
+     * @returns create mutable Color4
+     */
+    export function subtract(value: ReadonlyColor4, right: ReadonlyColor4): ReadonlyColor4;
+    /**
+     * Subtracts the given ones from the current Color4 values and stores the results in "result"
+     * @param right - defines the second operand
+     * @param result - defines the Color4 object where to store the result
+     * @returns the current Color4 object
+     */
+    export function subtractToRef(a: ReadonlyColor4, b: ReadonlyColor4, result: MutableColor4): void;
+    /**
+     * Creates a Color4 with the current Color4 values multiplied by scale
+     * @param scale - defines the scaling factor to apply
+     * @returns create mutable Color4
+     */
+    export function scale(value: ReadonlyColor4, scale: number): ReadonlyColor4;
+    /**
+     * Multiplies the current Color4 values by scale and stores the result in "result"
+     * @param scale - defines the scaling factor to apply
+     * @param result - defines the Color4 object where to store the result
+     */
+    export function scaleToRef(value: ReadonlyColor4, scale: number, result: MutableColor4): void;
+    /**
+     * Scale the current Color4 values by a factor and add the result to a given Color4
+     * @param scale - defines the scale factor
+     * @param result - defines the Color4 object where to store the result
+     */
+    export function scaleAndAddToRef(value: ReadonlyColor4, scale: number, result: MutableColor4): void;
+    /**
+     * Clamps the rgb values by the min and max values and stores the result into "result"
+     * @param min - defines minimum clamping value (default is 0)
+     * @param max - defines maximum clamping value (default is 1)
+     * @param result - defines color to store the result into.
+     */
+    export function clampToRef(value: ReadonlyColor4, min: number | undefined, max: number | undefined, result: MutableColor4): void;
+    /**
+     * Multipy an Color4 value by another and return create mutable Color4
+     * @param color - defines the Color4 value to multiply by
+     * @returns create mutable Color4
+     */
+    export function multiply(value: ReadonlyColor4, color: ReadonlyColor4): ReadonlyColor4;
+    /**
+     * Multipy a Color4 value by another and push the result in a reference value
+     * @param color - defines the Color4 value to multiply by
+     * @param result - defines the Color4 to fill the result in
+     * @returns the result Color4
+     */
+    export function multiplyToRef(value: ReadonlyColor4, color: ReadonlyColor4, result: MutableColor4): void;
+    /**
+     * Creates a string with the Color4 current values
+     * @returns the string representation of the Color4 object
+     */
+    export function toString(value: ReadonlyColor4): string;
+    /**
+     * Compute the Color4 hash code
+     * @returns an unique number that can be used to hash Color4 objects
+     */
+    export function getHashCode(value: ReadonlyColor4): number;
+    /**
+     * Creates a Color4 copied from the current one
+     * @returns create mutable Color4
+     */
+    export function clone(value: ReadonlyColor4): MutableColor4;
+    /**
+     * Copies the given Color4 values into the destination
+     * @param source - defines the source Color4 object
+     * @param dest - defines the destination Color4 object
+     * @returns
+     */
+    export function copyFrom(source: ReadonlyColor4, dest: MutableColor4): void;
+    /**
+     * Copies the given float values into the current one
+     * @param r - defines the red component to read from
+     * @param g - defines the green component to read from
+     * @param b - defines the blue component to read from
+     * @param a - defines the alpha component to read from
+     * @returns the current updated Color4 object
+     */
+    export function copyFromFloats(r: number, g: number, b: number, a: number, dest: MutableColor4): void;
+    /**
+     * Copies the given float values into the current one
+     * @param r - defines the red component to read from
+     * @param g - defines the green component to read from
+     * @param b - defines the blue component to read from
+     * @param a - defines the alpha component to read from
+     * @returns the current updated Color4 object
+     */
+    export function set(r: number, g: number, b: number, a: number, dest: MutableColor4): void;
+    /**
+     * Compute the Color4 hexadecimal code as a string
+     * @returns a string containing the hexadecimal representation of the Color4 object
+     */
+    export function toHexString(value: ReadonlyColor4): string;
+    /**
+     * Computes a Color4 converted from the current one to linear space
+     * @returns create mutable Color4
+     */
+    export function toLinearSpace(value: ReadonlyColor4): MutableColor4;
+    /**
+     * Converts the Color4 values to linear space and stores the result in "convertedColor"
+     * @param convertedColor - defines the Color4 object where to store the linear space version
+     * @returns the unmodified Color4
+     */
+    export function toLinearSpaceToRef(value: ReadonlyColor4, ref: MutableColor4): void;
+    /**
+     * Computes a Color4 converted from the current one to gamma space
+     * @returns create mutable Color4
+     */
+    export function toGammaSpace(value: ReadonlyColor4): ReadonlyColor4;
+    /**
+     * Converts the Color4 values to gamma space and stores the result in "convertedColor"
+     * @param convertedColor - defines the Color4 object where to store the gamma space version
+     * @returns the unmodified Color4
+     */
+    export function toGammaSpaceToRef(value: ReadonlyColor4, convertedColor: MutableColor4): void;
+}
+
+declare interface Color4_2 {
     r: number;
     g: number;
     b: number;
@@ -785,7 +1471,7 @@ declare namespace Matrix {
     /**
      * Gets an identity matrix that must not be updated
      */
-    function IdentityReadOnly(): ReadonlyMatrix;
+    function IdentityReadonly(): ReadonlyMatrix;
     /**
      * Creates an empty matrix (filled with zeros)
      */
@@ -1869,11 +2555,11 @@ declare interface PBAvatarShape {
     /** default = urn:decentraland:off-chain:base-avatars:BaseFemale */
     bodyShape?: string | undefined;
     /** default = decentraland.common.Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
-    skinColor?: Color3 | undefined;
+    skinColor?: Color3_2 | undefined;
     /** default = decentraland.common.Color3(R = 0.283f, G = 0.142f, B = 0f) */
-    hairColor?: Color3 | undefined;
+    hairColor?: Color3_2 | undefined;
     /** default = decentraland.common.Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
-    eyeColor?: Color3 | undefined;
+    eyeColor?: Color3_2 | undefined;
     expressionTriggerId?: string | undefined;
     /** default = timestamp */
     expressionTriggerTimestamp?: number | undefined;
@@ -1929,11 +2615,11 @@ declare interface PBMaterial {
     /** default = null */
     bumpTexture?: PBMaterial_Texture | undefined;
     /** default = white; */
-    albedoColor?: Color3 | undefined;
+    albedoColor?: Color3_2 | undefined;
     /** default = black; */
-    emissiveColor?: Color3 | undefined;
+    emissiveColor?: Color3_2 | undefined;
     /** default = white; */
-    reflectivityColor?: Color3 | undefined;
+    reflectivityColor?: Color3_2 | undefined;
     /** default = TransparencyMode.Auto */
     transparencyMode?: MaterialTransparencyMode | undefined;
     /** default = 0.5 */
@@ -2021,7 +2707,7 @@ declare interface PBNftShape {
     /** default = PictureFrameStyle.Classic */
     style?: NftFrameType | undefined;
     /** default = decentraland.common.Color3(0.6404918, 0.611472, 0.8584906) */
-    color?: Color3 | undefined;
+    color?: Color3_2 | undefined;
 }
 
 declare interface PBPointerEvents {
@@ -2106,22 +2792,22 @@ declare interface PBTextShape {
     shadowOffsetY?: number | undefined;
     outlineWidth?: number | undefined;
     /** default=(1.0,1.0,1.0) */
-    shadowColor?: Color3 | undefined;
+    shadowColor?: Color3_2 | undefined;
     /** default=(1.0,1.0,1.0) */
-    outlineColor?: Color3 | undefined;
+    outlineColor?: Color3_2 | undefined;
     /** default=(1.0,1.0,1.0) */
-    textColor?: Color4 | undefined;
+    textColor?: Color4_2 | undefined;
 }
 
 declare interface PBUiBackground {
     /** default=(0.0, 0.0, 0.0, 0.0) */
-    backgroundColor?: Color4 | undefined;
+    backgroundColor?: Color4_2 | undefined;
 }
 
 declare interface PBUiText {
     value: string;
     /** default=(1.0,1.0,1.0) */
-    color?: Color3 | undefined;
+    color?: Color3_2 | undefined;
     /** default='center' */
     textAlign?: TextAlignMode | undefined;
     /** default=0 */
@@ -2357,26 +3043,69 @@ declare function preEngine(): {
 
 /**
  * @public
+ * Quaternion is a type and a namespace.
+ * - The namespace contains all types and functions to operates with Quaternion
+ * - The type Quaternion is an alias to Quaternion.ReadonlyQuaternion
+ * ```
+ *
+ * // Namespace usage example
+ * const next = Quaternion.add(pointA, velocityA)
+ *
+ * // Type usage example
+ * const readonlyRotation: Quaternion = Quaternion.Zero()
+ * readonlyRotation.x = 0.1 // this FAILS
+ *
+ * // For mutable usage, use `Quaternion.Mutable`
+ * const rotation: Quaternion.Mutable = Quaternion.Identity()
+ * rotation.x = 3.0 // this WORKS
+ * ```
+ */
+declare type Quaternion = Quaternion.ReadonlyQuaternion;
+
+/**
+ * @public
+ * Quaternion is a type and a namespace.
+ * ```
+ * // The namespace contains all types and functions to operates with Quaternion
+ * const next = Quaternion.add(pointA, velocityA)
+ * // The type Quaternion is an alias to Quaternion.ReadonlyQuaternion
+ * const readonlyRotation: Quaternion = Quaternion.Zero()
+ * readonlyRotation.x = 0.1 // this FAILS
+ *
+ * // For mutable usage, use `Quaternion.Mutable`
+ * const rotation: Quaternion.Mutable = Quaternion.Identity()
+ * rotation.x = 3.0 // this WORKS
+ * ```
  */
 declare namespace Quaternion {
     /**
      * @public
+     * For external use, type with `Quaternion`, e.g. `const zeroRotation: Quaternion = Quaternion.Zero()`.
+     * For mutable typing, use `Quaternion.Mutable`, e.g. `const identityQuaternion: Quaternion.Mutable = Quaternion.Identity()`.
+     */
+    export type ReadonlyQuaternion = {
+        readonly x: number;
+        readonly y: number;
+        readonly z: number;
+        readonly w: number;
+    };
+    /**
+     * @public
+     * For external usage, type with `Quaternion`, e.g. `const zeroRotation: Quaternion = Quaternion.Zero()`.
+     * For mutable typing, use `Quaternion.Mutable`, e.g. `const identityQuaternion: Quaternion.Mutable = Quaternion.Identity()`.
      */
     export type MutableQuaternion = {
-        y: number;
         x: number;
+        y: number;
         z: number;
         w: number;
     };
     /**
      * @public
+     * Type with `Quaternion` for readonly usage, e.g. `const zeroRotation: Quaternion = Quaternion.Zero()`.
+     * For mutable, use `Quaternion.Mutable`, e.g. `const identityQuaternion: Quaternion.Mutable = Quaternion.Identity()`.
      */
-    export type ReadonlyQuaternion = {
-        readonly y: number;
-        readonly x: number;
-        readonly z: number;
-        readonly w: number;
-    };
+    export type Mutable = MutableQuaternion;
     /**
      * Creates a new Quaternion from the given floats
      * @param x - defines the first component (0 by default)
@@ -2402,19 +3131,19 @@ declare namespace Quaternion {
     export function add(q1: ReadonlyQuaternion, q2: ReadonlyQuaternion): MutableQuaternion;
     /**
      * Creates a new rotation from the given Euler float angles (y, x, z) and stores it in the target quaternion
-     * @param yaw - defines the rotation around Y axis
-     * @param pitch - defines the rotation around X axis
-     * @param roll - defines the rotation around Z axis
-     * @param result - defines the target quaternion
+     * @param yaw - defines the rotation around Y axis (radians)
+     * @param pitch - defines the rotation around X axis (radians)
+     * @param roll - defines the rotation around Z axis (radians)
+     * @returns result quaternion
      */
-    export function rotationYawPitchRoll(yaw: number, pitch: number, roll: number): MutableQuaternion;
+    export function fromRotationYawPitchRoll(yaw: number, pitch: number, roll: number): MutableQuaternion;
     /**
      * Returns a rotation that rotates z degrees around the z axis, x degrees around the x axis, and y degrees around the y axis.
      * @param x - the rotation on the x axis in euler degrees
      * @param y - the rotation on the y axis in euler degrees
      * @param z - the rotation on the z axis in euler degrees
      */
-    export function euler(x: number, y: number, z: number): MutableQuaternion;
+    export function fromEulerDegress(x: number, y: number, z: number): MutableQuaternion;
     /**
      * Gets length of current quaternion
      * @returns the quaternion length (float)
@@ -2436,6 +3165,7 @@ declare namespace Quaternion {
      * Returns the angle in degrees between two rotations a and b.
      * @param quat1 - defines the first quaternion
      * @param quat2 - defines the second quaternion
+     * @returns the degress angle
      */
     export function angle(quat1: ReadonlyQuaternion, quat2: ReadonlyQuaternion): number;
     /**
@@ -2470,16 +3200,18 @@ declare namespace Quaternion {
     /**
      * Gets or sets the euler angle representation of the rotation.
      * Implemented unity-based calculations from: https://stackoverflow.com/a/56055813
+     * @public
+     * @returns a new Vector3 with euler angles degress
      */
-    export function eulerAngles(q: MutableQuaternion): Vector3.MutableVector3;
+    export function toEulerAngles(q: MutableQuaternion): Vector3.Mutable;
     /**
      * Creates a new rotation from the given Euler float angles (y, x, z) and stores it in the target quaternion
-     * @param yaw - defines the rotation around Y axis
-     * @param pitch - defines the rotation around X axis
-     * @param roll - defines the rotation around Z axis
+     * @param yaw - defines the rotation around Y axis (radians)
+     * @param pitch - defines the rotation around X axis (radians)
+     * @param roll - defines the rotation around Z axis (radians)
      * @param result - defines the target quaternion
      */
-    export function rotationYawPitchRollToRef(yaw: number, pitch: number, roll: number, result: Quaternion.MutableQuaternion): void;
+    export function fromRotationYawPitchRollToRef(yaw: number, pitch: number, roll: number, result: Quaternion.MutableQuaternion): void;
     /**
      * Updates the given quaternion with the given rotation matrix values
      * @param matrix - defines the source matrix
@@ -2517,7 +3249,13 @@ declare namespace Quaternion {
      * @returns the current quaternion
      */
     export function multiplyToRef(self: ReadonlyQuaternion, q1: ReadonlyQuaternion, result: MutableQuaternion): void;
-    export function angleAxis(degress: number, axis: Vector3.ReadonlyVector3): MutableQuaternion;
+    /**
+     *
+     * @param degress - the angle degress
+     * @param axis - vector3
+     * @returns a new Quaternion
+     */
+    export function fromAngleAxis(degress: number, axis: Vector3.ReadonlyVector3): MutableQuaternion;
     /**
      * Creates a new quaternion containing the rotation value to reach the target (axis1, axis2, axis3) orientation as a rotated XYZ system (axis1, axis2 and axis3 are normalized during this operation)
      * @param axis1 - defines the first axis
@@ -2525,7 +3263,7 @@ declare namespace Quaternion {
      * @param axis3 - defines the third axis
      * @returns the new quaternion
      */
-    export function rotationQuaternionFromAxis(axis1: Vector3.ReadonlyVector3, axis2: Vector3.ReadonlyVector3, axis3: Vector3.ReadonlyVector3): MutableQuaternion;
+    export function fromAxisToRotationQuaternion(axis1: Vector3.ReadonlyVector3, axis2: Vector3.ReadonlyVector3, axis3: Vector3.ReadonlyVector3): MutableQuaternion;
     /**
      * Creates a rotation value to reach the target (axis1, axis2, axis3) orientation as a rotated XYZ system (axis1, axis2 and axis3 are normalized during this operation) and stores it in the target quaternion
      * @param axis1 - defines the first axis
@@ -2533,11 +3271,21 @@ declare namespace Quaternion {
      * @param axis3 - defines the third axis
      * @param ref - defines the target quaternion
      */
-    export function rotationQuaternionFromAxisToRef(axis1: Vector3.ReadonlyVector3, axis2: Vector3.ReadonlyVector3, axis3: Vector3.ReadonlyVector3, ref: MutableQuaternion): void;
+    export function fromAxisToRotationQuaternionToRef(axis1: Vector3.ReadonlyVector3, axis2: Vector3.ReadonlyVector3, axis3: Vector3.ReadonlyVector3, ref: MutableQuaternion): void;
     /**
      * Returns a zero filled quaternion
      */
     export function Zero(): MutableQuaternion;
+    /**
+     * @public
+     * Rotates the transform so the forward vector points at target's current position.
+     */
+    export function fromLookAt(position: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, worldUp?: Vector3.ReadonlyVector3): MutableQuaternion;
+    /**
+     * @public
+     * Rotates the transform so the forward vector points at target's current position.
+     */
+    export function fromLookAtToRef(position: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, worldUp: Vector3.ReadonlyVector3 | undefined, result: MutableQuaternion): void;
 }
 
 /**
@@ -2596,6 +3344,198 @@ declare type ReceiveMessage = {
 declare type Result<T extends Spec> = ToOptional<{
     [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? Result<T[K]> : never;
 }>;
+
+/**
+ * Scalar computation library
+ * @public
+ */
+declare namespace Scalar {
+    /**
+     * Two pi constants convenient for computation.
+     */
+    const TwoPi: number;
+    /**
+     * Boolean : true if the absolute difference between a and b is lower than epsilon (default = 1.401298E-45)
+     * @param a - number
+     * @param b - number
+     * @param epsilon - (default = 1.401298E-45)
+     * @returns true if the absolute difference between a and b is lower than epsilon (default = 1.401298E-45)
+     */
+    export function withinEpsilon(a: number, b: number, epsilon?: number): boolean;
+    /**
+     * Returns a string : the upper case translation of the number i to hexadecimal.
+     * @param i - number
+     * @returns the upper case translation of the number i to hexadecimal.
+     */
+    export function toHex(i: number): string;
+    /**
+     * Returns -1 if value is negative and +1 is value is positive.
+     * @param _value - the value
+     * @returns the value itself if it's equal to zero.
+     */
+    export function sign(value: number): number;
+    /**
+     * Returns the value itself if it's between min and max.
+     * Returns min if the value is lower than min.
+     * Returns max if the value is greater than max.
+     * @param value - the value to clmap
+     * @param min - the min value to clamp to (default: 0)
+     * @param max - the max value to clamp to (default: 1)
+     * @returns the clamped value
+     */
+    export function clamp(value: number, min?: number, max?: number): number;
+    /**
+     * the log2 of value.
+     * @param value - the value to compute log2 of
+     * @returns the log2 of value.
+     */
+    export function log2(value: number): number;
+    /**
+     * Loops the value, so that it is never larger than length and never smaller than 0.
+     *
+     * This is similar to the modulo operator but it works with floating point numbers.
+     * For example, using 3.0 for t and 2.5 for length, the result would be 0.5.
+     * With t = 5 and length = 2.5, the result would be 0.0.
+     * Note, however, that the behaviour is not defined for negative numbers as it is for the modulo operator
+     * @param value - the value
+     * @param length - the length
+     * @returns the looped value
+     */
+    export function repeat(value: number, length: number): number;
+    /**
+     * Normalize the value between 0.0 and 1.0 using min and max values
+     * @param value - value to normalize
+     * @param min - max to normalize between
+     * @param max - min to normalize between
+     * @returns the normalized value
+     */
+    export function normalize(value: number, min: number, max: number): number;
+    /**
+     * Denormalize the value from 0.0 and 1.0 using min and max values
+     * @param normalized - value to denormalize
+     * @param min - max to denormalize between
+     * @param max - min to denormalize between
+     * @returns the denormalized value
+     */
+    export function denormalize(normalized: number, min: number, max: number): number;
+    /**
+     * Calculates the shortest difference between two given angles given in degrees.
+     * @param current - current angle in degrees
+     * @param target - target angle in degrees
+     * @returns the delta
+     */
+    export function deltaAngle(current: number, target: number): number;
+    /**
+     * PingPongs the value t, so that it is never larger than length and never smaller than 0.
+     * @param tx - value
+     * @param length - length
+     * @returns The returned value will move back and forth between 0 and length
+     */
+    export function pingPong(tx: number, length: number): number;
+    /**
+     * Interpolates between min and max with smoothing at the limits.
+     *
+     * This export function interpolates between min and max in a similar way to Lerp. However, the interpolation will gradually speed up
+     * from the start and slow down toward the end. This is useful for creating natural-looking animation, fading and other transitions.
+     * @param from - from
+     * @param to - to
+     * @param tx - value
+     * @returns the smooth stepped value
+     */
+    export function smoothStep(from: number, to: number, tx: number): number;
+    /**
+     * Moves a value current towards target.
+     *
+     * This is essentially the same as Mathf.Lerp but instead the export function will ensure that the speed never exceeds maxDelta.
+     * Negative values of maxDelta pushes the value away from target.
+     * @param current - current value
+     * @param target - target value
+     * @param maxDelta - max distance to move
+     * @returns resulting value
+     */
+    export function moveTowards(current: number, target: number, maxDelta: number): number;
+    /**
+     * Same as MoveTowards but makes sure the values interpolate correctly when they wrap around 360 degrees.
+     *
+     * Variables current and target are assumed to be in degrees. For optimization reasons, negative values of maxDelta
+     *  are not supported and may cause oscillation. To push current away from a target angle, add 180 to that angle instead.
+     * @param current - current value
+     * @param target - target value
+     * @param maxDelta - max distance to move
+     * @returns resulting angle
+     */
+    export function moveTowardsAngle(current: number, target: number, maxDelta: number): number;
+    /**
+     * Creates a new scalar with values linearly interpolated of "amount" between the start scalar and the end scalar
+     * @param start - start value
+     * @param end - target value
+     * @param amount - amount to lerp between
+     * @returns the lerped value
+     */
+    export function lerp(start: number, end: number, amount: number): number;
+    /**
+     * Same as Lerp but makes sure the values interpolate correctly when they wrap around 360 degrees.
+     * The parameter t is clamped to the range [0, 1]. Variables a and b are assumed to be in degrees.
+     * @param start - start value
+     * @param end - target value
+     * @param amount - amount to lerp between
+     * @returns the lerped value
+     */
+    export function lerpAngle(start: number, end: number, amount: number): number;
+    /**
+     * Calculates the linear parameter t that produces the interpolant value within the range [a, b].
+     * @param a - start value
+     * @param b - target value
+     * @param value - value between a and b
+     * @returns the inverseLerp value
+     */
+    export function inverseLerp(a: number, b: number, value: number): number;
+    /**
+     * Returns a new scalar located for "amount" (float) on the Hermite spline defined by the scalars "value1", "value3", "tangent1", "tangent2".
+     * {@link http://mathworld.wolfram.com/HermitePolynomial.html}
+     * @param value1 - spline value
+     * @param tangent1 - spline value
+     * @param value2 - spline value
+     * @param tangent2 - spline value
+     * @param amount - input value
+     * @returns hermite result
+     */
+    export function hermite(value1: number, tangent1: number, value2: number, tangent2: number, amount: number): number;
+    /**
+     * Returns a random float number between and min and max values
+     * @param min - min value of random
+     * @param max - max value of random
+     * @returns random value
+     */
+    export function randomRange(min: number, max: number): number;
+    /**
+     * This export function returns percentage of a number in a given range.
+     *
+     * RangeToPercent(40,20,60) will return 0.5 (50%)
+     * RangeToPercent(34,0,100) will return 0.34 (34%)
+     * @param num - to convert to percentage
+     * @param min - min range
+     * @param max - max range
+     * @returns the percentage
+     */
+    export function rangeToPercent(num: number, min: number, max: number): number;
+    /**
+     * This export function returns number that corresponds to the percentage in a given range.
+     *
+     * PercentToRange(0.34,0,100) will return 34.
+     * @param percent - to convert to number
+     * @param min - min range
+     * @param max - max range
+     * @returns the number
+     */
+    export function percentToRange(percent: number, min: number, max: number): number;
+    /**
+     * Returns the angle converted to equivalent value between -Math.PI and Math.PI radians.
+     * @param angle - The angle to normalize in radian.
+     * @returns The converted angle.
+     */
+    export function normalizeRadians(angle: number): number;
+}
 
 /**
  * @public
@@ -2717,10 +3657,55 @@ declare type Unpacked<T> = T extends (infer U)[] ? U : T;
 
 /**
  * @public
+ * Vector3 is a type and a namespace.
+ * - The namespace contains all types and functions to operates with Vector3
+ * - The type Vector3 is an alias to Vector3.ReadonlyVector3
+ * ```
+ *
+ * // Namespace usage example
+ * const next = Vector3.add(pointA, velocityA)
+ *
+ * // Type usage example
+ * const readonlyPosition: Vector3 = Vector3.Zero()
+ * readonlyPosition.x = 0.1 // this FAILS
+ *
+ * // For mutable usage, use `Vector3.Mutable`
+ * const position: Vector3.Mutable = Vector3.One()
+ * position.x = 3.0 // this WORKS
+ * ```
+ */
+declare type Vector3 = Vector3.ReadonlyVector3;
+
+/**
+ * @public
+ * Vector3 is a type and a namespace.
+ * ```
+ * // The namespace contains all types and functions to operates with Vector3
+ * const next = Vector3.add(pointA, velocityA)
+ * // The type Vector3 is an alias to Vector3.ReadonlyVector3
+ * const readonlyPosition: Vector3 = Vector3.Zero()
+ * readonlyPosition.x = 0.1 // this FAILS
+ *
+ * // For mutable usage, use `Vector3.Mutable`
+ * const position: Vector3.Mutable = Vector3.One()
+ * position.x = 3.0 // this WORKS
+ * ```
  */
 declare namespace Vector3 {
     /**
      * @public
+     * For external use, type with `Vector3`, e.g. `const zeroPosition: Vector3 = Vector3.Zero()`.
+     * For mutable typing, use `Vector3.Mutable`, e.g. `const upVector: Vector3.Mutable = Vector3.Up()`.
+     */
+    export type ReadonlyVector3 = {
+        readonly x: number;
+        readonly y: number;
+        readonly z: number;
+    };
+    /**
+     * @public
+     * For external usage, type with `Vector3`, e.g. `const zeroPosition: Vector3 = Vector3.Zero()`.
+     * For mutable typing, use `Vector3.Mutable`, e.g. `const upVector: Vector3.Mutable = Vector3.Up()`.
      */
     export type MutableVector3 = {
         x: number;
@@ -2729,12 +3714,10 @@ declare namespace Vector3 {
     };
     /**
      * @public
+     * Type with `Vector3` for readonly usage, e.g. `const zeroPosition: Vector3 = Vector3.Zero()`.
+     * For mutable, use `Vector3.Mutable`, e.g. `const upVector: Vector3.Mutable = Vector3.Up()`.
      */
-    export type ReadonlyVector3 = {
-        readonly x: number;
-        readonly y: number;
-        readonly z: number;
-    };
+    export type Mutable = MutableVector3;
     /**
      * Gets a boolean indicating that the vector is non uniform meaning x, y or z are not all the same
      * @param vector - vector to check
@@ -2799,7 +3782,7 @@ declare namespace Vector3 {
      * Copy source into dest
      *
      */
-    export function copy(source: ReadonlyVector3, dest: MutableVector3): void;
+    export function copyFrom(source: ReadonlyVector3, dest: MutableVector3): void;
     /**
      * Sets the given vector "dest" with the given floats.
      * @param x - defines the x coordinate of the source
@@ -2862,7 +3845,7 @@ declare namespace Vector3 {
     export function fromFloatArrayToRef(array: FloatArray, offset: number, result: MutableVector3): void;
     /**
      * Gets the length of the Vector3
-     * @returns the length of the Vecto3
+     * @returns the length of the Vector3
      */
     export function length(vector: ReadonlyVector3): number;
     /**
