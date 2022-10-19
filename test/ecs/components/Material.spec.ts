@@ -1,6 +1,4 @@
-import {
-  MaterialTransparencyMode
-} from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/material.gen'
+import { MaterialTransparencyMode } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/material.gen'
 import {
   TextureFilterMode,
   TextureWrapMode
