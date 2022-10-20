@@ -1,3 +1,4 @@
+import { Listeners } from './listeners/types'
 import { UiBackgroundProps } from './uiBackground/types'
 import { UiTextProps } from './uiText/types'
 import { UiTransformProps } from './uiTransform/types'
@@ -9,6 +10,7 @@ export type EntityPropTypes = {
   uiTransform?: UiTransformProps
   uiText?: UiTextProps
   uiBackground?: UiBackgroundProps
+  listeners?: Listeners
 }
 
 export type Key = number | string

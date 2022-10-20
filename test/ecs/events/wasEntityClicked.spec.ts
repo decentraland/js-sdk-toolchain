@@ -158,7 +158,7 @@ describe('Events helpers wasEntityClicked', () => {
   })
 })
 
-function createTestPointerDownCommand(
+export function createTestPointerDownCommand(
   entity: Entity,
   timestamp: number,
   state: PointerEventType

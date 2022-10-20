@@ -72,6 +72,7 @@ export type EntityComponents = {
     uiTransform: PBUiTransform;
     uiText: PBUiText;
     uiBackground: PBUiBackground;
+    listeners: Listeners;
 };
 
 // @public (undocumented)
@@ -111,6 +112,13 @@ export namespace JSX {
 //
 // @public (undocumented)
 export type Key = number | string;
+
+// Warning: (ae-missing-release-tag) "Listeners" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type Listeners = {
+    onClick: OnClick;
+};
 
 // Warning: (ae-missing-release-tag) "PBUiBackground" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -531,6 +539,10 @@ export enum YGWrap {
     // (undocumented)
     YGW_WRAP_REVERSE = 2
 }
+
+// Warnings were encountered during analysis:
+//
+// dist/components/listeners/types.d.ts:3:5 - (ae-forgotten-export) The symbol "OnClick" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

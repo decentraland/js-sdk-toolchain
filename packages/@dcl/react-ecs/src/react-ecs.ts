@@ -16,6 +16,7 @@ export type EntityComponents = {
   uiTransform: PBUiTransform
   uiText: PBUiText
   uiBackground: PBUiBackground
+  // TBD 🫠
   listeners: Listeners
 }
 
