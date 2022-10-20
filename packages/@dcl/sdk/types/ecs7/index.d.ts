@@ -918,7 +918,7 @@ declare namespace Components {
     /** @public */
     const GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     /** @public */
-    const Material: ComponentDefinition<ISchema<PBMaterial>, Partial<PBMaterial>>;
+    const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     /** @public */
     const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
     /** @public */
@@ -1140,7 +1140,6 @@ declare function defineSdkComponents(engine: PreEngine): {
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
     MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
-    Material: ComponentDefinition<ISchema<PBMaterial>, Partial<PBMaterial>>;
     Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
@@ -1151,6 +1150,7 @@ declare function defineSdkComponents(engine: PreEngine): {
     CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
+    Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
@@ -1413,7 +1413,7 @@ declare const log: (...a: any[]) => void;
 declare function makeCollisionMask(...layers: ColliderLayer[]): number;
 
 /** @public */
-declare const Material: ComponentDefinition<ISchema<PBMaterial>, Partial<PBMaterial>>;
+declare const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
 
 declare const enum MaterialTransparencyMode {
     MTM_OPAQUE = 0,

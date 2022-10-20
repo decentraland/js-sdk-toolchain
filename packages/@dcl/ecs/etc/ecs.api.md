@@ -249,7 +249,7 @@ export namespace Components {
     const // Warning: (ae-forgotten-export) The symbol "PBMaterial" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    Material: ComponentDefinition<ISchema<PBMaterial>, Partial<PBMaterial>>;
+    Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     const // Warning: (ae-forgotten-export) The symbol "PBMeshCollider" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -414,7 +414,7 @@ export const log: (...a: any[]) => void;
 export function makeCollisionMask(...layers: ColliderLayer[]): number;
 
 // @public (undocumented)
-export const Material: ComponentDefinition<ISchema<PBMaterial>, Partial<PBMaterial>>;
+export const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
 
 // @public (undocumented)
 export const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
