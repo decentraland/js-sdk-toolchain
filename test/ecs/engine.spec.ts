@@ -570,4 +570,51 @@ describe('Engine tests', () => {
     expect(errorFunc.mock.calls[1][0]).toBe(errorString(e0))
     ;(globalThis as any).dcl = originalDcl
   })
+
+  it('should remove all children of a tree', () => {
+    const engine = Engine()
+    // Cube factory
+    function createCube(
+      x: number,
+      y: number,
+      z: number,
+      parent?: Entity
+    ): Entity {
+      const meshEntity = engine.addEntity()
+      engine.baseComponents.Transform.create(meshEntity, {
+        position: { x, y, z },
+        parent,
+        scale: Vector3.create(0.5, 0.5, 0.5)
+      })
+      engine.baseComponents.MeshRenderer.create(meshEntity, {
+        box: { uvs: [] }
+      })
+      engine.baseComponents.MeshCollider.create(meshEntity, { box: {} })
+      return meshEntity
+    }
+
+    const e_A = createCube(8, 1, 8)
+    const e_A1 = createCube(1, 0, 0, e_A)
+    const e_A2 = createCube(0, 0, 1, e_A)
+    const e_A3 = createCube(0, 1, 0, e_A)
+    const e_A1_1 = createCube(1, 0, 0, e_A1)
+    const e_A1_2 = createCube(1, 1, 0, e_A1)
+    const e_A1_3 = createCube(1, 0, 1, e_A1)
+
+    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_3)).not.toBeNull()
+    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_2)).not.toBeNull()
+    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_1)).not.toBeNull()
+    expect(engine.baseComponents.MeshCollider.getOrNull(e_A2)).not.toBeNull()
+    expect(engine.baseComponents.MeshCollider.getOrNull(e_A3)).not.toBeNull()
+    expect(engine.baseComponents.MeshCollider.getOrNull(e_A)).not.toBeNull()
+
+    engine.removeEntityWithChildren(e_A)
+
+    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_3)).toBeNull()
+    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_2)).toBeNull()
+    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_1)).toBeNull()
+    expect(engine.baseComponents.MeshCollider.getOrNull(e_A2)).toBeNull()
+    expect(engine.baseComponents.MeshCollider.getOrNull(e_A3)).toBeNull()
+    expect(engine.baseComponents.MeshCollider.getOrNull(e_A)).toBeNull()
+  })
 })

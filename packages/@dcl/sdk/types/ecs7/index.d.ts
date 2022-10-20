@@ -1228,6 +1228,11 @@ declare type IEngine = {
      */
     removeEntity(entity: Entity): void;
     /**
+     * Remove all components of each entity in the tree made with Transform parenting
+     * @param firstEntity - the root entity of the tree
+     */
+    removeEntityWithChildren(firstEntity: Entity): void;
+    /**
      * Add the system to the engine. It will be called every tick updated.
      * @param system function that receives the delta time between last tick and current one.
      * @param priority a number with the priority, big number are called before smaller ones

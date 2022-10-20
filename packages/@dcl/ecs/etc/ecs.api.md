@@ -369,6 +369,7 @@ export type IEngine = {
     addEntity(dynamic?: boolean): Entity;
     addDynamicEntity(): Entity;
     removeEntity(entity: Entity): void;
+    removeEntityWithChildren(firstEntity: Entity): void;
     addSystem(system: SystemFn, priority?: number, name?: string): void;
     removeSystem(selector: string | SystemFn): boolean;
     defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>;
@@ -910,21 +911,21 @@ export function wasEntityClickedGenerator(engine: IEngine): (entity: Entity, act
 // dist/engine/types.d.ts:26:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/types.d.ts:27:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
 // dist/engine/types.d.ts:36:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:41:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:42:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:43:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:59:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:65:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:66:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:67:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:68:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// dist/engine/types.d.ts:82:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:83:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:84:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// dist/engine/types.d.ts:94:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:95:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// dist/engine/types.d.ts:104:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/engine/types.d.ts:105:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/types.d.ts:46:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:47:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:48:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:64:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:70:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:71:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:72:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:73:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/types.d.ts:87:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:88:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:89:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/types.d.ts:99:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:100:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// dist/engine/types.d.ts:109:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/engine/types.d.ts:110:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
 
 // (No @packageDocumentation comment for this package)
 
