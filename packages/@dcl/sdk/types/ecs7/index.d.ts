@@ -1190,6 +1190,8 @@ declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
 }[keyof T];
 
+declare const executeTask: (task: Task<unknown>) => void;
+
 /** @public */
 declare type FloatArray = number[];
 
@@ -1372,14 +1374,7 @@ declare type ISchema<T = any> = {
     create(): T;
 };
 
-/**
- * Check if a pointer event has been emited in the last tick-update.
- * @param entity the entity to query, for global clicks use `engine.RootEntity`
- * @param actionButton
- * @param pointerEventType
- * @returns
- */
-declare function isPointerEventActive(entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType): boolean;
+declare const isPointerEventActive: (entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType) => boolean;
 
 declare function isPointerEventActiveGenerator(engine: IEngine): (entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType) => boolean;
 
@@ -3564,6 +3559,8 @@ declare interface Spec {
  */
 declare type SystemFn = (dt: number) => void;
 
+declare type Task<T = unknown> = () => Promise<T>;
+
 declare const enum TextAlignMode {
     TAM_TOP_LEFT = 0,
     TAM_TOP_CENTER = 1,
@@ -4248,13 +4245,7 @@ declare interface Vector3_2 {
 /** @public */
 declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 
-/**
- * Check if an entity emitted a clicked event
- * @param entity the entity to query, for global clicks use `engine.RootEntity`
- * @param actionButton
- * @returns true if the entity was clicked in the last tick-update
- */
-declare function wasEntityClicked(entity: Entity, actionButton: InputAction): boolean;
+declare const wasEntityClicked: (entity: Entity, actionButton: InputAction) => boolean;
 
 declare function wasEntityClickedGenerator(engine: IEngine): (entity: Entity, actionButton: InputAction) => boolean;
 
