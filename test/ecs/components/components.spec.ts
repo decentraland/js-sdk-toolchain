@@ -37,7 +37,7 @@ describe('Legacy component tests', () => {
       for (const [entity, component] of group) {
         Quaternion.multiplyToRef(
           component.rotation,
-          Quaternion.angleAxis(dt * 10, Vector3.Up()),
+          Quaternion.fromAngleAxis(dt * 10, Vector3.Up()),
           component.rotation
         )
 
