@@ -42,4 +42,15 @@ describe('Generated MeshRenderer ProtoBuf', () => {
     })
     expect(meshRenderer.box).toStrictEqual({ uvs: [] })
   })
+
+  it('should create a Mesh with default constructor (a prefilled undefined) without uvs', () => {
+    const newEngine = Engine()
+    const { MeshRenderer } = newEngine.baseComponents
+    const entity = newEngine.addEntity()
+
+    const meshRenderer = MeshRenderer.create(entity, {
+      box: {}
+    })
+    expect(meshRenderer.box).toStrictEqual({ uvs: [] })
+  })
 })
