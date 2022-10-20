@@ -11,6 +11,50 @@ import {
   Type
 } from './types'
 
+export function isEqual<T = unknown>(val1: T, val2: T): boolean {
+  if (!val1 && !val2) {
+    return true
+  }
+
+  if (!val1 || !val2) {
+    return val1 === val2
+  }
+
+  if (val1 === val2) {
+    return true
+  }
+
+  if (typeof val1 !== typeof val2) {
+    return false
+  }
+
+  if (typeof val1 !== 'object') {
+    return val1 === val2
+  }
+
+  if (Array.isArray(val1) && Array.isArray(val2)) {
+    if (val1.length !== val2.length) {
+      return false
+    }
+  }
+
+  if (Object.keys(val1).length !== Object.keys(val2).length) {
+    return false
+  }
+
+  if (JSON.stringify(val1) === JSON.stringify(val2)) {
+    return true
+  }
+
+  for (const key in val1) {
+    if (!isEqual(val1[key]!, val2[key]!)) {
+      return false
+    }
+  }
+
+  return true
+}
+
 export const isNotUndefined = <T>(val: T | undefined): val is T => {
   return !!val
 }

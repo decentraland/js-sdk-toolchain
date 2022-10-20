@@ -2,6 +2,8 @@ import type { Entity } from '@dcl/ecs'
 import { CommonProps } from '../components'
 import type { EntityComponents } from '../react-ecs'
 
+export type EngineComponents = Omit<EntityComponents, 'listeners'>
+
 export type OpaqueHandle = any
 export type Type = 'entity'
 export type Props = EntityComponents & CommonProps
