@@ -426,4 +426,31 @@ describe('Serialization Types', () => {
       d: 12
     })
   })
+
+  it('should serialize and deserialize math schemas', () => {
+    const engine = Engine()
+    const entity = engine.addEntity()
+    const MixComponent = engine.defineComponent(
+      {
+        v3: Schemas.Vector3,
+        q: Schemas.Quaternion,
+        c3: Schemas.Color3,
+        c4: Schemas.Color4
+      },
+      1222
+    )
+
+    const originalValue = MixComponent.create(entity, {
+      c3: { r: 0.1, g: 0.2, b: 0.3 },
+      c4: { r: 0.4, g: 0.5, b: 0.6, a: 0.7 },
+      q: { x: 0.8, y: 0.9, z: 1.0, w: 1.1 },
+      v3: { x: 1.2, y: 1.3, z: 1.4 }
+    })
+
+    const entityB = engine.addEntity()
+    const buf = MixComponent.toBinary(entity)
+    const value = MixComponent.upsertFromBinary(entityB, buf)
+
+    expect(value).toBeDeepCloseTo(originalValue)
+  })
 })
