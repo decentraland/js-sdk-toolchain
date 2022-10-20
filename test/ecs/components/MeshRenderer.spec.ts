@@ -51,6 +51,26 @@ describe('Generated MeshRenderer ProtoBuf', () => {
     const meshRenderer = MeshRenderer.create(entity, {
       box: {}
     })
+
     expect(meshRenderer.box).toStrictEqual({ uvs: [] })
+  })
+
+  it('should serialize without and with uvs the same', () => {
+    const newEngine = Engine()
+    const { MeshRenderer } = newEngine.baseComponents
+    const entityA = newEngine.addEntity()
+    const entityB = newEngine.addEntity()
+
+    MeshRenderer.create(entityA, {
+      box: {}
+    })
+    MeshRenderer.create(entityB, {
+      box: { uvs: [] }
+    })
+
+    const bufA = MeshRenderer.toBinary(entityA).toBinary().toString()
+    const bufB = MeshRenderer.toBinary(entityB).toBinary().toString()
+
+    expect(bufA).toStrictEqual(bufB)
   })
 })
