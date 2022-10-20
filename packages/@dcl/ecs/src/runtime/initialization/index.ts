@@ -16,9 +16,13 @@ export const engine = Engine({
   transports: [rendererTransport]
 })
 
+// Dcl Interface
 export const { log, error } = initializeDcl(engine, rendererTransport)
 
+// Events
 export const { wasEntityClicked, isPointerEventActive } =
   initializeEvents(engine)
 
+// Task System
 export const { executeTask } = taskSystem(engine)
+export { Task } from '../../systems/async-task'
