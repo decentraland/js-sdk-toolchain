@@ -15,7 +15,7 @@ describe('Generated Material ProtoBuf', () => {
     const _material = Material.create(entity, {
       ...Material.default(),
       texture: {
-        srcTexture: {
+        texture: {
           wrapMode: TextureWrapMode.TWM_CLAMP,
           filterMode: undefined,
           src: 'not-casla'
@@ -64,7 +64,7 @@ describe('Generated Material ProtoBuf', () => {
         src: 'not-casla'
       },
       texture: {
-        srcTexture: {
+        texture: {
           wrapMode: TextureWrapMode.TWM_REPEAT,
           src: 'not-casla'
         },
