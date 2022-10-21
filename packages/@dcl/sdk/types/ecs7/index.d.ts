@@ -1198,8 +1198,6 @@ declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
 }[keyof T];
 
-declare const executeTask: (task: Task<unknown>) => void;
-
 /** @public */
 declare type FloatArray = number[];
 
@@ -1382,7 +1380,14 @@ declare type ISchema<T = any> = {
     create(): T;
 };
 
-declare const isPointerEventActive: (entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType) => boolean;
+/**
+ * Check if a pointer event has been emited in the last tick-update.
+ * @param entity the entity to query, for global clicks use `engine.RootEntity`
+ * @param actionButton
+ * @param pointerEventType
+ * @returns
+ */
+declare function isPointerEventActive(entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType): boolean;
 
 declare function isPointerEventActiveGenerator(engine: IEngine): (entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType) => boolean;
 
@@ -2604,17 +2609,17 @@ declare interface PBGltfContainer {
 
 declare interface PBMaterial {
     /** default = null */
-    texture?: Texture | undefined;
+    texture?: TextureUnion | undefined;
     /** default = 0.5. range value: from 0 to 1 */
     alphaTest?: number | undefined;
     /** default =  true */
     castShadows?: boolean | undefined;
     /** default = null */
-    alphaTexture?: SRCTexture | undefined;
+    alphaTexture?: Texture | undefined;
     /** default = null */
-    emissiveTexture?: SRCTexture | undefined;
+    emissiveTexture?: Texture | undefined;
     /** default = null */
-    bumpTexture?: SRCTexture | undefined;
+    bumpTexture?: Texture | undefined;
     /** default = white; */
     albedoColor?: Color3_2 | undefined;
     /** default = black; */
@@ -3554,20 +3559,10 @@ declare interface Spec {
     [key: string]: ISchema;
 }
 
-declare interface SRCTexture {
-    src: string;
-    /** default = TextureWrapMode.Clamp */
-    wrapMode?: TextureWrapMode | undefined;
-    /** default = FilterMode.Bilinear */
-    filterMode?: TextureFilterMode | undefined;
-}
-
 /**
  * @public
  */
 declare type SystemFn = (dt: number) => void;
-
-declare type Task<T = unknown> = () => Promise<T>;
 
 declare const enum TextAlignMode {
     TAM_TOP_LEFT = 0,
@@ -3585,16 +3580,24 @@ declare const enum TextAlignMode {
 declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 
 declare interface Texture {
-    /** default = null */
-    srcTexture: SRCTexture | undefined;
-    /** default = null */
-    avatarTexture: AvatarTexture | undefined;
+    src: string;
+    /** default = TextureWrapMode.Clamp */
+    wrapMode?: TextureWrapMode | undefined;
+    /** default = FilterMode.Bilinear */
+    filterMode?: TextureFilterMode | undefined;
 }
 
 declare const enum TextureFilterMode {
     TFM_POINT = 0,
     TFM_BILINEAR = 1,
     TFM_TRILINEAR = 2
+}
+
+declare interface TextureUnion {
+    /** default = null */
+    texture: Texture | undefined;
+    /** default = null */
+    avatarTexture: AvatarTexture | undefined;
 }
 
 declare const enum TextureWrapMode {
@@ -4260,7 +4263,13 @@ declare interface Vector3_2 {
 /** @public */
 declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 
-declare const wasEntityClicked: (entity: Entity, actionButton: InputAction) => boolean;
+/**
+ * Check if an entity emitted a clicked event
+ * @param entity the entity to query, for global clicks use `engine.RootEntity`
+ * @param actionButton
+ * @returns true if the entity was clicked in the last tick-update
+ */
+declare function wasEntityClicked(entity: Entity, actionButton: InputAction): boolean;
 
 declare function wasEntityClickedGenerator(engine: IEngine): (entity: Entity, actionButton: InputAction) => boolean;
 
