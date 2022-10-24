@@ -80,6 +80,7 @@ export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
     uiText?: UiTextProps;
     uiBackground?: UiBackgroundProps;
+    listeners?: Listeners;
 };
 
 // Warning: (ae-missing-release-tag) "Font" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -117,7 +118,7 @@ export type Key = number | string;
 //
 // @public (undocumented)
 export type Listeners = {
-    onClick: OnClick;
+    onClick?: OnClick;
 };
 
 // Warning: (ae-missing-release-tag) "PBUiBackground" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)

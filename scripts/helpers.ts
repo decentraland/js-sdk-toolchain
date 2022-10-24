@@ -41,7 +41,6 @@ export function runCommand(
         process.stdout.write('  ' + stdout.replace(/\n/g, '\n  ') + '\n')
       stderr.trim().length &&
         process.stderr.write('! ' + stderr.replace(/\n/g, '\n  ') + '\n')
-
       if (error) {
         onError(stderr)
       } else {

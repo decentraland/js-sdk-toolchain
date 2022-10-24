@@ -1,4 +1,4 @@
-import { Entity, IEngine, wasEntityClicked } from '@dcl/ecs'
+import type { Entity, IEngine, IInput } from '@dcl/ecs'
 import Reconciler, { HostConfig } from 'react-reconciler'
 import { CANVAS_ROOT_ENTITY, Listeners } from '../components'
 import { EntityComponents, JSX } from '../react-ecs'
@@ -22,6 +22,10 @@ import {
 } from './types'
 import { isEqual, isNotUndefined, noopConfig } from './utils'
 
+declare const Input: IInput
+
+// TODO: export InputAction types.
+const IA_POINTER = 0
 function propsChanged<K extends keyof EntityComponents>(
   component: K,
   prevProps: Partial<EntityComponents[K]>,
@@ -187,13 +191,18 @@ export function createReconciler(
 
       for (const key in props) {
         const keyTyped: keyof Props = key as keyof Props
-        if (
-          keyTyped === 'children' ||
-          keyTyped === 'key' ||
-          keyTyped === 'listeners'
-        )
+        if (keyTyped === 'children' || keyTyped === 'key') {
           continue
-        upsertComponent(instance, props[keyTyped], keyTyped)
+        }
+        if (keyTyped === 'listeners') {
+          upsertListener(instance, {
+            type: 'add',
+            props: props[keyTyped],
+            component: 'listeners'
+          })
+        } else {
+          upsertComponent(instance, props[keyTyped], keyTyped)
+        }
       }
 
       return instance
@@ -287,9 +296,11 @@ export function createReconciler(
     runningEvents = true
     for (const [entity, listeners] of events) {
       for (const [keyListener, fn] of listeners) {
-        if (!fn) continue
-        // TODO: InputAction.Primary ?
-        if (keyListener === 'onClick' && wasEntityClicked(entity, 0)) {
+        if (
+          fn &&
+          keyListener === 'onClick' &&
+          Input.wasJustClicked(IA_POINTER, entity)
+        ) {
           fn()
         }
       }
