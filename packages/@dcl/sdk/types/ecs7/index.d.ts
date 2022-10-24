@@ -1183,15 +1183,14 @@ declare type Entity = number & {
 
 declare const entitySymbol: unique symbol;
 
-/**
- * @public
- */
 declare const error: (message: string | Error, data?: any) => void;
 
 /** Excludes property keys from T where the property is assignable to U */
 declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
 }[keyof T];
+
+declare const executeTask: (task: Task<unknown>) => void;
 
 /** @public */
 declare type FloatArray = number[];
@@ -1432,9 +1431,6 @@ declare type ISchema<T = any> = {
     create(): T;
 };
 
-/**
- * @public
- */
 declare const log: (...a: any[]) => void;
 
 /**
@@ -3615,6 +3611,8 @@ declare interface Spec {
  * @public
  */
 declare type SystemFn = (dt: number) => void;
+
+declare type Task<T = unknown> = () => Promise<T>;
 
 declare const enum TextAlignMode {
     TAM_TOP_LEFT = 0,
