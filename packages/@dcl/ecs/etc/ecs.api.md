@@ -697,6 +697,22 @@ export namespace Schemas {
     Int64: ISchema<number>;
     const // (undocumented)
     Number: ISchema<number>;
+    const // Warning: (ae-forgotten-export) The symbol "Vector3Type" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    Vector3: ISchema<Vector3Type>;
+    const // Warning: (ae-forgotten-export) The symbol "QuaternionType" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    Quaternion: ISchema<QuaternionType>;
+    const // Warning: (ae-forgotten-export) The symbol "Color3Type" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    Color3: ISchema<Color3Type>;
+    const // Warning: (ae-forgotten-export) The symbol "Color4Type" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    Color4: ISchema<Color4Type>;
     const // Warning: (ae-forgotten-export) The symbol "IEnum" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)

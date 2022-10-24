@@ -416,6 +416,15 @@ declare interface Color3_2 {
 
 /**
  * @public
+ */
+declare type Color3Type = {
+    r: number;
+    g: number;
+    b: number;
+};
+
+/**
+ * @public
  * Color4 is a type and a namespace.
  * - The namespace contains all types and functions to operates with Color4
  * - The type Color4 is an alias to Color4.ReadonlyColor4
@@ -758,6 +767,16 @@ declare interface Color4_2 {
     b: number;
     a: number;
 }
+
+/**
+ * @public
+ */
+declare type Color4Type = {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+};
 
 /**
  * @public
@@ -3327,6 +3346,16 @@ declare namespace Quaternion {
 }
 
 /**
+ * @public
+ */
+declare type QuaternionType = {
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+};
+
+/**
  * Constant used to convert from radians to Euler degrees
  * @public
  */
@@ -3589,6 +3618,10 @@ declare namespace Schemas {
     const Int: ISchema<number>;
     const Int64: ISchema<number>;
     const Number: ISchema<number>;
+    const Vector3: ISchema<Vector3Type>;
+    const Quaternion: ISchema<QuaternionType>;
+    const Color3: ISchema<Color3Type>;
+    const Color4: ISchema<Color4Type>;
     const Enum: typeof IEnum;
     const Array: typeof IArray;
     const Map: typeof IMap;
@@ -4294,6 +4327,15 @@ declare interface Vector3_2 {
     y: number;
     z: number;
 }
+
+/**
+ * @public
+ */
+declare type Vector3Type = {
+    x: number;
+    y: number;
+    z: number;
+};
 
 /** @public */
 declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
