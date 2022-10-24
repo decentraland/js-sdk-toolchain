@@ -9,6 +9,8 @@ import { ReadonlyComponentSchema } from './readonly'
 
 export { ISchema } from '../schemas/ISchema'
 
+export { IInput } from './input'
+
 /**
  * @public
  */

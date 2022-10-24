@@ -1183,14 +1183,15 @@ declare type Entity = number & {
 
 declare const entitySymbol: unique symbol;
 
+/**
+ * @public
+ */
 declare const error: (message: string | Error, data?: any) => void;
 
 /** Excludes property keys from T where the property is assignable to U */
 declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
 }[keyof T];
-
-declare const executeTask: (task: Task<unknown>) => void;
 
 /** @public */
 declare type FloatArray = number[];
@@ -1341,12 +1342,64 @@ declare function IEnum<T>(type: ISchema<any>): ISchema<T>;
 /**
  * @public
  */
+declare type IInput = {
+    /**
+     * Check if a click was emmited in the current tick for the input action.
+     * This is defined when an UP event is triggered with a previously DOWN state.
+     * @param inputAction - the input action to query
+     * @param entity - the entity to query, ignore for global events.
+     * @returns true if the entity was clicked in the last tick-update
+     */
+    wasJustClicked: (inputAction: InputAction, entity?: Entity) => boolean;
+    /**
+     * Check if a pointer event has been emited in the last tick-update.
+     * @param inputAction - the input action to query
+     * @param pointerEventType - the pointer event type to query
+     * @param entity - the entity to query, ignore for global
+     * @returns
+     */
+    wasInputJustActive: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
+    /**
+     * Check if an input action is in DOWN state.
+     * @param inputAction - the input action to query
+     * @returns true if the input action is being pressed
+     */
+    isActionDown: (inputAction: InputAction) => boolean;
+    /**
+     * Get the click info if a click was emmited in the current tick for the input action.
+     * This is defined when an UP event is triggered with a previously DOWN state.
+     * @param inputAction - the input action to query
+     * @param entity - the entity to query, ignore for global events.
+     * @returns the click info or undefined if there is no command in the last tick-update
+     */
+    getClick: (inputAction: InputAction, entity?: Entity) => {
+        up: PBPointerEventsResult_PointerCommand;
+        down: PBPointerEventsResult_PointerCommand;
+    } | null;
+    /**
+     * Get the input command info if a pointer event has been emited in the last tick-update.
+     * @param inputAction - the input action to query
+     * @param pointerEventType - the pointer event type to query
+     * @param entity - the entity to query, ignore for global
+     * @returns the input command info or undefined if there is no command in the last tick-update
+     */
+    getInputCommand: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => PBPointerEventsResult_PointerCommand | null;
+};
+
+/**
+ * @public
+ */
 declare function IMap<T extends Spec>(spec: T): ISchema<Result<T>>;
 
 /** Include property keys from T where the property is assignable to U */
 declare type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
 }[keyof T];
+
+/**
+ * @public
+ */
+declare const Input: IInput;
 
 declare const enum InputAction {
     IA_POINTER = 0,
@@ -1379,10 +1432,9 @@ declare type ISchema<T = any> = {
     create(): T;
 };
 
-declare const isPointerEventActive: (entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType) => boolean;
-
-declare function isPointerEventActiveGenerator(engine: IEngine): (entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType) => boolean;
-
+/**
+ * @public
+ */
 declare const log: (...a: any[]) => void;
 
 /**
@@ -3564,8 +3616,6 @@ declare interface Spec {
  */
 declare type SystemFn = (dt: number) => void;
 
-declare type Task<T = unknown> = () => Promise<T>;
-
 declare const enum TextAlignMode {
     TAM_TOP_LEFT = 0,
     TAM_TOP_CENTER = 1,
@@ -4249,10 +4299,6 @@ declare interface Vector3_2 {
 
 /** @public */
 declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
-
-declare const wasEntityClicked: (entity: Entity, actionButton: InputAction) => boolean;
-
-declare function wasEntityClickedGenerator(engine: IEngine): (entity: Entity, actionButton: InputAction) => boolean;
 
 declare namespace WireMessage {
     enum Enum {
