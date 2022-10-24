@@ -41,7 +41,7 @@ function circularSystem(dt: number) {
 function spawnerSystem() {
   const clickedCubes = engine.getEntitiesWith(PointerEvents)
   for (const [entity] of clickedCubes) {
-    if (wasEntityClicked(entity, InputAction.IA_PRIMARY)) {
+    if (Input.wasJustClicked(InputAction.IA_PRIMARY, entity)) {
       createCube(
         1 + Math.random() * 8,
         Math.random() * 8,
