@@ -202,27 +202,25 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     }
   }
 
-  function getTreeEntityArray(
+  function* getTreeEntityArray(
     firstEntity: Entity,
     proccesedEntities: Entity[]
-  ): Entity[] {
-    const children: Entity[] = []
-
+  ): Generator<Entity> {
     // This avoid infinite loop when there is a cyclic parenting
-    if (proccesedEntities.find((value) => firstEntity === value)) return []
+    if (proccesedEntities.find((value) => firstEntity === value)) return
     proccesedEntities.push(firstEntity)
 
     for (const [entity, value] of engine.getEntitiesWith(
       baseComponents.Transform
     )) {
       if (value.parent === firstEntity) {
-        const childrenOfChildren = getTreeEntityArray(entity, proccesedEntities)
-        children.push(...childrenOfChildren)
+        yield* getTreeEntityArray(entity, proccesedEntities)
       }
     }
 
-    return [firstEntity, ...children]
+    yield firstEntity
   }
+
   function removeEntityWithChildren(firstEntity: Entity) {
     for (const entity of getTreeEntityArray(firstEntity, [])) {
       engine.removeEntity(entity)
