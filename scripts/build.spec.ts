@@ -87,8 +87,6 @@ flow('build-all', () => {
     // install required dependencies
     itExecutes(`npm install --quiet ${BUILD_ECS_PATH}`, SDK_PATH)
     itExecutes(`npm install --quiet ${DECENTRALAND_AMD_PATH}`, SDK_PATH)
-
-    itExecutes(`${TSC} src/setupProxy.ts src/setupExport.ts`, SDK_PATH)
   })
 
   flow('@dcl/js-runtime', () => {
