@@ -27,9 +27,12 @@ describe('Generated Material ProtoBuf', () => {
         }
       },
       alphaTexture: {
-        filterMode: undefined,
-        src: 'not-casla',
-        wrapMode: undefined
+        texture: {
+          filterMode: undefined,
+          src: 'not-casla',
+          wrapMode: undefined
+        },
+        avatarTexture: undefined
       },
       castShadows: true,
       glossiness: 1,
@@ -49,19 +52,28 @@ describe('Generated Material ProtoBuf', () => {
       albedoColor: { r: 0, g: 1, b: 1 },
       alphaTest: 1,
       alphaTexture: {
-        wrapMode: TextureWrapMode.TWM_CLAMP,
-        filterMode: TextureFilterMode.TFM_BILINEAR,
-        src: 'not-casla'
+        texture: {
+          wrapMode: TextureWrapMode.TWM_CLAMP,
+          filterMode: TextureFilterMode.TFM_BILINEAR,
+          src: 'not-casla'
+        },
+        avatarTexture: undefined
       },
       bumpTexture: {
-        wrapMode: TextureWrapMode.TWM_MIRROR,
-        filterMode: TextureFilterMode.TFM_POINT,
-        src: 'not-casla'
+        texture: {
+          wrapMode: TextureWrapMode.TWM_MIRROR,
+          filterMode: TextureFilterMode.TFM_POINT,
+          src: 'not-casla'
+        },
+        avatarTexture: undefined
       },
       emissiveTexture: {
-        wrapMode: TextureWrapMode.TWM_MIRROR_ONCE,
-        filterMode: TextureFilterMode.TFM_TRILINEAR,
-        src: 'not-casla'
+        texture: {
+          wrapMode: TextureWrapMode.TWM_MIRROR_ONCE,
+          filterMode: TextureFilterMode.TFM_TRILINEAR,
+          src: 'not-casla'
+        },
+        avatarTexture: undefined
       },
       texture: {
         texture: {
