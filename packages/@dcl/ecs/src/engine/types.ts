@@ -9,6 +9,8 @@ import { ReadonlyComponentSchema } from './readonly'
 
 export { ISchema } from '../schemas/ISchema'
 
+export { IInput } from './input'
+
 /**
  * @public
  */
@@ -42,6 +44,12 @@ export type IEngine = {
    * @param entity
    */
   removeEntity(entity: Entity): void
+
+  /**
+   * Remove all components of each entity in the tree made with Transform parenting
+   * @param firstEntity - the root entity of the tree
+   */
+  removeEntityWithChildren(firstEntity: Entity): void
 
   /**
    * Add the system to the engine. It will be called every tick updated.

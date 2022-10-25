@@ -7,7 +7,7 @@
 
 import { Engine } from '../../engine'
 import { createRendererTransport } from '../../systems/crdt/transports/rendererTransport'
-import { initializeEvents } from './events'
+import { createInput } from './../../engine/input'
 import { initializeDcl } from './dcl'
 import { taskSystem } from '../../systems/async-task'
 
@@ -19,9 +19,10 @@ export const engine = Engine({
 // Dcl Interface
 export const { log, error } = initializeDcl(engine, rendererTransport)
 
-// Events
-export const { wasEntityClicked, isPointerEventActive } =
-  initializeEvents(engine)
+/**
+ * @public
+ */
+export const Input = createInput(engine)
 
 // Task System
 export const { executeTask } = taskSystem(engine)

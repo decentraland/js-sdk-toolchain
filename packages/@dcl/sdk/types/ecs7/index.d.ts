@@ -30,14 +30,6 @@ declare const enum AvatarModifierType {
 /** @public */
 declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
 
-declare interface AvatarTexture {
-    userId: string;
-    /** default = TextureWrapMode.Clamp */
-    wrapMode?: TextureWrapMode | undefined;
-    /** default = FilterMode.Bilinear */
-    filterMode?: TextureFilterMode | undefined;
-}
-
 /** @public */
 declare const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
 
@@ -424,6 +416,15 @@ declare interface Color3_2 {
 
 /**
  * @public
+ */
+declare type Color3Type = {
+    r: number;
+    g: number;
+    b: number;
+};
+
+/**
+ * @public
  * Color4 is a type and a namespace.
  * - The namespace contains all types and functions to operates with Color4
  * - The type Color4 is an alias to Color4.ReadonlyColor4
@@ -766,6 +767,16 @@ declare interface Color4_2 {
     b: number;
     a: number;
 }
+
+/**
+ * @public
+ */
+declare type Color4Type = {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+};
 
 /**
  * @public
@@ -1198,6 +1209,8 @@ declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
 }[keyof T];
 
+declare const executeTask: (task: Task<unknown>) => void;
+
 /** @public */
 declare type FloatArray = number[];
 
@@ -1233,6 +1246,11 @@ declare type IEngine = {
      * @param entity
      */
     removeEntity(entity: Entity): void;
+    /**
+     * Remove all components of each entity in the tree made with Transform parenting
+     * @param firstEntity - the root entity of the tree
+     */
+    removeEntityWithChildren(firstEntity: Entity): void;
     /**
      * Add the system to the engine. It will be called every tick updated.
      * @param system function that receives the delta time between last tick and current one.
@@ -1342,12 +1360,64 @@ declare function IEnum<T>(type: ISchema<any>): ISchema<T>;
 /**
  * @public
  */
+declare type IInput = {
+    /**
+     * Check if a click was emmited in the current tick for the input action.
+     * This is defined when an UP event is triggered with a previously DOWN state.
+     * @param inputAction - the input action to query
+     * @param entity - the entity to query, ignore for global events.
+     * @returns true if the entity was clicked in the last tick-update
+     */
+    wasJustClicked: (inputAction: InputAction, entity?: Entity) => boolean;
+    /**
+     * Check if a pointer event has been emited in the last tick-update.
+     * @param inputAction - the input action to query
+     * @param pointerEventType - the pointer event type to query
+     * @param entity - the entity to query, ignore for global
+     * @returns
+     */
+    wasInputJustActive: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
+    /**
+     * Check if an input action is in DOWN state.
+     * @param inputAction - the input action to query
+     * @returns true if the input action is being pressed
+     */
+    isActionDown: (inputAction: InputAction) => boolean;
+    /**
+     * Get the click info if a click was emmited in the current tick for the input action.
+     * This is defined when an UP event is triggered with a previously DOWN state.
+     * @param inputAction - the input action to query
+     * @param entity - the entity to query, ignore for global events.
+     * @returns the click info or undefined if there is no command in the last tick-update
+     */
+    getClick: (inputAction: InputAction, entity?: Entity) => {
+        up: PBPointerEventsResult_PointerCommand;
+        down: PBPointerEventsResult_PointerCommand;
+    } | null;
+    /**
+     * Get the input command info if a pointer event has been emited in the last tick-update.
+     * @param inputAction - the input action to query
+     * @param pointerEventType - the pointer event type to query
+     * @param entity - the entity to query, ignore for global
+     * @returns the input command info or undefined if there is no command in the last tick-update
+     */
+    getInputCommand: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => PBPointerEventsResult_PointerCommand | null;
+};
+
+/**
+ * @public
+ */
 declare function IMap<T extends Spec>(spec: T): ISchema<Result<T>>;
 
 /** Include property keys from T where the property is assignable to U */
 declare type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
 }[keyof T];
+
+/**
+ * @public
+ */
+declare const Input: IInput;
 
 declare const enum InputAction {
     IA_POINTER = 0,
@@ -1379,17 +1449,6 @@ declare type ISchema<T = any> = {
     deserialize(reader: ByteBuffer): T;
     create(): T;
 };
-
-/**
- * Check if a pointer event has been emited in the last tick-update.
- * @param entity the entity to query, for global clicks use `engine.RootEntity`
- * @param actionButton
- * @param pointerEventType
- * @returns
- */
-declare function isPointerEventActive(entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType): boolean;
-
-declare function isPointerEventActiveGenerator(engine: IEngine): (entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType) => boolean;
 
 declare const log: (...a: any[]) => void;
 
@@ -2609,17 +2668,17 @@ declare interface PBGltfContainer {
 
 declare interface PBMaterial {
     /** default = null */
-    texture?: TextureUnion | undefined;
+    texture?: PBMaterial_Texture | undefined;
     /** default = 0.5. range value: from 0 to 1 */
     alphaTest?: number | undefined;
     /** default =  true */
     castShadows?: boolean | undefined;
     /** default = null */
-    alphaTexture?: Texture | undefined;
+    alphaTexture?: PBMaterial_Texture | undefined;
     /** default = null */
-    emissiveTexture?: Texture | undefined;
+    emissiveTexture?: PBMaterial_Texture | undefined;
     /** default = null */
-    bumpTexture?: Texture | undefined;
+    bumpTexture?: PBMaterial_Texture | undefined;
     /** default = white; */
     albedoColor?: Color3_2 | undefined;
     /** default = black; */
@@ -2640,6 +2699,14 @@ declare interface PBMaterial {
     emissiveIntensity?: number | undefined;
     /** default = 1 */
     directIntensity?: number | undefined;
+}
+
+declare interface PBMaterial_Texture {
+    src: string;
+    /** default = TextureWrapMode.Clamp */
+    wrapMode?: TextureWrapMode | undefined;
+    /** default = FilterMode.Bilinear */
+    filterMode?: TextureFilterMode | undefined;
 }
 
 declare interface PBMeshCollider {
@@ -3279,6 +3346,16 @@ declare namespace Quaternion {
 }
 
 /**
+ * @public
+ */
+declare type QuaternionType = {
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+};
+
+/**
  * Constant used to convert from radians to Euler degrees
  * @public
  */
@@ -3541,6 +3618,10 @@ declare namespace Schemas {
     const Int: ISchema<number>;
     const Int64: ISchema<number>;
     const Number: ISchema<number>;
+    const Vector3: ISchema<Vector3Type>;
+    const Quaternion: ISchema<QuaternionType>;
+    const Color3: ISchema<Color3Type>;
+    const Color4: ISchema<Color4Type>;
     const Enum: typeof IEnum;
     const Array: typeof IArray;
     const Map: typeof IMap;
@@ -3564,6 +3645,8 @@ declare interface Spec {
  */
 declare type SystemFn = (dt: number) => void;
 
+declare type Task<T = unknown> = () => Promise<T>;
+
 declare const enum TextAlignMode {
     TAM_TOP_LEFT = 0,
     TAM_TOP_CENTER = 1,
@@ -3579,25 +3662,10 @@ declare const enum TextAlignMode {
 /** @public */
 declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 
-declare interface Texture {
-    src: string;
-    /** default = TextureWrapMode.Clamp */
-    wrapMode?: TextureWrapMode | undefined;
-    /** default = FilterMode.Bilinear */
-    filterMode?: TextureFilterMode | undefined;
-}
-
 declare const enum TextureFilterMode {
     TFM_POINT = 0,
     TFM_BILINEAR = 1,
     TFM_TRILINEAR = 2
-}
-
-declare interface TextureUnion {
-    /** default = null */
-    texture: Texture | undefined;
-    /** default = null */
-    avatarTexture: AvatarTexture | undefined;
 }
 
 declare const enum TextureWrapMode {
@@ -4260,18 +4328,17 @@ declare interface Vector3_2 {
     z: number;
 }
 
+/**
+ * @public
+ */
+declare type Vector3Type = {
+    x: number;
+    y: number;
+    z: number;
+};
+
 /** @public */
 declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
-
-/**
- * Check if an entity emitted a clicked event
- * @param entity the entity to query, for global clicks use `engine.RootEntity`
- * @param actionButton
- * @returns true if the entity was clicked in the last tick-update
- */
-declare function wasEntityClicked(entity: Entity, actionButton: InputAction): boolean;
-
-declare function wasEntityClickedGenerator(engine: IEngine): (entity: Entity, actionButton: InputAction) => boolean;
 
 declare namespace WireMessage {
     enum Enum {
