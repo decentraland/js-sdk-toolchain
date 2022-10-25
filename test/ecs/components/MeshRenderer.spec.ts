@@ -8,17 +8,11 @@ describe('Generated MeshRenderer ProtoBuf', () => {
     const entityB = newEngine.addEntity()
 
     const _meshRenderer = MeshRenderer.create(entity, {
-      box: { uvs: [0, 1, 0, 0] },
-      sphere: undefined,
-      cylinder: { radiusBottom: 1, radiusTop: 2 },
-      plane: undefined
+      mesh: { $case: 'cylinder', cylinder: { radiusBottom: 1, radiusTop: 2 } }
     })
 
     MeshRenderer.create(entityB, {
-      sphere: {},
-      box: undefined,
-      cylinder: undefined,
-      plane: { uvs: [1, 1, 1, 1] }
+      mesh: { $case: 'plane', plane: { uvs: [1, 1, 1, 1] } }
     })
     const buffer = MeshRenderer.toBinary(entity)
     MeshRenderer.updateFromBinary(entityB, buffer)
@@ -38,8 +32,10 @@ describe('Generated MeshRenderer ProtoBuf', () => {
     const entity = newEngine.addEntity()
 
     const meshRenderer = MeshRenderer.create(entity, {
-      box: { uvs: [] }
+      mesh: { $case: 'box', box: { uvs: [] } }
     })
-    expect(meshRenderer.box).toStrictEqual({ uvs: [] })
+    expect(
+      meshRenderer.mesh?.$case === 'box' && meshRenderer.mesh.box
+    ).toStrictEqual({ uvs: [] })
   })
 })

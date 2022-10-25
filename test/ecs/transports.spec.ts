@@ -61,7 +61,9 @@ describe('Transport tests', () => {
     jest.resetAllMocks()
 
     // MeshRenderer component should be sent to renderer transport
-    engine.baseComponents.MeshRenderer.create(entity, { box: { uvs: [] } })
+    engine.baseComponents.MeshRenderer.create(entity, {
+      mesh: { $case: 'box', box: { uvs: [] } }
+    })
     engine.update(1)
 
     expect(networkSpy).toBeCalledTimes(1)

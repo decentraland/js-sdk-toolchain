@@ -1,7 +1,7 @@
 function createSphere(x: number, y: number, z: number): Entity {
   const meshEntity = engine.addEntity()
   Transform.create(meshEntity, { position: { x, y, z } })
-  MeshRenderer.create(meshEntity, { sphere: {} })
+  MeshRenderer.create(meshEntity, { mesh: { $case: 'sphere', sphere: {} } })
   return meshEntity
 }
 

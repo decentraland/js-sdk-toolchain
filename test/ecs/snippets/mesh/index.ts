@@ -17,26 +17,38 @@ function createMesh(
 
   switch (mesh) {
     case Mesh.BOX:
-      MeshRenderer.create(meshEntity, { box: { uvs: [] } })
-      if (withCollider) MeshCollider.create(meshEntity, { box: {} })
+      MeshRenderer.create(meshEntity, {
+        mesh: { $case: 'box', box: { uvs: [] } }
+      })
+      if (withCollider)
+        MeshCollider.create(meshEntity, { mesh: { $case: 'box', box: {} } })
       break
     case Mesh.SPHERE:
-      MeshRenderer.create(meshEntity, { sphere: {} })
-      if (withCollider) MeshCollider.create(meshEntity, { sphere: {} })
+      MeshRenderer.create(meshEntity, { mesh: { $case: 'sphere', sphere: {} } })
+      if (withCollider)
+        MeshCollider.create(meshEntity, {
+          mesh: { $case: 'sphere', sphere: {} }
+        })
       break
     case Mesh.CONE:
     case Mesh.CYLINDER:
       MeshRenderer.create(meshEntity, {
-        cylinder: {
-          radiusBottom: 1,
-          radiusTop: mesh === Mesh.CONE ? 0 : 1
+        mesh: {
+          $case: 'cylinder',
+          cylinder: {
+            radiusBottom: 1,
+            radiusTop: mesh === Mesh.CONE ? 0 : 1
+          }
         }
       })
       if (withCollider)
         MeshCollider.create(meshEntity, {
-          cylinder: {
-            radiusBottom: 1,
-            radiusTop: mesh === Mesh.CONE ? 0 : 1
+          mesh: {
+            $case: 'cylinder',
+            cylinder: {
+              radiusBottom: 1,
+              radiusTop: mesh === Mesh.CONE ? 0 : 1
+            }
           }
         })
       break

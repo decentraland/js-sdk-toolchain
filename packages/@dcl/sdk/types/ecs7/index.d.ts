@@ -2712,10 +2712,19 @@ declare interface PBMaterial_Texture {
 declare interface PBMeshCollider {
     /** default = ColliderLayer.Physics | ColliderLayer.Pointer */
     collisionMask?: number | undefined;
-    box: PBMeshCollider_BoxMesh | undefined;
-    sphere: PBMeshCollider_SphereMesh | undefined;
-    cylinder: PBMeshCollider_CylinderMesh | undefined;
-    plane: PBMeshCollider_PlaneMesh | undefined;
+    mesh?: {
+        $case: 'box';
+        box: PBMeshCollider_BoxMesh;
+    } | {
+        $case: 'sphere';
+        sphere: PBMeshCollider_SphereMesh;
+    } | {
+        $case: 'cylinder';
+        cylinder: PBMeshCollider_CylinderMesh;
+    } | {
+        $case: 'plane';
+        plane: PBMeshCollider_PlaneMesh;
+    };
 }
 
 declare interface PBMeshCollider_BoxMesh {
@@ -2735,10 +2744,19 @@ declare interface PBMeshCollider_SphereMesh {
 }
 
 declare interface PBMeshRenderer {
-    box: PBMeshRenderer_BoxMesh | undefined;
-    sphere: PBMeshRenderer_SphereMesh | undefined;
-    cylinder: PBMeshRenderer_CylinderMesh | undefined;
-    plane: PBMeshRenderer_PlaneMesh | undefined;
+    mesh?: {
+        $case: 'box';
+        box: PBMeshRenderer_BoxMesh;
+    } | {
+        $case: 'sphere';
+        sphere: PBMeshRenderer_SphereMesh;
+    } | {
+        $case: 'cylinder';
+        cylinder: PBMeshRenderer_CylinderMesh;
+    } | {
+        $case: 'plane';
+        plane: PBMeshRenderer_PlaneMesh;
+    };
 }
 
 declare interface PBMeshRenderer_BoxMesh {

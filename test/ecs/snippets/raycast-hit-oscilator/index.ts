@@ -19,8 +19,8 @@ function createCube(x: number, y: number, z: number) {
   Transform.create(cubeEntity, { position: { x, y, z } })
   CubeComponent.create(cubeEntity)
 
-  MeshRenderer.create(cubeEntity, { box: { uvs: [] } })
-  MeshCollider.create(cubeEntity, { box: {} })
+  MeshRenderer.create(cubeEntity, { mesh: { $case: 'box', box: { uvs: [] } } })
+  MeshCollider.create(cubeEntity, { mesh: { $case: 'box', box: {} } })
 
   // This should be removed and keep working ok!
   // TODO: see physics layers
