@@ -356,11 +356,6 @@ export type Entity = number & {
 // @public (undocumented)
 export const error: (message: string | Error, data?: any) => void;
 
-// Warning: (ae-missing-release-tag) "executeTask" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const executeTask: (task: Task<unknown>) => void;
-
 // @public (undocumented)
 export const GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
 
@@ -400,14 +395,19 @@ export type IInput = {
 };
 
 // @public (undocumented)
-export const Input: IInput;
-
-// @public (undocumented)
 export type ISchema<T = any> = {
     serialize(value: T, builder: ByteBuffer): void;
     deserialize(reader: ByteBuffer): T;
     create(): T;
 };
+
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (ae-missing-release-tag) "isPointerEventActive" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export function isPointerEventActive(entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType): boolean;
 
 // Warning: (ae-missing-release-tag) "log" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -745,11 +745,6 @@ export interface Spec {
 // @public (undocumented)
 export type SystemFn = (dt: number) => void;
 
-// Warning: (ae-missing-release-tag) "Task" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type Task<T = unknown> = () => Promise<T>;
-
 // @public (undocumented)
 export const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 
@@ -882,6 +877,13 @@ export namespace Vector3 {
 
 // @public (undocumented)
 export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
+
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (ae-missing-release-tag) "wasEntityClicked" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export function wasEntityClicked(entity: Entity, actionButton: InputAction): boolean;
 
 // Warnings were encountered during analysis:
 //

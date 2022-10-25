@@ -31,7 +31,7 @@
     "@dcl/crdt": "^1.0.0-20220819145912.commit-35069cd",
     "@dcl/ecs-math": "^2.0.1-20221018212447.commit-82ecfec",
     "@dcl/posix": "^1.0.4",
-    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-3298987372.commit-05b549e.tgz"
+    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-3322689560.commit-7c598bc.tgz"
   },
   "files": [
     "dist/index.js",
