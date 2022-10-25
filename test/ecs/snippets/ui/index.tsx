@@ -78,7 +78,7 @@ function createCube(x: number, y: number, z: number, spawner = true): Entity {
   MeshRenderer.create(meshEntity, { box: { uvs: [] } })
   MeshCollider.create(meshEntity, { box: {} })
   if (spawner) {
-    PointerEvents.create(meshEntity, {
+    PointerHoverFeedback.create(meshEntity, {
       pointerEvents: [
         {
           eventType: PointerEventType.PET_DOWN,
@@ -112,7 +112,7 @@ function circularSystem(dt: number) {
 }
 
 function spawnerSystem() {
-  const clickedCubes = engine.getEntitiesWith(PointerEvents)
+  const clickedCubes = engine.getEntitiesWith(PointerHoverFeedback)
   for (const [entity] of clickedCubes) {
     if (Input.wasJustClicked(InputAction.IA_PRIMARY, entity)) {
       counter++
