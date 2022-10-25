@@ -22,20 +22,15 @@ jobs:
       - name: build
         run: make build
       - name: test
-        run: make test-coverage --outputFile=report.json test/
+        run: make test-coverage
       - name: lint
         run: make lint
       - name: prepare releasable packages
         run: make prepare
-      - uses: ArtiomTr/jest-coverage-report-action@v2
-        id: coverage
+      - name: Report Coverage
+        uses: coverallsapp/github-action@master
         with:
-            coverage-file: ./coverage/report.json
-            base-coverage-file: ./coverage/master/report.json
-            output: comment, report-markdown
-      - uses: marocchino/sticky-pull-request-comment@v2
-        with:
-            message: ${{ steps.coverage.outputs.report }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
   build:
     runs-on: ubuntu-latest
     outputs:
