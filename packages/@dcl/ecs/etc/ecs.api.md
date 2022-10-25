@@ -253,11 +253,11 @@ export namespace Components {
     const // Warning: (ae-forgotten-export) The symbol "PBMeshCollider" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
+    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
     const // Warning: (ae-forgotten-export) The symbol "PBMeshRenderer" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
+    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
     const // Warning: (ae-forgotten-export) The symbol "PBNftShape" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -364,6 +364,20 @@ export const executeTask: (task: Task<unknown>) => void;
 // @public (undocumented)
 export const GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
 
+// Warning: (ae-missing-release-tag) "Helper" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export namespace Helper {
+    const // (undocumented)
+    MeshRenderer: {
+        buildBox: typeof buildBox;
+    };
+    const // (undocumented)
+    MeshCollider: {
+        buildColliderBox: typeof buildColliderBox;
+    };
+}
+
 // @public (undocumented)
 export type IEngine = {
     addEntity(dynamic?: boolean): Entity;
@@ -423,10 +437,10 @@ export function makeCollisionMask(...layers: ColliderLayer[]): number;
 export const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
 
 // @public (undocumented)
-export const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
+export const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
 
 // @public (undocumented)
-export const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
+export const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
 
 // Warning: (tsdoc-missing-deprecation-message) The @deprecated block must include a deprecation message, e.g. describing the recommended alternative
 //
@@ -885,6 +899,8 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 
 // Warnings were encountered during analysis:
 //
+// dist/components/helpers/index.d.ts:5:9 - (ae-forgotten-export) The symbol "buildBox" needs to be exported by the entry point index.d.ts
+// dist/components/helpers/index.d.ts:8:9 - (ae-forgotten-export) The symbol "buildColliderBox" needs to be exported by the entry point index.d.ts
 // dist/engine/component.d.ts:24:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/component.d.ts:37:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/component.d.ts:38:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration

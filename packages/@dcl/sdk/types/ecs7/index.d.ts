@@ -38,6 +38,10 @@ declare const enum BillboardMode {
     BM_Y_AXE = 1
 }
 
+declare function buildBox(uvs?: number[]): PBMeshRenderer;
+
+declare function buildColliderBox(): PBMeshCollider;
+
 /**
  * @public
  */
@@ -931,9 +935,9 @@ declare namespace Components {
     /** @public */
     const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     /** @public */
-    const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
+    const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
     /** @public */
-    const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
+    const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
     /** @public */
     const NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     /** @public */
@@ -1149,8 +1153,6 @@ declare type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 
 declare function defineSdkComponents(engine: PreEngine): {
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
-    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
-    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
     Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
@@ -1162,6 +1164,8 @@ declare function defineSdkComponents(engine: PreEngine): {
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
     NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
@@ -1221,6 +1225,15 @@ declare const enum Font {
 
 /** @public */
 declare const GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
+
+declare namespace Helper {
+    const MeshRenderer: {
+        buildBox: typeof buildBox;
+    };
+    const MeshCollider: {
+        buildColliderBox: typeof buildColliderBox;
+    };
+}
 
 /**
  * @public
@@ -2214,10 +2227,10 @@ declare namespace Matrix {
 }
 
 /** @public */
-declare const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
+declare const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
 
 /** @public */
-declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
+declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
 
 /**
  * @public
