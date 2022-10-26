@@ -1,4 +1,7 @@
-import { ColliderLayer } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/mesh_collider.gen'
+import {
+  ColliderLayer,
+  PBMeshCollider
+} from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/mesh_collider.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 import { makeCollisionMask } from '../../../packages/@dcl/ecs/src/components'
 
@@ -9,27 +12,37 @@ describe('Generated MeshCollider ProtoBuf', () => {
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 
-    const _meshCollider = MeshCollider.create(entity, {
-      mesh: { $case: 'cylinder', cylinder: { radiusBottom: 1, radiusTop: 2 } },
-      collisionMask: ColliderLayer.CL_POINTER
-    })
+    const serializeComponents: PBMeshCollider[] = [
+      {
+        mesh: { $case: 'cylinder', cylinder: { radiusBottom: 1, radiusTop: 2 } }
+      },
+      {
+        mesh: { $case: 'plane', plane: {} }
+      },
+      {
+        mesh: { $case: 'box', box: {} }
+      },
+      {
+        mesh: { $case: 'sphere', sphere: {} }
+      }
+    ]
 
-    MeshCollider.create(entityB, {
-      mesh: { $case: 'plane', plane: {} },
-      collisionMask: makeCollisionMask(
-        ColliderLayer.CL_POINTER,
-        ColliderLayer.CL_PHYSICS
-      )
-    })
-    const buffer = MeshCollider.toBinary(entity)
-    MeshCollider.updateFromBinary(entityB, buffer)
+    let previousData = serializeComponents[serializeComponents.length - 1]
+    for (const data of serializeComponents) {
+      MeshCollider.createOrReplace(entity, data)
+      MeshCollider.createOrReplace(entityB, previousData)
+      previousData = data
 
-    expect(_meshCollider).toBeDeepCloseTo({
-      ...MeshCollider.getMutable(entityB)
-    } as any)
+      const buffer = MeshCollider.toBinary(entity)
+      MeshCollider.updateFromBinary(entityB, buffer)
 
-    expect(MeshCollider.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...MeshCollider.getMutable(entity)
-    } as any)
+      expect(MeshCollider.get(entity)).toBeDeepCloseTo({
+        ...MeshCollider.getMutable(entityB)
+      } as any)
+
+      expect(MeshCollider.createOrReplace(entityB)).not.toBeDeepCloseTo({
+        ...MeshCollider.getMutable(entity)
+      } as any)
+    }
   })
 })
