@@ -1,9 +1,5 @@
-import {
-  ColliderLayer,
-  PBMeshCollider
-} from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/mesh_collider.gen'
+import { PBMeshCollider } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/mesh_collider.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
-import { makeCollisionMask } from '../../../packages/@dcl/ecs/src/components'
 
 describe('Generated MeshCollider ProtoBuf', () => {
   it('should serialize/deserialize MeshCollider', () => {
