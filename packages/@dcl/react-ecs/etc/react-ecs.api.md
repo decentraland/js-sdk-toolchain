@@ -62,7 +62,7 @@ export type ContainerPropTypes = Partial<CommonProps> & EntityPropTypes['uiTrans
 //
 // @public (undocumented)
 export type EcsElements = {
-    entity: Partial<EntityComponents & CommonProps>;
+    entity: Partial<Omit<EntityComponents, 'onClick'> & CommonProps>;
 };
 
 // Warning: (ae-missing-release-tag) "EntityComponents" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -80,7 +80,7 @@ export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
     uiText?: UiTextProps;
     uiBackground?: UiBackgroundProps;
-} & Listeners;
+};
 
 // Warning: (ae-missing-release-tag) "Font" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

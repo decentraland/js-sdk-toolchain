@@ -6,7 +6,7 @@ import {
   UiEntity
 } from '../../../packages/@dcl/react-ecs/src'
 import { createTestPointerDownCommand } from '../events/utils'
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_events.gen'
+import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
 
 declare let engine: IEngine
 
@@ -43,6 +43,8 @@ describe('Ui Listeners React Ecs', () => {
       counter++
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     const ui = () => <UiEntity uiTransform={{ width: 100 }} onClick={onClick} />
     renderUi(ui)
     expect(counter).toBe(0)
