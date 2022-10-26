@@ -1,3 +1,4 @@
+import { EntityComponents } from '../react-ecs'
 import {
   Container,
   HostContext,
@@ -10,6 +11,16 @@ import {
   TimeoutHandle,
   Type
 } from './types'
+
+const entityComponent: EntityComponents = {
+  uiText: undefined as any,
+  uiBackground: undefined as any,
+  uiTransform: undefined as any,
+  onClick: undefined as any
+}
+export const componentKeys: (keyof EntityComponents)[] = Object.keys(
+  entityComponent
+) as (keyof EntityComponents)[]
 
 export function isEqual<T = unknown>(val1: T, val2: T): boolean {
   if (!val1 && !val2) {

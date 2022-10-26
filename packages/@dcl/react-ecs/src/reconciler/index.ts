@@ -1,6 +1,6 @@
 import type { Entity, IEngine, IInput } from '@dcl/ecs'
 import Reconciler, { HostConfig } from 'react-reconciler'
-import { CANVAS_ROOT_ENTITY, Listeners } from '../components'
+import { CANVAS_ROOT_ENTITY, isListener, Listeners } from '../components'
 import { EntityComponents, JSX } from '../react-ecs'
 import {
   Changes,
@@ -20,7 +20,7 @@ import {
   OpaqueHandle,
   EngineComponents
 } from './types'
-import { isEqual, isNotUndefined, noopConfig } from './utils'
+import { componentKeys, isEqual, isNotUndefined, noopConfig } from './utils'
 
 declare const Input: IInput
 
@@ -43,8 +43,13 @@ function propsChanged<K extends keyof EntityComponents>(
     return { type: 'add', props: nextProps, component }
   }
 
-  const changes: Partial<EntityComponents[K]> = {}
+  if (isListener(component)) {
+    if (!isEqual(prevProps, nextProps)) {
+      return { type: 'put', component, props: nextProps }
+    }
+  }
 
+  const changes: Partial<EntityComponents[K]> = {}
   // TODO: array and object types. For now only primitives
   for (const k in prevProps) {
     const propKey = k as keyof typeof prevProps
@@ -69,7 +74,7 @@ export function createReconciler(
   const entities = new Set<Entity>()
   const events = new Map<
     Entity,
-    Map<keyof EntityComponents['listeners'], any>
+    Map<keyof Listeners, Listeners[keyof Listeners]>
   >()
   const getComponentId: {
     [key in keyof EngineComponents]: number
@@ -86,7 +91,10 @@ export function createReconciler(
     upsertComponent(instance, props, 'uiTransform')
   }
 
-  function upsertListener(instance: Instance, update: Changes<'listeners'>) {
+  function upsertListener(
+    instance: Instance,
+    update: Changes<keyof Listeners>
+  ) {
     if (update.type === 'delete') {
       events.delete(instance.entity)
       return
@@ -95,10 +103,10 @@ export function createReconciler(
       events.get(instance.entity) ||
       events.set(instance.entity, new Map()).get(instance.entity)!
 
-    for (const key in update.props) {
-      const typedKey = key as keyof Listeners
-      entityEvents.set(typedKey, update.props[typedKey])
-    }
+    entityEvents.set(
+      update.component,
+      update.props as Listeners[typeof update.component]
+    )
   }
 
   function removeComponent(
@@ -194,11 +202,11 @@ export function createReconciler(
         if (keyTyped === 'children' || keyTyped === 'key') {
           continue
         }
-        if (keyTyped === 'listeners') {
+        if (isListener(keyTyped)) {
           upsertListener(instance, {
             type: 'add',
             props: props[keyTyped],
-            component: 'listeners'
+            component: keyTyped
           })
         } else {
           upsertComponent(instance, props[keyTyped], keyTyped)
@@ -219,10 +227,7 @@ export function createReconciler(
       oldProps: Props,
       newProps: Props
     ): UpdatePayload {
-      const components = Object.keys(
-        getComponentId
-      ) as (keyof EntityComponents)[]
-      return components
+      return componentKeys
         .map((component) =>
           propsChanged(component, oldProps[component], newProps[component])
         )
@@ -239,8 +244,8 @@ export function createReconciler(
     ): void {
       for (const update of updatePayload) {
         console.log(update)
-        if (update.component === 'listeners') {
-          upsertListener(instance, update as Changes<'listeners'>)
+        if (isListener(update.component)) {
+          upsertListener(instance, update as Changes<keyof Listeners>)
           continue
         }
         if (update.type === 'delete') {
@@ -301,7 +306,7 @@ export function createReconciler(
           keyListener === 'onClick' &&
           Input.wasJustClicked(IA_POINTER, entity)
         ) {
-          fn()
+          void fn()
         }
       }
     }

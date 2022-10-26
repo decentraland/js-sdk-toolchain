@@ -19,27 +19,59 @@ describe('Ui Listeners React Ecs', () => {
   it('should run onClick if it was fake-clicked', async () => {
     const { PointerEventsResult } = engine.baseComponents
     const uiEntity = (engine.addEntity() + 1) as Entity
-    let counter = 0
+    let fakeCounter = 0
+    const fakeClick = () => {
+      PointerEventsResult.createOrReplace(engine.RootEntity, {
+        commands: [
+          createTestPointerDownCommand(
+            uiEntity,
+            fakeCounter + 1,
+            PointerEventType.PET_DOWN
+          ),
+          createTestPointerDownCommand(
+            uiEntity,
+            fakeCounter + 2,
+            PointerEventType.PET_UP
+          )
+        ]
+      })
+      fakeCounter += 1
+    }
 
-    function onClick() {
+    let counter = 0
+    let onClick: (() => void) | undefined = () => {
       counter++
     }
 
-    const ui = () => (
-      <UiEntity uiTransform={{ width: 100 }} listeners={{ onClick }} />
-    )
+    const ui = () => <UiEntity uiTransform={{ width: 100 }} onClick={onClick} />
     renderUi(ui)
     expect(counter).toBe(0)
     engine.update(1)
 
-    PointerEventsResult.create(engine.RootEntity, {
-      commands: [
-        createTestPointerDownCommand(uiEntity, 4, PointerEventType.PET_DOWN),
-        createTestPointerDownCommand(uiEntity, 5, PointerEventType.PET_UP)
-      ]
-    })
-
+    // Click with the current onclick
+    fakeClick()
     engine.update(1)
     expect(counter).toBe(1)
+
+    fakeClick()
+    engine.update(1)
+    expect(counter).toBe(2)
+
+    // Remove onClick
+    onClick = undefined
+    engine.update(1)
+    fakeClick()
+    engine.update(1)
+    expect(counter).toBe(2)
+
+    // Add a new onclick
+    onClick = () => {
+      counter = 8888
+    }
+    engine.update(1)
+    fakeClick()
+
+    engine.update(1)
+    expect(counter).toBe(8888)
   })
 })

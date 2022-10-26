@@ -10,8 +10,7 @@ export type EntityPropTypes = {
   uiTransform?: UiTransformProps
   uiText?: UiTextProps
   uiBackground?: UiBackgroundProps
-  listeners?: Listeners
-}
+} & Listeners
 
 export type Key = number | string
 export type Children = any

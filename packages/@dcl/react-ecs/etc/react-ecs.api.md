@@ -72,7 +72,7 @@ export type EntityComponents = {
     uiTransform: PBUiTransform;
     uiText: PBUiText;
     uiBackground: PBUiBackground;
-    listeners: Listeners;
+    onClick: OnClick;
 };
 
 // @public (undocumented)
@@ -80,8 +80,7 @@ export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
     uiText?: UiTextProps;
     uiBackground?: UiBackgroundProps;
-    listeners?: Listeners;
-};
+} & Listeners;
 
 // Warning: (ae-missing-release-tag) "Font" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -94,6 +93,11 @@ export enum Font {
     // (undocumented)
     UNRECOGNIZED = -1
 }
+
+// Warning: (ae-missing-release-tag) "isListener" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const isListener: (key: string) => key is "onClick";
 
 // Warning: (ae-missing-release-tag) "JSX" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -120,6 +124,11 @@ export type Key = number | string;
 export type Listeners = {
     onClick?: OnClick;
 };
+
+// Warning: (ae-missing-release-tag) "OnClick" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type OnClick = () => Promise<void> | void;
 
 // Warning: (ae-missing-release-tag) "PBUiBackground" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -540,10 +549,6 @@ export enum YGWrap {
     // (undocumented)
     YGW_WRAP_REVERSE = 2
 }
-
-// Warnings were encountered during analysis:
-//
-// dist/components/listeners/types.d.ts:3:5 - (ae-forgotten-export) The symbol "OnClick" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
