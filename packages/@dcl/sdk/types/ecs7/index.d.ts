@@ -1458,7 +1458,7 @@ declare type ISchema<T = any> = {
  * @param pointerEventType
  * @returns
  */
-declare function isPointerEventActive(entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType): boolean;
+declare function isPointerEventActive(entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType_2): boolean;
 
 declare const log: (...a: any[]) => void;
 
@@ -3063,6 +3063,13 @@ declare namespace Plane {
 declare const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
 
 declare const enum PointerEventType {
+    PET_UP = 0,
+    PET_DOWN = 1,
+    PET_HOVER_ENTER = 2,
+    PET_HOVER_LEAVE = 3
+}
+
+declare const enum PointerEventType_2 {
     PET_UP = 0,
     PET_DOWN = 1,
     PET_HOVER_ENTER = 2,
