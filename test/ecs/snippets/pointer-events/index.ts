@@ -7,8 +7,8 @@ function createCube(
 ): Entity {
   const meshEntity = engine.addEntity()
   Transform.create(meshEntity, { position: { x, y, z } })
-  MeshRenderer.create(meshEntity, { box: { uvs: [] } })
-  MeshCollider.create(meshEntity, { box: {} })
+  MeshRenderer.create(meshEntity, { mesh: { $case: 'box', box: { uvs: [] } } })
+  MeshCollider.create(meshEntity, { mesh: { $case: 'box', box: {} } })
   PointerHoverFeedback.create(meshEntity, { pointerEvents })
   return meshEntity
 }

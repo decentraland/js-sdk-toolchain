@@ -1,4 +1,5 @@
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+import type { PBMeshRenderer } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/mesh_renderer.gen'
 
 describe('Generated MeshRenderer ProtoBuf', () => {
   it('should serialize/deserialize MeshRenderer', () => {
@@ -7,39 +8,37 @@ describe('Generated MeshRenderer ProtoBuf', () => {
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 
-    const _meshRenderer = MeshRenderer.create(entity, {
-      box: { uvs: [0, 1, 0, 0] },
-      sphere: undefined,
-      cylinder: { radiusBottom: 1, radiusTop: 2 },
-      plane: undefined
-    })
+    const serializeComponents: PBMeshRenderer[] = [
+      {
+        mesh: { $case: 'cylinder', cylinder: { radiusBottom: 1, radiusTop: 2 } }
+      },
+      {
+        mesh: { $case: 'plane', plane: { uvs: [1, 1, 1, 1] } }
+      },
+      {
+        mesh: { $case: 'box', box: { uvs: [1, 1, 1, 1] } }
+      },
+      {
+        mesh: { $case: 'sphere', sphere: {} }
+      }
+    ]
 
-    MeshRenderer.create(entityB, {
-      sphere: {},
-      box: undefined,
-      cylinder: undefined,
-      plane: { uvs: [1, 1, 1, 1] }
-    })
-    const buffer = MeshRenderer.toBinary(entity)
-    MeshRenderer.updateFromBinary(entityB, buffer)
+    let previousData = serializeComponents[serializeComponents.length - 1]
+    for (const data of serializeComponents) {
+      MeshRenderer.createOrReplace(entity, data)
+      MeshRenderer.createOrReplace(entityB, previousData)
+      previousData = data
 
-    expect(_meshRenderer).toBeDeepCloseTo({
-      ...MeshRenderer.getMutable(entityB)
-    } as any)
+      const buffer = MeshRenderer.toBinary(entity)
+      MeshRenderer.updateFromBinary(entityB, buffer)
 
-    expect(MeshRenderer.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...MeshRenderer.getMutable(entity)
-    } as any)
-  })
+      expect(MeshRenderer.get(entity)).toBeDeepCloseTo({
+        ...MeshRenderer.getMutable(entityB)
+      } as any)
 
-  it('should create a Mesh with default constructor (a prefilled undefined)', () => {
-    const newEngine = Engine()
-    const { MeshRenderer } = newEngine.baseComponents
-    const entity = newEngine.addEntity()
-
-    const meshRenderer = MeshRenderer.create(entity, {
-      box: { uvs: [] }
-    })
-    expect(meshRenderer.box).toStrictEqual({ uvs: [] })
+      expect(MeshRenderer.createOrReplace(entityB)).not.toBeDeepCloseTo({
+        ...MeshRenderer.getMutable(entity)
+      } as any)
+    }
   })
 })

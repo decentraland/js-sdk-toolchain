@@ -939,9 +939,9 @@ declare namespace Components {
     /** @public */
     const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     /** @public */
-    const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
+    const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
     /** @public */
-    const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
+    const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
     /** @public */
     const NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     /** @public */
@@ -1157,8 +1157,6 @@ declare type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 
 declare function defineSdkComponents(engine: PreEngine): {
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
-    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
-    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
     Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
@@ -1170,6 +1168,8 @@ declare function defineSdkComponents(engine: PreEngine): {
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
     NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
     PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
@@ -1216,6 +1216,8 @@ declare const error: (message: string | Error, data?: any) => void;
 declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
 }[keyof T];
+
+declare const executeTask: (task: Task<unknown>) => void;
 
 /** @public */
 declare type FloatArray = number[];
@@ -1420,6 +1422,11 @@ declare type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
 }[keyof T];
 
+/**
+ * @public
+ */
+declare const Input: IInput;
+
 declare const enum InputAction {
     IA_POINTER = 0,
     IA_PRIMARY = 1,
@@ -1450,15 +1457,6 @@ declare type ISchema<T = any> = {
     deserialize(reader: ByteBuffer): T;
     create(): T;
 };
-
-/**
- * Check if a pointer event has been emited in the last tick-update.
- * @param entity the entity to query, for global clicks use `engine.RootEntity`
- * @param actionButton
- * @param pointerEventType
- * @returns
- */
-declare function isPointerEventActive(entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType_2): boolean;
 
 declare const log: (...a: any[]) => void;
 
@@ -2224,10 +2222,10 @@ declare namespace Matrix {
 }
 
 /** @public */
-declare const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, Partial<PBMeshCollider>>;
+declare const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
 
 /** @public */
-declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, Partial<PBMeshRenderer>>;
+declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
 
 /**
  * @public
@@ -2714,10 +2712,19 @@ declare interface PBMaterial {
 declare interface PBMeshCollider {
     /** default = ColliderLayer.Physics | ColliderLayer.Pointer */
     collisionMask?: number | undefined;
-    box: PBMeshCollider_BoxMesh | undefined;
-    sphere: PBMeshCollider_SphereMesh | undefined;
-    cylinder: PBMeshCollider_CylinderMesh | undefined;
-    plane: PBMeshCollider_PlaneMesh | undefined;
+    mesh?: {
+        $case: 'box';
+        box: PBMeshCollider_BoxMesh;
+    } | {
+        $case: 'sphere';
+        sphere: PBMeshCollider_SphereMesh;
+    } | {
+        $case: 'cylinder';
+        cylinder: PBMeshCollider_CylinderMesh;
+    } | {
+        $case: 'plane';
+        plane: PBMeshCollider_PlaneMesh;
+    };
 }
 
 declare interface PBMeshCollider_BoxMesh {
@@ -2737,10 +2744,19 @@ declare interface PBMeshCollider_SphereMesh {
 }
 
 declare interface PBMeshRenderer {
-    box: PBMeshRenderer_BoxMesh | undefined;
-    sphere: PBMeshRenderer_SphereMesh | undefined;
-    cylinder: PBMeshRenderer_CylinderMesh | undefined;
-    plane: PBMeshRenderer_PlaneMesh | undefined;
+    mesh?: {
+        $case: 'box';
+        box: PBMeshRenderer_BoxMesh;
+    } | {
+        $case: 'sphere';
+        sphere: PBMeshRenderer_SphereMesh;
+    } | {
+        $case: 'cylinder';
+        cylinder: PBMeshRenderer_CylinderMesh;
+    } | {
+        $case: 'plane';
+        plane: PBMeshRenderer_PlaneMesh;
+    };
 }
 
 declare interface PBMeshRenderer_BoxMesh {
@@ -3063,13 +3079,6 @@ declare namespace Plane {
 declare const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
 
 declare const enum PointerEventType {
-    PET_UP = 0,
-    PET_DOWN = 1,
-    PET_HOVER_ENTER = 2,
-    PET_HOVER_LEAVE = 3
-}
-
-declare const enum PointerEventType_2 {
     PET_UP = 0,
     PET_DOWN = 1,
     PET_HOVER_ENTER = 2,
@@ -3654,6 +3663,8 @@ declare interface Spec {
  */
 declare type SystemFn = (dt: number) => void;
 
+declare type Task<T = unknown> = () => Promise<T>;
+
 declare const enum TextAlignMode {
     TAM_TOP_LEFT = 0,
     TAM_TOP_CENTER = 1,
@@ -3684,10 +3695,13 @@ declare const enum TextureFilterMode {
 }
 
 declare interface TextureUnion {
-    /** default = null */
-    texture: Texture | undefined;
-    /** default = null */
-    avatarTexture: AvatarTexture | undefined;
+    tex?: {
+        $case: 'texture';
+        texture: Texture;
+    } | {
+        $case: 'avatarTexture';
+        avatarTexture: AvatarTexture;
+    };
 }
 
 declare const enum TextureWrapMode {
@@ -4361,14 +4375,6 @@ declare type Vector3Type = {
 
 /** @public */
 declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
-
-/**
- * Check if an entity emitted a clicked event
- * @param entity the entity to query, for global clicks use `engine.RootEntity`
- * @param actionButton
- * @returns true if the entity was clicked in the last tick-update
- */
-declare function wasEntityClicked(entity: Entity, actionButton: InputAction): boolean;
 
 declare namespace WireMessage {
     enum Enum {

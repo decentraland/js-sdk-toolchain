@@ -356,7 +356,7 @@ describe('Engine tests', () => {
     const engine = Engine()
     const entityA = engine.addEntity()
     engine.baseComponents.MeshRenderer.create(entityA, {
-      box: { uvs: [] }
+      mesh: { $case: 'box', box: { uvs: [] } }
     })
     expect(engine.baseComponents.MeshRenderer.isDirty(entityA)).toBe(true)
     engine.update(1)
@@ -579,7 +579,9 @@ describe('Engine tests', () => {
       engine.baseComponents.Transform.create(meshEntity, {
         parent
       })
-      engine.baseComponents.MeshCollider.create(meshEntity, { box: {} })
+      engine.baseComponents.MeshCollider.create(meshEntity, {
+        mesh: { $case: 'box', box: {} }
+      })
       return meshEntity
     }
 
@@ -616,7 +618,9 @@ describe('Engine tests', () => {
       engine.baseComponents.Transform.create(meshEntity, {
         parent
       })
-      engine.baseComponents.MeshCollider.create(meshEntity, { box: {} })
+      engine.baseComponents.MeshCollider.create(meshEntity, {
+        mesh: { $case: 'box', box: {} }
+      })
       return meshEntity
     }
 

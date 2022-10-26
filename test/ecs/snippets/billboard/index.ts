@@ -3,8 +3,10 @@ function createPlaneTexture(x: number, y: number, z: number): Entity {
 
   Material.create(meshEntity, {
     texture: {
-      texture: { src: 'models/polaroid2.png' },
-      avatarTexture: undefined
+      tex: {
+        $case: 'texture',
+        texture: { src: 'models/polaroid2.png' }
+      }
     }
   })
   Transform.create(meshEntity, {
@@ -12,8 +14,11 @@ function createPlaneTexture(x: number, y: number, z: number): Entity {
     scale: Vector3.create(2, 2, 2)
   })
   MeshRenderer.create(meshEntity, {
-    plane: {
-      uvs: [...Array.from({ length: 40 }, () => 0), 0, 1, 1, 1, 1, 0, 0, 0]
+    mesh: {
+      $case: 'plane',
+      plane: {
+        uvs: [...Array.from({ length: 40 }, () => 0), 0, 1, 1, 1, 1, 0, 0, 0]
+      }
     }
   })
   return meshEntity

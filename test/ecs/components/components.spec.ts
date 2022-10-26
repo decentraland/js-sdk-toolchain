@@ -19,7 +19,7 @@ describe('Legacy component tests', () => {
       const newCubeEntity = engine.addEntity()
 
       sdk.MeshRenderer.create(newCubeEntity, {
-        box: { uvs: [0, 0, 0, 0] }
+        mesh: { $case: 'box', box: { uvs: [0, 0, 0, 0] } }
       })
 
       sdk.Transform.create(newCubeEntity, {
