@@ -1210,13 +1210,55 @@ declare type Entity = number & {
 
 declare const entitySymbol: unique symbol;
 
+/**
+ * Error function. Prints a console error. Only works in debug mode, otherwise it does nothing.
+ * @param error - string or Error object.
+ * @param data - any debug information.
+ * @public
+ */
 declare const error: (message: string | Error, data?: any) => void;
+
+declare namespace EventsSystem {
+    export type Callback = (event: PBPointerEventsResult_PointerCommand) => void | Promise<void>;
+    export type Opts = {
+        button: InputAction;
+        hoverText?: string;
+    };
+    /**
+     * Remove the callback for onClick event
+     * @param entity Entity where the callback was attached
+     */
+    export function removeOnClick(entity: Entity): void;
+    /**
+     * Remove the callback for onPointerDown event
+     * @param entity Entity where the callback was attached
+     */
+    export function removeOnPointerDown(entity: Entity): void;
+    /**
+     * Execute callback when the user pressed the button declared while pointing at the entity
+     * @param entity Entity to attach the callback
+     * @param cb Function to execute when onPointerDown fires
+     * @param opts Opts to trigger Feedback and Button
+     */
+    export function onClick(entity: Entity, cb: Callback, opts?: Opts): void;
+    /**
+     * Execute callback when the user releases the button declared while pointing at the entity
+     * @param entity Entity to attach the callback
+     * @param cb Function to execute when click fires
+     * @param opts Opts to trigger Feedback and Button
+     */
+    export function onPointerDown(entity: Entity, cb: Callback, opts?: Opts): void;
+}
 
 /** Excludes property keys from T where the property is assignable to U */
 declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
 }[keyof T];
 
+/**
+ * @public
+ * Execute async task
+ */
 declare const executeTask: (task: Task<unknown>) => void;
 
 /** @public */
@@ -1259,6 +1301,12 @@ declare type IEngine = {
      * @param firstEntity - the root entity of the tree
      */
     removeEntityWithChildren(firstEntity: Entity): void;
+    /**
+     * Check if an entity exists in the engine
+     * @param entity - the entity to validate
+     * @returns true if the entity exists in the engine
+     */
+    entityExists(entity: Entity): boolean;
     /**
      * Add the system to the engine. It will be called every tick updated.
      * @param system function that receives the delta time between last tick and current one.
@@ -1458,6 +1506,11 @@ declare type ISchema<T = any> = {
     create(): T;
 };
 
+/**
+ * Log function. Only works in debug mode, otherwise it does nothing.
+ * @param args - any loggable parameter
+ * @public
+ */
 declare const log: (...a: any[]) => void;
 
 /**
@@ -3097,7 +3150,7 @@ declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointer
 declare type PreEngine = ReturnType<typeof preEngine>;
 
 declare function preEngine(): {
-    entitiesComponent: Map<number, Set<number>>;
+    entityExists: (entity: Entity) => boolean;
     componentsDefinition: Map<number, ComponentDefinition<any, any>>;
     addEntity: (dynamic?: boolean) => Entity;
     addDynamicEntity: () => Entity;

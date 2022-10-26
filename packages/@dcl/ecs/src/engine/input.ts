@@ -146,6 +146,8 @@ export function createInput(engine: IEngine): IInput {
       entity
     )
     // We search the last UP command sorted by timestamp
+    if (!down) return null
+
     const up = findLastAction(
       commands,
       PointerEventType.PET_UP,
@@ -153,7 +155,6 @@ export function createInput(engine: IEngine): IInput {
       entity
     )
 
-    if (!down) return null
     if (!up) return null
 
     const state = InternalInputStateComponent.get(engine.RootEntity)
