@@ -3,13 +3,13 @@ function createCube(
   x: number,
   y: number,
   z: number,
-  pointerEvents: PBPointerEvents_Entry[]
+  pointerEvents: PBPointerHoverFeedback_Entry[]
 ): Entity {
   const meshEntity = engine.addEntity()
   Transform.create(meshEntity, { position: { x, y, z } })
-  MeshRenderer.create(meshEntity, { mesh: { $case: 'box', box: { uvs: [] } } })
-  MeshCollider.create(meshEntity, { mesh: { $case: 'box', box: {} } })
-  PointerEvents.create(meshEntity, { pointerEvents })
+  MeshRenderer.create(meshEntity, { box: { uvs: [] } })
+  MeshCollider.create(meshEntity, { box: {} })
+  PointerHoverFeedback.create(meshEntity, { pointerEvents })
   return meshEntity
 }
 
