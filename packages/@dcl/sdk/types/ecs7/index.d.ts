@@ -46,10 +46,6 @@ declare const enum BillboardMode {
     BM_Y_AXE = 1
 }
 
-declare function buildBox(uvs?: number[]): PBMeshRenderer;
-
-declare function buildColliderBox(): PBMeshCollider;
-
 /**
  * @public
  */
@@ -1221,6 +1217,8 @@ declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
 }[keyof T];
 
+declare const executeTask: (task: Task<unknown>) => void;
+
 /** @public */
 declare type FloatArray = number[];
 
@@ -1231,15 +1229,6 @@ declare const enum Font {
 
 /** @public */
 declare const GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
-
-declare namespace Helper {
-    const MeshRenderer: {
-        buildBox: typeof buildBox;
-    };
-    const MeshCollider: {
-        buildColliderBox: typeof buildColliderBox;
-    };
-}
 
 /**
  * @public
@@ -1433,6 +1422,11 @@ declare type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
 }[keyof T];
 
+/**
+ * @public
+ */
+declare const Input: IInput;
+
 declare const enum InputAction {
     IA_POINTER = 0,
     IA_PRIMARY = 1,
@@ -1463,15 +1457,6 @@ declare type ISchema<T = any> = {
     deserialize(reader: ByteBuffer): T;
     create(): T;
 };
-
-/**
- * Check if a pointer event has been emited in the last tick-update.
- * @param entity the entity to query, for global clicks use `engine.RootEntity`
- * @param actionButton
- * @param pointerEventType
- * @returns
- */
-declare function isPointerEventActive(entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType_2): boolean;
 
 declare const log: (...a: any[]) => void;
 
@@ -3100,13 +3085,6 @@ declare const enum PointerEventType {
     PET_HOVER_LEAVE = 3
 }
 
-declare const enum PointerEventType_2 {
-    PET_UP = 0,
-    PET_DOWN = 1,
-    PET_HOVER_ENTER = 2,
-    PET_HOVER_LEAVE = 3
-}
-
 /** @public */
 declare const PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
 
@@ -3685,6 +3663,8 @@ declare interface Spec {
  */
 declare type SystemFn = (dt: number) => void;
 
+declare type Task<T = unknown> = () => Promise<T>;
+
 declare const enum TextAlignMode {
     TAM_TOP_LEFT = 0,
     TAM_TOP_CENTER = 1,
@@ -3715,10 +3695,13 @@ declare const enum TextureFilterMode {
 }
 
 declare interface TextureUnion {
-    /** default = null */
-    texture: Texture | undefined;
-    /** default = null */
-    avatarTexture: AvatarTexture | undefined;
+    tex?: {
+        $case: 'texture';
+        texture: Texture;
+    } | {
+        $case: 'avatarTexture';
+        avatarTexture: AvatarTexture;
+    };
 }
 
 declare const enum TextureWrapMode {
@@ -4392,14 +4375,6 @@ declare type Vector3Type = {
 
 /** @public */
 declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
-
-/**
- * Check if an entity emitted a clicked event
- * @param entity the entity to query, for global clicks use `engine.RootEntity`
- * @param actionButton
- * @returns true if the entity was clicked in the last tick-update
- */
-declare function wasEntityClicked(entity: Entity, actionButton: InputAction): boolean;
 
 declare namespace WireMessage {
     enum Enum {

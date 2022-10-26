@@ -3,8 +3,10 @@ function createPlaneTexture(x: number, y: number, z: number): Entity {
 
   Material.create(meshEntity, {
     texture: {
-      texture: { src: 'models/polaroid2.png' },
-      avatarTexture: undefined
+      tex: {
+        $case: 'texture',
+        texture: { src: 'models/polaroid2.png' }
+      }
     }
   })
   Transform.create(meshEntity, {
