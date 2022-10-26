@@ -34,20 +34,32 @@ type ProjectConfig = ts.ParsedCommandLine & {
 // nameCache for the minifier
 const nameCache = {}
 
-const WATCH = process.argv.indexOf('--watch') !== -1 || process.argv.indexOf('-w') !== -1
+const WATCH =
+  process.argv.indexOf('--watch') !== -1 || process.argv.indexOf('-w') !== -1
 
 // PRODUCTION == true : makes the compiler to prefer .min.js files while importing and produces a minified output
-const PRODUCTION = !WATCH && (process.argv.indexOf('--production') !== -1 || process.env.NODE_ENV === 'production')
+const PRODUCTION =
+  !WATCH &&
+  (process.argv.indexOf('--production') !== -1 ||
+    process.env.NODE_ENV === 'production')
 
 const watchedFiles = new Set<string>()
 
 type FileMap = ts.MapLike<{ version: number }>
 
 // finds a library entry point in $(cwd)/node_modules
-function findLibraryEntryPoint(packageName: string, cwd: string): string | null {
+function findLibraryEntryPoint(
+  packageName: string,
+  cwd: string
+): string | null {
   try {
     const t = require.resolve(packageName, {
-      paths: [cwd, cwd + '/node_modules', cwd + '/node_modules/@dcl/sdk/', cwd + '/node_modules/@dcl/sdk/node_modules']
+      paths: [
+        cwd,
+        cwd + '/node_modules',
+        cwd + '/node_modules/@dcl/sdk/',
+        cwd + '/node_modules/@dcl/sdk/node_modules'
+      ]
     })
     if (t) return t
   } catch {}
@@ -58,12 +70,16 @@ async function compile() {
   // current working directory
   let CWD = process.cwd()
   ts.sys.getCurrentDirectory = () => CWD
-  ts.sys.resolvePath = (path: string) => resolve(ts.sys.getCurrentDirectory(), path)
+  ts.sys.resolvePath = (path: string) =>
+    resolve(ts.sys.getCurrentDirectory(), path)
 
   {
     // Read the target folder, if specified.
     // -p --project, like typescript
-    const projectArgIndex = Math.max(process.argv.indexOf('-p'), process.argv.indexOf('--project'))
+    const projectArgIndex = Math.max(
+      process.argv.indexOf('-p'),
+      process.argv.indexOf('--project')
+    )
     if (projectArgIndex !== -1 && process.argv.length > projectArgIndex) {
       const folder = resolve(process.cwd(), process.argv[projectArgIndex + 1])
       if (ts.sys.directoryExists(folder)) {
@@ -113,7 +129,8 @@ async function compile() {
   const services = ts.createLanguageService(
     {
       getScriptFileNames: () => cfg.fileNames,
-      getScriptVersion: (fileName) => files[fileName] && files[fileName].version.toString(),
+      getScriptVersion: (fileName) =>
+        files[fileName] && files[fileName].version.toString(),
       getScriptSnapshot: (fileName) => {
         if (!ts.sys.fileExists(fileName)) {
           return undefined
@@ -123,7 +140,9 @@ async function compile() {
           watchFile(fileName, services, files, cfg)
         }
 
-        return ts.ScriptSnapshot.fromString(ts.sys.readFile(fileName)!.toString())
+        return ts.ScriptSnapshot.fromString(
+          ts.sys.readFile(fileName)!.toString()
+        )
       },
       getCurrentDirectory: ts.sys.getCurrentDirectory,
       getCompilationSettings: () => cfg.options,
@@ -146,11 +165,18 @@ async function compile() {
   const diagnostics = await emitFile(cfg.fileNames[0], services, cfg)
 
   if (!WATCH && diagnostics.length) {
-    throw new Error(`! Error: compilation finished with ${diagnostics.length} errors`)
+    throw new Error(
+      `! Error: compilation finished with ${diagnostics.length} errors`
+    )
   }
 }
 
-function watchFile(fileName: string, services: ts.LanguageService, files: FileMap, cfg: ProjectConfig) {
+function watchFile(
+  fileName: string,
+  services: ts.LanguageService,
+  files: FileMap,
+  cfg: ProjectConfig
+) {
   if (!watchedFiles.has(fileName)) {
     watchedFiles.add(fileName)
 
@@ -198,13 +224,24 @@ async function minify(files: string | string[] | { [file: string]: string }) {
   return result
 }
 
-async function emitFile(fileName: string, services: ts.LanguageService, cfg: ProjectConfig) {
+async function emitFile(
+  fileName: string,
+  services: ts.LanguageService,
+  cfg: ProjectConfig
+) {
   const output = services.getEmitOutput(fileName)
 
   if (!output.emitSkipped) {
-    console.log(`> processing ${fileName.replace(ts.sys.getCurrentDirectory(), '')}`)
+    console.log(
+      `> processing ${fileName.replace(ts.sys.getCurrentDirectory(), '')}`
+    )
   } else {
-    console.log(`> processing ${fileName.replace(ts.sys.getCurrentDirectory(), '')} failed`)
+    console.log(
+      `> processing ${fileName.replace(
+        ts.sys.getCurrentDirectory(),
+        ''
+      )} failed`
+    )
   }
 
   const diagnostics = logErrors(services)
@@ -224,7 +261,9 @@ async function emitFile(fileName: string, services: ts.LanguageService, cfg: Pro
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function loadDclLib(lib: string) {
-    const path = findLibraryEntryPoint(lib, ts.sys.getCurrentDirectory()) || resolveFile(lib)
+    const path =
+      findLibraryEntryPoint(lib, ts.sys.getCurrentDirectory()) ||
+      resolveFile(lib)
 
     if (path) {
       const json: OutFile[] = JSON.parse(loadArtifact(lib))
@@ -236,7 +275,9 @@ async function emitFile(fileName: string, services: ts.LanguageService, cfg: Pro
   }
 
   function loadJsLib(lib: string) {
-    const path = findLibraryEntryPoint(lib, ts.sys.getCurrentDirectory()) || resolveFile(lib)
+    const path =
+      findLibraryEntryPoint(lib, ts.sys.getCurrentDirectory()) ||
+      resolveFile(lib)
 
     if (path) {
       const content = loadArtifact(lib)
@@ -255,7 +296,13 @@ async function emitFile(fileName: string, services: ts.LanguageService, cfg: Pro
   function loadLibOrJs(lib: string) {
     if (PRODUCTION) {
       // prefer .min.js when available for PRODUCTION builds
-      return /*loadDclLib(lib + '.lib') ||*/ loadJsLib(lib.replace(/\.js$/, '.min.js')) || loadJsLib(lib) || false
+      return (
+        /*loadDclLib(lib + '.lib') ||*/ loadJsLib(
+          lib.replace(/\.js$/, '.min.js')
+        ) ||
+        loadJsLib(lib) ||
+        false
+      )
     } else {
       return /*loadDclLib(lib + '.lib') ||*/ loadJsLib(lib) || false
     }
@@ -298,7 +345,11 @@ async function emitFile(fileName: string, services: ts.LanguageService, cfg: Pro
   }
 
   for (const [, file] of out) {
-    if (file.path.endsWith('.js') && file.content && !file.path.endsWith('.min.js')) {
+    if (
+      file.path.endsWith('.js') &&
+      file.content &&
+      !file.path.endsWith('.min.js')
+    ) {
       loadedLibs.push({
         path: relative(ts.sys.getCurrentDirectory(), fileName),
         fullPath: resolve(ts.sys.getCurrentDirectory(), fileName),
@@ -314,13 +365,19 @@ async function emitFile(fileName: string, services: ts.LanguageService, cfg: Pro
         if (content) {
           code.push(content)
 
-          const hasSourceMappingUrl = content.match(/^\/\/# (sourceMappingURL|sourceURL)=/)
+          const hasSourceMappingUrl = content.match(
+            /^\/\/# (sourceMappingURL|sourceURL)=/
+          )
           if (!hasSourceMappingUrl) {
             code.push('//# sourceURL=file://' + fullPath)
           }
         }
 
-        ret.push(`/*! ${JSON.stringify(path)} ${sha256 || ''} */ eval(${JSON.stringify(code.join('\n'))})`)
+        ret.push(
+          `/*! ${JSON.stringify(path)} ${sha256 || ''} */ eval(${JSON.stringify(
+            code.join('\n')
+          )})`
+        )
       }
 
       file.content = ret.join('\n')
@@ -338,13 +395,21 @@ async function emitFile(fileName: string, services: ts.LanguageService, cfg: Pro
 
       if (PRODUCTION || cfg.isDecentralandLib) {
         // minify && source map
-        const minifiedFile = getOutFile(cfg.isDecentralandLib ? file.path.replace(/\.js$/, '.min.js') : file.path)
+        const minifiedFile = getOutFile(
+          cfg.isDecentralandLib
+            ? file.path.replace(/\.js$/, '.min.js')
+            : file.path
+        )
         console.log(`> minifying ${normalizePath(minifiedFile.path)}`)
 
         try {
-          const minificationResult = await minify(loadedLibs.map(($) => $.content).join(';\n'))
+          const minificationResult = await minify(
+            loadedLibs.map(($) => $.content).join(';\n')
+          )
           minifiedFile.content = minificationResult.code
-          minifiedFile.sha256 = ts.sys.createSHA256Hash!(minificationResult.code!)
+          minifiedFile.sha256 = ts.sys.createSHA256Hash!(
+            minificationResult.code!
+          )
 
           // we don't want to always embed the source map in every scene. thus,
           // a new file is generated. This is controlled by the minify function
@@ -394,7 +459,10 @@ function logErrors(services: ts.LanguageService) {
   return allDiagnostics
 }
 
-function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson | null): ProjectConfig {
+function getConfiguration(
+  packageJson: PackageJson | null,
+  sceneJson: SceneJson | null
+): ProjectConfig {
   const host: ts.ParseConfigHost = {
     useCaseSensitiveFileNames: ts.sys.useCaseSensitiveFileNames,
     fileExists: ts.sys.fileExists,
@@ -417,7 +485,13 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
     process.exit(1)
   }
 
-  const tsconfig = ts.parseJsonConfigFileContent(parsed.config, host, ts.sys.getCurrentDirectory(), {}, 'tsconfig.json')
+  const tsconfig = ts.parseJsonConfigFileContent(
+    parsed.config,
+    host,
+    ts.sys.getCurrentDirectory(),
+    {},
+    'tsconfig.json'
+  )
 
   let hasError = false
 
@@ -425,7 +499,9 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
   let isDecentralandLib = false
 
   if (tsconfig.options.module !== ts.ModuleKind.AMD) {
-    console.error('! Error: tsconfig.json: Decentraland only allows AMD modules')
+    console.error(
+      '! Error: tsconfig.json: Decentraland only allows AMD modules'
+    )
     hasError = true
   }
 
@@ -455,14 +531,18 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
           }
         })
       } else if (packageJson.bundledDependencies) {
-        console.error(`! Error: package.json .bundledDependencies must be an array of strings.`)
+        console.error(
+          `! Error: package.json .bundledDependencies must be an array of strings.`
+        )
         hasError = true
       }
     }
   }
 
   if (isDecentralandLib && sceneJson) {
-    console.error('! Error: project of type decentralandLibrary must not have scene.json')
+    console.error(
+      '! Error: project of type decentralandLibrary must not have scene.json'
+    )
     process.exit(1)
   }
 
@@ -472,7 +552,9 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
   }
 
   if (isDecentralandLib && !packageJson) {
-    console.error('! Error: project of type decentralandLibrary requires a package.json')
+    console.error(
+      '! Error: project of type decentralandLibrary requires a package.json'
+    )
     process.exit(1)
   }
 
@@ -480,7 +562,9 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
     const outFile = ts.sys.resolvePath(tsconfig.options.outFile)
 
     if (!outFile) {
-      console.error(`! Error: field "outFile" in tsconfig.json cannot be resolved.`)
+      console.error(
+        `! Error: field "outFile" in tsconfig.json cannot be resolved.`
+      )
       hasError = true
     } else {
       if (isDecentralandLib) {
@@ -519,9 +603,14 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
     let resolved: string | null = null
 
     try {
-      resolved = findLibraryEntryPoint(libName + '/package.json', ts.sys.getCurrentDirectory())
+      resolved = findLibraryEntryPoint(
+        libName + '/package.json',
+        ts.sys.getCurrentDirectory()
+      )
     } catch (e) {
-      console.error(`! Error: dependency ${libName} not found (is it installed?)`)
+      console.error(
+        `! Error: dependency ${libName} not found (is it installed?)`
+      )
       hasError = true
     }
 
@@ -534,13 +623,18 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
         let typings: string | null = null
 
         if (!decentralandLibrary) {
-          throw new Error(`field "decentralandLibrary" is missing in package.json`)
+          throw new Error(
+            `field "decentralandLibrary" is missing in package.json`
+          )
         }
 
         if (!libPackageJson.main) {
           throw new Error(`field "main" is missing in package.json`)
         } else {
-          main = resolve(dirname(resolved), decentralandLibrary.main || libPackageJson.main)
+          main = resolve(
+            dirname(resolved),
+            decentralandLibrary.main || libPackageJson.main
+          )
           if (!ts.sys.fileExists(main)) {
             throw new Error(`main file ${main} not found`)
           }
@@ -549,7 +643,10 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
         if (!libPackageJson.typings) {
           throw new Error(`field "typings" is missing in package.json`)
         } else {
-          typings = resolve(dirname(resolved), decentralandLibrary.typings || libPackageJson.typings)
+          typings = resolve(
+            dirname(resolved),
+            decentralandLibrary.typings || libPackageJson.typings
+          )
           if (!ts.sys.fileExists(typings)) {
             throw new Error(`typings file ${typings} not found`)
           }
@@ -559,10 +656,14 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
         hasCustomLibraries = true
       } catch (e) {
         if (typeof e === 'object' && e) {
-          console.error(`! Error in library ${libName}: ${(e as Error).message}`)
+          console.error(
+            `! Error in library ${libName}: ${(e as Error).message}`
+          )
         } else {
           console.error(
-            `! Error in library ${libName}: ${e ? (e as any).toString() : String.prototype.toString.apply(e)}`
+            `! Error in library ${libName}: ${
+              e ? (e as any).toString() : String.prototype.toString.apply(e)
+            }`
           )
         }
         hasError = true
@@ -610,7 +711,10 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
     libs.forEach((lib) => {
       if (lib.name) {
         const tsOptions = ensurePathsTopLevelNames(tsconfig.options, lib.name)
-        const tsRawOptions = ensurePathsTopLevelNames(tsconfig.raw!.compilerOptions, lib.name)
+        const tsRawOptions = ensurePathsTopLevelNames(
+          tsconfig.raw!.compilerOptions,
+          lib.name
+        )
 
         if (lib.typings) {
           const relativePath = relative(dirname(tsconfigPath), lib.typings)
@@ -621,7 +725,9 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
           }
           // check if it is in the raw configuration (tsconfig.json contents)
           if (!tsRawOptions.includes(relativePath)) {
-            console.warn(`! Warning: ${relativePath} is missing in tsconfig.json paths`)
+            console.warn(
+              `! Warning: ${relativePath} is missing in tsconfig.json paths`
+            )
             tsRawOptions.push(relativePath)
             shouldRewriteTsconfig = true
           }
@@ -640,11 +746,14 @@ function getConfiguration(packageJson: PackageJson | null, sceneJson: SceneJson 
 function printDiagnostic(diagnostic: ts.Diagnostic) {
   const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
   if (diagnostic.file) {
-    const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start!)
+    const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(
+      diagnostic.start!
+    )
     console.log(
-      `  Error ${diagnostic.file.fileName.replace(ts.sys.getCurrentDirectory(), '')} (${line + 1},${
-        character + 1
-      }): ${message}`
+      `  Error ${diagnostic.file.fileName.replace(
+        ts.sys.getCurrentDirectory(),
+        ''
+      )} (${line + 1},${character + 1}): ${message}`
     )
   } else {
     console.log(`  Error: ${message}`)
@@ -701,22 +810,29 @@ function ensureDirectoriesExist(folder: string) {
   }
 }
 
-function validatePackageJsonForLibrary(packageJson: PackageJson, outFile: string) {
+function validatePackageJsonForLibrary(
+  packageJson: PackageJson,
+  outFile: string
+) {
   if (!packageJson.main) {
     throw new Error(`field "main" in package.json is missing.`)
   } else {
     const mainFile = ts.sys.resolvePath(packageJson.main)
 
     if (!mainFile) {
-      throw new Error(`! Error: field "main" in package.json cannot be resolved.`)
+      throw new Error(
+        `! Error: field "main" in package.json cannot be resolved.`
+      )
     }
 
     if (outFile !== mainFile) {
-      const help = `(${outFile.replace(ts.sys.getCurrentDirectory(), '')} != ${mainFile.replace(
+      const help = `(${outFile.replace(
         ts.sys.getCurrentDirectory(),
         ''
-      )})`
-      throw new Error(`! Error: tsconfig.json .outFile is not equal to package.json .main\n       ${help}`)
+      )} != ${mainFile.replace(ts.sys.getCurrentDirectory(), '')})`
+      throw new Error(
+        `! Error: tsconfig.json .outFile is not equal to package.json .main\n       ${help}`
+      )
     }
   }
 
@@ -726,16 +842,20 @@ function validatePackageJsonForLibrary(packageJson: PackageJson, outFile: string
     const typingsFile = ts.sys.resolvePath(packageJson.typings)
 
     if (!typingsFile) {
-      throw new Error(`! Error: field "typings" in package.json cannot be resolved.`)
+      throw new Error(
+        `! Error: field "typings" in package.json cannot be resolved.`
+      )
     }
 
     const resolvedTypings = outFile.replace(/\.js$/, '.d.ts')
     if (resolvedTypings !== typingsFile) {
-      const help = `(${resolvedTypings.replace(ts.sys.getCurrentDirectory(), '')} != ${typingsFile.replace(
+      const help = `(${resolvedTypings.replace(
         ts.sys.getCurrentDirectory(),
         ''
-      )})`
-      throw new Error(`! Error: package.json .typings does not match the emited file\n       ${help}`)
+      )} != ${typingsFile.replace(ts.sys.getCurrentDirectory(), '')})`
+      throw new Error(
+        `! Error: package.json .typings does not match the emited file\n       ${help}`
+      )
     }
   }
 }
@@ -752,11 +872,13 @@ function validateSceneJson(sceneJson: SceneJson, outFile: string) {
     }
 
     if (outFile !== mainFile) {
-      const help = `(${outFile.replace(ts.sys.getCurrentDirectory(), '')} != ${mainFile.replace(
+      const help = `(${outFile.replace(
         ts.sys.getCurrentDirectory(),
         ''
-      )})`
-      throw new Error(`! Error: tsconfig.json .outFile is not equal to scene.json .main\n       ${help}`)
+      )} != ${mainFile.replace(ts.sys.getCurrentDirectory(), '')})`
+      throw new Error(
+        `! Error: tsconfig.json .outFile is not equal to scene.json .main\n       ${help}`
+      )
     }
   }
 }
