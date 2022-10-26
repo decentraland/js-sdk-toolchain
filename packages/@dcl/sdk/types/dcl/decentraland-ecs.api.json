@@ -41825,7 +41825,7 @@
             {
               "kind": "Property",
               "canonicalReference": "@dcl/legacy-ecs!Shape#isPointerBlocker:member",
-              "docComment": "/**\n * Set to true to turn on the PointerEvents blocking for the entity.\n */\n",
+              "docComment": "/**\n * Set to true to turn on the PointerHoverFeedback blocking for the entity.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",

@@ -30,6 +30,14 @@ declare const enum AvatarModifierType {
 /** @public */
 declare const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
 
+declare interface AvatarTexture {
+    userId: string;
+    /** default = TextureWrapMode.Clamp */
+    wrapMode?: TextureWrapMode | undefined;
+    /** default = FilterMode.Bilinear */
+    filterMode?: TextureFilterMode | undefined;
+}
+
 /** @public */
 declare const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
 
@@ -937,9 +945,9 @@ declare namespace Components {
     /** @public */
     const NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     /** @public */
-    const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
-    /** @public */
     const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+    /** @public */
+    const PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
     /** @public */
     const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
     /** @public */
@@ -1163,8 +1171,8 @@ declare function defineSdkComponents(engine: PreEngine): {
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
-    PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+    PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
     Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
     RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
@@ -1208,8 +1216,6 @@ declare const error: (message: string | Error, data?: any) => void;
 declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
 }[keyof T];
-
-declare const executeTask: (task: Task<unknown>) => void;
 
 /** @public */
 declare type FloatArray = number[];
@@ -1414,11 +1420,6 @@ declare type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
 }[keyof T];
 
-/**
- * @public
- */
-declare const Input: IInput;
-
 declare const enum InputAction {
     IA_POINTER = 0,
     IA_PRIMARY = 1,
@@ -1449,6 +1450,15 @@ declare type ISchema<T = any> = {
     deserialize(reader: ByteBuffer): T;
     create(): T;
 };
+
+/**
+ * Check if a pointer event has been emited in the last tick-update.
+ * @param entity the entity to query, for global clicks use `engine.RootEntity`
+ * @param actionButton
+ * @param pointerEventType
+ * @returns
+ */
+declare function isPointerEventActive(entity: Entity, actionButton: InputAction, pointerEventType: PointerEventType_2): boolean;
 
 declare const log: (...a: any[]) => void;
 
@@ -2668,17 +2678,17 @@ declare interface PBGltfContainer {
 
 declare interface PBMaterial {
     /** default = null */
-    texture?: PBMaterial_Texture | undefined;
+    texture?: TextureUnion | undefined;
     /** default = 0.5. range value: from 0 to 1 */
     alphaTest?: number | undefined;
     /** default =  true */
     castShadows?: boolean | undefined;
     /** default = null */
-    alphaTexture?: PBMaterial_Texture | undefined;
+    alphaTexture?: TextureUnion | undefined;
     /** default = null */
-    emissiveTexture?: PBMaterial_Texture | undefined;
+    emissiveTexture?: TextureUnion | undefined;
     /** default = null */
-    bumpTexture?: PBMaterial_Texture | undefined;
+    bumpTexture?: TextureUnion | undefined;
     /** default = white; */
     albedoColor?: Color3_2 | undefined;
     /** default = black; */
@@ -2699,14 +2709,6 @@ declare interface PBMaterial {
     emissiveIntensity?: number | undefined;
     /** default = 1 */
     directIntensity?: number | undefined;
-}
-
-declare interface PBMaterial_Texture {
-    src: string;
-    /** default = TextureWrapMode.Clamp */
-    wrapMode?: TextureWrapMode | undefined;
-    /** default = FilterMode.Bilinear */
-    filterMode?: TextureFilterMode | undefined;
 }
 
 declare interface PBMeshCollider {
@@ -2767,26 +2769,6 @@ declare interface PBNftShape {
     color?: Color3_2 | undefined;
 }
 
-declare interface PBPointerEvents {
-    pointerEvents: PBPointerEvents_Entry[];
-}
-
-declare interface PBPointerEvents_Entry {
-    eventType: PointerEventType;
-    eventInfo: PBPointerEvents_Info | undefined;
-}
-
-declare interface PBPointerEvents_Info {
-    /** default=InputAction.ANY */
-    button?: InputAction | undefined;
-    /** default='Interact' */
-    hoverText?: string | undefined;
-    /** default=10 */
-    maxDistance?: number | undefined;
-    /** default=true */
-    showFeedback?: boolean | undefined;
-}
-
 /** the renderer will set this component to the root entity once per frame with all the events */
 declare interface PBPointerEventsResult {
     /** a list of the last N pointer commands (from the engine) */
@@ -2803,6 +2785,26 @@ declare interface PBPointerEventsResult_PointerCommand {
     timestamp: number;
     /** if the input is analog then we store it here */
     analog?: number | undefined;
+}
+
+declare interface PBPointerHoverFeedback {
+    pointerEvents: PBPointerHoverFeedback_Entry[];
+}
+
+declare interface PBPointerHoverFeedback_Entry {
+    eventType: PointerEventType;
+    eventInfo: PBPointerHoverFeedback_Info | undefined;
+}
+
+declare interface PBPointerHoverFeedback_Info {
+    /** default=InputAction.ANY */
+    button?: InputAction | undefined;
+    /** default='Interact' */
+    hoverText?: string | undefined;
+    /** default=10 */
+    maxDistance?: number | undefined;
+    /** default=true */
+    showFeedback?: boolean | undefined;
 }
 
 declare interface PBPointerLock {
@@ -3058,9 +3060,6 @@ declare namespace Plane {
 }
 
 /** @public */
-declare const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
-
-/** @public */
 declare const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
 
 declare const enum PointerEventType {
@@ -3069,6 +3068,16 @@ declare const enum PointerEventType {
     PET_HOVER_ENTER = 2,
     PET_HOVER_LEAVE = 3
 }
+
+declare const enum PointerEventType_2 {
+    PET_UP = 0,
+    PET_DOWN = 1,
+    PET_HOVER_ENTER = 2,
+    PET_HOVER_LEAVE = 3
+}
+
+/** @public */
+declare const PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
 
 /** @public */
 declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
@@ -3645,8 +3654,6 @@ declare interface Spec {
  */
 declare type SystemFn = (dt: number) => void;
 
-declare type Task<T = unknown> = () => Promise<T>;
-
 declare const enum TextAlignMode {
     TAM_TOP_LEFT = 0,
     TAM_TOP_CENTER = 1,
@@ -3662,10 +3669,25 @@ declare const enum TextAlignMode {
 /** @public */
 declare const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 
+declare interface Texture {
+    src: string;
+    /** default = TextureWrapMode.Clamp */
+    wrapMode?: TextureWrapMode | undefined;
+    /** default = FilterMode.Bilinear */
+    filterMode?: TextureFilterMode | undefined;
+}
+
 declare const enum TextureFilterMode {
     TFM_POINT = 0,
     TFM_BILINEAR = 1,
     TFM_TRILINEAR = 2
+}
+
+declare interface TextureUnion {
+    /** default = null */
+    texture: Texture | undefined;
+    /** default = null */
+    avatarTexture: AvatarTexture | undefined;
 }
 
 declare const enum TextureWrapMode {
@@ -4339,6 +4361,14 @@ declare type Vector3Type = {
 
 /** @public */
 declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
+
+/**
+ * Check if an entity emitted a clicked event
+ * @param entity the entity to query, for global clicks use `engine.RootEntity`
+ * @param actionButton
+ * @returns true if the entity was clicked in the last tick-update
+ */
+declare function wasEntityClicked(entity: Entity, actionButton: InputAction): boolean;
 
 declare namespace WireMessage {
     enum Enum {

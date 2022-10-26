@@ -2,7 +2,10 @@ function createPlaneTexture(x: number, y: number, z: number): Entity {
   const meshEntity = engine.addEntity()
 
   Material.create(meshEntity, {
-    texture: { src: 'models/polaroid2.png' }
+    texture: {
+      texture: { src: 'models/polaroid2.png' },
+      avatarTexture: undefined
+    }
   })
   Transform.create(meshEntity, {
     position: { x, y, z },

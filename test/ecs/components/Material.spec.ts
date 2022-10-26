@@ -1,8 +1,8 @@
+import { MaterialTransparencyMode } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/material.gen'
 import {
   TextureFilterMode,
-  TextureWrapMode,
-  MaterialTransparencyMode
-} from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/material.gen'
+  TextureWrapMode
+} from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/common/texture.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated Material ProtoBuf', () => {
@@ -15,14 +15,24 @@ describe('Generated Material ProtoBuf', () => {
     const _material = Material.create(entity, {
       ...Material.default(),
       texture: {
-        wrapMode: TextureWrapMode.TWM_CLAMP,
-        filterMode: undefined,
-        src: 'not-casla'
+        texture: {
+          wrapMode: TextureWrapMode.TWM_CLAMP,
+          filterMode: undefined,
+          src: 'not-casla'
+        },
+        avatarTexture: {
+          userId: 'user-id-dummy',
+          wrapMode: TextureWrapMode.TWM_CLAMP,
+          filterMode: undefined
+        }
       },
       alphaTexture: {
-        filterMode: undefined,
-        src: 'not-casla',
-        wrapMode: undefined
+        texture: {
+          filterMode: undefined,
+          src: 'not-casla',
+          wrapMode: undefined
+        },
+        avatarTexture: undefined
       },
       castShadows: true,
       glossiness: 1,
@@ -42,23 +52,39 @@ describe('Generated Material ProtoBuf', () => {
       albedoColor: { r: 0, g: 1, b: 1 },
       alphaTest: 1,
       alphaTexture: {
-        wrapMode: TextureWrapMode.TWM_CLAMP,
-        filterMode: TextureFilterMode.TFM_BILINEAR,
-        src: 'not-casla'
+        texture: {
+          wrapMode: TextureWrapMode.TWM_CLAMP,
+          filterMode: TextureFilterMode.TFM_BILINEAR,
+          src: 'not-casla'
+        },
+        avatarTexture: undefined
       },
       bumpTexture: {
-        wrapMode: TextureWrapMode.TWM_MIRROR,
-        filterMode: TextureFilterMode.TFM_POINT,
-        src: 'not-casla'
+        texture: {
+          wrapMode: TextureWrapMode.TWM_MIRROR,
+          filterMode: TextureFilterMode.TFM_POINT,
+          src: 'not-casla'
+        },
+        avatarTexture: undefined
       },
       emissiveTexture: {
-        wrapMode: TextureWrapMode.TWM_MIRROR_ONCE,
-        filterMode: TextureFilterMode.TFM_TRILINEAR,
-        src: 'not-casla'
+        texture: {
+          wrapMode: TextureWrapMode.TWM_MIRROR_ONCE,
+          filterMode: TextureFilterMode.TFM_TRILINEAR,
+          src: 'not-casla'
+        },
+        avatarTexture: undefined
       },
       texture: {
-        wrapMode: TextureWrapMode.TWM_REPEAT,
-        src: 'not-casla'
+        texture: {
+          wrapMode: TextureWrapMode.TWM_REPEAT,
+          src: 'not-casla'
+        },
+        avatarTexture: {
+          userId: '',
+          wrapMode: TextureWrapMode.TWM_REPEAT,
+          filterMode: undefined
+        }
       },
       castShadows: true,
       directIntensity: 1,

@@ -1,6 +1,6 @@
 import { Entity } from '../../../packages/@dcl/ecs/src/engine/entity'
 import { createInput } from '../../../packages/@dcl/ecs/src/engine/input'
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_events.gen'
+import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
 import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
