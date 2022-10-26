@@ -262,14 +262,14 @@ export namespace Components {
     //
     // (undocumented)
     NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
-    const // Warning: (ae-forgotten-export) The symbol "PBPointerEvents" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     const // Warning: (ae-forgotten-export) The symbol "PBPointerEventsResult" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+    const // Warning: (ae-forgotten-export) The symbol "PBPointerHoverFeedback" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
     const // Warning: (ae-forgotten-export) The symbol "PBPointerLock" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -560,10 +560,10 @@ export const onVideoEvent: Observable<{
 }>;
 
 // @public (undocumented)
-export const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
+export const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
 
 // @public (undocumented)
-export const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+export const PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
 
 // @public (undocumented)
 export const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;

@@ -945,9 +945,9 @@ declare namespace Components {
     /** @public */
     const NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     /** @public */
-    const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
-    /** @public */
     const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+    /** @public */
+    const PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
     /** @public */
     const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
     /** @public */
@@ -1171,8 +1171,8 @@ declare function defineSdkComponents(engine: PreEngine): {
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
-    PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+    PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
     Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
     RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
@@ -2769,26 +2769,6 @@ declare interface PBNftShape {
     color?: Color3_2 | undefined;
 }
 
-declare interface PBPointerEvents {
-    pointerEvents: PBPointerEvents_Entry[];
-}
-
-declare interface PBPointerEvents_Entry {
-    eventType: PointerEventType;
-    eventInfo: PBPointerEvents_Info | undefined;
-}
-
-declare interface PBPointerEvents_Info {
-    /** default=InputAction.ANY */
-    button?: InputAction | undefined;
-    /** default='Interact' */
-    hoverText?: string | undefined;
-    /** default=10 */
-    maxDistance?: number | undefined;
-    /** default=true */
-    showFeedback?: boolean | undefined;
-}
-
 /** the renderer will set this component to the root entity once per frame with all the events */
 declare interface PBPointerEventsResult {
     /** a list of the last N pointer commands (from the engine) */
@@ -2805,6 +2785,26 @@ declare interface PBPointerEventsResult_PointerCommand {
     timestamp: number;
     /** if the input is analog then we store it here */
     analog?: number | undefined;
+}
+
+declare interface PBPointerHoverFeedback {
+    pointerEvents: PBPointerHoverFeedback_Entry[];
+}
+
+declare interface PBPointerHoverFeedback_Entry {
+    eventType: PointerEventType;
+    eventInfo: PBPointerHoverFeedback_Info | undefined;
+}
+
+declare interface PBPointerHoverFeedback_Info {
+    /** default=InputAction.ANY */
+    button?: InputAction | undefined;
+    /** default='Interact' */
+    hoverText?: string | undefined;
+    /** default=10 */
+    maxDistance?: number | undefined;
+    /** default=true */
+    showFeedback?: boolean | undefined;
 }
 
 declare interface PBPointerLock {
@@ -3060,9 +3060,6 @@ declare namespace Plane {
 }
 
 /** @public */
-declare const PointerEvents: ComponentDefinition<ISchema<PBPointerEvents>, PBPointerEvents>;
-
-/** @public */
 declare const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
 
 declare const enum PointerEventType {
@@ -3071,6 +3068,9 @@ declare const enum PointerEventType {
     PET_HOVER_ENTER = 2,
     PET_HOVER_LEAVE = 3
 }
+
+/** @public */
+declare const PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
 
 /** @public */
 declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;

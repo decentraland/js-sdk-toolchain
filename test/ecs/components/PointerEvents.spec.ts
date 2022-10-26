@@ -1,15 +1,15 @@
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_events.gen'
+import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
 
 describe('Generated OnPointerDown ProtoBuf', () => {
   it('should serialize/deserialize OnPointerUp', () => {
     const newEngine = Engine()
-    const { PointerEvents } = newEngine.baseComponents
+    const { PointerHoverFeedback } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
-    PointerEvents.create(newEngine.addEntity())
-    const pointerEvents = PointerEvents.create(entity, {
+    PointerHoverFeedback.create(newEngine.addEntity())
+    const pointerHoverFeedback = PointerHoverFeedback.create(entity, {
       pointerEvents: [
         {
           eventType: PointerEventType.PET_UP,
@@ -23,7 +23,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
       ]
     })
 
-    PointerEvents.create(entityB, {
+    PointerHoverFeedback.create(entityB, {
       pointerEvents: [
         {
           eventType: PointerEventType.PET_DOWN,
@@ -37,21 +37,22 @@ describe('Generated OnPointerDown ProtoBuf', () => {
       ]
     })
 
-    const buffer = PointerEvents.toBinary(entity)
-    PointerEvents.updateFromBinary(entityB, buffer)
+    const buffer = PointerHoverFeedback.toBinary(entity)
+    PointerHoverFeedback.updateFromBinary(entityB, buffer)
 
-    const result = { ...PointerEvents.getMutable(entityB) }
-    expect(pointerEvents).toEqual(result)
+    const result = { ...PointerHoverFeedback.getMutable(entityB) }
+    expect(pointerHoverFeedback).toEqual(result)
   })
 
   it('should receive OnPointerResult', () => {
     const newEngine = Engine()
-    const { PointerEvents, PointerEventsResult } = newEngine.baseComponents
+    const { PointerHoverFeedback, PointerEventsResult } =
+      newEngine.baseComponents
     const entity = newEngine.addEntity()
-    PointerEvents.create(newEngine.addEntity())
+    PointerHoverFeedback.create(newEngine.addEntity())
 
     // We create an onPointerDownEvent
-    PointerEvents.create(entity, {
+    PointerHoverFeedback.create(entity, {
       pointerEvents: [
         {
           eventType: PointerEventType.PET_DOWN,

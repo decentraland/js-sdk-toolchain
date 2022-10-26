@@ -8,7 +8,7 @@ function createCube(x: number, y: number, z: number) {
 
   // This should be removed and keep working ok!
   // TODO: see physics layers
-  PointerEvents.create(cubeEntity)
+  PointerHoverFeedback.create(cubeEntity)
   return cubeEntity
 }
 

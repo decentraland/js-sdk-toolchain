@@ -1,6 +1,6 @@
 ﻿import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_events.gen'
+import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
 
 describe('Generated PointerEventsResult ProtoBuf', () => {
   it('should serialize/deserialize PointerEventsResult', () => {
