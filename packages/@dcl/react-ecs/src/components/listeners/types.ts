@@ -9,4 +9,5 @@ const listeners: Listeners = {
 }
 const listenersKey = Object.keys(listeners)
 
-export const isListener = (key: string): key is keyof Listeners => listenersKey.includes(key)
+export const isListener = (key: string): key is keyof Listeners =>
+  listenersKey.includes(key)
