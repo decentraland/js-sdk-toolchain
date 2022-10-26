@@ -320,7 +320,7 @@
      */
     "extractorMessageReporting": {
       "default": {
-        "logLevel": "warning",
+        "logLevel": "error",
         "addToApiReportFile": true
       },
       "ae-forgotten-export": {

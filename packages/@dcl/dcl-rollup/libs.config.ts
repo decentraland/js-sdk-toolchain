@@ -35,6 +35,7 @@ const config: RollupOptions = {
     typescript({
       tsconfig: tsconfigPath,
       compilerOptions: {
+        noEmitOnError: true,
         declaration: true,
         declarationDir: '.'
       }

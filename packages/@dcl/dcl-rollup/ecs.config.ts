@@ -68,6 +68,7 @@ const ecsConfig: RollupOptions = {
       tsconfig: './tsconfig.json',
       compilerOptions: {
         module: 'ESNext',
+        noEmitOnError: true,
         declarationDir: '.'
       },
       typescript: require('typescript')

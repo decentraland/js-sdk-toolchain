@@ -10,7 +10,6 @@ const uiContainer: { getEntities: () => Entity[]; update: () => void }[] = []
 
 export function renderUi(ui: UiComponent) {
   const renderer = createReconciler(engine)
-
   function update() {
     renderer.update(ui())
   }

@@ -62,7 +62,7 @@ export type ContainerPropTypes = Partial<CommonProps> & EntityPropTypes['uiTrans
 //
 // @public (undocumented)
 export type EcsElements = {
-    entity: Partial<EntityComponents & CommonProps>;
+    entity: Partial<Omit<EntityComponents, 'onClick'> & CommonProps>;
 };
 
 // Warning: (ae-missing-release-tag) "EntityComponents" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -72,6 +72,7 @@ export type EntityComponents = {
     uiTransform: PBUiTransform;
     uiText: PBUiText;
     uiBackground: PBUiBackground;
+    onClick: OnClick;
 };
 
 // @public (undocumented)
@@ -93,6 +94,11 @@ export enum Font {
     UNRECOGNIZED = -1
 }
 
+// Warning: (ae-missing-release-tag) "isListener" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const isListener: (key: string) => key is "onClick";
+
 // Warning: (ae-missing-release-tag) "JSX" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -111,6 +117,18 @@ export namespace JSX {
 //
 // @public (undocumented)
 export type Key = number | string;
+
+// Warning: (ae-missing-release-tag) "Listeners" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type Listeners = {
+    onClick?: OnClick;
+};
+
+// Warning: (ae-missing-release-tag) "OnClick" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type OnClick = () => Promise<void> | void;
 
 // Warning: (ae-missing-release-tag) "PBUiBackground" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

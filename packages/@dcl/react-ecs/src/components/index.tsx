@@ -7,6 +7,7 @@ export * from './types'
 export * from './uiTransform/types'
 export * from './uiText/types'
 export * from './uiBackground/types'
+export * from './listeners/types'
 
 /**
  * @public

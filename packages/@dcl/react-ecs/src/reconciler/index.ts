@@ -1,6 +1,6 @@
-import type { Entity, IEngine } from '@dcl/ecs'
+import type { Entity, IEngine, IInput } from '@dcl/ecs'
 import Reconciler, { HostConfig } from 'react-reconciler'
-import { CANVAS_ROOT_ENTITY } from '../components'
+import { CANVAS_ROOT_ENTITY, isListener, Listeners } from '../components'
 import { EntityComponents, JSX } from '../react-ecs'
 import {
   Changes,
@@ -17,54 +17,15 @@ import {
   _ChildSet,
   TimeoutHandle,
   NoTimeout,
-  OpaqueHandle
+  OpaqueHandle,
+  EngineComponents
 } from './types'
-import { isNotUndefined, noopConfig } from './utils'
+import { componentKeys, isEqual, isNotUndefined, noopConfig } from './utils'
 
-function isEqual<T = unknown>(val1: T, val2: T): boolean {
-  if (!val1 && !val2) {
-    return true
-  }
+declare const Input: IInput
 
-  if (!val1 || !val2) {
-    return val1 === val2
-  }
-
-  if (val1 === val2) {
-    return true
-  }
-
-  if (typeof val1 !== typeof val2) {
-    return false
-  }
-
-  if (typeof val1 !== 'object') {
-    return val1 === val2
-  }
-
-  if (Array.isArray(val1) && Array.isArray(val2)) {
-    if (val1.length !== val2.length) {
-      return false
-    }
-  }
-
-  if (Object.keys(val1).length !== Object.keys(val2).length) {
-    return false
-  }
-
-  if (JSON.stringify(val1) === JSON.stringify(val2)) {
-    return true
-  }
-
-  for (const key in val1) {
-    if (!isEqual(val1[key]!, val2[key]!)) {
-      return false
-    }
-  }
-
-  return true
-}
-
+// TODO: export InputAction types.
+const IA_POINTER = 0
 function propsChanged<K extends keyof EntityComponents>(
   component: K,
   prevProps: Partial<EntityComponents[K]>,
@@ -82,8 +43,13 @@ function propsChanged<K extends keyof EntityComponents>(
     return { type: 'add', props: nextProps, component }
   }
 
-  const changes: Partial<EntityComponents[K]> = {}
+  if (isListener(component)) {
+    if (!isEqual(prevProps, nextProps)) {
+      return { type: 'put', component, props: nextProps }
+    }
+  }
 
+  const changes: Partial<EntityComponents[K]> = {}
   // TODO: array and object types. For now only primitives
   for (const k in prevProps) {
     const propKey = k as keyof typeof prevProps
@@ -106,8 +72,13 @@ export function createReconciler(
   >
 ) {
   const entities = new Set<Entity>()
-
-  const getComponentId: { [key in keyof EntityComponents]: number } = {
+  const events = new Map<
+    Entity,
+    Map<keyof Listeners, Listeners[keyof Listeners]>
+  >()
+  const getComponentId: {
+    [key in keyof EngineComponents]: number
+  } = {
     uiTransform: engine.baseComponents.UiTransform._id,
     uiText: engine.baseComponents.UiText._id,
     uiBackground: engine.baseComponents.UiBackground._id
@@ -120,17 +91,35 @@ export function createReconciler(
     upsertComponent(instance, props, 'uiTransform')
   }
 
+  function upsertListener(
+    instance: Instance,
+    update: Changes<keyof Listeners>
+  ) {
+    if (update.type === 'delete') {
+      events.delete(instance.entity)
+      return
+    }
+    const entityEvents =
+      events.get(instance.entity) ||
+      events.set(instance.entity, new Map()).get(instance.entity)!
+
+    entityEvents.set(
+      update.component,
+      update.props as Listeners[typeof update.component]
+    )
+  }
+
   function removeComponent(
     instance: Instance,
-    component: keyof EntityComponents
+    component: keyof EngineComponents
   ) {
     const Component = engine.getComponent(getComponentId[component])
     Component.deleteFrom(instance.entity)
   }
 
-  function upsertComponent<K extends keyof EntityComponents>(
+  function upsertComponent<K extends keyof EngineComponents>(
     instance: Instance,
-    props: Partial<EntityComponents[K]>,
+    props: Partial<EngineComponents[K]>,
     componentName: K
   ) {
     const componentId = getComponentId[componentName]
@@ -141,12 +130,13 @@ export function createReconciler(
       Component.create(instance.entity)
 
     for (const key in props) {
-      const keyProp = key as keyof EntityComponents[K]
+      const keyProp = key as keyof EngineComponents[K]
       component[keyProp] = props[keyProp]
     }
   }
 
   function removeChildEntity(instance: Instance) {
+    events.delete(instance.entity)
     engine.removeEntity(instance.entity)
     for (const child of instance._child) {
       removeChildEntity(child)
@@ -209,8 +199,18 @@ export function createReconciler(
 
       for (const key in props) {
         const keyTyped: keyof Props = key as keyof Props
-        if (keyTyped === 'children' || keyTyped === 'key') continue
-        upsertComponent(instance, props[keyTyped], keyTyped)
+        if (keyTyped === 'children' || keyTyped === 'key') {
+          continue
+        }
+        if (isListener(keyTyped)) {
+          upsertListener(instance, {
+            type: 'add',
+            props: props[keyTyped],
+            component: keyTyped
+          })
+        } else {
+          upsertComponent(instance, props[keyTyped], keyTyped)
+        }
       }
 
       return instance
@@ -227,10 +227,7 @@ export function createReconciler(
       oldProps: Props,
       newProps: Props
     ): UpdatePayload {
-      const components = Object.keys(
-        getComponentId
-      ) as (keyof EntityComponents)[]
-      return components
+      return componentKeys
         .map((component) =>
           propsChanged(component, oldProps[component], newProps[component])
         )
@@ -247,10 +244,18 @@ export function createReconciler(
     ): void {
       for (const update of updatePayload) {
         console.log(update)
+        if (isListener(update.component)) {
+          upsertListener(instance, update as Changes<keyof Listeners>)
+          continue
+        }
         if (update.type === 'delete') {
           removeComponent(instance, update.component)
         } else {
-          upsertComponent(instance, update.props!, update.component)
+          upsertComponent(
+            instance,
+            update.props as Partial<EngineComponents[typeof update.component]>,
+            update.component
+          )
         }
       }
     },
@@ -288,8 +293,29 @@ export function createReconciler(
     () => {},
     null
   )
+
+  let runningEvents = false
+  function runEvents() {
+    // Avoid congestion of events.
+    if (runningEvents) return
+    runningEvents = true
+    for (const [entity, listeners] of events) {
+      for (const [keyListener, fn] of listeners) {
+        if (
+          fn &&
+          keyListener === 'onClick' &&
+          Input.wasJustClicked(IA_POINTER, entity)
+        ) {
+          void fn()
+        }
+      }
+    }
+    runningEvents = false
+  }
+
   return {
     update: function (component: JSX.Element) {
+      runEvents()
       return reconciler.updateContainer(component as any, root, null)
     },
     getEntities: () => Array.from(entities)
