@@ -24,27 +24,6 @@ function circularSystem(dt: number) {
   }
 }
 
-function clickSystem() {
-  if (Input.wasJustClicked(InputAction.IA_ANY, initEntity)) {
-    log('Was Just Clicked')
-  }
-  if (Input.wasJustClicked(InputAction.IA_ACTION_3, initEntity)) {
-    log('Was Just Clicked', 'Action 3')
-  }
-  if (Input.wasJustClicked(InputAction.IA_POINTER, initEntity)) {
-    log('Was Just Clicked', 'Pointer')
-  }
-  if (Input.wasJustClicked(InputAction.IA_PRIMARY, initEntity)) {
-    log('Was Just Clicked', 'Primary')
-  }
-  if (Input.wasJustClicked(InputAction.IA_JUMP, initEntity)) {
-    log('Was Just Clicked', 'Jump')
-  }
-  if (Input.wasJustClicked(InputAction.IA_LEFT, initEntity)) {
-    log('Was Just Clicked', 'Left')
-  }
-}
-
 // Init
 const initEntity = createCube(8, 1, 8)
 
