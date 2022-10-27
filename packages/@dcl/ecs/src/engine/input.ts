@@ -5,6 +5,21 @@ import { Schemas } from '../schemas'
 import { Entity } from './entity'
 import { IEngine } from './types'
 
+const InputCommands: InputAction[] = [
+  InputAction.IA_POINTER,
+  InputAction.IA_PRIMARY,
+  InputAction.IA_SECONDARY,
+  InputAction.IA_FORWARD,
+  InputAction.IA_BACKWARD,
+  InputAction.IA_RIGHT,
+  InputAction.IA_LEFT,
+  InputAction.IA_JUMP,
+  InputAction.IA_WALK,
+  InputAction.IA_ACTION_3,
+  InputAction.IA_ACTION_4,
+  InputAction.IA_ACTION_5,
+  InputAction.IA_ACTION_6
+]
 /**
  * @public
  */
@@ -78,8 +93,6 @@ const InternalInputStateSchema = {
   )
 }
 
-const LastInputAction = InputAction.IA_ACTION_6
-
 const InternalInputStateComponentId = 1500
 const TimestampUpdateSystemPriority = 1 << 20
 const ButtonStateUpdateSystemPriority = 0
@@ -91,7 +104,7 @@ export function createInput(engine: IEngine): IInput {
   )
 
   InternalInputStateComponent.create(engine.RootEntity, {
-    buttonState: Array.from({ length: LastInputAction + 1 }, () => ({
+    buttonState: Array.from({ length: InputCommands.length }, () => ({
       ts: 0,
       value: false
     }))
@@ -130,6 +143,18 @@ export function createInput(engine: IEngine): IInput {
   engine.addSystem(timestampUpdateSystem, TimestampUpdateSystemPriority)
 
   function getClick(inputAction: InputAction, entity?: Entity) {
+    if (inputAction !== InputAction.IA_ANY) {
+      return findClick(inputAction, entity)
+    }
+
+    for (const input of InputCommands) {
+      const cmd = findClick(input, entity)
+      if (cmd) return cmd
+    }
+    return null
+  }
+
+  function findClick(inputAction: InputAction, entity?: Entity) {
     const component = engine.baseComponents.PointerEventsResult.getOrNull(
       engine.RootEntity
     )
@@ -176,7 +201,23 @@ export function createInput(engine: IEngine): IInput {
     inputAction: InputAction,
     pointerEventType: PointerEventType,
     entity?: Entity
-  ) {
+  ): PBPointerEventsResult_PointerCommand | null {
+    if (inputAction !== InputAction.IA_ANY) {
+      return findInputCommand(inputAction, pointerEventType, entity)
+    }
+
+    for (const input of InputCommands) {
+      const cmd = findInputCommand(input, pointerEventType, entity)
+      if (cmd) return cmd
+    }
+    return null
+  }
+
+  function findInputCommand(
+    inputAction: InputAction,
+    pointerEventType: PointerEventType,
+    entity?: Entity
+  ): PBPointerEventsResult_PointerCommand | null {
     const component = engine.baseComponents.PointerEventsResult.getOrNull(
       engine.RootEntity
     )
