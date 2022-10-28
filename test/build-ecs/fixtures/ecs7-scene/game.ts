@@ -1,31 +1,44 @@
-function circularSystem() {
-  let t = 0.0
-  return (dt: number) => {
-    t += 2 * Math.PI * dt
+// Cube factory
+function createCube(x: number, y: number, z: number): Entity {
+  const meshEntity = engine.addEntity()
+  Transform.create(meshEntity, { position: { x, y, z } })
+  MeshRenderer.create(meshEntity, { mesh: { $case: 'box', box: { uvs: [] } } })
+  MeshCollider.create(meshEntity, { mesh: { $case: 'box', box: {} } })
 
-    const group = engine.getEntitiesWith(MeshRenderer)
-    for (const [entity] of group) {
-      const transform = Transform.getMutableOrNull(entity)
-      if (transform) {
-        transform.position.x = 8 + 2 * Math.cos(t)
-        transform.position.z = 8 + 2 * Math.sin(t)
-      }
-    }
+  return meshEntity
+}
+
+// Systems
+function circularSystem(dt: number) {
+  const entitiesWithMeshRenderer = engine.getEntitiesWith(
+    MeshRenderer,
+    Transform
+  )
+  for (const [entity, _meshRenderer, _transform] of entitiesWithMeshRenderer) {
+    const mutableTransform = Transform.getMutable(entity)
+
+    mutableTransform.rotation = Quaternion.multiply(
+      mutableTransform.rotation,
+      Quaternion.fromAngleAxis(dt * 10, Vector3.Up())
+    )
   }
 }
 
-function createCube(x: number, y: number, z: number) {
-  const myEntity = engine.addEntity()
+// Init
+const initEntity = createCube(8, 1, 8)
 
-  Transform.create(myEntity, {
-    position: { x, y, z }
-  })
+EventsSystem.onPointerDown(
+  initEntity,
+  function (event) {
+    log('Button: ', event.button)
+    createCube(1 + Math.random() * 8, Math.random() * 8, 1 + Math.random() * 8)
+    // EventsSystem.removeOnPointerDown(initEntity)
+  },
+  {
+    button: InputAction.IA_ANY,
+    hoverText: 'CASLA - BOEDO'
+  }
+)
 
-  MeshRenderer.create(myEntity, {
-    mesh: { $case: 'box', box: { uvs: [] } }
-  })
-
-  return myEntity
-}
-createCube(8, 2, 8)
-engine.addSystem(circularSystem())
+engine.addSystem(circularSystem)
+// engine.addSystem(clickSystem)

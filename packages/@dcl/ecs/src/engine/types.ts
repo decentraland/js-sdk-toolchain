@@ -52,6 +52,13 @@ export type IEngine = {
   removeEntityWithChildren(firstEntity: Entity): void
 
   /**
+   * Check if an entity exists in the engine
+   * @param entity - the entity to validate
+   * @returns true if the entity exists in the engine
+   */
+  entityExists(entity: Entity): boolean
+
+  /**
    * Add the system to the engine. It will be called every tick updated.
    * @param system function that receives the delta time between last tick and current one.
    * @param priority a number with the priority, big number are called before smaller ones
