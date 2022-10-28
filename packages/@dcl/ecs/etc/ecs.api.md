@@ -365,13 +365,17 @@ export namespace EventsSystem {
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    export function onClick(entity: Entity, cb: Callback, opts?: Opts): void;
+    export function onClick(entity: Entity, cb: Callback, opts?: Options): void;
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    export function onPointerDown(entity: Entity, cb: Callback, opts?: Opts): void;
+    export function onPointerDown(entity: Entity, cb: Callback, opts?: Options): void;
+    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+    export function onPointerUp(entity: Entity, cb: Callback, opts?: Options): void;
     // (undocumented)
-    export type Opts = {
+    export type Options = {
         button: InputAction;
         hoverText?: string;
     };
@@ -379,6 +383,8 @@ export namespace EventsSystem {
     export function removeOnClick(entity: Entity): void;
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     export function removeOnPointerDown(entity: Entity): void;
+    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+    export function removeOnPointerUp(entity: Entity): void;
 }
 
 // @public

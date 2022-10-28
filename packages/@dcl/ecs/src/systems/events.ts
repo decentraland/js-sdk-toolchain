@@ -10,16 +10,23 @@ export namespace EventsSystem {
     event: PBPointerEventsResult_PointerCommand
   ) => void | Promise<void>
 
-  export type Opts = {
-    button: InputAction
+  export type Options = {
+    button?: InputAction
     hoverText?: string
   }
-  type EventMapType = Map<PointerEventType, { cb: Callback; opts: Opts }>
 
-  const defaultOpts: Opts = {
-    button: InputAction.IA_ANY,
-    hoverText: ''
+  enum EventType {
+    Click,
+    Down,
+    Up
   }
+  type EventMapType = Map<EventType, { cb: Callback; opts: Required<Options> }>
+
+  const getDefaultOpts = (opts: Options = {}): Required<Options> => ({
+    button: InputAction.IA_ANY,
+    hoverText: '',
+    ...opts
+  })
 
   const eventsMap = new Map<Entity, EventMapType>()
 
@@ -32,7 +39,7 @@ export namespace EventsSystem {
   function setHoverFeedback(
     entity: Entity,
     type: PointerEventType,
-    opts: Opts
+    opts: Options
   ) {
     const { PointerHoverFeedback } = engine.baseComponents
     if (opts.hoverText) {
@@ -54,7 +61,7 @@ export namespace EventsSystem {
   function removeHoverFeedback(
     entity: Entity,
     type: PointerEventType,
-    button: Opts['button']
+    button: InputAction
   ) {
     const { PointerHoverFeedback } = engine.baseComponents
     const pointerEvent = PointerHoverFeedback.getMutableOrNull(entity)
@@ -65,12 +72,23 @@ export namespace EventsSystem {
     )
   }
 
-  function removeEvent(entity: Entity, type: PointerEventType) {
+  function getPointerEvent(eventType: EventType) {
+    if (eventType === EventType.Up) {
+      return PointerEventType.PET_UP
+    }
+    return PointerEventType.PET_DOWN
+  }
+
+  function removeEvent(entity: Entity, type: EventType) {
     const event = getEvent(entity)
     const pointerEvent = event.get(type)
 
     if (pointerEvent?.opts.hoverText) {
-      removeHoverFeedback(entity, type, pointerEvent.opts.button)
+      removeHoverFeedback(
+        entity,
+        getPointerEvent(type),
+        pointerEvent.opts.button
+      )
     }
 
     event.delete(type)
@@ -81,7 +99,7 @@ export namespace EventsSystem {
    * @param entity Entity where the callback was attached
    */
   export function removeOnClick(entity: Entity) {
-    removeEvent(entity, PointerEventType.PET_UP)
+    removeEvent(entity, EventType.Click)
   }
 
   /**
@@ -89,38 +107,57 @@ export namespace EventsSystem {
    * @param entity Entity where the callback was attached
    */
   export function removeOnPointerDown(entity: Entity) {
-    removeEvent(entity, PointerEventType.PET_DOWN)
+    removeEvent(entity, EventType.Down)
   }
 
   /**
-   * Execute callback when the user pressed the button declared while pointing at the entity
+   * Remove the callback for onPointerUp event
+   * @param entity Entity where the callback was attached
+   */
+  export function removeOnPointerUp(entity: Entity) {
+    removeEvent(entity, EventType.Up)
+  }
+
+  /**
+   * Execute callback when the user clicks the entity.
    * @param entity Entity to attach the callback
    * @param cb Function to execute when onPointerDown fires
    * @param opts Opts to trigger Feedback and Button
    */
-  export function onClick(entity: Entity, cb: Callback, opts = defaultOpts) {
+  export function onClick(entity: Entity, cb: Callback, opts?: Options) {
+    const options = getDefaultOpts(opts)
     // Clear previous event with over feedback included
-    removeEvent(entity, PointerEventType.PET_UP)
+    removeEvent(entity, EventType.Click)
 
     // Set new event
-    getEvent(entity).set(PointerEventType.PET_UP, { cb, opts })
-    setHoverFeedback(entity, PointerEventType.PET_UP, opts)
+    getEvent(entity).set(EventType.Click, { cb, opts: options })
+    setHoverFeedback(entity, PointerEventType.PET_DOWN, options)
   }
 
   /**
-   * Execute callback when the user releases the button declared while pointing at the entity
+   * Execute callback when the user a the entity
    * @param entity Entity to attach the callback
    * @param cb Function to execute when click fires
    * @param opts Opts to trigger Feedback and Button
    */
-  export function onPointerDown(
-    entity: Entity,
-    cb: Callback,
-    opts = defaultOpts
-  ) {
-    removeEvent(entity, PointerEventType.PET_DOWN)
-    getEvent(entity).set(PointerEventType.PET_DOWN, { cb, opts })
-    setHoverFeedback(entity, PointerEventType.PET_DOWN, opts)
+  export function onPointerDown(entity: Entity, cb: Callback, opts?: Options) {
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.Down)
+    getEvent(entity).set(EventType.Down, { cb, opts: options })
+    setHoverFeedback(entity, PointerEventType.PET_DOWN, options)
+  }
+
+  /**
+   * Execute callback when the user releases the InputButton pointing at the entity
+   * @param entity Entity to attach the callback
+   * @param cb Function to execute when click fires
+   * @param opts Opts to trigger Feedback and Button
+   */
+  export function onPointerUp(entity: Entity, cb: Callback, opts?: Options) {
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.Up)
+    getEvent(entity).set(EventType.Up, { cb, opts: options })
+    setHoverFeedback(entity, PointerEventType.PET_UP, options)
   }
 
   // @internal
@@ -133,15 +170,15 @@ export namespace EventsSystem {
         }
 
         for (const [eventType, { cb, opts }] of event) {
-          if (eventType === PointerEventType.PET_UP) {
+          if (eventType === EventType.Click) {
             const command = Input.getClick(opts.button, entity)
             if (command) void cb(command.up)
           }
 
-          if (eventType === PointerEventType.PET_DOWN) {
+          if (eventType === EventType.Down || eventType === EventType.Up) {
             const command = Input.getInputCommand(
               opts.button,
-              PointerEventType.PET_DOWN,
+              getPointerEvent(eventType),
               entity
             )
             if (command) {

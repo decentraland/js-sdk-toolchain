@@ -160,7 +160,6 @@ export function createInput(engine: IEngine): IInput {
     )
 
     if (!component) return null
-
     const commands = component.commands
 
     // We search the last DOWN command sorted by timestamp

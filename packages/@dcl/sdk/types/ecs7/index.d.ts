@@ -1220,7 +1220,7 @@ declare const error: (message: string | Error, data?: any) => void;
 
 declare namespace EventsSystem {
     export type Callback = (event: PBPointerEventsResult_PointerCommand) => void | Promise<void>;
-    export type Opts = {
+    export type Options = {
         button: InputAction;
         hoverText?: string;
     };
@@ -1235,19 +1235,31 @@ declare namespace EventsSystem {
      */
     export function removeOnPointerDown(entity: Entity): void;
     /**
-     * Execute callback when the user pressed the button declared while pointing at the entity
+     * Remove the callback for onPointerUp event
+     * @param entity Entity where the callback was attached
+     */
+    export function removeOnPointerUp(entity: Entity): void;
+    /**
+     * Execute callback when the user clicks the entity.
      * @param entity Entity to attach the callback
      * @param cb Function to execute when onPointerDown fires
      * @param opts Opts to trigger Feedback and Button
      */
-    export function onClick(entity: Entity, cb: Callback, opts?: Opts): void;
+    export function onClick(entity: Entity, cb: Callback, opts?: Options): void;
     /**
-     * Execute callback when the user releases the button declared while pointing at the entity
+     * Execute callback when the user a the entity
      * @param entity Entity to attach the callback
      * @param cb Function to execute when click fires
      * @param opts Opts to trigger Feedback and Button
      */
-    export function onPointerDown(entity: Entity, cb: Callback, opts?: Opts): void;
+    export function onPointerDown(entity: Entity, cb: Callback, opts?: Options): void;
+    /**
+     * Execute callback when the user releases the InputButton pointing at the entity
+     * @param entity Entity to attach the callback
+     * @param cb Function to execute when click fires
+     * @param opts Opts to trigger Feedback and Button
+     */
+    export function onPointerUp(entity: Entity, cb: Callback, opts?: Options): void;
 }
 
 /** Excludes property keys from T where the property is assignable to U */
