@@ -1,10 +1,11 @@
-import { Engine, IEngine, Entity } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import {
   Color4,
   ReactEcs,
   renderUi,
+  UiBackgroundProps,
   UiEntity
-} from '../../../packages/@dcl/react-ecs/src'
+} from '../../packages/@dcl/react-ecs/src'
 
 const CANVAS_ROOT_ENTITY = 0
 declare const engine: IEngine
@@ -57,5 +58,31 @@ describe('UiBackground React Ecs', () => {
     expect(getBackground(rootDivEntity)).toMatchObject({
       backgroundColor: undefined
     })
+  })
+
+  it('should remove backgrund component', () => {
+    const { UiTransform, UiBackground } = engine.baseComponents
+    const entityIndex = engine.addEntity()
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getBackground = () => UiBackground.getOrNull(rootDivEntity)
+    let backgroundProps: { uiBackground: UiBackgroundProps } | undefined = {
+      uiBackground: { backgroundColor: { r: 0, g: 1, b: 2, a: 0 } }
+    }
+
+    const ui = () => (
+      <UiEntity uiTransform={{ width: 100 }} {...backgroundProps} />
+    )
+
+    renderUi(ui)
+    engine.update(1)
+    expect(getBackground()?.backgroundColor).toMatchObject(
+      backgroundProps.uiBackground.backgroundColor!
+    )
+
+    backgroundProps = undefined
+    engine.update(1)
+    expect(getBackground()).toBe(null)
   })
 })

@@ -63,6 +63,7 @@ export function isEqual<T = unknown>(val1: T, val2: T): boolean {
     }
   }
 
+  /* istanbul ignore next */
   return true
 }
 
@@ -77,46 +78,56 @@ export const noopConfig = {
   isPrimaryRenderer: true,
   supportsHydration: false,
 
+  /* istanbul ignore next */
   insertInContainerBefore(
     _container: Container,
     _child: Instance | TextInstance,
     _beforeChild: Instance | TextInstance | SuspenseInstance
-  ): void {
-    // console.log('insertIncontainerBefore TODO')
-  },
-
-  detachDeletedInstance: function (_node: Instance): void {
-    // console.log('detahDeletedInstance')
-    // console.log({ node })
-  },
+  ): void {},
+  detachDeletedInstance(_node: Instance) {},
+  /* istanbul ignore next */
   hideInstance(_instance: Instance): void {},
+  /* istanbul ignore next */
   hideTextInstance(_textInstance: TextInstance): void {},
+  /* istanbul ignore next */
   unhideInstance(_instance: Instance, _props: Props): void {},
+  /* istanbul ignore next */
   unhideTextInstance(_textInstance: TextInstance, _text: string): void {},
+  /* istanbul ignore next */
   clearContainer(_container: Container): void {},
-  getCurrentEventPriority: function (): number {
+  /* istanbul ignore next */
+  getCurrentEventPriority(): number {
+    /* istanbul ignore next */
     return 0
   },
-  getInstanceFromNode: function (_node: Instance): null | undefined {
+  /* istanbul ignore next */
+  getInstanceFromNode(_node: Instance): null | undefined {
+    /* istanbul ignore next */
     return null
   },
-  beforeActiveInstanceBlur: function (): void {},
-  afterActiveInstanceBlur: function (): void {},
-  prepareScopeUpdate: function (
-    _scopeInstance: any,
-    _instance: Instance
-  ): void {},
-  getInstanceFromScope: function (_scopeInstance: Instance): Instance | null {
+  /* istanbul ignore next */
+  beforeActiveInstanceBlur(): void {},
+  /* istanbul ignore next */
+  afterActiveInstanceBlur(): void {},
+  /* istanbul ignore next */
+  prepareScopeUpdate() {},
+  /* istanbul ignore next */
+  getInstanceFromScope() {
+    /* istanbul ignore next */
     return null
   },
-  removeChildFromContainer: () => {},
+  /* istanbul ignore next */
+  removeChildFromContainer() {},
+  /* istanbul ignore next */
   commitMount(
     _instance: Instance,
     _type: Type,
     _props: Props,
     _internalInstanceHandle: OpaqueHandle
   ): void {},
+  /* istanbul ignore next */
   resetTextContent(_instance: Instance): void {},
+  /* istanbul ignore next */
   commitTextUpdate(
     _textInstance: TextInstance,
     _oldText: string,
@@ -126,16 +137,21 @@ export const noopConfig = {
     return null
   },
   resetAfterCommit(_containerInfo: Container): void {},
+  /* istanbul ignore next */
   preparePortalMount(_containerInfo: Container): void {},
+  /* istanbul ignore next */
   createTextInstance(
     _text: string,
     _rootContainer: Container,
     _hostContext: HostContext,
     _internalHandle: OpaqueHandle
   ): TextInstance {
+    /* istanbul ignore next */
     return {} as TextInstance
   },
+  /* istanbul ignore next */
   scheduleTimeout(_fn: any, _delay?: number): TimeoutHandle {},
+  /* istanbul ignore next */
   cancelTimeout(_id: TimeoutHandle): void {},
   shouldSetTextContent(_type: Type, _props: Props): boolean {
     return false
@@ -148,9 +164,12 @@ export const noopConfig = {
     _type: Type,
     _rootContainer: Container
   ): HostContext {
+    /* istanbul ignore next */
     return null
   },
+  /* istanbul ignore next */
   getPublicInstance(instance: Instance): PublicInstance {
+    /* istanbul ignore next */
     return instance
   },
   finalizeInitialChildren(

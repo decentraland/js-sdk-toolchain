@@ -9,14 +9,20 @@ module.exports = {
     "^.+\\.(ts|tsx)$": "ts-jest",
   },
   coverageDirectory: "coverage",
-  // coverageThreshold: {
-  //   "packages/@dcl/ecs/src/components/generated/pb": {
-  //     branches: 70,
-  //     functions: 70,
-  //     lines: 70,
-  //     statements: 70
-  //   }
-  // },
+  coverageThreshold: {
+    global: {
+        branches: 100,
+        functions: 100,
+        lines: 100,
+        statements: 100,
+    },
+    "packages/@dcl/ecs/src/components/generated/pb": {
+      branches: 70,
+      functions: 70,
+      lines: 70,
+      statements: 70
+    }
+  },
   coveragePathIgnorePatterns: [
     "scripts",
     "test",

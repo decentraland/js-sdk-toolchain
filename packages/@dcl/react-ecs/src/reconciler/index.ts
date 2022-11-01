@@ -96,7 +96,6 @@ export function createReconciler(
     instance: Instance,
     update: Changes<keyof Listeners>
   ) {
-    if (update.component !== 'onClick') return
     // TODO: This handles only onClick listener for the moment
     if (update.type === 'delete' || !update.props) {
       EventsSystem.removeOnPointerDown(instance.entity)
@@ -290,7 +289,8 @@ export function createReconciler(
     false,
     null,
     '',
-    () => {},
+    /* istanbul ignore next */
+    function () {},
     null
   )
 
