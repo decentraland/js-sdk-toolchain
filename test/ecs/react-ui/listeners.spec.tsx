@@ -7,13 +7,18 @@ import {
 } from '../../../packages/@dcl/react-ecs/src'
 import { createTestPointerDownCommand } from '../events/utils'
 import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
+import { EventsSystem } from '../../../packages/@dcl/ecs/src/systems/events'
 
-declare let engine: IEngine
+let engine: IEngine
 
 describe('Ui Listeners React Ecs', () => {
   beforeEach(() => {
-    engine = (globalThis as any).engine = Engine()
-    ;(global as any).Input = createInput(engine)
+    engine = Engine()
+    const Input = createInput(engine)
+    engine.addSystem(EventsSystem.update(Input))
+    ;(globalThis as any).engine = engine
+    ;(global as any).Input = Input
+    ;(global as any).EventsSystem = EventsSystem
   })
 
   it('should run onClick if it was fake-clicked', async () => {
