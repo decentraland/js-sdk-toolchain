@@ -9,18 +9,18 @@ module.exports = {
     "^.+\\.(ts|tsx)$": "ts-jest",
   },
   coverageDirectory: "coverage",
-  coverageThreshold: {
-    "packages/@dcl/ecs/src/components/generated/pb": {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70
-    }
-  },
+  // coverageThreshold: {
+  //   "packages/@dcl/ecs/src/components/generated/pb": {
+  //     branches: 70,
+  //     functions: 70,
+  //     lines: 70,
+  //     statements: 70
+  //   }
+  // },
   coveragePathIgnorePatterns: [
     "scripts",
     "test",
-    "packages/@dcl/react-ecs"
+    // "packages/@dcl/react-ecs"
   ],
   verbose: true,
   testMatch: ["**/*.spec.(ts|tsx)"],
