@@ -1503,25 +1503,6 @@ declare type ISchema<T = any> = {
  */
 declare const log: (...a: any[]) => void;
 
-/**
- * @public
- * Make the collision mask with some collider layers
- * @param layers a array layers to be assigned
- * @returns collisionMask to be used in the MeshCollider field
- * @example
- * ```ts
- * // Physics and Pointer are the defaults
- * MeshCollider.create(entity, {
- *  collisionMask: makeCollisionMask(
- *    ColliderLayer.Physics,
- *    ColliderLayer.Pointer
- *   ),
- *  box: {}
- * })
- * ```
- */
-declare function makeCollisionMask(...layers: ColliderLayer[]): number;
-
 /** @public */
 declare const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
 

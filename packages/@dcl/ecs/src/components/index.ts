@@ -40,6 +40,6 @@ export function defineSdkComponents(engine: PreEngine) {
  * })
  * ```
  */
-export function makeCollisionMask(...layers: ColliderLayer[]): number {
-  return layers.reduce((item, currentValue) => item | currentValue)
-}
+// export function makeCollisionMask(...layers: ColliderLayer[]): number {
+// return layers.reduce((item, currentValue) => item | currentValue)
+// }

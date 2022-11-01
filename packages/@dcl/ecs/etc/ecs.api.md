@@ -435,11 +435,6 @@ export type ISchema<T = any> = {
 // @public
 export const log: (...a: any[]) => void;
 
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-//
-// @public
-export function makeCollisionMask(...layers: ColliderLayer[]): number;
-
 // @public (undocumented)
 export const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
 
