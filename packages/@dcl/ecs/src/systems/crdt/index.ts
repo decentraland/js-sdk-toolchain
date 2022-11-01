@@ -8,13 +8,9 @@ import WireMessage from '../../serialization/wireMessage'
 import { Transport } from './transports/types'
 import { ReceiveMessage, TransportMessage } from './types'
 
-export function crdtSceneSystem({
-  engine,
-  transports
-}: {
-  engine: PreEngine
-  transports: Transport[]
-}) {
+export function crdtSceneSystem({ engine }: { engine: PreEngine }) {
+  const transports: Transport[] = []
+
   // CRDT Client
   const crdtClient = crdtProtocol<Uint8Array>()
   // Messages that we received at transport.onMessage waiting to be processed
@@ -22,10 +18,6 @@ export function crdtSceneSystem({
   // Messages already processed by the engine but that we need to broadcast to other transports.
   const transportMessages: TransportMessage[] = []
   // Map of entities already processed at least once
-
-  transports.forEach(
-    (transport) => (transport.onmessage = parseChunkMessage(transport.type))
-  )
 
   /**
    *
@@ -180,8 +172,14 @@ export function crdtSceneSystem({
     }
   }
 
+  function addTransport(transport: Transport) {
+    transports.push(transport)
+    transport.onmessage = parseChunkMessage(transport.type)
+  }
+
   return {
     createMessages,
-    receiveMessages
+    receiveMessages,
+    addTransport
   }
 }

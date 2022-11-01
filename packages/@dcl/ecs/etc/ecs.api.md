@@ -376,7 +376,7 @@ export namespace EventsSystem {
     export function onPointerUp(entity: Entity, cb: Callback, opts?: Options): void;
     // (undocumented)
     export type Options = {
-        button: InputAction;
+        button?: InputAction;
         hoverText?: string;
     };
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
