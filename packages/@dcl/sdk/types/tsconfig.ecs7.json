@@ -29,7 +29,6 @@
       "rpc-modules/EngineApi",
       "rpc-modules/EnvironmentApi",
       "rpc-modules/EthereumController",
-      "rpc-modules/ExperimentalApi",
       "rpc-modules/ParcelIdentity",
       "rpc-modules/Permissions",
       "rpc-modules/Players",

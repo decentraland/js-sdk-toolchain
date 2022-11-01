@@ -5,12 +5,12 @@ import { Quaternion, Vector3 } from '../../packages/@dcl/ecs/src/runtime/Math'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt/componentOperation'
 import WireMessage from '../../packages/@dcl/ecs/src/serialization/wireMessage'
-import { setupDclInterfaceForThisSuite, testingExperimentalApi } from './utils'
+import { setupDclInterfaceForThisSuite, testingEngineApi } from './utils'
 
 const putType = WireMessage.Enum.PUT_COMPONENT
 
 describe('Component operation tests', () => {
-  const engineApi = testingExperimentalApi()
+  const engineApi = testingEngineApi()
   setupDclInterfaceForThisSuite({
     ...engineApi.modules
   })
