@@ -1218,6 +1218,8 @@ declare const entitySymbol: unique symbol;
  */
 declare const error: (message: string | Error, data?: any) => void;
 
+declare type EventsSystem = typeof EventsSystem;
+
 declare namespace EventsSystem {
     export type Callback = (event: PBPointerEventsResult_PointerCommand) => void | Promise<void>;
     export type Options = {
@@ -1225,35 +1227,27 @@ declare namespace EventsSystem {
         hoverText?: string;
     };
     /**
-     * Remove the callback for onClick event
-     * @param entity Entity where the callback was attached
-     */
-    export function removeOnClick(entity: Entity): void;
-    /**
+     * @public
      * Remove the callback for onPointerDown event
      * @param entity Entity where the callback was attached
      */
     export function removeOnPointerDown(entity: Entity): void;
     /**
+     * @public
      * Remove the callback for onPointerUp event
      * @param entity Entity where the callback was attached
      */
     export function removeOnPointerUp(entity: Entity): void;
     /**
-     * Execute callback when the user clicks the entity.
-     * @param entity Entity to attach the callback
-     * @param cb Function to execute when onPointerDown fires
-     * @param opts Opts to trigger Feedback and Button
-     */
-    export function onClick(entity: Entity, cb: Callback, opts?: Options): void;
-    /**
-     * Execute callback when the user a the entity
+     * @public
+     * Execute callback when the user press the InputButton pointing at the entity
      * @param entity Entity to attach the callback
      * @param cb Function to execute when click fires
      * @param opts Opts to trigger Feedback and Button
      */
     export function onPointerDown(entity: Entity, cb: Callback, opts?: Options): void;
     /**
+     * @public
      * Execute callback when the user releases the InputButton pointing at the entity
      * @param entity Entity to attach the callback
      * @param cb Function to execute when click fires
@@ -1430,40 +1424,24 @@ declare function IEnum<T>(type: ISchema<any>): ISchema<T>;
  */
 declare type IInput = {
     /**
-     * Check if a click was emmited in the current tick for the input action.
-     * This is defined when an UP event is triggered with a previously DOWN state.
-     * @param inputAction - the input action to query
-     * @param entity - the entity to query, ignore for global events.
-     * @returns true if the entity was clicked in the last tick-update
-     */
-    wasJustClicked: (inputAction: InputAction, entity?: Entity) => boolean;
-    /**
-     * Check if a pointer event has been emited in the last tick-update.
+     * @public
+     * Check if a pointer event has been emitted in the last tick-update.
      * @param inputAction - the input action to query
      * @param pointerEventType - the pointer event type to query
      * @param entity - the entity to query, ignore for global
      * @returns
      */
-    wasInputJustActive: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
+    isActive: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
     /**
+     * @public
      * Check if an input action is in DOWN state.
      * @param inputAction - the input action to query
      * @returns true if the input action is being pressed
      */
     isActionDown: (inputAction: InputAction) => boolean;
     /**
-     * Get the click info if a click was emmited in the current tick for the input action.
-     * This is defined when an UP event is triggered with a previously DOWN state.
-     * @param inputAction - the input action to query
-     * @param entity - the entity to query, ignore for global events.
-     * @returns the click info or undefined if there is no command in the last tick-update
-     */
-    getClick: (inputAction: InputAction, entity?: Entity) => {
-        up: PBPointerEventsResult_PointerCommand;
-        down: PBPointerEventsResult_PointerCommand;
-    } | null;
-    /**
-     * Get the input command info if a pointer event has been emited in the last tick-update.
+     * @public
+     * Get the input command info if a pointer event has been emitted in the last tick-update.
      * @param inputAction - the input action to query
      * @param pointerEventType - the pointer event type to query
      * @param entity - the entity to query, ignore for global

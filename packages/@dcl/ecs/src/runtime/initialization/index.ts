@@ -1,5 +1,3 @@
-/// <reference types="@dcl/posix" />
-
 /**
  * @alpha * This file initialization is an alpha one. This is based on the old-ecs
  * init and it'll be changing.

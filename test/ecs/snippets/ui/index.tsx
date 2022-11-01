@@ -114,7 +114,9 @@ function circularSystem(dt: number) {
 function spawnerSystem() {
   const clickedCubes = engine.getEntitiesWith(PointerHoverFeedback)
   for (const [entity] of clickedCubes) {
-    if (Input.wasJustClicked(InputAction.IA_PRIMARY, entity)) {
+    if (
+      Input.isActive(InputAction.IA_PRIMARY, PointerEventType.PET_DOWN, entity)
+    ) {
       counter++
     }
   }

@@ -355,17 +355,17 @@ export type Entity = number & {
 export const error: (message: string | Error, data?: any) => void;
 
 // Warning: (ae-missing-release-tag) "EventsSystem" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "EventsSystem" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
+// @public (undocumented)
+export type EventsSystem = typeof EventsSystem;
+
 // @public (undocumented)
 export namespace EventsSystem {
     // Warning: (ae-forgotten-export) The symbol "PBPointerEventsResult_PointerCommand" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     export type Callback = (event: PBPointerEventsResult_PointerCommand) => void | Promise<void>;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    export function onClick(entity: Entity, cb: Callback, opts?: Options): void;
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
@@ -379,8 +379,6 @@ export namespace EventsSystem {
         button?: InputAction;
         hoverText?: string;
     };
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    export function removeOnClick(entity: Entity): void;
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     export function removeOnPointerDown(entity: Entity): void;
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
@@ -419,13 +417,8 @@ export type IEngineParams = {
 
 // @public (undocumented)
 export type IInput = {
-    wasJustClicked: (inputAction: InputAction, entity?: Entity) => boolean;
-    wasInputJustActive: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
+    isActive: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
     isActionDown: (inputAction: InputAction) => boolean;
-    getClick: (inputAction: InputAction, entity?: Entity) => {
-        up: PBPointerEventsResult_PointerCommand;
-        down: PBPointerEventsResult_PointerCommand;
-    } | null;
     getInputCommand: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => PBPointerEventsResult_PointerCommand | null;
 };
 
@@ -945,7 +938,7 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 // dist/engine/component.d.ts:125:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/component.d.ts:133:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
 // dist/engine/component.d.ts:133:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
-// dist/engine/input.d.ts:25:5 - (ae-forgotten-export) The symbol "PointerEventType" needs to be exported by the entry point index.d.ts
+// dist/engine/input.d.ts:18:5 - (ae-forgotten-export) The symbol "PointerEventType" needs to be exported by the entry point index.d.ts
 // dist/engine/types.d.ts:27:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/types.d.ts:28:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
 // dist/engine/types.d.ts:37:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
@@ -964,7 +957,7 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 // dist/engine/types.d.ts:107:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
 // dist/engine/types.d.ts:116:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/types.d.ts:117:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// dist/systems/events.d.ts:7:9 - (ae-forgotten-export) The symbol "InputAction" needs to be exported by the entry point index.d.ts
+// dist/systems/events.d.ts:8:9 - (ae-forgotten-export) The symbol "InputAction" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

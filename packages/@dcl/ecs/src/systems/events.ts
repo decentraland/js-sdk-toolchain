@@ -5,6 +5,7 @@ import { Entity, IEngine, IInput } from '../engine'
 
 declare const engine: IEngine
 
+export type EventsSystem = typeof EventsSystem
 export namespace EventsSystem {
   export type Callback = (
     event: PBPointerEventsResult_PointerCommand
@@ -95,6 +96,7 @@ export namespace EventsSystem {
   }
 
   /**
+   * @internal
    * Remove the callback for onClick event
    * @param entity Entity where the callback was attached
    */
@@ -103,6 +105,7 @@ export namespace EventsSystem {
   }
 
   /**
+   * @public
    * Remove the callback for onPointerDown event
    * @param entity Entity where the callback was attached
    */
@@ -111,6 +114,7 @@ export namespace EventsSystem {
   }
 
   /**
+   * @public
    * Remove the callback for onPointerUp event
    * @param entity Entity where the callback was attached
    */
@@ -119,6 +123,7 @@ export namespace EventsSystem {
   }
 
   /**
+   * @internal
    * Execute callback when the user clicks the entity.
    * @param entity Entity to attach the callback
    * @param cb Function to execute when onPointerDown fires
@@ -135,7 +140,8 @@ export namespace EventsSystem {
   }
 
   /**
-   * Execute callback when the user a the entity
+   * @public
+   * Execute callback when the user press the InputButton pointing at the entity
    * @param entity Entity to attach the callback
    * @param cb Function to execute when click fires
    * @param opts Opts to trigger Feedback and Button
@@ -148,6 +154,7 @@ export namespace EventsSystem {
   }
 
   /**
+   * @public
    * Execute callback when the user releases the InputButton pointing at the entity
    * @param entity Entity to attach the callback
    * @param cb Function to execute when click fires

@@ -4,6 +4,8 @@
 
 ```ts
 
+/// <reference types="@dcl/posix" />
+
 // Warning: (ae-missing-release-tag) "CANVAS_ROOT_ENTITY" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -125,10 +127,11 @@ export type Listeners = {
     onClick?: OnClick;
 };
 
+// Warning: (ae-forgotten-export) The symbol "EventsSystem" needs to be exported by the entry point index.d.ts
 // Warning: (ae-missing-release-tag) "OnClick" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type OnClick = () => Promise<void> | void;
+export type OnClick = EventsSystem.Callback;
 
 // Warning: (ae-missing-release-tag) "PBUiBackground" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

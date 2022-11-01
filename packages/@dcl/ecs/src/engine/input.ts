@@ -25,28 +25,31 @@ const InputCommands: InputAction[] = [
  */
 export type IInput = {
   /**
+   * @internal
    * Check if a click was emmited in the current tick for the input action.
    * This is defined when an UP event is triggered with a previously DOWN state.
    * @param inputAction - the input action to query
    * @param entity - the entity to query, ignore for global events.
    * @returns true if the entity was clicked in the last tick-update
    */
-  wasJustClicked: (inputAction: InputAction, entity?: Entity) => boolean
+  isClicked: (inputAction: InputAction, entity?: Entity) => boolean
 
   /**
-   * Check if a pointer event has been emited in the last tick-update.
+   * @public
+   * Check if a pointer event has been emitted in the last tick-update.
    * @param inputAction - the input action to query
    * @param pointerEventType - the pointer event type to query
    * @param entity - the entity to query, ignore for global
    * @returns
    */
-  wasInputJustActive: (
+  isActive: (
     inputAction: InputAction,
     pointerEventType: PointerEventType,
     entity?: Entity
   ) => boolean
 
   /**
+   * @public
    * Check if an input action is in DOWN state.
    * @param inputAction - the input action to query
    * @returns true if the input action is being pressed
@@ -54,6 +57,7 @@ export type IInput = {
   isActionDown: (inputAction: InputAction) => boolean
 
   /**
+   * @internal
    * Get the click info if a click was emmited in the current tick for the input action.
    * This is defined when an UP event is triggered with a previously DOWN state.
    * @param inputAction - the input action to query
@@ -69,7 +73,8 @@ export type IInput = {
   } | null
 
   /**
-   * Get the input command info if a pointer event has been emited in the last tick-update.
+   * @public
+   * Get the input command info if a pointer event has been emitted in the last tick-update.
    * @param inputAction - the input action to query
    * @param pointerEventType - the pointer event type to query
    * @param entity - the entity to query, ignore for global
@@ -242,11 +247,11 @@ export function createInput(engine: IEngine): IInput {
     }
   }
 
-  function wasJustClicked(inputAction: InputAction, entity?: Entity) {
+  function isClicked(inputAction: InputAction, entity?: Entity) {
     return getClick(inputAction, entity) !== null
   }
 
-  function wasInputJustActive(
+  function isActive(
     inputAction: InputAction,
     pointerEventType: PointerEventType,
     entity?: Entity
@@ -261,11 +266,16 @@ export function createInput(engine: IEngine): IInput {
   }
 
   return {
+    // @public
     isActionDown,
+    // @internal
     getClick,
+    // @public
     getInputCommand,
-    wasJustClicked,
-    wasInputJustActive
+    // @internal
+    isClicked,
+    // @public
+    isActive
   }
 }
 

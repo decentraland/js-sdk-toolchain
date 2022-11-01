@@ -1,24 +1,10 @@
 // Cube factory
-function createCube(x: number, y: number, z: number, spawner = true): Entity {
+function createCube(x: number, y: number, z: number): Entity {
   const meshEntity = engine.addEntity()
   Transform.create(meshEntity, { position: { x, y, z } })
   MeshRenderer.create(meshEntity, { mesh: { $case: 'box', box: { uvs: [] } } })
   MeshCollider.create(meshEntity, { mesh: { $case: 'box', box: {} } })
-  if (spawner) {
-    PointerHoverFeedback.create(meshEntity, {
-      pointerEvents: [
-        {
-          eventType: PointerEventType.PET_DOWN,
-          eventInfo: {
-            button: InputAction.IA_PRIMARY,
-            hoverText: 'Press E to spawn',
-            maxDistance: 100,
-            showFeedback: true
-          }
-        }
-      ]
-    })
-  }
+
   return meshEntity
 }
 
@@ -38,23 +24,16 @@ function circularSystem(dt: number) {
   }
 }
 
-function spawnerSystem() {
-  const clickedCubes = engine.getEntitiesWith(PointerHoverFeedback)
-  for (const [entity] of clickedCubes) {
-    if (Input.wasJustClicked(InputAction.IA_PRIMARY, entity)) {
-      createCube(
-        1 + Math.random() * 8,
-        Math.random() * 8,
-        1 + Math.random() * 8,
-        false
-      )
-    }
-  }
-}
-
 // Init
-createCube(8, 1, 8)
+const initEntity = createCube(8, 1, 8)
+EventsSystem.onPointerDown(
+  initEntity,
+  () => {
+    createCube(1 + Math.random() * 8, Math.random() * 8, 1 + Math.random() * 8)
+  },
+  { button: InputAction.IA_PRIMARY, hoverText: 'Press E to spawn' }
+)
+
 engine.addSystem(circularSystem)
-engine.addSystem(spawnerSystem)
 
 export {}
