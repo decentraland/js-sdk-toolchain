@@ -47,6 +47,7 @@ async function internalCompile() {
   removeSync(outModulesPath)
   mkdirSync(outModulesPath)
 
+  let apisDTsContent = ''
   for (const api of apiArray) {
     const types: Set<string> = new Set()
     const functions: string[] = []
@@ -82,8 +83,21 @@ async function internalCompile() {
     rmSync(path.resolve(apiModuleDirPath, 'tsconfig.json'))
     rmSync(path.resolve(apiModuleDirPath, 'index.gen.ts'))
 
-    processDeclarations(api.name, path.resolve(apiModuleDirPath, 'index.d.ts'))
+    const moduleDTsPath = path.resolve(apiModuleDirPath, 'index.d.ts')
+    processDeclarations(api.name, moduleDTsPath)
+
+    apisDTsContent += `
+
+      /**
+       * ${api.name}
+       */
+    `
+    apisDTsContent += readFileSync(moduleDTsPath).toString()
+
+    rmSync(apiModuleDirPath, { recursive: true, force: true })
   }
+
+  writeFileSync(path.resolve(outModulesPath, 'index.d.ts'), apisDTsContent)
 }
 
 async function preprocessProtoGeneration(protoPath: string) {

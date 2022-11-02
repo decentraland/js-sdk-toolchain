@@ -255,6 +255,10 @@ flow('build-all', () => {
           fileName: 'index.d.ts'
         },
         {
+          from: path.resolve(SDK_PATH, 'types', 'rpc-modules', 'index.d.ts'),
+          fileName: 'apis.d.ts'
+        },
+        {
           from: path.resolve(REACT_ECS, 'dist', 'index.min.js'),
           fileName: 'react-ecs.index.min.js'
         },
