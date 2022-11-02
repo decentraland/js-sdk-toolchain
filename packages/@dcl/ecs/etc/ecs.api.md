@@ -378,6 +378,7 @@ export namespace EventsSystem {
     export type Options = {
         button?: InputAction;
         hoverText?: string;
+        maxDistance?: number;
     };
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     export function removeOnPointerDown(entity: Entity): void;
@@ -418,7 +419,6 @@ export type IEngineParams = {
 // @public (undocumented)
 export type IInput = {
     isActive: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
-    isActionDown: (inputAction: InputAction) => boolean;
     getInputCommand: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => PBPointerEventsResult_PointerCommand | null;
 };
 

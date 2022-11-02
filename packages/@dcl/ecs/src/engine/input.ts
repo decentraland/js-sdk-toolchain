@@ -49,7 +49,7 @@ export type IInput = {
   ) => boolean
 
   /**
-   * @public
+   * @internal
    * Check if an input action is in DOWN state.
    * @param inputAction - the input action to query
    * @returns true if the input action is being pressed

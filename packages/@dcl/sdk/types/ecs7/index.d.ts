@@ -1225,6 +1225,7 @@ declare namespace EventsSystem {
     export type Options = {
         button?: InputAction;
         hoverText?: string;
+        maxDistance?: number;
     };
     /**
      * @public
@@ -1432,13 +1433,6 @@ declare type IInput = {
      * @returns
      */
     isActive: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
-    /**
-     * @public
-     * Check if an input action is in DOWN state.
-     * @param inputAction - the input action to query
-     * @returns true if the input action is being pressed
-     */
-    isActionDown: (inputAction: InputAction) => boolean;
     /**
      * @public
      * Get the input command info if a pointer event has been emitted in the last tick-update.
