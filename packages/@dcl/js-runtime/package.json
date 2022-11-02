@@ -1,6 +1,6 @@
 {
   "name": "@dcl/js-runtime",
-  "version": "0.0.0",
+  "version": "7.0.0",
   "description": "JavaScript runtime definitions for Decentraland environments",
   "scripts": {},
   "keywords": [],

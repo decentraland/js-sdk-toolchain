@@ -248,6 +248,7 @@ async function emitFile(
 
   type OutFile = {
     readonly path: string
+    readonly fullPath: string
     definition?: {
       path: string
       content: string
@@ -282,6 +283,7 @@ async function emitFile(
       const content = loadArtifact(lib)
       loadedLibs.push({
         path: relative(ts.sys.getCurrentDirectory(), path),
+        fullPath: resolve(ts.sys.getCurrentDirectory(), path),
         content,
         sha256: ts.sys.createSHA256Hash!(content)
       })
@@ -317,7 +319,7 @@ async function emitFile(
   function getOutFile(path: string) {
     let f = out.get(path)
     if (!f) {
-      f = { path }
+      f = { path, fullPath: resolve(ts.sys.getCurrentDirectory(), path) }
       out.set(path, f)
     }
     return f
@@ -350,18 +352,30 @@ async function emitFile(
     ) {
       loadedLibs.push({
         path: relative(ts.sys.getCurrentDirectory(), fileName),
+        fullPath: resolve(ts.sys.getCurrentDirectory(), fileName),
         content: file.content,
         sha256: ts.sys.createSHA256Hash!(file.content)
       })
 
       const ret: string[] = []
 
-      for (const { path, content, sha256 } of loadedLibs) {
-        const code = content + '\n//# sourceURL=dcl://' + path
+      for (const { path, content, sha256, fullPath } of loadedLibs) {
+        const code: string[] = []
+
+        if (content) {
+          code.push(content)
+
+          const hasSourceMappingUrl = content.match(
+            /^\/\/# (sourceMappingURL|sourceURL)=/
+          )
+          if (!hasSourceMappingUrl) {
+            code.push('//# sourceURL=file://' + fullPath)
+          }
+        }
 
         ret.push(
           `/*! ${JSON.stringify(path)} ${sha256 || ''} */ eval(${JSON.stringify(
-            code
+            code.join('\n')
           )})`
         )
       }
