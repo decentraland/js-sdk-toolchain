@@ -33,7 +33,7 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
   } = props
   return {
     ...defaultDiv,
-    ...(otherProps || {}),
+    ...otherProps,
     ...parsePosition(position, 'position'),
     ...parsePosition(margin, 'margin'),
     ...parsePosition(padding, 'padding'),
