@@ -104,7 +104,8 @@ export function createReconciler(
 
     if (update.props) {
       EventsSystem.onPointerDown(instance.entity, update.props as Callback, {
-        button: IA_POINTER
+        button: IA_POINTER,
+        hoverText: ''
       })
     }
   }
