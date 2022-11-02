@@ -1221,7 +1221,7 @@ declare const error: (message: string | Error, data?: any) => void;
 declare namespace EventsSystem {
     export type Callback = (event: PBPointerEventsResult_PointerCommand) => void | Promise<void>;
     export type Options = {
-        button: InputAction;
+        button?: InputAction;
         hoverText?: string;
     };
     /**
