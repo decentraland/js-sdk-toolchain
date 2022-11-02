@@ -1,4 +1,4 @@
-import * as Math from '../../packages/@dcl/ecs/src/runtime/matha'
+import * as Math from '../../packages/@dcl/ecs/src/runtime/math'
 
 describe('Events System', () => {
   it('should get Math exported fns', () => {
