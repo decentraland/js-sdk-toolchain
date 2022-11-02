@@ -171,8 +171,14 @@ export type PreEngine = ReturnType<typeof preEngine>
  */
 export function Engine({ transports }: IEngineParams = {}): IEngine {
   const engine = preEngine()
-  const crdtSystem = crdtSceneSystem({ engine, transports: transports || [] })
+  const crdtSystem = crdtSceneSystem({ engine })
   const baseComponents = defineSdkComponents(engine)
+
+  if (transports) {
+    for (const tranport of transports) {
+      crdtSystem.addTransport(tranport)
+    }
+  }
 
   function update(dt: number) {
     crdtSystem.receiveMessages()
@@ -242,6 +248,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     PlayerEntity: 1 as Entity,
     CameraEntity: 2 as Entity,
     baseComponents,
-    entityExists: engine.entityExists
+    entityExists: engine.entityExists,
+    addTransport: crdtSystem.addTransport
   }
 }
