@@ -14,6 +14,7 @@ export namespace EventsSystem {
   export type Options = {
     button?: InputAction
     hoverText?: string
+    maxDistance?: number
   }
 
   enum EventType {
@@ -25,7 +26,8 @@ export namespace EventsSystem {
 
   const getDefaultOpts = (opts: Options = {}): Required<Options> => ({
     button: InputAction.IA_ANY,
-    hoverText: '',
+    hoverText: 'Interact',
+    maxDistance: 100,
     ...opts
   })
 
@@ -53,7 +55,8 @@ export namespace EventsSystem {
         eventInfo: {
           button: opts.button,
           showFeedback: true,
-          hoverText: opts.hoverText
+          hoverText: opts.hoverText,
+          maxDistance: opts.maxDistance
         }
       })
     }
