@@ -1,6 +1,6 @@
 // The order of the following imports matters. Please do not auto-sort
 
-export * from './runtime/Math'
+export * from './runtime/math'
 export * from './engine'
 export * from './schemas'
 export * from './runtime/initialization'
@@ -14,6 +14,6 @@ export * from './runtime/types'
 
 export * from './runtime/observables'
 export * from './runtime/temp-fp/Observable'
-export * from './runtime/MessageBus'
+export * from './runtime/messageBus'
 
 // export { makeCollisionMask } from './components'

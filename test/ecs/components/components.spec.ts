@@ -1,7 +1,7 @@
 import {
   Quaternion,
   Vector3
-} from '../../../packages/@dcl/ecs/src/runtime/Math'
+} from '../../../packages/@dcl/ecs/src/runtime/math'
 import { Engine, Entity } from '../../../packages/@dcl/ecs/src/engine'
 import { setupDclInterfaceForThisSuite, testingEngineApi } from '../utils'
 

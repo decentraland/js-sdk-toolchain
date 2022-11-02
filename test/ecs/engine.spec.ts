@@ -6,7 +6,7 @@ import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/Byte
 import { createRendererTransport } from '../../packages/@dcl/ecs/src/systems/crdt/transports/rendererTransport'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { TransformSchema } from '../../packages/@dcl/ecs/src/components/legacy/Transform'
-import { Vector3 } from '../../packages/@dcl/ecs/src/runtime/Math'
+import { Vector3 } from '../../packages/@dcl/ecs/src/runtime/math'
 import { setupDclInterfaceForThisSuite, testingEngineApi } from './utils'
 
 const PositionSchema = {
