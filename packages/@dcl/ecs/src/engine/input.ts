@@ -40,21 +40,21 @@ export type IInput = {
    * @param inputAction - the input action to query
    * @param pointerEventType - the pointer event type to query
    * @param entity - the entity to query, ignore for global
-   * @returns
+   * @returns boolean
    */
-  isActive: (
+  isTriggered: (
     inputAction: InputAction,
     pointerEventType: PointerEventType,
     entity?: Entity
   ) => boolean
 
   /**
-   * @internal
-   * Check if an input action is in DOWN state.
+   * @public
+   * Check if an input action is currently being pressed.
    * @param inputAction - the input action to query
-   * @returns true if the input action is being pressed
+   * @returns boolean
    */
-  isActionDown: (inputAction: InputAction) => boolean
+  isPressed: (inputAction: InputAction) => boolean
 
   /**
    * @internal
@@ -251,7 +251,7 @@ export function createInput(engine: IEngine): IInput {
     return getClick(inputAction, entity) !== null
   }
 
-  function isActive(
+  function isTriggered(
     inputAction: InputAction,
     pointerEventType: PointerEventType,
     entity?: Entity
@@ -259,7 +259,7 @@ export function createInput(engine: IEngine): IInput {
     return getInputCommand(inputAction, pointerEventType, entity) !== null
   }
 
-  function isActionDown(inputAction: InputAction) {
+  function isPressed(inputAction: InputAction) {
     return InternalInputStateComponent.get(engine.RootEntity).buttonState[
       inputAction
     ].value
@@ -267,7 +267,7 @@ export function createInput(engine: IEngine): IInput {
 
   return {
     // @public
-    isActionDown,
+    isPressed,
     // @internal
     getClick,
     // @public
@@ -275,7 +275,7 @@ export function createInput(engine: IEngine): IInput {
     // @internal
     isClicked,
     // @public
-    isActive
+    isTriggered
   }
 }
 

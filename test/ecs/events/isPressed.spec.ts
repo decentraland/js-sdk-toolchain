@@ -4,12 +4,12 @@ import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/gene
 import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
-describe('Events helpers isPointerEventActive', () => {
+describe('Events helpers isTriggered', () => {
   it('should detect no events', () => {
     const newEngine = Engine()
-    const isPointerEventActive = createInput(newEngine).isActive
+    const { isTriggered } = createInput(newEngine)
     expect(
-      isPointerEventActive(
+      isTriggered(
         InputAction.IA_ANY,
         PointerEventType.PET_DOWN,
         newEngine.RootEntity
@@ -21,7 +21,7 @@ describe('Events helpers isPointerEventActive', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const isPointerEventActive = createInput(newEngine).isActive
+    const { isTriggered } = createInput(newEngine)
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -30,25 +30,13 @@ describe('Events helpers isPointerEventActive', () => {
     })
 
     expect(
-      isPointerEventActive(
-        InputAction.IA_POINTER,
-        PointerEventType.PET_DOWN,
-        entity
-      )
+      isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)
     ).toBe(true)
     expect(
-      isPointerEventActive(
-        InputAction.IA_POINTER,
-        PointerEventType.PET_UP,
-        entity
-      )
+      isTriggered(InputAction.IA_POINTER, PointerEventType.PET_UP, entity)
     ).toBe(false)
     expect(
-      isPointerEventActive(
-        InputAction.IA_ACTION_3,
-        PointerEventType.PET_UP,
-        entity
-      )
+      isTriggered(InputAction.IA_ACTION_3, PointerEventType.PET_UP, entity)
     ).toBe(false)
   })
 
@@ -56,7 +44,7 @@ describe('Events helpers isPointerEventActive', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const isPointerEventActive = createInput(newEngine).isActive
+    const { isTriggered } = createInput(newEngine)
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
         createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)
@@ -64,20 +52,12 @@ describe('Events helpers isPointerEventActive', () => {
     })
 
     expect(
-      isPointerEventActive(
-        InputAction.IA_POINTER,
-        PointerEventType.PET_DOWN,
-        entity
-      )
+      isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)
     ).toBe(true)
 
     newEngine.update(0)
     expect(
-      isPointerEventActive(
-        InputAction.IA_POINTER,
-        PointerEventType.PET_DOWN,
-        entity
-      )
+      isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)
     ).toBe(false)
   })
 
@@ -85,7 +65,7 @@ describe('Events helpers isPointerEventActive', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const isActionDown = createInput(newEngine).isActionDown
+    const { isPressed } = createInput(newEngine)
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
         createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)
@@ -93,11 +73,11 @@ describe('Events helpers isPointerEventActive', () => {
     })
 
     newEngine.update(0)
-    expect(isActionDown(InputAction.IA_POINTER)).toBe(true)
+    expect(isPressed(InputAction.IA_POINTER)).toBe(true)
 
     // See this keep the true value after the update
     newEngine.update(0)
-    expect(isActionDown(InputAction.IA_POINTER)).toBe(true)
+    expect(isPressed(InputAction.IA_POINTER)).toBe(true)
   })
 })
 

@@ -1430,9 +1430,16 @@ declare type IInput = {
      * @param inputAction - the input action to query
      * @param pointerEventType - the pointer event type to query
      * @param entity - the entity to query, ignore for global
-     * @returns
+     * @returns boolean
      */
-    isActive: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
+    isTriggered: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
+    /**
+     * @public
+     * Check if an input action is currently being pressed.
+     * @param inputAction - the input action to query
+     * @returns boolean
+     */
+    isPressed: (inputAction: InputAction) => boolean;
     /**
      * @public
      * Get the input command info if a pointer event has been emitted in the last tick-update.

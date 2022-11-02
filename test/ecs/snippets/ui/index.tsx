@@ -115,7 +115,11 @@ function spawnerSystem() {
   const clickedCubes = engine.getEntitiesWith(PointerHoverFeedback)
   for (const [entity] of clickedCubes) {
     if (
-      Input.isActive(InputAction.IA_PRIMARY, PointerEventType.PET_DOWN, entity)
+      Input.isTriggered(
+        InputAction.IA_PRIMARY,
+        PointerEventType.PET_DOWN,
+        entity
+      )
     ) {
       counter++
     }

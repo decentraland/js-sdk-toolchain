@@ -418,7 +418,8 @@ export type IEngineParams = {
 
 // @public (undocumented)
 export type IInput = {
-    isActive: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
+    isTriggered: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
+    isPressed: (inputAction: InputAction) => boolean;
     getInputCommand: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => PBPointerEventsResult_PointerCommand | null;
 };
 
