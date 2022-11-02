@@ -1,19 +1,20 @@
-import { Engine, Entity, IEngine } from '../../../packages/@dcl/ecs/src/engine'
-import { createInput } from '../../../packages/@dcl/ecs/src/engine/input'
-import {
-  ReactEcs,
-  renderUi,
-  UiEntity
-} from '../../../packages/@dcl/react-ecs/src'
-import { createTestPointerDownCommand } from '../events/utils'
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
+import { Engine, Entity, IEngine } from '../../packages/@dcl/ecs/src/engine'
+import { createInput } from '../../packages/@dcl/ecs/src/engine/input'
+import { ReactEcs, renderUi, UiEntity } from '../../packages/@dcl/react-ecs/src'
+import { createTestPointerDownCommand } from '../ecs/events/utils'
+import { PointerEventType } from '../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
+import { EventsSystem } from '../../packages/@dcl/ecs/src/systems/events'
 
-declare let engine: IEngine
+let engine: IEngine
 
 describe('Ui Listeners React Ecs', () => {
   beforeEach(() => {
-    engine = (globalThis as any).engine = Engine()
-    ;(global as any).Input = createInput(engine)
+    engine = Engine()
+    const Input = createInput(engine)
+    engine.addSystem(EventsSystem.update(Input))
+    ;(globalThis as any).engine = engine
+    ;(global as any).Input = Input
+    ;(global as any).EventsSystem = EventsSystem
   })
 
   it('should run onClick if it was fake-clicked', async () => {
@@ -75,5 +76,14 @@ describe('Ui Listeners React Ecs', () => {
 
     engine.update(1)
     expect(counter).toBe(8888)
+
+    // Update onclick listener
+    onClick = () => {
+      counter = 8
+    }
+    engine.update(1)
+    fakeClick()
+    engine.update(1)
+    expect(counter).toBe(8)
   })
 })
