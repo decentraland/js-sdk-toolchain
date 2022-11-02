@@ -25,8 +25,7 @@ module.exports = {
   },
   coveragePathIgnorePatterns: [
     "scripts",
-    "test",
-    // "packages/@dcl/react-ecs"
+    "test"
   ],
   verbose: true,
   testMatch: ["**/*.spec.(ts|tsx)"],
