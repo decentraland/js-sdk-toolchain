@@ -4,10 +4,10 @@ import {
   Vector3
 } from '../../../packages/@dcl/ecs/src/runtime/Math'
 import { TRANSFORM_LENGTH } from '../../../packages/@dcl/ecs/src/components/legacy/Transform'
-import { setupDclInterfaceForThisSuite, testingExperimentalApi } from '../utils'
+import { setupDclInterfaceForThisSuite, testingEngineApi } from '../utils'
 
 describe('Transform component', () => {
-  const engineApi = testingExperimentalApi()
+  const engineApi = testingEngineApi()
   setupDclInterfaceForThisSuite({
     ...engineApi.modules
   })
