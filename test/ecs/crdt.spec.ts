@@ -1,4 +1,4 @@
-import { Vector3 } from '../../packages/@dcl/ecs/src/runtime/math'
+import { Vector3 } from '../../packages/@dcl/ecs/src/runtime/matha'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'

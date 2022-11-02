@@ -1,6 +1,6 @@
 // The order of the following imports matters. Please do not auto-sort
 
-export * from './runtime/math'
+export * from './runtime/matha'
 export * from './engine'
 export * from './schemas'
 export * from './runtime/initialization'

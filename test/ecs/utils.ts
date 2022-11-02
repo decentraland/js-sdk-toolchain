@@ -1,4 +1,4 @@
-import { Quaternion, Vector3 } from '../../packages/@dcl/ecs/src/runtime/math'
+import { Quaternion, Vector3 } from '../../packages/@dcl/ecs/src/runtime/matha'
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'

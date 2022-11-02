@@ -2,7 +2,7 @@ import { Engine, Entity } from '../../../packages/@dcl/ecs/src/engine'
 import {
   Quaternion,
   Vector3
-} from '../../../packages/@dcl/ecs/src/runtime/math'
+} from '../../../packages/@dcl/ecs/src/runtime/matha'
 import { TRANSFORM_LENGTH } from '../../../packages/@dcl/ecs/src/components/legacy/Transform'
 import { setupDclInterfaceForThisSuite, testingEngineApi } from '../utils'
 
