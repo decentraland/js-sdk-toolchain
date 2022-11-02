@@ -1,7 +1,38 @@
 /// <reference types="@dcl/posix" />
 
 /** @public */
-declare const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+declare const Animator: AnimatorComponentDefinition;
+
+/**
+ * @public
+ */
+declare interface AnimatorComponentDefinition extends ComponentDefinition {
+    /**
+     * @public
+     *
+     * [Helper] Get a `mutable` version of animator clip
+     * @param entity
+     * @param name
+     */
+    getClip(entity: Entity, name: string): PBAnimationState | null;
+    /**
+     * @public
+     *
+     * [Helper] Set playing=true the animation `$name`
+     * @param entity
+     * @param name - animation name
+     * @param resetCursor - the animation starts at 0 or continues from the current cursor position
+     */
+    playSingleAnim(entity: Entity, name: string, resetCursor?: boolean): boolean;
+    /**
+     * @public
+     *
+     * [Helper] Set playing=false all animations
+     * @param entity
+     * @param resetCursor - the animation stops at 0 or at the current cursor position
+     */
+    stopAnims(entity: Entity, resetCursor?: boolean): boolean;
+}
 
 /** @public */
 declare const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
@@ -917,7 +948,7 @@ declare namespace Components {
     /** @public */
     const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     /** @public */
-    const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+    const Animator: AnimatorComponentDefinition;
     /** @public */
     const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     /** @public */
@@ -1156,8 +1187,8 @@ declare type DeepReadonlyObject<T> = {
 declare type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 
 declare function defineSdkComponents(engine: PreEngine): {
+    Animator: AnimatorComponentDefinition;
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
-    Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
     AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
@@ -1221,7 +1252,7 @@ declare const error: (message: string | Error, data?: any) => void;
 declare namespace EventsSystem {
     export type Callback = (event: PBPointerEventsResult_PointerCommand) => void | Promise<void>;
     export type Options = {
-        button: InputAction;
+        button?: InputAction;
         hoverText?: string;
     };
     /**
@@ -2656,10 +2687,6 @@ declare interface PBAnimationState {
     shouldReset?: boolean | undefined;
 }
 
-declare interface PBAnimator {
-    states: PBAnimationState[];
-}
-
 declare interface PBAudioSource {
     playing?: boolean | undefined;
     /** default=1.0f */
@@ -3705,6 +3732,7 @@ declare namespace Schemas {
     const Quaternion: ISchema<QuaternionType>;
     const Color3: ISchema<Color3Type>;
     const Color4: ISchema<Color4Type>;
+    const Entity: ISchema<Entity>;
     const Enum: typeof IEnum;
     const Array: typeof IArray;
     const Map: typeof IMap;

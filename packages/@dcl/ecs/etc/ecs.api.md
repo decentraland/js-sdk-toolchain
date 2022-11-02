@@ -6,10 +6,10 @@
 
 /// <reference types="@dcl/posix" />
 
-// Warning: (ae-forgotten-export) The symbol "PBAnimator" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "AnimatorComponentDefinition" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+export const Animator: AnimatorComponentDefinition;
 
 // Warning: (ae-forgotten-export) The symbol "PBAudioSource" needs to be exported by the entry point index.d.ts
 //
@@ -225,7 +225,7 @@ export namespace Components {
     // (undocumented)
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     const // (undocumented)
-    Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+    Animator: AnimatorComponentDefinition;
     const // (undocumented)
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     const // (undocumented)
@@ -376,7 +376,7 @@ export namespace EventsSystem {
     export function onPointerUp(entity: Entity, cb: Callback, opts?: Options): void;
     // (undocumented)
     export type Options = {
-        button: InputAction;
+        button?: InputAction;
         hoverText?: string;
     };
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
@@ -741,6 +741,8 @@ export namespace Schemas {
     //
     // (undocumented)
     Color4: ISchema<Color4Type>;
+    const // (undocumented)
+    Entity: ISchema<Entity>;
     const // Warning: (ae-forgotten-export) The symbol "IEnum" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
