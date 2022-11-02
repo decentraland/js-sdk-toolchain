@@ -22,7 +22,7 @@ export function EntityContainer() {
         staticEntity.removeEntity(entity) || dynamicEntity.removeEntity(entity)
       )
     },
-    isEntityExists(entity: Entity): boolean {
+    entityExists(entity: Entity): boolean {
       return (
         EntityUtils.isReservedEntity(entity) ||
         staticEntity.getExistingEntities().has(entity) ||

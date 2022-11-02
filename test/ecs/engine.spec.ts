@@ -6,8 +6,8 @@ import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/Byte
 import { createRendererTransport } from '../../packages/@dcl/ecs/src/systems/crdt/transports/rendererTransport'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { TransformSchema } from '../../packages/@dcl/ecs/src/components/legacy/Transform'
-import { Vector3 } from '../../packages/@dcl/ecs/src/runtime/Math'
-import { setupDclInterfaceForThisSuite, testingExperimentalApi } from './utils'
+import { Vector3 } from '../../packages/@dcl/ecs/src/runtime/math'
+import { setupDclInterfaceForThisSuite, testingEngineApi } from './utils'
 
 const PositionSchema = {
   x: Schemas.Float
@@ -18,7 +18,7 @@ const VelocitySchema = {
 }
 
 describe('Engine tests', () => {
-  const engineApi = testingExperimentalApi()
+  const engineApi = testingEngineApi()
   setupDclInterfaceForThisSuite({
     ...engineApi.modules
   })
@@ -84,7 +84,7 @@ describe('Engine tests', () => {
     expect(Position.get(entity)).toStrictEqual({ x: 10 })
   })
 
-  it('define component and creates new entity', () => {
+  it('define and remove component, also creates new entity', () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
     const Position = engine.defineComponent(PositionSchema, 888)
@@ -103,6 +103,8 @@ describe('Engine tests', () => {
       position.x = 80
     }
     expect(Position.get(entity)).toStrictEqual({ x: 80 })
+    engine.removeComponentDefinition(888)
+    expect(() => engine.getComponent(888)).toThrowError()
   })
 
   it('should fail if we try to fetch a component not deifned', () => {

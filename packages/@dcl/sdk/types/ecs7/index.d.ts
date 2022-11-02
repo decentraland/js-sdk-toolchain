@@ -1210,13 +1210,62 @@ declare type Entity = number & {
 
 declare const entitySymbol: unique symbol;
 
+/**
+ * Error function. Prints a console error. Only works in debug mode, otherwise it does nothing.
+ * @param error - string or Error object.
+ * @param data - any debug information.
+ * @public
+ */
 declare const error: (message: string | Error, data?: any) => void;
+
+declare type EventsSystem = typeof EventsSystem;
+
+declare namespace EventsSystem {
+    export type Callback = (event: PBPointerEventsResult_PointerCommand) => void | Promise<void>;
+    export type Options = {
+        button?: InputAction;
+        hoverText?: string;
+        maxDistance?: number;
+    };
+    /**
+     * @public
+     * Remove the callback for onPointerDown event
+     * @param entity Entity where the callback was attached
+     */
+    export function removeOnPointerDown(entity: Entity): void;
+    /**
+     * @public
+     * Remove the callback for onPointerUp event
+     * @param entity Entity where the callback was attached
+     */
+    export function removeOnPointerUp(entity: Entity): void;
+    /**
+     * @public
+     * Execute callback when the user press the InputButton pointing at the entity
+     * @param entity Entity to attach the callback
+     * @param cb Function to execute when click fires
+     * @param opts Opts to trigger Feedback and Button
+     */
+    export function onPointerDown(entity: Entity, cb: Callback, opts?: Options): void;
+    /**
+     * @public
+     * Execute callback when the user releases the InputButton pointing at the entity
+     * @param entity Entity to attach the callback
+     * @param cb Function to execute when click fires
+     * @param opts Opts to trigger Feedback and Button
+     */
+    export function onPointerUp(entity: Entity, cb: Callback, opts?: Options): void;
+}
 
 /** Excludes property keys from T where the property is assignable to U */
 declare type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
 }[keyof T];
 
+/**
+ * @public
+ * Execute async task
+ */
 declare const executeTask: (task: Task<unknown>) => void;
 
 /** @public */
@@ -1259,6 +1308,12 @@ declare type IEngine = {
      * @param firstEntity - the root entity of the tree
      */
     removeEntityWithChildren(firstEntity: Entity): void;
+    /**
+     * Check if an entity exists in the engine
+     * @param entity - the entity to validate
+     * @returns true if the entity exists in the engine
+     */
+    entityExists(entity: Entity): boolean;
     /**
      * Add the system to the engine. It will be called every tick updated.
      * @param system function that receives the delta time between last tick and current one.
@@ -1370,40 +1425,24 @@ declare function IEnum<T>(type: ISchema<any>): ISchema<T>;
  */
 declare type IInput = {
     /**
-     * Check if a click was emmited in the current tick for the input action.
-     * This is defined when an UP event is triggered with a previously DOWN state.
-     * @param inputAction - the input action to query
-     * @param entity - the entity to query, ignore for global events.
-     * @returns true if the entity was clicked in the last tick-update
-     */
-    wasJustClicked: (inputAction: InputAction, entity?: Entity) => boolean;
-    /**
-     * Check if a pointer event has been emited in the last tick-update.
+     * @public
+     * Check if a pointer event has been emitted in the last tick-update.
      * @param inputAction - the input action to query
      * @param pointerEventType - the pointer event type to query
      * @param entity - the entity to query, ignore for global
-     * @returns
+     * @returns boolean
      */
-    wasInputJustActive: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
+    isTriggered: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
     /**
-     * Check if an input action is in DOWN state.
+     * @public
+     * Check if an input action is currently being pressed.
      * @param inputAction - the input action to query
-     * @returns true if the input action is being pressed
+     * @returns boolean
      */
-    isActionDown: (inputAction: InputAction) => boolean;
+    isPressed: (inputAction: InputAction) => boolean;
     /**
-     * Get the click info if a click was emmited in the current tick for the input action.
-     * This is defined when an UP event is triggered with a previously DOWN state.
-     * @param inputAction - the input action to query
-     * @param entity - the entity to query, ignore for global events.
-     * @returns the click info or undefined if there is no command in the last tick-update
-     */
-    getClick: (inputAction: InputAction, entity?: Entity) => {
-        up: PBPointerEventsResult_PointerCommand;
-        down: PBPointerEventsResult_PointerCommand;
-    } | null;
-    /**
-     * Get the input command info if a pointer event has been emited in the last tick-update.
+     * @public
+     * Get the input command info if a pointer event has been emitted in the last tick-update.
      * @param inputAction - the input action to query
      * @param pointerEventType - the pointer event type to query
      * @param entity - the entity to query, ignore for global
@@ -1458,26 +1497,12 @@ declare type ISchema<T = any> = {
     create(): T;
 };
 
-declare const log: (...a: any[]) => void;
-
 /**
+ * Log function. Only works in debug mode, otherwise it does nothing.
+ * @param args - any loggable parameter
  * @public
- * Make the collision mask with some collider layers
- * @param layers a array layers to be assigned
- * @returns collisionMask to be used in the MeshCollider field
- * @example
- * ```ts
- * // Physics and Pointer are the defaults
- * MeshCollider.create(entity, {
- *  collisionMask: makeCollisionMask(
- *    ColliderLayer.Physics,
- *    ColliderLayer.Pointer
- *   ),
- *  box: {}
- * })
- * ```
  */
-declare function makeCollisionMask(...layers: ColliderLayer[]): number;
+declare const log: (...a: any[]) => void;
 
 /** @public */
 declare const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
@@ -3097,7 +3122,7 @@ declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointer
 declare type PreEngine = ReturnType<typeof preEngine>;
 
 declare function preEngine(): {
-    entitiesComponent: Map<number, Set<number>>;
+    entityExists: (entity: Entity) => boolean;
     componentsDefinition: Map<number, ComponentDefinition<any, any>>;
     addEntity: (dynamic?: boolean) => Entity;
     addDynamicEntity: () => Entity;

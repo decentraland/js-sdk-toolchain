@@ -1,4 +1,4 @@
-import { Quaternion, Vector3 } from '../../packages/@dcl/ecs/src/runtime/Math'
+import { Quaternion, Vector3 } from '../../packages/@dcl/ecs/src/runtime/math'
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
@@ -8,15 +8,15 @@ export function wait(ms: number) {
   return new Promise<void>((resolve) => setTimeout(() => resolve(), ms))
 }
 
-export function testingExperimentalApi() {
+export function testingEngineApi() {
   const sentMessages: Uint8Array[] = []
   const messagesFromRenderer: Uint8Array[] = []
   const modules = {
-    '~system/ExperimentalApi': {
-      async sendToRenderer(arg: { data: Uint8Array }) {
+    '~system/EngineApi': {
+      async crdtSendToRenderer(arg: { data: Uint8Array }) {
         sentMessages.push(arg.data)
       },
-      async messageFromRenderer() {
+      async crdtGetMessageFromRenderer() {
         const ret = messagesFromRenderer.slice(0)
         messagesFromRenderer.length = 0
         return ret

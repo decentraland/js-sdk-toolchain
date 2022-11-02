@@ -5,10 +5,11 @@ import { Entity } from '../../../packages/@dcl/ecs/src/engine/entity'
 export function createTestPointerDownCommand(
   entity: Entity,
   timestamp: number,
-  state: PointerEventType
+  state: PointerEventType,
+  button: InputAction = InputAction.IA_POINTER
 ) {
   return {
-    button: InputAction.IA_POINTER,
+    button,
     timestamp: timestamp,
     hit: {
       position: { x: 1, y: 2, z: 3 },

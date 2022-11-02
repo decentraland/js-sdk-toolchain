@@ -5,40 +5,59 @@ import { Schemas } from '../schemas'
 import { Entity } from './entity'
 import { IEngine } from './types'
 
+const InputCommands: InputAction[] = [
+  InputAction.IA_POINTER,
+  InputAction.IA_PRIMARY,
+  InputAction.IA_SECONDARY,
+  InputAction.IA_FORWARD,
+  InputAction.IA_BACKWARD,
+  InputAction.IA_RIGHT,
+  InputAction.IA_LEFT,
+  InputAction.IA_JUMP,
+  InputAction.IA_WALK,
+  InputAction.IA_ACTION_3,
+  InputAction.IA_ACTION_4,
+  InputAction.IA_ACTION_5,
+  InputAction.IA_ACTION_6
+]
 /**
  * @public
  */
 export type IInput = {
   /**
+   * @internal
    * Check if a click was emmited in the current tick for the input action.
    * This is defined when an UP event is triggered with a previously DOWN state.
    * @param inputAction - the input action to query
    * @param entity - the entity to query, ignore for global events.
    * @returns true if the entity was clicked in the last tick-update
    */
-  wasJustClicked: (inputAction: InputAction, entity?: Entity) => boolean
+  isClicked: (inputAction: InputAction, entity?: Entity) => boolean
 
   /**
-   * Check if a pointer event has been emited in the last tick-update.
+   * @public
+   * Check if a pointer event has been emitted in the last tick-update.
    * @param inputAction - the input action to query
    * @param pointerEventType - the pointer event type to query
    * @param entity - the entity to query, ignore for global
-   * @returns
+   * @returns boolean
    */
-  wasInputJustActive: (
+  isTriggered: (
     inputAction: InputAction,
     pointerEventType: PointerEventType,
     entity?: Entity
   ) => boolean
 
   /**
-   * Check if an input action is in DOWN state.
+   * @public
+   * Check if an input action is currently being pressed.
    * @param inputAction - the input action to query
-   * @returns true if the input action is being pressed
+   * @returns boolean
    */
-  isActionDown: (inputAction: InputAction) => boolean
+  isPressed: (inputAction: InputAction) => boolean
 
   /**
+   * @internal
    * Get the click info if a click was emmited in the current tick for the input action.
    * This is defined when an UP event is triggered with a previously DOWN state.
    * @param inputAction - the input action to query
@@ -54,7 +73,8 @@ export type IInput = {
   } | null
 
   /**
-   * Get the input command info if a pointer event has been emited in the last tick-update.
+   * @public
+   * Get the input command info if a pointer event has been emitted in the last tick-update.
    * @param inputAction - the input action to query
    * @param pointerEventType - the pointer event type to query
    * @param entity - the entity to query, ignore for global
@@ -78,8 +98,6 @@ const InternalInputStateSchema = {
   )
 }
 
-const LastInputAction = InputAction.IA_ACTION_6
-
 const InternalInputStateComponentId = 1500
 const TimestampUpdateSystemPriority = 1 << 20
 const ButtonStateUpdateSystemPriority = 0
@@ -91,7 +109,7 @@ export function createInput(engine: IEngine): IInput {
   )
 
   InternalInputStateComponent.create(engine.RootEntity, {
-    buttonState: Array.from({ length: LastInputAction + 1 }, () => ({
+    buttonState: Array.from({ length: InputCommands.length }, () => ({
       ts: 0,
       value: false
     }))
@@ -130,12 +148,23 @@ export function createInput(engine: IEngine): IInput {
   engine.addSystem(timestampUpdateSystem, TimestampUpdateSystemPriority)
 
   function getClick(inputAction: InputAction, entity?: Entity) {
+    if (inputAction !== InputAction.IA_ANY) {
+      return findClick(inputAction, entity)
+    }
+
+    for (const input of InputCommands) {
+      const cmd = findClick(input, entity)
+      if (cmd) return cmd
+    }
+    return null
+  }
+
+  function findClick(inputAction: InputAction, entity?: Entity) {
     const component = engine.baseComponents.PointerEventsResult.getOrNull(
       engine.RootEntity
     )
 
     if (!component) return null
-
     const commands = component.commands
 
     // We search the last DOWN command sorted by timestamp
@@ -146,6 +175,8 @@ export function createInput(engine: IEngine): IInput {
       entity
     )
     // We search the last UP command sorted by timestamp
+    if (!down) return null
+
     const up = findLastAction(
       commands,
       PointerEventType.PET_UP,
@@ -153,7 +184,6 @@ export function createInput(engine: IEngine): IInput {
       entity
     )
 
-    if (!down) return null
     if (!up) return null
 
     const state = InternalInputStateComponent.get(engine.RootEntity)
@@ -175,7 +205,23 @@ export function createInput(engine: IEngine): IInput {
     inputAction: InputAction,
     pointerEventType: PointerEventType,
     entity?: Entity
-  ) {
+  ): PBPointerEventsResult_PointerCommand | null {
+    if (inputAction !== InputAction.IA_ANY) {
+      return findInputCommand(inputAction, pointerEventType, entity)
+    }
+
+    for (const input of InputCommands) {
+      const cmd = findInputCommand(input, pointerEventType, entity)
+      if (cmd) return cmd
+    }
+    return null
+  }
+
+  function findInputCommand(
+    inputAction: InputAction,
+    pointerEventType: PointerEventType,
+    entity?: Entity
+  ): PBPointerEventsResult_PointerCommand | null {
     const component = engine.baseComponents.PointerEventsResult.getOrNull(
       engine.RootEntity
     )
@@ -201,11 +247,11 @@ export function createInput(engine: IEngine): IInput {
     }
   }
 
-  function wasJustClicked(inputAction: InputAction, entity?: Entity) {
+  function isClicked(inputAction: InputAction, entity?: Entity) {
     return getClick(inputAction, entity) !== null
   }
 
-  function wasInputJustActive(
+  function isTriggered(
     inputAction: InputAction,
     pointerEventType: PointerEventType,
     entity?: Entity
@@ -213,18 +259,23 @@ export function createInput(engine: IEngine): IInput {
     return getInputCommand(inputAction, pointerEventType, entity) !== null
   }
 
-  function isActionDown(inputAction: InputAction) {
+  function isPressed(inputAction: InputAction) {
     return InternalInputStateComponent.get(engine.RootEntity).buttonState[
       inputAction
     ].value
   }
 
   return {
-    isActionDown,
+    // @public
+    isPressed,
+    // @internal
     getClick,
+    // @public
     getInputCommand,
-    wasJustClicked,
-    wasInputJustActive
+    // @internal
+    isClicked,
+    // @public
+    isTriggered
   }
 }
 

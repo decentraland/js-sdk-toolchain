@@ -21,12 +21,6 @@ export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
 function preEngine() {
   const entityContainer = EntityContainer()
   const componentsDefinition = new Map<number, ComponentDefinition<any>>()
-  // TODO: find a way to make this work.
-  // Maybe a proxy/callback to be up-to-date
-  const entitiesComponent = new Map<
-    number,
-    Set<ComponentDefinition<any>['_id']>
-  >()
   const systems = SystemContainer()
 
   function addSystem(
@@ -45,6 +39,10 @@ function preEngine() {
     // entitiesCompnonent.set(entity, new Set())
     const entity = entityContainer.generateEntity(dynamic)
     return entity
+  }
+
+  function entityExists(entity: Entity) {
+    return entityContainer.entityExists(entity)
   }
 
   function addDynamicEntity() {
@@ -147,7 +145,7 @@ function preEngine() {
   }
 
   return {
-    entitiesComponent,
+    entityExists,
     componentsDefinition,
     addEntity,
     addDynamicEntity,
@@ -243,6 +241,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     RootEntity: 0 as Entity,
     PlayerEntity: 1 as Entity,
     CameraEntity: 2 as Entity,
-    baseComponents
+    baseComponents,
+    entityExists: engine.entityExists
   }
 }

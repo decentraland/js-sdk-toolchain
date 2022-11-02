@@ -9,14 +9,14 @@ describe('Entity container', () => {
     const entityContainer = EntityContainer()
     const entityA = entityContainer.generateEntity()
     expect(entityA).toBe(EntityUtils.STATIC_ENTITIES_RANGE[0])
-    expect(entityContainer.isEntityExists(entityA)).toBe(true)
+    expect(entityContainer.entityExists(entityA)).toBe(true)
   })
 
   it('destroy entities', () => {
     const entityContainer = EntityContainer()
     const entityA = entityContainer.generateEntity()
     expect(entityContainer.removeEntity(entityA)).toBe(true)
-    expect(entityContainer.isEntityExists(entityA)).toBe(false)
+    expect(entityContainer.entityExists(entityA)).toBe(false)
   })
 
   it('generates new entities', () => {
@@ -29,7 +29,7 @@ describe('Entity container', () => {
     expect(entityA).toBe(EntityUtils.STATIC_ENTITIES_RANGE[0])
     expect(dynEntityA).toBe(EntityUtils.DYNAMIC_ENTITIES_RANGE[0])
 
-    expect(entityContainer.isEntityExists(entityA)).toBe(true)
+    expect(entityContainer.entityExists(entityA)).toBe(true)
 
     expect(EntityUtils.isReservedEntity(rootEntity)).toBe(true)
     expect(EntityUtils.isStaticEntity(rootEntity)).toBe(false)

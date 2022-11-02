@@ -148,8 +148,8 @@ flow('build-all', () => {
       )
     })
     itExecutes('npm run build', REACT_ECS)
-
     it('check file exists', () => {
+      fixReactTypes()
       ensureFileExists('dist/index.js', REACT_ECS)
       ensureFileExists('dist/index.min.js', REACT_ECS)
       ensureFileExists('dist/index.d.ts', REACT_ECS)
@@ -272,6 +272,16 @@ flow('build-all', () => {
     })
   })
 })
+
+function fixReactTypes() {
+  const typesPath = ensureFileExists(REACT_ECS + '/dist/index.d.ts')
+  const content = readFileSync(typesPath).toString()
+
+  writeFileSync(
+    typesPath,
+    content.replace('/// <reference types="@dcl/posix" />', '')
+  )
+}
 
 function fixTypes(
   pathToDts: string,

@@ -10,6 +10,12 @@ module.exports = {
   },
   coverageDirectory: "coverage",
   coverageThreshold: {
+    global: {
+        branches: 100,
+        functions: 100,
+        lines: 100,
+        statements: 100,
+    },
     "packages/@dcl/ecs/src/components/generated/pb": {
       branches: 70,
       functions: 70,
@@ -19,8 +25,7 @@ module.exports = {
   },
   coveragePathIgnorePatterns: [
     "scripts",
-    "test",
-    "packages/@dcl/react-ecs"
+    "test"
   ],
   verbose: true,
   testMatch: ["**/*.spec.(ts|tsx)"],

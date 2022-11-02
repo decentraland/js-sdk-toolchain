@@ -1,12 +1,12 @@
 import {
   Quaternion,
   Vector3
-} from '../../../packages/@dcl/ecs/src/runtime/Math'
+} from '../../../packages/@dcl/ecs/src/runtime/math'
 import { Engine, Entity } from '../../../packages/@dcl/ecs/src/engine'
-import { setupDclInterfaceForThisSuite, testingExperimentalApi } from '../utils'
+import { setupDclInterfaceForThisSuite, testingEngineApi } from '../utils'
 
 describe('Legacy component tests', () => {
-  const engineApi = testingExperimentalApi()
+  const engineApi = testingEngineApi()
   setupDclInterfaceForThisSuite({
     ...engineApi.modules
   })
