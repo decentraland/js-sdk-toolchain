@@ -7,7 +7,8 @@
   "author": "",
   "files": [
     "index.d.ts",
-    "apis.d.ts"
+    "apis.d.ts",
+    "tsconfig.json"
   ],
   "license": "Apache-2.0",
   "typings": "./index.d.ts",
