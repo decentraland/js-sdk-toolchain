@@ -4,7 +4,7 @@ import WireMessage from '../../packages/@dcl/ecs/src/serialization/wireMessage'
 import { createNetworkTransport } from '../../packages/@dcl/ecs/src/systems/crdt/transports/networkTransport'
 import { createRendererTransport } from '../../packages/@dcl/ecs/src/systems/crdt/transports/rendererTransport'
 import { TransportMessage } from '../../packages/@dcl/ecs/src/systems/crdt/types'
-import { setupDclInterfaceForThisSuite, testingExperimentalApi } from './utils'
+import { setupDclInterfaceForThisSuite, testingEngineApi } from './utils'
 
 describe('Transport not declared', () => {
   it('should failed if there is no dcl', () => {
@@ -20,7 +20,7 @@ describe('Transport tests', () => {
     jest.restoreAllMocks()
   })
 
-  const engineApi = testingExperimentalApi()
+  const engineApi = testingEngineApi()
   setupDclInterfaceForThisSuite({
     ...engineApi.modules
   })

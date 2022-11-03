@@ -8,7 +8,7 @@ import {
   wait,
   SandBox,
   setupDclInterfaceForThisSuite,
-  testingExperimentalApi
+  testingEngineApi
 } from './utils'
 
 describe('CRDT tests', () => {
@@ -17,7 +17,7 @@ describe('CRDT tests', () => {
     jest.restoreAllMocks()
   })
 
-  const engineApi = testingExperimentalApi()
+  const engineApi = testingEngineApi()
   setupDclInterfaceForThisSuite({
     ...engineApi.modules
   })
