@@ -167,7 +167,7 @@ function processDeclarations(apiName: string, filePath: string) {
   } while (where)
 
   const content = blocks
-    .join('\n/t// Function declaration section')
+    .join('\n\t// Function declaration section')
     .replace(/import(.*)\n/g, '')
   writeFileSync(
     filePath,
