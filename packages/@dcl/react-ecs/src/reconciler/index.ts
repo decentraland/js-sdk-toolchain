@@ -146,16 +146,16 @@ export function createReconciler(
   function appendChild(parent: Instance, child: Instance): void {
     if (!child || !Object.keys(parent).length) return
     const isReorder = parent._child.find((c) => c.entity === child.entity)
-    // If its a reorder its seems that its a mutation of an array with key props
-    // So we need to update both entities.
-    // Update the child rightOf prop with the last entity of the array (append)
-    // and update the entity that was at the right of the current child
-    // childEntity.rightOf => Latest entity of the array
+    // If its a reorder its seems that its a mutation of an array with key prop
+    // We need to move the child to the end of the array
+    // And update the order of the parent_.child array
+    // child.rightOf => Latest entity of the array
     // childThatWasAtRightOfEntity = childEntity.rightOf
     if (isReorder) {
       const rightOfChild = parent._child.find((c) => c.rightOf === child.entity)
       if (rightOfChild) {
         rightOfChild.rightOf = child.rightOf
+        // Re-order parent._child array
         parent._child = parent._child.filter((c) => c.entity !== child.entity)
         parent._child.push(child)
         updateTree(rightOfChild, { rightOf: rightOfChild.rightOf })
