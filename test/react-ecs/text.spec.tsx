@@ -1,10 +1,12 @@
-import { Engine, IEngine, Entity } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import {
   Color3,
+  Font,
   ReactEcs,
   renderUi,
+  TextAlignMode,
   UiEntity
-} from '../../../packages/@dcl/react-ecs/src'
+} from '../../packages/@dcl/react-ecs/src'
 
 const CANVAS_ROOT_ENTITY = 0
 declare const engine: IEngine
@@ -26,7 +28,15 @@ describe('UiText React Ecs', () => {
     let color: Color3 | undefined = undefined
 
     const ui = () => (
-      <UiEntity uiTransform={{ width: 100 }} uiText={{ value: text, color }} />
+      <UiEntity
+        uiTransform={{ width: 100 }}
+        uiText={{
+          value: text,
+          color,
+          font: Font.F_LIBERATION_SANS,
+          textAlign: TextAlignMode.TAM_BOTTOM_CENTER
+        }}
+      />
     )
 
     renderUi(ui)
@@ -40,7 +50,9 @@ describe('UiText React Ecs', () => {
 
     expect(getText(rootDivEntity)).toMatchObject({
       value: 'CASLA',
-      color: undefined
+      color: undefined,
+      font: Font.F_LIBERATION_SANS,
+      textAlign: TextAlignMode.TAM_BOTTOM_CENTER
     })
 
     // Update values

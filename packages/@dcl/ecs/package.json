@@ -1,6 +1,6 @@
 {
   "name": "@dcl/ecs",
-  "version": "0.0.0",
+  "version": "7.0.0",
   "description": "Decentraland ECS",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -31,7 +31,7 @@
     "@dcl/crdt": "^1.0.0-20220819145912.commit-35069cd",
     "@dcl/ecs-math": "^2.0.1-20221018212447.commit-82ecfec",
     "@dcl/posix": "^1.0.4",
-    "@dcl/protocol": "^1.0.0-3328852000.commit-4edc0df"
+    "@dcl/protocol": "^1.0.0-3373991894.commit-8aa3a49"
   },
   "files": [
     "dist/index.js",

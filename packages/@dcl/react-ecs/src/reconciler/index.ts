@@ -1,4 +1,8 @@
-import type { Entity, IEngine, IInput } from '@dcl/ecs'
+import type {
+  Entity,
+  EventsSystem as EventsSystemType,
+  IEngine
+} from '@dcl/ecs'
 import Reconciler, { HostConfig } from 'react-reconciler'
 import { CANVAS_ROOT_ENTITY, isListener, Listeners } from '../components'
 import { EntityComponents, JSX } from '../react-ecs'
@@ -22,7 +26,8 @@ import {
 } from './types'
 import { componentKeys, isEqual, isNotUndefined, noopConfig } from './utils'
 
-declare const Input: IInput
+declare const EventsSystem: typeof EventsSystemType
+type Callback = EventsSystemType.Callback
 
 // TODO: export InputAction types.
 const IA_POINTER = 0
@@ -72,10 +77,6 @@ export function createReconciler(
   >
 ) {
   const entities = new Set<Entity>()
-  const events = new Map<
-    Entity,
-    Map<keyof Listeners, Listeners[keyof Listeners]>
-  >()
   const getComponentId: {
     [key in keyof EngineComponents]: number
   } = {
@@ -95,18 +96,18 @@ export function createReconciler(
     instance: Instance,
     update: Changes<keyof Listeners>
   ) {
-    if (update.type === 'delete') {
-      events.delete(instance.entity)
+    // TODO: This handles only onClick listener for the moment
+    if (update.type === 'delete' || !update.props) {
+      EventsSystem.removeOnPointerDown(instance.entity)
       return
     }
-    const entityEvents =
-      events.get(instance.entity) ||
-      events.set(instance.entity, new Map()).get(instance.entity)!
 
-    entityEvents.set(
-      update.component,
-      update.props as Listeners[typeof update.component]
-    )
+    if (update.props) {
+      EventsSystem.onPointerDown(instance.entity, update.props as Callback, {
+        button: IA_POINTER,
+        hoverText: ''
+      })
+    }
   }
 
   function removeComponent(
@@ -136,7 +137,6 @@ export function createReconciler(
   }
 
   function removeChildEntity(instance: Instance) {
-    events.delete(instance.entity)
     engine.removeEntity(instance.entity)
     for (const child of instance._child) {
       removeChildEntity(child)
@@ -290,32 +290,13 @@ export function createReconciler(
     false,
     null,
     '',
-    () => {},
+    /* istanbul ignore next */
+    function () {},
     null
   )
 
-  let runningEvents = false
-  function runEvents() {
-    // Avoid congestion of events.
-    if (runningEvents) return
-    runningEvents = true
-    for (const [entity, listeners] of events) {
-      for (const [keyListener, fn] of listeners) {
-        if (
-          fn &&
-          keyListener === 'onClick' &&
-          Input.wasJustClicked(IA_POINTER, entity)
-        ) {
-          void fn()
-        }
-      }
-    }
-    runningEvents = false
-  }
-
   return {
     update: function (component: JSX.Element) {
-      runEvents()
       return reconciler.updateContainer(component as any, root, null)
     },
     getEntities: () => Array.from(entities)

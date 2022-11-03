@@ -4,17 +4,17 @@ import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/gene
 import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { createTestPointerDownCommand } from './utils'
 
-describe('Events helpers wasJustClicked', () => {
+describe('Events helpers isClicked', () => {
   it('should detect no events', () => {
     const newEngine = Engine()
-    const { wasJustClicked } = createInput(newEngine)
-    expect(wasJustClicked(InputAction.IA_ANY, newEngine.RootEntity)).toBe(false)
+    const { isClicked } = createInput(newEngine)
+    expect(isClicked(InputAction.IA_ANY, newEngine.RootEntity)).toBe(false)
   })
 
   it('detect global click', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
-    const { wasJustClicked } = createInput(newEngine)
+    const { isClicked } = createInput(newEngine)
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -31,19 +31,15 @@ describe('Events helpers wasJustClicked', () => {
       ]
     })
 
-    expect(wasJustClicked(InputAction.IA_POINTER, newEngine.RootEntity)).toBe(
-      true
-    )
-    expect(wasJustClicked(InputAction.IA_ACTION_3, newEngine.RootEntity)).toBe(
-      false
-    )
+    expect(isClicked(InputAction.IA_POINTER, newEngine.RootEntity)).toBe(true)
+    expect(isClicked(InputAction.IA_ACTION_3, newEngine.RootEntity)).toBe(false)
   })
 
   it('detect entity click', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const { wasJustClicked } = createInput(newEngine)
+    const { isClicked } = createInput(newEngine)
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -52,15 +48,15 @@ describe('Events helpers wasJustClicked', () => {
       ]
     })
 
-    expect(wasJustClicked(InputAction.IA_POINTER, entity)).toBe(true)
-    expect(wasJustClicked(InputAction.IA_ACTION_3, entity)).toBe(false)
+    expect(isClicked(InputAction.IA_POINTER, entity)).toBe(true)
+    expect(isClicked(InputAction.IA_ACTION_3, entity)).toBe(false)
   })
 
   it('dont detect entity click after update', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const { wasJustClicked } = createInput(newEngine)
+    const { isClicked } = createInput(newEngine)
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -69,17 +65,17 @@ describe('Events helpers wasJustClicked', () => {
       ]
     })
 
-    expect(wasJustClicked(InputAction.IA_POINTER, entity)).toBe(true)
-    expect(wasJustClicked(InputAction.IA_POINTER, entity)).toBe(true)
+    expect(isClicked(InputAction.IA_POINTER, entity)).toBe(true)
+    expect(isClicked(InputAction.IA_POINTER, entity)).toBe(true)
     newEngine.update(0)
-    expect(wasJustClicked(InputAction.IA_POINTER, entity)).toBe(false)
+    expect(isClicked(InputAction.IA_POINTER, entity)).toBe(false)
   })
 
   it('dont detect entity click if pointer up is older', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const { wasJustClicked } = createInput(newEngine)
+    const { isClicked } = createInput(newEngine)
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -88,15 +84,15 @@ describe('Events helpers wasJustClicked', () => {
       ]
     })
 
-    expect(wasJustClicked(InputAction.IA_POINTER, entity)).toBe(false)
-    expect(wasJustClicked(InputAction.IA_ACTION_3, entity)).toBe(false)
+    expect(isClicked(InputAction.IA_POINTER, entity)).toBe(false)
+    expect(isClicked(InputAction.IA_ACTION_3, entity)).toBe(false)
   })
 
   it('dont detect entity click if pointer up doesnt exists', () => {
     const newEngine = Engine()
     const { PointerEventsResult } = newEngine.baseComponents
     const entity = newEngine.addEntity()
-    const { wasJustClicked } = createInput(newEngine)
+    const { isClicked } = createInput(newEngine)
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -104,8 +100,8 @@ describe('Events helpers wasJustClicked', () => {
       ]
     })
 
-    expect(wasJustClicked(InputAction.IA_POINTER, entity)).toBe(false)
-    expect(wasJustClicked(InputAction.IA_ACTION_3, entity)).toBe(false)
+    expect(isClicked(InputAction.IA_POINTER, entity)).toBe(false)
+    expect(isClicked(InputAction.IA_ACTION_3, entity)).toBe(false)
   })
 
   it('dont detect entity click if pointer down doesnt exists', () => {
@@ -118,10 +114,10 @@ describe('Events helpers wasJustClicked', () => {
         createTestPointerDownCommand(entity, 4, PointerEventType.PET_UP)
       ]
     })
-    const { wasJustClicked } = createInput(newEngine)
+    const { isClicked } = createInput(newEngine)
 
-    expect(wasJustClicked(InputAction.IA_POINTER, entity)).toBe(false)
-    expect(wasJustClicked(InputAction.IA_ACTION_3, entity)).toBe(false)
+    expect(isClicked(InputAction.IA_POINTER, entity)).toBe(false)
+    expect(isClicked(InputAction.IA_ACTION_3, entity)).toBe(false)
   })
 
   it('should detect click, then no click, then other click', () => {
@@ -135,11 +131,11 @@ describe('Events helpers wasJustClicked', () => {
         createTestPointerDownCommand(entity, 3, PointerEventType.PET_DOWN)
       ]
     })
-    const { wasJustClicked } = createInput(newEngine)
+    const { isClicked } = createInput(newEngine)
 
-    expect(wasJustClicked(InputAction.IA_POINTER, entity)).toBe(true)
+    expect(isClicked(InputAction.IA_POINTER, entity)).toBe(true)
     newEngine.update(0)
-    expect(wasJustClicked(InputAction.IA_POINTER, entity)).toBe(false)
+    expect(isClicked(InputAction.IA_POINTER, entity)).toBe(false)
 
     PointerEventsResult.createOrReplace(newEngine.RootEntity, {
       commands: [
@@ -150,8 +146,8 @@ describe('Events helpers wasJustClicked', () => {
       ]
     })
 
-    expect(wasJustClicked(InputAction.IA_POINTER, entity)).toBe(true)
+    expect(isClicked(InputAction.IA_POINTER, entity)).toBe(true)
     newEngine.update(0)
-    expect(wasJustClicked(InputAction.IA_POINTER, entity)).toBe(false)
+    expect(isClicked(InputAction.IA_POINTER, entity)).toBe(false)
   })
 })

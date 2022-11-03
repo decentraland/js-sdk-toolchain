@@ -1,4 +1,6 @@
-export type OnClick = () => Promise<void> | void
+import type { EventsSystem } from '@dcl/ecs'
+
+export type OnClick = EventsSystem.Callback
 
 export type Listeners = {
   onClick?: OnClick

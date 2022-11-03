@@ -1,10 +1,10 @@
-import { Engine, IEngine, Entity } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import {
   UiEntity,
   ReactEcs,
   renderUi,
   removeUi
-} from '../../../packages/@dcl/react-ecs/src'
+} from '../../packages/@dcl/react-ecs/src'
 
 declare const engine: IEngine
 

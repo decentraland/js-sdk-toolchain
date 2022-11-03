@@ -1,4 +1,4 @@
-import { Vector3 } from '../../packages/@dcl/ecs/src/runtime/Math'
+import { Vector3 } from '../../packages/@dcl/ecs/src/runtime/math'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
@@ -8,7 +8,7 @@ import {
   wait,
   SandBox,
   setupDclInterfaceForThisSuite,
-  testingExperimentalApi
+  testingEngineApi
 } from './utils'
 
 describe('CRDT tests', () => {
@@ -17,7 +17,7 @@ describe('CRDT tests', () => {
     jest.restoreAllMocks()
   })
 
-  const engineApi = testingExperimentalApi()
+  const engineApi = testingEngineApi()
   setupDclInterfaceForThisSuite({
     ...engineApi.modules
   })
