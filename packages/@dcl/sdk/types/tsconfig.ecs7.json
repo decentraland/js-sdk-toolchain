@@ -22,23 +22,11 @@
       "ES2020"
     ],
     "types": [
-      "env",
-      "ecs7",
-      "rpc-modules/CommunicationsController",
-      "rpc-modules/DevTools",
-      "rpc-modules/EngineApi",
-      "rpc-modules/EnvironmentApi",
-      "rpc-modules/EthereumController",
-      "rpc-modules/ParcelIdentity",
-      "rpc-modules/Permissions",
-      "rpc-modules/Players",
-      "rpc-modules/PortableExperiences",
-      "rpc-modules/SignedFetch",
-      "rpc-modules/SocialController",
-      "rpc-modules/UserActionModule",
-      "rpc-modules/UserIdentity"
+      "@dcl/js-runtime",
+      "ecs7"
     ],
     "typeRoots": [
+      "./../node_modules",
       "."
     ]
   }
