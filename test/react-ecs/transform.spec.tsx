@@ -1,4 +1,4 @@
-import { Engine, IEngine, Entity } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import {
   Position,
   PositionUnit,
@@ -6,7 +6,7 @@ import {
   renderUi,
   UiEntity,
   YGUnit
-} from '../../../packages/@dcl/react-ecs/src'
+} from '../../packages/@dcl/react-ecs/src'
 
 const CANVAS_ROOT_ENTITY = 0
 declare const engine: IEngine
@@ -14,6 +14,32 @@ declare const engine: IEngine
 describe('UiTransform React Ecs', () => {
   beforeEach(() => {
     ;(globalThis as any).engine = Engine()
+  })
+
+  it('should send empty object if uiTransform is undefined', async () => {
+    const { UiTransform } = engine.baseComponents
+    const entityIndex = engine.addEntity()
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getDiv = (entity: Entity) => UiTransform.get(entity)
+    const ui = () => <UiEntity uiTransform={undefined} />
+    renderUi(ui)
+    engine.update(1)
+    expect(getDiv(rootDivEntity).width).toBe(0)
+  })
+
+  it('should send 0 if you send an invalid px', async () => {
+    const { UiTransform } = engine.baseComponents
+    const entityIndex = engine.addEntity()
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getDiv = (entity: Entity) => UiTransform.get(entity)
+    const ui = () => <UiEntity uiTransform={{ width: 'boedo' as any }} />
+    renderUi(ui)
+    engine.update(1)
+    expect(getDiv(rootDivEntity).width).toBe(0)
   })
 
   it('should send position transform properties', async () => {

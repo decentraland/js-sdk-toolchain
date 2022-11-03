@@ -24,9 +24,8 @@ function isPoint(val: PositionUnit) {
 }
 
 function parsePositionUnit(val?: PositionUnit): [number | undefined, YGUnit] {
-  function getValue(key: 'px' | '%') {
-    if (typeof val !== 'string') return 0
-    return Number(val.slice(0, val.indexOf(key)))
+  function getValue(key: 'px' | '%', value: string) {
+    return Number(value.slice(0, value.indexOf(key)))
   }
 
   if (val === undefined || val === null) {
@@ -38,11 +37,11 @@ function parsePositionUnit(val?: PositionUnit): [number | undefined, YGUnit] {
   }
 
   if (isPercent(val)) {
-    return [getValue('%'), YGUnit.YGU_PERCENT]
+    return [getValue('%', val), YGUnit.YGU_PERCENT]
   }
 
   if (isPoint(val)) {
-    return [getValue('px'), YGUnit.YGU_POINT]
+    return [getValue('px', val), YGUnit.YGU_POINT]
   }
 
   return [undefined, YGUnit.YGU_UNDEFINED]

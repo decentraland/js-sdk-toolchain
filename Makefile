@@ -34,7 +34,7 @@ test:
 	node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS)
 
 test-coverage:
-	node_modules/.bin/jest --detectOpenHandles --colors --coverage test/ $(TESTARGS)
+	node_modules/.bin/jest --detectOpenHandles --colors --coverage $(TESTARGS)
 
 node_modules/.bin/protobuf/bin/protoc:
 	curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v$(PROTOBUF_VERSION)/$(PROTOBUF_ZIP)
