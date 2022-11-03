@@ -566,7 +566,6 @@ describe('RectEcs UI ✨', () => {
     const rootEntity = (entityIndex + uiEntities.length + 1) as Entity
     const entityA = (entityIndex + 1) as Entity
     const entityB = (entityIndex + 2) as Entity
-    console.log({ entityA, entityB, rootEntity })
     const getUi = (entity: number) => UiTransform.get(entity as Entity)
     const ui = () => (
       <UiEntity uiTransform={{ width: 111 }}>
@@ -645,5 +644,10 @@ describe('RectEcs UI ✨', () => {
     expect(getUi(entityE).rightOf).toBe(entityC)
     expect(getUi(entityA).rightOf).toBe(entityE)
     expect(getUi(entityB).rightOf).toBe(entityA)
+    expect(getUi(entityD).width).toBe(4)
+    expect(getUi(entityC).width).toBe(3)
+    expect(getUi(entityE).width).toBe(5)
+    expect(getUi(entityA).width).toBe(1)
+    expect(getUi(entityB).width).toBe(2)
   })
 })
