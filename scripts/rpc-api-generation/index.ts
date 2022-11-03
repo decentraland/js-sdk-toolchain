@@ -87,11 +87,10 @@ async function internalCompile() {
     processDeclarations(api.name, moduleDTsPath)
 
     apisDTsContent += `
-
-      /**
-       * ${api.name}
-       */
-    `
+/**
+  * ${api.name}
+  */
+`
     apisDTsContent += readFileSync(moduleDTsPath).toString()
 
     rmSync(apiModuleDirPath, { recursive: true, force: true })
@@ -153,7 +152,7 @@ function processDeclarations(apiName: string, filePath: string) {
     where = decFile.indexOf('declare module', where)
     if (where !== -1) {
       const block = getBlock(decFile, where).replace(
-        `export const protobufPackage = "";`,
+        /export const protobufPackage (.*)\n/,
         ''
       )
       if (block.length > 0) {
@@ -168,8 +167,8 @@ function processDeclarations(apiName: string, filePath: string) {
   } while (where)
 
   const content = blocks
-    .join('\n// ########### BLOCK \n')
-    .replace(/import /g, '// import')
+    .join('\n/t// Function declaration section')
+    .replace(/import(.*)\n/g, '')
   writeFileSync(
     filePath,
     `declare module "~system/${apiName}" {\n${content}\n}`
