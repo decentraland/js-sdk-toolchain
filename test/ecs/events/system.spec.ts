@@ -40,6 +40,7 @@ describe('Events System', () => {
 
   it('should run default onClick', () => {
     const entity = engine.addEntity()
+    const { PointerHoverFeedback } = engine.baseComponents
     let counter = 0
     EventsSystem.onClick(
       entity,
@@ -52,6 +53,10 @@ describe('Events System', () => {
     fakePointer(entity, PointerEventType.PET_UP, InputAction.IA_ACTION_3)
     engine.update(1)
     expect(counter).toBe(1)
+    expect(
+      PointerHoverFeedback.getOrNull(entity)?.pointerEvents[0].eventInfo
+        ?.hoverText
+    ).toBe('Interact')
   })
 
   it('should create pointer hover components', () => {
@@ -104,13 +109,19 @@ describe('Events System', () => {
 
   it('should run default onDown', () => {
     const entity = engine.addEntity()
+    const { PointerHoverFeedback } = engine.baseComponents
     let counter = 0
-    EventsSystem.onPointerDown(entity, () => {
-      counter += 1
-    })
+    EventsSystem.onPointerDown(
+      entity,
+      () => {
+        counter += 1
+      },
+      { hoverText: '' }
+    )
     fakePointer(entity, PointerEventType.PET_DOWN)
     engine.update(1)
     expect(counter).toBe(1)
+    expect(PointerHoverFeedback.getOrNull(entity)).toBe(null)
   })
 
   it('should remove pointer down', () => {
@@ -218,5 +229,24 @@ describe('Events System', () => {
     expect(downCounter).toBe(3)
     expect(upCounter).toBe(2)
     expect(clickCounter).toBe(2)
+  })
+
+  it('should delete events callbacks if the entity was removed', () => {
+    const entity = engine.addEntity()
+    let counter = 0
+    EventsSystem.onClick(
+      entity,
+      () => {
+        counter += 1
+      },
+      { button: InputAction.IA_ANY }
+    )
+    fakePointer(entity, PointerEventType.PET_DOWN, InputAction.IA_ACTION_3)
+    fakePointer(entity, PointerEventType.PET_UP, InputAction.IA_ACTION_3)
+    engine.update(1)
+    expect(counter).toBe(1)
+    engine.removeEntity(entity)
+    engine.update(1)
+    expect(counter).toBe(1)
   })
 })

@@ -1,9 +1,9 @@
-import { Engine, IEngine, Entity } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import {
   Container,
   ReactEcs,
   renderUi
-} from '../../../packages/@dcl/react-ecs/src'
+} from '../../packages/@dcl/react-ecs/src'
 
 const CANVAS_ROOT_ENTITY = 0
 declare const engine: IEngine

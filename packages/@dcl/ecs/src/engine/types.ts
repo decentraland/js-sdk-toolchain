@@ -185,6 +185,13 @@ export type IEngine = {
   CameraEntity: Entity
 
   baseComponents: SdkComponents
+
+  /**
+   * @internal
+   *
+   * @param tranport - transport which changes its onmessage to process CRDT messages
+   */
+  addTransport(transport: Transport): void
 }
 
 /**

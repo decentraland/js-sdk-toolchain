@@ -1,5 +1,3 @@
-/// <reference types="@dcl/posix" />
-
 import { IEngine } from '../../engine'
 import { _initEventObservables } from '../observables'
 import { Transport } from '../types'
