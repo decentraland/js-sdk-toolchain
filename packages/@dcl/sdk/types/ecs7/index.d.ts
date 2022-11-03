@@ -11,27 +11,27 @@ declare interface AnimatorComponentDefinition extends ComponentDefinition {
      * @public
      *
      * [Helper] Get a `mutable` version of animator clip
-     * @param entity
-     * @param name
+     * @param entity - entity with Animator component
+     * @param name - the field `name` of the component
      */
     getClip(entity: Entity, name: string): PBAnimationState | null;
     /**
      * @public
      *
      * [Helper] Set playing=true the animation `$name`
-     * @param entity
+     * @param entity - entity with Animator component
      * @param name - animation name
      * @param resetCursor - the animation starts at 0 or continues from the current cursor position
      */
-    playSingleAnim(entity: Entity, name: string, resetCursor?: boolean): boolean;
+    playSingleAnimation(entity: Entity, name: string, resetCursor?: boolean): boolean;
     /**
      * @public
      *
      * [Helper] Set playing=false all animations
-     * @param entity
+     * @param entity - entity with Animator component
      * @param resetCursor - the animation stops at 0 or at the current cursor position
      */
-    stopAnims(entity: Entity, resetCursor?: boolean): boolean;
+    stopAllAnimations(entity: Entity, resetCursor?: boolean): boolean;
 }
 
 /** @public */

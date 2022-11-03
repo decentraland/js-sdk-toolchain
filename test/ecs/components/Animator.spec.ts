@@ -89,7 +89,7 @@ describe('Generated Animator ProtoBuf', () => {
     })
   })
 
-  it('should Animator.playSingleAnim and Animator.stops helper works properly', () => {
+  it('should Animator.playSingleAnimation and Animator.stops helper works properly', () => {
     const newEngine = Engine()
     const { Animator } = newEngine.baseComponents
     const entity = newEngine.addEntity()
@@ -104,16 +104,18 @@ describe('Generated Animator ProtoBuf', () => {
       ]
     })
 
-    expect(Animator.playSingleAnim(entityWithoutAnimator, 'Some')).toBe(false)
+    expect(Animator.playSingleAnimation(entityWithoutAnimator, 'Some')).toBe(
+      false
+    )
 
     expect(Animator.getClip(entity, 'Some')!.playing).toBeFalsy()
-    expect(Animator.playSingleAnim(entity, 'SomeInexistent')).toBe(false)
-    expect(Animator.playSingleAnim(entity, 'Some')).toBe(true)
+    expect(Animator.playSingleAnimation(entity, 'SomeInexistent')).toBe(false)
+    expect(Animator.playSingleAnimation(entity, 'Some')).toBe(true)
 
     expect(Animator.getClip(entity, 'Some')!.playing).toBe(true)
 
-    expect(Animator.stopAnims(entityWithoutAnimator)).toBe(false)
-    expect(Animator.stopAnims(entity)).toBe(true)
+    expect(Animator.stopAllAnimations(entityWithoutAnimator)).toBe(false)
+    expect(Animator.stopAllAnimations(entity)).toBe(true)
     expect(Animator.getClip(entity, 'Some')!.playing).toBe(false)
   })
 })

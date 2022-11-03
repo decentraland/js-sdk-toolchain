@@ -1,10 +1,6 @@
 import { PreEngine } from '../engine'
-
 import { defineLibraryComponents } from './generated/index.gen'
-import { ColliderLayer } from './generated/pb/decentraland/sdk/components/mesh_collider.gen'
 import { defineTransformComponent } from './legacy/Transform'
-
-import * as AnimatorSchema from './generated/Animator.gen'
 import { defineAnimatorComponent } from './extended/Animator'
 
 export enum COMPONENT_ID {

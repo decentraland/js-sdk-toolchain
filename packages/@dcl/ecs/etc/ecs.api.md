@@ -6,10 +6,16 @@
 
 /// <reference types="@dcl/posix" />
 
-// Warning: (ae-forgotten-export) The symbol "AnimatorComponentDefinition" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const Animator: AnimatorComponentDefinition;
+
+// @public (undocumented)
+export interface AnimatorComponentDefinition extends ComponentDefinition {
+    // Warning: (ae-forgotten-export) The symbol "PBAnimationState" needs to be exported by the entry point index.d.ts
+    getClip(entity: Entity, name: string): PBAnimationState | null;
+    playSingleAnimation(entity: Entity, name: string, resetCursor?: boolean): boolean;
+    stopAllAnimations(entity: Entity, resetCursor?: boolean): boolean;
+}
 
 // Warning: (ae-forgotten-export) The symbol "PBAudioSource" needs to be exported by the entry point index.d.ts
 //
