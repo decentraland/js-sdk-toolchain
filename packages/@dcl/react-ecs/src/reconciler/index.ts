@@ -145,11 +145,29 @@ export function createReconciler(
 
   function appendChild(parent: Instance, child: Instance): void {
     if (!child || !Object.keys(parent).length) return
-
+    const isReorder = parent._child.find((c) => c.entity === child.entity)
+    // If its a reorder its seems that its a mutation of an array with key props
+    // So we need to update both entities.
+    // Update the child rightOf prop with the last entity of the array (append)
+    // and update the entity that was at the right of the current child
+    // childEntity.rightOf => Latest entity of the array
+    // childThatWasAtRightOfEntity = childEntity.rightOf
+    if (isReorder) {
+      const rightOfChild = parent._child.find((c) => c.rightOf === child.entity)
+      if (rightOfChild) {
+        rightOfChild.rightOf = child.rightOf
+        parent._child = parent._child.filter((c) => c.entity !== child.entity)
+        parent._child.push(child)
+        updateTree(rightOfChild, { rightOf: rightOfChild.rightOf })
+      }
+      // Its a re-order. We are the last element, so we need to fetch the element before us.
+      child.rightOf = parent._child[parent._child.length - 2]?.entity
+    } else {
+      // Its an append. Put it at the end
+      child.rightOf = parent._child[parent._child.length - 1]?.entity
+      parent._child.push(child)
+    }
     child.parent = parent.entity
-    child.rightOf = parent._child[parent._child.length - 1]?.entity
-    parent._child.push(child)
-
     updateTree(child, { rightOf: child.rightOf, parent: parent.entity })
   }
 
@@ -243,7 +261,6 @@ export function createReconciler(
       _internalHandle: OpaqueHandle
     ): void {
       for (const update of updatePayload) {
-        console.log(update)
         if (isListener(update.component)) {
           upsertListener(instance, update as Changes<keyof Listeners>)
           continue
@@ -294,7 +311,6 @@ export function createReconciler(
     function () {},
     null
   )
-
   return {
     update: function (component: JSX.Element) {
       return reconciler.updateContainer(component as any, root, null)

@@ -552,6 +552,7 @@ describe('RectEcs UI ✨', () => {
       width: 8
     })
   })
+
   it('should update rightOf of the array', async () => {
     const { UiTransform } = engine.baseComponents
     const entityIndex = engine.addEntity()
@@ -565,7 +566,7 @@ describe('RectEcs UI ✨', () => {
     const rootEntity = (entityIndex + uiEntities.length + 1) as Entity
     const entityA = (entityIndex + 1) as Entity
     const entityB = (entityIndex + 2) as Entity
-
+    console.log({ entityA, entityB, rootEntity })
     const getUi = (entity: number) => UiTransform.get(entity as Entity)
     const ui = () => (
       <UiEntity uiTransform={{ width: 111 }}>
@@ -595,8 +596,54 @@ describe('RectEcs UI ✨', () => {
 
     const first = uiEntities.shift()!
     uiEntities.push(first)
+
+    engine.update(1)
+    expect(getUi(entityA).rightOf).toBe(entityB)
+    expect(getUi(entityB).rightOf).toBe(undefined)
+
     uiEntities = [...uiEntities]
     engine.update(1)
+    expect(getUi(entityA).rightOf).toBe(entityB)
+    expect(getUi(entityB).rightOf).toBe(undefined)
+    uiEntities = [
+      { id: 3, value: 3 },
+      { id: 1, value: 1 },
+      { id: 2, value: 2 }
+    ]
+    engine.update(1)
+    /**
+     * Before => [ 514, 513 ]
+     * After InsertBefore => [514, 516, 513]
+     *
+     * C => 516
+     * A => 513
+     * B => 514
+     */
+    const entityC = (rootEntity + 1) as Entity
+    expect(getUi(entityC).rightOf).toBe(undefined)
+    expect(getUi(entityA).rightOf).toBe(entityC)
+    expect(getUi(entityB).rightOf).toBe(entityA)
 
+    uiEntities.unshift({ id: 4, value: 4 })
+    engine.update(1)
+    const entityD = (entityC + 1) as Entity
+    expect(getUi(entityD).rightOf).toBe(undefined)
+    expect(getUi(entityC).rightOf).toBe(entityD)
+    expect(getUi(entityA).rightOf).toBe(entityC)
+    expect(getUi(entityB).rightOf).toBe(entityA)
+
+    uiEntities = [
+      uiEntities[0],
+      uiEntities[1],
+      { id: 5, value: 5 },
+      ...uiEntities.slice(2)
+    ]
+    engine.update(1)
+    const entityE = (entityD + 1) as Entity
+    expect(getUi(entityD).rightOf).toBe(undefined)
+    expect(getUi(entityC).rightOf).toBe(entityD)
+    expect(getUi(entityE).rightOf).toBe(entityC)
+    expect(getUi(entityA).rightOf).toBe(entityE)
+    expect(getUi(entityB).rightOf).toBe(entityA)
   })
 })
