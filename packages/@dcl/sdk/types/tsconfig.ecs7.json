@@ -22,11 +22,11 @@
       "ES2020"
     ],
     "types": [
-      "env",
-      "ecs7",
-      "rpc-modules"
+      "@dcl/js-runtime",
+      "ecs7"
     ],
     "typeRoots": [
+      "./../node_modules",
       "."
     ]
   }

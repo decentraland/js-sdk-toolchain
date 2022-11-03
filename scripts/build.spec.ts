@@ -78,22 +78,6 @@ flow('build-all', () => {
     })
   })
 
-  flow('@dcl/sdk', () => {
-    itDeletesFolder('dist', SDK_PATH)
-    itExecutes(`npm i --quiet`, SDK_PATH)
-
-    itDeletesGlob('types/dcl/*.d.ts', SDK_PATH)
-
-    // install required dependencies
-    itExecutes(`npm install --quiet ${BUILD_ECS_PATH}`, SDK_PATH)
-    itExecutes(`npm install --quiet ${DECENTRALAND_AMD_PATH}`, SDK_PATH)
-  })
-
-  flow('@dcl/js-runtime', () => {
-    const filePath = ensureFileExists('index.d.ts', JS_RUNTIME)
-    copyFile(filePath, SDK_PATH + '/types/env/index.d.ts')
-  })
-
   flow('@dcl/ecs7', () => {
     itExecutes('npm i --quiet', ECS7_PATH)
     compileEcsComponents(
@@ -113,6 +97,18 @@ flow('build-all', () => {
       ensureFileExists('dist/proto-definitions', ECS7_PATH)
     })
 
+    flow('@dcl/sdk', () => {
+      itDeletesFolder('dist', SDK_PATH)
+      itExecutes(`npm i --quiet`, SDK_PATH)
+
+      itDeletesGlob('types/*.d.ts', SDK_PATH)
+
+      // install required dependencies
+      itExecutes(`npm install --quiet ${BUILD_ECS_PATH}`, SDK_PATH)
+      itExecutes(`npm install --quiet ${DECENTRALAND_AMD_PATH}`, SDK_PATH)
+      itExecutes(`npm install --quiet ${JS_RUNTIME}`, SDK_PATH)
+    })
+
     it('copy ecs7 to @dcl/sdk pkg', () => {
       const filesToCopy = [
         'index.js',
@@ -127,7 +123,7 @@ flow('build-all', () => {
 
         if (file === 'index.d.ts') {
           const typePath = SDK_PATH + '/types/ecs7/index.d.ts'
-          copyFile(filePath, SDK_PATH + '/types/ecs7/index.d.ts')
+          copyFile(filePath, typePath)
           fixTypes(typePath, { ignoreExportError: true })
         }
       }
@@ -172,8 +168,8 @@ flow('build-all', () => {
       await compileProtoApi()
 
       copySync(
-        path.resolve(__dirname, 'rpc-api-generation/src/modules'),
-        path.resolve(SDK_PATH, 'types', 'rpc-modules')
+        path.resolve(__dirname, 'rpc-api-generation/src/modules', 'index.d.ts'),
+        path.resolve(JS_RUNTIME, 'apis.d.ts')
       )
 
       expect(true).toBe(true)
@@ -255,7 +251,7 @@ flow('build-all', () => {
           fileName: 'index.d.ts'
         },
         {
-          from: path.resolve(SDK_PATH, 'types', 'rpc-modules', 'index.d.ts'),
+          from: path.resolve(JS_RUNTIME, 'apis.d.ts'),
           fileName: 'apis.d.ts'
         },
         {

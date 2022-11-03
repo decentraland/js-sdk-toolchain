@@ -1,4 +1,5 @@
 /// --- FETCH ---
+/// <reference types="./apis" />
 
 type RequestRedirect = 'follow' | 'error' | 'manual'
 type ResponseType = 'basic' | 'cors' | 'default' | 'error' | 'opaque' | 'opaqueredirect'
@@ -74,7 +75,7 @@ interface WebSocket {
 
 declare var WebSocket: {
   prototype: WebSocket
-  new (url: string, protocols?: string | string[]): WebSocket
+  new(url: string, protocols?: string | string[]): WebSocket
   readonly CLOSED: number
   readonly CLOSING: number
   readonly CONNECTING: number
