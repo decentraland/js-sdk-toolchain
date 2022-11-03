@@ -194,7 +194,7 @@ jobs:
         env:
           AMD_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_amd.outputs.s3-bucket-key }}
           BUILD_ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_build_ecs.outputs.s3-bucket-key }}
-          JS_RUNTIME_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_js_runtimes.outputs.s3-bucket-key }}
+          JS_RUNTIME_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_js_runtime.outputs.s3-bucket-key }}
       - name: playground upload to s3
         run: npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder $(pwd)/packages/@dcl/sdk/dist/playground --bucket-folder '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/playground'
         env:
