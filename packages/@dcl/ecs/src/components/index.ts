@@ -1,8 +1,5 @@
 import { PreEngine } from '../engine'
-
 import { defineLibraryComponents } from './generated/index.gen'
-import { ColliderLayer } from './generated/pb/decentraland/sdk/components/mesh_collider.gen'
-
 import { defineTransformComponent } from './legacy/Transform'
 
 export enum COMPONENT_ID {
