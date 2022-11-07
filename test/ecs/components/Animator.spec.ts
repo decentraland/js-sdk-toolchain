@@ -55,34 +55,19 @@ describe('Generated Animator ProtoBuf', () => {
       ]
     })
 
-    expect(Animator.getClip(entityWithoutAnimator, 'Some')).toBeNull()
+    expect(() => {
+      Animator.getClip(entityWithoutAnimator, 'Some')
+    }).toThrowError()
+    expect(Animator.getClipOrNull(entityWithoutAnimator, 'Some')).toBeNull()
 
+    expect(Animator.getClipOrNull(entity, 'Some')).not.toBeNull()
     expect(Animator.getClip(entity, 'Some')).not.toBeNull()
-    expect(Animator.getClip(entity, 'SomeInexistent')).toBeNull()
 
-    expect(Animator.getClip(entity, 'Some')).toStrictEqual({
-      name: 'Some',
-      clip: 'ClipSome'
-    })
-  })
+    expect(() => {
+      Animator.getClip(entity, 'SomeInexistent')
+    }).toThrowError()
+    expect(Animator.getClipOrNull(entity, 'SomeInexistent')).toBeNull()
 
-  it('should Animator.getClip helper works properly', () => {
-    const newEngine = Engine()
-    const { Animator } = newEngine.baseComponents
-    const entityWithoutAnimator = newEngine.addEntity()
-    const entity = newEngine.addEntity()
-
-    Animator.create(entity, {
-      states: [
-        {
-          name: 'Some',
-          clip: 'ClipSome'
-        }
-      ]
-    })
-
-    expect(Animator.getClip(entityWithoutAnimator, 'Some')).toBeNull()
-    expect(Animator.getClip(entity, 'Some')).not.toBeNull()
     expect(Animator.getClip(entity, 'Some')).toStrictEqual({
       name: 'Some',
       clip: 'ClipSome'
