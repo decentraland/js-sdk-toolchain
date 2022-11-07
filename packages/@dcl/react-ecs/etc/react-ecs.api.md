@@ -157,118 +157,110 @@ export interface PBUiText {
 // @public (undocumented)
 export interface PBUiTransform {
     // (undocumented)
-    alignContent: YGAlign;
+    alignContent?: YGAlign | undefined;
     // (undocumented)
-    alignItems: YGAlign;
+    alignItems?: YGAlign | undefined;
     // (undocumented)
-    alignSelf: YGAlign;
+    alignSelf?: YGAlign | undefined;
     // (undocumented)
-    borderBottom: number;
+    direction?: YGDirection | undefined;
     // (undocumented)
-    borderLeft: number;
+    display?: YGDisplay | undefined;
     // (undocumented)
-    borderRight: number;
+    flex?: number | undefined;
     // (undocumented)
-    borderTop: number;
+    flexBasis?: number | undefined;
     // (undocumented)
-    direction: YGDirection;
+    flexBasisUnit?: YGUnit | undefined;
     // (undocumented)
-    display: YGDisplay;
+    flexDirection?: YGFlexDirection | undefined;
     // (undocumented)
-    flex: number;
+    flexGrow?: number | undefined;
     // (undocumented)
-    flexBasis: number;
+    flexShrink?: number | undefined;
     // (undocumented)
-    flexBasisUnit: YGUnit;
+    flexWrap?: YGWrap | undefined;
     // (undocumented)
-    flexDirection: YGFlexDirection;
+    height?: number | undefined;
     // (undocumented)
-    flexGrow: number;
+    heightUnit?: YGUnit | undefined;
     // (undocumented)
-    flexShrink: number;
+    justifyContent?: YGJustify | undefined;
     // (undocumented)
-    flexWrap: YGWrap;
+    marginBottom?: number | undefined;
     // (undocumented)
-    height: number;
+    marginBottomUnit?: YGUnit | undefined;
     // (undocumented)
-    heightUnit: YGUnit;
+    marginLeft?: number | undefined;
+    marginLeftUnit?: YGUnit | undefined;
     // (undocumented)
-    justifyContent: YGJustify;
+    marginRight?: number | undefined;
     // (undocumented)
-    marginBottom: number;
+    marginRightUnit?: YGUnit | undefined;
     // (undocumented)
-    marginBottomUnit: YGUnit;
+    marginTop?: number | undefined;
     // (undocumented)
-    marginLeft: number;
-    marginLeftUnit: YGUnit;
+    marginTopUnit?: YGUnit | undefined;
     // (undocumented)
-    marginRight: number;
+    maxHeight?: number | undefined;
     // (undocumented)
-    marginRightUnit: YGUnit;
+    maxHeightUnit?: YGUnit | undefined;
     // (undocumented)
-    marginTop: number;
+    maxWidth?: number | undefined;
     // (undocumented)
-    marginTopUnit: YGUnit;
+    maxWidthUnit?: YGUnit | undefined;
     // (undocumented)
-    maxHeight: number;
+    minHeight?: number | undefined;
     // (undocumented)
-    maxHeightUnit: YGUnit;
+    minHeightUnit?: YGUnit | undefined;
     // (undocumented)
-    maxWidth: number;
+    minWidth?: number | undefined;
     // (undocumented)
-    maxWidthUnit: YGUnit;
+    minWidthUnit?: YGUnit | undefined;
     // (undocumented)
-    minHeight: number;
+    overflow?: YGOverflow | undefined;
     // (undocumented)
-    minHeightUnit: YGUnit;
+    paddingBottom?: number | undefined;
     // (undocumented)
-    minWidth: number;
+    paddingBottomUnit?: YGUnit | undefined;
     // (undocumented)
-    minWidthUnit: YGUnit;
+    paddingLeft?: number | undefined;
     // (undocumented)
-    overflow: YGOverflow;
+    paddingLeftUnit?: YGUnit | undefined;
     // (undocumented)
-    paddingBottom: number;
+    paddingRight?: number | undefined;
     // (undocumented)
-    paddingBottomUnit: YGUnit;
+    paddingRightUnit?: YGUnit | undefined;
     // (undocumented)
-    paddingLeft: number;
+    paddingTop?: number | undefined;
     // (undocumented)
-    paddingLeftUnit: YGUnit;
+    paddingTopUnit?: YGUnit | undefined;
     // (undocumented)
-    paddingRight: number;
+    parent?: number | undefined;
     // (undocumented)
-    paddingRightUnit: YGUnit;
+    positionBottom?: number | undefined;
     // (undocumented)
-    paddingTop: number;
+    positionBottomUnit?: YGUnit | undefined;
     // (undocumented)
-    paddingTopUnit: YGUnit;
+    positionLeft?: number | undefined;
     // (undocumented)
-    parent: number;
+    positionLeftUnit?: YGUnit | undefined;
     // (undocumented)
-    positionBottom: number;
+    positionRight?: number | undefined;
     // (undocumented)
-    positionBottomUnit: YGUnit;
+    positionRightUnit?: YGUnit | undefined;
     // (undocumented)
-    positionLeft: number;
+    positionTop?: number | undefined;
     // (undocumented)
-    positionLeftUnit: YGUnit;
+    positionTopUnit?: YGUnit | undefined;
     // (undocumented)
-    positionRight: number;
+    positionType?: YGPositionType | undefined;
     // (undocumented)
-    positionRightUnit: YGUnit;
+    rightOf?: number | undefined;
     // (undocumented)
-    positionTop: number;
+    width?: number | undefined;
     // (undocumented)
-    positionTopUnit: YGUnit;
-    // (undocumented)
-    positionType: YGPositionType;
-    // (undocumented)
-    rightOf: number;
-    // (undocumented)
-    width: number;
-    // (undocumented)
-    widthUnit: YGUnit;
+    widthUnit?: YGUnit | undefined;
 }
 
 // @public (undocumented)
