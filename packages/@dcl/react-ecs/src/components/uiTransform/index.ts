@@ -32,7 +32,7 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     ...otherProps
   } = props
   return {
-    ...defaultDiv,
+    ...defaultUiTransform,
     ...otherProps,
     ...parsePosition(position, 'position'),
     ...parsePosition(margin, 'margin'),
@@ -46,7 +46,7 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
   }
 }
 
-export const defaultDiv: PBUiTransform = {
+export const defaultUiTransform: PBUiTransform = {
   parent: CANVAS_ROOT_ENTITY,
   rightOf: 0,
   display: YGDisplay.YGD_FLEX,
