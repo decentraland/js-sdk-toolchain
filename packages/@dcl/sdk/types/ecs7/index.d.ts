@@ -2700,6 +2700,16 @@ declare interface PBGltfContainer {
 }
 
 declare interface PBMaterial {
+    material?: {
+        $case: 'unlit';
+        unlit: PBMaterial_UnlitMaterial;
+    } | {
+        $case: 'pbr';
+        pbr: PBMaterial_PbrMaterial;
+    };
+}
+
+declare interface PBMaterial_PbrMaterial {
     /** default = null */
     texture?: TextureUnion | undefined;
     /** default = 0.5. range value: from 0 to 1 */
@@ -2732,6 +2742,15 @@ declare interface PBMaterial {
     emissiveIntensity?: number | undefined;
     /** default = 1 */
     directIntensity?: number | undefined;
+}
+
+declare interface PBMaterial_UnlitMaterial {
+    /** default = null */
+    texture?: TextureUnion | undefined;
+    /** default = 0.5. range value: from 0 to 1 */
+    alphaTest?: number | undefined;
+    /** default =  true */
+    castShadows?: boolean | undefined;
 }
 
 declare interface PBMeshCollider {
