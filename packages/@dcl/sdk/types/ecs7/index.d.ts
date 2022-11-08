@@ -2928,75 +2928,75 @@ declare interface PBUiTransform {
     /** default: 1 */
     flexShrink?: number | undefined;
     /** YGPositionType.YGPT_RELATIVE */
-    positionType?: YGPositionType | undefined;
+    positionType: YGPositionType;
     /** YGAlign.YGA_AUTO */
-    alignSelf?: YGAlign | undefined;
+    alignSelf: YGAlign;
     /** YGFlexDirection.YGFD_ROW */
-    flexDirection?: YGFlexDirection | undefined;
+    flexDirection: YGFlexDirection;
     /** YGJustify.YGJ_FLEX_START */
-    justifyContent?: YGJustify | undefined;
+    justifyContent: YGJustify;
     /** YGOverflow.YGO_VISIBLE */
-    overflow?: YGOverflow | undefined;
+    overflow: YGOverflow;
     /** YGDisplay.YGD_FLEX */
-    display?: YGDisplay | undefined;
+    display: YGDisplay;
     /** YGUnit.YGU_UNDEFINED */
-    flexBasisUnit?: YGUnit | undefined;
-    flexBasis?: number | undefined;
-    flexGrow?: number | undefined;
+    flexBasisUnit: YGUnit;
+    flexBasis: number;
+    flexGrow: number;
     /** YGUnit.YGU_UNDEFINED */
-    widthUnit?: YGUnit | undefined;
-    width?: number | undefined;
+    widthUnit: YGUnit;
+    width: number;
     /** YGUnit.YGU_UNDEFINED */
-    heightUnit?: YGUnit | undefined;
-    height?: number | undefined;
+    heightUnit: YGUnit;
+    height: number;
     /** YGUnit.YGU_UNDEFINED */
-    minWidthUnit?: YGUnit | undefined;
-    minWidth?: number | undefined;
+    minWidthUnit: YGUnit;
+    minWidth: number;
     /** YGUnit.YGU_UNDEFINED */
-    minHeightUnit?: YGUnit | undefined;
-    minHeight?: number | undefined;
+    minHeightUnit: YGUnit;
+    minHeight: number;
     /** YGUnit.YGU_UNDEFINED */
-    maxWidthUnit?: YGUnit | undefined;
-    maxWidth?: number | undefined;
+    maxWidthUnit: YGUnit;
+    maxWidth: number;
     /** YGUnit.YGU_UNDEFINED */
-    maxHeightUnit?: YGUnit | undefined;
-    maxHeight?: number | undefined;
+    maxHeightUnit: YGUnit;
+    maxHeight: number;
     /** YGUnit.YGU_UNDEFINED */
-    positionLeftUnit?: YGUnit | undefined;
-    positionLeft?: number | undefined;
+    positionLeftUnit: YGUnit;
+    positionLeft: number;
     /** YGUnit.YGU_UNDEFINED */
-    positionTopUnit?: YGUnit | undefined;
-    positionTop?: number | undefined;
+    positionTopUnit: YGUnit;
+    positionTop: number;
     /** YGUnit.YGU_UNDEFINED */
-    positionRightUnit?: YGUnit | undefined;
-    positionRight?: number | undefined;
+    positionRightUnit: YGUnit;
+    positionRight: number;
     /** YGUnit.YGU_UNDEFINED */
-    positionBottomUnit?: YGUnit | undefined;
-    positionBottom?: number | undefined;
+    positionBottomUnit: YGUnit;
+    positionBottom: number;
     /** YGUnit.YGU_UNDEFINED */
-    marginLeftUnit?: YGUnit | undefined;
-    marginLeft?: number | undefined;
+    marginLeftUnit: YGUnit;
+    marginLeft: number;
     /** YGUnit.YGU_UNDEFINED */
-    marginTopUnit?: YGUnit | undefined;
-    marginTop?: number | undefined;
+    marginTopUnit: YGUnit;
+    marginTop: number;
     /** YGUnit.YGU_UNDEFINED */
-    marginRightUnit?: YGUnit | undefined;
-    marginRight?: number | undefined;
+    marginRightUnit: YGUnit;
+    marginRight: number;
     /** YGUnit.YGU_UNDEFINED */
-    marginBottomUnit?: YGUnit | undefined;
-    marginBottom?: number | undefined;
+    marginBottomUnit: YGUnit;
+    marginBottom: number;
     /** YGUnit.YGU_UNDEFINED */
-    paddingLeftUnit?: YGUnit | undefined;
-    paddingLeft?: number | undefined;
+    paddingLeftUnit: YGUnit;
+    paddingLeft: number;
     /** YGUnit.YGU_UNDEFINED */
-    paddingTopUnit?: YGUnit | undefined;
-    paddingTop?: number | undefined;
+    paddingTopUnit: YGUnit;
+    paddingTop: number;
     /** YGUnit.YGU_UNDEFINED */
-    paddingRightUnit?: YGUnit | undefined;
-    paddingRight?: number | undefined;
+    paddingRightUnit: YGUnit;
+    paddingRight: number;
     /** YGUnit.YGU_UNDEFINED */
-    paddingBottomUnit?: YGUnit | undefined;
-    paddingBottom?: number | undefined;
+    paddingBottomUnit: YGUnit;
+    paddingBottom: number;
 }
 
 declare interface PBVisibilityComponent {

@@ -1,7 +1,6 @@
 import {
   PBUiTransform,
   YGAlign,
-  YGDirection,
   YGDisplay,
   YGFlexDirection,
   YGJustify,
@@ -14,7 +13,6 @@ import {
 export {
   PBUiTransform,
   YGAlign,
-  YGDirection,
   YGDisplay,
   YGFlexDirection,
   YGJustify,
@@ -52,7 +50,6 @@ export interface UiTransformProps {
   position?: Partial<Position>
   padding?: Partial<Position>
   margin?: Partial<Position>
-  direction?: YGDirection
   width?: PositionUnit
   height?: PositionUnit
   minWidth?: PositionUnit

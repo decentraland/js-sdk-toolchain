@@ -1,6 +1,5 @@
 import {
   YGAlign,
-  YGDirection,
   YGDisplay,
   YGFlexDirection,
   YGJustify,

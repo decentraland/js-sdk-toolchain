@@ -158,77 +158,77 @@ export interface PBUiText {
 export interface PBUiTransform {
     alignContent?: YGAlign | undefined;
     alignItems?: YGAlign | undefined;
-    alignSelf?: YGAlign | undefined;
-    display?: YGDisplay | undefined;
+    alignSelf: YGAlign;
+    display: YGDisplay;
     // (undocumented)
-    flexBasis?: number | undefined;
-    flexBasisUnit?: YGUnit | undefined;
-    flexDirection?: YGFlexDirection | undefined;
+    flexBasis: number;
+    flexBasisUnit: YGUnit;
+    flexDirection: YGFlexDirection;
     // (undocumented)
-    flexGrow?: number | undefined;
+    flexGrow: number;
     flexShrink?: number | undefined;
     flexWrap?: YGWrap | undefined;
     // (undocumented)
-    height?: number | undefined;
-    heightUnit?: YGUnit | undefined;
-    justifyContent?: YGJustify | undefined;
+    height: number;
+    heightUnit: YGUnit;
+    justifyContent: YGJustify;
     // (undocumented)
-    marginBottom?: number | undefined;
-    marginBottomUnit?: YGUnit | undefined;
+    marginBottom: number;
+    marginBottomUnit: YGUnit;
     // (undocumented)
-    marginLeft?: number | undefined;
-    marginLeftUnit?: YGUnit | undefined;
+    marginLeft: number;
+    marginLeftUnit: YGUnit;
     // (undocumented)
-    marginRight?: number | undefined;
-    marginRightUnit?: YGUnit | undefined;
+    marginRight: number;
+    marginRightUnit: YGUnit;
     // (undocumented)
-    marginTop?: number | undefined;
-    marginTopUnit?: YGUnit | undefined;
+    marginTop: number;
+    marginTopUnit: YGUnit;
     // (undocumented)
-    maxHeight?: number | undefined;
-    maxHeightUnit?: YGUnit | undefined;
+    maxHeight: number;
+    maxHeightUnit: YGUnit;
     // (undocumented)
-    maxWidth?: number | undefined;
-    maxWidthUnit?: YGUnit | undefined;
+    maxWidth: number;
+    maxWidthUnit: YGUnit;
     // (undocumented)
-    minHeight?: number | undefined;
-    minHeightUnit?: YGUnit | undefined;
+    minHeight: number;
+    minHeightUnit: YGUnit;
     // (undocumented)
-    minWidth?: number | undefined;
-    minWidthUnit?: YGUnit | undefined;
-    overflow?: YGOverflow | undefined;
+    minWidth: number;
+    minWidthUnit: YGUnit;
+    overflow: YGOverflow;
     // (undocumented)
-    paddingBottom?: number | undefined;
-    paddingBottomUnit?: YGUnit | undefined;
+    paddingBottom: number;
+    paddingBottomUnit: YGUnit;
     // (undocumented)
-    paddingLeft?: number | undefined;
-    paddingLeftUnit?: YGUnit | undefined;
+    paddingLeft: number;
+    paddingLeftUnit: YGUnit;
     // (undocumented)
-    paddingRight?: number | undefined;
-    paddingRightUnit?: YGUnit | undefined;
+    paddingRight: number;
+    paddingRightUnit: YGUnit;
     // (undocumented)
-    paddingTop?: number | undefined;
-    paddingTopUnit?: YGUnit | undefined;
+    paddingTop: number;
+    paddingTopUnit: YGUnit;
     // (undocumented)
     parent: number;
     // (undocumented)
-    positionBottom?: number | undefined;
-    positionBottomUnit?: YGUnit | undefined;
+    positionBottom: number;
+    positionBottomUnit: YGUnit;
     // (undocumented)
-    positionLeft?: number | undefined;
-    positionLeftUnit?: YGUnit | undefined;
+    positionLeft: number;
+    positionLeftUnit: YGUnit;
     // (undocumented)
-    positionRight?: number | undefined;
-    positionRightUnit?: YGUnit | undefined;
+    positionRight: number;
+    positionRightUnit: YGUnit;
     // (undocumented)
-    positionTop?: number | undefined;
-    positionTopUnit?: YGUnit | undefined;
-    positionType?: YGPositionType | undefined;
+    positionTop: number;
+    positionTopUnit: YGUnit;
+    positionType: YGPositionType;
     // (undocumented)
     rightOf: number;
     // (undocumented)
-    width?: number | undefined;
-    widthUnit?: YGUnit | undefined;
+    width: number;
+    widthUnit: YGUnit;
 }
 
 // @public (undocumented)
@@ -328,8 +328,6 @@ export interface UiTransformProps {
     // (undocumented)
     alignSelf?: YGAlign;
     // (undocumented)
-    direction?: YGDirection;
-    // (undocumented)
     display?: YGDisplay;
     // (undocumented)
     flex?: number;
@@ -391,20 +389,6 @@ export enum YGAlign {
     YGA_SPACE_BETWEEN = 6,
     // (undocumented)
     YGA_STRETCH = 4
-}
-
-// Warning: (ae-missing-release-tag) "YGDirection" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export enum YGDirection {
-    // (undocumented)
-    UNRECOGNIZED = -1,
-    // (undocumented)
-    YGD_INHERIT = 0,
-    // (undocumented)
-    YGD_LTR = 1,
-    // (undocumented)
-    YGD_RTL = 2
 }
 
 // Warning: (ae-missing-release-tag) "YGDisplay" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)

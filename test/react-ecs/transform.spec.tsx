@@ -26,7 +26,7 @@ describe('UiTransform React Ecs', () => {
     const ui = () => <UiEntity uiTransform={undefined} />
     renderUi(ui)
     engine.update(1)
-    expect(getDiv(rootDivEntity).width).toBe(undefined)
+    expect(getDiv(rootDivEntity).width).toBe(0)
   })
 
   it('should send 0 if you send an invalid px', async () => {
@@ -39,7 +39,7 @@ describe('UiTransform React Ecs', () => {
     const ui = () => <UiEntity uiTransform={{ width: 'boedo' as any }} />
     renderUi(ui)
     engine.update(1)
-    expect(getDiv(rootDivEntity).width).toBe(undefined)
+    expect(getDiv(rootDivEntity).width).toBe(0)
   })
 
   it('should send position transform properties', async () => {
@@ -95,16 +95,16 @@ describe('UiTransform React Ecs', () => {
     engine.update(1)
 
     expect(getDiv(rootDivEntity)).toMatchObject({
-      positionRight: undefined,
-      positionRightUnit: undefined
+      positionRight: 0,
+      positionRightUnit: YGUnit.YGU_UNDEFINED
     })
 
     position.right = {} as any
     position.left = '10%'
     engine.update(1)
     expect(getDiv(rootDivEntity)).toMatchObject({
-      positionRight: undefined,
-      positionRightUnit: undefined,
+      positionRight: 0,
+      positionRightUnit: YGUnit.YGU_UNDEFINED,
       positionLeft: 10,
       positionLeftUnit: YGUnit.YGU_PERCENT
     })
@@ -164,14 +164,14 @@ describe('UiTransform React Ecs', () => {
     engine.update(1)
 
     expect(getDiv(rootDivEntity)).toMatchObject({
-      width: undefined,
-      widthUnit: undefined
+      width: 0,
+      widthUnit: YGUnit.YGU_UNDEFINED
     })
 
     width = { boedo: 'casla' } as any
     expect(getDiv(rootDivEntity)).toMatchObject({
-      width: undefined,
-      widthUnit: undefined
+      width: 0,
+      widthUnit: YGUnit.YGU_UNDEFINED
     })
   })
 })
