@@ -3243,7 +3243,7 @@ declare namespace Quaternion {
      * @param y - the rotation on the y axis in euler degrees
      * @param z - the rotation on the z axis in euler degrees
      */
-    export function fromEulerDegress(x: number, y: number, z: number): MutableQuaternion;
+    export function fromEulerDegrees(x: number, y: number, z: number): MutableQuaternion;
     /**
      * Gets length of current quaternion
      * @returns the quaternion length (float)
@@ -3265,7 +3265,7 @@ declare namespace Quaternion {
      * Returns the angle in degrees between two rotations a and b.
      * @param quat1 - defines the first quaternion
      * @param quat2 - defines the second quaternion
-     * @returns the degress angle
+     * @returns the degrees angle
      */
     export function angle(quat1: ReadonlyQuaternion, quat2: ReadonlyQuaternion): number;
     /**
@@ -3301,7 +3301,7 @@ declare namespace Quaternion {
      * Gets or sets the euler angle representation of the rotation.
      * Implemented unity-based calculations from: https://stackoverflow.com/a/56055813
      * @public
-     * @returns a new Vector3 with euler angles degress
+     * @returns a new Vector3 with euler angles degrees
      */
     export function toEulerAngles(q: MutableQuaternion): Vector3.Mutable;
     /**
@@ -3351,11 +3351,11 @@ declare namespace Quaternion {
     export function multiplyToRef(self: ReadonlyQuaternion, q1: ReadonlyQuaternion, result: MutableQuaternion): void;
     /**
      *
-     * @param degress - the angle degress
+     * @param degrees - the angle degrees
      * @param axis - vector3
      * @returns a new Quaternion
      */
-    export function fromAngleAxis(degress: number, axis: Vector3.ReadonlyVector3): MutableQuaternion;
+    export function fromAngleAxis(degrees: number, axis: Vector3.ReadonlyVector3): MutableQuaternion;
     /**
      * Creates a new quaternion containing the rotation value to reach the target (axis1, axis2, axis3) orientation as a rotated XYZ system (axis1, axis2 and axis3 are normalized during this operation)
      * @param axis1 - defines the first axis
