@@ -20,6 +20,7 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     ...otherProps
   } = props
   return {
+    ...defaultUiTransform,
     ...otherProps,
     ...parsePosition(position, 'position'),
     ...parsePosition(margin, 'margin'),
@@ -31,4 +32,9 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     ...parseSize(minWidth, 'minWidth'),
     ...parseSize(maxWidth, 'maxWidth')
   }
+}
+
+const defaultUiTransform: PBUiTransform = {
+  parent: CANVAS_ROOT_ENTITY,
+  rightOf: 0
 }

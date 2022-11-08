@@ -2917,58 +2917,84 @@ declare interface PBUiText {
 }
 
 declare interface PBUiTransform {
-    parent?: number | undefined;
-    rightOf?: number | undefined;
-    positionType?: YGPositionType | undefined;
+    parent: number;
+    rightOf: number;
+    /** default: YGAlign.YGA_FLEX_START */
     alignContent?: YGAlign | undefined;
+    /** default: YGAlign.YGA_STRETCH */
     alignItems?: YGAlign | undefined;
-    alignSelf?: YGAlign | undefined;
-    flexDirection?: YGFlexDirection | undefined;
+    /** default: YGWrap.YGW_WRAP */
     flexWrap?: YGWrap | undefined;
+    /** default: 1 */
+    flexShrink?: number | undefined;
+    /** YGPositionType.YGPT_RELATIVE */
+    positionType?: YGPositionType | undefined;
+    /** YGAlign.YGA_AUTO */
+    alignSelf?: YGAlign | undefined;
+    /** YGFlexDirection.YGFD_ROW */
+    flexDirection?: YGFlexDirection | undefined;
+    /** YGJustify.YGJ_FLEX_START */
     justifyContent?: YGJustify | undefined;
+    /** YGOverflow.YGO_VISIBLE */
     overflow?: YGOverflow | undefined;
+    /** YGDisplay.YGD_FLEX */
     display?: YGDisplay | undefined;
-    direction?: YGDirection | undefined;
-    flex?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     flexBasisUnit?: YGUnit | undefined;
     flexBasis?: number | undefined;
     flexGrow?: number | undefined;
-    flexShrink?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     widthUnit?: YGUnit | undefined;
     width?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     heightUnit?: YGUnit | undefined;
     height?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     minWidthUnit?: YGUnit | undefined;
     minWidth?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     minHeightUnit?: YGUnit | undefined;
     minHeight?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     maxWidthUnit?: YGUnit | undefined;
     maxWidth?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     maxHeightUnit?: YGUnit | undefined;
     maxHeight?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     positionLeftUnit?: YGUnit | undefined;
     positionLeft?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     positionTopUnit?: YGUnit | undefined;
     positionTop?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     positionRightUnit?: YGUnit | undefined;
     positionRight?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     positionBottomUnit?: YGUnit | undefined;
     positionBottom?: number | undefined;
-    /** margin */
+    /** YGUnit.YGU_UNDEFINED */
     marginLeftUnit?: YGUnit | undefined;
     marginLeft?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     marginTopUnit?: YGUnit | undefined;
     marginTop?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     marginRightUnit?: YGUnit | undefined;
     marginRight?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     marginBottomUnit?: YGUnit | undefined;
     marginBottom?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     paddingLeftUnit?: YGUnit | undefined;
     paddingLeft?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     paddingTopUnit?: YGUnit | undefined;
     paddingTop?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     paddingRightUnit?: YGUnit | undefined;
     paddingRight?: number | undefined;
+    /** YGUnit.YGU_UNDEFINED */
     paddingBottomUnit?: YGUnit | undefined;
     paddingBottom?: number | undefined;
 }
@@ -4432,21 +4458,15 @@ declare const enum YGAlign {
     YGA_SPACE_AROUND = 7
 }
 
-declare const enum YGDirection {
-    YGD_INHERIT = 0,
-    YGD_LTR = 1,
-    YGD_RTL = 2
-}
-
 declare const enum YGDisplay {
     YGD_FLEX = 0,
     YGD_NONE = 1
 }
 
 declare const enum YGFlexDirection {
-    YGFD_COLUMN = 0,
-    YGFD_COLUMN_REVERSE = 1,
-    YGFD_ROW = 2,
+    YGFD_ROW = 0,
+    YGFD_COLUMN = 1,
+    YGFD_COLUMN_REVERSE = 2,
     YGFD_ROW_REVERSE = 3
 }
 
@@ -4466,9 +4486,8 @@ declare const enum YGOverflow {
 }
 
 declare const enum YGPositionType {
-    YGPT_STATIC = 0,
-    YGPT_RELATIVE = 1,
-    YGPT_ABSOLUTE = 2
+    YGPT_RELATIVE = 0,
+    YGPT_ABSOLUTE = 1
 }
 
 declare const enum YGUnit {

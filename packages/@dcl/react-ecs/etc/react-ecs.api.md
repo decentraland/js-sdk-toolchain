@@ -156,110 +156,78 @@ export interface PBUiText {
 //
 // @public (undocumented)
 export interface PBUiTransform {
-    // (undocumented)
     alignContent?: YGAlign | undefined;
-    // (undocumented)
     alignItems?: YGAlign | undefined;
-    // (undocumented)
     alignSelf?: YGAlign | undefined;
-    // (undocumented)
-    direction?: YGDirection | undefined;
-    // (undocumented)
     display?: YGDisplay | undefined;
     // (undocumented)
-    flex?: number | undefined;
-    // (undocumented)
     flexBasis?: number | undefined;
-    // (undocumented)
     flexBasisUnit?: YGUnit | undefined;
-    // (undocumented)
     flexDirection?: YGFlexDirection | undefined;
     // (undocumented)
     flexGrow?: number | undefined;
-    // (undocumented)
     flexShrink?: number | undefined;
-    // (undocumented)
     flexWrap?: YGWrap | undefined;
     // (undocumented)
     height?: number | undefined;
-    // (undocumented)
     heightUnit?: YGUnit | undefined;
-    // (undocumented)
     justifyContent?: YGJustify | undefined;
     // (undocumented)
     marginBottom?: number | undefined;
-    // (undocumented)
     marginBottomUnit?: YGUnit | undefined;
     // (undocumented)
     marginLeft?: number | undefined;
     marginLeftUnit?: YGUnit | undefined;
     // (undocumented)
     marginRight?: number | undefined;
-    // (undocumented)
     marginRightUnit?: YGUnit | undefined;
     // (undocumented)
     marginTop?: number | undefined;
-    // (undocumented)
     marginTopUnit?: YGUnit | undefined;
     // (undocumented)
     maxHeight?: number | undefined;
-    // (undocumented)
     maxHeightUnit?: YGUnit | undefined;
     // (undocumented)
     maxWidth?: number | undefined;
-    // (undocumented)
     maxWidthUnit?: YGUnit | undefined;
     // (undocumented)
     minHeight?: number | undefined;
-    // (undocumented)
     minHeightUnit?: YGUnit | undefined;
     // (undocumented)
     minWidth?: number | undefined;
-    // (undocumented)
     minWidthUnit?: YGUnit | undefined;
-    // (undocumented)
     overflow?: YGOverflow | undefined;
     // (undocumented)
     paddingBottom?: number | undefined;
-    // (undocumented)
     paddingBottomUnit?: YGUnit | undefined;
     // (undocumented)
     paddingLeft?: number | undefined;
-    // (undocumented)
     paddingLeftUnit?: YGUnit | undefined;
     // (undocumented)
     paddingRight?: number | undefined;
-    // (undocumented)
     paddingRightUnit?: YGUnit | undefined;
     // (undocumented)
     paddingTop?: number | undefined;
-    // (undocumented)
     paddingTopUnit?: YGUnit | undefined;
     // (undocumented)
-    parent?: number | undefined;
+    parent: number;
     // (undocumented)
     positionBottom?: number | undefined;
-    // (undocumented)
     positionBottomUnit?: YGUnit | undefined;
     // (undocumented)
     positionLeft?: number | undefined;
-    // (undocumented)
     positionLeftUnit?: YGUnit | undefined;
     // (undocumented)
     positionRight?: number | undefined;
-    // (undocumented)
     positionRightUnit?: YGUnit | undefined;
     // (undocumented)
     positionTop?: number | undefined;
-    // (undocumented)
     positionTopUnit?: YGUnit | undefined;
-    // (undocumented)
     positionType?: YGPositionType | undefined;
     // (undocumented)
-    rightOf?: number | undefined;
+    rightOf: number;
     // (undocumented)
     width?: number | undefined;
-    // (undocumented)
     widthUnit?: YGUnit | undefined;
 }
 
@@ -458,11 +426,11 @@ export enum YGFlexDirection {
     // (undocumented)
     UNRECOGNIZED = -1,
     // (undocumented)
-    YGFD_COLUMN = 0,
+    YGFD_COLUMN = 1,
     // (undocumented)
-    YGFD_COLUMN_REVERSE = 1,
+    YGFD_COLUMN_REVERSE = 2,
     // (undocumented)
-    YGFD_ROW = 2,
+    YGFD_ROW = 0,
     // (undocumented)
     YGFD_ROW_REVERSE = 3
 }
@@ -508,11 +476,9 @@ export enum YGPositionType {
     // (undocumented)
     UNRECOGNIZED = -1,
     // (undocumented)
-    YGPT_ABSOLUTE = 2,
+    YGPT_ABSOLUTE = 1,
     // (undocumented)
-    YGPT_RELATIVE = 1,
-    // (undocumented)
-    YGPT_STATIC = 0
+    YGPT_RELATIVE = 0
 }
 
 // Warning: (ae-missing-release-tag) "YGUnit" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
