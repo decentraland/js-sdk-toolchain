@@ -1,14 +1,15 @@
 import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import {
+  CANVAS_ROOT_ENTITY,
   Position,
   PositionUnit,
   ReactEcs,
   renderUi,
   UiEntity,
-  YGUnit
+  YGUnit,
+  YGWrap
 } from '../../packages/@dcl/react-ecs/src'
 
-const CANVAS_ROOT_ENTITY = 0
 declare const engine: IEngine
 
 describe('UiTransform React Ecs', () => {
@@ -36,10 +37,15 @@ describe('UiTransform React Ecs', () => {
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
     const getDiv = (entity: Entity) => UiTransform.get(entity)
-    const ui = () => <UiEntity uiTransform={{ width: 'boedo' as any }} />
+    const ui = () => (
+      <UiEntity
+        uiTransform={{ width: 'boedo' as any, flexWrap: YGWrap.YGW_WRAP }}
+      />
+    )
     renderUi(ui)
     engine.update(1)
     expect(getDiv(rootDivEntity).width).toBe(0)
+    expect(getDiv(rootDivEntity).flexWrap).toBe(YGWrap.YGW_WRAP)
   })
 
   it('should send position transform properties', async () => {

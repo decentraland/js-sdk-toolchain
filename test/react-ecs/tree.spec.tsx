@@ -1,12 +1,12 @@
 import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import {
+  CANVAS_ROOT_ENTITY,
   Container,
   ReactEcs,
   renderUi,
   UiEntity
 } from '../../packages/@dcl/react-ecs/src'
 
-const CANVAS_ROOT_ENTITY = 0
 declare const engine: IEngine
 
 describe('RectEcs UI ✨', () => {

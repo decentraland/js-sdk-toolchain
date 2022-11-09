@@ -1,5 +1,6 @@
 import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import {
+  CANVAS_ROOT_ENTITY,
   Color4,
   ReactEcs,
   renderUi,
@@ -7,7 +8,6 @@ import {
   UiEntity
 } from '../../packages/@dcl/react-ecs/src'
 
-const CANVAS_ROOT_ENTITY = 0
 declare const engine: IEngine
 
 describe('UiBackground React Ecs', () => {
@@ -61,7 +61,7 @@ describe('UiBackground React Ecs', () => {
   })
 
   it('should remove backgrund component', () => {
-    const { UiTransform, UiBackground } = engine.baseComponents
+    const { UiBackground } = engine.baseComponents
     const entityIndex = engine.addEntity()
 
     // Helpers

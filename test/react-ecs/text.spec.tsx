@@ -1,5 +1,6 @@
 import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import {
+  CANVAS_ROOT_ENTITY,
   Color3,
   Font,
   ReactEcs,
@@ -8,7 +9,6 @@ import {
   UiEntity
 } from '../../packages/@dcl/react-ecs/src'
 
-const CANVAS_ROOT_ENTITY = 0
 declare const engine: IEngine
 
 describe('UiText React Ecs', () => {
