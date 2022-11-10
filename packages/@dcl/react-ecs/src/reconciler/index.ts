@@ -4,7 +4,8 @@ import type {
   IEngine
 } from '@dcl/ecs'
 import Reconciler, { HostConfig } from 'react-reconciler'
-import { CANVAS_ROOT_ENTITY, isListener, Listeners } from '../components'
+import { isListener, Listeners } from '../components'
+import { CANVAS_ROOT_ENTITY } from '../components/uiTransform'
 import { EntityComponents, JSX } from '../react-ecs'
 import {
   Changes,

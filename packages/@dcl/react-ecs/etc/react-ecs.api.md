@@ -6,11 +6,6 @@
 
 /// <reference types="@dcl/posix" />
 
-// Warning: (ae-missing-release-tag) "CANVAS_ROOT_ENTITY" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const CANVAS_ROOT_ENTITY = 7;
-
 // Warning: (ae-missing-release-tag) "Children" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
