@@ -561,12 +561,6 @@ declare namespace Color3 {
     export function toGammaSpaceToRef(value: ReadonlyColor3, convertedColor: MutableColor3): void;
 }
 
-declare interface Color3_2 {
-    r: number;
-    g: number;
-    b: number;
-}
-
 /**
  * @public
  */
@@ -912,13 +906,6 @@ declare namespace Color4 {
      * @returns the unmodified Color4
      */
     export function toGammaSpaceToRef(value: ReadonlyColor4, convertedColor: MutableColor4): void;
-}
-
-declare interface Color4_2 {
-    r: number;
-    g: number;
-    b: number;
-    a: number;
 }
 
 /**
@@ -1394,7 +1381,7 @@ declare type IEngine = {
      *
      * ```
      */
-    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>;
     /**
      * Define a component and add it to the engine.
      * @param spec An object with schema fields
@@ -2679,7 +2666,7 @@ declare interface PBAvatarAttach {
 }
 
 declare interface PBAvatarModifierArea {
-    area: Vector3_2 | undefined;
+    area: PBVector3 | undefined;
     excludeIds: string[];
     modifiers: AvatarModifierType[];
 }
@@ -2691,11 +2678,11 @@ declare interface PBAvatarShape {
     /** default = urn:decentraland:off-chain:base-avatars:BaseFemale */
     bodyShape?: string | undefined;
     /** default = decentraland.common.Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
-    skinColor?: Color3_2 | undefined;
+    skinColor?: PBColor3 | undefined;
     /** default = decentraland.common.Color3(R = 0.283f, G = 0.142f, B = 0f) */
-    hairColor?: Color3_2 | undefined;
+    hairColor?: PBColor3 | undefined;
     /** default = decentraland.common.Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
-    eyeColor?: Color3_2 | undefined;
+    eyeColor?: PBColor3 | undefined;
     expressionTriggerId?: string | undefined;
     /** default = timestamp */
     expressionTriggerTimestamp?: number | undefined;
@@ -2726,36 +2713,27 @@ declare interface PBCameraMode {
 }
 
 declare interface PBCameraModeArea {
-    area: Vector3_2 | undefined;
+    area: PBVector3 | undefined;
     mode: CameraType;
 }
 
-declare namespace PbCameraType {
-    export {
-        CameraType
-    }
+declare interface PBColor3 {
+    r: number;
+    g: number;
+    b: number;
 }
-export { PbCameraType }
 
-declare namespace PbColors {
-    export {
-        Color3_2 as Color3,
-        Color4_2 as Color4
-    }
+declare interface PBColor4 {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
 }
-export { PbColors }
 
 declare interface PBGltfContainer {
     /** which file to load */
     src: string;
 }
-
-declare namespace PbInputAction {
-    export {
-        InputAction
-    }
-}
-export { PbInputAction }
 
 declare interface PBMaterial {
     material?: {
@@ -2781,11 +2759,11 @@ declare interface PBMaterial_PbrMaterial {
     /** default = null */
     bumpTexture?: TextureUnion | undefined;
     /** default = white; */
-    albedoColor?: Color3_2 | undefined;
+    albedoColor?: PBColor3 | undefined;
     /** default = black; */
-    emissiveColor?: Color3_2 | undefined;
+    emissiveColor?: PBColor3 | undefined;
     /** default = white; */
-    reflectivityColor?: Color3_2 | undefined;
+    reflectivityColor?: PBColor3 | undefined;
     /** default = TransparencyMode.Auto */
     transparencyMode?: MaterialTransparencyMode | undefined;
     /** default = 0.5 */
@@ -2884,7 +2862,7 @@ declare interface PBNftShape {
     /** default = PictureFrameStyle.Classic */
     style?: NftFrameType | undefined;
     /** default = decentraland.common.Color3(0.6404918, 0.611472, 0.8584906) */
-    color?: Color3_2 | undefined;
+    color?: PBColor3 | undefined;
 }
 
 /** the renderer will set this component to the root entity once per frame with all the events */
@@ -2929,28 +2907,26 @@ declare interface PBPointerLock {
     isPointerLocked: boolean;
 }
 
+declare interface PBPosition {
+    x: number;
+    y: number;
+    z: number;
+}
+
 declare interface PBRaycast {
     timestamp: number;
-    origin: Vector3_2 | undefined;
-    direction: Vector3_2 | undefined;
+    origin: PBVector3 | undefined;
+    direction: PBVector3 | undefined;
     maxDistance: number;
     queryType: RaycastQueryType;
 }
 
 declare interface PBRaycastResult {
     timestamp: number;
-    origin: Vector3_2 | undefined;
-    direction: Vector3_2 | undefined;
+    origin: PBVector3 | undefined;
+    direction: PBVector3 | undefined;
     hits: RaycastHit[];
 }
-
-declare namespace PbTexts {
-    export {
-        TextAlignMode,
-        Font
-    }
-}
-export { PbTexts }
 
 declare interface PBTextShape {
     text: string;
@@ -2977,33 +2953,22 @@ declare interface PBTextShape {
     shadowOffsetY?: number | undefined;
     outlineWidth?: number | undefined;
     /** default=(1.0,1.0,1.0) */
-    shadowColor?: Color3_2 | undefined;
+    shadowColor?: PBColor3 | undefined;
     /** default=(1.0,1.0,1.0) */
-    outlineColor?: Color3_2 | undefined;
+    outlineColor?: PBColor3 | undefined;
     /** default=(1.0,1.0,1.0) */
-    textColor?: Color4_2 | undefined;
+    textColor?: PBColor4 | undefined;
 }
-
-declare namespace PbTexture {
-    export {
-        TextureWrapMode,
-        TextureFilterMode,
-        Texture,
-        AvatarTexture,
-        TextureUnion
-    }
-}
-export { PbTexture }
 
 declare interface PBUiBackground {
     /** default=(0.0, 0.0, 0.0, 0.0) */
-    backgroundColor?: Color4_2 | undefined;
+    backgroundColor?: PBColor4 | undefined;
 }
 
 declare interface PBUiText {
     value: string;
     /** default=(1.0,1.0,1.0) */
-    color?: Color3_2 | undefined;
+    color?: PBColor3 | undefined;
     /** default='center' */
     textAlign?: TextAlignMode | undefined;
     /** default=0 */
@@ -3073,14 +3038,16 @@ declare interface PBUiTransform {
     borderBottom: number;
 }
 
-declare namespace PbVectors {
-    export {
-        Position,
-        Vector3_2 as Vector3,
-        Vector2
-    }
+declare interface PBVector2 {
+    x: number;
+    y: number;
 }
-export { PbVectors }
+
+declare interface PBVector3 {
+    x: number;
+    y: number;
+    z: number;
+}
 
 declare interface PBVisibilityComponent {
     /** default=true */
@@ -3220,12 +3187,6 @@ declare const PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFe
 
 /** @public */
 declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
-
-declare interface Position {
-    x: number;
-    y: number;
-    z: number;
-}
 
 /**
  * @public
@@ -3495,10 +3456,10 @@ declare const Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
 
 /** Position will be relative to the scene */
 declare interface RaycastHit {
-    position: Vector3_2 | undefined;
-    origin: Vector3_2 | undefined;
-    direction: Vector3_2 | undefined;
-    normalHit: Vector3_2 | undefined;
+    position: PBVector3 | undefined;
+    origin: PBVector3 | undefined;
+    direction: PBVector3 | undefined;
+    normalHit: PBVector3 | undefined;
     length: number;
     meshName?: string | undefined;
     entityId?: number | undefined;
@@ -3868,11 +3829,6 @@ declare const UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTrans
  * @public
  */
 declare type Unpacked<T> = T extends (infer U)[] ? U : T;
-
-declare interface Vector2 {
-    x: number;
-    y: number;
-}
 
 /**
  * @public
@@ -4466,12 +4422,6 @@ declare namespace Vector3 {
      * @returns a random Vector3
      */
     export function Random(): MutableVector3;
-}
-
-declare interface Vector3_2 {
-    x: number;
-    y: number;
-    z: number;
 }
 
 /**

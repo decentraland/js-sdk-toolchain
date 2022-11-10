@@ -60,7 +60,7 @@ export const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarSh
 // Warning: (ae-missing-release-tag) "AvatarTexture" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface AvatarTexture {
+export interface AvatarTexture {
     filterMode?: TextureFilterMode | undefined;
     // (undocumented)
     userId: string;
@@ -146,7 +146,7 @@ export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCa
 // Warning: (ae-missing-release-tag) "CameraType" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const enum CameraType {
+export const enum CameraType {
     // (undocumented)
     CT_FIRST_PERSON = 0,
     // (undocumented)
@@ -234,18 +234,6 @@ export namespace Color3 {
     export function Yellow(): MutableColor3;
 }
 
-// Warning: (ae-missing-release-tag) "Color3" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-interface Color3_2 {
-    // (undocumented)
-    b: number;
-    // (undocumented)
-    g: number;
-    // (undocumented)
-    r: number;
-}
-
 // @public (undocumented)
 export type Color3Type = {
     r: number;
@@ -316,20 +304,6 @@ export namespace Color4 {
     export function toString(value: ReadonlyColor4): string;
     export function White(): MutableColor4;
     export function Yellow(): MutableColor4;
-}
-
-// Warning: (ae-missing-release-tag) "Color4" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-interface Color4_2 {
-    // (undocumented)
-    a: number;
-    // (undocumented)
-    b: number;
-    // (undocumented)
-    g: number;
-    // (undocumented)
-    r: number;
 }
 
 // @public (undocumented)
@@ -572,7 +546,7 @@ export type FloatArray = number[];
 // Warning: (ae-missing-release-tag) "Font" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const enum Font {
+export const enum Font {
     // (undocumented)
     F_LIBERATION_SANS = 0,
     // (undocumented)
@@ -594,7 +568,7 @@ export type IEngine = {
     entityExists(entity: Entity): boolean;
     addSystem(system: SystemFn, priority?: number, name?: string): void;
     removeSystem(selector: string | SystemFn): boolean;
-    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
+    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>;
     defineComponentFromSchema<T extends ISchema<Record<string, any>>, ConstructorType = ComponentType<T>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
     getEntitiesWith<T extends [ComponentDefinition, ...ComponentDefinition[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
@@ -635,7 +609,7 @@ export const Input: IInput;
 // Warning: (ae-missing-release-tag) "InputAction" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const enum InputAction {
+export const enum InputAction {
     // (undocumented)
     IA_ACTION_3 = 10,
     // (undocumented)
@@ -1103,7 +1077,7 @@ export interface PBAvatarAttach {
 // @public (undocumented)
 export interface PBAvatarModifierArea {
     // (undocumented)
-    area: Vector3_2 | undefined;
+    area: PBVector3 | undefined;
     // (undocumented)
     excludeIds: string[];
     // (undocumented)
@@ -1119,12 +1093,12 @@ export interface PBAvatarShape {
     // (undocumented)
     expressionTriggerId?: string | undefined;
     expressionTriggerTimestamp?: number | undefined;
-    eyeColor?: Color3_2 | undefined;
-    hairColor?: Color3_2 | undefined;
+    eyeColor?: PBColor3 | undefined;
+    hairColor?: PBColor3 | undefined;
     // (undocumented)
     id: string;
     name?: string | undefined;
-    skinColor?: Color3_2 | undefined;
+    skinColor?: PBColor3 | undefined;
     // (undocumented)
     talking?: boolean | undefined;
     wearables: string[];
@@ -1151,25 +1125,36 @@ export interface PBCameraMode {
 // @public (undocumented)
 export interface PBCameraModeArea {
     // (undocumented)
-    area: Vector3_2 | undefined;
+    area: PBVector3 | undefined;
     // (undocumented)
     mode: CameraType;
 }
 
-declare namespace PbCameraType {
-    export {
-        CameraType
-    }
+// Warning: (ae-missing-release-tag) "Color3" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBColor3 {
+    // (undocumented)
+    b: number;
+    // (undocumented)
+    g: number;
+    // (undocumented)
+    r: number;
 }
-export { PbCameraType }
 
-declare namespace PbColors {
-    export {
-        Color3_2 as Color3,
-        Color4_2 as Color4
-    }
+// Warning: (ae-missing-release-tag) "Color4" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBColor4 {
+    // (undocumented)
+    a: number;
+    // (undocumented)
+    b: number;
+    // (undocumented)
+    g: number;
+    // (undocumented)
+    r: number;
 }
-export { PbColors }
 
 // Warning: (ae-missing-release-tag) "PBGltfContainer" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -1178,29 +1163,22 @@ export interface PBGltfContainer {
     src: string;
 }
 
-declare namespace PbInputAction {
-    export {
-        InputAction
-    }
-}
-export { PbInputAction }
-
 // Warning: (ae-missing-release-tag) "PBMaterial" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export interface PBMaterial {
-    albedoColor?: Color3_2 | undefined;
+    albedoColor?: PBColor3 | undefined;
     alphaTest?: number | undefined;
     alphaTexture?: TextureUnion | undefined;
     bumpTexture?: TextureUnion | undefined;
     castShadows?: boolean | undefined;
     directIntensity?: number | undefined;
-    emissiveColor?: Color3_2 | undefined;
+    emissiveColor?: PBColor3 | undefined;
     emissiveIntensity?: number | undefined;
     emissiveTexture?: TextureUnion | undefined;
     glossiness?: number | undefined;
     metallic?: number | undefined;
-    reflectivityColor?: Color3_2 | undefined;
+    reflectivityColor?: PBColor3 | undefined;
     roughness?: number | undefined;
     specularIntensity?: number | undefined;
     texture?: TextureUnion | undefined;
@@ -1308,7 +1286,7 @@ export interface PBMeshRenderer_SphereMesh {
 //
 // @public (undocumented)
 export interface PBNftShape {
-    color?: Color3_2 | undefined;
+    color?: PBColor3 | undefined;
     // (undocumented)
     src: string;
     style?: NftFrameType | undefined;
@@ -1370,16 +1348,28 @@ export interface PBPointerLock {
     isPointerLocked: boolean;
 }
 
+// Warning: (ae-missing-release-tag) "Position" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBPosition {
+    // (undocumented)
+    x: number;
+    // (undocumented)
+    y: number;
+    // (undocumented)
+    z: number;
+}
+
 // Warning: (ae-missing-release-tag) "PBRaycast" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export interface PBRaycast {
     // (undocumented)
-    direction: Vector3_2 | undefined;
+    direction: PBVector3 | undefined;
     // (undocumented)
     maxDistance: number;
     // (undocumented)
-    origin: Vector3_2 | undefined;
+    origin: PBVector3 | undefined;
     // (undocumented)
     queryType: RaycastQueryType;
     // (undocumented)
@@ -1391,22 +1381,14 @@ export interface PBRaycast {
 // @public (undocumented)
 export interface PBRaycastResult {
     // (undocumented)
-    direction: Vector3_2 | undefined;
+    direction: PBVector3 | undefined;
     // (undocumented)
     hits: RaycastHit[];
     // (undocumented)
-    origin: Vector3_2 | undefined;
+    origin: PBVector3 | undefined;
     // (undocumented)
     timestamp: number;
 }
-
-declare namespace PbTexts {
-    export {
-        TextAlignMode,
-        Font
-    }
-}
-export { PbTexts }
 
 // Warning: (ae-missing-release-tag) "PBTextShape" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -1421,7 +1403,7 @@ export interface PBTextShape {
     lineCount?: number | undefined;
     // (undocumented)
     lineSpacing?: number | undefined;
-    outlineColor?: Color3_2 | undefined;
+    outlineColor?: PBColor3 | undefined;
     // (undocumented)
     outlineWidth?: number | undefined;
     // (undocumented)
@@ -1434,7 +1416,7 @@ export interface PBTextShape {
     paddingTop?: number | undefined;
     // (undocumented)
     shadowBlur?: number | undefined;
-    shadowColor?: Color3_2 | undefined;
+    shadowColor?: PBColor3 | undefined;
     // (undocumented)
     shadowOffsetX?: number | undefined;
     // (undocumented)
@@ -1442,35 +1424,24 @@ export interface PBTextShape {
     // (undocumented)
     text: string;
     textAlign?: TextAlignMode | undefined;
-    textColor?: Color4_2 | undefined;
+    textColor?: PBColor4 | undefined;
     // (undocumented)
     textWrapping?: boolean | undefined;
     width?: number | undefined;
 }
 
-declare namespace PbTexture {
-    export {
-        TextureWrapMode,
-        TextureFilterMode,
-        Texture,
-        AvatarTexture,
-        TextureUnion
-    }
-}
-export { PbTexture }
-
 // Warning: (ae-missing-release-tag) "PBUiBackground" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export interface PBUiBackground {
-    backgroundColor?: Color4_2 | undefined;
+    backgroundColor?: PBColor4 | undefined;
 }
 
 // Warning: (ae-missing-release-tag) "PBUiText" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export interface PBUiText {
-    color?: Color3_2 | undefined;
+    color?: PBColor3 | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
     textAlign?: TextAlignMode | undefined;
@@ -1597,14 +1568,27 @@ export interface PBUiTransform {
     widthUnit: YGUnit;
 }
 
-declare namespace PbVectors {
-    export {
-        Position,
-        Vector3_2 as Vector3,
-        Vector2
-    }
+// Warning: (ae-missing-release-tag) "Vector2" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBVector2 {
+    // (undocumented)
+    x: number;
+    // (undocumented)
+    y: number;
 }
-export { PbVectors }
+
+// Warning: (ae-missing-release-tag) "Vector3" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBVector3 {
+    // (undocumented)
+    x: number;
+    // (undocumented)
+    y: number;
+    // (undocumented)
+    z: number;
+}
 
 // Warning: (ae-missing-release-tag) "PBVisibilityComponent" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -1669,18 +1653,6 @@ export const PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFee
 
 // @public (undocumented)
 export const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
-
-// Warning: (ae-missing-release-tag) "Position" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-interface Position {
-    // (undocumented)
-    x: number;
-    // (undocumented)
-    y: number;
-    // (undocumented)
-    z: number;
-}
 
 // @public
 export type Quaternion = Quaternion.ReadonlyQuaternion;
@@ -1752,7 +1724,7 @@ export const Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
 // @public
 export interface RaycastHit {
     // (undocumented)
-    direction: Vector3_2 | undefined;
+    direction: PBVector3 | undefined;
     // (undocumented)
     entityId?: number | undefined;
     // (undocumented)
@@ -1760,11 +1732,11 @@ export interface RaycastHit {
     // (undocumented)
     meshName?: string | undefined;
     // (undocumented)
-    normalHit: Vector3_2 | undefined;
+    normalHit: PBVector3 | undefined;
     // (undocumented)
-    origin: Vector3_2 | undefined;
+    origin: PBVector3 | undefined;
     // (undocumented)
-    position: Vector3_2 | undefined;
+    position: PBVector3 | undefined;
 }
 
 // Warning: (ae-missing-release-tag) "RaycastQueryType" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -1896,7 +1868,7 @@ export type Task<T = unknown> = () => Promise<T>;
 // Warning: (ae-missing-release-tag) "TextAlignMode" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const enum TextAlignMode {
+export const enum TextAlignMode {
     // (undocumented)
     TAM_BOTTOM_CENTER = 7,
     // (undocumented)
@@ -1923,7 +1895,7 @@ export const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 // Warning: (ae-missing-release-tag) "Texture" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface Texture {
+export interface Texture {
     filterMode?: TextureFilterMode | undefined;
     // (undocumented)
     src: string;
@@ -1933,7 +1905,7 @@ interface Texture {
 // Warning: (ae-missing-release-tag) "TextureFilterMode" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const enum TextureFilterMode {
+export const enum TextureFilterMode {
     // (undocumented)
     TFM_BILINEAR = 1,
     // (undocumented)
@@ -1945,7 +1917,7 @@ const enum TextureFilterMode {
 // Warning: (ae-missing-release-tag) "TextureUnion" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface TextureUnion {
+export interface TextureUnion {
     // (undocumented)
     tex?: {
         $case: 'texture';
@@ -1959,7 +1931,7 @@ interface TextureUnion {
 // Warning: (ae-missing-release-tag) "TextureWrapMode" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const enum TextureWrapMode {
+export const enum TextureWrapMode {
     // (undocumented)
     TWM_CLAMP = 1,
     // (undocumented)
@@ -2025,16 +1997,6 @@ export const UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransf
 
 // @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;
-
-// Warning: (ae-missing-release-tag) "Vector2" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-interface Vector2 {
-    // (undocumented)
-    x: number;
-    // (undocumented)
-    y: number;
-}
 
 // @public
 export type Vector3 = Vector3.ReadonlyVector3;
@@ -2130,18 +2092,6 @@ export namespace Vector3 {
     export function transformNormalToRef(vector: ReadonlyVector3, transformation: Matrix.ReadonlyMatrix, result: MutableVector3): void;
     export function Up(): MutableVector3;
     export function Zero(): MutableVector3;
-}
-
-// Warning: (ae-missing-release-tag) "Vector3" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-interface Vector3_2 {
-    // (undocumented)
-    x: number;
-    // (undocumented)
-    y: number;
-    // (undocumented)
-    z: number;
 }
 
 // @public (undocumented)

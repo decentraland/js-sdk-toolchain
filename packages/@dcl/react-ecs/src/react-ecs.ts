@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import React from 'react'
-import { PBUiText, PBUiTransform, PBUiBackground, OnClick } from './components'
+import {
+  UiTextProps,
+  PBUiTransform,
+  UiBackgroundProps,
+  OnClick
+} from './components'
 import { CommonProps } from './components/types'
 
 export type EcsElements = {
@@ -11,8 +16,8 @@ export type EcsElements = {
 // TODO: Remove Omit when onClick its handled Unity Side
 export type EntityComponents = {
   uiTransform: PBUiTransform
-  uiText: PBUiText
-  uiBackground: PBUiBackground
+  uiText: UiTextProps
+  uiBackground: UiBackgroundProps
   onClick: OnClick
 }
 

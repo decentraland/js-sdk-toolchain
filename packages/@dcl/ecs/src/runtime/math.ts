@@ -10,6 +10,7 @@ import {
 } from '@dcl/ecs-math'
 import type { Matrix } from '@dcl/ecs-math/dist/Matrix'
 import type { Plane } from '@dcl/ecs-math/dist/Plane'
+
 export {
   FloatArray,
   DEG2RAD,

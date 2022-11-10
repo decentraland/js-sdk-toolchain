@@ -104,7 +104,7 @@ export type IEngine = {
     spec: T,
     componentId: number,
     constructorDefault?: ConstructorType
-  ): CompDef<ISchema<Result<T>>, ConstructorType>
+  ): CompDef<ISchema<Result<T>>, Partial<Result<T>>>
   /**
    * Define a component and add it to the engine.
    * @param spec An object with schema fields

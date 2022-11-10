@@ -131,18 +131,6 @@ flow('build-all', () => {
   })
   flow('@dcl/react-ecs', () => {
     itExecutes('npm i --quiet', REACT_ECS)
-    it('Copy proto files', async () => {
-      const protoTypesPath = `${REACT_ECS}/src/generated`
-      removeSync(protoTypesPath)
-      mkdirSync(protoTypesPath)
-
-      await createProtoTypes(
-        `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
-        protoTypesPath,
-        ['ui_transform.proto', 'ui_text.proto', 'ui_background.proto'],
-        `${ECS7_PATH}/node_modules/@dcl/protocol/proto`
-      )
-    })
     itExecutes('npm run build', REACT_ECS)
     it('check file exists', () => {
       fixReactTypes()
@@ -287,6 +275,7 @@ function fixTypes(
   pathToDts: string,
   { ignoreExportError } = { ignoreExportError: false }
 ) {
+  console.log({ boedo: 'fix types', pathToDts })
   let content = readFileSync(pathToDts).toString()
 
   content = content.replace(/^export declare/gm, 'declare')

@@ -16,7 +16,7 @@ export const CANVAS_ROOT_ENTITY = 7;
 // @public (undocumented)
 export type Children = any;
 
-// Warning: (ae-missing-release-tag) "Color3" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBColor3" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export interface Color3 {
@@ -28,7 +28,7 @@ export interface Color3 {
     r: number;
 }
 
-// Warning: (ae-missing-release-tag) "Color4" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBColor4" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export interface Color4 {
@@ -72,8 +72,8 @@ export type EcsElements = {
 // @public (undocumented)
 export type EntityComponents = {
     uiTransform: PBUiTransform;
-    uiText: PBUiText;
-    uiBackground: PBUiBackground;
+    uiText: UiTextProps;
+    uiBackground: UiBackgroundProps;
     onClick: OnClick;
 };
 
@@ -87,13 +87,11 @@ export type EntityPropTypes = {
 // Warning: (ae-missing-release-tag) "Font" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export enum Font {
+export const enum Font {
     // (undocumented)
     F_LIBERATION_SANS = 0,
     // (undocumented)
-    F_SANS_SERIF = 1,
-    // (undocumented)
-    UNRECOGNIZED = -1
+    F_SANS_SERIF = 1
 }
 
 // Warning: (ae-missing-release-tag) "isListener" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -132,25 +130,6 @@ export type Listeners = {
 //
 // @public (undocumented)
 export type OnClick = EventsSystem.Callback;
-
-// Warning: (ae-missing-release-tag) "PBUiBackground" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export interface PBUiBackground {
-    backgroundColor?: Color4 | undefined;
-}
-
-// Warning: (ae-missing-release-tag) "PBUiText" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export interface PBUiText {
-    color?: Color3 | undefined;
-    font?: Font | undefined;
-    fontSize?: number | undefined;
-    textAlign?: TextAlignMode | undefined;
-    // (undocumented)
-    value: string;
-}
 
 // Warning: (ae-missing-release-tag) "PBUiTransform" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -318,7 +297,7 @@ export function renderUi(ui: UiComponent): number;
 // Warning: (ae-missing-release-tag) "TextAlignMode" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export enum TextAlignMode {
+export const enum TextAlignMode {
     // (undocumented)
     TAM_BOTTOM_CENTER = 7,
     // (undocumented)
@@ -336,15 +315,15 @@ export enum TextAlignMode {
     // (undocumented)
     TAM_TOP_LEFT = 0,
     // (undocumented)
-    TAM_TOP_RIGHT = 2,
-    // (undocumented)
-    UNRECOGNIZED = -1
+    TAM_TOP_RIGHT = 2
 }
 
-// Warning: (ae-missing-release-tag) "UiBackgroundProps" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBUiBackground" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type UiBackgroundProps = PBUiBackground;
+export interface UiBackgroundProps {
+    backgroundColor?: Color4 | undefined;
+}
 
 // Warning: (ae-missing-release-tag) "UiComponent" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -354,10 +333,17 @@ export type UiComponent = () => JSX.Element;
 // @public (undocumented)
 export function UiEntity(props: EntityPropTypes & Partial<CommonProps>): ReactEcs.JSX.Element;
 
-// Warning: (ae-missing-release-tag) "UiTextProps" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBUiText" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type UiTextProps = PBUiText;
+export interface UiTextProps {
+    color?: Color3 | undefined;
+    font?: Font | undefined;
+    fontSize?: number | undefined;
+    textAlign?: TextAlignMode | undefined;
+    // (undocumented)
+    value: string;
+}
 
 // @public (undocumented)
 export interface UiTransformProps {
@@ -412,9 +398,7 @@ export interface UiTransformProps {
 // Warning: (ae-missing-release-tag) "YGAlign" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export enum YGAlign {
-    // (undocumented)
-    UNRECOGNIZED = -1,
+export const enum YGAlign {
     // (undocumented)
     YGA_AUTO = 0,
     // (undocumented)
@@ -436,9 +420,7 @@ export enum YGAlign {
 // Warning: (ae-missing-release-tag) "YGDirection" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export enum YGDirection {
-    // (undocumented)
-    UNRECOGNIZED = -1,
+export const enum YGDirection {
     // (undocumented)
     YGD_INHERIT = 0,
     // (undocumented)
@@ -450,9 +432,7 @@ export enum YGDirection {
 // Warning: (ae-missing-release-tag) "YGDisplay" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export enum YGDisplay {
-    // (undocumented)
-    UNRECOGNIZED = -1,
+export const enum YGDisplay {
     // (undocumented)
     YGD_FLEX = 0,
     // (undocumented)
@@ -462,9 +442,7 @@ export enum YGDisplay {
 // Warning: (ae-missing-release-tag) "YGFlexDirection" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export enum YGFlexDirection {
-    // (undocumented)
-    UNRECOGNIZED = -1,
+export const enum YGFlexDirection {
     // (undocumented)
     YGFD_COLUMN = 0,
     // (undocumented)
@@ -478,9 +456,7 @@ export enum YGFlexDirection {
 // Warning: (ae-missing-release-tag) "YGJustify" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export enum YGJustify {
-    // (undocumented)
-    UNRECOGNIZED = -1,
+export const enum YGJustify {
     // (undocumented)
     YGJ_CENTER = 1,
     // (undocumented)
@@ -498,9 +474,7 @@ export enum YGJustify {
 // Warning: (ae-missing-release-tag) "YGOverflow" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export enum YGOverflow {
-    // (undocumented)
-    UNRECOGNIZED = -1,
+export const enum YGOverflow {
     // (undocumented)
     YGO_HIDDEN = 1,
     // (undocumented)
@@ -512,9 +486,7 @@ export enum YGOverflow {
 // Warning: (ae-missing-release-tag) "YGPositionType" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export enum YGPositionType {
-    // (undocumented)
-    UNRECOGNIZED = -1,
+export const enum YGPositionType {
     // (undocumented)
     YGPT_ABSOLUTE = 2,
     // (undocumented)
@@ -526,9 +498,7 @@ export enum YGPositionType {
 // Warning: (ae-missing-release-tag) "YGUnit" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export enum YGUnit {
-    // (undocumented)
-    UNRECOGNIZED = -1,
+export const enum YGUnit {
     // (undocumented)
     YGU_AUTO = 3,
     // (undocumented)
@@ -542,9 +512,7 @@ export enum YGUnit {
 // Warning: (ae-missing-release-tag) "YGWrap" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export enum YGWrap {
-    // (undocumented)
-    UNRECOGNIZED = -1,
+export const enum YGWrap {
     // (undocumented)
     YGW_NO_WRAP = 0,
     // (undocumented)
