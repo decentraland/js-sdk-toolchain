@@ -48,7 +48,9 @@ const defaultInitialCapacity = 10240
  * - Use read and write function to generate or consume data.
  * - Use set and get only if you are sure that you're doing.
  */
-export function createByteBuffer(options: CreateByteBufferOptions = {}) {
+export function createByteBuffer(
+  options: CreateByteBufferOptions = {}
+): ByteBuffer {
   const initialROffset: number = options.reading?.currentOffset || 0
   let initialBuffer: Uint8Array | null = null
   let initialWOffset: number = 0
@@ -102,50 +104,25 @@ export function createByteBuffer(options: CreateByteBufferOptions = {}) {
   }
 
   return {
-    /**
-     * @returns The entire current Uint8Array.
-     *
-     * WARNING: if the buffer grows, the view had changed itself,
-     *  and the reference will be a invalid one.
-     */
     buffer(): Uint8Array {
       return buffer
     },
-    /**
-     * @returns The capacity of the current buffer
-     */
     bufferLength(): number {
       return buffer.length
     },
-    /**
-     * Resets byteBuffer to avoid creating a new one
-     */
     resetBuffer(): void {
       roffset = 0
       woffset = 0
     },
-    /**
-     * @returns The current read offset
-     */
     currentReadOffset(): number {
       return roffset
     },
-    /**
-     * @returns The current write offset
-     */
     currentWriteOffset(): number {
       return woffset
     },
-    /**
-     * Reading purpose
-     * Returns the previuos offsset size before incrementing
-     */
     incrementReadOffset(amount: number): number {
       return roAdd(amount)
     },
-    /**
-     * @returns How many bytes are available to read.
-     */
     remainingBytes(): number {
       return woffset - roffset
     },
@@ -183,43 +160,18 @@ export function createByteBuffer(options: CreateByteBufferOptions = {}) {
       const length = view.getUint32(roAdd(4))
       return buffer.subarray(roAdd(length), roAdd(0))
     },
-    /**
-     * Writing purpose
-     */
-    /**
-     * Increment offset
-     * @param amount - how many bytes
-     * @returns The offset when this reserving starts.
-     */
     incrementWriteOffset(amount: number): number {
       return woAdd(amount)
     },
-    /**
-     * @returns The total number of bytes writen in the buffer.
-     */
     size(): number {
       return woffset
     },
-    /**
-     * Take care using this function, if you modify the data after, the
-     * returned subarray will change too. If you'll modify the content of the
-     * bytebuffer, maybe you want to use toCopiedBinary()
-     *
-     * @returns The subarray from 0 to offset as reference.
-     */
     toBinary() {
       return buffer.subarray(0, woffset)
     },
-
-    /**
-     * Safe copied buffer of the current data of ByteBuffer
-     *
-     * @returns The subarray from 0 to offset.
-     */
     toCopiedBinary() {
       return new Uint8Array(this.toBinary())
     },
-
     writeBuffer(value: Uint8Array, writeLength: boolean = true) {
       if (writeLength) {
         this.writeUint32(value.byteLength)
@@ -335,4 +287,109 @@ export function createByteBuffer(options: CreateByteBufferOptions = {}) {
 /**
  * @public
  */
-export type ByteBuffer = ReturnType<typeof createByteBuffer>
+export type ByteBuffer = {
+  /**
+   * @returns The entire current Uint8Array.
+   *
+   * WARNING: if the buffer grows, the view had changed itself,
+   *  and the reference will be a invalid one.
+   */
+  buffer(): Uint8Array
+  /**
+   * @returns The capacity of the current buffer
+   */
+  bufferLength(): number
+  /**
+   * Resets byteBuffer to avoid creating a new one
+   */
+  resetBuffer(): void
+  /**
+   * @returns The current read offset
+   */
+  currentReadOffset(): number
+  /**
+   * @returns The current write offset
+   */
+  currentWriteOffset(): number
+  /**
+   * Reading purpose
+   * Returns the previuos offsset size before incrementing
+   */
+  incrementReadOffset(amount: number): number
+  /**
+   * @returns How many bytes are available to read.
+   */
+  remainingBytes(): number
+  readFloat32(): number
+  readFloat64(): number
+  readInt8(): number
+  readInt16(): number
+  readInt32(): number
+  readInt64(): bigint
+  readUint8(): number
+  readUint16(): number
+  readUint32(): number
+  readUint64(): bigint
+  readBuffer(): Uint8Array
+  /**
+   * Writing purpose
+   */
+  /**
+   * Increment offset
+   * @param amount - how many bytes
+   * @returns The offset when this reserving starts.
+   */
+  incrementWriteOffset(amount: number): number
+  /**
+   * @returns The total number of bytes writen in the buffer.
+   */
+  size(): number
+  /**
+   * Take care using this function, if you modify the data after, the
+   * returned subarray will change too. If you'll modify the content of the
+   * bytebuffer, maybe you want to use toCopiedBinary()
+   *
+   * @returns The subarray from 0 to offset as reference.
+   */
+  toBinary(): Uint8Array
+
+  /**
+   * Safe copied buffer of the current data of ByteBuffer
+   *
+   * @returns The subarray from 0 to offset.
+   */
+  toCopiedBinary(): Uint8Array
+
+  writeBuffer(value: Uint8Array, writeLength?: boolean): void
+  writeFloat32(value: number): void
+  writeFloat64(value: number): void
+  writeInt8(value: number): void
+  writeInt16(value: number): void
+  writeInt32(value: number): void
+  writeInt64(value: bigint): void
+  writeUint8(value: number): void
+  writeUint16(value: number): void
+  writeUint32(value: number): void
+  writeUint64(value: bigint): void
+  // Dataview Proxy
+  getFloat32(offset: number): number
+  getFloat64(offset: number): number
+  getInt8(offset: number): number
+  getInt16(offset: number): number
+  getInt32(offset: number): number
+  getInt64(offset: number): bigint
+  getUint8(offset: number): number
+  getUint16(offset: number): number
+  getUint32(offset: number): number
+  getUint64(offset: number): bigint
+  setFloat32(offset: number, value: number): void
+  setFloat64(offset: number, value: number): void
+  setInt8(offset: number, value: number): void
+  setInt16(offset: number, value: number): void
+  setInt32(offset: number, value: number): void
+  setInt64(offset: number, value: bigint): void
+  setUint8(offset: number, value: number): void
+  setUint16(offset: number, value: number): void
+  setUint32(offset: number, value: number): void
+  setUint64(offset: number, value: bigint): void
+}

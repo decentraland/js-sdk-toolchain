@@ -1,6 +1,6 @@
 import { crdtProtocol, Message as CrdtMessage } from '@dcl/crdt'
 
-import type { PreEngine } from '../../engine'
+import type { IEngine } from '../../engine'
 import { Entity } from '../../engine/entity'
 import { createByteBuffer } from '../../serialization/ByteBuffer'
 import { ComponentOperation as Message } from '../../serialization/crdt/componentOperation'
@@ -8,7 +8,7 @@ import WireMessage from '../../serialization/wireMessage'
 import { Transport } from './transports/types'
 import { ReceiveMessage, TransportMessage } from './types'
 
-export function crdtSceneSystem({ engine }: { engine: PreEngine }) {
+export function crdtSceneSystem(engine: Pick<IEngine, 'getComponent'>) {
   const transports: Transport[] = []
 
   // CRDT Client

@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { Component } from './generateComponent'
+import generateExportedTypes from './generateExportedTypes'
 
 const TransformComponent = {
   componentId: 1,
@@ -14,6 +15,10 @@ function enumTemplate({ componentPascalName, componentId }: Component) {
 
 function importComponent(component: Component) {
   return `import * as ${component.componentPascalName}Schema from './${component.componentPascalName}.gen'`
+}
+
+function exportComponent(component: Component) {
+  return `export * from './pb/decentraland/sdk/components/${component.componentFile}.gen'`
 }
 
 function defineComponent(component: Component) {
@@ -34,6 +39,7 @@ function namespaceComponent(component: Component) {
 const indexTemplate = `import type { IEngine } from '../../engine/types'
 import * as TransformSchema from '../legacy/Transform'
 $componentImports
+$componentExports
 
 export function defineLibraryComponents({
   defineComponentFromSchema
@@ -70,7 +76,6 @@ export function generateIndex(param: {
   generatedPath: string
 }) {
   const { components, generatedPath } = param
-
   const componentWithoutIndex = components.filter(
     (component) => component.componentPascalName !== 'index'
   )
@@ -83,6 +88,10 @@ export function generateIndex(param: {
     .replace(
       '$componentImports',
       componentWithoutIndex.map(importComponent).join('\n')
+    )
+    .replace(
+      '$componentExports',
+      componentWithoutIndex.map(exportComponent).join('\n')
     )
 
   fs.writeFileSync(path.resolve(generatedPath, 'index.gen.ts'), indexContent)
@@ -110,4 +119,5 @@ export function generateIndex(param: {
   )
 
   fs.writeFileSync(path.resolve(generatedPath, 'ids.gen.ts'), idsContent)
+  generateExportedTypes(generatedPath)
 }
