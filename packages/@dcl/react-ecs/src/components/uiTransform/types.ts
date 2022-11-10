@@ -33,8 +33,6 @@ export type Position = {
   left: PositionUnit
 }
 
-export const CANVAS_ROOT_ENTITY = 7
-
 /**
  * @public
  */

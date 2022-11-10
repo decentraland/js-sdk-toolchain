@@ -1,6 +1,5 @@
 import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import {
-  CANVAS_ROOT_ENTITY,
   Position,
   PositionUnit,
   ReactEcs,
@@ -9,6 +8,7 @@ import {
   YGUnit,
   YGWrap
 } from '../../packages/@dcl/react-ecs/src'
+import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 
 declare const engine: IEngine
 
