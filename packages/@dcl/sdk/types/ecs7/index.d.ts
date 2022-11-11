@@ -1149,10 +1149,6 @@ declare type DeepReadonlyObject<T> = {
  */
 declare type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 
-<<<<<<< HEAD
-declare function defineSdkComponents(engine: PreEngine): {
-    Animator: AnimatorComponentDefinition;
-=======
 declare function defineComponent<T extends ISchema, ConstructorType = ComponentType<T>>(componentId: number, spec: T, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
 
 declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEngine, 'defineComponentFromSchema'>): {
@@ -1182,8 +1178,8 @@ declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEn
     VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 };
 
-declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponentFromSchema'>): {
->>>>>>> aa008f1 (fix missing-ae-exports for make build)
+declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponentFromSchema' | 'getComponent'>): {
+    Animator: AnimatorComponentDefinition;
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
@@ -2641,6 +2637,10 @@ declare interface PBAnimationState {
     /** default=true */
     loop?: boolean | undefined;
     shouldReset?: boolean | undefined;
+}
+
+declare interface PBAnimator {
+    states: PBAnimationState[];
 }
 
 declare interface PBAudioSource {

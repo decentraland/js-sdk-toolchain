@@ -11,7 +11,6 @@ export const Animator: AnimatorComponentDefinition;
 
 // @public (undocumented)
 export interface AnimatorComponentDefinition extends ComponentDefinition {
-    // Warning: (ae-forgotten-export) The symbol "PBAnimationState" needs to be exported by the entry point index.d.ts
     getClip(entity: Entity, name: string): PBAnimationState;
     getClipOrNull(entity: Entity, name: string): PBAnimationState | null;
     playSingleAnimation(entity: Entity, name: string, resetCursor?: boolean): boolean;
@@ -450,9 +449,9 @@ export function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEng
 // Warning: (ae-missing-release-tag) "defineSdkComponents" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export function defineSdkComponents(engine: Pick<IEngine, 'defineComponentFromSchema'>): {
+export function defineSdkComponents(engine: Pick<IEngine, 'defineComponentFromSchema' | 'getComponent'>): {
+    Animator: AnimatorComponentDefinition;
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
-    Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
     AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
@@ -1835,13 +1834,8 @@ export namespace Schemas {
     const // (undocumented)
     Color4: ISchema<Color4Type>;
     const // (undocumented)
-<<<<<<< HEAD
     Entity: ISchema<Entity>;
-    const // Warning: (ae-forgotten-export) The symbol "IEnum" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-=======
->>>>>>> aa008f1 (fix missing-ae-exports for make build)
+    const // (undocumented)
     Enum: typeof IEnum;
     const // (undocumented)
     Array: typeof IArray;
