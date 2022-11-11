@@ -3,7 +3,10 @@ import path from 'path'
 import { snakeToPascal } from '../utils/snakeToPascal'
 
 function generaeteTypes(files: { name: string; path: string }[]) {
-  return `${files
+  return `
+  export { Position as PBPosition, Vector2 as PBVector2, Vector3 as PBVector3 } from './pb/decentraland/common/vectors.gen';
+  export { Color3 as PBColor3, Color4 as PBColor4 } from './pb/decentraland/common/colors.gen';
+  ${files
     .map(
       (f) => `export * from '.${f.path}.gen'
 // export { ${f.name} }
@@ -16,7 +19,6 @@ const sdkCommonPath = '/pb/decentraland/sdk/components/common'
 const commonPath = '/pb/decentraland/common'
 
 export default function generateTypes(pathDir: string) {
-  return
   const getFiles = (dir: string, pathname: string) =>
     fs.readdirSync(dir + pathname).map((file) => {
       const filename = file.replace('.gen.ts', '')
@@ -30,7 +32,7 @@ export default function generateTypes(pathDir: string) {
   const files = [
     ...getFiles(pathDir, sdkCommonPath),
     ...getFiles(pathDir, commonPath)
-  ].filter((f) => !['PbId'].includes(f.name))
+  ].filter((f) => !['PbId', 'PbColors', 'PbVectors'].includes(f.name))
 
   const typesContent = generaeteTypes(files)
   fs.writeFileSync(path.resolve(pathDir, 'types.gen.ts'), typesContent)
