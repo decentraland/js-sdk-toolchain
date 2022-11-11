@@ -453,4 +453,25 @@ describe('Serialization Types', () => {
 
     expect(value).toBeDeepCloseTo(originalValue)
   })
+
+  it('should serialize Entities', () => {
+    const engine = Engine()
+    const entity = engine.addEntity()
+    const entityCopied = engine.addEntity()
+    const someEntity = engine.addEntity()
+    let COMPONENT_ID = 888
+
+    const EntityComponent = engine.defineComponent(
+      { value: Schemas.Entity },
+      COMPONENT_ID++
+    )
+    const myEntity = EntityComponent.create(entity, { value: someEntity })
+    expect(myEntity.value).toBe(someEntity)
+
+    const buffer = EntityComponent.toBinary(entity)
+    const copiedEntity = EntityComponent.create(entityCopied)
+    expect(copiedEntity.value).toBe(engine.RootEntity)
+    const updatedEntity = EntityComponent.updateFromBinary(entityCopied, buffer)
+    expect(updatedEntity!.value).toBe(someEntity)
+  })
 })

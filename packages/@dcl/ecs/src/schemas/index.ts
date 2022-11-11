@@ -6,6 +6,7 @@ import { Int16, Int32, Int8, Int64 as iInt64 } from './basic/Integer'
 import { EcsString } from './basic/String'
 import { Color3Schema } from './custom/Color3'
 import { Color4Schema } from './custom/Color4'
+import { EntitySchema } from './custom/Entity'
 import { QuaternionSchema } from './custom/Quaternion'
 import { Vector3Schema } from './custom/Vector3'
 import { ISchema } from './ISchema'
@@ -36,6 +37,8 @@ export namespace Schemas {
   export const Quaternion = QuaternionSchema
   export const Color3 = Color3Schema
   export const Color4 = Color4Schema
+
+  export const Entity = EntitySchema
 
   export const Enum = IEnum
   export const Array = IArray

@@ -6,10 +6,17 @@
 
 /// <reference types="@dcl/posix" />
 
-// Warning: (ae-forgotten-export) The symbol "PBAnimator" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
-export const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+export const Animator: AnimatorComponentDefinition;
+
+// @public (undocumented)
+export interface AnimatorComponentDefinition extends ComponentDefinition {
+    // Warning: (ae-forgotten-export) The symbol "PBAnimationState" needs to be exported by the entry point index.d.ts
+    getClip(entity: Entity, name: string): PBAnimationState;
+    getClipOrNull(entity: Entity, name: string): PBAnimationState | null;
+    playSingleAnimation(entity: Entity, name: string, resetCursor?: boolean): boolean;
+    stopAllAnimations(entity: Entity, resetCursor?: boolean): boolean;
+}
 
 // Warning: (ae-forgotten-export) The symbol "PBAudioSource" needs to be exported by the entry point index.d.ts
 //
@@ -225,7 +232,7 @@ export namespace Components {
     // (undocumented)
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     const // (undocumented)
-    Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+    Animator: AnimatorComponentDefinition;
     const // (undocumented)
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     const // (undocumented)
@@ -730,6 +737,8 @@ export namespace Schemas {
     //
     // (undocumented)
     Color4: ISchema<Color4Type>;
+    const // (undocumented)
+    Entity: ISchema<Entity>;
     const // Warning: (ae-forgotten-export) The symbol "IEnum" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
