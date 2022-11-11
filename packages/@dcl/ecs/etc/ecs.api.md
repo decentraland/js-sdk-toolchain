@@ -611,10 +611,10 @@ export namespace Quaternion {
     w?: number): MutableQuaternion;
     export function dot(left: ReadonlyQuaternion, right: ReadonlyQuaternion): number;
     // (undocumented)
-    export function fromAngleAxis(degress: number, axis: Vector3.ReadonlyVector3): MutableQuaternion;
+    export function fromAngleAxis(degrees: number, axis: Vector3.ReadonlyVector3): MutableQuaternion;
     export function fromAxisToRotationQuaternion(axis1: Vector3.ReadonlyVector3, axis2: Vector3.ReadonlyVector3, axis3: Vector3.ReadonlyVector3): MutableQuaternion;
     export function fromAxisToRotationQuaternionToRef(axis1: Vector3.ReadonlyVector3, axis2: Vector3.ReadonlyVector3, axis3: Vector3.ReadonlyVector3, ref: MutableQuaternion): void;
-    export function fromEulerDegress(x: number, y: number, z: number): MutableQuaternion;
+    export function fromEulerDegrees(x: number, y: number, z: number): MutableQuaternion;
     export function fromLookAt(position: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, worldUp?: Vector3.ReadonlyVector3): MutableQuaternion;
     export function fromLookAtToRef(position: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, worldUp: Vector3.ReadonlyVector3 | undefined, result: MutableQuaternion): void;
     // Warning: (ae-forgotten-export) The symbol "Matrix" needs to be exported by the entry point index.d.ts
