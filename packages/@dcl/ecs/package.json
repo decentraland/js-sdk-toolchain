@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@dcl/crdt": "^1.0.0-20220819145912.commit-35069cd",
-    "@dcl/ecs-math": "^2.0.1-20221018212447.commit-82ecfec",
+    "@dcl/ecs-math": "^2.0.1-20221108141807.commit-a1344cb",
     "@dcl/posix": "^1.0.4",
     "@dcl/protocol": "^1.0.0-3462922101.commit-3985a0a"
   },

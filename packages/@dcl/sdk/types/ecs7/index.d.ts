@@ -1,7 +1,50 @@
 /// <reference types="@dcl/posix" />
 
 /** @public */
-declare const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+declare const Animator: AnimatorComponentDefinition;
+
+/**
+ * @public
+ */
+declare interface AnimatorComponentDefinition extends ComponentDefinition {
+    /**
+     * @public
+     *
+     * Get a `mutable` version of animator clip
+     * @param entity - entity with Animator component
+     * @param name - the field `name` of the component
+     * @returns the clip or fails if it isn't found
+     */
+    getClip(entity: Entity, name: string): PBAnimationState;
+    /**
+     * @public
+     *
+     * Get a `mutable` version of animator clip
+     * @param entity - entity with Animator component
+     * @param name - the field `name` of the component
+     * @returns the clip or null if it isn't found
+     */
+    getClipOrNull(entity: Entity, name: string): PBAnimationState | null;
+    /**
+     * @public
+     *
+     * Set playing=true the animation `$name`
+     * @param entity - entity with Animator component
+     * @param name - animation name
+     * @param resetCursor - the animation starts at 0 or continues from the current cursor position
+     * @returns true in successful playing, false if it doesn't find the Animator or clip
+     */
+    playSingleAnimation(entity: Entity, name: string, resetCursor?: boolean): boolean;
+    /**
+     * @public
+     *
+     * Set playing=false all animations
+     * @param entity - entity with Animator component
+     * @param resetCursor - the animation stops at 0 or at the current cursor position
+     * @returns true in successful playing, false if it doesn't find the Animator
+     */
+    stopAllAnimations(entity: Entity, resetCursor?: boolean): boolean;
+}
 
 /** @public */
 declare const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
@@ -917,7 +960,7 @@ declare namespace Components {
     /** @public */
     const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     /** @public */
-    const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+    const Animator: AnimatorComponentDefinition;
     /** @public */
     const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     /** @public */
@@ -1156,8 +1199,8 @@ declare type DeepReadonlyObject<T> = {
 declare type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 
 declare function defineSdkComponents(engine: PreEngine): {
+    Animator: AnimatorComponentDefinition;
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
-    Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
     AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
@@ -2616,10 +2659,6 @@ declare interface PBAnimationState {
     shouldReset?: boolean | undefined;
 }
 
-declare interface PBAnimator {
-    states: PBAnimationState[];
-}
-
 declare interface PBAudioSource {
     playing?: boolean | undefined;
     /** default=1.0f */
@@ -3262,7 +3301,7 @@ declare namespace Quaternion {
      * @param y - the rotation on the y axis in euler degrees
      * @param z - the rotation on the z axis in euler degrees
      */
-    export function fromEulerDegress(x: number, y: number, z: number): MutableQuaternion;
+    export function fromEulerDegrees(x: number, y: number, z: number): MutableQuaternion;
     /**
      * Gets length of current quaternion
      * @returns the quaternion length (float)
@@ -3284,7 +3323,7 @@ declare namespace Quaternion {
      * Returns the angle in degrees between two rotations a and b.
      * @param quat1 - defines the first quaternion
      * @param quat2 - defines the second quaternion
-     * @returns the degress angle
+     * @returns the degrees angle
      */
     export function angle(quat1: ReadonlyQuaternion, quat2: ReadonlyQuaternion): number;
     /**
@@ -3320,7 +3359,7 @@ declare namespace Quaternion {
      * Gets or sets the euler angle representation of the rotation.
      * Implemented unity-based calculations from: https://stackoverflow.com/a/56055813
      * @public
-     * @returns a new Vector3 with euler angles degress
+     * @returns a new Vector3 with euler angles degrees
      */
     export function toEulerAngles(q: MutableQuaternion): Vector3.Mutable;
     /**
@@ -3370,11 +3409,11 @@ declare namespace Quaternion {
     export function multiplyToRef(self: ReadonlyQuaternion, q1: ReadonlyQuaternion, result: MutableQuaternion): void;
     /**
      *
-     * @param degress - the angle degress
+     * @param degrees - the angle degrees
      * @param axis - vector3
      * @returns a new Quaternion
      */
-    export function fromAngleAxis(degress: number, axis: Vector3.ReadonlyVector3): MutableQuaternion;
+    export function fromAngleAxis(degrees: number, axis: Vector3.ReadonlyVector3): MutableQuaternion;
     /**
      * Creates a new quaternion containing the rotation value to reach the target (axis1, axis2, axis3) orientation as a rotated XYZ system (axis1, axis2 and axis3 are normalized during this operation)
      * @param axis1 - defines the first axis
@@ -3684,6 +3723,7 @@ declare namespace Schemas {
     const Quaternion: ISchema<QuaternionType>;
     const Color3: ISchema<Color3Type>;
     const Color4: ISchema<Color4Type>;
+    const Entity: ISchema<Entity>;
     const Enum: typeof IEnum;
     const Array: typeof IArray;
     const Map: typeof IMap;
