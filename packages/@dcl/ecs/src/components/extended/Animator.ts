@@ -1,4 +1,4 @@
-import { ComponentDefinition, Entity, PreEngine } from '../../engine'
+import { ComponentDefinition, Entity, IEngine } from '../../engine'
 import {
   PBAnimationState,
   PBAnimator
@@ -56,7 +56,7 @@ export interface AnimatorComponentDefinition extends ComponentDefinition {
 }
 
 export function defineAnimatorComponent(
-  engine: PreEngine
+  engine: Pick<IEngine, 'getComponent'>
 ): AnimatorComponentDefinition {
   const Animator = engine.getComponent<typeof AnimatorSchema.AnimatorSchema>(
     AnimatorSchema.COMPONENT_ID

@@ -11,57 +11,146 @@ export const Animator: AnimatorComponentDefinition;
 
 // @public (undocumented)
 export interface AnimatorComponentDefinition extends ComponentDefinition {
-    // Warning: (ae-forgotten-export) The symbol "PBAnimationState" needs to be exported by the entry point index.d.ts
     getClip(entity: Entity, name: string): PBAnimationState;
     getClipOrNull(entity: Entity, name: string): PBAnimationState | null;
     playSingleAnimation(entity: Entity, name: string, resetCursor?: boolean): boolean;
     stopAllAnimations(entity: Entity, resetCursor?: boolean): boolean;
 }
 
-// Warning: (ae-forgotten-export) The symbol "PBAudioSource" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
 
-// Warning: (ae-forgotten-export) The symbol "PBAudioStream" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
 
-// Warning: (ae-forgotten-export) The symbol "PBAvatarAttach" needs to be exported by the entry point index.d.ts
+// Warning: (ae-missing-release-tag) "AvatarAnchorPointType" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
+// @public (undocumented)
+export const enum AvatarAnchorPointType {
+    // (undocumented)
+    AAPT_LEFT_HAND = 2,
+    // (undocumented)
+    AAPT_NAME_TAG = 1,
+    // (undocumented)
+    AAPT_POSITION = 0,
+    // (undocumented)
+    AAPT_RIGHT_HAND = 3
+}
+
 // @public (undocumented)
 export const AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
 
-// Warning: (ae-forgotten-export) The symbol "PBAvatarModifierArea" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
 
-// Warning: (ae-forgotten-export) The symbol "PBAvatarShape" needs to be exported by the entry point index.d.ts
+// Warning: (ae-missing-release-tag) "AvatarModifierType" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
+// @public (undocumented)
+export const enum AvatarModifierType {
+    // (undocumented)
+    AMT_DISABLE_PASSPORTS = 1,
+    // (undocumented)
+    AMT_HIDE_AVATARS = 0
+}
+
 // @public (undocumented)
 export const AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
 
-// Warning: (ae-forgotten-export) The symbol "PBBillboard" needs to be exported by the entry point index.d.ts
+// Warning: (ae-missing-release-tag) "AvatarTexture" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
+// @public (undocumented)
+export interface AvatarTexture {
+    filterMode?: TextureFilterMode | undefined;
+    // (undocumented)
+    userId: string;
+    wrapMode?: TextureWrapMode | undefined;
+}
+
 // @public (undocumented)
 export const Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
 
-// Warning: (ae-forgotten-export) The symbol "createByteBuffer" needs to be exported by the entry point index.d.ts
+// Warning: (ae-missing-release-tag) "BillboardMode" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type ByteBuffer = ReturnType<typeof createByteBuffer>;
+export const enum BillboardMode {
+    // (undocumented)
+    BM_ALL_AXES = 0,
+    // (undocumented)
+    BM_Y_AXE = 1
+}
 
-// Warning: (ae-forgotten-export) The symbol "PBCameraMode" needs to be exported by the entry point index.d.ts
-//
+// @public (undocumented)
+export type ByteBuffer = {
+    buffer(): Uint8Array;
+    bufferLength(): number;
+    resetBuffer(): void;
+    currentReadOffset(): number;
+    currentWriteOffset(): number;
+    incrementReadOffset(amount: number): number;
+    remainingBytes(): number;
+    readFloat32(): number;
+    readFloat64(): number;
+    readInt8(): number;
+    readInt16(): number;
+    readInt32(): number;
+    readInt64(): bigint;
+    readUint8(): number;
+    readUint16(): number;
+    readUint32(): number;
+    readUint64(): bigint;
+    readBuffer(): Uint8Array;
+    incrementWriteOffset(amount: number): number;
+    size(): number;
+    toBinary(): Uint8Array;
+    toCopiedBinary(): Uint8Array;
+    writeBuffer(value: Uint8Array, writeLength?: boolean): void;
+    writeFloat32(value: number): void;
+    writeFloat64(value: number): void;
+    writeInt8(value: number): void;
+    writeInt16(value: number): void;
+    writeInt32(value: number): void;
+    writeInt64(value: bigint): void;
+    writeUint8(value: number): void;
+    writeUint16(value: number): void;
+    writeUint32(value: number): void;
+    writeUint64(value: bigint): void;
+    getFloat32(offset: number): number;
+    getFloat64(offset: number): number;
+    getInt8(offset: number): number;
+    getInt16(offset: number): number;
+    getInt32(offset: number): number;
+    getInt64(offset: number): bigint;
+    getUint8(offset: number): number;
+    getUint16(offset: number): number;
+    getUint32(offset: number): number;
+    getUint64(offset: number): bigint;
+    setFloat32(offset: number, value: number): void;
+    setFloat64(offset: number, value: number): void;
+    setInt8(offset: number, value: number): void;
+    setInt16(offset: number, value: number): void;
+    setInt32(offset: number, value: number): void;
+    setInt64(offset: number, value: bigint): void;
+    setUint8(offset: number, value: number): void;
+    setUint16(offset: number, value: number): void;
+    setUint32(offset: number, value: number): void;
+    setUint64(offset: number, value: bigint): void;
+};
+
 // @public (undocumented)
 export const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
 
-// Warning: (ae-forgotten-export) The symbol "PBCameraModeArea" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
+
+// Warning: (ae-missing-release-tag) "CameraType" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum CameraType {
+    // (undocumented)
+    CT_FIRST_PERSON = 0,
+    // (undocumented)
+    CT_THIRD_PERSON = 1
+}
 
 // Warning: (ae-missing-release-tag) "ColliderLayer" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -131,7 +220,6 @@ export namespace Color3 {
     export function subtract(value: ReadonlyColor3, otherColor: ReadonlyColor3): MutableColor3;
     export function subtractToRef(value: ReadonlyColor3, otherColor: ReadonlyColor3, result: MutableColor3): void;
     export function Teal(): MutableColor3;
-    // Warning: (ae-forgotten-export) The symbol "FloatArray" needs to be exported by the entry point index.d.ts
     export function toArray(value: ReadonlyColor3, array: FloatArray, index?: number): void;
     export function toColor4(value: ReadonlyColor3, alpha?: number): Color4.MutableColor4;
     export function toGammaSpace(value: ReadonlyColor3): ReadonlyColor3;
@@ -144,6 +232,13 @@ export namespace Color3 {
     export function White(): MutableColor3;
     export function Yellow(): MutableColor3;
 }
+
+// @public (undocumented)
+export type Color3Type = {
+    r: number;
+    g: number;
+    b: number;
+};
 
 // @public
 export type Color4 = Color4.ReadonlyColor4;
@@ -211,6 +306,14 @@ export namespace Color4 {
 }
 
 // @public (undocumented)
+export type Color4Type = {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+};
+
+// @public (undocumented)
 export type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorType = ComponentType<T>> = {
     _id: number;
     default(): DeepReadonly<ComponentType<T>>;
@@ -227,9 +330,7 @@ export type ComponentDefinition<T extends ISchema = ISchema<any>, ConstructorTyp
 
 // @public (undocumented)
 export namespace Components {
-    const // Warning: (ae-forgotten-export) The symbol "TransformType" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     const // (undocumented)
     Animator: AnimatorComponentDefinition;
@@ -249,65 +350,35 @@ export namespace Components {
     CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
     const // (undocumented)
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
-    const // Warning: (ae-forgotten-export) The symbol "PBGltfContainer" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
-    const // Warning: (ae-forgotten-export) The symbol "PBMaterial" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
-    const // Warning: (ae-forgotten-export) The symbol "PBMeshCollider" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
-    const // Warning: (ae-forgotten-export) The symbol "PBMeshRenderer" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
-    const // Warning: (ae-forgotten-export) The symbol "PBNftShape" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
-    const // Warning: (ae-forgotten-export) The symbol "PBPointerEventsResult" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
-    const // Warning: (ae-forgotten-export) The symbol "PBPointerHoverFeedback" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
-    const // Warning: (ae-forgotten-export) The symbol "PBPointerLock" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
-    const // Warning: (ae-forgotten-export) The symbol "PBRaycast" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
-    const // Warning: (ae-forgotten-export) The symbol "PBRaycastResult" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
-    const // Warning: (ae-forgotten-export) The symbol "PBTextShape" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
-    const // Warning: (ae-forgotten-export) The symbol "PBUiBackground" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     UiBackground: ComponentDefinition<ISchema<PBUiBackground>, PBUiBackground>;
-    const // Warning: (ae-forgotten-export) The symbol "PBUiText" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
-    const // Warning: (ae-forgotten-export) The symbol "PBUiTransform" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
-    const // Warning: (ae-forgotten-export) The symbol "PBVisibilityComponent" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 }
 
@@ -316,8 +387,6 @@ export type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefiniti
     [K in keyof T]: T[K] extends ComponentDefinition ? ReturnType<T[K]['getMutable']> : never;
 };
 
-// Warning: (ae-forgotten-export) The symbol "EcsResult" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type ComponentType<T extends ISchema> = EcsResult<T>;
 
@@ -342,8 +411,77 @@ export type DeepReadonlyObject<T> = {
 // @public (undocumented)
 export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 
+// Warning: (ae-missing-release-tag) "defineComponent" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function defineComponent<T extends ISchema, ConstructorType = ComponentType<T>>(componentId: number, spec: T, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
+
+// Warning: (ae-missing-release-tag) "defineLibraryComponents" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEngine, 'defineComponentFromSchema'>): {
+    Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+    AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
+    AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
+    AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
+    AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
+    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
+    Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
+    CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
+    CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
+    GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
+    Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
+    NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
+    PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+    PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
+    PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
+    RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
+    TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+    UiBackground: ComponentDefinition<ISchema<PBUiBackground>, PBUiBackground>;
+    UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
+    VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
+};
+
+// Warning: (ae-missing-release-tag) "defineSdkComponents" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function defineSdkComponents(engine: Pick<IEngine, 'defineComponentFromSchema' | 'getComponent'>): {
+    Animator: AnimatorComponentDefinition;
+    Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
+    AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
+    AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
+    AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
+    AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
+    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
+    Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
+    CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
+    CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
+    GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
+    Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
+    NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
+    PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+    PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
+    PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
+    RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
+    TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+    UiBackground: ComponentDefinition<ISchema<PBUiBackground>, PBUiBackground>;
+    UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
+    VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
+};
+
 // @public
 export const DEG2RAD: number;
+
+// @public (undocumented)
+export type EcsResult<T extends ISchema> = T extends ISchema ? ReturnType<T['deserialize']> : never;
 
 // @public (undocumented)
 export function Engine({ transports }?: IEngineParams): IEngine;
@@ -369,8 +507,6 @@ export type EventsSystem = typeof EventsSystem;
 
 // @public (undocumented)
 export namespace EventsSystem {
-    // Warning: (ae-forgotten-export) The symbol "PBPointerEventsResult_PointerCommand" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     export type Callback = (event: PBPointerEventsResult_PointerCommand) => void | Promise<void>;
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
@@ -393,11 +529,34 @@ export namespace EventsSystem {
     export function removeOnPointerUp(entity: Entity): void;
 }
 
+// Warning: (ae-missing-release-tag) "ExcludeUndefined" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export type ExcludeUndefined<T> = {
+    [P in keyof T]: undefined extends T[P] ? never : P;
+}[keyof T];
+
 // @public
 export const executeTask: (task: Task<unknown>) => void;
 
 // @public (undocumented)
+export type FloatArray = number[];
+
+// Warning: (ae-missing-release-tag) "Font" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum Font {
+    // (undocumented)
+    F_LIBERATION_SANS = 0,
+    // (undocumented)
+    F_SANS_SERIF = 1
+}
+
+// @public (undocumented)
 export const GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
+
+// @public (undocumented)
+export function IArray<T>(type: ISchema<T>): ISchema<Array<T>>;
 
 // @public (undocumented)
 export type IEngine = {
@@ -415,13 +574,16 @@ export type IEngine = {
     RootEntity: Entity;
     PlayerEntity: Entity;
     CameraEntity: Entity;
-    baseComponents: SdkComponents;
+    baseComponents: ReturnType<typeof defineSdkComponents>;
 };
 
 // @public (undocumented)
 export type IEngineParams = {
     transports?: Transport[];
 };
+
+// @public (undocumented)
+export function IEnum<T>(type: ISchema<any>): ISchema<T>;
 
 // @public (undocumented)
 export type IInput = {
@@ -431,7 +593,54 @@ export type IInput = {
 };
 
 // @public (undocumented)
+export function IMap<T extends Spec>(spec: T): ISchema<Result<T>>;
+
+// Warning: (ae-missing-release-tag) "IncludeUndefined" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export type IncludeUndefined<T> = {
+    [P in keyof T]: undefined extends T[P] ? P : never;
+}[keyof T];
+
+// @public (undocumented)
 export const Input: IInput;
+
+// Warning: (ae-missing-release-tag) "InputAction" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum InputAction {
+    // (undocumented)
+    IA_ACTION_3 = 10,
+    // (undocumented)
+    IA_ACTION_4 = 11,
+    // (undocumented)
+    IA_ACTION_5 = 12,
+    // (undocumented)
+    IA_ACTION_6 = 13,
+    // (undocumented)
+    IA_ANY = 3,
+    // (undocumented)
+    IA_BACKWARD = 5,
+    // (undocumented)
+    IA_FORWARD = 4,
+    // (undocumented)
+    IA_JUMP = 8,
+    // (undocumented)
+    IA_LEFT = 7,
+    // (undocumented)
+    IA_POINTER = 0,
+    // (undocumented)
+    IA_PRIMARY = 1,
+    // (undocumented)
+    IA_RIGHT = 6,
+    // (undocumented)
+    IA_SECONDARY = 2,
+    // (undocumented)
+    IA_WALK = 9
+}
+
+// @public (undocumented)
+export function IOptional<T>(spec: ISchema<T>): ISchema<T | undefined>;
 
 // @public (undocumented)
 export type ISchema<T = any> = {
@@ -445,6 +654,159 @@ export const log: (...a: any[]) => void;
 
 // @public (undocumented)
 export const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+
+// Warning: (ae-missing-release-tag) "MaterialTransparencyMode" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum MaterialTransparencyMode {
+    // (undocumented)
+    MTM_ALPHA_BLEND = 2,
+    // (undocumented)
+    MTM_ALPHA_TEST = 1,
+    // (undocumented)
+    MTM_ALPHA_TEST_AND_ALPHA_BLEND = 3,
+    // (undocumented)
+    MTM_AUTO = 4,
+    // (undocumented)
+    MTM_OPAQUE = 0
+}
+
+// @public
+export namespace Matrix {
+    export function add(self: ReadonlyMatrix, other: ReadonlyMatrix): MutableMatrix;
+    export function addAtIndex(self: MutableMatrix, index: number, value: number): void;
+    export function addToRef(self: ReadonlyMatrix, other: ReadonlyMatrix, result: MutableMatrix): void;
+    export function addToSelf(self: MutableMatrix, other: ReadonlyMatrix): void;
+    export function asArray(self: ReadonlyMatrix): Matrix4x4;
+    export function clone(self: ReadonlyMatrix): MutableMatrix;
+    export function compose(scale: Vector3.ReadonlyVector3, rotation: Quaternion.ReadonlyQuaternion, translation: Vector3.ReadonlyVector3): MutableMatrix;
+    export function composeToRef(scale: Vector3.ReadonlyVector3, rotation: Quaternion.ReadonlyQuaternion, translation: Vector3.ReadonlyVector3, result: MutableMatrix): void;
+    export function copy(from: ReadonlyMatrix, dest: MutableMatrix): void;
+    export function copyToArray(self: ReadonlyMatrix, arrayDest: FloatArray, offsetDest?: number): void;
+    export function create(): MutableMatrix;
+    export function decompose(self: ReadonlyMatrix, scale?: Vector3.MutableVector3, rotation?: Quaternion.MutableQuaternion, translation?: Vector3.MutableVector3): boolean;
+    export function decomposeLerp(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number): MutableMatrix;
+    export function decomposeLerpToRef(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number, result: MutableMatrix): void;
+    export function determinant(self: ReadonlyMatrix): number;
+    export function equals(self: ReadonlyMatrix, value: ReadonlyMatrix): boolean;
+    export function fromArray(array: Matrix4x4, offset?: number): MutableMatrix;
+    export function fromArrayToRef(array: Matrix4x4, offset: number, result: MutableMatrix): void;
+    export function fromFloatArrayToRefScaled(array: FloatArray, offset: number, scale: number, result: MutableMatrix): void;
+    export function fromQuaternionToRef(quat: Quaternion.ReadonlyQuaternion, result: MutableMatrix): void;
+    export function fromValues(initialM11: number, initialM12: number, initialM13: number, initialM14: number, initialM21: number, initialM22: number, initialM23: number, initialM24: number, initialM31: number, initialM32: number, initialM33: number, initialM34: number, initialM41: number, initialM42: number, initialM43: number, initialM44: number): MutableMatrix;
+    export function fromValuesToRef(initialM11: number, initialM12: number, initialM13: number, initialM14: number, initialM21: number, initialM22: number, initialM23: number, initialM24: number, initialM31: number, initialM32: number, initialM33: number, initialM34: number, initialM41: number, initialM42: number, initialM43: number, initialM44: number, result: MutableMatrix): void;
+    export function fromXYZAxesToRef(xaxis: Vector3.ReadonlyVector3, yaxis: Vector3.ReadonlyVector3, zaxis: Vector3.ReadonlyVector3, result: MutableMatrix): void;
+    export function GetAsMatrix2x2(matrix: ReadonlyMatrix): FloatArray;
+    export function GetAsMatrix3x3(matrix: ReadonlyMatrix): FloatArray;
+    export function getHashCode(self: ReadonlyMatrix): number;
+    export function getRotationMatrix(self: ReadonlyMatrix): MutableMatrix;
+    export function getRotationMatrixToRef(self: ReadonlyMatrix, result: MutableMatrix): void;
+    export function getTranslation(self: MutableMatrix): Vector3.MutableVector3;
+    export function getTranslationToRef(self: MutableMatrix, result: Vector3.MutableVector3): void;
+    export function Identity(): MutableMatrix;
+    export function IdentityReadonly(): ReadonlyMatrix;
+    export function IdentityToRef(result: MutableMatrix): void;
+    export function invert(source: ReadonlyMatrix): MutableMatrix;
+    export function invertToRef(source: ReadonlyMatrix, result: MutableMatrix): void;
+    export function isIdentityAs3x2Update(self: MutableMatrix): boolean;
+    export function isIdentityUpdate(self: MutableMatrix): boolean;
+    export function lerp(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number): MutableMatrix;
+    export function lerpToRef(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number, result: MutableMatrix): void;
+    export function LookAtLH(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3): MutableMatrix;
+    export function lookAtLHToRef(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3, result: MutableMatrix): void;
+    export function lookAtRH(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3): MutableMatrix;
+    export function lookAtRHToRef(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3, result: MutableMatrix): void;
+    export function m(self: MutableMatrix): Matrix4x4;
+    // (undocumented)
+    export type Matrix4x4 = [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+    ];
+    export function multiply(self: MutableMatrix, other: ReadonlyMatrix): MutableMatrix;
+    export function multiplyAtIndex(self: MutableMatrix, index: number, value: number): MutableMatrix;
+    export function multiplyToArray(self: ReadonlyMatrix, other: ReadonlyMatrix, result: FloatArray, offset: number): void;
+    export function multiplyToRef(self: ReadonlyMatrix, other: ReadonlyMatrix, result: MutableMatrix): void;
+    // (undocumented)
+    export type MutableMatrix = {
+        updateFlag: number;
+        isIdentity: boolean;
+        isIdentity3x2: boolean;
+        _isIdentityDirty: boolean;
+        _isIdentity3x2Dirty: boolean;
+        _m: Matrix4x4;
+    };
+    export function normalMatrixToRef(self: ReadonlyMatrix, ref: MutableMatrix): void;
+    export function orthoLH(width: number, height: number, znear: number, zfar: number): MutableMatrix;
+    export function orthoLHToRef(width: number, height: number, znear: number, zfar: number, result: MutableMatrix): void;
+    export function OrthoOffCenterLH(left: number, right: number, bottom: number, top: number, znear: number, zfar: number): MutableMatrix;
+    export function orthoOffCenterLHToRef(left: number, right: number, bottom: number, top: number, znear: number, zfar: number, result: MutableMatrix): void;
+    export function orthoOffCenterRH(left: number, right: number, bottom: number, top: number, znear: number, zfar: number): MutableMatrix;
+    export function orthoOffCenterRHToRef(left: number, right: number, bottom: number, top: number, znear: number, zfar: number, result: MutableMatrix): void;
+    export function perspectiveFovLH(fov: number, aspect: number, znear: number, zfar: number): MutableMatrix;
+    export function perspectiveFovLHToRef(fov: number, aspect: number, znear: number, zfar: number, result: MutableMatrix, isVerticalFovFixed?: boolean): void;
+    export function PerspectiveFovRH(fov: number, aspect: number, znear: number, zfar: number): MutableMatrix;
+    export function perspectiveFovRHToRef(fov: number, aspect: number, znear: number, zfar: number, result: MutableMatrix, isVerticalFovFixed?: boolean): void;
+    export function perspectiveFovWebVRToRef(fov: {
+        upDegrees: number;
+        downDegrees: number;
+        leftDegrees: number;
+        rightDegrees: number;
+    }, znear: number, zfar: number, result: MutableMatrix, rightHanded?: boolean): void;
+    export function perspectiveLH(width: number, height: number, znear: number, zfar: number): MutableMatrix;
+    // (undocumented)
+    export type ReadonlyMatrix = {
+        readonly updateFlag: number;
+        readonly isIdentity: boolean;
+        readonly isIdentity3x2: boolean;
+        readonly _isIdentityDirty: boolean;
+        readonly _isIdentity3x2Dirty: boolean;
+        readonly _m: Matrix4x4;
+    };
+    export function reflection(plane: Plane.ReadonlyPlane): MutableMatrix;
+    export function reflectionToRef(_plane: Plane.ReadonlyPlane, result: MutableMatrix): void;
+    export function removeRotationAndScaling(self: MutableMatrix): MutableMatrix;
+    export function reset(self: MutableMatrix): void;
+    export function rotationAxis(axis: Vector3.ReadonlyVector3, angle: number): MutableMatrix;
+    export function rotationAxisToRef(_axis: Vector3.ReadonlyVector3, angle: number, result: MutableMatrix): void;
+    export function RotationX(angle: number): MutableMatrix;
+    export function rotationXToRef(angle: number, result: MutableMatrix): void;
+    export function rotationY(angle: number): MutableMatrix;
+    export function rotationYawPitchRoll(yaw: number, pitch: number, roll: number): MutableMatrix;
+    export function rotationYawPitchRollToRef(yaw: number, pitch: number, roll: number, result: MutableMatrix): void;
+    export function rotationYToRef(angle: number, result: MutableMatrix): void;
+    export function rotationZ(angle: number): MutableMatrix;
+    export function rotationZToRef(angle: number, result: MutableMatrix): void;
+    export function scale(self: ReadonlyMatrix, scale: number): MutableMatrix;
+    export function scaleAndAddToRef(self: ReadonlyMatrix, scale: number, result: MutableMatrix): void;
+    export function scaleToRef(self: ReadonlyMatrix, scale: number, result: MutableMatrix): void;
+    export function scaling(x: number, y: number, z: number): MutableMatrix;
+    export function scalingToRef(x: number, y: number, z: number, result: MutableMatrix): void;
+    export function setRowFromFloats(self: MutableMatrix, index: number, x: number, y: number, z: number, w: number): void;
+    export function setTranslation(self: MutableMatrix, vector3: Vector3.ReadonlyVector3): void;
+    export function setTranslationFromFloats(self: MutableMatrix, x: number, y: number, z: number): void;
+    export function toArray(self: ReadonlyMatrix): Matrix4x4;
+    export function toggleModelMatrixHandInPlace(self: MutableMatrix): void;
+    export function toggleProjectionMatrixHandInPlace(self: MutableMatrix): void;
+    export function translation(x: number, y: number, z: number): MutableMatrix;
+    export function translationToRef(x: number, y: number, z: number, result: MutableMatrix): void;
+    export function transpose(matrix: ReadonlyMatrix): MutableMatrix;
+    export function transposeToRef(matrix: ReadonlyMatrix, result: MutableMatrix): void;
+    export function Zero(): MutableMatrix;
+}
 
 // @public (undocumented)
 export const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
@@ -461,6 +823,58 @@ export class MessageBus {
     emit(message: string, payload: Record<any, any>): void;
     // (undocumented)
     on(message: string, callback: (value: any, sender: string) => void): Observer<IEvents['comms']>;
+}
+
+// Warning: (ae-missing-release-tag) "NftFrameType" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum NftFrameType {
+    // (undocumented)
+    NFT_BAROQUE_ORNAMENT = 1,
+    // (undocumented)
+    NFT_BLOCKY = 5,
+    // (undocumented)
+    NFT_CANVAS = 21,
+    // (undocumented)
+    NFT_CLASSIC = 0,
+    // (undocumented)
+    NFT_DIAMOND_ORNAMENT = 2,
+    // (undocumented)
+    NFT_GOLD_CARVED = 7,
+    // (undocumented)
+    NFT_GOLD_EDGES = 6,
+    // (undocumented)
+    NFT_GOLD_ROUNDED = 9,
+    // (undocumented)
+    NFT_GOLD_WIDE = 8,
+    // (undocumented)
+    NFT_METAL_MEDIUM = 10,
+    // (undocumented)
+    NFT_METAL_ROUNDED = 13,
+    // (undocumented)
+    NFT_METAL_SLIM = 12,
+    // (undocumented)
+    NFT_METAL_WIDE = 11,
+    // (undocumented)
+    NFT_MINIMAL_BLACK = 15,
+    // (undocumented)
+    NFT_MINIMAL_GREY = 4,
+    // (undocumented)
+    NFT_MINIMAL_WHITE = 16,
+    // (undocumented)
+    NFT_MINIMAL_WIDE = 3,
+    // (undocumented)
+    NFT_NONE = 22,
+    // (undocumented)
+    NFT_PINS = 14,
+    // (undocumented)
+    NFT_TAPE = 17,
+    // (undocumented)
+    NFT_WOOD_SLIM = 18,
+    // (undocumented)
+    NFT_WOOD_TWIGS = 20,
+    // (undocumented)
+    NFT_WOOD_WIDE = 19
 }
 
 // @public (undocumented)
@@ -532,6 +946,20 @@ export const onLeaveSceneObservable: Observable<{
     userId: string;
 }>;
 
+// Warning: (ae-missing-release-tag) "OnlyNonUndefinedTypes" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type OnlyNonUndefinedTypes<T> = {
+    [K in ExcludeUndefined<T>]: T[K];
+};
+
+// Warning: (ae-missing-release-tag) "OnlyOptionalUndefinedTypes" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type OnlyOptionalUndefinedTypes<T> = {
+    [K in IncludeUndefined<T>]?: T[K];
+};
+
 // @public @deprecated (undocumented)
 export const onPlayerClickedObservable: Observable<{
     userId: string;
@@ -583,19 +1011,670 @@ export const onVideoEvent: Observable<{
     totalVideoLength: number;
 }>;
 
+// Warning: (ae-missing-release-tag) "PBAnimationState" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBAnimationState {
+    // (undocumented)
+    clip: string;
+    loop?: boolean | undefined;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    playing?: boolean | undefined;
+    // (undocumented)
+    shouldReset?: boolean | undefined;
+    speed?: number | undefined;
+    weight?: number | undefined;
+}
+
+// Warning: (ae-missing-release-tag) "PBAnimator" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBAnimator {
+    // (undocumented)
+    states: PBAnimationState[];
+}
+
+// Warning: (ae-missing-release-tag) "PBAudioSource" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBAudioSource {
+    // (undocumented)
+    audioClipUrl: string;
+    // (undocumented)
+    loop?: boolean | undefined;
+    pitch?: number | undefined;
+    // (undocumented)
+    playing?: boolean | undefined;
+    volume?: number | undefined;
+}
+
+// Warning: (ae-missing-release-tag) "PBAudioStream" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBAudioStream {
+    // (undocumented)
+    playing?: boolean | undefined;
+    // (undocumented)
+    url: string;
+    volume?: number | undefined;
+}
+
+// Warning: (ae-missing-release-tag) "PBAvatarAttach" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBAvatarAttach {
+    // (undocumented)
+    anchorPointId: AvatarAnchorPointType;
+    // (undocumented)
+    avatarId: string;
+}
+
+// Warning: (ae-missing-release-tag) "PBAvatarModifierArea" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBAvatarModifierArea {
+    // (undocumented)
+    area: PBVector3 | undefined;
+    // (undocumented)
+    excludeIds: string[];
+    // (undocumented)
+    modifiers: AvatarModifierType[];
+}
+
+// Warning: (ae-missing-release-tag) "PBAvatarShape" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBAvatarShape {
+    bodyShape?: string | undefined;
+    emotes: string[];
+    // (undocumented)
+    expressionTriggerId?: string | undefined;
+    expressionTriggerTimestamp?: number | undefined;
+    eyeColor?: PBColor3 | undefined;
+    hairColor?: PBColor3 | undefined;
+    // (undocumented)
+    id: string;
+    name?: string | undefined;
+    skinColor?: PBColor3 | undefined;
+    // (undocumented)
+    talking?: boolean | undefined;
+    wearables: string[];
+}
+
+// Warning: (ae-missing-release-tag) "PBBillboard" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBBillboard {
+    billboardMode?: BillboardMode | undefined;
+    oppositeDirection?: boolean | undefined;
+}
+
+// Warning: (ae-missing-release-tag) "PBCameraMode" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBCameraMode {
+    // (undocumented)
+    mode: CameraType;
+}
+
+// Warning: (ae-missing-release-tag) "PBCameraModeArea" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBCameraModeArea {
+    // (undocumented)
+    area: PBVector3 | undefined;
+    // (undocumented)
+    mode: CameraType;
+}
+
+// Warning: (ae-missing-release-tag) "Color3" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBColor3 {
+    // (undocumented)
+    b: number;
+    // (undocumented)
+    g: number;
+    // (undocumented)
+    r: number;
+}
+
+// Warning: (ae-missing-release-tag) "Color4" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBColor4 {
+    // (undocumented)
+    a: number;
+    // (undocumented)
+    b: number;
+    // (undocumented)
+    g: number;
+    // (undocumented)
+    r: number;
+}
+
+// Warning: (ae-missing-release-tag) "PBGltfContainer" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBGltfContainer {
+    src: string;
+}
+
+// Warning: (ae-missing-release-tag) "PBMaterial" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBMaterial {
+    // (undocumented)
+    material?: {
+        $case: 'unlit';
+        unlit: PBMaterial_UnlitMaterial;
+    } | {
+        $case: 'pbr';
+        pbr: PBMaterial_PbrMaterial;
+    };
+}
+
+// Warning: (ae-missing-release-tag) "PBMaterial_PbrMaterial" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBMaterial_PbrMaterial {
+    albedoColor?: PBColor3 | undefined;
+    alphaTest?: number | undefined;
+    alphaTexture?: TextureUnion | undefined;
+    bumpTexture?: TextureUnion | undefined;
+    castShadows?: boolean | undefined;
+    directIntensity?: number | undefined;
+    emissiveColor?: PBColor3 | undefined;
+    emissiveIntensity?: number | undefined;
+    emissiveTexture?: TextureUnion | undefined;
+    glossiness?: number | undefined;
+    metallic?: number | undefined;
+    reflectivityColor?: PBColor3 | undefined;
+    roughness?: number | undefined;
+    specularIntensity?: number | undefined;
+    texture?: TextureUnion | undefined;
+    transparencyMode?: MaterialTransparencyMode | undefined;
+}
+
+// Warning: (ae-missing-release-tag) "PBMaterial_UnlitMaterial" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBMaterial_UnlitMaterial {
+    alphaTest?: number | undefined;
+    castShadows?: boolean | undefined;
+    texture?: TextureUnion | undefined;
+}
+
+// Warning: (ae-missing-release-tag) "PBMeshCollider" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBMeshCollider {
+    collisionMask?: number | undefined;
+    // (undocumented)
+    mesh?: {
+        $case: 'box';
+        box: PBMeshCollider_BoxMesh;
+    } | {
+        $case: 'sphere';
+        sphere: PBMeshCollider_SphereMesh;
+    } | {
+        $case: 'cylinder';
+        cylinder: PBMeshCollider_CylinderMesh;
+    } | {
+        $case: 'plane';
+        plane: PBMeshCollider_PlaneMesh;
+    };
+}
+
+// Warning: (ae-missing-release-tag) "PBMeshCollider_BoxMesh" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBMeshCollider_BoxMesh {
+}
+
+// Warning: (ae-missing-release-tag) "PBMeshCollider_CylinderMesh" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBMeshCollider_CylinderMesh {
+    radiusBottom?: number | undefined;
+    radiusTop?: number | undefined;
+}
+
+// Warning: (ae-missing-release-tag) "PBMeshCollider_PlaneMesh" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBMeshCollider_PlaneMesh {
+}
+
+// Warning: (ae-missing-release-tag) "PBMeshCollider_SphereMesh" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBMeshCollider_SphereMesh {
+}
+
+// Warning: (ae-missing-release-tag) "PBMeshRenderer" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBMeshRenderer {
+    // (undocumented)
+    mesh?: {
+        $case: 'box';
+        box: PBMeshRenderer_BoxMesh;
+    } | {
+        $case: 'sphere';
+        sphere: PBMeshRenderer_SphereMesh;
+    } | {
+        $case: 'cylinder';
+        cylinder: PBMeshRenderer_CylinderMesh;
+    } | {
+        $case: 'plane';
+        plane: PBMeshRenderer_PlaneMesh;
+    };
+}
+
+// Warning: (ae-missing-release-tag) "PBMeshRenderer_BoxMesh" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBMeshRenderer_BoxMesh {
+    // (undocumented)
+    uvs: number[];
+}
+
+// Warning: (ae-missing-release-tag) "PBMeshRenderer_CylinderMesh" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBMeshRenderer_CylinderMesh {
+    radiusBottom?: number | undefined;
+    radiusTop?: number | undefined;
+}
+
+// Warning: (ae-missing-release-tag) "PBMeshRenderer_PlaneMesh" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBMeshRenderer_PlaneMesh {
+    // (undocumented)
+    uvs: number[];
+}
+
+// Warning: (ae-missing-release-tag) "PBMeshRenderer_SphereMesh" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBMeshRenderer_SphereMesh {
+}
+
+// Warning: (ae-missing-release-tag) "PBNftShape" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBNftShape {
+    color?: PBColor3 | undefined;
+    // (undocumented)
+    src: string;
+    style?: NftFrameType | undefined;
+}
+
+// Warning: (ae-missing-release-tag) "PBPointerEventsResult" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export interface PBPointerEventsResult {
+    commands: PBPointerEventsResult_PointerCommand[];
+}
+
+// Warning: (ae-missing-release-tag) "PBPointerEventsResult_PointerCommand" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export interface PBPointerEventsResult_PointerCommand {
+    analog?: number | undefined;
+    button: InputAction;
+    // (undocumented)
+    hit: RaycastHit | undefined;
+    // (undocumented)
+    state: PointerEventType;
+    timestamp: number;
+}
+
+// Warning: (ae-missing-release-tag) "PBPointerHoverFeedback" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBPointerHoverFeedback {
+    // (undocumented)
+    pointerEvents: PBPointerHoverFeedback_Entry[];
+}
+
+// Warning: (ae-missing-release-tag) "PBPointerHoverFeedback_Entry" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBPointerHoverFeedback_Entry {
+    // (undocumented)
+    eventInfo: PBPointerHoverFeedback_Info | undefined;
+    // (undocumented)
+    eventType: PointerEventType;
+}
+
+// Warning: (ae-missing-release-tag) "PBPointerHoverFeedback_Info" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBPointerHoverFeedback_Info {
+    button?: InputAction | undefined;
+    hoverText?: string | undefined;
+    maxDistance?: number | undefined;
+    showFeedback?: boolean | undefined;
+}
+
+// Warning: (ae-missing-release-tag) "PBPointerLock" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBPointerLock {
+    // (undocumented)
+    isPointerLocked: boolean;
+}
+
+// Warning: (ae-missing-release-tag) "Position" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBPosition {
+    // (undocumented)
+    x: number;
+    // (undocumented)
+    y: number;
+    // (undocumented)
+    z: number;
+}
+
+// Warning: (ae-missing-release-tag) "PBRaycast" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBRaycast {
+    // (undocumented)
+    direction: PBVector3 | undefined;
+    // (undocumented)
+    maxDistance: number;
+    // (undocumented)
+    origin: PBVector3 | undefined;
+    // (undocumented)
+    queryType: RaycastQueryType;
+    // (undocumented)
+    timestamp: number;
+}
+
+// Warning: (ae-missing-release-tag) "PBRaycastResult" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBRaycastResult {
+    // (undocumented)
+    direction: PBVector3 | undefined;
+    // (undocumented)
+    hits: RaycastHit[];
+    // (undocumented)
+    origin: PBVector3 | undefined;
+    // (undocumented)
+    timestamp: number;
+}
+
+// Warning: (ae-missing-release-tag) "PBTextShape" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBTextShape {
+    font?: Font | undefined;
+    // (undocumented)
+    fontAutoSize?: boolean | undefined;
+    fontSize?: number | undefined;
+    height?: number | undefined;
+    // (undocumented)
+    lineCount?: number | undefined;
+    // (undocumented)
+    lineSpacing?: number | undefined;
+    outlineColor?: PBColor3 | undefined;
+    // (undocumented)
+    outlineWidth?: number | undefined;
+    // (undocumented)
+    paddingBottom?: number | undefined;
+    // (undocumented)
+    paddingLeft?: number | undefined;
+    // (undocumented)
+    paddingRight?: number | undefined;
+    // (undocumented)
+    paddingTop?: number | undefined;
+    // (undocumented)
+    shadowBlur?: number | undefined;
+    shadowColor?: PBColor3 | undefined;
+    // (undocumented)
+    shadowOffsetX?: number | undefined;
+    // (undocumented)
+    shadowOffsetY?: number | undefined;
+    // (undocumented)
+    text: string;
+    textAlign?: TextAlignMode | undefined;
+    textColor?: PBColor4 | undefined;
+    // (undocumented)
+    textWrapping?: boolean | undefined;
+    width?: number | undefined;
+}
+
+// Warning: (ae-missing-release-tag) "PBUiBackground" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBUiBackground {
+    backgroundColor?: PBColor4 | undefined;
+}
+
+// Warning: (ae-missing-release-tag) "PBUiText" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBUiText {
+    color?: PBColor3 | undefined;
+    font?: Font | undefined;
+    fontSize?: number | undefined;
+    textAlign?: TextAlignMode | undefined;
+    // (undocumented)
+    value: string;
+}
+
+// Warning: (ae-missing-release-tag) "PBUiTransform" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBUiTransform {
+    // (undocumented)
+    alignContent: YGAlign;
+    // (undocumented)
+    alignItems: YGAlign;
+    // (undocumented)
+    alignSelf: YGAlign;
+    // (undocumented)
+    borderBottom: number;
+    // (undocumented)
+    borderLeft: number;
+    // (undocumented)
+    borderRight: number;
+    // (undocumented)
+    borderTop: number;
+    // (undocumented)
+    direction: YGDirection;
+    // (undocumented)
+    display: YGDisplay;
+    // (undocumented)
+    flex: number;
+    // (undocumented)
+    flexBasis: number;
+    // (undocumented)
+    flexBasisUnit: YGUnit;
+    // (undocumented)
+    flexDirection: YGFlexDirection;
+    // (undocumented)
+    flexGrow: number;
+    // (undocumented)
+    flexShrink: number;
+    // (undocumented)
+    flexWrap: YGWrap;
+    // (undocumented)
+    height: number;
+    // (undocumented)
+    heightUnit: YGUnit;
+    // (undocumented)
+    justifyContent: YGJustify;
+    // (undocumented)
+    marginBottom: number;
+    // (undocumented)
+    marginBottomUnit: YGUnit;
+    // (undocumented)
+    marginLeft: number;
+    marginLeftUnit: YGUnit;
+    // (undocumented)
+    marginRight: number;
+    // (undocumented)
+    marginRightUnit: YGUnit;
+    // (undocumented)
+    marginTop: number;
+    // (undocumented)
+    marginTopUnit: YGUnit;
+    // (undocumented)
+    maxHeight: number;
+    // (undocumented)
+    maxHeightUnit: YGUnit;
+    // (undocumented)
+    maxWidth: number;
+    // (undocumented)
+    maxWidthUnit: YGUnit;
+    // (undocumented)
+    minHeight: number;
+    // (undocumented)
+    minHeightUnit: YGUnit;
+    // (undocumented)
+    minWidth: number;
+    // (undocumented)
+    minWidthUnit: YGUnit;
+    // (undocumented)
+    overflow: YGOverflow;
+    // (undocumented)
+    paddingBottom: number;
+    // (undocumented)
+    paddingBottomUnit: YGUnit;
+    // (undocumented)
+    paddingLeft: number;
+    // (undocumented)
+    paddingLeftUnit: YGUnit;
+    // (undocumented)
+    paddingRight: number;
+    // (undocumented)
+    paddingRightUnit: YGUnit;
+    // (undocumented)
+    paddingTop: number;
+    // (undocumented)
+    paddingTopUnit: YGUnit;
+    // (undocumented)
+    parent: number;
+    // (undocumented)
+    positionBottom: number;
+    // (undocumented)
+    positionBottomUnit: YGUnit;
+    // (undocumented)
+    positionLeft: number;
+    // (undocumented)
+    positionLeftUnit: YGUnit;
+    // (undocumented)
+    positionRight: number;
+    // (undocumented)
+    positionRightUnit: YGUnit;
+    // (undocumented)
+    positionTop: number;
+    // (undocumented)
+    positionTopUnit: YGUnit;
+    // (undocumented)
+    positionType: YGPositionType;
+    // (undocumented)
+    rightOf: number;
+    // (undocumented)
+    width: number;
+    // (undocumented)
+    widthUnit: YGUnit;
+}
+
+// Warning: (ae-missing-release-tag) "Vector2" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBVector2 {
+    // (undocumented)
+    x: number;
+    // (undocumented)
+    y: number;
+}
+
+// Warning: (ae-missing-release-tag) "Vector3" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBVector3 {
+    // (undocumented)
+    x: number;
+    // (undocumented)
+    y: number;
+    // (undocumented)
+    z: number;
+}
+
+// Warning: (ae-missing-release-tag) "PBVisibilityComponent" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBVisibilityComponent {
+    visible?: boolean | undefined;
+}
+
+// @public
+export namespace Plane {
+    // (undocumented)
+    export function asArray(plane: ReadonlyPlane): number[];
+    // (undocumented)
+    export function clone(plane: ReadonlyPlane): MutablePlane;
+    export function copyFromPoints(point1: Vector3.ReadonlyVector3, point2: Vector3.ReadonlyVector3, point3: Vector3.ReadonlyVector3): MutablePlane;
+    export function create(a: number, b: number, c: number, d: number): {
+        normal: Vector3.MutableVector3;
+        d: number;
+    };
+    export function dotCoordinate(plane: ReadonlyPlane, point: Vector3.ReadonlyVector3): number;
+    export function fromArray(array: number[]): MutablePlane;
+    export function fromPoints(_point1: Vector3.ReadonlyVector3, _point2: Vector3.ReadonlyVector3, _point3: Vector3.ReadonlyVector3): MutablePlane;
+    // (undocumented)
+    export function getHashCode(_plane: ReadonlyPlane): number;
+    export function isFrontFacingTo(plane: ReadonlyPlane, direction: Vector3.ReadonlyVector3, epsilon: number): boolean;
+    // (undocumented)
+    export type MutablePlane = {
+        normal: Vector3.MutableVector3;
+        d: number;
+    };
+    export function normalize(plane: ReadonlyPlane): MutablePlane;
+    // (undocumented)
+    export type ReadonlyPlane = {
+        normal: Vector3.ReadonlyVector3;
+        d: number;
+    };
+    export function romPositionAndNormal(origin: Vector3.ReadonlyVector3, normal: Vector3.ReadonlyVector3): MutablePlane;
+    export function signedDistanceTo(plane: ReadonlyPlane, point: Vector3.ReadonlyVector3): number;
+    export function signedDistanceToPlaneFromPositionAndNormal(origin: Vector3.ReadonlyVector3, normal: Vector3.ReadonlyVector3, point: Vector3.ReadonlyVector3): number;
+    export function transform(plane: ReadonlyPlane, transformation: Matrix.ReadonlyMatrix): MutablePlane;
+}
+
 // @public (undocumented)
 export const PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+
+// Warning: (ae-missing-release-tag) "PointerEventType" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum PointerEventType {
+    // (undocumented)
+    PET_DOWN = 1,
+    // (undocumented)
+    PET_HOVER_ENTER = 2,
+    // (undocumented)
+    PET_HOVER_LEAVE = 3,
+    // (undocumented)
+    PET_UP = 0
+}
 
 // @public (undocumented)
 export const PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
 
 // @public (undocumented)
 export const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
-
-// Warning: (ae-forgotten-export) The symbol "preEngine" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
-export type PreEngine = ReturnType<typeof preEngine>;
 
 // @public
 export type Quaternion = Quaternion.ReadonlyQuaternion;
@@ -617,7 +1696,6 @@ export namespace Quaternion {
     export function fromEulerDegrees(x: number, y: number, z: number): MutableQuaternion;
     export function fromLookAt(position: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, worldUp?: Vector3.ReadonlyVector3): MutableQuaternion;
     export function fromLookAtToRef(position: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, worldUp: Vector3.ReadonlyVector3 | undefined, result: MutableQuaternion): void;
-    // Warning: (ae-forgotten-export) The symbol "Matrix" needs to be exported by the entry point index.d.ts
     export function fromRotationMatrixToRef(matrix: Matrix.ReadonlyMatrix, result: Quaternion.MutableQuaternion): void;
     export function fromRotationYawPitchRoll(yaw: number, pitch: number, roll: number): MutableQuaternion;
     export function fromRotationYawPitchRollToRef(yaw: number, pitch: number, roll: number, result: Quaternion.MutableQuaternion): void;
@@ -649,11 +1727,49 @@ export namespace Quaternion {
     export function Zero(): MutableQuaternion;
 }
 
+// @public (undocumented)
+export type QuaternionType = {
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+};
+
 // @public
 export const RAD2DEG: number;
 
 // @public (undocumented)
 export const Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
+
+// Warning: (ae-missing-release-tag) "RaycastHit" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export interface RaycastHit {
+    // (undocumented)
+    direction: PBVector3 | undefined;
+    // (undocumented)
+    entityId?: number | undefined;
+    // (undocumented)
+    length: number;
+    // (undocumented)
+    meshName?: string | undefined;
+    // (undocumented)
+    normalHit: PBVector3 | undefined;
+    // (undocumented)
+    origin: PBVector3 | undefined;
+    // (undocumented)
+    position: PBVector3 | undefined;
+}
+
+// Warning: (ae-missing-release-tag) "RaycastQueryType" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum RaycastQueryType {
+    // (undocumented)
+    RQT_HIT_FIRST = 0,
+    // (undocumented)
+    RQT_QUERY_ALL = 1
+}
 
 // @public (undocumented)
 export const RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
@@ -666,8 +1782,19 @@ export type ReadonlyComponentSchema<T extends [ComponentDefinition, ...Component
 // @public (undocumented)
 export type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
 
-// Warning: (ae-forgotten-export) The symbol "ToOptional" needs to be exported by the entry point index.d.ts
+// Warning: (ae-missing-release-tag) "ReceiveMessage" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
+// @public (undocumented)
+export type ReceiveMessage = {
+    type: WireMessage.Enum;
+    entity: Entity;
+    componentId: number;
+    timestamp: number;
+    transportType?: string;
+    data?: Uint8Array;
+    messageBuffer: Uint8Array;
+};
+
 // @public (undocumented)
 export type Result<T extends Spec> = ToOptional<{
     [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? Result<T[K]> : never;
@@ -721,46 +1848,25 @@ export namespace Schemas {
     Int64: ISchema<number>;
     const // (undocumented)
     Number: ISchema<number>;
-    const // Warning: (ae-forgotten-export) The symbol "Vector3Type" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     Vector3: ISchema<Vector3Type>;
-    const // Warning: (ae-forgotten-export) The symbol "QuaternionType" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     Quaternion: ISchema<QuaternionType>;
-    const // Warning: (ae-forgotten-export) The symbol "Color3Type" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     Color3: ISchema<Color3Type>;
-    const // Warning: (ae-forgotten-export) The symbol "Color4Type" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     Color4: ISchema<Color4Type>;
     const // (undocumented)
     Entity: ISchema<Entity>;
-    const // Warning: (ae-forgotten-export) The symbol "IEnum" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     Enum: typeof IEnum;
-    const // Warning: (ae-forgotten-export) The symbol "IArray" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     Array: typeof IArray;
-    const // Warning: (ae-forgotten-export) The symbol "IMap" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     Map: typeof IMap;
-    const // Warning: (ae-forgotten-export) The symbol "IOptional" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     Optional: typeof IOptional;
 }
-
-// Warning: (ae-forgotten-export) The symbol "defineSdkComponents" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
-export type SdkComponents = ReturnType<typeof defineSdkComponents>;
 
 // @public (undocumented)
 export interface Spec {
@@ -776,11 +1882,111 @@ export type SystemFn = (dt: number) => void;
 // @public (undocumented)
 export type Task<T = unknown> = () => Promise<T>;
 
+// Warning: (ae-missing-release-tag) "TextAlignMode" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum TextAlignMode {
+    // (undocumented)
+    TAM_BOTTOM_CENTER = 7,
+    // (undocumented)
+    TAM_BOTTOM_LEFT = 6,
+    // (undocumented)
+    TAM_BOTTOM_RIGHT = 8,
+    // (undocumented)
+    TAM_MIDDLE_CENTER = 4,
+    // (undocumented)
+    TAM_MIDDLE_LEFT = 3,
+    // (undocumented)
+    TAM_MIDDLE_RIGHT = 5,
+    // (undocumented)
+    TAM_TOP_CENTER = 1,
+    // (undocumented)
+    TAM_TOP_LEFT = 0,
+    // (undocumented)
+    TAM_TOP_RIGHT = 2
+}
+
 // @public (undocumented)
 export const TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
 
+// Warning: (ae-missing-release-tag) "Texture" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface Texture {
+    filterMode?: TextureFilterMode | undefined;
+    // (undocumented)
+    src: string;
+    wrapMode?: TextureWrapMode | undefined;
+}
+
+// Warning: (ae-missing-release-tag) "TextureFilterMode" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum TextureFilterMode {
+    // (undocumented)
+    TFM_BILINEAR = 1,
+    // (undocumented)
+    TFM_POINT = 0,
+    // (undocumented)
+    TFM_TRILINEAR = 2
+}
+
+// Warning: (ae-missing-release-tag) "TextureUnion" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface TextureUnion {
+    // (undocumented)
+    tex?: {
+        $case: 'texture';
+        texture: Texture;
+    } | {
+        $case: 'avatarTexture';
+        avatarTexture: AvatarTexture;
+    };
+}
+
+// Warning: (ae-missing-release-tag) "TextureWrapMode" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum TextureWrapMode {
+    // (undocumented)
+    TWM_CLAMP = 1,
+    // (undocumented)
+    TWM_MIRROR = 2,
+    // (undocumented)
+    TWM_MIRROR_ONCE = 3,
+    // (undocumented)
+    TWM_REPEAT = 0
+}
+
+// Warning: (ae-missing-release-tag) "ToOptional" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
+
 // @public (undocumented)
 export const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
+
+// @public (undocumented)
+export type TransformType = {
+    position: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    rotation: {
+        x: number;
+        y: number;
+        z: number;
+        w: number;
+    };
+    scale: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    parent?: Entity;
+};
 
 // Warning: (ae-missing-release-tag) "Transport" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -792,7 +1998,6 @@ export type Transport = {
     filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
 };
 
-// Warning: (ae-forgotten-export) The symbol "ReceiveMessage" needs to be exported by the entry point index.d.ts
 // Warning: (ae-missing-release-tag) "TransportMessage" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -907,7 +2112,193 @@ export namespace Vector3 {
 }
 
 // @public (undocumented)
+export type Vector3Type = {
+    x: number;
+    y: number;
+    z: number;
+};
+
+// @public (undocumented)
 export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
+
+// Warning: (ae-missing-release-tag) "WireMessage" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export namespace WireMessage {
+    // (undocumented)
+    export enum Enum {
+        // (undocumented)
+        DELETE_COMPONENT = 2,
+        // (undocumented)
+        MAX_MESSAGE_TYPE = 3,
+        // (undocumented)
+        PUT_COMPONENT = 1,
+        // (undocumented)
+        RESERVED = 0
+    }
+    // (undocumented)
+    export type Header = {
+        length: Uint32;
+        type: Uint32;
+    };
+    // (undocumented)
+    export function readHeader(buf: ByteBuffer): Header | null;
+    const // (undocumented)
+    HEADER_LENGTH = 8;
+    // (undocumented)
+    export type Uint32 = number;
+    export function validate(buf: ByteBuffer): boolean;
+}
+
+// Warning: (ae-missing-release-tag) "YGAlign" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum YGAlign {
+    // (undocumented)
+    YGA_AUTO = 0,
+    // (undocumented)
+    YGA_BASELINE = 5,
+    // (undocumented)
+    YGA_CENTER = 2,
+    // (undocumented)
+    YGA_FLEX_END = 3,
+    // (undocumented)
+    YGA_FLEX_START = 1,
+    // (undocumented)
+    YGA_SPACE_AROUND = 7,
+    // (undocumented)
+    YGA_SPACE_BETWEEN = 6,
+    // (undocumented)
+    YGA_STRETCH = 4
+}
+
+// Warning: (ae-missing-release-tag) "YGDirection" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum YGDirection {
+    // (undocumented)
+    YGD_INHERIT = 0,
+    // (undocumented)
+    YGD_LTR = 1,
+    // (undocumented)
+    YGD_RTL = 2
+}
+
+// Warning: (ae-missing-release-tag) "YGDisplay" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum YGDisplay {
+    // (undocumented)
+    YGD_FLEX = 0,
+    // (undocumented)
+    YGD_NONE = 1
+}
+
+// Warning: (ae-missing-release-tag) "YGEdge" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum YGEdge {
+    // (undocumented)
+    YGE_ALL = 8,
+    // (undocumented)
+    YGE_BOTTOM = 3,
+    // (undocumented)
+    YGE_END = 5,
+    // (undocumented)
+    YGE_HORIZONTAL = 6,
+    // (undocumented)
+    YGE_LEFT = 0,
+    // (undocumented)
+    YGE_RIGHT = 2,
+    // (undocumented)
+    YGE_START = 4,
+    // (undocumented)
+    YGE_TOP = 1,
+    // (undocumented)
+    YGE_VERTICAL = 7
+}
+
+// Warning: (ae-missing-release-tag) "YGFlexDirection" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum YGFlexDirection {
+    // (undocumented)
+    YGFD_COLUMN = 0,
+    // (undocumented)
+    YGFD_COLUMN_REVERSE = 1,
+    // (undocumented)
+    YGFD_ROW = 2,
+    // (undocumented)
+    YGFD_ROW_REVERSE = 3
+}
+
+// Warning: (ae-missing-release-tag) "YGJustify" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum YGJustify {
+    // (undocumented)
+    YGJ_CENTER = 1,
+    // (undocumented)
+    YGJ_FLEX_END = 2,
+    // (undocumented)
+    YGJ_FLEX_START = 0,
+    // (undocumented)
+    YGJ_SPACE_AROUND = 4,
+    // (undocumented)
+    YGJ_SPACE_BETWEEN = 3,
+    // (undocumented)
+    YGJ_SPACE_EVENLY = 5
+}
+
+// Warning: (ae-missing-release-tag) "YGOverflow" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum YGOverflow {
+    // (undocumented)
+    YGO_HIDDEN = 1,
+    // (undocumented)
+    YGO_SCROLL = 2,
+    // (undocumented)
+    YGO_VISIBLE = 0
+}
+
+// Warning: (ae-missing-release-tag) "YGPositionType" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum YGPositionType {
+    // (undocumented)
+    YGPT_ABSOLUTE = 2,
+    // (undocumented)
+    YGPT_RELATIVE = 1,
+    // (undocumented)
+    YGPT_STATIC = 0
+}
+
+// Warning: (ae-missing-release-tag) "YGUnit" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum YGUnit {
+    // (undocumented)
+    YGU_AUTO = 3,
+    // (undocumented)
+    YGU_PERCENT = 2,
+    // (undocumented)
+    YGU_POINT = 1,
+    // (undocumented)
+    YGU_UNDEFINED = 0
+}
+
+// Warning: (ae-missing-release-tag) "YGWrap" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum YGWrap {
+    // (undocumented)
+    YGW_NO_WRAP = 0,
+    // (undocumented)
+    YGW_WRAP = 1,
+    // (undocumented)
+    YGW_WRAP_REVERSE = 2
+}
 
 // Warnings were encountered during analysis:
 //
@@ -943,7 +2334,6 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 // dist/engine/component.d.ts:125:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/component.d.ts:133:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
 // dist/engine/component.d.ts:133:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
-// dist/engine/input.d.ts:18:5 - (ae-forgotten-export) The symbol "PointerEventType" needs to be exported by the entry point index.d.ts
 // dist/engine/types.d.ts:27:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/types.d.ts:28:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
 // dist/engine/types.d.ts:37:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
@@ -962,7 +2352,6 @@ export const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityCompon
 // dist/engine/types.d.ts:107:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
 // dist/engine/types.d.ts:116:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // dist/engine/types.d.ts:117:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// dist/systems/events.d.ts:8:9 - (ae-forgotten-export) The symbol "InputAction" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

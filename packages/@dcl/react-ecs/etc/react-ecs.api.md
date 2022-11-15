@@ -72,8 +72,8 @@ export type EcsElements = {
 // @public (undocumented)
 export type EntityComponents = {
     uiTransform: PBUiTransform;
-    uiText: PBUiText;
-    uiBackground: PBUiBackground;
+    uiText: UiTextProps;
+    uiBackground: UiBackgroundProps;
     onClick: OnClick;
 };
 

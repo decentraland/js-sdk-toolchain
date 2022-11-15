@@ -14,9 +14,8 @@
 
 import { ByteBuffer } from './ByteBuffer'
 
-type Uint32 = number
-
 export namespace WireMessage {
+  export type Uint32 = number
   export enum Enum {
     RESERVED = 0,
 
