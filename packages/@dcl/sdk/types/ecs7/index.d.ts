@@ -2967,8 +2967,8 @@ declare interface PBUiBackground {
 
 declare interface PBUiText {
     value: string;
-    /** default=(1.0,1.0,1.0) */
-    color?: PBColor3 | undefined;
+    /** default=(1.0,1.0,1.0,1.0) */
+    color?: PBColor4 | undefined;
     /** default='center' */
     textAlign?: TextAlignMode | undefined;
     /** default=0 */

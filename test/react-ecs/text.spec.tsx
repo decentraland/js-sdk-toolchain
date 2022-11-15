@@ -1,6 +1,7 @@
 import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import {
   Color3,
+  Color4,
   Font,
   ReactEcs,
   renderUi,
@@ -25,7 +26,7 @@ describe('UiText React Ecs', () => {
     const getDiv = (entity: Entity) => UiTransform.get(entity)
     const getText = (entity: Entity) => UiText.get(entity)
     let text = 'CASLA'
-    let color: Color3 | undefined = undefined
+    let color: Color4 | undefined = undefined
 
     const ui = () => (
       <UiEntity
@@ -57,12 +58,12 @@ describe('UiText React Ecs', () => {
 
     // Update values
     text = 'BOEDO'
-    color = { r: 1, g: 1, b: 1 }
+    color = { r: 1, g: 1, b: 1, a: 1 }
 
     engine.update(1)
     expect(getText(rootDivEntity)).toMatchObject({
       value: 'BOEDO',
-      color: { r: 1, g: 1, b: 1 }
+      color: { r: 1, g: 1, b: 1, a: 1 }
     })
     engine.update(1)
   })

@@ -144,7 +144,7 @@ export interface PBUiBackground {
 //
 // @public (undocumented)
 export interface PBUiText {
-    color?: Color3 | undefined;
+    color?: Color4 | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
     textAlign?: TextAlignMode | undefined;
