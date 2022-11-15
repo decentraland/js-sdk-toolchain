@@ -1166,6 +1166,20 @@ export interface PBGltfContainer {
 //
 // @public (undocumented)
 export interface PBMaterial {
+    // (undocumented)
+    material?: {
+        $case: 'unlit';
+        unlit: PBMaterial_UnlitMaterial;
+    } | {
+        $case: 'pbr';
+        pbr: PBMaterial_PbrMaterial;
+    };
+}
+
+// Warning: (ae-missing-release-tag) "PBMaterial_PbrMaterial" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBMaterial_PbrMaterial {
     albedoColor?: PBColor3 | undefined;
     alphaTest?: number | undefined;
     alphaTexture?: TextureUnion | undefined;
@@ -1182,6 +1196,15 @@ export interface PBMaterial {
     specularIntensity?: number | undefined;
     texture?: TextureUnion | undefined;
     transparencyMode?: MaterialTransparencyMode | undefined;
+}
+
+// Warning: (ae-missing-release-tag) "PBMaterial_UnlitMaterial" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBMaterial_UnlitMaterial {
+    alphaTest?: number | undefined;
+    castShadows?: boolean | undefined;
+    texture?: TextureUnion | undefined;
 }
 
 // Warning: (ae-missing-release-tag) "PBMeshCollider" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
