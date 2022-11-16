@@ -8,8 +8,8 @@ import {
   YGUnit,
   YGWrap
 } from '../../packages/@dcl/react-ecs/src'
+import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 
-const CANVAS_ROOT_ENTITY = 0
 declare const engine: IEngine
 
 describe('UiTransform React Ecs', () => {
@@ -45,6 +45,7 @@ describe('UiTransform React Ecs', () => {
     renderUi(ui)
     engine.update(1)
     expect(getDiv(rootDivEntity).width).toBe(0)
+    expect(getDiv(rootDivEntity).flexWrap).toBe(YGWrap.YGW_WRAP)
   })
 
   it('should send position transform properties', async () => {
