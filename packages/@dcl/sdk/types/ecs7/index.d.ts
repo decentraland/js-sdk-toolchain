@@ -2980,62 +2980,84 @@ declare interface PBUiText {
 declare interface PBUiTransform {
     parent: number;
     rightOf: number;
+    /** default: YGAlign.YGA_FLEX_START */
+    alignContent?: YGAlign | undefined;
+    /** default: YGAlign.YGA_STRETCH */
+    alignItems?: YGAlign | undefined;
+    /** default: YGWrap.YGW_WRAP */
+    flexWrap?: YGWrap | undefined;
+    /** default: 1 */
+    flexShrink?: number | undefined;
+    /** YGPositionType.YGPT_RELATIVE */
     positionType: YGPositionType;
-    alignContent: YGAlign;
-    alignItems: YGAlign;
+    /** YGAlign.YGA_AUTO */
     alignSelf: YGAlign;
+    /** YGFlexDirection.YGFD_ROW */
     flexDirection: YGFlexDirection;
-    flexWrap: YGWrap;
+    /** YGJustify.YGJ_FLEX_START */
     justifyContent: YGJustify;
+    /** YGOverflow.YGO_VISIBLE */
     overflow: YGOverflow;
+    /** YGDisplay.YGD_FLEX */
     display: YGDisplay;
-    direction: YGDirection;
-    flex: number;
+    /** YGUnit.YGU_UNDEFINED */
     flexBasisUnit: YGUnit;
     flexBasis: number;
     flexGrow: number;
-    flexShrink: number;
+    /** YGUnit.YGU_UNDEFINED */
     widthUnit: YGUnit;
     width: number;
+    /** YGUnit.YGU_UNDEFINED */
     heightUnit: YGUnit;
     height: number;
+    /** YGUnit.YGU_UNDEFINED */
     minWidthUnit: YGUnit;
     minWidth: number;
+    /** YGUnit.YGU_UNDEFINED */
     minHeightUnit: YGUnit;
     minHeight: number;
+    /** YGUnit.YGU_UNDEFINED */
     maxWidthUnit: YGUnit;
     maxWidth: number;
+    /** YGUnit.YGU_UNDEFINED */
     maxHeightUnit: YGUnit;
     maxHeight: number;
+    /** YGUnit.YGU_UNDEFINED */
     positionLeftUnit: YGUnit;
     positionLeft: number;
+    /** YGUnit.YGU_UNDEFINED */
     positionTopUnit: YGUnit;
     positionTop: number;
+    /** YGUnit.YGU_UNDEFINED */
     positionRightUnit: YGUnit;
     positionRight: number;
+    /** YGUnit.YGU_UNDEFINED */
     positionBottomUnit: YGUnit;
     positionBottom: number;
-    /** margin */
+    /** YGUnit.YGU_UNDEFINED */
     marginLeftUnit: YGUnit;
     marginLeft: number;
+    /** YGUnit.YGU_UNDEFINED */
     marginTopUnit: YGUnit;
     marginTop: number;
+    /** YGUnit.YGU_UNDEFINED */
     marginRightUnit: YGUnit;
     marginRight: number;
+    /** YGUnit.YGU_UNDEFINED */
     marginBottomUnit: YGUnit;
     marginBottom: number;
+    /** YGUnit.YGU_UNDEFINED */
     paddingLeftUnit: YGUnit;
     paddingLeft: number;
+    /** YGUnit.YGU_UNDEFINED */
     paddingTopUnit: YGUnit;
     paddingTop: number;
+    /** YGUnit.YGU_UNDEFINED */
     paddingRightUnit: YGUnit;
     paddingRight: number;
+    /** YGUnit.YGU_UNDEFINED */
     paddingBottomUnit: YGUnit;
     paddingBottom: number;
-    borderLeft: number;
-    borderTop: number;
-    borderRight: number;
-    borderBottom: number;
 }
 
 declare interface PBVector2 {
@@ -4472,12 +4494,6 @@ declare const enum YGAlign {
     YGA_SPACE_AROUND = 7
 }
 
-declare const enum YGDirection {
-    YGD_INHERIT = 0,
-    YGD_LTR = 1,
-    YGD_RTL = 2
-}
-
 declare const enum YGDisplay {
     YGD_FLEX = 0,
     YGD_NONE = 1
@@ -4496,9 +4512,9 @@ declare const enum YGEdge {
 }
 
 declare const enum YGFlexDirection {
-    YGFD_COLUMN = 0,
-    YGFD_COLUMN_REVERSE = 1,
-    YGFD_ROW = 2,
+    YGFD_ROW = 0,
+    YGFD_COLUMN = 1,
+    YGFD_COLUMN_REVERSE = 2,
     YGFD_ROW_REVERSE = 3
 }
 
@@ -4518,9 +4534,8 @@ declare const enum YGOverflow {
 }
 
 declare const enum YGPositionType {
-    YGPT_STATIC = 0,
-    YGPT_RELATIVE = 1,
-    YGPT_ABSOLUTE = 2
+    YGPT_RELATIVE = 0,
+    YGPT_ABSOLUTE = 1
 }
 
 declare const enum YGUnit {
