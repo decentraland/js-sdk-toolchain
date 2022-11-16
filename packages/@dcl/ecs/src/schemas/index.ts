@@ -6,11 +6,21 @@ import { Int16, Int32, Int8, Int64 as iInt64 } from './basic/Integer'
 import { EcsString } from './basic/String'
 import { Color3Schema } from './custom/Color3'
 import { Color4Schema } from './custom/Color4'
+import { EntitySchema } from './custom/Entity'
 import { QuaternionSchema } from './custom/Quaternion'
 import { Vector3Schema } from './custom/Vector3'
 import { ISchema } from './ISchema'
 import { IMap } from './Map'
 import { IOptional } from './Optional'
+
+export type { IOptional } from './Optional'
+export type { IMap } from './Map'
+export type { IArray } from './Array'
+export type { IEnum } from './basic/Enum'
+export type { Vector3Type } from './custom/Vector3'
+export type { QuaternionType } from './custom/Quaternion'
+export type { Color3Type } from './custom/Color3'
+export type { Color4Type } from './custom/Color4'
 
 /**
  * @public
@@ -36,6 +46,8 @@ export namespace Schemas {
   export const Quaternion = QuaternionSchema
   export const Color3 = Color3Schema
   export const Color4 = Color4Schema
+
+  export const Entity = EntitySchema
 
   export const Enum = IEnum
   export const Array = IArray

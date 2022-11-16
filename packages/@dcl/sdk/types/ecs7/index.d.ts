@@ -1,7 +1,50 @@
 /// <reference types="@dcl/posix" />
 
 /** @public */
-declare const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+declare const Animator: AnimatorComponentDefinition;
+
+/**
+ * @public
+ */
+declare interface AnimatorComponentDefinition extends ComponentDefinition {
+    /**
+     * @public
+     *
+     * Get a `mutable` version of animator clip
+     * @param entity - entity with Animator component
+     * @param name - the field `name` of the component
+     * @returns the clip or fails if it isn't found
+     */
+    getClip(entity: Entity, name: string): PBAnimationState;
+    /**
+     * @public
+     *
+     * Get a `mutable` version of animator clip
+     * @param entity - entity with Animator component
+     * @param name - the field `name` of the component
+     * @returns the clip or null if it isn't found
+     */
+    getClipOrNull(entity: Entity, name: string): PBAnimationState | null;
+    /**
+     * @public
+     *
+     * Set playing=true the animation `$name`
+     * @param entity - entity with Animator component
+     * @param name - animation name
+     * @param resetCursor - the animation starts at 0 or continues from the current cursor position
+     * @returns true in successful playing, false if it doesn't find the Animator or clip
+     */
+    playSingleAnimation(entity: Entity, name: string, resetCursor?: boolean): boolean;
+    /**
+     * @public
+     *
+     * Set playing=false all animations
+     * @param entity - entity with Animator component
+     * @param resetCursor - the animation stops at 0 or at the current cursor position
+     * @returns true in successful playing, false if it doesn't find the Animator
+     */
+    stopAllAnimations(entity: Entity, resetCursor?: boolean): boolean;
+}
 
 /** @public */
 declare const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
@@ -49,7 +92,109 @@ declare const enum BillboardMode {
 /**
  * @public
  */
-declare type ByteBuffer = ReturnType<typeof createByteBuffer>;
+declare type ByteBuffer = {
+    /**
+     * @returns The entire current Uint8Array.
+     *
+     * WARNING: if the buffer grows, the view had changed itself,
+     *  and the reference will be a invalid one.
+     */
+    buffer(): Uint8Array;
+    /**
+     * @returns The capacity of the current buffer
+     */
+    bufferLength(): number;
+    /**
+     * Resets byteBuffer to avoid creating a new one
+     */
+    resetBuffer(): void;
+    /**
+     * @returns The current read offset
+     */
+    currentReadOffset(): number;
+    /**
+     * @returns The current write offset
+     */
+    currentWriteOffset(): number;
+    /**
+     * Reading purpose
+     * Returns the previuos offsset size before incrementing
+     */
+    incrementReadOffset(amount: number): number;
+    /**
+     * @returns How many bytes are available to read.
+     */
+    remainingBytes(): number;
+    readFloat32(): number;
+    readFloat64(): number;
+    readInt8(): number;
+    readInt16(): number;
+    readInt32(): number;
+    readInt64(): bigint;
+    readUint8(): number;
+    readUint16(): number;
+    readUint32(): number;
+    readUint64(): bigint;
+    readBuffer(): Uint8Array;
+    /**
+     * Writing purpose
+     */
+    /**
+     * Increment offset
+     * @param amount - how many bytes
+     * @returns The offset when this reserving starts.
+     */
+    incrementWriteOffset(amount: number): number;
+    /**
+     * @returns The total number of bytes writen in the buffer.
+     */
+    size(): number;
+    /**
+     * Take care using this function, if you modify the data after, the
+     * returned subarray will change too. If you'll modify the content of the
+     * bytebuffer, maybe you want to use toCopiedBinary()
+     *
+     * @returns The subarray from 0 to offset as reference.
+     */
+    toBinary(): Uint8Array;
+    /**
+     * Safe copied buffer of the current data of ByteBuffer
+     *
+     * @returns The subarray from 0 to offset.
+     */
+    toCopiedBinary(): Uint8Array;
+    writeBuffer(value: Uint8Array, writeLength?: boolean): void;
+    writeFloat32(value: number): void;
+    writeFloat64(value: number): void;
+    writeInt8(value: number): void;
+    writeInt16(value: number): void;
+    writeInt32(value: number): void;
+    writeInt64(value: bigint): void;
+    writeUint8(value: number): void;
+    writeUint16(value: number): void;
+    writeUint32(value: number): void;
+    writeUint64(value: bigint): void;
+    getFloat32(offset: number): number;
+    getFloat64(offset: number): number;
+    getInt8(offset: number): number;
+    getInt16(offset: number): number;
+    getInt32(offset: number): number;
+    getInt64(offset: number): bigint;
+    getUint8(offset: number): number;
+    getUint16(offset: number): number;
+    getUint32(offset: number): number;
+    getUint64(offset: number): bigint;
+    setFloat32(offset: number, value: number): void;
+    setFloat64(offset: number, value: number): void;
+    setInt8(offset: number, value: number): void;
+    setInt16(offset: number, value: number): void;
+    setInt32(offset: number, value: number): void;
+    setInt64(offset: number, value: bigint): void;
+    setUint8(offset: number, value: number): void;
+    setUint16(offset: number, value: number): void;
+    setUint32(offset: number, value: number): void;
+    setUint64(offset: number, value: bigint): void;
+};
 
 /** @public */
 declare const CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
@@ -416,12 +561,6 @@ declare namespace Color3 {
     export function toGammaSpaceToRef(value: ReadonlyColor3, convertedColor: MutableColor3): void;
 }
 
-declare interface Color3_2 {
-    r: number;
-    g: number;
-    b: number;
-}
-
 /**
  * @public
  */
@@ -769,13 +908,6 @@ declare namespace Color4 {
     export function toGammaSpaceToRef(value: ReadonlyColor4, convertedColor: MutableColor4): void;
 }
 
-declare interface Color4_2 {
-    r: number;
-    g: number;
-    b: number;
-    a: number;
-}
-
 /**
  * @public
  */
@@ -917,7 +1049,7 @@ declare namespace Components {
     /** @public */
     const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     /** @public */
-    const Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+    const Animator: AnimatorComponentDefinition;
     /** @public */
     const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     /** @public */
@@ -979,144 +1111,6 @@ declare type ComponentSchema<T extends [ComponentDefinition, ...ComponentDefinit
 declare type ComponentType<T extends ISchema> = EcsResult<T>;
 
 /**
- * ByteBuffer is a wrapper of DataView which also adds a read and write offset.
- *  Also in a write operation it resizes the buffer is being used if it needs.
- *
- * - Use read and write function to generate or consume data.
- * - Use set and get only if you are sure that you're doing.
- */
-declare function createByteBuffer(options?: CreateByteBufferOptions): {
-    /**
-     * @returns The entire current Uint8Array.
-     *
-     * WARNING: if the buffer grows, the view had changed itself,
-     *  and the reference will be a invalid one.
-     */
-    buffer(): Uint8Array;
-    /**
-     * @returns The capacity of the current buffer
-     */
-    bufferLength(): number;
-    /**
-     * Resets byteBuffer to avoid creating a new one
-     */
-    resetBuffer(): void;
-    /**
-     * @returns The current read offset
-     */
-    currentReadOffset(): number;
-    /**
-     * @returns The current write offset
-     */
-    currentWriteOffset(): number;
-    /**
-     * Reading purpose
-     * Returns the previuos offsset size before incrementing
-     */
-    incrementReadOffset(amount: number): number;
-    /**
-     * @returns How many bytes are available to read.
-     */
-    remainingBytes(): number;
-    readFloat32(): number;
-    readFloat64(): number;
-    readInt8(): number;
-    readInt16(): number;
-    readInt32(): number;
-    readInt64(): bigint;
-    readUint8(): number;
-    readUint16(): number;
-    readUint32(): number;
-    readUint64(): bigint;
-    readBuffer(): Uint8Array;
-    /**
-     * Writing purpose
-     */
-    /**
-     * Increment offset
-     * @param amount - how many bytes
-     * @returns The offset when this reserving starts.
-     */
-    incrementWriteOffset(amount: number): number;
-    /**
-     * @returns The total number of bytes writen in the buffer.
-     */
-    size(): number;
-    /**
-     * Take care using this function, if you modify the data after, the
-     * returned subarray will change too. If you'll modify the content of the
-     * bytebuffer, maybe you want to use toCopiedBinary()
-     *
-     * @returns The subarray from 0 to offset as reference.
-     */
-    toBinary(): Uint8Array;
-    /**
-     * Safe copied buffer of the current data of ByteBuffer
-     *
-     * @returns The subarray from 0 to offset.
-     */
-    toCopiedBinary(): Uint8Array;
-    writeBuffer(value: Uint8Array, writeLength?: boolean): void;
-    writeFloat32(value: number): void;
-    writeFloat64(value: number): void;
-    writeInt8(value: number): void;
-    writeInt16(value: number): void;
-    writeInt32(value: number): void;
-    writeInt64(value: bigint): void;
-    writeUint8(value: number): void;
-    writeUint16(value: number): void;
-    writeUint32(value: number): void;
-    writeUint64(value: bigint): void;
-    getFloat32(offset: number): number;
-    getFloat64(offset: number): number;
-    getInt8(offset: number): number;
-    getInt16(offset: number): number;
-    getInt32(offset: number): number;
-    getInt64(offset: number): bigint;
-    getUint8(offset: number): number;
-    getUint16(offset: number): number;
-    getUint32(offset: number): number;
-    getUint64(offset: number): bigint;
-    setFloat32(offset: number, value: number): void;
-    setFloat64(offset: number, value: number): void;
-    setInt8(offset: number, value: number): void;
-    setInt16(offset: number, value: number): void;
-    setInt32(offset: number, value: number): void;
-    setInt64(offset: number, value: bigint): void;
-    setUint8(offset: number, value: number): void;
-    setUint16(offset: number, value: number): void;
-    setUint32(offset: number, value: number): void;
-    setUint64(offset: number, value: bigint): void;
-};
-
-/**
- * @param writing - writing option, see object specs.
- * @param reading - reading option, see object specs.
- * @param initialCapacity - Initial capacity of buffer to allocate, ignored if you use writing or reading options
- */
-declare interface CreateByteBufferOptions {
-    /**
-     * @param buffer - a buffer already allocated to read from there.
-     * @param currentOffset - set the cursor where begins to read. Default 0
-     * @param length - delimite where the valid data ends. Default: buffer.length
-     */
-    reading?: {
-        buffer: Uint8Array;
-        length?: number;
-        currentOffset: number;
-    };
-    /**
-     * @param buffer - a buffer already allocated to write there.
-     * @param currentOffset - set the cursor to not start writing from the begin of it. Default 0
-     */
-    writing?: {
-        buffer: Uint8Array;
-        currentOffset?: number;
-    };
-    initialCapacity?: number;
-}
-
-/**
  * Transform parenting: cyclic dependency checker
  * It checks only in modified Transforms
  *
@@ -1155,9 +1149,38 @@ declare type DeepReadonlyObject<T> = {
  */
 declare type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 
-declare function defineSdkComponents(engine: PreEngine): {
-    Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
+declare function defineComponent<T extends ISchema, ConstructorType = ComponentType<T>>(componentId: number, spec: T, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
+
+declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEngine, 'defineComponentFromSchema'>): {
     Animator: ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+    AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
+    AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
+    AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
+    AvatarModifierArea: ComponentDefinition<ISchema<PBAvatarModifierArea>, PBAvatarModifierArea>;
+    AvatarShape: ComponentDefinition<ISchema<PBAvatarShape>, PBAvatarShape>;
+    Billboard: ComponentDefinition<ISchema<PBBillboard>, PBBillboard>;
+    CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
+    CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
+    GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
+    Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
+    NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
+    PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
+    PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
+    PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
+    Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
+    RaycastResult: ComponentDefinition<ISchema<PBRaycastResult>, PBRaycastResult>;
+    TextShape: ComponentDefinition<ISchema<PBTextShape>, PBTextShape>;
+    UiBackground: ComponentDefinition<ISchema<PBUiBackground>, PBUiBackground>;
+    UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
+    UiTransform: ComponentDefinition<ISchema<PBUiTransform>, PBUiTransform>;
+    VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
+};
+
+declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponentFromSchema' | 'getComponent'>): {
+    Animator: AnimatorComponentDefinition;
+    Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
     AvatarAttach: ComponentDefinition<ISchema<PBAvatarAttach>, PBAvatarAttach>;
@@ -1405,7 +1428,7 @@ declare type IEngine = {
      * Camera entity of current player.
      */
     CameraEntity: Entity;
-    baseComponents: SdkComponents;
+    baseComponents: ReturnType<typeof defineSdkComponents>;
 };
 
 /**
@@ -1520,7 +1543,7 @@ declare const enum MaterialTransparencyMode {
  * @public
  */
 declare namespace Matrix {
-    type Matrix4x4 = [
+    export type Matrix4x4 = [
     number,
     number,
     number,
@@ -1538,7 +1561,7 @@ declare namespace Matrix {
     number,
     number
     ];
-    type MutableMatrix = {
+    export type MutableMatrix = {
         /**
          * Gets the update flag of the matrix which is an unique number for the matrix.
          * It will be incremented every time the matrix data change.
@@ -1551,7 +1574,7 @@ declare namespace Matrix {
         _isIdentity3x2Dirty: boolean;
         _m: Matrix4x4;
     };
-    type ReadonlyMatrix = {
+    export type ReadonlyMatrix = {
         /**
          * Gets the update flag of the matrix which is an unique number for the matrix.
          * It will be incremented every time the matrix data change.
@@ -1567,29 +1590,29 @@ declare namespace Matrix {
     /**
      * Gets the internal data of the matrix
      */
-    function m(self: MutableMatrix): Matrix4x4;
+    export function m(self: MutableMatrix): Matrix4x4;
     /**
      * Gets an identity matrix that must not be updated
      */
-    function IdentityReadonly(): ReadonlyMatrix;
+    export function IdentityReadonly(): ReadonlyMatrix;
     /**
      * Creates an empty matrix (filled with zeros)
      */
-    function create(): MutableMatrix;
+    export function create(): MutableMatrix;
     /**
      * Creates a matrix from an array
      * @param array - defines the source array
      * @param offset - defines an offset in the source array
      * @returns a new Matrix set from the starting index of the given array
      */
-    function fromArray(array: Matrix4x4, offset?: number): MutableMatrix;
+    export function fromArray(array: Matrix4x4, offset?: number): MutableMatrix;
     /**
      * Copy the content of an array into a given matrix
      * @param array - defines the source array
      * @param offset - defines an offset in the source array
      * @param result - defines the target matrix
      */
-    function fromArrayToRef(array: Matrix4x4, offset: number, result: MutableMatrix): void;
+    export function fromArrayToRef(array: Matrix4x4, offset: number, result: MutableMatrix): void;
     /**
      * Stores an array into a matrix after having multiplied each component by a given factor
      * @param array - defines the source array
@@ -1597,7 +1620,7 @@ declare namespace Matrix {
      * @param scale - defines the scaling factor
      * @param result - defines the target matrix
      */
-    function fromFloatArrayToRefScaled(array: FloatArray, offset: number, scale: number, result: MutableMatrix): void;
+    export function fromFloatArrayToRefScaled(array: FloatArray, offset: number, scale: number, result: MutableMatrix): void;
     /**
      * Stores a list of values (16) inside a given matrix
      * @param initialM11 - defines 1st value of 1st row
@@ -1618,7 +1641,7 @@ declare namespace Matrix {
      * @param initialM44 - defines 4th value of 4th row
      * @param result - defines the target matrix
      */
-    function fromValuesToRef(initialM11: number, initialM12: number, initialM13: number, initialM14: number, initialM21: number, initialM22: number, initialM23: number, initialM24: number, initialM31: number, initialM32: number, initialM33: number, initialM34: number, initialM41: number, initialM42: number, initialM43: number, initialM44: number, result: MutableMatrix): void;
+    export function fromValuesToRef(initialM11: number, initialM12: number, initialM13: number, initialM14: number, initialM21: number, initialM22: number, initialM23: number, initialM24: number, initialM31: number, initialM32: number, initialM33: number, initialM34: number, initialM41: number, initialM42: number, initialM43: number, initialM44: number, result: MutableMatrix): void;
     /**
      * Creates new matrix from a list of values (16)
      * @param initialM11 - defines 1st value of 1st row
@@ -1639,7 +1662,7 @@ declare namespace Matrix {
      * @param initialM44 - defines 4th value of 4th row
      * @returns the new matrix
      */
-    function fromValues(initialM11: number, initialM12: number, initialM13: number, initialM14: number, initialM21: number, initialM22: number, initialM23: number, initialM24: number, initialM31: number, initialM32: number, initialM33: number, initialM34: number, initialM41: number, initialM42: number, initialM43: number, initialM44: number): MutableMatrix;
+    export function fromValues(initialM11: number, initialM12: number, initialM13: number, initialM14: number, initialM21: number, initialM22: number, initialM23: number, initialM24: number, initialM31: number, initialM32: number, initialM33: number, initialM34: number, initialM41: number, initialM42: number, initialM43: number, initialM44: number): MutableMatrix;
     /**
      * Creates a new matrix composed by merging scale (vector3), rotation (quaternion) and translation (vector3)
      * @param scale - defines the scale vector3
@@ -1647,7 +1670,7 @@ declare namespace Matrix {
      * @param translation - defines the translation vector3
      * @returns a new matrix
      */
-    function compose(scale: Vector3.ReadonlyVector3, rotation: Quaternion.ReadonlyQuaternion, translation: Vector3.ReadonlyVector3): MutableMatrix;
+    export function compose(scale: Vector3.ReadonlyVector3, rotation: Quaternion.ReadonlyQuaternion, translation: Vector3.ReadonlyVector3): MutableMatrix;
     /**
      * Sets a matrix to a value composed by merging scale (vector3), rotation (quaternion) and translation (vector3)
      * @param scale - defines the scale vector3
@@ -1655,72 +1678,72 @@ declare namespace Matrix {
      * @param translation - defines the translation vector3
      * @param result - defines the target matrix
      */
-    function composeToRef(scale: Vector3.ReadonlyVector3, rotation: Quaternion.ReadonlyQuaternion, translation: Vector3.ReadonlyVector3, result: MutableMatrix): void;
+    export function composeToRef(scale: Vector3.ReadonlyVector3, rotation: Quaternion.ReadonlyQuaternion, translation: Vector3.ReadonlyVector3, result: MutableMatrix): void;
     /**
      * Creates a new identity matrix
      * @returns a new identity matrix
      */
-    function Identity(): MutableMatrix;
+    export function Identity(): MutableMatrix;
     /**
      * Creates a new identity matrix and stores the result in a given matrix
      * @param result - defines the target matrix
      */
-    function IdentityToRef(result: MutableMatrix): void;
+    export function IdentityToRef(result: MutableMatrix): void;
     /**
      * Creates a new zero matrix
      * @returns a new zero matrix
      */
-    function Zero(): MutableMatrix;
+    export function Zero(): MutableMatrix;
     /**
      * Creates a new rotation matrix for "angle" radians around the X axis
      * @param angle - defines the angle (in radians) to use
      * @returns the new matrix
      */
-    function RotationX(angle: number): MutableMatrix;
+    export function RotationX(angle: number): MutableMatrix;
     /**
      * Creates a new rotation matrix for "angle" radians around the X axis and stores it in a given matrix
      * @param angle - defines the angle (in radians) to use
      * @param result - defines the target matrix
      */
-    function rotationXToRef(angle: number, result: MutableMatrix): void;
+    export function rotationXToRef(angle: number, result: MutableMatrix): void;
     /**
      * Creates a new rotation matrix for "angle" radians around the Y axis
      * @param angle - defines the angle (in radians) to use
      * @returns the new matrix
      */
-    function rotationY(angle: number): MutableMatrix;
+    export function rotationY(angle: number): MutableMatrix;
     /**
      * Creates a new rotation matrix for "angle" radians around the Y axis and stores it in a given matrix
      * @param angle - defines the angle (in radians) to use
      * @param result - defines the target matrix
      */
-    function rotationYToRef(angle: number, result: MutableMatrix): void;
+    export function rotationYToRef(angle: number, result: MutableMatrix): void;
     /**
      * Creates a new rotation matrix for "angle" radians around the Z axis
      * @param angle - defines the angle (in radians) to use
      * @returns the new matrix
      */
-    function rotationZ(angle: number): MutableMatrix;
+    export function rotationZ(angle: number): MutableMatrix;
     /**
      * Creates a new rotation matrix for "angle" radians around the Z axis and stores it in a given matrix
      * @param angle - defines the angle (in radians) to use
      * @param result - defines the target matrix
      */
-    function rotationZToRef(angle: number, result: MutableMatrix): void;
+    export function rotationZToRef(angle: number, result: MutableMatrix): void;
     /**
      * Creates a new rotation matrix for "angle" radians around the given axis
      * @param axis - defines the axis to use
      * @param angle - defines the angle (in radians) to use
      * @returns the new matrix
      */
-    function rotationAxis(axis: Vector3.ReadonlyVector3, angle: number): MutableMatrix;
+    export function rotationAxis(axis: Vector3.ReadonlyVector3, angle: number): MutableMatrix;
     /**
      * Creates a new rotation matrix for "angle" radians around the given axis and stores it in a given matrix
      * @param axis - defines the axis to use
      * @param angle - defines the angle (in radians) to use
      * @param result - defines the target matrix
      */
-    function rotationAxisToRef(_axis: Vector3.ReadonlyVector3, angle: number, result: MutableMatrix): void;
+    export function rotationAxisToRef(_axis: Vector3.ReadonlyVector3, angle: number, result: MutableMatrix): void;
     /**
      * Creates a rotation matrix
      * @param yaw - defines the yaw angle in radians (Y axis)
@@ -1728,7 +1751,7 @@ declare namespace Matrix {
      * @param roll - defines the roll angle in radians (X axis)
      * @returns the new rotation matrix
      */
-    function rotationYawPitchRoll(yaw: number, pitch: number, roll: number): MutableMatrix;
+    export function rotationYawPitchRoll(yaw: number, pitch: number, roll: number): MutableMatrix;
     /**
      * Creates a rotation matrix and stores it in a given matrix
      * @param yaw - defines the yaw angle in radians (Y axis)
@@ -1736,7 +1759,7 @@ declare namespace Matrix {
      * @param roll - defines the roll angle in radians (X axis)
      * @param result - defines the target matrix
      */
-    function rotationYawPitchRollToRef(yaw: number, pitch: number, roll: number, result: MutableMatrix): void;
+    export function rotationYawPitchRollToRef(yaw: number, pitch: number, roll: number, result: MutableMatrix): void;
     /**
      * Creates a scaling matrix
      * @param x - defines the scale factor on X axis
@@ -1744,7 +1767,7 @@ declare namespace Matrix {
      * @param z - defines the scale factor on Z axis
      * @returns the new matrix
      */
-    function scaling(x: number, y: number, z: number): MutableMatrix;
+    export function scaling(x: number, y: number, z: number): MutableMatrix;
     /**
      * Creates a scaling matrix and stores it in a given matrix
      * @param x - defines the scale factor on X axis
@@ -1752,7 +1775,7 @@ declare namespace Matrix {
      * @param z - defines the scale factor on Z axis
      * @param result - defines the target matrix
      */
-    function scalingToRef(x: number, y: number, z: number, result: MutableMatrix): void;
+    export function scalingToRef(x: number, y: number, z: number, result: MutableMatrix): void;
     /**
      * Creates a translation matrix
      * @param x - defines the translation on X axis
@@ -1760,7 +1783,7 @@ declare namespace Matrix {
      * @param z - defines the translationon Z axis
      * @returns the new matrix
      */
-    function translation(x: number, y: number, z: number): MutableMatrix;
+    export function translation(x: number, y: number, z: number): MutableMatrix;
     /**
      * Creates a translation matrix and stores it in a given matrix
      * @param x - defines the translation on X axis
@@ -1768,7 +1791,7 @@ declare namespace Matrix {
      * @param z - defines the translationon Z axis
      * @param result - defines the target matrix
      */
-    function translationToRef(x: number, y: number, z: number, result: MutableMatrix): void;
+    export function translationToRef(x: number, y: number, z: number, result: MutableMatrix): void;
     /**
      * Returns a new Matrix whose values are the interpolated values for "gradient" (float) between the ones of the matrices "startValue" and "endValue".
      * @param startValue - defines the start value
@@ -1776,7 +1799,7 @@ declare namespace Matrix {
      * @param gradient - defines the gradient factor
      * @returns the new matrix
      */
-    function lerp(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number): MutableMatrix;
+    export function lerp(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number): MutableMatrix;
     /**
      * Set the given matrix "result" as the interpolated values for "gradient" (float) between the ones of the matrices "startValue" and "endValue".
      * @param startValue - defines the start value
@@ -1784,7 +1807,7 @@ declare namespace Matrix {
      * @param gradient - defines the gradient factor
      * @param result - defines the Matrix object where to store data
      */
-    function lerpToRef(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number, result: MutableMatrix): void;
+    export function lerpToRef(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number, result: MutableMatrix): void;
     /**
      * Builds a new matrix whose values are computed by:
      * * decomposing the the "startValue" and "endValue" matrices into their respective scale, rotation and translation matrices
@@ -1795,7 +1818,7 @@ declare namespace Matrix {
      * @param gradient - defines the gradient between the two matrices
      * @returns the new matrix
      */
-    function decomposeLerp(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number): MutableMatrix;
+    export function decomposeLerp(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number): MutableMatrix;
     /**
      * Update a matrix to values which are computed by:
      * * decomposing the the "startValue" and "endValue" matrices into their respective scale, rotation and translation matrices
@@ -1806,7 +1829,7 @@ declare namespace Matrix {
      * @param gradient - defines the gradient between the two matrices
      * @param result - defines the target matrix
      */
-    function decomposeLerpToRef(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number, result: MutableMatrix): void;
+    export function decomposeLerpToRef(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number, result: MutableMatrix): void;
     /**
      * Gets a new rotation matrix used to rotate an entity so as it looks at the target vector3, from the eye vector3 position, the up vector3 being oriented like "up"
      * self function works in left handed mode
@@ -1815,7 +1838,7 @@ declare namespace Matrix {
      * @param up - defines the up vector for the entity
      * @returns the new matrix
      */
-    function LookAtLH(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3): MutableMatrix;
+    export function LookAtLH(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3): MutableMatrix;
     /**
      * Sets the given "result" Matrix to a rotation matrix used to rotate an entity so that it looks at the target vector3, from the eye vector3 position, the up vector3 being oriented like "up".
      * self function works in left handed mode
@@ -1824,7 +1847,7 @@ declare namespace Matrix {
      * @param up - defines the up vector for the entity
      * @param result - defines the target matrix
      */
-    function lookAtLHToRef(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3, result: MutableMatrix): void;
+    export function lookAtLHToRef(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3, result: MutableMatrix): void;
     /**
      * Gets a new rotation matrix used to rotate an entity so as it looks at the target vector3, from the eye vector3 position, the up vector3 being oriented like "up"
      * self function works in right handed mode
@@ -1833,7 +1856,7 @@ declare namespace Matrix {
      * @param up - defines the up vector for the entity
      * @returns the new matrix
      */
-    function lookAtRH(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3): MutableMatrix;
+    export function lookAtRH(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3): MutableMatrix;
     /**
      * Sets the given "result" Matrix to a rotation matrix used to rotate an entity so that it looks at the target vector3, from the eye vector3 position, the up vector3 being oriented like "up".
      * self function works in right handed mode
@@ -1842,7 +1865,7 @@ declare namespace Matrix {
      * @param up - defines the up vector for the entity
      * @param result - defines the target matrix
      */
-    function lookAtRHToRef(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3, result: MutableMatrix): void;
+    export function lookAtRHToRef(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3, result: MutableMatrix): void;
     /**
      * Create a left-handed orthographic projection matrix
      * @param width - defines the viewport width
@@ -1851,7 +1874,7 @@ declare namespace Matrix {
      * @param zfar - defines the far clip plane
      * @returns a new matrix as a left-handed orthographic projection matrix
      */
-    function orthoLH(width: number, height: number, znear: number, zfar: number): MutableMatrix;
+    export function orthoLH(width: number, height: number, znear: number, zfar: number): MutableMatrix;
     /**
      * Store a left-handed orthographic projection to a given matrix
      * @param width - defines the viewport width
@@ -1860,7 +1883,7 @@ declare namespace Matrix {
      * @param zfar - defines the far clip plane
      * @param result - defines the target matrix
      */
-    function orthoLHToRef(width: number, height: number, znear: number, zfar: number, result: MutableMatrix): void;
+    export function orthoLHToRef(width: number, height: number, znear: number, zfar: number, result: MutableMatrix): void;
     /**
      * Create a left-handed orthographic projection matrix
      * @param left - defines the viewport left coordinate
@@ -1871,7 +1894,7 @@ declare namespace Matrix {
      * @param zfar - defines the far clip plane
      * @returns a new matrix as a left-handed orthographic projection matrix
      */
-    function OrthoOffCenterLH(left: number, right: number, bottom: number, top: number, znear: number, zfar: number): MutableMatrix;
+    export function OrthoOffCenterLH(left: number, right: number, bottom: number, top: number, znear: number, zfar: number): MutableMatrix;
     /**
      * Stores a left-handed orthographic projection into a given matrix
      * @param left - defines the viewport left coordinate
@@ -1882,7 +1905,7 @@ declare namespace Matrix {
      * @param zfar - defines the far clip plane
      * @param result - defines the target matrix
      */
-    function orthoOffCenterLHToRef(left: number, right: number, bottom: number, top: number, znear: number, zfar: number, result: MutableMatrix): void;
+    export function orthoOffCenterLHToRef(left: number, right: number, bottom: number, top: number, znear: number, zfar: number, result: MutableMatrix): void;
     /**
      * Creates a right-handed orthographic projection matrix
      * @param left - defines the viewport left coordinate
@@ -1893,7 +1916,7 @@ declare namespace Matrix {
      * @param zfar - defines the far clip plane
      * @returns a new matrix as a right-handed orthographic projection matrix
      */
-    function orthoOffCenterRH(left: number, right: number, bottom: number, top: number, znear: number, zfar: number): MutableMatrix;
+    export function orthoOffCenterRH(left: number, right: number, bottom: number, top: number, znear: number, zfar: number): MutableMatrix;
     /**
      * Stores a right-handed orthographic projection into a given matrix
      * @param left - defines the viewport left coordinate
@@ -1904,7 +1927,7 @@ declare namespace Matrix {
      * @param zfar - defines the far clip plane
      * @param result - defines the target matrix
      */
-    function orthoOffCenterRHToRef(left: number, right: number, bottom: number, top: number, znear: number, zfar: number, result: MutableMatrix): void;
+    export function orthoOffCenterRHToRef(left: number, right: number, bottom: number, top: number, znear: number, zfar: number, result: MutableMatrix): void;
     /**
      * Creates a left-handed perspective projection matrix
      * @param width - defines the viewport width
@@ -1913,7 +1936,7 @@ declare namespace Matrix {
      * @param zfar - defines the far clip plane
      * @returns a new matrix as a left-handed perspective projection matrix
      */
-    function perspectiveLH(width: number, height: number, znear: number, zfar: number): MutableMatrix;
+    export function perspectiveLH(width: number, height: number, znear: number, zfar: number): MutableMatrix;
     /**
      * Creates a left-handed perspective projection matrix
      * @param fov - defines the horizontal field of view
@@ -1922,7 +1945,7 @@ declare namespace Matrix {
      * @param zfar - defines the far clip plane
      * @returns a new matrix as a left-handed perspective projection matrix
      */
-    function perspectiveFovLH(fov: number, aspect: number, znear: number, zfar: number): MutableMatrix;
+    export function perspectiveFovLH(fov: number, aspect: number, znear: number, zfar: number): MutableMatrix;
     /**
      * Stores a left-handed perspective projection into a given matrix
      * @param fov - defines the horizontal field of view
@@ -1932,7 +1955,7 @@ declare namespace Matrix {
      * @param result - defines the target matrix
      * @param isVerticalFovFixed - defines it the fov is vertically fixed (default) or horizontally
      */
-    function perspectiveFovLHToRef(fov: number, aspect: number, znear: number, zfar: number, result: MutableMatrix, isVerticalFovFixed?: boolean): void;
+    export function perspectiveFovLHToRef(fov: number, aspect: number, znear: number, zfar: number, result: MutableMatrix, isVerticalFovFixed?: boolean): void;
     /**
      * Creates a right-handed perspective projection matrix
      * @param fov - defines the horizontal field of view
@@ -1941,7 +1964,7 @@ declare namespace Matrix {
      * @param zfar - defines the far clip plane
      * @returns a new matrix as a right-handed perspective projection matrix
      */
-    function PerspectiveFovRH(fov: number, aspect: number, znear: number, zfar: number): MutableMatrix;
+    export function PerspectiveFovRH(fov: number, aspect: number, znear: number, zfar: number): MutableMatrix;
     /**
      * Stores a right-handed perspective projection into a given matrix
      * @param fov - defines the horizontal field of view
@@ -1951,7 +1974,7 @@ declare namespace Matrix {
      * @param result - defines the target matrix
      * @param isVerticalFovFixed - defines it the fov is vertically fixed (default) or horizontally
      */
-    function perspectiveFovRHToRef(fov: number, aspect: number, znear: number, zfar: number, result: MutableMatrix, isVerticalFovFixed?: boolean): void;
+    export function perspectiveFovRHToRef(fov: number, aspect: number, znear: number, zfar: number, result: MutableMatrix, isVerticalFovFixed?: boolean): void;
     /**
      * Stores a perspective projection for WebVR info a given matrix
      * @param fov - defines the field of view
@@ -1960,7 +1983,7 @@ declare namespace Matrix {
      * @param result - defines the target matrix
      * @param rightHanded - defines if the matrix must be in right-handed mode (false by default)
      */
-    function perspectiveFovWebVRToRef(fov: {
+    export function perspectiveFovWebVRToRef(fov: {
         upDegrees: number;
         downDegrees: number;
         leftDegrees: number;
@@ -1971,37 +1994,37 @@ declare namespace Matrix {
      * @param matrix - defines the matrix to use
      * @returns a new FloatArray array with 4 elements : the 2x2 matrix extracted from the given matrix
      */
-    function GetAsMatrix2x2(matrix: ReadonlyMatrix): FloatArray;
+    export function GetAsMatrix2x2(matrix: ReadonlyMatrix): FloatArray;
     /**
      * Extracts a 3x3 matrix from a given matrix and store the result in a FloatArray
      * @param matrix - defines the matrix to use
      * @returns a new FloatArray array with 9 elements : the 3x3 matrix extracted from the given matrix
      */
-    function GetAsMatrix3x3(matrix: ReadonlyMatrix): FloatArray;
+    export function GetAsMatrix3x3(matrix: ReadonlyMatrix): FloatArray;
     /**
      * Compute the transpose of a given matrix
      * @param matrix - defines the matrix to transpose
      * @returns the new matrix
      */
-    function transpose(matrix: ReadonlyMatrix): MutableMatrix;
+    export function transpose(matrix: ReadonlyMatrix): MutableMatrix;
     /**
      * Compute the transpose of a matrix and store it in a target matrix
      * @param matrix - defines the matrix to transpose
      * @param result - defines the target matrix
      */
-    function transposeToRef(matrix: ReadonlyMatrix, result: MutableMatrix): void;
+    export function transposeToRef(matrix: ReadonlyMatrix, result: MutableMatrix): void;
     /**
      * Computes a reflection matrix from a plane
      * @param plane - defines the reflection plane
      * @returns a new matrix
      */
-    function reflection(plane: Plane.ReadonlyPlane): MutableMatrix;
+    export function reflection(plane: Plane.ReadonlyPlane): MutableMatrix;
     /**
      * Computes a reflection matrix from a plane
      * @param plane - defines the reflection plane
      * @param result - defines the target matrix
      */
-    function reflectionToRef(_plane: Plane.ReadonlyPlane, result: MutableMatrix): void;
+    export function reflectionToRef(_plane: Plane.ReadonlyPlane, result: MutableMatrix): void;
     /**
      * Sets the given matrix as a rotation matrix composed from the 3 left handed axes
      * @param xaxis - defines the value of the 1st axis
@@ -2009,88 +2032,88 @@ declare namespace Matrix {
      * @param zaxis - defines the value of the 3rd axis
      * @param result - defines the target matrix
      */
-    function fromXYZAxesToRef(xaxis: Vector3.ReadonlyVector3, yaxis: Vector3.ReadonlyVector3, zaxis: Vector3.ReadonlyVector3, result: MutableMatrix): void;
+    export function fromXYZAxesToRef(xaxis: Vector3.ReadonlyVector3, yaxis: Vector3.ReadonlyVector3, zaxis: Vector3.ReadonlyVector3, result: MutableMatrix): void;
     /**
      * Creates a rotation matrix from a quaternion and stores it in a target matrix
      * @param quat - defines the quaternion to use
      * @param result - defines the target matrix
      */
-    function fromQuaternionToRef(quat: Quaternion.ReadonlyQuaternion, result: MutableMatrix): void;
+    export function fromQuaternionToRef(quat: Quaternion.ReadonlyQuaternion, result: MutableMatrix): void;
     /**
      * Check if the current matrix is identity
      * @returns true is the matrix is the identity matrix
      */
-    function isIdentityUpdate(self: MutableMatrix): boolean;
+    export function isIdentityUpdate(self: MutableMatrix): boolean;
     /**
      * Check if the current matrix is identity as a texture matrix (3x2 store in 4x4)
      * @returns true is the matrix is the identity matrix
      */
-    function isIdentityAs3x2Update(self: MutableMatrix): boolean;
+    export function isIdentityAs3x2Update(self: MutableMatrix): boolean;
     /**
      * Gets the determinant of the matrix
      * @returns the matrix determinant
      */
-    function determinant(self: ReadonlyMatrix): number;
+    export function determinant(self: ReadonlyMatrix): number;
     /**
      * Returns the matrix as a FloatArray
      * @returns the matrix underlying array
      */
-    function toArray(self: ReadonlyMatrix): Matrix4x4;
+    export function toArray(self: ReadonlyMatrix): Matrix4x4;
     /**
      * Returns the matrix as a FloatArray
      * @returns the matrix underlying array.
      */
-    function asArray(self: ReadonlyMatrix): Matrix4x4;
+    export function asArray(self: ReadonlyMatrix): Matrix4x4;
     /**
      * Sets all the matrix elements to zero
      * @returns the current matrix
      */
-    function reset(self: MutableMatrix): void;
+    export function reset(self: MutableMatrix): void;
     /**
      * Adds the current matrix with a second one
      * @param other - defines the matrix to add
      * @returns a new matrix as the addition of the current matrix and the given one
      */
-    function add(self: ReadonlyMatrix, other: ReadonlyMatrix): MutableMatrix;
+    export function add(self: ReadonlyMatrix, other: ReadonlyMatrix): MutableMatrix;
     /**
      * Sets the given matrix "result" to the addition of the current matrix and the given one
      * @param other - defines the matrix to add
      * @param result - defines the target matrix
      * @returns the current matrix
      */
-    function addToRef(self: ReadonlyMatrix, other: ReadonlyMatrix, result: MutableMatrix): void;
+    export function addToRef(self: ReadonlyMatrix, other: ReadonlyMatrix, result: MutableMatrix): void;
     /**
      * Adds in place the given matrix to the current matrix
      * @param other - defines the second operand
      * @returns the current updated matrix
      */
-    function addToSelf(self: MutableMatrix, other: ReadonlyMatrix): void;
+    export function addToSelf(self: MutableMatrix, other: ReadonlyMatrix): void;
     /**
      * Creates a new matrix as the invert of a given matrix
      * @param source - defines the source matrix
      * @returns the new matrix
      */
-    function invert(source: ReadonlyMatrix): MutableMatrix;
+    export function invert(source: ReadonlyMatrix): MutableMatrix;
     /**
      * Sets the given matrix to the current inverted Matrix
      * @param other - defines the target matrix
      * @returns the unmodified current matrix
      */
-    function invertToRef(source: ReadonlyMatrix, result: MutableMatrix): void;
+    export function invertToRef(source: ReadonlyMatrix, result: MutableMatrix): void;
     /**
      * add a value at the specified position in the current Matrix
      * @param index - the index of the value within the matrix. between 0 and 15.
      * @param value - the value to be added
      * @returns the current updated matrix
      */
-    function addAtIndex(self: MutableMatrix, index: number, value: number): void;
+    export function addAtIndex(self: MutableMatrix, index: number, value: number): void;
     /**
      * mutiply the specified position in the current Matrix by a value
      * @param index - the index of the value within the matrix. between 0 and 15.
      * @param value - the value to be added
      * @returns the current updated matrix
      */
-    function multiplyAtIndex(self: MutableMatrix, index: number, value: number): MutableMatrix;
+    export function multiplyAtIndex(self: MutableMatrix, index: number, value: number): MutableMatrix;
     /**
      * Inserts the translation vector (using 3 floats) in the current matrix
      * @param x - defines the 1st component of the translation
@@ -2098,55 +2121,55 @@ declare namespace Matrix {
      * @param z - defines the 3rd component of the translation
      * @returns the current updated matrix
      */
-    function setTranslationFromFloats(self: MutableMatrix, x: number, y: number, z: number): void;
+    export function setTranslationFromFloats(self: MutableMatrix, x: number, y: number, z: number): void;
     /**
      * Inserts the translation vector in the current matrix
      * @param vector3 - defines the translation to insert
      * @returns the current updated matrix
      */
-    function setTranslation(self: MutableMatrix, vector3: Vector3.ReadonlyVector3): void;
+    export function setTranslation(self: MutableMatrix, vector3: Vector3.ReadonlyVector3): void;
     /**
      * Gets the translation value of the current matrix
      * @returns a new Vector3 as the extracted translation from the matrix
      */
-    function getTranslation(self: MutableMatrix): Vector3.MutableVector3;
+    export function getTranslation(self: MutableMatrix): Vector3.MutableVector3;
     /**
      * Fill a Vector3 with the extracted translation from the matrix
      * @param result - defines the Vector3 where to store the translation
      * @returns the current matrix
      */
-    function getTranslationToRef(self: MutableMatrix, result: Vector3.MutableVector3): void;
+    export function getTranslationToRef(self: MutableMatrix, result: Vector3.MutableVector3): void;
     /**
      * Remove rotation and scaling part from the matrix
      * @returns the updated matrix
      */
-    function removeRotationAndScaling(self: MutableMatrix): MutableMatrix;
+    export function removeRotationAndScaling(self: MutableMatrix): MutableMatrix;
     /**
      * Multiply two matrices
      * @param other - defines the second operand
      * @returns a new matrix set with the multiplication result of the current Matrix and the given one
      */
-    function multiply(self: MutableMatrix, other: ReadonlyMatrix): MutableMatrix;
+    export function multiply(self: MutableMatrix, other: ReadonlyMatrix): MutableMatrix;
     /**
      * Copy the current matrix from the given one
      * @param other - defines the source matrix
      * @returns the current updated matrix
      */
-    function copy(from: ReadonlyMatrix, dest: MutableMatrix): void;
+    export function copy(from: ReadonlyMatrix, dest: MutableMatrix): void;
     /**
      * Populates the given array from the starting index with the current matrix values
      * @param array - defines the target array
      * @param offset - defines the offset in the target array where to start storing values
      * @returns the current matrix
      */
-    function copyToArray(self: ReadonlyMatrix, arrayDest: FloatArray, offsetDest?: number): void;
+    export function copyToArray(self: ReadonlyMatrix, arrayDest: FloatArray, offsetDest?: number): void;
     /**
      * Sets the given matrix "result" with the multiplication result of the current Matrix and the given one
      * @param other - defines the second operand
      * @param result - defines the matrix where to store the multiplication
      * @returns the current matrix
      */
-    function multiplyToRef(self: ReadonlyMatrix, other: ReadonlyMatrix, result: MutableMatrix): void;
+    export function multiplyToRef(self: ReadonlyMatrix, other: ReadonlyMatrix, result: MutableMatrix): void;
     /**
      * Sets the FloatArray "result" from the given index "offset" with the multiplication of the current matrix and the given one
      * @param other - defines the second operand
@@ -2154,23 +2177,23 @@ declare namespace Matrix {
      * @param offset - defines the offset in the target array where to start storing values
      * @returns the current matrix
      */
-    function multiplyToArray(self: ReadonlyMatrix, other: ReadonlyMatrix, result: FloatArray, offset: number): void;
+    export function multiplyToArray(self: ReadonlyMatrix, other: ReadonlyMatrix, result: FloatArray, offset: number): void;
     /**
      * Check equality between self matrix and a second one
      * @param value - defines the second matrix to compare
      * @returns true is the current matrix and the given one values are strictly equal
      */
-    function equals(self: ReadonlyMatrix, value: ReadonlyMatrix): boolean;
+    export function equals(self: ReadonlyMatrix, value: ReadonlyMatrix): boolean;
     /**
      * Clone the current matrix
      * @returns a new matrix from the current matrix
      */
-    function clone(self: ReadonlyMatrix): MutableMatrix;
+    export function clone(self: ReadonlyMatrix): MutableMatrix;
     /**
      * Gets the hash code of the current matrix
      * @returns the hash code
      */
-    function getHashCode(self: ReadonlyMatrix): number;
+    export function getHashCode(self: ReadonlyMatrix): number;
     /**
      * Decomposes the current Matrix into a translation, rotation and scaling components
      * @param scale - defines the scale vector3 given as a reference to update
@@ -2178,7 +2201,7 @@ declare namespace Matrix {
      * @param translation - defines the translation vector3 given as a reference to update
      * @returns true if operation was successful
      */
-    function decompose(self: ReadonlyMatrix, scale?: Vector3.MutableVector3, rotation?: Quaternion.MutableQuaternion, translation?: Vector3.MutableVector3): boolean;
+    export function decompose(self: ReadonlyMatrix, scale?: Vector3.MutableVector3, rotation?: Quaternion.MutableQuaternion, translation?: Vector3.MutableVector3): boolean;
     /**
      * Gets specific row of the matrix
      * @param index - defines the number of the row to get
@@ -2199,51 +2222,51 @@ declare namespace Matrix {
      * @param w - defines the w component to set
      * @returns the updated current matrix
      */
-    function setRowFromFloats(self: MutableMatrix, index: number, x: number, y: number, z: number, w: number): void;
+    export function setRowFromFloats(self: MutableMatrix, index: number, x: number, y: number, z: number, w: number): void;
     /**
      * Compute a new matrix set with the current matrix values multiplied by scale (float)
      * @param scale - defines the scale factor
      * @returns a new matrix
      */
-    function scale(self: ReadonlyMatrix, scale: number): MutableMatrix;
+    export function scale(self: ReadonlyMatrix, scale: number): MutableMatrix;
     /**
      * Scale the current matrix values by a factor to a given result matrix
      * @param scale - defines the scale factor
      * @param result - defines the matrix to store the result
      * @returns the current matrix
      */
-    function scaleToRef(self: ReadonlyMatrix, scale: number, result: MutableMatrix): void;
+    export function scaleToRef(self: ReadonlyMatrix, scale: number, result: MutableMatrix): void;
     /**
      * Scale the current matrix values by a factor and add the result to a given matrix
      * @param scale - defines the scale factor
      * @param result - defines the Matrix to store the result
      * @returns the current matrix
      */
-    function scaleAndAddToRef(self: ReadonlyMatrix, scale: number, result: MutableMatrix): void;
+    export function scaleAndAddToRef(self: ReadonlyMatrix, scale: number, result: MutableMatrix): void;
     /**
      * Writes to the given matrix a normal matrix, computed from self one (using values from identity matrix for fourth row and column).
      * @param ref - matrix to store the result
      */
-    function normalMatrixToRef(self: ReadonlyMatrix, ref: MutableMatrix): void;
+    export function normalMatrixToRef(self: ReadonlyMatrix, ref: MutableMatrix): void;
     /**
      * Gets only rotation part of the current matrix
      * @returns a new matrix sets to the extracted rotation matrix from the current one
      */
-    function getRotationMatrix(self: ReadonlyMatrix): MutableMatrix;
+    export function getRotationMatrix(self: ReadonlyMatrix): MutableMatrix;
     /**
      * Extracts the rotation matrix from the current one and sets it as the given "result"
      * @param result - defines the target matrix to store data to
      * @returns the current matrix
      */
-    function getRotationMatrixToRef(self: ReadonlyMatrix, result: MutableMatrix): void;
+    export function getRotationMatrixToRef(self: ReadonlyMatrix, result: MutableMatrix): void;
     /**
      * Toggles model matrix from being right handed to left handed in place and vice versa
      */
-    function toggleModelMatrixHandInPlace(self: MutableMatrix): void;
+    export function toggleModelMatrixHandInPlace(self: MutableMatrix): void;
     /**
      * Toggles projection matrix from being right handed to left handed in place and vice versa
      */
-    function toggleProjectionMatrixHandInPlace(self: MutableMatrix): void;
+    export function toggleProjectionMatrixHandInPlace(self: MutableMatrix): void;
 }
 
 /** @public */
@@ -2643,7 +2666,7 @@ declare interface PBAvatarAttach {
 }
 
 declare interface PBAvatarModifierArea {
-    area: Vector3_2 | undefined;
+    area: PBVector3 | undefined;
     excludeIds: string[];
     modifiers: AvatarModifierType[];
 }
@@ -2655,11 +2678,11 @@ declare interface PBAvatarShape {
     /** default = urn:decentraland:off-chain:base-avatars:BaseFemale */
     bodyShape?: string | undefined;
     /** default = decentraland.common.Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
-    skinColor?: Color3_2 | undefined;
+    skinColor?: PBColor3 | undefined;
     /** default = decentraland.common.Color3(R = 0.283f, G = 0.142f, B = 0f) */
-    hairColor?: Color3_2 | undefined;
+    hairColor?: PBColor3 | undefined;
     /** default = decentraland.common.Color3(R = 0.6f, G = 0.462f, B = 0.356f) */
-    eyeColor?: Color3_2 | undefined;
+    eyeColor?: PBColor3 | undefined;
     expressionTriggerId?: string | undefined;
     /** default = timestamp */
     expressionTriggerTimestamp?: number | undefined;
@@ -2690,8 +2713,21 @@ declare interface PBCameraMode {
 }
 
 declare interface PBCameraModeArea {
-    area: Vector3_2 | undefined;
+    area: PBVector3 | undefined;
     mode: CameraType;
+}
+
+declare interface PBColor3 {
+    r: number;
+    g: number;
+    b: number;
+}
+
+declare interface PBColor4 {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
 }
 
 declare interface PBGltfContainer {
@@ -2700,6 +2736,16 @@ declare interface PBGltfContainer {
 }
 
 declare interface PBMaterial {
+    material?: {
+        $case: 'unlit';
+        unlit: PBMaterial_UnlitMaterial;
+    } | {
+        $case: 'pbr';
+        pbr: PBMaterial_PbrMaterial;
+    };
+}
+
+declare interface PBMaterial_PbrMaterial {
     /** default = null */
     texture?: TextureUnion | undefined;
     /** default = 0.5. range value: from 0 to 1 */
@@ -2713,11 +2759,11 @@ declare interface PBMaterial {
     /** default = null */
     bumpTexture?: TextureUnion | undefined;
     /** default = white; */
-    albedoColor?: Color3_2 | undefined;
+    albedoColor?: PBColor3 | undefined;
     /** default = black; */
-    emissiveColor?: Color3_2 | undefined;
+    emissiveColor?: PBColor3 | undefined;
     /** default = white; */
-    reflectivityColor?: Color3_2 | undefined;
+    reflectivityColor?: PBColor3 | undefined;
     /** default = TransparencyMode.Auto */
     transparencyMode?: MaterialTransparencyMode | undefined;
     /** default = 0.5 */
@@ -2732,6 +2778,15 @@ declare interface PBMaterial {
     emissiveIntensity?: number | undefined;
     /** default = 1 */
     directIntensity?: number | undefined;
+}
+
+declare interface PBMaterial_UnlitMaterial {
+    /** default = null */
+    texture?: TextureUnion | undefined;
+    /** default = 0.5. range value: from 0 to 1 */
+    alphaTest?: number | undefined;
+    /** default =  true */
+    castShadows?: boolean | undefined;
 }
 
 declare interface PBMeshCollider {
@@ -2807,7 +2862,7 @@ declare interface PBNftShape {
     /** default = PictureFrameStyle.Classic */
     style?: NftFrameType | undefined;
     /** default = decentraland.common.Color3(0.6404918, 0.611472, 0.8584906) */
-    color?: Color3_2 | undefined;
+    color?: PBColor3 | undefined;
 }
 
 /** the renderer will set this component to the root entity once per frame with all the events */
@@ -2852,18 +2907,24 @@ declare interface PBPointerLock {
     isPointerLocked: boolean;
 }
 
+declare interface PBPosition {
+    x: number;
+    y: number;
+    z: number;
+}
+
 declare interface PBRaycast {
     timestamp: number;
-    origin: Vector3_2 | undefined;
-    direction: Vector3_2 | undefined;
+    origin: PBVector3 | undefined;
+    direction: PBVector3 | undefined;
     maxDistance: number;
     queryType: RaycastQueryType;
 }
 
 declare interface PBRaycastResult {
     timestamp: number;
-    origin: Vector3_2 | undefined;
-    direction: Vector3_2 | undefined;
+    origin: PBVector3 | undefined;
+    direction: PBVector3 | undefined;
     hits: RaycastHit[];
 }
 
@@ -2892,22 +2953,22 @@ declare interface PBTextShape {
     shadowOffsetY?: number | undefined;
     outlineWidth?: number | undefined;
     /** default=(1.0,1.0,1.0) */
-    shadowColor?: Color3_2 | undefined;
+    shadowColor?: PBColor3 | undefined;
     /** default=(1.0,1.0,1.0) */
-    outlineColor?: Color3_2 | undefined;
+    outlineColor?: PBColor3 | undefined;
     /** default=(1.0,1.0,1.0) */
-    textColor?: Color4_2 | undefined;
+    textColor?: PBColor4 | undefined;
 }
 
 declare interface PBUiBackground {
     /** default=(0.0, 0.0, 0.0, 0.0) */
-    backgroundColor?: Color4_2 | undefined;
+    backgroundColor?: PBColor4 | undefined;
 }
 
 declare interface PBUiText {
     value: string;
     /** default=(1.0,1.0,1.0) */
-    color?: Color3_2 | undefined;
+    color?: PBColor3 | undefined;
     /** default='center' */
     textAlign?: TextAlignMode | undefined;
     /** default=0 */
@@ -2999,6 +3060,17 @@ declare interface PBUiTransform {
     paddingBottom: number;
 }
 
+declare interface PBVector2 {
+    x: number;
+    y: number;
+}
+
+declare interface PBVector3 {
+    x: number;
+    y: number;
+    z: number;
+}
+
 declare interface PBVisibilityComponent {
     /** default=true */
     visible?: boolean | undefined;
@@ -3009,7 +3081,7 @@ declare interface PBVisibilityComponent {
  * @public
  */
 declare namespace Plane {
-    type MutablePlane = {
+    export type MutablePlane = {
         /**
          * Normal of the plane (a,b,c)
          */
@@ -3019,7 +3091,7 @@ declare namespace Plane {
          */
         d: number;
     };
-    type ReadonlyPlane = {
+    export type ReadonlyPlane = {
         /**
          * Normal of the plane (a,b,c)
          */
@@ -3036,7 +3108,7 @@ declare namespace Plane {
      * @param c - c component of the plane
      * @param d - d component of the plane
      */
-    function create(a: number, b: number, c: number, d: number): {
+    export function create(a: number, b: number, c: number, d: number): {
         normal: Vector3.MutableVector3;
         d: number;
     };
@@ -3045,7 +3117,7 @@ declare namespace Plane {
      * @param array - the array to create a plane from
      * @returns a new Plane from the given array.
      */
-    function fromArray(array: number[]): MutablePlane;
+    export function fromArray(array: number[]): MutablePlane;
     /**
      * Creates a plane from three points
      * @param point1 - point used to create the plane
@@ -3053,7 +3125,7 @@ declare namespace Plane {
      * @param point3 - point used to create the plane
      * @returns a new Plane defined by the three given points.
      */
-    function fromPoints(_point1: Vector3.ReadonlyVector3, _point2: Vector3.ReadonlyVector3, _point3: Vector3.ReadonlyVector3): MutablePlane;
+    export function fromPoints(_point1: Vector3.ReadonlyVector3, _point2: Vector3.ReadonlyVector3, _point3: Vector3.ReadonlyVector3): MutablePlane;
     /**
      * Creates a plane from an origin point and a normal
      * @param origin - origin of the plane to be constructed
@@ -3061,7 +3133,7 @@ declare namespace Plane {
      * @returns a new Plane the normal vector to this plane at the given origin point.
      * Note : the vector "normal" is updated because normalized.
      */
-    function romPositionAndNormal(origin: Vector3.ReadonlyVector3, normal: Vector3.ReadonlyVector3): MutablePlane;
+    export function romPositionAndNormal(origin: Vector3.ReadonlyVector3, normal: Vector3.ReadonlyVector3): MutablePlane;
     /**
      * Calculates the distance from a plane and a point
      * @param origin - origin of the plane to be constructed
@@ -3069,36 +3141,36 @@ declare namespace Plane {
      * @param point - point to calculate distance to
      * @returns the signed distance between the plane defined by the normal vector at the "origin"" point and the given other point.
      */
-    function signedDistanceToPlaneFromPositionAndNormal(origin: Vector3.ReadonlyVector3, normal: Vector3.ReadonlyVector3, point: Vector3.ReadonlyVector3): number;
+    export function signedDistanceToPlaneFromPositionAndNormal(origin: Vector3.ReadonlyVector3, normal: Vector3.ReadonlyVector3, point: Vector3.ReadonlyVector3): number;
     /**
      * @returns the plane coordinates as a new array of 4 elements [a, b, c, d].
      */
-    function asArray(plane: ReadonlyPlane): number[];
+    export function asArray(plane: ReadonlyPlane): number[];
     /**
      * @returns a new plane copied from the current Plane.
      */
-    function clone(plane: ReadonlyPlane): MutablePlane;
+    export function clone(plane: ReadonlyPlane): MutablePlane;
     /**
      * @returns the Plane hash code.
      */
-    function getHashCode(_plane: ReadonlyPlane): number;
+    export function getHashCode(_plane: ReadonlyPlane): number;
     /**
      * Normalize the current Plane in place.
      * @returns the updated Plane.
      */
-    function normalize(plane: ReadonlyPlane): MutablePlane;
+    export function normalize(plane: ReadonlyPlane): MutablePlane;
     /**
      * Applies a transformation the plane and returns the result
      * @param transformation - the transformation matrix to be applied to the plane
      * @returns a new Plane as the result of the transformation of the current Plane by the given matrix.
      */
-    function transform(plane: ReadonlyPlane, transformation: Matrix.ReadonlyMatrix): MutablePlane;
+    export function transform(plane: ReadonlyPlane, transformation: Matrix.ReadonlyMatrix): MutablePlane;
     /**
      * Calcualtte the dot product between the point and the plane normal
      * @param point - point to calculate the dot product with
      * @returns the dot product (float) of the point coordinates and the plane normal.
      */
-    function dotCoordinate(plane: ReadonlyPlane, point: Vector3.ReadonlyVector3): number;
+    export function dotCoordinate(plane: ReadonlyPlane, point: Vector3.ReadonlyVector3): number;
     /**
      * Updates the current Plane from the plane defined by the three given points.
      * @param point1 - one of the points used to contruct the plane
@@ -3106,20 +3178,20 @@ declare namespace Plane {
      * @param point3 - one of the points used to contruct the plane
      * @returns the updated Plane.
      */
-    function copyFromPoints(point1: Vector3.ReadonlyVector3, point2: Vector3.ReadonlyVector3, point3: Vector3.ReadonlyVector3): MutablePlane;
+    export function copyFromPoints(point1: Vector3.ReadonlyVector3, point2: Vector3.ReadonlyVector3, point3: Vector3.ReadonlyVector3): MutablePlane;
     /**
      * Checks if the plane is facing a given direction
      * @param direction - the direction to check if the plane is facing
      * @param epsilon - value the dot product is compared against (returns true if dot &lt;= epsilon)
      * @returns True is the vector "direction"  is the same side than the plane normal.
      */
-    function isFrontFacingTo(plane: ReadonlyPlane, direction: Vector3.ReadonlyVector3, epsilon: number): boolean;
+    export function isFrontFacingTo(plane: ReadonlyPlane, direction: Vector3.ReadonlyVector3, epsilon: number): boolean;
     /**
      * Calculates the distance to a point
      * @param point - point to calculate distance to
      * @returns the signed distance (float) from the given point to the Plane.
      */
-    function signedDistanceTo(plane: ReadonlyPlane, point: Vector3.ReadonlyVector3): number;
+    export function signedDistanceTo(plane: ReadonlyPlane, point: Vector3.ReadonlyVector3): number;
 }
 
 /** @public */
@@ -3137,31 +3209,6 @@ declare const PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFe
 
 /** @public */
 declare const PointerLock: ComponentDefinition<ISchema<PBPointerLock>, PBPointerLock>;
-
-/**
- * @public
- */
-declare type PreEngine = ReturnType<typeof preEngine>;
-
-declare function preEngine(): {
-    entityExists: (entity: Entity) => boolean;
-    componentsDefinition: Map<number, ComponentDefinition<any, any>>;
-    addEntity: (dynamic?: boolean) => Entity;
-    addDynamicEntity: () => Entity;
-    removeEntity: (entity: Entity) => boolean;
-    addSystem: (fn: SystemFn, priority?: number, name?: string | undefined) => void;
-    getSystems: () => {
-        fn: SystemFn;
-        priority: number;
-        name?: string | undefined;
-    }[];
-    removeSystem: (selector: string | SystemFn) => boolean;
-    defineComponent: <T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType | undefined) => ComponentDefinition<ISchema<Result<T>>, ConstructorType>;
-    defineComponentFromSchema: <T_1 extends ISchema<any>, ConstructorType_1 = EcsResult<T_1>>(spec: T_1, componentId: number, constructorDefault?: ConstructorType_1 | undefined) => ComponentDefinition<T_1, ConstructorType_1>;
-    getEntitiesWith: <T_2 extends [ComponentDefinition<ISchema<any>, any>, ...ComponentDefinition<ISchema<any>, any>[]]>(...components: T_2) => Iterable<[Entity, ...ReadonlyComponentSchema<T_2>]>;
-    getComponent: <T_3 extends ISchema<any>>(componentId: number) => ComponentDefinition<T_3, EcsResult<T_3>>;
-    removeComponentDefinition: (componentId: number) => void;
-};
 
 /**
  * @public
@@ -3265,7 +3312,7 @@ declare namespace Quaternion {
      * @param y - the rotation on the y axis in euler degrees
      * @param z - the rotation on the z axis in euler degrees
      */
-    export function fromEulerDegress(x: number, y: number, z: number): MutableQuaternion;
+    export function fromEulerDegrees(x: number, y: number, z: number): MutableQuaternion;
     /**
      * Gets length of current quaternion
      * @returns the quaternion length (float)
@@ -3287,7 +3334,7 @@ declare namespace Quaternion {
      * Returns the angle in degrees between two rotations a and b.
      * @param quat1 - defines the first quaternion
      * @param quat2 - defines the second quaternion
-     * @returns the degress angle
+     * @returns the degrees angle
      */
     export function angle(quat1: ReadonlyQuaternion, quat2: ReadonlyQuaternion): number;
     /**
@@ -3323,7 +3370,7 @@ declare namespace Quaternion {
      * Gets or sets the euler angle representation of the rotation.
      * Implemented unity-based calculations from: https://stackoverflow.com/a/56055813
      * @public
-     * @returns a new Vector3 with euler angles degress
+     * @returns a new Vector3 with euler angles degrees
      */
     export function toEulerAngles(q: MutableQuaternion): Vector3.Mutable;
     /**
@@ -3373,11 +3420,11 @@ declare namespace Quaternion {
     export function multiplyToRef(self: ReadonlyQuaternion, q1: ReadonlyQuaternion, result: MutableQuaternion): void;
     /**
      *
-     * @param degress - the angle degress
+     * @param degrees - the angle degrees
      * @param axis - vector3
      * @returns a new Quaternion
      */
-    export function fromAngleAxis(degress: number, axis: Vector3.ReadonlyVector3): MutableQuaternion;
+    export function fromAngleAxis(degrees: number, axis: Vector3.ReadonlyVector3): MutableQuaternion;
     /**
      * Creates a new quaternion containing the rotation value to reach the target (axis1, axis2, axis3) orientation as a rotated XYZ system (axis1, axis2 and axis3 are normalized during this operation)
      * @param axis1 - defines the first axis
@@ -3431,10 +3478,10 @@ declare const Raycast: ComponentDefinition<ISchema<PBRaycast>, PBRaycast>;
 
 /** Position will be relative to the scene */
 declare interface RaycastHit {
-    position: Vector3_2 | undefined;
-    origin: Vector3_2 | undefined;
-    direction: Vector3_2 | undefined;
-    normalHit: Vector3_2 | undefined;
+    position: PBVector3 | undefined;
+    origin: PBVector3 | undefined;
+    direction: PBVector3 | undefined;
+    normalHit: PBVector3 | undefined;
     length: number;
     meshName?: string | undefined;
     entityId?: number | undefined;
@@ -3687,16 +3734,12 @@ declare namespace Schemas {
     const Quaternion: ISchema<QuaternionType>;
     const Color3: ISchema<Color3Type>;
     const Color4: ISchema<Color4Type>;
+    const Entity: ISchema<Entity>;
     const Enum: typeof IEnum;
     const Array: typeof IArray;
     const Map: typeof IMap;
     const Optional: typeof IOptional;
 }
-
-/**
- * @public
- */
-declare type SdkComponents = ReturnType<typeof defineSdkComponents>;
 
 /**
  * @public
@@ -3797,8 +3840,6 @@ declare type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
 /** @public */
 declare const UiBackground: ComponentDefinition<ISchema<PBUiBackground>, PBUiBackground>;
-
-declare type Uint32 = number;
 
 /** @public */
 declare const UiText: ComponentDefinition<ISchema<PBUiText>, PBUiText>;
@@ -4405,12 +4446,6 @@ declare namespace Vector3 {
     export function Random(): MutableVector3;
 }
 
-declare interface Vector3_2 {
-    x: number;
-    y: number;
-    z: number;
-}
-
 /**
  * @public
  */
@@ -4424,7 +4459,8 @@ declare type Vector3Type = {
 declare const VisibilityComponent: ComponentDefinition<ISchema<PBVisibilityComponent>, PBVisibilityComponent>;
 
 declare namespace WireMessage {
-    enum Enum {
+    export type Uint32 = number;
+    export enum Enum {
         RESERVED = 0,
         PUT_COMPONENT = 1,
         DELETE_COMPONENT = 2,
@@ -4434,7 +4470,7 @@ declare namespace WireMessage {
      * @param length - Uint32 the length of all message (including the header)
      * @param type - define the function which handles the data
      */
-    type Header = {
+    export type Header = {
         length: Uint32;
         type: Uint32;
     };
@@ -4443,8 +4479,8 @@ declare namespace WireMessage {
      * Validate if the message incoming is completed
      * @param buf - ByteBuffer
      */
-    function validate(buf: ByteBuffer): boolean;
-    function readHeader(buf: ByteBuffer): Header | null;
+    export function validate(buf: ByteBuffer): boolean;
+    export function readHeader(buf: ByteBuffer): Header | null;
 }
 
 declare const enum YGAlign {
@@ -4461,6 +4497,18 @@ declare const enum YGAlign {
 declare const enum YGDisplay {
     YGD_FLEX = 0,
     YGD_NONE = 1
+}
+
+declare const enum YGEdge {
+    YGE_LEFT = 0,
+    YGE_TOP = 1,
+    YGE_RIGHT = 2,
+    YGE_BOTTOM = 3,
+    YGE_START = 4,
+    YGE_END = 5,
+    YGE_HORIZONTAL = 6,
+    YGE_VERTICAL = 7,
+    YGE_ALL = 8
 }
 
 declare const enum YGFlexDirection {

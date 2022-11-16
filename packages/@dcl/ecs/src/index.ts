@@ -1,5 +1,4 @@
 // The order of the following imports matters. Please do not auto-sort
-
 export * from './runtime/math'
 export * from './engine'
 export * from './schemas'
@@ -11,7 +10,11 @@ export * from './components/generated/global.gen'
 export * from './components/generated/global.namespace.gen'
 
 export * from './runtime/types'
+export * from './components/types'
 
 export * from './runtime/observables'
 export * from './runtime/temp-fp/Observable'
 export * from './runtime/messageBus'
+
+export * from './components/generated/index.gen'
+export * from './components/generated/types.gen'

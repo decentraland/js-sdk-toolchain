@@ -1,4 +1,4 @@
-import { SdkComponents } from '../components'
+import { defineSdkComponents } from '../components'
 import type { ISchema } from '../schemas/ISchema'
 import { Result, Spec } from '../schemas/Map'
 import { Transport } from '../systems/crdt/transports/types'
@@ -105,7 +105,6 @@ export type IEngine = {
     componentId: number,
     constructorDefault?: ConstructorType
   ): CompDef<ISchema<Result<T>>, Partial<Result<T>>>
-
   /**
    * Define a component and add it to the engine.
    * @param spec An object with schema fields
@@ -184,7 +183,7 @@ export type IEngine = {
    */
   CameraEntity: Entity
 
-  baseComponents: SdkComponents
+  baseComponents: ReturnType<typeof defineSdkComponents>
 
   /**
    * @internal

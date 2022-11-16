@@ -2,10 +2,15 @@ function createPlaneTexture(x: number, y: number, z: number): Entity {
   const meshEntity = engine.addEntity()
 
   Material.create(meshEntity, {
-    texture: {
-      tex: {
-        $case: 'texture',
-        texture: { src: 'models/polaroid2.png' }
+    material: {
+      $case: 'pbr',
+      pbr: {
+        texture: {
+          tex: {
+            $case: 'texture',
+            texture: { src: 'models/polaroid2.png' }
+          }
+        }
       }
     }
   })

@@ -2,7 +2,9 @@ import ReactEcs, {
   UiEntity,
   YGDisplay,
   YGJustify,
-  YGAlign
+  YGAlign,
+  Font,
+  TextAlignMode
 } from '@dcl/react-ecs'
 
 export const ui = () => (
@@ -26,7 +28,12 @@ export const ui = () => (
     >
       <UiEntity
         uiTransform={{ width: 80, height: 20 }}
-        uiText={{ value: 'Boedo', textAlign: 0, fontSize: 12 }}
+        uiText={{
+          value: 'Boedo',
+          textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
+          fontSize: 12,
+          font: Font.F_LIBERATION_SANS
+        }}
         uiBackground={{ backgroundColor: { r: 255, g: 45, b: 85, a: 1 } }}
       />
     </UiEntity>
