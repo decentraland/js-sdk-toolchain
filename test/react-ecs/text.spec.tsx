@@ -8,8 +8,8 @@ import {
   TextAlignMode,
   UiEntity
 } from '../../packages/@dcl/react-ecs/src'
+import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 
-const CANVAS_ROOT_ENTITY = 0
 declare const engine: IEngine
 
 describe('UiText React Ecs', () => {

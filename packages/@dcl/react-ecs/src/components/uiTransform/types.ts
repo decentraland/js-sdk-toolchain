@@ -1,7 +1,6 @@
 import {
   PBUiTransform,
   YGAlign,
-  YGDirection,
   YGDisplay,
   YGFlexDirection,
   YGJustify,
@@ -14,7 +13,6 @@ import {
 export {
   PBUiTransform,
   YGAlign,
-  YGDirection,
   YGDisplay,
   YGFlexDirection,
   YGJustify,
@@ -35,8 +33,6 @@ export type Position = {
   left: PositionUnit
 }
 
-export const CANVAS_ROOT_ENTITY = 7
-
 /**
  * @public
  */
@@ -52,7 +48,6 @@ export interface UiTransformProps {
   position?: Partial<Position>
   padding?: Partial<Position>
   margin?: Partial<Position>
-  direction?: YGDirection
   width?: PositionUnit
   height?: PositionUnit
   minWidth?: PositionUnit

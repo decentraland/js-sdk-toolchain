@@ -1475,118 +1475,78 @@ export interface PBUiText {
 //
 // @public (undocumented)
 export interface PBUiTransform {
-    // (undocumented)
-    alignContent: YGAlign;
-    // (undocumented)
-    alignItems: YGAlign;
-    // (undocumented)
+    alignContent?: YGAlign | undefined;
+    alignItems?: YGAlign | undefined;
     alignSelf: YGAlign;
-    // (undocumented)
-    borderBottom: number;
-    // (undocumented)
-    borderLeft: number;
-    // (undocumented)
-    borderRight: number;
-    // (undocumented)
-    borderTop: number;
-    // (undocumented)
-    direction: YGDirection;
-    // (undocumented)
     display: YGDisplay;
     // (undocumented)
-    flex: number;
-    // (undocumented)
     flexBasis: number;
-    // (undocumented)
     flexBasisUnit: YGUnit;
-    // (undocumented)
     flexDirection: YGFlexDirection;
     // (undocumented)
     flexGrow: number;
-    // (undocumented)
-    flexShrink: number;
-    // (undocumented)
-    flexWrap: YGWrap;
+    flexShrink?: number | undefined;
+    flexWrap?: YGWrap | undefined;
     // (undocumented)
     height: number;
-    // (undocumented)
     heightUnit: YGUnit;
-    // (undocumented)
     justifyContent: YGJustify;
     // (undocumented)
     marginBottom: number;
-    // (undocumented)
     marginBottomUnit: YGUnit;
     // (undocumented)
     marginLeft: number;
     marginLeftUnit: YGUnit;
     // (undocumented)
     marginRight: number;
-    // (undocumented)
     marginRightUnit: YGUnit;
     // (undocumented)
     marginTop: number;
-    // (undocumented)
     marginTopUnit: YGUnit;
     // (undocumented)
     maxHeight: number;
-    // (undocumented)
     maxHeightUnit: YGUnit;
     // (undocumented)
     maxWidth: number;
-    // (undocumented)
     maxWidthUnit: YGUnit;
     // (undocumented)
     minHeight: number;
-    // (undocumented)
     minHeightUnit: YGUnit;
     // (undocumented)
     minWidth: number;
-    // (undocumented)
     minWidthUnit: YGUnit;
-    // (undocumented)
     overflow: YGOverflow;
     // (undocumented)
     paddingBottom: number;
-    // (undocumented)
     paddingBottomUnit: YGUnit;
     // (undocumented)
     paddingLeft: number;
-    // (undocumented)
     paddingLeftUnit: YGUnit;
     // (undocumented)
     paddingRight: number;
-    // (undocumented)
     paddingRightUnit: YGUnit;
     // (undocumented)
     paddingTop: number;
-    // (undocumented)
     paddingTopUnit: YGUnit;
     // (undocumented)
     parent: number;
     // (undocumented)
     positionBottom: number;
-    // (undocumented)
     positionBottomUnit: YGUnit;
     // (undocumented)
     positionLeft: number;
-    // (undocumented)
     positionLeftUnit: YGUnit;
     // (undocumented)
     positionRight: number;
-    // (undocumented)
     positionRightUnit: YGUnit;
     // (undocumented)
     positionTop: number;
-    // (undocumented)
     positionTopUnit: YGUnit;
-    // (undocumented)
     positionType: YGPositionType;
     // (undocumented)
     rightOf: number;
     // (undocumented)
     width: number;
-    // (undocumented)
     widthUnit: YGUnit;
 }
 
@@ -2172,18 +2132,6 @@ export const enum YGAlign {
     YGA_STRETCH = 4
 }
 
-// Warning: (ae-missing-release-tag) "YGDirection" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const enum YGDirection {
-    // (undocumented)
-    YGD_INHERIT = 0,
-    // (undocumented)
-    YGD_LTR = 1,
-    // (undocumented)
-    YGD_RTL = 2
-}
-
 // Warning: (ae-missing-release-tag) "YGDisplay" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -2223,11 +2171,11 @@ export const enum YGEdge {
 // @public (undocumented)
 export const enum YGFlexDirection {
     // (undocumented)
-    YGFD_COLUMN = 0,
+    YGFD_COLUMN = 1,
     // (undocumented)
-    YGFD_COLUMN_REVERSE = 1,
+    YGFD_COLUMN_REVERSE = 2,
     // (undocumented)
-    YGFD_ROW = 2,
+    YGFD_ROW = 0,
     // (undocumented)
     YGFD_ROW_REVERSE = 3
 }
@@ -2267,11 +2215,9 @@ export const enum YGOverflow {
 // @public (undocumented)
 export const enum YGPositionType {
     // (undocumented)
-    YGPT_ABSOLUTE = 2,
+    YGPT_ABSOLUTE = 1,
     // (undocumented)
-    YGPT_RELATIVE = 1,
-    // (undocumented)
-    YGPT_STATIC = 0
+    YGPT_RELATIVE = 0
 }
 
 // Warning: (ae-missing-release-tag) "YGUnit" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)

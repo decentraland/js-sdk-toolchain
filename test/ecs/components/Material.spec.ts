@@ -1,7 +1,8 @@
 import {
   MaterialTransparencyMode,
   PBMaterial,
-  PBMaterial_PbrMaterial
+  PBMaterial_PbrMaterial,
+  PBMaterial_UnlitMaterial
 } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/material.gen'
 import {
   TextureFilterMode,
@@ -18,12 +19,23 @@ function createPbrMaterial(pbr: PBMaterial_PbrMaterial): PBMaterial {
   }
 }
 
+function createUnlitMaterial(unlit: PBMaterial_UnlitMaterial): PBMaterial {
+  return {
+    material: {
+      $case: 'unlit',
+      unlit
+    }
+  }
+}
+
 describe('Generated Material ProtoBuf', () => {
   it('should serialize/deserialize Material', () => {
     const newEngine = Engine()
     const { Material } = newEngine.baseComponents
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
+    const entityC = newEngine.addEntity()
+    const entityD = newEngine.addEntity()
 
     const _material = Material.create(
       entity,
@@ -122,6 +134,32 @@ describe('Generated Material ProtoBuf', () => {
         transparencyMode: MaterialTransparencyMode.MTM_ALPHA_BLEND
       })
     )
+
+    const materialC = Material.create(
+      entityC,
+      createUnlitMaterial({
+        castShadows: true,
+        alphaTest: 1,
+        texture: {
+          tex: {
+            $case: 'texture',
+            texture: {
+              wrapMode: TextureWrapMode.TWM_MIRROR_ONCE,
+              filterMode: TextureFilterMode.TFM_TRILINEAR,
+              src: 'not-casla'
+            }
+          }
+        }
+      })
+    )
+
+    Material.create(
+      entityD,
+      createUnlitMaterial({
+        castShadows: true
+      })
+    )
+
     const buffer = Material.toBinary(entity)
     Material.updateFromBinary(entityB, buffer)
 
@@ -131,5 +169,11 @@ describe('Generated Material ProtoBuf', () => {
     expect(Material.createOrReplace(entityB)).not.toBeDeepCloseTo({
       ...Material.getMutable(entity)
     } as any)
+
+    const bufferC = Material.toBinary(entityC)
+    Material.updateFromBinary(entityD, bufferC)
+
+    const mD = Material.getMutable(entityD)
+    expect(materialC).toBeDeepCloseTo(mD as any)
   })
 })
