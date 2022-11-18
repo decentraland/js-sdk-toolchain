@@ -1,2 +1,5 @@
 export type { AnimatorComponentDefinition } from './extended/Animator'
-export type { MaterialComponentDefinition } from './extended/Material'
+export type {
+  TextureHelper,
+  MaterialComponentDefinition
+} from './extended/Material'
