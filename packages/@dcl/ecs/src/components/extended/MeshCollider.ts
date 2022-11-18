@@ -29,15 +29,15 @@ export interface MeshColliderComponentDefinition extends ComponentDefinition {
    * @public
    * Set a cylinder in the MeshCollider component
    * @param entity - entity to create or replace the MeshCollider component
+   * @param radiusBottom - radius of bottom of cylinder
+   * @param radiusTop - radius of top of cylinder
    * @param colliderMask - the set of layer where the collider reacts, default: Physics and Pointer
-   * @param radiusBottom -
-   * @param radiusTop -
    */
   setCylinder(
     entity: Entity,
-    colliderLayers?: ColliderLayer | ColliderLayer[],
     radiusBottom?: number,
-    radiusTop?: number
+    radiusTop?: number,
+    colliderLayers?: ColliderLayer | ColliderLayer[]
   ): void
 
   /**
@@ -91,9 +91,9 @@ export function defineMeshColliderComponent(
     },
     setCylinder(
       entity: Entity,
-      colliderLayers?: ColliderLayer | ColliderLayer[],
       radiusBottom?: number,
-      radiusTop?: number
+      radiusTop?: number,
+      colliderLayers?: ColliderLayer | ColliderLayer[]
     ): void {
       MeshCollider.createOrReplace(entity, {
         mesh: { $case: 'cylinder', cylinder: { radiusBottom, radiusTop } },
