@@ -23,7 +23,6 @@ createCube(8, 1, 8)
 createCube(8, 1, 4)
 
 Raycast.createOrReplace(engine.addEntity(), {
-  timestamp: 123,
   origin: Vector3.create(8, 1, 0),
   direction: Vector3.create(0, 0, 1),
   maxDistance: 16,

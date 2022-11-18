@@ -38,7 +38,6 @@ engine.addSystem((dt) => {
       raycaster.t = 0
 
       Raycast.createOrReplace(entity, {
-        timestamp: raycaster.ts,
         origin: Vector3.create(8, 1, 0),
         direction: Vector3.create(0, 0, 1),
         maxDistance: 16,
