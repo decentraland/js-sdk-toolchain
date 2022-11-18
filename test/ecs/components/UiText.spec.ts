@@ -9,19 +9,19 @@ describe('Generated UiText ProtoBuf', () => {
 
     const _uiText = UiText.create(entity, {
       value: 'casla-boedo',
-      color: { r: 0, g: 0, b: 0 }
+      color: { r: 0, g: 0, b: 0, a: 0 }
     })
 
     UiText.create(entityB, {
       value: 'casla',
-      color: { r: 0, g: 0, b: 1 }
+      color: { r: 0, g: 0, b: 1, a: 0 }
     })
     const buffer = UiText.toBinary(entity)
     UiText.updateFromBinary(entityB, buffer)
 
     expect(_uiText).toEqual({
       value: 'casla-boedo',
-      color: { r: 0, g: 0, b: 0 }
+      color: { r: 0, g: 0, b: 0, a: 0 }
     })
   })
 })
