@@ -355,9 +355,9 @@ export namespace Components {
     const // (undocumented)
     Material: MaterialComponentDefinition;
     const // (undocumented)
-    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+    MeshCollider: MeshColliderComponentDefinition;
     const // (undocumented)
-    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
+    MeshRenderer: MeshRendererComponentDefinition;
     const // (undocumented)
     NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     const // (undocumented)
@@ -452,6 +452,8 @@ export function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEng
 export function defineSdkComponents(engine: Pick<IEngine, 'defineComponentFromSchema' | 'getComponent'>): {
     Material: MaterialComponentDefinition;
     Animator: AnimatorComponentDefinition;
+    MeshRenderer: MeshRendererComponentDefinition;
+    MeshCollider: MeshColliderComponentDefinition;
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
@@ -462,8 +464,6 @@ export function defineSdkComponents(engine: Pick<IEngine, 'defineComponentFromSc
     CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
-    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
-    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
     NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
     PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
@@ -819,10 +819,26 @@ export namespace Matrix {
 }
 
 // @public (undocumented)
-export const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+export const MeshCollider: MeshColliderComponentDefinition;
 
 // @public (undocumented)
-export const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
+export interface MeshColliderComponentDefinition extends ComponentDefinition {
+    setBox(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
+    setCylinder(entity: Entity, radiusBottom?: number, radiusTop?: number, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
+    setPlane(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
+    setSphere(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
+}
+
+// @public (undocumented)
+export const MeshRenderer: MeshRendererComponentDefinition;
+
+// @public (undocumented)
+export interface MeshRendererComponentDefinition extends ComponentDefinition {
+    setBox(entity: Entity, uvs?: number[]): void;
+    setCylinder(entity: Entity, radiusBottom?: number, radiusTop?: number): void;
+    setPlane(entity: Entity, uvs?: number[]): void;
+    setSphere(entity: Entity): void;
+}
 
 // Warning: (tsdoc-missing-deprecation-message) The @deprecated block must include a deprecation message, e.g. describing the recommended alternative
 //

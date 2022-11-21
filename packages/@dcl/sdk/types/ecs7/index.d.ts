@@ -1071,9 +1071,9 @@ declare namespace Components {
     /** @public */
     const Material: MaterialComponentDefinition;
     /** @public */
-    const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+    const MeshCollider: MeshColliderComponentDefinition;
     /** @public */
-    const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
+    const MeshRenderer: MeshRendererComponentDefinition;
     /** @public */
     const NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     /** @public */
@@ -1181,6 +1181,8 @@ declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEn
 declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponentFromSchema' | 'getComponent'>): {
     Material: MaterialComponentDefinition;
     Animator: AnimatorComponentDefinition;
+    MeshRenderer: MeshRendererComponentDefinition;
+    MeshCollider: MeshColliderComponentDefinition;
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
@@ -1191,8 +1193,6 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponentFromS
     CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
-    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
-    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
     NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
     PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
@@ -2279,10 +2279,80 @@ declare namespace Matrix {
 }
 
 /** @public */
-declare const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+declare const MeshCollider: MeshColliderComponentDefinition;
+
+/**
+ * @public
+ */
+declare interface MeshColliderComponentDefinition extends ComponentDefinition {
+    /**
+     * @public
+     * Set a box in the MeshCollider component
+     * @param entity - entity to create or replace the MeshCollider component
+     * @param colliderMask - the set of layer where the collider reacts, default: Physics and Pointer
+     */
+    setBox(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
+    /**
+     * @public
+     * Set a plane in the MeshCollider component
+     * @param entity - entity to create or replace the MeshCollider component
+     * @param colliderMask - the set of layer where the collider reacts, default: Physics and Pointer
+     */
+    setPlane(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
+    /**
+     * @public
+     * Set a cylinder in the MeshCollider component
+     * @param entity - entity to create or replace the MeshCollider component
+     * @param radiusBottom - radius of bottom of cylinder
+     * @param radiusTop - radius of top of cylinder
+     * @param colliderMask - the set of layer where the collider reacts, default: Physics and Pointer
+     */
+    setCylinder(entity: Entity, radiusBottom?: number, radiusTop?: number, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
+    /**
+     * @public
+     * Set a sphere in the MeshCollider component
+     * @param entity - entity to create or replace the MeshCollider component
+     * @param colliderMask - the set of layer where the collider reacts, default: Physics and Pointer
+     */
+    setSphere(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
+}
 
 /** @public */
-declare const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
+declare const MeshRenderer: MeshRendererComponentDefinition;
+
+/**
+ * @public
+ */
+declare interface MeshRendererComponentDefinition extends ComponentDefinition {
+    /**
+     * @public
+     * Set a box in the MeshRenderer component
+     * @param entity - entity to create or replace the MeshRenderer component
+     * @param uvs - uvs coord
+     */
+    setBox(entity: Entity, uvs?: number[]): void;
+    /**
+     * @public
+     * Set a plane in the MeshRenderer component
+     * @param entity - entity to create or replace the MeshRenderer component
+     * @param uvs - uvs coord
+     */
+    setPlane(entity: Entity, uvs?: number[]): void;
+    /**
+     * @public
+     * Set a cylinder in the MeshRenderer component
+     * @param entity - entity to create or replace the MeshRenderer component
+     * @param radiusBottom -
+     * @param radiusTop -
+     */
+    setCylinder(entity: Entity, radiusBottom?: number, radiusTop?: number): void;
+    /**
+     * @public
+     * Set a sphere in the MeshRenderer component
+     * @param entity - entity to create or replace the MeshRenderer component
+     */
+    setSphere(entity: Entity): void;
+}
 
 /**
  * @public

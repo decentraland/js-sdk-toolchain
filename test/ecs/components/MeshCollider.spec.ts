@@ -1,4 +1,7 @@
-import { PBMeshCollider } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/mesh_collider.gen'
+import {
+  ColliderLayer,
+  PBMeshCollider
+} from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/mesh_collider.gen'
 import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 
 describe('Generated MeshCollider ProtoBuf', () => {
@@ -40,5 +43,64 @@ describe('Generated MeshCollider ProtoBuf', () => {
         ...MeshCollider.getMutable(entity)
       } as any)
     }
+  })
+
+  it('should helper creates box MeshCollider', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const { MeshCollider } = newEngine.baseComponents
+
+    expect(MeshCollider.getOrNull(entity)).toBe(null)
+    MeshCollider.setBox(entity)
+
+    expect(MeshCollider.getOrNull(entity)).not.toBe(null)
+  })
+
+  it('should helper test all datas', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const { MeshCollider } = newEngine.baseComponents
+
+    MeshCollider.setBox(entity, ColliderLayer.CL_PHYSICS)
+    expect(MeshCollider.get(entity)).toStrictEqual({
+      collisionMask: ColliderLayer.CL_PHYSICS,
+      mesh: {
+        $case: 'box',
+        box: {}
+      }
+    })
+
+    MeshCollider.setCylinder(entity, 1, 0, ColliderLayer.CL_PHYSICS)
+    expect(MeshCollider.get(entity)).toStrictEqual({
+      collisionMask: ColliderLayer.CL_PHYSICS,
+      mesh: {
+        $case: 'cylinder',
+        cylinder: {
+          radiusBottom: 1,
+          radiusTop: 0
+        }
+      }
+    })
+
+    MeshCollider.setSphere(entity, ColliderLayer.CL_POINTER)
+    expect(MeshCollider.get(entity)).toStrictEqual({
+      collisionMask: ColliderLayer.CL_POINTER,
+      mesh: {
+        $case: 'sphere',
+        sphere: {}
+      }
+    })
+
+    MeshCollider.setPlane(entity, [
+      ColliderLayer.CL_POINTER,
+      ColliderLayer.CL_PHYSICS
+    ])
+    expect(MeshCollider.get(entity)).toStrictEqual({
+      collisionMask: ColliderLayer.CL_POINTER | ColliderLayer.CL_PHYSICS,
+      mesh: {
+        $case: 'plane',
+        plane: {}
+      }
+    })
   })
 })

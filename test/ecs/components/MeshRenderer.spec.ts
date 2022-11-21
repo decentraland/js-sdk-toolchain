@@ -41,4 +41,70 @@ describe('Generated MeshRenderer ProtoBuf', () => {
       } as any)
     }
   })
+
+  it('should helper creates box MeshRenderer', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const { MeshRenderer } = newEngine.baseComponents
+
+    expect(MeshRenderer.getOrNull(entity)).toBe(null)
+    MeshRenderer.setBox(entity)
+
+    expect(MeshRenderer.getOrNull(entity)).not.toBe(null)
+  })
+
+  it('should helper test all datas', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const { MeshRenderer } = newEngine.baseComponents
+
+    MeshRenderer.setBox(entity, [1, 2, 3])
+    expect(MeshRenderer.get(entity)).toStrictEqual({
+      mesh: {
+        $case: 'box',
+        box: {
+          uvs: [1, 2, 3]
+        }
+      }
+    })
+
+    MeshRenderer.setCylinder(entity, 1, 0)
+    expect(MeshRenderer.get(entity)).toStrictEqual({
+      mesh: {
+        $case: 'cylinder',
+        cylinder: {
+          radiusBottom: 1,
+          radiusTop: 0
+        }
+      }
+    })
+
+    MeshRenderer.setSphere(entity)
+    expect(MeshRenderer.get(entity)).toStrictEqual({
+      mesh: {
+        $case: 'sphere',
+        sphere: {}
+      }
+    })
+
+    MeshRenderer.setPlane(entity, [4, 5, 6])
+    expect(MeshRenderer.get(entity)).toStrictEqual({
+      mesh: {
+        $case: 'plane',
+        plane: {
+          uvs: [4, 5, 6]
+        }
+      }
+    })
+
+    MeshRenderer.setPlane(entity)
+    expect(MeshRenderer.get(entity)).toStrictEqual({
+      mesh: {
+        $case: 'plane',
+        plane: {
+          uvs: []
+        }
+      }
+    })
+  })
 })
