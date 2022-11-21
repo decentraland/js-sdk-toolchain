@@ -1069,7 +1069,7 @@ declare namespace Components {
     /** @public */
     const GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     /** @public */
-    const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    const Material: MaterialComponentDefinition;
     /** @public */
     const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
     /** @public */
@@ -1179,6 +1179,7 @@ declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEn
 };
 
 declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponentFromSchema' | 'getComponent'>): {
+    Material: MaterialComponentDefinition;
     Animator: AnimatorComponentDefinition;
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
@@ -1190,7 +1191,6 @@ declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponentFromS
     CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
-    Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
     MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
     MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
     NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
@@ -1528,7 +1528,16 @@ declare type ISchema<T = any> = {
 declare const log: (...a: any[]) => void;
 
 /** @public */
-declare const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+declare const Material: MaterialComponentDefinition;
+
+/**
+ * @public
+ */
+declare interface MaterialComponentDefinition extends ComponentDefinition {
+    Texture: TextureHelper;
+    setBasicMaterial: (entity: Entity, material: PBMaterial_UnlitMaterial) => void;
+    setPbrMaterial: (entity: Entity, material: PBMaterial_PbrMaterial) => void;
+}
 
 declare const enum MaterialTransparencyMode {
     MTM_OPAQUE = 0,
@@ -3783,6 +3792,14 @@ declare const enum TextureFilterMode {
     TFM_BILINEAR = 1,
     TFM_TRILINEAR = 2
 }
+
+/**
+ * @public
+ */
+declare type TextureHelper = {
+    Common: (texture: Texture) => TextureUnion;
+    Avatar: (avatarTexture: AvatarTexture) => TextureUnion;
+};
 
 declare interface TextureUnion {
     tex?: {
