@@ -30,71 +30,79 @@ function createPlaneTexture(x: number, y: number, z: number): Entity {
 }
 
 function createBillboards() {
-  Billboard.create(createPlaneTexture(8, 3, 1), {
-    billboardMode: BillboardMode.BM_Y_AXE
-  })
-  Billboard.create(createPlaneTexture(12, 3, 1))
+  const plane1 = createPlaneTexture(8, 3, 1)
+  const plane2 = createPlaneTexture(12, 3, 1)
   createPlaneTexture(4, 3, 1)
 
-  Billboard.create(createPlaneTexture(8, 3, 8), {
-    oppositeDirection: true,
+  const plane5 = createPlaneTexture(8, 3, 8)
+  const plane4 = createPlaneTexture(12, 3, 8)
+  createPlaneTexture(4, 3, 8)
+
+  Billboard.create(plane1, {
     billboardMode: BillboardMode.BM_Y_AXE
   })
-  Billboard.create(createPlaneTexture(12, 3, 8), {
+  Billboard.create(plane2)
+  Billboard.create(plane4, {
     oppositeDirection: true,
     billboardMode: BillboardMode.BM_ALL_AXES
   })
-  createPlaneTexture(4, 3, 8)
+  Billboard.create(plane5, {
+    oppositeDirection: true,
+    billboardMode: BillboardMode.BM_Y_AXE
+  })
 }
 
-function createTextShape(text: string, position: Vector3.ReadonlyVector3) {
+function createTextShape(text: string, position: Vector3, textColor: Color4) {
   const entity = engine.addEntity()
   Transform.create(entity, { position })
-  return TextShape.create(entity, { text })
+  return TextShape.create(entity, {
+    text,
+    fontSize: 3,
+    outlineWidth: 0.1,
+    outlineColor: Color3.Black(),
+    textColor
+  })
 }
 
 function createTextShapes() {
-  const text1 = createTextShape(
+  const regularColor = Color4.create(1, 0.2, 0.8, 0.8)
+  const oppositeColor = Color4.create(0.8, 0.2, 1, 0.8)
+
+  createTextShape(
     'Regular, only Y-rotation',
-    Vector3.create(8, 1, 1)
+    Vector3.create(8, 1, 1),
+    regularColor
   )
-  text1.fontSize = 3
-  text1.textColor = { r: 1, g: 0.2, b: 0.8, a: 0.8 }
-  text1.outlineColor = { r: 0, g: 0, b: 0 }
-  text1.outlineWidth = 0.1
-
-  const text2 = createTextShape('Regular', Vector3.create(12, 1, 1))
-  text2.fontSize = 3
-  text2.textColor = { r: 1, g: 0.2, b: 0.8, a: 0.8 }
-  text2.outlineColor = { r: 0, g: 0, b: 0 }
-  text2.outlineWidth = 0.1
-
-  const text3 = createTextShape('Without billboard', Vector3.create(4, 1, 1))
-  text3.fontSize = 3
-  text3.textColor = { r: 1, g: 0.2, b: 0.8, a: 0.8 }
-  text3.outlineColor = { r: 0, g: 0, b: 0 }
-  text3.outlineWidth = 0.1
-
-  const text4 = createTextShape('Opposite, only Y', Vector3.create(8, 1, 8))
-  text4.fontSize = 3
-  text4.textColor = { r: 0.8, g: 0.2, b: 1.0, a: 0.8 }
-  text4.outlineColor = { r: 0, g: 0, b: 0 }
-  text4.outlineWidth = 0.1
-
-  const text5 = createTextShape('Opposite', Vector3.create(12, 1, 8))
-  text5.fontSize = 3
-  text5.textColor = { r: 0.8, g: 0.2, b: 1.0, a: 0.8 }
-  text5.outlineColor = { r: 0, g: 0, b: 0 }
-  text5.outlineWidth = 0.1
-
-  const text6 = createTextShape('Without billboard', Vector3.create(4, 1, 8))
-  text6.fontSize = 3
-  text6.textColor = { r: 0.8, g: 0.2, b: 1.0, a: 0.8 }
-  text6.outlineColor = { r: 0, g: 0, b: 0 }
-  text6.outlineWidth = 0.1
+  createTextShape('Regular', Vector3.create(12, 1, 1), regularColor)
+  createTextShape('Without billboard', Vector3.create(4, 1, 1), regularColor)
+  createTextShape('Opposite, only Y', Vector3.create(8, 1, 8), oppositeColor)
+  createTextShape('Opposite', Vector3.create(12, 1, 8), oppositeColor)
+  createTextShape('Without billboard', Vector3.create(4, 1, 8), oppositeColor)
 }
 
 createBillboards()
 createTextShapes()
 
-export {}
+const BouncingBillboard = engine.defineComponent(
+  {
+    t: Schemas.Number,
+    originalPosition: Schemas.Vector3
+  },
+  123123
+)
+
+engine.addSystem((dt: number) => {
+  for (const [entity] of engine.getEntitiesWith(Billboard, Transform)) {
+    if (BouncingBillboard.getOrNull(entity) === null) {
+      BouncingBillboard.create(entity, {
+        originalPosition: Transform.get(entity).position
+      })
+    }
+
+    const bounce = BouncingBillboard.getMutable(entity)
+    bounce.t += dt
+
+    Transform.getMutable(entity).position.y =
+      bounce.originalPosition.y + 0.05 * Math.sin(10 * bounce.t)
+  }
+})
