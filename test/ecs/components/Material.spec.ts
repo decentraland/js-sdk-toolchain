@@ -176,4 +176,58 @@ describe('Generated Material ProtoBuf', () => {
     const mD = Material.getMutable(entityD)
     expect(materialC).toBeDeepCloseTo(mD as any)
   })
+
+  it('should test all helper cases', () => {
+    const newEngine = Engine()
+    const { Material } = newEngine.baseComponents
+    const entity = newEngine.addEntity()
+
+    expect(Material.getOrNull(entity)).toBeNull()
+
+    Material.setBasicMaterial(entity, {
+      texture: Material.Texture.Common({
+        src: 'someTexture.png'
+      })
+    })
+
+    expect(Material.get(entity)).toStrictEqual<PBMaterial>({
+      material: {
+        $case: 'unlit',
+        unlit: {
+          texture: {
+            tex: {
+              $case: 'texture',
+              texture: {
+                src: 'someTexture.png'
+              }
+            }
+          }
+        }
+      }
+    })
+
+    Material.setPbrMaterial(entity, {
+      texture: Material.Texture.Avatar({
+        userId: '0xsome'
+      }),
+      roughness: 0.3
+    })
+
+    expect(Material.get(entity)).toStrictEqual<PBMaterial>({
+      material: {
+        $case: 'pbr',
+        pbr: {
+          texture: {
+            tex: {
+              $case: 'avatarTexture',
+              avatarTexture: {
+                userId: '0xsome'
+              }
+            }
+          },
+          roughness: 0.3
+        }
+      }
+    })
+  })
 })

@@ -353,11 +353,11 @@ export namespace Components {
     const // (undocumented)
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     const // (undocumented)
-    Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+    Material: MaterialComponentDefinition;
     const // (undocumented)
-    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+    MeshCollider: MeshColliderComponentDefinition;
     const // (undocumented)
-    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
+    MeshRenderer: MeshRendererComponentDefinition;
     const // (undocumented)
     NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     const // (undocumented)
@@ -450,7 +450,10 @@ export function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEng
 //
 // @public (undocumented)
 export function defineSdkComponents(engine: Pick<IEngine, 'defineComponentFromSchema' | 'getComponent'>): {
+    Material: MaterialComponentDefinition;
     Animator: AnimatorComponentDefinition;
+    MeshRenderer: MeshRendererComponentDefinition;
+    MeshCollider: MeshColliderComponentDefinition;
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
@@ -461,9 +464,6 @@ export function defineSdkComponents(engine: Pick<IEngine, 'defineComponentFromSc
     CameraMode: ComponentDefinition<ISchema<PBCameraMode>, PBCameraMode>;
     CameraModeArea: ComponentDefinition<ISchema<PBCameraModeArea>, PBCameraModeArea>;
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
-    Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
-    MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
-    MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
     NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     PointerEventsResult: ComponentDefinition<ISchema<PBPointerEventsResult>, PBPointerEventsResult>;
     PointerHoverFeedback: ComponentDefinition<ISchema<PBPointerHoverFeedback>, PBPointerHoverFeedback>;
@@ -653,7 +653,17 @@ export type ISchema<T = any> = {
 export const log: (...a: any[]) => void;
 
 // @public (undocumented)
-export const Material: ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+export const Material: MaterialComponentDefinition;
+
+// @public (undocumented)
+export interface MaterialComponentDefinition extends ComponentDefinition {
+    // (undocumented)
+    setBasicMaterial: (entity: Entity, material: PBMaterial_UnlitMaterial) => void;
+    // (undocumented)
+    setPbrMaterial: (entity: Entity, material: PBMaterial_PbrMaterial) => void;
+    // (undocumented)
+    Texture: TextureHelper;
+}
 
 // Warning: (ae-missing-release-tag) "MaterialTransparencyMode" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -809,10 +819,26 @@ export namespace Matrix {
 }
 
 // @public (undocumented)
-export const MeshCollider: ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+export const MeshCollider: MeshColliderComponentDefinition;
 
 // @public (undocumented)
-export const MeshRenderer: ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
+export interface MeshColliderComponentDefinition extends ComponentDefinition {
+    setBox(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
+    setCylinder(entity: Entity, radiusBottom?: number, radiusTop?: number, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
+    setPlane(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
+    setSphere(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
+}
+
+// @public (undocumented)
+export const MeshRenderer: MeshRendererComponentDefinition;
+
+// @public (undocumented)
+export interface MeshRendererComponentDefinition extends ComponentDefinition {
+    setBox(entity: Entity, uvs?: number[]): void;
+    setCylinder(entity: Entity, radiusBottom?: number, radiusTop?: number): void;
+    setPlane(entity: Entity, uvs?: number[]): void;
+    setSphere(entity: Entity): void;
+}
 
 // Warning: (tsdoc-missing-deprecation-message) The @deprecated block must include a deprecation message, e.g. describing the recommended alternative
 //
@@ -1890,6 +1916,12 @@ export const enum TextureFilterMode {
     // (undocumented)
     TFM_TRILINEAR = 2
 }
+
+// @public (undocumented)
+export type TextureHelper = {
+    Common: (texture: Texture) => TextureUnion;
+    Avatar: (avatarTexture: AvatarTexture) => TextureUnion;
+};
 
 // Warning: (ae-missing-release-tag) "TextureUnion" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
