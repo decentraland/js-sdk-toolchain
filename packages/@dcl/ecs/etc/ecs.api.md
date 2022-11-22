@@ -657,11 +657,8 @@ export const Material: MaterialComponentDefinition;
 
 // @public (undocumented)
 export interface MaterialComponentDefinition extends ComponentDefinition {
-    // (undocumented)
     setBasicMaterial: (entity: Entity, material: PBMaterial_UnlitMaterial) => void;
-    // (undocumented)
     setPbrMaterial: (entity: Entity, material: PBMaterial_PbrMaterial) => void;
-    // (undocumented)
     Texture: TextureHelper;
 }
 
@@ -1420,8 +1417,6 @@ export interface PBRaycast {
     origin: PBVector3 | undefined;
     // (undocumented)
     queryType: RaycastQueryType;
-    // (undocumented)
-    timestamp: number;
 }
 
 // Warning: (ae-missing-release-tag) "PBRaycastResult" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
