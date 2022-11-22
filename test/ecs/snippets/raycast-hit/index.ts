@@ -1,4 +1,4 @@
-import { EventsSystem } from '../../../../packages/@dcl/ecs/src'
+import { EventsSystem } from '../../../../packages/@dcl/ecs/src/systems/events'
 
 function createCube(
   x: number,
