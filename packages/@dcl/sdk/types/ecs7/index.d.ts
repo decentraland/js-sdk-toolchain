@@ -1534,8 +1534,21 @@ declare const Material: MaterialComponentDefinition;
  * @public
  */
 declare interface MaterialComponentDefinition extends ComponentDefinition {
+    /**
+     * Texture helpers with constructor
+     */
     Texture: TextureHelper;
+    /**
+     * Create or replace the component Material in the entity specified
+     * @param entity - the entity to link the component
+     * @param material - the Unlit data for this material
+     */
     setBasicMaterial: (entity: Entity, material: PBMaterial_UnlitMaterial) => void;
+    /**
+     * Create or replace the component Material in the entity specified
+     * @param entity - the entity to link the component
+     * @param material - the PBR data for this material
+     */
     setPbrMaterial: (entity: Entity, material: PBMaterial_PbrMaterial) => void;
 }
 
@@ -3867,7 +3880,13 @@ declare const enum TextureFilterMode {
  * @public
  */
 declare type TextureHelper = {
+    /**
+     * @returns a common texture with a source file
+     */
     Common: (texture: Texture) => TextureUnion;
+    /**
+     * @returns the avatar texture of userId specified
+     */
     Avatar: (avatarTexture: AvatarTexture) => TextureUnion;
 };
 

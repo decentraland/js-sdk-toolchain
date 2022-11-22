@@ -35,22 +35,6 @@ export const basicRollupConfig: RollupOptions = {
       sourcemap: 'hidden',
       compact: true,
       plugins: [terser({ format: { comments: false } })]
-    },
-    {
-      file: packageJson.main.replace(/\.js$/, '.iife.js'),
-      format: 'iife',
-      name: 'self',
-      extend: true,
-      sourcemap: 'inline'
-    },
-    {
-      file: packageJson.main.replace(/\.js$/, '.min.iife.js'),
-      format: 'iife',
-      name: 'self',
-      extend: true,
-      sourcemap: 'hidden',
-      compact: true,
-      plugins: [terser({ format: { comments: false } })]
     }
   ],
   plugins: [
@@ -67,10 +51,11 @@ export const basicRollupConfig: RollupOptions = {
       local: !PROD,
       cleanUpRollup: false
     }),
-    analyze({
-      hideDeps: true,
-      summaryOnly: true
-    })
+    false &&
+      analyze({
+        hideDeps: true,
+        summaryOnly: true
+      })
   ]
 }
 

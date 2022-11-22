@@ -46,6 +46,7 @@ test-watch:
 	node_modules/.bin/jest --detectOpenHandles --colors --watch --roots "test"
 
 build:
+	make clean
 	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/build.spec.ts
 
 prepare:
@@ -66,13 +67,13 @@ compile_apis: ${PBS_TS}
 
 .PHONY: build test install
 
-deep-clean: 
+deep-clean:
 	rm -rf node_modules/ packages/@dcl/amd/node_modules/ packages/@dcl/build-ecs/node_modules/ packages/@dcl/dcl-rollup/node_modules/ packages/@dcl/ecs/node_modules/ packages/@dcl/react-ecs/node_modules/  packages/@dcl/sdk/node_modules/
 	make clean
 
-clean: 
+clean:
 	rm -rf coverage/
-	rm -rf packages/@dcl/amd/dist/ packages/@dcl/build-ecs/dist/  packages/@dcl/dcl-rollup/dist/ packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/ 
+	rm -rf packages/@dcl/amd/dist/ packages/@dcl/build-ecs/dist/  packages/@dcl/dcl-rollup/dist/ packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/
 	rm -rf packages/@dcl/ecs/src/components/generated/ packages/@dcl/ecs/temp/
 	rm -rf packages/@dcl/js-runtime/apis.d.ts
 	rm -rf packages/@dcl/react-ecs/dist/ packages/@dcl/react-ecs/src/generated/ packages/@dcl/react-ecs/temp/
