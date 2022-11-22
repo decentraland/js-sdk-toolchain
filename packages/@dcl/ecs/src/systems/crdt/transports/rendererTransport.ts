@@ -15,7 +15,7 @@ export function createRendererTransport(): Transport {
   }
 
   const type = 'renderer'
-  return {
+  const rendererTransport: Transport = {
     type,
     send(message: Uint8Array): void {
       // TODO: replace with new rpc
@@ -23,6 +23,14 @@ export function createRendererTransport(): Transport {
         .callRpc('~system/EngineApi', 'crdtSendToRenderer', [
           { data: new Uint8Array(message) }
         ])
+        .then((response) => {
+          if (response && response.data && response.data.length)
+            if (rendererTransport.onmessage) {
+              for (const byteArray of response.data) {
+                rendererTransport.onmessage(byteArray)
+              }
+            }
+        })
         .catch(dcl.error)
     },
     filter(message: TransportMessage): boolean {
@@ -39,4 +47,6 @@ export function createRendererTransport(): Transport {
       return !!message
     }
   }
+
+  return rendererTransport
 }
