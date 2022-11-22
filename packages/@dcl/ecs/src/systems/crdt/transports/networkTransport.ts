@@ -1,5 +1,4 @@
-import { TransportMessage } from '../types'
-import { Transport } from './types'
+import { TransportMessage, Transport } from '../types'
 
 export function createNetworkTransport(): Transport {
   // const rpc = new RpcTransport()

@@ -1,5 +1,4 @@
-import { TransportMessage } from '../types'
-import { Transport } from './types'
+import { TransportMessage, Transport } from '../types'
 import { ECSComponentIDs } from '../../../components/generated/ids.gen'
 
 const componentIds = Object.values(ECSComponentIDs)

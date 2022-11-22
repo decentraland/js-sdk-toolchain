@@ -24,13 +24,27 @@ export const basicRollupConfig: RollupOptions = {
   output: [
     {
       file: packageJson.main,
+      format: 'esm',
+      extend: true,
+      sourcemap: 'inline'
+    },
+    {
+      file: packageJson.main.replace(/\.js$/, '.min.js'),
+      format: 'esm',
+      extend: true,
+      sourcemap: 'hidden',
+      compact: true,
+      plugins: [terser({ format: { comments: false } })]
+    },
+    {
+      file: packageJson.main.replace(/\.js$/, '.iife.js'),
       format: 'iife',
       name: 'self',
       extend: true,
       sourcemap: 'inline'
     },
     {
-      file: packageJson.main.replace(/\.js$/, '.min.js'),
+      file: packageJson.main.replace(/\.js$/, '.min.iife.js'),
       format: 'iife',
       name: 'self',
       extend: true,

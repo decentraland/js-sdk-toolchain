@@ -5,8 +5,7 @@ import { Entity } from '../../engine/entity'
 import { createByteBuffer } from '../../serialization/ByteBuffer'
 import { ComponentOperation as Message } from '../../serialization/crdt/componentOperation'
 import WireMessage from '../../serialization/wireMessage'
-import { Transport } from './transports/types'
-import { ReceiveMessage, TransportMessage } from './types'
+import { ReceiveMessage, TransportMessage, Transport } from './types'
 
 export function crdtSceneSystem(engine: Pick<IEngine, 'getComponent'>) {
   const transports: Transport[] = []

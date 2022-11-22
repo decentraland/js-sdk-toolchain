@@ -11,11 +11,13 @@
   "author": "Decentraland",
   "license": "Apache 2.0",
   "dependencies": {
+    "esbuild": "^0.15.15",
     "terser": "^5.7.2",
     "typescript": "^4.4.2"
   },
   "files": [
-    "index.js"
+    "index.js",
+    "esbuild.js"
   ],
   "devDependencies": {
     "@types/node": "^14.17.1"

@@ -1,7 +1,10 @@
 export type { SystemFn } from '../engine/systems'
 export type { Result, Spec } from '../schemas/Map'
-export type { Transport } from '../systems/crdt/transports/types'
-export type { TransportMessage, ReceiveMessage } from '../systems/crdt/types'
+export type {
+  TransportMessage,
+  ReceiveMessage,
+  Transport
+} from '../systems/crdt/types'
 export type { WireMessage } from '../serialization/wireMessage'
 export type { defineSdkComponents } from '../components'
 export { TransformType } from '../components/legacy/Transform'

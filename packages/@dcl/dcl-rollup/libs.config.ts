@@ -50,21 +50,15 @@ const config: RollupOptions = {
   output: [
     {
       file: packageJson.main,
-      format: 'amd',
-      sourcemap: 'inline',
-      amd: {
-        id: packageJson.name
-      }
+      format: 'esm',
+      sourcemap: 'inline'
     },
     {
       file: packageJson.main.replace(/\.js$/, '.min.js'),
-      format: 'amd',
+      format: 'esm',
       compact: true,
       sourcemap: 'hidden',
-      plugins: [terser({ format: { comments: false } })],
-      amd: {
-        id: packageJson.name
-      }
+      plugins: [terser({ format: { comments: false } })]
     }
   ]
 }

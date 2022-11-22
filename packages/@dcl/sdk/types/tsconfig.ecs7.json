@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2020",
-    "module": "amd",
-    "moduleResolution": "classic",
+    "moduleResolution": "node",
     "pretty": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
@@ -23,7 +22,6 @@
     ],
     "types": [
       "@dcl/js-runtime",
-      "ecs7"
     ],
     "typeRoots": [
       "./../node_modules",

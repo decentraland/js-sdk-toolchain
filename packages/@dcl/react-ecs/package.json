@@ -35,8 +35,10 @@
   },
   "files": [
     "dist/index.js",
+    "dist/index.iife.js",
     "dist/index.d.ts",
     "dist/index.min.js",
+    "dist/index.min.iife.js",
     "dist/index.min.js.map"
   ]
 }
