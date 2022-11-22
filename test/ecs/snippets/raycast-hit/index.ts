@@ -1,5 +1,5 @@
 import { EventsSystem } from '../../../../packages/@dcl/ecs/src/systems/events'
-import {InputAction} from "../../../../packages/@dcl/ecs/src/components/generated/types.gen";
+import { InputAction } from '../../../../packages/@dcl/ecs/src/components/generated/types.gen'
 
 function createCube(
   x: number,
