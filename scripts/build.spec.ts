@@ -37,6 +37,7 @@ flow('build-all', () => {
     itExecutes(`npm i --quiet`, BUILD_ECS_PATH)
     itExecutes(`${TSC} -p tsconfig.json`, BUILD_ECS_PATH)
     itExecutes(`chmod +x index.js`, BUILD_ECS_PATH + '/dist')
+    itExecutes(`chmod +x esbuild.js`, BUILD_ECS_PATH + '/dist')
     copyFile(
       BUILD_ECS_PATH + '/package.json',
       BUILD_ECS_PATH + '/dist/package.json'

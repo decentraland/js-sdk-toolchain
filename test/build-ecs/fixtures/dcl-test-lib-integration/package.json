@@ -11,7 +11,7 @@
   "typings": "./bin/lib.d.ts",
   "scripts": {
     "start": "dcl start",
-    "build": "../../../../packages/@dcl/build-ecs/dist/index.js",
+    "build": "../../../../packages/@dcl/build-ecs/dist/esbuild.js",
     "build-prod": "../../../../packages/@dcl/build-ecs/dist/index.js --production",
     "watch": "../../../../packages/@dcl/build-ecs/dist/index.js --watch"
   },
@@ -20,9 +20,6 @@
     "@dcl/sdk": "./../../../../packages/@dcl/sdk"
   },
   "dependencies": {
-    "eth-connect": "^6.0.0"
-  },
-  "bundleDependencies": [
-    "eth-connect"
-  ]
+    "ethers": "^5.7.2"
+  }
 }

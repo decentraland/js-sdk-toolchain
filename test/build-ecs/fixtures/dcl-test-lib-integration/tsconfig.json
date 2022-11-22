@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
-    "outFile": "./bin/lib.js",
     "allowJs": true,
     "paths": {
-      "eth-connect": [
-        "node_modules/eth-connect/eth-connect.d.ts"
-      ]
     },
     "baseUrl": "."
   },
