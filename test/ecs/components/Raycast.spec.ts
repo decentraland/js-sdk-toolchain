@@ -9,7 +9,6 @@ describe('Generated Raycast ProtoBuf', () => {
     const entityB = newEngine.addEntity()
 
     const raycast = Raycast.create(entity, {
-      timestamp: 12,
       origin: undefined,
       direction: undefined,
       maxDistance: 100,
@@ -17,7 +16,6 @@ describe('Generated Raycast ProtoBuf', () => {
     })
 
     Raycast.create(entityB, {
-      timestamp: 0,
       origin: undefined,
       direction: undefined,
       maxDistance: Infinity,
