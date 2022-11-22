@@ -1,31 +1,12 @@
 import { IEngine } from '../../engine'
 import { _initEventObservables } from '../observables'
-import { Transport } from '../types'
 
-export function initializeDcl(engine: IEngine, rendererTransport: Transport) {
+export function initializeDcl(engine: IEngine) {
   if (typeof dcl !== 'undefined') {
     dcl.loadModule('~system/EngineApi', {}).catch(dcl.error)
 
-    async function pullRendererMessages() {
-      const response = await dcl.callRpc(
-        '~system/EngineApi',
-        'crdtGetMessageFromRenderer',
-        []
-      )
-
-      if (response.data?.length) {
-        if (rendererTransport.onmessage) {
-          for (const byteArray of response.data) {
-            rendererTransport.onmessage(byteArray)
-          }
-        }
-      }
-    }
-
     dcl.onUpdate((dt: number) => {
-      pullRendererMessages()
-        .catch(dcl.error)
-        .finally(() => engine.update(dt))
+      engine.update(dt)
     })
 
     _initEventObservables()

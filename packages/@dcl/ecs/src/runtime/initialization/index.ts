@@ -4,11 +4,11 @@
  */
 
 import { Engine } from '../../engine'
+import { Task, taskSystem } from '../../systems/async-task'
 import { createRendererTransport } from '../../systems/crdt/transports/rendererTransport'
+import { EventsSystem } from '../../systems/events'
 import { createInput } from './../../engine/input'
 import { initializeDcl } from './dcl'
-import { taskSystem, Task } from '../../systems/async-task'
-import { EventsSystem } from '../../systems/events'
 
 const rendererTransport = createRendererTransport()
 export const engine = Engine({
@@ -16,7 +16,7 @@ export const engine = Engine({
 })
 
 // Dcl Interface
-const dclInterface = initializeDcl(engine, rendererTransport)
+const dclInterface = initializeDcl(engine)
 /**
  * Log function. Only works in debug mode, otherwise it does nothing.
  * @param args - any loggable parameter

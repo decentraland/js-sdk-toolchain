@@ -77,4 +77,37 @@ describe('Transport tests', () => {
     expect(networkSpy).toBeCalledTimes(1)
     expect(rendererSpy).toBeCalledTimes(0)
   })
+
+  it('should send and receive crdt messages', async () => {
+    const transports = [createNetworkTransport(), createRendererTransport()]
+    const networkSpy = jest.spyOn(transports[0], 'send')
+    const rendererSpy = jest.spyOn(transports[1], 'send')
+    const engine = Engine({ transports })
+    const entity = engine.addDynamicEntity()
+
+    const originalCrdtSendToRenderer =
+      engineApi.modules['~system/EngineApi'].crdtSendToRenderer
+
+    engineApi.modules['~system/EngineApi'].crdtSendToRenderer = jest
+      .fn()
+      .mockReturnValue({ data: [new Uint8Array([])] })
+
+    transports[1].onmessage = jest.fn()
+
+    // Transform component should be sent to renderer transport
+    engine.baseComponents.Transform.create(entity)
+    engine.update(1)
+
+    jest.mock('')
+    // since callRpc is async function, it's necessary
+    await new Promise(process.nextTick)
+
+    expect(networkSpy).toBeCalledTimes(1)
+    expect(rendererSpy).toBeCalledTimes(1)
+    expect(transports[1].onmessage).toBeCalledTimes(1)
+    jest.resetAllMocks()
+
+    engineApi.modules['~system/EngineApi'].crdtSendToRenderer =
+      originalCrdtSendToRenderer
+  })
 })
