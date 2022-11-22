@@ -44,7 +44,7 @@ EventsSystem.onPointerDown(
 let lastRaycastTimestamp = -1
 engine.addSystem(() => {
   for (const [entity, result] of engine.getEntitiesWith(RaycastResult)) {
-    if (result.hits?.length == 0 || result.timestamp <= lastRaycastTimestamp)
+    if (result.hits?.length === 0 || result.timestamp <= lastRaycastTimestamp)
       continue
     lastRaycastTimestamp = result.timestamp
 
