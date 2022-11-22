@@ -1420,8 +1420,6 @@ export interface PBRaycast {
     origin: PBVector3 | undefined;
     // (undocumented)
     queryType: RaycastQueryType;
-    // (undocumented)
-    timestamp: number;
 }
 
 // Warning: (ae-missing-release-tag) "PBRaycastResult" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
