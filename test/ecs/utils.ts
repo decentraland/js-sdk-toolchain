@@ -104,7 +104,7 @@ export function setupDclInterfaceForThisSuite(
         methods: []
       }
       for (const methodName in modules[moduleName]) {
-        exportsObj[methodName] = modules[moduleName][moduleName].bind(
+        exportsObj[methodName] = modules[moduleName][methodName].bind(
           modules[moduleName]
         )
         ret.methods.push({ name: methodName })

@@ -6,7 +6,13 @@ const componentIds = Object.values(ECSComponentIDs)
   .filter((a) => typeof a === 'number')
   .map(Number)
 
-export function createRendererTransport(): Transport {
+// @internal
+export interface RendererTranport extends Transport {
+  wasCalled: () => boolean
+  clearWasCalledFlag: () => void
+}
+
+export function createRendererTransport(): RendererTranport {
   if (typeof dcl === 'undefined') {
     // TODO: replace with new rpc
     throw new Error(
@@ -14,24 +20,29 @@ export function createRendererTransport(): Transport {
     )
   }
 
+  let wasCalled = false
+  async function sendToRenderer(message: Uint8Array) {
+    wasCalled = true
+    const response = await dcl.callRpc(
+      '~system/EngineApi',
+      'crdtSendToRenderer',
+      [{ data: new Uint8Array(message) }]
+    )
+
+    if (response && response.data && response.data.length) {
+      if (rendererTransport.onmessage) {
+        for (const byteArray of response.data) {
+          rendererTransport.onmessage(byteArray)
+        }
+      }
+    }
+  }
+
   const type = 'renderer'
-  const rendererTransport: Transport = {
+  const rendererTransport: RendererTranport = {
     type,
     send(message: Uint8Array): void {
-      // TODO: replace with new rpc
-      dcl
-        .callRpc('~system/EngineApi', 'crdtSendToRenderer', [
-          { data: new Uint8Array(message) }
-        ])
-        .then((response) => {
-          if (response && response.data && response.data.length)
-            if (rendererTransport.onmessage) {
-              for (const byteArray of response.data) {
-                rendererTransport.onmessage(byteArray)
-              }
-            }
-        })
-        .catch(dcl.error)
+      sendToRenderer(message).catch(dcl.error)
     },
     filter(message: TransportMessage): boolean {
       // Echo message, ignore them
@@ -45,6 +56,12 @@ export function createRendererTransport(): Transport {
       }
 
       return !!message
+    },
+    wasCalled() {
+      return wasCalled
+    },
+    clearWasCalledFlag() {
+      wasCalled = false
     }
   }
 

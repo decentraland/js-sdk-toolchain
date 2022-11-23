@@ -16,7 +16,7 @@ export const engine = Engine({
 })
 
 // Dcl Interface
-const dclInterface = initializeDcl(engine)
+const dclInterface = initializeDcl(engine, rendererTransport)
 /**
  * Log function. Only works in debug mode, otherwise it does nothing.
  * @param args - any loggable parameter

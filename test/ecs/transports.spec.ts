@@ -5,6 +5,7 @@ import { createNetworkTransport } from '../../packages/@dcl/ecs/src/systems/crdt
 import { createRendererTransport } from '../../packages/@dcl/ecs/src/systems/crdt/transports/rendererTransport'
 import { TransportMessage } from '../../packages/@dcl/ecs/src/systems/crdt/types'
 import { setupDclInterfaceForThisSuite, testingEngineApi } from './utils'
+import { initializeDcl } from '../../packages/@dcl/ecs/src/runtime/initialization/dcl'
 
 describe('Transport not declared', () => {
   it('should failed if there is no dcl', () => {
@@ -21,7 +22,7 @@ describe('Transport tests', () => {
   })
 
   const engineApi = testingEngineApi()
-  setupDclInterfaceForThisSuite({
+  const mockedDcl = setupDclInterfaceForThisSuite({
     ...engineApi.modules
   })
 
@@ -105,6 +106,67 @@ describe('Transport tests', () => {
     expect(networkSpy).toBeCalledTimes(1)
     expect(rendererSpy).toBeCalledTimes(1)
     expect(transports[1].onmessage).toBeCalledTimes(1)
+    jest.resetAllMocks()
+
+    engineApi.modules['~system/EngineApi'].crdtSendToRenderer =
+      originalCrdtSendToRenderer
+  })
+
+  it('should receive crdt messages even if there is no message to send', async () => {
+    const rendererTransport = createRendererTransport()
+    const transports = [createNetworkTransport(), rendererTransport]
+
+    const networkSpy = jest.spyOn(transports[0], 'send')
+    const rendererSpy = jest.spyOn(transports[1], 'send')
+    const engine = Engine({ transports })
+
+    initializeDcl(engine, rendererTransport)
+
+    const entity = engine.addDynamicEntity()
+
+    const originalCrdtSendToRenderer =
+      engineApi.modules['~system/EngineApi'].crdtSendToRenderer
+
+    engineApi.modules['~system/EngineApi'].crdtSendToRenderer = jest
+      .fn()
+      .mockReturnValue({ data: [new Uint8Array([])] })
+
+    // Transform component should be sent to renderer transport
+    engine.baseComponents.Transform.create(entity)
+    // 1) A tick with updates
+    mockedDcl.tick(1)
+
+    jest.mock('')
+    // since callRpc is async function, it's necessary
+    await new Promise(process.nextTick)
+
+    // 2) A tick without updates
+    transports[1].onmessage = jest.fn()
+    mockedDcl.tick(1)
+    await new Promise(process.nextTick)
+
+    expect(networkSpy).toBeCalledTimes(1)
+    expect(rendererSpy).toBeCalledTimes(2)
+    expect(transports[1].onmessage).toBeCalledTimes(1)
+
+    // 3) Another tick without updates
+    mockedDcl.tick(1)
+    await new Promise(process.nextTick)
+
+    expect(networkSpy).toBeCalledTimes(1)
+    expect(rendererSpy).toBeCalledTimes(3)
+    expect(transports[1].onmessage).toBeCalledTimes(2)
+
+    engine.baseComponents.Transform.createOrReplace(entity)
+
+    // 4) Tick with updates
+    mockedDcl.tick(1)
+    await new Promise(process.nextTick)
+
+    expect(networkSpy).toBeCalledTimes(2)
+    expect(rendererSpy).toBeCalledTimes(4)
+    expect(transports[1].onmessage).toBeCalledTimes(3)
+
     jest.resetAllMocks()
 
     engineApi.modules['~system/EngineApi'].crdtSendToRenderer =
