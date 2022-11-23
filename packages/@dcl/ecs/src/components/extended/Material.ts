@@ -1,10 +1,19 @@
-import { ComponentDefinition, Entity, IEngine } from '../../engine'
+import { ComponentDefinition, Entity, IEngine, ISchema } from '../../engine'
 import {
+  PBMaterial,
   PBMaterial_PbrMaterial,
   PBMaterial_UnlitMaterial
 } from '../generated/index.gen'
 import * as MaterialSchema from '../generated/Material.gen'
 import { AvatarTexture, Texture, TextureUnion } from '../generated/types.gen'
+
+/**
+ * @public
+ */
+export type MaterialComponentDefinition = ComponentDefinition<
+  ISchema<PBMaterial>,
+  PBMaterial
+>
 
 /**
  * @public
@@ -24,7 +33,8 @@ export type TextureHelper = {
 /**
  * @public
  */
-export interface MaterialComponentDefinition extends ComponentDefinition {
+export interface MaterialComponentDefinitionExtended
+  extends MaterialComponentDefinition {
   /**
    * Texture helpers with constructor
    */
@@ -66,7 +76,7 @@ const TextureHelper: TextureHelper = {
 
 export function defineMaterialComponent(
   engine: Pick<IEngine, 'getComponent'>
-): MaterialComponentDefinition {
+): MaterialComponentDefinitionExtended {
   const Material = engine.getComponent<typeof MaterialSchema.MaterialSchema>(
     MaterialSchema.COMPONENT_ID
   )

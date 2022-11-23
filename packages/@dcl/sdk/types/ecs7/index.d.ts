@@ -1,12 +1,17 @@
 /// <reference types="@dcl/posix" />
 
 /** @public */
-declare const Animator: AnimatorComponentDefinition;
+declare const Animator: AnimatorComponentDefinitionExtended;
 
 /**
  * @public
  */
-declare interface AnimatorComponentDefinition extends ComponentDefinition {
+declare type AnimatorComponentDefinition = ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+
+/**
+ * @public
+ */
+declare interface AnimatorComponentDefinitionExtended extends AnimatorComponentDefinition {
     /**
      * @public
      *
@@ -1049,7 +1054,7 @@ declare namespace Components {
     /** @public */
     const Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     /** @public */
-    const Animator: AnimatorComponentDefinition;
+    const Animator: AnimatorComponentDefinitionExtended;
     /** @public */
     const AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     /** @public */
@@ -1069,11 +1074,11 @@ declare namespace Components {
     /** @public */
     const GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     /** @public */
-    const Material: MaterialComponentDefinition;
+    const Material: MaterialComponentDefinitionExtended;
     /** @public */
-    const MeshCollider: MeshColliderComponentDefinition;
+    const MeshCollider: MeshColliderComponentDefinitionExtended;
     /** @public */
-    const MeshRenderer: MeshRendererComponentDefinition;
+    const MeshRenderer: MeshRendererComponentDefinitionExtended;
     /** @public */
     const NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     /** @public */
@@ -1179,10 +1184,10 @@ declare function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEn
 };
 
 declare function defineSdkComponents(engine: Pick<IEngine, 'defineComponentFromSchema' | 'getComponent'>): {
-    Material: MaterialComponentDefinition;
-    Animator: AnimatorComponentDefinition;
-    MeshRenderer: MeshRendererComponentDefinition;
-    MeshCollider: MeshColliderComponentDefinition;
+    Material: MaterialComponentDefinitionExtended;
+    Animator: AnimatorComponentDefinitionExtended;
+    MeshRenderer: MeshRendererComponentDefinitionExtended;
+    MeshCollider: MeshColliderComponentDefinitionExtended;
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
@@ -1528,12 +1533,17 @@ declare type ISchema<T = any> = {
 declare const log: (...a: any[]) => void;
 
 /** @public */
-declare const Material: MaterialComponentDefinition;
+declare const Material: MaterialComponentDefinitionExtended;
 
 /**
  * @public
  */
-declare interface MaterialComponentDefinition extends ComponentDefinition {
+declare type MaterialComponentDefinition = ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+
+/**
+ * @public
+ */
+declare interface MaterialComponentDefinitionExtended extends MaterialComponentDefinition {
     /**
      * Texture helpers with constructor
      */
@@ -2292,12 +2302,17 @@ declare namespace Matrix {
 }
 
 /** @public */
-declare const MeshCollider: MeshColliderComponentDefinition;
+declare const MeshCollider: MeshColliderComponentDefinitionExtended;
 
 /**
  * @public
  */
-declare interface MeshColliderComponentDefinition extends ComponentDefinition {
+declare type MeshColliderComponentDefinition = ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+
+/**
+ * @public
+ */
+declare interface MeshColliderComponentDefinitionExtended extends MeshColliderComponentDefinition {
     /**
      * @public
      * Set a box in the MeshCollider component
@@ -2331,12 +2346,17 @@ declare interface MeshColliderComponentDefinition extends ComponentDefinition {
 }
 
 /** @public */
-declare const MeshRenderer: MeshRendererComponentDefinition;
+declare const MeshRenderer: MeshRendererComponentDefinitionExtended;
 
 /**
  * @public
  */
-declare interface MeshRendererComponentDefinition extends ComponentDefinition {
+declare type MeshRendererComponentDefinition = ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
+
+/**
+ * @public
+ */
+declare interface MeshRendererComponentDefinitionExtended extends MeshRendererComponentDefinition {
     /**
      * @public
      * Set a box in the MeshRenderer component
