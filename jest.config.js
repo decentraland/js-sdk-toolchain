@@ -21,6 +21,12 @@ module.exports = {
       functions: 70,
       lines: 70,
       statements: 70
+    },
+    "packages/@dcl/ecs/src/runtime/temp-fp": {
+      branches: 10,
+      functions: 10,
+      lines: 10,
+      statements: 10
     }
   },
   coveragePathIgnorePatterns: [

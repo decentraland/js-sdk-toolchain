@@ -33,6 +33,7 @@ export function setupDclInterfaceForThisSuite(
   const updateFns: Array<(dt: number) => void> = []
   const eventFns: Array<(any: any) => void> = []
   const startFns: Array<() => void> = []
+  const subscribeEvents: Set<string> = new Set()
 
   const dcl: DecentralandInterface = {
     // legacy not used
@@ -66,11 +67,11 @@ export function setupDclInterfaceForThisSuite(
     openNFTDialog: () => {
       throw new Error('not implemented')
     },
-    subscribe: () => {
-      throw new Error('not implemented')
+    subscribe: (event: string) => {
+      subscribeEvents.add(event)
     },
-    unsubscribe: () => {
-      throw new Error('not implemented')
+    unsubscribe: (event: string) => {
+      subscribeEvents.delete(event)
     },
     setParent: () => {
       throw new Error('not implemented')
@@ -125,7 +126,7 @@ export function setupDclInterfaceForThisSuite(
     updateFns.forEach(($) => $(dt))
   }
 
-  return { eventFns, updateFns, startFns, tick }
+  return { eventFns, updateFns, startFns, tick, subscribeEvents }
 }
 
 export namespace SandBox {
