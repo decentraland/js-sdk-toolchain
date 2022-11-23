@@ -7,10 +7,13 @@
 /// <reference types="@dcl/posix" />
 
 // @public (undocumented)
-export const Animator: AnimatorComponentDefinition;
+export const Animator: AnimatorComponentDefinitionExtended;
 
 // @public (undocumented)
-export interface AnimatorComponentDefinition extends ComponentDefinition {
+export type AnimatorComponentDefinition = ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+
+// @public (undocumented)
+export interface AnimatorComponentDefinitionExtended extends AnimatorComponentDefinition {
     getClip(entity: Entity, name: string): PBAnimationState;
     getClipOrNull(entity: Entity, name: string): PBAnimationState | null;
     playSingleAnimation(entity: Entity, name: string, resetCursor?: boolean): boolean;
@@ -333,7 +336,7 @@ export namespace Components {
     const // (undocumented)
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     const // (undocumented)
-    Animator: AnimatorComponentDefinition;
+    Animator: AnimatorComponentDefinitionExtended;
     const // (undocumented)
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     const // (undocumented)
@@ -353,11 +356,11 @@ export namespace Components {
     const // (undocumented)
     GltfContainer: ComponentDefinition<ISchema<PBGltfContainer>, PBGltfContainer>;
     const // (undocumented)
-    Material: MaterialComponentDefinition;
+    Material: MaterialComponentDefinitionExtended;
     const // (undocumented)
-    MeshCollider: MeshColliderComponentDefinition;
+    MeshCollider: MeshColliderComponentDefinitionExtended;
     const // (undocumented)
-    MeshRenderer: MeshRendererComponentDefinition;
+    MeshRenderer: MeshRendererComponentDefinitionExtended;
     const // (undocumented)
     NftShape: ComponentDefinition<ISchema<PBNftShape>, PBNftShape>;
     const // (undocumented)
@@ -450,10 +453,10 @@ export function defineLibraryComponents({ defineComponentFromSchema }: Pick<IEng
 //
 // @public (undocumented)
 export function defineSdkComponents(engine: Pick<IEngine, 'defineComponentFromSchema' | 'getComponent'>): {
-    Material: MaterialComponentDefinition;
-    Animator: AnimatorComponentDefinition;
-    MeshRenderer: MeshRendererComponentDefinition;
-    MeshCollider: MeshColliderComponentDefinition;
+    Material: MaterialComponentDefinitionExtended;
+    Animator: AnimatorComponentDefinitionExtended;
+    MeshRenderer: MeshRendererComponentDefinitionExtended;
+    MeshCollider: MeshColliderComponentDefinitionExtended;
     Transform: ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
     AudioSource: ComponentDefinition<ISchema<PBAudioSource>, PBAudioSource>;
     AudioStream: ComponentDefinition<ISchema<PBAudioStream>, PBAudioStream>;
@@ -653,10 +656,13 @@ export type ISchema<T = any> = {
 export const log: (...a: any[]) => void;
 
 // @public (undocumented)
-export const Material: MaterialComponentDefinition;
+export const Material: MaterialComponentDefinitionExtended;
 
 // @public (undocumented)
-export interface MaterialComponentDefinition extends ComponentDefinition {
+export type MaterialComponentDefinition = ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+
+// @public (undocumented)
+export interface MaterialComponentDefinitionExtended extends MaterialComponentDefinition {
     setBasicMaterial: (entity: Entity, material: PBMaterial_UnlitMaterial) => void;
     setPbrMaterial: (entity: Entity, material: PBMaterial_PbrMaterial) => void;
     Texture: TextureHelper;
@@ -816,10 +822,13 @@ export namespace Matrix {
 }
 
 // @public (undocumented)
-export const MeshCollider: MeshColliderComponentDefinition;
+export const MeshCollider: MeshColliderComponentDefinitionExtended;
 
 // @public (undocumented)
-export interface MeshColliderComponentDefinition extends ComponentDefinition {
+export type MeshColliderComponentDefinition = ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+
+// @public (undocumented)
+export interface MeshColliderComponentDefinitionExtended extends MeshColliderComponentDefinition {
     setBox(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
     setCylinder(entity: Entity, radiusBottom?: number, radiusTop?: number, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
     setPlane(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
@@ -827,10 +836,13 @@ export interface MeshColliderComponentDefinition extends ComponentDefinition {
 }
 
 // @public (undocumented)
-export const MeshRenderer: MeshRendererComponentDefinition;
+export const MeshRenderer: MeshRendererComponentDefinitionExtended;
 
 // @public (undocumented)
-export interface MeshRendererComponentDefinition extends ComponentDefinition {
+export type MeshRendererComponentDefinition = ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
+
+// @public (undocumented)
+export interface MeshRendererComponentDefinitionExtended extends MeshRendererComponentDefinition {
     setBox(entity: Entity, uvs?: number[]): void;
     setCylinder(entity: Entity, radiusBottom?: number, radiusTop?: number): void;
     setPlane(entity: Entity, uvs?: number[]): void;
