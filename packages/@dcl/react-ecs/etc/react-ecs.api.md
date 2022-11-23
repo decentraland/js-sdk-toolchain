@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="@dcl/posix" />
-
 // Warning: (ae-missing-release-tag) "Children" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)

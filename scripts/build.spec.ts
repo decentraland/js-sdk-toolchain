@@ -79,37 +79,33 @@ flow('build-all', () => {
     })
   })
 
-  flow('@dcl/ecs7', () => {
+  flow('@dcl/ecs7 install everything that needs', () => {
     itExecutes('npm i --quiet', ECS7_PATH)
     compileEcsComponents(
       `${ECS7_PATH}/src/components`,
       `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
       `${ECS7_PATH}/node_modules/@dcl/protocol/proto/`
     )
-    itExecutes('npm run build', ECS7_PATH)
+  })
+
+  flow('@dcl/sdk build', () => {
+    itDeletesFolder('dist', SDK_PATH)
+    itExecutes(`npm i --quiet`, SDK_PATH)
+
+    itDeletesGlob('types/*.d.ts', SDK_PATH)
+
+    // install required dependencies
+    itExecutes(`npm install --quiet ${BUILD_ECS_PATH}`, SDK_PATH)
+    itExecutes(`npm install --quiet ${DECENTRALAND_AMD_PATH}`, SDK_PATH)
+    itExecutes(`npm install --quiet ${JS_RUNTIME}`, SDK_PATH)
+
+    // Build ecs
+    itExecutes('npm run build-rollup', ECS7_PATH)
     copyFile(
       `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
-      `${ECS7_PATH}/dist/proto-definitions`
+      `${SDK_PATH}/dist/ecs7/proto-definitions`
     )
-
-    it('check file exists', () => {
-      ensureFileExists('dist/index.js', ECS7_PATH)
-      ensureFileExists('dist/index.min.js', ECS7_PATH)
-      ensureFileExists('dist/proto-definitions', ECS7_PATH)
-    })
-
-    flow('@dcl/sdk', () => {
-      itDeletesFolder('dist', SDK_PATH)
-      itExecutes(`npm i --quiet`, SDK_PATH)
-
-      itDeletesGlob('types/*.d.ts', SDK_PATH)
-
-      // install required dependencies
-      itExecutes(`npm install --quiet ${BUILD_ECS_PATH}`, SDK_PATH)
-      itExecutes(`npm install --quiet ${DECENTRALAND_AMD_PATH}`, SDK_PATH)
-      itExecutes(`npm install --quiet ${JS_RUNTIME}`, SDK_PATH)
-    })
-
+    // Copy ecs into @dcl/sdk
     it('copy ecs7 to @dcl/sdk pkg', () => {
       const filesToCopy = [
         'index.js',
@@ -130,6 +126,16 @@ flow('build-all', () => {
       }
     })
   })
+
+  flow('@dcl/sdk build', () => {
+    itDeletesFolder('dist', ECS7_PATH)
+    itExecutes('npm run build', ECS7_PATH)
+    copyFile(
+      `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
+      `${ECS7_PATH}/dist/proto-definitions`
+    )
+  })
+
   flow('@dcl/react-ecs', () => {
     itExecutes('npm i --quiet', REACT_ECS)
     it('Copy proto files', async () => {
@@ -223,7 +229,6 @@ flow('build-all', () => {
         const finalContent = fileContent.replace('export {}', '')
 
         const distPlaygroundPath = path.resolve(distSnippetsPath, fileName)
-        console.log({ distPlaygroundPath })
         writeFileSync(distPlaygroundPath, finalContent)
       }
 

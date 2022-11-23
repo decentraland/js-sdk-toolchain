@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-
 import { build } from 'esbuild'
 
 const WATCH = process.argv.includes('--watch') || process.argv.includes('-w')
 
+// @deprecated
 async function compile() {
   const CWD = process.cwd()
 
