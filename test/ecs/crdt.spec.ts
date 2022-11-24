@@ -72,7 +72,7 @@ describe('CRDT tests', () => {
     // Call update again with no updates and verify that there's no message
     // being sent through the wire
     engine.update(1 / 30)
-    expect(spySend).toBeCalledTimes(0)
+    expect(spySend).toBeCalledWith(new Uint8Array([]))
   })
 
   it('should sent new entity through the wire and process it in the other engine', async () => {
@@ -98,7 +98,7 @@ describe('CRDT tests', () => {
     expect(SandBox.DEFAULT_POSITION).toBeDeepCloseTo(TransformB.get(entityA))
     expect(posA).toBeDeepCloseTo(PositionB.get(entityA))
     expect(clientA.spySend).toBeCalledTimes(1)
-    expect(clientB.spySend).toBeCalledTimes(0)
+    expect(clientB.spySend).toBeCalledTimes(1)
   })
 
   it('create multiple clients with the same code. Just like a scene', async () => {
@@ -183,7 +183,7 @@ describe('CRDT tests', () => {
     transports[0].onmessage!(buffer.toBinary())
     engine.update(1)
 
-    expect(spySend).toBeCalledTimes(1)
+    expect(spySend).toBeCalledTimes(2)
     expect(spyWrite).toBeCalledTimes(1)
   })
 
@@ -208,7 +208,7 @@ describe('CRDT tests', () => {
     transports[0].onmessage!(buffer.toBinary())
     engine.update(1)
 
-    expect(spySend).toBeCalledTimes(1)
+    expect(spySend).toBeCalledTimes(2)
     expect(spyWrite).toBeCalledTimes(1)
   })
 

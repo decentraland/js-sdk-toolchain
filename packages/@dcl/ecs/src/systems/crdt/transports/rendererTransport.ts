@@ -6,13 +6,7 @@ const componentIds = Object.values(ECSComponentIDs)
   .filter((a) => typeof a === 'number')
   .map(Number)
 
-// @internal
-export interface RendererTranport extends Transport {
-  wasCalled: () => boolean
-  clearWasCalledFlag: () => void
-}
-
-export function createRendererTransport(): RendererTranport {
+export function createRendererTransport(): Transport {
   if (typeof dcl === 'undefined') {
     // TODO: replace with new rpc
     throw new Error(
@@ -20,9 +14,7 @@ export function createRendererTransport(): RendererTranport {
     )
   }
 
-  let wasCalled = false
   async function sendToRenderer(message: Uint8Array) {
-    wasCalled = true
     const response = await dcl.callRpc(
       '~system/EngineApi',
       'crdtSendToRenderer',
@@ -39,7 +31,7 @@ export function createRendererTransport(): RendererTranport {
   }
 
   const type = 'renderer'
-  const rendererTransport: RendererTranport = {
+  const rendererTransport: Transport = {
     type,
     send(message: Uint8Array): void {
       sendToRenderer(message).catch(dcl.error)
@@ -56,12 +48,6 @@ export function createRendererTransport(): RendererTranport {
       }
 
       return !!message
-    },
-    wasCalled() {
-      return wasCalled
-    },
-    clearWasCalledFlag() {
-      wasCalled = false
     }
   }
 

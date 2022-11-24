@@ -20,7 +20,7 @@ describe('`dcl` object not declared', () => {
   it('should failed if there is no dcl', () => {
     const networkTransport = createNetworkTransport()
     const engine = Engine({ transports: [networkTransport] })
-    const obj = initializeDcl(engine, null as any)
+    const obj = initializeDcl(engine)
     expect(typeof obj.error).toBe('function')
     expect(typeof obj.log).toBe('function')
 
@@ -42,7 +42,7 @@ describe('Observable tests', () => {
   it('should avoid echo messages', () => {
     const rendererTransport = createRendererTransport()
     const engine = Engine({ transports: [rendererTransport] })
-    initializeDcl(engine, rendererTransport)
+    initializeDcl(engine)
 
     const eventToEmit = [
       { type: 'onEnterScene', data: {} },

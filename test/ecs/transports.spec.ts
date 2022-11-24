@@ -76,7 +76,10 @@ describe('Transport tests', () => {
     UserComponent.create(newEntity, { x: 1 })
     engine.update(1)
     expect(networkSpy).toBeCalledTimes(1)
-    expect(rendererSpy).toBeCalledTimes(0)
+
+    // Now the send is invoked, but the arg should be []
+    expect(rendererSpy).toBeCalledTimes(1)
+    expect(rendererSpy).toBeCalledWith(new Uint8Array([]))
   })
 
   it('should send and receive crdt messages', async () => {
@@ -120,7 +123,7 @@ describe('Transport tests', () => {
     const rendererSpy = jest.spyOn(transports[1], 'send')
     const engine = Engine({ transports })
 
-    initializeDcl(engine, rendererTransport)
+    initializeDcl(engine)
 
     const entity = engine.addDynamicEntity()
 
@@ -145,7 +148,7 @@ describe('Transport tests', () => {
     mockedDcl.tick(1)
     await new Promise(process.nextTick)
 
-    expect(networkSpy).toBeCalledTimes(1)
+    expect(networkSpy).toBeCalledTimes(2)
     expect(rendererSpy).toBeCalledTimes(2)
     expect(transports[1].onmessage).toBeCalledTimes(1)
 
@@ -153,7 +156,7 @@ describe('Transport tests', () => {
     mockedDcl.tick(1)
     await new Promise(process.nextTick)
 
-    expect(networkSpy).toBeCalledTimes(1)
+    expect(networkSpy).toBeCalledTimes(3)
     expect(rendererSpy).toBeCalledTimes(3)
     expect(transports[1].onmessage).toBeCalledTimes(2)
 
@@ -163,7 +166,7 @@ describe('Transport tests', () => {
     mockedDcl.tick(1)
     await new Promise(process.nextTick)
 
-    expect(networkSpy).toBeCalledTimes(2)
+    expect(networkSpy).toBeCalledTimes(4)
     expect(rendererSpy).toBeCalledTimes(4)
     expect(transports[1].onmessage).toBeCalledTimes(3)
 
