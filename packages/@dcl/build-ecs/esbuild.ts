@@ -14,7 +14,8 @@ async function compile() {
     outdir: 'dist',
     watch: WATCH,
     treeShaking: true,
-    platform: 'browser'
+    platform: 'browser',
+    bundle: true
   })
   console.log(buildProcess)
 }
