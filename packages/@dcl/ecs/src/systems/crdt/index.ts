@@ -168,6 +168,8 @@ export function crdtSceneSystem(engine: Pick<IEngine, 'getComponent'>) {
       }
       if (transportBuffer.size()) {
         transport.send(transportBuffer.toBinary())
+      } else {
+        transport.send(new Uint8Array([]))
       }
     }
   }
