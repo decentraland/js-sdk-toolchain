@@ -8,8 +8,16 @@ import * as AnimatorSchema from './../generated/Animator.gen'
 /**
  * @public
  */
-export interface AnimatorComponentDefinition
-  extends ComponentDefinition<ISchema<PBAnimator>, PBAnimator> {
+export type AnimatorComponentDefinition = ComponentDefinition<
+  ISchema<PBAnimator>,
+  PBAnimator
+>
+
+/**
+ * @public
+ */
+export interface AnimatorComponentDefinitionExtended
+  extends AnimatorComponentDefinition {
   /**
    * @public
    *
@@ -58,11 +66,8 @@ export interface AnimatorComponentDefinition
 
 export function defineAnimatorComponent(
   engine: Pick<IEngine, 'getComponent'>
-): AnimatorComponentDefinition {
-  const Animator: ComponentDefinition<
-    ISchema<PBAnimator>,
-    PBAnimator
-  > = engine.getComponent<typeof AnimatorSchema.AnimatorSchema>(
+): AnimatorComponentDefinitionExtended {
+  const Animator = engine.getComponent<typeof AnimatorSchema.AnimatorSchema>(
     AnimatorSchema.COMPONENT_ID
   )
 

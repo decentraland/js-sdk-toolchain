@@ -4,10 +4,10 @@
  */
 
 import { Engine, IEngine } from '../../engine'
+import { Task, taskSystem } from '../../systems/async-task'
 import { createRendererTransport } from '../../systems/crdt/transports/rendererTransport'
-import { createInput } from '../../engine/input'
-import { taskSystem, Task } from '../../systems/async-task'
 import { EventsSystem } from '../../systems/events'
+import { createInput } from './../../engine/input'
 
 const rendererTransport = createRendererTransport()
 export const engine: IEngine = Engine({

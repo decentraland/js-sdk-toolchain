@@ -1,26 +1,39 @@
-/// <reference types="@dcl/js-runtime" />
-
-import { TransportMessage, Transport } from '../types'
+import { Transport, TransportMessage } from '../types'
 import { ECSComponentIDs } from '../../../components/generated/ids.gen'
 
 const componentIds = Object.values(ECSComponentIDs)
   .filter((a) => typeof a === 'number')
   .map(Number)
 
-// TODO: replace with module
-declare let require: any
+declare var require: any
 
 export function createRendererTransport(): Transport {
-  const type = 'renderer'
+  if (typeof require === 'undefined') {
+    // TODO: replace with new rpc
+    throw new Error(
+      'Cannot create createRendererTransport without global dcl object'
+    )
+  }
+
   const engineApi = require('~system/EngineApi')
-  return {
+
+  async function sendToRenderer(message: Uint8Array) {
+    const response = await engineApi.crdtSendToRenderer({ data: new Uint8Array(message) })
+
+    if (response && response.data && response.data.length) {
+      if (rendererTransport.onmessage) {
+        for (const byteArray of response.data) {
+          rendererTransport.onmessage(byteArray)
+        }
+      }
+    }
+  }
+
+  const type = 'renderer'
+  const rendererTransport: Transport = {
     type,
     send(message: Uint8Array): void {
-      engineApi
-        .crdtSendToRenderer({ data: new Uint8Array(message) })
-        .catch(() => {
-          debugger
-        })
+      sendToRenderer(message).catch(() => {debugger})
     },
     filter(message: TransportMessage): boolean {
       // Echo message, ignore them
@@ -36,4 +49,6 @@ export function createRendererTransport(): Transport {
       return !!message
     }
   }
+
+  return rendererTransport
 }

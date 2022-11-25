@@ -32,7 +32,7 @@
     "@dcl/crdt": "^1.0.0-20220819145912.commit-35069cd",
     "@dcl/ecs-math": "^2.0.1-20221108141807.commit-a1344cb",
     "@dcl/js-runtime": "file:../js-runtime",
-    "@dcl/protocol": "^1.0.0-3490809059.commit-e420af7"
+    "@dcl/protocol": "^1.0.0-3524279049.commit-02b9080"
   },
   "files": [
     "dist/index.js",

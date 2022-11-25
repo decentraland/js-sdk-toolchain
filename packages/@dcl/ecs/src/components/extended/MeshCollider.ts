@@ -1,14 +1,20 @@
-import { IEngine, ISchema } from '../../engine'
-import { ComponentDefinition } from '../../engine/component'
-import { Entity } from '../../engine/entity'
+import { ComponentDefinition, Entity, IEngine, ISchema } from '../../engine'
 import { ColliderLayer, PBMeshCollider } from '../generated/index.gen'
 import * as MeshColliderSchema from './../generated/MeshCollider.gen'
 
 /**
  * @public
  */
-export interface MeshColliderComponentDefinition
-  extends ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider> {
+export type MeshColliderComponentDefinition = ComponentDefinition<
+  ISchema<PBMeshCollider>,
+  PBMeshCollider
+>
+
+/**
+ * @public
+ */
+export interface MeshColliderComponentDefinitionExtended
+  extends MeshColliderComponentDefinition {
   /**
    * @public
    * Set a box in the MeshCollider component
@@ -57,7 +63,7 @@ export interface MeshColliderComponentDefinition
 
 export function defineMeshColliderComponent(
   engine: Pick<IEngine, 'getComponent'>
-): MeshColliderComponentDefinition {
+): MeshColliderComponentDefinitionExtended {
   const MeshCollider = engine.getComponent<
     typeof MeshColliderSchema.MeshColliderSchema
   >(MeshColliderSchema.COMPONENT_ID)

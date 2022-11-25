@@ -10,6 +10,14 @@ import { AvatarTexture, Texture, TextureUnion } from '../generated/types.gen'
 /**
  * @public
  */
+export type MaterialComponentDefinition = ComponentDefinition<
+  ISchema<PBMaterial>,
+  PBMaterial
+>
+
+/**
+ * @public
+ */
 export type TextureHelper = {
   /**
    * @returns a common texture with a source file
@@ -25,8 +33,8 @@ export type TextureHelper = {
 /**
  * @public
  */
-export interface MaterialComponentDefinition
-  extends ComponentDefinition<ISchema<PBMaterial>, PBMaterial> {
+export interface MaterialComponentDefinitionExtended
+  extends MaterialComponentDefinition {
   /**
    * Texture helpers with constructor
    */
@@ -68,11 +76,8 @@ const TextureHelper: TextureHelper = {
 
 export function defineMaterialComponent(
   engine: Pick<IEngine, 'getComponent'>
-): MaterialComponentDefinition {
-  const Material: ComponentDefinition<
-    ISchema<PBMaterial>,
-    PBMaterial
-  > = engine.getComponent<typeof MaterialSchema.MaterialSchema>(
+): MaterialComponentDefinitionExtended {
+  const Material = engine.getComponent<typeof MaterialSchema.MaterialSchema>(
     MaterialSchema.COMPONENT_ID
   )
 
