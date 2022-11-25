@@ -3,7 +3,7 @@ import analyze from 'rollup-plugin-analyzer'
 import commonjs from '@rollup/plugin-commonjs'
 import typescript from '@rollup/plugin-typescript'
 import { sys } from 'typescript'
-import { terser } from 'rollup-plugin-terser'
+import terser from '@rollup/plugin-terser'
 import { RollupOptions } from 'rollup'
 import { apiExtractorConfig } from './api-extractor'
 import { apiExtractor } from 'rollup-plugin-api-extractor'
@@ -20,7 +20,7 @@ console.assert(packageJson.typings, 'package.json .typings must be present')
 
 export const basicRollupConfig: RollupOptions = {
   input: 'src/index.ts',
-  external: [/@decentraland\//, /~system\//],
+  external: [/~system\//],
   output: [
     {
       file: packageJson.main,
@@ -45,12 +45,13 @@ export const basicRollupConfig: RollupOptions = {
     commonjs({
       strictRequires: true
     }),
-    apiExtractor({
-      configFile: './api-extractor.json',
-      configuration: apiExtractorConfig(packageJsonPath),
-      local: !PROD,
-      cleanUpRollup: false
-    }),
+    false &&
+      apiExtractor({
+        configFile: './api-extractor.json',
+        configuration: apiExtractorConfig(packageJsonPath),
+        local: !PROD,
+        cleanUpRollup: false
+      }),
     false &&
       analyze({
         hideDeps: true,
@@ -61,6 +62,7 @@ export const basicRollupConfig: RollupOptions = {
 
 const ecsConfig: RollupOptions = {
   ...basicRollupConfig,
+  input: 'src/index-bundle.ts',
   context: 'self',
   plugins: [
     typescript({
@@ -72,7 +74,7 @@ const ecsConfig: RollupOptions = {
       },
       typescript: require('typescript')
     }),
-    ...basicRollupConfig.plugins!
+    ...(basicRollupConfig.plugins as any)
   ]
 }
 

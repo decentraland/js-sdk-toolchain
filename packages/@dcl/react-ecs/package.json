@@ -26,10 +26,10 @@
   "homepage": "https://github.com/decentraland/js-sdk-toolchain#readme",
   "devDependencies": {
     "@types/react": "^18.0.18",
-    "@types/react-reconciler": "^0.28.0",
-    "@dcl/ecs": "file:../ecs"
+    "@types/react-reconciler": "^0.28.0"
   },
   "dependencies": {
+    "@dcl/ecs": "file:../ecs",
     "react": "^18.2.0",
     "react-reconciler": "^0.29.0"
   },

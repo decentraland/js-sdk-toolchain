@@ -28,6 +28,13 @@ function defineComponent(component: Component) {
   return `\t\t${component.componentPascalName}: defineComponentFromSchema(${component.componentPascalName}Schema.${component.componentPascalName}Schema, ${component.componentPascalName}Schema.COMPONENT_ID),`
 }
 
+function defineComponentType(component: Component) {
+  if (component.componentId === TransformComponent.componentId) {
+    return `\t\t${component.componentPascalName}: ComponentDefinition<ISchema<${component.componentPascalName}Schema.TransformType>, Partial<TransformType>>`
+  }
+  return `\t\t${component.componentPascalName}: ComponentDefinition<typeof ${component.componentPascalName}Schema.${component.componentPascalName}Schema>`
+}
+
 function useDefinedComponent(component: Component) {
   return `/** @public */\nexport const ${component.componentPascalName} = engine.baseComponents.${component.componentPascalName}`
 }
@@ -37,13 +44,18 @@ function namespaceComponent(component: Component) {
 }
 
 const indexTemplate = `import type { IEngine } from '../../engine/types'
+import { ComponentDefinition } from '../../engine/component'
 import * as TransformSchema from '../legacy/Transform'
 $componentImports
 $componentExports
 
+export type LibraryComponents = {
+$componentTypes
+}
+
 export function defineLibraryComponents({
   defineComponentFromSchema
-}: Pick<IEngine, 'defineComponentFromSchema'>) {
+}: Pick<IEngine, 'defineComponentFromSchema'>): LibraryComponents {
   return {
 $componentReturns
   }
@@ -84,6 +96,10 @@ export function generateIndex(param: {
     .replace(
       '$componentReturns',
       componentWithoutIndex.map(defineComponent).join('\n')
+    )
+    .replace(
+      '$componentTypes',
+      componentWithoutIndex.map(defineComponentType).join('\n')
     )
     .replace(
       '$componentImports',

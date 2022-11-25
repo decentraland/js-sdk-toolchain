@@ -32,7 +32,7 @@ export namespace ComponentOperation {
     type: WireMessage.Enum,
     entity: Entity,
     timestamp: number,
-    componentDefinition: ComponentDefinition,
+    componentDefinition: ComponentDefinition<any, any>,
     buf: ByteBuffer
   ) {
     // reserve the beginning

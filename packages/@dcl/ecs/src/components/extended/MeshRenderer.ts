@@ -1,10 +1,14 @@
-import { ComponentDefinition, Entity, IEngine } from '../../engine'
+import { IEngine, ISchema } from '../../engine'
+import { ComponentDefinition } from '../../engine/component'
+import { Entity } from '../../engine/entity'
+import { PBMeshRenderer } from '../generated/index.gen'
 import * as MeshRendererSchema from './../generated/MeshRenderer.gen'
 
 /**
  * @public
  */
-export interface MeshRendererComponentDefinition extends ComponentDefinition {
+export interface MeshRendererComponentDefinition
+  extends ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer> {
   /**
    * @public
    * Set a box in the MeshRenderer component
@@ -41,9 +45,12 @@ export interface MeshRendererComponentDefinition extends ComponentDefinition {
 export function defineMeshRendererComponent(
   engine: Pick<IEngine, 'getComponent'>
 ): MeshRendererComponentDefinition {
-  const MeshRenderer = engine.getComponent<
-    typeof MeshRendererSchema.MeshRendererSchema
-  >(MeshRendererSchema.COMPONENT_ID)
+  const MeshRenderer: ComponentDefinition<
+    ISchema<PBMeshRenderer>,
+    PBMeshRenderer
+  > = engine.getComponent<typeof MeshRendererSchema.MeshRendererSchema>(
+    MeshRendererSchema.COMPONENT_ID
+  )
 
   return {
     ...MeshRenderer,

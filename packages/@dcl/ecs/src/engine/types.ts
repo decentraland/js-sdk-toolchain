@@ -1,4 +1,4 @@
-import { defineSdkComponents } from '../components'
+import { defineSdkComponents, SdkComponents } from '../components'
 import type { ISchema } from '../schemas/ISchema'
 import { Result, Spec } from '../schemas/Map'
 import { Transport } from '../systems/crdt/types'
@@ -19,8 +19,10 @@ export type Unpacked<T> = T extends (infer U)[] ? U : T
 /**
  * @public
  */
-export type ComponentSchema<T extends [CompDef, ...CompDef[]]> = {
-  [K in keyof T]: T[K] extends CompDef ? ReturnType<T[K]['getMutable']> : never
+export type ComponentSchema<T extends [CompDef<any>, ...CompDef<any>[]]> = {
+  [K in keyof T]: T[K] extends CompDef<any>
+    ? ReturnType<T[K]['getMutable']>
+    : never
 }
 
 /**
@@ -117,8 +119,8 @@ export type IEngine = {
    * ```
    */
   defineComponentFromSchema<
-    T extends ISchema<Record<string, any>>,
-    ConstructorType = ComponentType<T>
+    T extends ISchema<ConstructorType>,
+    ConstructorType
   >(
     spec: T,
     componentId: number,
@@ -148,7 +150,7 @@ export type IEngine = {
    * }
    * ```
    */
-  getEntitiesWith<T extends [CompDef, ...CompDef[]]>(
+  getEntitiesWith<T extends [CompDef<any>, ...CompDef<any>[]]>(
     ...components: T
   ): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>
 
@@ -183,7 +185,7 @@ export type IEngine = {
    */
   CameraEntity: Entity
 
-  baseComponents: ReturnType<typeof defineSdkComponents>
+  baseComponents: SdkComponents
 
   /**
    * @internal

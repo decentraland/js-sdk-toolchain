@@ -1,4 +1,4 @@
-import { Entity } from '../../engine'
+import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
 import { ISchema } from '../ISchema'
 

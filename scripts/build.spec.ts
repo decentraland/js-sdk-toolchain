@@ -5,7 +5,6 @@ import { copySync, mkdirSync, removeSync } from 'fs-extra'
 import {
   BUILD_ECS_PATH,
   commonChecks,
-  DECENTRALAND_AMD_PATH,
   ECS7_PATH,
   flow,
   JS_RUNTIME,
@@ -49,19 +48,30 @@ flow('build-all', () => {
     })
   })
 
-  flow('@dcl/amd', () => {
-    itExecutes(`npm i --quiet`, DECENTRALAND_AMD_PATH)
-    itDeletesFolder('dist', DECENTRALAND_AMD_PATH)
-    itExecutes(`${TSC} -p tsconfig.json`, DECENTRALAND_AMD_PATH)
-    itExecutes(
-      `${TERSER} --mangle --comments some --source-map -o dist/amd.min.js dist/amd.js`,
-      DECENTRALAND_AMD_PATH
-    )
+  flow('@dcl/js-runtime', () => {
+    it('compile protos', async () => {
+      const rpcProtoPath = path.resolve(
+        __dirname,
+        'rpc-api-generation',
+        'src',
+        'proto'
+      )
+      removeSync(rpcProtoPath)
+      mkdirSync(rpcProtoPath)
+      writeFileSync(path.resolve(rpcProtoPath, 'README.md'), '# Generated code')
+
+      await runCommand(`make compile_apis`, path.resolve(__dirname, '..'))
+      await compileProtoApi()
+
+      copySync(
+        path.resolve(__dirname, 'rpc-api-generation/src/modules', 'index.d.ts'),
+        path.resolve(JS_RUNTIME, 'apis.d.ts')
+      )
+    }, 60000)
 
     it('check file exists', () => {
-      ensureFileExists('dist/amd.js', DECENTRALAND_AMD_PATH)
-      ensureFileExists('dist/amd.min.js', DECENTRALAND_AMD_PATH)
-      ensureFileExists('dist/amd.min.js.map', DECENTRALAND_AMD_PATH)
+      ensureFileExists('apis.d.ts', JS_RUNTIME)
+      ensureFileExists('index.d.ts', JS_RUNTIME)
     })
   })
 
@@ -79,13 +89,22 @@ flow('build-all', () => {
     })
   })
 
-  flow('@dcl/ecs7 install everything that needs', () => {
+  flow('@dcl/ecs build', () => {
+    itDeletesFolder('dist', ECS7_PATH)
     itExecutes('npm i --quiet', ECS7_PATH)
     compileEcsComponents(
       `${ECS7_PATH}/src/components`,
       `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
       `${ECS7_PATH}/node_modules/@dcl/protocol/proto/`
     )
+    copyFile(
+      `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
+      `${SDK_PATH}/dist/ecs7/proto-definitions`
+    )
+    itExecutes('npm run build', ECS7_PATH)
+
+    // Build ecs
+    itExecutes('npm run build-rollup', ECS7_PATH)
   })
 
   flow('@dcl/sdk build', () => {
@@ -95,49 +114,16 @@ flow('build-all', () => {
     itDeletesGlob('types/*.d.ts', SDK_PATH)
 
     // install required dependencies
-    itExecutes(`npm install --quiet ${BUILD_ECS_PATH}`, SDK_PATH)
-    itExecutes(`npm install --quiet ${DECENTRALAND_AMD_PATH}`, SDK_PATH)
+    itExecutes(`npm install --quiet ${ROLLUP_CONFIG_PATH}`, SDK_PATH)
     itExecutes(`npm install --quiet ${JS_RUNTIME}`, SDK_PATH)
+    itExecutes(`npm install --quiet ${ECS7_PATH}`, SDK_PATH)
 
-    // Build ecs
-    itExecutes('npm run build-rollup', ECS7_PATH)
-    copyFile(
-      `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
-      `${SDK_PATH}/dist/ecs7/proto-definitions`
-    )
-    // Copy ecs into @dcl/sdk
-    it('copy ecs7 to @dcl/sdk pkg', () => {
-      const filesToCopy = [
-        'index.js',
-        'index.d.ts',
-        'index.min.js',
-        'index.min.js.map',
-        'proto-definitions'
-      ]
-      for (const file of filesToCopy) {
-        const filePath = ensureFileExists(`dist/${file}`, ECS7_PATH)
-        copyFile(filePath, `${SDK_PATH}/dist/ecs7/${file}`)
-
-        if (file === 'index.d.ts') {
-          const typePath = SDK_PATH + '/types/ecs7/index.d.ts'
-          copyFile(filePath, typePath)
-          fixTypes(typePath, { ignoreExportError: true })
-        }
-      }
-    })
-  })
-
-  flow('@dcl/sdk build', () => {
-    itDeletesFolder('dist', ECS7_PATH)
     itExecutes('npm run build', ECS7_PATH)
-    copyFile(
-      `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
-      `${ECS7_PATH}/dist/proto-definitions`
-    )
   })
 
   flow('@dcl/react-ecs', () => {
     itExecutes('npm i --quiet', REACT_ECS)
+    itExecutes(`npm install --quiet ${ECS7_PATH}`, REACT_ECS)
     it('Copy proto files', async () => {
       const protoTypesPath = `${REACT_ECS}/src/generated`
       removeSync(protoTypesPath)
@@ -159,30 +145,6 @@ flow('build-all', () => {
     })
   })
 
-  flow('rpc api generation', () => {
-    it('compile protos', async () => {
-      const rpcProtoPath = path.resolve(
-        __dirname,
-        'rpc-api-generation',
-        'src',
-        'proto'
-      )
-      removeSync(rpcProtoPath)
-      mkdirSync(rpcProtoPath)
-      writeFileSync(path.resolve(rpcProtoPath, 'README.md'), '# Generated code')
-
-      await runCommand(`make compile_apis`, path.resolve(__dirname, '..'))
-      await compileProtoApi()
-
-      copySync(
-        path.resolve(__dirname, 'rpc-api-generation/src/modules', 'index.d.ts'),
-        path.resolve(JS_RUNTIME, 'apis.d.ts')
-      )
-
-      expect(true).toBe(true)
-    }, 60000)
-  })
-
   flow('playground copy files', () => {
     it('playground copy snippets', async () => {
       const PLAYGORUND_INFO_JSON = 'info.json'
@@ -196,7 +158,7 @@ flow('build-all', () => {
 
       // Clean last build
       removeSync(playgroundDistPath)
-      mkdirSync(playgroundDistPath)
+      mkdirSync(playgroundDistPath, { recursive: true })
 
       // Copy snippets
       const snippetsFiles = getSnippetsfile(snippetsPath)
@@ -245,10 +207,6 @@ flow('build-all', () => {
       // Copy minified ecs
       const filesToCopy = [
         {
-          from: path.resolve(DECENTRALAND_AMD_PATH, 'dist', 'amd.min.js'),
-          fileName: 'amd.min.js'
-        },
-        {
           from: path.resolve(SDK_PATH, 'dist', 'ecs7', 'index.min.js'),
           fileName: 'index.min.js'
         },
@@ -283,10 +241,10 @@ function fixReactTypes() {
   const typesPath = ensureFileExists(REACT_ECS + '/dist/index.d.ts')
   const content = readFileSync(typesPath).toString()
 
-  writeFileSync(
-    typesPath,
-    content.replace('/// <reference types="@dcl/posix" />', '')
-  )
+  // writeFileSync(
+  //   typesPath,
+  //   content.replace('/// <reference types="@dcl/posix" />', '')
+  // )
 }
 
 function fixTypes(

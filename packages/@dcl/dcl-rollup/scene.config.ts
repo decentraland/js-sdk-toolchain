@@ -1,7 +1,7 @@
 import typescript from '@rollup/plugin-typescript'
 import { sys } from 'typescript'
 import { RollupOptions } from 'rollup'
-import { terser } from 'rollup-plugin-terser'
+import terser from '@rollup/plugin-terser'
 import analyze from 'rollup-plugin-analyzer'
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
@@ -19,7 +19,7 @@ console.assert(packageJson.main, 'package.json .main must be present')
 console.assert(sceneJson.main, 'scene.json .main must be present')
 
 const sceneConfig: RollupOptions = {
-  external: [/@decentraland\//, /~system\//],
+  external: [/~system\//],
   input: packageJson.main.replace(/\.js$/, '.ts'),
   plugins: [
     typescript({

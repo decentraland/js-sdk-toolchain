@@ -1,14 +1,15 @@
+import { Entity } from '../engine'
 import { IArray } from './Array'
 import { Bool } from './basic/Boolean'
 import { IEnum } from './basic/Enum'
 import { Float32, Float64 } from './basic/Float'
 import { Int16, Int32, Int8, Int64 as iInt64 } from './basic/Integer'
 import { EcsString } from './basic/String'
-import { Color3Schema } from './custom/Color3'
-import { Color4Schema } from './custom/Color4'
+import { Color3Schema, Color3Type } from './custom/Color3'
+import { Color4Schema, Color4Type } from './custom/Color4'
 import { EntitySchema } from './custom/Entity'
-import { QuaternionSchema } from './custom/Quaternion'
-import { Vector3Schema } from './custom/Vector3'
+import { QuaternionSchema, QuaternionType } from './custom/Quaternion'
+import { Vector3Schema, Vector3Type } from './custom/Vector3'
 import { ISchema } from './ISchema'
 import { IMap } from './Map'
 import { IOptional } from './Optional'
@@ -42,12 +43,12 @@ export namespace Schemas {
 
   export const Number = Float32
 
-  export const Vector3 = Vector3Schema
-  export const Quaternion = QuaternionSchema
-  export const Color3 = Color3Schema
-  export const Color4 = Color4Schema
+  export const Vector3: ISchema<Vector3Type> = Vector3Schema
+  export const Quaternion: ISchema<QuaternionType> = QuaternionSchema
+  export const Color3: ISchema<Color3Type> = Color3Schema
+  export const Color4: ISchema<Color4Type> = Color4Schema
 
-  export const Entity = EntitySchema
+  export const Entity: ISchema<Entity> = EntitySchema
 
   export const Enum = IEnum
   export const Array = IArray

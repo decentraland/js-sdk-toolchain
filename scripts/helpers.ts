@@ -1,6 +1,6 @@
 import { exec } from 'child_process'
 import { sync as globSync } from 'glob'
-import { resolve } from 'path'
+import { resolve, relative } from 'path'
 import {
   existsSync,
   readFileSync,
@@ -35,7 +35,13 @@ export function runCommand(
   env?: Record<string, string>
 ): Promise<string> {
   return new Promise<string>((onSuccess, onError) => {
-    process.stdout.write('∑ ' + cwd + '; ' + command + '\n')
+    process.stdout.write(
+      '\u001b[36min ' +
+        relative(process.cwd(), cwd) +
+        ':\u001b[0m ' +
+        command +
+        '\n'
+    )
     exec(command, { cwd, env }, (error, stdout, stderr) => {
       stdout.trim().length &&
         process.stdout.write('  ' + stdout.replace(/\n/g, '\n  ') + '\n')
@@ -124,7 +130,7 @@ export function itInstallsADependencyFromFolderAndCopiesTheVersion(
 }
 
 export function copyFile(from: string, to: string) {
-  console.log(`> copying ${from} to ${to}`)
+  process.stdout.write(`> copying ${from} to ${to}\n`)
 
   if (!existsSync(from)) {
     throw new Error(`${from} does not exist`)

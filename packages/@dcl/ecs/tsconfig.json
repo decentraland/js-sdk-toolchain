@@ -13,9 +13,7 @@
     "downlevelIteration": true,
     "preserveConstEnums": true,
     "outDir": "dist",
-    "types": [
-      "@dcl/posix"
-    ]
+    "types": []
   },
   "include": [
     "src",

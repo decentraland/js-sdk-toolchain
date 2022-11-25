@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2020",
+    "module": "esnext",
     "moduleResolution": "node",
     "pretty": true,
     "forceConsistentCasingInFileNames": true,
@@ -22,10 +23,6 @@
     ],
     "types": [
       "@dcl/js-runtime",
-    ],
-    "typeRoots": [
-      "./../node_modules",
-      "."
     ]
   }
 }

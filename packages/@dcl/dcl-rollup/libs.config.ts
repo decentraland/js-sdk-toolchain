@@ -1,6 +1,6 @@
 import typescript from '@rollup/plugin-typescript'
 import { sys } from 'typescript'
-import { terser } from 'rollup-plugin-terser'
+import terser from '@rollup/plugin-terser'
 import path from 'path'
 import { RollupOptions } from 'rollup'
 
@@ -30,6 +30,7 @@ sys.writeFile(tsconfigPath, JSON.stringify(tsconfig, null, 2))
 
 const config: RollupOptions = {
   ...basicRollupConfig,
+  external: [...(basicRollupConfig.external as any), /@dcl\/ecs/, /@dcl\/sdk/],
   context: 'globalThis',
   plugins: [
     typescript({
@@ -45,7 +46,7 @@ const config: RollupOptions = {
         PROD ? 'production' : 'development'
       )
     }),
-    ...basicRollupConfig.plugins!
+    ...(basicRollupConfig.plugins as any)
   ],
   output: [
     {

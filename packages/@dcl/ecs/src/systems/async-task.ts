@@ -16,12 +16,15 @@ export function taskSystem(engine: IEngine) {
       const resp = await task()
       return resp
     } catch (e: any) {
-      dcl.error(`executeTask: FAILED. ${e.toString()}`, e)
+      throw e
+      // TODO: dcl.error(`executeTask: FAILED. ${e.toString()}`, e)
     }
   }
 
   function executeTasks() {
-    getAndClean(tasks).forEach((task) => runTask(task))
+    for (const task of getAndClean(tasks)) {
+      runTask(task).catch(() => {})
+    }
   }
 
   engine.addSystem(executeTasks)

@@ -1,11 +1,14 @@
-import { ComponentDefinition, Entity, IEngine } from '../../engine'
-import { ColliderLayer } from '../generated/index.gen'
+import { IEngine, ISchema } from '../../engine'
+import { ComponentDefinition } from '../../engine/component'
+import { Entity } from '../../engine/entity'
+import { ColliderLayer, PBMeshCollider } from '../generated/index.gen'
 import * as MeshColliderSchema from './../generated/MeshCollider.gen'
 
 /**
  * @public
  */
-export interface MeshColliderComponentDefinition extends ComponentDefinition {
+export interface MeshColliderComponentDefinition
+  extends ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider> {
   /**
    * @public
    * Set a box in the MeshCollider component

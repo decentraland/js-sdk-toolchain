@@ -7,10 +7,7 @@ export type {
 } from '../systems/crdt/types'
 export type { WireMessage } from '../serialization/wireMessage'
 export type { defineSdkComponents } from '../components'
-export {
-  TransformType,
-  TransformComponent
-} from '../components/legacy/Transform'
+export { TransformType } from '../components/legacy/Transform'
 export * from '../engine/component'
 export * from '../schemas/typing'
 

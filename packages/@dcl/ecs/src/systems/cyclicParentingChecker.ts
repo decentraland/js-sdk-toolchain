@@ -22,7 +22,8 @@ export function cyclicParentingChecker(engine: IEngine) {
       let transform = Transform.getOrNull(entity)
       while (transform && transform.parent) {
         if (transform.parent === entity) {
-          dcl.error(`There is a cyclic parent with entity ${entity}`)
+          throw new Error(`There is a cyclic parent with entity ${entity}`)
+          // TODO: error(`There is a cyclic parent with entity ${entity}`)
           break
         } else {
           transform = Transform.getOrNull(transform.parent)

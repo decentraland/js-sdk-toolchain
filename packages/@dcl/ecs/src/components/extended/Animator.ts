@@ -1,4 +1,4 @@
-import { ComponentDefinition, Entity, IEngine } from '../../engine'
+import { ComponentDefinition, Entity, IEngine, ISchema } from '../../engine'
 import {
   PBAnimationState,
   PBAnimator
@@ -8,7 +8,8 @@ import * as AnimatorSchema from './../generated/Animator.gen'
 /**
  * @public
  */
-export interface AnimatorComponentDefinition extends ComponentDefinition {
+export interface AnimatorComponentDefinition
+  extends ComponentDefinition<ISchema<PBAnimator>, PBAnimator> {
   /**
    * @public
    *
@@ -58,7 +59,10 @@ export interface AnimatorComponentDefinition extends ComponentDefinition {
 export function defineAnimatorComponent(
   engine: Pick<IEngine, 'getComponent'>
 ): AnimatorComponentDefinition {
-  const Animator = engine.getComponent<typeof AnimatorSchema.AnimatorSchema>(
+  const Animator: ComponentDefinition<
+    ISchema<PBAnimator>,
+    PBAnimator
+  > = engine.getComponent<typeof AnimatorSchema.AnimatorSchema>(
     AnimatorSchema.COMPONENT_ID
   )
 

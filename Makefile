@@ -20,7 +20,6 @@ install:
 	make node_modules/.bin/protobuf/bin/protoc
 	cd packages/@dcl/build-ecs; npm ci
 	cd packages/@dcl/dcl-rollup; npm ci
-	cd packages/@dcl/amd; npm ci
 	cd packages/@dcl/ecs; make install
 
 lint:
@@ -53,7 +52,7 @@ prepare:
 	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/prepare.spec.ts
 
 scripts/rpc-api-generation/src/proto/%.gen.ts: packages/@dcl/ecs/node_modules/@dcl/protocol/proto/decentraland/kernel/apis/%.proto node_modules/.bin/protobuf/bin/protoc
-	${PROTOC}  \
+	@${PROTOC}  \
 			--plugin=./node_modules/.bin/protoc-gen-ts_proto \
 			--ts_proto_opt=esModuleInterop=true,returnObservable=false,outputServices=generic-definitions \
 			--ts_proto_opt=fileSuffix=.gen \
@@ -68,22 +67,28 @@ compile_apis: ${PBS_TS}
 .PHONY: build test install
 
 deep-clean:
-	rm -rf node_modules/ packages/@dcl/amd/node_modules/ packages/@dcl/build-ecs/node_modules/ packages/@dcl/dcl-rollup/node_modules/ packages/@dcl/ecs/node_modules/ packages/@dcl/react-ecs/node_modules/  packages/@dcl/sdk/node_modules/
+	rm -rf node_modules/ \
+		packages/@dcl/build-ecs/node_modules/ \
+		packages/@dcl/dcl-rollup/node_modules/ \
+		packages/@dcl/ecs/node_modules/ \
+		packages/@dcl/react-ecs/node_modules/ \
+		packages/@dcl/sdk/node_modules/
 	make clean
 
 clean:
-	rm -rf coverage/
-	rm -rf packages/@dcl/amd/dist/ packages/@dcl/build-ecs/dist/  packages/@dcl/dcl-rollup/dist/ packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/
-	rm -rf packages/@dcl/ecs/src/components/generated/ packages/@dcl/ecs/temp/
-	rm -rf packages/@dcl/js-runtime/apis.d.ts
-	rm -rf packages/@dcl/react-ecs/dist/ packages/@dcl/react-ecs/src/generated/ packages/@dcl/react-ecs/temp/
-	rm -rf packages/@dcl/sdk/package-lock.json packages/@dcl/sdk/types/env/ packages/@dcl/sdk/types/rpc-modules/
-	rm -rf scripts/rpc-api-generation/src/modules/ scripts/rpc-api-generation/src/proto/
-	rm -rf test/build-ecs/fixtures/dcl-test-lib-integration/bin/ test/build-ecs/fixtures/dcl-test-lib-integration/node_modules/
-	rm -rf test/build-ecs/fixtures/ecs7-scene/bin/ test/build-ecs/fixtures/ecs7-scene/node_modules/
-	rm -rf test/build-ecs/fixtures/rollup-lib-integration/dist/ test/build-ecs/fixtures/rollup-lib-integration/tsdoc-metadata.json
-	rm -rf test/build-ecs/fixtures/simple-scene-with-bundled/bin/ test/build-ecs/fixtures/simple-scene-with-bundled/node_modules/
-	rm -rf test/build-ecs/fixtures/simple-scene-with-library/bin/ test/build-ecs/fixtures/simple-scene-with-library/node_modules/
-	rm -rf test/build-ecs/fixtures/simple-scene-without-installed-ecs/bin/
-	rm -rf test/build-ecs/fixtures/simple-scene/bin/ test/build-ecs/fixtures/simple-scene/node_modules/
-	rm -rf test/ecs/snippets/dist/
+	@echo "> Cleaning all folders"
+	@rm -rf coverage/
+	@rm -rf packages/@dcl/build-ecs/dist/  packages/@dcl/dcl-rollup/dist/ packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/
+	@rm -rf packages/@dcl/ecs/src/components/generated/ packages/@dcl/ecs/temp/
+	@rm -rf packages/@dcl/js-runtime/apis.d.ts
+	@rm -rf packages/@dcl/react-ecs/dist/ packages/@dcl/react-ecs/src/generated/ packages/@dcl/react-ecs/temp/
+	@rm -rf packages/@dcl/sdk/package-lock.json packages/@dcl/sdk/types/env/ packages/@dcl/sdk/types/rpc-modules/
+	@rm -rf scripts/rpc-api-generation/src/modules/ scripts/rpc-api-generation/src/proto/
+	@rm -rf test/build-ecs/fixtures/dcl-test-lib-integration/bin/ test/build-ecs/fixtures/dcl-test-lib-integration/node_modules/
+	@rm -rf test/build-ecs/fixtures/ecs7-scene/bin/ test/build-ecs/fixtures/ecs7-scene/node_modules/
+	@rm -rf test/build-ecs/fixtures/rollup-lib-integration/dist/ test/build-ecs/fixtures/rollup-lib-integration/tsdoc-metadata.json
+	@rm -rf test/build-ecs/fixtures/simple-scene-with-bundled/bin/ test/build-ecs/fixtures/simple-scene-with-bundled/node_modules/
+	@rm -rf test/build-ecs/fixtures/simple-scene-with-library/bin/ test/build-ecs/fixtures/simple-scene-with-library/node_modules/
+	@rm -rf test/build-ecs/fixtures/simple-scene-without-installed-ecs/bin/
+	@rm -rf test/build-ecs/fixtures/simple-scene/bin/ test/build-ecs/fixtures/simple-scene/node_modules/
+	@rm -rf test/ecs/snippets/dist/

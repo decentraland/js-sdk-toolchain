@@ -1,7 +1,8 @@
 import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
 import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
-import { Entity, IInput } from '../engine'
+import { IInput } from '../engine'
+import { Entity } from '../engine/entity'
 import { engine } from '../runtime/initialization'
 
 export type EventsSystem = typeof EventsSystem

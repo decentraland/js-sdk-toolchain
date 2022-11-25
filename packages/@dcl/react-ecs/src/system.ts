@@ -1,13 +1,7 @@
-import type { IEngine, Entity } from '@dcl/ecs'
+import { Entity, engine } from '@dcl/ecs'
 
 import type { JSX } from './react-ecs'
 import { createReconciler } from './reconciler'
-
-// TODO: this wont work anymore with the new approach.
-// import { engine } from '@dcl/sdk'
-// Maybe we can pass the engine to renderUi,
-// or compile it globally via esbuild so the engine is available.
-declare const engine: IEngine
 
 export type UiComponent = () => JSX.Element
 const uiContainer: { getEntities: () => Entity[]; update: () => void }[] = []

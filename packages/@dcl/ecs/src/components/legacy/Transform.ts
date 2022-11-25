@@ -3,6 +3,11 @@ import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
 import { ComponentDefinition, IEngine } from '../../engine'
 
+export type TransformComponent = ComponentDefinition<
+  ISchema<TransformType>,
+  Partial<TransformType>
+>
+
 /**
  * @internal
  */

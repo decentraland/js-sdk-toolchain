@@ -20,7 +20,10 @@ export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
 
 function preEngine() {
   const entityContainer = EntityContainer()
-  const componentsDefinition = new Map<number, ComponentDefinition<any>>()
+  const componentsDefinition = new Map<
+    number,
+    ComponentDefinition<ISchema<unknown>, unknown>
+  >()
   const systems = SystemContainer()
 
   function addSystem(
@@ -60,7 +63,7 @@ function preEngine() {
   }
 
   function defineComponentFromSchema<
-    T extends ISchema,
+    T extends ISchema<ConstructorType>,
     ConstructorType = ComponentType<T>
   >(
     spec: T,
@@ -86,17 +89,17 @@ function preEngine() {
     spec: T,
     componentId: number,
     constructorDefault?: ConstructorType
-  ): ComponentDefinition<ISchema<Result<T>>, ConstructorType> {
+  ): ComponentDefinition<ISchema<ConstructorType>> {
     return defineComponentFromSchema(
-      Schemas.Map(spec),
+      Schemas.Map(spec) as ISchema<ConstructorType>,
       componentId,
       constructorDefault
     )
   }
 
-  function getComponent<T extends ISchema>(
+  function getComponent<T extends ISchema<V>, V>(
     componentId: number
-  ): ComponentDefinition<T> {
+  ): ComponentDefinition<T, V> {
     const component = componentsDefinition.get(componentId)
     if (!component) {
       throw new Error(
@@ -107,7 +110,10 @@ function preEngine() {
   }
 
   function* getEntitiesWith<
-    T extends [ComponentDefinition, ...ComponentDefinition[]]
+    T extends [
+      ComponentDefinition<any, any>,
+      ...ComponentDefinition<any, any>[]
+    ]
   >(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]> {
     for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
       yield [entity, ...groupComp.map((c) => c.get(entity))] as [
@@ -117,7 +123,7 @@ function preEngine() {
     }
   }
 
-  function* getComponentDefGroup<T extends ComponentDefinition[]>(
+  function* getComponentDefGroup<T extends ComponentDefinition<any, any>[]>(
     ...args: T
   ): Iterable<[Entity, ...T]> {
     const [firstComponentDef, ...componentDefinitions] = args
@@ -233,7 +239,8 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     removeEntityWithChildren,
     addSystem: engine.addSystem,
     removeSystem: engine.removeSystem,
-    defineComponent: engine.defineComponent,
+    // TODO: fix this type
+    defineComponent: engine.defineComponent as any,
     defineComponentFromSchema: engine.defineComponentFromSchema,
     getEntitiesWith: engine.getEntitiesWith,
     getComponent: engine.getComponent,

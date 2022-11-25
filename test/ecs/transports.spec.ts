@@ -6,14 +6,6 @@ import { createRendererTransport } from '../../packages/@dcl/ecs/src/systems/crd
 import { TransportMessage } from '../../packages/@dcl/ecs/src/systems/crdt/types'
 import { setupDclInterfaceForThisSuite, testingEngineApi } from './utils'
 
-describe('Transport not declared', () => {
-  it('should failed if there is no dcl', () => {
-    expect(createRendererTransport).toThrowError(
-      'Cannot create createRendererTransport without global dcl object'
-    )
-  })
-})
-
 describe('Transport tests', () => {
   beforeEach(() => {
     jest.resetAllMocks()

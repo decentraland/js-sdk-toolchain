@@ -27,7 +27,6 @@ describe('build-ecs: simple scene compilation', () => {
     const lib: any[] = JSON.parse(
       readFileSync(resolve(cwd, 'bin/game.js.lib')).toString()
     ).map(($: { path: string }) => resolve(cwd, $.path))
-    expect(lib).toContain(resolve('packages/@dcl/amd/dist/amd.js'))
     expect(lib).toContain(resolve('packages/@dcl/sdk/dist/ecs7/index.js'))
   })
 })
@@ -50,7 +49,6 @@ describe('build-ecs: simple scene compilation, production mode', () => {
     const lib: any[] = JSON.parse(
       readFileSync(resolve(cwd, 'bin/game.js.lib')).toString()
     ).map(($: { path: string }) => resolve(cwd, $.path))
-    expect(lib).toContain(resolve('packages/@dcl/amd/dist/amd.min.js'))
     expect(lib).toContain(resolve('packages/@dcl/sdk/dist/ecs7/index.min.js'))
   })
 })

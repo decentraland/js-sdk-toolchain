@@ -19,8 +19,8 @@ export type ComponentType<T extends ISchema> = EcsResult<T>
  * @public
  */
 export type ComponentDefinition<
-  T extends ISchema = ISchema<any>,
-  ConstructorType = ComponentType<T>
+  T extends ISchema<ConstructorType>,
+  ConstructorType = any
 > = {
   _id: number
 

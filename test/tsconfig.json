@@ -6,8 +6,7 @@
     "pretty": true,
     "types": [
       "node",
-      "jest",
-      "packages/@dcl/ecs/node_modules/@dcl/posix/index.d.ts"
+      "jest"
     ],
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,

@@ -18,12 +18,10 @@ describe('simple-scene-without-installed-ecs: build a scene with env vars', () =
     __dirname,
     '../../packages/@dcl/sdk/dist/ecs7/index.js'
   )
-  const AMD_PATH = resolve(__dirname, '../../packages/@dcl/amd/dist/amd.js')
 
   itExecutes('npm run --quiet build', cwd, {
     ...process.env,
-    SDK_PATH,
-    AMD_PATH
+    SDK_PATH
   })
 
   it('ensure files exist', () => {
@@ -36,6 +34,5 @@ describe('simple-scene-without-installed-ecs: build a scene with env vars', () =
       readFileSync(resolve(cwd, 'bin/game.js.lib')).toString()
     ).map(($: { path: string }) => resolve(cwd, $.path))
     expect(lib).toContain(SDK_PATH)
-    expect(lib).toContain(AMD_PATH)
   })
 })
