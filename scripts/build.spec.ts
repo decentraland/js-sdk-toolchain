@@ -61,11 +61,11 @@ flow('build-all', () => {
     itDeletesFolder('dist', ROLLUP_CONFIG_PATH)
     itExecutes(`npm i --silent`, ROLLUP_CONFIG_PATH)
     itExecutes(`${TSC} -p tsconfig.json`, ROLLUP_CONFIG_PATH)
-    copyFile(
-      ROLLUP_CONFIG_PATH + '/package.json',
-      ROLLUP_CONFIG_PATH + '/dist/package.json'
-    )
     it('check file exists', () => {
+      copyFile(
+        ROLLUP_CONFIG_PATH + '/package.json',
+        ROLLUP_CONFIG_PATH + '/dist/package.json'
+      )
       ensureFileExists('dist/package.json', ROLLUP_CONFIG_PATH)
       ensureFileExists('dist/index.js', ROLLUP_CONFIG_PATH)
     })
