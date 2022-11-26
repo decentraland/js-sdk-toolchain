@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { ensureFileExists, readJson } from './helpers'
+import { ensureFileExists } from './helpers'
 
 export const flow = describe
 

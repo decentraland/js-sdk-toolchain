@@ -5,7 +5,7 @@ const componentIds = Object.values(ECSComponentIDs)
   .filter((a) => typeof a === 'number')
   .map(Number)
 
-declare var require: any
+declare let require: any
 
 export function createRendererTransport(): Transport {
   if (typeof require === 'undefined') {
@@ -18,7 +18,9 @@ export function createRendererTransport(): Transport {
   const engineApi = require('~system/EngineApi')
 
   async function sendToRenderer(message: Uint8Array) {
-    const response = await engineApi.crdtSendToRenderer({ data: new Uint8Array(message) })
+    const response = await engineApi.crdtSendToRenderer({
+      data: new Uint8Array(message)
+    })
 
     if (response && response.data && response.data.length) {
       if (rendererTransport.onmessage) {
@@ -33,7 +35,9 @@ export function createRendererTransport(): Transport {
   const rendererTransport: Transport = {
     type,
     send(message: Uint8Array): void {
-      sendToRenderer(message).catch(() => {debugger})
+      sendToRenderer(message).catch(() => {
+        debugger
+      })
     },
     filter(message: TransportMessage): boolean {
       // Echo message, ignore them

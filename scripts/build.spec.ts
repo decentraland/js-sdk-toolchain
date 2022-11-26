@@ -10,7 +10,6 @@ import {
   REACT_ECS,
   ROLLUP_CONFIG_PATH,
   SDK_PATH,
-  TERSER,
   TSC
 } from './common'
 import {

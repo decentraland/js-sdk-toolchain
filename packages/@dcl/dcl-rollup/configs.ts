@@ -93,7 +93,7 @@ export function createLibConfig(options: { PROD: boolean }): RollupOptions {
           // this is required to be false to enable watch mode in build-ecs
           noEmitOnError: false,
           declaration: true,
-          declarationDir: '.',
+          declarationDir: '.'
         },
         typescript: require('typescript')
       }),
@@ -101,7 +101,9 @@ export function createLibConfig(options: { PROD: boolean }): RollupOptions {
         values: {
           document: 'undefined',
           window: 'undefined',
-          'process.env.NODE_ENV': JSON.stringify(options.PROD ? 'production' : 'development')
+          'process.env.NODE_ENV': JSON.stringify(
+            options.PROD ? 'production' : 'development'
+          )
         },
         preventAssignment: true
       })
@@ -145,7 +147,9 @@ export function createSceneConfig(options: { PROD: boolean }): RollupOptions {
         values: {
           document: 'undefined',
           window: 'undefined',
-          'process.env.NODE_ENV': JSON.stringify(options.PROD ? 'production' : 'development')
+          'process.env.NODE_ENV': JSON.stringify(
+            options.PROD ? 'production' : 'development'
+          )
         },
         preventAssignment: true
       }),

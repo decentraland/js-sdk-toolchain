@@ -1,4 +1,4 @@
-import { createLibConfig } from "./configs"
+import { createLibConfig } from './configs'
 
 const PROD = !!process.env.CI || process.env.NODE_ENV === 'production'
 

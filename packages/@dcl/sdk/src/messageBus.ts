@@ -12,7 +12,10 @@ export class MessageBus {
 
   constructor() {}
 
-  on(message: string, callback: (value: any, sender: string) => void): Observer<IEvents['comms']> {
+  on(
+    message: string,
+    callback: (value: any, sender: string) => void
+  ): Observer<IEvents['comms']> {
     return onCommsMessage.add((e) => {
       const m = JSON.parse(e.message)
 

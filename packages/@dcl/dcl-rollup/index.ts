@@ -6,7 +6,12 @@ import * as ts from 'typescript'
 import { resolve, dirname, relative } from 'path'
 import { inspect } from 'util'
 import { future } from 'fp-future'
-import { checkConfiguration, loadArtifact, PackageJson, readPackageJson } from './scene.checks'
+import {
+  checkConfiguration,
+  loadArtifact,
+  PackageJson,
+  readPackageJson
+} from './scene.checks'
 import { createColors } from 'colorette'
 
 // @see https://no-color.org
@@ -15,10 +20,14 @@ const colors = createColors({
   useColor: process.env.FORCE_COLOR !== '0' && !process.env.NO_COLOR
 })
 
-const WATCH = process.argv.indexOf('--watch') !== -1 || process.argv.indexOf('-w') !== -1
+const WATCH =
+  process.argv.indexOf('--watch') !== -1 || process.argv.indexOf('-w') !== -1
 
-// PRODUCTION == true : makes the compiler to prefer .min.js files while importing and produces a minified output
-const PRODUCTION = !WATCH && (process.argv.indexOf('--production') !== -1 || process.env.NODE_ENV === 'production')
+// PRODUCTION === true : makes the compiler to prefer .min.js files while importing and produces a minified output
+const PRODUCTION =
+  !WATCH &&
+  (process.argv.indexOf('--production') !== -1 ||
+    process.env.NODE_ENV === 'production')
 
 const IS_LIB = !WATCH && process.argv.indexOf('--library') !== -1
 
@@ -26,12 +35,16 @@ async function compile() {
   // current working directory
   let CWD = process.cwd()
   ts.sys.getCurrentDirectory = () => CWD
-  ts.sys.resolvePath = (path: string) => resolve(ts.sys.getCurrentDirectory(), path)
+  ts.sys.resolvePath = (path: string) =>
+    resolve(ts.sys.getCurrentDirectory(), path)
 
   {
     // Read the target folder, if specified.
     // -p --project, like typescript
-    const projectArgIndex = Math.max(process.argv.indexOf('-p'), process.argv.indexOf('--project'))
+    const projectArgIndex = Math.max(
+      process.argv.indexOf('-p'),
+      process.argv.indexOf('--project')
+    )
     if (projectArgIndex !== -1 && process.argv.length > projectArgIndex) {
       const folder = resolve(process.cwd(), process.argv[projectArgIndex + 1])
       if (ts.sys.directoryExists(folder)) {
@@ -45,13 +58,15 @@ async function compile() {
   console.log('> dev mode: ' + !PRODUCTION)
   console.log(`> working directory: ${ts.sys.getCurrentDirectory()}`)
 
-  let packageJson: PackageJson = readPackageJson()
+  const packageJson: PackageJson = readPackageJson()
 
   checkConfiguration(packageJson, IS_LIB)
 
   console.log('')
 
-  const baseConfig = IS_LIB ? createLibConfig({ PROD: PRODUCTION }) : createSceneConfig({ PROD: PRODUCTION })
+  const baseConfig = IS_LIB
+    ? createLibConfig({ PROD: PRODUCTION })
+    : createSceneConfig({ PROD: PRODUCTION })
 
   const finished = future<void>()
 
@@ -71,28 +86,32 @@ async function compile() {
   })
 
   watcher.on('event', (event) => {
-    if (event.code == 'END') {
+    if (event.code === 'END') {
       if (WATCH) {
         console.log('\nThe compiler is watching file changes...\n')
-      } else {
         finished.resolve()
       }
-    } else if (event.code == 'BUNDLE_START') {
+    } else if (event.code === 'BUNDLE_START') {
       for (const out of event.output) {
         stderr(colors.greenBright(`Compiling: `) + out)
       }
-    } else if (event.code == 'BUNDLE_END') {
+    } else if (event.code === 'BUNDLE_END') {
       for (const out of event.output) {
-        stderr(colors.greenBright(`Wrote: `) + out + ' ' + colors.dim(`(${(event.duration / 1000).toFixed(1)}sec)`))
+        stderr(
+          colors.greenBright(`Wrote: `) +
+            out +
+            ' ' +
+            colors.dim(`(${(event.duration / 1000).toFixed(1)}sec)`)
+        )
       }
-    } else if (event.code == 'START') {
+    } else if (event.code === 'START') {
       if (WATCH) {
         // print blank lines until it covers the screen
         stderr('\u001B[2J')
         // clear the scrollback
         stderr('\u001b[H\u001b[2J\u001b[3J')
       }
-    } else if (event.code == 'ERROR') {
+    } else if (event.code === 'ERROR') {
       handleError(event.error, true)
     } else {
       console.dir(event)
@@ -166,7 +185,8 @@ compile()
   })
 
 // log to stderr to keep `rollup main.js > bundle.js` from breaking
-const stderr = (...parameters: readonly unknown[]) => process.stderr.write(`${parameters.join('')}\n`)
+const stderr = (...parameters: readonly unknown[]) =>
+  process.stderr.write(`${parameters.join('')}\n`)
 
 function handleError(error: RollupError, recover = false): void {
   const name = error.name || error.cause?.name
@@ -181,7 +201,11 @@ function handleError(error: RollupError, recover = false): void {
   }
 
   if (error.loc) {
-    stderr(`${relativeId((error.loc.file || error.id)!)} (${error.loc.line}:${error.loc.column})`)
+    stderr(
+      `${relativeId((error.loc.file || error.id)!)} (${error.loc.line}:${
+        error.loc.column
+      })`
+    )
   } else if (error.id) {
     stderr(relativeId(error.id))
   }
@@ -196,7 +220,6 @@ function handleError(error: RollupError, recover = false): void {
 
   stderr('')
 
-  // eslint-disable-next-line unicorn/no-process-exit
   if (!recover) process.exit(1)
 }
 

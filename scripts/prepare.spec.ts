@@ -3,7 +3,7 @@ import {
   commonChecks,
   SDK_PATH,
   ROLLUP_CONFIG_PATH,
-  JS_RUNTIME,
+  JS_RUNTIME
 } from './common'
 
 import {
@@ -16,7 +16,10 @@ flow('build-all', () => {
 
   flow('@dcl/sdk', () => {
     // update dependencies versions and link packages
-    itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, ROLLUP_CONFIG_PATH)
+    itInstallsADependencyFromFolderAndCopiesTheVersion(
+      SDK_PATH,
+      ROLLUP_CONFIG_PATH
+    )
     itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, JS_RUNTIME)
   })
 
