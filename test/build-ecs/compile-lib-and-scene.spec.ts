@@ -1,6 +1,10 @@
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
-import { itDeletesFolder, itExecutes, ensureFileExists } from '../../scripts/helpers'
+import {
+  itDeletesFolder,
+  itExecutes,
+  ensureFileExists
+} from '../../scripts/helpers'
 
 function buildEcsBuildLibFlow() {
   const cwd = resolve(__dirname, './fixtures/dcl-test-lib-integration')
@@ -25,7 +29,10 @@ describe('integration flow, build libs and build scene using libs', () => {
 
   // install libs
   itDeletesFolder('./node_modules', sceneCwd)
-  itExecutes('npm install --silent --no-progress -B ' + JSON.stringify(ecsLibCwd), sceneCwd)
+  itExecutes(
+    'npm install --silent --no-progress -B ' + JSON.stringify(ecsLibCwd),
+    sceneCwd
+  )
   // install rest of dependencies, if any
   itExecutes('npm install --silent --no-progress', sceneCwd)
 
@@ -56,7 +63,10 @@ describe('integration flow with bundledDependencies, build libs and build scene 
 
   // install libs
   itDeletesFolder('./node_modules', sceneCwd)
-  itExecutes('npm install --silent --no-progress -B ' + JSON.stringify(ecsLibCwd), sceneCwd)
+  itExecutes(
+    'npm install --silent --no-progress -B ' + JSON.stringify(ecsLibCwd),
+    sceneCwd
+  )
   // install rest of dependencies, if any
   itExecutes('npm install --silent --no-progress', sceneCwd)
 

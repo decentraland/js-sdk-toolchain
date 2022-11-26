@@ -76,7 +76,10 @@ export namespace SandBox {
     const clients = Array.from({ length }).map((_, index) => {
       const clientTransport = transport.createNetworkTransport()
       const engine = Engine({ transports: [clientTransport] })
-      const Position = engine.defineComponent(SandBox.Position.type, SandBox.Position.id)
+      const Position = engine.defineComponent(
+        SandBox.Position.type,
+        SandBox.Position.id
+      )
       const Door = engine.defineComponent(SandBox.Door.type, SandBox.Door.id)
 
       return {

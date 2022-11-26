@@ -13,11 +13,9 @@ import {
 } from './scene.checks'
 import { createColors } from 'colorette'
 
-
 // log to stderr to keep `rollup main.js > bundle.js` from breaking
 const stderr = (...parameters: readonly unknown[]) =>
   process.stderr.write(`${parameters.join('')}\n`)
-
 
 // @see https://no-color.org
 // @see https://www.npmjs.com/package/chalk

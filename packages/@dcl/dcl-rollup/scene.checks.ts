@@ -83,7 +83,13 @@ export function checkConfiguration(packageJson: PackageJson) {
     process.exit(1)
   }
 
-  const tsconfig = ts.parseJsonConfigFileContent(parsed.config, host, ts.sys.getCurrentDirectory(), {}, 'tsconfig.json')
+  const tsconfig = ts.parseJsonConfigFileContent(
+    parsed.config,
+    host,
+    ts.sys.getCurrentDirectory(),
+    {},
+    'tsconfig.json'
+  )
 
   const hasError = false
 
@@ -106,11 +112,14 @@ export function checkConfiguration(packageJson: PackageJson) {
 function printDiagnostic(diagnostic: ts.Diagnostic) {
   const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
   if (diagnostic.file) {
-    const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start!)
+    const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(
+      diagnostic.start!
+    )
     console.log(
-      `  Error ${diagnostic.file.fileName.replace(ts.sys.getCurrentDirectory(), '')} (${line + 1},${
-        character + 1
-      }): ${message}`
+      `  Error ${diagnostic.file.fileName.replace(
+        ts.sys.getCurrentDirectory(),
+        ''
+      )} (${line + 1},${character + 1}): ${message}`
     )
   } else {
     console.log(`  Error: ${message}`)
@@ -170,13 +179,19 @@ function validatePackageJsonForLibrary(packageJson: PackageJson) {
     const typingsFile = ts.sys.resolvePath(packageJson.types)
 
     if (!typingsFile) {
-      throw new Error(`! Error: field "types" in package.json cannot be resolved.`)
+      throw new Error(
+        `! Error: field "types" in package.json cannot be resolved.`
+      )
     }
 
-    const resolvedTypings = ts.sys.resolvePath(packageJson.main.replace(/\.js$/, '.d.ts'))
+    const resolvedTypings = ts.sys.resolvePath(
+      packageJson.main.replace(/\.js$/, '.d.ts')
+    )
     if (resolvedTypings !== typingsFile) {
       const help = `(${resolvedTypings} != ${typingsFile})`
-      throw new Error(`! Error: package.json .types does not match the emited file\n       ${help}`)
+      throw new Error(
+        `! Error: package.json .types does not match the emited file\n       ${help}`
+      )
     }
   }
 }
