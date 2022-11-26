@@ -77,7 +77,7 @@ jobs:
           retention-days: 5
       - name: publish @dcl/dcl-rollup package
         uses: menduz/oddish-action@master
-        if: publish_dcl_rollup
+        id: publish_dcl_rollup
         with:
           registry-url: 'https://registry.npmjs.org'
           access: public
