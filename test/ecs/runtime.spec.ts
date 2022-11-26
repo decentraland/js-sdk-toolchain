@@ -1,5 +1,5 @@
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
-import { initializeDcl } from '../../packages/@dcl/ecs/src/runtime/initialization/dcl'
+import { initializeDcl } from '../../packages/@dcl/ecs/src/runtime/initialization/'
 import {
   onEnterSceneObservable,
   onLeaveSceneObservable,
@@ -11,7 +11,7 @@ import {
   onRealmChangedObservable,
   onSceneReadyObservable,
   onVideoEvent
-} from '../../packages/@dcl/ecs/src/runtime/observables'
+} from '../../packages/@dcl/sdk/src/observables'
 import { createNetworkTransport } from '../../packages/@dcl/ecs/src/systems/crdt/transports/networkTransport'
 import { setupDclInterfaceForThisSuite, testingEngineApi } from './utils'
 import { createRendererTransport } from '../../packages/@dcl/ecs/src/systems/crdt/transports/rendererTransport'

@@ -26,100 +26,24 @@ export function testingEngineApi() {
   return { modules, sentMessages, messagesFromRenderer }
 }
 
+require.extensions
+
 export function setupDclInterfaceForThisSuite(
-  modules: Record<string, Record<string, (arg: any) => Promise<any>>> = {},
-  defaults: Partial<DecentralandInterface> = {}
+  modules: Record<string, Record<string, (arg: any) => Promise<any>>> = {}
 ) {
   const updateFns: Array<(dt: number) => void> = []
   const eventFns: Array<(any: any) => void> = []
   const startFns: Array<() => void> = []
   const subscribeEvents: Set<string> = new Set()
 
-  const dcl: DecentralandInterface = {
-    // legacy not used
-    addEntity: () => {
-      throw new Error('not implemented')
-    },
-    attachEntityComponent: () => {
-      throw new Error('not implemented')
-    },
-    componentCreated: () => {
-      throw new Error('not implemented')
-    },
-    componentDisposed: () => {
-      throw new Error('not implemented')
-    },
-    componentUpdated: () => {
-      throw new Error('not implemented')
-    },
-    openExternalUrl: () => {
-      throw new Error('not implemented')
-    },
-    removeEntity: () => {
-      throw new Error('not implemented')
-    },
-    removeEntityComponent: () => {
-      throw new Error('not implemented')
-    },
-    query: () => {
-      throw new Error('not implemented')
-    },
-    openNFTDialog: () => {
-      throw new Error('not implemented')
-    },
-    subscribe: (event: string) => {
-      subscribeEvents.add(event)
-    },
-    unsubscribe: (event: string) => {
-      subscribeEvents.delete(event)
-    },
-    setParent: () => {
-      throw new Error('not implemented')
-    },
-    updateEntityComponent: () => {
-      throw new Error('not implemented')
-    },
-    updateEntity: (() => {
-      throw new Error('not implemented')
-    }) as any,
-    DEBUG: true,
-    // utils
-    error: console.error,
-    log: console.log,
-    onEvent: (fn) => eventFns.push(fn),
-    onUpdate: (fn) => updateFns.push(fn),
-    onStart: (fn) => startFns.push(fn as any),
-    // modules
-    async callRpc(moduleName, method, args) {
-      if (!modules[moduleName])
-        throw new Error(`Module ${moduleName} not found`)
-      if (!modules[moduleName][method])
-        throw new Error(`Method ${moduleName}.${method} not found`)
-      return modules[moduleName][method].apply(null, args as any)
-    },
-    async loadModule(moduleName, exportsObj) {
-      if (!modules[moduleName])
-        throw new Error(`Module ${moduleName} not found`)
-      const ret: ModuleDescriptor = {
-        rpcHandle: moduleName,
-        methods: []
-      }
-      for (const methodName in modules[moduleName]) {
-        exportsObj[methodName] = modules[moduleName][methodName].bind(
-          modules[moduleName]
-        )
-        ret.methods.push({ name: methodName })
-      }
-      return ret
-    },
-    ...defaults
-  }
-
   beforeAll(() => {
     updateFns.length = 0
     eventFns.length = 0
     startFns.length = 0
-    globalThis.dcl = dcl
+    globalThis.require = function (moduleName: string) {
+      if (moduleName in modules) return modules[moduleName]
+      throw new Error(`Module ${moduleName} not found`)
+    } as any
   })
 
   function tick(dt: number) {
@@ -152,10 +76,7 @@ export namespace SandBox {
     const clients = Array.from({ length }).map((_, index) => {
       const clientTransport = transport.createNetworkTransport()
       const engine = Engine({ transports: [clientTransport] })
-      const Position = engine.defineComponent(
-        SandBox.Position.type,
-        SandBox.Position.id
-      )
+      const Position = engine.defineComponent(SandBox.Position.type, SandBox.Position.id)
       const Door = engine.defineComponent(SandBox.Door.type, SandBox.Door.id)
 
       return {

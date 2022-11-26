@@ -70,55 +70,6 @@ export function createEcsConfig(options: { PROD: boolean }): RollupOptions {
     ]
   }
 }
-export function createLibConfig(options: { PROD: boolean }): RollupOptions {
-  const packageJsonPath = sys.resolvePath('./package.json')
-  const packageJson = JSON.parse(sys.readFile(packageJsonPath)!)
-
-  console.assert(packageJson.name, 'package.json .name must be present')
-  console.assert(packageJson.main, 'package.json .main must be present')
-  console.assert(packageJson.types, 'package.json .types must be present')
-
-  return {
-    input: 'src/index.ts',
-    external: [/~system\//, /@dcl\//],
-    context: 'globalThis',
-    treeshake: {
-      preset: 'recommended'
-    },
-    plugins: [
-      typescript({
-        tsconfig: './tsconfig.json',
-        compilerOptions: {
-          module: 'ESNext',
-          // this is required to be false to enable watch mode in build-ecs
-          noEmitOnError: false,
-          declaration: true,
-          declarationDir: '.'
-        },
-        typescript: require('typescript')
-      }),
-      replace({
-        values: {
-          document: 'undefined',
-          window: 'undefined',
-          'process.env.NODE_ENV': JSON.stringify(
-            options.PROD ? 'production' : 'development'
-          )
-        },
-        preventAssignment: true
-      })
-    ],
-    output: [
-      {
-        file: packageJson.main,
-        format: 'esm',
-        // libraries always have the source maps and are never minified.
-        // the minified files are the scenes themselves
-        sourcemap: 'inline'
-      }
-    ]
-  }
-}
 
 export function createSceneConfig(options: { PROD: boolean }): RollupOptions {
   const sceneJsonPath = sys.resolvePath('./scene.json')

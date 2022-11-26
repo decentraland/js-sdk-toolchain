@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
-import { createSceneConfig, createLibConfig } from './configs'
-import { rollup, RollupError, RollupWatcherEvent, watch } from 'rollup'
+import { createSceneConfig } from './configs'
+import { rollup, RollupError, watch } from 'rollup'
 import * as ts from 'typescript'
-import { resolve, dirname, relative } from 'path'
-import { inspect } from 'util'
+import { resolve, relative } from 'path'
 import { future } from 'fp-future'
 import {
   checkConfiguration,
@@ -13,6 +12,12 @@ import {
   readPackageJson
 } from './scene.checks'
 import { createColors } from 'colorette'
+
+
+// log to stderr to keep `rollup main.js > bundle.js` from breaking
+const stderr = (...parameters: readonly unknown[]) =>
+  process.stderr.write(`${parameters.join('')}\n`)
+
 
 // @see https://no-color.org
 // @see https://www.npmjs.com/package/chalk
@@ -28,8 +33,6 @@ const PRODUCTION =
   !WATCH &&
   (process.argv.indexOf('--production') !== -1 ||
     process.env.NODE_ENV === 'production')
-
-const IS_LIB = !WATCH && process.argv.indexOf('--library') !== -1
 
 async function compile() {
   // current working directory
@@ -55,18 +58,16 @@ async function compile() {
     }
   }
 
-  console.log('> dev mode: ' + !PRODUCTION)
-  console.log(`> working directory: ${ts.sys.getCurrentDirectory()}`)
+  stderr('> dev mode: ' + !PRODUCTION)
+  stderr(`> working directory: ${ts.sys.getCurrentDirectory()}`)
 
   const packageJson: PackageJson = readPackageJson()
 
-  checkConfiguration(packageJson, IS_LIB)
+  checkConfiguration(packageJson)
 
-  console.log('')
+  stderr('')
 
-  const baseConfig = IS_LIB
-    ? createLibConfig({ PROD: PRODUCTION })
-    : createSceneConfig({ PROD: PRODUCTION })
+  const baseConfig = createSceneConfig({ PROD: PRODUCTION })
 
   const finished = future<void>()
 
@@ -88,7 +89,8 @@ async function compile() {
   watcher.on('event', (event) => {
     if (event.code === 'END') {
       if (WATCH) {
-        console.log('\nThe compiler is watching file changes...\n')
+        stderr('\nThe compiler is watching file changes...\n')
+      } else {
         finished.resolve()
       }
     } else if (event.code === 'BUNDLE_START') {
@@ -183,10 +185,6 @@ compile()
     handleError(e)
     process.exit(1)
   })
-
-// log to stderr to keep `rollup main.js > bundle.js` from breaking
-const stderr = (...parameters: readonly unknown[]) =>
-  process.stderr.write(`${parameters.join('')}\n`)
 
 function handleError(error: RollupError, recover = false): void {
   const name = error.name || error.cause?.name

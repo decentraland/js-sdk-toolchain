@@ -1,6 +1,6 @@
 {
   "name": "js-sdk-toolchain",
-  "version": "1.0.0",
+  "version": "7.0.0",
   "description": "",
   "main": "jest.config.js",
   "directories": {

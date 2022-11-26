@@ -58,7 +58,7 @@ export function readTsconfig(): any {
   }
 }
 
-export function checkConfiguration(packageJson: PackageJson, isLib: boolean) {
+export function checkConfiguration(packageJson: PackageJson) {
   const host: ts.ParseConfigHost = {
     useCaseSensitiveFileNames: ts.sys.useCaseSensitiveFileNames,
     fileExists: ts.sys.fileExists,
@@ -66,7 +66,7 @@ export function checkConfiguration(packageJson: PackageJson, isLib: boolean) {
     readDirectory: ts.sys.readDirectory
   }
 
-  const sceneJson: SceneJson | undefined = isLib ? undefined : loadSceneJson()
+  const sceneJson: SceneJson = loadSceneJson()
 
   const tsconfigPath = ts.sys.resolvePath('tsconfig.json')
   const tsconfigContent = ts.sys.readFile(tsconfigPath)
@@ -83,69 +83,34 @@ export function checkConfiguration(packageJson: PackageJson, isLib: boolean) {
     process.exit(1)
   }
 
-  const tsconfig = ts.parseJsonConfigFileContent(
-    parsed.config,
-    host,
-    ts.sys.getCurrentDirectory(),
-    {},
-    'tsconfig.json'
-  )
+  const tsconfig = ts.parseJsonConfigFileContent(parsed.config, host, ts.sys.getCurrentDirectory(), {}, 'tsconfig.json')
 
   const hasError = false
 
   // should this project be compiled as a lib? or as a scene?
 
-  if (isLib && sceneJson) {
-    console.error('! Error: project of type library must not have scene.json')
-    process.exit(1)
-  }
-
-  if (!isLib && !sceneJson) {
+  if (!sceneJson) {
     console.error('! Error: project of type scene must have a scene.json')
     process.exit(1)
   }
 
-  if (isLib && !packageJson) {
-    console.error('! Error: project of type library requires a package.json')
-    process.exit(1)
-  }
-
-  if (isLib) {
-    validatePackageJsonForLibrary(packageJson)
-  } else {
-    validateSceneJson(sceneJson!)
-  }
+  validateSceneJson(sceneJson!)
 
   if (hasError) {
     console.log('tsconfig.json:')
     console.log(inspect(tsconfig, false, 10, true))
     process.exit(1)
   }
-
-  // the new code generation as libraries enables us to leverage source maps
-  // source map config is overwritten for that reason.
-
-  if (isLib) {
-    tsconfig.options.inlineSourceMap = true
-    tsconfig.options.inlineSources = true
-    tsconfig.options.sourceMap = false
-    tsconfig.options.removeComments = false
-    tsconfig.options.declaration = true
-    delete tsconfig.options.declarationDir
-  }
 }
 
 function printDiagnostic(diagnostic: ts.Diagnostic) {
   const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
   if (diagnostic.file) {
-    const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(
-      diagnostic.start!
-    )
+    const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start!)
     console.log(
-      `  Error ${diagnostic.file.fileName.replace(
-        ts.sys.getCurrentDirectory(),
-        ''
-      )} (${line + 1},${character + 1}): ${message}`
+      `  Error ${diagnostic.file.fileName.replace(ts.sys.getCurrentDirectory(), '')} (${line + 1},${
+        character + 1
+      }): ${message}`
     )
   } else {
     console.log(`  Error: ${message}`)
@@ -205,19 +170,13 @@ function validatePackageJsonForLibrary(packageJson: PackageJson) {
     const typingsFile = ts.sys.resolvePath(packageJson.types)
 
     if (!typingsFile) {
-      throw new Error(
-        `! Error: field "types" in package.json cannot be resolved.`
-      )
+      throw new Error(`! Error: field "types" in package.json cannot be resolved.`)
     }
 
-    const resolvedTypings = ts.sys.resolvePath(
-      packageJson.main.replace(/\.js$/, '.d.ts')
-    )
+    const resolvedTypings = ts.sys.resolvePath(packageJson.main.replace(/\.js$/, '.d.ts'))
     if (resolvedTypings !== typingsFile) {
       const help = `(${resolvedTypings} != ${typingsFile})`
-      throw new Error(
-        `! Error: package.json .types does not match the emited file\n       ${help}`
-      )
+      throw new Error(`! Error: package.json .types does not match the emited file\n       ${help}`)
     }
   }
 }

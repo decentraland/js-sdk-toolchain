@@ -7,13 +7,11 @@
   "license": "Apache-2.0",
   "version": "1.0.0",
   "description": "My new Decentraland project",
-  "main": "./bin/lib.js",
-  "types": "./bin/lib.d.ts",
+  "main": "./bin/index.js",
+  "types": "./bin/index.d.ts",
   "scripts": {
     "start": "dcl start",
-    "build": "build-ecs --library",
-    "build-prod": "build-ecs  --library --production",
-    "watch": "build-ecs  --library --watch"
+    "build": "tsc -p tsconfig.json"
   },
   "devDependencies": {
     "@dcl/dcl-rollup": "file:../../../../packages/@dcl/dcl-rollup",
@@ -22,6 +20,7 @@
     "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime"
   },
   "dependencies": {
-    "ethers": "^5.7.2"
+    "ethers": "^5.7.2",
+    "typescript": "*"
   }
 }

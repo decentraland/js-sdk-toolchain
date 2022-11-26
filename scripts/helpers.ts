@@ -102,7 +102,7 @@ export function itInstallsADependencyFromFolderAndCopiesTheVersion(
 ) {
   const dependencies = devDependency ? 'devDependencies' : 'dependencies'
 
-  itExecutes(`npm install --quiet ${depPath}`, cwd)
+  itExecutes(`npm install --silent ${depPath}`, cwd)
 
   it(`update ${dependencies} version ${depPath} in ${cwd}`, () => {
     const depPackageJson = readJson('package.json', depPath)

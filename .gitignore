@@ -4,10 +4,10 @@ temp
 tsdoc-metadata.json
 coverage
 **/.DS_Store
-test/rollup-lib-integration/dist
 packages/**/*.js
 !packages/@dcl/ecs/jest.config.js
 packages/@dcl/sdk/package-lock.json
 **/*.tgz
 test/sdk/simple-scene
 **/bin/game.js
+**/bin/game.js.map

@@ -5,8 +5,7 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "build-rollup": "./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/dist/ecs.config.js"
+    "build": "tsc -p tsconfig.json"
   },
   "repository": {
     "type": "git",

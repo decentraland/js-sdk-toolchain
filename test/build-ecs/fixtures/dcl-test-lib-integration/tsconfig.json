@@ -1,7 +1,9 @@
 {
   "include": ["src"],
   "compilerOptions": {
-    "module": "ESNext"
+    "module": "ESNext",
+    "outDir": "bin",
+    "declaration": true
   },
   "extends": "../../../../packages/@dcl/sdk/types/tsconfig.ecs7.strict.json",
   "compileOnSave": false,

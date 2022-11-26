@@ -22,11 +22,9 @@
   },
   "dependencies": {
     "@dcl/ecs-math": "^2.0.1-20221108141807.commit-a1344cb",
-    "eth-connect": "^6.0.3",
-    "rollup-demo-decentraland-lib": "file:../rollup-lib-integration"
+    "eth-connect": "^6.0.3"
   },
   "bundleDependencies": [
-    "dcl-test-lib-integration",
-    "rollup-demo-decentraland-lib"
+    "dcl-test-lib-integration"
   ]
 }

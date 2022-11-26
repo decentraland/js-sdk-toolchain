@@ -58,7 +58,8 @@ flow('build-all', () => {
   })
 
   flow('@dcl/dcl-rollup', () => {
-    itExecutes(`npm i --quiet`, ROLLUP_CONFIG_PATH)
+    itDeletesFolder('dist', ROLLUP_CONFIG_PATH)
+    itExecutes(`npm i --silent`, ROLLUP_CONFIG_PATH)
     itExecutes(`${TSC} -p tsconfig.json`, ROLLUP_CONFIG_PATH)
     copyFile(
       ROLLUP_CONFIG_PATH + '/package.json',
@@ -66,14 +67,13 @@ flow('build-all', () => {
     )
     it('check file exists', () => {
       ensureFileExists('dist/package.json', ROLLUP_CONFIG_PATH)
-      ensureFileExists('dist/ecs.config.js', ROLLUP_CONFIG_PATH)
-      ensureFileExists('dist/libs.config.js', ROLLUP_CONFIG_PATH)
+      ensureFileExists('dist/index.js', ROLLUP_CONFIG_PATH)
     })
   })
 
   flow('@dcl/ecs build', () => {
     itDeletesFolder('dist', ECS7_PATH)
-    itExecutes('npm i --quiet', ECS7_PATH)
+    itExecutes('npm i --silent', ECS7_PATH)
     compileEcsComponents(
       `${ECS7_PATH}/src/components`,
       `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
@@ -84,28 +84,25 @@ flow('build-all', () => {
     //   `${SDK_PATH}/dist/ecs7/proto-definitions`
     // )
     itExecutes('npm run build', ECS7_PATH)
-
-    // Build ecs
-    itExecutes('npm run build-rollup', ECS7_PATH)
   })
 
   flow('@dcl/sdk build', () => {
     itDeletesFolder('dist', SDK_PATH)
-    itExecutes(`npm i --quiet`, SDK_PATH)
+    itExecutes(`npm i --silent`, SDK_PATH)
 
     itDeletesGlob('types/*.d.ts', SDK_PATH)
 
     // install required dependencies
-    itExecutes(`npm install --quiet ${ROLLUP_CONFIG_PATH}`, SDK_PATH)
-    itExecutes(`npm install --quiet ${JS_RUNTIME}`, SDK_PATH)
-    itExecutes(`npm install --quiet ${ECS7_PATH}`, SDK_PATH)
+    itExecutes(`npm install --silent ${ROLLUP_CONFIG_PATH}`, SDK_PATH)
+    itExecutes(`npm install --silent ${JS_RUNTIME}`, SDK_PATH)
+    itExecutes(`npm install --silent ${ECS7_PATH}`, SDK_PATH)
 
     itExecutes('npm run build', SDK_PATH)
   })
 
   flow('@dcl/react-ecs', () => {
-    itExecutes('npm i --quiet', REACT_ECS)
-    itExecutes(`npm install --quiet ${ECS7_PATH}`, REACT_ECS)
+    itExecutes('npm i --silent', REACT_ECS)
+    itExecutes(`npm install --silent ${ECS7_PATH}`, REACT_ECS)
     it('Copy proto files', async () => {
       const protoTypesPath = `${REACT_ECS}/src/generated`
       removeSync(protoTypesPath)
@@ -122,7 +119,6 @@ flow('build-all', () => {
     it('check file exists', () => {
       fixReactTypes()
       ensureFileExists('dist/index.js', REACT_ECS)
-      ensureFileExists('dist/index.min.js', REACT_ECS)
       ensureFileExists('dist/index.d.ts', REACT_ECS)
     })
   })
@@ -183,7 +179,7 @@ flow('build-all', () => {
       )
     })
 
-    it('playground copy minified files', async () => {
+    it.skip('playground copy minified files', async () => {
       const playgroundDistPath = path.resolve(SDK_PATH, 'dist', 'playground')
 
       // Copy minified ecs
