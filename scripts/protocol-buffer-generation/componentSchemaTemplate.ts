@@ -3,12 +3,12 @@ import { ByteBuffer } from '../../serialization/ByteBuffer'
 import { PB$\{ComponentName\} } from './pb/decentraland/sdk/components/$\{ComponentFile\}.gen'
 
 /**
- * @internal
+ *
  */
 export const COMPONENT_ID = $\{ComponentId\}
 
 /**
- * @internal
+ *
  */
 export const $\{ComponentName\}Schema: ISchema<PB$\{ComponentName\}> = {
   serialize(value: PB$\{ComponentName\}, builder: ByteBuffer): void {

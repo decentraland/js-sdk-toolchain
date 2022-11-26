@@ -18,7 +18,6 @@ PBS_TS = $(SCENE_PROTO_FILES:packages/@dcl/ecs/node_modules/@dcl/protocol/proto/
 install:
 	npm i
 	make node_modules/.bin/protobuf/bin/protoc
-	cd packages/@dcl/build-ecs; npm ci
 	cd packages/@dcl/dcl-rollup; npm ci
 	cd packages/@dcl/ecs; make install
 
@@ -68,7 +67,6 @@ compile_apis: ${PBS_TS}
 
 deep-clean:
 	rm -rf node_modules/ \
-		packages/@dcl/build-ecs/node_modules/ \
 		packages/@dcl/dcl-rollup/node_modules/ \
 		packages/@dcl/ecs/node_modules/ \
 		packages/@dcl/react-ecs/node_modules/ \
@@ -78,7 +76,7 @@ deep-clean:
 clean:
 	@echo "> Cleaning all folders"
 	@rm -rf coverage/
-	@rm -rf packages/@dcl/build-ecs/dist/  packages/@dcl/dcl-rollup/dist/ packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/
+	@rm -rf packages/@dcl/dcl-rollup/dist/ packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/
 	@rm -rf packages/@dcl/ecs/src/components/generated/ packages/@dcl/ecs/temp/
 	@rm -rf packages/@dcl/js-runtime/apis.d.ts
 	@rm -rf packages/@dcl/react-ecs/dist/ packages/@dcl/react-ecs/src/generated/ packages/@dcl/react-ecs/temp/
@@ -89,6 +87,5 @@ clean:
 	@rm -rf test/build-ecs/fixtures/rollup-lib-integration/dist/ test/build-ecs/fixtures/rollup-lib-integration/tsdoc-metadata.json
 	@rm -rf test/build-ecs/fixtures/simple-scene-with-bundled/bin/ test/build-ecs/fixtures/simple-scene-with-bundled/node_modules/
 	@rm -rf test/build-ecs/fixtures/simple-scene-with-library/bin/ test/build-ecs/fixtures/simple-scene-with-library/node_modules/
-	@rm -rf test/build-ecs/fixtures/simple-scene-without-installed-ecs/bin/
 	@rm -rf test/build-ecs/fixtures/simple-scene/bin/ test/build-ecs/fixtures/simple-scene/node_modules/
 	@rm -rf test/ecs/snippets/dist/

@@ -81,3 +81,8 @@ declare var WebSocket: {
   readonly CONNECTING: number
   readonly OPEN: number
 }
+
+declare var console: {
+  log(text: string): void
+  error(error: any): void
+}

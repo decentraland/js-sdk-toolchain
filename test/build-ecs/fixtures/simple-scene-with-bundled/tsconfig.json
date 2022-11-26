@@ -1,25 +1,10 @@
 {
   "compilerOptions": {
-    "outFile": "./bin/game.js",
     "allowJs": true,
-    "paths": {
-      "eth-connect": [
-        "node_modules/eth-connect/eth-connect.d.ts"
-      ],
-      "dcl-test-lib-integration": [
-        "../dcl-test-lib-integration/bin/lib.d.ts"
-      ],
-      "rollup-demo-decentraland-lib": [
-        "../rollup-lib-integration/dist/index.d.ts"
-      ],
-      "@dcl/ecs-scene-utils": [
-        "node_modules/@dcl/ecs-scene-utils/dist/index.d.ts"
-      ]
-    },
     "baseUrl": "."
   },
   "include": [
-    "*.ts"
+    "src"
   ],
   "extends": "./node_modules/@dcl/sdk/types/tsconfig.ecs7.json",
   "compileOnSave": false

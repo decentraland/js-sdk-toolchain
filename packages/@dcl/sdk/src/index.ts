@@ -1,7 +1,7 @@
-import * as ecs from '@dcl/ecs'
+import { engine } from '@dcl/ecs'
 import { pollEvents } from './observables'
 
-export async function onUpdate(deltaTime: number) {
-  await ecs.onUpdate(deltaTime)
+export async function runTick(deltaTime: number) {
+  await engine.update(deltaTime)
   await pollEvents()
 }

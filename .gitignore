@@ -10,3 +10,4 @@ packages/**/*.js
 packages/@dcl/sdk/package-lock.json
 **/*.tgz
 test/sdk/simple-scene
+**/bin/game.js

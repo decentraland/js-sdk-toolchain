@@ -1,42 +1,6 @@
 import { Observable, Observer } from './temp-fp/Observable'
-
-let communicationsController: ModuleDescriptor | null = null
-let communicationsControllerPromise: PromiseLike<ModuleDescriptor> | null = null
-
-let _messageObserver: null | Observable<IEvents['comms']> = null
-
-/**
- * @internal
- */
-export function getMessageObserver() {
-  if (!_messageObserver) {
-    _messageObserver = new Observable<IEvents['comms']>()
-  }
-  return _messageObserver
-}
-
-function ensureCommunicationsController() {
-  if (!communicationsControllerPromise) {
-    communicationsControllerPromise = dcl.loadModule(
-      '~system/CommunicationsController',
-      {}
-    )
-
-    void communicationsControllerPromise.then(($) => {
-      communicationsController = $
-    })
-
-    const observer = getMessageObserver()
-
-    dcl.subscribe('comms')
-    dcl.onEvent((event) => {
-      if (event.type === 'comms') {
-        observer.notifyObservers(event.data as any)
-      }
-    })
-  }
-  return communicationsControllerPromise
-}
+import * as communicationsController from '~system/CommunicationsController'
+import { IEvents, onCommsMessage } from './observables'
 
 /**
  * @public
@@ -44,32 +8,16 @@ function ensureCommunicationsController() {
  */
 export class MessageBus {
   private messageQueue: string[] = []
-  private connected = false
   private flushing = false
 
-  constructor() {
-    void ensureCommunicationsController().then(() => {
-      this.connected = true
-      this.flush()
-    })
-  }
+  constructor() {}
 
-  on(
-    message: string,
-    callback: (value: any, sender: string) => void
-  ): Observer<IEvents['comms']> {
-    return getMessageObserver().add((e) => {
-      try {
-        const m = JSON.parse(e.message)
+  on(message: string, callback: (value: any, sender: string) => void): Observer<IEvents['comms']> {
+    return onCommsMessage.add((e) => {
+      const m = JSON.parse(e.message)
 
-        if (m.message === message) {
-          callback(m.payload, e.sender)
-        }
-      } catch (e) {
-        dcl.error(
-          'Error parsing comms message ' + ((e as Error).message || ''),
-          e
-        )
+      if (m.message === message) {
+        callback(m.payload, e.sender)
       }
     })!
   }
@@ -78,15 +26,13 @@ export class MessageBus {
   sendRaw(message: string) {
     this.messageQueue.push(message)
 
-    if (this.connected) {
-      this.flush()
-    }
+    this.flush()
   }
 
   emit(message: string, payload: Record<any, any>) {
     const messageToSend = JSON.stringify({ message, payload })
     this.sendRaw(messageToSend)
-    getMessageObserver().notifyObservers({
+    onCommsMessage.notifyObservers({
       message: messageToSend,
       sender: 'self'
     })
@@ -94,15 +40,13 @@ export class MessageBus {
 
   private flush() {
     if (this.messageQueue.length === 0) return
-    if (!this.connected) return
-    if (!communicationsController) return
     if (this.flushing) return
 
-    const message = this.messageQueue.shift()
+    const message = this.messageQueue.shift()!
 
     this.flushing = true
 
-    dcl.callRpc(communicationsController.rpcHandle, 'send', [message]).then(
+    communicationsController.send({ message }).then(
       (_) => {
         this.flushing = false
         this.flush()

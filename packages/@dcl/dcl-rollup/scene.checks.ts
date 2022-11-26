@@ -1,0 +1,208 @@
+import { rollup, RollupWatcherEvent, watch } from 'rollup'
+import * as ts from 'typescript'
+import { resolve, dirname } from 'path'
+import { inspect } from 'util'
+
+export type PackageJson = {
+  main: string
+
+  // only package.json
+  typings?: string
+  types?: string
+}
+
+export type SceneJson = {
+  main: string
+}
+
+function validateSceneJson(sceneJson: SceneJson) {
+  if (!sceneJson.main) {
+    console.dir(sceneJson)
+    throw new Error(`field "main" in scene.json is missing.`)
+  }
+}
+
+function loadSceneJson(): SceneJson {
+  const content = ts.sys.readFile('scene.json')
+  if (content === undefined) {
+    throw new Error('scene.json not found')
+  }
+  try {
+    return JSON.parse(content)
+  } catch {
+    throw new Error('Error reading scene.json')
+  }
+}
+
+export function readPackageJson(): PackageJson {
+  const content = ts.sys.readFile('package.json')
+  if (content === undefined) {
+    throw new Error('package.json not found')
+  }
+  try {
+    return JSON.parse(content)
+  } catch {
+    throw new Error('Error reading package.json')
+  }
+}
+
+export function readTsconfig(): any {
+  const content = ts.sys.readFile('tsconfig.json')
+  if (content === undefined) {
+    throw new Error('tsconfig.json not found')
+  }
+  try {
+    return JSON.parse(content)
+  } catch {
+    throw new Error('Error reading tsconfig.json')
+  }
+}
+
+export function checkConfiguration(packageJson: PackageJson, isLib: boolean) {
+  const host: ts.ParseConfigHost = {
+    useCaseSensitiveFileNames: ts.sys.useCaseSensitiveFileNames,
+    fileExists: ts.sys.fileExists,
+    readFile: ts.sys.readFile,
+    readDirectory: ts.sys.readDirectory
+  }
+
+  const sceneJson: SceneJson | undefined = isLib ? undefined : loadSceneJson()
+
+  const tsconfigPath = ts.sys.resolvePath('tsconfig.json')
+  const tsconfigContent = ts.sys.readFile(tsconfigPath)
+
+  if (!tsconfigContent) {
+    console.error(`! Error: missing tsconfig.json file`)
+    process.exit(1)
+  }
+
+  const parsed = ts.parseConfigFileTextToJson('tsconfig.json', tsconfigContent)
+
+  if (parsed.error) {
+    printDiagnostic(parsed.error)
+    process.exit(1)
+  }
+
+  const tsconfig = ts.parseJsonConfigFileContent(parsed.config, host, ts.sys.getCurrentDirectory(), {}, 'tsconfig.json')
+
+  let hasError = false
+
+  // should this project be compiled as a lib? or as a scene?
+
+  if (isLib && sceneJson) {
+    console.error('! Error: project of type library must not have scene.json')
+    process.exit(1)
+  }
+
+  if (!isLib && !sceneJson) {
+    console.error('! Error: project of type scene must have a scene.json')
+    process.exit(1)
+  }
+
+  if (isLib && !packageJson) {
+    console.error('! Error: project of type library requires a package.json')
+    process.exit(1)
+  }
+
+  if (isLib) {
+    validatePackageJsonForLibrary(packageJson)
+  } else {
+    validateSceneJson(sceneJson!)
+  }
+
+  if (hasError) {
+    console.log('tsconfig.json:')
+    console.log(inspect(tsconfig, false, 10, true))
+    process.exit(1)
+  }
+
+  // the new code generation as libraries enables us to leverage source maps
+  // source map config is overwritten for that reason.
+
+  if (isLib) {
+    tsconfig.options.inlineSourceMap = true
+    tsconfig.options.inlineSources = true
+    tsconfig.options.sourceMap = false
+    tsconfig.options.removeComments = false
+    tsconfig.options.declaration = true
+    delete tsconfig.options.declarationDir
+  }
+}
+
+function printDiagnostic(diagnostic: ts.Diagnostic) {
+  const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
+  if (diagnostic.file) {
+    const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start!)
+    console.log(
+      `  Error ${diagnostic.file.fileName.replace(ts.sys.getCurrentDirectory(), '')} (${line + 1},${
+        character + 1
+      }): ${message}`
+    )
+  } else {
+    console.log(`  Error: ${message}`)
+  }
+}
+
+export function loadArtifact(path: string): string {
+  try {
+    const resolved = resolveFile(path)
+    if (resolved) {
+      return ts.sys.readFile(resolved)!
+    }
+
+    throw new Error()
+  } catch (e) {
+    console.error(`! Error: ${path} not found. ` + e)
+    process.exit(2)
+  }
+}
+
+export function resolveFile(path: string): string | null {
+  let resolved = ts.sys.resolvePath(path)
+
+  if (ts.sys.fileExists(resolved)) {
+    return resolved
+  }
+
+  resolved = ts.sys.resolvePath('node_modules/' + path)
+
+  if (ts.sys.fileExists(resolved)) {
+    return resolved
+  }
+
+  resolved = ts.sys.resolvePath('../node_modules/' + path)
+
+  if (ts.sys.fileExists(resolved)) {
+    return resolved
+  }
+
+  resolved = ts.sys.resolvePath('../../node_modules/' + path)
+
+  if (ts.sys.fileExists(resolved)) {
+    return resolved
+  }
+
+  return null
+}
+
+function validatePackageJsonForLibrary(packageJson: PackageJson) {
+  if (!packageJson.main) {
+    throw new Error(`field "main" in package.json is missing.`)
+  }
+
+  if (!packageJson.types) {
+    throw new Error(`field "types" in package.json is missing.`)
+  } else {
+    const typingsFile = ts.sys.resolvePath(packageJson.types)
+
+    if (!typingsFile) {
+      throw new Error(`! Error: field "types" in package.json cannot be resolved.`)
+    }
+
+    const resolvedTypings = ts.sys.resolvePath(packageJson.main.replace(/\.js$/, '.d.ts'))
+    if (resolvedTypings !== typingsFile) {
+      const help = `(${resolvedTypings} != ${typingsFile})`
+      throw new Error(`! Error: package.json .types does not match the emited file\n       ${help}`)
+    }
+  }
+}

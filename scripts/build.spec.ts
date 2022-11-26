@@ -3,7 +3,6 @@ import { readFileSync, writeFileSync } from 'fs'
 import { copySync, mkdirSync, removeSync } from 'fs-extra'
 
 import {
-  BUILD_ECS_PATH,
   commonChecks,
   ECS7_PATH,
   flow,
@@ -31,22 +30,6 @@ import { getSnippetsfile } from './utils/getFilePathsSync'
 
 flow('build-all', () => {
   commonChecks()
-
-  flow('@dcl/build-ecs', () => {
-    itExecutes(`npm i --quiet`, BUILD_ECS_PATH)
-    itExecutes(`${TSC} -p tsconfig.json`, BUILD_ECS_PATH)
-    itExecutes(`chmod +x index.js`, BUILD_ECS_PATH + '/dist')
-    itExecutes(`chmod +x esbuild.js`, BUILD_ECS_PATH + '/dist')
-    copyFile(
-      BUILD_ECS_PATH + '/package.json',
-      BUILD_ECS_PATH + '/dist/package.json'
-    )
-
-    it('check file exists', () => {
-      ensureFileExists('index.js', BUILD_ECS_PATH + '/dist')
-      ensureFileExists('package.json', BUILD_ECS_PATH + '/dist')
-    })
-  })
 
   flow('@dcl/js-runtime', () => {
     it('compile protos', async () => {
@@ -97,10 +80,10 @@ flow('build-all', () => {
       `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
       `${ECS7_PATH}/node_modules/@dcl/protocol/proto/`
     )
-    copyFile(
-      `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
-      `${SDK_PATH}/dist/ecs7/proto-definitions`
-    )
+    // copyFile(
+    //   `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
+    //   `${SDK_PATH}/dist/ecs7/proto-definitions`
+    // )
     itExecutes('npm run build', ECS7_PATH)
 
     // Build ecs
@@ -118,7 +101,7 @@ flow('build-all', () => {
     itExecutes(`npm install --quiet ${JS_RUNTIME}`, SDK_PATH)
     itExecutes(`npm install --quiet ${ECS7_PATH}`, SDK_PATH)
 
-    itExecutes('npm run build', ECS7_PATH)
+    itExecutes('npm run build', SDK_PATH)
   })
 
   flow('@dcl/react-ecs', () => {

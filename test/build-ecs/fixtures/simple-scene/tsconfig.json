@@ -1,12 +1,10 @@
 {
   "compilerOptions": {
-    "outFile": "./bin/game.js",
     "allowJs": true,
-    "paths": {},
     "baseUrl": "."
   },
   "include": [
-    "*.ts"
+    "src"
   ],
   "extends": "./node_modules/@dcl/sdk/types/tsconfig.ecs7.json",
   "compileOnSave": false

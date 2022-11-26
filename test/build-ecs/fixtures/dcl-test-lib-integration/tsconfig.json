@@ -1,13 +1,9 @@
 {
+  "include": ["src"],
   "compilerOptions": {
-    "allowJs": true,
-    "paths": {
-    },
-    "baseUrl": "."
+    "module": "ESNext"
   },
-  "include": [
-    "src/*.ts"
-  ],
-  "extends": "./node_modules/@dcl/sdk/types/tsconfig.ecs7.json",
-  "compileOnSave": false
+  "extends": "../../../../packages/@dcl/sdk/types/tsconfig.ecs7.strict.json",
+  "compileOnSave": false,
+  "exclude": ["./bin"]
 }

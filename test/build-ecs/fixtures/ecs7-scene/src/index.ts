@@ -1,3 +1,7 @@
+import { engine, Entity, EventsSystem, InputAction, MeshCollider, MeshRenderer, Transform } from '@dcl/ecs'
+import * as sdk from '@dcl/sdk'
+import { Quaternion, Vector3 } from '@dcl/ecs-math'
+
 // Cube factory
 function createCube(x: number, y: number, z: number): Entity {
   const meshEntity = engine.addEntity()
@@ -10,10 +14,7 @@ function createCube(x: number, y: number, z: number): Entity {
 
 // Systems
 function circularSystem(dt: number) {
-  const entitiesWithMeshRenderer = engine.getEntitiesWith(
-    MeshRenderer,
-    Transform
-  )
+  const entitiesWithMeshRenderer = engine.getEntitiesWith(MeshRenderer, Transform)
   for (const [entity, _meshRenderer, _transform] of entitiesWithMeshRenderer) {
     const mutableTransform = Transform.getMutable(entity)
 
@@ -30,7 +31,7 @@ const initEntity = createCube(8, 1, 8)
 EventsSystem.onPointerDown(
   initEntity,
   function (event) {
-    log('Button: ', event.button)
+    console.log('Button: ' + event.button)
     createCube(1 + Math.random() * 8, Math.random() * 8, 1 + Math.random() * 8)
     // EventsSystem.removeOnPointerDown(initEntity)
   },
@@ -42,3 +43,7 @@ EventsSystem.onPointerDown(
 
 engine.addSystem(circularSystem)
 // engine.addSystem(clickSystem)
+
+export async function onUpdate(dt: number) {
+  await sdk.runTick(dt)
+}

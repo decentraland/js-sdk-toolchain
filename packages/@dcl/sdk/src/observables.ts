@@ -471,6 +471,12 @@ export const onRealmChangedObservable = new Observable<IEvents['onRealmChanged']
 export const onPlayerClickedObservable = new Observable<IEvents['playerClicked']>(createSubscriber('playerClicked'))
 
 /**
+ * @interternal
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ */
+export const onCommsMessage = new Observable<IEvents['comms']>(createSubscriber('comms'))
+
+/**
  * @internal
  * @deprecated this is an OLD API.
  * This function uses the SDK6 sendBatch to poll events from the renderer

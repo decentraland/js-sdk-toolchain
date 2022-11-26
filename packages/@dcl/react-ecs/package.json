@@ -1,7 +1,6 @@
 {
   "name": "@dcl/react-ecs",
   "version": "0.0.1",
-  "decentralandLibrary": {},
   "description": "Decentraland ECS",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",

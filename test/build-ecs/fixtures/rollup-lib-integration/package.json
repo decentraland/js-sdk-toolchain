@@ -8,9 +8,15 @@
   "version": "1.0.0",
   "description": "My new Decentraland project",
   "main": "./dist/index.js",
-  "typings": "./dist/index.d.ts",
-  "decentralandLibrary": {},
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "../../../../packages/@dcl/dcl-rollup/node_modules/.bin/rollup -c ../../../../packages/@dcl/dcl-rollup/dist/libs.config.js"
+    "start": "dcl start",
+    "build": "build-ecs --library",
+    "build-prod": "build-ecs --library --production",
+    "watch": "build-ecs --library --watch"
+  },
+  "devDependencies": {
+    "@dcl/dcl-rollup": "file:../../../../packages/@dcl/dcl-rollup",
+    "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime"
   }
 }

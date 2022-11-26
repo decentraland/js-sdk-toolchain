@@ -1,8 +1,8 @@
-import { engine, log } from '@dcl/sdk'
+import { engine } from '@dcl/ecs'
 import { errors } from 'ethers/lib.esm/ethers'
 
 // TODO: types + rollup for type check
 export function test() {
-  log(engine.PlayerEntity)
+  console.log(engine.PlayerEntity)
   return errors
 }

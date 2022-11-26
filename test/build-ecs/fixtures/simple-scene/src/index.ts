@@ -1,3 +1,6 @@
+import { testSubfolder } from './subfolder/subfoldergame'
+import { Engine, MeshRenderer, Transform } from '@dcl/ecs'
+
 function circularSystem() {
   let t = 0.0
   return (dt: number) => {
@@ -29,6 +32,10 @@ function createCube(x: number, y: number, z: number) {
 
   return myEntity
 }
+const engine = Engine()
 
 createCube(8, 2, 8)
+
 engine.addSystem(circularSystem())
+
+testSubfolder()

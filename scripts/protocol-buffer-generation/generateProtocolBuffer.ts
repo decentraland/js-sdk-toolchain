@@ -116,6 +116,6 @@ function fixTsGeneratedByProto(filePath: string) {
 
 const internalComment = `
 /**
- * @internal
+ * Internal
  */
 export const`

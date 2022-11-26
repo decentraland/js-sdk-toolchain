@@ -17,7 +17,3 @@ export * from './engine/entity'
 
 export * from './components/generated/index.gen'
 export * from './components/generated/types.gen'
-
-export async function onUpdate(deltaTime: number) {
-  engine.update(deltaTime)
-}

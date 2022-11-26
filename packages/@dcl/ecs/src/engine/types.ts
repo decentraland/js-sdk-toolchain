@@ -155,8 +155,6 @@ export type IEngine = {
   ): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>
 
   /**
-   * @internal
-   *
    * @param dt
    */
   update(dt: number): void

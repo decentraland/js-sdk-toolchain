@@ -15,10 +15,6 @@ export const ROLLUP = resolve(
 )
 
 // WORKING DIRECTORIES
-export const BUILD_ECS_PATH = resolve(
-  process.cwd(),
-  './packages/@dcl/build-ecs'
-)
 export const ROLLUP_CONFIG_PATH = resolve(
   process.cwd(),
   './packages/@dcl/dcl-rollup'
