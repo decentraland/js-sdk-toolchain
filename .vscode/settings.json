@@ -2,5 +2,15 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "packages/@dcl/dcl-rollup/*.d.ts": true,
+    "packages/@dcl/dcl-rollup/*.js": true
   }
 }

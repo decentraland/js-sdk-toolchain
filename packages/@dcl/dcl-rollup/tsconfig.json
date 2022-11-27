@@ -12,8 +12,7 @@
     "esModuleInterop": true,
     "strictPropertyInitialization": true,
     "alwaysStrict": true,
-    "outDir": "dist"
+    "declaration": true
   },
-  "include": ["*.ts"],
-  "exclude": ["dist"]
+  "include": ["*.ts"]
 }

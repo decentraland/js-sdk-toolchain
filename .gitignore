@@ -7,6 +7,8 @@ coverage
 packages/**/*.js
 !packages/@dcl/ecs/jest.config.js
 packages/@dcl/sdk/package-lock.json
+packages/@dcl/dcl-rollup/*.js
+packages/@dcl/dcl-rollup/*.d.ts
 **/*.tgz
 test/sdk/simple-scene
 **/bin/game.js

@@ -2,9 +2,9 @@
   "name": "@dcl/dcl-rollup",
   "version": "7.0.0",
   "description": "",
-  "main": "./dist/scene.config.js",
+  "main": "./configs.js",
   "scripts": {
-    "build": "tsc && chmod +x dist/index.js"
+    "build": "tsc && chmod +x index.js"
   },
   "publishConfig": {
     "access": "public"
@@ -12,7 +12,7 @@
   "keywords": [],
   "author": "",
   "bin": {
-    "build-ecs": "./dist/index.js"
+    "build-ecs": "./index.js"
   },
   "license": "Apache-2.0",
   "dependencies": {
@@ -27,5 +27,9 @@
     "rollup-plugin-analyzer": "^4.0.0",
     "rollup-plugin-api-extractor": "^0.2.5",
     "typescript": "^4.8.4"
-  }
+  },
+  "files": [
+    "*.js",
+    "*.d.ts"
+  ]
 }

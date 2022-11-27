@@ -76,7 +76,8 @@ deep-clean:
 clean:
 	@echo "> Cleaning all folders"
 	@rm -rf coverage/
-	@rm -rf packages/@dcl/dcl-rollup/dist/ packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/
+	@rm -rf packages/@dcl/dcl-rollup/*.js packages/@dcl/dcl-rollup/*.d.ts
+	@rm -rf packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/
 	@rm -rf packages/@dcl/ecs/src/components/generated/ packages/@dcl/ecs/temp/
 	@rm -rf packages/@dcl/js-runtime/apis.d.ts
 	@rm -rf packages/@dcl/react-ecs/dist/ packages/@dcl/react-ecs/src/generated/ packages/@dcl/react-ecs/temp/
