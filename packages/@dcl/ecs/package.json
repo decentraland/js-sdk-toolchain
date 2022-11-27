@@ -34,10 +34,6 @@
     "@dcl/protocol": "^1.0.0-3524279049.commit-02b9080"
   },
   "files": [
-    "dist/index.js",
-    "dist/index.d.ts",
-    "dist/index.min.js",
-    "dist/index.min.js.map",
-    "proto-definitions"
+    "dist"
   ]
 }
