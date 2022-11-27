@@ -48,7 +48,9 @@ export function runCommand(
       stderr.trim().length &&
         process.stderr.write('! ' + stderr.replace(/\n/g, '\n  ') + '\n')
       if (error) {
-        onError(stderr || stdout || 'command "' + command + '" failed to execute')
+        onError(
+          stderr || stdout || 'command "' + command + '" failed to execute'
+        )
       } else {
         onSuccess(stdout)
       }

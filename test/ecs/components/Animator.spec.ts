@@ -1,9 +1,9 @@
-﻿import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+﻿import { Engine, components } from '../../../packages/@dcl/ecs/src'
 
 describe('Generated Animator ProtoBuf', () => {
   it('should serialize/deserialize Animator', () => {
     const newEngine = Engine()
-    const { Animator } = newEngine.baseComponents
+    const Animator = components.Animator(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
     Animator.create(newEngine.addEntity())
@@ -42,7 +42,7 @@ describe('Generated Animator ProtoBuf', () => {
 
   it('should Animator.getClip helper works properly', () => {
     const newEngine = Engine()
-    const { Animator } = newEngine.baseComponents
+    const Animator = components.Animator(newEngine)
     const entityWithoutAnimator = newEngine.addEntity()
     const entity = newEngine.addEntity()
 
@@ -76,7 +76,7 @@ describe('Generated Animator ProtoBuf', () => {
 
   it('should Animator.playSingleAnimation and Animator.stops helper works properly', () => {
     const newEngine = Engine()
-    const { Animator } = newEngine.baseComponents
+    const Animator = components.Animator(newEngine)
     const entity = newEngine.addEntity()
     const entityWithoutAnimator = newEngine.addEntity()
 

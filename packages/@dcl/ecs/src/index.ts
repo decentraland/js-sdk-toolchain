@@ -11,11 +11,16 @@ export { cyclicParentingChecker } from './systems/cyclicParentingChecker'
 export * from './systems/events'
 export * from './systems/async-task'
 
-export * from './components/generated/global.gen'
-export * from './components/generated/global.namespace.gen'
-
-export * from './components/types'
 export * from './engine/entity'
 
-export * from './components/generated/index.gen'
+import * as components from './components'
+export { components }
+
+import { engine } from './runtime/initialization'
+
+// export components for global engine
+/*#__PURE__*/ export const Transform = components.Transform(engine)
+// export components for global engine
+export * from './components/generated/global.gen'
+
 export * from './components/generated/types.gen'

@@ -1,9 +1,9 @@
-import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, components } from '../../../packages/@dcl/ecs/src'
 
 describe('Generated NftShape ProtoBuf', () => {
   it('should serialize/deserialize NftShape', () => {
     const newEngine = Engine()
-    const { NftShape } = newEngine.baseComponents
+    const NftShape = components.NftShape(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

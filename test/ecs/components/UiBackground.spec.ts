@@ -1,9 +1,9 @@
-import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, components } from '../../../packages/@dcl/ecs/src'
 
 describe('Generated UiBackground ProtoBuf', () => {
   it('should serialize/deserialize UiBackground', () => {
     const newEngine = Engine()
-    const { UiBackground } = newEngine.baseComponents
+    const UiBackground = components.UiBackground(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

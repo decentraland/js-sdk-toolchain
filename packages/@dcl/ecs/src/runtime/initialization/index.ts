@@ -4,23 +4,22 @@
  */
 
 import { Engine, IEngine } from '../../engine'
-import { Task, taskSystem } from '../../systems/async-task'
-import { EventsSystem } from '../../systems/events'
-import { createInput } from './../../engine/input'
+import { Task, createTaskSystem } from '../../systems/async-task'
+import { createPointerEventSystem } from '../../systems/events'
+import { createInputSystem } from './../../engine/input'
 
+/*#__PURE__*/
 export const engine: IEngine = Engine()
 
 // INPUT Manager
-/**
- * @public
- */
-export const Input = createInput(engine)
+/*#__PURE__*/
+export const inputSystem = createInputSystem(engine)
+/*#__PURE__*/
+export const pointerEventsSystem = createPointerEventSystem(engine, inputSystem)
 
 /**
  * @public
- * Execute async task
  */
-export const executeTask = taskSystem(engine).executeTask
+/*#__PURE__*/
+export const executeTask = createTaskSystem(engine).executeTask
 export type { Task }
-export { EventsSystem }
-engine.addSystem(EventsSystem.update(Input))

@@ -1,5 +1,3 @@
-declare let Promise: any
-
 /**
  * A class serves as a medium between the observable and its observers
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed
@@ -403,9 +401,9 @@ export class Observable<T> {
   private _deferUnregister(observer: Observer<T>): void {
     observer.unregisterOnNextCall = false
     observer._willBeUnregistered = true
-    Promise.resolve().then.bind(Promise.resolve())(async () =>
-      this._remove(observer)
-    )
+    Promise.resolve()
+      .then.bind(Promise.resolve())(async () => this._remove(observer))
+      .catch(console.error)
   }
 
   // This should only be called when not iterating over _observers to avoid callback skipping.

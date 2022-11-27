@@ -1,15 +1,10 @@
-import { Vector3 } from '../../packages/@dcl/ecs/src'
+import { components, Vector3 } from '../../packages/@dcl/ecs/src'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt/componentOperation'
 import WireMessage from '../../packages/@dcl/ecs/src/serialization/wireMessage'
-import {
-  wait,
-  SandBox,
-  setupDclInterfaceForThisSuite,
-  testingEngineApi
-} from './utils'
+import { wait, SandBox } from './utils'
 
 describe('CRDT tests', () => {
   beforeEach(() => {
@@ -17,15 +12,10 @@ describe('CRDT tests', () => {
     jest.restoreAllMocks()
   })
 
-  const engineApi = testingEngineApi()
-  setupDclInterfaceForThisSuite({
-    ...engineApi.modules
-  })
-
   it('should send static entities', () => {
     const { engine, spySend } = SandBox.create({ length: 1 })[0]
     const entityA = engine.addEntity()
-    const { Transform } = engine.baseComponents
+    const Transform = components.Transform(engine)
     const Test = engine.getComponent(SandBox.Position.id)
 
     // Create two basic components for entity A
@@ -47,7 +37,7 @@ describe('CRDT tests', () => {
   it('Send ONLY dirty components via trasnport and spy on send messages', () => {
     const { engine, spySend } = SandBox.create({ length: 1 })[0]
     const entityA = engine.addDynamicEntity()
-    const { Transform } = engine.baseComponents
+    const Transform = components.Transform(engine)
     const Test = engine.getComponent(SandBox.Position.id)
 
     // Create two basic components for entity A
@@ -79,13 +69,13 @@ describe('CRDT tests', () => {
     const [clientA, clientB] = SandBox.create({ length: 2 })
 
     const entityA = clientA.engine.addDynamicEntity()
-    const { Transform } = clientA.engine.baseComponents
-    const TransformB = clientB.engine.baseComponents.Transform
+    const TransformA = components.Transform(clientA.engine)
+    const TransformB = components.Transform(clientB.engine)
     const PositionA = clientA.components.Position
     const PositionB = clientB.components.Position
 
     // Create two components for a dynamic entity.
-    Transform.create(entityA, SandBox.DEFAULT_POSITION)
+    TransformA.create(entityA, SandBox.DEFAULT_POSITION)
     const posA = PositionA.create(entityA, { x: 10.231231, y: 0.12321321312 })
 
     clientA.engine.update(1 / 30)
@@ -116,7 +106,7 @@ describe('CRDT tests', () => {
       const DoorComponent = engine.getComponent(SandBox.Door.id)
       const entity = engine.addEntity()
 
-      engine.baseComponents.Transform.create(entity, SandBox.DEFAULT_POSITION)
+      components.Transform(engine).create(entity, SandBox.DEFAULT_POSITION)
       PosCompomnent.create(entity, Vector3.Up())
       DoorComponent.create(entity, { open: 1 })
     })
@@ -126,11 +116,11 @@ describe('CRDT tests', () => {
      * If we change a static entity in one scene. It should be send to other peers.
      */
     const [clientA, ...otherClients] = clients
-    const { Transform } = clientA.engine.baseComponents
+    const TransformA = components.Transform(clientA.engine)
     const DoorComponent = clientA.components.Door
     // Upate Transform from static entity
-    const entity = (clientA.engine.addEntity() as any - 1) as Entity
-    Transform.getMutable(entity).position.x = 10
+    const entity = ((clientA.engine.addEntity() as any) - 1) as Entity
+    TransformA.getMutable(entity).position.x = 10
 
     // Create a dynamic entity
     const dynamicEntity = clientA.engine.addDynamicEntity()
@@ -166,16 +156,17 @@ describe('CRDT tests', () => {
   it('should resend a crdt message if its outdated', () => {
     const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
     const entity = engine.addEntity()
-    engine.baseComponents.Transform.create(entity, SandBox.DEFAULT_POSITION)
+    const Transform = components.Transform(engine)
+    Transform.create(entity, SandBox.DEFAULT_POSITION)
     engine.update(1)
-    engine.baseComponents.Transform.getMutable(entity).position.x = 8
+    Transform.getMutable(entity).position.x = 8
     engine.update(1)
     const buffer = createByteBuffer()
     ComponentOperation.write(
       WireMessage.Enum.PUT_COMPONENT,
       entity,
       0,
-      engine.baseComponents.Transform,
+      Transform,
       buffer
     )
     jest.resetAllMocks()
@@ -190,7 +181,7 @@ describe('CRDT tests', () => {
   it('should resend a crdt delete message if its outdated', () => {
     const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
     const entity = engine.addEntity()
-    const { Transform } = engine.baseComponents
+    const Transform = components.Transform(engine)
     Transform.create(entity, SandBox.DEFAULT_POSITION)
     engine.update(1)
     const buffer = createByteBuffer()
@@ -216,7 +207,7 @@ describe('CRDT tests', () => {
     const [{ engine, transports }] = SandBox.create({ length: 1 })
     const [transport] = transports
     const entity = engine.addEntity()
-    const { Transform } = engine.baseComponents
+    const Transform = components.Transform(engine)
 
     Transform.create(entity, SandBox.DEFAULT_POSITION)
     engine.update(1)
@@ -226,7 +217,7 @@ describe('CRDT tests', () => {
       WireMessage.Enum.DELETE_COMPONENT,
       entity,
       2,
-      engine.baseComponents.Transform,
+      Transform,
       buffer
     )
     transport.onmessage!(buffer.toBinary())

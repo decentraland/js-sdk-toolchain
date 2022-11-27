@@ -73,11 +73,8 @@ export const TransformSchema: ISchema<TransformType> = {
   }
 }
 
-export function defineTransformComponent({
-  defineComponentFromSchema
-}: Pick<IEngine, 'defineComponentFromSchema'>): ComponentDefinition<
-  ISchema<TransformType>,
-  Partial<TransformType>
-> {
-  return defineComponentFromSchema(TransformSchema, COMPONENT_ID)
+export function defineTransformComponent(
+  engine: Pick<IEngine, 'defineComponentFromSchema'>
+): ComponentDefinition<ISchema<TransformType>, Partial<TransformType>> {
+  return engine.defineComponentFromSchema(TransformSchema, COMPONENT_ID)
 }

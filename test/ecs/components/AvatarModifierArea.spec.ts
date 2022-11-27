@@ -1,10 +1,13 @@
-﻿import { AvatarModifierType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/avatar_modifier_area.gen'
-import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+﻿import {
+  Engine,
+  components,
+  AvatarModifierType
+} from '../../../packages/@dcl/ecs/src'
 
 describe('Generated Avatar ModifierArea ProtoBuf', () => {
   it('should serialize/deserialize Avatar Modifier Area', () => {
     const newEngine = Engine()
-    const { AvatarModifierArea } = newEngine.baseComponents
+    const AvatarModifierArea = components.AvatarModifierArea(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

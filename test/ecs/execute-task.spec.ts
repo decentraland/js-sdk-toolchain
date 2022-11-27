@@ -1,10 +1,10 @@
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
-import { taskSystem } from '../../packages/@dcl/ecs/src/systems/async-task'
+import { createTaskSystem } from '../../packages/@dcl/ecs/src/systems/async-task'
 
 describe('Execute Task', () => {
   it('should run async tasks in the engine', () => {
     const engine = Engine()
-    const { executeTask } = taskSystem(engine)
+    const { executeTask } = createTaskSystem(engine)
 
     let counter = 0
 
@@ -23,7 +23,7 @@ describe('Execute Task', () => {
   it('should catch the error and log it', async () => {
     const error = jest.spyOn(console, 'error')
     const engine = Engine()
-    const { executeTask } = taskSystem(engine)
+    const { executeTask } = createTaskSystem(engine)
     async function errorFn() {
       throw 'Error bubbles to console'
     }

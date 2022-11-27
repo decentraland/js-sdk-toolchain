@@ -1,20 +1,14 @@
 import { TRANSFORM_LENGTH } from '../../packages/@dcl/ecs/src/components/legacy/Transform'
 import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
-import { Quaternion, Vector3 } from '../../packages/@dcl/ecs/src'
+import { components, Quaternion, Vector3 } from '../../packages/@dcl/ecs/src'
 
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt/componentOperation'
 import WireMessage from '../../packages/@dcl/ecs/src/serialization/wireMessage'
-import { setupDclInterfaceForThisSuite, testingEngineApi } from './utils'
 
 const putType = WireMessage.Enum.PUT_COMPONENT
 
 describe('Component operation tests', () => {
-  const engineApi = testingEngineApi()
-  setupDclInterfaceForThisSuite({
-    ...engineApi.modules
-  })
-
   it('validate corrupt message', () => {
     const buf = createByteBuffer({
       reading: {
@@ -30,13 +24,13 @@ describe('Component operation tests', () => {
 
   it('serialize and process two PutComenentOperation message', () => {
     const newEngine = Engine()
-    const sdk = newEngine.baseComponents
+    const Transform = components.Transform(newEngine)
     const entityA = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 
     let timestamp = 1
 
-    const mutableTransform = sdk.Transform.create(entityA, {
+    const mutableTransform = Transform.create(entityA, {
       position: Vector3.create(1, 1, 1),
       scale: Vector3.create(1, 1, 1),
       rotation: Quaternion.create(1, 1, 1, 1),
@@ -49,14 +43,14 @@ describe('Component operation tests', () => {
       WireMessage.Enum.PUT_COMPONENT,
       entityA,
       timestamp,
-      sdk.Transform,
+      Transform,
       bb
     )
 
     mutableTransform.position.x = 31.3
     timestamp++
 
-    ComponentOperation.write(putType, entityA, timestamp, sdk.Transform, bb)
+    ComponentOperation.write(putType, entityA, timestamp, Transform, bb)
 
     while (WireMessage.validate(bb)) {
       const msgOne = ComponentOperation.read(bb)!
@@ -66,7 +60,7 @@ describe('Component operation tests', () => {
           WireMessage.HEADER_LENGTH
       )
       expect(msgOne.type).toBe(WireMessage.Enum.PUT_COMPONENT)
-      sdk.Transform.upsertFromBinary(entityB, bb)
+      Transform.upsertFromBinary(entityB, bb)
     }
   })
 

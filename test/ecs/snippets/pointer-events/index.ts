@@ -10,7 +10,6 @@ import {
   PointerEventType
 } from '@dcl/ecs'
 
-
 // Cube factory
 function createCube(
   x: number,

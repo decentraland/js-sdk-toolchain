@@ -1,4 +1,4 @@
-import { defineSdkComponents } from '../components'
+import * as components from '../components'
 import { Schemas } from '../schemas'
 import { ISchema } from '../schemas/ISchema'
 import { Result, Spec } from '../schemas/Map'
@@ -12,6 +12,7 @@ import {
 import { Entity, EntityContainer } from './entity'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, SystemFn } from './systems'
 import type { IEngine } from './types'
+export * from './input'
 import { ReadonlyComponentSchema } from './readonly'
 
 export * from './readonly'
@@ -70,8 +71,10 @@ function preEngine() {
     componentId: number,
     constructorDefault?: ConstructorType
   ): ComponentDefinition<T, ConstructorType> {
-    if (componentsDefinition.get(componentId)) {
-      throw new Error(`Component ${componentId} already declared`)
+    const prev = componentsDefinition.get(componentId)
+    if (prev) {
+      // TODO: assert spec === prev.spec
+      return prev
     }
     const newComponent = defComponent<T, ConstructorType>(
       componentId,
@@ -173,7 +176,6 @@ function preEngine() {
 export function Engine(): IEngine {
   const engine = preEngine()
   const crdtSystem = crdtSceneSystem(engine)
-  const baseComponents = defineSdkComponents(engine)
 
   function update(dt: number) {
     crdtSystem.receiveMessages()
@@ -210,6 +212,8 @@ export function Engine(): IEngine {
     }
   }
 
+  const Transform = components.Transform(engine)
+
   function* getTreeEntityArray(
     firstEntity: Entity,
     proccesedEntities: Entity[]
@@ -218,9 +222,7 @@ export function Engine(): IEngine {
     if (proccesedEntities.find((value) => firstEntity === value)) return
     proccesedEntities.push(firstEntity)
 
-    for (const [entity, value] of engine.getEntitiesWith(
-      baseComponents.Transform
-    )) {
+    for (const [entity, value] of engine.getEntitiesWith(Transform)) {
       if (value.parent === firstEntity) {
         yield* getTreeEntityArray(entity, proccesedEntities)
       }
@@ -252,7 +254,6 @@ export function Engine(): IEngine {
     RootEntity: 0 as Entity,
     PlayerEntity: 1 as Entity,
     CameraEntity: 2 as Entity,
-    baseComponents,
     entityExists: engine.entityExists,
     addTransport: crdtSystem.addTransport
   }

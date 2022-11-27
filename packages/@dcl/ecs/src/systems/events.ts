@@ -1,29 +1,43 @@
 import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
 import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
-import { IInput } from '../engine'
+import * as components from '../components'
+import { IEngine } from '../engine/types'
 import { Entity } from '../engine/entity'
-import { engine } from '../runtime/initialization'
+import { IInputSystem } from '../engine/input'
 import { checkNotThenable } from '../runtime/invariant'
 
-export type EventsSystem = typeof EventsSystem
-export namespace EventsSystem {
-  export type Callback = (event: PBPointerEventsResult_PointerCommand) => void
+export type EventSystemCallback = (
+  event: PBPointerEventsResult_PointerCommand
+) => void
 
-  export type Options = {
-    button?: InputAction
-    hoverText?: string
-    maxDistance?: number
-  }
+export type EventSystemOptions = {
+  button?: InputAction
+  hoverText?: string
+  maxDistance?: number
+}
+
+export type PointerEventsSystem = ReturnType<typeof createPointerEventSystem>
+
+export function createPointerEventSystem(
+  engine: IEngine,
+  inputSystem: IInputSystem
+) {
+  const PointerHoverFeedback = components.PointerHoverFeedback(engine)
 
   enum EventType {
     Click,
     Down,
     Up
   }
-  type EventMapType = Map<EventType, { cb: Callback; opts: Required<Options> }>
+  type EventMapType = Map<
+    EventType,
+    { cb: EventSystemCallback; opts: Required<EventSystemOptions> }
+  >
 
-  const getDefaultOpts = (opts: Options = {}): Required<Options> => ({
+  const getDefaultOpts = (
+    opts: EventSystemOptions = {}
+  ): Required<EventSystemOptions> => ({
     button: InputAction.IA_ANY,
     hoverText: 'Interact',
     maxDistance: 100,
@@ -41,9 +55,8 @@ export namespace EventsSystem {
   function setHoverFeedback(
     entity: Entity,
     type: PointerEventType,
-    opts: Options
+    opts: EventSystemOptions
   ) {
-    const { PointerHoverFeedback } = engine.baseComponents
     if (opts.hoverText) {
       const pointerEvent =
         PointerHoverFeedback.getMutableOrNull(entity) ||
@@ -66,7 +79,6 @@ export namespace EventsSystem {
     type: PointerEventType,
     button: InputAction
   ) {
-    const { PointerHoverFeedback } = engine.baseComponents
     const pointerEvent = PointerHoverFeedback.getMutableOrNull(entity)
     if (!pointerEvent) return
     pointerEvent.pointerEvents = pointerEvent.pointerEvents.filter(
@@ -97,112 +109,124 @@ export namespace EventsSystem {
     event.delete(type)
   }
 
-  /**
-   * @internal
-   * Remove the callback for onClick event
-   * @param entity Entity where the callback was attached
-   */
-  export function removeOnClick(entity: Entity) {
-    removeEvent(entity, EventType.Click)
-  }
-
-  /**
-   * @public
-   * Remove the callback for onPointerDown event
-   * @param entity Entity where the callback was attached
-   */
-  export function removeOnPointerDown(entity: Entity) {
-    removeEvent(entity, EventType.Down)
-  }
-
-  /**
-   * @public
-   * Remove the callback for onPointerUp event
-   * @param entity Entity where the callback was attached
-   */
-  export function removeOnPointerUp(entity: Entity) {
-    removeEvent(entity, EventType.Up)
-  }
-
-  /**
-   * @internal
-   * Execute callback when the user clicks the entity.
-   * @param entity Entity to attach the callback
-   * @param cb Function to execute when onPointerDown fires
-   * @param opts Opts to trigger Feedback and Button
-   */
-  export function onClick(entity: Entity, cb: Callback, opts?: Options) {
-    const options = getDefaultOpts(opts)
-    // Clear previous event with over feedback included
-    removeEvent(entity, EventType.Click)
-
-    // Set new event
-    getEvent(entity).set(EventType.Click, { cb, opts: options })
-    setHoverFeedback(entity, PointerEventType.PET_DOWN, options)
-  }
-
-  /**
-   * @public
-   * Execute callback when the user press the InputButton pointing at the entity
-   * @param entity Entity to attach the callback
-   * @param cb Function to execute when click fires
-   * @param opts Opts to trigger Feedback and Button
-   */
-  export function onPointerDown(entity: Entity, cb: Callback, opts?: Options) {
-    const options = getDefaultOpts(opts)
-    removeEvent(entity, EventType.Down)
-    getEvent(entity).set(EventType.Down, { cb, opts: options })
-    setHoverFeedback(entity, PointerEventType.PET_DOWN, options)
-  }
-
-  /**
-   * @public
-   * Execute callback when the user releases the InputButton pointing at the entity
-   * @param entity Entity to attach the callback
-   * @param cb Function to execute when click fires
-   * @param opts Opts to trigger Feedback and Button
-   */
-  export function onPointerUp(entity: Entity, cb: Callback, opts?: Options) {
-    const options = getDefaultOpts(opts)
-    removeEvent(entity, EventType.Up)
-    getEvent(entity).set(EventType.Up, { cb, opts: options })
-    setHoverFeedback(entity, PointerEventType.PET_UP, options)
-  }
-
   // @internal
-  export function update(Input: IInput) {
-    return function () {
-      for (const [entity, event] of eventsMap) {
-        if (!engine.entityExists(entity)) {
-          eventsMap.delete(entity)
-          continue
+  engine.addSystem(function EventSystem() {
+    for (const [entity, event] of eventsMap) {
+      if (!engine.entityExists(entity)) {
+        eventsMap.delete(entity)
+        continue
+      }
+
+      for (const [eventType, { cb, opts }] of event) {
+        if (eventType === EventType.Click) {
+          const command = inputSystem.getClick(opts.button, entity)
+          if (command)
+            checkNotThenable(
+              cb(command.up),
+              'Click event returned a thenable. Only synchronous functions are allowed'
+            )
         }
 
-        for (const [eventType, { cb, opts }] of event) {
-          if (eventType === EventType.Click) {
-            const command = Input.getClick(opts.button, entity)
-            if (command)
-              checkNotThenable(
-                cb(command.up),
-                'Click event returned a thenable. Only synchronous functions are allowed'
-              )
-          }
-
-          if (eventType === EventType.Down || eventType === EventType.Up) {
-            const command = Input.getInputCommand(
-              opts.button,
-              getPointerEvent(eventType),
-              entity
+        if (eventType === EventType.Down || eventType === EventType.Up) {
+          const command = inputSystem.getInputCommand(
+            opts.button,
+            getPointerEvent(eventType),
+            entity
+          )
+          if (command) {
+            checkNotThenable(
+              cb(command),
+              'Event handler returned a thenable. Only synchronous functions are allowed'
             )
-            if (command) {
-              checkNotThenable(
-                cb(command),
-                'Event handler returned a thenable. Only synchronous functions are allowed'
-              )
-            }
           }
         }
       }
+    }
+  })
+
+  return {
+    /**
+     * @internal
+     * Remove the callback for onClick event
+     * @param entity Entity where the callback was attached
+     */
+    removeOnClick(entity: Entity) {
+      removeEvent(entity, EventType.Click)
+    },
+
+    /**
+     * @public
+     * Remove the callback for onPointerDown event
+     * @param entity Entity where the callback was attached
+     */
+    removeOnPointerDown(entity: Entity) {
+      removeEvent(entity, EventType.Down)
+    },
+
+    /**
+     * @public
+     * Remove the callback for onPointerUp event
+     * @param entity Entity where the callback was attached
+     */
+    removeOnPointerUp(entity: Entity) {
+      removeEvent(entity, EventType.Up)
+    },
+
+    /**
+     * @internal
+     * Execute callback when the user clicks the entity.
+     * @param entity Entity to attach the callback
+     * @param cb Function to execute when onPointerDown fires
+     * @param opts Opts to trigger Feedback and Button
+     */
+    onClick(
+      entity: Entity,
+      cb: EventSystemCallback,
+      opts?: EventSystemOptions
+    ) {
+      const options = getDefaultOpts(opts)
+      // Clear previous event with over feedback included
+      removeEvent(entity, EventType.Click)
+
+      // Set new event
+      getEvent(entity).set(EventType.Click, { cb, opts: options })
+      setHoverFeedback(entity, PointerEventType.PET_DOWN, options)
+    },
+
+    /**
+     * @public
+     * Execute callback when the user press the InputButton pointing at the entity
+     * @param entity Entity to attach the callback
+     * @param cb Function to execute when click fires
+     * @param opts Opts to trigger Feedback and Button
+     */
+    onPointerDown(
+      entity: Entity,
+      cb: EventSystemCallback,
+      opts?: EventSystemOptions
+    ) {
+      const options = getDefaultOpts(opts)
+      removeEvent(entity, EventType.Down)
+      getEvent(entity).set(EventType.Down, { cb, opts: options })
+      setHoverFeedback(entity, PointerEventType.PET_DOWN, options)
+    },
+
+    /**
+     * @public
+     * Execute callback when the user releases the InputButton pointing at the entity
+     * @param entity Entity to attach the callback
+     * @param cb Function to execute when click fires
+     * @param opts Opts to trigger Feedback and Button
+     */
+    onPointerUp(
+      entity: Entity,
+      cb: EventSystemCallback,
+      opts?: EventSystemOptions
+    ) {
+      const options = getDefaultOpts(opts)
+      removeEvent(entity, EventType.Up)
+      getEvent(entity).set(EventType.Up, { cb, opts: options })
+      setHoverFeedback(entity, PointerEventType.PET_UP, options)
     }
   }
 }

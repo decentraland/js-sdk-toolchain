@@ -1,13 +1,13 @@
 import {
   engine,
   Entity,
-  EventsSystem,
   InputAction,
   MeshCollider,
   MeshRenderer,
   Transform,
   Quaternion,
-  Vector3
+  Vector3,
+  pointerEventsSystem
 } from '@dcl/ecs'
 export * from '@dcl/sdk'
 
@@ -40,7 +40,7 @@ function circularSystem(dt: number) {
 // Init
 const initEntity = createCube(8, 1, 8)
 
-EventsSystem.onPointerDown(
+pointerEventsSystem.onPointerDown(
   initEntity,
   function (event) {
     console.log('Button: ' + event.button)

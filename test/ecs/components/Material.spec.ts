@@ -1,14 +1,13 @@
 import {
+  Engine,
+  components,
+  TextureFilterMode,
+  TextureWrapMode,
   MaterialTransparencyMode,
   PBMaterial,
   PBMaterial_PbrMaterial,
   PBMaterial_UnlitMaterial
-} from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/material.gen'
-import {
-  TextureFilterMode,
-  TextureWrapMode
-} from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/common/texture.gen'
-import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+} from '../../../packages/@dcl/ecs/src'
 
 function createPbrMaterial(pbr: PBMaterial_PbrMaterial): PBMaterial {
   return {
@@ -31,7 +30,7 @@ function createUnlitMaterial(unlit: PBMaterial_UnlitMaterial): PBMaterial {
 describe('Generated Material ProtoBuf', () => {
   it('should serialize/deserialize Material', () => {
     const newEngine = Engine()
-    const { Material } = newEngine.baseComponents
+    const Material = components.Material(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
     const entityC = newEngine.addEntity()
@@ -179,7 +178,7 @@ describe('Generated Material ProtoBuf', () => {
 
   it('should test all helper cases', () => {
     const newEngine = Engine()
-    const { Material } = newEngine.baseComponents
+    const Material = components.Material(newEngine)
     const entity = newEngine.addEntity()
 
     expect(Material.getOrNull(entity)).toBeNull()

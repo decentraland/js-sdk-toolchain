@@ -1,3 +1,4 @@
+import * as components from '../components'
 import { IEngine } from '../engine/types'
 
 /**
@@ -16,14 +17,13 @@ import { IEngine } from '../engine/types'
  * @returns a system
  */
 export function cyclicParentingChecker(engine: IEngine) {
-  const Transform = engine.baseComponents.Transform
+  const Transform = components.Transform(engine)
   return () => {
     for (const entity of Transform.dirtyIterator()) {
       let transform = Transform.getOrNull(entity)
       while (transform && transform.parent) {
         if (transform.parent === entity) {
-          throw new Error(`There is a cyclic parent with entity ${entity}`)
-          // TODO: error(`There is a cyclic parent with entity ${entity}`)
+          console.error(`There is a cyclic parent with entity ${entity}`)
           break
         } else {
           transform = Transform.getOrNull(transform.parent)

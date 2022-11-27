@@ -1,24 +1,20 @@
-import { Engine, Entity } from '../../../packages/@dcl/ecs/src/engine'
 import {
+  Engine,
+  Entity,
+  components,
   Quaternion,
   Vector3
 } from '../../../packages/@dcl/ecs/src'
 import { TRANSFORM_LENGTH } from '../../../packages/@dcl/ecs/src/components/legacy/Transform'
-import { setupDclInterfaceForThisSuite, testingEngineApi } from '../utils'
 
 describe('Transform component', () => {
-  const engineApi = testingEngineApi()
-  setupDclInterfaceForThisSuite({
-    ...engineApi.modules
-  })
-
   it('should transform length 44 bytes ', () => {
     expect(TRANSFORM_LENGTH).toBe(44)
   })
 
   it('should serialize Transform with 44 bytes', () => {
     const newEngine = Engine()
-    const { Transform } = newEngine.baseComponents
+    const Transform = components.Transform(newEngine)
     const entity = newEngine.addEntity()
 
     Transform.create(entity, {
@@ -39,7 +35,7 @@ describe('Transform component', () => {
 
   it('should serialize/deserialize Transform', () => {
     const newEngine = Engine()
-    const { Transform } = newEngine.baseComponents
+    const Transform = components.Transform(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 
@@ -65,7 +61,7 @@ describe('Transform component', () => {
 
   it('should serialize/deserialize Transform without parent', () => {
     const newEngine = Engine()
-    const { Transform } = newEngine.baseComponents
+    const Transform = components.Transform(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 
@@ -92,7 +88,7 @@ describe('Transform component', () => {
 
   it('should create a valid empty transform component if no value argument is passed', () => {
     const newEngine = Engine()
-    const { Transform } = newEngine.baseComponents
+    const Transform = components.Transform(newEngine)
     const entity = newEngine.addEntity()
 
     const t1 = Transform.create(entity)
@@ -106,7 +102,7 @@ describe('Transform component', () => {
 
   it('should create a valid empty transform component if no value argument is passed in getOrCreate', () => {
     const newEngine = Engine()
-    const { Transform } = newEngine.baseComponents
+    const Transform = components.Transform(newEngine)
     const entity = newEngine.addEntity()
 
     Transform.create(entity, {

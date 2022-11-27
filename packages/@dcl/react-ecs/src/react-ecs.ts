@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
+import { EventSystemCallback } from '@dcl/ecs'
 import React from 'react'
-import {
-  UiTextProps,
-  PBUiTransform,
-  UiBackgroundProps,
-  OnClick
-} from './components'
+import { UiTextProps, PBUiTransform, UiBackgroundProps } from './components'
 import { CommonProps } from './components/types'
 
 export type EcsElements = {
@@ -18,7 +14,7 @@ export type EntityComponents = {
   uiTransform: PBUiTransform
   uiText: UiTextProps
   uiBackground: UiBackgroundProps
-  onClick: OnClick
+  onClick: EventSystemCallback
 }
 
 export namespace JSX {

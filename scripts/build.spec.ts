@@ -22,7 +22,6 @@ import {
   runCommand
 } from './helpers'
 import { compileEcsComponents } from './protocol-buffer-generation'
-
 import { createProtoTypes } from './protocol-buffer-generation/generateProtocolTypes'
 import { compileProtoApi } from './rpc-api-generation'
 import { getSnippetsfile } from './utils/getFilePathsSync'

@@ -8,53 +8,6 @@ export function wait(ms: number) {
   return new Promise<void>((resolve) => setTimeout(() => resolve(), ms))
 }
 
-export function testingEngineApi() {
-  const sentMessages: Uint8Array[] = []
-  const messagesFromRenderer: Uint8Array[] = []
-  const modules = {
-    '~system/EngineApi': {
-      async crdtSendToRenderer(arg: { data: Uint8Array }) {
-        sentMessages.push(arg.data)
-      },
-      async crdtGetMessageFromRenderer() {
-        const ret = messagesFromRenderer.slice(0)
-        messagesFromRenderer.length = 0
-        return ret
-      }
-    }
-  }
-  return { modules, sentMessages, messagesFromRenderer }
-}
-
-require.extensions
-
-export function setupDclInterfaceForThisSuite(
-  modules: Record<string, Record<string, (arg: any) => Promise<any>>> = {}
-) {
-  const updateFns: Array<(dt: number) => Promise<void>> = []
-  const eventFns: Array<(any: any) => void> = []
-  const startFns: Array<() => void> = []
-  const subscribeEvents: Set<string> = new Set()
-
-  beforeAll(() => {
-    updateFns.length = 0
-    eventFns.length = 0
-    startFns.length = 0
-    globalThis.require = function (moduleName: string) {
-      if (moduleName in modules) return modules[moduleName]
-      throw new Error(`Module ${moduleName} not found`)
-    } as any
-  })
-
-  async function tick(dt: number) {
-    for (const fn of updateFns) {
-      await fn(dt)
-    }
-  }
-
-  return { eventFns, updateFns, startFns, tick, subscribeEvents }
-}
-
 export namespace SandBox {
   export const WS_SEND_DELAY = 30
   export const Position = {

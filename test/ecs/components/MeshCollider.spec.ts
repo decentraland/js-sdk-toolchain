@@ -1,13 +1,14 @@
+import { PBMeshCollider } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/mesh_collider.gen'
 import {
-  ColliderLayer,
-  PBMeshCollider
-} from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/mesh_collider.gen'
-import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+  Engine,
+  components,
+  ColliderLayer
+} from '../../../packages/@dcl/ecs/src'
 
 describe('Generated MeshCollider ProtoBuf', () => {
   it('should serialize/deserialize MeshCollider', () => {
     const newEngine = Engine()
-    const { MeshCollider } = newEngine.baseComponents
+    const MeshCollider = components.MeshCollider(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 
@@ -48,7 +49,7 @@ describe('Generated MeshCollider ProtoBuf', () => {
   it('should helper creates box MeshCollider', () => {
     const newEngine = Engine()
     const entity = newEngine.addEntity()
-    const { MeshCollider } = newEngine.baseComponents
+    const MeshCollider = components.MeshCollider(newEngine)
 
     expect(MeshCollider.getOrNull(entity)).toBe(null)
     MeshCollider.setBox(entity)
@@ -59,7 +60,7 @@ describe('Generated MeshCollider ProtoBuf', () => {
   it('should helper test all datas', () => {
     const newEngine = Engine()
     const entity = newEngine.addEntity()
-    const { MeshCollider } = newEngine.baseComponents
+    const MeshCollider = components.MeshCollider(newEngine)
 
     MeshCollider.setBox(entity, ColliderLayer.CL_PHYSICS)
     expect(MeshCollider.get(entity)).toStrictEqual({

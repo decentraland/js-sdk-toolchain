@@ -13,3 +13,4 @@ packages/@dcl/dcl-rollup/*.d.ts
 test/sdk/simple-scene
 **/bin/game.js
 **/bin/game.js.map
+test/ecs/snippets/ui/index.js

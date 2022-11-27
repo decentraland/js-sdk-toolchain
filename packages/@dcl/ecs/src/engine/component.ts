@@ -247,9 +247,7 @@ export function defineComponent<
       dirtyIterator.add(entity)
       return component || null
     },
-    getOrNull(
-      entity: Entity
-    ): DeepReadonly<ComponentType<T>> | null {
+    getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null {
       const component = data.get(entity)
       return component ? deepReadonly(component) : null
     },
@@ -262,10 +260,7 @@ export function defineComponent<
       }
       return deepReadonly(component)
     },
-    create(
-      entity: Entity,
-      value?: ConstructorType
-    ): ComponentType<T> {
+    create(entity: Entity, value?: ConstructorType): ComponentType<T> {
       const component = data.get(entity)
       if (component) {
         throw new Error(
@@ -278,10 +273,7 @@ export function defineComponent<
       dirtyIterator.add(entity)
       return usedValue
     },
-    createOrReplace(
-      entity: Entity,
-      value?: ConstructorType
-    ): ComponentType<T> {
+    createOrReplace(entity: Entity, value?: ConstructorType): ComponentType<T> {
       const usedValue =
         value === undefined ? getDefaultValue() : prefillValue(value)
       data.set(entity, usedValue!)

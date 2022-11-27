@@ -1,10 +1,10 @@
 import { ComponentDefinition, Entity, IEngine, ISchema } from '../../engine'
 import {
+  Material,
   PBMaterial,
   PBMaterial_PbrMaterial,
   PBMaterial_UnlitMaterial
 } from '../generated/index.gen'
-import * as MaterialSchema from '../generated/Material.gen'
 import { AvatarTexture, Texture, TextureUnion } from '../generated/types.gen'
 
 /**
@@ -75,17 +75,15 @@ const TextureHelper: TextureHelper = {
 }
 
 export function defineMaterialComponent(
-  engine: Pick<IEngine, 'getComponent'>
+  engine: Pick<IEngine, 'defineComponentFromSchema'>
 ): MaterialComponentDefinitionExtended {
-  const Material = engine.getComponent<typeof MaterialSchema.MaterialSchema>(
-    MaterialSchema.COMPONENT_ID
-  )
+  const theComponent = Material(engine)
 
   return {
-    ...Material,
+    ...theComponent,
     Texture: TextureHelper,
     setBasicMaterial(entity: Entity, material: PBMaterial_UnlitMaterial) {
-      Material.createOrReplace(entity, {
+      theComponent.createOrReplace(entity, {
         material: {
           $case: 'unlit',
           unlit: material
@@ -93,7 +91,7 @@ export function defineMaterialComponent(
       })
     },
     setPbrMaterial(entity: Entity, material: PBMaterial_PbrMaterial) {
-      Material.createOrReplace(entity, {
+      theComponent.createOrReplace(entity, {
         material: {
           $case: 'pbr',
           pbr: material

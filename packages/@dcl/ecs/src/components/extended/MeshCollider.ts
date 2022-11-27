@@ -1,6 +1,9 @@
 import { ComponentDefinition, Entity, IEngine, ISchema } from '../../engine'
-import { ColliderLayer, PBMeshCollider } from '../generated/index.gen'
-import * as MeshColliderSchema from './../generated/MeshCollider.gen'
+import {
+  ColliderLayer,
+  PBMeshCollider,
+  MeshCollider
+} from '../generated/index.gen'
 
 /**
  * @public
@@ -62,11 +65,9 @@ export interface MeshColliderComponentDefinitionExtended
 }
 
 export function defineMeshColliderComponent(
-  engine: Pick<IEngine, 'getComponent'>
+  engine: Pick<IEngine, 'defineComponentFromSchema'>
 ): MeshColliderComponentDefinitionExtended {
-  const MeshCollider = engine.getComponent<
-    typeof MeshColliderSchema.MeshColliderSchema
-  >(MeshColliderSchema.COMPONENT_ID)
+  const theComponent = MeshCollider(engine)
 
   function getCollisionMask(layers?: ColliderLayer | ColliderLayer[]) {
     if (Array.isArray(layers)) {
@@ -79,12 +80,12 @@ export function defineMeshColliderComponent(
   }
 
   return {
-    ...MeshCollider,
+    ...theComponent,
     setBox(
       entity: Entity,
       colliderLayers?: ColliderLayer | ColliderLayer[]
     ): void {
-      MeshCollider.createOrReplace(entity, {
+      theComponent.createOrReplace(entity, {
         mesh: { $case: 'box', box: {} },
         collisionMask: getCollisionMask(colliderLayers)
       })
@@ -93,7 +94,7 @@ export function defineMeshColliderComponent(
       entity: Entity,
       colliderLayers?: ColliderLayer | ColliderLayer[]
     ): void {
-      MeshCollider.createOrReplace(entity, {
+      theComponent.createOrReplace(entity, {
         mesh: { $case: 'plane', plane: {} },
         collisionMask: getCollisionMask(colliderLayers)
       })
@@ -104,7 +105,7 @@ export function defineMeshColliderComponent(
       radiusTop?: number,
       colliderLayers?: ColliderLayer | ColliderLayer[]
     ): void {
-      MeshCollider.createOrReplace(entity, {
+      theComponent.createOrReplace(entity, {
         mesh: { $case: 'cylinder', cylinder: { radiusBottom, radiusTop } },
         collisionMask: getCollisionMask(colliderLayers)
       })
@@ -113,7 +114,7 @@ export function defineMeshColliderComponent(
       entity: Entity,
       colliderLayers?: ColliderLayer | ColliderLayer[]
     ): void {
-      MeshCollider.createOrReplace(entity, {
+      theComponent.createOrReplace(entity, {
         mesh: { $case: 'sphere', sphere: {} },
         collisionMask: getCollisionMask(colliderLayers)
       })

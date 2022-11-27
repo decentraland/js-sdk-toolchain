@@ -1,10 +1,10 @@
 import { Observer } from './temp-fp/Observable'
-import * as communicationsController from '~system/CommunicationsController'
 import { IEvents, onCommsMessage } from './observables'
+import * as communicationsController from '~system/CommunicationsController'
 
 /**
  * @public
- * @deprecated
+ * @deprecated this will only exist for a few releases in ECS7
  */
 export class MessageBus {
   private messageQueue: string[] = []

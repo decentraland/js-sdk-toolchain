@@ -6,8 +6,7 @@ import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/Byte
 import { createRendererTransport } from '../../packages/@dcl/sdk/src/transports/rendererTransport'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { TransformSchema } from '../../packages/@dcl/ecs/src/components/legacy/Transform'
-import { Vector3 } from '../../packages/@dcl/ecs/src'
-import { setupDclInterfaceForThisSuite, testingEngineApi } from './utils'
+import { components, Vector3 } from '../../packages/@dcl/ecs/src'
 
 const PositionSchema = {
   x: Schemas.Float
@@ -18,11 +17,6 @@ const VelocitySchema = {
 }
 
 describe('Engine tests', () => {
-  const engineApi = testingEngineApi()
-  setupDclInterfaceForThisSuite({
-    ...engineApi.modules
-  })
-
   it('generates new entities', () => {
     const engine = Engine()
     const entityA = engine.addEntity()
@@ -204,12 +198,14 @@ describe('Engine tests', () => {
     expect(Velocity.getOrNull(entity)).toBe(null)
   })
 
-  it('should throw an error if the component class id already exists', () => {
+  it.skip('should throw an error if the component class id already exists and the component definition is different', () => {})
+
+  it('should return exactly the same component trying to re-define it', () => {
     const engine = Engine()
     const COMPONENT_ID = 888
-    engine.defineComponent(PositionSchema, COMPONENT_ID)
-    const Velocity = () => engine.defineComponent(VelocitySchema, COMPONENT_ID)
-    expect(Velocity).toThrowError()
+    const a = engine.defineComponent(PositionSchema, COMPONENT_ID)
+    const b = engine.defineComponent(PositionSchema, COMPONENT_ID)
+    expect(a).toStrictEqual(b)
   })
 
   it('should return mutable obj if use component.getMutable()', () => {
@@ -356,28 +352,29 @@ describe('Engine tests', () => {
 
   it('should return isDirty if we mutate the component', () => {
     const engine = Engine()
+    const MeshRenderer = components.MeshRenderer(engine)
     const entityA = engine.addEntity()
-    engine.baseComponents.MeshRenderer.create(entityA, {
+    MeshRenderer.create(entityA, {
       mesh: { $case: 'box', box: { uvs: [] } }
     })
-    expect(engine.baseComponents.MeshRenderer.isDirty(entityA)).toBe(true)
+    expect(MeshRenderer.isDirty(entityA)).toBe(true)
     engine.update(1)
-    expect(engine.baseComponents.MeshRenderer.isDirty(entityA)).toBe(false)
-    engine.baseComponents.MeshRenderer.getMutable(entityA)
-    expect(engine.baseComponents.MeshRenderer.isDirty(entityA)).toBe(true)
+    expect(MeshRenderer.isDirty(entityA)).toBe(false)
+    MeshRenderer.getMutable(entityA)
+    expect(MeshRenderer.isDirty(entityA)).toBe(true)
   })
 
   it('should fail to write to byte buffer if the entity not exists', () => {
     const engine = Engine()
+    const MeshRenderer = components.MeshRenderer(engine)
     const entityA = engine.addEntity()
     const buf = createByteBuffer()
-    expect(() =>
-      engine.baseComponents.MeshRenderer.writeToByteBuffer(entityA, buf)
-    ).toThrowError('')
+    expect(() => MeshRenderer.writeToByteBuffer(entityA, buf)).toThrowError('')
   })
 
   it('should remove component when using deleteFrom', () => {
     const engine = Engine()
+    const Transform = components.Transform(engine)
     const MoveTransportData = {
       duration: Schemas.Float,
       speed: Schemas.Float
@@ -396,8 +393,7 @@ describe('Engine tests', () => {
       )) {
         const move = MoveTransformComponent.getMutable(entity)
         move.speed += 1
-        engine.baseComponents.Transform.getMutable(entity).position =
-          Vector3.Zero()
+        Transform.getMutable(entity).position = Vector3.Zero()
         if (moves === 2) {
           MoveTransformComponent.deleteFrom(entity)
         }
@@ -409,7 +405,7 @@ describe('Engine tests', () => {
       speed: 1
     })
 
-    engine.baseComponents.Transform.create(zombie, {
+    Transform.create(zombie, {
       position: { x: 12, y: 1, z: 3 },
       scale: { x: 1, y: 1, z: 1 },
       rotation: { x: 0, y: 0, z: 0, w: 1 }
@@ -432,11 +428,12 @@ describe('Engine tests', () => {
 
   it('should remove Transform component and send it throught the network', () => {
     const engine = Engine()
-    engine.addTransport(createRendererTransport())
+    const crdtSendToRenderer = jest.fn()
+    engine.addTransport(createRendererTransport({ crdtSendToRenderer }))
     const entity = engine.addEntity()
 
     let moves = 0
-    const { Transform } = engine.baseComponents
+    const Transform = components.Transform(engine)
 
     function moveSystem(_dt: number) {
       moves++
@@ -465,6 +462,7 @@ describe('Engine tests', () => {
     expect(Transform.get(entity).position.x).toStrictEqual(13)
     engine.update(1)
     expect(Transform.getOrNull(entity)).toStrictEqual(null)
+    // TODO: assert crdtSendToRenderer called
   })
 
   it('should run in the order', () => {
@@ -523,18 +521,16 @@ describe('Engine tests', () => {
 
   it('should not remove the component after the update', () => {
     const engine = Engine()
-    engine.baseComponents.PointerEventsResult.create(engine.RootEntity)
+    const PointerEventsResult = components.PointerEventsResult(engine)
+    PointerEventsResult.create(engine.RootEntity)
     engine.update(1 / 30)
-    expect(
-      engine.baseComponents.PointerEventsResult.has(engine.RootEntity)
-    ).toBe(true)
+    expect(PointerEventsResult.has(engine.RootEntity)).toBe(true)
   })
 
   it('should return the default component of the transform', () => {
     const engine = Engine()
-    expect(TransformSchema.create()).toBeDeepCloseTo(
-      engine.baseComponents.Transform.default()
-    )
+    const Transform = components.Transform(engine)
+    expect(TransformSchema.create()).toBeDeepCloseTo(Transform.default())
   })
 
   it('should log the error of cyclic parenting', () => {
@@ -544,6 +540,7 @@ describe('Engine tests', () => {
       'There is a cyclic parent with entity ' + e
 
     const engine = Engine()
+    const Transform = components.Transform(engine)
     const e0 = engine.addEntity()
     const e1 = engine.addEntity()
     const e2 = engine.addEntity()
@@ -551,20 +548,20 @@ describe('Engine tests', () => {
 
     engine.addSystem(cyclicParentingChecker(engine))
 
-    engine.baseComponents.Transform.create(e0)
-    engine.baseComponents.Transform.create(e1).parent = e0
-    engine.baseComponents.Transform.create(e2).parent = e1
-    engine.baseComponents.Transform.create(e3).parent = e2
+    Transform.create(e0)
+    Transform.create(e1).parent = e0
+    Transform.create(e2).parent = e1
+    Transform.create(e3).parent = e2
     engine.update(1 / 30)
     expect(errorFunc).not.toBeCalled()
 
-    engine.baseComponents.Transform.getMutable(e3).parent = e3
+    Transform.getMutable(e3).parent = e3
     engine.update(1.0 / 30.0)
     expect(errorFunc).toBeCalledWith(errorString(e3))
     errorFunc.mock.calls = []
 
-    engine.baseComponents.Transform.getMutable(e3).parent = e2
-    engine.baseComponents.Transform.getMutable(e0).parent = e3
+    Transform.getMutable(e3).parent = e2
+    Transform.getMutable(e0).parent = e3
     engine.update(1.0 / 30.0)
     expect(errorFunc.mock.calls.length).toBe(2)
     expect(errorFunc).toBeCalledTimes(2)
@@ -574,13 +571,15 @@ describe('Engine tests', () => {
 
   it('should remove all children of a tree', () => {
     const engine = Engine()
+    const Transform = components.Transform(engine)
+    const MeshCollider = components.MeshCollider(engine)
     // Cube factory
     function createCube(parent?: Entity): Entity {
       const meshEntity = engine.addEntity()
-      engine.baseComponents.Transform.create(meshEntity, {
+      Transform.create(meshEntity, {
         parent
       })
-      engine.baseComponents.MeshCollider.create(meshEntity, {
+      MeshCollider.create(meshEntity, {
         mesh: { $case: 'box', box: {} }
       })
       return meshEntity
@@ -594,32 +593,34 @@ describe('Engine tests', () => {
     const e_A1_2 = createCube(e_A1)
     const e_A1_3 = createCube(e_A1)
 
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_3)).not.toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_2)).not.toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_1)).not.toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A2)).not.toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A3)).not.toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A)).not.toBeNull()
+    expect(MeshCollider.getOrNull(e_A1_3)).not.toBeNull()
+    expect(MeshCollider.getOrNull(e_A1_2)).not.toBeNull()
+    expect(MeshCollider.getOrNull(e_A1_1)).not.toBeNull()
+    expect(MeshCollider.getOrNull(e_A2)).not.toBeNull()
+    expect(MeshCollider.getOrNull(e_A3)).not.toBeNull()
+    expect(MeshCollider.getOrNull(e_A)).not.toBeNull()
 
     engine.removeEntityWithChildren(e_A)
 
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_3)).toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_2)).toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_1)).toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A2)).toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A3)).toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A)).toBeNull()
+    expect(MeshCollider.getOrNull(e_A1_3)).toBeNull()
+    expect(MeshCollider.getOrNull(e_A1_2)).toBeNull()
+    expect(MeshCollider.getOrNull(e_A1_1)).toBeNull()
+    expect(MeshCollider.getOrNull(e_A2)).toBeNull()
+    expect(MeshCollider.getOrNull(e_A3)).toBeNull()
+    expect(MeshCollider.getOrNull(e_A)).toBeNull()
   })
 
   it('should remove all children of a tree with recursive parenting', () => {
     const engine = Engine()
+    const Transform = components.Transform(engine)
+    const MeshCollider = components.MeshCollider(engine)
     // Cube factory
     function createCube(parent?: Entity): Entity {
       const meshEntity = engine.addEntity()
-      engine.baseComponents.Transform.create(meshEntity, {
+      Transform.create(meshEntity, {
         parent
       })
-      engine.baseComponents.MeshCollider.create(meshEntity, {
+      MeshCollider.create(meshEntity, {
         mesh: { $case: 'box', box: {} }
       })
       return meshEntity
@@ -634,26 +635,24 @@ describe('Engine tests', () => {
     const e_A1_3 = createCube(e_A1)
 
     const e_recursive = createCube(e_A1)
-    engine.baseComponents.Transform.getMutable(e_A).parent = e_recursive
+    Transform.getMutable(e_A).parent = e_recursive
 
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_3)).not.toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_2)).not.toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_1)).not.toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A2)).not.toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A3)).not.toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A)).not.toBeNull()
-    expect(
-      engine.baseComponents.MeshCollider.getOrNull(e_recursive)
-    ).not.toBeNull()
+    expect(MeshCollider.getOrNull(e_A1_3)).not.toBeNull()
+    expect(MeshCollider.getOrNull(e_A1_2)).not.toBeNull()
+    expect(MeshCollider.getOrNull(e_A1_1)).not.toBeNull()
+    expect(MeshCollider.getOrNull(e_A2)).not.toBeNull()
+    expect(MeshCollider.getOrNull(e_A3)).not.toBeNull()
+    expect(MeshCollider.getOrNull(e_A)).not.toBeNull()
+    expect(MeshCollider.getOrNull(e_recursive)).not.toBeNull()
 
     engine.removeEntityWithChildren(e_A)
 
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_3)).toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_2)).toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A1_1)).toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A2)).toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A3)).toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_A)).toBeNull()
-    expect(engine.baseComponents.MeshCollider.getOrNull(e_recursive)).toBeNull()
+    expect(MeshCollider.getOrNull(e_A1_3)).toBeNull()
+    expect(MeshCollider.getOrNull(e_A1_2)).toBeNull()
+    expect(MeshCollider.getOrNull(e_A1_1)).toBeNull()
+    expect(MeshCollider.getOrNull(e_A2)).toBeNull()
+    expect(MeshCollider.getOrNull(e_A3)).toBeNull()
+    expect(MeshCollider.getOrNull(e_A)).toBeNull()
+    expect(MeshCollider.getOrNull(e_recursive)).toBeNull()
   })
 })

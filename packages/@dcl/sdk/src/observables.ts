@@ -1,6 +1,10 @@
 import { Observable } from './temp-fp/Observable'
-import { subscribe, sendBatch } from '~system/EngineApi'
 import { QuaternionType, Vector3Type } from '@dcl/ecs'
+import { ManyEntityAction, SendBatchResponse } from '~system/EngineApi'
+
+let subscribeFunction: (event: {
+  eventId: string
+}) => Promise<any> = async () => {}
 
 /** @public */
 export type InputEventResult = {
@@ -387,7 +391,7 @@ export interface IEvents {
  */
 function createSubscriber(eventName: string) {
   return () => {
-    subscribe({ eventId: eventName }).catch(console.error)
+    subscribeFunction({ eventId: eventName }).catch(console.error)
   }
 }
 
@@ -494,10 +498,21 @@ export const onCommsMessage = new Observable<IEvents['comms']>(
 
 /**
  * @internal
+ */
+export function setSubscribeFunction(
+  fn: (event: { eventId: string }) => Promise<any>
+) {
+  subscribeFunction = fn
+}
+
+/**
+ * @internal
  * @deprecated this is an OLD API.
  * This function uses the SDK6 sendBatch to poll events from the renderer
  */
-export async function pollEvents() {
+export async function pollEvents(
+  sendBatch: (body: ManyEntityAction) => Promise<SendBatchResponse>
+) {
   const { events } = await sendBatch({ actions: [] })
   for (const e of events) {
     if (e.generic) {
@@ -507,56 +522,56 @@ export async function pollEvents() {
           onEnterSceneObservable.notifyObservers(
             data as IEvents['onEnterScene']
           )
-          return
+          break
         }
         case 'onLeaveScene': {
           onLeaveSceneObservable.notifyObservers(
             data as IEvents['onLeaveScene']
           )
-          return
+          break
         }
         case 'sceneStart': {
           onSceneReadyObservable.notifyObservers(data as IEvents['sceneStart'])
-          return
+          break
         }
         case 'playerExpression': {
           onPlayerExpressionObservable.notifyObservers(
             data as IEvents['playerExpression']
           )
-          return
+          break
         }
         case 'videoEvent': {
           const videoData = data as IEvents['videoEvent']
           onVideoEvent.notifyObservers(videoData)
-          return
+          break
         }
         case 'profileChanged': {
           onProfileChanged.notifyObservers(data as IEvents['profileChanged'])
-          return
+          break
         }
         case 'playerConnected': {
           onPlayerConnectedObservable.notifyObservers(
             data as IEvents['playerConnected']
           )
-          return
+          break
         }
         case 'playerDisconnected': {
           onPlayerDisconnectedObservable.notifyObservers(
             data as IEvents['playerDisconnected']
           )
-          return
+          break
         }
         case 'onRealmChanged': {
           onRealmChangedObservable.notifyObservers(
             data as IEvents['onRealmChanged']
           )
-          return
+          break
         }
         case 'playerClicked': {
           onPlayerClickedObservable.notifyObservers(
             data as IEvents['playerClicked']
           )
-          return
+          break
         }
       }
     }

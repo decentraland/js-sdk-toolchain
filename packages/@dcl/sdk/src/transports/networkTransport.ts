@@ -1,4 +1,4 @@
-import { TransportMessage, Transport } from '@dcl/ecs/src/systems/crdt/types'
+import { TransportMessage, Transport } from '@dcl/ecs'
 
 export function createNetworkTransport(): Transport {
   // const rpc = new RpcTransport()

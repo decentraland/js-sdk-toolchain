@@ -1,9 +1,7 @@
-import type { EventsSystem } from '@dcl/ecs'
-
-export type OnClick = EventsSystem.Callback
+import type { EventSystemCallback } from '@dcl/ecs'
 
 export type Listeners = {
-  onClick?: OnClick
+  onClick?: EventSystemCallback
 }
 
 const listeners: Listeners = {

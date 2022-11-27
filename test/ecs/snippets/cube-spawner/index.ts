@@ -1,7 +1,7 @@
 import {
   Entity,
   engine,
-  EventsSystem,
+  pointerEventsSystem,
   Transform,
   Vector3,
   MeshRenderer,
@@ -38,7 +38,7 @@ function circularSystem(dt: number) {
 
 // Init
 const initEntity = createCube(8, 1, 8)
-EventsSystem.onPointerDown(
+pointerEventsSystem.onPointerDown(
   initEntity,
   () => {
     createCube(1 + Math.random() * 8, Math.random() * 8, 1 + Math.random() * 8)

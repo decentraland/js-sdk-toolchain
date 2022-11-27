@@ -1,24 +1,18 @@
-import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
-import {
-  Color3,
-  Color4,
-  Font,
-  ReactEcs,
-  renderUi,
-  TextAlignMode,
-  UiEntity
-} from '../../packages/@dcl/react-ecs/src'
+import { Engine, Entity, components, createPointerEventSystem, createInputSystem } from '../../packages/@dcl/ecs/src'
+import { Color4, Font, ReactEcs, createReactBasedUiSystem, TextAlignMode, UiEntity } from '../../packages/@dcl/react-ecs/src'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
-
-let engine: IEngine
 
 describe('UiText React Ecs', () => {
   beforeEach(() => {
-    engine = Engine()
   })
 
   it('should generate a UI and update the width of a div', async () => {
-    const { UiTransform, UiText } = engine.baseComponents
+    const engine = Engine()
+    const input = createInputSystem(engine)
+    const pointerEventSystem = createPointerEventSystem(engine, input)
+    const renderer = createReactBasedUiSystem(engine as any, pointerEventSystem as any)
+    const UiTransform = components.UiTransform(engine)
+    const UiText = components.UiText(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -40,7 +34,7 @@ describe('UiText React Ecs', () => {
       />
     )
 
-    renderUi(ui)
+    renderer.setUiRenderer(ui)
     engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({

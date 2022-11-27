@@ -1,6 +1,5 @@
 import { ComponentDefinition, Entity, IEngine, ISchema } from '../../engine'
-import { PBMeshRenderer } from '../generated/index.gen'
-import * as MeshRendererSchema from './../generated/MeshRenderer.gen'
+import { MeshRenderer, PBMeshRenderer } from '../generated/index.gen'
 
 /**
  * @public
@@ -48,31 +47,29 @@ export interface MeshRendererComponentDefinitionExtended
 }
 
 export function defineMeshRendererComponent(
-  engine: Pick<IEngine, 'getComponent'>
+  engine: Pick<IEngine, 'defineComponentFromSchema'>
 ): MeshRendererComponentDefinitionExtended {
-  const MeshRenderer = engine.getComponent<
-    typeof MeshRendererSchema.MeshRendererSchema
-  >(MeshRendererSchema.COMPONENT_ID)
+  const theComponent = MeshRenderer(engine)
 
   return {
-    ...MeshRenderer,
+    ...theComponent,
     setBox(entity: Entity, uvs?: number[]): void {
-      MeshRenderer.createOrReplace(entity, {
+      theComponent.createOrReplace(entity, {
         mesh: { $case: 'box', box: { uvs: uvs || [] } }
       })
     },
     setPlane(entity: Entity, uvs?: number[]): void {
-      MeshRenderer.createOrReplace(entity, {
+      theComponent.createOrReplace(entity, {
         mesh: { $case: 'plane', plane: { uvs: uvs || [] } }
       })
     },
     setCylinder(entity: Entity, radiusBottom: number, radiusTop: number): void {
-      MeshRenderer.createOrReplace(entity, {
+      theComponent.createOrReplace(entity, {
         mesh: { $case: 'cylinder', cylinder: { radiusBottom, radiusTop } }
       })
     },
     setSphere(entity: Entity): void {
-      MeshRenderer.createOrReplace(entity, {
+      theComponent.createOrReplace(entity, {
         mesh: { $case: 'sphere', sphere: {} }
       })
     }

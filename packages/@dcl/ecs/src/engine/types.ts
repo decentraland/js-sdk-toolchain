@@ -1,4 +1,3 @@
-import { SdkComponents } from '../components'
 import type { ISchema } from '../schemas/ISchema'
 import { Result, Spec } from '../schemas/Map'
 import { Transport } from '../systems/crdt/types'
@@ -8,8 +7,6 @@ import { SystemFn } from './systems'
 import { ReadonlyComponentSchema } from './readonly'
 
 export { ISchema } from '../schemas/ISchema'
-
-export { IInput } from './input'
 
 /**
  * @public
@@ -182,8 +179,6 @@ export type IEngine = {
    * Camera entity of current player.
    */
   CameraEntity: Entity
-
-  baseComponents: SdkComponents
 
   /**
    *

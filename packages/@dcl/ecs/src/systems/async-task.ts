@@ -8,7 +8,7 @@ function getAndClean<T = unknown>(value: T[]) {
   return messagesToProcess
 }
 
-export function taskSystem(engine: IEngine) {
+export function createTaskSystem(engine: IEngine) {
   const tasks: Task[] = []
 
   async function runTask(task: Task) {

@@ -7,18 +7,18 @@ import {
   InputAction,
   Vector3,
   Color4,
-  Input,
+  inputSystem,
   Quaternion,
   PointerHoverFeedback,
   PointerEventType
 } from '@dcl/ecs'
 
 import ReactEcs, {
-  renderUi,
   UiEntity,
   YGAlign,
   YGDisplay,
-  YGJustify
+  YGJustify,
+  ReactEcsRenderer
 } from '@dcl/react-ecs'
 
 let counter = 0
@@ -84,7 +84,7 @@ function getPlayerPosition() {
   return `{x: ${x.toFixed(2)}, y: ${y.toFixed(2)}, z: ${z.toFixed(2)} }`
 }
 
-renderUi(uiComponent)
+ReactEcsRenderer.setUiRenderer(uiComponent)
 
 // Cube factory
 function createCube(x: number, y: number, z: number, spawner = true): Entity {
@@ -130,7 +130,7 @@ function spawnerSystem() {
   const clickedCubes = engine.getEntitiesWith(PointerHoverFeedback)
   for (const [entity] of clickedCubes) {
     if (
-      Input.isTriggered(
+      inputSystem.isTriggered(
         InputAction.IA_PRIMARY,
         PointerEventType.PET_DOWN,
         entity

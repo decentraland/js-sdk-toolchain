@@ -1,37 +1,42 @@
-import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
+import { Engine, IEngine, Entity, components, createInputSystem, createPointerEventSystem } from '../../packages/@dcl/ecs/src'
 import {
+  createReactBasedUiSystem,
   Position,
   PositionUnit,
+  ReactBasedUiSystem,
   ReactEcs,
-  renderUi,
   UiEntity,
   YGUnit,
   YGWrap
 } from '../../packages/@dcl/react-ecs/src'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 
-let engine: IEngine
 
 describe('UiTransform React Ecs', () => {
+  let engine: IEngine
+  let uiRenderer: ReactBasedUiSystem
+
   beforeEach(() => {
     engine = Engine()
+    uiRenderer = createReactBasedUiSystem(engine as any, createPointerEventSystem(engine, createInputSystem(engine)) as any)
   })
 
+
   it('should send empty object if uiTransform is undefined', async () => {
-    const { UiTransform } = engine.baseComponents
+    const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
     const getUiTransform = (entity: Entity) => UiTransform.get(entity)
     const ui = () => <UiEntity uiTransform={undefined} />
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
     expect(getUiTransform(rootDivEntity).width).toBe(0)
   })
 
   it('should send 0 if you send an invalid px', async () => {
-    const { UiTransform } = engine.baseComponents
+    const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -42,14 +47,14 @@ describe('UiTransform React Ecs', () => {
         uiTransform={{ width: 'boedo' as any, flexWrap: YGWrap.YGW_WRAP }}
       />
     )
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
     expect(getUiTransform(rootDivEntity).width).toBe(0)
     expect(getUiTransform(rootDivEntity).flexWrap).toBe(YGWrap.YGW_WRAP)
   })
 
   it('should send position transform properties', async () => {
-    const { UiTransform } = engine.baseComponents
+    const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -65,7 +70,7 @@ describe('UiTransform React Ecs', () => {
 
     const ui = () => <UiEntity uiTransform={{ width: 100, position }} />
 
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({
@@ -117,7 +122,7 @@ describe('UiTransform React Ecs', () => {
   })
 
   it('should send height & width properties', async () => {
-    const { UiTransform } = engine.baseComponents
+    const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -137,7 +142,7 @@ describe('UiTransform React Ecs', () => {
       />
     )
 
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({

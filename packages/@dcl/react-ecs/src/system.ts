@@ -1,30 +1,37 @@
-import { Entity, engine as globalEngine, IEngine } from '@dcl/ecs'
+import { IEngine, PointerEventsSystem } from '@dcl/ecs'
 
 import type { JSX } from './react-ecs'
 import { createReconciler } from './reconciler'
 
 export type UiComponent = () => JSX.Element
-const uiContainer: { getEntities: () => Entity[]; update: () => void }[] = []
 
-export function renderUi(ui: UiComponent, engine: IEngine = globalEngine) {
-  const renderer = createReconciler(engine)
-  function update() {
-    renderer.update(ui())
-  }
-
-  engine.addSystem(update)
-  return uiContainer.push({ update, getEntities: renderer.getEntities }) - 1
+export type ReactBasedUiSystem = {
+  destroy(): void
+  setUiRenderer(ui: UiComponent): void
 }
 
-export function removeUi(index: number, engine: IEngine = globalEngine) {
-  const ui = uiContainer[index]
-  if (!ui) return
+export function createReactBasedUiSystem(
+  engine: IEngine,
+  pointerSystem: PointerEventsSystem
+): ReactBasedUiSystem {
+  const renderer = createReconciler(engine, pointerSystem)
+  let uiComponent: UiComponent = () => ({})
 
-  uiContainer.splice(index, 1)
+  function ReactBasedUiSystem() {
+    renderer.update(uiComponent())
+  }
 
-  engine.removeSystem(ui.update)
+  engine.addSystem(ReactBasedUiSystem, 100e3, '@dcl/react-ecs')
 
-  for (const entity of ui.getEntities()) {
-    engine.removeEntity(entity)
+  return {
+    destroy() {
+      engine.removeSystem(ReactBasedUiSystem)
+      for (const entity of renderer.getEntities()) {
+        engine.removeEntity(entity)
+      }
+    },
+    setUiRenderer(ui: UiComponent) {
+      uiComponent = ui
+    }
   }
 }

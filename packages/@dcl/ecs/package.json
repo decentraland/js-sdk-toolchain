@@ -24,8 +24,6 @@
   },
   "homepage": "https://github.com/decentraland/ecs#readme",
   "devDependencies": {
-    "@types/fs-extra": "^9.0.13",
-    "fs-extra": "^10.1.0",
     "ts-proto": "^1.112.0"
   },
   "dependencies": {

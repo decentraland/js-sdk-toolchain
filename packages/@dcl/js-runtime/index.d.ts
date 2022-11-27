@@ -83,8 +83,8 @@ declare var WebSocket: {
 }
 
 declare var console: {
-  log(text: string): void
-  error(error: any): void
+  log(message?: any, ...optionalParams: any[]): void;
+  error(message?: any, ...optionalParams: any[]): void;
 }
 
 declare const DEBUG: boolean

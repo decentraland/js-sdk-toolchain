@@ -8,12 +8,12 @@ import {
   YGUnit
   // YGUnit
 } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/ui_transform.gen'
-import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, components } from '../../../packages/@dcl/ecs/src'
 
 describe('UiTransform component', () => {
   it('should serialize', () => {
     const newEngine = Engine()
-    const { UiTransform } = newEngine.baseComponents
+    const UiTransform = components.UiTransform(newEngine)
     const entity = newEngine.addEntity()
     UiTransform.create(entity, {
       parent: 0,

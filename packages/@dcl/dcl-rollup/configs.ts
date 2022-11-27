@@ -82,7 +82,7 @@ export function createSceneConfig(options: { PROD: boolean }): RollupOptions {
     external: [/~system\//],
     input: 'src/index.ts',
     treeshake: {
-      preset: 'recommended'
+      preset: 'smallest'
     },
     plugins: [
       typescript({
@@ -113,7 +113,8 @@ export function createSceneConfig(options: { PROD: boolean }): RollupOptions {
       commonjs({
         strictRequires: true
       }),
-      false && options.PROD &&
+      false &&
+        options.PROD &&
         analyze({
           hideDeps: true,
           summaryOnly: true

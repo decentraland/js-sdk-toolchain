@@ -1,0 +1,25 @@
+{
+  "name": "simple-scene",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decentraland/js-sdk-toolchain.git"
+  },
+  "license": "Apache-2.0",
+  "description": "My new Decentraland project",
+  "scripts": {
+    "start": "dcl start",
+    "build": "build-ecs --production",
+    "build-dev": "build-ecs",
+    "watch": "build-ecs --watch"
+  },
+  "devDependencies": {
+    "@dcl/dcl-rollup": "file:../../../../packages/@dcl/dcl-rollup",
+    "@dcl/ecs": "file:../../../../packages/@dcl/ecs",
+    "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime",
+    "@dcl/sdk": "file:../../../../packages/@dcl/sdk"
+  },
+  "dependencies": {
+    "@dcl/ecs-math": "^2.0.1-20221108141807.commit-a1344cb"
+  }
+}

@@ -13,7 +13,7 @@ describe('build-ecs: simple scene compilation', () => {
   itDeletesFolder('./node_modules', cwd)
 
   itExecutes('npm i --silent --no-progress', cwd)
-  itExecutes('npm run build', cwd)
+  itExecutes('npm run build --silent', cwd)
 
   it('ensure files exist', () => {
     const binPath = ensureFileExists('bin/game.js', cwd)
@@ -27,5 +27,21 @@ describe('build-ecs: simple scene compilation', () => {
     if (!transformComponentInclided) {
       throw new Error("scene doesn't include TransformComponent")
     }
+  })
+})
+
+describe('build-ecs: side-effect-free-build', () => {
+  const cwd = resolve(__dirname, './fixtures/side-effect-free-build')
+
+  itDeletesFolder('./bin', cwd)
+  itDeletesFolder('./node_modules', cwd)
+
+  itExecutes('npm i --silent --no-progress', cwd)
+  itExecutes('npm run build --silent', cwd)
+
+  it('ensure files exist', () => {
+    const binPath = ensureFileExists('bin/game.js', cwd)
+    const fileText = readFileSync(binPath, 'utf8')
+    expect(fileText.trim()).toEqual('"use strict";')
   })
 })

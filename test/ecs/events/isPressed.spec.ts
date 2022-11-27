@@ -1,13 +1,13 @@
 import { Entity } from '../../../packages/@dcl/ecs/src/engine/entity'
-import { createInput } from '../../../packages/@dcl/ecs/src/engine/input'
+import { createInputSystem } from '../../../packages/@dcl/ecs/src/engine/input'
 import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
 import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
-import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, components } from '../../../packages/@dcl/ecs/src'
 
 describe('Events helpers isTriggered', () => {
   it('should detect no events', () => {
     const newEngine = Engine()
-    const { isTriggered } = createInput(newEngine)
+    const { isTriggered } = createInputSystem(newEngine)
     expect(
       isTriggered(
         InputAction.IA_ANY,
@@ -19,9 +19,9 @@ describe('Events helpers isTriggered', () => {
 
   it('detect pointerEvent', () => {
     const newEngine = Engine()
-    const { PointerEventsResult } = newEngine.baseComponents
+    const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
-    const { isTriggered } = createInput(newEngine)
+    const { isTriggered } = createInputSystem(newEngine)
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
@@ -42,9 +42,9 @@ describe('Events helpers isTriggered', () => {
 
   it('dont detect pointerEventActive after update', () => {
     const newEngine = Engine()
-    const { PointerEventsResult } = newEngine.baseComponents
+    const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
-    const { isTriggered } = createInput(newEngine)
+    const { isTriggered } = createInputSystem(newEngine)
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
         createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)
@@ -63,9 +63,9 @@ describe('Events helpers isTriggered', () => {
 
   it('down state should persist after update', () => {
     const newEngine = Engine()
-    const { PointerEventsResult } = newEngine.baseComponents
+    const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
-    const { isPressed } = createInput(newEngine)
+    const { isPressed } = createInputSystem(newEngine)
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
         createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)

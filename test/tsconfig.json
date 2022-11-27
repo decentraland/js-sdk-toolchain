@@ -4,10 +4,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "pretty": true,
-    "types": [
-      "node",
-      "jest"
-    ],
+    "types": ["jest", "@dcl/js-runtime"],
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
@@ -25,7 +22,8 @@
     "alwaysStrict": true,
     "jsx": "react",
     "jsxFactory": "ReactEcs.createElement",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "typeRoots": ["../packages", "../node_modules/@types"]
   },
   "includes": "*.ts"
 }

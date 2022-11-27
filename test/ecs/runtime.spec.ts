@@ -9,22 +9,11 @@ import {
   onProfileChanged,
   onRealmChangedObservable,
   onSceneReadyObservable,
-  onVideoEvent
+  onVideoEvent,
+  pollEvents
 } from '../../packages/@dcl/sdk/src/observables'
-import { setupDclInterfaceForThisSuite, testingEngineApi } from './utils'
 import { createRendererTransport } from '../../packages/@dcl/sdk/src/transports/rendererTransport'
-
-// describe('`dcl` object not declared', () => {
-//   it('should failed if there is no dcl', () => {
-//     const networkTransport = createNetworkTransport()
-//     const engine = Engine({ transports: [networkTransport] })
-//     const obj = initializeDcl(engine)
-//     expect(typeof obj.error).toBe('function')
-//     expect(typeof obj.log).toBe('function')
-
-//     obj.log() // do nothing
-//   })
-// })
+import { SendBatchResponse } from '~system/EngineApi'
 
 describe('Observable tests', () => {
   beforeEach(() => {
@@ -32,27 +21,23 @@ describe('Observable tests', () => {
     jest.restoreAllMocks()
   })
 
-  const engineApi = testingEngineApi()
-  const mockedDcl = setupDclInterfaceForThisSuite({
-    ...engineApi.modules
-  })
-
-  it('should avoid echo messages', () => {
-    const rendererTransport = createRendererTransport()
+  it('should avoid echo messages', async () => {
+    const crdtSendToRenderer = jest.fn()
+    const rendererTransport = createRendererTransport({ crdtSendToRenderer })
     const engine = Engine()
     engine.addTransport(rendererTransport)
 
     const eventToEmit = [
-      { type: 'onEnterScene', data: {} },
-      { type: 'onLeaveScene', data: {} },
-      { type: 'sceneStart', data: {} },
-      { type: 'playerExpression', data: {} },
-      { type: 'videoEvent', data: {} },
-      { type: 'profileChanged', data: {} },
-      { type: 'playerConnected', data: {} },
-      { type: 'playerDisconnected', data: {} },
-      { type: 'onRealmChanged', data: {} },
-      { type: 'playerClicked', data: {} }
+      { eventId: 'onEnterScene', eventData: '{}' },
+      { eventId: 'onLeaveScene', eventData: '{}' },
+      { eventId: 'sceneStart', eventData: '{}' },
+      { eventId: 'playerExpression', eventData: '{}' },
+      { eventId: 'videoEvent', eventData: '{}' },
+      { eventId: 'profileChanged', eventData: '{}' },
+      { eventId: 'playerConnected', eventData: '{}' },
+      { eventId: 'playerDisconnected', eventData: '{}' },
+      { eventId: 'onRealmChanged', eventData: '{}' },
+      { eventId: 'playerClicked', eventData: '{}' }
     ]
     const counter = {
       onEnterSceneObservable: 0,
@@ -97,11 +82,11 @@ describe('Observable tests', () => {
       counter.onPlayerClickedObservable++
     })
 
-    mockedDcl.eventFns.forEach((cb) => {
-      for (const e of eventToEmit) {
-        cb(e)
-      }
-    })
+    await pollEvents(
+      async (): Promise<SendBatchResponse> => ({
+        events: eventToEmit.map(($) => ({ type: 0 /*generic*/, generic: $ }))
+      })
+    )
 
     expect(counter.onEnterSceneObservable).toBe(1)
     expect(counter.onLeaveSceneObservable).toBe(1)

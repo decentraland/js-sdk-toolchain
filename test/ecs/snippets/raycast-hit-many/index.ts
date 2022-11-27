@@ -4,7 +4,7 @@ import {
   MeshRenderer,
   MeshCollider,
   InputAction,
-  EventsSystem,
+  pointerEventsSystem,
   Vector3,
   Raycast,
   RaycastQueryType,
@@ -36,7 +36,7 @@ const _cubeEntity2 = createCube(8, 1, 13)
 const raycastEntity = engine.addEntity()
 
 // Add OnPointerDown component to cube entity to trigger ray casting on interaction
-EventsSystem.onPointerDown(
+pointerEventsSystem.onPointerDown(
   cubeEntity,
   () => {
     Raycast.createOrReplace(raycastEntity, {
@@ -69,7 +69,9 @@ engine.addSystem(() => {
       )
     }
 
-    console.log(`Hits (this should be '2' the first time): '${result.hits.length}'`)
+    console.log(
+      `Hits (this should be '2' the first time): '${result.hits.length}'`
+    )
   }
 })
 

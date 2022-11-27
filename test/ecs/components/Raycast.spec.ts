@@ -1,10 +1,13 @@
-﻿import { RaycastQueryType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/raycast.gen'
-import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+﻿import {
+  Engine,
+  components,
+  RaycastQueryType
+} from '../../../packages/@dcl/ecs/src'
 
 describe('Generated Raycast ProtoBuf', () => {
   it('should serialize/deserialize Raycast', () => {
     const newEngine = Engine()
-    const { Raycast } = newEngine.baseComponents
+    const Raycast = components.Raycast(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

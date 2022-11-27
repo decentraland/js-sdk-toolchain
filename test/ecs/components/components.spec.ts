@@ -1,25 +1,25 @@
-import { Quaternion, Vector3 } from '../../../packages/@dcl/ecs/src'
-import { Engine, Entity } from '../../../packages/@dcl/ecs/src/engine'
-import { setupDclInterfaceForThisSuite, testingEngineApi } from '../utils'
+import {
+  Engine,
+  Entity,
+  components,
+  Quaternion,
+  Vector3
+} from '../../../packages/@dcl/ecs/src'
 
 describe('Legacy component tests', () => {
-  const engineApi = testingEngineApi()
-  setupDclInterfaceForThisSuite({
-    ...engineApi.modules
-  })
-
   it('cube example scene', () => {
     const engine = Engine()
-    const sdk = engine.baseComponents
+    const MeshRenderer = components.MeshRenderer(engine)
+    const Transform = components.Transform(engine)
 
     function spawnCube(x: number, y: number, z: number) {
       const newCubeEntity = engine.addEntity()
 
-      sdk.MeshRenderer.create(newCubeEntity, {
+      MeshRenderer.create(newCubeEntity, {
         mesh: { $case: 'box', box: { uvs: [0, 0, 0, 0] } }
       })
 
-      sdk.Transform.create(newCubeEntity, {
+      Transform.create(newCubeEntity, {
         position: Vector3.create(x, y, z),
         scale: Vector3.One(),
         rotation: Quaternion.Identity(),
@@ -30,7 +30,7 @@ describe('Legacy component tests', () => {
     }
 
     function rotatorSystem(dt: number) {
-      const group = engine.getEntitiesWith(sdk.Transform)
+      const group = engine.getEntitiesWith(Transform)
       for (const [entity, component] of group) {
         Quaternion.multiplyToRef(
           component.rotation,
@@ -38,18 +38,24 @@ describe('Legacy component tests', () => {
           component.rotation
         )
 
-        const transformData = sdk.Transform.toBinary(entity)
+        const transformData = Transform.toBinary(entity)
         const transformOriginal = { ...component }
-        const transformReceveid = sdk.Transform.updateFromBinary(entity, transformData)
+        const transformReceveid = Transform.updateFromBinary(
+          entity,
+          transformData
+        )
         expect(transformReceveid).toBeDeepCloseTo(transformOriginal)
       }
 
-      const groupBoxShape = engine.getEntitiesWith(sdk.MeshRenderer)
+      const groupBoxShape = engine.getEntitiesWith(MeshRenderer)
       for (const [entity, component] of groupBoxShape) {
-        const boxShapeData = sdk.MeshRenderer.toBinary(entity)
+        const boxShapeData = MeshRenderer.toBinary(entity)
         // TODO: see this
         const boxShapeOriginal = { ...component } as any
-        const boxShapeReceveid = sdk.MeshRenderer.updateFromBinary(entity, boxShapeData)
+        const boxShapeReceveid = MeshRenderer.updateFromBinary(
+          entity,
+          boxShapeData
+        )
         expect(boxShapeReceveid).toBeDeepCloseTo(boxShapeOriginal)
       }
     }

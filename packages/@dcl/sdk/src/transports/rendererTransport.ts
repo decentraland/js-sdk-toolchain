@@ -1,22 +1,23 @@
-import { Transport, TransportMessage } from '@dcl/ecs/src/systems/crdt/types'
-import { ECSComponentIDs } from '@dcl/ecs/src/components/generated/ids.gen'
+import { Transport, TransportMessage } from '@dcl/ecs'
+import { ECSComponentIDs } from '@dcl/ecs/dist/components/generated/ids.gen'
+import type {
+  CrdtSendToRendererRequest,
+  CrdtSendToResponse
+} from '~system/EngineApi'
 
 const componentIds = Object.values(ECSComponentIDs)
   .filter((a) => typeof a === 'number')
   .map(Number)
 
-declare let require: any
+export type EngineApiForTransport = {
+  crdtSendToRenderer(
+    body: CrdtSendToRendererRequest
+  ): Promise<CrdtSendToResponse>
+}
 
-export function createRendererTransport(): Transport {
-  if (typeof require === 'undefined') {
-    // TODO: replace with new rpc
-    throw new Error(
-      'Cannot create createRendererTransport without global dcl object'
-    )
-  }
-
-  const engineApi = require('~system/EngineApi')
-
+export function createRendererTransport(
+  engineApi: EngineApiForTransport
+): Transport {
   async function sendToRenderer(message: Uint8Array) {
     const response = await engineApi.crdtSendToRenderer({
       data: new Uint8Array(message)
@@ -35,7 +36,8 @@ export function createRendererTransport(): Transport {
   const rendererTransport: Transport = {
     type,
     send(message: Uint8Array): void {
-      sendToRenderer(message).catch(() => {
+      sendToRenderer(message).catch((error) => {
+        console.error(error)
         debugger
       })
     },
