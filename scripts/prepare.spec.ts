@@ -26,6 +26,6 @@ flow('build-all', () => {
   flow('pack every package', () => {
     itExecutes('npm pack', SDK_PATH)
     itExecutes('npm pack', JS_RUNTIME)
-    itExecutes('npm pack', ROLLUP_CONFIG_PATH + '/dist')
+    itExecutes('npm pack', ROLLUP_CONFIG_PATH)
   })
 })
