@@ -81,7 +81,7 @@ jobs:
         with:
           registry-url: 'https://registry.npmjs.org'
           access: public
-          cwd: ./packages/@dcl/dcl-rollup/dist
+          cwd: ./packages/@dcl/dcl-rollup
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
 
