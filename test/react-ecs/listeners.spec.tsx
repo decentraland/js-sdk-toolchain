@@ -12,14 +12,11 @@ describe('Ui Listeners React Ecs', () => {
     engine = Engine()
     const Input = createInput(engine)
     engine.addSystem(EventsSystem.update(Input))
-    ;(globalThis as any).engine = engine
-    ;(global as any).Input = Input
-    ;(global as any).EventsSystem = EventsSystem
   })
 
   it('should run onClick if it was fake-clicked', async () => {
     const { PointerEventsResult } = engine.baseComponents
-    const uiEntity = (engine.addEntity() + 1) as Entity
+    const uiEntity = (engine.addEntity() as number + 1) as Entity
     let fakeCounter = 0
     const fakeClick = () => {
       PointerEventsResult.createOrReplace(engine.RootEntity, {

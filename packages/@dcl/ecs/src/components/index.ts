@@ -1,36 +1,18 @@
 import { ISchema, IEngine } from '../engine'
-import {
-  defineLibraryComponents,
-  LibraryComponents
-} from './generated/index.gen'
-import {
-  defineTransformComponent,
-  TransformComponent
-} from './legacy/Transform'
-import {
-  AnimatorComponentDefinition,
-  defineAnimatorComponent
-} from './extended/Animator'
-import {
-  defineMeshColliderComponent,
-  MeshColliderComponentDefinition
-} from './extended/MeshCollider'
-import {
-  defineMeshRendererComponent,
-  MeshRendererComponentDefinition
-} from './extended/MeshRenderer'
-import {
-  defineMaterialComponent,
-  MaterialComponentDefinition
-} from './extended/Material'
+import { defineLibraryComponents, LibraryComponents } from './generated/index.gen'
+import { defineTransformComponent, TransformComponent } from './legacy/Transform'
+import { AnimatorComponentDefinitionExtended, defineAnimatorComponent } from './extended/Animator'
+import { defineMeshColliderComponent, MeshColliderComponentDefinitionExtended } from './extended/MeshCollider'
+import { defineMeshRendererComponent, MeshRendererComponentDefinitionExtended } from './extended/MeshRenderer'
+import { defineMaterialComponent, MaterialComponentDefinitionExtended } from './extended/Material'
 import { ComponentDefinition } from '../engine/component'
 export { ISchema, ComponentDefinition }
 
 export type SdkComponents = LibraryComponents & {
-  Material: MaterialComponentDefinition
-  Animator: AnimatorComponentDefinition
-  MeshRenderer: MeshRendererComponentDefinition
-  MeshCollider: MeshColliderComponentDefinition
+  Material: MaterialComponentDefinitionExtended
+  Animator: AnimatorComponentDefinitionExtended
+  MeshRenderer: MeshRendererComponentDefinitionExtended
+  MeshCollider: MeshColliderComponentDefinitionExtended
   Transform: TransformComponent
 }
 

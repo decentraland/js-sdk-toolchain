@@ -1,8 +1,8 @@
-import { defineSdkComponents, SdkComponents } from '../components'
+import { SdkComponents } from '../components'
 import type { ISchema } from '../schemas/ISchema'
 import { Result, Spec } from '../schemas/Map'
 import { Transport } from '../systems/crdt/types'
-import { ComponentDefinition as CompDef, ComponentType } from './component'
+import { ComponentDefinition as CompDef } from './component'
 import { Entity } from './entity'
 import { SystemFn } from './systems'
 import { ReadonlyComponentSchema } from './readonly'
@@ -186,16 +186,8 @@ export type IEngine = {
   baseComponents: SdkComponents
 
   /**
-   * @internal
    *
    * @param tranport - transport which changes its onmessage to process CRDT messages
    */
   addTransport(transport: Transport): void
-}
-
-/**
- * @public
- */
-export type IEngineParams = {
-  transports?: Transport[]
 }

@@ -1,6 +1,6 @@
 ```ts
 /**
- * This is te first approach we discuss with @mendez
+ * This is te first approach we discuss with @menduz
  * Keeping here just for document purpose
  */
 

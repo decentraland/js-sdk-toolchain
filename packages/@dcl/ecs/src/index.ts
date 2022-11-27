@@ -2,7 +2,10 @@
 export * from './engine'
 export * from './schemas'
 export * from './runtime/initialization'
-import { engine } from './runtime/initialization'
+export * from './runtime/types'
+export * from '@dcl/ecs-math'
+export * from '@dcl/ecs-math/dist/Matrix'
+export * from '@dcl/ecs-math/dist/Plane'
 
 export { cyclicParentingChecker } from './systems/cyclicParentingChecker'
 export * from './systems/events'

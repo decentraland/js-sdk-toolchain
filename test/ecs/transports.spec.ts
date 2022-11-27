@@ -1,11 +1,10 @@
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
 import WireMessage from '../../packages/@dcl/ecs/src/serialization/wireMessage'
-import { createNetworkTransport } from '../../packages/@dcl/ecs/src/systems/crdt/transports/networkTransport'
-import { createRendererTransport } from '../../packages/@dcl/ecs/src/systems/crdt/transports/rendererTransport'
+import { createNetworkTransport } from '../../packages/@dcl/sdk/src/transports/networkTransport'
+import { createRendererTransport } from '../../packages/@dcl/sdk/src/transports/rendererTransport'
 import { TransportMessage } from '../../packages/@dcl/ecs/src/systems/crdt/types'
 import { setupDclInterfaceForThisSuite, testingEngineApi } from './utils'
-import { initializeDcl } from '../../packages/@dcl/ecs/src/runtime/initialization/dcl'
 
 describe('Transport tests', () => {
   beforeEach(() => {
@@ -20,7 +19,8 @@ describe('Transport tests', () => {
 
   it('should avoid echo messages', () => {
     const transport = createRendererTransport()
-    const engine = Engine({ transports: [transport] })
+    const engine = Engine()
+    engine.addTransport(transport)
     const entity = engine.addEntity()
     const message: TransportMessage = {
       type: WireMessage.Enum.PUT_COMPONENT,
@@ -37,7 +37,8 @@ describe('Transport tests', () => {
     const transports = [createNetworkTransport(), createRendererTransport()]
     const networkSpy = jest.spyOn(transports[0], 'send')
     const rendererSpy = jest.spyOn(transports[1], 'send')
-    const engine = Engine({ transports })
+    const engine = Engine()
+    transports.forEach(engine.addTransport)
     const entity = engine.addDynamicEntity()
     const UserComponent = engine.defineComponent(
       { x: Schemas.Byte },
@@ -78,7 +79,8 @@ describe('Transport tests', () => {
     const transports = [createNetworkTransport(), createRendererTransport()]
     const networkSpy = jest.spyOn(transports[0], 'send')
     const rendererSpy = jest.spyOn(transports[1], 'send')
-    const engine = Engine({ transports })
+    const engine = Engine()
+    transports.forEach(engine.addTransport)
     const entity = engine.addDynamicEntity()
 
     const originalCrdtSendToRenderer =
@@ -113,7 +115,8 @@ describe('Transport tests', () => {
 
     const networkSpy = jest.spyOn(transports[0], 'send')
     const rendererSpy = jest.spyOn(transports[1], 'send')
-    const engine = Engine({ transports })
+    const engine = Engine()
+    transports.forEach(engine.addTransport)
 
     initializeDcl(engine)
 
@@ -129,7 +132,7 @@ describe('Transport tests', () => {
     // Transform component should be sent to renderer transport
     engine.baseComponents.Transform.create(entity)
     // 1) A tick with updates
-    mockedDcl.tick(1)
+    await mockedDcl.tick(1)
 
     jest.mock('')
     // since callRpc is async function, it's necessary
@@ -137,7 +140,7 @@ describe('Transport tests', () => {
 
     // 2) A tick without updates
     transports[1].onmessage = jest.fn()
-    mockedDcl.tick(1)
+    await mockedDcl.tick(1)
     await new Promise(process.nextTick)
 
     expect(networkSpy).toBeCalledTimes(2)
@@ -145,7 +148,7 @@ describe('Transport tests', () => {
     expect(transports[1].onmessage).toBeCalledTimes(1)
 
     // 3) Another tick without updates
-    mockedDcl.tick(1)
+    await mockedDcl.tick(1)
     await new Promise(process.nextTick)
 
     expect(networkSpy).toBeCalledTimes(3)
@@ -155,7 +158,7 @@ describe('Transport tests', () => {
     engine.baseComponents.Transform.createOrReplace(entity)
 
     // 4) Tick with updates
-    mockedDcl.tick(1)
+    await mockedDcl.tick(1)
     await new Promise(process.nextTick)
 
     expect(networkSpy).toBeCalledTimes(4)

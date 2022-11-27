@@ -1,5 +1,4 @@
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
-import { initializeDcl } from '../../packages/@dcl/ecs/src/runtime/initialization/'
 import {
   onEnterSceneObservable,
   onLeaveSceneObservable,
@@ -12,21 +11,20 @@ import {
   onSceneReadyObservable,
   onVideoEvent
 } from '../../packages/@dcl/sdk/src/observables'
-import { createNetworkTransport } from '../../packages/@dcl/ecs/src/systems/crdt/transports/networkTransport'
 import { setupDclInterfaceForThisSuite, testingEngineApi } from './utils'
-import { createRendererTransport } from '../../packages/@dcl/ecs/src/systems/crdt/transports/rendererTransport'
+import { createRendererTransport } from '../../packages/@dcl/sdk/src/transports/rendererTransport'
 
-describe('`dcl` object not declared', () => {
-  it('should failed if there is no dcl', () => {
-    const networkTransport = createNetworkTransport()
-    const engine = Engine({ transports: [networkTransport] })
-    const obj = initializeDcl(engine)
-    expect(typeof obj.error).toBe('function')
-    expect(typeof obj.log).toBe('function')
+// describe('`dcl` object not declared', () => {
+//   it('should failed if there is no dcl', () => {
+//     const networkTransport = createNetworkTransport()
+//     const engine = Engine({ transports: [networkTransport] })
+//     const obj = initializeDcl(engine)
+//     expect(typeof obj.error).toBe('function')
+//     expect(typeof obj.log).toBe('function')
 
-    obj.log() // do nothing
-  })
-})
+//     obj.log() // do nothing
+//   })
+// })
 
 describe('Observable tests', () => {
   beforeEach(() => {
@@ -41,8 +39,8 @@ describe('Observable tests', () => {
 
   it('should avoid echo messages', () => {
     const rendererTransport = createRendererTransport()
-    const engine = Engine({ transports: [rendererTransport] })
-    initializeDcl(engine)
+    const engine = Engine()
+    engine.addTransport(rendererTransport)
 
     const eventToEmit = [
       { type: 'onEnterScene', data: {} },

@@ -15,14 +15,7 @@
     "outDir": "dist",
     "types": []
   },
-  "include": [
-    "src",
-    "temp-protocolbuffers"
-  ],
-  "files": [
-    "node_modules/protobufjs/minimal.d.ts"
-  ],
-  "exclude": [
-    "dist"
-  ]
+  "include": ["src"],
+  "files": ["node_modules/protobufjs/minimal.d.ts"],
+  "exclude": ["dist"]
 }

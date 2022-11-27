@@ -1,3 +1,16 @@
+import {
+  engine,
+  Transform,
+  MeshRenderer,
+  MeshCollider,
+  InputAction,
+  EventsSystem,
+  Vector3,
+  Raycast,
+  RaycastQueryType,
+  RaycastResult
+} from '@dcl/ecs'
+
 function createCube(
   x: number,
   y: number,
@@ -55,7 +68,7 @@ engine.addSystem(() => {
       )
     }
 
-    log(`Hits (this should be '1'): '${result.hits.length}'`)
+    console.log(`Hits (this should be '1'): '${result.hits.length}'`)
   }
 })
 

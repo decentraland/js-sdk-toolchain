@@ -1,4 +1,4 @@
-import { Observable, Observer } from './temp-fp/Observable'
+import { Observer } from './temp-fp/Observable'
 import * as communicationsController from '~system/CommunicationsController'
 import { IEvents, onCommsMessage } from './observables'
 

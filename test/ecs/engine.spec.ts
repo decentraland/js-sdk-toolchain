@@ -3,10 +3,10 @@ import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import { SYSTEMS_REGULAR_PRIORITY } from '../../packages/@dcl/ecs/src/engine/systems'
 import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { createRendererTransport } from '../../packages/@dcl/ecs/src/systems/crdt/transports/rendererTransport'
+import { createRendererTransport } from '../../packages/@dcl/sdk/src/transports/rendererTransport'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { TransformSchema } from '../../packages/@dcl/ecs/src/components/legacy/Transform'
-import { Vector3 } from '../../packages/@dcl/ecs/src/runtime/math'
+import { Vector3 } from '../../packages/@dcl/ecs/src'
 import { setupDclInterfaceForThisSuite, testingEngineApi } from './utils'
 
 const PositionSchema = {
@@ -431,7 +431,8 @@ describe('Engine tests', () => {
   })
 
   it('should remove Transform component and send it throught the network', () => {
-    const engine = Engine({ transports: [createRendererTransport()] })
+    const engine = Engine()
+    engine.addTransport(createRendererTransport())
     const entity = engine.addEntity()
 
     let moves = 0
@@ -538,10 +539,9 @@ describe('Engine tests', () => {
 
   it('should log the error of cyclic parenting', () => {
     const originalDcl = (globalThis as any).dcl
-    const errorFunc = jest.fn()
+    const errorFunc = jest.spyOn(console, 'error')
     const errorString = (e: Entity) =>
       'There is a cyclic parent with entity ' + e
-    ;(globalThis as any).dcl = { error: errorFunc }
 
     const engine = Engine()
     const e0 = engine.addEntity()
@@ -556,20 +556,19 @@ describe('Engine tests', () => {
     engine.baseComponents.Transform.create(e2).parent = e1
     engine.baseComponents.Transform.create(e3).parent = e2
     engine.update(1 / 30)
-    expect(errorFunc.mock.calls.length).toBe(0)
+    expect(errorFunc).not.toBeCalled()
 
     engine.baseComponents.Transform.getMutable(e3).parent = e3
     engine.update(1.0 / 30.0)
-    expect(errorFunc.mock.calls.length).toBe(1)
-    expect(errorFunc.mock.calls[0][0]).toBe(errorString(e3))
+    expect(errorFunc).toBeCalledWith(errorString(e3))
     errorFunc.mock.calls = []
 
     engine.baseComponents.Transform.getMutable(e3).parent = e2
     engine.baseComponents.Transform.getMutable(e0).parent = e3
     engine.update(1.0 / 30.0)
     expect(errorFunc.mock.calls.length).toBe(2)
-    expect(errorFunc.mock.calls[0][0]).toBe(errorString(e3))
-    expect(errorFunc.mock.calls[1][0]).toBe(errorString(e0))
+    expect(errorFunc).toBeCalledTimes(2)
+    expect(errorFunc).toBeCalledWith(errorString(e0))
     ;(globalThis as any).dcl = originalDcl
   })
 

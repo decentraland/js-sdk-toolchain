@@ -232,37 +232,37 @@ export function defineComponent<
 
   return {
     _id: componentId,
-    default: function () {
+    default() {
       return getDefaultValue()
     },
-    isDirty: function (entity: Entity): boolean {
+    isDirty(entity: Entity): boolean {
       return dirtyIterator.has(entity)
     },
-    has: function (entity: Entity): boolean {
+    has(entity: Entity): boolean {
       return data.has(entity)
     },
-    deleteFrom: function (entity: Entity): ComponentType<T> | null {
+    deleteFrom(entity: Entity): ComponentType<T> | null {
       const component = data.get(entity)
       data.delete(entity)
       dirtyIterator.add(entity)
       return component || null
     },
-    getOrNull: function (
+    getOrNull(
       entity: Entity
     ): DeepReadonly<ComponentType<T>> | null {
       const component = data.get(entity)
       return component ? deepReadonly(component) : null
     },
-    get: function (entity: Entity): DeepReadonly<ComponentType<T>> {
+    get(entity: Entity): DeepReadonly<ComponentType<T>> {
       const component = data.get(entity)
       if (!component) {
         throw new Error(
-          `[getFrom] Component ${componentId} for ${entity} not found`
+          `[getFrom] Component ${componentId} for entity #${entity} not found`
         )
       }
       return deepReadonly(component)
     },
-    create: function (
+    create(
       entity: Entity,
       value?: ConstructorType
     ): ComponentType<T> {
@@ -278,7 +278,7 @@ export function defineComponent<
       dirtyIterator.add(entity)
       return usedValue
     },
-    createOrReplace: function (
+    createOrReplace(
       entity: Entity,
       value?: ConstructorType
     ): ComponentType<T> {
@@ -288,7 +288,7 @@ export function defineComponent<
       dirtyIterator.add(entity)
       return usedValue!
     },
-    getMutableOrNull: function (entity: Entity): ComponentType<T> | null {
+    getMutableOrNull(entity: Entity): ComponentType<T> | null {
       const component = data.get(entity)
       if (!component) {
         return null
@@ -296,7 +296,7 @@ export function defineComponent<
       dirtyIterator.add(entity)
       return component
     },
-    getMutable: function (entity: Entity): ComponentType<T> {
+    getMutable(entity: Entity): ComponentType<T> {
       const component = this.getMutableOrNull(entity)
       if (component === null) {
         throw new Error(
@@ -305,12 +305,12 @@ export function defineComponent<
       }
       return component
     },
-    iterator: function* (): Iterable<[Entity, ComponentType<T>]> {
+    *iterator(): Iterable<[Entity, ComponentType<T>]> {
       for (const [entity, component] of data) {
         yield [entity, component]
       }
     },
-    dirtyIterator: function* (): Iterable<Entity> {
+    *dirtyIterator(): Iterable<Entity> {
       for (const entity of dirtyIterator) {
         yield entity
       }
@@ -331,7 +331,7 @@ export function defineComponent<
       const component = data.get(entity)
       if (!component) {
         throw new Error(
-          `[writeToByteBuffer] Component ${componentId} for ${entity} not found`
+          `[writeToByteBuffer] Component ${componentId} for entity #${entity} not found`
         )
       }
 
@@ -358,7 +358,7 @@ export function defineComponent<
       dirtyIterator.add(entity)
       return newValue
     },
-    clearDirty: function () {
+    clearDirty() {
       dirtyIterator.clear()
     }
   }

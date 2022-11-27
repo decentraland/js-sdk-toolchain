@@ -79,7 +79,11 @@ flow('build-all', () => {
     //   `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
     //   `${SDK_PATH}/dist/ecs7/proto-definitions`
     // )
-    itExecutes('npm run build', ECS7_PATH)
+    itExecutes('npm run build --silent', ECS7_PATH)
+    it('check file exists', () => {
+      ensureFileExists('dist/index.d.ts', ECS7_PATH)
+      ensureFileExists('dist/index.js', ECS7_PATH)
+    })
   })
 
   flow('@dcl/sdk build', () => {
@@ -93,7 +97,7 @@ flow('build-all', () => {
     itExecutes(`npm install --silent ${JS_RUNTIME}`, SDK_PATH)
     itExecutes(`npm install --silent ${ECS7_PATH}`, SDK_PATH)
 
-    itExecutes('npm run build', SDK_PATH)
+    itExecutes('npm run build --silent', SDK_PATH)
   })
 
   flow('@dcl/react-ecs', () => {
@@ -111,9 +115,8 @@ flow('build-all', () => {
         `${ECS7_PATH}/node_modules/@dcl/protocol/proto`
       )
     })
-    itExecutes('npm run build', REACT_ECS)
+    itExecutes('npm run build --silent', REACT_ECS)
     it('check file exists', () => {
-      fixReactTypes()
       ensureFileExists('dist/index.js', REACT_ECS)
       ensureFileExists('dist/index.d.ts', REACT_ECS)
     })
@@ -210,39 +213,3 @@ flow('build-all', () => {
     })
   })
 })
-
-function fixReactTypes() {
-  const typesPath = ensureFileExists(REACT_ECS + '/dist/index.d.ts')
-  const content = readFileSync(typesPath).toString()
-
-  // writeFileSync(
-  //   typesPath,
-  //   content.replace('/// <reference types="@dcl/posix" />', '')
-  // )
-}
-
-function fixTypes(
-  pathToDts: string,
-  { ignoreExportError } = { ignoreExportError: false }
-) {
-  let content = readFileSync(pathToDts).toString()
-
-  content = content.replace(/^export declare/gm, 'declare')
-
-  content = content.replace(/^export \{([\s\n\r]*)\}/gm, '')
-
-  writeFileSync(pathToDts, content)
-
-  if (!ignoreExportError && content.match(/\bexport\b/)) {
-    throw new Error(`The file ${pathToDts} contains exports`)
-  }
-
-  if (content.match(/\bimport\b/)) {
-    throw new Error(`The file ${pathToDts} contains imports`)
-  }
-
-  // TODO: uncomment this once @dcl/js-runtime is up and running
-  // if (content.includes('/// <ref')) {
-  //   throw new Error(`The file ${dtsFile} contains '/// <ref'`)
-  // }
-}

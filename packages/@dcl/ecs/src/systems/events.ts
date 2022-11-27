@@ -4,12 +4,11 @@ import { PointerEventType } from '../components/generated/pb/decentraland/sdk/co
 import { IInput } from '../engine'
 import { Entity } from '../engine/entity'
 import { engine } from '../runtime/initialization'
+import { checkNotThenable } from '../runtime/invariant'
 
 export type EventsSystem = typeof EventsSystem
 export namespace EventsSystem {
-  export type Callback = (
-    event: PBPointerEventsResult_PointerCommand
-  ) => void | Promise<void>
+  export type Callback = (event: PBPointerEventsResult_PointerCommand) => void
 
   export type Options = {
     button?: InputAction
@@ -182,7 +181,11 @@ export namespace EventsSystem {
         for (const [eventType, { cb, opts }] of event) {
           if (eventType === EventType.Click) {
             const command = Input.getClick(opts.button, entity)
-            if (command) void cb(command.up)
+            if (command)
+              checkNotThenable(
+                cb(command.up),
+                'Click event returned a thenable. Only synchronous functions are allowed'
+              )
           }
 
           if (eventType === EventType.Down || eventType === EventType.Up) {
@@ -192,7 +195,10 @@ export namespace EventsSystem {
               entity
             )
             if (command) {
-              void cb(command)
+              checkNotThenable(
+                cb(command),
+                'Event handler returned a thenable. Only synchronous functions are allowed'
+              )
             }
           }
         }

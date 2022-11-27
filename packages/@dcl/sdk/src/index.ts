@@ -1,7 +1,7 @@
 import { engine } from '@dcl/ecs'
 import { pollEvents } from './observables'
 
-export async function runTick(deltaTime: number) {
-  await engine.update(deltaTime)
+export async function onUpdate(deltaTime: number) {
+  engine.update(deltaTime)
   await pollEvents()
 }

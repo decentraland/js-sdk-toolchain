@@ -40,7 +40,7 @@ export const TransformSchema: ISchema<TransformType> = {
     builder.setFloat32(ptr + 28, value.scale.x)
     builder.setFloat32(ptr + 32, value.scale.y)
     builder.setFloat32(ptr + 36, value.scale.z)
-    builder.setUint32(ptr + 40, value.parent || 0)
+    builder.setUint32(ptr + 40, (value.parent as number) || 0)
   },
   deserialize(reader: ByteBuffer): TransformType {
     const ptr = reader.incrementReadOffset(TRANSFORM_LENGTH)

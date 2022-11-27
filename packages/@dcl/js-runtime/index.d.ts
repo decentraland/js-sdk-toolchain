@@ -75,7 +75,7 @@ interface WebSocket {
 
 declare var WebSocket: {
   prototype: WebSocket
-  new(url: string, protocols?: string | string[]): WebSocket
+  new (url: string, protocols?: string | string[]): WebSocket
   readonly CLOSED: number
   readonly CLOSING: number
   readonly CONNECTING: number
@@ -86,3 +86,5 @@ declare var console: {
   log(text: string): void
   error(error: any): void
 }
+
+declare const DEBUG: boolean

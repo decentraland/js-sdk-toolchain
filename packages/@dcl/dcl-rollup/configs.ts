@@ -98,6 +98,8 @@ export function createSceneConfig(options: { PROD: boolean }): RollupOptions {
         values: {
           document: 'undefined',
           window: 'undefined',
+          DEBUG: options.PROD ? 'false' : 'true',
+          'globalThis.DEBUG': options.PROD ? 'false' : 'true',
           'process.env.NODE_ENV': JSON.stringify(
             options.PROD ? 'production' : 'development'
           )
@@ -111,7 +113,7 @@ export function createSceneConfig(options: { PROD: boolean }): RollupOptions {
       commonjs({
         strictRequires: true
       }),
-      options.PROD &&
+      false && options.PROD &&
         analyze({
           hideDeps: true,
           summaryOnly: true

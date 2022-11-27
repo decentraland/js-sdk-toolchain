@@ -1,4 +1,4 @@
-import { Vector3 } from '../../packages/@dcl/ecs/src/runtime/math'
+import { Vector3 } from '../../packages/@dcl/ecs/src'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
@@ -129,7 +129,7 @@ describe('CRDT tests', () => {
     const { Transform } = clientA.engine.baseComponents
     const DoorComponent = clientA.components.Door
     // Upate Transform from static entity
-    const entity = (clientA.engine.addEntity() - 1) as Entity
+    const entity = (clientA.engine.addEntity() as any - 1) as Entity
     Transform.getMutable(entity).position.x = 10
 
     // Create a dynamic entity

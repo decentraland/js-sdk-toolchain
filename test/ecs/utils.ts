@@ -1,8 +1,8 @@
-import { Quaternion, Vector3 } from '../../packages/@dcl/ecs/src/runtime/math'
+import { Quaternion, Vector3 } from '../../packages/@dcl/ecs/src'
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
-import * as transport from '../../packages/@dcl/ecs/src/systems/crdt/transports/networkTransport'
+import * as transport from '../../packages/@dcl/sdk/src/transports/networkTransport'
 
 export function wait(ms: number) {
   return new Promise<void>((resolve) => setTimeout(() => resolve(), ms))
@@ -31,7 +31,7 @@ require.extensions
 export function setupDclInterfaceForThisSuite(
   modules: Record<string, Record<string, (arg: any) => Promise<any>>> = {}
 ) {
-  const updateFns: Array<(dt: number) => void> = []
+  const updateFns: Array<(dt: number) => Promise<void>> = []
   const eventFns: Array<(any: any) => void> = []
   const startFns: Array<() => void> = []
   const subscribeEvents: Set<string> = new Set()
@@ -46,8 +46,10 @@ export function setupDclInterfaceForThisSuite(
     } as any
   })
 
-  function tick(dt: number) {
-    updateFns.forEach(($) => $(dt))
+  async function tick(dt: number) {
+    for (const fn of updateFns) {
+      await fn(dt)
+    }
   }
 
   return { eventFns, updateFns, startFns, tick, subscribeEvents }
@@ -75,7 +77,8 @@ export namespace SandBox {
   export function create({ length }: { length: number }) {
     const clients = Array.from({ length }).map((_, index) => {
       const clientTransport = transport.createNetworkTransport()
-      const engine = Engine({ transports: [clientTransport] })
+      const engine = Engine()
+      engine.addTransport(clientTransport)
       const Position = engine.defineComponent(
         SandBox.Position.type,
         SandBox.Position.id

@@ -15,6 +15,7 @@
     "esModuleInterop": true,
     "declaration": false,
     "downlevelIteration": true,
+    "allowJs": true,
     "keyofStringsOnly": true,
     "strict": true,
     "strictNullChecks": true,

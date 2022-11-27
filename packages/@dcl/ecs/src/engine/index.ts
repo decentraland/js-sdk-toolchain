@@ -11,7 +11,7 @@ import {
 } from './component'
 import { Entity, EntityContainer } from './entity'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, SystemFn } from './systems'
-import type { IEngineParams, IEngine } from './types'
+import type { IEngine } from './types'
 import { ReadonlyComponentSchema } from './readonly'
 
 export * from './readonly'
@@ -170,22 +170,25 @@ function preEngine() {
 /**
  * @public
  */
-export function Engine({ transports }: IEngineParams = {}): IEngine {
+export function Engine(): IEngine {
   const engine = preEngine()
   const crdtSystem = crdtSceneSystem(engine)
   const baseComponents = defineSdkComponents(engine)
-
-  if (transports) {
-    for (const tranport of transports) {
-      crdtSystem.addTransport(tranport)
-    }
-  }
 
   function update(dt: number) {
     crdtSystem.receiveMessages()
 
     for (const system of engine.getSystems()) {
-      system.fn(dt)
+      const ret: any = system.fn(dt)
+      if ((globalThis as any).DEBUG) {
+        if (ret && typeof ret === 'object' && typeof ret.then === 'function') {
+          throw new Error(
+            `A system (${
+              system.name || 'anonymous'
+            }) returned a thenable. Systems cannot be async functions. Documentation: https://dcl.gg/sdk/sync-systems`
+          )
+        }
+      }
     }
 
     // TODO: Perf tip

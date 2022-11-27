@@ -1,3 +1,15 @@
+import {
+  Entity,
+  engine,
+  EventsSystem,
+  Transform,
+  Vector3,
+  MeshRenderer,
+  MeshCollider,
+  Quaternion,
+  InputAction
+} from '@dcl/ecs'
+
 // Cube factory
 function createCube(x: number, y: number, z: number): Entity {
   const meshEntity = engine.addEntity()

@@ -1,3 +1,18 @@
+import {
+  Entity,
+  engine,
+  Material,
+  Transform,
+  Vector3,
+  MeshRenderer,
+  Billboard,
+  BillboardMode,
+  TextShape,
+  Color3,
+  Color4,
+  Schemas
+} from '@dcl/ecs'
+
 function createPlaneTexture(x: number, y: number, z: number): Entity {
   const meshEntity = engine.addEntity()
 
@@ -68,11 +83,7 @@ function createTextShapes() {
   const regularColor = Color4.create(1, 0.2, 0.8, 0.8)
   const oppositeColor = Color4.create(0.8, 0.2, 1, 0.8)
 
-  createTextShape(
-    'Regular, only Y-rotation',
-    Vector3.create(8, 1, 1),
-    regularColor
-  )
+  createTextShape('Regular, only Y-rotation', Vector3.create(8, 1, 1), regularColor)
   createTextShape('Regular', Vector3.create(12, 1, 1), regularColor)
   createTextShape('Without billboard', Vector3.create(4, 1, 1), regularColor)
   createTextShape('Opposite, only Y', Vector3.create(8, 1, 8), oppositeColor)
@@ -102,7 +113,6 @@ engine.addSystem((dt: number) => {
     const bounce = BouncingBillboard.getMutable(entity)
     bounce.t += dt
 
-    Transform.getMutable(entity).position.y =
-      bounce.originalPosition.y + 0.05 * Math.sin(10 * bounce.t)
+    Transform.getMutable(entity).position.y = bounce.originalPosition.y + 0.05 * Math.sin(10 * bounce.t)
   }
 })

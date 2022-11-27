@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 
 import { createSceneConfig } from './configs'
-import { rollup, RollupError, watch } from 'rollup'
+import { RollupError, watch } from 'rollup'
 import * as ts from 'typescript'
 import { resolve, relative } from 'path'
 import { future } from 'fp-future'
 import {
   checkConfiguration,
-  loadArtifact,
   PackageJson,
   readPackageJson
 } from './scene.checks'

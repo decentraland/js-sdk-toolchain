@@ -90,7 +90,7 @@ export function createReconciler(
     instance: Instance,
     props: Partial<{ rightOf: Entity; parent: Entity }>
   ) {
-    upsertComponent(instance, props, 'uiTransform')
+    upsertComponent(instance, props as { rightOf: number; parent: number }, 'uiTransform')
   }
 
   function upsertListener(

@@ -1,3 +1,5 @@
+import { engine, Transform, MeshRenderer, MeshCollider } from '@dcl/ecs'
+
 enum Mesh {
   BOX,
   CYLINDER,

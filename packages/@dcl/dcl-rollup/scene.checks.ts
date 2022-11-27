@@ -1,6 +1,4 @@
-import { rollup, RollupWatcherEvent, watch } from 'rollup'
 import * as ts from 'typescript'
-import { resolve, dirname } from 'path'
 import { inspect } from 'util'
 
 export type PackageJson = {
@@ -58,7 +56,7 @@ export function readTsconfig(): any {
   }
 }
 
-export function checkConfiguration(packageJson: PackageJson) {
+export function checkConfiguration(_packageJson: PackageJson) {
   const host: ts.ParseConfigHost = {
     useCaseSensitiveFileNames: ts.sys.useCaseSensitiveFileNames,
     fileExists: ts.sys.fileExists,
@@ -166,32 +164,4 @@ export function resolveFile(path: string): string | null {
   }
 
   return null
-}
-
-function validatePackageJsonForLibrary(packageJson: PackageJson) {
-  if (!packageJson.main) {
-    throw new Error(`field "main" in package.json is missing.`)
-  }
-
-  if (!packageJson.types) {
-    throw new Error(`field "types" in package.json is missing.`)
-  } else {
-    const typingsFile = ts.sys.resolvePath(packageJson.types)
-
-    if (!typingsFile) {
-      throw new Error(
-        `! Error: field "types" in package.json cannot be resolved.`
-      )
-    }
-
-    const resolvedTypings = ts.sys.resolvePath(
-      packageJson.main.replace(/\.js$/, '.d.ts')
-    )
-    if (resolvedTypings !== typingsFile) {
-      const help = `(${resolvedTypings} != ${typingsFile})`
-      throw new Error(
-        `! Error: package.json .types does not match the emited file\n       ${help}`
-      )
-    }
-  }
 }

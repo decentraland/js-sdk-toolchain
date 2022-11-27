@@ -16,14 +16,13 @@ export function taskSystem(engine: IEngine) {
       const resp = await task()
       return resp
     } catch (e: any) {
-      throw e
-      // TODO: dcl.error(`executeTask: FAILED. ${e.toString()}`, e)
+      console.error(e)
     }
   }
 
   function executeTasks() {
     for (const task of getAndClean(tasks)) {
-      runTask(task).catch(() => {})
+      runTask(task).catch(console.error)
     }
   }
 

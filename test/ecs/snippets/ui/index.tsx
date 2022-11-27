@@ -1,3 +1,18 @@
+import {
+  Entity,
+  engine,
+  Transform,
+  MeshRenderer,
+  MeshCollider,
+  InputAction,
+  Vector3,
+  Color4,
+  Input,
+  Quaternion,
+  PointerHoverFeedback,
+  PointerEventType
+} from '@dcl/ecs'
+
 import ReactEcs, {
   renderUi,
   UiEntity,

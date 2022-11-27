@@ -7,5 +7,6 @@ renderUi(ui)
 engine.addEntity()
 
 export async function onUpdate(dt: number) {
-  await sdk.runTick(dt)
+  await sdk.onUpdate(dt)
 }
+

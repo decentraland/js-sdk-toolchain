@@ -1,4 +1,4 @@
-import { Entity, engine } from '@dcl/ecs'
+import { Entity, engine as globalEngine, IEngine } from '@dcl/ecs'
 
 import type { JSX } from './react-ecs'
 import { createReconciler } from './reconciler'
@@ -6,7 +6,7 @@ import { createReconciler } from './reconciler'
 export type UiComponent = () => JSX.Element
 const uiContainer: { getEntities: () => Entity[]; update: () => void }[] = []
 
-export function renderUi(ui: UiComponent) {
+export function renderUi(ui: UiComponent, engine: IEngine = globalEngine) {
   const renderer = createReconciler(engine)
   function update() {
     renderer.update(ui())
@@ -16,7 +16,7 @@ export function renderUi(ui: UiComponent) {
   return uiContainer.push({ update, getEntities: renderer.getEntities }) - 1
 }
 
-export function removeUi(index: number) {
+export function removeUi(index: number, engine: IEngine = globalEngine) {
   const ui = uiContainer[index]
   if (!ui) return
 

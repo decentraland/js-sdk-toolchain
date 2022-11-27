@@ -1,7 +1,4 @@
-import {
-  Quaternion,
-  Vector3
-} from '../../../packages/@dcl/ecs/src/runtime/math'
+import { Quaternion, Vector3 } from '../../../packages/@dcl/ecs/src'
 import { Engine, Entity } from '../../../packages/@dcl/ecs/src/engine'
 import { setupDclInterfaceForThisSuite, testingEngineApi } from '../utils'
 
@@ -43,10 +40,7 @@ describe('Legacy component tests', () => {
 
         const transformData = sdk.Transform.toBinary(entity)
         const transformOriginal = { ...component }
-        const transformReceveid = sdk.Transform.updateFromBinary(
-          entity,
-          transformData
-        )
+        const transformReceveid = sdk.Transform.updateFromBinary(entity, transformData)
         expect(transformReceveid).toBeDeepCloseTo(transformOriginal)
       }
 
@@ -55,10 +49,7 @@ describe('Legacy component tests', () => {
         const boxShapeData = sdk.MeshRenderer.toBinary(entity)
         // TODO: see this
         const boxShapeOriginal = { ...component } as any
-        const boxShapeReceveid = sdk.MeshRenderer.updateFromBinary(
-          entity,
-          boxShapeData
-        )
+        const boxShapeReceveid = sdk.MeshRenderer.updateFromBinary(entity, boxShapeData)
         expect(boxShapeReceveid).toBeDeepCloseTo(boxShapeOriginal)
       }
     }

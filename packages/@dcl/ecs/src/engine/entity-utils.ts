@@ -27,7 +27,7 @@ export namespace EntityUtils {
   ]
 
   function isInRange(entity: Entity, range: EntityRange): boolean {
-    return entity >= range[0] && entity <= range[1]
+    return (entity as number) >= range[0] && (entity as number) <= range[1]
   }
 
   export function isDynamicEntity(entity: Entity) {

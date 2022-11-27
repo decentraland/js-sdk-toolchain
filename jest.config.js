@@ -1,4 +1,5 @@
 module.exports = {
+  // preset: "ts-jest/presets/js-with-ts",
   globals: {
     "ts-jest": {
       tsconfig: "test/tsconfig.json",
@@ -6,7 +7,7 @@ module.exports = {
   },
   moduleFileExtensions: ["ts", "js", "tsx"],
   transform: {
-    "^.+\\.(ts|tsx)$": "ts-jest",
+    "^.+\\.(js|jsx|ts|tsx)$": "ts-jest",
   },
   coverageDirectory: "coverage",
   coverageThreshold: {

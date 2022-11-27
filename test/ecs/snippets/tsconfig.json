@@ -1,7 +1,12 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "strict": true
+    "strict": true,
+    "typeRoots": ["../../../packages"],
+    "paths": {
+      "@dcl/ecs": ["../../../packages/@dcl/ecs"],
+      "@dcl/react-ecs": ["../../../packages/@dcl/react-ecs"]
+    }
   },
   "include": ["**/*.ts", "**/*.tsx"],
   "extends": "../../../packages/@dcl/sdk/types/tsconfig.ecs7.json"

@@ -1,10 +1,9 @@
 import { EntityUtils } from './entity-utils'
 
-declare const entitySymbol: unique symbol
 /**
  * @public
  */
-export type Entity = number & { [entitySymbol]: true }
+export type Entity = unknown
 
 export function EntityContainer() {
   const staticEntity = Entity(EntityUtils.STATIC_ENTITIES_RANGE)

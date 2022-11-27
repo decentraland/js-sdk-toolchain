@@ -1,5 +1,4 @@
 import { resolve } from 'path'
-import { readFileSync } from 'fs'
 import {
   itExecutes,
   ensureFileExists,

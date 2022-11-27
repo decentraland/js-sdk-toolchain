@@ -14,10 +14,10 @@ let fakePointer: (
 
 describe('Events System', () => {
   beforeEach(() => {
-    engine = (globalThis as any).engine = Engine()
+    engine = Engine()
     const Input = createInput(engine)
-    ;(global as any).Input = Input
     engine.addSystem(EventsSystem.update(Input))
+
     const { PointerEventsResult } = engine.baseComponents
     let fakeCounter = 0
 
@@ -28,7 +28,7 @@ describe('Events System', () => {
 
       pointerEvents.commands.push(
         createTestPointerDownCommand(
-          entity,
+          entity as number,
           fakeCounter + 1,
           pointerType,
           button

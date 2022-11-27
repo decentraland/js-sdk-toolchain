@@ -39,7 +39,7 @@ export function runCommand(
       '\u001b[36min ' +
         relative(process.cwd(), cwd) +
         ':\u001b[0m ' +
-        command +
+        relative(process.cwd(), command) +
         '\n'
     )
     exec(command, { cwd, env }, (error, stdout, stderr) => {
@@ -48,7 +48,7 @@ export function runCommand(
       stderr.trim().length &&
         process.stderr.write('! ' + stderr.replace(/\n/g, '\n  ') + '\n')
       if (error) {
-        onError(stderr)
+        onError(stderr || stdout || 'command "' + command + '" failed to execute')
       } else {
         onSuccess(stdout)
       }

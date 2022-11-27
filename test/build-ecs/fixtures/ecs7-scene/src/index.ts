@@ -5,10 +5,11 @@ import {
   InputAction,
   MeshCollider,
   MeshRenderer,
-  Transform
+  Transform,
+  Quaternion,
+  Vector3
 } from '@dcl/ecs'
-import * as sdk from '@dcl/sdk'
-import { Quaternion, Vector3 } from '@dcl/ecs-math'
+export * from '@dcl/sdk'
 
 // Cube factory
 function createCube(x: number, y: number, z: number): Entity {
@@ -54,7 +55,3 @@ EventsSystem.onPointerDown(
 
 engine.addSystem(circularSystem)
 // engine.addSystem(clickSystem)
-
-export async function onUpdate(dt: number) {
-  await sdk.runTick(dt)
-}

@@ -10,20 +10,20 @@ import {
 } from '../../packages/@dcl/react-ecs/src'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 
-declare const engine: IEngine
+let engine: IEngine
 
 describe('UiText React Ecs', () => {
   beforeEach(() => {
-    ;(globalThis as any).engine = Engine()
+    engine = Engine()
   })
 
   it('should generate a UI and update the width of a div', async () => {
     const { UiTransform, UiText } = engine.baseComponents
-    const entityIndex = engine.addEntity()
+    const entityIndex = engine.addEntity() as number
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
-    const getDiv = (entity: Entity) => UiTransform.get(entity)
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
     const getText = (entity: Entity) => UiText.get(entity)
     let text = 'CASLA'
     let color: Color4 | undefined = undefined
@@ -43,7 +43,7 @@ describe('UiText React Ecs', () => {
     renderUi(ui)
     engine.update(1)
 
-    expect(getDiv(rootDivEntity)).toMatchObject({
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
       rightOf: 0,
       width: 100
