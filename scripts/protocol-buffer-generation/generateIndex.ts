@@ -14,54 +14,54 @@ function enumTemplate({ componentPascalName, componentId }: Component) {
 }
 
 function importComponent(component: Component) {
-  return `import * as ${component.componentPascalName}Schema from './${component.componentPascalName}.gen'`
+  return `import { ${component.componentPascalName}Schema } from './${component.componentPascalName}.gen'; export { ${component.componentPascalName}Schema };`
+}
+
+function importComponentFromIndex(component: Component) {
+  return `import { ${component.componentPascalName}Schema } from './index.gen';`
 }
 
 function exportComponent(component: Component) {
   return `export * from './pb/decentraland/sdk/components/${component.componentFile}.gen'`
 }
 
-function defineComponent(component: Component) {
-  if (component.componentId === TransformComponent.componentId) {
-    return `\t\t${component.componentPascalName}: TransformSchema.defineTransformComponent({ defineComponentFromSchema }),`
-  }
-  return `\t\t${component.componentPascalName}: defineComponentFromSchema(${component.componentPascalName}Schema.${component.componentPascalName}Schema, ${component.componentPascalName}Schema.COMPONENT_ID),`
+function defineComponentDecl(component: Component) {
+  return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: ComponentGetter<ComponentDefinition<typeof ${component.componentPascalName}Schema>> = engine =>
+    engine.defineComponentFromSchema(${component.componentPascalName}Schema, ${component.componentPascalName}Schema.COMPONENT_ID);
+  `.trim()
 }
 
-function useDefinedComponent(component: Component) {
-  return `/** @public */\nexport const ${component.componentPascalName} = engine.baseComponents.${component.componentPascalName}`
-}
-
-function namespaceComponent(component: Component) {
-  return `\t/** @public */\n\texport const ${component.componentPascalName} = engine.baseComponents.${component.componentPascalName}`
+const skipExposeGlobally: string[] = [
+  'Animator',
+  'MeshRenderer',
+  'MeshCollider',
+  'Material'
+]
+function defineGlobalComponentDecl(component: Component) {
+  if (skipExposeGlobally.includes(component.componentPascalName)) return ''
+  return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: ComponentDefinition<typeof ${component.componentPascalName}Schema> = components.${component.componentPascalName}(engine)`.trim()
 }
 
 const indexTemplate = `import type { IEngine } from '../../engine/types'
+import { ComponentDefinition } from '../../engine/component'
 import * as TransformSchema from '../legacy/Transform'
 $componentImports
 $componentExports
 
-export function defineLibraryComponents({
-  defineComponentFromSchema
-}: Pick<IEngine, 'defineComponentFromSchema'>) {
-  return {
-$componentReturns
-  }
-}
+export type ComponentGetter<T extends ComponentDefinition<any>> = (engine: Pick<IEngine,'defineComponentFromSchema'>) => T
+
+$componentDeclarations
 `
 
-const globalTemplate = `import { engine } from '../../runtime/initialization'
+const globalTemplate = `
+import { engine } from '../../runtime/initialization'
+import { ComponentDefinition } from '../../engine/component'
+import * as components from './index.gen'
+export * from './index.gen';
 
-${useDefinedComponent(TransformComponent)}
-$componentReturns
-`
+$allGlobalComponentsImports
 
-const globalNamespaceTemplate = `import { engine } from '../../runtime/initialization'
-/** @public */
-export namespace Components {
-${namespaceComponent(TransformComponent)}
-$componentPascalNamespace
-}
+$allGlobalComponents
 `
 
 const idsTemplate = `/** @public */
@@ -82,8 +82,8 @@ export function generateIndex(param: {
 
   const indexContent = indexTemplate
     .replace(
-      '$componentReturns',
-      componentWithoutIndex.map(defineComponent).join('\n')
+      '$componentDeclarations',
+      componentWithoutIndex.map(defineComponentDecl).join('\n')
     )
     .replace(
       '$componentImports',
@@ -96,22 +96,17 @@ export function generateIndex(param: {
 
   fs.writeFileSync(path.resolve(generatedPath, 'index.gen.ts'), indexContent)
 
-  const globalContent = globalTemplate.replace(
-    '$componentReturns',
-    componentWithoutIndex.map(useDefinedComponent).join('\n')
-  )
+  const globalContent = globalTemplate
+    .replace(
+      '$allGlobalComponentsImports',
+      componentWithoutIndex.map(importComponentFromIndex).join('\n')
+    )
+    .replace(
+      '$allGlobalComponents',
+      componentWithoutIndex.map(defineGlobalComponentDecl).join('\n')
+    )
 
   fs.writeFileSync(path.resolve(generatedPath, 'global.gen.ts'), globalContent)
-
-  const namespaceContent = globalNamespaceTemplate.replace(
-    '$componentPascalNamespace',
-    componentWithoutIndex.map(namespaceComponent).join('\n')
-  )
-
-  fs.writeFileSync(
-    path.resolve(generatedPath, 'global.namespace.gen.ts'),
-    namespaceContent
-  )
 
   const idsContent = idsTemplate.replace(
     '$enumComponentIds',

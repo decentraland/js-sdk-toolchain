@@ -1,9 +1,9 @@
-﻿import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+﻿import { Engine, components } from '../../../packages/@dcl/ecs/src'
 
 describe('Generated VisibilityComponent ProtoBuf', () => {
   it('should serialize/deserialize VisibilityComponent', () => {
     const newEngine = Engine()
-    const { VisibilityComponent } = newEngine.baseComponents
+    const VisibilityComponent = components.VisibilityComponent(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

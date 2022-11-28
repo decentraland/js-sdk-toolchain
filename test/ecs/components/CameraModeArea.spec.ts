@@ -1,10 +1,9 @@
-import { CameraType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/camera_type.gen'
-import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, components, CameraType } from '../../../packages/@dcl/ecs/src'
 
 describe('Generated CameraModifierArea ProtoBuf', () => {
   it('should serialize/deserialize CameraModifierArea', () => {
     const newEngine = Engine()
-    const { CameraModeArea } = newEngine.baseComponents
+    const CameraModeArea = components.CameraModeArea(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

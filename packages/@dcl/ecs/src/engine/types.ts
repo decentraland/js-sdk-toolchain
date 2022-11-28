@@ -1,15 +1,12 @@
-import { defineSdkComponents } from '../components'
 import type { ISchema } from '../schemas/ISchema'
 import { Result, Spec } from '../schemas/Map'
-import { Transport } from '../systems/crdt/transports/types'
-import { ComponentDefinition as CompDef, ComponentType } from './component'
+import { Transport } from '../systems/crdt/types'
+import { ComponentDefinition as CompDef } from './component'
 import { Entity } from './entity'
 import { SystemFn } from './systems'
 import { ReadonlyComponentSchema } from './readonly'
 
 export { ISchema } from '../schemas/ISchema'
-
-export { IInput } from './input'
 
 /**
  * @public
@@ -19,8 +16,10 @@ export type Unpacked<T> = T extends (infer U)[] ? U : T
 /**
  * @public
  */
-export type ComponentSchema<T extends [CompDef, ...CompDef[]]> = {
-  [K in keyof T]: T[K] extends CompDef ? ReturnType<T[K]['getMutable']> : never
+export type ComponentSchema<T extends [CompDef<any>, ...CompDef<any>[]]> = {
+  [K in keyof T]: T[K] extends CompDef<any>
+    ? ReturnType<T[K]['getMutable']>
+    : never
 }
 
 /**
@@ -29,8 +28,8 @@ export type ComponentSchema<T extends [CompDef, ...CompDef[]]> = {
 export type IEngine = {
   /**
    * Increment the used entity counter and return the next one.
-   * @param dynamic
-   * @return the next entity unused
+   * @param dynamic - whether or no the entity should be considered as Dynamic (vs Static)
+   * @returns the next entity unused
    */
   addEntity(dynamic?: boolean): Entity
 
@@ -41,7 +40,7 @@ export type IEngine = {
 
   /**
    * Remove all components of an entity
-   * @param entity
+   * @param entity - entity
    */
   removeEntity(entity: Entity): void
 
@@ -60,9 +59,9 @@ export type IEngine = {
 
   /**
    * Add the system to the engine. It will be called every tick updated.
-   * @param system function that receives the delta time between last tick and current one.
-   * @param priority a number with the priority, big number are called before smaller ones
-   * @param name optional: a unique name to identify it
+   * @param system - function that receives the delta time between last tick and current one.
+   * @param priority - a number with the priority, big number are called before smaller ones
+   * @param name - optional: a unique name to identify it
    *
    * Example:
    * ```ts
@@ -79,17 +78,17 @@ export type IEngine = {
 
   /**
    * Remove a system from the engine.
-   * @param selector the function or the unique name to identify
+   * @param selector - the function or the unique name to identify
    * @returns if it was found and removed
    */
   removeSystem(selector: string | SystemFn): boolean
 
   /**
    * Define a component and add it to the engine.
-   * @param spec An object with schema fields
-   * @param componentId unique id to identify the component, if the component id already exist, it will fail.
-   * @param constructorDefault the initial value prefilled when a component is created without a value
-   * @return The component definition
+   * @param spec - An object with schema fields
+   * @param componentId - unique id to identify the component, if the component id already exist, it will fail.
+   * @param constructorDefault - the initial value prefilled when a component is created without a value
+   * @returns The component definition
    *
    * ```ts
    * const DoorComponentId = 10017
@@ -107,9 +106,9 @@ export type IEngine = {
   ): CompDef<ISchema<Result<T>>, Partial<Result<T>>>
   /**
    * Define a component and add it to the engine.
-   * @param spec An object with schema fields
-   * @param componentId unique id to identify the component, if the component id already exist, it will fail.
-   * @return The component definition
+   * @param spec - An object with schema fields
+   * @param componentId - unique id to identify the component, if the component id already exist, it will fail.
+   * @returns The component definition
    *
    * ```ts
    * const StateComponentId = 10023
@@ -117,8 +116,8 @@ export type IEngine = {
    * ```
    */
   defineComponentFromSchema<
-    T extends ISchema<Record<string, any>>,
-    ConstructorType = ComponentType<T>
+    T extends ISchema<ConstructorType>,
+    ConstructorType
   >(
     spec: T,
     componentId: number,
@@ -127,8 +126,8 @@ export type IEngine = {
 
   /**
    * Get the component definition from the component id.
-   * @param componentId
-   * @return the component definition, throw an error if it doesn't exist
+   * @param componentId - component number used to identify the component descriptor
+   * @returns the component definition, throw an error if it doesn't exist
    * ```ts
    * const StateComponentId = 10023
    * const StateComponent = engine.getComponent(StateComponentId)
@@ -138,8 +137,8 @@ export type IEngine = {
 
   /**
    * Get a iterator of entities that has all the component requested.
-   * @param components a list of component definitions
-   * @return An iterator of an array with the [entity, component1, component2, ...]
+   * @param components - a list of component definitions
+   * @returns An iterator of an array with the [entity, component1, component2, ...]
    *
    * Example:
    * ```ts
@@ -148,20 +147,18 @@ export type IEngine = {
    * }
    * ```
    */
-  getEntitiesWith<T extends [CompDef, ...CompDef[]]>(
+  getEntitiesWith<T extends [CompDef<any>, ...CompDef<any>[]]>(
     ...components: T
   ): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>
 
   /**
-   * @internal
-   *
-   * @param dt
+   * @param deltaTime - deltaTime in seconds
    */
-  update(dt: number): void
+  update(deltaTime: number): void
 
   /**
    * @internal
-   * @param componentId
+   * @param componentId - componentId
    */
   removeComponentDefinition(componentId: number): void
 
@@ -169,33 +166,22 @@ export type IEngine = {
    * @public
    * Refer to the root of the scene, all Transforms without a parent are parenting with RootEntity.
    */
-  RootEntity: Entity
+  readonly RootEntity: Entity
 
   /**
    * @public
    * The current player entity
    */
-  PlayerEntity: Entity
+  readonly PlayerEntity: Entity
 
   /**
    * @public
    * Camera entity of current player.
    */
-  CameraEntity: Entity
-
-  baseComponents: ReturnType<typeof defineSdkComponents>
+  readonly CameraEntity: Entity
 
   /**
-   * @internal
-   *
-   * @param tranport - transport which changes its onmessage to process CRDT messages
+   * @param transport - transport which changes its onmessage to process CRDT messages
    */
   addTransport(transport: Transport): void
-}
-
-/**
- * @public
- */
-export type IEngineParams = {
-  transports?: Transport[]
 }

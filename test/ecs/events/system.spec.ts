@@ -1,7 +1,15 @@
-import { Engine, Entity, IEngine } from '../../../packages/@dcl/ecs/src/engine'
-import { createInput } from '../../../packages/@dcl/ecs/src/engine/input'
+import {
+  Engine,
+  Entity,
+  IEngine,
+  components
+} from '../../../packages/@dcl/ecs/src'
+import { createInputSystem } from '../../../packages/@dcl/ecs/src/engine/input'
 import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
-import { EventsSystem } from '../../../packages/@dcl/ecs/src/systems/events'
+import {
+  createPointerEventSystem,
+  PointerEventsSystem
+} from '../../../packages/@dcl/ecs/src/systems/events'
 import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
 import { createTestPointerDownCommand } from './utils'
 
@@ -13,12 +21,13 @@ let fakePointer: (
 ) => void
 
 describe('Events System', () => {
+  let EventsSystem: PointerEventsSystem
   beforeEach(() => {
-    engine = (globalThis as any).engine = Engine()
-    const Input = createInput(engine)
-    ;(global as any).Input = Input
-    engine.addSystem(EventsSystem.update(Input))
-    const { PointerEventsResult } = engine.baseComponents
+    engine = Engine()
+    const Input = createInputSystem(engine)
+    EventsSystem = createPointerEventSystem(engine, Input)
+
+    const PointerEventsResult = components.PointerEventsResult(engine)
     let fakeCounter = 0
 
     fakePointer = (entity, pointerType, button) => {
@@ -28,11 +37,11 @@ describe('Events System', () => {
 
       pointerEvents.commands.push(
         createTestPointerDownCommand(
-          entity,
+          entity as number,
           fakeCounter + 1,
           pointerType,
           button
-        )
+        ) as any
       )
       fakeCounter += 1
     }
@@ -40,7 +49,7 @@ describe('Events System', () => {
 
   it('should run default onClick', () => {
     const entity = engine.addEntity()
-    const { PointerHoverFeedback } = engine.baseComponents
+    const PointerHoverFeedback = components.PointerHoverFeedback(engine)
     let counter = 0
     EventsSystem.onClick(
       entity,
@@ -61,7 +70,7 @@ describe('Events System', () => {
 
   it('should create pointer hover components', () => {
     const entity = engine.addEntity()
-    const { PointerHoverFeedback } = engine.baseComponents
+    const PointerHoverFeedback = components.PointerHoverFeedback(engine)
     EventsSystem.onClick(entity, () => {}, { hoverText: 'Boedo' })
     fakePointer(entity, PointerEventType.PET_DOWN)
     fakePointer(entity, PointerEventType.PET_UP)
@@ -75,7 +84,7 @@ describe('Events System', () => {
 
   it('should delete pointer hover components and callback', () => {
     const entity = engine.addEntity()
-    const { PointerHoverFeedback } = engine.baseComponents
+    const PointerHoverFeedback = components.PointerHoverFeedback(engine)
     let counter = 0
     EventsSystem.onClick(
       entity,
@@ -109,7 +118,7 @@ describe('Events System', () => {
 
   it('should run default onDown', () => {
     const entity = engine.addEntity()
-    const { PointerHoverFeedback } = engine.baseComponents
+    const PointerHoverFeedback = components.PointerHoverFeedback(engine)
     let counter = 0
     EventsSystem.onPointerDown(
       entity,
@@ -126,7 +135,7 @@ describe('Events System', () => {
 
   it('should remove pointer down', () => {
     const entity = engine.addEntity()
-    const { PointerHoverFeedback } = engine.baseComponents
+    const PointerHoverFeedback = components.PointerHoverFeedback(engine)
     let counter = 0
     EventsSystem.onPointerDown(
       entity,
@@ -159,7 +168,7 @@ describe('Events System', () => {
 
   it('should remove pointer up', () => {
     const entity = engine.addEntity()
-    const { PointerHoverFeedback } = engine.baseComponents
+    const PointerHoverFeedback = components.PointerHoverFeedback(engine)
     let counter = 0
     EventsSystem.onPointerUp(
       entity,
@@ -248,5 +257,42 @@ describe('Events System', () => {
     engine.removeEntity(entity)
     engine.update(1)
     expect(counter).toBe(1)
+  })
+
+  it('should throw error with a callback thenable', () => {
+    const entity = engine.addEntity()
+    let counter = 0
+    EventsSystem.onPointerUp(entity, async function () {
+      counter += 1
+      return new Promise((resolve) => setTimeout(resolve, 0))
+    })
+    fakePointer(entity, PointerEventType.PET_UP)
+
+    const previousDebugMode = (globalThis as any).DEBUG
+    ;(globalThis as any).DEBUG = true
+    expect(() => {
+      engine.update(1)
+    }).toThrowError()
+
+    if (previousDebugMode) {
+      ;(globalThis as any).DEBUG = previousDebugMode
+    } else {
+      delete (globalThis as any).DEBUG
+    }
+
+    expect(counter).toBe(1)
+  })
+
+  it(`should ignore removing hover feedback`, () => {
+    const entity = engine.addEntity()
+    EventsSystem.onPointerUp(entity, function () {}, {
+      hoverText: 'test',
+      button: InputAction.IA_ACTION_3
+    })
+
+    const PointerHoverFeedback = components.PointerHoverFeedback(engine)
+    PointerHoverFeedback.deleteFrom(entity)
+
+    EventsSystem.removeOnPointerUp(entity)
   })
 })

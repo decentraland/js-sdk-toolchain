@@ -1,12 +1,11 @@
 {
   "name": "@dcl/react-ecs",
   "version": "0.0.1",
-  "decentralandLibrary": {},
   "description": "Decentraland ECS",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/dist/libs.config.js"
+    "build": "tsc -p tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -26,17 +25,15 @@
   "homepage": "https://github.com/decentraland/js-sdk-toolchain#readme",
   "devDependencies": {
     "@types/react": "^18.0.18",
-    "@types/react-reconciler": "^0.28.0",
-    "@dcl/ecs": "file:../ecs"
+    "@types/react-reconciler": "^0.28.0"
   },
   "dependencies": {
+    "@dcl/ecs": "file:../ecs",
     "react": "^18.2.0",
     "react-reconciler": "^0.29.0"
   },
   "files": [
-    "dist/index.js",
-    "dist/index.d.ts",
-    "dist/index.min.js",
-    "dist/index.min.js.map"
+    "dist",
+    "tsconfig.json"
   ]
 }

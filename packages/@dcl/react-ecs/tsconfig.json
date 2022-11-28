@@ -15,9 +15,7 @@
     "jsx": "react",
     "jsxFactory": "ReactEcs.createElement",
     "rootDir": "src",
-    "types": [
-      "@dcl/ecs"
-    ]
+    "types": []
   },
   "include": [
     "src"

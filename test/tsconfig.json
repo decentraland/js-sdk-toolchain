@@ -4,11 +4,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "pretty": true,
-    "types": [
-      "node",
-      "jest",
-      "packages/@dcl/ecs/node_modules/@dcl/posix/index.d.ts"
-    ],
+    "types": ["jest", "@dcl/js-runtime"],
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
@@ -16,6 +12,7 @@
     "esModuleInterop": true,
     "declaration": false,
     "downlevelIteration": true,
+    "allowJs": true,
     "keyofStringsOnly": true,
     "strict": true,
     "strictNullChecks": true,
@@ -25,7 +22,8 @@
     "alwaysStrict": true,
     "jsx": "react",
     "jsxFactory": "ReactEcs.createElement",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "typeRoots": ["../packages", "../node_modules/@types"]
   },
   "includes": "*.ts"
 }

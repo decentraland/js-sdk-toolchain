@@ -1,6 +1,6 @@
 import { exec } from 'child_process'
 import { sync as globSync } from 'glob'
-import { resolve } from 'path'
+import { resolve, relative } from 'path'
 import {
   existsSync,
   readFileSync,
@@ -35,14 +35,22 @@ export function runCommand(
   env?: Record<string, string>
 ): Promise<string> {
   return new Promise<string>((onSuccess, onError) => {
-    process.stdout.write('∑ ' + cwd + '; ' + command + '\n')
+    process.stdout.write(
+      '\u001b[36min ' +
+        relative(process.cwd(), cwd) +
+        ':\u001b[0m ' +
+        relative(process.cwd(), command) +
+        '\n'
+    )
     exec(command, { cwd, env }, (error, stdout, stderr) => {
       stdout.trim().length &&
         process.stdout.write('  ' + stdout.replace(/\n/g, '\n  ') + '\n')
       stderr.trim().length &&
         process.stderr.write('! ' + stderr.replace(/\n/g, '\n  ') + '\n')
       if (error) {
-        onError(stderr)
+        onError(
+          stderr || stdout || 'command "' + command + '" failed to execute'
+        )
       } else {
         onSuccess(stdout)
       }
@@ -96,7 +104,7 @@ export function itInstallsADependencyFromFolderAndCopiesTheVersion(
 ) {
   const dependencies = devDependency ? 'devDependencies' : 'dependencies'
 
-  itExecutes(`npm install --quiet ${depPath}`, cwd)
+  itExecutes(`npm install --silent ${depPath}`, cwd)
 
   it(`update ${dependencies} version ${depPath} in ${cwd}`, () => {
     const depPackageJson = readJson('package.json', depPath)
@@ -124,7 +132,12 @@ export function itInstallsADependencyFromFolderAndCopiesTheVersion(
 }
 
 export function copyFile(from: string, to: string) {
-  console.log(`> copying ${from} to ${to}`)
+  process.stdout.write(
+    `> copying ${relative(process.cwd(), from)} to ${relative(
+      process.cwd(),
+      to
+    )}\n`
+  )
 
   if (!existsSync(from)) {
     throw new Error(`${from} does not exist`)

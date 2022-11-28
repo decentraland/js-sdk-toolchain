@@ -1,12 +1,11 @@
+import { YGDisplay } from '@dcl/ecs'
 import { ReactEcs } from '../react-ecs'
 import { CommonProps, EntityPropTypes } from './types'
-import { parseUiTransform } from './uiTransform'
-import { YGDisplay } from './uiTransform/types'
+import { parseUiTransform, CANVAS_ROOT_ENTITY } from './uiTransform'
 
 export * from './types'
+export { CANVAS_ROOT_ENTITY }
 export * from './uiTransform/types'
-export * from './uiText/types'
-export * from './uiBackground/types'
 export * from './listeners/types'
 
 /**
@@ -21,6 +20,7 @@ export function UiEntity(props: EntityPropTypes & Partial<CommonProps>) {
 
 export type ContainerPropTypes = Partial<CommonProps> &
   EntityPropTypes['uiTransform']
+
 export function Container({ width, height, children }: ContainerPropTypes) {
   return (
     <UiEntity uiTransform={{ width, height, display: YGDisplay.YGD_FLEX }}>

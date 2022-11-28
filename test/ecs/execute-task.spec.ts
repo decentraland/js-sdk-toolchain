@@ -1,10 +1,12 @@
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
-import { taskSystem } from '../../packages/@dcl/ecs/src/systems/async-task'
+import { createTaskSystem } from '../../packages/@dcl/ecs/src/systems/async-task'
+
+declare let process: any
 
 describe('Execute Task', () => {
   it('should run async tasks in the engine', () => {
     const engine = Engine()
-    const { executeTask } = taskSystem(engine)
+    const { executeTask } = createTaskSystem(engine)
 
     let counter = 0
 
@@ -21,19 +23,17 @@ describe('Execute Task', () => {
   })
 
   it('should catch the error and log it', async () => {
-    ;(globalThis as any).dcl = {
-      error: jest.fn()
-    }
+    const error = jest.spyOn(console, 'error')
     const engine = Engine()
-    const { executeTask } = taskSystem(engine)
+    const { executeTask } = createTaskSystem(engine)
     async function errorFn() {
-      throw 1
+      throw 'Error bubbles to console'
     }
     executeTask(errorFn)
     engine.update(1)
 
     // flush the callback event looper
-    await new Promise((resolve) => setTimeout(resolve, 0))
-    expect(dcl.error).toBeCalledWith('executeTask: FAILED. 1', 1)
+    await new Promise(process.nextTick)
+    expect(error).toBeCalledWith('Error bubbles to console')
   })
 })

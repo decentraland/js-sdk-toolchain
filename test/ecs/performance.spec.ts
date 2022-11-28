@@ -1,18 +1,10 @@
-import {
-  SandBox,
-  setupDclInterfaceForThisSuite,
-  testingEngineApi
-} from './utils'
+import { components as engineComponents } from '../../packages/@dcl/ecs/src'
+import { SandBox } from './utils'
 
 describe.skip('Performance.', () => {
-  const engineApi = testingEngineApi()
-  setupDclInterfaceForThisSuite({
-    ...engineApi.modules
-  })
-
   it('should run 10k iterations', () => {
     const { engine, components } = SandBox.create({ length: 1 })[0]
-    const { Transform } = engine.baseComponents
+    const Transform = engineComponents.Transform(engine)
     const NUM_ENTITIES = 1000
     const NUM_ITERATIONS = 1000
 

@@ -1,13 +1,14 @@
-import { Engine } from '../../../packages/@dcl/ecs/src/engine'
 import {
+  Engine,
+  components,
   Font,
   TextAlignMode
-} from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/texts.gen'
+} from '../../../packages/@dcl/ecs/src'
 
 describe('Generated TextShape ProtoBuf', () => {
   it('should serialize/deserialize TextShape', () => {
     const newEngine = Engine()
-    const { TextShape } = newEngine.baseComponents
+    const TextShape = components.TextShape(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

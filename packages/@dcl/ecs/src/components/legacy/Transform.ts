@@ -3,6 +3,11 @@ import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
 import { ComponentDefinition, IEngine } from '../../engine'
 
+export type TransformComponent = ComponentDefinition<
+  ISchema<TransformType>,
+  Partial<TransformType>
+>
+
 /**
  * @internal
  */
@@ -35,7 +40,7 @@ export const TransformSchema: ISchema<TransformType> = {
     builder.setFloat32(ptr + 28, value.scale.x)
     builder.setFloat32(ptr + 32, value.scale.y)
     builder.setFloat32(ptr + 36, value.scale.z)
-    builder.setUint32(ptr + 40, value.parent || 0)
+    builder.setUint32(ptr + 40, (value.parent as number) || 0)
   },
   deserialize(reader: ByteBuffer): TransformType {
     const ptr = reader.incrementReadOffset(TRANSFORM_LENGTH)
@@ -68,11 +73,8 @@ export const TransformSchema: ISchema<TransformType> = {
   }
 }
 
-export function defineTransformComponent({
-  defineComponentFromSchema
-}: Pick<IEngine, 'defineComponentFromSchema'>): ComponentDefinition<
-  ISchema<TransformType>,
-  Partial<TransformType>
-> {
-  return defineComponentFromSchema(TransformSchema, COMPONENT_ID)
+export function defineTransformComponent(
+  engine: Pick<IEngine, 'defineComponentFromSchema'>
+): ComponentDefinition<ISchema<TransformType>, Partial<TransformType>> {
+  return engine.defineComponentFromSchema(TransformSchema, COMPONENT_ID)
 }

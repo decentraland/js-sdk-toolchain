@@ -1,26 +1,12 @@
 import {
-  PBUiTransform,
   YGAlign,
   YGDisplay,
   YGFlexDirection,
   YGJustify,
   YGOverflow,
   YGPositionType,
-  YGUnit,
   YGWrap
-} from '../../generated/decentraland/sdk/components/ui_transform.gen'
-
-export {
-  PBUiTransform,
-  YGAlign,
-  YGDisplay,
-  YGFlexDirection,
-  YGJustify,
-  YGOverflow,
-  YGPositionType,
-  YGUnit,
-  YGWrap
-}
+} from '@dcl/ecs/dist/runtime/types'
 
 export type PositionUnit = `${number}px` | `${number}%` | number
 /**

@@ -1,7 +1,6 @@
 import { parsePosition, parseSize } from './utils'
+import { UiTransformProps } from './types'
 import {
-  PBUiTransform,
-  UiTransformProps,
   YGAlign,
   YGDisplay,
   YGFlexDirection,
@@ -9,7 +8,8 @@ import {
   YGOverflow,
   YGPositionType,
   YGUnit
-} from './types'
+} from '@dcl/ecs'
+import { PBUiTransform } from '@dcl/ecs/dist/components'
 
 export const CANVAS_ROOT_ENTITY = 0
 

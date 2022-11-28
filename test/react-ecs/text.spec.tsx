@@ -1,29 +1,20 @@
-import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
-import {
-  Color3,
-  Color4,
-  Font,
-  ReactEcs,
-  renderUi,
-  TextAlignMode,
-  UiEntity
-} from '../../packages/@dcl/react-ecs/src'
-import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
-
-declare const engine: IEngine
+import { Engine, Entity, createPointerEventSystem, createInputSystem, TextAlignMode, Font, components } from '../../packages/@dcl/ecs/src'
+import { ReactEcs, createReactBasedUiSystem, UiEntity, CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src'
+import { Color4 } from '../../packages/@dcl/sdk/math'
 
 describe('UiText React Ecs', () => {
-  beforeEach(() => {
-    ;(globalThis as any).engine = Engine()
-  })
-
   it('should generate a UI and update the width of a div', async () => {
-    const { UiTransform, UiText } = engine.baseComponents
-    const entityIndex = engine.addEntity()
+    const engine = Engine()
+    const input = createInputSystem(engine)
+    const pointerEventSystem = createPointerEventSystem(engine, input)
+    const renderer = createReactBasedUiSystem(engine as any, pointerEventSystem as any)
+    const UiTransform = components.UiTransform(engine)
+    const UiText = components.UiText(engine)
+    const entityIndex = engine.addEntity() as number
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
-    const getDiv = (entity: Entity) => UiTransform.get(entity)
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
     const getText = (entity: Entity) => UiText.get(entity)
     let text = 'CASLA'
     let color: Color4 | undefined = undefined
@@ -34,16 +25,16 @@ describe('UiText React Ecs', () => {
         uiText={{
           value: text,
           color,
-          font: Font.F_LIBERATION_SANS,
-          textAlign: TextAlignMode.TAM_BOTTOM_CENTER
+          font: Font.F_LIBERATION_SANS as any,
+          textAlign: TextAlignMode.TAM_BOTTOM_CENTER as any
         }}
       />
     )
 
-    renderUi(ui)
+    renderer.setUiRenderer(ui)
     engine.update(1)
 
-    expect(getDiv(rootDivEntity)).toMatchObject({
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
       rightOf: 0,
       width: 100

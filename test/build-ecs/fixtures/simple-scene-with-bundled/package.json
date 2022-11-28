@@ -9,29 +9,22 @@
   "license": "Apache-2.0",
   "scripts": {
     "start": "dcl start",
-    "build": "../../../../packages/@dcl/build-ecs/dist/index.js",
-    "build-prod": "../../../../packages/@dcl/build-ecs/dist/index.js --production",
-    "watch": "../../../../packages/@dcl/build-ecs/dist/index.js --watch"
+    "build": "build-ecs",
+    "build-prod": "build-ecs --production",
+    "watch": "build-ecs --watch"
   },
   "devDependencies": {
-    "@dcl/sdk": "./../../../../packages/@dcl/sdk",
+    "@dcl/dcl-rollup": "file:../../../../packages/@dcl/dcl-rollup",
+    "@dcl/ecs": "file:../../../../packages/@dcl/ecs",
+    "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime",
+    "@dcl/sdk": "file:../../../../packages/@dcl/sdk",
     "dcl-test-lib-integration": "file:../dcl-test-lib-integration"
   },
   "dependencies": {
-    "@dcl/ecs-scene-utils": "^1.7.5",
-    "eth-connect": "^6.0.0",
-    "rollup-demo-decentraland-lib": "file:../rollup-lib-integration"
+    "@dcl/ecs-math": "^2.0.1-20221108141807.commit-a1344cb",
+    "eth-connect": "^6.0.3"
   },
-  "bundledDependencies": [
-    "@dcl/ecs-scene-utils",
-    "eth-connect",
-    "dcl-test-lib-integration",
-    "rollup-demo-decentraland-lib"
-  ],
   "bundleDependencies": [
-    "@dcl/ecs-scene-utils",
-    "dcl-test-lib-integration",
-    "eth-connect",
-    "rollup-demo-decentraland-lib"
+    "dcl-test-lib-integration"
   ]
 }

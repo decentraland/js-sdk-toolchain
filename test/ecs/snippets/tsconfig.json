@@ -1,13 +1,15 @@
 {
-    "compilerOptions": {
-        "outFile": "./dist/game.js",
-        "allowJs": true,
-        "strict": true,
-        "paths": {
-            "@dcl/react-ecs": ["../../../packages/@dcl/react-ecs/dist/index.d.ts"]
-        }
-
-    },
-    "include": ["**/*.ts", "**/*.tsx"],
-    "extends": "../../../packages/@dcl/sdk/types/tsconfig.ecs7.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "strict": true,
+    "typeRoots": ["../../../packages"],
+    "paths": {
+      "@dcl/sdk/react-ecs": ["../../../packages/@dcl/sdk/react-ecs"],
+      "@dcl/sdk/math": ["../../../packages/@dcl/sdk/math"],
+      "@dcl/sdk/ecs": ["../../../packages/@dcl/sdk/ecs"],
+      "@dcl/sdk": ["../../../packages/@dcl/sdk"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "extends": "../../../packages/@dcl/sdk/types/tsconfig.ecs7.json"
 }

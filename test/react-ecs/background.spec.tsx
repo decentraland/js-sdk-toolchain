@@ -1,28 +1,32 @@
-import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
+import { Engine, IEngine, Entity, createPointerEventSystem, createInputSystem, PBUiBackground, components } from '../../packages/@dcl/ecs/src'
+import { Color4 } from '../../packages/@dcl/sdk/math'
 import {
-  Color4,
   ReactEcs,
-  renderUi,
-  UiBackgroundProps,
-  UiEntity
+  UiEntity,
+  createReactBasedUiSystem,
+  ReactBasedUiSystem,
+  CANVAS_ROOT_ENTITY
 } from '../../packages/@dcl/react-ecs/src'
-import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
-declare const engine: IEngine
 
 describe('UiBackground React Ecs', () => {
+  let engine: IEngine
+  let uiRenderer: ReactBasedUiSystem
+
   beforeEach(() => {
-    ;(globalThis as any).engine = Engine()
+    engine = Engine()
+    uiRenderer = createReactBasedUiSystem(engine as any, createPointerEventSystem(engine, createInputSystem(engine)) as any)
   })
 
   it('should generate a UI and update the width of a div', async () => {
-    const { UiTransform, UiBackground } = engine.baseComponents
-    const entityIndex = engine.addEntity()
+    const UiTransform=components.UiTransform(engine)
+    const UiBackground=components.UiBackground(engine)
+    const entityIndex = engine.addEntity() as number
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
-    const getDiv = (entity: Entity) => UiTransform.get(entity)
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
     const getBackground = (entity: Entity) => UiBackground.get(entity)
-    let backgroundColor: Color4 | undefined = { r: 0, g: 1, b: 2, a: 0 }
+    let backgroundColor: Color4.Mutable | undefined = { r: 0, g: 1, b: 2, a: 0 }
 
     const ui = () => (
       <UiEntity
@@ -31,10 +35,10 @@ describe('UiBackground React Ecs', () => {
       />
     )
 
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
 
-    expect(getDiv(rootDivEntity)).toMatchObject({
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
       rightOf: 0,
       width: 100
@@ -60,13 +64,13 @@ describe('UiBackground React Ecs', () => {
   })
 
   it('should remove backgrund component', () => {
-    const { UiBackground } = engine.baseComponents
-    const entityIndex = engine.addEntity()
+    const UiBackground=components.UiBackground(engine)
+    const entityIndex = engine.addEntity() as number
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
     const getBackground = () => UiBackground.getOrNull(rootDivEntity)
-    let backgroundProps: { uiBackground: UiBackgroundProps } | undefined = {
+    let backgroundProps: { uiBackground: PBUiBackground } | undefined = {
       uiBackground: { backgroundColor: { r: 0, g: 1, b: 2, a: 0 } }
     }
 
@@ -74,7 +78,7 @@ describe('UiBackground React Ecs', () => {
       <UiEntity uiTransform={{ width: 100 }} {...backgroundProps} />
     )
 
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
     expect(getBackground()?.backgroundColor).toMatchObject(
       backgroundProps.uiBackground.backgroundColor!

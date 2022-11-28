@@ -1,9 +1,9 @@
-import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, components } from '../../../packages/@dcl/ecs/src'
 
 describe('Generated RaycastResult ProtoBuf', () => {
   it('should serialize/deserialize RaycastResult', () => {
     const newEngine = Engine()
-    const { RaycastResult } = newEngine.baseComponents
+    const RaycastResult = components.RaycastResult(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

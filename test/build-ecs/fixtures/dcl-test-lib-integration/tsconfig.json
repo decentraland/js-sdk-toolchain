@@ -1,17 +1,11 @@
 {
+  "include": ["src"],
   "compilerOptions": {
-    "outFile": "./bin/lib.js",
-    "allowJs": true,
-    "paths": {
-      "eth-connect": [
-        "node_modules/eth-connect/eth-connect.d.ts"
-      ]
-    },
-    "baseUrl": "."
+    "module": "ESNext",
+    "outDir": "bin",
+    "declaration": true
   },
-  "include": [
-    "src/*.ts"
-  ],
-  "extends": "./node_modules/@dcl/sdk/types/tsconfig.ecs7.json",
-  "compileOnSave": false
+  "extends": "@dcl/sdk/types/tsconfig.ecs7.strict.json",
+  "compileOnSave": false,
+  "exclude": ["./bin"]
 }

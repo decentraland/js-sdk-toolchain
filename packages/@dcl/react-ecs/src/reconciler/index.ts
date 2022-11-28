@@ -1,8 +1,10 @@
-import type {
+import {
   Entity,
-  EventsSystem as EventsSystemType,
-  IEngine
+  IEngine,
+  EventSystemCallback,
+  PointerEventsSystem
 } from '@dcl/ecs'
+import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
 import { isListener, Listeners } from '../components'
 import { CANVAS_ROOT_ENTITY } from '../components/uiTransform'
@@ -26,9 +28,6 @@ import {
   EngineComponents
 } from './types'
 import { componentKeys, isEqual, isNotUndefined, noopConfig } from './utils'
-
-declare const EventsSystem: typeof EventsSystemType
-type Callback = EventsSystemType.Callback
 
 // TODO: export InputAction types.
 const IA_POINTER = 0
@@ -74,23 +73,33 @@ function propsChanged<K extends keyof EntityComponents>(
 export function createReconciler(
   engine: Pick<
     IEngine,
-    'baseComponents' | 'getComponent' | 'addEntity' | 'removeEntity'
-  >
+    'getComponent' | 'addEntity' | 'removeEntity' | 'defineComponentFromSchema'
+  >,
+  pointerEvents: PointerEventsSystem
 ) {
   const entities = new Set<Entity>()
+
+  const UiTransform = components.UiTransform(engine)
+  const UiText = components.UiText(engine)
+  const UiBackground = components.UiBackground(engine)
+
   const getComponentId: {
     [key in keyof EngineComponents]: number
   } = {
-    uiTransform: engine.baseComponents.UiTransform._id,
-    uiText: engine.baseComponents.UiText._id,
-    uiBackground: engine.baseComponents.UiBackground._id
+    uiTransform: UiTransform._id,
+    uiText: UiText._id,
+    uiBackground: UiBackground._id
   }
 
   function updateTree(
     instance: Instance,
     props: Partial<{ rightOf: Entity; parent: Entity }>
   ) {
-    upsertComponent(instance, props, 'uiTransform')
+    upsertComponent(
+      instance,
+      props as { rightOf: number; parent: number },
+      'uiTransform'
+    )
   }
 
   function upsertListener(
@@ -99,15 +108,19 @@ export function createReconciler(
   ) {
     // TODO: This handles only onClick listener for the moment
     if (update.type === 'delete' || !update.props) {
-      EventsSystem.removeOnPointerDown(instance.entity)
+      pointerEvents.removeOnPointerDown(instance.entity)
       return
     }
 
     if (update.props) {
-      EventsSystem.onPointerDown(instance.entity, update.props as Callback, {
-        button: IA_POINTER,
-        hoverText: ''
-      })
+      pointerEvents.onPointerDown(
+        instance.entity,
+        update.props as EventSystemCallback,
+        {
+          button: IA_POINTER,
+          hoverText: ''
+        }
+      )
     }
   }
 

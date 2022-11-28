@@ -1,3 +1,15 @@
+import {
+  engine,
+  Transform,
+  MeshRenderer,
+  MeshCollider,
+  InputAction,
+  pointerEventsSystem,
+  Raycast,
+  RaycastQueryType,
+  RaycastResult
+} from '@dcl/sdk/ecs'
+import { Vector3 } from '@dcl/sdk/math'
 function createCube(
   x: number,
   y: number,
@@ -23,7 +35,7 @@ const _cubeEntity2 = createCube(8, 1, 13)
 const raycastEntity = engine.addEntity()
 
 // Add OnPointerDown component to cube entity to trigger ray casting on interaction
-EventsSystem.onPointerDown(
+pointerEventsSystem.onPointerDown(
   cubeEntity,
   () => {
     Raycast.createOrReplace(raycastEntity, {
@@ -56,7 +68,9 @@ engine.addSystem(() => {
       )
     }
 
-    log(`Hits (this should be '2' the first time): '${result.hits.length}'`)
+    console.log(
+      `Hits (this should be '2' the first time): '${result.hits.length}'`
+    )
   }
 })
 

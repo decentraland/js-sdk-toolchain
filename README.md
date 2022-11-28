@@ -1,10 +1,8 @@
 # Decentraland SDK 7
 
-[![CI](https://github.com/decentraland/js-sdk-toolchain/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/decentraland/js-sdk-toolchain/actions/workflows/ci.yml)&nbsp;&nbsp;&nbsp;&nbsp;[![Verify posix version](https://github.com/decentraland/js-sdk-toolchain/actions/workflows/check-versions.yml/badge.svg?branch=main)](https://github.com/decentraland/js-sdk-toolchain/actions/workflows/check-versions.yml)
-
 ## This project tree
 ```
-js-sdk-toolchain    
+js-sdk-toolchain
 │   README.md
 │   Makefile
 └───scripts
@@ -12,13 +10,12 @@ js-sdk-toolchain
 └───docs
 └───packages/@dcl
     └───sdk
-    └───amd
     └───dcl-rollup
     └───ecs
     └───js-runtime
 
 ```
-When the package `@dcl/sdk` is built, `@dcl/amd`, `@dcl/rollup` and `@dcl/ecs` are versioned.
+When the package `@dcl/sdk` is built, `@dcl/rollup` and `@dcl/ecs` are versioned.
 `@dcl/sdk` collects a dependency of these three packages to be able to build scenes and libraries.
 
 ## ECS 6 dev support

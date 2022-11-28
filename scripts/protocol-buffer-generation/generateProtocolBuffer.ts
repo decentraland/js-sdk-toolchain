@@ -46,7 +46,9 @@ export async function generateProtocolBuffer(params: {
     protoFiles
   ]
   const commandWorkingDir = process.cwd()
-  console.log(`Command is ${protoCompilerPath} ${protoCommandArgs.join(' ')}`)
+  process.stderr.write(
+    `Command is ${protoCompilerPath} \\ ${protoCommandArgs.join('\\\n  ')}\n`
+  )
 
   try {
     await runCommand({
@@ -116,6 +118,6 @@ function fixTsGeneratedByProto(filePath: string) {
 
 const internalComment = `
 /**
- * @internal
+ * Internal
  */
 export const`

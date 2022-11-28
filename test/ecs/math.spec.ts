@@ -1,4 +1,4 @@
-import * as Math from '../../packages/@dcl/ecs/src/runtime/math'
+import * as Math from '../../packages/@dcl/sdk/src/math'
 
 describe('Events System', () => {
   it('should get Math exported fns', () => {
@@ -9,5 +9,7 @@ describe('Events System', () => {
     expect(Math.Color3).toBeDefined()
     expect(Math.Color4).toBeDefined()
     expect(Math.Scalar).toBeDefined()
+    expect(Math.Matrix).toBeDefined()
+    expect(Math.Plane).toBeDefined()
   })
 })

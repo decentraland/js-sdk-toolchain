@@ -1,25 +1,21 @@
-import { Engine, Entity, IEngine } from '../../packages/@dcl/ecs/src/engine'
-import { createInput } from '../../packages/@dcl/ecs/src/engine/input'
-import { ReactEcs, renderUi, UiEntity } from '../../packages/@dcl/react-ecs/src'
+import { Engine, Entity, IEngine, components, createPointerEventSystem, PointerEventType } from '../../packages/@dcl/ecs/src'
+import { createInputSystem } from '../../packages/@dcl/ecs/src/engine/input'
+import { createReactBasedUiSystem, ReactBasedUiSystem, ReactEcs, UiEntity } from '../../packages/@dcl/react-ecs/src'
 import { createTestPointerDownCommand } from '../ecs/events/utils'
-import { PointerEventType } from '../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
-import { EventsSystem } from '../../packages/@dcl/ecs/src/systems/events'
-
-let engine: IEngine
 
 describe('Ui Listeners React Ecs', () => {
+  let engine: IEngine
+  let uiRenderer: ReactBasedUiSystem
+
   beforeEach(() => {
     engine = Engine()
-    const Input = createInput(engine)
-    engine.addSystem(EventsSystem.update(Input))
-    ;(globalThis as any).engine = engine
-    ;(global as any).Input = Input
-    ;(global as any).EventsSystem = EventsSystem
+    const Input = createInputSystem(engine)
+    uiRenderer = createReactBasedUiSystem(engine as any, createPointerEventSystem(engine, Input) as any)
   })
 
   it('should run onClick if it was fake-clicked', async () => {
-    const { PointerEventsResult } = engine.baseComponents
-    const uiEntity = (engine.addEntity() + 1) as Entity
+    const PointerEventsResult = components.PointerEventsResult(engine)
+    const uiEntity = (engine.addEntity() as number + 1) as Entity
     let fakeCounter = 0
     const fakeClick = () => {
       PointerEventsResult.createOrReplace(engine.RootEntity, {
@@ -47,7 +43,7 @@ describe('Ui Listeners React Ecs', () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const ui = () => <UiEntity uiTransform={{ width: 100 }} onClick={onClick} />
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     expect(counter).toBe(0)
     engine.update(1)
 

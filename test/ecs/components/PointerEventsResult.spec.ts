@@ -1,11 +1,14 @@
-﻿import { Engine } from '../../../packages/@dcl/ecs/src/engine'
-import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
+﻿import {
+  Engine,
+  components,
+  InputAction,
+  PointerEventType
+} from '../../../packages/@dcl/ecs/src'
 
 describe('Generated PointerEventsResult ProtoBuf', () => {
   it('should serialize/deserialize PointerEventsResult', () => {
     const newEngine = Engine()
-    const { PointerEventsResult } = newEngine.baseComponents
+    const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
     PointerEventsResult.create(newEngine.addEntity())

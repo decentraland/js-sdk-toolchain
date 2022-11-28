@@ -9,12 +9,17 @@
   "description": "My new Decentraland project",
   "scripts": {
     "start": "dcl start",
-    "build": "../../../../packages/@dcl/build-ecs/dist/index.js",
-    "build-prod": "../../../../packages/@dcl/build-ecs/dist/index.js --production",
-    "watch": "../../../../packages/@dcl/build-ecs/dist/index.js --watch"
+    "build": "build-ecs",
+    "build-prod": "build-ecs --production",
+    "watch": "build-ecs --watch"
   },
   "devDependencies": {
+    "@dcl/dcl-rollup": "file:../../../../packages/@dcl/dcl-rollup",
+    "@dcl/ecs": "file:../../../../packages/@dcl/ecs",
+    "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime",
     "@dcl/sdk": "file:../../../../packages/@dcl/sdk"
   },
-  "bundleDependencies": []
+  "dependencies": {
+    "@dcl/ecs-math": "^2.0.1-20221108141807.commit-a1344cb"
+  }
 }

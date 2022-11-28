@@ -1,11 +1,14 @@
-import { Engine } from '../../../packages/@dcl/ecs/src/engine'
-import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
+import {
+  Engine,
+  components,
+  InputAction,
+  PointerEventType
+} from '../../../packages/@dcl/ecs/src'
 
 describe('Generated OnPointerDown ProtoBuf', () => {
   it('should serialize/deserialize OnPointerUp', () => {
     const newEngine = Engine()
-    const { PointerHoverFeedback } = newEngine.baseComponents
+    const PointerHoverFeedback = components.PointerHoverFeedback(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
     PointerHoverFeedback.create(newEngine.addEntity())
@@ -46,8 +49,8 @@ describe('Generated OnPointerDown ProtoBuf', () => {
 
   it('should receive OnPointerResult', () => {
     const newEngine = Engine()
-    const { PointerHoverFeedback, PointerEventsResult } =
-      newEngine.baseComponents
+    const PointerHoverFeedback = components.PointerHoverFeedback(newEngine)
+    const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
     PointerHoverFeedback.create(newEngine.addEntity())
 

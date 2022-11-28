@@ -1,3 +1,4 @@
+import * as components from '../components'
 import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
 import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
@@ -23,7 +24,7 @@ const InputCommands: InputAction[] = [
 /**
  * @public
  */
-export type IInput = {
+export type IInputSystem = {
   /**
    * @internal
    * Check if a click was emmited in the current tick for the input action.
@@ -102,7 +103,8 @@ const InternalInputStateComponentId = 1500
 const TimestampUpdateSystemPriority = 1 << 20
 const ButtonStateUpdateSystemPriority = 0
 
-export function createInput(engine: IEngine): IInput {
+export function createInputSystem(engine: IEngine): IInputSystem {
+  const PointerEventsResult = components.PointerEventsResult(engine)
   const InternalInputStateComponent = engine.defineComponent(
     InternalInputStateSchema,
     InternalInputStateComponentId
@@ -125,9 +127,7 @@ export function createInput(engine: IEngine): IInput {
   }
 
   function buttonStateUpdateSystem() {
-    const component = engine.baseComponents.PointerEventsResult.getOrNull(
-      engine.RootEntity
-    )
+    const component = PointerEventsResult.getOrNull(engine.RootEntity)
 
     if (!component) return
 
@@ -144,8 +144,16 @@ export function createInput(engine: IEngine): IInput {
     }
   }
 
-  engine.addSystem(buttonStateUpdateSystem, ButtonStateUpdateSystemPriority)
-  engine.addSystem(timestampUpdateSystem, TimestampUpdateSystemPriority)
+  engine.addSystem(
+    buttonStateUpdateSystem,
+    ButtonStateUpdateSystemPriority,
+    '@dcl/ecs#buttonStateUpdateSystem'
+  )
+  engine.addSystem(
+    timestampUpdateSystem,
+    TimestampUpdateSystemPriority,
+    '@dcl/ecs#timestampUpdateSystem'
+  )
 
   function getClick(inputAction: InputAction, entity?: Entity) {
     if (inputAction !== InputAction.IA_ANY) {
@@ -160,9 +168,7 @@ export function createInput(engine: IEngine): IInput {
   }
 
   function findClick(inputAction: InputAction, entity?: Entity) {
-    const component = engine.baseComponents.PointerEventsResult.getOrNull(
-      engine.RootEntity
-    )
+    const component = PointerEventsResult.getOrNull(engine.RootEntity)
 
     if (!component) return null
     const commands = component.commands
@@ -222,9 +228,7 @@ export function createInput(engine: IEngine): IInput {
     pointerEventType: PointerEventType,
     entity?: Entity
   ): PBPointerEventsResult_PointerCommand | null {
-    const component = engine.baseComponents.PointerEventsResult.getOrNull(
-      engine.RootEntity
-    )
+    const component = PointerEventsResult.getOrNull(engine.RootEntity)
     if (!component) return null
 
     // We search the last pointer Event command sorted by timestamp

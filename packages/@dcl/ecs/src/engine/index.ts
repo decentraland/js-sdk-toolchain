@@ -1,4 +1,4 @@
-import { defineSdkComponents } from '../components'
+import * as components from '../components'
 import { Schemas } from '../schemas'
 import { ISchema } from '../schemas/ISchema'
 import { Result, Spec } from '../schemas/Map'
@@ -11,7 +11,8 @@ import {
 } from './component'
 import { Entity, EntityContainer } from './entity'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, SystemFn } from './systems'
-import type { IEngineParams, IEngine } from './types'
+import type { IEngine } from './types'
+export * from './input'
 import { ReadonlyComponentSchema } from './readonly'
 
 export * from './readonly'
@@ -20,7 +21,10 @@ export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
 
 function preEngine() {
   const entityContainer = EntityContainer()
-  const componentsDefinition = new Map<number, ComponentDefinition<any>>()
+  const componentsDefinition = new Map<
+    number,
+    ComponentDefinition<ISchema<unknown>, unknown>
+  >()
   const systems = SystemContainer()
 
   function addSystem(
@@ -60,15 +64,17 @@ function preEngine() {
   }
 
   function defineComponentFromSchema<
-    T extends ISchema,
+    T extends ISchema<ConstructorType>,
     ConstructorType = ComponentType<T>
   >(
     spec: T,
     componentId: number,
     constructorDefault?: ConstructorType
   ): ComponentDefinition<T, ConstructorType> {
-    if (componentsDefinition.get(componentId)) {
-      throw new Error(`Component ${componentId} already declared`)
+    const prev = componentsDefinition.get(componentId)
+    if (prev) {
+      // TODO: assert spec === prev.spec
+      return prev
     }
     const newComponent = defComponent<T, ConstructorType>(
       componentId,
@@ -86,17 +92,17 @@ function preEngine() {
     spec: T,
     componentId: number,
     constructorDefault?: ConstructorType
-  ): ComponentDefinition<ISchema<Result<T>>, ConstructorType> {
+  ): ComponentDefinition<ISchema<ConstructorType>> {
     return defineComponentFromSchema(
-      Schemas.Map(spec),
+      Schemas.Map(spec) as ISchema<ConstructorType>,
       componentId,
       constructorDefault
     )
   }
 
-  function getComponent<T extends ISchema>(
+  function getComponent<T extends ISchema<V>, V>(
     componentId: number
-  ): ComponentDefinition<T> {
+  ): ComponentDefinition<T, V> {
     const component = componentsDefinition.get(componentId)
     if (!component) {
       throw new Error(
@@ -107,7 +113,10 @@ function preEngine() {
   }
 
   function* getEntitiesWith<
-    T extends [ComponentDefinition, ...ComponentDefinition[]]
+    T extends [
+      ComponentDefinition<any, any>,
+      ...ComponentDefinition<any, any>[]
+    ]
   >(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]> {
     for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
       yield [entity, ...groupComp.map((c) => c.get(entity))] as [
@@ -117,7 +126,7 @@ function preEngine() {
     }
   }
 
-  function* getComponentDefGroup<T extends ComponentDefinition[]>(
+  function* getComponentDefGroup<T extends ComponentDefinition<any, any>[]>(
     ...args: T
   ): Iterable<[Entity, ...T]> {
     const [firstComponentDef, ...componentDefinitions] = args
@@ -164,22 +173,24 @@ function preEngine() {
 /**
  * @public
  */
-export function Engine({ transports }: IEngineParams = {}): IEngine {
+export function Engine(): IEngine {
   const engine = preEngine()
   const crdtSystem = crdtSceneSystem(engine)
-  const baseComponents = defineSdkComponents(engine)
-
-  if (transports) {
-    for (const tranport of transports) {
-      crdtSystem.addTransport(tranport)
-    }
-  }
 
   function update(dt: number) {
     crdtSystem.receiveMessages()
 
     for (const system of engine.getSystems()) {
-      system.fn(dt)
+      const ret: any = system.fn(dt)
+      if ((globalThis as any).DEBUG) {
+        if (ret && typeof ret === 'object' && typeof ret.then === 'function') {
+          throw new Error(
+            `A system (${
+              system.name || 'anonymous'
+            }) returned a thenable. Systems cannot be async functions. Documentation: https://dcl.gg/sdk/sync-systems`
+          )
+        }
+      }
     }
 
     // TODO: Perf tip
@@ -201,6 +212,8 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     }
   }
 
+  const Transform = components.Transform(engine)
+
   function* getTreeEntityArray(
     firstEntity: Entity,
     proccesedEntities: Entity[]
@@ -209,9 +222,7 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     if (proccesedEntities.find((value) => firstEntity === value)) return
     proccesedEntities.push(firstEntity)
 
-    for (const [entity, value] of engine.getEntitiesWith(
-      baseComponents.Transform
-    )) {
+    for (const [entity, value] of engine.getEntitiesWith(Transform)) {
       if (value.parent === firstEntity) {
         yield* getTreeEntityArray(entity, proccesedEntities)
       }
@@ -233,7 +244,8 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     removeEntityWithChildren,
     addSystem: engine.addSystem,
     removeSystem: engine.removeSystem,
-    defineComponent: engine.defineComponent,
+    // TODO: fix this type
+    defineComponent: engine.defineComponent as any,
     defineComponentFromSchema: engine.defineComponentFromSchema,
     getEntitiesWith: engine.getEntitiesWith,
     getComponent: engine.getComponent,
@@ -242,7 +254,6 @@ export function Engine({ transports }: IEngineParams = {}): IEngine {
     RootEntity: 0 as Entity,
     PlayerEntity: 1 as Entity,
     CameraEntity: 2 as Entity,
-    baseComponents,
     entityExists: engine.entityExists,
     addTransport: crdtSystem.addTransport
   }

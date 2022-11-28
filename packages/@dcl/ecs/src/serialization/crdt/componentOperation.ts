@@ -32,7 +32,7 @@ export namespace ComponentOperation {
     type: WireMessage.Enum,
     entity: Entity,
     timestamp: number,
-    componentDefinition: ComponentDefinition,
+    componentDefinition: ComponentDefinition<any, any>,
     buf: ByteBuffer
   ) {
     // reserve the beginning
@@ -51,7 +51,7 @@ export namespace ComponentOperation {
     buf.setUint32(startMessageOffset + 4, type)
 
     // Write ComponentOperation header
-    buf.setUint32(startMessageOffset + 8, entity)
+    buf.setUint32(startMessageOffset + 8, entity as number)
     buf.setUint32(startMessageOffset + 12, componentDefinition._id)
     buf.setUint64(startMessageOffset + 16, BigInt(timestamp))
     buf.setUint32(

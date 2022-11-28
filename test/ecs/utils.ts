@@ -1,132 +1,11 @@
-import { Quaternion, Vector3 } from '../../packages/@dcl/ecs/src/runtime/math'
+import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/math'
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
-import * as transport from '../../packages/@dcl/ecs/src/systems/crdt/transports/networkTransport'
+import * as transport from '../../packages/@dcl/sdk/src/internal/transports/networkTransport'
 
 export function wait(ms: number) {
   return new Promise<void>((resolve) => setTimeout(() => resolve(), ms))
-}
-
-export function testingEngineApi() {
-  const sentMessages: Uint8Array[] = []
-  const messagesFromRenderer: Uint8Array[] = []
-  const modules = {
-    '~system/EngineApi': {
-      async crdtSendToRenderer(arg: { data: Uint8Array }) {
-        sentMessages.push(arg.data)
-      },
-      async crdtGetMessageFromRenderer() {
-        const ret = messagesFromRenderer.slice(0)
-        messagesFromRenderer.length = 0
-        return ret
-      }
-    }
-  }
-  return { modules, sentMessages, messagesFromRenderer }
-}
-
-export function setupDclInterfaceForThisSuite(
-  modules: Record<string, Record<string, (arg: any) => Promise<any>>> = {},
-  defaults: Partial<DecentralandInterface> = {}
-) {
-  const updateFns: Array<(dt: number) => void> = []
-  const eventFns: Array<(any: any) => void> = []
-  const startFns: Array<() => void> = []
-  const subscribeEvents: Set<string> = new Set()
-
-  const dcl: DecentralandInterface = {
-    // legacy not used
-    addEntity: () => {
-      throw new Error('not implemented')
-    },
-    attachEntityComponent: () => {
-      throw new Error('not implemented')
-    },
-    componentCreated: () => {
-      throw new Error('not implemented')
-    },
-    componentDisposed: () => {
-      throw new Error('not implemented')
-    },
-    componentUpdated: () => {
-      throw new Error('not implemented')
-    },
-    openExternalUrl: () => {
-      throw new Error('not implemented')
-    },
-    removeEntity: () => {
-      throw new Error('not implemented')
-    },
-    removeEntityComponent: () => {
-      throw new Error('not implemented')
-    },
-    query: () => {
-      throw new Error('not implemented')
-    },
-    openNFTDialog: () => {
-      throw new Error('not implemented')
-    },
-    subscribe: (event: string) => {
-      subscribeEvents.add(event)
-    },
-    unsubscribe: (event: string) => {
-      subscribeEvents.delete(event)
-    },
-    setParent: () => {
-      throw new Error('not implemented')
-    },
-    updateEntityComponent: () => {
-      throw new Error('not implemented')
-    },
-    updateEntity: (() => {
-      throw new Error('not implemented')
-    }) as any,
-    DEBUG: true,
-    // utils
-    error: console.error,
-    log: console.log,
-    onEvent: (fn) => eventFns.push(fn),
-    onUpdate: (fn) => updateFns.push(fn),
-    onStart: (fn) => startFns.push(fn as any),
-    // modules
-    async callRpc(moduleName, method, args) {
-      if (!modules[moduleName])
-        throw new Error(`Module ${moduleName} not found`)
-      if (!modules[moduleName][method])
-        throw new Error(`Method ${moduleName}.${method} not found`)
-      return modules[moduleName][method].apply(null, args as any)
-    },
-    async loadModule(moduleName, exportsObj) {
-      if (!modules[moduleName])
-        throw new Error(`Module ${moduleName} not found`)
-      const ret: ModuleDescriptor = {
-        rpcHandle: moduleName,
-        methods: []
-      }
-      for (const methodName in modules[moduleName]) {
-        exportsObj[methodName] = modules[moduleName][methodName].bind(
-          modules[moduleName]
-        )
-        ret.methods.push({ name: methodName })
-      }
-      return ret
-    },
-    ...defaults
-  }
-
-  beforeAll(() => {
-    updateFns.length = 0
-    eventFns.length = 0
-    startFns.length = 0
-    globalThis.dcl = dcl
-  })
-
-  function tick(dt: number) {
-    updateFns.forEach(($) => $(dt))
-  }
-
-  return { eventFns, updateFns, startFns, tick, subscribeEvents }
 }
 
 export namespace SandBox {
@@ -151,7 +30,8 @@ export namespace SandBox {
   export function create({ length }: { length: number }) {
     const clients = Array.from({ length }).map((_, index) => {
       const clientTransport = transport.createNetworkTransport()
-      const engine = Engine({ transports: [clientTransport] })
+      const engine = Engine()
+      engine.addTransport(clientTransport)
       const Position = engine.defineComponent(
         SandBox.Position.type,
         SandBox.Position.id

@@ -12,3 +12,10 @@ export type ReceiveMessage = {
 }
 
 export type TransportMessage = Omit<ReceiveMessage, 'data'>
+
+export type Transport = {
+  type: string
+  send(message: Uint8Array): void
+  onmessage?(message: Uint8Array): void
+  filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean
+}

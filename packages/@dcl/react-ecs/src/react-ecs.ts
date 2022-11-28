@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
-import React from 'react'
+import { EventSystemCallback } from '@dcl/ecs'
 import {
-  UiTextProps,
-  PBUiTransform,
-  UiBackgroundProps,
-  OnClick
-} from './components'
+  PBUiBackground,
+  PBUiText,
+  PBUiTransform
+} from '@dcl/ecs/dist/components'
+import React from 'react'
 import { CommonProps } from './components/types'
 
 export type EcsElements = {
@@ -16,9 +16,9 @@ export type EcsElements = {
 // TODO: Remove Omit when onClick its handled Unity Side
 export type EntityComponents = {
   uiTransform: PBUiTransform
-  uiText: UiTextProps
-  uiBackground: UiBackgroundProps
-  onClick: OnClick
+  uiText: PBUiText
+  uiBackground: PBUiBackground
+  onClick: EventSystemCallback
 }
 
 export namespace JSX {

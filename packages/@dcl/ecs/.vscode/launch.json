@@ -29,14 +29,14 @@
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
       "autoAttachChildProcesses": true
-    },      
+    },
     {
       "type": "node",
       "name": "Debug tool protocol-buffer-generation",
       "request": "launch",
       "program": "${workspaceFolder}/tools/dist/protocol-buffer-generation/index.js",
       "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal", 
+      "console": "integratedTerminal",
       "args": ["test", "--component-path", "${workspaceFolder}/src/components"],
       "preLaunchTask": "Build tools"
     }

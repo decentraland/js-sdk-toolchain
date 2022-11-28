@@ -1,4 +1,4 @@
-import { Entity } from '../../engine'
+import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
 import { ISchema } from '../ISchema'
 
@@ -7,7 +7,7 @@ import { ISchema } from '../ISchema'
  */
 export const EntitySchema: ISchema<Entity> = {
   serialize(value: Entity, builder: ByteBuffer): void {
-    builder.writeInt32(value)
+    builder.writeInt32(value as number)
   },
   deserialize(reader: ByteBuffer): Entity {
     return reader.readInt32() as Entity

@@ -8,7 +8,7 @@ function getAndClean<T = unknown>(value: T[]) {
   return messagesToProcess
 }
 
-export function taskSystem(engine: IEngine) {
+export function createTaskSystem(engine: IEngine) {
   const tasks: Task[] = []
 
   async function runTask(task: Task) {
@@ -16,12 +16,14 @@ export function taskSystem(engine: IEngine) {
       const resp = await task()
       return resp
     } catch (e: any) {
-      dcl.error(`executeTask: FAILED. ${e.toString()}`, e)
+      console.error(e)
     }
   }
 
   function executeTasks() {
-    getAndClean(tasks).forEach((task) => runTask(task))
+    for (const task of getAndClean(tasks)) {
+      runTask(task).catch(console.error)
+    }
   }
 
   engine.addSystem(executeTasks)

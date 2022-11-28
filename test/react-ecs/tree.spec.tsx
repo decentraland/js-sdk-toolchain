@@ -1,22 +1,26 @@
-import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
+import { components, Engine, IEngine, Entity, createPointerEventSystem, createInputSystem } from '../../packages/@dcl/ecs/src'
 import {
   Container,
+  createReactBasedUiSystem,
+  ReactBasedUiSystem,
   ReactEcs,
-  renderUi,
-  UiEntity
+  UiEntity,
+  CANVAS_ROOT_ENTITY
 } from '../../packages/@dcl/react-ecs/src'
-import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
-
-declare const engine: IEngine
 
 describe('RectEcs UI ✨', () => {
+  let engine: IEngine
+  let uiRenderer: ReactBasedUiSystem
+
   beforeEach(() => {
-    ;(globalThis as any).engine = Engine()
+    engine = Engine()
+    uiRenderer = createReactBasedUiSystem(engine as any, createPointerEventSystem(engine, createInputSystem(engine)) as any)
   })
 
+
   it('should generate a UI and update the width', async () => {
-    const { UiTransform } = engine.baseComponents
-    const entityIndex = engine.addEntity()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as any
 
     // Helpers
     const childEntity = (entityIndex + 1) as Entity
@@ -39,7 +43,7 @@ describe('RectEcs UI ✨', () => {
         {/* UiEntity B */}
       </Container>
     )
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
     expect(getUi(rootEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
@@ -72,8 +76,8 @@ describe('RectEcs UI ✨', () => {
     expect(getUi(entityA).width).toBe(400)
   })
   it('should add a child at the beggining and then remove it', async () => {
-    const { UiTransform } = engine.baseComponents
-    const entityIndex = engine.addEntity()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as any
 
     // Helpers
     const rootEntity = (entityIndex + 3) as Entity
@@ -96,7 +100,7 @@ describe('RectEcs UI ✨', () => {
       )
     }
 
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
 
     expect(getUi(rootEntity)).toMatchObject({
@@ -164,8 +168,8 @@ describe('RectEcs UI ✨', () => {
     expect(UiTransform.getOrNull(entityAdded)).toBe(null)
   })
   it('should add a child at the middle and then remove it', async () => {
-    const { UiTransform } = engine.baseComponents
-    const entityIndex = engine.addEntity()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as any
 
     // Helpers
     const rootEntity = (entityIndex + 3) as Entity
@@ -186,7 +190,7 @@ describe('RectEcs UI ✨', () => {
         {/* UiEntity B */}
       </Container>
     )
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
 
     expect(getUi(entityA)).toMatchObject({
@@ -251,8 +255,8 @@ describe('RectEcs UI ✨', () => {
     expect(UiTransform.getOrNull(entityAdded)).toBe(null)
   })
   it('should add a child at the end and then remove it', async () => {
-    const { UiTransform } = engine.baseComponents
-    const entityIndex = engine.addEntity()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as any
 
     // Helpers
     const rootEntity = (entityIndex + 3) as Entity
@@ -274,7 +278,7 @@ describe('RectEcs UI ✨', () => {
         {/* UiEntity Added */}
       </Container>
     )
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
     expect(getUi(rootEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
@@ -338,8 +342,8 @@ describe('RectEcs UI ✨', () => {
     expect(UiTransform.getOrNull(entityAdded)).toBe(null)
   })
   it('should add a child at the middle with multiple childs and then remove it', async () => {
-    const { UiTransform } = engine.baseComponents
-    const entityIndex = engine.addEntity()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
 
     // Helpers
     const rootEntity = (entityIndex + 3) as Entity
@@ -372,7 +376,7 @@ describe('RectEcs UI ✨', () => {
       </Container>
     )
 
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
 
     addChild = true
@@ -433,8 +437,8 @@ describe('RectEcs UI ✨', () => {
     expect(UiTransform.getOrNull(addedEntityB)).toBe(null)
   })
   it('should iterate the array on every tick and update values', async () => {
-    const { UiTransform } = engine.baseComponents
-    const entityIndex = engine.addEntity()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
 
     // Helpers
     const uiEntities = [
@@ -448,7 +452,7 @@ describe('RectEcs UI ✨', () => {
     const entityB = (entityIndex + 2) as Entity
     const entityC = (entityIndex + 3) as Entity
 
-    const getUi = (entity: number) => UiTransform.get(entity as Entity)
+    const getUi = (entity: any) => UiTransform.get(entity as Entity)
     const ui = () => (
       <Container width={111}>
         {uiEntities.map((entity) => (
@@ -456,7 +460,7 @@ describe('RectEcs UI ✨', () => {
         ))}
       </Container>
     )
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
 
     expect(getUi(entityA)).toMatchObject({
@@ -484,7 +488,7 @@ describe('RectEcs UI ✨', () => {
     uiEntities.push({ id: 4, value: 4 })
     engine.update(1)
 
-    const entityD = (rootEntity + 1) as Entity
+    const entityD = (rootEntity as number + 1) as Entity
 
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
@@ -528,7 +532,7 @@ describe('RectEcs UI ✨', () => {
     // Add an element at the beginning of the array
     uiEntities.unshift({ id: 8, value: 8 })
     engine.update(1)
-    const newEntity = (entityD + 1) as Entity
+    const newEntity = (entityD as number + 1) as Entity
     // Entities props doesnt change
 
     expect(getUi(entityA)).toMatchObject({
@@ -554,8 +558,8 @@ describe('RectEcs UI ✨', () => {
   })
 
   it('should update rightOf of the array', async () => {
-    const { UiTransform } = engine.baseComponents
-    const entityIndex = engine.addEntity()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
 
     // Helpers
     let uiEntities: { id: number; value: number }[] = [
@@ -566,7 +570,7 @@ describe('RectEcs UI ✨', () => {
     const rootEntity = (entityIndex + uiEntities.length + 1) as Entity
     const entityA = (entityIndex + 1) as Entity
     const entityB = (entityIndex + 2) as Entity
-    const getUi = (entity: number) => UiTransform.get(entity as Entity)
+    const getUi = (entity: any) => UiTransform.get(entity as Entity)
     const ui = () => (
       <UiEntity uiTransform={{ width: 111 }}>
         {uiEntities.map((props) => (
@@ -574,7 +578,7 @@ describe('RectEcs UI ✨', () => {
         ))}
       </UiEntity>
     )
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
 
     expect(getUi(entityA)).toMatchObject({
@@ -618,14 +622,14 @@ describe('RectEcs UI ✨', () => {
      * A => 513
      * B => 514
      */
-    const entityC = (rootEntity + 1) as Entity
+    const entityC = (rootEntity as number + 1) as Entity
     expect(getUi(entityC).rightOf).toBe(undefined)
     expect(getUi(entityA).rightOf).toBe(entityC)
     expect(getUi(entityB).rightOf).toBe(entityA)
 
     uiEntities.unshift({ id: 4, value: 4 })
     engine.update(1)
-    const entityD = (entityC + 1) as Entity
+    const entityD = (entityC as number + 1) as Entity
     expect(getUi(entityD).rightOf).toBe(undefined)
     expect(getUi(entityC).rightOf).toBe(entityD)
     expect(getUi(entityA).rightOf).toBe(entityC)
@@ -638,7 +642,7 @@ describe('RectEcs UI ✨', () => {
       ...uiEntities.slice(2)
     ]
     engine.update(1)
-    const entityE = (entityD + 1) as Entity
+    const entityE = (entityD as any + 1) as Entity
     expect(getUi(entityD).rightOf).toBe(undefined)
     expect(getUi(entityC).rightOf).toBe(entityD)
     expect(getUi(entityE).rightOf).toBe(entityC)

@@ -1,9 +1,9 @@
-import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, components } from '../../../packages/@dcl/ecs/src'
 
 describe('Generated UiText ProtoBuf', () => {
   it('should serialize/deserialize UiText', () => {
     const newEngine = Engine()
-    const { UiText } = newEngine.baseComponents
+    const UiText = components.UiText(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

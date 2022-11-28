@@ -1,60 +1,63 @@
-import { Engine, IEngine, Entity } from '../../packages/@dcl/ecs/src/engine'
+import { Engine, IEngine, Entity, createInputSystem, createPointerEventSystem, YGWrap, YGUnit, components } from '../../packages/@dcl/ecs/src'
 import {
+  createReactBasedUiSystem,
   Position,
   PositionUnit,
+  ReactBasedUiSystem,
   ReactEcs,
-  renderUi,
   UiEntity,
-  YGUnit,
-  YGWrap
+  CANVAS_ROOT_ENTITY
 } from '../../packages/@dcl/react-ecs/src'
-import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 
-declare const engine: IEngine
 
 describe('UiTransform React Ecs', () => {
+  let engine: IEngine
+  let uiRenderer: ReactBasedUiSystem
+
   beforeEach(() => {
-    ;(globalThis as any).engine = Engine()
+    engine = Engine()
+    uiRenderer = createReactBasedUiSystem(engine as any, createPointerEventSystem(engine, createInputSystem(engine)) as any)
   })
 
+
   it('should send empty object if uiTransform is undefined', async () => {
-    const { UiTransform } = engine.baseComponents
-    const entityIndex = engine.addEntity()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
-    const getDiv = (entity: Entity) => UiTransform.get(entity)
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
     const ui = () => <UiEntity uiTransform={undefined} />
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
-    expect(getDiv(rootDivEntity).width).toBe(0)
+    expect(getUiTransform(rootDivEntity).width).toBe(0)
   })
 
   it('should send 0 if you send an invalid px', async () => {
-    const { UiTransform } = engine.baseComponents
-    const entityIndex = engine.addEntity()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
-    const getDiv = (entity: Entity) => UiTransform.get(entity)
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
     const ui = () => (
       <UiEntity
-        uiTransform={{ width: 'boedo' as any, flexWrap: YGWrap.YGW_WRAP }}
+        uiTransform={{ width: 'boedo' as any, flexWrap: YGWrap.YGW_WRAP as any }}
       />
     )
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
-    expect(getDiv(rootDivEntity).width).toBe(0)
-    expect(getDiv(rootDivEntity).flexWrap).toBe(YGWrap.YGW_WRAP)
+    expect(getUiTransform(rootDivEntity).width).toBe(0)
+    expect(getUiTransform(rootDivEntity).flexWrap).toBe(YGWrap.YGW_WRAP)
   })
 
   it('should send position transform properties', async () => {
-    const { UiTransform } = engine.baseComponents
-    const entityIndex = engine.addEntity()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
-    const getDiv = (entity: Entity) => UiTransform.get(entity)
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
 
     const position: Position = {
       top: '1px',
@@ -65,10 +68,10 @@ describe('UiTransform React Ecs', () => {
 
     const ui = () => <UiEntity uiTransform={{ width: 100, position }} />
 
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
 
-    expect(getDiv(rootDivEntity)).toMatchObject({
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
       rightOf: 0,
       width: 100,
@@ -84,7 +87,7 @@ describe('UiTransform React Ecs', () => {
 
     position.left = '88%'
     engine.update(1)
-    expect(getDiv(rootDivEntity)).toMatchObject({
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
       positionTop: 1,
       positionLeft: 88,
       positionRight: 3,
@@ -100,7 +103,7 @@ describe('UiTransform React Ecs', () => {
     delete position.right
     engine.update(1)
 
-    expect(getDiv(rootDivEntity)).toMatchObject({
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
       positionRight: 0,
       positionRightUnit: YGUnit.YGU_UNDEFINED
     })
@@ -108,7 +111,7 @@ describe('UiTransform React Ecs', () => {
     position.right = {} as any
     position.left = '10%'
     engine.update(1)
-    expect(getDiv(rootDivEntity)).toMatchObject({
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
       positionRight: 0,
       positionRightUnit: YGUnit.YGU_UNDEFINED,
       positionLeft: 10,
@@ -117,12 +120,12 @@ describe('UiTransform React Ecs', () => {
   })
 
   it('should send height & width properties', async () => {
-    const { UiTransform } = engine.baseComponents
-    const entityIndex = engine.addEntity()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
-    const getDiv = (entity: Entity) => UiTransform.get(entity)
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
     let width: PositionUnit = '10%'
     const ui = () => (
       <UiEntity
@@ -137,10 +140,10 @@ describe('UiTransform React Ecs', () => {
       />
     )
 
-    renderUi(ui)
+    uiRenderer.setUiRenderer(ui)
     engine.update(1)
 
-    expect(getDiv(rootDivEntity)).toMatchObject({
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
       rightOf: 0,
       width: 10,
@@ -159,7 +162,7 @@ describe('UiTransform React Ecs', () => {
 
     width = 110
     engine.update(1)
-    expect(getDiv(rootDivEntity)).toMatchObject({
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
       width: 110,
       widthUnit: YGUnit.YGU_POINT
     })
@@ -169,13 +172,13 @@ describe('UiTransform React Ecs', () => {
     width = undefined
     engine.update(1)
 
-    expect(getDiv(rootDivEntity)).toMatchObject({
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
       width: 0,
       widthUnit: YGUnit.YGU_UNDEFINED
     })
 
     width = { boedo: 'casla' } as any
-    expect(getDiv(rootDivEntity)).toMatchObject({
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
       width: 0,
       widthUnit: YGUnit.YGU_UNDEFINED
     })

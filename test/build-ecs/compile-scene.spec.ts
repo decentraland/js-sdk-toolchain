@@ -1,5 +1,4 @@
 import { resolve } from 'path'
-import { readFileSync } from 'fs'
 import {
   itExecutes,
   ensureFileExists,
@@ -14,21 +13,12 @@ describe('build-ecs: simple scene compilation', () => {
   itDeletesFolder('./bin', cwd)
   itDeletesFolder('./node_modules', cwd)
 
-  itExecutes('npm install --quiet --no-progress ' + ecsLocation, cwd)
-  itExecutes('npm i --quiet --no-progress', cwd)
-  itExecutes('npm run --quiet build', cwd)
+  itExecutes('npm install --silent --no-progress ' + ecsLocation, cwd)
+  itExecutes('npm i --silent --no-progress', cwd)
+  itExecutes('npm run --silent build', cwd)
 
   it('ensure files exist', () => {
     ensureFileExists('bin/game.js', cwd)
-    ensureFileExists('bin/game.js.lib', cwd)
-  })
-
-  it('ensure it uses not minified versions in .lib', () => {
-    const lib: any[] = JSON.parse(
-      readFileSync(resolve(cwd, 'bin/game.js.lib')).toString()
-    ).map(($: { path: string }) => resolve(cwd, $.path))
-    expect(lib).toContain(resolve('packages/@dcl/amd/dist/amd.js'))
-    expect(lib).toContain(resolve('packages/@dcl/sdk/dist/ecs7/index.js'))
   })
 })
 
@@ -38,19 +28,24 @@ describe('build-ecs: simple scene compilation, production mode', () => {
   itDeletesFolder('./bin', cwd)
   itDeletesFolder('./node_modules', cwd)
 
-  itExecutes('npm install --quiet --no-progress', cwd)
-  itExecutes('npm run --quiet build-prod', cwd)
+  itExecutes('npm install --silent --no-progress', cwd)
+  itExecutes('npm run --silent build-prod', cwd)
 
   it('ensure files exist', () => {
     ensureFileExists('bin/game.js', cwd)
-    ensureFileExists('bin/game.js.lib', cwd)
   })
+})
 
-  it('ensure it uses minified versions in .lib', () => {
-    const lib: any[] = JSON.parse(
-      readFileSync(resolve(cwd, 'bin/game.js.lib')).toString()
-    ).map(($: { path: string }) => resolve(cwd, $.path))
-    expect(lib).toContain(resolve('packages/@dcl/amd/dist/amd.min.js'))
-    expect(lib).toContain(resolve('packages/@dcl/sdk/dist/ecs7/index.min.js'))
+describe('build-ecs: scene with react', () => {
+  const cwd = resolve(__dirname, './fixtures/ecs7-ui')
+
+  itDeletesFolder('./bin', cwd)
+  itDeletesFolder('./node_modules', cwd)
+
+  itExecutes('npm install --silent --no-progress', cwd)
+  itExecutes('npm run --silent build-prod', cwd)
+
+  it('ensure files exist', () => {
+    ensureFileExists('bin/game.js', cwd)
   })
 })

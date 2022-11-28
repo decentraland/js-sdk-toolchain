@@ -3,46 +3,23 @@
  * init and it'll be changing.
  */
 
-import { Engine } from '../../engine'
-import { Task, taskSystem } from '../../systems/async-task'
-import { createRendererTransport } from '../../systems/crdt/transports/rendererTransport'
-import { EventsSystem } from '../../systems/events'
-import { createInput } from './../../engine/input'
-import { initializeDcl } from './dcl'
+import { Engine, IEngine } from '../../engine'
+import { Task, createTaskSystem } from '../../systems/async-task'
+import { createPointerEventSystem } from '../../systems/events'
+import { createInputSystem } from './../../engine/input'
 
-const rendererTransport = createRendererTransport()
-export const engine = Engine({
-  transports: [rendererTransport]
-})
-
-// Dcl Interface
-const dclInterface = initializeDcl(engine)
-/**
- * Log function. Only works in debug mode, otherwise it does nothing.
- * @param args - any loggable parameter
- * @public
- */
-export const log = dclInterface.log
-
-/**
- * Error function. Prints a console error. Only works in debug mode, otherwise it does nothing.
- * @param error - string or Error object.
- * @param data - any debug information.
- * @public
- */
-export const error = dclInterface.error
+/*#__PURE__*/
+export const engine: IEngine = Engine()
 
 // INPUT Manager
-/**
- * @public
- */
-export const Input = createInput(engine)
+/*#__PURE__*/
+export const inputSystem = createInputSystem(engine)
+/*#__PURE__*/
+export const pointerEventsSystem = createPointerEventSystem(engine, inputSystem)
 
 /**
  * @public
- * Execute async task
  */
-export const executeTask = taskSystem(engine).executeTask
+/*#__PURE__*/
+export const executeTask = createTaskSystem(engine).executeTask
 export type { Task }
-export { EventsSystem }
-engine.addSystem(EventsSystem.update(Input))

@@ -1,20 +1,21 @@
 module.exports = {
+  // preset: "ts-jest/presets/js-with-ts",
   globals: {
     "ts-jest": {
       tsconfig: "test/tsconfig.json",
     },
   },
-  moduleFileExtensions: ["ts", "js", "tsx"],
+  moduleFileExtensions: ["ts", "js", "tsx", "jsx"],
   transform: {
-    "^.+\\.(ts|tsx)$": "ts-jest",
+    "^.+\\.(js|jsx|ts|tsx)$": "ts-jest",
   },
   coverageDirectory: "coverage",
   coverageThreshold: {
     global: {
-        branches: 100,
-        functions: 100,
-        lines: 100,
-        statements: 100,
+      branches: 100,
+      functions: 100,
+      lines: 100,
+      statements: 100,
     },
     "packages/@dcl/ecs/src/components/generated/pb": {
       branches: 70,
@@ -22,16 +23,20 @@ module.exports = {
       lines: 70,
       statements: 70
     },
-    "packages/@dcl/ecs/src/runtime/temp-fp": {
-      branches: 10,
+    "packages/@dcl/ecs/src/components/generated/index.gen.ts": {
       functions: 10,
-      lines: 10,
-      statements: 10
+    },
+    "packages/@dcl/sdk/src/internal": {
+      branches: 37,
+      functions: 37,
+      lines: 37,
+      statements: 37
     }
   },
   coveragePathIgnorePatterns: [
     "scripts",
-    "test"
+    "test",
+    "(.)\\.(js)$",
   ],
   verbose: true,
   testMatch: ["**/*.spec.(ts|tsx)"],

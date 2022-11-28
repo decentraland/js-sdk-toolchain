@@ -1,17 +1,11 @@
 {
   "compilerOptions": {
-    "outFile": "./bin/game.js",
     "allowJs": true,
-    "baseUrl": ".",
-    "paths": {
-      "@dcl/react-ecs": [
-        "../../../../packages/@dcl/react-ecs/dist/index.d.ts"
-      ]
-    }
+    "baseUrl": "."
   },
   "include": [
-    "*.ts",
-    "*.tsx"
+    "src/*.ts",
+    "src/*.tsx"
   ],
   "extends": "../../../../packages/@dcl/sdk/types/tsconfig.ecs7.json",
   "compileOnSave": false

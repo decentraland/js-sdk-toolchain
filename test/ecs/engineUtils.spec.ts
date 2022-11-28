@@ -2,6 +2,8 @@
 import { deepReadonly } from '../../packages/@dcl/ecs/src/engine/readonly'
 import { isNotUndefined } from './utils'
 
+declare let process: { env: any }
+
 describe('Engine utils', () => {
   it('Should fail if you try to update a readonly prop', () => {
     const obj = {

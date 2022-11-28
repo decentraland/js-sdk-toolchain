@@ -9,11 +9,10 @@ Run `make build`
 ## Testing
 Run `make test`, you can also debug the test in VS code, selecting the launch `Jest current file` or just `Jest` (this will run all test)
 
-## Wishlist 
+## Wishlist
 Use this project as template for TypeScript libraries
 - [x] as any MutableGroupOf
 - [x] Tests for system
-- [ ] use @dcl/ecs-math https://github.com/decentraland/ecs-math
 - [ ] Basic Components ( Transform ) w/Tests
 - [ ] Sync Component W/Tests
 - [x] CRDT System

@@ -1,9 +1,9 @@
 import { ComponentDefinition, Entity, IEngine, ISchema } from '../../engine'
+import { Animator } from '../generated/index.gen'
 import {
   PBAnimationState,
   PBAnimator
 } from '../generated/pb/decentraland/sdk/components/animator.gen'
-import * as AnimatorSchema from './../generated/Animator.gen'
 
 /**
  * @public
@@ -65,11 +65,9 @@ export interface AnimatorComponentDefinitionExtended
 }
 
 export function defineAnimatorComponent(
-  engine: Pick<IEngine, 'getComponent'>
+  engine: Pick<IEngine, 'defineComponentFromSchema'>
 ): AnimatorComponentDefinitionExtended {
-  const Animator = engine.getComponent<typeof AnimatorSchema.AnimatorSchema>(
-    AnimatorSchema.COMPONENT_ID
-  )
+  const theComponent = Animator(engine)
 
   /**
    * @returns The tuple [animator, clip]
@@ -78,7 +76,7 @@ export function defineAnimatorComponent(
     entity: Entity,
     name: string
   ): [PBAnimator | null, PBAnimationState | null] {
-    const anim = Animator.getMutableOrNull(entity)
+    const anim = theComponent.getMutableOrNull(entity)
     if (!anim) return [null, null]
 
     const state = anim.states.find(
@@ -89,7 +87,7 @@ export function defineAnimatorComponent(
   }
 
   return {
-    ...Animator,
+    ...theComponent,
     getClipOrNull(entity: Entity, name: string): PBAnimationState | null {
       const [_, state] = getClipAndAnimator(entity, name)
       return state
@@ -131,7 +129,7 @@ export function defineAnimatorComponent(
 
     stopAllAnimations(entity: Entity, resetCursor: boolean = true): boolean {
       // Get the mutable to modifying
-      const animator = Animator.getMutableOrNull(entity)
+      const animator = theComponent.getMutableOrNull(entity)
       if (!animator) return false
 
       // Reset all other animations

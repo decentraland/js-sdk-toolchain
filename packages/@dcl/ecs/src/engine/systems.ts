@@ -15,21 +15,26 @@ export function SystemContainer() {
   const systems: System[] = []
 
   function sort() {
+    // TODO: systems with the same priority should always have the same stable order
+    //       add a "counter" to the System type to ensure that order
     systems.sort((a, b) => b.priority - a.priority)
   }
 
   function add(fn: SystemFn, priority: number, name?: string): void {
+    const systemName = name ?? fn.name
+
     if (systems.find((item) => item.fn === fn)) {
-      throw new Error('System already added')
-    } else if (name && systems.find((item) => item.name === name)) {
-      throw new Error('System name already used')
+      throw new Error(
+        `System ${JSON.stringify(systemName)} already added to the engine`
+      )
     }
 
     systems.push({
       fn,
       priority,
-      name
+      name: systemName
     })
+    // TODO: replace this sort by an insertion in the right place
     sort()
   }
 

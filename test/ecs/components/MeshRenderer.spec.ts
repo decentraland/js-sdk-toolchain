@@ -1,10 +1,10 @@
-import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, components } from '../../../packages/@dcl/ecs/src'
 import type { PBMeshRenderer } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/mesh_renderer.gen'
 
 describe('Generated MeshRenderer ProtoBuf', () => {
   it('should serialize/deserialize MeshRenderer', () => {
     const newEngine = Engine()
-    const { MeshRenderer } = newEngine.baseComponents
+    const MeshRenderer = components.MeshRenderer(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 
@@ -25,10 +25,12 @@ describe('Generated MeshRenderer ProtoBuf', () => {
 
     let previousData = serializeComponents[serializeComponents.length - 1]
     for (const data of serializeComponents) {
+      // put the new values in both components
       MeshRenderer.createOrReplace(entity, data)
       MeshRenderer.createOrReplace(entityB, previousData)
       previousData = data
 
+      // set entityB.meshRenderer = entity.meshRenderer via CRDT message
       const buffer = MeshRenderer.toBinary(entity)
       MeshRenderer.updateFromBinary(entityB, buffer)
 
@@ -45,7 +47,7 @@ describe('Generated MeshRenderer ProtoBuf', () => {
   it('should helper creates box MeshRenderer', () => {
     const newEngine = Engine()
     const entity = newEngine.addEntity()
-    const { MeshRenderer } = newEngine.baseComponents
+    const MeshRenderer = components.MeshRenderer(newEngine)
 
     expect(MeshRenderer.getOrNull(entity)).toBe(null)
     MeshRenderer.setBox(entity)
@@ -56,7 +58,7 @@ describe('Generated MeshRenderer ProtoBuf', () => {
   it('should helper test all datas', () => {
     const newEngine = Engine()
     const entity = newEngine.addEntity()
-    const { MeshRenderer } = newEngine.baseComponents
+    const MeshRenderer = components.MeshRenderer(newEngine)
 
     MeshRenderer.setBox(entity, [1, 2, 3])
     expect(MeshRenderer.get(entity)).toStrictEqual({

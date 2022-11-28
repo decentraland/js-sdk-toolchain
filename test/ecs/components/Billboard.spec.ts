@@ -1,10 +1,13 @@
-﻿import { Engine } from '../../../packages/@dcl/ecs/src/engine'
-import { BillboardMode } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/billboard.gen'
+﻿import {
+  Engine,
+  components,
+  BillboardMode
+} from '../../../packages/@dcl/ecs/src'
 
 describe('Generated Billboard ProtoBuf', () => {
   it('should serialize/deserialize Billboard', () => {
     const newEngine = Engine()
-    const { Billboard } = newEngine.baseComponents
+    const Billboard = components.Billboard(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

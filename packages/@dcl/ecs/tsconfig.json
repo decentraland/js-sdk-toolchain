@@ -13,18 +13,9 @@
     "downlevelIteration": true,
     "preserveConstEnums": true,
     "outDir": "dist",
-    "types": [
-      "@dcl/posix"
-    ]
+    "types": []
   },
-  "include": [
-    "src",
-    "temp-protocolbuffers"
-  ],
-  "files": [
-    "node_modules/protobufjs/minimal.d.ts"
-  ],
-  "exclude": [
-    "dist"
-  ]
+  "include": ["src"],
+  "files": ["node_modules/protobufjs/minimal.d.ts"],
+  "exclude": ["dist"]
 }

@@ -7,22 +7,20 @@
   "license": "Apache-2.0",
   "version": "1.0.0",
   "description": "My new Decentraland project",
-  "main": "./bin/lib.js",
-  "typings": "./bin/lib.d.ts",
+  "main": "./bin/index.js",
+  "types": "./bin/index.d.ts",
   "scripts": {
     "start": "dcl start",
-    "build": "../../../../packages/@dcl/build-ecs/dist/index.js",
-    "build-prod": "../../../../packages/@dcl/build-ecs/dist/index.js --production",
-    "watch": "../../../../packages/@dcl/build-ecs/dist/index.js --watch"
+    "build": "tsc -p tsconfig.json"
   },
-  "decentralandLibrary": {},
   "devDependencies": {
-    "@dcl/sdk": "./../../../../packages/@dcl/sdk"
+    "@dcl/dcl-rollup": "file:../../../../packages/@dcl/dcl-rollup",
+    "@dcl/ecs": "file:../../../../packages/@dcl/ecs",
+    "@dcl/sdk": "file:../../../../packages/@dcl/sdk",
+    "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime"
   },
   "dependencies": {
-    "eth-connect": "^6.0.0"
-  },
-  "bundleDependencies": [
-    "eth-connect"
-  ]
+    "ethers": "^5.7.2",
+    "typescript": "*"
+  }
 }

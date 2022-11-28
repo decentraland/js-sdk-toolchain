@@ -9,13 +9,13 @@
   "description": "My new Decentraland project",
   "scripts": {
     "start": "dcl start",
-    "build": "../../../../packages/@dcl/build-ecs/dist/index.js",
-    "build-prod": "../../../../packages/@dcl/build-ecs/dist/index.js --production",
-    "watch": "../../../../packages/@dcl/build-ecs/dist/index.js --watch"
+    "build": "build-ecs",
+    "build-prod": "build-ecs --production",
+    "watch": "build-ecs --watch"
   },
   "devDependencies": {
-    "@dcl/sdk": "file:../../../../packages/@dcl/sdk",
-    "@dcl/react-ecs": "file:../../../../packages/@dcl/react-ecs"
-  },
-  "bundledDependencies": ["@dcl/react-ecs"]
+    "@dcl/dcl-rollup": "file:../../../../packages/@dcl/dcl-rollup",
+    "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime",
+    "@dcl/sdk": "file:../../../../packages/@dcl/sdk"
+  }
 }

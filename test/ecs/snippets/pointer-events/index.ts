@@ -1,3 +1,15 @@
+import {
+  Entity,
+  engine,
+  Transform,
+  MeshRenderer,
+  MeshCollider,
+  InputAction,
+  PBPointerHoverFeedback_Entry,
+  PointerHoverFeedback,
+  PointerEventType
+} from '@dcl/sdk/ecs'
+
 // Cube factory
 function createCube(
   x: number,

@@ -1,9 +1,9 @@
-import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+import { Engine, components } from '../../../packages/@dcl/ecs/src'
 
 describe('Generated PointerLock ProtoBuf', () => {
   it('should serialize/deserialize PointerLock', () => {
     const newEngine = Engine()
-    const { PointerLock } = newEngine.baseComponents
+    const PointerLock = components.PointerLock(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

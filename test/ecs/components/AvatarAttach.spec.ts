@@ -1,9 +1,9 @@
-﻿import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+﻿import { Engine, components } from '../../../packages/@dcl/ecs/src'
 
 describe('Generated AvatarAttach ProtoBuf', () => {
   it('should serialize/deserialize AvatarAttach', () => {
     const newEngine = Engine()
-    const { AvatarAttach } = newEngine.baseComponents
+    const AvatarAttach = components.AvatarAttach(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

@@ -75,9 +75,16 @@ interface WebSocket {
 
 declare var WebSocket: {
   prototype: WebSocket
-  new(url: string, protocols?: string | string[]): WebSocket
+  new (url: string, protocols?: string | string[]): WebSocket
   readonly CLOSED: number
   readonly CLOSING: number
   readonly CONNECTING: number
   readonly OPEN: number
 }
+
+declare var console: {
+  log(message?: any, ...optionalParams: any[]): void;
+  error(message?: any, ...optionalParams: any[]): void;
+}
+
+declare const DEBUG: boolean

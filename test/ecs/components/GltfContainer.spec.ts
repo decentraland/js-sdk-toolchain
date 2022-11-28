@@ -1,9 +1,9 @@
-﻿import { Engine } from '../../../packages/@dcl/ecs/src/engine'
+﻿import { Engine, components } from '../../../packages/@dcl/ecs/src'
 
 describe('Generated GltfContainer ProtoBuf', () => {
   it('should serialize/deserialize GltfContainer', () => {
     const newEngine = Engine()
-    const { GltfContainer } = newEngine.baseComponents
+    const GltfContainer = components.GltfContainer(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 

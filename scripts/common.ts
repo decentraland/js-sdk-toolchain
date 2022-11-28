@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { ensureFileExists, readJson } from './helpers'
+import { ensureFileExists } from './helpers'
 
 export const flow = describe
 
@@ -15,19 +15,15 @@ export const ROLLUP = resolve(
 )
 
 // WORKING DIRECTORIES
-export const BUILD_ECS_PATH = resolve(
-  process.cwd(),
-  './packages/@dcl/build-ecs'
-)
-export const DECENTRALAND_AMD_PATH = resolve(
-  process.cwd(),
-  './packages/@dcl/amd'
-)
 export const ROLLUP_CONFIG_PATH = resolve(
   process.cwd(),
   './packages/@dcl/dcl-rollup'
 )
 export const SDK_PATH = resolve(process.cwd(), './packages/@dcl/sdk')
+export const PLAYGROUND_ASSETS_PATH = resolve(
+  process.cwd(),
+  './packages/@dcl/playground-assets'
+)
 
 export const ECS7_PATH = resolve(process.cwd(), './packages/@dcl/ecs')
 
@@ -40,39 +36,5 @@ export function commonChecks() {
     ensureFileExists(TSC)
     ensureFileExists(TERSER)
     ensureFileExists(ROLLUP)
-  })
-
-  test('@dcl/posix is consistent across projects', () => {
-    const ecsVersion = readJson('package.json', SDK_PATH).dependencies[
-      '@dcl/posix'
-    ]
-    const amdVersion = readJson('package.json', DECENTRALAND_AMD_PATH)
-      .devDependencies['@dcl/posix']
-
-    expect(amdVersion).toEqual(ecsVersion)
-  })
-
-  test('@dcl/posix snapshot are not used for releases', () => {
-    // we only validate ECS version, previous step validates consistenty
-    const dclPosixVersion: string =
-      readJson('package.json', SDK_PATH).dependencies['@dcl/posix'] || ''
-
-    const ref: string = (process.env.GITHUB_REF || '').split(/\//g).pop()!
-
-    const snapshotExpr = /-/ // if it contains a dash, it is a snapshot
-
-    // in releases, we fail right here
-    if (/^\d+\.\d+\.\d+.*/.test(ref)) {
-      expect(dclPosixVersion).not.toMatch(snapshotExpr)
-    }
-
-    if (snapshotExpr.test(dclPosixVersion)) {
-      console.error(
-        `::error file=${resolve(
-          SDK_PATH,
-          'package.json'
-        )},line=0,col=0::Using a snapshot version of @dcl/posix if you create a release with the snapshot it will fail`
-      )
-    }
   })
 }

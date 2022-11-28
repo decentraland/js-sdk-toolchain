@@ -43,8 +43,8 @@ export function compileEcsComponents(
       })
     }
 
-    console.log(
-      `Decentraland > Gen dir: ${generatedPath} - definitions dir: ${definitionsPath}`
+    process.stderr.write(
+      `Decentraland > Gen dir: ${generatedPath} - definitions dir: ${definitionsPath}\n`
     )
 
     const componentsFile = getFilePathsSync(definitionsPath, false)
