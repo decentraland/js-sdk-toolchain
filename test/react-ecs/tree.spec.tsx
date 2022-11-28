@@ -6,7 +6,7 @@ import {
   ReactEcs,
   UiEntity,
   CANVAS_ROOT_ENTITY
-} from '../../packages/@dcl/sdk/react-ecs'
+} from '../../packages/@dcl/react-ecs/src'
 
 
 describe('RectEcs UI ✨', () => {

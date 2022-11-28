@@ -1,5 +1,4 @@
-import { Engine, IEngine, Entity, createInputSystem, createPointerEventSystem, YGWrap, YGUnit } from '../../packages/@dcl/sdk/ecs'
-import * as components from '../../packages/@dcl/ecs/dist/components'
+import { Engine, IEngine, Entity, createInputSystem, createPointerEventSystem, YGWrap, YGUnit, components } from '../../packages/@dcl/ecs/src'
 import {
   createReactBasedUiSystem,
   Position,
@@ -8,7 +7,7 @@ import {
   ReactEcs,
   UiEntity,
   CANVAS_ROOT_ENTITY
-} from '../../packages/@dcl/sdk/react-ecs'
+} from '../../packages/@dcl/react-ecs/src'
 
 
 describe('UiTransform React Ecs', () => {
@@ -43,7 +42,7 @@ describe('UiTransform React Ecs', () => {
     const getUiTransform = (entity: Entity) => UiTransform.get(entity)
     const ui = () => (
       <UiEntity
-        uiTransform={{ width: 'boedo' as any, flexWrap: YGWrap.YGW_WRAP }}
+        uiTransform={{ width: 'boedo' as any, flexWrap: YGWrap.YGW_WRAP as any }}
       />
     )
     uiRenderer.setUiRenderer(ui)

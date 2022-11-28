@@ -1,5 +1,4 @@
-import { Engine, IEngine, Entity, createPointerEventSystem, createInputSystem, PBUiBackground } from '../../packages/@dcl/ecs/dist'
-import * as components from '../../packages/@dcl/ecs/dist/components'
+import { Engine, IEngine, Entity, createPointerEventSystem, createInputSystem, PBUiBackground, components } from '../../packages/@dcl/ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
 import {
   ReactEcs,
@@ -7,7 +6,7 @@ import {
   createReactBasedUiSystem,
   ReactBasedUiSystem,
   CANVAS_ROOT_ENTITY
-} from '../../packages/@dcl/sdk/react-ecs'
+} from '../../packages/@dcl/react-ecs/src'
 
 describe('UiBackground React Ecs', () => {
   let engine: IEngine

@@ -11,7 +11,7 @@ import {
   ReactEcs,
   ReactBasedUiSystem,
   createReactBasedUiSystem
-} from '../../packages/@dcl/react-ecs'
+} from '../../packages/@dcl/react-ecs/src'
 
 describe('Render UI System', () => {
   let engine: IEngine
