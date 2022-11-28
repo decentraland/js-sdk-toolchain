@@ -86,7 +86,7 @@ async function compile() {
   watcher.on('event', (event) => {
     if (event.code === 'END') {
       if (WATCH) {
-        stderr('\nThe compiler is watching file changes...\n')
+        console.log('\nThe compiler is watching file changes...\n')
       } else {
         finished.resolve()
       }
