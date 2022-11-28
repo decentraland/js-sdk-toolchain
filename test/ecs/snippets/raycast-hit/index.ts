@@ -5,11 +5,11 @@ import {
   MeshCollider,
   InputAction,
   pointerEventsSystem,
-  Vector3,
   Raycast,
   RaycastQueryType,
   RaycastResult
-} from '@dcl/ecs'
+} from '@dcl/sdk/ecs'
+import { Vector3 } from '@dcl/sdk/math'
 
 function createCube(
   x: number,

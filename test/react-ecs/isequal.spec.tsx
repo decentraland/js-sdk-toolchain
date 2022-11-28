@@ -1,4 +1,4 @@
-import { isEqual } from '../../packages/@dcl/react-ecs/src/reconciler/utils'
+import { isEqual } from '../../packages/@dcl/sdk/react-ecs/src/reconciler/utils'
 
 describe('UiBackground React Ecs', () => {
   it('should remove backgrund component', () => {

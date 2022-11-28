@@ -1,4 +1,5 @@
-import { Position, PositionUnit, YGUnit } from './types'
+import { YGUnit } from '@dcl/ecs'
+import { Position, PositionUnit } from './types'
 
 function capitalize<T extends string>(value: T): Capitalize<T> {
   return `${value[0].toUpperCase()}${value.slice(

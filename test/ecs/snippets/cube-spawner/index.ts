@@ -3,12 +3,11 @@ import {
   engine,
   pointerEventsSystem,
   Transform,
-  Vector3,
   MeshRenderer,
   MeshCollider,
-  Quaternion,
   InputAction
-} from '@dcl/ecs'
+} from '@dcl/sdk/ecs'
+import { Quaternion, Vector3 } from '@dcl/sdk/math'
 
 // Cube factory
 function createCube(x: number, y: number, z: number): Entity {

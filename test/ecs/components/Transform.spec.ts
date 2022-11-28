@@ -1,10 +1,5 @@
-import {
-  Engine,
-  Entity,
-  components,
-  Quaternion,
-  Vector3
-} from '../../../packages/@dcl/ecs/src'
+import { Engine, Entity, components } from '../../../packages/@dcl/ecs/src'
+import { Quaternion, Vector3 } from '../../../packages/@dcl/sdk/src/math'
 import { TRANSFORM_LENGTH } from '../../../packages/@dcl/ecs/src/components/legacy/Transform'
 
 describe('Transform component', () => {

@@ -13,7 +13,7 @@ import {
   pollEvents,
   setSubscribeFunction
 } from '../../packages/@dcl/sdk/src/observables'
-import { createRendererTransport } from '../../packages/@dcl/sdk/src/transports/rendererTransport'
+import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
 import { SendBatchResponse } from '~system/EngineApi'
 
 describe('Observable tests', () => {

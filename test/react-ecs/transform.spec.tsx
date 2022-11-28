@@ -8,8 +8,8 @@ import {
   UiEntity,
   YGUnit,
   YGWrap
-} from '../../packages/@dcl/react-ecs/src'
-import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
+} from '../../packages/@dcl/sdk/react-ecs/src'
+import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/sdk/react-ecs/src/components/uiTransform'
 
 
 describe('UiTransform React Ecs', () => {

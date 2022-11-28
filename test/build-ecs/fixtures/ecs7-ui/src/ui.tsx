@@ -5,7 +5,7 @@ import ReactEcs, {
   YGAlign,
   Font,
   TextAlignMode
-} from '@dcl/react-ecs'
+} from '@dcl/sdk/react-ecs'
 
 export const ui = () => (
   <UiEntity

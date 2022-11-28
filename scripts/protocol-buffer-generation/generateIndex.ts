@@ -50,6 +50,8 @@ const globalTemplate = `
 import { engine } from '../../runtime/initialization'
 import { ComponentDefinition } from '../../engine/component'
 import * as components from './index.gen'
+export * from './index.gen';
+
 $allGlobalComponentsImports
 
 $allGlobalComponents

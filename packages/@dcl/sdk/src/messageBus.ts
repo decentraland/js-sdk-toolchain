@@ -1,9 +1,9 @@
-import { Observer } from './temp-fp/Observable'
+import { Observer } from './internal/Observable'
 import { IEvents, onCommsMessage } from './observables'
 import * as communicationsController from '~system/CommunicationsController'
 
 /**
- * @public
+ * @alpha
  * @deprecated this will only exist for a few releases in ECS7
  */
 export class MessageBus {

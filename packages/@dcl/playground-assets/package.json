@@ -1,0 +1,21 @@
+{
+  "name": "@dcl/playground-assets",
+  "version": "7.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/ecs.config.js && ./../dcl-rollup/node_modules/.bin/api-extractor run -v"
+  },
+  "keywords": [],
+  "tsdoc": {
+    "tsdocFlavor": "AEDoc"
+  },
+  "author": "Decentraland",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@dcl/sdk": "file:../sdk"
+  },
+  "minCliVersion": "3.12.3"
+}

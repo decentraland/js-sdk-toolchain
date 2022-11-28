@@ -1,6 +1,6 @@
 import { Engine, Entity, components, createPointerEventSystem, createInputSystem } from '../../packages/@dcl/ecs/src'
-import { Color4, Font, ReactEcs, createReactBasedUiSystem, TextAlignMode, UiEntity } from '../../packages/@dcl/react-ecs/src'
-import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
+import { Color4, Font, ReactEcs, createReactBasedUiSystem, TextAlignMode, UiEntity } from '../../packages/@dcl/sdk/react-ecs/src'
+import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/sdk/react-ecs/src/components/uiTransform'
 
 describe('UiText React Ecs', () => {
   beforeEach(() => {

@@ -1,8 +1,8 @@
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { Engine, components } from '../../packages/@dcl/ecs/src'
 import WireMessage from '../../packages/@dcl/ecs/src/serialization/wireMessage'
-import { createNetworkTransport } from '../../packages/@dcl/sdk/src/transports/networkTransport'
-import { createRendererTransport } from '../../packages/@dcl/sdk/src/transports/rendererTransport'
+import { createNetworkTransport } from '../../packages/@dcl/sdk/src/internal/transports/networkTransport'
+import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
 import { TransportMessage } from '../../packages/@dcl/ecs/src/systems/crdt/types'
 
 declare const process: any

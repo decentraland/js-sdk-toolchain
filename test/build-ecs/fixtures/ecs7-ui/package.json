@@ -14,13 +14,8 @@
     "watch": "build-ecs --watch"
   },
   "devDependencies": {
-    "@dcl/react-ecs": "file:../../../../packages/@dcl/react-ecs",
     "@dcl/dcl-rollup": "file:../../../../packages/@dcl/dcl-rollup",
-    "@dcl/ecs": "file:../../../../packages/@dcl/ecs",
     "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime",
     "@dcl/sdk": "file:../../../../packages/@dcl/sdk"
-  },
-  "dependencies": {
-    "@dcl/ecs-math": "^2.0.1-20221108141807.commit-a1344cb"
   }
 }

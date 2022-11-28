@@ -7,6 +7,7 @@ import {
   ECS7_PATH,
   flow,
   JS_RUNTIME,
+  PLAYGROUND_ASSETS_PATH,
   REACT_ECS,
   ROLLUP_CONFIG_PATH,
   SDK_PATH,
@@ -22,7 +23,6 @@ import {
   runCommand
 } from './helpers'
 import { compileEcsComponents } from './protocol-buffer-generation'
-import { createProtoTypes } from './protocol-buffer-generation/generateProtocolTypes'
 import { compileProtoApi } from './rpc-api-generation'
 import { getSnippetsfile } from './utils/getFilePathsSync'
 
@@ -93,6 +93,16 @@ flow('build-all', () => {
     })
   })
 
+  flow('@dcl/react-ecs', () => {
+    itExecutes('npm i --silent', REACT_ECS)
+    itExecutes(`npm install --silent ${ECS7_PATH}`, REACT_ECS)
+    itExecutes('npm run build --silent', REACT_ECS)
+    it('check file exists', () => {
+      ensureFileExists('dist/index.js', REACT_ECS)
+      ensureFileExists('dist/index.d.ts', REACT_ECS)
+    })
+  })
+
   flow('@dcl/sdk build', () => {
     itDeletesFolder('dist', SDK_PATH)
     itExecutes(`npm i --silent`, SDK_PATH)
@@ -103,29 +113,41 @@ flow('build-all', () => {
     itExecutes(`npm install --silent ${ROLLUP_CONFIG_PATH}`, SDK_PATH)
     itExecutes(`npm install --silent ${JS_RUNTIME}`, SDK_PATH)
     itExecutes(`npm install --silent ${ECS7_PATH}`, SDK_PATH)
+    itExecutes(`npm install --silent ${REACT_ECS}`, SDK_PATH)
 
     itExecutes('npm run build --silent', SDK_PATH)
+
+    it('check files exists', () => {
+      ensureFileExists('index.js', SDK_PATH)
+      ensureFileExists('index.d.ts', SDK_PATH)
+      ensureFileExists('math.js', SDK_PATH)
+      ensureFileExists('math.d.ts', SDK_PATH)
+      ensureFileExists('ecs.js', SDK_PATH)
+      ensureFileExists('ecs.d.ts', SDK_PATH)
+      ensureFileExists('react-ecs.js', SDK_PATH)
+      ensureFileExists('react-ecs.d.ts', SDK_PATH)
+    })
   })
 
-  flow('@dcl/react-ecs', () => {
-    itExecutes('npm i --silent', REACT_ECS)
-    itExecutes(`npm install --silent ${ECS7_PATH}`, REACT_ECS)
-    it('Copy proto files', async () => {
-      const protoTypesPath = `${REACT_ECS}/src/generated`
-      removeSync(protoTypesPath)
-      mkdirSync(protoTypesPath)
+  flow('@dcl/playground-assets build', () => {
+    itDeletesFolder('dist', PLAYGROUND_ASSETS_PATH)
+    itExecutes(`npm i --silent`, PLAYGROUND_ASSETS_PATH)
 
-      await createProtoTypes(
-        `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
-        protoTypesPath,
-        ['ui_transform.proto', 'ui_text.proto', 'ui_background.proto'],
-        `${ECS7_PATH}/node_modules/@dcl/protocol/proto`
-      )
-    })
-    itExecutes('npm run build --silent', REACT_ECS)
-    it('check file exists', () => {
-      ensureFileExists('dist/index.js', REACT_ECS)
-      ensureFileExists('dist/index.d.ts', REACT_ECS)
+    // install required dependencies
+    itExecutes(`npm install --silent ${SDK_PATH}`, PLAYGROUND_ASSETS_PATH)
+    itExecutes('npm run build --silent', PLAYGROUND_ASSETS_PATH)
+
+    it('final checks', () => {
+      if (!process.env.CI) {
+        copyFile(
+          `${PLAYGROUND_ASSETS_PATH}/temp/playground-assets.api.md`,
+          `${PLAYGROUND_ASSETS_PATH}/etc/playground-assets.api.md`
+        )
+        copyFile(
+          `${PLAYGROUND_ASSETS_PATH}/temp/playground-assets.api.json`,
+          `${PLAYGROUND_ASSETS_PATH}/etc/playground-assets.api.json`
+        )
+      }
     })
   })
 
@@ -138,7 +160,11 @@ flow('build-all', () => {
         'ecs',
         'snippets'
       )
-      const playgroundDistPath = path.resolve(SDK_PATH, 'dist', 'playground')
+      const playgroundDistPath = path.resolve(
+        PLAYGROUND_ASSETS_PATH,
+        'dist',
+        'playground'
+      )
 
       // Clean last build
       removeSync(playgroundDistPath)
@@ -185,37 +211,27 @@ flow('build-all', () => {
       )
     })
 
-    it.skip('playground copy minified files', async () => {
-      const playgroundDistPath = path.resolve(SDK_PATH, 'dist', 'playground')
+    it('playground copy minified files', async () => {
+      const playgroundDistPath = path.resolve(
+        PLAYGROUND_ASSETS_PATH,
+        'dist',
+        'playground'
+      )
 
       // Copy minified ecs
       const filesToCopy = [
         {
-          from: path.resolve(SDK_PATH, 'dist', 'ecs7', 'index.min.js'),
-          fileName: 'index.min.js'
-        },
-        {
-          from: path.resolve(SDK_PATH, 'types', 'ecs7', 'index.d.ts'),
-          fileName: 'index.d.ts'
-        },
-        {
           from: path.resolve(JS_RUNTIME, 'apis.d.ts'),
           fileName: 'apis.d.ts'
-        },
-        {
-          from: path.resolve(REACT_ECS, 'dist', 'index.min.js'),
-          fileName: 'react-ecs.index.min.js'
-        },
-        {
-          from: path.resolve(REACT_ECS, 'dist', 'index.d.ts'),
-          fileName: 'react-ecs.index.d.ts'
         }
       ]
       const distPlaygroundSdkPath = path.resolve(playgroundDistPath, 'sdk')
       for (const file of filesToCopy) {
         const filePath = ensureFileExists(file.from)
         const destPath = path.resolve(distPlaygroundSdkPath, file.fileName)
+        ensureFileExists(filePath)
         copyFile(filePath, destPath)
+        ensureFileExists(destPath)
       }
     })
   })

@@ -5,10 +5,9 @@ import {
   MeshCollider,
   MeshRenderer,
   Transform,
-  Quaternion,
-  Vector3,
   pointerEventsSystem
 } from '@dcl/ecs'
+import { Vector3, Quaternion } from '@dcl/sdk/math'
 export * from '@dcl/sdk'
 
 // Cube factory

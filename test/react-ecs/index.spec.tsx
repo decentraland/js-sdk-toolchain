@@ -4,7 +4,7 @@ import {
   Entity,
   components,
   createPointerEventSystem,
-  createInputSystem
+  create../../packages/@dcl/sdk/react-ecs/src
 } from '../../packages/@dcl/ecs/src'
 import {
   UiEntity,

@@ -8,7 +8,7 @@ import {
   PBPointerHoverFeedback_Entry,
   PointerHoverFeedback,
   PointerEventType
-} from '@dcl/ecs'
+} from '@dcl/sdk/ecs'
 
 // Cube factory
 function createCube(

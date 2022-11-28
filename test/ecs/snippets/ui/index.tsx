@@ -5,13 +5,11 @@ import {
   MeshRenderer,
   MeshCollider,
   InputAction,
-  Vector3,
-  Color4,
   inputSystem,
-  Quaternion,
   PointerHoverFeedback,
   PointerEventType
-} from '@dcl/ecs'
+} from '@dcl/sdk/ecs'
+import{Vector3,Color4,Quaternion}from'@dcl/sdk/math'
 
 import ReactEcs, {
   UiEntity,
@@ -19,7 +17,7 @@ import ReactEcs, {
   YGDisplay,
   YGJustify,
   ReactEcsRenderer
-} from '@dcl/react-ecs'
+} from '../../../../packages/@dcl/sdk/react-ecs/dist'
 
 let counter = 0
 

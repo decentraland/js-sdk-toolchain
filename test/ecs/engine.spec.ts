@@ -2,10 +2,11 @@ import { cyclicParentingChecker } from '../../packages/@dcl/ecs/src/systems/cycl
 import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { createRendererTransport } from '../../packages/@dcl/sdk/src/transports/rendererTransport'
+import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { TransformSchema } from '../../packages/@dcl/ecs/src/components/legacy/Transform'
-import { components, Vector3 } from '../../packages/@dcl/ecs/src'
+import { components } from '../../packages/@dcl/ecs/src'
+import { Vector3 } from '../../packages/@dcl/sdk/src/math'
 
 const PositionSchema = {
   x: Schemas.Float

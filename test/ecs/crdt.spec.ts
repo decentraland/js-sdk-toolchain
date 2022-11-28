@@ -1,4 +1,5 @@
-import { components, Vector3 } from '../../packages/@dcl/ecs/src'
+import { components } from '../../packages/@dcl/ecs/src'
+import { Vector3 } from '../../packages/@dcl/sdk/src/math'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'

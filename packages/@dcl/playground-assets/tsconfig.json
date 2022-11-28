@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "stripInternal": true,
+    "downlevelIteration": true,
+    "preserveConstEnums": true,
+    "outDir": "dist",
+    "types": []
+  },
+  "include": ["src"],
+  "exclude": ["dist"]
+}

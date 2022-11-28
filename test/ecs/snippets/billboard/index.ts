@@ -3,15 +3,13 @@ import {
   engine,
   Material,
   Transform,
-  Vector3,
   MeshRenderer,
   Billboard,
   BillboardMode,
   TextShape,
-  Color3,
-  Color4,
   Schemas
-} from '@dcl/ecs'
+} from '@dcl/sdk/ecs'
+import { Vector3, Color3, Color4 } from '@dcl/sdk/math'
 
 function createPlaneTexture(x: number, y: number, z: number): Entity {
   const meshEntity = engine.addEntity()

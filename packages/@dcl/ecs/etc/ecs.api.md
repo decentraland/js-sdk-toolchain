@@ -9,11 +9,6 @@ import _m0 from 'protobufjs/minimal';
 // @public (undocumented)
 export const Animator: ComponentDefinition<typeof AnimatorSchema>;
 
-// Warning: (ae-missing-release-tag) "Animator" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-const Animator_2: ComponentGetter<AnimatorComponentDefinitionExtended>;
-
 // @public (undocumented)
 export type AnimatorComponentDefinition = ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
 
@@ -28,40 +23,34 @@ export interface AnimatorComponentDefinitionExtended extends AnimatorComponentDe
 // Warning: (ae-missing-release-tag) "AnimatorSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const AnimatorSchema: ISchema<PBAnimator> & {
+export const AnimatorSchema: ISchema<PBAnimator> & {
     COMPONENT_ID: number;
 };
 
 // @public (undocumented)
 export const AudioSource: ComponentDefinition<typeof AudioSourceSchema>;
 
-// @public (undocumented)
-const AudioSource_2: ComponentGetter<ComponentDefinition<typeof AudioSourceSchema>>;
-
 // Warning: (ae-missing-release-tag) "AudioSourceSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const AudioSourceSchema: ISchema<PBAudioSource> & {
+export const AudioSourceSchema: ISchema<PBAudioSource> & {
     COMPONENT_ID: number;
 };
 
 // @public (undocumented)
 export const AudioStream: ComponentDefinition<typeof AudioStreamSchema>;
 
-// @public (undocumented)
-const AudioStream_2: ComponentGetter<ComponentDefinition<typeof AudioStreamSchema>>;
-
 // Warning: (ae-missing-release-tag) "AudioStreamSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const AudioStreamSchema: ISchema<PBAudioStream> & {
+export const AudioStreamSchema: ISchema<PBAudioStream> & {
     COMPONENT_ID: number;
 };
 
 // Warning: (ae-missing-release-tag) "AvatarAnchorPointType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const enum AvatarAnchorPointType {
+export const enum AvatarAnchorPointType {
     // (undocumented)
     AAPT_LEFT_HAND = 2,
     // (undocumented)
@@ -75,26 +64,20 @@ const enum AvatarAnchorPointType {
 // @public (undocumented)
 export const AvatarAttach: ComponentDefinition<typeof AvatarAttachSchema>;
 
-// @public (undocumented)
-const AvatarAttach_2: ComponentGetter<ComponentDefinition<typeof AvatarAttachSchema>>;
-
 // Warning: (ae-missing-release-tag) "AvatarAttachSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const AvatarAttachSchema: ISchema<PBAvatarAttach> & {
+export const AvatarAttachSchema: ISchema<PBAvatarAttach> & {
     COMPONENT_ID: number;
 };
 
 // @public (undocumented)
 export const AvatarModifierArea: ComponentDefinition<typeof AvatarModifierAreaSchema>;
 
-// @public (undocumented)
-const AvatarModifierArea_2: ComponentGetter<ComponentDefinition<typeof AvatarModifierAreaSchema>>;
-
 // Warning: (ae-missing-release-tag) "AvatarModifierAreaSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const AvatarModifierAreaSchema: ISchema<PBAvatarModifierArea> & {
+export const AvatarModifierAreaSchema: ISchema<PBAvatarModifierArea> & {
     COMPONENT_ID: number;
 };
 
@@ -111,13 +94,10 @@ export const enum AvatarModifierType {
 // @public (undocumented)
 export const AvatarShape: ComponentDefinition<typeof AvatarShapeSchema>;
 
-// @public (undocumented)
-const AvatarShape_2: ComponentGetter<ComponentDefinition<typeof AvatarShapeSchema>>;
-
 // Warning: (ae-missing-release-tag) "AvatarShapeSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const AvatarShapeSchema: ISchema<PBAvatarShape> & {
+export const AvatarShapeSchema: ISchema<PBAvatarShape> & {
     COMPONENT_ID: number;
 };
 
@@ -141,9 +121,6 @@ export const AvatarTexture: {
 // @public (undocumented)
 export const Billboard: ComponentDefinition<typeof BillboardSchema>;
 
-// @public (undocumented)
-const Billboard_2: ComponentGetter<ComponentDefinition<typeof BillboardSchema>>;
-
 // Warning: (ae-missing-release-tag) "BillboardMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -157,7 +134,7 @@ export const enum BillboardMode {
 // Warning: (ae-missing-release-tag) "BillboardSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const BillboardSchema: ISchema<PBBillboard> & {
+export const BillboardSchema: ISchema<PBBillboard> & {
     COMPONENT_ID: number;
 };
 
@@ -222,25 +199,19 @@ export type ByteBuffer = {
 export const CameraMode: ComponentDefinition<typeof CameraModeSchema>;
 
 // @public (undocumented)
-const CameraMode_2: ComponentGetter<ComponentDefinition<typeof CameraModeSchema>>;
-
-// @public (undocumented)
 export const CameraModeArea: ComponentDefinition<typeof CameraModeAreaSchema>;
-
-// @public (undocumented)
-const CameraModeArea_2: ComponentGetter<ComponentDefinition<typeof CameraModeAreaSchema>>;
 
 // Warning: (ae-missing-release-tag) "CameraModeAreaSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const CameraModeAreaSchema: ISchema<PBCameraModeArea> & {
+export const CameraModeAreaSchema: ISchema<PBCameraModeArea> & {
     COMPONENT_ID: number;
 };
 
 // Warning: (ae-missing-release-tag) "CameraModeSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const CameraModeSchema: ISchema<PBCameraMode> & {
+export const CameraModeSchema: ISchema<PBCameraMode> & {
     COMPONENT_ID: number;
 };
 
@@ -266,146 +237,12 @@ export const enum ColliderLayer {
     CL_POINTER = 1
 }
 
-// @public
-export type Color3 = Color3.ReadonlyColor3;
-
-// @public
-export namespace Color3 {
-    export function add(value: ReadonlyColor3, otherColor: ReadonlyColor3): MutableColor3;
-    export function addToRef(value: ReadonlyColor3, otherColor: ReadonlyColor3, result: MutableColor3): void;
-    export function asArray(value: ReadonlyColor3): number[];
-    export function Black(): MutableColor3;
-    export function Blue(): MutableColor3;
-    export function clamp(value: ReadonlyColor3, min?: number, max?: number): MutableColor3;
-    export function clampToRef(value: ReadonlyColor3, min: number | undefined, max: number | undefined, result: MutableColor3): void;
-    export function clone(value: ReadonlyColor3): MutableColor3;
-    export function copyFrom(source: ReadonlyColor3, dest: MutableColor3): void;
-    export function create(
-    r?: number,
-    g?: number,
-    b?: number): {
-        r: number;
-        g: number;
-        b: number;
-    };
-    export function equals(value: ReadonlyColor3, otherColor: ReadonlyColor3): boolean;
-    export function equalsFloats(value: ReadonlyColor3, r: number, g: number, b: number): boolean;
-    export function fromArray(array: ArrayLike<number>, offset?: number): MutableColor3;
-    export function fromHexString(hex: string): MutableColor3;
-    export function fromInts(r: number, g: number, b: number): MutableColor3;
-    export function getHashCode(value: ReadonlyColor3): number;
-    export function Gray(): MutableColor3;
-    export function Green(): MutableColor3;
-    export function lerp(start: ReadonlyColor3, end: ReadonlyColor3, amount: number): MutableColor3;
-    export function lerpToRef(left: ReadonlyColor3, right: ReadonlyColor3, amount: number, result: MutableColor3): void;
-    export function Magenta(): MutableColor3;
-    export function multiply(value: ReadonlyColor3, otherColor: ReadonlyColor3): MutableColor3;
-    export function multiplyToRef(value: ReadonlyColor3, otherColor: ReadonlyColor3, result: MutableColor3): void;
-    export type Mutable = MutableColor3;
-    export type MutableColor3 = {
-        r: number;
-        g: number;
-        b: number;
-    };
-    export function Purple(): MutableColor3;
-    export function Random(): MutableColor3;
-    export type ReadonlyColor3 = {
-        readonly r: number;
-        readonly g: number;
-        readonly b: number;
-    };
-    export function Red(): MutableColor3;
-    export function scale(value: ReadonlyColor3, scale: number): MutableColor3;
-    export function scaleAndAddToRef(value: ReadonlyColor3, scale: number, result: MutableColor3): void;
-    export function scaleToRef(value: ReadonlyColor3, scale: number, result: MutableColor3): void;
-    export function set(dest: MutableColor3, r: number, g: number, b: number): void;
-    export function subtract(value: ReadonlyColor3, otherColor: ReadonlyColor3): MutableColor3;
-    export function subtractToRef(value: ReadonlyColor3, otherColor: ReadonlyColor3, result: MutableColor3): void;
-    export function Teal(): MutableColor3;
-    export function toArray(value: ReadonlyColor3, array: FloatArray, index?: number): void;
-    export function toColor4(value: ReadonlyColor3, alpha?: number): Color4.MutableColor4;
-    export function toGammaSpace(value: ReadonlyColor3): ReadonlyColor3;
-    export function toGammaSpaceToRef(value: ReadonlyColor3, convertedColor: MutableColor3): void;
-    export function toHexString(value: ReadonlyColor3): string;
-    export function toLinearSpace(value: ReadonlyColor3): MutableColor3;
-    export function toLinearSpaceToRef(value: ReadonlyColor3, convertedColor: MutableColor3): void;
-    export function toLuminance(value: ReadonlyColor3): number;
-    export function toString(value: ReadonlyColor3): string;
-    export function White(): MutableColor3;
-    export function Yellow(): MutableColor3;
-}
-
 // @public (undocumented)
 export type Color3Type = {
     r: number;
     g: number;
     b: number;
 };
-
-// @public
-export type Color4 = Color4.ReadonlyColor4;
-
-// @public
-export namespace Color4 {
-    export function add(value: ReadonlyColor4, right: ReadonlyColor4): MutableColor4;
-    export function addToRef(a: ReadonlyColor4, b: ReadonlyColor4, ref: MutableColor4): void;
-    export function Black(): MutableColor4;
-    export function Blue(): MutableColor4;
-    export function checkColors4(colors: number[], count: number): number[];
-    export function clampToRef(value: ReadonlyColor4, min: number | undefined, max: number | undefined, result: MutableColor4): void;
-    export function Clear(): MutableColor4;
-    export function clone(value: ReadonlyColor4): MutableColor4;
-    export function copyFrom(source: ReadonlyColor4, dest: MutableColor4): void;
-    export function copyFromFloats(r: number, g: number, b: number, a: number, dest: MutableColor4): void;
-    export function create(
-    r?: number,
-    g?: number,
-    b?: number,
-    a?: number): MutableColor4;
-    export function fromArray(array: ArrayLike<number>, offset?: number): ReadonlyColor4;
-    export function fromColor3(color3: Color3.ReadonlyColor3, alpha?: number): MutableColor4;
-    export function fromHexString(hex: string): MutableColor4;
-    export function fromInts(r: number, g: number, b: number, a: number): MutableColor4;
-    export function getHashCode(value: ReadonlyColor4): number;
-    export function Gray(): MutableColor4;
-    export function Green(): MutableColor4;
-    export function lerp(left: ReadonlyColor4, right: ReadonlyColor4, amount: number): MutableColor4;
-    export function lerpToRef(left: ReadonlyColor4, right: ReadonlyColor4, amount: number, result: MutableColor4): void;
-    export function Magenta(): MutableColor4;
-    export function multiply(value: ReadonlyColor4, color: ReadonlyColor4): ReadonlyColor4;
-    export function multiplyToRef(value: ReadonlyColor4, color: ReadonlyColor4, result: MutableColor4): void;
-    export type Mutable = MutableColor4;
-    export type MutableColor4 = {
-        r: number;
-        g: number;
-        b: number;
-        a: number;
-    };
-    export function Purple(): MutableColor4;
-    export type ReadonlyColor4 = {
-        readonly r: number;
-        readonly g: number;
-        readonly b: number;
-        readonly a: number;
-    };
-    export function Red(): MutableColor4;
-    export function scale(value: ReadonlyColor4, scale: number): ReadonlyColor4;
-    export function scaleAndAddToRef(value: ReadonlyColor4, scale: number, result: MutableColor4): void;
-    export function scaleToRef(value: ReadonlyColor4, scale: number, result: MutableColor4): void;
-    export function set(r: number, g: number, b: number, a: number, dest: MutableColor4): void;
-    export function subtract(value: ReadonlyColor4, right: ReadonlyColor4): ReadonlyColor4;
-    export function subtractToRef(a: ReadonlyColor4, b: ReadonlyColor4, result: MutableColor4): void;
-    export function Teal(): MutableColor4;
-    export function toArray(value: ReadonlyColor4, array: number[], index?: number): void;
-    export function toGammaSpace(value: ReadonlyColor4): ReadonlyColor4;
-    export function toGammaSpaceToRef(value: ReadonlyColor4, convertedColor: MutableColor4): void;
-    export function toHexString(value: ReadonlyColor4): string;
-    export function toLinearSpace(value: ReadonlyColor4): MutableColor4;
-    export function toLinearSpaceToRef(value: ReadonlyColor4, ref: MutableColor4): void;
-    export function toString(value: ReadonlyColor4): string;
-    export function White(): MutableColor4;
-    export function Yellow(): MutableColor4;
-}
 
 // @public (undocumented)
 export type Color4Type = {
@@ -433,121 +270,7 @@ export type ComponentDefinition<T extends ISchema<ConstructorType>, ConstructorT
 // Warning: (ae-missing-release-tag) "ComponentGetter" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-type ComponentGetter<T extends ComponentDefinition<any>> = (engine: Pick<IEngine, 'defineComponentFromSchema'>) => T;
-
-declare namespace components {
-    export {
-        ISchema,
-        ComponentDefinition,
-        Transform_2 as Transform,
-        Material_2 as Material,
-        Animator_2 as Animator,
-        MeshRenderer_2 as MeshRenderer,
-        MeshCollider_2 as MeshCollider,
-        AnimatorSchema,
-        AudioSourceSchema,
-        AudioStreamSchema,
-        AvatarAttachSchema,
-        AvatarModifierAreaSchema,
-        AvatarShapeSchema,
-        BillboardSchema,
-        CameraModeSchema,
-        CameraModeAreaSchema,
-        GltfContainerSchema,
-        MaterialSchema,
-        MeshColliderSchema,
-        MeshRendererSchema,
-        NftShapeSchema,
-        PointerEventsResultSchema,
-        PointerHoverFeedbackSchema,
-        PointerLockSchema,
-        RaycastSchema,
-        RaycastResultSchema,
-        TextShapeSchema,
-        UiBackgroundSchema,
-        UiTextSchema,
-        UiTransformSchema,
-        VisibilityComponentSchema,
-        ComponentGetter,
-        AudioSource_2 as AudioSource,
-        AudioStream_2 as AudioStream,
-        AvatarAttach_2 as AvatarAttach,
-        AvatarModifierArea_2 as AvatarModifierArea,
-        AvatarShape_2 as AvatarShape,
-        Billboard_2 as Billboard,
-        CameraMode_2 as CameraMode,
-        CameraModeArea_2 as CameraModeArea,
-        GltfContainer_2 as GltfContainer,
-        NftShape_2 as NftShape,
-        PointerEventsResult_2 as PointerEventsResult,
-        PointerHoverFeedback_2 as PointerHoverFeedback,
-        PointerLock_2 as PointerLock,
-        Raycast_2 as Raycast,
-        RaycastResult_2 as RaycastResult,
-        TextShape_2 as TextShape,
-        UiBackground_2 as UiBackground,
-        UiText_2 as UiText,
-        UiTransform_2 as UiTransform,
-        VisibilityComponent_2 as VisibilityComponent,
-        PBAnimator,
-        PBAnimationState,
-        PBAudioSource,
-        PBAudioStream,
-        AvatarAnchorPointType,
-        PBAvatarAttach,
-        AvatarModifierType,
-        PBAvatarModifierArea,
-        PBAvatarShape,
-        BillboardMode,
-        PBBillboard,
-        PBCameraMode,
-        PBCameraModeArea,
-        PBGltfContainer,
-        MaterialTransparencyMode,
-        PBMaterial,
-        PBMaterial_UnlitMaterial,
-        PBMaterial_PbrMaterial,
-        ColliderLayer,
-        PBMeshCollider,
-        PBMeshCollider_BoxMesh,
-        PBMeshCollider_CylinderMesh,
-        PBMeshCollider_PlaneMesh,
-        PBMeshCollider_SphereMesh,
-        PBMeshRenderer,
-        PBMeshRenderer_BoxMesh,
-        PBMeshRenderer_CylinderMesh,
-        PBMeshRenderer_PlaneMesh,
-        PBMeshRenderer_SphereMesh,
-        NftFrameType,
-        PBNftShape,
-        PBPointerEventsResult,
-        PBPointerEventsResult_PointerCommand,
-        PointerEventType,
-        PBPointerHoverFeedback,
-        PBPointerHoverFeedback_Info,
-        PBPointerHoverFeedback_Entry,
-        PBPointerLock,
-        RaycastQueryType,
-        PBRaycast,
-        PBRaycastResult,
-        RaycastHit,
-        PBTextShape,
-        PBUiBackground,
-        PBUiText,
-        YGPositionType,
-        YGAlign,
-        YGUnit,
-        YGFlexDirection,
-        YGWrap,
-        YGJustify,
-        YGOverflow,
-        YGDisplay,
-        YGEdge,
-        PBUiTransform,
-        PBVisibilityComponent
-    }
-}
-export { components }
+export type ComponentGetter<T extends ComponentDefinition<any>> = (engine: Pick<IEngine, 'defineComponentFromSchema'>) => T;
 
 // @public (undocumented)
 export type ComponentSchema<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]> = {
@@ -607,9 +330,6 @@ export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 // @public (undocumented)
 export function defineComponent<T extends ISchema, ConstructorType = ComponentType<T>>(componentId: number, spec: T, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
 
-// @public
-export const DEG2RAD: number;
-
 // @public (undocumented)
 export type EcsResult<T extends ISchema> = T extends ISchema ? ReturnType<T['deserialize']> : never;
 
@@ -633,9 +353,6 @@ export function EntityContainer(): {
     entityExists(entity: Entity): boolean;
     getExistingEntities(): Set<Entity>;
 };
-
-// @public
-export const Epsilon = 0.000001;
 
 // Warning: (ae-missing-release-tag) "EventSystemCallback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -661,9 +378,6 @@ export type ExcludeUndefined<T> = {
 // @public (undocumented)
 export const executeTask: (task: Task<unknown>) => void;
 
-// @public (undocumented)
-export type FloatArray = number[];
-
 // Warning: (ae-missing-release-tag) "Font" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -677,13 +391,10 @@ export const enum Font {
 // @public (undocumented)
 export const GltfContainer: ComponentDefinition<typeof GltfContainerSchema>;
 
-// @public (undocumented)
-const GltfContainer_2: ComponentGetter<ComponentDefinition<typeof GltfContainerSchema>>;
-
 // Warning: (ae-missing-release-tag) "GltfContainerSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const GltfContainerSchema: ISchema<PBGltfContainer> & {
+export const GltfContainerSchema: ISchema<PBGltfContainer> & {
     COMPONENT_ID: number;
 };
 
@@ -782,11 +493,6 @@ export type ISchema<T = any> = {
 // @public (undocumented)
 export const Material: ComponentDefinition<typeof MaterialSchema>;
 
-// Warning: (ae-missing-release-tag) "Material" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-const Material_2: ComponentGetter<MaterialComponentDefinitionExtended>;
-
 // @public (undocumented)
 export type MaterialComponentDefinition = ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
 
@@ -800,7 +506,7 @@ export interface MaterialComponentDefinitionExtended extends MaterialComponentDe
 // Warning: (ae-missing-release-tag) "MaterialSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const MaterialSchema: ISchema<PBMaterial> & {
+export const MaterialSchema: ISchema<PBMaterial> & {
     COMPONENT_ID: number;
 };
 
@@ -820,150 +526,8 @@ export const enum MaterialTransparencyMode {
     MTM_OPAQUE = 0
 }
 
-// @public
-export namespace Matrix {
-    export function add(self: ReadonlyMatrix, other: ReadonlyMatrix): MutableMatrix;
-    export function addAtIndex(self: MutableMatrix, index: number, value: number): void;
-    export function addToRef(self: ReadonlyMatrix, other: ReadonlyMatrix, result: MutableMatrix): void;
-    export function addToSelf(self: MutableMatrix, other: ReadonlyMatrix): void;
-    export function asArray(self: ReadonlyMatrix): Matrix4x4;
-    export function clone(self: ReadonlyMatrix): MutableMatrix;
-    export function compose(scale: Vector3.ReadonlyVector3, rotation: Quaternion.ReadonlyQuaternion, translation: Vector3.ReadonlyVector3): MutableMatrix;
-    export function composeToRef(scale: Vector3.ReadonlyVector3, rotation: Quaternion.ReadonlyQuaternion, translation: Vector3.ReadonlyVector3, result: MutableMatrix): void;
-    export function copy(from: ReadonlyMatrix, dest: MutableMatrix): void;
-    export function copyToArray(self: ReadonlyMatrix, arrayDest: FloatArray, offsetDest?: number): void;
-    export function create(): MutableMatrix;
-    export function decompose(self: ReadonlyMatrix, scale?: Vector3.MutableVector3, rotation?: Quaternion.MutableQuaternion, translation?: Vector3.MutableVector3): boolean;
-    export function decomposeLerp(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number): MutableMatrix;
-    export function decomposeLerpToRef(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number, result: MutableMatrix): void;
-    export function determinant(self: ReadonlyMatrix): number;
-    export function equals(self: ReadonlyMatrix, value: ReadonlyMatrix): boolean;
-    export function fromArray(array: Matrix4x4, offset?: number): MutableMatrix;
-    export function fromArrayToRef(array: Matrix4x4, offset: number, result: MutableMatrix): void;
-    export function fromFloatArrayToRefScaled(array: FloatArray, offset: number, scale: number, result: MutableMatrix): void;
-    export function fromQuaternionToRef(quat: Quaternion.ReadonlyQuaternion, result: MutableMatrix): void;
-    export function fromValues(initialM11: number, initialM12: number, initialM13: number, initialM14: number, initialM21: number, initialM22: number, initialM23: number, initialM24: number, initialM31: number, initialM32: number, initialM33: number, initialM34: number, initialM41: number, initialM42: number, initialM43: number, initialM44: number): MutableMatrix;
-    export function fromValuesToRef(initialM11: number, initialM12: number, initialM13: number, initialM14: number, initialM21: number, initialM22: number, initialM23: number, initialM24: number, initialM31: number, initialM32: number, initialM33: number, initialM34: number, initialM41: number, initialM42: number, initialM43: number, initialM44: number, result: MutableMatrix): void;
-    export function fromXYZAxesToRef(xaxis: Vector3.ReadonlyVector3, yaxis: Vector3.ReadonlyVector3, zaxis: Vector3.ReadonlyVector3, result: MutableMatrix): void;
-    export function GetAsMatrix2x2(matrix: ReadonlyMatrix): FloatArray;
-    export function GetAsMatrix3x3(matrix: ReadonlyMatrix): FloatArray;
-    export function getHashCode(self: ReadonlyMatrix): number;
-    export function getRotationMatrix(self: ReadonlyMatrix): MutableMatrix;
-    export function getRotationMatrixToRef(self: ReadonlyMatrix, result: MutableMatrix): void;
-    export function getTranslation(self: MutableMatrix): Vector3.MutableVector3;
-    export function getTranslationToRef(self: MutableMatrix, result: Vector3.MutableVector3): void;
-    export function Identity(): MutableMatrix;
-    export function IdentityReadonly(): ReadonlyMatrix;
-    export function IdentityToRef(result: MutableMatrix): void;
-    export function invert(source: ReadonlyMatrix): MutableMatrix;
-    export function invertToRef(source: ReadonlyMatrix, result: MutableMatrix): void;
-    export function isIdentityAs3x2Update(self: MutableMatrix): boolean;
-    export function isIdentityUpdate(self: MutableMatrix): boolean;
-    export function lerp(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number): MutableMatrix;
-    export function lerpToRef(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number, result: MutableMatrix): void;
-    export function LookAtLH(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3): MutableMatrix;
-    export function lookAtLHToRef(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3, result: MutableMatrix): void;
-    export function lookAtRH(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3): MutableMatrix;
-    export function lookAtRHToRef(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3, result: MutableMatrix): void;
-    export function m(self: MutableMatrix): Matrix4x4;
-    // (undocumented)
-    export type Matrix4x4 = [
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number
-    ];
-    export function multiply(self: MutableMatrix, other: ReadonlyMatrix): MutableMatrix;
-    export function multiplyAtIndex(self: MutableMatrix, index: number, value: number): MutableMatrix;
-    export function multiplyToArray(self: ReadonlyMatrix, other: ReadonlyMatrix, result: FloatArray, offset: number): void;
-    export function multiplyToRef(self: ReadonlyMatrix, other: ReadonlyMatrix, result: MutableMatrix): void;
-    // (undocumented)
-    export type MutableMatrix = {
-        updateFlag: number;
-        isIdentity: boolean;
-        isIdentity3x2: boolean;
-        _isIdentityDirty: boolean;
-        _isIdentity3x2Dirty: boolean;
-        _m: Matrix4x4;
-    };
-    export function normalMatrixToRef(self: ReadonlyMatrix, ref: MutableMatrix): void;
-    export function orthoLH(width: number, height: number, znear: number, zfar: number): MutableMatrix;
-    export function orthoLHToRef(width: number, height: number, znear: number, zfar: number, result: MutableMatrix): void;
-    export function OrthoOffCenterLH(left: number, right: number, bottom: number, top: number, znear: number, zfar: number): MutableMatrix;
-    export function orthoOffCenterLHToRef(left: number, right: number, bottom: number, top: number, znear: number, zfar: number, result: MutableMatrix): void;
-    export function orthoOffCenterRH(left: number, right: number, bottom: number, top: number, znear: number, zfar: number): MutableMatrix;
-    export function orthoOffCenterRHToRef(left: number, right: number, bottom: number, top: number, znear: number, zfar: number, result: MutableMatrix): void;
-    export function perspectiveFovLH(fov: number, aspect: number, znear: number, zfar: number): MutableMatrix;
-    export function perspectiveFovLHToRef(fov: number, aspect: number, znear: number, zfar: number, result: MutableMatrix, isVerticalFovFixed?: boolean): void;
-    export function PerspectiveFovRH(fov: number, aspect: number, znear: number, zfar: number): MutableMatrix;
-    export function perspectiveFovRHToRef(fov: number, aspect: number, znear: number, zfar: number, result: MutableMatrix, isVerticalFovFixed?: boolean): void;
-    export function perspectiveFovWebVRToRef(fov: {
-        upDegrees: number;
-        downDegrees: number;
-        leftDegrees: number;
-        rightDegrees: number;
-    }, znear: number, zfar: number, result: MutableMatrix, rightHanded?: boolean): void;
-    export function perspectiveLH(width: number, height: number, znear: number, zfar: number): MutableMatrix;
-    // (undocumented)
-    export type ReadonlyMatrix = {
-        readonly updateFlag: number;
-        readonly isIdentity: boolean;
-        readonly isIdentity3x2: boolean;
-        readonly _isIdentityDirty: boolean;
-        readonly _isIdentity3x2Dirty: boolean;
-        readonly _m: Matrix4x4;
-    };
-    export function reflection(plane: Plane.ReadonlyPlane): MutableMatrix;
-    export function reflectionToRef(_plane: Plane.ReadonlyPlane, result: MutableMatrix): void;
-    export function removeRotationAndScaling(self: MutableMatrix): MutableMatrix;
-    export function reset(self: MutableMatrix): void;
-    export function rotationAxis(axis: Vector3.ReadonlyVector3, angle: number): MutableMatrix;
-    export function rotationAxisToRef(_axis: Vector3.ReadonlyVector3, angle: number, result: MutableMatrix): void;
-    export function RotationX(angle: number): MutableMatrix;
-    export function rotationXToRef(angle: number, result: MutableMatrix): void;
-    export function rotationY(angle: number): MutableMatrix;
-    export function rotationYawPitchRoll(yaw: number, pitch: number, roll: number): MutableMatrix;
-    export function rotationYawPitchRollToRef(yaw: number, pitch: number, roll: number, result: MutableMatrix): void;
-    export function rotationYToRef(angle: number, result: MutableMatrix): void;
-    export function rotationZ(angle: number): MutableMatrix;
-    export function rotationZToRef(angle: number, result: MutableMatrix): void;
-    export function scale(self: ReadonlyMatrix, scale: number): MutableMatrix;
-    export function scaleAndAddToRef(self: ReadonlyMatrix, scale: number, result: MutableMatrix): void;
-    export function scaleToRef(self: ReadonlyMatrix, scale: number, result: MutableMatrix): void;
-    export function scaling(x: number, y: number, z: number): MutableMatrix;
-    export function scalingToRef(x: number, y: number, z: number, result: MutableMatrix): void;
-    export function setRowFromFloats(self: MutableMatrix, index: number, x: number, y: number, z: number, w: number): void;
-    export function setTranslation(self: MutableMatrix, vector3: Vector3.ReadonlyVector3): void;
-    export function setTranslationFromFloats(self: MutableMatrix, x: number, y: number, z: number): void;
-    export function toArray(self: ReadonlyMatrix): Matrix4x4;
-    export function toggleModelMatrixHandInPlace(self: MutableMatrix): void;
-    export function toggleProjectionMatrixHandInPlace(self: MutableMatrix): void;
-    export function translation(x: number, y: number, z: number): MutableMatrix;
-    export function translationToRef(x: number, y: number, z: number, result: MutableMatrix): void;
-    export function transpose(matrix: ReadonlyMatrix): MutableMatrix;
-    export function transposeToRef(matrix: ReadonlyMatrix, result: MutableMatrix): void;
-    export function Zero(): MutableMatrix;
-}
-
 // @public (undocumented)
 export const MeshCollider: ComponentDefinition<typeof MeshColliderSchema>;
-
-// Warning: (ae-missing-release-tag) "MeshCollider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-const MeshCollider_2: ComponentGetter<MeshColliderComponentDefinitionExtended>;
 
 // @public (undocumented)
 export type MeshColliderComponentDefinition = ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
@@ -979,17 +543,12 @@ export interface MeshColliderComponentDefinitionExtended extends MeshColliderCom
 // Warning: (ae-missing-release-tag) "MeshColliderSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const MeshColliderSchema: ISchema<PBMeshCollider> & {
+export const MeshColliderSchema: ISchema<PBMeshCollider> & {
     COMPONENT_ID: number;
 };
 
 // @public (undocumented)
 export const MeshRenderer: ComponentDefinition<typeof MeshRendererSchema>;
-
-// Warning: (ae-missing-release-tag) "MeshRenderer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-const MeshRenderer_2: ComponentGetter<MeshRendererComponentDefinitionExtended>;
 
 // @public (undocumented)
 export type MeshRendererComponentDefinition = ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
@@ -1005,14 +564,14 @@ export interface MeshRendererComponentDefinitionExtended extends MeshRendererCom
 // Warning: (ae-missing-release-tag) "MeshRendererSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const MeshRendererSchema: ISchema<PBMeshRenderer> & {
+export const MeshRendererSchema: ISchema<PBMeshRenderer> & {
     COMPONENT_ID: number;
 };
 
 // Warning: (ae-missing-release-tag) "NftFrameType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const enum NftFrameType {
+export const enum NftFrameType {
     // (undocumented)
     NFT_BAROQUE_ORNAMENT = 1,
     // (undocumented)
@@ -1064,13 +623,10 @@ const enum NftFrameType {
 // @public (undocumented)
 export const NftShape: ComponentDefinition<typeof NftShapeSchema>;
 
-// @public (undocumented)
-const NftShape_2: ComponentGetter<ComponentDefinition<typeof NftShapeSchema>>;
-
 // Warning: (ae-missing-release-tag) "NftShapeSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const NftShapeSchema: ISchema<PBNftShape> & {
+export const NftShapeSchema: ISchema<PBNftShape> & {
     COMPONENT_ID: number;
 };
 
@@ -1092,7 +648,7 @@ export type OnlyOptionalUndefinedTypes<T> = {
 // Warning: (ae-missing-release-tag) "PBAnimationState" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBAnimationState {
+export interface PBAnimationState {
     // (undocumented)
     clip: string;
     loop?: boolean | undefined;
@@ -1107,7 +663,7 @@ interface PBAnimationState {
 }
 
 // @public
-const PBAnimationState: {
+export const PBAnimationState: {
     encode(message: PBAnimationState, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBAnimationState;
 };
@@ -1116,13 +672,13 @@ const PBAnimationState: {
 // Warning: (ae-missing-release-tag) "PBAnimator" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBAnimator {
+export interface PBAnimator {
     // (undocumented)
     states: PBAnimationState[];
 }
 
 // @public
-const PBAnimator: {
+export const PBAnimator: {
     encode(message: PBAnimator, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBAnimator;
 };
@@ -1131,7 +687,7 @@ const PBAnimator: {
 // Warning: (ae-missing-release-tag) "PBAudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBAudioSource {
+export interface PBAudioSource {
     // (undocumented)
     audioClipUrl: string;
     // (undocumented)
@@ -1143,7 +699,7 @@ interface PBAudioSource {
 }
 
 // @public
-const PBAudioSource: {
+export const PBAudioSource: {
     encode(message: PBAudioSource, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioSource;
 };
@@ -1152,7 +708,7 @@ const PBAudioSource: {
 // Warning: (ae-missing-release-tag) "PBAudioStream" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBAudioStream {
+export interface PBAudioStream {
     // (undocumented)
     playing?: boolean | undefined;
     // (undocumented)
@@ -1161,7 +717,7 @@ interface PBAudioStream {
 }
 
 // @public
-const PBAudioStream: {
+export const PBAudioStream: {
     encode(message: PBAudioStream, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioStream;
 };
@@ -1170,7 +726,7 @@ const PBAudioStream: {
 // Warning: (ae-missing-release-tag) "PBAvatarAttach" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBAvatarAttach {
+export interface PBAvatarAttach {
     // (undocumented)
     anchorPointId: AvatarAnchorPointType;
     // (undocumented)
@@ -1178,7 +734,7 @@ interface PBAvatarAttach {
 }
 
 // @public
-const PBAvatarAttach: {
+export const PBAvatarAttach: {
     encode(message: PBAvatarAttach, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarAttach;
 };
@@ -1187,7 +743,7 @@ const PBAvatarAttach: {
 // Warning: (ae-missing-release-tag) "PBAvatarModifierArea" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBAvatarModifierArea {
+export interface PBAvatarModifierArea {
     // (undocumented)
     area: PBVector3 | undefined;
     // (undocumented)
@@ -1197,7 +753,7 @@ interface PBAvatarModifierArea {
 }
 
 // @public
-const PBAvatarModifierArea: {
+export const PBAvatarModifierArea: {
     encode(message: PBAvatarModifierArea, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarModifierArea;
 };
@@ -1206,7 +762,7 @@ const PBAvatarModifierArea: {
 // Warning: (ae-missing-release-tag) "PBAvatarShape" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBAvatarShape {
+export interface PBAvatarShape {
     bodyShape?: string | undefined;
     emotes: string[];
     // (undocumented)
@@ -1224,7 +780,7 @@ interface PBAvatarShape {
 }
 
 // @public
-const PBAvatarShape: {
+export const PBAvatarShape: {
     encode(message: PBAvatarShape, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarShape;
 };
@@ -1233,13 +789,13 @@ const PBAvatarShape: {
 // Warning: (ae-missing-release-tag) "PBBillboard" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBBillboard {
+export interface PBBillboard {
     billboardMode?: BillboardMode | undefined;
     oppositeDirection?: boolean | undefined;
 }
 
 // @public
-const PBBillboard: {
+export const PBBillboard: {
     encode(message: PBBillboard, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBBillboard;
 };
@@ -1248,13 +804,13 @@ const PBBillboard: {
 // Warning: (ae-missing-release-tag) "PBCameraMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBCameraMode {
+export interface PBCameraMode {
     // (undocumented)
     mode: CameraType;
 }
 
 // @public
-const PBCameraMode: {
+export const PBCameraMode: {
     encode(message: PBCameraMode, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBCameraMode;
 };
@@ -1263,7 +819,7 @@ const PBCameraMode: {
 // Warning: (ae-missing-release-tag) "PBCameraModeArea" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBCameraModeArea {
+export interface PBCameraModeArea {
     // (undocumented)
     area: PBVector3 | undefined;
     // (undocumented)
@@ -1271,7 +827,7 @@ interface PBCameraModeArea {
 }
 
 // @public
-const PBCameraModeArea: {
+export const PBCameraModeArea: {
     encode(message: PBCameraModeArea, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBCameraModeArea;
 };
@@ -1320,12 +876,12 @@ export const PBColor4: {
 // Warning: (ae-missing-release-tag) "PBGltfContainer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBGltfContainer {
+export interface PBGltfContainer {
     src: string;
 }
 
 // @public
-const PBGltfContainer: {
+export const PBGltfContainer: {
     encode(message: PBGltfContainer, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfContainer;
 };
@@ -1400,7 +956,7 @@ export const PBMaterial_UnlitMaterial: {
 // Warning: (ae-missing-release-tag) "PBMeshCollider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBMeshCollider {
+export interface PBMeshCollider {
     collisionMask?: number | undefined;
     // (undocumented)
     mesh?: {
@@ -1419,7 +975,7 @@ interface PBMeshCollider {
 }
 
 // @public
-const PBMeshCollider: {
+export const PBMeshCollider: {
     encode(message: PBMeshCollider, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider;
 };
@@ -1428,11 +984,11 @@ const PBMeshCollider: {
 // Warning: (ae-missing-release-tag) "PBMeshCollider_BoxMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBMeshCollider_BoxMesh {
+export interface PBMeshCollider_BoxMesh {
 }
 
 // @public
-const PBMeshCollider_BoxMesh: {
+export const PBMeshCollider_BoxMesh: {
     encode(_: PBMeshCollider_BoxMesh, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_BoxMesh;
 };
@@ -1441,13 +997,13 @@ const PBMeshCollider_BoxMesh: {
 // Warning: (ae-missing-release-tag) "PBMeshCollider_CylinderMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBMeshCollider_CylinderMesh {
+export interface PBMeshCollider_CylinderMesh {
     radiusBottom?: number | undefined;
     radiusTop?: number | undefined;
 }
 
 // @public
-const PBMeshCollider_CylinderMesh: {
+export const PBMeshCollider_CylinderMesh: {
     encode(message: PBMeshCollider_CylinderMesh, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_CylinderMesh;
 };
@@ -1456,11 +1012,11 @@ const PBMeshCollider_CylinderMesh: {
 // Warning: (ae-missing-release-tag) "PBMeshCollider_PlaneMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBMeshCollider_PlaneMesh {
+export interface PBMeshCollider_PlaneMesh {
 }
 
 // @public
-const PBMeshCollider_PlaneMesh: {
+export const PBMeshCollider_PlaneMesh: {
     encode(_: PBMeshCollider_PlaneMesh, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_PlaneMesh;
 };
@@ -1469,11 +1025,11 @@ const PBMeshCollider_PlaneMesh: {
 // Warning: (ae-missing-release-tag) "PBMeshCollider_SphereMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBMeshCollider_SphereMesh {
+export interface PBMeshCollider_SphereMesh {
 }
 
 // @public
-const PBMeshCollider_SphereMesh: {
+export const PBMeshCollider_SphereMesh: {
     encode(_: PBMeshCollider_SphereMesh, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_SphereMesh;
 };
@@ -1482,7 +1038,7 @@ const PBMeshCollider_SphereMesh: {
 // Warning: (ae-missing-release-tag) "PBMeshRenderer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBMeshRenderer {
+export interface PBMeshRenderer {
     // (undocumented)
     mesh?: {
         $case: 'box';
@@ -1500,7 +1056,7 @@ interface PBMeshRenderer {
 }
 
 // @public
-const PBMeshRenderer: {
+export const PBMeshRenderer: {
     encode(message: PBMeshRenderer, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer;
 };
@@ -1509,13 +1065,13 @@ const PBMeshRenderer: {
 // Warning: (ae-missing-release-tag) "PBMeshRenderer_BoxMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBMeshRenderer_BoxMesh {
+export interface PBMeshRenderer_BoxMesh {
     // (undocumented)
     uvs: number[];
 }
 
 // @public
-const PBMeshRenderer_BoxMesh: {
+export const PBMeshRenderer_BoxMesh: {
     encode(message: PBMeshRenderer_BoxMesh, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_BoxMesh;
 };
@@ -1524,13 +1080,13 @@ const PBMeshRenderer_BoxMesh: {
 // Warning: (ae-missing-release-tag) "PBMeshRenderer_CylinderMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBMeshRenderer_CylinderMesh {
+export interface PBMeshRenderer_CylinderMesh {
     radiusBottom?: number | undefined;
     radiusTop?: number | undefined;
 }
 
 // @public
-const PBMeshRenderer_CylinderMesh: {
+export const PBMeshRenderer_CylinderMesh: {
     encode(message: PBMeshRenderer_CylinderMesh, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_CylinderMesh;
 };
@@ -1539,13 +1095,13 @@ const PBMeshRenderer_CylinderMesh: {
 // Warning: (ae-missing-release-tag) "PBMeshRenderer_PlaneMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBMeshRenderer_PlaneMesh {
+export interface PBMeshRenderer_PlaneMesh {
     // (undocumented)
     uvs: number[];
 }
 
 // @public
-const PBMeshRenderer_PlaneMesh: {
+export const PBMeshRenderer_PlaneMesh: {
     encode(message: PBMeshRenderer_PlaneMesh, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_PlaneMesh;
 };
@@ -1554,11 +1110,11 @@ const PBMeshRenderer_PlaneMesh: {
 // Warning: (ae-missing-release-tag) "PBMeshRenderer_SphereMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBMeshRenderer_SphereMesh {
+export interface PBMeshRenderer_SphereMesh {
 }
 
 // @public
-const PBMeshRenderer_SphereMesh: {
+export const PBMeshRenderer_SphereMesh: {
     encode(_: PBMeshRenderer_SphereMesh, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_SphereMesh;
 };
@@ -1567,7 +1123,7 @@ const PBMeshRenderer_SphereMesh: {
 // Warning: (ae-missing-release-tag) "PBNftShape" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBNftShape {
+export interface PBNftShape {
     color?: PBColor3 | undefined;
     // (undocumented)
     src: string;
@@ -1575,7 +1131,7 @@ interface PBNftShape {
 }
 
 // @public
-const PBNftShape: {
+export const PBNftShape: {
     encode(message: PBNftShape, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBNftShape;
 };
@@ -1584,12 +1140,12 @@ const PBNftShape: {
 // Warning: (ae-missing-release-tag) "PBPointerEventsResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public
-interface PBPointerEventsResult {
+export interface PBPointerEventsResult {
     commands: PBPointerEventsResult_PointerCommand[];
 }
 
 // @public
-const PBPointerEventsResult: {
+export const PBPointerEventsResult: {
     encode(message: PBPointerEventsResult, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEventsResult;
 };
@@ -1598,7 +1154,7 @@ const PBPointerEventsResult: {
 // Warning: (ae-missing-release-tag) "PBPointerEventsResult_PointerCommand" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public
-interface PBPointerEventsResult_PointerCommand {
+export interface PBPointerEventsResult_PointerCommand {
     analog?: number | undefined;
     button: InputAction;
     // (undocumented)
@@ -1609,7 +1165,7 @@ interface PBPointerEventsResult_PointerCommand {
 }
 
 // @public
-const PBPointerEventsResult_PointerCommand: {
+export const PBPointerEventsResult_PointerCommand: {
     encode(message: PBPointerEventsResult_PointerCommand, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEventsResult_PointerCommand;
 };
@@ -1618,13 +1174,13 @@ const PBPointerEventsResult_PointerCommand: {
 // Warning: (ae-missing-release-tag) "PBPointerHoverFeedback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBPointerHoverFeedback {
+export interface PBPointerHoverFeedback {
     // (undocumented)
     pointerEvents: PBPointerHoverFeedback_Entry[];
 }
 
 // @public
-const PBPointerHoverFeedback: {
+export const PBPointerHoverFeedback: {
     encode(message: PBPointerHoverFeedback, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerHoverFeedback;
 };
@@ -1650,7 +1206,7 @@ export const PBPointerHoverFeedback_Entry: {
 // Warning: (ae-missing-release-tag) "PBPointerHoverFeedback_Info" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBPointerHoverFeedback_Info {
+export interface PBPointerHoverFeedback_Info {
     button?: InputAction | undefined;
     hoverText?: string | undefined;
     maxDistance?: number | undefined;
@@ -1658,7 +1214,7 @@ interface PBPointerHoverFeedback_Info {
 }
 
 // @public
-const PBPointerHoverFeedback_Info: {
+export const PBPointerHoverFeedback_Info: {
     encode(message: PBPointerHoverFeedback_Info, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerHoverFeedback_Info;
 };
@@ -1667,13 +1223,13 @@ const PBPointerHoverFeedback_Info: {
 // Warning: (ae-missing-release-tag) "PBPointerLock" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBPointerLock {
+export interface PBPointerLock {
     // (undocumented)
     isPointerLocked: boolean;
 }
 
 // @public
-const PBPointerLock: {
+export const PBPointerLock: {
     encode(message: PBPointerLock, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerLock;
 };
@@ -1701,7 +1257,7 @@ export const PBPosition: {
 // Warning: (ae-missing-release-tag) "PBRaycast" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBRaycast {
+export interface PBRaycast {
     // (undocumented)
     direction: PBVector3 | undefined;
     // (undocumented)
@@ -1713,7 +1269,7 @@ interface PBRaycast {
 }
 
 // @public
-const PBRaycast: {
+export const PBRaycast: {
     encode(message: PBRaycast, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBRaycast;
 };
@@ -1722,7 +1278,7 @@ const PBRaycast: {
 // Warning: (ae-missing-release-tag) "PBRaycastResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBRaycastResult {
+export interface PBRaycastResult {
     // (undocumented)
     direction: PBVector3 | undefined;
     // (undocumented)
@@ -1734,7 +1290,7 @@ interface PBRaycastResult {
 }
 
 // @public
-const PBRaycastResult: {
+export const PBRaycastResult: {
     encode(message: PBRaycastResult, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBRaycastResult;
 };
@@ -1743,7 +1299,7 @@ const PBRaycastResult: {
 // Warning: (ae-missing-release-tag) "PBTextShape" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBTextShape {
+export interface PBTextShape {
     font?: Font | undefined;
     // (undocumented)
     fontAutoSize?: boolean | undefined;
@@ -1781,7 +1337,7 @@ interface PBTextShape {
 }
 
 // @public
-const PBTextShape: {
+export const PBTextShape: {
     encode(message: PBTextShape, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBTextShape;
 };
@@ -1790,12 +1346,12 @@ const PBTextShape: {
 // Warning: (ae-missing-release-tag) "PBUiBackground" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBUiBackground {
+export interface PBUiBackground {
     backgroundColor?: PBColor4 | undefined;
 }
 
 // @public
-const PBUiBackground: {
+export const PBUiBackground: {
     encode(message: PBUiBackground, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBUiBackground;
 };
@@ -1804,7 +1360,7 @@ const PBUiBackground: {
 // Warning: (ae-missing-release-tag) "PBUiText" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBUiText {
+export interface PBUiText {
     color?: PBColor4 | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
@@ -1814,7 +1370,7 @@ interface PBUiText {
 }
 
 // @public
-const PBUiText: {
+export const PBUiText: {
     encode(message: PBUiText, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBUiText;
 };
@@ -1823,7 +1379,7 @@ const PBUiText: {
 // Warning: (ae-missing-release-tag) "PBUiTransform" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBUiTransform {
+export interface PBUiTransform {
     alignContent?: YGAlign | undefined;
     alignItems?: YGAlign | undefined;
     alignSelf: YGAlign;
@@ -1900,7 +1456,7 @@ interface PBUiTransform {
 }
 
 // @public
-const PBUiTransform: {
+export const PBUiTransform: {
     encode(message: PBUiTransform, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBUiTransform;
 };
@@ -1945,60 +1501,23 @@ export const PBVector3: {
 // Warning: (ae-missing-release-tag) "PBVisibilityComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-interface PBVisibilityComponent {
+export interface PBVisibilityComponent {
     visible?: boolean | undefined;
 }
 
 // @public
-const PBVisibilityComponent: {
+export const PBVisibilityComponent: {
     encode(message: PBVisibilityComponent, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBVisibilityComponent;
 };
 
-// @public
-export namespace Plane {
-    // (undocumented)
-    export function asArray(plane: ReadonlyPlane): number[];
-    // (undocumented)
-    export function clone(plane: ReadonlyPlane): MutablePlane;
-    export function copyFromPoints(point1: Vector3.ReadonlyVector3, point2: Vector3.ReadonlyVector3, point3: Vector3.ReadonlyVector3): MutablePlane;
-    export function create(a: number, b: number, c: number, d: number): {
-        normal: Vector3.MutableVector3;
-        d: number;
-    };
-    export function dotCoordinate(plane: ReadonlyPlane, point: Vector3.ReadonlyVector3): number;
-    export function fromArray(array: number[]): MutablePlane;
-    export function fromPoints(_point1: Vector3.ReadonlyVector3, _point2: Vector3.ReadonlyVector3, _point3: Vector3.ReadonlyVector3): MutablePlane;
-    // (undocumented)
-    export function getHashCode(_plane: ReadonlyPlane): number;
-    export function isFrontFacingTo(plane: ReadonlyPlane, direction: Vector3.ReadonlyVector3, epsilon: number): boolean;
-    // (undocumented)
-    export type MutablePlane = {
-        normal: Vector3.MutableVector3;
-        d: number;
-    };
-    export function normalize(plane: ReadonlyPlane): MutablePlane;
-    // (undocumented)
-    export type ReadonlyPlane = {
-        normal: Vector3.ReadonlyVector3;
-        d: number;
-    };
-    export function romPositionAndNormal(origin: Vector3.ReadonlyVector3, normal: Vector3.ReadonlyVector3): MutablePlane;
-    export function signedDistanceTo(plane: ReadonlyPlane, point: Vector3.ReadonlyVector3): number;
-    export function signedDistanceToPlaneFromPositionAndNormal(origin: Vector3.ReadonlyVector3, normal: Vector3.ReadonlyVector3, point: Vector3.ReadonlyVector3): number;
-    export function transform(plane: ReadonlyPlane, transformation: Matrix.ReadonlyMatrix): MutablePlane;
-}
-
 // @public (undocumented)
 export const PointerEventsResult: ComponentDefinition<typeof PointerEventsResultSchema>;
-
-// @public (undocumented)
-const PointerEventsResult_2: ComponentGetter<ComponentDefinition<typeof PointerEventsResultSchema>>;
 
 // Warning: (ae-missing-release-tag) "PointerEventsResultSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const PointerEventsResultSchema: ISchema<PBPointerEventsResult> & {
+export const PointerEventsResultSchema: ISchema<PBPointerEventsResult> & {
     COMPONENT_ID: number;
 };
 
@@ -2036,79 +1555,22 @@ export const enum PointerEventType {
 // @public (undocumented)
 export const PointerHoverFeedback: ComponentDefinition<typeof PointerHoverFeedbackSchema>;
 
-// @public (undocumented)
-const PointerHoverFeedback_2: ComponentGetter<ComponentDefinition<typeof PointerHoverFeedbackSchema>>;
-
 // Warning: (ae-missing-release-tag) "PointerHoverFeedbackSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const PointerHoverFeedbackSchema: ISchema<PBPointerHoverFeedback> & {
+export const PointerHoverFeedbackSchema: ISchema<PBPointerHoverFeedback> & {
     COMPONENT_ID: number;
 };
 
 // @public (undocumented)
 export const PointerLock: ComponentDefinition<typeof PointerLockSchema>;
 
-// @public (undocumented)
-const PointerLock_2: ComponentGetter<ComponentDefinition<typeof PointerLockSchema>>;
-
 // Warning: (ae-missing-release-tag) "PointerLockSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const PointerLockSchema: ISchema<PBPointerLock> & {
+export const PointerLockSchema: ISchema<PBPointerLock> & {
     COMPONENT_ID: number;
 };
-
-// @public
-export type Quaternion = Quaternion.ReadonlyQuaternion;
-
-// @public
-export namespace Quaternion {
-    export function add(q1: ReadonlyQuaternion, q2: ReadonlyQuaternion): MutableQuaternion;
-    export function angle(quat1: ReadonlyQuaternion, quat2: ReadonlyQuaternion): number;
-    export function create(
-    x?: number,
-    y?: number,
-    z?: number,
-    w?: number): MutableQuaternion;
-    export function dot(left: ReadonlyQuaternion, right: ReadonlyQuaternion): number;
-    // (undocumented)
-    export function fromAngleAxis(degrees: number, axis: Vector3.ReadonlyVector3): MutableQuaternion;
-    export function fromAxisToRotationQuaternion(axis1: Vector3.ReadonlyVector3, axis2: Vector3.ReadonlyVector3, axis3: Vector3.ReadonlyVector3): MutableQuaternion;
-    export function fromAxisToRotationQuaternionToRef(axis1: Vector3.ReadonlyVector3, axis2: Vector3.ReadonlyVector3, axis3: Vector3.ReadonlyVector3, ref: MutableQuaternion): void;
-    export function fromEulerDegrees(x: number, y: number, z: number): MutableQuaternion;
-    export function fromLookAt(position: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, worldUp?: Vector3.ReadonlyVector3): MutableQuaternion;
-    export function fromLookAtToRef(position: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, worldUp: Vector3.ReadonlyVector3 | undefined, result: MutableQuaternion): void;
-    export function fromRotationMatrixToRef(matrix: Matrix.ReadonlyMatrix, result: Quaternion.MutableQuaternion): void;
-    export function fromRotationYawPitchRoll(yaw: number, pitch: number, roll: number): MutableQuaternion;
-    export function fromRotationYawPitchRollToRef(yaw: number, pitch: number, roll: number, result: Quaternion.MutableQuaternion): void;
-    export function fromToRotation(from: Vector3.ReadonlyVector3, to: Vector3.ReadonlyVector3, up?: Vector3.ReadonlyVector3): MutableQuaternion;
-    export function Identity(): MutableQuaternion;
-    export function length(q: ReadonlyQuaternion): number;
-    export function lengthSquared(q: ReadonlyQuaternion): number;
-    export function lookRotation(forward: Vector3.ReadonlyVector3, up?: Vector3.ReadonlyVector3): MutableQuaternion;
-    export function multiply(self: ReadonlyQuaternion, q1: ReadonlyQuaternion): MutableQuaternion;
-    export function multiplyToRef(self: ReadonlyQuaternion, q1: ReadonlyQuaternion, result: MutableQuaternion): void;
-    export type Mutable = MutableQuaternion;
-    export type MutableQuaternion = {
-        x: number;
-        y: number;
-        z: number;
-        w: number;
-    };
-    export function normalize(q: ReadonlyQuaternion): MutableQuaternion;
-    export type ReadonlyQuaternion = {
-        readonly x: number;
-        readonly y: number;
-        readonly z: number;
-        readonly w: number;
-    };
-    export function rotateTowards(from: ReadonlyQuaternion, to: ReadonlyQuaternion, maxDegreesDelta: number): MutableQuaternion;
-    export function slerp(left: ReadonlyQuaternion, right: ReadonlyQuaternion, amount: number): MutableQuaternion;
-    export function slerpToRef(left: ReadonlyQuaternion, right: ReadonlyQuaternion, amount: number, result: MutableQuaternion): void;
-    export function toEulerAngles(q: MutableQuaternion): Vector3.Mutable;
-    export function Zero(): MutableQuaternion;
-}
 
 // @public (undocumented)
 export type QuaternionType = {
@@ -2118,20 +1580,14 @@ export type QuaternionType = {
     w: number;
 };
 
-// @public
-export const RAD2DEG: number;
-
 // @public (undocumented)
 export const Raycast: ComponentDefinition<typeof RaycastSchema>;
-
-// @public (undocumented)
-const Raycast_2: ComponentGetter<ComponentDefinition<typeof RaycastSchema>>;
 
 // Warning: (ae-missing-release-tag) "RaycastHit" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 // Warning: (ae-missing-release-tag) "RaycastHit" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public
-interface RaycastHit {
+export interface RaycastHit {
     // (undocumented)
     direction: PBVector3 | undefined;
     // (undocumented)
@@ -2149,7 +1605,7 @@ interface RaycastHit {
 }
 
 // @public
-const RaycastHit: {
+export const RaycastHit: {
     encode(message: RaycastHit, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): RaycastHit;
 };
@@ -2167,20 +1623,17 @@ export const enum RaycastQueryType {
 // @public (undocumented)
 export const RaycastResult: ComponentDefinition<typeof RaycastResultSchema>;
 
-// @public (undocumented)
-const RaycastResult_2: ComponentGetter<ComponentDefinition<typeof RaycastResultSchema>>;
-
 // Warning: (ae-missing-release-tag) "RaycastResultSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const RaycastResultSchema: ISchema<PBRaycastResult> & {
+export const RaycastResultSchema: ISchema<PBRaycastResult> & {
     COMPONENT_ID: number;
 };
 
 // Warning: (ae-missing-release-tag) "RaycastSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const RaycastSchema: ISchema<PBRaycast> & {
+export const RaycastSchema: ISchema<PBRaycast> & {
     COMPONENT_ID: number;
 };
 
@@ -2209,32 +1662,6 @@ export type ReceiveMessage = {
 export type Result<T extends Spec> = ToOptional<{
     [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? Result<T[K]> : never;
 }>;
-
-// @public
-export namespace Scalar {
-    const TwoPi: number;
-    export function clamp(value: number, min?: number, max?: number): number;
-    export function deltaAngle(current: number, target: number): number;
-    export function denormalize(normalized: number, min: number, max: number): number;
-    export function hermite(value1: number, tangent1: number, value2: number, tangent2: number, amount: number): number;
-    export function inverseLerp(a: number, b: number, value: number): number;
-    export function lerp(start: number, end: number, amount: number): number;
-    export function lerpAngle(start: number, end: number, amount: number): number;
-    export function log2(value: number): number;
-    export function moveTowards(current: number, target: number, maxDelta: number): number;
-    export function moveTowardsAngle(current: number, target: number, maxDelta: number): number;
-    export function normalize(value: number, min: number, max: number): number;
-    export function normalizeRadians(angle: number): number;
-    export function percentToRange(percent: number, min: number, max: number): number;
-    export function pingPong(tx: number, length: number): number;
-    export function randomRange(min: number, max: number): number;
-    export function rangeToPercent(num: number, min: number, max: number): number;
-    export function repeat(value: number, length: number): number;
-    export function sign(value: number): number;
-    export function smoothStep(from: number, to: number, tx: number): number;
-    export function toHex(i: number): string;
-    export function withinEpsilon(a: number, b: number, epsilon?: number): boolean;
-}
 
 // @public (undocumented)
 export namespace Schemas {
@@ -2319,13 +1746,10 @@ export const enum TextAlignMode {
 // @public (undocumented)
 export const TextShape: ComponentDefinition<typeof TextShapeSchema>;
 
-// @public (undocumented)
-const TextShape_2: ComponentGetter<ComponentDefinition<typeof TextShapeSchema>>;
-
 // Warning: (ae-missing-release-tag) "TextShapeSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const TextShapeSchema: ISchema<PBTextShape> & {
+export const TextShapeSchema: ISchema<PBTextShape> & {
     COMPONENT_ID: number;
 };
 
@@ -2399,12 +1823,6 @@ export const enum TextureWrapMode {
     TWM_REPEAT = 0
 }
 
-// @public
-export const ToGammaSpace: number;
-
-// @public
-export const ToLinearSpace = 2.2;
-
 // Warning: (ae-missing-release-tag) "ToOptional" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -2414,11 +1832,6 @@ export type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedType
 //
 // @public (undocumented)
 export const Transform: TransformComponent;
-
-// Warning: (ae-missing-release-tag) "Transform" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-const Transform_2: ComponentGetter<TransformComponent>;
 
 // Warning: (ae-missing-release-tag) "TransformComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2464,140 +1877,35 @@ export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 // @public (undocumented)
 export const UiBackground: ComponentDefinition<typeof UiBackgroundSchema>;
 
-// @public (undocumented)
-const UiBackground_2: ComponentGetter<ComponentDefinition<typeof UiBackgroundSchema>>;
-
 // Warning: (ae-missing-release-tag) "UiBackgroundSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const UiBackgroundSchema: ISchema<PBUiBackground> & {
+export const UiBackgroundSchema: ISchema<PBUiBackground> & {
     COMPONENT_ID: number;
 };
 
 // @public (undocumented)
 export const UiText: ComponentDefinition<typeof UiTextSchema>;
 
-// @public (undocumented)
-const UiText_2: ComponentGetter<ComponentDefinition<typeof UiTextSchema>>;
-
 // Warning: (ae-missing-release-tag) "UiTextSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const UiTextSchema: ISchema<PBUiText> & {
+export const UiTextSchema: ISchema<PBUiText> & {
     COMPONENT_ID: number;
 };
 
 // @public (undocumented)
 export const UiTransform: ComponentDefinition<typeof UiTransformSchema>;
 
-// @public (undocumented)
-const UiTransform_2: ComponentGetter<ComponentDefinition<typeof UiTransformSchema>>;
-
 // Warning: (ae-missing-release-tag) "UiTransformSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const UiTransformSchema: ISchema<PBUiTransform> & {
+export const UiTransformSchema: ISchema<PBUiTransform> & {
     COMPONENT_ID: number;
 };
 
 // @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;
-
-// @public
-export type Vector3 = Vector3.ReadonlyVector3;
-
-// @public
-export namespace Vector3 {
-    export function add(vector1: ReadonlyVector3, vector2: ReadonlyVector3): MutableVector3;
-    export function addToRef(vector1: ReadonlyVector3, vector2: ReadonlyVector3, result: MutableVector3): void;
-    export function applyMatrix4(vector: ReadonlyVector3, matrix: Matrix.ReadonlyMatrix): MutableVector3;
-    export function applyMatrix4ToRef(vector: ReadonlyVector3, matrix: Matrix.ReadonlyMatrix, result: MutableVector3): void;
-    export function Backward(): MutableVector3;
-    export function catmullRom(value1: ReadonlyVector3, value2: ReadonlyVector3, value3: ReadonlyVector3, value4: ReadonlyVector3, amount: number): MutableVector3;
-    export function center(value1: ReadonlyVector3, value2: ReadonlyVector3): MutableVector3;
-    export function clamp(value: ReadonlyVector3, min: ReadonlyVector3, max: ReadonlyVector3): MutableVector3;
-    export function clampToRef(value: ReadonlyVector3, min: ReadonlyVector3, max: ReadonlyVector3, result: MutableVector3): void;
-    export function clone(source: ReadonlyVector3): MutableVector3;
-    export function copyFrom(source: ReadonlyVector3, dest: MutableVector3): void;
-    export function copyFromFloats(x: number, y: number, z: number, dest: MutableVector3): void;
-    export function create(
-    x?: number,
-    y?: number,
-    z?: number): MutableVector3;
-    export function cross(left: ReadonlyVector3, right: ReadonlyVector3): MutableVector3;
-    export function crossToRef(left: ReadonlyVector3, right: ReadonlyVector3, result: MutableVector3): void;
-    export function distance(value1: ReadonlyVector3, value2: ReadonlyVector3): number;
-    export function distanceSquared(value1: ReadonlyVector3, value2: ReadonlyVector3): number;
-    export function divide(vector1: ReadonlyVector3, vector2: ReadonlyVector3): MutableVector3;
-    export function divideToRef(vector1: ReadonlyVector3, vector2: ReadonlyVector3, result: MutableVector3): void;
-    export function dot(left: ReadonlyVector3, right: ReadonlyVector3): number;
-    export function Down(): MutableVector3;
-    export function equals(vector1: ReadonlyVector3, vector2: ReadonlyVector3): boolean;
-    export function equalsToFloats(vector: ReadonlyVector3, x: number, y: number, z: number): boolean;
-    export function equalsWithEpsilon(vector1: ReadonlyVector3, vector2: ReadonlyVector3, epsilon?: number): boolean;
-    export function floor(vector1: ReadonlyVector3): MutableVector3;
-    export function Forward(): MutableVector3;
-    export function fract(vector1: ReadonlyVector3): MutableVector3;
-    export function fromArray(array: FloatArray, offset?: number): MutableVector3;
-    export function fromArrayToRef(array: number[], offset: number, result: MutableVector3): void;
-    export function fromFloatArray(array: FloatArray, offset?: number): MutableVector3;
-    export function fromFloatArrayToRef(array: FloatArray, offset: number, result: MutableVector3): void;
-    export function getAngleBetweenVectors(vector0: ReadonlyVector3, vector1: ReadonlyVector3, normal: ReadonlyVector3): number;
-    export function getClipFactor(vector0: ReadonlyVector3, vector1: ReadonlyVector3, axis: ReadonlyVector3, size: number): number;
-    export function getHashCode(vector: ReadonlyVector3): number;
-    export function hermite(value1: ReadonlyVector3, tangent1: ReadonlyVector3, value2: ReadonlyVector3, tangent2: ReadonlyVector3, amount: number): MutableVector3;
-    export function isNonUniform(vector: ReadonlyVector3): boolean;
-    export function Left(): MutableVector3;
-    export function length(vector: ReadonlyVector3): number;
-    export function lengthSquared(vector: ReadonlyVector3): number;
-    export function lerp(start: ReadonlyVector3, end: ReadonlyVector3, amount: number): MutableVector3;
-    export function lerpToRef(start: ReadonlyVector3, end: ReadonlyVector3, amount: number, result: MutableVector3): void;
-    export function maximize(left: MutableVector3, right: MutableVector3): MutableVector3;
-    export function maximizeInPlaceFromFloatsToRef(vector1: ReadonlyVector3, x: number, y: number, z: number, result: MutableVector3): void;
-    export function minimize(left: ReadonlyVector3, right: ReadonlyVector3): MutableVector3;
-    export function minimizeInPlaceFromFloatsToRef(vector1: ReadonlyVector3, x: number, y: number, z: number, result: MutableVector3): void;
-    export function multiply(vector1: ReadonlyVector3, vector2: ReadonlyVector3): MutableVector3;
-    export function multiplyByFloats(vector1: ReadonlyVector3, x: number, y: number, z: number): MutableVector3;
-    export function multiplyByFloatsToRef(vector1: ReadonlyVector3, x: number, y: number, z: number, result: MutableVector3): void;
-    export function multiplyToRef(vector1: ReadonlyVector3, vector2: ReadonlyVector3, result: MutableVector3): void;
-    export type Mutable = MutableVector3;
-    export type MutableVector3 = {
-        x: number;
-        y: number;
-        z: number;
-    };
-    export function negate(value: ReadonlyVector3): MutableVector3;
-    export function normalize(vector: ReadonlyVector3): MutableVector3;
-    export function normalizeFromLength(vector: ReadonlyVector3, len: number): MutableVector3;
-    export function normalizeFromLengthToRef(vector: ReadonlyVector3, len: number, result: MutableVector3): void;
-    export function normalizeToRef(vector: ReadonlyVector3, result: MutableVector3): void;
-    export function One(): MutableVector3;
-    export function Random(): MutableVector3;
-    export type ReadonlyVector3 = {
-        readonly x: number;
-        readonly y: number;
-        readonly z: number;
-    };
-    export function Right(): MutableVector3;
-    export function rotate(vector: ReadonlyVector3, q: Quaternion.ReadonlyQuaternion): MutableVector3;
-    export function rotateToRef(vector: ReadonlyVector3, q: Quaternion.ReadonlyQuaternion, result: MutableVector3): void;
-    export function rotationFromAxis(axis1: MutableVector3, axis2: MutableVector3, axis3: MutableVector3): MutableVector3;
-    export function rotationFromAxisToRef(axis1: MutableVector3, axis2: MutableVector3, axis3: MutableVector3, result: MutableVector3): void;
-    export function scale(vector: ReadonlyVector3, scale: number): MutableVector3;
-    export function scaleToRef(vector: ReadonlyVector3, scale: number, result: MutableVector3): void;
-    export function subtract(vector1: ReadonlyVector3, vector2: ReadonlyVector3): MutableVector3;
-    export function subtractFromFloatsToRef(vector1: ReadonlyVector3, x: number, y: number, z: number, result: MutableVector3): void;
-    export function subtractToRef(vector1: ReadonlyVector3, vector2: ReadonlyVector3, result: MutableVector3): void;
-    export function toString(vector: ReadonlyVector3): string;
-    export function transformCoordinates(vector: ReadonlyVector3, transformation: Matrix.ReadonlyMatrix): MutableVector3;
-    export function transformCoordinatesFromFloatsToRef(x: number, y: number, z: number, transformation: Matrix.ReadonlyMatrix, result: MutableVector3): void;
-    export function transformCoordinatesToRef(vector: ReadonlyVector3, transformation: Matrix.ReadonlyMatrix, result: MutableVector3): void;
-    export function transformNormal(vector: ReadonlyVector3, transformation: Matrix.ReadonlyMatrix): MutableVector3;
-    export function transformNormalFromFloatsToRef(x: number, y: number, z: number, transformation: Matrix.ReadonlyMatrix, result: MutableVector3): void;
-    export function transformNormalToRef(vector: ReadonlyVector3, transformation: Matrix.ReadonlyMatrix, result: MutableVector3): void;
-    export function Up(): MutableVector3;
-    export function Zero(): MutableVector3;
-}
 
 // @public (undocumented)
 export type Vector3Type = {
@@ -2609,13 +1917,10 @@ export type Vector3Type = {
 // @public (undocumented)
 export const VisibilityComponent: ComponentDefinition<typeof VisibilityComponentSchema>;
 
-// @public (undocumented)
-const VisibilityComponent_2: ComponentGetter<ComponentDefinition<typeof VisibilityComponentSchema>>;
-
 // Warning: (ae-missing-release-tag) "VisibilityComponentSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-const VisibilityComponentSchema: ISchema<PBVisibilityComponent> & {
+export const VisibilityComponentSchema: ISchema<PBVisibilityComponent> & {
     COMPONENT_ID: number;
 };
 

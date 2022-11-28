@@ -20,6 +20,10 @@ export const ROLLUP_CONFIG_PATH = resolve(
   './packages/@dcl/dcl-rollup'
 )
 export const SDK_PATH = resolve(process.cwd(), './packages/@dcl/sdk')
+export const PLAYGROUND_ASSETS_PATH = resolve(
+  process.cwd(),
+  './packages/@dcl/playground-assets'
+)
 
 export const ECS7_PATH = resolve(process.cwd(), './packages/@dcl/ecs')
 

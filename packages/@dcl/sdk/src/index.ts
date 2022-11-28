@@ -3,7 +3,7 @@
 import { engine } from '@dcl/ecs'
 import { pollEvents, setSubscribeFunction } from './observables'
 import { subscribe, sendBatch, crdtSendToRenderer } from '~system/EngineApi'
-import { createRendererTransport } from './transports/rendererTransport'
+import { createRendererTransport } from './internal/transports/rendererTransport'
 
 // Attach CRDT transport
 engine.addTransport(createRendererTransport({ crdtSendToRenderer }))

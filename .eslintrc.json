@@ -6,6 +6,7 @@
       "packages/@dcl/dcl-rollup/tsconfig.json",
       "packages/@dcl/ecs/tsconfig.json",
       "packages/@dcl/sdk/tsconfig.json",
+      "packages/@dcl/playground-assets/tsconfig.json",
       "packages/@dcl/react-ecs/tsconfig.json",
       "scripts/tsconfig.json",
       "test/tsconfig.json",

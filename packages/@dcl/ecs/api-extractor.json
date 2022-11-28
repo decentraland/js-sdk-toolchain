@@ -56,7 +56,7 @@
    * This would direct API Extractor to embed those types directly in the .d.ts rollup, as if they had been
    * local files for library1.
    */
-  "bundledPackages": ["@dcl/ecs-math"],
+  "bundledPackages": [],
   /**
    * Determines how the TypeScript compiler engine will be invoked by API Extractor.
    */

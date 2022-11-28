@@ -1,10 +1,10 @@
 import {
   Entity,
   IEngine,
-  components,
   EventSystemCallback,
   PointerEventsSystem
 } from '@dcl/ecs'
+import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
 import { isListener, Listeners } from '../components'
 import { CANVAS_ROOT_ENTITY } from '../components/uiTransform'

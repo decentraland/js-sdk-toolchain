@@ -1,8 +1,8 @@
-import { Quaternion, Vector3 } from '../../packages/@dcl/ecs/src'
+import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/math'
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
-import * as transport from '../../packages/@dcl/sdk/src/transports/networkTransport'
+import * as transport from '../../packages/@dcl/sdk/src/internal/transports/networkTransport'
 
 export function wait(ms: number) {
   return new Promise<void>((resolve) => setTimeout(() => resolve(), ms))

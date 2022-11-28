@@ -1,4 +1,4 @@
-import { Observable } from './temp-fp/Observable'
+import { Observable } from './internal/Observable'
 import { QuaternionType, Vector3Type } from '@dcl/ecs'
 import { ManyEntityAction, SendBatchResponse } from '~system/EngineApi'
 

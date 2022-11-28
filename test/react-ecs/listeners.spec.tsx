@@ -1,6 +1,6 @@
 import { Engine, Entity, IEngine, components, createPointerEventSystem } from '../../packages/@dcl/ecs/src'
 import { createInputSystem } from '../../packages/@dcl/ecs/src/engine/input'
-import { createReactBasedUiSystem, ReactBasedUiSystem, ReactEcs, UiEntity } from '../../packages/@dcl/react-ecs/src'
+import { createReactBasedUiSystem, ReactBasedUiSystem, ReactEcs, UiEntity } from '../../packages/@dcl/sdk/react-ecs/src'
 import { createTestPointerDownCommand } from '../ecs/events/utils'
 import { PointerEventType } from '../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
 

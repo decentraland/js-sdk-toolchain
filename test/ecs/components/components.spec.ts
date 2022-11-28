@@ -1,10 +1,5 @@
-import {
-  Engine,
-  Entity,
-  components,
-  Quaternion,
-  Vector3
-} from '../../../packages/@dcl/ecs/src'
+import { Engine, Entity, components } from '../../../packages/@dcl/ecs/src'
+import { Quaternion, Vector3 } from '../../../packages/@dcl/sdk/src/math'
 
 describe('Legacy component tests', () => {
   it('cube example scene', () => {

@@ -4,7 +4,9 @@
     "strict": true,
     "typeRoots": ["../../../packages"],
     "paths": {
-      "@dcl/ecs": ["../../../packages/@dcl/ecs"],
+      "@dcl/sdk": ["../../../packages/@dcl/sdk"],
+      "@dcl/sdk/ecs": ["..../../../packages/@dcl/sdk/react-ecs
+      "@dcl/sdk/math": ["../../../packages/@dcl/sdk/math"],
       "@dcl/react-ecs": ["../../../packages/@dcl/react-ecs"]
     }
   },

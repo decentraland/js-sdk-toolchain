@@ -1,4 +1,4 @@
-import { engine, Transform, MeshRenderer, MeshCollider } from '@dcl/ecs'
+import { engine, Transform, MeshRenderer, MeshCollider } from '@dcl/sdk/ecs'
 
 enum Mesh {
   BOX,
