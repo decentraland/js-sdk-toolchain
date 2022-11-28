@@ -148,7 +148,7 @@ export function createPointerEventSystem(
     /**
      * @internal
      * Remove the callback for onClick event
-     * @param entity Entity where the callback was attached
+     * @param entity - Entity where the callback was attached
      */
     removeOnClick(entity: Entity) {
       removeEvent(entity, EventType.Click)
@@ -157,7 +157,7 @@ export function createPointerEventSystem(
     /**
      * @public
      * Remove the callback for onPointerDown event
-     * @param entity Entity where the callback was attached
+     * @param entity - Entity where the callback was attached
      */
     removeOnPointerDown(entity: Entity) {
       removeEvent(entity, EventType.Down)
@@ -166,7 +166,7 @@ export function createPointerEventSystem(
     /**
      * @public
      * Remove the callback for onPointerUp event
-     * @param entity Entity where the callback was attached
+     * @param entity - Entity where the callback was attached
      */
     removeOnPointerUp(entity: Entity) {
       removeEvent(entity, EventType.Up)
@@ -175,9 +175,9 @@ export function createPointerEventSystem(
     /**
      * @internal
      * Execute callback when the user clicks the entity.
-     * @param entity Entity to attach the callback
-     * @param cb Function to execute when onPointerDown fires
-     * @param opts Opts to trigger Feedback and Button
+     * @param entity - Entity to attach the callback
+     * @param cb - Function to execute when onPointerDown fires
+     * @param opts - Opts to trigger Feedback and Button
      */
     onClick(
       entity: Entity,
@@ -196,9 +196,9 @@ export function createPointerEventSystem(
     /**
      * @public
      * Execute callback when the user press the InputButton pointing at the entity
-     * @param entity Entity to attach the callback
-     * @param cb Function to execute when click fires
-     * @param opts Opts to trigger Feedback and Button
+     * @param entity - Entity to attach the callback
+     * @param cb - Function to execute when click fires
+     * @param opts - Opts to trigger Feedback and Button
      */
     onPointerDown(
       entity: Entity,
@@ -214,9 +214,9 @@ export function createPointerEventSystem(
     /**
      * @public
      * Execute callback when the user releases the InputButton pointing at the entity
-     * @param entity Entity to attach the callback
-     * @param cb Function to execute when click fires
-     * @param opts Opts to trigger Feedback and Button
+     * @param entity - Entity to attach the callback
+     * @param cb - Function to execute when click fires
+     * @param opts - Opts to trigger Feedback and Button
      */
     onPointerUp(
       entity: Entity,

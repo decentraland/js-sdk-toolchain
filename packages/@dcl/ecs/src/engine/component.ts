@@ -31,142 +31,76 @@ export type ComponentDefinition<
 
   /**
    * Get if the entity has this component
-   * @param entity
-   *
-   * Example:
-   * ```ts
-   * const myEntity = engine.addEntity()
-   * Transform.has(myEntity) // return false
-   * Transform.create(myEntity)
-   * Transform.has(myEntity) // return true
-   * ```
+   * @param entity - entity to test
    */
   has(entity: Entity): boolean
 
   /**
    * Get the readonly component of the entity (to mutate it, use getMutable instead), throw an error if the entity doesn't have the component.
-   * @param entity
-   * @return
-   * Example:
-   * ```ts
-   * const myEntity = engine.addEntity()
-   * Transform.create(myEntity)
-   * const transform = Transform.get(myEntity) // return true
-   * log(transform.position.x === 0) // log 'true'
-   *
-   * transform.position.y = 10 // illegal statement, to mutate the component use getMutable
-   * ```
-   *
-   * ```ts
-   * const otherEntity = engine.addEntity()
-   * Transform.get(otherEntity) // throw an error!!
-   * ```
+   * @param entity - Entity that will be used to get the component
+   * @returns
    */
   get(entity: Entity): DeepReadonly<ComponentType<T>>
 
   /**
    * Get the readonly component of the entity (to mutate it, use getMutable instead), or null if the entity doesn't have the component.
-   * @param entity
-   * @return
-   *
-   * Example:
-   * ```ts
-   * const otherEntity = engine.addEntity()
-   * log(Transform.get(otherEntity) === null) // log 'true'
-   * ```
+   * @param entity - Entity that will be used to try to get the component
    */
   getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null
 
   /**
    * Add the current component to an entity, throw an error if the component already exists (use `createOrReplace` instead).
-   * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
-   * @param entity
-   * @param val The initial value
-   *
-   * Example:
-   * ```ts
-   * const myEntity = engine.addEntity()
-   * Transform.create(myEntity, { ...Transform.default(), position: {x: 4, y: 0, z: 4} }) // ok!
-   * Transform.create(myEntity) // throw an error, the `Transform` component already exists in `myEntity`
-   * ````
+   * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
+   * @param entity - Entity that will be used to create the component
+   * @param val - The initial value
    */
   create(entity: Entity, val?: ConstructorType): ComponentType<T>
   /**
    * Add the current component to an entity or replace the content if the entity already has the component
-   * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
-   * @param entity
-   * @param val The initial or new value
-   *
-   * Example:
-   * ```ts
-   * const myEntity = engine.addEntity()
-   * Transform.create(myEntity) // ok!
-   * Transform.createOrReplace(myEntity, { ...Transform.default(), position: {x: 4, y: 0, z: 4} }) // ok!
-   * ````
+   * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
+   * @param entity - Entity that will be used to create or replace the component
+   * @param val - The initial or new value
    */
   createOrReplace(entity: Entity, val?: ConstructorType): ComponentType<T>
 
   /**
    * Delete the current component to an entity, return null if the entity doesn't have the current component.
-   * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
-   * @param entity
-   *
-   * Example:
-   * ```ts
-   * const myEntity = engine.addEntity()
-   * Transform.create(myEntity) // ok!
-   * Transform.deleteFrom(myEntity) // return the component
-   * Transform.deleteFrom(myEntity) // return null
-   * ````
+   * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
+   * @param entity - Entity to delete the component from
    */
   deleteFrom(entity: Entity): ComponentType<T> | null
 
   /**
    * Get the mutable component of the entity, throw an error if the entity doesn't have the component.
-   * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
-   * @param entity
-   *
-   * Example:
-   * ```ts
-   * const myEntity = engine.addEntity()
-   * Transform.create(myEntity)
-   * Transform.getMutable(myEntity).position = {x: 4, y: 0, z: 4}
-   * ````
+   * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
+   * @param entity - Entity to get the component from
    */
   getMutable(entity: Entity): ComponentType<T>
 
   /**
    * Get the mutable component of the entity, return null if the entity doesn't have the component.
-   * - Internal comment: This method adds the <entity,component> to the list to be reviewed next frame
-   * @param entity
-   *
-   * Example:
-   * ```ts
-   * const transform = Transform.getMutableOrNull(myEntity)
-   * if (transform) {
-   *   transform.position = {x: 4, y: 0, z: 4}
-   * }
-   * ````
+   * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
+   * @param entity - Entity to get the component from
    */
   getMutableOrNull(entity: Entity): ComponentType<T> | null
 
   /**
    * @internal
-   * @param entity
-   * @param data
+   * @param entity - entity-component to update
+   * @param data - data to update the entity-component
    */
   upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null
   /**
    * @internal
-   * @param entity
-   * @param data
+   * @param entity - entity-component to update
+   * @param data - data to update the entity-component
    */
   updateFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null
 
   // allocates a buffer and returns new buffer
   /**
    * @internal
-   * @param entity
+   * @param entity - Entity to serizalie
    */
   toBinary(entity: Entity): ByteBuffer
 
