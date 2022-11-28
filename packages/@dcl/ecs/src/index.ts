@@ -21,6 +21,11 @@ import { engine } from './runtime/initialization'
 
 // export components for global engine
 /*#__PURE__*/ export const Transform = components.Transform(engine)
+/*#__PURE__*/ export const Animator = components.Animator(engine)
+/*#__PURE__*/ export const Material = components.Material(engine)
+/*#__PURE__*/ export const MeshRenderer = components.MeshRenderer(engine)
+/*#__PURE__*/ export const MeshCollider = components.MeshCollider(engine)
+
 // export components for global engine
 export * from './components/generated/global.gen'
 
