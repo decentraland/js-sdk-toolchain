@@ -91,7 +91,9 @@ export function createSceneConfig(options: { PROD: boolean }): RollupOptions {
           window: 'undefined',
           DEBUG: options.PROD ? 'false' : 'true',
           'globalThis.DEBUG': options.PROD ? 'false' : 'true',
-          'process.env.NODE_ENV': JSON.stringify(options.PROD ? 'production' : 'development')
+          'process.env.NODE_ENV': JSON.stringify(
+            options.PROD ? 'production' : 'development'
+          )
         },
         preventAssignment: true
       }),

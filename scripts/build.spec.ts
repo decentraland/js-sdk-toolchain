@@ -81,11 +81,8 @@ flow('build-all', () => {
     itExecutes('npm run build --silent', ECS7_PATH)
     itExecutes('npm run build-bundle --silent', ECS7_PATH)
     it('check file exists', () => {
-      if (!process.env.CI){
-        copyFile(
-          `${ECS7_PATH}/temp/ecs.api.md`,
-          `${ECS7_PATH}/etc/ecs.api.md`
-        )
+      if (!process.env.CI) {
+        copyFile(`${ECS7_PATH}/temp/ecs.api.md`, `${ECS7_PATH}/etc/ecs.api.md`)
         copyFile(
           `${ECS7_PATH}/temp/ecs.api.json`,
           `${ECS7_PATH}/etc/ecs.api.json`

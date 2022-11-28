@@ -88,14 +88,14 @@ export function generateIndex(param: {
   fs.writeFileSync(path.resolve(generatedPath, 'index.gen.ts'), indexContent)
 
   const globalContent = globalTemplate
-  .replace(
-    '$allGlobalComponentsImports',
-    componentWithoutIndex.map(importComponentFromIndex).join('\n')
-  )
-  .replace(
-    '$allGlobalComponents',
-    componentWithoutIndex.map(defineGlobalComponentDecl).join('\n')
-  )
+    .replace(
+      '$allGlobalComponentsImports',
+      componentWithoutIndex.map(importComponentFromIndex).join('\n')
+    )
+    .replace(
+      '$allGlobalComponents',
+      componentWithoutIndex.map(defineGlobalComponentDecl).join('\n')
+    )
 
   fs.writeFileSync(path.resolve(generatedPath, 'global.gen.ts'), globalContent)
 
