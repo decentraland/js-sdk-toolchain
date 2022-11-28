@@ -1,6 +1,8 @@
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
 import { createTaskSystem } from '../../packages/@dcl/ecs/src/systems/async-task'
 
+declare let process: any
+
 describe('Execute Task', () => {
   it('should run async tasks in the engine', () => {
     const engine = Engine()

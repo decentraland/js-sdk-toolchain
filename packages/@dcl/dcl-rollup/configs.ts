@@ -7,7 +7,7 @@ import analyze from 'rollup-plugin-analyzer'
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 
-export function createEcsConfig(options: { PROD: boolean }): RollupOptions {
+export function createEcsConfig(_options: { PROD: boolean }): RollupOptions {
   const packageJsonPath = sys.resolvePath('./package.json')
   const packageJson = JSON.parse(sys.readFile(packageJsonPath)!)
 

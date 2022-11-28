@@ -1,6 +1,5 @@
 import { cyclicParentingChecker } from '../../packages/@dcl/ecs/src/systems/cyclicParentingChecker'
 import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
-import { SYSTEMS_REGULAR_PRIORITY } from '../../packages/@dcl/ecs/src/engine/systems'
 import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { createRendererTransport } from '../../packages/@dcl/sdk/src/transports/rendererTransport'
@@ -62,11 +61,8 @@ describe('Engine tests', () => {
     expect(() => engine.addSystem(system)).toThrowError()
 
     const systemA = () => {}
-    const systemA2 = () => {}
-    engine.addSystem(systemA, SYSTEMS_REGULAR_PRIORITY, 'systemA')
-    expect(() =>
-      engine.addSystem(systemA2, SYSTEMS_REGULAR_PRIORITY, 'systemA')
-    ).toThrowError()
+    engine.addSystem(systemA)
+    expect(() => engine.addSystem(systemA)).toThrowError()
   })
 
   it('should replace existing component with the new one', () => {

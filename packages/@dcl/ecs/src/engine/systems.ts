@@ -25,8 +25,10 @@ export function SystemContainer() {
 
     if (systems.find((item) => item.fn === fn)) {
       throw new Error('System already added')
-    } else if (systemName && systems.find((item) => item.name === systemName)) {
-      throw new Error(`System name ${JSON.stringify(systemName)} already used`)
+    } else if (systems.find((item) => item.fn === fn)) {
+      throw new Error(
+        `System ${JSON.stringify(systemName)} already added to the engine`
+      )
     }
 
     systems.push({
