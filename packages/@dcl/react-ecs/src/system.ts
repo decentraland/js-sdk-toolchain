@@ -15,21 +15,23 @@ export function createReactBasedUiSystem(
   pointerSystem: PointerEventsSystem
 ): ReactBasedUiSystem {
   const renderer = createReconciler(engine, pointerSystem)
-  const systemName = '@dcl/react-ecs'
-  const systemPriority = 100e3
+  let uiComponent: UiComponent | undefined = undefined
+
+  function ReactBasedUiSystem() {
+    if (uiComponent) renderer.update(uiComponent())
+  }
+
+  engine.addSystem(ReactBasedUiSystem, 100e3, '@dcl/react-ecs')
 
   return {
     destroy() {
-      engine.removeSystem(systemName)
+      engine.removeSystem(ReactBasedUiSystem)
       for (const entity of renderer.getEntities()) {
         engine.removeEntity(entity)
       }
     },
     setUiRenderer(ui: UiComponent) {
-      function ReactBasedUiSystem() {
-        renderer.update(ui())
-      }
-      engine.addSystem(ReactBasedUiSystem, systemPriority, systemName)
+      uiComponent = ui
     }
   }
 }
