@@ -23,6 +23,9 @@ module.exports = {
       lines: 70,
       statements: 70
     },
+    "packages/@dcl/ecs/src/components/generated/index.gen.ts": {
+      functions: 10,
+    },
     "packages/@dcl/sdk/src/temp-fp": {
       branches: 10,
       functions: 10,

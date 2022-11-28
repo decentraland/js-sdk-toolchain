@@ -32,6 +32,9 @@ describe('Render UI System', () => {
     const getUiTransform = (entity: Entity) => UiTransform.getOrNull(entity)
     const divEntity = (entityIndex + 1) as Entity
 
+    // without uiRenderer , shouldn't throw an error
+    engine.update(1)
+
     uiRenderer.setUiRenderer(ui)
     engine.update(1)
     expect(getUiTransform(divEntity)?.width).toBe(1)

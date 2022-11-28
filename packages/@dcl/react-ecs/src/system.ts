@@ -15,10 +15,10 @@ export function createReactBasedUiSystem(
   pointerSystem: PointerEventsSystem
 ): ReactBasedUiSystem {
   const renderer = createReconciler(engine, pointerSystem)
-  let uiComponent: UiComponent
+  let uiComponent: UiComponent | undefined = undefined
 
   function ReactBasedUiSystem() {
-    renderer.update(uiComponent())
+    if (uiComponent) renderer.update(uiComponent())
   }
 
   engine.addSystem(ReactBasedUiSystem, 100e3, '@dcl/react-ecs')
