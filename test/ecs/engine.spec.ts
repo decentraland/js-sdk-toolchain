@@ -1,4 +1,4 @@
-import { cyclicParentingChecker } from '../../packages/@dcl/ecs/src/systems/cyclicParentingChecker'
+import { cyclicParentingChecker } from '../../packages/@dcl/ecs/src'
 import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'

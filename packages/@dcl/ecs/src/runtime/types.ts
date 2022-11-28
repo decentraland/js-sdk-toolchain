@@ -35,16 +35,14 @@ export {
   YGEdge,
   YGWrap
 } from '../components/generated/pb/decentraland/sdk/components/ui_transform.gen'
-export {
-  MaterialTransparencyMode,
+export { MaterialTransparencyMode } from '../components/generated/pb/decentraland/sdk/components/material.gen'
+export type {
   PBMaterial,
   PBMaterial_PbrMaterial,
   PBMaterial_UnlitMaterial
 } from '../components/generated/pb/decentraland/sdk/components/material.gen'
-export {
-  PBPointerHoverFeedback_Entry,
-  PointerEventType
-} from '../components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
+export { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
+export type { PBPointerHoverFeedback_Entry } from '../components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
 export {
   TextureFilterMode,
   TextureWrapMode
