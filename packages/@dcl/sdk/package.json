@@ -28,7 +28,7 @@
     "@dcl/js-runtime": "file:../js-runtime",
     "@dcl/kernel": "^1.0.0-3339209749.commit-fa9e5d7",
     "@dcl/posix": "^1.0.4",
-    "@dcl/unity-renderer": "^1.0.59980-20221027151836.commit-cc26142"
+    "@dcl/unity-renderer": "^1.0.64444-20221125155434.commit-fcef3c4"
   },
   "minCliVersion": "3.12.3"
 }
