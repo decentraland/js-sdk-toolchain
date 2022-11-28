@@ -162,4 +162,27 @@ describe('Transport tests', () => {
 
     jest.resetAllMocks()
   })
+
+  it('should rendererTransport throw an error ', async () => {
+    const crdtSendToRenderer = jest.fn()
+    const rendererTransport = createRendererTransport({ crdtSendToRenderer })
+    const transports = [createNetworkTransport(), rendererTransport]
+
+    const engine = Engine()
+    const Transform = components.Transform(engine)
+    transports.forEach(engine.addTransport)
+
+    const entity = engine.addDynamicEntity()
+
+    const errorSend = 'test error handling'
+    crdtSendToRenderer.mockRejectedValue(errorSend)
+
+    // Transform component should be sent to renderer transport
+    Transform.create(entity)
+    engine.update(1)
+
+    expect(crdtSendToRenderer).toBeCalledTimes(1)
+
+    jest.resetAllMocks()
+  })
 })

@@ -15,7 +15,7 @@ export function createReactBasedUiSystem(
   pointerSystem: PointerEventsSystem
 ): ReactBasedUiSystem {
   const renderer = createReconciler(engine, pointerSystem)
-  let uiComponent: UiComponent = () => ({})
+  let uiComponent: UiComponent
 
   function ReactBasedUiSystem() {
     renderer.update(uiComponent())

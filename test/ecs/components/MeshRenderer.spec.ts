@@ -4,7 +4,7 @@ import type { PBMeshRenderer } from '../../../packages/@dcl/ecs/src/components/g
 describe('Generated MeshRenderer ProtoBuf', () => {
   it('should serialize/deserialize MeshRenderer', () => {
     const newEngine = Engine()
-    const MeshRenderer = components.MeshCollider(newEngine)
+    const MeshRenderer = components.MeshRenderer(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 
@@ -47,7 +47,7 @@ describe('Generated MeshRenderer ProtoBuf', () => {
   it('should helper creates box MeshRenderer', () => {
     const newEngine = Engine()
     const entity = newEngine.addEntity()
-    const MeshRenderer = components.MeshCollider(newEngine)
+    const MeshRenderer = components.MeshRenderer(newEngine)
 
     expect(MeshRenderer.getOrNull(entity)).toBe(null)
     MeshRenderer.setBox(entity)

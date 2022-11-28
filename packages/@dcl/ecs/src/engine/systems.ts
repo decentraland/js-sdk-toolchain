@@ -24,8 +24,6 @@ export function SystemContainer() {
     const systemName = name ?? fn.name
 
     if (systems.find((item) => item.fn === fn)) {
-      throw new Error('System already added')
-    } else if (systems.find((item) => item.fn === fn)) {
       throw new Error(
         `System ${JSON.stringify(systemName)} already added to the engine`
       )
