@@ -225,6 +225,11 @@ export const enum CameraType {
     CT_THIRD_PERSON = 1
 }
 
+// Warning: (ae-missing-release-tag) "CANVAS_ROOT_ENTITY" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const CANVAS_ROOT_ENTITY = 0;
+
 // Warning: (ae-missing-release-tag) "Children" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)

@@ -1,10 +1,12 @@
-import ReactEcs, {
-  UiEntity,
+import {
   YGDisplay,
   YGJustify,
   YGAlign,
-  Font,
-  TextAlignMode
+  TextAlignMode,
+  Font
+} from '@dcl/sdk/ecs'
+import ReactEcs, {
+  UiEntity
 } from '@dcl/sdk/react-ecs'
 
 export const ui = () => (

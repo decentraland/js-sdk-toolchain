@@ -1734,6 +1734,33 @@
           ]
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "@dcl/playground-assets!CANVAS_ROOT_ENTITY:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "CANVAS_ROOT_ENTITY = "
+            },
+            {
+              "kind": "Content",
+              "text": "0"
+            }
+          ],
+          "fileUrlPath": "../react-ecs/dist/components/uiTransform/index.d.ts",
+          "initializerTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "CANVAS_ROOT_ENTITY",
+          "variableTypeTokenRange": {
+            "startIndex": 0,
+            "endIndex": 0
+          }
+        },
+        {
           "kind": "TypeAlias",
           "canonicalReference": "@dcl/playground-assets!Children:type",
           "docComment": "",

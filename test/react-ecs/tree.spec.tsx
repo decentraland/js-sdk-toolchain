@@ -4,9 +4,9 @@ import {
   createReactBasedUiSystem,
   ReactBasedUiSystem,
   ReactEcs,
-  UiEntity
-} from '../../packages/@dcl/sdk/react-ecs/src'
-import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/sdk/react-ecs/src/components/uiTransform'
+  UiEntity,
+  CANVAS_ROOT_ENTITY
+} from '../../packages/@dcl/sdk/react-ecs'
 
 
 describe('RectEcs UI ✨', () => {

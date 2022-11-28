@@ -1,13 +1,13 @@
-import { Engine, IEngine, Entity, components, createPointerEventSystem, createInputSystem } from '../../packages/@dcl/ecs/src'
+import { Engine, IEngine, Entity, createPointerEventSystem, createInputSystem, PBUiBackground } from '../../packages/@dcl/ecs/dist'
+import * as components from '../../packages/@dcl/ecs/dist/components'
+import { Color4 } from '../../packages/@dcl/sdk/math'
 import {
-  Color4,
   ReactEcs,
-  UiBackgroundProps,
   UiEntity,
   createReactBasedUiSystem,
-  ReactBasedUiSystem
-} from '../../packages/@dcl/sdk/react-ecs/src'
-import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/sdk/react-ecs/src/components/uiTransform'
+  ReactBasedUiSystem,
+  CANVAS_ROOT_ENTITY
+} from '../../packages/@dcl/sdk/react-ecs'
 
 describe('UiBackground React Ecs', () => {
   let engine: IEngine
@@ -27,7 +27,7 @@ describe('UiBackground React Ecs', () => {
     const rootDivEntity = (entityIndex + 1) as Entity
     const getUiTransform = (entity: Entity) => UiTransform.get(entity)
     const getBackground = (entity: Entity) => UiBackground.get(entity)
-    let backgroundColor: Color4 | undefined = { r: 0, g: 1, b: 2, a: 0 }
+    let backgroundColor: Color4.Mutable | undefined = { r: 0, g: 1, b: 2, a: 0 }
 
     const ui = () => (
       <UiEntity
@@ -71,7 +71,7 @@ describe('UiBackground React Ecs', () => {
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
     const getBackground = () => UiBackground.getOrNull(rootDivEntity)
-    let backgroundProps: { uiBackground: UiBackgroundProps } | undefined = {
+    let backgroundProps: { uiBackground: PBUiBackground } | undefined = {
       uiBackground: { backgroundColor: { r: 0, g: 1, b: 2, a: 0 } }
     }
 

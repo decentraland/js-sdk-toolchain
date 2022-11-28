@@ -1,4 +1,5 @@
-import { Engine, IEngine, Entity, components, createInputSystem, createPointerEventSystem } from '../../packages/@dcl/ecs/src'
+import { Engine, IEngine, Entity, createInputSystem, createPointerEventSystem, YGWrap, YGUnit } from '../../packages/@dcl/sdk/ecs'
+import * as components from '../../packages/@dcl/ecs/dist/components'
 import {
   createReactBasedUiSystem,
   Position,
@@ -6,10 +7,8 @@ import {
   ReactBasedUiSystem,
   ReactEcs,
   UiEntity,
-  YGUnit,
-  YGWrap
-} from '../../packages/@dcl/sdk/react-ecs/src'
-import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/sdk/react-ecs/src/components/uiTransform'
+  CANVAS_ROOT_ENTITY
+} from '../../packages/@dcl/sdk/react-ecs'
 
 
 describe('UiTransform React Ecs', () => {

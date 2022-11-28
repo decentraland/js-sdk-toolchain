@@ -18,3 +18,5 @@ test/sdk/simple-scene
 **/bin/game.js.map
 test/ecs/snippets/ui/index.js
 **/*.js.map
+
+test/build-ecs/fixtures/*/package-lock.json

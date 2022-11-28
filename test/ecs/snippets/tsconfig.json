@@ -4,10 +4,10 @@
     "strict": true,
     "typeRoots": ["../../../packages"],
     "paths": {
-      "@dcl/sdk": ["../../../packages/@dcl/sdk"],
-      "@dcl/sdk/ecs": ["..../../../packages/@dcl/sdk/react-ecs
+      "@dcl/sdk/react-ecs": ["../../../packages/@dcl/sdk/react-ecs"],
       "@dcl/sdk/math": ["../../../packages/@dcl/sdk/math"],
-      "@dcl/react-ecs": ["../../../packages/@dcl/react-ecs"]
+      "@dcl/sdk/ecs": ["../../../packages/@dcl/sdk/ecs"],
+      "@dcl/sdk": ["../../../packages/@dcl/sdk"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],

@@ -1,9 +1,10 @@
 import { YGDisplay } from '@dcl/ecs'
 import { ReactEcs } from '../react-ecs'
 import { CommonProps, EntityPropTypes } from './types'
-import { parseUiTransform } from './uiTransform'
+import { parseUiTransform, CANVAS_ROOT_ENTITY } from './uiTransform'
 
 export * from './types'
+export { CANVAS_ROOT_ENTITY }
 export * from './uiTransform/types'
 export * from './listeners/types'
 

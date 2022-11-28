@@ -7,17 +7,13 @@ import {
   InputAction,
   inputSystem,
   PointerHoverFeedback,
-  PointerEventType
-} from '@dcl/sdk/ecs'
-import{Vector3,Color4,Quaternion}from'@dcl/sdk/math'
-
-import ReactEcs, {
-  UiEntity,
   YGAlign,
   YGDisplay,
   YGJustify,
-  ReactEcsRenderer
-} from '../../../../packages/@dcl/sdk/react-ecs/dist'
+  PointerEventType
+} from '@dcl/sdk/ecs'
+import { Vector3, Color4, Quaternion } from '@dcl/sdk/math'
+import ReactEcs, { UiEntity, ReactEcsRenderer } from '@dcl/sdk/react-ecs'
 
 let counter = 0
 

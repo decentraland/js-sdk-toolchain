@@ -15,7 +15,7 @@ export function createEcsConfig(_options: { PROD: boolean }): RollupOptions {
   console.assert(packageJson.main, 'package.json .main must be present')
   console.assert(packageJson.typings, 'package.json .typings must be present')
 
-  const out = packageJson.main.replace(/\.js$/, '.bundled.js')
+  const out = packageJson.main // .replace(/\.js$/, '.bundled.js')
 
   return {
     input: 'src/index.ts',

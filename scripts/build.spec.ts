@@ -74,20 +74,8 @@ flow('build-all', () => {
       `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
       `${ECS7_PATH}/node_modules/@dcl/protocol/proto/`
     )
-    // copyFile(
-    //   `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
-    //   `${SDK_PATH}/dist/ecs7/proto-definitions`
-    // )
     itExecutes('npm run build --silent', ECS7_PATH)
-    itExecutes('npm run build-bundle --silent', ECS7_PATH)
     it('check file exists', () => {
-      if (!process.env.CI) {
-        copyFile(`${ECS7_PATH}/temp/ecs.api.md`, `${ECS7_PATH}/etc/ecs.api.md`)
-        copyFile(
-          `${ECS7_PATH}/temp/ecs.api.json`,
-          `${ECS7_PATH}/etc/ecs.api.json`
-        )
-      }
       ensureFileExists('dist/index.d.ts', ECS7_PATH)
       ensureFileExists('dist/index.js', ECS7_PATH)
     })

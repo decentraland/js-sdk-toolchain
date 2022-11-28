@@ -1,11 +1,9 @@
-import { Engine, Entity, components, createPointerEventSystem, createInputSystem } from '../../packages/@dcl/ecs/src'
-import { Color4, Font, ReactEcs, createReactBasedUiSystem, TextAlignMode, UiEntity } from '../../packages/@dcl/sdk/react-ecs/src'
-import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/sdk/react-ecs/src/components/uiTransform'
+import { Engine, Entity, createPointerEventSystem, createInputSystem, TextAlignMode, Font } from '../../packages/@dcl/ecs/dist'
+import * as components from '../../packages/@dcl/ecs/dist/components'
+import { ReactEcs, createReactBasedUiSystem, UiEntity, CANVAS_ROOT_ENTITY } from '../../packages/@dcl/sdk/react-ecs'
+import { Color4 } from '../../packages/@dcl/sdk/math'
 
 describe('UiText React Ecs', () => {
-  beforeEach(() => {
-  })
-
   it('should generate a UI and update the width of a div', async () => {
     const engine = Engine()
     const input = createInputSystem(engine)

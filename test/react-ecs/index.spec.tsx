@@ -4,14 +4,14 @@ import {
   Entity,
   components,
   createPointerEventSystem,
-  create../../packages/@dcl/sdk/react-ecs/src
+  createInputSystem
 } from '../../packages/@dcl/ecs/src'
 import {
   UiEntity,
   ReactEcs,
   ReactBasedUiSystem,
   createReactBasedUiSystem
-} from '../../packages/@dcl/react-ecs/src'
+} from '../../packages/@dcl/react-ecs'
 
 describe('Render UI System', () => {
   let engine: IEngine
