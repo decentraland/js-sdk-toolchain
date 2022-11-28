@@ -16,5 +16,3 @@ export async function onUpdate(deltaTime: number) {
   engine.update(deltaTime)
   await pollEvents(sendBatch)
 }
-
-console
