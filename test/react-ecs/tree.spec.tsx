@@ -8,7 +8,6 @@ import {
   CANVAS_ROOT_ENTITY
 } from '../../packages/@dcl/react-ecs/src'
 
-
 describe('RectEcs UI ✨', () => {
   let engine: IEngine
   let uiRenderer: ReactBasedUiSystem
