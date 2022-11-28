@@ -6,3 +6,4 @@ packages/@dcl/ecs/dist/
 packages/@dcl/sdk/dist/
 packages/@dcl/sdk/internal/
 packages/@dcl/playground-assets/dist
+packages/@dcl/ecs/src/components/generated

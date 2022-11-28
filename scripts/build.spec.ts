@@ -31,7 +31,12 @@ flow('build-all', () => {
 
   flow('@dcl/js-runtime', () => {
     it('compile protos', async () => {
-      const rpcProtoPath = path.resolve(__dirname, 'rpc-api-generation', 'src', 'proto')
+      const rpcProtoPath = path.resolve(
+        __dirname,
+        'rpc-api-generation',
+        'src',
+        'proto'
+      )
       removeSync(rpcProtoPath)
       mkdirSync(rpcProtoPath)
       writeFileSync(path.resolve(rpcProtoPath, 'README.md'), '# Generated code')
@@ -128,8 +133,17 @@ flow('build-all', () => {
   flow('playground copy files', () => {
     it('playground copy snippets', async () => {
       const PLAYGORUND_INFO_JSON = 'info.json'
-      const snippetsPath = path.resolve(process.cwd(), 'test', 'ecs', 'snippets')
-      const playgroundDistPath = path.resolve(PLAYGROUND_ASSETS_PATH, 'dist', 'playground')
+      const snippetsPath = path.resolve(
+        process.cwd(),
+        'test',
+        'ecs',
+        'snippets'
+      )
+      const playgroundDistPath = path.resolve(
+        PLAYGROUND_ASSETS_PATH,
+        'dist',
+        'playground'
+      )
 
       // Clean last build
       removeSync(playgroundDistPath)
@@ -170,11 +184,18 @@ flow('build-all', () => {
       }
 
       // // Create a JSON with the path of every snippet, this can be read by playground or CLI
-      writeFileSync(path.resolve(distSnippetsPath, PLAYGORUND_INFO_JSON), JSON.stringify(snippetInfo))
+      writeFileSync(
+        path.resolve(distSnippetsPath, PLAYGORUND_INFO_JSON),
+        JSON.stringify(snippetInfo)
+      )
     })
 
     it('playground copy minified files', async () => {
-      const playgroundDistPath = path.resolve(PLAYGROUND_ASSETS_PATH, 'dist', 'playground')
+      const playgroundDistPath = path.resolve(
+        PLAYGROUND_ASSETS_PATH,
+        'dist',
+        'playground'
+      )
 
       // Copy minified ecs
       const filesToCopy = [
