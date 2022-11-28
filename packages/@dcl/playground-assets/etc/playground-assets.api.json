@@ -175,38 +175,29 @@
         {
           "kind": "Variable",
           "canonicalReference": "@dcl/playground-assets!Animator:var",
-          "docComment": "/**\n * @public\n */\n",
+          "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
               "text": "Animator: "
             },
             {
-              "kind": "Reference",
-              "text": "ComponentDefinition",
-              "canonicalReference": "@dcl/playground-assets!ComponentDefinition:type"
-            },
-            {
               "kind": "Content",
-              "text": "<typeof "
+              "text": "import(\"./components/types\")."
             },
             {
               "kind": "Reference",
-              "text": "AnimatorSchema",
-              "canonicalReference": "@dcl/playground-assets!AnimatorSchema:var"
-            },
-            {
-              "kind": "Content",
-              "text": ">"
+              "text": "AnimatorComponentDefinitionExtended",
+              "canonicalReference": "@dcl/playground-assets!AnimatorComponentDefinitionExtended:interface"
             }
           ],
-          "fileUrlPath": "../ecs/dist/components/generated/global.gen.d.ts",
+          "fileUrlPath": "../ecs/dist/index.d.ts",
           "isReadonly": true,
           "releaseTag": "Public",
           "name": "Animator",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 5
+            "endIndex": 3
           }
         },
         {
@@ -10436,38 +10427,29 @@
         {
           "kind": "Variable",
           "canonicalReference": "@dcl/playground-assets!Material:var",
-          "docComment": "/**\n * @public\n */\n",
+          "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
               "text": "Material: "
             },
             {
-              "kind": "Reference",
-              "text": "ComponentDefinition",
-              "canonicalReference": "@dcl/playground-assets!ComponentDefinition:type"
-            },
-            {
               "kind": "Content",
-              "text": "<typeof "
+              "text": "import(\"./components/types\")."
             },
             {
               "kind": "Reference",
-              "text": "MaterialSchema",
-              "canonicalReference": "@dcl/playground-assets!MaterialSchema:var"
-            },
-            {
-              "kind": "Content",
-              "text": ">"
+              "text": "MaterialComponentDefinitionExtended",
+              "canonicalReference": "@dcl/playground-assets!MaterialComponentDefinitionExtended:interface"
             }
           ],
-          "fileUrlPath": "../ecs/dist/components/generated/global.gen.d.ts",
+          "fileUrlPath": "../ecs/dist/index.d.ts",
           "isReadonly": true,
           "releaseTag": "Public",
           "name": "Material",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 5
+            "endIndex": 3
           }
         },
         {
@@ -17932,38 +17914,29 @@
         {
           "kind": "Variable",
           "canonicalReference": "@dcl/playground-assets!MeshCollider:var",
-          "docComment": "/**\n * @public\n */\n",
+          "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
               "text": "MeshCollider: "
             },
             {
-              "kind": "Reference",
-              "text": "ComponentDefinition",
-              "canonicalReference": "@dcl/playground-assets!ComponentDefinition:type"
-            },
-            {
               "kind": "Content",
-              "text": "<typeof "
+              "text": "import(\"./components/types\")."
             },
             {
               "kind": "Reference",
-              "text": "MeshColliderSchema",
-              "canonicalReference": "@dcl/playground-assets!MeshColliderSchema:var"
-            },
-            {
-              "kind": "Content",
-              "text": ">"
+              "text": "MeshColliderComponentDefinitionExtended",
+              "canonicalReference": "@dcl/playground-assets!MeshColliderComponentDefinitionExtended:interface"
             }
           ],
-          "fileUrlPath": "../ecs/dist/components/generated/global.gen.d.ts",
+          "fileUrlPath": "../ecs/dist/index.d.ts",
           "isReadonly": true,
           "releaseTag": "Public",
           "name": "MeshCollider",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 5
+            "endIndex": 3
           }
         },
         {
@@ -18432,38 +18405,29 @@
         {
           "kind": "Variable",
           "canonicalReference": "@dcl/playground-assets!MeshRenderer:var",
-          "docComment": "/**\n * @public\n */\n",
+          "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
               "text": "MeshRenderer: "
             },
             {
-              "kind": "Reference",
-              "text": "ComponentDefinition",
-              "canonicalReference": "@dcl/playground-assets!ComponentDefinition:type"
-            },
-            {
               "kind": "Content",
-              "text": "<typeof "
+              "text": "import(\"./components/types\")."
             },
             {
               "kind": "Reference",
-              "text": "MeshRendererSchema",
-              "canonicalReference": "@dcl/playground-assets!MeshRendererSchema:var"
-            },
-            {
-              "kind": "Content",
-              "text": ">"
+              "text": "MeshRendererComponentDefinitionExtended",
+              "canonicalReference": "@dcl/playground-assets!MeshRendererComponentDefinitionExtended:interface"
             }
           ],
-          "fileUrlPath": "../ecs/dist/components/generated/global.gen.d.ts",
+          "fileUrlPath": "../ecs/dist/index.d.ts",
           "isReadonly": true,
           "releaseTag": "Public",
           "name": "MeshRenderer",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 5
+            "endIndex": 3
           }
         },
         {

@@ -31,7 +31,14 @@ function defineComponentDecl(component: Component) {
   `.trim()
 }
 
+const skipExposeGlobally: string[] = [
+  'Animator',
+  'MeshRenderer',
+  'MeshCollider',
+  'Material'
+]
 function defineGlobalComponentDecl(component: Component) {
+  if (skipExposeGlobally.includes(component.componentPascalName)) return ''
   return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: ComponentDefinition<typeof ${component.componentPascalName}Schema> = components.${component.componentPascalName}(engine)`.trim()
 }
 

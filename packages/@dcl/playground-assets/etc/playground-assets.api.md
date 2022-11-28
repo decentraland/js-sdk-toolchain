@@ -6,8 +6,10 @@
 
 import _m0 from 'protobufjs/minimal';
 
+// Warning: (ae-missing-release-tag) "Animator" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const Animator: ComponentDefinition<typeof AnimatorSchema>;
+export const Animator: AnimatorComponentDefinitionExtended;
 
 // @public (undocumented)
 export type AnimatorComponentDefinition = ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
@@ -716,8 +718,10 @@ export type Listeners = {
     onClick?: EventSystemCallback;
 };
 
+// Warning: (ae-missing-release-tag) "Material" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const Material: ComponentDefinition<typeof MaterialSchema>;
+export const Material: MaterialComponentDefinitionExtended;
 
 // @public (undocumented)
 export type MaterialComponentDefinition = ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
@@ -889,8 +893,10 @@ export namespace Matrix {
     export function Zero(): MutableMatrix;
 }
 
+// Warning: (ae-missing-release-tag) "MeshCollider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const MeshCollider: ComponentDefinition<typeof MeshColliderSchema>;
+export const MeshCollider: MeshColliderComponentDefinitionExtended;
 
 // @public (undocumented)
 export type MeshColliderComponentDefinition = ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
@@ -910,8 +916,10 @@ export const MeshColliderSchema: ISchema<PBMeshCollider> & {
     COMPONENT_ID: number;
 };
 
+// Warning: (ae-missing-release-tag) "MeshRenderer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const MeshRenderer: ComponentDefinition<typeof MeshRendererSchema>;
+export const MeshRenderer: MeshRendererComponentDefinitionExtended;
 
 // @public (undocumented)
 export type MeshRendererComponentDefinition = ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
@@ -2778,69 +2786,69 @@ export const enum YGWrap {
 
 // Warnings were encountered during analysis:
 //
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:24:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:37:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:38:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:57:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:58:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:69:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:69:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:70:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:71:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:78:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:78:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:83:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:83:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:84:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:85:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:92:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:92:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:97:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:97:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:98:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:106:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:106:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:111:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:111:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:112:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:119:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:119:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:124:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:124:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:125:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:133:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:133:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:25:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:26:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:35:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:51:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:52:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:53:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:69:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:75:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:76:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:77:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:78:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:92:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:93:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:94:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:104:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:105:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:114:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:115:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:126:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:17:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:23:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:29:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:35:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:36:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:37:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:43:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:44:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:45:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:51:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:52:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// /Users/user/code/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:53:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:24:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:37:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:38:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:57:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:58:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:69:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:69:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:70:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:71:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:78:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:78:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:83:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:83:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:84:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:85:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:92:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:92:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:97:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:97:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:98:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:106:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:106:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:111:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:111:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:112:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:119:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:119:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:124:66 - (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:124:49 - (tsdoc-html-tag-missing-greater-than) The HTML tag has invalid syntax: Expecting an attribute or ">" or "/>"
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:125:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:133:11 - (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/component.d.ts:133:11 - (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:25:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:26:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:35:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:51:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:52:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:53:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:69:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:75:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:76:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:77:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:78:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:92:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:93:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:94:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:104:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:105:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:114:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:115:8 - (tsdoc-undefined-tag) The TSDoc tag "@return" is not defined in this configuration
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/engine/types.d.ts:126:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:17:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:23:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:29:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:35:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:36:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:37:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:43:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:44:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:45:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:51:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:52:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// /home/leandro/github/js-sdk-toolchain/packages/@dcl/ecs/dist/systems/events.d.ts:53:8 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 
 // (No @packageDocumentation comment for this package)
 

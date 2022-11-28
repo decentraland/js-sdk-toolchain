@@ -6,8 +6,10 @@
 
 import _m0 from 'protobufjs/minimal';
 
+// Warning: (ae-missing-release-tag) "Animator" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const Animator: ComponentDefinition<typeof AnimatorSchema>;
+export const Animator: AnimatorComponentDefinitionExtended;
 
 // @public (undocumented)
 export type AnimatorComponentDefinition = ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
@@ -490,8 +492,10 @@ export type ISchema<T = any> = {
     create(): T;
 };
 
+// Warning: (ae-missing-release-tag) "Material" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const Material: ComponentDefinition<typeof MaterialSchema>;
+export const Material: MaterialComponentDefinitionExtended;
 
 // @public (undocumented)
 export type MaterialComponentDefinition = ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
@@ -526,8 +530,10 @@ export const enum MaterialTransparencyMode {
     MTM_OPAQUE = 0
 }
 
+// Warning: (ae-missing-release-tag) "MeshCollider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const MeshCollider: ComponentDefinition<typeof MeshColliderSchema>;
+export const MeshCollider: MeshColliderComponentDefinitionExtended;
 
 // @public (undocumented)
 export type MeshColliderComponentDefinition = ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
@@ -547,8 +553,10 @@ export const MeshColliderSchema: ISchema<PBMeshCollider> & {
     COMPONENT_ID: number;
 };
 
+// Warning: (ae-missing-release-tag) "MeshRenderer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const MeshRenderer: ComponentDefinition<typeof MeshRendererSchema>;
+export const MeshRenderer: MeshRendererComponentDefinitionExtended;
 
 // @public (undocumented)
 export type MeshRendererComponentDefinition = ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;

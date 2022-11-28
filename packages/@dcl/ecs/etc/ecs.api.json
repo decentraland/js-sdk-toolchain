@@ -175,38 +175,29 @@
         {
           "kind": "Variable",
           "canonicalReference": "@dcl/ecs!Animator:var",
-          "docComment": "/**\n * @public\n */\n",
+          "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
               "text": "Animator: "
             },
             {
-              "kind": "Reference",
-              "text": "ComponentDefinition",
-              "canonicalReference": "@dcl/ecs!ComponentDefinition:type"
-            },
-            {
               "kind": "Content",
-              "text": "<typeof "
+              "text": "import(\"./components/types\")."
             },
             {
               "kind": "Reference",
-              "text": "AnimatorSchema",
-              "canonicalReference": "@dcl/ecs!AnimatorSchema:var"
-            },
-            {
-              "kind": "Content",
-              "text": ">"
+              "text": "AnimatorComponentDefinitionExtended",
+              "canonicalReference": "@dcl/ecs!AnimatorComponentDefinitionExtended:interface"
             }
           ],
-          "fileUrlPath": "dist/components/generated/global.gen.d.ts",
+          "fileUrlPath": "dist/index.d.ts",
           "isReadonly": true,
           "releaseTag": "Public",
           "name": "Animator",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 5
+            "endIndex": 3
           }
         },
         {
@@ -4653,38 +4644,29 @@
         {
           "kind": "Variable",
           "canonicalReference": "@dcl/ecs!Material:var",
-          "docComment": "/**\n * @public\n */\n",
+          "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
               "text": "Material: "
             },
             {
-              "kind": "Reference",
-              "text": "ComponentDefinition",
-              "canonicalReference": "@dcl/ecs!ComponentDefinition:type"
-            },
-            {
               "kind": "Content",
-              "text": "<typeof "
+              "text": "import(\"./components/types\")."
             },
             {
               "kind": "Reference",
-              "text": "MaterialSchema",
-              "canonicalReference": "@dcl/ecs!MaterialSchema:var"
-            },
-            {
-              "kind": "Content",
-              "text": ">"
+              "text": "MaterialComponentDefinitionExtended",
+              "canonicalReference": "@dcl/ecs!MaterialComponentDefinitionExtended:interface"
             }
           ],
-          "fileUrlPath": "dist/components/generated/global.gen.d.ts",
+          "fileUrlPath": "dist/index.d.ts",
           "isReadonly": true,
           "releaseTag": "Public",
           "name": "Material",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 5
+            "endIndex": 3
           }
         },
         {
@@ -5057,38 +5039,29 @@
         {
           "kind": "Variable",
           "canonicalReference": "@dcl/ecs!MeshCollider:var",
-          "docComment": "/**\n * @public\n */\n",
+          "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
               "text": "MeshCollider: "
             },
             {
-              "kind": "Reference",
-              "text": "ComponentDefinition",
-              "canonicalReference": "@dcl/ecs!ComponentDefinition:type"
-            },
-            {
               "kind": "Content",
-              "text": "<typeof "
+              "text": "import(\"./components/types\")."
             },
             {
               "kind": "Reference",
-              "text": "MeshColliderSchema",
-              "canonicalReference": "@dcl/ecs!MeshColliderSchema:var"
-            },
-            {
-              "kind": "Content",
-              "text": ">"
+              "text": "MeshColliderComponentDefinitionExtended",
+              "canonicalReference": "@dcl/ecs!MeshColliderComponentDefinitionExtended:interface"
             }
           ],
-          "fileUrlPath": "dist/components/generated/global.gen.d.ts",
+          "fileUrlPath": "dist/index.d.ts",
           "isReadonly": true,
           "releaseTag": "Public",
           "name": "MeshCollider",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 5
+            "endIndex": 3
           }
         },
         {
@@ -5557,38 +5530,29 @@
         {
           "kind": "Variable",
           "canonicalReference": "@dcl/ecs!MeshRenderer:var",
-          "docComment": "/**\n * @public\n */\n",
+          "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
               "text": "MeshRenderer: "
             },
             {
-              "kind": "Reference",
-              "text": "ComponentDefinition",
-              "canonicalReference": "@dcl/ecs!ComponentDefinition:type"
-            },
-            {
               "kind": "Content",
-              "text": "<typeof "
+              "text": "import(\"./components/types\")."
             },
             {
               "kind": "Reference",
-              "text": "MeshRendererSchema",
-              "canonicalReference": "@dcl/ecs!MeshRendererSchema:var"
-            },
-            {
-              "kind": "Content",
-              "text": ">"
+              "text": "MeshRendererComponentDefinitionExtended",
+              "canonicalReference": "@dcl/ecs!MeshRendererComponentDefinitionExtended:interface"
             }
           ],
-          "fileUrlPath": "dist/components/generated/global.gen.d.ts",
+          "fileUrlPath": "dist/index.d.ts",
           "isReadonly": true,
           "releaseTag": "Public",
           "name": "MeshRenderer",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 5
+            "endIndex": 3
           }
         },
         {
