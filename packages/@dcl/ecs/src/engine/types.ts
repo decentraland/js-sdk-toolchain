@@ -136,6 +136,17 @@ export type IEngine = {
   getComponent<T extends ISchema>(componentId: number): CompDef<T>
 
   /**
+   * Get the component definition from the component id.
+   * @param componentId - component number used to identify the component descriptor
+   * @returns the component definition or null if its not founded
+   * ```ts
+   * const StateComponentId = 10023
+   * const StateComponent = engine.getComponent(StateComponentId)
+   * ```
+   */
+  getComponentOrNull<T extends ISchema>(componentId: number): CompDef<T> | null
+
+  /**
    * Get a iterator of entities that has all the component requested.
    * @param components - a list of component definitions
    * @returns An iterator of an array with the [entity, component1, component2, ...]

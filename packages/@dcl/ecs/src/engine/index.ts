@@ -112,6 +112,12 @@ function preEngine() {
     return component
   }
 
+  function getComponentOrNull<T extends ISchema<V>, V>(
+    componentId: number
+  ): ComponentDefinition<T, V> | null {
+    return componentsDefinition.get(componentId) ?? null
+  }
+
   function* getEntitiesWith<
     T extends [
       ComponentDefinition<any, any>,
@@ -166,6 +172,7 @@ function preEngine() {
     defineComponentFromSchema,
     getEntitiesWith,
     getComponent,
+    getComponentOrNull,
     removeComponentDefinition
   }
 }
@@ -249,6 +256,7 @@ export function Engine(): IEngine {
     defineComponentFromSchema: engine.defineComponentFromSchema,
     getEntitiesWith: engine.getEntitiesWith,
     getComponent: engine.getComponent,
+    getComponentOrNull: engine.getComponentOrNull,
     removeComponentDefinition: engine.removeComponentDefinition,
     update,
     RootEntity: 0 as Entity,

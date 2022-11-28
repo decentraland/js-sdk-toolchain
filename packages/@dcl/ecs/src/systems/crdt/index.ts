@@ -7,7 +7,7 @@ import { ComponentOperation as Message } from '../../serialization/crdt/componen
 import WireMessage from '../../serialization/wireMessage'
 import { ReceiveMessage, TransportMessage, Transport } from './types'
 
-export function crdtSceneSystem(engine: Pick<IEngine, 'getComponent'>) {
+export function crdtSceneSystem(engine: Pick<IEngine, 'getComponentOrNull'>) {
   const transports: Transport[] = []
 
   // CRDT Client
@@ -81,9 +81,9 @@ export function crdtSceneSystem(engine: Pick<IEngine, 'getComponent'>) {
           data: data || null,
           timestamp: timestamp
         }
-        const component = engine.getComponent(componentId)
+        const component = engine.getComponentOrNull(componentId)
         const current = crdtClient.processMessage(crdtMessage)
-
+        if (!component) continue
         // CRDT outdated message. Resend this message through the wire
         if (crdtMessage !== current) {
           const type = component.has(entity)
@@ -126,7 +126,8 @@ export function crdtSceneSystem(engine: Pick<IEngine, 'getComponent'>) {
 
     for (const [entity, componentsId] of dirtyMap) {
       for (const componentId of componentsId) {
-        const component = engine.getComponent(componentId)
+        const component = engine.getComponentOrNull(componentId)
+        if (!component) continue
         const entityComponent = component.has(entity)
           ? component.toBinary(entity).toBinary()
           : null
