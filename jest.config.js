@@ -12,10 +12,10 @@ module.exports = {
   coverageDirectory: "coverage",
   coverageThreshold: {
     global: {
-        branches: 100,
-        functions: 100,
-        lines: 100,
-        statements: 100,
+      branches: 100,
+      functions: 100,
+      lines: 100,
+      statements: 100,
     },
     "packages/@dcl/ecs/src/components/generated/pb": {
       branches: 70,
@@ -23,7 +23,7 @@ module.exports = {
       lines: 70,
       statements: 70
     },
-    "packages/@dcl/ecs/src/runtime/temp-fp": {
+    "packages/@dcl/sdk/src/temp-fp": {
       branches: 10,
       functions: 10,
       lines: 10,
@@ -32,7 +32,8 @@ module.exports = {
   },
   coveragePathIgnorePatterns: [
     "scripts",
-    "test"
+    "test",
+    "(.)\\.(js)$",
   ],
   verbose: true,
   testMatch: ["**/*.spec.(ts|tsx)"],

@@ -651,4 +651,33 @@ describe('Engine tests', () => {
     expect(MeshCollider.getOrNull(e_A)).toBeNull()
     expect(MeshCollider.getOrNull(e_recursive)).toBeNull()
   })
+
+  it('should throw an error if the system is a thenable', () => {
+    const engine = Engine()
+    engine.addSystem(async function () {
+      return new Promise((resolve) => setTimeout(resolve, 0))
+    })
+
+    const previousDebugMode = (globalThis as any).DEBUG
+    ;(globalThis as any).DEBUG = true
+    expect(() => {
+      engine.update(1)
+    }).toThrowError()
+
+    if (previousDebugMode) {
+      ;(globalThis as any).DEBUG = previousDebugMode
+    } else {
+      delete (globalThis as any).DEBUG
+    }
+  })
+
+  it('should throw an error if the system is added twice', () => {
+    const engine = Engine()
+    function testSystem() {}
+    engine.addSystem(testSystem)
+
+    expect(() => {
+      engine.addSystem(testSystem)
+    }).toThrowError()
+  })
 })

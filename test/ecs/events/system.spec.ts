@@ -258,4 +258,41 @@ describe('Events System', () => {
     engine.update(1)
     expect(counter).toBe(1)
   })
+
+  it('should throw error with a callback thenable', () => {
+    const entity = engine.addEntity()
+    let counter = 0
+    EventsSystem.onPointerUp(entity, async function () {
+      counter += 1
+      return new Promise((resolve) => setTimeout(resolve, 0))
+    })
+    fakePointer(entity, PointerEventType.PET_UP)
+
+    const previousDebugMode = (globalThis as any).DEBUG
+    ;(globalThis as any).DEBUG = true
+    expect(() => {
+      engine.update(1)
+    }).toThrowError()
+
+    if (previousDebugMode) {
+      ;(globalThis as any).DEBUG = previousDebugMode
+    } else {
+      delete (globalThis as any).DEBUG
+    }
+
+    expect(counter).toBe(1)
+  })
+
+  it(`should ignore removing hover feedback`, () => {
+    const entity = engine.addEntity()
+    EventsSystem.onPointerUp(entity, function () {}, {
+      hoverText: 'test',
+      button: InputAction.IA_ACTION_3
+    })
+
+    const PointerHoverFeedback = components.PointerHoverFeedback(engine)
+    PointerHoverFeedback.deleteFrom(entity)
+
+    EventsSystem.removeOnPointerUp(entity)
+  })
 })

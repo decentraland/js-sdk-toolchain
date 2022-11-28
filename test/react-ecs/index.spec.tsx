@@ -1,9 +1,16 @@
-import { Engine, IEngine, Entity, components, createPointerEventSystem, createInputSystem } from '../../packages/@dcl/ecs/src'
+import {
+  Engine,
+  IEngine,
+  Entity,
+  components,
+  createPointerEventSystem,
+  createInputSystem
+} from '../../packages/@dcl/ecs/src'
 import {
   UiEntity,
   ReactEcs,
   ReactBasedUiSystem,
-  createReactBasedUiSystem,
+  createReactBasedUiSystem
 } from '../../packages/@dcl/react-ecs/src'
 
 describe('Render UI System', () => {
@@ -12,7 +19,10 @@ describe('Render UI System', () => {
 
   beforeEach(() => {
     engine = Engine()
-    uiRenderer = createReactBasedUiSystem(engine as any, createPointerEventSystem(engine, createInputSystem(engine)) as any)
+    uiRenderer = createReactBasedUiSystem(
+      engine as any,
+      createPointerEventSystem(engine, createInputSystem(engine)) as any
+    )
   })
 
   it('should remove the ui and the entities', () => {

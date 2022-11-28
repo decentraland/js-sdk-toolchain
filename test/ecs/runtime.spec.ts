@@ -10,7 +10,8 @@ import {
   onRealmChangedObservable,
   onSceneReadyObservable,
   onVideoEvent,
-  pollEvents
+  pollEvents,
+  setSubscribeFunction
 } from '../../packages/@dcl/sdk/src/observables'
 import { createRendererTransport } from '../../packages/@dcl/sdk/src/transports/rendererTransport'
 import { SendBatchResponse } from '~system/EngineApi'
@@ -75,6 +76,12 @@ describe('Observable tests', () => {
     onPlayerDisconnectedObservable.add(() => {
       counter.onPlayerDisconnectedObservable++
     })
+
+    let counterSubscribe = 0
+    setSubscribeFunction(async () => {
+      counterSubscribe++
+    })
+
     onRealmChangedObservable.add(() => {
       counter.onRealmChangedObservable++
     })
@@ -98,5 +105,6 @@ describe('Observable tests', () => {
     expect(counter.onPlayerDisconnectedObservable).toBe(1)
     expect(counter.onRealmChangedObservable).toBe(1)
     expect(counter.onPlayerClickedObservable).toBe(1)
+    expect(counterSubscribe).toBe(2)
   })
 })
