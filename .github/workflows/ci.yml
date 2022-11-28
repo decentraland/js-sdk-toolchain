@@ -182,7 +182,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: publish @dcl/playground-assets package
         uses: menduz/oddish-action@master
-        id: publish_decentraland_ecs
+        id: publish_playground_assets
         with:
           registry-url: 'https://registry.npmjs.org'
           access: public
