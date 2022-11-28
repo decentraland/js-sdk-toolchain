@@ -6,8 +6,6 @@ import terser from '@rollup/plugin-terser'
 import analyze from 'rollup-plugin-analyzer'
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
-import { apiExtractorConfig } from './api-extractor'
-import { apiExtractor } from 'rollup-plugin-api-extractor'
 
 export function createEcsConfig(options: { PROD: boolean }): RollupOptions {
   const packageJsonPath = sys.resolvePath('./package.json')
@@ -20,7 +18,7 @@ export function createEcsConfig(options: { PROD: boolean }): RollupOptions {
   const out = packageJson.main.replace(/\.js$/, '.bundled.js')
 
   return {
-    input: 'src/index-bundle.ts',
+    input: 'src/index.ts',
     context: 'self',
     output: [
       {
@@ -46,13 +44,6 @@ export function createEcsConfig(options: { PROD: boolean }): RollupOptions {
       commonjs({
         strictRequires: true
       }),
-      false &&
-        apiExtractor({
-          configFile: './api-extractor.json',
-          configuration: apiExtractorConfig(packageJsonPath),
-          local: !options.PROD,
-          cleanUpRollup: false
-        }),
       false &&
         analyze({
           hideDeps: true,
@@ -100,9 +91,7 @@ export function createSceneConfig(options: { PROD: boolean }): RollupOptions {
           window: 'undefined',
           DEBUG: options.PROD ? 'false' : 'true',
           'globalThis.DEBUG': options.PROD ? 'false' : 'true',
-          'process.env.NODE_ENV': JSON.stringify(
-            options.PROD ? 'production' : 'development'
-          )
+          'process.env.NODE_ENV': JSON.stringify(options.PROD ? 'production' : 'development')
         },
         preventAssignment: true
       }),

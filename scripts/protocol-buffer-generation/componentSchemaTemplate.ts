@@ -5,12 +5,8 @@ import { PB$\{ComponentName\} } from './pb/decentraland/sdk/components/$\{Compon
 /**
  *
  */
-export const COMPONENT_ID = $\{ComponentId\}
-
-/**
- *
- */
-export const $\{ComponentName\}Schema: ISchema<PB$\{ComponentName\}> = {
+export const $\{ComponentName\}Schema: ISchema<PB$\{ComponentName\}> & { COMPONENT_ID: number } = {
+  COMPONENT_ID: $\{ComponentId\},
   serialize(value: PB$\{ComponentName\}, builder: ByteBuffer): void {
     const writer = PB$\{ComponentName\}.encode(value)
     const buffer = new Uint8Array(writer.finish(), 0, writer.len)

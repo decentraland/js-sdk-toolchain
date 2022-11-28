@@ -13,6 +13,7 @@ export * from './systems/async-task'
 
 export * from './engine/entity'
 
+export * from './components/types'
 import * as components from './components'
 export { components }
 

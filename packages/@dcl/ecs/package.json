@@ -6,7 +6,8 @@
   "typings": "./dist/index.d.ts",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "build-bundle": "./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/ecs.config.js && ./../dcl-rollup/node_modules/.bin/api-extractor run -v"
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
     "@dcl/protocol": "^1.0.0-3524279049.commit-02b9080"
   },
   "files": [
-    "dist"
+    "dist",
+    "etc"
   ]
 }
