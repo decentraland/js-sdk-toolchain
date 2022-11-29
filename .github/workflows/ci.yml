@@ -57,6 +57,12 @@ jobs:
           cwd: packages/@dcl/ecs
           deterministic-snapshot: true
           only-update-versions: true
+      - name: update version of packages/@dcl/react-ecs
+        uses: menduz/oddish-action@master
+        with:
+          cwd: packages/@dcl/react-ecs
+          deterministic-snapshot: true
+          only-update-versions: true
       - name: update version of packages/@dcl/sdk
         uses: menduz/oddish-action@master
         with:
