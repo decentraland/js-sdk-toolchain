@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2020",
-    "module": "CommonJS",
+    "module": "esnext",
     "moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
@@ -15,10 +15,6 @@
     "outDir": "dist",
     "types": []
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "dist"
-  ]
+  "include": ["src"],
+  "exclude": ["dist"]
 }
