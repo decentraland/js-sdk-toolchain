@@ -6,6 +6,7 @@
   "typings": "./dist/index.d.ts",
   "types": "./dist/index.d.ts",
   "scripts": {
+    "build-as-scene": "./../dcl-rollup/index.js",
     "build": "./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/ecs.config.js && ./../dcl-rollup/node_modules/.bin/api-extractor run",
     "build-local": "./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/ecs.config.js && ./../dcl-rollup/node_modules/.bin/api-extractor run --local --verbose --diagnostics"
   },

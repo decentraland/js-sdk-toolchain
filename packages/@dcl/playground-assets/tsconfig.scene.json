@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "strict": true
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+    "extends": "./../sdk/types/tsconfig.ecs7.json",
+    "exclude": [
+        "dist"
+    ]
+}
