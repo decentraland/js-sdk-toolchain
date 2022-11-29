@@ -2,10 +2,10 @@ import {
   Engine,
   IEngine,
   Entity,
-  components,
   createPointerEventSystem,
   createInputSystem
-} from '../../packages/@dcl/ecs/src'
+} from '../../packages/@dcl/ecs'
+import { components, IEngine as IIEngine } from '../../packages/@dcl/ecs/src'
 import {
   UiEntity,
   ReactEcs,
@@ -20,14 +20,14 @@ describe('Render UI System', () => {
   beforeEach(() => {
     engine = Engine()
     uiRenderer = createReactBasedUiSystem(
-      engine as any,
-      createPointerEventSystem(engine, createInputSystem(engine)) as any
+      engine,
+      createPointerEventSystem(engine, createInputSystem(engine))
     )
   })
 
   it('should remove the ui and the entities', () => {
     const ui = () => <UiEntity uiTransform={{ width: 1 }} />
-    const UiTransform = components.UiTransform(engine)
+    const UiTransform = components.UiTransform(engine as IIEngine)
     const entityIndex = engine.addEntity() as number
     const getUiTransform = (entity: Entity) => UiTransform.getOrNull(entity)
     const divEntity = (entityIndex + 1) as Entity

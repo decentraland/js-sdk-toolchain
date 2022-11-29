@@ -22,6 +22,8 @@ describe('UiBackground React Ecs', () => {
 
     expect(isEqual({ a: { b: { c: 1 } } }, { a: { b: { c: 2 } } })).toBe(false)
     expect(isEqual({ a: { b: { c: 1 } } }, { a: { b: { c: 1 } } })).toBe(true)
-    expect(isEqual(1, '1' as any)).toBe(false)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    expect(isEqual(1, '1')).toBe(false)
   })
 })

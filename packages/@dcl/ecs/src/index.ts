@@ -30,3 +30,8 @@ import { engine } from './runtime/initialization'
 export * from './components/generated/global.gen'
 
 export * from './components/generated/types.gen'
+
+declare global {
+  // eslint-disable-next-line no-var
+  var DEBUG: boolean | undefined
+}

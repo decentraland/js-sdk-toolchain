@@ -531,7 +531,6 @@ describe('Engine tests', () => {
   })
 
   it('should log the error of cyclic parenting', () => {
-    const originalDcl = (globalThis as any).dcl
     const errorFunc = jest.spyOn(console, 'error')
     const errorString = (e: Entity) =>
       'There is a cyclic parent with entity ' + e
@@ -563,7 +562,6 @@ describe('Engine tests', () => {
     expect(errorFunc.mock.calls.length).toBe(2)
     expect(errorFunc).toBeCalledTimes(2)
     expect(errorFunc).toBeCalledWith(errorString(e0))
-    ;(globalThis as any).dcl = originalDcl
   })
 
   it('should remove all children of a tree', () => {
@@ -658,17 +656,16 @@ describe('Engine tests', () => {
     engine.addSystem(async function () {
       return new Promise((resolve) => setTimeout(resolve, 0))
     })
-
-    const previousDebugMode = (globalThis as any).DEBUG
-    ;(globalThis as any).DEBUG = true
+    const previousDebugMode = globalThis.DEBUG
+    globalThis.DEBUG = true
     expect(() => {
       engine.update(1)
     }).toThrowError()
 
     if (previousDebugMode) {
-      ;(globalThis as any).DEBUG = previousDebugMode
+      globalThis.DEBUG = previousDebugMode
     } else {
-      delete (globalThis as any).DEBUG
+      delete globalThis.DEBUG
     }
   })
 

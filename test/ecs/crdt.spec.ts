@@ -119,7 +119,7 @@ describe('CRDT tests', () => {
     const TransformA = components.Transform(clientA.engine)
     const DoorComponent = clientA.components.Door
     // Upate Transform from static entity
-    const entity = ((clientA.engine.addEntity() as any) - 1) as Entity
+    const entity = ((clientA.engine.addEntity() as number) - 1) as Entity
     TransformA.getMutable(entity).position.x = 10
 
     // Create a dynamic entity

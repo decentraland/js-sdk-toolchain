@@ -163,17 +163,17 @@ describe('Generated Material ProtoBuf', () => {
     Material.updateFromBinary(entityB, buffer)
 
     const m = Material.getMutable(entityB)
-    expect(_material).toBeDeepCloseTo(m as any)
+    expect(_material).toEqual(m)
 
-    expect(Material.createOrReplace(entityB)).not.toBeDeepCloseTo({
+    expect(Material.createOrReplace(entityB)).not.toEqual({
       ...Material.getMutable(entity)
-    } as any)
+    })
 
     const bufferC = Material.toBinary(entityC)
     Material.updateFromBinary(entityD, bufferC)
 
     const mD = Material.getMutable(entityD)
-    expect(materialC).toBeDeepCloseTo(mD as any)
+    expect(materialC).toEqual(mD)
   })
 
   it('should test all helper cases', () => {

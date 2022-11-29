@@ -12,6 +12,7 @@ import {
   Type
 } from './types'
 
+// as any HACK so every time we add a new component, we must add also the component here.
 const entityComponent: EntityComponents = {
   uiText: undefined as any,
   uiBackground: undefined as any,
