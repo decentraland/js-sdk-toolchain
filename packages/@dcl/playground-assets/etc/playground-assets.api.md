@@ -615,6 +615,7 @@ export type IEngine = {
     defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>;
     defineComponentFromSchema<T extends ISchema<ConstructorType>, ConstructorType>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
+    getComponentOrNull<T extends ISchema>(componentId: number): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     update(deltaTime: number): void;
     readonly RootEntity: Entity;
