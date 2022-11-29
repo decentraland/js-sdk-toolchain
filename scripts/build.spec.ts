@@ -179,8 +179,18 @@ flow('build-all', () => {
 
         snippetInfo.push(info)
 
+        // TODO: remove this when the `import` works in the playground
+        const importSectionMsg = '// import-section-end'
+        const importSectionIndex = fileContent.search(importSectionMsg)
+
+        if (importSectionIndex === -1) {
+          throw new Error(`The snippet ${info.name} has no import-section-end`)
+        }
+
         // Remove the unnecesary 'export {}', the only purposes of this is to compile all files in one step and test it
-        const finalContent = fileContent.replace('export {}', '')
+        const finalContent = fileContent
+          .substring(importSectionIndex + importSectionMsg.length)
+          .replace('export {}', '')
 
         const distPlaygroundPath = path.resolve(distSnippetsPath, fileName)
         writeFileSync(distPlaygroundPath, finalContent)

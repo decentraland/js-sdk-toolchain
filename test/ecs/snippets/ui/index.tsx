@@ -15,6 +15,8 @@ import {
 import { Vector3, Color4, Quaternion } from '@dcl/sdk/math'
 import ReactEcs, { UiEntity, ReactEcsRenderer } from '@dcl/sdk/react-ecs'
 
+// import-section-end
+
 let counter = 0
 
 export const uiComponent = () => (
