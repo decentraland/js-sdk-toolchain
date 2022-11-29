@@ -1,5 +1,9 @@
 type K = unknown | Promise<unknown>
 
+declare let globalThis: {
+  DEBUG: boolean
+}
+
 export function checkNotThenable<T extends K>(t: T, error: string): T {
   if (globalThis.DEBUG) {
     if (
