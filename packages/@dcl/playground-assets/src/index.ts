@@ -1,4 +1,4 @@
-export * from '@dcl/ecs-math'
+export * from '@dcl/sdk/math'
 export * from '@dcl/sdk/ecs'
 export * from '@dcl/sdk/react-ecs'
 

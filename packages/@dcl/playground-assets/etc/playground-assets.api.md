@@ -6,11 +6,6 @@
 
 import _m0 from 'protobufjs/minimal';
 
-// Warning: (ae-missing-release-tag) "algo" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const algo = "aaaaaaaaaaaaaaaaaaaaaa";
-
 // Warning: (ae-missing-release-tag) "Animator" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -765,6 +760,143 @@ export const enum MaterialTransparencyMode {
     MTM_AUTO = 4,
     // (undocumented)
     MTM_OPAQUE = 0
+}
+
+// @public
+export namespace Matrix {
+    export function add(self: ReadonlyMatrix, other: ReadonlyMatrix): MutableMatrix;
+    export function addAtIndex(self: MutableMatrix, index: number, value: number): void;
+    export function addToRef(self: ReadonlyMatrix, other: ReadonlyMatrix, result: MutableMatrix): void;
+    export function addToSelf(self: MutableMatrix, other: ReadonlyMatrix): void;
+    export function asArray(self: ReadonlyMatrix): Matrix4x4;
+    export function clone(self: ReadonlyMatrix): MutableMatrix;
+    export function compose(scale: Vector3.ReadonlyVector3, rotation: Quaternion.ReadonlyQuaternion, translation: Vector3.ReadonlyVector3): MutableMatrix;
+    export function composeToRef(scale: Vector3.ReadonlyVector3, rotation: Quaternion.ReadonlyQuaternion, translation: Vector3.ReadonlyVector3, result: MutableMatrix): void;
+    export function copy(from: ReadonlyMatrix, dest: MutableMatrix): void;
+    export function copyToArray(self: ReadonlyMatrix, arrayDest: FloatArray, offsetDest?: number): void;
+    export function create(): MutableMatrix;
+    export function decompose(self: ReadonlyMatrix, scale?: Vector3.MutableVector3, rotation?: Quaternion.MutableQuaternion, translation?: Vector3.MutableVector3): boolean;
+    export function decomposeLerp(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number): MutableMatrix;
+    export function decomposeLerpToRef(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number, result: MutableMatrix): void;
+    export function determinant(self: ReadonlyMatrix): number;
+    export function equals(self: ReadonlyMatrix, value: ReadonlyMatrix): boolean;
+    export function fromArray(array: Matrix4x4, offset?: number): MutableMatrix;
+    export function fromArrayToRef(array: Matrix4x4, offset: number, result: MutableMatrix): void;
+    export function fromFloatArrayToRefScaled(array: FloatArray, offset: number, scale: number, result: MutableMatrix): void;
+    export function fromQuaternionToRef(quat: Quaternion.ReadonlyQuaternion, result: MutableMatrix): void;
+    export function fromValues(initialM11: number, initialM12: number, initialM13: number, initialM14: number, initialM21: number, initialM22: number, initialM23: number, initialM24: number, initialM31: number, initialM32: number, initialM33: number, initialM34: number, initialM41: number, initialM42: number, initialM43: number, initialM44: number): MutableMatrix;
+    export function fromValuesToRef(initialM11: number, initialM12: number, initialM13: number, initialM14: number, initialM21: number, initialM22: number, initialM23: number, initialM24: number, initialM31: number, initialM32: number, initialM33: number, initialM34: number, initialM41: number, initialM42: number, initialM43: number, initialM44: number, result: MutableMatrix): void;
+    export function fromXYZAxesToRef(xaxis: Vector3.ReadonlyVector3, yaxis: Vector3.ReadonlyVector3, zaxis: Vector3.ReadonlyVector3, result: MutableMatrix): void;
+    export function GetAsMatrix2x2(matrix: ReadonlyMatrix): FloatArray;
+    export function GetAsMatrix3x3(matrix: ReadonlyMatrix): FloatArray;
+    export function getHashCode(self: ReadonlyMatrix): number;
+    export function getRotationMatrix(self: ReadonlyMatrix): MutableMatrix;
+    export function getRotationMatrixToRef(self: ReadonlyMatrix, result: MutableMatrix): void;
+    export function getTranslation(self: MutableMatrix): Vector3.MutableVector3;
+    export function getTranslationToRef(self: MutableMatrix, result: Vector3.MutableVector3): void;
+    export function Identity(): MutableMatrix;
+    export function IdentityReadonly(): ReadonlyMatrix;
+    export function IdentityToRef(result: MutableMatrix): void;
+    export function invert(source: ReadonlyMatrix): MutableMatrix;
+    export function invertToRef(source: ReadonlyMatrix, result: MutableMatrix): void;
+    export function isIdentityAs3x2Update(self: MutableMatrix): boolean;
+    export function isIdentityUpdate(self: MutableMatrix): boolean;
+    export function lerp(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number): MutableMatrix;
+    export function lerpToRef(startValue: ReadonlyMatrix, endValue: ReadonlyMatrix, gradient: number, result: MutableMatrix): void;
+    export function LookAtLH(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3): MutableMatrix;
+    export function lookAtLHToRef(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3, result: MutableMatrix): void;
+    export function lookAtRH(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3): MutableMatrix;
+    export function lookAtRHToRef(eye: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, up: Vector3.ReadonlyVector3, result: MutableMatrix): void;
+    export function m(self: MutableMatrix): Matrix4x4;
+    // (undocumented)
+    export type Matrix4x4 = [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+    ];
+    export function multiply(self: MutableMatrix, other: ReadonlyMatrix): MutableMatrix;
+    export function multiplyAtIndex(self: MutableMatrix, index: number, value: number): MutableMatrix;
+    export function multiplyToArray(self: ReadonlyMatrix, other: ReadonlyMatrix, result: FloatArray, offset: number): void;
+    export function multiplyToRef(self: ReadonlyMatrix, other: ReadonlyMatrix, result: MutableMatrix): void;
+    // (undocumented)
+    export type MutableMatrix = {
+        updateFlag: number;
+        isIdentity: boolean;
+        isIdentity3x2: boolean;
+        _isIdentityDirty: boolean;
+        _isIdentity3x2Dirty: boolean;
+        _m: Matrix4x4;
+    };
+    export function normalMatrixToRef(self: ReadonlyMatrix, ref: MutableMatrix): void;
+    export function orthoLH(width: number, height: number, znear: number, zfar: number): MutableMatrix;
+    export function orthoLHToRef(width: number, height: number, znear: number, zfar: number, result: MutableMatrix): void;
+    export function OrthoOffCenterLH(left: number, right: number, bottom: number, top: number, znear: number, zfar: number): MutableMatrix;
+    export function orthoOffCenterLHToRef(left: number, right: number, bottom: number, top: number, znear: number, zfar: number, result: MutableMatrix): void;
+    export function orthoOffCenterRH(left: number, right: number, bottom: number, top: number, znear: number, zfar: number): MutableMatrix;
+    export function orthoOffCenterRHToRef(left: number, right: number, bottom: number, top: number, znear: number, zfar: number, result: MutableMatrix): void;
+    export function perspectiveFovLH(fov: number, aspect: number, znear: number, zfar: number): MutableMatrix;
+    export function perspectiveFovLHToRef(fov: number, aspect: number, znear: number, zfar: number, result: MutableMatrix, isVerticalFovFixed?: boolean): void;
+    export function PerspectiveFovRH(fov: number, aspect: number, znear: number, zfar: number): MutableMatrix;
+    export function perspectiveFovRHToRef(fov: number, aspect: number, znear: number, zfar: number, result: MutableMatrix, isVerticalFovFixed?: boolean): void;
+    export function perspectiveFovWebVRToRef(fov: {
+        upDegrees: number;
+        downDegrees: number;
+        leftDegrees: number;
+        rightDegrees: number;
+    }, znear: number, zfar: number, result: MutableMatrix, rightHanded?: boolean): void;
+    export function perspectiveLH(width: number, height: number, znear: number, zfar: number): MutableMatrix;
+    // (undocumented)
+    export type ReadonlyMatrix = {
+        readonly updateFlag: number;
+        readonly isIdentity: boolean;
+        readonly isIdentity3x2: boolean;
+        readonly _isIdentityDirty: boolean;
+        readonly _isIdentity3x2Dirty: boolean;
+        readonly _m: Matrix4x4;
+    };
+    export function reflection(plane: Plane.ReadonlyPlane): MutableMatrix;
+    export function reflectionToRef(_plane: Plane.ReadonlyPlane, result: MutableMatrix): void;
+    export function removeRotationAndScaling(self: MutableMatrix): MutableMatrix;
+    export function reset(self: MutableMatrix): void;
+    export function rotationAxis(axis: Vector3.ReadonlyVector3, angle: number): MutableMatrix;
+    export function rotationAxisToRef(_axis: Vector3.ReadonlyVector3, angle: number, result: MutableMatrix): void;
+    export function RotationX(angle: number): MutableMatrix;
+    export function rotationXToRef(angle: number, result: MutableMatrix): void;
+    export function rotationY(angle: number): MutableMatrix;
+    export function rotationYawPitchRoll(yaw: number, pitch: number, roll: number): MutableMatrix;
+    export function rotationYawPitchRollToRef(yaw: number, pitch: number, roll: number, result: MutableMatrix): void;
+    export function rotationYToRef(angle: number, result: MutableMatrix): void;
+    export function rotationZ(angle: number): MutableMatrix;
+    export function rotationZToRef(angle: number, result: MutableMatrix): void;
+    export function scale(self: ReadonlyMatrix, scale: number): MutableMatrix;
+    export function scaleAndAddToRef(self: ReadonlyMatrix, scale: number, result: MutableMatrix): void;
+    export function scaleToRef(self: ReadonlyMatrix, scale: number, result: MutableMatrix): void;
+    export function scaling(x: number, y: number, z: number): MutableMatrix;
+    export function scalingToRef(x: number, y: number, z: number, result: MutableMatrix): void;
+    export function setRowFromFloats(self: MutableMatrix, index: number, x: number, y: number, z: number, w: number): void;
+    export function setTranslation(self: MutableMatrix, vector3: Vector3.ReadonlyVector3): void;
+    export function setTranslationFromFloats(self: MutableMatrix, x: number, y: number, z: number): void;
+    export function toArray(self: ReadonlyMatrix): Matrix4x4;
+    export function toggleModelMatrixHandInPlace(self: MutableMatrix): void;
+    export function toggleProjectionMatrixHandInPlace(self: MutableMatrix): void;
+    export function translation(x: number, y: number, z: number): MutableMatrix;
+    export function translationToRef(x: number, y: number, z: number, result: MutableMatrix): void;
+    export function transpose(matrix: ReadonlyMatrix): MutableMatrix;
+    export function transposeToRef(matrix: ReadonlyMatrix, result: MutableMatrix): void;
+    export function Zero(): MutableMatrix;
 }
 
 // Warning: (ae-missing-release-tag) "MeshCollider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -1761,6 +1893,40 @@ export const PBVisibilityComponent: {
     decode(input: _m0.Reader | Uint8Array, length?: number): PBVisibilityComponent;
 };
 
+// @public
+export namespace Plane {
+    // (undocumented)
+    export function asArray(plane: ReadonlyPlane): number[];
+    // (undocumented)
+    export function clone(plane: ReadonlyPlane): MutablePlane;
+    export function copyFromPoints(point1: Vector3.ReadonlyVector3, point2: Vector3.ReadonlyVector3, point3: Vector3.ReadonlyVector3): MutablePlane;
+    export function create(a: number, b: number, c: number, d: number): {
+        normal: Vector3.MutableVector3;
+        d: number;
+    };
+    export function dotCoordinate(plane: ReadonlyPlane, point: Vector3.ReadonlyVector3): number;
+    export function fromArray(array: number[]): MutablePlane;
+    export function fromPoints(_point1: Vector3.ReadonlyVector3, _point2: Vector3.ReadonlyVector3, _point3: Vector3.ReadonlyVector3): MutablePlane;
+    // (undocumented)
+    export function getHashCode(_plane: ReadonlyPlane): number;
+    export function isFrontFacingTo(plane: ReadonlyPlane, direction: Vector3.ReadonlyVector3, epsilon: number): boolean;
+    // (undocumented)
+    export type MutablePlane = {
+        normal: Vector3.MutableVector3;
+        d: number;
+    };
+    export function normalize(plane: ReadonlyPlane): MutablePlane;
+    // (undocumented)
+    export type ReadonlyPlane = {
+        normal: Vector3.ReadonlyVector3;
+        d: number;
+    };
+    export function romPositionAndNormal(origin: Vector3.ReadonlyVector3, normal: Vector3.ReadonlyVector3): MutablePlane;
+    export function signedDistanceTo(plane: ReadonlyPlane, point: Vector3.ReadonlyVector3): number;
+    export function signedDistanceToPlaneFromPositionAndNormal(origin: Vector3.ReadonlyVector3, normal: Vector3.ReadonlyVector3, point: Vector3.ReadonlyVector3): number;
+    export function transform(plane: ReadonlyPlane, transformation: Matrix.ReadonlyMatrix): MutablePlane;
+}
+
 // @public (undocumented)
 export const PointerEventsResult: ComponentDefinition<typeof PointerEventsResultSchema>;
 
@@ -1849,13 +2015,12 @@ export namespace Quaternion {
     w?: number): MutableQuaternion;
     export function dot(left: ReadonlyQuaternion, right: ReadonlyQuaternion): number;
     // (undocumented)
-    export function fromAngleAxis(degress: number, axis: Vector3.ReadonlyVector3): MutableQuaternion;
+    export function fromAngleAxis(degrees: number, axis: Vector3.ReadonlyVector3): MutableQuaternion;
     export function fromAxisToRotationQuaternion(axis1: Vector3.ReadonlyVector3, axis2: Vector3.ReadonlyVector3, axis3: Vector3.ReadonlyVector3): MutableQuaternion;
     export function fromAxisToRotationQuaternionToRef(axis1: Vector3.ReadonlyVector3, axis2: Vector3.ReadonlyVector3, axis3: Vector3.ReadonlyVector3, ref: MutableQuaternion): void;
-    export function fromEulerDegress(x: number, y: number, z: number): MutableQuaternion;
+    export function fromEulerDegrees(x: number, y: number, z: number): MutableQuaternion;
     export function fromLookAt(position: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, worldUp?: Vector3.ReadonlyVector3): MutableQuaternion;
     export function fromLookAtToRef(position: Vector3.ReadonlyVector3, target: Vector3.ReadonlyVector3, worldUp: Vector3.ReadonlyVector3 | undefined, result: MutableQuaternion): void;
-    // Warning: (ae-forgotten-export) The symbol "Matrix" needs to be exported by the entry point index.d.ts
     export function fromRotationMatrixToRef(matrix: Matrix.ReadonlyMatrix, result: Quaternion.MutableQuaternion): void;
     export function fromRotationYawPitchRoll(yaw: number, pitch: number, roll: number): MutableQuaternion;
     export function fromRotationYawPitchRollToRef(yaw: number, pitch: number, roll: number, result: Quaternion.MutableQuaternion): void;
