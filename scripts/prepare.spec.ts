@@ -26,7 +26,10 @@ flow('build-all', () => {
     itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, ECS7_PATH)
     itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, REACT_ECS)
     itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, JS_RUNTIME)
-    itInstallsADependencyFromFolderAndCopiesTheVersion(PLAYGROUND_ASSETS_PATH, SDK_PATH)
+    itInstallsADependencyFromFolderAndCopiesTheVersion(
+      PLAYGROUND_ASSETS_PATH,
+      SDK_PATH
+    )
   })
 
   flow('pack every package', () => {
