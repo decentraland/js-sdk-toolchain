@@ -115,7 +115,11 @@ function preEngine() {
   function getComponentOrNull<T extends ISchema<V>, V>(
     componentId: number
   ): ComponentDefinition<T, V> | null {
-    return componentsDefinition.get(componentId) ?? null
+    return (
+      componentsDefinition.get(componentId) ??
+      /* istanbul ignore next */
+      null
+    )
   }
 
   function* getEntitiesWith<
