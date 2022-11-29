@@ -88,12 +88,12 @@ function preEngine() {
     spec: T,
     componentId: number,
     constructorDefault?: ConstructorType
-  ): ComponentDefinition<ISchema<ConstructorType>> {
+  ): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>> {
     return defineComponentFromSchema(
       Schemas.Map(spec) as ISchema<ConstructorType>,
       componentId,
       constructorDefault
-    )
+    ) as ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>
   }
 
   function getComponent<T extends ISchema<V>, V>(
@@ -247,7 +247,7 @@ export function Engine(): IEngine {
     addSystem: engine.addSystem,
     removeSystem: engine.removeSystem,
     // TODO: fix this type
-    defineComponent: engine.defineComponent as any,
+    defineComponent: engine.defineComponent,
     defineComponentFromSchema: engine.defineComponentFromSchema,
     getEntitiesWith: engine.getEntitiesWith,
     getComponent: engine.getComponent,
