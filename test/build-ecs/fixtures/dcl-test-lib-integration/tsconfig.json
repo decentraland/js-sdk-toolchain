@@ -5,7 +5,7 @@
     "outDir": "bin",
     "declaration": true
   },
-  "extends": "@dcl/sdk/types/tsconfig.ecs7.strict.json",
+  "extends": "@dcl/sdk/types/tsconfig.ecs7.json",
   "compileOnSave": false,
   "exclude": ["./bin"]
 }
