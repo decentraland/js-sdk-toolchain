@@ -2,7 +2,8 @@ import {
   Entity,
   IEngine,
   EventSystemCallback,
-  PointerEventsSystem
+  PointerEventsSystem,
+  InputAction
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
@@ -29,8 +30,6 @@ import {
 } from './types'
 import { componentKeys, isEqual, isNotUndefined, noopConfig } from './utils'
 
-// TODO: export InputAction types.
-const IA_POINTER = 0
 function propsChanged<K extends keyof EntityComponents>(
   component: K,
   prevProps: Partial<EntityComponents[K]>,
@@ -55,7 +54,6 @@ function propsChanged<K extends keyof EntityComponents>(
   }
 
   const changes: Partial<EntityComponents[K]> = {}
-  // TODO: array and object types. For now only primitives
   for (const k in prevProps) {
     const propKey = k as keyof typeof prevProps
     if (!isEqual(prevProps[propKey], nextProps[propKey])) {
@@ -117,7 +115,7 @@ export function createReconciler(
         instance.entity,
         update.props as EventSystemCallback,
         {
-          button: IA_POINTER,
+          button: InputAction.IA_POINTER,
           hoverText: ''
         }
       )

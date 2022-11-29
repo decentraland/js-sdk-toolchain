@@ -43,7 +43,6 @@ describe.skip('Performance.', () => {
         readonlyPosition,
         readonlyTransform
       ] of engine.getEntitiesWith(components.Position, Transform)) {
-        // TODO: see this
         Transform.getMutable(entity).position.x =
           readonlyPosition.x + Math.random() * 10
         components.Position.getMutable(entity).y =

@@ -56,7 +56,7 @@ describe('RectEcs UI ✨', () => {
     engine.update(1)
     expect(getUi(rootEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
-      rightOf: 0, // TODO: undefined
+      rightOf: 0,
       width: 111
     })
     expect(getUi(childEntity)).toMatchObject({
@@ -114,7 +114,7 @@ describe('RectEcs UI ✨', () => {
 
     expect(getUi(rootEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
-      rightOf: 0, // TODO: undefined
+      rightOf: 0,
       width: 111
     })
     expect(getUi(entityA)).toMatchObject({

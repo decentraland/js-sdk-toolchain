@@ -45,7 +45,6 @@ describe('Legacy component tests', () => {
       const groupBoxShape = engine.getEntitiesWith(MeshRenderer)
       for (const [entity, component] of groupBoxShape) {
         const boxShapeData = MeshRenderer.toBinary(entity)
-        // TODO: see this
         const boxShapeOriginal = { ...component }
         const boxShapeReceveid = MeshRenderer.updateFromBinary(
           entity,

@@ -246,7 +246,6 @@ export function Engine(): IEngine {
     removeEntityWithChildren,
     addSystem: engine.addSystem,
     removeSystem: engine.removeSystem,
-    // TODO: fix this type
     defineComponent: engine.defineComponent,
     defineComponentFromSchema: engine.defineComponentFromSchema,
     getEntitiesWith: engine.getEntitiesWith,
