@@ -132,3 +132,62 @@ export function createSceneConfig(options: { PROD: boolean }): RollupOptions {
     ]
   }
 }
+
+export function createPlaygroundEcsConfig(_options: {
+  PROD: boolean
+}): RollupOptions {
+  const packageJsonPath = sys.resolvePath('./package.json')
+  const packageJson = JSON.parse(sys.readFile(packageJsonPath)!)
+
+  console.assert(packageJson.name, 'package.json .name must be present')
+  console.assert(packageJson.main, 'package.json .main must be present')
+  console.assert(packageJson.typings, 'package.json .typings must be present')
+
+  const out = packageJson.main // .replace(/\.js$/, '.bundled.js')
+
+  return {
+    external: [/~system\//],
+    input: 'src/index.ts',
+    context: 'self',
+    output: [
+      {
+        file: out,
+        format: 'iife',
+        name: 'self',
+        extend: true,
+        sourcemap: 'hidden'
+      },
+      {
+        file: out.replace(/\.js$/, '.min.js'),
+        format: 'commonjs',
+        extend: true,
+        sourcemap: 'hidden',
+        compact: true,
+        plugins: [terser({ format: { comments: false } })]
+      }
+    ],
+    plugins: [
+      resolve({
+        preferBuiltins: false,
+        browser: true
+      }),
+      commonjs({
+        strictRequires: true
+      }),
+      false &&
+        analyze({
+          hideDeps: true,
+          summaryOnly: true
+        }),
+      typescript({
+        tsconfig: './tsconfig.json',
+        compilerOptions: {
+          module: 'ESNext',
+          noEmitOnError: true,
+          declarationDir: '.'
+        },
+        typescript: require('typescript')
+      })
+    ]
+  }
+}

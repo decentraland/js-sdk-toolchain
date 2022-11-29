@@ -121,11 +121,9 @@ flow('build-all', () => {
   flow('@dcl/playground-assets build', () => {
     itDeletesFolder('dist', PLAYGROUND_ASSETS_PATH)
     itDeletesFolder('bin', PLAYGROUND_ASSETS_PATH)
-    itDeletesFolder(`rm tsconfig.json`, PLAYGROUND_ASSETS_PATH)
 
     itExecutes(`npm i --silent`, PLAYGROUND_ASSETS_PATH)
 
-    itExecutes(`cp tsconfig.d.json tsconfig.json`, PLAYGROUND_ASSETS_PATH)
     // install required dependencies
     itExecutes(`npm install --silent ${SDK_PATH}`, PLAYGROUND_ASSETS_PATH)
     if (process.env.CI) {
@@ -133,13 +131,6 @@ flow('build-all', () => {
     } else {
       itExecutes('npm run build-local --silent', PLAYGROUND_ASSETS_PATH)
     }
-
-    itExecutes(`rm tsconfig.json`, PLAYGROUND_ASSETS_PATH)
-    itExecutes(`cp tsconfig.scene.json tsconfig.json`, PLAYGROUND_ASSETS_PATH)
-    itExecutes('npm run build-as-scene --silent', PLAYGROUND_ASSETS_PATH)
-
-    // clean
-    itExecutes(`rm tsconfig.json`, PLAYGROUND_ASSETS_PATH)
   })
 
   flow('playground copy files', () => {

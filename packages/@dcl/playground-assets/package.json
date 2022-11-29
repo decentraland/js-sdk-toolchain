@@ -6,9 +6,8 @@
   "typings": "./dist/index.d.ts",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build-as-scene": "./../dcl-rollup/index.js",
-    "build": "./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/ecs.config.js && ./../dcl-rollup/node_modules/.bin/api-extractor run",
-    "build-local": "./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/ecs.config.js && ./../dcl-rollup/node_modules/.bin/api-extractor run --local --verbose --diagnostics"
+    "build": "./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/ecs.config.js && ./../dcl-rollup/node_modules/.bin/api-extractor run && ./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/playground-ecs.config.js",
+    "build-local": "./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/ecs.config.js && ./../dcl-rollup/node_modules/.bin/api-extractor run --local --verbose --diagnostics && ./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/playground-ecs.config.js"
   },
   "keywords": [],
   "tsdoc": {
