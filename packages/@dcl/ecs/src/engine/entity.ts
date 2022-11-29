@@ -44,8 +44,17 @@ function Entity(range: EntityUtils.EntityRange) {
 
   let entityCounter = range[0]
   const usedEntities: Set<Entity> = new Set()
+  const freeList: Entity[] = []
 
   function generateEntity(): Entity {
+    if (freeList.length) {
+      const entity = freeList.pop()!
+      entityCounter++
+
+      usedEntities.add(entity)
+      return entity
+    }
+
     if (entityCounter >= range[1]) {
       throw new Error(
         `It fails trying to generate an entity out of range [${range[0]}, ${range[1]}].`
@@ -60,6 +69,7 @@ function Entity(range: EntityUtils.EntityRange) {
   }
 
   function removeEntity(entity: Entity) {
+    freeList.push(entity)
     return usedEntities.delete(entity)
   }
 
