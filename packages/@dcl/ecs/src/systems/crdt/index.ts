@@ -83,9 +83,9 @@ export function crdtSceneSystem(engine: Pick<IEngine, 'getComponentOrNull'>) {
         }
         const component = engine.getComponentOrNull(componentId)
         const current = crdtClient.processMessage(crdtMessage)
+        /* istanbul ignore next */
         if (!component)
           // TODO: TEST
-          /* istanbul ignore next */
           continue
         // CRDT outdated message. Resend this message through the wire
         if (crdtMessage !== current) {
@@ -130,9 +130,9 @@ export function crdtSceneSystem(engine: Pick<IEngine, 'getComponentOrNull'>) {
     for (const [entity, componentsId] of dirtyMap) {
       for (const componentId of componentsId) {
         const component = engine.getComponentOrNull(componentId)
+        /* istanbul ignore next */
         if (!component)
           // TODO: test coverage
-          /* istanbul ignore next */
           continue
         const entityComponent = component.has(entity)
           ? component.toBinary(entity).toBinary()
