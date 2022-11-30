@@ -17,6 +17,16 @@ describe('Events helpers isTriggered', () => {
     ).toBe(false)
   })
 
+  it('no rootEntity', () => {
+    const engine = Engine()
+    const PointerEventsResult = components.PointerEventsResult(engine)
+    const entity = engine.addEntity()
+    createInputSystem(engine)
+
+    engine.update(1)
+    expect(1).toBe(1)
+  })
+
   it('detect pointerEvent', () => {
     const newEngine = Engine()
     const PointerEventsResult = components.PointerEventsResult(newEngine)
