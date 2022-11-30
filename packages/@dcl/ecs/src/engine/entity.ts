@@ -10,7 +10,11 @@ export function EntityContainer() {
   const dynamicEntity = Entity(EntityUtils.DYNAMIC_ENTITIES_RANGE)
   return {
     generateEntity(dynamic: boolean = false): Entity {
+      /* istanbul ignore next */
       if (dynamic) {
+        // Dynamic entities are not being used, but since we dont know the future of the dynamic entities
+        // I prefer to comment the code instead of removing all the logic
+        /* istanbul ignore next */
         return dynamicEntity.generateEntity()
       } else {
         return staticEntity.generateEntity()

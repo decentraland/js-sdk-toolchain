@@ -39,18 +39,13 @@ function preEngine() {
     return systems.remove(selector)
   }
 
-  function addEntity(dynamic: boolean = false) {
-    // entitiesCompnonent.set(entity, new Set())
-    const entity = entityContainer.generateEntity(dynamic)
+  function addEntity() {
+    const entity = entityContainer.generateEntity()
     return entity
   }
 
   function entityExists(entity: Entity) {
     return entityContainer.entityExists(entity)
-  }
-
-  function addDynamicEntity() {
-    return addEntity(true)
   }
 
   function removeEntity(entity: Entity) {
@@ -167,7 +162,6 @@ function preEngine() {
     entityExists,
     componentsDefinition,
     addEntity,
-    addDynamicEntity,
     removeEntity,
     addSystem,
     getSystems,
@@ -250,7 +244,6 @@ export function Engine(): IEngine {
 
   return {
     addEntity: engine.addEntity,
-    addDynamicEntity: engine.addDynamicEntity,
     removeEntity: engine.removeEntity,
     removeEntityWithChildren,
     addSystem: engine.addSystem,

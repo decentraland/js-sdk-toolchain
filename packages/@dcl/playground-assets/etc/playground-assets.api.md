@@ -606,7 +606,6 @@ export function IArray<T>(type: ISchema<T>): ISchema<Array<T>>;
 // @public (undocumented)
 export type IEngine = {
     addEntity(dynamic?: boolean): Entity;
-    addDynamicEntity(): Entity;
     removeEntity(entity: Entity): void;
     removeEntityWithChildren(firstEntity: Entity): void;
     entityExists(entity: Entity): boolean;
