@@ -7,7 +7,7 @@ describe('Check there is fixed version', () => {
     const packageJsonPath = path.resolve(SDK_PATH, 'package.json')
     const packageJson = readJsonSync(packageJsonPath)
 
-    const shouldBeStartWithFile = [
+    const otherLocalDependencies = [
       '@dcl/dcl-rollup',
       '@dcl/ecs',
       '@dcl/js-runtime',
@@ -20,7 +20,7 @@ describe('Check there is fixed version', () => {
       '@dcl/unity-renderer'
     ]
 
-    const allLibraries = [...shouldBeFixedVersion, ...shouldBeStartWithFile]
+    const allLibraries = [...shouldBeFixedVersion, ...otherLocalDependencies]
     const dependencies = Object.keys(packageJson.dependencies || {})
 
     if (dependencies.length !== allLibraries.length) {
