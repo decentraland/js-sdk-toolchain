@@ -73,7 +73,7 @@ function propsChanged<K extends keyof EntityComponents>(
 export function createReconciler(
   engine: Pick<
     IEngine,
-    'getComponent' | 'addEntity' | 'removeEntity' | 'defineComponentFromSchema'
+    'getComponent' | 'addDynamicEntity' | 'removeEntity' | 'defineComponentFromSchema'
   >,
   pointerEvents: PointerEventsSystem
 ) {
@@ -220,7 +220,7 @@ export function createReconciler(
     ...noopConfig,
 
     createInstance(type: Type, props: Props): Instance {
-      const entity = engine.addEntity()
+      const entity = engine.addDynamicEntity()
       entities.add(entity)
       const instance: Instance = {
         entity,
