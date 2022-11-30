@@ -22,7 +22,7 @@ describe('UiTransform React Ecs', () => {
 
   it('should send empty object if uiTransform is undefined', async () => {
     const UiTransform = components.UiTransform(engine)
-    const entityIndex = engine.addEntity() as number
+    const entityIndex = engine.addDynamicEntity() as number
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
@@ -35,7 +35,7 @@ describe('UiTransform React Ecs', () => {
 
   it('should send 0 if you send an invalid px', async () => {
     const UiTransform = components.UiTransform(engine)
-    const entityIndex = engine.addEntity() as number
+    const entityIndex = engine.addDynamicEntity() as number
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
@@ -53,7 +53,7 @@ describe('UiTransform React Ecs', () => {
 
   it('should send position transform properties', async () => {
     const UiTransform = components.UiTransform(engine)
-    const entityIndex = engine.addEntity() as number
+    const entityIndex = engine.addDynamicEntity() as number
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
@@ -121,7 +121,7 @@ describe('UiTransform React Ecs', () => {
 
   it('should send height & width properties', async () => {
     const UiTransform = components.UiTransform(engine)
-    const entityIndex = engine.addEntity() as number
+    const entityIndex = engine.addDynamicEntity() as number
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity

@@ -15,7 +15,7 @@ describe('Ui Listeners React Ecs', () => {
 
   it('should run onClick if it was fake-clicked', async () => {
     const PointerEventsResult = components.PointerEventsResult(engine)
-    const uiEntity = (engine.addEntity() as number + 1) as Entity
+    const uiEntity = (engine.addDynamicEntity() as number + 1) as Entity
     let fakeCounter = 0
     const fakeClick = () => {
       PointerEventsResult.createOrReplace(engine.RootEntity, {

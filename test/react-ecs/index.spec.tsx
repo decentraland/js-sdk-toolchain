@@ -28,7 +28,7 @@ describe('Render UI System', () => {
   it('should remove the ui and the entities', () => {
     const ui = () => <UiEntity uiTransform={{ width: 1 }} />
     const UiTransform = components.UiTransform(engine)
-    const entityIndex = engine.addEntity() as number
+    const entityIndex = engine.addDynamicEntity() as number
     const getUiTransform = (entity: Entity) => UiTransform.getOrNull(entity)
     const divEntity = (entityIndex + 1) as Entity
 

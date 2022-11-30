@@ -20,7 +20,7 @@ describe('RectEcs UI ✨', () => {
 
   it('should generate a UI and update the width', async () => {
     const UiTransform = components.UiTransform(engine)
-    const entityIndex = engine.addEntity() as any
+    const entityIndex = engine.addDynamicEntity() as any
 
     // Helpers
     const childEntity = (entityIndex + 1) as Entity
@@ -77,7 +77,7 @@ describe('RectEcs UI ✨', () => {
   })
   it('should add a child at the beggining and then remove it', async () => {
     const UiTransform = components.UiTransform(engine)
-    const entityIndex = engine.addEntity() as any
+    const entityIndex = engine.addDynamicEntity() as any
 
     // Helpers
     const rootEntity = (entityIndex + 3) as Entity
@@ -169,7 +169,7 @@ describe('RectEcs UI ✨', () => {
   })
   it('should add a child at the middle and then remove it', async () => {
     const UiTransform = components.UiTransform(engine)
-    const entityIndex = engine.addEntity() as any
+    const entityIndex = engine.addDynamicEntity() as any
 
     // Helpers
     const rootEntity = (entityIndex + 3) as Entity
@@ -256,7 +256,7 @@ describe('RectEcs UI ✨', () => {
   })
   it('should add a child at the end and then remove it', async () => {
     const UiTransform = components.UiTransform(engine)
-    const entityIndex = engine.addEntity() as any
+    const entityIndex = engine.addDynamicEntity() as any
 
     // Helpers
     const rootEntity = (entityIndex + 3) as Entity
@@ -343,7 +343,7 @@ describe('RectEcs UI ✨', () => {
   })
   it('should add a child at the middle with multiple childs and then remove it', async () => {
     const UiTransform = components.UiTransform(engine)
-    const entityIndex = engine.addEntity() as number
+    const entityIndex = engine.addDynamicEntity() as number
 
     // Helpers
     const rootEntity = (entityIndex + 3) as Entity
@@ -438,7 +438,7 @@ describe('RectEcs UI ✨', () => {
   })
   it('should iterate the array on every tick and update values', async () => {
     const UiTransform = components.UiTransform(engine)
-    const entityIndex = engine.addEntity() as number
+    const entityIndex = engine.addDynamicEntity() as number
 
     // Helpers
     const uiEntities = [
@@ -559,7 +559,7 @@ describe('RectEcs UI ✨', () => {
 
   it('should update rightOf of the array', async () => {
     const UiTransform = components.UiTransform(engine)
-    const entityIndex = engine.addEntity() as number
+    const entityIndex = engine.addDynamicEntity() as number
 
     // Helpers
     let uiEntities: { id: number; value: number }[] = [

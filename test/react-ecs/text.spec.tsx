@@ -10,7 +10,7 @@ describe('UiText React Ecs', () => {
     const renderer = createReactBasedUiSystem(engine as any, pointerEventSystem as any)
     const UiTransform = components.UiTransform(engine)
     const UiText = components.UiText(engine)
-    const entityIndex = engine.addEntity() as number
+    const entityIndex = engine.addDynamicEntity() as number
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity

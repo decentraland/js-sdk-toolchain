@@ -20,7 +20,7 @@ describe('UiBackground React Ecs', () => {
   it('should generate a UI and update the width of a div', async () => {
     const UiTransform=components.UiTransform(engine)
     const UiBackground=components.UiBackground(engine)
-    const entityIndex = engine.addEntity() as number
+    const entityIndex = engine.addDynamicEntity() as number
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
@@ -65,7 +65,7 @@ describe('UiBackground React Ecs', () => {
 
   it('should remove backgrund component', () => {
     const UiBackground=components.UiBackground(engine)
-    const entityIndex = engine.addEntity() as number
+    const entityIndex = engine.addDynamicEntity() as number
 
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
