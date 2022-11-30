@@ -9,6 +9,9 @@ module.exports = {
   transform: {
     "^.+\\.(js|jsx|ts|tsx)$": "ts-jest",
   },
+  transformIgnorePatterns: [
+    "node_modules/(?!(@dcl/ecs-math)/)",
+  ],
   coverageDirectory: "coverage",
   coverageThreshold: {
     global: {
