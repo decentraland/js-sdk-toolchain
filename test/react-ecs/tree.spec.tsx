@@ -29,7 +29,7 @@ describe('RectEcs UI ✨', () => {
 
   it('should generate a UI and update the width', async () => {
     const UiTransform = components.UiTransform(engine as IIEngine)
-    const entityIndex = engine.addEntity() as any
+    const entityIndex = engine.addEntity() as number
 
     // Helpers
     const childEntity = (entityIndex + 1) as Entity
@@ -86,7 +86,7 @@ describe('RectEcs UI ✨', () => {
   })
   it('should add a child at the beggining and then remove it', async () => {
     const UiTransform = components.UiTransform(engine as IIEngine)
-    const entityIndex = engine.addEntity() as any
+    const entityIndex = engine.addEntity() as number
 
     // Helpers
     const rootEntity = (entityIndex + 3) as Entity
@@ -178,7 +178,7 @@ describe('RectEcs UI ✨', () => {
   })
   it('should add a child at the middle and then remove it', async () => {
     const UiTransform = components.UiTransform(engine as IIEngine)
-    const entityIndex = engine.addEntity() as any
+    const entityIndex = engine.addEntity() as number
 
     // Helpers
     const rootEntity = (entityIndex + 3) as Entity
@@ -265,7 +265,7 @@ describe('RectEcs UI ✨', () => {
   })
   it('should add a child at the end and then remove it', async () => {
     const UiTransform = components.UiTransform(engine as IIEngine)
-    const entityIndex = engine.addEntity() as any
+    const entityIndex = engine.addEntity() as number
 
     // Helpers
     const rootEntity = (entityIndex + 3) as Entity
@@ -651,7 +651,7 @@ describe('RectEcs UI ✨', () => {
       ...uiEntities.slice(2)
     ]
     engine.update(1)
-    const entityE = ((entityD as any) + 1) as Entity
+    const entityE = ((entityD as number) + 1) as Entity
     expect(getUi(entityD).rightOf).toBe(undefined)
     expect(getUi(entityC).rightOf).toBe(entityD)
     expect(getUi(entityE).rightOf).toBe(entityC)
