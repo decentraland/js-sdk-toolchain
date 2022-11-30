@@ -18,7 +18,8 @@ export namespace EntityUtils {
 
   export const STATIC_ENTITIES_RANGE: EntityRange = [
     RESERVED_STATIC_ENTITIES,
-    DYNAMIC_ENTITIES_START_AT - 1
+    MAX_ENTITIES
+    // DYNAMIC_ENTITIES_START_AT - 1
   ]
 
   export const DYNAMIC_ENTITIES_RANGE: EntityRange = [
@@ -30,6 +31,7 @@ export namespace EntityUtils {
     return (entity as number) >= range[0] && (entity as number) <= range[1]
   }
 
+  // @internal
   export function isDynamicEntity(entity: Entity) {
     return isInRange(entity, DYNAMIC_ENTITIES_RANGE)
   }

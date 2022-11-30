@@ -43,12 +43,8 @@ describe('Transport tests', () => {
     const Transform = components.Transform(engine)
     const MeshRenderer = components.MeshRenderer(engine)
     transports.forEach(engine.addTransport)
-    const entity = engine.addDynamicEntity()
-    const UserComponent = engine.defineComponent(
-      { x: Schemas.Byte },
-
-      8888
-    )
+    const entity = engine.addEntity()
+    const UserComponent = engine.defineComponent({ x: Schemas.Byte }, 8888)
 
     // Transform component should be sent to renderer transport
     Transform.create(entity)
@@ -69,7 +65,7 @@ describe('Transport tests', () => {
     jest.resetAllMocks()
 
     // Custom user component should NOT be sent to renderer transport
-    const newEntity = engine.addDynamicEntity()
+    const newEntity = engine.addEntity()
     UserComponent.create(newEntity, { x: 1 })
     engine.update(1)
     expect(networkSpy).toBeCalledTimes(1)
@@ -90,7 +86,7 @@ describe('Transport tests', () => {
     const engine = Engine()
     const Transform = components.Transform(engine)
     transports.forEach(engine.addTransport)
-    const entity = engine.addDynamicEntity()
+    const entity = engine.addEntity()
 
     crdtSendToRenderer.mockReturnValue({ data: [new Uint8Array([])] })
 
@@ -121,7 +117,7 @@ describe('Transport tests', () => {
     const Transform = components.Transform(engine)
     transports.forEach(engine.addTransport)
 
-    const entity = engine.addDynamicEntity()
+    const entity = engine.addEntity()
 
     crdtSendToRenderer.mockReturnValue({ data: [new Uint8Array([])] })
 
@@ -172,7 +168,7 @@ describe('Transport tests', () => {
     const Transform = components.Transform(engine)
     transports.forEach(engine.addTransport)
 
-    const entity = engine.addDynamicEntity()
+    const entity = engine.addEntity()
 
     const errorSend = 'test error handling'
     crdtSendToRenderer.mockRejectedValue(errorSend)
