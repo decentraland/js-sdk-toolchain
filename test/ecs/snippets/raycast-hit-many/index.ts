@@ -10,6 +10,7 @@ import {
   RaycastResult
 } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
+
 function createCube(
   x: number,
   y: number,

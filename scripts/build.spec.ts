@@ -64,6 +64,7 @@ flow('build-all', () => {
       ensureFileExists('index.js', ROLLUP_CONFIG_PATH)
       ensureFileExists('index.d.ts', ROLLUP_CONFIG_PATH)
     })
+    itExecutes(`chmod +x index.js`, ROLLUP_CONFIG_PATH)
   })
 
   flow('@dcl/ecs build', () => {
@@ -119,6 +120,8 @@ flow('build-all', () => {
 
   flow('@dcl/playground-assets build', () => {
     itDeletesFolder('dist', PLAYGROUND_ASSETS_PATH)
+    itDeletesFolder('bin', PLAYGROUND_ASSETS_PATH)
+
     itExecutes(`npm i --silent`, PLAYGROUND_ASSETS_PATH)
 
     // install required dependencies
@@ -176,11 +179,8 @@ flow('build-all', () => {
 
         snippetInfo.push(info)
 
-        // Remove the unnecesary 'export {}', the only purposes of this is to compile all files in one step and test it
-        const finalContent = fileContent.replace('export {}', '')
-
         const distPlaygroundPath = path.resolve(distSnippetsPath, fileName)
-        writeFileSync(distPlaygroundPath, finalContent)
+        writeFileSync(distPlaygroundPath, fileContent)
       }
 
       // // Create a JSON with the path of every snippet, this can be read by playground or CLI
