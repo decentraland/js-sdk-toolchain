@@ -11,8 +11,6 @@ import {
 } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
 
-// import-section-end
-
 function createCube(
   x: number,
   y: number,

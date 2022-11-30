@@ -9,8 +9,6 @@ import {
 } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 
-// import-section-end
-
 // Cube factory
 function createCube(x: number, y: number, z: number): Entity {
   const meshEntity = engine.addEntity()

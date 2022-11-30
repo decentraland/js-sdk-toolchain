@@ -7,8 +7,6 @@ import {
   MaterialTransparencyMode
 } from '@dcl/sdk/ecs'
 
-// import-section-end
-
 function createSphere(x: number, y: number, z: number): Entity {
   const meshEntity = engine.addEntity()
   Transform.create(meshEntity, { position: { x, y, z } })

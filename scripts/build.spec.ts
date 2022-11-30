@@ -179,15 +179,6 @@ flow('build-all', () => {
 
         snippetInfo.push(info)
 
-        // This check ensure that there is no conflict with the playground
-        // TODO: remove this check when the `import` works in the playground
-        const importSectionMsg = '// import-section-end'
-        const importSectionIndex = fileContent.search(importSectionMsg)
-
-        if (importSectionIndex === -1) {
-          throw new Error(`The snippet ${info.name} has no import-section-end`)
-        }
-
         const distPlaygroundPath = path.resolve(distSnippetsPath, fileName)
         writeFileSync(distPlaygroundPath, fileContent)
       }

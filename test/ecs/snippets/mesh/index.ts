@@ -1,7 +1,5 @@
 import { engine, Transform, MeshRenderer, MeshCollider } from '@dcl/sdk/ecs'
 
-// import-section-end
-
 enum Mesh {
   BOX,
   CYLINDER,

@@ -11,8 +11,6 @@ import {
 } from '@dcl/sdk/ecs'
 import { Vector3, Color3, Color4 } from '@dcl/sdk/math'
 
-// import-section-end
-
 function createPlaneTexture(x: number, y: number, z: number): Entity {
   const meshEntity = engine.addEntity()
 
