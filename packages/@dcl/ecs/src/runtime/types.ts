@@ -23,6 +23,7 @@ export {
   TextAlignMode
 } from '../components/generated/pb/decentraland/sdk/components/common/texts.gen'
 export { RaycastQueryType } from '../components/generated/pb/decentraland/sdk/components/raycast.gen'
+<<<<<<< Updated upstream
 
 export * from '../components/generated/pb/decentraland/sdk/components/ui_transform.gen'
 export * from '../components/generated/pb/decentraland/sdk/components/avatar_attach.gen'
@@ -34,3 +35,33 @@ export * from '../components/generated/pb/decentraland/sdk/components/raycast_re
 export * from '../components/generated/pb/decentraland/sdk/components/animator.gen'
 export * from '../components/generated/pb/decentraland/sdk/components/mesh_collider.gen'
 export * from '../components/generated/pb/decentraland/sdk/components/mesh_renderer.gen'
+=======
+export {
+  YGAlign,
+  YGDisplay,
+  YGFlexDirection,
+  YGJustify,
+  YGOverflow,
+  YGPositionType,
+  YGUnit,
+  YGEdge,
+  YGWrap
+} from '../components/generated/pb/decentraland/sdk/components/ui_transform.gen'
+export {
+  AvatarAnchorPointType
+} from '../components/generated/pb/decentraland/sdk/components/avatar_attach.gen'
+export {
+  MaterialTransparencyMode,
+  PBMaterial,
+  PBMaterial_PbrMaterial,
+  PBMaterial_UnlitMaterial
+} from '../components/generated/pb/decentraland/sdk/components/material.gen'
+export {
+  PBPointerHoverFeedback_Entry,
+  PointerEventType
+} from '../components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
+export {
+  TextureFilterMode,
+  TextureWrapMode
+} from '../components/generated/pb/decentraland/common/texture.gen'
+>>>>>>> Stashed changes
