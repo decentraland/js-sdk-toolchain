@@ -22,7 +22,7 @@
     "@dcl/js-runtime": "file:../js-runtime",
     "@dcl/kernel": "2.0.0-3583781876.commit-e9c174b",
     "@dcl/react-ecs": "file:../react-ecs",
-    "@dcl/unity-renderer": "1.0.65154-20221130130357.commit-491eade"
+    "@dcl/unity-renderer": "1.0.65245-20221130163927.commit-5b06fa8"
   },
-  "minCliVersion": "3.12.3"
+  "minCliVersion": "3.14.1"
 }
