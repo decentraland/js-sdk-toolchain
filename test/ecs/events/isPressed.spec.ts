@@ -19,8 +19,8 @@ describe('Events helpers isTriggered', () => {
 
   it('no rootEntity', () => {
     const engine = Engine()
-    const PointerEventsResult = components.PointerEventsResult(engine)
-    const entity = engine.addEntity()
+    components.PointerEventsResult(engine)
+    engine.addEntity()
     createInputSystem(engine)
 
     engine.update(1)
