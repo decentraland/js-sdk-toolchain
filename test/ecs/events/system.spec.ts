@@ -37,11 +37,11 @@ describe('Events System', () => {
 
       pointerEvents.commands.push(
         createTestPointerDownCommand(
-          entity as number,
+          entity,
           fakeCounter + 1,
           pointerType,
           button
-        ) as any
+        )
       )
       fakeCounter += 1
     }
@@ -268,16 +268,16 @@ describe('Events System', () => {
     })
     fakePointer(entity, PointerEventType.PET_UP)
 
-    const previousDebugMode = (globalThis as any).DEBUG
-    ;(globalThis as any).DEBUG = true
+    const previousDebugMode = globalThis.DEBUG
+    globalThis.DEBUG = true
     expect(() => {
       engine.update(1)
     }).toThrowError()
 
     if (previousDebugMode) {
-      ;(globalThis as any).DEBUG = previousDebugMode
+      globalThis.DEBUG = previousDebugMode
     } else {
-      delete (globalThis as any).DEBUG
+      delete globalThis.DEBUG
     }
 
     expect(counter).toBe(1)

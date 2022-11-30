@@ -1,4 +1,12 @@
-import { Engine, IEngine, Entity, createPointerEventSystem, createInputSystem, PBUiBackground, components } from '../../packages/@dcl/ecs/src'
+import {
+  Engine,
+  IEngine,
+  Entity,
+  createPointerEventSystem,
+  createInputSystem,
+  PBUiBackground
+} from '../../packages/@dcl/ecs'
+import { components, IEngine as IIEngine } from '../../packages/@dcl/ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
 import {
   ReactEcs,
@@ -14,12 +22,15 @@ describe('UiBackground React Ecs', () => {
 
   beforeEach(() => {
     engine = Engine()
-    uiRenderer = createReactBasedUiSystem(engine as any, createPointerEventSystem(engine, createInputSystem(engine)) as any)
+    uiRenderer = createReactBasedUiSystem(
+      engine,
+      createPointerEventSystem(engine, createInputSystem(engine))
+    )
   })
 
   it('should generate a UI and update the width of a div', async () => {
-    const UiTransform=components.UiTransform(engine)
-    const UiBackground=components.UiBackground(engine)
+    const UiTransform = components.UiTransform(engine as IIEngine)
+    const UiBackground = components.UiBackground(engine as IIEngine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -64,7 +75,7 @@ describe('UiBackground React Ecs', () => {
   })
 
   it('should remove backgrund component', () => {
-    const UiBackground=components.UiBackground(engine)
+    const UiBackground = components.UiBackground(engine as IIEngine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers

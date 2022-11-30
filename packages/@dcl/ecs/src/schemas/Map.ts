@@ -29,14 +29,12 @@ export function IMap<T extends Spec>(spec: T): ISchema<Result<T>> {
   return {
     serialize(value: Result<T>, builder: ByteBuffer): void {
       for (const key in spec) {
-        // TODO: as any
         spec[key].serialize((value as any)[key], builder)
       }
     },
     deserialize(reader: ByteBuffer): Result<T> {
       const newValue: Result<T> = {} as any
       for (const key in spec) {
-        // TODO: as any
         ;(newValue as any)[key] = spec[key].deserialize(reader)
       }
       return newValue
@@ -44,7 +42,6 @@ export function IMap<T extends Spec>(spec: T): ISchema<Result<T>> {
     create() {
       const newValue: Result<T> = {} as any
       for (const key in spec) {
-        // TODO: as any
         ;(newValue as any)[key] = spec[key].create()
       }
       return newValue

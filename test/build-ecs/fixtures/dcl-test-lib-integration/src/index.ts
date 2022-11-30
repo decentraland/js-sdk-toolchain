@@ -1,10 +1,8 @@
 import { engine } from '@dcl/ecs'
-import { keccak256 } from 'ethers/lib/utils'
-// import { errors } from 'ethers/lib.esm/ethers' ethers generate conflicts with the console
-
-import {} from 'js-sha3'
+import { v4 } from 'uuid'
 
 export function test() {
-  console.log(engine.PlayerEntity)
-  return keccak256
+  const uuid = v4()
+  console.log(engine.PlayerEntity, uuid)
+  return uuid
 }

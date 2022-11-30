@@ -34,11 +34,6 @@ export type IEngine = {
   addEntity(dynamic?: boolean): Entity
 
   /**
-   * An alias of engine.addEntity(true)
-   */
-  addDynamicEntity(): Entity
-
-  /**
    * Remove all components of an entity
    * @param entity - entity
    */

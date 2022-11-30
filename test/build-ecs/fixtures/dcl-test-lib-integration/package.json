@@ -16,11 +16,12 @@
   "devDependencies": {
     "@dcl/dcl-rollup": "file:../../../../packages/@dcl/dcl-rollup",
     "@dcl/ecs": "file:../../../../packages/@dcl/ecs",
+    "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime",
     "@dcl/sdk": "file:../../../../packages/@dcl/sdk",
-    "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime"
+    "@types/uuid": "^8.3.4"
   },
   "dependencies": {
-    "ethers": "^5.7.2",
-    "typescript": "*"
+    "typescript": "*",
+    "uuid": "^9.0.0"
   }
 }

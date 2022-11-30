@@ -1,7 +1,6 @@
 import { components } from '../../packages/@dcl/ecs/src'
 import { Vector3 } from '../../packages/@dcl/sdk/src/math'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
-import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt/componentOperation'
 import WireMessage from '../../packages/@dcl/ecs/src/serialization/wireMessage'
@@ -37,7 +36,7 @@ describe('CRDT tests', () => {
 
   it('Send ONLY dirty components via trasnport and spy on send messages', () => {
     const { engine, spySend } = SandBox.create({ length: 1 })[0]
-    const entityA = engine.addDynamicEntity()
+    const entityA = engine.addEntity()
     const Transform = components.Transform(engine)
     const Test = engine.getComponent(SandBox.Position.id)
 
@@ -69,7 +68,7 @@ describe('CRDT tests', () => {
   it('should sent new entity through the wire and process it in the other engine', async () => {
     const [clientA, clientB] = SandBox.create({ length: 2 })
 
-    const entityA = clientA.engine.addDynamicEntity()
+    const entityA = clientA.engine.addEntity()
     const TransformA = components.Transform(clientA.engine)
     const TransformB = components.Transform(clientB.engine)
     const PositionA = clientA.components.Position
@@ -120,11 +119,11 @@ describe('CRDT tests', () => {
     const TransformA = components.Transform(clientA.engine)
     const DoorComponent = clientA.components.Door
     // Upate Transform from static entity
-    const entity = ((clientA.engine.addEntity() as any) - 1) as Entity
+    const entity = ((clientA.engine.addEntity() as number) - 1) as Entity
     TransformA.getMutable(entity).position.x = 10
 
     // Create a dynamic entity
-    const dynamicEntity = clientA.engine.addDynamicEntity()
+    const dynamicEntity = clientA.engine.addEntity()
     DoorComponent.create(dynamicEntity, { open: 1 })
     const randomGuyWin = (Math.random() * CLIENT_LENGTH - 1) | 0
     otherClients.forEach(({ engine, components }, index) => {
@@ -135,7 +134,6 @@ describe('CRDT tests', () => {
         for (const [entity, _readOnlyDoor] of engine.getEntitiesWith(
           DoorComponent
         )) {
-          if (EntityUtils.isStaticEntity(entity)) continue
           DoorComponent.getMutable(entity).open = isRandomGuy
             ? DOOR_VALUE
             : Math.max(Math.random(), DOOR_VALUE) // Some random value < DOOR_VALUE

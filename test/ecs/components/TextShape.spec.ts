@@ -62,8 +62,8 @@ describe('Generated TextShape ProtoBuf', () => {
     TextShape.updateFromBinary(entityB, buffer)
 
     const otherTextShape = TextShape.getMutable(entityB)
-    expect(_textShape).toBeDeepCloseTo({
-      ...(otherTextShape as any)
+    expect(_textShape).toEqual({
+      ...otherTextShape
     })
 
     expect(TextShape.createOrReplace(entityB)).not.toBeDeepCloseTo({

@@ -1,4 +1,13 @@
-import { Engine, IEngine, Entity, createInputSystem, createPointerEventSystem, YGWrap, YGUnit, components } from '../../packages/@dcl/ecs/src'
+import {
+  Engine,
+  IEngine,
+  Entity,
+  createInputSystem,
+  createPointerEventSystem,
+  YGWrap,
+  YGUnit
+} from '../../packages/@dcl/ecs'
+import { components, IEngine as IIEngine } from '../../packages/@dcl/ecs/src'
 import {
   createReactBasedUiSystem,
   Position,
@@ -9,19 +18,20 @@ import {
   CANVAS_ROOT_ENTITY
 } from '../../packages/@dcl/react-ecs/src'
 
-
 describe('UiTransform React Ecs', () => {
   let engine: IEngine
   let uiRenderer: ReactBasedUiSystem
 
   beforeEach(() => {
     engine = Engine()
-    uiRenderer = createReactBasedUiSystem(engine as any, createPointerEventSystem(engine, createInputSystem(engine)) as any)
+    uiRenderer = createReactBasedUiSystem(
+      engine,
+      createPointerEventSystem(engine, createInputSystem(engine))
+    )
   })
 
-
   it('should send empty object if uiTransform is undefined', async () => {
-    const UiTransform = components.UiTransform(engine)
+    const UiTransform = components.UiTransform(engine as IIEngine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -34,7 +44,7 @@ describe('UiTransform React Ecs', () => {
   })
 
   it('should send 0 if you send an invalid px', async () => {
-    const UiTransform = components.UiTransform(engine)
+    const UiTransform = components.UiTransform(engine as IIEngine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -42,7 +52,10 @@ describe('UiTransform React Ecs', () => {
     const getUiTransform = (entity: Entity) => UiTransform.get(entity)
     const ui = () => (
       <UiEntity
-        uiTransform={{ width: 'boedo' as any, flexWrap: YGWrap.YGW_WRAP as any }}
+        uiTransform={{
+          width: 'boedo' as any, // We are asserting something thats not valid :)
+          flexWrap: YGWrap.YGW_WRAP
+        }}
       />
     )
     uiRenderer.setUiRenderer(ui)
@@ -52,7 +65,7 @@ describe('UiTransform React Ecs', () => {
   })
 
   it('should send position transform properties', async () => {
-    const UiTransform = components.UiTransform(engine)
+    const UiTransform = components.UiTransform(engine as IIEngine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -108,7 +121,7 @@ describe('UiTransform React Ecs', () => {
       positionRightUnit: YGUnit.YGU_UNDEFINED
     })
 
-    position.right = {} as any
+    position.right = {} as any // Assertion
     position.left = '10%'
     engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
@@ -120,7 +133,7 @@ describe('UiTransform React Ecs', () => {
   })
 
   it('should send height & width properties', async () => {
-    const UiTransform = components.UiTransform(engine)
+    const UiTransform = components.UiTransform(engine as IIEngine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -177,7 +190,7 @@ describe('UiTransform React Ecs', () => {
       widthUnit: YGUnit.YGU_UNDEFINED
     })
 
-    width = { boedo: 'casla' } as any
+    width = { boedo: 'casla' } as any // Assertion
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       width: 0,
       widthUnit: YGUnit.YGU_UNDEFINED

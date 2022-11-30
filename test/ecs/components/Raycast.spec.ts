@@ -27,10 +27,10 @@ describe('Generated Raycast ProtoBuf', () => {
     const buffer = Raycast.toBinary(entity)
     Raycast.updateFromBinary(entityB, buffer)
 
-    expect(raycast).toBeDeepCloseTo({ ...(Raycast.getMutable(entityB) as any) })
+    expect(raycast).toEqual({ ...Raycast.getMutable(entityB) })
 
-    expect(Raycast.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...(Raycast.getMutable(entity) as any)
+    expect(Raycast.createOrReplace(entityB)).not.toEqual({
+      ...Raycast.getMutable(entity)
     })
   })
 })

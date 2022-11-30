@@ -24,10 +24,8 @@ describe('Entity container', () => {
 
     const rootEntity = 0 as Entity
     const entityA = entityContainer.generateEntity()
-    const dynEntityA = entityContainer.generateEntity(true)
 
     expect(entityA).toBe(EntityUtils.STATIC_ENTITIES_RANGE[0])
-    expect(dynEntityA).toBe(EntityUtils.DYNAMIC_ENTITIES_RANGE[0])
 
     expect(entityContainer.entityExists(entityA)).toBe(true)
 
@@ -39,15 +37,8 @@ describe('Entity container', () => {
     expect(EntityUtils.isStaticEntity(entityA)).toBe(true)
     expect(EntityUtils.isDynamicEntity(entityA)).toBe(false)
 
-    expect(EntityUtils.isReservedEntity(dynEntityA)).toBe(false)
-    expect(EntityUtils.isStaticEntity(dynEntityA)).toBe(false)
-    expect(EntityUtils.isDynamicEntity(dynEntityA)).toBe(true)
-
-    expect(dynEntityA).toBe(EntityUtils.DYNAMIC_ENTITIES_RANGE[0])
-
     expect(Array.from(entityContainer.getExistingEntities())).toStrictEqual([
-      entityA,
-      dynEntityA
+      entityA
     ])
   })
 
