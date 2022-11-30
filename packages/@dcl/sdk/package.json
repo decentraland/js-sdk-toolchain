@@ -24,8 +24,5 @@
     "@dcl/react-ecs": "file:../react-ecs",
     "@dcl/unity-renderer": "^1.0.64444-20221125155434.commit-fcef3c4"
   },
-  "minCliVersion": "3.12.3",
-  "files": [
-    "dist"
-  ]
+  "minCliVersion": "3.12.3"
 }
