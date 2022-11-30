@@ -73,7 +73,10 @@ function propsChanged<K extends keyof EntityComponents>(
 export function createReconciler(
   engine: Pick<
     IEngine,
-    'getComponent' | 'addDynamicEntity' | 'removeEntity' | 'defineComponentFromSchema'
+    | 'getComponent'
+    | 'addDynamicEntity'
+    | 'removeEntity'
+    | 'defineComponentFromSchema'
   >,
   pointerEvents: PointerEventsSystem
 ) {
