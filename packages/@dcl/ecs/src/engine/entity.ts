@@ -69,6 +69,7 @@ function Entity(range: EntityUtils.EntityRange) {
   }
 
   function removeEntity(entity: Entity) {
+    entityCounter--
     freeList.push(entity)
     return usedEntities.delete(entity)
   }
