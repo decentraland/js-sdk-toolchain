@@ -2131,23 +2131,21 @@ export type ReactBasedUiSystem = {
 // Warning: (ae-missing-release-tag) "ReactEcs" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-namespace ReactEcs {
+export namespace ReactEcs {
     // (undocumented)
-    namespace JSX {
+    export namespace JSX {
         // (undocumented)
-        interface Component {
+        export interface Component {
         }
         // (undocumented)
-        interface Element {
+        export interface Element {
         }
         // (undocumented)
-        type IntrinsicElements = EcsElements;
+        export type IntrinsicElements = EcsElements;
     }
     const // (undocumented)
     createElement: any;
 }
-export { ReactEcs }
-export default ReactEcs;
 
 // Warning: (ae-missing-release-tag) "ReactEcsRenderer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
