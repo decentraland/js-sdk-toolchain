@@ -1,6 +1,16 @@
-export function checkNotThenable<T>(t: T, error: string): T {
-  if ((globalThis as any).DEBUG) {
-    if (t && typeof t === 'object' && typeof (t as any).then === 'function') {
+type K = unknown | Promise<unknown>
+
+declare let globalThis: {
+  DEBUG: boolean
+}
+
+export function checkNotThenable<T extends K>(t: T, error: string): T {
+  if (globalThis.DEBUG) {
+    if (
+      t &&
+      typeof t === 'object' &&
+      typeof (t as Promise<unknown>).then === 'function'
+    ) {
       throw new Error(error)
     }
   }

@@ -1,4 +1,4 @@
-import { IEngine, PointerEventsSystem } from '@dcl/ecs'
+import type { IEngine, PointerEventsSystem } from '@dcl/ecs'
 
 import type { JSX } from './react-ecs'
 import { createReconciler } from './reconciler'

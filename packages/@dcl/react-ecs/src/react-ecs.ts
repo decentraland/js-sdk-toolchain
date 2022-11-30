@@ -33,5 +33,6 @@ export namespace ReactEcs {
     export type IntrinsicElements = EcsElements
     export interface Component {}
   }
-  export const createElement: any = (React as any).createElement as any
+  // TODO: check if this as any is still needed
+  export const createElement = (React as any).createElement
 }

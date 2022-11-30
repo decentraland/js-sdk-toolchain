@@ -36,13 +36,13 @@ describe('Generated MeshCollider ProtoBuf', () => {
       const buffer = MeshCollider.toBinary(entity)
       MeshCollider.updateFromBinary(entityB, buffer)
 
-      expect(MeshCollider.get(entity)).toBeDeepCloseTo({
+      expect(MeshCollider.get(entity)).toEqual({
         ...MeshCollider.getMutable(entityB)
-      } as any)
+      })
 
-      expect(MeshCollider.createOrReplace(entityB)).not.toBeDeepCloseTo({
+      expect(MeshCollider.createOrReplace(entityB)).not.toEqual({
         ...MeshCollider.getMutable(entity)
-      } as any)
+      })
     }
   })
 

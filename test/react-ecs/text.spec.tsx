@@ -1,5 +1,18 @@
-import { Engine, Entity, createPointerEventSystem, createInputSystem, TextAlignMode, Font, components } from '../../packages/@dcl/ecs/src'
-import { ReactEcs, createReactBasedUiSystem, UiEntity, CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src'
+import {
+  Engine,
+  Entity,
+  createPointerEventSystem,
+  createInputSystem,
+  TextAlignMode,
+  Font
+} from '../../packages/@dcl/ecs'
+import { components, IEngine as IEngine } from '../../packages/@dcl/ecs/src'
+import {
+  ReactEcs,
+  createReactBasedUiSystem,
+  UiEntity,
+  CANVAS_ROOT_ENTITY
+} from '../../packages/@dcl/react-ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
 
 describe('UiText React Ecs', () => {
@@ -7,9 +20,9 @@ describe('UiText React Ecs', () => {
     const engine = Engine()
     const input = createInputSystem(engine)
     const pointerEventSystem = createPointerEventSystem(engine, input)
-    const renderer = createReactBasedUiSystem(engine as any, pointerEventSystem as any)
-    const UiTransform = components.UiTransform(engine)
-    const UiText = components.UiText(engine)
+    const renderer = createReactBasedUiSystem(engine, pointerEventSystem)
+    const UiTransform = components.UiTransform(engine as IEngine)
+    const UiText = components.UiText(engine as IEngine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -25,8 +38,8 @@ describe('UiText React Ecs', () => {
         uiText={{
           value: text,
           color,
-          font: Font.F_LIBERATION_SANS as any,
-          textAlign: TextAlignMode.TAM_BOTTOM_CENTER as any
+          font: Font.F_LIBERATION_SANS,
+          textAlign: TextAlignMode.TAM_BOTTOM_CENTER
         }}
       />
     )

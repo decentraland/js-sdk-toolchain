@@ -1,6 +1,8 @@
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
-import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
-import { Entity } from '../../../packages/@dcl/ecs/src/engine/entity'
+import {
+  PointerEventType,
+  InputAction,
+  Entity
+} from '../../../packages/@dcl/ecs/src'
 
 export function createTestPointerDownCommand(
   entity: Entity,
@@ -18,7 +20,7 @@ export function createTestPointerDownCommand(
       normalHit: { x: 1, y: 2, z: 3 },
       origin: { x: 1, y: 2, z: 3 },
       meshName: 'mesh',
-      entityId: entity
+      entityId: entity as number
     },
     state: state,
     analog: 5

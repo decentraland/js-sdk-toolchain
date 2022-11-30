@@ -1,6 +1,22 @@
-import { Engine, Entity, IEngine, components, createPointerEventSystem, PointerEventType } from '../../packages/@dcl/ecs/src'
-import { createInputSystem } from '../../packages/@dcl/ecs/src/engine/input'
-import { createReactBasedUiSystem, ReactBasedUiSystem, ReactEcs, UiEntity } from '../../packages/@dcl/react-ecs/src'
+import {
+  Engine,
+  Entity,
+  IEngine,
+  createPointerEventSystem,
+  // PointerEventType,
+  createInputSystem
+} from '../../packages/@dcl/ecs'
+import {
+  components,
+  IEngine as IIEngine,
+  PointerEventType
+} from '../../packages/@dcl/ecs/src'
+import {
+  createReactBasedUiSystem,
+  ReactBasedUiSystem,
+  ReactEcs,
+  UiEntity
+} from '../../packages/@dcl/react-ecs/src'
 import { createTestPointerDownCommand } from '../ecs/events/utils'
 
 describe('Ui Listeners React Ecs', () => {
@@ -10,12 +26,17 @@ describe('Ui Listeners React Ecs', () => {
   beforeEach(() => {
     engine = Engine()
     const Input = createInputSystem(engine)
-    uiRenderer = createReactBasedUiSystem(engine as any, createPointerEventSystem(engine, Input) as any)
+    uiRenderer = createReactBasedUiSystem(
+      engine,
+      createPointerEventSystem(engine, Input)
+    )
   })
 
   it('should run onClick if it was fake-clicked', async () => {
-    const PointerEventsResult = components.PointerEventsResult(engine)
-    const uiEntity = (engine.addEntity() as number + 1) as Entity
+    const PointerEventsResult = components.PointerEventsResult(
+      engine as IIEngine
+    )
+    const uiEntity = ((engine.addEntity() as number) + 1) as Entity
     let fakeCounter = 0
     const fakeClick = () => {
       PointerEventsResult.createOrReplace(engine.RootEntity, {

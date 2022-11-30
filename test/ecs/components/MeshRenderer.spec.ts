@@ -34,13 +34,13 @@ describe('Generated MeshRenderer ProtoBuf', () => {
       const buffer = MeshRenderer.toBinary(entity)
       MeshRenderer.updateFromBinary(entityB, buffer)
 
-      expect(MeshRenderer.get(entity)).toBeDeepCloseTo({
+      expect(MeshRenderer.get(entity)).toEqual({
         ...MeshRenderer.getMutable(entityB)
-      } as any)
+      })
 
-      expect(MeshRenderer.createOrReplace(entityB)).not.toBeDeepCloseTo({
+      expect(MeshRenderer.createOrReplace(entityB)).not.toEqual({
         ...MeshRenderer.getMutable(entity)
-      } as any)
+      })
     }
   })
 

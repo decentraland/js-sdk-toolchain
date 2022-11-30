@@ -14,6 +14,7 @@ import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, SystemFn } from './systems'
 import type { IEngine } from './types'
 export * from './input'
 import { ReadonlyComponentSchema } from './readonly'
+import { checkNotThenable } from '../runtime/invariant'
 
 export * from './readonly'
 export * from './types'
@@ -87,12 +88,12 @@ function preEngine() {
     spec: T,
     componentId: number,
     constructorDefault?: ConstructorType
-  ): ComponentDefinition<ISchema<ConstructorType>> {
+  ): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>> {
     return defineComponentFromSchema(
       Schemas.Map(spec) as ISchema<ConstructorType>,
       componentId,
       constructorDefault
-    )
+    ) as ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>
   }
 
   function getComponent<T extends ISchema<V>, V>(
@@ -186,16 +187,13 @@ export function Engine(): IEngine {
     crdtSystem.receiveMessages()
 
     for (const system of engine.getSystems()) {
-      const ret: any = system.fn(dt)
-      if ((globalThis as any).DEBUG) {
-        if (ret && typeof ret === 'object' && typeof ret.then === 'function') {
-          throw new Error(
-            `A system (${
-              system.name || 'anonymous'
-            }) returned a thenable. Systems cannot be async functions. Documentation: https://dcl.gg/sdk/sync-systems`
-          )
-        }
-      }
+      const ret: unknown | Promise<unknown> = system.fn(dt)
+      checkNotThenable(
+        ret,
+        `A system (${
+          system.name || 'anonymous'
+        }) returned a thenable. Systems cannot be async functions. Documentation: https://dcl.gg/sdk/sync-systems`
+      )
     }
 
     // TODO: Perf tip
@@ -248,8 +246,7 @@ export function Engine(): IEngine {
     removeEntityWithChildren,
     addSystem: engine.addSystem,
     removeSystem: engine.removeSystem,
-    // TODO: fix this type
-    defineComponent: engine.defineComponent as any,
+    defineComponent: engine.defineComponent,
     defineComponentFromSchema: engine.defineComponentFromSchema,
     getEntitiesWith: engine.getEntitiesWith,
     getComponent: engine.getComponent,
