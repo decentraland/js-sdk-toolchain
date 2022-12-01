@@ -61,10 +61,10 @@ flow('build-all', () => {
     itExecutes(`npm i --silent`, ROLLUP_CONFIG_PATH)
     itExecutes(`${TSC} -p tsconfig.json`, ROLLUP_CONFIG_PATH)
     it('check file exists', () => {
-      ensureFileExists('index.js', ROLLUP_CONFIG_PATH)
-      ensureFileExists('index.d.ts', ROLLUP_CONFIG_PATH)
+      ensureFileExists('dist/index.js', ROLLUP_CONFIG_PATH)
+      ensureFileExists('dist/index.d.ts', ROLLUP_CONFIG_PATH)
     })
-    itExecutes(`chmod +x index.js`, ROLLUP_CONFIG_PATH)
+    itExecutes(`chmod +x dist/index.js`, ROLLUP_CONFIG_PATH)
   })
 
   flow('@dcl/ecs build', () => {
