@@ -1,7 +1,6 @@
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { Engine, components } from '../../packages/@dcl/ecs/src'
 import WireMessage from '../../packages/@dcl/ecs/src/serialization/wireMessage'
-import { createNetworkTransport } from '../../packages/@dcl/sdk/src/internal/transports/networkTransport'
 import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
 import { TransportMessage } from '../../packages/@dcl/ecs/src/systems/crdt/types'
 
@@ -33,11 +32,7 @@ describe('Transport tests', () => {
 
   it('should test transports', () => {
     const crdtSendToRenderer = jest.fn()
-    const transports = [
-      createNetworkTransport(),
-      createRendererTransport({ crdtSendToRenderer })
-    ]
-    const networkSpy = jest.spyOn(transports[0], 'send')
+    const transports = [createRendererTransport({ crdtSendToRenderer })]
     const rendererSpy = jest.spyOn(transports[1], 'send')
     const engine = Engine()
     const Transform = components.Transform(engine)
@@ -50,7 +45,6 @@ describe('Transport tests', () => {
     Transform.create(entity)
     engine.update(1)
 
-    expect(networkSpy).toBeCalledTimes(1)
     expect(rendererSpy).toBeCalledTimes(1)
     jest.resetAllMocks()
 
@@ -60,7 +54,6 @@ describe('Transport tests', () => {
     })
     engine.update(1)
 
-    expect(networkSpy).toBeCalledTimes(1)
     expect(rendererSpy).toBeCalledTimes(1)
     jest.resetAllMocks()
 
@@ -68,7 +61,6 @@ describe('Transport tests', () => {
     const newEntity = engine.addEntity()
     UserComponent.create(newEntity, { x: 1 })
     engine.update(1)
-    expect(networkSpy).toBeCalledTimes(1)
 
     // Now the send is invoked, but the arg should be []
     expect(rendererSpy).toBeCalledTimes(1)
@@ -77,10 +69,7 @@ describe('Transport tests', () => {
 
   it('should send and receive crdt messages', async () => {
     const crdtSendToRenderer = jest.fn()
-    const transports = [
-      createNetworkTransport(),
-      createRendererTransport({ crdtSendToRenderer })
-    ]
+    const transports = [createRendererTransport({ crdtSendToRenderer })]
     const networkSpy = jest.spyOn(transports[0], 'send')
     const rendererSpy = jest.spyOn(transports[1], 'send')
     const engine = Engine()
@@ -109,7 +98,7 @@ describe('Transport tests', () => {
   it('should receive crdt messages even if there is no message to send', async () => {
     const crdtSendToRenderer = jest.fn()
     const rendererTransport = createRendererTransport({ crdtSendToRenderer })
-    const transports = [createNetworkTransport(), rendererTransport]
+    const transports = [rendererTransport]
 
     const networkSpy = jest.spyOn(transports[0], 'send')
     const rendererSpy = jest.spyOn(transports[1], 'send')
@@ -162,7 +151,7 @@ describe('Transport tests', () => {
   it('should rendererTransport throw an error ', async () => {
     const crdtSendToRenderer = jest.fn()
     const rendererTransport = createRendererTransport({ crdtSendToRenderer })
-    const transports = [createNetworkTransport(), rendererTransport]
+    const transports = [rendererTransport]
 
     const engine = Engine()
     const Transform = components.Transform(engine)

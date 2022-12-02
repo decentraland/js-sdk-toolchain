@@ -659,7 +659,7 @@ export type IEngine = {
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
     getComponentOrNull<T extends ISchema>(componentId: number): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
-    update(deltaTime: number): void;
+    update(deltaTime: number): Promise<void>;
     readonly RootEntity: Entity;
     readonly PlayerEntity: Entity;
     readonly CameraEntity: Entity;
@@ -2851,9 +2851,10 @@ export type TransformType = {
 // @public (undocumented)
 export type Transport = {
     type: string;
-    send(message: Uint8Array): void;
+    send(message: Uint8Array): Promise<void>;
     onmessage?(message: Uint8Array): void;
     filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
+    resendOutdatedMessages: boolean;
 };
 
 // Warning: (ae-missing-release-tag) "TransportMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)

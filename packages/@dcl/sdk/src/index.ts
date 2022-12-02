@@ -13,6 +13,6 @@ engine.addTransport(createRendererTransport({ crdtSendToRenderer }))
 setSubscribeFunction(subscribe)
 
 export async function onUpdate(deltaTime: number) {
-  engine.update(deltaTime)
+  await engine.update(deltaTime)
   await pollEvents(sendBatch)
 }

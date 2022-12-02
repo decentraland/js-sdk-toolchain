@@ -1,4 +1,4 @@
-import { Transport, TransportMessage } from '@dcl/ecs'
+import { Transport } from '@dcl/ecs'
 import { ECSComponentIDs } from '@dcl/ecs/dist/components/generated/ids.gen'
 import type {
   CrdtSendToRendererRequest,
@@ -34,14 +34,18 @@ export function createRendererTransport(
 
   const type = 'renderer'
   const rendererTransport: Transport = {
+    resendOutdatedMessages: false,
     type,
-    send(message: Uint8Array): void {
-      sendToRenderer(message).catch((error) => {
+    async send(message) {
+      try {
+        const msgs = await sendToRenderer(message)
+        return msgs
+      } catch (error) {
         console.error(error)
         debugger
-      })
+      }
     },
-    filter(message: TransportMessage): boolean {
+    filter(message) {
       // Echo message, ignore them
       if (message.transportType === type) {
         return false

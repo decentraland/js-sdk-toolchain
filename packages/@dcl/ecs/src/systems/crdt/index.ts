@@ -69,7 +69,7 @@ export function crdtSceneSystem(engine: Pick<IEngine, 'getComponentOrNull'>) {
    * This fn will be called on every tick.
    * Process all the messages queue received by the transport
    */
-  function receiveMessages() {
+  async function receiveMessages() {
     const messagesToProcess = getMessages(receivedMessages)
     for (const transport of transports) {
       const buffer = createByteBuffer()
@@ -112,8 +112,8 @@ export function crdtSceneSystem(engine: Pick<IEngine, 'getComponentOrNull'>) {
         }
       }
 
-      if (buffer.size()) {
-        transport.send(buffer.toBinary())
+      if (buffer.size() && transport.resendOutdatedMessages) {
+        await transport.send(buffer.toBinary())
       }
     }
   }
@@ -122,7 +122,7 @@ export function crdtSceneSystem(engine: Pick<IEngine, 'getComponentOrNull'>) {
    * Iterates the dirty map and generates crdt messages to be send
    * @param dirtyMap a map of { entities: [componentId] }
    */
-  function createMessages(dirtyMap: Map<Entity, Set<number>>) {
+  async function createMessages(dirtyMap: Map<Entity, Set<number>>) {
     // CRDT Messages will be the merge between the recieved transport messages and the new crdt messages
     const crdtMessages = getMessages(transportMessages)
     const buffer = createByteBuffer()
@@ -173,11 +173,10 @@ export function crdtSceneSystem(engine: Pick<IEngine, 'getComponentOrNull'>) {
           transportBuffer.writeBuffer(message.messageBuffer, false)
         }
       }
-      if (transportBuffer.size()) {
-        transport.send(transportBuffer.toBinary())
-      } else {
-        transport.send(new Uint8Array([]))
-      }
+      const message = transportBuffer.size()
+        ? transportBuffer.toBinary()
+        : new Uint8Array([])
+      await transport.send(message)
     }
   }
 

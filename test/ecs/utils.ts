@@ -2,7 +2,29 @@ import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/math'
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
-import * as transport from '../../packages/@dcl/sdk/src/internal/transports/networkTransport'
+import { TransportMessage, Transport } from '../../packages/@dcl/ecs/src'
+
+export function createNetworkTransport(): Transport {
+  // const rpc = new RpcTransport()
+  async function send(..._args: any[]) {
+    // console.log('NetworkMessage Sent: ', ...args)
+  }
+
+  const type = 'network-transport'
+  return {
+    resendOutdatedMessages: false,
+    send,
+    type,
+    filter(message: TransportMessage): boolean {
+      // Echo message, ignore them
+      if (message.transportType === type) {
+        return false
+      }
+
+      return !!message
+    }
+  }
+}
 
 export function wait(ms: number) {
   return new Promise<void>((resolve) => setTimeout(() => resolve(), ms))
@@ -29,7 +51,7 @@ export namespace SandBox {
    */
   export function create({ length }: { length: number }) {
     const clients = Array.from({ length }).map((_, index) => {
-      const clientTransport = transport.createNetworkTransport()
+      const clientTransport = createNetworkTransport()
       const engine = Engine()
       engine.addTransport(clientTransport)
       const Position = engine.defineComponent(
@@ -49,7 +71,7 @@ export namespace SandBox {
 
     for (const client of clients) {
       for (const transport of client.transports) {
-        transport.send = (data) => {
+        transport.send = async (data: Uint8Array) => {
           clients
             .filter((c) => c.id !== client.id)
             .map((c) => c.transports.find((t) => t.type === transport.type))

@@ -160,7 +160,7 @@ export type IEngine = {
   /**
    * @param deltaTime - deltaTime in seconds
    */
-  update(deltaTime: number): void
+  update(deltaTime: number): Promise<void>
 
   /**
    * @internal

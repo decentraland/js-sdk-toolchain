@@ -15,7 +15,8 @@ export type TransportMessage = Omit<ReceiveMessage, 'data'>
 
 export type Transport = {
   type: string
-  send(message: Uint8Array): void
+  send(message: Uint8Array): Promise<void>
   onmessage?(message: Uint8Array): void
   filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean
+  resendOutdatedMessages: boolean
 }
