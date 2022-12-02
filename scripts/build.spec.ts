@@ -137,6 +137,7 @@ flow('build-all', () => {
         summary.addRaw(readFileSync(file).toString())
       })
     } else {
+      itDeletesGlob('etc/*', PLAYGROUND_ASSETS_PATH)
       itExecutes('npm run build-local --silent', PLAYGROUND_ASSETS_PATH)
     }
   })
