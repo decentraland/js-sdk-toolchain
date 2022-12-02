@@ -3,6 +3,7 @@ export * from '@dcl/sdk/ecs'
 export * from '@dcl/sdk/react-ecs'
 export * from '@dcl/sdk/messageBus'
 export * from '@dcl/sdk/ethereum-provider'
+export * from '@dcl/sdk/observables'
 
 import ReactEcs from '@dcl/sdk/react-ecs'
 export { ReactEcs }

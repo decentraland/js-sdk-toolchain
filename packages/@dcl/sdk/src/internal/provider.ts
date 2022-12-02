@@ -1,11 +1,11 @@
 export interface SendAsyncResponse {
-  jsonAnyResponse: string;
+  jsonAnyResponse: string
 }
 
 export interface SendAsyncRequest {
-  id: number;
-  method: string;
-  jsonParams: string;
+  id: number
+  method: string
+  jsonParams: string
 }
 
 export type RPCSendableMessage = {

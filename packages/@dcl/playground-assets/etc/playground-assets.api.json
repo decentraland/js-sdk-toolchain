@@ -7649,6 +7649,70 @@
         },
         {
           "kind": "Function",
+          "canonicalReference": "@dcl/playground-assets!createEthereumProvider:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function createEthereumProvider(): "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    send(message: import(\"./internal/provider\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RPCSendableMessage",
+              "canonicalReference": "@dcl/playground-assets!RPCSendableMessage:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", callback?: ((error: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Error",
+              "canonicalReference": "!Error:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " | null, result?: any) => void) | undefined): void;\n    sendAsync(message: import(\"./internal/provider\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RPCSendableMessage",
+              "canonicalReference": "@dcl/playground-assets!RPCSendableMessage:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", callback: (error: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Error",
+              "canonicalReference": "!Error:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " | null, result?: any) => void): void;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "../sdk/ethereum-provider.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 10
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "createEthereumProvider"
+        },
+        {
+          "kind": "Function",
           "canonicalReference": "@dcl/playground-assets!createInputSystem:function(1)",
           "docComment": "",
           "excerptTokens": [
@@ -8631,6 +8695,96 @@
         },
         {
           "kind": "TypeAlias",
+          "canonicalReference": "@dcl/playground-assets!EngineEvent:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type EngineEvent<T extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "IEventNames",
+              "canonicalReference": "@dcl/playground-assets!IEventNames:type"
+            },
+            {
+              "kind": "Content",
+              "text": " = "
+            },
+            {
+              "kind": "Reference",
+              "text": "IEventNames",
+              "canonicalReference": "@dcl/playground-assets!IEventNames:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", V = "
+            },
+            {
+              "kind": "Reference",
+              "text": "IEvents",
+              "canonicalReference": "@dcl/playground-assets!IEvents:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[T]"
+            },
+            {
+              "kind": "Content",
+              "text": "> = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    type: T;\n    data: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Readonly",
+              "canonicalReference": "!Readonly:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<V>;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "releaseTag": "Public",
+          "name": "EngineEvent",
+          "typeParameters": [
+            {
+              "typeParameterName": "T",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              }
+            },
+            {
+              "typeParameterName": "V",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 7
+              }
+            }
+          ],
+          "typeTokenRange": {
+            "startIndex": 8,
+            "endIndex": 11
+          }
+        },
+        {
+          "kind": "TypeAlias",
           "canonicalReference": "@dcl/playground-assets!Entity:type",
           "docComment": "/**\n * @public\n */\n",
           "excerptTokens": [
@@ -9054,12 +9208,12 @@
           "members": [
             {
               "kind": "EnumMember",
-              "canonicalReference": "@dcl/playground-assets!Font.F_LIBERATION_SANS:member",
+              "canonicalReference": "@dcl/playground-assets!Font.F_SANS_SERIF:member",
               "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "F_LIBERATION_SANS = "
+                  "text": "F_SANS_SERIF = "
                 },
                 {
                   "kind": "Content",
@@ -9071,30 +9225,128 @@
                 "endIndex": 2
               },
               "releaseTag": "Public",
-              "name": "F_LIBERATION_SANS"
-            },
-            {
-              "kind": "EnumMember",
-              "canonicalReference": "@dcl/playground-assets!Font.F_SANS_SERIF:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "F_SANS_SERIF = "
-                },
-                {
-                  "kind": "Content",
-                  "text": "1"
-                }
-              ],
-              "initializerTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "releaseTag": "Public",
               "name": "F_SANS_SERIF"
             }
           ]
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@dcl/playground-assets!GizmoDragEndEvent:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type GizmoDragEndEvent = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    type: 'gizmoDragEnded';\n    transforms: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Array",
+              "canonicalReference": "!Array:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n        position: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Vector3Type",
+              "canonicalReference": "@dcl/playground-assets!Vector3Type:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        rotation: "
+            },
+            {
+              "kind": "Reference",
+              "text": "QuaternionType",
+              "canonicalReference": "@dcl/playground-assets!QuaternionType:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        scale: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Vector3Type",
+              "canonicalReference": "@dcl/playground-assets!Vector3Type:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        entityId: unknown;\n    }>;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "releaseTag": "Public",
+          "name": "GizmoDragEndEvent",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 10
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@dcl/playground-assets!GizmoSelectedEvent:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type GizmoSelectedEvent = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    type: 'gizmoSelected';\n    gizmoType: 'MOVE' | 'ROTATE' | 'SCALE' | 'NONE';\n    entities: string[];\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "releaseTag": "Public",
+          "name": "GizmoSelectedEvent",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@dcl/playground-assets!GlobalInputEventResult:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type GlobalInputEventResult = "
+            },
+            {
+              "kind": "Reference",
+              "text": "InputEventResult",
+              "canonicalReference": "@dcl/playground-assets!InputEventResult:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & {\n    type: 0 | 1;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "releaseTag": "Public",
+          "name": "GlobalInputEventResult",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
         },
         {
           "kind": "Variable",
@@ -9267,15 +9519,6 @@
             },
             {
               "kind": "Content",
-              "text": ";\n    addDynamicEntity(): "
-            },
-            {
-              "kind": "Reference",
-              "text": "Entity",
-              "canonicalReference": "@dcl/playground-assets!Entity:type"
-            },
-            {
-              "kind": "Content",
               "text": ";\n    removeEntity(entity: "
             },
             {
@@ -9429,7 +9672,25 @@
             },
             {
               "kind": "Content",
-              "text": "<T>;\n    getEntitiesWith<T extends ["
+              "text": "<T>;\n    getComponentOrNull<T extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "ISchema",
+              "canonicalReference": "@dcl/playground-assets!ISchema:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">(componentId: number): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CompDef",
+              "canonicalReference": "@dcl/playground-assets!ComponentDefinition:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<T> | null;\n    getEntitiesWith<T extends ["
             },
             {
               "kind": "Reference",
@@ -9474,7 +9735,7 @@
             },
             {
               "kind": "Content",
-              "text": "<T>]>;\n    update(dt: number): void;\n    RootEntity: "
+              "text": "<T>]>;\n    update(deltaTime: number): void;\n    readonly RootEntity: "
             },
             {
               "kind": "Reference",
@@ -9483,7 +9744,7 @@
             },
             {
               "kind": "Content",
-              "text": ";\n    PlayerEntity: "
+              "text": ";\n    readonly PlayerEntity: "
             },
             {
               "kind": "Reference",
@@ -9492,7 +9753,7 @@
             },
             {
               "kind": "Content",
-              "text": ";\n    CameraEntity: "
+              "text": ";\n    readonly CameraEntity: "
             },
             {
               "kind": "Reference",
@@ -9522,7 +9783,7 @@
           "name": "IEngine",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 58
+            "endIndex": 60
           }
         },
         {
@@ -9592,6 +9853,1298 @@
             }
           ],
           "name": "IEnum"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@dcl/playground-assets!IEventNames:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type IEventNames = "
+            },
+            {
+              "kind": "Content",
+              "text": "keyof "
+            },
+            {
+              "kind": "Reference",
+              "text": "IEvents",
+              "canonicalReference": "@dcl/playground-assets!IEvents:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "releaseTag": "Public",
+          "name": "IEventNames",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@dcl/playground-assets!IEvents:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface IEvents "
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "releaseTag": "Public",
+          "name": "IEvents",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#actionButtonEvent:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "actionButtonEvent: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "GlobalInputEventResult",
+                  "canonicalReference": "@dcl/playground-assets!GlobalInputEventResult:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "actionButtonEvent",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#builderSceneStart:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "builderSceneStart: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "unknown"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "builderSceneStart",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#builderSceneUnloaded:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "builderSceneUnloaded: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "unknown"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "builderSceneUnloaded",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#cameraModeChanged:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "cameraModeChanged: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        cameraMode: 0 | 1 | 2;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "cameraModeChanged",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#chatMessage:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "chatMessage: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        id: string;\n        sender: string;\n        message: string;\n        isCommand: boolean;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "chatMessage",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#comms:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "comms: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        sender: string;\n        message: string;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "comms",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#entitiesOutOfBoundaries:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "entitiesOutOfBoundaries: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        entities: string[];\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "entitiesOutOfBoundaries",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#entityBackInScene:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "entityBackInScene: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        entityId: unknown;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "entityBackInScene",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#entityOutOfScene:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "entityOutOfScene: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        entityId: unknown;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "entityOutOfScene",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#externalAction:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "externalAction: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        type: string;\n        [key: string]: any;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "externalAction",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#gizmoEvent:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "gizmoEvent: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "GizmoDragEndEvent",
+                  "canonicalReference": "@dcl/playground-assets!GizmoDragEndEvent:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "GizmoSelectedEvent",
+                  "canonicalReference": "@dcl/playground-assets!GizmoSelectedEvent:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "gizmoEvent",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#idleStateChanged:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "idleStateChanged: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        isIdle: boolean;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "idleStateChanged",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#limitsExceeded:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "limitsExceeded: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        given: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, number>;\n        limit: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, number>;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "limitsExceeded",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 6
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#metricsUpdate:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "metricsUpdate: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        given: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, number>;\n        limit: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, number>;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "metricsUpdate",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 6
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#onAnimationEnd:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "onAnimationEnd: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        clipName: string;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "onAnimationEnd",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#onBlur:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "onBlur: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        entityId: unknown;\n        pointerId: number;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "onBlur",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#onChange:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "onChange: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        value?: any;\n        pointerId?: number;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "onChange",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#onClick:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "onClick: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        entityId: unknown;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "onClick",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#onEnter:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "onEnter: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "unknown"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "onEnter",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#onEnterScene:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "onEnterScene: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        userId: string;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "onEnterScene",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#onFocus:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "onFocus: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        entityId: unknown;\n        pointerId: number;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "onFocus",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#onLeaveScene:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "onLeaveScene: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        userId: string;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "onLeaveScene",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#onPointerLock:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "onPointerLock: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        locked?: boolean;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "onPointerLock",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#onRealmChanged:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "onRealmChanged: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        domain: string;\n        room: string;\n        serverName: string;\n        displayName: string;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "onRealmChanged",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#onTextSubmit:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "onTextSubmit: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        text: string;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "onTextSubmit",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#playerClicked:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "playerClicked: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        userId: string;\n        ray: {\n            origin: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Vector3Type",
+                  "canonicalReference": "@dcl/playground-assets!Vector3Type:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";\n            direction: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Vector3Type",
+                  "canonicalReference": "@dcl/playground-assets!Vector3Type:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";\n            distance: number;\n        };\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "playerClicked",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 6
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#playerConnected:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "playerConnected: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        userId: string;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "playerConnected",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#playerDisconnected:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "playerDisconnected: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        userId: string;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "playerDisconnected",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#playerExpression:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "playerExpression: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        expressionId: string;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "playerExpression",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#pointerDown:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "pointerDown: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "InputEventResult",
+                  "canonicalReference": "@dcl/playground-assets!InputEventResult:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "pointerDown",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#pointerEvent:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "pointerEvent: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "GlobalInputEventResult",
+                  "canonicalReference": "@dcl/playground-assets!GlobalInputEventResult:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "pointerEvent",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#pointerHoverEnter:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "pointerHoverEnter: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "unknown"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "pointerHoverEnter",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#pointerHoverExit:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "pointerHoverExit: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "unknown"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "pointerHoverExit",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#pointerUp:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "pointerUp: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "InputEventResult",
+                  "canonicalReference": "@dcl/playground-assets!InputEventResult:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "pointerUp",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#positionChanged:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "positionChanged: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        position: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Vector3Type",
+                  "canonicalReference": "@dcl/playground-assets!Vector3Type:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";\n        cameraPosition: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Vector3Type",
+                  "canonicalReference": "@dcl/playground-assets!Vector3Type:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";\n        playerHeight: number;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "positionChanged",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 6
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#profileChanged:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "profileChanged: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        ethAddress: string;\n        version: number;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "profileChanged",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#raycastResponse:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "raycastResponse: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "RaycastResponsePayload",
+                  "canonicalReference": "@dcl/playground-assets!RaycastResponsePayload:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<any>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "raycastResponse",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#rotationChanged:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "rotationChanged: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        rotation: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Vector3Type",
+                  "canonicalReference": "@dcl/playground-assets!Vector3Type:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";\n        quaternion: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "QuaternionType",
+                  "canonicalReference": "@dcl/playground-assets!QuaternionType:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "rotationChanged",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 6
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#sceneStart:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "sceneStart: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "unknown"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "sceneStart",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#stateEvent:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "stateEvent: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        type: string;\n        payload: any;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "stateEvent",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#uuidEvent:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "uuidEvent: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        uuid: string;\n        payload: any;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "uuidEvent",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@dcl/playground-assets!IEvents#videoEvent:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "videoEvent: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        componentId: string;\n        videoClipId: string;\n        videoStatus: number;\n        currentOffset: number;\n        totalVideoLength: number;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "videoEvent",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
         },
         {
           "kind": "TypeAlias",
@@ -10121,6 +11674,77 @@
               "name": "IA_WALK"
             }
           ]
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@dcl/playground-assets!InputEventResult:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type InputEventResult = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    origin: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Vector3Type",
+              "canonicalReference": "@dcl/playground-assets!Vector3Type:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    direction: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Vector3Type",
+              "canonicalReference": "@dcl/playground-assets!Vector3Type:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    buttonId: number;\n    hit?: {\n        length: number;\n        hitPoint: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Vector3Type",
+              "canonicalReference": "@dcl/playground-assets!Vector3Type:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        meshName: string;\n        normal: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Vector3Type",
+              "canonicalReference": "@dcl/playground-assets!Vector3Type:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        worldNormal: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Vector3Type",
+              "canonicalReference": "@dcl/playground-assets!Vector3Type:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        entityId: unknown;\n    };\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "releaseTag": "Public",
+          "name": "InputEventResult",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 12
+          }
         },
         {
           "kind": "Variable",
@@ -18833,6 +20457,184 @@
           }
         },
         {
+          "kind": "Class",
+          "canonicalReference": "@dcl/playground-assets!MessageBus:class",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare class MessageBus "
+            }
+          ],
+          "fileUrlPath": "../sdk/messageBus.d.ts",
+          "releaseTag": "Public",
+          "name": "MessageBus",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "@dcl/playground-assets!MessageBus:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `MessageBus` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor();"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": []
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@dcl/playground-assets!MessageBus#emit:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "emit(message: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", payload: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<any, any>"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 6,
+                "endIndex": 7
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "message",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "payload",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 5
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "name": "emit"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@dcl/playground-assets!MessageBus#on:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "on(message: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", callback: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(value: any, sender: string) => void"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Observer",
+                  "canonicalReference": "@dcl/playground-assets!Observer:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "IEvents",
+                  "canonicalReference": "@dcl/playground-assets!IEvents:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "['comms']>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 9
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "message",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "callback",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "name": "on"
+            }
+          ],
+          "implementsTokenRanges": []
+        },
+        {
           "kind": "Enum",
           "canonicalReference": "@dcl/playground-assets!NftFrameType:enum",
           "docComment": "",
@@ -19407,6 +21209,1558 @@
           }
         },
         {
+          "kind": "Class",
+          "canonicalReference": "@dcl/playground-assets!Observable:class",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare class Observable<T> "
+            }
+          ],
+          "fileUrlPath": "../sdk/internal/Observable.d.ts",
+          "releaseTag": "Public",
+          "typeParameters": [
+            {
+              "typeParameterName": "T",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "Observable",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "@dcl/playground-assets!Observable:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `Observable` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(onObserverAdded?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(observer: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Observer",
+                  "canonicalReference": "@dcl/playground-assets!Observer:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<T>) => void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "onObserverAdded",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 4
+                  },
+                  "isOptional": true
+                }
+              ]
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@dcl/playground-assets!Observable#add:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "add(callback: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(eventData: T, eventState: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ObserverEventState",
+                  "canonicalReference": "@dcl/playground-assets!ObserverEventState:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", mask?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", insertFirst?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", scope?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", unregisterOnFirstCall?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "null | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Observer",
+                  "canonicalReference": "@dcl/playground-assets!Observer:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<T>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 13,
+                "endIndex": 16
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "callback",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 4
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "mask",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "isOptional": true
+                },
+                {
+                  "parameterName": "insertFirst",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 7,
+                    "endIndex": 8
+                  },
+                  "isOptional": true
+                },
+                {
+                  "parameterName": "scope",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 9,
+                    "endIndex": 10
+                  },
+                  "isOptional": true
+                },
+                {
+                  "parameterName": "unregisterOnFirstCall",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 11,
+                    "endIndex": 12
+                  },
+                  "isOptional": true
+                }
+              ],
+              "isOptional": false,
+              "name": "add"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@dcl/playground-assets!Observable#addOnce:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "addOnce(callback: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(eventData: T, eventState: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ObserverEventState",
+                  "canonicalReference": "@dcl/playground-assets!ObserverEventState:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => void"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "null | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Observer",
+                  "canonicalReference": "@dcl/playground-assets!Observer:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<T>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 8
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "callback",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 4
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "name": "addOnce"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@dcl/playground-assets!Observable#clear:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "clear(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "name": "clear"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@dcl/playground-assets!Observable#clone:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "clone(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Observable",
+                  "canonicalReference": "@dcl/playground-assets!Observable:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<T>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "name": "clone"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@dcl/playground-assets!Observable#hasObservers:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "hasObservers(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "name": "hasObservers"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@dcl/playground-assets!Observable#hasSpecificMask:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "hasSpecificMask(mask?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "mask",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": true
+                }
+              ],
+              "isOptional": false,
+              "name": "hasSpecificMask"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@dcl/playground-assets!Observable#notifyObserver:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "notifyObserver(observer: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Observer",
+                  "canonicalReference": "@dcl/playground-assets!Observer:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<T>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", eventData: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "T"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", mask?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 8,
+                "endIndex": 9
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "observer",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 3
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "eventData",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 4,
+                    "endIndex": 5
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "mask",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 6,
+                    "endIndex": 7
+                  },
+                  "isOptional": true
+                }
+              ],
+              "isOptional": false,
+              "name": "notifyObserver"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@dcl/playground-assets!Observable#notifyObservers:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "notifyObservers(eventData: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "T"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", mask?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", target?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", currentTarget?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 9,
+                "endIndex": 10
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "eventData",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "mask",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  },
+                  "isOptional": true
+                },
+                {
+                  "parameterName": "target",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "isOptional": true
+                },
+                {
+                  "parameterName": "currentTarget",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 7,
+                    "endIndex": 8
+                  },
+                  "isOptional": true
+                }
+              ],
+              "isOptional": false,
+              "name": "notifyObservers"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@dcl/playground-assets!Observable#notifyObserversWithPromise:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "notifyObserversWithPromise(eventData: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "T"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", mask?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", target?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", currentTarget?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<T>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 9,
+                "endIndex": 11
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "eventData",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "mask",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  },
+                  "isOptional": true
+                },
+                {
+                  "parameterName": "target",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "isOptional": true
+                },
+                {
+                  "parameterName": "currentTarget",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 7,
+                    "endIndex": 8
+                  },
+                  "isOptional": true
+                }
+              ],
+              "isOptional": false,
+              "name": "notifyObserversWithPromise"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@dcl/playground-assets!Observable#remove:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "remove(observer: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "null | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Observer",
+                  "canonicalReference": "@dcl/playground-assets!Observer:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<T>"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 6
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "observer",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 4
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "name": "remove"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@dcl/playground-assets!Observable#removeCallback:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "removeCallback(callback: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(eventData: T, eventState: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ObserverEventState",
+                  "canonicalReference": "@dcl/playground-assets!ObserverEventState:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", scope?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 7,
+                "endIndex": 8
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "callback",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 4
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "scope",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "isOptional": true
+                }
+              ],
+              "isOptional": false,
+              "name": "removeCallback"
+            }
+          ],
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Class",
+          "canonicalReference": "@dcl/playground-assets!Observer:class",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare class Observer<T> "
+            }
+          ],
+          "fileUrlPath": "../sdk/internal/Observable.d.ts",
+          "releaseTag": "Public",
+          "typeParameters": [
+            {
+              "typeParameterName": "T",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "Observer",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Property",
+              "canonicalReference": "@dcl/playground-assets!Observer#_willBeUnregistered:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "_willBeUnregistered: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "_willBeUnregistered",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false
+            },
+            {
+              "kind": "Constructor",
+              "canonicalReference": "@dcl/playground-assets!Observer:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `Observer` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(callback: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(eventData: T, eventState: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ObserverEventState",
+                  "canonicalReference": "@dcl/playground-assets!ObserverEventState:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", mask: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", scope?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "callback",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 4
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "mask",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "scope",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 7,
+                    "endIndex": 8
+                  },
+                  "isOptional": true
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@dcl/playground-assets!Observer#callback:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "callback: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(eventData: T, eventState: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ObserverEventState",
+                  "canonicalReference": "@dcl/playground-assets!ObserverEventState:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "callback",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              },
+              "isStatic": false,
+              "isProtected": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@dcl/playground-assets!Observer#mask:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "mask: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "mask",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@dcl/playground-assets!Observer#scope:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "scope: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "scope",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@dcl/playground-assets!Observer#unregisterOnNextCall:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "unregisterOnNextCall: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "unregisterOnNextCall",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false
+            }
+          ],
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Class",
+          "canonicalReference": "@dcl/playground-assets!ObserverEventState:class",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare class ObserverEventState "
+            }
+          ],
+          "fileUrlPath": "../sdk/internal/Observable.d.ts",
+          "releaseTag": "Public",
+          "name": "ObserverEventState",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "@dcl/playground-assets!ObserverEventState:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `ObserverEventState` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(mask: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", skipNextObservers?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", target?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", currentTarget?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "mask",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "skipNextObservers",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  },
+                  "isOptional": true
+                },
+                {
+                  "parameterName": "target",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "isOptional": true
+                },
+                {
+                  "parameterName": "currentTarget",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 7,
+                    "endIndex": 8
+                  },
+                  "isOptional": true
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@dcl/playground-assets!ObserverEventState#currentTarget:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "currentTarget?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "currentTarget",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@dcl/playground-assets!ObserverEventState#initalize:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "initalize(mask: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", skipNextObservers?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", target?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", currentTarget?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ObserverEventState",
+                  "canonicalReference": "@dcl/playground-assets!ObserverEventState:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 9,
+                "endIndex": 10
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "mask",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "skipNextObservers",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  },
+                  "isOptional": true
+                },
+                {
+                  "parameterName": "target",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "isOptional": true
+                },
+                {
+                  "parameterName": "currentTarget",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 7,
+                    "endIndex": 8
+                  },
+                  "isOptional": true
+                }
+              ],
+              "isOptional": false,
+              "name": "initalize"
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@dcl/playground-assets!ObserverEventState#lastReturnValue:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "lastReturnValue?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "lastReturnValue",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@dcl/playground-assets!ObserverEventState#mask:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "mask: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "mask",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@dcl/playground-assets!ObserverEventState#skipNextObservers:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "skipNextObservers: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "skipNextObservers",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@dcl/playground-assets!ObserverEventState#target:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "target?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "target",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false
+            }
+          ],
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@dcl/playground-assets!onCommsMessage:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onCommsMessage: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "@dcl/playground-assets!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    sender: string;\n    message: string;\n}>"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "onCommsMessage",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@dcl/playground-assets!onEnterScene:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onEnterScene: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "@dcl/playground-assets!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    userId: string;\n}>"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "onEnterScene",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@dcl/playground-assets!onEnterSceneObservable:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onEnterSceneObservable: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "@dcl/playground-assets!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    userId: string;\n}>"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "onEnterSceneObservable",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@dcl/playground-assets!onLeaveScene:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onLeaveScene: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "@dcl/playground-assets!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    userId: string;\n}>"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "onLeaveScene",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@dcl/playground-assets!onLeaveSceneObservable:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onLeaveSceneObservable: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "@dcl/playground-assets!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    userId: string;\n}>"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "onLeaveSceneObservable",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
           "kind": "TypeAlias",
           "canonicalReference": "@dcl/playground-assets!OnlyNonUndefinedTypes:type",
           "docComment": "",
@@ -19503,6 +22857,220 @@
           }
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "@dcl/playground-assets!onPlayerClickedObservable:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onPlayerClickedObservable: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "@dcl/playground-assets!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    userId: string;\n    ray: {\n        origin: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Vector3Type",
+              "canonicalReference": "@dcl/playground-assets!Vector3Type:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        direction: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Vector3Type",
+              "canonicalReference": "@dcl/playground-assets!Vector3Type:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        distance: number;\n    };\n}>"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "onPlayerClickedObservable",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 7
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@dcl/playground-assets!onPlayerConnectedObservable:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onPlayerConnectedObservable: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "@dcl/playground-assets!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    userId: string;\n}>"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "onPlayerConnectedObservable",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@dcl/playground-assets!onPlayerDisconnectedObservable:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onPlayerDisconnectedObservable: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "@dcl/playground-assets!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    userId: string;\n}>"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "onPlayerDisconnectedObservable",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@dcl/playground-assets!onPlayerExpressionObservable:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onPlayerExpressionObservable: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "@dcl/playground-assets!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    expressionId: string;\n}>"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "onPlayerExpressionObservable",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@dcl/playground-assets!onProfileChanged:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onProfileChanged: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "@dcl/playground-assets!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    ethAddress: string;\n    version: number;\n}>"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "onProfileChanged",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@dcl/playground-assets!onRealmChangedObservable:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onRealmChangedObservable: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "@dcl/playground-assets!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    domain: string;\n    room: string;\n    serverName: string;\n    displayName: string;\n}>"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "onRealmChangedObservable",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@dcl/playground-assets!onSceneReadyObservable:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onSceneReadyObservable: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "@dcl/playground-assets!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "onSceneReadyObservable",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
           "kind": "Function",
           "canonicalReference": "@dcl/playground-assets!onUpdate:function(1)",
           "docComment": "",
@@ -19551,6 +23119,34 @@
             }
           ],
           "name": "onUpdate"
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@dcl/playground-assets!onVideoEvent:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "onVideoEvent: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Observable",
+              "canonicalReference": "@dcl/playground-assets!Observable:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    componentId: string;\n    videoClipId: string;\n    videoStatus: number;\n    currentOffset: number;\n    totalVideoLength: number;\n}>"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "onVideoEvent",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
         },
         {
           "kind": "Interface",
@@ -32843,6 +36439,45 @@
           ]
         },
         {
+          "kind": "TypeAlias",
+          "canonicalReference": "@dcl/playground-assets!RaycastResponsePayload:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type RaycastResponsePayload<T> = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    queryId: string;\n    queryType: string;\n    payload: T;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "../sdk/observables.d.ts",
+          "releaseTag": "Public",
+          "name": "RaycastResponsePayload",
+          "typeParameters": [
+            {
+              "typeParameterName": "T",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "Variable",
           "canonicalReference": "@dcl/playground-assets!RaycastResult:var",
           "docComment": "/**\n * @public\n */\n",
@@ -33387,6 +37022,32 @@
           "typeTokenRange": {
             "startIndex": 3,
             "endIndex": 13
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@dcl/playground-assets!RPCSendableMessage:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type RPCSendableMessage = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    jsonrpc: '2.0';\n    id: number;\n    method: string;\n    params: any[];\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "../sdk/internal/provider.d.ts",
+          "releaseTag": "Public",
+          "name": "RPCSendableMessage",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
           }
         },
         {
