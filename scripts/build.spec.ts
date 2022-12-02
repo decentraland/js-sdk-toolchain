@@ -28,6 +28,10 @@ import { compileProtoApi } from './rpc-api-generation'
 import { getSnippetsfile } from './utils/getFilePathsSync'
 
 flow('build-all', () => {
+  afterAll(async () => {
+    await summary.write()
+  })
+
   commonChecks()
 
   flow('@dcl/js-runtime', () => {
@@ -134,7 +138,7 @@ flow('build-all', () => {
     }
 
     it('set the output as summary', async () => {
-      const file = path.resolve(PLAYGROUND_ASSETS_PATH, 'playground-assets.api.md')
+      const file = path.resolve(PLAYGROUND_ASSETS_PATH, 'etc/playground-assets.api.md')
       if(!existsSync(file)) throw new Error(`${file} doesn't exist`)
       summary.addRaw(readFileSync(file).toString())
     })
