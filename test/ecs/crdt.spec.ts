@@ -12,7 +12,7 @@ describe('CRDT tests', () => {
     jest.restoreAllMocks()
   })
 
-  it('should send static entities', () => {
+  it('should send static entities', async () => {
     const { engine, spySend } = SandBox.create({ length: 1 })[0]
     const entityA = engine.addEntity()
     const Transform = components.Transform(engine)
@@ -23,18 +23,18 @@ describe('CRDT tests', () => {
     Test.create(entityA, { x: 1, y: 2 })
 
     // Tick update and verify that both messages are being sent through ws.send
-    engine.update(1 / 30)
+    await engine.update(1 / 30)
     expect(spySend).toBeCalledTimes(1)
 
     // Reset ws.send called times
     jest.resetAllMocks()
 
     Transform.getMutable(entityA).position.x = 10
-    engine.update(1 / 30)
+    await engine.update(1 / 30)
     expect(spySend).toBeCalledTimes(1)
   })
 
-  it('Send ONLY dirty components via trasnport and spy on send messages', () => {
+  it('Send ONLY dirty components via trasnport and spy on send messages', async () => {
     const { engine, spySend } = SandBox.create({ length: 1 })[0]
     const entityA = engine.addEntity()
     const Transform = components.Transform(engine)
@@ -45,7 +45,7 @@ describe('CRDT tests', () => {
     Test.create(entityA, { x: 1, y: 2 })
 
     // Tick update and verify that both messages are being sent through ws.send
-    engine.update(1 / 30)
+    await engine.update(1 / 30)
     expect(spySend).toBeCalledTimes(1)
 
     // Reset ws.send called times
@@ -53,7 +53,7 @@ describe('CRDT tests', () => {
 
     // Update a component and verify that's being sent through the crdt system
     Transform.getMutable(entityA).position.x = 10
-    engine.update(1 / 30)
+    await engine.update(1 / 30)
     expect(spySend).toBeCalledTimes(1)
 
     // Reset ws.send again
@@ -61,7 +61,7 @@ describe('CRDT tests', () => {
 
     // Call update again with no updates and verify that there's no message
     // being sent through the wire
-    engine.update(1 / 30)
+    await engine.update(1 / 30)
     expect(spySend).toBeCalledWith(new Uint8Array([]))
   })
 
@@ -78,12 +78,12 @@ describe('CRDT tests', () => {
     TransformA.create(entityA, SandBox.DEFAULT_POSITION)
     const posA = PositionA.create(entityA, { x: 10.231231, y: 0.12321321312 })
 
-    clientA.engine.update(1 / 30)
+    await clientA.engine.update(1 / 30)
     expect(PositionB.has(entityA)).toBe(false)
 
     // Update engine, process crdt messages.
     await wait(SandBox.WS_SEND_DELAY)
-    clientB.engine.update(1 / 30)
+    await clientB.engine.update(1 / 30)
 
     expect(SandBox.DEFAULT_POSITION).toBeDeepCloseTo(TransformB.get(entityA))
     expect(posA).toBeDeepCloseTo(PositionB.get(entityA))
@@ -152,14 +152,14 @@ describe('CRDT tests', () => {
       expect(doorValue).toBe(DOOR_VALUE)
     })
   })
-  it('should resend a crdt message if its outdated', () => {
+  it('should resend a crdt message if its outdated', async () => {
     const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
     const entity = engine.addEntity()
     const Transform = components.Transform(engine)
     Transform.create(entity, SandBox.DEFAULT_POSITION)
-    engine.update(1)
+    await engine.update(1)
     Transform.getMutable(entity).position.x = 8
-    engine.update(1)
+    await engine.update(1)
     const buffer = createByteBuffer()
     ComponentOperation.write(
       WireMessage.Enum.PUT_COMPONENT,
@@ -171,18 +171,18 @@ describe('CRDT tests', () => {
     jest.resetAllMocks()
     const spyWrite = jest.spyOn(ComponentOperation, 'write')
     transports[0].onmessage!(buffer.toBinary())
-    engine.update(1)
+    await engine.update(1)
 
     expect(spySend).toBeCalledTimes(2)
     expect(spyWrite).toBeCalledTimes(1)
   })
 
-  it('should resend a crdt delete message if its outdated', () => {
+  it('should resend a crdt delete message if its outdated', async () => {
     const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
     const entity = engine.addEntity()
     const Transform = components.Transform(engine)
     Transform.create(entity, SandBox.DEFAULT_POSITION)
-    engine.update(1)
+    await engine.update(1)
     const buffer = createByteBuffer()
     ComponentOperation.write(
       WireMessage.Enum.PUT_COMPONENT,
@@ -192,24 +192,24 @@ describe('CRDT tests', () => {
       buffer
     )
     Transform.deleteFrom(entity)
-    engine.update(1)
+    await engine.update(1)
     jest.resetAllMocks()
     const spyWrite = jest.spyOn(ComponentOperation, 'write')
     transports[0].onmessage!(buffer.toBinary())
-    engine.update(1)
+    await engine.update(1)
 
     expect(spySend).toBeCalledTimes(2)
     expect(spyWrite).toBeCalledTimes(1)
   })
 
-  it('should remove a component if we receive a DELETE_COMPONENT operation message', () => {
+  it('should remove a component if we receive a DELETE_COMPONENT operation message', async () => {
     const [{ engine, transports }] = SandBox.create({ length: 1 })
     const [transport] = transports
     const entity = engine.addEntity()
     const Transform = components.Transform(engine)
 
     Transform.create(entity, SandBox.DEFAULT_POSITION)
-    engine.update(1)
+    await engine.update(1)
 
     const buffer = createByteBuffer()
     ComponentOperation.write(
@@ -220,7 +220,7 @@ describe('CRDT tests', () => {
       buffer
     )
     transport.onmessage!(buffer.toBinary())
-    engine.update(1)
+    await engine.update(1)
     expect(Transform.getOrNull(entity)).toBe(null)
   })
 })

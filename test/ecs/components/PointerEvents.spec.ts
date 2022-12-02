@@ -47,7 +47,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     expect(pointerHoverFeedback).toEqual(result)
   })
 
-  it('should receive OnPointerResult', () => {
+  it('should receive OnPointerResult', async () => {
     const newEngine = Engine()
     const PointerHoverFeedback = components.PointerHoverFeedback(newEngine)
     const PointerEventsResult = components.PointerEventsResult(newEngine)
@@ -70,7 +70,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     })
 
     // wait a tick to receive a response
-    newEngine.update(1 / 30)
+    await newEngine.update(1 / 30)
 
     // We receive an OnPointerResult
     PointerEventsResult.create(entity, {

@@ -2,7 +2,7 @@ import { components as engineComponents } from '../../packages/@dcl/ecs/src'
 import { SandBox } from './utils'
 
 describe.skip('Performance.', () => {
-  it('should run 10k iterations', () => {
+  it('should run 10k iterations', async () => {
     const { engine, components } = SandBox.create({ length: 1 })[0]
     const Transform = engineComponents.Transform(engine)
     const NUM_ENTITIES = 1000
@@ -55,7 +55,7 @@ describe.skip('Performance.', () => {
 
     performance.mark('update')
     for (let dt = 0; dt <= NUM_ITERATIONS; dt++) {
-      engine.update(dt)
+      await engine.update(dt)
     }
     performance.mark('end-update')
 
