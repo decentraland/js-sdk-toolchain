@@ -131,11 +131,6 @@ export function createSceneConfig(options: { PROD: boolean }): RollupOptions {
             name: 'Scene',
             extend: true,
             sourcemap: 'inline',
-            // sourcemapPathTransform: (relativeSourcePath: string, sourcemapPath: string) => {
-            //   const out = pathToFileURL(ts.sys.resolvePath(relativeSourcePath)).toString()
-            //   console.dir({ relativeSourcePath, sourcemapPath, out })
-            //   return out
-            // }
             sourcemapPathTransform: (distRelativeSourcePath: string) => {
               // Transform the relative-to-the-dist-folder source paths we get by default
               // into ones relative to the app root and prefixed with the package name
@@ -161,11 +156,6 @@ export function createSceneConfig(options: { PROD: boolean }): RollupOptions {
               if (url.startsWith(fileRoot)) {
                 // if it is relative to the project, then we return a dcl://url
                 const dclUrl = url.replace(fileRoot, 'dcl://')
-                console.dir({
-                  distRelativeSourcePath,
-                  absoluteSourcePath,
-                  dclUrl
-                })
                 return dclUrl
               }
 
