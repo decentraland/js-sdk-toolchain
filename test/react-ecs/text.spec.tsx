@@ -38,7 +38,7 @@ describe('UiText React Ecs', () => {
         uiText={{
           value: text,
           color,
-          font: Font.F_LIBERATION_SANS,
+          font: Font.F_SANS_SERIF,
           textAlign: TextAlignMode.TAM_BOTTOM_CENTER
         }}
       />
@@ -56,7 +56,7 @@ describe('UiText React Ecs', () => {
     expect(getText(rootDivEntity)).toMatchObject({
       value: 'CASLA',
       color: undefined,
-      font: Font.F_LIBERATION_SANS,
+      font: Font.F_SANS_SERIF,
       textAlign: TextAlignMode.TAM_BOTTOM_CENTER
     })
 
