@@ -20,7 +20,7 @@ export * from './readonly'
 export * from './types'
 export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
 
-function preEngine() {
+function engineConfig() {
   const entityContainer = EntityContainer()
   const componentsDefinition = new Map<
     number,
@@ -159,6 +159,31 @@ function preEngine() {
     componentsDefinition.delete(componentId)
   }
 
+  const Transform = components.Transform({ defineComponentFromSchema })
+
+  function* getTreeEntityArray(
+    firstEntity: Entity,
+    proccesedEntities: Entity[]
+  ): Generator<Entity> {
+    // This avoid infinite loop when there is a cyclic parenting
+    if (proccesedEntities.find((value) => firstEntity === value)) return
+    proccesedEntities.push(firstEntity)
+
+    for (const [entity, value] of getEntitiesWith(Transform)) {
+      if (value.parent === firstEntity) {
+        yield* getTreeEntityArray(entity, proccesedEntities)
+      }
+    }
+
+    yield firstEntity
+  }
+
+  function removeEntityWithChildren(firstEntity: Entity) {
+    for (const entity of getTreeEntityArray(firstEntity, [])) {
+      removeEntity(entity)
+    }
+  }
+
   return {
     entityExists,
     componentsDefinition,
@@ -172,7 +197,8 @@ function preEngine() {
     getEntitiesWith,
     getComponent,
     getComponentOrNull,
-    removeComponentDefinition
+    removeComponentDefinition,
+    removeEntityWithChildren
   }
 }
 
@@ -180,7 +206,7 @@ function preEngine() {
  * @public
  */
 export function Engine(): IEngine {
-  const engine = preEngine()
+  const engine = engineConfig()
   const crdtSystem = crdtSceneSystem(engine)
 
   function update(dt: number) {
@@ -215,35 +241,10 @@ export function Engine(): IEngine {
     }
   }
 
-  const Transform = components.Transform(engine)
-
-  function* getTreeEntityArray(
-    firstEntity: Entity,
-    proccesedEntities: Entity[]
-  ): Generator<Entity> {
-    // This avoid infinite loop when there is a cyclic parenting
-    if (proccesedEntities.find((value) => firstEntity === value)) return
-    proccesedEntities.push(firstEntity)
-
-    for (const [entity, value] of engine.getEntitiesWith(Transform)) {
-      if (value.parent === firstEntity) {
-        yield* getTreeEntityArray(entity, proccesedEntities)
-      }
-    }
-
-    yield firstEntity
-  }
-
-  function removeEntityWithChildren(firstEntity: Entity) {
-    for (const entity of getTreeEntityArray(firstEntity, [])) {
-      engine.removeEntity(entity)
-    }
-  }
-
   return {
     addEntity: engine.addEntity,
     removeEntity: engine.removeEntity,
-    removeEntityWithChildren,
+    removeEntityWithChildren: engine.removeEntityWithChildren,
     addSystem: engine.addSystem,
     removeSystem: engine.removeSystem,
     defineComponent: engine.defineComponent,
