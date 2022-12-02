@@ -140,6 +140,14 @@ flow('build-all', () => {
       itDeletesGlob('etc/*', PLAYGROUND_ASSETS_PATH)
       itExecutes('npm run build-local --silent', PLAYGROUND_ASSETS_PATH)
     }
+
+    it('check no ae-forgotten-export are present in bundle file', async () => {
+      const file = path.resolve(PLAYGROUND_ASSETS_PATH, 'etc/playground-assets.api.md')
+      if (!existsSync(file)) throw new Error(`${file} doesn't exist`)
+      const content = readFileSync(file).toString()
+      const occurences = content.match(/^.*ae-forgotten-export.*/mig)
+      expect(occurences).toEqual([])
+    })
   })
 
   flow('playground copy files', () => {
