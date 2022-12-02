@@ -593,9 +593,7 @@ export type FloatArray = number[];
 // @public (undocumented)
 export const enum Font {
     // (undocumented)
-    F_LIBERATION_SANS = 0,
-    // (undocumented)
-    F_SANS_SERIF = 1
+    F_SANS_SERIF = 0
 }
 
 // @public (undocumented)
