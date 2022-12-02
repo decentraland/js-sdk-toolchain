@@ -444,6 +444,14 @@ export function Container({ width, height, children }: ContainerPropTypes): Reac
 // @public (undocumented)
 export type ContainerPropTypes = Partial<CommonProps> & EntityPropTypes['uiTransform'];
 
+// Warning: (ae-missing-release-tag) "createEthereumProvider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function createEthereumProvider(): {
+    send(message: RPCSendableMessage, callback?: ((error: Error | null, result?: any) => void) | undefined): void;
+    sendAsync(message: RPCSendableMessage, callback: (error: Error | null, result?: any) => void): void;
+};
+
 // Warning: (ae-missing-release-tag) "createInputSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -943,6 +951,20 @@ export interface MeshRendererComponentDefinitionExtended extends MeshRendererCom
 export const MeshRendererSchema: ISchema<PBMeshRenderer> & {
     COMPONENT_ID: number;
 };
+
+// Warning: (ae-missing-release-tag) "MessageBus" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export class MessageBus {
+    constructor();
+    // (undocumented)
+    emit(message: string, payload: Record<any, any>): void;
+    // Warning: (ae-forgotten-export) The symbol "Observer" needs to be exported by the entry point index.d.ts
+    // Warning: (ae-forgotten-export) The symbol "IEvents" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    on(message: string, callback: (value: any, sender: string) => void): Observer<IEvents['comms']>;
+}
 
 // Warning: (ae-missing-release-tag) "NftFrameType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2786,6 +2808,10 @@ export const enum YGWrap {
     // (undocumented)
     YGW_WRAP_REVERSE = 2
 }
+
+// Warnings were encountered during analysis:
+//
+// /Users/user/code/js-sdk-toolchain/packages/@dcl/sdk/ethereum-provider.d.ts:2:5 - (ae-forgotten-export) The symbol "RPCSendableMessage" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

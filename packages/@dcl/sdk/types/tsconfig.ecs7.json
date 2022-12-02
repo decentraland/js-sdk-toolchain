@@ -9,6 +9,8 @@
     "experimentalDecorators": true,
     "downlevelIteration": true,
     "keyofStringsOnly": true,
+    "suppressExcessPropertyErrors": false,
+    "exactOptionalPropertyTypes": false,
     "inlineSourceMap": true,
     "sourceMap": false,
     "removeComments": true,
@@ -18,6 +20,12 @@
     "allowJs": true,
     "jsx": "react",
     "jsxFactory": "ReactEcs.createElement",
+    "alwaysStrict": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
     "lib": [
       "ES2020"
     ],
