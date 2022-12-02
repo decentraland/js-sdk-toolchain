@@ -1,6 +1,7 @@
 import * as path from 'path'
 import { readFileSync, writeFileSync } from 'fs'
-import { copySync, mkdirSync, removeSync } from 'fs-extra'
+import { copySync, existsSync, mkdirSync, removeSync } from 'fs-extra'
+import { summary } from '@actions/core'
 
 import {
   commonChecks,
@@ -131,6 +132,12 @@ flow('build-all', () => {
     } else {
       itExecutes('npm run build-local --silent', PLAYGROUND_ASSETS_PATH)
     }
+
+    it('set the output as summary', async () => {
+      const file = path.resolve(PLAYGROUND_ASSETS_PATH, 'playground-assets.api.md')
+      if(!existsSync(file)) throw new Error(`${file} doesn't exist`)
+      summary.addRaw(readFileSync(file).toString())
+    })
   })
 
   flow('playground copy files', () => {
