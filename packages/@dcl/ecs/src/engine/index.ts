@@ -183,8 +183,8 @@ export function Engine(): IEngine {
   const engine = preEngine()
   const crdtSystem = crdtSceneSystem(engine)
 
-  function update(dt: number) {
-    crdtSystem.receiveMessages()
+  async function update(dt: number) {
+    await crdtSystem.receiveMessages()
 
     for (const system of engine.getSystems()) {
       const ret: unknown | Promise<unknown> = system.fn(dt)
@@ -208,7 +208,7 @@ export function Engine(): IEngine {
         dirtySet.get(entity)!.add(componentId)
       }
     }
-    crdtSystem.createMessages(dirtySet)
+    await crdtSystem.createMessages(dirtySet)
 
     for (const [_componentId, definition] of engine.componentsDefinition) {
       definition.clearDirty()
