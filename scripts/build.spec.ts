@@ -29,19 +29,16 @@ import { getSnippetsfile } from './utils/getFilePathsSync'
 
 flow('build-all', () => {
   afterAll(async () => {
-    await summary.write()
+    if (process.env.GITHUB_STEP_SUMMARY) {
+      await summary.write()
+    }
   })
 
   commonChecks()
 
   flow('@dcl/js-runtime', () => {
     it('compile protos', async () => {
-      const rpcProtoPath = path.resolve(
-        __dirname,
-        'rpc-api-generation',
-        'src',
-        'proto'
-      )
+      const rpcProtoPath = path.resolve(__dirname, 'rpc-api-generation', 'src', 'proto')
       removeSync(rpcProtoPath)
       mkdirSync(rpcProtoPath)
       writeFileSync(path.resolve(rpcProtoPath, 'README.md'), '# Generated code')
@@ -131,33 +128,24 @@ flow('build-all', () => {
 
     // install required dependencies
     itExecutes(`npm install --silent ${SDK_PATH}`, PLAYGROUND_ASSETS_PATH)
-    if (process.env.CI) {
+
+    if (process.env.GITHUB_STEP_SUMMARY) {
       itExecutes('npm run build --silent', PLAYGROUND_ASSETS_PATH)
+      it('set the output as summary', async () => {
+        const file = path.resolve(PLAYGROUND_ASSETS_PATH, 'etc/playground-assets.api.md')
+        if (!existsSync(file)) throw new Error(`${file} doesn't exist`)
+        summary.addRaw(readFileSync(file).toString())
+      })
     } else {
       itExecutes('npm run build-local --silent', PLAYGROUND_ASSETS_PATH)
     }
-
-    it('set the output as summary', async () => {
-      const file = path.resolve(PLAYGROUND_ASSETS_PATH, 'etc/playground-assets.api.md')
-      if(!existsSync(file)) throw new Error(`${file} doesn't exist`)
-      summary.addRaw(readFileSync(file).toString())
-    })
   })
 
   flow('playground copy files', () => {
     it('playground copy snippets', async () => {
       const PLAYGORUND_INFO_JSON = 'info.json'
-      const snippetsPath = path.resolve(
-        process.cwd(),
-        'test',
-        'ecs',
-        'snippets'
-      )
-      const playgroundDistPath = path.resolve(
-        PLAYGROUND_ASSETS_PATH,
-        'dist',
-        'playground'
-      )
+      const snippetsPath = path.resolve(process.cwd(), 'test', 'ecs', 'snippets')
+      const playgroundDistPath = path.resolve(PLAYGROUND_ASSETS_PATH, 'dist', 'playground')
 
       // Clean last build
       removeSync(playgroundDistPath)
@@ -195,18 +183,11 @@ flow('build-all', () => {
       }
 
       // // Create a JSON with the path of every snippet, this can be read by playground or CLI
-      writeFileSync(
-        path.resolve(distSnippetsPath, PLAYGORUND_INFO_JSON),
-        JSON.stringify(snippetInfo)
-      )
+      writeFileSync(path.resolve(distSnippetsPath, PLAYGORUND_INFO_JSON), JSON.stringify(snippetInfo))
     })
 
     it('playground copy minified files', async () => {
-      const playgroundDistPath = path.resolve(
-        PLAYGROUND_ASSETS_PATH,
-        'dist',
-        'playground'
-      )
+      const playgroundDistPath = path.resolve(PLAYGROUND_ASSETS_PATH, 'dist', 'playground')
 
       // Copy minified ecs
       const filesToCopy = [
