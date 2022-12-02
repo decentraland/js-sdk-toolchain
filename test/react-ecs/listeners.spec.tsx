@@ -66,41 +66,41 @@ describe('Ui Listeners React Ecs', () => {
     const ui = () => <UiEntity uiTransform={{ width: 100 }} onClick={onClick} />
     uiRenderer.setUiRenderer(ui)
     expect(counter).toBe(0)
-    engine.update(1)
+    await engine.update(1)
 
     // Click with the current onclick
     fakeClick()
-    engine.update(1)
+    await engine.update(1)
     expect(counter).toBe(1)
 
     fakeClick()
-    engine.update(1)
+    await engine.update(1)
     expect(counter).toBe(2)
 
     // Remove onClick
     onClick = undefined
-    engine.update(1)
+    await engine.update(1)
     fakeClick()
-    engine.update(1)
+    await engine.update(1)
     expect(counter).toBe(2)
 
     // Add a new onclick
     onClick = () => {
       counter = 8888
     }
-    engine.update(1)
+    await engine.update(1)
     fakeClick()
 
-    engine.update(1)
+    await engine.update(1)
     expect(counter).toBe(8888)
 
     // Update onclick listener
     onClick = () => {
       counter = 8
     }
-    engine.update(1)
+    await engine.update(1)
     fakeClick()
-    engine.update(1)
+    await engine.update(1)
     expect(counter).toBe(8)
   })
 })

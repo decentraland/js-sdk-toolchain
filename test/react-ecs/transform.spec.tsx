@@ -39,7 +39,7 @@ describe('UiTransform React Ecs', () => {
     const getUiTransform = (entity: Entity) => UiTransform.get(entity)
     const ui = () => <UiEntity uiTransform={undefined} />
     uiRenderer.setUiRenderer(ui)
-    engine.update(1)
+    await engine.update(1)
     expect(getUiTransform(rootDivEntity).width).toBe(0)
   })
 
@@ -59,7 +59,7 @@ describe('UiTransform React Ecs', () => {
       />
     )
     uiRenderer.setUiRenderer(ui)
-    engine.update(1)
+    await engine.update(1)
     expect(getUiTransform(rootDivEntity).width).toBe(0)
     expect(getUiTransform(rootDivEntity).flexWrap).toBe(YGWrap.YGW_WRAP)
   })
@@ -82,7 +82,7 @@ describe('UiTransform React Ecs', () => {
     const ui = () => <UiEntity uiTransform={{ width: 100, position }} />
 
     uiRenderer.setUiRenderer(ui)
-    engine.update(1)
+    await engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
@@ -99,7 +99,7 @@ describe('UiTransform React Ecs', () => {
     })
 
     position.left = '88%'
-    engine.update(1)
+    await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       positionTop: 1,
       positionLeft: 88,
@@ -114,7 +114,7 @@ describe('UiTransform React Ecs', () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     delete position.right
-    engine.update(1)
+    await engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       positionRight: 0,
@@ -123,7 +123,7 @@ describe('UiTransform React Ecs', () => {
 
     position.right = {} as any // Assertion
     position.left = '10%'
-    engine.update(1)
+    await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       positionRight: 0,
       positionRightUnit: YGUnit.YGU_UNDEFINED,
@@ -154,7 +154,7 @@ describe('UiTransform React Ecs', () => {
     )
 
     uiRenderer.setUiRenderer(ui)
-    engine.update(1)
+    await engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
@@ -174,7 +174,7 @@ describe('UiTransform React Ecs', () => {
     })
 
     width = 110
-    engine.update(1)
+    await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       width: 110,
       widthUnit: YGUnit.YGU_POINT
@@ -183,7 +183,7 @@ describe('UiTransform React Ecs', () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     width = undefined
-    engine.update(1)
+    await engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       width: 0,

@@ -53,7 +53,7 @@ describe('RectEcs UI ✨', () => {
       </Container>
     )
     uiRenderer.setUiRenderer(ui)
-    engine.update(1)
+    await engine.update(1)
     expect(getUi(rootEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
       rightOf: 0,
@@ -77,7 +77,7 @@ describe('RectEcs UI ✨', () => {
 
     // Update width prop and see if it has changed
     width = 400
-    engine.update(1)
+    await engine.update(1)
 
     expect(UiTransform.isDirty(childEntity)).toBe(false)
     expect(UiTransform.isDirty(rootEntity)).toBe(false)
@@ -110,7 +110,7 @@ describe('RectEcs UI ✨', () => {
     }
 
     uiRenderer.setUiRenderer(ui)
-    engine.update(1)
+    await engine.update(1)
 
     expect(getUi(rootEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
@@ -129,7 +129,7 @@ describe('RectEcs UI ✨', () => {
     })
 
     addChild = true
-    engine.update(1)
+    await engine.update(1)
 
     // Root UiEntity doesn't have to change
     expect(UiTransform.isDirty(rootEntity)).toBe(false)
@@ -157,7 +157,7 @@ describe('RectEcs UI ✨', () => {
 
     // Remove addedEntity and check that all goes back to the first iteration
     addChild = false
-    engine.update(1)
+    await engine.update(1)
 
     expect(getUi(rootEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
@@ -200,7 +200,7 @@ describe('RectEcs UI ✨', () => {
       </Container>
     )
     uiRenderer.setUiRenderer(ui)
-    engine.update(1)
+    await engine.update(1)
 
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
@@ -214,7 +214,7 @@ describe('RectEcs UI ✨', () => {
     })
 
     addChild = true
-    engine.update(1)
+    await engine.update(1)
 
     expect(getUi(entityAdded)).toMatchObject({
       parent: rootEntity,
@@ -244,7 +244,7 @@ describe('RectEcs UI ✨', () => {
 
     // Remove UiEntity Added and check that all goes back to the first iteration
     addChild = false
-    engine.update(1)
+    await engine.update(1)
 
     expect(getUi(rootEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
@@ -288,7 +288,7 @@ describe('RectEcs UI ✨', () => {
       </Container>
     )
     uiRenderer.setUiRenderer(ui)
-    engine.update(1)
+    await engine.update(1)
     expect(getUi(rootEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
       rightOf: 0,
@@ -307,7 +307,7 @@ describe('RectEcs UI ✨', () => {
 
     // Update addChild value
     addChild = true
-    engine.update(1)
+    await engine.update(1)
     expect(getUi(entityAdded)).toMatchObject({
       parent: rootEntity,
       rightOf: entityB,
@@ -332,7 +332,7 @@ describe('RectEcs UI ✨', () => {
 
     // Remove UiEntity Added and check that all goes back to the first iteration
     addChild = false
-    engine.update(1)
+    await engine.update(1)
 
     expect(getUi(entityB)).toMatchObject({
       parent: rootEntity,
@@ -386,10 +386,10 @@ describe('RectEcs UI ✨', () => {
     )
 
     uiRenderer.setUiRenderer(ui)
-    engine.update(1)
+    await engine.update(1)
 
     addChild = true
-    engine.update(1)
+    await engine.update(1)
 
     // Add child entities
     expect(getUi(entityRootAdded)).toMatchObject({
@@ -435,7 +435,7 @@ describe('RectEcs UI ✨', () => {
     // Remove UiEntity Added and check that all goes back to the first iteration
     width = 333.22
     addChild = false
-    engine.update(1)
+    await engine.update(1)
     expect(getUi(entityB)).toMatchObject({
       parent: rootEntity,
       rightOf: entityA,
@@ -470,7 +470,7 @@ describe('RectEcs UI ✨', () => {
       </Container>
     )
     uiRenderer.setUiRenderer(ui)
-    engine.update(1)
+    await engine.update(1)
 
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
@@ -495,7 +495,7 @@ describe('RectEcs UI ✨', () => {
 
     // Add an element to the array
     uiEntities.push({ id: 4, value: 4 })
-    engine.update(1)
+    await engine.update(1)
 
     const entityD = ((rootEntity as number) + 1) as Entity
 
@@ -527,12 +527,12 @@ describe('RectEcs UI ✨', () => {
 
     // Update first elemnt of the array
     uiEntities[0] = { ...uiEntities[0], value: 111 }
-    engine.update(1)
+    await engine.update(1)
     expect(getUi(entityA).width).toBe(111)
 
     // Remove B and C entities
     uiEntities.splice(1, 2)
-    engine.update(1)
+    await engine.update(1)
 
     expect(UiTransform.getOrNull(entityB)).toBe(null)
     expect(UiTransform.getOrNull(entityC)).toBe(null)
@@ -540,7 +540,7 @@ describe('RectEcs UI ✨', () => {
 
     // Add an element at the beginning of the array
     uiEntities.unshift({ id: 8, value: 8 })
-    engine.update(1)
+    await engine.update(1)
     const newEntity = ((entityD as number) + 1) as Entity
     // Entities props doesnt change
 
@@ -588,7 +588,7 @@ describe('RectEcs UI ✨', () => {
       </UiEntity>
     )
     uiRenderer.setUiRenderer(ui)
-    engine.update(1)
+    await engine.update(1)
 
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
@@ -609,12 +609,12 @@ describe('RectEcs UI ✨', () => {
     const first = uiEntities.shift()!
     uiEntities.push(first)
 
-    engine.update(1)
+    await engine.update(1)
     expect(getUi(entityA).rightOf).toBe(entityB)
     expect(getUi(entityB).rightOf).toBe(undefined)
 
     uiEntities = [...uiEntities]
-    engine.update(1)
+    await engine.update(1)
     expect(getUi(entityA).rightOf).toBe(entityB)
     expect(getUi(entityB).rightOf).toBe(undefined)
     uiEntities = [
@@ -622,7 +622,7 @@ describe('RectEcs UI ✨', () => {
       { id: 1, value: 1 },
       { id: 2, value: 2 }
     ]
-    engine.update(1)
+    await engine.update(1)
     /**
      * Before => [ 514, 513 ]
      * After InsertBefore => [514, 516, 513]
@@ -637,7 +637,7 @@ describe('RectEcs UI ✨', () => {
     expect(getUi(entityB).rightOf).toBe(entityA)
 
     uiEntities.unshift({ id: 4, value: 4 })
-    engine.update(1)
+    await engine.update(1)
     const entityD = ((entityC as number) + 1) as Entity
     expect(getUi(entityD).rightOf).toBe(undefined)
     expect(getUi(entityC).rightOf).toBe(entityD)
@@ -650,7 +650,7 @@ describe('RectEcs UI ✨', () => {
       { id: 5, value: 5 },
       ...uiEntities.slice(2)
     ]
-    engine.update(1)
+    await engine.update(1)
     const entityE = ((entityD as number) + 1) as Entity
     expect(getUi(entityD).rightOf).toBe(undefined)
     expect(getUi(entityC).rightOf).toBe(entityD)

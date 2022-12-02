@@ -17,7 +17,7 @@ const VelocitySchema = {
 }
 
 describe('Engine tests', () => {
-  it('generates new entities', () => {
+  it('generates new entities', async () => {
     const engine = Engine()
     const entityA = engine.addEntity()
     const entityB = engine.addEntity()
@@ -25,7 +25,7 @@ describe('Engine tests', () => {
     expect(entityB).toBe(EntityUtils.STATIC_ENTITIES_RANGE[0] + 1)
   })
 
-  it('should not allow u to create same component to an existing entitiy', () => {
+  it('should not allow u to create same component to an existing entitiy', async () => {
     const engine = Engine()
     const entity = engine.addEntity()
     const Position = engine.defineComponent(PositionSchema, 888)
@@ -33,7 +33,7 @@ describe('Engine tests', () => {
     expect(() => Position.create(entity, { x: 10 })).toThrowError()
   })
 
-  it('should throw an error if the component doesnt exist', () => {
+  it('should throw an error if the component doesnt exist', async () => {
     const engine = Engine()
     const Position = engine.defineComponent(PositionSchema, 888)
     const entity = engine.addEntity()
@@ -45,7 +45,7 @@ describe('Engine tests', () => {
     expect(() => Position.updateFromBinary(entity, binary)).toThrowError()
   })
 
-  it('should delete component if exists or not', () => {
+  it('should delete component if exists or not', async () => {
     const engine = Engine()
     const Position = engine.defineComponent(PositionSchema, 888)
     const entity = engine.addEntity()
@@ -55,7 +55,7 @@ describe('Engine tests', () => {
     expect(Position.deleteFrom(entity2)).toStrictEqual(null)
   })
 
-  it('should fail when trying to add the same system twice', () => {
+  it('should fail when trying to add the same system twice', async () => {
     const engine = Engine()
     const system = () => {}
     engine.addSystem(system)
@@ -66,7 +66,7 @@ describe('Engine tests', () => {
     expect(() => engine.addSystem(systemA)).toThrowError()
   })
 
-  it('should replace existing component with the new one', () => {
+  it('should replace existing component with the new one', async () => {
     const engine = Engine()
     const Position = engine.defineComponent(PositionSchema, 888)
     const entity = engine.addEntity()
@@ -75,7 +75,7 @@ describe('Engine tests', () => {
     expect(Position.get(entity)).toStrictEqual({ x: 10 })
   })
 
-  it('define and remove component, also creates new entity', () => {
+  it('define and remove component, also creates new entity', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
     const Position = engine.defineComponent(PositionSchema, 888)
@@ -98,12 +98,12 @@ describe('Engine tests', () => {
     expect(() => engine.getComponent(888)).toThrowError()
   })
 
-  it('should fail if we try to fetch a component not deifned', () => {
+  it('should fail if we try to fetch a component not deifned', async () => {
     const engine = Engine()
     expect(() => engine.getComponent(1238)).toThrowError()
   })
 
-  it('iterate multiple components', () => {
+  it('iterate multiple components', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
     const Position = engine.defineComponent(PositionSchema, 888)
@@ -122,7 +122,7 @@ describe('Engine tests', () => {
     }
   })
 
-  it('define two custom components multiple components without ids', () => {
+  it('define two custom components multiple components without ids', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
     const Position = engine.defineComponent(PositionSchema, 123)
@@ -141,7 +141,7 @@ describe('Engine tests', () => {
     }
   })
 
-  it('should not update a readonly prop', () => {
+  it('should not update a readonly prop', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
     const Position = engine.defineComponent(PositionSchema, 888)
@@ -152,7 +152,7 @@ describe('Engine tests', () => {
     expect(Position.get(entity)).toStrictEqual({ x: 1000000000000 })
   })
 
-  it('should not update a readonly prop groupOf', () => {
+  it('should not update a readonly prop groupOf', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
     const Position = engine.defineComponent(PositionSchema, 888)
@@ -165,7 +165,7 @@ describe('Engine tests', () => {
     expect(Position.get(entity)).toStrictEqual({ x: 10 })
   })
 
-  it('should not update a readonly prop getFrom(entity)', () => {
+  it('should not update a readonly prop getFrom(entity)', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
     const Position = engine.defineComponent(PositionSchema, 888)
@@ -177,7 +177,7 @@ describe('Engine tests', () => {
     expect(Position.get(entity)).toStrictEqual({ x: 10 })
   })
 
-  it('should fail if we fetch a component that doesnt exists on an entity', () => {
+  it('should fail if we fetch a component that doesnt exists on an entity', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
     const Position = engine.defineComponent(PositionSchema, 888)
@@ -186,7 +186,7 @@ describe('Engine tests', () => {
     expect(() => Velocity.get(entity)).toThrowError()
   })
 
-  it('should return null if the component not exists on the entity.', () => {
+  it('should return null if the component not exists on the entity.', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
     const Position = engine.defineComponent(PositionSchema, 888)
@@ -195,9 +195,9 @@ describe('Engine tests', () => {
     expect(Velocity.getOrNull(entity)).toBe(null)
   })
 
-  it.skip('should throw an error if the component class id already exists and the component definition is different', () => {})
+  it.skip('should throw an error if the component class id already exists and the component definition is different', async () => {})
 
-  it('should return exactly the same component trying to re-define it', () => {
+  it('should return exactly the same component trying to re-define it', async () => {
     const engine = Engine()
     const COMPONENT_ID = 888
     const a = engine.defineComponent(PositionSchema, COMPONENT_ID)
@@ -205,7 +205,7 @@ describe('Engine tests', () => {
     expect(a).toStrictEqual(b)
   })
 
-  it('should return mutable obj if use component.getMutable()', () => {
+  it('should return mutable obj if use component.getMutable()', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
     const COMPONENT_ID = 888
@@ -215,7 +215,7 @@ describe('Engine tests', () => {
     expect(Position.get(entity)).toStrictEqual({ x: 8888 })
   })
 
-  it('should destroy an entity', () => {
+  it('should destroy an entity', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
     const entityB = engine.addEntity() // 0
@@ -236,7 +236,7 @@ describe('Engine tests', () => {
     expect(Position.getOrNull(entityB)).toStrictEqual({ x: 20 })
   })
 
-  it('should return get entities with multiples components', () => {
+  it('should return get entities with multiples components', async () => {
     const engine = Engine()
     const entityA = engine.addEntity()
     const entityB = engine.addEntity()
@@ -262,7 +262,7 @@ describe('Engine tests', () => {
     }
   })
 
-  it('should return mutableGroupOf single component', () => {
+  it('should return mutableGroupOf single component', async () => {
     const engine = Engine()
     const entityA = engine.addEntity()
     const entityB = engine.addEntity()
@@ -274,7 +274,7 @@ describe('Engine tests', () => {
     Velocity.create(entityB, { y: 10 })
 
     // avoid dirty iterators
-    engine.update(0)
+    await engine.update(0)
 
     for (const [entity, _readonlyPosition] of engine.getEntitiesWith(
       Position
@@ -288,7 +288,7 @@ describe('Engine tests', () => {
     expect(Array.from(Position.dirtyIterator())).toEqual([entityA])
   })
 
-  it('should return mutableGroupOf multi component & entities', () => {
+  it('should return mutableGroupOf multi component & entities', async () => {
     const engine = Engine()
     const entityA = engine.addEntity()
     const entityB = engine.addEntity()
@@ -303,7 +303,7 @@ describe('Engine tests', () => {
     Velocity.create(entityB, { y: 1 })
 
     // avoid dirty iterators
-    engine.update(0)
+    await engine.update(0)
 
     const [component1, component2, component3] = Array.from(
       engine.getEntitiesWith(Position, Velocity)
@@ -320,7 +320,7 @@ describe('Engine tests', () => {
     expect(Array.from(Position.dirtyIterator())).toEqual([entityA, entityB])
   })
 
-  it('should return groupOf multi component & entities', () => {
+  it('should return groupOf multi component & entities', async () => {
     const engine = Engine()
     const entityA = engine.addEntity()
     const entityB = engine.addEntity()
@@ -335,7 +335,7 @@ describe('Engine tests', () => {
     Velocity.create(entityB, { y: 1 })
 
     // avoid dirty iterators
-    engine.update(0)
+    await engine.update(0)
 
     const [component1, component2, component3] = Array.from(
       engine.getEntitiesWith(Position, Velocity)
@@ -347,7 +347,7 @@ describe('Engine tests', () => {
     expect(Array.from(Position.dirtyIterator())).toEqual([])
   })
 
-  it('should return isDirty if we mutate the component', () => {
+  it('should return isDirty if we mutate the component', async () => {
     const engine = Engine()
     const MeshRenderer = components.MeshRenderer(engine)
     const entityA = engine.addEntity()
@@ -355,13 +355,13 @@ describe('Engine tests', () => {
       mesh: { $case: 'box', box: { uvs: [] } }
     })
     expect(MeshRenderer.isDirty(entityA)).toBe(true)
-    engine.update(1)
+    await engine.update(1)
     expect(MeshRenderer.isDirty(entityA)).toBe(false)
     MeshRenderer.getMutable(entityA)
     expect(MeshRenderer.isDirty(entityA)).toBe(true)
   })
 
-  it('should fail to write to byte buffer if the entity not exists', () => {
+  it('should fail to write to byte buffer if the entity not exists', async () => {
     const engine = Engine()
     const MeshRenderer = components.MeshRenderer(engine)
     const entityA = engine.addEntity()
@@ -369,7 +369,7 @@ describe('Engine tests', () => {
     expect(() => MeshRenderer.writeToByteBuffer(entityA, buf)).toThrowError('')
   })
 
-  it('should remove component when using deleteFrom', () => {
+  it('should remove component when using deleteFrom', async () => {
     const engine = Engine()
     const Transform = components.Transform(engine)
     const MoveTransportData = {
@@ -414,16 +414,16 @@ describe('Engine tests', () => {
       duration: 10,
       speed: 1
     })
-    engine.update(1)
+    await engine.update(1)
     expect(MoveTransformComponent.get(zombie)).toStrictEqual({
       speed: 2,
       duration: 10
     })
-    engine.update(1)
+    await engine.update(1)
     expect(MoveTransformComponent.getOrNull(zombie)).toStrictEqual(null)
   })
 
-  it('should remove Transform component and send it throught the network', () => {
+  it('should remove Transform component and send it throught the network', async () => {
     const engine = Engine()
     const crdtSendToRenderer = jest.fn()
     engine.addTransport(createRendererTransport({ crdtSendToRenderer }))
@@ -455,14 +455,14 @@ describe('Engine tests', () => {
       scale: { x: 1, y: 1, z: 1 },
       rotation: { x: 0, y: 0, z: 0, w: 1 }
     })
-    engine.update(1)
+    await engine.update(1)
     expect(Transform.get(entity).position.x).toStrictEqual(13)
-    engine.update(1)
+    await engine.update(1)
     expect(Transform.getOrNull(entity)).toStrictEqual(null)
     // TODO: assert crdtSendToRenderer called
   })
 
-  it('should run in the order', () => {
+  it('should run in the order', async () => {
     const array: string[] = []
     const engine = Engine()
     function systemA() {
@@ -479,11 +479,11 @@ describe('Engine tests', () => {
     engine.addSystem(systemB, 10)
     engine.addSystem(systemC)
 
-    engine.update(0)
+    await engine.update(0)
     expect(array).toStrictEqual(['A', 'C', 'B'])
   })
 
-  it('should remove system', () => {
+  it('should remove system', async () => {
     let array: string[] = []
     const engine = Engine()
     function systemA() {
@@ -500,37 +500,37 @@ describe('Engine tests', () => {
     engine.addSystem(systemB, 10, 'systemB')
     engine.addSystem(systemC)
 
-    engine.update(0)
+    await engine.update(0)
     expect(array).toStrictEqual(['A', 'C', 'B'])
 
     array = []
     expect(engine.removeSystem('systemB')).toBe(true)
     expect(engine.removeSystem('inexistingSystem')).toBe(false)
 
-    engine.update(0)
+    await engine.update(0)
     expect(array).toStrictEqual(['A', 'C'])
 
     array = []
     expect(engine.removeSystem(systemA)).toBe(true)
-    engine.update(0)
+    await engine.update(0)
     expect(array).toStrictEqual(['C'])
   })
 
-  it('should not remove the component after the update', () => {
+  it('should not remove the component after the update', async () => {
     const engine = Engine()
     const PointerEventsResult = components.PointerEventsResult(engine)
     PointerEventsResult.create(engine.RootEntity)
-    engine.update(1 / 30)
+    await engine.update(1 / 30)
     expect(PointerEventsResult.has(engine.RootEntity)).toBe(true)
   })
 
-  it('should return the default component of the transform', () => {
+  it('should return the default component of the transform', async () => {
     const engine = Engine()
     const Transform = components.Transform(engine)
     expect(TransformSchema.create()).toBeDeepCloseTo(Transform.default())
   })
 
-  it('should log the error of cyclic parenting', () => {
+  it('should log the error of cyclic parenting', async () => {
     const errorFunc = jest.spyOn(console, 'error')
     const errorString = (e: Entity) =>
       'There is a cyclic parent with entity ' + e
@@ -548,23 +548,23 @@ describe('Engine tests', () => {
     Transform.create(e1).parent = e0
     Transform.create(e2).parent = e1
     Transform.create(e3).parent = e2
-    engine.update(1 / 30)
+    await engine.update(1 / 30)
     expect(errorFunc).not.toBeCalled()
 
     Transform.getMutable(e3).parent = e3
-    engine.update(1.0 / 30.0)
+    await engine.update(1.0 / 30.0)
     expect(errorFunc).toBeCalledWith(errorString(e3))
     errorFunc.mock.calls = []
 
     Transform.getMutable(e3).parent = e2
     Transform.getMutable(e0).parent = e3
-    engine.update(1.0 / 30.0)
+    await engine.update(1.0 / 30.0)
     expect(errorFunc.mock.calls.length).toBe(2)
     expect(errorFunc).toBeCalledTimes(2)
     expect(errorFunc).toBeCalledWith(errorString(e0))
   })
 
-  it('should remove all children of a tree', () => {
+  it('should remove all children of a tree', async () => {
     const engine = Engine()
     const Transform = components.Transform(engine)
     const MeshCollider = components.MeshCollider(engine)
@@ -605,7 +605,7 @@ describe('Engine tests', () => {
     expect(MeshCollider.getOrNull(e_A)).toBeNull()
   })
 
-  it('should remove all children of a tree with recursive parenting', () => {
+  it('should remove all children of a tree with recursive parenting', async () => {
     const engine = Engine()
     const Transform = components.Transform(engine)
     const MeshCollider = components.MeshCollider(engine)
@@ -651,16 +651,14 @@ describe('Engine tests', () => {
     expect(MeshCollider.getOrNull(e_recursive)).toBeNull()
   })
 
-  it('should throw an error if the system is a thenable', () => {
+  it('should throw an error if the system is a thenable', async () => {
     const engine = Engine()
     engine.addSystem(async function () {
       return new Promise((resolve) => setTimeout(resolve, 0))
     })
     const previousDebugMode = globalThis.DEBUG
     globalThis.DEBUG = true
-    expect(() => {
-      engine.update(1)
-    }).toThrowError()
+    await expect(engine.update(1)).rejects.toThrowError()
 
     if (previousDebugMode) {
       globalThis.DEBUG = previousDebugMode
@@ -669,7 +667,7 @@ describe('Engine tests', () => {
     }
   })
 
-  it('should throw an error if the system is added twice', () => {
+  it('should throw an error if the system is added twice', async () => {
     const engine = Engine()
     function testSystem() {}
     engine.addSystem(testSystem)

@@ -2,7 +2,7 @@ import { Engine, Entity, components } from '../../../packages/@dcl/ecs/src'
 import { Quaternion, Vector3 } from '../../../packages/@dcl/sdk/src/math'
 
 describe('Legacy component tests', () => {
-  it('cube example scene', () => {
+  it('cube example scene', async () => {
     const engine = Engine()
     const MeshRenderer = components.MeshRenderer(engine)
     const Transform = components.Transform(engine)
@@ -56,6 +56,6 @@ describe('Legacy component tests', () => {
 
     spawnCube(4, 2, 4)
     engine.addSystem(rotatorSystem)
-    engine.update(1 / 60)
+    await engine.update(1 / 60)
   })
 })
