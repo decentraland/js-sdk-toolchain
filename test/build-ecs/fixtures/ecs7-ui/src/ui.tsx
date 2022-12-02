@@ -5,9 +5,7 @@ import {
   TextAlignMode,
   Font
 } from '@dcl/sdk/ecs'
-import ReactEcs, {
-  UiEntity
-} from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
 export const ui = () => (
   <UiEntity
@@ -34,7 +32,7 @@ export const ui = () => (
           value: 'Boedo',
           textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
           fontSize: 12,
-          font: Font.F_LIBERATION_SANS
+          font: Font.F_SANS_SERIF
         }}
         uiBackground={{ backgroundColor: { r: 255, g: 45, b: 85, a: 1 } }}
       />

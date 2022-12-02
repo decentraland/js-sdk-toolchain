@@ -14,7 +14,7 @@ describe('Generated TextShape ProtoBuf', () => {
 
     const _textShape = TextShape.create(entity, {
       text: 'true',
-      font: Font.F_LIBERATION_SANS,
+      font: Font.F_SANS_SERIF,
       textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
       fontSize: 5,
       fontAutoSize: true,
