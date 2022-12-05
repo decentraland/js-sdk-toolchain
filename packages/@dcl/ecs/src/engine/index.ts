@@ -159,6 +159,31 @@ function preEngine() {
     componentsDefinition.delete(componentId)
   }
 
+  const Transform = components.Transform({ defineComponentFromSchema })
+
+  function* getTreeEntityArray(
+    firstEntity: Entity,
+    proccesedEntities: Entity[]
+  ): Generator<Entity> {
+    // This avoid infinite loop when there is a cyclic parenting
+    if (proccesedEntities.find((value) => firstEntity === value)) return
+    proccesedEntities.push(firstEntity)
+
+    for (const [entity, value] of getEntitiesWith(Transform)) {
+      if (value.parent === firstEntity) {
+        yield* getTreeEntityArray(entity, proccesedEntities)
+      }
+    }
+
+    yield firstEntity
+  }
+
+  function removeEntityWithChildren(firstEntity: Entity) {
+    for (const entity of getTreeEntityArray(firstEntity, [])) {
+      removeEntity(entity)
+    }
+  }
+
   return {
     entityExists,
     componentsDefinition,
@@ -172,7 +197,8 @@ function preEngine() {
     getEntitiesWith,
     getComponent,
     getComponentOrNull,
-    removeComponentDefinition
+    removeComponentDefinition,
+    removeEntityWithChildren
   }
 }
 
@@ -196,9 +222,6 @@ export function Engine(): IEngine {
       )
     }
 
-    // TODO: Perf tip
-    // Should we add some dirtyIteratorSet at engine level so we dont have
-    // to iterate all the component definitions to get the dirty ones ?
     const dirtySet = new Map<Entity, Set<number>>()
     for (const [componentId, definition] of engine.componentsDefinition) {
       for (const entity of definition.dirtyIterator()) {
@@ -208,42 +231,17 @@ export function Engine(): IEngine {
         dirtySet.get(entity)!.add(componentId)
       }
     }
-    await crdtSystem.createMessages(dirtySet)
+    await crdtSystem.createAndSendMessages(dirtySet)
 
     for (const [_componentId, definition] of engine.componentsDefinition) {
       definition.clearDirty()
     }
   }
 
-  const Transform = components.Transform(engine)
-
-  function* getTreeEntityArray(
-    firstEntity: Entity,
-    proccesedEntities: Entity[]
-  ): Generator<Entity> {
-    // This avoid infinite loop when there is a cyclic parenting
-    if (proccesedEntities.find((value) => firstEntity === value)) return
-    proccesedEntities.push(firstEntity)
-
-    for (const [entity, value] of engine.getEntitiesWith(Transform)) {
-      if (value.parent === firstEntity) {
-        yield* getTreeEntityArray(entity, proccesedEntities)
-      }
-    }
-
-    yield firstEntity
-  }
-
-  function removeEntityWithChildren(firstEntity: Entity) {
-    for (const entity of getTreeEntityArray(firstEntity, [])) {
-      engine.removeEntity(entity)
-    }
-  }
-
   return {
     addEntity: engine.addEntity,
     removeEntity: engine.removeEntity,
-    removeEntityWithChildren,
+    removeEntityWithChildren: engine.removeEntityWithChildren,
     addSystem: engine.addSystem,
     removeSystem: engine.removeSystem,
     defineComponent: engine.defineComponent,

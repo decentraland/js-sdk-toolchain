@@ -126,7 +126,7 @@ export function crdtSceneSystem(
    * Iterates the dirty map and generates crdt messages to be send
    * @param dirtyMap a map of { entities: [componentId] }
    */
-  async function createMessages(dirtyMap: Map<Entity, Set<number>>) {
+  async function createAndSendMessages(dirtyMap: Map<Entity, Set<number>>) {
     // CRDT Messages will be the merge between the recieved transport messages and the new crdt messages
     const crdtMessages = getMessages(broadcastMessages)
     const buffer = createByteBuffer()
@@ -210,7 +210,7 @@ export function crdtSceneSystem(
 
   return {
     getCrdt,
-    createMessages,
+    createAndSendMessages,
     receiveMessages,
     addTransport
   }

@@ -2854,7 +2854,6 @@ export type Transport = {
     send(message: Uint8Array): Promise<void>;
     onmessage?(message: Uint8Array): void;
     filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
-    resendOutdatedMessages: boolean;
 };
 
 // Warning: (ae-missing-release-tag) "TransportMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
