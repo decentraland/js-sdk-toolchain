@@ -5,6 +5,7 @@ import { ComponentDefinition as CompDef } from './component'
 import { Entity } from './entity'
 import { SystemFn } from './systems'
 import { ReadonlyComponentSchema } from './readonly'
+import { State } from '@dcl/crdt'
 
 export { ISchema } from '../schemas/ISchema'
 
@@ -190,4 +191,10 @@ export type IEngine = {
    * @param transport - transport which changes its onmessage to process CRDT messages
    */
   addTransport(transport: Transport): void
+
+  /**
+   * @internal
+   * Returns the crdt state. For now only for testing purpose
+   */
+  getCrdtState(): State<Uint8Array>
 }

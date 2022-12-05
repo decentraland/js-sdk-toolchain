@@ -1,4 +1,4 @@
-import { components } from '../../packages/@dcl/ecs/src'
+import { components, Schemas } from '../../packages/@dcl/ecs/src'
 import { Vector3 } from '../../packages/@dcl/sdk/src/math'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
@@ -152,6 +152,7 @@ describe('CRDT tests', () => {
       expect(doorValue).toBe(DOOR_VALUE)
     })
   })
+
   it('should resend a crdt message if its outdated', async () => {
     const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
     const entity = engine.addEntity()
@@ -169,12 +170,18 @@ describe('CRDT tests', () => {
       buffer
     )
     jest.resetAllMocks()
-    const spyWrite = jest.spyOn(ComponentOperation, 'write')
     transports[0].onmessage!(buffer.toBinary())
     await engine.update(1)
 
-    expect(spySend).toBeCalledTimes(2)
-    expect(spyWrite).toBeCalledTimes(1)
+    const outdatedBuffer = createByteBuffer()
+    ComponentOperation.write(
+      WireMessage.Enum.PUT_COMPONENT,
+      entity,
+      2,
+      Transform,
+      outdatedBuffer
+    )
+    expect(spySend).toBeCalledWith(outdatedBuffer.toBinary())
   })
 
   it('should resend a crdt delete message if its outdated', async () => {
@@ -194,12 +201,17 @@ describe('CRDT tests', () => {
     Transform.deleteFrom(entity)
     await engine.update(1)
     jest.resetAllMocks()
-    const spyWrite = jest.spyOn(ComponentOperation, 'write')
     transports[0].onmessage!(buffer.toBinary())
     await engine.update(1)
-
-    expect(spySend).toBeCalledTimes(2)
-    expect(spyWrite).toBeCalledTimes(1)
+    const outdatedBuffer = createByteBuffer()
+    ComponentOperation.write(
+      WireMessage.Enum.DELETE_COMPONENT,
+      entity,
+      2,
+      Transform,
+      outdatedBuffer
+    )
+    expect(spySend).toBeCalledWith(outdatedBuffer.toBinary())
   })
 
   it('should remove a component if we receive a DELETE_COMPONENT operation message', async () => {
@@ -222,5 +234,43 @@ describe('CRDT tests', () => {
     transport.onmessage!(buffer.toBinary())
     await engine.update(1)
     expect(Transform.getOrNull(entity)).toBe(null)
+  })
+  it('should process messages even if the component is not found', async () => {
+    const [{ engine }, { engine: serverEngine, transports }] = SandBox.create({
+      length: 2
+    })
+    const [serverTransport] = transports
+    const entity = engine.addEntity()
+    const cusutomComponent = engine.defineComponent(
+      { open: Schemas.Boolean },
+      12371273
+    )
+    cusutomComponent.create(entity, { open: false })
+    await engine.update(1)
+
+    const buffer = createByteBuffer()
+    ComponentOperation.write(
+      WireMessage.Enum.PUT_COMPONENT,
+      entity,
+      1,
+      cusutomComponent,
+      buffer
+    )
+    serverTransport.onmessage!(buffer.toBinary())
+    await serverEngine.update(1)
+    const crdtState = serverEngine.getCrdtState()
+    const component = crdtState.get(entity as number)?.get(cusutomComponent._id)
+    expect(component?.data).toStrictEqual(
+      cusutomComponent.toBinary(entity).toBinary()
+    )
+    expect(component?.timestamp).toBe(1)
+  })
+
+  it('should failed if we added the same tranposrt twice', () => {
+    const [{ engine, transports }] = SandBox.create({ length: 1 })
+    const [transport] = transports
+    expect(() => engine.addTransport(transport)).toThrowError(
+      'Transport already added'
+    )
   })
 })
