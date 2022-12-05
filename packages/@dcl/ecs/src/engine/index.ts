@@ -257,6 +257,7 @@ export function Engine(): IEngine {
     PlayerEntity: 1 as Entity,
     CameraEntity: 2 as Entity,
     entityExists: engine.entityExists,
-    addTransport: crdtSystem.addTransport
+    addTransport: crdtSystem.addTransport,
+    getCrdtState: crdtSystem.getCrdt
   }
 }

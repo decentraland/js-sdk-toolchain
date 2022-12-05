@@ -12,6 +12,7 @@
  *
  */
 
+import { ComponentDefinition, Entity, ISchema } from '../engine'
 import { ByteBuffer } from './ByteBuffer'
 
 export namespace WireMessage {
@@ -63,6 +64,13 @@ export namespace WireMessage {
       length: buf.readUint32(),
       type: buf.readUint32() as Enum
     }
+  }
+
+  export function getType(
+    component: ComponentDefinition<ISchema<unknown>, unknown>,
+    entity: Entity
+  ): Enum {
+    return component.has(entity) ? Enum.PUT_COMPONENT : Enum.DELETE_COMPONENT
   }
 }
 

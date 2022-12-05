@@ -7,7 +7,9 @@ import { ComponentOperation as Message } from '../../serialization/crdt/componen
 import WireMessage from '../../serialization/wireMessage'
 import { ReceiveMessage, TransportMessage, Transport } from './types'
 
-export function crdtSceneSystem(engine: Pick<IEngine, 'getComponentOrNull'>) {
+export function crdtSceneSystem(
+  engine: Pick<IEngine, 'getComponentOrNull' | 'getComponent'>
+) {
   const transports: Transport[] = []
 
   // CRDT Client
@@ -15,9 +17,9 @@ export function crdtSceneSystem(engine: Pick<IEngine, 'getComponentOrNull'>) {
   // Messages that we received at transport.onMessage waiting to be processed
   const receivedMessages: ReceiveMessage[] = []
   // Messages already processed by the engine but that we need to broadcast to other transports.
-  const transportMessages: TransportMessage[] = []
-  // Map of entities already processed at least once
-
+  const broadcastMessages: TransportMessage[] = []
+  // Messages receieved by a transport that were outdated. We need to correct them
+  const outdatedMessages: TransportMessage[] = []
   /**
    *
    * @param transportType tranport id to identiy messages
@@ -37,7 +39,6 @@ export function crdtSceneSystem(engine: Pick<IEngine, 'getComponentOrNull'>) {
       while (WireMessage.validate(buffer)) {
         const offset = buffer.currentReadOffset()
         const message = Message.read(buffer)!
-
         const { type, entity, componentId, data, timestamp } = message
         receivedMessages.push({
           type,
@@ -71,49 +72,52 @@ export function crdtSceneSystem(engine: Pick<IEngine, 'getComponentOrNull'>) {
    */
   async function receiveMessages() {
     const messagesToProcess = getMessages(receivedMessages)
-    for (const transport of transports) {
-      const buffer = createByteBuffer()
-      for (const message of messagesToProcess) {
-        const { data, timestamp, componentId, entity, type } = message
-        const crdtMessage: CrdtMessage<Uint8Array> = {
-          key1: entity as number,
-          key2: componentId,
-          data: data || null,
-          timestamp: timestamp
-        }
-        const component = engine.getComponentOrNull(componentId)
-        const current = crdtClient.processMessage(crdtMessage)
-        /* istanbul ignore next */
-        if (!component)
-          // TODO: TEST
-          continue
-        // CRDT outdated message. Resend this message through the wire
-        if (crdtMessage !== current) {
-          const type = component.has(entity)
-            ? WireMessage.Enum.PUT_COMPONENT
-            : WireMessage.Enum.DELETE_COMPONENT
-          Message.write(type, entity, current.timestamp, component, buffer)
-        } else {
-          // Process CRDT Message
-          if (type === WireMessage.Enum.DELETE_COMPONENT) {
-            component.deleteFrom(entity)
-          } else {
-            const opts = {
-              reading: { buffer: message.data!, currentOffset: 0 }
-            }
-            const bb = createByteBuffer(opts)
+    const bufferForOutdated = createByteBuffer()
 
-            // Update engine component
-            component.upsertFromBinary(message.entity, bb)
-            component.clearDirty()
-          }
-          // Add message to transport queue to be processed by others transports
-          transportMessages.push(message)
-        }
+    for (const message of messagesToProcess) {
+      const { data, timestamp, componentId, entity, type } = message
+      const crdtMessage: CrdtMessage<Uint8Array> = {
+        key1: entity as number,
+        key2: componentId,
+        data: data || null,
+        timestamp: timestamp
+      }
+      const component = engine.getComponentOrNull(componentId)
+      const current = crdtClient.processMessage(crdtMessage)
+
+      if (!component) {
+        continue
       }
 
-      if (buffer.size() && transport.resendOutdatedMessages) {
-        await transport.send(buffer.toBinary())
+      // CRDT outdated message. Resend this message to the transport
+      // To do this we add this message to a queue that will be processed at the end of the update tick
+      if (crdtMessage !== current) {
+        const offset = bufferForOutdated.currentWriteOffset()
+        const type = WireMessage.getType(component, entity)
+        const ts = current.timestamp
+        Message.write(type, entity, ts, component, bufferForOutdated)
+        outdatedMessages.push({
+          ...message,
+          timestamp: current.timestamp,
+          messageBuffer: bufferForOutdated
+            .buffer()
+            .subarray(offset, bufferForOutdated.currentWriteOffset())
+        })
+      } else {
+        // Add message to transport queue to be processed by others transports
+        broadcastMessages.push(message)
+
+        // Process CRDT Message
+        if (type === WireMessage.Enum.DELETE_COMPONENT) {
+          component.deleteFrom(entity)
+        } else {
+          const opts = {
+            reading: { buffer: message.data!, currentOffset: 0 }
+          }
+          const data = createByteBuffer(opts)
+          component.upsertFromBinary(message.entity, data)
+        }
+        component.clearDirty()
       }
     }
   }
@@ -124,16 +128,13 @@ export function crdtSceneSystem(engine: Pick<IEngine, 'getComponentOrNull'>) {
    */
   async function createMessages(dirtyMap: Map<Entity, Set<number>>) {
     // CRDT Messages will be the merge between the recieved transport messages and the new crdt messages
-    const crdtMessages = getMessages(transportMessages)
+    const crdtMessages = getMessages(broadcastMessages)
     const buffer = createByteBuffer()
 
     for (const [entity, componentsId] of dirtyMap) {
       for (const componentId of componentsId) {
-        const component = engine.getComponentOrNull(componentId)
-        /* istanbul ignore next */
-        if (!component)
-          // TODO: test coverage
-          continue
+        // Component will be always defined here since dirtyMap its an iterator of engine.componentsDefinition
+        const component = engine.getComponent(componentId)
         const entityComponent = component.has(entity)
           ? component.toBinary(entity).toBinary()
           : null
@@ -143,15 +144,14 @@ export function crdtSceneSystem(engine: Pick<IEngine, 'getComponentOrNull'>) {
           entityComponent
         )
         const offset = buffer.currentWriteOffset()
-        const type = component.has(entity)
-          ? WireMessage.Enum.PUT_COMPONENT
-          : WireMessage.Enum.DELETE_COMPONENT
+        const type = WireMessage.getType(component, entity)
         const transportMessage: Omit<TransportMessage, 'messageBuffer'> = {
           type,
           componentId,
           entity,
           timestamp: event.timestamp
         }
+        // Avoid creating messages if there is no transport that will handle it
         if (transports.some((t) => t.filter(transportMessage))) {
           Message.write(type, entity, event.timestamp, component, buffer)
           crdtMessages.push({
@@ -164,10 +164,18 @@ export function crdtSceneSystem(engine: Pick<IEngine, 'getComponentOrNull'>) {
       }
     }
 
-    // Send messages to transports
+    // Send CRDT messages to transports
     const transportBuffer = createByteBuffer()
     for (const transport of transports) {
       transportBuffer.resetBuffer()
+      // First we need to send all the messages that were outdated from a transport
+      // So we can fix their crdt state
+      for (const message of outdatedMessages) {
+        if (message.transportType === transport.type) {
+          transportBuffer.writeBuffer(message.messageBuffer, false)
+        }
+      }
+      // Then we send all the new crdtMessages that the transport needs to process
       for (const message of crdtMessages) {
         if (transport.filter(message)) {
           transportBuffer.writeBuffer(message.messageBuffer, false)
@@ -180,14 +188,28 @@ export function crdtSceneSystem(engine: Pick<IEngine, 'getComponentOrNull'>) {
     }
   }
 
+  /**
+   * @public
+   * Add a transport to the crdt system
+   */
   function addTransport(transport: Transport) {
+    if (transports.find((t) => transport.type === t.type)) {
+      throw new Error('Transport already added')
+    }
     transports.push(transport)
     transport.onmessage = parseChunkMessage(transport.type)
-    // TODO: pull messages from transport
-    // TODO: send entities to transport
+  }
+
+  /**
+   * @public
+   * @returns returns the crdt state
+   */
+  function getCrdt() {
+    return crdtClient.getState()
   }
 
   return {
+    getCrdt,
     createMessages,
     receiveMessages,
     addTransport
