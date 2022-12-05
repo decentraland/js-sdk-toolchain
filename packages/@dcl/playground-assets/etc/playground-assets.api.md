@@ -3080,14 +3080,16 @@ export namespace WireMessage {
         RESERVED = 0
     }
     // (undocumented)
+    export function getType(component: ComponentDefinition<ISchema<unknown>, unknown>, entity: Entity): Enum;
+    // (undocumented)
     export type Header = {
         length: Uint32;
         type: Uint32;
     };
-    // (undocumented)
-    export function readHeader(buf: ByteBuffer): Header | null;
     const // (undocumented)
     HEADER_LENGTH = 8;
+    // (undocumented)
+    export function readHeader(buf: ByteBuffer): Header | null;
     // (undocumented)
     export type Uint32 = number;
     export function validate(buf: ByteBuffer): boolean;
