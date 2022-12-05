@@ -1,6 +1,7 @@
 import * as path from 'path'
 import { readFileSync, writeFileSync } from 'fs'
-import { copySync, mkdirSync, removeSync } from 'fs-extra'
+import { copySync, existsSync, mkdirSync, removeSync } from 'fs-extra'
+import { summary } from '@actions/core'
 
 import {
   commonChecks,
@@ -27,6 +28,12 @@ import { compileProtoApi } from './rpc-api-generation'
 import { getSnippetsfile } from './utils/getFilePathsSync'
 
 flow('build-all', () => {
+  afterAll(async () => {
+    if (process.env.GITHUB_STEP_SUMMARY) {
+      await summary.write()
+    }
+  })
+
   commonChecks()
 
   flow('@dcl/js-runtime', () => {
@@ -126,11 +133,32 @@ flow('build-all', () => {
 
     // install required dependencies
     itExecutes(`npm install --silent ${SDK_PATH}`, PLAYGROUND_ASSETS_PATH)
-    if (process.env.CI) {
+
+    if (process.env.GITHUB_STEP_SUMMARY) {
       itExecutes('npm run build --silent', PLAYGROUND_ASSETS_PATH)
+      it('set the output as summary', async () => {
+        const file = path.resolve(
+          PLAYGROUND_ASSETS_PATH,
+          'etc/playground-assets.api.md'
+        )
+        if (!existsSync(file)) throw new Error(`${file} doesn't exist`)
+        summary.addRaw(readFileSync(file).toString())
+      })
     } else {
+      itDeletesGlob('etc/*', PLAYGROUND_ASSETS_PATH)
       itExecutes('npm run build-local --silent', PLAYGROUND_ASSETS_PATH)
     }
+
+    it('check no ae-forgotten-export are present in bundle file', async () => {
+      const file = path.resolve(
+        PLAYGROUND_ASSETS_PATH,
+        'etc/playground-assets.api.md'
+      )
+      if (!existsSync(file)) throw new Error(`${file} doesn't exist`)
+      const content = readFileSync(file).toString()
+      const occurences = content.match(/^.*ae-forgotten-export.*/gim)
+      expect(occurences ?? []).toEqual([])
+    })
   })
 
   flow('playground copy files', () => {

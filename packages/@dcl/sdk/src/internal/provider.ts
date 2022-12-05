@@ -1,7 +1,12 @@
-import type {
-  SendAsyncRequest,
-  SendAsyncResponse
-} from '~system/EthereumController'
+export interface SendAsyncResponse {
+  jsonAnyResponse: string
+}
+
+export interface SendAsyncRequest {
+  id: number
+  method: string
+  jsonParams: string
+}
 
 export type RPCSendableMessage = {
   jsonrpc: '2.0'

@@ -6,6 +6,9 @@ import terser from '@rollup/plugin-terser'
 import analyze from 'rollup-plugin-analyzer'
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
+import * as path from 'path'
+
+import { pathToFileURL } from 'url'
 
 export function createEcsConfig(_options: { PROD: boolean }): RollupOptions {
   const packageJsonPath = sys.resolvePath('./package.json')
@@ -127,7 +130,39 @@ export function createSceneConfig(options: { PROD: boolean }): RollupOptions {
             format: 'commonjs',
             name: 'Scene',
             extend: true,
-            sourcemap: 'inline'
+            sourcemap: 'inline',
+            sourcemapPathTransform: (distRelativeSourcePath: string) => {
+              // Transform the relative-to-the-dist-folder source paths we get by default
+              // into ones relative to the app root and prefixed with the package name
+              // e.g. ../src/foo/bar.ts -> my-package-name/src/foo/bar.ts
+              //
+              // This fixes a monorepo issue where, when these source maps get bundled by a consumer's
+              // webpack, everything mistakenly gets lumped under a single src directory
+              // https://github.com/rollup/rollup/issues/2168#issuecomment-416628432
+              //////////////////////////////////////////////////////////////////
+              // source maps are generated with paths relative to the bundled file
+              // for that reason we first get the dist folder in which the sourceMaps are
+              const distFolder = path.dirname(path.resolve(sceneJson.main))
+              // then we resolve the file, relative to distFolder
+              const absoluteSourcePath = path.resolve(
+                distFolder,
+                distRelativeSourcePath
+              )
+              // then we convert it to a URL
+              const url = pathToFileURL(absoluteSourcePath).toString()
+
+              const fileRoot = pathToFileURL(process.cwd()).toString()
+
+              if (url.startsWith(fileRoot)) {
+                // if it is relative to the project, then we return a dcl://url
+                const dclUrl = url.replace(fileRoot, 'dcl://')
+                return dclUrl
+              }
+
+              const prefixedSourcePath = url.toString()
+              return prefixedSourcePath
+            },
+            sourcemapBaseUrl: pathToFileURL(process.cwd()).toString()
           }
     ]
   }

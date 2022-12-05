@@ -20,3 +20,4 @@ test/sdk/simple-scene
 **/*.js.map
 
 test/build-ecs/fixtures/*/package-lock.json
+packages/@dcl/playground-assets/etc/playground-assets.api.json
