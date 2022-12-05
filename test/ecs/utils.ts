@@ -12,7 +12,6 @@ export function createNetworkTransport(): Transport {
 
   const type = 'network-transport'
   return {
-    resendOutdatedMessages: true,
     send,
     type,
     filter(message: TransportMessage): boolean {

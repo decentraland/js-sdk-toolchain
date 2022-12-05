@@ -34,12 +34,10 @@ export function createRendererTransport(
 
   const type = 'renderer'
   const rendererTransport: Transport = {
-    resendOutdatedMessages: false,
     type,
     async send(message) {
       try {
-        const msgs = await sendToRenderer(message)
-        return msgs
+        await sendToRenderer(message)
       } catch (error) {
         console.error(error)
         debugger
