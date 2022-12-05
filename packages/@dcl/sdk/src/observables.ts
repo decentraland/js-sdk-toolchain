@@ -1,6 +1,4 @@
 import { Observable } from './internal/Observable'
-/* istanbul ignore next */
-export { Observer, Observable, ObserverEventState } from './internal/Observable'
 import { QuaternionType, Vector3Type } from '@dcl/ecs'
 import { ManyEntityAction, SendBatchResponse } from '~system/EngineApi'
 

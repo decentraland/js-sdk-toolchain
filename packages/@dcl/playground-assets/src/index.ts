@@ -3,8 +3,12 @@ export * from '@dcl/sdk/ecs'
 export * from '@dcl/sdk/react-ecs'
 export * from '@dcl/sdk/messageBus'
 export * from '@dcl/sdk/ethereum-provider'
-export * from '@dcl/sdk/observables'
 
+// legacy
+export * from '@dcl/sdk/observables'
+export { Observer, Observable, ObserverEventState } from '@dcl/sdk/internal/Observable'
+
+// react
 import ReactEcs from '@dcl/sdk/react-ecs'
 export { ReactEcs }
 
