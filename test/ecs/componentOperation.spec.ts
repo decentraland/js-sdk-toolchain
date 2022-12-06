@@ -1,6 +1,6 @@
 import { TRANSFORM_LENGTH } from '../../packages/@dcl/ecs/src/components/legacy/Transform'
 import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
-import { components } from '../../packages/@dcl/ecs/src'
+import * as components from '../../packages/@dcl/ecs/src/components'
 import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/src/math'
 
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'

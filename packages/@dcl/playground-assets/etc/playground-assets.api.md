@@ -654,6 +654,7 @@ export type IEngine = {
     entityExists(entity: Entity): boolean;
     addSystem(system: SystemFn, priority?: number, name?: string): void;
     removeSystem(selector: string | SystemFn): boolean;
+    registerCustomComponent<T extends ISchema, V>(component: ComponentDefinition<T, V>, componentId: number): ComponentDefinition<T, V>;
     defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>;
     defineComponentFromSchema<T extends ISchema<ConstructorType>, ConstructorType>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;

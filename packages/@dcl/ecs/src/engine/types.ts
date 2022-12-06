@@ -78,7 +78,15 @@ export type IEngine = {
    * @returns if it was found and removed
    */
   removeSystem(selector: string | SystemFn): boolean
-
+  /**
+   * Registers a custom component definition.
+   * @param component - The component definition
+   * @param componentId - unique id to identify the component, if the component id already exist, it will fail.
+   */
+  registerCustomComponent<T extends ISchema, V>(
+    component: CompDef<T, V>,
+    componentId: number
+  ): CompDef<T, V>
   /**
    * Define a component and add it to the engine.
    * @param spec - An object with schema fields
