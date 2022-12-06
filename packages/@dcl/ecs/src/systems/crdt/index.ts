@@ -1,14 +1,17 @@
 import { crdtProtocol, Message as CrdtMessage } from '@dcl/crdt'
 
 import type { IEngine } from '../../engine'
-import { Entity } from '../../engine/entity'
+import { Entity, EntityContainer } from '../../engine/entity'
 import { createByteBuffer } from '../../serialization/ByteBuffer'
 import { ComponentOperation as Message } from '../../serialization/crdt/componentOperation'
 import WireMessage from '../../serialization/wireMessage'
 import { ReceiveMessage, TransportMessage, Transport } from './types'
 
 export function crdtSceneSystem(
-  engine: Pick<IEngine, 'getComponentOrNull' | 'getComponent'>
+  engine: Pick<
+    IEngine,
+    'getComponentOrNull' | 'getComponent' | 'componentsDefinition'
+  >
 ) {
   const transports: Transport[] = []
 
@@ -87,11 +90,10 @@ export function crdtSceneSystem(
       if (!component) {
         continue
       }
-      console.dir({ crdtMessage, current })
       // CRDT outdated message. Resend this message to the transport
       // To do this we add this message to a queue that will be processed at the end of the update tick
+      console.dir({ crdtMessage, current })
       if (crdtMessage !== current) {
-        //|| component.isDirty(entity)
         const offset = bufferForOutdated.currentWriteOffset()
         const type = WireMessage.getType(component, entity)
         const ts = current.timestamp
@@ -121,38 +123,62 @@ export function crdtSceneSystem(
     }
   }
 
+  function getDirtyMap() {
+    const dirtySet = new Map<Entity, Set<number>>()
+    for (const [componentId, definition] of engine.componentsDefinition) {
+      for (const entity of definition.dirtyIterator()) {
+        if (!dirtySet.has(entity)) {
+          dirtySet.set(entity, new Set())
+        }
+        dirtySet.get(entity)!.add(componentId)
+      }
+    }
+    return dirtySet
+  }
+
+  /**
+   * Updates CRDT state of the current engine dirty components
+   */
+  function updateState() {
+    for (const [entity, componentsId] of getDirtyMap()) {
+      for (const componentId of componentsId) {
+        const component = engine.getComponent(componentId)
+        const componentValue =
+          component.toBinaryOrNull(entity)?.toBinary() ?? null
+        crdtClient.createEvent(entity as number, componentId, componentValue)
+      }
+    }
+  }
+
   /**
    * Iterates the dirty map and generates crdt messages to be send
-   * @param dirtyMap a map of { entities: [componentId] }
    */
-  async function createAndSendMessages(dirtyMap: Map<Entity, Set<number>>) {
+  async function sendMessages() {
     // CRDT Messages will be the merge between the recieved transport messages and the new crdt messages
     const crdtMessages = getMessages(broadcastMessages)
+    const outdatedMessagesBkp = getMessages(outdatedMessages)
     const buffer = createByteBuffer()
-    console.dir({ crdtMessages })
-    for (const [entity, componentsId] of dirtyMap) {
+    console.dir({ getDirtyMap: getDirtyMap() })
+    for (const [entity, componentsId] of getDirtyMap()) {
       for (const componentId of componentsId) {
         // Component will be always defined here since dirtyMap its an iterator of engine.componentsDefinition
         const component = engine.getComponent(componentId)
-        const entityComponent = component.has(entity)
-          ? component.toBinary(entity).toBinary()
-          : null
-        const event = crdtClient.createEvent(
-          entity as number,
-          componentId,
-          entityComponent
-        )
+        const { timestamp } = crdtClient
+          .getState()
+          .get(entity as number)!
+          .get(componentId)!
         const offset = buffer.currentWriteOffset()
         const type = WireMessage.getType(component, entity)
         const transportMessage: Omit<TransportMessage, 'messageBuffer'> = {
           type,
           componentId,
           entity,
-          timestamp: event.timestamp
+          timestamp
         }
         // Avoid creating messages if there is no transport that will handle it
         if (transports.some((t) => t.filter(transportMessage))) {
-          Message.write(type, entity, event.timestamp, component, buffer)
+          console.log('PUSH: ', { entity, id: componentId })
+          Message.write(type, entity, timestamp, component, buffer)
           crdtMessages.push({
             ...transportMessage,
             messageBuffer: buffer
@@ -162,20 +188,25 @@ export function crdtSceneSystem(
         }
       }
     }
-
     // Send CRDT messages to transports
     const transportBuffer = createByteBuffer()
-    for (
-      let transportIndex = 0;
-      transportIndex < transports.length;
-      transportIndex++
-    ) {
+    for (const index in transports) {
+      const transportIndex = Number(index)
       const transport = transports[transportIndex]
       transportBuffer.resetBuffer()
       // First we need to send all the messages that were outdated from a transport
       // So we can fix their crdt state
-      for (const message of outdatedMessages) {
-        if (message.transportId === transportIndex) {
+      console.log({ outdatedMessagesBkp, crdtMessages, broadcastMessages })
+      for (const message of outdatedMessagesBkp) {
+        if (
+          message.transportId === transportIndex &&
+          // Avoid sending multiple messages for the same entity-componentId
+          !crdtMessages.find(
+            (m) =>
+              m.entity === message.entity &&
+              m.componentId === message.componentId
+          )
+        ) {
           transportBuffer.writeBuffer(message.messageBuffer, false)
         }
       }
@@ -185,6 +216,10 @@ export function crdtSceneSystem(
           message.transportId !== transportIndex &&
           transport.filter(message)
         ) {
+          console.log(
+            { message },
+            engine.getComponent(message.componentId).get(message.entity)
+          )
           transportBuffer.writeBuffer(message.messageBuffer, false)
         }
       }
@@ -214,8 +249,9 @@ export function crdtSceneSystem(
 
   return {
     getCrdt,
-    createAndSendMessages,
+    sendMessages,
     receiveMessages,
-    addTransport
+    addTransport,
+    updateState
   }
 }

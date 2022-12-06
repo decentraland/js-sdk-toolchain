@@ -232,23 +232,13 @@ export function Engine(): IEngine {
         }) returned a thenable. Systems cannot be async functions. Documentation: https://dcl.gg/sdk/sync-systems`
       )
     }
-
-    const dirtySet = new Map<Entity, Set<number>>()
-    for (const [componentId, definition] of engine.componentsDefinition) {
-      for (const entity of definition.dirtyIterator()) {
-        if (!dirtySet.has(entity)) {
-          dirtySet.set(entity, new Set())
-        }
-        dirtySet.get(entity)!.add(componentId)
-      }
-    }
-    await crdtSystem.createAndSendMessages(dirtySet)
+    crdtSystem.updateState()
+    await crdtSystem.sendMessages()
+    await crdtSystem.receiveMessages()
 
     for (const [_componentId, definition] of engine.componentsDefinition) {
       definition.clearDirty()
     }
-
-    await crdtSystem.receiveMessages()
   }
 
   return {
@@ -270,6 +260,7 @@ export function Engine(): IEngine {
     CameraEntity: 2 as Entity,
     entityExists: engine.entityExists,
     addTransport: crdtSystem.addTransport,
-    getCrdtState: crdtSystem.getCrdt
+    getCrdtState: crdtSystem.getCrdt,
+    componentsDefinition: engine.componentsDefinition
   }
 }

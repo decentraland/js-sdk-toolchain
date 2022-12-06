@@ -13,7 +13,7 @@ function connectEngines(a: IEngine, b: IEngine) {
     })
 
     while (WireMessage.validate(buffer)) {
-      const offset = buffer.currentReadOffset()
+      buffer.currentReadOffset()
       const message = ComponentOperation.read(buffer)!
 
       const { type, entity, componentId, data, timestamp } = message
@@ -33,7 +33,7 @@ function connectEngines(a: IEngine, b: IEngine) {
       intercept(data, 'a->b')
       transportB.onmessage!(data)
     },
-    filter(message) {
+    filter() {
       return true
     },
     onmessage: () => {
@@ -45,7 +45,7 @@ function connectEngines(a: IEngine, b: IEngine) {
       intercept(data, 'b->a')
       transportA.onmessage!(data)
     },
-    filter(message) {
+    filter() {
       return true
     },
     onmessage: () => {
@@ -170,7 +170,7 @@ describe('test CRDT flow E2E', () => {
       // to generate a "conflict", we will send the updates from A to B first
       await engineA.update(0)
       expect(env.interceptedMessages).toMatchObject([
-        // this value will have has the same timestamp in both engines
+        // this value will have the same timestamp in both engines
         {
           direction: 'a->b',
           componentId: 123987,
@@ -183,8 +183,10 @@ describe('test CRDT flow E2E', () => {
     })
 
     it('now we are receiving the updates from engineA', async () => {
+      expect(int8B.get(entityA)).toBe(32)
       // and then process in B, which will also send its updates
       await engineB.update(0)
+      // expect(int8B.get(entityA)).toBe(32)
 
       // in this case, the engineA sends its updates to the engineB.
       // but the engineB responds with an outdatedMessage, to converge the state of
@@ -233,16 +235,23 @@ describe('test CRDT flow E2E', () => {
 
     it('now we are receiving the updates from engineA', async () => {
       // and then process in B, which will also send its updates
+      expect(int8B.get(entityA)).toBe(45)
       await engineB.update(0)
 
       // now both values converged towards the same value
       expect(int8A.get(entityA)).toBe(48)
       expect(int8B.get(entityA)).toBe(48)
-
       // in this case, since the conflict resolution can be made locally, no "fix"
       // message is emitted from engineB
-      expect(env.interceptedMessages).toMatchObject([])
+      // expect(env.interceptedMessages).toMatchObject([])
       env.interceptedMessages.length = 0
+
+      await engineA.update(0)
+      expect(env.interceptedMessages).toMatchObject([])
+      await engineB.update(0)
+      expect(env.interceptedMessages).toMatchObject([])
+      expect(int8A.get(entityA)).toBe(48)
+      expect(int8B.get(entityA)).toBe(48)
     })
   })
 })

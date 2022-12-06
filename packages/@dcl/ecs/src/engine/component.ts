@@ -64,12 +64,20 @@ export type ComponentDefinition<
   createOrReplace(entity: Entity, val?: ConstructorType): ComponentType<T>
 
   /**
+   * @internal
    * Delete the current component to an entity, return null if the entity doesn't have the current component.
    * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
    * @param entity - Entity to delete the component from
    * @param markAsDirty - defaults to true
    */
   deleteFrom(entity: Entity, markAsDirty?: boolean): ComponentType<T> | null
+  /**
+   * @public
+   * Delete the current component to an entity, return null if the entity doesn't have the current component.
+   * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
+   * @param entity - Entity to delete the component from
+   */
+  deleteFrom(entity: Entity): ComponentType<T> | null
 
   /**
    * Get the mutable component of the entity, throw an error if the entity doesn't have the component.
@@ -115,6 +123,13 @@ export type ComponentDefinition<
    */
   toBinary(entity: Entity): ByteBuffer
 
+  // allocates a buffer and returns new buffer if it exists or null
+  /**
+   * @internal
+   * @param entity - Entity to serizalie
+   */
+  toBinaryOrNull(entity: Entity): ByteBuffer | null
+
   // writes to a pre-allocated buffer
   writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void
 
@@ -132,7 +147,7 @@ export type ComponentDefinition<
   /**
    * @internal
    */
-  clearDirty(): void
+  clearDirty(entity?: unknown): void
   /**
    * @internal
    */
@@ -191,6 +206,8 @@ export function defineComponent<
       data.delete(entity)
       if (markAsDirty) {
         dirtyIterator.add(entity)
+      } else {
+        dirtyIterator.delete(entity)
       }
       return component || null
     },
@@ -266,6 +283,16 @@ export function defineComponent<
       spec.serialize(component, writeBuffer)
       return writeBuffer
     },
+    toBinaryOrNull(entity: Entity): ByteBuffer | null {
+      const component = data.get(entity)
+      if (!component) {
+        return null
+      }
+
+      const writeBuffer = createByteBuffer()
+      spec.serialize(component, writeBuffer)
+      return writeBuffer
+    },
     writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void {
       const component = data.get(entity)
       if (!component) {
@@ -298,10 +325,16 @@ export function defineComponent<
       data.set(entity, newValue)
       if (markAsDirty) {
         dirtyIterator.add(entity)
+      } else {
+        dirtyIterator.delete(entity)
       }
       return newValue
     },
-    clearDirty() {
+    clearDirty(entity: unknown) {
+      if (entity) {
+        dirtyIterator.delete(entity)
+        return
+      }
       dirtyIterator.clear()
     }
   }

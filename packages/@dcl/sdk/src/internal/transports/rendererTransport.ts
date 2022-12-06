@@ -32,9 +32,7 @@ export function createRendererTransport(
     }
   }
 
-  const type = 'renderer'
   const rendererTransport: Transport = {
-    type,
     async send(message) {
       try {
         await sendToRenderer(message)
@@ -44,11 +42,6 @@ export function createRendererTransport(
       }
     },
     filter(message) {
-      // Echo message, ignore them
-      if (message.transportType === type) {
-        return false
-      }
-
       // Only send renderer components (Proto Generated)
       if (!componentIds.includes(message.componentId)) {
         return false

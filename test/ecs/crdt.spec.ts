@@ -265,12 +265,4 @@ describe('CRDT tests', () => {
     )
     expect(component?.timestamp).toBe(1)
   })
-
-  it('should failed if we added the same tranposrt twice', () => {
-    const [{ engine, transports }] = SandBox.create({ length: 1 })
-    const [transport] = transports
-    expect(() => engine.addTransport(transport)).toThrowError(
-      'Transport already added'
-    )
-  })
 })

@@ -52,6 +52,8 @@ export const int8Component = (engine: IEngine) => {
       values.set(entity, data.readInt8())
       if (marksDirty) {
         dirtyIterator.add(entity)
+      } else {
+        dirtyIterator.delete(entity)
       }
     },
     updateFromBinary: function (
@@ -62,9 +64,17 @@ export const int8Component = (engine: IEngine) => {
       values.set(entity, data.readInt8())
       if (marksDirty) {
         dirtyIterator.add(entity)
+      } else {
+        dirtyIterator.delete(entity)
       }
     },
     toBinary: function (entity: Entity): ByteBuffer {
+      const b = createByteBuffer()
+      b.writeInt8(values.get(entity)!)
+      return b
+    },
+    toBinaryOrNull: function (entity: Entity): ByteBuffer | null {
+      if (!values.has(entity)) return null
       const b = createByteBuffer()
       b.writeInt8(values.get(entity)!)
       return b

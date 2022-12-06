@@ -1,7 +1,10 @@
 import type { ISchema } from '../schemas/ISchema'
 import { Result, Spec } from '../schemas/Map'
 import { Transport } from '../systems/crdt/types'
-import { ComponentDefinition as CompDef } from './component'
+import {
+  ComponentDefinition as CompDef,
+  ComponentDefinition
+} from './component'
 import { Entity } from './entity'
 import { SystemFn } from './systems'
 import { ReadonlyComponentSchema } from './readonly'
@@ -205,4 +208,12 @@ export type IEngine = {
    * Returns the crdt state. For now only for testing purpose
    */
   getCrdtState(): State<Uint8Array>
+
+  /**
+   * @internal
+   */
+  componentsDefinition: Map<
+    number,
+    ComponentDefinition<ISchema<unknown>, unknown>
+  >
 }
