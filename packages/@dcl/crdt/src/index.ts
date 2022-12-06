@@ -25,8 +25,9 @@ export function sameData<T>(a: T, b: T): boolean {
   }
 
   if (globalBuffer) {
+    /* istanbul ignore next */
     if (a instanceof globalBuffer && b instanceof globalBuffer) {
-      // Deep level
+      /* istanbul ignore next */
       return (a as any).equals(b)
     }
   }

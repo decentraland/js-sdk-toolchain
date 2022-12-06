@@ -94,9 +94,10 @@ export function snapshotTest<T = unknown>() {
     if (!!process.env.DEBUG) {
       messagesToPrint.forEach((m) => console.log(m, '\n'))
     }
-
-    if (!process.env.CI) {
-      await writeDataFile(fileName, messagesToPrint.join('\n') + '\n')
+    if (!process.env.WITH_COVERAGE) {
+      if (!process.env.CI && !process.env.WITH_COVERAGE) {
+        await writeDataFile(fileName, messagesToPrint.join('\n') + '\n')
+      }
     }
 
     await validateTestIfExists(
