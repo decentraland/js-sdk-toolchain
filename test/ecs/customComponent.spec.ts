@@ -23,10 +23,7 @@ function connectEngines(a: IEngine, b: IEngine) {
         componentId,
         data,
         timestamp,
-        direction,
-        messageBuffer: buffer
-          .buffer()
-          .subarray(offset, buffer.currentReadOffset())
+        direction
       })
     }
   }
@@ -39,7 +36,6 @@ function connectEngines(a: IEngine, b: IEngine) {
     filter(message) {
       return true
     },
-    type: 'a',
     onmessage: () => {
       throw new Error('transportA onmessage not implemented')
     }
@@ -52,7 +48,6 @@ function connectEngines(a: IEngine, b: IEngine) {
     filter(message) {
       return true
     },
-    type: 'a',
     onmessage: () => {
       throw new Error('transportB onmessage not implemented')
     }
@@ -205,6 +200,11 @@ describe('test CRDT flow E2E', () => {
       ])
       env.interceptedMessages.length = 0
 
+      // process the incoming "correction" message
+      await engineA.update(0)
+      // no messages should be emitted from engineA because it is receiving a "correction"
+      expect(env.interceptedMessages).toMatchObject([])
+
       // now both values converged towards the same value
       expect(int8A.get(entityA)).toBe(32)
       expect(int8B.get(entityA)).toBe(32)
@@ -235,14 +235,14 @@ describe('test CRDT flow E2E', () => {
       // and then process in B, which will also send its updates
       await engineB.update(0)
 
+      // now both values converged towards the same value
+      expect(int8A.get(entityA)).toBe(48)
+      expect(int8B.get(entityA)).toBe(48)
+
       // in this case, since the conflict resolution can be made locally, no "fix"
       // message is emitted from engineB
       expect(env.interceptedMessages).toMatchObject([])
       env.interceptedMessages.length = 0
-
-      // now both values converged towards the same value
-      expect(int8A.get(entityA)).toBe(48)
-      expect(int8B.get(entityA)).toBe(48)
     })
   })
 })
