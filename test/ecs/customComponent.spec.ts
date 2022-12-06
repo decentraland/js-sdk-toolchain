@@ -84,6 +84,7 @@ describe('test CRDT flow E2E', () => {
     await engineB.update(0)
     expect(env.interceptedMessages).toEqual([])
   })
+
   // create the components for both engines
   const int8A = int8Component(engineA)
   const int8B = int8Component(engineB)
@@ -99,6 +100,7 @@ describe('test CRDT flow E2E', () => {
     // and the dirtyIterator of the component should of course contain the dirty entity
     expect(Array.from(int8A.dirtyIterator())).toEqual([entityA])
   })
+
   it('then we run a tick in the dirty engine, and the component should be no longer dirty', async () => {
     await engineA.update(0)
     expect(Array.from(int8A.dirtyIterator())).toEqual([])
@@ -153,85 +155,94 @@ describe('test CRDT flow E2E', () => {
     ])
     env.interceptedMessages.length = 0
   })
+
   it('then we do the processing on engineA to apply the changes', async () => {
     await engineA.update(0)
 
     // and assert
     expect(int8A.get(entityA)).toBe(4)
   })
-  it('test conflicting timestamps resolution', async () => {
-    // now we are going to make things a little bit spicy, we will send a message
-    // with conflicts between the two engines. at this moment both converged towards
-    // the same state. the value will be changed to 16 in the engineA and 32 on
-    // the engineB, increasing the timestamp of both internal states
-    int8A.createOrReplace(entityA, 16)
-    int8B.createOrReplace(entityA, 32)
 
-    // to generate a "conflict", we will send the updates from A to B first
-    await engineA.update(0)
-    expect(env.interceptedMessages).toMatchObject([
-      // this value will have has the same timestamp in both engines
-      {
-        direction: 'a->b',
-        componentId: 123987,
-        entity: entityA,
-        data: Uint8Array.of(16),
-        timestamp: 3
-      }
-    ])
-    env.interceptedMessages.length = 0
+  describe('conflict resolution case 1', () => {
+    it('test conflicting timestamps resolution', async () => {
+      // now we are going to make things a little bit spicy, we will send a message
+      // with conflicts between the two engines. at this moment both converged towards
+      // the same state. the value will be changed to 16 in the engineA and 32 on
+      // the engineB, increasing the timestamp of both internal states
+      int8A.createOrReplace(entityA, 16)
+      int8B.createOrReplace(entityA, 32)
 
-    // and then process in B, which will also send its updates
-    await engineB.update(0)
+      // to generate a "conflict", we will send the updates from A to B first
+      await engineA.update(0)
+      expect(env.interceptedMessages).toMatchObject([
+        // this value will have has the same timestamp in both engines
+        {
+          direction: 'a->b',
+          componentId: 123987,
+          entity: entityA,
+          data: Uint8Array.of(16),
+          timestamp: 3
+        }
+      ])
+      env.interceptedMessages.length = 0
+    })
 
-    // in this case, the engineA sends its updates to the engineB.
-    // but the engineB responds with an outdatedMessage, to converge the state of
-    // engineA towards the same value
-    expect(env.interceptedMessages).toMatchObject([
-      // this was the selected value for convergence. sent back to the transport
-      {
-        direction: 'b->a',
-        componentId: 123987,
-        entity: entityA,
-        data: Uint8Array.of(32),
-        timestamp: 3
-      }
-    ])
-    env.interceptedMessages.length = 0
+    it('now we are receiving the updates from engineA', async () => {
+      // and then process in B, which will also send its updates
+      await engineB.update(0)
 
-    // now both values converged towards the same value
-    expect(int8A.get(entityA)).toBe(32)
-    expect(int8B.get(entityA)).toBe(32)
+      // in this case, the engineA sends its updates to the engineB.
+      // but the engineB responds with an outdatedMessage, to converge the state of
+      // engineA towards the same value
+      expect(env.interceptedMessages).toMatchObject([
+        {
+          direction: 'b->a',
+          componentId: 123987,
+          entity: entityA,
+          data: Uint8Array.of(32),
+          timestamp: 3
+        }
+      ])
+      env.interceptedMessages.length = 0
+
+      // now both values converged towards the same value
+      expect(int8A.get(entityA)).toBe(32)
+      expect(int8B.get(entityA)).toBe(32)
+    })
   })
 
-  it('now that engines have the same conflict-free state, we are repeating the same but with inverted values', async () => {
-    int8A.createOrReplace(entityA, 48)
-    int8B.createOrReplace(entityA, 45)
+  describe('conflict resolution case 2', () => {
+    it('now that engines have the same conflict-free state, we are repeating the same but with inverted values', async () => {
+      int8A.createOrReplace(entityA, 48)
+      int8B.createOrReplace(entityA, 45)
 
-    // to generate a "conflict", we will send the updates from A to B first
-    await engineA.update(0)
-    expect(env.interceptedMessages).toMatchObject([
-      // this value will have has the same timestamp in both engines
-      {
-        direction: 'a->b',
-        componentId: 123987,
-        entity: entityA,
-        data: Uint8Array.of(48),
-        timestamp: 4
-      }
-    ])
-    env.interceptedMessages.length = 0
+      // to generate a "conflict", we will send the updates from A to B first
+      await engineA.update(0)
+      expect(env.interceptedMessages).toMatchObject([
+        // this value will have has the same timestamp in both engines
+        {
+          direction: 'a->b',
+          componentId: 123987,
+          entity: entityA,
+          data: Uint8Array.of(48),
+          timestamp: 4
+        }
+      ])
+      env.interceptedMessages.length = 0
+    })
 
-    // and then process in B, which will also send its updates
-    await engineB.update(0)
+    it('now we are receiving the updates from engineA', async () => {
+      // and then process in B, which will also send its updates
+      await engineB.update(0)
 
-    // in this case, since the conflict resolution can be made locally, no "fix"
-    // message is emitted from engineB
-    expect(env.interceptedMessages).toMatchObject([])
-    env.interceptedMessages.length = 0
+      // in this case, since the conflict resolution can be made locally, no "fix"
+      // message is emitted from engineB
+      expect(env.interceptedMessages).toMatchObject([])
+      env.interceptedMessages.length = 0
 
-    // now both values converged towards the same value
-    expect(int8A.get(entityA)).toBe(48)
-    expect(int8B.get(entityA)).toBe(48)
+      // now both values converged towards the same value
+      expect(int8A.get(entityA)).toBe(48)
+      expect(int8B.get(entityA)).toBe(48)
+    })
   })
 })
