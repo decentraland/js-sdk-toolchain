@@ -8,7 +8,9 @@ function connectEngines(a: IEngine, b: IEngine) {
   const interceptedMessages: any[] = []
 
   function intercept(data: Uint8Array, direction: string) {
-    const buffer = createByteBuffer({ reading: { buffer: data, currentOffset: 0 } })
+    const buffer = createByteBuffer({
+      reading: { buffer: data, currentOffset: 0 }
+    })
 
     while (WireMessage.validate(buffer)) {
       const offset = buffer.currentReadOffset()
@@ -22,7 +24,9 @@ function connectEngines(a: IEngine, b: IEngine) {
         data,
         timestamp,
         direction,
-        messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
+        messageBuffer: buffer
+          .buffer()
+          .subarray(offset, buffer.currentReadOffset())
       })
     }
   }
@@ -60,30 +64,31 @@ function connectEngines(a: IEngine, b: IEngine) {
   return { interceptedMessages }
 }
 
-describe('Creates custom components', () => {
-  it('full synchronization flow 1', async () => {
-    const engineA = Engine()
-    const engineB = Engine()
+describe('test CRDT flow E2E', () => {
+  const engineA = Engine()
+  const engineB = Engine()
+  const env = connectEngines(engineA, engineB)
 
-    const env = connectEngines(engineA, engineB)
-
+  it('in empty engines there should be no messages', async () => {
     // in empty engines there should be no messages
     await engineA.update(0)
     await engineB.update(0)
     expect(env.interceptedMessages).toEqual([])
+  })
 
-    // then create an entity in engineA
-    const entityA = engineA.addEntity()
+  // then create an entity in engineA
+  const entityA = engineA.addEntity()
 
-    // adding an entity should emit no message
+  it('adding an entity should emit no message', async () => {
     await engineA.update(0)
     await engineB.update(0)
     expect(env.interceptedMessages).toEqual([])
+  })
+  // create the components for both engines
+  const int8A = int8Component(engineA)
+  const int8B = int8Component(engineB)
 
-    // create the components for both engines
-    const int8A = int8Component(engineA)
-    const int8B = int8Component(engineB)
-
+  it('and add the component value "3" to the entityA', async () => {
     // and add the component value "3" to the entityA
     int8A.create(entityA, 3)
 
@@ -93,11 +98,9 @@ describe('Creates custom components', () => {
 
     // and the dirtyIterator of the component should of course contain the dirty entity
     expect(Array.from(int8A.dirtyIterator())).toEqual([entityA])
-
-    // then we run a tick in the dirty engine
+  })
+  it('then we run a tick in the dirty engine, and the component should be no longer dirty', async () => {
     await engineA.update(0)
-
-    // and the component should be no longer dirty
     expect(Array.from(int8A.dirtyIterator())).toEqual([])
 
     // and the engineA should have sent ONLY ONE message to update this entity and component
@@ -116,8 +119,9 @@ describe('Creates custom components', () => {
     // component is not dirty
     await engineA.update(0)
     expect(env.interceptedMessages).toEqual([])
+  })
 
-    // then we will run the update on the engineB, to process the "queued" update
+  it('then we will run the update on the engineB, to process the "queued" update', async () => {
     await engineB.update(0)
 
     // to verify that the queue got processed, we check the component
@@ -129,8 +133,9 @@ describe('Creates custom components', () => {
     // and since there was no updates on this end. no messages should be sent
     // through the wire
     expect(env.interceptedMessages).toEqual([])
+  })
 
-    // now, if we update the component from engineB's end it should fly back to engineA
+  it(`now, if we update the component from engineB's end it should fly back to engineA`, async () => {
     int8B.createOrReplace(entityA, 4)
     expect(Array.from(int8B.dirtyIterator())).toEqual([entityA])
     await engineB.update(0)
@@ -147,13 +152,14 @@ describe('Creates custom components', () => {
       }
     ])
     env.interceptedMessages.length = 0
-
-    // then we do the processing on engineA to apply the changes
+  })
+  it('then we do the processing on engineA to apply the changes', async () => {
     await engineA.update(0)
 
     // and assert
     expect(int8A.get(entityA)).toBe(4)
-
+  })
+  it('test conflicting timestamps resolution', async () => {
     // now we are going to make things a little bit spicy, we will send a message
     // with conflicts between the two engines. at this moment both converged towards
     // the same state. the value will be changed to 16 in the engineA and 32 on
@@ -171,7 +177,7 @@ describe('Creates custom components', () => {
         entity: entityA,
         data: Uint8Array.of(16),
         timestamp: 3
-      },
+      }
     ])
     env.interceptedMessages.length = 0
 
@@ -196,5 +202,36 @@ describe('Creates custom components', () => {
     // now both values converged towards the same value
     expect(int8A.get(entityA)).toBe(32)
     expect(int8B.get(entityA)).toBe(32)
+  })
+
+  it('now that engines have the same conflict-free state, we are repeating the same but with inverted values', async () => {
+    int8A.createOrReplace(entityA, 48)
+    int8B.createOrReplace(entityA, 45)
+
+    // to generate a "conflict", we will send the updates from A to B first
+    await engineA.update(0)
+    expect(env.interceptedMessages).toMatchObject([
+      // this value will have has the same timestamp in both engines
+      {
+        direction: 'a->b',
+        componentId: 123987,
+        entity: entityA,
+        data: Uint8Array.of(48),
+        timestamp: 4
+      }
+    ])
+    env.interceptedMessages.length = 0
+
+    // and then process in B, which will also send its updates
+    await engineB.update(0)
+
+    // in this case, since the conflict resolution can be made locally, no "fix"
+    // message is emitted from engineB
+    expect(env.interceptedMessages).toMatchObject([])
+    env.interceptedMessages.length = 0
+
+    // now both values converged towards the same value
+    expect(int8A.get(entityA)).toBe(48)
+    expect(int8B.get(entityA)).toBe(48)
   })
 })
