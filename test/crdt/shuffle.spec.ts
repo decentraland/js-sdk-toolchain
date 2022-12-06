@@ -51,6 +51,9 @@ describe('Process messages and get the same result', () => {
     expect(
       compareStatePayloads([clients[0].getState(), clientA.getState()])
     ).toBe(true)
+
+    // check that invalid keys return null without failing
+    expect(clientA.getElementSetState(12938712983, 12371928)).toStrictEqual(null)
   })
 
   it('should process all the messages and get the same state even if we sent them in a diff order', async () => {
