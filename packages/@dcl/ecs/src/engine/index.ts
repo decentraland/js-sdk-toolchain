@@ -223,8 +223,6 @@ export function Engine(): IEngine {
   const crdtSystem = crdtSceneSystem(engine)
 
   async function update(dt: number) {
-    await crdtSystem.receiveMessages()
-
     for (const system of engine.getSystems()) {
       const ret: unknown | Promise<unknown> = system.fn(dt)
       checkNotThenable(
@@ -249,6 +247,8 @@ export function Engine(): IEngine {
     for (const [_componentId, definition] of engine.componentsDefinition) {
       definition.clearDirty()
     }
+
+    await crdtSystem.receiveMessages()
   }
 
   return {

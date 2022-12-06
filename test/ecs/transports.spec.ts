@@ -24,7 +24,6 @@ describe('Transport tests', () => {
       entity,
       componentId: Transform._id,
       timestamp: Date.now(),
-      transportType: 'renderer',
       messageBuffer: new Uint8Array()
     }
     expect(transport.filter(message)).toBe(false)

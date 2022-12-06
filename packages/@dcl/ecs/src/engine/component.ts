@@ -67,8 +67,9 @@ export type ComponentDefinition<
    * Delete the current component to an entity, return null if the entity doesn't have the current component.
    * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
    * @param entity - Entity to delete the component from
+   * @param markAsDirty - defaults to true
    */
-  deleteFrom(entity: Entity): ComponentType<T> | null
+  deleteFrom(entity: Entity, markAsDirty?: boolean): ComponentType<T> | null
 
   /**
    * Get the mutable component of the entity, throw an error if the entity doesn't have the component.
@@ -88,14 +89,24 @@ export type ComponentDefinition<
    * @internal
    * @param entity - entity-component to update
    * @param data - data to update the entity-component
+   * @param markAsDirty - defaults to true
    */
-  upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null
+  upsertFromBinary(
+    entity: Entity,
+    data: ByteBuffer,
+    markAsDirty?: boolean
+  ): ComponentType<T> | null
   /**
    * @internal
    * @param entity - entity-component to update
    * @param data - data to update the entity-component
+   * @param markAsDirty - defaults to true
    */
-  updateFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null
+  updateFromBinary(
+    entity: Entity,
+    data: ByteBuffer,
+    markAsDirty?: boolean
+  ): ComponentType<T> | null
 
   // allocates a buffer and returns new buffer
   /**
@@ -175,10 +186,12 @@ export function defineComponent<
     has(entity: Entity): boolean {
       return data.has(entity)
     },
-    deleteFrom(entity: Entity): ComponentType<T> | null {
+    deleteFrom(entity: Entity, markAsDirty = true): ComponentType<T> | null {
       const component = data.get(entity)
       data.delete(entity)
-      dirtyIterator.add(entity)
+      if (markAsDirty) {
+        dirtyIterator.add(entity)
+      }
       return component || null
     },
     getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null {
@@ -265,7 +278,8 @@ export function defineComponent<
     },
     updateFromBinary(
       entity: Entity,
-      buffer: ByteBuffer
+      buffer: ByteBuffer,
+      markAsDirty = true
     ): ComponentType<T> | null {
       const component = data.get(entity)
       if (!component) {
@@ -273,15 +287,18 @@ export function defineComponent<
           `[updateFromBinary] Component ${componentId} for ${entity} not found`
         )
       }
-      return this.upsertFromBinary(entity, buffer)
+      return this.upsertFromBinary(entity, buffer, markAsDirty)
     },
     upsertFromBinary(
       entity: Entity,
-      buffer: ByteBuffer
+      buffer: ByteBuffer,
+      markAsDirty = true
     ): ComponentType<T> | null {
       const newValue = spec.deserialize(buffer)
       data.set(entity, newValue)
-      dirtyIterator.add(entity)
+      if (markAsDirty) {
+        dirtyIterator.add(entity)
+      }
       return newValue
     },
     clearDirty() {

@@ -13,13 +13,7 @@ export function createNetworkTransport(): Transport {
   const type = 'network-transport'
   return {
     send,
-    type,
     filter(message: TransportMessage): boolean {
-      // Echo message, ignore them
-      if (message.transportType === type) {
-        return false
-      }
-
       return !!message
     }
   }
@@ -64,20 +58,25 @@ export namespace SandBox {
         engine,
         transports: [clientTransport],
         components: { Door, Position },
-        spySend: jest.spyOn(clientTransport, 'send')
+        spySend: jest.spyOn(clientTransport, 'send'),
+        clientTransport
       }
     })
 
     for (const client of clients) {
-      for (const transport of client.transports) {
+      for (
+        let transportIndex = 0;
+        transportIndex < client.transports.length;
+        transportIndex++
+      ) {
+        const transport = client.transports[transportIndex]
         transport.send = async (data: Uint8Array) => {
-          clients
-            .filter((c) => c.id !== client.id)
-            .map((c) => c.transports.find((t) => t.type === transport.type))
-            .forEach(async (clientTransport) => {
+          for (const c of clients) {
+            if (c.id !== client.id && c.clientTransport !== transport) {
               await wait(WS_SEND_DELAY)
-              clientTransport?.onmessage!(data)
-            })
+              c.clientTransport.onmessage!(data)
+            }
+          }
         }
       }
     }

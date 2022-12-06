@@ -22,10 +22,10 @@ export function crdtSceneSystem(
   const outdatedMessages: TransportMessage[] = []
   /**
    *
-   * @param transportType tranport id to identiy messages
+   * @param transportId tranport id to identiy messages
    * @returns a function to process received messages
    */
-  function parseChunkMessage(transportType: string) {
+  function parseChunkMessage(transportId: number) {
     /**
      * Receives a chunk of binary messages and stores all the valid
      * Component Operation Messages at messages queue
@@ -46,7 +46,7 @@ export function crdtSceneSystem(
           componentId,
           data,
           timestamp,
-          transportType,
+          transportId,
           messageBuffer: buffer
             .buffer()
             .subarray(offset, buffer.currentReadOffset())
@@ -87,10 +87,11 @@ export function crdtSceneSystem(
       if (!component) {
         continue
       }
-
+      console.dir({ crdtMessage, current })
       // CRDT outdated message. Resend this message to the transport
       // To do this we add this message to a queue that will be processed at the end of the update tick
       if (crdtMessage !== current) {
+        //|| component.isDirty(entity)
         const offset = bufferForOutdated.currentWriteOffset()
         const type = WireMessage.getType(component, entity)
         const ts = current.timestamp
@@ -104,17 +105,17 @@ export function crdtSceneSystem(
         })
       } else {
         // Add message to transport queue to be processed by others transports
-        // broadcastMessages.push(message)
+        broadcastMessages.push(message)
 
         // Process CRDT Message
         if (type === WireMessage.Enum.DELETE_COMPONENT) {
-          component.deleteFrom(entity)
+          component.deleteFrom(entity, false)
         } else {
           const opts = {
             reading: { buffer: message.data!, currentOffset: 0 }
           }
           const data = createByteBuffer(opts)
-          component.upsertFromBinary(message.entity, data)
+          component.upsertFromBinary(message.entity, data, false)
         }
       }
     }
@@ -128,7 +129,7 @@ export function crdtSceneSystem(
     // CRDT Messages will be the merge between the recieved transport messages and the new crdt messages
     const crdtMessages = getMessages(broadcastMessages)
     const buffer = createByteBuffer()
-
+    console.dir({ crdtMessages })
     for (const [entity, componentsId] of dirtyMap) {
       for (const componentId of componentsId) {
         // Component will be always defined here since dirtyMap its an iterator of engine.componentsDefinition
@@ -164,18 +165,26 @@ export function crdtSceneSystem(
 
     // Send CRDT messages to transports
     const transportBuffer = createByteBuffer()
-    for (const transport of transports) {
+    for (
+      let transportIndex = 0;
+      transportIndex < transports.length;
+      transportIndex++
+    ) {
+      const transport = transports[transportIndex]
       transportBuffer.resetBuffer()
       // First we need to send all the messages that were outdated from a transport
       // So we can fix their crdt state
       for (const message of outdatedMessages) {
-        if (message.transportType === transport.type) {
+        if (message.transportId === transportIndex) {
           transportBuffer.writeBuffer(message.messageBuffer, false)
         }
       }
       // Then we send all the new crdtMessages that the transport needs to process
       for (const message of crdtMessages) {
-        if (transport.filter(message)) {
+        if (
+          message.transportId !== transportIndex &&
+          transport.filter(message)
+        ) {
           transportBuffer.writeBuffer(message.messageBuffer, false)
         }
       }
@@ -191,11 +200,8 @@ export function crdtSceneSystem(
    * Add a transport to the crdt system
    */
   function addTransport(transport: Transport) {
-    if (transports.find((t) => transport.type === t.type)) {
-      throw new Error('Transport already added')
-    }
-    transports.push(transport)
-    transport.onmessage = parseChunkMessage(transport.type)
+    const id = transports.push(transport) - 1
+    transport.onmessage = parseChunkMessage(id)
   }
 
   /**
