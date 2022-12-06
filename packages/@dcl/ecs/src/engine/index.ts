@@ -59,6 +59,18 @@ function preEngine() {
     return entityContainer.removeEntity(entity)
   }
 
+  function registerCustomComponent(
+    component: ComponentDefinition<any, any>,
+    componentId: number
+  ): ComponentDefinition<any, any> {
+    const prev = componentsDefinition.get(componentId)
+    if (prev) {
+      throw new Error(`Component number ${componentId} was already registered.`)
+    }
+    componentsDefinition.set(componentId, component)
+    return component
+  }
+
   function defineComponentFromSchema<
     T extends ISchema<ConstructorType>,
     ConstructorType = ComponentType<T>
@@ -198,7 +210,8 @@ function preEngine() {
     getComponent,
     getComponentOrNull,
     removeComponentDefinition,
-    removeEntityWithChildren
+    removeEntityWithChildren,
+    registerCustomComponent
   }
 }
 
@@ -246,6 +259,7 @@ export function Engine(): IEngine {
     removeSystem: engine.removeSystem,
     defineComponent: engine.defineComponent,
     defineComponentFromSchema: engine.defineComponentFromSchema,
+    registerCustomComponent: engine.registerCustomComponent,
     getEntitiesWith: engine.getEntitiesWith,
     getComponent: engine.getComponent,
     getComponentOrNull: engine.getComponentOrNull,

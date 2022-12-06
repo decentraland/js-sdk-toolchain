@@ -61,8 +61,7 @@ export function crdtSceneSystem(
    * @returns messages recieved by the transport to process on the next tick
    */
   function getMessages<T = unknown>(value: T[]) {
-    const messagesToProcess = Array.from(value)
-    value.length = 0
+    const messagesToProcess = value.splice(0, value.length)
     return messagesToProcess
   }
 
@@ -105,7 +104,7 @@ export function crdtSceneSystem(
         })
       } else {
         // Add message to transport queue to be processed by others transports
-        broadcastMessages.push(message)
+        // broadcastMessages.push(message)
 
         // Process CRDT Message
         if (type === WireMessage.Enum.DELETE_COMPONENT) {
@@ -117,7 +116,6 @@ export function crdtSceneSystem(
           const data = createByteBuffer(opts)
           component.upsertFromBinary(message.entity, data)
         }
-        component.clearDirty()
       }
     }
   }
