@@ -5,6 +5,7 @@ import { summary } from '@actions/core'
 
 import {
   commonChecks,
+  CRDT_PATH,
   ECS7_PATH,
   flow,
   JS_RUNTIME,
@@ -74,9 +75,21 @@ flow('build-all', () => {
     itExecutes(`chmod +x index.js`, ROLLUP_CONFIG_PATH)
   })
 
+  flow('@dcl/crdt build', () => {
+    itDeletesFolder('dist', CRDT_PATH)
+    itExecutes('npm i --silent', CRDT_PATH)
+    itExecutes('npm run build --silent', CRDT_PATH)
+    it('check file exists', () => {
+      ensureFileExists('dist/index.d.ts', CRDT_PATH)
+      ensureFileExists('dist/index.js', CRDT_PATH)
+      ensureFileExists('dist/types.d.ts', CRDT_PATH)
+      ensureFileExists('dist/types.js', CRDT_PATH)
+    })
+  })
   flow('@dcl/ecs build', () => {
     itDeletesFolder('dist', ECS7_PATH)
     itExecutes('npm i --silent', ECS7_PATH)
+    itExecutes(`npm install --silent ${CRDT_PATH}`, ECS7_PATH)
     compileEcsComponents(
       `${ECS7_PATH}/src/components`,
       `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
