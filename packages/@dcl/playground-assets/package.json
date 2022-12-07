@@ -21,6 +21,6 @@
   },
   "minCliVersion": "3.12.3",
   "files": [
-    "dist"
+    "dist", "etc"
   ]
 }
