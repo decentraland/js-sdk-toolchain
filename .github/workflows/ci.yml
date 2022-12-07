@@ -9,6 +9,18 @@ on:
 
 name: CI
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - name: install
+        run: make install
+      - name: lint
+        run: make lint
   test:
     runs-on: ubuntu-latest
     steps:
@@ -23,8 +35,11 @@ jobs:
         run: make build
       - name: test
         run: make test-coverage
-      - name: lint
-        run: make lint
+      - uses: codecov/codecov-action@v3
+        if: always()
+        with:
+          fail_ci_if_error: true # optional (default = false)
+          verbose: true # optional (default = false)
       - name: prepare releasable packages
         run: make prepare
   build:
@@ -43,6 +58,12 @@ jobs:
         uses: menduz/oddish-action@master
         with:
           cwd: packages/@dcl/dcl-rollup
+          deterministic-snapshot: true
+          only-update-versions: true
+      - name: update version of packages/@dcl/crdt
+        uses: menduz/oddish-action@master
+        with:
+          cwd: packages/@dcl/crdt
           deterministic-snapshot: true
           only-update-versions: true
       - name: update version of packages/@dcl/js-runtime
@@ -77,8 +98,6 @@ jobs:
           only-update-versions: true
       - name: build
         run: make build
-      - name: lint
-        run: make lint
       - name: prepare releasable packages
         run: make prepare
       - name: 'Upload Artifact'
@@ -94,6 +113,23 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           access: public
           cwd: ./packages/@dcl/dcl-rollup
+          ## use action runId instead of current date to generate snapshot numbers
+          deterministic-snapshot: true
+
+          ## publish every package to s3
+          s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/dcl-rollup'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+      - name: publish @dcl/crdt package
+        uses: menduz/oddish-action@master
+        id: publish_crdt
+        with:
+          registry-url: 'https://registry.npmjs.org'
+          access: public
+          cwd: ./packages/@dcl/crdt
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
 
@@ -155,6 +191,12 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+      - name: (PR) change @dcl/ecs version to s3 url
+        working-directory: ./packages/@dcl/sdk
+        if: ${{ github.event.pull_request.number }}
+        run: node -e "let pkg=require('./package.json'); pkg.dependencies['@dcl/crdt']='$CRDT_S3_URL'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
+        env:
+          CRDT_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_crdt.outputs.s3-bucket-key }}
       - name: (PR) change @dcl/sdk version to s3 url
         working-directory: ./packages/@dcl/sdk
         if: ${{ github.event.pull_request.number }}
@@ -235,5 +277,5 @@ jobs:
                npm install "${{ steps.url-generator.outputs.body }}"
                ```
             - You can preview this build entering:
-              https://playground.decentraland.org/?&sdk-branch=${{ github.head_ref || github.ref }}
+              https://playground.decentraland.org/?sdk-branch=${{ github.head_ref || github.ref }}
           edit-mode: replace

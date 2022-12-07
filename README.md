@@ -1,5 +1,7 @@
 # Decentraland SDK 7
 
+[![codecov](https://codecov.io/gh/decentraland/js-sdk-toolchain/branch/main/graph/badge.svg?token=F7J331CGP6)](https://codecov.io/gh/decentraland/js-sdk-toolchain)
+
 ## This project tree
 ```
 js-sdk-toolchain
