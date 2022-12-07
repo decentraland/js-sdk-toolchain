@@ -19,5 +19,8 @@
   "dependencies": {
     "@dcl/sdk": "file:../sdk"
   },
-  "minCliVersion": "3.12.3"
+  "minCliVersion": "3.12.3",
+  "files": [
+    "dist"
+  ]
 }
