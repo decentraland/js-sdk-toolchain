@@ -27,7 +27,7 @@
     "ts-proto": "^1.112.0"
   },
   "dependencies": {
-    "@dcl/crdt": "^1.0.0-20220819145912.commit-35069cd",
+    "@dcl/crdt": "file:../crdt",
     "@dcl/js-runtime": "file:../js-runtime",
     "@dcl/protocol": "^1.0.0-3603890942.commit-44633cf"
   },

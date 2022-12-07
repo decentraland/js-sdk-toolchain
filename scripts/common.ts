@@ -26,6 +26,7 @@ export const PLAYGROUND_ASSETS_PATH = resolve(
 )
 
 export const ECS7_PATH = resolve(process.cwd(), './packages/@dcl/ecs')
+export const CRDT_PATH = resolve(process.cwd(), './packages/@dcl/crdt')
 
 export const JS_RUNTIME = resolve(process.cwd(), './packages/@dcl/js-runtime')
 
