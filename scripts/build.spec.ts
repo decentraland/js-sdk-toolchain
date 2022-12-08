@@ -243,6 +243,10 @@ flow('build-all', () => {
         {
           from: path.resolve(JS_RUNTIME, 'apis.d.ts'),
           fileName: 'apis.d.ts'
+        },
+        {
+          from: path.resolve(SDK_PATH, 'package.json'),
+          fileName: 'dcl-sdk.package.json'
         }
       ]
       const distPlaygroundSdkPath = path.resolve(playgroundDistPath, 'sdk')
