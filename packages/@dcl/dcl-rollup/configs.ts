@@ -183,12 +183,12 @@ export function createPlaygroundEcsConfig(_options: {
   return {
     external: [/~system\//],
     input: 'src/index.ts',
-    context: 'self',
+    context: 'globalThis',
     output: [
       {
         file: out,
         format: 'iife',
-        name: 'self',
+        name: 'globalThis',
         extend: true,
         sourcemap: 'hidden'
       },
