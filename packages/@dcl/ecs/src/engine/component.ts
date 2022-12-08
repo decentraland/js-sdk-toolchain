@@ -148,7 +148,7 @@ export type ComponentDefinition<
   /**
    * @internal
    */
-  clearDirty(entity?: unknown): void
+  clearDirty(): void
   /**
    * @internal
    */
@@ -330,11 +330,7 @@ export function defineComponent<
       }
       return newValue
     },
-    clearDirty(entity: unknown) {
-      if (entity) {
-        dirtyIterator.delete(entity)
-        return
-      }
+    clearDirty() {
       dirtyIterator.clear()
     }
   }

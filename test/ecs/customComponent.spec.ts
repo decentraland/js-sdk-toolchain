@@ -84,6 +84,10 @@ describe('test CRDT flow E2E', () => {
   const int8A = int8Component(engineA)
   const int8B = int8Component(engineB)
 
+  it('should fail if you want to register the same component twice', () => {
+    expect(() => int8Component(engineA)).toThrow()
+  })
+
   it('and add the component value "3" to the entityA', async () => {
     // and add the component value "3" to the entityA
     int8A.create(entityA, 3)
