@@ -415,7 +415,7 @@ export type ComponentDefinition<T extends ISchema<ConstructorType>, ConstructorT
     getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
     create(entity: Entity, val?: ConstructorType): ComponentType<T>;
     createOrReplace(entity: Entity, val?: ConstructorType): ComponentType<T>;
-    deleteFrom(entity: Entity): ComponentType<T> | null;
+    deleteFrom(entity: Entity, markAsDirty?: boolean): ComponentType<T> | null;
     getMutable(entity: Entity): ComponentType<T>;
     getMutableOrNull(entity: Entity): ComponentType<T> | null;
     writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void;
