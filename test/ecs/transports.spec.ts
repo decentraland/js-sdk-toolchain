@@ -12,23 +12,6 @@ describe('Transport tests', () => {
     jest.restoreAllMocks()
   })
 
-  it('should avoid echo messages', async () => {
-    const crdtSendToRenderer = jest.fn()
-    const transport = createRendererTransport({ crdtSendToRenderer })
-    const engine = Engine()
-    engine.addTransport(transport)
-    const Transform = components.Transform(engine)
-    const entity = engine.addEntity()
-    const message: TransportMessage = {
-      type: WireMessage.Enum.PUT_COMPONENT,
-      entity,
-      componentId: Transform._id,
-      timestamp: Date.now(),
-      messageBuffer: new Uint8Array()
-    }
-    expect(transport.filter(message)).toBe(false)
-  })
-
   it('should test transports', async () => {
     const crdtSendToRenderer = jest.fn()
     const transports = [createRendererTransport({ crdtSendToRenderer })]

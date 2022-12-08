@@ -3,8 +3,8 @@ import * as components from '../../packages/@dcl/ecs/src/components'
 
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
+export const ID = 123987
 export const int8Component = (engine: IEngine) => {
-  const ID = 123987
   const values = new Map<Entity, number>()
   const dirtyIterator = new Set<Entity>()
 

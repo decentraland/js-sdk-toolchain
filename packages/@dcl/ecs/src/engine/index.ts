@@ -223,6 +223,7 @@ export function Engine(): IEngine {
   const crdtSystem = crdtSceneSystem(engine)
 
   async function update(dt: number) {
+    await crdtSystem.receiveMessages()
     for (const system of engine.getSystems()) {
       const ret: unknown | Promise<unknown> = system.fn(dt)
       checkNotThenable(
@@ -232,9 +233,8 @@ export function Engine(): IEngine {
         }) returned a thenable. Systems cannot be async functions. Documentation: https://dcl.gg/sdk/sync-systems`
       )
     }
-    crdtSystem.updateState()
-    await crdtSystem.sendMessages()
-    await crdtSystem.receiveMessages()
+    const dirtyEntities = crdtSystem.updateState()
+    await crdtSystem.sendMessages(dirtyEntities)
 
     for (const [_componentId, definition] of engine.componentsDefinition) {
       definition.clearDirty()

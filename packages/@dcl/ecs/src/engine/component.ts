@@ -165,7 +165,6 @@ export function defineComponent<
 ): ComponentDefinition<T, ConstructorType> {
   const data = new Map<Entity, ComponentType<T>>()
   const dirtyIterator = new Set<Entity>()
-
   const defaultBuffer = createByteBuffer()
   if (constructorDefault) {
     spec.serialize(constructorDefault, defaultBuffer)

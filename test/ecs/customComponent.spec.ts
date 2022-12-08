@@ -197,10 +197,11 @@ describe('test CRDT flow E2E', () => {
           componentId: 123987,
           entity: entityA,
           data: Uint8Array.of(32),
-          timestamp: 3
+          timestamp: 4
         }
       ])
       env.interceptedMessages.length = 0
+      await engineB.update(0)
 
       // process the incoming "correction" message
       await engineA.update(0)
@@ -227,7 +228,7 @@ describe('test CRDT flow E2E', () => {
           componentId: 123987,
           entity: entityA,
           data: Uint8Array.of(48),
-          timestamp: 4
+          timestamp: 5
         }
       ])
       env.interceptedMessages.length = 0
