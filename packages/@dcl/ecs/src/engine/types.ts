@@ -1,10 +1,7 @@
 import type { ISchema } from '../schemas/ISchema'
 import { Result, Spec } from '../schemas/Map'
 import { Transport } from '../systems/crdt/types'
-import {
-  ComponentDefinition as CompDef,
-  ComponentDefinition
-} from './component'
+import { ComponentDefinition } from './component'
 import { Entity } from './entity'
 import { SystemFn } from './systems'
 import { ReadonlyComponentSchema } from './readonly'
@@ -20,8 +17,10 @@ export type Unpacked<T> = T extends (infer U)[] ? U : T
 /**
  * @public
  */
-export type ComponentSchema<T extends [CompDef<any>, ...CompDef<any>[]]> = {
-  [K in keyof T]: T[K] extends CompDef<any>
+export type ComponentSchema<
+  T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]
+> = {
+  [K in keyof T]: T[K] extends ComponentDefinition<any>
     ? ReturnType<T[K]['getMutable']>
     : never
 }
@@ -87,9 +86,9 @@ export type IEngine = {
    * @param componentId - unique id to identify the component, if the component id already exist, it will fail.
    */
   registerCustomComponent<T extends ISchema, V>(
-    component: CompDef<T, V>,
+    component: ComponentDefinition<T, V>,
     componentId: number
-  ): CompDef<T, V>
+  ): ComponentDefinition<T, V>
   /**
    * Define a component and add it to the engine.
    * @param spec - An object with schema fields
@@ -110,7 +109,7 @@ export type IEngine = {
     spec: T,
     componentId: number,
     constructorDefault?: ConstructorType
-  ): CompDef<ISchema<Result<T>>, Partial<Result<T>>>
+  ): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>
   /**
    * Define a component and add it to the engine.
    * @param spec - An object with schema fields
@@ -129,7 +128,7 @@ export type IEngine = {
     spec: T,
     componentId: number,
     constructorDefault?: ConstructorType
-  ): CompDef<T, ConstructorType>
+  ): ComponentDefinition<T, ConstructorType>
 
   /**
    * Get the component definition from the component id.
@@ -140,7 +139,7 @@ export type IEngine = {
    * const StateComponent = engine.getComponent(StateComponentId)
    * ```
    */
-  getComponent<T extends ISchema>(componentId: number): CompDef<T>
+  getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>
 
   /**
    * Get the component definition from the component id.
@@ -151,7 +150,9 @@ export type IEngine = {
    * const StateComponent = engine.getComponent(StateComponentId)
    * ```
    */
-  getComponentOrNull<T extends ISchema>(componentId: number): CompDef<T> | null
+  getComponentOrNull<T extends ISchema>(
+    componentId: number
+  ): ComponentDefinition<T> | null
 
   /**
    * Get a iterator of entities that has all the component requested.
@@ -165,7 +166,9 @@ export type IEngine = {
    * }
    * ```
    */
-  getEntitiesWith<T extends [CompDef<any>, ...CompDef<any>[]]>(
+  getEntitiesWith<
+    T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]
+  >(
     ...components: T
   ): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>
 
