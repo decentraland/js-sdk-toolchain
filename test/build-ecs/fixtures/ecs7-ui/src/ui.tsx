@@ -27,7 +27,7 @@ export const ui = () => (
       uiBackground={{ backgroundColor: { r: 255, g: 45, b: 85, a: 0.2 } }}
     >
       <UiEntity
-        uiTransform={{ width: 80, height: 20 }}
+        uiTransform={{ width: 80, height: 20, flex: 1 }}
         uiText={{
           value: 'Boedo',
           textAlign: TextAlignMode.TAM_BOTTOM_CENTER,

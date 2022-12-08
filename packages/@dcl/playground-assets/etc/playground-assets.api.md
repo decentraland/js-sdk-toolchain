@@ -654,12 +654,13 @@ export type IEngine = {
     entityExists(entity: Entity): boolean;
     addSystem(system: SystemFn, priority?: number, name?: string): void;
     removeSystem(selector: string | SystemFn): boolean;
+    registerCustomComponent<T extends ISchema, V>(component: ComponentDefinition<T, V>, componentId: number): ComponentDefinition<T, V>;
     defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>;
     defineComponentFromSchema<T extends ISchema<ConstructorType>, ConstructorType>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
     getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
     getComponentOrNull<T extends ISchema>(componentId: number): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
-    update(deltaTime: number): void;
+    update(deltaTime: number): Promise<void>;
     readonly RootEntity: Entity;
     readonly PlayerEntity: Entity;
     readonly CameraEntity: Entity;
@@ -2598,7 +2599,7 @@ export type ReceiveMessage = {
     entity: Entity;
     componentId: number;
     timestamp: number;
-    transportType?: string;
+    transportId?: number;
     data?: Uint8Array;
     messageBuffer: Uint8Array;
 };
@@ -2850,8 +2851,7 @@ export type TransformType = {
 //
 // @public (undocumented)
 export type Transport = {
-    type: string;
-    send(message: Uint8Array): void;
+    send(message: Uint8Array): Promise<void>;
     onmessage?(message: Uint8Array): void;
     filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
 };
@@ -3079,14 +3079,16 @@ export namespace WireMessage {
         RESERVED = 0
     }
     // (undocumented)
+    export function getType(component: ComponentDefinition<ISchema<unknown>, unknown>, entity: Entity): Enum;
+    // (undocumented)
     export type Header = {
         length: Uint32;
         type: Uint32;
     };
-    // (undocumented)
-    export function readHeader(buf: ByteBuffer): Header | null;
     const // (undocumented)
     HEADER_LENGTH = 8;
+    // (undocumented)
+    export function readHeader(buf: ByteBuffer): Header | null;
     // (undocumented)
     export type Uint32 = number;
     export function validate(buf: ByteBuffer): boolean;

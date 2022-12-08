@@ -64,6 +64,15 @@ export type ComponentDefinition<
   createOrReplace(entity: Entity, val?: ConstructorType): ComponentType<T>
 
   /**
+   * @internal
+   * Delete the current component to an entity, return null if the entity doesn't have the current component.
+   * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
+   * @param entity - Entity to delete the component from
+   * @param markAsDirty - defaults to true
+   */
+  deleteFrom(entity: Entity, markAsDirty?: boolean): ComponentType<T> | null
+  /**
+   * @public
    * Delete the current component to an entity, return null if the entity doesn't have the current component.
    * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
    * @param entity - Entity to delete the component from
@@ -88,14 +97,24 @@ export type ComponentDefinition<
    * @internal
    * @param entity - entity-component to update
    * @param data - data to update the entity-component
+   * @param markAsDirty - defaults to true
    */
-  upsertFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null
+  upsertFromBinary(
+    entity: Entity,
+    data: ByteBuffer,
+    markAsDirty?: boolean
+  ): ComponentType<T> | null
   /**
    * @internal
    * @param entity - entity-component to update
    * @param data - data to update the entity-component
+   * @param markAsDirty - defaults to true
    */
-  updateFromBinary(entity: Entity, data: ByteBuffer): ComponentType<T> | null
+  updateFromBinary(
+    entity: Entity,
+    data: ByteBuffer,
+    markAsDirty?: boolean
+  ): ComponentType<T> | null
 
   // allocates a buffer and returns new buffer
   /**
@@ -103,6 +122,13 @@ export type ComponentDefinition<
    * @param entity - Entity to serizalie
    */
   toBinary(entity: Entity): ByteBuffer
+
+  // allocates a buffer and returns new buffer if it exists or null
+  /**
+   * @internal
+   * @param entity - Entity to serizalie
+   */
+  toBinaryOrNull(entity: Entity): ByteBuffer | null
 
   // writes to a pre-allocated buffer
   writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void
@@ -139,7 +165,6 @@ export function defineComponent<
 ): ComponentDefinition<T, ConstructorType> {
   const data = new Map<Entity, ComponentType<T>>()
   const dirtyIterator = new Set<Entity>()
-
   const defaultBuffer = createByteBuffer()
   if (constructorDefault) {
     spec.serialize(constructorDefault, defaultBuffer)
@@ -175,10 +200,14 @@ export function defineComponent<
     has(entity: Entity): boolean {
       return data.has(entity)
     },
-    deleteFrom(entity: Entity): ComponentType<T> | null {
+    deleteFrom(entity: Entity, markAsDirty = true): ComponentType<T> | null {
       const component = data.get(entity)
       data.delete(entity)
-      dirtyIterator.add(entity)
+      if (markAsDirty) {
+        dirtyIterator.add(entity)
+      } else {
+        dirtyIterator.delete(entity)
+      }
       return component || null
     },
     getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null {
@@ -253,6 +282,16 @@ export function defineComponent<
       spec.serialize(component, writeBuffer)
       return writeBuffer
     },
+    toBinaryOrNull(entity: Entity): ByteBuffer | null {
+      const component = data.get(entity)
+      if (!component) {
+        return null
+      }
+
+      const writeBuffer = createByteBuffer()
+      spec.serialize(component, writeBuffer)
+      return writeBuffer
+    },
     writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void {
       const component = data.get(entity)
       if (!component) {
@@ -265,7 +304,8 @@ export function defineComponent<
     },
     updateFromBinary(
       entity: Entity,
-      buffer: ByteBuffer
+      buffer: ByteBuffer,
+      markAsDirty = true
     ): ComponentType<T> | null {
       const component = data.get(entity)
       if (!component) {
@@ -273,15 +313,20 @@ export function defineComponent<
           `[updateFromBinary] Component ${componentId} for ${entity} not found`
         )
       }
-      return this.upsertFromBinary(entity, buffer)
+      return this.upsertFromBinary(entity, buffer, markAsDirty)
     },
     upsertFromBinary(
       entity: Entity,
-      buffer: ByteBuffer
+      buffer: ByteBuffer,
+      markAsDirty = true
     ): ComponentType<T> | null {
       const newValue = spec.deserialize(buffer)
       data.set(entity, newValue)
-      dirtyIterator.add(entity)
+      if (markAsDirty) {
+        dirtyIterator.add(entity)
+      } else {
+        dirtyIterator.delete(entity)
+      }
       return newValue
     },
     clearDirty() {

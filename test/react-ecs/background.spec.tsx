@@ -47,7 +47,7 @@ describe('UiBackground React Ecs', () => {
     )
 
     uiRenderer.setUiRenderer(ui)
-    engine.update(1)
+    await engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
@@ -62,19 +62,19 @@ describe('UiBackground React Ecs', () => {
     // Update values
     backgroundColor.g = 20.8
 
-    engine.update(1)
+    await engine.update(1)
     expect(getBackground(rootDivEntity)).toMatchObject({
       backgroundColor: { r: 0, g: 20.8, b: 2 }
     })
 
     backgroundColor = undefined
-    engine.update(1)
+    await engine.update(1)
     expect(getBackground(rootDivEntity)).toMatchObject({
       backgroundColor: undefined
     })
   })
 
-  it('should remove backgrund component', () => {
+  it('should remove backgrund component', async () => {
     const UiBackground = components.UiBackground(engine as IIEngine)
     const entityIndex = engine.addEntity() as number
 
@@ -90,13 +90,13 @@ describe('UiBackground React Ecs', () => {
     )
 
     uiRenderer.setUiRenderer(ui)
-    engine.update(1)
+    await engine.update(1)
     expect(getBackground()?.backgroundColor).toMatchObject(
       backgroundProps.uiBackground.backgroundColor!
     )
 
     backgroundProps = undefined
-    engine.update(1)
+    await engine.update(1)
     expect(getBackground()).toBe(null)
   })
 })

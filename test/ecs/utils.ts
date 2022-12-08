@@ -2,7 +2,18 @@ import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/math'
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
-import * as transport from '../../packages/@dcl/sdk/src/internal/transports/networkTransport'
+import { TransportMessage, Transport } from '../../packages/@dcl/ecs/src'
+
+export function createNetworkTransport(): Transport {
+  async function send(..._args: any[]) {}
+
+  return {
+    send,
+    filter(message: TransportMessage): boolean {
+      return !!message
+    }
+  }
+}
 
 export function wait(ms: number) {
   return new Promise<void>((resolve) => setTimeout(() => resolve(), ms))
@@ -29,7 +40,7 @@ export namespace SandBox {
    */
   export function create({ length }: { length: number }) {
     const clients = Array.from({ length }).map((_, index) => {
-      const clientTransport = transport.createNetworkTransport()
+      const clientTransport = createNetworkTransport()
       const engine = Engine()
       engine.addTransport(clientTransport)
       const Position = engine.defineComponent(
@@ -43,20 +54,25 @@ export namespace SandBox {
         engine,
         transports: [clientTransport],
         components: { Door, Position },
-        spySend: jest.spyOn(clientTransport, 'send')
+        spySend: jest.spyOn(clientTransport, 'send'),
+        clientTransport
       }
     })
 
     for (const client of clients) {
-      for (const transport of client.transports) {
-        transport.send = (data) => {
-          clients
-            .filter((c) => c.id !== client.id)
-            .map((c) => c.transports.find((t) => t.type === transport.type))
-            .forEach(async (clientTransport) => {
+      for (
+        let transportIndex = 0;
+        transportIndex < client.transports.length;
+        transportIndex++
+      ) {
+        const transport = client.transports[transportIndex]
+        transport.send = async (data: Uint8Array) => {
+          for (const c of clients) {
+            if (c.id !== client.id && c.clientTransport !== transport) {
               await wait(WS_SEND_DELAY)
-              clientTransport?.onmessage!(data)
-            })
+              c.clientTransport.onmessage!(data)
+            }
+          }
         }
       }
     }

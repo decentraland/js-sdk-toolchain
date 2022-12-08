@@ -17,13 +17,13 @@ describe('Events helpers isTriggered', () => {
     ).toBe(false)
   })
 
-  it('no rootEntity', () => {
+  it('no rootEntity', async () => {
     const engine = Engine()
     components.PointerEventsResult(engine)
     engine.addEntity()
     createInputSystem(engine)
 
-    engine.update(1)
+    await engine.update(1)
     expect(1).toBe(1)
   })
 
@@ -50,7 +50,7 @@ describe('Events helpers isTriggered', () => {
     ).toBe(false)
   })
 
-  it('dont detect pointerEventActive after update', () => {
+  it('dont detect pointerEventActive after update', async () => {
     const newEngine = Engine()
     const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
@@ -65,13 +65,13 @@ describe('Events helpers isTriggered', () => {
       isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)
     ).toBe(true)
 
-    newEngine.update(0)
+    await newEngine.update(0)
     expect(
       isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)
     ).toBe(false)
   })
 
-  it('down state should persist after update', () => {
+  it('down state should persist after update', async () => {
     const newEngine = Engine()
     const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
@@ -82,11 +82,11 @@ describe('Events helpers isTriggered', () => {
       ]
     })
 
-    newEngine.update(0)
+    await newEngine.update(0)
     expect(isPressed(InputAction.IA_POINTER)).toBe(true)
 
     // See this keep the true value after the update
-    newEngine.update(0)
+    await newEngine.update(0)
     expect(isPressed(InputAction.IA_POINTER)).toBe(true)
   })
 })

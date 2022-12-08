@@ -4,7 +4,7 @@ import { createTaskSystem } from '../../packages/@dcl/ecs/src/systems/async-task
 declare let process: any
 
 describe('Execute Task', () => {
-  it('should run async tasks in the engine', () => {
+  it('should run async tasks in the engine', async () => {
     const engine = Engine()
     const { executeTask } = createTaskSystem(engine)
 
@@ -16,9 +16,9 @@ describe('Execute Task', () => {
 
     executeTask(task)
     expect(counter).toBe(0)
-    engine.update(1)
+    await engine.update(1)
     expect(counter).toBe(1)
-    engine.update(1)
+    await engine.update(1)
     expect(counter).toBe(1)
   })
 
@@ -30,7 +30,7 @@ describe('Execute Task', () => {
       throw 'Error bubbles to console'
     }
     executeTask(errorFn)
-    engine.update(1)
+    await engine.update(1)
 
     // flush the callback event looper
     await new Promise(process.nextTick)

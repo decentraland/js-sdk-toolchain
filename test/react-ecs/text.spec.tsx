@@ -45,7 +45,7 @@ describe('UiText React Ecs', () => {
     )
 
     renderer.setUiRenderer(ui)
-    engine.update(1)
+    await engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
@@ -64,11 +64,11 @@ describe('UiText React Ecs', () => {
     text = 'BOEDO'
     color = { r: 1, g: 1, b: 1, a: 1 }
 
-    engine.update(1)
+    await engine.update(1)
     expect(getText(rootDivEntity)).toMatchObject({
       value: 'BOEDO',
       color: { r: 1, g: 1, b: 1, a: 1 }
     })
-    engine.update(1)
+    await engine.update(1)
   })
 })

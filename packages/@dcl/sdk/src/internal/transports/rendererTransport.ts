@@ -1,4 +1,4 @@
-import { Transport, TransportMessage } from '@dcl/ecs'
+import { Transport } from '@dcl/ecs'
 import { ECSComponentIDs } from '@dcl/ecs/dist/components/generated/ids.gen'
 import type {
   CrdtSendToRendererRequest,
@@ -32,21 +32,16 @@ export function createRendererTransport(
     }
   }
 
-  const type = 'renderer'
   const rendererTransport: Transport = {
-    type,
-    send(message: Uint8Array): void {
-      sendToRenderer(message).catch((error) => {
+    async send(message) {
+      try {
+        await sendToRenderer(message)
+      } catch (error) {
         console.error(error)
         debugger
-      })
-    },
-    filter(message: TransportMessage): boolean {
-      // Echo message, ignore them
-      if (message.transportType === type) {
-        return false
       }
-
+    },
+    filter(message) {
       // Only send renderer components (Proto Generated)
       if (!componentIds.includes(message.componentId)) {
         return false

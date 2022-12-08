@@ -30,10 +30,10 @@ module.exports = {
       functions: 10,
     },
     "packages/@dcl/sdk/src/internal": {
-      branches: 37,
-      functions: 37,
-      lines: 37,
-      statements: 37
+      branches: 26,
+      functions: 26,
+      lines: 26,
+      statements: 26
     }
   },
   coveragePathIgnorePatterns: [

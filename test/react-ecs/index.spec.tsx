@@ -25,7 +25,7 @@ describe('Render UI System', () => {
     )
   })
 
-  it('should remove the ui and the entities', () => {
+  it('should remove the ui and the entities', async () => {
     const ui = () => <UiEntity uiTransform={{ width: 1 }} />
     const UiTransform = components.UiTransform(engine as IIEngine)
     const entityIndex = engine.addEntity() as number
@@ -33,14 +33,14 @@ describe('Render UI System', () => {
     const divEntity = (entityIndex + 1) as Entity
 
     // without uiRenderer , shouldn't throw an error
-    engine.update(1)
+    await engine.update(1)
 
     uiRenderer.setUiRenderer(ui)
-    engine.update(1)
+    await engine.update(1)
     expect(getUiTransform(divEntity)?.width).toBe(1)
 
     uiRenderer.destroy()
-    engine.update(1)
+    await engine.update(1)
     expect(getUiTransform(divEntity)).toBe(null)
   })
 })
