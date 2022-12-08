@@ -76,9 +76,8 @@ export type ComponentDefinition<
    * Delete the current component to an entity, return null if the entity doesn't have the current component.
    * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
    * @param entity - Entity to delete the component from
-   * @param markAsDirty - defaults to true
    */
-  deleteFrom(entity: Entity, markAsDirty?: boolean): ComponentType<T> | null
+  deleteFrom(entity: Entity): ComponentType<T> | null
 
   /**
    * Get the mutable component of the entity, throw an error if the entity doesn't have the component.
