@@ -38,10 +38,10 @@ export const int8Component = (engine: IEngine) => {
         dirtyIterator.add(entity)
       }
     },
-    getMutable: function (entity: Entity) {
+    getMutable: function (_entity: Entity) {
       throw new Error('Function not implemented.')
     },
-    getMutableOrNull: function (entity: Entity) {
+    getMutableOrNull: function (_entity: Entity) {
       throw new Error('Function not implemented.')
     },
     upsertFromBinary: function (

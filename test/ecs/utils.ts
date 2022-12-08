@@ -5,12 +5,8 @@ import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { TransportMessage, Transport } from '../../packages/@dcl/ecs/src'
 
 export function createNetworkTransport(): Transport {
-  // const rpc = new RpcTransport()
-  async function send(..._args: any[]) {
-    // console.log('NetworkMessage Sent: ', ...args)
-  }
+  async function send(..._args: any[]) {}
 
-  const type = 'network-transport'
   return {
     send,
     filter(message: TransportMessage): boolean {
