@@ -286,4 +286,44 @@ describe('test CRDT flow E2E', () => {
       expect(int8B.get(entityA)).toBe(48)
     })
   })
+  describe('conflict resolution case 3', () => {
+    it('now that engines have the same conflict-free state, we are going to remove a component outside a fn and receive and update of the same component from the other engine', async () => {
+      int8A.deleteFrom(entityA)
+      updateIntB(entityA, 88)
+
+      // We send the message from B -> A
+      await engineB.update(0)
+      expect(env.interceptedMessages).toMatchObject([
+        // this value will have has the same timestamp in both engines
+        {
+          direction: 'b->a',
+          componentId: 123987,
+          entity: entityA,
+          data: Uint8Array.of(88),
+          timestamp: 6
+        }
+      ])
+      env.interceptedMessages.length = 0
+    })
+
+    it('now we are receiving the updates from engineB', async () => {
+      // run update tick on engineA so we receive the message of the component that we already remove
+      await engineA.update(0)
+      expect(env.interceptedMessages).toMatchObject([
+        {
+          direction: 'a->b',
+          componentId: 123987,
+          entity: entityA,
+          data: undefined,
+          timestamp: 7
+        }
+      ])
+      env.interceptedMessages.length = 0
+      await Promise.all([engineA.update(0), engineB.update(0)])
+      expect(env.interceptedMessages).toMatchObject([])
+
+      expect(int8A.getOrNull(entityA)).toBe(null)
+      expect(int8B.getOrNull(entityA)).toBe(null)
+    })
+  })
 })

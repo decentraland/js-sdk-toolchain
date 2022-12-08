@@ -140,7 +140,8 @@ export function crdtProtocol<
 
     // Race condition, same timestamp diff data.
     function compareData(current: T | null, data: T | null) {
-      return current! > data!
+      // Null value wins
+      return !current || current! > data!
     }
 
     if (compareData(current.data, data)) {

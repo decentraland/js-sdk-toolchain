@@ -98,7 +98,6 @@ export function crdtSceneSystem(
       if (!component) {
         continue
       }
-
       // CRDT outdated message. Resend this message to the transport
       // To do this we add this message to a queue that will be processed at the end of the update tick
       if (crdtMessage !== current) {

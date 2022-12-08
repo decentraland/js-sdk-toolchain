@@ -21,7 +21,7 @@ export const int8Component = (engine: IEngine) => {
       return values.get(entity)
     },
     getOrNull: function (entity: Entity) {
-      return values.get(entity)
+      return values.get(entity) ?? null
     },
     create: function (entity: Entity, val?: number) {
       if (values.has(entity)) throw new Error(`Entity already has component`)
