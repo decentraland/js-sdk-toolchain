@@ -1940,6 +1940,55 @@ export const PBNftShape: {
     decode(input: _m0.Reader | Uint8Array, length?: number): PBNftShape;
 };
 
+// Warning: (ae-missing-release-tag) "PBPointerEvents" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBPointerEvents" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBPointerEvents {
+    // (undocumented)
+    pointerEvents: PBPointerEvents_Entry[];
+}
+
+// @public
+export const PBPointerEvents: {
+    encode(message: PBPointerEvents, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEvents;
+};
+
+// Warning: (ae-missing-release-tag) "PBPointerEvents_Entry" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBPointerEvents_Entry" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBPointerEvents_Entry {
+    // (undocumented)
+    eventInfo: PBPointerEvents_Info | undefined;
+    // (undocumented)
+    eventType: PointerEventType;
+}
+
+// @public
+export const PBPointerEvents_Entry: {
+    encode(message: PBPointerEvents_Entry, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEvents_Entry;
+};
+
+// Warning: (ae-missing-release-tag) "PBPointerEvents_Info" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBPointerEvents_Info" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBPointerEvents_Info {
+    button?: InputAction | undefined;
+    hoverText?: string | undefined;
+    maxDistance?: number | undefined;
+    showFeedback?: boolean | undefined;
+}
+
+// @public
+export const PBPointerEvents_Info: {
+    encode(message: PBPointerEvents_Info, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEvents_Info;
+};
+
 // Warning: (ae-missing-release-tag) "PBPointerEventsResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 // Warning: (ae-missing-release-tag) "PBPointerEventsResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -1972,55 +2021,6 @@ export interface PBPointerEventsResult_PointerCommand {
 export const PBPointerEventsResult_PointerCommand: {
     encode(message: PBPointerEventsResult_PointerCommand, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEventsResult_PointerCommand;
-};
-
-// Warning: (ae-missing-release-tag) "PBPointerHoverFeedback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBPointerHoverFeedback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export interface PBPointerHoverFeedback {
-    // (undocumented)
-    pointerEvents: PBPointerHoverFeedback_Entry[];
-}
-
-// @public
-export const PBPointerHoverFeedback: {
-    encode(message: PBPointerHoverFeedback, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerHoverFeedback;
-};
-
-// Warning: (ae-missing-release-tag) "PBPointerHoverFeedback_Entry" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBPointerHoverFeedback_Entry" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export interface PBPointerHoverFeedback_Entry {
-    // (undocumented)
-    eventInfo: PBPointerHoverFeedback_Info | undefined;
-    // (undocumented)
-    eventType: PointerEventType;
-}
-
-// @public
-export const PBPointerHoverFeedback_Entry: {
-    encode(message: PBPointerHoverFeedback_Entry, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerHoverFeedback_Entry;
-};
-
-// Warning: (ae-missing-release-tag) "PBPointerHoverFeedback_Info" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBPointerHoverFeedback_Info" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export interface PBPointerHoverFeedback_Info {
-    button?: InputAction | undefined;
-    hoverText?: string | undefined;
-    maxDistance?: number | undefined;
-    showFeedback?: boolean | undefined;
-}
-
-// @public
-export const PBPointerHoverFeedback_Info: {
-    encode(message: PBPointerHoverFeedback_Info, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerHoverFeedback_Info;
 };
 
 // Warning: (ae-missing-release-tag) "PBPointerLock" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2350,12 +2350,22 @@ export namespace Plane {
 }
 
 // @public (undocumented)
+export const PointerEvents: ComponentDefinition<typeof PointerEventsSchema>;
+
+// @public (undocumented)
 export const PointerEventsResult: ComponentDefinition<typeof PointerEventsResultSchema>;
 
 // Warning: (ae-missing-release-tag) "PointerEventsResultSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export const PointerEventsResultSchema: ISchema<PBPointerEventsResult> & {
+    COMPONENT_ID: number;
+};
+
+// Warning: (ae-missing-release-tag) "PointerEventsSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const PointerEventsSchema: ISchema<PBPointerEvents> & {
     COMPONENT_ID: number;
 };
 
@@ -2389,16 +2399,6 @@ export const enum PointerEventType {
     // (undocumented)
     PET_UP = 0
 }
-
-// @public (undocumented)
-export const PointerHoverFeedback: ComponentDefinition<typeof PointerHoverFeedbackSchema>;
-
-// Warning: (ae-missing-release-tag) "PointerHoverFeedbackSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const PointerHoverFeedbackSchema: ISchema<PBPointerHoverFeedback> & {
-    COMPONENT_ID: number;
-};
 
 // @public (undocumented)
 export const PointerLock: ComponentDefinition<typeof PointerLockSchema>;

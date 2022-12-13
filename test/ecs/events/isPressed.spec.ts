@@ -1,8 +1,11 @@
 import { Entity } from '../../../packages/@dcl/ecs/src/engine/entity'
 import { createInputSystem } from '../../../packages/@dcl/ecs/src/engine/input'
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
-import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
-import { Engine, components } from '../../../packages/@dcl/ecs/src'
+import {
+  Engine,
+  components,
+  PointerEventType,
+  InputAction
+} from '../../../packages/@dcl/ecs/src'
 
 describe('Events helpers isTriggered', () => {
   it('should detect no events', () => {

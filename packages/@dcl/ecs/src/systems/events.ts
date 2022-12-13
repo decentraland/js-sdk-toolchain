@@ -1,6 +1,6 @@
 import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
-import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
+import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_events.gen'
 import * as components from '../components'
 import { IEngine } from '../engine/types'
 import { Entity } from '../engine/entity'
@@ -23,7 +23,7 @@ export function createPointerEventSystem(
   engine: IEngine,
   inputSystem: IInputSystem
 ) {
-  const PointerHoverFeedback = components.PointerHoverFeedback(engine)
+  const PointerEvents = components.PointerEvents(engine)
 
   enum EventType {
     Click,
@@ -59,8 +59,7 @@ export function createPointerEventSystem(
   ) {
     if (opts.hoverText) {
       const pointerEvent =
-        PointerHoverFeedback.getMutableOrNull(entity) ||
-        PointerHoverFeedback.create(entity)
+        PointerEvents.getMutableOrNull(entity) || PointerEvents.create(entity)
 
       pointerEvent.pointerEvents.push({
         eventType: type,
@@ -79,7 +78,7 @@ export function createPointerEventSystem(
     type: PointerEventType,
     button: InputAction
   ) {
-    const pointerEvent = PointerHoverFeedback.getMutableOrNull(entity)
+    const pointerEvent = PointerEvents.getMutableOrNull(entity)
     if (!pointerEvent) return
     pointerEvent.pointerEvents = pointerEvent.pointerEvents.filter(
       (pointer) =>

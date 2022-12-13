@@ -2,15 +2,15 @@ import {
   Engine,
   Entity,
   IEngine,
-  components
+  components,
+  PointerEventType,
+  InputAction
 } from '../../../packages/@dcl/ecs/src'
 import { createInputSystem } from '../../../packages/@dcl/ecs/src/engine/input'
-import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import {
   createPointerEventSystem,
   PointerEventsSystem
 } from '../../../packages/@dcl/ecs/src/systems/events'
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
 import { createTestPointerDownCommand } from './utils'
 
 let engine: IEngine

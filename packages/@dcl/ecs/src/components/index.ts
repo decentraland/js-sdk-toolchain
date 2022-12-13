@@ -1,5 +1,5 @@
 import { ISchema } from '../engine'
-import { ComponentGetter } from './generated/index.gen'
+import { ComponentGetter, PointerEvents } from './generated/index.gen'
 export * from './generated/index.gen'
 import {
   defineTransformComponent,
@@ -47,3 +47,6 @@ export const MeshRenderer: ComponentGetter<
 export const MeshCollider: ComponentGetter<
   MeshColliderComponentDefinitionExtended
 > = (engine) => defineMeshColliderComponent(engine)
+
+/*#__PURE__*/
+export const PointerHoverFeedback = PointerEvents

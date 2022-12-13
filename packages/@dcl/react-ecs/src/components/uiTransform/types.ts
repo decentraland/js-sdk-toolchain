@@ -6,7 +6,7 @@ import {
   YGOverflow,
   YGPositionType,
   YGWrap
-} from '@dcl/ecs/dist/runtime/types'
+} from '@dcl/ecs/dist/components/generated/index.gen'
 
 export type PositionUnit = `${number}px` | `${number}%` | number
 /**
