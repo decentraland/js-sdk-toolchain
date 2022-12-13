@@ -5,8 +5,8 @@ import {
   MeshRenderer,
   MeshCollider,
   InputAction,
-  PBPointerHoverFeedback_Entry,
-  PointerHoverFeedback,
+  PBPointerEvents_Entry,
+  PointerEvents,
   PointerEventType
 } from '@dcl/sdk/ecs'
 
@@ -15,13 +15,13 @@ function createCube(
   x: number,
   y: number,
   z: number,
-  pointerEvents: PBPointerHoverFeedback_Entry[]
+  pointerEvents: PBPointerEvents_Entry[]
 ): Entity {
   const meshEntity = engine.addEntity()
   Transform.create(meshEntity, { position: { x, y, z } })
   MeshRenderer.create(meshEntity, { mesh: { $case: 'box', box: { uvs: [] } } })
   MeshCollider.create(meshEntity, { mesh: { $case: 'box', box: {} } })
-  PointerHoverFeedback.create(meshEntity, { pointerEvents })
+  PointerEvents.create(meshEntity, { pointerEvents })
   return meshEntity
 }
 

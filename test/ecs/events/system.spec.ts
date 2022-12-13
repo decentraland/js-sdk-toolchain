@@ -49,7 +49,7 @@ describe('Events System', () => {
 
   it('should run default onClick', async () => {
     const entity = engine.addEntity()
-    const PointerHoverFeedback = components.PointerHoverFeedback(engine)
+    const PointerEvents = components.PointerEvents(engine)
     let counter = 0
     EventsSystem.onClick(
       entity,
@@ -63,19 +63,18 @@ describe('Events System', () => {
     await engine.update(1)
     expect(counter).toBe(1)
     expect(
-      PointerHoverFeedback.getOrNull(entity)?.pointerEvents[0].eventInfo
-        ?.hoverText
+      PointerEvents.getOrNull(entity)?.pointerEvents[0].eventInfo?.hoverText
     ).toBe('Interact')
   })
 
   it('should create pointer hover components', async () => {
     const entity = engine.addEntity()
-    const PointerHoverFeedback = components.PointerHoverFeedback(engine)
+    const PointerEvents = components.PointerEvents(engine)
     EventsSystem.onClick(entity, () => {}, { hoverText: 'Boedo' })
     fakePointer(entity, PointerEventType.PET_DOWN)
     fakePointer(entity, PointerEventType.PET_UP)
     await engine.update(1)
-    const feedback = PointerHoverFeedback.getOrNull(entity)
+    const feedback = PointerEvents.getOrNull(entity)
     const boedoFeedback = feedback?.pointerEvents.find(
       (f) => f.eventInfo?.hoverText === 'Boedo'
     )
@@ -84,7 +83,7 @@ describe('Events System', () => {
 
   it('should delete pointer hover components and callback', async () => {
     const entity = engine.addEntity()
-    const PointerHoverFeedback = components.PointerHoverFeedback(engine)
+    const PointerEvents = components.PointerEvents(engine)
     let counter = 0
     EventsSystem.onClick(
       entity,
@@ -97,7 +96,7 @@ describe('Events System', () => {
     fakePointer(entity, PointerEventType.PET_DOWN, InputAction.IA_JUMP)
     fakePointer(entity, PointerEventType.PET_UP, InputAction.IA_JUMP)
 
-    const feedback = PointerHoverFeedback.getOrNull(entity)
+    const feedback = PointerEvents.getOrNull(entity)
     const boedoFeedback = feedback?.pointerEvents.find(
       (f) => f.eventInfo?.hoverText === 'Boedo'
     )
@@ -107,8 +106,7 @@ describe('Events System', () => {
     // Update tick, and verify that the counter increments and the Hover was removed
     await engine.update(1)
     expect(counter).toBe(1)
-    const removedFeedback =
-      PointerHoverFeedback.getOrNull(entity)?.pointerEvents
+    const removedFeedback = PointerEvents.getOrNull(entity)?.pointerEvents
     expect(removedFeedback?.length).toBe(0)
 
     // Update tick and verify we didnt increment the counter again
@@ -118,7 +116,7 @@ describe('Events System', () => {
 
   it('should run default onDown', async () => {
     const entity = engine.addEntity()
-    const PointerHoverFeedback = components.PointerHoverFeedback(engine)
+    const PointerEvents = components.PointerEvents(engine)
     let counter = 0
     EventsSystem.onPointerDown(
       entity,
@@ -130,12 +128,12 @@ describe('Events System', () => {
     fakePointer(entity, PointerEventType.PET_DOWN)
     await engine.update(1)
     expect(counter).toBe(1)
-    expect(PointerHoverFeedback.getOrNull(entity)).toBe(null)
+    expect(PointerEvents.getOrNull(entity)).toBe(null)
   })
 
   it('should remove pointer down', async () => {
     const entity = engine.addEntity()
-    const PointerHoverFeedback = components.PointerHoverFeedback(engine)
+    const PointerEvents = components.PointerEvents(engine)
     let counter = 0
     EventsSystem.onPointerDown(
       entity,
@@ -151,7 +149,7 @@ describe('Events System', () => {
 
     await engine.update(1)
     expect(counter).toBe(1)
-    const feedback = PointerHoverFeedback.getOrNull(entity)?.pointerEvents
+    const feedback = PointerEvents.getOrNull(entity)?.pointerEvents
     expect(feedback?.length).toBe(0)
   })
 
@@ -168,7 +166,7 @@ describe('Events System', () => {
 
   it('should remove pointer up', async () => {
     const entity = engine.addEntity()
-    const PointerHoverFeedback = components.PointerHoverFeedback(engine)
+    const PointerEvents = components.PointerEvents(engine)
     let counter = 0
     EventsSystem.onPointerUp(
       entity,
@@ -184,7 +182,7 @@ describe('Events System', () => {
 
     await engine.update(1)
     expect(counter).toBe(1)
-    const feedback = PointerHoverFeedback.getOrNull(entity)?.pointerEvents
+    const feedback = PointerEvents.getOrNull(entity)?.pointerEvents
     expect(feedback?.length).toBe(0)
   })
 
@@ -288,8 +286,8 @@ describe('Events System', () => {
       button: InputAction.IA_ACTION_3
     })
 
-    const PointerHoverFeedback = components.PointerHoverFeedback(engine)
-    PointerHoverFeedback.deleteFrom(entity)
+    const PointerEvents = components.PointerEvents(engine)
+    PointerEvents.deleteFrom(entity)
 
     EventsSystem.removeOnPointerUp(entity)
   })

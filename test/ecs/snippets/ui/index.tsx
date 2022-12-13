@@ -6,7 +6,7 @@ import {
   MeshCollider,
   InputAction,
   inputSystem,
-  PointerHoverFeedback,
+  PointerEvents,
   YGAlign,
   YGDisplay,
   YGJustify,
@@ -87,7 +87,7 @@ function createCube(x: number, y: number, z: number, spawner = true): Entity {
   MeshRenderer.create(meshEntity, { mesh: { $case: 'box', box: { uvs: [] } } })
   MeshCollider.create(meshEntity, { mesh: { $case: 'box', box: {} } })
   if (spawner) {
-    PointerHoverFeedback.create(meshEntity, {
+    PointerEvents.create(meshEntity, {
       pointerEvents: [
         {
           eventType: PointerEventType.PET_DOWN,
@@ -121,7 +121,7 @@ function circularSystem(dt: number) {
 }
 
 function spawnerSystem() {
-  const clickedCubes = engine.getEntitiesWith(PointerHoverFeedback)
+  const clickedCubes = engine.getEntitiesWith(PointerEvents)
   for (const [entity] of clickedCubes) {
     if (
       inputSystem.isTriggered(

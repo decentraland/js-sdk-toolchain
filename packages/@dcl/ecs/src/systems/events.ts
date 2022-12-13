@@ -52,7 +52,7 @@ export function createPointerEventSystem(
     )
   }
 
-  function setHoverFeedback(
+  function setPointerEvent(
     entity: Entity,
     type: PointerEventType,
     opts: EventSystemOptions
@@ -73,7 +73,7 @@ export function createPointerEventSystem(
     }
   }
 
-  function removeHoverFeedback(
+  function removePointerEvent(
     entity: Entity,
     type: PointerEventType,
     button: InputAction
@@ -98,7 +98,7 @@ export function createPointerEventSystem(
     const pointerEvent = event.get(type)
 
     if (pointerEvent?.opts.hoverText) {
-      removeHoverFeedback(
+      removePointerEvent(
         entity,
         getPointerEvent(type),
         pointerEvent.opts.button
@@ -189,7 +189,7 @@ export function createPointerEventSystem(
 
       // Set new event
       getEvent(entity).set(EventType.Click, { cb, opts: options })
-      setHoverFeedback(entity, PointerEventType.PET_DOWN, options)
+      setPointerEvent(entity, PointerEventType.PET_DOWN, options)
     },
 
     /**
@@ -207,7 +207,7 @@ export function createPointerEventSystem(
       const options = getDefaultOpts(opts)
       removeEvent(entity, EventType.Down)
       getEvent(entity).set(EventType.Down, { cb, opts: options })
-      setHoverFeedback(entity, PointerEventType.PET_DOWN, options)
+      setPointerEvent(entity, PointerEventType.PET_DOWN, options)
     },
 
     /**
@@ -225,7 +225,7 @@ export function createPointerEventSystem(
       const options = getDefaultOpts(opts)
       removeEvent(entity, EventType.Up)
       getEvent(entity).set(EventType.Up, { cb, opts: options })
-      setHoverFeedback(entity, PointerEventType.PET_UP, options)
+      setPointerEvent(entity, PointerEventType.PET_UP, options)
     }
   }
 }

@@ -8,11 +8,11 @@ import {
 describe('Generated OnPointerDown ProtoBuf', () => {
   it('should serialize/deserialize OnPointerUp', () => {
     const newEngine = Engine()
-    const PointerHoverFeedback = components.PointerHoverFeedback(newEngine)
+    const PointerEvents = components.PointerEvents(newEngine)
     const entity = newEngine.addEntity()
     const entityB = newEngine.addEntity()
-    PointerHoverFeedback.create(newEngine.addEntity())
-    const pointerHoverFeedback = PointerHoverFeedback.create(entity, {
+    PointerEvents.create(newEngine.addEntity())
+    const pointerEvents = PointerEvents.create(entity, {
       pointerEvents: [
         {
           eventType: PointerEventType.PET_UP,
@@ -26,7 +26,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
       ]
     })
 
-    PointerHoverFeedback.create(entityB, {
+    PointerEvents.create(entityB, {
       pointerEvents: [
         {
           eventType: PointerEventType.PET_DOWN,
@@ -40,22 +40,22 @@ describe('Generated OnPointerDown ProtoBuf', () => {
       ]
     })
 
-    const buffer = PointerHoverFeedback.toBinary(entity)
-    PointerHoverFeedback.updateFromBinary(entityB, buffer)
+    const buffer = PointerEvents.toBinary(entity)
+    PointerEvents.updateFromBinary(entityB, buffer)
 
-    const result = { ...PointerHoverFeedback.getMutable(entityB) }
-    expect(pointerHoverFeedback).toEqual(result)
+    const result = { ...PointerEvents.getMutable(entityB) }
+    expect(pointerEvents).toEqual(result)
   })
 
   it('should receive OnPointerResult', async () => {
     const newEngine = Engine()
-    const PointerHoverFeedback = components.PointerHoverFeedback(newEngine)
+    const PointerEvents = components.PointerEvents(newEngine)
     const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
-    PointerHoverFeedback.create(newEngine.addEntity())
+    PointerEvents.create(newEngine.addEntity())
 
     // We create an onPointerDownEvent
-    PointerHoverFeedback.create(entity, {
+    PointerEvents.create(entity, {
       pointerEvents: [
         {
           eventType: PointerEventType.PET_DOWN,
