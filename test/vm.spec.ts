@@ -1,6 +1,128 @@
 import { withQuickJsVm } from './vm'
 
 describe('ensure that VM works', () => {
+  it('runs no code and vm has no leaks', async () => withQuickJsVm(async (opts) => {}))
+
+  it('runs empty script and returns without leaks', async () =>
+    withQuickJsVm(async (opts) => {
+      expect(opts.eval(``)).toEqual(void 0)
+    }))
+
+  it('runs script and returns without leaks', async () =>
+    withQuickJsVm(async (opts) => {
+      expect(opts.eval(`void 0`)).toEqual(void 0)
+      expect(opts.eval(`1==1`)).toEqual(true)
+    }))
+
+  it('converts qjs types to js', async () =>
+    withQuickJsVm(async (opts) => {
+      expect(opts.eval(`true`)).toEqual(true)
+      expect(opts.eval(`false`)).toEqual(false)
+      expect(opts.eval(`null`)).toEqual(null)
+      expect(opts.eval(`123`)).toEqual(123)
+      expect(opts.eval(`"123"`)).toEqual('123')
+      expect(opts.eval(`["123"]`)).toEqual(['123'])
+      expect(opts.eval(`(() => ({a: "123"}))()`)).toEqual({ a: '123' })
+      expect(opts.eval(`new Uint8Array([1,2,3])`)).toEqual(new Uint8Array([1, 2, 3]))
+    }))
+
+  it('doesnt leak on provide', async () =>
+    withQuickJsVm(async (opts) => {
+      const values: any[] = []
+      opts.provide({
+        log(...args) {
+          values.push(args)
+        },
+        error(...args) {
+          throw new Error('not implemented')
+        },
+        require(...args) {
+          throw new Error('not implemented')
+        }
+      })
+    }))
+
+  it('doesnt leak on log', async () =>
+    withQuickJsVm(async (opts) => {
+      const values: any[] = []
+      opts.provide({
+        log(...args) {
+          values.push(args)
+        },
+        error(...args) {
+          throw new Error('not implemented')
+        },
+        require(...args) {
+          throw new Error('not implemented')
+        }
+      })
+
+      opts.eval(`
+        console.log(true)
+        console.log(false)
+        console.log(null)
+        console.log(123)
+        console.log("123")
+        console.log(["123"])
+        console.log((() => ({a: "123"}))())
+        console.log(new Uint8Array([1,2,3]))
+      `)
+
+      expect(values).toEqual([
+        [true],
+        [false],
+        [null],
+        [123],
+        ['123'],
+        [['123']],
+        [{ a: '123' }],
+        [new Uint8Array([1, 2, 3])]
+      ])
+    }))
+
+  it('doesnt leak on module call', async () =>
+    withQuickJsVm(async (opts) => {
+      const values: any[] = []
+      opts.provide({
+        log(...args) {
+          throw new Error('not implemented')
+        },
+        error(...args) {
+          throw new Error('not implemented')
+        },
+        require(...args) {
+          return {
+            fn(...args: any[]) {
+              values.push(args)
+            }
+          }
+        }
+      })
+
+      opts.eval(`
+        const m = require('test')
+        m.fn(true)
+        m.fn(false)
+        m.fn(null)
+        m.fn(123)
+        m.fn("123")
+        m.fn(["123"])
+        m.fn((() => ({a: "123"}))())
+        m.fn(new Uint8Array([1,2,3]))
+      `)
+
+      expect(values).toEqual([
+        [true],
+        [false],
+        [null],
+        [123],
+        ['123'],
+        [['123']],
+        [{ a: '123' }],
+        [new Uint8Array([1, 2, 3])]
+      ])
+    }))
+
   it('runs the vm and logs results', async () =>
     withQuickJsVm(async (opts) => {
       const logs: any[] = []
