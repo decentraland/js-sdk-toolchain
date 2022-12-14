@@ -1,18 +1,15 @@
 import WireMessage from '../packages/@dcl/ecs/src/serialization/wireMessage'
-import {
-  ByteBuffer,
-  createByteBuffer
-} from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import { createByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { ComponentOperation as Message } from '../packages/@dcl/ecs/src/serialization/crdt/componentOperation'
 import { engine } from '../packages/@dcl/ecs/src'
 import { existsSync, readFileSync, writeFileSync } from 'fs-extra'
 import path from 'path'
 import glob from 'glob'
 import { exec } from 'child_process'
-import { OpCodeResult, withQuickJsVm } from './vm'
+import { withQuickJsVm } from './vm'
 
 const ENV: Record<string, string> = { ...process.env } as any
-const writeToFile = true
+const writeToFile = process.env.UPDATE_SNAPSHOTS
 
 describe('Runs the snapshots', () => {
   it('runs npm install in the target folder', async () => {

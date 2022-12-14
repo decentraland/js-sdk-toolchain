@@ -1,5 +1,5 @@
 import { createInterface } from 'readline'
-import fs from 'fs-extra'
+import fs, { readFileSync } from 'fs-extra'
 import path from 'path'
 
 import { Message, State } from '../../../packages/@dcl/crdt/src'
@@ -94,17 +94,16 @@ export function snapshotTest<T = unknown>() {
     if (!!process.env.DEBUG) {
       messagesToPrint.forEach((m) => console.log(m, '\n'))
     }
-    if (!process.env.WITH_COVERAGE) {
-      if (!process.env.CI && !process.env.WITH_COVERAGE) {
-        await writeDataFile(fileName, messagesToPrint.join('\n') + '\n')
-      }
-    }
 
-    await validateTestIfExists(
-      testName!,
-      getDataPath(fileName),
-      messagesToPrint
-    )
+    if (process.env.UPDATE_SNAPSHOTS) {
+      await writeDataFile(fileName, messagesToPrint.join('\n') + '\n')
+    } else {
+      await validateTestIfExists(
+        testName!,
+        getDataPath(fileName),
+        messagesToPrint
+      )
+    }
   }
 
   return {
