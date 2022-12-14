@@ -16,8 +16,8 @@
   "author": "Decentraland",
   "license": "Apache-2.0",
   "dependencies": {
-    "@dcl/dcl-rollup": "7.0.0",
-    "@dcl/ecs": "7.0.0",
+    "@dcl/dcl-rollup": "file:../dcl-rollup",
+    "@dcl/ecs": "file:../ecs",
     "@dcl/ecs-math": "2.0.1-20221129185242.commit-40495c1",
     "@dcl/js-runtime": "file:../js-runtime",
     "@dcl/kernel": "2.0.0-3640389337.commit-b563bb9",
