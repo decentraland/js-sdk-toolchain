@@ -99,7 +99,7 @@ async function compile() {
       }
     } else if (event.code === 'BUNDLE_START') {
       for (const out of event.output) {
-        stderr(colors.greenBright(`Starting bundle: `) + out)
+        stderr(colors.greenBright(`Creating bundle: `) + out)
       }
     } else if (event.code === 'BUNDLE_END') {
       for (const out of event.output) {
