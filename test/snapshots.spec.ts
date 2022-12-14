@@ -9,7 +9,7 @@ import { existsSync, readFileSync, writeFileSync } from 'fs-extra'
 import path from 'path'
 import glob from 'glob'
 import { exec } from 'child_process'
-import { withQuickJsVm } from './vm'
+import { OpCodeResult, withQuickJsVm } from './vm'
 
 const ENV: Record<string, string> = { ...process.env } as any
 const writeToFile = true
@@ -90,19 +90,43 @@ async function run(fileName: string): Promise<string> {
         }
       }
     })
-    try {
-      vm.eval(readFileSync(fileName).toString(), fileName)
 
+    function addStats() {
+      const opcodes = vm.getStats()
+      opcodes
+        .sort((a, b) => {
+          if (a.count > b.count) return -1
+          return 1
+        })
+        .filter(($) => $.count > 10)
+      out.push(
+        '> Opcodes x100: ' +
+          ((opcodes.reduce(($, $$) => $ + $$.count, 0n) / 100n) | 0n)
+      )
+
+      // out.push('> STATS: ' + opcodes.slice(0,10).map(_ => `${_.opcode}=${_.count}`).join(','))
+    }
+
+    try {
+      addStats()
+      vm.eval(readFileSync(fileName).toString(), fileName)
+      addStats()
       out.push('> call onStart()')
       await vm.onStart()
+      addStats()
+
       out.push('> call onUpdate(0.0)')
       await vm.onUpdate(0.0)
+      addStats()
       out.push('> call onUpdate(0.1)')
       await vm.onUpdate(0.1)
+      addStats()
       out.push('> call onUpdate(0.1)')
       await vm.onUpdate(0.1)
+      addStats()
       out.push('> call onUpdate(0.1)')
       await vm.onUpdate(0.1)
+      addStats()
     } catch (err: any) {
       if (err.stack?.includes('Host: QuickJSUnwrapError')) {
         out.push(`ERR! ` + err.stack.split('Host: QuickJSUnwrapError')[0])

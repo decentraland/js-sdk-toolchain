@@ -10,11 +10,14 @@ export type ProvideOptions = {
   require(module: string): any
 }
 
+export type OpCodeResult = { count: bigint; opcode: number }
+
 export type RunWithVmOptions = {
   eval(code: string, filename?: string): void
   onUpdate(dt: number): Promise<any>
   onStart(): Promise<void>
   provide(opts: ProvideOptions): void
+  getStats(): Array<OpCodeResult>
 }
 
 export async function withQuickJsVm<T>(
@@ -71,12 +74,19 @@ export async function withQuickJsVm<T>(
     }
   }, 1)
 
+  const ops = Q.getOpcodeInfo()
+
   try {
     return await cb({
       eval(code: string, filename?: string) {
         const result = vm.evalCode(code, filename)
         const $ = vm.unwrapResult(result)
         const ret = dumpAndDispose(vm, $)
+        return ret
+      },
+      getStats() {
+        const ret = ops.getOpcodesCount()
+        ops.resetOpcodeCounters()
         return ret
       },
       async onUpdate(dt) {

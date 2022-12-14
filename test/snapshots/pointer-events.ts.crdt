@@ -1,8 +1,11 @@
 test/snapshots/pointer-events.js
+> Opcodes x100: 0
 > require: ~system/EngineApi
 > require: buffer
 > require: long
+> Opcodes x100: 188
 > call onStart()
+> Opcodes x100: 0
 > call onUpdate(0.0)
   CRDT: e=512 c=1 data=65,112,0,0,63,128,0,0,65,112,0,0,0,0,0,0,0,0,0,0,0,0,0,0,63,128,0,0,63,128,0,0,63,128,0,0,63,128,0,0,0,0,0,0
   CRDT: e=512 c=1062 data=10,26,8,1,18,22,8,1,18,11,80,114,105,109,97,114,121,68,111,119,110,29,0,0,160,64,32,1
@@ -16,6 +19,10 @@ test/snapshots/pointer-events.js
   CRDT: e=514 c=1062 data=10,29,8,2,18,25,8,3,18,14,73,110,102,105,110,105,116,121,32,72,111,118,101,114,29,128,150,24,75,32,1
   CRDT: e=514 c=1018 data=10,2,10,0
   CRDT: e=514 c=1019 data=18,0
+> Opcodes x100: 342
 > call onUpdate(0.1)
+> Opcodes x100: 22
 > call onUpdate(0.1)
+> Opcodes x100: 22
 > call onUpdate(0.1)
+> Opcodes x100: 22
