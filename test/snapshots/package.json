@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "description": "My new Decentraland project",
   "scripts": {
-    "build": "build-ecs --production"
+    "build": "build-ecs"
   },
   "devDependencies": {
     "@dcl/dcl-rollup": "file:../../packages/@dcl/dcl-rollup",

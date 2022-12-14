@@ -1,5 +1,8 @@
 import WireMessage from '../packages/@dcl/ecs/src/serialization/wireMessage'
-import { ByteBuffer, createByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import {
+  ByteBuffer,
+  createByteBuffer
+} from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { ComponentOperation as Message } from '../packages/@dcl/ecs/src/serialization/crdt/componentOperation'
 import { engine } from '../packages/@dcl/ecs/src'
 import { existsSync, readFileSync, writeFileSync } from 'fs-extra'
@@ -8,25 +11,28 @@ import glob from 'glob'
 import { exec } from 'child_process'
 import { withQuickJsVm } from './vm'
 
-const CWD = path.resolve('test/snapshots')
 const ENV: Record<string, string> = { ...process.env } as any
 const writeToFile = true
 
 describe('Runs the snapshots', () => {
   it('runs npm install in the target folder', async () => {
-    await runCommand('npm install --silent', CWD, ENV)
+    await runCommand('npm install --silent', 'test/snapshots', ENV)
   }, 15000)
-  glob.sync('test/snapshots/*.ts', { absolute: false }).forEach(testFileSnapshot)
+  glob
+    .sync('test/snapshots/*.ts', { absolute: false })
+    .forEach((file) => testFileSnapshot(file, 'test/snapshots'))
 })
 
-function testFileSnapshot(fileName: string) {
+function testFileSnapshot(fileName: string, workingDirectory: string) {
   it(`tests the file ${fileName}`, async () => {
-    await compile(fileName)
+    await compile(fileName, workingDirectory)
     const result = await run(fileName.replace(/\.ts$/, '.js'))
 
     const compareToFileName = fileName + '.crdt'
     const compareFileExists = existsSync(compareToFileName)
-    const compareTo = compareFileExists ? readFileSync(compareToFileName).toString().replace(/\r\n/g, '\n') : ''
+    const compareTo = compareFileExists
+      ? readFileSync(compareToFileName).toString().replace(/\r\n/g, '\n')
+      : ''
     if (writeToFile || !compareFileExists) {
       writeFileSync(compareToFileName, result)
     }
@@ -48,7 +54,8 @@ async function run(fileName: string): Promise<string> {
       },
       require(moduleName) {
         out.push('> require: ' + moduleName)
-        if (moduleName !== '~system/EngineApi') throw new Error('Unknown module')
+        if (moduleName !== '~system/EngineApi')
+          throw new Error('Unknown module')
         return {
           async subscribe() {
             return {}
@@ -56,11 +63,16 @@ async function run(fileName: string): Promise<string> {
           async sendBatch() {
             return { events: [] }
           },
-          async crdtSendToRenderer(payload: { data: Uint8Array }): Promise<{ data: Uint8Array[] }> {
-            console.dir(payload)
+          async crdtSendToRenderer(payload: {
+            data: Uint8Array
+          }): Promise<{ data: Uint8Array[] }> {
+            // console.dir(payload)
 
             const buffer = createByteBuffer({
-              reading: { buffer: new Uint8Array(Object.values(payload.data)), currentOffset: 0 }
+              reading: {
+                buffer: new Uint8Array(Object.values(payload.data)),
+                currentOffset: 0
+              }
             })
 
             while (WireMessage.validate(buffer)) {
@@ -79,7 +91,7 @@ async function run(fileName: string): Promise<string> {
       }
     })
     try {
-      vm.eval(readFileSync(fileName).toString())
+      vm.eval(readFileSync(fileName).toString(), fileName)
 
       out.push('> call onStart()')
       await vm.onStart()
@@ -92,27 +104,50 @@ async function run(fileName: string): Promise<string> {
       out.push('> call onUpdate(0.1)')
       await vm.onUpdate(0.1)
     } catch (err: any) {
-      out.push(`ERR! ` + err)
+      if (err.stack?.includes('Host: QuickJSUnwrapError')) {
+        out.push(`ERR! ` + err.stack.split('Host: QuickJSUnwrapError')[0])
+      } else {
+        out.push(`ERR! ` + err.stack)
+      }
     }
 
     return out.join('\n')
   })
 }
 
-async function compile(filename: string) {
-  await runCommand(`npm run build --silent -- --single ${path.relative(CWD, filename)}`, CWD, ENV)
+async function compile(filename: string, workingDirectory: string) {
+  const cwd = path.resolve(workingDirectory)
+  await runCommand(
+    `npm run build --silent -- --single ${JSON.stringify(
+      path.relative(cwd, filename)
+    )}`,
+    cwd,
+    ENV
+  )
 }
 
-export function runCommand(command: string, cwd: string, env?: Record<string, string>): Promise<string> {
+export function runCommand(
+  command: string,
+  cwd: string,
+  env?: Record<string, string>
+): Promise<string> {
   return new Promise<string>((onSuccess, onError) => {
     process.stdout.write(
-      '\u001b[36min ' + path.relative(process.cwd(), cwd) + ':\u001b[0m ' + path.relative(process.cwd(), command) + '\n'
+      '\u001b[36min ' +
+        path.relative(process.cwd(), cwd) +
+        ':\u001b[0m ' +
+        path.relative(process.cwd(), command) +
+        '\n'
     )
     exec(command, { cwd, env }, (error, stdout, stderr) => {
-      stdout.trim().length && process.stdout.write('  ' + stdout.replace(/\n/g, '\n  ') + '\n')
-      stderr.trim().length && process.stderr.write('! ' + stderr.replace(/\n/g, '\n  ') + '\n')
+      stdout.trim().length &&
+        process.stdout.write('  ' + stdout.replace(/\n/g, '\n  ') + '\n')
+      stderr.trim().length &&
+        process.stderr.write('! ' + stderr.replace(/\n/g, '\n  ') + '\n')
       if (error) {
-        onError(stderr || stdout || 'command "' + command + '" failed to execute')
+        onError(
+          stderr || stdout || 'command "' + command + '" failed to execute'
+        )
       } else {
         onSuccess(stdout)
       }

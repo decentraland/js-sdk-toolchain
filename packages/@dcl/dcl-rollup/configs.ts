@@ -1,6 +1,6 @@
 import typescript from '@rollup/plugin-typescript'
 import { sys } from 'typescript'
-import { RollupOptions } from 'rollup'
+import { RollupOptions, Plugin } from 'rollup'
 import replace from '@rollup/plugin-replace'
 import terser from '@rollup/plugin-terser'
 import analyze from 'rollup-plugin-analyzer'
@@ -65,18 +65,26 @@ export function createEcsConfig(_options: { PROD: boolean }): RollupOptions {
   }
 }
 
-export function createSceneConfig(options: { PROD: boolean, single?: string }): RollupOptions {
+export function createSceneConfig(options: {
+  PROD: boolean
+  single?: string
+}): RollupOptions {
   const sceneJsonPath = sys.resolvePath('./scene.json')
   const sceneJson = JSON.parse(sys.readFile(sceneJsonPath)!)
 
   console.assert(sceneJson.main, 'scene.json .main must be present')
-  console.assert(sceneJson.runtimeVersion == "7", 'scene.json `"runtimeVersion": "7"` must be present')
+  console.assert(
+    sceneJson.runtimeVersion === '7',
+    'scene.json `"runtimeVersion": "7"` must be present'
+  )
 
-  const out = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
+  const out = !options.single
+    ? sceneJson.main
+    : options.single.replace(/\.ts$/, '.js')
 
   return {
     external: [/~system\//],
-    input: options.single || 'src/index.ts',
+    input: options.single ?? 'src/index.ts',
     treeshake: {
       preset: 'smallest'
     },
@@ -109,7 +117,8 @@ export function createSceneConfig(options: { PROD: boolean, single?: string }): 
       commonjs({
         strictRequires: true
       }),
-      false && options.PROD &&
+      false &&
+        options.PROD &&
         analyze({
           hideDeps: true,
           summaryOnly: true

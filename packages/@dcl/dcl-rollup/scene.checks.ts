@@ -44,19 +44,7 @@ export function readPackageJson(): PackageJson {
   }
 }
 
-export function readTsconfig(): any {
-  const content = ts.sys.readFile('tsconfig.json')
-  if (content === undefined) {
-    throw new Error('tsconfig.json not found')
-  }
-  try {
-    return JSON.parse(content)
-  } catch {
-    throw new Error('Error reading tsconfig.json')
-  }
-}
-
-export function checkConfiguration(_packageJson: PackageJson) {
+export function checkConfiguration(CWD: string) {
   const host: ts.ParseConfigHost = {
     useCaseSensitiveFileNames: ts.sys.useCaseSensitiveFileNames,
     fileExists: ts.sys.fileExists,

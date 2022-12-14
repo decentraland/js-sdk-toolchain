@@ -1,7 +1,8 @@
 import { withQuickJsVm } from './vm'
 
 describe('ensure that VM works', () => {
-  it('runs no code and vm has no leaks', async () => withQuickJsVm(async (opts) => {}))
+  it('runs no code and vm has no leaks', async () =>
+    withQuickJsVm(async (opts) => {}))
 
   it('runs empty script and returns without leaks', async () =>
     withQuickJsVm(async (opts) => {
@@ -23,7 +24,9 @@ describe('ensure that VM works', () => {
       expect(opts.eval(`"123"`)).toEqual('123')
       expect(opts.eval(`["123"]`)).toEqual(['123'])
       expect(opts.eval(`(() => ({a: "123"}))()`)).toEqual({ a: '123' })
-      expect(opts.eval(`new Uint8Array([1,2,3])`)).toEqual(new Uint8Array([1, 2, 3]))
+      expect(opts.eval(`new Uint8Array([1,2,3])`)).toEqual(
+        new Uint8Array([1, 2, 3])
+      )
     }))
 
   it('doesnt leak on provide', async () =>
@@ -188,6 +191,34 @@ describe('ensure that VM works', () => {
       expect(logs).toEqual(['onStart', 'onUpdate', 0, 'onUpdate', 1])
     }))
 
+  it('setImmediate works resolving promise', async () =>
+    withQuickJsVm(async (opts) => {
+      const logs: any[] = []
+      opts.provide({
+        log(...args) {
+          logs.push(...args)
+        },
+        error(...args) {
+          throw 'Not implemented'
+        },
+        require() {
+          throw 'Not implemented'
+        }
+      })
+
+      opts.eval(`
+      module.exports.onUpdate = async function () {
+        console.log('onUpdate')
+        await new Promise(setImmediate)
+        console.log('onUpdateEnd')
+      }
+    `)
+
+      await opts.onUpdate(1)
+
+      expect(logs).toEqual(['onUpdate', 'onUpdateEnd'])
+    }))
+
   it('onStart and onUpdate fail', async () =>
     withQuickJsVm(async (opts) => {
       const logs: any[] = []
@@ -232,7 +263,7 @@ describe('ensure that VM works', () => {
           logs.push(...args)
         },
         require(moduleName) {
-          if (moduleName == 'test') {
+          if (moduleName === 'test') {
             return {
               fnNumber() {
                 return 1
@@ -301,7 +332,7 @@ describe('ensure that VM works', () => {
           logs.push(...args)
         },
         require(moduleName) {
-          if (moduleName == 'test') {
+          if (moduleName === 'test') {
             return {
               async promise(arg: any) {
                 wasCalledWithValue = arg
@@ -328,6 +359,11 @@ describe('ensure that VM works', () => {
 
       expect(wasCalledWithValue).toEqual(123)
 
-      expect(logs).toEqual(['its a promise', 'awaiting promises work', 1, 'end'])
+      expect(logs).toEqual([
+        'its a promise',
+        'awaiting promises work',
+        1,
+        'end'
+      ])
     }))
 })
