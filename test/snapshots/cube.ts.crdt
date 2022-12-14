@@ -1,0 +1,10 @@
+test/snapshots/cube.js
+> require: ~system/EngineApi
+> require: buffer
+> require: long
+> call onStart()
+> call onUpdate(0.0)
+  CRDT: e=512 c=1 data=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,63,128,0,0,63,128,0,0,63,128,0,0,63,128,0,0,0,0,0,0
+> call onUpdate(0.1)
+> call onUpdate(0.1)
+> call onUpdate(0.1)

@@ -21,6 +21,7 @@
     "@rollup/plugin-replace": "^5.0.1",
     "@rollup/plugin-terser": "^0.1.0",
     "@rollup/plugin-typescript": "^9.0.2",
+    "arg": "^5.0.2",
     "colorette": "^2.0.19",
     "fp-future": "^1.0.1",
     "glob": "^7.1.7",

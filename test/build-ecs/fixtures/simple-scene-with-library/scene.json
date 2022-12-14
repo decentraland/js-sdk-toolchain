@@ -1,5 +1,6 @@
 {
   "ecs7": true,
+  "runtimeVersion": "7",
   "display": {
     "title": "interactive-text",
     "favicon": "favicon_asset"

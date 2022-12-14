@@ -1,0 +1,6 @@
+test/snapshots/simple.js
+> call onStart()
+> call onUpdate(0.0)
+> call onUpdate(0.1)
+> call onUpdate(0.1)
+> call onUpdate(0.1)

@@ -9,6 +9,9 @@
     "**/.hg": true,
     "**/CVS": true,
     "**/.DS_Store": true,
-    "**/Thumbs.db": true
+    "**/Thumbs.db": true,
+    "test/snapshots/*.js.map": true,
+    "test/snapshots/node_modules": true,
+    "test/snapshots/package-lock.json": true,
   }
 }
