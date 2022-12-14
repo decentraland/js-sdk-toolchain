@@ -1,13 +1,13 @@
 test/snapshots/simple.js
-> Opcodes x100: 0
-> Opcodes x100: 0
-> call onStart()
-> Opcodes x100: 0
-> call onUpdate(0.0)
-> Opcodes x100: 0
-> call onUpdate(0.1)
-> Opcodes x100: 0
-> call onUpdate(0.1)
-> Opcodes x100: 0
-> call onUpdate(0.1)
-> Opcodes x100: 0
+  OPCODES (x100): 0
+  OPCODES (x100): 0
+CALL onStart()
+  OPCODES (x100): 0
+CALL onUpdate(0.0)
+  OPCODES (x100): 0
+CALL onUpdate(0.1)
+  OPCODES (x100): 0
+CALL onUpdate(0.1)
+  OPCODES (x100): 0
+CALL onUpdate(0.1)
+  OPCODES (x100): 0

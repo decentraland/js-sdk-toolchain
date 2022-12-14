@@ -47,17 +47,18 @@ async function run(fileName: string): Promise<string> {
 
     vm.provide({
       log(...args) {
-        out.push('> log: ' + JSON.stringify(args))
+        out.push('  LOG: ' + JSON.stringify(args))
       },
       error(...args) {
-        out.push('> error: ' + JSON.stringify(args))
+        out.push('  ERROR: ' + JSON.stringify(args))
       },
       require(moduleName) {
-        out.push('> require: ' + moduleName)
+        out.push('  REQUIRE: ' + moduleName)
         if (moduleName !== '~system/EngineApi')
           throw new Error('Unknown module')
         return {
-          async subscribe() {
+          async subscribe(event: string) {
+            out.push(`  SUBSCRIBE-TO: ${event}`)
             return {}
           },
           async sendBatch() {
@@ -76,13 +77,24 @@ async function run(fileName: string): Promise<string> {
             })
 
             while (WireMessage.validate(buffer)) {
-              const offset = buffer.currentReadOffset()
               const message = Message.read(buffer)!
-              const { type, entity, componentId, data, timestamp } = message
+              const { entity, componentId, data, timestamp } = message
 
               const c = engine.getComponent(componentId)
 
-              out.push(`  CRDT: e=${entity} c=${componentId} data=${data}`)
+              out.push(
+                `  CRDT: e=${entity} c=${componentId} t=${timestamp} data=${JSON.stringify(
+                  data &&
+                    c.deserialize(
+                      createByteBuffer({
+                        reading: {
+                          buffer: data,
+                          currentOffset: 0
+                        }
+                      })
+                    )
+                )}`
+              )
             }
 
             return { data: [] }
@@ -99,8 +111,9 @@ async function run(fileName: string): Promise<string> {
           return 1
         })
         .filter(($) => $.count > 10)
+
       out.push(
-        '> Opcodes x100: ' +
+        '  OPCODES (x100): ' +
           ((opcodes.reduce(($, $$) => $ + $$.count, 0n) / 100n) | 0n)
       )
 
@@ -111,27 +124,27 @@ async function run(fileName: string): Promise<string> {
       addStats()
       vm.eval(readFileSync(fileName).toString(), fileName)
       addStats()
-      out.push('> call onStart()')
+      out.push('CALL onStart()')
       await vm.onStart()
       addStats()
 
-      out.push('> call onUpdate(0.0)')
+      out.push('CALL onUpdate(0.0)')
       await vm.onUpdate(0.0)
       addStats()
-      out.push('> call onUpdate(0.1)')
+      out.push('CALL onUpdate(0.1)')
       await vm.onUpdate(0.1)
       addStats()
-      out.push('> call onUpdate(0.1)')
+      out.push('CALL onUpdate(0.1)')
       await vm.onUpdate(0.1)
       addStats()
-      out.push('> call onUpdate(0.1)')
+      out.push('CALL onUpdate(0.1)')
       await vm.onUpdate(0.1)
       addStats()
     } catch (err: any) {
       if (err.stack?.includes('Host: QuickJSUnwrapError')) {
-        out.push(`ERR! ` + err.stack.split('Host: QuickJSUnwrapError')[0])
+        out.push(`  ERR! ` + err.stack.split('Host: QuickJSUnwrapError')[0])
       } else {
-        out.push(`ERR! ` + err.stack)
+        out.push(`  ERR! ` + err.stack)
       }
     }
 

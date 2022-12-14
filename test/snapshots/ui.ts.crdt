@@ -1,37 +1,37 @@
 test/snapshots/ui.js
-> Opcodes x100: 0
-> require: ~system/EngineApi
-> require: buffer
-> require: long
-> Opcodes x100: 264
-> call onStart()
-> Opcodes x100: 0
-> call onUpdate(0.0)
-  CRDT: e=512 c=1 data=65,0,0,0,63,128,0,0,65,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,63,128,0,0,63,128,0,0,63,128,0,0,63,128,0,0,0,0,0,0
-  CRDT: e=512 c=1062 data=10,31,8,1,18,27,8,1,18,16,80,114,101,115,115,32,69,32,116,111,32,115,112,97,119,110,29,0,0,200,66,32,1
-  CRDT: e=512 c=1018 data=10,2,10,0
-  CRDT: e=512 c=1019 data=18,0
-  CRDT: e=513 c=1053 data=10,0
-  CRDT: e=513 c=1052 data=10,5,83,68,75,32,55,40,80
-  CRDT: e=513 c=1050 data=8,130,4,16,0,144,3,2
-  CRDT: e=515 c=1053 data=10,0
-  CRDT: e=515 c=1052 data=10,8,67,111,117,110,116,101,114,58,40,60
-  CRDT: e=515 c=1050 data=8,132,4,16,0,144,3,2
-  CRDT: e=517 c=1053 data=10,0
-  CRDT: e=517 c=1052 data=10,7,80,108,97,121,101,114,58,40,40
-  CRDT: e=517 c=1050 data=8,134,4,16,0,144,3,2
-  CRDT: e=519 c=1053 data=10,20,13,0,0,0,63,21,205,204,76,63,29,205,204,204,61,37,154,153,25,63
-  CRDT: e=519 c=1050 data=128,1,1,141,1,0,0,47,68,144,1,1,157,1,0,0,200,67,160,2,1,173,2,0,0,250,67,176,2,1,189,2,0,0,12,66,144,3,2
-  CRDT: e=514 c=1050 data=8,135,4,16,0,32,2,80,1,128,1,2,141,1,0,0,200,66,144,1,2,157,1,0,0,160,65,144,3,2
-  CRDT: e=516 c=1050 data=8,135,4,16,130,4,32,2,80,1,128,1,2,141,1,0,0,200,66,144,1,2,157,1,0,0,160,65,144,3,2
-  CRDT: e=518 c=1050 data=8,135,4,16,132,4,32,2,80,1,128,1,2,141,1,0,0,200,66,144,1,1,157,1,0,0,200,66,144,3,2
-> Opcodes x100: 983
-> call onUpdate(0.1)
-  CRDT: e=512 c=1 data=65,0,0,0,63,128,0,0,65,0,0,0,0,0,0,0,60,14,249,190,0,0,0,0,63,127,253,129,63,128,0,0,63,128,0,0,63,128,0,0,0,0,0,0
-> Opcodes x100: 503
-> call onUpdate(0.1)
-  CRDT: e=512 c=1 data=65,0,0,0,63,128,0,0,65,0,0,0,0,0,0,0,60,142,248,89,0,0,0,0,63,127,246,5,63,128,0,0,63,128,0,0,63,128,0,0,0,0,0,0
-> Opcodes x100: 482
-> call onUpdate(0.1)
-  CRDT: e=512 c=1 data=65,0,0,0,63,128,0,0,65,0,0,0,0,0,0,0,60,214,113,10,0,0,0,0,63,127,233,139,63,128,0,0,63,128,0,0,63,128,0,0,0,0,0,0
-> Opcodes x100: 482
+  OPCODES (x100): 0
+  REQUIRE: ~system/EngineApi
+  REQUIRE: buffer
+  REQUIRE: long
+  OPCODES (x100): 265
+CALL onStart()
+  OPCODES (x100): 0
+CALL onUpdate(0.0)
+  CRDT: e=512 c=1 t=1 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  CRDT: e=512 c=1062 t=1 data={"pointerEvents":[{"eventType":1,"eventInfo":{"button":1,"hoverText":"Press E to spawn","maxDistance":100,"showFeedback":true}}]}
+  CRDT: e=512 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
+  CRDT: e=512 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
+  CRDT: e=513 c=1053 t=1 data={"backgroundColor":{"r":0,"g":0,"b":0,"a":0}}
+  CRDT: e=513 c=1052 t=1 data={"value":"SDK 7","fontSize":80}
+  CRDT: e=513 c=1050 t=1 data={"parent":514,"rightOf":0,"positionType":0,"alignSelf":0,"flexDirection":0,"justifyContent":0,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":0,"width":0,"heightUnit":0,"height":0,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":0,"marginLeft":0,"marginTopUnit":0,"marginTop":0,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":2,"paddingBottom":0}
+  CRDT: e=515 c=1053 t=1 data={"backgroundColor":{"r":0,"g":0,"b":0,"a":0}}
+  CRDT: e=515 c=1052 t=1 data={"value":"Counter:","fontSize":60}
+  CRDT: e=515 c=1050 t=1 data={"parent":516,"rightOf":0,"positionType":0,"alignSelf":0,"flexDirection":0,"justifyContent":0,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":0,"width":0,"heightUnit":0,"height":0,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":0,"marginLeft":0,"marginTopUnit":0,"marginTop":0,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":2,"paddingBottom":0}
+  CRDT: e=517 c=1053 t=1 data={"backgroundColor":{"r":0,"g":0,"b":0,"a":0}}
+  CRDT: e=517 c=1052 t=1 data={"value":"Player:","fontSize":40}
+  CRDT: e=517 c=1050 t=1 data={"parent":518,"rightOf":0,"positionType":0,"alignSelf":0,"flexDirection":0,"justifyContent":0,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":0,"width":0,"heightUnit":0,"height":0,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":0,"marginLeft":0,"marginTopUnit":0,"marginTop":0,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":2,"paddingBottom":0}
+  CRDT: e=519 c=1053 t=1 data={"backgroundColor":{"r":0.5,"g":0.800000011920929,"b":0.10000000149011612,"a":0.6000000238418579}}
+  CRDT: e=519 c=1050 t=1 data={"parent":0,"rightOf":0,"positionType":0,"alignSelf":0,"flexDirection":0,"justifyContent":0,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":1,"width":700,"heightUnit":1,"height":400,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":1,"marginLeft":500,"marginTopUnit":1,"marginTop":35,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":2,"paddingBottom":0}
+  CRDT: e=514 c=1050 t=1 data={"parent":519,"rightOf":0,"alignItems":2,"positionType":0,"alignSelf":0,"flexDirection":0,"justifyContent":1,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":2,"width":100,"heightUnit":2,"height":20,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":0,"marginLeft":0,"marginTopUnit":0,"marginTop":0,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":2,"paddingBottom":0}
+  CRDT: e=516 c=1050 t=1 data={"parent":519,"rightOf":514,"alignItems":2,"positionType":0,"alignSelf":0,"flexDirection":0,"justifyContent":1,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":2,"width":100,"heightUnit":2,"height":20,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":0,"marginLeft":0,"marginTopUnit":0,"marginTop":0,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":2,"paddingBottom":0}
+  CRDT: e=518 c=1050 t=1 data={"parent":519,"rightOf":516,"alignItems":2,"positionType":0,"alignSelf":0,"flexDirection":0,"justifyContent":1,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":2,"width":100,"heightUnit":1,"height":100,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":0,"marginLeft":0,"marginTopUnit":0,"marginTop":0,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":2,"paddingBottom":0}
+  OPCODES (x100): 1004
+CALL onUpdate(0.1)
+  CRDT: e=512 c=1 t=2 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.008726535364985466,"z":0,"w":0.9999619126319885},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  OPCODES (x100): 512
+CALL onUpdate(0.1)
+  CRDT: e=512 c=1 t=3 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.017452405765652657,"z":0,"w":0.9998477101325989},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  OPCODES (x100): 492
+CALL onUpdate(0.1)
+  CRDT: e=512 c=1 t=4 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.026176948100328445,"z":0,"w":0.9996573328971863},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  OPCODES (x100): 492

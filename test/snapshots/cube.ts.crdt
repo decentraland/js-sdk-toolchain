@@ -1,17 +1,17 @@
 test/snapshots/cube.js
-> Opcodes x100: 0
-> require: ~system/EngineApi
-> require: buffer
-> require: long
-> Opcodes x100: 110
-> call onStart()
-> Opcodes x100: 0
-> call onUpdate(0.0)
-  CRDT: e=512 c=1 data=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,63,128,0,0,63,128,0,0,63,128,0,0,63,128,0,0,0,0,0,0
-> Opcodes x100: 45
-> call onUpdate(0.1)
-> Opcodes x100: 13
-> call onUpdate(0.1)
-> Opcodes x100: 13
-> call onUpdate(0.1)
-> Opcodes x100: 13
+  OPCODES (x100): 0
+  REQUIRE: ~system/EngineApi
+  REQUIRE: buffer
+  REQUIRE: long
+  OPCODES (x100): 111
+CALL onStart()
+  OPCODES (x100): 0
+CALL onUpdate(0.0)
+  CRDT: e=512 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  OPCODES (x100): 50
+CALL onUpdate(0.1)
+  OPCODES (x100): 17
+CALL onUpdate(0.1)
+  OPCODES (x100): 17
+CALL onUpdate(0.1)
+  OPCODES (x100): 17
