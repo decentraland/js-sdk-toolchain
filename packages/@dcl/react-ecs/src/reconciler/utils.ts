@@ -1,5 +1,7 @@
+import { isListener } from '../components'
 import { EntityComponents } from '../react-ecs'
 import {
+  Changes,
   Container,
   HostContext,
   Instance,
@@ -12,12 +14,50 @@ import {
   Type
 } from './types'
 
+export function propsChanged<K extends keyof EntityComponents>(
+  component: K,
+  prevProps: Partial<EntityComponents[K]>,
+  nextProps: Partial<EntityComponents[K]>
+): Changes<K> | undefined {
+  if (prevProps && !nextProps) {
+    return { type: 'delete', component }
+  }
+
+  if (!nextProps) {
+    return
+  }
+
+  if (!prevProps && nextProps) {
+    return { type: 'add', props: nextProps, component }
+  }
+
+  if (isListener(component)) {
+    if (!isEqual(prevProps, nextProps)) {
+      return { type: 'put', component, props: nextProps }
+    }
+  }
+
+  const changes: Partial<EntityComponents[K]> = {}
+  for (const k in prevProps) {
+    const propKey = k as keyof typeof prevProps
+    if (!isEqual(prevProps[propKey], nextProps[propKey])) {
+      changes[propKey] = nextProps[propKey]
+    }
+  }
+
+  if (!Object.keys(changes).length) {
+    return
+  }
+
+  return { type: 'put', props: changes, component }
+}
 // as any HACK so every time we add a new component, we must add also the component here.
 const entityComponent: EntityComponents = {
   uiText: undefined as any,
   uiBackground: undefined as any,
   uiTransform: undefined as any,
-  onClick: undefined as any
+  onClick: undefined as any,
+  uiInput: undefined as any
 }
 export const componentKeys: (keyof EntityComponents)[] = Object.keys(
   entityComponent

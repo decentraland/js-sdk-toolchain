@@ -9,7 +9,7 @@ import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
 import { isListener, Listeners } from '../components'
 import { CANVAS_ROOT_ENTITY } from '../components/uiTransform'
-import { EntityComponents, JSX } from '../react-ecs'
+import { JSX } from '../react-ecs'
 import {
   Changes,
   Type,
@@ -28,65 +28,40 @@ import {
   OpaqueHandle,
   EngineComponents
 } from './types'
-import { componentKeys, isEqual, isNotUndefined, noopConfig } from './utils'
+import {
+  componentKeys,
+  isNotUndefined,
+  noopConfig,
+  propsChanged
+} from './utils'
 
-function propsChanged<K extends keyof EntityComponents>(
-  component: K,
-  prevProps: Partial<EntityComponents[K]>,
-  nextProps: Partial<EntityComponents[K]>
-): Changes<K> | undefined {
-  if (prevProps && !nextProps) {
-    return { type: 'delete', component }
-  }
-
-  if (!nextProps) {
-    return
-  }
-
-  if (!prevProps && nextProps) {
-    return { type: 'add', props: nextProps, component }
-  }
-
-  if (isListener(component)) {
-    if (!isEqual(prevProps, nextProps)) {
-      return { type: 'put', component, props: nextProps }
-    }
-  }
-
-  const changes: Partial<EntityComponents[K]> = {}
-  for (const k in prevProps) {
-    const propKey = k as keyof typeof prevProps
-    if (!isEqual(prevProps[propKey], nextProps[propKey])) {
-      changes[propKey] = nextProps[propKey]
-    }
-  }
-
-  if (!Object.keys(changes).length) {
-    return
-  }
-
-  return { type: 'put', props: changes, component }
-}
-
+type OnChangeState = { fn: (val?: string) => void; timestamp?: number }
 export function createReconciler(
   engine: Pick<
     IEngine,
-    'getComponent' | 'addEntity' | 'removeEntity' | 'defineComponentFromSchema'
+    | 'getComponent'
+    | 'addEntity'
+    | 'removeEntity'
+    | 'defineComponentFromSchema'
+    | 'getEntitiesWith'
+    | 'getLamportTimestampOrNull'
   >,
   pointerEvents: PointerEventsSystem
 ) {
   const entities = new Set<Entity>()
-
   const UiTransform = components.UiTransform(engine)
   const UiText = components.UiText(engine)
   const UiBackground = components.UiBackground(engine)
-
+  const UiInput = components.UiInput(engine)
+  const UiInputResult = components.UiInputResult(engine)
+  const changeEvents = new Map<Entity, Map<number, OnChangeState | undefined>>()
   const getComponentId: {
     [key in keyof EngineComponents]: number
   } = {
     uiTransform: UiTransform._id,
     uiText: UiText._id,
-    uiBackground: UiBackground._id
+    uiBackground: UiBackground._id,
+    uiInput: UiInput._id
   }
 
   function updateTree(
@@ -122,12 +97,17 @@ export function createReconciler(
     }
   }
 
-  function removeComponent(
+  function removeComponent<K extends keyof EngineComponents>(
     instance: Instance,
-    component: keyof EngineComponents
+    component: keyof EngineComponents,
+    props: Partial<EngineComponents[K]>
   ) {
-    const Component = engine.getComponent(getComponentId[component])
+    const componentId = getComponentId[component]
+    const Component = engine.getComponent(componentId)
     Component.deleteFrom(instance.entity)
+    if ('onChange' in props) {
+      updateOnChange(instance.entity, componentId, undefined)
+    }
   }
 
   function upsertComponent<K extends keyof EngineComponents>(
@@ -144,11 +124,17 @@ export function createReconciler(
 
     for (const key in props) {
       const keyProp = key as keyof EngineComponents[K]
-      component[keyProp] = props[keyProp]
+      if (key === 'onChange') {
+        const onChange = props[keyProp] as OnChangeState['fn']
+        updateOnChange(instance.entity, componentId, { fn: onChange })
+      } else {
+        component[keyProp] = props[keyProp]
+      }
     }
   }
 
   function removeChildEntity(instance: Instance) {
+    changeEvents.delete(instance.entity)
     engine.removeEntity(instance.entity)
     for (const child of instance._child) {
       removeChildEntity(child)
@@ -198,6 +184,24 @@ export function createReconciler(
     // Mutate 💀
     parentInstance._child.splice(childIndex, 1)
     removeChildEntity(child)
+  }
+
+  function updateOnChange(
+    entity: Entity,
+    componentId: number,
+    value?: OnChangeState
+  ) {
+    const event =
+      changeEvents.get(entity) ||
+      changeEvents.set(entity, new Map()).get(entity)!
+    const oldState = event.get(componentId)
+    const newValue = value
+      ? {
+          fn: value.fn,
+          timestamp: value.timestamp || oldState?.timestamp || 0
+        }
+      : undefined
+    event.set(componentId, newValue)
   }
 
   const hostConfig: HostConfig<
@@ -268,7 +272,7 @@ export function createReconciler(
       instance: Instance,
       updatePayload: UpdatePayload,
       _type: Type,
-      _prevPropsProps: Props,
+      prevProps: Props,
       _nextProps: Props,
       _internalHandle: OpaqueHandle
     ): void {
@@ -278,7 +282,11 @@ export function createReconciler(
           continue
         }
         if (update.type === 'delete') {
-          removeComponent(instance, update.component)
+          removeComponent(
+            instance,
+            update.component,
+            prevProps[update.component]
+          )
         } else {
           upsertComponent(
             instance,
@@ -323,8 +331,44 @@ export function createReconciler(
     function () {},
     null
   )
+
+  // Maybe this could be something similar to Input system, but since we
+  // are going to use this only here, i prefer to scope it here.
+  function handleOnChange(componentId: number, resultComponentId: number) {
+    return function (
+      entity: unknown,
+      componentResult: components.PBUiInputResult
+    ) {
+      const entityState = changeEvents.get(entity)?.get(componentId)
+      const crdtTimestamp = engine.getLamportTimestampOrNull(
+        entity,
+        resultComponentId
+      )
+      if (
+        entityState?.fn &&
+        crdtTimestamp &&
+        (!entityState.timestamp || crdtTimestamp > entityState.timestamp)
+      ) {
+        // Call onChange callback and update internal timestamp
+        entityState.fn(componentResult.value)
+        updateOnChange(entity, componentId, {
+          fn: entityState.fn,
+          timestamp: crdtTimestamp
+        })
+      }
+    }
+  }
+  const uiInputOnChange = handleOnChange(UiInput._id, UiInputResult._id)
+
+  function onChangeSystem() {
+    for (const [entity, Result] of engine.getEntitiesWith(UiInputResult)) {
+      uiInputOnChange(entity, Result)
+    }
+  }
+
   return {
     update: function (component: JSX.Element) {
+      onChangeSystem()
       return reconciler.updateContainer(component as any, root, null)
     },
     getEntities: () => Array.from(entities)

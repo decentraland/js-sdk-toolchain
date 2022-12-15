@@ -213,6 +213,12 @@ export type IEngine = {
   getCrdtState(): State<Uint8Array>
 
   /**
+   * @public
+   * Returns the lamport timestmap for the specified entity-component.
+   */
+  getLamportTimestampOrNull(entity: Entity, componentId: number): number | null
+
+  /**
    * @internal
    */
   componentsDefinition: Map<

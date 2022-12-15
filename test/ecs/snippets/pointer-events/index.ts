@@ -21,7 +21,9 @@ function createCube(
   Transform.create(meshEntity, { position: { x, y, z } })
   MeshRenderer.create(meshEntity, { mesh: { $case: 'box', box: { uvs: [] } } })
   MeshCollider.create(meshEntity, { mesh: { $case: 'box', box: {} } })
+
   PointerEvents.create(meshEntity, { pointerEvents })
+
   return meshEntity
 }
 

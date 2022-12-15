@@ -7,6 +7,7 @@ export * from './types'
 export { CANVAS_ROOT_ENTITY }
 export * from './uiTransform/types'
 export * from './listeners/types'
+export * from './uiInput/types'
 
 /**
  * @public

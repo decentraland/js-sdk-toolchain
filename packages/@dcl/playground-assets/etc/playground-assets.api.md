@@ -120,6 +120,15 @@ export const AvatarTexture: {
     decode(input: _m0.Reader | Uint8Array, length?: number): AvatarTexture;
 };
 
+// Warning: (ae-missing-release-tag) "BackgroundTextureMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum BackgroundTextureMode {
+    CENTER = 1,
+    NINE_SLICES = 0,
+    STRETCH = 2
+}
+
 // @public (undocumented)
 export const Billboard: ComponentDefinition<typeof BillboardSchema>;
 
@@ -138,6 +147,27 @@ export const enum BillboardMode {
 // @public (undocumented)
 export const BillboardSchema: ISchema<PBBillboard> & {
     COMPONENT_ID: number;
+};
+
+// Warning: (ae-missing-release-tag) "BorderRect" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "BorderRect" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export interface BorderRect {
+    // (undocumented)
+    bottom: number;
+    // (undocumented)
+    left: number;
+    // (undocumented)
+    right: number;
+    // (undocumented)
+    top: number;
+}
+
+// @public
+export const BorderRect: {
+    encode(message: BorderRect, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): BorderRect;
 };
 
 // @public (undocumented)
@@ -546,6 +576,7 @@ export type EntityComponents = {
     uiTransform: PBUiTransform;
     uiText: PBUiText;
     uiBackground: PBUiBackground;
+    uiInput: PBUiInput;
     onClick: EventSystemCallback;
 };
 
@@ -564,6 +595,7 @@ export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
     uiText?: PBUiText;
     uiBackground?: PBUiBackground;
+    uiInput?: UiInputProps;
 };
 
 // @public
@@ -665,6 +697,7 @@ export type IEngine = {
     readonly PlayerEntity: Entity;
     readonly CameraEntity: Entity;
     addTransport(transport: Transport): void;
+    getLamportTimestampOrNull(entity: Entity, componentId: number): number | null;
 };
 
 // @public (undocumented)
@@ -1697,10 +1730,10 @@ export const PBGltfContainer: {
 export interface PBMaterial {
     // (undocumented)
     material?: {
-        $case: 'unlit';
+        $case: "unlit";
         unlit: PBMaterial_UnlitMaterial;
     } | {
-        $case: 'pbr';
+        $case: "pbr";
         pbr: PBMaterial_PbrMaterial;
     };
 }
@@ -1764,16 +1797,16 @@ export interface PBMeshCollider {
     collisionMask?: number | undefined;
     // (undocumented)
     mesh?: {
-        $case: 'box';
+        $case: "box";
         box: PBMeshCollider_BoxMesh;
     } | {
-        $case: 'sphere';
+        $case: "sphere";
         sphere: PBMeshCollider_SphereMesh;
     } | {
-        $case: 'cylinder';
+        $case: "cylinder";
         cylinder: PBMeshCollider_CylinderMesh;
     } | {
-        $case: 'plane';
+        $case: "plane";
         plane: PBMeshCollider_PlaneMesh;
     };
 }
@@ -1845,16 +1878,16 @@ export const PBMeshCollider_SphereMesh: {
 export interface PBMeshRenderer {
     // (undocumented)
     mesh?: {
-        $case: 'box';
+        $case: "box";
         box: PBMeshRenderer_BoxMesh;
     } | {
-        $case: 'sphere';
+        $case: "sphere";
         sphere: PBMeshRenderer_SphereMesh;
     } | {
-        $case: 'cylinder';
+        $case: "cylinder";
         cylinder: PBMeshRenderer_CylinderMesh;
     } | {
-        $case: 'plane';
+        $case: "plane";
         plane: PBMeshRenderer_PlaneMesh;
     };
 }
@@ -2151,13 +2184,56 @@ export const PBTextShape: {
 //
 // @public (undocumented)
 export interface PBUiBackground {
-    backgroundColor?: PBColor4 | undefined;
+    color?: PBColor4 | undefined;
+    // (undocumented)
+    texture?: Texture | undefined;
+    // (undocumented)
+    textureMode: BackgroundTextureMode;
+    textureSlices?: BorderRect | undefined;
+    uvs: number[];
 }
 
 // @public
 export const PBUiBackground: {
     encode(message: PBUiBackground, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBUiBackground;
+};
+
+// Warning: (ae-missing-release-tag) "PBUiInput" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBUiInput" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBUiInput {
+    color?: PBColor4 | undefined;
+    // (undocumented)
+    disabled: boolean;
+    font?: Font | undefined;
+    fontSize?: number | undefined;
+    // (undocumented)
+    placeholder: string;
+    placeholderColor?: PBColor4 | undefined;
+    textAlign?: TextAlignMode | undefined;
+}
+
+// @public
+export const PBUiInput: {
+    encode(message: PBUiInput, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): PBUiInput;
+};
+
+// Warning: (ae-missing-release-tag) "PBUiInputResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBUiInputResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBUiInputResult {
+    // (undocumented)
+    value: string;
+}
+
+// @public
+export const PBUiInputResult: {
+    encode(message: PBUiInputResult, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): PBUiInputResult;
 };
 
 // Warning: (ae-missing-release-tag) "PBUiText" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2777,10 +2853,10 @@ export type TextureHelper = {
 export interface TextureUnion {
     // (undocumented)
     tex?: {
-        $case: 'texture';
+        $case: "texture";
         texture: Texture;
     } | {
-        $case: 'avatarTexture';
+        $case: "avatarTexture";
         avatarTexture: AvatarTexture;
     };
 }
@@ -2878,6 +2954,31 @@ export type UiComponent = () => JSX.Element;
 
 // @public (undocumented)
 export function UiEntity(props: EntityPropTypes & Partial<CommonProps>): ReactEcs.JSX.Element;
+
+// @public (undocumented)
+export const UiInput: ComponentDefinition<typeof UiInputSchema>;
+
+// @public (undocumented)
+export type UiInputProps = PBUiInput & {
+    onChange?(value: string): void;
+};
+
+// @public (undocumented)
+export const UiInputResult: ComponentDefinition<typeof UiInputResultSchema>;
+
+// Warning: (ae-missing-release-tag) "UiInputResultSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const UiInputResultSchema: ISchema<PBUiInputResult> & {
+    COMPONENT_ID: number;
+};
+
+// Warning: (ae-missing-release-tag) "UiInputSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const UiInputSchema: ISchema<PBUiInput> & {
+    COMPONENT_ID: number;
+};
 
 // @public (undocumented)
 export const UiText: ComponentDefinition<typeof UiTextSchema>;

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
-import { EventSystemCallback } from '@dcl/ecs'
+import { EventSystemCallback, PBUiInput } from '@dcl/ecs'
 import {
   PBUiBackground,
   PBUiText,
@@ -18,6 +18,7 @@ export type EntityComponents = {
   uiTransform: PBUiTransform
   uiText: PBUiText
   uiBackground: PBUiBackground
+  uiInput: PBUiInput
   onClick: EventSystemCallback
 }
 
