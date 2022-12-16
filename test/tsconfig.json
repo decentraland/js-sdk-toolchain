@@ -24,6 +24,5 @@
     "jsxFactory": "ReactEcs.createElement",
     "skipLibCheck": true,
     "typeRoots": ["../packages", "../node_modules/@types"]
-  },
-  "includes": "*.ts"
+  }
 }

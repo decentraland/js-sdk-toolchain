@@ -79,6 +79,9 @@ export const int8Component = (engine: IEngine) => {
       b.writeInt8(values.get(entity)!)
       return b
     },
+    deserialize(buffer) {
+      return buffer.readInt8()
+    },
     writeToByteBuffer: function (entity: Entity, buffer: ByteBuffer): void {
       buffer.writeInt8(values.get(entity)!)
     },

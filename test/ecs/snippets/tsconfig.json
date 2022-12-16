@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "strict": true,
+    "allowJs": false,
     "typeRoots": ["../../../packages"],
     "paths": {
       "@dcl/sdk/react-ecs": ["../../../packages/@dcl/sdk/react-ecs"],

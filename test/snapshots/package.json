@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decentraland/js-sdk-toolchain.git"
+  },
+  "license": "Apache-2.0",
+  "description": "My new Decentraland project",
+  "scripts": {
+    "build": "build-ecs"
+  },
+  "devDependencies": {
+    "@dcl/dcl-rollup": "file:../../packages/@dcl/dcl-rollup",
+    "@dcl/js-runtime": "file:../../packages/@dcl/js-runtime",
+    "@dcl/sdk": "file:../../packages/@dcl/sdk"
+  }
+}
