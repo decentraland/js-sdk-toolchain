@@ -2,7 +2,7 @@ import { withQuickJsVm } from './vm'
 
 describe('ensure that VM works', () => {
   it('runs no code and vm has no leaks', async () =>
-    withQuickJsVm(async (opts) => {}))
+    withQuickJsVm(async () => {}))
 
   it('runs empty script and returns without leaks', async () =>
     withQuickJsVm(async (opts) => {
@@ -36,10 +36,10 @@ describe('ensure that VM works', () => {
         log(...args) {
           values.push(args)
         },
-        error(...args) {
+        error() {
           throw new Error('not implemented')
         },
-        require(...args) {
+        require() {
           throw new Error('not implemented')
         }
       })
@@ -52,10 +52,10 @@ describe('ensure that VM works', () => {
         log(...args) {
           values.push(args)
         },
-        error(...args) {
+        error() {
           throw new Error('not implemented')
         },
-        require(...args) {
+        require() {
           throw new Error('not implemented')
         }
       })
@@ -87,13 +87,13 @@ describe('ensure that VM works', () => {
     withQuickJsVm(async (opts) => {
       const values: any[] = []
       opts.provide({
-        log(...args) {
+        log() {
           throw new Error('not implemented')
         },
-        error(...args) {
+        error() {
           throw new Error('not implemented')
         },
-        require(...args) {
+        require() {
           return {
             fn(...args: any[]) {
               values.push(args)
@@ -198,7 +198,7 @@ describe('ensure that VM works', () => {
         log(...args) {
           logs.push(...args)
         },
-        error(...args) {
+        error() {
           throw 'Not implemented'
         },
         require() {

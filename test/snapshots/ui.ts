@@ -56,8 +56,6 @@ function circularSystem(dt: number) {
   }
 }
 
-let counter = 0
-
 function spawnerSystem() {
   const clickedCubes = engine.getEntitiesWith(PointerHoverFeedback)
   for (const [entity] of clickedCubes) {
@@ -68,7 +66,7 @@ function spawnerSystem() {
         entity
       )
     ) {
-      counter++
+      // noop
     }
   }
 }

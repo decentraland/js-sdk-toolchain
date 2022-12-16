@@ -1,6 +1,6 @@
 import typescript from '@rollup/plugin-typescript'
 import { sys } from 'typescript'
-import { RollupOptions, Plugin } from 'rollup'
+import { RollupOptions } from 'rollup'
 import replace from '@rollup/plugin-replace'
 import terser from '@rollup/plugin-terser'
 import analyze from 'rollup-plugin-analyzer'

@@ -1,5 +1,5 @@
 import { createInterface } from 'readline'
-import fs, { readFileSync } from 'fs-extra'
+import fs from 'fs-extra'
 import path from 'path'
 
 import { Message, State } from '../../../packages/@dcl/crdt/src'

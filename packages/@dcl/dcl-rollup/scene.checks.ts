@@ -44,7 +44,7 @@ export function readPackageJson(): PackageJson {
   }
 }
 
-export function checkConfiguration(CWD: string) {
+export function checkConfiguration() {
   const host: ts.ParseConfigHost = {
     useCaseSensitiveFileNames: ts.sys.useCaseSensitiveFileNames,
     fileExists: ts.sys.fileExists,

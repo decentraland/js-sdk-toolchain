@@ -3,14 +3,9 @@
 import { createSceneConfig } from './configs'
 import { RollupError, watch } from 'rollup'
 import * as ts from 'typescript'
-import * as path from 'path'
 import { resolve, relative } from 'path'
 import { future } from 'fp-future'
-import {
-  checkConfiguration,
-  PackageJson,
-  readPackageJson
-} from './scene.checks'
+import { checkConfiguration } from './scene.checks'
 import { createColors } from 'colorette'
 import arg from 'arg'
 
@@ -66,7 +61,7 @@ async function compile() {
     colors.greenBright(`Working directory: `) + ts.sys.getCurrentDirectory()
   )
 
-  checkConfiguration(CWD)
+  checkConfiguration()
 
   const baseConfig = createSceneConfig({
     PROD: PRODUCTION,

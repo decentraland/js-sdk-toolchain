@@ -1,13 +1,13 @@
 test/snapshots/simple.js
-  OPCODES (x100): 0
-  OPCODES (x100): 0
+  OPCODES ~= 0.0k
+  OPCODES ~= 0.0k
 CALL onStart()
-  OPCODES (x100): 0
+  OPCODES ~= 0.0k
 CALL onUpdate(0.0)
-  OPCODES (x100): 0
+  OPCODES ~= 0.0k
 CALL onUpdate(0.1)
-  OPCODES (x100): 0
+  OPCODES ~= 0.0k
 CALL onUpdate(0.1)
-  OPCODES (x100): 0
+  OPCODES ~= 0.0k
 CALL onUpdate(0.1)
-  OPCODES (x100): 0
+  OPCODES ~= 0.0k

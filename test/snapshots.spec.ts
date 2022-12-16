@@ -110,8 +110,11 @@ async function run(fileName: string): Promise<string> {
         .filter(($) => $.count > 10)
 
       out.push(
-        '  OPCODES (x100): ' +
-          ((opcodes.reduce(($, $$) => $ + $$.count, 0n) / 100n) | 0n)
+        '  OPCODES ~= ' +
+          (
+            Number(opcodes.reduce(($, $$) => $ + $$.count, 0n) / 100n) / 10
+          ).toFixed(1) +
+          'k'
       )
 
       // out.push('> STATS: ' + opcodes.slice(0,10).map(_ => `${_.opcode}=${_.count}`).join(','))
