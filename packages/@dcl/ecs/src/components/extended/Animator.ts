@@ -9,8 +9,7 @@ import {
  * @public
  */
 export type AnimatorComponentDefinition = ComponentDefinition<
-  ISchema<PBAnimator>,
-  PBAnimator
+  ISchema<PBAnimator>
 >
 
 /**

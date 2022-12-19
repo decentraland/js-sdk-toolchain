@@ -14,10 +14,21 @@ export interface Spec {
  */
 export type MapResult<T extends Spec> = ToOptional<{
   [K in keyof T]: T[K] extends ISchema
-  ? ReturnType<T[K]['deserialize']>
-  : T[K] extends Spec
-  ? MapResult<T[K]>
-  : never
+    ? ReturnType<T[K]['deserialize']>
+    : T[K] extends Spec
+    ? MapResult<T[K]>
+    : never
+}>
+
+/**
+ * @public
+ */
+export type MapResultWithOptional<T extends Spec> = ToOptional<{
+  [K in keyof T]?: T[K] extends ISchema
+    ? ReturnType<T[K]['deserialize']>
+    : T[K] extends Spec
+    ? MapResult<T[K]>
+    : never
 }>
 
 export type MapSchemaType<T extends Spec> = ISchema<MapResult<T>>
@@ -35,14 +46,14 @@ export function IMap<T extends Spec>(spec: T): ISchema<MapResult<T>> {
     deserialize(reader: ByteBuffer): MapResult<T> {
       const newValue: MapResult<T> = {} as any
       for (const key in spec) {
-        ; (newValue as any)[key] = spec[key].deserialize(reader)
+        ;(newValue as any)[key] = spec[key].deserialize(reader)
       }
       return newValue
     },
     create() {
       const newValue: MapResult<T> = {} as any
       for (const key in spec) {
-        ; (newValue as any)[key] = spec[key].create()
+        ;(newValue as any)[key] = spec[key].create()
       }
       return newValue
     }

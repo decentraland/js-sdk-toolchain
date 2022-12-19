@@ -1,7 +1,8 @@
 import * as components from '../components'
+import { checkNotThenable } from '../runtime/invariant'
 import { Schemas } from '../schemas'
 import { ISchema } from '../schemas/ISchema'
-import { MapResult, Spec } from '../schemas/Map'
+import { MapResult, MapSchemaType, Spec } from '../schemas/Map'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { crdtSceneSystem } from '../systems/crdt'
 import {
@@ -11,12 +12,10 @@ import {
   SchemaResult
 } from './component'
 import { Entity, EntityContainer } from './entity'
-import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, SystemFn } from './systems'
-import type { IEngine } from './types'
-export * from './input'
 import { ReadonlyComponentSchema } from './readonly'
-import { checkNotThenable } from '../runtime/invariant'
-
+import { SystemContainer, SystemFn, SYSTEMS_REGULAR_PRIORITY } from './systems'
+import type { IEngine, MapComponentDefinition } from './types'
+export * from './input'
 export * from './readonly'
 export * from './types'
 export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
@@ -72,9 +71,7 @@ function preEngine() {
     return component
   }
 
-  function defineComponentFromSchema<
-    T extends ISchema
-  >(
+  function defineComponentFromSchema<T extends ISchema>(
     spec: T,
     componentId: number,
     constructorDefault?: SchemaResult<T>
@@ -84,28 +81,41 @@ function preEngine() {
       // TODO: assert spec === prev.spec
       return prev
     }
-    const newComponent = defComponent<T>(
-      componentId,
-      spec,
-      constructorDefault
-    )
+    const newComponent = defComponent<T>(componentId, spec, constructorDefault)
     componentsDefinition.set(componentId, newComponent)
     return newComponent
   }
 
-  function defineComponent<
-    T extends Spec,
-    ConstructorType = Partial<MapResult<T>>
-  >(
-    spec: T,
+  function defineComponent<T extends Spec>(
+    mapSpec: T,
     componentId: number,
-    constructorDefault?: ConstructorType
-  ): ComponentDefinition<ISchema<MapResult<T>>> {
-    return defineComponentFromSchema(
-      Schemas.Map(spec) as ISchema<ConstructorType>,
+    constructorDefault?: Partial<MapResult<T>>
+  ): MapComponentDefinition<MapSchemaType<T>> {
+    const prev = componentsDefinition.get(componentId)
+    if (prev) {
+      // TODO: assert spec === prev.spec
+      return prev as MapComponentDefinition<MapSchemaType<T>>
+    }
+
+    const schemaSpec = Schemas.Map(mapSpec)
+    const defaultConstructor = { ...schemaSpec.create(), ...constructorDefault }
+    const def = defComponent<MapSchemaType<T>>(
       componentId,
-      constructorDefault
-    ) as ComponentDefinition<ISchema<MapResult<T>>>
+      schemaSpec,
+      defaultConstructor
+    )
+    const newComponent = {
+      ...def,
+      create(entity: Entity, val?: Partial<MapResult<T>>) {
+        return def.create(entity, val as any)
+      },
+      createOrReplace(entity: Entity, val?: Partial<MapResult<T>>) {
+        return def.createOrReplace(entity, val as any)
+      }
+    }
+
+    componentsDefinition.set(componentId, newComponent)
+    return newComponent
   }
 
   function getComponent<T extends ISchema>(
@@ -131,10 +141,7 @@ function preEngine() {
   }
 
   function* getEntitiesWith<
-    T extends [
-      ComponentDefinition<any>,
-      ...ComponentDefinition<any>[]
-    ]
+    T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]
   >(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]> {
     for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
       yield [entity, ...groupComp.map((c) => c.get(entity))] as [
@@ -228,7 +235,8 @@ export function Engine(): IEngine {
       const ret: unknown | Promise<unknown> = system.fn(dt)
       checkNotThenable(
         ret,
-        `A system (${system.name || 'anonymous'
+        `A system (${
+          system.name || 'anonymous'
         }) returned a thenable. Systems cannot be async functions. Documentation: https://dcl.gg/sdk/sync-systems`
       )
     }

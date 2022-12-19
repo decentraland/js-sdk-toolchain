@@ -1,14 +1,13 @@
 import { ISchema } from '../engine'
-import { ComponentGetter } from './generated/index.gen'
-export * from './generated/index.gen'
-import {
-  defineTransformComponent,
-  TransformComponent
-} from './legacy/Transform'
+import { ComponentDefinition } from '../engine/component'
 import {
   AnimatorComponentDefinitionExtended,
   defineAnimatorComponent
 } from './extended/Animator'
+import {
+  defineMaterialComponent,
+  MaterialComponentDefinitionExtended
+} from './extended/Material'
 import {
   defineMeshColliderComponent,
   MeshColliderComponentDefinitionExtended
@@ -17,16 +16,18 @@ import {
   defineMeshRendererComponent,
   MeshRendererComponentDefinitionExtended
 } from './extended/MeshRenderer'
+import { ComponentGetter } from './generated/index.gen'
 import {
-  defineMaterialComponent,
-  MaterialComponentDefinitionExtended
-} from './extended/Material'
-import { ComponentDefinition } from '../engine/component'
+  defineTransformComponent,
+  TransformComponentExtended
+} from './legacy/Transform'
+export * from './generated/index.gen'
 export { ISchema, ComponentDefinition }
 
 /*#__PURE__*/
-export const Transform: ComponentGetter<TransformComponent> = (engine) =>
-  defineTransformComponent(engine)
+export const Transform: ComponentGetter<TransformComponentExtended> = (
+  engine
+) => defineTransformComponent(engine)
 
 /*#__PURE__*/
 export const Material: ComponentGetter<MaterialComponentDefinitionExtended> = (

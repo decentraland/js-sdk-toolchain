@@ -8,7 +8,7 @@ export const int8Component = (engine: IEngine) => {
   const values = new Map<Entity, number>()
   const dirtyIterator = new Set<Entity>()
 
-  const component: components.ComponentDefinition<any, number> = {
+  const component: components.ComponentDefinition<any> = {
     _id: ID,
     default: function () {
       return 0

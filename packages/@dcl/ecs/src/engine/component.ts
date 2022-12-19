@@ -18,9 +18,7 @@ export type ComponentType<T extends ISchema> = SchemaResult<T>
 /**
  * @public
  */
-export type ComponentDefinition<
-  T extends ISchema
-> = {
+export type ComponentDefinition<T extends ISchema> = {
   _id: number
 
   /**
@@ -158,9 +156,7 @@ export type ComponentDefinition<
   isDirty(entity: Entity): boolean
 }
 
-export function defineComponent<
-  T extends ISchema
->(
+export function defineComponent<T extends ISchema>(
   componentId: number,
   spec: T,
   constructorDefault?: ComponentType<T>
@@ -239,7 +235,10 @@ export function defineComponent<
       dirtyIterator.add(entity)
       return usedValue
     },
-    createOrReplace(entity: Entity, value?: ComponentType<T>): ComponentType<T> {
+    createOrReplace(
+      entity: Entity,
+      value?: ComponentType<T>
+    ): ComponentType<T> {
       const usedValue =
         value === undefined ? getDefaultValue() : prefillValue(value)
       data.set(entity, usedValue!)

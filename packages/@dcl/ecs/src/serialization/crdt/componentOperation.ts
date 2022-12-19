@@ -1,3 +1,4 @@
+import { ISchema } from '../../components'
 import { ComponentDefinition } from '../../engine/component'
 import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../ByteBuffer'
@@ -32,7 +33,7 @@ export namespace ComponentOperation {
     type: WireMessage.Enum,
     entity: Entity,
     timestamp: number,
-    componentDefinition: ComponentDefinition<any, any>,
+    componentDefinition: ComponentDefinition<ISchema<unknown>>,
     buf: ByteBuffer
   ) {
     // reserve the beginning

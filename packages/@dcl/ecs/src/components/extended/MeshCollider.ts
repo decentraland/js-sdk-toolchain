@@ -9,8 +9,7 @@ import {
  * @public
  */
 export type MeshColliderComponentDefinition = ComponentDefinition<
-  ISchema<PBMeshCollider>,
-  PBMeshCollider
+  ISchema<PBMeshCollider>
 >
 
 /**

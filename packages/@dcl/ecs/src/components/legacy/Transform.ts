@@ -1,12 +1,23 @@
-import type { ISchema } from '../../schemas/ISchema'
-import { Entity } from '../../engine/entity'
-import { ByteBuffer } from '../../serialization/ByteBuffer'
 import { ComponentDefinition, IEngine } from '../../engine'
+import { Entity } from '../../engine/entity'
+import type { ISchema } from '../../schemas/ISchema'
+import { ByteBuffer } from '../../serialization/ByteBuffer'
 
-export type TransformComponent = ComponentDefinition<
-  ISchema<TransformType>,
-  Partial<TransformType>
->
+/**
+ * @public
+ */
+export type TransformComponent = ComponentDefinition<ISchema<TransformType>>
+
+/**
+ * @public
+ */
+export interface TransformComponentExtended extends TransformComponent {
+  create(entity: Entity, val?: TransformTypeWithOptionals): TransformType
+  createOrReplace(
+    entity: Entity,
+    val?: TransformTypeWithOptionals
+  ): TransformType
+}
 
 /**
  * @internal
@@ -73,8 +84,30 @@ export const TransformSchema: ISchema<TransformType> = {
   }
 }
 
+/**
+ * @public
+ */
+export type TransformTypeWithOptionals = {
+  position?: { x: number; y: number; z: number }
+  rotation?: { x: number; y: number; z: number; w: number }
+  scale?: { x: number; y: number; z: number }
+  parent?: Entity
+}
+
 export function defineTransformComponent(
   engine: Pick<IEngine, 'defineComponentFromSchema'>
-): ComponentDefinition<ISchema<TransformType>, Partial<TransformType>> {
-  return engine.defineComponentFromSchema(TransformSchema, COMPONENT_ID)
+): ComponentDefinition<ISchema<TransformType>> {
+  const transformDef = engine.defineComponentFromSchema(
+    TransformSchema,
+    COMPONENT_ID
+  )
+  return {
+    ...transformDef,
+    create(entity: Entity, val?: TransformTypeWithOptionals) {
+      return transformDef.create(entity, val as TransformType)
+    },
+    createOrReplace(entity: Entity, val?: TransformTypeWithOptionals) {
+      return transformDef.createOrReplace(entity, val as TransformType)
+    }
+  }
 }

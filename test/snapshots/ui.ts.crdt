@@ -3,7 +3,7 @@ test/snapshots/ui.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 26.5k
+  OPCODES ~= 27.0k
 CALL onStart()
   OPCODES ~= 0.0k
 CALL onUpdate(0.0)

@@ -67,7 +67,7 @@ export namespace WireMessage {
   }
 
   export function getType(
-    component: ComponentDefinition<ISchema<unknown>, unknown>,
+    component: ComponentDefinition<ISchema<unknown>>,
     entity: Entity
   ): Enum {
     return component.has(entity) ? Enum.PUT_COMPONENT : Enum.DELETE_COMPONENT

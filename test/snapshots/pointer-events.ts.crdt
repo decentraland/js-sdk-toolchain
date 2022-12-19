@@ -3,7 +3,7 @@ test/snapshots/pointer-events.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 18.9k
+  OPCODES ~= 19.5k
 CALL onStart()
   OPCODES ~= 0.0k
 CALL onUpdate(0.0)

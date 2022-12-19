@@ -11,8 +11,7 @@ import { AvatarTexture, Texture, TextureUnion } from '../generated/types.gen'
  * @public
  */
 export type MaterialComponentDefinition = ComponentDefinition<
-  ISchema<PBMaterial>,
-  PBMaterial
+  ISchema<PBMaterial>
 >
 
 /**

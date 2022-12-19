@@ -1,4 +1,5 @@
 import { ComponentDefinition } from './component'
+import { ISchema } from './types'
 
 /**
  * @public
@@ -32,9 +33,12 @@ export type ReadonlyPrimitive =
  * @public
  */
 export type ReadonlyComponentSchema<
-  T extends [ComponentDefinition<any, any>, ...ComponentDefinition<any, any>[]]
+  T extends [
+    ComponentDefinition<ISchema<unknown>>,
+    ...ComponentDefinition<ISchema<unknown>>[]
+  ]
 > = {
-  [K in keyof T]: T[K] extends ComponentDefinition<any, any>
+  [K in keyof T]: T[K] extends ComponentDefinition<ISchema<unknown>>
     ? ReturnType<T[K]['get']>
     : never
 }

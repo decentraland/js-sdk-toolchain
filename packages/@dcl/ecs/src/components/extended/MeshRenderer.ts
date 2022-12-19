@@ -5,8 +5,7 @@ import { MeshRenderer, PBMeshRenderer } from '../generated/index.gen'
  * @public
  */
 export type MeshRendererComponentDefinition = ComponentDefinition<
-  ISchema<PBMeshRenderer>,
-  PBMeshRenderer
+  ISchema<PBMeshRenderer>
 >
 /**
  * @public
