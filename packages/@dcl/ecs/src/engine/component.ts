@@ -6,21 +6,20 @@ import { deepReadonly, DeepReadonly } from './readonly'
 /**
  * @public
  */
-export type EcsResult<T extends ISchema> = T extends ISchema
+export type SchemaResult<T extends ISchema> = T extends ISchema
   ? ReturnType<T['deserialize']>
   : never
 
 /**
  * @public
  */
-export type ComponentType<T extends ISchema> = EcsResult<T>
+export type ComponentType<T extends ISchema> = SchemaResult<T>
 
 /**
  * @public
  */
 export type ComponentDefinition<
-  T extends ISchema<ConstructorType>,
-  ConstructorType = any
+  T extends ISchema
 > = {
   _id: number
 
@@ -54,14 +53,14 @@ export type ComponentDefinition<
    * @param entity - Entity that will be used to create the component
    * @param val - The initial value
    */
-  create(entity: Entity, val?: ConstructorType): ComponentType<T>
+  create(entity: Entity, val?: ComponentType<T>): ComponentType<T>
   /**
    * Add the current component to an entity or replace the content if the entity already has the component
    * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
    * @param entity - Entity that will be used to create or replace the component
    * @param val - The initial or new value
    */
-  createOrReplace(entity: Entity, val?: ConstructorType): ComponentType<T>
+  createOrReplace(entity: Entity, val?: ComponentType<T>): ComponentType<T>
 
   /**
    * @internal
@@ -160,14 +159,13 @@ export type ComponentDefinition<
 }
 
 export function defineComponent<
-  T extends ISchema,
-  ConstructorType = ComponentType<T>
+  T extends ISchema
 >(
   componentId: number,
   spec: T,
-  constructorDefault?: ConstructorType
+  constructorDefault?: ComponentType<T>
   // meta: { syncFlags }
-): ComponentDefinition<T, ConstructorType> {
+): ComponentDefinition<T> {
   const data = new Map<Entity, ComponentType<T>>()
   const dirtyIterator = new Set<Entity>()
   const defaultBuffer = createByteBuffer()
@@ -190,7 +188,7 @@ export function defineComponent<
     }
   }
 
-  function prefillValue(value: ConstructorType) {
+  function prefillValue(value: ComponentType<T>) {
     return { ...getDefaultValue(), ...value }
   }
 
@@ -228,7 +226,7 @@ export function defineComponent<
       }
       return deepReadonly(component)
     },
-    create(entity: Entity, value?: ConstructorType): ComponentType<T> {
+    create(entity: Entity, value?: ComponentType<T>): ComponentType<T> {
       const component = data.get(entity)
       if (component) {
         throw new Error(
@@ -241,7 +239,7 @@ export function defineComponent<
       dirtyIterator.add(entity)
       return usedValue
     },
-    createOrReplace(entity: Entity, value?: ConstructorType): ComponentType<T> {
+    createOrReplace(entity: Entity, value?: ComponentType<T>): ComponentType<T> {
       const usedValue =
         value === undefined ? getDefaultValue() : prefillValue(value)
       data.set(entity, usedValue!)

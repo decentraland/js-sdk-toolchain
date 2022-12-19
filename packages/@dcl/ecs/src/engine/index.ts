@@ -1,13 +1,14 @@
 import * as components from '../components'
 import { Schemas } from '../schemas'
 import { ISchema } from '../schemas/ISchema'
-import { Result, Spec } from '../schemas/Map'
+import { MapResult, Spec } from '../schemas/Map'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { crdtSceneSystem } from '../systems/crdt'
 import {
   ComponentDefinition,
   ComponentType,
-  defineComponent as defComponent
+  defineComponent as defComponent,
+  SchemaResult
 } from './component'
 import { Entity, EntityContainer } from './entity'
 import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, SystemFn } from './systems'
@@ -24,7 +25,7 @@ function preEngine() {
   const entityContainer = EntityContainer()
   const componentsDefinition = new Map<
     number,
-    ComponentDefinition<ISchema<unknown>, unknown>
+    ComponentDefinition<ISchema<unknown>>
   >()
   const systems = SystemContainer()
 
@@ -60,9 +61,9 @@ function preEngine() {
   }
 
   function registerCustomComponent(
-    component: ComponentDefinition<any, any>,
+    component: ComponentDefinition<any>,
     componentId: number
-  ): ComponentDefinition<any, any> {
+  ): ComponentDefinition<any> {
     const prev = componentsDefinition.get(componentId)
     if (prev) {
       throw new Error(`Component number ${componentId} was already registered.`)
@@ -72,19 +73,18 @@ function preEngine() {
   }
 
   function defineComponentFromSchema<
-    T extends ISchema<ConstructorType>,
-    ConstructorType = ComponentType<T>
+    T extends ISchema
   >(
     spec: T,
     componentId: number,
-    constructorDefault?: ConstructorType
-  ): ComponentDefinition<T, ConstructorType> {
+    constructorDefault?: SchemaResult<T>
+  ): ComponentDefinition<T> {
     const prev = componentsDefinition.get(componentId)
     if (prev) {
       // TODO: assert spec === prev.spec
       return prev
     }
-    const newComponent = defComponent<T, ConstructorType>(
+    const newComponent = defComponent<T>(
       componentId,
       spec,
       constructorDefault
@@ -95,22 +95,22 @@ function preEngine() {
 
   function defineComponent<
     T extends Spec,
-    ConstructorType = Partial<Result<T>>
+    ConstructorType = Partial<MapResult<T>>
   >(
     spec: T,
     componentId: number,
     constructorDefault?: ConstructorType
-  ): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>> {
+  ): ComponentDefinition<ISchema<MapResult<T>>> {
     return defineComponentFromSchema(
       Schemas.Map(spec) as ISchema<ConstructorType>,
       componentId,
       constructorDefault
-    ) as ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>
+    ) as ComponentDefinition<ISchema<MapResult<T>>>
   }
 
-  function getComponent<T extends ISchema<V>, V>(
+  function getComponent<T extends ISchema>(
     componentId: number
-  ): ComponentDefinition<T, V> {
+  ): ComponentDefinition<T> {
     const component = componentsDefinition.get(componentId)
     if (!component) {
       throw new Error(
@@ -122,7 +122,7 @@ function preEngine() {
 
   function getComponentOrNull<T extends ISchema<V>, V>(
     componentId: number
-  ): ComponentDefinition<T, V> | null {
+  ): ComponentDefinition<T> | null {
     return (
       componentsDefinition.get(componentId) ??
       /* istanbul ignore next */
@@ -132,8 +132,8 @@ function preEngine() {
 
   function* getEntitiesWith<
     T extends [
-      ComponentDefinition<any, any>,
-      ...ComponentDefinition<any, any>[]
+      ComponentDefinition<any>,
+      ...ComponentDefinition<any>[]
     ]
   >(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]> {
     for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
@@ -144,7 +144,7 @@ function preEngine() {
     }
   }
 
-  function* getComponentDefGroup<T extends ComponentDefinition<any, any>[]>(
+  function* getComponentDefGroup<T extends ComponentDefinition<any>[]>(
     ...args: T
   ): Iterable<[Entity, ...T]> {
     const [firstComponentDef, ...componentDefinitions] = args
@@ -228,8 +228,7 @@ export function Engine(): IEngine {
       const ret: unknown | Promise<unknown> = system.fn(dt)
       checkNotThenable(
         ret,
-        `A system (${
-          system.name || 'anonymous'
+        `A system (${system.name || 'anonymous'
         }) returned a thenable. Systems cannot be async functions. Documentation: https://dcl.gg/sdk/sync-systems`
       )
     }
