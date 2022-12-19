@@ -23,8 +23,9 @@ describe('Generated AudioStream ProtoBuf', () => {
 
     expect(_audioStream).toBeDeepCloseTo({ ...AudioStream.getMutable(entityB) })
 
-    expect(AudioStream.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...AudioStream.getMutable(entity)
-    })
+    const initialValue = AudioStream.getMutable(entity)
+    const overrideDefaultValue = AudioStream.createOrReplace(entityB)
+
+    expect(initialValue).not.toBeDeepCloseTo(overrideDefaultValue as any)
   })
 })

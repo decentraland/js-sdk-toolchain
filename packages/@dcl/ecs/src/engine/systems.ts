@@ -5,9 +5,6 @@ export type SystemFn = (dt: number) => void
 
 export const SYSTEMS_REGULAR_PRIORITY = 100e3
 
-/**
- * @internal
- */
 export type SystemItem = {
   fn: SystemFn
   priority: number

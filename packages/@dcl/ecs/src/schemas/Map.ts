@@ -59,6 +59,13 @@ export function IMap<T extends Spec>(
         ;(newValue as any)[key] = spec[key].create()
       }
       return { ...newValue, ...defaultValue }
+    },
+    extend: (base?: MapResult<T>) => {
+      const newValue: MapResult<T> = {} as any
+      for (const key in spec) {
+        ;(newValue as any)[key] = spec[key].create()
+      }
+      return { ...newValue, ...defaultValue, ...base }
     }
   }
 }

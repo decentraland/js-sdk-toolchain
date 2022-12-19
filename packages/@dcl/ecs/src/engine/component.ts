@@ -200,13 +200,23 @@ export function defineComponent<T>(
           `[create] Component ${componentId} for ${entity} already exists`
         )
       }
-      const usedValue = value === undefined ? spec.create() : spec.create(value)
+      const usedValue =
+        value === undefined
+          ? spec.create()
+          : spec.extend
+          ? spec.extend(value)
+          : value
       data.set(entity, usedValue)
       dirtyIterator.add(entity)
       return usedValue
     },
     createOrReplace(entity: Entity, value?: T): T {
-      const usedValue = value === undefined ? spec.create() : spec.create(value)
+      const usedValue =
+        value === undefined
+          ? spec.create()
+          : spec.extend
+          ? spec.extend(value)
+          : value
       data.set(entity, usedValue!)
       dirtyIterator.add(entity)
       return usedValue!
