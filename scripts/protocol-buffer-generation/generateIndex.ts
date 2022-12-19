@@ -14,11 +14,11 @@ function enumTemplate({ componentPascalName, componentId }: Component) {
 }
 
 function importComponent(component: Component) {
-  return `import { ${component.componentPascalName}Schema } from './${component.componentPascalName}.gen'; export { ${component.componentPascalName}Schema }; import { PB${component.componentPascalName} } from './pb/decentraland/sdk/components/${component.componentFile}.gen'`
+  return `import { ${component.componentPascalName}Schema } from './${component.componentPascalName}.gen'; import { PB${component.componentPascalName} } from './pb/decentraland/sdk/components/${component.componentFile}.gen'`
 }
 
 function importComponentFromIndex(component: Component) {
-  return `import { ${component.componentPascalName}Schema } from './index.gen'; import { PB${component.componentPascalName} } from './pb/decentraland/sdk/components/${component.componentFile}.gen'`
+  return `import { PB${component.componentPascalName} } from './pb/decentraland/sdk/components/${component.componentFile}.gen'`
 }
 
 function exportComponent(component: Component) {
