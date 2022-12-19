@@ -1,5 +1,5 @@
 test/snapshots/cube.js
-  OPCODES ~= 6.2k
+  OPCODES ~= 0.0k
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long

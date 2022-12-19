@@ -1,5 +1,5 @@
 test/snapshots/simple.js
-  OPCODES ~= 3.0k
+  OPCODES ~= 0.0k
   OPCODES ~= 0.0k
 CALL onStart()
   OPCODES ~= 0.0k
