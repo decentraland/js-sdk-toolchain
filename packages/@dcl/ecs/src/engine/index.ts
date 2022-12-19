@@ -2,30 +2,50 @@ import * as components from '../components'
 import { checkNotThenable } from '../runtime/invariant'
 import { Schemas } from '../schemas'
 import { ISchema } from '../schemas/ISchema'
-import { MapResult, MapSchemaType, Spec } from '../schemas/Map'
+import { MapResult, Spec } from '../schemas/Map'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { crdtSceneSystem } from '../systems/crdt'
 import {
   ComponentDefinition,
-  ComponentType,
-  defineComponent as defComponent,
-  SchemaResult
+  defineComponent as defComponent
 } from './component'
 import { Entity, EntityContainer } from './entity'
 import { ReadonlyComponentSchema } from './readonly'
-import { SystemContainer, SystemFn, SYSTEMS_REGULAR_PRIORITY } from './systems'
+import {
+  SystemItem,
+  SystemContainer,
+  SystemFn,
+  SYSTEMS_REGULAR_PRIORITY
+} from './systems'
 import type { IEngine, MapComponentDefinition } from './types'
 export * from './input'
 export * from './readonly'
 export * from './types'
-export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
+export { Entity, ByteBuffer, ComponentDefinition, SystemItem }
 
-function preEngine() {
+type PreEngine = Pick<
+  IEngine,
+  | 'addEntity'
+  | 'removeEntity'
+  | 'removeEntityWithChildren'
+  | 'addSystem'
+  | 'removeSystem'
+  | 'defineComponent'
+  | 'defineComponentFromSchema'
+  | 'registerCustomComponent'
+  | 'getEntitiesWith'
+  | 'getComponent'
+  | 'getComponentOrNull'
+  | 'removeComponentDefinition'
+  | 'entityExists'
+  | 'componentsDefinition'
+> & {
+  getSystems: () => SystemItem[]
+}
+
+function preEngine(): PreEngine {
   const entityContainer = EntityContainer()
-  const componentsDefinition = new Map<
-    number,
-    ComponentDefinition<ISchema<unknown>>
-  >()
+  const componentsDefinition = new Map<number, ComponentDefinition<unknown>>()
   const systems = SystemContainer()
 
   function addSystem(
@@ -71,39 +91,30 @@ function preEngine() {
     return component
   }
 
-  function defineComponentFromSchema<T extends ISchema>(
-    spec: T,
-    componentId: number,
-    constructorDefault?: SchemaResult<T>
-  ): ComponentDefinition<T> {
+  function defineComponentFromSchema<T>(spec: ISchema<T>, componentId: number) {
     const prev = componentsDefinition.get(componentId)
     if (prev) {
       // TODO: assert spec === prev.spec
-      return prev
+      return prev as ComponentDefinition<T>
     }
-    const newComponent = defComponent<T>(componentId, spec, constructorDefault)
+    const newComponent = defComponent<T>(componentId, spec)
     componentsDefinition.set(componentId, newComponent)
-    return newComponent
+    return newComponent as ComponentDefinition<T>
   }
 
   function defineComponent<T extends Spec>(
     mapSpec: T,
     componentId: number,
     constructorDefault?: Partial<MapResult<T>>
-  ): MapComponentDefinition<MapSchemaType<T>> {
+  ) {
     const prev = componentsDefinition.get(componentId)
     if (prev) {
       // TODO: assert spec === prev.spec
-      return prev as MapComponentDefinition<MapSchemaType<T>>
+      return prev as MapComponentDefinition<MapResult<T>>
     }
 
-    const schemaSpec = Schemas.Map(mapSpec)
-    const defaultConstructor = { ...schemaSpec.create(), ...constructorDefault }
-    const def = defComponent<MapSchemaType<T>>(
-      componentId,
-      schemaSpec,
-      defaultConstructor
-    )
+    const schemaSpec = Schemas.Map(mapSpec, constructorDefault)
+    const def = defComponent<MapResult<T>>(componentId, schemaSpec)
     const newComponent = {
       ...def,
       create(entity: Entity, val?: Partial<MapResult<T>>) {
@@ -115,26 +126,24 @@ function preEngine() {
     }
 
     componentsDefinition.set(componentId, newComponent)
-    return newComponent
+    return newComponent as MapComponentDefinition<MapResult<T>>
   }
 
-  function getComponent<T extends ISchema>(
-    componentId: number
-  ): ComponentDefinition<T> {
+  function getComponent<T>(componentId: number): ComponentDefinition<T> {
     const component = componentsDefinition.get(componentId)
     if (!component) {
       throw new Error(
         `Component ${componentId} not found. You need to declare the components at the beginnig of the engine declaration`
       )
     }
-    return component
+    return component as ComponentDefinition<T>
   }
 
-  function getComponentOrNull<T extends ISchema<V>, V>(
+  function getComponentOrNull<T>(
     componentId: number
   ): ComponentDefinition<T> | null {
     return (
-      componentsDefinition.get(componentId) ??
+      (componentsDefinition.get(componentId) as ComponentDefinition<T>) ??
       /* istanbul ignore next */
       null
     )

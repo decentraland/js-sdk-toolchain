@@ -36,7 +36,10 @@ export type MapSchemaType<T extends Spec> = ISchema<MapResult<T>>
 /**
  * @public
  */
-export function IMap<T extends Spec>(spec: T): ISchema<MapResult<T>> {
+export function IMap<T extends Spec>(
+  spec: T,
+  defaultValue?: Partial<MapResult<T>>
+): ISchema<MapResult<T>> {
   return {
     serialize(value: MapResult<T>, builder: ByteBuffer): void {
       for (const key in spec) {
@@ -55,7 +58,7 @@ export function IMap<T extends Spec>(spec: T): ISchema<MapResult<T>> {
       for (const key in spec) {
         ;(newValue as any)[key] = spec[key].create()
       }
-      return newValue
+      return { ...newValue, ...defaultValue }
     }
   }
 }

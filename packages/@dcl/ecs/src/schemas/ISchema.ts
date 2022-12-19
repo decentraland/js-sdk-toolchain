@@ -6,5 +6,5 @@ import { ByteBuffer } from '../serialization/ByteBuffer'
 export type ISchema<T = any> = {
   serialize(value: T, builder: ByteBuffer): void
   deserialize(reader: ByteBuffer): T
-  create(): T
+  create(base?: T): T
 }

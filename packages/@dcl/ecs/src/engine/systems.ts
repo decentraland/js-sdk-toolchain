@@ -5,14 +5,17 @@ export type SystemFn = (dt: number) => void
 
 export const SYSTEMS_REGULAR_PRIORITY = 100e3
 
-type System = {
+/**
+ * @internal
+ */
+export type SystemItem = {
   fn: SystemFn
   priority: number
   name?: string
 }
 
 export function SystemContainer() {
-  const systems: System[] = []
+  const systems: SystemItem[] = []
 
   function sort() {
     // TODO: systems with the same priority should always have the same stable order

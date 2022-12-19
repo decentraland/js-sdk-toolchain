@@ -6,7 +6,7 @@ import { ByteBuffer } from '../../serialization/ByteBuffer'
 /**
  * @public
  */
-export type TransformComponent = ComponentDefinition<ISchema<TransformType>>
+export type TransformComponent = ComponentDefinition<TransformType>
 
 /**
  * @public
@@ -96,7 +96,7 @@ export type TransformTypeWithOptionals = {
 
 export function defineTransformComponent(
   engine: Pick<IEngine, 'defineComponentFromSchema'>
-): ComponentDefinition<ISchema<TransformType>> {
+): ComponentDefinition<TransformType> {
   const transformDef = engine.defineComponentFromSchema(
     TransformSchema,
     COMPONENT_ID

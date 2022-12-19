@@ -14,11 +14,11 @@ function enumTemplate({ componentPascalName, componentId }: Component) {
 }
 
 function importComponent(component: Component) {
-  return `import { ${component.componentPascalName}Schema } from './${component.componentPascalName}.gen'; export { ${component.componentPascalName}Schema };`
+  return `import { ${component.componentPascalName}Schema } from './${component.componentPascalName}.gen'; export { ${component.componentPascalName}Schema }; import { PB${component.componentPascalName} } from './pb/decentraland/sdk/components/${component.componentFile}.gen'`
 }
 
 function importComponentFromIndex(component: Component) {
-  return `import { ${component.componentPascalName}Schema } from './index.gen';`
+  return `import { ${component.componentPascalName}Schema } from './index.gen'; import { PB${component.componentPascalName} } from './pb/decentraland/sdk/components/${component.componentFile}.gen'`
 }
 
 function exportComponent(component: Component) {
@@ -26,7 +26,7 @@ function exportComponent(component: Component) {
 }
 
 function defineComponentDecl(component: Component) {
-  return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: ComponentGetter<ComponentDefinition<typeof ${component.componentPascalName}Schema>> = engine =>
+  return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: ComponentGetter<ComponentDefinition<PB${component.componentPascalName}>> = engine =>
     engine.defineComponentFromSchema(${component.componentPascalName}Schema, ${component.componentPascalName}Schema.COMPONENT_ID);
   `.trim()
 }
@@ -39,7 +39,7 @@ const skipExposeGlobally: string[] = [
 ]
 function defineGlobalComponentDecl(component: Component) {
   if (skipExposeGlobally.includes(component.componentPascalName)) return ''
-  return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: ComponentDefinition<typeof ${component.componentPascalName}Schema> = components.${component.componentPascalName}(engine)`.trim()
+  return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: ComponentDefinition<PB${component.componentPascalName}> = components.${component.componentPascalName}(engine)`.trim()
 }
 
 const indexTemplate = `import type { IEngine } from '../../engine/types'

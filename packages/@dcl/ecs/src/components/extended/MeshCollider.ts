@@ -1,16 +1,15 @@
-import { ComponentDefinition, Entity, IEngine, ISchema } from '../../engine'
+import { ComponentDefinition, Entity, IEngine } from '../../engine'
 import {
   ColliderLayer,
-  PBMeshCollider,
-  MeshCollider
+  MeshCollider,
+  PBMeshCollider
 } from '../generated/index.gen'
 
 /**
  * @public
  */
-export type MeshColliderComponentDefinition = ComponentDefinition<
-  ISchema<PBMeshCollider>
->
+export type MeshColliderComponentDefinition =
+  ComponentDefinition<PBMeshCollider>
 
 /**
  * @public

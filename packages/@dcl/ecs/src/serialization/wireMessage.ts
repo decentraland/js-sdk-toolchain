@@ -12,7 +12,7 @@
  *
  */
 
-import { ComponentDefinition, Entity, ISchema } from '../engine'
+import { ComponentDefinition, Entity } from '../engine'
 import { ByteBuffer } from './ByteBuffer'
 
 export namespace WireMessage {
@@ -67,7 +67,7 @@ export namespace WireMessage {
   }
 
   export function getType(
-    component: ComponentDefinition<ISchema<unknown>>,
+    component: ComponentDefinition<unknown>,
     entity: Entity
   ): Enum {
     return component.has(entity) ? Enum.PUT_COMPONENT : Enum.DELETE_COMPONENT

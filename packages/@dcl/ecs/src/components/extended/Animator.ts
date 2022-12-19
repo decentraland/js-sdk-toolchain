@@ -1,4 +1,4 @@
-import { ComponentDefinition, Entity, IEngine, ISchema } from '../../engine'
+import { ComponentDefinition, Entity, IEngine } from '../../engine'
 import { Animator } from '../generated/index.gen'
 import {
   PBAnimationState,
@@ -8,9 +8,7 @@ import {
 /**
  * @public
  */
-export type AnimatorComponentDefinition = ComponentDefinition<
-  ISchema<PBAnimator>
->
+export type AnimatorComponentDefinition = ComponentDefinition<PBAnimator>
 
 /**
  * @public
