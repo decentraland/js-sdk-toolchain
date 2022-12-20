@@ -29,7 +29,7 @@ describe('Ui Listeners React Ecs', () => {
     )
   })
 
-  it('should run onClick if it was fake-clicked', async () => {
+  it('should run onChange if it was a keyboard event', async () => {
     const UiInputResult = components.UiInputResult(engine as IIEngine)
     const uiEntity = ((engine.addEntity() as number) + 1) as Entity
     const onChange: jest.Mock | undefined = jest.fn()
@@ -58,20 +58,27 @@ describe('Ui Listeners React Ecs', () => {
     expect(onChange).toBeCalledTimes(0)
     UiInputResult.create(uiEntity, { value: 'BOEDO' })
     await engine.update(1)
-    await engine.update(1)
     expect(onChange).toBeCalledWith('BOEDO')
     onChange.mockClear()
     await engine.update(1)
     expect(onChange).toBeCalledTimes(0)
     UiInputResult.getMutable(uiEntity).value = 'CASLA'
     await engine.update(1)
-    await engine.update(1)
     expect(onChange).toBeCalledWith('CASLA')
     onChange.mockClear()
-    UiInputResult.getMutable(uiEntity).value = 'Casla - Boedo'
     conditional = false
     await engine.update(1)
+    UiInputResult.getMutable(uiEntity).value = 'Casla - Boedo'
     await engine.update(1)
     expect(onChange).toBeCalledTimes(0)
+    UiInputResult.getMutable(uiEntity).value = 'Casla - Boedo'
+    await engine.update(1)
+    expect(onChange).toBeCalledTimes(0)
+    conditional = true
+    await engine.update(1)
+    expect(onChange).toBeCalledTimes(0)
+    UiInputResult.getMutable(uiEntity).value = 'Casla - '
+    await engine.update(1)
+    expect(onChange).toBeCalledWith('Casla - ')
   })
 })

@@ -621,7 +621,6 @@ export type IEngine = {
     readonly PlayerEntity: Entity;
     readonly CameraEntity: Entity;
     addTransport(transport: Transport): void;
-    getLamportTimestampOrNull(entity: Entity, componentId: number): number | null;
 };
 
 // @public (undocumented)

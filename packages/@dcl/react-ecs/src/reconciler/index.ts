@@ -35,7 +35,10 @@ import {
   propsChanged
 } from './utils'
 
-type OnChangeState = { fn: (val?: string) => void; timestamp?: number }
+type OnChangeState<T = string | number> = {
+  fn: (val?: T) => void
+  value?: T
+}
 export function createReconciler(
   engine: Pick<
     IEngine,
@@ -44,7 +47,6 @@ export function createReconciler(
     | 'removeEntity'
     | 'defineComponentFromSchema'
     | 'getEntitiesWith'
-    | 'getLamportTimestampOrNull'
   >,
   pointerEvents: PointerEventsSystem
 ) {
@@ -198,7 +200,7 @@ export function createReconciler(
     const newValue = value
       ? {
           fn: value.fn,
-          timestamp: value.timestamp || oldState?.timestamp || 0
+          value: value.value || oldState?.value
         }
       : undefined
     event.set(componentId, newValue)
@@ -334,31 +336,23 @@ export function createReconciler(
 
   // Maybe this could be something similar to Input system, but since we
   // are going to use this only here, i prefer to scope it here.
-  function handleOnChange(componentId: number, resultComponentId: number) {
+  function handleOnChange(componentId: number) {
     return function (
       entity: unknown,
       componentResult: components.PBUiInputResult
     ) {
       const entityState = changeEvents.get(entity)?.get(componentId)
-      const crdtTimestamp = engine.getLamportTimestampOrNull(
-        entity,
-        resultComponentId
-      )
-      if (
-        entityState?.fn &&
-        crdtTimestamp &&
-        (!entityState.timestamp || crdtTimestamp > entityState.timestamp)
-      ) {
+      if (entityState?.fn && componentResult.value !== entityState.value) {
         // Call onChange callback and update internal timestamp
         entityState.fn(componentResult.value)
         updateOnChange(entity, componentId, {
           fn: entityState.fn,
-          timestamp: crdtTimestamp
+          value: componentResult.value
         })
       }
     }
   }
-  const uiInputOnChange = handleOnChange(UiInput._id, UiInputResult._id)
+  const uiInputOnChange = handleOnChange(UiInput._id)
 
   function onChangeSystem() {
     for (const [entity, Result] of engine.getEntitiesWith(UiInputResult)) {
@@ -368,7 +362,9 @@ export function createReconciler(
 
   return {
     update: function (component: JSX.Element) {
-      onChangeSystem()
+      if (changeEvents.size) {
+        onChangeSystem()
+      }
       return reconciler.updateContainer(component as any, root, null)
     },
     getEntities: () => Array.from(entities)

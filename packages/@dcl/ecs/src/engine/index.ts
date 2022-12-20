@@ -237,15 +237,6 @@ export function Engine(): IEngine {
   const engine = preEngine()
   const crdtSystem = crdtSceneSystem(engine)
 
-  function getLamportTimestampOrNull(entity: Entity, componentId: number) {
-    return (
-      crdtSystem
-        .getCrdt()
-        .get(entity as number)
-        ?.get(componentId)?.timestamp || null
-    )
-  }
-
   async function update(dt: number) {
     await crdtSystem.receiveMessages()
     for (const system of engine.getSystems()) {
@@ -285,7 +276,6 @@ export function Engine(): IEngine {
     entityExists: engine.entityExists,
     addTransport: crdtSystem.addTransport,
     getCrdtState: crdtSystem.getCrdt,
-    getLamportTimestampOrNull,
     componentsDefinition: engine.componentsDefinition
   }
 }
