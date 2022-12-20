@@ -1,31 +1,51 @@
 import * as components from '../components'
+import { checkNotThenable } from '../runtime/invariant'
 import { Schemas } from '../schemas'
 import { ISchema } from '../schemas/ISchema'
-import { Result, Spec } from '../schemas/Map'
+import { MapResult, Spec } from '../schemas/Map'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { crdtSceneSystem } from '../systems/crdt'
 import {
   ComponentDefinition,
-  ComponentType,
   defineComponent as defComponent
 } from './component'
 import { Entity, EntityContainer } from './entity'
-import { SystemContainer, SYSTEMS_REGULAR_PRIORITY, SystemFn } from './systems'
-import type { IEngine } from './types'
-export * from './input'
 import { ReadonlyComponentSchema } from './readonly'
-import { checkNotThenable } from '../runtime/invariant'
-
+import {
+  SystemItem,
+  SystemContainer,
+  SystemFn,
+  SYSTEMS_REGULAR_PRIORITY
+} from './systems'
+import type { IEngine, MapComponentDefinition } from './types'
+export * from './input'
 export * from './readonly'
 export * from './types'
-export { ComponentType, Entity, ByteBuffer, ComponentDefinition }
+export { Entity, ByteBuffer, ComponentDefinition, SystemItem }
 
-function preEngine() {
+type PreEngine = Pick<
+  IEngine,
+  | 'addEntity'
+  | 'removeEntity'
+  | 'removeEntityWithChildren'
+  | 'addSystem'
+  | 'removeSystem'
+  | 'defineComponent'
+  | 'defineComponentFromSchema'
+  | 'registerCustomComponent'
+  | 'getEntitiesWith'
+  | 'getComponent'
+  | 'getComponentOrNull'
+  | 'removeComponentDefinition'
+  | 'entityExists'
+  | 'componentsDefinition'
+> & {
+  getSystems: () => SystemItem[]
+}
+
+function preEngine(): PreEngine {
   const entityContainer = EntityContainer()
-  const componentsDefinition = new Map<
-    number,
-    ComponentDefinition<ISchema<unknown>, unknown>
-  >()
+  const componentsDefinition = new Map<number, ComponentDefinition<unknown>>()
   const systems = SystemContainer()
 
   function addSystem(
@@ -60,9 +80,9 @@ function preEngine() {
   }
 
   function registerCustomComponent(
-    component: ComponentDefinition<any, any>,
+    component: ComponentDefinition<any>,
     componentId: number
-  ): ComponentDefinition<any, any> {
+  ): ComponentDefinition<any> {
     const prev = componentsDefinition.get(componentId)
     if (prev) {
       throw new Error(`Component number ${componentId} was already registered.`)
@@ -71,70 +91,66 @@ function preEngine() {
     return component
   }
 
-  function defineComponentFromSchema<
-    T extends ISchema<ConstructorType>,
-    ConstructorType = ComponentType<T>
-  >(
-    spec: T,
-    componentId: number,
-    constructorDefault?: ConstructorType
-  ): ComponentDefinition<T, ConstructorType> {
+  function defineComponentFromSchema<T>(spec: ISchema<T>, componentId: number) {
     const prev = componentsDefinition.get(componentId)
     if (prev) {
       // TODO: assert spec === prev.spec
-      return prev
+      return prev as ComponentDefinition<T>
     }
-    const newComponent = defComponent<T, ConstructorType>(
-      componentId,
-      spec,
-      constructorDefault
-    )
+    const newComponent = defComponent<T>(componentId, spec)
     componentsDefinition.set(componentId, newComponent)
-    return newComponent
+    return newComponent as ComponentDefinition<T>
   }
 
-  function defineComponent<
-    T extends Spec,
-    ConstructorType = Partial<Result<T>>
-  >(
-    spec: T,
+  function defineComponent<T extends Spec>(
+    mapSpec: T,
     componentId: number,
-    constructorDefault?: ConstructorType
-  ): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>> {
-    return defineComponentFromSchema(
-      Schemas.Map(spec) as ISchema<ConstructorType>,
-      componentId,
-      constructorDefault
-    ) as ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>
+    constructorDefault?: Partial<MapResult<T>>
+  ) {
+    const prev = componentsDefinition.get(componentId)
+    if (prev) {
+      // TODO: assert spec === prev.spec
+      return prev as MapComponentDefinition<MapResult<T>>
+    }
+
+    const schemaSpec = Schemas.Map(mapSpec, constructorDefault)
+    const def = defComponent<MapResult<T>>(componentId, schemaSpec)
+    const newComponent = {
+      ...def,
+      create(entity: Entity, val?: Partial<MapResult<T>>) {
+        return def.create(entity, val as any)
+      },
+      createOrReplace(entity: Entity, val?: Partial<MapResult<T>>) {
+        return def.createOrReplace(entity, val as any)
+      }
+    }
+
+    componentsDefinition.set(componentId, newComponent)
+    return newComponent as MapComponentDefinition<MapResult<T>>
   }
 
-  function getComponent<T extends ISchema<V>, V>(
-    componentId: number
-  ): ComponentDefinition<T, V> {
+  function getComponent<T>(componentId: number): ComponentDefinition<T> {
     const component = componentsDefinition.get(componentId)
     if (!component) {
       throw new Error(
         `Component ${componentId} not found. You need to declare the components at the beginnig of the engine declaration`
       )
     }
-    return component
+    return component as ComponentDefinition<T>
   }
 
-  function getComponentOrNull<T extends ISchema<V>, V>(
+  function getComponentOrNull<T>(
     componentId: number
-  ): ComponentDefinition<T, V> | null {
+  ): ComponentDefinition<T> | null {
     return (
-      componentsDefinition.get(componentId) ??
+      (componentsDefinition.get(componentId) as ComponentDefinition<T>) ??
       /* istanbul ignore next */
       null
     )
   }
 
   function* getEntitiesWith<
-    T extends [
-      ComponentDefinition<any, any>,
-      ...ComponentDefinition<any, any>[]
-    ]
+    T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]
   >(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]> {
     for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
       yield [entity, ...groupComp.map((c) => c.get(entity))] as [
@@ -144,7 +160,7 @@ function preEngine() {
     }
   }
 
-  function* getComponentDefGroup<T extends ComponentDefinition<any, any>[]>(
+  function* getComponentDefGroup<T extends ComponentDefinition<any>[]>(
     ...args: T
   ): Iterable<[Entity, ...T]> {
     const [firstComponentDef, ...componentDefinitions] = args

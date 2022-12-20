@@ -1,4 +1,8 @@
-import { Engine, components } from '../../../packages/@dcl/ecs/src'
+import {
+  Engine,
+  components,
+  BackgroundTextureMode
+} from '../../../packages/@dcl/ecs/src'
 
 describe('Generated UiBackground ProtoBuf', () => {
   it('should serialize/deserialize UiBackground', () => {
@@ -8,11 +12,15 @@ describe('Generated UiBackground ProtoBuf', () => {
     const entityB = newEngine.addEntity()
 
     const _uiBackground = UiBackground.create(entity, {
-      backgroundColor: { r: 0, g: 0, b: 0, a: 0 }
+      color: { r: 0, g: 0, b: 0, a: 0 },
+      textureMode: BackgroundTextureMode.CENTER,
+      uvs: []
     })
 
     UiBackground.create(entityB, {
-      backgroundColor: { r: 0, g: 0, b: 1, a: 0 }
+      color: { r: 0, g: 0, b: 1, a: 0 },
+      textureMode: BackgroundTextureMode.CENTER,
+      uvs: []
     })
     const buffer = UiBackground.toBinary(entity)
     UiBackground.updateFromBinary(entityB, buffer)
@@ -20,5 +28,8 @@ describe('Generated UiBackground ProtoBuf', () => {
     expect(_uiBackground).toEqual({
       backgroundColor: { r: 0, g: 0, b: 0, a: 0 }
     })
+    expect(_uiBackground).not.toEqual(
+      UiBackground.create(newEngine.addEntity())
+    )
   })
 })

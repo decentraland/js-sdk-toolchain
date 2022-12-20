@@ -5,8 +5,7 @@ import {
   createPointerEventSystem,
   createInputSystem,
   TextAlignMode,
-  Font,
-  YGDisplay
+  Font
 } from '../../packages/@dcl/ecs'
 import { components, IEngine as IIEngine } from '../../packages/@dcl/ecs/src'
 import {

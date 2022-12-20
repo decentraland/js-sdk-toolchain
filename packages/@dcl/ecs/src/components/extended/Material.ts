@@ -1,4 +1,4 @@
-import { ComponentDefinition, Entity, IEngine, ISchema } from '../../engine'
+import { ComponentDefinition, Entity, IEngine } from '../../engine'
 import {
   Material,
   PBMaterial,
@@ -10,10 +10,7 @@ import { AvatarTexture, Texture, TextureUnion } from '../generated/types.gen'
 /**
  * @public
  */
-export type MaterialComponentDefinition = ComponentDefinition<
-  ISchema<PBMaterial>,
-  PBMaterial
->
+export type MaterialComponentDefinition = ComponentDefinition<PBMaterial>
 
 /**
  * @public

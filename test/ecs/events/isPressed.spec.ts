@@ -4,7 +4,8 @@ import {
   Engine,
   components,
   PointerEventType,
-  InputAction
+  InputAction,
+  PBPointerEventsResult_PointerCommand
 } from '../../../packages/@dcl/ecs/src'
 
 describe('Events helpers isTriggered', () => {
@@ -35,7 +36,6 @@ describe('Events helpers isTriggered', () => {
     const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
     const { isTriggered } = createInputSystem(newEngine)
-
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
         createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)
@@ -98,7 +98,7 @@ function createTestPointerDownCommand(
   entity: Entity,
   timestamp: number,
   state: PointerEventType
-) {
+): PBPointerEventsResult_PointerCommand {
   return {
     button: InputAction.IA_POINTER,
     timestamp: timestamp,
@@ -109,7 +109,7 @@ function createTestPointerDownCommand(
       normalHit: { x: 1, y: 2, z: 3 },
       origin: { x: 1, y: 2, z: 3 },
       meshName: 'mesh',
-      entityId: entity
+      entityId: entity as number
     },
     state: state,
     analog: 5

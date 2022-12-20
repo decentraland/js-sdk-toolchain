@@ -1,11 +1,11 @@
+import { State } from '@dcl/crdt'
 import type { ISchema } from '../schemas/ISchema'
-import { Result, Spec } from '../schemas/Map'
+import { MapResult, Spec } from '../schemas/Map'
 import { Transport } from '../systems/crdt/types'
 import { ComponentDefinition } from './component'
 import { Entity } from './entity'
-import { SystemFn } from './systems'
 import { ReadonlyComponentSchema } from './readonly'
-import { State } from '@dcl/crdt'
+import { SystemFn } from './systems'
 
 export { ISchema } from '../schemas/ISchema'
 
@@ -23,6 +23,23 @@ export type ComponentSchema<
   [K in keyof T]: T[K] extends ComponentDefinition<any>
     ? ReturnType<T[K]['getMutable']>
     : never
+}
+
+export interface MapComponentDefinition<T> extends ComponentDefinition<T> {
+  /**
+   * Add the current component to an entity, throw an error if the component already exists (use `createOrReplace` instead).
+   * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
+   * @param entity - Entity that will be used to create the component
+   * @param val - The initial value
+   */
+  create(entity: Entity, val?: Partial<T>): T
+  /**
+   * Add the current component to an entity or replace the content if the entity already has the component
+   * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
+   * @param entity - Entity that will be used to create or replace the component
+   * @param val - The initial or new value
+   */
+  createOrReplace(entity: Entity, val?: Partial<T>): T
 }
 
 /**
@@ -85,10 +102,10 @@ export type IEngine = {
    * @param component - The component definition
    * @param componentId - unique id to identify the component, if the component id already exist, it will fail.
    */
-  registerCustomComponent<T extends ISchema, V>(
-    component: ComponentDefinition<T, V>,
+  registerCustomComponent<T>(
+    component: ComponentDefinition<T>,
     componentId: number
-  ): ComponentDefinition<T, V>
+  ): ComponentDefinition<T>
   /**
    * Define a component and add it to the engine.
    * @param spec - An object with schema fields
@@ -105,11 +122,12 @@ export type IEngine = {
    *
    * ```
    */
-  defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(
+  defineComponent<T extends Spec>(
     spec: T,
     componentId: number,
-    constructorDefault?: ConstructorType
-  ): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>
+    constructorDefault?: Partial<MapResult<T>>
+  ): MapComponentDefinition<MapResult<T>>
+
   /**
    * Define a component and add it to the engine.
    * @param spec - An object with schema fields
@@ -121,14 +139,10 @@ export type IEngine = {
    * const StateComponent = engine.defineComponent(Schemas.Bool, VisibleComponentId)
    * ```
    */
-  defineComponentFromSchema<
-    T extends ISchema<ConstructorType>,
-    ConstructorType
-  >(
-    spec: T,
-    componentId: number,
-    constructorDefault?: ConstructorType
-  ): ComponentDefinition<T, ConstructorType>
+  defineComponentFromSchema<T>(
+    spec: ISchema<T>,
+    componentId: number
+  ): ComponentDefinition<T>
 
   /**
    * Get the component definition from the component id.
@@ -139,7 +153,7 @@ export type IEngine = {
    * const StateComponent = engine.getComponent(StateComponentId)
    * ```
    */
-  getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>
+  getComponent<T>(componentId: number): ComponentDefinition<T>
 
   /**
    * Get the component definition from the component id.
@@ -150,9 +164,7 @@ export type IEngine = {
    * const StateComponent = engine.getComponent(StateComponentId)
    * ```
    */
-  getComponentOrNull<T extends ISchema>(
-    componentId: number
-  ): ComponentDefinition<T> | null
+  getComponentOrNull<T>(componentId: number): ComponentDefinition<T> | null
 
   /**
    * Get a iterator of entities that has all the component requested.
@@ -221,8 +233,5 @@ export type IEngine = {
   /**
    * @internal
    */
-  componentsDefinition: Map<
-    number,
-    ComponentDefinition<ISchema<unknown>, unknown>
-  >
+  componentsDefinition: Map<number, ComponentDefinition<unknown>>
 }

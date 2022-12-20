@@ -1,5 +1,4 @@
 export type { SystemFn } from '../engine/systems'
-export type { Result, Spec } from '../schemas/Map'
 export type {
   TransportMessage,
   ReceiveMessage,
@@ -10,5 +9,8 @@ export {
   TransformType,
   TransformComponent
 } from '../components/legacy/Transform'
+export * from '../engine/component'
+export * from '../schemas/typing'
+export type { MapResult, Spec } from '../schemas/Map'
 export * from '../engine/component'
 export * from '../schemas/typing'

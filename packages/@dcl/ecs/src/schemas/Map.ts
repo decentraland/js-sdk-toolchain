@@ -12,39 +12,60 @@ export interface Spec {
 /**
  * @public
  */
-export type Result<T extends Spec> = ToOptional<{
+export type MapResult<T extends Spec> = ToOptional<{
   [K in keyof T]: T[K] extends ISchema
     ? ReturnType<T[K]['deserialize']>
     : T[K] extends Spec
-    ? Result<T[K]>
+    ? MapResult<T[K]>
     : never
 }>
-
-export type MapSchemaType<T extends Spec> = ISchema<Result<T>>
 
 /**
  * @public
  */
-export function IMap<T extends Spec>(spec: T): ISchema<Result<T>> {
+export type MapResultWithOptional<T extends Spec> = ToOptional<{
+  [K in keyof T]?: T[K] extends ISchema
+    ? ReturnType<T[K]['deserialize']>
+    : T[K] extends Spec
+    ? MapResult<T[K]>
+    : never
+}>
+
+export type MapSchemaType<T extends Spec> = ISchema<MapResult<T>>
+
+/**
+ * @public
+ */
+export function IMap<T extends Spec>(
+  spec: T,
+  defaultValue?: Partial<MapResult<T>>
+): ISchema<MapResult<T>> {
   return {
-    serialize(value: Result<T>, builder: ByteBuffer): void {
+    serialize(value: MapResult<T>, builder: ByteBuffer): void {
       for (const key in spec) {
         spec[key].serialize((value as any)[key], builder)
       }
     },
-    deserialize(reader: ByteBuffer): Result<T> {
-      const newValue: Result<T> = {} as any
+    deserialize(reader: ByteBuffer): MapResult<T> {
+      const newValue: MapResult<T> = {} as any
       for (const key in spec) {
         ;(newValue as any)[key] = spec[key].deserialize(reader)
       }
       return newValue
     },
     create() {
-      const newValue: Result<T> = {} as any
+      const newValue: MapResult<T> = {} as any
       for (const key in spec) {
         ;(newValue as any)[key] = spec[key].create()
       }
-      return newValue
+      return { ...newValue, ...defaultValue }
+    },
+    extend: (base?: MapResult<T>) => {
+      const newValue: MapResult<T> = {} as any
+      for (const key in spec) {
+        ;(newValue as any)[key] = spec[key].create()
+      }
+      return { ...newValue, ...defaultValue, ...base }
     }
   }
 }
