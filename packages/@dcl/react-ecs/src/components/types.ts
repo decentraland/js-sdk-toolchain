@@ -1,4 +1,5 @@
-import { PBUiBackground, PBUiText } from '@dcl/ecs'
+import { PBUiText } from '@dcl/ecs'
+import { UiBackgroundProps } from './uiBackground/types'
 import { UiInputProps } from './uiInput/types'
 import { UiTransformProps } from './uiTransform/types'
 
@@ -8,7 +9,7 @@ import { UiTransformProps } from './uiTransform/types'
 export type EntityPropTypes = {
   uiTransform?: UiTransformProps
   uiText?: PBUiText
-  uiBackground?: PBUiBackground
+  uiBackground?: UiBackgroundProps
   uiInput?: UiInputProps
 } // & Listeners
 // TODO: Add Listeners when onClick its handled Unity Side

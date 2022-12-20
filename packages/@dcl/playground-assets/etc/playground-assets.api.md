@@ -525,7 +525,7 @@ export function EntityContainer(): {
 export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
     uiText?: PBUiText;
-    uiBackground?: PBUiBackground;
+    uiBackground?: UiBackgroundProps;
     uiInput?: UiInputProps;
 };
 
@@ -2820,6 +2820,9 @@ export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
 // @public (undocumented)
 export const UiBackground: ComponentDefinition<PBUiBackground>;
+
+// @public (undocumented)
+export type UiBackgroundProps = Partial<PBUiBackground>;
 
 // Warning: (ae-missing-release-tag) "UiComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

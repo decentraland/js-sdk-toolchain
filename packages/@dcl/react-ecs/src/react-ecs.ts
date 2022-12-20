@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
-import { EventSystemCallback, PBUiInput } from '@dcl/ecs'
 import {
   PBUiBackground,
   PBUiText,
-  PBUiTransform
-} from '@dcl/ecs/dist/components'
+  PBUiTransform,
+  PBUiInput,
+  EventSystemCallback
+} from '@dcl/ecs'
 import React from 'react'
 import { CommonProps } from './components/types'
 

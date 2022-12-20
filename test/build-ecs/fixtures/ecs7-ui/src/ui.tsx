@@ -14,7 +14,7 @@ export const ui = () => (
       height: 500,
       padding: { top: 10, right: 10, bottom: 10, left: 10 }
     }}
-    uiBackground={{ backgroundColor: { r: 10, g: 10, b: 10, a: 0.2 } }}
+    uiBackground={{ color: { r: 10, g: 10, b: 10, a: 0.2 } }}
   >
     <UiEntity
       uiTransform={{
@@ -24,7 +24,7 @@ export const ui = () => (
         justifyContent: YGJustify.YGJ_CENTER,
         alignItems: YGAlign.YGA_CENTER
       }}
-      uiBackground={{ backgroundColor: { r: 255, g: 45, b: 85, a: 0.2 } }}
+      uiBackground={{ color: { r: 255, g: 45, b: 85, a: 0.2 } }}
     >
       <UiEntity
         uiTransform={{ width: 80, height: 20, flex: 1 }}
@@ -34,7 +34,7 @@ export const ui = () => (
           fontSize: 12,
           font: Font.F_SANS_SERIF
         }}
-        uiBackground={{ backgroundColor: { r: 255, g: 45, b: 85, a: 1 } }}
+        uiBackground={{ color: { r: 255, g: 45, b: 85, a: 1 } }}
       />
     </UiEntity>
   </UiEntity>

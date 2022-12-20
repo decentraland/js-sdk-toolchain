@@ -24,7 +24,7 @@ export const uiComponent = () => (
       height: 400,
       margin: { top: '35px', left: '500px' }
     }}
-    uiBackground={{ backgroundColor: Color4.create(0.5, 0.8, 0.1, 0.6) }}
+    uiBackground={{ color: Color4.create(0.5, 0.8, 0.1, 0.6) }}
   >
     <UiEntity
       uiTransform={{
@@ -37,7 +37,7 @@ export const uiComponent = () => (
     >
       <UiEntity
         uiText={{ value: 'SDK 7', fontSize: 80 }}
-        uiBackground={{ backgroundColor: Color4.fromHexString('#fbf0f0') }}
+        uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
       />
     </UiEntity>
     <UiEntity
@@ -51,7 +51,7 @@ export const uiComponent = () => (
     >
       <UiEntity
         uiText={{ value: `Counter: ${counter}`, fontSize: 60 }}
-        uiBackground={{ backgroundColor: Color4.fromHexString('#fbf0f0') }}
+        uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
       />
     </UiEntity>
     <UiEntity
@@ -65,7 +65,7 @@ export const uiComponent = () => (
     >
       <UiEntity
         uiText={{ value: `Player: ${getPlayerPosition()}`, fontSize: 40 }}
-        uiBackground={{ backgroundColor: Color4.fromHexString('#fbf0f0') }}
+        uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
       />
     </UiEntity>
   </UiEntity>
