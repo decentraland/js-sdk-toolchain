@@ -1,13 +1,11 @@
-import { ComponentDefinition, Entity, IEngine, ISchema } from '../../engine'
+import { ComponentDefinition, Entity, IEngine } from '../../engine'
 import { MeshRenderer, PBMeshRenderer } from '../generated/index.gen'
 
 /**
  * @public
  */
-export type MeshRendererComponentDefinition = ComponentDefinition<
-  ISchema<PBMeshRenderer>,
-  PBMeshRenderer
->
+export type MeshRendererComponentDefinition =
+  ComponentDefinition<PBMeshRenderer>
 /**
  * @public
  */

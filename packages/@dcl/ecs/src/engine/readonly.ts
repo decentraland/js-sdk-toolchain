@@ -32,9 +32,9 @@ export type ReadonlyPrimitive =
  * @public
  */
 export type ReadonlyComponentSchema<
-  T extends [ComponentDefinition<any, any>, ...ComponentDefinition<any, any>[]]
+  T extends [ComponentDefinition<unknown>, ...ComponentDefinition<unknown>[]]
 > = {
-  [K in keyof T]: T[K] extends ComponentDefinition<any, any>
+  [K in keyof T]: T[K] extends ComponentDefinition<unknown>
     ? ReturnType<T[K]['get']>
     : never
 }

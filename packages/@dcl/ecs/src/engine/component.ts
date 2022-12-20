@@ -6,28 +6,13 @@ import { deepReadonly, DeepReadonly } from './readonly'
 /**
  * @public
  */
-export type EcsResult<T extends ISchema> = T extends ISchema
-  ? ReturnType<T['deserialize']>
-  : never
-
-/**
- * @public
- */
-export type ComponentType<T extends ISchema> = EcsResult<T>
-
-/**
- * @public
- */
-export type ComponentDefinition<
-  T extends ISchema<ConstructorType>,
-  ConstructorType = any
-> = {
+export type ComponentDefinition<T> = {
   _id: number
 
   /**
    * Return the default value of the current component
    */
-  default(): DeepReadonly<ComponentType<T>>
+  default(): DeepReadonly<T>
 
   /**
    * Get if the entity has this component
@@ -40,13 +25,13 @@ export type ComponentDefinition<
    * @param entity - Entity that will be used to get the component
    * @returns
    */
-  get(entity: Entity): DeepReadonly<ComponentType<T>>
+  get(entity: Entity): DeepReadonly<T>
 
   /**
    * Get the readonly component of the entity (to mutate it, use getMutable instead), or null if the entity doesn't have the component.
    * @param entity - Entity that will be used to try to get the component
    */
-  getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null
+  getOrNull(entity: Entity): DeepReadonly<T> | null
 
   /**
    * Add the current component to an entity, throw an error if the component already exists (use `createOrReplace` instead).
@@ -54,14 +39,14 @@ export type ComponentDefinition<
    * @param entity - Entity that will be used to create the component
    * @param val - The initial value
    */
-  create(entity: Entity, val?: ConstructorType): ComponentType<T>
+  create(entity: Entity, val?: T): T
   /**
    * Add the current component to an entity or replace the content if the entity already has the component
    * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
    * @param entity - Entity that will be used to create or replace the component
    * @param val - The initial or new value
    */
-  createOrReplace(entity: Entity, val?: ConstructorType): ComponentType<T>
+  createOrReplace(entity: Entity, val?: T): T
 
   /**
    * @internal
@@ -70,34 +55,34 @@ export type ComponentDefinition<
    * @param entity - Entity to delete the component from
    * @param markAsDirty - defaults to true
    */
-  deleteFrom(entity: Entity, markAsDirty?: boolean): ComponentType<T> | null
+  deleteFrom(entity: Entity, markAsDirty?: boolean): T | null
   /**
    * @public
    * Delete the current component to an entity, return null if the entity doesn't have the current component.
    * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
    * @param entity - Entity to delete the component from
    */
-  deleteFrom(entity: Entity): ComponentType<T> | null
+  deleteFrom(entity: Entity): T | null
 
   /**
    * Get the mutable component of the entity, throw an error if the entity doesn't have the component.
    * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
    * @param entity - Entity to get the component from
    */
-  getMutable(entity: Entity): ComponentType<T>
+  getMutable(entity: Entity): T
 
   /**
    * Get the mutable component of the entity, return null if the entity doesn't have the component.
    * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
    * @param entity - Entity to get the component from
    */
-  getMutableOrNull(entity: Entity): ComponentType<T> | null
+  getMutableOrNull(entity: Entity): T | null
 
   /**
    * @internal
    * @param buffer - data to deserialize
    */
-  deserialize(buffer: ByteBuffer): ComponentType<T>
+  deserialize(buffer: ByteBuffer): T
   /**
    * @internal
    * @param entity - entity-component to update
@@ -108,7 +93,7 @@ export type ComponentDefinition<
     entity: Entity,
     data: ByteBuffer,
     markAsDirty?: boolean
-  ): ComponentType<T> | null
+  ): T | null
   /**
    * @internal
    * @param entity - entity-component to update
@@ -119,7 +104,7 @@ export type ComponentDefinition<
     entity: Entity,
     data: ByteBuffer,
     markAsDirty?: boolean
-  ): ComponentType<T> | null
+  ): T | null
 
   // allocates a buffer and returns new buffer
   /**
@@ -142,7 +127,7 @@ export type ComponentDefinition<
    * @internal Use engine.getEntitiesWith(Component) instead.
    * Get the iterator to every entity has the component
    */
-  iterator(): Iterable<[Entity, ComponentType<T>]>
+  iterator(): Iterable<[Entity, T]>
 
   // Dirty
   /**
@@ -159,45 +144,18 @@ export type ComponentDefinition<
   isDirty(entity: Entity): boolean
 }
 
-export function defineComponent<
-  T extends ISchema,
-  ConstructorType = ComponentType<T>
->(
+export function defineComponent<T>(
   componentId: number,
-  spec: T,
-  constructorDefault?: ConstructorType
+  spec: ISchema<T>
   // meta: { syncFlags }
-): ComponentDefinition<T, ConstructorType> {
-  const data = new Map<Entity, ComponentType<T>>()
+): ComponentDefinition<T> {
+  const data = new Map<Entity, T>()
   const dirtyIterator = new Set<Entity>()
-  const defaultBuffer = createByteBuffer()
-  if (constructorDefault) {
-    spec.serialize(constructorDefault, defaultBuffer)
-  }
-
-  function getDefaultValue() {
-    if (constructorDefault) {
-      return spec.deserialize(
-        createByteBuffer({
-          writing: {
-            buffer: defaultBuffer.buffer(),
-            currentOffset: defaultBuffer.currentWriteOffset()
-          }
-        })
-      )
-    } else {
-      return spec.create()
-    }
-  }
-
-  function prefillValue(value: ConstructorType) {
-    return { ...getDefaultValue(), ...value }
-  }
 
   return {
     _id: componentId,
     default() {
-      return getDefaultValue()
+      return spec.create() as DeepReadonly<T>
     },
     isDirty(entity: Entity): boolean {
       return dirtyIterator.has(entity)
@@ -205,7 +163,7 @@ export function defineComponent<
     has(entity: Entity): boolean {
       return data.has(entity)
     },
-    deleteFrom(entity: Entity, markAsDirty = true): ComponentType<T> | null {
+    deleteFrom(entity: Entity, markAsDirty = true): T | null {
       const component = data.get(entity)
       data.delete(entity)
       if (markAsDirty) {
@@ -215,11 +173,11 @@ export function defineComponent<
       }
       return component || null
     },
-    getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null {
+    getOrNull(entity: Entity): DeepReadonly<T> | null {
       const component = data.get(entity)
       return component ? deepReadonly(component) : null
     },
-    get(entity: Entity): DeepReadonly<ComponentType<T>> {
+    get(entity: Entity): DeepReadonly<T> {
       const component = data.get(entity)
       if (!component) {
         throw new Error(
@@ -228,7 +186,7 @@ export function defineComponent<
       }
       return deepReadonly(component)
     },
-    create(entity: Entity, value?: ConstructorType): ComponentType<T> {
+    create(entity: Entity, value?: T): T {
       const component = data.get(entity)
       if (component) {
         throw new Error(
@@ -236,19 +194,27 @@ export function defineComponent<
         )
       }
       const usedValue =
-        value === undefined ? getDefaultValue() : prefillValue(value)
+        value === undefined
+          ? spec.create()
+          : spec.extend
+          ? spec.extend(value)
+          : value
       data.set(entity, usedValue)
       dirtyIterator.add(entity)
       return usedValue
     },
-    createOrReplace(entity: Entity, value?: ConstructorType): ComponentType<T> {
+    createOrReplace(entity: Entity, value?: T): T {
       const usedValue =
-        value === undefined ? getDefaultValue() : prefillValue(value)
+        value === undefined
+          ? spec.create()
+          : spec.extend
+          ? spec.extend(value)
+          : value
       data.set(entity, usedValue!)
       dirtyIterator.add(entity)
       return usedValue!
     },
-    getMutableOrNull(entity: Entity): ComponentType<T> | null {
+    getMutableOrNull(entity: Entity): T | null {
       const component = data.get(entity)
       if (!component) {
         return null
@@ -256,7 +222,7 @@ export function defineComponent<
       dirtyIterator.add(entity)
       return component
     },
-    getMutable(entity: Entity): ComponentType<T> {
+    getMutable(entity: Entity): T {
       const component = this.getMutableOrNull(entity)
       if (component === null) {
         throw new Error(
@@ -265,7 +231,7 @@ export function defineComponent<
       }
       return component
     },
-    *iterator(): Iterable<[Entity, ComponentType<T>]> {
+    *iterator(): Iterable<[Entity, T]> {
       for (const [entity, component] of data) {
         yield [entity, component]
       }
@@ -311,7 +277,7 @@ export function defineComponent<
       entity: Entity,
       buffer: ByteBuffer,
       markAsDirty = true
-    ): ComponentType<T> | null {
+    ): T | null {
       const component = data.get(entity)
       if (!component) {
         throw new Error(
@@ -324,7 +290,7 @@ export function defineComponent<
       entity: Entity,
       buffer: ByteBuffer,
       markAsDirty = true
-    ): ComponentType<T> | null {
+    ): T | null {
       const newValue = spec.deserialize(buffer)
       data.set(entity, newValue)
       if (markAsDirty) {
@@ -334,7 +300,7 @@ export function defineComponent<
       }
       return newValue
     },
-    deserialize(buffer: ByteBuffer): ComponentType<T> {
+    deserialize(buffer: ByteBuffer): T {
       return spec.deserialize(buffer)
     },
     clearDirty() {

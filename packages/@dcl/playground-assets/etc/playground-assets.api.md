@@ -12,7 +12,7 @@ import _m0 from 'protobufjs/minimal';
 export const Animator: AnimatorComponentDefinitionExtended;
 
 // @public (undocumented)
-export type AnimatorComponentDefinition = ComponentDefinition<ISchema<PBAnimator>, PBAnimator>;
+export type AnimatorComponentDefinition = ComponentDefinition<PBAnimator>;
 
 // @public (undocumented)
 export interface AnimatorComponentDefinitionExtended extends AnimatorComponentDefinition {
@@ -22,32 +22,11 @@ export interface AnimatorComponentDefinitionExtended extends AnimatorComponentDe
     stopAllAnimations(entity: Entity, resetCursor?: boolean): boolean;
 }
 
-// Warning: (ae-missing-release-tag) "AnimatorSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
-export const AnimatorSchema: ISchema<PBAnimator> & {
-    COMPONENT_ID: number;
-};
+export const AudioSource: ComponentDefinition<PBAudioSource>;
 
 // @public (undocumented)
-export const AudioSource: ComponentDefinition<typeof AudioSourceSchema>;
-
-// Warning: (ae-missing-release-tag) "AudioSourceSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const AudioSourceSchema: ISchema<PBAudioSource> & {
-    COMPONENT_ID: number;
-};
-
-// @public (undocumented)
-export const AudioStream: ComponentDefinition<typeof AudioStreamSchema>;
-
-// Warning: (ae-missing-release-tag) "AudioStreamSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const AudioStreamSchema: ISchema<PBAudioStream> & {
-    COMPONENT_ID: number;
-};
+export const AudioStream: ComponentDefinition<PBAudioStream>;
 
 // Warning: (ae-missing-release-tag) "AvatarAnchorPointType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -64,24 +43,10 @@ export const enum AvatarAnchorPointType {
 }
 
 // @public (undocumented)
-export const AvatarAttach: ComponentDefinition<typeof AvatarAttachSchema>;
-
-// Warning: (ae-missing-release-tag) "AvatarAttachSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const AvatarAttachSchema: ISchema<PBAvatarAttach> & {
-    COMPONENT_ID: number;
-};
+export const AvatarAttach: ComponentDefinition<PBAvatarAttach>;
 
 // @public (undocumented)
-export const AvatarModifierArea: ComponentDefinition<typeof AvatarModifierAreaSchema>;
-
-// Warning: (ae-missing-release-tag) "AvatarModifierAreaSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const AvatarModifierAreaSchema: ISchema<PBAvatarModifierArea> & {
-    COMPONENT_ID: number;
-};
+export const AvatarModifierArea: ComponentDefinition<PBAvatarModifierArea>;
 
 // Warning: (ae-missing-release-tag) "AvatarModifierType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -94,14 +59,7 @@ export const enum AvatarModifierType {
 }
 
 // @public (undocumented)
-export const AvatarShape: ComponentDefinition<typeof AvatarShapeSchema>;
-
-// Warning: (ae-missing-release-tag) "AvatarShapeSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const AvatarShapeSchema: ISchema<PBAvatarShape> & {
-    COMPONENT_ID: number;
-};
+export const AvatarShape: ComponentDefinition<PBAvatarShape>;
 
 // Warning: (ae-missing-release-tag) "AvatarTexture" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 // Warning: (ae-missing-release-tag) "AvatarTexture" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -121,7 +79,7 @@ export const AvatarTexture: {
 };
 
 // @public (undocumented)
-export const Billboard: ComponentDefinition<typeof BillboardSchema>;
+export const Billboard: ComponentDefinition<PBBillboard>;
 
 // Warning: (ae-missing-release-tag) "BillboardMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -132,13 +90,6 @@ export const enum BillboardMode {
     // (undocumented)
     BM_Y_AXE = 1
 }
-
-// Warning: (ae-missing-release-tag) "BillboardSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const BillboardSchema: ISchema<PBBillboard> & {
-    COMPONENT_ID: number;
-};
 
 // @public (undocumented)
 export type ByteBuffer = {
@@ -198,24 +149,10 @@ export type ByteBuffer = {
 };
 
 // @public (undocumented)
-export const CameraMode: ComponentDefinition<typeof CameraModeSchema>;
+export const CameraMode: ComponentDefinition<PBCameraMode>;
 
 // @public (undocumented)
-export const CameraModeArea: ComponentDefinition<typeof CameraModeAreaSchema>;
-
-// Warning: (ae-missing-release-tag) "CameraModeAreaSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const CameraModeAreaSchema: ISchema<PBCameraModeArea> & {
-    COMPONENT_ID: number;
-};
-
-// Warning: (ae-missing-release-tag) "CameraModeSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const CameraModeSchema: ISchema<PBCameraMode> & {
-    COMPONENT_ID: number;
-};
+export const CameraModeArea: ComponentDefinition<PBCameraModeArea>;
 
 // Warning: (ae-missing-release-tag) "CameraType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -407,17 +344,17 @@ export type CommonProps = {
 };
 
 // @public (undocumented)
-export type ComponentDefinition<T extends ISchema<ConstructorType>, ConstructorType = any> = {
+export type ComponentDefinition<T> = {
     _id: number;
-    default(): DeepReadonly<ComponentType<T>>;
+    default(): DeepReadonly<T>;
     has(entity: Entity): boolean;
-    get(entity: Entity): DeepReadonly<ComponentType<T>>;
-    getOrNull(entity: Entity): DeepReadonly<ComponentType<T>> | null;
-    create(entity: Entity, val?: ConstructorType): ComponentType<T>;
-    createOrReplace(entity: Entity, val?: ConstructorType): ComponentType<T>;
-    deleteFrom(entity: Entity): ComponentType<T> | null;
-    getMutable(entity: Entity): ComponentType<T>;
-    getMutableOrNull(entity: Entity): ComponentType<T> | null;
+    get(entity: Entity): DeepReadonly<T>;
+    getOrNull(entity: Entity): DeepReadonly<T> | null;
+    create(entity: Entity, val?: T): T;
+    createOrReplace(entity: Entity, val?: T): T;
+    deleteFrom(entity: Entity): T | null;
+    getMutable(entity: Entity): T;
+    getMutableOrNull(entity: Entity): T | null;
     writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void;
 };
 
@@ -430,9 +367,6 @@ export type ComponentGetter<T extends ComponentDefinition<any>> = (engine: Pick<
 export type ComponentSchema<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]> = {
     [K in keyof T]: T[K] extends ComponentDefinition<any> ? ReturnType<T[K]['getMutable']> : never;
 };
-
-// @public (undocumented)
-export type ComponentType<T extends ISchema> = EcsResult<T>;
 
 // Warning: (ae-missing-release-tag) "Container" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -505,7 +439,7 @@ export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 // Warning: (ae-missing-release-tag) "defineComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export function defineComponent<T extends ISchema, ConstructorType = ComponentType<T>>(componentId: number, spec: T, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
+export function defineComponent<T>(componentId: number, spec: ISchema<T>): ComponentDefinition<T>;
 
 // @public
 export const DEG2RAD: number;
@@ -516,9 +450,6 @@ export const DEG2RAD: number;
 export type EcsElements = {
     entity: Partial<Omit<EntityComponents, 'onClick'> & CommonProps>;
 };
-
-// @public (undocumented)
-export type EcsResult<T extends ISchema> = T extends ISchema ? ReturnType<T['deserialize']> : never;
 
 // @public (undocumented)
 export function Engine(): IEngine;
@@ -634,14 +565,7 @@ export type GlobalInputEventResult = InputEventResult & {
 };
 
 // @public (undocumented)
-export const GltfContainer: ComponentDefinition<typeof GltfContainerSchema>;
-
-// Warning: (ae-missing-release-tag) "GltfContainerSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const GltfContainerSchema: ISchema<PBGltfContainer> & {
-    COMPONENT_ID: number;
-};
+export const GltfContainer: ComponentDefinition<PBGltfContainer>;
 
 // @public (undocumented)
 export function IArray<T>(type: ISchema<T>): ISchema<Array<T>>;
@@ -654,11 +578,11 @@ export type IEngine = {
     entityExists(entity: Entity): boolean;
     addSystem(system: SystemFn, priority?: number, name?: string): void;
     removeSystem(selector: string | SystemFn): boolean;
-    registerCustomComponent<T extends ISchema, V>(component: ComponentDefinition<T, V>, componentId: number): ComponentDefinition<T, V>;
-    defineComponent<T extends Spec, ConstructorType = Partial<Result<T>>>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<ISchema<Result<T>>, Partial<Result<T>>>;
-    defineComponentFromSchema<T extends ISchema<ConstructorType>, ConstructorType>(spec: T, componentId: number, constructorDefault?: ConstructorType): ComponentDefinition<T, ConstructorType>;
-    getComponent<T extends ISchema>(componentId: number): ComponentDefinition<T>;
-    getComponentOrNull<T extends ISchema>(componentId: number): ComponentDefinition<T> | null;
+    registerCustomComponent<T>(component: ComponentDefinition<T>, componentId: number): ComponentDefinition<T>;
+    defineComponent<T extends Spec>(spec: T, componentId: number, constructorDefault?: Partial<MapResult<T>>): MapComponentDefinition<MapResult<T>>;
+    defineComponentFromSchema<T>(spec: ISchema<T>, componentId: number): ComponentDefinition<T>;
+    getComponent<T>(componentId: number): ComponentDefinition<T>;
+    getComponentOrNull<T>(componentId: number): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     update(deltaTime: number): Promise<void>;
     readonly RootEntity: Entity;
@@ -861,7 +785,7 @@ export type IInputSystem = {
 };
 
 // @public (undocumented)
-export function IMap<T extends Spec>(spec: T): ISchema<Result<T>>;
+export function IMap<T extends Spec>(spec: T, defaultValue?: Partial<MapResult<T>>): ISchema<MapResult<T>>;
 
 // Warning: (ae-missing-release-tag) "IncludeUndefined" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -934,6 +858,7 @@ export type ISchema<T = any> = {
     serialize(value: T, builder: ByteBuffer): void;
     deserialize(reader: ByteBuffer): T;
     create(): T;
+    extend?: (base?: T) => T;
 };
 
 // Warning: (ae-missing-release-tag) "isListener" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -967,13 +892,26 @@ export type Listeners = {
     onClick?: EventSystemCallback;
 };
 
+// Warning: (ae-missing-release-tag) "MapComponentDefinition" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface MapComponentDefinition<T> extends ComponentDefinition<T> {
+    create(entity: Entity, val?: Partial<T>): T;
+    createOrReplace(entity: Entity, val?: Partial<T>): T;
+}
+
+// @public (undocumented)
+export type MapResult<T extends Spec> = ToOptional<{
+    [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? MapResult<T[K]> : never;
+}>;
+
 // Warning: (ae-missing-release-tag) "Material" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export const Material: MaterialComponentDefinitionExtended;
 
 // @public (undocumented)
-export type MaterialComponentDefinition = ComponentDefinition<ISchema<PBMaterial>, PBMaterial>;
+export type MaterialComponentDefinition = ComponentDefinition<PBMaterial>;
 
 // @public (undocumented)
 export interface MaterialComponentDefinitionExtended extends MaterialComponentDefinition {
@@ -981,13 +919,6 @@ export interface MaterialComponentDefinitionExtended extends MaterialComponentDe
     setPbrMaterial: (entity: Entity, material: PBMaterial_PbrMaterial) => void;
     Texture: TextureHelper;
 }
-
-// Warning: (ae-missing-release-tag) "MaterialSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const MaterialSchema: ISchema<PBMaterial> & {
-    COMPONENT_ID: number;
-};
 
 // Warning: (ae-missing-release-tag) "MaterialTransparencyMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -1148,7 +1079,7 @@ export namespace Matrix {
 export const MeshCollider: MeshColliderComponentDefinitionExtended;
 
 // @public (undocumented)
-export type MeshColliderComponentDefinition = ComponentDefinition<ISchema<PBMeshCollider>, PBMeshCollider>;
+export type MeshColliderComponentDefinition = ComponentDefinition<PBMeshCollider>;
 
 // @public (undocumented)
 export interface MeshColliderComponentDefinitionExtended extends MeshColliderComponentDefinition {
@@ -1158,20 +1089,13 @@ export interface MeshColliderComponentDefinitionExtended extends MeshColliderCom
     setSphere(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
 }
 
-// Warning: (ae-missing-release-tag) "MeshColliderSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const MeshColliderSchema: ISchema<PBMeshCollider> & {
-    COMPONENT_ID: number;
-};
-
 // Warning: (ae-missing-release-tag) "MeshRenderer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export const MeshRenderer: MeshRendererComponentDefinitionExtended;
 
 // @public (undocumented)
-export type MeshRendererComponentDefinition = ComponentDefinition<ISchema<PBMeshRenderer>, PBMeshRenderer>;
+export type MeshRendererComponentDefinition = ComponentDefinition<PBMeshRenderer>;
 
 // @public (undocumented)
 export interface MeshRendererComponentDefinitionExtended extends MeshRendererComponentDefinition {
@@ -1180,13 +1104,6 @@ export interface MeshRendererComponentDefinitionExtended extends MeshRendererCom
     setPlane(entity: Entity, uvs?: number[]): void;
     setSphere(entity: Entity): void;
 }
-
-// Warning: (ae-missing-release-tag) "MeshRendererSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const MeshRendererSchema: ISchema<PBMeshRenderer> & {
-    COMPONENT_ID: number;
-};
 
 // Warning: (ae-missing-release-tag) "MessageBus" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -1252,14 +1169,7 @@ export const enum NftFrameType {
 }
 
 // @public (undocumented)
-export const NftShape: ComponentDefinition<typeof NftShapeSchema>;
-
-// Warning: (ae-missing-release-tag) "NftShapeSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const NftShapeSchema: ISchema<PBNftShape> & {
-    COMPONENT_ID: number;
-};
+export const NftShape: ComponentDefinition<PBNftShape>;
 
 // Warning: (ae-missing-release-tag) "Observable" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2350,14 +2260,7 @@ export namespace Plane {
 }
 
 // @public (undocumented)
-export const PointerEventsResult: ComponentDefinition<typeof PointerEventsResultSchema>;
-
-// Warning: (ae-missing-release-tag) "PointerEventsResultSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const PointerEventsResultSchema: ISchema<PBPointerEventsResult> & {
-    COMPONENT_ID: number;
-};
+export const PointerEventsResult: ComponentDefinition<PBPointerEventsResult>;
 
 // Warning: (ae-missing-release-tag) "PointerEventsSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2391,24 +2294,10 @@ export const enum PointerEventType {
 }
 
 // @public (undocumented)
-export const PointerHoverFeedback: ComponentDefinition<typeof PointerHoverFeedbackSchema>;
-
-// Warning: (ae-missing-release-tag) "PointerHoverFeedbackSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const PointerHoverFeedbackSchema: ISchema<PBPointerHoverFeedback> & {
-    COMPONENT_ID: number;
-};
+export const PointerHoverFeedback: ComponentDefinition<PBPointerHoverFeedback>;
 
 // @public (undocumented)
-export const PointerLock: ComponentDefinition<typeof PointerLockSchema>;
-
-// Warning: (ae-missing-release-tag) "PointerLockSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const PointerLockSchema: ISchema<PBPointerLock> & {
-    COMPONENT_ID: number;
-};
+export const PointerLock: ComponentDefinition<PBPointerLock>;
 
 // @public (undocumented)
 export type Position = {
@@ -2486,7 +2375,7 @@ export type QuaternionType = {
 export const RAD2DEG: number;
 
 // @public (undocumented)
-export const Raycast: ComponentDefinition<typeof RaycastSchema>;
+export const Raycast: ComponentDefinition<PBRaycast>;
 
 // Warning: (ae-missing-release-tag) "RaycastHit" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 // Warning: (ae-missing-release-tag) "RaycastHit" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2535,21 +2424,7 @@ export type RaycastResponsePayload<T> = {
 };
 
 // @public (undocumented)
-export const RaycastResult: ComponentDefinition<typeof RaycastResultSchema>;
-
-// Warning: (ae-missing-release-tag) "RaycastResultSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const RaycastResultSchema: ISchema<PBRaycastResult> & {
-    COMPONENT_ID: number;
-};
-
-// Warning: (ae-missing-release-tag) "RaycastSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const RaycastSchema: ISchema<PBRaycast> & {
-    COMPONENT_ID: number;
-};
+export const RaycastResult: ComponentDefinition<PBRaycastResult>;
 
 // Warning: (ae-missing-release-tag) "ReactBasedUiSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2584,8 +2459,8 @@ export namespace ReactEcs {
 export const ReactEcsRenderer: ReactBasedUiSystem;
 
 // @public (undocumented)
-export type ReadonlyComponentSchema<T extends [ComponentDefinition<any, any>, ...ComponentDefinition<any, any>[]]> = {
-    [K in keyof T]: T[K] extends ComponentDefinition<any, any> ? ReturnType<T[K]['get']> : never;
+export type ReadonlyComponentSchema<T extends [ComponentDefinition<unknown>, ...ComponentDefinition<unknown>[]]> = {
+    [K in keyof T]: T[K] extends ComponentDefinition<unknown> ? ReturnType<T[K]['get']> : never;
 };
 
 // @public (undocumented)
@@ -2603,11 +2478,6 @@ export type ReceiveMessage = {
     data?: Uint8Array;
     messageBuffer: Uint8Array;
 };
-
-// @public (undocumented)
-export type Result<T extends Spec> = ToOptional<{
-    [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? Result<T[K]> : never;
-}>;
 
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2696,6 +2566,15 @@ export interface Spec {
 // @public (undocumented)
 export type SystemFn = (dt: number) => void;
 
+// Warning: (ae-missing-release-tag) "SystemItem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type SystemItem = {
+    fn: SystemFn;
+    priority: number;
+    name?: string;
+};
+
 // Warning: (ae-missing-release-tag) "Task" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -2726,14 +2605,7 @@ export const enum TextAlignMode {
 }
 
 // @public (undocumented)
-export const TextShape: ComponentDefinition<typeof TextShapeSchema>;
-
-// Warning: (ae-missing-release-tag) "TextShapeSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const TextShapeSchema: ISchema<PBTextShape> & {
-    COMPONENT_ID: number;
-};
+export const TextShape: ComponentDefinition<PBTextShape>;
 
 // Warning: (ae-missing-release-tag) "Texture" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 // Warning: (ae-missing-release-tag) "Texture" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2819,12 +2691,18 @@ export type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedType
 // Warning: (ae-missing-release-tag) "Transform" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export const Transform: TransformComponent;
+export const Transform: TransformComponentExtended;
 
-// Warning: (ae-missing-release-tag) "TransformComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
-export type TransformComponent = ComponentDefinition<ISchema<TransformType>, Partial<TransformType>>;
+export type TransformComponent = ComponentDefinition<TransformType>;
+
+// @public (undocumented)
+export interface TransformComponentExtended extends TransformComponent {
+    // (undocumented)
+    create(entity: Entity, val?: TransformTypeWithOptionals): TransformType;
+    // (undocumented)
+    createOrReplace(entity: Entity, val?: TransformTypeWithOptionals): TransformType;
+}
 
 // @public (undocumented)
 export type TransformType = {
@@ -2847,6 +2725,9 @@ export type TransformType = {
     parent?: Entity;
 };
 
+// @public (undocumented)
+export type TransformTypeWithOptionals = Partial<TransformType>;
+
 // Warning: (ae-missing-release-tag) "Transport" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -2862,14 +2743,7 @@ export type Transport = {
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
 // @public (undocumented)
-export const UiBackground: ComponentDefinition<typeof UiBackgroundSchema>;
-
-// Warning: (ae-missing-release-tag) "UiBackgroundSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const UiBackgroundSchema: ISchema<PBUiBackground> & {
-    COMPONENT_ID: number;
-};
+export const UiBackground: ComponentDefinition<PBUiBackground>;
 
 // Warning: (ae-missing-release-tag) "UiComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2880,17 +2754,10 @@ export type UiComponent = () => JSX.Element;
 export function UiEntity(props: EntityPropTypes & Partial<CommonProps>): ReactEcs.JSX.Element;
 
 // @public (undocumented)
-export const UiText: ComponentDefinition<typeof UiTextSchema>;
-
-// Warning: (ae-missing-release-tag) "UiTextSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const UiTextSchema: ISchema<PBUiText> & {
-    COMPONENT_ID: number;
-};
+export const UiText: ComponentDefinition<PBUiText>;
 
 // @public (undocumented)
-export const UiTransform: ComponentDefinition<typeof UiTransformSchema>;
+export const UiTransform: ComponentDefinition<PBUiTransform>;
 
 // @public (undocumented)
 export interface UiTransformProps {
@@ -2939,13 +2806,6 @@ export interface UiTransformProps {
     // (undocumented)
     width?: PositionUnit;
 }
-
-// Warning: (ae-missing-release-tag) "UiTransformSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const UiTransformSchema: ISchema<PBUiTransform> & {
-    COMPONENT_ID: number;
-};
 
 // @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;
@@ -3054,14 +2914,7 @@ export type Vector3Type = {
 };
 
 // @public (undocumented)
-export const VisibilityComponent: ComponentDefinition<typeof VisibilityComponentSchema>;
-
-// Warning: (ae-missing-release-tag) "VisibilityComponentSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const VisibilityComponentSchema: ISchema<PBVisibilityComponent> & {
-    COMPONENT_ID: number;
-};
+export const VisibilityComponent: ComponentDefinition<PBVisibilityComponent>;
 
 // Warning: (ae-missing-release-tag) "WireMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -3079,7 +2932,7 @@ export namespace WireMessage {
         RESERVED = 0
     }
     // (undocumented)
-    export function getType(component: ComponentDefinition<ISchema<unknown>, unknown>, entity: Entity): Enum;
+    export function getType(component: ComponentDefinition<unknown>, entity: Entity): Enum;
     // (undocumented)
     export type Header = {
         length: Uint32;

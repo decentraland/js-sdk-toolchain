@@ -15,3 +15,7 @@ export type {
   MaterialComponentDefinition,
   MaterialComponentDefinitionExtended
 } from './extended/Material'
+export type {
+  TransformComponentExtended,
+  TransformTypeWithOptionals
+} from './legacy/Transform'

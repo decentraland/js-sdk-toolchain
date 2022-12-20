@@ -1,9 +1,9 @@
 import {
   Entity,
-  IEngine,
   EventSystemCallback,
-  PointerEventsSystem,
-  InputAction
+  IEngine,
+  InputAction,
+  PointerEventsSystem
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
@@ -12,21 +12,21 @@ import { CANVAS_ROOT_ENTITY } from '../components/uiTransform'
 import { EntityComponents, JSX } from '../react-ecs'
 import {
   Changes,
-  Type,
-  Props,
   Container,
-  Instance,
-  TextInstance,
-  SuspenseInstance,
-  HydratableInstance,
-  PublicInstance,
+  EngineComponents,
   HostContext,
-  UpdatePayload,
-  _ChildSet,
-  TimeoutHandle,
+  HydratableInstance,
+  Instance,
   NoTimeout,
   OpaqueHandle,
-  EngineComponents
+  Props,
+  PublicInstance,
+  SuspenseInstance,
+  TextInstance,
+  TimeoutHandle,
+  Type,
+  UpdatePayload,
+  _ChildSet
 } from './types'
 import { componentKeys, isEqual, isNotUndefined, noopConfig } from './utils'
 
@@ -144,7 +144,7 @@ export function createReconciler(
 
     for (const key in props) {
       const keyProp = key as keyof EngineComponents[K]
-      component[keyProp] = props[keyProp]
+      ;(component as any)[keyProp] = props[keyProp]
     }
   }
 

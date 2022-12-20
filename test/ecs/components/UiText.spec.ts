@@ -23,5 +23,6 @@ describe('Generated UiText ProtoBuf', () => {
       value: 'casla-boedo',
       color: { r: 0, g: 0, b: 0, a: 0 }
     })
+    expect(_uiText).not.toEqual(UiText.create(newEngine.addEntity()))
   })
 })

@@ -1,12 +1,23 @@
-import type { ISchema } from '../../schemas/ISchema'
-import { Entity } from '../../engine/entity'
-import { ByteBuffer } from '../../serialization/ByteBuffer'
 import { ComponentDefinition, IEngine } from '../../engine'
+import { Entity } from '../../engine/entity'
+import type { ISchema } from '../../schemas/ISchema'
+import { ByteBuffer } from '../../serialization/ByteBuffer'
 
-export type TransformComponent = ComponentDefinition<
-  ISchema<TransformType>,
-  Partial<TransformType>
->
+/**
+ * @public
+ */
+export type TransformComponent = ComponentDefinition<TransformType>
+
+/**
+ * @public
+ */
+export interface TransformComponentExtended extends TransformComponent {
+  create(entity: Entity, val?: TransformTypeWithOptionals): TransformType
+  createOrReplace(
+    entity: Entity,
+    val?: TransformTypeWithOptionals
+  ): TransformType
+}
 
 /**
  * @internal
@@ -70,11 +81,36 @@ export const TransformSchema: ISchema<TransformType> = {
       scale: { x: 1, y: 1, z: 1 },
       rotation: { x: 0, y: 0, z: 0, w: 1 }
     }
+  },
+  extend(value?: TransformType) {
+    return {
+      position: { x: 0, y: 0, z: 0 },
+      scale: { x: 1, y: 1, z: 1 },
+      rotation: { x: 0, y: 0, z: 0, w: 1 },
+      ...value
+    }
   }
 }
 
+/**
+ * @public
+ */
+export type TransformTypeWithOptionals = Partial<TransformType>
+
 export function defineTransformComponent(
   engine: Pick<IEngine, 'defineComponentFromSchema'>
-): ComponentDefinition<ISchema<TransformType>, Partial<TransformType>> {
-  return engine.defineComponentFromSchema(TransformSchema, COMPONENT_ID)
+): TransformComponentExtended {
+  const transformDef = engine.defineComponentFromSchema(
+    TransformSchema,
+    COMPONENT_ID
+  )
+  return {
+    ...transformDef,
+    create(entity: Entity, val?: TransformTypeWithOptionals) {
+      return transformDef.create(entity, val as TransformType)
+    },
+    createOrReplace(entity: Entity, val?: TransformTypeWithOptionals) {
+      return transformDef.createOrReplace(entity, val as TransformType)
+    }
+  }
 }
