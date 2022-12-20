@@ -2516,9 +2516,6 @@ export namespace Scalar {
 }
 
 // @public (undocumented)
-export type SchemaResult<T extends ISchema> = T extends ISchema ? ReturnType<T['deserialize']> : never;
-
-// @public (undocumented)
 export namespace Schemas {
     // (undocumented)
     export type SchemaType = ISchema;
@@ -2729,25 +2726,7 @@ export type TransformType = {
 };
 
 // @public (undocumented)
-export type TransformTypeWithOptionals = {
-    position?: {
-        x: number;
-        y: number;
-        z: number;
-    };
-    rotation?: {
-        x: number;
-        y: number;
-        z: number;
-        w: number;
-    };
-    scale?: {
-        x: number;
-        y: number;
-        z: number;
-    };
-    parent?: Entity;
-};
+export type TransformTypeWithOptionals = Partial<TransformType>;
 
 // Warning: (ae-missing-release-tag) "Transport" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

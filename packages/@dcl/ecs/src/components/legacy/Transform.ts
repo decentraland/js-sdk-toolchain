@@ -99,7 +99,7 @@ export type TransformTypeWithOptionals = Partial<TransformType>
 
 export function defineTransformComponent(
   engine: Pick<IEngine, 'defineComponentFromSchema'>
-): ComponentDefinition<TransformType> {
+): TransformComponentExtended {
   const transformDef = engine.defineComponentFromSchema(
     TransformSchema,
     COMPONENT_ID
