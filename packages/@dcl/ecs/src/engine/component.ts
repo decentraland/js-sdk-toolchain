@@ -6,13 +6,6 @@ import { deepReadonly, DeepReadonly } from './readonly'
 /**
  * @public
  */
-export type SchemaResult<T extends ISchema> = T extends ISchema
-  ? ReturnType<T['deserialize']>
-  : never
-
-/**
- * @public
- */
 export type ComponentDefinition<T> = {
   _id: number
 

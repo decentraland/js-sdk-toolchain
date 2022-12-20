@@ -95,12 +95,7 @@ export const TransformSchema: ISchema<TransformType> = {
 /**
  * @public
  */
-export type TransformTypeWithOptionals = {
-  position?: { x: number; y: number; z: number }
-  rotation?: { x: number; y: number; z: number; w: number }
-  scale?: { x: number; y: number; z: number }
-  parent?: Entity
-}
+export type TransformTypeWithOptionals = Partial<TransformType>
 
 export function defineTransformComponent(
   engine: Pick<IEngine, 'defineComponentFromSchema'>
