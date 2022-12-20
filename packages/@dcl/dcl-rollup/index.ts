@@ -5,12 +5,9 @@ import { RollupError, watch } from 'rollup'
 import * as ts from 'typescript'
 import { resolve, relative } from 'path'
 import { future } from 'fp-future'
-import {
-  checkConfiguration,
-  PackageJson,
-  readPackageJson
-} from './scene.checks'
+import { checkConfiguration } from './scene.checks'
 import { createColors } from 'colorette'
+import arg from 'arg'
 
 // log to stderr to keep `rollup main.js > bundle.js` from breaking
 const stderr = (...parameters: readonly unknown[]) =>
@@ -22,49 +19,54 @@ const colors = createColors({
   useColor: process.env.FORCE_COLOR !== '0' && !process.env.NO_COLOR
 })
 
-const WATCH =
-  process.argv.indexOf('--watch') !== -1 || process.argv.indexOf('-w') !== -1
+const args = arg({
+  '--watch': Boolean,
+  '-w': '--watch',
+  '--single': String,
+  '--production': Boolean,
+  '--project': String,
+  '-p': '--project'
+})
+
+const WATCH = !!args['--watch']
 
 // PRODUCTION === true : makes the compiler to prefer .min.js files while importing and produces a minified output
 const PRODUCTION =
-  !WATCH &&
-  (process.argv.indexOf('--production') !== -1 ||
-    process.env.NODE_ENV === 'production')
+  !WATCH && (args['--production'] || process.env.NODE_ENV === 'production')
 
 async function compile() {
   // current working directory
   let CWD = process.cwd()
+
+  // Read the target folder, if specified.
+  // -p --project, like typescript
+  if (args['--project']) {
+    const folder = resolve(process.cwd(), args['--project'])
+    if (ts.sys.directoryExists(folder)) {
+      CWD = folder
+    } else {
+      throw new Error(`Folder ${folder} does not exist!.`)
+    }
+  }
+
   ts.sys.getCurrentDirectory = () => CWD
   ts.sys.resolvePath = (path: string) =>
     resolve(ts.sys.getCurrentDirectory(), path)
 
-  {
-    // Read the target folder, if specified.
-    // -p --project, like typescript
-    const projectArgIndex = Math.max(
-      process.argv.indexOf('-p'),
-      process.argv.indexOf('--project')
-    )
-    if (projectArgIndex !== -1 && process.argv.length > projectArgIndex) {
-      const folder = resolve(process.cwd(), process.argv[projectArgIndex + 1])
-      if (ts.sys.directoryExists(folder)) {
-        CWD = folder
-      } else {
-        throw new Error(`Folder ${folder} does not exist!.`)
-      }
-    }
-  }
+  stderr(
+    colors.greenBright('Mode: ') +
+      (PRODUCTION ? 'Production (optimized)' : 'Development')
+  )
+  stderr(
+    colors.greenBright(`Working directory: `) + ts.sys.getCurrentDirectory()
+  )
 
-  stderr('> dev mode: ' + !PRODUCTION)
-  stderr(`> working directory: ${ts.sys.getCurrentDirectory()}`)
+  checkConfiguration()
 
-  const packageJson: PackageJson = readPackageJson()
-
-  checkConfiguration(packageJson)
-
-  stderr('')
-
-  const baseConfig = createSceneConfig({ PROD: PRODUCTION })
+  const baseConfig = createSceneConfig({
+    PROD: PRODUCTION,
+    single: args['--single']
+  })
 
   const finished = future<void>()
 
@@ -92,7 +94,7 @@ async function compile() {
       }
     } else if (event.code === 'BUNDLE_START') {
       for (const out of event.output) {
-        stderr(colors.greenBright(`Compiling: `) + out)
+        stderr(colors.greenBright(`Creating bundle: `) + out)
       }
     } else if (event.code === 'BUNDLE_END') {
       for (const out of event.output) {

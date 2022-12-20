@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@actions/core": "^1.10.0",
+    "@dcl/quickjs-emscripten": "^0.21.0-3680274614.commit-1808aa1",
     "@types/fs-extra": "^9.0.12",
     "@types/jest": "^28.1.8",
     "@types/rimraf": "^3.0.0",

@@ -1,0 +1,28 @@
+test/snapshots/pointer-events.js
+  OPCODES ~= 0.0k
+  REQUIRE: ~system/EngineApi
+  REQUIRE: buffer
+  REQUIRE: long
+  OPCODES ~= 18.9k
+CALL onStart()
+  OPCODES ~= 0.0k
+CALL onUpdate(0.0)
+  CRDT: e=512 c=1 t=1 data={"position":{"x":15,"y":1,"z":15},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  CRDT: e=512 c=1062 t=1 data={"pointerEvents":[{"eventType":1,"eventInfo":{"button":1,"hoverText":"PrimaryDown","maxDistance":5,"showFeedback":true}}]}
+  CRDT: e=512 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
+  CRDT: e=512 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
+  CRDT: e=513 c=1 t=1 data={"position":{"x":13,"y":1,"z":15},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  CRDT: e=513 c=1062 t=1 data={"pointerEvents":[{"eventType":0,"eventInfo":{"button":2,"hoverText":"Secondary Up","maxDistance":5,"showFeedback":true}}]}
+  CRDT: e=513 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
+  CRDT: e=513 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
+  CRDT: e=514 c=1 t=1 data={"position":{"x":11,"y":1,"z":15},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  CRDT: e=514 c=1062 t=1 data={"pointerEvents":[{"eventType":2,"eventInfo":{"button":3,"hoverText":"Infinity Hover","maxDistance":10000000,"showFeedback":true}}]}
+  CRDT: e=514 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
+  CRDT: e=514 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
+  OPCODES ~= 35.9k
+CALL onUpdate(0.1)
+  OPCODES ~= 3.1k
+CALL onUpdate(0.1)
+  OPCODES ~= 3.1k
+CALL onUpdate(0.1)
+  OPCODES ~= 3.1k

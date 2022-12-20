@@ -65,16 +65,26 @@ export function createEcsConfig(_options: { PROD: boolean }): RollupOptions {
   }
 }
 
-export function createSceneConfig(options: { PROD: boolean }): RollupOptions {
+export function createSceneConfig(options: {
+  PROD: boolean
+  single?: string
+}): RollupOptions {
   const sceneJsonPath = sys.resolvePath('./scene.json')
   const sceneJson = JSON.parse(sys.readFile(sceneJsonPath)!)
 
   console.assert(sceneJson.main, 'scene.json .main must be present')
-  console.assert(sceneJson.ecs7, 'scene.json `"ecs7": "true"` must be present')
+  console.assert(
+    sceneJson.runtimeVersion === '7',
+    'scene.json `"runtimeVersion": "7"` must be present'
+  )
+
+  const out = !options.single
+    ? sceneJson.main
+    : options.single.replace(/\.ts$/, '.js')
 
   return {
     external: [/~system\//],
-    input: 'src/index.ts',
+    input: options.single ?? 'src/index.ts',
     treeshake: {
       preset: 'smallest'
     },
@@ -117,7 +127,7 @@ export function createSceneConfig(options: { PROD: boolean }): RollupOptions {
     output: [
       options.PROD
         ? {
-            file: sceneJson.main,
+            file: out,
             format: 'commonjs',
             name: 'Scene',
             extend: true,
@@ -126,7 +136,7 @@ export function createSceneConfig(options: { PROD: boolean }): RollupOptions {
             plugins: [terser({ format: { comments: false } })]
           }
         : {
-            file: sceneJson.main,
+            file: out,
             format: 'commonjs',
             name: 'Scene',
             extend: true,

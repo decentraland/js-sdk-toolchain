@@ -95,6 +95,11 @@ export type ComponentDefinition<
 
   /**
    * @internal
+   * @param buffer - data to deserialize
+   */
+  deserialize(buffer: ByteBuffer): ComponentType<T>
+  /**
+   * @internal
    * @param entity - entity-component to update
    * @param data - data to update the entity-component
    * @param markAsDirty - defaults to true
@@ -328,6 +333,9 @@ export function defineComponent<
         dirtyIterator.delete(entity)
       }
       return newValue
+    },
+    deserialize(buffer: ByteBuffer): ComponentType<T> {
+      return spec.deserialize(buffer)
     },
     clearDirty() {
       dirtyIterator.clear()
