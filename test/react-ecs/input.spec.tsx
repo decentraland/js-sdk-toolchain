@@ -35,21 +35,26 @@ describe('Ui Listeners React Ecs', () => {
     const onChange: jest.Mock | undefined = jest.fn()
     const undefinedChange: jest.Mock | undefined = undefined
     let conditional = true
+    let removeComponent = false
     const ui = () => (
       <UiEntity
         uiTransform={{
           width: 100
         }}
-        uiInput={{
-          placeholder: 'Boedo its carnaval',
-          disabled: false,
-          color: Color4.Red(),
-          placeholderColor: Color4.Blue(),
-          textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
-          font: Font.F_SANS_SERIF,
-          fontSize: 14,
-          onChange: conditional ? onChange : undefinedChange
-        }}
+        uiInput={
+          !removeComponent
+            ? {
+                placeholder: 'Boedo its carnaval',
+                disabled: false,
+                color: Color4.Red(),
+                placeholderColor: Color4.Blue(),
+                textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
+                font: Font.F_SANS_SERIF,
+                fontSize: 14,
+                onChange: conditional ? onChange : undefinedChange
+              }
+            : undefined
+        }
       />
     )
     uiRenderer.setUiRenderer(ui)
@@ -80,5 +85,11 @@ describe('Ui Listeners React Ecs', () => {
     UiInputResult.getMutable(uiEntity).value = 'Casla - '
     await engine.update(1)
     expect(onChange).toBeCalledWith('Casla - ')
+    onChange.mockClear()
+    removeComponent = true
+    await engine.update(1)
+    UiInputResult.getMutable(uiEntity).value = 'Boedo'
+    await engine.update(1)
+    expect(onChange).toBeCalledTimes(0)
   })
 })
