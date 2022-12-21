@@ -1,6 +1,8 @@
-import { cyclicParentingChecker } from '../../packages/@dcl/ecs/src'
+import {
+  cyclicParentingChecker,
+  RESERVED_STATIC_ENTITIES
+} from '../../packages/@dcl/ecs/src'
 import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
-import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
@@ -21,8 +23,8 @@ describe('Engine tests', () => {
     const engine = Engine()
     const entityA = engine.addEntity()
     const entityB = engine.addEntity()
-    expect(entityA).toBe(EntityUtils.STATIC_ENTITIES_RANGE[0])
-    expect(entityB).toBe(EntityUtils.STATIC_ENTITIES_RANGE[0] + 1)
+    expect(entityA).toBe(RESERVED_STATIC_ENTITIES)
+    expect(entityB).toBe(RESERVED_STATIC_ENTITIES + 1)
   })
 
   it('should not allow u to create same component to an existing entitiy', async () => {

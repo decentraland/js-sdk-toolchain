@@ -1,77 +1,108 @@
-import { EntityUtils } from './entity-utils'
+/**
+ * @public Only for explicitation purposes
+ */
+export type uint32 = number
+export const MAX_U16 = 0xffff
+export const MASK_UPPER_16_ON_32 = 0xffff0000
+
+export const AMOUNT_VERSION_AVAILABLE = MAX_U16 + 1
+
+/**
+ * @public
+ *  version  number
+ * [31...16][15...0]
+ *
+ * Convertion from entity to its compound numbers:
+ * To get the version => ((entity & MASK_UPPER_16_ON_32) >> 16) & MAX_U16
+ * To get the number  => entity & MAX_U16
+ *
+ * Convertion from its compound numbers to entity:
+ * entity = (entityNumber & MAX_U16) | ((entityVersion & MAX_U16) << 16)
+ */
+export type Entity = uint32
+
+/**
+ * @public This first 512 entities are reserved by the renderer
+ */
+export const RESERVED_STATIC_ENTITIES = 512
 
 /**
  * @public
  */
-export type Entity = unknown
+export const MAX_ENTITY_NUMBER = MAX_U16
 
 export function EntityContainer() {
-  const staticEntity = Entity(EntityUtils.STATIC_ENTITIES_RANGE)
-  const dynamicEntity = Entity(EntityUtils.DYNAMIC_ENTITIES_RANGE)
-  return {
-    generateEntity(dynamic: boolean = false): Entity {
-      /* istanbul ignore next */
-      if (dynamic) {
-        // Dynamic entities are not being used, but since we dont know the future of the dynamic entities
-        // I prefer to comment the code instead of removing all the logic
-        /* istanbul ignore next */
-        return dynamicEntity.generateEntity()
-      } else {
-        return staticEntity.generateEntity()
-      }
-    },
-    removeEntity(entity: Entity): boolean {
-      return (
-        staticEntity.removeEntity(entity) || dynamicEntity.removeEntity(entity)
-      )
-    },
-    entityExists(entity: Entity): boolean {
-      return (
-        EntityUtils.isReservedEntity(entity) ||
-        staticEntity.getExistingEntities().has(entity) ||
-        dynamicEntity.getExistingEntities().has(entity)
-      )
-    },
-    getExistingEntities(): Set<Entity> {
-      return new Set([
-        ...staticEntity.getExistingEntities(),
-        ...dynamicEntity.getExistingEntities()
-      ])
-    }
-  }
-}
-
-function Entity(range: EntityUtils.EntityRange) {
-  function createEntity(entity: number): Entity {
-    return entity as Entity
-  }
-
-  let entityCounter = range[0]
+  let entityCounter = RESERVED_STATIC_ENTITIES
   const usedEntities: Set<Entity> = new Set()
+  const removedEntities: Map<number, number> = new Map()
 
-  function generateEntity(): Entity {
-    if (entityCounter >= range[1]) {
+  function entityVersion(entity: Entity) {
+    return (((entity & MASK_UPPER_16_ON_32) >> 16) & MAX_U16) >>> 0
+  }
+
+  function entityNumber(entity: Entity) {
+    return (entity & MAX_U16) >>> 0
+  }
+
+  function entityId(entityNumber: number, entityVersion: number): Entity {
+    return ((entityNumber & MAX_U16) | ((entityVersion & MAX_U16) << 16)) >>> 0
+  }
+
+  function generateNewEntity(): Entity {
+    if (entityCounter > MAX_ENTITY_NUMBER - 1) {
       throw new Error(
-        `It fails trying to generate an entity out of range [${range[0]}, ${range[1]}].`
+        `It fails trying to generate an entity out of range ${MAX_ENTITY_NUMBER}.`
       )
     }
 
-    const entity = createEntity(entityCounter)
-    entityCounter++
-
+    const entity = entityCounter++
     usedEntities.add(entity)
     return entity
   }
 
+  function generateEntity() {
+    if (usedEntities.size + RESERVED_STATIC_ENTITIES >= entityCounter) {
+      return generateNewEntity()
+    }
+
+    for (const [number, version] of removedEntities) {
+      if (version < MAX_U16) {
+        const entity = entityId(number, version + 1)
+
+        usedEntities.add(entity)
+        removedEntities.delete(number)
+
+        return entity
+      }
+    }
+
+    return generateNewEntity()
+  }
+
   function removeEntity(entity: Entity) {
-    return usedEntities.delete(entity)
+    const deleted = usedEntities.delete(entity)
+    if (deleted) {
+      removedEntities.set(entityNumber(entity), entityVersion(entity))
+    }
+    return deleted
   }
 
   return {
-    getExistingEntities() {
+    generateEntity(): Entity {
+      return generateEntity()
+    },
+    removeEntity(entity: Entity): boolean {
+      return removeEntity(entity)
+    },
+    entityExists(entity: Entity): boolean {
+      return entity < RESERVED_STATIC_ENTITIES || usedEntities.has(entity)
+    },
+    getExistingEntities(): Set<Entity> {
       return new Set(usedEntities)
     },
-    generateEntity,
-    removeEntity
+
+    entityVersion,
+    entityNumber,
+    entityId
   }
 }

@@ -1,5 +1,6 @@
 import {
   Engine,
+  Entity,
   IEngine,
   ReceiveMessage,
   Transport
@@ -70,13 +71,13 @@ describe('test CRDT flow E2E', () => {
   const engineA = Engine()
   const engineB = Engine()
   const env = connectEngines(engineA, engineB)
-  function updateIntA(entity: unknown, value: number) {
+  function updateIntA(entity: Entity, value: number) {
     updateInt(engineA, entity, value)
   }
-  function updateIntB(entity: unknown, value: number) {
+  function updateIntB(entity: Entity, value: number) {
     updateInt(engineB, entity, value)
   }
-  function updateInt(engine: IEngine, entity: unknown, value: number) {
+  function updateInt(engine: IEngine, entity: Entity, value: number) {
     const name = 'system'
     function update() {
       const component = engine.getComponent(ID)!

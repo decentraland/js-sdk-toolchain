@@ -467,8 +467,15 @@ export type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = {
     data: Readonly<V>;
 };
 
-// @public (undocumented)
-export type Entity = unknown;
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-malformed-html-name) Invalid HTML element: Expecting an HTML name
+// Warning: (tsdoc-malformed-html-name) Invalid HTML element: A space is not allowed here
+//
+// @public
+export type Entity = uint32;
 
 // Warning: (ae-missing-release-tag) "EntityComponents" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -484,7 +491,7 @@ export type EntityComponents = {
 //
 // @public (undocumented)
 export function EntityContainer(): {
-    generateEntity(dynamic?: boolean): Entity;
+    generateEntity(): Entity;
     removeEntity(entity: Entity): boolean;
     entityExists(entity: Entity): boolean;
     getExistingEntities(): Set<Entity>;
@@ -905,6 +912,11 @@ export type MapResult<T extends Spec> = ToOptional<{
     [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? MapResult<T[K]> : never;
 }>;
 
+// Warning: (ae-missing-release-tag) "MASK_UPPER_16_ON_32" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const MASK_UPPER_16_ON_32 = 4294901760;
+
 // Warning: (ae-missing-release-tag) "Material" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -1072,6 +1084,14 @@ export namespace Matrix {
     export function transposeToRef(matrix: ReadonlyMatrix, result: MutableMatrix): void;
     export function Zero(): MutableMatrix;
 }
+
+// @public (undocumented)
+export const MAX_ENTITY_NUMBER = 65535;
+
+// Warning: (ae-missing-release-tag) "MAX_U16" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const MAX_U16 = 65535;
 
 // Warning: (ae-missing-release-tag) "MeshCollider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2271,12 +2291,12 @@ export type PointerEventsSystem = ReturnType<typeof createPointerEventSystem>;
 //
 // @public (undocumented)
 export const pointerEventsSystem: {
-    removeOnClick(entity: unknown): void;
-    removeOnPointerDown(entity: unknown): void;
-    removeOnPointerUp(entity: unknown): void;
-    onClick(entity: unknown, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
-    onPointerDown(entity: unknown, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
-    onPointerUp(entity: unknown, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
+    removeOnClick(entity: number): void;
+    removeOnPointerDown(entity: number): void;
+    removeOnPointerUp(entity: number): void;
+    onClick(entity: number, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
+    onPointerDown(entity: number, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
+    onPointerUp(entity: number, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
 };
 
 // Warning: (ae-missing-release-tag) "PointerEventType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2478,6 +2498,9 @@ export type ReceiveMessage = {
     data?: Uint8Array;
     messageBuffer: Uint8Array;
 };
+
+// @public
+export const RESERVED_STATIC_ENTITIES = 512;
 
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2752,6 +2775,9 @@ export type UiComponent = () => JSX.Element;
 
 // @public (undocumented)
 export function UiEntity(props: EntityPropTypes & Partial<CommonProps>): ReactEcs.JSX.Element;
+
+// @public
+export type uint32 = number;
 
 // @public (undocumented)
 export const UiText: ComponentDefinition<PBUiText>;
