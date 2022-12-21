@@ -508,6 +508,7 @@ export type EntityComponents = {
     uiText: PBUiText;
     uiBackground: PBUiBackground;
     uiInput: PBUiInput;
+    uiDropdown: PBUiDropdown;
     onClick: EventSystemCallback;
 };
 
@@ -527,6 +528,7 @@ export type EntityPropTypes = {
     uiText?: PBUiText;
     uiBackground?: UiBackgroundProps;
     uiInput?: UiInputProps;
+    uiDropdown?: UiDropdownProps;
 };
 
 // @public
@@ -2108,6 +2110,47 @@ export const PBUiBackground: {
     decode(input: _m0.Reader | Uint8Array, length?: number): PBUiBackground;
 };
 
+// Warning: (ae-missing-release-tag) "PBUiDropdown" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBUiDropdown" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBUiDropdown {
+    // (undocumented)
+    acceptEmpty: boolean;
+    color?: PBColor4 | undefined;
+    // (undocumented)
+    disabled: boolean;
+    // (undocumented)
+    emptyLabel?: string | undefined;
+    font?: Font | undefined;
+    fontSize?: number | undefined;
+    // (undocumented)
+    options: string[];
+    selectedIndex: number;
+    textAlign?: TextAlignMode | undefined;
+}
+
+// @public
+export const PBUiDropdown: {
+    encode(message: PBUiDropdown, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): PBUiDropdown;
+};
+
+// Warning: (ae-missing-release-tag) "PBUiDropdownResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBUiDropdownResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBUiDropdownResult {
+    // (undocumented)
+    value: number;
+}
+
+// @public
+export const PBUiDropdownResult: {
+    encode(message: PBUiDropdownResult, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): PBUiDropdownResult;
+};
+
 // Warning: (ae-missing-release-tag) "PBUiInput" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 // Warning: (ae-missing-release-tag) "PBUiInput" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2827,6 +2870,17 @@ export type UiBackgroundProps = Partial<PBUiBackground>;
 //
 // @public (undocumented)
 export type UiComponent = () => JSX.Element;
+
+// @public (undocumented)
+export const UiDropdown: ComponentDefinition<PBUiDropdown>;
+
+// @public (undocumented)
+export type UiDropdownProps = Partial<PBUiDropdown> & {
+    onChange?(value: number): void;
+};
+
+// @public (undocumented)
+export const UiDropdownResult: ComponentDefinition<PBUiDropdownResult>;
 
 // @public (undocumented)
 export function UiEntity(props: EntityPropTypes & Partial<CommonProps>): ReactEcs.JSX.Element;

@@ -57,7 +57,8 @@ const entityComponent: EntityComponents = {
   uiBackground: undefined as any,
   uiTransform: undefined as any,
   onClick: undefined as any,
-  uiInput: undefined as any
+  uiInput: undefined as any,
+  uiDropdown: undefined as any
 }
 export const componentKeys: (keyof EntityComponents)[] = Object.keys(
   entityComponent

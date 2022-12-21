@@ -56,6 +56,8 @@ export function createReconciler(
   const UiBackground = components.UiBackground(engine)
   const UiInput = components.UiInput(engine)
   const UiInputResult = components.UiInputResult(engine)
+  const UiDropdown = components.UiDropdown(engine)
+  const UiDropdownResult = components.UiDropdownResult(engine)
   const changeEvents = new Map<Entity, Map<number, OnChangeState | undefined>>()
   const getComponentId: {
     [key in keyof EngineComponents]: number
@@ -63,7 +65,8 @@ export function createReconciler(
     uiTransform: UiTransform._id,
     uiText: UiText._id,
     uiBackground: UiBackground._id,
-    uiInput: UiInput._id
+    uiInput: UiInput._id,
+    uiDropdown: UiDropdown._id
   }
 
   function updateTree(
@@ -93,7 +96,7 @@ export function createReconciler(
         update.props as EventSystemCallback,
         {
           button: InputAction.IA_POINTER,
-          hoverText: ''
+          hoverText: '@dcl/react-ecs/onPointerDown'
         }
       )
     }
@@ -336,34 +339,28 @@ export function createReconciler(
 
   // Maybe this could be something similar to Input system, but since we
   // are going to use this only here, i prefer to scope it here.
-  function handleOnChange(componentId: number) {
-    return function (
-      entity: unknown,
-      componentResult: components.PBUiInputResult
-    ) {
+  function handleOnChange(
+    componentId: number,
+    resultComponent: typeof UiInputResult | typeof UiDropdownResult
+  ) {
+    for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
       const entityState = changeEvents.get(entity)?.get(componentId)
-      if (entityState?.fn && componentResult.value !== entityState.value) {
+      if (entityState?.fn && Result.value !== entityState.value) {
         // Call onChange callback and update internal timestamp
-        entityState.fn(componentResult.value)
+        entityState.fn(Result.value)
         updateOnChange(entity, componentId, {
           fn: entityState.fn,
-          value: componentResult.value
+          value: Result.value
         })
       }
-    }
-  }
-  const uiInputOnChange = handleOnChange(UiInput._id)
-
-  function onChangeSystem() {
-    for (const [entity, Result] of engine.getEntitiesWith(UiInputResult)) {
-      uiInputOnChange(entity, Result)
     }
   }
 
   return {
     update: function (component: JSX.Element) {
       if (changeEvents.size) {
-        onChangeSystem()
+        handleOnChange(UiInput._id, UiInputResult)
+        handleOnChange(UiDropdown._id, UiDropdownResult)
       }
       return reconciler.updateContainer(component as any, root, null)
     },

@@ -4,7 +4,8 @@ import {
   PBUiText,
   PBUiTransform,
   PBUiInput,
-  EventSystemCallback
+  EventSystemCallback,
+  PBUiDropdown
 } from '@dcl/ecs'
 import React from 'react'
 import { CommonProps } from './components/types'
@@ -20,6 +21,7 @@ export type EntityComponents = {
   uiText: PBUiText
   uiBackground: PBUiBackground
   uiInput: PBUiInput
+  uiDropdown: PBUiDropdown
   onClick: EventSystemCallback
 }
 

@@ -10,7 +10,7 @@ import {
 import { generateIndex } from './generateIndex'
 import { snakeToPascal } from '../utils/snakeToPascal'
 
-const NON_EXPOSED_LIST: number[] = [1094, 1096]
+const NON_EXPOSED_LIST: number[] = []
 
 /**
  * @param componentPath - Argument of execution '--component-path'

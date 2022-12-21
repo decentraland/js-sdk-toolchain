@@ -1,7 +1,9 @@
 import {
   Engine,
   components,
-  BackgroundTextureMode
+  BackgroundTextureMode,
+  TextureWrapMode,
+  TextureFilterMode
 } from '../../../packages/@dcl/ecs/src'
 
 describe('Generated UiBackground ProtoBuf', () => {
@@ -14,6 +16,17 @@ describe('Generated UiBackground ProtoBuf', () => {
     const _uiBackground = UiBackground.create(entity, {
       color: { r: 0, g: 0, b: 0, a: 0 },
       textureMode: BackgroundTextureMode.CENTER,
+      texture: {
+        src: 'some-src',
+        wrapMode: TextureWrapMode.TWM_CLAMP,
+        filterMode: TextureFilterMode.TFM_BILINEAR
+      },
+      textureSlices: {
+        top: 1 / 3,
+        left: 1 / 3,
+        right: 1 / 3,
+        bottom: 1 / 3
+      },
       uvs: []
     })
 
@@ -28,7 +41,18 @@ describe('Generated UiBackground ProtoBuf', () => {
     expect(_uiBackground).toEqual({
       color: { r: 0, g: 0, b: 0, a: 0 },
       uvs: [],
-      textureMode: 1
+      textureMode: 1,
+      texture: {
+        src: 'some-src',
+        wrapMode: TextureWrapMode.TWM_CLAMP,
+        filterMode: TextureFilterMode.TFM_BILINEAR
+      },
+      textureSlices: {
+        top: 1 / 3,
+        left: 1 / 3,
+        right: 1 / 3,
+        bottom: 1 / 3
+      }
     })
     expect(_uiBackground).not.toEqual(
       UiBackground.create(newEngine.addEntity())
