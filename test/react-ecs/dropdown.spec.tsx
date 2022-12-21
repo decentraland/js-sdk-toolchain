@@ -22,12 +22,14 @@ describe('UiDropdown React ECS', () => {
     createPointerEventSystem(engine, Input)
   )
 
+  const UiDropdown = components.UiDropdown(engine as IEngine)
   const UiDropdownResult = components.UiDropdownResult(engine as IEngine)
   const uiEntity = ((engine.addEntity() as number) + 1) as Entity
   const onChange: jest.Mock | undefined = jest.fn()
   const undefinedChange: jest.Mock | undefined = undefined
   let conditional = true
   let removeComponent = false
+  let acceptEmpty = true
 
   const ui = () => (
     <UiEntity
@@ -37,10 +39,9 @@ describe('UiDropdown React ECS', () => {
       uiDropdown={
         !removeComponent
           ? {
-              acceptEmpty: true,
+              acceptEmpty,
               emptyLabel: 'Select your team (BOEDO)',
               options: ['BOEDO', 'CASLA', 'SAN LORENZO'],
-              disabled: false,
               color: Color4.Red(),
               textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
               font: Font.F_SANS_SERIF,
@@ -51,8 +52,22 @@ describe('UiDropdown React ECS', () => {
       }
     />
   )
-  it('onChange should not be called if there is no DropdownResult', async () => {
+
+  it('should validate default props', async () => {
     uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(UiDropdown.get(uiEntity).selectedIndex).toBe(-1)
+    expect(UiDropdown.get(uiEntity).disabled).toBe(false)
+    expect(UiDropdown.get(uiEntity).options).toStrictEqual([
+      'BOEDO',
+      'CASLA',
+      'SAN LORENZO'
+    ])
+    acceptEmpty = false
+    await engine.update(1)
+    expect(UiDropdown.get(uiEntity).selectedIndex).toBe(0)
+  })
+  it('onChange should not be called if there is no DropdownResult', async () => {
     expect(onChange).toBeCalledTimes(0)
     await engine.update(1)
     expect(onChange).toBeCalledTimes(0)

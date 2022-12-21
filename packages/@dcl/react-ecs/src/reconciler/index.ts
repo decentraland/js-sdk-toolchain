@@ -122,7 +122,6 @@ export function createReconciler(
   ) {
     const componentId = getComponentId[componentName]
     const Component = engine.getComponent(componentId)
-
     const component =
       Component.getMutableOrNull(instance.entity) ||
       Component.create(instance.entity)
