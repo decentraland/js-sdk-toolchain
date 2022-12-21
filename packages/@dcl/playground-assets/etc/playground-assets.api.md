@@ -6,6 +6,11 @@
 
 import _m0 from 'protobufjs/minimal';
 
+// Warning: (ae-missing-release-tag) "AMOUNT_VERSION_AVAILABLE" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const AMOUNT_VERSION_AVAILABLE: number;
+
 // Warning: (ae-missing-release-tag) "Animator" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -495,6 +500,9 @@ export function EntityContainer(): {
     removeEntity(entity: Entity): boolean;
     entityExists(entity: Entity): boolean;
     getExistingEntities(): Set<Entity>;
+    entityVersion: (entity: Entity) => number;
+    entityNumber: (entity: Entity) => number;
+    entityId: (entityNumber: number, entityVersion: number) => Entity;
 };
 
 // @public (undocumented)
