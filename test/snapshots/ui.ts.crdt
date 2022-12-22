@@ -31,7 +31,7 @@ CALL onUpdate(0.1)
   OPCODES ~= 52.6k
 CALL onUpdate(0.1)
   CRDT: e=512 c=1 t=3 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.017452405765652657,"z":0,"w":0.9998477101325989},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 50.6k
+  OPCODES ~= 50.5k
 CALL onUpdate(0.1)
   CRDT: e=512 c=1 t=4 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.026176948100328445,"z":0,"w":0.9996573328971863},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 50.6k
+  OPCODES ~= 50.5k

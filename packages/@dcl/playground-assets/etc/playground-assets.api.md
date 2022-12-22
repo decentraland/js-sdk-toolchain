@@ -398,16 +398,6 @@ export type ComponentSchema<T extends [ComponentDefinition<any>, ...ComponentDef
     [K in keyof T]: T[K] extends ComponentDefinition<any> ? ReturnType<T[K]['getMutable']> : never;
 };
 
-// Warning: (ae-missing-release-tag) "Container" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function Container({ width, height, children }: ContainerPropTypes): ReactEcs.JSX.Element;
-
-// Warning: (ae-missing-release-tag) "ContainerPropTypes" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type ContainerPropTypes = Partial<CommonProps> & EntityPropTypes['uiTransform'];
-
 // Warning: (ae-missing-release-tag) "createEthereumProvider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -474,6 +464,9 @@ export function defineComponent<T>(componentId: number, spec: ISchema<T>): Compo
 // @public
 export const DEG2RAD: number;
 
+// @public (undocumented)
+export function Dropdown(props: Pick<EntityPropTypes, 'uiTransform'> & Partial<CommonProps> & UiDropdownProps): ReactEcs.JSX.Element;
+
 // Warning: (ae-missing-release-tag) "EcsElements" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -527,8 +520,6 @@ export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
     uiText?: PBUiText;
     uiBackground?: UiBackgroundProps;
-    uiInput?: UiInputProps;
-    uiDropdown?: UiDropdownProps;
 };
 
 // @public
@@ -828,6 +819,9 @@ export type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
 }[keyof T];
 
+// @public (undocumented)
+export function Input(props: Pick<EntityPropTypes, 'uiTransform'> & Partial<CommonProps> & Partial<UiInputProps>): ReactEcs.JSX.Element;
+
 // Warning: (ae-missing-release-tag) "InputAction" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -908,8 +902,7 @@ export namespace JSX {
     export interface Component {
     }
     // (undocumented)
-    export interface Element {
-    }
+    export type Element = {} | null;
     // (undocumented)
     export type IntrinsicElements = EcsElements;
 }
@@ -2562,8 +2555,7 @@ export namespace ReactEcs {
         export interface Component {
         }
         // (undocumented)
-        export interface Element {
-        }
+        export type Element = {} | null;
         // (undocumented)
         export type IntrinsicElements = EcsElements;
     }

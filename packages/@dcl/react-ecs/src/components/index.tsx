@@ -1,9 +1,9 @@
-import { YGDisplay } from '@dcl/ecs'
 import { ReactEcs } from '../react-ecs'
 import { CommonProps, EntityPropTypes } from './types'
 import { parseUiTransform, CANVAS_ROOT_ENTITY } from './uiTransform'
 import { parseUiBackground } from './uiBackground'
-import { parseUiDropdown } from './uiDropdown'
+import { UiDropdownComponent } from './uiDropdown/types'
+import { UiInputComponent } from './uiInput/types'
 
 export * from './types'
 export { CANVAS_ROOT_ENTITY }
@@ -13,36 +13,33 @@ export * from './uiInput/types'
 export * from './uiBackground/types'
 export * from './uiDropdown/types'
 
+export { Dropdown } from './uiDropdown'
+export { Input } from './uiInput'
+
 /**
  * @public
  */
 export function UiEntity(props: EntityPropTypes & Partial<CommonProps>) {
-  const { uiTransform, uiBackground, uiDropdown, ...otherProps } = props
+  return <entity {...parseProps(props)} />
+}
+
+/**
+ * @internal
+ */
+export function parseProps(
+  props: EntityPropTypes &
+    Partial<CommonProps> &
+    UiDropdownComponent &
+    UiInputComponent
+) {
+  const { uiTransform, uiBackground, ...otherProps } = props
   const uiTransformProps = parseUiTransform(uiTransform)
   const uiBackgroundProps = uiBackground
     ? { uiBackground: parseUiBackground(uiBackground) }
     : undefined
-  const uiDropdownProps = uiDropdown
-    ? { uiDropdown: parseUiDropdown(uiDropdown) }
-    : undefined
-
-  return (
-    <entity
-      uiTransform={uiTransformProps}
-      {...uiBackgroundProps}
-      {...uiDropdownProps}
-      {...otherProps}
-    />
-  )
-}
-
-export type ContainerPropTypes = Partial<CommonProps> &
-  EntityPropTypes['uiTransform']
-
-export function Container({ width, height, children }: ContainerPropTypes) {
-  return (
-    <UiEntity uiTransform={{ width, height, display: YGDisplay.YGD_FLEX }}>
-      {children}
-    </UiEntity>
-  )
+  return {
+    ...otherProps,
+    uiTransform: uiTransformProps,
+    ...uiBackgroundProps
+  }
 }

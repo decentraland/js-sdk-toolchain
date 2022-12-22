@@ -36,7 +36,7 @@ import {
 } from './utils'
 
 type OnChangeState<T = string | number> = {
-  fn: (val?: T) => void
+  fn?: (val?: T) => void
   value?: T
 }
 export function createReconciler(
@@ -50,7 +50,11 @@ export function createReconciler(
   >,
   pointerEvents: PointerEventsSystem
 ) {
+  // Store all the entities so when we destroy the UI we can also destroy them
   const entities = new Set<Entity>()
+  // Store the onChange callbacks to be runned every time a Result has changed
+  const changeEvents = new Map<Entity, Map<number, OnChangeState | undefined>>()
+  // Initialize components
   const UiTransform = components.UiTransform(engine)
   const UiText = components.UiText(engine)
   const UiBackground = components.UiBackground(engine)
@@ -58,7 +62,7 @@ export function createReconciler(
   const UiInputResult = components.UiInputResult(engine)
   const UiDropdown = components.UiDropdown(engine)
   const UiDropdownResult = components.UiDropdownResult(engine)
-  const changeEvents = new Map<Entity, Map<number, OnChangeState | undefined>>()
+  // Component ID Helper
   const getComponentId: {
     [key in keyof EngineComponents]: number
   } = {
@@ -102,17 +106,13 @@ export function createReconciler(
     }
   }
 
-  function removeComponent<K extends keyof EngineComponents>(
+  function removeComponent(
     instance: Instance,
-    component: keyof EngineComponents,
-    props: Partial<EngineComponents[K]>
+    component: keyof EngineComponents
   ) {
     const componentId = getComponentId[component]
     const Component = engine.getComponent(componentId)
     Component.deleteFrom(instance.entity)
-    if ('onChange' in props) {
-      updateOnChange(instance.entity, componentId, undefined)
-    }
   }
 
   function upsertComponent<K extends keyof EngineComponents>(
@@ -193,19 +193,15 @@ export function createReconciler(
   function updateOnChange(
     entity: Entity,
     componentId: number,
-    value?: OnChangeState
+    state?: OnChangeState
   ) {
     const event =
       changeEvents.get(entity) ||
       changeEvents.set(entity, new Map()).get(entity)!
     const oldState = event.get(componentId)
-    const newValue = value
-      ? {
-          fn: value.fn,
-          value: value.value || oldState?.value
-        }
-      : undefined
-    event.set(componentId, newValue)
+    const fn = state?.fn
+    const value = state?.value || oldState?.value
+    event.set(componentId, { fn, value })
   }
 
   const hostConfig: HostConfig<
@@ -276,7 +272,7 @@ export function createReconciler(
       instance: Instance,
       updatePayload: UpdatePayload,
       _type: Type,
-      prevProps: Props,
+      _prevProps: Props,
       _nextProps: Props,
       _internalHandle: OpaqueHandle
     ): void {
@@ -286,11 +282,7 @@ export function createReconciler(
           continue
         }
         if (update.type === 'delete') {
-          removeComponent(
-            instance,
-            update.component,
-            prevProps[update.component]
-          )
+          removeComponent(instance, update.component)
         } else {
           upsertComponent(
             instance,
@@ -320,6 +312,9 @@ export function createReconciler(
 
       updateTree(child, { rightOf: child.rightOf, parent: child.parent })
       updateTree(beforeChild, { rightOf: beforeChild.rightOf })
+    },
+    removeChildFromContainer(parenInstance: Instance, child: Instance) {
+      removeChildEntity(child)
     }
   }
 

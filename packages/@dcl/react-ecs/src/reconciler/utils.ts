@@ -159,8 +159,6 @@ export const noopConfig = {
     return null
   },
   /* istanbul ignore next */
-  removeChildFromContainer() {},
-  /* istanbul ignore next */
   commitMount(
     _instance: Instance,
     _type: Type,

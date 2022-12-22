@@ -6,3 +6,10 @@ import { PBUiInput } from '@dcl/ecs'
 export type UiInputProps = PBUiInput & {
   onChange?(value: string): void
 }
+
+/**
+ * @internal
+ */
+export type UiInputComponent = {
+  uiInput?: PBUiInput
+}

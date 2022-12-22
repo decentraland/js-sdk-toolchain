@@ -26,14 +26,16 @@ export type EntityComponents = {
 }
 
 export namespace JSX {
-  export interface Element {}
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  export type Element = {} | null
   export type IntrinsicElements = EcsElements
   export interface Component {}
 }
 
 export namespace ReactEcs {
   export namespace JSX {
-    export interface Element {}
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    export type Element = {} | null
     export type IntrinsicElements = EcsElements
     export interface Component {}
   }

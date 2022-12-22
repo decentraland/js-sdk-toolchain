@@ -9,6 +9,7 @@ import {
 import { components, IEngine } from '../../packages/@dcl/ecs/src'
 import {
   createReactBasedUiSystem,
+  Dropdown,
   ReactEcs,
   UiEntity
 } from '../../packages/@dcl/react-ecs/src'
@@ -32,25 +33,23 @@ describe('UiDropdown React ECS', () => {
   let acceptEmpty = true
 
   const ui = () => (
-    <UiEntity
-      uiTransform={{
-        width: 100
-      }}
-      uiDropdown={
-        !removeComponent
-          ? {
-              acceptEmpty,
-              emptyLabel: 'Select your team (BOEDO)',
-              options: ['BOEDO', 'CASLA', 'SAN LORENZO'],
-              color: Color4.Red(),
-              textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
-              font: Font.F_SANS_SERIF,
-              fontSize: 14,
-              onChange: conditional ? onChange : undefinedChange
-            }
-          : undefined
-      }
-    />
+    <UiEntity>
+      {!removeComponent && (
+        <Dropdown
+          uiTransform={{
+            width: 100
+          }}
+          acceptEmpty={acceptEmpty}
+          emptyLabel={'Select your team (BOEDO)'}
+          options={['BOEDO', 'CASLA', 'SAN LORENZO']}
+          color={Color4.Red()}
+          textAlign={TextAlignMode.TAM_BOTTOM_CENTER}
+          font={Font.F_SANS_SERIF}
+          fontSize={14}
+          onChange={conditional ? onChange : undefinedChange}
+        />
+      )}
+    </UiEntity>
   )
 
   it('should validate default props', async () => {
@@ -115,7 +114,7 @@ describe('UiDropdown React ECS', () => {
   it('remove the component and see if the onChange fn is removed', async () => {
     removeComponent = true
     await engine.update(1)
-    UiDropdownResult.getMutable(uiEntity).value = 1
+    UiDropdownResult.create(uiEntity).value = 1
     await engine.update(1)
     expect(onChange).toBeCalledTimes(0)
   })

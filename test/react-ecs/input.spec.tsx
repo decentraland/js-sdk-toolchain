@@ -12,9 +12,10 @@ import {
   createReactBasedUiSystem,
   ReactBasedUiSystem,
   ReactEcs,
-  UiEntity
+  Input
 } from '../../packages/@dcl/react-ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
+import { UiEntity } from '../../packages/@dcl/sdk/react-ecs'
 
 describe('Ui Listeners React Ecs', () => {
   let engine: IEngine
@@ -36,28 +37,27 @@ describe('Ui Listeners React Ecs', () => {
     const undefinedChange: jest.Mock | undefined = undefined
     let conditional = true
     let removeComponent = false
-    const ui = () => (
-      <UiEntity
-        uiTransform={{
-          width: 100
-        }}
-        uiInput={
-          !removeComponent
-            ? {
-                placeholder: 'Boedo its carnaval',
-                disabled: false,
-                color: Color4.Red(),
-                placeholderColor: Color4.Blue(),
-                textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
-                font: Font.F_SANS_SERIF,
-                fontSize: 14,
-                onChange: conditional ? onChange : undefinedChange
-              }
-            : undefined
-        }
-      />
-    )
+    const ui = () => {
+      return (
+        !removeComponent && (
+          <Input
+            uiTransform={{
+              width: 100
+            }}
+            placeholderColor={Color4.Blue()}
+            placeholder="Boedo its carnaval"
+            disabled={false}
+            color={Color4.Red()}
+            textAlign={TextAlignMode.TAM_BOTTOM_CENTER}
+            font={Font.F_SANS_SERIF}
+            fontSize={14}
+            onChange={conditional ? onChange : undefinedChange}
+          />
+        )
+      )
+    }
     uiRenderer.setUiRenderer(ui)
+
     expect(onChange).toBeCalledTimes(0)
     await engine.update(1)
     expect(onChange).toBeCalledTimes(0)
@@ -88,7 +88,7 @@ describe('Ui Listeners React Ecs', () => {
     onChange.mockClear()
     removeComponent = true
     await engine.update(1)
-    UiInputResult.getMutable(uiEntity).value = 'Boedo'
+    UiInputResult.create(uiEntity, { value: 'BOEDO' })
     await engine.update(1)
     expect(onChange).toBeCalledTimes(0)
   })
