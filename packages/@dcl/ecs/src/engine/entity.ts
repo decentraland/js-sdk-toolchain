@@ -1,5 +1,5 @@
 /**
- * @public Only for explicitation purposes
+ * @public It only defines the type explicitly, no effects.
  */
 export type uint32 = number
 export const MAX_U16 = 0xffff
@@ -8,7 +8,7 @@ export const MASK_UPPER_16_ON_32 = 0xffff0000
 export const AMOUNT_VERSION_AVAILABLE = MAX_U16 + 1
 
 /**
- * @public
+ * @public The Entity is a number type, the cast is only for typescript, the final javascript code treat as a number
  *  version  number
  * [31...16][15...0]
  *
