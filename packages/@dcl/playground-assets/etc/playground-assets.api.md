@@ -465,7 +465,7 @@ export function defineComponent<T>(componentId: number, spec: ISchema<T>): Compo
 export const DEG2RAD: number;
 
 // @public (undocumented)
-export function Dropdown(props: Pick<EntityPropTypes, 'uiTransform'> & Partial<CommonProps> & UiDropdownProps): ReactEcs.JSX.Element;
+export function Dropdown(props: Pick<EntityPropTypes, 'uiTransform'> & UiDropdownProps): ReactEcs.JSX.Element;
 
 // Warning: (ae-missing-release-tag) "EcsElements" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
