@@ -480,7 +480,9 @@ export type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = {
 // Warning: (tsdoc-malformed-html-name) Invalid HTML element: A space is not allowed here
 //
 // @public
-export type Entity = uint32;
+export type Entity = uint32 & {
+    __entity_type: '';
+};
 
 // Warning: (ae-missing-release-tag) "EntityComponents" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2299,12 +2301,12 @@ export type PointerEventsSystem = ReturnType<typeof createPointerEventSystem>;
 //
 // @public (undocumented)
 export const pointerEventsSystem: {
-    removeOnClick(entity: number): void;
-    removeOnPointerDown(entity: number): void;
-    removeOnPointerUp(entity: number): void;
-    onClick(entity: number, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
-    onPointerDown(entity: number, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
-    onPointerUp(entity: number, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
+    removeOnClick(entity: Entity): void;
+    removeOnPointerDown(entity: Entity): void;
+    removeOnPointerUp(entity: Entity): void;
+    onClick(entity: Entity, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
+    onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
+    onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
 };
 
 // Warning: (ae-missing-release-tag) "PointerEventType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)

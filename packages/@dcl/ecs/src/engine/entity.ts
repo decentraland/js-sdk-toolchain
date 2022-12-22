@@ -19,7 +19,7 @@ export const AMOUNT_VERSION_AVAILABLE = MAX_U16 + 1
  * Convertion from its compound numbers to entity:
  * entity = (entityNumber & MAX_U16) | ((entityVersion & MAX_U16) << 16)
  */
-export type Entity = uint32
+export type Entity = uint32 & { __entity_type: '' }
 
 /**
  * @public This first 512 entities are reserved by the renderer
@@ -45,7 +45,8 @@ export function EntityContainer() {
   }
 
   function entityId(entityNumber: number, entityVersion: number): Entity {
-    return ((entityNumber & MAX_U16) | ((entityVersion & MAX_U16) << 16)) >>> 0
+    return (((entityNumber & MAX_U16) | ((entityVersion & MAX_U16) << 16)) >>>
+      0) as Entity
   }
 
   function generateNewEntity(): Entity {
@@ -55,7 +56,7 @@ export function EntityContainer() {
       )
     }
 
-    const entity = entityCounter++
+    const entity = entityCounter++ as Entity
     usedEntities.add(entity)
     return entity
   }

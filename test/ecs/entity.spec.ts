@@ -49,7 +49,8 @@ describe('Entity container', () => {
       entityContainer.generateEntity()
     }).toThrowError()
 
-    const randomEntityNumber: Entity = 32e3 + Math.round(Math.random() * 32e3)
+    const randomEntityNumber = (32e3 +
+      Math.round(Math.random() * 32e3)) as Entity
     entityContainer.removeEntity(randomEntityNumber)
 
     expect(() => {
