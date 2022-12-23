@@ -178,6 +178,11 @@ export type ByteBuffer = {
     setUint64(offset: number, value: bigint): void;
 };
 
+// Warning: (ae-missing-release-tag) "Callback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type Callback = () => void;
+
 // @public (undocumented)
 export const CameraMode: ComponentDefinition<PBCameraMode>;
 
@@ -465,13 +470,13 @@ export function defineComponent<T>(componentId: number, spec: ISchema<T>): Compo
 export const DEG2RAD: number;
 
 // @public (undocumented)
-export function Dropdown(props: Pick<EntityPropTypes, 'uiTransform'> & UiDropdownProps): ReactEcs.JSX.Element;
+export function Dropdown(props: Pick<EntityPropTypes, 'uiTransform'> & UiDropdownProps & Listeners): ReactEcs.JSX.Element;
 
 // Warning: (ae-missing-release-tag) "EcsElements" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export type EcsElements = {
-    entity: Partial<Omit<EntityComponents, 'onClick'> & CommonProps>;
+    entity: Partial<EntityComponents & CommonProps>;
 };
 
 // @public (undocumented)
@@ -502,7 +507,8 @@ export type EntityComponents = {
     uiBackground: PBUiBackground;
     uiInput: PBUiInput;
     uiDropdown: PBUiDropdown;
-    onClick: EventSystemCallback;
+    onMouseDown: Callback;
+    onMouseUp: Callback;
 };
 
 // Warning: (ae-missing-release-tag) "EntityContainer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -520,7 +526,7 @@ export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
     uiText?: PBUiText;
     uiBackground?: UiBackgroundProps;
-};
+} & Listeners;
 
 // @public
 export const Epsilon = 0.000001;
@@ -820,7 +826,7 @@ export type IncludeUndefined<T> = {
 }[keyof T];
 
 // @public (undocumented)
-export function Input(props: Pick<EntityPropTypes, 'uiTransform'> & Partial<CommonProps> & Partial<UiInputProps>): ReactEcs.JSX.Element;
+export function Input(props: Pick<EntityPropTypes, 'uiTransform'> & Partial<UiInputProps> & Listeners): ReactEcs.JSX.Element;
 
 // Warning: (ae-missing-release-tag) "InputAction" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -892,7 +898,7 @@ export type ISchema<T = any> = {
 // Warning: (ae-missing-release-tag) "isListener" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export const isListener: (key: string) => key is "onClick";
+export const isListener: (key: string) => key is keyof Listeners;
 
 // Warning: (ae-missing-release-tag) "JSX" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -916,7 +922,8 @@ export type Key = number | string;
 //
 // @public (undocumented)
 export type Listeners = {
-    onClick?: EventSystemCallback;
+    onMouseDown?: Callback;
+    onMouseUp?: Callback;
 };
 
 // Warning: (ae-missing-release-tag) "MapComponentDefinition" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)

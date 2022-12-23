@@ -1,4 +1,5 @@
 import { PBUiText } from '@dcl/ecs'
+import { Listeners } from './listeners/types'
 import { UiBackgroundProps } from './uiBackground/types'
 import { UiTransformProps } from './uiTransform/types'
 
@@ -9,8 +10,7 @@ export type EntityPropTypes = {
   uiTransform?: UiTransformProps
   uiText?: PBUiText
   uiBackground?: UiBackgroundProps
-} // & Listeners
-// TODO: Add Listeners when onClick its handled Unity Side
+} & Listeners
 
 export type Key = number | string
 export type Children = any

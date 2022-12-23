@@ -1,6 +1,6 @@
-import { parseProps } from '..'
+import { Listeners, parseProps } from '..'
 import { ReactEcs } from '../../react-ecs'
-import { CommonProps, EntityPropTypes } from '../types'
+import { EntityPropTypes } from '../types'
 import { UiInputProps } from './types'
 
 function parseUiInput(props: Partial<UiInputProps>): UiInputProps {
@@ -16,11 +16,11 @@ function parseUiInput(props: Partial<UiInputProps>): UiInputProps {
  */
 export function Input(
   props: Pick<EntityPropTypes, 'uiTransform'> &
-    Partial<CommonProps> &
-    Partial<UiInputProps>
+    Partial<UiInputProps> &
+    Listeners
 ) {
-  const { uiTransform, key, children, ...otherProps } = props
+  const { uiTransform, onMouseDown, onMouseUp, ...otherProps } = props
   const inputProps = parseUiInput(otherProps)
-  const commonProps = parseProps({ uiTransform, key, children })
+  const commonProps = parseProps({ uiTransform, onMouseDown, onMouseUp })
   return <entity {...commonProps} uiInput={inputProps} />
 }

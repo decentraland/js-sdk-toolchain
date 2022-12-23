@@ -86,23 +86,27 @@ export function createReconciler(
 
   function upsertListener(
     instance: Instance,
-    update: Changes<keyof Listeners>
+    update: Changes<keyof Pick<Listeners, 'onMouseDown' | 'onMouseUp'>>
   ) {
-    // TODO: This handles only onClick listener for the moment
     if (update.type === 'delete' || !update.props) {
-      pointerEvents.removeOnPointerDown(instance.entity)
+      if (update.component === 'onMouseDown') {
+        pointerEvents.removeOnPointerDown(instance.entity)
+      } else if (update.component === 'onMouseUp') {
+        pointerEvents.removeOnPointerUp(instance.entity)
+      }
       return
     }
 
     if (update.props) {
-      pointerEvents.onPointerDown(
-        instance.entity,
-        update.props as EventSystemCallback,
-        {
-          button: InputAction.IA_POINTER,
-          hoverText: '@dcl/react-ecs/onPointerDown'
-        }
-      )
+      const pointerEvent =
+        update.component === 'onMouseDown'
+          ? pointerEvents.onPointerDown
+          : pointerEvents.onPointerUp
+
+      pointerEvent(instance.entity, update.props as EventSystemCallback, {
+        button: InputAction.IA_POINTER,
+        hoverText: '@dcl/react-ecs/onPointerDown'
+      })
     }
   }
 

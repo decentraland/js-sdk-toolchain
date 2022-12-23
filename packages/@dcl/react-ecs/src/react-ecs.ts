@@ -4,25 +4,24 @@ import {
   PBUiText,
   PBUiTransform,
   PBUiInput,
-  EventSystemCallback,
   PBUiDropdown
 } from '@dcl/ecs'
 import React from 'react'
+import { Callback } from './components'
 import { CommonProps } from './components/types'
 
 export type EcsElements = {
-  // TODO: Remove Omit when onClick its handled Unity Side
-  entity: Partial<Omit<EntityComponents, 'onClick'> & CommonProps>
+  entity: Partial<EntityComponents & CommonProps>
 }
 
-// TODO: Remove Omit when onClick its handled Unity Side
 export type EntityComponents = {
   uiTransform: PBUiTransform
   uiText: PBUiText
   uiBackground: PBUiBackground
   uiInput: PBUiInput
   uiDropdown: PBUiDropdown
-  onClick: EventSystemCallback
+  onMouseDown: Callback
+  onMouseUp: Callback
 }
 
 export namespace JSX {

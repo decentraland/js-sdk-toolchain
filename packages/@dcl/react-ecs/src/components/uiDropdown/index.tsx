@@ -1,7 +1,7 @@
 import { PBUiDropdown } from '@dcl/ecs'
-import { parseProps } from '..'
+import { Listeners, parseProps } from '..'
 import { ReactEcs } from '../../react-ecs'
-import { CommonProps, EntityPropTypes } from '../types'
+import { EntityPropTypes } from '../types'
 import { UiDropdownProps } from './types'
 
 function parseUiDropdown(props: UiDropdownProps): PBUiDropdown {
@@ -18,10 +18,10 @@ function parseUiDropdown(props: UiDropdownProps): PBUiDropdown {
  * @public
  */
 export function Dropdown(
-  props: Pick<EntityPropTypes, 'uiTransform'> & UiDropdownProps
+  props: Pick<EntityPropTypes, 'uiTransform'> & UiDropdownProps & Listeners
 ) {
-  const { uiTransform, ...otherProps } = props
+  const { uiTransform, onMouseDown, onMouseUp, ...otherProps } = props
   const dropdownProps = parseUiDropdown(otherProps)
-  const commonProps = parseProps({ uiTransform })
+  const commonProps = parseProps({ uiTransform, onMouseDown, onMouseUp })
   return <entity {...commonProps} uiDropdown={dropdownProps} />
 }
