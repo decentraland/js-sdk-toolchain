@@ -563,7 +563,11 @@ export type FloatArray = number[];
 // @public (undocumented)
 export const enum Font {
     // (undocumented)
-    F_SANS_SERIF = 0
+    F_MONOSPACE = 2,
+    // (undocumented)
+    F_SANS_SERIF = 0,
+    // (undocumented)
+    F_SERIF = 1
 }
 
 // Warning: (ae-missing-release-tag) "GizmoDragEndEvent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2053,9 +2057,7 @@ export interface PBTextShape {
     fontAutoSize?: boolean | undefined;
     fontSize?: number | undefined;
     height?: number | undefined;
-    // (undocumented)
     lineCount?: number | undefined;
-    // (undocumented)
     lineSpacing?: number | undefined;
     outlineColor?: PBColor3 | undefined;
     // (undocumented)
@@ -2079,7 +2081,6 @@ export interface PBTextShape {
     text: string;
     textAlign?: TextAlignMode | undefined;
     textColor?: PBColor4 | undefined;
-    // (undocumented)
     textWrapping?: boolean | undefined;
     width?: number | undefined;
 }
@@ -2126,7 +2127,7 @@ export interface PBUiDropdown {
     fontSize?: number | undefined;
     // (undocumented)
     options: string[];
-    selectedIndex: number;
+    selectedIndex?: number | undefined;
     textAlign?: TextAlignMode | undefined;
 }
 
