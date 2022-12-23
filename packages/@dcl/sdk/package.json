@@ -20,9 +20,9 @@
     "@dcl/ecs": "file:../ecs",
     "@dcl/ecs-math": "2.0.1-20221129185242.commit-40495c1",
     "@dcl/js-runtime": "file:../js-runtime",
-    "@dcl/kernel": "2.0.0-3640389337.commit-b563bb9",
+    "@dcl/kernel": "2.0.0-3766760530.commit-239d2a9",
     "@dcl/react-ecs": "file:../react-ecs",
-    "@dcl/unity-renderer": "1.0.66458-20221207172857.commit-1a83854"
+    "@dcl/unity-renderer": "1.0.68557-20221221195847.commit-f743b85"
   },
   "minCliVersion": "3.14.1"
 }
