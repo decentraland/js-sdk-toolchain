@@ -128,8 +128,8 @@ export function crdtSceneSystem(
         //  out of the block of systems update between `receiveMessage` and `updateState`
         if (component?.isDirty(msg.entityId)) {
           crdtClient.createComponentDataEvent(
-            msg.entityId,
             component._id,
+            msg.entityId,
             component.toBinaryOrNull(msg.entityId)?.toBinary() || null
           )
         }
@@ -219,7 +219,7 @@ export function crdtSceneSystem(
         const componentValue =
           component.toBinaryOrNull(entity)?.toBinary() ?? null
 
-        crdtClient.createComponentDataEvent(entity as number, componentId, componentValue)
+        crdtClient.createComponentDataEvent(componentId, entity as number, componentValue)
       }
     }
     return dirtyEntities
@@ -239,8 +239,8 @@ export function crdtSceneSystem(
         const component = engine.getComponent(componentId)
         const { timestamp, data } = crdtClient
           .getState().components
-          .get(entity as number)!
           .get(componentId)!
+          .get(entity as number)!
         const offset = buffer.currentWriteOffset()
         const type: WireMessageEnum = ComponentOperation.getType(component, entity)
         const transportMessage = {

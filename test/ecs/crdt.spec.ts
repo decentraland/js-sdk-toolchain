@@ -259,7 +259,7 @@ describe('CRDT tests', () => {
     serverTransport.onmessage!(buffer.toBinary())
     await serverEngine.update(1)
     const crdtState = serverEngine.getCrdtState()
-    const component = crdtState.get(entity as number)?.get(cusutomComponent._id)
+    const component = crdtState.components.get(cusutomComponent._id)!.get(entity as number)!
     expect(component?.data).toStrictEqual(
       cusutomComponent.toBinary(entity).toBinary()
     )
