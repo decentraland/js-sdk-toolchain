@@ -204,7 +204,7 @@ export function createReconciler(
       changeEvents.set(entity, new Map()).get(entity)!
     const oldState = event.get(componentId)
     const fn = state?.fn
-    const value = state?.value || oldState?.value
+    const value = state?.value ?? oldState?.value
     event.set(componentId, { fn, value })
   }
 
