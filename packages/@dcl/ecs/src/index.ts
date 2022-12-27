@@ -30,3 +30,6 @@ import { engine } from './runtime/initialization'
 export * from './components/generated/global.gen'
 
 export * from './components/generated/types.gen'
+
+export * from './serialization/wireMessage'
+export * from './serialization/types'

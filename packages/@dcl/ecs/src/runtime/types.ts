@@ -26,7 +26,6 @@ export * from '../engine/component'
 export type { SystemFn } from '../engine/systems'
 export type { MapResult, Spec } from '../schemas/Map'
 export * from '../schemas/typing'
-export type { WireMessage } from '../serialization/wireMessage'
 export type {
   ReceiveMessage,
   Transport,

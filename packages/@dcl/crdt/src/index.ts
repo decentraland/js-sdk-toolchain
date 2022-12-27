@@ -1,4 +1,5 @@
-import { CRDT, Message, Payload, State } from './types'
+import { gset } from './gset'
+import { AddGSetMessage, CRDT, LWWMessage, Message, MessageType, Payload, State } from './types'
 export * from './types'
 
 const globalBuffer = (globalThis as any).Buffer
@@ -42,11 +43,17 @@ export function sameData<T>(a: T, b: T): boolean {
 export function* stateIterator<T>(
   state: State<T>
 ): IterableIterator<[number, number, Payload<T> | null]> {
-  for (const [key1, value1] of state.entries()) {
-    for (const [key2, value2] of value1.entries()) {
-      yield [key1, key2, value2]
+  for (const [componentId, value1] of state.entries()) {
+    for (const [entityId, value2] of value1.entries()) {
+      yield [componentId, entityId, value2]
     }
   }
+}
+
+type EntityUtils = {
+  entityVersion(entityId: number): number
+  entityNumber(entityId: number): number
+  entityId(entityNumber: number, entityVersion: number): number
 }
 
 /**
@@ -58,35 +65,36 @@ export function* stateIterator<T>(
  */
 export function crdtProtocol<
   T extends number | Uint8Array | string
->(): CRDT<T> {
+>(entityUtils: EntityUtils): CRDT<T> {
   /**
    * Local state where we store the latest lamport timestamp
    * and the raw data value
    * @internal
    */
   const state: State<T> = new Map()
+  const stateGrowonlySet = gset()
 
   /**
    * We should call this fn in order to update the state
    * @internal
    */
   function updateState(
-    key1: number,
-    key2: number,
+    componentId: number,
+    entityId: number,
     data: T | null,
     remoteTimestamp: number
   ): Payload<T> {
-    const key1Value = state.get(key1)
+    const componentIdValue = state.get(componentId)
     const timestamp = Math.max(
       remoteTimestamp,
-      key1Value?.get(key2)?.timestamp || 0
+      componentIdValue?.get(entityId)?.timestamp || 0
     )
-    if (key1Value) {
-      key1Value.set(key2, { timestamp, data })
+    if (componentIdValue) {
+      componentIdValue.set(entityId, { timestamp, data })
     } else {
-      const newKey1Value = new Map()
-      newKey1Value.set(key2, { timestamp, data })
-      state.set(key1, newKey1Value)
+      const componentIdValue = new Map()
+      componentIdValue.set(entityId, { timestamp, data })
+      state.set(componentId, componentIdValue)
     }
     return { timestamp, data }
   }
@@ -96,12 +104,12 @@ export function crdtProtocol<
    * lamport timestmap incremented by one in the state.
    * @public
    */
-  function createEvent(key1: number, key2: number, data: T | null): Message<T> {
+  function createEvent(componentId: number, entityId: number, data: T | null): Message<T> {
     // Increment the timestamp
-    const timestamp = (state.get(key1)?.get(key2)?.timestamp || 0) + 1
-    updateState(key1, key2, data, timestamp)
+    const timestamp = (state.get(componentId)?.get(entityId)?.timestamp || 0) + 1
+    updateState(componentId, entityId, data, timestamp)
 
-    return { key1, key2, data, timestamp }
+    return { type: MessageType.MT_LWW, componentId, entityId, data, timestamp }
   }
 
   /**
@@ -113,21 +121,31 @@ export function crdtProtocol<
    * If it was an outdated message, then we return void
    * @public
    */
-  function processMessage(message: Message<T>): Message<T> {
-    const { key1, key2, data, timestamp } = message
-    const current = state.get(key1)?.get(key2)
+  function processLWWMessage(message: LWWMessage<T>): Message<T> {
+    const n = entityUtils.entityNumber(message.entityId)
+    const v = entityUtils.entityNumber(message.entityId)
+    if (stateGrowonlySet.has(n, v)) {
+      return {
+        type: MessageType.MT_AddGSet,
+        entityId: message.entityId
+      }
+    }
+
+    const { componentId, entityId, data, timestamp } = message
+    const current = state.get(componentId)?.get(entityId)
 
     // The received message is > than our current value, update our state.
     if (!current || current.timestamp < timestamp) {
-      updateState(key1, key2, data, timestamp)
+      updateState(componentId, entityId, data, timestamp)
       return message
     }
 
     // Outdated Message. Resend our state message through the wire.
     if (current.timestamp > timestamp) {
       return {
-        key1,
-        key2,
+        type: MessageType.MT_LWW,
+        componentId,
+        entityId,
         data: current.data,
         timestamp: current.timestamp
       }
@@ -146,15 +164,43 @@ export function crdtProtocol<
 
     if (compareData(current.data, data)) {
       return {
-        key1,
-        key2,
+        type: MessageType.MT_LWW,
+        componentId,
+        entityId,
         data: current.data,
         timestamp: current.timestamp
       }
     }
-    updateState(key1, key2, data, timestamp).data
+    updateState(componentId, entityId, data, timestamp).data
     return message
   }
+
+  /*
+  * @public
+  */
+  function processMessage(message: Message<T>): Message<T> {
+    if (message.type === MessageType.MT_LWW) {
+      return processLWWMessage(message as LWWMessage<T>)
+    } else {
+      return processAddSetMessage(message as AddGSetMessage)
+    }
+  }
+
+  function processAddSetMessage(message: AddGSetMessage): AddGSetMessage {
+    const { entityId } = message
+    stateGrowonlySet.addTo(entityUtils.entityNumber(entityId), entityUtils.entityVersion(entityId))
+
+    for (const [, payload] of state) {
+      payload.delete(entityId)
+    }
+
+    return {
+      type: MessageType.MT_AddGSet,
+      entityId
+    }
+  }
+
+
 
   /**
    * Returns the current state
@@ -168,8 +214,8 @@ export function crdtProtocol<
    * Returns the element state of a given element of the LWW-ElementSet
    * @public
    */
-  function getElementSetState(key1: number, key2: number): Payload<T> | null {
-    return state.get(key1)?.get(key2) || null
+  function getElementSetState(componentId: number, entityId: number): Payload<T> | null {
+    return state.get(componentId)?.get(entityId) || null
   }
 
   return {

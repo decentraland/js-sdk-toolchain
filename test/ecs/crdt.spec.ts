@@ -2,8 +2,8 @@ import { components, Schemas } from '../../packages/@dcl/ecs/src'
 import { Vector3 } from '../../packages/@dcl/sdk/src/math'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt/componentOperation'
-import WireMessage from '../../packages/@dcl/ecs/src/serialization/wireMessage'
+import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/messages/componentOperation'
+import { WireMessageEnum } from '../../packages/@dcl/ecs/src/serialization/types'
 import { wait, SandBox } from './utils'
 
 describe('CRDT tests', () => {
@@ -163,7 +163,7 @@ describe('CRDT tests', () => {
     await engine.update(1)
     const buffer = createByteBuffer()
     ComponentOperation.write(
-      WireMessage.Enum.PUT_COMPONENT,
+      WireMessageEnum.PUT_COMPONENT,
       entity,
       0,
       Transform,
@@ -175,7 +175,7 @@ describe('CRDT tests', () => {
 
     const outdatedBuffer = createByteBuffer()
     ComponentOperation.write(
-      WireMessage.Enum.PUT_COMPONENT,
+      WireMessageEnum.PUT_COMPONENT,
       entity,
       2,
       Transform,
@@ -192,7 +192,7 @@ describe('CRDT tests', () => {
     await engine.update(1)
     const buffer = createByteBuffer()
     ComponentOperation.write(
-      WireMessage.Enum.PUT_COMPONENT,
+      WireMessageEnum.PUT_COMPONENT,
       entity,
       0,
       Transform,
@@ -205,7 +205,7 @@ describe('CRDT tests', () => {
     await engine.update(1)
     const outdatedBuffer = createByteBuffer()
     ComponentOperation.write(
-      WireMessage.Enum.DELETE_COMPONENT,
+      WireMessageEnum.DELETE_COMPONENT,
       entity,
       2,
       Transform,
@@ -225,7 +225,7 @@ describe('CRDT tests', () => {
 
     const buffer = createByteBuffer()
     ComponentOperation.write(
-      WireMessage.Enum.DELETE_COMPONENT,
+      WireMessageEnum.DELETE_COMPONENT,
       entity,
       2,
       Transform,
@@ -250,7 +250,7 @@ describe('CRDT tests', () => {
 
     const buffer = createByteBuffer()
     ComponentOperation.write(
-      WireMessage.Enum.PUT_COMPONENT,
+      WireMessageEnum.PUT_COMPONENT,
       entity,
       1,
       cusutomComponent,

@@ -7,7 +7,7 @@ import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/Byte
 import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt/componentOperation'
 import WireMessage from '../../packages/@dcl/ecs/src/serialization/wireMessage'
 
-const putType = WireMessage.Enum.PUT_COMPONENT
+const putType = WireMessageEnum.PUT_COMPONENT
 
 describe('Component operation tests', () => {
   it('validate corrupt message', () => {
@@ -41,7 +41,7 @@ describe('Component operation tests', () => {
     const bb = createByteBuffer()
 
     ComponentOperation.write(
-      WireMessage.Enum.PUT_COMPONENT,
+      WireMessageEnum.PUT_COMPONENT,
       entityA,
       timestamp,
       Transform,
@@ -57,10 +57,10 @@ describe('Component operation tests', () => {
       const msgOne = ComponentOperation.read(bb)!
       expect(msgOne.length).toBe(
         TRANSFORM_LENGTH +
-          ComponentOperation.MESSAGE_HEADER_LENGTH +
-          WireMessage.HEADER_LENGTH
+        ComponentOperation.MESSAGE_HEADER_LENGTH +
+        WireMessage.HEADER_LENGTH
       )
-      expect(msgOne.type).toBe(WireMessage.Enum.PUT_COMPONENT)
+      expect(msgOne.type).toBe(WireMessageEnum.PUT_COMPONENT)
       Transform.upsertFromBinary(entityB, bb)
     }
   })

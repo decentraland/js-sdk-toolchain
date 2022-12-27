@@ -31,23 +31,26 @@ export const RESERVED_STATIC_ENTITIES = 512
  */
 export const MAX_ENTITY_NUMBER = MAX_U16
 
-export function EntityContainer() {
-  let entityCounter = RESERVED_STATIC_ENTITIES
-  const usedEntities: Set<Entity> = new Set()
-  const removedEntities: Map<number, number> = new Map()
-
-  function entityVersion(entity: Entity) {
+export namespace EntityUtils {
+  export function entityVersion(entity: Entity) {
     return (((entity & MASK_UPPER_16_ON_32) >> 16) & MAX_U16) >>> 0
   }
 
-  function entityNumber(entity: Entity) {
+  export function entityNumber(entity: Entity) {
     return (entity & MAX_U16) >>> 0
   }
 
-  function entityId(entityNumber: number, entityVersion: number): Entity {
+  export function entityId(entityNumber: number, entityVersion: number): Entity {
     return (((entityNumber & MAX_U16) | ((entityVersion & MAX_U16) << 16)) >>>
       0) as Entity
   }
+}
+
+export function EntityContainer() {
+  let entityCounter = RESERVED_STATIC_ENTITIES
+  const usedEntities: Set<Entity> = new Set()
+  let toRemoveEntities: Entity[] = []
+  const removedEntities: Map<number, number> = new Map()
 
   function generateNewEntity(): Entity {
     if (entityCounter > MAX_ENTITY_NUMBER - 1) {
@@ -68,7 +71,7 @@ export function EntityContainer() {
 
     for (const [number, version] of removedEntities) {
       if (version < MAX_U16) {
-        const entity = entityId(number, version + 1)
+        const entity = EntityUtils.entityId(number, version + 1)
 
         usedEntities.add(entity)
         removedEntities.delete(number)
@@ -83,9 +86,19 @@ export function EntityContainer() {
   function removeEntity(entity: Entity) {
     const deleted = usedEntities.delete(entity)
     if (deleted) {
-      removedEntities.set(entityNumber(entity), entityVersion(entity))
+      toRemoveEntities.push(entity)
+      removedEntities.set(EntityUtils.entityNumber(entity), EntityUtils.entityVersion(entity))
     }
     return deleted
+  }
+
+  function releaseRemovedEntities() {
+    const arr = toRemoveEntities
+    toRemoveEntities = []
+    for (const entity of arr) {
+      removedEntities.set(EntityUtils.entityNumber(entity), EntityUtils.entityVersion(entity))
+    }
+    return arr
   }
 
   return {
@@ -101,9 +114,9 @@ export function EntityContainer() {
     getExistingEntities(): Set<Entity> {
       return new Set(usedEntities)
     },
-
-    entityVersion,
-    entityNumber,
-    entityId
+    releaseRemovedEntities,
+    entityVersion: EntityUtils.entityVersion,
+    entityNumber: EntityUtils.entityNumber,
+    entityId: EntityUtils.entityId
   }
 }

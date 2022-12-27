@@ -1,4 +1,4 @@
-import { Transport } from '@dcl/ecs'
+import { Transport, TransportMessage, WireMessageEnum } from '@dcl/ecs'
 import { ECSComponentIDs } from '@dcl/ecs/dist/components/generated/ids.gen'
 import type {
   CrdtSendToRendererRequest,
@@ -41,9 +41,11 @@ export function createRendererTransport(
         debugger
       }
     },
-    filter(message) {
+    filter(message: TransportMessage) {
       // Only send renderer components (Proto Generated)
-      if (!componentIds.includes(message.componentId)) {
+      if ((message.type === WireMessageEnum.PUT_COMPONENT ||
+        message.type === WireMessageEnum.DELETE_COMPONENT) &&
+        !componentIds.includes((message as any).componentId)) {
         return false
       }
 

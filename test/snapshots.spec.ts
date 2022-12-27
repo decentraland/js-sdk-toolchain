@@ -1,6 +1,5 @@
 import WireMessage from '../packages/@dcl/ecs/src/serialization/wireMessage'
 import { createByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { ComponentOperation as Message } from '../packages/@dcl/ecs/src/serialization/crdt/componentOperation'
 import { engine } from '../packages/@dcl/ecs/src'
 import { existsSync, readFileSync, writeFileSync } from 'fs-extra'
 import path from 'path'

@@ -1,13 +1,26 @@
+export enum MessageType {
+  MT_LWW = 1,
+  MT_AddGSet
+}
+
 /**
  * Struct of the message that's being transfered between clients.
  * @public
  */
-export type Message<T = unknown> = {
-  key1: number
-  key2: number
+export type LWWMessage<T = unknown> = {
+  type: MessageType.MT_LWW,
+  componentId: number
+  entityId: number
   timestamp: number
   data: T | null
 }
+
+export type AddGSetMessage = {
+  type: MessageType.MT_AddGSet,
+  entityId: number
+}
+
+export type Message<T = unknown> = LWWMessage<T> | AddGSetMessage
 
 /**
  * Payload that its being stored in the state.
@@ -29,9 +42,9 @@ export type State<T = unknown> = Map<number, Map<number, Payload<T> | null>>
  * @public
  */
 export type CRDT<T = unknown> = {
-  createEvent(key1: number, key2: number, data: T | null): Message<T>
+  createEvent(componentId: number, entityId: number, data: T | null): Message<T>
   processMessage(message: Message<T>): Message<T>
   // @internal
   getState(): State<T>
-  getElementSetState(key1: number, key2: number): Payload<T> | null
+  getElementSetState(componentId: number, entityId: number): Payload<T> | null
 }

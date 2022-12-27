@@ -12,38 +12,17 @@
  *
  */
 
-import { ComponentDefinition, Entity } from '../engine'
 import { ByteBuffer } from './ByteBuffer'
+import { WireMessageEnum, WireMessageHeader, WIRE_MESSAGE_HEADER_LENGTH } from './types'
 
 export namespace WireMessage {
-  export type Uint32 = number
-  export enum Enum {
-    RESERVED = 0,
-
-    // Component Operation
-    PUT_COMPONENT = 1,
-    DELETE_COMPONENT = 2,
-
-    MAX_MESSAGE_TYPE
-  }
-
-  /**
-   * @param length - Uint32 the length of all message (including the header)
-   * @param type - define the function which handles the data
-   */
-  export type Header = {
-    length: Uint32
-    type: Uint32
-  }
-
-  export const HEADER_LENGTH = 8
   /**
    * Validate if the message incoming is completed
    * @param buf - ByteBuffer
    */
   export function validate(buf: ByteBuffer) {
     const rem = buf.remainingBytes()
-    if (rem < HEADER_LENGTH) {
+    if (rem < WIRE_MESSAGE_HEADER_LENGTH) {
       return false
     }
 
@@ -55,22 +34,32 @@ export namespace WireMessage {
     return true
   }
 
-  export function readHeader(buf: ByteBuffer): Header | null {
+  export function readHeader(buf: ByteBuffer): WireMessageHeader | null {
     if (!validate(buf)) {
       return null
     }
 
     return {
       length: buf.readUint32(),
-      type: buf.readUint32() as Enum
+      type: buf.readUint32() as WireMessageEnum
     }
   }
 
-  export function getType(
-    component: ComponentDefinition<unknown>,
-    entity: Entity
-  ): Enum {
-    return component.has(entity) ? Enum.PUT_COMPONENT : Enum.DELETE_COMPONENT
+  export function getHeader(buf: ByteBuffer): WireMessageHeader | null {
+    const rem = buf.remainingBytes()
+    if (rem < WIRE_MESSAGE_HEADER_LENGTH) {
+      return null
+    }
+
+    const messageLength = buf.getUint32(buf.currentReadOffset())
+    if (rem < messageLength) {
+      return null
+    }
+
+    return {
+      length: messageLength,
+      type: buf.getUint32(buf.currentReadOffset() + 4) as WireMessageEnum
+    }
   }
 }
 

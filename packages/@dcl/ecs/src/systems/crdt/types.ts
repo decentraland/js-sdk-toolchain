@@ -1,15 +1,10 @@
-import { Entity } from '../../engine/entity'
-import WireMessage from '../../serialization/wireMessage'
+import { MessageBody } from "../../serialization/types"
 
-export type ReceiveMessage = {
-  type: WireMessage.Enum
-  entity: Entity
-  componentId: number
-  timestamp: number
-  transportId?: number
-  data?: Uint8Array
-  messageBuffer: Uint8Array
-}
+export type ReceiveMessage =
+  MessageBody & {
+    transportId?: number
+    messageBuffer: Uint8Array
+  }
 
 export type TransportMessage = Omit<ReceiveMessage, 'data'>
 
