@@ -1,5 +1,6 @@
 import { compareData } from './utils'
 import { createSandbox } from './utils/sandbox'
+import { LWWMessage } from './../../packages/@dcl/crdt/dist/types'
 
 describe('CRDT Uint8Array', () => {
   const encode = new TextEncoder()
@@ -16,7 +17,7 @@ describe('CRDT Uint8Array', () => {
       clientA.sendMessage(messageA)
     ])
     await compare()
-    expect(compareData(messageA.data, messageA.data)).toBe(true)
+    expect(compareData((messageA as LWWMessage<Uint8Array>).data, (messageA as LWWMessage<Uint8Array>).data)).toBe(true)
   })
 
   it('should return the bigger raw data', async () => {

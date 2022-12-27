@@ -3,11 +3,15 @@ import expect from 'expect'
 import { compareData, compareStatePayloads } from './utils'
 import { createSandbox } from './utils/sandbox'
 
+import { LWWMessage, MessageType } from '../../packages/@dcl/crdt/dist/types'
+
 describe('CRDT protocol', () => {
   it('should return true if there is no state', () => {
     expect(compareStatePayloads([])).toBe(true)
   })
-  ;[true, false].forEach((delay) => {
+  const delayEnable = [false, false]
+  delayEnable.forEach((delay) => {
+
     const msg = delay ? '[Delay] ' : ''
     it(`${msg}should store the message A in all the clients`, async () => {
       const { clients, compare } = createSandbox({ clientLength: 2, delay })
@@ -17,7 +21,10 @@ describe('CRDT protocol', () => {
       const messageA = clientA.createEvent(key1, key2, Buffer.from('casla'))
       await clientA.sendMessage(messageA)
       await compare()
-      expect(clientA.getElementSetState(key1, key2)?.data).toBe(messageA.data)
+
+      expect(messageA.type).toBe(MessageType.MT_LWW)
+      expect(clientA.getElementSetState(key1, key2)?.data).toBe((messageA as LWWMessage<Buffer>).data)
+      expect(clientA.getElementSetState(key1, key2)?.data).toBe((messageA as LWWMessage<Buffer>).data)
     })
 
     it(`${msg}one message with more clients (N > 2)`, async () => {
@@ -46,7 +53,7 @@ describe('CRDT protocol', () => {
       expect(
         compareData(
           clientA.getState().get(key1)!.get(key2)!.data,
-          messageB.data
+          (messageB as LWWMessage<Buffer>).data
         )
       ).toBe(true)
     })
@@ -63,7 +70,7 @@ describe('CRDT protocol', () => {
       await Promise.all([promiseA, promiseB])
       await compare()
       expect(
-        compareData(clientA.getElementSetState(key1, key2)?.data, messageB.data)
+        compareData(clientA.getElementSetState(key1, key2)?.data, (messageB as LWWMessage<Buffer>).data)
       ).toBe(true)
     })
 
@@ -90,7 +97,7 @@ describe('CRDT protocol', () => {
       await Promise.all([p3, p4])
       await compare()
       expect(clientA.getElementSetState(key1b, key2b)?.data).toBe(
-        messageA2.data
+        (messageA2 as LWWMessage<Buffer>).data
       )
     })
 
@@ -118,7 +125,7 @@ describe('CRDT protocol', () => {
       await Promise.all([p1, p2])
       await compare()
       expect(clientA.getElementSetState(key1b, key2b)?.data).toBe(
-        messageB2.data
+        (messageB2 as LWWMessage<Buffer>).data
       )
     })
 
@@ -145,7 +152,7 @@ describe('CRDT protocol', () => {
       await Promise.all([p1, p2])
       await compare()
       expect(clientA.getElementSetState(key1b, key2b)?.data).toBe(
-        messageB2.data
+        (messageB2 as LWWMessage<Buffer>).data
       )
     })
 

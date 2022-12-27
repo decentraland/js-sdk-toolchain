@@ -11,21 +11,21 @@ export function stateFromString<T>(stateStr: string) {
   const state = JSON.parse(stateStr)
   const newState: State<T> = new Map()
   for (const value of state) {
-    const { key1, key2, timestamp, data } = value
-    if (!newState.has(key1)) {
-      newState.set(key1, new Map())
+    const { componentId, entityId, timestamp, data } = value
+    if (!newState.has(componentId)) {
+      newState.set(componentId, new Map())
     }
-    newState.get(key1)!.set(key2, value !== null ? { timestamp, data } : null)
+    newState.get(componentId)!.set(entityId, value !== null ? { timestamp, data } : null)
   }
   return newState
 }
 
 export function stateToString<T>(state: State<T>): string {
   const arr = []
-  for (const [key1, key2, value] of stateIterator(state)) {
+  for (const [componentId, entityId, value] of stateIterator(state)) {
     arr.push({
-      key1,
-      key2,
+      componentId,
+      entityId,
       timestamp: value?.timestamp,
       data: dataToString(value?.data)
     })

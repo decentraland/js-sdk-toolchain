@@ -2,7 +2,7 @@ import { createInterface } from 'readline'
 import fs from 'fs-extra'
 import path from 'path'
 
-import { Message, State } from '../../../packages/@dcl/crdt/src'
+import { Message, MessageType, State } from '../../../packages/@dcl/crdt/src'
 import { dataToString, stateToString } from './state'
 
 export function getDataPath(fileName: string) {
@@ -75,7 +75,11 @@ export function snapshotTest<T = unknown>() {
   }
 
   function addMessage(message: Message<T>) {
-    messages.push({ ...message, data: dataToString(message.data) })
+    if (message.type === MessageType.MT_LWW) {
+      messages.push({ ...message, data: dataToString(message.data) })
+    } else {
+      messages.push({ ...message })
+    }
   }
 
   async function validateSpec(state: State<T>) {

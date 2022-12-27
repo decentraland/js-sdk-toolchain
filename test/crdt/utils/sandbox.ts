@@ -1,4 +1,4 @@
-import { Message, crdtProtocol } from '../../../packages/@dcl/crdt/src'
+import { Message, crdtProtocol, MessageType } from '../../../packages/@dcl/crdt/src'
 import { compareStatePayloads, sleep } from '.'
 import { snapshotTest } from './snapshot'
 
@@ -49,7 +49,17 @@ export function createSandbox<T extends Buffer | Uint8Array | string = Buffer>(
   const clients = Array.from({ length: opts.clientLength }).map((_, index) => {
     const uuid = `${index}`
     const ws = broadcast(uuid)
-    const crdt = crdtProtocol<T>()
+    const crdt = crdtProtocol<T>({
+      entityVersion: function (entity: number) {
+        return (((entity & 4294901760) >> 16) & 65535) >>> 0
+      },
+      entityNumber: function (entity: number) {
+        return (entity & 65535) >>> 0
+      },
+      entityId: function (entityNumber: number, entityVersion: number): number {
+        return ((entityNumber & 65535) | ((entityVersion & 65535) << 16)) >>> 0
+      }
+    })
 
     return {
       ...crdt,
@@ -60,9 +70,11 @@ export function createSandbox<T extends Buffer | Uint8Array | string = Buffer>(
       },
       onMessage: function (message: Message<T>) {
         const msg = crdt.processMessage(message)
+
         // If the returned process message its different,
         // it means its an outdated message. Broadcast it.
-        if (msg.data !== message.data) {
+        if ((msg.type === MessageType.MT_LWW && message.type === MessageType.MT_LWW && msg.data !== message.data) ||
+          (msg.type === MessageType.MT_AddGSet && message.entityId !== msg.entityId)) {
           return ws.send(msg)
         }
       }

@@ -1,6 +1,7 @@
 import { CRDT } from '../../packages/@dcl/crdt/src'
 import { compareStatePayloads, shuffle } from './utils'
 import { createSandbox } from './utils/sandbox'
+import { LWWMessage } from './../../packages/@dcl/crdt/dist/types'
 
 function createMessages(
   client: CRDT<Buffer> & { id: string },
@@ -28,7 +29,7 @@ async function prepareSandbox() {
   const messages = [...m1, m2, m3]
 
   await compare()
-  expect(clientA.getElementSetState(key1, key2)?.data).toStrictEqual(m3.data)
+  expect(clientA.getElementSetState(key1, key2)?.data).toStrictEqual((m3 as LWWMessage<Buffer>).data)
 
   // A sends to messages, B & C receive them.
   // B & C creates a new message at the same time. C > B so message C wins.
