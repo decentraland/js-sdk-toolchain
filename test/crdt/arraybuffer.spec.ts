@@ -1,6 +1,5 @@
 import { compareData } from './utils'
 import { createSandbox } from './utils/sandbox'
-import { LWWMessage } from './../../packages/@dcl/crdt/dist/types'
 
 describe('CRDT Uint8Array', () => {
   const encode = new TextEncoder()
@@ -10,14 +9,14 @@ describe('CRDT Uint8Array', () => {
     const key1 = 7,
       key2 = 11
 
-    const messageA = clientA.createEvent(key1, key2, encode.encode('Hola'))
-    const messageB = clientB.createEvent(key1, key2, encode.encode('Hola'))
+    const messageA = clientA.createComponentDataEvent(key1, key2, encode.encode('Hola'))
+    const messageB = clientB.createComponentDataEvent(key1, key2, encode.encode('Hola'))
     await Promise.all([
       clientB.sendMessage(messageB),
       clientA.sendMessage(messageA)
     ])
     await compare()
-    expect(compareData((messageA as LWWMessage<Uint8Array>).data, (messageA as LWWMessage<Uint8Array>).data)).toBe(true)
+    expect(compareData(messageA.data, messageA.data)).toBe(true)
   })
 
   it('should return the bigger raw data', async () => {
@@ -26,8 +25,8 @@ describe('CRDT Uint8Array', () => {
     const key1 = 7,
       key2 = 11
 
-    const messageA = clientA.createEvent(key1, key2, encode.encode('a'))
-    const messageB = clientB.createEvent(key1, key2, encode.encode('b'))
+    const messageA = clientA.createComponentDataEvent(key1, key2, encode.encode('a'))
+    const messageB = clientB.createComponentDataEvent(key1, key2, encode.encode('b'))
     // b > a
     await Promise.all([
       clientB.sendMessage(messageB),
@@ -47,8 +46,8 @@ describe('CRDT Uint8Array', () => {
     const key1 = 7,
       key2 = 11
 
-    const messageA = clientA.createEvent(key1, key2, encode.encode('aa'))
-    const messageB = clientB.createEvent(key1, key2, encode.encode('b'))
+    const messageA = clientA.createComponentDataEvent(key1, key2, encode.encode('aa'))
+    const messageB = clientB.createComponentDataEvent(key1, key2, encode.encode('b'))
     // b > a
     await Promise.all([
       clientB.sendMessage(messageB),

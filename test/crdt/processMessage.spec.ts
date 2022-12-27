@@ -3,17 +3,16 @@ import expect from 'expect'
 import { compareData } from './utils'
 import { createSandbox } from './utils/sandbox'
 
-import { LWWMessage } from './../../packages/@dcl/crdt/dist/types'
-
 describe('CRDT process message', () => {
   it('should return the data if its a new message', async () => {
     const [clientA, clientB] = createSandbox({ clientLength: 2 }).clients
     const key1 = 7,
       key2 = 11
-    const messageA = clientA.createEvent(key1, key2, Buffer.from('casla'))
-    const value = clientB.processMessage(messageA)
+    const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('casla'))
+    const resultValue = clientB.processMessage(messageA)
+    const value = clientB.getState().components.get(messageA.componentId)!.get(messageA.entityId)!
 
-    expect(compareData((value as LWWMessage<Uint8Array>).data as Buffer, (messageA as LWWMessage<Uint8Array>).data)).toBe(true)
+    expect(compareData(value.data as Buffer, messageA.data)).toBe(true)
   })
 
   it('should return void if its an outdated message', async () => {
@@ -21,31 +20,36 @@ describe('CRDT process message', () => {
     const key1 = 7,
       key2 = 11
 
-    clientA.createEvent(key1, key2, Buffer.from('casla'))
-    const { data } = clientA.createEvent(key1, key2, Buffer.from('casla2')) as LWWMessage<Uint8Array>
+    clientA.createComponentDataEvent(key1, key2, Buffer.from('casla'))
+    const { data } = clientA.createComponentDataEvent(key1, key2, Buffer.from('casla2'))
+    const messageB = clientB.createComponentDataEvent(key1, key2, Buffer.from('boedo'))
+    // LamportA: 2, data: casla2
+    // LamportB: 1, data: boedo
+    const resultValue = clientA.processMessage(messageB)
+    const value = clientA.getState().components.get(messageB.componentId)!.get(messageB.entityId)!
 
-  const messageB = clientB.createEvent(key1, key2, Buffer.from('boedo'))
-  // LamportA: 2, data: casla2
-  // LamportB: 1, data: boedo
-  const value = clientA.processMessage(messageB)
-  await clientB.sendMessage(messageB)
-  expect((value as LWWMessage<Uint8Array>).data).toBe(data)
-  expect(clientB.getElementSetState(key1, key2)?.data).toBe(data)
-})
+    await clientB.sendMessage(messageB)
+    expect(value.data).toBe(data)
+    expect(clientB.getElementSetState(key1, key2)?.data).toBe(data)
+  })
 
-it('should return data if they have the same lamport number but bigger raw value', async () => {
-  const [clientA, clientB] = createSandbox({ clientLength: 2 }).clients
-  const key1 = 7,
-    key2 = 11
+  it('should return data if they have the same lamport number but bigger raw value', async () => {
+    const [clientA, clientB] = createSandbox({ clientLength: 2 }).clients
+    const key1 = 7,
+      key2 = 11
 
-  const messageA = clientA.createEvent(key1, key2, Buffer.from('casla'))
-  const messageB = clientB.createEvent(key1, key2, Buffer.from('boedo'))
-  // LamportA: 1, data: casla2
-  // LamportB: 1, data: boedo
-  // dataA > dataB
-  const valueB = clientB.processMessage(messageA)
-  const valueA = clientA.processMessage(messageB)
-  expect((valueA as LWWMessage<Uint8Array>).data).toBe((messageA as LWWMessage<Uint8Array>).data)
-  expect(compareData((valueB as LWWMessage<Uint8Array>).data as Buffer, (messageA as LWWMessage<Uint8Array>).data)).toBe(true)
-})
+    const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('casla'))
+    const messageB = clientB.createComponentDataEvent(key1, key2, Buffer.from('boedo'))
+    // LamportA: 1, data: casla2
+    // LamportB: 1, data: boedo
+    // dataA > dataB
+    const resultValueB = clientB.processMessage(messageA)
+    const valueB = clientB.getState().components.get(messageA.componentId)!.get(messageA.entityId)!
+
+    const resultValueA = clientA.processMessage(messageB)
+    const valueA = clientA.getState().components.get(messageB.componentId)!.get(messageB.entityId)!
+
+    expect(valueA.data).toBe(messageA.data)
+    expect(compareData(valueB.data as Buffer, messageA.data)).toBe(true)
+  })
 })

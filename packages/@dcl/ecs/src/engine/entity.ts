@@ -32,6 +32,18 @@ export const RESERVED_STATIC_ENTITIES = 512
 export const MAX_ENTITY_NUMBER = MAX_U16
 
 export namespace EntityUtils {
+  /**
+   * @returns [number, version]
+   */
+  export function fromEntityId(entityId: Entity): [number, number] {
+    return [(entityId & MAX_U16) >>> 0, (((entityId & MASK_UPPER_16_ON_32) >> 16) & MAX_U16) >>> 0]
+  }
+
+  export function toEntityId(entityNumber: number, entityVersion: number): Entity {
+    return (((entityNumber & MAX_U16) | ((entityVersion & MAX_U16) << 16)) >>>
+      0) as Entity
+  }
+
   export function entityVersion(entity: Entity) {
     return (((entity & MASK_UPPER_16_ON_32) >> 16) & MAX_U16) >>> 0
   }

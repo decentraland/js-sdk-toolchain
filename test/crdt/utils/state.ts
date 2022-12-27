@@ -1,4 +1,5 @@
 import { State, stateIterator } from '../../../packages/@dcl/crdt/src'
+import { createGSet } from '../../../packages/@dcl/crdt/src/gset'
 
 export function dataToString<T>(data: T) {
   if (data instanceof Uint8Array || data instanceof Buffer) {
@@ -9,13 +10,16 @@ export function dataToString<T>(data: T) {
 
 export function stateFromString<T>(stateStr: string) {
   const state = JSON.parse(stateStr)
-  const newState: State<T> = new Map()
+  const newState: State<T> = {
+    components: new Map(),
+    deletedEntities: createGSet()
+  }
   for (const value of state) {
     const { componentId, entityId, timestamp, data } = value
-    if (!newState.has(componentId)) {
-      newState.set(componentId, new Map())
+    if (!newState.components.has(componentId)) {
+      newState.components.set(componentId, new Map())
     }
-    newState.get(componentId)!.set(entityId, value !== null ? { timestamp, data } : null)
+    newState.components.get(componentId)!.set(entityId, value !== null ? { timestamp, data } : null)
   }
   return newState
 }

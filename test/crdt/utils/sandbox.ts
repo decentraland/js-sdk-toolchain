@@ -1,5 +1,5 @@
-import { Message, crdtProtocol, MessageType } from '../../../packages/@dcl/crdt/src'
 import { compareStatePayloads, sleep } from '.'
+import { CRDTMessage, CRDTMessageType, crdtProtocol, ProcessMessageResultType } from '../../../packages/@dcl/crdt/src'
 import { snapshotTest } from './snapshot'
 
 /**
@@ -28,7 +28,7 @@ export function createSandbox<T extends Buffer | Uint8Array | string = Buffer>(
    * @internal
    */
   function broadcast(uuid: string) {
-    async function send(message: Message<T>) {
+    async function send(message: CRDTMessage<T>) {
       const randomTime = (Math.random() * 100 + 50) | 0
       if (opts.delay) {
         await sleep(randomTime)
@@ -50,13 +50,10 @@ export function createSandbox<T extends Buffer | Uint8Array | string = Buffer>(
     const uuid = `${index}`
     const ws = broadcast(uuid)
     const crdt = crdtProtocol<T>({
-      entityVersion: function (entity: number) {
-        return (((entity & 4294901760) >> 16) & 65535) >>> 0
+      fromEntityId: function (entity: number) {
+        return [(entity & 65535) >>> 0, (((entity & 4294901760) >> 16) & 65535) >>> 0]
       },
-      entityNumber: function (entity: number) {
-        return (entity & 65535) >>> 0
-      },
-      entityId: function (entityNumber: number, entityVersion: number): number {
+      toEntityId: function (entityNumber: number, entityVersion: number): number {
         return ((entityNumber & 65535) | ((entityVersion & 65535) << 16)) >>> 0
       }
     })
@@ -64,18 +61,29 @@ export function createSandbox<T extends Buffer | Uint8Array | string = Buffer>(
     return {
       ...crdt,
       id: uuid,
-      sendMessage: function (message: Message<T>) {
+      sendMessage: function (message: CRDTMessage<T>) {
         snapshot.addMessage(message)
         return ws.send(message)
       },
-      onMessage: function (message: Message<T>) {
+      onMessage: function (message: CRDTMessage<T>) {
         const msg = crdt.processMessage(message)
 
         // If the returned process message its different,
         // it means its an outdated message. Broadcast it.
-        if ((msg.type === MessageType.MT_LWW && message.type === MessageType.MT_LWW && msg.data !== message.data) ||
-          (msg.type === MessageType.MT_AddGSet && message.entityId !== msg.entityId)) {
-          return ws.send(msg)
+        // TODO: what about delete entity message
+        if ((msg === ProcessMessageResultType.StateOutdatedData ||
+          msg === ProcessMessageResultType.StateOutdatedTimestamp) &&
+          message.type === CRDTMessageType.CRDTMT_PutComponentData) {
+
+          const current = crdt.getState().components.get(message.componentId)!.get(message.entityId)!
+          const newMsg: CRDTMessage<T> = {
+            type: CRDTMessageType.CRDTMT_PutComponentData,
+            data: current.data,
+            timestamp: current.timestamp,
+            componentId: message.componentId,
+            entityId: message.entityId
+          }
+          return ws.send(newMsg)
         }
       }
     }

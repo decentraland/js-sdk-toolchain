@@ -5,9 +5,55 @@
  *
  * The function `add` isn't defined (for this implementation), instead, the addTo is: add all versions of a number `n` until (and including) `v`.
  *
- * @returns gset
  */
-export function gset() {
+export type OptimizedGrowonlySet = {
+  /**
+   * @public
+   *
+   * @param n
+   * @param v
+   * @returns
+   */
+  addTo(n: number, v: number): boolean
+
+  /**
+   * @public
+   * 
+   * @returns the set with [number, version] of each value
+   */
+  get(): [number, number][]
+
+  /**
+   * @public
+   * 
+   * @returns the set with [number, version] of each value
+   */
+  has(n: number, v: number): boolean
+
+  /**
+   * @internal
+   * @returns
+   */
+  getMap(): Map<number, number>
+
+
+  /**
+   * @public 
+   * 
+   * @param n 
+   * 
+   * @returns
+   */
+  getLastVersionOfN(n: number): number | null
+
+}
+
+
+/**
+ * 
+ * @returns a new GSet
+ */
+export function createGSet(): OptimizedGrowonlySet {
   const lastVersion: Map<number, number> = new Map()
   return {
     /**
@@ -35,10 +81,10 @@ export function gset() {
      * @returns the set with [number, version] of each value
      */
     get() {
-      const arr = []
+      const arr: [number, number][] = []
       for (const [n, v] of lastVersion) {
-        for (const index of Array.from({ length: v + 1 })) {
-          arr.push([n, index])
+        for (let i = 0; i <= v; i++) {
+          arr.push([n, i])
         }
       }
       return arr
@@ -62,7 +108,7 @@ export function gset() {
       return new Map(lastVersion)
     },
     getLastVersionOfN(n: number) {
-      return lastVersion.get(n)
+      return lastVersion.get(n) || null
     }
   }
 }

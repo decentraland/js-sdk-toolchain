@@ -1,8 +1,8 @@
-import { createInterface } from 'readline'
 import fs from 'fs-extra'
 import path from 'path'
+import { createInterface } from 'readline'
 
-import { Message, MessageType, State } from '../../../packages/@dcl/crdt/src'
+import { CRDTMessage, CRDTMessageType, State } from '../../../packages/@dcl/crdt/src'
 import { dataToString, stateToString } from './state'
 
 export function getDataPath(fileName: string) {
@@ -25,7 +25,7 @@ export async function* readByLine(fileName: string) {
 }
 
 export function snapshotTest<T = unknown>() {
-  const messages: Message<string>[] = []
+  const messages: CRDTMessage<string>[] = []
 
   function getDataPath(fileName: string) {
     return path.resolve(__dirname, '..', 'data', path.basename(fileName))
@@ -74,8 +74,8 @@ export function snapshotTest<T = unknown>() {
     }
   }
 
-  function addMessage(message: Message<T>) {
-    if (message.type === MessageType.MT_LWW) {
+  function addMessage(message: CRDTMessage<T>) {
+    if (message.type === CRDTMessageType.CRDTMT_PutComponentData) {
       messages.push({ ...message, data: dataToString(message.data) })
     } else {
       messages.push({ ...message })

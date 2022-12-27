@@ -3,8 +3,6 @@ import expect from 'expect'
 import { compareData, compareStatePayloads } from './utils'
 import { createSandbox } from './utils/sandbox'
 
-import { LWWMessage, MessageType } from '../../packages/@dcl/crdt/dist/types'
-
 describe('CRDT protocol', () => {
   it('should return true if there is no state', () => {
     expect(compareStatePayloads([])).toBe(true)
@@ -18,13 +16,12 @@ describe('CRDT protocol', () => {
       const [clientA] = clients
       const key1 = 7,
         key2 = 11
-      const messageA = clientA.createEvent(key1, key2, Buffer.from('casla'))
+      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('casla'))
       await clientA.sendMessage(messageA)
       await compare()
 
-      expect(messageA.type).toBe(MessageType.MT_LWW)
-      expect(clientA.getElementSetState(key1, key2)?.data).toBe((messageA as LWWMessage<Buffer>).data)
-      expect(clientA.getElementSetState(key1, key2)?.data).toBe((messageA as LWWMessage<Buffer>).data)
+      expect(clientA.getElementSetState(key1, key2)?.data).toBe(messageA.data)
+      expect(clientA.getElementSetState(key1, key2)?.data).toBe(messageA.data)
     })
 
     it(`${msg}one message with more clients (N > 2)`, async () => {
@@ -32,7 +29,7 @@ describe('CRDT protocol', () => {
       const [clientA] = clients
       const key1 = 7,
         key2 = 11
-      const messageA = clientA.createEvent(key1, key2, Buffer.from('casla'))
+      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('casla'))
       await clientA.sendMessage(messageA)
       await compare()
     })
@@ -44,16 +41,16 @@ describe('CRDT protocol', () => {
         key2 = 11
 
       // Buffer('a') > Buffer('z')
-      const messageA = clientA.createEvent(key1, key2, Buffer.from('a'))
-      const messageB = clientB.createEvent(key1, key2, Buffer.from('z'))
+      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('a'))
+      const messageB = clientB.createComponentDataEvent(key1, key2, Buffer.from('z'))
       const promiseA = clientA.sendMessage(messageA)
       const promiseB = clientB.sendMessage(messageB)
       await Promise.all([promiseA, promiseB])
       await compare()
       expect(
         compareData(
-          clientA.getState().get(key1)!.get(key2)!.data,
-          (messageB as LWWMessage<Buffer>).data
+          clientA.getState().components.get(key1)!.get(key2)!.data,
+          messageB.data
         )
       ).toBe(true)
     })
@@ -63,14 +60,14 @@ describe('CRDT protocol', () => {
       const [clientA, clientB] = clients
       const key1 = 7,
         key2 = 11
-      const messageA = clientA.createEvent(key1, key2, Buffer.from('a'))
-      const messageB = clientB.createEvent(key1, key2, Buffer.from('b'))
+      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('a'))
+      const messageB = clientB.createComponentDataEvent(key1, key2, Buffer.from('b'))
       const promiseA = clientA.sendMessage(messageA)
       const promiseB = clientB.sendMessage(messageB)
       await Promise.all([promiseA, promiseB])
       await compare()
       expect(
-        compareData(clientA.getElementSetState(key1, key2)?.data, (messageB as LWWMessage<Buffer>).data)
+        compareData(clientA.getElementSetState(key1, key2)?.data, messageB.data)
       ).toBe(true)
     })
 
@@ -83,21 +80,21 @@ describe('CRDT protocol', () => {
       const key1b = 13,
         key2b = 17
 
-      const messageA = clientA.createEvent(key1, key2, Buffer.from('boedo'))
-      const messageB = clientB.createEvent(key1b, key2b, Buffer.from('casla'))
+      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('boedo'))
+      const messageB = clientB.createComponentDataEvent(key1b, key2b, Buffer.from('casla'))
 
       const p1 = clientA.sendMessage(messageA)
       const p2 = clientB.sendMessage(messageB)
       await Promise.all([p1, p2])
 
-      const messageB2 = clientB.createEvent(key1b, key2b, Buffer.from('a'))
-      const messageA2 = clientA.createEvent(key1b, key2b, Buffer.from('z'))
+      const messageB2 = clientB.createComponentDataEvent(key1b, key2b, Buffer.from('a'))
+      const messageA2 = clientA.createComponentDataEvent(key1b, key2b, Buffer.from('z'))
       const p3 = clientB.sendMessage(messageB2)
       const p4 = clientA.sendMessage(messageA2)
       await Promise.all([p3, p4])
       await compare()
       expect(clientA.getElementSetState(key1b, key2b)?.data).toBe(
-        (messageA2 as LWWMessage<Buffer>).data
+        messageA2.data
       )
     })
 
@@ -110,22 +107,22 @@ describe('CRDT protocol', () => {
       const key1b = 13,
         key2b = 17
 
-      const messageA = clientA.createEvent(key1, key2, Buffer.from('boedo'))
-      const messageB = clientB.createEvent(key1b, key2b, Buffer.from('casla'))
+      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('boedo'))
+      const messageB = clientB.createComponentDataEvent(key1b, key2b, Buffer.from('casla'))
       const promises = [
         clientA.sendMessage(messageA),
         clientB.sendMessage(messageB)
       ]
       await Promise.all(promises)
-      const messageB2 = clientB.createEvent(key1b, key2b, Buffer.from('z'))
-      const messageA2 = clientA.createEvent(key1b, key2b, Buffer.from('a'))
+      const messageB2 = clientB.createComponentDataEvent(key1b, key2b, Buffer.from('z'))
+      const messageA2 = clientA.createComponentDataEvent(key1b, key2b, Buffer.from('a'))
       const p1 = clientA.sendMessage(messageA2)
       const p2 = clientB.sendMessage(messageB2)
 
       await Promise.all([p1, p2])
       await compare()
       expect(clientA.getElementSetState(key1b, key2b)?.data).toBe(
-        (messageB2 as LWWMessage<Buffer>).data
+        messageB2.data
       )
     })
 
@@ -138,21 +135,21 @@ describe('CRDT protocol', () => {
       const key1b = 13,
         key2b = 17
 
-      const messageA = clientA.createEvent(key1, key2, Buffer.from('boedo'))
-      const messageB = clientB.createEvent(key1b, key2b, Buffer.from('casla'))
+      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('boedo'))
+      const messageB = clientB.createComponentDataEvent(key1b, key2b, Buffer.from('casla'))
       const promises = [
         clientA.sendMessage(messageA),
         clientB.sendMessage(messageB)
       ]
       await Promise.all(promises)
-      const messageB2 = clientB.createEvent(key1b, key2b, Buffer.from('z'))
-      const messageA2 = clientA.createEvent(key1b, key2b, Buffer.from('a'))
+      const messageB2 = clientB.createComponentDataEvent(key1b, key2b, Buffer.from('z'))
+      const messageA2 = clientA.createComponentDataEvent(key1b, key2b, Buffer.from('a'))
       const p1 = clientA.sendMessage(messageA2)
       const p2 = clientB.sendMessage(messageB2)
       await Promise.all([p1, p2])
       await compare()
       expect(clientA.getElementSetState(key1b, key2b)?.data).toBe(
-        (messageB2 as LWWMessage<Buffer>).data
+        messageB2.data
       )
     })
 
@@ -163,9 +160,9 @@ describe('CRDT protocol', () => {
         key2 = 11
 
       // Buffer('a') > Buffer('z')
-      const messageA = clientA.createEvent(key1, key2, Buffer.from('A'))
-      const messageB = clientB.createEvent(key1, key2, Buffer.from('z'))
-      const messageC = clientC.createEvent(key1, key2, Buffer.from('C'))
+      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('A'))
+      const messageB = clientB.createComponentDataEvent(key1, key2, Buffer.from('z'))
+      const messageC = clientC.createComponentDataEvent(key1, key2, Buffer.from('C'))
       const p1 = clientA.sendMessage(messageA)
       const p2 = clientB.sendMessage(messageB)
       const p3 = clientC.sendMessage(messageC)
@@ -186,9 +183,9 @@ describe('CRDT protocol', () => {
         key2 = 11
 
       // Buffer('a') > Buffer('z')
-      const messageB1 = clientB.createEvent(key1, key2, Buffer.from('A'))
-      const messageB2 = clientB.createEvent(key1, key2, Buffer.from('B'))
-      const messageA = clientA.createEvent(key1, key2, Buffer.from('C'))
+      const messageB1 = clientB.createComponentDataEvent(key1, key2, Buffer.from('A'))
+      const messageB2 = clientB.createComponentDataEvent(key1, key2, Buffer.from('B'))
+      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('C'))
       const p2 = clientB.sendMessage(messageB1)
       const p3 = clientB.sendMessage(messageB2)
       await Promise.all([p2, p3])

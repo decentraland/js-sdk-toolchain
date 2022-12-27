@@ -1,11 +1,11 @@
-import { sameData, State, stateIterator } from '../../../packages/@dcl/crdt/src'
+import { dataCompare, State, stateIterator } from '../../../packages/@dcl/crdt/src'
 
 /**
  * Compare buffer data
  * @internal
  */
 export function compareData(a: unknown, b: unknown) {
-  return sameData(a, b)
+  return dataCompare(a, b) === 0
 }
 
 /**
@@ -21,20 +21,20 @@ export function compareStatePayloads<T = Buffer>(states: State<T>[]) {
 
   for (const state of states) {
     // Compare key1 keys map size
-    if (state.size !== baseState.size) {
+    if (state.components.size !== baseState.components.size) {
       return false
     }
 
     // Compare inside key1 the key2 keys map size
-    for (const key1 of baseState.keys()) {
-      if (state.get(key1)?.size !== baseState.get(key1)!.size) {
+    for (const key1 of baseState.components.keys()) {
+      if (state.components.get(key1)?.size !== baseState.components.get(key1)!.size) {
         return false
       }
     }
 
     // Compare each <key1, key2> exists and the { timestamp, data } is the same
     for (const [key1, key2, baseStatePayload] of stateIterator(baseState)) {
-      const currentStatePayload = state.get(key1)?.get(key2)
+      const currentStatePayload = state.components.get(key1)?.get(key2)
       const isDifferent =
         !currentStatePayload ||
         currentStatePayload.timestamp !== baseStatePayload?.timestamp ||
@@ -44,7 +44,24 @@ export function compareStatePayloads<T = Buffer>(states: State<T>[]) {
         return false
       }
     }
+
+
+    const baseDeletedEntities = baseState.deletedEntities.getMap()
+    const deletedEntities = state.deletedEntities.getMap()
+
+    // Compare number of entities deleted
+    if (baseDeletedEntities.size !== deletedEntities.size) {
+      return false
+    }
+
+    // Compare inside key1 the key2 keys map size
+    for (const [entityNumber, entityVersion] of baseDeletedEntities) {
+      if (deletedEntities.get(entityNumber) !== entityVersion) {
+        return false
+      }
+    }
   }
+
 
   return true
 }

@@ -20,10 +20,10 @@ export type Unpacked<T> = T extends (infer U)[] ? U : T
 export type ComponentSchema<
   T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]
 > = {
-  [K in keyof T]: T[K] extends ComponentDefinition<any>
+    [K in keyof T]: T[K] extends ComponentDefinition<any>
     ? ReturnType<T[K]['getMutable']>
     : never
-}
+  }
 
 export interface MapComponentDefinition<T> extends ComponentDefinition<T> {
   /**

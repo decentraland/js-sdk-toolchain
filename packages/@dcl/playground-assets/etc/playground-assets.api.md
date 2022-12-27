@@ -553,6 +553,10 @@ export namespace EntityUtils {
     export function entityNumber(entity: Entity): number;
     // (undocumented)
     export function entityVersion(entity: Entity): number;
+    // (undocumented)
+    export function fromEntityId(entityId: Entity): [number, number];
+    // (undocumented)
+    export function toEntityId(entityNumber: number, entityVersion: number): Entity;
 }
 
 // @public
