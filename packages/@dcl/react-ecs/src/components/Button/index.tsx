@@ -1,4 +1,3 @@
-import { parseProps } from '../utils'
 import { ReactEcs } from '../../react-ecs'
 import { EntityPropTypes } from '../types'
 import { UiButtonProps } from './types'
@@ -28,10 +27,10 @@ export function Button(props: EntityPropTypes & UiButtonProps) {
   const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...uiTextProps } =
     props
   const buttonProps = getButtonProps(props)
-  const uiBackgroundProps = {
+  const uiBackgroundProps = parseUiBackground({
     ...buttonProps.uiBackground,
-    ...parseUiBackground(uiBackground ?? {})
-  }
+    ...uiBackground
+  })
   const textProps = {
     ...buttonProps.uiText,
     ...uiTextProps
@@ -40,7 +39,7 @@ export function Button(props: EntityPropTypes & UiButtonProps) {
     height: 36,
     ...uiTransform
   })
-
+  console.log(uiBackgroundProps, buttonProps.uiBackground, uiBackground)
   return (
     <entity
       onMouseDown={onMouseDown}

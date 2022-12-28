@@ -5,7 +5,10 @@ import { UiBackgroundProps } from './types'
  *
  * @public
  */
-export function parseUiBackground(props: UiBackgroundProps): PBUiBackground {
+export function parseUiBackground(
+  props: UiBackgroundProps | undefined
+): PBUiBackground | undefined {
+  if (!props || !Object.keys(props).length) return undefined
   return {
     ...props,
     uvs: props.uvs ?? [],
