@@ -19,7 +19,7 @@ CALL onUpdate(0.0)
   CRDT: e=514 c=1062 t=1 data={"pointerEvents":[{"eventType":2,"eventInfo":{"button":3,"hoverText":"Infinity Hover","maxDistance":10000000,"showFeedback":true}}]}
   CRDT: e=514 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   CRDT: e=514 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-  OPCODES ~= 35.1k
+  OPCODES ~= 35.0k
 CALL onUpdate(0.1)
   OPCODES ~= 2.3k
 CALL onUpdate(0.1)

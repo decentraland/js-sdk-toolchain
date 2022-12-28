@@ -7,6 +7,8 @@ export const MASK_UPPER_16_ON_32 = 0xffff0000
 
 export const AMOUNT_VERSION_AVAILABLE = MAX_U16 + 1
 
+import type { EntityID as CrdtEntity } from '@dcl/crdt'
+
 /**
  * @public The Entity is a number type, the cast is only for typescript, the final javascript code treat as a number
  *  version  number
@@ -19,7 +21,7 @@ export const AMOUNT_VERSION_AVAILABLE = MAX_U16 + 1
  * Convertion from its compound numbers to entity:
  * entity = (entityNumber & MAX_U16) | ((entityVersion & MAX_U16) << 16)
  */
-export type Entity = uint32 & { __entity_type: '' }
+export type Entity = CrdtEntity
 
 /**
  * @public This first 512 entities are reserved by the renderer
@@ -33,7 +35,7 @@ export const MAX_ENTITY_NUMBER = MAX_U16
 
 export namespace EntityUtils {
   /**
-   * @returns [number, version]
+   * @returns [entityNumber, entityVersion]
    */
   export function fromEntityId(entityId: Entity): [number, number] {
     return [
@@ -42,23 +44,10 @@ export namespace EntityUtils {
     ]
   }
 
+  /**
+   * @returns compound number from entityNumber and entityVerison
+   */
   export function toEntityId(
-    entityNumber: number,
-    entityVersion: number
-  ): Entity {
-    return (((entityNumber & MAX_U16) | ((entityVersion & MAX_U16) << 16)) >>>
-      0) as Entity
-  }
-
-  export function entityVersion(entity: Entity) {
-    return (((entity & MASK_UPPER_16_ON_32) >> 16) & MAX_U16) >>> 0
-  }
-
-  export function entityNumber(entity: Entity) {
-    return (entity & MAX_U16) >>> 0
-  }
-
-  export function entityId(
     entityNumber: number,
     entityVersion: number
   ): Entity {
@@ -70,6 +59,7 @@ export namespace EntityUtils {
 export function EntityContainer() {
   let entityCounter = RESERVED_STATIC_ENTITIES
   const usedEntities: Set<Entity> = new Set()
+
   let toRemoveEntities: Entity[] = []
   const removedEntities: Map<number, number> = new Map()
 
@@ -92,7 +82,7 @@ export function EntityContainer() {
 
     for (const [number, version] of removedEntities) {
       if (version < MAX_U16) {
-        const entity = EntityUtils.entityId(number, version + 1)
+        const entity = EntityUtils.toEntityId(number, version + 1)
 
         usedEntities.add(entity)
         removedEntities.delete(number)
@@ -105,25 +95,16 @@ export function EntityContainer() {
   }
 
   function removeEntity(entity: Entity) {
-    const deleted = usedEntities.delete(entity)
-    if (deleted) {
-      toRemoveEntities.push(entity)
-      removedEntities.set(
-        EntityUtils.entityNumber(entity),
-        EntityUtils.entityVersion(entity)
-      )
-    }
-    return deleted
+    usedEntities.delete(entity)
+    toRemoveEntities.push(entity)
   }
 
   function releaseRemovedEntities() {
     const arr = toRemoveEntities
     toRemoveEntities = []
     for (const entity of arr) {
-      removedEntities.set(
-        EntityUtils.entityNumber(entity),
-        EntityUtils.entityVersion(entity)
-      )
+      const [n, v] = EntityUtils.fromEntityId(entity)
+      removedEntities.set(n, v)
     }
     return arr
   }
@@ -132,8 +113,8 @@ export function EntityContainer() {
     generateEntity(): Entity {
       return generateEntity()
     },
-    removeEntity(entity: Entity): boolean {
-      return removeEntity(entity)
+    removeEntity(entity: Entity) {
+      removeEntity(entity)
     },
     entityExists(entity: Entity): boolean {
       return entity < RESERVED_STATIC_ENTITIES || usedEntities.has(entity)
@@ -141,9 +122,6 @@ export function EntityContainer() {
     getExistingEntities(): Set<Entity> {
       return new Set(usedEntities)
     },
-    releaseRemovedEntities,
-    entityVersion: EntityUtils.entityVersion,
-    entityNumber: EntityUtils.entityNumber,
-    entityId: EntityUtils.entityId
+    releaseRemovedEntities
   }
 }

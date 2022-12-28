@@ -40,7 +40,8 @@ type PreEngine = Pick<
   | 'entityExists'
   | 'componentsDefinition'
 > & {
-  getSystems: () => SystemItem[]
+  getSystems: () => SystemItem[],
+  entityContainer: ReturnType<typeof EntityContainer>
 }
 
 function preEngine(): PreEngine {
@@ -227,7 +228,8 @@ function preEngine(): PreEngine {
     getComponentOrNull,
     removeComponentDefinition,
     removeEntityWithChildren,
-    registerCustomComponent
+    registerCustomComponent,
+    entityContainer
   }
 }
 
@@ -244,13 +246,13 @@ export function Engine(): IEngine {
       const ret: unknown | Promise<unknown> = system.fn(dt)
       checkNotThenable(
         ret,
-        `A system (${
-          system.name || 'anonymous'
+        `A system (${system.name || 'anonymous'
         }) returned a thenable. Systems cannot be async functions. Documentation: https://dcl.gg/sdk/sync-systems`
       )
     }
     const dirtyEntities = crdtSystem.updateState()
-    await crdtSystem.sendMessages(dirtyEntities)
+    const deletedEntites = engine.entityContainer.releaseRemovedEntities()
+    await crdtSystem.sendMessages(dirtyEntities, deletedEntites)
 
     for (const [_componentId, definition] of engine.componentsDefinition) {
       definition.clearDirty()
@@ -271,12 +273,15 @@ export function Engine(): IEngine {
     getComponentOrNull: engine.getComponentOrNull,
     removeComponentDefinition: engine.removeComponentDefinition,
     update,
+
     RootEntity: 0 as Entity,
     PlayerEntity: 1 as Entity,
     CameraEntity: 2 as Entity,
+
     entityExists: engine.entityExists,
     addTransport: crdtSystem.addTransport,
     getCrdtState: crdtSystem.getCrdt,
+
     componentsDefinition: engine.componentsDefinition
   }
 }

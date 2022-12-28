@@ -114,6 +114,7 @@ export function crdtSceneSystem(
   async function receiveMessages() {
     const messagesToProcess = getMessages(receivedMessages)
     const bufferForOutdated = createByteBuffer()
+    const entitiesShouldBeCleaned: Entity[] = []
 
     for (const msg of messagesToProcess) {
       if (msg.type === WireMessageEnum.DELETE_ENTITY) {
@@ -122,8 +123,7 @@ export function crdtSceneSystem(
           entityId: msg.entityId
         })
 
-        // if we miss some delete_entity msg => TODO:
-        // engine.deleteEntity
+        entitiesShouldBeCleaned.push(msg.entityId)
       } else {
         const crdtMessage: ComponentDataMessage<Uint8Array> = {
           type: CRDTMessageType.CRDTMT_PutComponentData,
@@ -213,6 +213,19 @@ export function crdtSceneSystem(
         }
       }
     }
+
+    for (const entity of entitiesShouldBeCleaned) {
+      // If we tried to resend outdated message and the entity was deleted before, we avoid sending them.
+      for (let i = outdatedMessages.length - 1; i >= 0; i--) {
+        if (outdatedMessages[i].entityId === entity) {
+          outdatedMessages.splice(i, 1)
+        }
+      }
+
+      for (const [, definition] of engine.componentsDefinition) {
+        definition.deleteFrom(entity, false)
+      }
+    }
   }
 
   function getDirtyMap() {
@@ -246,13 +259,14 @@ export function crdtSceneSystem(
         )
       }
     }
+
     return dirtyEntities
   }
 
   /**
    * Iterates the dirty map and generates crdt messages to be send
    */
-  async function sendMessages(dirtyEntities: Map<Entity, Set<number>>) {
+  async function sendMessages(dirtyEntities: Map<Entity, Set<number>>, deletedEntities: Entity[]) {
     // CRDT Messages will be the merge between the recieved transport messages and the new crdt messages
     const crdtMessages = getMessages(broadcastMessages)
     const outdatedMessagesBkp = getMessages(outdatedMessages)
@@ -289,6 +303,22 @@ export function crdtSceneSystem(
         }
       }
     }
+
+    // After all updates, I execute the DeletedEntity messages
+    for (const entityId of deletedEntities) {
+      crdtClient.createDeleteEntityEvent(entityId)
+
+      const offset = buffer.currentWriteOffset()
+      DeleteEntity.write(entityId, buffer)
+      crdtMessages.push({
+        type: WireMessageEnum.DELETE_ENTITY,
+        entityId,
+        messageBuffer: buffer
+          .buffer()
+          .subarray(offset, buffer.currentWriteOffset())
+      })
+    }
+
     // Send CRDT messages to transports
     const transportBuffer = createByteBuffer()
     for (const index in transports) {
