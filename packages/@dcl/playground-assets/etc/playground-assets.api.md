@@ -2212,6 +2212,24 @@ export const PBVector3: {
     decode(input: _m0.Reader | Uint8Array, length?: number): PBVector3;
 };
 
+// Warning: (ae-missing-release-tag) "PBVideoPlayer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBVideoPlayer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBVideoPlayer {
+    // (undocumented)
+    playing: boolean;
+    // (undocumented)
+    position: number;
+    src: string;
+}
+
+// @public
+export const PBVideoPlayer: {
+    encode(message: PBVideoPlayer, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): PBVideoPlayer;
+};
+
 // Warning: (ae-missing-release-tag) "PBVisibilityComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 // Warning: (ae-missing-release-tag) "PBVisibilityComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2655,6 +2673,9 @@ export interface TextureUnion {
     } | {
         $case: 'avatarTexture';
         avatarTexture: AvatarTexture;
+    } | {
+        $case: 'videoTexture';
+        videoTexture: VideoTexture;
     };
 }
 
@@ -2912,6 +2933,24 @@ export type Vector3Type = {
     x: number;
     y: number;
     z: number;
+};
+
+// @public (undocumented)
+export const VideoPlayer: ComponentDefinition<PBVideoPlayer>;
+
+// Warning: (ae-missing-release-tag) "VideoTexture" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "VideoTexture" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface VideoTexture {
+    // (undocumented)
+    videoPlayerEntity: number;
+}
+
+// @public
+export const VideoTexture: {
+    encode(message: VideoTexture, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): VideoTexture;
 };
 
 // @public (undocumented)
