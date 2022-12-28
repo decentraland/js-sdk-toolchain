@@ -207,7 +207,7 @@ export const CANVAS_ROOT_ENTITY = 0;
 // Warning: (ae-missing-release-tag) "Children" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type Children = any;
+export type Children = unknown;
 
 // Warning: (ae-missing-release-tag) "ColliderLayer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -470,7 +470,7 @@ export function defineComponent<T>(componentId: number, spec: ISchema<T>): Compo
 export const DEG2RAD: number;
 
 // @public (undocumented)
-export function Dropdown(props: Pick<EntityPropTypes, 'uiTransform'> & UiDropdownProps & Listeners): ReactEcs.JSX.Element;
+export function Dropdown(props: EntityPropTypes & UiDropdownProps): ReactEcs.JSX.Element;
 
 // Warning: (ae-missing-release-tag) "EcsElements" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -524,7 +524,6 @@ export function EntityContainer(): {
 // @public (undocumented)
 export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
-    uiText?: PBUiText;
     uiBackground?: UiBackgroundProps;
 } & Listeners;
 
@@ -830,7 +829,7 @@ export type IncludeUndefined<T> = {
 }[keyof T];
 
 // @public (undocumented)
-export function Input(props: Pick<EntityPropTypes, 'uiTransform'> & Partial<UiInputProps> & Listeners): ReactEcs.JSX.Element;
+export function Input(props: EntityPropTypes & Partial<UiInputProps>): ReactEcs.JSX.Element;
 
 // Warning: (ae-missing-release-tag) "InputAction" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2698,6 +2697,10 @@ export type SystemItem = {
 // @public (undocumented)
 export type Task<T = unknown> = () => Promise<T>;
 
+// @public (undocumented)
+function Text_2(props: EntityPropTypes & UiTextProps): ReactEcs.JSX.Element;
+export { Text_2 as Text }
+
 // Warning: (ae-missing-release-tag) "TextAlignMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -2898,6 +2901,9 @@ export const UiInputResult: ComponentDefinition<PBUiInputResult>;
 
 // @public (undocumented)
 export const UiText: ComponentDefinition<PBUiText>;
+
+// @public (undocumented)
+export type UiTextProps = PBUiText;
 
 // @public (undocumented)
 export const UiTransform: ComponentDefinition<PBUiTransform>;

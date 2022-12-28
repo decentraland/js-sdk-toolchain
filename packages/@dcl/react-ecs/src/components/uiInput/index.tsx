@@ -1,9 +1,11 @@
-import { Listeners, parseProps } from '..'
+import { PBUiInput } from '@dcl/ecs'
+
+import { parseProps } from '../utils'
 import { ReactEcs } from '../../react-ecs'
 import { EntityPropTypes } from '../types'
 import { UiInputProps } from './types'
 
-function parseUiInput(props: Partial<UiInputProps>): UiInputProps {
+function parseUiInput(props: Partial<UiInputProps>): PBUiInput {
   return {
     disabled: false,
     placeholder: '',
@@ -14,13 +16,15 @@ function parseUiInput(props: Partial<UiInputProps>): UiInputProps {
 /**
  * @public
  */
-export function Input(
-  props: Pick<EntityPropTypes, 'uiTransform'> &
-    Partial<UiInputProps> &
-    Listeners
-) {
-  const { uiTransform, onMouseDown, onMouseUp, ...otherProps } = props
+export function Input(props: EntityPropTypes & Partial<UiInputProps>) {
+  const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...otherProps } =
+    props
   const inputProps = parseUiInput(otherProps)
-  const commonProps = parseProps({ uiTransform, onMouseDown, onMouseUp })
+  const commonProps = parseProps({
+    uiTransform,
+    uiBackground,
+    onMouseDown,
+    onMouseUp
+  })
   return <entity {...commonProps} uiInput={inputProps} />
 }

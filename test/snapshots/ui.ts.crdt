@@ -25,13 +25,13 @@ CALL onUpdate(0.0)
   CRDT: e=514 c=1050 t=1 data={"parent":519,"rightOf":0,"alignItems":2,"positionType":0,"alignSelf":0,"flexDirection":0,"justifyContent":1,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":2,"width":100,"heightUnit":2,"height":20,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":0,"marginLeft":0,"marginTopUnit":0,"marginTop":0,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":2,"paddingBottom":0}
   CRDT: e=516 c=1050 t=1 data={"parent":519,"rightOf":514,"alignItems":2,"positionType":0,"alignSelf":0,"flexDirection":0,"justifyContent":1,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":2,"width":100,"heightUnit":2,"height":20,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":0,"marginLeft":0,"marginTopUnit":0,"marginTop":0,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":2,"paddingBottom":0}
   CRDT: e=518 c=1050 t=1 data={"parent":519,"rightOf":516,"alignItems":2,"positionType":0,"alignSelf":0,"flexDirection":0,"justifyContent":1,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":2,"width":100,"heightUnit":1,"height":100,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":0,"marginLeft":0,"marginTopUnit":0,"marginTop":0,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":2,"paddingBottom":0}
-  OPCODES ~= 106.1k
+  OPCODES ~= 107.1k
 CALL onUpdate(0.1)
   CRDT: e=512 c=1 t=2 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.008726535364985466,"z":0,"w":0.9999619126319885},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 52.7k
+  OPCODES ~= 53.3k
 CALL onUpdate(0.1)
   CRDT: e=512 c=1 t=3 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.017452405765652657,"z":0,"w":0.9998477101325989},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 50.6k
+  OPCODES ~= 51.2k
 CALL onUpdate(0.1)
   CRDT: e=512 c=1 t=4 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.026176948100328445,"z":0,"w":0.9996573328971863},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 50.6k
+  OPCODES ~= 51.2k
