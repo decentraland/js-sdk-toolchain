@@ -1,17 +1,18 @@
 import {
   TextureWrapMode,
   TextureFilterMode,
-  BackgroundTextureMode
+  BackgroundTextureMode,
+  TextAlignMode
 } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, {
   ReactEcsRenderer,
   UiEntity,
   Input,
-  Dropdown
+  Dropdown,
+  Text,
+  Button
 } from '../../../../../packages/@dcl/react-ecs/dist'
-
-let globalIndex = -1
 
 const uiComponent = () => (
   <UiEntity
@@ -22,11 +23,11 @@ const uiComponent = () => (
       console.log('MOUSE_UP event')
     }}
     uiTransform={{
-      width: 500,
+      width: 900,
       height: 500,
-      position: {
-        left: 200,
-        top: 200
+      margin: {
+        left: 270,
+        top: 16
       }
     }}
     uiBackground={{
@@ -46,26 +47,31 @@ const uiComponent = () => (
     }}
   >
     <Dropdown
+      uiBackground={{
+        color: Color4.Blue()
+      }}
       color={Color4.Red()}
-      disabled={false}
-      selectedIndex={globalIndex}
       options={['BOEDO', 'CASLA']}
-      onChange={(index) => {
-        globalIndex = index
-      }}
-      uiTransform={{
-        width: 200,
-        height: 200
-      }}
+      uiTransform={{ width: 200, height: 36 }}
     />
     <Input
       placeholder={'SARASA'}
-      color={Color4.Blue()}
       onChange={(value) => {
         console.log({ value })
       }}
-      uiTransform={{ width: 200, height: 120 }}
+      uiBackground={{
+        color: Color4.Red()
+      }}
+      uiTransform={{ width: 200, height: 36 }}
     />
+    <Text
+      color={{ r: 1, g: 1, b: 1, a: 1 }}
+      value="Some text"
+      fontSize={16}
+      textAlign={TextAlignMode.TAM_MIDDLE_CENTER}
+    />
+    <Button type="primary" value="Primary Button" />
+    <Button type="secondary" value="Secondary Button" />
   </UiEntity>
 )
 

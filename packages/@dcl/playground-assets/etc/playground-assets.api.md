@@ -122,6 +122,9 @@ export const BorderRect: {
 };
 
 // @public (undocumented)
+export function Button(props: EntityPropTypes & UiButtonProps): ReactEcs.JSX.Element;
+
+// @public (undocumented)
 export type ByteBuffer = {
     buffer(): Uint8Array;
     bufferLength(): number;
@@ -2868,6 +2871,11 @@ export const UiBackground: ComponentDefinition<PBUiBackground>;
 
 // @public (undocumented)
 export type UiBackgroundProps = Partial<PBUiBackground>;
+
+// @public (undocumented)
+export type UiButtonProps = PBUiText & {
+    type?: 'primary' | 'secondary';
+};
 
 // Warning: (ae-missing-release-tag) "UiComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

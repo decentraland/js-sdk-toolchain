@@ -7,20 +7,20 @@ export * from './types'
 export { CANVAS_ROOT_ENTITY }
 export * from './uiTransform/types'
 export * from './listeners/types'
-export * from './uiInput/types'
+export * from './Input/types'
 export * from './uiBackground/types'
-export * from './uiDropdown/types'
-export * from './uiText/types'
+export * from './Dropdown/types'
+export * from './Text/types'
+export * from './Button/types'
 
-export { Dropdown } from './uiDropdown'
-export { Input } from './uiInput'
-export { Text } from './uiText'
+export { Dropdown } from './Dropdown'
+export { Input } from './Input'
+export { Text } from './Text'
+export { Button } from './Button'
 
 /**
  * @public
  */
-export function UiEntity(
-  props: EntityPropTypes & Partial<CommonProps>
-): ReactEcs.JSX.Element {
+export function UiEntity(props: EntityPropTypes & Partial<CommonProps>) {
   return <entity {...parseProps(props)} />
 }
