@@ -5,7 +5,12 @@ import {
   PBMaterial_PbrMaterial,
   PBMaterial_UnlitMaterial
 } from '../generated/index.gen'
-import { AvatarTexture, Texture, TextureUnion } from '../generated/types.gen'
+import {
+  AvatarTexture,
+  Texture,
+  TextureUnion,
+  VideoTexture
+} from '../generated/types.gen'
 
 /**
  * @public
@@ -25,6 +30,11 @@ export type TextureHelper = {
    * @returns the avatar texture of userId specified
    */
   Avatar: (avatarTexture: AvatarTexture) => TextureUnion
+
+  /**
+   * @returns the video texture of videoPlayerEntity specified
+   */
+  Video: (videoTexture: VideoTexture) => TextureUnion
 }
 
 /**
@@ -66,6 +76,14 @@ const TextureHelper: TextureHelper = {
       tex: {
         $case: 'avatarTexture',
         avatarTexture
+      }
+    }
+  },
+  Video(videoTexture: VideoTexture) {
+    return {
+      tex: {
+        $case: 'videoTexture',
+        videoTexture
       }
     }
   }
