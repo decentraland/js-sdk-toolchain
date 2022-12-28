@@ -1,7 +1,12 @@
 import { ComponentDefinition } from '../../engine/component'
 import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../ByteBuffer'
-import { DeleteComponentMessage, PutComponentMessage, WireMessageEnum, WIRE_MESSAGE_HEADER_LENGTH } from '../types'
+import {
+  DeleteComponentMessage,
+  PutComponentMessage,
+  WireMessageEnum,
+  WIRE_MESSAGE_HEADER_LENGTH
+} from '../types'
 import WireMessage from '../wireMessage'
 
 export namespace ComponentOperation {
@@ -36,11 +41,9 @@ export namespace ComponentOperation {
     buf.setUint32(startMessageOffset + 8, entity as number)
     buf.setUint32(startMessageOffset + 12, componentDefinition._id)
     buf.setUint64(startMessageOffset + 16, BigInt(timestamp))
-    const newLocal = messageLength - MESSAGE_HEADER_LENGTH - WIRE_MESSAGE_HEADER_LENGTH
-    buf.setUint32(
-      startMessageOffset + 24,
-      newLocal
-    )
+    const newLocal =
+      messageLength - MESSAGE_HEADER_LENGTH - WIRE_MESSAGE_HEADER_LENGTH
+    buf.setUint32(startMessageOffset + 24, newLocal)
   }
 
   export function read(
@@ -76,6 +79,15 @@ export namespace ComponentOperation {
     component: ComponentDefinition<unknown>,
     entity: Entity
   ) {
-    return component.has(entity) ? WireMessageEnum.PUT_COMPONENT : WireMessageEnum.DELETE_COMPONENT
+    return component.has(entity)
+      ? WireMessageEnum.PUT_COMPONENT
+      : WireMessageEnum.DELETE_COMPONENT
+  }
+
+  export function is(type: WireMessageEnum) {
+    return (
+      type === WireMessageEnum.PUT_COMPONENT ||
+      type === WireMessageEnum.DELETE_COMPONENT
+    )
   }
 }

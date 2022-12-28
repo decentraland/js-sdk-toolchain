@@ -9,14 +9,17 @@ describe('CRDT protocol', () => {
   })
   const delayEnable = [false, false]
   delayEnable.forEach((delay) => {
-
     const msg = delay ? '[Delay] ' : ''
     it(`${msg}should store the message A in all the clients`, async () => {
       const { clients, compare } = createSandbox({ clientLength: 2, delay })
       const [clientA] = clients
       const key1 = 7,
         key2 = 11
-      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('casla'))
+      const messageA = clientA.createComponentDataEvent(
+        key1,
+        key2,
+        Buffer.from('casla')
+      )
       await clientA.sendMessage(messageA)
       await compare()
 
@@ -29,7 +32,11 @@ describe('CRDT protocol', () => {
       const [clientA] = clients
       const key1 = 7,
         key2 = 11
-      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('casla'))
+      const messageA = clientA.createComponentDataEvent(
+        key1,
+        key2,
+        Buffer.from('casla')
+      )
       await clientA.sendMessage(messageA)
       await compare()
     })
@@ -41,8 +48,16 @@ describe('CRDT protocol', () => {
         key2 = 11
 
       // Buffer('a') > Buffer('z')
-      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('a'))
-      const messageB = clientB.createComponentDataEvent(key1, key2, Buffer.from('z'))
+      const messageA = clientA.createComponentDataEvent(
+        key1,
+        key2,
+        Buffer.from('a')
+      )
+      const messageB = clientB.createComponentDataEvent(
+        key1,
+        key2,
+        Buffer.from('z')
+      )
       const promiseA = clientA.sendMessage(messageA)
       const promiseB = clientB.sendMessage(messageB)
       await Promise.all([promiseA, promiseB])
@@ -60,8 +75,16 @@ describe('CRDT protocol', () => {
       const [clientA, clientB] = clients
       const key1 = 7,
         key2 = 11
-      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('a'))
-      const messageB = clientB.createComponentDataEvent(key1, key2, Buffer.from('b'))
+      const messageA = clientA.createComponentDataEvent(
+        key1,
+        key2,
+        Buffer.from('a')
+      )
+      const messageB = clientB.createComponentDataEvent(
+        key1,
+        key2,
+        Buffer.from('b')
+      )
       const promiseA = clientA.sendMessage(messageA)
       const promiseB = clientB.sendMessage(messageB)
       await Promise.all([promiseA, promiseB])
@@ -80,15 +103,31 @@ describe('CRDT protocol', () => {
       const key1b = 13,
         key2b = 17
 
-      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('boedo'))
-      const messageB = clientB.createComponentDataEvent(key1b, key2b, Buffer.from('casla'))
+      const messageA = clientA.createComponentDataEvent(
+        key1,
+        key2,
+        Buffer.from('boedo')
+      )
+      const messageB = clientB.createComponentDataEvent(
+        key1b,
+        key2b,
+        Buffer.from('casla')
+      )
 
       const p1 = clientA.sendMessage(messageA)
       const p2 = clientB.sendMessage(messageB)
       await Promise.all([p1, p2])
 
-      const messageB2 = clientB.createComponentDataEvent(key1b, key2b, Buffer.from('a'))
-      const messageA2 = clientA.createComponentDataEvent(key1b, key2b, Buffer.from('z'))
+      const messageB2 = clientB.createComponentDataEvent(
+        key1b,
+        key2b,
+        Buffer.from('a')
+      )
+      const messageA2 = clientA.createComponentDataEvent(
+        key1b,
+        key2b,
+        Buffer.from('z')
+      )
       const p3 = clientB.sendMessage(messageB2)
       const p4 = clientA.sendMessage(messageA2)
       await Promise.all([p3, p4])
@@ -107,15 +146,31 @@ describe('CRDT protocol', () => {
       const key1b = 13,
         key2b = 17
 
-      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('boedo'))
-      const messageB = clientB.createComponentDataEvent(key1b, key2b, Buffer.from('casla'))
+      const messageA = clientA.createComponentDataEvent(
+        key1,
+        key2,
+        Buffer.from('boedo')
+      )
+      const messageB = clientB.createComponentDataEvent(
+        key1b,
+        key2b,
+        Buffer.from('casla')
+      )
       const promises = [
         clientA.sendMessage(messageA),
         clientB.sendMessage(messageB)
       ]
       await Promise.all(promises)
-      const messageB2 = clientB.createComponentDataEvent(key1b, key2b, Buffer.from('z'))
-      const messageA2 = clientA.createComponentDataEvent(key1b, key2b, Buffer.from('a'))
+      const messageB2 = clientB.createComponentDataEvent(
+        key1b,
+        key2b,
+        Buffer.from('z')
+      )
+      const messageA2 = clientA.createComponentDataEvent(
+        key1b,
+        key2b,
+        Buffer.from('a')
+      )
       const p1 = clientA.sendMessage(messageA2)
       const p2 = clientB.sendMessage(messageB2)
 
@@ -135,15 +190,31 @@ describe('CRDT protocol', () => {
       const key1b = 13,
         key2b = 17
 
-      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('boedo'))
-      const messageB = clientB.createComponentDataEvent(key1b, key2b, Buffer.from('casla'))
+      const messageA = clientA.createComponentDataEvent(
+        key1,
+        key2,
+        Buffer.from('boedo')
+      )
+      const messageB = clientB.createComponentDataEvent(
+        key1b,
+        key2b,
+        Buffer.from('casla')
+      )
       const promises = [
         clientA.sendMessage(messageA),
         clientB.sendMessage(messageB)
       ]
       await Promise.all(promises)
-      const messageB2 = clientB.createComponentDataEvent(key1b, key2b, Buffer.from('z'))
-      const messageA2 = clientA.createComponentDataEvent(key1b, key2b, Buffer.from('a'))
+      const messageB2 = clientB.createComponentDataEvent(
+        key1b,
+        key2b,
+        Buffer.from('z')
+      )
+      const messageA2 = clientA.createComponentDataEvent(
+        key1b,
+        key2b,
+        Buffer.from('a')
+      )
       const p1 = clientA.sendMessage(messageA2)
       const p2 = clientB.sendMessage(messageB2)
       await Promise.all([p1, p2])
@@ -160,9 +231,21 @@ describe('CRDT protocol', () => {
         key2 = 11
 
       // Buffer('a') > Buffer('z')
-      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('A'))
-      const messageB = clientB.createComponentDataEvent(key1, key2, Buffer.from('z'))
-      const messageC = clientC.createComponentDataEvent(key1, key2, Buffer.from('C'))
+      const messageA = clientA.createComponentDataEvent(
+        key1,
+        key2,
+        Buffer.from('A')
+      )
+      const messageB = clientB.createComponentDataEvent(
+        key1,
+        key2,
+        Buffer.from('z')
+      )
+      const messageC = clientC.createComponentDataEvent(
+        key1,
+        key2,
+        Buffer.from('C')
+      )
       const p1 = clientA.sendMessage(messageA)
       const p2 = clientB.sendMessage(messageB)
       const p3 = clientC.sendMessage(messageC)
@@ -183,9 +266,21 @@ describe('CRDT protocol', () => {
         key2 = 11
 
       // Buffer('a') > Buffer('z')
-      const messageB1 = clientB.createComponentDataEvent(key1, key2, Buffer.from('A'))
-      const messageB2 = clientB.createComponentDataEvent(key1, key2, Buffer.from('B'))
-      const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('C'))
+      const messageB1 = clientB.createComponentDataEvent(
+        key1,
+        key2,
+        Buffer.from('A')
+      )
+      const messageB2 = clientB.createComponentDataEvent(
+        key1,
+        key2,
+        Buffer.from('B')
+      )
+      const messageA = clientA.createComponentDataEvent(
+        key1,
+        key2,
+        Buffer.from('C')
+      )
       const p2 = clientB.sendMessage(messageB1)
       const p3 = clientB.sendMessage(messageB2)
       await Promise.all([p2, p3])

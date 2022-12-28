@@ -1,4 +1,8 @@
-import { dataCompare, State, stateIterator } from '../../../packages/@dcl/crdt/src'
+import {
+  dataCompare,
+  State,
+  stateIterator
+} from '../../../packages/@dcl/crdt/src'
 
 /**
  * Compare buffer data
@@ -27,7 +31,10 @@ export function compareStatePayloads<T = Buffer>(states: State<T>[]) {
 
     // Compare inside key1 the key2 keys map size
     for (const key1 of baseState.components.keys()) {
-      if (state.components.get(key1)?.size !== baseState.components.get(key1)!.size) {
+      if (
+        state.components.get(key1)?.size !==
+        baseState.components.get(key1)!.size
+      ) {
         return false
       }
     }
@@ -45,7 +52,6 @@ export function compareStatePayloads<T = Buffer>(states: State<T>[]) {
       }
     }
 
-
     const baseDeletedEntities = baseState.deletedEntities.getMap()
     const deletedEntities = state.deletedEntities.getMap()
 
@@ -61,7 +67,6 @@ export function compareStatePayloads<T = Buffer>(states: State<T>[]) {
       }
     }
   }
-
 
   return true
 }

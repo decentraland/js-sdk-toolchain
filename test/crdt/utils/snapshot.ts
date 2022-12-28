@@ -2,7 +2,11 @@ import fs from 'fs-extra'
 import path from 'path'
 import { createInterface } from 'readline'
 
-import { CRDTMessage, CRDTMessageType, State } from '../../../packages/@dcl/crdt/src'
+import {
+  CRDTMessage,
+  CRDTMessageType,
+  State
+} from '../../../packages/@dcl/crdt/src'
 import { dataToString, stateToString } from './state'
 
 export function getDataPath(fileName: string) {

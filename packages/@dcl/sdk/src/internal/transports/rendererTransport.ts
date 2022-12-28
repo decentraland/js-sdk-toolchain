@@ -43,9 +43,11 @@ export function createRendererTransport(
     },
     filter(message: TransportMessage) {
       // Only send renderer components (Proto Generated)
-      if ((message.type === WireMessageEnum.PUT_COMPONENT ||
-        message.type === WireMessageEnum.DELETE_COMPONENT) &&
-        !componentIds.includes((message as any).componentId)) {
+      if (
+        (message.type === WireMessageEnum.PUT_COMPONENT ||
+          message.type === WireMessageEnum.DELETE_COMPONENT) &&
+        !componentIds.includes((message as any).componentId)
+      ) {
         return false
       }
 

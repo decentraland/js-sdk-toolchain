@@ -8,9 +8,17 @@ describe('CRDT process message', () => {
     const [clientA, clientB] = createSandbox({ clientLength: 2 }).clients
     const key1 = 7,
       key2 = 11
-    const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('casla'))
-    const resultValue = clientB.processMessage(messageA)
-    const value = clientB.getState().components.get(messageA.componentId)!.get(messageA.entityId)!
+    const messageA = clientA.createComponentDataEvent(
+      key1,
+      key2,
+      Buffer.from('casla')
+    )
+
+    clientB.processMessage(messageA)
+    const value = clientB
+      .getState()
+      .components.get(messageA.componentId)!
+      .get(messageA.entityId)!
 
     expect(compareData(value.data as Buffer, messageA.data)).toBe(true)
   })
@@ -21,12 +29,24 @@ describe('CRDT process message', () => {
       key2 = 11
 
     clientA.createComponentDataEvent(key1, key2, Buffer.from('casla'))
-    const { data } = clientA.createComponentDataEvent(key1, key2, Buffer.from('casla2'))
-    const messageB = clientB.createComponentDataEvent(key1, key2, Buffer.from('boedo'))
+    const { data } = clientA.createComponentDataEvent(
+      key1,
+      key2,
+      Buffer.from('casla2')
+    )
+    const messageB = clientB.createComponentDataEvent(
+      key1,
+      key2,
+      Buffer.from('boedo')
+    )
     // LamportA: 2, data: casla2
     // LamportB: 1, data: boedo
-    const resultValue = clientA.processMessage(messageB)
-    const value = clientA.getState().components.get(messageB.componentId)!.get(messageB.entityId)!
+
+    clientA.processMessage(messageB)
+    const value = clientA
+      .getState()
+      .components.get(messageB.componentId)!
+      .get(messageB.entityId)!
 
     await clientB.sendMessage(messageB)
     expect(value.data).toBe(data)
@@ -38,16 +58,31 @@ describe('CRDT process message', () => {
     const key1 = 7,
       key2 = 11
 
-    const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('casla'))
-    const messageB = clientB.createComponentDataEvent(key1, key2, Buffer.from('boedo'))
+    const messageA = clientA.createComponentDataEvent(
+      key1,
+      key2,
+      Buffer.from('casla')
+    )
+    const messageB = clientB.createComponentDataEvent(
+      key1,
+      key2,
+      Buffer.from('boedo')
+    )
     // LamportA: 1, data: casla2
     // LamportB: 1, data: boedo
     // dataA > dataB
-    const resultValueB = clientB.processMessage(messageA)
-    const valueB = clientB.getState().components.get(messageA.componentId)!.get(messageA.entityId)!
 
-    const resultValueA = clientA.processMessage(messageB)
-    const valueA = clientA.getState().components.get(messageB.componentId)!.get(messageB.entityId)!
+    clientB.processMessage(messageA)
+    const valueB = clientB
+      .getState()
+      .components.get(messageA.componentId)!
+      .get(messageA.entityId)!
+
+    clientA.processMessage(messageB)
+    const valueA = clientA
+      .getState()
+      .components.get(messageB.componentId)!
+      .get(messageB.entityId)!
 
     expect(valueA.data).toBe(messageA.data)
     expect(compareData(valueB.data as Buffer, messageA.data)).toBe(true)

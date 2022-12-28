@@ -1,10 +1,9 @@
-import { MessageBody } from "../../serialization/types"
+import { MessageBody } from '../../serialization/types'
 
-export type ReceiveMessage =
-  MessageBody & {
-    transportId?: number
-    messageBuffer: Uint8Array
-  }
+export type ReceiveMessage = MessageBody & {
+  transportId?: number
+  messageBuffer: Uint8Array
+}
 
 export type TransportMessage = Omit<ReceiveMessage, 'data'>
 

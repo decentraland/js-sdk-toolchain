@@ -13,7 +13,11 @@
  */
 
 import { ByteBuffer } from './ByteBuffer'
-import { WireMessageEnum, WireMessageHeader, WIRE_MESSAGE_HEADER_LENGTH } from './types'
+import {
+  WireMessageEnum,
+  WireMessageHeader,
+  WIRE_MESSAGE_HEADER_LENGTH
+} from './types'
 
 export namespace WireMessage {
   /**

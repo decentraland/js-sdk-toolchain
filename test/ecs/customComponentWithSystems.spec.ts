@@ -2,7 +2,6 @@ import {
   Engine,
   Entity,
   IEngine,
-  ReceiveMessage,
   Transport,
   WireMessageHeader
 } from '../../packages/@dcl/ecs/src'
@@ -11,9 +10,6 @@ import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/me
 import { WireMessage } from '../../packages/@dcl/ecs/src/serialization/wireMessage'
 import { ID, int8Component } from './int8component'
 
-type InterceptedMessage = Omit<ReceiveMessage, 'messageBuffer'> & {
-  direction: string
-}
 function connectEngines(a: IEngine, b: IEngine) {
   const connection: {
     interceptedMessages: any[]
@@ -27,16 +23,18 @@ function connectEngines(a: IEngine, b: IEngine) {
     })
 
     let header: WireMessageHeader | null
-    while (header = WireMessage.getHeader(buffer)) {
-      const msg = ComponentOperation.read(buffer)!
-      connection.interceptedMessages.push({
-        type: msg.type,
-        entityId: msg.entityId,
-        componentId: msg.componentId,
-        data: (msg as any).data,
-        timestamp: msg.timestamp,
-        direction
-      })
+    while ((header = WireMessage.getHeader(buffer))) {
+      if (ComponentOperation.is(header.type)) {
+        const msg = ComponentOperation.read(buffer)!
+        connection.interceptedMessages.push({
+          type: msg.type,
+          entityId: msg.entityId,
+          componentId: msg.componentId,
+          data: (msg as any).data,
+          timestamp: msg.timestamp,
+          direction
+        })
+      }
     }
   }
 

@@ -1,6 +1,10 @@
 import WireMessage from '../packages/@dcl/ecs/src/serialization/wireMessage'
 import { createByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { engine, WireMessageHeader, WireMessageEnum } from '../packages/@dcl/ecs/src'
+import {
+  engine,
+  WireMessageHeader,
+  WireMessageEnum
+} from '../packages/@dcl/ecs/src'
 import { ComponentOperation } from '../packages/@dcl/ecs/src/serialization/messages/componentOperation'
 import { existsSync, readFileSync, writeFileSync } from 'fs-extra'
 import path from 'path'
@@ -74,28 +78,31 @@ async function run(fileName: string): Promise<string> {
             })
 
             let header: WireMessageHeader | null
-            while (header = WireMessage.getHeader(buffer)) {
-              const offset = buffer.currentReadOffset()
-
-              if (header.type === WireMessageEnum.PUT_COMPONENT || header.type === WireMessageEnum.DELETE_COMPONENT) {
-
+            while ((header = WireMessage.getHeader(buffer))) {
+              if (
+                header.type === WireMessageEnum.PUT_COMPONENT ||
+                header.type === WireMessageEnum.DELETE_COMPONENT
+              ) {
                 const message = ComponentOperation.read(buffer)!
                 const { entityId, componentId, timestamp } = message
-                const data = message.type === WireMessageEnum.PUT_COMPONENT ? message.data : undefined
+                const data =
+                  message.type === WireMessageEnum.PUT_COMPONENT
+                    ? message.data
+                    : undefined
 
                 const c = engine.getComponent(componentId)
 
                 out.push(
                   `  CRDT: e=${entityId} c=${componentId} t=${timestamp} data=${JSON.stringify(
                     data &&
-                    c.deserialize(
-                      createByteBuffer({
-                        reading: {
-                          buffer: data,
-                          currentOffset: 0
-                        }
-                      })
-                    )
+                      c.deserialize(
+                        createByteBuffer({
+                          reading: {
+                            buffer: data,
+                            currentOffset: 0
+                          }
+                        })
+                      )
                   )}`
                 )
               }
@@ -118,10 +125,10 @@ async function run(fileName: string): Promise<string> {
 
       out.push(
         '  OPCODES ~= ' +
-        (
-          Number(opcodes.reduce(($, $$) => $ + $$.count, 0n) / 100n) / 10
-        ).toFixed(1) +
-        'k'
+          (
+            Number(opcodes.reduce(($, $$) => $ + $$.count, 0n) / 100n) / 10
+          ).toFixed(1) +
+          'k'
       )
 
       // out.push('> STATS: ' + opcodes.slice(0,10).map(_ => `${_.opcode}=${_.count}`).join(','))
@@ -178,10 +185,10 @@ export function runCommand(
   return new Promise<string>((onSuccess, onError) => {
     process.stdout.write(
       '\u001b[36min ' +
-      path.relative(process.cwd(), cwd) +
-      ':\u001b[0m ' +
-      path.relative(process.cwd(), command) +
-      '\n'
+        path.relative(process.cwd(), cwd) +
+        ':\u001b[0m ' +
+        path.relative(process.cwd(), command) +
+        '\n'
     )
     exec(command, { cwd, env }, (error, stdout, stderr) => {
       stdout.trim().length &&

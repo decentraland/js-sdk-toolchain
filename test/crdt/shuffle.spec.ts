@@ -9,7 +9,11 @@ function createMessages(
   length: number = 1
 ) {
   return Array.from({ length }).map((_, index) =>
-    client.createComponentDataEvent(key1, key2, Buffer.from(`Message-${index}-${client.id}`))
+    client.createComponentDataEvent(
+      key1,
+      key2,
+      Buffer.from(`Message-${index}-${client.id}`)
+    )
   )
 }
 

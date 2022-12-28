@@ -1,4 +1,4 @@
-import { OptimizedGrowonlySet } from "./gset"
+import { OptimizedGrowonlySet } from './gset'
 
 /**
  * CRDT entity identifier: it use to be a compound number
@@ -18,7 +18,7 @@ export enum CRDTMessageType {
  * @public
  */
 export type ComponentDataMessage<T = unknown> = {
-  type: CRDTMessageType.CRDTMT_PutComponentData,
+  type: CRDTMessageType.CRDTMT_PutComponentData
   componentId: number
   entityId: number
   timestamp: number
@@ -30,11 +30,13 @@ export type ComponentDataMessage<T = unknown> = {
  * @public
  */
 export type DeleteEntityMessage = {
-  type: CRDTMessageType.CRDTMT_DeleteEntity,
+  type: CRDTMessageType.CRDTMT_DeleteEntity
   entityId: number
 }
 
-export type CRDTMessage<T = unknown> = ComponentDataMessage<T> | DeleteEntityMessage
+export type CRDTMessage<T = unknown> =
+  | ComponentDataMessage<T>
+  | DeleteEntityMessage
 
 /**
  * Payload that its being stored in the state.
@@ -53,7 +55,6 @@ export type State<T = unknown> = {
   components: Map<number, Map<number, Payload<T> | null>>
   deletedEntities: OptimizedGrowonlySet
 }
-
 
 export enum ProcessMessageResultType {
   /**
@@ -94,7 +95,7 @@ export enum ProcessMessageResultType {
   /**
    * Entity was previously deleted.
    * @state it does NOT CHANGE.
-   * @reason The message is considered old. 
+   * @reason The message is considered old.
    */
   EntityWasDeleted = 6,
 
@@ -103,7 +104,7 @@ export enum ProcessMessageResultType {
    * @state CHANGE.
    * @reason the state is storing old entities
    */
-  EntityDeleted = 7,
+  EntityDeleted = 7
 }
 
 /**
@@ -112,20 +113,24 @@ export enum ProcessMessageResultType {
  */
 export type CRDT<T = unknown> = {
   /**
-   * Create an event for the specified pair of <componentId, entityId> 
+   * Create an event for the specified pair of <componentId, entityId>
    * and store the new data and lamport timestmap incremented by one in the state.
-   * 
-   * @param componentId 
-   * @param entityId 
-   * @param data 
-   * 
+   *
+   * @param componentId
+   * @param entityId
+   * @param data
+   *
    * @returns
    */
-  createComponentDataEvent(componentId: number, entityId: number, data: T | null): ComponentDataMessage<T>
+  createComponentDataEvent(
+    componentId: number,
+    entityId: number,
+    data: T | null
+  ): ComponentDataMessage<T>
 
   /**
-   * 
-   * @param entityId 
+   *
+   * @param entityId
    */
   createDeleteEntityEvent(entityId: number): DeleteEntityMessage
 
@@ -146,18 +151,17 @@ export type CRDT<T = unknown> = {
   getElementSetState(componentId: number, entityId: number): Payload<T> | null
 }
 
-    // we receive LWW, v=6, we have v=5 => we receive with delay the deleteEntity(v=5)
-    //   => we should generate the deleteEntity message effects internally with deleteEntity(v=5),
-    //       but don't resend the deleteEntity
-    //          - (CRDT) addDeletedEntitySet v=5 (with crdt state cleaning) and then LWW v=6
-    //          - (engine) engine.deleteEntity v=5
+// we receive LWW, v=6, we have v=5 => we receive with delay the deleteEntity(v=5)
+//   => we should generate the deleteEntity message effects internally with deleteEntity(v=5),
+//       but don't resend the deleteEntity
+//          - (CRDT) addDeletedEntitySet v=5 (with crdt state cleaning) and then LWW v=6
+//          - (engine) engine.deleteEntity v=5
 
-    // we receive LWW, v=7, we have v=5 => we receive with delay the deleteEntity(v=5), deleteEntity(v=6), ..., N
-    //   => we should generate the deleteEntity message effects internally with deleteEntity(v=5),
-    //       but don't resend the deleteEntity
-    //          - (CRDT) addDeletedEntitySet v=5 (with crdt state cleaning) and then LWW v=6
-    //          - (engine) engine.deleteEntity v=5
+// we receive LWW, v=7, we have v=5 => we receive with delay the deleteEntity(v=5), deleteEntity(v=6), ..., N
+//   => we should generate the deleteEntity message effects internally with deleteEntity(v=5),
+//       but don't resend the deleteEntity
+//          - (CRDT) addDeletedEntitySet v=5 (with crdt state cleaning) and then LWW v=6
+//          - (engine) engine.deleteEntity v=5
 
-
-    // msg delete entity: it only should be sent by deleter
-    // 
+// msg delete entity: it only should be sent by deleter
+//

@@ -18,14 +18,14 @@ export type OptimizedGrowonlySet = {
 
   /**
    * @public
-   * 
+   *
    * @returns the set with [number, version] of each value
    */
   get(): [number, number][]
 
   /**
    * @public
-   * 
+   *
    * @returns the set with [number, version] of each value
    */
   has(n: number, v: number): boolean
@@ -36,21 +36,18 @@ export type OptimizedGrowonlySet = {
    */
   getMap(): Map<number, number>
 
-
   /**
-   * @public 
-   * 
-   * @param n 
-   * 
+   * @public
+   *
+   * @param n
+   *
    * @returns
    */
   getLastVersionOfN(n: number): number | null
-
 }
 
-
 /**
- * 
+ *
  * @returns a new GSet
  */
 export function createGSet(): OptimizedGrowonlySet {

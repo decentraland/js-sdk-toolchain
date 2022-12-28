@@ -36,10 +36,16 @@ export namespace EntityUtils {
    * @returns [number, version]
    */
   export function fromEntityId(entityId: Entity): [number, number] {
-    return [(entityId & MAX_U16) >>> 0, (((entityId & MASK_UPPER_16_ON_32) >> 16) & MAX_U16) >>> 0]
+    return [
+      (entityId & MAX_U16) >>> 0,
+      (((entityId & MASK_UPPER_16_ON_32) >> 16) & MAX_U16) >>> 0
+    ]
   }
 
-  export function toEntityId(entityNumber: number, entityVersion: number): Entity {
+  export function toEntityId(
+    entityNumber: number,
+    entityVersion: number
+  ): Entity {
     return (((entityNumber & MAX_U16) | ((entityVersion & MAX_U16) << 16)) >>>
       0) as Entity
   }
@@ -52,7 +58,10 @@ export namespace EntityUtils {
     return (entity & MAX_U16) >>> 0
   }
 
-  export function entityId(entityNumber: number, entityVersion: number): Entity {
+  export function entityId(
+    entityNumber: number,
+    entityVersion: number
+  ): Entity {
     return (((entityNumber & MAX_U16) | ((entityVersion & MAX_U16) << 16)) >>>
       0) as Entity
   }
@@ -99,7 +108,10 @@ export function EntityContainer() {
     const deleted = usedEntities.delete(entity)
     if (deleted) {
       toRemoveEntities.push(entity)
-      removedEntities.set(EntityUtils.entityNumber(entity), EntityUtils.entityVersion(entity))
+      removedEntities.set(
+        EntityUtils.entityNumber(entity),
+        EntityUtils.entityVersion(entity)
+      )
     }
     return deleted
   }
@@ -108,7 +120,10 @@ export function EntityContainer() {
     const arr = toRemoveEntities
     toRemoveEntities = []
     for (const entity of arr) {
-      removedEntities.set(EntityUtils.entityNumber(entity), EntityUtils.entityVersion(entity))
+      removedEntities.set(
+        EntityUtils.entityNumber(entity),
+        EntityUtils.entityVersion(entity)
+      )
     }
     return arr
   }

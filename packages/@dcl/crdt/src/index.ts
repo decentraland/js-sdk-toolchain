@@ -1,5 +1,14 @@
-import { createGSet } from "./gset"
-import { ComponentDataMessage, CRDT, CRDTMessage, CRDTMessageType, DeleteEntityMessage, Payload, ProcessMessageResultType, State } from "./types"
+import { createGSet } from './gset'
+import {
+  ComponentDataMessage,
+  CRDT,
+  CRDTMessage,
+  CRDTMessageType,
+  DeleteEntityMessage,
+  Payload,
+  ProcessMessageResultType,
+  State
+} from './types'
 
 const globalBuffer = (globalThis as any).Buffer
 
@@ -78,9 +87,9 @@ export type EntityUtils = {
  * to process and store the new data in case its an update, or
  * to discard and send our local value cause remote it's outdated.
  */
-export function crdtProtocol<
-  T extends number | Uint8Array | string
->(entityUtils: EntityUtils): CRDT<T> {
+export function crdtProtocol<T extends number | Uint8Array | string>(
+  entityUtils: EntityUtils
+): CRDT<T> {
   /**
    * Local state where we store the latest lamport timestamp
    * and the raw data value
@@ -97,7 +106,7 @@ export function crdtProtocol<
    */
   function updateState(
     componentId: number,
-    entityId: number, // todo: force type entity 
+    entityId: number, // todo: force type entity
     data: T | null,
     remoteTimestamp: number
   ): Payload<T> {
@@ -121,12 +130,23 @@ export function crdtProtocol<
    * lamport timestmap incremented by one in the state.components.
    * @public
    */
-  function createComponentDataEvent(componentId: number, entityId: number, data: T | null): ComponentDataMessage<T> {
+  function createComponentDataEvent(
+    componentId: number,
+    entityId: number,
+    data: T | null
+  ): ComponentDataMessage<T> {
     // Increment the timestamp
-    const timestamp = (state.components.get(componentId)?.get(entityId)?.timestamp || 0) + 1
+    const timestamp =
+      (state.components.get(componentId)?.get(entityId)?.timestamp || 0) + 1
     updateState(componentId, entityId, data, timestamp)
 
-    return { type: CRDTMessageType.CRDTMT_PutComponentData, componentId, entityId, data, timestamp }
+    return {
+      type: CRDTMessageType.CRDTMT_PutComponentData,
+      componentId,
+      entityId,
+      data,
+      timestamp
+    }
   }
 
   /**
@@ -154,8 +174,12 @@ export function crdtProtocol<
    * If it was an outdated message, then we return void
    * @public
    */
-  function processComponentDataMessage(message: ComponentDataMessage<T>): ProcessMessageResultType {
-    const [entityNumber, entityVersion] = entityUtils.fromEntityId(message.entityId)
+  function processComponentDataMessage(
+    message: ComponentDataMessage<T>
+  ): ProcessMessageResultType {
+    const [entityNumber, entityVersion] = entityUtils.fromEntityId(
+      message.entityId
+    )
     if (state.deletedEntities.has(entityNumber, entityVersion)) {
       return ProcessMessageResultType.EntityWasDeleted
     }
@@ -189,12 +213,11 @@ export function crdtProtocol<
       updateState(componentId, entityId, data, timestamp)
       return ProcessMessageResultType.StateUpdatedData
     }
-
   }
 
   /*
-  * @public
-  */
+   * @public
+   */
   function processMessage(message: CRDTMessage<T>): ProcessMessageResultType {
     if (message.type === CRDTMessageType.CRDTMT_PutComponentData) {
       return processComponentDataMessage(message as ComponentDataMessage<T>)
@@ -205,14 +228,15 @@ export function crdtProtocol<
     }
   }
 
-  function processDeleteEntityMessage(message: DeleteEntityMessage): ProcessMessageResultType {
+  function processDeleteEntityMessage(
+    message: DeleteEntityMessage
+  ): ProcessMessageResultType {
     const { entityId } = message
-    const [entityNumber, entityVersion] = entityUtils.fromEntityId(message.entityId)
-
-    state.deletedEntities.addTo(
-      entityNumber,
-      entityVersion
+    const [entityNumber, entityVersion] = entityUtils.fromEntityId(
+      message.entityId
     )
+
+    state.deletedEntities.addTo(entityNumber, entityVersion)
 
     for (const [, payload] of state.components) {
       payload.delete(entityId)
@@ -220,8 +244,6 @@ export function crdtProtocol<
 
     return ProcessMessageResultType.EntityDeleted
   }
-
-
 
   /**
    * Returns the current state
@@ -235,7 +257,10 @@ export function crdtProtocol<
    * Returns the element state of a given element of the LWW-ElementSet
    * @public
    */
-  function getElementSetState(componentId: number, entityId: number): Payload<T> | null {
+  function getElementSetState(
+    componentId: number,
+    entityId: number
+  ): Payload<T> | null {
     return state.components.get(componentId)?.get(entityId) || null
   }
 
