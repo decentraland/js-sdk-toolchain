@@ -2659,6 +2659,7 @@ export const enum TextureFilterMode {
 export type TextureHelper = {
     Common: (texture: Texture) => TextureUnion;
     Avatar: (avatarTexture: AvatarTexture) => TextureUnion;
+    Video: (videoTexture: VideoTexture) => TextureUnion;
 };
 
 // Warning: (ae-missing-release-tag) "TextureUnion" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
