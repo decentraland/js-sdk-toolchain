@@ -8,7 +8,8 @@ import {
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt/componentOperation'
 import { WireMessage } from '../../packages/@dcl/ecs/src/serialization/wireMessage'
-import { int8Component, ID } from './int8component'
+import { ID, int8Component } from './int8component'
+
 type InterceptedMessage = Omit<ReceiveMessage, 'messageBuffer'> & {
   direction: string
 }
@@ -24,10 +25,12 @@ function connectEngines(a: IEngine, b: IEngine) {
       buffer.currentReadOffset()
       const message = ComponentOperation.read(buffer)!
 
-      const { type, entity, componentId, data, timestamp } = message
+      const { type, entityId, componentId, timestamp } = message
+      const data = message.type === WireMessageEnum.PUT_COMPONENT ? message.data : null
+
       interceptedMessages.push({
         type,
-        entity,
+        entityId,
         componentId,
         data,
         timestamp,

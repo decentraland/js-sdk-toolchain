@@ -4,8 +4,10 @@ import * as components from '../../packages/@dcl/ecs/src/components'
 import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/src/math'
 
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt/componentOperation'
-import WireMessage from '../../packages/@dcl/ecs/src/serialization/wireMessage'
+import { WireMessageEnum, WIRE_MESSAGE_HEADER_LENGTH } from '../../packages/@dcl/ecs/src/serialization/types'
+
+import { WireMessage } from '../../packages/@dcl/ecs/src/serialization/wireMessage'
+import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/messages/componentOperation'
 
 const putType = WireMessageEnum.PUT_COMPONENT
 
@@ -58,7 +60,7 @@ describe('Component operation tests', () => {
       expect(msgOne.length).toBe(
         TRANSFORM_LENGTH +
         ComponentOperation.MESSAGE_HEADER_LENGTH +
-        WireMessage.HEADER_LENGTH
+        WIRE_MESSAGE_HEADER_LENGTH
       )
       expect(msgOne.type).toBe(WireMessageEnum.PUT_COMPONENT)
       Transform.upsertFromBinary(entityB, bb)

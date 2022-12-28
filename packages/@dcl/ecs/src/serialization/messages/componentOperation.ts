@@ -52,14 +52,7 @@ export namespace ComponentOperation {
       return null
     }
 
-    if (header.type === WireMessageEnum.DELETE_COMPONENT) {
-      return {
-        ...header,
-        entityId: buf.readUint32() as Entity,
-        componentId: buf.readInt32(),
-        timestamp: Number(buf.readUint64())
-      }
-    } else {
+    if (header.type === WireMessageEnum.PUT_COMPONENT) {
       return {
         ...header,
         entityId: buf.readUint32() as Entity,
@@ -67,6 +60,15 @@ export namespace ComponentOperation {
         timestamp: Number(buf.readUint64()),
         data: buf.readBuffer()
       }
+    } else if (header.type === WireMessageEnum.DELETE_COMPONENT) {
+      return {
+        ...header,
+        entityId: buf.readUint32() as Entity,
+        componentId: buf.readInt32(),
+        timestamp: Number(buf.readUint64())
+      }
+    } else {
+      throw new Error('ComponentOperation tried to read other message type.')
     }
   }
 
