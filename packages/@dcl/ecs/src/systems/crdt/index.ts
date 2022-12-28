@@ -274,15 +274,16 @@ export function crdtSceneSystem(
         if (
           message.transportId === transportIndex
 
-          // TODO: fix this
-          // &&
-          // // Avoid sending multiple messages for the same entity-componentId
-          // !crdtMessages.find(
-          //   (m) =>
-          //     m.entityId === message.entityId &&
-          //     m.type !==
-          //     m.componentId === message.componentId
-          // )
+          // TODO: This is an optimization, the state should converge anyway, whatever the message is sent.
+          &&
+          // Avoid sending multiple messages for the same entity-componentId
+          !crdtMessages.find(
+            (m) =>
+              m.entityId === message.entityId &&
+              // TODO: as any, with multiple type of messages, it should have many checks before the check for similar messages 
+              (m as any).componentId &&
+              (m as any).componentId === (message as any).componentId
+          )
         ) {
           transportBuffer.writeBuffer(message.messageBuffer, false)
         }
