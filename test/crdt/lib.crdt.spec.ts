@@ -18,7 +18,6 @@ describe('CRDT protocol', () => {
       const key1 = 7,
         key2 = 11
 
-
       // try to process invalid message
       const invalidMessageReuslt = clientA.processMessage({} as any)
       expect(invalidMessageReuslt).toBe(ProcessMessageResultType.NoChanges)
@@ -305,7 +304,6 @@ describe('CRDT protocol', () => {
       ).toBe(true)
     })
 
-
     it(`${msg}continuos message after delete the entities.`, async () => {
       const { clients, compare } = createSandbox({ clientLength: 3, delay })
       const [clientA, clientB] = clients
@@ -321,9 +319,7 @@ describe('CRDT protocol', () => {
         )
 
         if (i > 5) {
-          const msgB = clientB.createDeleteEntityEvent(
-            entityId
-          )
+          const msgB = clientB.createDeleteEntityEvent(entityId)
           toResolve.push(clientB.sendMessage(msgB))
         }
 
@@ -333,20 +329,26 @@ describe('CRDT protocol', () => {
       await Promise.all(toResolve)
       await compare()
 
-      const deletedEntities = clientA.getState().deletedEntities.get()
+      const deletedEntities = clientA
+        .getState()
+        .deletedEntities.get()
         .sort((a, b) => {
           if (a[0] === b[0]) {
             return a[1] - b[1]
           }
           return a[0] - b[0]
         })
-      expect(
-        deletedEntities.toString()
-      ).toStrictEqual([[0, 0], [1, 0], [2, 0]].toString())
+      expect(deletedEntities.toString()).toStrictEqual(
+        [
+          [0, 0],
+          [1, 0],
+          [2, 0]
+        ].toString()
+      )
     })
 
     it(`${msg} null message should lose.`, async () => {
-      const { clients, compare } = createSandbox({ clientLength: 3, delay })
+      const { clients } = createSandbox({ clientLength: 3, delay })
       const [clientA, clientB] = clients
 
       const msgA = clientA.createComponentDataEvent(1, 1, Buffer.from('messi'))
@@ -369,9 +371,11 @@ describe('CRDT protocol', () => {
       ).toBe(true)
     })
 
-
     it(`${msg} greater number should win.`, async () => {
-      const { clients, compare } = createSandbox<number>({ clientLength: 3, delay })
+      const { clients } = createSandbox<number>({
+        clientLength: 3,
+        delay
+      })
       const [clientA, clientB] = clients
 
       const msgA = clientA.createComponentDataEvent(1, 1, 47)
@@ -381,16 +385,10 @@ describe('CRDT protocol', () => {
       await clientB.sendMessage(msgB!)
 
       expect(
-        compareData(
-          clientA.getState().components.get(1)!.get(1)!.data,
-          59
-        )
+        compareData(clientA.getState().components.get(1)!.get(1)!.data, 59)
       ).toBe(true)
       expect(
-        compareData(
-          clientB.getState().components.get(1)!.get(1)!.data,
-          59
-        )
+        compareData(clientB.getState().components.get(1)!.get(1)!.data, 59)
       ).toBe(true)
 
       const msgA2 = clientA.createComponentDataEvent(1, 1, 40)
@@ -400,16 +398,10 @@ describe('CRDT protocol', () => {
       await clientB.sendMessage(msgB2!)
 
       expect(
-        compareData(
-          clientA.getState().components.get(1)!.get(1)!.data,
-          40
-        )
+        compareData(clientA.getState().components.get(1)!.get(1)!.data, 40)
       ).toBe(true)
       expect(
-        compareData(
-          clientB.getState().components.get(1)!.get(1)!.data,
-          40
-        )
+        compareData(clientB.getState().components.get(1)!.get(1)!.data, 40)
       ).toBe(true)
     })
   })

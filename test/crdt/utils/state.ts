@@ -28,7 +28,6 @@ export function stateFromString<T>(stateStr: string) {
       .set(entityId, value !== null ? { timestamp, data } : null)
   }
 
-
   const deletedEntities = stateObject.components || []
   for (const value of deletedEntities) {
     const { entityNumber, entityVersion } = value

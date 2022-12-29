@@ -20,9 +20,9 @@ type Sandbox = {
  * Generate clients, transport and compare fns so its easier to write tests.
  * @internal
  */
-export function createSandbox<T extends Buffer | Uint8Array | string | number = Buffer>(
-  opts: Sandbox
-) {
+export function createSandbox<
+  T extends Buffer | Uint8Array | string | number = Buffer
+>(opts: Sandbox) {
   /**
    *
    */

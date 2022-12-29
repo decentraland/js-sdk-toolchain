@@ -88,9 +88,10 @@ describe('CRDT process message', () => {
     expect(compareData(valueB.data as Buffer, messageA.data)).toBe(true)
   })
 
-
   it('delete entity should converge to the same state independent of sorting', async () => {
-    const [clientA, clientB, clientC] = createSandbox({ clientLength: 3 }).clients
+    const [clientA, clientB, clientC] = createSandbox({
+      clientLength: 3
+    }).clients
 
     const componentId = 7,
       entityId = 11
@@ -111,13 +112,21 @@ describe('CRDT process message', () => {
     clientC.processMessage(message)
     clientC.processMessage(deleteMsg)
 
-    const valueA = clientA.getState().components.get(message.componentId)?.get(message.entityId)
-    const valueB = clientB.getState().components.get(message.componentId)?.get(message.entityId)
-    const valueC = clientC.getState().components.get(message.componentId)?.get(message.entityId)
+    const valueA = clientA
+      .getState()
+      .components.get(message.componentId)
+      ?.get(message.entityId)
+    const valueB = clientB
+      .getState()
+      .components.get(message.componentId)
+      ?.get(message.entityId)
+    const valueC = clientC
+      .getState()
+      .components.get(message.componentId)
+      ?.get(message.entityId)
 
     expect(valueA).toBeUndefined()
     expect(valueB).toBeUndefined()
     expect(valueC).toBeUndefined()
-
   })
 })
