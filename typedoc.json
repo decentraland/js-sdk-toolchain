@@ -1,0 +1,17 @@
+{
+  // Comments are supported, like tsconfig.json
+  "entryPoints": [
+    "packages/@dcl/ecs",
+    "packages/@dcl/react-ecs",
+    "packages/@dcl/js-runtime",
+    "packages/@dcl/crdt",
+    "packages/@dcl/sdk"
+  ],
+  "includeVersion": true,
+  "cleanOutputDir": true,
+  "json": "generated-docs/docs.json",
+  "name": "SDK Documentation",
+  "excludeExternals": false,
+  "entryPointStrategy": "packages",
+  "out": "generated-docs"
+}

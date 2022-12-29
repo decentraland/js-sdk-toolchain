@@ -16,6 +16,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "@microsoft/api-documenter": "^7.19.27",
     "@rollup/plugin-commonjs": "^23.0.2",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^5.0.1",

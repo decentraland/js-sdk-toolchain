@@ -40,6 +40,9 @@ node_modules/.bin/protobuf/bin/protoc:
 	rm $(PROTOBUF_ZIP)
 	chmod +x ./node_modules/.bin/protobuf/bin/protoc
 
+docs:
+	./node_modules/.bin/typedoc
+
 test-watch:
 	node_modules/.bin/jest --detectOpenHandles --colors --watch --roots "test"
 
@@ -63,7 +66,7 @@ scripts/rpc-api-generation/src/proto/%.gen.ts: packages/@dcl/ecs/node_modules/@d
 
 compile_apis: ${PBS_TS}
 
-.PHONY: build test install
+.PHONY: build test install docs
 
 deep-clean:
 	rm -rf node_modules/ \

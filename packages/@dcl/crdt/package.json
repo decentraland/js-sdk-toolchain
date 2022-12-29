@@ -23,5 +23,11 @@
   "files": [
     "dist",
     "data"
-  ]
+  ],
+  "typedoc": {
+    "entryPoint": "./src/index.ts",
+    "readmeFile": "./README.md",
+    "displayName": "CRDT Library",
+    "tsconfig": "./tsconfig.json"
+  }
 }
