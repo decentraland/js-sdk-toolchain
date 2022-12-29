@@ -3,7 +3,7 @@ test/snapshots/cube.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 9.9k
+  OPCODES ~= 10.0k
 CALL onStart()
   OPCODES ~= 0.0k
 CALL onUpdate(0.0)

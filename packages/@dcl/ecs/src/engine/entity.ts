@@ -57,7 +57,41 @@ export namespace EntityUtils {
   }
 }
 
-export function EntityContainer() {
+/**
+ * @public
+ */
+export enum EntityState {
+  Unknown = 0,
+
+  /**
+   * The entity was generated and added to the usedEntities set
+   */
+  UsedEntity = 1,
+
+  /**
+   * The entity was removed from current engine or remotely
+   */
+  Removed = 2,
+
+  /**
+   * The entity is reserved number.
+   */
+  Reserved = 3
+}
+
+export type EntityContainer = {
+  generateEntity(): Entity
+  removeEntity(entity: Entity): boolean
+  getEntityState(entity: Entity): EntityState
+
+  getExistingEntities(): Set<Entity>
+
+  releaseRemovedEntities(): Entity[]
+  updateRemovedEntity(entity: Entity): boolean
+  updateUsedEntity(entity: Entity): boolean
+}
+
+export function EntityContainer(): EntityContainer {
   let entityCounter = RESERVED_STATIC_ENTITIES
   const usedEntities: Set<Entity> = new Set()
 
@@ -72,7 +106,9 @@ export function EntityContainer() {
     }
 
     const entityNumber = entityCounter++
-    const entityVersion = !removedEntities.has(entityNumber) ? 0 : (removedEntities.get(entityNumber)! + 1)
+    const entityVersion = !removedEntities.has(entityNumber)
+      ? 0
+      : removedEntities.get(entityNumber)! + 1
     const entity = EntityUtils.toEntityId(entityNumber, entityVersion)
 
     usedEntities.add(entity)
@@ -131,10 +167,17 @@ export function EntityContainer() {
     for (let i = 0; i <= v; i++) {
       usedEntities.delete(EntityUtils.toEntityId(n, i))
     }
+
+    return true
   }
 
   function updateUsedEntity(entity: Entity) {
     const [n, v] = EntityUtils.fromEntityId(entity)
+
+    const removedVersion = removedEntities.get(n)
+    if (removedVersion !== undefined && removedVersion >= v) {
+      return false
+    }
 
     // Update
     if (v > 0) {
@@ -143,18 +186,36 @@ export function EntityContainer() {
       }
       removedEntities.set(n, v - 1)
     }
+    usedEntities.add(entity)
+    return true
+  }
 
+  function getEntityState(entity: Entity): EntityState {
+    const [n, v] = EntityUtils.fromEntityId(entity)
+    if (n < RESERVED_STATIC_ENTITIES) {
+      return EntityState.Reserved
+    }
+
+    if (usedEntities.has(entity)) {
+      return EntityState.UsedEntity
+    }
+
+    const removedVersion = removedEntities.get(n)
+    if (removedVersion !== undefined && removedVersion >= v) {
+      return EntityState.Removed
+    }
+
+    return EntityState.Unknown
   }
 
   return {
     generateEntity,
     removeEntity,
-    entityExists(entity: Entity): boolean {
-      return entity < RESERVED_STATIC_ENTITIES || usedEntities.has(entity)
-    },
     getExistingEntities(): Set<Entity> {
       return new Set(usedEntities)
     },
+
+    getEntityState,
     releaseRemovedEntities,
 
     updateRemovedEntity,

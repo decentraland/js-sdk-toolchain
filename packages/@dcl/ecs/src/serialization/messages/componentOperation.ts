@@ -64,12 +64,14 @@ export namespace ComponentOperation {
         data: buf.readBuffer()
       }
     } else if (header.type === WireMessageEnum.DELETE_COMPONENT) {
-      return {
+      const msg = {
         ...header,
         entityId: buf.readUint32() as Entity,
         componentId: buf.readInt32(),
         timestamp: Number(buf.readUint64())
       }
+      buf.readUint32()
+      return msg
     } else {
       throw new Error('ComponentOperation tried to read other message type.')
     }

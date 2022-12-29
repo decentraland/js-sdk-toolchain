@@ -2,6 +2,7 @@ import {
   AMOUNT_VERSION_AVAILABLE,
   Entity,
   EntityContainer,
+  EntityState,
   MAX_U16,
   RESERVED_STATIC_ENTITIES
 } from '../../packages/@dcl/ecs/src/engine/entity'
@@ -11,14 +12,19 @@ describe('Entity container', () => {
     const entityContainer = EntityContainer()
     const entityA = entityContainer.generateEntity()
     expect(entityA).toBe(RESERVED_STATIC_ENTITIES)
-    expect(entityContainer.entityExists(entityA)).toBe(true)
+    expect(entityContainer.getEntityState(entityA)).toBe(EntityState.UsedEntity)
   })
 
   it('destroy entities', () => {
     const entityContainer = EntityContainer()
     const entityA = entityContainer.generateEntity()
+    expect(entityContainer.getEntityState(entityA)).toBe(EntityState.UsedEntity)
+
     entityContainer.removeEntity(entityA)
-    expect(entityContainer.entityExists(entityA)).toBe(false)
+    expect(entityContainer.getEntityState(entityA)).not.toBe(EntityState.UsedEntity)
+
+    entityContainer.releaseRemovedEntities()
+    expect(entityContainer.getEntityState(entityA)).toBe(EntityState.Removed)
   })
 
   it('generates new entities', () => {
@@ -27,7 +33,7 @@ describe('Entity container', () => {
 
     expect(entityA).toBe(RESERVED_STATIC_ENTITIES)
 
-    expect(entityContainer.entityExists(entityA)).toBe(true)
+    expect(entityContainer.getEntityState(entityA)).toBe(EntityState.UsedEntity)
 
     expect(Array.from(entityContainer.getExistingEntities())).toStrictEqual([
       entityA

@@ -1,6 +1,10 @@
 import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../ByteBuffer'
-import { DeleteEntityMessage, WireMessageEnum } from '../types'
+import {
+  DeleteEntityMessage,
+  WireMessageEnum,
+  WIRE_MESSAGE_HEADER_LENGTH
+} from '../types'
 import WireMessage from '../wireMessage'
 
 export namespace DeleteEntity {
@@ -11,7 +15,7 @@ export namespace DeleteEntity {
    */
   export function write(entity: Entity, buf: ByteBuffer) {
     // Write WireMessage header
-    buf.writeUint32(4)
+    buf.writeUint32(WIRE_MESSAGE_HEADER_LENGTH + 4)
     buf.writeUint32(WireMessageEnum.DELETE_ENTITY)
 
     // body

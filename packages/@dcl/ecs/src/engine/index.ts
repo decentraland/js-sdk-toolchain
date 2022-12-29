@@ -37,11 +37,10 @@ type PreEngine = Pick<
   | 'getComponent'
   | 'getComponentOrNull'
   | 'removeComponentDefinition'
-  | 'entityExists'
   | 'componentsDefinition'
+  | 'entityContainer'
 > & {
   getSystems: () => SystemItem[]
-  entityContainer: ReturnType<typeof EntityContainer>
 }
 
 function preEngine(): PreEngine {
@@ -64,10 +63,6 @@ function preEngine(): PreEngine {
   function addEntity() {
     const entity = entityContainer.generateEntity()
     return entity
-  }
-
-  function entityExists(entity: Entity) {
-    return entityContainer.entityExists(entity)
   }
 
   function removeEntity(entity: Entity) {
@@ -214,7 +209,6 @@ function preEngine(): PreEngine {
   }
 
   return {
-    entityExists,
     componentsDefinition,
     addEntity,
     removeEntity,
@@ -279,10 +273,11 @@ export function Engine(): IEngine {
     PlayerEntity: 1 as Entity,
     CameraEntity: 2 as Entity,
 
-    entityExists: engine.entityExists,
+    getEntityState: engine.entityContainer.getEntityState,
     addTransport: crdtSystem.addTransport,
     getCrdtState: crdtSystem.getCrdt,
 
-    componentsDefinition: engine.componentsDefinition
+    componentsDefinition: engine.componentsDefinition,
+    entityContainer: engine.entityContainer
   }
 }

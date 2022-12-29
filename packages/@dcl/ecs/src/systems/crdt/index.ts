@@ -6,7 +6,7 @@ import {
 } from '@dcl/crdt/dist/types'
 
 import type { IEngine } from '../../engine'
-import { Entity, EntityUtils } from '../../engine/entity'
+import { Entity, EntityState, EntityUtils } from '../../engine/entity'
 import { createByteBuffer } from '../../serialization/ByteBuffer'
 import { ComponentOperation } from '../../serialization/messages/componentOperation'
 import { DeleteEntity } from '../../serialization/messages/deleteEntity'
@@ -22,7 +22,10 @@ import { ReceiveMessage, Transport, TransportMessage } from './types'
 export function crdtSceneSystem(
   engine: Pick<
     IEngine,
-    'getComponentOrNull' | 'getComponent' | 'componentsDefinition'
+    | 'getComponentOrNull'
+    | 'getComponent'
+    | 'componentsDefinition'
+    | 'entityContainer'
   >
 ) {
   const transports: Transport[] = []
@@ -92,6 +95,10 @@ export function crdtSceneSystem(
               .buffer()
               .subarray(offset, buffer.currentReadOffset())
           })
+
+          // Unknown message, we skip it
+        } else {
+          buffer.incrementReadOffset(header.length)
         }
       }
       // TODO: do something if buffler.len>0
@@ -132,6 +139,16 @@ export function crdtSceneSystem(
           data: msg.type === WireMessageEnum.PUT_COMPONENT ? msg.data : null,
           timestamp: msg.timestamp
         }
+
+        const entityState = engine.entityContainer.getEntityState(msg.entityId)
+        // Skip updates from removed entityes
+        if (entityState === EntityState.Removed) continue
+
+        // Entities with unknown entities should update its entity state
+        if (entityState === EntityState.Unknown) {
+          engine.entityContainer.updateUsedEntity(msg.entityId)
+        }
+
         const component = engine.getComponentOrNull(msg.componentId)
 
         // The state isn't updated because the dirty was set
@@ -202,13 +219,10 @@ export function crdtSceneSystem(
             }
             break
 
-          case ProcessMessageResultType.EntityDeleted:
-            break
-
-          case ProcessMessageResultType.EntityWasDeleted:
-            break
-          // nothing to do here
           case ProcessMessageResultType.NoChanges:
+          case ProcessMessageResultType.EntityDeleted:
+          case ProcessMessageResultType.EntityWasDeleted:
+          default:
             break
         }
       }

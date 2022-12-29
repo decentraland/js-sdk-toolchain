@@ -523,14 +523,20 @@ export type EntityComponents = {
 };
 
 // Warning: (ae-missing-release-tag) "EntityContainer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "EntityContainer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export function EntityContainer(): {
+export function EntityContainer(): EntityContainer;
+
+// @public (undocumented)
+export type EntityContainer = {
     generateEntity(): Entity;
-    removeEntity(entity: Entity): void;
-    entityExists(entity: Entity): boolean;
+    removeEntity(entity: Entity): boolean;
+    getEntityState(entity: Entity): EntityState;
     getExistingEntities(): Set<Entity>;
-    releaseRemovedEntities: () => Entity[];
+    releaseRemovedEntities(): Entity[];
+    updateRemovedEntity(entity: Entity): boolean;
+    updateUsedEntity(entity: Entity): boolean;
 };
 
 // @public (undocumented)
@@ -539,6 +545,15 @@ export type EntityPropTypes = {
     uiText?: PBUiText;
     uiBackground?: PBUiBackground;
 };
+
+// @public (undocumented)
+export enum EntityState {
+    Removed = 2,
+    Reserved = 3,
+    // (undocumented)
+    Unknown = 0,
+    UsedEntity = 1
+}
 
 // Warning: (ae-missing-release-tag) "EntityUtils" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -628,7 +643,7 @@ export type IEngine = {
     addEntity(dynamic?: boolean): Entity;
     removeEntity(entity: Entity): void;
     removeEntityWithChildren(firstEntity: Entity): void;
-    entityExists(entity: Entity): boolean;
+    getEntityState(entity: Entity): EntityState;
     addSystem(system: SystemFn, priority?: number, name?: string): void;
     removeSystem(selector: string | SystemFn): boolean;
     registerCustomComponent<T>(component: ComponentDefinition<T>, componentId: number): ComponentDefinition<T>;
