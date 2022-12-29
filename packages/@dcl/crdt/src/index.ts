@@ -48,7 +48,7 @@ export function dataCompare<T>(a: T, b: T): number {
     return a.localeCompare(b as string)
   }
 
-  return a > b ? 1 : b > a ? -1 : 0
+  return a > b ? 1 : -1
 }
 
 /**

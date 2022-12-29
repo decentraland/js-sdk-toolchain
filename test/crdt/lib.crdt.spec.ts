@@ -3,6 +3,8 @@ import expect from 'expect'
 import { compareData, compareStatePayloads } from './utils'
 import { createSandbox } from './utils/sandbox'
 
+import { ProcessMessageResultType } from './../../packages/@dcl/crdt/src/types'
+
 describe('CRDT protocol', () => {
   it('should return true if there is no state', () => {
     expect(compareStatePayloads([])).toBe(true)
@@ -15,6 +17,15 @@ describe('CRDT protocol', () => {
       const [clientA] = clients
       const key1 = 7,
         key2 = 11
+
+
+      // try to process invalid message
+      const invalidMessageReuslt = clientA.processMessage({} as any)
+      expect(invalidMessageReuslt).toBe(ProcessMessageResultType.NoChanges)
+
+      // try to add negative version
+      expect(clientA.getState().deletedEntities.addTo(0, -2)).toBe(false)
+
       const messageA = clientA.createComponentDataEvent(
         key1,
         key2,
@@ -332,6 +343,74 @@ describe('CRDT protocol', () => {
       expect(
         deletedEntities.toString()
       ).toStrictEqual([[0, 0], [1, 0], [2, 0]].toString())
+    })
+
+    it(`${msg} null message should lose.`, async () => {
+      const { clients, compare } = createSandbox({ clientLength: 3, delay })
+      const [clientA, clientB] = clients
+
+      const msgA = clientA.createComponentDataEvent(1, 1, Buffer.from('messi'))
+      const msgB = clientB.createComponentDataEvent(1, 1, null)
+
+      await clientA.sendMessage(msgA!)
+      await clientB.sendMessage(msgB!)
+
+      expect(
+        compareData(
+          clientA.getState().components.get(1)!.get(1)!.data,
+          Buffer.from('messi')
+        )
+      ).toBe(true)
+      expect(
+        compareData(
+          clientB.getState().components.get(1)!.get(1)!.data,
+          Buffer.from('messi')
+        )
+      ).toBe(true)
+    })
+
+
+    it(`${msg} greater number should win.`, async () => {
+      const { clients, compare } = createSandbox<number>({ clientLength: 3, delay })
+      const [clientA, clientB] = clients
+
+      const msgA = clientA.createComponentDataEvent(1, 1, 47)
+      const msgB = clientB.createComponentDataEvent(1, 1, 59)
+
+      await clientA.sendMessage(msgA!)
+      await clientB.sendMessage(msgB!)
+
+      expect(
+        compareData(
+          clientA.getState().components.get(1)!.get(1)!.data,
+          59
+        )
+      ).toBe(true)
+      expect(
+        compareData(
+          clientB.getState().components.get(1)!.get(1)!.data,
+          59
+        )
+      ).toBe(true)
+
+      const msgA2 = clientA.createComponentDataEvent(1, 1, 40)
+      const msgB2 = clientB.createComponentDataEvent(1, 1, 40)
+
+      await clientA.sendMessage(msgA2!)
+      await clientB.sendMessage(msgB2!)
+
+      expect(
+        compareData(
+          clientA.getState().components.get(1)!.get(1)!.data,
+          40
+        )
+      ).toBe(true)
+      expect(
+        compareData(
+          clientB.getState().components.get(1)!.get(1)!.data,
+          40
+        )
+      ).toBe(true)
     })
   })
 })

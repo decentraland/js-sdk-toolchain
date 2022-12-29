@@ -2,6 +2,8 @@ import { State, stateIterator } from '../../../packages/@dcl/crdt/src'
 import { createGSet } from '../../../packages/@dcl/crdt/src/gset'
 
 export function dataToString<T>(data: T) {
+  if (data === null) return null
+
   if (data instanceof Uint8Array || data instanceof Buffer) {
     return new TextDecoder().decode(data)
   }
