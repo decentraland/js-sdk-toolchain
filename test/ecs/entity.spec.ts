@@ -21,7 +21,9 @@ describe('Entity container', () => {
     expect(entityContainer.getEntityState(entityA)).toBe(EntityState.UsedEntity)
 
     entityContainer.removeEntity(entityA)
-    expect(entityContainer.getEntityState(entityA)).not.toBe(EntityState.UsedEntity)
+    expect(entityContainer.getEntityState(entityA)).not.toBe(
+      EntityState.UsedEntity
+    )
 
     entityContainer.releaseRemovedEntities()
     expect(entityContainer.getEntityState(entityA)).toBe(EntityState.Removed)
