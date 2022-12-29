@@ -508,7 +508,7 @@ export type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = {
 // Warning: (tsdoc-malformed-html-name) Invalid HTML element: A space is not allowed here
 //
 // @public
-export type Entity = uint32 & {
+export type Entity = number & {
     __entity_type: '';
 };
 
@@ -527,13 +527,10 @@ export type EntityComponents = {
 // @public (undocumented)
 export function EntityContainer(): {
     generateEntity(): Entity;
-    removeEntity(entity: Entity): boolean;
+    removeEntity(entity: Entity): void;
     entityExists(entity: Entity): boolean;
     getExistingEntities(): Set<Entity>;
     releaseRemovedEntities: () => Entity[];
-    entityVersion: typeof EntityUtils.entityVersion;
-    entityNumber: typeof EntityUtils.entityNumber;
-    entityId: typeof EntityUtils.entityId;
 };
 
 // @public (undocumented)
@@ -547,12 +544,6 @@ export type EntityPropTypes = {
 //
 // @public (undocumented)
 export namespace EntityUtils {
-    // (undocumented)
-    export function entityId(entityNumber: number, entityVersion: number): Entity;
-    // (undocumented)
-    export function entityNumber(entity: Entity): number;
-    // (undocumented)
-    export function entityVersion(entity: Entity): number;
     // (undocumented)
     export function fromEntityId(entityId: Entity): [number, number];
     // (undocumented)

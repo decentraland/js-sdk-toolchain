@@ -266,7 +266,10 @@ export function crdtSceneSystem(
   /**
    * Iterates the dirty map and generates crdt messages to be send
    */
-  async function sendMessages(dirtyEntities: Map<Entity, Set<number>>, deletedEntities: Entity[]) {
+  async function sendMessages(
+    dirtyEntities: Map<Entity, Set<number>>,
+    deletedEntities: Entity[]
+  ) {
     // CRDT Messages will be the merge between the recieved transport messages and the new crdt messages
     const crdtMessages = getMessages(broadcastMessages)
     const outdatedMessagesBkp = getMessages(outdatedMessages)

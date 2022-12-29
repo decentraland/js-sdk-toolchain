@@ -7,8 +7,6 @@ export const MASK_UPPER_16_ON_32 = 0xffff0000
 
 export const AMOUNT_VERSION_AVAILABLE = MAX_U16 + 1
 
-import type { EntityID as CrdtEntity } from '@dcl/crdt'
-
 /**
  * @public The Entity is a number type, the cast is only for typescript, the final javascript code treat as a number
  *  version  number
@@ -21,7 +19,10 @@ import type { EntityID as CrdtEntity } from '@dcl/crdt'
  * Convertion from its compound numbers to entity:
  * entity = (entityNumber & MAX_U16) | ((entityVersion & MAX_U16) << 16)
  */
-export type Entity = CrdtEntity
+export type Entity = number & {
+  __entity_type: ''
+}
+// This type matches with @dcl/crdt entity type.
 
 /**
  * @public This first 512 entities are reserved by the renderer
@@ -70,7 +71,10 @@ export function EntityContainer() {
       )
     }
 
-    const entity = entityCounter++ as Entity
+    const entityNumber = entityCounter++
+    const entityVersion = !removedEntities.has(entityNumber) ? 0 : (removedEntities.get(entityNumber)! + 1)
+    const entity = EntityUtils.toEntityId(entityNumber, entityVersion)
+
     usedEntities.add(entity)
     return entity
   }
@@ -95,8 +99,16 @@ export function EntityContainer() {
   }
 
   function removeEntity(entity: Entity) {
-    usedEntities.delete(entity)
-    toRemoveEntities.push(entity)
+    if (entity < RESERVED_STATIC_ENTITIES) return false
+
+    if (usedEntities.has(entity)) {
+      usedEntities.delete(entity)
+      toRemoveEntities.push(entity)
+    } else {
+      updateRemovedEntity(entity)
+    }
+
+    return true
   }
 
   function releaseRemovedEntities() {
@@ -109,19 +121,43 @@ export function EntityContainer() {
     return arr
   }
 
+  function updateRemovedEntity(entity: Entity) {
+    const [n, v] = EntityUtils.fromEntityId(entity)
+
+    // Update the removed entities map
+    removedEntities.set(n, v)
+
+    // Remove the usedEntities if exist
+    for (let i = 0; i <= v; i++) {
+      usedEntities.delete(EntityUtils.toEntityId(n, i))
+    }
+  }
+
+  function updateUsedEntity(entity: Entity) {
+    const [n, v] = EntityUtils.fromEntityId(entity)
+
+    // Update
+    if (v > 0) {
+      for (let i = 0; i <= v - 1; i++) {
+        usedEntities.delete(EntityUtils.toEntityId(n, i))
+      }
+      removedEntities.set(n, v - 1)
+    }
+
+  }
+
   return {
-    generateEntity(): Entity {
-      return generateEntity()
-    },
-    removeEntity(entity: Entity) {
-      removeEntity(entity)
-    },
+    generateEntity,
+    removeEntity,
     entityExists(entity: Entity): boolean {
       return entity < RESERVED_STATIC_ENTITIES || usedEntities.has(entity)
     },
     getExistingEntities(): Set<Entity> {
       return new Set(usedEntities)
     },
-    releaseRemovedEntities
+    releaseRemovedEntities,
+
+    updateRemovedEntity,
+    updateUsedEntity
   }
 }

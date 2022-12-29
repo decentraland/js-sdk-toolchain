@@ -40,7 +40,7 @@ type PreEngine = Pick<
   | 'entityExists'
   | 'componentsDefinition'
 > & {
-  getSystems: () => SystemItem[],
+  getSystems: () => SystemItem[]
   entityContainer: ReturnType<typeof EntityContainer>
 }
 
@@ -246,7 +246,8 @@ export function Engine(): IEngine {
       const ret: unknown | Promise<unknown> = system.fn(dt)
       checkNotThenable(
         ret,
-        `A system (${system.name || 'anonymous'
+        `A system (${
+          system.name || 'anonymous'
         }) returned a thenable. Systems cannot be async functions. Documentation: https://dcl.gg/sdk/sync-systems`
       )
     }

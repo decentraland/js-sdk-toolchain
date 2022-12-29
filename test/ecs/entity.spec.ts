@@ -17,7 +17,7 @@ describe('Entity container', () => {
   it('destroy entities', () => {
     const entityContainer = EntityContainer()
     const entityA = entityContainer.generateEntity()
-    expect(entityContainer.removeEntity(entityA)).toBe(true)
+    entityContainer.removeEntity(entityA)
     expect(entityContainer.entityExists(entityA)).toBe(false)
   })
 
@@ -49,9 +49,8 @@ describe('Entity container', () => {
       entityContainer.generateEntity()
     }).toThrowError()
 
-    const randomEntityNumber = (32e3 +
-      Math.round(Math.random() * 32e3)) as Entity
-    entityContainer.removeEntity(randomEntityNumber)
+    entityContainer.removeEntity(50e3 as Entity)
+    entityContainer.releaseRemovedEntities()
 
     expect(() => {
       entityContainer.generateEntity()
@@ -66,6 +65,7 @@ describe('Entity container', () => {
       expect(entity & 0xffff).toBe(RESERVED_STATIC_ENTITIES)
 
       entityContainer.removeEntity(entity)
+      entityContainer.releaseRemovedEntities()
     }
 
     const entity = entityContainer.generateEntity()
