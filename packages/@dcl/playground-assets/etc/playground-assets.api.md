@@ -924,6 +924,9 @@ export namespace JSX {
 // @public (undocumented)
 export type Key = number | string;
 
+// @public (undocumented)
+export function Label(props: EntityPropTypes & UiTextProps): ReactEcs.JSX.Element;
+
 // Warning: (ae-missing-release-tag) "Listeners" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -2699,10 +2702,6 @@ export type SystemItem = {
 //
 // @public (undocumented)
 export type Task<T = unknown> = () => Promise<T>;
-
-// @public (undocumented)
-function Text_2(props: EntityPropTypes & UiTextProps): ReactEcs.JSX.Element;
-export { Text_2 as Text }
 
 // Warning: (ae-missing-release-tag) "TextAlignMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

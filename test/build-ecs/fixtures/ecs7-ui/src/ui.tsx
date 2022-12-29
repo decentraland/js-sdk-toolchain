@@ -10,7 +10,7 @@ import ReactEcs, {
   UiEntity,
   Input,
   Dropdown,
-  Text,
+  Label,
   Button
 } from '../../../../../packages/@dcl/react-ecs/dist'
 
@@ -64,7 +64,7 @@ const uiComponent = () => (
       }}
       uiTransform={{ width: 200, height: 36 }}
     />
-    <Text
+    <Label
       color={{ r: 1, g: 1, b: 1, a: 1 }}
       value="Some text"
       fontSize={16}

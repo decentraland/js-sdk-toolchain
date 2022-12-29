@@ -10,7 +10,7 @@ import { components, IEngine as IEngine } from '../../packages/@dcl/ecs/src'
 import {
   ReactEcs,
   createReactBasedUiSystem,
-  Text,
+  Label,
   CANVAS_ROOT_ENTITY
 } from '../../packages/@dcl/react-ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
@@ -33,7 +33,7 @@ describe('UiText React Ecs', () => {
     let color: Color4 | undefined = undefined
 
     const ui = () => (
-      <Text
+      <Label
         uiTransform={{ width: 100 }}
         value={text}
         color={color}

@@ -10,17 +10,18 @@ export * from './listeners/types'
 export * from './Input/types'
 export * from './uiBackground/types'
 export * from './Dropdown/types'
-export * from './Text/types'
+export * from './Label/types'
 export * from './Button/types'
 
 export { Dropdown } from './Dropdown'
 export { Input } from './Input'
-export { Text } from './Text'
+export { Label } from './Label'
 export { Button } from './Button'
 
 /**
  * @public
  */
+/*#__PURE__*/
 export function UiEntity(props: EntityPropTypes & Partial<CommonProps>) {
   return <entity {...parseProps(props)} />
 }

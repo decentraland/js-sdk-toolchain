@@ -23,6 +23,7 @@ function getButtonProps(props: EntityPropTypes & UiButtonProps) {
 /**
  * @public
  */
+/*#__PURE__*/
 export function Button(props: EntityPropTypes & UiButtonProps) {
   const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...uiTextProps } =
     props
@@ -39,7 +40,6 @@ export function Button(props: EntityPropTypes & UiButtonProps) {
     height: 36,
     ...uiTransform
   })
-  console.log(uiBackgroundProps, buttonProps.uiBackground, uiBackground)
   return (
     <entity
       onMouseDown={onMouseDown}

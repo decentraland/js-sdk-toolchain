@@ -16,6 +16,7 @@ function parseUiInput(props: Partial<UiInputProps>): PBUiInput {
 /**
  * @public
  */
+/*#__PURE__*/
 export function Input(props: EntityPropTypes & Partial<UiInputProps>) {
   const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...otherProps } =
     props

@@ -13,7 +13,7 @@ import {
   PointerEventType
 } from '@dcl/sdk/ecs'
 import { Vector3, Color4, Quaternion } from '@dcl/sdk/math'
-import ReactEcs, { UiEntity, Text, ReactEcsRenderer } from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity, Label, ReactEcsRenderer } from '@dcl/sdk/react-ecs'
 
 let counter = 0
 
@@ -35,7 +35,7 @@ export const uiComponent = () => (
         display: YGDisplay.YGD_FLEX
       }}
     >
-      <Text
+      <Label
         value="SDK 7"
         fontSize={80}
         uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
@@ -50,7 +50,7 @@ export const uiComponent = () => (
         display: YGDisplay.YGD_FLEX
       }}
     >
-      <Text
+      <Label
         value={`Counter: ${counter}`}
         fontSize={60}
         uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
@@ -65,7 +65,7 @@ export const uiComponent = () => (
         display: YGDisplay.YGD_FLEX
       }}
     >
-      <Text
+      <Label
         value={`Player: ${getPlayerPosition()}`}
         fontSize={40}
         uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}

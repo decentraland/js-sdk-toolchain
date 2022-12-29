@@ -6,7 +6,8 @@ import { UiTextProps } from './types'
 /**
  * @public
  */
-export function Text(props: EntityPropTypes & UiTextProps) {
+/*#__PURE__*/
+export function Label(props: EntityPropTypes & UiTextProps) {
   const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...uiTextProps } =
     props
   const commonProps = parseProps({

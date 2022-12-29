@@ -2,9 +2,9 @@ import { BackgroundTextureMode, PBUiBackground } from '@dcl/ecs'
 import { UiBackgroundProps } from './types'
 
 /**
- *
  * @public
  */
+/*#__PURE__*/
 export function parseUiBackground(
   props: UiBackgroundProps | undefined
 ): PBUiBackground | undefined {

@@ -1,6 +1,6 @@
 import { YGJustify, YGAlign, YGDisplay } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { UiEntity, Text } from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity, Label } from '@dcl/sdk/react-ecs'
 
 export const uiComponent = () => (
   <UiEntity
@@ -20,7 +20,7 @@ export const uiComponent = () => (
         display: YGDisplay.YGD_FLEX
       }}
     >
-      <Text
+      <Label
         value={'SDK 7'}
         fontSize={80}
         uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
@@ -35,7 +35,7 @@ export const uiComponent = () => (
         display: YGDisplay.YGD_FLEX
       }}
     >
-      <Text
+      <Label
         value={`Counter:`}
         fontSize={60}
         uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
@@ -50,7 +50,7 @@ export const uiComponent = () => (
         display: YGDisplay.YGD_FLEX
       }}
     >
-      <Text
+      <Label
         value={`Player:`}
         fontSize={40}
         uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
