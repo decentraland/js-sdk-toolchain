@@ -291,4 +291,6 @@ jobs:
                ```
             - You can preview this build entering:
               https://playground.decentraland.org/?sdk-branch=${{ github.head_ref || github.ref }}
+            - You can preview the documentation at:
+              https://sdk-team-cdn.decentraland.org/@dcl/js-sdk-toolchain/generated-docs/${{ github.head_ref || github.ref }}
           edit-mode: replace
