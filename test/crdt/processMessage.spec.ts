@@ -12,7 +12,7 @@ describe('CRDT process message', () => {
       key1,
       key2,
       Buffer.from('casla')
-    )
+    )!
 
     clientB.processMessage(messageA)
     const value = clientB
@@ -33,12 +33,12 @@ describe('CRDT process message', () => {
       key1,
       key2,
       Buffer.from('casla2')
-    )
+    )!
     const messageB = clientB.createComponentDataEvent(
       key1,
       key2,
       Buffer.from('boedo')
-    )
+    )!
     // LamportA: 2, data: casla2
     // LamportB: 1, data: boedo
 
@@ -62,12 +62,12 @@ describe('CRDT process message', () => {
       key1,
       key2,
       Buffer.from('casla')
-    )
+    )!
     const messageB = clientB.createComponentDataEvent(
       key1,
       key2,
       Buffer.from('boedo')
-    )
+    )!
     // LamportA: 1, data: casla2
     // LamportB: 1, data: boedo
     // dataA > dataB
@@ -86,5 +86,38 @@ describe('CRDT process message', () => {
 
     expect(valueA.data).toBe(messageA.data)
     expect(compareData(valueB.data as Buffer, messageA.data)).toBe(true)
+  })
+
+
+  it('delete entity should converge to the same state independent of sorting', async () => {
+    const [clientA, clientB, clientC] = createSandbox({ clientLength: 3 }).clients
+
+    const componentId = 7,
+      entityId = 11
+
+    const message = clientA.createComponentDataEvent(
+      componentId,
+      entityId,
+      Buffer.from('messi')
+    )!
+
+    const deleteMsg = clientA.createDeleteEntityEvent(entityId)
+
+    // clientB: receive first the delete
+    clientB.processMessage(deleteMsg)
+    clientB.processMessage(message)
+
+    // clientC: receive right ordering
+    clientC.processMessage(message)
+    clientC.processMessage(deleteMsg)
+
+    const valueA = clientA.getState().components.get(message.componentId)?.get(message.entityId)
+    const valueB = clientB.getState().components.get(message.componentId)?.get(message.entityId)
+    const valueC = clientC.getState().components.get(message.componentId)?.get(message.entityId)
+
+    expect(valueA).toBeUndefined()
+    expect(valueB).toBeUndefined()
+    expect(valueC).toBeUndefined()
+
   })
 })

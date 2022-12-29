@@ -134,18 +134,24 @@ export function crdtProtocol<T extends number | Uint8Array | string>(
     componentId: number,
     entityId: number,
     data: T | null
-  ): ComponentDataMessage<T> {
+  ): ComponentDataMessage<T> | null {
     // Increment the timestamp
     const timestamp =
       (state.components.get(componentId)?.get(entityId)?.timestamp || 0) + 1
-    updateState(componentId, entityId, data, timestamp)
 
-    return {
+    const msg: ComponentDataMessage<T> = {
       type: CRDTMessageType.CRDTMT_PutComponentData,
       componentId,
       entityId,
       data,
       timestamp
+    }
+
+    const res = processComponentDataMessage(msg)
+    if (res === ProcessMessageResultType.StateUpdatedTimestamp) {
+      return msg
+    } else {
+      return null
     }
   }
 

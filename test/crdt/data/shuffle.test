@@ -6,7 +6,7 @@
 {"type":1,"componentId":7,"entityId":11,"data":"Message-0-2","timestamp":3}
 # End of messages
 # Final CRDT State
-[{"componentId":7,"entityId":11,"timestamp":3,"data":"Message-0-2"}]
+{"components":[{"componentId":7,"entityId":11,"timestamp":3,"data":"Message-0-2"}],"deletedEntities":[]}
 #
 # Process messages and get the same result should process all the messages and get the same state even if we sent them in a diff order
 # Messages sent over the wire
@@ -16,5 +16,5 @@
 {"type":1,"componentId":7,"entityId":11,"data":"Message-0-2","timestamp":3}
 # End of messages
 # Final CRDT State
-[{"componentId":7,"entityId":11,"timestamp":3,"data":"Message-0-2"}]
+{"components":[{"componentId":7,"entityId":11,"timestamp":3,"data":"Message-0-2"}],"deletedEntities":[]}
 #

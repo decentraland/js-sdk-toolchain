@@ -24,17 +24,25 @@ export function compareStatePayloads<T = Buffer>(states: State<T>[]) {
   const baseState = states[0]
 
   for (const state of states) {
-    // Compare key1 keys map size
-    if (state.components.size !== baseState.components.size) {
+    // Compare key1 keys map size,
+    const numberOfState = Array.from(state.components).reduce((prev: number, cur) => prev + cur[1].size, 0)
+    const baseNumberOfState = Array.from(state.components).reduce((prev: number, cur) => prev + cur[1].size, 0)
+
+    if (numberOfState !== baseNumberOfState) {
       return false
     }
 
     // Compare inside key1 the key2 keys map size
     for (const key1 of baseState.components.keys()) {
-      if (
-        state.components.get(key1)?.size !==
-        baseState.components.get(key1)!.size
-      ) {
+      const baseSize = baseState.components.get(key1)!.size
+      const component = state.components.get(key1)
+
+      if (component === undefined) {
+        if (baseSize === 0) continue
+        return false
+      }
+
+      if (component.size !== baseSize) {
         return false
       }
     }

@@ -35,15 +35,6 @@ export type OptimizedGrowonlySet = {
    * @returns
    */
   getMap(): Map<number, number>
-
-  /**
-   * @public
-   *
-   * @param n
-   *
-   * @returns
-   */
-  getLastVersionOfN(n: number): number | null
 }
 
 /**
@@ -67,7 +58,7 @@ export function createGSet(): OptimizedGrowonlySet {
       const currentValue = lastVersion.get(n)
 
       // If the version is >=, it means the value it's already in the set
-      if (currentValue && currentValue >= v) {
+      if (currentValue !== undefined && currentValue >= v) {
         return true
       }
 
@@ -93,7 +84,7 @@ export function createGSet(): OptimizedGrowonlySet {
       const currentValue = lastVersion.get(n)
 
       // If the version is >=, it means the value it's already in the set
-      if (currentValue && currentValue >= v) {
+      if (currentValue !== undefined && currentValue >= v) {
         return true
       }
 
@@ -103,9 +94,6 @@ export function createGSet(): OptimizedGrowonlySet {
     // Map functionality
     getMap() {
       return new Map(lastVersion)
-    },
-    getLastVersionOfN(n: number) {
-      return lastVersion.get(n) || null
     }
   }
 }

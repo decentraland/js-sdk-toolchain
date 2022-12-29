@@ -7,7 +7,7 @@ describe('CRDT protocol', () => {
   it('should return true if there is no state', () => {
     expect(compareStatePayloads([])).toBe(true)
   })
-  const delayEnable = [false, false]
+  const delayEnable = [false, true]
   delayEnable.forEach((delay) => {
     const msg = delay ? '[Delay] ' : ''
     it(`${msg}should store the message A in all the clients`, async () => {
@@ -19,7 +19,7 @@ describe('CRDT protocol', () => {
         key1,
         key2,
         Buffer.from('casla')
-      )
+      )!
       await clientA.sendMessage(messageA)
       await compare()
 
@@ -36,7 +36,7 @@ describe('CRDT protocol', () => {
         key1,
         key2,
         Buffer.from('casla')
-      )
+      )!
       await clientA.sendMessage(messageA)
       await compare()
     })
@@ -52,12 +52,12 @@ describe('CRDT protocol', () => {
         key1,
         key2,
         Buffer.from('a')
-      )
+      )!
       const messageB = clientB.createComponentDataEvent(
         key1,
         key2,
         Buffer.from('z')
-      )
+      )!
       const promiseA = clientA.sendMessage(messageA)
       const promiseB = clientB.sendMessage(messageB)
       await Promise.all([promiseA, promiseB])
@@ -79,12 +79,12 @@ describe('CRDT protocol', () => {
         key1,
         key2,
         Buffer.from('a')
-      )
+      )!
       const messageB = clientB.createComponentDataEvent(
         key1,
         key2,
         Buffer.from('b')
-      )
+      )!
       const promiseA = clientA.sendMessage(messageA)
       const promiseB = clientB.sendMessage(messageB)
       await Promise.all([promiseA, promiseB])
@@ -107,12 +107,12 @@ describe('CRDT protocol', () => {
         key1,
         key2,
         Buffer.from('boedo')
-      )
+      )!
       const messageB = clientB.createComponentDataEvent(
         key1b,
         key2b,
         Buffer.from('casla')
-      )
+      )!
 
       const p1 = clientA.sendMessage(messageA)
       const p2 = clientB.sendMessage(messageB)
@@ -122,12 +122,12 @@ describe('CRDT protocol', () => {
         key1b,
         key2b,
         Buffer.from('a')
-      )
+      )!
       const messageA2 = clientA.createComponentDataEvent(
         key1b,
         key2b,
         Buffer.from('z')
-      )
+      )!
       const p3 = clientB.sendMessage(messageB2)
       const p4 = clientA.sendMessage(messageA2)
       await Promise.all([p3, p4])
@@ -150,12 +150,12 @@ describe('CRDT protocol', () => {
         key1,
         key2,
         Buffer.from('boedo')
-      )
+      )!
       const messageB = clientB.createComponentDataEvent(
         key1b,
         key2b,
         Buffer.from('casla')
-      )
+      )!
       const promises = [
         clientA.sendMessage(messageA),
         clientB.sendMessage(messageB)
@@ -165,12 +165,12 @@ describe('CRDT protocol', () => {
         key1b,
         key2b,
         Buffer.from('z')
-      )
+      )!
       const messageA2 = clientA.createComponentDataEvent(
         key1b,
         key2b,
         Buffer.from('a')
-      )
+      )!
       const p1 = clientA.sendMessage(messageA2)
       const p2 = clientB.sendMessage(messageB2)
 
@@ -194,12 +194,12 @@ describe('CRDT protocol', () => {
         key1,
         key2,
         Buffer.from('boedo')
-      )
+      )!
       const messageB = clientB.createComponentDataEvent(
         key1b,
         key2b,
         Buffer.from('casla')
-      )
+      )!
       const promises = [
         clientA.sendMessage(messageA),
         clientB.sendMessage(messageB)
@@ -209,12 +209,12 @@ describe('CRDT protocol', () => {
         key1b,
         key2b,
         Buffer.from('z')
-      )
+      )!
       const messageA2 = clientA.createComponentDataEvent(
         key1b,
         key2b,
         Buffer.from('a')
-      )
+      )!
       const p1 = clientA.sendMessage(messageA2)
       const p2 = clientB.sendMessage(messageB2)
       await Promise.all([p1, p2])
@@ -235,17 +235,17 @@ describe('CRDT protocol', () => {
         key1,
         key2,
         Buffer.from('A')
-      )
+      )!
       const messageB = clientB.createComponentDataEvent(
         key1,
         key2,
         Buffer.from('z')
-      )
+      )!
       const messageC = clientC.createComponentDataEvent(
         key1,
         key2,
         Buffer.from('C')
-      )
+      )!
       const p1 = clientA.sendMessage(messageA)
       const p2 = clientB.sendMessage(messageB)
       const p3 = clientC.sendMessage(messageC)
@@ -270,17 +270,17 @@ describe('CRDT protocol', () => {
         key1,
         key2,
         Buffer.from('A')
-      )
+      )!
       const messageB2 = clientB.createComponentDataEvent(
         key1,
         key2,
         Buffer.from('B')
-      )
+      )!
       const messageA = clientA.createComponentDataEvent(
         key1,
         key2,
         Buffer.from('C')
-      )
+      )!
       const p2 = clientB.sendMessage(messageB1)
       const p3 = clientB.sendMessage(messageB2)
       await Promise.all([p2, p3])
@@ -292,6 +292,46 @@ describe('CRDT protocol', () => {
           Buffer.from('B')
         )
       ).toBe(true)
+    })
+
+
+    it(`${msg}continuos message after delete the entities.`, async () => {
+      const { clients, compare } = createSandbox({ clientLength: 3, delay })
+      const [clientA, clientB] = clients
+
+      const toResolve: Promise<any>[] = []
+      for (let i = 0; i < 15; i++) {
+        const entityId = i % 3
+        const componentId = 7 + i
+        const msgA = clientA.createComponentDataEvent(
+          componentId,
+          entityId,
+          Buffer.from('messi')
+        )
+
+        if (i > 5) {
+          const msgB = clientB.createDeleteEntityEvent(
+            entityId
+          )
+          toResolve.push(clientB.sendMessage(msgB))
+        }
+
+        if (msgA !== null) toResolve.push(clientA.sendMessage(msgA))
+      }
+
+      await Promise.all(toResolve)
+      await compare()
+
+      const deletedEntities = clientA.getState().deletedEntities.get()
+        .sort((a, b) => {
+          if (a[0] === b[0]) {
+            return a[1] - b[1]
+          }
+          return a[0] - b[0]
+        })
+      expect(
+        deletedEntities.toString()
+      ).toStrictEqual([[0, 0], [1, 0], [2, 0]].toString())
     })
   })
 })

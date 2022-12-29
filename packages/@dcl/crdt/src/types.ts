@@ -126,7 +126,7 @@ export type CRDT<T = unknown> = {
     componentId: number,
     entityId: number,
     data: T | null
-  ): ComponentDataMessage<T>
+  ): ComponentDataMessage<T> | null
 
   /**
    *

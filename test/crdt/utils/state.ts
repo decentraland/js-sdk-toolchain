@@ -9,12 +9,14 @@ export function dataToString<T>(data: T) {
 }
 
 export function stateFromString<T>(stateStr: string) {
-  const state = JSON.parse(stateStr)
+  const stateObject = JSON.parse(stateStr)
   const newState: State<T> = {
     components: new Map(),
     deletedEntities: createGSet()
   }
-  for (const value of state) {
+
+  const components = stateObject.components || []
+  for (const value of components) {
     const { componentId, entityId, timestamp, data } = value
     if (!newState.components.has(componentId)) {
       newState.components.set(componentId, new Map())
@@ -23,18 +25,45 @@ export function stateFromString<T>(stateStr: string) {
       .get(componentId)!
       .set(entityId, value !== null ? { timestamp, data } : null)
   }
+
+
+  const deletedEntities = stateObject.components || []
+  for (const value of deletedEntities) {
+    const { entityNumber, entityVersion } = value
+    newState.deletedEntities.addTo(entityNumber, entityVersion)
+  }
+
   return newState
 }
 
 export function stateToString<T>(state: State<T>): string {
-  const arr = []
+  const components = []
   for (const [componentId, entityId, value] of stateIterator(state)) {
-    arr.push({
+    components.push({
       componentId,
       entityId,
       timestamp: value?.timestamp,
       data: dataToString(value?.data)
     })
   }
-  return JSON.stringify(arr, null, 0)
+
+  const deletedEntities = []
+  for (const [entityNumber, entityVersion] of state.deletedEntities.getMap()) {
+    deletedEntities.push({
+      entityNumber,
+      entityVersion
+    })
+  }
+
+  const stateObj = {
+    components,
+    deletedEntities: deletedEntities.sort((a, b) => {
+      if (a.entityNumber === b.entityNumber) {
+        return a.entityVersion - b.entityVersion
+      }
+      return a.entityNumber - b.entityNumber
+    })
+  }
+
+  return JSON.stringify(stateObj, null, 0)
 }
