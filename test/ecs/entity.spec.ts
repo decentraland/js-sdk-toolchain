@@ -1,14 +1,16 @@
 import {
+  AMOUNT_VERSION_AVAILABLE,
   Entity,
-  EntityContainer
+  EntityContainer,
+  MAX_U16,
+  RESERVED_STATIC_ENTITIES
 } from '../../packages/@dcl/ecs/src/engine/entity'
-import EntityUtils from '../../packages/@dcl/ecs/src/engine/entity-utils'
 
 describe('Entity container', () => {
   it('generates new static entities', () => {
     const entityContainer = EntityContainer()
     const entityA = entityContainer.generateEntity()
-    expect(entityA).toBe(EntityUtils.STATIC_ENTITIES_RANGE[0])
+    expect(entityA).toBe(RESERVED_STATIC_ENTITIES)
     expect(entityContainer.entityExists(entityA)).toBe(true)
   })
 
@@ -21,21 +23,11 @@ describe('Entity container', () => {
 
   it('generates new entities', () => {
     const entityContainer = EntityContainer()
-
-    const rootEntity = 0 as Entity
     const entityA = entityContainer.generateEntity()
 
-    expect(entityA).toBe(EntityUtils.STATIC_ENTITIES_RANGE[0])
+    expect(entityA).toBe(RESERVED_STATIC_ENTITIES)
 
     expect(entityContainer.entityExists(entityA)).toBe(true)
-
-    expect(EntityUtils.isReservedEntity(rootEntity)).toBe(true)
-    expect(EntityUtils.isStaticEntity(rootEntity)).toBe(false)
-    expect(EntityUtils.isDynamicEntity(rootEntity)).toBe(false)
-
-    expect(EntityUtils.isReservedEntity(entityA)).toBe(false)
-    expect(EntityUtils.isStaticEntity(entityA)).toBe(true)
-    expect(EntityUtils.isDynamicEntity(entityA)).toBe(false)
 
     expect(Array.from(entityContainer.getExistingEntities())).toStrictEqual([
       entityA
@@ -48,27 +40,35 @@ describe('Entity container', () => {
   })
 
   it('should fail with creating entity out of range', () => {
-    const realValue = EntityUtils.STATIC_ENTITIES_RANGE[1]
-
-    function changeRange(value: number) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      EntityUtils.STATIC_ENTITIES_RANGE[1] = value
-    }
-
-    changeRange(600)
-
     const entityContainer = EntityContainer()
-    const RangeMock = EntityUtils.STATIC_ENTITIES_RANGE
-
-    for (let i = RangeMock[0]; i < RangeMock[1]; i++) {
+    const entitiesAvailable = MAX_U16 - RESERVED_STATIC_ENTITIES
+    for (let i = 0; i < entitiesAvailable; i++) {
       entityContainer.generateEntity()
     }
 
-    expect(() => {
-      entityContainer.generateEntity()
-    }).toThrowError()
+    // since we consumed all entitites, generating another one is illegal
+    expect(() => entityContainer.generateEntity()).toThrowError()
 
-    changeRange(realValue)
+    // then we "return" that entity to the pool
+    const randomEntityNumber = (32e3 +
+      Math.round(Math.random() * 32e3)) as Entity
+    entityContainer.removeEntity(randomEntityNumber)
+
+    // and since we have availability, another one can be generated
+    expect(() => entityContainer.generateEntity()).not.toThrowError()
+  }, 10000)
+
+  it(`should drain the all versions of entity number ${RESERVED_STATIC_ENTITIES}`, () => {
+    const entityContainer = EntityContainer()
+
+    for (let i = 0; i < AMOUNT_VERSION_AVAILABLE; i++) {
+      const entity = entityContainer.generateEntity()
+      expect(entity & 0xffff).toBe(RESERVED_STATIC_ENTITIES)
+
+      entityContainer.removeEntity(entity)
+    }
+
+    const entity = entityContainer.generateEntity()
+    expect(entity & 0xffff).not.toBe(RESERVED_STATIC_ENTITIES)
   })
 })

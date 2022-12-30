@@ -3,7 +3,8 @@ import {
   IEngine,
   Entity,
   createPointerEventSystem,
-  createInputSystem
+  createInputSystem,
+  MAX_U16
 } from '../../packages/@dcl/ecs'
 import { components, IEngine as IIEngine } from '../../packages/@dcl/ecs/src'
 import {
@@ -540,8 +541,12 @@ describe('RectEcs UI ✨', () => {
     // Add an element at the beginning of the array
     uiEntities.unshift({ id: 8, value: 8 })
     await engine.update(1)
-    const newEntity = ((entityD as number) + 1) as Entity
+    const newEntity = getUi(entityA).rightOf
     // Entities props doesnt change
+
+    // Now it's more difficult to predic the entityId,
+    // but I know that it reuse a removed entity number
+    expect(newEntity).toBeGreaterThan(MAX_U16)
 
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
