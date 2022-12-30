@@ -506,6 +506,7 @@ export type DeleteEntityMessageBody = {
     type: WireMessageEnum.DELETE_ENTITY;
     entityId: Entity;
 };
+
 // @public (undocumented)
 export function Dropdown(props: EntityPropTypes & UiDropdownProps): ReactEcs.JSX.Element;
 
@@ -1743,10 +1744,10 @@ export const PBGltfContainer: {
 export interface PBMaterial {
     // (undocumented)
     material?: {
-        $case: "unlit";
+        $case: 'unlit';
         unlit: PBMaterial_UnlitMaterial;
     } | {
-        $case: "pbr";
+        $case: 'pbr';
         pbr: PBMaterial_PbrMaterial;
     };
 }
@@ -1810,16 +1811,16 @@ export interface PBMeshCollider {
     collisionMask?: number | undefined;
     // (undocumented)
     mesh?: {
-        $case: "box";
+        $case: 'box';
         box: PBMeshCollider_BoxMesh;
     } | {
-        $case: "sphere";
+        $case: 'sphere';
         sphere: PBMeshCollider_SphereMesh;
     } | {
-        $case: "cylinder";
+        $case: 'cylinder';
         cylinder: PBMeshCollider_CylinderMesh;
     } | {
-        $case: "plane";
+        $case: 'plane';
         plane: PBMeshCollider_PlaneMesh;
     };
 }
@@ -1891,16 +1892,16 @@ export const PBMeshCollider_SphereMesh: {
 export interface PBMeshRenderer {
     // (undocumented)
     mesh?: {
-        $case: "box";
+        $case: 'box';
         box: PBMeshRenderer_BoxMesh;
     } | {
-        $case: "sphere";
+        $case: 'sphere';
         sphere: PBMeshRenderer_SphereMesh;
     } | {
-        $case: "cylinder";
+        $case: 'cylinder';
         cylinder: PBMeshRenderer_CylinderMesh;
     } | {
-        $case: "plane";
+        $case: 'plane';
         plane: PBMeshRenderer_PlaneMesh;
     };
 }
@@ -2879,10 +2880,10 @@ export type TextureHelper = {
 export interface TextureUnion {
     // (undocumented)
     tex?: {
-        $case: "texture";
+        $case: 'texture';
         texture: Texture;
     } | {
-        $case: "avatarTexture";
+        $case: 'avatarTexture';
         avatarTexture: AvatarTexture;
     };
 }
@@ -3007,14 +3008,6 @@ export const UiDropdownResult: ComponentDefinition<PBUiDropdownResult>;
 // @public (undocumented)
 export function UiEntity(props: EntityPropTypes & Partial<CommonProps>): ReactEcs.JSX.Element;
 
-// Warning: (ae-missing-release-tag) "Uint32" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type Uint32 = number;
-
-// @public
-export type uint32 = number;
-
 // @public (undocumented)
 export const UiInput: ComponentDefinition<PBUiInput>;
 
@@ -3025,6 +3018,11 @@ export type UiInputProps = PBUiInput & {
 
 // @public (undocumented)
 export const UiInputResult: ComponentDefinition<PBUiInputResult>;
+
+// Warning: (ae-missing-release-tag) "Uint32" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type Uint32 = number;
 
 // @public
 export type uint32 = number;

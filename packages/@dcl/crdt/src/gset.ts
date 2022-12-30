@@ -92,10 +92,10 @@ export function createGSet(): OptimizedGrowonlySet {
     },
 
     /**
-     * Warning: this function returns the reference to the internal map, 
-     *  if you need to mutate some value, make a copy. 
+     * Warning: this function returns the reference to the internal map,
+     *  if you need to mutate some value, make a copy.
      * For optimization purpose the copy isn't made here.
-     * 
+     *
      * @returns the map of number to version
      */
     getMap() {

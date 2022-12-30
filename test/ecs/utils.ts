@@ -4,9 +4,9 @@ import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import {
   TransportMessage,
   Transport,
-  WireMessage,
   WireMessageHeader
 } from '../../packages/@dcl/ecs/src'
+import { WireMessage } from './../../packages/@dcl/ecs/src/serialization/wireMessage'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import {
   components,
@@ -283,11 +283,11 @@ export function getRandomFunction(_seed?: number) {
   return function random() {
     let mz = state.mz
     let mw = state.mw
-    mz = ((mz & 0xffff) * 36969 + (mz >> 16)) & 0xffffffff;
-    mw = ((mw & 0xffff) * 18000 + (mw >> 16)) & 0xffffffff;
-    state.mz = mz;
-    state.mw = mw;
-    const x = (((mz << 16) + mw) & 0xffffffff) / 0x100000000;
-    return 0.5 + x;
+    mz = ((mz & 0xffff) * 36969 + (mz >> 16)) & 0xffffffff
+    mw = ((mw & 0xffff) * 18000 + (mw >> 16)) & 0xffffffff
+    state.mz = mz
+    state.mw = mw
+    const x = (((mz << 16) + mw) & 0xffffffff) / 0x100000000
+    return 0.5 + x
   }
 }

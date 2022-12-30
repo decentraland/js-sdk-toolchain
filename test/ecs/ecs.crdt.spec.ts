@@ -436,5 +436,4 @@ describe('CRDT tests', () => {
       })
     })
   })
-
 })

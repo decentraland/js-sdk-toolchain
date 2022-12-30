@@ -1,4 +1,4 @@
-import { createGSet } from "@dcl/crdt/dist/gset"
+import { createGSet } from '@dcl/crdt/dist/gset'
 
 /**
  * @public It only defines the type explicitly, no effects.
@@ -109,7 +109,8 @@ export function EntityContainer(): EntityContainer {
 
     const entityNumber = entityCounter++
     const entityVersion = removedEntities.getMap().has(entityNumber)
-      ? removedEntities.getMap().get(entityNumber)! + 1 : 0
+      ? removedEntities.getMap().get(entityNumber)! + 1
+      : 0
     const entity = EntityUtils.toEntityId(entityNumber, entityVersion)
 
     usedEntities.add(entity)

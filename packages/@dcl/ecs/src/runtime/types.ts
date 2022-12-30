@@ -14,8 +14,3 @@ export * from '../schemas/typing'
 export type { MapResult, Spec } from '../schemas/Map'
 export * from '../engine/component'
 export * from '../schemas/typing'
-export type {
-  ReceiveMessage,
-  Transport,
-  TransportMessage
-} from '../systems/crdt/types'

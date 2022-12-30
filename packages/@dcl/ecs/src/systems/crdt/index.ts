@@ -269,11 +269,13 @@ export function crdtSceneSystem(
           component.toBinaryOrNull(entity)?.toBinary() ?? null
 
         // if update goes bad, the entity doesn't accept put anymore (it's added to deleted entities set)
-        if (crdtClient.createComponentDataEvent(
-          componentId,
-          entity as number,
-          componentValue
-        ) === null) {
+        if (
+          crdtClient.createComponentDataEvent(
+            componentId,
+            entity as number,
+            componentValue
+          ) === null
+        ) {
           component.deleteFrom(entity, false)
           componentsId.delete(componentId)
         }
