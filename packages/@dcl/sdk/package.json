@@ -24,5 +24,11 @@
     "@dcl/react-ecs": "file:../react-ecs",
     "@dcl/unity-renderer": "1.0.68557-20221221195847.commit-f743b85"
   },
-  "minCliVersion": "3.14.1"
+  "minCliVersion": "3.14.1",
+  "typedoc": {
+    "entryPoint": "./src/index.ts",
+    "readmeFile": "./README.md",
+    "displayName": "SDK",
+    "tsconfig": "./tsconfig.json"
+  }
 }
