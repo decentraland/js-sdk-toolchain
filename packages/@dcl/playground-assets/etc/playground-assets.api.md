@@ -144,10 +144,12 @@ export type ByteBuffer = {
     readUint32(): number;
     readUint64(): bigint;
     readBuffer(): Uint8Array;
+    readUtf8String(): string;
     incrementWriteOffset(amount: number): number;
     size(): number;
     toBinary(): Uint8Array;
     toCopiedBinary(): Uint8Array;
+    writeUtf8String(value: string, writeLength?: boolean): void;
     writeBuffer(value: Uint8Array, writeLength?: boolean): void;
     writeFloat32(value: number): void;
     writeFloat64(value: number): void;
