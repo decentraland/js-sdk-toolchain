@@ -6,10 +6,10 @@ import { ISchema } from '../ISchema'
  */
 export const FlatString: ISchema<string> = {
   serialize(value: string, builder: ByteBuffer): void {
-    builder.writeBuffer(new TextEncoder().encode(value))
+    builder.writeUtf8String(value)
   },
   deserialize(reader: ByteBuffer): string {
-    return new TextDecoder().decode(reader.readBuffer())
+    return reader.readUtf8String()
   },
   create() {
     return ''
