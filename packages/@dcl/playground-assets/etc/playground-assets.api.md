@@ -1744,10 +1744,10 @@ export const PBGltfContainer: {
 export interface PBMaterial {
     // (undocumented)
     material?: {
-        $case: 'unlit';
+        $case: "unlit";
         unlit: PBMaterial_UnlitMaterial;
     } | {
-        $case: 'pbr';
+        $case: "pbr";
         pbr: PBMaterial_PbrMaterial;
     };
 }
@@ -1811,16 +1811,16 @@ export interface PBMeshCollider {
     collisionMask?: number | undefined;
     // (undocumented)
     mesh?: {
-        $case: 'box';
+        $case: "box";
         box: PBMeshCollider_BoxMesh;
     } | {
-        $case: 'sphere';
+        $case: "sphere";
         sphere: PBMeshCollider_SphereMesh;
     } | {
-        $case: 'cylinder';
+        $case: "cylinder";
         cylinder: PBMeshCollider_CylinderMesh;
     } | {
-        $case: 'plane';
+        $case: "plane";
         plane: PBMeshCollider_PlaneMesh;
     };
 }
@@ -1892,16 +1892,16 @@ export const PBMeshCollider_SphereMesh: {
 export interface PBMeshRenderer {
     // (undocumented)
     mesh?: {
-        $case: 'box';
+        $case: "box";
         box: PBMeshRenderer_BoxMesh;
     } | {
-        $case: 'sphere';
+        $case: "sphere";
         sphere: PBMeshRenderer_SphereMesh;
     } | {
-        $case: 'cylinder';
+        $case: "cylinder";
         cylinder: PBMeshRenderer_CylinderMesh;
     } | {
-        $case: 'plane';
+        $case: "plane";
         plane: PBMeshRenderer_PlaneMesh;
     };
 }
@@ -2880,10 +2880,10 @@ export type TextureHelper = {
 export interface TextureUnion {
     // (undocumented)
     tex?: {
-        $case: 'texture';
+        $case: "texture";
         texture: Texture;
     } | {
-        $case: 'avatarTexture';
+        $case: "avatarTexture";
         avatarTexture: AvatarTexture;
     };
 }
