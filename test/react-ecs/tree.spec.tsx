@@ -544,7 +544,8 @@ describe('RectEcs UI ✨', () => {
     const newEntity = getUi(entityA).rightOf
     // Entities props doesnt change
 
-    // Now it's more difficult to predic the entityId, but I know that it reuse a removed entity number
+    // Now it's more difficult to predic the entityId,
+    // but I know that it reuse a removed entity number
     expect(newEntity).toBeGreaterThan(MAX_U16)
 
     expect(getUi(entityA)).toMatchObject({

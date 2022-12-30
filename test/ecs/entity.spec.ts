@@ -45,18 +45,18 @@ describe('Entity container', () => {
     for (let i = 0; i < entitiesAvailable; i++) {
       entityContainer.generateEntity()
     }
-    expect(() => {
-      entityContainer.generateEntity()
-    }).toThrowError()
 
+    // since we consumed all entitites, generating another one is illegal
+    expect(() => entityContainer.generateEntity()).toThrowError()
+
+    // then we "return" that entity to the pool
     const randomEntityNumber = (32e3 +
       Math.round(Math.random() * 32e3)) as Entity
     entityContainer.removeEntity(randomEntityNumber)
 
-    expect(() => {
-      entityContainer.generateEntity()
-    }).not.toThrowError()
-  })
+    // and since we have availability, another one can be generated
+    expect(() => entityContainer.generateEntity()).not.toThrowError()
+  }, 10000)
 
   it(`should drain the all versions of entity number ${RESERVED_STATIC_ENTITIES}`, () => {
     const entityContainer = EntityContainer()
