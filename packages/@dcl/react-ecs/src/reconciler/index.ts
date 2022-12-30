@@ -105,7 +105,9 @@ export function createReconciler(
 
       pointerEvent(instance.entity, update.props as EventSystemCallback, {
         button: InputAction.IA_POINTER,
-        hoverText: '@dcl/react-ecs/onPointerDown'
+        // We add this showFeedBack so the pointerEventSystem creates a PointerEvent component with our entity
+        // This is needed for the renderer to know which entities are clickeables
+        showFeedback: true
       })
     }
   }

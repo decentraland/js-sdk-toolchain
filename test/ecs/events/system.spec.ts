@@ -64,7 +64,7 @@ describe('Events System', () => {
     expect(counter).toBe(1)
     expect(
       PointerEvents.getOrNull(entity)?.pointerEvents[0].eventInfo?.hoverText
-    ).toBe('Interact')
+    ).toBe(undefined)
   })
 
   it('should create pointer hover components', async () => {

@@ -12,9 +12,10 @@ export type EventSystemCallback = (
 ) => void
 
 export type EventSystemOptions = {
-  button?: InputAction
+  button: InputAction
   hoverText?: string
   maxDistance?: number
+  showFeedback?: boolean
 }
 
 export type PointerEventsSystem = ReturnType<typeof createPointerEventSystem>
@@ -32,15 +33,13 @@ export function createPointerEventSystem(
   }
   type EventMapType = Map<
     EventType,
-    { cb: EventSystemCallback; opts: Required<EventSystemOptions> }
+    { cb: EventSystemCallback; opts: EventSystemOptions }
   >
 
   const getDefaultOpts = (
-    opts: EventSystemOptions = {}
-  ): Required<EventSystemOptions> => ({
+    opts: Partial<EventSystemOptions> = {}
+  ): EventSystemOptions => ({
     button: InputAction.IA_ANY,
-    hoverText: 'Interact',
-    maxDistance: 100,
     ...opts
   })
 
@@ -57,7 +56,7 @@ export function createPointerEventSystem(
     type: PointerEventType,
     opts: EventSystemOptions
   ) {
-    if (opts.hoverText) {
+    if (opts.hoverText || opts.showFeedback) {
       const pointerEvent =
         PointerEvents.getMutableOrNull(entity) || PointerEvents.create(entity)
 
@@ -65,7 +64,7 @@ export function createPointerEventSystem(
         eventType: type,
         eventInfo: {
           button: opts.button,
-          showFeedback: true,
+          showFeedback: opts.showFeedback,
           hoverText: opts.hoverText,
           maxDistance: opts.maxDistance
         }
@@ -181,7 +180,7 @@ export function createPointerEventSystem(
     onClick(
       entity: Entity,
       cb: EventSystemCallback,
-      opts?: EventSystemOptions
+      opts?: Partial<EventSystemOptions>
     ) {
       const options = getDefaultOpts(opts)
       // Clear previous event with over feedback included
@@ -202,7 +201,7 @@ export function createPointerEventSystem(
     onPointerDown(
       entity: Entity,
       cb: EventSystemCallback,
-      opts?: EventSystemOptions
+      opts?: Partial<EventSystemOptions>
     ) {
       const options = getDefaultOpts(opts)
       removeEvent(entity, EventType.Down)
@@ -220,7 +219,7 @@ export function createPointerEventSystem(
     onPointerUp(
       entity: Entity,
       cb: EventSystemCallback,
-      opts?: EventSystemOptions
+      opts?: Partial<EventSystemOptions>
     ) {
       const options = getDefaultOpts(opts)
       removeEvent(entity, EventType.Up)

@@ -426,9 +426,9 @@ export function createPointerEventSystem(engine: IEngine, inputSystem: IInputSys
     removeOnClick(entity: Entity): void;
     removeOnPointerDown(entity: Entity): void;
     removeOnPointerUp(entity: Entity): void;
-    onClick(entity: Entity, cb: EventSystemCallback, opts?: EventSystemOptions): void;
-    onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: EventSystemOptions): void;
-    onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: EventSystemOptions): void;
+    onClick(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
+    onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
+    onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
 };
 
 // Warning: (ae-missing-release-tag) "createReactBasedUiSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -542,9 +542,10 @@ export type EventSystemCallback = (event: PBPointerEventsResult_PointerCommand) 
 //
 // @public (undocumented)
 export type EventSystemOptions = {
-    button?: InputAction;
+    button: InputAction;
     hoverText?: string;
     maxDistance?: number;
+    showFeedback?: boolean;
 };
 
 // Warning: (ae-missing-release-tag) "ExcludeUndefined" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2401,9 +2402,9 @@ export const pointerEventsSystem: {
     removeOnClick(entity: unknown): void;
     removeOnPointerDown(entity: unknown): void;
     removeOnPointerUp(entity: unknown): void;
-    onClick(entity: unknown, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
-    onPointerDown(entity: unknown, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
-    onPointerUp(entity: unknown, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
+    onClick(entity: unknown, cb: EventSystemCallback, opts?: Partial<EventSystemOptions> | undefined): void;
+    onPointerDown(entity: unknown, cb: EventSystemCallback, opts?: Partial<EventSystemOptions> | undefined): void;
+    onPointerUp(entity: unknown, cb: EventSystemCallback, opts?: Partial<EventSystemOptions> | undefined): void;
 };
 
 // Warning: (ae-missing-release-tag) "PointerEventType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
