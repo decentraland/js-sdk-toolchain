@@ -1,41 +1,80 @@
 import {
-  YGDisplay,
-  YGJustify,
-  YGAlign,
-  TextAlignMode,
-  Font
+  TextureWrapMode,
+  TextureFilterMode,
+  BackgroundTextureMode,
+  TextAlignMode
 } from '@dcl/sdk/ecs'
-import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
+import { Color4 } from '@dcl/sdk/math'
+import ReactEcs, {
+  ReactEcsRenderer,
+  UiEntity,
+  Input,
+  Dropdown,
+  Label,
+  Button
+} from '../../../../../packages/@dcl/react-ecs/dist'
 
-export const ui = () => (
+const uiComponent = () => (
   <UiEntity
-    uiTransform={{
-      width: 500,
-      height: 500,
-      padding: { top: 10, right: 10, bottom: 10, left: 10 }
+    onMouseDown={() => {
+      console.log('MOUSE_DOWN event')
     }}
-    uiBackground={{ backgroundColor: { r: 10, g: 10, b: 10, a: 0.2 } }}
+    onMouseUp={() => {
+      console.log('MOUSE_UP event')
+    }}
+    uiTransform={{
+      width: 900,
+      height: 500,
+      margin: {
+        left: 270,
+        top: 16
+      }
+    }}
+    uiBackground={{
+      color: Color4.fromInts(231, 255, 255, 150),
+      textureMode: BackgroundTextureMode.STRETCH,
+      texture: {
+        src: 'models/buffa.jpg',
+        wrapMode: TextureWrapMode.TWM_CLAMP,
+        filterMode: TextureFilterMode.TFM_BILINEAR
+      },
+      textureSlices: {
+        top: 0.46,
+        left: 0.59,
+        right: 0.47,
+        bottom: 0.38
+      }
+    }}
   >
-    <UiEntity
-      uiTransform={{
-        width: 100,
-        height: 100,
-        display: YGDisplay.YGD_FLEX,
-        justifyContent: YGJustify.YGJ_CENTER,
-        alignItems: YGAlign.YGA_CENTER
+    <Dropdown
+      uiBackground={{
+        color: Color4.Blue()
       }}
-      uiBackground={{ backgroundColor: { r: 255, g: 45, b: 85, a: 0.2 } }}
-    >
-      <UiEntity
-        uiTransform={{ width: 80, height: 20, flex: 1 }}
-        uiText={{
-          value: 'Boedo',
-          textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
-          fontSize: 12,
-          font: Font.F_SANS_SERIF
-        }}
-        uiBackground={{ backgroundColor: { r: 255, g: 45, b: 85, a: 1 } }}
-      />
-    </UiEntity>
+      color={Color4.Red()}
+      options={['BOEDO', 'CASLA']}
+      uiTransform={{ width: 200, height: 36 }}
+    />
+    <Input
+      placeholder={'SARASA'}
+      onChange={(value) => {
+        console.log({ value })
+      }}
+      uiBackground={{
+        color: Color4.Red()
+      }}
+      uiTransform={{ width: 200, height: 36 }}
+    />
+    <Label
+      color={{ r: 1, g: 1, b: 1, a: 1 }}
+      value="Some text"
+      fontSize={16}
+      textAlign={TextAlignMode.TAM_MIDDLE_CENTER}
+    />
+    <Button type="primary" value="Primary Button" />
+    <Button type="secondary" value="Secondary Button" />
   </UiEntity>
 )
+
+export function setupUi() {
+  ReactEcsRenderer.setUiRenderer(uiComponent)
+}

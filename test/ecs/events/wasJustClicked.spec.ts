@@ -1,7 +1,10 @@
-import { Engine, components } from '../../../packages/@dcl/ecs/src'
+import {
+  Engine,
+  components,
+  PointerEventType,
+  InputAction
+} from '../../../packages/@dcl/ecs/src'
 import { createInputSystem } from '../../../packages/@dcl/ecs/src/engine/input'
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
-import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { createTestPointerDownCommand } from './utils'
 
 describe('Events helpers isClicked', () => {

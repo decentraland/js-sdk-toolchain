@@ -13,6 +13,7 @@
     "downlevelIteration": true,
     "preserveConstEnums": true,
     "outDir": "dist",
+    "lib": ["ES2020"],
     "types": []
   },
   "include": ["src"],

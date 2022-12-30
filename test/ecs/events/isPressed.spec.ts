@@ -1,10 +1,10 @@
 import { Entity } from '../../../packages/@dcl/ecs/src/engine/entity'
 import { createInputSystem } from '../../../packages/@dcl/ecs/src/engine/input'
-import { PointerEventType } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
-import { InputAction } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import {
   Engine,
   components,
+  PointerEventType,
+  InputAction,
   PBPointerEventsResult_PointerCommand
 } from '../../../packages/@dcl/ecs/src'
 
@@ -36,7 +36,6 @@ describe('Events helpers isTriggered', () => {
     const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
     const { isTriggered } = createInputSystem(newEngine)
-
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
         createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)
