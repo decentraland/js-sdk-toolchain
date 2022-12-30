@@ -239,6 +239,8 @@ export function crdtSceneSystem(
       for (const [, definition] of engine.componentsDefinition) {
         definition.deleteFrom(entity, false)
       }
+
+      engine.entityContainer.updateRemovedEntity(entity)
     }
   }
 
@@ -266,11 +268,15 @@ export function crdtSceneSystem(
         const componentValue =
           component.toBinaryOrNull(entity)?.toBinary() ?? null
 
-        crdtClient.createComponentDataEvent(
+        // if update goes bad, the entity doesn't accept put anymore (it's added to deleted entities set)
+        if (crdtClient.createComponentDataEvent(
           componentId,
           entity as number,
           componentValue
-        )
+        ) === null) {
+          component.deleteFrom(entity, false)
+          componentsId.delete(componentId)
+        }
       }
     }
 

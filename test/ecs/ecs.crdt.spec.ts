@@ -1,4 +1,4 @@
-import { components, Schemas } from '../../packages/@dcl/ecs/src'
+import { components, IEngine, Schemas } from '../../packages/@dcl/ecs/src'
 import { Vector3 } from '../../packages/@dcl/sdk/src/math'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
@@ -6,6 +6,56 @@ import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/me
 import { WireMessageEnum } from '../../packages/@dcl/ecs/src/serialization/types'
 import { wait, SandBox, checkCrdtStateWithEngine } from './utils'
 import { compareStatePayloads } from '../crdt/utils'
+
+async function simpleScene(engine: IEngine) {
+  const Transform = components.Transform(engine)
+  const MeshRenderer = components.MeshRenderer(engine)
+
+  const entityA = engine.addEntity()
+  Transform.create(entityA, { position: Vector3.One() })
+  MeshRenderer.setBox(entityA)
+
+  for (let i = 0; i < 10; i++) {
+    Transform.getMutable(entityA).position.x += 10
+  }
+
+  MeshRenderer.setCylinder(entityA)
+
+  const tenEntities: Entity[] = []
+  for (let i = 0; i < 10; i++) {
+    const entity = engine.addEntity()
+    MeshRenderer.setSphere(entity)
+    Transform.create(entity, { scale: Vector3.create(i, i, i) })
+    tenEntities.push(entity)
+  }
+
+  engine.removeEntity(entityA)
+
+  const newEntity = engine.addEntity()
+  Transform.create(newEntity, { position: Vector3.Left() })
+  MeshRenderer.setPlane(newEntity)
+
+  // Until this point it shouldn't reuse any entity
+  await engine.update(1)
+
+  const entityShouldReused = engine.addEntity()
+  Transform.create(entityShouldReused, { position: Vector3.Left() })
+  MeshRenderer.setPlane(entityShouldReused)
+
+  await engine.update(1)
+
+  engine.removeEntity(tenEntities[0])
+  engine.removeEntity(tenEntities[1])
+  engine.removeEntity(tenEntities[2])
+
+  await engine.update(1)
+
+  // These two line shouldn't has effect in the final state, entityA has already deleted
+  Transform.create(entityA, { position: Vector3.Left() })
+  MeshRenderer.setPlane(entityA)
+
+  await engine.update(1)
+}
 
 describe('CRDT tests', () => {
   beforeEach(() => {
@@ -309,75 +359,82 @@ describe('CRDT tests', () => {
       getCrdtStates
     } = SandBox.createEngines({ length: 3 })
 
-    {
-      const entityA = clientA.engine.addEntity()
-      clientA.Transform.create(entityA, { position: Vector3.One() })
-      clientA.MeshRenderer.setBox(entityA)
+    // runs a kind of scene in the clientA
+    await simpleScene(clientA.engine)
 
-      for (let i = 0; i < 10; i++) {
-        clientA.Transform.getMutable(entityA).position.x += 10
-      }
-
-      clientA.MeshRenderer.setCylinder(entityA)
-
-      const tenEntities: Entity[] = []
-      for (let i = 0; i < 10; i++) {
-        const entity = clientA.engine.addEntity()
-        clientA.MeshRenderer.setSphere(entity)
-        clientA.Transform.create(entity, { scale: Vector3.create(i, i, i) })
-        tenEntities.push(entity)
-      }
-
-      clientA.engine.removeEntity(entityA)
-
-      // These two line shouldn't has effect+
-      clientA.Transform.create(entityA, { position: Vector3.Left() })
-      clientA.MeshRenderer.setPlane(entityA)
-
-      const newEntity = clientA.engine.addEntity()
-      clientA.Transform.create(newEntity, { position: Vector3.Left() })
-      clientA.MeshRenderer.setPlane(newEntity)
-
-      // Until this point it shouldn't reuse any entity
-      await clientA.engine.update(1)
-
-      const entityShouldReused = clientA.engine.addEntity()
-      clientA.Transform.create(entityShouldReused, { position: Vector3.Left() })
-      clientA.MeshRenderer.setPlane(entityShouldReused)
-
-      await clientA.engine.update(1)
-
-      clientA.engine.removeEntity(tenEntities[0])
-      clientA.engine.removeEntity(tenEntities[1])
-      clientA.engine.removeEntity(tenEntities[2])
-
-      await clientA.engine.update(1)
-    }
-
-    // // now, the crdt state and engine should converge
-    // expect(checkCrdtStateWithEngine(clientA.engine).freeConflicts).toBe(true)
-
-    // // between clients, ClientA hasn't sent anything yet, so, crdt state won't be synched
-    // expect(compareStatePayloads(getCrdtStates())).toBe(false)
-
+    // sends all its updates
     clientA.flushOutgoing()
 
-    // // flush is not enough, the updates should be called to read messages
-    // expect(compareStatePayloads(getCrdtStates())).toBe(false)
-
+    // all engine run their tick
     await clientA.engine.update(1)
     await clientB.engine.update(1)
     await clientC.engine.update(1)
 
     // now, it should be all synched
     expect(compareStatePayloads(getCrdtStates())).toBe(true)
-
-    const conflictsA = checkCrdtStateWithEngine(clientA.engine)
-    const conflictsB = checkCrdtStateWithEngine(clientB.engine)
-    const conflictsC = checkCrdtStateWithEngine(clientC.engine)
-
-    expect(conflictsA.conflicts).toEqual([])
-    expect(conflictsB.conflicts).toEqual([])
-    expect(conflictsC.conflicts).toEqual([])
+    expect(checkCrdtStateWithEngine(clientA.engine).conflicts).toEqual([])
+    expect(checkCrdtStateWithEngine(clientB.engine).conflicts).toEqual([])
+    expect(checkCrdtStateWithEngine(clientC.engine).conflicts).toEqual([])
   })
+
+  describe(`should converge to the same final state (more complex scene code) (shuffle messages)`, () => {
+    const shuffleSeeds = [283945239, 219, 1, 8239423, 19230]
+    shuffleSeeds.forEach((seedValue) => {
+      it(`shuffle with seed ${seedValue}`, async () => {
+        const {
+          clients: [clientA, clientB, clientC],
+          getCrdtStates
+        } = SandBox.createEngines({ length: 3 })
+
+        await simpleScene(clientA.engine)
+
+        // same as previous test, now I shuffle the messages
+        clientA.shuffleOutgoingMessages(seedValue)
+        clientA.flushOutgoing()
+
+        await clientA.engine.update(1)
+        await clientB.engine.update(1)
+        await clientC.engine.update(1)
+
+        // now, it should be all synched
+        expect(compareStatePayloads(getCrdtStates())).toBe(true)
+        expect(checkCrdtStateWithEngine(clientA.engine).conflicts).toEqual([])
+        expect(checkCrdtStateWithEngine(clientB.engine).conflicts).toEqual([])
+        expect(checkCrdtStateWithEngine(clientC.engine).conflicts).toEqual([])
+      })
+
+      it(`shuffle messages with seed ${seedValue}, and with multiple scene runs`, async () => {
+        const {
+          clients: [clientA, clientB, clientC],
+          getCrdtStates
+        } = SandBox.createEngines({ length: 3 })
+
+        // same as previous test, but all the clients run the same scene
+        await simpleScene(clientA.engine)
+        await simpleScene(clientB.engine)
+        await simpleScene(clientC.engine)
+
+        // same as previous test, now I shuffle the messages of each client
+        clientA.shuffleOutgoingMessages(seedValue + 342358924)
+        clientA.flushOutgoing()
+
+        clientB.shuffleOutgoingMessages(seedValue + 87683272)
+        clientB.flushOutgoing()
+
+        clientC.shuffleOutgoingMessages(seedValue + 178698447)
+        clientC.flushOutgoing()
+
+        await clientA.engine.update(1)
+        await clientB.engine.update(1)
+        await clientC.engine.update(1)
+
+        // now, it should be all synched
+        expect(compareStatePayloads(getCrdtStates())).toBe(true)
+        expect(checkCrdtStateWithEngine(clientA.engine).conflicts).toEqual([])
+        expect(checkCrdtStateWithEngine(clientB.engine).conflicts).toEqual([])
+        expect(checkCrdtStateWithEngine(clientC.engine).conflicts).toEqual([])
+      })
+    })
+  })
+
 })

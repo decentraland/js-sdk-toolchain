@@ -183,9 +183,10 @@ export namespace SandBox {
         }
       }
 
-      function shuffleOutgoingMessages() {
+      function shuffleOutgoingMessages(seed: number) {
+        const rand = getRandomFunction(seed)
         msgsOutgoing = msgsOutgoing
-          .map((value) => ({ value, index: Math.random() }))
+          .map((value) => ({ value, index: rand() }))
           .sort((a, b) => a.index - b.index)
           .map((item) => item.value)
       }
@@ -268,4 +269,25 @@ export namespace SandBox {
 
 export function isNotUndefined<T>(val: T | undefined): val is T {
   return !!val
+}
+
+/**
+ * Return a pseudo-random number generator that returns between 0 inclusive and 1 exclusive.
+ * The algorithm used is MWC (multiply-with-carry) by George Marsaglia.
+ */
+export function getRandomFunction(_seed?: number) {
+  const state = {
+    mz: 123456789,
+    mw: _seed || new Date().getTime()
+  }
+  return function random() {
+    let mz = state.mz
+    let mw = state.mw
+    mz = ((mz & 0xffff) * 36969 + (mz >> 16)) & 0xffffffff;
+    mw = ((mw & 0xffff) * 18000 + (mw >> 16)) & 0xffffffff;
+    state.mz = mz;
+    state.mw = mw;
+    const x = (((mz << 16) + mw) & 0xffffffff) / 0x100000000;
+    return 0.5 + x;
+  }
 }

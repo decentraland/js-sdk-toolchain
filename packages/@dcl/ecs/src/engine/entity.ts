@@ -1,3 +1,5 @@
+import { createGSet } from "@dcl/crdt/dist/gset"
+
 /**
  * @public It only defines the type explicitly, no effects.
  */
@@ -96,7 +98,7 @@ export function EntityContainer(): EntityContainer {
   const usedEntities: Set<Entity> = new Set()
 
   let toRemoveEntities: Entity[] = []
-  const removedEntities: Map<number, number> = new Map()
+  const removedEntities = createGSet()
 
   function generateNewEntity(): Entity {
     if (entityCounter > MAX_ENTITY_NUMBER - 1) {
@@ -106,9 +108,8 @@ export function EntityContainer(): EntityContainer {
     }
 
     const entityNumber = entityCounter++
-    const entityVersion = !removedEntities.has(entityNumber)
-      ? 0
-      : removedEntities.get(entityNumber)! + 1
+    const entityVersion = removedEntities.getMap().has(entityNumber)
+      ? removedEntities.getMap().get(entityNumber)! + 1 : 0
     const entity = EntityUtils.toEntityId(entityNumber, entityVersion)
 
     usedEntities.add(entity)
@@ -120,12 +121,11 @@ export function EntityContainer(): EntityContainer {
       return generateNewEntity()
     }
 
-    for (const [number, version] of removedEntities) {
+    for (const [number, version] of removedEntities.getMap()) {
       if (version < MAX_U16) {
         const entity = EntityUtils.toEntityId(number, version + 1)
 
         usedEntities.add(entity)
-        removedEntities.delete(number)
 
         return entity
       }
@@ -152,7 +152,7 @@ export function EntityContainer(): EntityContainer {
     toRemoveEntities = []
     for (const entity of arr) {
       const [n, v] = EntityUtils.fromEntityId(entity)
-      removedEntities.set(n, v)
+      removedEntities.addTo(n, v)
     }
     return arr
   }
@@ -161,7 +161,7 @@ export function EntityContainer(): EntityContainer {
     const [n, v] = EntityUtils.fromEntityId(entity)
 
     // Update the removed entities map
-    removedEntities.set(n, v)
+    removedEntities.addTo(n, v)
 
     // Remove the usedEntities if exist
     for (let i = 0; i <= v; i++) {
@@ -174,7 +174,7 @@ export function EntityContainer(): EntityContainer {
   function updateUsedEntity(entity: Entity) {
     const [n, v] = EntityUtils.fromEntityId(entity)
 
-    const removedVersion = removedEntities.get(n)
+    const removedVersion = removedEntities.getMap().get(n)
     if (removedVersion !== undefined && removedVersion >= v) {
       return false
     }
@@ -184,7 +184,7 @@ export function EntityContainer(): EntityContainer {
       for (let i = 0; i <= v - 1; i++) {
         usedEntities.delete(EntityUtils.toEntityId(n, i))
       }
-      removedEntities.set(n, v - 1)
+      removedEntities.addTo(n, v - 1)
     }
     usedEntities.add(entity)
     return true
@@ -200,7 +200,7 @@ export function EntityContainer(): EntityContainer {
       return EntityState.UsedEntity
     }
 
-    const removedVersion = removedEntities.get(n)
+    const removedVersion = removedEntities.getMap().get(n)
     if (removedVersion !== undefined && removedVersion >= v) {
       return EntityState.Removed
     }
