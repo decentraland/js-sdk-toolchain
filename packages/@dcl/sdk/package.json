@@ -8,10 +8,11 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "build:cli": "tsc -p tsconfig.cli.json",
-    "start": "npm run build && tsc -p tsconfig.json --watch",
-    "init": "@dcl/sdk init"
+    "start": "npm run build && tsc -p tsconfig.json --watch"
   },
-  "bin": "./cli/index.js",
+  "bin": {
+    "sdk-commands": "./cli/index.js"
+  },
   "keywords": [],
   "tsdoc": {
     "tsdocFlavor": "AEDoc"
@@ -25,7 +26,8 @@
     "@dcl/js-runtime": "file:../js-runtime",
     "@dcl/kernel": "2.0.0-3766760530.commit-239d2a9",
     "@dcl/react-ecs": "file:../react-ecs",
-    "@dcl/unity-renderer": "1.0.68557-20221221195847.commit-f743b85"
+    "@dcl/unity-renderer": "1.0.68557-20221221195847.commit-f743b85",
+    "arg": "5.0.2"
   },
   "minCliVersion": "3.14.1",
   "typedoc": {

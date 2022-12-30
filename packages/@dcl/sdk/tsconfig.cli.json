@@ -9,7 +9,7 @@
     ],
     "outDir": "./cli"
   },
-  "include": ["src/cli"],
+  "include": ["cli"],
   "exclude": ["dist"],
   "extends": "./types/tsconfig.ecs7.strict.json"
 }

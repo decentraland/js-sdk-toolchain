@@ -6,6 +6,6 @@
     "outDir": "."
   },
   "include": ["src"],
-  "exclude": ["dist", "src/cli"],
+  "exclude": ["dist"],
   "extends": "./types/tsconfig.ecs7.strict.json"
 }

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import arg from 'arg'
 import { readdirSync } from 'fs'
 import { resolve } from 'path'
 
@@ -50,18 +51,14 @@ const validCommandFns = (fns: FileFns): fns is Required<FileFns> => {
   return true
 }
 
-const getCommand = () => {
-  const [arg1, arg2] = process.argv.slice(2)
-  const needsHelp = arg1 === 'help'
-
-  return {
-    needsHelp,
-    command: needsHelp ? arg2 : arg1
-  }
-}
+const args = arg({
+  '--help': Boolean,
+  '-h': '--help'
+})
 
 ;(async () => {
-  const { command, needsHelp } = getCommand()
+  const command = process.argv[2]
+  const needsHelp = args['--help']
 
   if (!commands.has(command)) {
     if (needsHelp) {

@@ -140,7 +140,7 @@ flow('build-all', () => {
       ensureFileExists('cli/index.d.ts', SDK_PATH)
     })
 
-    itExecutes(`chmod -R +x cli`, SDK_PATH)
+    itExecutes(`chmod +x cli/index.js`, SDK_PATH)
   })
 
   flow('@dcl/playground-assets build', () => {
