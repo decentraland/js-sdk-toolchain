@@ -1,20 +1,9 @@
 import {
-  Entity,
   engine,
-  Transform,
-  MeshRenderer,
-  MeshCollider,
-  InputAction,
-  inputSystem,
-  PointerEvents,
-  YGAlign,
-  YGDisplay,
-  YGJustify,
-  PointerEventType,
   YGFlexDirection,
-  BackgroundTextureMode
+  BackgroundTextureMode,
+  executeTask
 } from '@dcl/sdk/ecs'
-type GenesisPlazaContent = string
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, {
   UiEntity,
@@ -22,11 +11,19 @@ import ReactEcs, {
   ReactEcsRenderer,
   Dropdown
 } from '@dcl/sdk/react-ecs'
+import { getUserData } from '~system/UserIdentity'
 
+type GenesisPlazaContent = string
 const src: GenesisPlazaContent = 'images/rounded_alpha_square.png'
 const centeredImage: GenesisPlazaContent = 'images/ui_beam_up_bg.png'
 
 let dt = 0
+let userId: string | undefined
+
+executeTask(async () => {
+  const { data } = await getUserData({})
+  userId = data?.userId
+})
 
 engine.addSystem((t) => {
   dt += t
@@ -152,6 +149,24 @@ const options = [
           textureMode: BackgroundTextureMode.CENTER,
           texture: {
             src: centeredImage
+          }
+        }}
+      >
+        <Label value="CENTER" color={Color4.Green()} fontSize={29} />
+      </UiEntity>
+    )
+  },
+  function AvatarTexture() {
+    return (
+      <UiEntity
+        uiTransform={{
+          width: 250 + Math.cos(dt) * 100,
+          height: 128 + Math.sin(dt * 0.2) * 64
+        }}
+        uiBackground={{
+          textureMode: BackgroundTextureMode.CENTER,
+          avatarTexture: {
+            userId: userId ?? ''
           }
         }}
       >
