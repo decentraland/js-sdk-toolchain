@@ -2217,15 +2217,11 @@ export const PBVector3: {
 //
 // @public (undocumented)
 export interface PBVideoPlayer {
-    // (undocumented)
-    playbackRate: number;
-    // (undocumented)
-    playing: boolean;
-    // (undocumented)
-    position: number;
+    playbackRate?: number | undefined;
+    playing?: boolean | undefined;
+    position?: number | undefined;
     src: string;
-    // (undocumented)
-    volume: number;
+    volume?: number | undefined;
 }
 
 // @public
