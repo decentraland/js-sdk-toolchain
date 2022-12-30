@@ -1,3 +1,5 @@
+import * as utf8 from '@protobufjs/utf8'
+
 /**
  * Take the max between currentSize and intendedSize and then plus 1024. Then,
  *  find the next nearer multiple of 1024.
@@ -160,6 +162,10 @@ export function createByteBuffer(
       const length = view.getUint32(roAdd(4))
       return buffer.subarray(roAdd(length), roAdd(0))
     },
+    readUtf8String() {
+      const length = view.getUint32(roAdd(4))
+      return utf8.read(buffer, roAdd(length), roAdd(0))
+    },
     incrementWriteOffset(amount: number): number {
       return woAdd(amount)
     },
@@ -179,6 +185,17 @@ export function createByteBuffer(
 
       const o = woAdd(value.byteLength)
       buffer.set(value, o)
+    },
+    writeUtf8String(value: string, writeLength: boolean = true) {
+      const byteLength = utf8.length(value)
+
+      if (writeLength) {
+        this.writeUint32(byteLength)
+      }
+
+      const o = woAdd(byteLength)
+
+      utf8.write(value, buffer, o)
     },
     writeFloat32(value: number): void {
       const o = woAdd(4)
@@ -331,6 +348,7 @@ export type ByteBuffer = {
   readUint32(): number
   readUint64(): bigint
   readBuffer(): Uint8Array
+  readUtf8String(): string
   /**
    * Writing purpose
    */
@@ -360,6 +378,7 @@ export type ByteBuffer = {
    */
   toCopiedBinary(): Uint8Array
 
+  writeUtf8String(value: string, writeLength?: boolean): void
   writeBuffer(value: Uint8Array, writeLength?: boolean): void
   writeFloat32(value: number): void
   writeFloat64(value: number): void

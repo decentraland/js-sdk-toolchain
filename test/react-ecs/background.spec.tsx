@@ -4,7 +4,8 @@ import {
   Entity,
   createPointerEventSystem,
   createInputSystem,
-  PBUiBackground
+  PBUiBackground,
+  BackgroundTextureMode
 } from '../../packages/@dcl/ecs'
 import { components, IEngine as IIEngine } from '../../packages/@dcl/ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
@@ -13,7 +14,8 @@ import {
   UiEntity,
   createReactBasedUiSystem,
   ReactBasedUiSystem,
-  CANVAS_ROOT_ENTITY
+  CANVAS_ROOT_ENTITY,
+  UiBackgroundProps
 } from '../../packages/@dcl/react-ecs/src'
 
 describe('UiBackground React Ecs', () => {
@@ -37,13 +39,10 @@ describe('UiBackground React Ecs', () => {
     const rootDivEntity = (entityIndex + 1) as Entity
     const getUiTransform = (entity: Entity) => UiTransform.get(entity)
     const getBackground = (entity: Entity) => UiBackground.get(entity)
-    let backgroundColor: Color4.Mutable | undefined = { r: 0, g: 1, b: 2, a: 0 }
+    let color: Color4.Mutable | undefined = { r: 0, g: 1, b: 2, a: 0 }
 
     const ui = () => (
-      <UiEntity
-        uiTransform={{ width: 100 }}
-        uiBackground={{ backgroundColor }}
-      />
+      <UiEntity uiTransform={{ width: 100 }} uiBackground={{ color }} />
     )
 
     uiRenderer.setUiRenderer(ui)
@@ -56,21 +55,21 @@ describe('UiBackground React Ecs', () => {
     })
 
     expect(getBackground(rootDivEntity)).toMatchObject({
-      backgroundColor: { r: 0, g: 1, b: 2, a: 0 }
+      color: { r: 0, g: 1, b: 2, a: 0 }
     })
 
     // Update values
-    backgroundColor.g = 20.8
+    color.g = 20.8
 
     await engine.update(1)
     expect(getBackground(rootDivEntity)).toMatchObject({
-      backgroundColor: { r: 0, g: 20.8, b: 2 }
+      color: { r: 0, g: 20.8, b: 2 }
     })
 
-    backgroundColor = undefined
+    color = undefined
     await engine.update(1)
     expect(getBackground(rootDivEntity)).toMatchObject({
-      backgroundColor: undefined
+      color: undefined
     })
   })
 
@@ -82,7 +81,11 @@ describe('UiBackground React Ecs', () => {
     const rootDivEntity = (entityIndex + 1) as Entity
     const getBackground = () => UiBackground.getOrNull(rootDivEntity)
     let backgroundProps: { uiBackground: PBUiBackground } | undefined = {
-      uiBackground: { backgroundColor: { r: 0, g: 1, b: 2, a: 0 } }
+      uiBackground: {
+        color: { r: 0, g: 1, b: 2, a: 0 },
+        textureMode: BackgroundTextureMode.CENTER,
+        uvs: []
+      }
     }
 
     const ui = () => (
@@ -91,12 +94,66 @@ describe('UiBackground React Ecs', () => {
 
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
-    expect(getBackground()?.backgroundColor).toMatchObject(
-      backgroundProps.uiBackground.backgroundColor!
+    expect(getBackground()?.color).toMatchObject(
+      backgroundProps.uiBackground.color!
     )
 
     backgroundProps = undefined
     await engine.update(1)
     expect(getBackground()).toBe(null)
+  })
+
+  it('Texture background', async () => {
+    const UiBackground = components.UiBackground(engine as IIEngine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getBackground = () => UiBackground.getOrNull(rootDivEntity)
+    let backgroundProps: { uiBackground: UiBackgroundProps } | undefined = {
+      uiBackground: {
+        color: { r: 0, g: 1, b: 2, a: 0 },
+        textureMode: BackgroundTextureMode.CENTER,
+        uvs: [],
+        texture: {
+          src: 'boedo-src'
+        }
+      }
+    }
+
+    const ui = () => (
+      <UiEntity uiTransform={{ width: 100 }} {...backgroundProps} />
+    )
+
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getBackground()?.color).toMatchObject(
+      backgroundProps.uiBackground.color!
+    )
+    expect(getBackground()?.texture).toMatchObject({
+      tex: {
+        $case: 'texture',
+        texture: {
+          src: 'boedo-src'
+        }
+      }
+    })
+
+    backgroundProps = {
+      uiBackground: {
+        avatarTexture: {
+          userId: 'casla-user-id'
+        }
+      }
+    }
+    await engine.update(1)
+    expect(getBackground()?.texture).toMatchObject({
+      tex: {
+        $case: 'avatarTexture',
+        avatarTexture: {
+          userId: 'casla-user-id'
+        }
+      }
+    })
   })
 })

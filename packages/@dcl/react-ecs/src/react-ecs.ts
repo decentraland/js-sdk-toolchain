@@ -1,35 +1,40 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
-import { EventSystemCallback } from '@dcl/ecs'
 import {
   PBUiBackground,
   PBUiText,
-  PBUiTransform
-} from '@dcl/ecs/dist/components'
+  PBUiTransform,
+  PBUiInput,
+  PBUiDropdown
+} from '@dcl/ecs'
 import React from 'react'
+import { Callback } from './components'
 import { CommonProps } from './components/types'
 
 export type EcsElements = {
-  // TODO: Remove Omit when onClick its handled Unity Side
-  entity: Partial<Omit<EntityComponents, 'onClick'> & CommonProps>
+  entity: Partial<EntityComponents & CommonProps>
 }
 
-// TODO: Remove Omit when onClick its handled Unity Side
 export type EntityComponents = {
   uiTransform: PBUiTransform
   uiText: PBUiText
   uiBackground: PBUiBackground
-  onClick: EventSystemCallback
+  uiInput: PBUiInput
+  uiDropdown: PBUiDropdown
+  onMouseDown: Callback
+  onMouseUp: Callback
 }
 
 export namespace JSX {
-  export interface Element {}
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  export type Element = {} | null
   export type IntrinsicElements = EcsElements
   export interface Component {}
 }
 
 export namespace ReactEcs {
   export namespace JSX {
-    export interface Element {}
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    export type Element = {} | null
     export type IntrinsicElements = EcsElements
     export interface Component {}
   }

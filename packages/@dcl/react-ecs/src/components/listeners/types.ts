@@ -1,11 +1,13 @@
-import type { EventSystemCallback } from '@dcl/ecs'
+export type Callback = () => void
 
 export type Listeners = {
-  onClick?: EventSystemCallback
+  onMouseDown?: Callback
+  onMouseUp?: Callback
 }
 
 const listeners: Listeners = {
-  onClick: undefined
+  onMouseDown: undefined,
+  onMouseUp: undefined
 }
 const listenersKey = Object.keys(listeners)
 

@@ -207,7 +207,6 @@ function preEngine(): PreEngine {
       removeEntity(entity)
     }
   }
-
   return {
     componentsDefinition,
     addEntity,

@@ -15,5 +15,10 @@
   "typings": "./index.d.ts",
   "publishConfig": {
     "access": "public"
+  },
+  "typedoc": {
+    "entryPoint": "./index.d.ts",
+    "displayName": "js-runtime",
+    "tsconfig": "./tsconfig.json"
   }
 }
