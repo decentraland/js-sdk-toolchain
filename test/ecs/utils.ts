@@ -1,9 +1,19 @@
 import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/math'
 import { Engine, IEngine } from '../../packages/@dcl/ecs/src/engine'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
-import { TransportMessage, Transport, WireMessage, WireMessageHeader } from '../../packages/@dcl/ecs/src'
+import {
+  TransportMessage,
+  Transport,
+  WireMessage,
+  WireMessageHeader
+} from '../../packages/@dcl/ecs/src'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { components, Schemas, EntityUtils, EntityState } from '../../packages/@dcl/ecs/src'
+import {
+  components,
+  Schemas,
+  EntityUtils,
+  EntityState
+} from '../../packages/@dcl/ecs/src'
 import { compareData } from '../crdt/utils'
 
 export function createNetworkTransport(): Transport {
@@ -21,7 +31,6 @@ export function wait(ms: number) {
   return new Promise<void>((resolve) => setTimeout(() => resolve(), ms))
 }
 
-
 export function checkCrdtStateWithEngine(engine: IEngine) {
   const conflicts: string[] = []
   const usedEntitiesByComponents: Set<Entity> = new Set()
@@ -31,16 +40,20 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
     const componentValues = Array.from(def.iterator())
     const crdtComponent = crdtState.components.get(componentId)
 
-    if (componentValues.length === 0 && (crdtComponent === undefined || crdtComponent.size === 0)) {
+    if (
+      componentValues.length === 0 &&
+      (crdtComponent === undefined || crdtComponent.size === 0)
+    ) {
       continue
     }
 
     if (crdtComponent === undefined) {
-      conflicts.push(`Component ${componentId} has ${componentValues.length
-        } entities but there is no state stored in the CRDT.`)
+      conflicts.push(
+        `Component ${componentId} has ${componentValues.length} entities but there is no state stored in the CRDT.`
+      )
     }
 
-    for (const [entity, value] of componentValues) {
+    for (const [entity, _value] of componentValues) {
       usedEntitiesByComponents.add(entity)
       if (crdtComponent === undefined) {
         continue
@@ -49,40 +62,55 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
       const crdtEntry = crdtComponent.get(entity)
       const data = def.toBinary(entity).toBinary()
 
-      if (crdtEntry === null || crdtEntry === undefined || crdtEntry.data === null) {
-        conflicts.push(`Entity ${entity} with componentId ${componentId} has value in the engine but not in the crdt.`)
+      if (
+        crdtEntry === null ||
+        crdtEntry === undefined ||
+        crdtEntry.data === null
+      ) {
+        conflicts.push(
+          `Entity ${entity} with componentId ${componentId} has value in the engine but not in the crdt.`
+        )
         continue
       }
 
       const theSame = compareData(crdtEntry.data, data)
       if (!theSame) {
-        conflicts.push(`Entity ${entity} with componentId ${componentId} hasn't equal values between CRDT and engine => ${crdtEntry.data.toString()} vs ${data.toString()}`)
+        conflicts.push(
+          `Entity ${entity} with componentId ${componentId} hasn't equal values between CRDT and engine => ${crdtEntry.data.toString()} vs ${data.toString()}`
+        )
       }
     }
 
     if (crdtComponent !== undefined) {
       // If CRDT has more entities, this will show the conflicts
-      for (const [entity, payload] of crdtComponent) {
+      for (const [entity, _payload] of crdtComponent) {
         if (def.getOrNull(entity as Entity) === null) {
-          conflicts.push(`Entity ${entity} with componentId ${componentId} has value in the CRDT but not in the engine.`)
+          conflicts.push(
+            `Entity ${entity} with componentId ${componentId} has value in the CRDT but not in the engine.`
+          )
         }
       }
     }
   }
 
-
-  for (const [entityNumber, entityVersion] of engine.getCrdtState().deletedEntities.getMap()) {
+  for (const [entityNumber, entityVersion] of engine
+    .getCrdtState()
+    .deletedEntities.getMap()) {
     const entity = EntityUtils.toEntityId(entityNumber, entityVersion)
 
     if (engine.getEntityState(entity) !== EntityState.Removed) {
-      conflicts.push(`Entity ${entity} is added to deleted entities in the CRDT state, but the state in the engine isn't.`)
+      conflicts.push(
+        `Entity ${entity} is added to deleted entities in the CRDT state, but the state in the engine isn't.`
+      )
     }
   }
 
   for (const entityId of usedEntitiesByComponents) {
     const [n, v] = EntityUtils.fromEntityId(entityId)
     if (crdtState.deletedEntities.has(n, v)) {
-      conflicts.push(`Entity ${entityId} is added to deleted entities in the CRDT state, but the entity is being used in the engine.`)
+      conflicts.push(
+        `Entity ${entityId} is added to deleted entities in the CRDT state, but the entity is being used in the engine.`
+      )
     }
   }
 
@@ -90,7 +118,6 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
     conflicts,
     freeConflicts: conflicts.length === 0
   }
-
 }
 
 export namespace SandBox {
@@ -123,7 +150,9 @@ export namespace SandBox {
         let header: WireMessageHeader | null
         while ((header = WireMessage.getHeader(buffer))) {
           const offset = buffer.incrementReadOffset(header.length)
-          const data = new Uint8Array(message.subarray(offset, offset + header.length))
+          const data = new Uint8Array(
+            message.subarray(offset, offset + header.length)
+          )
           msgsOutgoing.push({
             ...header,
             data
@@ -132,7 +161,10 @@ export namespace SandBox {
       }
 
       function flushOutgoing(length: number = 0) {
-        const N: number = Math.min(length || msgsOutgoing.length, msgsOutgoing.length)
+        const N: number = Math.min(
+          length || msgsOutgoing.length,
+          msgsOutgoing.length
+        )
         if (N === 0) return
 
         const buffer = createByteBuffer()
@@ -145,18 +177,18 @@ export namespace SandBox {
         for (const client of clients) {
           if (client.id !== index) {
             if (client.transports[0].onmessage) {
-              client.transports[0].onmessage(
-                new Uint8Array(buffer.toBinary())
-              )
+              client.transports[0].onmessage(new Uint8Array(buffer.toBinary()))
             }
           }
         }
       }
 
       function shuffleOutgoingMessages() {
-        msgsOutgoing = msgsOutgoing.map((value) => ({ value, index: Math.random() })).sort((a, b) => a.index - b.index).map(item => item.value)
+        msgsOutgoing = msgsOutgoing
+          .map((value) => ({ value, index: Math.random() }))
+          .sort((a, b) => a.index - b.index)
+          .map((item) => item.value)
       }
-
 
       engine.addTransport(clientTransport)
 
@@ -179,7 +211,7 @@ export namespace SandBox {
     return {
       clients,
       getCrdtStates() {
-        return clients.map(client => client.engine.getCrdtState())
+        return clients.map((client) => client.engine.getCrdtState())
       }
     }
   }

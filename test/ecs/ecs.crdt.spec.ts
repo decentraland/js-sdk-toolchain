@@ -270,7 +270,10 @@ describe('CRDT tests', () => {
   })
 
   it('should converge to the same final state (a simple transform creation)', async () => {
-    const { clients: [clientA, clientB, clientC], getCrdtStates } = SandBox.createEngines({ length: 3 })
+    const {
+      clients: [clientA, clientB, clientC],
+      getCrdtStates
+    } = SandBox.createEngines({ length: 3 })
 
     const entityA = clientA.engine.addEntity()
     clientA.Transform.create(entityA, { position: Vector3.One() })
@@ -300,9 +303,11 @@ describe('CRDT tests', () => {
     expect(checkCrdtStateWithEngine(clientC.engine).conflicts).toEqual([])
   })
 
-
   it('should converge to the same final state (more complex scene code)', async () => {
-    const { clients: [clientA, clientB, clientC], getCrdtStates } = SandBox.createEngines({ length: 3 })
+    const {
+      clients: [clientA, clientB, clientC],
+      getCrdtStates
+    } = SandBox.createEngines({ length: 3 })
 
     {
       const entityA = clientA.engine.addEntity()
@@ -347,9 +352,7 @@ describe('CRDT tests', () => {
       clientA.engine.removeEntity(tenEntities[2])
 
       await clientA.engine.update(1)
-
     }
-
 
     // // now, the crdt state and engine should converge
     // expect(checkCrdtStateWithEngine(clientA.engine).freeConflicts).toBe(true)
@@ -369,9 +372,9 @@ describe('CRDT tests', () => {
     // now, it should be all synched
     expect(compareStatePayloads(getCrdtStates())).toBe(true)
 
-    let conflictsA = checkCrdtStateWithEngine(clientA.engine)
-    let conflictsB = checkCrdtStateWithEngine(clientB.engine)
-    let conflictsC = checkCrdtStateWithEngine(clientC.engine)
+    const conflictsA = checkCrdtStateWithEngine(clientA.engine)
+    const conflictsB = checkCrdtStateWithEngine(clientB.engine)
+    const conflictsC = checkCrdtStateWithEngine(clientC.engine)
 
     expect(conflictsA.conflicts).toEqual([])
     expect(conflictsB.conflicts).toEqual([])
