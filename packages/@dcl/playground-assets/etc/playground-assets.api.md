@@ -2218,10 +2218,14 @@ export const PBVector3: {
 // @public (undocumented)
 export interface PBVideoPlayer {
     // (undocumented)
+    playbackRate: number;
+    // (undocumented)
     playing: boolean;
     // (undocumented)
     position: number;
     src: string;
+    // (undocumented)
+    volume: number;
 }
 
 // @public
@@ -2944,8 +2948,10 @@ export const VideoPlayer: ComponentDefinition<PBVideoPlayer>;
 //
 // @public (undocumented)
 export interface VideoTexture {
+    filterMode?: TextureFilterMode | undefined;
     // (undocumented)
     videoPlayerEntity: number;
+    wrapMode?: TextureWrapMode | undefined;
 }
 
 // @public
