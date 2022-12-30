@@ -2,10 +2,6 @@
   "name": "js-sdk-toolchain",
   "version": "7.0.0",
   "description": "",
-  "workspaces": [
-    "./packages/@dcl/crdt",
-    "./packages/@dcl/*"
-  ],
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@dcl/quickjs-emscripten": "^0.21.0-3680274614.commit-1808aa1",
