@@ -118,6 +118,7 @@ export function EntityContainer(): EntityContainer {
   }
 
   function generateEntity() {
+    // If all entities until `entityCounter` are being used, we need to generate another one
     if (usedEntities.size + RESERVED_STATIC_ENTITIES >= entityCounter) {
       return generateNewEntity()
     }
@@ -125,10 +126,11 @@ export function EntityContainer(): EntityContainer {
     for (const [number, version] of removedEntities.getMap()) {
       if (version < MAX_U16) {
         const entity = EntityUtils.toEntityId(number, version + 1)
-
-        usedEntities.add(entity)
-
-        return entity
+        // If the entity is not being used, we can re-use it
+        if (!usedEntities.has(entity)) {
+          usedEntities.add(entity)
+          return entity
+        }
       }
     }
 

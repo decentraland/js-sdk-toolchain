@@ -17,7 +17,7 @@ import {
 import { compareData } from '../crdt/utils'
 
 export function createNetworkTransport(): Transport {
-  async function send(..._args: any[]) { }
+  async function send(..._args: any[]) {}
 
   return {
     send,

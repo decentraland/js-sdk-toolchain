@@ -211,11 +211,6 @@ export function crdtSceneSystem(
                   .buffer()
                   .subarray(offset, bufferForOutdated.currentWriteOffset())
               })
-            } else {
-              // TODO: we can not be here
-              throw new Error(
-                'CRDT marked a message as outdated but the state is empty'
-              )
             }
             break
 

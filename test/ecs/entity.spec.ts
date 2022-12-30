@@ -4,7 +4,8 @@ import {
   EntityContainer,
   EntityState,
   MAX_U16,
-  RESERVED_STATIC_ENTITIES
+  RESERVED_STATIC_ENTITIES,
+  EntityUtils
 } from '../../packages/@dcl/ecs/src/engine/entity'
 
 describe('Entity container', () => {
@@ -42,9 +43,27 @@ describe('Entity container', () => {
     ])
   })
 
-  it('trying to remove arbitrary entity', () => {
+  it('trying to remove entity', () => {
     const entityContainer = EntityContainer()
+    // reserved entity
     expect(entityContainer.removeEntity(1 as Entity)).toBe(false)
+    expect(entityContainer.getEntityState(1 as Entity)).toBe(
+      EntityState.Reserved
+    )
+
+    // remove entity that wasn't used (add to GSet)
+    expect(entityContainer.removeEntity(513 as Entity)).toBe(true)
+
+    // update the internal gset state
+    entityContainer.releaseRemovedEntities()
+
+    // the first entity to receive
+    expect(entityContainer.generateEntity()).toBe(512)
+
+    // the second would be 513, but it was deleted, so we'll get the version 1 of 513
+    expect(entityContainer.generateEntity()).toBe(
+      EntityUtils.toEntityId(513, 1)
+    )
   })
 
   it('should fail with creating entity out of range', () => {

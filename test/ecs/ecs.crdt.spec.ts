@@ -1,11 +1,12 @@
 import { components, IEngine, Schemas } from '../../packages/@dcl/ecs/src'
-import { Vector3 } from '../../packages/@dcl/sdk/src/math'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/messages/componentOperation'
 import { WireMessageEnum } from '../../packages/@dcl/ecs/src/serialization/types'
-import { wait, SandBox, checkCrdtStateWithEngine } from './utils'
+import { Vector3 } from '../../packages/@dcl/sdk/src/math'
 import { compareStatePayloads } from '../crdt/utils'
+import { stateToString } from '../crdt/utils/state'
+import { checkCrdtStateWithEngine, SandBox, wait } from './utils'
 
 async function simpleScene(engine: IEngine) {
   const Transform = components.Transform(engine)
@@ -351,6 +352,25 @@ describe('CRDT tests', () => {
     expect(checkCrdtStateWithEngine(clientA.engine).conflicts).toEqual([])
     expect(checkCrdtStateWithEngine(clientB.engine).conflicts).toEqual([])
     expect(checkCrdtStateWithEngine(clientC.engine).conflicts).toEqual([])
+  })
+  it.only('should ignore invalid message type', async () => {
+    const {
+      clients: [clientA]
+    } = SandBox.createEngines({ length: 1 })
+
+    const buf = createByteBuffer()
+    buf.writeUint32(8)
+    buf.writeUint32(0x83294732)
+
+    clientA.transports[0].onmessage!(buf.toBinary()!)
+
+    const stateBeforeProcessMessage = stateToString(
+      clientA.engine.getCrdtState()
+    )
+    await clientA.engine.update(1)
+    expect(stateToString(clientA.engine.getCrdtState())).toBe(
+      stateBeforeProcessMessage
+    )
   })
 
   it('should converge to the same final state (more complex scene code)', async () => {
