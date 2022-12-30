@@ -4,7 +4,8 @@ import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/messages/componentOperation'
 import { WireMessageEnum } from '../../packages/@dcl/ecs/src/serialization/types'
-import { wait, SandBox } from './utils'
+import { wait, SandBox, checkCrdtStateWithEngine } from './utils'
+import { compareStatePayloads } from '../crdt/utils'
 
 describe('CRDT tests', () => {
   beforeEach(() => {
@@ -266,5 +267,114 @@ describe('CRDT tests', () => {
       cusutomComponent.toBinary(entity).toBinary()
     )
     expect(component?.timestamp).toBe(1)
+  })
+
+  it('should converge to the same final state (a simple transform creation)', async () => {
+    const { clients: [clientA, clientB, clientC], getCrdtStates } = SandBox.createEngines({ length: 3 })
+
+    const entityA = clientA.engine.addEntity()
+    clientA.Transform.create(entityA, { position: Vector3.One() })
+
+    // before the update, the crdt state is out-to-date
+    expect(checkCrdtStateWithEngine(clientA.engine).freeConflicts).toBe(false)
+    await clientA.engine.update(1)
+
+    // now, the crdt state and engine should converge
+    expect(checkCrdtStateWithEngine(clientA.engine).freeConflicts).toBe(true)
+
+    // between clients, ClientA hasn't sent anything yet, so, crdt state won't be synched
+    expect(compareStatePayloads(getCrdtStates())).toBe(false)
+
+    clientA.flushOutgoing()
+
+    // flush is not enough, the updates should be called to read messages
+    expect(compareStatePayloads(getCrdtStates())).toBe(false)
+
+    await clientB.engine.update(1)
+    await clientC.engine.update(1)
+
+    // now, it should be all synched
+    expect(compareStatePayloads(getCrdtStates())).toBe(true)
+    expect(checkCrdtStateWithEngine(clientA.engine).conflicts).toEqual([])
+    expect(checkCrdtStateWithEngine(clientB.engine).conflicts).toEqual([])
+    expect(checkCrdtStateWithEngine(clientC.engine).conflicts).toEqual([])
+  })
+
+
+  it('should converge to the same final state (more complex scene code)', async () => {
+    const { clients: [clientA, clientB, clientC], getCrdtStates } = SandBox.createEngines({ length: 3 })
+
+    {
+      const entityA = clientA.engine.addEntity()
+      clientA.Transform.create(entityA, { position: Vector3.One() })
+      clientA.MeshRenderer.setBox(entityA)
+
+      for (let i = 0; i < 10; i++) {
+        clientA.Transform.getMutable(entityA).position.x += 10
+      }
+
+      clientA.MeshRenderer.setCylinder(entityA)
+
+      const tenEntities: Entity[] = []
+      for (let i = 0; i < 10; i++) {
+        const entity = clientA.engine.addEntity()
+        clientA.MeshRenderer.setSphere(entity)
+        clientA.Transform.create(entity, { scale: Vector3.create(i, i, i) })
+        tenEntities.push(entity)
+      }
+
+      clientA.engine.removeEntity(entityA)
+
+      // These two line shouldn't has effect+
+      clientA.Transform.create(entityA, { position: Vector3.Left() })
+      clientA.MeshRenderer.setPlane(entityA)
+
+      const newEntity = clientA.engine.addEntity()
+      clientA.Transform.create(newEntity, { position: Vector3.Left() })
+      clientA.MeshRenderer.setPlane(newEntity)
+
+      // Until this point it shouldn't reuse any entity
+      await clientA.engine.update(1)
+
+      const entityShouldReused = clientA.engine.addEntity()
+      clientA.Transform.create(entityShouldReused, { position: Vector3.Left() })
+      clientA.MeshRenderer.setPlane(entityShouldReused)
+
+      await clientA.engine.update(1)
+
+      clientA.engine.removeEntity(tenEntities[0])
+      clientA.engine.removeEntity(tenEntities[1])
+      clientA.engine.removeEntity(tenEntities[2])
+
+      await clientA.engine.update(1)
+
+    }
+
+
+    // // now, the crdt state and engine should converge
+    // expect(checkCrdtStateWithEngine(clientA.engine).freeConflicts).toBe(true)
+
+    // // between clients, ClientA hasn't sent anything yet, so, crdt state won't be synched
+    // expect(compareStatePayloads(getCrdtStates())).toBe(false)
+
+    clientA.flushOutgoing()
+
+    // // flush is not enough, the updates should be called to read messages
+    // expect(compareStatePayloads(getCrdtStates())).toBe(false)
+
+    await clientA.engine.update(1)
+    await clientB.engine.update(1)
+    await clientC.engine.update(1)
+
+    // now, it should be all synched
+    expect(compareStatePayloads(getCrdtStates())).toBe(true)
+
+    let conflictsA = checkCrdtStateWithEngine(clientA.engine)
+    let conflictsB = checkCrdtStateWithEngine(clientB.engine)
+    let conflictsC = checkCrdtStateWithEngine(clientC.engine)
+
+    expect(conflictsA.conflicts).toEqual([])
+    expect(conflictsB.conflicts).toEqual([])
+    expect(conflictsC.conflicts).toEqual([])
   })
 })

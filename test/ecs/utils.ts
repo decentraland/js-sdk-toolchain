@@ -1,11 +1,13 @@
 import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/math'
-import { Engine } from '../../packages/@dcl/ecs/src/engine'
+import { Engine, IEngine } from '../../packages/@dcl/ecs/src/engine'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
-import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
-import { TransportMessage, Transport } from '../../packages/@dcl/ecs/src'
+import { TransportMessage, Transport, WireMessage, WireMessageHeader } from '../../packages/@dcl/ecs/src'
+import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import { components, Schemas, EntityUtils, EntityState } from '../../packages/@dcl/ecs/src'
+import { compareData } from '../crdt/utils'
 
 export function createNetworkTransport(): Transport {
-  async function send(..._args: any[]) {}
+  async function send(..._args: any[]) { }
 
   return {
     send,
@@ -17,6 +19,78 @@ export function createNetworkTransport(): Transport {
 
 export function wait(ms: number) {
   return new Promise<void>((resolve) => setTimeout(() => resolve(), ms))
+}
+
+
+export function checkCrdtStateWithEngine(engine: IEngine) {
+  const conflicts: string[] = []
+  const usedEntitiesByComponents: Set<Entity> = new Set()
+  const crdtState = engine.getCrdtState()
+
+  for (const [componentId, def] of engine.componentsDefinition) {
+    const componentValues = Array.from(def.iterator())
+    const crdtComponent = crdtState.components.get(componentId)
+
+    if (componentValues.length === 0 && (crdtComponent === undefined || crdtComponent.size === 0)) {
+      continue
+    }
+
+    if (crdtComponent === undefined) {
+      conflicts.push(`Component ${componentId} has ${componentValues.length
+        } entities but there is no state stored in the CRDT.`)
+    }
+
+    for (const [entity, value] of componentValues) {
+      usedEntitiesByComponents.add(entity)
+      if (crdtComponent === undefined) {
+        continue
+      }
+
+      const crdtEntry = crdtComponent.get(entity)
+      const data = def.toBinary(entity).toBinary()
+
+      if (crdtEntry === null || crdtEntry === undefined || crdtEntry.data === null) {
+        conflicts.push(`Entity ${entity} with componentId ${componentId} has value in the engine but not in the crdt.`)
+        continue
+      }
+
+      const theSame = compareData(crdtEntry.data, data)
+      if (!theSame) {
+        conflicts.push(`Entity ${entity} with componentId ${componentId} hasn't equal values between CRDT and engine => ${crdtEntry.data.toString()} vs ${data.toString()}`)
+      }
+    }
+
+    if (crdtComponent !== undefined) {
+      // If CRDT has more entities, this will show the conflicts
+      for (const [entity, payload] of crdtComponent) {
+        if (def.getOrNull(entity as Entity) === null) {
+          conflicts.push(`Entity ${entity} with componentId ${componentId} has value in the CRDT but not in the engine.`)
+        }
+      }
+    }
+  }
+
+
+  for (const [entityNumber, entityVersion] of engine.getCrdtState().deletedEntities.getMap()) {
+    const entity = EntityUtils.toEntityId(entityNumber, entityVersion)
+
+    if (engine.getEntityState(entity) !== EntityState.Removed) {
+      conflicts.push(`Entity ${entity} is added to deleted entities in the CRDT state, but the state in the engine isn't.`)
+    }
+  }
+
+  for (const entityId of usedEntitiesByComponents) {
+    const [n, v] = EntityUtils.fromEntityId(entityId)
+    if (crdtState.deletedEntities.has(n, v)) {
+      conflicts.push(`Entity ${entityId} is added to deleted entities in the CRDT state, but the entity is being used in the engine.`)
+    }
+  }
+
+  return {
+    conflicts,
+    freeConflicts: conflicts.length === 0
+  }
+
 }
 
 export namespace SandBox {
@@ -32,6 +106,82 @@ export namespace SandBox {
     scale: Vector3.One(),
     rotation: Quaternion.Identity(),
     parent: 0 as Entity
+  }
+
+  export function createEngines({ length }: { length: number }) {
+    const clients = Array.from({ length }).map((_, index) => {
+      const clientTransport = createNetworkTransport()
+      const engine = Engine()
+
+      type Message = WireMessageHeader & { data: Uint8Array }
+      let msgsOutgoing: Message[] = []
+      clientTransport.send = async (message: Uint8Array) => {
+        const buffer = createByteBuffer({
+          reading: { buffer: message, currentOffset: 0 }
+        })
+
+        let header: WireMessageHeader | null
+        while ((header = WireMessage.getHeader(buffer))) {
+          const offset = buffer.incrementReadOffset(header.length)
+          const data = new Uint8Array(message.subarray(offset, offset + header.length))
+          msgsOutgoing.push({
+            ...header,
+            data
+          })
+        }
+      }
+
+      function flushOutgoing(length: number = 0) {
+        const N: number = Math.min(length || msgsOutgoing.length, msgsOutgoing.length)
+        if (N === 0) return
+
+        const buffer = createByteBuffer()
+        for (let i = 0; i < N; i++) {
+          const msg = msgsOutgoing.pop()!
+          const offset = buffer.incrementWriteOffset(msg.length)
+          buffer.buffer().set(msg.data, offset)
+        }
+
+        for (const client of clients) {
+          if (client.id !== index) {
+            if (client.transports[0].onmessage) {
+              client.transports[0].onmessage(
+                new Uint8Array(buffer.toBinary())
+              )
+            }
+          }
+        }
+      }
+
+      function shuffleOutgoingMessages() {
+        msgsOutgoing = msgsOutgoing.map((value) => ({ value, index: Math.random() })).sort((a, b) => a.index - b.index).map(item => item.value)
+      }
+
+
+      engine.addTransport(clientTransport)
+
+      const Transform = components.Transform(engine)
+      const MeshRenderer = components.MeshRenderer(engine)
+      const Material = components.Material(engine)
+
+      return {
+        id: index,
+        engine,
+        transports: [clientTransport],
+        flushOutgoing,
+        shuffleOutgoingMessages,
+        Transform,
+        MeshRenderer,
+        Material
+      }
+    })
+
+    return {
+      clients,
+      getCrdtStates() {
+        return clients.map(client => client.engine.getCrdtState())
+      }
+    }
   }
 
   /**

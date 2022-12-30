@@ -70,7 +70,7 @@ export namespace ComponentOperation {
         componentId: buf.readInt32(),
         timestamp: Number(buf.readUint64())
       }
-      buf.readUint32()
+      buf.incrementReadOffset(4)
       return msg
     } else {
       throw new Error('ComponentOperation tried to read other message type.')
