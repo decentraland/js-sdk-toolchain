@@ -5,6 +5,7 @@
       "packages/@dcl/sdk/types/tsconfig.ecs7.json",
       "packages/@dcl/dcl-rollup/tsconfig.json",
       "packages/@dcl/ecs/tsconfig.json",
+      "packages/@dcl/sdk/tsconfig.cli.json",
       "packages/@dcl/sdk/tsconfig.json",
       "packages/@dcl/crdt/tsconfig.json",
       "packages/@dcl/playground-assets/tsconfig.json",

@@ -125,6 +125,7 @@ flow('build-all', () => {
     itExecutes(`npm install --silent ${REACT_ECS}`, SDK_PATH)
 
     itExecutes('npm run build --silent', SDK_PATH)
+    itExecutes('npm run build:cli --silent', SDK_PATH)
 
     it('check files exists', () => {
       ensureFileExists('index.js', SDK_PATH)
@@ -135,7 +136,11 @@ flow('build-all', () => {
       ensureFileExists('ecs.d.ts', SDK_PATH)
       ensureFileExists('react-ecs.js', SDK_PATH)
       ensureFileExists('react-ecs.d.ts', SDK_PATH)
+      ensureFileExists('cli/index.js', SDK_PATH)
+      ensureFileExists('cli/index.d.ts', SDK_PATH)
     })
+
+    itExecutes(`chmod -R +x cli`, SDK_PATH)
   })
 
   flow('@dcl/playground-assets build', () => {
