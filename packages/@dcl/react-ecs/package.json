@@ -35,5 +35,11 @@
   "files": [
     "dist",
     "tsconfig.json"
-  ]
+  ],
+  "typedoc": {
+    "entryPoint": "./src/index.ts",
+    "readmeFile": "./README.md",
+    "displayName": "React ECS",
+    "tsconfig": "./tsconfig.json"
+  }
 }

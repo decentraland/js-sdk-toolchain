@@ -1,6 +1,6 @@
 import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
-import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
+import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_events.gen'
 import * as components from '../components'
 import { IEngine } from '../engine/types'
 import { Entity } from '../engine/entity'
@@ -12,9 +12,10 @@ export type EventSystemCallback = (
 ) => void
 
 export type EventSystemOptions = {
-  button?: InputAction
+  button: InputAction
   hoverText?: string
   maxDistance?: number
+  showFeedback?: boolean
 }
 
 export type PointerEventsSystem = ReturnType<typeof createPointerEventSystem>
@@ -23,7 +24,7 @@ export function createPointerEventSystem(
   engine: IEngine,
   inputSystem: IInputSystem
 ) {
-  const PointerHoverFeedback = components.PointerHoverFeedback(engine)
+  const PointerEvents = components.PointerEvents(engine)
 
   enum EventType {
     Click,
@@ -32,15 +33,13 @@ export function createPointerEventSystem(
   }
   type EventMapType = Map<
     EventType,
-    { cb: EventSystemCallback; opts: Required<EventSystemOptions> }
+    { cb: EventSystemCallback; opts: EventSystemOptions }
   >
 
   const getDefaultOpts = (
-    opts: EventSystemOptions = {}
-  ): Required<EventSystemOptions> => ({
+    opts: Partial<EventSystemOptions> = {}
+  ): EventSystemOptions => ({
     button: InputAction.IA_ANY,
-    hoverText: 'Interact',
-    maxDistance: 100,
     ...opts
   })
 
@@ -52,21 +51,20 @@ export function createPointerEventSystem(
     )
   }
 
-  function setHoverFeedback(
+  function setPointerEvent(
     entity: Entity,
     type: PointerEventType,
     opts: EventSystemOptions
   ) {
-    if (opts.hoverText) {
+    if (opts.hoverText || opts.showFeedback) {
       const pointerEvent =
-        PointerHoverFeedback.getMutableOrNull(entity) ||
-        PointerHoverFeedback.create(entity)
+        PointerEvents.getMutableOrNull(entity) || PointerEvents.create(entity)
 
       pointerEvent.pointerEvents.push({
         eventType: type,
         eventInfo: {
           button: opts.button,
-          showFeedback: true,
+          showFeedback: opts.showFeedback,
           hoverText: opts.hoverText,
           maxDistance: opts.maxDistance
         }
@@ -74,12 +72,12 @@ export function createPointerEventSystem(
     }
   }
 
-  function removeHoverFeedback(
+  function removePointerEvent(
     entity: Entity,
     type: PointerEventType,
     button: InputAction
   ) {
-    const pointerEvent = PointerHoverFeedback.getMutableOrNull(entity)
+    const pointerEvent = PointerEvents.getMutableOrNull(entity)
     if (!pointerEvent) return
     pointerEvent.pointerEvents = pointerEvent.pointerEvents.filter(
       (pointer) =>
@@ -99,7 +97,7 @@ export function createPointerEventSystem(
     const pointerEvent = event.get(type)
 
     if (pointerEvent?.opts.hoverText) {
-      removeHoverFeedback(
+      removePointerEvent(
         entity,
         getPointerEvent(type),
         pointerEvent.opts.button
@@ -182,7 +180,7 @@ export function createPointerEventSystem(
     onClick(
       entity: Entity,
       cb: EventSystemCallback,
-      opts?: EventSystemOptions
+      opts?: Partial<EventSystemOptions>
     ) {
       const options = getDefaultOpts(opts)
       // Clear previous event with over feedback included
@@ -190,7 +188,7 @@ export function createPointerEventSystem(
 
       // Set new event
       getEvent(entity).set(EventType.Click, { cb, opts: options })
-      setHoverFeedback(entity, PointerEventType.PET_DOWN, options)
+      setPointerEvent(entity, PointerEventType.PET_DOWN, options)
     },
 
     /**
@@ -203,12 +201,12 @@ export function createPointerEventSystem(
     onPointerDown(
       entity: Entity,
       cb: EventSystemCallback,
-      opts?: EventSystemOptions
+      opts?: Partial<EventSystemOptions>
     ) {
       const options = getDefaultOpts(opts)
       removeEvent(entity, EventType.Down)
       getEvent(entity).set(EventType.Down, { cb, opts: options })
-      setHoverFeedback(entity, PointerEventType.PET_DOWN, options)
+      setPointerEvent(entity, PointerEventType.PET_DOWN, options)
     },
 
     /**
@@ -221,12 +219,12 @@ export function createPointerEventSystem(
     onPointerUp(
       entity: Entity,
       cb: EventSystemCallback,
-      opts?: EventSystemOptions
+      opts?: Partial<EventSystemOptions>
     ) {
       const options = getDefaultOpts(opts)
       removeEvent(entity, EventType.Up)
       getEvent(entity).set(EventType.Up, { cb, opts: options })
-      setHoverFeedback(entity, PointerEventType.PET_UP, options)
+      setPointerEvent(entity, PointerEventType.PET_UP, options)
     }
   }
 }

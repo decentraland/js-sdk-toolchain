@@ -9,7 +9,7 @@ import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
 import { isListener, Listeners } from '../components'
 import { CANVAS_ROOT_ENTITY } from '../components/uiTransform'
-import { EntityComponents, JSX } from '../react-ecs'
+import { JSX } from '../react-ecs'
 import {
   Changes,
   Container,
@@ -28,65 +28,49 @@ import {
   UpdatePayload,
   _ChildSet
 } from './types'
-import { componentKeys, isEqual, isNotUndefined, noopConfig } from './utils'
+import {
+  componentKeys,
+  isNotUndefined,
+  noopConfig,
+  propsChanged
+} from './utils'
 
-function propsChanged<K extends keyof EntityComponents>(
-  component: K,
-  prevProps: Partial<EntityComponents[K]>,
-  nextProps: Partial<EntityComponents[K]>
-): Changes<K> | undefined {
-  if (prevProps && !nextProps) {
-    return { type: 'delete', component }
-  }
-
-  if (!nextProps) {
-    return
-  }
-
-  if (!prevProps && nextProps) {
-    return { type: 'add', props: nextProps, component }
-  }
-
-  if (isListener(component)) {
-    if (!isEqual(prevProps, nextProps)) {
-      return { type: 'put', component, props: nextProps }
-    }
-  }
-
-  const changes: Partial<EntityComponents[K]> = {}
-  for (const k in prevProps) {
-    const propKey = k as keyof typeof prevProps
-    if (!isEqual(prevProps[propKey], nextProps[propKey])) {
-      changes[propKey] = nextProps[propKey]
-    }
-  }
-
-  if (!Object.keys(changes).length) {
-    return
-  }
-
-  return { type: 'put', props: changes, component }
+type OnChangeState<T = string | number> = {
+  fn?: (val?: T) => void
+  value?: T
 }
-
 export function createReconciler(
   engine: Pick<
     IEngine,
-    'getComponent' | 'addEntity' | 'removeEntity' | 'defineComponentFromSchema'
+    | 'getComponent'
+    | 'addEntity'
+    | 'removeEntity'
+    | 'defineComponentFromSchema'
+    | 'getEntitiesWith'
   >,
   pointerEvents: PointerEventsSystem
 ) {
+  // Store all the entities so when we destroy the UI we can also destroy them
   const entities = new Set<Entity>()
-
+  // Store the onChange callbacks to be runned every time a Result has changed
+  const changeEvents = new Map<Entity, Map<number, OnChangeState | undefined>>()
+  // Initialize components
   const UiTransform = components.UiTransform(engine)
   const UiText = components.UiText(engine)
   const UiBackground = components.UiBackground(engine)
-
+  const UiInput = components.UiInput(engine)
+  const UiInputResult = components.UiInputResult(engine)
+  const UiDropdown = components.UiDropdown(engine)
+  const UiDropdownResult = components.UiDropdownResult(engine)
+  // Component ID Helper
   const getComponentId: {
     [key in keyof EngineComponents]: number
   } = {
     uiTransform: UiTransform._id,
     uiText: UiText._id,
-    uiBackground: UiBackground._id
+    uiBackground: UiBackground._id,
+    uiInput: UiInput._id,
+    uiDropdown: UiDropdown._id
   }
 
   function updateTree(
@@ -102,23 +86,29 @@ export function createReconciler(
 
   function upsertListener(
     instance: Instance,
-    update: Changes<keyof Listeners>
+    update: Changes<keyof Pick<Listeners, 'onMouseDown' | 'onMouseUp'>>
   ) {
-    // TODO: This handles only onClick listener for the moment
     if (update.type === 'delete' || !update.props) {
-      pointerEvents.removeOnPointerDown(instance.entity)
+      if (update.component === 'onMouseDown') {
+        pointerEvents.removeOnPointerDown(instance.entity)
+      } else if (update.component === 'onMouseUp') {
+        pointerEvents.removeOnPointerUp(instance.entity)
+      }
       return
     }
 
     if (update.props) {
-      pointerEvents.onPointerDown(
-        instance.entity,
-        update.props as EventSystemCallback,
-        {
-          button: InputAction.IA_POINTER,
-          hoverText: ''
-        }
-      )
+      const pointerEvent =
+        update.component === 'onMouseDown'
+          ? pointerEvents.onPointerDown
+          : pointerEvents.onPointerUp
+
+      pointerEvent(instance.entity, update.props as EventSystemCallback, {
+        button: InputAction.IA_POINTER,
+        // We add this showFeedBack so the pointerEventSystem creates a PointerEvent component with our entity
+        // This is needed for the renderer to know which entities are clickeables
+        showFeedback: true
+      })
     }
   }
 
@@ -126,7 +116,8 @@ export function createReconciler(
     instance: Instance,
     component: keyof EngineComponents
   ) {
-    const Component = engine.getComponent(getComponentId[component])
+    const componentId = getComponentId[component]
+    const Component = engine.getComponent(componentId)
     Component.deleteFrom(instance.entity)
   }
 
@@ -137,18 +128,23 @@ export function createReconciler(
   ) {
     const componentId = getComponentId[componentName]
     const Component = engine.getComponent(componentId)
-
     const component =
       Component.getMutableOrNull(instance.entity) ||
       Component.create(instance.entity)
 
     for (const key in props) {
       const keyProp = key as keyof EngineComponents[K]
-      ;(component as any)[keyProp] = props[keyProp]
+      if (key === 'onChange') {
+        const onChange = props[keyProp] as OnChangeState['fn']
+        updateOnChange(instance.entity, componentId, { fn: onChange })
+      } else {
+        ;(component as any)[keyProp] = props[keyProp]
+      }
     }
   }
 
   function removeChildEntity(instance: Instance) {
+    changeEvents.delete(instance.entity)
     engine.removeEntity(instance.entity)
     for (const child of instance._child) {
       removeChildEntity(child)
@@ -198,6 +194,20 @@ export function createReconciler(
     // Mutate 💀
     parentInstance._child.splice(childIndex, 1)
     removeChildEntity(child)
+  }
+
+  function updateOnChange(
+    entity: Entity,
+    componentId: number,
+    state?: OnChangeState
+  ) {
+    const event =
+      changeEvents.get(entity) ||
+      changeEvents.set(entity, new Map()).get(entity)!
+    const oldState = event.get(componentId)
+    const fn = state?.fn
+    const value = state?.value ?? oldState?.value
+    event.set(componentId, { fn, value })
   }
 
   const hostConfig: HostConfig<
@@ -268,7 +278,7 @@ export function createReconciler(
       instance: Instance,
       updatePayload: UpdatePayload,
       _type: Type,
-      _prevPropsProps: Props,
+      _prevProps: Props,
       _nextProps: Props,
       _internalHandle: OpaqueHandle
     ): void {
@@ -308,6 +318,9 @@ export function createReconciler(
 
       updateTree(child, { rightOf: child.rightOf, parent: child.parent })
       updateTree(beforeChild, { rightOf: beforeChild.rightOf })
+    },
+    removeChildFromContainer(parenInstance: Instance, child: Instance) {
+      removeChildEntity(child)
     }
   }
 
@@ -323,8 +336,32 @@ export function createReconciler(
     function () {},
     null
   )
+
+  // Maybe this could be something similar to Input system, but since we
+  // are going to use this only here, i prefer to scope it here.
+  function handleOnChange(
+    componentId: number,
+    resultComponent: typeof UiInputResult | typeof UiDropdownResult
+  ) {
+    for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
+      const entityState = changeEvents.get(entity)?.get(componentId)
+      if (entityState?.fn && Result.value !== entityState.value) {
+        // Call onChange callback and update internal timestamp
+        entityState.fn(Result.value)
+        updateOnChange(entity, componentId, {
+          fn: entityState.fn,
+          value: Result.value
+        })
+      }
+    }
+  }
+
   return {
     update: function (component: JSX.Element) {
+      if (changeEvents.size) {
+        handleOnChange(UiInput._id, UiInputResult)
+        handleOnChange(UiDropdown._id, UiDropdownResult)
+      }
       return reconciler.updateContainer(component as any, root, null)
     },
     getEntities: () => Array.from(entities)

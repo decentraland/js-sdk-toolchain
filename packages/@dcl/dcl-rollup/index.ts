@@ -70,6 +70,8 @@ async function compile() {
 
   const finished = future<void>()
 
+  let hasErrors = false
+
   const watcher = watch({
     ...baseConfig,
     watch: {
@@ -79,6 +81,7 @@ async function compile() {
     onwarn: (warning, defaultHandler) => {
       if (warning.plugin === 'typescript') {
         handleError(warning, true)
+        hasErrors = true
       } else {
         return defaultHandler(warning)
       }
@@ -173,6 +176,8 @@ async function compile() {
 
   await watcher.close()
   watcher.removeAllListeners()
+
+  if (hasErrors) process.exitCode = 1
 }
 
 // Start the watcher

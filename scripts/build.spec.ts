@@ -172,6 +172,17 @@ flow('build-all', () => {
       const occurences = content.match(/^.*ae-forgotten-export.*/gim)
       expect(occurences ?? []).toEqual([])
     })
+
+    it('check no conflict in types are present in generated bundle', async () => {
+      const file = path.resolve(
+        PLAYGROUND_ASSETS_PATH,
+        'etc/playground-assets.api.md'
+      )
+      if (!existsSync(file)) throw new Error(`${file} doesn't exist`)
+      const content = readFileSync(file).toString()
+      const occurences = content.match(/.*_2\b/gim)
+      expect(occurences ?? []).toEqual([])
+    })
   })
 
   flow('playground copy files', () => {
