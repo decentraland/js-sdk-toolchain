@@ -78,6 +78,15 @@ export const AvatarTexture: {
     decode(input: _m0.Reader | Uint8Array, length?: number): AvatarTexture;
 };
 
+// Warning: (ae-missing-release-tag) "BackgroundTextureMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const enum BackgroundTextureMode {
+    CENTER = 1,
+    NINE_SLICES = 0,
+    STRETCH = 2
+}
+
 // @public (undocumented)
 export const Billboard: ComponentDefinition<PBBillboard>;
 
@@ -90,6 +99,30 @@ export const enum BillboardMode {
     // (undocumented)
     BM_Y_AXE = 1
 }
+
+// Warning: (ae-missing-release-tag) "BorderRect" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "BorderRect" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export interface BorderRect {
+    // (undocumented)
+    bottom: number;
+    // (undocumented)
+    left: number;
+    // (undocumented)
+    right: number;
+    // (undocumented)
+    top: number;
+}
+
+// @public
+export const BorderRect: {
+    encode(message: BorderRect, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): BorderRect;
+};
+
+// @public (undocumented)
+export function Button(props: EntityPropTypes & UiButtonProps): ReactEcs.JSX.Element;
 
 // @public (undocumented)
 export type ByteBuffer = {
@@ -150,6 +183,11 @@ export type ByteBuffer = {
     setUint64(offset: number, value: bigint): void;
 };
 
+// Warning: (ae-missing-release-tag) "Callback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type Callback = () => void;
+
 // @public (undocumented)
 export const CameraMode: ComponentDefinition<PBCameraMode>;
 
@@ -174,7 +212,7 @@ export const CANVAS_ROOT_ENTITY = 0;
 // Warning: (ae-missing-release-tag) "Children" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type Children = any;
+export type Children = unknown;
 
 // Warning: (ae-missing-release-tag) "ColliderLayer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -370,16 +408,6 @@ export type ComponentSchema<T extends [ComponentDefinition<any>, ...ComponentDef
     [K in keyof T]: T[K] extends ComponentDefinition<any> ? ReturnType<T[K]['getMutable']> : never;
 };
 
-// Warning: (ae-missing-release-tag) "Container" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function Container({ width, height, children }: ContainerPropTypes): ReactEcs.JSX.Element;
-
-// Warning: (ae-missing-release-tag) "ContainerPropTypes" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type ContainerPropTypes = Partial<CommonProps> & EntityPropTypes['uiTransform'];
-
 // Warning: (ae-missing-release-tag) "createEthereumProvider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -400,9 +428,9 @@ export function createPointerEventSystem(engine: IEngine, inputSystem: IInputSys
     removeOnClick(entity: Entity): void;
     removeOnPointerDown(entity: Entity): void;
     removeOnPointerUp(entity: Entity): void;
-    onClick(entity: Entity, cb: EventSystemCallback, opts?: EventSystemOptions): void;
-    onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: EventSystemOptions): void;
-    onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: EventSystemOptions): void;
+    onClick(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
+    onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
+    onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
 };
 
 // Warning: (ae-missing-release-tag) "createReactBasedUiSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -446,11 +474,14 @@ export function defineComponent<T>(componentId: number, spec: ISchema<T>): Compo
 // @public
 export const DEG2RAD: number;
 
+// @public (undocumented)
+export function Dropdown(props: EntityPropTypes & UiDropdownProps): ReactEcs.JSX.Element;
+
 // Warning: (ae-missing-release-tag) "EcsElements" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export type EcsElements = {
-    entity: Partial<Omit<EntityComponents, 'onClick'> & CommonProps>;
+    entity: Partial<EntityComponents & CommonProps>;
 };
 
 // @public (undocumented)
@@ -479,7 +510,10 @@ export type EntityComponents = {
     uiTransform: PBUiTransform;
     uiText: PBUiText;
     uiBackground: PBUiBackground;
-    onClick: EventSystemCallback;
+    uiInput: PBUiInput;
+    uiDropdown: PBUiDropdown;
+    onMouseDown: Callback;
+    onMouseUp: Callback;
 };
 
 // Warning: (ae-missing-release-tag) "EntityContainer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -495,9 +529,8 @@ export function EntityContainer(): {
 // @public (undocumented)
 export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
-    uiText?: PBUiText;
-    uiBackground?: PBUiBackground;
-};
+    uiBackground?: UiBackgroundProps;
+} & Listeners;
 
 // @public
 export const Epsilon = 0.000001;
@@ -511,9 +544,10 @@ export type EventSystemCallback = (event: PBPointerEventsResult_PointerCommand) 
 //
 // @public (undocumented)
 export type EventSystemOptions = {
-    button?: InputAction;
+    button: InputAction;
     hoverText?: string;
     maxDistance?: number;
+    showFeedback?: boolean;
 };
 
 // Warning: (ae-missing-release-tag) "ExcludeUndefined" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -800,6 +834,9 @@ export type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
 }[keyof T];
 
+// @public (undocumented)
+export function Input(props: EntityPropTypes & Partial<UiInputProps>): ReactEcs.JSX.Element;
+
 // Warning: (ae-missing-release-tag) "InputAction" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -870,7 +907,7 @@ export type ISchema<T = any> = {
 // Warning: (ae-missing-release-tag) "isListener" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export const isListener: (key: string) => key is "onClick";
+export const isListener: (key: string) => key is keyof Listeners;
 
 // Warning: (ae-missing-release-tag) "JSX" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -880,8 +917,7 @@ export namespace JSX {
     export interface Component {
     }
     // (undocumented)
-    export interface Element {
-    }
+    export type Element = {} | null;
     // (undocumented)
     export type IntrinsicElements = EcsElements;
 }
@@ -891,11 +927,15 @@ export namespace JSX {
 // @public (undocumented)
 export type Key = number | string;
 
+// @public (undocumented)
+export function Label(props: EntityPropTypes & UiTextProps): ReactEcs.JSX.Element;
+
 // Warning: (ae-missing-release-tag) "Listeners" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export type Listeners = {
-    onClick?: EventSystemCallback;
+    onMouseDown?: Callback;
+    onMouseUp?: Callback;
 };
 
 // Warning: (ae-missing-release-tag) "MapComponentDefinition" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -1856,6 +1896,55 @@ export const PBNftShape: {
     decode(input: _m0.Reader | Uint8Array, length?: number): PBNftShape;
 };
 
+// Warning: (ae-missing-release-tag) "PBPointerEvents" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBPointerEvents" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBPointerEvents {
+    // (undocumented)
+    pointerEvents: PBPointerEvents_Entry[];
+}
+
+// @public
+export const PBPointerEvents: {
+    encode(message: PBPointerEvents, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEvents;
+};
+
+// Warning: (ae-missing-release-tag) "PBPointerEvents_Entry" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBPointerEvents_Entry" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBPointerEvents_Entry {
+    // (undocumented)
+    eventInfo: PBPointerEvents_Info | undefined;
+    // (undocumented)
+    eventType: PointerEventType;
+}
+
+// @public
+export const PBPointerEvents_Entry: {
+    encode(message: PBPointerEvents_Entry, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEvents_Entry;
+};
+
+// Warning: (ae-missing-release-tag) "PBPointerEvents_Info" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBPointerEvents_Info" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBPointerEvents_Info {
+    button?: InputAction | undefined;
+    hoverText?: string | undefined;
+    maxDistance?: number | undefined;
+    showFeedback?: boolean | undefined;
+}
+
+// @public
+export const PBPointerEvents_Info: {
+    encode(message: PBPointerEvents_Info, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEvents_Info;
+};
+
 // Warning: (ae-missing-release-tag) "PBPointerEventsResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 // Warning: (ae-missing-release-tag) "PBPointerEventsResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -1888,55 +1977,6 @@ export interface PBPointerEventsResult_PointerCommand {
 export const PBPointerEventsResult_PointerCommand: {
     encode(message: PBPointerEventsResult_PointerCommand, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEventsResult_PointerCommand;
-};
-
-// Warning: (ae-missing-release-tag) "PBPointerHoverFeedback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBPointerHoverFeedback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export interface PBPointerHoverFeedback {
-    // (undocumented)
-    pointerEvents: PBPointerHoverFeedback_Entry[];
-}
-
-// @public
-export const PBPointerHoverFeedback: {
-    encode(message: PBPointerHoverFeedback, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerHoverFeedback;
-};
-
-// Warning: (ae-missing-release-tag) "PBPointerHoverFeedback_Entry" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBPointerHoverFeedback_Entry" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export interface PBPointerHoverFeedback_Entry {
-    // (undocumented)
-    eventInfo: PBPointerHoverFeedback_Info | undefined;
-    // (undocumented)
-    eventType: PointerEventType;
-}
-
-// @public
-export const PBPointerHoverFeedback_Entry: {
-    encode(message: PBPointerHoverFeedback_Entry, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerHoverFeedback_Entry;
-};
-
-// Warning: (ae-missing-release-tag) "PBPointerHoverFeedback_Info" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBPointerHoverFeedback_Info" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export interface PBPointerHoverFeedback_Info {
-    button?: InputAction | undefined;
-    hoverText?: string | undefined;
-    maxDistance?: number | undefined;
-    showFeedback?: boolean | undefined;
-}
-
-// @public
-export const PBPointerHoverFeedback_Info: {
-    encode(message: PBPointerHoverFeedback_Info, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerHoverFeedback_Info;
 };
 
 // Warning: (ae-missing-release-tag) "PBPointerLock" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2064,13 +2104,97 @@ export const PBTextShape: {
 //
 // @public (undocumented)
 export interface PBUiBackground {
-    backgroundColor?: PBColor4 | undefined;
+    color?: PBColor4 | undefined;
+    // (undocumented)
+    texture?: TextureUnion | undefined;
+    // (undocumented)
+    textureMode: BackgroundTextureMode;
+    textureSlices?: BorderRect | undefined;
+    uvs: number[];
 }
 
 // @public
 export const PBUiBackground: {
     encode(message: PBUiBackground, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): PBUiBackground;
+};
+
+// Warning: (ae-missing-release-tag) "PBUiDropdown" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBUiDropdown" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBUiDropdown {
+    // (undocumented)
+    acceptEmpty: boolean;
+    color?: PBColor4 | undefined;
+    // (undocumented)
+    disabled: boolean;
+    // (undocumented)
+    emptyLabel?: string | undefined;
+    font?: Font | undefined;
+    fontSize?: number | undefined;
+    // (undocumented)
+    options: string[];
+    selectedIndex?: number | undefined;
+    textAlign?: TextAlignMode | undefined;
+}
+
+// @public
+export const PBUiDropdown: {
+    encode(message: PBUiDropdown, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): PBUiDropdown;
+};
+
+// Warning: (ae-missing-release-tag) "PBUiDropdownResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBUiDropdownResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBUiDropdownResult {
+    // (undocumented)
+    value: number;
+}
+
+// @public
+export const PBUiDropdownResult: {
+    encode(message: PBUiDropdownResult, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): PBUiDropdownResult;
+};
+
+// Warning: (ae-missing-release-tag) "PBUiInput" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBUiInput" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBUiInput {
+    color?: PBColor4 | undefined;
+    // (undocumented)
+    disabled: boolean;
+    font?: Font | undefined;
+    fontSize?: number | undefined;
+    // (undocumented)
+    placeholder: string;
+    placeholderColor?: PBColor4 | undefined;
+    textAlign?: TextAlignMode | undefined;
+}
+
+// @public
+export const PBUiInput: {
+    encode(message: PBUiInput, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): PBUiInput;
+};
+
+// Warning: (ae-missing-release-tag) "PBUiInputResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "PBUiInputResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface PBUiInputResult {
+    // (undocumented)
+    value: string;
+}
+
+// @public
+export const PBUiInputResult: {
+    encode(message: PBUiInputResult, writer?: _m0.Writer): _m0.Writer;
+    decode(input: _m0.Reader | Uint8Array, length?: number): PBUiInputResult;
 };
 
 // Warning: (ae-missing-release-tag) "PBUiText" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2263,6 +2387,9 @@ export namespace Plane {
 }
 
 // @public (undocumented)
+export const PointerEvents: ComponentDefinition<PBPointerEvents>;
+
+// @public (undocumented)
 export const PointerEventsResult: ComponentDefinition<PBPointerEventsResult>;
 
 // Warning: (ae-missing-release-tag) "PointerEventsSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2277,9 +2404,9 @@ export const pointerEventsSystem: {
     removeOnClick(entity: unknown): void;
     removeOnPointerDown(entity: unknown): void;
     removeOnPointerUp(entity: unknown): void;
-    onClick(entity: unknown, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
-    onPointerDown(entity: unknown, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
-    onPointerUp(entity: unknown, cb: EventSystemCallback, opts?: EventSystemOptions | undefined): void;
+    onClick(entity: unknown, cb: EventSystemCallback, opts?: Partial<EventSystemOptions> | undefined): void;
+    onPointerDown(entity: unknown, cb: EventSystemCallback, opts?: Partial<EventSystemOptions> | undefined): void;
+    onPointerUp(entity: unknown, cb: EventSystemCallback, opts?: Partial<EventSystemOptions> | undefined): void;
 };
 
 // Warning: (ae-missing-release-tag) "PointerEventType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2295,9 +2422,6 @@ export const enum PointerEventType {
     // (undocumented)
     PET_UP = 0
 }
-
-// @public (undocumented)
-export const PointerHoverFeedback: ComponentDefinition<PBPointerHoverFeedback>;
 
 // @public (undocumented)
 export const PointerLock: ComponentDefinition<PBPointerLock>;
@@ -2447,8 +2571,7 @@ export namespace ReactEcs {
         export interface Component {
         }
         // (undocumented)
-        export interface Element {
-        }
+        export type Element = {} | null;
         // (undocumented)
         export type IntrinsicElements = EcsElements;
     }
@@ -2746,7 +2869,20 @@ export type Transport = {
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
 // @public (undocumented)
+export type UiAvatarTexture = {
+    avatarTexture?: AvatarTexture;
+};
+
+// @public (undocumented)
 export const UiBackground: ComponentDefinition<PBUiBackground>;
+
+// @public (undocumented)
+export type UiBackgroundProps = Partial<Omit<PBUiBackground, 'texture'>> & UiTextureUnion;
+
+// @public (undocumented)
+export type UiButtonProps = PBUiText & {
+    type?: 'primary' | 'secondary';
+};
 
 // Warning: (ae-missing-release-tag) "UiComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2754,10 +2890,43 @@ export const UiBackground: ComponentDefinition<PBUiBackground>;
 export type UiComponent = () => JSX.Element;
 
 // @public (undocumented)
+export const UiDropdown: ComponentDefinition<PBUiDropdown>;
+
+// @public (undocumented)
+export type UiDropdownProps = Partial<PBUiDropdown> & {
+    onChange?(value: number): void;
+};
+
+// @public (undocumented)
+export const UiDropdownResult: ComponentDefinition<PBUiDropdownResult>;
+
+// @public (undocumented)
 export function UiEntity(props: EntityPropTypes & Partial<CommonProps>): ReactEcs.JSX.Element;
 
 // @public (undocumented)
+export const UiInput: ComponentDefinition<PBUiInput>;
+
+// @public (undocumented)
+export type UiInputProps = PBUiInput & {
+    onChange?(value: string): void;
+};
+
+// @public (undocumented)
+export const UiInputResult: ComponentDefinition<PBUiInputResult>;
+
+// @public (undocumented)
 export const UiText: ComponentDefinition<PBUiText>;
+
+// @public (undocumented)
+export type UiTextProps = PBUiText;
+
+// @public (undocumented)
+export type UiTexture = {
+    texture?: Texture;
+};
+
+// @public (undocumented)
+export type UiTextureUnion = UiAvatarTexture | UiTexture;
 
 // @public (undocumented)
 export const UiTransform: ComponentDefinition<PBUiTransform>;

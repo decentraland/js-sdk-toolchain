@@ -211,7 +211,6 @@ function preEngine(): PreEngine {
       removeEntity(entity)
     }
   }
-
   return {
     entityExists,
     componentsDefinition,

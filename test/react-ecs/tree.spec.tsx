@@ -7,7 +7,6 @@ import {
 } from '../../packages/@dcl/ecs'
 import { components, IEngine as IIEngine } from '../../packages/@dcl/ecs/src'
 import {
-  Container,
   createReactBasedUiSystem,
   ReactBasedUiSystem,
   ReactEcs,
@@ -42,15 +41,15 @@ describe('RectEcs UI ✨', () => {
     let width = 222
 
     const ui = () => (
-      <Container width={111}>
+      <UiEntity uiTransform={{ width: 111 }}>
         {/* // Root */}
-        <Container width={width}>
-          <Container width={222.1} />
-        </Container>
+        <UiEntity uiTransform={{ width: width }}>
+          <UiEntity uiTransform={{ width: 222.1 }} />
+        </UiEntity>
         {/* UiEntity A */}
-        <Container width={333} />
+        <UiEntity uiTransform={{ width: 333 }} />
         {/* UiEntity B */}
-      </Container>
+      </UiEntity>
     )
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
@@ -98,14 +97,14 @@ describe('RectEcs UI ✨', () => {
     let addChild = false
     const ui = () => {
       return (
-        <Container width={111}>
-          {addChild && <Container width={333} />}
+        <UiEntity uiTransform={{ width: 111 }}>
+          {addChild && <UiEntity uiTransform={{ width: 333 }} />}
           {/* // Root */}
-          <Container width={888} />
+          <UiEntity uiTransform={{ width: 888 }} />
           {/* UiEntity A */}
-          <Container width={999} />
+          <UiEntity uiTransform={{ width: 999 }} />
           {/* UiEntity B */}
-        </Container>
+        </UiEntity>
       )
     }
 
@@ -189,15 +188,15 @@ describe('RectEcs UI ✨', () => {
     const getUi = (entity: Entity) => UiTransform.get(entity)
     let addChild = false
     const ui = () => (
-      <Container width={111}>
+      <UiEntity uiTransform={{ width: 111 }}>
         {/* // Root */}
-        <Container width={888} />
+        <UiEntity uiTransform={{ width: 888 }} />
         {/* UiEntity A */}
-        {addChild && <Container width={333} />}
+        {addChild && <UiEntity uiTransform={{ width: 333 }} />}
         {/* UiEntity Added */}
-        <Container width={999} />
+        <UiEntity uiTransform={{ width: 999 }} />
         {/* UiEntity B */}
-      </Container>
+      </UiEntity>
     )
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
@@ -277,15 +276,15 @@ describe('RectEcs UI ✨', () => {
 
     let addChild = false
     const ui = () => (
-      <Container width={111}>
+      <UiEntity uiTransform={{ width: 111 }}>
         {/* // Root */}
-        <Container width={888} />
+        <UiEntity uiTransform={{ width: 888 }} />
         {/* UiEntity A */}
-        <Container width={999} />
+        <UiEntity uiTransform={{ width: 999 }} />
         {/* UiEntity B */}
-        {addChild && <Container width={333} />}
+        {addChild && <UiEntity uiTransform={{ width: 333 }} />}
         {/* UiEntity Added */}
-      </Container>
+      </UiEntity>
     )
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
@@ -367,22 +366,22 @@ describe('RectEcs UI ✨', () => {
     let width = 333.2
     let addChild = false
     const ui = () => (
-      <Container width={111}>
+      <UiEntity uiTransform={{ width: 111 }}>
         {/* // Root */}
-        <Container width={888} />
+        <UiEntity uiTransform={{ width: 888 }} />
         {/* UiEntity A */}
         {addChild && (
-          <Container width={333}>
-            <Container width={333.1}>
-              <Container width={333.11} />
-            </Container>
-            <Container width={width} />
-          </Container>
+          <UiEntity uiTransform={{ width: 333 }}>
+            <UiEntity uiTransform={{ width: 333.1 }}>
+              <UiEntity uiTransform={{ width: 333.11 }} />
+            </UiEntity>
+            <UiEntity uiTransform={{ width: width }} />
+          </UiEntity>
         )}
         {/* UiEntity Added */}
-        <Container width={999} />
+        <UiEntity uiTransform={{ width: 999 }} />
         {/* UiEntity B */}
-      </Container>
+      </UiEntity>
     )
 
     uiRenderer.setUiRenderer(ui)
@@ -463,11 +462,11 @@ describe('RectEcs UI ✨', () => {
 
     const getUi = (entity: any) => UiTransform.get(entity as Entity)
     const ui = () => (
-      <Container width={111}>
+      <UiEntity uiTransform={{ width: 111 }}>
         {uiEntities.map((entity) => (
-          <Container key={entity.id} width={entity.value} />
+          <UiEntity key={entity.id} uiTransform={{ width: entity.value }} />
         ))}
-      </Container>
+      </UiEntity>
     )
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
