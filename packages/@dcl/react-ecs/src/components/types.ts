@@ -8,11 +8,12 @@ import { UiTransformProps } from './uiTransform/types'
 export type EntityPropTypes = {
   uiTransform?: UiTransformProps
   uiBackground?: UiBackgroundProps
-} & Listeners
+} & Listeners &
+  Pick<CommonProps, 'key'>
 
 export type Key = number | string
 export type Children = unknown
 export type CommonProps = {
-  key: Key
-  children: Children
+  key?: Key
+  children?: Children
 }
