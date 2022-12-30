@@ -1,9 +1,4 @@
-import {
-  engine,
-  YGFlexDirection,
-  BackgroundTextureMode,
-  executeTask
-} from '@dcl/sdk/ecs'
+import { engine, YGFlexDirection, BackgroundTextureMode } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, {
   UiEntity,
@@ -11,7 +6,6 @@ import ReactEcs, {
   ReactEcsRenderer,
   Dropdown
 } from '@dcl/sdk/react-ecs'
-import { getUserData } from '~system/UserIdentity'
 
 type GenesisPlazaContent = string
 const src: GenesisPlazaContent = 'images/rounded_alpha_square.png'
@@ -19,11 +13,6 @@ const centeredImage: GenesisPlazaContent = 'images/ui_beam_up_bg.png'
 
 let dt = 0
 let userId: string | undefined
-
-executeTask(async () => {
-  const { data } = await getUserData({})
-  userId = data?.userId
-})
 
 engine.addSystem((t) => {
   dt += t
@@ -187,8 +176,9 @@ export const ui = () => {
     <UiEntity
       uiTransform={{
         width: '100%',
-        height: '2100px',
-        flexDirection: YGFlexDirection.YGFD_COLUMN
+        height: '50%',
+        flexDirection: YGFlexDirection.YGFD_COLUMN,
+        margin: { left: 300 }
       }}
       uiBackground={{ color: Color4.Black() }}
     >
