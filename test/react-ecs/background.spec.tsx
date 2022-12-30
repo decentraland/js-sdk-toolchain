@@ -14,7 +14,8 @@ import {
   UiEntity,
   createReactBasedUiSystem,
   ReactBasedUiSystem,
-  CANVAS_ROOT_ENTITY
+  CANVAS_ROOT_ENTITY,
+  UiBackgroundProps
 } from '../../packages/@dcl/react-ecs/src'
 
 describe('UiBackground React Ecs', () => {
@@ -100,5 +101,59 @@ describe('UiBackground React Ecs', () => {
     backgroundProps = undefined
     await engine.update(1)
     expect(getBackground()).toBe(null)
+  })
+
+  it('Texture background', async () => {
+    const UiBackground = components.UiBackground(engine as IIEngine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getBackground = () => UiBackground.getOrNull(rootDivEntity)
+    let backgroundProps: { uiBackground: UiBackgroundProps } | undefined = {
+      uiBackground: {
+        color: { r: 0, g: 1, b: 2, a: 0 },
+        textureMode: BackgroundTextureMode.CENTER,
+        uvs: [],
+        texture: {
+          src: 'boedo-src'
+        }
+      }
+    }
+
+    const ui = () => (
+      <UiEntity uiTransform={{ width: 100 }} {...backgroundProps} />
+    )
+
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getBackground()?.color).toMatchObject(
+      backgroundProps.uiBackground.color!
+    )
+    expect(getBackground()?.texture).toMatchObject({
+      tex: {
+        $case: 'texture',
+        texture: {
+          src: 'boedo-src'
+        }
+      }
+    })
+
+    backgroundProps = {
+      uiBackground: {
+        avatarTexture: {
+          userId: 'casla-user-id'
+        }
+      }
+    }
+    await engine.update(1)
+    expect(getBackground()?.texture).toMatchObject({
+      tex: {
+        $case: 'avatarTexture',
+        avatarTexture: {
+          userId: 'casla-user-id'
+        }
+      }
+    })
   })
 })

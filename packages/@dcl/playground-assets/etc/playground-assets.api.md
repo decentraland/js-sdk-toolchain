@@ -2104,7 +2104,7 @@ export const PBTextShape: {
 export interface PBUiBackground {
     color?: PBColor4 | undefined;
     // (undocumented)
-    texture?: Texture | undefined;
+    texture?: TextureUnion | undefined;
     // (undocumented)
     textureMode: BackgroundTextureMode;
     textureSlices?: BorderRect | undefined;
@@ -2867,10 +2867,15 @@ export type Transport = {
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
 // @public (undocumented)
+export type UiAvatarTexture = {
+    avatarTexture?: AvatarTexture;
+};
+
+// @public (undocumented)
 export const UiBackground: ComponentDefinition<PBUiBackground>;
 
 // @public (undocumented)
-export type UiBackgroundProps = Partial<PBUiBackground>;
+export type UiBackgroundProps = Partial<Omit<PBUiBackground, 'texture'>> & UiTextureUnion;
 
 // @public (undocumented)
 export type UiButtonProps = PBUiText & {
@@ -2912,6 +2917,14 @@ export const UiText: ComponentDefinition<PBUiText>;
 
 // @public (undocumented)
 export type UiTextProps = PBUiText;
+
+// @public (undocumented)
+export type UiTexture = {
+    texture?: Texture;
+};
+
+// @public (undocumented)
+export type UiTextureUnion = UiAvatarTexture | UiTexture;
 
 // @public (undocumented)
 export const UiTransform: ComponentDefinition<PBUiTransform>;

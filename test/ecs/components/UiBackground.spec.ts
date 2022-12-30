@@ -17,9 +17,14 @@ describe('Generated UiBackground ProtoBuf', () => {
       color: { r: 0, g: 0, b: 0, a: 0 },
       textureMode: BackgroundTextureMode.CENTER,
       texture: {
-        src: 'some-src',
-        wrapMode: TextureWrapMode.TWM_CLAMP,
-        filterMode: TextureFilterMode.TFM_BILINEAR
+        tex: {
+          $case: 'texture',
+          texture: {
+            src: 'some-src',
+            wrapMode: TextureWrapMode.TWM_CLAMP,
+            filterMode: TextureFilterMode.TFM_BILINEAR
+          }
+        }
       },
       textureSlices: {
         top: 1 / 3,
@@ -43,9 +48,14 @@ describe('Generated UiBackground ProtoBuf', () => {
       uvs: [],
       textureMode: 1,
       texture: {
-        src: 'some-src',
-        wrapMode: TextureWrapMode.TWM_CLAMP,
-        filterMode: TextureFilterMode.TFM_BILINEAR
+        tex: {
+          $case: 'texture',
+          texture: {
+            src: 'some-src',
+            wrapMode: TextureWrapMode.TWM_CLAMP,
+            filterMode: TextureFilterMode.TFM_BILINEAR
+          }
+        }
       },
       textureSlices: {
         top: 1 / 3,
