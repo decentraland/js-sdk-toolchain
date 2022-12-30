@@ -384,8 +384,8 @@ export type Color4Type = {
 //
 // @public (undocumented)
 export type CommonProps = {
-    key: Key;
-    children: Children;
+    key?: Key;
+    children?: Children;
 };
 
 // @public (undocumented)
@@ -547,7 +547,7 @@ export function EntityContainer(): {
 export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
     uiBackground?: UiBackgroundProps;
-} & Listeners;
+} & Listeners & Pick<CommonProps, 'key'>;
 
 // @public
 export const Epsilon = 0.000001;
