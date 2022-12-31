@@ -98,4 +98,14 @@ describe('Entity container', () => {
     const entity = entityContainer.generateEntity()
     expect(entity & 0xffff).not.toBe(RESERVED_STATIC_ENTITIES)
   })
+
+  it(`should not have effect the update of usedEntity with a removed one `, () => {
+    const entityContainer = EntityContainer()
+
+    const entity = entityContainer.generateEntity()
+    entityContainer.removeEntity(entity)
+    entityContainer.releaseRemovedEntities()
+
+    expect(entityContainer.updateUsedEntity(entity)).toBe(false)
+  })
 })

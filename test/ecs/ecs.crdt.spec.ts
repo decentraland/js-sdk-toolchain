@@ -1,5 +1,9 @@
 import { components, IEngine, Schemas } from '../../packages/@dcl/ecs/src'
-import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
+import {
+  Entity,
+  EntityUtils,
+  RESERVED_STATIC_ENTITIES
+} from '../../packages/@dcl/ecs/src/engine/entity'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/messages/componentOperation'
 import { WireMessageEnum } from '../../packages/@dcl/ecs/src/serialization/types'
@@ -353,7 +357,8 @@ describe('CRDT tests', () => {
     expect(checkCrdtStateWithEngine(clientB.engine).conflicts).toEqual([])
     expect(checkCrdtStateWithEngine(clientC.engine).conflicts).toEqual([])
   })
-  it.only('should ignore invalid message type', async () => {
+
+  it('should ignore invalid message type', async () => {
     const {
       clients: [clientA]
     } = SandBox.createEngines({ length: 1 })
@@ -455,5 +460,32 @@ describe('CRDT tests', () => {
         expect(checkCrdtStateWithEngine(clientC.engine).conflicts).toEqual([])
       })
     })
+  })
+
+  it('should receive an update from a version greater', async () => {
+    const {
+      clients: [clientA, clientB],
+      testCrdtSynchronization
+    } = SandBox.createEngines({ length: 3 })
+
+    for (let i = 0; i < 30; i++) {
+      clientA.engine.removeEntity(clientA.engine.addEntity())
+      await clientA.engine.update(1)
+    }
+
+    const entity = clientA.engine.addEntity()
+    expect(entity).toBe(EntityUtils.toEntityId(RESERVED_STATIC_ENTITIES, 30))
+    clientA.Transform.create(entity, { position: Vector3.create() })
+    await clientA.engine.update(1)
+
+    const entityB = clientB.engine.addEntity()
+    clientB.Transform.create(entityB)
+    await clientB.engine.update(1)
+    clientB.flushOutgoing()
+
+    await clientA.engine.update(1)
+
+    const res = await testCrdtSynchronization()
+    expect(res.allConflicts.length).toBe(0)
   })
 })

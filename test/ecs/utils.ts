@@ -14,7 +14,7 @@ import {
   EntityUtils,
   EntityState
 } from '../../packages/@dcl/ecs/src'
-import { compareData } from '../crdt/utils'
+import { compareData, compareStatePayloads } from '../crdt/utils'
 
 export function createNetworkTransport(): Transport {
   async function send(..._args: any[]) {}
@@ -209,11 +209,42 @@ export namespace SandBox {
       }
     })
 
+    function getCrdtStates() {
+      return clients.map((client) => client.engine.getCrdtState())
+    }
+    async function testCrdtSynchronization() {
+      for (const client of clients) {
+        await client.engine.update(1)
+      }
+
+      for (const client of clients) {
+        client.flushOutgoing()
+      }
+
+      for (const client of clients) {
+        await client.engine.update(1)
+      }
+
+      const crdtStateConverged = compareStatePayloads(getCrdtStates())
+      const clientsEngineState = clients.map((client) => ({
+        id: client.id,
+        res: checkCrdtStateWithEngine(client.engine)
+      }))
+      const allConflicts = clientsEngineState
+        .map((item) => item.res.conflicts)
+        .flat(1)
+
+      return {
+        crdtStateConverged,
+        clientsEngineState,
+        allConflicts
+      }
+    }
+
     return {
       clients,
-      getCrdtStates() {
-        return clients.map((client) => client.engine.getCrdtState())
-      }
+      testCrdtSynchronization,
+      getCrdtStates
     }
   }
 

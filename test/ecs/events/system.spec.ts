@@ -252,7 +252,12 @@ describe('Events System', () => {
     fakePointer(entity, PointerEventType.PET_UP, InputAction.IA_ACTION_3)
     await engine.update(1)
     expect(counter).toBe(1)
+
     engine.removeEntity(entity)
+    await engine.update(1)
+
+    fakePointer(entity, PointerEventType.PET_DOWN, InputAction.IA_ACTION_3)
+    fakePointer(entity, PointerEventType.PET_UP, InputAction.IA_ACTION_3)
     await engine.update(1)
     expect(counter).toBe(1)
   })
