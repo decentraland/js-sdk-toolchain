@@ -8,55 +8,55 @@ CALL onStart()
   OPCODES ~= 0.0k
 CALL onUpdate(0.0)
   CRDT: e=512 c=1 t=1 data={"position":{"x":8,"y":3,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
-  CRDT: e=512 c=1090 t=1 data={"billboardMode":1}
-  CRDT: e=512 c=1017 t=1 data={"material":{"$case":"pbr","pbr":{"texture":{"tex":{"$case":"texture","texture":{"src":"models/polaroid2.png"}}}}}}
-  CRDT: e=512 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   CRDT: e=513 c=1 t=1 data={"position":{"x":12,"y":3,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
-  CRDT: e=513 c=1090 t=1 data={}
-  CRDT: e=513 c=1017 t=1 data={"material":{"$case":"pbr","pbr":{"texture":{"tex":{"$case":"texture","texture":{"src":"models/polaroid2.png"}}}}}}
-  CRDT: e=513 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   CRDT: e=514 c=1 t=1 data={"position":{"x":4,"y":3,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
-  CRDT: e=514 c=1017 t=1 data={"material":{"$case":"pbr","pbr":{"texture":{"tex":{"$case":"texture","texture":{"src":"models/polaroid2.png"}}}}}}
-  CRDT: e=514 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   CRDT: e=515 c=1 t=1 data={"position":{"x":8,"y":3,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
-  CRDT: e=515 c=1090 t=1 data={"billboardMode":1,"oppositeDirection":true}
-  CRDT: e=515 c=1017 t=1 data={"material":{"$case":"pbr","pbr":{"texture":{"tex":{"$case":"texture","texture":{"src":"models/polaroid2.png"}}}}}}
-  CRDT: e=515 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   CRDT: e=516 c=1 t=1 data={"position":{"x":12,"y":3,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
-  CRDT: e=516 c=1090 t=1 data={"billboardMode":0,"oppositeDirection":true}
-  CRDT: e=516 c=1017 t=1 data={"material":{"$case":"pbr","pbr":{"texture":{"tex":{"$case":"texture","texture":{"src":"models/polaroid2.png"}}}}}}
-  CRDT: e=516 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   CRDT: e=517 c=1 t=1 data={"position":{"x":4,"y":3,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
-  CRDT: e=517 c=1017 t=1 data={"material":{"$case":"pbr","pbr":{"texture":{"tex":{"$case":"texture","texture":{"src":"models/polaroid2.png"}}}}}}
-  CRDT: e=517 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   CRDT: e=518 c=1 t=1 data={"position":{"x":8,"y":1,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  CRDT: e=518 c=1030 t=1 data={"text":"Regular, only Y-rotation","fontSize":3,"outlineWidth":0.10000000149011612,"outlineColor":{"r":0,"g":0,"b":0},"textColor":{"r":1,"g":0.20000000298023224,"b":0.800000011920929,"a":0.800000011920929}}
   CRDT: e=519 c=1 t=1 data={"position":{"x":12,"y":1,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  CRDT: e=519 c=1030 t=1 data={"text":"Regular","fontSize":3,"outlineWidth":0.10000000149011612,"outlineColor":{"r":0,"g":0,"b":0},"textColor":{"r":1,"g":0.20000000298023224,"b":0.800000011920929,"a":0.800000011920929}}
   CRDT: e=520 c=1 t=1 data={"position":{"x":4,"y":1,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  CRDT: e=520 c=1030 t=1 data={"text":"Without billboard","fontSize":3,"outlineWidth":0.10000000149011612,"outlineColor":{"r":0,"g":0,"b":0},"textColor":{"r":1,"g":0.20000000298023224,"b":0.800000011920929,"a":0.800000011920929}}
   CRDT: e=521 c=1 t=1 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  CRDT: e=521 c=1030 t=1 data={"text":"Opposite, only Y","fontSize":3,"outlineWidth":0.10000000149011612,"outlineColor":{"r":0,"g":0,"b":0},"textColor":{"r":0.800000011920929,"g":0.20000000298023224,"b":1,"a":0.800000011920929}}
   CRDT: e=522 c=1 t=1 data={"position":{"x":12,"y":1,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  CRDT: e=522 c=1030 t=1 data={"text":"Opposite","fontSize":3,"outlineWidth":0.10000000149011612,"outlineColor":{"r":0,"g":0,"b":0},"textColor":{"r":0.800000011920929,"g":0.20000000298023224,"b":1,"a":0.800000011920929}}
   CRDT: e=523 c=1 t=1 data={"position":{"x":4,"y":1,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  CRDT: e=512 c=1090 t=1 data={"billboardMode":1}
+  CRDT: e=513 c=1090 t=1 data={}
+  CRDT: e=516 c=1090 t=1 data={"billboardMode":0,"oppositeDirection":true}
+  CRDT: e=515 c=1090 t=1 data={"billboardMode":1,"oppositeDirection":true}
+  CRDT: e=518 c=1030 t=1 data={"text":"Regular, only Y-rotation","fontSize":3,"outlineWidth":0.10000000149011612,"outlineColor":{"r":0,"g":0,"b":0},"textColor":{"r":1,"g":0.20000000298023224,"b":0.800000011920929,"a":0.800000011920929}}
+  CRDT: e=519 c=1030 t=1 data={"text":"Regular","fontSize":3,"outlineWidth":0.10000000149011612,"outlineColor":{"r":0,"g":0,"b":0},"textColor":{"r":1,"g":0.20000000298023224,"b":0.800000011920929,"a":0.800000011920929}}
+  CRDT: e=520 c=1030 t=1 data={"text":"Without billboard","fontSize":3,"outlineWidth":0.10000000149011612,"outlineColor":{"r":0,"g":0,"b":0},"textColor":{"r":1,"g":0.20000000298023224,"b":0.800000011920929,"a":0.800000011920929}}
+  CRDT: e=521 c=1030 t=1 data={"text":"Opposite, only Y","fontSize":3,"outlineWidth":0.10000000149011612,"outlineColor":{"r":0,"g":0,"b":0},"textColor":{"r":0.800000011920929,"g":0.20000000298023224,"b":1,"a":0.800000011920929}}
+  CRDT: e=522 c=1030 t=1 data={"text":"Opposite","fontSize":3,"outlineWidth":0.10000000149011612,"outlineColor":{"r":0,"g":0,"b":0},"textColor":{"r":0.800000011920929,"g":0.20000000298023224,"b":1,"a":0.800000011920929}}
   CRDT: e=523 c=1030 t=1 data={"text":"Without billboard","fontSize":3,"outlineWidth":0.10000000149011612,"outlineColor":{"r":0,"g":0,"b":0},"textColor":{"r":0.800000011920929,"g":0.20000000298023224,"b":1,"a":0.800000011920929}}
-  OPCODES ~= 179.6k
+  CRDT: e=512 c=1017 t=1 data={"material":{"$case":"pbr","pbr":{"texture":{"tex":{"$case":"texture","texture":{"src":"models/polaroid2.png"}}}}}}
+  CRDT: e=513 c=1017 t=1 data={"material":{"$case":"pbr","pbr":{"texture":{"tex":{"$case":"texture","texture":{"src":"models/polaroid2.png"}}}}}}
+  CRDT: e=514 c=1017 t=1 data={"material":{"$case":"pbr","pbr":{"texture":{"tex":{"$case":"texture","texture":{"src":"models/polaroid2.png"}}}}}}
+  CRDT: e=515 c=1017 t=1 data={"material":{"$case":"pbr","pbr":{"texture":{"tex":{"$case":"texture","texture":{"src":"models/polaroid2.png"}}}}}}
+  CRDT: e=516 c=1017 t=1 data={"material":{"$case":"pbr","pbr":{"texture":{"tex":{"$case":"texture","texture":{"src":"models/polaroid2.png"}}}}}}
+  CRDT: e=517 c=1017 t=1 data={"material":{"$case":"pbr","pbr":{"texture":{"tex":{"$case":"texture","texture":{"src":"models/polaroid2.png"}}}}}}
+  CRDT: e=512 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
+  CRDT: e=513 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
+  CRDT: e=514 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
+  CRDT: e=515 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
+  CRDT: e=516 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
+  CRDT: e=517 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
+  OPCODES ~= 176.1k
 CALL onUpdate(0.1)
   CRDT: e=512 c=1 t=2 data={"position":{"x":8,"y":3.0420734882354736,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=513 c=1 t=2 data={"position":{"x":12,"y":3.0420734882354736,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=516 c=1 t=2 data={"position":{"x":12,"y":3.0420734882354736,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=515 c=1 t=2 data={"position":{"x":8,"y":3.0420734882354736,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
-  OPCODES ~= 12.1k
+  OPCODES ~= 10.7k
 CALL onUpdate(0.1)
   CRDT: e=512 c=1 t=3 data={"position":{"x":8,"y":3.087538480758667,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=513 c=1 t=3 data={"position":{"x":12,"y":3.087538480758667,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=516 c=1 t=3 data={"position":{"x":12,"y":3.087538480758667,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=515 c=1 t=3 data={"position":{"x":8,"y":3.087538480758667,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
-  OPCODES ~= 12.1k
+  OPCODES ~= 10.7k
 CALL onUpdate(0.1)
   CRDT: e=512 c=1 t=4 data={"position":{"x":8,"y":3.0945944786071777,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=513 c=1 t=4 data={"position":{"x":12,"y":3.0945944786071777,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=516 c=1 t=4 data={"position":{"x":12,"y":3.0945944786071777,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=515 c=1 t=4 data={"position":{"x":8,"y":3.0945944786071777,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
-  OPCODES ~= 12.1k
+  OPCODES ~= 10.7k

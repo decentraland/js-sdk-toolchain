@@ -224,8 +224,5 @@ export type IEngine = {
    */
   getCrdtState(): State<Uint8Array>
 
-  /**
-   * @internal
-   */
   componentsDefinition: Map<number, ComponentDefinition<unknown>>
 }

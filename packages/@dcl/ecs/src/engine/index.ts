@@ -21,7 +21,7 @@ import type { IEngine, MapComponentDefinition } from './types'
 export * from './input'
 export * from './readonly'
 export * from './types'
-export { Entity, ByteBuffer, ComponentDefinition, SystemItem }
+export { Entity, ByteBuffer, ComponentDefinition, SystemItem, OnChangeFunction }
 
 type PreEngine = Pick<
   IEngine,
