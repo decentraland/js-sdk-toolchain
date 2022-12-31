@@ -167,8 +167,12 @@ export function crdtSceneSystem(
     for (const [entity, componentsId] of getDirtyMap()) {
       for (const componentId of componentsId) {
         const component = engine.getComponent(componentId)
+
+        // TODO: reuse shared writer to prevent extra allocations of toBinary
         const componentValue =
           component.toBinaryOrNull(entity)?.toBinary() ?? null
+
+        // TODO: do not emit event if componentValue equals the value didn't change
         crdtClient.createEvent(entity as number, componentId, componentValue)
         onProcessEntityComponentChange &&
           onProcessEntityComponentChange(
