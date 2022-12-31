@@ -1,17 +1,25 @@
 import { crdtProtocol, Message as CrdtMessage } from '@dcl/crdt'
 
-import type { IEngine } from '../../engine'
+import type { ComponentDefinition, IEngine } from '../../engine'
 import { Entity } from '../../engine/entity'
 import { createByteBuffer } from '../../serialization/ByteBuffer'
 import { ComponentOperation as Message } from '../../serialization/crdt/componentOperation'
 import WireMessage from '../../serialization/wireMessage'
 import { ReceiveMessage, TransportMessage, Transport } from './types'
 
+export type OnChangeFunction = (
+  entity: Entity,
+  component: ComponentDefinition<any>,
+  componentId: number,
+  operation: WireMessage.Enum
+) => void
+
 export function crdtSceneSystem(
   engine: Pick<
     IEngine,
     'getComponentOrNull' | 'getComponent' | 'componentsDefinition'
-  >
+  >,
+  onProcessEntityComponentChange: OnChangeFunction | null
 ) {
   const transports: Transport[] = []
 
@@ -126,10 +134,16 @@ export function crdtSceneSystem(
           const data = createByteBuffer(opts)
           component.upsertFromBinary(message.entity, data, false)
         }
+
+        onProcessEntityComponentChange &&
+          onProcessEntityComponentChange(entity, component, componentId, type)
       }
     }
   }
 
+  /**
+   * TODO: Measure allocations of this function
+   */
   function getDirtyMap() {
     const dirtySet = new Map<Entity, Set<number>>()
     for (const [componentId, definition] of engine.componentsDefinition) {
@@ -145,6 +159,8 @@ export function crdtSceneSystem(
 
   /**
    * Updates CRDT state of the current engine dirty components
+   *
+   * TODO: optimize this function allocations using a bitmap
    */
   function updateState() {
     const dirtyEntities = getDirtyMap()
@@ -154,6 +170,15 @@ export function crdtSceneSystem(
         const componentValue =
           component.toBinaryOrNull(entity)?.toBinary() ?? null
         crdtClient.createEvent(entity as number, componentId, componentValue)
+        onProcessEntityComponentChange &&
+          onProcessEntityComponentChange(
+            entity,
+            component,
+            componentId,
+            componentValue === null
+              ? WireMessage.Enum.DELETE_COMPONENT
+              : WireMessage.Enum.PUT_COMPONENT
+          )
       }
     }
     return dirtyEntities

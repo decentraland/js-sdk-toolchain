@@ -4,7 +4,7 @@ import { Schemas } from '../schemas'
 import { ISchema } from '../schemas/ISchema'
 import { MapResult, Spec } from '../schemas/Map'
 import { ByteBuffer } from '../serialization/ByteBuffer'
-import { crdtSceneSystem } from '../systems/crdt'
+import { crdtSceneSystem, OnChangeFunction } from '../systems/crdt'
 import {
   ComponentDefinition,
   defineComponent as defComponent
@@ -233,9 +233,16 @@ function preEngine(): PreEngine {
 /**
  * @public
  */
-export function Engine(): IEngine {
+export type IEngineOptions = {
+  onChangeFunction: OnChangeFunction
+}
+
+/**
+ * @public
+ */
+export function Engine(options?: IEngineOptions): IEngine {
   const engine = preEngine()
-  const crdtSystem = crdtSceneSystem(engine)
+  const crdtSystem = crdtSceneSystem(engine, options?.onChangeFunction || null)
 
   async function update(dt: number) {
     await crdtSystem.receiveMessages()
