@@ -384,8 +384,8 @@ export type Color4Type = {
 //
 // @public (undocumented)
 export type CommonProps = {
-    key: Key;
-    children: Children;
+    key?: Key;
+    children?: Children;
 };
 
 // @public (undocumented)
@@ -579,7 +579,7 @@ export type EntityContainer = {
 export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
     uiBackground?: UiBackgroundProps;
-} & Listeners;
+} & Listeners & Pick<CommonProps, 'key'>;
 
 // @public (undocumented)
 export enum EntityState {

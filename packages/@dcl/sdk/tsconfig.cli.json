@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "declaration": true,
+    "stripInternal": true,
+    "types": [
+      "node",
+    ],
+    "outDir": "./cli"
+  },
+  "include": ["cli"],
+  "exclude": ["dist"],
+  "extends": "./types/tsconfig.ecs7.strict.json"
+}
