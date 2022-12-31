@@ -26,14 +26,16 @@ export function dataCompare<T>(a: T, b: T): number {
   if (a !== null && b === null) return 1
 
   if (a instanceof Uint8Array && b instanceof Uint8Array) {
+    let res: number
     const n = a.byteLength > b.byteLength ? b.byteLength : a.byteLength
     for (let i = 0; i < n; i++) {
-      const res = a[i] - b[i]
+      res = a[i] - b[i]
       if (res !== 0) {
-        return Math.sign(res)
+        return res > 0 ? 1 : -1
       }
     }
-    return Math.sign(a.byteLength - b.byteLength)
+    res = a.byteLength - b.byteLength
+    return res > 0 ? 1 : res < 0 ? -1 : 0
   }
 
   if (globalBuffer) {
