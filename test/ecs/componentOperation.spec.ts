@@ -12,12 +12,10 @@ const putType = WireMessage.Enum.PUT_COMPONENT
 describe('Component operation tests', () => {
   it('validate corrupt message', () => {
     const buf = createByteBuffer({
-      reading: {
-        buffer: new Uint8Array([
-          255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
-        ]),
-        currentOffset: 0
-      }
+      buffer: new Uint8Array([
+        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
+      ]),
+      readingOffset: 0
     })
 
     expect(WireMessage.validate(buf)).toBe(false)

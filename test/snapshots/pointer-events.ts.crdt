@@ -19,10 +19,10 @@ CALL onUpdate(0.0)
   CRDT: e=512 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   CRDT: e=513 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   CRDT: e=514 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-  OPCODES ~= 35.6k
+  OPCODES ~= 36.0k
 CALL onUpdate(0.1)
-  OPCODES ~= 2.0k
+  OPCODES ~= 2.1k
 CALL onUpdate(0.1)
-  OPCODES ~= 2.0k
+  OPCODES ~= 2.1k
 CALL onUpdate(0.1)
-  OPCODES ~= 2.0k
+  OPCODES ~= 2.1k

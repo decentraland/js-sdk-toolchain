@@ -7,10 +7,10 @@ test/snapshots/schema-components.js
 CALL onStart()
   OPCODES ~= 0.0k
 CALL onUpdate(0.0)
-  OPCODES ~= 4.5k
+  OPCODES ~= 4.6k
 CALL onUpdate(0.1)
-  OPCODES ~= 0.9k
+  OPCODES ~= 1.0k
 CALL onUpdate(0.1)
-  OPCODES ~= 0.9k
+  OPCODES ~= 1.0k
 CALL onUpdate(0.1)
-  OPCODES ~= 0.9k
+  OPCODES ~= 1.0k

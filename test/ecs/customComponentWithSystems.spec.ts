@@ -17,7 +17,7 @@ function connectEngines(a: IEngine, b: IEngine) {
 
   function intercept(data: Uint8Array, direction: string) {
     const buffer = createByteBuffer({
-      reading: { buffer: data, currentOffset: 0 }
+      buffer: data
     })
 
     while (WireMessage.validate(buffer)) {

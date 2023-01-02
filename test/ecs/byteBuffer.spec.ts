@@ -37,10 +37,8 @@ describe('ByteBuffer tests', () => {
 
   it('should test bounds conditions', () => {
     const buf = createByteBuffer({
-      reading: {
-        buffer: new Uint8Array([1, 2]),
-        currentOffset: 2
-      }
+      buffer: new Uint8Array([1, 2]),
+      readingOffset: 2
     })
 
     expect(() => {
@@ -58,10 +56,8 @@ describe('ByteBuffer tests', () => {
 
   it('should write options and endianess', () => {
     const buf = createByteBuffer({
-      writing: {
-        buffer: new Uint8Array([0, 200, 0, 200]),
-        currentOffset: 2
-      }
+      buffer: new Uint8Array([0, 200, 0, 200]),
+      writeOffset: 2
     })
 
     expect(buf.size()).toBe(2)
@@ -75,10 +71,8 @@ describe('ByteBuffer tests', () => {
 
   it('should not fail using the view wrapper after a grow', () => {
     const buf = createByteBuffer({
-      writing: {
-        buffer: new Uint8Array([0, 200, 0, 200]),
-        currentOffset: 2
-      }
+      buffer: new Uint8Array([0, 200, 0, 200]),
+      writeOffset: 2
     })
 
     expect(buf.buffer().byteLength).toBe(4)
@@ -95,20 +89,16 @@ describe('ByteBuffer tests', () => {
     arr[3] = 0xde
 
     const buf = createByteBuffer({
-      writing: {
-        buffer: arr.subarray(512),
-        currentOffset: 0
-      }
+      buffer: arr.subarray(512),
+      writeOffset: 0
     })
     expect(buf.getUint32(0)).toBe(0)
   })
 
   it('should fails using the view after a grow', () => {
     const buf = createByteBuffer({
-      writing: {
-        buffer: new Uint8Array([0, 200, 0, 200]),
-        currentOffset: 2
-      }
+      buffer: new Uint8Array([0, 200, 0, 200]),
+      writeOffset: 2
     })
 
     expect(buf.buffer().byteLength).toBe(4)

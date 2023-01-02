@@ -68,10 +68,7 @@ async function run(fileName: string) {
             // console.dir(payload)
 
             const buffer = createByteBuffer({
-              reading: {
-                buffer: new Uint8Array(Object.values(payload.data)),
-                currentOffset: 0
-              }
+              buffer: new Uint8Array(Object.values(payload.data))
             })
 
             while (WireMessage.validate(buffer)) {
@@ -85,10 +82,7 @@ async function run(fileName: string) {
                   data &&
                     c.deserialize(
                       createByteBuffer({
-                        reading: {
-                          buffer: data,
-                          currentOffset: 0
-                        }
+                        buffer: data
                       })
                     )
                 )}`
