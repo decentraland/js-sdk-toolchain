@@ -46,7 +46,7 @@ export function crdtSceneSystem(
      */
     return function parseChunkMessage(chunkMessage: Uint8Array) {
       const buffer = createByteBuffer({
-        reading: { buffer: chunkMessage, currentOffset: 0 }
+        buffer: chunkMessage
       })
 
       while (WireMessage.validate(buffer)) {
@@ -130,10 +130,7 @@ export function crdtSceneSystem(
         if (type === WireMessage.Enum.DELETE_COMPONENT) {
           component.deleteFrom(entity, false)
         } else {
-          const opts = {
-            reading: { buffer: message.data!, currentOffset: 0 }
-          }
-          const data = createByteBuffer(opts)
+          const data = createByteBuffer({ buffer: message.data! })
           component.upsertFromBinary(message.entity, data, false)
         }
 

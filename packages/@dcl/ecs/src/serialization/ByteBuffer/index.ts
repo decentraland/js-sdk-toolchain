@@ -48,10 +48,21 @@ export type ReadBufferOptions = {
   }
 }
 
-export type CreateByteBufferOptions =
-  | WriteBufferOptions
-  | ReadBufferOptions
-  | {}
+export type CreateByteBufferOptions = {
+  /**
+   * The initial buffer, provide a buffer if you need to set "initial capacity"
+   */
+  buffer: Uint8Array
+  /**
+   * Set the cursor where begins to read. Default 0
+   */
+  readingOffset?: number
+  /**
+   * Set the cursor to not start writing from the begin of it.
+   * Defaults to the buffer size
+   */
+  writeOffset?: number
+}
 
 const defaultInitialCapacity = 10240
 
@@ -61,26 +72,12 @@ class ReadWriteByteBuffer implements ByteBuffer {
   woffset: number
   roffset: number
 
-  constructor(options: CreateByteBufferOptions) {
-    let initialROffset: number = 0
-    let initialWOffset: number = 0
-    let initialBuffer: Uint8Array | null = null
-
-    if ('writing' in options) {
-      initialBuffer = options.writing.buffer
-      initialWOffset = options.writing.currentOffset || 0
-    } else if ('reading' in options) {
-      initialBuffer = options.reading.buffer
-      initialROffset = options.reading.currentOffset || 0
-      initialWOffset = options.reading.length || options.reading.buffer.length
-    } else {
-      initialBuffer = new Uint8Array(defaultInitialCapacity)
-    }
-
-    this._buffer = initialBuffer
+  constructor(options?: CreateByteBufferOptions) {
+    this._buffer =
+      options?.buffer || new Uint8Array(defaultInitialCapacity)
     this.view = new DataView(this._buffer.buffer, this._buffer.byteOffset)
-    this.woffset = initialWOffset
-    this.roffset = initialROffset
+    this.woffset = options?.writeOffset ?? options?.buffer.length ?? 0
+    this.roffset = options?.readingOffset ?? 0
   }
 
   /**
@@ -94,8 +91,9 @@ class ReadWriteByteBuffer implements ByteBuffer {
       )
       const newBuffer = new Uint8Array(newsize)
       newBuffer.set(this._buffer)
+      const oldOffset = this._buffer.byteOffset
       this._buffer = newBuffer
-      this.view = new DataView(this._buffer.buffer)
+      this.view = new DataView(this._buffer.buffer, oldOffset)
     }
 
     this.woffset += amount
@@ -317,7 +315,7 @@ class ReadWriteByteBuffer implements ByteBuffer {
  * - Use set and get only if you are sure that you're doing.
  */
 export function createByteBuffer(
-  options: CreateByteBufferOptions = {}
+  options?: CreateByteBufferOptions
 ): ByteBuffer {
   return new ReadWriteByteBuffer(options)
 }
