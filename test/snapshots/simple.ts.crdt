@@ -1,4 +1,4 @@
-(start empty vm)
+(start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0.0k
   MALLOC_COUNT = 1005
   ALIVE_OBJS_DELTA ~= 0.19k

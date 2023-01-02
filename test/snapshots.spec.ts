@@ -7,6 +7,7 @@ import path from 'path'
 import glob from 'glob'
 import { exec } from 'child_process'
 import { withQuickJsVm } from './vm'
+import { version as vmVersion } from '@dcl/quickjs-emscripten/package.json'
 
 const ENV: Record<string, string> = { ...process.env } as any
 const writeToFile = process.env.UPDATE_SNAPSHOTS
@@ -41,7 +42,7 @@ function testFileSnapshot(fileName: string, workingDirectory: string) {
 
 async function run(fileName: string) {
   return withQuickJsVm(async (vm) => {
-    const out: string[] = ['(start empty vm)']
+    const out: string[] = [`(start empty vm ${vmVersion})`]
 
     vm.provide({
       log(...args) {
