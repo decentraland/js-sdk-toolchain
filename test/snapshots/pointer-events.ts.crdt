@@ -3,7 +3,7 @@ test/snapshots/pointer-events.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 13.8k
+  OPCODES ~= 13.9k
 CALL onStart()
   OPCODES ~= 0.0k
 CALL onUpdate(0.0)
@@ -19,10 +19,10 @@ CALL onUpdate(0.0)
   CRDT: e=512 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   CRDT: e=513 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   CRDT: e=514 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-  OPCODES ~= 34.4k
+  OPCODES ~= 35.6k
 CALL onUpdate(0.1)
-  OPCODES ~= 2.4k
+  OPCODES ~= 2.0k
 CALL onUpdate(0.1)
-  OPCODES ~= 2.4k
+  OPCODES ~= 2.0k
 CALL onUpdate(0.1)
-  OPCODES ~= 2.4k
+  OPCODES ~= 2.0k

@@ -13,68 +13,74 @@ function getNextSize(currentSize: number, intendedSize: number) {
 }
 
 /**
- * @param writing - writing option, see object specs.
- * @param reading - reading option, see object specs.
- * @param initialCapacity - Initial capacity of buffer to allocate, ignored if you use writing or reading options
+ * Creates a writable buffer
  */
-export interface CreateByteBufferOptions {
-  /**
-   * @param buffer - a buffer already allocated to read from there.
-   * @param currentOffset - set the cursor where begins to read. Default 0
-   * @param length - delimite where the valid data ends. Default: buffer.length
-   */
-  reading?: {
+export type WriteBufferOptions = {
+  writing: {
+    /**
+     *  a buffer already allocated to write
+     */
     buffer: Uint8Array
-    length?: number
-    currentOffset: number
-  }
-
-  /**
-   * @param buffer - a buffer already allocated to write there.
-   * @param currentOffset - set the cursor to not start writing from the begin of it. Default 0
-   */
-  writing?: {
-    buffer: Uint8Array
+    /**
+     * set the cursor to not start writing from the begin of it. Default 0
+     */
     currentOffset?: number
   }
-
-  initialCapacity?: number
 }
+
+/**
+ * Creates a writable buffer
+ */
+export type ReadBufferOptions = {
+  reading: {
+    /**
+     * a buffer already allocated to read from there.
+     */
+    buffer: Uint8Array
+    /**
+     * delimite where the valid data ends. Default: buffer.length
+     */
+    length?: number
+    /**
+     * set the cursor where begins to read. Default 0
+     */
+    currentOffset: number
+  }
+}
+
+export type CreateByteBufferOptions =
+  | WriteBufferOptions
+  | ReadBufferOptions
+  | {}
 
 const defaultInitialCapacity = 10240
 
 class ReadWriteByteBuffer implements ByteBuffer {
-  initialROffset: number
-  initialBuffer: Uint8Array | null = null
-  initialWOffset: number = 0
-
   _buffer: Uint8Array
   view: DataView
   woffset: number
   roffset: number
 
   constructor(options: CreateByteBufferOptions) {
-    this.initialROffset = options.reading?.currentOffset || 0
+    let initialROffset: number = 0
+    let initialWOffset: number = 0
+    let initialBuffer: Uint8Array | null = null
 
-    if (options.writing) {
-      this.initialBuffer = options.writing.buffer
-      if (options.writing.currentOffset) {
-        this.initialWOffset = options.writing.currentOffset
-      }
-    } else if (options.reading) {
-      this.initialBuffer = options.reading.buffer
-      this.initialWOffset =
-        options.reading.length || options.reading.buffer.length
+    if ('writing' in options) {
+      initialBuffer = options.writing.buffer
+      initialWOffset = options.writing.currentOffset || 0
+    } else if ('reading' in options) {
+      initialBuffer = options.reading.buffer
+      initialROffset = options.reading.currentOffset || 0
+      initialWOffset = options.reading.length || options.reading.buffer.length
     } else {
-      this.initialBuffer = new Uint8Array(
-        options.initialCapacity || defaultInitialCapacity
-      )
+      initialBuffer = new Uint8Array(defaultInitialCapacity)
     }
 
-    this._buffer = this.initialBuffer!
+    this._buffer = initialBuffer
     this.view = new DataView(this._buffer.buffer, this._buffer.byteOffset)
-    this.woffset = this.initialWOffset
-    this.roffset = this.initialROffset
+    this.woffset = initialWOffset
+    this.roffset = initialROffset
   }
 
   /**

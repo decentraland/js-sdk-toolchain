@@ -3,15 +3,15 @@ test/snapshots/cube.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 9.6k
+  OPCODES ~= 9.8k
 CALL onStart()
   OPCODES ~= 0.0k
 CALL onUpdate(0.0)
   CRDT: e=512 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 4.5k
+  OPCODES ~= 5.2k
 CALL onUpdate(0.1)
-  OPCODES ~= 1.4k
+  OPCODES ~= 1.0k
 CALL onUpdate(0.1)
-  OPCODES ~= 1.4k
+  OPCODES ~= 1.0k
 CALL onUpdate(0.1)
-  OPCODES ~= 1.4k
+  OPCODES ~= 1.0k

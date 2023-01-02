@@ -3,7 +3,7 @@ test/snapshots/billboard.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 18.9k
+  OPCODES ~= 19.1k
 CALL onStart()
   OPCODES ~= 0.0k
 CALL onUpdate(0.0)
@@ -41,22 +41,22 @@ CALL onUpdate(0.0)
   CRDT: e=515 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   CRDT: e=516 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   CRDT: e=517 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
-  OPCODES ~= 175.6k
+  OPCODES ~= 178.6k
 CALL onUpdate(0.1)
   CRDT: e=512 c=1 t=2 data={"position":{"x":8,"y":3.0420734882354736,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=513 c=1 t=2 data={"position":{"x":12,"y":3.0420734882354736,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=516 c=1 t=2 data={"position":{"x":12,"y":3.0420734882354736,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=515 c=1 t=2 data={"position":{"x":8,"y":3.0420734882354736,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
-  OPCODES ~= 10.4k
+  OPCODES ~= 10.6k
 CALL onUpdate(0.1)
   CRDT: e=512 c=1 t=3 data={"position":{"x":8,"y":3.087538480758667,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=513 c=1 t=3 data={"position":{"x":12,"y":3.087538480758667,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=516 c=1 t=3 data={"position":{"x":12,"y":3.087538480758667,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=515 c=1 t=3 data={"position":{"x":8,"y":3.087538480758667,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
-  OPCODES ~= 10.4k
+  OPCODES ~= 10.6k
 CALL onUpdate(0.1)
   CRDT: e=512 c=1 t=4 data={"position":{"x":8,"y":3.0945944786071777,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=513 c=1 t=4 data={"position":{"x":12,"y":3.0945944786071777,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=516 c=1 t=4 data={"position":{"x":12,"y":3.0945944786071777,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   CRDT: e=515 c=1 t=4 data={"position":{"x":8,"y":3.0945944786071777,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
-  OPCODES ~= 10.4k
+  OPCODES ~= 10.6k
