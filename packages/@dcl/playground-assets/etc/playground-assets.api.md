@@ -590,7 +590,7 @@ export type EcsElements = {
 };
 
 // @public (undocumented)
-export function Engine(): IEngine;
+export function Engine(options?: IEngineOptions): IEngine;
 
 // Warning: (ae-missing-release-tag) "engine" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -769,6 +769,12 @@ export type IEngine = {
     readonly PlayerEntity: Entity;
     readonly CameraEntity: Entity;
     addTransport(transport: Transport): void;
+    componentsIter(): Iterable<ComponentDefinition<unknown>>;
+};
+
+// @public (undocumented)
+export type IEngineOptions = {
+    onChangeFunction: OnChangeFunction;
 };
 
 // @public (undocumented)
@@ -1434,6 +1440,9 @@ export class ObserverEventState {
     // (undocumented)
     target?: any;
 }
+
+// @public (undocumented)
+export type OnChangeFunction = (entity: Entity, component: ComponentDefinition<any>, operation: WireMessage.Enum) => void;
 
 // Warning: (ae-missing-release-tag) "onCommsMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

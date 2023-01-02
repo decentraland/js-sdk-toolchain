@@ -141,6 +141,8 @@ describe('CRDT tests', () => {
     await clientA.engine.update(1 / 30)
     expect(PositionB.has(entityA)).toBe(false)
 
+    expect(clientB.operations).toBeDeepCloseTo([])
+
     // Update engine, process crdt messages.
     await wait(SandBox.WS_SEND_DELAY)
     await clientB.engine.update(1 / 30)
@@ -149,6 +151,15 @@ describe('CRDT tests', () => {
     expect(posA).toBeDeepCloseTo(PositionB.get(entityA))
     expect(clientA.spySend).toBeCalledTimes(1)
     expect(clientB.spySend).toBeCalledTimes(1)
+
+    expect(clientA.operations).toBeDeepCloseTo([
+      { entity: entityA, value: SandBox.DEFAULT_POSITION },
+      { entity: entityA, value: { x: 10.231231, y: 0.12321321312 } }
+    ])
+    expect(clientB.operations).toBeDeepCloseTo([
+      { entity: entityA, value: SandBox.DEFAULT_POSITION },
+      { entity: entityA, value: { x: 10.231231, y: 0.12321321312 } }
+    ])
   })
 
   it('create multiple clients with the same code. Just like a scene', async () => {

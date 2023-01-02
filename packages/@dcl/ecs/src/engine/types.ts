@@ -20,10 +20,10 @@ export type Unpacked<T> = T extends (infer U)[] ? U : T
 export type ComponentSchema<
   T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]
 > = {
-  [K in keyof T]: T[K] extends ComponentDefinition<any>
+    [K in keyof T]: T[K] extends ComponentDefinition<any>
     ? ReturnType<T[K]['getMutable']>
     : never
-}
+  }
 
 export interface MapComponentDefinition<T> extends ComponentDefinition<T> {
   /**
@@ -226,6 +226,7 @@ export type IEngine = {
 
   /**
    * @internal
+   * Returns the crdt state. For now only for testing purpose
    */
   componentsDefinition: Map<number, ComponentDefinition<unknown>>
 
@@ -234,4 +235,10 @@ export type IEngine = {
    * Entity continaer
    */
   entityContainer: EntityContainer
+
+  /**
+   * @internal
+   * Iterator of registered components
+   */
+  componentsIter(): Iterable<ComponentDefinition<unknown>>
 }

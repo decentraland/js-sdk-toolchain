@@ -5,8 +5,8 @@ import {
   ProcessMessageResultType
 } from '@dcl/crdt/dist/types'
 
-import type { IEngine } from '../../engine'
 import { Entity, EntityState, EntityUtils } from '../../engine/entity'
+import type { ComponentDefinition, IEngine } from '../../engine'
 import { createByteBuffer } from '../../serialization/ByteBuffer'
 import CrdtMessageProtocol from '../../serialization/crdt'
 import { DeleteComponent } from '../../serialization/crdt/deleteComponent'
@@ -18,6 +18,15 @@ import {
 } from '../../serialization/crdt/types'
 import { ReceiveMessage, Transport, TransportMessage } from './types'
 
+/**
+ * @public
+ */
+export type OnChangeFunction = (
+  entity: Entity,
+  component: ComponentDefinition<any>,
+  operation: CrdtMessageType
+) => void
+
 export function crdtSceneSystem(
   engine: Pick<
     IEngine,
@@ -25,7 +34,9 @@ export function crdtSceneSystem(
     | 'getComponent'
     | 'componentsDefinition'
     | 'entityContainer'
-  >
+    | 'componentsIter'
+  >,
+  onProcessEntityComponentChange: OnChangeFunction | null
 ) {
   const transports: Transport[] = []
 
@@ -120,6 +131,7 @@ export function crdtSceneSystem(
     const entitiesShouldBeCleaned: Entity[] = []
 
     for (const msg of messagesToProcess) {
+      // TODO: emit delete entity to el onCrdtMessage
       if (msg.type === CrdtMessageType.DELETE_ENTITY) {
         crdtClient.processMessage({
           type: CRDTMessageType.CRDTMT_DeleteEntity,
@@ -128,6 +140,7 @@ export function crdtSceneSystem(
 
         entitiesShouldBeCleaned.push(msg.entityId)
       } else {
+        // TODO: emit pu/delete component to el onCrdtMessage
         const crdtMessage: ComponentDataMessage<Uint8Array> = {
           type: CRDTMessageType.CRDTMT_PutComponentData,
           entityId: msg.entityId,
@@ -178,6 +191,8 @@ export function crdtSceneSystem(
               const data = createByteBuffer(opts)
               component.upsertFromBinary(msg.entityId, data, false)
             }
+
+
             break
 
           // CRDT outdated message. Resend this message to the transport
@@ -226,6 +241,7 @@ export function crdtSceneSystem(
       }
     }
 
+    // TODO: emit delete entity to el onCrdtMessage
     for (const entity of entitiesShouldBeCleaned) {
       // If we tried to resend outdated message and the entity was deleted before, we avoid sending them.
       for (let i = outdatedMessages.length - 1; i >= 0; i--) {
@@ -242,75 +258,84 @@ export function crdtSceneSystem(
     }
   }
 
-  function getDirtyMap() {
-    const dirtySet = new Map<Entity, Set<number>>()
-    for (const [componentId, definition] of engine.componentsDefinition) {
-      for (const entity of definition.dirtyIterator()) {
-        if (!dirtySet.has(entity)) {
-          dirtySet.set(entity, new Set())
-        }
-        dirtySet.get(entity)!.add(componentId)
-      }
-    }
-    return dirtySet
-  }
 
   /**
    * Updates CRDT state of the current engine dirty components
+   *
+   * TODO: optimize this function allocations using a bitmap
+   * TODO: unify this function with sendMessages
    */
   function updateState() {
-    const dirtyEntities = getDirtyMap()
-    for (const [entity, componentsId] of dirtyEntities) {
-      for (const componentId of componentsId) {
-        const component = engine.getComponent(componentId)
+    const dirtyMap = new Map<ComponentDefinition<unknown>, Array<Entity>>()
+    for (const component of engine.componentsIter()) {
+      let entitySet: Array<Entity> | null = null
+      for (const entity of component.dirtyIterator()) {
+        if (!entitySet) {
+          entitySet = []
+          dirtyMap.set(component, entitySet)
+        }
+        entitySet.push(entity)
+
+        // TODO: reuse shared writer to prevent extra allocations of toBinary
         const componentValue =
           component.toBinaryOrNull(entity)?.toBinary() ?? null
 
+        // TODO: do not emit event if componentValue equals the value didn't change
         // if update goes bad, the entity doesn't accept put anymore (it's added to deleted entities set)
         if (
           crdtClient.createComponentDataEvent(
-            componentId,
+            component._id,
             entity as number,
             componentValue
           ) === null
         ) {
           component.deleteFrom(entity, false)
-          componentsId.delete(componentId)
+          // componentsId.delete(componentId)
         }
+
+        // TODO: add this logic
+        // onProcessEntityComponentChange &&
+        // onProcessEntityComponentChange(
+        //   entity,
+        //   component,
+        //   componentValue === null
+        //     ? CrdtMessageType.Enum.DELETE_COMPONENT
+        //     : CrdtMessageType.Enum.PUT_COMPONENT
+        // )
+
       }
     }
-
-    return dirtyEntities
+    return dirtyMap
   }
 
   /**
    * Iterates the dirty map and generates crdt messages to be send
    */
   async function sendMessages(
-    dirtyEntities: Map<Entity, Set<number>>,
+    dirtyEntities: Map<ComponentDefinition<unknown>, Array<Entity>>,
     deletedEntities: Entity[]
   ) {
     // CRDT Messages will be the merge between the recieved transport messages and the new crdt messages
     const crdtMessages = getMessages(broadcastMessages)
     const outdatedMessagesBkp = getMessages(outdatedMessages)
     const buffer = createByteBuffer()
-    for (const [entity, componentsId] of dirtyEntities) {
-      for (const componentId of componentsId) {
+    for (const [component, entities] of dirtyEntities) {
+      for (const entity of entities) {
         // Component will be always defined here since dirtyMap its an iterator of engine.componentsDefinition
-        const component = engine.getComponent(componentId)
         const { timestamp } = crdtClient
           .getState()
-          .components.get(componentId)!
+          .components.get(component._id)!
           .get(entity as number)!
+
         const offset = buffer.currentWriteOffset()
         const type: CrdtMessageType = component.has(entity)
           ? CrdtMessageType.PUT_COMPONENT
           : CrdtMessageType.DELETE_COMPONENT
         const transportMessage = {
           type,
-          timestamp,
           entityId: entity,
-          componentId
+          componentId: component._id,
+          timestamp
         }
 
         // Avoid creating messages if there is no transport that will handle it

@@ -4,7 +4,7 @@ import { Schemas } from '../schemas'
 import { ISchema } from '../schemas/ISchema'
 import { MapResult, Spec } from '../schemas/Map'
 import { ByteBuffer } from '../serialization/ByteBuffer'
-import { crdtSceneSystem } from '../systems/crdt'
+import { crdtSceneSystem, OnChangeFunction } from '../systems/crdt'
 import {
   ComponentDefinition,
   defineComponent as defComponent
@@ -21,7 +21,7 @@ import type { IEngine, MapComponentDefinition } from './types'
 export * from './input'
 export * from './readonly'
 export * from './types'
-export { Entity, ByteBuffer, ComponentDefinition, SystemItem }
+export { Entity, ByteBuffer, ComponentDefinition, SystemItem, OnChangeFunction }
 
 type PreEngine = Pick<
   IEngine,
@@ -39,6 +39,7 @@ type PreEngine = Pick<
   | 'removeComponentDefinition'
   | 'componentsDefinition'
   | 'entityContainer'
+  | 'componentsIter'
 > & {
   getSystems: () => SystemItem[]
 }
@@ -179,6 +180,10 @@ function preEngine(): PreEngine {
     return systems.getSystems()
   }
 
+  function componentsIter() {
+    return componentsDefinition.values()
+  }
+
   function removeComponentDefinition(componentId: number) {
     componentsDefinition.delete(componentId)
   }
@@ -222,16 +227,24 @@ function preEngine(): PreEngine {
     removeComponentDefinition,
     removeEntityWithChildren,
     registerCustomComponent,
-    entityContainer
+    entityContainer,
+    componentsIter
   }
 }
 
 /**
  * @public
  */
-export function Engine(): IEngine {
+export type IEngineOptions = {
+  onChangeFunction: OnChangeFunction
+}
+
+/**
+ * @public
+ */
+export function Engine(options?: IEngineOptions): IEngine {
   const engine = preEngine()
-  const crdtSystem = crdtSceneSystem(engine)
+  const crdtSystem = crdtSceneSystem(engine, options?.onChangeFunction || null)
 
   async function update(dt: number) {
     await crdtSystem.receiveMessages()
@@ -239,8 +252,7 @@ export function Engine(): IEngine {
       const ret: unknown | Promise<unknown> = system.fn(dt)
       checkNotThenable(
         ret,
-        `A system (${
-          system.name || 'anonymous'
+        `A system (${system.name || 'anonymous'
         }) returned a thenable. Systems cannot be async functions. Documentation: https://dcl.gg/sdk/sync-systems`
       )
     }
@@ -266,6 +278,7 @@ export function Engine(): IEngine {
     getComponent: engine.getComponent,
     getComponentOrNull: engine.getComponentOrNull,
     removeComponentDefinition: engine.removeComponentDefinition,
+    componentsIter: engine.componentsIter,
     update,
 
     RootEntity: 0 as Entity,
