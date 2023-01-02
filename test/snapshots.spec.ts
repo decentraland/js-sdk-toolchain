@@ -15,7 +15,9 @@ describe('Runs the snapshots', () => {
   it('runs npm install in the target folder', async () => {
     await runCommand('npm install --silent', 'test/snapshots', ENV)
   }, 15000)
-  glob.sync('test/snapshots/*.ts', { absolute: false }).forEach((file) => testFileSnapshot(file, 'test/snapshots'))
+  glob
+    .sync('test/snapshots/*.ts', { absolute: false })
+    .forEach((file) => testFileSnapshot(file, 'test/snapshots'))
 })
 
 function testFileSnapshot(fileName: string, workingDirectory: string) {
@@ -25,7 +27,9 @@ function testFileSnapshot(fileName: string, workingDirectory: string) {
 
     const compareToFileName = fileName + '.crdt'
     const compareFileExists = existsSync(compareToFileName)
-    const compareTo = compareFileExists ? readFileSync(compareToFileName).toString().replace(/\r\n/g, '\n') : ''
+    const compareTo = compareFileExists
+      ? readFileSync(compareToFileName).toString().replace(/\r\n/g, '\n')
+      : ''
     if (writeToFile || !compareFileExists) {
       writeFileSync(compareToFileName, result)
     }
@@ -48,7 +52,8 @@ async function run(fileName: string) {
       },
       require(moduleName) {
         out.push('  REQUIRE: ' + moduleName)
-        if (moduleName !== '~system/EngineApi') throw new Error('Unknown module')
+        if (moduleName !== '~system/EngineApi')
+          throw new Error('Unknown module')
         return {
           async subscribe(event: string) {
             out.push(`  SUBSCRIBE-TO: ${event}`)
@@ -57,7 +62,9 @@ async function run(fileName: string) {
           async sendBatch() {
             return { events: [] }
           },
-          async crdtSendToRenderer(payload: { data: Uint8Array }): Promise<{ data: Uint8Array[] }> {
+          async crdtSendToRenderer(payload: {
+            data: Uint8Array
+          }): Promise<{ data: Uint8Array[] }> {
             // console.dir(payload)
 
             const buffer = createByteBuffer({
@@ -110,7 +117,10 @@ async function run(fileName: string) {
         })
         .filter(($) => $.count > 10)
 
-      out.push('  OPCODES ~= ' + hundredsNotation(opcodes.reduce(($, $$) => $ + $$.count, 0n)))
+      out.push(
+        '  OPCODES ~= ' +
+          hundredsNotation(opcodes.reduce(($, $$) => $ + $$.count, 0n))
+      )
 
       const deltaAllocations = memory.malloc_count - prevAllocations
       prevAllocations = memory.malloc_count
@@ -160,19 +170,37 @@ async function run(fileName: string) {
 
 async function compile(filename: string, workingDirectory: string) {
   const cwd = path.resolve(workingDirectory)
-  await runCommand(`npm run build --silent -- --single ${JSON.stringify(path.relative(cwd, filename))}`, cwd, ENV)
+  await runCommand(
+    `npm run build --silent -- --single ${JSON.stringify(
+      path.relative(cwd, filename)
+    )}`,
+    cwd,
+    ENV
+  )
 }
 
-export function runCommand(command: string, cwd: string, env?: Record<string, string>): Promise<string> {
+export function runCommand(
+  command: string,
+  cwd: string,
+  env?: Record<string, string>
+): Promise<string> {
   return new Promise<string>((onSuccess, onError) => {
     process.stdout.write(
-      '\u001b[36min ' + path.relative(process.cwd(), cwd) + ':\u001b[0m ' + path.relative(process.cwd(), command) + '\n'
+      '\u001b[36min ' +
+        path.relative(process.cwd(), cwd) +
+        ':\u001b[0m ' +
+        path.relative(process.cwd(), command) +
+        '\n'
     )
     exec(command, { cwd, env }, (error, stdout, stderr) => {
-      stdout.trim().length && process.stdout.write('  ' + stdout.replace(/\n/g, '\n  ') + '\n')
-      stderr.trim().length && process.stderr.write('! ' + stderr.replace(/\n/g, '\n  ') + '\n')
+      stdout.trim().length &&
+        process.stdout.write('  ' + stdout.replace(/\n/g, '\n  ') + '\n')
+      stderr.trim().length &&
+        process.stderr.write('! ' + stderr.replace(/\n/g, '\n  ') + '\n')
       if (error) {
-        onError(stderr || stdout || 'command "' + command + '" failed to execute')
+        onError(
+          stderr || stdout || 'command "' + command + '" failed to execute'
+        )
       } else {
         onSuccess(stdout)
       }
