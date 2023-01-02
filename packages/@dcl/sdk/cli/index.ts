@@ -1,13 +1,18 @@
 #!/usr/bin/env node
 
-import arg from 'arg'
 import { readdirSync } from 'fs'
 import { resolve } from 'path'
 
-import { CliError } from './error'
+import { getArgs } from './utils/args'
+import { log } from './utils/log'
+import { CliError } from './utils/error'
+
+interface Options {
+  args: string[]
+}
 
 // leaving args as "any" since we don't know yet if we will use them
-type FileFn = (...args: any) => Promise<void>
+type FileFn = (options: Options) => Promise<void>
 
 interface FileFns {
   help?: FileFn
@@ -33,9 +38,11 @@ const listCommandsStr = () =>
     )
     .join('')
 
-const handleError = (err: Error) => {
-  const error = err instanceof CliError ? err.message : err
-  console.error(error)
+const handleError = (err: CliError) => {
+  if (!(err instanceof CliError)) {
+    log.fail(`Developer: All errors thrown must be an instance of "CliError"`)
+  }
+  log.fail(err.message)
   process.exit(1)
 }
 
@@ -51,10 +58,8 @@ const validCommandFns = (fns: FileFns): fns is Required<FileFns> => {
   return true
 }
 
-const args = arg({
-  '--help': Boolean,
-  '-h': '--help'
-})
+const args = getArgs()
+const helpMessage = `Here is the list of commands: ${listCommandsStr()}`
 
 ;(async () => {
   const command = process.argv[2]
@@ -62,16 +67,17 @@ const args = arg({
 
   if (!commands.has(command)) {
     if (needsHelp) {
-      console.log('TODO: help message')
+      log.info(helpMessage)
       return
     }
-    throw new CliError(`Invalid command. Possible are: ${listCommandsStr()}`)
+    throw new CliError(`Command ${command} is invalid. ${helpMessage}`)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const fns = require(resolve(COMMANDS_PATH, command + JS_EXT))
 
   if (validCommandFns(fns)) {
-    needsHelp ? await fns.help() : await fns.default()
+    const options = { args: process.argv }
+    needsHelp ? await fns.help(options) : await fns.default(options)
   }
 })().catch(handleError)
