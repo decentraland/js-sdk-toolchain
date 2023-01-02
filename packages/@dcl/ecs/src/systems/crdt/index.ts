@@ -23,18 +23,14 @@ import { ReceiveMessage, Transport, TransportMessage } from './types'
  */
 export type OnChangeFunction = (
   entity: Entity,
-  component: ComponentDefinition<any>,
-  operation: CrdtMessageType
+  operation: CrdtMessageType,
+  component?: ComponentDefinition<any>
 ) => void
 
 export function crdtSceneSystem(
   engine: Pick<
     IEngine,
-    | 'getComponentOrNull'
-    | 'getComponent'
-    | 'componentsDefinition'
-    | 'entityContainer'
-    | 'componentsIter'
+    'getComponentOrNull' | 'getComponent' | 'entityContainer' | 'componentsIter'
   >,
   onProcessEntityComponentChange: OnChangeFunction | null
 ) {
@@ -192,6 +188,8 @@ export function crdtSceneSystem(
               component.upsertFromBinary(msg.entityId, data, false)
             }
 
+            onProcessEntityComponentChange &&
+              onProcessEntityComponentChange(msg.entityId, msg.type, component)
 
             break
 
@@ -250,14 +248,16 @@ export function crdtSceneSystem(
         }
       }
 
-      for (const [, definition] of engine.componentsDefinition) {
+      for (const definition of engine.componentsIter()) {
         definition.deleteFrom(entity, false)
       }
 
       engine.entityContainer.updateRemovedEntity(entity)
+
+      onProcessEntityComponentChange &&
+        onProcessEntityComponentChange(entity, CrdtMessageType.DELETE_ENTITY)
     }
   }
-
 
   /**
    * Updates CRDT state of the current engine dirty components
@@ -274,7 +274,6 @@ export function crdtSceneSystem(
           entitySet = []
           dirtyMap.set(component, entitySet)
         }
-        entitySet.push(entity)
 
         // TODO: reuse shared writer to prevent extra allocations of toBinary
         const componentValue =
@@ -290,19 +289,18 @@ export function crdtSceneSystem(
           ) === null
         ) {
           component.deleteFrom(entity, false)
-          // componentsId.delete(componentId)
+        } else {
+          entitySet.push(entity)
+
+          onProcessEntityComponentChange &&
+            onProcessEntityComponentChange(
+              entity,
+              componentValue === null
+                ? CrdtMessageType.DELETE_COMPONENT
+                : CrdtMessageType.PUT_COMPONENT,
+              component
+            )
         }
-
-        // TODO: add this logic
-        // onProcessEntityComponentChange &&
-        // onProcessEntityComponentChange(
-        //   entity,
-        //   component,
-        //   componentValue === null
-        //     ? CrdtMessageType.Enum.DELETE_COMPONENT
-        //     : CrdtMessageType.Enum.PUT_COMPONENT
-        // )
-
       }
     }
     return dirtyMap

@@ -769,6 +769,7 @@ export type IEngine = {
     readonly PlayerEntity: Entity;
     readonly CameraEntity: Entity;
     addTransport(transport: Transport): void;
+    entityContainer: EntityContainer;
     componentsIter(): Iterable<ComponentDefinition<unknown>>;
 };
 
@@ -1442,7 +1443,7 @@ export class ObserverEventState {
 }
 
 // @public (undocumented)
-export type OnChangeFunction = (entity: Entity, component: ComponentDefinition<any>, operation: WireMessage.Enum) => void;
+export type OnChangeFunction = (entity: Entity, operation: CrdtMessageType, component?: ComponentDefinition<any>) => void;
 
 // Warning: (ae-missing-release-tag) "onCommsMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

@@ -1,5 +1,6 @@
 import {
   components,
+  CrdtMessageType,
   DeleteComponent,
   IEngine,
   PutComponentOperation,
@@ -466,5 +467,6 @@ describe('CRDT tests', () => {
 
     const res = await testCrdtSynchronization()
     expect(res.allConflicts.length).toBe(0)
+    expect(clientB.operations.includes({ entity: 512 as Entity, operation: CrdtMessageType.DELETE_ENTITY, value: undefined }))
   })
 })

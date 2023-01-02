@@ -37,7 +37,6 @@ type PreEngine = Pick<
   | 'getComponent'
   | 'getComponentOrNull'
   | 'removeComponentDefinition'
-  | 'componentsDefinition'
   | 'entityContainer'
   | 'componentsIter'
 > & {
@@ -213,7 +212,6 @@ function preEngine(): PreEngine {
     }
   }
   return {
-    componentsDefinition,
     addEntity,
     removeEntity,
     addSystem,
@@ -252,7 +250,8 @@ export function Engine(options?: IEngineOptions): IEngine {
       const ret: unknown | Promise<unknown> = system.fn(dt)
       checkNotThenable(
         ret,
-        `A system (${system.name || 'anonymous'
+        `A system (${
+          system.name || 'anonymous'
         }) returned a thenable. Systems cannot be async functions. Documentation: https://dcl.gg/sdk/sync-systems`
       )
     }
@@ -260,7 +259,7 @@ export function Engine(options?: IEngineOptions): IEngine {
     const deletedEntites = engine.entityContainer.releaseRemovedEntities()
     await crdtSystem.sendMessages(dirtyEntities, deletedEntites)
 
-    for (const [_componentId, definition] of engine.componentsDefinition) {
+    for (const definition of engine.componentsIter()) {
       definition.clearDirty()
     }
   }
@@ -289,7 +288,6 @@ export function Engine(options?: IEngineOptions): IEngine {
     addTransport: crdtSystem.addTransport,
     getCrdtState: crdtSystem.getCrdt,
 
-    componentsDefinition: engine.componentsDefinition,
     entityContainer: engine.entityContainer
   }
 }

@@ -6,7 +6,7 @@ import {
   Transport,
   CrdtMessageHeader
 } from '../../packages/@dcl/ecs/src'
-import { CrdtMessageProtocol } from './../../packages/@dcl/ecs/src/serialization/crdt'
+import { CrdtMessageProtocol, CrdtMessageType } from './../../packages/@dcl/ecs/src/serialization/crdt'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import {
   components,
@@ -17,7 +17,7 @@ import {
 import { compareData, compareStatePayloads } from '../crdt/utils'
 
 export function createNetworkTransport(): Transport {
-  async function send(..._args: any[]) {}
+  async function send(..._args: any[]) { }
 
   return {
     send,
@@ -36,9 +36,9 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
   const usedEntitiesByComponents: Set<Entity> = new Set()
   const crdtState = engine.getCrdtState()
 
-  for (const [componentId, def] of engine.componentsDefinition) {
+  for (const def of engine.componentsIter()) {
     const componentValues = Array.from(def.iterator())
-    const crdtComponent = crdtState.components.get(componentId)
+    const crdtComponent = crdtState.components.get(def._id)
 
     if (
       componentValues.length === 0 &&
@@ -49,7 +49,7 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
 
     if (crdtComponent === undefined) {
       conflicts.push(
-        `Component ${componentId} has ${componentValues.length} entities but there is no state stored in the CRDT.`
+        `Component ${def._id} has ${componentValues.length} entities but there is no state stored in the CRDT.`
       )
     }
 
@@ -68,7 +68,7 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
         crdtEntry.data === null
       ) {
         conflicts.push(
-          `Entity ${entity} with componentId ${componentId} has value in the engine but not in the crdt.`
+          `Entity ${entity} with componentId ${def._id} has value in the engine but not in the crdt.`
         )
         continue
       }
@@ -76,7 +76,8 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
       const theSame = compareData(crdtEntry.data, data)
       if (!theSame) {
         conflicts.push(
-          `Entity ${entity} with componentId ${componentId} hasn't equal values between CRDT and engine => ${crdtEntry.data.toString()} vs ${data.toString()}`
+          `Entity ${entity} with componentId ${def._id
+          } hasn't equal values between CRDT and engine => ${crdtEntry.data.toString()} vs ${data.toString()}`
         )
       }
     }
@@ -86,7 +87,7 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
       for (const [entity, _payload] of crdtComponent) {
         if (def.getOrNull(entity as Entity) === null) {
           conflicts.push(
-            `Entity ${entity} with componentId ${componentId} has value in the CRDT but not in the engine.`
+            `Entity ${entity} with componentId ${def._id} has value in the CRDT but not in the engine.`
           )
         }
       }
@@ -138,7 +139,20 @@ export namespace SandBox {
   export function createEngines({ length }: { length: number }) {
     const clients = Array.from({ length }).map((_, index) => {
       const clientTransport = createNetworkTransport()
-      const engine = Engine()
+      const operations: {
+        entity: Entity
+        operation: CrdtMessageType
+        value: unknown
+      }[] = []
+      const engine = Engine({
+        onChangeFunction: (entity, operation, component) => {
+          operations.push({
+            entity,
+            operation,
+            value: component ? component.getOrNull(entity) : null
+          })
+        }
+      })
 
       type Message = CrdtMessageHeader & { data: Uint8Array }
       let msgsOutgoing: Message[] = []
@@ -205,7 +219,8 @@ export namespace SandBox {
         shuffleOutgoingMessages,
         Transform,
         MeshRenderer,
-        Material
+        Material,
+        operations
       }
     })
 
@@ -260,8 +275,11 @@ export namespace SandBox {
         value: unknown
       }[] = []
       const engine = Engine({
-        onChangeFunction: (entity, component, _operation) => {
-          operations.push({ entity, value: component.getOrNull(entity) })
+        onChangeFunction: (entity, _operation, component) => {
+          operations.push({
+            entity,
+            value: component ? component.getOrNull(entity) : null
+          })
         }
       })
       engine.addTransport(clientTransport)
