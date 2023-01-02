@@ -26,33 +26,3 @@ CALL onUpdate(0.1)
   OPCODES ~= 0.0k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-QuickJS memory usage -- BigNum 2021-03-27 version, 32-bit, malloc limit: -1
-
-  malloc_usable_size unavailable
-
-JSObject classes
-     56   1 Object
-      1   2 Array
-      1   3 Error
-      1   4 Number
-      1   5 String
-      1   6 Boolean
-    127  12 Function
-      1  13 Function
-      6  37 OperatorSet
-      2  52 <null>
-
-NAME                    COUNT     SIZE
-memory allocated         1030     8240  (8.0 per block)
-memory used              1032    53353  (8 overhead, -43.7 average slack)
-atoms                     553    19200  (34.7 per atom)
-strings                     1       53  (53.0 per string)
-objects                   197     9456  (48.0 per object)
-  properties              965     8752  (4.9 per object)
-  shapes                   63    13376  (212.3 per shape)
-bytecode functions          3      411
-  bytecode                  3       33  (11.0 per function)
-C functions               127
-arrays                      1
-  fast arrays               1
-  elements                  0        0  (0.0 per fa

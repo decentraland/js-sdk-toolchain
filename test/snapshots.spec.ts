@@ -163,7 +163,7 @@ async function run(fileName: string) {
       }
     }
 
-    out.push(vm.dumpMemory())
+    console.log(vm.dumpMemory())
 
     return out.join('\n')
   })
