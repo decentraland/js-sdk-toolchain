@@ -7,7 +7,7 @@ EVAL test/snapshots/pointer-events.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 14.0k
-  MALLOC_COUNT = 8754
+  MALLOC_COUNT = 8751
   ALIVE_OBJS_DELTA ~= 1.77k
 CALL onStart()
   OPCODES ~= 0.0k
@@ -26,7 +26,7 @@ CALL onUpdate(0.0)
   CRDT: e=512 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   CRDT: e=513 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   CRDT: e=514 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-  OPCODES ~= 35.7k
+  OPCODES ~= 35.9k
   MALLOC_COUNT = 189
   ALIVE_OBJS_DELTA ~= 0.07k
 CALL onUpdate(0.1)

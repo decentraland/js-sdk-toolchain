@@ -7,7 +7,7 @@ EVAL test/snapshots/cubes.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 49.9k
-  MALLOC_COUNT = 13208
+  MALLOC_COUNT = 13205
   ALIVE_OBJS_DELTA ~= 3.29k
 CALL onStart()
   OPCODES ~= 0.0k
@@ -561,7 +561,7 @@ CALL onUpdate(0.0)
   CRDT: e=692 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   CRDT: e=693 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   CRDT: e=694 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  OPCODES ~= 1256.4k
+  OPCODES ~= 1263.6k
   MALLOC_COUNT = 7703
   ALIVE_OBJS_DELTA ~= 2.57k
 CALL onUpdate(0.1)
@@ -923,7 +923,7 @@ CALL onUpdate(0.1)
   CRDT: e=692 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
   CRDT: e=693 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
   CRDT: e=694 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  OPCODES ~= 814.1k
+  OPCODES ~= 818.9k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
@@ -1285,7 +1285,7 @@ CALL onUpdate(0.1)
   CRDT: e=692 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
   CRDT: e=693 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
   CRDT: e=694 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  OPCODES ~= 814.2k
+  OPCODES ~= 818.9k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
@@ -1647,6 +1647,6 @@ CALL onUpdate(0.1)
   CRDT: e=692 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
   CRDT: e=693 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
   CRDT: e=694 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  OPCODES ~= 814.2k
+  OPCODES ~= 818.9k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
