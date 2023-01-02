@@ -11,13 +11,41 @@ export type ProvideOptions = {
 }
 
 export type OpCodeResult = { count: bigint; opcode: number }
+export type MemoryDump = {
+  malloc_limit: number
+  memory_used_size: number
+  malloc_count: number
+  memory_used_count: number
+  atom_count: number
+  atom_size: number
+  str_count: number
+  str_size: number
+  obj_count: number
+  obj_size: number
+  prop_count: number
+  prop_size: number
+  shape_count: number
+  shape_size: number
+  js_func_count: number
+  js_func_size: number
+  js_func_code_size: number
+  js_func_pc2line_count: number
+  js_func_pc2line_size: number
+  c_func_count: number
+  array_count: number
+  fast_array_count: number
+  fast_array_elements: number
+  binary_object_count: number
+  binary_object_size: number
+}
 
 export type RunWithVmOptions = {
   eval(code: string, filename?: string): void
   onUpdate(dt: number): Promise<any>
   onStart(): Promise<void>
   provide(opts: ProvideOptions): void
-  getStats(): Array<OpCodeResult>
+  getStats(): { opcodes: OpCodeResult[]; memory: MemoryDump }
+  dumpMemory(): string
 }
 
 export async function withQuickJsVm<T>(
@@ -91,9 +119,15 @@ export async function withQuickJsVm<T>(
         return ret
       },
       getStats() {
-        const ret = ops.getOpcodesCount()
+        const opcodes = ops.getOpcodesCount()
         ops.resetOpcodeCounters()
-        return ret
+        return {
+          opcodes,
+          memory: dumpAndDispose(vm, vm.runtime.computeMemoryUsage())
+        }
+      },
+      dumpMemory() {
+        return vm.runtime.dumpMemoryUsage()
       },
       async onUpdate(dt) {
         const result = vm.evalCode(
