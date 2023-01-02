@@ -646,7 +646,7 @@ export type IEngine = {
     readonly PlayerEntity: Entity;
     readonly CameraEntity: Entity;
     addTransport(transport: Transport): void;
-    componentsDefinition: Map<number, ComponentDefinition<unknown>>;
+    componentsIter(): Iterable<ComponentDefinition<unknown>>;
 };
 
 // @public (undocumented)

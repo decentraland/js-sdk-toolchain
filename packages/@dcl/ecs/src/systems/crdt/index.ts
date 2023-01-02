@@ -19,7 +19,7 @@ export type OnChangeFunction = (
 export function crdtSceneSystem(
   engine: Pick<
     IEngine,
-    'getComponentOrNull' | 'getComponent' | 'componentsDefinition'
+    'getComponentOrNull' | 'getComponent' | 'componentsIter'
   >,
   onProcessEntityComponentChange: OnChangeFunction | null
 ) {
@@ -144,32 +144,22 @@ export function crdtSceneSystem(
   }
 
   /**
-   * TODO: Measure allocations of this function
-   */
-  function getDirtyMap() {
-    const dirtySet = new Map<ComponentDefinition<unknown>, Array<Entity>>()
-    for (const [_, definition] of engine.componentsDefinition) {
-      let entitySet: Array<Entity> | null = null
-      for (const entity of definition.dirtyIterator()) {
-        if (!entitySet) {
-          entitySet = []
-          dirtySet.set(definition, entitySet)
-        }
-        entitySet.push(entity)
-      }
-    }
-    return dirtySet
-  }
-
-  /**
    * Updates CRDT state of the current engine dirty components
    *
    * TODO: optimize this function allocations using a bitmap
+   * TODO: unify this function with sendMessages
    */
   function updateState() {
-    const dirtyEntities = getDirtyMap()
-    for (const [component, entities] of dirtyEntities) {
-      for (const entity of entities) {
+    const dirtyMap = new Map<ComponentDefinition<unknown>, Array<Entity>>()
+    for (const component of engine.componentsIter()) {
+      let entitySet: Array<Entity> | null = null
+      for (const entity of component.dirtyIterator()) {
+        if (!entitySet) {
+          entitySet = []
+          dirtyMap.set(component, entitySet)
+        }
+        entitySet.push(entity)
+
         // TODO: reuse shared writer to prevent extra allocations of toBinary
         const componentValue =
           component.toBinaryOrNull(entity)?.toBinary() ?? null
@@ -186,7 +176,7 @@ export function crdtSceneSystem(
           )
       }
     }
-    return dirtyEntities
+    return dirtyMap
   }
 
   /**

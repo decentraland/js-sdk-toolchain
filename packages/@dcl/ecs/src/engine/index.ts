@@ -39,6 +39,7 @@ type PreEngine = Pick<
   | 'removeComponentDefinition'
   | 'entityExists'
   | 'componentsDefinition'
+  | 'componentsIter'
 > & {
   getSystems: () => SystemItem[]
 }
@@ -183,6 +184,10 @@ function preEngine(): PreEngine {
     return systems.getSystems()
   }
 
+  function componentsIter() {
+    return componentsDefinition.values()
+  }
+
   function removeComponentDefinition(componentId: number) {
     componentsDefinition.delete(componentId)
   }
@@ -226,7 +231,8 @@ function preEngine(): PreEngine {
     getComponentOrNull,
     removeComponentDefinition,
     removeEntityWithChildren,
-    registerCustomComponent
+    registerCustomComponent,
+    componentsIter
   }
 }
 
@@ -276,6 +282,7 @@ export function Engine(options?: IEngineOptions): IEngine {
     getComponent: engine.getComponent,
     getComponentOrNull: engine.getComponentOrNull,
     removeComponentDefinition: engine.removeComponentDefinition,
+    componentsIter: engine.componentsIter,
     update,
     RootEntity: 0 as Entity,
     PlayerEntity: 1 as Entity,

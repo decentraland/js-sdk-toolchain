@@ -224,5 +224,14 @@ export type IEngine = {
    */
   getCrdtState(): State<Uint8Array>
 
+  /**
+   * @internal
+   * Returns the crdt state. For now only for testing purpose
+   */
   componentsDefinition: Map<number, ComponentDefinition<unknown>>
+
+  /**
+   * Iterator of registered components
+   */
+  componentsIter(): Iterable<ComponentDefinition<unknown>>
 }
