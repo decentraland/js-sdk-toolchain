@@ -6,7 +6,10 @@ import {
   Transport,
   CrdtMessageHeader
 } from '../../packages/@dcl/ecs/src'
-import { CrdtMessageProtocol, CrdtMessageType } from './../../packages/@dcl/ecs/src/serialization/crdt'
+import {
+  CrdtMessageProtocol,
+  CrdtMessageType
+} from './../../packages/@dcl/ecs/src/serialization/crdt'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import {
   components,
@@ -17,7 +20,7 @@ import {
 import { compareData, compareStatePayloads } from '../crdt/utils'
 
 export function createNetworkTransport(): Transport {
-  async function send(..._args: any[]) { }
+  async function send(..._args: any[]) {}
 
   return {
     send,
@@ -76,7 +79,8 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
       const theSame = compareData(crdtEntry.data, data)
       if (!theSame) {
         conflicts.push(
-          `Entity ${entity} with componentId ${def._id
+          `Entity ${entity} with componentId ${
+            def._id
           } hasn't equal values between CRDT and engine => ${crdtEntry.data.toString()} vs ${data.toString()}`
         )
       }
