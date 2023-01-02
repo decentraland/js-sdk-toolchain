@@ -12,20 +12,20 @@ function getNextSize(currentSize: number, intendedSize: number) {
   return Math.ceil(minNewSize / 1024) * 1024
 }
 
-/**
- * Creates a writable buffer
- */
-export type WriteBufferOptions = {
-  writing: {
-    /**
-     *  a buffer already allocated to write
-     */
-    buffer: Uint8Array
-    /**
-     * set the cursor to not start writing from the begin of it. Default 0
-     */
-    currentOffset?: number
-  }
+export type CreateByteBufferOptions = {
+  /**
+   * The initial buffer, provide a buffer if you need to set "initial capacity"
+   */
+  buffer: Uint8Array
+  /**
+   * Set the cursor where begins to read. Default 0
+   */
+  readingOffset?: number
+  /**
+   * Set the cursor to not start writing from the begin of it.
+   * Defaults to the buffer size
+   */
+  writeOffset?: number
 }
 
 const defaultInitialCapacity = 10240
