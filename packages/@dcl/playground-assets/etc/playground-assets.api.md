@@ -1319,7 +1319,7 @@ export class ObserverEventState {
 }
 
 // @public (undocumented)
-export type OnChangeFunction = (entity: Entity, component: ComponentDefinition<any>, componentId: number, operation: WireMessage.Enum) => void;
+export type OnChangeFunction = (entity: Entity, component: ComponentDefinition<any>, operation: WireMessage.Enum) => void;
 
 // Warning: (ae-missing-release-tag) "onCommsMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

@@ -13,7 +13,6 @@ import { ReceiveMessage, TransportMessage, Transport } from './types'
 export type OnChangeFunction = (
   entity: Entity,
   component: ComponentDefinition<any>,
-  componentId: number,
   operation: WireMessage.Enum
 ) => void
 
@@ -139,7 +138,7 @@ export function crdtSceneSystem(
         }
 
         onProcessEntityComponentChange &&
-          onProcessEntityComponentChange(entity, component, componentId, type)
+          onProcessEntityComponentChange(entity, component, type)
       }
     }
   }
@@ -181,7 +180,6 @@ export function crdtSceneSystem(
           onProcessEntityComponentChange(
             entity,
             component,
-            component._id,
             componentValue === null
               ? WireMessage.Enum.DELETE_COMPONENT
               : WireMessage.Enum.PUT_COMPONENT

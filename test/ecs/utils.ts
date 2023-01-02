@@ -46,7 +46,7 @@ export namespace SandBox {
         value: unknown
       }[] = []
       const engine = Engine({
-        onChangeFunction: (entity, component, _componentId, _operation) => {
+        onChangeFunction: (entity, component, _operation) => {
           operations.push({ entity, value: component.getOrNull(entity) })
         }
       })
