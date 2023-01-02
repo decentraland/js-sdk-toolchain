@@ -6,13 +6,9 @@ EVAL test/snapshots/cubes.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-<<<<<<< HEAD
   OPCODES ~= 49.9k
   MALLOC_COUNT = 13205
   ALIVE_OBJS_DELTA ~= 3.29k
-=======
-  OPCODES ~= 52.9k
->>>>>>> 0168adecc9e32f93ae55701b38739bd677007c58
 CALL onStart()
   OPCODES ~= 0.0k
   MALLOC_COUNT = 2
@@ -565,29 +561,9 @@ CALL onUpdate(0.0)
   CRDT: e=692 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   CRDT: e=693 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   CRDT: e=694 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-<<<<<<< HEAD
   OPCODES ~= 1263.6k
   MALLOC_COUNT = 7703
   ALIVE_OBJS_DELTA ~= 2.57k
-=======
-  CRDT: e=695 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  CRDT: e=696 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  CRDT: e=697 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  CRDT: e=698 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  CRDT: e=699 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  CRDT: e=700 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  CRDT: e=701 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  CRDT: e=702 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  CRDT: e=703 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  CRDT: e=704 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  CRDT: e=705 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  CRDT: e=706 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  CRDT: e=707 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  CRDT: e=708 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  CRDT: e=709 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  CRDT: e=710 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  OPCODES ~= 1378.6k
->>>>>>> 0168adecc9e32f93ae55701b38739bd677007c58
 CALL onUpdate(0.1)
   CRDT: e=512 c=1 t=2 data={"position":{"x":-3,"y":2.7722561359405518,"z":-3},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
   CRDT: e=513 c=1 t=2 data={"position":{"x":-4,"y":3.498049020767212,"z":-4},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
@@ -947,29 +923,9 @@ CALL onUpdate(0.1)
   CRDT: e=692 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
   CRDT: e=693 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
   CRDT: e=694 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-<<<<<<< HEAD
   OPCODES ~= 818.9k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-=======
-  CRDT: e=695 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=696 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=697 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=698 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=699 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=700 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=701 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=702 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=703 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=704 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=705 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=706 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=707 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=708 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=709 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=710 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  OPCODES ~= 895.3k
->>>>>>> 0168adecc9e32f93ae55701b38739bd677007c58
 CALL onUpdate(0.1)
   CRDT: e=512 c=1 t=3 data={"position":{"x":-3,"y":3.0513527393341064,"z":-3},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
   CRDT: e=513 c=1 t=3 data={"position":{"x":-4,"y":3.686894416809082,"z":-4},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
@@ -1329,29 +1285,9 @@ CALL onUpdate(0.1)
   CRDT: e=692 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
   CRDT: e=693 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
   CRDT: e=694 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-<<<<<<< HEAD
   OPCODES ~= 818.9k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-=======
-  CRDT: e=695 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=696 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=697 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=698 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=699 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=700 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=701 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=702 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=703 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=704 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=705 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=706 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=707 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=708 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=709 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=710 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  OPCODES ~= 895.4k
->>>>>>> 0168adecc9e32f93ae55701b38739bd677007c58
 CALL onUpdate(0.1)
   CRDT: e=512 c=1 t=4 data={"position":{"x":-3,"y":3.3045616149902344,"z":-3},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
   CRDT: e=513 c=1 t=4 data={"position":{"x":-4,"y":3.834203004837036,"z":-4},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
@@ -1711,26 +1647,6 @@ CALL onUpdate(0.1)
   CRDT: e=692 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
   CRDT: e=693 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
   CRDT: e=694 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-<<<<<<< HEAD
   OPCODES ~= 818.9k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-=======
-  CRDT: e=695 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=696 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=697 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=698 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=699 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=700 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=701 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=702 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=703 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=704 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=705 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=706 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=707 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=708 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=709 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  CRDT: e=710 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1}}}}
-  OPCODES ~= 895.4k
->>>>>>> 0168adecc9e32f93ae55701b38739bd677007c58
