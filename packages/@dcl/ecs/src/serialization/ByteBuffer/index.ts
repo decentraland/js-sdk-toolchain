@@ -37,8 +37,7 @@ class ReadWriteByteBuffer implements ByteBuffer {
   roffset: number
 
   constructor(options?: CreateByteBufferOptions) {
-    this._buffer =
-      options?.buffer || new Uint8Array(defaultInitialCapacity)
+    this._buffer = options?.buffer || new Uint8Array(defaultInitialCapacity)
     this.view = new DataView(this._buffer.buffer, this._buffer.byteOffset)
     this.woffset = options?.writeOffset ?? options?.buffer.length ?? 0
     this.roffset = options?.readingOffset ?? 0
