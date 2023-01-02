@@ -93,7 +93,7 @@ function spawnCubes() {
   })
 
   Billboard.create(sign, {
-    oppositeDirection: true
+    billboardMode: 0
   })
 
   for (let x = 0.5; x < 16; x += 1) {

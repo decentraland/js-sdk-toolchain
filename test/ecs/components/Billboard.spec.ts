@@ -12,8 +12,7 @@ describe('Generated Billboard ProtoBuf', () => {
     const entityB = newEngine.addEntity()
 
     const billboard = Billboard.create(entity, {
-      billboardMode: BillboardMode.BM_Y_AXE,
-      oppositeDirection: true
+      billboardMode: BillboardMode.BM_Y
     })
 
     Billboard.create(entityB)

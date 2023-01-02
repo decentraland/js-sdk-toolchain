@@ -6,8 +6,8 @@ EVAL test/snapshots/cubes.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 49.7k
-  MALLOC_COUNT = 13065
+  OPCODES ~= 49.8k
+  MALLOC_COUNT = 13066
   ALIVE_OBJS_DELTA ~= 3.23k
 CALL onStart()
   OPCODES ~= 0.0k
@@ -198,7 +198,7 @@ CALL onUpdate(0.0)
   CRDT: e=693 c=1 t=1 data={"position":{"x":15.5,"y":0.47935929894447327,"z":9.5},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
   CRDT: e=694 c=1 t=1 data={"position":{"x":15.5,"y":0.3782283067703247,"z":10.5},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
   CRDT: e=512 c=1090 t=1 data={}
-  CRDT: e=518 c=1090 t=1 data={"oppositeDirection":true}
+  CRDT: e=518 c=1090 t=1 data={"billboardMode":0}
   CRDT: e=515 c=1041 t=1 data={"src":"models/shark.glb"}
   CRDT: e=516 c=1041 t=1 data={"src":"models/Fish_01.glb"}
   CRDT: e=517 c=1041 t=1 data={"src":"models/Underwater_floor.glb"}

@@ -100,9 +100,15 @@ export const Billboard: ComponentDefinition<PBBillboard>;
 // @public (undocumented)
 export const enum BillboardMode {
     // (undocumented)
-    BM_ALL_AXES = 0,
+    BM_ALL = 7,
     // (undocumented)
-    BM_Y_AXE = 1
+    BM_NONE = 0,
+    // (undocumented)
+    BM_X = 1,
+    // (undocumented)
+    BM_Y = 2,
+    // (undocumented)
+    BM_Z = 4
 }
 
 // Warning: (ae-missing-release-tag) "BorderRect" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -1590,7 +1596,6 @@ export const PBAvatarShape: {
 // @public (undocumented)
 export interface PBBillboard {
     billboardMode?: BillboardMode | undefined;
-    oppositeDirection?: boolean | undefined;
 }
 
 // @public
