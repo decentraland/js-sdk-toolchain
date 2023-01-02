@@ -13,6 +13,7 @@ import CrdtMessageProtocol, {
   PutComponentOperation
 } from '../packages/@dcl/ecs/src/serialization/crdt'
 import { withQuickJsVm } from './vm'
+import { version as vmVersion } from '@dcl/quickjs-emscripten/package.json'
 
 const ENV: Record<string, string> = { ...process.env } as any
 const writeToFile = process.env.UPDATE_SNAPSHOTS
@@ -47,7 +48,7 @@ function testFileSnapshot(fileName: string, workingDirectory: string) {
 
 async function run(fileName: string) {
   return withQuickJsVm(async (vm) => {
-    const out: string[] = [fileName]
+    const out: string[] = [`(start empty vm ${vmVersion})`]
 
     vm.provide({
       log(...args) {
@@ -120,8 +121,15 @@ async function run(fileName: string) {
       }
     })
 
+    let prevAllocations = 0
+    let prevObjects = 0
+
+    function hundredsNotation(num: number | bigint, resolution = 1) {
+      return (Number(num) / 100 / 10).toFixed(resolution) + 'k'
+    }
+
     function addStats() {
-      const opcodes = vm.getStats()
+      const { opcodes, memory } = vm.getStats()
       opcodes
         .sort((a, b) => {
           if (a.count > b.count) return -1
@@ -131,17 +139,23 @@ async function run(fileName: string) {
 
       out.push(
         '  OPCODES ~= ' +
-          (
-            Number(opcodes.reduce(($, $$) => $ + $$.count, 0n) / 100n) / 10
-          ).toFixed(1) +
-          'k'
+          hundredsNotation(opcodes.reduce(($, $$) => $ + $$.count, 0n))
       )
+
+      const deltaAllocations = memory.malloc_count - prevAllocations
+      prevAllocations = memory.malloc_count
+      out.push(`  MALLOC_COUNT = ${deltaAllocations}`)
+
+      const deltaObjects = memory.obj_count - prevObjects
+      prevObjects = memory.obj_count
+      out.push(`  ALIVE_OBJS_DELTA ~= ${hundredsNotation(deltaObjects, 2)}`)
 
       // out.push('> STATS: ' + opcodes.slice(0,10).map(_ => `${_.opcode}=${_.count}`).join(','))
     }
 
     try {
       addStats()
+      out.push('EVAL ' + fileName)
       vm.eval(readFileSync(fileName).toString(), fileName)
       addStats()
       out.push('CALL onStart()')
@@ -167,6 +181,8 @@ async function run(fileName: string) {
         out.push(`  ERR! ` + err.stack)
       }
     }
+
+    console.log(vm.dumpMemory())
 
     return out.join('\n')
   })

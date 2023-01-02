@@ -1,11 +1,18 @@
-test/snapshots/pointer-events.js
+(start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0.0k
+  MALLOC_COUNT = 1005
+  ALIVE_OBJS_DELTA ~= 0.19k
+EVAL test/snapshots/pointer-events.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 14.4k
+  MALLOC_COUNT = 8810
+  ALIVE_OBJS_DELTA ~= 1.75k
 CALL onStart()
   OPCODES ~= 0.0k
+  MALLOC_COUNT = 2
+  ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.0)
   CRDT: e=512 c=1 t=1 data={"position":{"x":15,"y":1,"z":15},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   CRDT: e=513 c=1 t=1 data={"position":{"x":13,"y":1,"z":15},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -20,9 +27,17 @@ CALL onUpdate(0.0)
   CRDT: e=513 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   CRDT: e=514 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   OPCODES ~= 36.0k
+  MALLOC_COUNT = 186
+  ALIVE_OBJS_DELTA ~= 0.06k
 CALL onUpdate(0.1)
   OPCODES ~= 2.2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   OPCODES ~= 2.2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   OPCODES ~= 2.2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k

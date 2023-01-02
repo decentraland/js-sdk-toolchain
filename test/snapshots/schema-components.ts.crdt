@@ -1,16 +1,31 @@
-test/snapshots/schema-components.js
+(start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0.0k
+  MALLOC_COUNT = 1005
+  ALIVE_OBJS_DELTA ~= 0.19k
+EVAL test/snapshots/schema-components.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 9.3k
+  MALLOC_COUNT = 4920
+  ALIVE_OBJS_DELTA ~= 0.76k
 CALL onStart()
   OPCODES ~= 0.0k
+  MALLOC_COUNT = 2
+  ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.0)
-  OPCODES ~= 4.3k
+  OPCODES ~= 4.4k
+  MALLOC_COUNT = 60
+  ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
-  OPCODES ~= 1.2k
+  OPCODES ~= 1.3k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
-  OPCODES ~= 1.2k
+  OPCODES ~= 1.3k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
-  OPCODES ~= 1.2k
+  OPCODES ~= 1.3k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k

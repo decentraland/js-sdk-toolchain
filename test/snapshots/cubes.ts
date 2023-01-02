@@ -99,7 +99,7 @@ function spawnCubes() {
   for (let x = 0.5; x < 16; x += 1) {
     // this should be 16, but QuickJS allocator fails to release the memory
     // with that number
-    const Y_DIMENSION = 12
+    const Y_DIMENSION = 11
     for (let y = 0.5; y < Y_DIMENSION; y += 1) {
       createCube(x, 0, y)
     }
