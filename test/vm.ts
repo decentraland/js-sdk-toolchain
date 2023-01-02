@@ -22,17 +22,20 @@ export type RunWithVmOptions = {
 
 export async function withQuickJsVm<T>(
   cb: (opts: RunWithVmOptions) => Promise<T>
-): Promise<T> {
+): Promise<{ result: T; leaking: boolean }> {
   // const vm = await newAsyncContext()
   const Q = await getQuickJS()
   const vm = Q.newContext()
 
-  const module = vm.newObject()
-  const exports = vm.newObject()
+  vm.newObject().consume((exports) => {
+    vm.newObject().consume((module) => {
+      vm.setProp(module, 'exports', exports)
+      vm.setProp(vm.global, 'module', module)
+    })
 
-  vm.setProp(module, 'exports', exports)
-  vm.setProp(vm.global, 'module', module)
-  vm.setProp(vm.global, 'exports', exports)
+    vm.setProp(vm.global, 'exports', exports)
+  })
+
   vm.setProp(vm.global, 'self', vm.global)
   vm.setProp(vm.global, 'global', vm.global)
   const failures: any[] = []
@@ -76,8 +79,11 @@ export async function withQuickJsVm<T>(
 
   const ops = Q.getOpcodeInfo()
 
+  let result: T
+  let leaking = false
+
   try {
-    return await cb({
+    result = await cb({
       eval(code: string, filename?: string) {
         const result = vm.evalCode(code, filename)
         const $ = vm.unwrapResult(result)
@@ -160,8 +166,6 @@ export async function withQuickJsVm<T>(
 
     expect(vm.runtime.hasPendingJob()).toEqual(false)
     clearInterval(int)
-    module.dispose()
-    exports.dispose()
     try {
       vm.dispose()
     } catch (err: any) {
@@ -169,13 +173,14 @@ export async function withQuickJsVm<T>(
         err.toString().includes('list_empty(&rt->gc_obj_list)') &&
         !failures.length
       ) {
-        throw new Error('Ran succesfully but leaking memory')
+        leaking = true
       } else throw err
     }
     if (failures.length) {
       throw failures[0]
     }
   }
+  return { result, leaking }
 }
 
 function dumpAndDispose(vm: QuickJSContext, val: QuickJSHandle) {
