@@ -28,42 +28,6 @@ export type WriteBufferOptions = {
   }
 }
 
-/**
- * Creates a writable buffer
- */
-export type ReadBufferOptions = {
-  reading: {
-    /**
-     * a buffer already allocated to read from there.
-     */
-    buffer: Uint8Array
-    /**
-     * delimite where the valid data ends. Default: buffer.length
-     */
-    length?: number
-    /**
-     * set the cursor where begins to read. Default 0
-     */
-    currentOffset: number
-  }
-}
-
-export type CreateByteBufferOptions = {
-  /**
-   * The initial buffer, provide a buffer if you need to set "initial capacity"
-   */
-  buffer: Uint8Array
-  /**
-   * Set the cursor where begins to read. Default 0
-   */
-  readingOffset?: number
-  /**
-   * Set the cursor to not start writing from the begin of it.
-   * Defaults to the buffer size
-   */
-  writeOffset?: number
-}
-
 const defaultInitialCapacity = 10240
 
 class ReadWriteByteBuffer implements ByteBuffer {
