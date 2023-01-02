@@ -38,6 +38,15 @@ export async function compileProtoApi() {
   }
 }
 
+const NON_EXPOSED_LIST_NAMES: string[] = [
+  'SocialController',
+  'DevTools',
+  'Permissions',
+  'DevTools',
+  'Permissions',
+  'PortableExperiences'
+]
+
 async function internalCompile() {
   const outModulesPath = path.resolve(__dirname, 'src', 'modules')
   const apiArray = await preprocessProtoGeneration(
@@ -49,6 +58,7 @@ async function internalCompile() {
 
   let apisDTsContent = ''
   for (const api of apiArray) {
+    if (NON_EXPOSED_LIST_NAMES.includes(api.name)) continue
     const types: Set<string> = new Set()
     const functions: string[] = []
     for (const [methodName, method] of Object.entries(api.def.methods)) {
