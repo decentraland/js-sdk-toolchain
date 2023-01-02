@@ -1,13 +1,12 @@
 import {
+  CrdtMessageType,
   Engine,
   IEngine,
-  Transport,
-  WireMessageEnum,
-  WireMessageHeader
+  CrdtMessage,
+  Transport
 } from '../../packages/@dcl/ecs/src'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/messages/componentOperation'
-import { WireMessage } from '../../packages/@dcl/ecs/src/serialization/wireMessage'
+import { readMessage } from '../../packages/@dcl/ecs/src/serialization/crdt/message'
 import { int8Component } from './int8component'
 
 function connectEngines(a: IEngine, b: IEngine) {
@@ -22,19 +21,12 @@ function connectEngines(a: IEngine, b: IEngine) {
       reading: { buffer: data, currentOffset: 0 }
     })
 
-    let header: WireMessageHeader | null
-    while ((header = WireMessage.getHeader(buffer))) {
-      if (ComponentOperation.is(header.type)) {
-        const msg = ComponentOperation.read(buffer)!
-        connection.interceptedMessages.push({
-          type: msg.type,
-          entityId: msg.entityId,
-          componentId: msg.componentId,
-          data: (msg as any).data,
-          timestamp: msg.timestamp,
-          direction
-        })
-      }
+    let msg: CrdtMessage | null
+    while ((msg = readMessage(buffer))) {
+      connection.interceptedMessages.push({
+        ...msg,
+        direction
+      })
     }
   }
 
@@ -120,7 +112,7 @@ describe('test CRDT flow E2E', () => {
         direction: 'a->b',
         componentId: 123987,
         entityId: entityA,
-        type: WireMessageEnum.PUT_COMPONENT,
+        type: CrdtMessageType.PUT_COMPONENT,
         data: Uint8Array.of(3),
         timestamp: 1
       }
@@ -159,7 +151,7 @@ describe('test CRDT flow E2E', () => {
         direction: 'b->a',
         componentId: 123987,
         entityId: entityA,
-        type: WireMessageEnum.PUT_COMPONENT,
+        type: CrdtMessageType.PUT_COMPONENT,
         data: Uint8Array.of(4),
         timestamp: 2
       }
@@ -191,7 +183,7 @@ describe('test CRDT flow E2E', () => {
           direction: 'a->b',
           componentId: 123987,
           entityId: entityA,
-          type: WireMessageEnum.PUT_COMPONENT,
+          type: CrdtMessageType.PUT_COMPONENT,
           data: Uint8Array.of(16),
           timestamp: 3
         }
@@ -213,7 +205,7 @@ describe('test CRDT flow E2E', () => {
           direction: 'b->a',
           componentId: 123987,
           entityId: entityA,
-          type: WireMessageEnum.PUT_COMPONENT,
+          type: CrdtMessageType.PUT_COMPONENT,
           data: Uint8Array.of(32),
           timestamp: 4
         }
@@ -245,7 +237,7 @@ describe('test CRDT flow E2E', () => {
           direction: 'a->b',
           componentId: 123987,
           entityId: entityA,
-          type: WireMessageEnum.PUT_COMPONENT,
+          type: CrdtMessageType.PUT_COMPONENT,
           data: Uint8Array.of(48),
           timestamp: 5
         }

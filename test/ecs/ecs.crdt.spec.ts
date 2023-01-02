@@ -1,12 +1,16 @@
-import { components, IEngine, Schemas } from '../../packages/@dcl/ecs/src'
+import {
+  components,
+  DeleteComponent,
+  IEngine,
+  PutComponentOperation,
+  Schemas
+} from '../../packages/@dcl/ecs/src'
 import {
   Entity,
   EntityUtils,
   RESERVED_STATIC_ENTITIES
 } from '../../packages/@dcl/ecs/src/engine/entity'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/messages/componentOperation'
-import { WireMessageEnum } from '../../packages/@dcl/ecs/src/serialization/types'
 import { Vector3 } from '../../packages/@dcl/sdk/src/math'
 import { compareStatePayloads } from '../crdt/utils'
 import { stateToString } from '../crdt/utils/state'
@@ -218,25 +222,13 @@ describe('CRDT tests', () => {
     Transform.getMutable(entity).position.x = 8
     await engine.update(1)
     const buffer = createByteBuffer()
-    ComponentOperation.write(
-      WireMessageEnum.PUT_COMPONENT,
-      entity,
-      0,
-      Transform,
-      buffer
-    )
+    PutComponentOperation.write(entity, 0, Transform, buffer)
     jest.resetAllMocks()
     transports[0].onmessage!(buffer.toBinary())
     await engine.update(1)
 
     const outdatedBuffer = createByteBuffer()
-    ComponentOperation.write(
-      WireMessageEnum.PUT_COMPONENT,
-      entity,
-      2,
-      Transform,
-      outdatedBuffer
-    )
+    PutComponentOperation.write(entity, 2, Transform, outdatedBuffer)
     expect(spySend).toBeCalledWith(outdatedBuffer.toBinary())
   })
 
@@ -247,26 +239,14 @@ describe('CRDT tests', () => {
     Transform.create(entity, SandBox.DEFAULT_POSITION)
     await engine.update(1)
     const buffer = createByteBuffer()
-    ComponentOperation.write(
-      WireMessageEnum.PUT_COMPONENT,
-      entity,
-      0,
-      Transform,
-      buffer
-    )
+    PutComponentOperation.write(entity, 0, Transform, buffer)
     Transform.deleteFrom(entity)
     await engine.update(1)
     jest.resetAllMocks()
     transports[0].onmessage!(buffer.toBinary())
     await engine.update(1)
     const outdatedBuffer = createByteBuffer()
-    ComponentOperation.write(
-      WireMessageEnum.DELETE_COMPONENT,
-      entity,
-      2,
-      Transform,
-      outdatedBuffer
-    )
+    DeleteComponent.write(entity, Transform._id, 2, outdatedBuffer)
     expect(spySend).toBeCalledWith(outdatedBuffer.toBinary())
   })
 
@@ -280,13 +260,7 @@ describe('CRDT tests', () => {
     await engine.update(1)
 
     const buffer = createByteBuffer()
-    ComponentOperation.write(
-      WireMessageEnum.DELETE_COMPONENT,
-      entity,
-      2,
-      Transform,
-      buffer
-    )
+    DeleteComponent.write(entity, Transform._id, 2, buffer)
     transport.onmessage!(buffer.toBinary())
     await engine.update(1)
     expect(Transform.getOrNull(entity)).toBe(null)
@@ -305,13 +279,7 @@ describe('CRDT tests', () => {
     await engine.update(1)
 
     const buffer = createByteBuffer()
-    ComponentOperation.write(
-      WireMessageEnum.PUT_COMPONENT,
-      entity,
-      1,
-      cusutomComponent,
-      buffer
-    )
+    PutComponentOperation.write(entity, 1, cusutomComponent, buffer)
     serverTransport.onmessage!(buffer.toBinary())
     await serverEngine.update(1)
     const crdtState = serverEngine.getCrdtState()

@@ -1,7 +1,8 @@
-import { Entity } from '../engine/entity'
+import { Entity } from '../../engine/entity'
 
 export type Uint32 = number
-export enum WireMessageEnum {
+
+export enum CrdtMessageType {
   RESERVED = 0,
 
   // Component Operation
@@ -14,24 +15,28 @@ export enum WireMessageEnum {
 }
 
 /**
+ * Min length = 8 bytes
+ * All message length including
  * @param length - Uint32 the length of all message (including the header)
  * @param type - define the function which handles the data
  */
-export type WireMessageHeader = {
+export type CrdtMessageHeader = {
   length: Uint32
   type: Uint32
 }
 
-export const WIRE_MESSAGE_HEADER_LENGTH = 8
+export const CRDT_MESSAGE_HEADER_LENGTH = 8
 
 /**
+ * Min. length = header (8 bytes) + 20 bytes = 28 bytes
+ *
  * @param entity - Uint32 number of the entity
  * @param componentId - Uint32 number of id
  * @param timestamp - Uint64 Lamport timestamp
- * @param data - Uint8[] data of component
+ * @param data - Uint8[] data of component => length(4 bytes) + block of bytes[0..length-1]
  */
 export type PutComponentMessageBody = {
-  type: WireMessageEnum.PUT_COMPONENT
+  type: CrdtMessageType.PUT_COMPONENT
   entityId: Entity
   componentId: number
   timestamp: number
@@ -39,7 +44,7 @@ export type PutComponentMessageBody = {
 }
 
 export type DeleteComponentMessageBody = {
-  type: WireMessageEnum.DELETE_COMPONENT
+  type: CrdtMessageType.DELETE_COMPONENT
   entityId: Entity
   componentId: number
   timestamp: number
@@ -49,20 +54,20 @@ export type DeleteComponentMessageBody = {
  * @param entity - Uint32 number of the entity
  */
 export type DeleteEntityMessageBody = {
-  type: WireMessageEnum.DELETE_ENTITY
+  type: CrdtMessageType.DELETE_ENTITY
   entityId: Entity
 }
 
-export type PutComponentMessage = WireMessageHeader & PutComponentMessageBody
-export type DeleteComponentMessage = WireMessageHeader &
+export type PutComponentMessage = CrdtMessageHeader & PutComponentMessageBody
+export type DeleteComponentMessage = CrdtMessageHeader &
   DeleteComponentMessageBody
-export type DeleteEntityMessage = WireMessageHeader & DeleteEntityMessageBody
+export type DeleteEntityMessage = CrdtMessageHeader & DeleteEntityMessageBody
 
-export type Message =
+export type CrdtMessage =
   | PutComponentMessage
   | DeleteComponentMessage
   | DeleteEntityMessage
-export type MessageBody =
+export type CrdtMessageBody =
   | PutComponentMessageBody
   | DeleteComponentMessageBody
   | DeleteEntityMessage

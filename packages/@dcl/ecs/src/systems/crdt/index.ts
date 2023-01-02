@@ -8,15 +8,14 @@ import {
 import type { IEngine } from '../../engine'
 import { Entity, EntityState, EntityUtils } from '../../engine/entity'
 import { createByteBuffer } from '../../serialization/ByteBuffer'
-import { ComponentOperation } from '../../serialization/messages/componentOperation'
-import { DeleteEntity } from '../../serialization/messages/deleteEntity'
+import CrdtMessageProtocol from '../../serialization/crdt'
+import { DeleteComponent } from '../../serialization/crdt/deleteComponent'
+import { DeleteEntity } from '../../serialization/crdt/deleteEntity'
+import { PutComponentOperation } from '../../serialization/crdt/putComponent'
 import {
-  DeleteComponentMessageBody,
-  PutComponentMessageBody,
-  WireMessageEnum,
-  WireMessageHeader
-} from '../../serialization/types'
-import WireMessage from '../../serialization/wireMessage'
+  CrdtMessageType,
+  CrdtMessageHeader
+} from '../../serialization/crdt/types'
 import { ReceiveMessage, Transport, TransportMessage } from './types'
 
 export function crdtSceneSystem(
@@ -57,14 +56,12 @@ export function crdtSceneSystem(
         reading: { buffer: chunkMessage, currentOffset: 0 }
       })
 
-      let header: WireMessageHeader | null
-      while ((header = WireMessage.getHeader(buffer))) {
+      let header: CrdtMessageHeader | null
+      while ((header = CrdtMessageProtocol.getHeader(buffer))) {
         const offset = buffer.currentReadOffset()
 
-        if (header.type === WireMessageEnum.DELETE_COMPONENT) {
-          const message = ComponentOperation.read(
-            buffer
-          ) as DeleteComponentMessageBody
+        if (header.type === CrdtMessageType.DELETE_COMPONENT) {
+          const message = DeleteComponent.read(buffer)!
           receivedMessages.push({
             ...header,
             ...message,
@@ -73,10 +70,8 @@ export function crdtSceneSystem(
               .buffer()
               .subarray(offset, buffer.currentReadOffset())
           })
-        } else if (header.type === WireMessageEnum.PUT_COMPONENT) {
-          const message = ComponentOperation.read(
-            buffer
-          ) as PutComponentMessageBody
+        } else if (header.type === CrdtMessageType.PUT_COMPONENT) {
+          const message = PutComponentOperation.read(buffer)!
           receivedMessages.push({
             ...header,
             ...message,
@@ -85,7 +80,7 @@ export function crdtSceneSystem(
               .buffer()
               .subarray(offset, buffer.currentReadOffset())
           })
-        } else if (header.type === WireMessageEnum.DELETE_ENTITY) {
+        } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
           const message = DeleteEntity.read(buffer)!
           receivedMessages.push({
             ...header,
@@ -98,6 +93,7 @@ export function crdtSceneSystem(
 
           // Unknown message, we skip it
         } else {
+          // consume the message
           buffer.incrementReadOffset(header.length)
         }
       }
@@ -124,7 +120,7 @@ export function crdtSceneSystem(
     const entitiesShouldBeCleaned: Entity[] = []
 
     for (const msg of messagesToProcess) {
-      if (msg.type === WireMessageEnum.DELETE_ENTITY) {
+      if (msg.type === CrdtMessageType.DELETE_ENTITY) {
         crdtClient.processMessage({
           type: CRDTMessageType.CRDTMT_DeleteEntity,
           entityId: msg.entityId
@@ -136,7 +132,7 @@ export function crdtSceneSystem(
           type: CRDTMessageType.CRDTMT_PutComponentData,
           entityId: msg.entityId,
           componentId: msg.componentId,
-          data: msg.type === WireMessageEnum.PUT_COMPONENT ? msg.data : null,
+          data: msg.type === CrdtMessageType.PUT_COMPONENT ? msg.data : null,
           timestamp: msg.timestamp
         }
 
@@ -173,7 +169,7 @@ export function crdtSceneSystem(
             broadcastMessages.push(msg)
 
             // Process CRDT Message
-            if (msg.type === WireMessageEnum.DELETE_COMPONENT) {
+            if (msg.type === CrdtMessageType.DELETE_COMPONENT) {
               component.deleteFrom(msg.entityId, false)
             } else {
               const opts = {
@@ -194,16 +190,23 @@ export function crdtSceneSystem(
               ?.get(msg.entityId)
             if (current) {
               const offset = bufferForOutdated.currentWriteOffset()
-              const type = ComponentOperation.getType(component, msg.entityId)
 
               const ts = current.timestamp
-              ComponentOperation.write(
-                type,
-                msg.entityId,
-                ts,
-                component,
-                bufferForOutdated
-              )
+              if (component.has(msg.entityId)) {
+                PutComponentOperation.write(
+                  msg.entityId,
+                  ts,
+                  component,
+                  bufferForOutdated
+                )
+              } else {
+                DeleteComponent.write(
+                  msg.entityId,
+                  component._id,
+                  ts,
+                  bufferForOutdated
+                )
+              }
 
               outdatedMessages.push({
                 ...msg,
@@ -300,10 +303,9 @@ export function crdtSceneSystem(
           .components.get(componentId)!
           .get(entity as number)!
         const offset = buffer.currentWriteOffset()
-        const type: WireMessageEnum = ComponentOperation.getType(
-          component,
-          entity
-        )
+        const type: CrdtMessageType = component.has(entity)
+          ? CrdtMessageType.PUT_COMPONENT
+          : CrdtMessageType.DELETE_COMPONENT
         const transportMessage = {
           type,
           timestamp,
@@ -313,7 +315,12 @@ export function crdtSceneSystem(
 
         // Avoid creating messages if there is no transport that will handle it
         if (transports.some((t) => t.filter(transportMessage))) {
-          ComponentOperation.write(type, entity, timestamp, component, buffer)
+          if (transportMessage.type === CrdtMessageType.PUT_COMPONENT) {
+            PutComponentOperation.write(entity, timestamp, component, buffer)
+          } else {
+            DeleteComponent.write(entity, component._id, timestamp, buffer)
+          }
+
           crdtMessages.push({
             ...transportMessage,
             messageBuffer: buffer
@@ -331,7 +338,7 @@ export function crdtSceneSystem(
       const offset = buffer.currentWriteOffset()
       DeleteEntity.write(entityId, buffer)
       crdtMessages.push({
-        type: WireMessageEnum.DELETE_ENTITY,
+        type: CrdtMessageType.DELETE_ENTITY,
         entityId,
         messageBuffer: buffer
           .buffer()

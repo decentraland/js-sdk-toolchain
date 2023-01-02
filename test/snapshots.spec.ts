@@ -1,15 +1,17 @@
-import WireMessage from '../packages/@dcl/ecs/src/serialization/wireMessage'
-import { createByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import {
-  engine,
-  WireMessageHeader,
-  WireMessageEnum
-} from '../packages/@dcl/ecs/src'
-import { ComponentOperation } from '../packages/@dcl/ecs/src/serialization/messages/componentOperation'
-import { existsSync, readFileSync, writeFileSync } from 'fs-extra'
-import path from 'path'
-import glob from 'glob'
 import { exec } from 'child_process'
+import { existsSync, readFileSync, writeFileSync } from 'fs-extra'
+import glob from 'glob'
+import path from 'path'
+import {
+  CrdtMessageType,
+  CrdtMessageHeader,
+  engine
+} from '../packages/@dcl/ecs/src'
+import { createByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import CrdtMessageProtocol, {
+  DeleteComponent,
+  PutComponentOperation
+} from '../packages/@dcl/ecs/src/serialization/crdt'
 import { withQuickJsVm } from './vm'
 
 const ENV: Record<string, string> = { ...process.env } as any
@@ -77,16 +79,19 @@ async function run(fileName: string): Promise<string> {
               }
             })
 
-            let header: WireMessageHeader | null
-            while ((header = WireMessage.getHeader(buffer))) {
+            let header: CrdtMessageHeader | null
+            while ((header = CrdtMessageProtocol.getHeader(buffer))) {
               if (
-                header.type === WireMessageEnum.PUT_COMPONENT ||
-                header.type === WireMessageEnum.DELETE_COMPONENT
+                header.type === CrdtMessageType.PUT_COMPONENT ||
+                header.type === CrdtMessageType.DELETE_COMPONENT
               ) {
-                const message = ComponentOperation.read(buffer)!
+                const message =
+                  header.type === CrdtMessageType.DELETE_COMPONENT
+                    ? DeleteComponent.read(buffer)!
+                    : PutComponentOperation.read(buffer)!
                 const { entityId, componentId, timestamp } = message
                 const data =
-                  message.type === WireMessageEnum.PUT_COMPONENT
+                  message.type === CrdtMessageType.PUT_COMPONENT
                     ? message.data
                     : undefined
 

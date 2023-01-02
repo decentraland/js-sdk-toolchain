@@ -4,9 +4,9 @@ import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import {
   TransportMessage,
   Transport,
-  WireMessageHeader
+  CrdtMessageHeader
 } from '../../packages/@dcl/ecs/src'
-import { WireMessage } from './../../packages/@dcl/ecs/src/serialization/wireMessage'
+import { CrdtMessageProtocol } from './../../packages/@dcl/ecs/src/serialization/crdt'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import {
   components,
@@ -140,15 +140,15 @@ export namespace SandBox {
       const clientTransport = createNetworkTransport()
       const engine = Engine()
 
-      type Message = WireMessageHeader & { data: Uint8Array }
+      type Message = CrdtMessageHeader & { data: Uint8Array }
       let msgsOutgoing: Message[] = []
       clientTransport.send = async (message: Uint8Array) => {
         const buffer = createByteBuffer({
           reading: { buffer: message, currentOffset: 0 }
         })
 
-        let header: WireMessageHeader | null
-        while ((header = WireMessage.getHeader(buffer))) {
+        let header: CrdtMessageHeader | null
+        while ((header = CrdtMessageProtocol.getHeader(buffer))) {
           const offset = buffer.incrementReadOffset(header.length)
           const data = new Uint8Array(
             message.subarray(offset, offset + header.length)

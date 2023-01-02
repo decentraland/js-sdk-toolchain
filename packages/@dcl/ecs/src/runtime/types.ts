@@ -4,7 +4,6 @@ export type {
   ReceiveMessage,
   Transport
 } from '../systems/crdt/types'
-export type { WireMessage } from '../serialization/wireMessage'
 export {
   TransformType,
   TransformComponent

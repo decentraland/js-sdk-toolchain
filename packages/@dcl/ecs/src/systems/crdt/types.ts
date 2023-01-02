@@ -1,6 +1,6 @@
-import { MessageBody } from '../../serialization/types'
+import { CrdtMessageBody } from '../../serialization/crdt/types'
 
-export type ReceiveMessage = MessageBody & {
+export type ReceiveMessage = CrdtMessageBody & {
   transportId?: number
   messageBuffer: Uint8Array
 }

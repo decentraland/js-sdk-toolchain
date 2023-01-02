@@ -1,16 +1,14 @@
 import {
+  CrdtMessageType,
   Engine,
   Entity,
   EntityState,
   IEngine,
-  Transport,
-  WireMessageHeader
+  CrdtMessage,
+  Transport
 } from '../../packages/@dcl/ecs/src'
 import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { ComponentOperation } from '../../packages/@dcl/ecs/src/serialization/messages/componentOperation'
-import { DeleteEntity } from '../../packages/@dcl/ecs/src/serialization/messages/deleteEntity'
-import { WireMessageEnum } from '../../packages/@dcl/ecs/src/serialization/types'
-import { WireMessage } from '../../packages/@dcl/ecs/src/serialization/wireMessage'
+import { readMessage } from '../../packages/@dcl/ecs/src/serialization/crdt/message'
 import { ID, int8Component } from './int8component'
 
 function connectEngines(a: IEngine, b: IEngine) {
@@ -25,26 +23,12 @@ function connectEngines(a: IEngine, b: IEngine) {
       reading: { buffer: data, currentOffset: 0 }
     })
 
-    let header: WireMessageHeader | null
-    while ((header = WireMessage.getHeader(buffer))) {
-      if (ComponentOperation.is(header.type)) {
-        const msg = ComponentOperation.read(buffer)!
-        connection.interceptedMessages.push({
-          type: msg.type,
-          entityId: msg.entityId,
-          componentId: msg.componentId,
-          data: (msg as any).data,
-          timestamp: msg.timestamp,
-          direction
-        })
-      } else {
-        const msg = DeleteEntity.read(buffer)!
-        connection.interceptedMessages.push({
-          type: msg.type,
-          entityId: msg.entityId,
-          direction
-        })
-      }
+    let msg: CrdtMessage | null
+    while ((msg = readMessage(buffer))) {
+      connection.interceptedMessages.push({
+        ...msg,
+        direction
+      })
     }
   }
 
@@ -411,15 +395,14 @@ describe('test CRDT flow E2E', () => {
         // this value will have has the same timestamp in both engines
         {
           componentId: 123987,
-          data: undefined,
           direction: 'b->a',
           entityId: entityA,
           timestamp: 8,
-          type: WireMessageEnum.DELETE_COMPONENT
+          type: CrdtMessageType.DELETE_COMPONENT
         },
         {
           direction: 'b->a',
-          type: WireMessageEnum.DELETE_ENTITY,
+          type: CrdtMessageType.DELETE_ENTITY,
           entityId: entityA
         }
       ])
