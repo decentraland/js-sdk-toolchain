@@ -41,7 +41,15 @@ export namespace SandBox {
   export function create({ length }: { length: number }) {
     const clients = Array.from({ length }).map((_, index) => {
       const clientTransport = createNetworkTransport()
-      const engine = Engine()
+      const operations: {
+        entity: Entity
+        value: unknown
+      }[] = []
+      const engine = Engine({
+        onChangeFunction: (entity, component, _operation) => {
+          operations.push({ entity, value: component.getOrNull(entity) })
+        }
+      })
       engine.addTransport(clientTransport)
       const Position = engine.defineComponent(
         SandBox.Position.type,
@@ -55,7 +63,8 @@ export namespace SandBox {
         transports: [clientTransport],
         components: { Door, Position },
         spySend: jest.spyOn(clientTransport, 'send'),
-        clientTransport
+        clientTransport,
+        operations
       }
     })
 

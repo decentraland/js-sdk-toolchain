@@ -1,17 +1,27 @@
 import { crdtProtocol, Message as CrdtMessage } from '@dcl/crdt'
 
-import type { IEngine } from '../../engine'
+import type { ComponentDefinition, IEngine } from '../../engine'
 import { Entity } from '../../engine/entity'
 import { createByteBuffer } from '../../serialization/ByteBuffer'
 import { ComponentOperation as Message } from '../../serialization/crdt/componentOperation'
 import WireMessage from '../../serialization/wireMessage'
 import { ReceiveMessage, TransportMessage, Transport } from './types'
 
+/**
+ * @public
+ */
+export type OnChangeFunction = (
+  entity: Entity,
+  component: ComponentDefinition<any>,
+  operation: WireMessage.Enum
+) => void
+
 export function crdtSceneSystem(
   engine: Pick<
     IEngine,
-    'getComponentOrNull' | 'getComponent' | 'componentsDefinition'
-  >
+    'getComponentOrNull' | 'getComponent' | 'componentsIter'
+  >,
+  onProcessEntityComponentChange: OnChangeFunction | null
 ) {
   const transports: Transport[] = []
 
@@ -126,60 +136,71 @@ export function crdtSceneSystem(
           const data = createByteBuffer(opts)
           component.upsertFromBinary(message.entity, data, false)
         }
-      }
-    }
-  }
 
-  function getDirtyMap() {
-    const dirtySet = new Map<Entity, Set<number>>()
-    for (const [componentId, definition] of engine.componentsDefinition) {
-      for (const entity of definition.dirtyIterator()) {
-        if (!dirtySet.has(entity)) {
-          dirtySet.set(entity, new Set())
-        }
-        dirtySet.get(entity)!.add(componentId)
+        onProcessEntityComponentChange &&
+          onProcessEntityComponentChange(entity, component, type)
       }
     }
-    return dirtySet
   }
 
   /**
    * Updates CRDT state of the current engine dirty components
+   *
+   * TODO: optimize this function allocations using a bitmap
+   * TODO: unify this function with sendMessages
    */
   function updateState() {
-    const dirtyEntities = getDirtyMap()
-    for (const [entity, componentsId] of getDirtyMap()) {
-      for (const componentId of componentsId) {
-        const component = engine.getComponent(componentId)
+    const dirtyMap = new Map<ComponentDefinition<unknown>, Array<Entity>>()
+    for (const component of engine.componentsIter()) {
+      let entitySet: Array<Entity> | null = null
+      for (const entity of component.dirtyIterator()) {
+        if (!entitySet) {
+          entitySet = []
+          dirtyMap.set(component, entitySet)
+        }
+        entitySet.push(entity)
+
+        // TODO: reuse shared writer to prevent extra allocations of toBinary
         const componentValue =
           component.toBinaryOrNull(entity)?.toBinary() ?? null
-        crdtClient.createEvent(entity as number, componentId, componentValue)
+
+        // TODO: do not emit event if componentValue equals the value didn't change
+        crdtClient.createEvent(entity as number, component._id, componentValue)
+        onProcessEntityComponentChange &&
+          onProcessEntityComponentChange(
+            entity,
+            component,
+            componentValue === null
+              ? WireMessage.Enum.DELETE_COMPONENT
+              : WireMessage.Enum.PUT_COMPONENT
+          )
       }
     }
-    return dirtyEntities
+    return dirtyMap
   }
 
   /**
    * Iterates the dirty map and generates crdt messages to be send
    */
-  async function sendMessages(dirtyEntities: Map<Entity, Set<number>>) {
+  async function sendMessages(
+    dirtyEntities: Map<ComponentDefinition<unknown>, Array<Entity>>
+  ) {
     // CRDT Messages will be the merge between the recieved transport messages and the new crdt messages
     const crdtMessages = getMessages(broadcastMessages)
     const outdatedMessagesBkp = getMessages(outdatedMessages)
     const buffer = createByteBuffer()
-    for (const [entity, componentsId] of dirtyEntities) {
-      for (const componentId of componentsId) {
+    for (const [component, entities] of dirtyEntities) {
+      for (const entity of entities) {
         // Component will be always defined here since dirtyMap its an iterator of engine.componentsDefinition
-        const component = engine.getComponent(componentId)
         const { timestamp } = crdtClient
           .getState()
           .get(entity as number)!
-          .get(componentId)!
+          .get(component._id)!
         const offset = buffer.currentWriteOffset()
         const type = WireMessage.getType(component, entity)
         const transportMessage: Omit<TransportMessage, 'messageBuffer'> = {
           type,
-          componentId,
+          componentId: component._id,
           entity,
           timestamp
         }

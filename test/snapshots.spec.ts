@@ -23,7 +23,7 @@ describe('Runs the snapshots', () => {
 function testFileSnapshot(fileName: string, workingDirectory: string) {
   it(`tests the file ${fileName}`, async () => {
     await compile(fileName, workingDirectory)
-    const result = await run(fileName.replace(/\.ts$/, '.js'))
+    const { result, leaking } = await run(fileName.replace(/\.ts$/, '.js'))
 
     const compareToFileName = fileName + '.crdt'
     const compareFileExists = existsSync(compareToFileName)
@@ -35,10 +35,11 @@ function testFileSnapshot(fileName: string, workingDirectory: string) {
     }
     expect(compareTo.trim().length > 0 || !compareFileExists).toEqual(true)
     expect(result.trim()).toEqual(compareTo.trim())
+    if (leaking) throw new Error('Ran successfully but leaking memory')
   }, 60000)
 }
 
-async function run(fileName: string): Promise<string> {
+async function run(fileName: string) {
   return withQuickJsVm(async (vm) => {
     const out: string[] = [fileName]
 

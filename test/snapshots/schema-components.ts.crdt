@@ -3,14 +3,14 @@ test/snapshots/schema-components.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 8.7k
+  OPCODES ~= 8.8k
 CALL onStart()
   OPCODES ~= 0.0k
 CALL onUpdate(0.0)
-  OPCODES ~= 4.4k
+  OPCODES ~= 4.0k
 CALL onUpdate(0.1)
-  OPCODES ~= 1.4k
+  OPCODES ~= 1.2k
 CALL onUpdate(0.1)
-  OPCODES ~= 1.4k
+  OPCODES ~= 1.2k
 CALL onUpdate(0.1)
-  OPCODES ~= 1.4k
+  OPCODES ~= 1.2k
