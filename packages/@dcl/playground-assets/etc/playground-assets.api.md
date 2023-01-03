@@ -413,6 +413,55 @@ export type ComponentSchema<T extends [ComponentDefinition<any>, ...ComponentDef
     [K in keyof T]: T[K] extends ComponentDefinition<any> ? ReturnType<T[K]['getMutable']> : never;
 };
 
+// Warning: (ae-missing-release-tag) "CRDT_MESSAGE_HEADER_LENGTH" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const CRDT_MESSAGE_HEADER_LENGTH = 8;
+
+// Warning: (ae-missing-release-tag) "CrdtMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage;
+
+// Warning: (ae-missing-release-tag) "CrdtMessageBody" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type CrdtMessageBody = PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessage;
+
+// Warning: (ae-missing-release-tag) "CrdtMessageHeader" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export type CrdtMessageHeader = {
+    length: Uint32;
+    type: Uint32;
+};
+
+// Warning: (ae-missing-release-tag) "CrdtMessageProtocol" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export namespace CrdtMessageProtocol {
+    export function consumeMessage(buf: ByteBuffer): boolean;
+    export function getHeader(buf: ByteBuffer): CrdtMessageHeader | null;
+    export function readHeader(buf: ByteBuffer): CrdtMessageHeader | null;
+    export function validate(buf: ByteBuffer): boolean;
+}
+
+// Warning: (ae-missing-release-tag) "CrdtMessageType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export enum CrdtMessageType {
+    // (undocumented)
+    DELETE_COMPONENT = 2,
+    // (undocumented)
+    DELETE_ENTITY = 3,
+    // (undocumented)
+    MAX_MESSAGE_TYPE = 4,
+    // (undocumented)
+    PUT_COMPONENT = 1,
+    // (undocumented)
+    RESERVED = 0
+}
+
 // Warning: (ae-missing-release-tag) "createEthereumProvider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -479,6 +528,57 @@ export function defineComponent<T>(componentId: number, spec: ISchema<T>): Compo
 // @public
 export const DEG2RAD: number;
 
+// Warning: (ae-missing-release-tag) "DeleteComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export namespace DeleteComponent {
+    const // (undocumented)
+    MESSAGE_HEADER_LENGTH = 20;
+    // (undocumented)
+    export function read(buf: ByteBuffer): DeleteComponentMessage | null;
+    export function write(entity: Entity, componentId: number, timestamp: number, buf: ByteBuffer): void;
+}
+
+// Warning: (ae-missing-release-tag) "DeleteComponentMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type DeleteComponentMessage = CrdtMessageHeader & DeleteComponentMessageBody;
+
+// Warning: (ae-missing-release-tag) "DeleteComponentMessageBody" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type DeleteComponentMessageBody = {
+    type: CrdtMessageType.DELETE_COMPONENT;
+    entityId: Entity;
+    componentId: number;
+    timestamp: number;
+};
+
+// Warning: (ae-missing-release-tag) "DeleteEntity" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export namespace DeleteEntity {
+    const // (undocumented)
+    MESSAGE_HEADER_LENGTH = 4;
+    // (undocumented)
+    export function read(buf: ByteBuffer): DeleteEntityMessage | null;
+    // (undocumented)
+    export function write(entity: Entity, buf: ByteBuffer): void;
+}
+
+// Warning: (ae-missing-release-tag) "DeleteEntityMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type DeleteEntityMessage = CrdtMessageHeader & DeleteEntityMessageBody;
+
+// Warning: (ae-missing-release-tag) "DeleteEntityMessageBody" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type DeleteEntityMessageBody = {
+    type: CrdtMessageType.DELETE_ENTITY;
+    entityId: Entity;
+};
+
 // @public (undocumented)
 export function Dropdown(props: EntityPropTypes & UiDropdownProps): ReactEcs.JSX.Element;
 
@@ -513,7 +613,7 @@ export type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = {
 // Warning: (tsdoc-malformed-html-name) Invalid HTML element: A space is not allowed here
 //
 // @public
-export type Entity = uint32 & {
+export type Entity = number & {
     __entity_type: '';
 };
 
@@ -531,16 +631,20 @@ export type EntityComponents = {
 };
 
 // Warning: (ae-missing-release-tag) "EntityContainer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "EntityContainer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export function EntityContainer(): {
+export function EntityContainer(): EntityContainer;
+
+// @public (undocumented)
+export type EntityContainer = {
     generateEntity(): Entity;
     removeEntity(entity: Entity): boolean;
-    entityExists(entity: Entity): boolean;
+    getEntityState(entity: Entity): EntityState;
     getExistingEntities(): Set<Entity>;
-    entityVersion: (entity: Entity) => number;
-    entityNumber: (entity: Entity) => number;
-    entityId: (entityNumber: number, entityVersion: number) => Entity;
+    releaseRemovedEntities(): Entity[];
+    updateRemovedEntity(entity: Entity): boolean;
+    updateUsedEntity(entity: Entity): boolean;
 };
 
 // @public (undocumented)
@@ -548,6 +652,25 @@ export type EntityPropTypes = {
     uiTransform?: UiTransformProps;
     uiBackground?: UiBackgroundProps;
 } & Listeners & Pick<CommonProps, 'key'>;
+
+// @public (undocumented)
+export enum EntityState {
+    Removed = 2,
+    Reserved = 3,
+    // (undocumented)
+    Unknown = 0,
+    UsedEntity = 1
+}
+
+// Warning: (ae-missing-release-tag) "EntityUtils" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export namespace EntityUtils {
+    // (undocumented)
+    export function fromEntityId(entityId: Entity): [number, number];
+    // (undocumented)
+    export function toEntityId(entityNumber: number, entityVersion: number): Entity;
+}
 
 // @public
 export const Epsilon = 0.000001;
@@ -632,7 +755,7 @@ export type IEngine = {
     addEntity(dynamic?: boolean): Entity;
     removeEntity(entity: Entity): void;
     removeEntityWithChildren(firstEntity: Entity): void;
-    entityExists(entity: Entity): boolean;
+    getEntityState(entity: Entity): EntityState;
     addSystem(system: SystemFn, priority?: number, name?: string): void;
     removeSystem(selector: string | SystemFn): boolean;
     registerCustomComponent<T>(component: ComponentDefinition<T>, componentId: number): ComponentDefinition<T>;
@@ -646,6 +769,7 @@ export type IEngine = {
     readonly PlayerEntity: Entity;
     readonly CameraEntity: Entity;
     addTransport(transport: Transport): void;
+    entityContainer: EntityContainer;
     componentsIter(): Iterable<ComponentDefinition<unknown>>;
 };
 
@@ -1319,7 +1443,7 @@ export class ObserverEventState {
 }
 
 // @public (undocumented)
-export type OnChangeFunction = (entity: Entity, component: ComponentDefinition<any>, operation: WireMessage.Enum) => void;
+export type OnChangeFunction = (entity: Entity, operation: CrdtMessageType, component?: ComponentDefinition<any>) => void;
 
 // Warning: (ae-missing-release-tag) "onCommsMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2478,6 +2602,34 @@ export type Position = {
 // @public (undocumented)
 export type PositionUnit = `${number}px` | `${number}%` | number;
 
+// Warning: (ae-missing-release-tag) "PutComponentMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type PutComponentMessage = CrdtMessageHeader & PutComponentMessageBody;
+
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (ae-missing-release-tag) "PutComponentMessageBody" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export type PutComponentMessageBody = {
+    type: CrdtMessageType.PUT_COMPONENT;
+    entityId: Entity;
+    componentId: number;
+    timestamp: number;
+    data: Uint8Array;
+};
+
+// Warning: (ae-missing-release-tag) "PutComponentOperation" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export namespace PutComponentOperation {
+    const // (undocumented)
+    MESSAGE_HEADER_LENGTH = 20;
+    // (undocumented)
+    export function read(buf: ByteBuffer): PutComponentMessage | null;
+    export function write(entity: Entity, timestamp: number, componentDefinition: ComponentDefinition<unknown>, buf: ByteBuffer): void;
+}
+
 // @public
 export type Quaternion = Quaternion.ReadonlyQuaternion;
 
@@ -2634,13 +2786,8 @@ export type ReadonlyPrimitive = number | string | number[] | string[] | boolean 
 // Warning: (ae-missing-release-tag) "ReceiveMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type ReceiveMessage = {
-    type: WireMessage.Enum;
-    entity: Entity;
-    componentId: number;
-    timestamp: number;
+export type ReceiveMessage = CrdtMessageBody & {
     transportId?: number;
-    data?: Uint8Array;
     messageBuffer: Uint8Array;
 };
 
@@ -2956,6 +3103,11 @@ export type UiInputProps = PBUiInput & {
 // @public (undocumented)
 export const UiInputResult: ComponentDefinition<PBUiInputResult>;
 
+// Warning: (ae-missing-release-tag) "Uint32" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type Uint32 = number;
+
 // @public
 export type uint32 = number;
 
@@ -3132,37 +3284,6 @@ export type Vector3Type = {
 
 // @public (undocumented)
 export const VisibilityComponent: ComponentDefinition<PBVisibilityComponent>;
-
-// Warning: (ae-missing-release-tag) "WireMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export namespace WireMessage {
-    // (undocumented)
-    export enum Enum {
-        // (undocumented)
-        DELETE_COMPONENT = 2,
-        // (undocumented)
-        MAX_MESSAGE_TYPE = 3,
-        // (undocumented)
-        PUT_COMPONENT = 1,
-        // (undocumented)
-        RESERVED = 0
-    }
-    // (undocumented)
-    export function getType(component: ComponentDefinition<unknown>, entity: Entity): Enum;
-    // (undocumented)
-    export type Header = {
-        length: Uint32;
-        type: Uint32;
-    };
-    const // (undocumented)
-    HEADER_LENGTH = 8;
-    // (undocumented)
-    export function readHeader(buf: ByteBuffer): Header | null;
-    // (undocumented)
-    export type Uint32 = number;
-    export function validate(buf: ByteBuffer): boolean;
-}
 
 // Warning: (ae-missing-release-tag) "YGAlign" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

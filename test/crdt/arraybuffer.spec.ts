@@ -9,8 +9,16 @@ describe('CRDT Uint8Array', () => {
     const key1 = 7,
       key2 = 11
 
-    const messageA = clientA.createEvent(key1, key2, encode.encode('Hola'))
-    const messageB = clientB.createEvent(key1, key2, encode.encode('Hola'))
+    const messageA = clientA.createComponentDataEvent(
+      key1,
+      key2,
+      encode.encode('Hola')
+    )!
+    const messageB = clientB.createComponentDataEvent(
+      key1,
+      key2,
+      encode.encode('Hola')
+    )!
     await Promise.all([
       clientB.sendMessage(messageB),
       clientA.sendMessage(messageA)
@@ -25,8 +33,16 @@ describe('CRDT Uint8Array', () => {
     const key1 = 7,
       key2 = 11
 
-    const messageA = clientA.createEvent(key1, key2, encode.encode('a'))
-    const messageB = clientB.createEvent(key1, key2, encode.encode('b'))
+    const messageA = clientA.createComponentDataEvent(
+      key1,
+      key2,
+      encode.encode('a')
+    )!
+    const messageB = clientB.createComponentDataEvent(
+      key1,
+      key2,
+      encode.encode('b')
+    )!
     // b > a
     await Promise.all([
       clientB.sendMessage(messageB),
@@ -46,8 +62,16 @@ describe('CRDT Uint8Array', () => {
     const key1 = 7,
       key2 = 11
 
-    const messageA = clientA.createEvent(key1, key2, encode.encode('aa'))
-    const messageB = clientB.createEvent(key1, key2, encode.encode('b'))
+    const messageA = clientA.createComponentDataEvent(
+      key1,
+      key2,
+      encode.encode('aa')
+    )!
+    const messageB = clientB.createComponentDataEvent(
+      key1,
+      key2,
+      encode.encode('b')
+    )!
     // b > a
     await Promise.all([
       clientB.sendMessage(messageB),
@@ -58,6 +82,36 @@ describe('CRDT Uint8Array', () => {
       compareData(
         clientA.getElementSetState(key1, key2)!.data,
         encode.encode('b')
+      )
+    ).toBe(true)
+  })
+
+  it('should return the bigger raw data. a.byteLength === b.byteLength', async () => {
+    const { clients, compare } = createSandbox<Uint8Array>({ clientLength: 2 })
+    const [clientA, clientB] = clients
+    const key1 = 7,
+      key2 = 11
+
+    const messageA = clientA.createComponentDataEvent(
+      key1,
+      key2,
+      encode.encode('messirve')
+    )!
+    const messageB = clientB.createComponentDataEvent(
+      key1,
+      key2,
+      encode.encode('messi')
+    )!
+    // b > a
+    await Promise.all([
+      clientB.sendMessage(messageB),
+      clientA.sendMessage(messageA)
+    ])
+    await compare()
+    expect(
+      compareData(
+        clientA.getElementSetState(key1, key2)!.data,
+        encode.encode('messirve')
       )
     ).toBe(true)
   })
