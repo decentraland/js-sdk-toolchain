@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 16
+          cache: 'npm'
       - name: install
         run: make install
       - name: lint
@@ -25,10 +25,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 16
+          cache: 'npm'
       - name: install
         run: make install
       - name: build
@@ -48,10 +48,10 @@ jobs:
       decentraland_ecs_s3_bucket_key: ${{ steps.publish_decentraland_ecs.outputs.s3-bucket-key }}
     steps:
       - uses: actions/checkout@master
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 16
+          cache: 'npm'
       - name: install
         run: make install
       - name: update version of packages/@dcl/dcl-rollup
