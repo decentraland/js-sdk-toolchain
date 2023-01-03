@@ -101,7 +101,9 @@ async function run(fileName: string) {
                 const c = engine.getComponent(componentId)
 
                 out.push(
-                  `  CRDT: e=${entityId} c=${componentId} t=${timestamp} data=${JSON.stringify(
+                  `  CRDT: e=0x${entityId.toString(
+                    16
+                  )} c=${componentId} t=${timestamp} data=${JSON.stringify(
                     data &&
                       c.deserialize(
                         createByteBuffer({
@@ -114,8 +116,8 @@ async function run(fileName: string) {
                   )}`
                 )
               } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
-                const entityId = DeleteEntity.read(buffer)?.entityId
-                out.push(`  CRDT: e=${entityId} deleted`)
+                const entityId = DeleteEntity.read(buffer)!.entityId
+                out.push(`  CRDT: e=0x${entityId?.toString(16)} deleted`)
               } else {
                 throw new Error('Unknown CrdtMessageType')
               }

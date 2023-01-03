@@ -479,4 +479,43 @@ describe('CRDT tests', () => {
       })
     )
   })
+
+  it('should delete many entities', async () => {
+    const {
+      clients: [clientA],
+      getCrdtStates,
+      testCrdtSynchronization
+    } = SandBox.createEngines({ length: 3 })
+
+    const cube = clientA.engine.addEntity()
+    clientA.Transform.create(cube)
+
+    const entitiesCalledToBeRemoved = []
+    let prevEntity: Entity | null = null
+    function system() {
+      if (prevEntity) {
+        entitiesCalledToBeRemoved.push(prevEntity)
+        clientA.engine.removeEntity(prevEntity)
+      }
+      prevEntity = clientA.engine.addEntity()
+      clientA.MeshRenderer.setBox(prevEntity)
+    }
+
+    clientA.engine.addSystem(system, 0, 'test-system')
+
+    for (let i = 0; i < 10; i++) {
+      await clientA.engine.update(1)
+      clientA.flushOutgoing()
+    }
+
+    clientA.engine.removeSystem('test-system')
+    await clientA.engine.update(1)
+
+    const result = await testCrdtSynchronization()
+    expect(result.allConflicts.length).toBe(0)
+    expect(result.crdtStateConverged).toBe(true)
+
+    const deletedEntities = getCrdtStates()[0].deletedEntities.get()
+    expect(deletedEntities.length).toBe(entitiesCalledToBeRemoved.length)
+  })
 })

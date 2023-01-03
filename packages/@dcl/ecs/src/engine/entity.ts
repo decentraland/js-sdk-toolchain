@@ -127,7 +127,8 @@ export function EntityContainer(): EntityContainer {
       if (version < MAX_U16) {
         const entity = EntityUtils.toEntityId(number, version + 1)
         // If the entity is not being used, we can re-use it
-        if (!usedEntities.has(entity)) {
+        // If the entity was removed in this tick, we're not counting for the usedEntities, but we have it in the toRemoveEntityArray
+        if (!usedEntities.has(entity) && !toRemoveEntities.includes(entity)) {
           usedEntities.add(entity)
           return entity
         }
