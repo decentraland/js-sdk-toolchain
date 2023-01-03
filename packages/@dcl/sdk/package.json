@@ -28,7 +28,10 @@
     "@dcl/react-ecs": "file:../react-ecs",
     "@dcl/unity-renderer": "1.0.68557-20221221195847.commit-f743b85",
     "arg": "5.0.2",
-    "ora": "6.1.2"
+    "extract-zip": "2.0.1",
+    "inquirer": "8.2.5",
+    "ora": "6.1.2",
+    "undici": "5.14.0"
   },
   "minCliVersion": "3.14.1",
   "typedoc": {
@@ -36,5 +39,8 @@
     "readmeFile": "./README.md",
     "displayName": "SDK",
     "tsconfig": "./tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/inquirer": "8.2.5"
   }
 }

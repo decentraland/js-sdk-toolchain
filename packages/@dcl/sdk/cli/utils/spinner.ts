@@ -1,38 +1,44 @@
 import ora, { Ora } from 'ora'
 
-import { log } from './log'
+import log from './log'
 
-function initSpinner(): typeof log | Ora {
-  if (!process.stdout.isTTY && process.env.DEBUG) {
-    return log
+class Spinner {
+  spinner: Ora | typeof log
+
+  constructor() {
+    if (!process.stdout.isTTY && process.env.DEBUG) {
+      this.spinner = log
+      return
+    }
+
+    this.spinner = ora()
   }
 
-  return ora()
+  private log(method: keyof Ora, message: string) {
+    const fn = (this.spinner as any)[method] || log.raw
+    fn(message)
+  }
+
+  start(message: string) {
+    this.log('start', message)
+  }
+  stop() {
+    this.log('stop', '')
+  }
+  fail(message: string) {
+    this.log('fail', message)
+  }
+  warn(message: string) {
+    this.log('warn', message)
+  }
+  info(message: string) {
+    this.log('info', message)
+  }
+  succeed(message: string) {
+    this.log('succeed', message)
+  }
 }
 
-const spinner = initSpinner()
+const spinner = new Spinner()
 
-export function start(message: string) {
-  spinner.text = message
-  spinner.start()
-}
-
-export function stop() {
-  spinner.stop()
-}
-
-export function fail(message: string) {
-  spinner.fail(message)
-}
-
-export function warn(message: string) {
-  spinner.warn(message)
-}
-
-export function info(message: string) {
-  spinner.info(message)
-}
-
-export function succeed(message: string) {
-  spinner.succeed(message)
-}
+export default spinner

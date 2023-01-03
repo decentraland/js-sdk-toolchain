@@ -1,37 +1,25 @@
 #!/usr/bin/env node
 
-import { readdirSync } from 'fs'
-import { resolve } from 'path'
-
 import { getArgs } from './utils/args'
-import { log } from './utils/log'
+import log from './utils/log'
 import { CliError } from './utils/error'
+import { COMMANDS_PATH, getCommands } from './utils/commands'
 
-interface Options {
-  args: string[]
+export interface Options {
+  args: ReturnType<typeof getArgs>
 }
 
 // leaving args as "any" since we don't know yet if we will use them
 type FileFn = (options: Options) => Promise<void>
 
-interface FileFns {
+interface FileExports {
   help?: FileFn
-  default?: FileFn
+  main?: FileFn
+  args?: ReturnType<typeof getArgs>
 }
 
-const JS_EXT = '.js'
-const COMMANDS_PATH = resolve(__dirname, './commands')
-
-const isJSFile = (file: string): boolean => file.slice(-3) === JS_EXT
-
-const commands = new Set(
-  readdirSync(COMMANDS_PATH)
-    .filter((fileName) => isJSFile(fileName))
-    .map((fileName) => fileName.slice(0, -3))
-)
-
-const listCommandsStr = () =>
-  Array.from(commands)
+const listCommandsStr = (commands: string[]) =>
+  commands
     .map(
       ($) => `
   * npx sdk ${$}`
@@ -40,44 +28,45 @@ const listCommandsStr = () =>
 
 const handleError = (err: CliError) => {
   if (!(err instanceof CliError)) {
-    log.fail(`Developer: All errors thrown must be an instance of "CliError"`)
+    log.warn(`Developer: All errors thrown must be an instance of "CliError"`)
   }
   log.fail(err.message)
   process.exit(1)
 }
 
-const validCommandFns = (fns: FileFns): fns is Required<FileFns> => {
-  const { help, default: _def } = fns
-  if (!help || !_def) {
-    throw new CliError(`
-      Command does not follow implementation rules:
-        * Requires a "help" function
-        * Requires a "default" function
+const commandFnsAreValid = (fns: FileExports): fns is Required<FileExports> => {
+  const { help, main } = fns
+  if (!help || !main) {
+    throw new CliError(`Command does not follow implementation rules:
+      * Requires a "help" function
+      * Requires a "main" function
     `)
   }
   return true
 }
 
 const args = getArgs()
-const helpMessage = `Here is the list of commands: ${listCommandsStr()}`
+const helpMessage = (commands: string[]) =>
+  `Here is the list of commands: ${listCommandsStr(commands)}`
 
 ;(async () => {
   const command = process.argv[2]
   const needsHelp = args['--help']
+  const commands = await getCommands()
 
-  if (!commands.has(command)) {
+  if (!commands.includes(command)) {
     if (needsHelp) {
-      log.info(helpMessage)
+      log.info(helpMessage(commands))
       return
     }
     throw new CliError(`Command ${command} is invalid. ${helpMessage}`)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const fns = require(resolve(COMMANDS_PATH, command + JS_EXT))
+  const cmd = require(`${COMMANDS_PATH}/${command}`)
 
-  if (validCommandFns(fns)) {
-    const options = { args: process.argv }
-    needsHelp ? await fns.help(options) : await fns.default(options)
+  if (commandFnsAreValid(cmd)) {
+    const options = { args: cmd.args }
+    needsHelp ? await cmd.help(options) : await cmd.main(options)
   }
 })().catch(handleError)

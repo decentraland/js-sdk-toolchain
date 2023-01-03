@@ -20,5 +20,5 @@ export function getArgs<T extends Args>(
   args: T
 ): Result<typeof DEFAULT_ARGS & T>
 export function getArgs<T extends Args>(args?: T) {
-  return arg({ ...DEFAULT_ARGS, ...args })
+  return arg({ ...DEFAULT_ARGS, ...args }, { permissive: true })
 }
