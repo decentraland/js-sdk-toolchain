@@ -5,7 +5,7 @@ import {
   CrdtMessage,
   Transport
 } from '../../packages/@dcl/ecs/src'
-import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { readMessage } from '../../packages/@dcl/ecs/src/serialization/crdt/message'
 import { int8Component } from './int8component'
 
@@ -17,10 +17,7 @@ function connectEngines(a: IEngine, b: IEngine) {
   }
 
   function intercept(data: Uint8Array, direction: string) {
-    const buffer = createByteBuffer({
-      buffer: data,
-      readingOffset: 0
-    })
+    const buffer = new ReadWriteByteBuffer(data, 0)
 
     let msg: CrdtMessage | null
     while ((msg = readMessage(buffer))) {

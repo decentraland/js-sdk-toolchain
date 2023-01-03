@@ -1,8 +1,8 @@
-import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
 describe('ByteBuffer tests', () => {
   it('test all types', () => {
-    const buf = createByteBuffer()
+    const buf = new ReadWriteByteBuffer()
 
     buf.writeInt8(0xff)
     buf.writeInt16(0xffff)
@@ -36,10 +36,7 @@ describe('ByteBuffer tests', () => {
   })
 
   it('should test bounds conditions', () => {
-    const buf = createByteBuffer({
-      buffer: new Uint8Array([1, 2]),
-      readingOffset: 2
-    })
+    const buf = new ReadWriteByteBuffer(new Uint8Array([1, 2]), 2)
 
     expect(() => {
       buf.readInt8()
@@ -55,10 +52,7 @@ describe('ByteBuffer tests', () => {
   })
 
   it('should write options and endianess', () => {
-    const buf = createByteBuffer({
-      buffer: new Uint8Array([0, 200, 0, 200]),
-      writeOffset: 2
-    })
+    const buf = new ReadWriteByteBuffer(new Uint8Array([0, 200, 0, 200]), 2)
 
     expect(buf.size()).toBe(2)
 
@@ -70,10 +64,7 @@ describe('ByteBuffer tests', () => {
   })
 
   it('should not fail using the view wrapper after a grow', () => {
-    const buf = createByteBuffer({
-      buffer: new Uint8Array([0, 200, 0, 200]),
-      writeOffset: 2
-    })
+    const buf = new ReadWriteByteBuffer(new Uint8Array([0, 200, 0, 200]), 2)
 
     expect(buf.buffer().byteLength).toBe(4)
 
@@ -88,18 +79,16 @@ describe('ByteBuffer tests', () => {
     arr[1] = 0xfa
     arr[3] = 0xde
 
-    const buf = createByteBuffer({
-      buffer: arr.subarray(512),
-      writeOffset: 0
-    })
+    const buf = new ReadWriteByteBuffer(arr.subarray(512), undefined, 0)
     expect(buf.getUint32(0)).toBe(0)
   })
 
   it('should fails using the view after a grow', () => {
-    const buf = createByteBuffer({
-      buffer: new Uint8Array([0, 200, 0, 200]),
-      writeOffset: 2
-    })
+    const buf = new ReadWriteByteBuffer(
+      new Uint8Array([0, 200, 0, 200]),
+      undefined,
+      2
+    )
 
     expect(buf.buffer().byteLength).toBe(4)
 
@@ -109,7 +98,7 @@ describe('ByteBuffer tests', () => {
   })
 
   it('should test increment offset and types with custom offset', () => {
-    const position = createByteBuffer()
+    const position = new ReadWriteByteBuffer()
     const writeOffset = position.incrementWriteOffset(12)
     expect(writeOffset).toBe(0)
 
@@ -144,7 +133,7 @@ describe('ByteBuffer tests', () => {
     const testValueA = [123, 123, 123, 123, 123]
     const testValueB = [77, 77, 77, 77, 77]
 
-    const bb = createByteBuffer()
+    const bb = new ReadWriteByteBuffer()
 
     for (const value of testValueA) {
       bb.writeUint8(value)

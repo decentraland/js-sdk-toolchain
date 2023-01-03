@@ -7,7 +7,7 @@ import {
   CrdtMessageHeader,
   engine
 } from '../packages/@dcl/ecs/src'
-import { createByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import { ReadWriteByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import CrdtMessageProtocol, {
   DeleteComponent,
   DeleteEntity,
@@ -75,9 +75,9 @@ async function run(fileName: string) {
           }): Promise<{ data: Uint8Array[] }> {
             // console.dir(payload)
 
-            const buffer = createByteBuffer({
-              buffer: new Uint8Array(Object.values(payload.data))
-            })
+            const buffer = new ReadWriteByteBuffer(
+              new Uint8Array(Object.values(payload.data))
+            )
 
             let header: CrdtMessageHeader | null
             while ((header = CrdtMessageProtocol.getHeader(buffer))) {
@@ -101,12 +101,7 @@ async function run(fileName: string) {
                   `  CRDT: e=0x${entityId.toString(
                     16
                   )} c=${componentId} t=${timestamp} data=${JSON.stringify(
-                    data &&
-                      c.deserialize(
-                        createByteBuffer({
-                          buffer: data
-                        })
-                      )
+                    data && c.deserialize(new ReadWriteByteBuffer(data))
                   )}`
                 )
               } else if (header.type === CrdtMessageType.DELETE_ENTITY) {

@@ -12,35 +12,34 @@ function getNextSize(currentSize: number, intendedSize: number) {
   return Math.ceil(minNewSize / 1024) * 1024
 }
 
-export type CreateByteBufferOptions = {
-  /**
-   * The initial buffer, provide a buffer if you need to set "initial capacity"
-   */
-  buffer: Uint8Array
-  /**
-   * Set the cursor where begins to read. Default 0
-   */
-  readingOffset?: number
-  /**
-   * Set the cursor to not start writing from the begin of it.
-   * Defaults to the buffer size
-   */
-  writeOffset?: number
-}
-
 const defaultInitialCapacity = 10240
 
-class ReadWriteByteBuffer implements ByteBuffer {
+/**
+ * ByteBuffer is a wrapper of DataView which also adds a read and write offset.
+ *  Also in a write operation it resizes the buffer is being used if it needs.
+ *
+ * - Use read and write function to generate or consume data.
+ * - Use set and get only if you are sure that you're doing.
+ */
+export class ReadWriteByteBuffer implements ByteBuffer {
   _buffer: Uint8Array
   view: DataView
   woffset: number
   roffset: number
-
-  constructor(options?: CreateByteBufferOptions) {
-    this._buffer = options?.buffer || new Uint8Array(defaultInitialCapacity)
+  /**
+   * @param buffer - The initial buffer, provide a buffer if you need to set "initial capacity"
+   * @param readingOffset - Set the cursor where begins to read. Default 0
+   * @param writingOffset - Set the cursor to not start writing from the begin of it. Defaults to the buffer size
+   */
+  constructor(
+    buffer?: Uint8Array | undefined,
+    readingOffset?: number | undefined,
+    writingOffset?: number | undefined
+  ) {
+    this._buffer = buffer || new Uint8Array(defaultInitialCapacity)
     this.view = new DataView(this._buffer.buffer, this._buffer.byteOffset)
-    this.woffset = options?.writeOffset ?? options?.buffer.length ?? 0
-    this.roffset = options?.readingOffset ?? 0
+    this.woffset = writingOffset ?? this._buffer.length ?? 0
+    this.roffset = readingOffset ?? 0
   }
 
   /**
@@ -268,19 +267,6 @@ class ReadWriteByteBuffer implements ByteBuffer {
   setUint64(offset: number, value: bigint): void {
     this.view.setBigUint64(offset, value)
   }
-}
-
-/**
- * ByteBuffer is a wrapper of DataView which also adds a read and write offset.
- *  Also in a write operation it resizes the buffer is being used if it needs.
- *
- * - Use read and write function to generate or consume data.
- * - Use set and get only if you are sure that you're doing.
- */
-export function createByteBuffer(
-  options?: CreateByteBufferOptions
-): ByteBuffer {
-  return new ReadWriteByteBuffer(options)
 }
 
 /**
