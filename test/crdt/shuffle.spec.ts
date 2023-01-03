@@ -9,7 +9,11 @@ function createMessages(
   length: number = 1
 ) {
   return Array.from({ length }).map((_, index) =>
-    client.createEvent(key1, key2, Buffer.from(`Message-${index}-${client.id}`))
+    client.createComponentDataEvent(
+      key1,
+      key2,
+      Buffer.from(`Message-${index}-${client.id}`)
+    )
   )
 }
 
@@ -19,10 +23,10 @@ async function prepareSandbox() {
   const key1 = 7,
     key2 = 11
   const m1 = createMessages(clientA, key1, key2, 2)
-  await Promise.all(m1.map((m) => clientA.sendMessage(m)))
+  await Promise.all(m1.map((m) => clientA.sendMessage(m!)))
 
-  const m2 = createMessages(clientB, key1, key2, 1)[0] // data: Message-1-2
-  const m3 = createMessages(clientC, key1, key2, 1)[0] // data: Message-1-3
+  const m2 = createMessages(clientB, key1, key2, 1)[0]! // data: Message-1-2
+  const m3 = createMessages(clientC, key1, key2, 1)[0]! // data: Message-1-3
   // m3 > m2. m3 wins.
   await Promise.all([clientB.sendMessage(m2), clientC.sendMessage(m3)])
   const messages = [...m1, m2, m3]
@@ -45,7 +49,7 @@ describe('Process messages and get the same result', () => {
     const [clientA] = createSandbox({ clientLength: 1 }).clients
 
     await Promise.all(
-      messages.map(async (message) => await clientA.processMessage(message))
+      messages.map(async (message) => await clientA.processMessage(message!))
     )
 
     expect(
@@ -63,7 +67,7 @@ describe('Process messages and get the same result', () => {
     const [clientA] = createSandbox({ clientLength: 1 }).clients
 
     await Promise.all(
-      shuffle(messages).map(async (message) => clientA.processMessage(message))
+      shuffle(messages).map(async (message) => clientA.processMessage(message!))
     )
 
     expect(
