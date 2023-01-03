@@ -7,7 +7,7 @@ EVAL test/snapshots/cubes.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 55.7k
-  MALLOC_COUNT = 13393
+  MALLOC_COUNT = 13394
   ALIVE_OBJS_DELTA ~= 3.33k
 CALL onStart()
   OPCODES ~= 0.0k
@@ -198,7 +198,7 @@ CALL onUpdate(0.0)
   CRDT: e=0x2b5 c=1 t=1 data={"position":{"x":15.5,"y":0.47935929894447327,"z":9.5},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
   CRDT: e=0x2b6 c=1 t=1 data={"position":{"x":15.5,"y":0.3782283067703247,"z":10.5},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
   CRDT: e=0x200 c=1090 t=1 data={}
-  CRDT: e=0x206 c=1090 t=1 data={"oppositeDirection":true}
+  CRDT: e=0x206 c=1090 t=1 data={"billboardMode":0}
   CRDT: e=0x203 c=1041 t=1 data={"src":"models/shark.glb"}
   CRDT: e=0x204 c=1041 t=1 data={"src":"models/Fish_01.glb"}
   CRDT: e=0x205 c=1041 t=1 data={"src":"models/Underwater_floor.glb"}
@@ -561,7 +561,7 @@ CALL onUpdate(0.0)
   CRDT: e=0x2b4 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   CRDT: e=0x2b5 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   CRDT: e=0x2b6 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  OPCODES ~= 1324.6k
+  OPCODES ~= 1324.5k
   MALLOC_COUNT = 6814
   ALIVE_OBJS_DELTA ~= 2.39k
 CALL onUpdate(0.1)

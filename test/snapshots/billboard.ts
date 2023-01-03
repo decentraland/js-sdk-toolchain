@@ -53,16 +53,14 @@ function createBillboards() {
   createPlaneTexture(4, 3, 8)
 
   Billboard.create(plane1, {
-    billboardMode: BillboardMode.BM_Y_AXE
+    billboardMode: BillboardMode.BM_Y
   })
   Billboard.create(plane2)
   Billboard.create(plane4, {
-    oppositeDirection: true,
-    billboardMode: BillboardMode.BM_ALL_AXES
+    billboardMode: BillboardMode.BM_ALL
   })
   Billboard.create(plane5, {
-    oppositeDirection: true,
-    billboardMode: BillboardMode.BM_Y_AXE
+    billboardMode: BillboardMode.BM_Y
   })
 }
 
