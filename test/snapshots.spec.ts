@@ -10,6 +10,7 @@ import {
 import { createByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import CrdtMessageProtocol, {
   DeleteComponent,
+  DeleteEntity,
   PutComponentOperation
 } from '../packages/@dcl/ecs/src/serialization/crdt'
 import { withQuickJsVm } from './vm'
@@ -112,6 +113,11 @@ async function run(fileName: string) {
                       )
                   )}`
                 )
+              } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
+                const entityId = DeleteEntity.read(buffer)?.entityId
+                out.push(`  CRDT: e=${entityId} deleted`)
+              } else {
+                throw new Error('Unknown CrdtMessageType')
               }
             }
 
