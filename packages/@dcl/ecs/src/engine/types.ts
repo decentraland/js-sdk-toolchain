@@ -3,7 +3,7 @@ import type { ISchema } from '../schemas/ISchema'
 import { MapResult, Spec } from '../schemas/Map'
 import { Transport } from '../systems/crdt/types'
 import { ComponentDefinition } from './component'
-import { Entity } from './entity'
+import { Entity, EntityContainer, EntityState } from './entity'
 import { ReadonlyComponentSchema } from './readonly'
 import { SystemFn } from './systems'
 
@@ -66,11 +66,11 @@ export type IEngine = {
   removeEntityWithChildren(firstEntity: Entity): void
 
   /**
-   * Check if an entity exists in the engine
+   * Check the state of an entityin  the engine
    * @param entity - the entity to validate
-   * @returns true if the entity exists in the engine
+   * @returns known enum value
    */
-  entityExists(entity: Entity): boolean
+  getEntityState(entity: Entity): EntityState
 
   /**
    * Add the system to the engine. It will be called every tick updated.
@@ -225,10 +225,9 @@ export type IEngine = {
   getCrdtState(): State<Uint8Array>
 
   /**
-   * @internal
-   * Returns the crdt state. For now only for testing purpose
+   * Entity continaer
    */
-  componentsDefinition: Map<number, ComponentDefinition<unknown>>
+  entityContainer: EntityContainer
 
   /**
    * Iterator of registered components

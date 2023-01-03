@@ -1,38 +1,56 @@
-import { CRDT, Message, Payload, State } from './types'
-export * from './types'
+import { createGSet } from './gset'
+import {
+  ComponentDataMessage,
+  CRDT,
+  CRDTMessage,
+  CRDTMessageType,
+  DeleteEntityMessage,
+  Payload,
+  ProcessMessageResultType,
+  State
+} from './types'
 
 const globalBuffer = (globalThis as any).Buffer
+
+export * from './types'
 
 /**
  * Compare raw data.
  * @internal
+ * @returns 0 if is the same data, 1 if a > b, -1 if b > a
  */
-export function sameData<T>(a: T, b: T): boolean {
+export function dataCompare<T>(a: T, b: T): number {
   // At reference level
-  if (a === b) return true
+  if (a === b) return 0
+  if (a === null && b !== null) return -1
+  if (a !== null && b === null) return 1
 
   if (a instanceof Uint8Array && b instanceof Uint8Array) {
-    if (a.byteLength !== b.byteLength) {
-      return false
-    }
-
-    for (let i = 0; i < a.byteLength; i++) {
-      if (a[i] !== b[i]) {
-        return false
+    let res: number
+    const n = a.byteLength > b.byteLength ? b.byteLength : a.byteLength
+    for (let i = 0; i < n; i++) {
+      res = a[i] - b[i]
+      if (res !== 0) {
+        return res > 0 ? 1 : -1
       }
     }
-    return true
+    res = a.byteLength - b.byteLength
+    return res > 0 ? 1 : res < 0 ? -1 : 0
   }
 
   if (globalBuffer) {
     /* istanbul ignore next */
     if (a instanceof globalBuffer && b instanceof globalBuffer) {
       /* istanbul ignore next */
-      return (a as any).equals(b)
+      return (a as any).compare(b)
     }
   }
 
-  return false
+  if (typeof a === 'string') {
+    return a.localeCompare(b as string)
+  }
+
+  return a > b ? 1 : -1
 }
 
 /**
@@ -42,11 +60,26 @@ export function sameData<T>(a: T, b: T): boolean {
 export function* stateIterator<T>(
   state: State<T>
 ): IterableIterator<[number, number, Payload<T> | null]> {
-  for (const [key1, value1] of state.entries()) {
-    for (const [key2, value2] of value1.entries()) {
-      yield [key1, key2, value2]
+  for (const [componentId, value1] of state.components.entries()) {
+    for (const [entityId, value2] of value1.entries()) {
+      yield [componentId, entityId, value2]
     }
   }
+}
+
+export type EntityUtils = {
+  /**
+   * Convert from entityId to the tuple [entityNumber, entityVersion]
+   * @param entityId compound number entityId
+   */
+  fromEntityId(entityId: number): [number, number]
+
+  /**
+   * Convert tuple [entityNumber, entityVersion] to entityId compound number
+   * @param entityNumber number part
+   * @param entityVersion version part
+   */
+  toEntityId(entityNumber: number, entityVersion: number): number
 }
 
 /**
@@ -56,52 +89,88 @@ export function* stateIterator<T>(
  * to process and store the new data in case its an update, or
  * to discard and send our local value cause remote it's outdated.
  */
-export function crdtProtocol<
-  T extends number | Uint8Array | string
->(): CRDT<T> {
+export function crdtProtocol<T extends number | Uint8Array | string>(
+  entityUtils: EntityUtils
+): CRDT<T> {
   /**
    * Local state where we store the latest lamport timestamp
    * and the raw data value
    * @internal
    */
-  const state: State<T> = new Map()
+  const state: State<T> = {
+    components: new Map(),
+    deletedEntities: createGSet()
+  }
 
   /**
    * We should call this fn in order to update the state
    * @internal
    */
   function updateState(
-    key1: number,
-    key2: number,
+    componentId: number,
+    entityId: number, // todo: force type entity
     data: T | null,
     remoteTimestamp: number
   ): Payload<T> {
-    const key1Value = state.get(key1)
+    const componentIdValue = state.components.get(componentId)
     const timestamp = Math.max(
       remoteTimestamp,
-      key1Value?.get(key2)?.timestamp || 0
+      componentIdValue?.get(entityId)?.timestamp || 0
     )
-    if (key1Value) {
-      key1Value.set(key2, { timestamp, data })
+    if (componentIdValue) {
+      componentIdValue.set(entityId, { timestamp, data })
     } else {
-      const newKey1Value = new Map()
-      newKey1Value.set(key2, { timestamp, data })
-      state.set(key1, newKey1Value)
+      const componentIdValue = new Map()
+      componentIdValue.set(entityId, { timestamp, data })
+      state.components.set(componentId, componentIdValue)
     }
     return { timestamp, data }
   }
 
   /**
    * Create an event for the specified key and store the new data and
-   * lamport timestmap incremented by one in the state.
+   * lamport timestmap incremented by one in the state.components.
    * @public
    */
-  function createEvent(key1: number, key2: number, data: T | null): Message<T> {
+  function createComponentDataEvent(
+    componentId: number,
+    entityId: number,
+    data: T | null
+  ): ComponentDataMessage<T> | null {
     // Increment the timestamp
-    const timestamp = (state.get(key1)?.get(key2)?.timestamp || 0) + 1
-    updateState(key1, key2, data, timestamp)
+    const timestamp =
+      (state.components.get(componentId)?.get(entityId)?.timestamp || 0) + 1
 
-    return { key1, key2, data, timestamp }
+    const msg: ComponentDataMessage<T> = {
+      type: CRDTMessageType.CRDTMT_PutComponentData,
+      componentId,
+      entityId,
+      data,
+      timestamp
+    }
+
+    const res = processComponentDataMessage(msg)
+    if (res === ProcessMessageResultType.StateUpdatedTimestamp) {
+      return msg
+    } else {
+      return null
+    }
+  }
+
+  /**
+   * Create an event for the specified key and store the new data and
+   * lamport timestmap incremented by one in the state.components.
+   * @public
+   */
+  function createDeleteEntityEvent(entityId: number): DeleteEntityMessage {
+    // Increment the timestamp
+    const message: DeleteEntityMessage = {
+      type: CRDTMessageType.CRDTMT_DeleteEntity,
+      entityId
+    }
+
+    processDeleteEntityMessage(message)
+    return message
   }
 
   /**
@@ -113,47 +182,75 @@ export function crdtProtocol<
    * If it was an outdated message, then we return void
    * @public
    */
-  function processMessage(message: Message<T>): Message<T> {
-    const { key1, key2, data, timestamp } = message
-    const current = state.get(key1)?.get(key2)
+  function processComponentDataMessage(
+    message: ComponentDataMessage<T>
+  ): ProcessMessageResultType {
+    const [entityNumber, entityVersion] = entityUtils.fromEntityId(
+      message.entityId
+    )
+    if (state.deletedEntities.has(entityNumber, entityVersion)) {
+      return ProcessMessageResultType.EntityWasDeleted
+    }
 
-    // The received message is > than our current value, update our state.
+    const { componentId, entityId, data, timestamp } = message
+    const current = state.components.get(componentId)?.get(entityId)
+
+    // The received message is > than our current value, update our state.components.
     if (!current || current.timestamp < timestamp) {
-      updateState(key1, key2, data, timestamp)
-      return message
+      updateState(componentId, entityId, data, timestamp)
+      return ProcessMessageResultType.StateUpdatedTimestamp
     }
 
     // Outdated Message. Resend our state message through the wire.
     if (current.timestamp > timestamp) {
-      return {
-        key1,
-        key2,
-        data: current.data,
-        timestamp: current.timestamp
-      }
+      return ProcessMessageResultType.StateOutdatedData
     }
+
+    const currentDataGreater = dataCompare(current.data, data)
 
     // Same data, same timestamp. Weirdo echo message.
-    if (sameData(current.data, data)) {
-      return message
+    if (currentDataGreater === 0) {
+      return ProcessMessageResultType.NoChanges
+
+      // Current data is greater
+    } else if (currentDataGreater > 0) {
+      return ProcessMessageResultType.StateOutdatedData
+
+      // Curent data is lower
+    } else {
+      updateState(componentId, entityId, data, timestamp)
+      return ProcessMessageResultType.StateUpdatedData
+    }
+  }
+
+  /*
+   * @public
+   */
+  function processMessage(message: CRDTMessage<T>): ProcessMessageResultType {
+    if (message.type === CRDTMessageType.CRDTMT_PutComponentData) {
+      return processComponentDataMessage(message as ComponentDataMessage<T>)
+    } else if (message.type === CRDTMessageType.CRDTMT_DeleteEntity) {
+      return processDeleteEntityMessage(message as DeleteEntityMessage)
+    } else {
+      return ProcessMessageResultType.NoChanges
+    }
+  }
+
+  function processDeleteEntityMessage(
+    message: DeleteEntityMessage
+  ): ProcessMessageResultType {
+    const { entityId } = message
+    const [entityNumber, entityVersion] = entityUtils.fromEntityId(
+      message.entityId
+    )
+
+    state.deletedEntities.addTo(entityNumber, entityVersion)
+
+    for (const [, payload] of state.components) {
+      payload.delete(entityId)
     }
 
-    // Race condition, same timestamp diff data.
-    function compareData(current: T | null, data: T | null) {
-      // Null value wins
-      return !current || current! > data!
-    }
-
-    if (compareData(current.data, data)) {
-      return {
-        key1,
-        key2,
-        data: current.data,
-        timestamp: current.timestamp
-      }
-    }
-    updateState(key1, key2, data, timestamp).data
-    return message
+    return ProcessMessageResultType.EntityDeleted
   }
 
   /**
@@ -168,13 +265,17 @@ export function crdtProtocol<
    * Returns the element state of a given element of the LWW-ElementSet
    * @public
    */
-  function getElementSetState(key1: number, key2: number): Payload<T> | null {
-    return state.get(key1)?.get(key2) || null
+  function getElementSetState(
+    componentId: number,
+    entityId: number
+  ): Payload<T> | null {
+    return state.components.get(componentId)?.get(entityId) || null
   }
 
   return {
     getElementSetState,
-    createEvent,
+    createComponentDataEvent,
+    createDeleteEntityEvent,
     processMessage,
     getState
   }

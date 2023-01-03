@@ -1,11 +1,18 @@
-import WireMessage from '../packages/@dcl/ecs/src/serialization/wireMessage'
-import { createByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { ComponentOperation as Message } from '../packages/@dcl/ecs/src/serialization/crdt/componentOperation'
-import { engine } from '../packages/@dcl/ecs/src'
-import { existsSync, readFileSync, writeFileSync } from 'fs-extra'
-import path from 'path'
-import glob from 'glob'
 import { exec } from 'child_process'
+import { existsSync, readFileSync, writeFileSync } from 'fs-extra'
+import glob from 'glob'
+import path from 'path'
+import {
+  CrdtMessageType,
+  CrdtMessageHeader,
+  engine
+} from '../packages/@dcl/ecs/src'
+import { createByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import CrdtMessageProtocol, {
+  DeleteComponent,
+  DeleteEntity,
+  PutComponentOperation
+} from '../packages/@dcl/ecs/src/serialization/crdt'
 import { withQuickJsVm } from './vm'
 import { version as vmVersion } from '@dcl/quickjs-emscripten/package.json'
 
@@ -72,22 +79,42 @@ async function run(fileName: string) {
               buffer: new Uint8Array(Object.values(payload.data))
             })
 
-            while (WireMessage.validate(buffer)) {
-              const message = Message.read(buffer)!
-              const { entity, componentId, data, timestamp } = message
+            let header: CrdtMessageHeader | null
+            while ((header = CrdtMessageProtocol.getHeader(buffer))) {
+              if (
+                header.type === CrdtMessageType.PUT_COMPONENT ||
+                header.type === CrdtMessageType.DELETE_COMPONENT
+              ) {
+                const message =
+                  header.type === CrdtMessageType.DELETE_COMPONENT
+                    ? DeleteComponent.read(buffer)!
+                    : PutComponentOperation.read(buffer)!
+                const { entityId, componentId, timestamp } = message
+                const data =
+                  message.type === CrdtMessageType.PUT_COMPONENT
+                    ? message.data
+                    : undefined
 
-              const c = engine.getComponent(componentId)
+                const c = engine.getComponent(componentId)
 
-              out.push(
-                `  CRDT: e=${entity} c=${componentId} t=${timestamp} data=${JSON.stringify(
-                  data &&
-                    c.deserialize(
-                      createByteBuffer({
-                        buffer: data
-                      })
-                    )
-                )}`
-              )
+                out.push(
+                  `  CRDT: e=0x${entityId.toString(
+                    16
+                  )} c=${componentId} t=${timestamp} data=${JSON.stringify(
+                    data &&
+                      c.deserialize(
+                        createByteBuffer({
+                          buffer: data
+                        })
+                      )
+                  )}`
+                )
+              } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
+                const entityId = DeleteEntity.read(buffer)!.entityId
+                out.push(`  CRDT: e=0x${entityId?.toString(16)} deleted`)
+              } else {
+                throw new Error('Unknown CrdtMessageType')
+              }
             }
 
             return { data: [] }
