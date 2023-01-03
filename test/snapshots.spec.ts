@@ -136,7 +136,10 @@ async function run(fileName: string) {
 
       out.push(
         '  OPCODES ~= ' +
-          hundredsNotation(opcodes.reduce(($, $$) => $ + $$.count, 0n))
+          hundredsNotation(
+            opcodes.reduce(($, $$) => $ + $$.count, 0n),
+            0
+          )
       )
 
       const deltaAllocations = memory.malloc_count - prevAllocations
