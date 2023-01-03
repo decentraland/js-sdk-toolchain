@@ -314,11 +314,15 @@ describe('CRDT tests', () => {
     clientA.Transform.create(entityA, { position: Vector3.One() })
 
     // before the update, the crdt state is out-to-date
-    expect(checkCrdtStateWithEngine(clientA.engine).freeConflicts).toBe(false)
+    expect(
+      checkCrdtStateWithEngine(clientA.engine).conflicts.length === 0
+    ).toBe(false)
     await clientA.engine.update(1)
 
     // now, the crdt state and engine should converge
-    expect(checkCrdtStateWithEngine(clientA.engine).freeConflicts).toBe(true)
+    expect(
+      checkCrdtStateWithEngine(clientA.engine).conflicts.length === 0
+    ).toBe(true)
 
     // between clients, ClientA hasn't sent anything yet, so, crdt state won't be synched
     expect(compareStatePayloads(getCrdtStates())).toBe(false)

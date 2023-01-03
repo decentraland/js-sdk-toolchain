@@ -331,42 +331,41 @@ describe('test CRDT flow E2E', () => {
       expect(int8B.getOrNull(entityA)).toBe(88)
     })
   })
-  // describe('conflict resolution case 4', () => {
-  //   it('same as case 3) but with roles inverted', async () => {
-  //     int8B.deleteFrom(entityA)
-  //     updateIntA(entityA, 114)
+  describe('conflict resolution case 4', () => {
+    it('same as case 3) but with roles inverted', async () => {
+      int8B.deleteFrom(entityA)
+      updateIntA(entityA, 114)
 
-  //     // We send the message from A -> B
-  //     await engineA.update(0)
-  //     expect(env.connection.interceptedMessages).toMatchObject([
-  //       // this value will have has the same timestamp in both engines
-  //       {
-  //         direction: 'a->b',
-  //         componentId: 123987,
-  //         entityId: entityA,
-  //         data: Uint8Array.of(88),
-  //         timestamp: 7
-  //       }
-  //     ])
-  //     env.connection.interceptedMessages = []
-  //   })
+      // We send the message from A -> B
+      await engineA.update(0)
+      expect(env.connection.interceptedMessages).toMatchObject([
+        // this value will have has the same timestamp in both engines
+        {
+          direction: 'a->b',
+          entityId: entityA,
+          data: Uint8Array.of(114),
+          timestamp: 7
+        }
+      ])
+      env.connection.interceptedMessages = []
+    })
 
-  //   it('now we are receiving the updates from engineA', async () => {
-  //     // run update tick on engineA so we receive the message of the component that we already remove
-  //     await engineB.update(0)
-  //     expect(env.connection.interceptedMessages).toMatchObject([])
+    it('now we are receiving the updates from engineA', async () => {
+      // run update tick on engineA so we receive the message of the component that we already remove
+      await engineB.update(0)
+      expect(env.connection.interceptedMessages).toMatchObject([])
 
-  //     await Promise.all([engineA.update(0), engineB.update(0)])
-  //     expect(env.connection.interceptedMessages).toMatchObject([])
+      await Promise.all([engineA.update(0), engineB.update(0)])
+      expect(env.connection.interceptedMessages).toMatchObject([])
 
-  //     expect(int8A.getOrNull(entityA)).toBe(114)
-  //     expect(int8B.getOrNull(entityA)).toBe(114)
-  //   })
-  // })
+      expect(int8A.getOrNull(entityA)).toBe(114)
+      expect(int8B.getOrNull(entityA)).toBe(114)
+    })
+  })
   describe('conflict resolution case 5', () => {
     it('the entity is deleted, this operation wins always', async () => {
       removeEntityB(entityA)
-      updateIntA(entityA, 114)
+      updateIntA(entityA, 118)
 
       // We send the message from A -> B
       await engineA.update(0)
@@ -375,8 +374,8 @@ describe('test CRDT flow E2E', () => {
           direction: 'a->b',
           componentId: 123987,
           entityId: entityA,
-          data: Uint8Array.of(114),
-          timestamp: 7
+          data: Uint8Array.of(118),
+          timestamp: 8
         }
       ])
       env.connection.interceptedMessages = []
@@ -397,7 +396,7 @@ describe('test CRDT flow E2E', () => {
           componentId: 123987,
           direction: 'b->a',
           entityId: entityA,
-          timestamp: 8,
+          timestamp: 9,
           type: CrdtMessageType.DELETE_COMPONENT
         },
         {

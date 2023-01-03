@@ -34,6 +34,14 @@ export function wait(ms: number) {
   return new Promise<void>((resolve) => setTimeout(() => resolve(), ms))
 }
 
+/**
+ * Compare the internal crdt state with the engine state.
+ * - Deleted entities in the engine have to be the same as in the deleted entities gset on crdt
+ * - each pair of <component, entityId> has to be the same data in both
+ *
+ * @param engine
+ * @returns object with a conflicts array, if it's zero, it goes well.
+ */
 export function checkCrdtStateWithEngine(engine: IEngine) {
   const conflicts: string[] = []
   const usedEntitiesByComponents: Set<Entity> = new Set()
@@ -120,8 +128,7 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
   }
 
   return {
-    conflicts,
-    freeConflicts: conflicts.length === 0
+    conflicts
   }
 }
 
@@ -188,8 +195,7 @@ export namespace SandBox {
         const buffer = createByteBuffer()
         for (let i = 0; i < N; i++) {
           const msg = msgsOutgoing.pop()!
-          const offset = buffer.incrementWriteOffset(msg.length)
-          buffer.buffer().set(msg.data, offset)
+          buffer.writeBuffer(msg.data, false)
         }
 
         for (const client of clients) {
