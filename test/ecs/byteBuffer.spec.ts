@@ -16,7 +16,7 @@ describe('ByteBuffer tests', () => {
     buf.writeFloat64(Math.PI)
     buf.writeBuffer(new Uint8Array([27, 43, 97, 31]))
 
-    expect(buf.size()).toBe(50)
+    expect(buf.currentWriteOffset()).toBe(50)
 
     expect(buf.readInt8()).toBe(-1)
     expect(buf.readInt16()).toBe(-1)
@@ -42,29 +42,29 @@ describe('ByteBuffer tests', () => {
       buf.readInt8()
     }).toThrowError('Outside of the bounds of writen data.')
 
-    expect(buf.size()).toBe(2)
+    expect(buf.currentWriteOffset()).toBe(2)
     buf.writeInt8(100)
 
-    expect(buf.size()).toBeGreaterThan(2)
+    expect(buf.currentWriteOffset()).toBeGreaterThan(2)
     expect(buf.bufferLength()).toBeGreaterThan(20)
 
     expect(buf.readUint8()).toBe(100)
   })
 
   it('should write options and endianess', () => {
-    const buf = new ReadWriteByteBuffer(new Uint8Array([0, 200, 0, 200]), 2)
+    const buf = new ReadWriteByteBuffer(new Uint8Array([0, 200, 0, 200]), 0, 2)
 
-    expect(buf.size()).toBe(2)
+    expect(buf.currentWriteOffset()).toBe(2)
 
     buf.writeUint16(0xffff)
 
-    expect(buf.size()).toBe(4)
+    expect(buf.currentWriteOffset()).toBe(4)
     expect(buf.bufferLength()).toBe(4)
     expect(buf.toBinary().toString()).toBe([0, 200, 255, 255].toString())
   })
 
   it('should not fail using the view wrapper after a grow', () => {
-    const buf = new ReadWriteByteBuffer(new Uint8Array([0, 200, 0, 200]), 2)
+    const buf = new ReadWriteByteBuffer(new Uint8Array([0, 200, 0, 200]), 0, 2)
 
     expect(buf.buffer().byteLength).toBe(4)
 
@@ -72,6 +72,8 @@ describe('ByteBuffer tests', () => {
 
     expect(buf.buffer().byteLength).toBeGreaterThan(4)
     expect(buf.getUint32(2)).toBe(0xfade)
+    expect(buf.getUint8(0)).toBe(0)
+    expect(buf.getUint8(1)).toBe(200)
   })
 
   it('should create a buffer with subArray offset', () => {

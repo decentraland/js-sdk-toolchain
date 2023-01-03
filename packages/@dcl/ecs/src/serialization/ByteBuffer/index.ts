@@ -138,9 +138,6 @@ export class ReadWriteByteBuffer implements ByteBuffer {
   incrementWriteOffset(amount: number): number {
     return this.#woAdd(amount)
   }
-  size(): number {
-    return this.woffset
-  }
   toBinary() {
     return this._buffer.subarray(0, this.woffset)
   }
@@ -326,10 +323,6 @@ export type ByteBuffer = {
    * @returns The offset when this reserving starts.
    */
   incrementWriteOffset(amount: number): number
-  /**
-   * @returns The total number of bytes writen in the buffer.
-   */
-  size(): number
   /**
    * Take care using this function, if you modify the data after, the
    * returned subarray will change too. If you'll modify the content of the

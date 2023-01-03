@@ -393,7 +393,7 @@ export function crdtSceneSystem(
           transportBuffer.writeBuffer(message.messageBuffer, false)
         }
       }
-      const message = transportBuffer.size()
+      const message = transportBuffer.currentWriteOffset()
         ? transportBuffer.toBinary()
         : new Uint8Array([])
       await transport.send(message)
