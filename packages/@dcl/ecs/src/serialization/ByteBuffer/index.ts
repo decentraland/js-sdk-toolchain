@@ -38,7 +38,7 @@ export class ReadWriteByteBuffer implements ByteBuffer {
   ) {
     this._buffer = buffer || new Uint8Array(defaultInitialCapacity)
     this.view = new DataView(this._buffer.buffer, this._buffer.byteOffset)
-    this.woffset = writingOffset ?? this._buffer.length ?? 0
+    this.woffset = writingOffset ?? (buffer ? this._buffer.length : 0) ?? 0
     this.roffset = readingOffset ?? 0
   }
 
