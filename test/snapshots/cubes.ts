@@ -9,7 +9,6 @@ import {
 } from '@dcl/sdk/ecs'
 import { Color3 } from '@dcl/sdk/math'
 export * from '@dcl/sdk'
-
 // My cube generator
 function createCube(x: number, y: number, z: number) {
   // Dynamic entity because we aren't loading static entities out of this scene code
@@ -93,7 +92,7 @@ function spawnCubes() {
   })
 
   Billboard.create(sign, {
-    oppositeDirection: true
+    billboardMode: 0
   })
 
   for (let x = 0.5; x < 16; x += 1) {

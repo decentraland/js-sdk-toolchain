@@ -1,28 +1,28 @@
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
-  OPCODES ~= 0.0k
+  OPCODES ~= 0k
   MALLOC_COUNT = 1005
   ALIVE_OBJS_DELTA ~= 0.19k
 EVAL test/snapshots/simple.js
-  OPCODES ~= 0.0k
+  OPCODES ~= 0k
   MALLOC_COUNT = 23
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onStart()
-  OPCODES ~= 0.0k
+  OPCODES ~= 0k
   MALLOC_COUNT = 2
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.0)
-  OPCODES ~= 0.0k
+  OPCODES ~= 0k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
-  OPCODES ~= 0.0k
+  OPCODES ~= 0k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
-  OPCODES ~= 0.0k
+  OPCODES ~= 0k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
-  OPCODES ~= 0.0k
+  OPCODES ~= 0k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k

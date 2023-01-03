@@ -1,42 +1,42 @@
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
-  OPCODES ~= 0.0k
+  OPCODES ~= 0k
   MALLOC_COUNT = 1005
   ALIVE_OBJS_DELTA ~= 0.19k
 EVAL test/snapshots/cube-deleted.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 10.3k
-  MALLOC_COUNT = 5820
-  ALIVE_OBJS_DELTA ~= 0.95k
+  OPCODES ~= 10k
+  MALLOC_COUNT = 5949
+  ALIVE_OBJS_DELTA ~= 1.01k
 CALL onStart()
-  OPCODES ~= 0.0k
+  OPCODES ~= 0k
   MALLOC_COUNT = 2
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.0)
   CRDT: e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   CRDT: e=0x201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-  OPCODES ~= 6.9k
-  MALLOC_COUNT = 99
-  ALIVE_OBJS_DELTA ~= 0.03k
+  OPCODES ~= 7k
+  MALLOC_COUNT = 103
+  ALIVE_OBJS_DELTA ~= 0.04k
 CALL onUpdate(0.1)
   CRDT: e=0x201 c=1019 t=2 data=undefined
   CRDT: e=0x202 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   CRDT: e=0x201 deleted
-  OPCODES ~= 4.7k
+  OPCODES ~= 5k
   MALLOC_COUNT = 8
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   CRDT: e=0x202 c=1019 t=2 data=undefined
   CRDT: e=0x10201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   CRDT: e=0x202 deleted
-  OPCODES ~= 4.7k
+  OPCODES ~= 5k
   MALLOC_COUNT = 2
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   CRDT: e=0x10201 c=1019 t=2 data=undefined
   CRDT: e=0x10202 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   CRDT: e=0x10201 deleted
-  OPCODES ~= 4.8k
+  OPCODES ~= 5k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k

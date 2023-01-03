@@ -157,7 +157,6 @@ export type ByteBuffer = {
     readBuffer(): Uint8Array;
     readUtf8String(): string;
     incrementWriteOffset(amount: number): number;
-    size(): number;
     toBinary(): Uint8Array;
     toCopiedBinary(): Uint8Array;
     writeUtf8String(value: string, writeLength?: boolean): void;

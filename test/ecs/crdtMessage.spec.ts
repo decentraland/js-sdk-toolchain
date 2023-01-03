@@ -3,7 +3,7 @@ import { TRANSFORM_LENGTH } from '../../packages/@dcl/ecs/src/components/legacy/
 import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/src/math'
 
-import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import {
   CrdtMessageType,
   CRDT_MESSAGE_HEADER_LENGTH
@@ -19,14 +19,12 @@ import { readMessage } from '../../packages/@dcl/ecs/src/serialization/crdt/mess
 
 describe('Component operation tests', () => {
   it('validate corrupt message', () => {
-    const buf = createByteBuffer({
-      reading: {
-        buffer: new Uint8Array([
-          255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
-        ]),
-        currentOffset: 0
-      }
-    })
+    const buf = new ReadWriteByteBuffer(
+      new Uint8Array([
+        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
+      ]),
+      0
+    )
 
     expect(CrdtMessageProtocol.validate(buf)).toBe(false)
     expect(DeleteComponent.read(buf)).toBe(null)
@@ -50,7 +48,7 @@ describe('Component operation tests', () => {
       parent: 0 as Entity
     })
 
-    const bb = createByteBuffer()
+    const bb = new ReadWriteByteBuffer()
 
     PutComponentOperation.write(entityA, timestamp, Transform, bb)
 
@@ -72,7 +70,7 @@ describe('Component operation tests', () => {
   })
 
   it('should return null if it has an invalid header', () => {
-    const buf = createByteBuffer()
+    const buf = new ReadWriteByteBuffer()
     expect(readMessage(buf)).toBe(null)
     expect(DeleteEntity.read(buf)).toBe(null)
 
@@ -82,7 +80,7 @@ describe('Component operation tests', () => {
   })
 
   it('should fail null if it has an invalid type', () => {
-    const buf = createByteBuffer()
+    const buf = new ReadWriteByteBuffer()
 
     function writeSomeInvalidMessage() {
       buf.writeUint32(8)
