@@ -242,13 +242,16 @@ export function defineComponent<T>(
       }
     },
     toBinary(entity: Entity): ByteBuffer {
-      const serialized = this.toBinaryOrNull(entity)
-      if (!serialized) {
+      const component = data.get(entity)
+      if (!component) {
         throw new Error(
           `[toBinary] Component ${componentId} for ${entity} not found`
         )
       }
-      return serialized
+
+      const writeBuffer = new ReadWriteByteBuffer()
+      spec.serialize(component, writeBuffer)
+      return writeBuffer
     },
     toBinaryOrNull(entity: Entity): ByteBuffer | null {
       const component = data.get(entity)

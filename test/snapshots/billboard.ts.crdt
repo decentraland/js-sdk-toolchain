@@ -7,7 +7,7 @@ EVAL test/snapshots/billboard.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 20.0k
-  MALLOC_COUNT = 11731
+  MALLOC_COUNT = 11730
   ALIVE_OBJS_DELTA ~= 2.25k
 CALL onStart()
   OPCODES ~= 0.0k
