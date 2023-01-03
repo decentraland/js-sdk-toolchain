@@ -1,7 +1,7 @@
 import { ByteBuffer, Entity, IEngine } from '../../packages/@dcl/ecs/src/engine'
 import * as components from '../../packages/@dcl/ecs/src/components'
 
-import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
 export const ID = 123987
 export const int8Component = (engine: IEngine) => {
@@ -69,13 +69,13 @@ export const int8Component = (engine: IEngine) => {
       }
     },
     toBinary: function (entity: Entity): ByteBuffer {
-      const b = createByteBuffer()
+      const b = new ReadWriteByteBuffer()
       b.writeInt8(values.get(entity)!)
       return b
     },
     toBinaryOrNull: function (entity: Entity): ByteBuffer | null {
       if (!values.has(entity)) return null
-      const b = createByteBuffer()
+      const b = new ReadWriteByteBuffer()
       b.writeInt8(values.get(entity)!)
       return b
     },

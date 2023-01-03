@@ -7,7 +7,7 @@ import {
 
 import { Entity, EntityState, EntityUtils } from '../../engine/entity'
 import type { ComponentDefinition, IEngine } from '../../engine'
-import { createByteBuffer } from '../../serialization/ByteBuffer'
+import { ReadWriteByteBuffer } from '../../serialization/ByteBuffer'
 import CrdtMessageProtocol from '../../serialization/crdt'
 import { DeleteComponent } from '../../serialization/crdt/deleteComponent'
 import { DeleteEntity } from '../../serialization/crdt/deleteEntity'
@@ -59,9 +59,7 @@ export function crdtSceneSystem(
      * @param chunkMessage A chunk of binary messages
      */
     return function parseChunkMessage(chunkMessage: Uint8Array) {
-      const buffer = createByteBuffer({
-        reading: { buffer: chunkMessage, currentOffset: 0 }
-      })
+      const buffer = new ReadWriteByteBuffer(chunkMessage)
 
       let header: CrdtMessageHeader | null
       while ((header = CrdtMessageProtocol.getHeader(buffer))) {
@@ -123,20 +121,17 @@ export function crdtSceneSystem(
    */
   async function receiveMessages() {
     const messagesToProcess = getMessages(receivedMessages)
-    const bufferForOutdated = createByteBuffer()
+    const bufferForOutdated = new ReadWriteByteBuffer()
     const entitiesShouldBeCleaned: Entity[] = []
 
     for (const msg of messagesToProcess) {
-      // TODO: emit delete entity to el onCrdtMessage
       if (msg.type === CrdtMessageType.DELETE_ENTITY) {
         crdtClient.processMessage({
           type: CRDTMessageType.CRDTMT_DeleteEntity,
           entityId: msg.entityId
         })
-
         entitiesShouldBeCleaned.push(msg.entityId)
       } else {
-        // TODO: emit pu/delete component to el onCrdtMessage
         const crdtMessage: ComponentDataMessage<Uint8Array> = {
           type: CRDTMessageType.CRDTMT_PutComponentData,
           entityId: msg.entityId,
@@ -181,10 +176,7 @@ export function crdtSceneSystem(
             if (msg.type === CrdtMessageType.DELETE_COMPONENT) {
               component.deleteFrom(msg.entityId, false)
             } else {
-              const opts = {
-                reading: { buffer: msg.data!, currentOffset: 0 }
-              }
-              const data = createByteBuffer(opts)
+              const data = new ReadWriteByteBuffer(msg.data!)
               component.upsertFromBinary(msg.entityId, data, false)
             }
 
@@ -239,7 +231,6 @@ export function crdtSceneSystem(
       }
     }
 
-    // TODO: emit delete entity to el onCrdtMessage
     for (const entity of entitiesShouldBeCleaned) {
       // If we tried to resend outdated message and the entity was deleted before, we avoid sending them.
       for (let i = outdatedMessages.length - 1; i >= 0; i--) {
@@ -316,7 +307,7 @@ export function crdtSceneSystem(
     // CRDT Messages will be the merge between the recieved transport messages and the new crdt messages
     const crdtMessages = getMessages(broadcastMessages)
     const outdatedMessagesBkp = getMessages(outdatedMessages)
-    const buffer = createByteBuffer()
+    const buffer = new ReadWriteByteBuffer()
     for (const [component, entities] of dirtyEntities) {
       for (const entity of entities) {
         // Component will be always defined here since dirtyMap its an iterator of engine.componentsDefinition
@@ -370,7 +361,7 @@ export function crdtSceneSystem(
     }
 
     // Send CRDT messages to transports
-    const transportBuffer = createByteBuffer()
+    const transportBuffer = new ReadWriteByteBuffer()
     for (const index in transports) {
       const transportIndex = Number(index)
       const transport = transports[transportIndex]
@@ -402,7 +393,7 @@ export function crdtSceneSystem(
           transportBuffer.writeBuffer(message.messageBuffer, false)
         }
       }
-      const message = transportBuffer.size()
+      const message = transportBuffer.currentWriteOffset()
         ? transportBuffer.toBinary()
         : new Uint8Array([])
       await transport.send(message)

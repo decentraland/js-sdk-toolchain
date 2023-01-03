@@ -1,5 +1,5 @@
 import type { ISchema } from '../schemas/ISchema'
-import { ByteBuffer, createByteBuffer } from '../serialization/ByteBuffer'
+import { ByteBuffer, ReadWriteByteBuffer } from '../serialization/ByteBuffer'
 import { Entity } from './entity'
 import { deepReadonly, DeepReadonly } from './readonly'
 
@@ -249,7 +249,7 @@ export function defineComponent<T>(
         )
       }
 
-      const writeBuffer = createByteBuffer()
+      const writeBuffer = new ReadWriteByteBuffer()
       spec.serialize(component, writeBuffer)
       return writeBuffer
     },
@@ -259,7 +259,7 @@ export function defineComponent<T>(
         return null
       }
 
-      const writeBuffer = createByteBuffer()
+      const writeBuffer = new ReadWriteByteBuffer()
       spec.serialize(component, writeBuffer)
       return writeBuffer
     },

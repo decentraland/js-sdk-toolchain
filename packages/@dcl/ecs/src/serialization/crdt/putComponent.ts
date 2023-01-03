@@ -28,7 +28,7 @@ export namespace PutComponentOperation {
 
     // write body
     componentDefinition.writeToByteBuffer(entity, buf)
-    const messageLength = buf.size() - startMessageOffset
+    const messageLength = buf.currentWriteOffset() - startMessageOffset
 
     // Write CrdtMessage header
     buf.setUint32(startMessageOffset, messageLength)

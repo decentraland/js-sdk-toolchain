@@ -66,6 +66,9 @@ scripts/rpc-api-generation/src/proto/%.gen.ts: packages/@dcl/ecs/node_modules/@d
 
 compile_apis: ${PBS_TS}
 
+deep-clean-and-snapshot:
+	git clean -fxd && $(make) install build test update-snapshots lint-fix
+
 .PHONY: build test install docs
 
 deep-clean:

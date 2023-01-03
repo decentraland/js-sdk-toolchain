@@ -11,7 +11,7 @@ import {
   EntityUtils,
   RESERVED_STATIC_ENTITIES
 } from '../../packages/@dcl/ecs/src/engine/entity'
-import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { Vector3 } from '../../packages/@dcl/sdk/src/math'
 import { compareStatePayloads } from '../crdt/utils'
 import { stateToString } from '../crdt/utils/state'
@@ -233,13 +233,13 @@ describe('CRDT tests', () => {
     await engine.update(1)
     Transform.getMutable(entity).position.x = 8
     await engine.update(1)
-    const buffer = createByteBuffer()
+    const buffer = new ReadWriteByteBuffer()
     PutComponentOperation.write(entity, 0, Transform, buffer)
     jest.resetAllMocks()
     transports[0].onmessage!(buffer.toBinary())
     await engine.update(1)
 
-    const outdatedBuffer = createByteBuffer()
+    const outdatedBuffer = new ReadWriteByteBuffer()
     PutComponentOperation.write(entity, 2, Transform, outdatedBuffer)
     expect(spySend).toBeCalledWith(outdatedBuffer.toBinary())
   })
@@ -250,14 +250,14 @@ describe('CRDT tests', () => {
     const Transform = components.Transform(engine)
     Transform.create(entity, SandBox.DEFAULT_POSITION)
     await engine.update(1)
-    const buffer = createByteBuffer()
+    const buffer = new ReadWriteByteBuffer()
     PutComponentOperation.write(entity, 0, Transform, buffer)
     Transform.deleteFrom(entity)
     await engine.update(1)
     jest.resetAllMocks()
     transports[0].onmessage!(buffer.toBinary())
     await engine.update(1)
-    const outdatedBuffer = createByteBuffer()
+    const outdatedBuffer = new ReadWriteByteBuffer()
     DeleteComponent.write(entity, Transform._id, 2, outdatedBuffer)
     expect(spySend).toBeCalledWith(outdatedBuffer.toBinary())
   })
@@ -271,7 +271,7 @@ describe('CRDT tests', () => {
     Transform.create(entity, SandBox.DEFAULT_POSITION)
     await engine.update(1)
 
-    const buffer = createByteBuffer()
+    const buffer = new ReadWriteByteBuffer()
     DeleteComponent.write(entity, Transform._id, 2, buffer)
     transport.onmessage!(buffer.toBinary())
     await engine.update(1)
@@ -290,7 +290,7 @@ describe('CRDT tests', () => {
     cusutomComponent.create(entity, { open: false })
     await engine.update(1)
 
-    const buffer = createByteBuffer()
+    const buffer = new ReadWriteByteBuffer()
     PutComponentOperation.write(entity, 1, cusutomComponent, buffer)
     serverTransport.onmessage!(buffer.toBinary())
     await serverEngine.update(1)
@@ -347,7 +347,7 @@ describe('CRDT tests', () => {
       clients: [clientA]
     } = SandBox.createEngines({ length: 1 })
 
-    const buf = createByteBuffer()
+    const buf = new ReadWriteByteBuffer()
     buf.writeUint32(8)
     buf.writeUint32(0x83294732)
 

@@ -10,7 +10,7 @@ import {
   CrdtMessageProtocol,
   CrdtMessageType
 } from './../../packages/@dcl/ecs/src/serialization/crdt'
-import { createByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import {
   components,
   Schemas,
@@ -168,9 +168,7 @@ export namespace SandBox {
       type Message = CrdtMessageHeader & { data: Uint8Array }
       let msgsOutgoing: Message[] = []
       clientTransport.send = async (message: Uint8Array) => {
-        const buffer = createByteBuffer({
-          reading: { buffer: message, currentOffset: 0 }
-        })
+        const buffer = new ReadWriteByteBuffer(message)
 
         let header: CrdtMessageHeader | null
         while ((header = CrdtMessageProtocol.getHeader(buffer))) {
@@ -192,7 +190,7 @@ export namespace SandBox {
         )
         if (N === 0) return
 
-        const buffer = createByteBuffer()
+        const buffer = new ReadWriteByteBuffer()
         for (let i = 0; i < N; i++) {
           const msg = msgsOutgoing.pop()!
           buffer.writeBuffer(msg.data, false)
