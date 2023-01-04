@@ -29,7 +29,7 @@
   "dependencies": {
     "@dcl/crdt": "file:../crdt",
     "@dcl/js-runtime": "file:../js-runtime",
-    "@dcl/protocol": "^1.0.0-3825036757.commit-42e850e"
+    "@dcl/protocol": "^1.0.0-3840796783.commit-1c7238d"
   },
   "files": [
     "dist",

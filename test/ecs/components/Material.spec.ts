@@ -64,7 +64,7 @@ describe('Generated Material ProtoBuf', () => {
         metallic: 1,
         roughness: 1,
         specularIntensity: 0,
-        albedoColor: { r: 0, g: 1, b: 1 },
+        albedoColor: { r: 0, g: 1, b: 1, a: 1 },
         alphaTest: 0,
         directIntensity: 1,
         emissiveIntensity: 1,
@@ -79,7 +79,7 @@ describe('Generated Material ProtoBuf', () => {
     Material.create(
       entityB,
       createPbrMaterial({
-        albedoColor: { r: 0, g: 1, b: 1 },
+        albedoColor: { r: 0, g: 1, b: 1, a: 1 },
         alphaTest: 1,
         alphaTexture: {
           tex: {

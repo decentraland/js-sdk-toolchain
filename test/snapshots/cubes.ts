@@ -7,7 +7,7 @@ import {
   Material,
   TextShape
 } from '@dcl/sdk/ecs'
-import { Color3 } from '@dcl/sdk/math'
+import { Color4 } from '@dcl/sdk/math'
 export * from '@dcl/sdk'
 // My cube generator
 function createCube(x: number, y: number, z: number) {
@@ -147,7 +147,7 @@ function MaterialChangerSystem(dt: number) {
   // iterate over the entities of the group
   for (const [entity] of entitiesWithBoxShapes) {
     Material.setPbrMaterial(entity, {
-      albedoColor: color ? Color3.Blue() : Color3.Green()
+      albedoColor: color ? Color4.Blue() : Color4.Green()
     })
     const { scale } = Transform.getMutable(entity)
     scale.x = scale.y = scale.z = color ? 0.5 : 1
