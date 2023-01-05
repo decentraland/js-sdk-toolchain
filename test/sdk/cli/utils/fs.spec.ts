@@ -148,7 +148,10 @@ describe('utils/fs', () => {
 
     expect(dist).toBe('other/path')
     expect(fetchSpy).toBeCalledWith('some/path')
-    expect(writeFileSpy).toBeCalledWith('other/path', Buffer.from(new ArrayBuffer(123)))
+    expect(writeFileSpy).toBeCalledWith(
+      'other/path',
+      Buffer.from(new ArrayBuffer(123))
+    )
   })
 
   it("extract: should extract a zip file and return it's destination", async () => {

@@ -10,7 +10,9 @@ afterEach(() => {
 
 describe('utils/prompt', () => {
   it('confirm: should return answer', async () => {
-    const promptSpy = jest.spyOn(inquirer, 'prompt').mockResolvedValue({ answer: true })
+    const promptSpy = jest
+      .spyOn(inquirer, 'prompt')
+      .mockResolvedValue({ answer: true })
 
     const res = await promptUtils.confirm('some message')
 

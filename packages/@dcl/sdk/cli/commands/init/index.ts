@@ -25,7 +25,9 @@ export async function main(options: Options) {
   const yes = options.args['--yes']
 
   if (!isEmpty && !yes) {
-    const answer = await confirm('The folder specified is not empty, continue anyway?')
+    const answer = await confirm(
+      'The folder specified is not empty, continue anyway?'
+    )
 
     if (!answer) return
   }
