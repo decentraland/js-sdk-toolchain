@@ -1,77 +1,72 @@
 #!/usr/bin/env node
 
-import arg from 'arg'
-import { readdirSync } from 'fs'
-import { resolve } from 'path'
+import { getArgs } from './utils/args'
+import log from './utils/log'
+import { CliError } from './utils/error'
+import { COMMANDS_PATH, getCommands } from './utils/commands'
 
-import { CliError } from './error'
-
-// leaving args as "any" since we don't know yet if we will use them
-type FileFn = (...args: any) => Promise<void>
-
-interface FileFns {
-  help?: FileFn
-  default?: FileFn
+export interface Options {
+  args: ReturnType<typeof getArgs>
 }
 
-const JS_EXT = '.js'
-const COMMANDS_PATH = resolve(__dirname, './commands')
+// leaving args as "any" since we don't know yet if we will use them
+type FileFn = (options: Options) => Promise<void>
 
-const isJSFile = (file: string): boolean => file.slice(-3) === JS_EXT
+interface FileExports {
+  help?: FileFn
+  main?: FileFn
+  args?: ReturnType<typeof getArgs>
+}
 
-const commands = new Set(
-  readdirSync(COMMANDS_PATH)
-    .filter((fileName) => isJSFile(fileName))
-    .map((fileName) => fileName.slice(0, -3))
-)
-
-const listCommandsStr = () =>
-  Array.from(commands)
+const listCommandsStr = (commands: string[]) =>
+  commands
     .map(
       ($) => `
   * npx sdk ${$}`
     )
     .join('')
 
-const handleError = (err: Error) => {
-  const error = err instanceof CliError ? err.message : err
-  console.error(error)
+const handleError = (err: CliError) => {
+  if (!(err instanceof CliError)) {
+    log.warn(`Developer: All errors thrown must be an instance of "CliError"`)
+  }
+  log.fail(err.message)
   process.exit(1)
 }
 
-const validCommandFns = (fns: FileFns): fns is Required<FileFns> => {
-  const { help, default: _def } = fns
-  if (!help || !_def) {
-    throw new CliError(`
-      Command does not follow implementation rules:
-        * Requires a "help" function
-        * Requires a "default" function
+const commandFnsAreValid = (fns: FileExports): fns is Required<FileExports> => {
+  const { help, main } = fns
+  if (!help || !main) {
+    throw new CliError(`Command does not follow implementation rules:
+      * Requires a "help" function
+      * Requires a "main" function
     `)
   }
   return true
 }
 
-const args = arg({
-  '--help': Boolean,
-  '-h': '--help'
-})
+const args = getArgs()
+const helpMessage = (commands: string[]) =>
+  `Here is the list of commands: ${listCommandsStr(commands)}`
 
 ;(async () => {
   const command = process.argv[2]
   const needsHelp = args['--help']
+  const commands = await getCommands()
 
-  if (!commands.has(command)) {
+  if (!commands.includes(command)) {
     if (needsHelp) {
-      console.log('TODO: help message')
+      log.info(helpMessage(commands))
       return
     }
-    throw new CliError(`Invalid command. Possible are: ${listCommandsStr()}`)
+    throw new CliError(`Command ${command} is invalid. ${helpMessage}`)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const fns = require(resolve(COMMANDS_PATH, command + JS_EXT))
+  const cmd = require(`${COMMANDS_PATH}/${command}`)
 
-  if (validCommandFns(fns)) {
-    needsHelp ? await fns.help() : await fns.default()
+  if (commandFnsAreValid(cmd)) {
+    const options = { args: cmd.args }
+    needsHelp ? await cmd.help(options) : await cmd.main(options)
   }
 })().catch(handleError)

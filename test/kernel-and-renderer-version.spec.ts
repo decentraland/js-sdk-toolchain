@@ -12,7 +12,8 @@ describe('Check there is fixed version', () => {
       '@dcl/ecs',
       '@dcl/js-runtime',
       '@dcl/react-ecs',
-      'arg'
+      'arg',
+      'ora'
     ]
 
     const shouldBeFixedVersion = [
