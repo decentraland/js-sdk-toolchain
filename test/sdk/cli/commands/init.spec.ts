@@ -1,31 +1,42 @@
 import * as prompt from '../../../../packages/@dcl/sdk/cli/utils/prompt'
-import * as fsUtls from '../../../../packages/@dcl/sdk/cli/utils/fs'
-import { main } from '../../../../packages/@dcl/sdk/cli/commands/init'
+import * as fsUtils from '../../../../packages/@dcl/sdk/cli/utils/fs'
+import { CliError } from '../../../../packages/@dcl/sdk/cli/utils/error'
+import * as init from '../../../../packages/@dcl/sdk/cli/commands/init/index'
 
 afterEach(() => {
   jest.clearAllMocks()
+  jest.restoreAllMocks()
 })
 
 describe('init command', () => {
-  it('should do nothing if directory is not empty and no bypass arg is provided nor prompt accepted', async () => {
-    const confirmSpy = jest.spyOn(prompt, 'confirm').mockResolvedValue(false)
-    const downloadSpy = jest.spyOn(fsUtls, 'download')
-    const extractSpy = jest.spyOn(fsUtls, 'extract')
+  it('help: return void', async () => {
+    const helpSpy = jest.spyOn(init, 'help')
 
-    await main({ args: { _: [] } })
+    const res = await init.help()
+
+    expect(res).toBe(undefined)
+    expect(helpSpy).toBeCalled()
+  })
+
+  it('main: should do nothing if directory is not empty and no bypass arg is provided nor prompt accepted', async () => {
+    const confirmSpy = jest.spyOn(prompt, 'confirm').mockResolvedValue(false)
+    const downloadSpy = jest.spyOn(fsUtils, 'download')
+    const extractSpy = jest.spyOn(fsUtils, 'extract')
+
+    await init.main({ args: { _: [] } })
 
     expect(confirmSpy).toBeCalled()
     expect(downloadSpy).not.toBeCalled()
     expect(extractSpy).not.toBeCalled()
   })
 
-  it('should download & extract if directory is not empty and prompt is accepted', async () => {
+  it('main: should download & extract if directory is not empty and prompt is accepted', async () => {
     const confirmSpy = jest.spyOn(prompt, 'confirm').mockResolvedValueOnce(true)
-    const downloadSpy = jest.spyOn(fsUtls, 'download').mockImplementation()
-    const extractSpy = jest.spyOn(fsUtls, 'extract').mockImplementation()
-    const removeSpy = jest.spyOn(fsUtls, 'remove').mockImplementation()
+    const downloadSpy = jest.spyOn(fsUtils, 'download').mockImplementation()
+    const extractSpy = jest.spyOn(fsUtils, 'extract').mockImplementation()
+    const removeSpy = jest.spyOn(fsUtils, 'remove').mockImplementation()
 
-    await main({ args: { _: [] } })
+    await init.main({ args: { _: [] } })
 
     expect(confirmSpy).toBeCalled()
     expect(downloadSpy).toBeCalled()
@@ -33,17 +44,29 @@ describe('init command', () => {
     expect(removeSpy).toBeCalled()
   })
 
-  it('should download & extract if directory is not empty and "--yes" arg is provided', async () => {
+  it('main: should download & extract if directory is not empty and "--yes" arg is provided', async () => {
     const confirmSpy = jest.spyOn(prompt, 'confirm')
-    const downloadSpy = jest.spyOn(fsUtls, 'download').mockImplementation()
-    const extractSpy = jest.spyOn(fsUtls, 'extract').mockImplementation()
-    const removeSpy = jest.spyOn(fsUtls, 'remove').mockImplementation()
+    const downloadSpy = jest.spyOn(fsUtils, 'download').mockImplementation()
+    const extractSpy = jest.spyOn(fsUtils, 'extract').mockImplementation()
+    const removeSpy = jest.spyOn(fsUtils, 'remove').mockImplementation()
 
-    await main({ args: { _: [], '--yes': true } })
+    await init.main({ args: { _: [], '--yes': true } })
 
     expect(confirmSpy).not.toBeCalled()
     expect(downloadSpy).toBeCalled()
     expect(extractSpy).toBeCalled()
     expect(removeSpy).toBeCalled()
+  })
+
+  it('main: should throw if something wrong happens', async () => {
+    jest.spyOn(fsUtils, 'download').mockImplementation(() => {
+      throw new Error()
+    })
+
+    try {
+      await init.main({ args: { _: [], '--yes': true } })
+    } catch (e) {
+      expect(e).toBeInstanceOf(CliError)
+    }
   })
 })

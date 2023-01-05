@@ -8,7 +8,7 @@ export function checkNotThenable<T extends K>(t: T, error: string): T {
     if (
       t &&
       typeof t === 'object' &&
-      typeof (t as Promise<unknown>).then === 'function'
+      typeof (t as unknown as Promise<unknown>).then === 'function'
     ) {
       throw new Error(error)
     }

@@ -2,12 +2,14 @@ import fs from 'fs/promises'
 import extractZip from 'extract-zip'
 import { fetch } from 'undici'
 
+const _this = exports
+
 /**
  * Create's a directory if not exists
  * @param path New directory path
  */
 export async function createDirIfNotExists(path: string): Promise<void> {
-  if (!path || (await exists(path))) return
+  if (!path || (await _this.exists(path))) return
   await fs.mkdir(path)
 }
 
@@ -16,18 +18,18 @@ export async function createDirIfNotExists(path: string): Promise<void> {
  * @param path One or multiple paths to be checked.
  */
 export async function ensureFolder(path: string | string[]): Promise<void> {
-  if (!Array.isArray(path)) return createDirIfNotExists(path)
-  if (path.length <= 1) return createDirIfNotExists(path[0] || '')
+  if (!Array.isArray(path)) return _this.createDirIfNotExists(path)
+  if (path.length <= 1) return _this.createDirIfNotExists(path[0])
 
-  await createDirIfNotExists(path[0])
-  await ensureFolder(path.slice(1))
+  await _this.createDirIfNotExists(path[0])
+  await _this.ensureFolder(path.slice(1))
 }
 
 /**
  * Check's if directory is empty
  * @param dir Directory to check for emptyness
  */
-export async function isDirectoryEmpty(dir: string = '.'): Promise<boolean> {
+export async function isDirectoryEmpty(dir: string): Promise<boolean> {
   const files = await fs.readdir(dir)
   return !files.length
 }
@@ -37,7 +39,7 @@ export async function isDirectoryEmpty(dir: string = '.'): Promise<boolean> {
  * @param path Path to some file/directory
  */
 export async function isDirectory(path: string): Promise<boolean> {
-  return (await exists(path)) && (await fs.lstat(path)).isDirectory()
+  return (await _this.exists(path)) && (await fs.lstat(path)).isDirectory()
 }
 
 /**
@@ -45,7 +47,7 @@ export async function isDirectory(path: string): Promise<boolean> {
  * @param path Path to some file/directory
  */
 export async function isFile(path: string): Promise<boolean> {
-  return (await exists(path)) && (await fs.lstat(path)).isFile()
+  return (await _this.exists(path)) && (await fs.lstat(path)).isFile()
 }
 
 /**
