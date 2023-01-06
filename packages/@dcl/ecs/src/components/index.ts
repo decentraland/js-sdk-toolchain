@@ -5,6 +5,10 @@ import {
   defineAnimatorComponent
 } from './extended/Animator'
 import {
+  AvatarAttachComponentDefinitionExtended,
+  defineAvatarAttachComponent
+} from './extended/AvatarAttach'
+import {
   defineMaterialComponent,
   MaterialComponentDefinitionExtended
 } from './extended/Material'
@@ -23,6 +27,11 @@ import {
 } from './legacy/Transform'
 export * from './generated/index.gen'
 export { ISchema, ComponentDefinition }
+
+/*#__PURE__*/
+export const AvatarAttach: ComponentGetter<
+  AvatarAttachComponentDefinitionExtended
+> = (engine) => defineAvatarAttachComponent(engine)
 
 /*#__PURE__*/
 export const Transform: ComponentGetter<TransformComponentExtended> = (
