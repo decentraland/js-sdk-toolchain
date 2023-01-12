@@ -1662,8 +1662,7 @@ export const PBAudioStream: {
 export interface PBAvatarAttach {
     // (undocumented)
     anchorPointId: AvatarAnchorPointType;
-    // (undocumented)
-    avatarId: string;
+    avatarId?: string | undefined;
 }
 
 // @public
