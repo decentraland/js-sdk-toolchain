@@ -1,30 +1,27 @@
-import { YGDisplay } from '@dcl/ecs'
 import { ReactEcs } from '../react-ecs'
 import { CommonProps, EntityPropTypes } from './types'
-import { parseUiTransform, CANVAS_ROOT_ENTITY } from './uiTransform'
+import { CANVAS_ROOT_ENTITY } from './uiTransform'
+import { parseProps } from './utils'
 
 export * from './types'
 export { CANVAS_ROOT_ENTITY }
 export * from './uiTransform/types'
 export * from './listeners/types'
+export * from './Input/types'
+export * from './uiBackground/types'
+export * from './Dropdown/types'
+export * from './Label/types'
+export * from './Button/types'
+
+export { Dropdown } from './Dropdown'
+export { Input } from './Input'
+export { Label } from './Label'
+export { Button } from './Button'
 
 /**
  * @public
  */
+/*#__PURE__*/
 export function UiEntity(props: EntityPropTypes & Partial<CommonProps>) {
-  const { uiTransform, ...otherProps } = props
-  const uiTransformProps = parseUiTransform(uiTransform)
-
-  return <entity uiTransform={uiTransformProps} {...otherProps} />
-}
-
-export type ContainerPropTypes = Partial<CommonProps> &
-  EntityPropTypes['uiTransform']
-
-export function Container({ width, height, children }: ContainerPropTypes) {
-  return (
-    <UiEntity uiTransform={{ width, height, display: YGDisplay.YGD_FLEX }}>
-      {children}
-    </UiEntity>
-  )
+  return <entity {...parseProps(props)} />
 }

@@ -13,5 +13,8 @@
     "test/snapshots/*.js.map": true,
     "test/snapshots/node_modules": true,
     "test/snapshots/package-lock.json": true,
+    "packages/@dcl/*/*.tgz": true,
+    "packages/@dcl/*/*.js": true,
+    "**/*.js": { "when": "$(basename).ts" }
   }
 }

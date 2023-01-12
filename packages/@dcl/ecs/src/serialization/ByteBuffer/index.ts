@@ -1,3 +1,5 @@
+import * as utf8 from '@protobufjs/utf8'
+
 /**
  * Take the max between currentSize and intendedSize and then plus 1024. Then,
  *  find the next nearer multiple of 1024.
@@ -10,35 +12,6 @@ function getNextSize(currentSize: number, intendedSize: number) {
   return Math.ceil(minNewSize / 1024) * 1024
 }
 
-/**
- * @param writing - writing option, see object specs.
- * @param reading - reading option, see object specs.
- * @param initialCapacity - Initial capacity of buffer to allocate, ignored if you use writing or reading options
- */
-export interface CreateByteBufferOptions {
-  /**
-   * @param buffer - a buffer already allocated to read from there.
-   * @param currentOffset - set the cursor where begins to read. Default 0
-   * @param length - delimite where the valid data ends. Default: buffer.length
-   */
-  reading?: {
-    buffer: Uint8Array
-    length?: number
-    currentOffset: number
-  }
-
-  /**
-   * @param buffer - a buffer already allocated to write there.
-   * @param currentOffset - set the cursor to not start writing from the begin of it. Default 0
-   */
-  writing?: {
-    buffer: Uint8Array
-    currentOffset?: number
-  }
-
-  initialCapacity?: number
-}
-
 const defaultInitialCapacity = 10240
 
 /**
@@ -48,239 +21,248 @@ const defaultInitialCapacity = 10240
  * - Use read and write function to generate or consume data.
  * - Use set and get only if you are sure that you're doing.
  */
-export function createByteBuffer(
-  options: CreateByteBufferOptions = {}
-): ByteBuffer {
-  const initialROffset: number = options.reading?.currentOffset || 0
-  let initialBuffer: Uint8Array | null = null
-  let initialWOffset: number = 0
-
-  if (options.writing) {
-    initialBuffer = options.writing.buffer
-    if (options.writing.currentOffset) {
-      initialWOffset = options.writing.currentOffset
-    }
-  } else if (options.reading) {
-    initialBuffer = options.reading.buffer
-    initialWOffset = options.reading.length || options.reading.buffer.length
-  } else {
-    initialBuffer = new Uint8Array(
-      options.initialCapacity || defaultInitialCapacity
-    )
+export class ReadWriteByteBuffer implements ByteBuffer {
+  _buffer: Uint8Array
+  view: DataView
+  woffset: number
+  roffset: number
+  /**
+   * @param buffer - The initial buffer, provide a buffer if you need to set "initial capacity"
+   * @param readingOffset - Set the cursor where begins to read. Default 0
+   * @param writingOffset - Set the cursor to not start writing from the begin of it. Defaults to the buffer size
+   */
+  constructor(
+    buffer?: Uint8Array | undefined,
+    readingOffset?: number | undefined,
+    writingOffset?: number | undefined
+  ) {
+    this._buffer = buffer || new Uint8Array(defaultInitialCapacity)
+    this.view = new DataView(this._buffer.buffer, this._buffer.byteOffset)
+    this.woffset = writingOffset ?? (buffer ? this._buffer.length : null) ?? 0
+    this.roffset = readingOffset ?? 0
   }
-
-  let buffer: Uint8Array = initialBuffer!
-  let view: DataView = new DataView(buffer.buffer, buffer.byteOffset)
-  let woffset: number = initialWOffset
-  let roffset: number = initialROffset
 
   /**
    * Increement the write offset and resize the buffer if it needs.
    */
-  const woAdd = (amount: number) => {
-    if (woffset + amount > buffer.byteLength) {
-      const newsize = getNextSize(buffer.byteLength, woffset + amount)
+  #woAdd(amount: number) {
+    if (this.woffset + amount > this._buffer.byteLength) {
+      const newsize = getNextSize(
+        this._buffer.byteLength,
+        this.woffset + amount
+      )
       const newBuffer = new Uint8Array(newsize)
-      newBuffer.set(buffer)
-      buffer = newBuffer
-      view = new DataView(buffer.buffer)
+      newBuffer.set(this._buffer)
+      const oldOffset = this._buffer.byteOffset
+      this._buffer = newBuffer
+      this.view = new DataView(this._buffer.buffer, oldOffset)
     }
 
-    woffset += amount
-    return woffset - amount
+    this.woffset += amount
+    return this.woffset - amount
   }
 
   /**
    * Increment the read offset and throw an error if it's trying to read
    *  outside the bounds.
    */
-  const roAdd = (amount: number) => {
-    if (roffset + amount > woffset) {
+  #roAdd(amount: number) {
+    if (this.roffset + amount > this.woffset) {
       throw new Error('Outside of the bounds of writen data.')
     }
 
-    roffset += amount
-    return roffset - amount
+    this.roffset += amount
+    return this.roffset - amount
   }
 
-  return {
-    buffer(): Uint8Array {
-      return buffer
-    },
-    bufferLength(): number {
-      return buffer.length
-    },
-    resetBuffer(): void {
-      roffset = 0
-      woffset = 0
-    },
-    currentReadOffset(): number {
-      return roffset
-    },
-    currentWriteOffset(): number {
-      return woffset
-    },
-    incrementReadOffset(amount: number): number {
-      return roAdd(amount)
-    },
-    remainingBytes(): number {
-      return woffset - roffset
-    },
-    readFloat32(): number {
-      return view.getFloat32(roAdd(4))
-    },
-    readFloat64(): number {
-      return view.getFloat64(roAdd(8))
-    },
-    readInt8(): number {
-      return view.getInt8(roAdd(1))
-    },
-    readInt16(): number {
-      return view.getInt16(roAdd(2))
-    },
-    readInt32(): number {
-      return view.getInt32(roAdd(4))
-    },
-    readInt64(): bigint {
-      return view.getBigInt64(roAdd(8))
-    },
-    readUint8(): number {
-      return view.getUint8(roAdd(1))
-    },
-    readUint16(): number {
-      return view.getUint16(roAdd(2))
-    },
-    readUint32(): number {
-      return view.getUint32(roAdd(4))
-    },
-    readUint64(): bigint {
-      return view.getBigUint64(roAdd(8))
-    },
-    readBuffer() {
-      const length = view.getUint32(roAdd(4))
-      return buffer.subarray(roAdd(length), roAdd(0))
-    },
-    incrementWriteOffset(amount: number): number {
-      return woAdd(amount)
-    },
-    size(): number {
-      return woffset
-    },
-    toBinary() {
-      return buffer.subarray(0, woffset)
-    },
-    toCopiedBinary() {
-      return new Uint8Array(this.toBinary())
-    },
-    writeBuffer(value: Uint8Array, writeLength: boolean = true) {
-      if (writeLength) {
-        this.writeUint32(value.byteLength)
-      }
-
-      const o = woAdd(value.byteLength)
-      buffer.set(value, o)
-    },
-    writeFloat32(value: number): void {
-      const o = woAdd(4)
-      view.setFloat32(o, value)
-    },
-    writeFloat64(value: number): void {
-      const o = woAdd(8)
-      view.setFloat64(o, value)
-    },
-    writeInt8(value: number): void {
-      const o = woAdd(1)
-      view.setInt8(o, value)
-    },
-    writeInt16(value: number): void {
-      const o = woAdd(2)
-      view.setInt16(o, value)
-    },
-    writeInt32(value: number): void {
-      const o = woAdd(4)
-      view.setInt32(o, value)
-    },
-    writeInt64(value: bigint): void {
-      const o = woAdd(8)
-      view.setBigInt64(o, value)
-    },
-    writeUint8(value: number): void {
-      const o = woAdd(1)
-      view.setUint8(o, value)
-    },
-    writeUint16(value: number): void {
-      const o = woAdd(2)
-      view.setUint16(o, value)
-    },
-    writeUint32(value: number): void {
-      const o = woAdd(4)
-      view.setUint32(o, value)
-    },
-    writeUint64(value: bigint): void {
-      const o = woAdd(8)
-      view.setBigUint64(o, value)
-    },
-    // Dataview Proxy
-    getFloat32(offset: number): number {
-      return view.getFloat32(offset)
-    },
-    getFloat64(offset: number): number {
-      return view.getFloat64(offset)
-    },
-    getInt8(offset: number): number {
-      return view.getInt8(offset)
-    },
-    getInt16(offset: number): number {
-      return view.getInt16(offset)
-    },
-    getInt32(offset: number): number {
-      return view.getInt32(offset)
-    },
-    getInt64(offset: number): bigint {
-      return view.getBigInt64(offset)
-    },
-    getUint8(offset: number): number {
-      return view.getUint8(offset)
-    },
-    getUint16(offset: number): number {
-      return view.getUint16(offset)
-    },
-    getUint32(offset: number): number {
-      return view.getUint32(offset)
-    },
-    getUint64(offset: number): bigint {
-      return view.getBigUint64(offset)
-    },
-    setFloat32(offset: number, value: number): void {
-      view.setFloat32(offset, value)
-    },
-    setFloat64(offset: number, value: number): void {
-      view.setFloat64(offset, value)
-    },
-    setInt8(offset: number, value: number): void {
-      view.setInt8(offset, value)
-    },
-    setInt16(offset: number, value: number): void {
-      view.setInt16(offset, value)
-    },
-    setInt32(offset: number, value: number): void {
-      view.setInt32(offset, value)
-    },
-    setInt64(offset: number, value: bigint): void {
-      view.setBigInt64(offset, value)
-    },
-    setUint8(offset: number, value: number): void {
-      view.setUint8(offset, value)
-    },
-    setUint16(offset: number, value: number): void {
-      view.setUint16(offset, value)
-    },
-    setUint32(offset: number, value: number): void {
-      view.setUint32(offset, value)
-    },
-    setUint64(offset: number, value: bigint): void {
-      view.setBigUint64(offset, value)
+  buffer(): Uint8Array {
+    return this._buffer
+  }
+  bufferLength(): number {
+    return this._buffer.length
+  }
+  resetBuffer(): void {
+    this.roffset = 0
+    this.woffset = 0
+  }
+  currentReadOffset(): number {
+    return this.roffset
+  }
+  currentWriteOffset(): number {
+    return this.woffset
+  }
+  incrementReadOffset(amount: number): number {
+    return this.#roAdd(amount)
+  }
+  remainingBytes(): number {
+    return this.woffset - this.roffset
+  }
+  readFloat32(): number {
+    return this.view.getFloat32(this.#roAdd(4))
+  }
+  readFloat64(): number {
+    return this.view.getFloat64(this.#roAdd(8))
+  }
+  readInt8(): number {
+    return this.view.getInt8(this.#roAdd(1))
+  }
+  readInt16(): number {
+    return this.view.getInt16(this.#roAdd(2))
+  }
+  readInt32(): number {
+    return this.view.getInt32(this.#roAdd(4))
+  }
+  readInt64(): bigint {
+    return this.view.getBigInt64(this.#roAdd(8))
+  }
+  readUint8(): number {
+    return this.view.getUint8(this.#roAdd(1))
+  }
+  readUint16(): number {
+    return this.view.getUint16(this.#roAdd(2))
+  }
+  readUint32(): number {
+    return this.view.getUint32(this.#roAdd(4))
+  }
+  readUint64(): bigint {
+    return this.view.getBigUint64(this.#roAdd(8))
+  }
+  readBuffer() {
+    const length = this.view.getUint32(this.#roAdd(4))
+    return this._buffer.subarray(this.#roAdd(length), this.#roAdd(0))
+  }
+  readUtf8String() {
+    const length = this.view.getUint32(this.#roAdd(4))
+    return utf8.read(this._buffer, this.#roAdd(length), this.#roAdd(0))
+  }
+  incrementWriteOffset(amount: number): number {
+    return this.#woAdd(amount)
+  }
+  toBinary() {
+    return this._buffer.subarray(0, this.woffset)
+  }
+  toCopiedBinary() {
+    return new Uint8Array(this.toBinary())
+  }
+  writeBuffer(value: Uint8Array, writeLength: boolean = true) {
+    if (writeLength) {
+      this.writeUint32(value.byteLength)
     }
+
+    const o = this.#woAdd(value.byteLength)
+    this._buffer.set(value, o)
+  }
+  writeUtf8String(value: string, writeLength: boolean = true) {
+    const byteLength = utf8.length(value)
+
+    if (writeLength) {
+      this.writeUint32(byteLength)
+    }
+
+    const o = this.#woAdd(byteLength)
+
+    utf8.write(value, this._buffer, o)
+  }
+  writeFloat32(value: number): void {
+    const o = this.#woAdd(4)
+    this.view.setFloat32(o, value)
+  }
+  writeFloat64(value: number): void {
+    const o = this.#woAdd(8)
+    this.view.setFloat64(o, value)
+  }
+  writeInt8(value: number): void {
+    const o = this.#woAdd(1)
+    this.view.setInt8(o, value)
+  }
+  writeInt16(value: number): void {
+    const o = this.#woAdd(2)
+    this.view.setInt16(o, value)
+  }
+  writeInt32(value: number): void {
+    const o = this.#woAdd(4)
+    this.view.setInt32(o, value)
+  }
+  writeInt64(value: bigint): void {
+    const o = this.#woAdd(8)
+    this.view.setBigInt64(o, value)
+  }
+  writeUint8(value: number): void {
+    const o = this.#woAdd(1)
+    this.view.setUint8(o, value)
+  }
+  writeUint16(value: number): void {
+    const o = this.#woAdd(2)
+    this.view.setUint16(o, value)
+  }
+  writeUint32(value: number): void {
+    const o = this.#woAdd(4)
+    this.view.setUint32(o, value)
+  }
+  writeUint64(value: bigint): void {
+    const o = this.#woAdd(8)
+    this.view.setBigUint64(o, value)
+  }
+  // DataView Proxy
+  getFloat32(offset: number): number {
+    return this.view.getFloat32(offset)
+  }
+  getFloat64(offset: number): number {
+    return this.view.getFloat64(offset)
+  }
+  getInt8(offset: number): number {
+    return this.view.getInt8(offset)
+  }
+  getInt16(offset: number): number {
+    return this.view.getInt16(offset)
+  }
+  getInt32(offset: number): number {
+    return this.view.getInt32(offset)
+  }
+  getInt64(offset: number): bigint {
+    return this.view.getBigInt64(offset)
+  }
+  getUint8(offset: number): number {
+    return this.view.getUint8(offset)
+  }
+  getUint16(offset: number): number {
+    return this.view.getUint16(offset)
+  }
+  getUint32(offset: number): number {
+    return this.view.getUint32(offset)
+  }
+  getUint64(offset: number): bigint {
+    return this.view.getBigUint64(offset)
+  }
+  setFloat32(offset: number, value: number): void {
+    this.view.setFloat32(offset, value)
+  }
+  setFloat64(offset: number, value: number): void {
+    this.view.setFloat64(offset, value)
+  }
+  setInt8(offset: number, value: number): void {
+    this.view.setInt8(offset, value)
+  }
+  setInt16(offset: number, value: number): void {
+    this.view.setInt16(offset, value)
+  }
+  setInt32(offset: number, value: number): void {
+    this.view.setInt32(offset, value)
+  }
+  setInt64(offset: number, value: bigint): void {
+    this.view.setBigInt64(offset, value)
+  }
+  setUint8(offset: number, value: number): void {
+    this.view.setUint8(offset, value)
+  }
+  setUint16(offset: number, value: number): void {
+    this.view.setUint16(offset, value)
+  }
+  setUint32(offset: number, value: number): void {
+    this.view.setUint32(offset, value)
+  }
+  setUint64(offset: number, value: bigint): void {
+    this.view.setBigUint64(offset, value)
   }
 }
 
@@ -331,6 +313,7 @@ export type ByteBuffer = {
   readUint32(): number
   readUint64(): bigint
   readBuffer(): Uint8Array
+  readUtf8String(): string
   /**
    * Writing purpose
    */
@@ -340,10 +323,6 @@ export type ByteBuffer = {
    * @returns The offset when this reserving starts.
    */
   incrementWriteOffset(amount: number): number
-  /**
-   * @returns The total number of bytes writen in the buffer.
-   */
-  size(): number
   /**
    * Take care using this function, if you modify the data after, the
    * returned subarray will change too. If you'll modify the content of the
@@ -360,6 +339,7 @@ export type ByteBuffer = {
    */
   toCopiedBinary(): Uint8Array
 
+  writeUtf8String(value: string, writeLength?: boolean): void
   writeBuffer(value: Uint8Array, writeLength?: boolean): void
   writeFloat32(value: number): void
   writeFloat64(value: number): void

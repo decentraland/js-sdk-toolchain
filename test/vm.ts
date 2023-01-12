@@ -11,28 +11,59 @@ export type ProvideOptions = {
 }
 
 export type OpCodeResult = { count: bigint; opcode: number }
+export type MemoryDump = {
+  malloc_limit: number
+  memory_used_size: number
+  malloc_count: number
+  memory_used_count: number
+  atom_count: number
+  atom_size: number
+  str_count: number
+  str_size: number
+  obj_count: number
+  obj_size: number
+  prop_count: number
+  prop_size: number
+  shape_count: number
+  shape_size: number
+  js_func_count: number
+  js_func_size: number
+  js_func_code_size: number
+  js_func_pc2line_count: number
+  js_func_pc2line_size: number
+  c_func_count: number
+  array_count: number
+  fast_array_count: number
+  fast_array_elements: number
+  binary_object_count: number
+  binary_object_size: number
+}
 
 export type RunWithVmOptions = {
   eval(code: string, filename?: string): void
   onUpdate(dt: number): Promise<any>
   onStart(): Promise<void>
   provide(opts: ProvideOptions): void
-  getStats(): Array<OpCodeResult>
+  getStats(): { opcodes: OpCodeResult[]; memory: MemoryDump }
+  dumpMemory(): string
 }
 
 export async function withQuickJsVm<T>(
   cb: (opts: RunWithVmOptions) => Promise<T>
-): Promise<T> {
+): Promise<{ result: T; leaking: boolean }> {
   // const vm = await newAsyncContext()
   const Q = await getQuickJS()
   const vm = Q.newContext()
 
-  const module = vm.newObject()
-  const exports = vm.newObject()
+  vm.newObject().consume((exports) => {
+    vm.newObject().consume((module) => {
+      vm.setProp(module, 'exports', exports)
+      vm.setProp(vm.global, 'module', module)
+    })
 
-  vm.setProp(module, 'exports', exports)
-  vm.setProp(vm.global, 'module', module)
-  vm.setProp(vm.global, 'exports', exports)
+    vm.setProp(vm.global, 'exports', exports)
+  })
+
   vm.setProp(vm.global, 'self', vm.global)
   vm.setProp(vm.global, 'global', vm.global)
   const failures: any[] = []
@@ -76,8 +107,11 @@ export async function withQuickJsVm<T>(
 
   const ops = Q.getOpcodeInfo()
 
+  let result: T
+  let leaking = false
+
   try {
-    return await cb({
+    result = await cb({
       eval(code: string, filename?: string) {
         const result = vm.evalCode(code, filename)
         const $ = vm.unwrapResult(result)
@@ -85,9 +119,15 @@ export async function withQuickJsVm<T>(
         return ret
       },
       getStats() {
-        const ret = ops.getOpcodesCount()
+        const opcodes = ops.getOpcodesCount()
         ops.resetOpcodeCounters()
-        return ret
+        return {
+          opcodes,
+          memory: dumpAndDispose(vm, vm.runtime.computeMemoryUsage())
+        }
+      },
+      dumpMemory() {
+        return vm.runtime.dumpMemoryUsage()
       },
       async onUpdate(dt) {
         const result = vm.evalCode(
@@ -160,8 +200,6 @@ export async function withQuickJsVm<T>(
 
     expect(vm.runtime.hasPendingJob()).toEqual(false)
     clearInterval(int)
-    module.dispose()
-    exports.dispose()
     try {
       vm.dispose()
     } catch (err: any) {
@@ -169,13 +207,14 @@ export async function withQuickJsVm<T>(
         err.toString().includes('list_empty(&rt->gc_obj_list)') &&
         !failures.length
       ) {
-        throw new Error('Ran succesfully but leaking memory')
+        leaking = true
       } else throw err
     }
     if (failures.length) {
       throw failures[0]
     }
   }
+  return { result, leaking }
 }
 
 function dumpAndDispose(vm: QuickJSContext, val: QuickJSHandle) {

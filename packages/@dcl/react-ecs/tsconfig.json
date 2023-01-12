@@ -13,6 +13,7 @@
     "preserveConstEnums": true,
     "outDir": "dist",
     "jsx": "react",
+    "lib": ["ES2020"],
     "jsxFactory": "ReactEcs.createElement",
     "rootDir": "src",
     "types": []

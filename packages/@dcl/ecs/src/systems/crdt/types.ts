@@ -1,13 +1,7 @@
-import { Entity } from '../../engine/entity'
-import WireMessage from '../../serialization/wireMessage'
+import { CrdtMessageBody } from '../../serialization/crdt/types'
 
-export type ReceiveMessage = {
-  type: WireMessage.Enum
-  entity: Entity
-  componentId: number
-  timestamp: number
+export type ReceiveMessage = CrdtMessageBody & {
   transportId?: number
-  data?: Uint8Array
   messageBuffer: Uint8Array
 }
 

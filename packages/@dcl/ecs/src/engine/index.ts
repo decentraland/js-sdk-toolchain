@@ -4,7 +4,7 @@ import { Schemas } from '../schemas'
 import { ISchema } from '../schemas/ISchema'
 import { MapResult, Spec } from '../schemas/Map'
 import { ByteBuffer } from '../serialization/ByteBuffer'
-import { crdtSceneSystem } from '../systems/crdt'
+import { crdtSceneSystem, OnChangeFunction } from '../systems/crdt'
 import {
   ComponentDefinition,
   defineComponent as defComponent
@@ -21,7 +21,7 @@ import type { IEngine, MapComponentDefinition } from './types'
 export * from './input'
 export * from './readonly'
 export * from './types'
-export { Entity, ByteBuffer, ComponentDefinition, SystemItem }
+export { Entity, ByteBuffer, ComponentDefinition, SystemItem, OnChangeFunction }
 
 type PreEngine = Pick<
   IEngine,
@@ -37,8 +37,8 @@ type PreEngine = Pick<
   | 'getComponent'
   | 'getComponentOrNull'
   | 'removeComponentDefinition'
-  | 'entityExists'
-  | 'componentsDefinition'
+  | 'entityContainer'
+  | 'componentsIter'
 > & {
   getSystems: () => SystemItem[]
 }
@@ -63,10 +63,6 @@ function preEngine(): PreEngine {
   function addEntity() {
     const entity = entityContainer.generateEntity()
     return entity
-  }
-
-  function entityExists(entity: Entity) {
-    return entityContainer.entityExists(entity)
   }
 
   function removeEntity(entity: Entity) {
@@ -183,6 +179,10 @@ function preEngine(): PreEngine {
     return systems.getSystems()
   }
 
+  function componentsIter() {
+    return componentsDefinition.values()
+  }
+
   function removeComponentDefinition(componentId: number) {
     componentsDefinition.delete(componentId)
   }
@@ -211,10 +211,7 @@ function preEngine(): PreEngine {
       removeEntity(entity)
     }
   }
-
   return {
-    entityExists,
-    componentsDefinition,
     addEntity,
     removeEntity,
     addSystem,
@@ -227,16 +224,25 @@ function preEngine(): PreEngine {
     getComponentOrNull,
     removeComponentDefinition,
     removeEntityWithChildren,
-    registerCustomComponent
+    registerCustomComponent,
+    entityContainer,
+    componentsIter
   }
 }
 
 /**
  * @public
  */
-export function Engine(): IEngine {
+export type IEngineOptions = {
+  onChangeFunction: OnChangeFunction
+}
+
+/**
+ * @public
+ */
+export function Engine(options?: IEngineOptions): IEngine {
   const engine = preEngine()
-  const crdtSystem = crdtSceneSystem(engine)
+  const crdtSystem = crdtSceneSystem(engine, options?.onChangeFunction || null)
 
   async function update(dt: number) {
     await crdtSystem.receiveMessages()
@@ -250,9 +256,10 @@ export function Engine(): IEngine {
       )
     }
     const dirtyEntities = crdtSystem.updateState()
-    await crdtSystem.sendMessages(dirtyEntities)
+    const deletedEntites = engine.entityContainer.releaseRemovedEntities()
+    await crdtSystem.sendMessages(dirtyEntities, deletedEntites)
 
-    for (const [_componentId, definition] of engine.componentsDefinition) {
+    for (const definition of engine.componentsIter()) {
       definition.clearDirty()
     }
   }
@@ -270,13 +277,17 @@ export function Engine(): IEngine {
     getComponent: engine.getComponent,
     getComponentOrNull: engine.getComponentOrNull,
     removeComponentDefinition: engine.removeComponentDefinition,
+    componentsIter: engine.componentsIter,
     update,
+
     RootEntity: 0 as Entity,
     PlayerEntity: 1 as Entity,
     CameraEntity: 2 as Entity,
-    entityExists: engine.entityExists,
+
+    getEntityState: engine.entityContainer.getEntityState,
     addTransport: crdtSystem.addTransport,
     getCrdtState: crdtSystem.getCrdt,
-    componentsDefinition: engine.componentsDefinition
+
+    entityContainer: engine.entityContainer
   }
 }

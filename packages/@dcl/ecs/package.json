@@ -34,5 +34,11 @@
   "files": [
     "dist",
     "etc"
-  ]
+  ],
+  "typedoc": {
+    "entryPoint": "./src/index.ts",
+    "readmeFile": "./README.md",
+    "displayName": "ECS",
+    "tsconfig": "./tsconfig.json"
+  }
 }

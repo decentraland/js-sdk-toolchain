@@ -1,11 +1,15 @@
-import { sameData, State, stateIterator } from '../../../packages/@dcl/crdt/src'
+import {
+  dataCompare,
+  State,
+  stateIterator
+} from '../../../packages/@dcl/crdt/src'
 
 /**
  * Compare buffer data
  * @internal
  */
 export function compareData(a: unknown, b: unknown) {
-  return sameData(a, b)
+  return dataCompare(a, b) === 0
 }
 
 /**
@@ -20,27 +24,59 @@ export function compareStatePayloads<T = Buffer>(states: State<T>[]) {
   const baseState = states[0]
 
   for (const state of states) {
-    // Compare key1 keys map size
-    if (state.size !== baseState.size) {
+    // Compare key1 keys map size,
+    const numberOfState = Array.from(state.components).reduce(
+      (prev: number, cur) => prev + cur[1].size,
+      0
+    )
+    const baseNumberOfState = Array.from(state.components).reduce(
+      (prev: number, cur) => prev + cur[1].size,
+      0
+    )
+
+    if (numberOfState !== baseNumberOfState) {
       return false
     }
 
     // Compare inside key1 the key2 keys map size
-    for (const key1 of baseState.keys()) {
-      if (state.get(key1)?.size !== baseState.get(key1)!.size) {
+    for (const key1 of baseState.components.keys()) {
+      const baseSize = baseState.components.get(key1)!.size
+      const component = state.components.get(key1)
+
+      if (component === undefined) {
+        if (baseSize === 0) continue
+        return false
+      }
+
+      if (component.size !== baseSize) {
         return false
       }
     }
 
     // Compare each <key1, key2> exists and the { timestamp, data } is the same
     for (const [key1, key2, baseStatePayload] of stateIterator(baseState)) {
-      const currentStatePayload = state.get(key1)?.get(key2)
+      const currentStatePayload = state.components.get(key1)?.get(key2)
       const isDifferent =
         !currentStatePayload ||
         currentStatePayload.timestamp !== baseStatePayload?.timestamp ||
         !compareData(currentStatePayload.data, baseStatePayload.data)
 
       if (isDifferent) {
+        return false
+      }
+    }
+
+    const baseDeletedEntities = baseState.deletedEntities.getMap()
+    const deletedEntities = state.deletedEntities.getMap()
+
+    // Compare number of entities deleted
+    if (baseDeletedEntities.size !== deletedEntities.size) {
+      return false
+    }
+
+    // Compare inside key1 the key2 keys map size
+    for (const [entityNumber, entityVersion] of baseDeletedEntities) {
+      if (deletedEntities.get(entityNumber) !== entityVersion) {
         return false
       }
     }

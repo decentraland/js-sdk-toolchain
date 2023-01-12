@@ -6,14 +6,14 @@ import {
   MeshCollider,
   InputAction,
   inputSystem,
-  PointerHoverFeedback,
+  PointerEvents,
   YGAlign,
   YGDisplay,
   YGJustify,
   PointerEventType
 } from '@dcl/sdk/ecs'
 import { Vector3, Color4, Quaternion } from '@dcl/sdk/math'
-import ReactEcs, { UiEntity, ReactEcsRenderer } from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity, Label, ReactEcsRenderer } from '@dcl/sdk/react-ecs'
 
 let counter = 0
 
@@ -24,7 +24,7 @@ export const uiComponent = () => (
       height: 400,
       margin: { top: '35px', left: '500px' }
     }}
-    uiBackground={{ backgroundColor: Color4.create(0.5, 0.8, 0.1, 0.6) }}
+    uiBackground={{ color: Color4.create(0.5, 0.8, 0.1, 0.6) }}
   >
     <UiEntity
       uiTransform={{
@@ -35,9 +35,10 @@ export const uiComponent = () => (
         display: YGDisplay.YGD_FLEX
       }}
     >
-      <UiEntity
-        uiText={{ value: 'SDK 7', fontSize: 80 }}
-        uiBackground={{ backgroundColor: Color4.fromHexString('#fbf0f0') }}
+      <Label
+        value="SDK 7"
+        fontSize={80}
+        uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
       />
     </UiEntity>
     <UiEntity
@@ -49,9 +50,10 @@ export const uiComponent = () => (
         display: YGDisplay.YGD_FLEX
       }}
     >
-      <UiEntity
-        uiText={{ value: `Counter: ${counter}`, fontSize: 60 }}
-        uiBackground={{ backgroundColor: Color4.fromHexString('#fbf0f0') }}
+      <Label
+        value={`Counter: ${counter}`}
+        fontSize={60}
+        uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
       />
     </UiEntity>
     <UiEntity
@@ -63,9 +65,10 @@ export const uiComponent = () => (
         display: YGDisplay.YGD_FLEX
       }}
     >
-      <UiEntity
-        uiText={{ value: `Player: ${getPlayerPosition()}`, fontSize: 40 }}
-        uiBackground={{ backgroundColor: Color4.fromHexString('#fbf0f0') }}
+      <Label
+        value={`Player: ${getPlayerPosition()}`}
+        fontSize={40}
+        uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
       />
     </UiEntity>
   </UiEntity>
@@ -87,7 +90,7 @@ function createCube(x: number, y: number, z: number, spawner = true): Entity {
   MeshRenderer.create(meshEntity, { mesh: { $case: 'box', box: { uvs: [] } } })
   MeshCollider.create(meshEntity, { mesh: { $case: 'box', box: {} } })
   if (spawner) {
-    PointerHoverFeedback.create(meshEntity, {
+    PointerEvents.create(meshEntity, {
       pointerEvents: [
         {
           eventType: PointerEventType.PET_DOWN,
@@ -121,7 +124,7 @@ function circularSystem(dt: number) {
 }
 
 function spawnerSystem() {
-  const clickedCubes = engine.getEntitiesWith(PointerHoverFeedback)
+  const clickedCubes = engine.getEntitiesWith(PointerEvents)
   for (const [entity] of clickedCubes) {
     if (
       inputSystem.isTriggered(

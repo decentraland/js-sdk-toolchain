@@ -9,6 +9,7 @@
     "outDir": "./dist",
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "lib": ["ES2020"],
     "forceConsistentCasingInFileNames": true
   },
   "include": [

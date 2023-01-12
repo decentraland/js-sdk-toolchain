@@ -125,6 +125,7 @@ flow('build-all', () => {
     itExecutes(`npm install --silent ${REACT_ECS}`, SDK_PATH)
 
     itExecutes('npm run build --silent', SDK_PATH)
+    itExecutes('npm run build:cli --silent', SDK_PATH)
 
     it('check files exists', () => {
       ensureFileExists('index.js', SDK_PATH)
@@ -135,7 +136,11 @@ flow('build-all', () => {
       ensureFileExists('ecs.d.ts', SDK_PATH)
       ensureFileExists('react-ecs.js', SDK_PATH)
       ensureFileExists('react-ecs.d.ts', SDK_PATH)
+      ensureFileExists('cli/index.js', SDK_PATH)
+      ensureFileExists('cli/index.d.ts', SDK_PATH)
     })
+
+    itExecutes(`chmod +x cli/index.js`, SDK_PATH)
   })
 
   flow('@dcl/playground-assets build', () => {
@@ -170,6 +175,17 @@ flow('build-all', () => {
       if (!existsSync(file)) throw new Error(`${file} doesn't exist`)
       const content = readFileSync(file).toString()
       const occurences = content.match(/^.*ae-forgotten-export.*/gim)
+      expect(occurences ?? []).toEqual([])
+    })
+
+    it('check no conflict in types are present in generated bundle', async () => {
+      const file = path.resolve(
+        PLAYGROUND_ASSETS_PATH,
+        'etc/playground-assets.api.md'
+      )
+      if (!existsSync(file)) throw new Error(`${file} doesn't exist`)
+      const content = readFileSync(file).toString()
+      const occurences = content.match(/.*_2\b/gim)
       expect(occurences ?? []).toEqual([])
     })
   })

@@ -40,6 +40,9 @@ node_modules/.bin/protobuf/bin/protoc:
 	rm $(PROTOBUF_ZIP)
 	chmod +x ./node_modules/.bin/protobuf/bin/protoc
 
+docs:
+	./node_modules/.bin/typedoc
+
 test-watch:
 	node_modules/.bin/jest --detectOpenHandles --colors --watch --roots "test"
 
@@ -63,7 +66,13 @@ scripts/rpc-api-generation/src/proto/%.gen.ts: packages/@dcl/ecs/node_modules/@d
 
 compile_apis: ${PBS_TS}
 
-.PHONY: build test install
+deep-clean-and-snapshot:
+	git clean -fxd
+	make install
+	make build
+	make test update-snapshots lint-fix
+
+.PHONY: build test install docs deep-clean-and-snapshot update-snapshots
 
 deep-clean:
 	rm -rf node_modules/ \
@@ -83,6 +92,8 @@ clean:
 	@rm -rf coverage/
 	@rm -rf packages/@dcl/dcl-rollup/*.js packages/@dcl/dcl-rollup/*.d.ts
 	@rm -rf packages/@dcl/sdk/*.js packages/@dcl/sdk/*.d.ts packages/@dcl/sdk/internal
+	@find packages/@dcl/sdk/cli -name "*.js" -type f -delete
+	@find packages/@dcl/sdk/cli -name "*.d.ts" -type f -delete
 	@rm -rf packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/
 	@rm -rf packages/@dcl/ecs/src/components/generated/ packages/@dcl/ecs/temp/
 	@rm -rf packages/@dcl/js-runtime/apis.d.ts

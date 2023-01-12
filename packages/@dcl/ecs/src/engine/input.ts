@@ -1,6 +1,6 @@
 import * as components from '../components'
 import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
-import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_hover_feedback.gen'
+import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_events.gen'
 import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
 import { Schemas } from '../schemas'
 import { Entity } from './entity'
