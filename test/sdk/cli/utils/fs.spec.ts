@@ -168,4 +168,24 @@ describe('utils/fs', () => {
 
     expect(fs.rm).toBeCalledWith('some/path')
   })
+
+  it('readdir: should return a list of directory files', async () => {
+    const readdirSpy = jest
+      .spyOn(fs, 'readdir')
+      .mockResolvedValue(['file1', 'file2'] as any)
+    const files = await fsUtils.readdir('some/path')
+
+    expect(files).toStrictEqual(['file1', 'file2'])
+    expect(readdirSpy).toBeCalledWith('some/path')
+  })
+
+  it('readFile: should read file contents', async () => {
+    const readFileSpy = jest
+      .spyOn(fs, 'readFile')
+      .mockResolvedValue('testing content')
+    const content = await fsUtils.readFile('some/path')
+
+    expect(content).toBe('testing content')
+    expect(readFileSpy).toBeCalledWith('some/path', 'utf8')
+  })
 })

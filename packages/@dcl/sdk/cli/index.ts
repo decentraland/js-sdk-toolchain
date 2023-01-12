@@ -1,6 +1,12 @@
 #!/usr/bin/env node
 
+/*
+  istanbul ignore file
+  Doesn't make sense to test this file
+*/
+
 import { getArgs } from './utils/args'
+import { toStringList } from './utils/out-messages'
 import log from './utils/log'
 import { CliError } from './utils/error'
 import { COMMANDS_PATH, getCommands } from './utils/commands'
@@ -19,12 +25,7 @@ interface FileExports {
 }
 
 const listCommandsStr = (commands: string[]) =>
-  commands
-    .map(
-      ($) => `
-  * npx sdk ${$}`
-    )
-    .join('')
+  toStringList(commands.map(($) => `npx sdk ${$}`))
 
 const handleError = (err: CliError) => {
   if (!(err instanceof CliError)) {
@@ -59,7 +60,9 @@ const helpMessage = (commands: string[]) =>
       log.info(helpMessage(commands))
       return
     }
-    throw new CliError(`Command ${command} is invalid. ${helpMessage}`)
+    throw new CliError(
+      `Command ${command} is invalid. ${helpMessage(commands)}`
+    )
   }
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires

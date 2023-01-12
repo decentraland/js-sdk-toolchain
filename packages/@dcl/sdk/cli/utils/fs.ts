@@ -26,11 +26,27 @@ export async function ensureFolder(path: string | string[]): Promise<void> {
 }
 
 /**
+ * Read's a directory files
+ * @param dir Directory to read files from
+ */
+export async function readdir(dir: string): Promise<string[]> {
+  return fs.readdir(dir)
+}
+
+/**
+ * Read's a file contents
+ * @param path File to read content from
+ */
+export async function readFile(path: string): Promise<string> {
+  return fs.readFile(path, 'utf8')
+}
+
+/**
  * Check's if directory is empty
  * @param dir Directory to check for emptyness
  */
 export async function isDirectoryEmpty(dir: string): Promise<boolean> {
-  const files = await fs.readdir(dir)
+  const files = await _this.readdir(dir)
   return !files.length
 }
 
