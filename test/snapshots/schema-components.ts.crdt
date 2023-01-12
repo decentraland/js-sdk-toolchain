@@ -6,8 +6,8 @@ EVAL test/snapshots/schema-components.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 9k
-  MALLOC_COUNT = 5049
+  OPCODES ~= 10k
+  MALLOC_COUNT = 5050
   ALIVE_OBJS_DELTA ~= 0.82k
 CALL onStart()
   OPCODES ~= 0k
