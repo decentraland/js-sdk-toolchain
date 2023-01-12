@@ -10,7 +10,7 @@ export const getCommands = async ({
   const commandDirs = await fs.readdir(COMMANDS_PATH)
 
   const commands = commandDirs.map(async (dir) => {
-    const path = `${COMMANDS_PATH}/${dir}`
+    const path = resolve(COMMANDS_PATH, dir)
 
     const statDir = await fs.stat(path)
 
