@@ -1657,8 +1657,7 @@ export const PBAudioStream: {
 export interface PBAvatarAttach {
     // (undocumented)
     anchorPointId: AvatarAnchorPointType;
-    // (undocumented)
-    avatarId: string;
+    avatarId?: string | undefined;
 }
 
 // @public
@@ -1839,7 +1838,7 @@ export const PBMaterial: {
 //
 // @public (undocumented)
 export interface PBMaterial_PbrMaterial {
-    albedoColor?: PBColor3 | undefined;
+    albedoColor?: PBColor4 | undefined;
     alphaTest?: number | undefined;
     alphaTexture?: TextureUnion | undefined;
     bumpTexture?: TextureUnion | undefined;
