@@ -1,4 +1,7 @@
-import { componentNumberFromName, MAX_STATIC_COMPONENT } from '../../packages/@dcl/ecs/src/components/component-number'
+import {
+  componentNumberFromName,
+  MAX_STATIC_COMPONENT
+} from '../../packages/@dcl/ecs/src/components/component-number'
 import { coreComponentMappings } from '../../packages/@dcl/ecs/src/components/generated/component-names.gen'
 
 describe('component number generator', () => {
