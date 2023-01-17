@@ -3,16 +3,6 @@ import * as path from 'path'
 import { Component } from './generateComponent'
 import generateExportedTypes from './generateExportedTypes'
 
-const TransformComponent = {
-  componentId: 1,
-  componentPascalName: 'Transform',
-  componentFile: 'none'
-}
-
-function enumTemplate({ componentPascalName, componentId }: Component) {
-  return `\t${componentPascalName} = ${componentId},`
-}
-
 function importComponent(component: Component) {
   return `import { ${component.componentPascalName}Schema } from './${component.componentPascalName}.gen'; import { PB${component.componentPascalName} } from './pb/decentraland/sdk/components/${component.componentFile}.gen'`
 }
