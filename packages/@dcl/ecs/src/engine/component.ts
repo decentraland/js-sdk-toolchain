@@ -154,8 +154,12 @@ export function createComponentDefinitionFromSchema<T>(
   const dirtyIterator = new Set<Entity>()
 
   return {
-    componentId,
-    componentName,
+    get componentId() {
+      return componentId
+    },
+    get componentName() {
+      return componentName
+    },
     default() {
       return schema.create() as DeepReadonly<T>
     },
