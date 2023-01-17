@@ -1,7 +1,7 @@
 import { ComponentDefinition } from '../../engine/component'
 
 export namespace CrdtUtils {
-  export type ComponentID = ComponentDefinition<any>['_id']
+  export type ComponentID = ComponentDefinition<any>['componentId']
 
   export enum SynchronizedEntityType {
     // synchronizes entities with the NetworkSynchronized component only, used for networked games

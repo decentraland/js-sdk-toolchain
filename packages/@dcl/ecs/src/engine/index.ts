@@ -1,4 +1,5 @@
 import * as components from '../components'
+import { componentNumberFromName } from '../components/component-number'
 import { checkNotThenable } from '../runtime/invariant'
 import { Schemas } from '../schemas'
 import { ISchema } from '../schemas/ISchema'
@@ -7,7 +8,7 @@ import { ByteBuffer } from '../serialization/ByteBuffer'
 import { crdtSceneSystem, OnChangeFunction } from '../systems/crdt'
 import {
   ComponentDefinition,
-  defineComponent as defComponent
+  createComponentDefinitionFromSchema
 } from './component'
 import { Entity, EntityContainer } from './entity'
 import { ReadonlyComponentSchema } from './readonly'
@@ -32,13 +33,14 @@ type PreEngine = Pick<
   | 'removeSystem'
   | 'defineComponent'
   | 'defineComponentFromSchema'
-  | 'registerCustomComponent'
+  | 'registerComponentDefinition'
   | 'getEntitiesWith'
   | 'getComponent'
   | 'getComponentOrNull'
   | 'removeComponentDefinition'
   | 'entityContainer'
   | 'componentsIter'
+  | 'seal'
 > & {
   getSystems: () => SystemItem[]
 }
@@ -47,6 +49,8 @@ function preEngine(): PreEngine {
   const entityContainer = EntityContainer()
   const componentsDefinition = new Map<number, ComponentDefinition<unknown>>()
   const systems = SystemContainer()
+
+  let sealed = false
 
   function addSystem(
     fn: SystemFn,
@@ -75,34 +79,66 @@ function preEngine(): PreEngine {
     return entityContainer.removeEntity(entity)
   }
 
-  function registerCustomComponent(
-    component: ComponentDefinition<any>,
-    componentId: number
+  function registerComponentDefinition(
+    componentName: string,
+    component: ComponentDefinition<any>
   ): ComponentDefinition<any> {
+    if (sealed)
+      throw new Error(
+        'Engine is already sealed. No components can be added at this stage'
+      )
+    const componentId = componentNumberFromName(componentName)
     const prev = componentsDefinition.get(componentId)
     if (prev) {
       throw new Error(`Component number ${componentId} was already registered.`)
+    }
+    if (component.componentName !== componentName) {
+      throw new Error(
+        `Component name doesn't match componentDefinition.componentName ${componentName} != ${component.componentName}`
+      )
+    }
+    if (component.componentId !== componentId) {
+      throw new Error(
+        `Component number doesn't match componentDefinition.componentId ${componentId} != ${component.componentId}`
+      )
     }
     componentsDefinition.set(componentId, component)
     return component
   }
 
-  function defineComponentFromSchema<T>(spec: ISchema<T>, componentId: number) {
+  function defineComponentFromSchema<T>(
+    componentName: string,
+    schema: ISchema<T>
+  ) {
+    if (sealed)
+      throw new Error(
+        'Engine is already sealed. No components can be added at this stage'
+      )
+    const componentId = componentNumberFromName(componentName)
     const prev = componentsDefinition.get(componentId)
     if (prev) {
       // TODO: assert spec === prev.spec
       return prev as ComponentDefinition<T>
     }
-    const newComponent = defComponent<T>(componentId, spec)
+    const newComponent = createComponentDefinitionFromSchema<T>(
+      componentName,
+      componentId,
+      schema
+    )
     componentsDefinition.set(componentId, newComponent)
     return newComponent as ComponentDefinition<T>
   }
 
   function defineComponent<T extends Spec>(
+    componentName: string,
     mapSpec: T,
-    componentId: number,
     constructorDefault?: Partial<MapResult<T>>
   ) {
+    if (sealed)
+      throw new Error(
+        'Engine is already sealed. No components can be added at this stage'
+      )
+    const componentId = componentNumberFromName(componentName)
     const prev = componentsDefinition.get(componentId)
     if (prev) {
       // TODO: assert spec === prev.spec
@@ -110,7 +146,11 @@ function preEngine(): PreEngine {
     }
 
     const schemaSpec = Schemas.Map(mapSpec, constructorDefault)
-    const def = defComponent<MapResult<T>>(componentId, schemaSpec)
+    const def = createComponentDefinitionFromSchema<MapResult<T>>(
+      componentName,
+      componentId,
+      schemaSpec
+    )
     const newComponent = {
       ...def,
       create(entity: Entity, val?: Partial<MapResult<T>>) {
@@ -211,6 +251,12 @@ function preEngine(): PreEngine {
       removeEntity(entity)
     }
   }
+
+  function seal() {
+    if (sealed) return
+    sealed = true
+  }
+
   return {
     addEntity,
     removeEntity,
@@ -224,9 +270,10 @@ function preEngine(): PreEngine {
     getComponentOrNull,
     removeComponentDefinition,
     removeEntityWithChildren,
-    registerCustomComponent,
+    registerComponentDefinition,
     entityContainer,
-    componentsIter
+    componentsIter,
+    seal
   }
 }
 
@@ -272,12 +319,14 @@ export function Engine(options?: IEngineOptions): IEngine {
     removeSystem: engine.removeSystem,
     defineComponent: engine.defineComponent,
     defineComponentFromSchema: engine.defineComponentFromSchema,
-    registerCustomComponent: engine.registerCustomComponent,
+    registerComponentDefinition: engine.registerComponentDefinition,
     getEntitiesWith: engine.getEntitiesWith,
     getComponent: engine.getComponent,
     getComponentOrNull: engine.getComponentOrNull,
     removeComponentDefinition: engine.removeComponentDefinition,
     componentsIter: engine.componentsIter,
+    seal: engine.seal,
+
     update,
 
     RootEntity: 0 as Entity,

@@ -99,72 +99,72 @@ export type IEngine = {
   removeSystem(selector: string | SystemFn): boolean
   /**
    * Registers a custom component definition.
-   * @param component - The component definition
-   * @param componentId - unique id to identify the component, if the component id already exist, it will fail.
+   * @param componentName - unique name to identify the component, a hash is calculated for it, it will fail if the hash has collisions.
+   * @param componentDefinition - The component definition
    */
-  registerCustomComponent<T>(
-    component: ComponentDefinition<T>,
-    componentId: number
+  registerComponentDefinition<T>(
+    componentName: string,
+    componentDefinition: ComponentDefinition<T>
   ): ComponentDefinition<T>
   /**
    * Define a component and add it to the engine.
    * @param spec - An object with schema fields
-   * @param componentId - unique id to identify the component, if the component id already exist, it will fail.
+   * @param componentName - unique name to identify the component, a hash is calculated for it, it will fail if the hash has collisions.
    * @param constructorDefault - the initial value prefilled when a component is created without a value
    * @returns The component definition
    *
    * ```ts
-   * const DoorComponentId = 10017
-   * const Door = engine.defineComponent({
+   * const Door = engine.defineComponent("my-scene::Door", {
    *   id: Schemas.Int,
    *   name: Schemas.String
-   * }, DoorComponentId)
-   *
+   * })
    * ```
    */
   defineComponent<T extends Spec>(
+    componentName: string,
     spec: T,
-    componentId: number,
     constructorDefault?: Partial<MapResult<T>>
   ): MapComponentDefinition<MapResult<T>>
 
   /**
    * Define a component and add it to the engine.
+   * @param componentName - unique name to identify the component, a hash is calculated for it, it will fail if the hash has collisions.
    * @param spec - An object with schema fields
-   * @param componentId - unique id to identify the component, if the component id already exist, it will fail.
    * @returns The component definition
    *
    * ```ts
    * const StateComponentId = 10023
-   * const StateComponent = engine.defineComponent(Schemas.Bool, VisibleComponentId)
+   * const StateComponent = engine.defineComponentFromSchema("my-lib::VisibleComponent", Schemas.Bool)
    * ```
    */
   defineComponentFromSchema<T>(
-    spec: ISchema<T>,
-    componentId: number
+    componentName: string,
+    spec: ISchema<T>
   ): ComponentDefinition<T>
 
   /**
    * Get the component definition from the component id.
-   * @param componentId - component number used to identify the component descriptor
+   * @param componentId - component number or name used to identify the component descriptor
    * @returns the component definition, throw an error if it doesn't exist
    * ```ts
    * const StateComponentId = 10023
    * const StateComponent = engine.getComponent(StateComponentId)
    * ```
    */
-  getComponent<T>(componentId: number): ComponentDefinition<T>
+  getComponent<T>(componentId: number | string): ComponentDefinition<T>
 
   /**
    * Get the component definition from the component id.
-   * @param componentId - component number used to identify the component descriptor
+   * @param componentId - component number or name used to identify the component descriptor
    * @returns the component definition or null if its not founded
    * ```ts
    * const StateComponentId = 10023
    * const StateComponent = engine.getComponent(StateComponentId)
    * ```
    */
-  getComponentOrNull<T>(componentId: number): ComponentDefinition<T> | null
+  getComponentOrNull<T>(
+    componentId: number | string
+  ): ComponentDefinition<T> | null
 
   /**
    * Get a iterator of entities that has all the component requested.
@@ -233,4 +233,10 @@ export type IEngine = {
    * Iterator of registered components
    */
   componentsIter(): Iterable<ComponentDefinition<unknown>>
+
+  /**
+   * Seals the engine components. It is used to clearly define the scope of the
+   * components that will be available to this engine and to run optimizations.
+   */
+  seal(): void
 }

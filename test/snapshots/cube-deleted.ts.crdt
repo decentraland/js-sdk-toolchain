@@ -6,8 +6,8 @@ EVAL test/snapshots/cube-deleted.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 10k
-  MALLOC_COUNT = 5967
+  OPCODES ~= 15k
+  MALLOC_COUNT = 6043
   ALIVE_OBJS_DELTA ~= 1.02k
 CALL onStart()
   OPCODES ~= 0k

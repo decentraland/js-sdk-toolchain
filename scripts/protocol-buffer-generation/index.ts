@@ -7,7 +7,7 @@ import {
   generateProtocolBuffer,
   getComponentId
 } from './generateProtocolBuffer'
-import { generateIndex } from './generateIndex'
+import { generateIndex, generateNameMappings } from './generateIndex'
 import { snakeToPascal } from '../utils/snakeToPascal'
 
 const NON_EXPOSED_LIST: number[] = []
@@ -99,6 +99,9 @@ export function compileEcsComponents(
       ({ componentId }) => !NON_EXPOSED_LIST.includes(componentId)
     )
     generateIndex({ components: filteredComponents, generatedPath })
+
+    generateNameMappings({ components, generatedPath })
+
     // await runCommand({/
     //   command: resolve(process.cwd(), 'node_modules', '.bin', 'eslint'),
     //   args: [generatedPath, '--ext', '.ts', '--fix'],

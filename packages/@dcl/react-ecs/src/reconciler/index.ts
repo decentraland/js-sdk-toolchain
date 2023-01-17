@@ -66,11 +66,11 @@ export function createReconciler(
   const getComponentId: {
     [key in keyof EngineComponents]: number
   } = {
-    uiTransform: UiTransform._id,
-    uiText: UiText._id,
-    uiBackground: UiBackground._id,
-    uiInput: UiInput._id,
-    uiDropdown: UiDropdown._id
+    uiTransform: UiTransform.componentId,
+    uiText: UiText.componentId,
+    uiBackground: UiBackground.componentId,
+    uiInput: UiInput.componentId,
+    uiDropdown: UiDropdown.componentId
   }
 
   function updateTree(
@@ -359,8 +359,8 @@ export function createReconciler(
   return {
     update: function (component: JSX.Element) {
       if (changeEvents.size) {
-        handleOnChange(UiInput._id, UiInputResult)
-        handleOnChange(UiDropdown._id, UiDropdownResult)
+        handleOnChange(UiInput.componentId, UiInputResult)
+        handleOnChange(UiDropdown.componentId, UiDropdownResult)
       }
       return reconciler.updateContainer(component as any, root, null)
     },

@@ -6,8 +6,8 @@ EVAL test/snapshots/pointer-events.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 15k
-  MALLOC_COUNT = 8941
+  OPCODES ~= 20k
+  MALLOC_COUNT = 9017
   ALIVE_OBJS_DELTA ~= 1.81k
 CALL onStart()
   OPCODES ~= 0k
