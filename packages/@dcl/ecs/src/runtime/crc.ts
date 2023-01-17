@@ -52,9 +52,6 @@ function _crc32(buf: Uint8Array, previous: number) {
   return crc ^ -1
 }
 
-export function signedCRC32(data: Uint8Array, prev = 0) {
-  return _crc32(data, prev)
-}
 export function unsignedCRC32(data: Uint8Array, prev = 0) {
   return _crc32(data, prev) >>> 0
 }

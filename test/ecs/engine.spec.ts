@@ -667,6 +667,20 @@ describe('Engine tests', () => {
     }
   })
 
+
+
+  it('should throw an error adding components after seal', async () => {
+    const engine = Engine()
+
+    engine.defineComponent("comp1", {})
+    engine.defineComponent("comp2", {})
+    engine.seal()
+
+    expect(() => {
+      engine.defineComponent("comp3", {})
+    }).toThrowError()
+  })
+
   it('should throw an error if the system is added twice', async () => {
     const engine = Engine()
     function testSystem() {}

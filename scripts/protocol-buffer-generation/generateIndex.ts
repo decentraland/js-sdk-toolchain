@@ -64,13 +64,6 @@ $allGlobalComponentsImports
 $allGlobalComponents
 `
 
-const idsTemplate = `/** @public */
-export enum ECSComponentIDs {
-${enumTemplate(TransformComponent)}
-$enumComponentIds
-}
-`
-
 export function generateIndex(param: {
   components: Component[]
   generatedPath: string
@@ -108,12 +101,6 @@ export function generateIndex(param: {
 
   fs.writeFileSync(path.resolve(generatedPath, 'global.gen.ts'), globalContent)
 
-  const idsContent = idsTemplate.replace(
-    '$enumComponentIds',
-    componentWithoutIndex.map(enumTemplate).join('\n')
-  )
-
-  fs.writeFileSync(path.resolve(generatedPath, 'ids.gen.ts'), idsContent)
   generateExportedTypes(generatedPath)
 }
 

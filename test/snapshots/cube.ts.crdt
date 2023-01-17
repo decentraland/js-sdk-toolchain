@@ -7,8 +7,8 @@ EVAL test/snapshots/cube.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 15k
-  MALLOC_COUNT = 6015
-  ALIVE_OBJS_DELTA ~= 1.01k
+  MALLOC_COUNT = 6074
+  ALIVE_OBJS_DELTA ~= 1.03k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 2

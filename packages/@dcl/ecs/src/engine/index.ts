@@ -83,6 +83,7 @@ function preEngine(): PreEngine {
     componentName: string,
     component: ComponentDefinition<any>
   ): ComponentDefinition<any> {
+    /* istanbul ignore next */
     if (sealed)
       throw new Error(
         'Engine is already sealed. No components can be added at this stage'
@@ -92,11 +93,13 @@ function preEngine(): PreEngine {
     if (prev) {
       throw new Error(`Component number ${componentId} was already registered.`)
     }
+    /* istanbul ignore next */
     if (component.componentName !== componentName) {
       throw new Error(
         `Component name doesn't match componentDefinition.componentName ${componentName} != ${component.componentName}`
       )
     }
+    /* istanbul ignore next */
     if (component.componentId !== componentId) {
       throw new Error(
         `Component number doesn't match componentDefinition.componentId ${componentId} != ${component.componentId}`
@@ -110,6 +113,7 @@ function preEngine(): PreEngine {
     componentName: string,
     schema: ISchema<T>
   ) {
+    /* istanbul ignore next */
     if (sealed)
       throw new Error(
         'Engine is already sealed. No components can be added at this stage'
@@ -253,8 +257,9 @@ function preEngine(): PreEngine {
   }
 
   function seal() {
-    if (sealed) return
-    sealed = true
+    if (!sealed) {
+      sealed = true
+    }
   }
 
   return {

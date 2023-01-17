@@ -1,11 +1,11 @@
 import { Transport, TransportMessage, CrdtMessageType } from '@dcl/ecs'
-import { ECSComponentIDs } from '@dcl/ecs/dist/components/generated/ids.gen'
+import { coreComponentMappings } from '@dcl/ecs/dist/components/generated/component-names.gen'
 import type {
   CrdtSendToRendererRequest,
   CrdtSendToResponse
 } from '~system/EngineApi'
 
-const componentIds = Object.values(ECSComponentIDs)
+const componentIds = Object.values(coreComponentMappings)
   .filter((a) => typeof a === 'number')
   .map(Number)
 
