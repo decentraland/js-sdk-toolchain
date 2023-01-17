@@ -6,9 +6,9 @@ EVAL test/snapshots/ui.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 23k
-  MALLOC_COUNT = 22257
-  ALIVE_OBJS_DELTA ~= 3.24k
+  OPCODES ~= 28k
+  MALLOC_COUNT = 22602
+  ALIVE_OBJS_DELTA ~= 3.30k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 2
@@ -33,12 +33,12 @@ CALL onUpdate(0.0)
   CRDT: e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   CRDT: e=0x200 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   OPCODES ~= 109k
-  MALLOC_COUNT = 607
+  MALLOC_COUNT = 609
   ALIVE_OBJS_DELTA ~= 0.21k
 CALL onUpdate(0.1)
   CRDT: e=0x200 c=1 t=2 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.008726535364985466,"z":0,"w":0.9999619126319885},"scale":{"x":1,"y":1,"z":1},"parent":0}
   OPCODES ~= 52k
-  MALLOC_COUNT = 179
+  MALLOC_COUNT = 181
   ALIVE_OBJS_DELTA ~= 0.08k
 CALL onUpdate(0.1)
   CRDT: e=0x200 c=1 t=3 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.017452405765652657,"z":0,"w":0.9998477101325989},"scale":{"x":1,"y":1,"z":1},"parent":0}

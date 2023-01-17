@@ -1,15 +1,19 @@
 import { ByteBuffer, Entity, IEngine } from '../../packages/@dcl/ecs/src/engine'
+import { componentNumberFromName } from '../../packages/@dcl/ecs/src/components/component-number'
 import * as components from '../../packages/@dcl/ecs/src/components'
 
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
-export const ID = 123987
+export const componentName = 'int8'
+export const ID = componentNumberFromName(componentName)
+
 export const int8Component = (engine: IEngine) => {
   const values = new Map<Entity, number>()
   const dirtyIterator = new Set<Entity>()
 
   const component: components.ComponentDefinition<any> = {
-    _id: ID,
+    componentId: ID,
+    componentName: componentName,
     default: function () {
       return 0
     },
@@ -103,5 +107,5 @@ export const int8Component = (engine: IEngine) => {
     }
   }
 
-  return engine.registerCustomComponent(component, ID)
+  return engine.registerComponentDefinition(componentName, component)
 }

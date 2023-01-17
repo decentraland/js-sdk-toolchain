@@ -155,5 +155,13 @@ describe('ByteBuffer tests', () => {
     expect(copiedBuffer[0]).toBe(testValueA[0])
     expect(referenceBuffer[0]).toBe(testValueB[0])
   })
+
+  it('ensure that unsigned ints are properly stored', () => {
+    const writeBuffer = new ReadWriteByteBuffer()
+    writeBuffer.writeInt32(-1)
+    writeBuffer.writeInt32(0xffff_ffff)
+    expect(writeBuffer.readUint32()).toEqual(0xffffffff)
+    expect(writeBuffer.readUint32()).toEqual(0xffffffff)
+  })
 })
 // getInt64

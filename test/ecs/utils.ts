@@ -1,6 +1,7 @@
 import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/math'
 import { Engine, IEngine } from '../../packages/@dcl/ecs/src/engine'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
+import { componentNumberFromName } from '../../packages/@dcl/ecs/src/components/component-number'
 import {
   TransportMessage,
   Transport,
@@ -49,7 +50,7 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
 
   for (const def of engine.componentsIter()) {
     const componentValues = Array.from(def.iterator())
-    const crdtComponent = crdtState.components.get(def._id)
+    const crdtComponent = crdtState.components.get(def.componentId)
 
     if (
       componentValues.length === 0 &&
@@ -60,7 +61,7 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
 
     if (crdtComponent === undefined) {
       conflicts.push(
-        `Component ${def._id} has ${componentValues.length} entities but there is no state stored in the CRDT.`
+        `Component ${def.componentId} has ${componentValues.length} entities but there is no state stored in the CRDT.`
       )
     }
 
@@ -79,7 +80,7 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
         crdtEntry.data === null
       ) {
         conflicts.push(
-          `Entity ${entity} with componentId ${def._id} has value in the engine but not in the crdt.`
+          `Entity ${entity} with componentId ${def.componentId} has value in the engine but not in the crdt.`
         )
         continue
       }
@@ -88,7 +89,7 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
       if (!theSame) {
         conflicts.push(
           `Entity ${entity} with componentId ${
-            def._id
+            def.componentId
           } hasn't equal values between CRDT and engine => ${crdtEntry.data.toString()} vs ${data.toString()}`
         )
       }
@@ -99,7 +100,7 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
       for (const [entity, _payload] of crdtComponent) {
         if (def.getOrNull(entity as Entity) === null) {
           conflicts.push(
-            `Entity ${entity} with componentId ${def._id} has value in the CRDT but not in the engine.`
+            `Entity ${entity} with componentId ${def.componentId} has value in the CRDT but not in the engine.`
           )
         }
       }
@@ -135,10 +136,15 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
 export namespace SandBox {
   export const WS_SEND_DELAY = 30
   export const Position = {
-    id: 88,
+    id: componentNumberFromName('88'),
+    name: '88',
     type: { x: Schemas.Float, y: Schemas.Float }
   }
-  export const Door = { id: 888, type: { open: Schemas.Byte } }
+  export const Door = {
+    id: componentNumberFromName('888'),
+    name: '888',
+    type: { open: Schemas.Byte }
+  }
 
   export const DEFAULT_POSITION = {
     position: Vector3.create(0, 1, 2),
@@ -292,10 +298,10 @@ export namespace SandBox {
       })
       engine.addTransport(clientTransport)
       const Position = engine.defineComponent(
-        SandBox.Position.type,
-        SandBox.Position.id
+        SandBox.Position.name,
+        SandBox.Position.type
       )
-      const Door = engine.defineComponent(SandBox.Door.type, SandBox.Door.id)
+      const Door = engine.defineComponent(SandBox.Door.name, SandBox.Door.type)
 
       return {
         id: index,
