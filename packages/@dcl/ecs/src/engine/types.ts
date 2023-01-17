@@ -151,7 +151,7 @@ export type IEngine = {
    * const StateComponent = engine.getComponent(StateComponentId)
    * ```
    */
-  getComponent<T>(componentId: number | string): ComponentDefinition<T>
+  getComponent<T>(componentId: number): ComponentDefinition<T>
 
   /**
    * Get the component definition from the component id.
@@ -162,9 +162,7 @@ export type IEngine = {
    * const StateComponent = engine.getComponent(StateComponentId)
    * ```
    */
-  getComponentOrNull<T>(
-    componentId: number | string
-  ): ComponentDefinition<T> | null
+  getComponentOrNull<T>(componentId: number): ComponentDefinition<T> | null
 
   /**
    * Get a iterator of entities that has all the component requested.

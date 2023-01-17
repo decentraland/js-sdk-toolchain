@@ -767,8 +767,8 @@ export type IEngine = {
     registerComponentDefinition<T>(componentName: string, componentDefinition: ComponentDefinition<T>): ComponentDefinition<T>;
     defineComponent<T extends Spec>(componentName: string, spec: T, constructorDefault?: Partial<MapResult<T>>): MapComponentDefinition<MapResult<T>>;
     defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): ComponentDefinition<T>;
-    getComponent<T>(componentId: number | string): ComponentDefinition<T>;
-    getComponentOrNull<T>(componentId: number | string): ComponentDefinition<T> | null;
+    getComponent<T>(componentId: number): ComponentDefinition<T>;
+    getComponentOrNull<T>(componentId: number): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     update(deltaTime: number): Promise<void>;
     readonly RootEntity: Entity;

@@ -3,7 +3,7 @@ import * as utf8 from '@protobufjs/utf8'
 import { unsignedCRC32 } from '../runtime/crc'
 
 // Max possible pre-defined (static) component.
-export const MAX_STATIC_COMPONENT = 2 << 10 // 2048
+export const MAX_STATIC_COMPONENT = 1 << 11 // 2048
 
 /**
  * All components that are not part of the coreComponentMappings MUST yield
