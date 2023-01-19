@@ -36,7 +36,7 @@ export namespace PutComponentOperation {
 
     // Write ComponentOperation header
     buf.setUint32(startMessageOffset + 8, entity as number)
-    buf.setUint32(startMessageOffset + 12, componentDefinition._id)
+    buf.setUint32(startMessageOffset + 12, componentDefinition.componentId)
     buf.setUint64(startMessageOffset + 16, BigInt(timestamp))
     const newLocal =
       messageLength - MESSAGE_HEADER_LENGTH - CRDT_MESSAGE_HEADER_LENGTH
@@ -59,7 +59,7 @@ export namespace PutComponentOperation {
     return {
       ...header,
       entityId: buf.readUint32() as Entity,
-      componentId: buf.readInt32(),
+      componentId: buf.readUint32(),
       timestamp: Number(buf.readUint64()),
       data: buf.readBuffer()
     }
