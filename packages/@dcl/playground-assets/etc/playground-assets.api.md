@@ -6,6 +6,9 @@
 
 import _m0 from 'protobufjs/minimal';
 
+// @public (undocumented)
+export type Align = 'auto' | 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline' | 'space-between' | 'space-around';
+
 // Warning: (ae-missing-release-tag) "AMOUNT_VERSION_AVAILABLE" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -585,6 +588,9 @@ export type DeleteEntityMessageBody = {
 };
 
 // @public (undocumented)
+export type Display = 'flex' | 'none';
+
+// @public (undocumented)
 export function Dropdown(props: EntityPropTypes & UiDropdownProps): ReactEcs.JSX.Element;
 
 // Warning: (ae-missing-release-tag) "EcsElements" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -704,6 +710,12 @@ export type ExcludeUndefined<T> = {
 
 // @public (undocumented)
 export const executeTask: (task: Task<unknown>) => void;
+
+// @public (undocumented)
+export type FlexDirection = 'row' | 'column' | 'column-reverse' | 'row-reverse';
+
+// @public (undocumented)
+export type FlexWrap = 'wrap' | 'nowrap' | 'wrap-reverse';
 
 // @public (undocumented)
 export type FloatArray = number[];
@@ -1073,6 +1085,9 @@ export namespace JSX {
     // (undocumented)
     export type IntrinsicElements = EcsElements;
 }
+
+// @public (undocumented)
+export type Justify = 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
 
 // Warning: (ae-missing-release-tag) "Key" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -1571,6 +1586,9 @@ export const onVideoEvent: Observable<{
     currentOffset: number;
     totalVideoLength: number;
 }>;
+
+// @public (undocumented)
+export type Overflow = 'hidden' | 'scroll' | 'visible';
 
 // Warning: (ae-missing-release-tag) "PBAnimationState" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 // Warning: (ae-missing-release-tag) "PBAnimationState" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2600,6 +2618,9 @@ export type Position = {
     left: PositionUnit;
 };
 
+// @public (undocumented)
+export type PositionType = 'absolute' | 'relative';
+
 // Warning: (ae-missing-release-tag) "PositionUnit" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -3134,29 +3155,29 @@ export const UiTransform: ComponentDefinition<PBUiTransform>;
 // @public (undocumented)
 export interface UiTransformProps {
     // (undocumented)
-    alignContent?: YGAlign;
+    alignContent?: Align;
     // (undocumented)
-    alignItems?: YGAlign;
+    alignItems?: Align;
     // (undocumented)
-    alignSelf?: YGAlign;
+    alignSelf?: Align;
     // (undocumented)
-    display?: YGDisplay;
+    display?: Display;
     // (undocumented)
     flex?: number;
     // (undocumented)
     flexBasis?: number;
     // (undocumented)
-    flexDirection?: YGFlexDirection;
+    flexDirection?: FlexDirection;
     // (undocumented)
     flexGrow?: number;
     // (undocumented)
     flexShrink?: number;
     // (undocumented)
-    flexWrap?: YGWrap;
+    flexWrap?: FlexWrap;
     // (undocumented)
     height?: PositionUnit;
     // (undocumented)
-    justifyContent?: YGJustify;
+    justifyContent?: Justify;
     // (undocumented)
     margin?: Partial<Position>;
     // (undocumented)
@@ -3168,13 +3189,13 @@ export interface UiTransformProps {
     // (undocumented)
     minWidth?: PositionUnit;
     // (undocumented)
-    overflow?: YGOverflow;
+    overflow?: Overflow;
     // (undocumented)
     padding?: Partial<Position>;
     // (undocumented)
     position?: Partial<Position>;
     // (undocumented)
-    positionType?: YGPositionType;
+    positionType?: PositionType;
     // (undocumented)
     width?: PositionUnit;
 }

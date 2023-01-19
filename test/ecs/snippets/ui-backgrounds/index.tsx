@@ -1,4 +1,4 @@
-import { engine, YGFlexDirection, BackgroundTextureMode } from '@dcl/sdk/ecs'
+import { engine, BackgroundTextureMode } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, {
   UiEntity,
@@ -177,7 +177,7 @@ export const ui = () => {
       uiTransform={{
         width: '100%',
         height: '50%',
-        flexDirection: YGFlexDirection.YGFD_COLUMN,
+        flexDirection: 'column',
         margin: { left: 300 }
       }}
       uiBackground={{ color: Color4.Black() }}

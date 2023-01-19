@@ -1,10 +1,24 @@
-import {
-  YGFlexDirection,
-} from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { UiEntity, Label, ReactEcsRenderer, Dropdown } from '@dcl/sdk/react-ecs'
+import ReactEcs, {
+  UiEntity,
+  Label,
+  ReactEcsRenderer,
+  Dropdown
+} from '@dcl/sdk/react-ecs'
 
-const colorList = ['Red', 'Green', 'Blue', 'Black', 'White', 'Purple', 'Magenta', 'Yellow', 'Gray', 'Teal', 'Clear']
+const colorList = [
+  'Red',
+  'Green',
+  'Blue',
+  'Black',
+  'White',
+  'Purple',
+  'Magenta',
+  'Yellow',
+  'Gray',
+  'Teal',
+  'Clear'
+]
 
 let selectedColorIndex = 0
 
@@ -16,17 +30,16 @@ export const ui = () => {
   return (
     <UiEntity
       uiTransform={{
-        width: "100%",
-        height: "3000px",
-        flexDirection: YGFlexDirection.YGFD_COLUMN
+        width: '100%',
+        height: '3000px',
+        flexDirection: 'column'
       }}
       uiBackground={{ color: (Color4 as any)[colorList[selectedColorIndex]]() }}
     >
-      <Label value="Select a color"  fontSize={29} />
+      <Label value="Select a color" fontSize={29} />
       <Dropdown options={colorList} onChange={selectOption} />
     </UiEntity>
   )
 }
-
 
 ReactEcsRenderer.setUiRenderer(ui)
