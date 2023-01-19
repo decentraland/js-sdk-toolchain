@@ -18,7 +18,7 @@ describe('VideoPlayer component', () => {
     const buffer = VideoPlayer.toBinary(entity)
     VideoPlayer.upsertFromBinary(entity, buffer)
     const entityB = newEngine.addEntity()
-    expect(VideoPlayer.createOrReplace(entityB)).not.toBeDeepCloseTo({
+    expect(VideoPlayer.createOrReplace(entityB)).not.toEqual({
       ...VideoPlayer.get(entity)
     })
   })
