@@ -2509,6 +2509,7 @@ export const PBVector3: {
 //
 // @public (undocumented)
 export interface PBVideoPlayer {
+    loop?: boolean | undefined;
     playbackRate?: number | undefined;
     playing?: boolean | undefined;
     position?: number | undefined;
