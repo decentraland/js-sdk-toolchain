@@ -1,4 +1,4 @@
-import { engine, BackgroundTextureMode } from '@dcl/sdk/ecs'
+import { engine } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, {
   UiEntity,
@@ -34,7 +34,7 @@ const options = [
         }}
         uiBackground={{
           color: tint2,
-          textureMode: BackgroundTextureMode.STRETCH,
+          textureMode: 'stretch',
           texture: {
             src
           }
@@ -58,7 +58,7 @@ const options = [
         }}
         uiBackground={{
           color: tint,
-          textureMode: BackgroundTextureMode.NINE_SLICES,
+          textureMode: 'nine-slices',
           texture: {
             src
           }
@@ -87,7 +87,7 @@ const options = [
         }}
         uiBackground={{
           color: tint,
-          textureMode: BackgroundTextureMode.NINE_SLICES,
+          textureMode: 'nine-slices',
           texture: {
             src: centeredImage
           }
@@ -107,7 +107,7 @@ const options = [
           height: 256
         }}
         uiBackground={{
-          textureMode: BackgroundTextureMode.NINE_SLICES,
+          textureMode: 'nine-slices',
           texture: {
             src: centeredImage
           },
@@ -135,7 +135,7 @@ const options = [
           height: 128 + Math.sin(dt * 0.2) * 64
         }}
         uiBackground={{
-          textureMode: BackgroundTextureMode.CENTER,
+          textureMode: 'center',
           texture: {
             src: centeredImage
           }
@@ -153,7 +153,7 @@ const options = [
           height: 128 + Math.sin(dt * 0.2) * 64
         }}
         uiBackground={{
-          textureMode: BackgroundTextureMode.CENTER,
+          textureMode: 'center',
           avatarTexture: {
             userId: userId ?? ''
           }

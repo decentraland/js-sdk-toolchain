@@ -2963,6 +2963,9 @@ export const Texture: {
     decode(input: _m0.Reader | Uint8Array, length?: number): Texture;
 };
 
+// @public (undocumented)
+export type TextureFilter = 'point' | 'bi-linear' | 'tri-linear';
+
 // Warning: (ae-missing-release-tag) "TextureFilterMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -2980,6 +2983,9 @@ export type TextureHelper = {
     Common: (texture: Texture) => TextureUnion;
     Avatar: (avatarTexture: AvatarTexture) => TextureUnion;
 };
+
+// @public
+export type TextureMode = 'nine-slices' | 'center' | 'stretch';
 
 // Warning: (ae-missing-release-tag) "TextureUnion" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 // Warning: (ae-missing-release-tag) "TextureUnion" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -3001,6 +3007,9 @@ export const TextureUnion: {
     encode(message: TextureUnion, writer?: _m0.Writer): _m0.Writer;
     decode(input: _m0.Reader | Uint8Array, length?: number): TextureUnion;
 };
+
+// @public (undocumented)
+export type TextureWrap = 'repeat' | 'clamp' | 'mirror' | 'mirror-once';
 
 // Warning: (ae-missing-release-tag) "TextureWrapMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -3083,14 +3092,23 @@ export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
 // @public (undocumented)
 export type UiAvatarTexture = {
-    avatarTexture?: AvatarTexture;
+    avatarTexture?: {
+        userId: string;
+        wrapMode?: TextureWrap;
+        filterMode?: TextureFilter;
+    };
 };
 
 // @public (undocumented)
 export const UiBackground: ComponentDefinition<PBUiBackground>;
 
 // @public (undocumented)
-export type UiBackgroundProps = Partial<Omit<PBUiBackground, 'texture'>> & UiTextureUnion;
+export type UiBackgroundProps = {
+    color?: PBColor4 | undefined;
+    textureMode?: TextureMode;
+    textureSlices?: BorderRect | undefined;
+    uvs?: number[];
+} & UiTextureUnion;
 
 // @public (undocumented)
 export type UiButtonProps = PBUiText & {
@@ -3143,7 +3161,11 @@ export type UiTextProps = PBUiText;
 
 // @public (undocumented)
 export type UiTexture = {
-    texture?: Texture;
+    texture?: {
+        src: string;
+        wrapMode?: TextureWrap;
+        filterMode?: TextureFilter;
+    };
 };
 
 // @public (undocumented)

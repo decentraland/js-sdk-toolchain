@@ -32,11 +32,11 @@ const uiComponent = () => (
     }}
     uiBackground={{
       color: Color4.fromInts(231, 255, 255, 150),
-      textureMode: BackgroundTextureMode.STRETCH,
+      textureMode: 'stretch',
       texture: {
         src: 'models/buffa.jpg',
-        wrapMode: TextureWrapMode.TWM_CLAMP,
-        filterMode: TextureFilterMode.TFM_BILINEAR
+        wrapMode: 'clamp',
+        filterMode: 'bi-linear'
       },
       textureSlices: {
         top: 0.46,
