@@ -3,16 +3,11 @@ import { PBUiText } from '@dcl/ecs'
 /**
  * @public
  */
-export type UiLabelProps = {
-  value: string
-  /** default=(1.0,1.0,1.0,1.0) */
-  color?: PBUiText['color']
-  /** default='center' */
+export type UiLabelProps = Omit<PBUiText, 'textAlign' | 'font'> & {
+  /** default='middle-center' */
   textAlign?: TextAlign | undefined
   /** default='sans-serif' */
   font?: UiFont | undefined
-  /** default='10' */
-  fontSize?: number | undefined
 }
 
 /**

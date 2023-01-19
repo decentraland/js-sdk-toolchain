@@ -9,9 +9,11 @@ const parseFont: Readonly<Record<UiFont, Font>> = {
 /**
  * @internal
  */
-export function getFont(font: UiFont | undefined): Record<'font', Font> {
-  const value: Font = font ? parseFont[font] : Font.F_SANS_SERIF
-  return { font: value }
+export function getFont(
+  font: UiFont | undefined
+): Record<'font', Font> | undefined {
+  if (!font) return undefined
+  return { font: parseFont[font] }
 }
 
 const parseTextAlign: Readonly<Record<TextAlign, TextAlignMode>> = {
@@ -30,9 +32,7 @@ const parseTextAlign: Readonly<Record<TextAlign, TextAlignMode>> = {
  */
 export function getTextAlign(
   textAlign: TextAlign | undefined
-): Record<'textAlign', TextAlignMode> {
-  const value: TextAlignMode = textAlign
-    ? parseTextAlign[textAlign]
-    : TextAlignMode.TAM_MIDDLE_CENTER
-  return { textAlign: value }
+): Record<'textAlign', TextAlignMode> | undefined {
+  if (!textAlign) return undefined
+  return { textAlign: parseTextAlign[textAlign] }
 }

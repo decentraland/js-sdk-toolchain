@@ -19,10 +19,11 @@ export function Label(props: EntityPropTypes & UiLabelProps) {
     onMouseDown,
     onMouseUp
   })
+  const { font, textAlign, ...textProps } = uiTextProps
   const uiText: PBUiText = {
-    ...uiTextProps,
-    ...getFont(uiTextProps.font),
-    ...getTextAlign(uiTextProps.textAlign)
+    ...textProps,
+    ...getFont(font),
+    ...getTextAlign(textAlign)
   }
 
   return <entity {...commonProps} uiText={uiText} />

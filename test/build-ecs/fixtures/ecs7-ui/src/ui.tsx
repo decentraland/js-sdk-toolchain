@@ -1,9 +1,3 @@
-import {
-  TextureWrapMode,
-  TextureFilterMode,
-  BackgroundTextureMode,
-  TextAlignMode
-} from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, {
   ReactEcsRenderer,
@@ -68,7 +62,7 @@ const uiComponent = () => (
       color={{ r: 1, g: 1, b: 1, a: 1 }}
       value="Some text"
       fontSize={16}
-      textAlign={TextAlignMode.TAM_MIDDLE_CENTER}
+      textAlign="middle-center"
     />
     <Button type="primary" value="Primary Button" />
     <Button type="secondary" value="Secondary Button" />

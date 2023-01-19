@@ -3129,8 +3129,8 @@ export const UiDropdown: ComponentDefinition<PBUiDropdown>;
 // @public (undocumented)
 export type UiDropdownProps = Partial<Omit<PBUiDropdown, 'textAlign' | 'font'>> & {
     onChange?(value: number): void;
-    font: UiFont;
-    textAlign: TextAlign;
+    font?: UiFont;
+    textAlign?: TextAlign;
 };
 
 // @public (undocumented)
@@ -3146,20 +3146,19 @@ export type UiFont = 'sans-serif' | 'serif' | 'monospace';
 export const UiInput: ComponentDefinition<PBUiInput>;
 
 // @public (undocumented)
-export type UiInputProps = PBUiInput & {
+export type UiInputProps = Omit<PBUiInput, 'font' | 'textAlign'> & {
     onChange?(value: string): void;
+    font?: UiFont;
+    textAlign?: TextAlign;
 };
 
 // @public (undocumented)
 export const UiInputResult: ComponentDefinition<PBUiInputResult>;
 
 // @public (undocumented)
-export type UiLabelProps = {
-    value: string;
-    color?: PBUiText['color'];
+export type UiLabelProps = Omit<PBUiText, 'textAlign' | 'font'> & {
     textAlign?: TextAlign | undefined;
     font?: UiFont | undefined;
-    fontSize?: number | undefined;
 };
 
 // Warning: (ae-missing-release-tag) "Uint32" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
