@@ -6,9 +6,9 @@ EVAL test/snapshots/cube-deleted.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 11k
-  MALLOC_COUNT = 5995
-  ALIVE_OBJS_DELTA ~= 1.02k
+  OPCODES ~= 15k
+  MALLOC_COUNT = 6120
+  ALIVE_OBJS_DELTA ~= 1.04k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 2
@@ -17,8 +17,8 @@ CALL onUpdate(0.0)
   CRDT: e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   CRDT: e=0x201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   OPCODES ~= 7k
-  MALLOC_COUNT = 103
-  ALIVE_OBJS_DELTA ~= 0.04k
+  MALLOC_COUNT = 101
+  ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0.1)
   CRDT: e=0x201 c=1019 t=2 data=undefined
   CRDT: e=0x202 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
@@ -31,7 +31,7 @@ CALL onUpdate(0.1)
   CRDT: e=0x10201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   CRDT: e=0x202 deleted
   OPCODES ~= 5k
-  MALLOC_COUNT = 2
+  MALLOC_COUNT = 4
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   CRDT: e=0x10201 c=1019 t=2 data=undefined
