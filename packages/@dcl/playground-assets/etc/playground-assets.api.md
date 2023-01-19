@@ -539,7 +539,7 @@ export const DEG2RAD: number;
 // @public (undocumented)
 export namespace DeleteComponent {
     const // (undocumented)
-    MESSAGE_HEADER_LENGTH = 20;
+    MESSAGE_HEADER_LENGTH = 12;
     // (undocumented)
     export function read(buf: ByteBuffer): DeleteComponentMessage | null;
     export function write(entity: Entity, componentId: number, timestamp: number, buf: ByteBuffer): void;
@@ -2634,7 +2634,7 @@ export type PutComponentMessageBody = {
 // @public (undocumented)
 export namespace PutComponentOperation {
     const // (undocumented)
-    MESSAGE_HEADER_LENGTH = 20;
+    MESSAGE_HEADER_LENGTH = 16;
     // (undocumented)
     export function read(buf: ByteBuffer): PutComponentMessage | null;
     export function write(entity: Entity, timestamp: number, componentDefinition: ComponentDefinition<unknown>, buf: ByteBuffer): void;

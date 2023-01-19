@@ -26,9 +26,7 @@ export namespace DeleteEntity {
     }
 
     if (header.type !== CrdtMessageType.DELETE_ENTITY) {
-      throw new Error(
-        'DeleteComponentOperation tried to read another message type.'
-      )
+      throw new Error('DeleteEntity tried to read another message type.')
     }
 
     return {

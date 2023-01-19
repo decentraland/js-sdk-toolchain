@@ -8,8 +8,7 @@ import {
 } from './types'
 
 export namespace DeleteComponent {
-  // TODO: change timestamp to 32 bit and remove buffer length (-8 bytes)
-  export const MESSAGE_HEADER_LENGTH = 20
+  export const MESSAGE_HEADER_LENGTH = 12
 
   /**
    * Write DeleteComponent message
@@ -32,11 +31,7 @@ export namespace DeleteComponent {
     buf.setUint32(startMessageOffset + 8, entity as number)
     buf.setUint32(startMessageOffset + 12, componentId)
 
-    // TODO: change timestamp to 32bit (-4 bytes)
-    buf.setUint64(startMessageOffset + 16, BigInt(timestamp))
-
-    // TODO: remove buffer length (-4 bytes)
-    buf.setUint32(startMessageOffset + 24, 0)
+    buf.setUint32(startMessageOffset + 16, timestamp)
   }
 
   export function read(buf: ByteBuffer): DeleteComponentMessage | null {
@@ -56,11 +51,9 @@ export namespace DeleteComponent {
       ...header,
       entityId: buf.readUint32() as Entity,
       componentId: buf.readUint32(),
-      timestamp: Number(buf.readUint64())
+      timestamp: buf.readUint32()
     }
 
-    // TODO: remove buffer length
-    buf.incrementReadOffset(4)
     return msg
   }
 }
