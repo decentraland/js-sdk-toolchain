@@ -99,15 +99,14 @@ const InternalInputStateSchema = {
   )
 }
 
-const InternalInputStateComponentId = 1500
 const TimestampUpdateSystemPriority = 1 << 20
 const ButtonStateUpdateSystemPriority = 0
 
 export function createInputSystem(engine: IEngine): IInputSystem {
   const PointerEventsResult = components.PointerEventsResult(engine)
   const InternalInputStateComponent = engine.defineComponent(
-    InternalInputStateSchema,
-    InternalInputStateComponentId
+    '@dcl/sdk/InternalInputStateSchema',
+    InternalInputStateSchema
   )
 
   InternalInputStateComponent.create(engine.RootEntity, {

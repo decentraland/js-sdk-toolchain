@@ -30,14 +30,14 @@ describe('Engine tests', () => {
   it('should not allow u to create same component to an existing entitiy', async () => {
     const engine = Engine()
     const entity = engine.addEntity()
-    const Position = engine.defineComponent(PositionSchema, 888)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
     Position.create(entity, { x: 1 })
     expect(() => Position.create(entity, { x: 10 })).toThrowError()
   })
 
   it('should throw an error if the component doesnt exist', async () => {
     const engine = Engine()
-    const Position = engine.defineComponent(PositionSchema, 888)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
     const entity = engine.addEntity()
     const entityB = engine.addEntity()
     expect(() => Position.getMutable(entity)).toThrowError()
@@ -49,7 +49,7 @@ describe('Engine tests', () => {
 
   it('should delete component if exists or not', async () => {
     const engine = Engine()
-    const Position = engine.defineComponent(PositionSchema, 888)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
     const entity = engine.addEntity()
     const entity2 = engine.addEntity()
     Position.create(entity, { x: 10 })
@@ -70,7 +70,7 @@ describe('Engine tests', () => {
 
   it('should replace existing component with the new one', async () => {
     const engine = Engine()
-    const Position = engine.defineComponent(PositionSchema, 888)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
     const entity = engine.addEntity()
     Position.create(entity, { x: 1 })
     Position.createOrReplace(entity, { x: 10 })
@@ -80,7 +80,7 @@ describe('Engine tests', () => {
   it('define and remove component, also creates new entity', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
-    const Position = engine.defineComponent(PositionSchema, 888)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
     const posComponent = Position.create(entity, { x: 10 })
     expect(posComponent).toStrictEqual({ x: 10 })
 
@@ -108,8 +108,8 @@ describe('Engine tests', () => {
   it('iterate multiple components', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
-    const Position = engine.defineComponent(PositionSchema, 888)
-    const Velocity = engine.defineComponent(VelocitySchema, 222)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
+    const Velocity = engine.defineComponent('VelocitySchema', VelocitySchema)
     const posComponent = Position.create(entity, { x: 10 })
     const velComponent = Velocity.create(entity, { y: 20 })
 
@@ -127,8 +127,8 @@ describe('Engine tests', () => {
   it('define two custom components multiple components without ids', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
-    const Position = engine.defineComponent(PositionSchema, 123)
-    const Velocity = engine.defineComponent(VelocitySchema, 124)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
+    const Velocity = engine.defineComponent('VelocitySchema', VelocitySchema)
     const posComponent = Position.create(entity, { x: 10 })
     const velComponent = Velocity.create(entity, { y: 20 })
 
@@ -146,7 +146,7 @@ describe('Engine tests', () => {
   it('should not update a readonly prop', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
-    const Position = engine.defineComponent(PositionSchema, 888)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
     expect(Array.from(Position.dirtyIterator())).toEqual([])
     const posComponent = Position.create(entity, { x: 10 })
     posComponent.x = 1000000000000
@@ -157,7 +157,7 @@ describe('Engine tests', () => {
   it('should not update a readonly prop groupOf', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
-    const Position = engine.defineComponent(PositionSchema, 888)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
     const _posComponent = Position.create(entity, { x: 10 })
     for (const [_entity, position] of engine.getEntitiesWith(Position)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -170,7 +170,7 @@ describe('Engine tests', () => {
   it('should not update a readonly prop getFrom(entity)', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
-    const Position = engine.defineComponent(PositionSchema, 888)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
     Position.create(entity, { x: 10 })
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -182,8 +182,8 @@ describe('Engine tests', () => {
   it('should fail if we fetch a component that doesnt exists on an entity', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
-    const Position = engine.defineComponent(PositionSchema, 888)
-    const Velocity = engine.defineComponent(VelocitySchema, 222)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
+    const Velocity = engine.defineComponent('VelocitySchema', VelocitySchema)
     Position.create(entity, { x: 10 })
     expect(() => Velocity.get(entity)).toThrowError()
   })
@@ -191,8 +191,8 @@ describe('Engine tests', () => {
   it('should return null if the component not exists on the entity.', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
-    const Position = engine.defineComponent(PositionSchema, 888)
-    const Velocity = engine.defineComponent(VelocitySchema, 222)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
+    const Velocity = engine.defineComponent('VelocitySchema', VelocitySchema)
     Position.create(entity, { x: 10 })
     expect(Velocity.getOrNull(entity)).toBe(null)
   })
@@ -201,17 +201,17 @@ describe('Engine tests', () => {
 
   it('should return exactly the same component trying to re-define it', async () => {
     const engine = Engine()
-    const COMPONENT_ID = 888
-    const a = engine.defineComponent(PositionSchema, COMPONENT_ID)
-    const b = engine.defineComponent(PositionSchema, COMPONENT_ID)
+    const COMPONENT_ID = 'COMPONENT_ID'
+    const a = engine.defineComponent(COMPONENT_ID, PositionSchema)
+    const b = engine.defineComponent(COMPONENT_ID, PositionSchema)
     expect(a).toStrictEqual(b)
   })
 
   it('should return mutable obj if use component.getMutable()', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
-    const COMPONENT_ID = 888
-    const Position = engine.defineComponent(PositionSchema, COMPONENT_ID)
+    const COMPONENT_ID = 'COMPONENT_ID'
+    const Position = engine.defineComponent(COMPONENT_ID, PositionSchema)
     Position.create(entity, { x: 10 })
     Position.getMutable(entity).x = 8888
     expect(Position.get(entity)).toStrictEqual({ x: 8888 })
@@ -221,9 +221,8 @@ describe('Engine tests', () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
     const entityB = engine.addEntity() // 0
-    const COMPONENT_ID = 888
-    const Position = engine.defineComponent(PositionSchema, COMPONENT_ID)
-    const Velocity = engine.defineComponent(VelocitySchema, COMPONENT_ID + 1)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
+    const Velocity = engine.defineComponent('VelocitySchema', VelocitySchema)
     Position.create(entity, { x: 10 })
     Position.create(entityB, { x: 20 })
     Velocity.create(entity, { y: 20 })
@@ -242,10 +241,9 @@ describe('Engine tests', () => {
     const engine = Engine()
     const entityA = engine.addEntity()
     const entityB = engine.addEntity()
-    const COMPONENT_ID = 888
-    const Position = engine.defineComponent(PositionSchema, COMPONENT_ID)
-    const Position2 = engine.defineComponent(PositionSchema, COMPONENT_ID + 1)
-    const Velocity = engine.defineComponent(VelocitySchema, COMPONENT_ID + 2)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
+    const Position2 = engine.defineComponent('PositionSchema2', PositionSchema)
+    const Velocity = engine.defineComponent('VelocitySchema', VelocitySchema)
     Position.create(entityA, { x: 0 })
     Position2.create(entityA, { x: 8 })
     Velocity.create(entityA, { y: 1 })
@@ -268,9 +266,8 @@ describe('Engine tests', () => {
     const engine = Engine()
     const entityA = engine.addEntity()
     const entityB = engine.addEntity()
-    const COMPONENT_ID = Math.random() | 0
-    const Position = engine.defineComponent(PositionSchema, COMPONENT_ID)
-    const Velocity = engine.defineComponent(VelocitySchema, COMPONENT_ID + 2)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
+    const Velocity = engine.defineComponent('VelocitySchema', VelocitySchema)
     Position.create(entityA, { x: 0 })
     Velocity.create(entityA, { y: 1 })
     Velocity.create(entityB, { y: 10 })
@@ -295,9 +292,8 @@ describe('Engine tests', () => {
     const entityA = engine.addEntity()
     const entityB = engine.addEntity()
     const entityC = engine.addEntity()
-    const COMPONENT_ID = Math.random() | 0
-    const Position = engine.defineComponent(PositionSchema, COMPONENT_ID)
-    const Velocity = engine.defineComponent(VelocitySchema, COMPONENT_ID + 2)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
+    const Velocity = engine.defineComponent('VelocitySchema', VelocitySchema)
     Position.create(entityA, { x: 0 })
     Position.create(entityB, { x: 1 })
     Position.create(entityC, { x: 2 })
@@ -327,9 +323,8 @@ describe('Engine tests', () => {
     const entityA = engine.addEntity()
     const entityB = engine.addEntity()
     const entityC = engine.addEntity()
-    const COMPONENT_ID = Math.random() | 0
-    const Position = engine.defineComponent(PositionSchema, COMPONENT_ID)
-    const Velocity = engine.defineComponent(VelocitySchema, COMPONENT_ID + 2)
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
+    const Velocity = engine.defineComponent('VelocitySchema', VelocitySchema)
     Position.create(entityA, { x: 0 })
     Position.create(entityB, { x: 1 })
     Position.create(entityC, { x: 2 })
@@ -378,10 +373,13 @@ describe('Engine tests', () => {
       duration: Schemas.Float,
       speed: Schemas.Float
     }
-    engine.defineComponent(MoveTransportData, 888)
+    engine.defineComponent('MoveTransportData', MoveTransportData)
     const zombie = engine.addEntity()
 
-    const MoveTransformComponent = engine.defineComponent(MoveTransportData, 46)
+    const MoveTransformComponent = engine.defineComponent(
+      'MoveTransportData2',
+      MoveTransportData
+    )
 
     let moves = 0
 
@@ -667,6 +665,18 @@ describe('Engine tests', () => {
     } else {
       delete globalThis.DEBUG
     }
+  })
+
+  it('should throw an error adding components after seal', async () => {
+    const engine = Engine()
+
+    engine.defineComponent('comp1', {})
+    engine.defineComponent('comp2', {})
+    engine.seal()
+
+    expect(() => {
+      engine.defineComponent('comp3', {})
+    }).toThrowError()
   })
 
   it('should throw an error if the system is added twice', async () => {

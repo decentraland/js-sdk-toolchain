@@ -7,7 +7,8 @@ import { deepReadonly, DeepReadonly } from './readonly'
  * @public
  */
 export type ComponentDefinition<T> = {
-  _id: number
+  readonly componentId: number
+  readonly componentName: string
 
   /**
    * Return the default value of the current component
@@ -144,18 +145,23 @@ export type ComponentDefinition<T> = {
   isDirty(entity: Entity): boolean
 }
 
-export function defineComponent<T>(
+export function createComponentDefinitionFromSchema<T>(
+  componentName: string,
   componentId: number,
-  spec: ISchema<T>
-  // meta: { syncFlags }
+  schema: ISchema<T>
 ): ComponentDefinition<T> {
   const data = new Map<Entity, T>()
   const dirtyIterator = new Set<Entity>()
 
   return {
-    _id: componentId,
+    get componentId() {
+      return componentId
+    },
+    get componentName() {
+      return componentName
+    },
     default() {
-      return spec.create() as DeepReadonly<T>
+      return schema.create() as DeepReadonly<T>
     },
     isDirty(entity: Entity): boolean {
       return dirtyIterator.has(entity)
@@ -181,7 +187,7 @@ export function defineComponent<T>(
       const component = data.get(entity)
       if (!component) {
         throw new Error(
-          `[getFrom] Component ${componentId} for entity #${entity} not found`
+          `[getFrom] Component ${componentName} for entity #${entity} not found`
         )
       }
       return deepReadonly(component)
@@ -190,14 +196,14 @@ export function defineComponent<T>(
       const component = data.get(entity)
       if (component) {
         throw new Error(
-          `[create] Component ${componentId} for ${entity} already exists`
+          `[create] Component ${componentName} for ${entity} already exists`
         )
       }
       const usedValue =
         value === undefined
-          ? spec.create()
-          : spec.extend
-          ? spec.extend(value)
+          ? schema.create()
+          : schema.extend
+          ? schema.extend(value)
           : value
       data.set(entity, usedValue)
       dirtyIterator.add(entity)
@@ -206,9 +212,9 @@ export function defineComponent<T>(
     createOrReplace(entity: Entity, value?: T): T {
       const usedValue =
         value === undefined
-          ? spec.create()
-          : spec.extend
-          ? spec.extend(value)
+          ? schema.create()
+          : schema.extend
+          ? schema.extend(value)
           : value
       data.set(entity, usedValue!)
       dirtyIterator.add(entity)
@@ -226,7 +232,7 @@ export function defineComponent<T>(
       const component = this.getMutableOrNull(entity)
       if (component === null) {
         throw new Error(
-          `[mutable] Component ${componentId} for ${entity} not found`
+          `[mutable] Component ${componentName} for ${entity} not found`
         )
       }
       return component
@@ -245,12 +251,12 @@ export function defineComponent<T>(
       const component = data.get(entity)
       if (!component) {
         throw new Error(
-          `[toBinary] Component ${componentId} for ${entity} not found`
+          `[toBinary] Component ${componentName} for ${entity} not found`
         )
       }
 
       const writeBuffer = new ReadWriteByteBuffer()
-      spec.serialize(component, writeBuffer)
+      schema.serialize(component, writeBuffer)
       return writeBuffer
     },
     toBinaryOrNull(entity: Entity): ByteBuffer | null {
@@ -260,18 +266,18 @@ export function defineComponent<T>(
       }
 
       const writeBuffer = new ReadWriteByteBuffer()
-      spec.serialize(component, writeBuffer)
+      schema.serialize(component, writeBuffer)
       return writeBuffer
     },
     writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void {
       const component = data.get(entity)
       if (!component) {
         throw new Error(
-          `[writeToByteBuffer] Component ${componentId} for entity #${entity} not found`
+          `[writeToByteBuffer] Component ${componentName} for entity #${entity} not found`
         )
       }
 
-      spec.serialize(component, buffer)
+      schema.serialize(component, buffer)
     },
     updateFromBinary(
       entity: Entity,
@@ -281,7 +287,7 @@ export function defineComponent<T>(
       const component = data.get(entity)
       if (!component) {
         throw new Error(
-          `[updateFromBinary] Component ${componentId} for ${entity} not found`
+          `[updateFromBinary] Component ${componentName} for ${entity} not found`
         )
       }
       return this.upsertFromBinary(entity, buffer, markAsDirty)
@@ -291,7 +297,7 @@ export function defineComponent<T>(
       buffer: ByteBuffer,
       markAsDirty = true
     ): T | null {
-      const newValue = spec.deserialize(buffer)
+      const newValue = schema.deserialize(buffer)
       data.set(entity, newValue)
       if (markAsDirty) {
         dirtyIterator.add(entity)
@@ -301,7 +307,7 @@ export function defineComponent<T>(
       return newValue
     },
     deserialize(buffer: ByteBuffer): T {
-      return spec.deserialize(buffer)
+      return schema.deserialize(buffer)
     },
     clearDirty() {
       dirtyIterator.clear()

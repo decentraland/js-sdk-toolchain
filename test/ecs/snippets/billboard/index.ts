@@ -94,13 +94,10 @@ function createTextShapes() {
 createBillboards()
 createTextShapes()
 
-const BouncingBillboard = engine.defineComponent(
-  {
-    t: Schemas.Number,
-    originalPosition: Schemas.Vector3
-  },
-  123123
-)
+const BouncingBillboard = engine.defineComponent('bouncing billboard', {
+  t: Schemas.Number,
+  originalPosition: Schemas.Vector3
+})
 
 engine.addSystem((dt: number) => {
   for (const [entity] of engine.getEntitiesWith(Billboard, Transform)) {

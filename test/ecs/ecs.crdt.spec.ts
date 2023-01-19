@@ -258,7 +258,7 @@ describe('CRDT tests', () => {
     transports[0].onmessage!(buffer.toBinary())
     await engine.update(1)
     const outdatedBuffer = new ReadWriteByteBuffer()
-    DeleteComponent.write(entity, Transform._id, 2, outdatedBuffer)
+    DeleteComponent.write(entity, Transform.componentId, 2, outdatedBuffer)
     expect(spySend).toBeCalledWith(outdatedBuffer.toBinary())
   })
 
@@ -272,7 +272,7 @@ describe('CRDT tests', () => {
     await engine.update(1)
 
     const buffer = new ReadWriteByteBuffer()
-    DeleteComponent.write(entity, Transform._id, 2, buffer)
+    DeleteComponent.write(entity, Transform.componentId, 2, buffer)
     transport.onmessage!(buffer.toBinary())
     await engine.update(1)
     expect(Transform.getOrNull(entity)).toBe(null)
@@ -283,10 +283,9 @@ describe('CRDT tests', () => {
     })
     const [serverTransport] = transports
     const entity = engine.addEntity()
-    const cusutomComponent = engine.defineComponent(
-      { open: Schemas.Boolean },
-      12371273
-    )
+    const cusutomComponent = engine.defineComponent('custom component', {
+      open: Schemas.Boolean
+    })
     cusutomComponent.create(entity, { open: false })
     await engine.update(1)
 
@@ -296,7 +295,7 @@ describe('CRDT tests', () => {
     await serverEngine.update(1)
     const crdtState = serverEngine.getCrdtState()
     const component = crdtState.components
-      .get(cusutomComponent._id)!
+      .get(cusutomComponent.componentId)!
       .get(entity as number)!
     expect(component?.data).toStrictEqual(
       cusutomComponent.toBinary(entity).toBinary()

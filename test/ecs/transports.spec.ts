@@ -19,7 +19,7 @@ describe('Transport tests', () => {
     const MeshRenderer = components.MeshRenderer(engine)
     transports.forEach(engine.addTransport)
     const entity = engine.addEntity()
-    const UserComponent = engine.defineComponent({ x: Schemas.Byte }, 8888)
+    const UserComponent = engine.defineComponent('8888', { x: Schemas.Byte })
 
     // Transform component should be sent to renderer transport
     Transform.create(entity)

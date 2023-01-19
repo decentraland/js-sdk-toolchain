@@ -398,7 +398,8 @@ export type CommonProps = {
 
 // @public (undocumented)
 export type ComponentDefinition<T> = {
-    _id: number;
+    readonly componentId: number;
+    readonly componentName: string;
     default(): DeepReadonly<T>;
     has(entity: Entity): boolean;
     get(entity: Entity): DeepReadonly<T>;
@@ -470,6 +471,11 @@ export enum CrdtMessageType {
     RESERVED = 0
 }
 
+// Warning: (ae-missing-release-tag) "createComponentDefinitionFromSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function createComponentDefinitionFromSchema<T>(componentName: string, componentId: number, schema: ISchema<T>): ComponentDefinition<T>;
+
 // Warning: (ae-missing-release-tag) "createEthereumProvider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -527,11 +533,6 @@ export type DeepReadonlyObject<T> = {
 
 // @public (undocumented)
 export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
-
-// Warning: (ae-missing-release-tag) "defineComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function defineComponent<T>(componentId: number, spec: ISchema<T>): ComponentDefinition<T>;
 
 // @public
 export const DEG2RAD: number;
@@ -775,9 +776,9 @@ export type IEngine = {
     getEntityState(entity: Entity): EntityState;
     addSystem(system: SystemFn, priority?: number, name?: string): void;
     removeSystem(selector: string | SystemFn): boolean;
-    registerCustomComponent<T>(component: ComponentDefinition<T>, componentId: number): ComponentDefinition<T>;
-    defineComponent<T extends Spec>(spec: T, componentId: number, constructorDefault?: Partial<MapResult<T>>): MapComponentDefinition<MapResult<T>>;
-    defineComponentFromSchema<T>(spec: ISchema<T>, componentId: number): ComponentDefinition<T>;
+    registerComponentDefinition<T>(componentName: string, componentDefinition: ComponentDefinition<T>): ComponentDefinition<T>;
+    defineComponent<T extends Spec>(componentName: string, spec: T, constructorDefault?: Partial<MapResult<T>>): MapComponentDefinition<MapResult<T>>;
+    defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): ComponentDefinition<T>;
     getComponent<T>(componentId: number): ComponentDefinition<T>;
     getComponentOrNull<T>(componentId: number): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
@@ -788,6 +789,7 @@ export type IEngine = {
     addTransport(transport: Transport): void;
     entityContainer: EntityContainer;
     componentsIter(): Iterable<ComponentDefinition<unknown>>;
+    seal(): void;
 };
 
 // @public (undocumented)
@@ -1570,6 +1572,11 @@ export const onRealmChangedObservable: Observable<{
 //
 // @public (undocumented)
 export const onSceneReadyObservable: Observable<unknown>;
+
+// Warning: (ae-missing-release-tag) "onStart" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function onStart(): Promise<void>;
 
 // Warning: (ae-missing-release-tag) "onUpdate" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
