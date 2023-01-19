@@ -3,7 +3,9 @@ import {
   IEngine,
   Entity,
   createPointerEventSystem,
-  createInputSystem
+  createInputSystem,
+  TextureWrapMode,
+  TextureFilterMode
 } from '../../packages/@dcl/ecs'
 import { components, IEngine as IIEngine } from '../../packages/@dcl/ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
@@ -114,7 +116,9 @@ describe('UiBackground React Ecs', () => {
         textureMode: 'center',
         uvs: [],
         texture: {
-          src: 'boedo-src'
+          src: 'boedo-src',
+          wrapMode: 'clamp',
+          filterMode: 'bi-linear'
         }
       }
     }
@@ -132,7 +136,9 @@ describe('UiBackground React Ecs', () => {
       tex: {
         $case: 'texture',
         texture: {
-          src: 'boedo-src'
+          src: 'boedo-src',
+          wrapMode: TextureWrapMode.TWM_CLAMP,
+          filterMode: TextureFilterMode.TFM_BILINEAR
         }
       }
     })
