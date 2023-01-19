@@ -3,6 +3,7 @@ import { EntityPropTypes } from '../types'
 import { UiButtonProps } from './types'
 import { parseUiBackground } from '../uiBackground'
 import { parseUiTransform } from '../uiTransform'
+import { getFont, getTextAlign } from '../Label/utils'
 
 function getButtonProps(props: EntityPropTypes & UiButtonProps) {
   if (props.type === 'primary') {
@@ -34,7 +35,9 @@ export function Button(props: EntityPropTypes & UiButtonProps) {
   })
   const textProps = {
     ...buttonProps.uiText,
-    ...uiTextProps
+    ...uiTextProps,
+    ...getFont(uiTextProps.font),
+    ...getTextAlign(uiTextProps.textAlign)
   }
   const uiTransformProps = parseUiTransform({
     height: 36,

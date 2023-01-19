@@ -37,8 +37,8 @@ describe('UiText React Ecs', () => {
         uiTransform={{ width: 100 }}
         value={text}
         color={color}
-        font={Font.F_SANS_SERIF}
-        textAlign={TextAlignMode.TAM_BOTTOM_CENTER}
+        font="sans-serif"
+        textAlign="bottom-center"
       />
     )
 

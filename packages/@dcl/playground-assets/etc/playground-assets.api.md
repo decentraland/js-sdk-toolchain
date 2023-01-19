@@ -1095,7 +1095,7 @@ export type Justify = 'flex-start' | 'center' | 'flex-end' | 'space-between' | '
 export type Key = number | string;
 
 // @public (undocumented)
-export function Label(props: EntityPropTypes & UiTextProps): ReactEcs.JSX.Element;
+export function Label(props: EntityPropTypes & UiLabelProps): ReactEcs.JSX.Element;
 
 // Warning: (ae-missing-release-tag) "Listeners" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2919,6 +2919,9 @@ export type SystemItem = {
 // @public (undocumented)
 export type Task<T = unknown> = () => Promise<T>;
 
+// @public (undocumented)
+export type TextAlign = 'top-left' | 'top-center' | 'top-right' | 'middle-left' | 'middle-center' | 'middle-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
+
 // Warning: (ae-missing-release-tag) "TextAlignMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -3111,7 +3114,7 @@ export type UiBackgroundProps = {
 } & UiTextureUnion;
 
 // @public (undocumented)
-export type UiButtonProps = PBUiText & {
+export type UiButtonProps = UiLabelProps & {
     type?: 'primary' | 'secondary';
 };
 
@@ -3124,8 +3127,10 @@ export type UiComponent = () => JSX.Element;
 export const UiDropdown: ComponentDefinition<PBUiDropdown>;
 
 // @public (undocumented)
-export type UiDropdownProps = Partial<PBUiDropdown> & {
+export type UiDropdownProps = Partial<Omit<PBUiDropdown, 'textAlign' | 'font'>> & {
     onChange?(value: number): void;
+    font: UiFont;
+    textAlign: TextAlign;
 };
 
 // @public (undocumented)
@@ -3133,6 +3138,9 @@ export const UiDropdownResult: ComponentDefinition<PBUiDropdownResult>;
 
 // @public (undocumented)
 export function UiEntity(props: EntityPropTypes & Partial<CommonProps>): ReactEcs.JSX.Element;
+
+// @public (undocumented)
+export type UiFont = 'sans-serif' | 'serif' | 'monospace';
 
 // @public (undocumented)
 export const UiInput: ComponentDefinition<PBUiInput>;
@@ -3145,6 +3153,15 @@ export type UiInputProps = PBUiInput & {
 // @public (undocumented)
 export const UiInputResult: ComponentDefinition<PBUiInputResult>;
 
+// @public (undocumented)
+export type UiLabelProps = {
+    value: string;
+    color?: PBUiText['color'];
+    textAlign?: TextAlign | undefined;
+    font?: UiFont | undefined;
+    fontSize?: number | undefined;
+};
+
 // Warning: (ae-missing-release-tag) "Uint32" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -3155,9 +3172,6 @@ export type uint32 = number;
 
 // @public (undocumented)
 export const UiText: ComponentDefinition<PBUiText>;
-
-// @public (undocumented)
-export type UiTextProps = PBUiText;
 
 // @public (undocumented)
 export type UiTexture = {
