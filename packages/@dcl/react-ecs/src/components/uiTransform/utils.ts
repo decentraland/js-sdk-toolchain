@@ -179,12 +179,13 @@ export function getFlexDirection(
   return { flexDirection: value }
 }
 
-const parseFlexDirection: Readonly<Record<FlexDirectionType, YGFlexDirection>> = {
-  row: YGFlexDirection.YGFD_ROW,
-  column: YGFlexDirection.YGFD_COLUMN,
-  'row-reverse': YGFlexDirection.YGFD_ROW_REVERSE,
-  'column-reverse': YGFlexDirection.YGFD_COLUMN_REVERSE
-}
+const parseFlexDirection: Readonly<Record<FlexDirectionType, YGFlexDirection>> =
+  {
+    row: YGFlexDirection.YGFD_ROW,
+    column: YGFlexDirection.YGFD_COLUMN,
+    'row-reverse': YGFlexDirection.YGFD_ROW_REVERSE,
+    'column-reverse': YGFlexDirection.YGFD_COLUMN_REVERSE
+  }
 
 /**
  * @internal
