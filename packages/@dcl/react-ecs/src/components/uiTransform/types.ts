@@ -12,11 +12,11 @@ export type Position = {
 /**
  * @public
  */
-export type Display = 'flex' | 'none'
+export type DisplayType = 'flex' | 'none'
 /**
  * @public
  */
-export type Justify =
+export type JustifyType =
   | 'flex-start'
   | 'center'
   | 'flex-end'
@@ -26,7 +26,7 @@ export type Justify =
 /**
  * @public
  */
-export type Align =
+export type AlignType =
   | 'auto'
   | 'flex-start'
   | 'center'
@@ -39,16 +39,20 @@ export type Align =
 /**
  * @public
  */
-export type FlexDirection = 'row' | 'column' | 'column-reverse' | 'row-reverse'
+export type FlexDirectionType =
+  | 'row'
+  | 'column'
+  | 'column-reverse'
+  | 'row-reverse'
 /**
  * @public
  */
-export type FlexWrap = 'wrap' | 'nowrap' | 'wrap-reverse'
+export type FlexWrapType = 'wrap' | 'nowrap' | 'wrap-reverse'
 
 /**
  * @public
  */
-export type Overflow = 'hidden' | 'scroll' | 'visible'
+export type OverflowType = 'hidden' | 'scroll' | 'visible'
 
 /**
  * @public
@@ -59,14 +63,14 @@ export type PositionType = 'absolute' | 'relative'
  * @public
  */
 export interface UiTransformProps {
-  display?: Display
+  display?: DisplayType
   flex?: number
-  justifyContent?: Justify
+  justifyContent?: JustifyType
   positionType?: PositionType
-  alignItems?: Align
-  alignSelf?: Align
-  alignContent?: Align
-  flexDirection?: FlexDirection
+  alignItems?: AlignType
+  alignSelf?: AlignType
+  alignContent?: AlignType
+  flexDirection?: FlexDirectionType
   position?: Partial<Position>
   padding?: Partial<Position>
   margin?: Partial<Position>
@@ -76,9 +80,9 @@ export interface UiTransformProps {
   maxWidth?: PositionUnit
   minHeight?: PositionUnit
   maxHeight?: PositionUnit
-  flexWrap?: FlexWrap
+  flexWrap?: FlexWrapType
   flexBasis?: number
   flexGrow?: number
   flexShrink?: number
-  overflow?: Overflow
+  overflow?: OverflowType
 }

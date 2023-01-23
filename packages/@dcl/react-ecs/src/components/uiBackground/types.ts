@@ -22,8 +22,8 @@ export type UiTextureUnion = UiAvatarTexture | UiTexture
 export type UiAvatarTexture = {
   avatarTexture?: {
     userId: string
-    wrapMode?: TextureWrap
-    filterMode?: TextureFilter
+    wrapMode?: TextureWrapType
+    filterMode?: TextureFilterType
   }
 }
 
@@ -33,19 +33,19 @@ export type UiAvatarTexture = {
 export type UiTexture = {
   texture?: {
     src: string
-    wrapMode?: TextureWrap
-    filterMode?: TextureFilter
+    wrapMode?: TextureWrapType
+    filterMode?: TextureFilterType
   }
 }
 
 /**
  * @public
  */
-export type TextureWrap = 'repeat' | 'clamp' | 'mirror' | 'mirror-once'
+export type TextureWrapType = 'repeat' | 'clamp' | 'mirror' | 'mirror-once'
 /**
  * @public
  */
-export type TextureFilter = 'point' | 'bi-linear' | 'tri-linear'
+export type TextureFilterType = 'point' | 'bi-linear' | 'tri-linear'
 /**
  * @public
   * NINE_SLICES - https://docs.unity3d.com/Manual/UIE-USS-SupportedProperties.html (Slicing section)

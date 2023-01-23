@@ -1,7 +1,7 @@
 import { Font, TextAlignMode } from '@dcl/ecs'
-import { TextAlign, UiFont } from './types'
+import { TextAlignType, UiFontType } from './types'
 
-const parseFont: Readonly<Record<UiFont, Font>> = {
+const parseFont: Readonly<Record<UiFontType, Font>> = {
   'sans-serif': Font.F_SANS_SERIF,
   serif: Font.F_SERIF,
   monospace: Font.F_MONOSPACE
@@ -10,13 +10,13 @@ const parseFont: Readonly<Record<UiFont, Font>> = {
  * @internal
  */
 export function getFont(
-  font: UiFont | undefined
+  font: UiFontType | undefined
 ): Record<'font', Font> | undefined {
   if (!font) return undefined
   return { font: parseFont[font] }
 }
 
-const parseTextAlign: Readonly<Record<TextAlign, TextAlignMode>> = {
+const parseTextAlign: Readonly<Record<TextAlignType, TextAlignMode>> = {
   'top-left': TextAlignMode.TAM_TOP_LEFT,
   'top-center': TextAlignMode.TAM_TOP_CENTER,
   'top-right': TextAlignMode.TAM_TOP_RIGHT,
@@ -31,7 +31,7 @@ const parseTextAlign: Readonly<Record<TextAlign, TextAlignMode>> = {
  * @internal
  */
 export function getTextAlign(
-  textAlign: TextAlign | undefined
+  textAlign: TextAlignType | undefined
 ): Record<'textAlign', TextAlignMode> | undefined {
   if (!textAlign) return undefined
   return { textAlign: parseTextAlign[textAlign] }

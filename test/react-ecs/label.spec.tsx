@@ -12,8 +12,8 @@ import {
   createReactBasedUiSystem,
   Label,
   CANVAS_ROOT_ENTITY,
-  UiFont,
-  TextAlign
+  UiFontType,
+  TextAlignType
 } from '../../packages/@dcl/react-ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
 
@@ -33,8 +33,8 @@ describe('UiText React Ecs', () => {
     const getText = (entity: Entity) => UiText.get(entity)
     let text = 'CASLA'
     let color: Color4 | undefined = undefined
-    let font: UiFont | undefined = 'sans-serif'
-    let textAlign: TextAlign | undefined = 'bottom-center'
+    let font: UiFontType | undefined = 'sans-serif'
+    let textAlign: TextAlignType | undefined = 'bottom-center'
     const ui = () => (
       <Label
         uiTransform={{ width: 100 }}

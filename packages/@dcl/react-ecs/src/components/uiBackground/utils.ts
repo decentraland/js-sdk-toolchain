@@ -8,8 +8,8 @@ import {
   UiBackgroundProps,
   UiTexture,
   UiAvatarTexture,
-  TextureWrap,
-  TextureFilter,
+  TextureWrapType,
+  TextureFilterType,
   TextureMode
 } from './types'
 
@@ -69,8 +69,8 @@ export function getTexture(
 }
 
 type CommonTexture<T = unknown> = T & {
-  wrapMode?: TextureWrap
-  filterMode?: TextureFilter
+  wrapMode?: TextureWrapType
+  filterMode?: TextureFilterType
 }
 type Texture<T = unknown> = T & {
   wrapMode?: TextureWrapMode | undefined
@@ -85,13 +85,13 @@ function parseTexture<T = unknown>(texture: CommonTexture<T>): Texture<T> {
   }
 }
 
-const parseWrap: Readonly<Record<TextureWrap, TextureWrapMode>> = {
+const parseWrap: Readonly<Record<TextureWrapType, TextureWrapMode>> = {
   repeat: TextureWrapMode.TWM_REPEAT,
   clamp: TextureWrapMode.TWM_CLAMP,
   mirror: TextureWrapMode.TWM_MIRROR,
   'mirror-once': TextureWrapMode.TWM_MIRROR_ONCE
 }
-const parseFilter: Readonly<Record<TextureFilter, TextureFilterMode>> = {
+const parseFilter: Readonly<Record<TextureFilterType, TextureFilterMode>> = {
   point: TextureFilterMode.TFM_POINT,
   'bi-linear': TextureFilterMode.TFM_BILINEAR,
   'tri-linear': TextureFilterMode.TFM_TRILINEAR

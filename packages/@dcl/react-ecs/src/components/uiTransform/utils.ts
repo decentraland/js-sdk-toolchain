@@ -9,12 +9,12 @@ import {
   YGWrap
 } from '@dcl/ecs'
 import {
-  Align,
-  FlexDirection,
-  Display,
-  FlexWrap,
-  Justify,
-  Overflow,
+  AlignType,
+  FlexDirectionType,
+  DisplayType,
+  FlexWrapType,
+  JustifyType,
+  OverflowType,
   Position,
   PositionType,
   PositionUnit
@@ -114,12 +114,12 @@ export function parseSize(
  * @internal
  */
 export function getDisplay(
-  display: Display | undefined
+  display: DisplayType | undefined
 ): Record<'display', YGDisplay> {
   const value: YGDisplay = display ? parseDisplay[display] : YGDisplay.YGD_FLEX
   return { display: value }
 }
-const parseDisplay: Readonly<Record<Display, YGDisplay>> = {
+const parseDisplay: Readonly<Record<DisplayType, YGDisplay>> = {
   flex: YGDisplay.YGD_FLEX,
   none: YGDisplay.YGD_NONE
 }
@@ -127,14 +127,14 @@ const parseDisplay: Readonly<Record<Display, YGDisplay>> = {
  * @internal
  */
 export function getJustify(
-  justify: Justify | undefined
+  justify: JustifyType | undefined
 ): Record<'justifyContent', YGJustify> {
   const value: YGJustify = justify
     ? parseJustify[justify]
     : YGJustify.YGJ_FLEX_START
   return { justifyContent: value }
 }
-const parseJustify: Readonly<Record<Justify, YGJustify>> = {
+const parseJustify: Readonly<Record<JustifyType, YGJustify>> = {
   center: YGJustify.YGJ_CENTER,
   'flex-end': YGJustify.YGJ_FLEX_END,
   'flex-start': YGJustify.YGJ_FLEX_START,
@@ -149,14 +149,14 @@ type AlignProp = 'alignContent' | 'alignItems' | 'alignSelf'
  */
 export function getAlign<T extends AlignProp>(
   prop: T,
-  align: Align | undefined,
+  align: AlignType | undefined,
   defaultValue: YGAlign
 ): Record<T, YGAlign> {
   const value: YGAlign = align ? parseAligns[align] : defaultValue
   return { [prop]: value } as Record<T, YGAlign>
 }
 
-const parseAligns: Readonly<Record<Align, YGAlign>> = {
+const parseAligns: Readonly<Record<AlignType, YGAlign>> = {
   auto: YGAlign.YGA_AUTO,
   baseline: YGAlign.YGA_BASELINE,
   center: YGAlign.YGA_CENTER,
@@ -171,7 +171,7 @@ const parseAligns: Readonly<Record<Align, YGAlign>> = {
  * @internal
  */
 export function getFlexDirection(
-  flexDirection: FlexDirection | undefined
+  flexDirection: FlexDirectionType | undefined
 ): Record<'flexDirection', YGFlexDirection> {
   const value: YGFlexDirection = flexDirection
     ? parseFlexDirection[flexDirection]
@@ -179,7 +179,7 @@ export function getFlexDirection(
   return { flexDirection: value }
 }
 
-const parseFlexDirection: Readonly<Record<FlexDirection, YGFlexDirection>> = {
+const parseFlexDirection: Readonly<Record<FlexDirectionType, YGFlexDirection>> = {
   row: YGFlexDirection.YGFD_ROW,
   column: YGFlexDirection.YGFD_COLUMN,
   'row-reverse': YGFlexDirection.YGFD_ROW_REVERSE,
@@ -190,13 +190,13 @@ const parseFlexDirection: Readonly<Record<FlexDirection, YGFlexDirection>> = {
  * @internal
  */
 export function getFlexWrap(
-  flexWrap: FlexWrap | undefined
+  flexWrap: FlexWrapType | undefined
 ): Record<'flexWrap', YGWrap> {
   const value: YGWrap = flexWrap ? parseFlexWrap[flexWrap] : YGWrap.YGW_WRAP
   return { flexWrap: value }
 }
 
-const parseFlexWrap: Readonly<Record<FlexWrap, YGWrap>> = {
+const parseFlexWrap: Readonly<Record<FlexWrapType, YGWrap>> = {
   wrap: YGWrap.YGW_WRAP,
   nowrap: YGWrap.YGW_NO_WRAP,
   'wrap-reverse': YGWrap.YGW_WRAP_REVERSE
@@ -206,7 +206,7 @@ const parseFlexWrap: Readonly<Record<FlexWrap, YGWrap>> = {
  * @internal
  */
 export function getOverflow(
-  overflow: Overflow | undefined
+  overflow: OverflowType | undefined
 ): Record<'overflow', YGOverflow> {
   const value: YGOverflow = overflow
     ? parseOverflow[overflow]
@@ -214,7 +214,7 @@ export function getOverflow(
   return { overflow: value }
 }
 
-const parseOverflow: Readonly<Record<Overflow, YGOverflow>> = {
+const parseOverflow: Readonly<Record<OverflowType, YGOverflow>> = {
   visible: YGOverflow.YGO_VISIBLE,
   scroll: YGOverflow.YGO_SCROLL,
   hidden: YGOverflow.YGO_HIDDEN

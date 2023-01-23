@@ -5,19 +5,19 @@ import { PBUiText } from '@dcl/ecs'
  */
 export type UiLabelProps = Omit<PBUiText, 'textAlign' | 'font'> & {
   /** default='middle-center' */
-  textAlign?: TextAlign | undefined
+  textAlign?: TextAlignType | undefined
   /** default='sans-serif' */
-  font?: UiFont | undefined
+  font?: UiFontType | undefined
 }
 
 /**
  * @public
  */
-export type UiFont = 'sans-serif' | 'serif' | 'monospace'
+export type UiFontType = 'sans-serif' | 'serif' | 'monospace'
 /**
  * @public
  */
-export type TextAlign =
+export type TextAlignType =
   | 'top-left'
   | 'top-center'
   | 'top-right'
