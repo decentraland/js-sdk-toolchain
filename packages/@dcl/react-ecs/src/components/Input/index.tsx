@@ -4,12 +4,16 @@ import { parseProps } from '../utils'
 import { ReactEcs } from '../../react-ecs'
 import { EntityPropTypes } from '../types'
 import { UiInputProps } from './types'
+import { getTextAlign, getFont } from '../Label/utils'
 
 function parseUiInput(props: Partial<UiInputProps>): PBUiInput {
+  const { textAlign, font, ...otherProps } = props
   return {
     disabled: false,
     placeholder: '',
-    ...props
+    ...otherProps,
+    ...getTextAlign(textAlign),
+    ...getFont(font)
   }
 }
 

@@ -1,8 +1,7 @@
-import { PBUiText } from '@dcl/ecs'
-
+import { UiLabelProps } from '../Label/types'
 /**
  * @public
  */
-export type UiButtonProps = PBUiText & {
+export type UiButtonProps = UiLabelProps & {
   type?: 'primary' | 'secondary'
 }

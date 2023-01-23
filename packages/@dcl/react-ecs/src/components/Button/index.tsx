@@ -1,8 +1,11 @@
+import { PBUiText } from '@dcl/ecs'
+
 import { ReactEcs } from '../../react-ecs'
+import { getFont, getTextAlign } from '../Label/utils'
 import { EntityPropTypes } from '../types'
-import { UiButtonProps } from './types'
 import { parseUiBackground } from '../uiBackground'
 import { parseUiTransform } from '../uiTransform'
+import { UiButtonProps } from './types'
 
 function getButtonProps(props: EntityPropTypes & UiButtonProps) {
   if (props.type === 'primary') {
@@ -25,16 +28,19 @@ function getButtonProps(props: EntityPropTypes & UiButtonProps) {
  */
 /*#__PURE__*/
 export function Button(props: EntityPropTypes & UiButtonProps) {
-  const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...uiTextProps } =
+  const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...otherProps } =
     props
   const buttonProps = getButtonProps(props)
   const uiBackgroundProps = parseUiBackground({
     ...buttonProps.uiBackground,
     ...uiBackground
   })
-  const textProps = {
+  const { font, textAlign, ...uiTexProps } = otherProps
+  const textProps: PBUiText = {
     ...buttonProps.uiText,
-    ...uiTextProps
+    ...uiTexProps,
+    ...getFont(font),
+    ...getTextAlign(textAlign)
   }
   const uiTransformProps = parseUiTransform({
     height: 36,
