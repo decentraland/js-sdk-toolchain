@@ -37,8 +37,8 @@ describe('utils/fs', () => {
 
   it('existPath', async () => {
     const fs = createFsComponent()
-    expect(fs.existPath('package.json')).toBeTruthy()
-    expect(fs.existPath('noooooooooo.json')).toBeFalsy()
+    expect(await fs.existPath('package.json')).toBeTruthy()
+    expect(await fs.existPath('noooooooooo.json')).toBeFalsy()
   })
 
   it("extract: should extract a zip file and return it's destination", async () => {
