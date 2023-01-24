@@ -191,7 +191,7 @@ compile()
   })
 
 function handleError(error: RollupError, recover = false): void {
-  const name = error.name || error.cause?.name
+  const name = error.name || (error.cause as any)?.name
   const nameSection = name ? `${name}: ` : ''
   const pluginSection = error.plugin ? `(plugin ${error.plugin}) ` : ''
   const message = `${pluginSection}${nameSection}${error.message}`

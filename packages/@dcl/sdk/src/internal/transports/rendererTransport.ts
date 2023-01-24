@@ -1,13 +1,9 @@
 import { Transport, TransportMessage, CrdtMessageType } from '@dcl/ecs'
-import { ECSComponentIDs } from '@dcl/ecs/dist/components/generated/ids.gen'
+import { MAX_STATIC_COMPONENT } from '@dcl/ecs/dist/components/component-number'
 import type {
   CrdtSendToRendererRequest,
   CrdtSendToResponse
 } from '~system/EngineApi'
-
-const componentIds = Object.values(ECSComponentIDs)
-  .filter((a) => typeof a === 'number')
-  .map(Number)
 
 export type EngineApiForTransport = {
   crdtSendToRenderer(
@@ -46,7 +42,8 @@ export function createRendererTransport(
       if (
         (message.type === CrdtMessageType.PUT_COMPONENT ||
           message.type === CrdtMessageType.DELETE_COMPONENT) &&
-        !componentIds.includes((message as any).componentId)
+        // filter out messages for non-core components
+        (message as any).componentId > MAX_STATIC_COMPONENT
       ) {
         return false
       }

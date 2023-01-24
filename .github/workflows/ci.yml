@@ -35,6 +35,8 @@ jobs:
         run: make build
       - name: test
         run: make test-coverage
+      - name: test-cli
+        run: make test-cli
       - uses: codecov/codecov-action@v3
         if: always()
         with:

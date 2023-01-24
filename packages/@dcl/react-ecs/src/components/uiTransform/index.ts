@@ -1,22 +1,31 @@
-import { parsePosition, parseSize } from './utils'
-import { UiTransformProps } from './types'
 import {
-  YGAlign,
-  YGDisplay,
-  YGFlexDirection,
-  YGJustify,
-  YGOverflow,
-  YGPositionType,
-  YGUnit
-} from '@dcl/ecs'
+  getAlign,
+  getFlexDirection,
+  getDisplay,
+  getFlexWrap,
+  getJustify,
+  getOverflow,
+  getPoistionType,
+  parsePosition,
+  parseSize
+} from './utils'
+import { UiTransformProps } from './types'
+import { YGAlign, YGUnit } from '@dcl/ecs'
 import { PBUiTransform } from '@dcl/ecs/dist/components'
 
 export const CANVAS_ROOT_ENTITY = 0
 
-const defaultUiTransform: PBUiTransform = {
+const defaultUiTransform: Omit<
+  PBUiTransform,
+  | 'display'
+  | 'justifyContent'
+  | 'alignSelf'
+  | 'overflow'
+  | 'flexDirection'
+  | 'positionType'
+> = {
   parent: CANVAS_ROOT_ENTITY,
   rightOf: 0,
-  display: YGDisplay.YGD_FLEX,
   flexBasis: 0,
   width: 0,
   height: 0,
@@ -24,10 +33,6 @@ const defaultUiTransform: PBUiTransform = {
   minHeight: 0,
   maxWidth: 0,
   maxHeight: 0,
-  justifyContent: YGJustify.YGJ_FLEX_START,
-  alignSelf: YGAlign.YGA_AUTO,
-  flexDirection: YGFlexDirection.YGFD_ROW,
-  positionType: YGPositionType.YGPT_RELATIVE,
   flexGrow: 0,
   marginBottom: 0,
   marginBottomUnit: YGUnit.YGU_UNDEFINED,
@@ -41,9 +46,8 @@ const defaultUiTransform: PBUiTransform = {
   maxWidthUnit: YGUnit.YGU_UNDEFINED,
   minHeightUnit: YGUnit.YGU_UNDEFINED,
   minWidthUnit: YGUnit.YGU_UNDEFINED,
-  overflow: YGOverflow.YGO_VISIBLE,
   paddingBottom: 0,
-  paddingBottomUnit: YGUnit.YGU_PERCENT,
+  paddingBottomUnit: YGUnit.YGU_UNDEFINED,
   paddingLeft: 0,
   paddingLeftUnit: YGUnit.YGU_UNDEFINED,
   paddingTopUnit: YGUnit.YGU_UNDEFINED,
@@ -69,28 +73,34 @@ const defaultUiTransform: PBUiTransform = {
 /*#__PURE__*/
 export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
   const {
-    position,
-    padding,
-    margin,
     height,
     minHeight,
     maxHeight,
     width,
-    maxWidth,
     minWidth,
+    maxWidth,
     ...otherProps
   } = props
   return {
     ...defaultUiTransform,
     ...otherProps,
-    ...parsePosition(position, 'position'),
-    ...parsePosition(margin, 'margin'),
-    ...parsePosition(padding, 'padding'),
-    ...parseSize(height, 'height'),
-    ...parseSize(minHeight, 'minHeight'),
-    ...parseSize(maxHeight, 'maxHeight'),
-    ...parseSize(width, 'width'),
-    ...parseSize(minWidth, 'minWidth'),
-    ...parseSize(maxWidth, 'maxWidth')
+    ...parsePosition(props.position, 'position'),
+    ...parsePosition(props.margin, 'margin'),
+    ...parsePosition(props.padding, 'padding'),
+    ...parseSize(props.height, 'height'),
+    ...parseSize(props.minHeight, 'minHeight'),
+    ...parseSize(props.maxHeight, 'maxHeight'),
+    ...parseSize(props.width, 'width'),
+    ...parseSize(props.minWidth, 'minWidth'),
+    ...parseSize(props.maxWidth, 'maxWidth'),
+    ...getDisplay(props.display),
+    ...getAlign('alignContent', props.alignContent, YGAlign.YGA_FLEX_START),
+    ...getAlign('alignSelf', props.alignSelf, YGAlign.YGA_FLEX_START),
+    ...getAlign('alignItems', props.alignItems, YGAlign.YGA_FLEX_START),
+    ...getJustify(props.justifyContent),
+    ...getFlexDirection(props.flexDirection),
+    ...getFlexWrap(props.flexWrap),
+    ...getOverflow(props.overflow),
+    ...getPoistionType(props.positionType)
   }
 }

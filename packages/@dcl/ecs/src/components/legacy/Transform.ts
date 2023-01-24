@@ -101,8 +101,8 @@ export function defineTransformComponent(
   engine: Pick<IEngine, 'defineComponentFromSchema'>
 ): TransformComponentExtended {
   const transformDef = engine.defineComponentFromSchema(
-    TransformSchema,
-    COMPONENT_ID
+    'core::Transform',
+    TransformSchema
   )
   return {
     ...transformDef,

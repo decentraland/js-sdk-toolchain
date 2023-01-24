@@ -108,7 +108,7 @@ describe('test CRDT flow E2E', () => {
     expect(env.connection.interceptedMessages).toMatchObject([
       {
         direction: 'a->b',
-        componentId: 123987,
+        componentId: int8A.componentId,
         entityId: entityA,
         type: CrdtMessageType.PUT_COMPONENT,
         data: Uint8Array.of(3),
@@ -147,7 +147,7 @@ describe('test CRDT flow E2E', () => {
     expect(env.connection.interceptedMessages).toMatchObject([
       {
         direction: 'b->a',
-        componentId: 123987,
+        componentId: int8A.componentId,
         entityId: entityA,
         type: CrdtMessageType.PUT_COMPONENT,
         data: Uint8Array.of(4),
@@ -179,7 +179,7 @@ describe('test CRDT flow E2E', () => {
         // this value will have the same timestamp in both engines
         {
           direction: 'a->b',
-          componentId: 123987,
+          componentId: int8A.componentId,
           entityId: entityA,
           type: CrdtMessageType.PUT_COMPONENT,
           data: Uint8Array.of(16),
@@ -201,7 +201,7 @@ describe('test CRDT flow E2E', () => {
       expect(env.connection.interceptedMessages).toMatchObject([
         {
           direction: 'b->a',
-          componentId: 123987,
+          componentId: int8A.componentId,
           entityId: entityA,
           type: CrdtMessageType.PUT_COMPONENT,
           data: Uint8Array.of(32),
@@ -233,7 +233,7 @@ describe('test CRDT flow E2E', () => {
         // this value will have has the same timestamp in both engines
         {
           direction: 'a->b',
-          componentId: 123987,
+          componentId: int8A.componentId,
           entityId: entityA,
           type: CrdtMessageType.PUT_COMPONENT,
           data: Uint8Array.of(48),

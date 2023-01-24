@@ -18,8 +18,8 @@ describe('Serialization Types', () => {
 
     for (const t of toTest) {
       const IntegerComponent = engine.defineComponent(
-        { value: t },
-        COMPONENT_ID++
+        (COMPONENT_ID++).toString(),
+        { value: t }
       )
       const myInteger = IntegerComponent.create(entity, { value: 33 })
       expect(myInteger.value).toBe(33)
@@ -47,8 +47,8 @@ describe('Serialization Types', () => {
 
     for (const t of toTest) {
       const FloatComponent = engine.defineComponent(
-        { value: t },
-        COMPONENT_ID++
+        (COMPONENT_ID++).toString(),
+        { value: t }
       )
       const myFloat = FloatComponent.create(entity, { value: testValue })
       expect(myFloat.value).toBe(testValue)
@@ -72,10 +72,9 @@ describe('Serialization Types', () => {
     let COMPONENT_ID = 888
     const testValue = 'testing an string'
 
-    const FloatComponent = engine.defineComponent(
-      { value: Schemas.String },
-      COMPONENT_ID++
-    )
+    const FloatComponent = engine.defineComponent((COMPONENT_ID++).toString(), {
+      value: Schemas.String
+    })
     const myFloat = FloatComponent.create(entity, { value: testValue })
     expect(myFloat.value).toBe(testValue)
 
@@ -107,18 +106,15 @@ describe('Serialization Types', () => {
 
     expect(defaultValue).toEqual({ itemId: 0, name: '', enchantingIds: [] })
 
-    const PlayerComponent = engine.defineComponent(
-      {
-        name: Schemas.String,
-        description: Schemas.String,
-        level: Schemas.Int,
-        hp: Schemas.Float,
-        position: Vector3,
-        targets: Schemas.Array(Vector3),
-        items: Schemas.Array(ItemType)
-      },
-      COMPONENT_ID
-    )
+    const PlayerComponent = engine.defineComponent(COMPONENT_ID.toString(), {
+      name: Schemas.String,
+      description: Schemas.String,
+      level: Schemas.Int,
+      hp: Schemas.Float,
+      position: Vector3,
+      targets: Schemas.Array(Vector3),
+      items: Schemas.Array(ItemType)
+    })
 
     const defaultPlayer = {
       name: '',
@@ -183,8 +179,8 @@ describe('Serialization Types', () => {
     })
 
     const TestComponent = engine.defineComponentFromSchema(
-      definition,
-      COMPONENT_ID
+      COMPONENT_ID.toString(),
+      definition
     )
 
     expect(definition.create()).toEqual({
@@ -216,14 +212,11 @@ describe('Serialization Types', () => {
     const entity = engine.addEntity()
     const COMPONENT_ID = 888
 
-    const TestComponent = engine.defineComponent(
-      {
-        optionalColor: Schemas.Optional(Schemas.Boolean),
-        visible: Schemas.Optional(Schemas.Boolean),
-        notVisible: Schemas.Boolean
-      },
-      COMPONENT_ID
-    )
+    const TestComponent = engine.defineComponent(COMPONENT_ID.toString(), {
+      optionalColor: Schemas.Optional(Schemas.Boolean),
+      visible: Schemas.Optional(Schemas.Boolean),
+      notVisible: Schemas.Boolean
+    })
 
     TestComponent.create(entity, { optionalColor: true, notVisible: false })
 
@@ -258,10 +251,9 @@ describe('Serialization Types', () => {
       Pink = 0xff290323
     }
 
-    const TestComponent = engine.defineComponent(
-      { testEnum: Schemas.Enum<ColorToNumber>(Schemas.Int64) },
-      COMPONENT_ID
-    )
+    const TestComponent = engine.defineComponent(COMPONENT_ID.toString(), {
+      testEnum: Schemas.Enum<ColorToNumber>(Schemas.Int64)
+    })
 
     expect(TestComponent.create(entity)).toStrictEqual({ testEnum: 0 })
     TestComponent.createOrReplace(entity, { testEnum: ColorToNumber.Pink })
@@ -291,10 +283,9 @@ describe('Serialization Types', () => {
       Pink = '0xff290323'
     }
 
-    const TestComponent = engine.defineComponent(
-      { testEnum: Schemas.Enum<ColorToString>(Schemas.String) },
-      COMPONENT_ID
-    )
+    const TestComponent = engine.defineComponent(COMPONENT_ID.toString(), {
+      testEnum: Schemas.Enum<ColorToString>(Schemas.String)
+    })
 
     // const value1 = TestComponent.create(entity, {})
     expect(TestComponent.create(entity)).toStrictEqual({ testEnum: '' })
@@ -320,16 +311,12 @@ describe('Serialization Types', () => {
     const entityEmpty = engine.addEntity() // 1
     const COMPONENT_ID = 888
 
-    const TestComponentType = engine.defineComponent(
-      {
-        a: Schemas.Int,
-        b: Schemas.Int,
-        c: Schemas.Array(Schemas.Int),
-        d: Schemas.Int64
-      },
-
-      COMPONENT_ID
-    )
+    const TestComponentType = engine.defineComponent(COMPONENT_ID.toString(), {
+      a: Schemas.Int,
+      b: Schemas.Int,
+      c: Schemas.Array(Schemas.Int),
+      d: Schemas.Int64
+    })
     const myComponent = TestComponentType.create(entityFilled, {
       a: 2331,
       b: 10,
@@ -371,7 +358,10 @@ describe('Serialization Types', () => {
       vectorType[key] = Schemas.Int
       objectValues[key] = 50 + i
       zeroObjectValues[key] = 0
-      const TestComponentType = engine.defineComponent(vectorType, COMPONENT_ID)
+      const TestComponentType = engine.defineComponent(
+        COMPONENT_ID.toString(),
+        vectorType
+      )
 
       TestComponentType.create(entity, objectValues)
       TestComponentType.create(entityCopied, zeroObjectValues)
@@ -390,13 +380,13 @@ describe('Serialization Types', () => {
     const COMPONENT_ID = 888
 
     const TestComponentType = engine.defineComponent(
+      COMPONENT_ID.toString(),
       {
         a: Schemas.Int,
         b: Schemas.Int,
         c: Schemas.Array(Schemas.Int),
         d: Schemas.Int64
       },
-      COMPONENT_ID,
       {
         a: 123,
         b: 123,
@@ -430,15 +420,12 @@ describe('Serialization Types', () => {
   it('should serialize and deserialize math schemas', () => {
     const engine = Engine()
     const entity = engine.addEntity()
-    const MixComponent = engine.defineComponent(
-      {
-        v3: Schemas.Vector3,
-        q: Schemas.Quaternion,
-        c3: Schemas.Color3,
-        c4: Schemas.Color4
-      },
-      1222
-    )
+    const MixComponent = engine.defineComponent('1222', {
+      v3: Schemas.Vector3,
+      q: Schemas.Quaternion,
+      c3: Schemas.Color3,
+      c4: Schemas.Color4
+    })
 
     const originalValue = MixComponent.create(entity, {
       c3: { r: 0.1, g: 0.2, b: 0.3 },
@@ -459,12 +446,10 @@ describe('Serialization Types', () => {
     const entity = engine.addEntity()
     const entityCopied = engine.addEntity()
     const someEntity = engine.addEntity()
-    let COMPONENT_ID = 888
 
-    const EntityComponent = engine.defineComponent(
-      { value: Schemas.Entity },
-      COMPONENT_ID++
-    )
+    const EntityComponent = engine.defineComponent('998', {
+      value: Schemas.Entity
+    })
     const myEntity = EntityComponent.create(entity, { value: someEntity })
     expect(myEntity.value).toBe(someEntity)
 

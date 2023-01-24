@@ -229,7 +229,7 @@ export class ReadWriteByteBuffer implements ByteBuffer {
     return this.view.getUint16(offset)
   }
   getUint32(offset: number): number {
-    return this.view.getUint32(offset)
+    return this.view.getUint32(offset) >>> 0
   }
   getUint64(offset: number): bigint {
     return this.view.getBigUint64(offset)

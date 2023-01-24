@@ -24,6 +24,8 @@ export async function onUpdate(deltaTime: number) {
 }
 
 export async function onStart() {
+  await engine.seal()
+
   const response = await crdtGetState({ data: new Uint8Array() })
   if (!!rendererTransport.onmessage) {
     if (response && response.data && response.data.length) {

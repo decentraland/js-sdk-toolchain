@@ -1,5 +1,6 @@
 import fs from 'fs/promises'
 import extractZip from 'extract-zip'
+import { resolve } from 'path'
 import { fetch } from 'undici'
 
 const _this = exports
@@ -82,8 +83,9 @@ export async function download(url: string, dest: string): Promise<string> {
  * @param dest Path to where to extract the zip file
  */
 export async function extract(path: string, dest: string): Promise<string> {
-  await extractZip(path, { dir: dest })
-  return dest
+  const destPath = resolve(dest)
+  await extractZip(path, { dir: destPath })
+  return destPath
 }
 
 /**

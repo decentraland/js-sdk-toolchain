@@ -6,9 +6,9 @@ EVAL test/snapshots/billboard.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 20k
-  MALLOC_COUNT = 11725
-  ALIVE_OBJS_DELTA ~= 2.24k
+  OPCODES ~= 29k
+  MALLOC_COUNT = 12099
+  ALIVE_OBJS_DELTA ~= 2.31k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 2

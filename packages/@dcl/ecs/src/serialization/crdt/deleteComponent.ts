@@ -55,7 +55,7 @@ export namespace DeleteComponent {
     const msg = {
       ...header,
       entityId: buf.readUint32() as Entity,
-      componentId: buf.readInt32(),
+      componentId: buf.readUint32(),
       timestamp: Number(buf.readUint64())
     }
 

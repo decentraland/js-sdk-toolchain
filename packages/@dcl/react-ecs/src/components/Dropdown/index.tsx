@@ -1,17 +1,21 @@
-import { PBUiDropdown } from '@dcl/ecs'
+import { PBUiDropdown, pointerEventsSystem } from '@dcl/ecs'
 
 import { parseProps } from '../utils'
 import { ReactEcs } from '../../react-ecs'
 import { EntityPropTypes } from '../types'
 import { UiDropdownProps } from './types'
+import { getFont, getTextAlign } from '../Label/utils'
 
 function parseUiDropdown(props: UiDropdownProps): PBUiDropdown {
+  const { textAlign, font, ...otherProps } = props
   return {
     acceptEmpty: false,
     options: [],
     selectedIndex: props.acceptEmpty ? -1 : 0,
     disabled: false,
-    ...props
+    ...otherProps,
+    ...getTextAlign(textAlign),
+    ...getFont(font)
   }
 }
 

@@ -29,7 +29,7 @@
   "dependencies": {
     "@dcl/crdt": "file:../crdt",
     "@dcl/js-runtime": "file:../js-runtime",
-    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-3858099301.commit-69ab554.tgz"
+    "@dcl/protocol": "1.0.0-3998437165.commit-16d59c3"
   },
   "files": [
     "dist",

@@ -155,7 +155,7 @@ export function crdtSceneSystem(
         //  out of the block of systems update between `receiveMessage` and `updateState`
         if (component?.isDirty(msg.entityId)) {
           crdtClient.createComponentDataEvent(
-            component._id,
+            component.componentId,
             msg.entityId,
             component.toBinaryOrNull(msg.entityId)?.toBinary() || null
           )
@@ -207,7 +207,7 @@ export function crdtSceneSystem(
               } else {
                 DeleteComponent.write(
                   msg.entityId,
-                  component._id,
+                  component.componentId,
                   ts,
                   bufferForOutdated
                 )
@@ -274,7 +274,7 @@ export function crdtSceneSystem(
         // if update goes bad, the entity doesn't accept put anymore (it's added to deleted entities set)
         if (
           crdtClient.createComponentDataEvent(
-            component._id,
+            component.componentId,
             entity as number,
             componentValue
           ) === null
@@ -313,7 +313,7 @@ export function crdtSceneSystem(
         // Component will be always defined here since dirtyMap its an iterator of engine.componentsDefinition
         const { timestamp } = crdtClient
           .getState()
-          .components.get(component._id)!
+          .components.get(component.componentId)!
           .get(entity as number)!
 
         const offset = buffer.currentWriteOffset()
@@ -323,7 +323,7 @@ export function crdtSceneSystem(
         const transportMessage = {
           type,
           entityId: entity,
-          componentId: component._id,
+          componentId: component.componentId,
           timestamp
         }
 
@@ -332,7 +332,12 @@ export function crdtSceneSystem(
           if (transportMessage.type === CrdtMessageType.PUT_COMPONENT) {
             PutComponentOperation.write(entity, timestamp, component, buffer)
           } else {
-            DeleteComponent.write(entity, component._id, timestamp, buffer)
+            DeleteComponent.write(
+              entity,
+              component.componentId,
+              timestamp,
+              buffer
+            )
           }
 
           crdtMessages.push({
