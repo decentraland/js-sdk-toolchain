@@ -4,9 +4,11 @@ import { getArgs } from './utils/args'
 import log from './utils/log'
 import { CliError } from './utils/error'
 import { COMMANDS_PATH, getCommands } from './utils/commands'
+import { CliComponents, initComponents } from './components'
 
 export interface Options {
   args: ReturnType<typeof getArgs>
+  components: CliComponents
 }
 
 // leaving args as "any" since we don't know yet if we will use them
@@ -52,7 +54,9 @@ const helpMessage = (commands: string[]) =>
 ;(async () => {
   const command = process.argv[2]
   const needsHelp = args['--help']
-  const commands = await getCommands()
+  const components: CliComponents = initComponents()
+
+  const commands = await getCommands(components)
 
   if (!commands.includes(command)) {
     if (needsHelp) {
@@ -66,7 +70,7 @@ const helpMessage = (commands: string[]) =>
   const cmd = require(`${COMMANDS_PATH}/${command}`)
 
   if (commandFnsAreValid(cmd)) {
-    const options = { args: cmd.args }
+    const options = { args: cmd.args, components }
     needsHelp ? await cmd.help(options) : await cmd.main(options)
   }
 })().catch(handleError)
