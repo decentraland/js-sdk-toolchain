@@ -17,7 +17,7 @@ import { main as handler } from '../../utils/handler'
 import { info } from 'console'
 
 interface Options {
-  args: typeof args
+  args: Omit<typeof args, '_'>
 }
 
 export const args = getArgs({

@@ -25,7 +25,7 @@ describe('build command', () => {
     const projectStructure = helpers.getProjectStructure()
 
     try {
-      await build.main({ args: { _: [] } })
+      await build.main({ args: {} })
     } catch (e) {
       expect(projectValidatorSpy).toBeCalledWith(
         process.cwd(),
@@ -42,7 +42,7 @@ describe('build command', () => {
       .mockResolvedValue(false)
 
     try {
-      await build.main({ args: { _: [] } })
+      await build.main({ args: {} })
     } catch (e) {
       expect(packageJsonValidatorSpy).toBeCalledWith(
         process.cwd(),
@@ -65,7 +65,7 @@ describe('build command', () => {
       .mockRejectedValue(undefined)
 
     try {
-      await build.main({ args: { _: [] } })
+      await build.main({ args: {} })
     } catch (_) {
       expect(needsDependenciesSpy).toBeCalledWith(process.cwd())
       expect(installDependenciesSpy).toBeCalledWith(process.cwd())
@@ -85,7 +85,7 @@ describe('build command', () => {
       .mockRejectedValue(undefined)
 
     try {
-      await build.main({ args: { _: [] } })
+      await build.main({ args: {} })
     } catch (_) {
       expect(needsDependenciesSpy).toBeCalledWith(process.cwd())
       expect(installDependenciesSpy).not.toBeCalled()
@@ -105,7 +105,7 @@ describe('build command', () => {
       .mockRejectedValue(undefined)
 
     try {
-      await build.main({ args: { _: [], '--skip-install': true } })
+      await build.main({ args: { '--skip-install': true } })
     } catch (_) {
       expect(needsDependenciesSpy).toBeCalledWith(process.cwd())
       expect(installDependenciesSpy).not.toBeCalled()
@@ -121,7 +121,7 @@ describe('build command', () => {
       .spyOn(helpers, 'buildTypescript')
       .mockResolvedValue()
 
-    await build.main({ args: { _: [], '--watch': true, '--production': true } })
+    await build.main({ args: { '--watch': true, '--production': true } })
     expect(tsBuildSpy).toBeCalledWith({
       dir: process.cwd(),
       watch: true,
