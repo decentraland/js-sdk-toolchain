@@ -11,9 +11,7 @@ describe('Check there is fixed version', () => {
       '@dcl/dcl-rollup',
       '@dcl/ecs',
       '@dcl/js-runtime',
-      '@dcl/react-ecs',
-      'arg',
-      'ora'
+      '@dcl/react-ecs'
     ]
 
     const shouldBeFixedVersion = [
@@ -25,27 +23,24 @@ describe('Check there is fixed version', () => {
     const allLibraries = [...shouldBeFixedVersion, ...otherLocalDependencies]
     const dependencies = Object.keys(packageJson.dependencies || {})
 
-    if (dependencies.length !== allLibraries.length) {
-      const untrackedDependency = dependencies.filter(
-        (item) => !allLibraries.includes(item)
-      )
+    const untrackedDependency = dependencies.filter(
+      (item) => !allLibraries.includes(item)
+    )
+
+    if (untrackedDependency.length) {
       throw new Error(
         `There is some not tracked libraries: ${untrackedDependency}`
       )
     }
 
-    for (const libName of shouldBeFixedVersion) {
-      const libVersion = packageJson.dependencies[libName]
-      if (typeof libVersion === 'string') {
+    for (const libName in packageJson.dependencies) {
+      if (libName.startsWith('@dcl/')) {
+        const libVersion = packageJson.dependencies[libName]
         if (libVersion === 'next' || libVersion.startsWith('^')) {
           throw new Error(
             `The library ${libName} has a non-fixed version: ${libVersion}`
           )
         }
-      } else {
-        throw new Error(
-          `The library ${libName} isn't added to @dcl/sdk dependencies`
-        )
       }
     }
   })

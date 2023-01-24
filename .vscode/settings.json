@@ -17,5 +17,8 @@
     "packages/@dcl/*/*.js": true,
     "**/*.js": { "when": "$(basename).ts" },
     "**/*.d.ts": true
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   }
 }
