@@ -1,6 +1,8 @@
-jest.mock('inquirer')
+jest.mock('../../../../packages/@dcl/sdk/node_modules/inquirer')
 
-import * as inquirer from 'inquirer'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import * as inquirer from '../../../../packages/@dcl/sdk/node_modules/inquirer'
 import * as promptUtils from '../../../../packages/@dcl/sdk/cli/utils/prompt'
 
 afterEach(() => {
