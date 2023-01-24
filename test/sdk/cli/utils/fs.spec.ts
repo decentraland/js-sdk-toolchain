@@ -19,7 +19,7 @@ describe('utils/fs', () => {
       arrayBuffer: async () => new ArrayBuffer(123)
     } as any)
 
-    const writeFileSpy = jest.spyOn(fs, 'writeFile')
+    const writeFileSpy = jest.spyOn(fs, 'writeFile').mockImplementation()
 
     const dist = await fsUtils.download(
       { fs, fetch },
