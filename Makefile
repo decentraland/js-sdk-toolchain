@@ -7,7 +7,11 @@ PROTOBUF_VERSION = 3.20.1
 ifeq ($(shell uname),Darwin)
 PROTOBUF_ZIP = protoc-$(PROTOBUF_VERSION)-osx-x86_64.zip
 else
+ifeq ($(shell arch),aarch64)
+PROTOBUF_ZIP = protoc-$(PROTOBUF_VERSION)-linux-aarch_64.zip
+else
 PROTOBUF_ZIP = protoc-$(PROTOBUF_VERSION)-linux-x86_64.zip
+endif
 endif
 
 PROTOC = node_modules/.bin/protobuf/bin/protoc
@@ -19,7 +23,6 @@ install:
 	npm i
 	make node_modules/.bin/protobuf/bin/protoc
 	cd packages/@dcl/dcl-rollup; npm ci
-	cd packages/@dcl/ecs; make install
 
 lint:
 	node_modules/.bin/eslint . --ext .ts
@@ -30,6 +33,11 @@ lint-fix:
 TESTARGS ?= test/
 test:
 	node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS)
+
+test-cli:
+	@rm -rf tmp
+	@mkdir -p tmp/scene
+	cd tmp/scene; $(PWD)/packages/@dcl/sdk/cli/index.js init
 
 test-coverage:
 	WITH_COVERAGE=true node_modules/.bin/jest --detectOpenHandles --colors --coverage $(TESTARGS)

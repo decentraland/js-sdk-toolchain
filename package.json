@@ -8,11 +8,7 @@
     "@types/fs-extra": "^9.0.12",
     "@types/jest": "^28.1.8",
     "@types/rimraf": "^3.0.0",
-    "express": "^4.16.2",
-    "extract-zip": "^2.0.1",
-    "fp-future": "^1.0.1",
     "fs-extra": "^10.0.0",
-    "inquirer": "^8.2.5",
     "jest": "^28.1.3",
     "jest-matcher-deep-close-to": "^3.0.2",
     "rimraf": "^3.0.2",
@@ -20,13 +16,10 @@
     "ts-jest": "^28.0.8",
     "ts-proto": "^1.122.0",
     "tslib": "^2.4.0",
-    "typescript": "^4.8.4",
-    "undici": "^5.14.0"
+    "typescript": "^4.9.4"
   },
   "devDependencies": {
     "@dcl/eslint-config": "^1.0.1-20211208155836.commit-63a2880",
-    "@types/express": "^4.17.13",
-    "@types/inquirer": "^8.2.5",
     "@types/node": "^18.11.18",
     "@types/supertest": "^2.0.11",
     "typedoc": "^0.23.23"

@@ -5,7 +5,13 @@ import {
   createInputSystem,
   createPointerEventSystem,
   YGWrap,
-  YGUnit
+  YGUnit,
+  YGFlexDirection,
+  YGOverflow,
+  YGAlign,
+  YGDisplay,
+  YGPositionType,
+  YGJustify
 } from '../../packages/@dcl/ecs'
 import { components, IEngine as IIEngine } from '../../packages/@dcl/ecs/src'
 import {
@@ -54,14 +60,28 @@ describe('UiTransform React Ecs', () => {
       <UiEntity
         uiTransform={{
           width: 'boedo' as any, // We are asserting something thats not valid :)
-          flexWrap: YGWrap.YGW_WRAP
+          flexWrap: 'wrap',
+          flexDirection: 'column',
+          overflow: 'scroll',
+          alignItems: 'auto',
+          display: 'flex',
+          positionType: 'absolute',
+          justifyContent: 'flex-end'
         }}
       />
     )
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
-    expect(getUiTransform(rootDivEntity).width).toBe(0)
-    expect(getUiTransform(rootDivEntity).flexWrap).toBe(YGWrap.YGW_WRAP)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      flexWrap: YGWrap.YGW_WRAP,
+      flexDirection: YGFlexDirection.YGFD_COLUMN,
+      overflow: YGOverflow.YGO_SCROLL,
+      alignItems: YGAlign.YGA_AUTO,
+      display: YGDisplay.YGD_FLEX,
+      positionType: YGPositionType.YGPT_ABSOLUTE,
+      width: 0,
+      justifyContent: YGJustify.YGJ_FLEX_END
+    })
   })
 
   it('should send position transform properties', async () => {

@@ -38,6 +38,8 @@ flow('build-all', () => {
   commonChecks()
 
   flow('@dcl/js-runtime', () => {
+    itExecutes('npm i --silent', ECS7_PATH)
+
     it('compile protos', async () => {
       const rpcProtoPath = path.resolve(
         __dirname,
