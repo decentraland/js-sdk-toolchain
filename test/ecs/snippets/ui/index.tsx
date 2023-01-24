@@ -7,9 +7,6 @@ import {
   InputAction,
   inputSystem,
   PointerEvents,
-  YGAlign,
-  YGDisplay,
-  YGJustify,
   PointerEventType
 } from '@dcl/sdk/ecs'
 import { Vector3, Color4, Quaternion } from '@dcl/sdk/math'
@@ -30,9 +27,9 @@ export const uiComponent = () => (
       uiTransform={{
         width: '100%',
         height: '20%',
-        justifyContent: YGJustify.YGJ_CENTER,
-        alignItems: YGAlign.YGA_CENTER,
-        display: YGDisplay.YGD_FLEX
+        justifyContent: 'center',
+        alignItems: 'center',
+        display: 'flex'
       }}
     >
       <Label
@@ -45,9 +42,9 @@ export const uiComponent = () => (
       uiTransform={{
         width: '100%',
         height: '20%',
-        justifyContent: YGJustify.YGJ_CENTER,
-        alignItems: YGAlign.YGA_CENTER,
-        display: YGDisplay.YGD_FLEX
+        justifyContent: 'center',
+        alignItems: 'center',
+        display: 'flex'
       }}
     >
       <Label
@@ -60,9 +57,9 @@ export const uiComponent = () => (
       uiTransform={{
         width: '100%',
         height: '100px',
-        justifyContent: YGJustify.YGJ_CENTER,
-        alignItems: YGAlign.YGA_CENTER,
-        display: YGDisplay.YGD_FLEX
+        justifyContent: 'center',
+        alignItems: 'center',
+        display: 'flex'
       }}
     >
       <Label

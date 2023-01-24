@@ -1,4 +1,3 @@
-import { YGJustify, YGAlign, YGDisplay } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { UiEntity, Label } from '@dcl/sdk/react-ecs'
 
@@ -15,9 +14,9 @@ export const uiComponent = () => (
       uiTransform={{
         width: '100%',
         height: '20%',
-        justifyContent: YGJustify.YGJ_CENTER,
-        alignItems: YGAlign.YGA_CENTER,
-        display: YGDisplay.YGD_FLEX
+        justifyContent: 'center',
+        alignItems: 'center',
+        display: 'flex'
       }}
     >
       <Label
@@ -30,9 +29,9 @@ export const uiComponent = () => (
       uiTransform={{
         width: '100%',
         height: '20%',
-        justifyContent: YGJustify.YGJ_CENTER,
-        alignItems: YGAlign.YGA_CENTER,
-        display: YGDisplay.YGD_FLEX
+        justifyContent: 'center',
+        alignItems: 'center',
+        display: 'flex'
       }}
     >
       <Label
@@ -45,9 +44,9 @@ export const uiComponent = () => (
       uiTransform={{
         width: '100%',
         height: '100px',
-        justifyContent: YGJustify.YGJ_CENTER,
-        alignItems: YGAlign.YGA_CENTER,
-        display: YGDisplay.YGD_FLEX
+        justifyContent: 'center',
+        alignItems: 'center',
+        display: 'flex'
       }}
     >
       <Label

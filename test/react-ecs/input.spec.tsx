@@ -3,9 +3,7 @@ import {
   Entity,
   IEngine,
   createPointerEventSystem,
-  createInputSystem,
-  TextAlignMode,
-  Font
+  createInputSystem
 } from '../../packages/@dcl/ecs'
 import { components, IEngine as IIEngine } from '../../packages/@dcl/ecs/src'
 import {
@@ -15,7 +13,6 @@ import {
   Input
 } from '../../packages/@dcl/react-ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
-import { UiEntity } from '../../packages/@dcl/sdk/react-ecs'
 
 describe('Ui Listeners React Ecs', () => {
   let engine: IEngine
@@ -48,8 +45,8 @@ describe('Ui Listeners React Ecs', () => {
             placeholder="Boedo its carnaval"
             disabled={false}
             color={Color4.Red()}
-            textAlign={TextAlignMode.TAM_BOTTOM_CENTER}
-            font={Font.F_SANS_SERIF}
+            textAlign="bottom-center"
+            font="sans-serif"
             fontSize={14}
             onChange={conditional ? onChange : undefinedChange}
           />
