@@ -1,8 +1,8 @@
 jest.mock('fs/promises')
 jest.mock('undici')
-jest.mock('extract-zip')
+jest.mock('../../../../packages/@dcl/sdk/node_modules/extract-zip')
 
-import * as extractZip from 'extract-zip'
+import * as extractZip from '../../../../packages/@dcl/sdk/node_modules/extract-zip'
 import * as undici from 'undici'
 import * as fs from 'fs/promises'
 import * as fsUtils from '../../../../packages/@dcl/sdk/cli/utils/fs'
