@@ -1,9 +1,9 @@
 jest.mock('fs/promises')
-jest.mock('undici')
+jest.mock('../../../../packages/@dcl/sdk/node_modules/undici')
 jest.mock('../../../../packages/@dcl/sdk/node_modules/extract-zip')
 
 import * as extractZip from '../../../../packages/@dcl/sdk/node_modules/extract-zip'
-import * as undici from 'undici'
+import * as undici from '../../../../packages/@dcl/sdk/node_modules/undici'
 import * as fs from 'fs/promises'
 import * as fsUtils from '../../../../packages/@dcl/sdk/cli/utils/fs'
 import path from 'path'
@@ -155,7 +155,7 @@ describe('utils/fs', () => {
     )
   })
 
-  it.skip("extract: should extract a zip file and return it's destination", async () => {
+  it("extract: should extract a zip file and return it's destination", async () => {
     const extractSpy = jest.spyOn(extractZip, 'default')
 
     const dist = await fsUtils.extract('some/path', './other/path')
