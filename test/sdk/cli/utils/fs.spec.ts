@@ -35,6 +35,12 @@ describe('utils/fs', () => {
     )
   })
 
+  it('existPath', async () => {
+    const fs = createFsComponent()
+    expect(fs.existPath('package.json')).toBeTruthy()
+    expect(fs.existPath('noooooooooo.json')).toBeFalsy()
+  })
+
   it("extract: should extract a zip file and return it's destination", async () => {
     const extractSpy = jest.spyOn(extractZip, 'default')
 
