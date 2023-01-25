@@ -1,11 +1,14 @@
 import { CliError } from '../../../../../packages/@dcl/sdk/cli/utils/error'
 import * as helpers from '../../../../../packages/@dcl/sdk/cli/commands/build/helpers'
 import * as build from '../../../../../packages/@dcl/sdk/cli/commands/build/index'
+import { initComponents } from '../../../../../packages/@dcl/sdk/cli/components'
 
 afterEach(() => {
   jest.clearAllMocks()
   jest.restoreAllMocks()
 })
+
+const components = initComponents()
 
 describe('build command', () => {
   it('help: return void', () => {
@@ -25,7 +28,7 @@ describe('build command', () => {
     const projectStructure = helpers.getProjectStructure()
 
     try {
-      await build.main({ args: {} })
+      await build.main({ args: {}, components })
     } catch (e) {
       expect(projectValidatorSpy).toBeCalledWith(
         process.cwd(),
@@ -42,7 +45,7 @@ describe('build command', () => {
       .mockResolvedValue(false)
 
     try {
-      await build.main({ args: {} })
+      await build.main({ args: {}, components })
     } catch (e) {
       expect(packageJsonValidatorSpy).toBeCalledWith(
         process.cwd(),
@@ -65,11 +68,11 @@ describe('build command', () => {
       .mockRejectedValue(undefined)
 
     try {
-      await build.main({ args: {} })
-    } catch (_) {
-      expect(needsDependenciesSpy).toBeCalledWith(process.cwd())
-      expect(installDependenciesSpy).toBeCalledWith(process.cwd())
-    }
+      await build.main({ args: {}, components })
+    } catch (_) {}
+
+    expect(needsDependenciesSpy).toBeCalledWith(components, process.cwd())
+    expect(installDependenciesSpy).toBeCalledWith(process.cwd())
   })
 
   it('should avoid installing dependencies if not needed', async () => {
@@ -85,11 +88,11 @@ describe('build command', () => {
       .mockRejectedValue(undefined)
 
     try {
-      await build.main({ args: {} })
-    } catch (_) {
-      expect(needsDependenciesSpy).toBeCalledWith(process.cwd())
-      expect(installDependenciesSpy).not.toBeCalled()
-    }
+      await build.main({ args: {}, components })
+    } catch (_) {}
+
+    expect(needsDependenciesSpy).toBeCalledWith(components, process.cwd())
+    expect(installDependenciesSpy).not.toBeCalled()
   })
 
   it('should avoid installing dependencies if "--skip-install" is provided', async () => {
@@ -105,11 +108,10 @@ describe('build command', () => {
       .mockRejectedValue(undefined)
 
     try {
-      await build.main({ args: { '--skip-install': true } })
-    } catch (_) {
-      expect(needsDependenciesSpy).toBeCalledWith(process.cwd())
-      expect(installDependenciesSpy).not.toBeCalled()
-    }
+      await build.main({ args: { '--skip-install': true }, components })
+    } catch (_) {}
+    expect(needsDependenciesSpy).toBeCalledWith(components, process.cwd())
+    expect(installDependenciesSpy).not.toBeCalled()
   })
 
   it('should build typescript if all conditions are met', async () => {
@@ -121,7 +123,11 @@ describe('build command', () => {
       .spyOn(helpers, 'buildTypescript')
       .mockResolvedValue()
 
-    await build.main({ args: { '--watch': true, '--production': true } })
+    await build.main({
+      args: { '--watch': true, '--production': true },
+      components
+    })
+
     expect(tsBuildSpy).toBeCalledWith({
       dir: process.cwd(),
       watch: true,

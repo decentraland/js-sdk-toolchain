@@ -11,6 +11,7 @@ import { createTestMetricsComponent } from '@well-known-components/metrics'
 import { createWsComponent } from './ws'
 import future from 'fp-future'
 
+import { CliComponents } from '../../components'
 import { getArgs } from '../../utils/args'
 import { main as handler } from '../../utils/handler'
 import { PreviewComponents } from './types'
@@ -25,6 +26,7 @@ export function help() {
 
 interface Options {
   args: Omit<typeof args, '_'>
+  components: Pick<CliComponents, 'fetch' | 'fs'>
 }
 
 export const args = getArgs({
@@ -39,7 +41,7 @@ export const args = getArgs({
 // TODO: refactor this stuff completely
 export const main = handler(async function main(options: Options) {
   const dir = resolve(process.cwd(), options.args['--dir'] || '.')
-  await validateExistingProject(dir)
+  await validateExistingProject(options.components, dir)
   await validateSceneOptions(dir)
 
   const port = options.args['--port'] || (await previewPort())

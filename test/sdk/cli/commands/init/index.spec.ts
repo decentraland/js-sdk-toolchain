@@ -1,8 +1,8 @@
-import * as prompt from '../../../../packages/@dcl/sdk/cli/utils/prompt'
-import * as fsUtils from '../../../../packages/@dcl/sdk/cli/utils/fs'
-import { CliError } from '../../../../packages/@dcl/sdk/cli/utils/error'
-import * as init from '../../../../packages/@dcl/sdk/cli/commands/init/index'
-import { initComponents } from '../../../../packages/@dcl/sdk/cli/components'
+import * as prompt from '../../../../../packages/@dcl/sdk/cli/utils/prompt'
+import * as fsUtils from '../../../../../packages/@dcl/sdk/cli/utils/fs'
+import { CliError } from '../../../../../packages/@dcl/sdk/cli/utils/error'
+import * as init from '../../../../../packages/@dcl/sdk/cli/commands/init/index'
+import { initComponents } from '../../../../../packages/@dcl/sdk/cli/components'
 
 afterEach(() => {
   jest.clearAllMocks()

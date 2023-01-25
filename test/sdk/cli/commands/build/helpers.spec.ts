@@ -1,11 +1,14 @@
 import * as helpers from '../../../../../packages/@dcl/sdk/cli/commands/build/helpers'
 import * as execUtils from '../../../../../packages/@dcl/sdk/cli/utils/exec'
 import * as fsUtils from '../../../../../packages/@dcl/sdk/cli/utils/fs'
+import { initComponents } from '../../../../../packages/@dcl/sdk/cli/components'
 
 afterEach(() => {
   jest.clearAllMocks()
   jest.restoreAllMocks()
 })
+
+const components = initComponents()
 
 describe('build:helpers', () => {
   it('validateProjectStructure: should return true if provided list of files is inside the dir', async () => {
@@ -52,27 +55,27 @@ describe('build:helpers', () => {
   })
 
   it('needsDependencies: should return true if "node_modules" does not exist', async () => {
-    jest.spyOn(fsUtils, 'exists').mockResolvedValue(false)
+    jest.spyOn(components.fs, 'existPath').mockResolvedValue(false)
 
-    const res = await helpers.needsDependencies('some/path')
+    const res = await helpers.needsDependencies(components, 'some/path')
 
     expect(res).toBe(true)
   })
 
   it('needsDependencies: should return true if "node_modules" is empty', async () => {
-    jest.spyOn(fsUtils, 'exists').mockResolvedValue(true)
+    jest.spyOn(components.fs, 'existPath').mockResolvedValue(true)
     jest.spyOn(fsUtils, 'readdir').mockResolvedValue([])
 
-    const res = await helpers.needsDependencies('some/path')
+    const res = await helpers.needsDependencies(components, 'some/path')
 
     expect(res).toBe(true)
   })
 
   it('needsDependencies: should return false if "node_modules" is valid', async () => {
-    jest.spyOn(fsUtils, 'exists').mockResolvedValue(true)
+    jest.spyOn(components.fs, 'existPath').mockResolvedValue(true)
     jest.spyOn(fsUtils, 'readdir').mockResolvedValue(['some', 'files'])
 
-    const res = await helpers.needsDependencies('some/path')
+    const res = await helpers.needsDependencies(components, 'some/path')
 
     expect(res).toBe(false)
   })

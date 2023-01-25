@@ -1,5 +1,6 @@
 const spawnMock = {
   stdout: {
+    on: jest.fn(),
     pipe: jest.fn()
   },
   stderr: {
@@ -78,6 +79,25 @@ describe('utils/exec', () => {
     })
     expect(pipeSpy).not.toBeCalled()
     expect(res).toBe(undefined)
+  })
+
+  it('it should resolve when compiler starts waching files', async () => {
+    const spawnSpy = jest.spyOn(childProcess, 'spawn')
+    spawnMock.stdout.on.mockImplementationOnce((_: string, cb: (data: any) => void) => {
+      cb('The compiler is watching file changes...')
+    })
+
+    const res = await execUtils.exec(process.cwd(), 'run some test', {
+      env: { someKey: '1' },
+      silent: true
+    })
+
+    expect(spawnSpy).toBeCalledWith('run', ['some', 'test'], {
+      shell: true,
+      cwd: process.cwd(),
+      env: { ...process.env, NODE_ENV: '', someKey: '1' }
+    })
+    expect(res).toBeUndefined()
   })
 
   it('it should throw when returned code is not "0"', async () => {

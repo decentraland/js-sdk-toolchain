@@ -23,6 +23,15 @@ export function exec(
       child.stderr.pipe(process.stderr)
     }
 
+    child.stdout.on('data', (data) => {
+      if (
+        data.toString().indexOf('The compiler is watching file changes...') !==
+        -1
+      ) {
+        return resolve(undefined)
+      }
+    })
+
     child.on('close', (code: number) => {
       if (code !== 0) {
         const command = `${cmd} ${rest.join(' ')}`

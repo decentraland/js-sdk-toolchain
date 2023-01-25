@@ -2,18 +2,15 @@ import os from 'os'
 import { resolve } from 'path'
 import open from 'open'
 
+import { CliComponents } from '../../components'
 import { main as build } from '../build'
 import { main as preview } from '../preview'
 import { previewPort } from '../preview/port'
-// import { toStringList } from '../../utils/out-messages'
-// import { succeed } from '../../utils/log'
 import { getArgs } from '../../utils/args'
-// import { CliError } from '../../utils/error'
 import { main as handler } from '../../utils/handler'
-// import { info } from 'console'
-
 interface Options {
   args: typeof args
+  components: Pick<CliComponents, 'fetch' | 'fs'>
 }
 
 export const args = getArgs({
@@ -75,10 +72,11 @@ export const main = handler(async function main(options: Options) {
   const baseCoords = { x: 0, y: 0 }
   const hasPortableExperience = false
 
+  const comps = { components: options.components }
   if (!skipBuild) {
-    await build({ args: { '--dir': dir, '--watch': watch } })
+    await build({ args: { '--dir': dir, '--watch': watch }, ...comps })
   }
-  await preview({ args: { '--dir': dir, '--port': port } })
+  await preview({ args: { '--dir': dir, '--port': port }, ...comps })
 
   const ifaces = os.networkInterfaces()
   const availableURLs: string[] = []

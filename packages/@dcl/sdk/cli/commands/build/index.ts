@@ -1,5 +1,6 @@
 import { resolve } from 'path'
 
+import { CliComponents } from '../../components'
 import { toStringList } from '../../utils/out-messages'
 import { succeed } from '../../utils/log'
 import { getArgs } from '../../utils/args'
@@ -18,6 +19,7 @@ import { info } from 'console'
 
 interface Options {
   args: Omit<typeof args, '_'>
+  components: Pick<CliComponents, 'fs'>
 }
 
 export const args = getArgs({
@@ -73,7 +75,10 @@ export const main = handler(async function main(options: Options) {
 
   succeed('Project has a valid "package.json"')
 
-  const shouldInstallDeps = await needsDependencies(dir)
+  const shouldInstallDeps = await needsDependencies(
+    options.components,
+    dir
+  )
 
   if (shouldInstallDeps && !options.args['--skip-install']) {
     info('Installing dependencies...')

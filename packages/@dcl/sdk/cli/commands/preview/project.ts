@@ -1,9 +1,10 @@
 import { resolve } from 'path'
 import { Scene } from '@dcl/schemas'
 
-import { readFile, exists } from '../../utils/fs'
+import { readFile } from '../../utils/fs'
 import { CliError } from '../../utils/error'
 import { getObject, inBounds, getBounds, areConnected } from './coordinates'
+import { IFileSystemComponent } from '../../components/fs'
 
 export const SCENE_FILE = 'scene.json'
 
@@ -68,9 +69,7 @@ export function validateSceneData(sceneFile: Scene): void {
   }
 
   if (!parcelSet.has(base)) {
-    throw new CliError(
-      `Your base parcel ${base} should be included on parcels attribute at scene.json`
-    )
+    throw new CliError(`Your base parcel ${base} should be included on parcels attribute at scene.json`)
   }
 
   const objParcels = parcels.map(getObject)
@@ -79,15 +78,11 @@ export function validateSceneData(sceneFile: Scene): void {
       return
     }
     const { minX, maxX } = getBounds()
-    throw new CliError(
-      `Coordinates ${x},${y} are outside of allowed limits (from ${minX} to ${maxX})`
-    )
+    throw new CliError(`Coordinates ${x},${y} are outside of allowed limits (from ${minX} to ${maxX})`)
   })
 
   if (!areConnected(objParcels)) {
-    throw new CliError(
-      'Parcels described on scene.json are not connected. They should be one next to each other'
-    )
+    throw new CliError('Parcels described on scene.json are not connected. They should be one next to each other')
   }
 }
 
@@ -103,23 +98,19 @@ export async function validateSceneOptions(dir: string): Promise<void> {
  * Validates all the conditions required to operate over an existing project.
  * Throws if a project contains an invalid main path or if the `scene.json` file is missing.
  */
-export async function validateExistingProject(dir: string) {
+export async function validateExistingProject(
+  components: { fs: IFileSystemComponent },
+  dir: string,
+) {
   const sceneFile = await getSceneFile(dir)
 
   if (!isWebSocket(sceneFile.main)) {
     if (!isValidMainFormat(sceneFile.main)) {
-      throw new CliError(
-        `Main scene format file (${sceneFile.main}) is not a supported format`
-      )
+      throw new CliError(`Main scene format file (${sceneFile.main}) is not a supported format`)
     }
 
-    if (
-      sceneFile.main !== null &&
-      !(await exists(resolve(dir, sceneFile.main)))
-    ) {
-      throw new CliError(
-        `Main scene file ${sceneFile.main} is missing in folder ${dir}`
-      )
+    if (sceneFile.main !== null && !(await components.fs.existPath(resolve(dir, sceneFile.main)))) {
+      throw new CliError(`Main scene file ${sceneFile.main} is missing in folder ${dir}`)
     }
   }
 }

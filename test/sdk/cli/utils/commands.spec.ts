@@ -3,70 +3,96 @@ import { resolve } from 'path'
 import { CliError } from '../../../../packages/@dcl/sdk/cli/utils/error'
 import * as commands from '../../../../packages/@dcl/sdk/cli/utils/commands'
 import * as fsUtils from '../../../../packages/@dcl/sdk/cli/utils/fs'
+import { initComponents } from '../../../../packages/@dcl/sdk/cli/components'
 
 afterEach(() => {
   jest.clearAllMocks()
   jest.restoreAllMocks()
 })
 
+const components = initComponents()
+
 describe('utils/commands', () => {
   it('should read commands from the defined commands path', async () => {
     const readDirSpy = jest
-      .spyOn(fsUtils, 'readdir')
-      .mockResolvedValue(['test'])
-    const isDirSpy = jest.spyOn(fsUtils, 'isDirectory').mockResolvedValue(true)
-    const isFileSpy = jest.spyOn(fsUtils, 'isFile').mockResolvedValue(true)
+      .spyOn(components.fs, 'readdir')
+      .mockResolvedValue(['test'] as any)
+    const stat = {
+      isDirectory: jest.fn(() => true),
+      isFile: jest.fn(() => true)
+    }
+    const statSpy = jest
+      .spyOn(components.fs, 'stat')
+      .mockResolvedValue(stat as any)
 
-    await commands.getCommands()
+    await commands.getCommands(components)
 
     expect(readDirSpy).toBeCalledWith(commands.COMMANDS_PATH)
-    expect(isDirSpy).toBeCalledWith(resolve(commands.COMMANDS_PATH, 'test'))
-    expect(isFileSpy).toBeCalledWith(
+    expect(statSpy).toBeCalledWith(resolve(commands.COMMANDS_PATH, 'test'))
+    expect(statSpy).toBeCalledWith(
       resolve(commands.COMMANDS_PATH, 'test', 'index.js')
     )
+    expect(stat.isDirectory).toBeCalled()
+    expect(stat.isFile).toBeCalled()
   })
 
   it('should throw if command is not inside a folder', async () => {
     const readDirSpy = jest
-      .spyOn(fsUtils, 'readdir')
-      .mockResolvedValue(['command1'])
-    const isDirSpy = jest.spyOn(fsUtils, 'isDirectory')
+      .spyOn(components.fs, 'readdir')
+      .mockResolvedValue(['command1'] as any)
+    const stat = {
+      isDirectory: jest.fn(() => false),
+      isFile: jest.fn(() => true)
+    }
+    jest.spyOn(components.fs, 'stat').mockResolvedValue(stat as any)
+
+    let error
 
     try {
-      await commands.getCommands()
+      await commands.getCommands(components)
     } catch (e) {
-      expect(e).toBeInstanceOf(CliError)
+      error = e
     }
-
     expect(readDirSpy).toBeCalled()
-    expect(isDirSpy).toBeCalled()
-    expect(isDirSpy).toReturn()
+    expect(stat.isDirectory).toBeCalled()
+    expect(error).toBeInstanceOf(CliError)
   })
 
   it('should throw if command does not have an "index.ts"', async () => {
     const readDirSpy = jest
-      .spyOn(fsUtils, 'readdir')
-      .mockResolvedValue(['command'])
-    const isDirSpy = jest.spyOn(fsUtils, 'isDirectory').mockResolvedValue(true)
-    const isFileSpy = jest.spyOn(fsUtils, 'isFile')
+      .spyOn(components.fs, 'readdir')
+      .mockResolvedValue(['command'] as any)
+    const stat = {
+      isDirectory: jest.fn(() => true),
+      isFile: jest.fn(() => false)
+    }
+    jest.spyOn(components.fs, 'stat').mockResolvedValue(stat as any)
+
+    let error
 
     try {
-      await commands.getCommands()
+      await commands.getCommands(components)
     } catch (e) {
-      expect(e).toBeInstanceOf(CliError)
+      error = e
     }
 
     expect(readDirSpy).toBeCalled()
-    expect(isDirSpy).toBeCalled()
-    expect(isFileSpy).toBeCalled()
+    expect(stat.isDirectory).toBeCalled()
+    expect(stat.isFile).toBeCalled()
+    expect(error).toBeInstanceOf(CliError)
   })
 
   it('should return all the commands in the directory', async () => {
-    jest.spyOn(fsUtils, 'readdir').mockResolvedValue(['command1', 'command2'])
-    jest.spyOn(fsUtils, 'isDirectory').mockResolvedValue(true)
-    jest.spyOn(fsUtils, 'isFile').mockResolvedValue(true)
+    jest
+      .spyOn(components.fs, 'readdir')
+      .mockResolvedValue(['command1', 'command2'] as any)
+    const stat = {
+      isDirectory: jest.fn(() => true),
+      isFile: jest.fn(() => true)
+    }
+    jest.spyOn(components.fs, 'stat').mockResolvedValue(stat as any)
 
-    const res = await commands.getCommands()
+    const res = await commands.getCommands(components)
 
     expect(res).toStrictEqual(['command1', 'command2'])
   })
