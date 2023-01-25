@@ -2,6 +2,7 @@ import * as prompt from '../../../../packages/@dcl/sdk/cli/utils/prompt'
 import * as fsUtils from '../../../../packages/@dcl/sdk/cli/utils/fs'
 import { CliError } from '../../../../packages/@dcl/sdk/cli/utils/error'
 import * as init from '../../../../packages/@dcl/sdk/cli/commands/init/index'
+import { initComponents } from '../../../../packages/@dcl/sdk/cli/components'
 
 afterEach(() => {
   jest.clearAllMocks()
@@ -23,7 +24,9 @@ describe('init command', () => {
     const downloadSpy = jest.spyOn(fsUtils, 'download')
     const extractSpy = jest.spyOn(fsUtils, 'extract')
 
-    await init.main({ args: { _: [] } })
+    const components = initComponents()
+
+    await init.main({ args: { _: [] }, components })
 
     expect(confirmSpy).toBeCalled()
     expect(downloadSpy).not.toBeCalled()
@@ -31,26 +34,28 @@ describe('init command', () => {
   })
 
   it('main: should download & extract if directory is not empty and prompt is accepted', async () => {
+    const components = initComponents()
     const confirmSpy = jest.spyOn(prompt, 'confirm').mockResolvedValueOnce(true)
-    const downloadSpy = jest.spyOn(fsUtils, 'download').mockImplementation()
+    const downloadSpy = jest.spyOn(fsUtils, 'download').mockResolvedValue('1')
     const extractSpy = jest.spyOn(fsUtils, 'extract').mockImplementation()
-    const removeSpy = jest.spyOn(fsUtils, 'remove').mockImplementation()
+    const removeSpy = jest.spyOn(components.fs, 'unlink').mockImplementation()
 
-    await init.main({ args: { _: [] } })
+    await init.main({ args: { _: [] }, components })
 
     expect(confirmSpy).toBeCalled()
     expect(downloadSpy).toBeCalled()
-    expect(extractSpy).toBeCalled()
-    expect(removeSpy).toBeCalled()
+    expect(extractSpy).toBeCalledWith('1', process.cwd())
+    expect(removeSpy).toBeCalledWith('1')
   })
 
   it('main: should download & extract if directory is not empty and "--yes" arg is provided', async () => {
+    const components = initComponents()
     const confirmSpy = jest.spyOn(prompt, 'confirm')
     const downloadSpy = jest.spyOn(fsUtils, 'download').mockImplementation()
     const extractSpy = jest.spyOn(fsUtils, 'extract').mockImplementation()
-    const removeSpy = jest.spyOn(fsUtils, 'remove').mockImplementation()
+    const removeSpy = jest.spyOn(components.fs, 'unlink').mockImplementation()
 
-    await init.main({ args: { _: [], '--yes': true } })
+    await init.main({ args: { _: [], '--yes': true }, components })
 
     expect(confirmSpy).not.toBeCalled()
     expect(downloadSpy).toBeCalled()
@@ -63,8 +68,10 @@ describe('init command', () => {
       throw new Error()
     })
 
+    const components = initComponents()
+
     try {
-      await init.main({ args: { _: [], '--yes': true } })
+      await init.main({ args: { _: [], '--yes': true }, components })
     } catch (e) {
       expect(e).toBeInstanceOf(CliError)
     }
