@@ -92,6 +92,9 @@ async function run(fileName: string) {
             }
 
             return { data: [] }
+          },
+          async crdtGetState(_payload: { data: Uint8Array }): Promise<{ data: Uint8Array[] }> {
+            return { data: [] }
           }
         }
       }

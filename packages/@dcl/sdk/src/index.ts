@@ -2,12 +2,7 @@
 
 import { engine } from '@dcl/ecs'
 import { pollEvents, setSubscribeFunction } from './observables'
-import {
-  subscribe,
-  sendBatch,
-  crdtSendToRenderer,
-  crdtGetState
-} from '~system/EngineApi'
+import { subscribe, sendBatch, crdtSendToRenderer, crdtGetState } from '~system/EngineApi'
 import { createRendererTransport } from './internal/transports/rendererTransport'
 
 // Attach CRDT transport
@@ -23,6 +18,10 @@ export async function onUpdate(deltaTime: number) {
   await pollEvents(sendBatch)
 }
 
+/**
+ * @internal
+ * Function that is called before the first update and after the evaluation of the code.
+ */
 export async function onStart() {
   await engine.seal()
 
