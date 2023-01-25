@@ -7,11 +7,10 @@ import {
   PBUiDropdown
 } from '@dcl/ecs'
 import React from 'react'
-import { Callback } from './components'
-import { CommonProps } from './components/types'
+import { Callback, Children, Key } from './components'
 
-export type EcsElements = {
-  entity: Partial<EntityComponents & CommonProps>
+export interface EcsElements {
+  entity: Partial<EntityComponents> & { children?: Children; key?: Key }
 }
 
 export type EntityComponents = {
@@ -24,6 +23,9 @@ export type EntityComponents = {
   onMouseUp: Callback
 }
 
+/**
+ * @hidden
+ */
 export namespace JSX {
   // eslint-disable-next-line @typescript-eslint/ban-types
   export type Element = {} | null
@@ -31,6 +33,9 @@ export namespace JSX {
   export interface Component {}
 }
 
+/**
+ * @public
+ */
 export namespace ReactEcs {
   export namespace JSX {
     // eslint-disable-next-line @typescript-eslint/ban-types

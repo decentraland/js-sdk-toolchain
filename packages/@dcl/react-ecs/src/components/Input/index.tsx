@@ -19,8 +19,21 @@ function parseUiInput(props: Partial<UiInputProps>): PBUiInput {
 
 /**
  * @public
- */
-/*#__PURE__*/
+ * Input component
+ *
+ * An Input is a field used to obtain a response from a user.
+ *
+ * @example
+    <Input
+      placeholder="Please enter your email"
+      onChange={(value) => {
+        email = value
+      }}
+      uiBackground={{ color: Color4.Red() }}
+      uiTransform={{ width: 200, height: 36 }}
+    />
+ *
+ */ /*#__PURE__*/
 export function Input(props: EntityPropTypes & Partial<UiInputProps>) {
   const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...otherProps } =
     props

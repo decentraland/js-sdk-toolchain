@@ -11,9 +11,9 @@ import {
   ReactEcs,
   createReactBasedUiSystem,
   Button,
-  CANVAS_ROOT_ENTITY,
   UiButtonProps
 } from '../../packages/@dcl/react-ecs/src'
+import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 import { Color4 } from '../../packages/@dcl/sdk/math'
 
 describe('Button React Ecs', () => {
@@ -34,10 +34,10 @@ describe('Button React Ecs', () => {
     const getBackground = (entity: Entity) => UiBackground.getOrNull(entity)
     let text = 'CASLA'
     let color: Color4 | undefined = undefined
-    let type: UiButtonProps['type'] = 'primary'
+    let type: UiButtonProps['variant'] = 'primary'
     const ui = () => (
       <Button
-        type={type}
+        variant={type}
         uiTransform={{ width: 100 }}
         value={text}
         color={color}

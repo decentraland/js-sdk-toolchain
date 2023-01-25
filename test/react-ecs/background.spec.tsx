@@ -14,9 +14,9 @@ import {
   UiEntity,
   createReactBasedUiSystem,
   ReactBasedUiSystem,
-  CANVAS_ROOT_ENTITY,
   UiBackgroundProps
 } from '../../packages/@dcl/react-ecs/src'
+import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 
 describe('UiBackground React Ecs', () => {
   let engine: IEngine

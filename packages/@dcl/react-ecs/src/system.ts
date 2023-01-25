@@ -1,15 +1,24 @@
 import type { IEngine, PointerEventsSystem } from '@dcl/ecs'
 
-import type { JSX } from './react-ecs'
+import type { ReactEcs } from './react-ecs'
 import { createReconciler } from './reconciler'
 
-export type UiComponent = () => JSX.Element
+/**
+ * @public
+ */
+export type UiComponent = () => ReactEcs.JSX.Element
 
-export type ReactBasedUiSystem = {
+/**
+ * @public
+ */
+export interface ReactBasedUiSystem {
   destroy(): void
   setUiRenderer(ui: UiComponent): void
 }
 
+/**
+ * @internal
+ */
 export function createReactBasedUiSystem(
   engine: IEngine,
   pointerSystem: PointerEventsSystem

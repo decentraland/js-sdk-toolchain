@@ -11,9 +11,9 @@ import {
   createReactBasedUiSystem,
   ReactBasedUiSystem,
   ReactEcs,
-  UiEntity,
-  CANVAS_ROOT_ENTITY
+  UiEntity
 } from '../../packages/@dcl/react-ecs/src'
+import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 
 describe('RectEcs UI ✨', () => {
   let engine: IEngine

@@ -11,10 +11,10 @@ import {
   ReactEcs,
   createReactBasedUiSystem,
   Label,
-  CANVAS_ROOT_ENTITY,
   UiFontType,
   TextAlignType
 } from '../../packages/@dcl/react-ecs/src'
+import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 import { Color4 } from '../../packages/@dcl/sdk/math'
 
 describe('UiText React Ecs', () => {

@@ -1,12 +1,12 @@
 import type { Entity } from '@dcl/ecs'
-import { CommonProps, Listeners } from '../components'
+import { Children, Key, Listeners } from '../components'
 import type { EntityComponents } from '../react-ecs'
 
 export type EngineComponents = Omit<EntityComponents, keyof Listeners>
 
 export type OpaqueHandle = any
 export type Type = 'entity'
-export type Props = EntityComponents & CommonProps
+export type Props = EntityComponents & { children?: Children; key?: Key }
 export type Container = Document | Instance | any
 export type Instance = {
   entity: Entity

@@ -135,8 +135,8 @@ export const BorderRect: {
     decode(input: _m0.Reader | Uint8Array, length?: number): BorderRect;
 };
 
-// @public (undocumented)
-export function Button(props: EntityPropTypes & UiButtonProps): ReactEcs.JSX.Element;
+// @public
+export function Button(props: UiButtonProps): ReactEcs.JSX.Element;
 
 // @public (undocumented)
 export type ByteBuffer = {
@@ -196,9 +196,7 @@ export type ByteBuffer = {
     setUint64(offset: number, value: bigint): void;
 };
 
-// Warning: (ae-missing-release-tag) "Callback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public
 export type Callback = () => void;
 
 // @public (undocumented)
@@ -216,11 +214,6 @@ export const enum CameraType {
     // (undocumented)
     CT_THIRD_PERSON = 1
 }
-
-// Warning: (ae-missing-release-tag) "CANVAS_ROOT_ENTITY" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const CANVAS_ROOT_ENTITY = 0;
 
 // Warning: (ae-missing-release-tag) "Children" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -388,14 +381,6 @@ export type Color4Type = {
     a: number;
 };
 
-// Warning: (ae-missing-release-tag) "CommonProps" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type CommonProps = {
-    key?: Key;
-    children?: Children;
-};
-
 // @public (undocumented)
 export type ComponentDefinition<T> = {
     readonly componentId: number;
@@ -501,11 +486,6 @@ export function createPointerEventSystem(engine: IEngine, inputSystem: IInputSys
     onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
 };
 
-// Warning: (ae-missing-release-tag) "createReactBasedUiSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function createReactBasedUiSystem(engine: IEngine, pointerSystem: PointerEventsSystem): ReactBasedUiSystem;
-
 // Warning: (ae-missing-release-tag) "createTaskSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -591,15 +571,33 @@ export type DeleteEntityMessageBody = {
 // @public (undocumented)
 export type DisplayType = 'flex' | 'none';
 
-// @public (undocumented)
-export function Dropdown(props: EntityPropTypes & UiDropdownProps): ReactEcs.JSX.Element;
+// Warning: (tsdoc-html-tag-missing-string) The HTML element has an invalid attribute: Expecting an HTML string starting with a single-quote or double-quote character
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+//
+// @public
+export function Dropdown(props: UiDropdownProps): ReactEcs.JSX.Element;
 
 // Warning: (ae-missing-release-tag) "EcsElements" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type EcsElements = {
-    entity: Partial<EntityComponents & CommonProps>;
-};
+export interface EcsElements {
+    // (undocumented)
+    entity: Partial<EntityComponents> & {
+        children?: Children;
+        key?: Key;
+    };
+}
 
 // @public (undocumented)
 export function Engine(options?: IEngineOptions): IEngine;
@@ -659,11 +657,12 @@ export type EntityContainer = {
     updateUsedEntity(entity: Entity): boolean;
 };
 
-// @public (undocumented)
-export type EntityPropTypes = {
-    uiTransform?: UiTransformProps;
+// @public
+export interface EntityPropTypes extends Listeners {
+    key?: Key;
     uiBackground?: UiBackgroundProps;
-} & Listeners & Pick<CommonProps, 'key'>;
+    uiTransform?: UiTransformProps;
+}
 
 // @public (undocumented)
 export enum EntityState {
@@ -1000,7 +999,23 @@ export type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
 }[keyof T];
 
-// @public (undocumented)
+// Warning: (tsdoc-html-tag-missing-string) The HTML element has an invalid attribute: Expecting an HTML string starting with a single-quote or double-quote character
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+//
+// @public
 export function Input(props: EntityPropTypes & Partial<UiInputProps>): ReactEcs.JSX.Element;
 
 // Warning: (ae-missing-release-tag) "InputAction" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -1070,11 +1085,7 @@ export type ISchema<T = any> = {
     extend?: (base?: T) => T;
 };
 
-// Warning: (ae-missing-release-tag) "isListener" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const isListener: (key: string) => key is keyof Listeners;
-
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@hidden" is not defined in this configuration
 // Warning: (ae-missing-release-tag) "JSX" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -1091,17 +1102,22 @@ export namespace JSX {
 // @public (undocumented)
 export type JustifyType = 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
 
-// Warning: (ae-missing-release-tag) "Key" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public
 export type Key = number | string;
 
-// @public (undocumented)
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-html-tag-missing-string) The HTML element has an invalid attribute: Expecting an HTML string starting with a single-quote or double-quote character
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+//
+// @public
 export function Label(props: EntityPropTypes & UiLabelProps): ReactEcs.JSX.Element;
 
-// Warning: (ae-missing-release-tag) "Listeners" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public
 export type Listeners = {
     onMouseDown?: Callback;
     onMouseUp?: Callback;
@@ -1594,7 +1610,7 @@ export const onVideoEvent: Observable<{
     totalVideoLength: number;
 }>;
 
-// @public (undocumented)
+// @public
 export type OverflowType = 'hidden' | 'scroll' | 'visible';
 
 // Warning: (ae-missing-release-tag) "PBAnimationState" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2617,20 +2633,22 @@ export const enum PointerEventType {
 // @public (undocumented)
 export const PointerLock: ComponentDefinition<PBPointerLock>;
 
-// @public (undocumented)
-export type Position = {
-    top: PositionUnit;
-    right: PositionUnit;
+// @public
+export interface Position {
+    // (undocumented)
     bottom: PositionUnit;
+    // (undocumented)
     left: PositionUnit;
-};
+    // (undocumented)
+    right: PositionUnit;
+    // (undocumented)
+    top: PositionUnit;
+}
 
-// @public (undocumented)
+// @public
 export type PositionType = 'absolute' | 'relative';
 
-// Warning: (ae-missing-release-tag) "PositionUnit" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public
 export type PositionUnit = `${number}px` | `${number}%` | number;
 
 // Warning: (ae-missing-release-tag) "PutComponentMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2775,16 +2793,14 @@ export type RaycastResponsePayload<T> = {
 // @public (undocumented)
 export const RaycastResult: ComponentDefinition<PBRaycastResult>;
 
-// Warning: (ae-missing-release-tag) "ReactBasedUiSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
-export type ReactBasedUiSystem = {
+export interface ReactBasedUiSystem {
+    // (undocumented)
     destroy(): void;
+    // (undocumented)
     setUiRenderer(ui: UiComponent): void;
-};
+}
 
-// Warning: (ae-missing-release-tag) "ReactEcs" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export namespace ReactEcs {
     // (undocumented)
@@ -2801,9 +2817,11 @@ export namespace ReactEcs {
     createElement: any;
 }
 
-// Warning: (ae-missing-release-tag) "ReactEcsRenderer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (tsdoc-at-sign-in-word) The "@" character looks like part of a TSDoc tag; use a backslash to escape it
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
 //
-// @public (undocumented)
+// @public
 export const ReactEcsRenderer: ReactBasedUiSystem;
 
 // @public (undocumented)
@@ -3100,51 +3118,56 @@ export type Transport = {
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
-// @public (undocumented)
-export type UiAvatarTexture = {
-    avatarTexture?: {
-        userId: string;
-        wrapMode?: TextureWrapType;
-        filterMode?: TextureFilterType;
-    };
-};
+// @public
+export interface UiAvatarTexture {
+    // (undocumented)
+    filterMode?: TextureFilterType;
+    // (undocumented)
+    userId: string;
+    // (undocumented)
+    wrapMode?: TextureWrapType;
+}
 
 // @public (undocumented)
 export const UiBackground: ComponentDefinition<PBUiBackground>;
 
-// @public (undocumented)
-export type UiBackgroundProps = {
+// @public
+export interface UiBackgroundProps {
+    avatarTexture?: UiAvatarTexture;
     color?: PBColor4 | undefined;
+    texture?: UiTexture;
+    // (undocumented)
     textureMode?: TextureMode;
     textureSlices?: BorderRect | undefined;
     uvs?: number[];
-} & UiTextureUnion;
+}
+
+// @public
+export interface UiButtonProps extends UiLabelProps, EntityPropTypes {
+    variant?: 'primary' | 'secondary';
+}
 
 // @public (undocumented)
-export type UiButtonProps = UiLabelProps & {
-    type?: 'primary' | 'secondary';
-};
-
-// Warning: (ae-missing-release-tag) "UiComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type UiComponent = () => JSX.Element;
+export type UiComponent = () => ReactEcs.JSX.Element;
 
 // @public (undocumented)
 export const UiDropdown: ComponentDefinition<PBUiDropdown>;
 
-// @public (undocumented)
-export type UiDropdownProps = Partial<Omit<PBUiDropdown, 'textAlign' | 'font'>> & {
-    onChange?(value: number): void;
+// @public
+export interface UiDropdownProps extends EntityPropTypes, Omit<Partial<PBUiDropdown>, 'textAlign' | 'font'> {
+    // (undocumented)
     font?: UiFontType;
+    // (undocumented)
+    onChange?(value: number): void;
+    // (undocumented)
     textAlign?: TextAlignType;
-};
+}
 
 // @public (undocumented)
 export const UiDropdownResult: ComponentDefinition<PBUiDropdownResult>;
 
 // @public (undocumented)
-export function UiEntity(props: EntityPropTypes & Partial<CommonProps>): ReactEcs.JSX.Element;
+export function UiEntity(props: EntityPropTypes): ReactEcs.JSX.Element;
 
 // @public (undocumented)
 export type UiFontType = 'sans-serif' | 'serif' | 'monospace';
@@ -3153,20 +3176,25 @@ export type UiFontType = 'sans-serif' | 'serif' | 'monospace';
 export const UiInput: ComponentDefinition<PBUiInput>;
 
 // @public (undocumented)
-export type UiInputProps = Omit<PBUiInput, 'font' | 'textAlign'> & {
-    onChange?(value: string): void;
+export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign'> {
+    // (undocumented)
     font?: UiFontType;
+    onChange?(value: string): void;
+    // (undocumented)
     textAlign?: TextAlignType;
-};
+}
 
 // @public (undocumented)
 export const UiInputResult: ComponentDefinition<PBUiInputResult>;
 
-// @public (undocumented)
-export type UiLabelProps = Omit<PBUiText, 'textAlign' | 'font'> & {
-    textAlign?: TextAlignType | undefined;
+// @public
+export interface UiLabelProps {
+    color?: PBColor4 | undefined;
     font?: UiFontType | undefined;
-};
+    fontSize?: number | undefined;
+    textAlign?: TextAlignType | undefined;
+    value: string;
+}
 
 // Warning: (ae-missing-release-tag) "Uint32" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -3179,66 +3207,39 @@ export type uint32 = number;
 // @public (undocumented)
 export const UiText: ComponentDefinition<PBUiText>;
 
-// @public (undocumented)
+// @public
 export type UiTexture = {
-    texture?: {
-        src: string;
-        wrapMode?: TextureWrapType;
-        filterMode?: TextureFilterType;
-    };
+    src: string;
+    wrapMode?: TextureWrapType;
+    filterMode?: TextureFilterType;
 };
-
-// @public (undocumented)
-export type UiTextureUnion = UiAvatarTexture | UiTexture;
 
 // @public (undocumented)
 export const UiTransform: ComponentDefinition<PBUiTransform>;
 
-// @public (undocumented)
+// @public
 export interface UiTransformProps {
-    // (undocumented)
     alignContent?: AlignType;
-    // (undocumented)
     alignItems?: AlignType;
-    // (undocumented)
     alignSelf?: AlignType;
-    // (undocumented)
     display?: DisplayType;
-    // (undocumented)
     flex?: number;
-    // (undocumented)
     flexBasis?: number;
-    // (undocumented)
     flexDirection?: FlexDirectionType;
-    // (undocumented)
     flexGrow?: number;
-    // (undocumented)
     flexShrink?: number;
-    // (undocumented)
     flexWrap?: FlexWrapType;
-    // (undocumented)
     height?: PositionUnit;
-    // (undocumented)
     justifyContent?: JustifyType;
-    // (undocumented)
     margin?: Partial<Position>;
-    // (undocumented)
     maxHeight?: PositionUnit;
-    // (undocumented)
     maxWidth?: PositionUnit;
-    // (undocumented)
     minHeight?: PositionUnit;
-    // (undocumented)
     minWidth?: PositionUnit;
-    // (undocumented)
     overflow?: OverflowType;
-    // (undocumented)
     padding?: Partial<Position>;
-    // (undocumented)
     position?: Partial<Position>;
-    // (undocumented)
     positionType?: PositionType;
-    // (undocumented)
     width?: PositionUnit;
 }
 

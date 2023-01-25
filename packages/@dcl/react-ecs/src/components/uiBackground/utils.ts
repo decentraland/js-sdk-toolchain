@@ -6,8 +6,6 @@ import {
 } from '@dcl/ecs'
 import {
   UiBackgroundProps,
-  UiTexture,
-  UiAvatarTexture,
   TextureWrapType,
   TextureFilterType,
   TextureMode
@@ -30,25 +28,13 @@ export function getTextureMode(
   return { textureMode: value }
 }
 
-function isAvatarTexture(
-  props: UiBackgroundProps
-): props is UiBackgroundProps & UiAvatarTexture {
-  return !!(props as UiAvatarTexture).avatarTexture
-}
-
-function isTexture(
-  props: UiBackgroundProps
-): props is UiBackgroundProps & UiTexture {
-  return !!(props as UiTexture).texture
-}
-
 /**
  * @internal
  */
 export function getTexture(
   props: UiBackgroundProps
 ): PBUiBackground['texture'] {
-  if (isTexture(props) && props.texture) {
+  if (props.texture) {
     return {
       tex: {
         $case: 'texture',
@@ -57,7 +43,7 @@ export function getTexture(
     }
   }
 
-  if (isAvatarTexture(props) && props.avatarTexture) {
+  if (props.avatarTexture) {
     return {
       tex: {
         $case: 'avatarTexture',

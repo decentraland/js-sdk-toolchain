@@ -13,6 +13,9 @@ import { UiTransformProps } from './types'
 import { YGAlign, YGUnit } from '@dcl/ecs'
 import { PBUiTransform } from '@dcl/ecs/dist/components'
 
+/**
+ * @internal
+ */
 export const CANVAS_ROOT_ENTITY = 0
 
 const defaultUiTransform: Omit<

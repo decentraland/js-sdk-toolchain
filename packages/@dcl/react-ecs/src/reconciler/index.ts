@@ -9,7 +9,7 @@ import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
 import { isListener, Listeners } from '../components'
 import { CANVAS_ROOT_ENTITY } from '../components/uiTransform'
-import { JSX } from '../react-ecs'
+import { ReactEcs } from '../react-ecs'
 import {
   Changes,
   Container,
@@ -357,7 +357,7 @@ export function createReconciler(
   }
 
   return {
-    update: function (component: JSX.Element) {
+    update: function (component: ReactEcs.JSX.Element) {
       if (changeEvents.size) {
         handleOnChange(UiInput.componentId, UiInputResult)
         handleOnChange(UiDropdown.componentId, UiDropdownResult)
