@@ -65,22 +65,14 @@ export function createEcsConfig(_options: { PROD: boolean }): RollupOptions {
   }
 }
 
-export function createSceneConfig(options: {
-  PROD: boolean
-  single?: string
-}): RollupOptions {
+export function createSceneConfig(options: { PROD: boolean; single?: string }): RollupOptions {
   const sceneJsonPath = sys.resolvePath('./scene.json')
   const sceneJson = JSON.parse(sys.readFile(sceneJsonPath)!)
 
   console.assert(sceneJson.main, 'scene.json .main must be present')
-  console.assert(
-    sceneJson.runtimeVersion === '7',
-    'scene.json `"runtimeVersion": "7"` must be present'
-  )
+  console.assert(sceneJson.runtimeVersion === '7', 'scene.json `"runtimeVersion": "7"` must be present')
 
-  const out = !options.single
-    ? sceneJson.main
-    : options.single.replace(/\.ts$/, '.js')
+  const out = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
 
   return {
     external: [/~system\//],
@@ -104,9 +96,7 @@ export function createSceneConfig(options: {
           window: 'undefined',
           DEBUG: options.PROD ? 'false' : 'true',
           'globalThis.DEBUG': options.PROD ? 'false' : 'true',
-          'process.env.NODE_ENV': JSON.stringify(
-            options.PROD ? 'production' : 'development'
-          )
+          'process.env.NODE_ENV': JSON.stringify(options.PROD ? 'production' : 'development')
         },
         preventAssignment: true
       }),
@@ -154,10 +144,7 @@ export function createSceneConfig(options: {
               // for that reason we first get the dist folder in which the sourceMaps are
               const distFolder = path.dirname(path.resolve(sceneJson.main))
               // then we resolve the file, relative to distFolder
-              const absoluteSourcePath = path.resolve(
-                distFolder,
-                distRelativeSourcePath
-              )
+              const absoluteSourcePath = path.resolve(distFolder, distRelativeSourcePath)
               // then we convert it to a URL
               const url = pathToFileURL(absoluteSourcePath).toString()
 
@@ -178,9 +165,7 @@ export function createSceneConfig(options: {
   }
 }
 
-export function createPlaygroundEcsConfig(_options: {
-  PROD: boolean
-}): RollupOptions {
+export function createPlaygroundEcsConfig(_options: { PROD: boolean }): RollupOptions {
   const packageJsonPath = sys.resolvePath('./package.json')
   const packageJson = JSON.parse(sys.readFile(packageJsonPath)!)
 

@@ -61,9 +61,7 @@ const entityComponent: EntityComponents = {
   uiInput: undefined as any,
   uiDropdown: undefined as any
 }
-export const componentKeys: (keyof EntityComponents)[] = Object.keys(
-  entityComponent
-) as (keyof EntityComponents)[]
+export const componentKeys: (keyof EntityComponents)[] = Object.keys(entityComponent) as (keyof EntityComponents)[]
 
 export function isEqual<T = unknown>(val1: T, val2: T): boolean {
   if (!val1 && !val2) {
@@ -160,20 +158,11 @@ export const noopConfig = {
     return null
   },
   /* istanbul ignore next */
-  commitMount(
-    _instance: Instance,
-    _type: Type,
-    _props: Props,
-    _internalInstanceHandle: OpaqueHandle
-  ): void {},
+  commitMount(_instance: Instance, _type: Type, _props: Props, _internalInstanceHandle: OpaqueHandle): void {},
   /* istanbul ignore next */
   resetTextContent(_instance: Instance): void {},
   /* istanbul ignore next */
-  commitTextUpdate(
-    _textInstance: TextInstance,
-    _oldText: string,
-    _newText: string
-  ): void {},
+  commitTextUpdate(_textInstance: TextInstance, _oldText: string, _newText: string): void {},
   prepareForCommit(_containerInfo: Container): Record<string, any> | null {
     return null
   },
@@ -200,11 +189,7 @@ export const noopConfig = {
   getRootHostContext(_rootContainer: Container): HostContext | null {
     return null
   },
-  getChildHostContext(
-    _parentHostContext: HostContext,
-    _type: Type,
-    _rootContainer: Container
-  ): HostContext {
+  getChildHostContext(_parentHostContext: HostContext, _type: Type, _rootContainer: Container): HostContext {
     /* istanbul ignore next */
     return null
   },

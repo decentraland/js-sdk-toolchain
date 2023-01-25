@@ -11,12 +11,7 @@ import {
 } from '@dcl/sdk/ecs'
 
 // Cube factory
-function createCube(
-  x: number,
-  y: number,
-  z: number,
-  pointerEvents: PBPointerEvents_Entry[]
-): Entity {
+function createCube(x: number, y: number, z: number, pointerEvents: PBPointerEvents_Entry[]): Entity {
   const meshEntity = engine.addEntity()
   Transform.create(meshEntity, { position: { x, y, z } })
   MeshRenderer.create(meshEntity, { mesh: { $case: 'box', box: { uvs: [] } } })

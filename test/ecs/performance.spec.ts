@@ -25,11 +25,7 @@ describe.skip('Performance.', () => {
     }
     performance.mark('end-create-entities')
 
-    const EntitiesCreation = performance.measure(
-      'Entities creation',
-      'create-entities',
-      'end-create-entities'
-    )
+    const EntitiesCreation = performance.measure('Entities creation', 'create-entities', 'end-create-entities')
 
     function doorSystem() {
       for (const [entity] of engine.getEntitiesWith(components.Door)) {
@@ -38,15 +34,12 @@ describe.skip('Performance.', () => {
     }
 
     function transformSystem() {
-      for (const [
-        entity,
-        readonlyPosition,
-        readonlyTransform
-      ] of engine.getEntitiesWith(components.Position, Transform)) {
-        Transform.getMutable(entity).position.x =
-          readonlyPosition.x + Math.random() * 10
-        components.Position.getMutable(entity).y =
-          readonlyTransform.position.y + Math.random() * 10
+      for (const [entity, readonlyPosition, readonlyTransform] of engine.getEntitiesWith(
+        components.Position,
+        Transform
+      )) {
+        Transform.getMutable(entity).position.x = readonlyPosition.x + Math.random() * 10
+        components.Position.getMutable(entity).y = readonlyTransform.position.y + Math.random() * 10
       }
     }
 
@@ -59,11 +52,7 @@ describe.skip('Performance.', () => {
     }
     performance.mark('end-update')
 
-    const EngineUpdate = performance.measure(
-      'Engine Updates',
-      'update',
-      'end-update'
-    )
+    const EngineUpdate = performance.measure('Engine Updates', 'update', 'end-update')
 
     console.log(EntitiesCreation)
     console.log(EngineUpdate)

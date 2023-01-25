@@ -1,14 +1,7 @@
 import { exec } from 'child_process'
 import { sync as globSync } from 'glob'
 import { resolve, relative } from 'path'
-import {
-  existsSync,
-  readFileSync,
-  writeFileSync,
-  lstatSync,
-  removeSync,
-  copySync
-} from 'fs-extra'
+import { existsSync, readFileSync, writeFileSync, lstatSync, removeSync, copySync } from 'fs-extra'
 import { sync as rimraf } from 'rimraf'
 
 /**
@@ -29,28 +22,16 @@ export function ensureFileExistsSilent(file: string, root?: string) {
   return existsSync(x) ? x : false
 }
 
-export function runCommand(
-  command: string,
-  cwd: string,
-  env?: Record<string, string>
-): Promise<string> {
+export function runCommand(command: string, cwd: string, env?: Record<string, string>): Promise<string> {
   return new Promise<string>((onSuccess, onError) => {
     process.stdout.write(
-      '\u001b[36min ' +
-        relative(process.cwd(), cwd) +
-        ':\u001b[0m ' +
-        relative(process.cwd(), command) +
-        '\n'
+      '\u001b[36min ' + relative(process.cwd(), cwd) + ':\u001b[0m ' + relative(process.cwd(), command) + '\n'
     )
     exec(command, { cwd, env }, (error, stdout, stderr) => {
-      stdout.trim().length &&
-        process.stdout.write('  ' + stdout.replace(/\n/g, '\n  ') + '\n')
-      stderr.trim().length &&
-        process.stderr.write('! ' + stderr.replace(/\n/g, '\n  ') + '\n')
+      stdout.trim().length && process.stdout.write('  ' + stdout.replace(/\n/g, '\n  ') + '\n')
+      stderr.trim().length && process.stderr.write('! ' + stderr.replace(/\n/g, '\n  ') + '\n')
       if (error) {
-        onError(
-          stderr || stdout || 'command "' + command + '" failed to execute'
-        )
+        onError(stderr || stdout || 'command "' + command + '" failed to execute')
       } else {
         onSuccess(stdout)
       }
@@ -58,11 +39,7 @@ export function runCommand(
   })
 }
 
-export function itExecutes(
-  command: string,
-  cwd: string,
-  env?: Record<string, string>
-) {
+export function itExecutes(command: string, cwd: string, env?: Record<string, string>) {
   it(command, async () => await runCommand(command, cwd, env), 60000)
 }
 
@@ -85,16 +62,9 @@ export function readJson(file: string, cwd: string): any {
   return JSON.parse(readFileSync(resolve(cwd, file)).toString())
 }
 
-export function patchJson(
-  file: string,
-  cwd: string,
-  redux: (previous: any) => any
-): any {
+export function patchJson(file: string, cwd: string, redux: (previous: any) => any): any {
   const path = resolve(cwd, file)
-  return writeFileSync(
-    path,
-    JSON.stringify(redux(JSON.parse(readFileSync(path).toString())), null, 2)
-  )
+  return writeFileSync(path, JSON.stringify(redux(JSON.parse(readFileSync(path).toString())), null, 2))
 }
 
 export function itInstallsADependencyFromFolderAndCopiesTheVersion(
@@ -132,12 +102,7 @@ export function itInstallsADependencyFromFolderAndCopiesTheVersion(
 }
 
 export function copyFile(from: string, to: string) {
-  process.stdout.write(
-    `> copying ${relative(process.cwd(), from)} to ${relative(
-      process.cwd(),
-      to
-    )}\n`
-  )
+  process.stdout.write(`> copying ${relative(process.cwd(), from)} to ${relative(process.cwd(), to)}\n`)
 
   if (!existsSync(from)) {
     throw new Error(`${from} does not exist`)
@@ -162,10 +127,7 @@ export async function delay(timeMs: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, timeMs))
 }
 
-export async function waitForFileExist(
-  filePath: string,
-  timeoutMs: number = 120000
-) {
+export async function waitForFileExist(filePath: string, timeoutMs: number = 120000) {
   const stepMs = 1000
   let remaining = timeoutMs
   while (remaining > 0 && !existsSync(filePath)) {

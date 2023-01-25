@@ -1,15 +1,24 @@
 {
   "compilerOptions": {
+    "target": "ES2017",
     "module": "commonjs",
     "esModuleInterop": true,
     "declaration": true,
+    "noUnusedLocals": true,
     "stripInternal": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true,
+    "strict": true,
     "types": [
       "node",
+    ],
+    "lib": [
+      "es2016"
     ],
     "outDir": "./cli"
   },
   "include": ["cli"],
-  "exclude": ["dist"],
+  "exclude": ["dist", "**/proto"],
   "extends": "./types/tsconfig.ecs7.strict.json"
 }

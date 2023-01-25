@@ -20,12 +20,7 @@ export const CANVAS_ROOT_ENTITY = 0
 
 const defaultUiTransform: Omit<
   PBUiTransform,
-  | 'display'
-  | 'justifyContent'
-  | 'alignSelf'
-  | 'overflow'
-  | 'flexDirection'
-  | 'positionType'
+  'display' | 'justifyContent' | 'alignSelf' | 'overflow' | 'flexDirection' | 'positionType'
 > = {
   parent: CANVAS_ROOT_ENTITY,
   rightOf: 0,
@@ -75,15 +70,7 @@ const defaultUiTransform: Omit<
  */
 /*#__PURE__*/
 export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
-  const {
-    height,
-    minHeight,
-    maxHeight,
-    width,
-    minWidth,
-    maxWidth,
-    ...otherProps
-  } = props
+  const { height, minHeight, maxHeight, width, minWidth, maxWidth, ...otherProps } = props
   return {
     ...defaultUiTransform,
     ...otherProps,

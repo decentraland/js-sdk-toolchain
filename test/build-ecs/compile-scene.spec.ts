@@ -1,9 +1,5 @@
 import { resolve } from 'path'
-import {
-  itExecutes,
-  ensureFileExists,
-  itDeletesFolder
-} from '../../scripts/helpers'
+import { itExecutes, ensureFileExists, itDeletesFolder } from '../../scripts/helpers'
 
 const ecsLocation = resolve(__dirname, '../../packages/@dcl/sdk')
 

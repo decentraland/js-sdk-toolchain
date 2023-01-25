@@ -35,10 +35,7 @@ describe('Legacy component tests', () => {
 
         const transformData = Transform.toBinary(entity)
         const transformOriginal = { ...component }
-        const transformReceveid = Transform.updateFromBinary(
-          entity,
-          transformData
-        )
+        const transformReceveid = Transform.updateFromBinary(entity, transformData)
         expect(transformReceveid).toBeDeepCloseTo(transformOriginal)
       }
 
@@ -46,10 +43,7 @@ describe('Legacy component tests', () => {
       for (const [entity, component] of groupBoxShape) {
         const boxShapeData = MeshRenderer.toBinary(entity)
         const boxShapeOriginal = { ...component }
-        const boxShapeReceveid = MeshRenderer.updateFromBinary(
-          entity,
-          boxShapeData
-        )
+        const boxShapeReceveid = MeshRenderer.updateFromBinary(entity, boxShapeData)
         expect(boxShapeReceveid).toBeDeepCloseTo(boxShapeOriginal)
       }
     }

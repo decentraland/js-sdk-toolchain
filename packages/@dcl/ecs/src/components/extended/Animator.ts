@@ -1,9 +1,6 @@
 import { ComponentDefinition, Entity, IEngine } from '../../engine'
 import { Animator } from '../generated/index.gen'
-import {
-  PBAnimationState,
-  PBAnimator
-} from '../generated/pb/decentraland/sdk/components/animator.gen'
+import { PBAnimationState, PBAnimator } from '../generated/pb/decentraland/sdk/components/animator.gen'
 
 /**
  * @public
@@ -13,8 +10,7 @@ export type AnimatorComponentDefinition = ComponentDefinition<PBAnimator>
 /**
  * @public
  */
-export interface AnimatorComponentDefinitionExtended
-  extends AnimatorComponentDefinition {
+export interface AnimatorComponentDefinitionExtended extends AnimatorComponentDefinition {
   /**
    * @public
    *
@@ -44,11 +40,7 @@ export interface AnimatorComponentDefinitionExtended
    * @param resetCursor - the animation starts at 0 or continues from the current cursor position
    * @returns true in successful playing, false if it doesn't find the Animator or clip
    */
-  playSingleAnimation(
-    entity: Entity,
-    name: string,
-    resetCursor?: boolean
-  ): boolean
+  playSingleAnimation(entity: Entity, name: string, resetCursor?: boolean): boolean
 
   /**
    * @public
@@ -69,16 +61,11 @@ export function defineAnimatorComponent(
   /**
    * @returns The tuple [animator, clip]
    */
-  function getClipAndAnimator(
-    entity: Entity,
-    name: string
-  ): [PBAnimator | null, PBAnimationState | null] {
+  function getClipAndAnimator(entity: Entity, name: string): [PBAnimator | null, PBAnimationState | null] {
     const anim = theComponent.getMutableOrNull(entity)
     if (!anim) return [null, null]
 
-    const state = anim.states.find(
-      (item) => item.name === name || item.clip === name
-    )
+    const state = anim.states.find((item) => item.name === name || item.clip === name)
     if (!state) return [anim, null]
     return [anim, state]
   }
@@ -97,18 +84,12 @@ export function defineAnimatorComponent(
       }
 
       if (!state) {
-        throw new Error(
-          `The Animator component of ${entity} has no the state ${name}`
-        )
+        throw new Error(`The Animator component of ${entity} has no the state ${name}`)
       }
 
       return state
     },
-    playSingleAnimation(
-      entity: Entity,
-      name: string,
-      shouldReset: boolean = true
-    ): boolean {
+    playSingleAnimation(entity: Entity, name: string, shouldReset: boolean = true): boolean {
       const [animator, state] = getClipAndAnimator(entity, name)
       if (!animator || !state) return false
 

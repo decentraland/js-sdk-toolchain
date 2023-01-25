@@ -22,13 +22,7 @@ export type DisplayType = 'flex' | 'none'
 /**
  * @public
  */
-export type JustifyType =
-  | 'flex-start'
-  | 'center'
-  | 'flex-end'
-  | 'space-between'
-  | 'space-around'
-  | 'space-evenly'
+export type JustifyType = 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly'
 /**
  * @public
  */
@@ -45,11 +39,7 @@ export type AlignType =
 /**
  * @public
  */
-export type FlexDirectionType =
-  | 'row'
-  | 'column'
-  | 'column-reverse'
-  | 'row-reverse'
+export type FlexDirectionType = 'row' | 'column' | 'column-reverse' | 'row-reverse'
 /**
  * @public
  */

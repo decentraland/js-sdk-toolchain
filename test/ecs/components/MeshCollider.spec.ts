@@ -1,9 +1,5 @@
 import { PBMeshCollider } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/mesh_collider.gen'
-import {
-  Engine,
-  components,
-  ColliderLayer
-} from '../../../packages/@dcl/ecs/src'
+import { Engine, components, ColliderLayer } from '../../../packages/@dcl/ecs/src'
 
 describe('Generated MeshCollider ProtoBuf', () => {
   it('should serialize/deserialize MeshCollider', () => {
@@ -92,10 +88,7 @@ describe('Generated MeshCollider ProtoBuf', () => {
       }
     })
 
-    MeshCollider.setPlane(entity, [
-      ColliderLayer.CL_POINTER,
-      ColliderLayer.CL_PHYSICS
-    ])
+    MeshCollider.setPlane(entity, [ColliderLayer.CL_POINTER, ColliderLayer.CL_PHYSICS])
     expect(MeshCollider.get(entity)).toStrictEqual({
       collisionMask: ColliderLayer.CL_POINTER | ColliderLayer.CL_PHYSICS,
       mesh: {

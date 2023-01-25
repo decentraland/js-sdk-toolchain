@@ -1,13 +1,4 @@
-import {
-  YGAlign,
-  YGDisplay,
-  YGFlexDirection,
-  YGJustify,
-  YGOverflow,
-  YGPositionType,
-  YGUnit,
-  YGWrap
-} from '@dcl/ecs'
+import { YGAlign, YGDisplay, YGFlexDirection, YGJustify, YGOverflow, YGPositionType, YGUnit, YGWrap } from '@dcl/ecs'
 import {
   AlignType,
   FlexDirectionType,
@@ -21,10 +12,7 @@ import {
 } from './types'
 
 function capitalize<T extends string>(value: T): Capitalize<T> {
-  return `${value[0].toUpperCase()}${value.slice(
-    1,
-    value.length
-  )}` as Capitalize<T>
+  return `${value[0].toUpperCase()}${value.slice(1, value.length)}` as Capitalize<T>
 }
 
 type PropName = 'position' | 'margin' | 'padding'
@@ -68,10 +56,7 @@ function parsePositionUnit(val?: PositionUnit): [number | undefined, YGUnit] {
 }
 
 // position: { top: '1px' } => { positionTop: 1, positionTopUnit: YGUnit.YGU_Point }
-export function parsePosition<T extends PropName>(
-  position: Partial<Position> = {},
-  prop: T
-) {
+export function parsePosition<T extends PropName>(position: Partial<Position> = {}, prop: T) {
   const obj: Partial<PositionParsed> = {}
   for (const key in position) {
     const typedKey: keyof Position = key as keyof Position
@@ -87,18 +72,12 @@ export function parsePosition<T extends PropName>(
 
 // Size Props
 type HeightWidth = 'height' | 'width'
-type SizePropName =
-  | HeightWidth
-  | `max${Capitalize<HeightWidth>}`
-  | `min${Capitalize<HeightWidth>}`
+type SizePropName = HeightWidth | `max${Capitalize<HeightWidth>}` | `min${Capitalize<HeightWidth>}`
 type SizePropKeyUnit = `${SizePropName}Unit`
 type SizeReturnType = {
   [key in SizePropName]: number
 } & { [key in SizePropKeyUnit]: YGUnit }
-export function parseSize(
-  val: PositionUnit | undefined,
-  key: SizePropName
-): Partial<SizeReturnType> {
+export function parseSize(val: PositionUnit | undefined, key: SizePropName): Partial<SizeReturnType> {
   const unitKey: SizePropKeyUnit = `${key}Unit`
   const [value, unit] = parsePositionUnit(val)
 
@@ -113,9 +92,7 @@ export function parseSize(
 /**
  * @internal
  */
-export function getDisplay(
-  display: DisplayType | undefined
-): Record<'display', YGDisplay> {
+export function getDisplay(display: DisplayType | undefined): Record<'display', YGDisplay> {
   const value: YGDisplay = display ? parseDisplay[display] : YGDisplay.YGD_FLEX
   return { display: value }
 }
@@ -126,12 +103,8 @@ const parseDisplay: Readonly<Record<DisplayType, YGDisplay>> = {
 /**
  * @internal
  */
-export function getJustify(
-  justify: JustifyType | undefined
-): Record<'justifyContent', YGJustify> {
-  const value: YGJustify = justify
-    ? parseJustify[justify]
-    : YGJustify.YGJ_FLEX_START
+export function getJustify(justify: JustifyType | undefined): Record<'justifyContent', YGJustify> {
+  const value: YGJustify = justify ? parseJustify[justify] : YGJustify.YGJ_FLEX_START
   return { justifyContent: value }
 }
 const parseJustify: Readonly<Record<JustifyType, YGJustify>> = {
@@ -173,26 +146,21 @@ const parseAligns: Readonly<Record<AlignType, YGAlign>> = {
 export function getFlexDirection(
   flexDirection: FlexDirectionType | undefined
 ): Record<'flexDirection', YGFlexDirection> {
-  const value: YGFlexDirection = flexDirection
-    ? parseFlexDirection[flexDirection]
-    : YGFlexDirection.YGFD_ROW
+  const value: YGFlexDirection = flexDirection ? parseFlexDirection[flexDirection] : YGFlexDirection.YGFD_ROW
   return { flexDirection: value }
 }
 
-const parseFlexDirection: Readonly<Record<FlexDirectionType, YGFlexDirection>> =
-  {
-    row: YGFlexDirection.YGFD_ROW,
-    column: YGFlexDirection.YGFD_COLUMN,
-    'row-reverse': YGFlexDirection.YGFD_ROW_REVERSE,
-    'column-reverse': YGFlexDirection.YGFD_COLUMN_REVERSE
-  }
+const parseFlexDirection: Readonly<Record<FlexDirectionType, YGFlexDirection>> = {
+  row: YGFlexDirection.YGFD_ROW,
+  column: YGFlexDirection.YGFD_COLUMN,
+  'row-reverse': YGFlexDirection.YGFD_ROW_REVERSE,
+  'column-reverse': YGFlexDirection.YGFD_COLUMN_REVERSE
+}
 
 /**
  * @internal
  */
-export function getFlexWrap(
-  flexWrap: FlexWrapType | undefined
-): Record<'flexWrap', YGWrap> {
+export function getFlexWrap(flexWrap: FlexWrapType | undefined): Record<'flexWrap', YGWrap> {
   const value: YGWrap = flexWrap ? parseFlexWrap[flexWrap] : YGWrap.YGW_WRAP
   return { flexWrap: value }
 }
@@ -206,12 +174,8 @@ const parseFlexWrap: Readonly<Record<FlexWrapType, YGWrap>> = {
 /**
  * @internal
  */
-export function getOverflow(
-  overflow: OverflowType | undefined
-): Record<'overflow', YGOverflow> {
-  const value: YGOverflow = overflow
-    ? parseOverflow[overflow]
-    : YGOverflow.YGO_VISIBLE
+export function getOverflow(overflow: OverflowType | undefined): Record<'overflow', YGOverflow> {
+  const value: YGOverflow = overflow ? parseOverflow[overflow] : YGOverflow.YGO_VISIBLE
   return { overflow: value }
 }
 
@@ -224,12 +188,8 @@ const parseOverflow: Readonly<Record<OverflowType, YGOverflow>> = {
 /**
  * @internal
  */
-export function getPoistionType(
-  position: PositionType | undefined
-): Record<'positionType', YGPositionType> {
-  const value: YGPositionType = position
-    ? parsePositionType[position]
-    : YGPositionType.YGPT_RELATIVE
+export function getPoistionType(position: PositionType | undefined): Record<'positionType', YGPositionType> {
+  const value: YGPositionType = position ? parsePositionType[position] : YGPositionType.YGPT_RELATIVE
   return { positionType: value }
 }
 
