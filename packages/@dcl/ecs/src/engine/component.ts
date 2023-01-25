@@ -90,22 +90,14 @@ export type ComponentDefinition<T> = {
    * @param data - data to update the entity-component
    * @param markAsDirty - defaults to true
    */
-  upsertFromBinary(
-    entity: Entity,
-    data: ByteBuffer,
-    markAsDirty?: boolean
-  ): T | null
+  upsertFromBinary(entity: Entity, data: ByteBuffer, markAsDirty?: boolean): T | null
   /**
    * @internal
    * @param entity - entity-component to update
    * @param data - data to update the entity-component
    * @param markAsDirty - defaults to true
    */
-  updateFromBinary(
-    entity: Entity,
-    data: ByteBuffer,
-    markAsDirty?: boolean
-  ): T | null
+  updateFromBinary(entity: Entity, data: ByteBuffer, markAsDirty?: boolean): T | null
 
   // allocates a buffer and returns new buffer
   /**
@@ -186,36 +178,22 @@ export function createComponentDefinitionFromSchema<T>(
     get(entity: Entity): DeepReadonly<T> {
       const component = data.get(entity)
       if (!component) {
-        throw new Error(
-          `[getFrom] Component ${componentName} for entity #${entity} not found`
-        )
+        throw new Error(`[getFrom] Component ${componentName} for entity #${entity} not found`)
       }
       return deepReadonly(component)
     },
     create(entity: Entity, value?: T): T {
       const component = data.get(entity)
       if (component) {
-        throw new Error(
-          `[create] Component ${componentName} for ${entity} already exists`
-        )
+        throw new Error(`[create] Component ${componentName} for ${entity} already exists`)
       }
-      const usedValue =
-        value === undefined
-          ? schema.create()
-          : schema.extend
-          ? schema.extend(value)
-          : value
+      const usedValue = value === undefined ? schema.create() : schema.extend ? schema.extend(value) : value
       data.set(entity, usedValue)
       dirtyIterator.add(entity)
       return usedValue
     },
     createOrReplace(entity: Entity, value?: T): T {
-      const usedValue =
-        value === undefined
-          ? schema.create()
-          : schema.extend
-          ? schema.extend(value)
-          : value
+      const usedValue = value === undefined ? schema.create() : schema.extend ? schema.extend(value) : value
       data.set(entity, usedValue!)
       dirtyIterator.add(entity)
       return usedValue!
@@ -231,9 +209,7 @@ export function createComponentDefinitionFromSchema<T>(
     getMutable(entity: Entity): T {
       const component = this.getMutableOrNull(entity)
       if (component === null) {
-        throw new Error(
-          `[mutable] Component ${componentName} for ${entity} not found`
-        )
+        throw new Error(`[mutable] Component ${componentName} for ${entity} not found`)
       }
       return component
     },
@@ -250,9 +226,7 @@ export function createComponentDefinitionFromSchema<T>(
     toBinary(entity: Entity): ByteBuffer {
       const component = data.get(entity)
       if (!component) {
-        throw new Error(
-          `[toBinary] Component ${componentName} for ${entity} not found`
-        )
+        throw new Error(`[toBinary] Component ${componentName} for ${entity} not found`)
       }
 
       const writeBuffer = new ReadWriteByteBuffer()
@@ -272,31 +246,19 @@ export function createComponentDefinitionFromSchema<T>(
     writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void {
       const component = data.get(entity)
       if (!component) {
-        throw new Error(
-          `[writeToByteBuffer] Component ${componentName} for entity #${entity} not found`
-        )
+        throw new Error(`[writeToByteBuffer] Component ${componentName} for entity #${entity} not found`)
       }
 
       schema.serialize(component, buffer)
     },
-    updateFromBinary(
-      entity: Entity,
-      buffer: ByteBuffer,
-      markAsDirty = true
-    ): T | null {
+    updateFromBinary(entity: Entity, buffer: ByteBuffer, markAsDirty = true): T | null {
       const component = data.get(entity)
       if (!component) {
-        throw new Error(
-          `[updateFromBinary] Component ${componentName} for ${entity} not found`
-        )
+        throw new Error(`[updateFromBinary] Component ${componentName} for ${entity} not found`)
       }
       return this.upsertFromBinary(entity, buffer, markAsDirty)
     },
-    upsertFromBinary(
-      entity: Entity,
-      buffer: ByteBuffer,
-      markAsDirty = true
-    ): T | null {
+    upsertFromBinary(entity: Entity, buffer: ByteBuffer, markAsDirty = true): T | null {
       const newValue = schema.deserialize(buffer)
       data.set(entity, newValue)
       if (markAsDirty) {

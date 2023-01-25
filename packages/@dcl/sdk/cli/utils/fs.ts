@@ -7,10 +7,7 @@ import { IFetchComponent } from '../components/fetch'
  * Check's if directory is empty
  * @param dir Directory to check for emptyness
  */
-export async function isDirectoryEmpty(
-  components: { fs: IFileSystemComponent },
-  dir: string
-): Promise<boolean> {
+export async function isDirectoryEmpty(components: { fs: IFileSystemComponent }, dir: string): Promise<boolean> {
   const files = await components.fs.readdir(dir)
   return !files.length
 }

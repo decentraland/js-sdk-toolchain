@@ -1,8 +1,4 @@
-﻿import {
-  Engine,
-  components,
-  BillboardMode
-} from '../../../packages/@dcl/ecs/src'
+﻿import { Engine, components, BillboardMode } from '../../../packages/@dcl/ecs/src'
 
 describe('Generated Billboard ProtoBuf', () => {
   it('should serialize/deserialize Billboard', () => {

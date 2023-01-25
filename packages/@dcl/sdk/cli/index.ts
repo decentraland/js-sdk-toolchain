@@ -1,6 +1,12 @@
 #!/usr/bin/env node
 
+/*
+  istanbul ignore file
+  Doesn't make sense to test this file
+*/
+
 import { getArgs } from './utils/args'
+import { toStringList } from './utils/out-messages'
 import log from './utils/log'
 import { CliError } from './utils/error'
 import { COMMANDS_PATH, getCommands } from './utils/commands'
@@ -20,13 +26,7 @@ interface FileExports {
   args?: ReturnType<typeof getArgs>
 }
 
-const listCommandsStr = (commands: string[]) =>
-  commands
-    .map(
-      ($) => `
-  * npx sdk ${$}`
-    )
-    .join('')
+const listCommandsStr = (commands: string[]) => toStringList(commands.map(($) => `npx @dcl/sdk ${$}`))
 
 const handleError = (err: CliError) => {
   if (!(err instanceof CliError)) {
@@ -48,8 +48,7 @@ const commandFnsAreValid = (fns: FileExports): fns is Required<FileExports> => {
 }
 
 const args = getArgs()
-const helpMessage = (commands: string[]) =>
-  `Here is the list of commands: ${listCommandsStr(commands)}`
+const helpMessage = (commands: string[]) => `Here is the list of commands: ${listCommandsStr(commands)}`
 
 ;(async () => {
   const command = process.argv[2]
@@ -63,7 +62,7 @@ const helpMessage = (commands: string[]) =>
       log.info(helpMessage(commands))
       return
     }
-    throw new CliError(`Command ${command} is invalid. ${helpMessage}`)
+    throw new CliError(`Command ${command} is invalid. ${helpMessage(commands)}`)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires

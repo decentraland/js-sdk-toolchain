@@ -1,11 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
-import {
-  PBUiBackground,
-  PBUiText,
-  PBUiTransform,
-  PBUiInput,
-  PBUiDropdown
-} from '@dcl/ecs'
+import { PBUiBackground, PBUiText, PBUiTransform, PBUiInput, PBUiDropdown } from '@dcl/ecs'
 import React from 'react'
 import { Callback } from './components'
 import { CommonProps } from './components/types'

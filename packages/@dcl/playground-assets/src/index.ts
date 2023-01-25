@@ -6,11 +6,7 @@ export * from '@dcl/sdk/ethereum-provider'
 
 // legacy
 export * from '@dcl/sdk/observables'
-export {
-  Observer,
-  Observable,
-  ObserverEventState
-} from '@dcl/sdk/internal/Observable'
+export { Observer, Observable, ObserverEventState } from '@dcl/sdk/internal/Observable'
 
 // react
 import ReactEcs from '@dcl/sdk/react-ecs'

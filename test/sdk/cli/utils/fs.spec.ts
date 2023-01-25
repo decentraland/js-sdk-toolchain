@@ -21,18 +21,11 @@ describe('utils/fs', () => {
 
     const writeFileSpy = jest.spyOn(fs, 'writeFile').mockImplementation()
 
-    const dist = await fsUtils.download(
-      { fs, fetch },
-      'some/path',
-      'other/path'
-    )
+    const dist = await fsUtils.download({ fs, fetch }, 'some/path', 'other/path')
 
     expect(dist).toBe('other/path')
     expect(fetchSpy).toBeCalledWith('some/path')
-    expect(writeFileSpy).toBeCalledWith(
-      'other/path',
-      Buffer.from(new ArrayBuffer(123))
-    )
+    expect(writeFileSpy).toBeCalledWith('other/path', Buffer.from(new ArrayBuffer(123)))
   })
 
   it('existPath', async () => {

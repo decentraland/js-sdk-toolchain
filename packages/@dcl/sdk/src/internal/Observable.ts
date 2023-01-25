@@ -36,12 +36,7 @@ export class ObserverEventState {
    * @param target - defines the original target of the state
    * @param currentTarget - defines the current target of the state
    */
-  constructor(
-    mask: number,
-    skipNextObservers = false,
-    target?: any,
-    currentTarget?: any
-  ) {
+  constructor(mask: number, skipNextObservers = false, target?: any, currentTarget?: any) {
     this.initalize(mask, skipNextObservers, target, currentTarget)
   }
 
@@ -53,12 +48,7 @@ export class ObserverEventState {
    * @param currentTarget - defines the current target of the state
    * @returns the current event state
    */
-  public initalize(
-    mask: number,
-    skipNextObservers = false,
-    target?: any,
-    currentTarget?: any
-  ): ObserverEventState {
+  public initalize(mask: number, skipNextObservers = false, target?: any, currentTarget?: any): ObserverEventState {
     this.mask = mask
     this.skipNextObservers = skipNextObservers
     this.target = target
@@ -172,9 +162,7 @@ export class Observable<T> {
    * @param callback - the callback that will be executed for that Observer
    * @returns the new observer created for the callback
    */
-  public addOnce(
-    callback: (eventData: T, eventState: ObserverEventState) => void
-  ): null | Observer<T> {
+  public addOnce(callback: (eventData: T, eventState: ObserverEventState) => void): null | Observer<T> {
     return this.add(callback, undefined, undefined, undefined, true)
   }
 
@@ -204,15 +192,9 @@ export class Observable<T> {
    * @param scope - optional scope. If used only the callbacks with this scope will be removed
    * @returns false if it doesn't belong to this Observable
    */
-  public removeCallback(
-    callback: (eventData: T, eventState: ObserverEventState) => void,
-    scope?: any
-  ): boolean {
+  public removeCallback(callback: (eventData: T, eventState: ObserverEventState) => void, scope?: any): boolean {
     for (let index = 0; index < this._observers.length; index++) {
-      if (
-        this._observers[index].callback === callback &&
-        (!scope || scope === this._observers[index].scope)
-      ) {
+      if (this._observers[index].callback === callback && (!scope || scope === this._observers[index].scope)) {
         this._deferUnregister(this._observers[index])
         return true
       }
@@ -230,12 +212,7 @@ export class Observable<T> {
    * @param currentTarget - defines the current target of the state
    * @returns false if the complete observer chain was not processed (because one observer set the skipNextObservers to true)
    */
-  public notifyObservers(
-    eventData: T,
-    mask: number = -1,
-    target?: any,
-    currentTarget?: any
-  ): boolean {
+  public notifyObservers(eventData: T, mask: number = -1, target?: any, currentTarget?: any): boolean {
     if (!this._observers.length) {
       return true
     }
@@ -254,10 +231,7 @@ export class Observable<T> {
 
       if (obs.mask & mask) {
         if (obs.scope) {
-          state.lastReturnValue = obs.callback.apply(obs.scope, [
-            eventData,
-            state
-          ])
+          state.lastReturnValue = obs.callback.apply(obs.scope, [eventData, state])
         } else {
           state.lastReturnValue = obs.callback(eventData, state)
         }
@@ -286,12 +260,7 @@ export class Observable<T> {
    * @param currentTarget - defines he current object in the bubbling phase
    * @returns will return a Promise than resolves when all callbacks executed successfully.
    */
-  public notifyObserversWithPromise(
-    eventData: T,
-    mask: number = -1,
-    target?: any,
-    currentTarget?: any
-  ): Promise<T> {
+  public notifyObserversWithPromise(eventData: T, mask: number = -1, target?: any, currentTarget?: any): Promise<T> {
     // create an empty promise
     let p: Promise<any> = Promise.resolve(eventData)
 
@@ -344,11 +313,7 @@ export class Observable<T> {
    * @param eventData - defines the data to be sent to each callback
    * @param mask - is used to filter observers defaults to -1
    */
-  public notifyObserver(
-    observer: Observer<T>,
-    eventData: T,
-    mask: number = -1
-  ): void {
+  public notifyObserver(observer: Observer<T>, eventData: T, mask: number = -1): void {
     const state = this._eventState
     state.mask = mask
     state.skipNextObservers = false

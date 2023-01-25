@@ -4,10 +4,7 @@ import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/src/math'
 
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import {
-  CrdtMessageType,
-  CRDT_MESSAGE_HEADER_LENGTH
-} from '../../packages/@dcl/ecs/src/serialization/crdt/types'
+import { CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH } from '../../packages/@dcl/ecs/src/serialization/crdt/types'
 
 import {
   CrdtMessageProtocol,
@@ -20,9 +17,7 @@ import { readMessage } from '../../packages/@dcl/ecs/src/serialization/crdt/mess
 describe('Component operation tests', () => {
   it('validate corrupt message', () => {
     const buf = new ReadWriteByteBuffer(
-      new Uint8Array([
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
-      ]),
+      new Uint8Array([255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]),
       0
     )
 
@@ -60,9 +55,7 @@ describe('Component operation tests', () => {
     while (CrdtMessageProtocol.validate(bb)) {
       const msgOne = readMessage(bb)!
       expect(msgOne.length).toBe(
-        TRANSFORM_LENGTH +
-          PutComponentOperation.MESSAGE_HEADER_LENGTH +
-          CRDT_MESSAGE_HEADER_LENGTH
+        TRANSFORM_LENGTH + PutComponentOperation.MESSAGE_HEADER_LENGTH + CRDT_MESSAGE_HEADER_LENGTH
       )
       expect(msgOne.type).toBe(CrdtMessageType.PUT_COMPONENT)
       Transform.upsertFromBinary(entityB, bb)

@@ -1,19 +1,12 @@
 import { Transport, TransportMessage, CrdtMessageType } from '@dcl/ecs'
 import { MAX_STATIC_COMPONENT } from '@dcl/ecs/dist/components/component-number'
-import type {
-  CrdtSendToRendererRequest,
-  CrdtSendToResponse
-} from '~system/EngineApi'
+import type { CrdtSendToRendererRequest, CrdtSendToResponse } from '~system/EngineApi'
 
 export type EngineApiForTransport = {
-  crdtSendToRenderer(
-    body: CrdtSendToRendererRequest
-  ): Promise<CrdtSendToResponse>
+  crdtSendToRenderer(body: CrdtSendToRendererRequest): Promise<CrdtSendToResponse>
 }
 
-export function createRendererTransport(
-  engineApi: EngineApiForTransport
-): Transport {
+export function createRendererTransport(engineApi: EngineApiForTransport): Transport {
   async function sendToRenderer(message: Uint8Array) {
     const response = await engineApi.crdtSendToRenderer({
       data: new Uint8Array(message)
@@ -40,8 +33,7 @@ export function createRendererTransport(
     filter(message: TransportMessage) {
       // Only send renderer components (Proto Generated)
       if (
-        (message.type === CrdtMessageType.PUT_COMPONENT ||
-          message.type === CrdtMessageType.DELETE_COMPONENT) &&
+        (message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.DELETE_COMPONENT) &&
         // filter out messages for non-core components
         (message as any).componentId > MAX_STATIC_COMPONENT
       ) {

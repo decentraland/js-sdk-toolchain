@@ -1,10 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
-import {
-  ExtractorConfig,
-  IExtractorConfigPrepareOptions
-} from '@microsoft/api-extractor'
+import { ExtractorConfig, IExtractorConfigPrepareOptions } from '@microsoft/api-extractor'
 
 export function apiExtractorConfig(packageJsonPath: string) {
   const cwd = path.dirname(packageJsonPath)
@@ -12,24 +9,19 @@ export function apiExtractorConfig(packageJsonPath: string) {
   console.assert(packageJson.typings, 'package.json#typings is not valid')
   const typingsFullPath = path.resolve(packageJson.typings)
 
-  const prepareOptions: IExtractorConfigPrepareOptions =
-    ExtractorConfig.tryLoadForFolder({ startingFolder: cwd }) || {
-      configObject: {
-        projectFolder: cwd,
-        mainEntryPointFilePath: path.resolve(
-          packageJson.main.replace(/\.js$/, '.d.ts')
-        ),
-        compiler: {
-          tsconfigFilePath: 'tsconfig.json'
-        }
-      },
-      configObjectFullPath: undefined,
-      packageJsonFullPath: packageJsonPath
-    }
+  const prepareOptions: IExtractorConfigPrepareOptions = ExtractorConfig.tryLoadForFolder({ startingFolder: cwd }) || {
+    configObject: {
+      projectFolder: cwd,
+      mainEntryPointFilePath: path.resolve(packageJson.main.replace(/\.js$/, '.d.ts')),
+      compiler: {
+        tsconfigFilePath: 'tsconfig.json'
+      }
+    },
+    configObjectFullPath: undefined,
+    packageJsonFullPath: packageJsonPath
+  }
 
-  prepareOptions.configObject.mainEntryPointFilePath = path.resolve(
-    prepareOptions.configObject.mainEntryPointFilePath
-  )
+  prepareOptions.configObject.mainEntryPointFilePath = path.resolve(prepareOptions.configObject.mainEntryPointFilePath)
 
   if (!prepareOptions.configObject.dtsRollup) {
     prepareOptions.configObject.dtsRollup = {

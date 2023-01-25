@@ -2,9 +2,7 @@ import { Observable } from './internal/Observable'
 import { QuaternionType, Vector3Type } from '@dcl/ecs'
 import { ManyEntityAction, SendBatchResponse } from '~system/EngineApi'
 
-let subscribeFunction: (event: {
-  eventId: string
-}) => Promise<any> = async () => {}
+let subscribeFunction: (event: { eventId: string }) => Promise<any> = async () => {}
 
 /** @public */
 export type InputEventResult = {
@@ -400,9 +398,7 @@ function createSubscriber(eventName: string) {
  * @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
  */
-export const onEnterSceneObservable = new Observable<IEvents['onEnterScene']>(
-  createSubscriber('onEnterScene')
-)
+export const onEnterSceneObservable = new Observable<IEvents['onEnterScene']>(createSubscriber('onEnterScene'))
 
 /** @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
@@ -414,9 +410,7 @@ export const onEnterScene = onEnterSceneObservable
  * @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
  */
-export const onLeaveSceneObservable = new Observable<IEvents['onLeaveScene']>(
-  createSubscriber('onLeaveScene')
-)
+export const onLeaveSceneObservable = new Observable<IEvents['onLeaveScene']>(createSubscriber('onLeaveScene'))
 
 /** @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
@@ -428,80 +422,66 @@ export const onLeaveScene = onLeaveSceneObservable
  * @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
  */
-export const onSceneReadyObservable = new Observable<IEvents['sceneStart']>(
-  createSubscriber('sceneStart')
+export const onSceneReadyObservable = new Observable<IEvents['sceneStart']>(createSubscriber('sceneStart'))
+
+/**
+ * @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ */
+export const onPlayerExpressionObservable = new Observable<IEvents['playerExpression']>(
+  createSubscriber('playerExpression')
 )
 
 /**
  * @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
  */
-export const onPlayerExpressionObservable = new Observable<
-  IEvents['playerExpression']
->(createSubscriber('playerExpression'))
+export const onVideoEvent = new Observable<IEvents['videoEvent']>(createSubscriber('videoEvent'))
 
 /**
  * @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
  */
-export const onVideoEvent = new Observable<IEvents['videoEvent']>(
-  createSubscriber('videoEvent')
+export const onProfileChanged = new Observable<IEvents['profileChanged']>(createSubscriber('profileChanged'))
+
+/**
+ * @public
+ * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
+ */
+export const onPlayerConnectedObservable = new Observable<IEvents['playerConnected']>(
+  createSubscriber('playerConnected')
 )
 
 /**
  * @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
  */
-export const onProfileChanged = new Observable<IEvents['profileChanged']>(
-  createSubscriber('profileChanged')
+export const onPlayerDisconnectedObservable = new Observable<IEvents['playerDisconnected']>(
+  createSubscriber('playerDisconnected')
 )
 
 /**
  * @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
  */
-export const onPlayerConnectedObservable = new Observable<
-  IEvents['playerConnected']
->(createSubscriber('playerConnected'))
+export const onRealmChangedObservable = new Observable<IEvents['onRealmChanged']>(createSubscriber('onRealmChanged'))
 
 /**
  * @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
  */
-export const onPlayerDisconnectedObservable = new Observable<
-  IEvents['playerDisconnected']
->(createSubscriber('playerDisconnected'))
-
-/**
- * @public
- * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
- */
-export const onRealmChangedObservable = new Observable<
-  IEvents['onRealmChanged']
->(createSubscriber('onRealmChanged'))
-
-/**
- * @public
- * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
- */
-export const onPlayerClickedObservable = new Observable<
-  IEvents['playerClicked']
->(createSubscriber('playerClicked'))
+export const onPlayerClickedObservable = new Observable<IEvents['playerClicked']>(createSubscriber('playerClicked'))
 
 /**
  * @interternal
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
  */
-export const onCommsMessage = new Observable<IEvents['comms']>(
-  createSubscriber('comms')
-)
+export const onCommsMessage = new Observable<IEvents['comms']>(createSubscriber('comms'))
 
 /**
  * @internal
  */
-export function setSubscribeFunction(
-  fn: (event: { eventId: string }) => Promise<any>
-) {
+export function setSubscribeFunction(fn: (event: { eventId: string }) => Promise<any>) {
   subscribeFunction = fn
 }
 
@@ -510,24 +490,18 @@ export function setSubscribeFunction(
  * @deprecated this is an OLD API.
  * This function uses the SDK6 sendBatch to poll events from the renderer
  */
-export async function pollEvents(
-  sendBatch: (body: ManyEntityAction) => Promise<SendBatchResponse>
-) {
+export async function pollEvents(sendBatch: (body: ManyEntityAction) => Promise<SendBatchResponse>) {
   const { events } = await sendBatch({ actions: [] })
   for (const e of events) {
     if (e.generic) {
       const data = JSON.parse(e.generic.eventData)
       switch (e.generic.eventId) {
         case 'onEnterScene': {
-          onEnterSceneObservable.notifyObservers(
-            data as IEvents['onEnterScene']
-          )
+          onEnterSceneObservable.notifyObservers(data as IEvents['onEnterScene'])
           break
         }
         case 'onLeaveScene': {
-          onLeaveSceneObservable.notifyObservers(
-            data as IEvents['onLeaveScene']
-          )
+          onLeaveSceneObservable.notifyObservers(data as IEvents['onLeaveScene'])
           break
         }
         case 'sceneStart': {
@@ -535,9 +509,7 @@ export async function pollEvents(
           break
         }
         case 'playerExpression': {
-          onPlayerExpressionObservable.notifyObservers(
-            data as IEvents['playerExpression']
-          )
+          onPlayerExpressionObservable.notifyObservers(data as IEvents['playerExpression'])
           break
         }
         case 'videoEvent': {
@@ -550,27 +522,19 @@ export async function pollEvents(
           break
         }
         case 'playerConnected': {
-          onPlayerConnectedObservable.notifyObservers(
-            data as IEvents['playerConnected']
-          )
+          onPlayerConnectedObservable.notifyObservers(data as IEvents['playerConnected'])
           break
         }
         case 'playerDisconnected': {
-          onPlayerDisconnectedObservable.notifyObservers(
-            data as IEvents['playerDisconnected']
-          )
+          onPlayerDisconnectedObservable.notifyObservers(data as IEvents['playerDisconnected'])
           break
         }
         case 'onRealmChanged': {
-          onRealmChangedObservable.notifyObservers(
-            data as IEvents['onRealmChanged']
-          )
+          onRealmChangedObservable.notifyObservers(data as IEvents['onRealmChanged'])
           break
         }
         case 'playerClicked': {
-          onPlayerClickedObservable.notifyObservers(
-            data as IEvents['playerClicked']
-          )
+          onPlayerClickedObservable.notifyObservers(data as IEvents['playerClicked'])
           break
         }
       }

@@ -23,9 +23,7 @@ export function stateFromString<T>(stateStr: string) {
     if (!newState.components.has(componentId)) {
       newState.components.set(componentId, new Map())
     }
-    newState.components
-      .get(componentId)!
-      .set(entityId, value !== null ? { timestamp, data } : null)
+    newState.components.get(componentId)!.set(entityId, value !== null ? { timestamp, data } : null)
   }
 
   const deletedEntities = stateObject.components || []

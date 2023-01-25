@@ -1,10 +1,5 @@
 import { compareStatePayloads, sleep } from '.'
-import {
-  CRDTMessage,
-  CRDTMessageType,
-  crdtProtocol,
-  ProcessMessageResultType
-} from '../../../packages/@dcl/crdt/src'
+import { CRDTMessage, CRDTMessageType, crdtProtocol, ProcessMessageResultType } from '../../../packages/@dcl/crdt/src'
 import { snapshotTest } from './snapshot'
 
 /**
@@ -20,9 +15,7 @@ type Sandbox = {
  * Generate clients, transport and compare fns so its easier to write tests.
  * @internal
  */
-export function createSandbox<
-  T extends Buffer | Uint8Array | string | number = Buffer
->(opts: Sandbox) {
+export function createSandbox<T extends Buffer | Uint8Array | string | number = Buffer>(opts: Sandbox) {
   /**
    *
    */
@@ -38,9 +31,7 @@ export function createSandbox<
       if (opts.delay) {
         await sleep(randomTime)
       }
-      await Promise.all(
-        clients.map((c) => c.id !== uuid && c.onMessage(message))
-      )
+      await Promise.all(clients.map((c) => c.id !== uuid && c.onMessage(message)))
     }
 
     return {
@@ -56,15 +47,9 @@ export function createSandbox<
     const ws = broadcast(uuid)
     const crdt = crdtProtocol<T>({
       fromEntityId: function (entity: number) {
-        return [
-          (entity & 65535) >>> 0,
-          (((entity & 4294901760) >> 16) & 65535) >>> 0
-        ]
+        return [(entity & 65535) >>> 0, (((entity & 4294901760) >> 16) & 65535) >>> 0]
       },
-      toEntityId: function (
-        entityNumber: number,
-        entityVersion: number
-      ): number {
+      toEntityId: function (entityNumber: number, entityVersion: number): number {
         return ((entityNumber & 65535) | ((entityVersion & 65535) << 16)) >>> 0
       }
     })
@@ -87,10 +72,7 @@ export function createSandbox<
             msg === ProcessMessageResultType.StateOutdatedTimestamp) &&
           message.type === CRDTMessageType.CRDTMT_PutComponentData
         ) {
-          const current = crdt
-            .getState()
-            .components.get(message.componentId)!
-            .get(message.entityId)!
+          const current = crdt.getState().components.get(message.componentId)!.get(message.entityId)!
           const newMsg: CRDTMessage<T> = {
             type: CRDTMessageType.CRDTMT_PutComponentData,
             data: current.data,

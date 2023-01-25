@@ -1,12 +1,4 @@
-import {
-  engine,
-  Transform,
-  MeshRenderer,
-  Billboard,
-  GltfContainer,
-  Material,
-  TextShape
-} from '@dcl/sdk/ecs'
+import { engine, Transform, MeshRenderer, Billboard, GltfContainer, Material, TextShape } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
 export * from '@dcl/sdk'
 // My cube generator
@@ -119,12 +111,7 @@ function CircleHoverSystem(dt: number) {
     // mutate the rotation
     transform.position.y =
       Math.cos(
-        hoverState +
-          Math.sqrt(
-            Math.pow(transform.position.x - 8, 2) +
-              Math.pow(transform.position.z - 8, 2)
-          ) /
-            Math.PI
+        hoverState + Math.sqrt(Math.pow(transform.position.x - 8, 2) + Math.pow(transform.position.z - 8, 2)) / Math.PI
       ) *
         2 +
       2

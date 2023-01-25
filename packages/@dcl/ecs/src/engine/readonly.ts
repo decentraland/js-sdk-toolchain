@@ -3,10 +3,7 @@ import { ComponentDefinition } from './component'
 /**
  * @public
  */
-export type DeepReadonlyMap<K, V> = ReadonlyMap<
-  DeepReadonly<K>,
-  DeepReadonly<V>
->
+export type DeepReadonlyMap<K, V> = ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>
 /**
  * @public
  */
@@ -20,23 +17,13 @@ export type DeepReadonlyObject<T> = {
 /**
  * @public
  */
-export type ReadonlyPrimitive =
-  | number
-  | string
-  | number[]
-  | string[]
-  | boolean
-  | boolean[]
+export type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[]
 
 /**
  * @public
  */
-export type ReadonlyComponentSchema<
-  T extends [ComponentDefinition<unknown>, ...ComponentDefinition<unknown>[]]
-> = {
-  [K in keyof T]: T[K] extends ComponentDefinition<unknown>
-    ? ReturnType<T[K]['get']>
-    : never
+export type ReadonlyComponentSchema<T extends [ComponentDefinition<unknown>, ...ComponentDefinition<unknown>[]]> = {
+  [K in keyof T]: T[K] extends ComponentDefinition<unknown> ? ReturnType<T[K]['get']> : never
 }
 
 /**
@@ -53,8 +40,6 @@ export type DeepReadonly<T> = T extends ReadonlyPrimitive
 /**
  * @internal
  */
-export function deepReadonly<T extends Record<string, unknown>>(
-  val: T
-): DeepReadonly<T> {
+export function deepReadonly<T extends Record<string, unknown>>(val: T): DeepReadonly<T> {
   return Object.freeze({ ...val }) as DeepReadonly<T>
 }

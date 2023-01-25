@@ -1,9 +1,5 @@
 import { ByteBuffer } from '../ByteBuffer'
-import {
-  CrdtMessageType,
-  CrdtMessageHeader,
-  CRDT_MESSAGE_HEADER_LENGTH
-} from './types'
+import { CrdtMessageType, CrdtMessageHeader, CRDT_MESSAGE_HEADER_LENGTH } from './types'
 
 export * from './types'
 export * from './deleteComponent'
