@@ -23,7 +23,6 @@ install:
 	npm i
 	make node_modules/.bin/protobuf/bin/protoc
 	cd packages/@dcl/dcl-rollup; npm ci
-	cd packages/@dcl/ecs; make install
 
 lint:
 	node_modules/.bin/eslint . --ext .ts
@@ -34,6 +33,11 @@ lint-fix:
 TESTARGS ?= test/
 test:
 	node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS)
+
+test-cli:
+	@rm -rf tmp
+	@mkdir -p tmp/scene
+	cd tmp/scene; $(PWD)/packages/@dcl/sdk/cli/index.js init
 
 test-coverage:
 	WITH_COVERAGE=true node_modules/.bin/jest --detectOpenHandles --colors --coverage $(TESTARGS)

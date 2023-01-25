@@ -3,9 +3,6 @@ ifneq ($(CI), true)
 LOCAL_ARG = --local --verbose --diagnostics
 endif
 
-install:
-	npm install
-
 clean:
 	rm -rf dist/
 	rm -rf src/components/generated

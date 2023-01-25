@@ -1,21 +1,25 @@
 import { resolve } from 'path'
-import { readdir } from 'fs/promises'
-
-import { isDirectory, isFile } from './fs'
+import { CliComponents } from '../components'
 import { CliError } from './error'
 
 export const COMMANDS_PATH = resolve(__dirname, '../commands')
 
-export const getCommands = async (): Promise<string[]> => {
-  const commandDirs = await readdir(COMMANDS_PATH)
+export const getCommands = async ({
+  fs
+}: Pick<CliComponents, 'fs'>): Promise<string[]> => {
+  const commandDirs = await fs.readdir(COMMANDS_PATH)
 
   const commands = commandDirs.map(async (dir) => {
     const path = `${COMMANDS_PATH}/${dir}`
-    if (!(await isDirectory(path))) {
+
+    const statDir = await fs.stat(path)
+
+    if (!statDir.isDirectory()) {
       throw new CliError('Developer: All commands must be inside a folder')
     }
 
-    if (!(await isFile(`${path}/index.js`))) {
+    const statIndex = await fs.stat(`${path}/index.js`)
+    if (!statIndex.isFile()) {
       throw new CliError(
         'Developer: All commands must have an "index.js" file inside'
       )
