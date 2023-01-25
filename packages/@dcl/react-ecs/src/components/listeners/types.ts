@@ -24,5 +24,4 @@ const listenersKey = Object.keys(listeners)
 /**
  * @internal
  */
-export const isListener = (key: string): key is keyof Listeners =>
-  listenersKey.includes(key)
+export const isListener = (key: string): key is keyof Listeners => listenersKey.includes(key)

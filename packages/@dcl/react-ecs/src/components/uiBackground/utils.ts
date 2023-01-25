@@ -1,15 +1,5 @@
-import {
-  BackgroundTextureMode,
-  PBUiBackground,
-  TextureFilterMode,
-  TextureWrapMode
-} from '@dcl/ecs'
-import {
-  UiBackgroundProps,
-  TextureWrapType,
-  TextureFilterType,
-  TextureMode
-} from './types'
+import { BackgroundTextureMode, PBUiBackground, TextureFilterMode, TextureWrapMode } from '@dcl/ecs'
+import { UiBackgroundProps, TextureWrapType, TextureFilterType, TextureMode } from './types'
 
 const parseTextureMode: Readonly<Record<TextureMode, BackgroundTextureMode>> = {
   'nine-slices': BackgroundTextureMode.NINE_SLICES,
@@ -19,21 +9,15 @@ const parseTextureMode: Readonly<Record<TextureMode, BackgroundTextureMode>> = {
 /**
  * @internal
  */
-export function getTextureMode(
-  mode: TextureMode | undefined
-): Record<'textureMode', BackgroundTextureMode> {
-  const value: BackgroundTextureMode = mode
-    ? parseTextureMode[mode]
-    : BackgroundTextureMode.CENTER
+export function getTextureMode(mode: TextureMode | undefined): Record<'textureMode', BackgroundTextureMode> {
+  const value: BackgroundTextureMode = mode ? parseTextureMode[mode] : BackgroundTextureMode.CENTER
   return { textureMode: value }
 }
 
 /**
  * @internal
  */
-export function getTexture(
-  props: UiBackgroundProps
-): PBUiBackground['texture'] {
+export function getTexture(props: UiBackgroundProps): PBUiBackground['texture'] {
   if (props.texture) {
     return {
       tex: {

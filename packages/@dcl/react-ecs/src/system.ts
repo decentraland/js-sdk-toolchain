@@ -19,10 +19,7 @@ export interface ReactBasedUiSystem {
 /**
  * @internal
  */
-export function createReactBasedUiSystem(
-  engine: IEngine,
-  pointerSystem: PointerEventsSystem
-): ReactBasedUiSystem {
+export function createReactBasedUiSystem(engine: IEngine, pointerSystem: PointerEventsSystem): ReactBasedUiSystem {
   const renderer = createReconciler(engine, pointerSystem)
   let uiComponent: UiComponent | undefined = undefined
 
