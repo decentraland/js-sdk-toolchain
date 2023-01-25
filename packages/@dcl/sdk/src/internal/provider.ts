@@ -19,9 +19,7 @@ export interface MessageDict {
   [key: string]: string
 }
 
-export type SendAsyncType = (
-  params: SendAsyncRequest
-) => Promise<SendAsyncResponse>
+export type SendAsyncType = (params: SendAsyncRequest) => Promise<SendAsyncResponse>
 
 export function getEthereumProvider(sendAsync: SendAsyncType) {
   async function request(message: RPCSendableMessage) {
@@ -35,10 +33,7 @@ export function getEthereumProvider(sendAsync: SendAsyncType) {
 
   return {
     // @internal
-    send(
-      message: RPCSendableMessage,
-      callback?: (error: Error | null, result?: any) => void
-    ): void {
+    send(message: RPCSendableMessage, callback?: (error: Error | null, result?: any) => void): void {
       if (message && callback && callback instanceof Function) {
         request(message)
           .then((x: any) => callback(null, x))
@@ -47,10 +42,7 @@ export function getEthereumProvider(sendAsync: SendAsyncType) {
         throw new Error('Decentraland provider only allows async calls')
       }
     },
-    sendAsync(
-      message: RPCSendableMessage,
-      callback: (error: Error | null, result?: any) => void
-    ): void {
+    sendAsync(message: RPCSendableMessage, callback: (error: Error | null, result?: any) => void): void {
       request(message)
         .then((x: any) => callback(null, x))
         .catch(callback)

@@ -34,6 +34,12 @@ module.exports = {
       functions: 26,
       lines: 26,
       statements: 26
+    },
+    "packages/@dcl/sdk/cli": {
+      branches: 100,
+      functions: 100,
+      lines: 100,
+      statements: 100,
     }
   },
   coveragePathIgnorePatterns: [

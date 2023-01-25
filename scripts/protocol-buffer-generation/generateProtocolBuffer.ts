@@ -18,19 +18,11 @@ export async function generateProtocolBuffer(params: {
   fs.removeSync(pbGeneratedPath)
   fs.mkdirSync(pbGeneratedPath, { recursive: true })
 
-  const protoFiles = components
-    .map((item) => path.resolve(definitionsPath, `${item.componentFile}.proto`))
-    .join(' ')
+  const protoFiles = components.map((item) => path.resolve(definitionsPath, `${item.componentFile}.proto`)).join(' ')
 
-  const protoCompilerPath = path.resolve(
-    process.cwd(),
-    'node_modules/.bin/protobuf/bin/protoc'
-  )
+  const protoCompilerPath = path.resolve(process.cwd(), 'node_modules/.bin/protobuf/bin/protoc')
 
-  const tsProtoPluginPath = path.resolve(
-    process.cwd(),
-    'node_modules/.bin/protoc-gen-ts_proto'
-  )
+  const tsProtoPluginPath = path.resolve(process.cwd(), 'node_modules/.bin/protoc-gen-ts_proto')
 
   const protoCommandArgs: string[] = [
     `--plugin=${tsProtoPluginPath}`,
@@ -46,9 +38,7 @@ export async function generateProtocolBuffer(params: {
     protoFiles
   ]
   const commandWorkingDir = process.cwd()
-  process.stderr.write(
-    `Command is ${protoCompilerPath} \\ ${protoCommandArgs.join('\\\n  ')}\n`
-  )
+  process.stderr.write(`Command is ${protoCompilerPath} \\ ${protoCommandArgs.join('\\\n  ')}\n`)
 
   try {
     await runCommand({
@@ -74,10 +64,7 @@ export async function generateProtocolBuffer(params: {
 export function getComponentId(protoContent: string) {
   const componentIdLine = protoContent
     .split('\n')
-    .filter(
-      (line) =>
-        line.indexOf('ecs_component_id') !== -1 && line.indexOf('option') !== -1
-    )
+    .filter((line) => line.indexOf('ecs_component_id') !== -1 && line.indexOf('option') !== -1)
   if (componentIdLine.length > 1) {
     throw Error(
       'There are more than one match with `ecs_component_id` and `option`. Please reserve this keyword to only the definition of ComponentId'
@@ -101,10 +88,7 @@ function fixTsGeneratedByProto(filePath: string) {
    * Read the generated pb component and add @internal comments to exported methods
    * So we dont add this types to the final .d.ts build
    */
-  content = content.replace(
-    `export const protobufPackage = `,
-    'const protobufPackage = '
-  )
+  content = content.replace(`export const protobufPackage = `, 'const protobufPackage = ')
   content = content.replace(/export const/g, internalComment)
 
   /**

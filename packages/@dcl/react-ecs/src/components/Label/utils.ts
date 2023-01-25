@@ -9,9 +9,7 @@ const parseFont: Readonly<Record<UiFontType, Font>> = {
 /**
  * @internal
  */
-export function getFont(
-  font: UiFontType | undefined
-): Record<'font', Font> | undefined {
+export function getFont(font: UiFontType | undefined): Record<'font', Font> | undefined {
   if (!font) return undefined
   return { font: parseFont[font] }
 }
@@ -30,9 +28,7 @@ const parseTextAlign: Readonly<Record<TextAlignType, TextAlignMode>> = {
 /**
  * @internal
  */
-export function getTextAlign(
-  textAlign: TextAlignType | undefined
-): Record<'textAlign', TextAlignMode> | undefined {
+export function getTextAlign(textAlign: TextAlignType | undefined): Record<'textAlign', TextAlignMode> | undefined {
   if (!textAlign) return undefined
   return { textAlign: parseTextAlign[textAlign] }
 }

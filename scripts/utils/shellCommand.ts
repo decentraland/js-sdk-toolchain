@@ -47,9 +47,7 @@ export function runCommand({
       child.stderr.on('data', (data) => {
         stdErr += data.toString()
       })
-    } else if (
-      standardOption === FileDescriptorStandardOption.SEND_TO_CALLBACK
-    ) {
+    } else if (standardOption === FileDescriptorStandardOption.SEND_TO_CALLBACK) {
       child.stdout.on('data', (data) => {
         if (cb?.onOutData) {
           cb.onOutData(data.toString())
@@ -64,9 +62,7 @@ export function runCommand({
     }
 
     child.on('close', (code) => {
-      const errorMessage = `Command '${command}' with args '${args.join(
-        ' '
-      )}' exited with code ${code}. \n
+      const errorMessage = `Command '${command}' with args '${args.join(' ')}' exited with code ${code}. \n
           > Working directory: ${workingDir} `
 
       if (code !== 0) {

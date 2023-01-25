@@ -34,9 +34,7 @@ export type DeleteEntityMessage = {
   entityId: number
 }
 
-export type CRDTMessage<T = unknown> =
-  | ComponentDataMessage<T>
-  | DeleteEntityMessage
+export type CRDTMessage<T = unknown> = ComponentDataMessage<T> | DeleteEntityMessage
 
 /**
  * Payload that its being stored in the state.
@@ -122,11 +120,7 @@ export type CRDT<T = unknown> = {
    *
    * @returns
    */
-  createComponentDataEvent(
-    componentId: number,
-    entityId: number,
-    data: T | null
-  ): ComponentDataMessage<T> | null
+  createComponentDataEvent(componentId: number, entityId: number, data: T | null): ComponentDataMessage<T> | null
 
   /**
    *

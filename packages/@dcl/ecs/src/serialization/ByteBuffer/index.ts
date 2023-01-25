@@ -31,11 +31,7 @@ export class ReadWriteByteBuffer implements ByteBuffer {
    * @param readingOffset - Set the cursor where begins to read. Default 0
    * @param writingOffset - Set the cursor to not start writing from the begin of it. Defaults to the buffer size
    */
-  constructor(
-    buffer?: Uint8Array | undefined,
-    readingOffset?: number | undefined,
-    writingOffset?: number | undefined
-  ) {
+  constructor(buffer?: Uint8Array | undefined, readingOffset?: number | undefined, writingOffset?: number | undefined) {
     this._buffer = buffer || new Uint8Array(defaultInitialCapacity)
     this.view = new DataView(this._buffer.buffer, this._buffer.byteOffset)
     this.woffset = writingOffset ?? (buffer ? this._buffer.length : null) ?? 0
@@ -47,10 +43,7 @@ export class ReadWriteByteBuffer implements ByteBuffer {
    */
   #woAdd(amount: number) {
     if (this.woffset + amount > this._buffer.byteLength) {
-      const newsize = getNextSize(
-        this._buffer.byteLength,
-        this.woffset + amount
-      )
+      const newsize = getNextSize(this._buffer.byteLength, this.woffset + amount)
       const newBuffer = new Uint8Array(newsize)
       newBuffer.set(this._buffer)
       const oldOffset = this._buffer.byteOffset

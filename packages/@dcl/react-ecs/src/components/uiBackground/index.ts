@@ -6,9 +6,7 @@ import { getTexture, getTextureMode } from './utils'
  * @public
  */
 /*#__PURE__*/
-export function parseUiBackground(
-  props: UiBackgroundProps | undefined
-): PBUiBackground | undefined {
+export function parseUiBackground(props: UiBackgroundProps | undefined): PBUiBackground | undefined {
   if (!props || !Object.keys(props).length) return undefined
   const texture = getTexture(props)
   return {

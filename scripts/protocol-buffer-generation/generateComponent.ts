@@ -15,10 +15,7 @@ export async function generateComponent(params: {
 }) {
   const { component, generatedPath } = params
 
-  const componentFilePath = path.resolve(
-    generatedPath,
-    `${component.componentPascalName}.gen.ts`
-  )
+  const componentFilePath = path.resolve(generatedPath, `${component.componentPascalName}.gen.ts`)
   const componentContent = componentSchemaTemplate
     .replace(/\$\{ComponentName\}/g, component.componentPascalName)
     .replace(/\$\{ComponentFile\}/g, component.componentFile)

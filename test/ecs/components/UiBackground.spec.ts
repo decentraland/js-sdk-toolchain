@@ -64,8 +64,6 @@ describe('Generated UiBackground ProtoBuf', () => {
         bottom: 1 / 3
       }
     })
-    expect(_uiBackground).not.toEqual(
-      UiBackground.create(newEngine.addEntity())
-    )
+    expect(_uiBackground).not.toEqual(UiBackground.create(newEngine.addEntity()))
   })
 })

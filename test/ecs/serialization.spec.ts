@@ -17,20 +17,14 @@ describe('Serialization Types', () => {
     let COMPONENT_ID = 888
 
     for (const t of toTest) {
-      const IntegerComponent = engine.defineComponent(
-        (COMPONENT_ID++).toString(),
-        { value: t }
-      )
+      const IntegerComponent = engine.defineComponent((COMPONENT_ID++).toString(), { value: t })
       const myInteger = IntegerComponent.create(entity, { value: 33 })
       expect(myInteger.value).toBe(33)
 
       const buffer = IntegerComponent.toBinary(entity)
       const copiedInteger = IntegerComponent.create(entityCopied, { value: 21 })
       expect(copiedInteger.value).toBe(21)
-      const updatedInteger = IntegerComponent.updateFromBinary(
-        entityCopied,
-        buffer
-      )
+      const updatedInteger = IntegerComponent.updateFromBinary(entityCopied, buffer)
       expect(updatedInteger!.value).toBe(33)
 
       expect(t.create()).toEqual(0)
@@ -46,10 +40,7 @@ describe('Serialization Types', () => {
     const testValue = 2.0
 
     for (const t of toTest) {
-      const FloatComponent = engine.defineComponent(
-        (COMPONENT_ID++).toString(),
-        { value: t }
-      )
+      const FloatComponent = engine.defineComponent((COMPONENT_ID++).toString(), { value: t })
       const myFloat = FloatComponent.create(entity, { value: testValue })
       expect(myFloat.value).toBe(testValue)
 
@@ -178,10 +169,7 @@ describe('Serialization Types', () => {
       hasAlpha: Schemas.Boolean
     })
 
-    const TestComponent = engine.defineComponentFromSchema(
-      COMPONENT_ID.toString(),
-      definition
-    )
+    const TestComponent = engine.defineComponentFromSchema(COMPONENT_ID.toString(), definition)
 
     expect(definition.create()).toEqual({
       optionalColor: undefined,
@@ -198,10 +186,7 @@ describe('Serialization Types', () => {
       optionalColor: { r: 1, g: 2, b: 3 }
     })
 
-    const value2 = TestComponent.updateFromBinary(
-      entity2,
-      TestComponent.toBinary(entity)
-    )!
+    const value2 = TestComponent.updateFromBinary(entity2, TestComponent.toBinary(entity))!
 
     expect(value2.hasAlpha).toBe(true)
     expect(value2.optionalColor).toBeUndefined()
@@ -220,9 +205,7 @@ describe('Serialization Types', () => {
 
     TestComponent.create(entity, { optionalColor: true, notVisible: false })
 
-    expect(TestComponent.toBinary(entity).toBinary()).toStrictEqual(
-      new Uint8Array([1, 1, 0, 0])
-    )
+    expect(TestComponent.toBinary(entity).toBinary()).toStrictEqual(new Uint8Array([1, 1, 0, 0]))
     expect(TestComponent.get(entity).optionalColor).toBe(true)
 
     // Deserialize and update new optional
@@ -234,9 +217,7 @@ describe('Serialization Types', () => {
     })
     TestComponent.upsertFromBinary(entity, TestComponent.toBinary(newEntity))
 
-    expect(TestComponent.toBinary(entity).toBinary()).toStrictEqual(
-      new Uint8Array([1, 1, 1, 1, 0])
-    )
+    expect(TestComponent.toBinary(entity).toBinary()).toStrictEqual(new Uint8Array([1, 1, 1, 1, 0]))
   })
 
   it('should serialize Int Schemas.Enums', () => {
@@ -264,10 +245,7 @@ describe('Serialization Types', () => {
     })
     expect(initialValue).toStrictEqual({ testEnum: ColorToNumber.Green })
 
-    const value2 = TestComponent.updateFromBinary(
-      entity2,
-      TestComponent.toBinary(entity)
-    )!
+    const value2 = TestComponent.updateFromBinary(entity2, TestComponent.toBinary(entity))!
 
     expect(value2).toStrictEqual({ testEnum: ColorToNumber.Pink })
   })
@@ -297,10 +275,7 @@ describe('Serialization Types', () => {
     })
     expect(initialValue).toStrictEqual({ testEnum: ColorToString.Green })
 
-    const value2 = TestComponent.updateFromBinary(
-      entity2,
-      TestComponent.toBinary(entity)
-    )!
+    const value2 = TestComponent.updateFromBinary(entity2, TestComponent.toBinary(entity))!
 
     expect(value2).toStrictEqual({ testEnum: ColorToString.Pink })
   })
@@ -358,18 +333,13 @@ describe('Serialization Types', () => {
       vectorType[key] = Schemas.Int
       objectValues[key] = 50 + i
       zeroObjectValues[key] = 0
-      const TestComponentType = engine.defineComponent(
-        COMPONENT_ID.toString(),
-        vectorType
-      )
+      const TestComponentType = engine.defineComponent(COMPONENT_ID.toString(), vectorType)
 
       TestComponentType.create(entity, objectValues)
       TestComponentType.create(entityCopied, zeroObjectValues)
       const buffer = TestComponentType.toBinary(entity)
       TestComponentType.updateFromBinary(entityCopied, buffer)
-      expect(TestComponentType.get(entity)).toStrictEqual(
-        TestComponentType.get(entityCopied)
-      )
+      expect(TestComponentType.get(entity)).toStrictEqual(TestComponentType.get(entityCopied))
     }
   })
 

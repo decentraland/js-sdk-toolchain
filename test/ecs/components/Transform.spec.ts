@@ -21,9 +21,8 @@ describe('Transform component', () => {
 
     const buffer = Transform.toBinary(entity)
     expect(Array.from(buffer.toBinary())).toStrictEqual([
-      64, 73, 15, 219, 64, 19, 93, 142, 63, 53, 4, 243, 64, 73, 15, 219, 64, 45,
-      248, 84, 0, 0, 0, 0, 63, 53, 4, 243, 64, 73, 15, 219, 64, 45, 248, 84, 64,
-      19, 93, 142, 7, 91, 205, 21
+      64, 73, 15, 219, 64, 19, 93, 142, 63, 53, 4, 243, 64, 73, 15, 219, 64, 45, 248, 84, 0, 0, 0, 0, 63, 53, 4, 243,
+      64, 73, 15, 219, 64, 45, 248, 84, 64, 19, 93, 142, 7, 91, 205, 21
     ])
     expect(buffer.toBinary().length).toBe(TRANSFORM_LENGTH)
   })

@@ -57,9 +57,7 @@ export function dataCompare<T>(a: T, b: T): number {
  * State iterator
  * @internal
  */
-export function* stateIterator<T>(
-  state: State<T>
-): IterableIterator<[number, number, Payload<T> | null]> {
+export function* stateIterator<T>(state: State<T>): IterableIterator<[number, number, Payload<T> | null]> {
   for (const [componentId, value1] of state.components.entries()) {
     for (const [entityId, value2] of value1.entries()) {
       yield [componentId, entityId, value2]
@@ -89,9 +87,7 @@ export type EntityUtils = {
  * to process and store the new data in case its an update, or
  * to discard and send our local value cause remote it's outdated.
  */
-export function crdtProtocol<T extends number | Uint8Array | string>(
-  entityUtils: EntityUtils
-): CRDT<T> {
+export function crdtProtocol<T extends number | Uint8Array | string>(entityUtils: EntityUtils): CRDT<T> {
   /**
    * Local state where we store the latest lamport timestamp
    * and the raw data value
@@ -113,10 +109,7 @@ export function crdtProtocol<T extends number | Uint8Array | string>(
     remoteTimestamp: number
   ): Payload<T> {
     const componentIdValue = state.components.get(componentId)
-    const timestamp = Math.max(
-      remoteTimestamp,
-      componentIdValue?.get(entityId)?.timestamp || 0
-    )
+    const timestamp = Math.max(remoteTimestamp, componentIdValue?.get(entityId)?.timestamp || 0)
     if (componentIdValue) {
       componentIdValue.set(entityId, { timestamp, data })
     } else {
@@ -138,8 +131,7 @@ export function crdtProtocol<T extends number | Uint8Array | string>(
     data: T | null
   ): ComponentDataMessage<T> | null {
     // Increment the timestamp
-    const timestamp =
-      (state.components.get(componentId)?.get(entityId)?.timestamp || 0) + 1
+    const timestamp = (state.components.get(componentId)?.get(entityId)?.timestamp || 0) + 1
 
     const msg: ComponentDataMessage<T> = {
       type: CRDTMessageType.CRDTMT_PutComponentData,
@@ -182,12 +174,8 @@ export function crdtProtocol<T extends number | Uint8Array | string>(
    * If it was an outdated message, then we return void
    * @public
    */
-  function processComponentDataMessage(
-    message: ComponentDataMessage<T>
-  ): ProcessMessageResultType {
-    const [entityNumber, entityVersion] = entityUtils.fromEntityId(
-      message.entityId
-    )
+  function processComponentDataMessage(message: ComponentDataMessage<T>): ProcessMessageResultType {
+    const [entityNumber, entityVersion] = entityUtils.fromEntityId(message.entityId)
     if (state.deletedEntities.has(entityNumber, entityVersion)) {
       return ProcessMessageResultType.EntityWasDeleted
     }
@@ -236,13 +224,9 @@ export function crdtProtocol<T extends number | Uint8Array | string>(
     }
   }
 
-  function processDeleteEntityMessage(
-    message: DeleteEntityMessage
-  ): ProcessMessageResultType {
+  function processDeleteEntityMessage(message: DeleteEntityMessage): ProcessMessageResultType {
     const { entityId } = message
-    const [entityNumber, entityVersion] = entityUtils.fromEntityId(
-      message.entityId
-    )
+    const [entityNumber, entityVersion] = entityUtils.fromEntityId(message.entityId)
 
     state.deletedEntities.addTo(entityNumber, entityVersion)
 
@@ -265,10 +249,7 @@ export function crdtProtocol<T extends number | Uint8Array | string>(
    * Returns the element state of a given element of the LWW-ElementSet
    * @public
    */
-  function getElementSetState(
-    componentId: number,
-    entityId: number
-  ): Payload<T> | null {
+  function getElementSetState(componentId: number, entityId: number): Payload<T> | null {
     return state.components.get(componentId)?.get(entityId) || null
   }
 

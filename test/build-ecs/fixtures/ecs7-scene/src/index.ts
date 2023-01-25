@@ -1,12 +1,4 @@
-import {
-  engine,
-  Entity,
-  InputAction,
-  MeshCollider,
-  MeshRenderer,
-  Transform,
-  pointerEventsSystem
-} from '@dcl/ecs'
+import { engine, Entity, InputAction, MeshCollider, MeshRenderer, Transform, pointerEventsSystem } from '@dcl/ecs'
 import { Vector3, Quaternion } from '@dcl/sdk/math'
 export * from '@dcl/sdk'
 
@@ -22,10 +14,7 @@ function createCube(x: number, y: number, z: number): Entity {
 
 // Systems
 function circularSystem(dt: number) {
-  const entitiesWithMeshRenderer = engine.getEntitiesWith(
-    MeshRenderer,
-    Transform
-  )
+  const entitiesWithMeshRenderer = engine.getEntitiesWith(MeshRenderer, Transform)
   for (const [entity, _meshRenderer, _transform] of entitiesWithMeshRenderer) {
     const mutableTransform = Transform.getMutable(entity)
 

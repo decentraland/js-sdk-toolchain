@@ -1,24 +1,10 @@
-import {
-  Engine,
-  Entity,
-  IEngine,
-  components,
-  PointerEventType,
-  InputAction
-} from '../../../packages/@dcl/ecs/src'
+import { Engine, Entity, IEngine, components, PointerEventType, InputAction } from '../../../packages/@dcl/ecs/src'
 import { createInputSystem } from '../../../packages/@dcl/ecs/src/engine/input'
-import {
-  createPointerEventSystem,
-  PointerEventsSystem
-} from '../../../packages/@dcl/ecs/src/systems/events'
+import { createPointerEventSystem, PointerEventsSystem } from '../../../packages/@dcl/ecs/src/systems/events'
 import { createTestPointerDownCommand } from './utils'
 
 let engine: IEngine
-let fakePointer: (
-  entity: Entity,
-  pointerType: PointerEventType,
-  button?: InputAction
-) => void
+let fakePointer: (entity: Entity, pointerType: PointerEventType, button?: InputAction) => void
 
 describe('Events System', () => {
   let EventsSystem: PointerEventsSystem
@@ -32,17 +18,9 @@ describe('Events System', () => {
 
     fakePointer = (entity, pointerType, button) => {
       const pointerEvents =
-        PointerEventsResult.getMutableOrNull(engine.RootEntity) ||
-        PointerEventsResult.create(engine.RootEntity)
+        PointerEventsResult.getMutableOrNull(engine.RootEntity) || PointerEventsResult.create(engine.RootEntity)
 
-      pointerEvents.commands.push(
-        createTestPointerDownCommand(
-          entity,
-          fakeCounter + 1,
-          pointerType,
-          button
-        )
-      )
+      pointerEvents.commands.push(createTestPointerDownCommand(entity, fakeCounter + 1, pointerType, button))
       fakeCounter += 1
     }
   })
@@ -62,9 +40,7 @@ describe('Events System', () => {
     fakePointer(entity, PointerEventType.PET_UP, InputAction.IA_ACTION_3)
     await engine.update(1)
     expect(counter).toBe(1)
-    expect(
-      PointerEvents.getOrNull(entity)?.pointerEvents[0].eventInfo?.hoverText
-    ).toBe(undefined)
+    expect(PointerEvents.getOrNull(entity)?.pointerEvents[0].eventInfo?.hoverText).toBe(undefined)
   })
 
   it('should create pointer hover components', async () => {
@@ -75,9 +51,7 @@ describe('Events System', () => {
     fakePointer(entity, PointerEventType.PET_UP)
     await engine.update(1)
     const feedback = PointerEvents.getOrNull(entity)
-    const boedoFeedback = feedback?.pointerEvents.find(
-      (f) => f.eventInfo?.hoverText === 'Boedo'
-    )
+    const boedoFeedback = feedback?.pointerEvents.find((f) => f.eventInfo?.hoverText === 'Boedo')
     expect(boedoFeedback?.eventType).toBe(PointerEventType.PET_DOWN)
   })
 
@@ -97,9 +71,7 @@ describe('Events System', () => {
     fakePointer(entity, PointerEventType.PET_UP, InputAction.IA_JUMP)
 
     const feedback = PointerEvents.getOrNull(entity)
-    const boedoFeedback = feedback?.pointerEvents.find(
-      (f) => f.eventInfo?.hoverText === 'Boedo'
-    )
+    const boedoFeedback = feedback?.pointerEvents.find((f) => f.eventInfo?.hoverText === 'Boedo')
     expect(boedoFeedback?.eventType).toBe(PointerEventType.PET_DOWN)
     expect(counter).toBe(0)
 

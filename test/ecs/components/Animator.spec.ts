@@ -89,9 +89,7 @@ describe('Generated Animator ProtoBuf', () => {
       ]
     })
 
-    expect(Animator.playSingleAnimation(entityWithoutAnimator, 'Some')).toBe(
-      false
-    )
+    expect(Animator.playSingleAnimation(entityWithoutAnimator, 'Some')).toBe(false)
 
     expect(Animator.getClip(entity, 'Some')!.playing).toBeFalsy()
     expect(Animator.playSingleAnimation(entity, 'SomeInexistent')).toBe(false)
