@@ -1,7 +1,6 @@
 import { resolve } from 'path'
 
 import { IFileSystemComponent } from '../../components/fs'
-import { readdir, readFile } from '../../utils/fs'
 import { exec } from '../../utils/exec'
 import { Dict, hasPrimitiveKeys } from '../../utils/object'
 
@@ -17,11 +16,7 @@ export const REQUIRED_FILES = {
 /**
  * Required "package.json" structure
  */
-export const REQUIRED_PACKAGE_JSON = {
-  devDependencies: {
-    '@dcl/sdk': ['latest']
-  }
-}
+export const REQUIRED_PACKAGE_JSON = {}
 
 /**
  * Returns the required files for a project
@@ -31,8 +26,12 @@ export const getProjectStructure = () => Object.values(REQUIRED_FILES)
 /**
  * Returns true if the project follows a valid scene structure
  */
-export const validateProjectStructure = async (dir: string, fileList: string[]): Promise<boolean> => {
-  const files = await readdir(dir)
+export const validateProjectStructure = async (
+  components: { fs: IFileSystemComponent },
+  dir: string,
+  fileList: string[]
+): Promise<boolean> => {
+  const files = await components.fs.readdir(dir)
   const requiredFiles = new Set(fileList)
 
   for (let i = 0; i < files.length && requiredFiles.size > 0; i++) {
@@ -47,8 +46,12 @@ export const validateProjectStructure = async (dir: string, fileList: string[]):
 /**
  * Returns true if the project's "package.json" is valid
  */
-export const validatePackageJson = async (dir: string, deps: Dict): Promise<boolean> => {
-  const packageJson = JSON.parse(await readFile(resolve(dir, REQUIRED_FILES.PACKAGE_JSON)))
+export const validatePackageJson = async (
+  components: { fs: IFileSystemComponent },
+  dir: string,
+  deps: Dict
+): Promise<boolean> => {
+  const packageJson = JSON.parse(await components.fs.readFile(resolve(dir, REQUIRED_FILES.PACKAGE_JSON), 'utf-8'))
   return hasPrimitiveKeys(packageJson, deps)
 }
 
@@ -58,7 +61,7 @@ export const validatePackageJson = async (dir: string, deps: Dict): Promise<bool
 export const needsDependencies = async (components: { fs: IFileSystemComponent }, dir: string): Promise<boolean> => {
   const nodeModulesPath = resolve(dir, 'node_modules')
   const hasNodeModulesFolder = await components.fs.existPath(nodeModulesPath)
-  const isNodeModulesEmpty = hasNodeModulesFolder && (await readdir(nodeModulesPath)).length === 0
+  const isNodeModulesEmpty = hasNodeModulesFolder && (await components.fs.readdir(nodeModulesPath)).length === 0
 
   return !hasNodeModulesFolder || isNodeModulesEmpty
 }

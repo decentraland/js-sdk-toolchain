@@ -1,6 +1,5 @@
 import * as helpers from '../../../../../packages/@dcl/sdk/cli/commands/build/helpers'
 import * as execUtils from '../../../../../packages/@dcl/sdk/cli/utils/exec'
-import * as fsUtils from '../../../../../packages/@dcl/sdk/cli/utils/fs'
 import { initComponents } from '../../../../../packages/@dcl/sdk/cli/components'
 
 afterEach(() => {
@@ -12,37 +11,37 @@ const components = initComponents()
 
 describe('build:helpers', () => {
   it('validateProjectStructure: should return true if provided list of files is inside the dir', async () => {
-    jest.spyOn(fsUtils, 'readdir').mockResolvedValue(['a', 'file'])
+    jest.spyOn(components.fs, 'readdir').mockResolvedValue(['a', 'file'])
     jest.spyOn(helpers, 'validateProjectStructure')
 
-    const res = await helpers.validateProjectStructure('some/path', ['a', 'file'])
+    const res = await helpers.validateProjectStructure(components, 'some/path', ['a', 'file'])
 
     expect(res).toBe(true)
   })
 
   it('validateProjectStructure: should return false if provided list of files is not inside the dir', async () => {
-    jest.spyOn(fsUtils, 'readdir').mockResolvedValue(['a', 'file'])
+    jest.spyOn(components.fs, 'readdir').mockResolvedValue(['a', 'file'])
     jest.spyOn(helpers, 'validateProjectStructure')
 
-    const res = await helpers.validateProjectStructure('some/path', ['a', 'file', 'new-file'])
+    const res = await helpers.validateProjectStructure(components, 'some/path', ['a', 'file', 'new-file'])
 
     expect(res).toBe(false)
   })
 
   it('validatePackageJson: should return true if "package.json" has valid structure', async () => {
     const structure = { test: 1 }
-    jest.spyOn(fsUtils, 'readFile').mockResolvedValue(JSON.stringify(structure))
+    jest.spyOn(components.fs, 'readFile').mockResolvedValue(JSON.stringify(structure))
 
-    const res = await helpers.validatePackageJson('some/path', structure)
+    const res = await helpers.validatePackageJson(components, 'some/path', structure)
 
     expect(res).toBe(true)
   })
 
   it('validatePackageJson: should return false if "package.json" has invalid structure', async () => {
     const structure = { test: 1 }
-    jest.spyOn(fsUtils, 'readFile').mockResolvedValue(JSON.stringify(structure))
+    jest.spyOn(components.fs, 'readFile').mockResolvedValue(JSON.stringify(structure))
 
-    const res = await helpers.validatePackageJson('some/path', { fail: 1 })
+    const res = await helpers.validatePackageJson(components, 'some/path', { fail: 1 })
 
     expect(res).toBe(false)
   })
@@ -57,7 +56,7 @@ describe('build:helpers', () => {
 
   it('needsDependencies: should return true if "node_modules" is empty', async () => {
     jest.spyOn(components.fs, 'existPath').mockResolvedValue(true)
-    jest.spyOn(fsUtils, 'readdir').mockResolvedValue([])
+    jest.spyOn(components.fs, 'readdir').mockResolvedValue([])
 
     const res = await helpers.needsDependencies(components, 'some/path')
 
@@ -66,7 +65,7 @@ describe('build:helpers', () => {
 
   it('needsDependencies: should return false if "node_modules" is valid', async () => {
     jest.spyOn(components.fs, 'existPath').mockResolvedValue(true)
-    jest.spyOn(fsUtils, 'readdir').mockResolvedValue(['some', 'files'])
+    jest.spyOn(components.fs, 'readdir').mockResolvedValue(['some', 'files'])
 
     const res = await helpers.needsDependencies(components, 'some/path')
 

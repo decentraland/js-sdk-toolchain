@@ -39,14 +39,14 @@ export const args = getArgs({
 export const main = handler(async function main(options: Options) {
   const dir = resolve(process.cwd(), options.args['--dir'] || '.')
   await validateExistingProject(options.components, dir)
-  await validateSceneOptions(dir)
+  await validateSceneOptions(options.components, dir)
 
   const port = options.args['--port'] || (await previewPort())
   const startedFuture = future<void>()
 
   setTimeout(() => startedFuture.reject(new Error('Timed out starting the server')), 3000)
 
-  void Lifecycle.run<PreviewComponents>({
+  await Lifecycle.run<PreviewComponents>({
     async initComponents() {
       const metrics = createTestMetricsComponent(roomsMetrics)
       const config = createRecordConfigComponent({

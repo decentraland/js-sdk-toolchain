@@ -28,7 +28,7 @@ describe('build command', () => {
     try {
       await build.main({ args: {}, components })
     } catch (e) {
-      expect(projectValidatorSpy).toBeCalledWith(process.cwd(), projectStructure)
+      expect(projectValidatorSpy).toBeCalledWith(components, process.cwd(), projectStructure)
       expect(e).toBeInstanceOf(CliError)
     }
   })
@@ -40,7 +40,7 @@ describe('build command', () => {
     try {
       await build.main({ args: {}, components })
     } catch (e) {
-      expect(packageJsonValidatorSpy).toBeCalledWith(process.cwd(), helpers.REQUIRED_PACKAGE_JSON)
+      expect(packageJsonValidatorSpy).toBeCalledWith(components, process.cwd(), helpers.REQUIRED_PACKAGE_JSON)
       expect(e).toBeInstanceOf(CliError)
     }
   })

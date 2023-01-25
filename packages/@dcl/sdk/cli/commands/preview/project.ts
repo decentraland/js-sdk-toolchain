@@ -1,7 +1,6 @@
 import { resolve } from 'path'
 import { Scene } from '@dcl/schemas'
 
-import { readFile } from '../../utils/fs'
 import { CliError } from '../../utils/error'
 import { getObject, inBounds, getBounds, areConnected } from './coordinates'
 import { IFileSystemComponent } from '../../components/fs'
@@ -37,9 +36,9 @@ export function getSceneFilePath(dir: string): string {
 /**
  * Returns an object containing the contents of the `scene.json` file.
  */
-export async function getSceneFile(dir: string): Promise<Scene> {
+export async function getSceneFile(components: { fs: IFileSystemComponent }, dir: string): Promise<Scene> {
   try {
-    const sceneFile = JSON.parse(await readFile(getSceneFilePath(dir)))
+    const sceneFile = JSON.parse(await components.fs.readFile(getSceneFilePath(dir), 'utf-8'))
     return sceneFile as any as Scene
   } catch (e) {
     throw new CliError(`Unable to read 'scene.json' file. Try initializing the project using 'dcl init'.
@@ -89,8 +88,8 @@ export function validateSceneData(sceneFile: Scene): void {
 /**
  * Fails the execution if one of the parcel data is invalid
  */
-export async function validateSceneOptions(dir: string): Promise<void> {
-  const sceneFile = await getSceneFile(dir)
+export async function validateSceneOptions(components: { fs: IFileSystemComponent }, dir: string): Promise<void> {
+  const sceneFile = await getSceneFile(components, dir)
   return validateSceneData(sceneFile)
 }
 
@@ -99,7 +98,7 @@ export async function validateSceneOptions(dir: string): Promise<void> {
  * Throws if a project contains an invalid main path or if the `scene.json` file is missing.
  */
 export async function validateExistingProject(components: { fs: IFileSystemComponent }, dir: string) {
-  const sceneFile = await getSceneFile(dir)
+  const sceneFile = await getSceneFile(components, dir)
 
   if (!isWebSocket(sceneFile.main)) {
     if (!isValidMainFormat(sceneFile.main)) {

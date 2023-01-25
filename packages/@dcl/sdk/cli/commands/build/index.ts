@@ -51,7 +51,7 @@ export const main = handler(async function main(options: Options) {
   const dir = resolve(process.cwd(), options.args['--dir'] || '.')
   const projectStructure = getProjectStructure()
 
-  const hasValidProjectStructure = await validateProjectStructure(dir, projectStructure)
+  const hasValidProjectStructure = await validateProjectStructure(options.components, dir, projectStructure)
 
   if (!hasValidProjectStructure) {
     throw new CliError(`Invalid scene structure found. Required files:
@@ -60,7 +60,7 @@ export const main = handler(async function main(options: Options) {
 
   succeed('Project has a valid structure')
 
-  const hasValidPackageJson = await validatePackageJson(dir, REQUIRED_PACKAGE_JSON)
+  const hasValidPackageJson = await validatePackageJson(options.components, dir, REQUIRED_PACKAGE_JSON)
 
   if (!hasValidPackageJson) {
     throw new CliError(`Invalid "package.json" file. Structure required:

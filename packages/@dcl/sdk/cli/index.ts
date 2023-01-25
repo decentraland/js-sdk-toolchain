@@ -26,7 +26,7 @@ interface FileExports {
   args?: ReturnType<typeof getArgs>
 }
 
-const listCommandsStr = (commands: string[]) => toStringList(commands.map(($) => `npx sdk ${$}`))
+const listCommandsStr = (commands: string[]) => toStringList(commands.map(($) => `npx @dcl/sdk ${$}`))
 
 const handleError = (err: CliError) => {
   if (!(err instanceof CliError)) {

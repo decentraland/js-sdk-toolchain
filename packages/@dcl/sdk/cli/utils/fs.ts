@@ -1,26 +1,7 @@
-import fs from 'fs/promises'
 import extractZip from 'extract-zip'
 import { resolve } from 'path'
 import { IFileSystemComponent } from '../components/fs'
 import { IFetchComponent } from '../components/fetch'
-
-/**
- * Read's a directory files
- * @param dir Directory to read files from
- */
-/* istanbul ignore next */
-export async function readdir(dir: string): Promise<string[]> {
-  return fs.readdir(dir)
-}
-
-/**
- * Read's a file contents
- * @param path File to read content from
- */
-/* istanbul ignore next */
-export async function readFile(path: string): Promise<string> {
-  return fs.readFile(path, 'utf8')
-}
 
 /**
  * Check's if directory is empty
