@@ -7,13 +7,7 @@ enum Mesh {
   CONE
 }
 
-function createMesh(
-  x: number,
-  y: number,
-  z: number,
-  mesh: Mesh,
-  withCollider: boolean = false
-) {
+function createMesh(x: number, y: number, z: number, mesh: Mesh, withCollider: boolean = false) {
   const meshEntity = engine.addEntity()
   Transform.create(meshEntity, { position: { x, y, z } })
 
@@ -22,8 +16,7 @@ function createMesh(
       MeshRenderer.create(meshEntity, {
         mesh: { $case: 'box', box: { uvs: [] } }
       })
-      if (withCollider)
-        MeshCollider.create(meshEntity, { mesh: { $case: 'box', box: {} } })
+      if (withCollider) MeshCollider.create(meshEntity, { mesh: { $case: 'box', box: {} } })
       break
     case Mesh.SPHERE:
       MeshRenderer.create(meshEntity, { mesh: { $case: 'sphere', sphere: {} } })

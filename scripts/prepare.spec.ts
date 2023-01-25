@@ -10,28 +10,19 @@ import {
   CRDT_PATH
 } from './common'
 
-import {
-  itExecutes,
-  itInstallsADependencyFromFolderAndCopiesTheVersion
-} from './helpers'
+import { itExecutes, itInstallsADependencyFromFolderAndCopiesTheVersion } from './helpers'
 
 flow('build-all', () => {
   commonChecks()
 
   flow('@dcl/sdk', () => {
     // update dependencies versions and link packages
-    itInstallsADependencyFromFolderAndCopiesTheVersion(
-      SDK_PATH,
-      ROLLUP_CONFIG_PATH
-    )
+    itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, ROLLUP_CONFIG_PATH)
     itInstallsADependencyFromFolderAndCopiesTheVersion(ECS7_PATH, CRDT_PATH)
     itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, ECS7_PATH)
     itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, REACT_ECS)
     itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, JS_RUNTIME)
-    itInstallsADependencyFromFolderAndCopiesTheVersion(
-      PLAYGROUND_ASSETS_PATH,
-      SDK_PATH
-    )
+    itInstallsADependencyFromFolderAndCopiesTheVersion(PLAYGROUND_ASSETS_PATH, SDK_PATH)
   })
 
   flow('pack every package', () => {

@@ -59,15 +59,8 @@ export type DeleteEntityMessageBody = {
 }
 
 export type PutComponentMessage = CrdtMessageHeader & PutComponentMessageBody
-export type DeleteComponentMessage = CrdtMessageHeader &
-  DeleteComponentMessageBody
+export type DeleteComponentMessage = CrdtMessageHeader & DeleteComponentMessageBody
 export type DeleteEntityMessage = CrdtMessageHeader & DeleteEntityMessageBody
 
-export type CrdtMessage =
-  | PutComponentMessage
-  | DeleteComponentMessage
-  | DeleteEntityMessage
-export type CrdtMessageBody =
-  | PutComponentMessageBody
-  | DeleteComponentMessageBody
-  | DeleteEntityMessage
+export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage
+export type CrdtMessageBody = PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessage

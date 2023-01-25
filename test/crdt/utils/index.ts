@@ -1,8 +1,4 @@
-import {
-  dataCompare,
-  State,
-  stateIterator
-} from '../../../packages/@dcl/crdt/src'
+import { dataCompare, State, stateIterator } from '../../../packages/@dcl/crdt/src'
 
 /**
  * Compare buffer data
@@ -25,14 +21,8 @@ export function compareStatePayloads<T = Buffer>(states: State<T>[]) {
 
   for (const state of states) {
     // Compare key1 keys map size,
-    const numberOfState = Array.from(state.components).reduce(
-      (prev: number, cur) => prev + cur[1].size,
-      0
-    )
-    const baseNumberOfState = Array.from(state.components).reduce(
-      (prev: number, cur) => prev + cur[1].size,
-      0
-    )
+    const numberOfState = Array.from(state.components).reduce((prev: number, cur) => prev + cur[1].size, 0)
+    const baseNumberOfState = Array.from(state.components).reduce((prev: number, cur) => prev + cur[1].size, 0)
 
     if (numberOfState !== baseNumberOfState) {
       return false

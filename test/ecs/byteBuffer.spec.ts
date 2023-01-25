@@ -86,11 +86,7 @@ describe('ByteBuffer tests', () => {
   })
 
   it('should fails using the view after a grow', () => {
-    const buf = new ReadWriteByteBuffer(
-      new Uint8Array([0, 200, 0, 200]),
-      undefined,
-      2
-    )
+    const buf = new ReadWriteByteBuffer(new Uint8Array([0, 200, 0, 200]), undefined, 2)
 
     expect(buf.buffer().byteLength).toBe(4)
 

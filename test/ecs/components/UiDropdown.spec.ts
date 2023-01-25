@@ -1,9 +1,4 @@
-import {
-  Engine,
-  components,
-  TextAlignMode,
-  Font
-} from '../../../packages/@dcl/ecs/src'
+import { Engine, components, TextAlignMode, Font } from '../../../packages/@dcl/ecs/src'
 import { Color4 } from '../../../packages/@dcl/sdk/math'
 
 describe('UiDropdown component', () => {

@@ -1,9 +1,4 @@
-import {
-  Engine,
-  components,
-  Font,
-  TextAlignMode
-} from '../../../packages/@dcl/ecs/src'
+import { Engine, components, Font, TextAlignMode } from '../../../packages/@dcl/ecs/src'
 
 describe('Generated TextShape ProtoBuf', () => {
   it('should serialize/deserialize TextShape', () => {

@@ -22,9 +22,7 @@ describe('Entity container', () => {
     expect(entityContainer.getEntityState(entityA)).toBe(EntityState.UsedEntity)
 
     entityContainer.removeEntity(entityA)
-    expect(entityContainer.getEntityState(entityA)).not.toBe(
-      EntityState.UsedEntity
-    )
+    expect(entityContainer.getEntityState(entityA)).not.toBe(EntityState.UsedEntity)
 
     entityContainer.releaseRemovedEntities()
     expect(entityContainer.getEntityState(entityA)).toBe(EntityState.Removed)
@@ -38,18 +36,14 @@ describe('Entity container', () => {
 
     expect(entityContainer.getEntityState(entityA)).toBe(EntityState.UsedEntity)
 
-    expect(Array.from(entityContainer.getExistingEntities())).toStrictEqual([
-      entityA
-    ])
+    expect(Array.from(entityContainer.getExistingEntities())).toStrictEqual([entityA])
   })
 
   it('trying to remove entity', () => {
     const entityContainer = EntityContainer()
     // reserved entity
     expect(entityContainer.removeEntity(1 as Entity)).toBe(false)
-    expect(entityContainer.getEntityState(1 as Entity)).toBe(
-      EntityState.Reserved
-    )
+    expect(entityContainer.getEntityState(1 as Entity)).toBe(EntityState.Reserved)
 
     // remove entity that wasn't used (add to GSet)
     expect(entityContainer.removeEntity(513 as Entity)).toBe(true)
@@ -61,9 +55,7 @@ describe('Entity container', () => {
     expect(entityContainer.generateEntity()).toBe(512)
 
     // the second would be 513, but it was deleted, so we'll get the version 1 of 513
-    expect(entityContainer.generateEntity()).toBe(
-      EntityUtils.toEntityId(513, 1)
-    )
+    expect(entityContainer.generateEntity()).toBe(EntityUtils.toEntityId(513, 1))
   })
 
   it('should fail with creating entity out of range', () => {

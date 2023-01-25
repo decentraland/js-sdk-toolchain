@@ -11,9 +11,7 @@ function checkDeps(folder: string): Record<string, string> {
       const libVersion = packageJson.dependencies[libName]
       if (libVersion === 'next' || libVersion.startsWith('^')) {
         throw new Error(
-          `The library ${libName} has a non-fixed version: ${JSON.stringify(
-            libVersion
-          )} in the file ${packageJsonPath}`
+          `The library ${libName} has a non-fixed version: ${JSON.stringify(libVersion)} in the file ${packageJsonPath}`
         )
       }
     }
@@ -41,14 +39,10 @@ describe('Check there is fixed version', () => {
 
     const dependencies = Object.keys(sdkDeps)
 
-    const untrackedDependency = requiredDependencies.filter(
-      (item) => !dependencies.includes(item)
-    )
+    const untrackedDependency = requiredDependencies.filter((item) => !dependencies.includes(item))
 
     if (untrackedDependency.length) {
-      throw new Error(
-        `There are some untracked libraries: ${untrackedDependency}`
-      )
+      throw new Error(`There are some untracked libraries: ${untrackedDependency}`)
     }
   })
 })

@@ -45,20 +45,10 @@ describe('CRDT process generated messages', () => {
           const isValid = compareStatePayloads([crdt.getState(), msg])
           expect.setState({ currentTestName: testSpecName })
           if (!isValid) {
-            messages.push(
-              `\x1b[31m✕ \x1b[0m${testSpecName?.replace(
-                /#/,
-                ''
-              )}  [./${file}]\n`
-            )
+            messages.push(`\x1b[31m✕ \x1b[0m${testSpecName?.replace(/#/, '')}  [./${file}]\n`)
             expect(isValid).toBe(true)
           } else {
-            messages.push(
-              `\x1b[32m✓ \x1b[0m${testSpecName?.replace(
-                /#/,
-                ''
-              )}  [./${file}]\n`
-            )
+            messages.push(`\x1b[32m✓ \x1b[0m${testSpecName?.replace(/#/, '')}  [./${file}]\n`)
           }
           resetCrdt()
         }

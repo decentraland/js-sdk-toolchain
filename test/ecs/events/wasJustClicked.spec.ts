@@ -1,9 +1,4 @@
-import {
-  Engine,
-  components,
-  PointerEventType,
-  InputAction
-} from '../../../packages/@dcl/ecs/src'
+import { Engine, components, PointerEventType, InputAction } from '../../../packages/@dcl/ecs/src'
 import { createInputSystem } from '../../../packages/@dcl/ecs/src/engine/input'
 import { createTestPointerDownCommand } from './utils'
 
@@ -21,16 +16,8 @@ describe('Events helpers isClicked', () => {
 
     PointerEventsResult.create(newEngine.RootEntity, {
       commands: [
-        createTestPointerDownCommand(
-          newEngine.RootEntity,
-          4,
-          PointerEventType.PET_DOWN
-        ),
-        createTestPointerDownCommand(
-          newEngine.RootEntity,
-          5,
-          PointerEventType.PET_UP
-        )
+        createTestPointerDownCommand(newEngine.RootEntity, 4, PointerEventType.PET_DOWN),
+        createTestPointerDownCommand(newEngine.RootEntity, 5, PointerEventType.PET_UP)
       ]
     })
 
@@ -98,9 +85,7 @@ describe('Events helpers isClicked', () => {
     const { isClicked } = createInputSystem(newEngine)
 
     PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [
-        createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)
-      ]
+      commands: [createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)]
     })
 
     expect(isClicked(InputAction.IA_POINTER, entity)).toBe(false)
@@ -113,9 +98,7 @@ describe('Events helpers isClicked', () => {
     const entity = newEngine.addEntity()
 
     PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [
-        createTestPointerDownCommand(entity, 4, PointerEventType.PET_UP)
-      ]
+      commands: [createTestPointerDownCommand(entity, 4, PointerEventType.PET_UP)]
     })
     const { isClicked } = createInputSystem(newEngine)
 

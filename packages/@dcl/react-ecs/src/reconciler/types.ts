@@ -24,9 +24,8 @@ export type _ChildSet = never
 export type TimeoutHandle = any
 export type NoTimeout = number
 
-export type Changes<K extends keyof EntityComponents = keyof EntityComponents> =
-  {
-    type: 'delete' | 'add' | 'put'
-    props?: Partial<EntityComponents[K]>
-    component: K
-  }
+export type Changes<K extends keyof EntityComponents = keyof EntityComponents> = {
+  type: 'delete' | 'add' | 'put'
+  props?: Partial<EntityComponents[K]>
+  component: K
+}

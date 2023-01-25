@@ -1,11 +1,4 @@
-import {
-  copyFileSync,
-  mkdirSync,
-  readFileSync,
-  removeSync,
-  rmSync,
-  writeFileSync
-} from 'fs-extra'
+import { copyFileSync, mkdirSync, readFileSync, removeSync, rmSync, writeFileSync } from 'fs-extra'
 import * as path from 'path'
 import { TSC } from '../common'
 import { runCommand } from '../helpers'
@@ -65,11 +58,9 @@ async function internalCompile() {
       types.add(method.requestType)
       types.add(method.responseType)
       functions.push(
-        `export declare function ${
-          method.requestStream ? '*' : ''
-        }${methodName}(body: ${method.requestType}): Promise<${
-          method.responseType
-        }>`
+        `export declare function ${method.requestStream ? '*' : ''}${methodName}(body: ${
+          method.requestType
+        }): Promise<${method.responseType}>`
       )
     }
 
@@ -77,9 +68,9 @@ async function internalCompile() {
     mkdirSync(path.resolve(apiModuleDirPath))
 
     let indexContent = ''
-    indexContent += `import type {${Array.from(types).join(
-      ', '
-    )}} from './../../proto/decentraland/kernel/apis/${api.fileName}.gen'\n`
+    indexContent += `import type {${Array.from(types).join(', ')}} from './../../proto/decentraland/kernel/apis/${
+      api.fileName
+    }.gen'\n`
     indexContent += functions.join('\n')
 
     writeFileSync(path.resolve(apiModuleDirPath, `index.gen.ts`), indexContent)
@@ -129,10 +120,7 @@ async function preprocessProtoGeneration(protoPath: string) {
 
     const item = snakeToPascal(fileName)
 
-    const defBlock = getBlock(
-      textContent,
-      textContent.indexOf(`export const ${item}ServiceDefinition`)
-    )
+    const defBlock = getBlock(textContent, textContent.indexOf(`export const ${item}ServiceDefinition`))
 
     const cleanContent = textContent
       .replace(`export type ${item}ServiceDefinition`, '//')
@@ -161,10 +149,7 @@ function processDeclarations(apiName: string, filePath: string) {
   do {
     where = decFile.indexOf('declare module', where)
     if (where !== -1) {
-      const block = getBlock(decFile, where).replace(
-        /export const protobufPackage (.*)\n/,
-        ''
-      )
+      const block = getBlock(decFile, where).replace(/export const protobufPackage (.*)\n/, '')
       if (block.length > 0) {
         blocks.push(block)
       } else {
@@ -176,11 +161,6 @@ function processDeclarations(apiName: string, filePath: string) {
     where += 'declare module'.length
   } while (where)
 
-  const content = blocks
-    .join('\n\t// Function declaration section')
-    .replace(/import(.*)\n/g, '')
-  writeFileSync(
-    filePath,
-    `declare module "~system/${apiName}" {\n${content}\n}`
-  )
+  const content = blocks.join('\n\t// Function declaration section').replace(/import(.*)\n/g, '')
+  writeFileSync(filePath, `declare module "~system/${apiName}" {\n${content}\n}`)
 }

@@ -1,17 +1,5 @@
-import {
-  BackgroundTextureMode,
-  PBUiBackground,
-  TextureFilterMode,
-  TextureWrapMode
-} from '@dcl/ecs'
-import {
-  UiBackgroundProps,
-  UiTexture,
-  UiAvatarTexture,
-  TextureWrapType,
-  TextureFilterType,
-  TextureMode
-} from './types'
+import { BackgroundTextureMode, PBUiBackground, TextureFilterMode, TextureWrapMode } from '@dcl/ecs'
+import { UiBackgroundProps, UiTexture, UiAvatarTexture, TextureWrapType, TextureFilterType, TextureMode } from './types'
 
 const parseTextureMode: Readonly<Record<TextureMode, BackgroundTextureMode>> = {
   'nine-slices': BackgroundTextureMode.NINE_SLICES,
@@ -21,33 +9,23 @@ const parseTextureMode: Readonly<Record<TextureMode, BackgroundTextureMode>> = {
 /**
  * @internal
  */
-export function getTextureMode(
-  mode: TextureMode | undefined
-): Record<'textureMode', BackgroundTextureMode> {
-  const value: BackgroundTextureMode = mode
-    ? parseTextureMode[mode]
-    : BackgroundTextureMode.CENTER
+export function getTextureMode(mode: TextureMode | undefined): Record<'textureMode', BackgroundTextureMode> {
+  const value: BackgroundTextureMode = mode ? parseTextureMode[mode] : BackgroundTextureMode.CENTER
   return { textureMode: value }
 }
 
-function isAvatarTexture(
-  props: UiBackgroundProps
-): props is UiBackgroundProps & UiAvatarTexture {
+function isAvatarTexture(props: UiBackgroundProps): props is UiBackgroundProps & UiAvatarTexture {
   return !!(props as UiAvatarTexture).avatarTexture
 }
 
-function isTexture(
-  props: UiBackgroundProps
-): props is UiBackgroundProps & UiTexture {
+function isTexture(props: UiBackgroundProps): props is UiBackgroundProps & UiTexture {
   return !!(props as UiTexture).texture
 }
 
 /**
  * @internal
  */
-export function getTexture(
-  props: UiBackgroundProps
-): PBUiBackground['texture'] {
+export function getTexture(props: UiBackgroundProps): PBUiBackground['texture'] {
   if (isTexture(props) && props.texture) {
     return {
       tex: {

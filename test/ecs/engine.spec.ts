@@ -1,7 +1,4 @@
-import {
-  cyclicParentingChecker,
-  RESERVED_STATIC_ENTITIES
-} from '../../packages/@dcl/ecs/src'
+import { cyclicParentingChecker, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src'
 import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
@@ -249,12 +246,11 @@ describe('Engine tests', () => {
     Velocity.create(entityA, { y: 1 })
     Velocity.create(entityB, { y: 1 })
 
-    for (const [
-      entity,
-      readonlyVelocity,
-      readonlyPosition,
-      readonlyPosition2
-    ] of engine.getEntitiesWith(Velocity, Position, Position2)) {
+    for (const [entity, readonlyVelocity, readonlyPosition, readonlyPosition2] of engine.getEntitiesWith(
+      Velocity,
+      Position,
+      Position2
+    )) {
       expect(entity).toBe(entityA)
       expect(readonlyVelocity).toStrictEqual({ y: 1 })
       expect(readonlyPosition).toStrictEqual({ x: 0 })
@@ -275,9 +271,7 @@ describe('Engine tests', () => {
     // avoid dirty iterators
     await engine.update(0)
 
-    for (const [entity, _readonlyPosition] of engine.getEntitiesWith(
-      Position
-    )) {
+    for (const [entity, _readonlyPosition] of engine.getEntitiesWith(Position)) {
       const position = Position.getMutable(entity)
       expect(entity).toBe(entityA)
       expect(position).toStrictEqual({ x: 0 })
@@ -303,13 +297,9 @@ describe('Engine tests', () => {
     // avoid dirty iterators
     await engine.update(0)
 
-    const [component1, component2, component3] = Array.from(
-      engine.getEntitiesWith(Position, Velocity)
-    ).map(([entity]) => [
-      entity,
-      Position.getMutable(entity),
-      Velocity.getMutable(entity)
-    ])
+    const [component1, component2, component3] = Array.from(engine.getEntitiesWith(Position, Velocity)).map(
+      ([entity]) => [entity, Position.getMutable(entity), Velocity.getMutable(entity)]
+    )
 
     expect(component1).toStrictEqual([entityA, { x: 0 }, { y: 0 }])
     expect(component2).toStrictEqual([entityB, { x: 1 }, { y: 1 }])
@@ -334,9 +324,7 @@ describe('Engine tests', () => {
     // avoid dirty iterators
     await engine.update(0)
 
-    const [component1, component2, component3] = Array.from(
-      engine.getEntitiesWith(Position, Velocity)
-    )
+    const [component1, component2, component3] = Array.from(engine.getEntitiesWith(Position, Velocity))
     expect(component1).toStrictEqual([entityA, { x: 0 }, { y: 0 }])
     expect(component2).toStrictEqual([entityB, { x: 1 }, { y: 1 }])
     expect(component3).toBe(undefined)
@@ -376,18 +364,13 @@ describe('Engine tests', () => {
     engine.defineComponent('MoveTransportData', MoveTransportData)
     const zombie = engine.addEntity()
 
-    const MoveTransformComponent = engine.defineComponent(
-      'MoveTransportData2',
-      MoveTransportData
-    )
+    const MoveTransformComponent = engine.defineComponent('MoveTransportData2', MoveTransportData)
 
     let moves = 0
 
     function moveSystem(_dt: number) {
       moves++
-      for (const [entity, _readonlyMove] of engine.getEntitiesWith(
-        MoveTransformComponent
-      )) {
+      for (const [entity, _readonlyMove] of engine.getEntitiesWith(MoveTransformComponent)) {
         const move = MoveTransformComponent.getMutable(entity)
         move.speed += 1
         Transform.getMutable(entity).position = Vector3.Zero()
@@ -532,8 +515,7 @@ describe('Engine tests', () => {
 
   it('should log the error of cyclic parenting', async () => {
     const errorFunc = jest.spyOn(console, 'error')
-    const errorString = (e: Entity) =>
-      'There is a cyclic parent with entity ' + e
+    const errorString = (e: Entity) => 'There is a cyclic parent with entity ' + e
 
     const engine = Engine()
     const Transform = components.Transform(engine)

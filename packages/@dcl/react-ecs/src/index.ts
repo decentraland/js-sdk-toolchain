@@ -7,9 +7,6 @@ export * from './system'
 export * from './react-ecs'
 
 /*#__PURE__*/
-export const ReactEcsRenderer = createReactBasedUiSystem(
-  engine,
-  pointerEventsSystem
-)
+export const ReactEcsRenderer = createReactBasedUiSystem(engine, pointerEventsSystem)
 
 export default ReactEcs

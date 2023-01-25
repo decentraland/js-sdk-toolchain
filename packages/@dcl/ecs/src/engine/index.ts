@@ -6,18 +6,10 @@ import { ISchema } from '../schemas/ISchema'
 import { MapResult, Spec } from '../schemas/Map'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { crdtSceneSystem, OnChangeFunction } from '../systems/crdt'
-import {
-  ComponentDefinition,
-  createComponentDefinitionFromSchema
-} from './component'
+import { ComponentDefinition, createComponentDefinitionFromSchema } from './component'
 import { Entity, EntityContainer } from './entity'
 import { ReadonlyComponentSchema } from './readonly'
-import {
-  SystemItem,
-  SystemContainer,
-  SystemFn,
-  SYSTEMS_REGULAR_PRIORITY
-} from './systems'
+import { SystemItem, SystemContainer, SystemFn, SYSTEMS_REGULAR_PRIORITY } from './systems'
 import type { IEngine, MapComponentDefinition } from './types'
 export * from './input'
 export * from './readonly'
@@ -52,11 +44,7 @@ function preEngine(): PreEngine {
 
   let sealed = false
 
-  function addSystem(
-    fn: SystemFn,
-    priority: number = SYSTEMS_REGULAR_PRIORITY,
-    name?: string
-  ) {
+  function addSystem(fn: SystemFn, priority: number = SYSTEMS_REGULAR_PRIORITY, name?: string) {
     systems.add(fn, priority, name)
   }
 
@@ -84,10 +72,7 @@ function preEngine(): PreEngine {
     component: ComponentDefinition<any>
   ): ComponentDefinition<any> {
     /* istanbul ignore next */
-    if (sealed)
-      throw new Error(
-        'Engine is already sealed. No components can be added at this stage'
-      )
+    if (sealed) throw new Error('Engine is already sealed. No components can be added at this stage')
     const componentId = componentNumberFromName(componentName)
     const prev = componentsDefinition.get(componentId)
     if (prev) {
@@ -109,26 +94,16 @@ function preEngine(): PreEngine {
     return component
   }
 
-  function defineComponentFromSchema<T>(
-    componentName: string,
-    schema: ISchema<T>
-  ) {
+  function defineComponentFromSchema<T>(componentName: string, schema: ISchema<T>) {
     /* istanbul ignore next */
-    if (sealed)
-      throw new Error(
-        'Engine is already sealed. No components can be added at this stage'
-      )
+    if (sealed) throw new Error('Engine is already sealed. No components can be added at this stage')
     const componentId = componentNumberFromName(componentName)
     const prev = componentsDefinition.get(componentId)
     if (prev) {
       // TODO: assert spec === prev.spec
       return prev as ComponentDefinition<T>
     }
-    const newComponent = createComponentDefinitionFromSchema<T>(
-      componentName,
-      componentId,
-      schema
-    )
+    const newComponent = createComponentDefinitionFromSchema<T>(componentName, componentId, schema)
     componentsDefinition.set(componentId, newComponent)
     return newComponent as ComponentDefinition<T>
   }
@@ -138,10 +113,7 @@ function preEngine(): PreEngine {
     mapSpec: T,
     constructorDefault?: Partial<MapResult<T>>
   ) {
-    if (sealed)
-      throw new Error(
-        'Engine is already sealed. No components can be added at this stage'
-      )
+    if (sealed) throw new Error('Engine is already sealed. No components can be added at this stage')
     const componentId = componentNumberFromName(componentName)
     const prev = componentsDefinition.get(componentId)
     if (prev) {
@@ -150,11 +122,7 @@ function preEngine(): PreEngine {
     }
 
     const schemaSpec = Schemas.Map(mapSpec, constructorDefault)
-    const def = createComponentDefinitionFromSchema<MapResult<T>>(
-      componentName,
-      componentId,
-      schemaSpec
-    )
+    const def = createComponentDefinitionFromSchema<MapResult<T>>(componentName, componentId, schemaSpec)
     const newComponent = {
       ...def,
       create(entity: Entity, val?: Partial<MapResult<T>>) {
@@ -179,9 +147,7 @@ function preEngine(): PreEngine {
     return component as ComponentDefinition<T>
   }
 
-  function getComponentOrNull<T>(
-    componentId: number
-  ): ComponentDefinition<T> | null {
+  function getComponentOrNull<T>(componentId: number): ComponentDefinition<T> | null {
     return (
       (componentsDefinition.get(componentId) as ComponentDefinition<T>) ??
       /* istanbul ignore next */
@@ -189,20 +155,15 @@ function preEngine(): PreEngine {
     )
   }
 
-  function* getEntitiesWith<
-    T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]
-  >(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]> {
+  function* getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(
+    ...components: T
+  ): Iterable<[Entity, ...ReadonlyComponentSchema<T>]> {
     for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
-      yield [entity, ...groupComp.map((c) => c.get(entity))] as [
-        Entity,
-        ...ReadonlyComponentSchema<T>
-      ]
+      yield [entity, ...groupComp.map((c) => c.get(entity))] as [Entity, ...ReadonlyComponentSchema<T>]
     }
   }
 
-  function* getComponentDefGroup<T extends ComponentDefinition<any>[]>(
-    ...args: T
-  ): Iterable<[Entity, ...T]> {
+  function* getComponentDefGroup<T extends ComponentDefinition<any>[]>(...args: T): Iterable<[Entity, ...T]> {
     const [firstComponentDef, ...componentDefinitions] = args
     for (const [entity] of firstComponentDef.iterator()) {
       let matches = true
@@ -233,10 +194,7 @@ function preEngine(): PreEngine {
 
   const Transform = components.Transform({ defineComponentFromSchema })
 
-  function* getTreeEntityArray(
-    firstEntity: Entity,
-    proccesedEntities: Entity[]
-  ): Generator<Entity> {
+  function* getTreeEntityArray(firstEntity: Entity, proccesedEntities: Entity[]): Generator<Entity> {
     // This avoid infinite loop when there is a cyclic parenting
     if (proccesedEntities.find((value) => firstEntity === value)) return
     proccesedEntities.push(firstEntity)

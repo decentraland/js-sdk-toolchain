@@ -1,8 +1,7 @@
 import { withQuickJsVm } from './vm'
 
 describe('ensure that VM works', () => {
-  it('runs no code and vm has no leaks', async () =>
-    withQuickJsVm(async () => {}))
+  it('runs no code and vm has no leaks', async () => withQuickJsVm(async () => {}))
 
   it('runs empty script and returns without leaks', async () =>
     withQuickJsVm(async (opts) => {
@@ -24,9 +23,7 @@ describe('ensure that VM works', () => {
       expect(opts.eval(`"123"`)).toEqual('123')
       expect(opts.eval(`["123"]`)).toEqual(['123'])
       expect(opts.eval(`(() => ({a: "123"}))()`)).toEqual({ a: '123' })
-      expect(opts.eval(`new Uint8Array([1,2,3])`)).toEqual(
-        new Uint8Array([1, 2, 3])
-      )
+      expect(opts.eval(`new Uint8Array([1,2,3])`)).toEqual(new Uint8Array([1, 2, 3]))
     }))
 
   it('doesnt leak on provide', async () =>
@@ -359,11 +356,6 @@ describe('ensure that VM works', () => {
 
       expect(wasCalledWithValue).toEqual(123)
 
-      expect(logs).toEqual([
-        'its a promise',
-        'awaiting promises work',
-        1,
-        'end'
-      ])
+      expect(logs).toEqual(['its a promise', 'awaiting promises work', 1, 'end'])
     }))
 })
