@@ -40,30 +40,15 @@ describe('utils/object', () => {
   it('hasPrimitiveKeys: should return true if two objects contains same structure (with an optional list of values)', () => {
     expect(objUtils.hasPrimitiveKeys({ key: 1 }, { key: 1 })).toBe(true)
     expect(objUtils.hasPrimitiveKeys({ key: 1 }, { key: [2, 1] })).toBe(true)
-    expect(
-      objUtils.hasPrimitiveKeys({ key: { key2: 1 } }, { key: { key2: 1 } })
-    ).toBe(true)
-    expect(
-      objUtils.hasPrimitiveKeys({ key: [1, 2, 3] }, { key: [1, 2, 3] })
-    ).toBe(true)
-    expect(
-      objUtils.hasPrimitiveKeys(
-        { key: { key2: 3 } },
-        { key: { key2: [1, 2, 3] } }
-      )
-    ).toBe(true)
+    expect(objUtils.hasPrimitiveKeys({ key: { key2: 1 } }, { key: { key2: 1 } })).toBe(true)
+    expect(objUtils.hasPrimitiveKeys({ key: [1, 2, 3] }, { key: [1, 2, 3] })).toBe(true)
+    expect(objUtils.hasPrimitiveKeys({ key: { key2: 3 } }, { key: { key2: [1, 2, 3] } })).toBe(true)
 
     expect(objUtils.hasPrimitiveKeys({ key: 1 }, { key: 2 })).toBe(false)
     expect(objUtils.hasPrimitiveKeys({ key: 1 }, { key2: 1 })).toBe(false)
-    expect(
-      objUtils.hasPrimitiveKeys({ key: { key2: 1 } }, { key: { key2: 2 } })
-    ).toBe(false)
-    expect(
-      objUtils.hasPrimitiveKeys({ key: { key2: 1 } }, { key: { key3: 1 } })
-    ).toBe(false)
-    expect(objUtils.hasPrimitiveKeys({ key: [1, 2, 3] }, { key: [1] })).toBe(
-      false
-    )
+    expect(objUtils.hasPrimitiveKeys({ key: { key2: 1 } }, { key: { key2: 2 } })).toBe(false)
+    expect(objUtils.hasPrimitiveKeys({ key: { key2: 1 } }, { key: { key3: 1 } })).toBe(false)
+    expect(objUtils.hasPrimitiveKeys({ key: [1, 2, 3] }, { key: [1] })).toBe(false)
     expect(objUtils.hasPrimitiveKeys({ key: 1 }, { key: [4] })).toBe(false)
     expect(objUtils.hasPrimitiveKeys({ key: [1] }, { key: 1 })).toBe(false)
   })

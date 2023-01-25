@@ -1,9 +1,5 @@
 import { crdtProtocol } from '@dcl/crdt'
-import {
-  ComponentDataMessage,
-  CRDTMessageType,
-  ProcessMessageResultType
-} from '@dcl/crdt/dist/types'
+import { ComponentDataMessage, CRDTMessageType, ProcessMessageResultType } from '@dcl/crdt/dist/types'
 
 import { Entity, EntityState, EntityUtils } from '../../engine/entity'
 import type { ComponentDefinition, IEngine } from '../../engine'
@@ -12,10 +8,7 @@ import CrdtMessageProtocol from '../../serialization/crdt'
 import { DeleteComponent } from '../../serialization/crdt/deleteComponent'
 import { DeleteEntity } from '../../serialization/crdt/deleteEntity'
 import { PutComponentOperation } from '../../serialization/crdt/putComponent'
-import {
-  CrdtMessageType,
-  CrdtMessageHeader
-} from '../../serialization/crdt/types'
+import { CrdtMessageType, CrdtMessageHeader } from '../../serialization/crdt/types'
 import { ReceiveMessage, Transport, TransportMessage } from './types'
 
 /**
@@ -28,10 +21,7 @@ export type OnChangeFunction = (
 ) => void
 
 export function crdtSceneSystem(
-  engine: Pick<
-    IEngine,
-    'getComponentOrNull' | 'getComponent' | 'entityContainer' | 'componentsIter'
-  >,
+  engine: Pick<IEngine, 'getComponentOrNull' | 'getComponent' | 'entityContainer' | 'componentsIter'>,
   onProcessEntityComponentChange: OnChangeFunction | null
 ) {
   const transports: Transport[] = []
@@ -71,9 +61,7 @@ export function crdtSceneSystem(
             ...header,
             ...message,
             transportId,
-            messageBuffer: buffer
-              .buffer()
-              .subarray(offset, buffer.currentReadOffset())
+            messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
           })
         } else if (header.type === CrdtMessageType.PUT_COMPONENT) {
           const message = PutComponentOperation.read(buffer)!
@@ -81,9 +69,7 @@ export function crdtSceneSystem(
             ...header,
             ...message,
             transportId,
-            messageBuffer: buffer
-              .buffer()
-              .subarray(offset, buffer.currentReadOffset())
+            messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
           })
         } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
           const message = DeleteEntity.read(buffer)!
@@ -91,9 +77,7 @@ export function crdtSceneSystem(
             ...header,
             ...message,
             transportId,
-            messageBuffer: buffer
-              .buffer()
-              .subarray(offset, buffer.currentReadOffset())
+            messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
           })
 
           // Unknown message, we skip it
@@ -180,8 +164,7 @@ export function crdtSceneSystem(
               component.upsertFromBinary(msg.entityId, data, false)
             }
 
-            onProcessEntityComponentChange &&
-              onProcessEntityComponentChange(msg.entityId, msg.type, component)
+            onProcessEntityComponentChange && onProcessEntityComponentChange(msg.entityId, msg.type, component)
 
             break
 
@@ -189,35 +172,20 @@ export function crdtSceneSystem(
           // To do this we add this message to a queue that will be processed at the end of the update tick
           case ProcessMessageResultType.StateOutdatedData:
           case ProcessMessageResultType.StateOutdatedTimestamp:
-            const current = crdtClient
-              .getState()
-              .components.get(msg.componentId)
-              ?.get(msg.entityId)
+            const current = crdtClient.getState().components.get(msg.componentId)?.get(msg.entityId)
             if (current) {
               const offset = bufferForOutdated.currentWriteOffset()
 
               const ts = current.timestamp
               if (component.has(msg.entityId)) {
-                PutComponentOperation.write(
-                  msg.entityId,
-                  ts,
-                  component,
-                  bufferForOutdated
-                )
+                PutComponentOperation.write(msg.entityId, ts, component, bufferForOutdated)
               } else {
-                DeleteComponent.write(
-                  msg.entityId,
-                  component.componentId,
-                  ts,
-                  bufferForOutdated
-                )
+                DeleteComponent.write(msg.entityId, component.componentId, ts, bufferForOutdated)
               }
 
               outdatedMessages.push({
                 ...msg,
-                messageBuffer: bufferForOutdated
-                  .buffer()
-                  .subarray(offset, bufferForOutdated.currentWriteOffset())
+                messageBuffer: bufferForOutdated.buffer().subarray(offset, bufferForOutdated.currentWriteOffset())
               })
             }
             break
@@ -245,8 +213,7 @@ export function crdtSceneSystem(
 
       engine.entityContainer.updateRemovedEntity(entity)
 
-      onProcessEntityComponentChange &&
-        onProcessEntityComponentChange(entity, CrdtMessageType.DELETE_ENTITY)
+      onProcessEntityComponentChange && onProcessEntityComponentChange(entity, CrdtMessageType.DELETE_ENTITY)
     }
   }
 
@@ -267,18 +234,11 @@ export function crdtSceneSystem(
         }
 
         // TODO: reuse shared writer to prevent extra allocations of toBinary
-        const componentValue =
-          component.toBinaryOrNull(entity)?.toBinary() ?? null
+        const componentValue = component.toBinaryOrNull(entity)?.toBinary() ?? null
 
         // TODO: do not emit event if componentValue equals the value didn't change
         // if update goes bad, the entity doesn't accept put anymore (it's added to deleted entities set)
-        if (
-          crdtClient.createComponentDataEvent(
-            component.componentId,
-            entity as number,
-            componentValue
-          ) === null
-        ) {
+        if (crdtClient.createComponentDataEvent(component.componentId, entity as number, componentValue) === null) {
           component.deleteFrom(entity, false)
         } else {
           entitySet.push(entity)
@@ -286,9 +246,7 @@ export function crdtSceneSystem(
           onProcessEntityComponentChange &&
             onProcessEntityComponentChange(
               entity,
-              componentValue === null
-                ? CrdtMessageType.DELETE_COMPONENT
-                : CrdtMessageType.PUT_COMPONENT,
+              componentValue === null ? CrdtMessageType.DELETE_COMPONENT : CrdtMessageType.PUT_COMPONENT,
               component
             )
         }
@@ -332,19 +290,12 @@ export function crdtSceneSystem(
           if (transportMessage.type === CrdtMessageType.PUT_COMPONENT) {
             PutComponentOperation.write(entity, timestamp, component, buffer)
           } else {
-            DeleteComponent.write(
-              entity,
-              component.componentId,
-              timestamp,
-              buffer
-            )
+            DeleteComponent.write(entity, component.componentId, timestamp, buffer)
           }
 
           crdtMessages.push({
             ...transportMessage,
-            messageBuffer: buffer
-              .buffer()
-              .subarray(offset, buffer.currentWriteOffset())
+            messageBuffer: buffer.buffer().subarray(offset, buffer.currentWriteOffset())
           })
         }
       }
@@ -359,9 +310,7 @@ export function crdtSceneSystem(
       crdtMessages.push({
         type: CrdtMessageType.DELETE_ENTITY,
         entityId,
-        messageBuffer: buffer
-          .buffer()
-          .subarray(offset, buffer.currentWriteOffset())
+        messageBuffer: buffer.buffer().subarray(offset, buffer.currentWriteOffset())
       })
     }
 
@@ -391,16 +340,11 @@ export function crdtSceneSystem(
       }
       // Then we send all the new crdtMessages that the transport needs to process
       for (const message of crdtMessages) {
-        if (
-          message.transportId !== transportIndex &&
-          transport.filter(message)
-        ) {
+        if (message.transportId !== transportIndex && transport.filter(message)) {
           transportBuffer.writeBuffer(message.messageBuffer, false)
         }
       }
-      const message = transportBuffer.currentWriteOffset()
-        ? transportBuffer.toBinary()
-        : new Uint8Array([])
+      const message = transportBuffer.currentWriteOffset() ? transportBuffer.toBinary() : new Uint8Array([])
       await transport.send(message)
     }
   }

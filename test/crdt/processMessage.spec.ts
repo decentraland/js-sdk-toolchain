@@ -8,17 +8,10 @@ describe('CRDT process message', () => {
     const [clientA, clientB] = createSandbox({ clientLength: 2 }).clients
     const key1 = 7,
       key2 = 11
-    const messageA = clientA.createComponentDataEvent(
-      key1,
-      key2,
-      Buffer.from('casla')
-    )!
+    const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('casla'))!
 
     clientB.processMessage(messageA)
-    const value = clientB
-      .getState()
-      .components.get(messageA.componentId)!
-      .get(messageA.entityId)!
+    const value = clientB.getState().components.get(messageA.componentId)!.get(messageA.entityId)!
 
     expect(compareData(value.data as Buffer, messageA.data)).toBe(true)
   })
@@ -29,24 +22,13 @@ describe('CRDT process message', () => {
       key2 = 11
 
     clientA.createComponentDataEvent(key1, key2, Buffer.from('casla'))
-    const { data } = clientA.createComponentDataEvent(
-      key1,
-      key2,
-      Buffer.from('casla2')
-    )!
-    const messageB = clientB.createComponentDataEvent(
-      key1,
-      key2,
-      Buffer.from('boedo')
-    )!
+    const { data } = clientA.createComponentDataEvent(key1, key2, Buffer.from('casla2'))!
+    const messageB = clientB.createComponentDataEvent(key1, key2, Buffer.from('boedo'))!
     // LamportA: 2, data: casla2
     // LamportB: 1, data: boedo
 
     clientA.processMessage(messageB)
-    const value = clientA
-      .getState()
-      .components.get(messageB.componentId)!
-      .get(messageB.entityId)!
+    const value = clientA.getState().components.get(messageB.componentId)!.get(messageB.entityId)!
 
     await clientB.sendMessage(messageB)
     expect(value.data).toBe(data)
@@ -58,31 +40,17 @@ describe('CRDT process message', () => {
     const key1 = 7,
       key2 = 11
 
-    const messageA = clientA.createComponentDataEvent(
-      key1,
-      key2,
-      Buffer.from('casla')
-    )!
-    const messageB = clientB.createComponentDataEvent(
-      key1,
-      key2,
-      Buffer.from('boedo')
-    )!
+    const messageA = clientA.createComponentDataEvent(key1, key2, Buffer.from('casla'))!
+    const messageB = clientB.createComponentDataEvent(key1, key2, Buffer.from('boedo'))!
     // LamportA: 1, data: casla2
     // LamportB: 1, data: boedo
     // dataA > dataB
 
     clientB.processMessage(messageA)
-    const valueB = clientB
-      .getState()
-      .components.get(messageA.componentId)!
-      .get(messageA.entityId)!
+    const valueB = clientB.getState().components.get(messageA.componentId)!.get(messageA.entityId)!
 
     clientA.processMessage(messageB)
-    const valueA = clientA
-      .getState()
-      .components.get(messageB.componentId)!
-      .get(messageB.entityId)!
+    const valueA = clientA.getState().components.get(messageB.componentId)!.get(messageB.entityId)!
 
     expect(valueA.data).toBe(messageA.data)
     expect(compareData(valueB.data as Buffer, messageA.data)).toBe(true)
@@ -96,11 +64,7 @@ describe('CRDT process message', () => {
     const componentId = 7,
       entityId = 11
 
-    const message = clientA.createComponentDataEvent(
-      componentId,
-      entityId,
-      Buffer.from('messi')
-    )!
+    const message = clientA.createComponentDataEvent(componentId, entityId, Buffer.from('messi'))!
 
     const deleteMsg = clientA.createDeleteEntityEvent(entityId)
 
@@ -112,18 +76,9 @@ describe('CRDT process message', () => {
     clientC.processMessage(message)
     clientC.processMessage(deleteMsg)
 
-    const valueA = clientA
-      .getState()
-      .components.get(message.componentId)
-      ?.get(message.entityId)
-    const valueB = clientB
-      .getState()
-      .components.get(message.componentId)
-      ?.get(message.entityId)
-    const valueC = clientC
-      .getState()
-      .components.get(message.componentId)
-      ?.get(message.entityId)
+    const valueA = clientA.getState().components.get(message.componentId)?.get(message.entityId)
+    const valueB = clientB.getState().components.get(message.componentId)?.get(message.entityId)
+    const valueC = clientC.getState().components.get(message.componentId)?.get(message.entityId)
 
     expect(valueA).toBeUndefined()
     expect(valueB).toBeUndefined()

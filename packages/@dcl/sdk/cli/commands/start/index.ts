@@ -102,11 +102,7 @@ export const main = handler(async function main(options: Options) {
 
   // Push localhost and 127.0.0.1 at top
   const sortedURLs = availableURLs.sort((a, _b) => {
-    return a.toLowerCase().includes('localhost') ||
-      a.includes('127.0.0.1') ||
-      a.includes('0.0.0.0')
-      ? -1
-      : 1
+    return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
   })
 
   for (const addr of sortedURLs) {

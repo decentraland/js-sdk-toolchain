@@ -21,36 +21,26 @@ describe('build command', () => {
   })
 
   it('should throw if project has invalid structure', async () => {
-    const projectValidatorSpy = jest
-      .spyOn(helpers, 'validateProjectStructure')
-      .mockResolvedValue(false)
+    const projectValidatorSpy = jest.spyOn(helpers, 'validateProjectStructure').mockResolvedValue(false)
 
     const projectStructure = helpers.getProjectStructure()
 
     try {
       await build.main({ args: {}, components })
     } catch (e) {
-      expect(projectValidatorSpy).toBeCalledWith(
-        process.cwd(),
-        projectStructure
-      )
+      expect(projectValidatorSpy).toBeCalledWith(process.cwd(), projectStructure)
       expect(e).toBeInstanceOf(CliError)
     }
   })
 
   it('should throw if project has invalid "package.json" file', async () => {
     jest.spyOn(helpers, 'validateProjectStructure').mockResolvedValue(true)
-    const packageJsonValidatorSpy = jest
-      .spyOn(helpers, 'validatePackageJson')
-      .mockResolvedValue(false)
+    const packageJsonValidatorSpy = jest.spyOn(helpers, 'validatePackageJson').mockResolvedValue(false)
 
     try {
       await build.main({ args: {}, components })
     } catch (e) {
-      expect(packageJsonValidatorSpy).toBeCalledWith(
-        process.cwd(),
-        helpers.REQUIRED_PACKAGE_JSON
-      )
+      expect(packageJsonValidatorSpy).toBeCalledWith(process.cwd(), helpers.REQUIRED_PACKAGE_JSON)
       expect(e).toBeInstanceOf(CliError)
     }
   })
@@ -59,13 +49,9 @@ describe('build command', () => {
     jest.spyOn(helpers, 'validateProjectStructure').mockResolvedValue(true)
     jest.spyOn(helpers, 'validatePackageJson').mockResolvedValue(true)
 
-    const needsDependenciesSpy = jest
-      .spyOn(helpers, 'needsDependencies')
-      .mockResolvedValue(true)
+    const needsDependenciesSpy = jest.spyOn(helpers, 'needsDependencies').mockResolvedValue(true)
 
-    const installDependenciesSpy = jest
-      .spyOn(helpers, 'installDependencies')
-      .mockRejectedValue(undefined)
+    const installDependenciesSpy = jest.spyOn(helpers, 'installDependencies').mockRejectedValue(undefined)
 
     try {
       await build.main({ args: {}, components })
@@ -79,13 +65,9 @@ describe('build command', () => {
     jest.spyOn(helpers, 'validateProjectStructure').mockResolvedValue(true)
     jest.spyOn(helpers, 'validatePackageJson').mockResolvedValue(true)
 
-    const needsDependenciesSpy = jest
-      .spyOn(helpers, 'needsDependencies')
-      .mockResolvedValue(false)
+    const needsDependenciesSpy = jest.spyOn(helpers, 'needsDependencies').mockResolvedValue(false)
 
-    const installDependenciesSpy = jest
-      .spyOn(helpers, 'installDependencies')
-      .mockRejectedValue(undefined)
+    const installDependenciesSpy = jest.spyOn(helpers, 'installDependencies').mockRejectedValue(undefined)
 
     try {
       await build.main({ args: {}, components })
@@ -99,13 +81,9 @@ describe('build command', () => {
     jest.spyOn(helpers, 'validateProjectStructure').mockResolvedValue(true)
     jest.spyOn(helpers, 'validatePackageJson').mockResolvedValue(true)
 
-    const needsDependenciesSpy = jest
-      .spyOn(helpers, 'needsDependencies')
-      .mockResolvedValue(true)
+    const needsDependenciesSpy = jest.spyOn(helpers, 'needsDependencies').mockResolvedValue(true)
 
-    const installDependenciesSpy = jest
-      .spyOn(helpers, 'installDependencies')
-      .mockRejectedValue(undefined)
+    const installDependenciesSpy = jest.spyOn(helpers, 'installDependencies').mockRejectedValue(undefined)
 
     try {
       await build.main({ args: { '--skip-install': true }, components })
@@ -119,9 +97,7 @@ describe('build command', () => {
     jest.spyOn(helpers, 'validatePackageJson').mockResolvedValue(true)
     jest.spyOn(helpers, 'needsDependencies').mockResolvedValue(false)
 
-    const tsBuildSpy = jest
-      .spyOn(helpers, 'buildTypescript')
-      .mockResolvedValue()
+    const tsBuildSpy = jest.spyOn(helpers, 'buildTypescript').mockResolvedValue()
 
     await build.main({
       args: { '--watch': true, '--production': true },

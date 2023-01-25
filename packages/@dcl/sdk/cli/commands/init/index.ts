@@ -33,11 +33,7 @@ export const main = handler(async function main(options: Options) {
   }
 
   const scene = 'scene-template'
-  const zip = await download(
-    options.components,
-    getRepo(scene),
-    join(dir, `${scene}.zip`)
-  )
+  const zip = await download(options.components, getRepo(scene), join(dir, `${scene}.zip`))
   await extract(zip, dir)
   await options.components.fs.unlink(zip)
 })

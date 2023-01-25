@@ -2,11 +2,7 @@ import CrdtMessageProtocol from '.'
 import { ComponentDefinition } from '../../engine/component'
 import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../ByteBuffer'
-import {
-  CrdtMessageType,
-  CRDT_MESSAGE_HEADER_LENGTH,
-  PutComponentMessage
-} from './types'
+import { CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH, PutComponentMessage } from './types'
 
 export namespace PutComponentOperation {
   export const MESSAGE_HEADER_LENGTH = 20
@@ -22,9 +18,7 @@ export namespace PutComponentOperation {
     buf: ByteBuffer
   ) {
     // reserve the beginning
-    const startMessageOffset = buf.incrementWriteOffset(
-      CRDT_MESSAGE_HEADER_LENGTH + MESSAGE_HEADER_LENGTH
-    )
+    const startMessageOffset = buf.incrementWriteOffset(CRDT_MESSAGE_HEADER_LENGTH + MESSAGE_HEADER_LENGTH)
 
     // write body
     componentDefinition.writeToByteBuffer(entity, buf)
@@ -38,8 +32,7 @@ export namespace PutComponentOperation {
     buf.setUint32(startMessageOffset + 8, entity as number)
     buf.setUint32(startMessageOffset + 12, componentDefinition.componentId)
     buf.setUint64(startMessageOffset + 16, BigInt(timestamp))
-    const newLocal =
-      messageLength - MESSAGE_HEADER_LENGTH - CRDT_MESSAGE_HEADER_LENGTH
+    const newLocal = messageLength - MESSAGE_HEADER_LENGTH - CRDT_MESSAGE_HEADER_LENGTH
     buf.setUint32(startMessageOffset + 24, newLocal)
   }
 
@@ -51,9 +44,7 @@ export namespace PutComponentOperation {
     }
 
     if (header.type !== CrdtMessageType.PUT_COMPONENT) {
-      throw new Error(
-        'PutComponentOperation tried to read another message type.'
-      )
+      throw new Error('PutComponentOperation tried to read another message type.')
     }
 
     return {

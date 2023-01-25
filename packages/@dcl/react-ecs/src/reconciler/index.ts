@@ -1,10 +1,4 @@
-import {
-  Entity,
-  EventSystemCallback,
-  IEngine,
-  InputAction,
-  PointerEventsSystem
-} from '@dcl/ecs'
+import { Entity, EventSystemCallback, IEngine, InputAction, PointerEventsSystem } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
 import { isListener, Listeners } from '../components'
@@ -28,12 +22,7 @@ import {
   UpdatePayload,
   _ChildSet
 } from './types'
-import {
-  componentKeys,
-  isNotUndefined,
-  noopConfig,
-  propsChanged
-} from './utils'
+import { componentKeys, isNotUndefined, noopConfig, propsChanged } from './utils'
 
 type OnChangeState<T = string | number> = {
   fn?: (val?: T) => void
@@ -42,11 +31,7 @@ type OnChangeState<T = string | number> = {
 export function createReconciler(
   engine: Pick<
     IEngine,
-    | 'getComponent'
-    | 'addEntity'
-    | 'removeEntity'
-    | 'defineComponentFromSchema'
-    | 'getEntitiesWith'
+    'getComponent' | 'addEntity' | 'removeEntity' | 'defineComponentFromSchema' | 'getEntitiesWith'
   >,
   pointerEvents: PointerEventsSystem
 ) {
@@ -73,21 +58,11 @@ export function createReconciler(
     uiDropdown: UiDropdown.componentId
   }
 
-  function updateTree(
-    instance: Instance,
-    props: Partial<{ rightOf: Entity; parent: Entity }>
-  ) {
-    upsertComponent(
-      instance,
-      props as { rightOf: number; parent: number },
-      'uiTransform'
-    )
+  function updateTree(instance: Instance, props: Partial<{ rightOf: Entity; parent: Entity }>) {
+    upsertComponent(instance, props as { rightOf: number; parent: number }, 'uiTransform')
   }
 
-  function upsertListener(
-    instance: Instance,
-    update: Changes<keyof Pick<Listeners, 'onMouseDown' | 'onMouseUp'>>
-  ) {
+  function upsertListener(instance: Instance, update: Changes<keyof Pick<Listeners, 'onMouseDown' | 'onMouseUp'>>) {
     if (update.type === 'delete' || !update.props) {
       if (update.component === 'onMouseDown') {
         pointerEvents.removeOnPointerDown(instance.entity)
@@ -98,10 +73,7 @@ export function createReconciler(
     }
 
     if (update.props) {
-      const pointerEvent =
-        update.component === 'onMouseDown'
-          ? pointerEvents.onPointerDown
-          : pointerEvents.onPointerUp
+      const pointerEvent = update.component === 'onMouseDown' ? pointerEvents.onPointerDown : pointerEvents.onPointerUp
 
       pointerEvent(instance.entity, update.props as EventSystemCallback, {
         button: InputAction.IA_POINTER,
@@ -112,10 +84,7 @@ export function createReconciler(
     }
   }
 
-  function removeComponent(
-    instance: Instance,
-    component: keyof EngineComponents
-  ) {
+  function removeComponent(instance: Instance, component: keyof EngineComponents) {
     const componentId = getComponentId[component]
     const Component = engine.getComponent(componentId)
     Component.deleteFrom(instance.entity)
@@ -128,9 +97,7 @@ export function createReconciler(
   ) {
     const componentId = getComponentId[componentName]
     const Component = engine.getComponent(componentId)
-    const component =
-      Component.getMutableOrNull(instance.entity) ||
-      Component.create(instance.entity)
+    const component = Component.getMutableOrNull(instance.entity) || Component.create(instance.entity)
 
     for (const key in props) {
       const keyProp = key as keyof EngineComponents[K]
@@ -180,9 +147,7 @@ export function createReconciler(
   }
 
   function removeChild(parentInstance: Instance, child: Instance): void {
-    const childIndex = parentInstance._child.findIndex(
-      (c) => c.entity === child.entity
-    )
+    const childIndex = parentInstance._child.findIndex((c) => c.entity === child.entity)
 
     const childToModify = parentInstance._child[childIndex + 1]
 
@@ -196,14 +161,8 @@ export function createReconciler(
     removeChildEntity(child)
   }
 
-  function updateOnChange(
-    entity: Entity,
-    componentId: number,
-    state?: OnChangeState
-  ) {
-    const event =
-      changeEvents.get(entity) ||
-      changeEvents.set(entity, new Map()).get(entity)!
+  function updateOnChange(entity: Entity, componentId: number, state?: OnChangeState) {
+    const event = changeEvents.get(entity) || changeEvents.set(entity, new Map()).get(entity)!
     const oldState = event.get(componentId)
     const fn = state?.fn
     const value = state?.value ?? oldState?.value
@@ -261,16 +220,9 @@ export function createReconciler(
 
     removeChild: removeChild,
 
-    prepareUpdate(
-      _instance: Instance,
-      _type: Type,
-      oldProps: Props,
-      newProps: Props
-    ): UpdatePayload {
+    prepareUpdate(_instance: Instance, _type: Type, oldProps: Props, newProps: Props): UpdatePayload {
       return componentKeys
-        .map((component) =>
-          propsChanged(component, oldProps[component], newProps[component])
-        )
+        .map((component) => propsChanged(component, oldProps[component], newProps[component]))
         .filter(isNotUndefined)
     },
 
@@ -298,14 +250,8 @@ export function createReconciler(
         }
       }
     },
-    insertBefore(
-      parentInstance: Instance,
-      child: Instance,
-      beforeChild: Instance
-    ): void {
-      const beforeChildIndex = parentInstance._child.findIndex(
-        (c) => c.entity === beforeChild.entity
-      )
+    insertBefore(parentInstance: Instance, child: Instance, beforeChild: Instance): void {
+      const beforeChildIndex = parentInstance._child.findIndex((c) => c.entity === beforeChild.entity)
       parentInstance._child = [
         ...parentInstance._child.slice(0, beforeChildIndex),
         child,
@@ -339,10 +285,7 @@ export function createReconciler(
 
   // Maybe this could be something similar to Input system, but since we
   // are going to use this only here, i prefer to scope it here.
-  function handleOnChange(
-    componentId: number,
-    resultComponent: typeof UiInputResult | typeof UiDropdownResult
-  ) {
+  function handleOnChange(componentId: number, resultComponent: typeof UiInputResult | typeof UiDropdownResult) {
     for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
       const entityState = changeEvents.get(entity)?.get(componentId)
       if (entityState?.fn && Result.value !== entityState.value) {

@@ -5,11 +5,7 @@ interface Options {
   silent: boolean
 }
 
-export function exec(
-  cwd: string,
-  command: string,
-  { env, silent }: Partial<Options> = {}
-): Promise<void> {
+export function exec(cwd: string, command: string, { env, silent }: Partial<Options> = {}): Promise<void> {
   return new Promise((resolve, reject) => {
     const [cmd, ...rest] = command.split(' ')
     const child = spawn(cmd, rest, {
@@ -24,10 +20,7 @@ export function exec(
     }
 
     child.stdout.on('data', (data) => {
-      if (
-        data.toString().indexOf('The compiler is watching file changes...') !==
-        -1
-      ) {
+      if (data.toString().indexOf('The compiler is watching file changes...') !== -1) {
         return resolve(undefined)
       }
     })
@@ -35,11 +28,7 @@ export function exec(
     child.on('close', (code: number) => {
       if (code !== 0) {
         const command = `${cmd} ${rest.join(' ')}`
-        reject(
-          new Error(
-            `Command "${command}" exited with code ${code}. Please try running the command manually`
-          )
-        )
+        reject(new Error(`Command "${command}" exited with code ${code}. Please try running the command manually`))
         return
       }
 

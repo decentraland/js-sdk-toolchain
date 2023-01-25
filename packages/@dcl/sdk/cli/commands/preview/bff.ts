@@ -9,10 +9,7 @@ import { upgradeWebSocketResponse } from '@well-known-components/http-server/dis
  * It runs using @dcl/mini-comms implementing RFC-5
  */
 
-export async function setupBffAndComms(
-  components: PreviewComponents,
-  router: Router<PreviewComponents>
-) {
+export async function setupBffAndComms(components: PreviewComponents, router: Router<PreviewComponents>) {
   router.get('/about', async (ctx) => {
     const host = ctx.url.host
 
@@ -21,10 +18,7 @@ export async function setupBffAndComms(
       comms: {
         healthy: true,
         protocol: 'v3',
-        fixedAdapter: `ws-room:${ctx.url.protocol.replace(
-          /^http/,
-          'ws'
-        )}//${host}/mini-comms/room-1`
+        fixedAdapter: `ws-room:${ctx.url.protocol.replace(/^http/, 'ws')}//${host}/mini-comms/room-1`
       },
       configurations: {
         realmName: 'LocalPreview'
@@ -55,12 +49,10 @@ export async function setupBffAndComms(
           console.debug('Websocket closed')
         })
 
-        handleSocketLinearProtocol(components, ws, ctx.params.roomId).catch(
-          (err: any) => {
-            console.info(err)
-            ws.close()
-          }
-        )
+        handleSocketLinearProtocol(components, ws, ctx.params.roomId).catch((err: any) => {
+          console.info(err)
+          ws.close()
+        })
       }
     })
   })

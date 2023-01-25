@@ -3,10 +3,7 @@ import { resolve } from 'path'
 import { compareFolders } from '../utils/compareFolder'
 import { getFilePathsSync } from '../utils/getFilePathsSync'
 import { Component, generateComponent } from './generateComponent'
-import {
-  generateProtocolBuffer,
-  getComponentId
-} from './generateProtocolBuffer'
+import { generateProtocolBuffer, getComponentId } from './generateProtocolBuffer'
 import { generateIndex, generateNameMappings } from './generateIndex'
 import { snakeToPascal } from '../utils/snakeToPascal'
 
@@ -30,9 +27,7 @@ export function compileEcsComponents(
   test = false
 ) {
   it('compiles components for folder ' + componentPathParam, async () => {
-    const componentPath = test
-      ? resolve(process.cwd(), 'temp-protocolbuffers')
-      : componentPathParam
+    const componentPath = test ? resolve(process.cwd(), 'temp-protocolbuffers') : componentPathParam
     const generatedPath = resolve(componentPath, 'generated')
 
     if (test) {
@@ -43,20 +38,14 @@ export function compileEcsComponents(
       })
     }
 
-    process.stderr.write(
-      `Decentraland > Gen dir: ${generatedPath} - definitions dir: ${definitionsPath}\n`
-    )
+    process.stderr.write(`Decentraland > Gen dir: ${generatedPath} - definitions dir: ${definitionsPath}\n`)
 
     const componentsFile = getFilePathsSync(definitionsPath, false)
       .filter((filePath) => filePath.toLowerCase().endsWith('.proto'))
-      .map((filePath) =>
-        filePath.substring(0, filePath.length - '.proto'.length)
-      )
+      .map((filePath) => filePath.substring(0, filePath.length - '.proto'.length))
 
     const components: Component[] = componentsFile.map((componentFile) => {
-      const protoFileContent = readFileSync(
-        resolve(definitionsPath, `${componentFile}.proto`)
-      ).toString()
+      const protoFileContent = readFileSync(resolve(definitionsPath, `${componentFile}.proto`)).toString()
 
       let componentId: number = -1
       try {
@@ -95,9 +84,7 @@ export function compileEcsComponents(
         definitionsPath
       })
     }
-    const filteredComponents = components.filter(
-      ({ componentId }) => !NON_EXPOSED_LIST.includes(componentId)
-    )
+    const filteredComponents = components.filter(({ componentId }) => !NON_EXPOSED_LIST.includes(componentId))
     generateIndex({ components: filteredComponents, generatedPath })
 
     generateNameMappings({ components, generatedPath })
@@ -110,10 +97,7 @@ export function compileEcsComponents(
     // })
 
     if (test) {
-      const result = compareFolders(
-        generatedPath,
-        resolve(componentPathParam, 'generated')
-      )
+      const result = compareFolders(generatedPath, resolve(componentPathParam, 'generated'))
       removeSync(componentPath)
 
       if (!result) {

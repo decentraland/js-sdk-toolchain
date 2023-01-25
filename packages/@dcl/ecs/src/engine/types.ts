@@ -17,12 +17,8 @@ export type Unpacked<T> = T extends (infer U)[] ? U : T
 /**
  * @public
  */
-export type ComponentSchema<
-  T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]
-> = {
-  [K in keyof T]: T[K] extends ComponentDefinition<any>
-    ? ReturnType<T[K]['getMutable']>
-    : never
+export type ComponentSchema<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]> = {
+  [K in keyof T]: T[K] extends ComponentDefinition<any> ? ReturnType<T[K]['getMutable']> : never
 }
 
 export interface MapComponentDefinition<T> extends ComponentDefinition<T> {
@@ -137,10 +133,7 @@ export type IEngine = {
    * const StateComponent = engine.defineComponentFromSchema("my-lib::VisibleComponent", Schemas.Bool)
    * ```
    */
-  defineComponentFromSchema<T>(
-    componentName: string,
-    spec: ISchema<T>
-  ): ComponentDefinition<T>
+  defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): ComponentDefinition<T>
 
   /**
    * Get the component definition from the component id.
@@ -176,9 +169,7 @@ export type IEngine = {
    * }
    * ```
    */
-  getEntitiesWith<
-    T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]
-  >(
+  getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(
     ...components: T
   ): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>
 

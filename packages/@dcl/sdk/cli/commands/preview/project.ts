@@ -98,10 +98,7 @@ export async function validateSceneOptions(dir: string): Promise<void> {
  * Validates all the conditions required to operate over an existing project.
  * Throws if a project contains an invalid main path or if the `scene.json` file is missing.
  */
-export async function validateExistingProject(
-  components: { fs: IFileSystemComponent },
-  dir: string,
-) {
+export async function validateExistingProject(components: { fs: IFileSystemComponent }, dir: string) {
   const sceneFile = await getSceneFile(dir)
 
   if (!isWebSocket(sceneFile.main)) {

@@ -22,9 +22,7 @@ export async function fetchEntityByPointer(
     body: JSON.stringify({ pointers })
   })
 
-  const deployments: Entity[] = response.ok
-    ? ((await response.json()) as Entity[])
-    : []
+  const deployments: Entity[] = response.ok ? ((await response.json()) as Entity[]) : []
 
   return {
     baseUrl,

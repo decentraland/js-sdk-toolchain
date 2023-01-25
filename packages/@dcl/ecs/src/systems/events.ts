@@ -7,9 +7,7 @@ import { Entity, EntityState } from '../engine/entity'
 import { IInputSystem } from '../engine/input'
 import { checkNotThenable } from '../runtime/invariant'
 
-export type EventSystemCallback = (
-  event: PBPointerEventsResult_PointerCommand
-) => void
+export type EventSystemCallback = (event: PBPointerEventsResult_PointerCommand) => void
 
 export type EventSystemOptions = {
   button: InputAction
@@ -20,10 +18,7 @@ export type EventSystemOptions = {
 
 export type PointerEventsSystem = ReturnType<typeof createPointerEventSystem>
 
-export function createPointerEventSystem(
-  engine: IEngine,
-  inputSystem: IInputSystem
-) {
+export function createPointerEventSystem(engine: IEngine, inputSystem: IInputSystem) {
   const PointerEvents = components.PointerEvents(engine)
 
   enum EventType {
@@ -31,14 +26,9 @@ export function createPointerEventSystem(
     Down,
     Up
   }
-  type EventMapType = Map<
-    EventType,
-    { cb: EventSystemCallback; opts: EventSystemOptions }
-  >
+  type EventMapType = Map<EventType, { cb: EventSystemCallback; opts: EventSystemOptions }>
 
-  const getDefaultOpts = (
-    opts: Partial<EventSystemOptions> = {}
-  ): EventSystemOptions => ({
+  const getDefaultOpts = (opts: Partial<EventSystemOptions> = {}): EventSystemOptions => ({
     button: InputAction.IA_ANY,
     ...opts
   })
@@ -46,19 +36,12 @@ export function createPointerEventSystem(
   const eventsMap = new Map<Entity, EventMapType>()
 
   function getEvent(entity: Entity) {
-    return (
-      eventsMap.get(entity) || eventsMap.set(entity, new Map()).get(entity)!
-    )
+    return eventsMap.get(entity) || eventsMap.set(entity, new Map()).get(entity)!
   }
 
-  function setPointerEvent(
-    entity: Entity,
-    type: PointerEventType,
-    opts: EventSystemOptions
-  ) {
+  function setPointerEvent(entity: Entity, type: PointerEventType, opts: EventSystemOptions) {
     if (opts.hoverText || opts.showFeedback) {
-      const pointerEvent =
-        PointerEvents.getMutableOrNull(entity) || PointerEvents.create(entity)
+      const pointerEvent = PointerEvents.getMutableOrNull(entity) || PointerEvents.create(entity)
 
       pointerEvent.pointerEvents.push({
         eventType: type,
@@ -72,16 +55,11 @@ export function createPointerEventSystem(
     }
   }
 
-  function removePointerEvent(
-    entity: Entity,
-    type: PointerEventType,
-    button: InputAction
-  ) {
+  function removePointerEvent(entity: Entity, type: PointerEventType, button: InputAction) {
     const pointerEvent = PointerEvents.getMutableOrNull(entity)
     if (!pointerEvent) return
     pointerEvent.pointerEvents = pointerEvent.pointerEvents.filter(
-      (pointer) =>
-        !(pointer.eventInfo?.button === button && pointer.eventType === type)
+      (pointer) => !(pointer.eventInfo?.button === button && pointer.eventType === type)
     )
   }
 
@@ -97,11 +75,7 @@ export function createPointerEventSystem(
     const pointerEvent = event.get(type)
 
     if (pointerEvent?.opts.hoverText) {
-      removePointerEvent(
-        entity,
-        getPointerEvent(type),
-        pointerEvent.opts.button
-      )
+      removePointerEvent(entity, getPointerEvent(type), pointerEvent.opts.button)
     }
 
     event.delete(type)
@@ -119,23 +93,13 @@ export function createPointerEventSystem(
         if (eventType === EventType.Click) {
           const command = inputSystem.getClick(opts.button, entity)
           if (command)
-            checkNotThenable(
-              cb(command.up),
-              'Click event returned a thenable. Only synchronous functions are allowed'
-            )
+            checkNotThenable(cb(command.up), 'Click event returned a thenable. Only synchronous functions are allowed')
         }
 
         if (eventType === EventType.Down || eventType === EventType.Up) {
-          const command = inputSystem.getInputCommand(
-            opts.button,
-            getPointerEvent(eventType),
-            entity
-          )
+          const command = inputSystem.getInputCommand(opts.button, getPointerEvent(eventType), entity)
           if (command) {
-            checkNotThenable(
-              cb(command),
-              'Event handler returned a thenable. Only synchronous functions are allowed'
-            )
+            checkNotThenable(cb(command), 'Event handler returned a thenable. Only synchronous functions are allowed')
           }
         }
       }
@@ -177,11 +141,7 @@ export function createPointerEventSystem(
      * @param cb - Function to execute when onPointerDown fires
      * @param opts - Opts to trigger Feedback and Button
      */
-    onClick(
-      entity: Entity,
-      cb: EventSystemCallback,
-      opts?: Partial<EventSystemOptions>
-    ) {
+    onClick(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>) {
       const options = getDefaultOpts(opts)
       // Clear previous event with over feedback included
       removeEvent(entity, EventType.Click)
@@ -198,11 +158,7 @@ export function createPointerEventSystem(
      * @param cb - Function to execute when click fires
      * @param opts - Opts to trigger Feedback and Button
      */
-    onPointerDown(
-      entity: Entity,
-      cb: EventSystemCallback,
-      opts?: Partial<EventSystemOptions>
-    ) {
+    onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>) {
       const options = getDefaultOpts(opts)
       removeEvent(entity, EventType.Down)
       getEvent(entity).set(EventType.Down, { cb, opts: options })
@@ -216,11 +172,7 @@ export function createPointerEventSystem(
      * @param cb - Function to execute when click fires
      * @param opts - Opts to trigger Feedback and Button
      */
-    onPointerUp(
-      entity: Entity,
-      cb: EventSystemCallback,
-      opts?: Partial<EventSystemOptions>
-    ) {
+    onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>) {
       const options = getDefaultOpts(opts)
       removeEvent(entity, EventType.Up)
       getEvent(entity).set(EventType.Up, { cb, opts: options })

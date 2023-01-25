@@ -15,10 +15,7 @@ describe('build:helpers', () => {
     jest.spyOn(fsUtils, 'readdir').mockResolvedValue(['a', 'file'])
     jest.spyOn(helpers, 'validateProjectStructure')
 
-    const res = await helpers.validateProjectStructure('some/path', [
-      'a',
-      'file'
-    ])
+    const res = await helpers.validateProjectStructure('some/path', ['a', 'file'])
 
     expect(res).toBe(true)
   })
@@ -27,11 +24,7 @@ describe('build:helpers', () => {
     jest.spyOn(fsUtils, 'readdir').mockResolvedValue(['a', 'file'])
     jest.spyOn(helpers, 'validateProjectStructure')
 
-    const res = await helpers.validateProjectStructure('some/path', [
-      'a',
-      'file',
-      'new-file'
-    ])
+    const res = await helpers.validateProjectStructure('some/path', ['a', 'file', 'new-file'])
 
     expect(res).toBe(false)
   })
@@ -97,13 +90,9 @@ describe('build:helpers', () => {
       production: false
     })
 
-    expect(execSpy).toBeCalledWith(
-      'some/path',
-      expect.stringContaining('build'),
-      {
-        env: { NODE_ENV: '' }
-      }
-    )
+    expect(execSpy).toBeCalledWith('some/path', expect.stringContaining('build'), {
+      env: { NODE_ENV: '' }
+    })
   })
 
   it('buildTypescript: should build Typescript for production', async () => {
@@ -115,13 +104,9 @@ describe('build:helpers', () => {
       production: true
     })
 
-    expect(execSpy).toBeCalledWith(
-      'some/path',
-      expect.stringContaining('build'),
-      {
-        env: { NODE_ENV: 'production' }
-      }
-    )
+    expect(execSpy).toBeCalledWith('some/path', expect.stringContaining('build'), {
+      env: { NODE_ENV: 'production' }
+    })
   })
 
   it('buildTypescript: should watch Typescript', async () => {
@@ -133,12 +118,8 @@ describe('build:helpers', () => {
       production: true
     })
 
-    expect(execSpy).toBeCalledWith(
-      'some/path',
-      expect.stringContaining('watch'),
-      {
-        env: { NODE_ENV: 'production' }
-      }
-    )
+    expect(execSpy).toBeCalledWith('some/path', expect.stringContaining('watch'), {
+      env: { NODE_ENV: 'production' }
+    })
   })
 })

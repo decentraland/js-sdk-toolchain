@@ -41,21 +41,14 @@ export namespace EntityUtils {
    * @returns [entityNumber, entityVersion]
    */
   export function fromEntityId(entityId: Entity): [number, number] {
-    return [
-      (entityId & MAX_U16) >>> 0,
-      (((entityId & MASK_UPPER_16_ON_32) >> 16) & MAX_U16) >>> 0
-    ]
+    return [(entityId & MAX_U16) >>> 0, (((entityId & MASK_UPPER_16_ON_32) >> 16) & MAX_U16) >>> 0]
   }
 
   /**
    * @returns compound number from entityNumber and entityVerison
    */
-  export function toEntityId(
-    entityNumber: number,
-    entityVersion: number
-  ): Entity {
-    return (((entityNumber & MAX_U16) | ((entityVersion & MAX_U16) << 16)) >>>
-      0) as Entity
+  export function toEntityId(entityNumber: number, entityVersion: number): Entity {
+    return (((entityNumber & MAX_U16) | ((entityVersion & MAX_U16) << 16)) >>> 0) as Entity
   }
 }
 
@@ -102,9 +95,7 @@ export function EntityContainer(): EntityContainer {
 
   function generateNewEntity(): Entity {
     if (entityCounter > MAX_ENTITY_NUMBER - 1) {
-      throw new Error(
-        `It fails trying to generate an entity out of range ${MAX_ENTITY_NUMBER}.`
-      )
+      throw new Error(`It fails trying to generate an entity out of range ${MAX_ENTITY_NUMBER}.`)
     }
 
     const entityNumber = entityCounter++

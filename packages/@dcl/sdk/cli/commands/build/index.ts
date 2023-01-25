@@ -51,10 +51,7 @@ export const main = handler(async function main(options: Options) {
   const dir = resolve(process.cwd(), options.args['--dir'] || '.')
   const projectStructure = getProjectStructure()
 
-  const hasValidProjectStructure = await validateProjectStructure(
-    dir,
-    projectStructure
-  )
+  const hasValidProjectStructure = await validateProjectStructure(dir, projectStructure)
 
   if (!hasValidProjectStructure) {
     throw new CliError(`Invalid scene structure found. Required files:
@@ -63,10 +60,7 @@ export const main = handler(async function main(options: Options) {
 
   succeed('Project has a valid structure')
 
-  const hasValidPackageJson = await validatePackageJson(
-    dir,
-    REQUIRED_PACKAGE_JSON
-  )
+  const hasValidPackageJson = await validatePackageJson(dir, REQUIRED_PACKAGE_JSON)
 
   if (!hasValidPackageJson) {
     throw new CliError(`Invalid "package.json" file. Structure required:
@@ -75,10 +69,7 @@ export const main = handler(async function main(options: Options) {
 
   succeed('Project has a valid "package.json"')
 
-  const shouldInstallDeps = await needsDependencies(
-    options.components,
-    dir
-  )
+  const shouldInstallDeps = await needsDependencies(options.components, dir)
 
   if (shouldInstallDeps && !options.args['--skip-install']) {
     info('Installing dependencies...')

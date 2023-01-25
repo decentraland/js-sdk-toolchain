@@ -31,10 +31,7 @@ export const getProjectStructure = () => Object.values(REQUIRED_FILES)
 /**
  * Returns true if the project follows a valid scene structure
  */
-export const validateProjectStructure = async (
-  dir: string,
-  fileList: string[]
-): Promise<boolean> => {
+export const validateProjectStructure = async (dir: string, fileList: string[]): Promise<boolean> => {
   const files = await readdir(dir)
   const requiredFiles = new Set(fileList)
 
@@ -50,27 +47,18 @@ export const validateProjectStructure = async (
 /**
  * Returns true if the project's "package.json" is valid
  */
-export const validatePackageJson = async (
-  dir: string,
-  deps: Dict
-): Promise<boolean> => {
-  const packageJson = JSON.parse(
-    await readFile(resolve(dir, REQUIRED_FILES.PACKAGE_JSON))
-  )
+export const validatePackageJson = async (dir: string, deps: Dict): Promise<boolean> => {
+  const packageJson = JSON.parse(await readFile(resolve(dir, REQUIRED_FILES.PACKAGE_JSON)))
   return hasPrimitiveKeys(packageJson, deps)
 }
 
 /*
  * Returns true if the project contains an empty node_modules folder
  */
-export const needsDependencies = async (
-  components: { fs: IFileSystemComponent },
-  dir: string,
-): Promise<boolean> => {
+export const needsDependencies = async (components: { fs: IFileSystemComponent }, dir: string): Promise<boolean> => {
   const nodeModulesPath = resolve(dir, 'node_modules')
   const hasNodeModulesFolder = await components.fs.existPath(nodeModulesPath)
-  const isNodeModulesEmpty =
-    hasNodeModulesFolder && (await readdir(nodeModulesPath)).length === 0
+  const isNodeModulesEmpty = hasNodeModulesFolder && (await readdir(nodeModulesPath)).length === 0
 
   return !hasNodeModulesFolder || isNodeModulesEmpty
 }

@@ -17,10 +17,7 @@ export function getSnippetsfile(dir: string) {
   return files
 }
 
-export function getFilePathsSync(
-  dir: string,
-  recursive: boolean = true
-): string[] {
+export function getFilePathsSync(dir: string, recursive: boolean = true): string[] {
   // variables
   const fileNames = fs.readdirSync(dir)
   const filePaths = fileNames.map((fileName) => path.resolve(dir, fileName))
@@ -47,10 +44,7 @@ export function getFilePathsSync(
 
 export type PathItem = { path: string; isDirectory: boolean }
 
-export function getPathsSync(
-  dir: string,
-  recursive: boolean = true
-): PathItem[] {
+export function getPathsSync(dir: string, recursive: boolean = true): PathItem[] {
   // variables
   const fileNames = fs.readdirSync(dir)
   const filePaths = fileNames.map((fileName) => path.resolve(dir, fileName))

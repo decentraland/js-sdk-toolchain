@@ -1,21 +1,15 @@
 import { ComponentDefinition, Entity, IEngine } from '../../engine'
-import {
-  ColliderLayer,
-  MeshCollider,
-  PBMeshCollider
-} from '../generated/index.gen'
+import { ColliderLayer, MeshCollider, PBMeshCollider } from '../generated/index.gen'
 
 /**
  * @public
  */
-export type MeshColliderComponentDefinition =
-  ComponentDefinition<PBMeshCollider>
+export type MeshColliderComponentDefinition = ComponentDefinition<PBMeshCollider>
 
 /**
  * @public
  */
-export interface MeshColliderComponentDefinitionExtended
-  extends MeshColliderComponentDefinition {
+export interface MeshColliderComponentDefinitionExtended extends MeshColliderComponentDefinition {
   /**
    * @public
    * Set a box in the MeshCollider component
@@ -30,10 +24,7 @@ export interface MeshColliderComponentDefinitionExtended
    * @param entity - entity to create or replace the MeshCollider component
    * @param colliderMask - the set of layer where the collider reacts, default: Physics and Pointer
    */
-  setPlane(
-    entity: Entity,
-    colliderLayers?: ColliderLayer | ColliderLayer[]
-  ): void
+  setPlane(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void
 
   /**
    * @public
@@ -56,10 +47,7 @@ export interface MeshColliderComponentDefinitionExtended
    * @param entity - entity to create or replace the MeshCollider component
    * @param colliderMask - the set of layer where the collider reacts, default: Physics and Pointer
    */
-  setSphere(
-    entity: Entity,
-    colliderLayers?: ColliderLayer | ColliderLayer[]
-  ): void
+  setSphere(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void
 }
 
 export function defineMeshColliderComponent(
@@ -69,9 +57,7 @@ export function defineMeshColliderComponent(
 
   function getCollisionMask(layers?: ColliderLayer | ColliderLayer[]) {
     if (Array.isArray(layers)) {
-      return layers
-        .map((item) => item as number)
-        .reduce((prev, item) => prev | item, 0)
+      return layers.map((item) => item as number).reduce((prev, item) => prev | item, 0)
     } else if (layers) {
       return layers
     }
@@ -79,19 +65,13 @@ export function defineMeshColliderComponent(
 
   return {
     ...theComponent,
-    setBox(
-      entity: Entity,
-      colliderLayers?: ColliderLayer | ColliderLayer[]
-    ): void {
+    setBox(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void {
       theComponent.createOrReplace(entity, {
         mesh: { $case: 'box', box: {} },
         collisionMask: getCollisionMask(colliderLayers)
       })
     },
-    setPlane(
-      entity: Entity,
-      colliderLayers?: ColliderLayer | ColliderLayer[]
-    ): void {
+    setPlane(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void {
       theComponent.createOrReplace(entity, {
         mesh: { $case: 'plane', plane: {} },
         collisionMask: getCollisionMask(colliderLayers)
@@ -108,10 +88,7 @@ export function defineMeshColliderComponent(
         collisionMask: getCollisionMask(colliderLayers)
       })
     },
-    setSphere(
-      entity: Entity,
-      colliderLayers?: ColliderLayer | ColliderLayer[]
-    ): void {
+    setSphere(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void {
       theComponent.createOrReplace(entity, {
         mesh: { $case: 'sphere', sphere: {} },
         collisionMask: getCollisionMask(colliderLayers)

@@ -26,8 +26,7 @@ interface FileExports {
   args?: ReturnType<typeof getArgs>
 }
 
-const listCommandsStr = (commands: string[]) =>
-  toStringList(commands.map(($) => `npx sdk ${$}`))
+const listCommandsStr = (commands: string[]) => toStringList(commands.map(($) => `npx sdk ${$}`))
 
 const handleError = (err: CliError) => {
   if (!(err instanceof CliError)) {
@@ -49,8 +48,7 @@ const commandFnsAreValid = (fns: FileExports): fns is Required<FileExports> => {
 }
 
 const args = getArgs()
-const helpMessage = (commands: string[]) =>
-  `Here is the list of commands: ${listCommandsStr(commands)}`
+const helpMessage = (commands: string[]) => `Here is the list of commands: ${listCommandsStr(commands)}`
 
 ;(async () => {
   const command = process.argv[2]
@@ -64,9 +62,7 @@ const helpMessage = (commands: string[]) =>
       log.info(helpMessage(commands))
       return
     }
-    throw new CliError(
-      `Command ${command} is invalid. ${helpMessage(commands)}`
-    )
+    throw new CliError(`Command ${command} is invalid. ${helpMessage(commands)}`)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires

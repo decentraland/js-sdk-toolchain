@@ -48,11 +48,7 @@ export const int8Component = (engine: IEngine) => {
     getMutableOrNull: function (_entity: Entity) {
       throw new Error('Function not implemented.')
     },
-    upsertFromBinary: function (
-      entity: Entity,
-      data: ByteBuffer,
-      marksDirty = true
-    ) {
+    upsertFromBinary: function (entity: Entity, data: ByteBuffer, marksDirty = true) {
       values.set(entity, data.readInt8())
       if (marksDirty) {
         dirtyIterator.add(entity)
@@ -60,11 +56,7 @@ export const int8Component = (engine: IEngine) => {
         dirtyIterator.delete(entity)
       }
     },
-    updateFromBinary: function (
-      entity: Entity,
-      data: ByteBuffer,
-      marksDirty = true
-    ) {
+    updateFromBinary: function (entity: Entity, data: ByteBuffer, marksDirty = true) {
       values.set(entity, data.readInt8())
       if (marksDirty) {
         dirtyIterator.add(entity)

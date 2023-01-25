@@ -1,21 +1,9 @@
-export type {
-  AnimatorComponentDefinition,
-  AnimatorComponentDefinitionExtended
-} from './extended/Animator'
-export type {
-  MeshRendererComponentDefinition,
-  MeshRendererComponentDefinitionExtended
-} from './extended/MeshRenderer'
-export type {
-  MeshColliderComponentDefinition,
-  MeshColliderComponentDefinitionExtended
-} from './extended/MeshCollider'
+export type { AnimatorComponentDefinition, AnimatorComponentDefinitionExtended } from './extended/Animator'
+export type { MeshRendererComponentDefinition, MeshRendererComponentDefinitionExtended } from './extended/MeshRenderer'
+export type { MeshColliderComponentDefinition, MeshColliderComponentDefinitionExtended } from './extended/MeshCollider'
 export type {
   TextureHelper,
   MaterialComponentDefinition,
   MaterialComponentDefinitionExtended
 } from './extended/Material'
-export type {
-  TransformComponentExtended,
-  TransformTypeWithOptionals
-} from './legacy/Transform'
+export type { TransformComponentExtended, TransformTypeWithOptionals } from './legacy/Transform'

@@ -1,9 +1,6 @@
 import { resolve } from 'path'
 import { Lifecycle } from '@well-known-components/interfaces'
-import {
-  roomsMetrics,
-  createRoomsComponent
-} from '@dcl/mini-comms/dist/adapters/rooms'
+import { roomsMetrics, createRoomsComponent } from '@dcl/mini-comms/dist/adapters/rooms'
 import { createRecordConfigComponent } from '@well-known-components/env-config-provider'
 import { createServerComponent } from '@well-known-components/http-server'
 import { createConsoleLogComponent } from '@well-known-components/logger'
@@ -47,10 +44,7 @@ export const main = handler(async function main(options: Options) {
   const port = options.args['--port'] || (await previewPort())
   const startedFuture = future<void>()
 
-  setTimeout(
-    () => startedFuture.reject(new Error('Timed out starting the server')),
-    3000
-  )
+  setTimeout(() => startedFuture.reject(new Error('Timed out starting the server')), 3000)
 
   void Lifecycle.run<PreviewComponents>({
     async initComponents() {
@@ -62,10 +56,7 @@ export const main = handler(async function main(options: Options) {
       })
       const logs = await createConsoleLogComponent({})
       const ws = await createWsComponent({ logs })
-      const server = await createServerComponent<PreviewComponents>(
-        { config, logs, ws: ws.ws },
-        { cors: {} }
-      )
+      const server = await createServerComponent<PreviewComponents>({ config, logs, ws: ws.ws }, { cors: {} })
       const rooms = await createRoomsComponent({
         metrics,
         logs,
