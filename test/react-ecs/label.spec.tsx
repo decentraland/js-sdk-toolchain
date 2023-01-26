@@ -1,30 +1,15 @@
-import {
-  Engine,
-  Entity,
-  createPointerEventSystem,
-  createInputSystem,
-  TextAlignMode,
-  Font
-} from '../../packages/@dcl/ecs'
-import { components, IEngine as IEngine } from '../../packages/@dcl/ecs/src'
-import {
-  ReactEcs,
-  createReactBasedUiSystem,
-  Label,
-  UiFontType,
-  TextAlignType
-} from '../../packages/@dcl/react-ecs/src'
+import { Entity, TextAlignMode, Font } from '../../packages/@dcl/ecs'
+import { components } from '../../packages/@dcl/ecs/src'
+import { ReactEcs, Label, UiFontType, TextAlignType } from '../../packages/@dcl/react-ecs/src'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 import { Color4 } from '../../packages/@dcl/sdk/math'
+import { setupEngine } from './utils'
 
 describe('UiText React Ecs', () => {
   it('should generate a UI and update the width of a div', async () => {
-    const engine = Engine()
-    const input = createInputSystem(engine)
-    const pointerEventSystem = createPointerEventSystem(engine, input)
-    const renderer = createReactBasedUiSystem(engine, pointerEventSystem)
-    const UiTransform = components.UiTransform(engine as IEngine)
-    const UiText = components.UiText(engine as IEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const UiText = components.UiText(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -35,17 +20,9 @@ describe('UiText React Ecs', () => {
     let color: Color4 | undefined = undefined
     let font: UiFontType | undefined = 'sans-serif'
     let textAlign: TextAlignType | undefined = 'bottom-center'
-    const ui = () => (
-      <Label
-        uiTransform={{ width: 100 }}
-        value={text}
-        color={color}
-        font={font}
-        textAlign={textAlign}
-      />
-    )
+    const ui = () => <Label uiTransform={{ width: 100 }} value={text} color={color} font={font} textAlign={textAlign} />
 
-    renderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui)
     await engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({

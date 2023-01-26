@@ -1,4 +1,3 @@
-import { ISchema } from '../engine'
 import { ComponentDefinition } from '../engine/component'
 import { AnimatorComponentDefinitionExtended, defineAnimatorComponent } from './extended/Animator'
 import { defineMaterialComponent, MaterialComponentDefinitionExtended } from './extended/Material'
@@ -6,8 +5,10 @@ import { defineMeshColliderComponent, MeshColliderComponentDefinitionExtended } 
 import { defineMeshRendererComponent, MeshRendererComponentDefinitionExtended } from './extended/MeshRenderer'
 import { ComponentGetter } from './generated/index.gen'
 import { defineTransformComponent, TransformComponentExtended } from './legacy/Transform'
+
 export * from './generated/index.gen'
-export { ISchema, ComponentDefinition }
+
+export type { ComponentDefinition, ComponentGetter }
 
 /*#__PURE__*/
 export const Transform: ComponentGetter<TransformComponentExtended> = (engine) => defineTransformComponent(engine)

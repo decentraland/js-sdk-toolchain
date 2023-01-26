@@ -10,32 +10,11 @@ import { ComponentDefinition, createComponentDefinitionFromSchema } from './comp
 import { Entity, EntityContainer } from './entity'
 import { ReadonlyComponentSchema } from './readonly'
 import { SystemItem, SystemContainer, SystemFn, SYSTEMS_REGULAR_PRIORITY } from './systems'
-import type { IEngine, MapComponentDefinition } from './types'
+import type { IEngine, IEngineOptions, MapComponentDefinition, PreEngine } from './types'
 export * from './input'
 export * from './readonly'
 export * from './types'
 export { Entity, ByteBuffer, ComponentDefinition, SystemItem, OnChangeFunction }
-
-type PreEngine = Pick<
-  IEngine,
-  | 'addEntity'
-  | 'removeEntity'
-  | 'removeEntityWithChildren'
-  | 'addSystem'
-  | 'removeSystem'
-  | 'defineComponent'
-  | 'defineComponentFromSchema'
-  | 'registerComponentDefinition'
-  | 'getEntitiesWith'
-  | 'getComponent'
-  | 'getComponentOrNull'
-  | 'removeComponentDefinition'
-  | 'entityContainer'
-  | 'componentsIter'
-  | 'seal'
-> & {
-  getSystems: () => SystemItem[]
-}
 
 function preEngine(): PreEngine {
   const entityContainer = EntityContainer()
@@ -123,7 +102,7 @@ function preEngine(): PreEngine {
 
     const schemaSpec = Schemas.Map(mapSpec, constructorDefault)
     const def = createComponentDefinitionFromSchema<MapResult<T>>(componentName, componentId, schemaSpec)
-    const newComponent = {
+    const newComponent: MapComponentDefinition<MapResult<T>> = {
       ...def,
       create(entity: Entity, val?: Partial<MapResult<T>>) {
         return def.create(entity, val as any)
@@ -134,7 +113,7 @@ function preEngine(): PreEngine {
     }
 
     componentsDefinition.set(componentId, newComponent)
-    return newComponent as MapComponentDefinition<MapResult<T>>
+    return newComponent
   }
 
   function getComponent<T>(componentId: number): ComponentDefinition<T> {
@@ -241,22 +220,15 @@ function preEngine(): PreEngine {
 }
 
 /**
- * @public
- */
-export type IEngineOptions = {
-  onChangeFunction: OnChangeFunction
-}
-
-/**
- * @public
+ * @internal
  */
 export function Engine(options?: IEngineOptions): IEngine {
-  const engine = preEngine()
-  const crdtSystem = crdtSceneSystem(engine, options?.onChangeFunction || null)
+  const partialEngine = preEngine()
+  const crdtSystem = crdtSceneSystem(partialEngine, options?.onChangeFunction || null)
 
   async function update(dt: number) {
     await crdtSystem.receiveMessages()
-    for (const system of engine.getSystems()) {
+    for (const system of partialEngine.getSystems()) {
       const ret: unknown | Promise<unknown> = system.fn(dt)
       checkNotThenable(
         ret,
@@ -266,29 +238,29 @@ export function Engine(options?: IEngineOptions): IEngine {
       )
     }
     const dirtyEntities = crdtSystem.updateState()
-    const deletedEntites = engine.entityContainer.releaseRemovedEntities()
+    const deletedEntites = partialEngine.entityContainer.releaseRemovedEntities()
     await crdtSystem.sendMessages(dirtyEntities, deletedEntites)
 
-    for (const definition of engine.componentsIter()) {
+    for (const definition of partialEngine.componentsIter()) {
       definition.clearDirty()
     }
   }
 
   return {
-    addEntity: engine.addEntity,
-    removeEntity: engine.removeEntity,
-    removeEntityWithChildren: engine.removeEntityWithChildren,
-    addSystem: engine.addSystem,
-    removeSystem: engine.removeSystem,
-    defineComponent: engine.defineComponent,
-    defineComponentFromSchema: engine.defineComponentFromSchema,
-    registerComponentDefinition: engine.registerComponentDefinition,
-    getEntitiesWith: engine.getEntitiesWith,
-    getComponent: engine.getComponent,
-    getComponentOrNull: engine.getComponentOrNull,
-    removeComponentDefinition: engine.removeComponentDefinition,
-    componentsIter: engine.componentsIter,
-    seal: engine.seal,
+    addEntity: partialEngine.addEntity,
+    removeEntity: partialEngine.removeEntity,
+    removeEntityWithChildren: partialEngine.removeEntityWithChildren,
+    addSystem: partialEngine.addSystem,
+    removeSystem: partialEngine.removeSystem,
+    defineComponent: partialEngine.defineComponent,
+    defineComponentFromSchema: partialEngine.defineComponentFromSchema,
+    registerComponentDefinition: partialEngine.registerComponentDefinition,
+    getEntitiesWith: partialEngine.getEntitiesWith,
+    getComponent: partialEngine.getComponent,
+    getComponentOrNull: partialEngine.getComponentOrNull,
+    removeComponentDefinition: partialEngine.removeComponentDefinition,
+    componentsIter: partialEngine.componentsIter,
+    seal: partialEngine.seal,
 
     update,
 
@@ -296,10 +268,10 @@ export function Engine(options?: IEngineOptions): IEngine {
     PlayerEntity: 1 as Entity,
     CameraEntity: 2 as Entity,
 
-    getEntityState: engine.entityContainer.getEntityState,
+    getEntityState: partialEngine.entityContainer.getEntityState,
     addTransport: crdtSystem.addTransport,
     getCrdtState: crdtSystem.getCrdt,
 
-    entityContainer: engine.entityContainer
+    entityContainer: partialEngine.entityContainer
   }
 }

@@ -14,15 +14,7 @@ import { ISchema } from './ISchema'
 import { IMap } from './Map'
 import { IOptional } from './Optional'
 
-export type { IOptional } from './Optional'
-export type { IMap } from './Map'
-export type { IArray } from './Array'
-export type { IEnum } from './basic/Enum'
-export type { Vector3Type } from './custom/Vector3'
-export type { QuaternionType } from './custom/Quaternion'
-export type { Color3Type } from './custom/Color3'
-export type { Color4Type } from './custom/Color4'
-
+export { QuaternionType, Vector3Type, ISchema, Color3Type, Color4Type }
 /**
  * @public
  */

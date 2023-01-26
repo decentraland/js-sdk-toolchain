@@ -1,30 +1,14 @@
-import {
-  Engine,
-  Entity,
-  createPointerEventSystem,
-  createInputSystem,
-  TextAlignMode,
-  Font
-} from '../../packages/@dcl/ecs/dist'
-import { components, IEngine } from '../../packages/@dcl/ecs/src'
-import {
-  createReactBasedUiSystem,
-  Dropdown,
-  ReactEcs,
-  UiEntity
-} from '../../packages/@dcl/react-ecs/src'
+import { Entity } from '../../packages/@dcl/ecs/dist'
+import { components } from '../../packages/@dcl/ecs/src'
+import { Dropdown, ReactEcs, UiEntity } from '../../packages/@dcl/react-ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
+import { setupEngine } from './utils'
 
 describe('UiDropdown React ECS', () => {
-  const engine = Engine()
-  const Input = createInputSystem(engine)
-  const uiRenderer = createReactBasedUiSystem(
-    engine,
-    createPointerEventSystem(engine, Input)
-  )
+  const { engine, uiRenderer } = setupEngine()
 
-  const UiDropdown = components.UiDropdown(engine as IEngine)
-  const UiDropdownResult = components.UiDropdownResult(engine as IEngine)
+  const UiDropdown = components.UiDropdown(engine)
+  const UiDropdownResult = components.UiDropdownResult(engine)
   const uiEntity = ((engine.addEntity() as number) + 1) as Entity
   const onChange: jest.Mock | undefined = jest.fn()
   const undefinedChange: jest.Mock | undefined = undefined
@@ -57,11 +41,7 @@ describe('UiDropdown React ECS', () => {
     await engine.update(1)
     expect(UiDropdown.get(uiEntity).selectedIndex).toBe(-1)
     expect(UiDropdown.get(uiEntity).disabled).toBe(false)
-    expect(UiDropdown.get(uiEntity).options).toStrictEqual([
-      'BOEDO',
-      'CASLA',
-      'SAN LORENZO'
-    ])
+    expect(UiDropdown.get(uiEntity).options).toStrictEqual(['BOEDO', 'CASLA', 'SAN LORENZO'])
     acceptEmpty = false
     await engine.update(1)
     expect(UiDropdown.get(uiEntity).selectedIndex).toBe(0)

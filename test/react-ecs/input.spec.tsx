@@ -1,34 +1,13 @@
-import {
-  Engine,
-  Entity,
-  IEngine,
-  createPointerEventSystem,
-  createInputSystem
-} from '../../packages/@dcl/ecs'
-import { components, IEngine as IIEngine } from '../../packages/@dcl/ecs/src'
-import {
-  createReactBasedUiSystem,
-  ReactBasedUiSystem,
-  ReactEcs,
-  Input
-} from '../../packages/@dcl/react-ecs/src'
+import { Entity } from '../../packages/@dcl/ecs'
+import { components } from '../../packages/@dcl/ecs/src'
+import { ReactEcs, Input } from '../../packages/@dcl/react-ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
+import { setupEngine } from './utils'
 
 describe('Ui Listeners React Ecs', () => {
-  let engine: IEngine
-  let uiRenderer: ReactBasedUiSystem
-
-  beforeEach(() => {
-    engine = Engine()
-    const Input = createInputSystem(engine)
-    uiRenderer = createReactBasedUiSystem(
-      engine,
-      createPointerEventSystem(engine, Input)
-    )
-  })
-
   it('should run onChange if it was a keyboard event', async () => {
-    const UiInputResult = components.UiInputResult(engine as IIEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiInputResult = components.UiInputResult(engine)
     const uiEntity = ((engine.addEntity() as number) + 1) as Entity
     const onChange: jest.Mock | undefined = jest.fn()
     const undefinedChange: jest.Mock | undefined = undefined

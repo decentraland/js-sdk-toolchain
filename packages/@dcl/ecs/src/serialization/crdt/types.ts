@@ -1,6 +1,4 @@
-import { Entity } from '../../engine/entity'
-
-export type Uint32 = number
+import { Entity, uint32 } from '../../engine/entity'
 
 export enum CrdtMessageType {
   RESERVED = 0,
@@ -17,21 +15,24 @@ export enum CrdtMessageType {
 /**
  * Min length = 8 bytes
  * All message length including
- * @param length - Uint32 the length of all message (including the header)
+ * @param length - uint32 the length of all message (including the header)
  * @param type - define the function which handles the data
  */
 export type CrdtMessageHeader = {
-  length: Uint32
-  type: Uint32
+  length: uint32
+  type: uint32
 }
 
+/**
+ * @internal
+ */
 export const CRDT_MESSAGE_HEADER_LENGTH = 8
 
 /**
  * Min. length = header (8 bytes) + 20 bytes = 28 bytes
  *
- * @param entity - Uint32 number of the entity
- * @param componentId - Uint32 number of id
+ * @param entity - uint32 number of the entity
+ * @param componentId - uint32 number of id
  * @param timestamp - Uint64 Lamport timestamp
  * @param data - Uint8[] data of component => length(4 bytes) + block of bytes[0..length-1]
  */
@@ -51,7 +52,7 @@ export type DeleteComponentMessageBody = {
 }
 
 /**
- * @param entity - Uint32 number of the entity
+ * @param entity - uint32 number of the entity
  */
 export type DeleteEntityMessageBody = {
   type: CrdtMessageType.DELETE_ENTITY

@@ -10,7 +10,7 @@
  * ```
  *
  *
- * Go to the Function section to see all the UI Components availabl
+ * Go to the Function section to see all the UI Components.
  * @module ReactEcs
  *
  */

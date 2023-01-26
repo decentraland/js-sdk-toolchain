@@ -1,38 +1,15 @@
-import {
-  Engine,
-  IEngine,
-  Entity,
-  createPointerEventSystem,
-  createInputSystem,
-  TextureWrapMode,
-  TextureFilterMode
-} from '../../packages/@dcl/ecs'
-import { components, IEngine as IIEngine } from '../../packages/@dcl/ecs/src'
+import { Entity, TextureWrapMode, TextureFilterMode } from '../../packages/@dcl/ecs/src'
+import { components } from '../../packages/@dcl/ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
-import {
-  ReactEcs,
-  UiEntity,
-  createReactBasedUiSystem,
-  ReactBasedUiSystem,
-  UiBackgroundProps
-} from '../../packages/@dcl/react-ecs/src'
+import { ReactEcs, UiEntity, UiBackgroundProps } from '../../packages/@dcl/react-ecs/src'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
+import { setupEngine } from './utils'
 
 describe('UiBackground React Ecs', () => {
-  let engine: IEngine
-  let uiRenderer: ReactBasedUiSystem
-
-  beforeEach(() => {
-    engine = Engine()
-    uiRenderer = createReactBasedUiSystem(
-      engine,
-      createPointerEventSystem(engine, createInputSystem(engine))
-    )
-  })
-
   it('should generate a UI and update the width of a div', async () => {
-    const UiTransform = components.UiTransform(engine as IIEngine)
-    const UiBackground = components.UiBackground(engine as IIEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const UiBackground = components.UiBackground(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -41,9 +18,7 @@ describe('UiBackground React Ecs', () => {
     const getBackground = (entity: Entity) => UiBackground.get(entity)
     let color: Color4.Mutable | undefined = { r: 0, g: 1, b: 2, a: 0 }
 
-    const ui = () => (
-      <UiEntity uiTransform={{ width: 100 }} uiBackground={{ color }} />
-    )
+    const ui = () => <UiEntity uiTransform={{ width: 100 }} uiBackground={{ color }} />
 
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
@@ -74,7 +49,8 @@ describe('UiBackground React Ecs', () => {
   })
 
   it('should remove backgrund component', async () => {
-    const UiBackground = components.UiBackground(engine as IIEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiBackground = components.UiBackground(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -88,15 +64,11 @@ describe('UiBackground React Ecs', () => {
       }
     }
 
-    const ui = () => (
-      <UiEntity uiTransform={{ width: 100 }} {...backgroundProps} />
-    )
+    const ui = () => <UiEntity uiTransform={{ width: 100 }} {...backgroundProps} />
 
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
-    expect(getBackground()?.color).toMatchObject(
-      backgroundProps.uiBackground.color!
-    )
+    expect(getBackground()?.color).toMatchObject(backgroundProps.uiBackground.color!)
 
     backgroundProps = undefined
     await engine.update(1)
@@ -104,7 +76,8 @@ describe('UiBackground React Ecs', () => {
   })
 
   it('Texture background', async () => {
-    const UiBackground = components.UiBackground(engine as IIEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiBackground = components.UiBackground(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -123,15 +96,11 @@ describe('UiBackground React Ecs', () => {
       }
     }
 
-    const ui = () => (
-      <UiEntity uiTransform={{ width: 100 }} {...backgroundProps} />
-    )
+    const ui = () => <UiEntity uiTransform={{ width: 100 }} {...backgroundProps} />
 
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
-    expect(getBackground()?.color).toMatchObject(
-      backgroundProps.uiBackground.color!
-    )
+    expect(getBackground()?.color).toMatchObject(backgroundProps.uiBackground.color!)
     expect(getBackground()?.texture).toMatchObject({
       tex: {
         $case: 'texture',

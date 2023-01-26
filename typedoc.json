@@ -12,7 +12,11 @@
   "excludeInternal": true,
   "entryPointStrategy": "expand",
   "out": "generated-docs",
-  "exclude": ["packages/@dcl/sdk/src/internal/**/*.ts"],
+  "exclude": [
+    "packages/@dcl/sdk/src/internal/**/*.ts",
+    "packages/@dcl/sdk/src/message-bus.ts",
+    "packages/@dcl/sdk/src/observables.ts"
+  ],
   "plugin": [],
   "kindSortOrder": [
     "Module",

@@ -1,13 +1,12 @@
 import { State } from '@dcl/crdt'
 import type { ISchema } from '../schemas/ISchema'
 import { MapResult, Spec } from '../schemas/Map'
+import { OnChangeFunction } from '../systems/crdt'
 import { Transport } from '../systems/crdt/types'
 import { ComponentDefinition } from './component'
 import { Entity, EntityContainer, EntityState } from './entity'
 import { ReadonlyComponentSchema } from './readonly'
-import { SystemFn } from './systems'
-
-export { ISchema } from '../schemas/ISchema'
+import { SystemFn, SystemItem } from './systems'
 
 /**
  * @public
@@ -39,10 +38,42 @@ export interface MapComponentDefinition<T> extends ComponentDefinition<T> {
 }
 
 /**
+ * @internal
+ */
+export type PreEngine = Pick<
+  IEngine,
+  | 'addEntity'
+  | 'removeEntity'
+  | 'removeEntityWithChildren'
+  | 'addSystem'
+  | 'removeSystem'
+  | 'defineComponent'
+  | 'defineComponentFromSchema'
+  | 'registerComponentDefinition'
+  | 'getEntitiesWith'
+  | 'getComponent'
+  | 'getComponentOrNull'
+  | 'removeComponentDefinition'
+  | 'componentsIter'
+  | 'seal'
+  | 'entityContainer'
+> & {
+  getSystems: () => SystemItem[]
+}
+
+/**
+ * @internal
+ */
+export interface IEngineOptions {
+  onChangeFunction: OnChangeFunction
+}
+
+/**
  * @public
  */
-export type IEngine = {
+export interface IEngine {
   /**
+   * @public
    * Increment the used entity counter and return the next one.
    * @param dynamic - whether or no the entity should be considered as Dynamic (vs Static)
    * @returns the next entity unused
@@ -50,6 +81,7 @@ export type IEngine = {
   addEntity(dynamic?: boolean): Entity
 
   /**
+   * @public
    * Remove all components of an entity
    * @param entity - entity
    */
@@ -62,19 +94,22 @@ export type IEngine = {
   removeEntityWithChildren(firstEntity: Entity): void
 
   /**
+   *
+   * @public
    * Check the state of an entityin  the engine
    * @param entity - the entity to validate
-   * @returns known enum value
+   * @returns EntityState enum
    */
   getEntityState(entity: Entity): EntityState
 
   /**
+   * @public
    * Add the system to the engine. It will be called every tick updated.
    * @param system - function that receives the delta time between last tick and current one.
    * @param priority - a number with the priority, big number are called before smaller ones
    * @param name - optional: a unique name to identify it
    *
-   * Example:
+   * @example
    * ```ts
    * function mySystem(dt: number) {
    *   const entitiesWithMeshRenderer = engine.getEntitiesWith(MeshRenderer, Transform)
@@ -88,12 +123,14 @@ export type IEngine = {
   addSystem(system: SystemFn, priority?: number, name?: string): void
 
   /**
+   * @public
    * Remove a system from the engine.
    * @param selector - the function or the unique name to identify
    * @returns if it was found and removed
    */
   removeSystem(selector: string | SystemFn): boolean
   /**
+   * @public
    * Registers a custom component definition.
    * @param componentName - unique name to identify the component, a hash is calculated for it, it will fail if the hash has collisions.
    * @param componentDefinition - The component definition
@@ -103,14 +140,16 @@ export type IEngine = {
     componentDefinition: ComponentDefinition<T>
   ): ComponentDefinition<T>
   /**
+   * @public
    * Define a component and add it to the engine.
-   * @param spec - An object with schema fields
    * @param componentName - unique name to identify the component, a hash is calculated for it, it will fail if the hash has collisions.
+   * @param spec - An object with schema fields
    * @param constructorDefault - the initial value prefilled when a component is created without a value
    * @returns The component definition
    *
+   * @example
    * ```ts
-   * const Door = engine.defineComponent("my-scene::Door", {
+   * const CustomComponent = engine.defineComponent("my-scene::custom-name", {
    *   id: Schemas.Int,
    *   name: Schemas.String
    * })
@@ -123,11 +162,13 @@ export type IEngine = {
   ): MapComponentDefinition<MapResult<T>>
 
   /**
+   * @public
    * Define a component and add it to the engine.
    * @param componentName - unique name to identify the component, a hash is calculated for it, it will fail if the hash has collisions.
    * @param spec - An object with schema fields
    * @returns The component definition
    *
+   * @example
    * ```ts
    * const StateComponentId = 10023
    * const StateComponent = engine.defineComponentFromSchema("my-lib::VisibleComponent", Schemas.Bool)
@@ -136,6 +177,7 @@ export type IEngine = {
   defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): ComponentDefinition<T>
 
   /**
+   * @public
    * Get the component definition from the component id.
    * @param componentId - component number or name used to identify the component descriptor
    * @returns the component definition, throw an error if it doesn't exist
@@ -158,6 +200,7 @@ export type IEngine = {
   getComponentOrNull<T>(componentId: number): ComponentDefinition<T> | null
 
   /**
+   * @public
    * Get a iterator of entities that has all the component requested.
    * @param components - a list of component definitions
    * @returns An iterator of an array with the [entity, component1, component2, ...]
@@ -174,6 +217,7 @@ export type IEngine = {
   ): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>
 
   /**
+   * @public
    * @param deltaTime - deltaTime in seconds
    */
   update(deltaTime: number): Promise<void>
@@ -203,6 +247,7 @@ export type IEngine = {
   readonly CameraEntity: Entity
 
   /**
+   * @alpha
    * @param transport - transport which changes its onmessage to process CRDT messages
    */
   addTransport(transport: Transport): void
@@ -214,11 +259,7 @@ export type IEngine = {
   getCrdtState(): State<Uint8Array>
 
   /**
-   * Entity continaer
-   */
-  entityContainer: EntityContainer
-
-  /**
+   * @public
    * Iterator of registered components
    */
   componentsIter(): Iterable<ComponentDefinition<unknown>>
@@ -228,4 +269,10 @@ export type IEngine = {
    * components that will be available to this engine and to run optimizations.
    */
   seal(): void
+
+  /**
+   * @internal
+   * Entity container with custom methods to update their state.
+   */
+  entityContainer: EntityContainer
 }

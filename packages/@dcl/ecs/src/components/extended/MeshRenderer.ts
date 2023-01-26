@@ -4,11 +4,7 @@ import { MeshRenderer, PBMeshRenderer } from '../generated/index.gen'
 /**
  * @public
  */
-export type MeshRendererComponentDefinition = ComponentDefinition<PBMeshRenderer>
-/**
- * @public
- */
-export interface MeshRendererComponentDefinitionExtended extends MeshRendererComponentDefinition {
+export interface MeshRendererComponentDefinitionExtended extends ComponentDefinition<PBMeshRenderer> {
   /**
    * @public
    * Set a box in the MeshRenderer component

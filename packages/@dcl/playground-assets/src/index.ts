@@ -1,7 +1,7 @@
 export * from '@dcl/sdk/math'
 export * from '@dcl/sdk/ecs'
 export * from '@dcl/sdk/react-ecs'
-export * from '@dcl/sdk/messageBus'
+export * from '@dcl/sdk/message-bus'
 export * from '@dcl/sdk/ethereum-provider'
 
 // legacy
