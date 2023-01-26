@@ -11,13 +11,11 @@ export const ROLLUP = resolve(process.cwd(), './packages/@dcl/dcl-rollup/node_mo
 // WORKING DIRECTORIES
 export const ROLLUP_CONFIG_PATH = resolve(process.cwd(), './packages/@dcl/dcl-rollup')
 export const SDK_PATH = resolve(process.cwd(), './packages/@dcl/sdk')
+export const INSPECTOR_PATH = resolve(process.cwd(), './packages/@dcl/inspector')
 export const PLAYGROUND_ASSETS_PATH = resolve(process.cwd(), './packages/@dcl/playground-assets')
-
 export const ECS7_PATH = resolve(process.cwd(), './packages/@dcl/ecs')
 export const CRDT_PATH = resolve(process.cwd(), './packages/@dcl/crdt')
-
 export const JS_RUNTIME = resolve(process.cwd(), './packages/@dcl/js-runtime')
-
 export const REACT_ECS = resolve(process.cwd(), './packages/@dcl/react-ecs')
 
 export function commonChecks() {
