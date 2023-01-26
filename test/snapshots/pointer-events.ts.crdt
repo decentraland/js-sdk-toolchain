@@ -7,7 +7,7 @@ EVAL test/snapshots/pointer-events.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 19k
-  MALLOC_COUNT = 9305
+  MALLOC_COUNT = 9308
   ALIVE_OBJS_DELTA ~= 1.87k
 CALL onStart()
   OPCODES ~= 0k

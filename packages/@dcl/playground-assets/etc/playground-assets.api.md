@@ -1500,11 +1500,6 @@ export const onRealmChangedObservable: Observable<{
 // @public (undocumented)
 export const onSceneReadyObservable: Observable<unknown>;
 
-// Warning: (ae-missing-release-tag) "onStart" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function onStart(): Promise<void>;
-
 // Warning: (ae-missing-release-tag) "onUpdate" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
