@@ -88,7 +88,8 @@ function fixTsGeneratedByProto(filePath: string) {
    * Read the generated pb component and add @internal comments to exported methods
    * So we dont add this types to the final .d.ts build
    */
-  content = content.replace(`export const protobufPackage = `, 'const protobufPackage = ')
+  content = content.replace(`export const protobufPackage = `, 'const protobufPackageSarasa = ')
+  content = content.replace(/\nexport /g, publicInterface)
   content = content.replace(/export const/g, internalComment)
 
   /**
@@ -105,3 +106,9 @@ const internalComment = `
  * @internal
  */
 export const`
+
+const publicInterface = `
+/**
+ * @public
+ */
+export `

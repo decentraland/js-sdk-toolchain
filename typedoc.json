@@ -14,6 +14,7 @@
   },
   "excludeExternals": false,
   "excludeInternal": true,
+  "excludeNotDocumented": true,
   "entryPointStrategy": "expand",
   "out": "generated-docs",
   "exclude": [

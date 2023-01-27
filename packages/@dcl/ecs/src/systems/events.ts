@@ -7,8 +7,14 @@ import { Entity, EntityState } from '../engine/entity'
 import { IInputSystem } from '../engine/input'
 import { checkNotThenable } from '../runtime/invariant'
 
+/**
+ * @public
+ */
 export type EventSystemCallback = (event: PBPointerEventsResult_PointerCommand) => void
 
+/**
+ * @public
+ */
 export type EventSystemOptions = {
   button: InputAction
   hoverText?: string
@@ -16,6 +22,9 @@ export type EventSystemOptions = {
   showFeedback?: boolean
 }
 
+/**
+ * @public
+ */
 export interface PointerEventsSystem {
   /**
    * @internal

@@ -20,6 +20,10 @@ export type ComponentSchema<T extends [ComponentDefinition<any>, ...ComponentDef
   [K in keyof T]: T[K] extends ComponentDefinition<any> ? ReturnType<T[K]['getMutable']> : never
 }
 
+/**
+ * @public
+ * Overrides component definition to support partial default values
+ */
 export interface MapComponentDefinition<T> extends ComponentDefinition<T> {
   /**
    * Add the current component to an entity, throw an error if the component already exists (use `createOrReplace` instead).
