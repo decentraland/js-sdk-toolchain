@@ -15,12 +15,12 @@ import { getFont, getTextAlign } from './utils'
  * @example
  * <Label value="SDK 7" uiTransform={{ margin: { left: 10 } }} />
  *
+ * @category Component
  */
 
 /*#__PURE__*/
 export function Label(props: EntityPropTypes & UiLabelProps) {
-  const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...uiTextProps } =
-    props
+  const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...uiTextProps } = props
   const commonProps = parseProps({
     uiTransform,
     uiBackground,

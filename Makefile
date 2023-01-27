@@ -49,7 +49,7 @@ node_modules/.bin/protobuf/bin/protoc:
 	chmod +x ./node_modules/.bin/protobuf/bin/protoc
 
 docs:
-	./node_modules/.bin/typedoc
+	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/docs.spec.ts
 
 test-watch:
 	node_modules/.bin/jest --detectOpenHandles --colors --watch --roots "test"

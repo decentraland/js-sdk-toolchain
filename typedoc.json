@@ -1,5 +1,4 @@
 {
-  // Comments are supported, like tsconfig.json
   "entryPoints": [
     "packages/@dcl/sdk/src",
   ],
@@ -8,15 +7,22 @@
   "cleanOutputDir": true,
   "json": "generated-docs/docs.json",
   "name": "SDK Documentation",
-  "excludeExternals": true,
+  "categorizeByGroup": true,
+  "defaultCategory" : " ",
+  "searchCategoryBoosts": {
+    "Component": 1,
+  },
+  "excludeExternals": false,
   "excludeInternal": true,
   "entryPointStrategy": "expand",
   "out": "generated-docs",
   "exclude": [
     "packages/@dcl/sdk/src/internal/**/*.ts",
     "packages/@dcl/sdk/src/message-bus.ts",
-    "packages/@dcl/sdk/src/observables.ts"
+    "packages/@dcl/sdk/src/observables.ts",
+    "packages/@dcl/sdk/src/index.ts"
   ],
+  "treatWarningsAsErrors": true,
   "plugin": [],
   "kindSortOrder": [
     "Module",
@@ -25,19 +31,15 @@
     "Interface",
     "TypeAlias",
     "Namespace",
-    "Enum",
-    "EnumMember",
-    "Property",
-    "Accessor",
-    "Method",
-    "ObjectLiteral",
-    "Parameter",
-    "TypeParameter",
-    "TypeLiteral",
-    "CallSignature",
-    "ConstructorSignature",
-    "IndexSignature",
-    "GetSignature",
-    "SetSignature",
-  ]
+    "Enum"
+  ],
+  "visibilityFilters": {
+    "protected": false,
+    "private": false,
+    "inherited": false,
+    "external": false
+  },
+  "sidebarLinks": {
+    "Documentation": "http://docs.decentraland.org"
+  }
 }

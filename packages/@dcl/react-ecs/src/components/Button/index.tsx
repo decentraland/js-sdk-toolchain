@@ -32,11 +32,11 @@ function getButtonProps(props: UiButtonProps) {
  * @example
  * <Button variant="primary" value="Click me!" />
  *
+ * @category Component
  */
 /*#__PURE__*/
 export function Button(props: UiButtonProps) {
-  const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...otherProps } =
-    props
+  const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...otherProps } = props
   const buttonProps = getButtonProps(props)
   const uiBackgroundProps = parseUiBackground({
     ...buttonProps.uiBackground,

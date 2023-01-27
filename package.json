@@ -22,8 +22,7 @@
     "@dcl/eslint-config": "^1.0.6-20220629202434.commit-44f87f0",
     "@types/node": "^18.11.18",
     "@types/supertest": "^2.0.11",
-    "typedoc": "^0.23.23",
-    "typedoc-plugin-markdown": "^3.14.0"
+    "typedoc": "^0.23.23"
   },
   "repository": {
     "type": "git",

@@ -33,10 +33,10 @@ function parseUiInput(props: Partial<UiInputProps>): PBUiInput {
       uiTransform={{ width: 200, height: 36 }}
     />
  *
+ * @category Component
  */ /*#__PURE__*/
 export function Input(props: EntityPropTypes & Partial<UiInputProps>) {
-  const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...otherProps } =
-    props
+  const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...otherProps } = props
   const inputProps = parseUiInput(otherProps)
   const commonProps = parseProps({
     uiTransform,
