@@ -2510,7 +2510,9 @@ export interface UiDropdownProps extends EntityPropTypes, Omit<Partial<PBUiDropd
 // @public (undocumented)
 export const UiDropdownResult: ComponentDefinition<PBUiDropdownResult>;
 
-// @public (undocumented)
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
+//
+// @public
 export function UiEntity(props: EntityPropTypes): ReactEcs.JSX.Element;
 
 // @public (undocumented)

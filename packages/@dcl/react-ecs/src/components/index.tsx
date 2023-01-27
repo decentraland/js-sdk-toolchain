@@ -18,6 +18,7 @@ export { Button } from './Button'
 
 /**
  * @public
+ * @category Component
  */
 /*#__PURE__*/
 export function UiEntity(props: EntityPropTypes) {

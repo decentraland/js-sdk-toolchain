@@ -1,6 +1,8 @@
 /**
  * The module react-ecs is exposed by the sdk in the /react-ecs path.
+ *
  * UI components and semantics for the SDK 7.
+ *
  * JSX & Flexbox is used due to its market adoption and availability of implementations and documentation and expertise.
  * @example
  * ```tsx

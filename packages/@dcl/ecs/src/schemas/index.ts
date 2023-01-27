@@ -19,31 +19,50 @@ export { QuaternionType, Vector3Type, ISchema, Color3Type, Color4Type }
  * @public
  */
 export namespace Schemas {
+  /** @public */
   export type SchemaType = ISchema
 
+  /** @public */
   export const Boolean = Bool
 
+  /** @public */
   export const String = EcsString
 
+  /** @public */
   export const Float = Float32
+  /** @public */
   export const Double = Float64
 
+  /** @public */
   export const Byte = Int8
+  /** @public */
   export const Short = Int16
+  /** @public */
   export const Int = Int32
+  /** @public */
   export const Int64 = iInt64
 
+  /** @public */
   export const Number = Float32
 
+  /** @public */
   export const Vector3: ISchema<Vector3Type> = Vector3Schema
+  /** @public */
   export const Quaternion: ISchema<QuaternionType> = QuaternionSchema
+  /** @public */
   export const Color3: ISchema<Color3Type> = Color3Schema
+  /** @public */
   export const Color4: ISchema<Color4Type> = Color4Schema
 
+  /** @public */
   export const Entity: ISchema<Entity> = EntitySchema
 
+  /** @public */
   export const Enum = IEnum
+  /** @public */
   export const Array = IArray
+  /** @public */
   export const Map = IMap
+  /** @public */
   export const Optional = IOptional
 }

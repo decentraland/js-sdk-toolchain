@@ -19,6 +19,9 @@ flow('build docs site', () => {
 .tsd-navigation.settings {
   display: none;
 }
+.tsd-index-heading.uppercase {
+  display: none
+}
 `
     writeFileSync(cssPath, customCss + cssContent)
   })
