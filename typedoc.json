@@ -35,10 +35,10 @@
     "Enum"
   ],
   "visibilityFilters": {
-    "protected": false,
-    "private": false,
-    "inherited": false,
-    "external": false
+    "protected": true,
+    "private": true,
+    "inherited": true,
+    "external": true
   },
   "sidebarLinks": {
     "Documentation": "http://docs.decentraland.org"
