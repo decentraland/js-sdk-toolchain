@@ -5,7 +5,7 @@
   "tsconfig": "packages/@dcl/sdk/tsconfig.json",
   "includeVersion": true,
   "cleanOutputDir": true,
-  "json": "generated-docs/docs.json",
+  "json": "api-docs/docs.json",
   "name": "SDK Documentation",
   "categorizeByGroup": true,
   "defaultCategory" : " ",
@@ -16,7 +16,7 @@
   "excludeInternal": true,
   "excludeNotDocumented": true,
   "entryPointStrategy": "expand",
-  "out": "generated-docs",
+  "out": "api-docs",
   "exclude": [
     "packages/@dcl/sdk/src/internal/**/*.ts",
     "packages/@dcl/sdk/src/message-bus.ts",

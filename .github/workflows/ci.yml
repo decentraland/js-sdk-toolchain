@@ -247,19 +247,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
-      - name: publish docs
-        run: |
-          make docs
-          npx @dcl/cdn-uploader@next \
-            --bucket "$S3_BUCKET" \
-            --local-folder "generated-docs" \
-            --bucket-folder "@dcl/js-sdk-toolchain/generated-docs/$REF" \
-            --concurrency 10
-        env:
-          REF: ${{ github.head_ref || github.ref }}
-          S3_BUCKET: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
   notify_deployment:
     needs: [build]
     if: ${{ github.event.pull_request.number }}
@@ -293,6 +280,4 @@ jobs:
                ```
             - You can preview this build entering:
               https://playground.decentraland.org/?sdk-branch=${{ github.head_ref || github.ref }}
-            - You can preview the documentation at:
-              https://sdk-team-cdn.decentraland.org/@dcl/js-sdk-toolchain/generated-docs/${{ github.head_ref || github.ref }}
           edit-mode: replace
