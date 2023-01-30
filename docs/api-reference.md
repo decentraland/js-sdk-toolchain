@@ -1,9 +1,25 @@
 
 # Scene runtime (SDK7)
-Nowadays, the scenes are run through a single JavaScript file and the `scene-runtime` is responsible for that can happen. It serves some essential context and the scene can abstract from its implementation. This is: 
+Nowadays, the scenes are run through a single JavaScript file and the `scene-runtime` is responsible for that can happen. It serves some essential context and the scene can abstract from its implementation.
+
+In some steps, the scene-runtime:
+1. Prepares the global context (in JavaScript this would be the `globalThis`, `self` and/or `global`)
+2. Retrieves the scene-code and then evaluates with the global-context prepared.
+3. Expects from the evaluation some functions exported: `onStart` and `onUpdate`
+4. Determinates when it's ready to call first `onStart` and then a continuos `onUpdate`. 
+
+## Global context where the scene is evaluated
 ```ts
 /**
  * All ES2022 features and syntax specifications: https://github.com/tc39/ecma402
+ */
+ 
+/**
+ * WebSocket: https://developer.mozilla.org/es/docs/Web/API/WebSocket
+ */
+
+/**
+ * fetch: https://developer.mozilla.org/es/docs/Web/API/Fetch_API
  */
 
 /** @public */
