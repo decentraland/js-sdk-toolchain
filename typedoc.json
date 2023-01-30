@@ -12,6 +12,7 @@
   "searchCategoryBoosts": {
     "Component": 1,
   },
+  "hideGenerator": true,
   "excludeExternals": false,
   "excludeInternal": true,
   "excludeNotDocumented": true,
