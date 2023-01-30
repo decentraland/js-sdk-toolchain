@@ -1,0 +1,14 @@
+name: "Release Api Reference"
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  run-updater:
+    runs-on: ubuntu-latest
+    steps:
+    - name: REST API with curl
+      run: |
+        curl -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${{ secrets.CLOUDFLARE_WEBHOOK_TOKEN }}"
