@@ -362,10 +362,27 @@ function getEcsPath(workingDir: string) {
   }
 }
 
+
+/* require.resolve patch with undefined when fails */
+function resolveOrUndefined(
+  id: string,
+  options?: { paths?: string[] | undefined }
+): string | undefined {
+  try {
+    return require.resolve(id, options)
+  } catch (err) {
+    return undefined
+  }
+}
+
+
 function serveStatic(dir: string, router: Router<PreviewComponents>) {
   const ecsPath = path.dirname(getEcsPath(dir))
+  const dclExplorerJsonPath = resolveOrUndefined('@dcl/explorer/package.json', {
+    paths: [dir, ecsPath]
+  })
   const dclKernelPath = path.dirname(
-    require.resolve('@dcl/kernel/package.json', {
+    dclExplorerJsonPath ?? require.resolve('@dcl/kernel/package.json', {
       paths: [dir, ecsPath]
     })
   )
@@ -373,7 +390,7 @@ function serveStatic(dir: string, router: Router<PreviewComponents>) {
   const dclKernelImagesDecentralandConnect = path.resolve(dclKernelPath, 'images', 'decentraland-connect')
   const dclKernelLoaderPath = path.resolve(dclKernelPath, 'loader')
   const dclUnityRenderer = path.dirname(
-    require.resolve('@dcl/unity-renderer/package.json', {
+    dclExplorerJsonPath ?? require.resolve('@dcl/unity-renderer/package.json', {
       paths: [dir, ecsPath]
     })
   )
