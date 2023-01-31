@@ -30,10 +30,9 @@ export namespace PutComponentOperation {
 
     // Write ComponentOperation header
     buf.setUint32(startMessageOffset + 8, entity as number)
-    buf.setUint32(startMessageOffset + 12, componentDefinition.componentId
+    buf.setUint32(startMessageOffset + 12, componentDefinition.componentId)
     buf.setUint32(startMessageOffset + 16, timestamp)
-    const newLocal =
-      messageLength - MESSAGE_HEADER_LENGTH - CRDT_MESSAGE_HEADER_LENGTH
+    const newLocal = messageLength - MESSAGE_HEADER_LENGTH - CRDT_MESSAGE_HEADER_LENGTH
     buf.setUint32(startMessageOffset + 20, newLocal)
   }
 

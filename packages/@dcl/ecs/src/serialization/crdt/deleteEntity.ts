@@ -22,11 +22,7 @@ export namespace DeleteEntity {
     }
 
     if (header.type !== CrdtMessageType.DELETE_ENTITY) {
-<<<<<<< feat/adr-117-revision-v2
       throw new Error('DeleteEntity tried to read another message type.')
-=======
-      throw new Error('DeleteComponentOperation tried to read another message type.')
->>>>>>> main
     }
 
     return {
