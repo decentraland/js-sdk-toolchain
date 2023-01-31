@@ -14,7 +14,7 @@
     "Component": 1,
   },
   "hideGenerator": true,
-  "excludeExternals": false,
+  "excludeExternals": true,
   "excludeInternal": true,
   // TODO: We need to document all the protocol ~system/ API
   "excludeNotDocumented": false,
