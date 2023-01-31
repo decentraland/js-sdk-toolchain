@@ -4,7 +4,7 @@
 
 Use the Decentraland Software Development Kit v7 to create experiences for the Decentraland ecosystem.
 
-## Creating a scene and preview it locally
+## Create a scene and preview it locally
 
 1. Download the SDK by running `npm install -g @dcl/sdk`.
 2. Run `dcl init` on an empty folder, or `dcl init my-scene` to create a folder named `my-scene` with a new project.
