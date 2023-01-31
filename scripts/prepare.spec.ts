@@ -7,7 +7,8 @@ import {
   ECS7_PATH,
   REACT_ECS,
   PLAYGROUND_ASSETS_PATH,
-  CRDT_PATH
+  CRDT_PATH,
+  INSPECTOR_PATH
 } from './common'
 
 import { itExecutes, itInstallsADependencyFromFolderAndCopiesTheVersion } from './helpers'
@@ -32,5 +33,6 @@ flow('build-all', () => {
     itExecutes('npm pack', ECS7_PATH)
     itExecutes('npm pack', REACT_ECS)
     itExecutes('npm pack', ROLLUP_CONFIG_PATH)
+    itExecutes('npm pack', INSPECTOR_PATH)
   })
 })

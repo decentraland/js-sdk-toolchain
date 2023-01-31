@@ -87,7 +87,8 @@ deep-clean:
 		packages/@dcl/dcl-rollup/node_modules/ \
 		packages/@dcl/ecs/node_modules/ \
 		packages/@dcl/react-ecs/node_modules/ \
-		packages/@dcl/sdk/node_modules/
+		packages/@dcl/sdk/node_modules/ \
+		packages/@dcl/inspector/node_modules/
 	make clean
 
 update-snapshots:
@@ -100,6 +101,7 @@ clean:
 	@rm -rf coverage/
 	@rm -rf packages/@dcl/dcl-rollup/*.js packages/@dcl/dcl-rollup/*.d.ts
 	@rm -rf packages/@dcl/sdk/*.js packages/@dcl/sdk/*.d.ts packages/@dcl/sdk/internal
+	@rm -rf packages/@dcl/inspector/*.js packages/@dcl/inspector/*.d.ts packages/@dcl/inspector/build
 	@find packages/@dcl/sdk/cli -name "*.js" ! -path "packages/@dcl/sdk/cli/commands/preview/proto/*" -type f -delete
 	@find packages/@dcl/sdk/cli -name "*.d.ts" ! -path "packages/@dcl/sdk/cli/commands/preview/proto/*" -type f -delete
 	@rm -rf packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/
