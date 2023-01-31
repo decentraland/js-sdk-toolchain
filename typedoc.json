@@ -1,6 +1,7 @@
 {
   "entryPoints": [
     "packages/@dcl/sdk/src",
+    "packages/@dcl/js-runtime/apis.d.ts"
   ],
   "tsconfig": "packages/@dcl/sdk/tsconfig.json",
   "includeVersion": true,
@@ -15,7 +16,8 @@
   "hideGenerator": true,
   "excludeExternals": false,
   "excludeInternal": true,
-  "excludeNotDocumented": true,
+  // TODO: We need to document all the protocol ~system/ API
+  "excludeNotDocumented": false,
   "entryPointStrategy": "expand",
   "out": "api-docs",
   "exclude": [
