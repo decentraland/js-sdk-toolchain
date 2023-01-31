@@ -14,6 +14,11 @@ PROTOBUF_ZIP = protoc-$(PROTOBUF_VERSION)-linux-x86_64.zip
 endif
 endif
 
+SED_OPTION = -i
+ifeq ($(shell uname),Darwin)
+SED_OPTION=-i ""
+endif
+
 PROTOC = node_modules/.bin/protobuf/bin/protoc
 SCENE_PROTO_FILES := $(wildcard packages/@dcl/ecs/node_modules/@dcl/protocol/proto/decentraland/kernel/apis/*.proto)
 PBS_TS = $(SCENE_PROTO_FILES:packages/@dcl/ecs/node_modules/@dcl/protocol/proto/decentraland/kernel/apis/%.proto=scripts/rpc-api-generation/src/proto/%.gen.ts)
@@ -50,6 +55,10 @@ node_modules/.bin/protobuf/bin/protoc:
 
 docs:
 	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/docs.spec.ts
+# Cloudflare doesn't allow a directory called functions. 🪄🎩
+	mv api-docs/functions api-docs/funcs
+	find ./api-docs -type f -name '*.html' \
+  | xargs sed ${SED_OPTION} -E 's:(href="[^"]+)functions/:\1funcs/:g'
 
 test-watch:
 	node_modules/.bin/jest --detectOpenHandles --colors --watch --roots "test"

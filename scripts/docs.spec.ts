@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
 
 import { flow } from './common'
@@ -23,6 +23,5 @@ flow('build docs site', () => {
 }
 `
     writeFileSync(cssPath, customCss + replaceCss)
-    console.log(readdirSync(resolve(SDK_TOOLCHAIN_PATH, 'api-docs/functions')))
   })
 })
