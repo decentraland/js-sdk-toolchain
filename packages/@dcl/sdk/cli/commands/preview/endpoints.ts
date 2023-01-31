@@ -404,7 +404,7 @@ function serveStatic(dir: string, router: Router<PreviewComponents>) {
       type: 'text/html'
     },
     {
-      route: '/@/artifacts/index.js',
+      route: '/@/explorer/index.js',
       path: path.resolve(dclKernelPath, 'index.js'),
       type: 'text/javascript'
     }
@@ -447,10 +447,8 @@ function serveStatic(dir: string, router: Router<PreviewComponents>) {
   }
 
   createStaticRoutes('/images/decentraland-connect/:path+', dclKernelImagesDecentralandConnect)
-  createStaticRoutes('/@/artifacts/unity-renderer/:path+', dclUnityRenderer, (filePath) =>
-    filePath.replace(/.br+$/, '')
-  )
-  createStaticRoutes('/@/artifacts/loader/:path+', dclKernelLoaderPath)
+  createStaticRoutes('/@/explorer/unity-renderer/:path+', dclUnityRenderer, (filePath) => filePath.replace(/.br+$/, ''))
+  createStaticRoutes('/@/explorer/loader/:path+', dclKernelLoaderPath)
   createStaticRoutes('/default-profile/:path+', dclKernelDefaultProfilePath)
 
   router.get('/feature-flags/:file', async (ctx) => {
