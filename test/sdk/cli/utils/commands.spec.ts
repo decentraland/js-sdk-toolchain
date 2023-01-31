@@ -2,7 +2,6 @@ import { resolve } from 'path'
 
 import { CliError } from '../../../../packages/@dcl/sdk/cli/utils/error'
 import * as commands from '../../../../packages/@dcl/sdk/cli/utils/commands'
-import * as fsUtils from '../../../../packages/@dcl/sdk/cli/utils/fs'
 import { initComponents } from '../../../../packages/@dcl/sdk/cli/components'
 
 afterEach(() => {

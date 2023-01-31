@@ -1,6 +1,6 @@
 import * as path from 'path'
 import { readFileSync, writeFileSync } from 'fs'
-import { copySync, existsSync, mkdirSync, removeSync } from 'fs-extra'
+import { readdirSync, copySync, existsSync, mkdirSync, removeSync } from 'fs-extra'
 import { summary } from '@actions/core'
 
 import {
@@ -8,6 +8,7 @@ import {
   CRDT_PATH,
   ECS7_PATH,
   flow,
+  INSPECTOR_PATH,
   JS_RUNTIME,
   PLAYGROUND_ASSETS_PATH,
   REACT_ECS,
@@ -138,6 +139,21 @@ flow('build-all', () => {
     })
 
     itExecutes(`chmod +x cli/index.js`, SDK_PATH)
+  })
+
+  flow('@dcl/inspector', () => {
+    itDeletesFolder('build', INSPECTOR_PATH)
+
+    itExecutes('npm i --silent', INSPECTOR_PATH)
+    itExecutes('npm run build --silent', INSPECTOR_PATH)
+    it('check file exists', () => {
+      ensureFileExists('build/index.html', INSPECTOR_PATH)
+      const jsPath = path.resolve(INSPECTOR_PATH, 'build/static/js')
+      const files = readdirSync(jsPath)
+      if (!files.length || !files.find(($) => $.startsWith('main'))) {
+        throw new Error(`Invalid JS files on ${jsPath}`)
+      }
+    })
   })
 
   flow('@dcl/playground-assets build', () => {
