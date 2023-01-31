@@ -32,9 +32,8 @@ describe('Check there is fixed version', () => {
       '@dcl/ecs-math',
       '@dcl/ecs',
       '@dcl/js-runtime',
-      '@dcl/kernel',
-      '@dcl/react-ecs',
-      '@dcl/unity-renderer'
+      '@dcl/explorer',
+      '@dcl/react-ecs'
     ]
 
     const dependencies = Object.keys(sdkDeps)
