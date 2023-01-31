@@ -350,62 +350,35 @@ function getSceneJson({
   return resultEntities
 }
 
-function getEcsPath(workingDir: string) {
-  try {
-    return require.resolve('decentraland-ecs/package.json', {
-      paths: [workingDir]
-    })
-  } catch (e) {
-    return require.resolve('@dcl/sdk/package.json', {
-      paths: [workingDir]
-    })
-  }
-}
-
-/* require.resolve patch with undefined when fails */
-function resolveOrUndefined(id: string, options?: { paths?: string[] | undefined }): string | undefined {
-  try {
-    return require.resolve(id, options)
-  } catch (err) {
-    return undefined
-  }
-}
-
 function serveStatic(dir: string, router: Router<PreviewComponents>) {
-  const ecsPath = path.dirname(getEcsPath(dir))
-  const dclExplorerJsonPath = resolveOrUndefined('@dcl/explorer/package.json', {
-    paths: [dir, ecsPath]
-  })
-  const dclKernelPath = path.dirname(
-    dclExplorerJsonPath ??
-      require.resolve('@dcl/kernel/package.json', {
-        paths: [dir, ecsPath]
-      })
+  const sdkPath = path.dirname(
+    require.resolve('@dcl/sdk/package.json', {
+      paths: [dir]
+    })
   )
-  const dclKernelDefaultProfilePath = path.resolve(dclKernelPath, 'default-profile')
-  const dclKernelImagesDecentralandConnect = path.resolve(dclKernelPath, 'images', 'decentraland-connect')
-  const dclKernelLoaderPath = path.resolve(dclKernelPath, 'loader')
-  const dclUnityRenderer = path.dirname(
-    dclExplorerJsonPath ??
-      require.resolve('@dcl/unity-renderer/package.json', {
-        paths: [dir, ecsPath]
-      })
+  const dclExplorerJsonPath = path.dirname(
+    require.resolve('@dcl/explorer/package.json', {
+      paths: [dir, sdkPath]
+    })
   )
+
+  const dclKernelDefaultProfilePath = path.resolve(dclExplorerJsonPath, 'default-profile')
+  const dclKernelImagesDecentralandConnect = path.resolve(dclExplorerJsonPath, 'images', 'decentraland-connect')
 
   const routes = [
     {
       route: '/',
-      path: path.resolve(dclKernelPath, 'preview.html'),
+      path: path.resolve(dclExplorerJsonPath, 'preview.html'),
       type: 'text/html'
     },
     {
       route: '/favicon.ico',
-      path: path.resolve(dclKernelPath, 'favicon.ico'),
+      path: path.resolve(dclExplorerJsonPath, 'favicon.ico'),
       type: 'text/html'
     },
     {
       route: '/@/explorer/index.js',
-      path: path.resolve(dclKernelPath, 'index.js'),
+      path: path.resolve(dclExplorerJsonPath, 'index.js'),
       type: 'text/javascript'
     }
   ]
@@ -447,9 +420,8 @@ function serveStatic(dir: string, router: Router<PreviewComponents>) {
   }
 
   createStaticRoutes('/images/decentraland-connect/:path+', dclKernelImagesDecentralandConnect)
-  createStaticRoutes('/@/explorer/unity-renderer/:path+', dclUnityRenderer, (filePath) => filePath.replace(/.br+$/, ''))
-  createStaticRoutes('/@/explorer/loader/:path+', dclKernelLoaderPath)
   createStaticRoutes('/default-profile/:path+', dclKernelDefaultProfilePath)
+  createStaticRoutes('/@/explorer/:path+', dclExplorerJsonPath, (filePath) => filePath.replace(/.br+$/, ''))
 
   router.get('/feature-flags/:file', async (ctx) => {
     const res = await fetch(`https://feature-flags.decentraland.zone/${ctx.params.file}`, {
