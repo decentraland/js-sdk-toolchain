@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: 16.x
       - uses: actions/checkout@v2
-      - name: Udpate explorer
+      - name: Update explorer
         run: npm i @dcl/explorer@latest
         working-directory: packages/@dcl/sdk
       - name: Create Pull Request
