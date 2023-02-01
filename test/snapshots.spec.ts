@@ -135,6 +135,11 @@ async function run(fileName: string) {
       // out.push('> STATS: ' + opcodes.slice(0,10).map(_ => `${_.opcode}=${_.count}`).join(','))
     }
 
+    function addMemoryUsage() {
+      const { memory } = vm.getStats()
+      out.push(`  MEMORY_USAGE_COUNT ~= ${hundredsNotation(memory.memory_used_size, 2)} bytes`)
+    }
+
     try {
       addStats()
       out.push('EVAL ' + fileName)
@@ -156,6 +161,7 @@ async function run(fileName: string) {
       out.push('CALL onUpdate(0.1)')
       await vm.onUpdate(0.1)
       addStats()
+      addMemoryUsage()
     } catch (err: any) {
       if (err.stack?.includes('Host: QuickJSUnwrapError')) {
         out.push(`  ERR! ` + err.stack.split('Host: QuickJSUnwrapError')[0])

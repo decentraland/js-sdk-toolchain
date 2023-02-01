@@ -119,6 +119,15 @@ export function createInputSystem(engine: IEngine): IInputSystem {
     }
   }
 
+  function* commandIterator() {
+    // TODO: should filter by entity?
+    for (const [entity, value] of engine.getEntitiesWith(PointerEventsResult)) {
+      for (const command of value.commands) {
+        yield command
+      }
+    }
+  }
+
   function buttonStateUpdateSystem() {
     const component = PointerEventsResult.getOrNull(engine.RootEntity)
 
@@ -126,7 +135,7 @@ export function createInputSystem(engine: IEngine): IInputSystem {
 
     const state = InternalInputStateComponent.getMutable(engine.RootEntity)
 
-    for (const command of component.commands) {
+    for (const command of commandIterator()) {
       if (command.timestamp > state.buttonState[command.button].ts) {
         if (command.state === PointerEventType.PET_DOWN) {
           state.buttonState[command.button].value = true
@@ -153,10 +162,7 @@ export function createInputSystem(engine: IEngine): IInputSystem {
   }
 
   function findClick(inputAction: InputAction, entity?: Entity) {
-    const component = PointerEventsResult.getOrNull(engine.RootEntity)
-
-    if (!component) return null
-    const commands = component.commands
+    const commands = Array.from(commandIterator())
 
     // We search the last DOWN command sorted by timestamp
     const down = findLastAction(commands, PointerEventType.PET_DOWN, inputAction, entity)
@@ -201,11 +207,8 @@ export function createInputSystem(engine: IEngine): IInputSystem {
     pointerEventType: PointerEventType,
     entity?: Entity
   ): PBPointerEventsResult_PointerCommand | null {
-    const component = PointerEventsResult.getOrNull(engine.RootEntity)
-    if (!component) return null
-
     // We search the last pointer Event command sorted by timestamp
-    const command = findLastAction(component.commands, pointerEventType, inputAction, entity)
+    const command = findLastAction(Array.from(commandIterator()), pointerEventType, inputAction, entity)
     if (!command) return null
 
     const state = InternalInputStateComponent.get(engine.RootEntity)
