@@ -2,18 +2,9 @@ import { CRDT } from '../../packages/@dcl/crdt/src'
 import { compareStatePayloads, shuffle } from './utils'
 import { createSandbox } from './utils/sandbox'
 
-function createMessages(
-  client: CRDT<Buffer> & { id: string },
-  key1: number,
-  key2: number,
-  length: number = 1
-) {
+function createMessages(client: CRDT<Buffer> & { id: string }, key1: number, key2: number, length: number = 1) {
   return Array.from({ length }).map((_, index) =>
-    client.createComponentDataEvent(
-      key1,
-      key2,
-      Buffer.from(`Message-${index}-${client.id}`)
-    )
+    client.createComponentDataEvent(key1, key2, Buffer.from(`Message-${index}-${client.id}`))
   )
 }
 
@@ -48,30 +39,20 @@ describe('Process messages and get the same result', () => {
     const { messages, clients } = await prepareSandbox()
     const [clientA] = createSandbox({ clientLength: 1 }).clients
 
-    await Promise.all(
-      messages.map(async (message) => await clientA.processMessage(message!))
-    )
+    await Promise.all(messages.map(async (message) => await clientA.processMessage(message!)))
 
-    expect(
-      compareStatePayloads([clients[0].getState(), clientA.getState()])
-    ).toBe(true)
+    expect(compareStatePayloads([clients[0].getState(), clientA.getState()])).toBe(true)
 
     // check that invalid keys return null without failing
-    expect(clientA.getElementSetState(12938712983, 12371928)).toStrictEqual(
-      null
-    )
+    expect(clientA.getElementSetState(12938712983, 12371928)).toStrictEqual(null)
   })
 
   it('should process all the messages and get the same state even if we sent them in a diff order', async () => {
     const { messages, clients } = await prepareSandbox()
     const [clientA] = createSandbox({ clientLength: 1 }).clients
 
-    await Promise.all(
-      shuffle(messages).map(async (message) => clientA.processMessage(message!))
-    )
+    await Promise.all(shuffle(messages).map(async (message) => clientA.processMessage(message!)))
 
-    expect(
-      compareStatePayloads([clients[0].getState(), clientA.getState()])
-    ).toBe(true)
+    expect(compareStatePayloads([clients[0].getState(), clientA.getState()])).toBe(true)
   })
 })

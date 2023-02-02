@@ -42,10 +42,7 @@ function createCube(x: number, y: number, z: number, spawner = true): Entity {
 
 // Systems
 function circularSystem(dt: number) {
-  const entitiesWithMeshRenderer = engine.getEntitiesWith(
-    MeshRenderer,
-    Transform
-  )
+  const entitiesWithMeshRenderer = engine.getEntitiesWith(MeshRenderer, Transform)
   for (const [entity, _meshRenderer, _transform] of entitiesWithMeshRenderer) {
     const mutableTransform = Transform.getMutable(entity)
 
@@ -59,13 +56,7 @@ function circularSystem(dt: number) {
 function spawnerSystem() {
   const clickedCubes = engine.getEntitiesWith(PointerEvents)
   for (const [entity] of clickedCubes) {
-    if (
-      inputSystem.isTriggered(
-        InputAction.IA_PRIMARY,
-        PointerEventType.PET_DOWN,
-        entity
-      )
-    ) {
+    if (inputSystem.isTriggered(InputAction.IA_PRIMARY, PointerEventType.PET_DOWN, entity)) {
       // noop
     }
   }

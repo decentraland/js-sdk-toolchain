@@ -2,11 +2,7 @@ import fs from 'fs-extra'
 import path from 'path'
 import { createInterface } from 'readline'
 
-import {
-  CRDTMessage,
-  CRDTMessageType,
-  State
-} from '../../../packages/@dcl/crdt/src'
+import { CRDTMessage, CRDTMessageType, State } from '../../../packages/@dcl/crdt/src'
 import { dataToString, stateToString } from './state'
 
 export function getDataPath(fileName: string) {
@@ -36,22 +32,14 @@ export function snapshotTest<T = unknown>() {
   }
 
   function getfileNameFromSpec(spec: string) {
-    return path
-      .relative(process.cwd(), spec)
-      .replace('.ts', '')
-      .replace('test/', '')
-      .replace('.spec', '.test')
+    return path.relative(process.cwd(), spec).replace('.ts', '').replace('test/', '').replace('.spec', '.test')
   }
 
   async function writeDataFile(fileName: string, data: string) {
     await fs.appendFile(getDataPath(fileName), data)
   }
 
-  async function validateTestIfExists(
-    testName: string,
-    fileName: string,
-    messages: string[]
-  ) {
+  async function validateTestIfExists(testName: string, fileName: string, messages: string[]) {
     let start = false
     let index = 0
     for await (const line of readByLine(fileName)) {
@@ -72,9 +60,7 @@ export function snapshotTest<T = unknown>() {
     }
 
     if (!start) {
-      throw new Error(
-        `Spec ${testName} missing at ${fileName}. Update snapshots`
-      )
+      throw new Error(`Spec ${testName} missing at ${fileName}. Update snapshots`)
     }
   }
 
@@ -106,11 +92,7 @@ export function snapshotTest<T = unknown>() {
     if (process.env.UPDATE_SNAPSHOTS) {
       await writeDataFile(fileName, messagesToPrint.join('\n') + '\n')
     } else {
-      await validateTestIfExists(
-        testName!,
-        getDataPath(fileName),
-        messagesToPrint
-      )
+      await validateTestIfExists(testName!, getDataPath(fileName), messagesToPrint)
     }
   }
 

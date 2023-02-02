@@ -43,8 +43,8 @@ describe('UiDropdown React ECS', () => {
           emptyLabel={'Select your team (BOEDO)'}
           options={['BOEDO', 'CASLA', 'SAN LORENZO']}
           color={Color4.Red()}
-          textAlign={TextAlignMode.TAM_BOTTOM_CENTER}
-          font={Font.F_SANS_SERIF}
+          textAlign="bottom-center"
+          font="sans-serif"
           fontSize={14}
           onChange={conditional ? onChange : undefinedChange}
         />

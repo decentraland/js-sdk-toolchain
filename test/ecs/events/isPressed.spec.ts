@@ -12,13 +12,7 @@ describe('Events helpers isTriggered', () => {
   it('should detect no events', () => {
     const newEngine = Engine()
     const { isTriggered } = createInputSystem(newEngine)
-    expect(
-      isTriggered(
-        InputAction.IA_ANY,
-        PointerEventType.PET_DOWN,
-        newEngine.RootEntity
-      )
-    ).toBe(false)
+    expect(isTriggered(InputAction.IA_ANY, PointerEventType.PET_DOWN, newEngine.RootEntity)).toBe(false)
   })
 
   it('no rootEntity', async () => {
@@ -37,20 +31,12 @@ describe('Events helpers isTriggered', () => {
     const entity = newEngine.addEntity()
     const { isTriggered } = createInputSystem(newEngine)
     PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [
-        createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)
-      ]
+      commands: [createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)]
     })
 
-    expect(
-      isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)
-    ).toBe(true)
-    expect(
-      isTriggered(InputAction.IA_POINTER, PointerEventType.PET_UP, entity)
-    ).toBe(false)
-    expect(
-      isTriggered(InputAction.IA_ACTION_3, PointerEventType.PET_UP, entity)
-    ).toBe(false)
+    expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)).toBe(true)
+    expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_UP, entity)).toBe(false)
+    expect(isTriggered(InputAction.IA_ACTION_3, PointerEventType.PET_UP, entity)).toBe(false)
   })
 
   it('dont detect pointerEventActive after update', async () => {
@@ -59,19 +45,13 @@ describe('Events helpers isTriggered', () => {
     const entity = newEngine.addEntity()
     const { isTriggered } = createInputSystem(newEngine)
     PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [
-        createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)
-      ]
+      commands: [createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)]
     })
 
-    expect(
-      isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)
-    ).toBe(true)
+    expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)).toBe(true)
 
     await newEngine.update(0)
-    expect(
-      isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)
-    ).toBe(false)
+    expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)).toBe(false)
   })
 
   it('down state should persist after update', async () => {
@@ -80,9 +60,7 @@ describe('Events helpers isTriggered', () => {
     const entity = newEngine.addEntity()
     const { isPressed } = createInputSystem(newEngine)
     PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [
-        createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)
-      ]
+      commands: [createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)]
     })
 
     await newEngine.update(0)

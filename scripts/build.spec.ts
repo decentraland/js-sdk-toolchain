@@ -1,6 +1,6 @@
 import * as path from 'path'
 import { readFileSync, writeFileSync } from 'fs'
-import { copySync, existsSync, mkdirSync, removeSync } from 'fs-extra'
+import { readdirSync, copySync, existsSync, mkdirSync, removeSync } from 'fs-extra'
 import { summary } from '@actions/core'
 
 import {
@@ -8,6 +8,7 @@ import {
   CRDT_PATH,
   ECS7_PATH,
   flow,
+  INSPECTOR_PATH,
   JS_RUNTIME,
   PLAYGROUND_ASSETS_PATH,
   REACT_ECS,
@@ -38,13 +39,10 @@ flow('build-all', () => {
   commonChecks()
 
   flow('@dcl/js-runtime', () => {
+    itExecutes('npm i --silent', ECS7_PATH)
+
     it('compile protos', async () => {
-      const rpcProtoPath = path.resolve(
-        __dirname,
-        'rpc-api-generation',
-        'src',
-        'proto'
-      )
+      const rpcProtoPath = path.resolve(__dirname, 'rpc-api-generation', 'src', 'proto')
       removeSync(rpcProtoPath)
       mkdirSync(rpcProtoPath)
       writeFileSync(path.resolve(rpcProtoPath, 'README.md'), '# Generated code')
@@ -143,6 +141,21 @@ flow('build-all', () => {
     itExecutes(`chmod +x cli/index.js`, SDK_PATH)
   })
 
+  flow('@dcl/inspector', () => {
+    itDeletesFolder('build', INSPECTOR_PATH)
+
+    itExecutes('npm i --silent', INSPECTOR_PATH)
+    itExecutes('npm run build --silent', INSPECTOR_PATH)
+    it('check file exists', () => {
+      ensureFileExists('build/index.html', INSPECTOR_PATH)
+      const jsPath = path.resolve(INSPECTOR_PATH, 'build/static/js')
+      const files = readdirSync(jsPath)
+      if (!files.length || !files.find(($) => $.startsWith('main'))) {
+        throw new Error(`Invalid JS files on ${jsPath}`)
+      }
+    })
+  })
+
   flow('@dcl/playground-assets build', () => {
     itDeletesFolder('dist', PLAYGROUND_ASSETS_PATH)
     itDeletesFolder('bin', PLAYGROUND_ASSETS_PATH)
@@ -155,10 +168,7 @@ flow('build-all', () => {
     if (process.env.GITHUB_STEP_SUMMARY) {
       itExecutes('npm run build --silent', PLAYGROUND_ASSETS_PATH)
       it('set the output as summary', async () => {
-        const file = path.resolve(
-          PLAYGROUND_ASSETS_PATH,
-          'etc/playground-assets.api.md'
-        )
+        const file = path.resolve(PLAYGROUND_ASSETS_PATH, 'etc/playground-assets.api.md')
         if (!existsSync(file)) throw new Error(`${file} doesn't exist`)
         summary.addRaw(readFileSync(file).toString())
       })
@@ -168,10 +178,7 @@ flow('build-all', () => {
     }
 
     it('check no ae-forgotten-export are present in bundle file', async () => {
-      const file = path.resolve(
-        PLAYGROUND_ASSETS_PATH,
-        'etc/playground-assets.api.md'
-      )
+      const file = path.resolve(PLAYGROUND_ASSETS_PATH, 'etc/playground-assets.api.md')
       if (!existsSync(file)) throw new Error(`${file} doesn't exist`)
       const content = readFileSync(file).toString()
       const occurences = content.match(/^.*ae-forgotten-export.*/gim)
@@ -179,10 +186,7 @@ flow('build-all', () => {
     })
 
     it('check no conflict in types are present in generated bundle', async () => {
-      const file = path.resolve(
-        PLAYGROUND_ASSETS_PATH,
-        'etc/playground-assets.api.md'
-      )
+      const file = path.resolve(PLAYGROUND_ASSETS_PATH, 'etc/playground-assets.api.md')
       if (!existsSync(file)) throw new Error(`${file} doesn't exist`)
       const content = readFileSync(file).toString()
       const occurences = content.match(/.*_2\b/gim)
@@ -193,17 +197,8 @@ flow('build-all', () => {
   flow('playground copy files', () => {
     it('playground copy snippets', async () => {
       const PLAYGORUND_INFO_JSON = 'info.json'
-      const snippetsPath = path.resolve(
-        process.cwd(),
-        'test',
-        'ecs',
-        'snippets'
-      )
-      const playgroundDistPath = path.resolve(
-        PLAYGROUND_ASSETS_PATH,
-        'dist',
-        'playground'
-      )
+      const snippetsPath = path.resolve(process.cwd(), 'test', 'ecs', 'snippets')
+      const playgroundDistPath = path.resolve(PLAYGROUND_ASSETS_PATH, 'dist', 'playground')
 
       // Clean last build
       removeSync(playgroundDistPath)
@@ -241,18 +236,11 @@ flow('build-all', () => {
       }
 
       // // Create a JSON with the path of every snippet, this can be read by playground or CLI
-      writeFileSync(
-        path.resolve(distSnippetsPath, PLAYGORUND_INFO_JSON),
-        JSON.stringify(snippetInfo)
-      )
+      writeFileSync(path.resolve(distSnippetsPath, PLAYGORUND_INFO_JSON), JSON.stringify(snippetInfo))
     })
 
     it('playground copy minified files', async () => {
-      const playgroundDistPath = path.resolve(
-        PLAYGROUND_ASSETS_PATH,
-        'dist',
-        'playground'
-      )
+      const playgroundDistPath = path.resolve(PLAYGROUND_ASSETS_PATH, 'dist', 'playground')
 
       // Copy minified ecs
       const filesToCopy = [

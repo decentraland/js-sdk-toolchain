@@ -1,16 +1,6 @@
 import { ComponentDefinition, Entity, IEngine } from '../../engine'
-import {
-  Material,
-  PBMaterial,
-  PBMaterial_PbrMaterial,
-  PBMaterial_UnlitMaterial
-} from '../generated/index.gen'
-import {
-  AvatarTexture,
-  Texture,
-  TextureUnion,
-  VideoTexture
-} from '../generated/types.gen'
+import { Material, PBMaterial, PBMaterial_PbrMaterial, PBMaterial_UnlitMaterial } from '../generated/index.gen'
+import { AvatarTexture, Texture, TextureUnion, VideoTexture } from '../generated/types.gen'
 
 /**
  * @public
@@ -40,8 +30,7 @@ export type TextureHelper = {
 /**
  * @public
  */
-export interface MaterialComponentDefinitionExtended
-  extends MaterialComponentDefinition {
+export interface MaterialComponentDefinitionExtended extends MaterialComponentDefinition {
   /**
    * Texture helpers with constructor
    */

@@ -7,7 +7,11 @@ PROTOBUF_VERSION = 3.20.1
 ifeq ($(shell uname),Darwin)
 PROTOBUF_ZIP = protoc-$(PROTOBUF_VERSION)-osx-x86_64.zip
 else
+ifeq ($(shell arch),aarch64)
+PROTOBUF_ZIP = protoc-$(PROTOBUF_VERSION)-linux-aarch_64.zip
+else
 PROTOBUF_ZIP = protoc-$(PROTOBUF_VERSION)-linux-x86_64.zip
+endif
 endif
 
 PROTOC = node_modules/.bin/protobuf/bin/protoc
@@ -19,7 +23,6 @@ install:
 	npm i
 	make node_modules/.bin/protobuf/bin/protoc
 	cd packages/@dcl/dcl-rollup; npm ci
-	cd packages/@dcl/ecs; make install
 
 lint:
 	node_modules/.bin/eslint . --ext .ts
@@ -30,6 +33,11 @@ lint-fix:
 TESTARGS ?= test/
 test:
 	node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS)
+
+test-cli:
+	@rm -rf tmp
+	@mkdir -p tmp/scene
+	cd tmp/scene; $(PWD)/packages/@dcl/sdk/cli/index.js init
 
 test-coverage:
 	WITH_COVERAGE=true node_modules/.bin/jest --detectOpenHandles --colors --coverage $(TESTARGS)
@@ -79,7 +87,8 @@ deep-clean:
 		packages/@dcl/dcl-rollup/node_modules/ \
 		packages/@dcl/ecs/node_modules/ \
 		packages/@dcl/react-ecs/node_modules/ \
-		packages/@dcl/sdk/node_modules/
+		packages/@dcl/sdk/node_modules/ \
+		packages/@dcl/inspector/node_modules/
 	make clean
 
 update-snapshots:
@@ -92,8 +101,9 @@ clean:
 	@rm -rf coverage/
 	@rm -rf packages/@dcl/dcl-rollup/*.js packages/@dcl/dcl-rollup/*.d.ts
 	@rm -rf packages/@dcl/sdk/*.js packages/@dcl/sdk/*.d.ts packages/@dcl/sdk/internal
-	@find packages/@dcl/sdk/cli -name "*.js" -type f -delete
-	@find packages/@dcl/sdk/cli -name "*.d.ts" -type f -delete
+	@rm -rf packages/@dcl/inspector/*.js packages/@dcl/inspector/*.d.ts packages/@dcl/inspector/build
+	@find packages/@dcl/sdk/cli -name "*.js" ! -path "packages/@dcl/sdk/cli/commands/preview/proto/*" -type f -delete
+	@find packages/@dcl/sdk/cli -name "*.d.ts" ! -path "packages/@dcl/sdk/cli/commands/preview/proto/*" -type f -delete
 	@rm -rf packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/
 	@rm -rf packages/@dcl/ecs/src/components/generated/ packages/@dcl/ecs/temp/
 	@rm -rf packages/@dcl/js-runtime/apis.d.ts

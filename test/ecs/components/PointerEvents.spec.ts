@@ -1,9 +1,4 @@
-import {
-  Engine,
-  components,
-  InputAction,
-  PointerEventType
-} from '../../../packages/@dcl/ecs/src'
+import { Engine, components, InputAction, PointerEventType } from '../../../packages/@dcl/ecs/src'
 
 describe('Generated OnPointerDown ProtoBuf', () => {
   it('should serialize/deserialize OnPointerUp', () => {

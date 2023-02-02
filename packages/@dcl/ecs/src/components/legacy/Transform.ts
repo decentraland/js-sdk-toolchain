@@ -13,10 +13,7 @@ export type TransformComponent = ComponentDefinition<TransformType>
  */
 export interface TransformComponentExtended extends TransformComponent {
   create(entity: Entity, val?: TransformTypeWithOptionals): TransformType
-  createOrReplace(
-    entity: Entity,
-    val?: TransformTypeWithOptionals
-  ): TransformType
+  createOrReplace(entity: Entity, val?: TransformTypeWithOptionals): TransformType
 }
 
 /**
@@ -100,10 +97,7 @@ export type TransformTypeWithOptionals = Partial<TransformType>
 export function defineTransformComponent(
   engine: Pick<IEngine, 'defineComponentFromSchema'>
 ): TransformComponentExtended {
-  const transformDef = engine.defineComponentFromSchema(
-    'core::Transform',
-    TransformSchema
-  )
+  const transformDef = engine.defineComponentFromSchema('core::Transform', TransformSchema)
   return {
     ...transformDef,
     create(entity: Entity, val?: TransformTypeWithOptionals) {

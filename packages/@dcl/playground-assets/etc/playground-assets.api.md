@@ -6,6 +6,9 @@
 
 import _m0 from 'protobufjs/minimal';
 
+// @public (undocumented)
+export type AlignType = 'auto' | 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline' | 'space-between' | 'space-around';
+
 // Warning: (ae-missing-release-tag) "AMOUNT_VERSION_AVAILABLE" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -586,6 +589,9 @@ export type DeleteEntityMessageBody = {
 };
 
 // @public (undocumented)
+export type DisplayType = 'flex' | 'none';
+
+// @public (undocumented)
 export function Dropdown(props: EntityPropTypes & UiDropdownProps): ReactEcs.JSX.Element;
 
 // Warning: (ae-missing-release-tag) "EcsElements" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -705,6 +711,12 @@ export type ExcludeUndefined<T> = {
 
 // @public (undocumented)
 export const executeTask: (task: Task<unknown>) => void;
+
+// @public (undocumented)
+export type FlexDirectionType = 'row' | 'column' | 'column-reverse' | 'row-reverse';
+
+// @public (undocumented)
+export type FlexWrapType = 'wrap' | 'nowrap' | 'wrap-reverse';
 
 // @public (undocumented)
 export type FloatArray = number[];
@@ -1076,13 +1088,16 @@ export namespace JSX {
     export type IntrinsicElements = EcsElements;
 }
 
+// @public (undocumented)
+export type JustifyType = 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
+
 // Warning: (ae-missing-release-tag) "Key" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export type Key = number | string;
 
 // @public (undocumented)
-export function Label(props: EntityPropTypes & UiTextProps): ReactEcs.JSX.Element;
+export function Label(props: EntityPropTypes & UiLabelProps): ReactEcs.JSX.Element;
 
 // Warning: (ae-missing-release-tag) "Listeners" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -1558,11 +1573,6 @@ export const onRealmChangedObservable: Observable<{
 // @public (undocumented)
 export const onSceneReadyObservable: Observable<unknown>;
 
-// Warning: (ae-missing-release-tag) "onStart" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function onStart(): Promise<void>;
-
 // Warning: (ae-missing-release-tag) "onUpdate" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -1578,6 +1588,9 @@ export const onVideoEvent: Observable<{
     currentOffset: number;
     totalVideoLength: number;
 }>;
+
+// @public (undocumented)
+export type OverflowType = 'hidden' | 'scroll' | 'visible';
 
 // Warning: (ae-missing-release-tag) "PBAnimationState" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 // Warning: (ae-missing-release-tag) "PBAnimationState" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2626,6 +2639,9 @@ export type Position = {
     left: PositionUnit;
 };
 
+// @public (undocumented)
+export type PositionType = 'absolute' | 'relative';
+
 // Warning: (ae-missing-release-tag) "PositionUnit" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -2949,6 +2965,9 @@ export const enum TextAlignMode {
 }
 
 // @public (undocumented)
+export type TextAlignType = 'top-left' | 'top-center' | 'top-right' | 'middle-left' | 'middle-center' | 'middle-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
+
+// @public (undocumented)
 export const TextShape: ComponentDefinition<PBTextShape>;
 
 // Warning: (ae-missing-release-tag) "Texture" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2981,11 +3000,17 @@ export const enum TextureFilterMode {
 }
 
 // @public (undocumented)
+export type TextureFilterType = 'point' | 'bi-linear' | 'tri-linear';
+
+// @public (undocumented)
 export type TextureHelper = {
     Common: (texture: Texture) => TextureUnion;
     Avatar: (avatarTexture: AvatarTexture) => TextureUnion;
     Video: (videoTexture: VideoTexture) => TextureUnion;
 };
+
+// @public
+export type TextureMode = 'nine-slices' | 'center' | 'stretch';
 
 // Warning: (ae-missing-release-tag) "TextureUnion" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 // Warning: (ae-missing-release-tag) "TextureUnion" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -3024,6 +3049,9 @@ export const enum TextureWrapMode {
     // (undocumented)
     TWM_REPEAT = 0
 }
+
+// @public (undocumented)
+export type TextureWrapType = 'repeat' | 'clamp' | 'mirror' | 'mirror-once';
 
 // @public
 export const ToGammaSpace: number;
@@ -3092,17 +3120,26 @@ export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
 // @public (undocumented)
 export type UiAvatarTexture = {
-    avatarTexture?: AvatarTexture;
+    avatarTexture?: {
+        userId: string;
+        wrapMode?: TextureWrapType;
+        filterMode?: TextureFilterType;
+    };
 };
 
 // @public (undocumented)
 export const UiBackground: ComponentDefinition<PBUiBackground>;
 
 // @public (undocumented)
-export type UiBackgroundProps = Partial<Omit<PBUiBackground, 'texture'>> & UiTextureUnion;
+export type UiBackgroundProps = {
+    color?: PBColor4 | undefined;
+    textureMode?: TextureMode;
+    textureSlices?: BorderRect | undefined;
+    uvs?: number[];
+} & UiTextureUnion;
 
 // @public (undocumented)
-export type UiButtonProps = PBUiText & {
+export type UiButtonProps = UiLabelProps & {
     type?: 'primary' | 'secondary';
 };
 
@@ -3115,8 +3152,10 @@ export type UiComponent = () => JSX.Element;
 export const UiDropdown: ComponentDefinition<PBUiDropdown>;
 
 // @public (undocumented)
-export type UiDropdownProps = Partial<PBUiDropdown> & {
+export type UiDropdownProps = Partial<Omit<PBUiDropdown, 'textAlign' | 'font'>> & {
     onChange?(value: number): void;
+    font?: UiFontType;
+    textAlign?: TextAlignType;
 };
 
 // @public (undocumented)
@@ -3126,15 +3165,26 @@ export const UiDropdownResult: ComponentDefinition<PBUiDropdownResult>;
 export function UiEntity(props: EntityPropTypes & Partial<CommonProps>): ReactEcs.JSX.Element;
 
 // @public (undocumented)
+export type UiFontType = 'sans-serif' | 'serif' | 'monospace';
+
+// @public (undocumented)
 export const UiInput: ComponentDefinition<PBUiInput>;
 
 // @public (undocumented)
-export type UiInputProps = PBUiInput & {
+export type UiInputProps = Omit<PBUiInput, 'font' | 'textAlign'> & {
     onChange?(value: string): void;
+    font?: UiFontType;
+    textAlign?: TextAlignType;
 };
 
 // @public (undocumented)
 export const UiInputResult: ComponentDefinition<PBUiInputResult>;
+
+// @public (undocumented)
+export type UiLabelProps = Omit<PBUiText, 'textAlign' | 'font'> & {
+    textAlign?: TextAlignType | undefined;
+    font?: UiFontType | undefined;
+};
 
 // Warning: (ae-missing-release-tag) "Uint32" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -3148,11 +3198,12 @@ export type uint32 = number;
 export const UiText: ComponentDefinition<PBUiText>;
 
 // @public (undocumented)
-export type UiTextProps = PBUiText;
-
-// @public (undocumented)
 export type UiTexture = {
-    texture?: Texture;
+    texture?: {
+        src: string;
+        wrapMode?: TextureWrapType;
+        filterMode?: TextureFilterType;
+    };
 };
 
 // @public (undocumented)
@@ -3164,29 +3215,29 @@ export const UiTransform: ComponentDefinition<PBUiTransform>;
 // @public (undocumented)
 export interface UiTransformProps {
     // (undocumented)
-    alignContent?: YGAlign;
+    alignContent?: AlignType;
     // (undocumented)
-    alignItems?: YGAlign;
+    alignItems?: AlignType;
     // (undocumented)
-    alignSelf?: YGAlign;
+    alignSelf?: AlignType;
     // (undocumented)
-    display?: YGDisplay;
+    display?: DisplayType;
     // (undocumented)
     flex?: number;
     // (undocumented)
     flexBasis?: number;
     // (undocumented)
-    flexDirection?: YGFlexDirection;
+    flexDirection?: FlexDirectionType;
     // (undocumented)
     flexGrow?: number;
     // (undocumented)
     flexShrink?: number;
     // (undocumented)
-    flexWrap?: YGWrap;
+    flexWrap?: FlexWrapType;
     // (undocumented)
     height?: PositionUnit;
     // (undocumented)
-    justifyContent?: YGJustify;
+    justifyContent?: JustifyType;
     // (undocumented)
     margin?: Partial<Position>;
     // (undocumented)
@@ -3198,13 +3249,13 @@ export interface UiTransformProps {
     // (undocumented)
     minWidth?: PositionUnit;
     // (undocumented)
-    overflow?: YGOverflow;
+    overflow?: OverflowType;
     // (undocumented)
     padding?: Partial<Position>;
     // (undocumented)
     position?: Partial<Position>;
     // (undocumented)
-    positionType?: YGPositionType;
+    positionType?: PositionType;
     // (undocumented)
     width?: PositionUnit;
 }

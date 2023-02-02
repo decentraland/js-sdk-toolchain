@@ -1,24 +1,10 @@
 import * as path from 'path'
 import { FileDescriptorStandardOption, runCommand } from '../utils/shellCommand'
 
-export async function createProtoTypes(
-  definitionsPath: string,
-  output: string,
-  files: string[],
-  protocolPath: string
-) {
-  const protoFiles = files
-    .map((item) => path.resolve(definitionsPath, item))
-    .join(' ')
+export async function createProtoTypes(definitionsPath: string, output: string, files: string[], protocolPath: string) {
+  const protoFiles = files.map((item) => path.resolve(definitionsPath, item)).join(' ')
   await runCommand({
-    command: path.resolve(
-      process.cwd(),
-      'node_modules',
-      '.bin',
-      'protobuf',
-      'bin',
-      'protoc'
-    ),
+    command: path.resolve(process.cwd(), 'node_modules', '.bin', 'protobuf', 'bin', 'protoc'),
     workingDir: process.cwd(),
     args: [
       '--plugin=./node_modules/.bin/protoc-gen-ts_proto',

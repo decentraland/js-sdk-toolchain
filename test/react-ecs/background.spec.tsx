@@ -4,8 +4,8 @@ import {
   Entity,
   createPointerEventSystem,
   createInputSystem,
-  PBUiBackground,
-  BackgroundTextureMode
+  TextureWrapMode,
+  TextureFilterMode
 } from '../../packages/@dcl/ecs'
 import { components, IEngine as IIEngine } from '../../packages/@dcl/ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
@@ -80,10 +80,10 @@ describe('UiBackground React Ecs', () => {
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
     const getBackground = () => UiBackground.getOrNull(rootDivEntity)
-    let backgroundProps: { uiBackground: PBUiBackground } | undefined = {
+    let backgroundProps: { uiBackground: UiBackgroundProps } | undefined = {
       uiBackground: {
         color: { r: 0, g: 1, b: 2, a: 0 },
-        textureMode: BackgroundTextureMode.CENTER,
+        textureMode: 'center',
         uvs: []
       }
     }
@@ -113,10 +113,12 @@ describe('UiBackground React Ecs', () => {
     let backgroundProps: { uiBackground: UiBackgroundProps } | undefined = {
       uiBackground: {
         color: { r: 0, g: 1, b: 2, a: 0 },
-        textureMode: BackgroundTextureMode.CENTER,
+        textureMode: 'center',
         uvs: [],
         texture: {
-          src: 'boedo-src'
+          src: 'boedo-src',
+          wrapMode: 'clamp',
+          filterMode: 'bi-linear'
         }
       }
     }
@@ -134,7 +136,9 @@ describe('UiBackground React Ecs', () => {
       tex: {
         $case: 'texture',
         texture: {
-          src: 'boedo-src'
+          src: 'boedo-src',
+          wrapMode: TextureWrapMode.TWM_CLAMP,
+          filterMode: TextureFilterMode.TFM_BILINEAR
         }
       }
     })

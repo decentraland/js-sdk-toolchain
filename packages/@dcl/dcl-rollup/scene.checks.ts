@@ -69,13 +69,7 @@ export function checkConfiguration() {
     process.exit(1)
   }
 
-  const tsconfig = ts.parseJsonConfigFileContent(
-    parsed.config,
-    host,
-    ts.sys.getCurrentDirectory(),
-    {},
-    'tsconfig.json'
-  )
+  const tsconfig = ts.parseJsonConfigFileContent(parsed.config, host, ts.sys.getCurrentDirectory(), {}, 'tsconfig.json')
 
   const hasError = false
 
@@ -98,14 +92,11 @@ export function checkConfiguration() {
 function printDiagnostic(diagnostic: ts.Diagnostic) {
   const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
   if (diagnostic.file) {
-    const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(
-      diagnostic.start!
-    )
+    const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start!)
     console.log(
-      `  Error ${diagnostic.file.fileName.replace(
-        ts.sys.getCurrentDirectory(),
-        ''
-      )} (${line + 1},${character + 1}): ${message}`
+      `  Error ${diagnostic.file.fileName.replace(ts.sys.getCurrentDirectory(), '')} (${line + 1},${
+        character + 1
+      }): ${message}`
     )
   } else {
     console.log(`  Error: ${message}`)

@@ -35,6 +35,8 @@ jobs:
         run: make build
       - name: test
         run: make test-coverage
+      - name: test-cli
+        run: make test-cli
       - uses: codecov/codecov-action@v3
         if: always()
         with:
@@ -45,7 +47,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      decentraland_ecs_s3_bucket_key: ${{ steps.publish_decentraland_ecs.outputs.s3-bucket-key }}
+      decentraland_sdk_s3_bucket_key: ${{ steps.publish_decentraland_sdk.outputs.s3-bucket-key }}
+      decentraland_inspector_s3_bucket_key: ${{ steps.publish_decentraland_inspector.outputs.s3-bucket-key }}
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
@@ -88,6 +91,12 @@ jobs:
         uses: menduz/oddish-action@master
         with:
           cwd: packages/@dcl/sdk
+          deterministic-snapshot: true
+          only-update-versions: true
+      - name: update version of packages/@dcl/inspector
+        uses: menduz/oddish-action@master
+        with:
+          cwd: packages/@dcl/inspector
           deterministic-snapshot: true
           only-update-versions: true
       - name: update version of packages/@dcl/playground-assets
@@ -135,7 +144,7 @@ jobs:
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/dcl-rollup'
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/dcl-crdt'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
@@ -206,6 +215,10 @@ jobs:
           ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_ecs.outputs.s3-bucket-key }}
           ROLLUP_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_rollup.outputs.s3-bucket-key }}
           JS_RUNTIME_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_js_runtime.outputs.s3-bucket-key }}
+      - name: (PR) change @dcl/inspector version to s3 url
+        working-directory: ./packages/@dcl/inspector
+        if: ${{ github.event.pull_request.number }}
+        run: node -e "let pkg=require('./package.json'); require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
       - name: playground upload to s3
         run: npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder $(pwd)/packages/@dcl/playground-assets/dist --bucket-folder '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/playground-assets'
         env:
@@ -213,7 +226,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: publish @dcl/sdk package
         uses: menduz/oddish-action@master
-        id: publish_decentraland_ecs
+        id: publish_decentraland_sdk
         with:
           registry-url: 'https://registry.npmjs.org'
           access: public
@@ -224,6 +237,23 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+      - name: publish @dcl/inspector package
+        uses: menduz/oddish-action@master
+        id: publish_decentraland_inspector
+        with:
+          registry-url: 'https://registry.npmjs.org'
+          access: public
+          cwd: ./packages/@dcl/inspector
+          ## use action runId instead of current date to generate snapshot numbers
+          deterministic-snapshot: true
+
+          ## publish every package to s3
+          s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/inspector'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
@@ -271,13 +301,20 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: 'github-actions[bot]'
           body-includes: Test this pull request
-      - name: Generate S3 URL
-        id: url-generator
+      - name: Generate SDK S3 URL
+        id: sdk-url-generator
         run: |
-          body=$(echo ${{ secrets.SDK_TEAM_S3_BASE_URL }})/${{ needs.build.outputs.decentraland_ecs_s3_bucket_key }}
+          body=$(echo ${{ secrets.SDK_TEAM_S3_BASE_URL }})/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }}
           echo ::set-output name=body::$body
-      - name: Test Install S3 URL
-        run: mkdir -p test_s3 && cd test_s3 && npm init --yes && npm install "${{ steps.url-generator.outputs.body }}"
+      - name: Generate Inspector S3 URL
+        id: inspector-url-generator
+        run: |
+          body=$(echo ${{ secrets.SDK_TEAM_S3_BASE_URL }})/${{ needs.build.outputs.decentraland_inspector_s3_bucket_key }}
+          echo ::set-output name=body::$body
+      - name: Test SDK Install S3 URL
+        run: mkdir -p test_sdk_s3 && cd test_sdk_s3 && npm init --yes && npm install "${{ steps.sdk-url-generator.outputs.body }}"
+      - name: Test Inspector Install S3 URL
+        run: mkdir -p test_inspector_s3 && cd test_inspector_s3 && npm init --yes && npm install "${{ steps.inspector-url-generator.outputs.body }}"
       - name: Create or update comment
         uses: peter-evans/create-or-update-comment@v1
         with:
@@ -287,7 +324,12 @@ jobs:
             # Test this pull request
             - The `@dcl/sdk` package can be tested in scenes by running
                ```bash
-               npm install "${{ steps.url-generator.outputs.body }}"
+               npm install "${{ steps.sdk-url-generator.outputs.body }}"
+               ```
+
+            - The `@dcl/inspector` package can be tested by running
+               ```bash
+               npm install "${{ steps.inspector-url-generator.outputs.body }}"
                ```
             - You can preview this build entering:
               https://playground.decentraland.org/?sdk-branch=${{ github.head_ref || github.ref }}

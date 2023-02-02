@@ -29,10 +29,9 @@ export default function generateTypes(pathDir: string) {
       }
     })
 
-  const files = [
-    ...getFiles(pathDir, sdkCommonPath),
-    ...getFiles(pathDir, commonPath)
-  ].filter((f) => !['PbId', 'PbColors', 'PbVectors'].includes(f.name))
+  const files = [...getFiles(pathDir, sdkCommonPath), ...getFiles(pathDir, commonPath)].filter(
+    (f) => !['PbId', 'PbColors', 'PbVectors'].includes(f.name)
+  )
 
   const typesContent = generaeteTypes(files)
   fs.writeFileSync(path.resolve(pathDir, 'types.gen.ts'), typesContent)

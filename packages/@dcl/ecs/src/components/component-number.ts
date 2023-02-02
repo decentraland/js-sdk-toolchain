@@ -11,8 +11,7 @@ export const MAX_STATIC_COMPONENT = 1 << 11 // 2048
  * For that reason, we simply add MAX_STATIC_COMPONENT and trim to the domain 2^32
  */
 export function componentNumberFromName(componentName: string): number {
-  if (coreComponentMappings[componentName])
-    return coreComponentMappings[componentName]
+  if (coreComponentMappings[componentName]) return coreComponentMappings[componentName]
   const bytes = new Uint8Array(128)
   utf8.write(componentName, bytes, 0)
   return ((unsignedCRC32(bytes) + MAX_STATIC_COMPONENT) & 0xffff_ffff) >>> 0

@@ -10,8 +10,7 @@ import { createColors } from 'colorette'
 import arg from 'arg'
 
 // log to stderr to keep `rollup main.js > bundle.js` from breaking
-const stderr = (...parameters: readonly unknown[]) =>
-  process.stderr.write(`${parameters.join('')}\n`)
+const stderr = (...parameters: readonly unknown[]) => process.stderr.write(`${parameters.join('')}\n`)
 
 // @see https://no-color.org
 // @see https://www.npmjs.com/package/chalk
@@ -31,8 +30,7 @@ const args = arg({
 const WATCH = !!args['--watch']
 
 // PRODUCTION === true : makes the compiler to prefer .min.js files while importing and produces a minified output
-const PRODUCTION =
-  !WATCH && (args['--production'] || process.env.NODE_ENV === 'production')
+const PRODUCTION = !WATCH && (args['--production'] || process.env.NODE_ENV === 'production')
 
 async function compile() {
   // current working directory
@@ -50,16 +48,10 @@ async function compile() {
   }
 
   ts.sys.getCurrentDirectory = () => CWD
-  ts.sys.resolvePath = (path: string) =>
-    resolve(ts.sys.getCurrentDirectory(), path)
+  ts.sys.resolvePath = (path: string) => resolve(ts.sys.getCurrentDirectory(), path)
 
-  stderr(
-    colors.greenBright('Mode: ') +
-      (PRODUCTION ? 'Production (optimized)' : 'Development')
-  )
-  stderr(
-    colors.greenBright(`Working directory: `) + ts.sys.getCurrentDirectory()
-  )
+  stderr(colors.greenBright('Mode: ') + (PRODUCTION ? 'Production (optimized)' : 'Development'))
+  stderr(colors.greenBright(`Working directory: `) + ts.sys.getCurrentDirectory())
 
   checkConfiguration()
 
@@ -101,12 +93,7 @@ async function compile() {
       }
     } else if (event.code === 'BUNDLE_END') {
       for (const out of event.output) {
-        stderr(
-          colors.greenBright(`Wrote: `) +
-            out +
-            ' ' +
-            colors.dim(`(${(event.duration / 1000).toFixed(1)}sec)`)
-        )
+        stderr(colors.greenBright(`Wrote: `) + out + ' ' + colors.dim(`(${(event.duration / 1000).toFixed(1)}sec)`))
       }
     } else if (event.code === 'START') {
       if (WATCH) {
@@ -191,7 +178,7 @@ compile()
   })
 
 function handleError(error: RollupError, recover = false): void {
-  const name = error.name || error.cause?.name
+  const name = error.name || (error.cause as any)?.name
   const nameSection = name ? `${name}: ` : ''
   const pluginSection = error.plugin ? `(plugin ${error.plugin}) ` : ''
   const message = `${pluginSection}${nameSection}${error.message}`
@@ -203,11 +190,7 @@ function handleError(error: RollupError, recover = false): void {
   }
 
   if (error.loc) {
-    stderr(
-      `${relativeId((error.loc.file || error.id)!)} (${error.loc.line}:${
-        error.loc.column
-      })`
-    )
+    stderr(`${relativeId((error.loc.file || error.id)!)} (${error.loc.line}:${error.loc.column})`)
   } else if (error.id) {
     stderr(relativeId(error.id))
   }

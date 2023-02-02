@@ -6,11 +6,7 @@ import {
   PutComponentOperation,
   Schemas
 } from '../../packages/@dcl/ecs/src'
-import {
-  Entity,
-  EntityUtils,
-  RESERVED_STATIC_ENTITIES
-} from '../../packages/@dcl/ecs/src/engine/entity'
+import { Entity, EntityUtils, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src/engine/entity'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { Vector3 } from '../../packages/@dcl/sdk/src/math'
 import { compareStatePayloads } from '../crdt/utils'
@@ -203,12 +199,8 @@ describe('CRDT tests', () => {
       const isRandomGuy = randomGuyWin === index
 
       function doorSystem(_dt: number) {
-        for (const [entity, _readOnlyDoor] of engine.getEntitiesWith(
-          DoorComponent
-        )) {
-          DoorComponent.getMutable(entity).open = isRandomGuy
-            ? DOOR_VALUE
-            : Math.max(Math.random(), DOOR_VALUE) // Some random value < DOOR_VALUE
+        for (const [entity, _readOnlyDoor] of engine.getEntitiesWith(DoorComponent)) {
+          DoorComponent.getMutable(entity).open = isRandomGuy ? DOOR_VALUE : Math.max(Math.random(), DOOR_VALUE) // Some random value < DOOR_VALUE
         }
       }
       engine.addSystem(doorSystem)
@@ -294,12 +286,8 @@ describe('CRDT tests', () => {
     serverTransport.onmessage!(buffer.toBinary())
     await serverEngine.update(1)
     const crdtState = serverEngine.getCrdtState()
-    const component = crdtState.components
-      .get(cusutomComponent.componentId)!
-      .get(entity as number)!
-    expect(component?.data).toStrictEqual(
-      cusutomComponent.toBinary(entity).toBinary()
-    )
+    const component = crdtState.components.get(cusutomComponent.componentId)!.get(entity as number)!
+    expect(component?.data).toStrictEqual(cusutomComponent.toBinary(entity).toBinary())
     expect(component?.timestamp).toBe(1)
   })
 
@@ -313,15 +301,11 @@ describe('CRDT tests', () => {
     clientA.Transform.create(entityA, { position: Vector3.One() })
 
     // before the update, the crdt state is out-to-date
-    expect(
-      checkCrdtStateWithEngine(clientA.engine).conflicts.length === 0
-    ).toBe(false)
+    expect(checkCrdtStateWithEngine(clientA.engine).conflicts.length === 0).toBe(false)
     await clientA.engine.update(1)
 
     // now, the crdt state and engine should converge
-    expect(
-      checkCrdtStateWithEngine(clientA.engine).conflicts.length === 0
-    ).toBe(true)
+    expect(checkCrdtStateWithEngine(clientA.engine).conflicts.length === 0).toBe(true)
 
     // between clients, ClientA hasn't sent anything yet, so, crdt state won't be synched
     expect(compareStatePayloads(getCrdtStates())).toBe(false)
@@ -352,13 +336,9 @@ describe('CRDT tests', () => {
 
     clientA.transports[0].onmessage!(buf.toBinary()!)
 
-    const stateBeforeProcessMessage = stateToString(
-      clientA.engine.getCrdtState()
-    )
+    const stateBeforeProcessMessage = stateToString(clientA.engine.getCrdtState())
     await clientA.engine.update(1)
-    expect(stateToString(clientA.engine.getCrdtState())).toBe(
-      stateBeforeProcessMessage
-    )
+    expect(stateToString(clientA.engine.getCrdtState())).toBe(stateBeforeProcessMessage)
   })
 
   it('should converge to the same final state (more complex scene code)', async () => {

@@ -5,7 +5,6 @@ updates:
     schedule:
       interval: daily
     allow:
-      - dependency-name: "@dcl/kernel"
+      - dependency-name: "@dcl/explorer"
       - dependency-name: "@dcl/schemas"
-      - dependency-name: "@dcl/unity-renderer"
     versioning-strategy: auto

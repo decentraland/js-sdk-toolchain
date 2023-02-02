@@ -1,10 +1,6 @@
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
-import {
-  itExecutes,
-  ensureFileExists,
-  itDeletesFolder
-} from '../../scripts/helpers'
+import { itExecutes, ensureFileExists, itDeletesFolder } from '../../scripts/helpers'
 
 describe('build-ecs: simple scene compilation', () => {
   const cwd = resolve(__dirname, './fixtures/ecs7-scene')

@@ -10,10 +10,7 @@ export type ReactBasedUiSystem = {
   setUiRenderer(ui: UiComponent): void
 }
 
-export function createReactBasedUiSystem(
-  engine: IEngine,
-  pointerSystem: PointerEventsSystem
-): ReactBasedUiSystem {
+export function createReactBasedUiSystem(engine: IEngine, pointerSystem: PointerEventsSystem): ReactBasedUiSystem {
   const renderer = createReconciler(engine, pointerSystem)
   let uiComponent: UiComponent | undefined = undefined
 

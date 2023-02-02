@@ -1,8 +1,4 @@
-﻿import {
-  Engine,
-  components,
-  AvatarModifierType
-} from '../../../packages/@dcl/ecs/src'
+﻿import { Engine, components, AvatarModifierType } from '../../../packages/@dcl/ecs/src'
 
 describe('Generated Avatar ModifierArea ProtoBuf', () => {
   it('should serialize/deserialize Avatar Modifier Area', () => {
@@ -13,10 +9,7 @@ describe('Generated Avatar ModifierArea ProtoBuf', () => {
 
     const avatarModifierArea = AvatarModifierArea.create(entity, {
       area: { x: 1, y: 2, z: 3 },
-      modifiers: [
-        AvatarModifierType.AMT_DISABLE_PASSPORTS,
-        AvatarModifierType.AMT_HIDE_AVATARS
-      ],
+      modifiers: [AvatarModifierType.AMT_DISABLE_PASSPORTS, AvatarModifierType.AMT_HIDE_AVATARS],
       excludeIds: ['exclude', 'testIdReal', 'numberAndString12837127371']
     })
 

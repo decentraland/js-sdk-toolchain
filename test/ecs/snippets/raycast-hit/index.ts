@@ -11,12 +11,7 @@ import {
 } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
 
-function createCube(
-  x: number,
-  y: number,
-  z: number,
-  scaleMultiplier: number = 1
-) {
+function createCube(x: number, y: number, z: number, scaleMultiplier: number = 1) {
   const cubeEntity = engine.addEntity()
 
   Transform.create(cubeEntity, {
@@ -55,17 +50,11 @@ pointerEventsSystem.onPointerDown(
 let lastRaycastTimestamp = -1
 engine.addSystem(() => {
   for (const [_entity, result] of engine.getEntitiesWith(RaycastResult)) {
-    if (result.hits?.length === 0 || result.timestamp <= lastRaycastTimestamp)
-      continue
+    if (result.hits?.length === 0 || result.timestamp <= lastRaycastTimestamp) continue
     lastRaycastTimestamp = result.timestamp
 
     if (result.hits[0] && result.hits[0].position) {
-      createCube(
-        result.hits[0].position.x,
-        result.hits[0].position.y,
-        result.hits[0].position.z,
-        0.3
-      )
+      createCube(result.hits[0].position.x, result.hits[0].position.y, result.hits[0].position.z, 0.3)
     }
 
     console.log(`Hits (this should be '1'): '${result.hits.length}'`)

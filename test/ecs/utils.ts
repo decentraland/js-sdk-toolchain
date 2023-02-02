@@ -2,22 +2,10 @@ import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/math'
 import { Engine, IEngine } from '../../packages/@dcl/ecs/src/engine'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { componentNumberFromName } from '../../packages/@dcl/ecs/src/components/component-number'
-import {
-  TransportMessage,
-  Transport,
-  CrdtMessageHeader
-} from '../../packages/@dcl/ecs/src'
-import {
-  CrdtMessageProtocol,
-  CrdtMessageType
-} from './../../packages/@dcl/ecs/src/serialization/crdt'
+import { TransportMessage, Transport, CrdtMessageHeader } from '../../packages/@dcl/ecs/src'
+import { CrdtMessageProtocol, CrdtMessageType } from './../../packages/@dcl/ecs/src/serialization/crdt'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import {
-  components,
-  Schemas,
-  EntityUtils,
-  EntityState
-} from '../../packages/@dcl/ecs/src'
+import { components, Schemas, EntityUtils, EntityState } from '../../packages/@dcl/ecs/src'
 import { compareData, compareStatePayloads } from '../crdt/utils'
 
 export function createNetworkTransport(): Transport {
@@ -52,10 +40,7 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
     const componentValues = Array.from(def.iterator())
     const crdtComponent = crdtState.components.get(def.componentId)
 
-    if (
-      componentValues.length === 0 &&
-      (crdtComponent === undefined || crdtComponent.size === 0)
-    ) {
+    if (componentValues.length === 0 && (crdtComponent === undefined || crdtComponent.size === 0)) {
       continue
     }
 
@@ -74,11 +59,7 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
       const crdtEntry = crdtComponent.get(entity)
       const data = def.toBinary(entity).toBinary()
 
-      if (
-        crdtEntry === null ||
-        crdtEntry === undefined ||
-        crdtEntry.data === null
-      ) {
+      if (crdtEntry === null || crdtEntry === undefined || crdtEntry.data === null) {
         conflicts.push(
           `Entity ${entity} with componentId ${def.componentId} has value in the engine but not in the crdt.`
         )
@@ -107,9 +88,7 @@ export function checkCrdtStateWithEngine(engine: IEngine) {
     }
   }
 
-  for (const [entityNumber, entityVersion] of engine
-    .getCrdtState()
-    .deletedEntities.getMap()) {
+  for (const [entityNumber, entityVersion] of engine.getCrdtState().deletedEntities.getMap()) {
     const entity = EntityUtils.toEntityId(entityNumber, entityVersion)
 
     if (engine.getEntityState(entity) !== EntityState.Removed) {
@@ -179,9 +158,7 @@ export namespace SandBox {
         let header: CrdtMessageHeader | null
         while ((header = CrdtMessageProtocol.getHeader(buffer))) {
           const offset = buffer.incrementReadOffset(header.length)
-          const data = new Uint8Array(
-            message.subarray(offset, offset + header.length)
-          )
+          const data = new Uint8Array(message.subarray(offset, offset + header.length))
           msgsOutgoing.push({
             ...header,
             data
@@ -190,10 +167,7 @@ export namespace SandBox {
       }
 
       function flushOutgoing(length: number = 0) {
-        const N: number = Math.min(
-          length || msgsOutgoing.length,
-          msgsOutgoing.length
-        )
+        const N: number = Math.min(length || msgsOutgoing.length, msgsOutgoing.length)
         if (N === 0) return
 
         const buffer = new ReadWriteByteBuffer()
@@ -259,9 +233,7 @@ export namespace SandBox {
         id: client.id,
         res: checkCrdtStateWithEngine(client.engine)
       }))
-      const allConflicts = clientsEngineState
-        .map((item) => item.res.conflicts)
-        .flat(1)
+      const allConflicts = clientsEngineState.map((item) => item.res.conflicts).flat(1)
 
       return {
         crdtStateConverged,
@@ -297,10 +269,7 @@ export namespace SandBox {
         }
       })
       engine.addTransport(clientTransport)
-      const Position = engine.defineComponent(
-        SandBox.Position.name,
-        SandBox.Position.type
-      )
+      const Position = engine.defineComponent(SandBox.Position.name, SandBox.Position.type)
       const Door = engine.defineComponent(SandBox.Door.name, SandBox.Door.type)
 
       return {
@@ -315,11 +284,7 @@ export namespace SandBox {
     })
 
     for (const client of clients) {
-      for (
-        let transportIndex = 0;
-        transportIndex < client.transports.length;
-        transportIndex++
-      ) {
+      for (let transportIndex = 0; transportIndex < client.transports.length; transportIndex++) {
         const transport = client.transports[transportIndex]
         transport.send = async (data: Uint8Array) => {
           for (const c of clients) {

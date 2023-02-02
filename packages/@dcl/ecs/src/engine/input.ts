@@ -43,11 +43,7 @@ export type IInputSystem = {
    * @param entity - the entity to query, ignore for global
    * @returns boolean
    */
-  isTriggered: (
-    inputAction: InputAction,
-    pointerEventType: PointerEventType,
-    entity?: Entity
-  ) => boolean
+  isTriggered: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean
 
   /**
    * @public
@@ -119,9 +115,7 @@ export function createInputSystem(engine: IEngine): IInputSystem {
   function timestampUpdateSystem() {
     const state = InternalInputStateComponent.get(engine.RootEntity)
     if (state.currentTimestamp > state.timestampLastUpdate) {
-      InternalInputStateComponent.getMutable(
-        engine.RootEntity
-      ).timestampLastUpdate = state.currentTimestamp
+      InternalInputStateComponent.getMutable(engine.RootEntity).timestampLastUpdate = state.currentTimestamp
     }
   }
 
@@ -143,16 +137,8 @@ export function createInputSystem(engine: IEngine): IInputSystem {
     }
   }
 
-  engine.addSystem(
-    buttonStateUpdateSystem,
-    ButtonStateUpdateSystemPriority,
-    '@dcl/ecs#buttonStateUpdateSystem'
-  )
-  engine.addSystem(
-    timestampUpdateSystem,
-    TimestampUpdateSystemPriority,
-    '@dcl/ecs#timestampUpdateSystem'
-  )
+  engine.addSystem(buttonStateUpdateSystem, ButtonStateUpdateSystemPriority, '@dcl/ecs#buttonStateUpdateSystem')
+  engine.addSystem(timestampUpdateSystem, TimestampUpdateSystemPriority, '@dcl/ecs#timestampUpdateSystem')
 
   function getClick(inputAction: InputAction, entity?: Entity) {
     if (inputAction !== InputAction.IA_ANY) {
@@ -173,34 +159,22 @@ export function createInputSystem(engine: IEngine): IInputSystem {
     const commands = component.commands
 
     // We search the last DOWN command sorted by timestamp
-    const down = findLastAction(
-      commands,
-      PointerEventType.PET_DOWN,
-      inputAction,
-      entity
-    )
+    const down = findLastAction(commands, PointerEventType.PET_DOWN, inputAction, entity)
     // We search the last UP command sorted by timestamp
     if (!down) return null
 
-    const up = findLastAction(
-      commands,
-      PointerEventType.PET_UP,
-      inputAction,
-      entity
-    )
+    const up = findLastAction(commands, PointerEventType.PET_UP, inputAction, entity)
 
     if (!up) return null
 
     const state = InternalInputStateComponent.get(engine.RootEntity)
 
     // If the DOWN command has happen before the UP commands, it means that that a clicked has happen
-    if (
-      down.timestamp < up.timestamp &&
-      up.timestamp > state.timestampLastUpdate
-    ) {
-      InternalInputStateComponent.getMutable(
-        engine.RootEntity
-      ).currentTimestamp = Math.max(up.timestamp, state.currentTimestamp)
+    if (down.timestamp < up.timestamp && up.timestamp > state.timestampLastUpdate) {
+      InternalInputStateComponent.getMutable(engine.RootEntity).currentTimestamp = Math.max(
+        up.timestamp,
+        state.currentTimestamp
+      )
       return { up, down }
     }
     return null
@@ -231,19 +205,15 @@ export function createInputSystem(engine: IEngine): IInputSystem {
     if (!component) return null
 
     // We search the last pointer Event command sorted by timestamp
-    const command = findLastAction(
-      component.commands,
-      pointerEventType,
-      inputAction,
-      entity
-    )
+    const command = findLastAction(component.commands, pointerEventType, inputAction, entity)
     if (!command) return null
 
     const state = InternalInputStateComponent.get(engine.RootEntity)
     if (command.timestamp > state.timestampLastUpdate) {
-      InternalInputStateComponent.getMutable(
-        engine.RootEntity
-      ).currentTimestamp = Math.max(command.timestamp, state.currentTimestamp)
+      InternalInputStateComponent.getMutable(engine.RootEntity).currentTimestamp = Math.max(
+        command.timestamp,
+        state.currentTimestamp
+      )
       return command
     } else {
       return null
@@ -254,18 +224,12 @@ export function createInputSystem(engine: IEngine): IInputSystem {
     return getClick(inputAction, entity) !== null
   }
 
-  function isTriggered(
-    inputAction: InputAction,
-    pointerEventType: PointerEventType,
-    entity?: Entity
-  ) {
+  function isTriggered(inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) {
     return getInputCommand(inputAction, pointerEventType, entity) !== null
   }
 
   function isPressed(inputAction: InputAction) {
-    return InternalInputStateComponent.get(engine.RootEntity).buttonState[
-      inputAction
-    ].value
+    return InternalInputStateComponent.get(engine.RootEntity).buttonState[inputAction].value
   }
 
   return {
@@ -288,8 +252,7 @@ function findLastAction(
   inputAction: InputAction,
   entity?: Entity
 ): PBPointerEventsResult_PointerCommand | undefined {
-  let commandToReturn: PBPointerEventsResult_PointerCommand | undefined =
-    undefined
+  let commandToReturn: PBPointerEventsResult_PointerCommand | undefined = undefined
 
   for (const command of commands) {
     if (
@@ -297,8 +260,7 @@ function findLastAction(
       command.state === pointerEventType &&
       (!entity || (command.hit && entity === command.hit.entityId))
     ) {
-      if (!commandToReturn || command.timestamp >= commandToReturn.timestamp)
-        commandToReturn = command
+      if (!commandToReturn || command.timestamp >= commandToReturn.timestamp) commandToReturn = command
     }
   }
 
