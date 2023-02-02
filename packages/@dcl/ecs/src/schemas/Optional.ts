@@ -2,9 +2,9 @@ import { ByteBuffer } from '../serialization/ByteBuffer'
 import { ISchema } from './ISchema'
 
 /**
- * @public
+ * @internal
  */
-export function IOptional<T>(spec: ISchema<T>): ISchema<T | undefined> {
+export const IOptional = <T>(spec: ISchema<T>): ISchema<T | undefined> => {
   return {
     serialize(value: T | undefined, builder: ByteBuffer): void {
       if (value) {

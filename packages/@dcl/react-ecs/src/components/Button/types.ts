@@ -1,7 +1,12 @@
 import { UiLabelProps } from '../Label/types'
+import { EntityPropTypes } from '../types'
 /**
+ * Button Component Props
  * @public
  */
-export type UiButtonProps = UiLabelProps & {
-  type?: 'primary' | 'secondary'
+export interface UiButtonProps extends UiLabelProps, EntityPropTypes {
+  /**
+   * Use any of the available button style types to create a styled button.
+   */
+  variant?: 'primary' | 'secondary'
 }

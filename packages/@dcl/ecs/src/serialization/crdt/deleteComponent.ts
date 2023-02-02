@@ -1,8 +1,11 @@
-import CrdtMessageProtocol from '.'
+import { CrdtMessageProtocol } from '.'
 import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../ByteBuffer'
 import { CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH, DeleteComponentMessage } from './types'
 
+/**
+ * @internal
+ */
 export namespace DeleteComponent {
   // TODO: change timestamp to 32 bit and remove buffer length (-8 bytes)
   export const MESSAGE_HEADER_LENGTH = 20

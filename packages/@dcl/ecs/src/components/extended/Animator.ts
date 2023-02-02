@@ -5,12 +5,7 @@ import { PBAnimationState, PBAnimator } from '../generated/pb/decentraland/sdk/c
 /**
  * @public
  */
-export type AnimatorComponentDefinition = ComponentDefinition<PBAnimator>
-
-/**
- * @public
- */
-export interface AnimatorComponentDefinitionExtended extends AnimatorComponentDefinition {
+export interface AnimatorComponentDefinitionExtended extends ComponentDefinition<PBAnimator> {
   /**
    * @public
    *

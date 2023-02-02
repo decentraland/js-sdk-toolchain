@@ -1,10 +1,8 @@
 import { ReactEcs } from '../react-ecs'
-import { CommonProps, EntityPropTypes } from './types'
-import { CANVAS_ROOT_ENTITY } from './uiTransform'
+import { EntityPropTypes } from './types'
 import { parseProps } from './utils'
 
 export * from './types'
-export { CANVAS_ROOT_ENTITY }
 export * from './uiTransform/types'
 export * from './listeners/types'
 export * from './Input/types'
@@ -20,8 +18,9 @@ export { Button } from './Button'
 
 /**
  * @public
+ * @category Component
  */
 /*#__PURE__*/
-export function UiEntity(props: EntityPropTypes & Partial<CommonProps>) {
+export function UiEntity(props: EntityPropTypes) {
   return <entity {...parseProps(props)} />
 }

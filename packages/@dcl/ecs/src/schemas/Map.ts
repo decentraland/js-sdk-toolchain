@@ -26,9 +26,9 @@ export type MapResultWithOptional<T extends Spec> = ToOptional<{
 export type MapSchemaType<T extends Spec> = ISchema<MapResult<T>>
 
 /**
- * @public
+ * @internal
  */
-export function IMap<T extends Spec>(spec: T, defaultValue?: Partial<MapResult<T>>): ISchema<MapResult<T>> {
+export const IMap = <T extends Spec>(spec: T, defaultValue?: Partial<MapResult<T>>): ISchema<MapResult<T>> => {
   return {
     serialize(value: MapResult<T>, builder: ByteBuffer): void {
       for (const key in spec) {

@@ -1,12 +1,19 @@
-import { PBUiText } from '@dcl/ecs'
+import { Color4 } from '@dcl/ecs/dist/components/generated/pb/decentraland/common/colors.gen'
 
 /**
+ * Label component props
  * @public
  */
-export type UiLabelProps = Omit<PBUiText, 'textAlign' | 'font'> & {
-  /** default='middle-center' */
+export interface UiLabelProps {
+  /** Primary content. */
+  value: string
+  /** Color of the label. @defaultValue `{ r: 1, g: 1, b: 1, a: 1 }` */
+  color?: Color4 | undefined
+  /** Label font size. @defaultValue 10 */
+  fontSize?: number | undefined
+  /** Label align position. @defaultValue 'middle-center' */
   textAlign?: TextAlignType | undefined
-  /** default='sans-serif' */
+  /** Label font type. @defaultValue 'sans-serif' */
   font?: UiFontType | undefined
 }
 

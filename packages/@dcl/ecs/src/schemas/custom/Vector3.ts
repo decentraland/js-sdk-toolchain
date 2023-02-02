@@ -7,7 +7,7 @@ import { ISchema } from '../ISchema'
 export type Vector3Type = { x: number; y: number; z: number }
 
 /**
- * @public
+ * @internal
  */
 export const Vector3Schema: ISchema<Vector3Type> = {
   serialize(value: Vector3Type, builder: ByteBuffer): void {
