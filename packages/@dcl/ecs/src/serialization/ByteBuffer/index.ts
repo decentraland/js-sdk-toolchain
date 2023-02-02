@@ -262,7 +262,7 @@ export class ReadWriteByteBuffer implements ByteBuffer {
 /**
  * @public
  */
-export type ByteBuffer = {
+export interface ByteBuffer {
   /**
    * @returns The entire current Uint8Array.
    *

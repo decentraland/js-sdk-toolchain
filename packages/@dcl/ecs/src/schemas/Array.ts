@@ -2,9 +2,9 @@ import { ByteBuffer } from '../serialization/ByteBuffer'
 import { ISchema } from './ISchema'
 
 /**
- * @public
+ * @internal
  */
-export function IArray<T>(type: ISchema<T>): ISchema<Array<T>> {
+export const IArray = <T>(type: ISchema<T>): ISchema<Array<T>> => {
   return {
     serialize(value: Array<T>, builder: ByteBuffer): void {
       builder.writeUint32(value.length)

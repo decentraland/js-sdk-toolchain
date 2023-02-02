@@ -6,6 +6,9 @@ export * from './deleteComponent'
 export * from './putComponent'
 export * from './deleteEntity'
 
+/**
+ * @internal
+ */
 export namespace CrdtMessageProtocol {
   /**
    * Validate if the message incoming is completed
@@ -73,5 +76,3 @@ export namespace CrdtMessageProtocol {
     return true
   }
 }
-
-export default CrdtMessageProtocol

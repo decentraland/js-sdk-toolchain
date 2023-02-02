@@ -2,9 +2,9 @@ import { ByteBuffer } from '../../serialization/ByteBuffer'
 import { ISchema } from '../ISchema'
 
 /**
- * @public
+ * @internal
  */
-export function IEnum<T>(type: ISchema<any>): ISchema<T> {
+export const IEnum = <T>(type: ISchema<any>): ISchema<T> => {
   return {
     serialize(value: T, builder: ByteBuffer): void {
       type.serialize(value, builder)
