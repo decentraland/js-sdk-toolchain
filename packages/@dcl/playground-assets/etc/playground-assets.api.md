@@ -4,15 +4,8 @@
 
 ```ts
 
-import _m0 from 'protobufjs/minimal';
-
 // @public (undocumented)
 export type AlignType = 'auto' | 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline' | 'space-between' | 'space-around';
-
-// Warning: (ae-missing-release-tag) "AMOUNT_VERSION_AVAILABLE" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const AMOUNT_VERSION_AVAILABLE: number;
 
 // Warning: (ae-missing-release-tag) "Animator" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -20,10 +13,7 @@ export const AMOUNT_VERSION_AVAILABLE: number;
 export const Animator: AnimatorComponentDefinitionExtended;
 
 // @public (undocumented)
-export type AnimatorComponentDefinition = ComponentDefinition<PBAnimator>;
-
-// @public (undocumented)
-export interface AnimatorComponentDefinitionExtended extends AnimatorComponentDefinition {
+export interface AnimatorComponentDefinitionExtended extends ComponentDefinition<PBAnimator> {
     getClip(entity: Entity, name: string): PBAnimationState;
     getClipOrNull(entity: Entity, name: string): PBAnimationState | null;
     playSingleAnimation(entity: Entity, name: string, resetCursor?: boolean): boolean;
@@ -36,8 +26,6 @@ export const AudioSource: ComponentDefinition<PBAudioSource>;
 // @public (undocumented)
 export const AudioStream: ComponentDefinition<PBAudioStream>;
 
-// Warning: (ae-missing-release-tag) "AvatarAnchorPointType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum AvatarAnchorPointType {
     // (undocumented)
@@ -56,8 +44,6 @@ export const AvatarAttach: ComponentDefinition<PBAvatarAttach>;
 // @public (undocumented)
 export const AvatarModifierArea: ComponentDefinition<PBAvatarModifierArea>;
 
-// Warning: (ae-missing-release-tag) "AvatarModifierType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum AvatarModifierType {
     // (undocumented)
@@ -69,9 +55,6 @@ export const enum AvatarModifierType {
 // @public (undocumented)
 export const AvatarShape: ComponentDefinition<PBAvatarShape>;
 
-// Warning: (ae-missing-release-tag) "AvatarTexture" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "AvatarTexture" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface AvatarTexture {
     filterMode?: TextureFilterMode | undefined;
@@ -80,14 +63,6 @@ export interface AvatarTexture {
     wrapMode?: TextureWrapMode | undefined;
 }
 
-// @public
-export const AvatarTexture: {
-    encode(message: AvatarTexture, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): AvatarTexture;
-};
-
-// Warning: (ae-missing-release-tag) "BackgroundTextureMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum BackgroundTextureMode {
     CENTER = 1,
@@ -98,8 +73,6 @@ export const enum BackgroundTextureMode {
 // @public (undocumented)
 export const Billboard: ComponentDefinition<PBBillboard>;
 
-// Warning: (ae-missing-release-tag) "BillboardMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum BillboardMode {
     // (undocumented)
@@ -114,10 +87,7 @@ export const enum BillboardMode {
     BM_Z = 4
 }
 
-// Warning: (ae-missing-release-tag) "BorderRect" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "BorderRect" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public
+// @public (undocumented)
 export interface BorderRect {
     // (undocumented)
     bottom: number;
@@ -129,76 +99,119 @@ export interface BorderRect {
     top: number;
 }
 
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
+//
 // @public
-export const BorderRect: {
-    encode(message: BorderRect, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): BorderRect;
-};
+export function Button(props: UiButtonProps): ReactEcs.JSX.Element;
 
 // @public (undocumented)
-export function Button(props: EntityPropTypes & UiButtonProps): ReactEcs.JSX.Element;
-
-// @public (undocumented)
-export type ByteBuffer = {
+export interface ByteBuffer {
+    // (undocumented)
     buffer(): Uint8Array;
+    // (undocumented)
     bufferLength(): number;
-    resetBuffer(): void;
+    // (undocumented)
     currentReadOffset(): number;
+    // (undocumented)
     currentWriteOffset(): number;
+    // (undocumented)
+    getFloat32(offset: number): number;
+    // (undocumented)
+    getFloat64(offset: number): number;
+    // (undocumented)
+    getInt16(offset: number): number;
+    // (undocumented)
+    getInt32(offset: number): number;
+    // (undocumented)
+    getInt64(offset: number): bigint;
+    // (undocumented)
+    getInt8(offset: number): number;
+    // (undocumented)
+    getUint16(offset: number): number;
+    // (undocumented)
+    getUint32(offset: number): number;
+    // (undocumented)
+    getUint64(offset: number): bigint;
+    // (undocumented)
+    getUint8(offset: number): number;
     incrementReadOffset(amount: number): number;
-    remainingBytes(): number;
-    readFloat32(): number;
-    readFloat64(): number;
-    readInt8(): number;
-    readInt16(): number;
-    readInt32(): number;
-    readInt64(): bigint;
-    readUint8(): number;
-    readUint16(): number;
-    readUint32(): number;
-    readUint64(): bigint;
-    readBuffer(): Uint8Array;
-    readUtf8String(): string;
     incrementWriteOffset(amount: number): number;
+    // (undocumented)
+    readBuffer(): Uint8Array;
+    // (undocumented)
+    readFloat32(): number;
+    // (undocumented)
+    readFloat64(): number;
+    // (undocumented)
+    readInt16(): number;
+    // (undocumented)
+    readInt32(): number;
+    // (undocumented)
+    readInt64(): bigint;
+    // (undocumented)
+    readInt8(): number;
+    // (undocumented)
+    readUint16(): number;
+    // (undocumented)
+    readUint32(): number;
+    // (undocumented)
+    readUint64(): bigint;
+    // (undocumented)
+    readUint8(): number;
+    // (undocumented)
+    readUtf8String(): string;
+    // (undocumented)
+    remainingBytes(): number;
+    resetBuffer(): void;
+    // (undocumented)
+    setFloat32(offset: number, value: number): void;
+    // (undocumented)
+    setFloat64(offset: number, value: number): void;
+    // (undocumented)
+    setInt16(offset: number, value: number): void;
+    // (undocumented)
+    setInt32(offset: number, value: number): void;
+    // (undocumented)
+    setInt64(offset: number, value: bigint): void;
+    // (undocumented)
+    setInt8(offset: number, value: number): void;
+    // (undocumented)
+    setUint16(offset: number, value: number): void;
+    // (undocumented)
+    setUint32(offset: number, value: number): void;
+    // (undocumented)
+    setUint64(offset: number, value: bigint): void;
+    // (undocumented)
+    setUint8(offset: number, value: number): void;
     toBinary(): Uint8Array;
     toCopiedBinary(): Uint8Array;
-    writeUtf8String(value: string, writeLength?: boolean): void;
+    // (undocumented)
     writeBuffer(value: Uint8Array, writeLength?: boolean): void;
+    // (undocumented)
     writeFloat32(value: number): void;
+    // (undocumented)
     writeFloat64(value: number): void;
-    writeInt8(value: number): void;
+    // (undocumented)
     writeInt16(value: number): void;
+    // (undocumented)
     writeInt32(value: number): void;
+    // (undocumented)
     writeInt64(value: bigint): void;
-    writeUint8(value: number): void;
+    // (undocumented)
+    writeInt8(value: number): void;
+    // (undocumented)
     writeUint16(value: number): void;
+    // (undocumented)
     writeUint32(value: number): void;
+    // (undocumented)
     writeUint64(value: bigint): void;
-    getFloat32(offset: number): number;
-    getFloat64(offset: number): number;
-    getInt8(offset: number): number;
-    getInt16(offset: number): number;
-    getInt32(offset: number): number;
-    getInt64(offset: number): bigint;
-    getUint8(offset: number): number;
-    getUint16(offset: number): number;
-    getUint32(offset: number): number;
-    getUint64(offset: number): bigint;
-    setFloat32(offset: number, value: number): void;
-    setFloat64(offset: number, value: number): void;
-    setInt8(offset: number, value: number): void;
-    setInt16(offset: number, value: number): void;
-    setInt32(offset: number, value: number): void;
-    setInt64(offset: number, value: bigint): void;
-    setUint8(offset: number, value: number): void;
-    setUint16(offset: number, value: number): void;
-    setUint32(offset: number, value: number): void;
-    setUint64(offset: number, value: bigint): void;
-};
+    // (undocumented)
+    writeUint8(value: number): void;
+    // (undocumented)
+    writeUtf8String(value: string, writeLength?: boolean): void;
+}
 
-// Warning: (ae-missing-release-tag) "Callback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public
 export type Callback = () => void;
 
 // @public (undocumented)
@@ -207,8 +220,6 @@ export const CameraMode: ComponentDefinition<PBCameraMode>;
 // @public (undocumented)
 export const CameraModeArea: ComponentDefinition<PBCameraModeArea>;
 
-// Warning: (ae-missing-release-tag) "CameraType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum CameraType {
     // (undocumented)
@@ -217,18 +228,11 @@ export const enum CameraType {
     CT_THIRD_PERSON = 1
 }
 
-// Warning: (ae-missing-release-tag) "CANVAS_ROOT_ENTITY" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const CANVAS_ROOT_ENTITY = 0;
-
 // Warning: (ae-missing-release-tag) "Children" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export type Children = unknown;
 
-// Warning: (ae-missing-release-tag) "ColliderLayer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum ColliderLayer {
     // (undocumented)
@@ -388,29 +392,24 @@ export type Color4Type = {
     a: number;
 };
 
-// Warning: (ae-missing-release-tag) "CommonProps" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
-export type CommonProps = {
-    key?: Key;
-    children?: Children;
-};
-
-// @public (undocumented)
-export type ComponentDefinition<T> = {
+export interface ComponentDefinition<T> {
+    // (undocumented)
     readonly componentId: number;
+    // (undocumented)
     readonly componentName: string;
-    default(): DeepReadonly<T>;
-    has(entity: Entity): boolean;
-    get(entity: Entity): DeepReadonly<T>;
-    getOrNull(entity: Entity): DeepReadonly<T> | null;
     create(entity: Entity, val?: T): T;
     createOrReplace(entity: Entity, val?: T): T;
+    default(): DeepReadonly<T>;
     deleteFrom(entity: Entity): T | null;
+    get(entity: Entity): DeepReadonly<T>;
     getMutable(entity: Entity): T;
     getMutableOrNull(entity: Entity): T | null;
+    getOrNull(entity: Entity): DeepReadonly<T> | null;
+    has(entity: Entity): boolean;
+    // (undocumented)
     writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void;
-};
+}
 
 // Warning: (ae-missing-release-tag) "ComponentGetter" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -422,41 +421,9 @@ export type ComponentSchema<T extends [ComponentDefinition<any>, ...ComponentDef
     [K in keyof T]: T[K] extends ComponentDefinition<any> ? ReturnType<T[K]['getMutable']> : never;
 };
 
-// Warning: (ae-missing-release-tag) "CRDT_MESSAGE_HEADER_LENGTH" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
-export const CRDT_MESSAGE_HEADER_LENGTH = 8;
+export type CrdtMessageBody = PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessageBody;
 
-// Warning: (ae-missing-release-tag) "CrdtMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage;
-
-// Warning: (ae-missing-release-tag) "CrdtMessageBody" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type CrdtMessageBody = PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessage;
-
-// Warning: (ae-missing-release-tag) "CrdtMessageHeader" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public
-export type CrdtMessageHeader = {
-    length: Uint32;
-    type: Uint32;
-};
-
-// Warning: (ae-missing-release-tag) "CrdtMessageProtocol" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export namespace CrdtMessageProtocol {
-    export function consumeMessage(buf: ByteBuffer): boolean;
-    export function getHeader(buf: ByteBuffer): CrdtMessageHeader | null;
-    export function readHeader(buf: ByteBuffer): CrdtMessageHeader | null;
-    export function validate(buf: ByteBuffer): boolean;
-}
-
-// Warning: (ae-missing-release-tag) "CrdtMessageType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export enum CrdtMessageType {
     // (undocumented)
@@ -471,46 +438,12 @@ export enum CrdtMessageType {
     RESERVED = 0
 }
 
-// Warning: (ae-missing-release-tag) "createComponentDefinitionFromSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function createComponentDefinitionFromSchema<T>(componentName: string, componentId: number, schema: ISchema<T>): ComponentDefinition<T>;
-
 // Warning: (ae-missing-release-tag) "createEthereumProvider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export function createEthereumProvider(): {
     send(message: RPCSendableMessage, callback?: ((error: Error | null, result?: any) => void) | undefined): void;
     sendAsync(message: RPCSendableMessage, callback: (error: Error | null, result?: any) => void): void;
-};
-
-// Warning: (ae-missing-release-tag) "createInputSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function createInputSystem(engine: IEngine): IInputSystem;
-
-// Warning: (ae-missing-release-tag) "createPointerEventSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function createPointerEventSystem(engine: IEngine, inputSystem: IInputSystem): {
-    removeOnClick(entity: Entity): void;
-    removeOnPointerDown(entity: Entity): void;
-    removeOnPointerUp(entity: Entity): void;
-    onClick(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
-    onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
-    onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
-};
-
-// Warning: (ae-missing-release-tag) "createReactBasedUiSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function createReactBasedUiSystem(engine: IEngine, pointerSystem: PointerEventsSystem): ReactBasedUiSystem;
-
-// Warning: (ae-missing-release-tag) "createTaskSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function createTaskSystem(engine: IEngine): {
-    executeTask(task: Task): void;
 };
 
 // Warning: (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
@@ -537,24 +470,6 @@ export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 // @public
 export const DEG2RAD: number;
 
-// Warning: (ae-missing-release-tag) "DeleteComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export namespace DeleteComponent {
-    const // (undocumented)
-    MESSAGE_HEADER_LENGTH = 20;
-    // (undocumented)
-    export function read(buf: ByteBuffer): DeleteComponentMessage | null;
-    export function write(entity: Entity, componentId: number, timestamp: number, buf: ByteBuffer): void;
-}
-
-// Warning: (ae-missing-release-tag) "DeleteComponentMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type DeleteComponentMessage = CrdtMessageHeader & DeleteComponentMessageBody;
-
-// Warning: (ae-missing-release-tag) "DeleteComponentMessageBody" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type DeleteComponentMessageBody = {
     type: CrdtMessageType.DELETE_COMPONENT;
@@ -563,25 +478,6 @@ export type DeleteComponentMessageBody = {
     timestamp: number;
 };
 
-// Warning: (ae-missing-release-tag) "DeleteEntity" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export namespace DeleteEntity {
-    const // (undocumented)
-    MESSAGE_HEADER_LENGTH = 4;
-    // (undocumented)
-    export function read(buf: ByteBuffer): DeleteEntityMessage | null;
-    // (undocumented)
-    export function write(entity: Entity, buf: ByteBuffer): void;
-}
-
-// Warning: (ae-missing-release-tag) "DeleteEntityMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type DeleteEntityMessage = CrdtMessageHeader & DeleteEntityMessageBody;
-
-// Warning: (ae-missing-release-tag) "DeleteEntityMessageBody" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type DeleteEntityMessageBody = {
     type: CrdtMessageType.DELETE_ENTITY;
@@ -591,22 +487,38 @@ export type DeleteEntityMessageBody = {
 // @public (undocumented)
 export type DisplayType = 'flex' | 'none';
 
-// @public (undocumented)
-export function Dropdown(props: EntityPropTypes & UiDropdownProps): ReactEcs.JSX.Element;
-
-// Warning: (ae-missing-release-tag) "EcsElements" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (tsdoc-html-tag-missing-string) The HTML element has an invalid attribute: Expecting an HTML string starting with a single-quote or double-quote character
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
 //
-// @public (undocumented)
-export type EcsElements = {
-    entity: Partial<EntityComponents & CommonProps>;
-};
+// @public
+export function Dropdown(props: UiDropdownProps): ReactEcs.JSX.Element;
 
 // @public (undocumented)
-export function Engine(options?: IEngineOptions): IEngine;
+export interface EcsElements {
+    // (undocumented)
+    entity: Partial<EntityComponents> & {
+        children?: Children;
+        key?: Key;
+    };
+}
 
-// Warning: (ae-missing-release-tag) "engine" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (tsdoc-at-sign-in-word) The "@" character looks like part of a TSDoc tag; use a backslash to escape it
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
 //
-// @public (undocumented)
+// @public
 export const engine: IEngine;
 
 // Warning: (ae-missing-release-tag) "EngineEvent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -629,8 +541,6 @@ export type Entity = number & {
     __entity_type: '';
 };
 
-// Warning: (ae-missing-release-tag) "EntityComponents" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type EntityComponents = {
     uiTransform: PBUiTransform;
@@ -642,12 +552,9 @@ export type EntityComponents = {
     onMouseUp: Callback;
 };
 
-// Warning: (ae-missing-release-tag) "EntityContainer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@intenral" is not defined in this configuration
 // Warning: (ae-missing-release-tag) "EntityContainer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
-// @public (undocumented)
-export function EntityContainer(): EntityContainer;
-
 // @public (undocumented)
 export type EntityContainer = {
     generateEntity(): Entity;
@@ -659,11 +566,12 @@ export type EntityContainer = {
     updateUsedEntity(entity: Entity): boolean;
 };
 
-// @public (undocumented)
-export type EntityPropTypes = {
-    uiTransform?: UiTransformProps;
+// @public
+export interface EntityPropTypes extends Listeners {
+    key?: Key;
     uiBackground?: UiBackgroundProps;
-} & Listeners & Pick<CommonProps, 'key'>;
+    uiTransform?: UiTransformProps;
+}
 
 // @public (undocumented)
 export enum EntityState {
@@ -674,26 +582,12 @@ export enum EntityState {
     UsedEntity = 1
 }
 
-// Warning: (ae-missing-release-tag) "EntityUtils" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export namespace EntityUtils {
-    // (undocumented)
-    export function fromEntityId(entityId: Entity): [number, number];
-    // (undocumented)
-    export function toEntityId(entityNumber: number, entityVersion: number): Entity;
-}
-
 // @public
 export const Epsilon = 0.000001;
 
-// Warning: (ae-missing-release-tag) "EventSystemCallback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type EventSystemCallback = (event: PBPointerEventsResult_PointerCommand) => void;
 
-// Warning: (ae-missing-release-tag) "EventSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type EventSystemOptions = {
     button: InputAction;
@@ -702,14 +596,12 @@ export type EventSystemOptions = {
     showFeedback?: boolean;
 };
 
-// Warning: (ae-missing-release-tag) "ExcludeUndefined" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public
 export type ExcludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? never : P;
 }[keyof T];
 
-// @public (undocumented)
+// @public
 export const executeTask: (task: Task<unknown>) => void;
 
 // @public (undocumented)
@@ -721,8 +613,6 @@ export type FlexWrapType = 'wrap' | 'nowrap' | 'wrap-reverse';
 // @public (undocumented)
 export type FloatArray = number[];
 
-// Warning: (ae-missing-release-tag) "Font" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum Font {
     // (undocumented)
@@ -766,39 +656,29 @@ export type GlobalInputEventResult = InputEventResult & {
 export const GltfContainer: ComponentDefinition<PBGltfContainer>;
 
 // @public (undocumented)
-export function IArray<T>(type: ISchema<T>): ISchema<Array<T>>;
-
-// @public (undocumented)
-export type IEngine = {
+export interface IEngine {
     addEntity(dynamic?: boolean): Entity;
-    removeEntity(entity: Entity): void;
-    removeEntityWithChildren(firstEntity: Entity): void;
-    getEntityState(entity: Entity): EntityState;
     addSystem(system: SystemFn, priority?: number, name?: string): void;
-    removeSystem(selector: string | SystemFn): boolean;
-    registerComponentDefinition<T>(componentName: string, componentDefinition: ComponentDefinition<T>): ComponentDefinition<T>;
+    // @alpha (undocumented)
+    addTransport(transport: Transport): void;
+    readonly CameraEntity: Entity;
+    componentsIter(): Iterable<ComponentDefinition<unknown>>;
     defineComponent<T extends Spec>(componentName: string, spec: T, constructorDefault?: Partial<MapResult<T>>): MapComponentDefinition<MapResult<T>>;
     defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): ComponentDefinition<T>;
     getComponent<T>(componentId: number): ComponentDefinition<T>;
     getComponentOrNull<T>(componentId: number): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
-    update(deltaTime: number): Promise<void>;
-    readonly RootEntity: Entity;
+    getEntityState(entity: Entity): EntityState;
     readonly PlayerEntity: Entity;
-    readonly CameraEntity: Entity;
-    addTransport(transport: Transport): void;
-    entityContainer: EntityContainer;
-    componentsIter(): Iterable<ComponentDefinition<unknown>>;
+    registerComponentDefinition<T>(componentName: string, componentDefinition: ComponentDefinition<T>): ComponentDefinition<T>;
+    removeEntity(entity: Entity): void;
+    removeEntityWithChildren(firstEntity: Entity): void;
+    removeSystem(selector: string | SystemFn): boolean;
+    readonly RootEntity: Entity;
     seal(): void;
-};
-
-// @public (undocumented)
-export type IEngineOptions = {
-    onChangeFunction: OnChangeFunction;
-};
-
-// @public (undocumented)
-export function IEnum<T>(type: ISchema<any>): ISchema<T>;
+    // (undocumented)
+    update(deltaTime: number): Promise<void>;
+}
 
 // Warning: (ae-missing-release-tag) "IEventNames" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -990,21 +870,31 @@ export type IInputSystem = {
     getInputCommand: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => PBPointerEventsResult_PointerCommand | null;
 };
 
-// @public (undocumented)
-export function IMap<T extends Spec>(spec: T, defaultValue?: Partial<MapResult<T>>): ISchema<MapResult<T>>;
-
-// Warning: (ae-missing-release-tag) "IncludeUndefined" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public
 export type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
 }[keyof T];
 
-// @public (undocumented)
+// Warning: (tsdoc-html-tag-missing-string) The HTML element has an invalid attribute: Expecting an HTML string starting with a single-quote or double-quote character
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
+//
+// @public
 export function Input(props: EntityPropTypes & Partial<UiInputProps>): ReactEcs.JSX.Element;
 
-// Warning: (ae-missing-release-tag) "InputAction" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum InputAction {
     // (undocumented)
@@ -1054,27 +944,22 @@ export type InputEventResult = {
     };
 };
 
-// Warning: (ae-missing-release-tag) "inputSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public
 export const inputSystem: IInputSystem;
 
 // @public (undocumented)
-export function IOptional<T>(spec: ISchema<T>): ISchema<T | undefined>;
-
-// @public (undocumented)
-export type ISchema<T = any> = {
-    serialize(value: T, builder: ByteBuffer): void;
-    deserialize(reader: ByteBuffer): T;
+export interface ISchema<T = any> {
+    // (undocumented)
     create(): T;
+    // (undocumented)
+    deserialize(reader: ByteBuffer): T;
+    // (undocumented)
     extend?: (base?: T) => T;
-};
+    // (undocumented)
+    serialize(value: T, builder: ByteBuffer): void;
+}
 
-// Warning: (ae-missing-release-tag) "isListener" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const isListener: (key: string) => key is keyof Listeners;
-
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@hidden" is not defined in this configuration
 // Warning: (ae-missing-release-tag) "JSX" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -1091,25 +976,29 @@ export namespace JSX {
 // @public (undocumented)
 export type JustifyType = 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
 
-// Warning: (ae-missing-release-tag) "Key" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public
 export type Key = number | string;
 
-// @public (undocumented)
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-html-tag-missing-string) The HTML element has an invalid attribute: Expecting an HTML string starting with a single-quote or double-quote character
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
+//
+// @public
 export function Label(props: EntityPropTypes & UiLabelProps): ReactEcs.JSX.Element;
 
-// Warning: (ae-missing-release-tag) "Listeners" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public
 export type Listeners = {
     onMouseDown?: Callback;
     onMouseUp?: Callback;
 };
 
-// Warning: (ae-missing-release-tag) "MapComponentDefinition" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public
 export interface MapComponentDefinition<T> extends ComponentDefinition<T> {
     create(entity: Entity, val?: Partial<T>): T;
     createOrReplace(entity: Entity, val?: Partial<T>): T;
@@ -1120,28 +1009,18 @@ export type MapResult<T extends Spec> = ToOptional<{
     [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? MapResult<T[K]> : never;
 }>;
 
-// Warning: (ae-missing-release-tag) "MASK_UPPER_16_ON_32" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const MASK_UPPER_16_ON_32 = 4294901760;
-
 // Warning: (ae-missing-release-tag) "Material" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export const Material: MaterialComponentDefinitionExtended;
 
 // @public (undocumented)
-export type MaterialComponentDefinition = ComponentDefinition<PBMaterial>;
-
-// @public (undocumented)
-export interface MaterialComponentDefinitionExtended extends MaterialComponentDefinition {
+export interface MaterialComponentDefinitionExtended extends ComponentDefinition<PBMaterial> {
     setBasicMaterial: (entity: Entity, material: PBMaterial_UnlitMaterial) => void;
     setPbrMaterial: (entity: Entity, material: PBMaterial_PbrMaterial) => void;
     Texture: TextureHelper;
 }
 
-// Warning: (ae-missing-release-tag) "MaterialTransparencyMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum MaterialTransparencyMode {
     // (undocumented)
@@ -1293,24 +1172,13 @@ export namespace Matrix {
     export function Zero(): MutableMatrix;
 }
 
-// @public (undocumented)
-export const MAX_ENTITY_NUMBER = 65535;
-
-// Warning: (ae-missing-release-tag) "MAX_U16" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const MAX_U16 = 65535;
-
 // Warning: (ae-missing-release-tag) "MeshCollider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export const MeshCollider: MeshColliderComponentDefinitionExtended;
 
 // @public (undocumented)
-export type MeshColliderComponentDefinition = ComponentDefinition<PBMeshCollider>;
-
-// @public (undocumented)
-export interface MeshColliderComponentDefinitionExtended extends MeshColliderComponentDefinition {
+export interface MeshColliderComponentDefinitionExtended extends ComponentDefinition<PBMeshCollider> {
     setBox(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
     setCylinder(entity: Entity, radiusBottom?: number, radiusTop?: number, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
     setPlane(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
@@ -1323,10 +1191,7 @@ export interface MeshColliderComponentDefinitionExtended extends MeshColliderCom
 export const MeshRenderer: MeshRendererComponentDefinitionExtended;
 
 // @public (undocumented)
-export type MeshRendererComponentDefinition = ComponentDefinition<PBMeshRenderer>;
-
-// @public (undocumented)
-export interface MeshRendererComponentDefinitionExtended extends MeshRendererComponentDefinition {
+export interface MeshRendererComponentDefinitionExtended extends ComponentDefinition<PBMeshRenderer> {
     setBox(entity: Entity, uvs?: number[]): void;
     setCylinder(entity: Entity, radiusBottom?: number, radiusTop?: number): void;
     setPlane(entity: Entity, uvs?: number[]): void;
@@ -1344,8 +1209,6 @@ export class MessageBus {
     on(message: string, callback: (value: any, sender: string) => void): Observer<IEvents['comms']>;
 }
 
-// Warning: (ae-missing-release-tag) "NftFrameType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum NftFrameType {
     // (undocumented)
@@ -1503,15 +1366,11 @@ export const onLeaveSceneObservable: Observable<{
     userId: string;
 }>;
 
-// Warning: (ae-missing-release-tag) "OnlyNonUndefinedTypes" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type OnlyNonUndefinedTypes<T> = {
     [K in ExcludeUndefined<T>]: T[K];
 };
 
-// Warning: (ae-missing-release-tag) "OnlyOptionalUndefinedTypes" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type OnlyOptionalUndefinedTypes<T> = {
     [K in IncludeUndefined<T>]?: T[K];
@@ -1589,12 +1448,9 @@ export const onVideoEvent: Observable<{
     totalVideoLength: number;
 }>;
 
-// @public (undocumented)
+// @public
 export type OverflowType = 'hidden' | 'scroll' | 'visible';
 
-// Warning: (ae-missing-release-tag) "PBAnimationState" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBAnimationState" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBAnimationState {
     // (undocumented)
@@ -1610,30 +1466,12 @@ export interface PBAnimationState {
     weight?: number | undefined;
 }
 
-// @public
-export const PBAnimationState: {
-    encode(message: PBAnimationState, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBAnimationState;
-};
-
-// Warning: (ae-missing-release-tag) "PBAnimator" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBAnimator" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBAnimator {
     // (undocumented)
     states: PBAnimationState[];
 }
 
-// @public
-export const PBAnimator: {
-    encode(message: PBAnimator, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBAnimator;
-};
-
-// Warning: (ae-missing-release-tag) "PBAudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBAudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBAudioSource {
     // (undocumented)
@@ -1646,15 +1484,6 @@ export interface PBAudioSource {
     volume?: number | undefined;
 }
 
-// @public
-export const PBAudioSource: {
-    encode(message: PBAudioSource, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioSource;
-};
-
-// Warning: (ae-missing-release-tag) "PBAudioStream" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBAudioStream" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBAudioStream {
     // (undocumented)
@@ -1664,15 +1493,6 @@ export interface PBAudioStream {
     volume?: number | undefined;
 }
 
-// @public
-export const PBAudioStream: {
-    encode(message: PBAudioStream, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioStream;
-};
-
-// Warning: (ae-missing-release-tag) "PBAvatarAttach" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBAvatarAttach" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBAvatarAttach {
     // (undocumented)
@@ -1680,15 +1500,6 @@ export interface PBAvatarAttach {
     avatarId?: string | undefined;
 }
 
-// @public
-export const PBAvatarAttach: {
-    encode(message: PBAvatarAttach, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarAttach;
-};
-
-// Warning: (ae-missing-release-tag) "PBAvatarModifierArea" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBAvatarModifierArea" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBAvatarModifierArea {
     // (undocumented)
@@ -1699,15 +1510,6 @@ export interface PBAvatarModifierArea {
     modifiers: AvatarModifierType[];
 }
 
-// @public
-export const PBAvatarModifierArea: {
-    encode(message: PBAvatarModifierArea, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarModifierArea;
-};
-
-// Warning: (ae-missing-release-tag) "PBAvatarShape" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBAvatarShape" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBAvatarShape {
     bodyShape?: string | undefined;
@@ -1726,44 +1528,17 @@ export interface PBAvatarShape {
     wearables: string[];
 }
 
-// @public
-export const PBAvatarShape: {
-    encode(message: PBAvatarShape, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarShape;
-};
-
-// Warning: (ae-missing-release-tag) "PBBillboard" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBBillboard" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBBillboard {
     billboardMode?: BillboardMode | undefined;
 }
 
-// @public
-export const PBBillboard: {
-    encode(message: PBBillboard, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBBillboard;
-};
-
-// Warning: (ae-missing-release-tag) "PBCameraMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBCameraMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBCameraMode {
     // (undocumented)
     mode: CameraType;
 }
 
-// @public
-export const PBCameraMode: {
-    encode(message: PBCameraMode, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBCameraMode;
-};
-
-// Warning: (ae-missing-release-tag) "PBCameraModeArea" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBCameraModeArea" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBCameraModeArea {
     // (undocumented)
@@ -1772,15 +1547,6 @@ export interface PBCameraModeArea {
     mode: CameraType;
 }
 
-// @public
-export const PBCameraModeArea: {
-    encode(message: PBCameraModeArea, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBCameraModeArea;
-};
-
-// Warning: (ae-missing-release-tag) "Color3" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "Color3" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBColor3 {
     // (undocumented)
@@ -1791,15 +1557,6 @@ export interface PBColor3 {
     r: number;
 }
 
-// @public
-export const PBColor3: {
-    encode(message: PBColor3, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBColor3;
-};
-
-// Warning: (ae-missing-release-tag) "Color4" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "Color4" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBColor4 {
     // (undocumented)
@@ -1812,29 +1569,11 @@ export interface PBColor4 {
     r: number;
 }
 
-// @public
-export const PBColor4: {
-    encode(message: PBColor4, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBColor4;
-};
-
-// Warning: (ae-missing-release-tag) "PBGltfContainer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBGltfContainer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBGltfContainer {
     src: string;
 }
 
-// @public
-export const PBGltfContainer: {
-    encode(message: PBGltfContainer, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfContainer;
-};
-
-// Warning: (ae-missing-release-tag) "PBMaterial" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBMaterial" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBMaterial {
     // (undocumented)
@@ -1847,15 +1586,6 @@ export interface PBMaterial {
     };
 }
 
-// @public
-export const PBMaterial: {
-    encode(message: PBMaterial, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBMaterial;
-};
-
-// Warning: (ae-missing-release-tag) "PBMaterial_PbrMaterial" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBMaterial_PbrMaterial" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBMaterial_PbrMaterial {
     albedoColor?: PBColor4 | undefined;
@@ -1876,15 +1606,6 @@ export interface PBMaterial_PbrMaterial {
     transparencyMode?: MaterialTransparencyMode | undefined;
 }
 
-// @public
-export const PBMaterial_PbrMaterial: {
-    encode(message: PBMaterial_PbrMaterial, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBMaterial_PbrMaterial;
-};
-
-// Warning: (ae-missing-release-tag) "PBMaterial_UnlitMaterial" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBMaterial_UnlitMaterial" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBMaterial_UnlitMaterial {
     alphaTest?: number | undefined;
@@ -1892,15 +1613,6 @@ export interface PBMaterial_UnlitMaterial {
     texture?: TextureUnion | undefined;
 }
 
-// @public
-export const PBMaterial_UnlitMaterial: {
-    encode(message: PBMaterial_UnlitMaterial, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBMaterial_UnlitMaterial;
-};
-
-// Warning: (ae-missing-release-tag) "PBMeshCollider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBMeshCollider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBMeshCollider {
     collisionMask?: number | undefined;
@@ -1920,69 +1632,24 @@ export interface PBMeshCollider {
     };
 }
 
-// @public
-export const PBMeshCollider: {
-    encode(message: PBMeshCollider, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider;
-};
-
-// Warning: (ae-missing-release-tag) "PBMeshCollider_BoxMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBMeshCollider_BoxMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBMeshCollider_BoxMesh {
 }
 
-// @public
-export const PBMeshCollider_BoxMesh: {
-    encode(_: PBMeshCollider_BoxMesh, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_BoxMesh;
-};
-
-// Warning: (ae-missing-release-tag) "PBMeshCollider_CylinderMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBMeshCollider_CylinderMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBMeshCollider_CylinderMesh {
     radiusBottom?: number | undefined;
     radiusTop?: number | undefined;
 }
 
-// @public
-export const PBMeshCollider_CylinderMesh: {
-    encode(message: PBMeshCollider_CylinderMesh, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_CylinderMesh;
-};
-
-// Warning: (ae-missing-release-tag) "PBMeshCollider_PlaneMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBMeshCollider_PlaneMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBMeshCollider_PlaneMesh {
 }
 
-// @public
-export const PBMeshCollider_PlaneMesh: {
-    encode(_: PBMeshCollider_PlaneMesh, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_PlaneMesh;
-};
-
-// Warning: (ae-missing-release-tag) "PBMeshCollider_SphereMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBMeshCollider_SphereMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBMeshCollider_SphereMesh {
 }
 
-// @public
-export const PBMeshCollider_SphereMesh: {
-    encode(_: PBMeshCollider_SphereMesh, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_SphereMesh;
-};
-
-// Warning: (ae-missing-release-tag) "PBMeshRenderer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBMeshRenderer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBMeshRenderer {
     // (undocumented)
@@ -2001,73 +1668,28 @@ export interface PBMeshRenderer {
     };
 }
 
-// @public
-export const PBMeshRenderer: {
-    encode(message: PBMeshRenderer, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer;
-};
-
-// Warning: (ae-missing-release-tag) "PBMeshRenderer_BoxMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBMeshRenderer_BoxMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBMeshRenderer_BoxMesh {
     // (undocumented)
     uvs: number[];
 }
 
-// @public
-export const PBMeshRenderer_BoxMesh: {
-    encode(message: PBMeshRenderer_BoxMesh, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_BoxMesh;
-};
-
-// Warning: (ae-missing-release-tag) "PBMeshRenderer_CylinderMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBMeshRenderer_CylinderMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBMeshRenderer_CylinderMesh {
     radiusBottom?: number | undefined;
     radiusTop?: number | undefined;
 }
 
-// @public
-export const PBMeshRenderer_CylinderMesh: {
-    encode(message: PBMeshRenderer_CylinderMesh, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_CylinderMesh;
-};
-
-// Warning: (ae-missing-release-tag) "PBMeshRenderer_PlaneMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBMeshRenderer_PlaneMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBMeshRenderer_PlaneMesh {
     // (undocumented)
     uvs: number[];
 }
 
-// @public
-export const PBMeshRenderer_PlaneMesh: {
-    encode(message: PBMeshRenderer_PlaneMesh, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_PlaneMesh;
-};
-
-// Warning: (ae-missing-release-tag) "PBMeshRenderer_SphereMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBMeshRenderer_SphereMesh" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBMeshRenderer_SphereMesh {
 }
 
-// @public
-export const PBMeshRenderer_SphereMesh: {
-    encode(_: PBMeshRenderer_SphereMesh, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_SphereMesh;
-};
-
-// Warning: (ae-missing-release-tag) "PBNftShape" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBNftShape" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBNftShape {
     color?: PBColor3 | undefined;
@@ -2076,30 +1698,12 @@ export interface PBNftShape {
     style?: NftFrameType | undefined;
 }
 
-// @public
-export const PBNftShape: {
-    encode(message: PBNftShape, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBNftShape;
-};
-
-// Warning: (ae-missing-release-tag) "PBPointerEvents" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBPointerEvents" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBPointerEvents {
     // (undocumented)
     pointerEvents: PBPointerEvents_Entry[];
 }
 
-// @public
-export const PBPointerEvents: {
-    encode(message: PBPointerEvents, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEvents;
-};
-
-// Warning: (ae-missing-release-tag) "PBPointerEvents_Entry" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBPointerEvents_Entry" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBPointerEvents_Entry {
     // (undocumented)
@@ -2108,15 +1712,6 @@ export interface PBPointerEvents_Entry {
     eventType: PointerEventType;
 }
 
-// @public
-export const PBPointerEvents_Entry: {
-    encode(message: PBPointerEvents_Entry, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEvents_Entry;
-};
-
-// Warning: (ae-missing-release-tag) "PBPointerEvents_Info" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBPointerEvents_Info" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBPointerEvents_Info {
     button?: InputAction | undefined;
@@ -2125,30 +1720,12 @@ export interface PBPointerEvents_Info {
     showFeedback?: boolean | undefined;
 }
 
-// @public
-export const PBPointerEvents_Info: {
-    encode(message: PBPointerEvents_Info, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEvents_Info;
-};
-
-// Warning: (ae-missing-release-tag) "PBPointerEventsResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBPointerEventsResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public
+// @public (undocumented)
 export interface PBPointerEventsResult {
     commands: PBPointerEventsResult_PointerCommand[];
 }
 
-// @public
-export const PBPointerEventsResult: {
-    encode(message: PBPointerEventsResult, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEventsResult;
-};
-
-// Warning: (ae-missing-release-tag) "PBPointerEventsResult_PointerCommand" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBPointerEventsResult_PointerCommand" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public
+// @public (undocumented)
 export interface PBPointerEventsResult_PointerCommand {
     analog?: number | undefined;
     button: InputAction;
@@ -2159,30 +1736,12 @@ export interface PBPointerEventsResult_PointerCommand {
     timestamp: number;
 }
 
-// @public
-export const PBPointerEventsResult_PointerCommand: {
-    encode(message: PBPointerEventsResult_PointerCommand, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEventsResult_PointerCommand;
-};
-
-// Warning: (ae-missing-release-tag) "PBPointerLock" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBPointerLock" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBPointerLock {
     // (undocumented)
     isPointerLocked: boolean;
 }
 
-// @public
-export const PBPointerLock: {
-    encode(message: PBPointerLock, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerLock;
-};
-
-// Warning: (ae-missing-release-tag) "Position" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "Position" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBPosition {
     // (undocumented)
@@ -2193,15 +1752,6 @@ export interface PBPosition {
     z: number;
 }
 
-// @public
-export const PBPosition: {
-    encode(message: PBPosition, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBPosition;
-};
-
-// Warning: (ae-missing-release-tag) "PBRaycast" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBRaycast" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBRaycast {
     // (undocumented)
@@ -2214,15 +1764,6 @@ export interface PBRaycast {
     queryType: RaycastQueryType;
 }
 
-// @public
-export const PBRaycast: {
-    encode(message: PBRaycast, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBRaycast;
-};
-
-// Warning: (ae-missing-release-tag) "PBRaycastResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBRaycastResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBRaycastResult {
     // (undocumented)
@@ -2235,15 +1776,6 @@ export interface PBRaycastResult {
     timestamp: number;
 }
 
-// @public
-export const PBRaycastResult: {
-    encode(message: PBRaycastResult, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBRaycastResult;
-};
-
-// Warning: (ae-missing-release-tag) "PBTextShape" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBTextShape" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBTextShape {
     font?: Font | undefined;
@@ -2279,15 +1811,6 @@ export interface PBTextShape {
     width?: number | undefined;
 }
 
-// @public
-export const PBTextShape: {
-    encode(message: PBTextShape, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBTextShape;
-};
-
-// Warning: (ae-missing-release-tag) "PBUiBackground" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBUiBackground" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBUiBackground {
     color?: PBColor4 | undefined;
@@ -2299,15 +1822,6 @@ export interface PBUiBackground {
     uvs: number[];
 }
 
-// @public
-export const PBUiBackground: {
-    encode(message: PBUiBackground, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBUiBackground;
-};
-
-// Warning: (ae-missing-release-tag) "PBUiDropdown" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBUiDropdown" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBUiDropdown {
     // (undocumented)
@@ -2325,30 +1839,12 @@ export interface PBUiDropdown {
     textAlign?: TextAlignMode | undefined;
 }
 
-// @public
-export const PBUiDropdown: {
-    encode(message: PBUiDropdown, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBUiDropdown;
-};
-
-// Warning: (ae-missing-release-tag) "PBUiDropdownResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBUiDropdownResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBUiDropdownResult {
     // (undocumented)
     value: number;
 }
 
-// @public
-export const PBUiDropdownResult: {
-    encode(message: PBUiDropdownResult, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBUiDropdownResult;
-};
-
-// Warning: (ae-missing-release-tag) "PBUiInput" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBUiInput" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBUiInput {
     color?: PBColor4 | undefined;
@@ -2362,30 +1858,12 @@ export interface PBUiInput {
     textAlign?: TextAlignMode | undefined;
 }
 
-// @public
-export const PBUiInput: {
-    encode(message: PBUiInput, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBUiInput;
-};
-
-// Warning: (ae-missing-release-tag) "PBUiInputResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBUiInputResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBUiInputResult {
     // (undocumented)
     value: string;
 }
 
-// @public
-export const PBUiInputResult: {
-    encode(message: PBUiInputResult, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBUiInputResult;
-};
-
-// Warning: (ae-missing-release-tag) "PBUiText" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBUiText" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBUiText {
     color?: PBColor4 | undefined;
@@ -2396,15 +1874,6 @@ export interface PBUiText {
     value: string;
 }
 
-// @public
-export const PBUiText: {
-    encode(message: PBUiText, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBUiText;
-};
-
-// Warning: (ae-missing-release-tag) "PBUiTransform" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBUiTransform" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBUiTransform {
     alignContent?: YGAlign | undefined;
@@ -2482,15 +1951,6 @@ export interface PBUiTransform {
     widthUnit: YGUnit;
 }
 
-// @public
-export const PBUiTransform: {
-    encode(message: PBUiTransform, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBUiTransform;
-};
-
-// Warning: (ae-missing-release-tag) "Vector2" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "Vector2" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBVector2 {
     // (undocumented)
@@ -2499,15 +1959,6 @@ export interface PBVector2 {
     y: number;
 }
 
-// @public
-export const PBVector2: {
-    encode(message: PBVector2, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBVector2;
-};
-
-// Warning: (ae-missing-release-tag) "Vector3" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "Vector3" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBVector3 {
     // (undocumented)
@@ -2518,15 +1969,6 @@ export interface PBVector3 {
     z: number;
 }
 
-// @public
-export const PBVector3: {
-    encode(message: PBVector3, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBVector3;
-};
-
-// Warning: (ae-missing-release-tag) "PBVideoPlayer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBVideoPlayer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBVideoPlayer {
     loop?: boolean | undefined;
@@ -2537,25 +1979,10 @@ export interface PBVideoPlayer {
     volume?: number | undefined;
 }
 
-// @public
-export const PBVideoPlayer: {
-    encode(message: PBVideoPlayer, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBVideoPlayer;
-};
-
-// Warning: (ae-missing-release-tag) "PBVisibilityComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "PBVisibilityComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface PBVisibilityComponent {
     visible?: boolean | undefined;
 }
-
-// @public
-export const PBVisibilityComponent: {
-    encode(message: PBVisibilityComponent, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): PBVisibilityComponent;
-};
 
 // @public
 export namespace Plane {
@@ -2597,25 +2024,17 @@ export const PointerEvents: ComponentDefinition<PBPointerEvents>;
 // @public (undocumented)
 export const PointerEventsResult: ComponentDefinition<PBPointerEventsResult>;
 
-// Warning: (ae-missing-release-tag) "PointerEventsSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
-export type PointerEventsSystem = ReturnType<typeof createPointerEventSystem>;
-
-// Warning: (ae-missing-release-tag) "pointerEventsSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const pointerEventsSystem: {
-    removeOnClick(entity: Entity): void;
+export interface PointerEventsSystem {
+    onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
+    onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
     removeOnPointerDown(entity: Entity): void;
     removeOnPointerUp(entity: Entity): void;
-    onClick(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions> | undefined): void;
-    onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions> | undefined): void;
-    onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions> | undefined): void;
-};
+}
 
-// Warning: (ae-missing-release-tag) "PointerEventType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
+// @public
+export const pointerEventsSystem: PointerEventsSystem;
+
 // @public (undocumented)
 export const enum PointerEventType {
     // (undocumented)
@@ -2631,29 +2050,25 @@ export const enum PointerEventType {
 // @public (undocumented)
 export const PointerLock: ComponentDefinition<PBPointerLock>;
 
-// @public (undocumented)
-export type Position = {
-    top: PositionUnit;
-    right: PositionUnit;
+// @public
+export interface Position {
+    // (undocumented)
     bottom: PositionUnit;
+    // (undocumented)
     left: PositionUnit;
-};
+    // (undocumented)
+    right: PositionUnit;
+    // (undocumented)
+    top: PositionUnit;
+}
 
-// @public (undocumented)
+// @public
 export type PositionType = 'absolute' | 'relative';
 
-// Warning: (ae-missing-release-tag) "PositionUnit" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public
 export type PositionUnit = `${number}px` | `${number}%` | number;
 
-// Warning: (ae-missing-release-tag) "PutComponentMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type PutComponentMessage = CrdtMessageHeader & PutComponentMessageBody;
-
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-// Warning: (ae-missing-release-tag) "PutComponentMessageBody" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public
 export type PutComponentMessageBody = {
@@ -2663,17 +2078,6 @@ export type PutComponentMessageBody = {
     timestamp: number;
     data: Uint8Array;
 };
-
-// Warning: (ae-missing-release-tag) "PutComponentOperation" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export namespace PutComponentOperation {
-    const // (undocumented)
-    MESSAGE_HEADER_LENGTH = 20;
-    // (undocumented)
-    export function read(buf: ByteBuffer): PutComponentMessage | null;
-    export function write(entity: Entity, timestamp: number, componentDefinition: ComponentDefinition<unknown>, buf: ByteBuffer): void;
-}
 
 // @public
 export type Quaternion = Quaternion.ReadonlyQuaternion;
@@ -2740,10 +2144,7 @@ export const RAD2DEG: number;
 // @public (undocumented)
 export const Raycast: ComponentDefinition<PBRaycast>;
 
-// Warning: (ae-missing-release-tag) "RaycastHit" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "RaycastHit" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public
+// @public (undocumented)
 export interface RaycastHit {
     // (undocumented)
     direction: PBVector3 | undefined;
@@ -2761,14 +2162,6 @@ export interface RaycastHit {
     position: PBVector3 | undefined;
 }
 
-// @public
-export const RaycastHit: {
-    encode(message: RaycastHit, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): RaycastHit;
-};
-
-// Warning: (ae-missing-release-tag) "RaycastQueryType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum RaycastQueryType {
     // (undocumented)
@@ -2789,35 +2182,33 @@ export type RaycastResponsePayload<T> = {
 // @public (undocumented)
 export const RaycastResult: ComponentDefinition<PBRaycastResult>;
 
-// Warning: (ae-missing-release-tag) "ReactBasedUiSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
-export type ReactBasedUiSystem = {
+export interface ReactBasedUiSystem {
+    // (undocumented)
     destroy(): void;
+    // (undocumented)
     setUiRenderer(ui: UiComponent): void;
-};
+}
 
-// Warning: (ae-missing-release-tag) "ReactEcs" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export namespace ReactEcs {
     // (undocumented)
     export namespace JSX {
-        // (undocumented)
         export interface Component {
         }
         // (undocumented)
         export type Element = {} | null;
-        // (undocumented)
         export type IntrinsicElements = EcsElements;
     }
     const // (undocumented)
     createElement: any;
 }
 
-// Warning: (ae-missing-release-tag) "ReactEcsRenderer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (tsdoc-at-sign-in-word) The "@" character looks like part of a TSDoc tag; use a backslash to escape it
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
 //
-// @public (undocumented)
+// @public
 export const ReactEcsRenderer: ReactBasedUiSystem;
 
 // @public (undocumented)
@@ -2828,16 +2219,11 @@ export type ReadonlyComponentSchema<T extends [ComponentDefinition<unknown>, ...
 // @public (undocumented)
 export type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
 
-// Warning: (ae-missing-release-tag) "ReceiveMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type ReceiveMessage = CrdtMessageBody & {
     transportId?: number;
     messageBuffer: Uint8Array;
 };
-
-// @public
-export const RESERVED_STATIC_ENTITIES = 512;
 
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2908,13 +2294,13 @@ export namespace Schemas {
     const // (undocumented)
     Entity: ISchema<Entity>;
     const // (undocumented)
-    Enum: typeof IEnum;
+    Enum: <T>(type: ISchema<any>) => ISchema<T>;
     const // (undocumented)
-    Array: typeof IArray;
+    Array: <T>(type: ISchema<T>) => ISchema<T[]>;
     const // (undocumented)
-    Map: typeof IMap;
+    Map: <T extends Spec>(spec: T, defaultValue?: Partial<MapResult<T>> | undefined) => ISchema<MapResult<T>>;
     const // (undocumented)
-    Optional: typeof IOptional;
+    Optional: <T>(spec: ISchema<T>) => ISchema<T | undefined>;
 }
 
 // @public (undocumented)
@@ -2940,8 +2326,6 @@ export type SystemItem = {
 // @public (undocumented)
 export type Task<T = unknown> = () => Promise<T>;
 
-// Warning: (ae-missing-release-tag) "TextAlignMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum TextAlignMode {
     // (undocumented)
@@ -2970,9 +2354,6 @@ export type TextAlignType = 'top-left' | 'top-center' | 'top-right' | 'middle-le
 // @public (undocumented)
 export const TextShape: ComponentDefinition<PBTextShape>;
 
-// Warning: (ae-missing-release-tag) "Texture" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "Texture" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface Texture {
     filterMode?: TextureFilterMode | undefined;
@@ -2981,14 +2362,6 @@ export interface Texture {
     wrapMode?: TextureWrapMode | undefined;
 }
 
-// @public
-export const Texture: {
-    encode(message: Texture, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): Texture;
-};
-
-// Warning: (ae-missing-release-tag) "TextureFilterMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum TextureFilterMode {
     // (undocumented)
@@ -3003,18 +2376,18 @@ export const enum TextureFilterMode {
 export type TextureFilterType = 'point' | 'bi-linear' | 'tri-linear';
 
 // @public (undocumented)
-export type TextureHelper = {
-    Common: (texture: Texture) => TextureUnion;
+export interface TextureHelper {
+    // (undocumented)
     Avatar: (avatarTexture: AvatarTexture) => TextureUnion;
+    // (undocumented)
+    Common: (texture: Texture) => TextureUnion;
+    // (undocumented)
     Video: (videoTexture: VideoTexture) => TextureUnion;
-};
+}
 
 // @public
 export type TextureMode = 'nine-slices' | 'center' | 'stretch';
 
-// Warning: (ae-missing-release-tag) "TextureUnion" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "TextureUnion" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface TextureUnion {
     // (undocumented)
@@ -3030,14 +2403,6 @@ export interface TextureUnion {
     };
 }
 
-// @public
-export const TextureUnion: {
-    encode(message: TextureUnion, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): TextureUnion;
-};
-
-// Warning: (ae-missing-release-tag) "TextureWrapMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum TextureWrapMode {
     // (undocumented)
@@ -3059,8 +2424,6 @@ export const ToGammaSpace: number;
 // @public
 export const ToLinearSpace = 2.2;
 
-// Warning: (ae-missing-release-tag) "ToOptional" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
@@ -3104,8 +2467,6 @@ export type TransformType = {
 // @public (undocumented)
 export type TransformTypeWithOptionals = Partial<TransformType>;
 
-// Warning: (ae-missing-release-tag) "Transport" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type Transport = {
     send(message: Uint8Array): Promise<void>;
@@ -3113,56 +2474,61 @@ export type Transport = {
     filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
 };
 
-// Warning: (ae-missing-release-tag) "TransportMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
-// @public (undocumented)
-export type UiAvatarTexture = {
-    avatarTexture?: {
-        userId: string;
-        wrapMode?: TextureWrapType;
-        filterMode?: TextureFilterType;
-    };
-};
+// @public
+export interface UiAvatarTexture {
+    // (undocumented)
+    filterMode?: TextureFilterType;
+    // (undocumented)
+    userId: string;
+    // (undocumented)
+    wrapMode?: TextureWrapType;
+}
 
 // @public (undocumented)
 export const UiBackground: ComponentDefinition<PBUiBackground>;
 
-// @public (undocumented)
-export type UiBackgroundProps = {
+// @public
+export interface UiBackgroundProps {
+    avatarTexture?: UiAvatarTexture;
     color?: PBColor4 | undefined;
+    texture?: UiTexture;
+    // (undocumented)
     textureMode?: TextureMode;
     textureSlices?: BorderRect | undefined;
     uvs?: number[];
-} & UiTextureUnion;
+}
+
+// @public
+export interface UiButtonProps extends UiLabelProps, EntityPropTypes {
+    variant?: 'primary' | 'secondary';
+}
 
 // @public (undocumented)
-export type UiButtonProps = UiLabelProps & {
-    type?: 'primary' | 'secondary';
-};
-
-// Warning: (ae-missing-release-tag) "UiComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type UiComponent = () => JSX.Element;
+export type UiComponent = () => ReactEcs.JSX.Element;
 
 // @public (undocumented)
 export const UiDropdown: ComponentDefinition<PBUiDropdown>;
 
-// @public (undocumented)
-export type UiDropdownProps = Partial<Omit<PBUiDropdown, 'textAlign' | 'font'>> & {
-    onChange?(value: number): void;
+// @public
+export interface UiDropdownProps extends EntityPropTypes, Omit<Partial<PBUiDropdown>, 'textAlign' | 'font'> {
+    // (undocumented)
     font?: UiFontType;
+    // (undocumented)
+    onChange?(value: number): void;
+    // (undocumented)
     textAlign?: TextAlignType;
-};
+}
 
 // @public (undocumented)
 export const UiDropdownResult: ComponentDefinition<PBUiDropdownResult>;
 
-// @public (undocumented)
-export function UiEntity(props: EntityPropTypes & Partial<CommonProps>): ReactEcs.JSX.Element;
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
+//
+// @public
+export function UiEntity(props: EntityPropTypes): ReactEcs.JSX.Element;
 
 // @public (undocumented)
 export type UiFontType = 'sans-serif' | 'serif' | 'monospace';
@@ -3171,25 +2537,25 @@ export type UiFontType = 'sans-serif' | 'serif' | 'monospace';
 export const UiInput: ComponentDefinition<PBUiInput>;
 
 // @public (undocumented)
-export type UiInputProps = Omit<PBUiInput, 'font' | 'textAlign'> & {
-    onChange?(value: string): void;
+export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign'> {
+    // (undocumented)
     font?: UiFontType;
+    onChange?(value: string): void;
+    // (undocumented)
     textAlign?: TextAlignType;
-};
+}
 
 // @public (undocumented)
 export const UiInputResult: ComponentDefinition<PBUiInputResult>;
 
-// @public (undocumented)
-export type UiLabelProps = Omit<PBUiText, 'textAlign' | 'font'> & {
-    textAlign?: TextAlignType | undefined;
+// @public
+export interface UiLabelProps {
+    color?: PBColor4 | undefined;
     font?: UiFontType | undefined;
-};
-
-// Warning: (ae-missing-release-tag) "Uint32" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type Uint32 = number;
+    fontSize?: number | undefined;
+    textAlign?: TextAlignType | undefined;
+    value: string;
+}
 
 // @public
 export type uint32 = number;
@@ -3197,66 +2563,39 @@ export type uint32 = number;
 // @public (undocumented)
 export const UiText: ComponentDefinition<PBUiText>;
 
-// @public (undocumented)
+// @public
 export type UiTexture = {
-    texture?: {
-        src: string;
-        wrapMode?: TextureWrapType;
-        filterMode?: TextureFilterType;
-    };
+    src: string;
+    wrapMode?: TextureWrapType;
+    filterMode?: TextureFilterType;
 };
-
-// @public (undocumented)
-export type UiTextureUnion = UiAvatarTexture | UiTexture;
 
 // @public (undocumented)
 export const UiTransform: ComponentDefinition<PBUiTransform>;
 
-// @public (undocumented)
+// @public
 export interface UiTransformProps {
-    // (undocumented)
     alignContent?: AlignType;
-    // (undocumented)
     alignItems?: AlignType;
-    // (undocumented)
     alignSelf?: AlignType;
-    // (undocumented)
     display?: DisplayType;
-    // (undocumented)
     flex?: number;
-    // (undocumented)
     flexBasis?: number;
-    // (undocumented)
     flexDirection?: FlexDirectionType;
-    // (undocumented)
     flexGrow?: number;
-    // (undocumented)
     flexShrink?: number;
-    // (undocumented)
     flexWrap?: FlexWrapType;
-    // (undocumented)
     height?: PositionUnit;
-    // (undocumented)
     justifyContent?: JustifyType;
-    // (undocumented)
     margin?: Partial<Position>;
-    // (undocumented)
     maxHeight?: PositionUnit;
-    // (undocumented)
     maxWidth?: PositionUnit;
-    // (undocumented)
     minHeight?: PositionUnit;
-    // (undocumented)
     minWidth?: PositionUnit;
-    // (undocumented)
     overflow?: OverflowType;
-    // (undocumented)
     padding?: Partial<Position>;
-    // (undocumented)
     position?: Partial<Position>;
-    // (undocumented)
     positionType?: PositionType;
-    // (undocumented)
     width?: PositionUnit;
 }
 
@@ -3369,9 +2708,6 @@ export type Vector3Type = {
 // @public (undocumented)
 export const VideoPlayer: ComponentDefinition<PBVideoPlayer>;
 
-// Warning: (ae-missing-release-tag) "VideoTexture" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-// Warning: (ae-missing-release-tag) "VideoTexture" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface VideoTexture {
     filterMode?: TextureFilterMode | undefined;
@@ -3380,17 +2716,9 @@ export interface VideoTexture {
     wrapMode?: TextureWrapMode | undefined;
 }
 
-// @public
-export const VideoTexture: {
-    encode(message: VideoTexture, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): VideoTexture;
-};
-
 // @public (undocumented)
 export const VisibilityComponent: ComponentDefinition<PBVisibilityComponent>;
 
-// Warning: (ae-missing-release-tag) "YGAlign" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum YGAlign {
     // (undocumented)
@@ -3411,8 +2739,6 @@ export const enum YGAlign {
     YGA_STRETCH = 4
 }
 
-// Warning: (ae-missing-release-tag) "YGDisplay" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum YGDisplay {
     // (undocumented)
@@ -3421,8 +2747,6 @@ export const enum YGDisplay {
     YGD_NONE = 1
 }
 
-// Warning: (ae-missing-release-tag) "YGEdge" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum YGEdge {
     // (undocumented)
@@ -3445,8 +2769,6 @@ export const enum YGEdge {
     YGE_VERTICAL = 7
 }
 
-// Warning: (ae-missing-release-tag) "YGFlexDirection" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum YGFlexDirection {
     // (undocumented)
@@ -3459,8 +2781,6 @@ export const enum YGFlexDirection {
     YGFD_ROW_REVERSE = 3
 }
 
-// Warning: (ae-missing-release-tag) "YGJustify" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum YGJustify {
     // (undocumented)
@@ -3477,8 +2797,6 @@ export const enum YGJustify {
     YGJ_SPACE_EVENLY = 5
 }
 
-// Warning: (ae-missing-release-tag) "YGOverflow" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum YGOverflow {
     // (undocumented)
@@ -3489,8 +2807,6 @@ export const enum YGOverflow {
     YGO_VISIBLE = 0
 }
 
-// Warning: (ae-missing-release-tag) "YGPositionType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum YGPositionType {
     // (undocumented)
@@ -3499,8 +2815,6 @@ export const enum YGPositionType {
     YGPT_RELATIVE = 0
 }
 
-// Warning: (ae-missing-release-tag) "YGUnit" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum YGUnit {
     // (undocumented)
@@ -3513,8 +2827,6 @@ export const enum YGUnit {
     YGU_UNDEFINED = 0
 }
 
-// Warning: (ae-missing-release-tag) "YGWrap" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export const enum YGWrap {
     // (undocumented)
