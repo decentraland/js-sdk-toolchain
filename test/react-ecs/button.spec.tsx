@@ -1,30 +1,16 @@
-import {
-  Engine,
-  Entity,
-  createPointerEventSystem,
-  createInputSystem,
-  TextAlignMode,
-  Font
-} from '../../packages/@dcl/ecs/dist'
-import { components, IEngine } from '../../packages/@dcl/ecs/src'
-import {
-  ReactEcs,
-  createReactBasedUiSystem,
-  Button,
-  CANVAS_ROOT_ENTITY,
-  UiButtonProps
-} from '../../packages/@dcl/react-ecs/src'
+import { Entity, Font, TextAlignMode } from '../../packages/@dcl/ecs/dist'
+import { components } from '../../packages/@dcl/ecs/src'
+import { ReactEcs, Button, UiButtonProps } from '../../packages/@dcl/react-ecs/src'
+import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 import { Color4 } from '../../packages/@dcl/sdk/math'
+import { setupEngine } from './utils'
 
 describe('Button React Ecs', () => {
   it('validates button props', async () => {
-    const engine = Engine()
-    const input = createInputSystem(engine)
-    const pointerEventSystem = createPointerEventSystem(engine, input)
-    const renderer = createReactBasedUiSystem(engine, pointerEventSystem)
-    const UiTransform = components.UiTransform(engine as IEngine)
-    const UiText = components.UiText(engine as IEngine)
-    const UiBackground = components.UiBackground(engine as IEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const UiText = components.UiText(engine)
+    const UiBackground = components.UiBackground(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -34,10 +20,10 @@ describe('Button React Ecs', () => {
     const getBackground = (entity: Entity) => UiBackground.getOrNull(entity)
     let text = 'CASLA'
     let color: Color4 | undefined = undefined
-    let type: UiButtonProps['type'] = 'primary'
+    let type: UiButtonProps['variant'] = 'primary'
     const ui = () => (
       <Button
-        type={type}
+        variant={type}
         uiTransform={{ width: 100 }}
         value={text}
         color={color}
@@ -46,7 +32,7 @@ describe('Button React Ecs', () => {
       />
     )
 
-    renderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui)
     await engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({

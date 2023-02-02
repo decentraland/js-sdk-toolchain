@@ -5,12 +5,7 @@ import { AvatarTexture, Texture, TextureUnion } from '../generated/types.gen'
 /**
  * @public
  */
-export type MaterialComponentDefinition = ComponentDefinition<PBMaterial>
-
-/**
- * @public
- */
-export type TextureHelper = {
+export interface TextureHelper {
   /**
    * @returns a common texture with a source file
    */
@@ -25,7 +20,7 @@ export type TextureHelper = {
 /**
  * @public
  */
-export interface MaterialComponentDefinitionExtended extends MaterialComponentDefinition {
+export interface MaterialComponentDefinitionExtended extends ComponentDefinition<PBMaterial> {
   /**
    * Texture helpers with constructor
    */

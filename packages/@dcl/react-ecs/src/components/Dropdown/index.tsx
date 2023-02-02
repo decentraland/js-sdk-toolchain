@@ -1,8 +1,7 @@
-import { PBUiDropdown, pointerEventsSystem } from '@dcl/ecs'
+import { PBUiDropdown } from '@dcl/ecs'
 
 import { parseProps } from '../utils'
 import { ReactEcs } from '../../react-ecs'
-import { EntityPropTypes } from '../types'
 import { UiDropdownProps } from './types'
 import { getFont, getTextAlign } from '../Label/utils'
 
@@ -21,11 +20,25 @@ function parseUiDropdown(props: UiDropdownProps): PBUiDropdown {
 
 /**
  * @public
+ * Dropdown component
+ *
+ * A dropdown allows a user to select a value from a series of options.
+ *
+ * @example
+ * <Dropdown
+    options={['Red', 'Blue']}
+    color={Color4.Red()}
+    font="sans-serif"
+    fontSize={14}
+    selectedIndex={value}
+    onChange={(index) => value = index}
+  />
+ *
+ * @category Component
  */
 /*#__PURE__*/
-export function Dropdown(props: EntityPropTypes & UiDropdownProps) {
-  const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...otherProps } =
-    props
+export function Dropdown(props: UiDropdownProps) {
+  const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...otherProps } = props
   const dropdownProps = parseUiDropdown(otherProps)
   const commonProps = parseProps({
     uiTransform,

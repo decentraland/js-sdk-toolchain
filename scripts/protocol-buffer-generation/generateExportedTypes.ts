@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { snakeToPascal } from '../utils/snakeToPascal'
 
-function generaeteTypes(files: { name: string; path: string }[]) {
+function generateIndex(files: { name: string; path: string }[]) {
   return `
   export type { Position as PBPosition, Vector2 as PBVector2, Vector3 as PBVector3 } from './pb/decentraland/common/vectors.gen';
   export type { Color3 as PBColor3, Color4 as PBColor4 } from './pb/decentraland/common/colors.gen';
@@ -33,6 +33,6 @@ export default function generateTypes(pathDir: string) {
     (f) => !['PbId', 'PbColors', 'PbVectors'].includes(f.name)
   )
 
-  const typesContent = generaeteTypes(files)
+  const typesContent = generateIndex(files)
   fs.writeFileSync(path.resolve(pathDir, 'types.gen.ts'), typesContent)
 }

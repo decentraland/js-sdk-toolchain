@@ -2,19 +2,18 @@ import { PBUiText } from '@dcl/ecs'
 
 import { ReactEcs } from '../../react-ecs'
 import { getFont, getTextAlign } from '../Label/utils'
-import { EntityPropTypes } from '../types'
 import { parseUiBackground } from '../uiBackground'
 import { parseUiTransform } from '../uiTransform'
 import { UiButtonProps } from './types'
 
-function getButtonProps(props: EntityPropTypes & UiButtonProps) {
-  if (props.type === 'primary') {
+function getButtonProps(props: UiButtonProps) {
+  if (props.variant === 'primary') {
     return {
       uiBackground: { color: { r: 0.98, g: 0.17, b: 0.33, a: 1 } },
       uiText: { color: { r: 1, g: 1, b: 1, a: 1 } }
     }
   }
-  if (props.type === 'secondary') {
+  if (props.variant === 'secondary') {
     return {
       uiBackground: { color: { r: 1, g: 1, b: 1, a: 1 } },
       uiText: { color: { r: 0.98, g: 0.17, b: 0.33, a: 1 } }
@@ -24,12 +23,20 @@ function getButtonProps(props: EntityPropTypes & UiButtonProps) {
 }
 
 /**
+ *
  * @public
+ * Button component
+ *
+ * A Button indicates a possible user action.
+ *
+ * @example
+ * <Button variant="primary" value="Click me!" />
+ *
+ * @category Component
  */
 /*#__PURE__*/
-export function Button(props: EntityPropTypes & UiButtonProps) {
-  const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...otherProps } =
-    props
+export function Button(props: UiButtonProps) {
+  const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...otherProps } = props
   const buttonProps = getButtonProps(props)
   const uiBackgroundProps = parseUiBackground({
     ...buttonProps.uiBackground,

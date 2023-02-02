@@ -6,7 +6,7 @@ import { deepReadonly, DeepReadonly } from './readonly'
 /**
  * @public
  */
-export type ComponentDefinition<T> = {
+export interface ComponentDefinition<T> {
   readonly componentId: number
   readonly componentName: string
 
@@ -137,6 +137,9 @@ export type ComponentDefinition<T> = {
   isDirty(entity: Entity): boolean
 }
 
+/**
+ * @internal
+ */
 export function createComponentDefinitionFromSchema<T>(
   componentName: string,
   componentId: number,
