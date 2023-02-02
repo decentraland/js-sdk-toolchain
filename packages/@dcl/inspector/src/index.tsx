@@ -1,13 +1,41 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
-import App from './App'
+import App from './components/Tree'
 import reportWebVitals from './reportWebVitals'
+
+import { Tree } from './components/Tree'
+
+const tree: Tree = {
+  type: 'directory',
+  value: 'src',
+  childs: [{
+    type: 'directory',
+    value: 'components',
+    childs: [{
+      type: 'file',
+      value: 'Tree.tsx',
+      childs: []
+    }, {
+      type: 'file',
+      value: 'Tree.css',
+      childs: []
+    }]
+  }, {
+    type: 'file',
+    value: 'index.tsx',
+      childs: []
+  }, {
+    type: 'file',
+    value: 'index.css',
+      childs: []
+  }]
+}
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
-    <App />
+    <App value={tree} />
   </React.StrictMode>
 )
 
