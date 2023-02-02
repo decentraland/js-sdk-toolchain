@@ -2,8 +2,10 @@ name: "Release Api Reference"
 
 on:
   release:
+    branches:
+      - main
     types:
-      - created
+      - published
 
 jobs:
   run-updater:
