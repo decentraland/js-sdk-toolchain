@@ -4,7 +4,8 @@ import glob from 'glob'
 import path from 'path'
 import { CrdtMessageType, CrdtMessageHeader, engine } from '../packages/@dcl/ecs/src'
 import { ReadWriteByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import CrdtMessageProtocol, {
+import {
+  CrdtMessageProtocol,
   DeleteComponent,
   DeleteEntity,
   PutComponentOperation

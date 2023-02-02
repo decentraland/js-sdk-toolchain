@@ -7,7 +7,7 @@ import { ISchema } from '../ISchema'
 export type Color3Type = { r: number; g: number; b: number }
 
 /**
- * @public
+ * @internal
  */
 export const Color3Schema: ISchema<Color3Type> = {
   serialize(value: Color3Type, builder: ByteBuffer): void {

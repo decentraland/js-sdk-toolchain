@@ -3,7 +3,7 @@ import { ByteBuffer } from '../../serialization/ByteBuffer'
 import { ISchema } from '../ISchema'
 
 /**
- * @public
+ * @internal
  */
 export const EntitySchema: ISchema<Entity> = {
   serialize(value: Entity, builder: ByteBuffer): void {

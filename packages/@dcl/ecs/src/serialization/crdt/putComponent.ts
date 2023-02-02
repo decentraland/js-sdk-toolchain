@@ -1,9 +1,12 @@
-import CrdtMessageProtocol from '.'
+import { CrdtMessageProtocol } from '.'
 import { ComponentDefinition } from '../../engine/component'
 import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../ByteBuffer'
 import { CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH, PutComponentMessage } from './types'
 
+/**
+ * @internal
+ */
 export namespace PutComponentOperation {
   export const MESSAGE_HEADER_LENGTH = 20
 

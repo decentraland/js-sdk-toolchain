@@ -1,9 +1,5 @@
 import {
-  Engine,
-  IEngine,
   Entity,
-  createInputSystem,
-  createPointerEventSystem,
   YGWrap,
   YGUnit,
   YGFlexDirection,
@@ -13,31 +9,15 @@ import {
   YGPositionType,
   YGJustify
 } from '../../packages/@dcl/ecs'
-import { components, IEngine as IIEngine } from '../../packages/@dcl/ecs/src'
-import {
-  createReactBasedUiSystem,
-  Position,
-  PositionUnit,
-  ReactBasedUiSystem,
-  ReactEcs,
-  UiEntity,
-  CANVAS_ROOT_ENTITY
-} from '../../packages/@dcl/react-ecs/src'
+import { components } from '../../packages/@dcl/ecs/src'
+import { Position, PositionUnit, ReactEcs, UiEntity } from '../../packages/@dcl/react-ecs/src'
+import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
+import { setupEngine } from './utils'
 
 describe('UiTransform React Ecs', () => {
-  let engine: IEngine
-  let uiRenderer: ReactBasedUiSystem
-
-  beforeEach(() => {
-    engine = Engine()
-    uiRenderer = createReactBasedUiSystem(
-      engine,
-      createPointerEventSystem(engine, createInputSystem(engine))
-    )
-  })
-
   it('should send empty object if uiTransform is undefined', async () => {
-    const UiTransform = components.UiTransform(engine as IIEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -50,7 +30,8 @@ describe('UiTransform React Ecs', () => {
   })
 
   it('should send 0 if you send an invalid px', async () => {
-    const UiTransform = components.UiTransform(engine as IIEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -85,7 +66,8 @@ describe('UiTransform React Ecs', () => {
   })
 
   it('should send position transform properties', async () => {
-    const UiTransform = components.UiTransform(engine as IIEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -153,7 +135,8 @@ describe('UiTransform React Ecs', () => {
   })
 
   it('should send height & width properties', async () => {
-    const UiTransform = components.UiTransform(engine as IIEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
