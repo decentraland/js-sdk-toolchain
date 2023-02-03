@@ -2381,6 +2381,8 @@ export interface TextureHelper {
     Avatar: (avatarTexture: AvatarTexture) => TextureUnion;
     // (undocumented)
     Common: (texture: Texture) => TextureUnion;
+    // (undocumented)
+    Video: (videoTexture: VideoTexture) => TextureUnion;
 }
 
 // @public
