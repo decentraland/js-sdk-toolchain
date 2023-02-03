@@ -1,5 +1,6 @@
 import { CliError } from '../../../../../packages/@dcl/sdk/cli/utils/error'
 import * as helpers from '../../../../../packages/@dcl/sdk/cli/commands/build/helpers'
+import * as dclCompiler from '../../../../../packages/@dcl/dcl-rollup/compile'
 import * as build from '../../../../../packages/@dcl/sdk/cli/commands/build/index'
 import { initComponents } from '../../../../../packages/@dcl/sdk/cli/components'
 
@@ -97,7 +98,7 @@ describe('build command', () => {
     jest.spyOn(helpers, 'validatePackageJson').mockResolvedValue(true)
     jest.spyOn(helpers, 'needsDependencies').mockResolvedValue(false)
 
-    const tsBuildSpy = jest.spyOn(helpers, 'buildTypescript').mockResolvedValue()
+    const tsBuildSpy = jest.spyOn(dclCompiler, 'compile').mockResolvedValue()
 
     await build.main({
       args: { '--watch': true, '--production': true },
@@ -105,7 +106,7 @@ describe('build command', () => {
     })
 
     expect(tsBuildSpy).toBeCalledWith({
-      dir: process.cwd(),
+      project: process.cwd(),
       watch: true,
       production: true
     })

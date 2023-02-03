@@ -7,7 +7,7 @@
 
 import { getArgs } from './utils/args'
 import { toStringList } from './utils/out-messages'
-import log from './utils/log'
+import * as log from './utils/log'
 import { CliError } from './utils/error'
 import { COMMANDS_PATH, getCommands } from './utils/commands'
 import { CliComponents, initComponents } from './components'
@@ -28,12 +28,17 @@ interface FileExports {
 
 const listCommandsStr = (commands: string[]) => toStringList(commands.map(($) => `npx @dcl/sdk ${$}`))
 
-const handleError = (err: CliError) => {
-  if (!(err instanceof CliError)) {
+const handleError = (err: Error) => {
+  if (err instanceof CliError) {
+    log.fail(err.message)
+  } else {
+    // log with console to show stacktrace and debug information
+    console.error(err)
     log.warn(`Developer: All errors thrown must be an instance of "CliError"`)
   }
-  log.fail(err.message)
-  process.exit(1)
+
+  // set an exit code but not finish the program immediately to close any pending work
+  process.exitCode = 1
 }
 
 const commandFnsAreValid = (fns: FileExports): fns is Required<FileExports> => {
@@ -47,10 +52,9 @@ const commandFnsAreValid = (fns: FileExports): fns is Required<FileExports> => {
   return true
 }
 
-const args = getArgs()
-const helpMessage = (commands: string[]) => `Here is the list of commands:\n${listCommandsStr(commands)}`
-
-;(async () => {
+async function main() {
+  const helpMessage = (commands: string[]) => `Here is the list of commands:\n${listCommandsStr(commands)}`
+  const args = getArgs()
   const command = process.argv[2]
   const needsHelp = args['--help']
   const components: CliComponents = initComponents()
@@ -72,4 +76,6 @@ const helpMessage = (commands: string[]) => `Here is the list of commands:\n${li
     const options = { args: cmd.args, components }
     needsHelp ? await cmd.help(options) : await cmd.main(options)
   }
-})().catch(handleError)
+}
+
+main().catch(handleError)

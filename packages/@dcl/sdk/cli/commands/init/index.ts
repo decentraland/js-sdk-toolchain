@@ -6,7 +6,6 @@ import { CliComponents } from '../../components'
 import { isDirectoryEmpty, download, extract } from '../../utils/fs'
 
 import { get as getRepo } from './repos'
-import { main as handler } from '../../utils/handler'
 
 interface Options {
   args: typeof args
@@ -21,7 +20,7 @@ export const args = getArgs({
 
 export async function help() {}
 
-export const main = handler(async function main(options: Options) {
+export async function main(options: Options) {
   const dir = resolve(process.cwd(), options.args['--dir'] || '.')
   const isEmpty = await isDirectoryEmpty(options.components, dir)
   const yes = options.args['--yes']
@@ -38,7 +37,7 @@ export const main = handler(async function main(options: Options) {
   await extract(zip, dir)
   await options.components.fs.unlink(zip)
   await moveFilesFromDirs(options.components, dir, contentFolders)
-})
+}
 
 const moveFilesFromDir = async (components: Pick<CliComponents, 'fs'>, dir: string, folder: string) => {
   const files = await components.fs.readdir(folder)
