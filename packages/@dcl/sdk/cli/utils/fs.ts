@@ -36,6 +36,6 @@ export async function download(
  */
 export async function extract(path: string, dest: string): Promise<string> {
   const destPath = resolve(dest)
-  await extractZip(path, { dir: destPath })
+  await extractZip(resolve(path), { dir: destPath })
   return destPath
 }
