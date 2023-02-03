@@ -98,17 +98,18 @@ describe('build command', () => {
     jest.spyOn(helpers, 'validatePackageJson').mockResolvedValue(true)
     jest.spyOn(helpers, 'needsDependencies').mockResolvedValue(false)
 
-    const tsBuildSpy = jest.spyOn(dclCompiler, 'compile').mockResolvedValue()
+    const tsBuildSpy = jest.spyOn(dclCompiler, 'compile').mockResolvedValue(null as any)
 
     await build.main({
-      args: { '--watch': true, '--production': true },
+      args: { '--watch': false, '--production': true },
       components
     })
 
     expect(tsBuildSpy).toBeCalledWith({
       project: process.cwd(),
-      watch: true,
-      production: true
+      watch: false,
+      production: true,
+      watchingFuture: expect.anything()
     })
   })
 })

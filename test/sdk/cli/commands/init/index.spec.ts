@@ -1,6 +1,5 @@
 import * as prompt from '../../../../../packages/@dcl/sdk/cli/utils/prompt'
 import * as fsUtils from '../../../../../packages/@dcl/sdk/cli/utils/fs'
-import { CliError } from '../../../../../packages/@dcl/sdk/cli/utils/error'
 import * as init from '../../../../../packages/@dcl/sdk/cli/commands/init/index'
 import { initComponents } from '../../../../../packages/@dcl/sdk/cli/components'
 
@@ -97,10 +96,6 @@ describe('init command', () => {
 
     const components = initComponents()
 
-    try {
-      await init.main({ args: { _: [], '--yes': true }, components })
-    } catch (e) {
-      expect(e).toBeInstanceOf(CliError)
-    }
+    await expect(() => init.main({ args: { _: [], '--yes': true }, components })).rejects.toThrow()
   })
 })
