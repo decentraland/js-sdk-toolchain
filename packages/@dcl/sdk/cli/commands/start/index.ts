@@ -86,7 +86,7 @@ export async function main(options: Options) {
   }
 
   // after the watcher is running, start the server
-  await preview({ args: { '--dir': dir, '--port': port }, ...comps })
+  const server = await preview({ args: { '--dir': dir, '--port': port }, ...comps })
 
   const networkInterfaces = os.networkInterfaces()
   const availableURLs: string[] = []
@@ -139,4 +139,7 @@ export async function main(options: Options) {
       console.log('Unable to open browser automatically.')
     }
   }
+
+  // this signal is resolved by: (wkc)program.stop(), SIGTERM, SIGHUP
+  await server.components.signaler.programClosed
 }
