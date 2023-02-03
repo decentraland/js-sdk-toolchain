@@ -10,7 +10,6 @@ import future from 'fp-future'
 
 import { CliComponents } from '../../components'
 import { getArgs } from '../../utils/args'
-import { main as handler } from '../../utils/handler'
 import { PreviewComponents } from './types'
 import { validateExistingProject, validateSceneOptions } from './project'
 import { previewPort } from './port'
@@ -36,7 +35,7 @@ export const args = getArgs({
 
 // copy/paste from https://github.com/decentraland/cli/blob/32de96bcfc4ef1c26c5580c7767ad6c8cac3b367/src/lib/Decentraland.ts
 // TODO: refactor this stuff completely
-export const main = handler(async function main(options: Options) {
+export async function main(options: Options) {
   const dir = resolve(process.cwd(), options.args['--dir'] || '.')
   await validateExistingProject(options.components, dir)
   await validateSceneOptions(options.components, dir)
@@ -84,5 +83,8 @@ export const main = handler(async function main(options: Options) {
     }
   })
 
+  // bubble up the exception if startedFuture was rejected
+  await startedFuture
+
   return
-})
+}

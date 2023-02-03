@@ -2,6 +2,7 @@ import { resolve } from 'path'
 
 import { IFileSystemComponent } from '../../components/fs'
 import { exec } from '../../utils/exec'
+import { info, succeed } from '../../utils/log'
 import { Dict, hasPrimitiveKeys } from '../../utils/object'
 
 /**
@@ -73,23 +74,16 @@ export const npm = /^win/.test(process.platform) ? 'npm.cmd' : 'npm'
  * Runs "npm install" for desired project
  */
 export async function installDependencies(dir: string): Promise<void> {
-  await exec(dir, `${npm} install`)
+  info('Installing dependencies...')
+  // TODO: test in windows
+  await exec(dir, npm, ['install'])
+  succeed('Dependencies installed')
 }
 
 /**
- * Build's Typescript using "tsconfig.json" file
+ * Run NPM commands
  */
-export const buildTypescript = async ({
-  dir,
-  watch,
-  production
-}: {
-  dir: string
-  watch: boolean
-  production: boolean
-}): Promise<void> => {
-  const command = watch ? 'watch' : 'build'
-  await exec(dir, `${npm} run ${command}`, {
-    env: { NODE_ENV: production ? 'production' : '' }
-  })
+export async function npmRun(cwd: string, command: string, ...args: string[]): Promise<void> {
+  // TODO: test in windows
+  await exec(cwd, npm, ['run', command, '--silent', '--', ...args], { env: process.env as any })
 }
