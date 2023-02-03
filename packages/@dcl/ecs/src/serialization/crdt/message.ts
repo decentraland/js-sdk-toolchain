@@ -1,4 +1,4 @@
-import CrdtMessageProtocol, { DeleteComponent, DeleteEntity, PutComponentOperation } from '.'
+import { CrdtMessageProtocol, DeleteComponent, DeleteEntity, PutComponentOperation } from '.'
 import { ByteBuffer } from '../ByteBuffer'
 import { CrdtMessageType, CrdtMessage } from './types'
 

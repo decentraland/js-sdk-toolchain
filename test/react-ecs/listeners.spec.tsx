@@ -1,41 +1,18 @@
-import {
-  Engine,
-  Entity,
-  createPointerEventSystem,
-  createInputSystem
-} from '../../packages/@dcl/ecs'
-import {
-  components,
-  IEngine,
-  PointerEventType
-} from '../../packages/@dcl/ecs/src'
-import {
-  createReactBasedUiSystem,
-  ReactEcs,
-  UiEntity
-} from '../../packages/@dcl/react-ecs/src'
+import { Entity } from '../../packages/@dcl/ecs'
+import { components, PointerEventType } from '../../packages/@dcl/ecs/src'
+import { ReactEcs, UiEntity } from '../../packages/@dcl/react-ecs/src'
 import { createTestPointerDownCommand } from '../ecs/events/utils'
+import { setupEngine } from './utils'
 
 describe('Ui MosueDown React Ecs', () => {
-  const engine = Engine()
-  const Input = createInputSystem(engine)
-  const uiRenderer = createReactBasedUiSystem(
-    engine,
-    createPointerEventSystem(engine, Input)
-  )
+  const { engine, uiRenderer } = setupEngine()
 
-  const PointerEventsResult = components.PointerEventsResult(engine as IEngine)
+  const PointerEventsResult = components.PointerEventsResult(engine)
   const uiEntity = ((engine.addEntity() as number) + 1) as Entity
   let fakeCounter = 0
   const mouseDownEvent = () => {
     PointerEventsResult.createOrReplace(engine.RootEntity, {
-      commands: [
-        createTestPointerDownCommand(
-          uiEntity,
-          fakeCounter + 1,
-          PointerEventType.PET_DOWN
-        )
-      ]
+      commands: [createTestPointerDownCommand(uiEntity, fakeCounter + 1, PointerEventType.PET_DOWN)]
     })
     fakeCounter += 1
   }
@@ -44,9 +21,7 @@ describe('Ui MosueDown React Ecs', () => {
     counter++
   }
 
-  const ui = () => (
-    <UiEntity uiTransform={{ width: 100 }} onMouseDown={onMouseDown} />
-  )
+  const ui = () => <UiEntity uiTransform={{ width: 100 }} onMouseDown={onMouseDown} />
   uiRenderer.setUiRenderer(ui)
 
   it('the counter should be 0 at the begginning', async () => {
@@ -95,25 +70,13 @@ describe('Ui MosueDown React Ecs', () => {
 })
 
 describe('Ui MouseUp React Ecs', () => {
-  const engine = Engine()
-  const Input = createInputSystem(engine)
-  const uiRenderer = createReactBasedUiSystem(
-    engine,
-    createPointerEventSystem(engine, Input)
-  )
-
-  const PointerEventsResult = components.PointerEventsResult(engine as IEngine)
+  const { engine, uiRenderer } = setupEngine()
+  const PointerEventsResult = components.PointerEventsResult(engine)
   const uiEntity = ((engine.addEntity() as number) + 1) as Entity
   let fakeCounter = 0
   const mouseDownEvent = () => {
     PointerEventsResult.createOrReplace(engine.RootEntity, {
-      commands: [
-        createTestPointerDownCommand(
-          uiEntity,
-          fakeCounter + 1,
-          PointerEventType.PET_UP
-        )
-      ]
+      commands: [createTestPointerDownCommand(uiEntity, fakeCounter + 1, PointerEventType.PET_UP)]
     })
     fakeCounter += 1
   }
@@ -122,9 +85,7 @@ describe('Ui MouseUp React Ecs', () => {
     counter++
   }
 
-  const ui = () => (
-    <UiEntity uiTransform={{ width: 100 }} onMouseUp={onMouseUp} />
-  )
+  const ui = () => <UiEntity uiTransform={{ width: 100 }} onMouseUp={onMouseUp} />
   uiRenderer.setUiRenderer(ui)
 
   it('the counter should be 0 at the begginning', async () => {

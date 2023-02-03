@@ -2,7 +2,7 @@ import { ByteBuffer } from '../../serialization/ByteBuffer'
 import { ISchema } from '../ISchema'
 
 /**
- * @public
+ * @internal
  */
 export const FlatString: ISchema<string> = {
   serialize(value: string, builder: ByteBuffer): void {
@@ -17,6 +17,6 @@ export const FlatString: ISchema<string> = {
 }
 
 /**
- * @public
+ * @internal
  */
 export const EcsString = FlatString

@@ -4,12 +4,7 @@ import { ColliderLayer, MeshCollider, PBMeshCollider } from '../generated/index.
 /**
  * @public
  */
-export type MeshColliderComponentDefinition = ComponentDefinition<PBMeshCollider>
-
-/**
- * @public
- */
-export interface MeshColliderComponentDefinitionExtended extends MeshColliderComponentDefinition {
+export interface MeshColliderComponentDefinitionExtended extends ComponentDefinition<PBMeshCollider> {
   /**
    * @public
    * Set a box in the MeshCollider component

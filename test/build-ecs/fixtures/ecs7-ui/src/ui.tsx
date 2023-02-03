@@ -64,8 +64,8 @@ const uiComponent = () => (
       fontSize={16}
       textAlign="middle-center"
     />
-    <Button type="primary" value="Primary Button" />
-    <Button type="secondary" value="Secondary Button" />
+    <Button variant="primary" value="Primary Button" />
+    <Button variant="secondary" value="Secondary Button" />
   </UiEntity>
 )
 
