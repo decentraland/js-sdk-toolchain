@@ -85,7 +85,7 @@ describe('build:helpers', () => {
 
     await helpers.npmRun('some/path', 'build', 'a')
 
-    expect(execSpy).toBeCalledWith('some/path', 'npm', ['run', 'build', '--', 'a'], {
+    expect(execSpy).toBeCalledWith('some/path', 'npm', ['run', 'build', '--silent', '--', 'a'], {
       env: process.env
     })
   })

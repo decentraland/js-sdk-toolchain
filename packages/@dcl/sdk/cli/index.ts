@@ -76,6 +76,10 @@ async function main() {
     const options = { args: cmd.args, components }
     needsHelp ? await cmd.help(options) : await cmd.main(options)
   }
+
+  // rollup watcher leaves many open FSWatcher even in build mode. we must call
+  // process.exit at this point to prevent the program halting forever
+  process.exit(process.exitCode || 0)
 }
 
 main().catch(handleError)

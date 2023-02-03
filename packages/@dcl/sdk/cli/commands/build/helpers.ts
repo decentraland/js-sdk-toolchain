@@ -85,5 +85,5 @@ export async function installDependencies(dir: string): Promise<void> {
  */
 export async function npmRun(cwd: string, command: string, ...args: string[]): Promise<void> {
   // TODO: test in windows
-  await exec(cwd, npm, ['run', command, '--', ...args], { env: process.env as any })
+  await exec(cwd, npm, ['run', command, '--silent', '--', ...args], { env: process.env as any })
 }

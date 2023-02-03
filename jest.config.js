@@ -20,6 +20,12 @@ module.exports = {
       lines: 100,
       statements: 100,
     },
+    "packages/@dcl/dcl-rollup": {
+      branches: 10,
+      functions: 10,
+      lines: 10,
+      statements: 10
+    },
     "packages/@dcl/ecs/src/components/generated/pb": {
       branches: 70,
       functions: 70,
