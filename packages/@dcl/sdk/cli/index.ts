@@ -48,7 +48,7 @@ const commandFnsAreValid = (fns: FileExports): fns is Required<FileExports> => {
 }
 
 const args = getArgs()
-const helpMessage = (commands: string[]) => `Here is the list of commands: ${listCommandsStr(commands)}`
+const helpMessage = (commands: string[]) => `Here is the list of commands:\n${listCommandsStr(commands)}`
 
 ;(async () => {
   const command = process.argv[2]
