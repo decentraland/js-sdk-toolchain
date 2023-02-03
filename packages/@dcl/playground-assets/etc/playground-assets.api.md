@@ -1608,6 +1608,7 @@ export interface PBMaterial_PbrMaterial {
 
 // @public (undocumented)
 export interface PBMaterial_UnlitMaterial {
+    albedoColor?: PBColor4 | undefined;
     alphaTest?: number | undefined;
     castShadows?: boolean | undefined;
     texture?: TextureUnion | undefined;
