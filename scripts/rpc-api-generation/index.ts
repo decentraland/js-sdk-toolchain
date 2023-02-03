@@ -37,7 +37,8 @@ const NON_EXPOSED_LIST_NAMES: string[] = [
   'Permissions',
   'DevTools',
   'Permissions',
-  'PortableExperiences'
+  'PortableExperiences',
+  'ParcelIdentity'
 ]
 
 async function internalCompile() {

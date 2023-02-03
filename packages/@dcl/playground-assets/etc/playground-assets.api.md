@@ -1970,6 +1970,16 @@ export interface PBVector3 {
 }
 
 // @public (undocumented)
+export interface PBVideoPlayer {
+    loop?: boolean | undefined;
+    playbackRate?: number | undefined;
+    playing?: boolean | undefined;
+    position?: number | undefined;
+    src: string;
+    volume?: number | undefined;
+}
+
+// @public (undocumented)
 export interface PBVisibilityComponent {
     visible?: boolean | undefined;
 }
@@ -2385,6 +2395,9 @@ export interface TextureUnion {
     } | {
         $case: "avatarTexture";
         avatarTexture: AvatarTexture;
+    } | {
+        $case: "videoTexture";
+        videoTexture: VideoTexture;
     };
 }
 
@@ -2689,6 +2702,17 @@ export type Vector3Type = {
     y: number;
     z: number;
 };
+
+// @public (undocumented)
+export const VideoPlayer: ComponentDefinition<PBVideoPlayer>;
+
+// @public (undocumented)
+export interface VideoTexture {
+    filterMode?: TextureFilterMode | undefined;
+    // (undocumented)
+    videoPlayerEntity: number;
+    wrapMode?: TextureWrapMode | undefined;
+}
 
 // @public (undocumented)
 export const VisibilityComponent: ComponentDefinition<PBVisibilityComponent>;
