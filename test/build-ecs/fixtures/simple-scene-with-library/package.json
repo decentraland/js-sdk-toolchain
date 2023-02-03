@@ -9,9 +9,9 @@
   "license": "Apache-2.0",
   "scripts": {
     "start": "dcl start",
-    "build": "build-ecs",
-    "build-prod": "build-ecs --production",
-    "watch": "build-ecs --watch"
+    "build": "sdk-commands build",
+    "build-prod": "sdk-commands build --production",
+    "watch": "sdk-commands build --watch"
   },
   "devDependencies": {
     "@dcl/dcl-rollup": "file:../../../../packages/@dcl/dcl-rollup",

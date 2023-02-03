@@ -9,12 +9,11 @@
   "description": "My new Decentraland project",
   "scripts": {
     "start": "dcl start",
-    "build": "build-ecs",
-    "build-prod": "build-ecs --production",
-    "watch": "build-ecs --watch"
+    "build": "sdk-commands build",
+    "build-prod": "sdk-commands build --production",
+    "watch": "sdk-commands build --watch"
   },
   "devDependencies": {
-    "@dcl/dcl-rollup": "file:../../../../packages/@dcl/dcl-rollup",
     "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime",
     "@dcl/sdk": "file:../../../../packages/@dcl/sdk"
   }

@@ -16,4 +16,10 @@ export type PreviewComponents = {
   ethereumProvider: HTTPProvider
   rooms: RoomComponent
   ws: WebSocketComponent
+  signaler: ISignalerComponent
+}
+
+export type ISignalerComponent = {
+  // programClosed resolves when the component is stopped
+  programClosed: Promise<void>
 }
