@@ -3,7 +3,7 @@ import * as extractZip from '../../../../packages/@dcl/sdk/node_modules/extract-
 import * as fsUtils from '../../../../packages/@dcl/sdk/cli/utils/fs'
 import { createFsComponent } from '../../../../packages/@dcl/sdk/cli/components/fs'
 import { createFetchComponent } from '../../../../packages/@dcl/sdk/cli/components/fetch'
-import path from 'path'
+import path, { resolve } from 'path'
 
 afterEach(() => {
   jest.clearAllMocks()
@@ -40,8 +40,8 @@ describe('utils/fs', () => {
     const dist = await fsUtils.extract('some/path', './other/path')
 
     expect(dist).toBe(path.resolve('./other/path'))
-    expect(extractSpy).toBeCalledWith('some/path', {
-      dir: dist
+    expect(extractSpy).toBeCalledWith(resolve('some/path'), {
+      dir: resolve(dist)
     })
   })
 })

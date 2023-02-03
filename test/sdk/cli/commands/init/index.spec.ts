@@ -39,6 +39,9 @@ describe('init command', () => {
     const downloadSpy = jest.spyOn(fsUtils, 'download').mockResolvedValue('1')
     const extractSpy = jest.spyOn(fsUtils, 'extract').mockImplementation()
     const removeSpy = jest.spyOn(components.fs, 'unlink').mockImplementation()
+    jest.spyOn(components.fs, 'readdir').mockResolvedValue(['test'])
+    jest.spyOn(components.fs, 'rename').mockImplementation()
+    jest.spyOn(components.fs, 'rmdir').mockImplementation()
 
     await init.main({ args: { _: [] }, components })
 
@@ -54,6 +57,9 @@ describe('init command', () => {
     const downloadSpy = jest.spyOn(fsUtils, 'download').mockImplementation()
     const extractSpy = jest.spyOn(fsUtils, 'extract').mockImplementation()
     const removeSpy = jest.spyOn(components.fs, 'unlink').mockImplementation()
+    jest.spyOn(components.fs, 'readdir').mockResolvedValue(['test'])
+    jest.spyOn(components.fs, 'rename').mockImplementation()
+    jest.spyOn(components.fs, 'rmdir').mockImplementation()
 
     await init.main({ args: { _: [], '--yes': true }, components })
 
@@ -61,6 +67,27 @@ describe('init command', () => {
     expect(downloadSpy).toBeCalled()
     expect(extractSpy).toBeCalled()
     expect(removeSpy).toBeCalled()
+  })
+
+  it('main: should move files out of dirs', async () => {
+    const components = initComponents()
+    const confirmSpy = jest.spyOn(prompt, 'confirm')
+    const downloadSpy = jest.spyOn(fsUtils, 'download').mockImplementation()
+    const extractSpy = jest.spyOn(fsUtils, 'extract').mockImplementation()
+    const removeSpy = jest.spyOn(components.fs, 'unlink').mockImplementation()
+    const readdirSpy = jest.spyOn(components.fs, 'readdir').mockResolvedValue(['test'])
+    const renameSpy = jest.spyOn(components.fs, 'rename').mockImplementation()
+    const rmdirSpy = jest.spyOn(components.fs, 'rmdir').mockImplementation()
+
+    await init.main({ args: { _: [], '--yes': true }, components })
+
+    expect(confirmSpy).not.toBeCalled()
+    expect(downloadSpy).toBeCalled()
+    expect(extractSpy).toBeCalled()
+    expect(removeSpy).toBeCalled()
+    expect(readdirSpy).toBeCalled()
+    expect(renameSpy).toBeCalled()
+    expect(rmdirSpy).toBeCalled()
   })
 
   it('main: should throw if something wrong happens', async () => {

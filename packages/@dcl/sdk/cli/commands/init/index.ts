@@ -33,7 +33,29 @@ export const main = handler(async function main(options: Options) {
   }
 
   const scene = 'scene-template'
-  const zip = await download(options.components, getRepo(scene), join(dir, `${scene}.zip`))
+  const { url, contentFolders } = getRepo(scene)
+  const zip = await download(options.components, url, join(dir, `${scene}.zip`))
   await extract(zip, dir)
   await options.components.fs.unlink(zip)
+  await moveFilesFromDirs(options.components, dir, contentFolders)
 })
+
+const moveFilesFromDir = async (components: Pick<CliComponents, 'fs'>, dir: string, folder: string) => {
+  const files = await components.fs.readdir(folder)
+  await Promise.all(
+    files.map(($) => {
+      const filePath = resolve(folder, $)
+      return components.fs.rename(filePath, resolve(dir, $))
+    })
+  )
+  await components.fs.rmdir(folder)
+}
+
+const moveFilesFromDirs = async (components: Pick<CliComponents, 'fs'>, dir: string, folders: string[]) => {
+  await Promise.all(
+    folders.map(($) => {
+      const folderPath = resolve(dir, $)
+      return moveFilesFromDir(components, dir, folderPath)
+    })
+  )
+}
