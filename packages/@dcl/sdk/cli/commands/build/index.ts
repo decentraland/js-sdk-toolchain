@@ -89,7 +89,9 @@ export async function main(options: Options) {
   // track stuff...
   // https://github.com/decentraland/cli/blob/main/src/commands/build.ts
 
-  // rollup watcher leaves many open FSWatcher even in build mode. we must call
-  // process.exit at this point to prevent the program halting forever
-  process.exit(process.exitCode)
+  if (!watch) {
+    // rollup watcher leaves many open FSWatcher even in build mode. we must call
+    // process.exit at this point to prevent the program halting forever
+    process.exit(process.exitCode)
+  }
 }
