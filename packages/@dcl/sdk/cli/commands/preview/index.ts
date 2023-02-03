@@ -81,7 +81,7 @@ export async function main(options: Options) {
       }
     },
     async main({ components, startComponents }) {
-      await wire(dir, components, !!options.args['--watch'])
+      await wire(dir, components)
       await startComponents()
     }
   })
