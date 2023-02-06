@@ -1,34 +1,13 @@
-import {
-  Engine,
-  IEngine,
-  Entity,
-  createPointerEventSystem,
-  createInputSystem,
-  MAX_U16
-} from '../../packages/@dcl/ecs'
-import { components, IEngine as IIEngine } from '../../packages/@dcl/ecs/src'
-import {
-  createReactBasedUiSystem,
-  ReactBasedUiSystem,
-  ReactEcs,
-  UiEntity,
-  CANVAS_ROOT_ENTITY
-} from '../../packages/@dcl/react-ecs/src'
+import { Entity, MAX_U16 } from '../../packages/@dcl/ecs/src/engine/entity'
+import { components } from '../../packages/@dcl/ecs/src'
+import { ReactEcs, UiEntity } from '../../packages/@dcl/react-ecs/src'
+import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
+import { setupEngine } from './utils'
 
 describe('RectEcs UI ✨', () => {
-  let engine: IEngine
-  let uiRenderer: ReactBasedUiSystem
-
-  beforeEach(() => {
-    engine = Engine()
-    uiRenderer = createReactBasedUiSystem(
-      engine,
-      createPointerEventSystem(engine, createInputSystem(engine))
-    )
-  })
-
   it('should generate a UI and update the width', async () => {
-    const UiTransform = components.UiTransform(engine as IIEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -85,7 +64,8 @@ describe('RectEcs UI ✨', () => {
     expect(getUi(entityA).width).toBe(400)
   })
   it('should add a child at the beggining and then remove it', async () => {
-    const UiTransform = components.UiTransform(engine as IIEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -177,7 +157,8 @@ describe('RectEcs UI ✨', () => {
     expect(UiTransform.getOrNull(entityAdded)).toBe(null)
   })
   it('should add a child at the middle and then remove it', async () => {
-    const UiTransform = components.UiTransform(engine as IIEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -264,7 +245,8 @@ describe('RectEcs UI ✨', () => {
     expect(UiTransform.getOrNull(entityAdded)).toBe(null)
   })
   it('should add a child at the end and then remove it', async () => {
-    const UiTransform = components.UiTransform(engine as IIEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -351,7 +333,8 @@ describe('RectEcs UI ✨', () => {
     expect(UiTransform.getOrNull(entityAdded)).toBe(null)
   })
   it('should add a child at the middle with multiple childs and then remove it', async () => {
-    const UiTransform = components.UiTransform(engine as IIEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -446,7 +429,8 @@ describe('RectEcs UI ✨', () => {
     expect(UiTransform.getOrNull(addedEntityB)).toBe(null)
   })
   it('should iterate the array on every tick and update values', async () => {
-    const UiTransform = components.UiTransform(engine as IIEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -571,7 +555,8 @@ describe('RectEcs UI ✨', () => {
   })
 
   it('should update rightOf of the array', async () => {
-    const UiTransform = components.UiTransform(engine as IIEngine)
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -648,12 +633,7 @@ describe('RectEcs UI ✨', () => {
     expect(getUi(entityA).rightOf).toBe(entityC)
     expect(getUi(entityB).rightOf).toBe(entityA)
 
-    uiEntities = [
-      uiEntities[0],
-      uiEntities[1],
-      { id: 5, value: 5 },
-      ...uiEntities.slice(2)
-    ]
+    uiEntities = [uiEntities[0], uiEntities[1], { id: 5, value: 5 }, ...uiEntities.slice(2)]
     await engine.update(1)
     const entityE = ((entityD as number) + 1) as Entity
     expect(getUi(entityD).rightOf).toBe(undefined)

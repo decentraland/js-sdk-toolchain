@@ -7,8 +7,14 @@ import { Entity, EntityState } from '../engine/entity'
 import { IInputSystem } from '../engine/input'
 import { checkNotThenable } from '../runtime/invariant'
 
+/**
+ * @public
+ */
 export type EventSystemCallback = (event: PBPointerEventsResult_PointerCommand) => void
 
+/**
+ * @public
+ */
 export type EventSystemOptions = {
   button: InputAction
   hoverText?: string
@@ -16,9 +22,61 @@ export type EventSystemOptions = {
   showFeedback?: boolean
 }
 
-export type PointerEventsSystem = ReturnType<typeof createPointerEventSystem>
+/**
+ * @public
+ */
+export interface PointerEventsSystem {
+  /**
+   * @internal
+   * Remove the callback for onClick event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnClick(entity: Entity): void
+  /**
+   * @public
+   * Remove the callback for onPointerDown event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnPointerDown(entity: Entity): void
 
-export function createPointerEventSystem(engine: IEngine, inputSystem: IInputSystem) {
+  /**
+   * @public
+   * Remove the callback for onPointerUp event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnPointerUp(entity: Entity): void
+
+  /**
+   * @internal
+   * Execute callback when the user clicks the entity.
+   * @param entity - Entity to attach the callback
+   * @param cb - Function to execute when onPointerDown fires
+   * @param opts - Opts to trigger Feedback and Button
+   */
+  onClick(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void
+
+  /**
+   * @public
+   * Execute callback when the user press the InputButton pointing at the entity
+   * @param entity - Entity to attach the callback
+   * @param cb - Function to execute when click fires
+   * @param opts - Opts to trigger Feedback and Button
+   */
+  onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void
+  /**
+   * @public
+   * Execute callback when the user releases the InputButton pointing at the entity
+   * @param entity - Entity to attach the callback
+   * @param cb - Function to execute when click fires
+   * @param opts - Opts to trigger Feedback and Button
+   */
+  onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void
+}
+
+/**
+ * @internal
+ */
+export function createPointerEventSystem(engine: IEngine, inputSystem: IInputSystem): PointerEventsSystem {
   const PointerEvents = components.PointerEvents(engine)
 
   enum EventType {
@@ -107,40 +165,18 @@ export function createPointerEventSystem(engine: IEngine, inputSystem: IInputSys
   })
 
   return {
-    /**
-     * @internal
-     * Remove the callback for onClick event
-     * @param entity - Entity where the callback was attached
-     */
     removeOnClick(entity: Entity) {
       removeEvent(entity, EventType.Click)
     },
 
-    /**
-     * @public
-     * Remove the callback for onPointerDown event
-     * @param entity - Entity where the callback was attached
-     */
     removeOnPointerDown(entity: Entity) {
       removeEvent(entity, EventType.Down)
     },
 
-    /**
-     * @public
-     * Remove the callback for onPointerUp event
-     * @param entity - Entity where the callback was attached
-     */
     removeOnPointerUp(entity: Entity) {
       removeEvent(entity, EventType.Up)
     },
 
-    /**
-     * @internal
-     * Execute callback when the user clicks the entity.
-     * @param entity - Entity to attach the callback
-     * @param cb - Function to execute when onPointerDown fires
-     * @param opts - Opts to trigger Feedback and Button
-     */
     onClick(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>) {
       const options = getDefaultOpts(opts)
       // Clear previous event with over feedback included
@@ -151,13 +187,6 @@ export function createPointerEventSystem(engine: IEngine, inputSystem: IInputSys
       setPointerEvent(entity, PointerEventType.PET_DOWN, options)
     },
 
-    /**
-     * @public
-     * Execute callback when the user press the InputButton pointing at the entity
-     * @param entity - Entity to attach the callback
-     * @param cb - Function to execute when click fires
-     * @param opts - Opts to trigger Feedback and Button
-     */
     onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>) {
       const options = getDefaultOpts(opts)
       removeEvent(entity, EventType.Down)
@@ -165,13 +194,6 @@ export function createPointerEventSystem(engine: IEngine, inputSystem: IInputSys
       setPointerEvent(entity, PointerEventType.PET_DOWN, options)
     },
 
-    /**
-     * @public
-     * Execute callback when the user releases the InputButton pointing at the entity
-     * @param entity - Entity to attach the callback
-     * @param cb - Function to execute when click fires
-     * @param opts - Opts to trigger Feedback and Button
-     */
     onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>) {
       const options = getDefaultOpts(opts)
       removeEvent(entity, EventType.Up)

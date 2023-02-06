@@ -98,6 +98,9 @@ const InternalInputStateSchema = {
 const TimestampUpdateSystemPriority = 1 << 20
 const ButtonStateUpdateSystemPriority = 0
 
+/**
+ * @internal
+ */
 export function createInputSystem(engine: IEngine): IInputSystem {
   const PointerEventsResult = components.PointerEventsResult(engine)
   const InternalInputStateComponent = engine.defineComponent(

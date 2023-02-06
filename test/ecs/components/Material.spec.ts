@@ -6,7 +6,8 @@ import {
   MaterialTransparencyMode,
   PBMaterial,
   PBMaterial_PbrMaterial,
-  PBMaterial_UnlitMaterial
+  PBMaterial_UnlitMaterial,
+  VideoPlayer
 } from '../../../packages/@dcl/ecs/src'
 
 function createPbrMaterial(pbr: PBMaterial_PbrMaterial): PBMaterial {
@@ -155,7 +156,8 @@ describe('Generated Material ProtoBuf', () => {
     Material.create(
       entityD,
       createUnlitMaterial({
-        castShadows: true
+        castShadows: true,
+        albedoColor: { r: 0, g: 1, b: 1, a: 1 }
       })
     )
 
@@ -225,6 +227,42 @@ describe('Generated Material ProtoBuf', () => {
             }
           },
           roughness: 0.3
+        }
+      }
+    })
+  })
+
+  it('should test video texture helper cases', () => {
+    const newEngine = Engine()
+    const Material = components.Material(newEngine)
+    const entity = newEngine.addEntity()
+
+    expect(Material.getOrNull(entity)).toBeNull()
+
+    VideoPlayer.create(entity, {
+      playing: true,
+      position: 0.0,
+      src: 'someVideo.mp4'
+    })
+
+    Material.setBasicMaterial(entity, {
+      texture: Material.Texture.Video({
+        videoPlayerEntity: entity as number
+      })
+    })
+
+    expect(Material.get(entity)).toStrictEqual<PBMaterial>({
+      material: {
+        $case: 'unlit',
+        unlit: {
+          texture: {
+            tex: {
+              $case: 'videoTexture',
+              videoTexture: {
+                videoPlayerEntity: entity as number
+              }
+            }
+          }
         }
       }
     })

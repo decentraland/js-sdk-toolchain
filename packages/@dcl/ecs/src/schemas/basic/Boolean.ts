@@ -2,7 +2,7 @@ import { ByteBuffer } from '../../serialization/ByteBuffer'
 import { ISchema } from '../ISchema'
 
 /**
- * @public
+ * @internal
  */
 export const Bool: ISchema<boolean> = {
   serialize(value: boolean, builder: ByteBuffer): void {

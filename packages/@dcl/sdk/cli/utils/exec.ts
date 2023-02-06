@@ -5,10 +5,14 @@ interface Options {
   silent: boolean
 }
 
-export function exec(cwd: string, command: string, { env, silent }: Partial<Options> = {}): Promise<void> {
+export function exec(
+  cwd: string,
+  command: string,
+  args: string[],
+  { env, silent }: Partial<Options> = {}
+): Promise<void> {
   return new Promise((resolve, reject) => {
-    const [cmd, ...rest] = command.split(' ')
-    const child = spawn(cmd, rest, {
+    const child = spawn(command, args, {
       shell: true,
       cwd,
       env: { ...process.env, NODE_ENV: '', ...env }
@@ -27,8 +31,8 @@ export function exec(cwd: string, command: string, { env, silent }: Partial<Opti
 
     child.on('close', (code: number) => {
       if (code !== 0) {
-        const command = `${cmd} ${rest.join(' ')}`
-        reject(new Error(`Command "${command}" exited with code ${code}. Please try running the command manually`))
+        const _ = `${command} ${args.join(' ')}`
+        reject(new Error(`Command "${_}" exited with code ${code}. Please try running the command manually`))
         return
       }
 

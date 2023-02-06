@@ -1,33 +1,13 @@
-import {
-  Engine,
-  IEngine,
-  Entity,
-  createPointerEventSystem,
-  createInputSystem
-} from '../../packages/@dcl/ecs'
-import { components, IEngine as IIEngine } from '../../packages/@dcl/ecs/src'
-import {
-  UiEntity,
-  ReactEcs,
-  ReactBasedUiSystem,
-  createReactBasedUiSystem
-} from '../../packages/@dcl/react-ecs/src'
+import { Entity } from '../../packages/@dcl/ecs/src/engine'
+import { components } from '../../packages/@dcl/ecs/src'
+import { UiEntity, ReactEcs } from '../../packages/@dcl/react-ecs/src'
+import { setupEngine } from './utils'
 
 describe('Render UI System', () => {
-  let engine: IEngine
-  let uiRenderer: ReactBasedUiSystem
-
-  beforeEach(() => {
-    engine = Engine()
-    uiRenderer = createReactBasedUiSystem(
-      engine,
-      createPointerEventSystem(engine, createInputSystem(engine))
-    )
-  })
-
   it('should remove the ui and the entities', async () => {
+    const { engine, uiRenderer } = setupEngine()
     const ui = () => <UiEntity uiTransform={{ width: 1 }} />
-    const UiTransform = components.UiTransform(engine as IIEngine)
+    const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
     const getUiTransform = (entity: Entity) => UiTransform.getOrNull(entity)
     const divEntity = (entityIndex + 1) as Entity

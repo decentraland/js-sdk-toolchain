@@ -2,20 +2,18 @@ import { resolve } from 'path'
 
 import { CliComponents } from '../../components'
 import { toStringList } from '../../utils/out-messages'
-import { succeed } from '../../utils/log'
 import { getArgs } from '../../utils/args'
 import { CliError } from '../../utils/error'
+import { compile } from '@dcl/dcl-rollup/compile'
+import future from 'fp-future'
 import {
   getProjectStructure,
-  buildTypescript,
   installDependencies,
   needsDependencies,
   validateProjectStructure,
   validatePackageJson,
   REQUIRED_PACKAGE_JSON
 } from './helpers'
-import { main as handler } from '../../utils/handler'
-import { info } from 'console'
 
 interface Options {
   args: Omit<typeof args, '_'>
@@ -33,7 +31,7 @@ export const args = getArgs({
 
 export function help() {
   return `
-  Usage: 'dcl build [options]'
+  Usage: 'dcl-commands build [options]'
     Options:'
       -h, --help                Displays complete help
       -w, --watch               Watch for file changes and build on change
@@ -43,11 +41,11 @@ export function help() {
 
     Example:
     - Build your scene:
-      '$ dcl build'
+      '$ dcl-commands build'
   `
 }
 
-export const main = handler(async function main(options: Options) {
+export async function main(options: Options) {
   const dir = resolve(process.cwd(), options.args['--dir'] || '.')
   const projectStructure = getProjectStructure()
 
@@ -58,8 +56,6 @@ export const main = handler(async function main(options: Options) {
       ${toStringList(projectStructure)}`)
   }
 
-  succeed('Project has a valid structure')
-
   const hasValidPackageJson = await validatePackageJson(options.components, dir, REQUIRED_PACKAGE_JSON)
 
   if (!hasValidPackageJson) {
@@ -67,25 +63,29 @@ export const main = handler(async function main(options: Options) {
       ${JSON.stringify(REQUIRED_PACKAGE_JSON, null, 2)}`)
   }
 
-  succeed('Project has a valid "package.json"')
-
   const shouldInstallDeps = await needsDependencies(options.components, dir)
 
   if (shouldInstallDeps && !options.args['--skip-install']) {
-    info('Installing dependencies...')
     await installDependencies(dir)
   }
 
-  succeed('Dependencies installed')
+  const watch = !!options.args['--watch']
 
-  await buildTypescript({
-    dir,
-    watch: !!options.args['--watch'],
-    production: !!options.args['--production']
+  const watchingFuture = future<any>()
+
+  await compile({
+    project: dir,
+    watch,
+    production: !!options.args['--production'],
+    watchingFuture
   })
 
-  succeed('Project built successfully!')
+  if (!watch) {
+    watchingFuture.resolve(null)
+  }
+
+  await watchingFuture
 
   // track stuff...
   // https://github.com/decentraland/cli/blob/main/src/commands/build.ts
-})
+}

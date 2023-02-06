@@ -1,5 +1,4 @@
 /** @alpha THIS FILE INITIALIZES THE DECENTRALAND RUNTIME. WILL CHANGE SOON */
-
 import { engine } from '@dcl/ecs'
 import { pollEvents, setSubscribeFunction } from './observables'
 import { subscribe, sendBatch, crdtSendToRenderer, crdtGetState } from '~system/EngineApi'

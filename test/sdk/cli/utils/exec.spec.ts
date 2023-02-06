@@ -29,7 +29,7 @@ describe('utils/exec', () => {
       cb(0)
     })
 
-    const res = await execUtils.exec(process.cwd(), 'run some test')
+    const res = await execUtils.exec(process.cwd(), 'run', ['some', 'test'])
 
     expect(spawnSpy).toBeCalledWith('run', ['some', 'test'], {
       shell: true,
@@ -47,7 +47,7 @@ describe('utils/exec', () => {
       cb(0)
     })
 
-    const res = await execUtils.exec(process.cwd(), 'run some test', {
+    const res = await execUtils.exec(process.cwd(), 'run', ['some', 'test'], {
       env: { someKey: '1' }
     })
 
@@ -67,7 +67,7 @@ describe('utils/exec', () => {
       cb(0)
     })
 
-    const res = await execUtils.exec(process.cwd(), 'run some test', {
+    const res = await execUtils.exec(process.cwd(), 'run', ['some', 'test'], {
       env: { someKey: '1' },
       silent: true
     })
@@ -87,7 +87,7 @@ describe('utils/exec', () => {
       cb('The compiler is watching file changes...')
     })
 
-    const res = await execUtils.exec(process.cwd(), 'run some test', {
+    const res = await execUtils.exec(process.cwd(), 'run', ['some', 'test'], {
       env: { someKey: '1' },
       silent: true
     })
@@ -109,7 +109,7 @@ describe('utils/exec', () => {
     let error
 
     try {
-      await execUtils.exec(process.cwd(), 'run some test', {
+      await execUtils.exec(process.cwd(), 'run', ['some', 'test'], {
         env: { someKey: '1' },
         silent: true
       })

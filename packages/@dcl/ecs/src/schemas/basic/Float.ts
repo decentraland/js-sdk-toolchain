@@ -2,7 +2,7 @@ import { ByteBuffer } from '../../serialization/ByteBuffer'
 import { ISchema } from '../ISchema'
 
 /**
- * @public
+ * @internal
  */
 export const Float32: ISchema<number> = {
   serialize(value: number, builder: ByteBuffer): void {
@@ -17,7 +17,7 @@ export const Float32: ISchema<number> = {
 }
 
 /**
- * @public
+ * @internal
  */
 export const Float64: ISchema<number> = {
   serialize(value: number, builder: ByteBuffer): void {
