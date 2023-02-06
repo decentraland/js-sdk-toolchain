@@ -1,4 +1,4 @@
-import { CrdtMessageProtocol } from '.'
+import { CrdtMessageProtocol } from './crdtMessageProtocol'
 import { ComponentDefinition } from '../../engine/component'
 import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../ByteBuffer'

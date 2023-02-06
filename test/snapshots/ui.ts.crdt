@@ -7,8 +7,8 @@ EVAL test/snapshots/ui.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 28k
-  MALLOC_COUNT = 22834
-  ALIVE_OBJS_DELTA ~= 3.34k
+  MALLOC_COUNT = 22978
+  ALIVE_OBJS_DELTA ~= 3.38k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 2

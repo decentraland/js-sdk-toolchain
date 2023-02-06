@@ -1,4 +1,4 @@
-import { CrdtMessageProtocol } from '.'
+import { CrdtMessageProtocol } from './crdtMessageProtocol'
 import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../ByteBuffer'
 import { CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH, DeleteEntityMessage } from './types'

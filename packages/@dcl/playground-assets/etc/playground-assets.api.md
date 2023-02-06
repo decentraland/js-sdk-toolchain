@@ -470,24 +470,6 @@ export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 // @public
 export const DEG2RAD: number;
 
-// Warning: (ae-missing-release-tag) "DeleteComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export namespace DeleteComponent {
-    const // (undocumented)
-    MESSAGE_HEADER_LENGTH = 12;
-    // (undocumented)
-    export function read(buf: ByteBuffer): DeleteComponentMessage | null;
-    export function write(entity: Entity, componentId: number, timestamp: number, buf: ByteBuffer): void;
-}
-
-// Warning: (ae-missing-release-tag) "DeleteComponentMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type DeleteComponentMessage = CrdtMessageHeader & DeleteComponentMessageBody;
-
-// Warning: (ae-missing-release-tag) "DeleteComponentMessageBody" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type DeleteComponentMessageBody = {
     type: CrdtMessageType.DELETE_COMPONENT;
@@ -2097,17 +2079,6 @@ export type PutComponentMessageBody = {
     timestamp: number;
     data: Uint8Array;
 };
-
-// Warning: (ae-missing-release-tag) "PutComponentOperation" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export namespace PutComponentOperation {
-    const // (undocumented)
-    MESSAGE_HEADER_LENGTH = 16;
-    // (undocumented)
-    export function read(buf: ByteBuffer): PutComponentMessage | null;
-    export function write(entity: Entity, timestamp: number, componentDefinition: ComponentDefinition<unknown>, buf: ByteBuffer): void;
-}
 
 // @public
 export type Quaternion = Quaternion.ReadonlyQuaternion;

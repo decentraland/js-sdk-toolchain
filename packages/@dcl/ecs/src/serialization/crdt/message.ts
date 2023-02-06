@@ -1,6 +1,9 @@
-import { CrdtMessageProtocol, DeleteComponent, DeleteEntity, PutComponentOperation } from '.'
+import { CrdtMessageProtocol } from './crdtMessageProtocol'
 import { ByteBuffer } from '../ByteBuffer'
 import { CrdtMessageType, CrdtMessage } from './types'
+import { PutComponentOperation } from './putComponent'
+import { DeleteComponent } from './deleteComponent'
+import { DeleteEntity } from './deleteEntity'
 
 export function readMessage(buf: ByteBuffer): CrdtMessage | null {
   const header = CrdtMessageProtocol.getHeader(buf)
