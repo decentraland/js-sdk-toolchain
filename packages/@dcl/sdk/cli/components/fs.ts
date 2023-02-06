@@ -8,7 +8,10 @@ import * as fsPromises from 'fs/promises'
  */
 export type IFileSystemComponent = Pick<typeof fs, 'createReadStream'> &
   Pick<typeof fs, 'createWriteStream'> &
-  Pick<typeof fsPromises, 'access' | 'opendir' | 'stat' | 'unlink' | 'mkdir' | 'readFile' | 'writeFile'> & {
+  Pick<
+    typeof fsPromises,
+    'access' | 'opendir' | 'stat' | 'unlink' | 'mkdir' | 'readFile' | 'writeFile' | 'rename' | 'rmdir'
+  > & {
     constants: Pick<typeof fs.constants, 'F_OK' | 'R_OK'>
   } & {
     existPath(path: string): Promise<boolean>
@@ -37,12 +40,14 @@ export function createFsComponent(): IFileSystemComponent {
     stat: fsPromises.stat,
     unlink: fsPromises.unlink,
     mkdir: fsPromises.mkdir,
+    rmdir: fsPromises.rmdir,
     readdir: fsPromises.readdir,
     readFile: fsPromises.readFile,
     constants: {
       F_OK: fs.constants.F_OK,
       R_OK: fs.constants.R_OK
     },
+    rename: fsPromises.rename,
     existPath
   }
 }

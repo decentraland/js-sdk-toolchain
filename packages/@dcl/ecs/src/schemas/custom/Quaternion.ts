@@ -7,7 +7,7 @@ import { ISchema } from '../ISchema'
 export type QuaternionType = { x: number; y: number; z: number; w: number }
 
 /**
- * @public
+ * @internal
  */
 export const QuaternionSchema: ISchema<QuaternionType> = {
   serialize(value: QuaternionType, builder: ByteBuffer): void {

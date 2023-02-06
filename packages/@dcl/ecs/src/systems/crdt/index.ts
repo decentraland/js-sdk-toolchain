@@ -2,9 +2,10 @@ import { crdtProtocol } from '@dcl/crdt'
 import { ComponentDataMessage, CRDTMessageType, ProcessMessageResultType } from '@dcl/crdt/dist/types'
 
 import { Entity, EntityState, EntityUtils } from '../../engine/entity'
-import type { ComponentDefinition, IEngine } from '../../engine'
+import type { ComponentDefinition } from '../../engine'
+import type { PreEngine } from '../../engine/types'
 import { ReadWriteByteBuffer } from '../../serialization/ByteBuffer'
-import CrdtMessageProtocol from '../../serialization/crdt'
+import { CrdtMessageProtocol } from '../../serialization/crdt'
 import { DeleteComponent } from '../../serialization/crdt/deleteComponent'
 import { DeleteEntity } from '../../serialization/crdt/deleteEntity'
 import { PutComponentOperation } from '../../serialization/crdt/putComponent'
@@ -20,12 +21,11 @@ export type OnChangeFunction = (
   component?: ComponentDefinition<any>
 ) => void
 
-export function crdtSceneSystem(
-  engine: Pick<IEngine, 'getComponentOrNull' | 'getComponent' | 'entityContainer' | 'componentsIter'>,
-  onProcessEntityComponentChange: OnChangeFunction | null
-) {
+/**
+ * @internal
+ */
+export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChange: OnChangeFunction | null) {
   const transports: Transport[] = []
-
   // CRDT Client
   const crdtClient = crdtProtocol<Uint8Array>({
     toEntityId: EntityUtils.toEntityId,

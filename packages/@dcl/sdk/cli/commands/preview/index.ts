@@ -1,17 +1,16 @@
 import { resolve } from 'path'
-import { Lifecycle } from '@well-known-components/interfaces'
+import future from 'fp-future'
+import { Lifecycle, IBaseComponent } from '@well-known-components/interfaces'
 import { roomsMetrics, createRoomsComponent } from '@dcl/mini-comms/dist/adapters/rooms'
 import { createRecordConfigComponent } from '@well-known-components/env-config-provider'
 import { createServerComponent } from '@well-known-components/http-server'
 import { createConsoleLogComponent } from '@well-known-components/logger'
 import { createTestMetricsComponent } from '@well-known-components/metrics'
 import { createWsComponent } from './ws'
-import future from 'fp-future'
 
 import { CliComponents } from '../../components'
 import { getArgs } from '../../utils/args'
-import { main as handler } from '../../utils/handler'
-import { PreviewComponents } from './types'
+import { ISignalerComponent, PreviewComponents } from './types'
 import { validateExistingProject, validateSceneOptions } from './project'
 import { previewPort } from './port'
 import { providerInstance } from './eth'
@@ -36,17 +35,14 @@ export const args = getArgs({
 
 // copy/paste from https://github.com/decentraland/cli/blob/32de96bcfc4ef1c26c5580c7767ad6c8cac3b367/src/lib/Decentraland.ts
 // TODO: refactor this stuff completely
-export const main = handler(async function main(options: Options) {
+export async function main(options: Options) {
   const dir = resolve(process.cwd(), options.args['--dir'] || '.')
   await validateExistingProject(options.components, dir)
   await validateSceneOptions(options.components, dir)
 
   const port = options.args['--port'] || (await previewPort())
-  const startedFuture = future<void>()
 
-  setTimeout(() => startedFuture.reject(new Error('Timed out starting the server')), 3000)
-
-  await Lifecycle.run<PreviewComponents>({
+  const program = await Lifecycle.run<PreviewComponents>({
     async initComponents() {
       const metrics = createTestMetricsComponent(roomsMetrics)
       const config = createRecordConfigComponent({
@@ -63,6 +59,16 @@ export const main = handler(async function main(options: Options) {
         config
       })
 
+      const programClosed = future<void>()
+      const signaler: IBaseComponent & ISignalerComponent = {
+        programClosed,
+        async stop() {
+          // this promise is resolved upon SIGTERM or SIGHUP
+          // or when program.stop is called
+          programClosed.resolve()
+        }
+      }
+
       return {
         logs,
         ethereumProvider: providerInstance,
@@ -70,19 +76,15 @@ export const main = handler(async function main(options: Options) {
         config,
         metrics,
         server,
-        ws
+        ws,
+        signaler
       }
     },
     async main({ components, startComponents }) {
-      try {
-        await wire(dir, components, !!options.args['--watch'])
-        await startComponents()
-        startedFuture.resolve()
-      } catch (err: any) {
-        startedFuture.reject(err)
-      }
+      await wire(dir, components)
+      await startComponents()
     }
   })
 
-  return
-})
+  return program
+}

@@ -77,48 +77,16 @@ describe('build:helpers', () => {
 
     await helpers.installDependencies('some/path')
 
-    expect(execSpy).toBeCalledWith('some/path', expect.any(String))
+    expect(execSpy).toBeCalledWith('some/path', 'npm', ['install'])
   })
 
-  it('buildTypescript: should build Typescript', async () => {
+  it('npmRun: should build pass on the process.env', async () => {
     const execSpy = jest.spyOn(execUtils, 'exec').mockResolvedValue()
 
-    await helpers.buildTypescript({
-      dir: 'some/path',
-      watch: false,
-      production: false
-    })
+    await helpers.npmRun('some/path', 'build', 'a')
 
-    expect(execSpy).toBeCalledWith('some/path', expect.stringContaining('build'), {
-      env: { NODE_ENV: '' }
-    })
-  })
-
-  it('buildTypescript: should build Typescript for production', async () => {
-    const execSpy = jest.spyOn(execUtils, 'exec').mockResolvedValue()
-
-    await helpers.buildTypescript({
-      dir: 'some/path',
-      watch: false,
-      production: true
-    })
-
-    expect(execSpy).toBeCalledWith('some/path', expect.stringContaining('build'), {
-      env: { NODE_ENV: 'production' }
-    })
-  })
-
-  it('buildTypescript: should watch Typescript', async () => {
-    const execSpy = jest.spyOn(execUtils, 'exec').mockResolvedValue()
-
-    await helpers.buildTypescript({
-      dir: 'some/path',
-      watch: true,
-      production: true
-    })
-
-    expect(execSpy).toBeCalledWith('some/path', expect.stringContaining('watch'), {
-      env: { NODE_ENV: 'production' }
+    expect(execSpy).toBeCalledWith('some/path', 'npm', ['run', 'build', '--silent', '--', 'a'], {
+      env: process.env
     })
   })
 })

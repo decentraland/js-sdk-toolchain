@@ -4,9 +4,15 @@ import { createGSet } from '@dcl/crdt/dist/gset'
  * @public It only defines the type explicitly, no effects.
  */
 export type uint32 = number
+/**
+ * @internal
+ */
 export const MAX_U16 = 0xffff
-export const MASK_UPPER_16_ON_32 = 0xffff0000
+const MASK_UPPER_16_ON_32 = 0xffff0000
 
+/**
+ * @internal
+ */
 export const AMOUNT_VERSION_AVAILABLE = MAX_U16 + 1
 
 /**
@@ -27,15 +33,19 @@ export type Entity = number & {
 // This type matches with @dcl/crdt entity type.
 
 /**
- * @public This first 512 entities are reserved by the renderer
+ * @internal
+ * This first 512 entities are reserved by the renderer
  */
 export const RESERVED_STATIC_ENTITIES = 512
 
 /**
- * @public
+ * @internal
  */
 export const MAX_ENTITY_NUMBER = MAX_U16
 
+/**
+ * @internal
+ */
 export namespace EntityUtils {
   /**
    * @returns [entityNumber, entityVersion]
@@ -74,6 +84,9 @@ export enum EntityState {
   Reserved = 3
 }
 
+/**
+ * @intenral
+ */
 export type EntityContainer = {
   generateEntity(): Entity
   removeEntity(entity: Entity): boolean
@@ -86,6 +99,9 @@ export type EntityContainer = {
   updateUsedEntity(entity: Entity): boolean
 }
 
+/**
+ * @internal
+ */
 export function EntityContainer(): EntityContainer {
   let entityCounter = RESERVED_STATIC_ENTITIES
   const usedEntities: Set<Entity> = new Set()

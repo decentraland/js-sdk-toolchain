@@ -3,39 +3,40 @@ import { Color4 } from '@dcl/ecs/dist/components/generated/pb/decentraland/commo
 
 /**
  * @public
+ * Background Component props
+ * .i.e to define a background color or image
  */
-export type UiBackgroundProps = {
+export interface UiBackgroundProps {
+  /** Background color. @defaultValue `{ r: 1, g: 1, b: 1, a: 1 }` */
   color?: Color4 | undefined
   textureMode?: TextureMode
+  /** Texture slices represents the top | right | bottom | left sizes of the slices for the borders. Values are percentages of the texture. */
   textureSlices?: BorderRect | undefined
+  /** when STRETCH is selected, the uvs are configurable */
   uvs?: number[]
-} & UiTextureUnion
-
+  /** AvatarTexture for the background */
+  avatarTexture?: UiAvatarTexture
+  /** Texture for the background */
+  texture?: UiTexture
+}
 /**
+ * Avatar Texture
  * @public
  */
-export type UiTextureUnion = UiAvatarTexture | UiTexture
-
-/**
- * @public
- */
-export type UiAvatarTexture = {
-  avatarTexture?: {
-    userId: string
-    wrapMode?: TextureWrapType
-    filterMode?: TextureFilterType
-  }
+export interface UiAvatarTexture {
+  userId: string
+  wrapMode?: TextureWrapType
+  filterMode?: TextureFilterType
 }
 
 /**
+ * Texture
  * @public
  */
 export type UiTexture = {
-  texture?: {
-    src: string
-    wrapMode?: TextureWrapType
-    filterMode?: TextureFilterType
-  }
+  src: string
+  wrapMode?: TextureWrapType
+  filterMode?: TextureFilterType
 }
 
 /**

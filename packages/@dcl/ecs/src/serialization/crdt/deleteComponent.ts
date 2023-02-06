@@ -1,8 +1,11 @@
-import CrdtMessageProtocol from '.'
+import { CrdtMessageProtocol } from '.'
 import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../ByteBuffer'
 import { CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH, DeleteComponentMessage } from './types'
 
+/**
+ * @internal
+ */
 export namespace DeleteComponent {
   export const MESSAGE_HEADER_LENGTH = 12
 

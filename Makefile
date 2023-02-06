@@ -14,6 +14,11 @@ PROTOBUF_ZIP = protoc-$(PROTOBUF_VERSION)-linux-x86_64.zip
 endif
 endif
 
+SED_OPTION = -i
+ifeq ($(shell uname),Darwin)
+SED_OPTION=-i ""
+endif
+
 PROTOC = node_modules/.bin/protobuf/bin/protoc
 SCENE_PROTO_FILES := $(wildcard packages/@dcl/ecs/node_modules/@dcl/protocol/proto/decentraland/kernel/apis/*.proto)
 PBS_TS = $(SCENE_PROTO_FILES:packages/@dcl/ecs/node_modules/@dcl/protocol/proto/decentraland/kernel/apis/%.proto=scripts/rpc-api-generation/src/proto/%.gen.ts)
@@ -49,7 +54,11 @@ node_modules/.bin/protobuf/bin/protoc:
 	chmod +x ./node_modules/.bin/protobuf/bin/protoc
 
 docs:
-	./node_modules/.bin/typedoc
+	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/docs.spec.ts
+# Cloudflare doesn't allow a directory called functions. 🪄🎩
+	mv api-docs/functions api-docs/funcs
+	find ./api-docs -type f -name '*.html' \
+  | xargs sed ${SED_OPTION} -E 's:(href="[^"]+)functions/:\1funcs/:g'
 
 test-watch:
 	node_modules/.bin/jest --detectOpenHandles --colors --watch --roots "test"
@@ -87,7 +96,8 @@ deep-clean:
 		packages/@dcl/dcl-rollup/node_modules/ \
 		packages/@dcl/ecs/node_modules/ \
 		packages/@dcl/react-ecs/node_modules/ \
-		packages/@dcl/sdk/node_modules/
+		packages/@dcl/sdk/node_modules/ \
+		packages/@dcl/inspector/node_modules/
 	make clean
 
 update-snapshots:
@@ -100,6 +110,7 @@ clean:
 	@rm -rf coverage/
 	@rm -rf packages/@dcl/dcl-rollup/*.js packages/@dcl/dcl-rollup/*.d.ts
 	@rm -rf packages/@dcl/sdk/*.js packages/@dcl/sdk/*.d.ts packages/@dcl/sdk/internal
+	@rm -rf packages/@dcl/inspector/*.js packages/@dcl/inspector/*.d.ts packages/@dcl/inspector/build
 	@find packages/@dcl/sdk/cli -name "*.js" ! -path "packages/@dcl/sdk/cli/commands/preview/proto/*" -type f -delete
 	@find packages/@dcl/sdk/cli -name "*.d.ts" ! -path "packages/@dcl/sdk/cli/commands/preview/proto/*" -type f -delete
 	@rm -rf packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/

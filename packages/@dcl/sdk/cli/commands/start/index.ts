@@ -7,7 +7,8 @@ import { main as build } from '../build'
 import { main as preview } from '../preview'
 import { previewPort } from '../preview/port'
 import { getArgs } from '../../utils/args'
-import { main as handler } from '../../utils/handler'
+import { npmRun } from '../build/helpers'
+
 interface Options {
   args: typeof args
   components: Pick<CliComponents, 'fetch' | 'fs'>
@@ -60,32 +61,41 @@ export function help() {
 `
 }
 
-export const main = handler(async function main(options: Options) {
+export async function main(options: Options) {
   const dir = resolve(process.cwd(), options.args['--dir'] || '.')
   const isCi = args['--ci'] || process.env.CI || false
   const debug = !args['--no-debug'] && !isCi
   const openBrowser = !args['--no-browser'] && !isCi
   const skipBuild = args['--skip-build']
-  const watch = !args['--no-watch'] && !isCi && !skipBuild
+  const watch = !args['--no-watch']
   const enableWeb3 = args['--web3']
   const port = parseInt(args['--port']!, 10) || (await previewPort())
   const baseCoords = { x: 0, y: 0 }
   const hasPortableExperience = false
 
   const comps = { components: options.components }
+
+  // first run `npm run build`, this can be disabled with --skip-build
   if (!skipBuild) {
+    await npmRun(dir, 'build')
+  }
+
+  // then start the embedded compiler, this can be disabled with --no-watch
+  if (watch) {
     await build({ args: { '--dir': dir, '--watch': watch }, ...comps })
   }
-  await preview({ args: { '--dir': dir, '--port': port }, ...comps })
 
-  const ifaces = os.networkInterfaces()
+  // after the watcher is running, start the server
+  const server = await preview({ args: { '--dir': dir, '--port': port }, ...comps })
+
+  const networkInterfaces = os.networkInterfaces()
   const availableURLs: string[] = []
 
   console.log(`\nPreview server is now running!`)
   console.log('Available on:\n')
 
-  Object.keys(ifaces).forEach((dev) => {
-    ;(ifaces[dev] || []).forEach((details) => {
+  Object.keys(networkInterfaces).forEach((dev) => {
+    ;(networkInterfaces[dev] || []).forEach((details) => {
       if (details.family === 'IPv4') {
         let addr = `http://${details.address}:${port}?position=${baseCoords.x}%2C${baseCoords.y}&ENABLE_ECS7`
         if (debug) {
@@ -129,4 +139,7 @@ export const main = handler(async function main(options: Options) {
       console.log('Unable to open browser automatically.')
     }
   }
-})
+
+  // this signal is resolved by: (wkc)program.stop(), SIGTERM, SIGHUP
+  await server.components.signaler.programClosed
+}

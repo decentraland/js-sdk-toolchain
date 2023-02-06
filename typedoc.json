@@ -1,17 +1,49 @@
 {
-  // Comments are supported, like tsconfig.json
   "entryPoints": [
-    "packages/@dcl/ecs",
-    "packages/@dcl/react-ecs",
-    "packages/@dcl/js-runtime",
-    "packages/@dcl/crdt",
-    "packages/@dcl/sdk"
+    "packages/@dcl/sdk/src",
+    "packages/@dcl/js-runtime/apis.d.ts"
   ],
+  "tsconfig": "packages/@dcl/sdk/tsconfig.json",
   "includeVersion": true,
   "cleanOutputDir": true,
-  "json": "generated-docs/docs.json",
+  "json": "api-docs/docs.json",
   "name": "SDK Documentation",
+  "categorizeByGroup": true,
+  "defaultCategory" : " ",
+  "searchCategoryBoosts": {
+    "Component": 1,
+  },
+  "hideGenerator": true,
   "excludeExternals": false,
-  "entryPointStrategy": "packages",
-  "out": "generated-docs"
+  "excludeInternal": true,
+  // TODO: We need to document all the protocol ~system/ API
+  "excludeNotDocumented": false,
+  "entryPointStrategy": "expand",
+  "out": "api-docs",
+  "exclude": [
+    "packages/@dcl/sdk/src/internal/**/*.ts",
+    "packages/@dcl/sdk/src/message-bus.ts",
+    "packages/@dcl/sdk/src/observables.ts",
+    "packages/@dcl/sdk/src/index.ts"
+  ],
+  "treatWarningsAsErrors": true,
+  "plugin": [],
+  "kindSortOrder": [
+    "Module",
+    "Function",
+    "Variable",
+    "Interface",
+    "TypeAlias",
+    "Namespace",
+    "Enum"
+  ],
+  "visibilityFilters": {
+    "protected": true,
+    "private": true,
+    "inherited": true,
+    "external": true
+  },
+  "sidebarLinks": {
+    "Documentation": "http://docs.decentraland.org"
+  }
 }

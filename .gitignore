@@ -15,7 +15,7 @@ packages/@dcl/sdk/cli/**/*.js
 packages/@dcl/sdk/cli/*.d.ts
 packages/@dcl/sdk/cli/**/*.d.ts
 packages/@dcl/sdk/*.d.ts
-generated-docs
+api-docs
 packages/@dcl/sdk/internal
 test/ecs/snippets/**/*.js
 **/*.tgz
@@ -29,3 +29,4 @@ packages/@dcl/playground-assets/etc/playground-assets.api.json
 test/snapshots/package-lock.json
 test/snapshots/*.js
 tmp
+scene
