@@ -9,7 +9,7 @@ import { upgradeWebSocketResponse } from '@well-known-components/http-server/dis
  * It runs using @dcl/mini-comms implementing RFC-5
  */
 
-export async function setupBffAndComms(components: PreviewComponents, router: Router<PreviewComponents>) {
+export function setupBffAndComms(components: PreviewComponents, router: Router<PreviewComponents>) {
   router.get('/about', async (ctx) => {
     const host = ctx.url.host
 
