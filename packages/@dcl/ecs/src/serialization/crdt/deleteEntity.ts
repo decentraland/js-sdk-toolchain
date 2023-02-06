@@ -1,4 +1,4 @@
-import { CrdtMessageProtocol } from '.'
+import { CrdtMessageProtocol } from './crdtMessageProtocol'
 import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../ByteBuffer'
 import { CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH, DeleteEntityMessage } from './types'
@@ -25,7 +25,7 @@ export namespace DeleteEntity {
     }
 
     if (header.type !== CrdtMessageType.DELETE_ENTITY) {
-      throw new Error('DeleteComponentOperation tried to read another message type.')
+      throw new Error('DeleteEntity tried to read another message type.')
     }
 
     return {

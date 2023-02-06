@@ -33,11 +33,11 @@ export type CrdtMessageHeader = {
 export const CRDT_MESSAGE_HEADER_LENGTH = 8
 
 /**
- * Min. length = header (8 bytes) + 20 bytes = 28 bytes
+ * Min. length = header (8 bytes) + 16 bytes = 24 bytes
  *
- * @param entity - uint32 number of the entity
- * @param componentId - uint32 number of id
- * @param timestamp - Uint64 Lamport timestamp
+ * @param entity - Uint32 number of the entity
+ * @param componentId - Uint32 number of id
+ * @param timestamp - Uint32 Lamport timestamp
  * @param data - Uint8[] data of component => length(4 bytes) + block of bytes[0..length-1]
  * @public
  */
@@ -50,6 +50,9 @@ export type PutComponentMessageBody = {
 }
 
 /**
+ * @param entity - Uint32 number of the entity
+ * @param componentId - Uint32 number of id
+ * @param timestamp - Uint32 Lamport timestamp
  * @public
  */
 export type DeleteComponentMessageBody = {
