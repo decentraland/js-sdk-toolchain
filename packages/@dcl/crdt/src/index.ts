@@ -191,7 +191,7 @@ export function crdtProtocol<T extends number | Uint8Array | string>(entityUtils
 
     // Outdated Message. Resend our state message through the wire.
     if (current.timestamp > timestamp) {
-      return ProcessMessageResultType.StateOutdatedData
+      return ProcessMessageResultType.StateOutdatedTimestamp
     }
 
     const currentDataGreater = dataCompare(current.data, data)

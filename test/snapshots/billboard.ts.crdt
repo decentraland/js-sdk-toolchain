@@ -7,7 +7,7 @@ EVAL test/snapshots/billboard.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 29k
-  MALLOC_COUNT = 12270
+  MALLOC_COUNT = 12271
   ALIVE_OBJS_DELTA ~= 2.35k
 CALL onStart()
   OPCODES ~= 0k
@@ -49,7 +49,7 @@ CALL onUpdate(0.0)
   CRDT: e=0x204 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   CRDT: e=0x205 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   OPCODES ~= 183k
-  MALLOC_COUNT = 452
+  MALLOC_COUNT = 450
   ALIVE_OBJS_DELTA ~= 0.15k
 CALL onUpdate(0.1)
   CRDT: e=0x200 c=1 t=2 data={"position":{"x":8,"y":3.0420734882354736,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
@@ -75,4 +75,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 11k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1664.79k bytes
+  MEMORY_USAGE_COUNT ~= 1664.48k bytes

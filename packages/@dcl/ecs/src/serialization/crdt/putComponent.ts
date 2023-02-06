@@ -1,4 +1,4 @@
-import { CrdtMessageProtocol } from '.'
+import { CrdtMessageProtocol } from './crdtMessageProtocol'
 import { ComponentDefinition } from '../../engine/component'
 import { Entity } from '../../engine/entity'
 import { ByteBuffer } from '../ByteBuffer'
@@ -8,7 +8,7 @@ import { CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH, PutComponentMessage } from
  * @internal
  */
 export namespace PutComponentOperation {
-  export const MESSAGE_HEADER_LENGTH = 20
+  export const MESSAGE_HEADER_LENGTH = 16
 
   /**
    * Call this function for an optimal writing data passing the ByteBuffer
@@ -34,9 +34,9 @@ export namespace PutComponentOperation {
     // Write ComponentOperation header
     buf.setUint32(startMessageOffset + 8, entity as number)
     buf.setUint32(startMessageOffset + 12, componentDefinition.componentId)
-    buf.setUint64(startMessageOffset + 16, BigInt(timestamp))
+    buf.setUint32(startMessageOffset + 16, timestamp)
     const newLocal = messageLength - MESSAGE_HEADER_LENGTH - CRDT_MESSAGE_HEADER_LENGTH
-    buf.setUint32(startMessageOffset + 24, newLocal)
+    buf.setUint32(startMessageOffset + 20, newLocal)
   }
 
   export function read(buf: ByteBuffer): PutComponentMessage | null {
@@ -54,7 +54,7 @@ export namespace PutComponentOperation {
       ...header,
       entityId: buf.readUint32() as Entity,
       componentId: buf.readUint32(),
-      timestamp: Number(buf.readUint64()),
+      timestamp: buf.readUint32(),
       data: buf.readBuffer()
     }
   }

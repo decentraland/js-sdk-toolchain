@@ -7,7 +7,7 @@ EVAL test/snapshots/ui.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 28k
-  MALLOC_COUNT = 22989
+  MALLOC_COUNT = 22990
   ALIVE_OBJS_DELTA ~= 3.38k
 CALL onStart()
   OPCODES ~= 0k
@@ -33,7 +33,7 @@ CALL onUpdate(0.0)
   CRDT: e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   CRDT: e=0x200 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   OPCODES ~= 116k
-  MALLOC_COUNT = 612
+  MALLOC_COUNT = 610
   ALIVE_OBJS_DELTA ~= 0.21k
 CALL onUpdate(0.1)
   CRDT: e=0x200 c=1 t=2 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.008726535364985466,"z":0,"w":0.9999619126319885},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -50,4 +50,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 52k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 4767.12k bytes
+  MEMORY_USAGE_COUNT ~= 4766.82k bytes
