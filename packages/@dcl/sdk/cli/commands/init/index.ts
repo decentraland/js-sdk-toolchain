@@ -6,6 +6,7 @@ import { CliComponents } from '../../components'
 import { isDirectoryEmpty, download, extract } from '../../utils/fs'
 
 import { get as getRepo } from './repos'
+import { installDependencies, needsDependencies } from '../build/helpers'
 
 interface Options {
   args: typeof args
@@ -15,7 +16,8 @@ interface Options {
 export const args = getArgs({
   '--yes': Boolean,
   '-y': '--yes',
-  '--dir': String
+  '--dir': String,
+  '--skip-install': Boolean
 })
 
 export async function help() {}
@@ -31,12 +33,19 @@ export async function main(options: Options) {
     if (!answer) return
   }
 
+  // download and extract template project
   const scene = 'scene-template'
   const { url, contentFolders } = getRepo(scene)
   const zip = await download(options.components, url, join(dir, `${scene}.zip`))
   await extract(zip, dir)
   await options.components.fs.unlink(zip)
   await moveFilesFromDirs(options.components, dir, contentFolders)
+
+  // npm install
+  const shouldInstallDeps = await needsDependencies(options.components, dir)
+  if (shouldInstallDeps && !options.args['--skip-install']) {
+    await installDependencies(dir)
+  }
 }
 
 const moveFilesFromDir = async (components: Pick<CliComponents, 'fs'>, dir: string, folder: string) => {
