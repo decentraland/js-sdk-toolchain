@@ -51,7 +51,6 @@ describe('build command', () => {
     jest.spyOn(helpers, 'validatePackageJson').mockResolvedValue(true)
 
     const needsDependenciesSpy = jest.spyOn(helpers, 'needsDependencies').mockResolvedValue(true)
-
     const installDependenciesSpy = jest.spyOn(helpers, 'installDependencies').mockRejectedValue(undefined)
 
     try {
