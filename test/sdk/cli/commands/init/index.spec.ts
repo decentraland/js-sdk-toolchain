@@ -2,6 +2,7 @@ import * as prompt from '../../../../../packages/@dcl/sdk/cli/utils/prompt'
 import * as fsUtils from '../../../../../packages/@dcl/sdk/cli/utils/fs'
 import * as init from '../../../../../packages/@dcl/sdk/cli/commands/init/index'
 import { initComponents } from '../../../../../packages/@dcl/sdk/cli/components'
+import * as helpers from '../../../../../packages/@dcl/sdk/cli/commands/build/helpers'
 
 afterEach(() => {
   jest.clearAllMocks()
@@ -9,6 +10,10 @@ afterEach(() => {
 })
 
 describe('init command', () => {
+  beforeEach(() => {
+    jest.spyOn(helpers, 'needsDependencies').mockResolvedValue(true)
+  })
+
   it('help: return void', async () => {
     const helpSpy = jest.spyOn(init, 'help')
 
@@ -22,6 +27,7 @@ describe('init command', () => {
     const confirmSpy = jest.spyOn(prompt, 'confirm').mockResolvedValue(false)
     const downloadSpy = jest.spyOn(fsUtils, 'download')
     const extractSpy = jest.spyOn(fsUtils, 'extract')
+    const installDependenciesSpy = jest.spyOn(helpers, 'installDependencies').mockRejectedValue(undefined)
 
     const components = initComponents()
 
@@ -30,6 +36,7 @@ describe('init command', () => {
     expect(confirmSpy).toBeCalled()
     expect(downloadSpy).not.toBeCalled()
     expect(extractSpy).not.toBeCalled()
+    expect(installDependenciesSpy).not.toBeCalled()
   })
 
   it('main: should download & extract if directory is not empty and prompt is accepted', async () => {
@@ -38,16 +45,19 @@ describe('init command', () => {
     const downloadSpy = jest.spyOn(fsUtils, 'download').mockResolvedValue('1')
     const extractSpy = jest.spyOn(fsUtils, 'extract').mockImplementation()
     const removeSpy = jest.spyOn(components.fs, 'unlink').mockImplementation()
+    const installDependenciesSpy = jest.spyOn(helpers, 'installDependencies').mockRejectedValue(undefined)
+
     jest.spyOn(components.fs, 'readdir').mockResolvedValue(['test'])
     jest.spyOn(components.fs, 'rename').mockImplementation()
     jest.spyOn(components.fs, 'rmdir').mockImplementation()
 
-    await init.main({ args: { _: [] }, components })
+    await init.main({ args: { _: [], '--skip-install': true }, components })
 
     expect(confirmSpy).toBeCalled()
     expect(downloadSpy).toBeCalled()
     expect(extractSpy).toBeCalledWith('1', process.cwd())
     expect(removeSpy).toBeCalledWith('1')
+    expect(installDependenciesSpy).not.toBeCalled()
   })
 
   it('main: should download & extract if directory is not empty and "--yes" arg is provided', async () => {
@@ -59,6 +69,7 @@ describe('init command', () => {
     jest.spyOn(components.fs, 'readdir').mockResolvedValue(['test'])
     jest.spyOn(components.fs, 'rename').mockImplementation()
     jest.spyOn(components.fs, 'rmdir').mockImplementation()
+    const installDependenciesSpy = jest.spyOn(helpers, 'installDependencies').mockResolvedValue(undefined)
 
     await init.main({ args: { _: [], '--yes': true }, components })
 
@@ -66,6 +77,7 @@ describe('init command', () => {
     expect(downloadSpy).toBeCalled()
     expect(extractSpy).toBeCalled()
     expect(removeSpy).toBeCalled()
+    expect(installDependenciesSpy).toBeCalled()
   })
 
   it('main: should move files out of dirs', async () => {
@@ -78,7 +90,7 @@ describe('init command', () => {
     const renameSpy = jest.spyOn(components.fs, 'rename').mockImplementation()
     const rmdirSpy = jest.spyOn(components.fs, 'rmdir').mockImplementation()
 
-    await init.main({ args: { _: [], '--yes': true }, components })
+    await init.main({ args: { _: [], '--yes': true, '--skip-install': true }, components })
 
     expect(confirmSpy).not.toBeCalled()
     expect(downloadSpy).toBeCalled()
@@ -96,6 +108,8 @@ describe('init command', () => {
 
     const components = initComponents()
 
-    await expect(() => init.main({ args: { _: [], '--yes': true }, components })).rejects.toThrow()
+    await expect(() =>
+      init.main({ args: { _: [], '--yes': true, '--skip-install': true }, components })
+    ).rejects.toThrow()
   })
 })
