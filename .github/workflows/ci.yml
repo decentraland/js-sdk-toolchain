@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: 'npm'
       - name: install
         run: make install
@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: 'npm'
       - name: install
         run: make install
@@ -53,7 +53,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: 'npm'
       - name: install
         run: make install
@@ -321,3 +321,24 @@ jobs:
             - You can preview this build entering:
               https://playground.decentraland.org/?sdk-branch=${{ github.head_ref || github.ref }}
           edit-mode: replace
+  cli-e2e:
+    needs: [build]
+    runs-on: ubuntu-latest
+    name: CLI E2E
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: mkdir -p scene
+      - name: npx @dcl/sdk init
+        run: npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }} init
+        working-directory: scene
+      - name: check @dcl/sdk is installed by default
+        run: npm ls @dcl/sdk
+        working-directory: scene
+      - name: install CI version of @dcl/sdk
+        run: npm install ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }}
+        working-directory: scene
+      - name: npm run build
+        run: npm run build
+        working-directory: scene
