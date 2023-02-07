@@ -7,8 +7,9 @@ import {
 import { HTTPProvider } from 'eth-connect'
 import { RoomComponent } from '@dcl/mini-comms/dist/adapters/rooms'
 import { WebSocketComponent } from './ws'
+import { CliComponents } from '../../components'
 
-export type PreviewComponents = {
+export type PreviewComponents = CliComponents & {
   logs: ILoggerComponent
   server: IHttpServerComponent<PreviewComponents>
   config: IConfigComponent

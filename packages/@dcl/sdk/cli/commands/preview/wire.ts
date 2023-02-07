@@ -14,12 +14,7 @@ import { CliError } from '../../utils/error'
 import { PreviewComponents } from './types'
 import { upgradeWebSocketResponse } from '@well-known-components/http-server/dist/ws'
 
-export async function wire(
-  components: Pick<CliComponents, 'fs'>,
-  dir: string,
-  previewComponents: PreviewComponents,
-  watch: boolean = false
-) {
+export async function wire(components: PreviewComponents, dir: string, watch: boolean = false) {
   const npmModulesPath = path.resolve(dir, 'node_modules')
 
   // TODO: dcl.project.needsDependencies() should do this
@@ -39,17 +34,20 @@ export async function wire(
     return next()
   })
 
-  setupBffAndComms(previewComponents, router)
+  setupBffAndComms(components, router)
   setupEcs6Endpoints(dir, router)
 
-  previewComponents.server.setContext(previewComponents)
-  previewComponents.server.use(router.allowedMethods())
-  previewComponents.server.use(router.middleware())
+  components.server.setContext(components)
+  components.server.use(router.allowedMethods())
+  components.server.use(router.middleware())
 
   if (watch) {
-    const { clients } = previewComponents.ws.ws
+    const { clients } = components.ws.ws
+    const ignoredContent = await getDCLIgnoreFile(dir)
+    const ignored = (ignoredContent?.split('\n') || []).filter(Boolean)
     chokidar
-      .watch(resolve(dir, 'bin'), {
+      .watch(resolve(dir), {
+        ignored,
         ignoreInitial: false,
         cwd: dir
       })
@@ -59,6 +57,14 @@ export async function wire(
         }
       })
   }
+}
+
+const getDCLIgnoreFile = async (dir: string): Promise<string | null> => {
+  try {
+    return fs.readFile(resolve(dir, '.dclignore'), 'utf8')
+  } catch (e) {}
+
+  return null
 }
 
 const initWsConnection = (ws: WebSocket, clients: Set<WebSocket>) => {

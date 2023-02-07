@@ -70,6 +70,7 @@ export async function main(options: Options) {
       }
 
       return {
+        ...options.components,
         logs,
         ethereumProvider: providerInstance,
         rooms,
@@ -81,7 +82,7 @@ export async function main(options: Options) {
       }
     },
     async main({ components, startComponents }) {
-      await wire(options.components, dir, components, !!options.args['--watch'])
+      await wire(components, dir, !!options.args['--watch'])
       await startComponents()
     }
   })
