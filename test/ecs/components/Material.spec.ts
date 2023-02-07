@@ -157,7 +157,7 @@ describe('Generated Material ProtoBuf', () => {
       entityD,
       createUnlitMaterial({
         castShadows: true,
-        albedoColor: { r: 0, g: 1, b: 1, a: 1 }
+        diffuseColor: { r: 0, g: 1, b: 1, a: 1 }
       })
     )
 
