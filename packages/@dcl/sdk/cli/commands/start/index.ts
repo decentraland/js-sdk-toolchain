@@ -86,7 +86,7 @@ export async function main(options: Options) {
   }
 
   // after the watcher is running, start the server
-  const server = await preview({ args: { '--dir': dir, '--port': port }, ...comps })
+  const server = await preview({ args: { '--dir': dir, '--port': port, '--watch': watch }, ...comps })
 
   const networkInterfaces = os.networkInterfaces()
   const availableURLs: string[] = []
