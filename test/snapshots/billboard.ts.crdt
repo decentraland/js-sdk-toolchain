@@ -7,11 +7,7 @@ EVAL test/snapshots/billboard.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 29k
-<<<<<<< HEAD
-  MALLOC_COUNT = 12306
-=======
   MALLOC_COUNT = 12308
->>>>>>> main
   ALIVE_OBJS_DELTA ~= 2.36k
 CALL onStart()
   OPCODES ~= 0k
@@ -79,8 +75,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 11k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 1667.47k bytes
-=======
   MEMORY_USAGE_COUNT ~= 1667.85k bytes
->>>>>>> main
