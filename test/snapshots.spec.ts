@@ -74,7 +74,6 @@ async function run(fileName: string) {
 
     async function runRendererFrame(data: Uint8Array) {
       const serverUpdates = await vm.onServerUpdate(data)
-      console.dir({ serverUpdates })
       out.push(...Array.from(serializeCrdtMessages('Renderer->Scene', serverUpdates)))
 
       if (serverUpdates?.length) {
