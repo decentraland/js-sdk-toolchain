@@ -12,6 +12,7 @@
   "devDependencies": {
     "@dcl/dcl-rollup": "file:../../packages/@dcl/dcl-rollup",
     "@dcl/js-runtime": "file:../../packages/@dcl/js-runtime",
+    "@dcl/ecs": "file:../../packages/@dcl/ecs",
     "@dcl/sdk": "file:../../packages/@dcl/sdk"
   }
 }

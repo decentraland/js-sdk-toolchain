@@ -1,8 +1,8 @@
 import { Observable } from './internal/Observable'
 import { QuaternionType, Vector3Type } from '@dcl/ecs'
-import { ManyEntityAction, SendBatchResponse } from '~system/EngineApi'
+import { ManyEntityAction, SendBatchResponse, subscribe } from '~system/EngineApi'
 
-let subscribeFunction: (event: { eventId: string }) => Promise<any> = async () => {}
+let subscribeFunction: typeof subscribe = async () => ({})
 
 /** @public */
 export type InputEventResult = {

@@ -41,28 +41,28 @@ export type OptimizedGrowonlySet = {
  *
  * @returns a new GSet
  */
-export function createGSet(): OptimizedGrowonlySet {
+export function createVersionGSet(): OptimizedGrowonlySet {
   const lastVersion: Map<number, number> = new Map()
   return {
     /**
      *
-     * @param n
-     * @param v
+     * @param number
+     * @param version
      * @returns
      */
-    addTo(n: number, v: number) {
-      if (v < 0) {
+    addTo(number: number, version: number) {
+      if (version < 0) {
         return false
       }
 
-      const currentValue = lastVersion.get(n)
+      const currentValue = lastVersion.get(number)
 
       // If the version is >=, it means the value it's already in the set
-      if (currentValue !== undefined && currentValue >= v) {
+      if (currentValue !== undefined && currentValue >= version) {
         return true
       }
 
-      lastVersion.set(n, v)
+      lastVersion.set(number, version)
       return true
     },
     /**

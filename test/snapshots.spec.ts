@@ -40,9 +40,48 @@ function testFileSnapshot(fileName: string, workingDirectory: string) {
   }, 60000)
 }
 
+function* serializeCrdtMessages(prefix: string, data: Uint8Array) {
+  const buffer = new ReadWriteByteBuffer(data)
+
+  let header: CrdtMessageHeader | null
+
+  while ((header = CrdtMessageProtocol.getHeader(buffer))) {
+    if (header.type === CrdtMessageType.PUT_COMPONENT || header.type === CrdtMessageType.DELETE_COMPONENT) {
+      const message =
+        header.type === CrdtMessageType.DELETE_COMPONENT
+          ? DeleteComponent.read(buffer)!
+          : PutComponentOperation.read(buffer)!
+      const { entityId, componentId, timestamp } = message
+      const data = message.type === CrdtMessageType.PUT_COMPONENT ? message.data : undefined
+
+      const c = engine.getComponent(componentId)
+
+      yield `  ${prefix}: e=0x${entityId.toString(16)} c=${componentId} t=${timestamp} data=${JSON.stringify(
+        data && c.deserialize(new ReadWriteByteBuffer(data))
+      )}`
+    } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
+      const entityId = DeleteEntity.read(buffer)!.entityId
+      yield `  ${prefix}: e=0x${entityId?.toString(16)} deleted`
+    } else {
+      yield 'Unknown CrdtMessageType'
+    }
+  }
+}
+
 async function run(fileName: string) {
   return withQuickJsVm(async (vm) => {
     const out: string[] = [`(start empty vm ${vmVersion})`]
+
+    async function runRendererFrame(data: Uint8Array) {
+      const serverUpdates = await vm.onServerUpdate(data)
+      out.push(...Array.from(serializeCrdtMessages('Renderer->Scene', serverUpdates)))
+
+      if (serverUpdates?.length) {
+        return [serverUpdates]
+      } else {
+        return []
+      }
+    }
 
     vm.provide({
       log(...args) {
@@ -50,54 +89,34 @@ async function run(fileName: string) {
       },
       error(...args) {
         out.push('  ERROR: ' + JSON.stringify(args))
+        process.exitCode = 1
       },
       require(moduleName) {
         out.push('  REQUIRE: ' + moduleName)
-        if (moduleName !== '~system/EngineApi') throw new Error('Unknown module')
-        return {
-          async subscribe(event: string) {
-            out.push(`  SUBSCRIBE-TO: ${event}`)
-            return {}
-          },
-          async sendBatch() {
-            return { events: [] }
-          },
-          async crdtSendToRenderer(payload: { data: Uint8Array }): Promise<{ data: Uint8Array[] }> {
-            // console.dir(payload)
 
-            const buffer = new ReadWriteByteBuffer(new Uint8Array(Object.values(payload.data)))
-
-            let header: CrdtMessageHeader | null
-            while ((header = CrdtMessageProtocol.getHeader(buffer))) {
-              if (header.type === CrdtMessageType.PUT_COMPONENT || header.type === CrdtMessageType.DELETE_COMPONENT) {
-                const message =
-                  header.type === CrdtMessageType.DELETE_COMPONENT
-                    ? DeleteComponent.read(buffer)!
-                    : PutComponentOperation.read(buffer)!
-                const { entityId, componentId, timestamp } = message
-                const data = message.type === CrdtMessageType.PUT_COMPONENT ? message.data : undefined
-
-                const c = engine.getComponent(componentId)
-
-                out.push(
-                  `  CRDT: e=0x${entityId.toString(16)} c=${componentId} t=${timestamp} data=${JSON.stringify(
-                    data && c.deserialize(new ReadWriteByteBuffer(data))
-                  )}`
-                )
-              } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
-                const entityId = DeleteEntity.read(buffer)!.entityId
-                out.push(`  CRDT: e=0x${entityId?.toString(16)} deleted`)
-              } else {
-                throw new Error('Unknown CrdtMessageType')
-              }
+        if (moduleName === '~system/EngineApi') {
+          return {
+            async subscribe(data: { eventId: string }) {
+              out.push(`  SUBSCRIBE-TO: ${data.eventId}`)
+              return {}
+            },
+            async sendBatch() {
+              return { events: [] }
+            },
+            async crdtSendToRenderer(payload: { data: Uint8Array }): Promise<{ data: Uint8Array[] }> {
+              const data = new Uint8Array(Object.values(payload.data))
+              out.push(...Array.from(serializeCrdtMessages('CRDT', data)))
+              const serverUpdates = await runRendererFrame(data)
+              return { data: serverUpdates }
+            },
+            async crdtGetState(_payload: { data: Uint8Array }): Promise<{ data: Uint8Array[] }> {
+              const serverUpdates = await runRendererFrame(new Uint8Array())
+              return { data: serverUpdates }
             }
-
-            return { data: [] }
-          },
-          async crdtGetState(_payload: { data: Uint8Array }): Promise<{ data: Uint8Array[] }> {
-            return { data: [] }
           }
         }
+
+        throw new Error('Unknown module ' + moduleName)
       }
     })
 

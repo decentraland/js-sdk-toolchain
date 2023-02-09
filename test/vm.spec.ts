@@ -358,4 +358,61 @@ describe('ensure that VM works', () => {
 
       expect(logs).toEqual(['its a promise', 'awaiting promises work', 1, 'end'])
     }))
+
+  it('missing onServerUpdate', async () =>
+    withQuickJsVm(async (opts) => {
+      const logs: any[] = []
+      opts.provide({
+        log(...args) {
+          logs.push(...args)
+        },
+        error(...args) {
+          logs.push(...args)
+        },
+        require(_moduleName) {
+          return {}
+        }
+      })
+
+      opts.eval(`
+        module.exports.onUpdate = async function() {
+        }
+      `)
+
+      await opts.onUpdate(0.0)
+    }))
+
+  it('onServerUpdate works', async () =>
+    withQuickJsVm(async (opts) => {
+      const logs: any[] = []
+      opts.provide({
+        log(...args) {
+          logs.push(...args)
+        },
+        error(...args) {
+          logs.push(...args)
+        },
+        require(_moduleName) {
+          return {
+            async call(data: Uint8Array) {
+              logs.push(data)
+              const res = await opts.onServerUpdate(data)
+              logs.push(res)
+              return res
+            }
+          }
+        }
+      })
+
+      opts.eval(`
+        const t = require('module')
+        module.exports.onUpdate = async function() {
+          console.log(await t.call(new Uint8Array([1,2,3])))
+        }
+      `)
+
+      await opts.onUpdate(0.0)
+
+      expect(logs).toEqual([new Uint8Array([1, 2, 3]), new Uint8Array([]), new Uint8Array([])])
+    }))
 })

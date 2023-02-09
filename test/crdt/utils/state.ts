@@ -1,5 +1,5 @@
 import { State, stateIterator } from '../../../packages/@dcl/crdt/src'
-import { createGSet } from '../../../packages/@dcl/crdt/src/gset'
+import { createVersionGSet } from '../../../packages/@dcl/crdt/src/gset'
 
 export function dataToString<T>(data: T) {
   if (data === null) return null
@@ -14,7 +14,7 @@ export function stateFromString<T>(stateStr: string) {
   const stateObject = JSON.parse(stateStr)
   const newState: State<T> = {
     components: new Map(),
-    deletedEntities: createGSet()
+    deletedEntities: createVersionGSet()
   }
 
   const components = stateObject.components || []
