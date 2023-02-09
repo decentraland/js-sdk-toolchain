@@ -1,7 +1,7 @@
 import { Entity } from '../engine'
 import { IArray } from './Array'
 import { Bool } from './basic/Boolean'
-import { IEnum } from './basic/Enum'
+import { IntEnum as IntEnumSchema, StringEnum as StringEnumSchema } from './basic/Enum'
 import { Float32, Float64 } from './basic/Float'
 import { Int16, Int32, Int8, Int64 as iInt64 } from './basic/Integer'
 import { EcsString } from './basic/String'
@@ -58,7 +58,9 @@ export namespace Schemas {
   export const Entity: ISchema<Entity> = EntitySchema
 
   /** @public */
-  export const Enum = IEnum
+  export const EnumNumber = IntEnumSchema
+  /** @public */
+  export const EnumString = StringEnumSchema
   /** @public */
   export const Array = IArray
   /** @public */

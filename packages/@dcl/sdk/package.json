@@ -26,6 +26,7 @@
     "@dcl/explorer": "1.0.77560-20230206183755.commit-ef27962",
     "@dcl/js-runtime": "file:../js-runtime",
     "@dcl/mini-comms": "1.0.0",
+    "@dcl/protocol": "1.0.0-4114477251.commit-ccb88d6",
     "@dcl/react-ecs": "file:../react-ecs",
     "@dcl/schemas": "6.6.0",
     "@types/inquirer": "^8.2.5",
