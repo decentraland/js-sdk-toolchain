@@ -1,4 +1,4 @@
-import { createGSet } from '@dcl/crdt/dist/gset'
+import { createVersionGSet } from '@dcl/crdt/dist/gset'
 
 /**
  * @public It only defines the type explicitly, no effects.
@@ -107,7 +107,7 @@ export function EntityContainer(): EntityContainer {
   const usedEntities: Set<Entity> = new Set()
 
   let toRemoveEntities: Entity[] = []
-  const removedEntities = createGSet()
+  const removedEntities = createVersionGSet()
 
   function generateNewEntity(): Entity {
     if (entityCounter > MAX_ENTITY_NUMBER - 1) {

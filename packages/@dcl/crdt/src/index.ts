@@ -1,4 +1,4 @@
-import { createGSet } from './gset'
+import { createVersionGSet } from './gset'
 import {
   ComponentDataMessage,
   CRDT,
@@ -95,7 +95,7 @@ export function crdtProtocol<T extends number | Uint8Array | string>(entityUtils
    */
   const state: State<T> = {
     components: new Map(),
-    deletedEntities: createGSet()
+    deletedEntities: createVersionGSet()
   }
 
   /**

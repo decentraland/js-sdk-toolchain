@@ -16,7 +16,7 @@ CALL onStart()
 CALL onUpdate(0.0)
   CRDT: e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   CRDT: e=0x201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-  OPCODES ~= 7k
+  OPCODES ~= 8k
   MALLOC_COUNT = 99
   ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0.1)
@@ -40,4 +40,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 5k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 869.53k bytes
+  MEMORY_USAGE_COUNT ~= 869.74k bytes

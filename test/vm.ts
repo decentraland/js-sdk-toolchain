@@ -39,6 +39,7 @@ export type RunWithVmOptions = {
   eval(code: string, filename?: string): void
   onUpdate(dt: number): Promise<any>
   onStart(): Promise<void>
+  onServerUpdate(data: Uint8Array): Promise<Uint8Array[]>
   provide(opts: ProvideOptions): void
   getStats(): { opcodes: OpCodeResult[]; memory: MemoryDump }
   dumpMemory(): string
@@ -133,6 +134,19 @@ export async function withQuickJsVm<T>(
         const resolvedHandle = vm.unwrapResult(resolvedResult)
         return dumpAndDispose(vm, resolvedHandle)
       },
+      async onServerUpdate(data: Uint8Array) {
+        const result = callFunctionFromEval(vm, '(exports.onServerUpdate || (async () => (new Uint8Array())))', data)
+
+        const promiseHandle = vm.unwrapResult(result)
+
+        // Convert the promise handle into a native promise and await it.
+        // If code like this deadlocks, make sure you are calling
+        // runtime.executePendingJobs appropriately.
+        const resolvedResult = await vm.resolvePromise(promiseHandle)
+        promiseHandle.dispose()
+        const resolvedHandle = vm.unwrapResult(resolvedResult)
+        return dumpAndDispose(vm, resolvedHandle)
+      },
       async onStart() {
         const result = vm.evalCode(`exports.onStart ? exports.onStart() : Promise.resolve()`, 'onStart')
 
@@ -190,6 +204,12 @@ export async function withQuickJsVm<T>(
     }
   }
   return { result, leaking }
+}
+
+function callFunctionFromEval(vm: QuickJSContext, codeReturningAFunction: string, arg: any) {
+  return vm.unwrapResult(vm.evalCode(codeReturningAFunction)).consume((fn) => {
+    return nativeToVmType(vm, arg).consume((arg) => vm.callFunction(fn, vm.global, arg))
+  })
 }
 
 function dumpAndDispose(vm: QuickJSContext, val: QuickJSHandle) {
