@@ -72,7 +72,17 @@ async function run(fileName: string) {
   return withQuickJsVm(async (vm) => {
     const out: string[] = [`(start empty vm ${vmVersion})`]
 
-    const messagesForServer: Uint8Array[] = []
+    async function runRendererFrame(data: Uint8Array) {
+      const serverUpdates = await vm.onServerUpdate(data)
+      console.dir({ serverUpdates })
+      out.push(...Array.from(serializeCrdtMessages('Renderer->Scene', serverUpdates)))
+
+      if (serverUpdates?.length) {
+        return [serverUpdates]
+      } else {
+        return []
+      }
+    }
 
     vm.provide({
       log(...args) {
@@ -80,6 +90,7 @@ async function run(fileName: string) {
       },
       error(...args) {
         out.push('  ERROR: ' + JSON.stringify(args))
+        process.exitCode = 1
       },
       require(moduleName) {
         out.push('  REQUIRE: ' + moduleName)
@@ -96,17 +107,17 @@ async function run(fileName: string) {
             async crdtSendToRenderer(payload: { data: Uint8Array }): Promise<{ data: Uint8Array[] }> {
               const data = new Uint8Array(Object.values(payload.data))
               out.push(...Array.from(serializeCrdtMessages('CRDT', data)))
-              const serverUpdates = await vm.onServerUpdate(data)
-              console.dir({ serverUpdates })
-              serverUpdates.forEach((data) => out.push(...Array.from(serializeCrdtMessages('Renderer->Scene', data))))
+              const serverUpdates = await runRendererFrame(data)
               return { data: serverUpdates }
             },
             async crdtGetState(_payload: { data: Uint8Array }): Promise<{ data: Uint8Array[] }> {
-              return { data: [] }
+              const serverUpdates = await runRendererFrame(new Uint8Array())
+              return { data: serverUpdates }
             }
           }
         }
-        throw new Error('Unknown module')
+
+        throw new Error('Unknown module ' + moduleName)
       }
     })
 

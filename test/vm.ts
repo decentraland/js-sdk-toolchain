@@ -39,7 +39,7 @@ export type RunWithVmOptions = {
   eval(code: string, filename?: string): void
   onUpdate(dt: number): Promise<any>
   onStart(): Promise<void>
-  onServerUpdate(data: Uint8Array): Promise<Uint8Array[]>
+  onServerUpdate(data: Uint8Array): Promise<Uint8Array>
   provide(opts: ProvideOptions): void
   getStats(): { opcodes: OpCodeResult[]; memory: MemoryDump }
   dumpMemory(): string
