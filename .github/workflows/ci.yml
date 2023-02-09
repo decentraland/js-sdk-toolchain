@@ -16,7 +16,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
+          cache: "npm"
+      - name: install npm v8
+        run: npm i -g npm@8
       - name: install
         run: make install
       - name: lint
@@ -28,7 +30,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
+          cache: "npm"
+      - name: install npm v8
+        run: npm i -g npm@8
       - name: install
         run: make install
       - name: build
@@ -54,7 +58,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
+          cache: "npm"
+      - name: install npm v8
+        run: npm i -g npm@8
       - name: install
         run: make install
       - name: update version of packages/@dcl/dcl-rollup
@@ -109,17 +115,17 @@ jobs:
         run: make build
       - name: prepare releasable packages
         run: make prepare
-      - name: 'Upload Artifact'
+      - name: "Upload Artifact"
         uses: actions/upload-artifact@v2
         with:
           name: built-artifacts
-          path: 'packages/**/*.tgz'
+          path: "packages/**/*.tgz"
           retention-days: 5
       - name: publish @dcl/dcl-rollup package
         uses: menduz/oddish-action@master
         id: publish_dcl_rollup
         with:
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
           access: public
           cwd: ./packages/@dcl/dcl-rollup
           ## use action runId instead of current date to generate snapshot numbers
@@ -127,7 +133,7 @@ jobs:
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/dcl-rollup'
+          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/dcl-rollup"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
@@ -136,7 +142,7 @@ jobs:
         uses: menduz/oddish-action@master
         id: publish_crdt
         with:
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
           access: public
           cwd: ./packages/@dcl/crdt
           ## use action runId instead of current date to generate snapshot numbers
@@ -144,7 +150,7 @@ jobs:
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/dcl-crdt'
+          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/dcl-crdt"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
@@ -153,7 +159,7 @@ jobs:
         uses: menduz/oddish-action@master
         id: publish_ecs
         with:
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
           access: public
           cwd: ./packages/@dcl/ecs
           ## use action runId instead of current date to generate snapshot numbers
@@ -161,7 +167,7 @@ jobs:
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/ecs'
+          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/ecs"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
@@ -170,7 +176,7 @@ jobs:
         id: publish_dcl_js_runtime
         uses: menduz/oddish-action@master
         with:
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
           access: public
           cwd: ./packages/@dcl/js-runtime
           ## use action runId instead of current date to generate snapshot numbers
@@ -178,7 +184,7 @@ jobs:
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/js-runtime'
+          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/js-runtime"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
@@ -187,7 +193,7 @@ jobs:
         id: publish_dcl_react_ecs
         uses: menduz/oddish-action@master
         with:
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
           access: public
           cwd: ./packages/@dcl/react-ecs
           ## use action runId instead of current date to generate snapshot numbers
@@ -195,7 +201,7 @@ jobs:
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/react-ecs'
+          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/react-ecs"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
@@ -228,7 +234,7 @@ jobs:
         uses: menduz/oddish-action@master
         id: publish_decentraland_sdk
         with:
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
           access: public
           cwd: ./packages/@dcl/sdk
           ## use action runId instead of current date to generate snapshot numbers
@@ -236,7 +242,7 @@ jobs:
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
+          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
@@ -245,7 +251,7 @@ jobs:
         uses: menduz/oddish-action@master
         id: publish_decentraland_inspector
         with:
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
           access: public
           cwd: ./packages/@dcl/inspector
           ## use action runId instead of current date to generate snapshot numbers
@@ -253,7 +259,7 @@ jobs:
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/inspector'
+          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/inspector"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
@@ -262,7 +268,7 @@ jobs:
         uses: menduz/oddish-action@master
         id: publish_playground_assets
         with:
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
           access: public
           cwd: ./packages/@dcl/playground-assets
           ## use action runId instead of current date to generate snapshot numbers
@@ -270,7 +276,7 @@ jobs:
 
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
+          s3-bucket-key-prefix: "@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
@@ -286,7 +292,7 @@ jobs:
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
+          comment-author: "github-actions[bot]"
           body-includes: Test this pull request
       - name: Generate SDK S3 URL
         id: sdk-url-generator
@@ -329,6 +335,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+      - name: install npm v8
+        run: npm i -g npm@8
       - run: mkdir -p scene
       - name: npx @dcl/sdk init
         run: npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }} init
