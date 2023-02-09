@@ -42,7 +42,6 @@ export interface MapComponentDefinition<T> extends ComponentDefinition<T> {
 }
 
 /**
- * @internal
  */
 export type PreEngine = Pick<
   IEngine,
@@ -65,16 +64,10 @@ export type PreEngine = Pick<
   getSystems: () => SystemItem[]
 }
 
-/**
- * @internal
- */
 export interface IEngineOptions {
   onChangeFunction: OnChangeFunction
 }
 
-/**
- * @public
- */
 export interface IEngine {
   /**
    * @public

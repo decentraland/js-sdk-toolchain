@@ -28,7 +28,9 @@
     "@types/react-reconciler": "^0.28.0"
   },
   "dependencies": {
+    "@dcl/crdt": "file:../crdt",
     "@dcl/ecs": "file:../ecs",
+    "@dcl/js-runtime": "file:../crdt",
     "react": "^18.2.0",
     "react-reconciler": "^0.29.0"
   },

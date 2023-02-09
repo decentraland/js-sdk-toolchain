@@ -28,6 +28,11 @@ import {
 import { compileEcsComponents } from './protocol-buffer-generation'
 import { compileProtoApi } from './rpc-api-generation'
 import { getSnippetsfile } from './utils/getFilePathsSync'
+import future, { IFuture } from 'fp-future'
+
+function itWaitFuture(label: string, fut: IFuture<any>) {
+  it(label, async () => fut)
+}
 
 flow('build-all', () => {
   afterAll(async () => {
@@ -37,6 +42,11 @@ flow('build-all', () => {
   })
 
   commonChecks()
+
+  const crdtBuildFuture = future<void>()
+  const ecsBuildFuture = future<void>()
+  const reactEcsBuildFuture = future<void>()
+  const sdkBuildFuture = future<void>()
 
   flow('@dcl/js-runtime', () => {
     itExecutes('npm i --silent', ECS7_PATH)
@@ -83,9 +93,13 @@ flow('build-all', () => {
       ensureFileExists('dist/types.d.ts', CRDT_PATH)
       ensureFileExists('dist/types.js', CRDT_PATH)
     })
+    crdtBuildFuture.resolve()
   })
+
   flow('@dcl/ecs build', () => {
     itDeletesFolder('dist', ECS7_PATH)
+    itWaitFuture('waiting for crdt build', crdtBuildFuture)
+
     itExecutes('npm i --silent', ECS7_PATH)
     itExecutes(`npm install --silent ${CRDT_PATH}`, ECS7_PATH)
     compileEcsComponents(
@@ -98,9 +112,11 @@ flow('build-all', () => {
       ensureFileExists('dist/index.d.ts', ECS7_PATH)
       ensureFileExists('dist/index.js', ECS7_PATH)
     })
+    ecsBuildFuture.resolve()
   })
 
   flow('@dcl/react-ecs', () => {
+    itWaitFuture('waiting for ecs build', ecsBuildFuture)
     itExecutes('npm i --silent', REACT_ECS)
     itExecutes(`npm install --silent ${ECS7_PATH}`, REACT_ECS)
     itExecutes('npm run build --silent', REACT_ECS)
@@ -108,9 +124,11 @@ flow('build-all', () => {
       ensureFileExists('dist/index.js', REACT_ECS)
       ensureFileExists('dist/index.d.ts', REACT_ECS)
     })
+    reactEcsBuildFuture.resolve()
   })
 
   flow('@dcl/sdk build', () => {
+    itWaitFuture('waiting for react-ecs build', reactEcsBuildFuture)
     itDeletesFolder('dist', SDK_PATH)
     itExecutes(`npm i --silent`, SDK_PATH)
 
@@ -139,6 +157,7 @@ flow('build-all', () => {
     })
 
     itExecutes(`chmod +x cli/index.js`, SDK_PATH)
+    sdkBuildFuture.resolve()
   })
 
   flow('@dcl/inspector', () => {
@@ -157,6 +176,8 @@ flow('build-all', () => {
   })
 
   flow('@dcl/playground-assets build', () => {
+    itWaitFuture('waiting for react-ecs build', sdkBuildFuture)
+
     itDeletesFolder('dist', PLAYGROUND_ASSETS_PATH)
     itDeletesFolder('bin', PLAYGROUND_ASSETS_PATH)
 
