@@ -7,7 +7,11 @@ EVAL test/snapshots/cube-deleted.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 15k
+<<<<<<< HEAD
   MALLOC_COUNT = 6190
+=======
+  MALLOC_COUNT = 6192
+>>>>>>> main
   ALIVE_OBJS_DELTA ~= 1.05k
 CALL onStart()
   OPCODES ~= 0k
@@ -40,4 +44,8 @@ CALL onUpdate(0.1)
   OPCODES ~= 5k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 872.48k bytes
+=======
+  MEMORY_USAGE_COUNT ~= 872.87k bytes
+>>>>>>> main

@@ -35,5 +35,8 @@
   "bugs": {
     "url": "https://github.com/decentraland/js-sdk-toolchain/issues"
   },
-  "homepage": "https://github.com/decentraland/js-sdk-toolchain#readme"
+  "homepage": "https://github.com/decentraland/js-sdk-toolchain#readme",
+  "engines": {
+    "npm": ">=8.0.0 <9.0.0"
+  }
 }
