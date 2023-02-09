@@ -2295,7 +2295,9 @@ export namespace Schemas {
     const // (undocumented)
     Entity: ISchema<Entity>;
     const // (undocumented)
-    Enum: <T>(type: ISchema<any>) => ISchema<T>;
+    EnumNumber: <T>(enumObject: Record<any, any>, defaultValue: T) => ISchema<T>;
+    const // (undocumented)
+    EnumString: <T>(enumObject: Record<any, any>, defaultValue: T) => ISchema<T>;
     const // (undocumented)
     Array: <T>(type: ISchema<T>) => ISchema<T[]>;
     const // (undocumented)

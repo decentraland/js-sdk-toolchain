@@ -229,11 +229,11 @@ describe('Serialization Types', () => {
       Default = 0,
       Red = 2,
       Green = 0x33,
-      Pink = 0xff290323
+      Pink = 0x1f290323
     }
 
     const TestComponent = engine.defineComponent(COMPONENT_ID.toString(), {
-      testEnum: Schemas.Enum<ColorToNumber>(Schemas.Int64)
+      testEnum: Schemas.EnumNumber<ColorToNumber>(ColorToNumber, ColorToNumber.Default)
     })
 
     expect(TestComponent.create(entity)).toStrictEqual({ testEnum: 0 })
@@ -258,15 +258,15 @@ describe('Serialization Types', () => {
     enum ColorToString {
       Red = '2',
       Green = '0x33',
-      Pink = '0xff290323'
+      Pink = '0x1f290323'
     }
 
     const TestComponent = engine.defineComponent(COMPONENT_ID.toString(), {
-      testEnum: Schemas.Enum<ColorToString>(Schemas.String)
+      testEnum: Schemas.EnumString<ColorToString>(ColorToString, ColorToString.Red)
     })
 
-    // const value1 = TestComponent.create(entity, {})
-    expect(TestComponent.create(entity)).toStrictEqual({ testEnum: '' })
+    // the default value is ColorToString.Red
+    expect(TestComponent.create(entity)).toStrictEqual({ testEnum: '2' })
     TestComponent.createOrReplace(entity, { testEnum: ColorToString.Pink })
 
     const entity2 = engine.addEntity()
@@ -428,5 +428,79 @@ describe('Serialization Types', () => {
     expect(copiedEntity.value).toBe(engine.RootEntity)
     const updatedEntity = EntityComponent.updateFromBinary(entityCopied, buffer)
     expect(updatedEntity!.value).toBe(someEntity)
+  })
+
+  it('should fail with wrong enums', () => {
+    expect(() => {
+      enum BadEnum {
+        Red = '2',
+        Green = '0x33',
+        Pink = '0x1f290323'
+      }
+
+      Schemas.EnumNumber<BadEnum>(BadEnum, BadEnum.Red)
+    }).toThrowError()
+
+    expect(() => {
+      enum BadEnum {
+        Red = 2,
+        Green = 0x33,
+        Pink = 0x1f290323
+      }
+
+      Schemas.EnumString<BadEnum>(BadEnum, BadEnum.Red)
+    }).toThrowError()
+
+    expect(() => {
+      enum BadEnum {
+        Red = 2,
+        Green = 0x33,
+        Pink = 0x1f290323,
+        StringColor = 'someColorString'
+      }
+
+      Schemas.EnumNumber<BadEnum>(BadEnum, BadEnum.Red)
+    }).toThrowError()
+
+    expect(() => {
+      enum BadEnum {
+        Red = 2,
+        Green = 0x33,
+        Pink = 0xff290323 // is out of range
+      }
+
+      Schemas.EnumNumber<BadEnum>(BadEnum, BadEnum.Red)
+    }).toThrowError()
+
+    expect(() => {
+      enum BadEnum {
+        Red = '2',
+        Green = '0x33',
+        Pink = '0x1f290323',
+        NumberColor = 435
+      }
+
+      Schemas.EnumString<BadEnum>(BadEnum, BadEnum.Red)
+    }).toThrowError()
+
+    expect(() => {
+      enum RightEnum {
+        Red = '2',
+        Green = '0x33',
+        Pink = '0x1f290323'
+      }
+
+      Schemas.EnumString<RightEnum>(RightEnum, RightEnum.Red)
+    }).not.toThrowError()
+
+    expect(() => {
+      enum RightEnum {
+        Red = 2,
+        Green = 0x33,
+        Pink = 0x1f290323
+      }
+
+      Schemas.EnumNumber<RightEnum>(RightEnum, RightEnum.Red)
+    }).not.toThrowError()
   })
 })

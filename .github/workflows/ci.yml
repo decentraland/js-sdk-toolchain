@@ -17,6 +17,8 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
+      - name: install npm v8
+        run: npm i -g npm@8
       - name: install
         run: make install
       - name: lint
@@ -29,6 +31,8 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
+      - name: install npm v8
+        run: npm i -g npm@8
       - name: install
         run: make install
       - name: build
@@ -55,6 +59,8 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
+      - name: install npm v8
+        run: npm i -g npm@8
       - name: install
         run: make install
       - name: update version of packages/@dcl/dcl-rollup
@@ -329,6 +335,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+      - name: install npm v8
+        run: npm i -g npm@8
       - run: mkdir -p scene
       - name: npx @dcl/sdk init
         run: npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }} init
