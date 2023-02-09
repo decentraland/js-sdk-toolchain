@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { createSceneConfig } from './configs'
 import { RollupError, RollupWatcher, watch } from 'rollup'
 import * as ts from 'typescript'
