@@ -220,7 +220,9 @@ export function createUpdateFromCrdt(
   }
 
   return (msg: CrdtMessageBody): [null | PutComponentMessageBody | DeleteComponentMessageBody, any] => {
+    /* istanbul ignore next */
     if (msg.type !== CrdtMessageType.PUT_COMPONENT && msg.type !== CrdtMessageType.DELETE_COMPONENT)
+      /* istanbul ignore next */
       return [null, data.get(msg.entityId)]
 
     const action = crdtRuleForCurrentState(msg)

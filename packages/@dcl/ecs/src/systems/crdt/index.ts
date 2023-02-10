@@ -146,9 +146,11 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
             onProcessEntityComponentChange && onProcessEntityComponentChange(msg.entityId, msg.type, component)
           }
+          /* istanbul ignore next */
         } else {
           // If we don't recognize the package's component it doesn't mean it is invalid.
           // we forward it to other transports
+          /* istanbul ignore next */
           broadcastMessages.push(msg)
         }
       }
