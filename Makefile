@@ -100,9 +100,8 @@ deep-clean:
 		packages/@dcl/inspector/node_modules/
 	make clean
 
-update-snapshots: export UPDATE_SNAPSHOTS = true
-update-snapshots:
-	make test TESTARGS="test/*.spec.ts"
+update-snapshots: export UPDATE_SNAPSHOTS=true
+update-snapshots: test
 
 clean:
 	@echo "> Cleaning all folders"
