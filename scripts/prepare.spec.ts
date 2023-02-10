@@ -7,7 +7,6 @@ import {
   ECS7_PATH,
   REACT_ECS,
   PLAYGROUND_ASSETS_PATH,
-  CRDT_PATH,
   INSPECTOR_PATH
 } from './common'
 
@@ -19,7 +18,6 @@ flow('build-all', () => {
   flow('@dcl/sdk', () => {
     // update dependencies versions and link packages
     itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, ROLLUP_CONFIG_PATH)
-    itInstallsADependencyFromFolderAndCopiesTheVersion(ECS7_PATH, CRDT_PATH)
     itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, ECS7_PATH)
     itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, REACT_ECS)
     itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, JS_RUNTIME)
@@ -27,7 +25,6 @@ flow('build-all', () => {
   })
 
   flow('pack every package', () => {
-    itExecutes('npm pack', CRDT_PATH)
     itExecutes('npm pack', SDK_PATH)
     itExecutes('npm pack', JS_RUNTIME)
     itExecutes('npm pack', ECS7_PATH)

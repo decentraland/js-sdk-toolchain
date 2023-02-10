@@ -1,14 +1,8 @@
-import { ComponentDataMessage, dataCompare, ProcessMessageResultType } from '@dcl/crdt'
-import { Schemas } from '../schemas'
 import type { ISchema } from '../schemas/ISchema'
 import { ByteBuffer, ReadWriteByteBuffer } from '../serialization/ByteBuffer'
-import {
-  CrdtMessageType,
-  DeleteComponentMessage,
-  DeleteComponentMessageBody,
-  PutComponentMessageBody
-} from '../serialization/crdt'
-import { Entity, EntityUtils } from './entity'
+import { CrdtMessageType, DeleteComponentMessageBody, ProcessMessageResultType, PutComponentMessageBody } from '../serialization/crdt'
+import { dataCompare } from '../systems/crdt/utils'
+import { Entity } from './entity'
 import { deepReadonly, DeepReadonly } from './readonly'
 
 /**
@@ -176,17 +170,27 @@ export function createUpdateFromCrdt(
 
     // Outdated Message. Resend our state message through the wire.
     if (currentTimestamp > timestamp) {
-      console.log('2', currentTimestamp, timestamp)
+      // console.log('2', currentTimestamp, timestamp)
       return ProcessMessageResultType.StateOutdatedTimestamp
     }
 
-    const writeBuffer = new ReadWriteByteBuffer()
-    schema.serialize(data.get(entityId)!, writeBuffer)
+    // Deletes are idempotent
+    if (message.type === CrdtMessageType.DELETE_COMPONENT && !data.has(entityId)) {
+      return ProcessMessageResultType.NoChanges
+    }
 
-    const currentDataGreater = dataCompare(writeBuffer.toBinary(), (message as any).data || null)
+    let currentDataGreater = 0
+
+    if (data.has(entityId)) {
+      const writeBuffer = new ReadWriteByteBuffer()
+      schema.serialize(data.get(entityId)!, writeBuffer)
+      currentDataGreater = dataCompare(writeBuffer.toBinary(), (message as any).data || null)
+    } else {
+      currentDataGreater = dataCompare(null, (message as any).data || null)
+    }
 
     // Same data, same timestamp. Weirdo echo message.
-    console.log('3', currentDataGreater, writeBuffer.toBinary(), (message as any).data || null)
+    // console.log('3', currentDataGreater, writeBuffer.toBinary(), (message as any).data || null)
     if (currentDataGreater === 0) {
       return ProcessMessageResultType.NoChanges
     } else if (currentDataGreater > 0) {
@@ -215,7 +219,7 @@ export function createUpdateFromCrdt(
           data.delete(entity)
         }
 
-        return [null, data.get(entity) || null]
+        return [null, data.get(entity)]
       }
       case ProcessMessageResultType.StateOutdatedTimestamp:
       case ProcessMessageResultType.StateOutdatedData: {
@@ -231,7 +235,7 @@ export function createUpdateFromCrdt(
               entityId: entity,
               timestamp: timestamps.get(entity)!
             } as PutComponentMessageBody,
-            data.get(entity) || null
+            data.get(entity)
           ]
         } else {
           return [
@@ -241,13 +245,13 @@ export function createUpdateFromCrdt(
               entityId: entity,
               timestamp: timestamps.get(entity)!
             } as DeleteComponentMessageBody,
-            null
+            undefined
           ]
         }
       }
     }
 
-    return [null, data.get(entity) || null]
+    return [null, data.get(entity)]
   }
 }
 

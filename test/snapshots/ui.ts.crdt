@@ -7,8 +7,8 @@ EVAL test/snapshots/ui.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 28k
-  MALLOC_COUNT = 23027
-  ALIVE_OBJS_DELTA ~= 3.38k
+  MALLOC_COUNT = 23427
+  ALIVE_OBJS_DELTA ~= 3.45k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 2
@@ -32,9 +32,9 @@ CALL onUpdate(0.0)
   CRDT: e=0x207 c=1050 t=1 data={"parent":0,"rightOf":0,"alignContent":1,"alignItems":1,"flexWrap":1,"positionType":0,"alignSelf":1,"flexDirection":0,"justifyContent":0,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":1,"width":700,"heightUnit":1,"height":400,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":1,"marginLeft":500,"marginTopUnit":1,"marginTop":35,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":0,"paddingBottom":0}
   CRDT: e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   CRDT: e=0x200 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-  OPCODES ~= 117k
-  MALLOC_COUNT = 610
-  ALIVE_OBJS_DELTA ~= 0.21k
+  OPCODES ~= 88k
+  MALLOC_COUNT = 398
+  ALIVE_OBJS_DELTA ~= 0.14k
 CALL onUpdate(0.1)
   CRDT: e=0x200 c=1 t=2 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.008726535364985466,"z":0,"w":0.9999619126319885},"scale":{"x":1,"y":1,"z":1},"parent":0}
   OPCODES ~= 54k
@@ -50,4 +50,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 52k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 4770.40k bytes
+  MEMORY_USAGE_COUNT ~= 4530.98k bytes

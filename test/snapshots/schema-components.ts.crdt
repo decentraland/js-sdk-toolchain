@@ -7,16 +7,16 @@ EVAL test/snapshots/schema-components.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 17k
-  MALLOC_COUNT = 5215
-  ALIVE_OBJS_DELTA ~= 0.84k
+  MALLOC_COUNT = 5113
+  ALIVE_OBJS_DELTA ~= 0.83k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 2
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.0)
-  OPCODES ~= 5k
-  MALLOC_COUNT = 62
-  ALIVE_OBJS_DELTA ~= 0.02k
+  OPCODES ~= 4k
+  MALLOC_COUNT = 33
+  ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
   OPCODES ~= 1k
   MALLOC_COUNT = 0
@@ -29,4 +29,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 758.07k bytes
+  MEMORY_USAGE_COUNT ~= 690.21k bytes

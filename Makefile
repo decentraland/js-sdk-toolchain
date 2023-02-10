@@ -101,8 +101,6 @@ deep-clean:
 	make clean
 
 update-snapshots:
-	rm -rf test/crdt/data/*.test
-	UPDATE_SNAPSHOTS=true make test TESTARGS="test/crdt/*.spec.ts"
 	UPDATE_SNAPSHOTS=true make test TESTARGS="test/*.spec.ts"
 
 clean:

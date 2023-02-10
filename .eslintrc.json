@@ -8,7 +8,6 @@
       "packages/@dcl/inspector/tsconfig.json",
       "packages/@dcl/sdk/tsconfig.cli.json",
       "packages/@dcl/sdk/tsconfig.json",
-      "packages/@dcl/crdt/tsconfig.json",
       "packages/@dcl/playground-assets/tsconfig.json",
       "packages/@dcl/react-ecs/tsconfig.json",
       "scripts/tsconfig.json",

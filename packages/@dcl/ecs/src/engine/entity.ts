@@ -1,4 +1,4 @@
-import { createVersionGSet } from '@dcl/crdt/dist/gset'
+import { createVersionGSet } from '../systems/crdt/gset'
 
 /**
  * @public It only defines the type explicitly, no effects.

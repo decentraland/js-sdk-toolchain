@@ -131,8 +131,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         if (component) {
           const [conflictMessage, _currentValue] = component.updateFromCrdt(msg)
 
-          console.log({ conflictMessage, _currentValue })
-
           if (conflictMessage) {
             const offset = bufferForOutdated.currentWriteOffset()
 

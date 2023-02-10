@@ -436,7 +436,8 @@ describe('Engine tests', () => {
     expect(Transform.get(entity)).toStrictEqual({
       position: { x: 12, y: 1, z: 3 },
       scale: { x: 1, y: 1, z: 1 },
-      rotation: { x: 0, y: 0, z: 0, w: 1 }
+      rotation: { x: 0, y: 0, z: 0, w: 1 },
+      parent: 0 as Entity
     })
     await engine.update(1)
     expect(Transform.get(entity).position.x).toStrictEqual(13)

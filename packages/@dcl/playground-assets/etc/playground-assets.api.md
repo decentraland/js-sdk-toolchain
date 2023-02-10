@@ -403,10 +403,14 @@ export interface ComponentDefinition<T> {
     default(): DeepReadonly<T>;
     deleteFrom(entity: Entity): T | null;
     get(entity: Entity): DeepReadonly<T>;
+    // (undocumented)
+    getCrdtUpdates(): Iterable<PutComponentMessageBody | DeleteComponentMessageBody>;
     getMutable(entity: Entity): T;
     getMutableOrNull(entity: Entity): T | null;
     getOrNull(entity: Entity): DeepReadonly<T> | null;
     has(entity: Entity): boolean;
+    // (undocumented)
+    updateFromCrdt(body: PutComponentMessageBody | DeleteComponentMessageBody): [null | DeleteComponentMessageBody | PutComponentMessageBody, T | null];
     // (undocumented)
     writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void;
 }
@@ -445,6 +449,16 @@ export function createEthereumProvider(): {
     send(message: RPCSendableMessage, callback?: ((error: Error | null, result?: any) => void) | undefined): void;
     sendAsync(message: RPCSendableMessage, callback: (error: Error | null, result?: any) => void): void;
 };
+
+// Warning: (ae-missing-release-tag) "createGetCrdtMessages" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function createGetCrdtMessages(componentId: number, timestamps: Map<Entity, number>, dirtyIterator: Set<Entity>, schema: Pick<ISchema<any>, 'serialize'>, data: Map<Entity, unknown>): () => Generator<PutComponentMessageBody | DeleteComponentMessageBody, void, unknown>;
+
+// Warning: (ae-missing-release-tag) "createUpdateFromCrdt" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function createUpdateFromCrdt(componentId: number, timestamps: Map<Entity, number>, schema: Pick<ISchema<any>, 'serialize' | 'deserialize'>, data: Map<Entity, unknown>): (msg: PutComponentMessageBody | DeleteComponentMessageBody) => [null | PutComponentMessageBody | DeleteComponentMessageBody, any];
 
 // Warning: (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
 // Warning: (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
@@ -874,6 +888,11 @@ export type IInputSystem = {
 export type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
 }[keyof T];
+
+// Warning: (ae-missing-release-tag) "incrementTimestamp" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function incrementTimestamp(entity: Entity, timestamps: Map<Entity, number>): number;
 
 // Warning: (tsdoc-html-tag-missing-string) The HTML element has an invalid attribute: Expecting an HTML string starting with a single-quote or double-quote character
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
@@ -2068,6 +2087,33 @@ export type PositionType = 'absolute' | 'relative';
 
 // @public
 export type PositionUnit = `${number}px` | `${number}%` | number;
+
+// Warning: (ae-missing-release-tag) "ProcessMessageResultType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export enum ProcessMessageResultType {
+    // Warning: (tsdoc-undefined-tag) The TSDoc tag "@state" is not defined in this configuration
+    // Warning: (tsdoc-undefined-tag) The TSDoc tag "@reason" is not defined in this configuration
+    EntityDeleted = 7,
+    // Warning: (tsdoc-undefined-tag) The TSDoc tag "@state" is not defined in this configuration
+    // Warning: (tsdoc-undefined-tag) The TSDoc tag "@reason" is not defined in this configuration
+    EntityWasDeleted = 6,
+    // Warning: (tsdoc-undefined-tag) The TSDoc tag "@state" is not defined in this configuration
+    // Warning: (tsdoc-undefined-tag) The TSDoc tag "@reason" is not defined in this configuration
+    NoChanges = 3,
+    // Warning: (tsdoc-undefined-tag) The TSDoc tag "@state" is not defined in this configuration
+    // Warning: (tsdoc-undefined-tag) The TSDoc tag "@reason" is not defined in this configuration
+    StateOutdatedData = 4,
+    // Warning: (tsdoc-undefined-tag) The TSDoc tag "@state" is not defined in this configuration
+    // Warning: (tsdoc-undefined-tag) The TSDoc tag "@reason" is not defined in this configuration
+    StateOutdatedTimestamp = 2,
+    // Warning: (tsdoc-undefined-tag) The TSDoc tag "@state" is not defined in this configuration
+    // Warning: (tsdoc-undefined-tag) The TSDoc tag "@reason" is not defined in this configuration
+    StateUpdatedData = 5,
+    // Warning: (tsdoc-undefined-tag) The TSDoc tag "@state" is not defined in this configuration
+    // Warning: (tsdoc-undefined-tag) The TSDoc tag "@reason" is not defined in this configuration
+    StateUpdatedTimestamp = 1
+}
 
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 //

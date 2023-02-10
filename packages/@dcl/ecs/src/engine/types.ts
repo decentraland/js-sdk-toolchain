@@ -1,4 +1,3 @@
-import { State } from '@dcl/crdt'
 import type { ISchema } from '../schemas/ISchema'
 import { MapResult, Spec } from '../schemas/Map'
 import { OnChangeFunction } from '../systems/crdt'
