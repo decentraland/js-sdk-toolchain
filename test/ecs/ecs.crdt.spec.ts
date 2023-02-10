@@ -1,4 +1,5 @@
-import { components, CrdtMessageType, DeleteComponent, IEngine } from '../../packages/@dcl/ecs/src'
+import { components, CrdtMessageType, DeleteComponent, IEngine, Schemas } from '../../packages/@dcl/ecs/src'
+import { PutComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt'
 import { Entity, EntityState, EntityUtils, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src/engine/entity'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { Vector3 } from '../../packages/@dcl/sdk/src/math'
@@ -215,42 +216,42 @@ describe('CRDT tests', () => {
     })
   })
 
-  // it('should resend a crdt message if its outdated', async () => {
-  //   const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
-  //   const entity = engine.addEntity()
-  //   const Transform = components.Transform(engine)
-  //   Transform.create(entity, SandBox.DEFAULT_POSITION)
-  //   await engine.update(1)
-  //   Transform.getMutable(entity).position.x = 8
-  //   await engine.update(1)
-  //   const buffer = new ReadWriteByteBuffer()
-  //   PutComponentOperation.write(entity, 0, Transform.componentId, , buffer)
-  //   jest.resetAllMocks()
-  //   transports[0].onmessage!(buffer.toBinary())
-  //   await engine.update(1)
+  it('should resend a crdt message if its outdated', async () => {
+    const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
+    const entity = engine.addEntity()
+    const Transform = components.Transform(engine)
+    Transform.create(entity, SandBox.DEFAULT_POSITION)
+    await engine.update(1)
+    Transform.getMutable(entity).position.x = 8
+    await engine.update(1)
+    const buffer = new ReadWriteByteBuffer()
+    PutComponentOperation.write(entity, 0, Transform.componentId, Transform.toBinary(entity).toBinary(), buffer)
+    jest.resetAllMocks()
+    transports[0].onmessage!(buffer.toBinary())
+    await engine.update(1)
 
-  //   const outdatedBuffer = new ReadWriteByteBuffer()
-  //   PutComponentOperation.write(entity, 2, Transform, outdatedBuffer)
-  //   expect(spySend).toBeCalledWith(outdatedBuffer.toBinary())
-  // })
+    const outdatedBuffer = new ReadWriteByteBuffer()
+    PutComponentOperation.write(entity, 2, Transform.componentId, Transform.toBinary(entity).toBinary(), outdatedBuffer)
+    expect(spySend).toBeCalledWith(outdatedBuffer.toBinary())
+  })
 
-  // it('should resend a crdt delete message if its outdated', async () => {
-  //   const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
-  //   const entity = engine.addEntity()
-  //   const Transform = components.Transform(engine)
-  //   Transform.create(entity, SandBox.DEFAULT_POSITION)
-  //   await engine.update(1)
-  //   const buffer = new ReadWriteByteBuffer()
-  //   PutComponentOperation.write(entity, 0, Transform, buffer)
-  //   Transform.deleteFrom(entity)
-  //   await engine.update(1)
-  //   jest.resetAllMocks()
-  //   transports[0].onmessage!(buffer.toBinary())
-  //   await engine.update(1)
-  //   const outdatedBuffer = new ReadWriteByteBuffer()
-  //   DeleteComponent.write(entity, Transform.componentId, 2, outdatedBuffer)
-  //   expect(spySend).toBeCalledWith(outdatedBuffer.toBinary())
-  // })
+  it('should resend a crdt delete message if its outdated', async () => {
+    const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
+    const entity = engine.addEntity()
+    const Transform = components.Transform(engine)
+    Transform.create(entity, SandBox.DEFAULT_POSITION)
+    await engine.update(1)
+    const buffer = new ReadWriteByteBuffer()
+    PutComponentOperation.write(entity, 0, Transform.componentId, Transform.toBinary(entity).toBinary(), buffer)
+    Transform.deleteFrom(entity)
+    await engine.update(1)
+    jest.resetAllMocks()
+    transports[0].onmessage!(buffer.toBinary())
+    await engine.update(1)
+    const outdatedBuffer = new ReadWriteByteBuffer()
+    DeleteComponent.write(entity, Transform.componentId, 2, outdatedBuffer)
+    expect(spySend).toBeCalledWith(outdatedBuffer.toBinary())
+  })
 
   it('should remove a component if we receive a DELETE_COMPONENT operation message', async () => {
     const [{ engine, transports }] = SandBox.create({ length: 1 })
@@ -267,73 +268,76 @@ describe('CRDT tests', () => {
     await engine.update(1)
     expect(Transform.getOrNull(entity)).toBe(null)
   })
-  // it('should process messages even if the component is not found', async () => {
-  //   const [{ engine }, { engine: serverEngine, transports }] = SandBox.create({
-  //     length: 2
-  //   })
-  //   const [serverTransport] = transports
-  //   const entity = engine.addEntity()
-  //   const cusutomComponent = engine.defineComponent('custom component', {
-  //     open: Schemas.Boolean
-  //   })
-  //   cusutomComponent.create(entity, { open: false })
-  //   await engine.update(1)
 
-  //   const buffer = new ReadWriteByteBuffer()
-  //   PutComponentOperation.write(entity, 1, cusutomComponent, buffer)
-  //   serverTransport.onmessage!(buffer.toBinary())
-  //   await serverEngine.update(1)
-  //   const crdtState = serverEngine.getCrdtState()
-  //   const component = crdtState.components.get(cusutomComponent.componentId)!.get(entity as number)!
-  //   expect(component?.data).toStrictEqual(cusutomComponent.toBinary(entity).toBinary())
-  //   expect(component?.timestamp).toBe(1)
-  // })
+  it('should process messages even if the component is not found', async () => {
+    const [{ engine }, { engine: serverEngine, transports }] = SandBox.create({
+      length: 2
+    })
+    const [serverTransport] = transports
+    const entity = engine.addEntity()
+    const customComponent = engine.defineComponent('custom component', {
+      open: Schemas.Boolean
+    })
+    const customServerComponent = serverEngine.defineComponent('custom component', {
+      open: Schemas.Boolean
+    })
+    customComponent.create(entity, { open: false })
+    await engine.update(1)
 
-  // it('should converge to the same final state (a simple transform creation)', async () => {
-  //   const {
-  //     clients: [clientA, clientB, clientC],
-  //   } = SandBox.createEngines({ length: 3 })
+    const buffer = new ReadWriteByteBuffer()
+    PutComponentOperation.write(
+      entity,
+      1,
+      customComponent.componentId,
+      customComponent.toBinary(entity).toBinary(),
+      buffer
+    )
+    serverTransport.onmessage!(buffer.toBinary())
+    await serverEngine.update(1)
+    expect(customServerComponent.get(entity)).toEqual(customComponent.get(entity))
+  })
 
-  //   const entityA = clientA.engine.addEntity()
-  //   clientA.Transform.create(entityA, { position: Vector3.One() })
+  it('should converge to the same final state (a simple transform creation)', async () => {
+    const {
+      clients: [clientA, clientB, clientC]
+    } = SandBox.createEngines({ length: 3 })
 
-  //   // before the update, the crdt state is out-to-date
-  //   expect(checkCrdtStateWithEngine(clientA.engine).conflicts.length === 0).toBe(false)
-  //   await clientA.engine.update(1)
+    const entityA = clientA.engine.addEntity()
+    clientA.Transform.create(entityA, { position: Vector3.One() })
 
-  //   // now, the crdt state and engine should converge
-  //   expect(checkCrdtStateWithEngine(clientA.engine).conflicts.length === 0).toBe(true)
+    // before the update, the crdt state is out-to-date
+    expect(() => compareStatePayloads({ clientA, clientB, clientC })).toThrow()
 
-  //   // between clients, ClientA hasn't sent anything yet, so, crdt state won't be synched
-  //   expect(compareStatePayloads(getCrdtStates())).toBe(false)
+    await clientA.engine.update(1)
 
-  //   clientA.flushOutgoing()
+    // now, the crdt state and engine should converge
+    expect(() => compareStatePayloads({ clientA, clientB, clientC })).toThrow()
 
-  //   // flush is not enough, the updates should be called to read messages
-  //   expect(compareStatePayloads(getCrdtStates())).toBe(false)
+    // between clients, ClientA hasn't sent anything yet, so, crdt state won't be synched
+    clientA.flushOutgoing()
 
-  //   await clientB.engine.update(1)
-  //   await clientC.engine.update(1)
+    await clientB.engine.update(1)
+    await clientC.engine.update(1)
 
-  //   // now, it should be all synched
-  //   compareStatePayloads({clientA, clientB, clientC})
-  // })
+    // now, it should be all synched
+    compareStatePayloads({ clientA, clientB, clientC })
+  })
 
-  // it('should ignore invalid message type', async () => {
-  //   const {
-  //     clients: [clientA]
-  //   } = SandBox.createEngines({ length: 1 })
+  it('should ignore invalid message type', async () => {
+    const {
+      clients: [clientA]
+    } = SandBox.createEngines({ length: 1 })
 
-  //   const buf = new ReadWriteByteBuffer()
-  //   buf.writeUint32(8)
-  //   buf.writeUint32(0x83294732)
+    const buf = new ReadWriteByteBuffer()
+    buf.writeUint32(8)
+    buf.writeUint32(0x83294732)
 
-  //   clientA.transports[0].onmessage!(buf.toBinary()!)
+    clientA.transports[0].onmessage!(buf.toBinary()!)
 
-  //   const stateBeforeProcessMessage = stateToString(clientA.engine.getCrdtState())
-  //   await clientA.engine.update(1)
-  //   expect(stateToString(clientA.engine.getCrdtState())).toBe(stateBeforeProcessMessage)
-  // })
+    const stateBeforeProcessMessage = serializeEngine(clientA.engine)
+    await clientA.engine.update(1)
+    expect(serializeEngine(clientA.engine)).toBe(stateBeforeProcessMessage)
+  })
 
   it('should converge to the same final state (more complex scene code)', async () => {
     const {
@@ -519,7 +523,7 @@ function getEngineState(engine: IEngine) {
   return entities
 }
 
-function _serializeEngine(engine: IEngine) {
+function serializeEngine(engine: IEngine) {
   const out: string[] = []
   function entityKey(entity: Entity): string {
     return JSON.stringify('0x' + entity.toString(16))
@@ -552,7 +556,7 @@ function compareStatePayloads(record: Record<string, { engine: IEngine }>) {
       try {
         expect(current.serialization).toEqual(prev.serialization)
       } catch (err) {
-        console.error(`Failed comparing ${prev.name} with ${current.name}`)
+        console.info(`${prev.name} != ${current.name}`)
         throw err
       }
       return current
