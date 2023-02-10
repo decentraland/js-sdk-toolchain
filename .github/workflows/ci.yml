@@ -132,10 +132,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: publish @dcl/ecs package
         uses: menduz/oddish-action@master
         id: publish_ecs
@@ -196,10 +192,10 @@ jobs:
           ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_ecs.outputs.s3-bucket-key }}
           ROLLUP_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_rollup.outputs.s3-bucket-key }}
           JS_RUNTIME_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_js_runtime.outputs.s3-bucket-key }}
-      - name: (PR) change @dcl/inspector version to s3 url
-        working-directory: ./packages/@dcl/inspector
-        if: ${{ github.event.pull_request.number }}
-        run: node -e "let pkg=require('./package.json'); require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
+      # - name: (PR) change @dcl/inspector version to s3 url
+      #   working-directory: ./packages/@dcl/inspector
+      #   if: ${{ github.event.pull_request.number }}
+      #   run: node -e "let pkg=require('./package.json'); require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
       - name: playground upload to s3
         run: npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder $(pwd)/packages/@dcl/playground-assets/dist --bucket-folder '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/playground-assets'
         env:
