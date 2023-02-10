@@ -20,7 +20,7 @@ export enum CrdtMessageType {
  * All message length including
  * @param length - uint32 the length of all message (including the header)
  * @param type - define the function which handles the data
- * @internal
+ * @public
  */
 export type CrdtMessageHeader = {
   length: uint32
@@ -28,7 +28,7 @@ export type CrdtMessageHeader = {
 }
 
 /**
- * @internal
+ * @public
  */
 export const CRDT_MESSAGE_HEADER_LENGTH = 8
 
