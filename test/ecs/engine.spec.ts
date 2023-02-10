@@ -1,6 +1,5 @@
 import { cyclicParentingChecker, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src'
 import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
-import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { TransformSchema } from '../../packages/@dcl/ecs/src/components/legacy/Transform'

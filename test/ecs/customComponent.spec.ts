@@ -283,7 +283,7 @@ describe('test CRDT flow E2E', () => {
         {
           direction: 'a->b',
           entityId: entityA,
-          type: CrdtMessageType.DELETE_ENTITY,
+          type: CrdtMessageType.DELETE_ENTITY
         }
       ])
       env.connection.interceptedMessages = []
