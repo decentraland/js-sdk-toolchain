@@ -11,7 +11,7 @@ describe('Generated VisibilityComponent ProtoBuf', () => {
 
     VisibilityComponent.create(entityB)
     const buffer = VisibilityComponent.toBinary(entity)
-    VisibilityComponent.updateFromBinary(entityB, buffer)
+    VisibilityComponent.upsertFromBinary(entityB, buffer)
 
     expect(_shape).toBeDeepCloseTo({
       ...VisibilityComponent.getMutable(entityB)

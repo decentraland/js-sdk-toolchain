@@ -1,12 +1,11 @@
 import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/math'
-import { Engine, IEngine } from '../../packages/@dcl/ecs/src/engine'
+import { Engine } from '../../packages/@dcl/ecs/src/engine'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { componentNumberFromName } from '../../packages/@dcl/ecs/src/components/component-number'
 import { TransportMessage, Transport, CrdtMessageHeader } from '../../packages/@dcl/ecs/src'
 import { CrdtMessageProtocol, CrdtMessageType } from './../../packages/@dcl/ecs/src/serialization/crdt'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { components, Schemas, EntityUtils, EntityState } from '../../packages/@dcl/ecs/src'
-import { compareData, compareStatePayloads } from '../crdt/utils'
+import { components, Schemas } from '../../packages/@dcl/ecs/src'
 
 export function createNetworkTransport(): Transport {
   async function send(..._args: any[]) {}
@@ -21,95 +20,6 @@ export function createNetworkTransport(): Transport {
 
 export function wait(ms: number) {
   return new Promise<void>((resolve) => setTimeout(() => resolve(), ms))
-}
-
-/**
- * Compare the internal crdt state with the engine state.
- * - Deleted entities in the engine have to be the same as in the deleted entities gset on crdt
- * - each pair of <component, entityId> has to be the same data in both
- *
- * @param engine
- * @returns object with a conflicts array, if it's zero, it goes well.
- */
-export function checkCrdtStateWithEngine(engine: IEngine) {
-  const conflicts: string[] = []
-  const usedEntitiesByComponents: Set<Entity> = new Set()
-  const crdtState = engine.getCrdtState()
-
-  for (const def of engine.componentsIter()) {
-    const componentValues = Array.from(def.iterator())
-    const crdtComponent = crdtState.components.get(def.componentId)
-
-    if (componentValues.length === 0 && (crdtComponent === undefined || crdtComponent.size === 0)) {
-      continue
-    }
-
-    if (crdtComponent === undefined) {
-      conflicts.push(
-        `Component ${def.componentId} has ${componentValues.length} entities but there is no state stored in the CRDT.`
-      )
-    }
-
-    for (const [entity, _value] of componentValues) {
-      usedEntitiesByComponents.add(entity)
-      if (crdtComponent === undefined) {
-        continue
-      }
-
-      const crdtEntry = crdtComponent.get(entity)
-      const data = def.toBinary(entity).toBinary()
-
-      if (crdtEntry === null || crdtEntry === undefined || crdtEntry.data === null) {
-        conflicts.push(
-          `Entity ${entity} with componentId ${def.componentId} has value in the engine but not in the crdt.`
-        )
-        continue
-      }
-
-      const theSame = compareData(crdtEntry.data, data)
-      if (!theSame) {
-        conflicts.push(
-          `Entity ${entity} with componentId ${
-            def.componentId
-          } hasn't equal values between CRDT and engine => ${crdtEntry.data.toString()} vs ${data.toString()}`
-        )
-      }
-    }
-
-    if (crdtComponent !== undefined) {
-      // If CRDT has more entities, this will show the conflicts
-      for (const [entity, _payload] of crdtComponent) {
-        if (def.getOrNull(entity as Entity) === null) {
-          conflicts.push(
-            `Entity ${entity} with componentId ${def.componentId} has value in the CRDT but not in the engine.`
-          )
-        }
-      }
-    }
-  }
-
-  for (const [entityNumber, entityVersion] of engine.getCrdtState().deletedEntities.getMap()) {
-    const entity = EntityUtils.toEntityId(entityNumber, entityVersion)
-
-    if (engine.getEntityState(entity) !== EntityState.Removed) {
-      conflicts.push(
-        `Entity ${entity} is added to deleted entities in the CRDT state, but the state in the engine isn't.`
-      )
-    }
-  }
-
-  for (const entityId of usedEntitiesByComponents) {
-    const [n, v] = EntityUtils.fromEntityId(entityId)
-    if (crdtState.deletedEntities.has(n, v)) {
-      conflicts.push(
-        `Entity ${entityId} is added to deleted entities in the CRDT state, but the entity is being used in the engine.`
-      )
-    }
-  }
-
-  return {
-    conflicts
-  }
 }
 
 export namespace SandBox {
@@ -212,9 +122,6 @@ export namespace SandBox {
       }
     })
 
-    function getCrdtStates() {
-      return clients.map((client) => client.engine.getCrdtState())
-    }
     async function testCrdtSynchronization() {
       for (const client of clients) {
         await client.engine.update(1)
@@ -228,24 +135,18 @@ export namespace SandBox {
         await client.engine.update(1)
       }
 
-      const crdtStateConverged = compareStatePayloads(getCrdtStates())
-      const clientsEngineState = clients.map((client) => ({
-        id: client.id,
-        res: checkCrdtStateWithEngine(client.engine)
-      }))
-      const allConflicts = clientsEngineState.map((item) => item.res.conflicts).flat(1)
+      const crdtStateConverged = false // compareStatePayloads(getCrdtStates())
+      const allConflicts = ['A CONFLICT'] // clientsEngineState.map((item) => item.res.conflicts).flat(1)
 
       return {
         crdtStateConverged,
-        clientsEngineState,
         allConflicts
       }
     }
 
     return {
       clients,
-      testCrdtSynchronization,
-      getCrdtStates
+      testCrdtSynchronization
     }
   }
 

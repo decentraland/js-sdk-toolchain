@@ -1,7 +1,4 @@
-import { crdtProtocol } from '@dcl/crdt'
-import { ComponentDataMessage, CRDTMessageType, ProcessMessageResultType } from '@dcl/crdt/dist/types'
-
-import { Entity, EntityState, EntityUtils } from '../../engine/entity'
+import { Entity, EntityState } from '../../engine/entity'
 import type { ComponentDefinition } from '../../engine'
 import type { PreEngine } from '../../engine/types'
 import { ReadWriteByteBuffer } from '../../serialization/ByteBuffer'
@@ -26,17 +23,14 @@ export type OnChangeFunction = (
  */
 export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChange: OnChangeFunction | null) {
   const transports: Transport[] = []
-  // CRDT Client
-  const crdtClient = crdtProtocol<Uint8Array>({
-    toEntityId: EntityUtils.toEntityId,
-    fromEntityId: EntityUtils.fromEntityId
-  })
+
   // Messages that we received at transport.onMessage waiting to be processed
   const receivedMessages: ReceiveMessage[] = []
   // Messages already processed by the engine but that we need to broadcast to other transports.
   const broadcastMessages: TransportMessage[] = []
   // Messages receieved by a transport that were outdated. We need to correct them
   const outdatedMessages: TransportMessage[] = []
+
   /**
    *
    * @param transportId tranport id to identiy messages
@@ -110,21 +104,10 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
     for (const msg of messagesToProcess) {
       if (msg.type === CrdtMessageType.DELETE_ENTITY) {
-        crdtClient.processMessage({
-          type: CRDTMessageType.CRDTMT_DeleteEntity,
-          entityId: msg.entityId
-        })
         entitiesShouldBeCleaned.push(msg.entityId)
       } else {
-        const crdtMessage: ComponentDataMessage<Uint8Array> = {
-          type: CRDTMessageType.CRDTMT_PutComponentData,
-          entityId: msg.entityId,
-          componentId: msg.componentId,
-          data: msg.type === CrdtMessageType.PUT_COMPONENT ? msg.data : null,
-          timestamp: msg.timestamp
-        }
-
         const entityState = engine.entityContainer.getEntityState(msg.entityId)
+
         // Skip updates from removed entityes
         if (entityState === EntityState.Removed) continue
 
@@ -135,66 +118,46 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
         const component = engine.getComponentOrNull(msg.componentId)
 
-        // The state isn't updated because the dirty was set
-        //  out of the block of systems update between `receiveMessage` and `updateState`
-        if (component?.isDirty(msg.entityId)) {
-          crdtClient.createComponentDataEvent(
-            component.componentId,
-            msg.entityId,
-            component.toBinaryOrNull(msg.entityId)?.toBinary() || null
-          )
-        }
-        const processResult = crdtClient.processMessage(crdtMessage)
+        // // The state isn't updated because the dirty was set
+        // //  out of the block of systems update between `receiveMessage` and `updateState`
+        // if (component?.isDirty(msg.entityId)) {
+        //   crdtClient.createComponentDataEvent(
+        //     component.componentId,
+        //     msg.entityId,
+        //     component.toBinaryOrNull(msg.entityId)?.toBinary() || null
+        //   )
+        // }
 
-        if (!component) {
-          continue
-        }
+        if (component) {
+          const [conflictMessage, _currentValue] = component.updateFromCrdt(msg)
 
-        switch (processResult) {
-          case ProcessMessageResultType.StateUpdatedTimestamp:
-          case ProcessMessageResultType.StateUpdatedData:
+          console.log({ conflictMessage, _currentValue })
+
+          if (conflictMessage) {
+            const offset = bufferForOutdated.currentWriteOffset()
+
+            if (conflictMessage.type === CrdtMessageType.PUT_COMPONENT) {
+              PutComponentOperation.write(
+                msg.entityId,
+                conflictMessage.timestamp,
+                conflictMessage.componentId,
+                conflictMessage.data,
+                bufferForOutdated
+              )
+            } else {
+              DeleteComponent.write(msg.entityId, component.componentId, conflictMessage.timestamp, bufferForOutdated)
+            }
+
+            outdatedMessages.push({
+              ...msg,
+              messageBuffer: bufferForOutdated.buffer().subarray(offset, bufferForOutdated.currentWriteOffset())
+            })
+          } else {
             // Add message to transport queue to be processed by others transports
             broadcastMessages.push(msg)
 
-            // Process CRDT Message
-            if (msg.type === CrdtMessageType.DELETE_COMPONENT) {
-              component.deleteFrom(msg.entityId, false)
-            } else {
-              const data = new ReadWriteByteBuffer(msg.data!)
-              component.upsertFromBinary(msg.entityId, data, false)
-            }
-
             onProcessEntityComponentChange && onProcessEntityComponentChange(msg.entityId, msg.type, component)
-
-            break
-
-          // CRDT outdated message. Resend this message to the transport
-          // To do this we add this message to a queue that will be processed at the end of the update tick
-          case ProcessMessageResultType.StateOutdatedData:
-          case ProcessMessageResultType.StateOutdatedTimestamp:
-            const current = crdtClient.getState().components.get(msg.componentId)?.get(msg.entityId)
-            if (current) {
-              const offset = bufferForOutdated.currentWriteOffset()
-
-              const ts = current.timestamp
-              if (component.has(msg.entityId)) {
-                PutComponentOperation.write(msg.entityId, ts, component, bufferForOutdated)
-              } else {
-                DeleteComponent.write(msg.entityId, component.componentId, ts, bufferForOutdated)
-              }
-
-              outdatedMessages.push({
-                ...msg,
-                messageBuffer: bufferForOutdated.buffer().subarray(offset, bufferForOutdated.currentWriteOffset())
-              })
-            }
-            break
-
-          case ProcessMessageResultType.NoChanges:
-          case ProcessMessageResultType.EntityDeleted:
-          case ProcessMessageResultType.EntityWasDeleted:
-          default:
-            break
+          }
         }
       }
     }
@@ -218,93 +181,38 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   }
 
   /**
-   * Updates CRDT state of the current engine dirty components
-   *
-   * TODO: optimize this function allocations using a bitmap
-   * TODO: unify this function with sendMessages
-   */
-  function updateState() {
-    const dirtyMap = new Map<ComponentDefinition<unknown>, Array<Entity>>()
-    for (const component of engine.componentsIter()) {
-      let entitySet: Array<Entity> | null = null
-      for (const entity of component.dirtyIterator()) {
-        if (!entitySet) {
-          entitySet = []
-          dirtyMap.set(component, entitySet)
-        }
-
-        // TODO: reuse shared writer to prevent extra allocations of toBinary
-        const componentValue = component.toBinaryOrNull(entity)?.toBinary() ?? null
-
-        // TODO: do not emit event if componentValue equals the value didn't change
-        // if update goes bad, the entity doesn't accept put anymore (it's added to deleted entities set)
-        if (crdtClient.createComponentDataEvent(component.componentId, entity as number, componentValue) === null) {
-          component.deleteFrom(entity, false)
-        } else {
-          entitySet.push(entity)
-
-          onProcessEntityComponentChange &&
-            onProcessEntityComponentChange(
-              entity,
-              componentValue === null ? CrdtMessageType.DELETE_COMPONENT : CrdtMessageType.PUT_COMPONENT,
-              component
-            )
-        }
-      }
-    }
-    return dirtyMap
-  }
-
-  /**
    * Iterates the dirty map and generates crdt messages to be send
    */
-  async function sendMessages(
-    dirtyEntities: Map<ComponentDefinition<unknown>, Array<Entity>>,
-    deletedEntities: Entity[]
-  ) {
+  async function sendMessages(entitiesDeletedThisTick: Entity[]) {
     // CRDT Messages will be the merge between the recieved transport messages and the new crdt messages
     const crdtMessages = getMessages(broadcastMessages)
     const outdatedMessagesBkp = getMessages(outdatedMessages)
     const buffer = new ReadWriteByteBuffer()
-    for (const [component, entities] of dirtyEntities) {
-      for (const entity of entities) {
-        // Component will be always defined here since dirtyMap its an iterator of engine.componentsDefinition
-        const { timestamp } = crdtClient
-          .getState()
-          .components.get(component.componentId)!
-          .get(entity as number)!
 
+    for (const component of engine.componentsIter()) {
+      for (const message of component.getCrdtUpdates()) {
         const offset = buffer.currentWriteOffset()
-        const type: CrdtMessageType = component.has(entity)
-          ? CrdtMessageType.PUT_COMPONENT
-          : CrdtMessageType.DELETE_COMPONENT
-        const transportMessage = {
-          type,
-          entityId: entity,
-          componentId: component.componentId,
-          timestamp
-        }
 
         // Avoid creating messages if there is no transport that will handle it
-        if (transports.some((t) => t.filter(transportMessage))) {
-          if (transportMessage.type === CrdtMessageType.PUT_COMPONENT) {
-            PutComponentOperation.write(entity, timestamp, component, buffer)
+        if (transports.some((t) => t.filter(message))) {
+          if (message.type === CrdtMessageType.PUT_COMPONENT) {
+            PutComponentOperation.write(message.entityId, message.timestamp, message.componentId, message.data, buffer)
           } else {
-            DeleteComponent.write(entity, component.componentId, timestamp, buffer)
+            DeleteComponent.write(message.entityId, component.componentId, message.timestamp, buffer)
           }
 
           crdtMessages.push({
-            ...transportMessage,
+            ...message,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentWriteOffset())
           })
+
+          onProcessEntityComponentChange && onProcessEntityComponentChange(message.entityId, message.type, component)
         }
       }
     }
 
     // After all updates, I execute the DeletedEntity messages
-    for (const entityId of deletedEntities) {
-      crdtClient.createDeleteEntityEvent(entityId)
-
+    for (const entityId of entitiesDeletedThisTick) {
       const offset = buffer.currentWriteOffset()
       DeleteEntity.write(entityId, buffer)
       crdtMessages.push({
@@ -358,19 +266,9 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     transport.onmessage = parseChunkMessage(id)
   }
 
-  /**
-   * @public
-   * @returns returns the crdt state
-   */
-  function getCrdt() {
-    return crdtClient.getState()
-  }
-
   return {
-    getCrdt,
     sendMessages,
     receiveMessages,
-    addTransport,
-    updateState
+    addTransport
   }
 }

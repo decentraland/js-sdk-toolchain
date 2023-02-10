@@ -162,7 +162,7 @@ describe('Generated Material ProtoBuf', () => {
     )
 
     const buffer = Material.toBinary(entity)
-    Material.updateFromBinary(entityB, buffer)
+    Material.upsertFromBinary(entityB, buffer)
 
     const m = Material.getMutable(entityB)
     expect(_material).toEqual(m)
@@ -172,7 +172,7 @@ describe('Generated Material ProtoBuf', () => {
     })
 
     const bufferC = Material.toBinary(entityC)
-    Material.updateFromBinary(entityD, bufferC)
+    Material.upsertFromBinary(entityD, bufferC)
 
     const mD = Material.getMutable(entityD)
     expect(materialC).toEqual(mD)

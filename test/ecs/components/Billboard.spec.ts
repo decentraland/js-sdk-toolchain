@@ -13,7 +13,7 @@ describe('Generated Billboard ProtoBuf', () => {
 
     Billboard.create(entityB)
     const buffer = Billboard.toBinary(entity)
-    Billboard.updateFromBinary(entityB, buffer)
+    Billboard.upsertFromBinary(entityB, buffer)
 
     expect(billboard).toBeDeepCloseTo({ ...Billboard.getMutable(entityB) })
 

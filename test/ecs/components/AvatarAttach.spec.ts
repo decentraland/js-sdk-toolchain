@@ -18,7 +18,7 @@ describe('Generated AvatarAttach ProtoBuf', () => {
     })
 
     const buffer = AvatarAttach.toBinary(entity)
-    AvatarAttach.updateFromBinary(entityB, buffer)
+    AvatarAttach.upsertFromBinary(entityB, buffer)
 
     expect(avatarAttach).toBeDeepCloseTo({
       ...AvatarAttach.getMutable(entityB)

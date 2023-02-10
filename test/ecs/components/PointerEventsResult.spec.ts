@@ -61,7 +61,7 @@ describe('Generated PointerEventsResult ProtoBuf', () => {
       ]
     })
     const buffer = PointerEventsResult.toBinary(entity)
-    PointerEventsResult.updateFromBinary(entityB, buffer)
+    PointerEventsResult.upsertFromBinary(entityB, buffer)
 
     const result = { ...PointerEventsResult.getMutable(entityB) }
 

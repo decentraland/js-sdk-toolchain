@@ -15,7 +15,7 @@ describe('Generated PointerLock ProtoBuf', () => {
       isPointerLocked: false
     })
     const buffer = PointerLock.toBinary(entity)
-    PointerLock.updateFromBinary(entityB, buffer)
+    PointerLock.upsertFromBinary(entityB, buffer)
 
     expect(_pointerLock).toBeDeepCloseTo({
       ...PointerLock.getMutable(entityB)

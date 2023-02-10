@@ -34,9 +34,7 @@ describe('Component operation tests', () => {
     const entityA = newEngine.addEntity()
     const entityB = newEngine.addEntity()
 
-    let timestamp = 1
-
-    const mutableTransform = Transform.create(entityA, {
+    Transform.create(entityA, {
       position: Vector3.create(1, 1, 1),
       scale: Vector3.create(1, 1, 1),
       rotation: Quaternion.create(1, 1, 1, 1),
@@ -45,12 +43,13 @@ describe('Component operation tests', () => {
 
     const bb = new ReadWriteByteBuffer()
 
-    PutComponentOperation.write(entityA, timestamp, Transform, bb)
+    // Avoid creating messages if there is no transport that will handle it
+    const [message] = Transform.getCrdtUpdates()
+    PutComponentOperation.write(message.entityId, message.timestamp, message.componentId, (message as any).data, bb)
 
-    mutableTransform.position.x = 31.3
-    timestamp++
+    Transform.getMutable(entityA).position.x = 31.3
 
-    PutComponentOperation.write(entityA, timestamp, Transform, bb)
+    PutComponentOperation.write(message.entityId, message.timestamp, message.componentId, (message as any).data, bb)
 
     while (CrdtMessageProtocol.validate(bb)) {
       const msgOne = readMessage(bb)!

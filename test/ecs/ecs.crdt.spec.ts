@@ -9,9 +9,7 @@ import {
 import { Entity, EntityUtils, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src/engine/entity'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { Vector3 } from '../../packages/@dcl/sdk/src/math'
-import { compareStatePayloads } from '../crdt/utils'
-import { stateToString } from '../crdt/utils/state'
-import { checkCrdtStateWithEngine, SandBox, wait } from './utils'
+import { SandBox, wait } from './utils'
 
 async function simpleScene(engine: IEngine) {
   const Transform = components.Transform(engine)
@@ -226,7 +224,7 @@ describe('CRDT tests', () => {
     Transform.getMutable(entity).position.x = 8
     await engine.update(1)
     const buffer = new ReadWriteByteBuffer()
-    PutComponentOperation.write(entity, 0, Transform, buffer)
+    PutComponentOperation.write(entity, 0, Transform.componentId, , buffer)
     jest.resetAllMocks()
     transports[0].onmessage!(buffer.toBinary())
     await engine.update(1)
@@ -294,7 +292,6 @@ describe('CRDT tests', () => {
   it('should converge to the same final state (a simple transform creation)', async () => {
     const {
       clients: [clientA, clientB, clientC],
-      getCrdtStates
     } = SandBox.createEngines({ length: 3 })
 
     const entityA = clientA.engine.addEntity()
@@ -319,10 +316,7 @@ describe('CRDT tests', () => {
     await clientC.engine.update(1)
 
     // now, it should be all synched
-    expect(compareStatePayloads(getCrdtStates())).toBe(true)
-    expect(checkCrdtStateWithEngine(clientA.engine).conflicts).toEqual([])
-    expect(checkCrdtStateWithEngine(clientB.engine).conflicts).toEqual([])
-    expect(checkCrdtStateWithEngine(clientC.engine).conflicts).toEqual([])
+    compareStatePayloads({clientA, clientB, clientC})
   })
 
   it('should ignore invalid message type', async () => {
@@ -344,7 +338,6 @@ describe('CRDT tests', () => {
   it('should converge to the same final state (more complex scene code)', async () => {
     const {
       clients: [clientA, clientB, clientC],
-      getCrdtStates
     } = SandBox.createEngines({ length: 3 })
 
     // runs a kind of scene in the clientA
@@ -359,10 +352,7 @@ describe('CRDT tests', () => {
     await clientC.engine.update(1)
 
     // now, it should be all synched
-    expect(compareStatePayloads(getCrdtStates())).toBe(true)
-    expect(checkCrdtStateWithEngine(clientA.engine).conflicts).toEqual([])
-    expect(checkCrdtStateWithEngine(clientB.engine).conflicts).toEqual([])
-    expect(checkCrdtStateWithEngine(clientC.engine).conflicts).toEqual([])
+    compareStatePayloads({clientA, clientB, clientC})
   })
 
   describe(`should converge to the same final state (more complex scene code) (shuffle messages)`, () => {
@@ -371,7 +361,6 @@ describe('CRDT tests', () => {
       it(`shuffle with seed ${seedValue}`, async () => {
         const {
           clients: [clientA, clientB, clientC],
-          getCrdtStates
         } = SandBox.createEngines({ length: 3 })
 
         await simpleScene(clientA.engine)
@@ -385,16 +374,12 @@ describe('CRDT tests', () => {
         await clientC.engine.update(1)
 
         // now, it should be all synched
-        expect(compareStatePayloads(getCrdtStates())).toBe(true)
-        expect(checkCrdtStateWithEngine(clientA.engine).conflicts).toEqual([])
-        expect(checkCrdtStateWithEngine(clientB.engine).conflicts).toEqual([])
-        expect(checkCrdtStateWithEngine(clientC.engine).conflicts).toEqual([])
+        compareStatePayloads({clientA, clientB, clientC})
       })
 
       it(`shuffle messages with seed ${seedValue}, and with multiple scene runs`, async () => {
         const {
           clients: [clientA, clientB, clientC],
-          getCrdtStates
         } = SandBox.createEngines({ length: 3 })
 
         // same as previous test, but all the clients run the same scene
@@ -417,10 +402,7 @@ describe('CRDT tests', () => {
         await clientC.engine.update(1)
 
         // now, it should be all synched
-        expect(compareStatePayloads(getCrdtStates())).toBe(true)
-        expect(checkCrdtStateWithEngine(clientA.engine).conflicts).toEqual([])
-        expect(checkCrdtStateWithEngine(clientB.engine).conflicts).toEqual([])
-        expect(checkCrdtStateWithEngine(clientC.engine).conflicts).toEqual([])
+        compareStatePayloads({clientA, clientB, clientC})
       })
     })
   })
@@ -462,7 +444,6 @@ describe('CRDT tests', () => {
   it('should delete many entities', async () => {
     const {
       clients: [clientA],
-      getCrdtStates,
       testCrdtSynchronization
     } = SandBox.createEngines({ length: 3 })
 
@@ -494,7 +475,12 @@ describe('CRDT tests', () => {
     expect(result.allConflicts.length).toBe(0)
     expect(result.crdtStateConverged).toBe(true)
 
-    const deletedEntities = getCrdtStates()[0].deletedEntities.get()
-    expect(deletedEntities.length).toBe(entitiesCalledToBeRemoved.length)
+    // const deletedEntities = clientA.engine.entityContainer.deletedEntities.get()
+    // expect(deletedEntities.length).toBe(entitiesCalledToBeRemoved.length)
+    expect(false).toEqual(true)
   })
 })
+
+function compareStatePayloads(record: Record<string, { engine: IEngine }>) {
+  expect(false).toEqual(true)
+}

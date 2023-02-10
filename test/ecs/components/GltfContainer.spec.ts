@@ -15,7 +15,7 @@ describe('Generated GltfContainer ProtoBuf', () => {
       src: 'test/sr23sc c'
     })
     const buffer = GltfContainer.toBinary(entity)
-    GltfContainer.updateFromBinary(entityB, buffer)
+    GltfContainer.upsertFromBinary(entityB, buffer)
 
     expect(_shape).toBeDeepCloseTo({ ...GltfContainer.getMutable(entityB) })
 

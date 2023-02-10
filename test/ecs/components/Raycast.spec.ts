@@ -21,7 +21,7 @@ describe('Generated Raycast ProtoBuf', () => {
       queryType: RaycastQueryType.RQT_HIT_FIRST
     })
     const buffer = Raycast.toBinary(entity)
-    Raycast.updateFromBinary(entityB, buffer)
+    Raycast.upsertFromBinary(entityB, buffer)
 
     expect(raycast).toEqual({ ...Raycast.getMutable(entityB) })
 

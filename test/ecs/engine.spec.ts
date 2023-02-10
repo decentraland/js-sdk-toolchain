@@ -41,7 +41,7 @@ describe('Engine tests', () => {
     expect(() => Position.toBinary(entity)).toThrowError()
     Position.create(entityB, { x: 10 })
     const binary = Position.toBinary(entityB)
-    expect(() => Position.updateFromBinary(entity, binary)).toThrowError()
+    expect(() => Position.upsertFromBinary(entity, binary)).toThrowError()
   })
 
   it('should delete component if exists or not', async () => {

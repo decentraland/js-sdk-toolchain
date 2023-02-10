@@ -36,7 +36,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     })
 
     const buffer = PointerEvents.toBinary(entity)
-    PointerEvents.updateFromBinary(entityB, buffer)
+    PointerEvents.upsertFromBinary(entityB, buffer)
 
     const result = { ...PointerEvents.getMutable(entityB) }
     expect(pointerEvents).toEqual(result)

@@ -15,7 +15,7 @@ describe('Generated CameraMode ProtoBuf', () => {
       mode: CameraType.CT_FIRST_PERSON
     })
     const buffer = CameraMode.toBinary(entity)
-    CameraMode.updateFromBinary(entityB, buffer)
+    CameraMode.upsertFromBinary(entityB, buffer)
 
     const immutableCameraMode = CameraMode.get(entity)
     switch (immutableCameraMode.mode) {

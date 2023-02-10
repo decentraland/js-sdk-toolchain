@@ -257,12 +257,6 @@ export interface IEngine {
   addTransport(transport: Transport): void
 
   /**
-   * @internal
-   * Returns the crdt state. For now only for testing purpose
-   */
-  getCrdtState(): State<Uint8Array>
-
-  /**
    * @public
    * Iterator of registered components
    */

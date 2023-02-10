@@ -35,7 +35,7 @@ describe('Generated AvatarShape ProtoBuf', () => {
       emotes: []
     })
     const buffer = AvatarShape.toBinary(entity)
-    AvatarShape.updateFromBinary(entityB, buffer)
+    AvatarShape.upsertFromBinary(entityB, buffer)
 
     expect(avatarShape).toEqual({ ...AvatarShape.get(entityB) })
     expect(AvatarShape.createOrReplace(entityB)).not.toEqual({

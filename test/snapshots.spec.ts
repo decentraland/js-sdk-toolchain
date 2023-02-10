@@ -57,7 +57,7 @@ function* serializeCrdtMessages(prefix: string, data: Uint8Array) {
       const c = engine.getComponent(componentId)
 
       yield `  ${prefix}: e=0x${entityId.toString(16)} c=${componentId} t=${timestamp} data=${JSON.stringify(
-        data && c.deserialize(new ReadWriteByteBuffer(data))
+        (data && c.deserialize(new ReadWriteByteBuffer(data))) || null
       )}`
     } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
       const entityId = DeleteEntity.read(buffer)!.entityId

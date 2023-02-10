@@ -32,7 +32,7 @@ describe('Generated MeshRenderer ProtoBuf', () => {
 
       // set entityB.meshRenderer = entity.meshRenderer via CRDT message
       const buffer = MeshRenderer.toBinary(entity)
-      MeshRenderer.updateFromBinary(entityB, buffer)
+      MeshRenderer.upsertFromBinary(entityB, buffer)
 
       expect(MeshRenderer.get(entity)).toEqual({
         ...MeshRenderer.getMutable(entityB)

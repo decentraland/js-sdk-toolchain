@@ -17,7 +17,7 @@ describe('Generated CameraModifierArea ProtoBuf', () => {
       mode: CameraType.CT_THIRD_PERSON
     })
     const buffer = CameraModeArea.toBinary(entity)
-    CameraModeArea.updateFromBinary(entityB, buffer)
+    CameraModeArea.upsertFromBinary(entityB, buffer)
 
     expect(avatarModifierArea).toEqual({
       ...CameraModeArea.getMutable(entityB)

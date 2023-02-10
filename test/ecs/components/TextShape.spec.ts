@@ -54,7 +54,7 @@ describe('Generated TextShape ProtoBuf', () => {
       textColor: { r: 1, g: 1, b: 1, a: 1 }
     })
     const buffer = TextShape.toBinary(entity)
-    TextShape.updateFromBinary(entityB, buffer)
+    TextShape.upsertFromBinary(entityB, buffer)
 
     const otherTextShape = TextShape.getMutable(entityB)
     expect(_textShape).toEqual({

@@ -19,7 +19,7 @@ describe('Generated Avatar ModifierArea ProtoBuf', () => {
       excludeIds: ['exclude_this', 'testId', '12837127371']
     })
     const buffer = AvatarModifierArea.toBinary(entity)
-    AvatarModifierArea.updateFromBinary(entityB, buffer)
+    AvatarModifierArea.upsertFromBinary(entityB, buffer)
 
     expect(avatarModifierArea).toEqual({
       ...AvatarModifierArea.getMutable(entityB)

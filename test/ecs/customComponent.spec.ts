@@ -167,8 +167,14 @@ describe('test CRDT flow E2E', () => {
       int8A.createOrReplace(entityA, 16)
       int8B.createOrReplace(entityA, 32)
 
+      // increase the timestamp to make sure we reach a conflictive state. In practice
+      // this will only happen on the event of two actors editing the same entity
+      // without properly implementing ADR-148
+      int8B.setTestTimestamp(entityA, 1)
+
       // to generate a "conflict", we will send the updates from A to B first
       await engineA.update(0)
+
       expect(env.connection.interceptedMessages).toMatchObject([
         // this value will have the same timestamp in both engines
         {

@@ -237,13 +237,9 @@ export function Engine(options?: IEngineOptions): IEngine {
         }) returned a thenable. Systems cannot be async functions. Documentation: https://dcl.gg/sdk/sync-systems`
       )
     }
-    const dirtyEntities = crdtSystem.updateState()
     const deletedEntites = partialEngine.entityContainer.releaseRemovedEntities()
-    await crdtSystem.sendMessages(dirtyEntities, deletedEntites)
 
-    for (const definition of partialEngine.componentsIter()) {
-      definition.clearDirty()
-    }
+    await crdtSystem.sendMessages(deletedEntites)
   }
 
   return {
@@ -270,7 +266,6 @@ export function Engine(options?: IEngineOptions): IEngine {
 
     getEntityState: partialEngine.entityContainer.getEntityState,
     addTransport: crdtSystem.addTransport,
-    getCrdtState: crdtSystem.getCrdt,
 
     entityContainer: partialEngine.entityContainer
   }

@@ -19,7 +19,7 @@ describe('Generated AudioStream ProtoBuf', () => {
       url: 'FakeUrl2'
     })
     const buffer = AudioStream.toBinary(entity)
-    AudioStream.updateFromBinary(entityB, buffer)
+    AudioStream.upsertFromBinary(entityB, buffer)
 
     expect(_audioStream).toBeDeepCloseTo({ ...AudioStream.getMutable(entityB) })
 

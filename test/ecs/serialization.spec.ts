@@ -24,7 +24,7 @@ describe('Serialization Types', () => {
       const buffer = IntegerComponent.toBinary(entity)
       const copiedInteger = IntegerComponent.create(entityCopied, { value: 21 })
       expect(copiedInteger.value).toBe(21)
-      const updatedInteger = IntegerComponent.updateFromBinary(entityCopied, buffer)
+      const updatedInteger = IntegerComponent.upsertFromBinary(entityCopied, buffer)
       expect(updatedInteger!.value).toBe(33)
 
       expect(t.create()).toEqual(0)
@@ -47,7 +47,7 @@ describe('Serialization Types', () => {
       const buffer = FloatComponent.toBinary(entity)
       const copiedFloat = FloatComponent.create(entityCopied, { value: 21.22 })
       expect(copiedFloat.value).toBe(21.22)
-      const updatedFloat = FloatComponent.updateFromBinary(entityCopied, buffer)
+      const updatedFloat = FloatComponent.upsertFromBinary(entityCopied, buffer)
       expect(updatedFloat!.value).toBe(testValue)
     }
 
@@ -72,7 +72,7 @@ describe('Serialization Types', () => {
     const buffer = FloatComponent.toBinary(entity)
     const copiedFloat = FloatComponent.create(entityCopied, { value: 'n' })
     expect(copiedFloat.value).toBe('n')
-    const updatedFloat = FloatComponent.updateFromBinary(entityCopied, buffer)
+    const updatedFloat = FloatComponent.upsertFromBinary(entityCopied, buffer)
     expect(updatedFloat!.value).toBe(testValue)
   })
 
@@ -144,7 +144,7 @@ describe('Serialization Types', () => {
     const otherEntity = engine.addEntity()
 
     PlayerComponent.create(otherEntity, defaultPlayer)
-    PlayerComponent.updateFromBinary(otherEntity, buffer)
+    PlayerComponent.upsertFromBinary(otherEntity, buffer)
 
     const originalPlayer = PlayerComponent.get(myEntity)
     const modifiedFromBinaryPlayer = PlayerComponent.get(otherEntity)
@@ -186,7 +186,7 @@ describe('Serialization Types', () => {
       optionalColor: { r: 1, g: 2, b: 3 }
     })
 
-    const value2 = TestComponent.updateFromBinary(entity2, TestComponent.toBinary(entity))!
+    const value2 = TestComponent.upsertFromBinary(entity2, TestComponent.toBinary(entity))!
 
     expect(value2.hasAlpha).toBe(true)
     expect(value2.optionalColor).toBeUndefined()
@@ -245,7 +245,7 @@ describe('Serialization Types', () => {
     })
     expect(initialValue).toStrictEqual({ testEnum: ColorToNumber.Green })
 
-    const value2 = TestComponent.updateFromBinary(entity2, TestComponent.toBinary(entity))!
+    const value2 = TestComponent.upsertFromBinary(entity2, TestComponent.toBinary(entity))!
 
     expect(value2).toStrictEqual({ testEnum: ColorToNumber.Pink })
   })
@@ -275,7 +275,7 @@ describe('Serialization Types', () => {
     })
     expect(initialValue).toStrictEqual({ testEnum: ColorToString.Green })
 
-    const value2 = TestComponent.updateFromBinary(entity2, TestComponent.toBinary(entity))!
+    const value2 = TestComponent.upsertFromBinary(entity2, TestComponent.toBinary(entity))!
 
     expect(value2).toStrictEqual({ testEnum: ColorToString.Pink })
   })
@@ -307,7 +307,7 @@ describe('Serialization Types', () => {
     })
 
     const buffer = TestComponentType.toBinary(entityFilled)
-    TestComponentType.updateFromBinary(entityEmpty, buffer)
+    TestComponentType.upsertFromBinary(entityEmpty, buffer)
 
     const modifiedComponent = TestComponentType.get(entityEmpty)
     expect(modifiedComponent.a).toBe(myComponent.a)
@@ -338,7 +338,7 @@ describe('Serialization Types', () => {
       TestComponentType.create(entity, objectValues)
       TestComponentType.create(entityCopied, zeroObjectValues)
       const buffer = TestComponentType.toBinary(entity)
-      TestComponentType.updateFromBinary(entityCopied, buffer)
+      TestComponentType.upsertFromBinary(entityCopied, buffer)
       expect(TestComponentType.get(entity)).toStrictEqual(TestComponentType.get(entityCopied))
     }
   })
@@ -426,7 +426,7 @@ describe('Serialization Types', () => {
     const buffer = EntityComponent.toBinary(entity)
     const copiedEntity = EntityComponent.create(entityCopied)
     expect(copiedEntity.value).toBe(engine.RootEntity)
-    const updatedEntity = EntityComponent.updateFromBinary(entityCopied, buffer)
+    const updatedEntity = EntityComponent.upsertFromBinary(entityCopied, buffer)
     expect(updatedEntity!.value).toBe(someEntity)
   })
 

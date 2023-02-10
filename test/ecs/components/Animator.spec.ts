@@ -35,7 +35,7 @@ describe('Generated Animator ProtoBuf', () => {
       ]
     })
     const buffer = Animator.toBinary(entity)
-    Animator.updateFromBinary(entityB, buffer)
+    Animator.upsertFromBinary(entityB, buffer)
 
     expect(_animator).toEqual({ ...Animator.getMutable(entityB) })
   })

@@ -41,7 +41,7 @@ describe('Generated UiBackground ProtoBuf', () => {
       uvs: []
     })
     const buffer = UiBackground.toBinary(entity)
-    UiBackground.updateFromBinary(entityB, buffer)
+    UiBackground.upsertFromBinary(entityB, buffer)
 
     expect(_uiBackground).toEqual({
       color: { r: 0, g: 0, b: 0, a: 0 },

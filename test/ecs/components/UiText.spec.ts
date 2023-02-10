@@ -17,7 +17,7 @@ describe('Generated UiText ProtoBuf', () => {
       color: { r: 0, g: 0, b: 1, a: 0 }
     })
     const buffer = UiText.toBinary(entity)
-    UiText.updateFromBinary(entityB, buffer)
+    UiText.upsertFromBinary(entityB, buffer)
 
     expect(_uiText).toEqual({
       value: 'casla-boedo',

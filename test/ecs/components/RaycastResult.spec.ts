@@ -31,7 +31,7 @@ describe('Generated RaycastResult ProtoBuf', () => {
       hits: []
     })
     const buffer = RaycastResult.toBinary(entity)
-    RaycastResult.updateFromBinary(entityB, buffer)
+    RaycastResult.upsertFromBinary(entityB, buffer)
 
     expect(raycastResult).toEqual({
       ...RaycastResult.getMutable(entityB)

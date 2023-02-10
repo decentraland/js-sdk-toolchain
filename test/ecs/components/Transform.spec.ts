@@ -48,7 +48,7 @@ describe('Transform component', () => {
     })
 
     const buffer = Transform.toBinary(entity)
-    Transform.updateFromBinary(entityB, buffer)
+    Transform.upsertFromBinary(entityB, buffer)
 
     expect(t1).toBeDeepCloseTo(Transform.get(entityB))
   })
@@ -73,7 +73,7 @@ describe('Transform component', () => {
     })
 
     const buffer = Transform.toBinary(entity)
-    Transform.updateFromBinary(entityB, buffer)
+    Transform.upsertFromBinary(entityB, buffer)
 
     expect({ ...t1, parent: 0 }).toBeDeepCloseTo(Transform.get(entityB))
     // optional parent serialize as 0

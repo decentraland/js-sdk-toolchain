@@ -30,7 +30,7 @@ describe('Generated MeshCollider ProtoBuf', () => {
       previousData = data
 
       const buffer = MeshCollider.toBinary(entity)
-      MeshCollider.updateFromBinary(entityB, buffer)
+      MeshCollider.upsertFromBinary(entityB, buffer)
 
       expect(MeshCollider.get(entity)).toEqual({
         ...MeshCollider.getMutable(entityB)
