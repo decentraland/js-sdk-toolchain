@@ -1,13 +1,11 @@
 ﻿import { Engine, components } from '../../../packages/@dcl/ecs/src'
+import { testComponentSerialization } from './assertion'
 
 describe('Generated Animator ProtoBuf', () => {
   it('should serialize/deserialize Animator', () => {
     const newEngine = Engine()
     const Animator = components.Animator(newEngine)
-    const entity = newEngine.addEntity()
-    const entityB = newEngine.addEntity()
-    Animator.create(newEngine.addEntity())
-    const _animator = Animator.create(entity, {
+    testComponentSerialization(Animator, {
       states: [
         {
           name: 'test',
@@ -21,7 +19,7 @@ describe('Generated Animator ProtoBuf', () => {
       ]
     })
 
-    Animator.create(entityB, {
+    testComponentSerialization(Animator, {
       states: [
         {
           name: 'test2',
@@ -34,10 +32,6 @@ describe('Generated Animator ProtoBuf', () => {
         }
       ]
     })
-    const buffer = Animator.toBinary(entity)
-    Animator.upsertFromBinary(entityB, buffer)
-
-    expect(_animator).toEqual({ ...Animator.getMutable(entityB) })
   })
 
   it('should Animator.getClip helper works properly', () => {

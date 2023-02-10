@@ -53,19 +53,16 @@ export const int8Component = (engine: IEngine) => {
         dirtyIterator.add(entity)
       }
     },
+    entityDeleted: function (entity: Entity, markAsDirty) {
+      if (data.delete(entity) && markAsDirty) {
+        dirtyIterator.add(entity)
+      }
+    },
     getMutable: function (_entity: Entity) {
       throw new Error('Function not implemented.')
     },
     getMutableOrNull: function (_entity: Entity) {
       throw new Error('Function not implemented.')
-    },
-    upsertFromBinary: function (entity: Entity, buf: ByteBuffer, marksDirty = true) {
-      data.set(entity, buf.readInt8())
-      if (marksDirty) {
-        dirtyIterator.add(entity)
-      } else {
-        dirtyIterator.delete(entity)
-      }
     },
     toBinary: function (entity: Entity): ByteBuffer {
       const b = new ReadWriteByteBuffer()

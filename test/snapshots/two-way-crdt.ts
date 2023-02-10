@@ -20,15 +20,19 @@ withRenderer((engine) => {
 })
 
 let stage = 0
+const newEntity = engine.addEntity()
 engine.addSystem(() => {
   switch (stage++) {
     case 0: {
       assert(Transform.has(engine.RootEntity), 'RootEntity has a transform')
       assert(Transform.getOrNull(engine.RootEntity)?.scale.x === 9, 'RootEntity has the correct scale')
       Transform.getMutableOrNull(engine.RootEntity)!.position.y += 1
+      Transform.create(newEntity)
       break
     }
     case 1: {
+      Transform.getMutable(newEntity)!.position.y = 1
+      engine.removeEntity(newEntity)
       Transform.deleteFrom(engine.RootEntity)
       break
     }

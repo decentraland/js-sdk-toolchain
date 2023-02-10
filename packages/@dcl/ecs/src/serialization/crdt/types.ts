@@ -72,20 +72,20 @@ export type DeleteEntityMessageBody = {
 }
 
 /**
- * @internal
+ * @public
  */
 export type PutComponentMessage = CrdtMessageHeader & PutComponentMessageBody
 /**
- * @internal
+ * @public
  */
 export type DeleteComponentMessage = CrdtMessageHeader & DeleteComponentMessageBody
 /**
- * @internal
+ * @public
  */
 export type DeleteEntityMessage = CrdtMessageHeader & DeleteEntityMessageBody
 
 /**
- * @internal
+ * @public
  */
 export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage
 /**

@@ -1,13 +1,12 @@
 import { Engine, components } from '../../../packages/@dcl/ecs/src'
+import { testComponentSerialization } from './assertion'
 
 describe('Generated RaycastResult ProtoBuf', () => {
   it('should serialize/deserialize RaycastResult', () => {
     const newEngine = Engine()
     const RaycastResult = components.RaycastResult(newEngine)
-    const entity = newEngine.addEntity()
-    const entityB = newEngine.addEntity()
 
-    const raycastResult = RaycastResult.create(entity, {
+    testComponentSerialization(RaycastResult, {
       timestamp: 12,
       origin: { x: 1, y: 2, z: 4 },
       direction: { x: 1, y: 2, z: 4 },
@@ -24,21 +23,11 @@ describe('Generated RaycastResult ProtoBuf', () => {
       ]
     })
 
-    RaycastResult.create(entityB, {
+    testComponentSerialization(RaycastResult, {
       timestamp: 0,
       origin: undefined,
       direction: undefined,
       hits: []
-    })
-    const buffer = RaycastResult.toBinary(entity)
-    RaycastResult.upsertFromBinary(entityB, buffer)
-
-    expect(raycastResult).toEqual({
-      ...RaycastResult.getMutable(entityB)
-    })
-
-    expect(RaycastResult.createOrReplace(entityB)).not.toEqual({
-      ...RaycastResult.getMutable(entity)
     })
   })
 })

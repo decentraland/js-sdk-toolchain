@@ -1,13 +1,11 @@
 ﻿import { Engine, components, InputAction, PointerEventType } from '../../../packages/@dcl/ecs/src'
+import { testComponentSerialization } from './assertion'
 
 describe('Generated PointerEventsResult ProtoBuf', () => {
   it('should serialize/deserialize PointerEventsResult', () => {
     const newEngine = Engine()
     const PointerEventsResult = components.PointerEventsResult(newEngine)
-    const entity = newEngine.addEntity()
-    const entityB = newEngine.addEntity()
-    PointerEventsResult.create(newEngine.addEntity())
-    const onPointerResult = PointerEventsResult.create(entity, {
+    testComponentSerialization(PointerEventsResult, {
       commands: [
         {
           button: InputAction.IA_ACTION_3,
@@ -27,7 +25,7 @@ describe('Generated PointerEventsResult ProtoBuf', () => {
       ]
     })
 
-    PointerEventsResult.create(entityB, {
+    testComponentSerialization(PointerEventsResult, {
       commands: [
         {
           button: InputAction.IA_ACTION_5,
@@ -50,6 +48,7 @@ describe('Generated PointerEventsResult ProtoBuf', () => {
           hit: {
             position: { x: 3, y: 4, z: 5 },
             length: 15,
+            entityId: undefined,
             direction: { x: 3, y: 4, z: 5 },
             normalHit: { x: 3, y: 4, z: 5 },
             origin: { x: 3, y: 4, z: 5 },
@@ -60,11 +59,5 @@ describe('Generated PointerEventsResult ProtoBuf', () => {
         }
       ]
     })
-    const buffer = PointerEventsResult.toBinary(entity)
-    PointerEventsResult.upsertFromBinary(entityB, buffer)
-
-    const result = { ...PointerEventsResult.getMutable(entityB) }
-
-    expect(onPointerResult).toEqual(result)
   })
 })

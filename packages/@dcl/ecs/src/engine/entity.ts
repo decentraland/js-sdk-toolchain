@@ -160,11 +160,15 @@ export function EntityContainer(): EntityContainer {
 
   function releaseRemovedEntities() {
     const arr = toRemoveEntities
-    toRemoveEntities = []
-    for (const entity of arr) {
-      const [n, v] = EntityUtils.fromEntityId(entity)
-      removedEntities.addTo(n, v)
+
+    if (arr.length) {
+      toRemoveEntities = []
+      for (const entity of arr) {
+        const [n, v] = EntityUtils.fromEntityId(entity)
+        removedEntities.addTo(n, v)
+      }
     }
+
     return arr
   }
 

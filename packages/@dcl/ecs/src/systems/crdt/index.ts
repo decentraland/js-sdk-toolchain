@@ -118,18 +118,8 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
         const component = engine.getComponentOrNull(msg.componentId)
 
-        // // The state isn't updated because the dirty was set
-        // //  out of the block of systems update between `receiveMessage` and `updateState`
-        // if (component?.isDirty(msg.entityId)) {
-        //   crdtClient.createComponentDataEvent(
-        //     component.componentId,
-        //     msg.entityId,
-        //     component.toBinaryOrNull(msg.entityId)?.toBinary() || null
-        //   )
-        // }
-
         if (component) {
-          const [conflictMessage, _currentValue] = component.updateFromCrdt(msg)
+          const [conflictMessage] = component.updateFromCrdt(msg)
 
           if (conflictMessage) {
             const offset = bufferForOutdated.currentWriteOffset()
@@ -156,20 +146,25 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
             onProcessEntityComponentChange && onProcessEntityComponentChange(msg.entityId, msg.type, component)
           }
+        } else {
+          // If we don't recognize the package's component it doesn't mean it is invalid.
+          // we forward it to other transports
+          broadcastMessages.push(msg)
         }
       }
     }
 
+    // the last stage of the syncrhonization is to delete the entities
     for (const entity of entitiesShouldBeCleaned) {
       // If we tried to resend outdated message and the entity was deleted before, we avoid sending them.
       for (let i = outdatedMessages.length - 1; i >= 0; i--) {
-        if (outdatedMessages[i].entityId === entity) {
+        if (outdatedMessages[i].entityId === entity && outdatedMessages[i].type !== CrdtMessageType.DELETE_ENTITY) {
           outdatedMessages.splice(i, 1)
         }
       }
 
       for (const definition of engine.componentsIter()) {
-        definition.deleteFrom(entity, false)
+        definition.entityDeleted(entity, false)
       }
 
       engine.entityContainer.updateRemovedEntity(entity)
@@ -218,6 +213,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         entityId,
         messageBuffer: buffer.buffer().subarray(offset, buffer.currentWriteOffset())
       })
+      onProcessEntityComponentChange && onProcessEntityComponentChange(entityId, CrdtMessageType.DELETE_ENTITY)
     }
 
     // Send CRDT messages to transports

@@ -1,12 +1,11 @@
 import { Engine, components } from '../../../packages/@dcl/ecs/src'
 import type { PBMeshRenderer } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/mesh_renderer.gen'
+import { testComponentSerialization } from './assertion'
 
 describe('Generated MeshRenderer ProtoBuf', () => {
   it('should serialize/deserialize MeshRenderer', () => {
     const newEngine = Engine()
     const MeshRenderer = components.MeshRenderer(newEngine)
-    const entity = newEngine.addEntity()
-    const entityB = newEngine.addEntity()
 
     const serializeComponents: PBMeshRenderer[] = [
       {
@@ -23,24 +22,9 @@ describe('Generated MeshRenderer ProtoBuf', () => {
       }
     ]
 
-    let previousData = serializeComponents[serializeComponents.length - 1]
     for (const data of serializeComponents) {
       // put the new values in both components
-      MeshRenderer.createOrReplace(entity, data)
-      MeshRenderer.createOrReplace(entityB, previousData)
-      previousData = data
-
-      // set entityB.meshRenderer = entity.meshRenderer via CRDT message
-      const buffer = MeshRenderer.toBinary(entity)
-      MeshRenderer.upsertFromBinary(entityB, buffer)
-
-      expect(MeshRenderer.get(entity)).toEqual({
-        ...MeshRenderer.getMutable(entityB)
-      })
-
-      expect(MeshRenderer.createOrReplace(entityB)).not.toEqual({
-        ...MeshRenderer.getMutable(entity)
-      })
+      testComponentSerialization(MeshRenderer, data)
     }
   })
 

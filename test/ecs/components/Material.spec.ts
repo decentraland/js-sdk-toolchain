@@ -10,6 +10,8 @@ import {
   VideoPlayer
 } from '../../../packages/@dcl/ecs/src'
 
+import { testComponentSerialization } from './assertion'
+
 function createPbrMaterial(pbr: PBMaterial_PbrMaterial): PBMaterial {
   return {
     material: {
@@ -32,13 +34,9 @@ describe('Generated Material ProtoBuf', () => {
   it('should serialize/deserialize Material', () => {
     const newEngine = Engine()
     const Material = components.Material(newEngine)
-    const entity = newEngine.addEntity()
-    const entityB = newEngine.addEntity()
-    const entityC = newEngine.addEntity()
-    const entityD = newEngine.addEntity()
 
-    const _material = Material.create(
-      entity,
+    testComponentSerialization(
+      Material,
       createPbrMaterial({
         texture: {
           tex: {
@@ -77,8 +75,8 @@ describe('Generated Material ProtoBuf', () => {
       })
     )
 
-    Material.create(
-      entityB,
+    testComponentSerialization(
+      Material,
       createPbrMaterial({
         albedoColor: { r: 0, g: 1, b: 1, a: 1 },
         alphaTest: 1,
@@ -135,47 +133,15 @@ describe('Generated Material ProtoBuf', () => {
       })
     )
 
-    const materialC = Material.create(
-      entityC,
+    testComponentSerialization(
+      Material,
       createUnlitMaterial({
         castShadows: true,
-        alphaTest: 1,
-        texture: {
-          tex: {
-            $case: 'texture',
-            texture: {
-              wrapMode: TextureWrapMode.TWM_MIRROR_ONCE,
-              filterMode: TextureFilterMode.TFM_TRILINEAR,
-              src: 'not-casla'
-            }
-          }
-        }
+        diffuseColor: { r: 0, g: 1, b: 1, a: 1 },
+        alphaTest: undefined,
+        texture: undefined
       })
     )
-
-    Material.create(
-      entityD,
-      createUnlitMaterial({
-        castShadows: true,
-        diffuseColor: { r: 0, g: 1, b: 1, a: 1 }
-      })
-    )
-
-    const buffer = Material.toBinary(entity)
-    Material.upsertFromBinary(entityB, buffer)
-
-    const m = Material.getMutable(entityB)
-    expect(_material).toEqual(m)
-
-    expect(Material.createOrReplace(entityB)).not.toEqual({
-      ...Material.getMutable(entity)
-    })
-
-    const bufferC = Material.toBinary(entityC)
-    Material.upsertFromBinary(entityD, bufferC)
-
-    const mD = Material.getMutable(entityD)
-    expect(materialC).toEqual(mD)
   })
 
   it('should test all helper cases', () => {

@@ -1,31 +1,19 @@
 ﻿import { Engine, components } from '../../../packages/@dcl/ecs/src'
+import { testComponentSerialization } from './assertion'
 
 describe('Generated AvatarAttach ProtoBuf', () => {
   it('should serialize/deserialize AvatarAttach', () => {
     const newEngine = Engine()
     const AvatarAttach = components.AvatarAttach(newEngine)
-    const entity = newEngine.addEntity()
-    const entityB = newEngine.addEntity()
 
-    const avatarAttach = AvatarAttach.create(entity, {
+    testComponentSerialization(AvatarAttach, {
       avatarId: 'string',
       anchorPointId: 5
     })
 
-    AvatarAttach.create(entityB, {
+    testComponentSerialization(AvatarAttach, {
       avatarId: 'e6',
       anchorPointId: 4
-    })
-
-    const buffer = AvatarAttach.toBinary(entity)
-    AvatarAttach.upsertFromBinary(entityB, buffer)
-
-    expect(avatarAttach).toBeDeepCloseTo({
-      ...AvatarAttach.getMutable(entityB)
-    })
-
-    expect(AvatarAttach.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...AvatarAttach.getMutable(entity)
     })
   })
 })

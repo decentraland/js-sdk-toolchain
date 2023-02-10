@@ -1,13 +1,12 @@
 import { Engine, components, Font, TextAlignMode } from '../../../packages/@dcl/ecs/src'
+import { testComponentSerialization } from './assertion'
 
 describe('Generated TextShape ProtoBuf', () => {
   it('should serialize/deserialize TextShape', () => {
     const newEngine = Engine()
     const TextShape = components.TextShape(newEngine)
-    const entity = newEngine.addEntity()
-    const entityB = newEngine.addEntity()
 
-    const _textShape = TextShape.create(entity, {
+    testComponentSerialization(TextShape, {
       text: 'true',
       font: Font.F_SANS_SERIF,
       textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
@@ -31,7 +30,8 @@ describe('Generated TextShape ProtoBuf', () => {
       textColor: { r: 1, g: 1, b: 1, a: 1 }
     })
 
-    TextShape.create(entityB, {
+    testComponentSerialization(TextShape, {
+      font: undefined,
       text: 'false',
       fontSize: 15,
       fontAutoSize: false,
@@ -52,17 +52,6 @@ describe('Generated TextShape ProtoBuf', () => {
       shadowColor: { r: 1, g: 1, b: 1 },
       outlineColor: { r: 1, g: 1, b: 1 },
       textColor: { r: 1, g: 1, b: 1, a: 1 }
-    })
-    const buffer = TextShape.toBinary(entity)
-    TextShape.upsertFromBinary(entityB, buffer)
-
-    const otherTextShape = TextShape.getMutable(entityB)
-    expect(_textShape).toEqual({
-      ...otherTextShape
-    })
-
-    expect(TextShape.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...TextShape.get(entity)
     })
   })
 })

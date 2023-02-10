@@ -1,6 +1,12 @@
 import type { ISchema } from '../schemas/ISchema'
 import { ByteBuffer, ReadWriteByteBuffer } from '../serialization/ByteBuffer'
-import { CrdtMessageType, DeleteComponentMessageBody, ProcessMessageResultType, PutComponentMessageBody } from '../serialization/crdt'
+import {
+  CrdtMessageBody,
+  CrdtMessageType,
+  DeleteComponentMessageBody,
+  ProcessMessageResultType,
+  PutComponentMessageBody
+} from '../serialization/crdt'
 import { dataCompare } from '../systems/crdt/utils'
 import { Entity } from './entity'
 import { deepReadonly, DeepReadonly } from './readonly'
@@ -69,6 +75,15 @@ export interface ComponentDefinition<T> {
   deleteFrom(entity: Entity): T | null
 
   /**
+   * @public
+   * Marks the entity as deleted and signals it cannot be used ever again. It must
+   * clear the component internal state, produces a synchronization message to remove
+   * the component from the entity.
+   * @param entity - Entity to delete the component from
+   */
+  entityDeleted(entity: Entity, markAsDirty: boolean): void
+
+  /**
    * Get the mutable component of the entity, throw an error if the entity doesn't have the component.
    * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
    * @param entity - Entity to get the component from
@@ -87,18 +102,9 @@ export interface ComponentDefinition<T> {
    * @param buffer - data to deserialize
    */
   deserialize(buffer: ByteBuffer): T
-  /**
-   * @internal
-   * @param entity - entity-component to update
-   * @param data - data to update the entity-component
-   * @param markAsDirty - defaults to true
-   */
-  upsertFromBinary(entity: Entity, data: ByteBuffer, markAsDirty?: boolean): T | null
 
   // returns a conflict message and the current value of the entity-component
-  updateFromCrdt(
-    body: PutComponentMessageBody | DeleteComponentMessageBody
-  ): [null | DeleteComponentMessageBody | PutComponentMessageBody, T | null]
+  updateFromCrdt(body: CrdtMessageBody): [null | PutComponentMessageBody | DeleteComponentMessageBody, T | null]
 
   // allocates a buffer and returns new buffer
   /**
@@ -202,9 +208,10 @@ export function createUpdateFromCrdt(
     }
   }
 
-  return (
-    msg: PutComponentMessageBody | DeleteComponentMessageBody
-  ): [null | PutComponentMessageBody | DeleteComponentMessageBody, any] => {
+  return (msg: CrdtMessageBody): [null | PutComponentMessageBody | DeleteComponentMessageBody, any] => {
+    if (msg.type !== CrdtMessageType.PUT_COMPONENT && msg.type !== CrdtMessageType.DELETE_COMPONENT)
+      return [null, data.get(msg.entityId)]
+
     const action = crdtRuleForCurrentState(msg)
     const entity = msg.entityId as Entity
     switch (action) {
@@ -331,6 +338,11 @@ export function createComponentDefinitionFromSchema<T>(
       }
       return component || null
     },
+    entityDeleted(entity: Entity, markAsDirty: boolean): void {
+      if (data.delete(entity) && markAsDirty) {
+        dirtyIterator.add(entity)
+      }
+    },
     getOrNull(entity: Entity): DeepReadonly<T> | null {
       const component = data.get(entity)
       return component ? deepReadonly(component) : null
@@ -413,16 +425,6 @@ export function createComponentDefinitionFromSchema<T>(
       schema.serialize(component, buffer)
     },
     updateFromCrdt: createUpdateFromCrdt(componentId, timestamps, schema, data),
-    upsertFromBinary(entity: Entity, buffer: ByteBuffer, markAsDirty = true): T | null {
-      const newValue = schema.deserialize(buffer)
-      data.set(entity, newValue)
-      if (markAsDirty) {
-        dirtyIterator.add(entity)
-      } else {
-        dirtyIterator.delete(entity)
-      }
-      return newValue
-    },
     deserialize(buffer: ByteBuffer): T {
       return schema.deserialize(buffer)
     }

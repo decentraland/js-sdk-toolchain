@@ -38,9 +38,7 @@ function preEngine(): PreEngine {
 
   function removeEntity(entity: Entity) {
     for (const [, component] of componentsDefinition) {
-      if (component.has(entity)) {
-        component.deleteFrom(entity)
-      }
+      component.entityDeleted(entity, true)
     }
 
     return entityContainer.removeEntity(entity)
@@ -237,6 +235,7 @@ export function Engine(options?: IEngineOptions): IEngine {
         }) returned a thenable. Systems cannot be async functions. Documentation: https://dcl.gg/sdk/sync-systems`
       )
     }
+    // get the deleted entities to send the DeleteEntity CRDT commands
     const deletedEntites = partialEngine.entityContainer.releaseRemovedEntities()
 
     await crdtSystem.sendMessages(deletedEntites)

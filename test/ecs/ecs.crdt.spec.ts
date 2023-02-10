@@ -1,5 +1,5 @@
 import { components, CrdtMessageType, DeleteComponent, IEngine } from '../../packages/@dcl/ecs/src'
-import { Entity, EntityUtils, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src/engine/entity'
+import { Entity, EntityState, EntityUtils, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src/engine/entity'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { Vector3 } from '../../packages/@dcl/sdk/src/math'
 import { SandBox, wait } from './utils'
@@ -47,11 +47,18 @@ async function simpleScene(engine: IEngine) {
 
   await engine.update(1)
 
-  // These two line shouldn't has effect in the final state, entityA has already deleted
-  Transform.create(entityA, { position: Vector3.Left() })
-  MeshRenderer.setPlane(entityA)
+  // TODO(Mendez):
+  //       Add a test to ensure that modification of already deleted entities throws an error in devmode
+  //       and passthrough in prd mode. It took me two hours to figure that this test is doing nonsense!
+  //       Comparing the final states of each engine of course diverged, because we are
+  //       trying to update an entity that was already deleted. Thus, the CRDT protocol
+  //       ignored its messages.
 
-  await engine.update(1)
+  // // These two line shouldn't has effect in the final state, entityA has already deleted
+  // Transform.create(entityA, { position: Vector3.Left() })
+  // MeshRenderer.setPlane(entityA)
+
+  // await engine.update(1)
 }
 
 describe('CRDT tests', () => {
@@ -344,8 +351,13 @@ describe('CRDT tests', () => {
     await clientB.engine.update(1)
     await clientC.engine.update(1)
 
+    const entityShouldBeDeleted = 512 as Entity
+    expect(clientA.engine.entityContainer.getEntityState(entityShouldBeDeleted)).toEqual(EntityState.Removed)
+    expect(clientB.engine.entityContainer.getEntityState(entityShouldBeDeleted)).toEqual(EntityState.Removed)
+    expect(clientC.engine.entityContainer.getEntityState(entityShouldBeDeleted)).toEqual(EntityState.Removed)
+
     // now, it should be all synched
-    compareStatePayloads({ clientA, clientB, clientC })
+    compareStatePayloads({ clientB, clientC, clientA })
   })
 
   describe(`should converge to the same final state (more complex scene code) (shuffle messages)`, () => {
@@ -402,8 +414,8 @@ describe('CRDT tests', () => {
 
   it('should receive an update from a version greater', async () => {
     const {
-      clients: [clientA, clientB],
-      testCrdtSynchronization
+      clients: [clientA, clientB, clientC],
+      flushCrdtAndSynchronize
     } = SandBox.createEngines({ length: 3 })
 
     for (let i = 0; i < 30; i++) {
@@ -423,8 +435,10 @@ describe('CRDT tests', () => {
 
     await clientA.engine.update(1)
 
-    const res = await testCrdtSynchronization()
-    expect(res.allConflicts.length).toBe(0)
+    await flushCrdtAndSynchronize()
+
+    compareStatePayloads({ clientA, clientB, clientC })
+
     expect(
       clientB.operations.includes({
         entity: 512 as Entity,
@@ -436,14 +450,14 @@ describe('CRDT tests', () => {
 
   it('should delete many entities', async () => {
     const {
-      clients: [clientA],
-      testCrdtSynchronization
+      clients: [clientA, clientB, clientC],
+      flushCrdtAndSynchronize
     } = SandBox.createEngines({ length: 3 })
 
     const cube = clientA.engine.addEntity()
     clientA.Transform.create(cube)
 
-    const entitiesCalledToBeRemoved = []
+    const entitiesCalledToBeRemoved: Entity[] = []
     let prevEntity: Entity | null = null
     function system() {
       if (prevEntity) {
@@ -464,13 +478,15 @@ describe('CRDT tests', () => {
     clientA.engine.removeSystem('test-system')
     await clientA.engine.update(1)
 
-    const result = await testCrdtSynchronization()
-    expect(result.allConflicts.length).toBe(0)
-    expect(result.crdtStateConverged).toBe(true)
+    await flushCrdtAndSynchronize()
 
-    // const deletedEntities = clientA.engine.entityContainer.deletedEntities.get()
-    // expect(deletedEntities.length).toBe(entitiesCalledToBeRemoved.length)
-    expect(false).toEqual(true)
+    compareStatePayloads({ clientA, clientB, clientC })
+
+    for (const e of entitiesCalledToBeRemoved) {
+      expect(clientA.engine.entityContainer.getEntityState(e)).toEqual(EntityState.Removed)
+      expect(clientB.engine.entityContainer.getEntityState(e)).toEqual(EntityState.Removed)
+      expect(clientC.engine.entityContainer.getEntityState(e)).toEqual(EntityState.Removed)
+    }
   })
 })
 
@@ -533,7 +549,12 @@ function compareStatePayloads(record: Record<string, { engine: IEngine }>) {
   Object.entries(record)
     .map(([name, { engine }]) => ({ name, serialization: getEngineState(engine) }))
     .reduce((prev, current) => {
-      expect(current.serialization).toEqual(prev.serialization)
+      try {
+        expect(current.serialization).toEqual(prev.serialization)
+      } catch (err) {
+        console.error(`Failed comparing ${prev.name} with ${current.name}`)
+        throw err
+      }
       return current
     })
 }

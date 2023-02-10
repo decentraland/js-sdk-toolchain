@@ -24,7 +24,7 @@ describe('Serialization Types', () => {
       const buffer = IntegerComponent.toBinary(entity)
       const copiedInteger = IntegerComponent.create(entityCopied, { value: 21 })
       expect(copiedInteger.value).toBe(21)
-      const updatedInteger = IntegerComponent.upsertFromBinary(entityCopied, buffer)
+      const updatedInteger = IntegerComponent.deserialize(buffer)
       expect(updatedInteger!.value).toBe(33)
 
       expect(t.create()).toEqual(0)
@@ -47,7 +47,7 @@ describe('Serialization Types', () => {
       const buffer = FloatComponent.toBinary(entity)
       const copiedFloat = FloatComponent.create(entityCopied, { value: 21.22 })
       expect(copiedFloat.value).toBe(21.22)
-      const updatedFloat = FloatComponent.upsertFromBinary(entityCopied, buffer)
+      const updatedFloat = FloatComponent.deserialize(buffer)
       expect(updatedFloat!.value).toBe(testValue)
     }
 
@@ -72,7 +72,7 @@ describe('Serialization Types', () => {
     const buffer = FloatComponent.toBinary(entity)
     const copiedFloat = FloatComponent.create(entityCopied, { value: 'n' })
     expect(copiedFloat.value).toBe('n')
-    const updatedFloat = FloatComponent.upsertFromBinary(entityCopied, buffer)
+    const updatedFloat = FloatComponent.deserialize(buffer)
     expect(updatedFloat!.value).toBe(testValue)
   })
 
@@ -144,10 +144,9 @@ describe('Serialization Types', () => {
     const otherEntity = engine.addEntity()
 
     PlayerComponent.create(otherEntity, defaultPlayer)
-    PlayerComponent.upsertFromBinary(otherEntity, buffer)
 
     const originalPlayer = PlayerComponent.get(myEntity)
-    const modifiedFromBinaryPlayer = PlayerComponent.get(otherEntity)
+    const modifiedFromBinaryPlayer = PlayerComponent.deserialize(buffer)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     expect(modifiedFromBinaryPlayer).toBeDeepCloseTo(originalPlayer)
@@ -186,7 +185,7 @@ describe('Serialization Types', () => {
       optionalColor: { r: 1, g: 2, b: 3 }
     })
 
-    const value2 = TestComponent.upsertFromBinary(entity2, TestComponent.toBinary(entity))!
+    const value2 = TestComponent.deserialize(TestComponent.toBinary(entity))!
 
     expect(value2.hasAlpha).toBe(true)
     expect(value2.optionalColor).toBeUndefined()
@@ -215,7 +214,14 @@ describe('Serialization Types', () => {
       visible: true,
       notVisible: false
     })
-    TestComponent.upsertFromBinary(entity, TestComponent.toBinary(newEntity))
+
+    TestComponent.updateFromCrdt({
+      componentId: TestComponent.componentId,
+      entityId: entity,
+      data: TestComponent.toBinary(newEntity).toBinary(),
+      timestamp: 3,
+      type: 1
+    })
 
     expect(TestComponent.toBinary(entity).toBinary()).toStrictEqual(new Uint8Array([1, 1, 1, 1, 0]))
   })
@@ -245,7 +251,7 @@ describe('Serialization Types', () => {
     })
     expect(initialValue).toStrictEqual({ testEnum: ColorToNumber.Green })
 
-    const value2 = TestComponent.upsertFromBinary(entity2, TestComponent.toBinary(entity))!
+    const value2 = TestComponent.deserialize(TestComponent.toBinary(entity))!
 
     expect(value2).toStrictEqual({ testEnum: ColorToNumber.Pink })
   })
@@ -275,7 +281,7 @@ describe('Serialization Types', () => {
     })
     expect(initialValue).toStrictEqual({ testEnum: ColorToString.Green })
 
-    const value2 = TestComponent.upsertFromBinary(entity2, TestComponent.toBinary(entity))!
+    const value2 = TestComponent.deserialize(TestComponent.toBinary(entity))!
 
     expect(value2).toStrictEqual({ testEnum: ColorToString.Pink })
   })
@@ -307,9 +313,8 @@ describe('Serialization Types', () => {
     })
 
     const buffer = TestComponentType.toBinary(entityFilled)
-    TestComponentType.upsertFromBinary(entityEmpty, buffer)
 
-    const modifiedComponent = TestComponentType.get(entityEmpty)
+    const modifiedComponent = TestComponentType.deserialize(buffer)
     expect(modifiedComponent.a).toBe(myComponent.a)
     expect(modifiedComponent.b).toBe(myComponent.b)
     expect(modifiedComponent.c).toEqual(myComponent.c)
@@ -338,8 +343,8 @@ describe('Serialization Types', () => {
       TestComponentType.create(entity, objectValues)
       TestComponentType.create(entityCopied, zeroObjectValues)
       const buffer = TestComponentType.toBinary(entity)
-      TestComponentType.upsertFromBinary(entityCopied, buffer)
-      expect(TestComponentType.get(entity)).toStrictEqual(TestComponentType.get(entityCopied))
+
+      expect(TestComponentType.deserialize(buffer)).toStrictEqual(TestComponentType.get(entity))
     }
   })
 
@@ -404,9 +409,8 @@ describe('Serialization Types', () => {
       v3: { x: 1.2, y: 1.3, z: 1.4 }
     })
 
-    const entityB = engine.addEntity()
     const buf = MixComponent.toBinary(entity)
-    const value = MixComponent.upsertFromBinary(entityB, buf)
+    const value = MixComponent.deserialize(buf)
 
     expect(value).toBeDeepCloseTo(originalValue)
   })
@@ -426,7 +430,7 @@ describe('Serialization Types', () => {
     const buffer = EntityComponent.toBinary(entity)
     const copiedEntity = EntityComponent.create(entityCopied)
     expect(copiedEntity.value).toBe(engine.RootEntity)
-    const updatedEntity = EntityComponent.upsertFromBinary(entityCopied, buffer)
+    const updatedEntity = EntityComponent.deserialize(buffer)
     expect(updatedEntity!.value).toBe(someEntity)
   })
 

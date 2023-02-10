@@ -122,7 +122,7 @@ export namespace SandBox {
       }
     })
 
-    async function testCrdtSynchronization() {
+    async function flushCrdtAndSynchronize() {
       for (const client of clients) {
         await client.engine.update(1)
       }
@@ -134,19 +134,11 @@ export namespace SandBox {
       for (const client of clients) {
         await client.engine.update(1)
       }
-
-      const crdtStateConverged = false // compareStatePayloads(getCrdtStates())
-      const allConflicts = ['A CONFLICT'] // clientsEngineState.map((item) => item.res.conflicts).flat(1)
-
-      return {
-        crdtStateConverged,
-        allConflicts
-      }
     }
 
     return {
       clients,
-      testCrdtSynchronization
+      flushCrdtAndSynchronize
     }
   }
 

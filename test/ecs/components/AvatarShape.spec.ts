@@ -1,13 +1,12 @@
 ﻿import { Engine, components } from '../../../packages/@dcl/ecs/src'
+import { testComponentSerialization } from './assertion'
 
 describe('Generated AvatarShape ProtoBuf', () => {
   it('should serialize/deserialize AvatarShape', () => {
     const newEngine = Engine()
     const AvatarShape = components.AvatarShape(newEngine)
-    const entity = newEngine.addEntity()
-    const entityB = newEngine.addEntity()
 
-    const avatarShape = AvatarShape.create(entity, {
+    testComponentSerialization(AvatarShape, {
       id: 'test',
       name: ' name',
       bodyShape: 'bodyshape',
@@ -21,7 +20,7 @@ describe('Generated AvatarShape ProtoBuf', () => {
       emotes: []
     })
 
-    AvatarShape.create(entityB, {
+    testComponentSerialization(AvatarShape, {
       id: 'test2',
       name: ' name2',
       bodyShape: 'bodyshape2',
@@ -33,13 +32,6 @@ describe('Generated AvatarShape ProtoBuf', () => {
       expressionTriggerTimestamp: 1,
       talking: false,
       emotes: []
-    })
-    const buffer = AvatarShape.toBinary(entity)
-    AvatarShape.upsertFromBinary(entityB, buffer)
-
-    expect(avatarShape).toEqual({ ...AvatarShape.get(entityB) })
-    expect(AvatarShape.createOrReplace(entityB)).not.toEqual({
-      ...AvatarShape.get(entity)
     })
   })
 })

@@ -1,13 +1,12 @@
 import { Engine, components, InputAction, PointerEventType } from '../../../packages/@dcl/ecs/src'
+import { testComponentSerialization } from './assertion'
 
 describe('Generated OnPointerDown ProtoBuf', () => {
   it('should serialize/deserialize OnPointerUp', () => {
     const newEngine = Engine()
     const PointerEvents = components.PointerEvents(newEngine)
-    const entity = newEngine.addEntity()
-    const entityB = newEngine.addEntity()
-    PointerEvents.create(newEngine.addEntity())
-    const pointerEvents = PointerEvents.create(entity, {
+
+    testComponentSerialization(PointerEvents, {
       pointerEvents: [
         {
           eventType: PointerEventType.PET_UP,
@@ -21,7 +20,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
       ]
     })
 
-    PointerEvents.create(entityB, {
+    testComponentSerialization(PointerEvents, {
       pointerEvents: [
         {
           eventType: PointerEventType.PET_DOWN,
@@ -34,12 +33,6 @@ describe('Generated OnPointerDown ProtoBuf', () => {
         }
       ]
     })
-
-    const buffer = PointerEvents.toBinary(entity)
-    PointerEvents.upsertFromBinary(entityB, buffer)
-
-    const result = { ...PointerEvents.getMutable(entityB) }
-    expect(pointerEvents).toEqual(result)
   })
 
   it('should receive OnPointerResult', async () => {

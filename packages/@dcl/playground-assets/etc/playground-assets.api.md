@@ -402,6 +402,7 @@ export interface ComponentDefinition<T> {
     createOrReplace(entity: Entity, val?: T): T;
     default(): DeepReadonly<T>;
     deleteFrom(entity: Entity): T | null;
+    entityDeleted(entity: Entity, markAsDirty: boolean): void;
     get(entity: Entity): DeepReadonly<T>;
     // (undocumented)
     getCrdtUpdates(): Iterable<PutComponentMessageBody | DeleteComponentMessageBody>;

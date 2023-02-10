@@ -32,7 +32,6 @@ describe('Component operation tests', () => {
     const newEngine = Engine()
     const Transform = components.Transform(newEngine)
     const entityA = newEngine.addEntity()
-    const entityB = newEngine.addEntity()
 
     Transform.create(entityA, {
       position: Vector3.create(1, 1, 1),
@@ -57,7 +56,7 @@ describe('Component operation tests', () => {
         TRANSFORM_LENGTH + PutComponentOperation.MESSAGE_HEADER_LENGTH + CRDT_MESSAGE_HEADER_LENGTH
       )
       expect(msgOne.type).toBe(CrdtMessageType.PUT_COMPONENT)
-      Transform.upsertFromBinary(entityB, bb)
+      Transform.updateFromCrdt(msgOne)
     }
   })
 

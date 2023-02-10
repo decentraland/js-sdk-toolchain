@@ -32,18 +32,6 @@ describe('Engine tests', () => {
     expect(() => Position.create(entity, { x: 10 })).toThrowError()
   })
 
-  it('should throw an error if the component doesnt exist', async () => {
-    const engine = Engine()
-    const Position = engine.defineComponent('PositionSchema', PositionSchema)
-    const entity = engine.addEntity()
-    const entityB = engine.addEntity()
-    expect(() => Position.getMutable(entity)).toThrowError()
-    expect(() => Position.toBinary(entity)).toThrowError()
-    Position.create(entityB, { x: 10 })
-    const binary = Position.toBinary(entityB)
-    expect(() => Position.upsertFromBinary(entity, binary)).toThrowError()
-  })
-
   it('should delete component if exists or not', async () => {
     const engine = Engine()
     const Position = engine.defineComponent('PositionSchema', PositionSchema)
