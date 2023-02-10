@@ -404,14 +404,12 @@ export interface ComponentDefinition<T> {
     deleteFrom(entity: Entity): T | null;
     entityDeleted(entity: Entity, markAsDirty: boolean): void;
     get(entity: Entity): DeepReadonly<T>;
-    // (undocumented)
-    getCrdtUpdates(): Iterable<PutComponentMessageBody | DeleteComponentMessageBody>;
+    getCrdtUpdates(): Iterable<CrdtMessageBody>;
     getMutable(entity: Entity): T;
     getMutableOrNull(entity: Entity): T | null;
     getOrNull(entity: Entity): DeepReadonly<T> | null;
     has(entity: Entity): boolean;
-    // (undocumented)
-    updateFromCrdt(body: PutComponentMessageBody | DeleteComponentMessageBody): [null | DeleteComponentMessageBody | PutComponentMessageBody, T | null];
+    updateFromCrdt(body: CrdtMessageBody): [null | PutComponentMessageBody | DeleteComponentMessageBody, T | null];
     // (undocumented)
     writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void;
 }
@@ -427,7 +425,19 @@ export type ComponentSchema<T extends [ComponentDefinition<any>, ...ComponentDef
 };
 
 // @public (undocumented)
+export const CRDT_MESSAGE_HEADER_LENGTH = 8;
+
+// @public (undocumented)
+export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage;
+
+// @public (undocumented)
 export type CrdtMessageBody = PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessageBody;
+
+// @public
+export type CrdtMessageHeader = {
+    length: uint32;
+    type: uint32;
+};
 
 // @public (undocumented)
 export enum CrdtMessageType {
@@ -459,7 +469,7 @@ export function createGetCrdtMessages(componentId: number, timestamps: Map<Entit
 // Warning: (ae-missing-release-tag) "createUpdateFromCrdt" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export function createUpdateFromCrdt(componentId: number, timestamps: Map<Entity, number>, schema: Pick<ISchema<any>, 'serialize' | 'deserialize'>, data: Map<Entity, unknown>): (msg: PutComponentMessageBody | DeleteComponentMessageBody) => [null | PutComponentMessageBody | DeleteComponentMessageBody, any];
+export function createUpdateFromCrdt(componentId: number, timestamps: Map<Entity, number>, schema: Pick<ISchema<any>, 'serialize' | 'deserialize'>, data: Map<Entity, unknown>): (msg: CrdtMessageBody) => [null | PutComponentMessageBody | DeleteComponentMessageBody, any];
 
 // Warning: (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
 // Warning: (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
@@ -486,12 +496,18 @@ export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 export const DEG2RAD: number;
 
 // @public (undocumented)
+export type DeleteComponentMessage = CrdtMessageHeader & DeleteComponentMessageBody;
+
+// @public (undocumented)
 export type DeleteComponentMessageBody = {
     type: CrdtMessageType.DELETE_COMPONENT;
     entityId: Entity;
     componentId: number;
     timestamp: number;
 };
+
+// @public (undocumented)
+export type DeleteEntityMessage = CrdtMessageHeader & DeleteEntityMessageBody;
 
 // @public (undocumented)
 export type DeleteEntityMessageBody = {
@@ -2115,6 +2131,9 @@ export enum ProcessMessageResultType {
     // Warning: (tsdoc-undefined-tag) The TSDoc tag "@reason" is not defined in this configuration
     StateUpdatedTimestamp = 1
 }
+
+// @public (undocumented)
+export type PutComponentMessage = CrdtMessageHeader & PutComponentMessageBody;
 
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 //

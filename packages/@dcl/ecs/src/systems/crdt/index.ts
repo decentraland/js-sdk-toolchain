@@ -190,7 +190,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         if (transports.some((t) => t.filter(message))) {
           if (message.type === CrdtMessageType.PUT_COMPONENT) {
             PutComponentOperation.write(message.entityId, message.timestamp, message.componentId, message.data, buffer)
-          } else {
+          } else if (message.type === CrdtMessageType.DELETE_COMPONENT) {
             DeleteComponent.write(message.entityId, component.componentId, message.timestamp, buffer)
           }
 

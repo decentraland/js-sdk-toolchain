@@ -4,7 +4,11 @@ import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/src/math'
 
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH } from '../../packages/@dcl/ecs/src/serialization/crdt/types'
+import {
+  CrdtMessageType,
+  CRDT_MESSAGE_HEADER_LENGTH,
+  PutComponentMessageBody
+} from '../../packages/@dcl/ecs/src/serialization/crdt/types'
 
 import {
   CrdtMessageProtocol,
@@ -43,7 +47,7 @@ describe('Component operation tests', () => {
     const bb = new ReadWriteByteBuffer()
 
     // Avoid creating messages if there is no transport that will handle it
-    const [message] = Transform.getCrdtUpdates()
+    const [message] = Transform.getCrdtUpdates() as [PutComponentMessageBody]
     PutComponentOperation.write(message.entityId, message.timestamp, message.componentId, (message as any).data, bb)
 
     Transform.getMutable(entityA).position.x = 31.3

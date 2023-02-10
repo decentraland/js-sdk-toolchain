@@ -103,8 +103,21 @@ export interface ComponentDefinition<T> {
    */
   deserialize(buffer: ByteBuffer): T
 
-  // returns a conflict message and the current value of the entity-component
+  /**
+   * This function receives a CRDT update and returns a touple with a "conflict
+   * resoluton" message, in case of the sender being updated or null in case of noop/accepted
+   * change. The second element of the touple is the modified/changed/deleted value.
+   * @public
+   */
   updateFromCrdt(body: CrdtMessageBody): [null | PutComponentMessageBody | DeleteComponentMessageBody, T | null]
+
+  /**
+   * This function returns an iterable with all the CRDT updates that need to be
+   * broadcasted to other actors in the system. After returning, this function
+   * clears the internal dirty state. Updates are produced only once.
+   * @public
+   */
+  getCrdtUpdates(): Iterable<CrdtMessageBody>
 
   // allocates a buffer and returns new buffer
   /**
@@ -128,8 +141,6 @@ export interface ComponentDefinition<T> {
    * Get the iterator to every entity has the component
    */
   iterator(): Iterable<[Entity, T]>
-
-  getCrdtUpdates(): Iterable<PutComponentMessageBody | DeleteComponentMessageBody>
 
   // Dirty
   /**
