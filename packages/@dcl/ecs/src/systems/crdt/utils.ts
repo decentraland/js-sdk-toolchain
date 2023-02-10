@@ -13,7 +13,6 @@ export namespace CrdtUtils {
 
 export default CrdtUtils
 
-const globalBuffer = (globalThis as any).Buffer
 /**
  * Compare raw data.
  * @internal
@@ -36,14 +35,6 @@ export function dataCompare<T>(a: T, b: T): number {
     }
     res = a.byteLength - b.byteLength
     return res > 0 ? 1 : res < 0 ? -1 : 0
-  }
-
-  if (globalBuffer) {
-    /* istanbul ignore next */
-    if (a instanceof globalBuffer && b instanceof globalBuffer) {
-      /* istanbul ignore next */
-      return (a as any).compare(b)
-    }
   }
 
   if (typeof a === 'string') {

@@ -1,6 +1,32 @@
 import { CrdtMessageType, Entity } from '../../packages/@dcl/ecs/src'
+import { dataCompare } from '../../packages/@dcl/ecs/src/systems/crdt/utils'
 import { createUpdateFromCrdt } from '../../packages/@dcl/ecs/src/engine/component'
 import { ByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
+
+describe('dataCompare', () => {
+  const testCases = [
+    [1, 1, 0],
+    [1, 0, 1],
+    [0, 1, -1],
+    [Uint8Array.of(0, 0), Uint8Array.of(0), 1],
+    [Uint8Array.of(0, 0), Uint8Array.of(0, 0), 0],
+    [Uint8Array.of(0), Uint8Array.of(0, 0), -1],
+    [Uint8Array.of(1), Uint8Array.of(0), 1],
+    [Uint8Array.of(1), Uint8Array.of(1), 0],
+    [Uint8Array.of(0), Uint8Array.of(1), -1],
+    [null, 1, -1],
+    [1, null, 1],
+    ['a', null, 1],
+    ['a', 'a', 0],
+    ['a', 'b', -1]
+  ] as const
+  let i = 0
+  for (const [a, b, result] of testCases) {
+    it(`runs test case ${i++}`, () => {
+      expect({ a, b, result: dataCompare(a, b) }).toEqual({ a, b, result: result })
+    })
+  }
+})
 
 describe('Conflict resolution rules for LWW-ElementSet based components', () => {
   const schema = {

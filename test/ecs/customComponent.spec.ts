@@ -264,4 +264,46 @@ describe('test CRDT flow E2E', () => {
       expect(int8B.get(entityA)).toBe(48)
     })
   })
+
+  describe('delete entity', () => {
+    it('now that engines have the same conflict-free state, we are repeating the same but with inverted values', async () => {
+      engineA.removeEntity(entityA)
+      int8B.createOrReplace(entityA, 45)
+
+      // to generate a "conflict", we will send the updates from A to B first
+      await engineA.update(0)
+      expect(env.connection.interceptedMessages).toMatchObject([
+        {
+          direction: 'a->b',
+          componentId: int8A.componentId,
+          entityId: entityA,
+          type: CrdtMessageType.DELETE_COMPONENT,
+          timestamp: 7
+        },
+        {
+          direction: 'a->b',
+          entityId: entityA,
+          type: CrdtMessageType.DELETE_ENTITY,
+        }
+      ])
+      env.connection.interceptedMessages = []
+    })
+
+    it('now we are receiving the updates from engineA', async () => {
+      // and then process in B, which will also send its updates
+      expect(int8B.get(entityA)).toBe(45)
+      await engineB.update(0)
+
+      // now both values converged towards the same value
+      expect(int8A.has(entityA)).toBe(false)
+      expect(int8B.has(entityA)).toBe(false)
+
+      env.connection.interceptedMessages = []
+
+      await engineA.update(0)
+      expect(env.connection.interceptedMessages).toMatchObject([])
+      await engineB.update(0)
+      expect(env.connection.interceptedMessages).toMatchObject([])
+    })
+  })
 })

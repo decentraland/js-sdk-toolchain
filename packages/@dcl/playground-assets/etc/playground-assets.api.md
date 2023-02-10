@@ -410,8 +410,6 @@ export interface ComponentDefinition<T> {
     getOrNull(entity: Entity): DeepReadonly<T> | null;
     has(entity: Entity): boolean;
     updateFromCrdt(body: CrdtMessageBody): [null | PutComponentMessageBody | DeleteComponentMessageBody, T | null];
-    // (undocumented)
-    writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void;
 }
 
 // Warning: (ae-missing-release-tag) "ComponentGetter" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)

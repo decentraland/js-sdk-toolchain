@@ -69,17 +69,8 @@ export const int8Component = (engine: IEngine) => {
       b.writeInt8(data.get(entity)!)
       return b
     },
-    toBinaryOrNull: function (entity: Entity): ByteBuffer | null {
-      if (!data.has(entity)) return null
-      const b = new ReadWriteByteBuffer()
-      b.writeInt8(data.get(entity)!)
-      return b
-    },
     deserialize(buffer) {
       return buffer.readInt8()
-    },
-    writeToByteBuffer: function (entity: Entity, buffer: ByteBuffer): void {
-      buffer.writeInt8(data.get(entity)!)
     },
     *iterator() {
       for (const [entity, component] of data) {

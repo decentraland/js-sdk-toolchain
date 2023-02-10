@@ -216,6 +216,18 @@ describe('CRDT tests', () => {
     })
   })
 
+  it('getMutable fails for inexistent entity', async () => {
+    const [{ engine }] = SandBox.create({ length: 1 })
+    const Transform = components.Transform(engine)
+    expect(() => Transform.getMutable(123 as Entity)).toThrow()
+  })
+
+  it('toBinary fails for inexistent entity', async () => {
+    const [{ engine }] = SandBox.create({ length: 1 })
+    const Transform = components.Transform(engine)
+    expect(() => Transform.toBinary(123 as Entity)).toThrow()
+  })
+
   it('should resend a crdt message if its outdated', async () => {
     const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
     const entity = engine.addEntity()

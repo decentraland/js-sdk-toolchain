@@ -127,14 +127,6 @@ export interface ComponentDefinition<T> {
   toBinary(entity: Entity): ByteBuffer
 
   // allocates a buffer and returns new buffer if it exists or null
-  /**
-   * @internal
-   * @param entity - Entity to serizalie
-   */
-  toBinaryOrNull(entity: Entity): ByteBuffer | null
-
-  // writes to a pre-allocated buffer
-  writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void
 
   /**
    * @internal Use engine.getEntitiesWith(Component) instead.
@@ -203,7 +195,7 @@ export function createUpdateFromCrdt(
       schema.serialize(data.get(entityId)!, writeBuffer)
       currentDataGreater = dataCompare(writeBuffer.toBinary(), (message as any).data || null)
     } else {
-      currentDataGreater = dataCompare(null, (message as any).data || null)
+      currentDataGreater = dataCompare(null, (message as any).data)
     }
 
     // Same data, same timestamp. Weirdo echo message.
@@ -343,11 +335,8 @@ export function createComponentDefinitionFromSchema<T>(
     },
     deleteFrom(entity: Entity, markAsDirty = true): T | null {
       const component = data.get(entity)
-      data.delete(entity)
-      if (markAsDirty) {
+      if (data.delete(entity) && markAsDirty) {
         dirtyIterator.add(entity)
-      } else {
-        dirtyIterator.delete(entity)
       }
       return component || null
     },
@@ -418,24 +407,6 @@ export function createComponentDefinitionFromSchema<T>(
       const writeBuffer = new ReadWriteByteBuffer()
       schema.serialize(component, writeBuffer)
       return writeBuffer
-    },
-    toBinaryOrNull(entity: Entity): ByteBuffer | null {
-      const component = data.get(entity)
-      if (!component) {
-        return null
-      }
-
-      const writeBuffer = new ReadWriteByteBuffer()
-      schema.serialize(component, writeBuffer)
-      return writeBuffer
-    },
-    writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void {
-      const component = data.get(entity)
-      if (!component) {
-        throw new Error(`[writeToByteBuffer] Component ${componentName} for entity #${entity} not found`)
-      }
-
-      schema.serialize(component, buffer)
     },
     updateFromCrdt: createUpdateFromCrdt(componentId, timestamps, schema, data),
     deserialize(buffer: ByteBuffer): T {

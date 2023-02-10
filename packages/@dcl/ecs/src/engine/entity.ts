@@ -189,10 +189,8 @@ export function EntityContainer(): EntityContainer {
   function updateUsedEntity(entity: Entity) {
     const [n, v] = EntityUtils.fromEntityId(entity)
 
-    const removedVersion = removedEntities.getMap().get(n)
-    if (removedVersion !== undefined && removedVersion >= v) {
-      return false
-    }
+    // if the entity was removed then abort fast
+    if (removedEntities.has(n, v)) return false
 
     // Update
     if (v > 0) {

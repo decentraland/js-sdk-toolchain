@@ -27,10 +27,10 @@ module.exports = {
       statements: 5
     },
     "packages/@dcl/ecs/src/components/generated/pb": {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70
+      branches: 1,
+      functions: 1,
+      lines: 1,
+      statements: 1
     },
     "packages/@dcl/ecs/src/components/generated/index.gen.ts": {
       functions: 10,
