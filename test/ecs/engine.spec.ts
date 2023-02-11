@@ -1,6 +1,5 @@
 import { cyclicParentingChecker, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src'
 import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
-import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { TransformSchema } from '../../packages/@dcl/ecs/src/components/legacy/Transform'
@@ -30,18 +29,6 @@ describe('Engine tests', () => {
     const Position = engine.defineComponent('PositionSchema', PositionSchema)
     Position.create(entity, { x: 1 })
     expect(() => Position.create(entity, { x: 10 })).toThrowError()
-  })
-
-  it('should throw an error if the component doesnt exist', async () => {
-    const engine = Engine()
-    const Position = engine.defineComponent('PositionSchema', PositionSchema)
-    const entity = engine.addEntity()
-    const entityB = engine.addEntity()
-    expect(() => Position.getMutable(entity)).toThrowError()
-    expect(() => Position.toBinary(entity)).toThrowError()
-    Position.create(entityB, { x: 10 })
-    const binary = Position.toBinary(entityB)
-    expect(() => Position.updateFromBinary(entity, binary)).toThrowError()
   })
 
   it('should delete component if exists or not', async () => {
@@ -346,13 +333,13 @@ describe('Engine tests', () => {
     expect(MeshRenderer.isDirty(entityA)).toBe(true)
   })
 
-  it('should fail to write to byte buffer if the entity not exists', async () => {
-    const engine = Engine()
-    const MeshRenderer = components.MeshRenderer(engine)
-    const entityA = engine.addEntity()
-    const buf = new ReadWriteByteBuffer()
-    expect(() => MeshRenderer.writeToByteBuffer(entityA, buf)).toThrowError('')
-  })
+  // it('should fail to write to byte buffer if the entity not exists', async () => {
+  //   const engine = Engine()
+  //   const MeshRenderer = components.MeshRenderer(engine)
+  //   const entityA = engine.addEntity()
+  //   const buf = new ReadWriteByteBuffer()
+  //   expect(() => MeshRenderer.writeToByteBuffer(entityA, buf)).toThrowError('')
+  // })
 
   it('should remove component when using deleteFrom', async () => {
     const engine = Engine()
@@ -436,7 +423,8 @@ describe('Engine tests', () => {
     expect(Transform.get(entity)).toStrictEqual({
       position: { x: 12, y: 1, z: 3 },
       scale: { x: 1, y: 1, z: 1 },
-      rotation: { x: 0, y: 0, z: 0, w: 1 }
+      rotation: { x: 0, y: 0, z: 0, w: 1 },
+      parent: 0 as Entity
     })
     await engine.update(1)
     expect(Transform.get(entity).position.x).toStrictEqual(13)

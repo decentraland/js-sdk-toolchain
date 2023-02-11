@@ -38,9 +38,7 @@ function preEngine(): PreEngine {
 
   function removeEntity(entity: Entity) {
     for (const [, component] of componentsDefinition) {
-      if (component.has(entity)) {
-        component.deleteFrom(entity)
-      }
+      component.entityDeleted(entity, true)
     }
 
     return entityContainer.removeEntity(entity)
@@ -237,13 +235,10 @@ export function Engine(options?: IEngineOptions): IEngine {
         }) returned a thenable. Systems cannot be async functions. Documentation: https://dcl.gg/sdk/sync-systems`
       )
     }
-    const dirtyEntities = crdtSystem.updateState()
+    // get the deleted entities to send the DeleteEntity CRDT commands
     const deletedEntites = partialEngine.entityContainer.releaseRemovedEntities()
-    await crdtSystem.sendMessages(dirtyEntities, deletedEntites)
 
-    for (const definition of partialEngine.componentsIter()) {
-      definition.clearDirty()
-    }
+    await crdtSystem.sendMessages(deletedEntites)
   }
 
   return {
@@ -270,7 +265,6 @@ export function Engine(options?: IEngineOptions): IEngine {
 
     getEntityState: partialEngine.entityContainer.getEntityState,
     addTransport: crdtSystem.addTransport,
-    getCrdtState: crdtSystem.getCrdt,
 
     entityContainer: partialEngine.entityContainer
   }

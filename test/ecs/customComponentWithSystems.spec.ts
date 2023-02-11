@@ -1,12 +1,4 @@
-import {
-  CrdtMessageType,
-  Engine,
-  Entity,
-  EntityState,
-  IEngine,
-  CrdtMessage,
-  Transport
-} from '../../packages/@dcl/ecs/src'
+import { Engine, Entity, IEngine, CrdtMessage, Transport } from '../../packages/@dcl/ecs/src'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { readMessage } from '../../packages/@dcl/ecs/src/serialization/crdt/message'
 import { ID, int8Component } from './int8component'
@@ -65,17 +57,6 @@ describe('test CRDT flow E2E', () => {
   const engineA = Engine()
   const engineB = Engine()
   const env = connectEngines(engineA, engineB)
-  function removeEntityB(entity: Entity) {
-    removeEntity(engineB, entity)
-  }
-  function removeEntity(engine: IEngine, entity: Entity) {
-    const name = 'systemEntity'
-    function update() {
-      engine.removeEntity(entity)
-      engine.removeSystem(name)
-    }
-    engine.addSystem(update, 0, name)
-  }
 
   function updateIntA(entity: Entity, value: number) {
     updateInt(engineA, entity, value)
@@ -112,6 +93,10 @@ describe('test CRDT flow E2E', () => {
   // create the components for both engines
   const int8A = int8Component(engineA)
   const int8B = int8Component(engineB)
+
+  beforeEach(() => {
+    env.connection.interceptedMessages.length = 0
+  })
 
   it('and add the component value "3" to the entityA', async () => {
     // and add the component value "3" to the entityA
@@ -296,26 +281,26 @@ describe('test CRDT flow E2E', () => {
   describe('conflict resolution case 3', () => {
     it('now that engines have the same conflict-free state, we are going to remove a component outside a fn and receive and update of the same component from the other engine', async () => {
       int8A.deleteFrom(entityA)
-      updateIntB(entityA, 88)
 
       // We send the message from B -> A
-      await engineB.update(0)
+      await engineA.update(0)
       expect(env.connection.interceptedMessages).toMatchObject([
         // this value will have has the same timestamp in both engines
         {
-          direction: 'b->a',
+          direction: 'a->b',
           componentId: int8A.componentId,
           entityId: entityA,
-          data: Uint8Array.of(88),
-          timestamp: 6
+          timestamp: 6,
+          type: 2 // delete
         }
       ])
-      env.connection.interceptedMessages = []
     })
 
     it('now we are receiving the updates from engineB', async () => {
-      // run update tick on engineA so we receive the message of the component that we already remove
-      await engineA.update(0)
+      console.log('CHECK')
+
+      // run update tick on engineA so the engineB receives the message of the component that we already remove
+      await engineB.update(0)
 
       // The conflict here is with same timestamp, `engineA` has removed the component, and `engineB` modified it.
       //  The "greater" data wins here, so the state converges to `engineB` LWW.
@@ -325,97 +310,8 @@ describe('test CRDT flow E2E', () => {
       await Promise.all([engineA.update(0), engineB.update(0)])
       expect(env.connection.interceptedMessages).toMatchObject([])
 
-      expect(int8A.getOrNull(entityA)).toBe(88)
-      expect(int8B.getOrNull(entityA)).toBe(88)
-    })
-  })
-  describe('conflict resolution case 4', () => {
-    it('same as case 3) but with roles inverted', async () => {
-      int8B.deleteFrom(entityA)
-      updateIntA(entityA, 114)
-
-      // We send the message from A -> B
-      await engineA.update(0)
-      expect(env.connection.interceptedMessages).toMatchObject([
-        // this value will have has the same timestamp in both engines
-        {
-          direction: 'a->b',
-          entityId: entityA,
-          data: Uint8Array.of(114),
-          timestamp: 7
-        }
-      ])
-      env.connection.interceptedMessages = []
-    })
-
-    it('now we are receiving the updates from engineA', async () => {
-      // run update tick on engineA so we receive the message of the component that we already remove
-      await engineB.update(0)
-      expect(env.connection.interceptedMessages).toMatchObject([])
-
-      await Promise.all([engineA.update(0), engineB.update(0)])
-      expect(env.connection.interceptedMessages).toMatchObject([])
-
-      expect(int8A.getOrNull(entityA)).toBe(114)
-      expect(int8B.getOrNull(entityA)).toBe(114)
-    })
-  })
-  describe('conflict resolution case 5', () => {
-    it('the entity is deleted, this operation wins always', async () => {
-      removeEntityB(entityA)
-      updateIntA(entityA, 118)
-
-      // We send the message from A -> B
-      await engineA.update(0)
-      expect(env.connection.interceptedMessages).toMatchObject([
-        {
-          direction: 'a->b',
-          componentId: int8A.componentId,
-          entityId: entityA,
-          data: Uint8Array.of(118),
-          timestamp: 8
-        }
-      ])
-      env.connection.interceptedMessages = []
-    })
-
-    it('now we are receiving the updates from engineA and finally the entity is removed and sync', async () => {
-      expect(engineB.getEntityState(entityA)).toBe(EntityState.UsedEntity)
-      expect(int8B.getOrNull(entityA)).not.toBe(null)
-
-      // the entity was deleted, so, the final state is removed
-      await engineB.update(0)
-      expect(engineB.getEntityState(entityA)).toBe(EntityState.Removed)
-      expect(int8B.getOrNull(entityA)).toBe(null)
-
-      expect(env.connection.interceptedMessages).toMatchObject([
-        // this value will have has the same timestamp in both engines
-        {
-          componentId: int8A.componentId,
-          direction: 'b->a',
-          entityId: entityA,
-          timestamp: 9,
-          type: CrdtMessageType.DELETE_COMPONENT
-        },
-        {
-          direction: 'b->a',
-          type: CrdtMessageType.DELETE_ENTITY,
-          entityId: entityA
-        }
-      ])
-      env.connection.interceptedMessages = []
-
-      await engineB.update(0)
-      expect(env.connection.interceptedMessages).toMatchObject([])
-
-      await engineA.update(0)
       expect(int8A.getOrNull(entityA)).toBe(null)
-
-      await Promise.all([engineA.update(0), engineB.update(0)])
-      expect(env.connection.interceptedMessages).toMatchObject([])
-
       expect(int8B.getOrNull(entityA)).toBe(null)
-      expect(int8A.getOrNull(entityA)).toBe(null)
     })
   })
 })

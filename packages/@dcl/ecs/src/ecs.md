@@ -30,7 +30,7 @@ type ComponentDefinition<T extends Spec> = {
   // adds this component to the list "to be reviewed next frame"
   mutable(entity: Entity): Result<T>
 
-  updateFromBinary(entity: Entity, data: Uint8Array): void
+  upsertFromBinary(entity: Entity, data: Uint8Array): void
   toBinary(entity: Entity): Uint8Array
 
   iterator(): Iterable<[Entity, Result<T>]>
@@ -137,7 +137,7 @@ for (const [_entity, position, velocity] of engine.each(Position.mutable, Veloci
 function receiveNewComponentData(entityId, componentId, data) {
   const TheComponentDefinition = engine.getComponentDefinition(componentId)
   if (TheComponentDefinition) {
-    TheComponentDefinition.updateFromBinary(entityId, data)
+    TheComponentDefinition.upsertFromBinary(entityId, data)
   }
 }
 

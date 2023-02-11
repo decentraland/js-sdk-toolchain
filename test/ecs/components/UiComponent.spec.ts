@@ -9,13 +9,13 @@ import {
   // YGUnit
 } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/ui_transform.gen'
 import { Engine, components } from '../../../packages/@dcl/ecs/src'
+import { testComponentSerialization } from './assertion'
 
 describe('UiTransform component', () => {
   it('should serialize', () => {
     const newEngine = Engine()
     const UiTransform = components.UiTransform(newEngine)
-    const entity = newEngine.addEntity()
-    UiTransform.create(entity, {
+    testComponentSerialization(UiTransform, {
       parent: 0,
       rightOf: 0,
       alignContent: YGAlign.YGA_CENTER,
@@ -67,14 +67,6 @@ describe('UiTransform component', () => {
       positionType: YGPositionType.YGPT_RELATIVE,
       width: 1,
       widthUnit: YGUnit.YGU_POINT
-    })
-    // uiTransform.marginBottomUnit = YGUnit.YGUnitPercent
-
-    const buffer = UiTransform.toBinary(entity)
-    UiTransform.upsertFromBinary(entity, buffer)
-    const entityB = newEngine.addEntity()
-    expect(UiTransform.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...UiTransform.get(entity)
     })
   })
 })

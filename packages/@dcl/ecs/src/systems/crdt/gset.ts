@@ -21,13 +21,6 @@ export type OptimizedGrowonlySet = {
    *
    * @returns the set with [number, version] of each value
    */
-  get(): [number, number][]
-
-  /**
-   * @public
-   *
-   * @returns the set with [number, version] of each value
-   */
   has(n: number, v: number): boolean
 
   /**
@@ -51,7 +44,9 @@ export function createVersionGSet(): OptimizedGrowonlySet {
      * @returns
      */
     addTo(number: number, version: number) {
+      /* istanbul ignore next */
       if (version < 0) {
+        /* istanbul ignore next */
         return false
       }
 
@@ -64,18 +59,6 @@ export function createVersionGSet(): OptimizedGrowonlySet {
 
       lastVersion.set(number, version)
       return true
-    },
-    /**
-     * @returns the set with [number, version] of each value
-     */
-    get() {
-      const arr: [number, number][] = []
-      for (const [n, v] of lastVersion) {
-        for (let i = 0; i <= v; i++) {
-          arr.push([n, i])
-        }
-      }
-      return arr
     },
     /**
      * @returns the set with [number, version] of each value

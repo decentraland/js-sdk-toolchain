@@ -5,15 +5,14 @@ import {
   TextureWrapMode,
   TextureFilterMode
 } from '../../../packages/@dcl/ecs/src'
+import { testComponentSerialization } from './assertion'
 
 describe('Generated UiBackground ProtoBuf', () => {
   it('should serialize/deserialize UiBackground', () => {
     const newEngine = Engine()
     const UiBackground = components.UiBackground(newEngine)
-    const entity = newEngine.addEntity()
-    const entityB = newEngine.addEntity()
 
-    const _uiBackground = UiBackground.create(entity, {
+    testComponentSerialization(UiBackground, {
       color: { r: 0, g: 0, b: 0, a: 0 },
       textureMode: BackgroundTextureMode.CENTER,
       texture: {
@@ -35,35 +34,12 @@ describe('Generated UiBackground ProtoBuf', () => {
       uvs: []
     })
 
-    UiBackground.create(entityB, {
+    testComponentSerialization(UiBackground, {
       color: { r: 0, g: 0, b: 1, a: 0 },
       textureMode: BackgroundTextureMode.CENTER,
-      uvs: []
-    })
-    const buffer = UiBackground.toBinary(entity)
-    UiBackground.updateFromBinary(entityB, buffer)
-
-    expect(_uiBackground).toEqual({
-      color: { r: 0, g: 0, b: 0, a: 0 },
       uvs: [],
-      textureMode: 1,
-      texture: {
-        tex: {
-          $case: 'texture',
-          texture: {
-            src: 'some-src',
-            wrapMode: TextureWrapMode.TWM_CLAMP,
-            filterMode: TextureFilterMode.TFM_BILINEAR
-          }
-        }
-      },
-      textureSlices: {
-        top: 1 / 3,
-        left: 1 / 3,
-        right: 1 / 3,
-        bottom: 1 / 3
-      }
+      texture: undefined,
+      textureSlices: undefined
     })
-    expect(_uiBackground).not.toEqual(UiBackground.create(newEngine.addEntity()))
   })
 })

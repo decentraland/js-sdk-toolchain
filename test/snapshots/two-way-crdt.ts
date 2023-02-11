@@ -11,13 +11,40 @@ withRenderer((engine) => {
   Transform.create(engine.RootEntity, { scale: { x: 9, y: 9, z: 9 } })
 
   engine.addSystem(() => {
-    Transform.getMutable(engine.RootEntity).position.x += 1
+    const mut = Transform.getMutableOrNull(engine.RootEntity)
+    if (mut) {
+      console.log(`Adding one to position.y=${mut.position.y}`)
+      mut.position.x = mut.position.y + 1
+    }
   })
 })
 
-engine.addSystem((deltaTime) => {
-  if (deltaTime === 0.0) {
-    assert(Transform.has(engine.RootEntity), 'RootEntity has a transform')
-    assert(Transform.getOrNull(engine.RootEntity)?.scale.x === 9, 'RootEntity has the correct scale')
+let stage = 0
+const newEntity = engine.addEntity()
+engine.addSystem(() => {
+  switch (stage++) {
+    case 0: {
+      assert(Transform.has(engine.RootEntity), 'RootEntity has a transform')
+      assert(Transform.getOrNull(engine.RootEntity)?.scale.x === 9, 'RootEntity has the correct scale')
+      Transform.getMutableOrNull(engine.RootEntity)!.position.y += 1
+      Transform.create(newEntity)
+      break
+    }
+    case 1: {
+      Transform.getMutable(newEntity)!.position.y = 1
+      engine.removeEntity(newEntity)
+      Transform.deleteFrom(engine.RootEntity)
+      break
+    }
+    case 2: {
+      Transform.create(engine.RootEntity)
+      break
+    }
+    case 3: {
+      assert(Transform.getOrNull(engine.RootEntity)?.position.x === 1, 'RootEntity has the correct position')
+      assert(Transform.getOrNull(engine.RootEntity)?.scale.x === 1, 'RootEntity has the correct scale')
+
+      break
+    }
   }
 })

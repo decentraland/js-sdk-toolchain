@@ -1,5 +1,13 @@
 import type { ISchema } from '../schemas/ISchema'
 import { ByteBuffer, ReadWriteByteBuffer } from '../serialization/ByteBuffer'
+import {
+  CrdtMessageBody,
+  CrdtMessageType,
+  DeleteComponentMessageBody,
+  ProcessMessageResultType,
+  PutComponentMessageBody
+} from '../serialization/crdt'
+import { dataCompare } from '../systems/crdt/utils'
 import { Entity } from './entity'
 import { deepReadonly, DeepReadonly } from './readonly'
 
@@ -57,6 +65,7 @@ export interface ComponentDefinition<T> {
    * @param markAsDirty - defaults to true
    */
   deleteFrom(entity: Entity, markAsDirty?: boolean): T | null
+
   /**
    * @public
    * Delete the current component to an entity, return null if the entity doesn't have the current component.
@@ -64,6 +73,15 @@ export interface ComponentDefinition<T> {
    * @param entity - Entity to delete the component from
    */
   deleteFrom(entity: Entity): T | null
+
+  /**
+   * @public
+   * Marks the entity as deleted and signals it cannot be used ever again. It must
+   * clear the component internal state, produces a synchronization message to remove
+   * the component from the entity.
+   * @param entity - Entity to delete the component from
+   */
+  entityDeleted(entity: Entity, markAsDirty: boolean): void
 
   /**
    * Get the mutable component of the entity, throw an error if the entity doesn't have the component.
@@ -84,20 +102,22 @@ export interface ComponentDefinition<T> {
    * @param buffer - data to deserialize
    */
   deserialize(buffer: ByteBuffer): T
+
   /**
-   * @internal
-   * @param entity - entity-component to update
-   * @param data - data to update the entity-component
-   * @param markAsDirty - defaults to true
+   * This function receives a CRDT update and returns a touple with a "conflict
+   * resoluton" message, in case of the sender being updated or null in case of noop/accepted
+   * change. The second element of the touple is the modified/changed/deleted value.
+   * @public
    */
-  upsertFromBinary(entity: Entity, data: ByteBuffer, markAsDirty?: boolean): T | null
+  updateFromCrdt(body: CrdtMessageBody): [null | PutComponentMessageBody | DeleteComponentMessageBody, T | null]
+
   /**
-   * @internal
-   * @param entity - entity-component to update
-   * @param data - data to update the entity-component
-   * @param markAsDirty - defaults to true
+   * This function returns an iterable with all the CRDT updates that need to be
+   * broadcasted to other actors in the system. After returning, this function
+   * clears the internal dirty state. Updates are produced only once.
+   * @public
    */
-  updateFromBinary(entity: Entity, data: ByteBuffer, markAsDirty?: boolean): T | null
+  getCrdtUpdates(): Iterable<CrdtMessageBody>
 
   // allocates a buffer and returns new buffer
   /**
@@ -107,14 +127,6 @@ export interface ComponentDefinition<T> {
   toBinary(entity: Entity): ByteBuffer
 
   // allocates a buffer and returns new buffer if it exists or null
-  /**
-   * @internal
-   * @param entity - Entity to serizalie
-   */
-  toBinaryOrNull(entity: Entity): ByteBuffer | null
-
-  // writes to a pre-allocated buffer
-  writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void
 
   /**
    * @internal Use engine.getEntitiesWith(Component) instead.
@@ -130,11 +142,167 @@ export interface ComponentDefinition<T> {
   /**
    * @internal
    */
-  clearDirty(): void
-  /**
-   * @internal
-   */
   isDirty(entity: Entity): boolean
+}
+
+export function incrementTimestamp(entity: Entity, timestamps: Map<Entity, number>): number {
+  const newTimestamp = (timestamps.get(entity) || 0) + 1
+  timestamps.set(entity, newTimestamp)
+  return newTimestamp
+}
+
+export function createUpdateFromCrdt(
+  componentId: number,
+  timestamps: Map<Entity, number>,
+  schema: Pick<ISchema<any>, 'serialize' | 'deserialize'>,
+  data: Map<Entity, unknown>
+) {
+  /**
+   * Process the received message only if the lamport number recieved is higher
+   * than the stored one. If its lower, we spread it to the network to correct the peer.
+   * If they are equal, the bigger raw data wins.
+
+    * Returns the recieved data if the lamport number was bigger than ours.
+    * If it was an outdated message, then we return void
+    * @public
+    */
+  function crdtRuleForCurrentState(
+    message: PutComponentMessageBody | DeleteComponentMessageBody
+  ): ProcessMessageResultType {
+    const { entityId, timestamp } = message
+    const currentTimestamp = timestamps.get(entityId as Entity)
+
+    // The received message is > than our current value, update our state.components.
+    if (currentTimestamp === undefined || currentTimestamp < timestamp) {
+      return ProcessMessageResultType.StateUpdatedTimestamp
+    }
+
+    // Outdated Message. Resend our state message through the wire.
+    if (currentTimestamp > timestamp) {
+      // console.log('2', currentTimestamp, timestamp)
+      return ProcessMessageResultType.StateOutdatedTimestamp
+    }
+
+    // Deletes are idempotent
+    if (message.type === CrdtMessageType.DELETE_COMPONENT && !data.has(entityId)) {
+      return ProcessMessageResultType.NoChanges
+    }
+
+    let currentDataGreater = 0
+
+    if (data.has(entityId)) {
+      const writeBuffer = new ReadWriteByteBuffer()
+      schema.serialize(data.get(entityId)!, writeBuffer)
+      currentDataGreater = dataCompare(writeBuffer.toBinary(), (message as any).data || null)
+    } else {
+      currentDataGreater = dataCompare(null, (message as any).data)
+    }
+
+    // Same data, same timestamp. Weirdo echo message.
+    // console.log('3', currentDataGreater, writeBuffer.toBinary(), (message as any).data || null)
+    if (currentDataGreater === 0) {
+      return ProcessMessageResultType.NoChanges
+    } else if (currentDataGreater > 0) {
+      // Current data is greater
+      return ProcessMessageResultType.StateOutdatedData
+    } else {
+      // Curent data is lower
+      return ProcessMessageResultType.StateUpdatedData
+    }
+  }
+
+  return (msg: CrdtMessageBody): [null | PutComponentMessageBody | DeleteComponentMessageBody, any] => {
+    /* istanbul ignore next */
+    if (msg.type !== CrdtMessageType.PUT_COMPONENT && msg.type !== CrdtMessageType.DELETE_COMPONENT)
+      /* istanbul ignore next */
+      return [null, data.get(msg.entityId)]
+
+    const action = crdtRuleForCurrentState(msg)
+    const entity = msg.entityId as Entity
+    switch (action) {
+      case ProcessMessageResultType.StateUpdatedData:
+      case ProcessMessageResultType.StateUpdatedTimestamp: {
+        timestamps.set(entity, msg.timestamp)
+
+        if (msg.type === CrdtMessageType.PUT_COMPONENT) {
+          const buf = new ReadWriteByteBuffer(msg.data!)
+          data.set(entity, schema.deserialize(buf))
+        } else {
+          data.delete(entity)
+        }
+
+        return [null, data.get(entity)]
+      }
+      case ProcessMessageResultType.StateOutdatedTimestamp:
+      case ProcessMessageResultType.StateOutdatedData: {
+        if (data.has(entity)) {
+          const writeBuffer = new ReadWriteByteBuffer()
+          schema.serialize(data.get(entity)!, writeBuffer)
+
+          return [
+            {
+              type: CrdtMessageType.PUT_COMPONENT,
+              componentId,
+              data: writeBuffer.toBinary(),
+              entityId: entity,
+              timestamp: timestamps.get(entity)!
+            } as PutComponentMessageBody,
+            data.get(entity)
+          ]
+        } else {
+          return [
+            {
+              type: CrdtMessageType.DELETE_COMPONENT,
+              componentId,
+              entityId: entity,
+              timestamp: timestamps.get(entity)!
+            } as DeleteComponentMessageBody,
+            undefined
+          ]
+        }
+      }
+    }
+
+    return [null, data.get(entity)]
+  }
+}
+
+export function createGetCrdtMessages(
+  componentId: number,
+  timestamps: Map<Entity, number>,
+  dirtyIterator: Set<Entity>,
+  schema: Pick<ISchema<any>, 'serialize'>,
+  data: Map<Entity, unknown>
+) {
+  return function* () {
+    for (const entity of dirtyIterator) {
+      const newTimestamp = incrementTimestamp(entity, timestamps)
+      if (data.has(entity)) {
+        const writeBuffer = new ReadWriteByteBuffer()
+        schema.serialize(data.get(entity)!, writeBuffer)
+
+        const msg: PutComponentMessageBody = {
+          type: CrdtMessageType.PUT_COMPONENT,
+          componentId,
+          entityId: entity,
+          data: writeBuffer.toBinary(),
+          timestamp: newTimestamp
+        }
+
+        yield msg
+      } else {
+        const msg: DeleteComponentMessageBody = {
+          type: CrdtMessageType.DELETE_COMPONENT,
+          componentId,
+          entityId: entity,
+          timestamp: newTimestamp
+        }
+
+        yield msg
+      }
+    }
+    dirtyIterator.clear()
+  }
 }
 
 /**
@@ -147,6 +315,7 @@ export function createComponentDefinitionFromSchema<T>(
 ): ComponentDefinition<T> {
   const data = new Map<Entity, T>()
   const dirtyIterator = new Set<Entity>()
+  const timestamps = new Map<Entity, number>()
 
   return {
     get componentId() {
@@ -166,13 +335,15 @@ export function createComponentDefinitionFromSchema<T>(
     },
     deleteFrom(entity: Entity, markAsDirty = true): T | null {
       const component = data.get(entity)
-      data.delete(entity)
-      if (markAsDirty) {
+      if (data.delete(entity) && markAsDirty) {
         dirtyIterator.add(entity)
-      } else {
-        dirtyIterator.delete(entity)
       }
       return component || null
+    },
+    entityDeleted(entity: Entity, markAsDirty: boolean): void {
+      if (data.delete(entity) && markAsDirty) {
+        dirtyIterator.add(entity)
+      }
     },
     getOrNull(entity: Entity): DeepReadonly<T> | null {
       const component = data.get(entity)
@@ -226,6 +397,7 @@ export function createComponentDefinitionFromSchema<T>(
         yield entity
       }
     },
+    getCrdtUpdates: createGetCrdtMessages(componentId, timestamps, dirtyIterator, schema, data),
     toBinary(entity: Entity): ByteBuffer {
       const component = data.get(entity)
       if (!component) {
@@ -236,46 +408,9 @@ export function createComponentDefinitionFromSchema<T>(
       schema.serialize(component, writeBuffer)
       return writeBuffer
     },
-    toBinaryOrNull(entity: Entity): ByteBuffer | null {
-      const component = data.get(entity)
-      if (!component) {
-        return null
-      }
-
-      const writeBuffer = new ReadWriteByteBuffer()
-      schema.serialize(component, writeBuffer)
-      return writeBuffer
-    },
-    writeToByteBuffer(entity: Entity, buffer: ByteBuffer): void {
-      const component = data.get(entity)
-      if (!component) {
-        throw new Error(`[writeToByteBuffer] Component ${componentName} for entity #${entity} not found`)
-      }
-
-      schema.serialize(component, buffer)
-    },
-    updateFromBinary(entity: Entity, buffer: ByteBuffer, markAsDirty = true): T | null {
-      const component = data.get(entity)
-      if (!component) {
-        throw new Error(`[updateFromBinary] Component ${componentName} for ${entity} not found`)
-      }
-      return this.upsertFromBinary(entity, buffer, markAsDirty)
-    },
-    upsertFromBinary(entity: Entity, buffer: ByteBuffer, markAsDirty = true): T | null {
-      const newValue = schema.deserialize(buffer)
-      data.set(entity, newValue)
-      if (markAsDirty) {
-        dirtyIterator.add(entity)
-      } else {
-        dirtyIterator.delete(entity)
-      }
-      return newValue
-    },
+    updateFromCrdt: createUpdateFromCrdt(componentId, timestamps, schema, data),
     deserialize(buffer: ByteBuffer): T {
       return schema.deserialize(buffer)
-    },
-    clearDirty() {
-      dirtyIterator.clear()
     }
   }
 }

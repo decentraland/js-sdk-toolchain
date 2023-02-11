@@ -1,4 +1,3 @@
-import { State } from '@dcl/crdt'
 import type { ISchema } from '../schemas/ISchema'
 import { MapResult, Spec } from '../schemas/Map'
 import { OnChangeFunction } from '../systems/crdt'
@@ -255,12 +254,6 @@ export interface IEngine {
    * @param transport - transport which changes its onmessage to process CRDT messages
    */
   addTransport(transport: Transport): void
-
-  /**
-   * @internal
-   * Returns the crdt state. For now only for testing purpose
-   */
-  getCrdtState(): State<Uint8Array>
 
   /**
    * @public

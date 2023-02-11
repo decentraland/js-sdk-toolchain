@@ -1,44 +1,33 @@
 import { PBMeshCollider } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/mesh_collider.gen'
 import { Engine, components, ColliderLayer } from '../../../packages/@dcl/ecs/src'
+import { testComponentSerialization } from './assertion'
 
 describe('Generated MeshCollider ProtoBuf', () => {
   it('should serialize/deserialize MeshCollider', () => {
     const newEngine = Engine()
     const MeshCollider = components.MeshCollider(newEngine)
-    const entity = newEngine.addEntity()
-    const entityB = newEngine.addEntity()
 
     const serializeComponents: PBMeshCollider[] = [
       {
+        collisionMask: undefined,
         mesh: { $case: 'cylinder', cylinder: { radiusBottom: 1, radiusTop: 2 } }
       },
       {
+        collisionMask: undefined,
         mesh: { $case: 'plane', plane: {} }
       },
       {
+        collisionMask: undefined,
         mesh: { $case: 'box', box: {} }
       },
       {
+        collisionMask: undefined,
         mesh: { $case: 'sphere', sphere: {} }
       }
     ]
 
-    let previousData = serializeComponents[serializeComponents.length - 1]
     for (const data of serializeComponents) {
-      MeshCollider.createOrReplace(entity, data)
-      MeshCollider.createOrReplace(entityB, previousData)
-      previousData = data
-
-      const buffer = MeshCollider.toBinary(entity)
-      MeshCollider.updateFromBinary(entityB, buffer)
-
-      expect(MeshCollider.get(entity)).toEqual({
-        ...MeshCollider.getMutable(entityB)
-      })
-
-      expect(MeshCollider.createOrReplace(entityB)).not.toEqual({
-        ...MeshCollider.getMutable(entity)
-      })
+      testComponentSerialization(MeshCollider, data)
     }
   })
 

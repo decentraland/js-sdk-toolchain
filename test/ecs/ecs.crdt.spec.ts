@@ -1,17 +1,9 @@
-import {
-  components,
-  CrdtMessageType,
-  DeleteComponent,
-  IEngine,
-  PutComponentOperation,
-  Schemas
-} from '../../packages/@dcl/ecs/src'
-import { Entity, EntityUtils, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src/engine/entity'
+import { components, CrdtMessageType, DeleteComponent, IEngine, Schemas } from '../../packages/@dcl/ecs/src'
+import { PutComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt'
+import { Entity, EntityState, EntityUtils, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src/engine/entity'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { Vector3 } from '../../packages/@dcl/sdk/src/math'
-import { compareStatePayloads } from '../crdt/utils'
-import { stateToString } from '../crdt/utils/state'
-import { checkCrdtStateWithEngine, SandBox, wait } from './utils'
+import { SandBox, wait } from './utils'
 
 async function simpleScene(engine: IEngine) {
   const Transform = components.Transform(engine)
@@ -56,11 +48,18 @@ async function simpleScene(engine: IEngine) {
 
   await engine.update(1)
 
-  // These two line shouldn't has effect in the final state, entityA has already deleted
-  Transform.create(entityA, { position: Vector3.Left() })
-  MeshRenderer.setPlane(entityA)
+  // TODO(Mendez):
+  //       Add a test to ensure that modification of already deleted entities throws an error in devmode
+  //       and passthrough in prd mode. It took me two hours to figure that this test is doing nonsense!
+  //       Comparing the final states of each engine of course diverged, because we are
+  //       trying to update an entity that was already deleted. Thus, the CRDT protocol
+  //       ignored its messages.
 
-  await engine.update(1)
+  // // These two line shouldn't has effect in the final state, entityA has already deleted
+  // Transform.create(entityA, { position: Vector3.Left() })
+  // MeshRenderer.setPlane(entityA)
+
+  // await engine.update(1)
 }
 
 describe('CRDT tests', () => {
@@ -217,6 +216,18 @@ describe('CRDT tests', () => {
     })
   })
 
+  it('getMutable fails for inexistent entity', async () => {
+    const [{ engine }] = SandBox.create({ length: 1 })
+    const Transform = components.Transform(engine)
+    expect(() => Transform.getMutable(123 as Entity)).toThrow()
+  })
+
+  it('toBinary fails for inexistent entity', async () => {
+    const [{ engine }] = SandBox.create({ length: 1 })
+    const Transform = components.Transform(engine)
+    expect(() => Transform.toBinary(123 as Entity)).toThrow()
+  })
+
   it('should resend a crdt message if its outdated', async () => {
     const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
     const entity = engine.addEntity()
@@ -226,13 +237,13 @@ describe('CRDT tests', () => {
     Transform.getMutable(entity).position.x = 8
     await engine.update(1)
     const buffer = new ReadWriteByteBuffer()
-    PutComponentOperation.write(entity, 0, Transform, buffer)
+    PutComponentOperation.write(entity, 0, Transform.componentId, Transform.toBinary(entity).toBinary(), buffer)
     jest.resetAllMocks()
     transports[0].onmessage!(buffer.toBinary())
     await engine.update(1)
 
     const outdatedBuffer = new ReadWriteByteBuffer()
-    PutComponentOperation.write(entity, 2, Transform, outdatedBuffer)
+    PutComponentOperation.write(entity, 2, Transform.componentId, Transform.toBinary(entity).toBinary(), outdatedBuffer)
     expect(spySend).toBeCalledWith(outdatedBuffer.toBinary())
   })
 
@@ -243,7 +254,7 @@ describe('CRDT tests', () => {
     Transform.create(entity, SandBox.DEFAULT_POSITION)
     await engine.update(1)
     const buffer = new ReadWriteByteBuffer()
-    PutComponentOperation.write(entity, 0, Transform, buffer)
+    PutComponentOperation.write(entity, 0, Transform.componentId, Transform.toBinary(entity).toBinary(), buffer)
     Transform.deleteFrom(entity)
     await engine.update(1)
     jest.resetAllMocks()
@@ -269,60 +280,59 @@ describe('CRDT tests', () => {
     await engine.update(1)
     expect(Transform.getOrNull(entity)).toBe(null)
   })
+
   it('should process messages even if the component is not found', async () => {
     const [{ engine }, { engine: serverEngine, transports }] = SandBox.create({
       length: 2
     })
     const [serverTransport] = transports
     const entity = engine.addEntity()
-    const cusutomComponent = engine.defineComponent('custom component', {
+    const customComponent = engine.defineComponent('custom component', {
       open: Schemas.Boolean
     })
-    cusutomComponent.create(entity, { open: false })
+    const customServerComponent = serverEngine.defineComponent('custom component', {
+      open: Schemas.Boolean
+    })
+    customComponent.create(entity, { open: false })
     await engine.update(1)
 
     const buffer = new ReadWriteByteBuffer()
-    PutComponentOperation.write(entity, 1, cusutomComponent, buffer)
+    PutComponentOperation.write(
+      entity,
+      1,
+      customComponent.componentId,
+      customComponent.toBinary(entity).toBinary(),
+      buffer
+    )
     serverTransport.onmessage!(buffer.toBinary())
     await serverEngine.update(1)
-    const crdtState = serverEngine.getCrdtState()
-    const component = crdtState.components.get(cusutomComponent.componentId)!.get(entity as number)!
-    expect(component?.data).toStrictEqual(cusutomComponent.toBinary(entity).toBinary())
-    expect(component?.timestamp).toBe(1)
+    expect(customServerComponent.get(entity)).toEqual(customComponent.get(entity))
   })
 
   it('should converge to the same final state (a simple transform creation)', async () => {
     const {
-      clients: [clientA, clientB, clientC],
-      getCrdtStates
+      clients: [clientA, clientB, clientC]
     } = SandBox.createEngines({ length: 3 })
 
     const entityA = clientA.engine.addEntity()
     clientA.Transform.create(entityA, { position: Vector3.One() })
 
     // before the update, the crdt state is out-to-date
-    expect(checkCrdtStateWithEngine(clientA.engine).conflicts.length === 0).toBe(false)
+    expect(() => compareStatePayloads({ clientA, clientB, clientC })).toThrow()
+
     await clientA.engine.update(1)
 
     // now, the crdt state and engine should converge
-    expect(checkCrdtStateWithEngine(clientA.engine).conflicts.length === 0).toBe(true)
+    expect(() => compareStatePayloads({ clientA, clientB, clientC })).toThrow()
 
     // between clients, ClientA hasn't sent anything yet, so, crdt state won't be synched
-    expect(compareStatePayloads(getCrdtStates())).toBe(false)
-
     clientA.flushOutgoing()
-
-    // flush is not enough, the updates should be called to read messages
-    expect(compareStatePayloads(getCrdtStates())).toBe(false)
 
     await clientB.engine.update(1)
     await clientC.engine.update(1)
 
     // now, it should be all synched
-    expect(compareStatePayloads(getCrdtStates())).toBe(true)
-    expect(checkCrdtStateWithEngine(clientA.engine).conflicts).toEqual([])
-    expect(checkCrdtStateWithEngine(clientB.engine).conflicts).toEqual([])
-    expect(checkCrdtStateWithEngine(clientC.engine).conflicts).toEqual([])
+    compareStatePayloads({ clientA, clientB, clientC })
   })
 
   it('should ignore invalid message type', async () => {
@@ -336,15 +346,14 @@ describe('CRDT tests', () => {
 
     clientA.transports[0].onmessage!(buf.toBinary()!)
 
-    const stateBeforeProcessMessage = stateToString(clientA.engine.getCrdtState())
+    const stateBeforeProcessMessage = serializeEngine(clientA.engine)
     await clientA.engine.update(1)
-    expect(stateToString(clientA.engine.getCrdtState())).toBe(stateBeforeProcessMessage)
+    expect(serializeEngine(clientA.engine)).toBe(stateBeforeProcessMessage)
   })
 
   it('should converge to the same final state (more complex scene code)', async () => {
     const {
-      clients: [clientA, clientB, clientC],
-      getCrdtStates
+      clients: [clientA, clientB, clientC]
     } = SandBox.createEngines({ length: 3 })
 
     // runs a kind of scene in the clientA
@@ -358,11 +367,13 @@ describe('CRDT tests', () => {
     await clientB.engine.update(1)
     await clientC.engine.update(1)
 
+    const entityShouldBeDeleted = 512 as Entity
+    expect(clientA.engine.entityContainer.getEntityState(entityShouldBeDeleted)).toEqual(EntityState.Removed)
+    expect(clientB.engine.entityContainer.getEntityState(entityShouldBeDeleted)).toEqual(EntityState.Removed)
+    expect(clientC.engine.entityContainer.getEntityState(entityShouldBeDeleted)).toEqual(EntityState.Removed)
+
     // now, it should be all synched
-    expect(compareStatePayloads(getCrdtStates())).toBe(true)
-    expect(checkCrdtStateWithEngine(clientA.engine).conflicts).toEqual([])
-    expect(checkCrdtStateWithEngine(clientB.engine).conflicts).toEqual([])
-    expect(checkCrdtStateWithEngine(clientC.engine).conflicts).toEqual([])
+    compareStatePayloads({ clientB, clientC, clientA })
   })
 
   describe(`should converge to the same final state (more complex scene code) (shuffle messages)`, () => {
@@ -370,8 +381,7 @@ describe('CRDT tests', () => {
     shuffleSeeds.forEach((seedValue) => {
       it(`shuffle with seed ${seedValue}`, async () => {
         const {
-          clients: [clientA, clientB, clientC],
-          getCrdtStates
+          clients: [clientA, clientB, clientC]
         } = SandBox.createEngines({ length: 3 })
 
         await simpleScene(clientA.engine)
@@ -385,16 +395,12 @@ describe('CRDT tests', () => {
         await clientC.engine.update(1)
 
         // now, it should be all synched
-        expect(compareStatePayloads(getCrdtStates())).toBe(true)
-        expect(checkCrdtStateWithEngine(clientA.engine).conflicts).toEqual([])
-        expect(checkCrdtStateWithEngine(clientB.engine).conflicts).toEqual([])
-        expect(checkCrdtStateWithEngine(clientC.engine).conflicts).toEqual([])
+        compareStatePayloads({ clientA, clientB, clientC })
       })
 
       it(`shuffle messages with seed ${seedValue}, and with multiple scene runs`, async () => {
         const {
-          clients: [clientA, clientB, clientC],
-          getCrdtStates
+          clients: [clientA, clientB, clientC]
         } = SandBox.createEngines({ length: 3 })
 
         // same as previous test, but all the clients run the same scene
@@ -417,18 +423,15 @@ describe('CRDT tests', () => {
         await clientC.engine.update(1)
 
         // now, it should be all synched
-        expect(compareStatePayloads(getCrdtStates())).toBe(true)
-        expect(checkCrdtStateWithEngine(clientA.engine).conflicts).toEqual([])
-        expect(checkCrdtStateWithEngine(clientB.engine).conflicts).toEqual([])
-        expect(checkCrdtStateWithEngine(clientC.engine).conflicts).toEqual([])
+        compareStatePayloads({ clientA, clientB, clientC })
       })
     })
   })
 
   it('should receive an update from a version greater', async () => {
     const {
-      clients: [clientA, clientB],
-      testCrdtSynchronization
+      clients: [clientA, clientB, clientC],
+      flushCrdtAndSynchronize
     } = SandBox.createEngines({ length: 3 })
 
     for (let i = 0; i < 30; i++) {
@@ -448,8 +451,10 @@ describe('CRDT tests', () => {
 
     await clientA.engine.update(1)
 
-    const res = await testCrdtSynchronization()
-    expect(res.allConflicts.length).toBe(0)
+    await flushCrdtAndSynchronize()
+
+    compareStatePayloads({ clientA, clientB, clientC })
+
     expect(
       clientB.operations.includes({
         entity: 512 as Entity,
@@ -461,15 +466,14 @@ describe('CRDT tests', () => {
 
   it('should delete many entities', async () => {
     const {
-      clients: [clientA],
-      getCrdtStates,
-      testCrdtSynchronization
+      clients: [clientA, clientB, clientC],
+      flushCrdtAndSynchronize
     } = SandBox.createEngines({ length: 3 })
 
     const cube = clientA.engine.addEntity()
     clientA.Transform.create(cube)
 
-    const entitiesCalledToBeRemoved = []
+    const entitiesCalledToBeRemoved: Entity[] = []
     let prevEntity: Entity | null = null
     function system() {
       if (prevEntity) {
@@ -490,11 +494,83 @@ describe('CRDT tests', () => {
     clientA.engine.removeSystem('test-system')
     await clientA.engine.update(1)
 
-    const result = await testCrdtSynchronization()
-    expect(result.allConflicts.length).toBe(0)
-    expect(result.crdtStateConverged).toBe(true)
+    await flushCrdtAndSynchronize()
 
-    const deletedEntities = getCrdtStates()[0].deletedEntities.get()
-    expect(deletedEntities.length).toBe(entitiesCalledToBeRemoved.length)
+    compareStatePayloads({ clientA, clientB, clientC })
+
+    for (const e of entitiesCalledToBeRemoved) {
+      expect(clientA.engine.entityContainer.getEntityState(e)).toEqual(EntityState.Removed)
+      expect(clientB.engine.entityContainer.getEntityState(e)).toEqual(EntityState.Removed)
+      expect(clientC.engine.entityContainer.getEntityState(e)).toEqual(EntityState.Removed)
+    }
   })
 })
+
+// Spec http://www.ecma-international.org/ecma-262/6.0/#sec-json.stringify
+const replacer = (key: string, value: any) =>
+  value instanceof Object && !(value instanceof Array)
+    ? Object.keys(value)
+        .sort()
+        .reduce((sorted: any, key) => {
+          sorted[key] = value[key]
+          return sorted
+        }, {})
+    : value
+
+function getEngineState(engine: IEngine) {
+  const entities: Map<Entity, Record<string, any>> = new Map()
+
+  function ensureEntityExists(entity: Entity) {
+    if (!entities.has(entity)) entities.set(entity, {})
+    return entities.get(entity)!
+  }
+
+  for (const component of engine.componentsIter()) {
+    for (const [entity, componentValue] of component.iterator()) {
+      const data = ensureEntityExists(entity)
+      data[component.componentName] = componentValue
+    }
+  }
+
+  return entities
+}
+
+function serializeEngine(engine: IEngine) {
+  const out: string[] = []
+  function entityKey(entity: Entity): string {
+    return JSON.stringify('0x' + entity.toString(16))
+  }
+
+  const entities = getEngineState(engine)
+
+  const sortedByEntity = Array.from(entities.entries()).sort((a, b) => {
+    return a[0] > b[0] ? 1 : 0
+  })
+
+  for (const [entity, components] of sortedByEntity) {
+    out.push(entityKey(entity) + ':')
+
+    // print sorted components
+    for (const componentName of Object.keys(components).sort()) {
+      out.push('  ' + JSON.stringify(componentName) + ': ' + JSON.stringify(components[componentName], replacer))
+    }
+
+    out.push('')
+  }
+
+  return out.join('\n')
+}
+
+function compareStatePayloads(record: Record<string, { engine: IEngine }>) {
+  Object.entries(record)
+    .map(([name, { engine }]) => ({ name, serialization: getEngineState(engine) }))
+    .reduce((prev, current) => {
+      try {
+        expect(current.serialization).toEqual(prev.serialization)
+      } catch (err) {
+        console.info(`${prev.name} != ${current.name}`)
+        throw err
+      }
+      return current
+    })
+}

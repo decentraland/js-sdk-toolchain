@@ -1,13 +1,12 @@
 ﻿import { Engine, components } from '../../../packages/@dcl/ecs/src'
+import { testComponentSerialization } from './assertion'
 
 describe('Generated AudioSource ProtoBuf', () => {
   it('should serialize/deserialize AudioSource', () => {
     const newEngine = Engine()
     const AudioSource = components.AudioSource(newEngine)
-    const entity = newEngine.addEntity()
-    const entityB = newEngine.addEntity()
 
-    const _audioSource = AudioSource.create(entity, {
+    testComponentSerialization(AudioSource, {
       playing: true,
       loop: true,
       volume: 1,
@@ -15,22 +14,12 @@ describe('Generated AudioSource ProtoBuf', () => {
       audioClipUrl: 'FakeUrl'
     })
 
-    AudioSource.create(entityB, {
+    testComponentSerialization(AudioSource, {
       playing: false,
       loop: false,
       volume: 0,
       pitch: 0,
       audioClipUrl: 'FakeUrl2'
-    })
-    const buffer = AudioSource.toBinary(entity)
-    AudioSource.updateFromBinary(entityB, buffer)
-
-    expect(_audioSource).toBeDeepCloseTo({
-      ...AudioSource.getMutable(entityB)
-    })
-
-    expect(AudioSource.createOrReplace(entityB)).not.toBeDeepCloseTo({
-      ...AudioSource.getMutable(entity)
     })
   })
 })

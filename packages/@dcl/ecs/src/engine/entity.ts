@@ -1,4 +1,4 @@
-import { createVersionGSet } from '@dcl/crdt/dist/gset'
+import { createVersionGSet } from '../systems/crdt/gset'
 
 /**
  * @public It only defines the type explicitly, no effects.
@@ -160,11 +160,15 @@ export function EntityContainer(): EntityContainer {
 
   function releaseRemovedEntities() {
     const arr = toRemoveEntities
-    toRemoveEntities = []
-    for (const entity of arr) {
-      const [n, v] = EntityUtils.fromEntityId(entity)
-      removedEntities.addTo(n, v)
+
+    if (arr.length) {
+      toRemoveEntities = []
+      for (const entity of arr) {
+        const [n, v] = EntityUtils.fromEntityId(entity)
+        removedEntities.addTo(n, v)
+      }
     }
+
     return arr
   }
 
@@ -185,10 +189,8 @@ export function EntityContainer(): EntityContainer {
   function updateUsedEntity(entity: Entity) {
     const [n, v] = EntityUtils.fromEntityId(entity)
 
-    const removedVersion = removedEntities.getMap().get(n)
-    if (removedVersion !== undefined && removedVersion >= v) {
-      return false
-    }
+    // if the entity was removed then abort fast
+    if (removedEntities.has(n, v)) return false
 
     // Update
     if (v > 0) {

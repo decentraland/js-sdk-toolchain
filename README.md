@@ -19,7 +19,6 @@ This repository consists of the following components, packaged for the `nodejs`/
 
 And some internal or maybe useful packages if you're digging deeper into how the Decentraland runtime works:
 * `@dcl/js-runtime`: the `js-runtime` contains the typings for the environment variables available in the sandboxed execution environment for scenes
-* `@dcl/crdt`: a reconciler of state among multiple peers for multiplayer scenes 
 * `@dcl/rollup`: configuration for the [rollup](https://rollupjs.org/) bundle and packaging system for javascript projects
 
 ### Versioning notes
