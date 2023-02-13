@@ -2330,20 +2330,20 @@ export namespace Scalar {
     export function withinEpsilon(a: number, b: number, epsilon?: number): boolean;
 }
 
-// @public (undocumented)
+// @public
 export type SchemaDescription = {
     type: string;
 } & SchemaDescriptionMap;
 
-// @public (undocumented)
+// @public
 export type SchemaDescriptionArray = Array<SchemaDescriptionPrimitive | SchemaDescriptionMap | SchemaDescriptionArray>;
 
-// @public (undocumented)
+// @public
 export type SchemaDescriptionMap = {
     [key: string]: SchemaDescriptionPrimitive | SchemaDescriptionMap | SchemaDescriptionArray;
 };
 
-// @public (undocumented)
+// @public
 export type SchemaDescriptionPrimitive = string | number | boolean | null;
 
 // @public (undocumented)
