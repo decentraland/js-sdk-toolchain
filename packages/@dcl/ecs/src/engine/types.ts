@@ -2,10 +2,11 @@ import type { ISchema } from '../schemas/ISchema'
 import { MapResult, Spec } from '../schemas/Map'
 import { OnChangeFunction } from '../systems/crdt'
 import { Transport } from '../systems/crdt/types'
-import { ComponentDefinition } from './component'
+import { ComponentDefinition, LastWriteWinElementSetComponentDefinition } from './component'
 import { Entity, EntityContainer, EntityState } from './entity'
 import { ReadonlyComponentSchema } from './readonly'
 import { SystemFn, SystemItem } from './systems'
+export * from './component'
 
 /**
  * @public
@@ -14,16 +15,9 @@ export type Unpacked<T> = T extends (infer U)[] ? U : T
 
 /**
  * @public
- */
-export type ComponentSchema<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]> = {
-  [K in keyof T]: T[K] extends ComponentDefinition<any> ? ReturnType<T[K]['getMutable']> : never
-}
-
-/**
- * @public
  * Overrides component definition to support partial default values
  */
-export interface MapComponentDefinition<T> extends ComponentDefinition<T> {
+export interface MapComponentDefinition<T> extends LastWriteWinElementSetComponentDefinition<T> {
   /**
    * Add the current component to an entity, throw an error if the component already exists (use `createOrReplace` instead).
    * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
@@ -177,7 +171,7 @@ export interface IEngine {
    * const StateComponent = engine.defineComponentFromSchema("my-lib::VisibleComponent", Schemas.Bool)
    * ```
    */
-  defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): ComponentDefinition<T>
+  defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): LastWriteWinElementSetComponentDefinition<T>
 
   /**
    * @public

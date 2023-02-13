@@ -16,7 +16,7 @@ function exportComponent(component: Component) {
 }
 
 function defineComponentDecl(component: Component) {
-  return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: ComponentGetter<ComponentDefinition<PB${component.componentPascalName}>> = engine =>
+  return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: ComponentGetter<LastWriteWinElementSetComponentDefinition<PB${component.componentPascalName}>> = engine =>
     engine.defineComponentFromSchema("core::${component.componentPascalName}", ${component.componentPascalName}Schema);
   `.trim()
 }
@@ -24,23 +24,23 @@ function defineComponentDecl(component: Component) {
 const skipExposeGlobally: string[] = ['Animator', 'MeshRenderer', 'MeshCollider', 'Material']
 function defineGlobalComponentDecl(component: Component) {
   if (skipExposeGlobally.includes(component.componentPascalName)) return ''
-  return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: ComponentDefinition<PB${component.componentPascalName}> = components.${component.componentPascalName}(engine)`.trim()
+  return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: LastWriteWinElementSetComponentDefinition<PB${component.componentPascalName}> = components.${component.componentPascalName}(engine)`.trim()
 }
 
 const indexTemplate = `import type { IEngine } from '../../engine/types'
-import { ComponentDefinition } from '../../engine/component'
+import { LastWriteWinElementSetComponentDefinition } from '../../engine/component'
 import * as TransformSchema from '../legacy/Transform'
 $componentImports
 $componentExports
 
-export type ComponentGetter<T extends ComponentDefinition<any>> = (engine: Pick<IEngine,'defineComponentFromSchema'>) => T
+export type ComponentGetter<T extends LastWriteWinElementSetComponentDefinition<any>> = (engine: Pick<IEngine,'defineComponentFromSchema'>) => T
 
 $componentDeclarations
 `
 
 const globalTemplate = `
 import { engine } from '../../runtime/initialization'
-import { ComponentDefinition } from '../../engine/component'
+import { LastWriteWinElementSetComponentDefinition } from '../../engine/component'
 import * as components from './index.gen'
 export * from './index.gen';
 

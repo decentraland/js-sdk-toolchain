@@ -1,4 +1,4 @@
-import { ComponentDefinition, IEngine } from '../../engine'
+import { LastWriteWinElementSetComponentDefinition, IEngine } from '../../engine'
 import { Entity } from '../../engine/entity'
 import type { ISchema } from '../../schemas/ISchema'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
@@ -6,7 +6,7 @@ import { ByteBuffer } from '../../serialization/ByteBuffer'
 /**
  * @public
  */
-export type TransformComponent = ComponentDefinition<TransformType>
+export type TransformComponent = LastWriteWinElementSetComponentDefinition<TransformType>
 
 /**
  * @public

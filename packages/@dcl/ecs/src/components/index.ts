@@ -1,4 +1,4 @@
-import { ComponentDefinition } from '../engine/component'
+import { LastWriteWinElementSetComponentDefinition } from '../engine/component'
 import { AnimatorComponentDefinitionExtended, defineAnimatorComponent } from './extended/Animator'
 import { defineMaterialComponent, MaterialComponentDefinitionExtended } from './extended/Material'
 import { defineMeshColliderComponent, MeshColliderComponentDefinitionExtended } from './extended/MeshCollider'
@@ -8,7 +8,7 @@ import { defineTransformComponent, TransformComponentExtended } from './legacy/T
 
 export * from './generated/index.gen'
 
-export type { ComponentDefinition, ComponentGetter }
+export type { LastWriteWinElementSetComponentDefinition, ComponentGetter }
 
 /*#__PURE__*/
 export const Transform: ComponentGetter<TransformComponentExtended> = (engine) => defineTransformComponent(engine)

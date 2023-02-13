@@ -1,6 +1,6 @@
-import { ComponentDefinition, Entity } from '../../../packages/@dcl/ecs/src'
+import { LastWriteWinElementSetComponentDefinition, Entity } from '../../../packages/@dcl/ecs/src'
 
-export function testComponentSerialization<T>(component: ComponentDefinition<T>, value: T) {
+export function testComponentSerialization<T>(component: LastWriteWinElementSetComponentDefinition<T>, value: T) {
   {
     const entityA = 123 as Entity
     component.createOrReplace(entityA, value)

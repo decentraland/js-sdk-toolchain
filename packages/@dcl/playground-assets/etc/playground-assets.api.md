@@ -13,18 +13,29 @@ export type AlignType = 'auto' | 'flex-start' | 'center' | 'flex-end' | 'stretch
 export const Animator: AnimatorComponentDefinitionExtended;
 
 // @public (undocumented)
-export interface AnimatorComponentDefinitionExtended extends ComponentDefinition<PBAnimator> {
+export interface AnimatorComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAnimator> {
     getClip(entity: Entity, name: string): PBAnimationState;
     getClipOrNull(entity: Entity, name: string): PBAnimationState | null;
     playSingleAnimation(entity: Entity, name: string, resetCursor?: boolean): boolean;
     stopAllAnimations(entity: Entity, resetCursor?: boolean): boolean;
 }
 
-// @public (undocumented)
-export const AudioSource: ComponentDefinition<PBAudioSource>;
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+//
+// @public
+export type AppendMessageBody = {
+    type: CrdtMessageType.PUT_COMPONENT;
+    entityId: Entity;
+    componentId: number;
+    timestamp: number;
+    data: Uint8Array;
+};
 
 // @public (undocumented)
-export const AudioStream: ComponentDefinition<PBAudioStream>;
+export const AudioSource: LastWriteWinElementSetComponentDefinition<PBAudioSource>;
+
+// @public (undocumented)
+export const AudioStream: LastWriteWinElementSetComponentDefinition<PBAudioStream>;
 
 // @public (undocumented)
 export const enum AvatarAnchorPointType {
@@ -39,10 +50,10 @@ export const enum AvatarAnchorPointType {
 }
 
 // @public (undocumented)
-export const AvatarAttach: ComponentDefinition<PBAvatarAttach>;
+export const AvatarAttach: LastWriteWinElementSetComponentDefinition<PBAvatarAttach>;
 
 // @public (undocumented)
-export const AvatarModifierArea: ComponentDefinition<PBAvatarModifierArea>;
+export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>;
 
 // @public (undocumented)
 export const enum AvatarModifierType {
@@ -53,7 +64,7 @@ export const enum AvatarModifierType {
 }
 
 // @public (undocumented)
-export const AvatarShape: ComponentDefinition<PBAvatarShape>;
+export const AvatarShape: LastWriteWinElementSetComponentDefinition<PBAvatarShape>;
 
 // @public (undocumented)
 export interface AvatarTexture {
@@ -71,7 +82,22 @@ export const enum BackgroundTextureMode {
 }
 
 // @public (undocumented)
-export const Billboard: ComponentDefinition<PBBillboard>;
+export interface BaseComponent<T> {
+    // (undocumented)
+    readonly componentId: number;
+    // (undocumented)
+    readonly componentName: string;
+    // (undocumented)
+    readonly componentType: ComponentType;
+    entityDeleted(entity: Entity, markAsDirty: boolean): void;
+    get(entity: Entity): DeepReadonly<T>;
+    getCrdtUpdates(): Iterable<CrdtMessageBody>;
+    has(entity: Entity): boolean;
+    updateFromCrdt(body: CrdtMessageBody): [null | ConflictResolutionMessage, T | undefined];
+}
+
+// @public (undocumented)
+export const Billboard: LastWriteWinElementSetComponentDefinition<PBBillboard>;
 
 // @public (undocumented)
 export const enum BillboardMode {
@@ -215,10 +241,10 @@ export interface ByteBuffer {
 export type Callback = () => void;
 
 // @public (undocumented)
-export const CameraMode: ComponentDefinition<PBCameraMode>;
+export const CameraMode: LastWriteWinElementSetComponentDefinition<PBCameraMode>;
 
 // @public (undocumented)
-export const CameraModeArea: ComponentDefinition<PBCameraModeArea>;
+export const CameraModeArea: LastWriteWinElementSetComponentDefinition<PBCameraModeArea>;
 
 // @public (undocumented)
 export const enum CameraType {
@@ -393,34 +419,23 @@ export type Color4Type = {
 };
 
 // @public (undocumented)
-export interface ComponentDefinition<T> {
-    // (undocumented)
-    readonly componentId: number;
-    // (undocumented)
-    readonly componentName: string;
-    create(entity: Entity, val?: T): T;
-    createOrReplace(entity: Entity, val?: T): T;
-    default(): DeepReadonly<T>;
-    deleteFrom(entity: Entity): T | null;
-    entityDeleted(entity: Entity, markAsDirty: boolean): void;
-    get(entity: Entity): DeepReadonly<T>;
-    getCrdtUpdates(): Iterable<CrdtMessageBody>;
-    getMutable(entity: Entity): T;
-    getMutableOrNull(entity: Entity): T | null;
-    getOrNull(entity: Entity): DeepReadonly<T> | null;
-    has(entity: Entity): boolean;
-    updateFromCrdt(body: CrdtMessageBody): [null | PutComponentMessageBody | DeleteComponentMessageBody, T | null];
-}
+export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T> | GrowOnlyValueSetComponentDefinition<T>;
 
 // Warning: (ae-missing-release-tag) "ComponentGetter" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type ComponentGetter<T extends ComponentDefinition<any>> = (engine: Pick<IEngine, 'defineComponentFromSchema'>) => T;
+export type ComponentGetter<T extends LastWriteWinElementSetComponentDefinition<any>> = (engine: Pick<IEngine, 'defineComponentFromSchema'>) => T;
 
-// @public (undocumented)
-export type ComponentSchema<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]> = {
-    [K in keyof T]: T[K] extends ComponentDefinition<any> ? ReturnType<T[K]['getMutable']> : never;
-};
+// @public
+export const enum ComponentType {
+    // (undocumented)
+    GrowOnlyValueSet = 1,
+    // (undocumented)
+    LastWriteWinElementSet = 0
+}
+
+// @public
+export type ConflictResolutionMessage = PutComponentMessageBody | DeleteComponentMessageBody;
 
 // @public (undocumented)
 export const CRDT_MESSAGE_HEADER_LENGTH = 8;
@@ -429,7 +444,7 @@ export const CRDT_MESSAGE_HEADER_LENGTH = 8;
 export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage;
 
 // @public (undocumented)
-export type CrdtMessageBody = PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessageBody;
+export type CrdtMessageBody = PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessageBody | AppendMessageBody;
 
 // @public
 export type CrdtMessageHeader = {
@@ -458,16 +473,6 @@ export function createEthereumProvider(): {
     send(message: RPCSendableMessage, callback?: ((error: Error | null, result?: any) => void) | undefined): void;
     sendAsync(message: RPCSendableMessage, callback: (error: Error | null, result?: any) => void): void;
 };
-
-// Warning: (ae-missing-release-tag) "createGetCrdtMessages" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function createGetCrdtMessages(componentId: number, timestamps: Map<Entity, number>, dirtyIterator: Set<Entity>, schema: Pick<ISchema<any>, 'serialize'>, data: Map<Entity, unknown>): () => Generator<PutComponentMessageBody | DeleteComponentMessageBody, void, unknown>;
-
-// Warning: (ae-missing-release-tag) "createUpdateFromCrdt" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function createUpdateFromCrdt(componentId: number, timestamps: Map<Entity, number>, schema: Pick<ISchema<any>, 'serialize' | 'deserialize'>, data: Map<Entity, unknown>): (msg: CrdtMessageBody) => [null | PutComponentMessageBody | DeleteComponentMessageBody, any];
 
 // Warning: (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
 // Warning: (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
@@ -682,7 +687,14 @@ export type GlobalInputEventResult = InputEventResult & {
 };
 
 // @public (undocumented)
-export const GltfContainer: ComponentDefinition<PBGltfContainer>;
+export const GltfContainer: LastWriteWinElementSetComponentDefinition<PBGltfContainer>;
+
+// @public (undocumented)
+export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<DeepReadonlySet<T>> {
+    addValue(entity: Entity, val: DeepReadonly<T>): DeepReadonlySet<T>;
+    // (undocumented)
+    readonly componentType: ComponentType.GrowOnlyValueSet;
+}
 
 // @public (undocumented)
 export interface IEngine {
@@ -693,7 +705,7 @@ export interface IEngine {
     readonly CameraEntity: Entity;
     componentsIter(): Iterable<ComponentDefinition<unknown>>;
     defineComponent<T extends Spec>(componentName: string, spec: T, constructorDefault?: Partial<MapResult<T>>): MapComponentDefinition<MapResult<T>>;
-    defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): ComponentDefinition<T>;
+    defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): LastWriteWinElementSetComponentDefinition<T>;
     getComponent<T>(componentId: number): ComponentDefinition<T>;
     getComponentOrNull<T>(componentId: number): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
@@ -904,11 +916,6 @@ export type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
 }[keyof T];
 
-// Warning: (ae-missing-release-tag) "incrementTimestamp" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function incrementTimestamp(entity: Entity, timestamps: Map<Entity, number>): number;
-
 // Warning: (tsdoc-html-tag-missing-string) The HTML element has an invalid attribute: Expecting an HTML string starting with a single-quote or double-quote character
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
@@ -1026,6 +1033,18 @@ export type Key = number | string;
 // @public
 export function Label(props: EntityPropTypes & UiLabelProps): ReactEcs.JSX.Element;
 
+// @public (undocumented)
+export interface LastWriteWinElementSetComponentDefinition<T> extends BaseComponent<T> {
+    // (undocumented)
+    readonly componentType: ComponentType.LastWriteWinElementSet;
+    create(entity: Entity, val?: T): T;
+    createOrReplace(entity: Entity, val?: T): T;
+    deleteFrom(entity: Entity): T | null;
+    getMutable(entity: Entity): T;
+    getMutableOrNull(entity: Entity): T | null;
+    getOrNull(entity: Entity): DeepReadonly<T> | null;
+}
+
 // @public
 export type Listeners = {
     onMouseDown?: Callback;
@@ -1033,7 +1052,7 @@ export type Listeners = {
 };
 
 // @public
-export interface MapComponentDefinition<T> extends ComponentDefinition<T> {
+export interface MapComponentDefinition<T> extends LastWriteWinElementSetComponentDefinition<T> {
     create(entity: Entity, val?: Partial<T>): T;
     createOrReplace(entity: Entity, val?: Partial<T>): T;
 }
@@ -1049,7 +1068,7 @@ export type MapResult<T extends Spec> = ToOptional<{
 export const Material: MaterialComponentDefinitionExtended;
 
 // @public (undocumented)
-export interface MaterialComponentDefinitionExtended extends ComponentDefinition<PBMaterial> {
+export interface MaterialComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBMaterial> {
     setBasicMaterial: (entity: Entity, material: PBMaterial_UnlitMaterial) => void;
     setPbrMaterial: (entity: Entity, material: PBMaterial_PbrMaterial) => void;
     Texture: TextureHelper;
@@ -1212,7 +1231,7 @@ export namespace Matrix {
 export const MeshCollider: MeshColliderComponentDefinitionExtended;
 
 // @public (undocumented)
-export interface MeshColliderComponentDefinitionExtended extends ComponentDefinition<PBMeshCollider> {
+export interface MeshColliderComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBMeshCollider> {
     setBox(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
     setCylinder(entity: Entity, radiusBottom?: number, radiusTop?: number, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
     setPlane(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
@@ -1225,7 +1244,7 @@ export interface MeshColliderComponentDefinitionExtended extends ComponentDefini
 export const MeshRenderer: MeshRendererComponentDefinitionExtended;
 
 // @public (undocumented)
-export interface MeshRendererComponentDefinitionExtended extends ComponentDefinition<PBMeshRenderer> {
+export interface MeshRendererComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBMeshRenderer> {
     setBox(entity: Entity, uvs?: number[]): void;
     setCylinder(entity: Entity, radiusBottom?: number, radiusTop?: number): void;
     setPlane(entity: Entity, uvs?: number[]): void;
@@ -1294,7 +1313,7 @@ export const enum NftFrameType {
 }
 
 // @public (undocumented)
-export const NftShape: ComponentDefinition<PBNftShape>;
+export const NftShape: LastWriteWinElementSetComponentDefinition<PBNftShape>;
 
 // Warning: (ae-missing-release-tag) "Observable" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2054,10 +2073,10 @@ export namespace Plane {
 }
 
 // @public (undocumented)
-export const PointerEvents: ComponentDefinition<PBPointerEvents>;
+export const PointerEvents: LastWriteWinElementSetComponentDefinition<PBPointerEvents>;
 
 // @public (undocumented)
-export const PointerEventsResult: ComponentDefinition<PBPointerEventsResult>;
+export const PointerEventsResult: LastWriteWinElementSetComponentDefinition<PBPointerEventsResult>;
 
 // @public (undocumented)
 export interface PointerEventsSystem {
@@ -2083,7 +2102,7 @@ export const enum PointerEventType {
 }
 
 // @public (undocumented)
-export const PointerLock: ComponentDefinition<PBPointerLock>;
+export const PointerLock: LastWriteWinElementSetComponentDefinition<PBPointerLock>;
 
 // @public
 export interface Position {
@@ -2207,7 +2226,7 @@ export type QuaternionType = {
 export const RAD2DEG: number;
 
 // @public (undocumented)
-export const Raycast: ComponentDefinition<PBRaycast>;
+export const Raycast: LastWriteWinElementSetComponentDefinition<PBRaycast>;
 
 // @public (undocumented)
 export interface RaycastHit {
@@ -2245,7 +2264,7 @@ export type RaycastResponsePayload<T> = {
 };
 
 // @public (undocumented)
-export const RaycastResult: ComponentDefinition<PBRaycastResult>;
+export const RaycastResult: LastWriteWinElementSetComponentDefinition<PBRaycastResult>;
 
 // @public (undocumented)
 export interface ReactBasedUiSystem {
@@ -2419,7 +2438,7 @@ export const enum TextAlignMode {
 export type TextAlignType = 'top-left' | 'top-center' | 'top-right' | 'middle-left' | 'middle-center' | 'middle-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
 
 // @public (undocumented)
-export const TextShape: ComponentDefinition<PBTextShape>;
+export const TextShape: LastWriteWinElementSetComponentDefinition<PBTextShape>;
 
 // @public (undocumented)
 export interface Texture {
@@ -2500,7 +2519,7 @@ export type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedType
 export const Transform: TransformComponentExtended;
 
 // @public (undocumented)
-export type TransformComponent = ComponentDefinition<TransformType>;
+export type TransformComponent = LastWriteWinElementSetComponentDefinition<TransformType>;
 
 // @public (undocumented)
 export interface TransformComponentExtended extends TransformComponent {
@@ -2555,7 +2574,7 @@ export interface UiAvatarTexture {
 }
 
 // @public (undocumented)
-export const UiBackground: ComponentDefinition<PBUiBackground>;
+export const UiBackground: LastWriteWinElementSetComponentDefinition<PBUiBackground>;
 
 // @public
 export interface UiBackgroundProps {
@@ -2577,7 +2596,7 @@ export interface UiButtonProps extends UiLabelProps, EntityPropTypes {
 export type UiComponent = () => ReactEcs.JSX.Element;
 
 // @public (undocumented)
-export const UiDropdown: ComponentDefinition<PBUiDropdown>;
+export const UiDropdown: LastWriteWinElementSetComponentDefinition<PBUiDropdown>;
 
 // @public
 export interface UiDropdownProps extends EntityPropTypes, Omit<Partial<PBUiDropdown>, 'textAlign' | 'font'> {
@@ -2590,7 +2609,7 @@ export interface UiDropdownProps extends EntityPropTypes, Omit<Partial<PBUiDropd
 }
 
 // @public (undocumented)
-export const UiDropdownResult: ComponentDefinition<PBUiDropdownResult>;
+export const UiDropdownResult: LastWriteWinElementSetComponentDefinition<PBUiDropdownResult>;
 
 // Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
 //
@@ -2601,7 +2620,7 @@ export function UiEntity(props: EntityPropTypes): ReactEcs.JSX.Element;
 export type UiFontType = 'sans-serif' | 'serif' | 'monospace';
 
 // @public (undocumented)
-export const UiInput: ComponentDefinition<PBUiInput>;
+export const UiInput: LastWriteWinElementSetComponentDefinition<PBUiInput>;
 
 // @public (undocumented)
 export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign'> {
@@ -2613,7 +2632,7 @@ export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign'> {
 }
 
 // @public (undocumented)
-export const UiInputResult: ComponentDefinition<PBUiInputResult>;
+export const UiInputResult: LastWriteWinElementSetComponentDefinition<PBUiInputResult>;
 
 // @public
 export interface UiLabelProps {
@@ -2628,7 +2647,7 @@ export interface UiLabelProps {
 export type uint32 = number;
 
 // @public (undocumented)
-export const UiText: ComponentDefinition<PBUiText>;
+export const UiText: LastWriteWinElementSetComponentDefinition<PBUiText>;
 
 // @public
 export type UiTexture = {
@@ -2638,7 +2657,7 @@ export type UiTexture = {
 };
 
 // @public (undocumented)
-export const UiTransform: ComponentDefinition<PBUiTransform>;
+export const UiTransform: LastWriteWinElementSetComponentDefinition<PBUiTransform>;
 
 // @public
 export interface UiTransformProps {
@@ -2773,7 +2792,7 @@ export type Vector3Type = {
 };
 
 // @public (undocumented)
-export const VideoPlayer: ComponentDefinition<PBVideoPlayer>;
+export const VideoPlayer: LastWriteWinElementSetComponentDefinition<PBVideoPlayer>;
 
 // @public (undocumented)
 export interface VideoTexture {
@@ -2784,7 +2803,7 @@ export interface VideoTexture {
 }
 
 // @public (undocumented)
-export const VisibilityComponent: ComponentDefinition<PBVisibilityComponent>;
+export const VisibilityComponent: LastWriteWinElementSetComponentDefinition<PBVisibilityComponent>;
 
 // @public (undocumented)
 export const enum YGAlign {

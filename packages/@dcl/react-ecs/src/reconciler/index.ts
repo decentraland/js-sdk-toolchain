@@ -86,7 +86,7 @@ export function createReconciler(
 
   function removeComponent(instance: Instance, component: keyof EngineComponents) {
     const componentId = getComponentId[component]
-    const Component = engine.getComponent(componentId)
+    const Component = engine.getComponent(componentId) as components.LastWriteWinElementSetComponentDefinition<any>
     Component.deleteFrom(instance.entity)
   }
 
@@ -96,7 +96,7 @@ export function createReconciler(
     componentName: K
   ) {
     const componentId = getComponentId[componentName]
-    const Component = engine.getComponent(componentId)
+    const Component = engine.getComponent(componentId) as components.LastWriteWinElementSetComponentDefinition<any>
     const component = Component.getMutableOrNull(instance.entity) || Component.create(instance.entity)
 
     for (const key in props) {

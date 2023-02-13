@@ -1,15 +1,18 @@
 import { ByteBuffer, Entity, IEngine } from '../../packages/@dcl/ecs/src/engine'
 import { componentNumberFromName } from '../../packages/@dcl/ecs/src/components/component-number'
-import { createGetCrdtMessagesForLww, createUpdateLwwFromCrdt } from '../../packages/@dcl/ecs/src/engine/component'
-import * as components from '../../packages/@dcl/ecs/src/components'
+import {
+  createGetCrdtMessagesForLww,
+  createUpdateLwwFromCrdt
+} from '../../packages/@dcl/ecs/src/engine/lww-element-set-component-definition'
+import * as components from '../../packages/@dcl/ecs/src/engine/component'
 
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
 export const componentName = 'int8'
 export const ID = componentNumberFromName(componentName)
 
-export const int8Component = (engine: IEngine) => {
-  const data = new Map<Entity, number>()
+export const int8SetComponent = (engine: IEngine) => {
+  const data = new Map<Entity, Set<number>>()
   const timestamps = new Map<Entity, number>()
   const dirtyIterator = new Set<Entity>()
   const schema = {
@@ -20,7 +23,9 @@ export const int8Component = (engine: IEngine) => {
       return reader.readInt8()
     }
   }
-  type Type = components.ComponentDefinition<any> & { setTestTimestamp(entity: Entity, timestamp: number): void }
+  type Type = components.GrowOnlyValueSetComponentDefinition<any> & {
+    setTestTimestamp(entity: Entity, timestamp: number): void
+  }
   const component: Type = {
     componentId: ID,
     componentName: componentName,

@@ -50,6 +50,23 @@ export type PutComponentMessageBody = {
 }
 
 /**
+ * Min. length = header (8 bytes) + 16 bytes = 24 bytes
+ *
+ * @param entity - Uint32 number of the entity
+ * @param componentId - Uint32 number of id
+ * @param timestamp - Uint32 timestamp
+ * @param data - Uint8[] data of component => length(4 bytes) + block of bytes[0..length-1]
+ * @public
+ */
+export type AppendMessageBody = {
+  type: CrdtMessageType.PUT_COMPONENT
+  entityId: Entity
+  componentId: number
+  timestamp: number
+  data: Uint8Array
+}
+
+/**
  * @param entity - Uint32 number of the entity
  * @param componentId - Uint32 number of id
  * @param timestamp - Uint32 Lamport timestamp
@@ -88,10 +105,15 @@ export type DeleteEntityMessage = CrdtMessageHeader & DeleteEntityMessageBody
  * @public
  */
 export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage
+
 /**
  * @public
  */
-export type CrdtMessageBody = PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessageBody
+export type CrdtMessageBody =
+  | PutComponentMessageBody
+  | DeleteComponentMessageBody
+  | DeleteEntityMessageBody
+  | AppendMessageBody
 
 export enum ProcessMessageResultType {
   /**

@@ -319,18 +319,19 @@ describe('Engine tests', () => {
     expect(Array.from(Position.dirtyIterator())).toEqual([])
   })
 
-  it('should return isDirty if we mutate the component', async () => {
+  it('should return dirtyIterator.includes(entity)==true if we mutate the component', async () => {
     const engine = Engine()
     const MeshRenderer = components.MeshRenderer(engine)
     const entityA = engine.addEntity()
     MeshRenderer.create(entityA, {
       mesh: { $case: 'box', box: { uvs: [] } }
     })
-    expect(MeshRenderer.isDirty(entityA)).toBe(true)
+
+    expect(Array.from(MeshRenderer.dirtyIterator()).includes(entityA)).toBe(true)
     await engine.update(1)
-    expect(MeshRenderer.isDirty(entityA)).toBe(false)
+    expect(Array.from(MeshRenderer.dirtyIterator()).includes(entityA)).toBe(false)
     MeshRenderer.getMutable(entityA)
-    expect(MeshRenderer.isDirty(entityA)).toBe(true)
+    expect(Array.from(MeshRenderer.dirtyIterator()).includes(entityA)).toBe(true)
   })
 
   // it('should fail to write to byte buffer if the entity not exists', async () => {

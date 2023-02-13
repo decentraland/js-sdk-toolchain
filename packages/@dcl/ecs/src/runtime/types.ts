@@ -4,4 +4,3 @@ export { TransformType, TransformComponent } from '../components/legacy/Transfor
 export * from '../engine/component'
 export * from '../schemas/typing'
 export type { MapResult, Spec } from '../schemas/Map'
-export * from '../engine/component'
