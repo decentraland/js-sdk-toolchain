@@ -20,11 +20,14 @@ export interface AnimatorComponentDefinitionExtended extends LastWriteWinElement
     stopAllAnimations(entity: Entity, resetCursor?: boolean): boolean;
 }
 
+// @public (undocumented)
+export type AppendValueMessage = CrdtMessageHeader & AppendValueMessageBody;
+
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 //
 // @public
-export type AppendMessageBody = {
-    type: CrdtMessageType.APPEND_COMPONENT;
+export type AppendValueMessageBody = {
+    type: CrdtMessageType.APPEND_VALUE;
     entityId: Entity;
     componentId: number;
     timestamp: number;
@@ -443,10 +446,10 @@ export type ConflictResolutionMessage = PutComponentMessageBody | DeleteComponen
 export const CRDT_MESSAGE_HEADER_LENGTH = 8;
 
 // @public (undocumented)
-export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage;
+export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage | AppendValueMessage;
 
 // @public (undocumented)
-export type CrdtMessageBody = PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessageBody | AppendMessageBody;
+export type CrdtMessageBody = PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessageBody | AppendValueMessageBody;
 
 // @public
 export type CrdtMessageHeader = {
@@ -457,7 +460,7 @@ export type CrdtMessageHeader = {
 // @public (undocumented)
 export enum CrdtMessageType {
     // (undocumented)
-    APPEND_COMPONENT = 4,
+    APPEND_VALUE = 4,
     // (undocumented)
     DELETE_COMPONENT = 2,
     // (undocumented)
@@ -489,7 +492,7 @@ export function cyclicParentingChecker(engine: IEngine): () => void;
 export type DeepReadonly<T> = T extends ReadonlyPrimitive ? T : T extends Array<infer K> ? ReadonlyArray<DeepReadonly<K>> : T extends Map<infer K, infer V> ? DeepReadonlyMap<K, V> : T extends Set<infer M> ? DeepReadonlySet<M> : DeepReadonlyObject<T>;
 
 // @public (undocumented)
-export type DeepReadonlyMap<K, V> = ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>;
+export type DeepReadonlyMap<K, V> = ReadonlyMap<K, DeepReadonly<V>>;
 
 // @public (undocumented)
 export type DeepReadonlyObject<T> = {

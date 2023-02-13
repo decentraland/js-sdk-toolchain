@@ -2,14 +2,10 @@ import { exec } from 'child_process'
 import { existsSync, readFileSync, writeFileSync } from 'fs-extra'
 import glob from 'glob'
 import path from 'path'
-import { CrdtMessageType, CrdtMessageHeader, engine } from '../packages/@dcl/ecs/src'
+import { CrdtMessageType, engine } from '../packages/@dcl/ecs/src'
 import { ReadWriteByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import {
-  CrdtMessageProtocol,
-  DeleteComponent,
-  DeleteEntity,
-  PutComponentOperation
-} from '../packages/@dcl/ecs/src/serialization/crdt'
+import { CrdtMessage } from '../packages/@dcl/ecs/src/serialization/crdt'
+import { readMessage } from '../packages/@dcl/ecs/src/serialization/crdt/message'
 import { withQuickJsVm } from './vm'
 import { version as vmVersion } from '@dcl/quickjs-emscripten/package.json'
 
@@ -43,25 +39,24 @@ function testFileSnapshot(fileName: string, workingDirectory: string) {
 function* serializeCrdtMessages(prefix: string, data: Uint8Array) {
   const buffer = new ReadWriteByteBuffer(data)
 
-  let header: CrdtMessageHeader | null
+  let message: CrdtMessage | null
 
-  while ((header = CrdtMessageProtocol.getHeader(buffer))) {
-    if (header.type === CrdtMessageType.PUT_COMPONENT || header.type === CrdtMessageType.DELETE_COMPONENT) {
-      const message =
-        header.type === CrdtMessageType.DELETE_COMPONENT
-          ? DeleteComponent.read(buffer)!
-          : PutComponentOperation.read(buffer)!
+  while ((message = readMessage(buffer))) {
+    if (
+      message.type === CrdtMessageType.PUT_COMPONENT ||
+      message.type === CrdtMessageType.DELETE_COMPONENT ||
+      message.type === CrdtMessageType.APPEND_VALUE
+    ) {
       const { entityId, componentId, timestamp } = message
-      const data = message.type === CrdtMessageType.PUT_COMPONENT ? message.data : undefined
+      const data = 'data' in message ? message.data : undefined
 
       const c = engine.getComponent(componentId)
 
       yield `  ${prefix}: e=0x${entityId.toString(16)} c=${componentId} t=${timestamp} data=${JSON.stringify(
         (data && c.schema.deserialize(new ReadWriteByteBuffer(data))) || null
       )}`
-    } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
-      const entityId = DeleteEntity.read(buffer)!.entityId
-      yield `  ${prefix}: e=0x${entityId?.toString(16)} deleted`
+    } else if (message.type === CrdtMessageType.DELETE_ENTITY) {
+      yield `  ${prefix}: e=0x${message.entityId.toString(16)} deleted`
     } else {
       yield 'Unknown CrdtMessageType'
     }

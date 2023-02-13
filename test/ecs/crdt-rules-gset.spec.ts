@@ -53,7 +53,7 @@ describe('Conflict resolution rules for GrowOnlyValueSet based components', () =
     expect(Array.from(component.getCrdtUpdates())).toMatchObject([
       {
         componentId: 1,
-        type: CrdtMessageType.APPEND_COMPONENT,
+        type: CrdtMessageType.APPEND_VALUE,
         timestamp: 0
       }
     ])
@@ -99,7 +99,7 @@ describe('Conflict resolution rules for GrowOnlyValueSet based components', () =
       data: buf.toBinary(),
       entityId,
       timestamp: 0,
-      type: CrdtMessageType.APPEND_COMPONENT
+      type: CrdtMessageType.APPEND_VALUE
     })
 
     // append operations do not generate a dirty state
@@ -144,7 +144,7 @@ describe('Conflict resolution rules for GrowOnlyValueSet based components', () =
         data: buf.toBinary(),
         entityId,
         timestamp: 0,
-        type: CrdtMessageType.APPEND_COMPONENT
+        type: CrdtMessageType.APPEND_VALUE
       })
     }
 
@@ -205,7 +205,7 @@ describe('Conflict resolution rules for GrowOnlyValueSet based components', () =
         data: buf.toBinary(),
         entityId,
         timestamp: 0,
-        type: CrdtMessageType.APPEND_COMPONENT
+        type: CrdtMessageType.APPEND_VALUE
       })
     }
 
@@ -234,7 +234,7 @@ describe('Conflict resolution rules for GrowOnlyValueSet based components', () =
     expect(Array.from(component.getCrdtUpdates())).toMatchObject([
       {
         componentId: 1,
-        type: CrdtMessageType.APPEND_COMPONENT,
+        type: CrdtMessageType.APPEND_VALUE,
         timestamp: 0,
         entityId
       }
@@ -286,7 +286,7 @@ describe('Conflict resolution rules for GrowOnlyValueSet based components with E
     expect(Array.from(component.getCrdtUpdates())).toMatchObject([
       {
         componentId: 1,
-        type: CrdtMessageType.APPEND_COMPONENT,
+        type: CrdtMessageType.APPEND_VALUE,
         timestamp: 0
       }
     ])
@@ -328,7 +328,7 @@ describe('Conflict resolution rules for GrowOnlyValueSet based components with S
     expect(Array.from(component.getCrdtUpdates())).toMatchObject([
       {
         componentId: 1,
-        type: CrdtMessageType.APPEND_COMPONENT,
+        type: CrdtMessageType.APPEND_VALUE,
         timestamp: 0
       }
     ])

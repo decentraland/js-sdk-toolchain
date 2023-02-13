@@ -2,7 +2,7 @@ import { Entity, EntityState } from '../../engine/entity'
 import type { ComponentDefinition } from '../../engine'
 import type { PreEngine } from '../../engine/types'
 import { ReadWriteByteBuffer } from '../../serialization/ByteBuffer'
-import { CrdtMessageProtocol } from '../../serialization/crdt'
+import { AppendValueOperation, CrdtMessageProtocol } from '../../serialization/crdt'
 import { DeleteComponent } from '../../serialization/crdt/deleteComponent'
 import { DeleteEntity } from '../../serialization/crdt/deleteEntity'
 import { PutComponentOperation } from '../../serialization/crdt/putComponent'
@@ -133,7 +133,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
                 conflictMessage.data,
                 bufferForOutdated
               )
-            } else {
+            } else if (conflictMessage.type === CrdtMessageType.DELETE_COMPONENT) {
               DeleteComponent.write(msg.entityId, component.componentId, conflictMessage.timestamp, bufferForOutdated)
             }
 
@@ -189,6 +189,8 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             PutComponentOperation.write(message.entityId, message.timestamp, message.componentId, message.data, buffer)
           } else if (message.type === CrdtMessageType.DELETE_COMPONENT) {
             DeleteComponent.write(message.entityId, component.componentId, message.timestamp, buffer)
+          } else if (message.type === CrdtMessageType.APPEND_VALUE) {
+            AppendValueOperation.write(message.entityId, message.timestamp, message.componentId, message.data, buffer)
           }
 
           crdtMessages.push({
@@ -198,7 +200,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
           if (onProcessEntityComponentChange) {
             const rawValue =
-              message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.APPEND_COMPONENT
+              message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.APPEND_VALUE
                 ? component.get(message.entityId)
                 : undefined
 

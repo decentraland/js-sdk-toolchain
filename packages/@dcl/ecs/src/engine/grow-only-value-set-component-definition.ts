@@ -1,6 +1,6 @@
 import { ISchema } from '../schemas'
 import { ReadWriteByteBuffer } from '../serialization/ByteBuffer'
-import { AppendMessageBody, CrdtMessageType } from '../serialization/crdt'
+import { AppendValueMessageBody, CrdtMessageType } from '../serialization/crdt'
 import { ComponentType, GrowOnlyValueSetComponentDefinition } from './component'
 import { __DEV__ } from '../runtime/invariant'
 import { Entity } from './entity'
@@ -43,7 +43,7 @@ export function createValueSetComponentDefinitionFromSchema<T>(
   }
   const data = new Map<Entity, InternalDatastructure>()
   const dirtyIterator = new Set<Entity>()
-  const queuedCommands: AppendMessageBody[] = []
+  const queuedCommands: AppendValueMessageBody[] = []
 
   // only sort the array if the latest (N) element has a timestamp <= N-1
   function shouldSort(row: InternalDatastructure) {
@@ -81,7 +81,9 @@ export function createValueSetComponentDefinitionFromSchema<T>(
     }
     const usedValue = schema.extend ? (schema.extend(value) as DeepReadonly<T>) : value
     const timestamp = options.timestampFunction(usedValue as any)
-    if (DEBUG) {
+    if (__DEV__) {
+      // only freeze the objects in dev mode to warn the developers because
+      // it is an expensive operation
       Object.freeze(usedValue)
     }
     row.raw.push({ value: usedValue, timestamp })
@@ -124,7 +126,7 @@ export function createValueSetComponentDefinitionFromSchema<T>(
         data: buf.toBinary(),
         entityId: entity,
         timestamp: 0,
-        type: CrdtMessageType.APPEND_COMPONENT
+        type: CrdtMessageType.APPEND_VALUE
       })
       return set
     },
@@ -144,7 +146,7 @@ export function createValueSetComponentDefinitionFromSchema<T>(
       return queuedCommands.splice(0, queuedCommands.length)
     },
     updateFromCrdt(_body) {
-      if (_body.type === CrdtMessageType.APPEND_COMPONENT) {
+      if (_body.type === CrdtMessageType.APPEND_VALUE) {
         const buf = new ReadWriteByteBuffer(_body.data)
         append(_body.entityId, schema.deserialize(buf) as DeepReadonly<T>)
       }

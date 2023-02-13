@@ -13,7 +13,8 @@ import {
 import {
   CrdtMessageProtocol,
   DeleteComponent,
-  PutComponentOperation
+  PutComponentOperation,
+  AppendValueOperation
 } from '../../packages/@dcl/ecs/src/serialization/crdt'
 import { DeleteEntity } from '../../packages/@dcl/ecs/src/serialization/crdt/deleteEntity'
 import { readMessage } from '../../packages/@dcl/ecs/src/serialization/crdt/message'
@@ -72,6 +73,21 @@ describe('Component operation tests', () => {
     buf.writeUint32(4567)
     buf.writeUint32(1)
     expect(CrdtMessageProtocol.getHeader(buf)).toBe(null)
+  })
+
+  it('appendValue works', () => {
+    const buf = new ReadWriteByteBuffer()
+    AppendValueOperation.write(1 as Entity, 0, 1, Uint8Array.of(1, 2, 3), buf)
+    const msg = readMessage(buf)
+
+    expect(msg).toEqual({
+      componentId: 1,
+      data: Uint8Array.of(1, 2, 3),
+      entityId: 1,
+      length: 27,
+      timestamp: 0,
+      type: 4
+    })
   })
 
   it('should fail null if it has an invalid type', () => {
