@@ -32,6 +32,7 @@ describe('UiTransform React Ecs', () => {
   it('should send 0 if you send an invalid px', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
+    const UiText = components.UiText(engine)
     const entityIndex = engine.addEntity() as number
 
     // Helpers
@@ -39,6 +40,7 @@ describe('UiTransform React Ecs', () => {
     const getUiTransform = (entity: Entity) => UiTransform.get(entity)
     const ui = () => (
       <UiEntity
+        uiText={{ value: 'BOEDO' }}
         uiTransform={{
           width: 'boedo' as any, // We are asserting something thats not valid :)
           flexWrap: 'wrap',
@@ -54,6 +56,7 @@ describe('UiTransform React Ecs', () => {
     )
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
+    expect(UiText.get(rootDivEntity)).toMatchObject({ value: 'BOEDO' })
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       flexWrap: YGWrap.YGW_WRAP,
       flexDirection: YGFlexDirection.YGFD_COLUMN,
