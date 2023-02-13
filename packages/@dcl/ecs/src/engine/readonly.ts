@@ -3,7 +3,7 @@ import { ComponentDefinition } from './component'
 /**
  * @public
  */
-export type DeepReadonlyMap<K, V> = ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>
+export type DeepReadonlyMap<K, V> = ReadonlyMap<K, DeepReadonly<V>>
 /**
  * @public
  */

@@ -1,5 +1,8 @@
 import { ISchema } from '../schemas'
+import { ReadWriteByteBuffer } from '../serialization/ByteBuffer'
+import { AppendMessageBody, CrdtMessageType } from '../serialization/crdt'
 import { ComponentType, GrowOnlyValueSetComponentDefinition } from './component'
+import { __DEV__ } from '../runtime/invariant'
 import { Entity } from './entity'
 import { DeepReadonly, DeepReadonlySet } from './readonly'
 
@@ -40,17 +43,49 @@ export function createValueSetComponentDefinitionFromSchema<T>(
   }
   const data = new Map<Entity, InternalDatastructure>()
   const dirtyIterator = new Set<Entity>()
+  const queuedCommands: AppendMessageBody[] = []
 
-  function gotUpdated(entity: Entity) {
+  // only sort the array if the latest (N) element has a timestamp <= N-1
+  function shouldSort(row: InternalDatastructure) {
+    const len = row.raw.length
+    if (len > 1 && row.raw[len - 1].timestamp <= row.raw[len - 2].timestamp) {
+      return true
+    }
+    return false
+  }
+
+  function gotUpdated(entity: Entity): DeepReadonlySet<T> {
     const row = data.get(entity)
+    /* istanbul ignore else */
     if (row) {
-      row.raw.sort(sortByTimestamp)
+      if (shouldSort(row)) {
+        row.raw.sort(sortByTimestamp)
+      }
+      while (row.raw.length > options.maxElements) {
+        row.raw.shift()
+      }
       const frozenSet: DeepReadonlySet<T> = freezeSet(new Set(row?.raw.map(($) => $.value)))
       row.frozenSet = frozenSet
       return frozenSet
     } else {
+      /* istanbul ignore next */
       return emptyReadonlySet as any
     }
+  }
+
+  function append(entity: Entity, value: DeepReadonly<T>) {
+    let row = data.get(entity)
+    if (!row) {
+      row = { raw: [], frozenSet: emptyReadonlySet as any }
+      data.set(entity, row)
+    }
+    const usedValue = schema.extend ? (schema.extend(value) as DeepReadonly<T>) : value
+    const timestamp = options.timestampFunction(usedValue as any)
+    if (DEBUG) {
+      Object.freeze(usedValue)
+    }
+    row.raw.push({ value: usedValue, timestamp })
+    return { set: gotUpdated(entity), value: usedValue }
   }
 
   const ret: GrowOnlyValueSetComponentDefinition<T> = {
@@ -68,10 +103,8 @@ export function createValueSetComponentDefinitionFromSchema<T>(
     has(entity: Entity): boolean {
       return data.has(entity)
     },
-    entityDeleted(entity: Entity, markAsDirty: boolean): void {
-      if (data.delete(entity) && markAsDirty) {
-        dirtyIterator.add(entity)
-      }
+    entityDeleted(entity: Entity): void {
+      data.delete(entity)
     },
     get(entity: Entity): DeepReadonlySet<T> {
       const values = data.get(entity)
@@ -81,16 +114,19 @@ export function createValueSetComponentDefinitionFromSchema<T>(
         return emptyReadonlySet as any
       }
     },
-    addValue(entity: Entity, value: DeepReadonly<T>) {
-      let row = data.get(entity)
-      if (!row) {
-        row = { raw: [], frozenSet: emptyReadonlySet as any }
-        data.set(entity, row)
-      }
-      const usedValue = schema.extend ? (schema.extend(value) as DeepReadonly<T>) : value
-      row.raw.push({ value: usedValue, timestamp: options.timestampFunction(usedValue as any) })
+    addValue(entity: Entity, rawValue: DeepReadonly<T>) {
+      const { set, value } = append(entity, rawValue)
       dirtyIterator.add(entity)
-      return gotUpdated(entity)
+      const buf = new ReadWriteByteBuffer()
+      schema.serialize(value, buf)
+      queuedCommands.push({
+        componentId,
+        data: buf.toBinary(),
+        entityId: entity,
+        timestamp: 0,
+        type: CrdtMessageType.APPEND_COMPONENT
+      })
+      return set
     },
     *iterator(): Iterable<[Entity, Iterable<DeepReadonly<T>>]> {
       for (const [entity, component] of data) {
@@ -102,8 +138,16 @@ export function createValueSetComponentDefinitionFromSchema<T>(
         yield entity
       }
     },
-    *getCrdtUpdates() {},
+    getCrdtUpdates() {
+      // return a copy of the commands, and then clear the local copy
+      dirtyIterator.clear()
+      return queuedCommands.splice(0, queuedCommands.length)
+    },
     updateFromCrdt(_body) {
+      if (_body.type === CrdtMessageType.APPEND_COMPONENT) {
+        const buf = new ReadWriteByteBuffer(_body.data)
+        append(_body.entityId, schema.deserialize(buf) as DeepReadonly<T>)
+      }
       return [null, undefined]
     }
   }
