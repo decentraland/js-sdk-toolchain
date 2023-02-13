@@ -28,7 +28,17 @@ export type MapSchemaType<T extends Spec> = ISchema<MapResult<T>>
 /**
  * @internal
  */
+export const MapReflectionType = 'schemas::v1::map'
+
+/**
+ * @internal
+ */
 export const IMap = <T extends Spec>(spec: T, defaultValue?: Partial<MapResult<T>>): ISchema<MapResult<T>> => {
+  const specReflection = Object.keys(spec).reduce((specReflection, currentKey) => {
+    specReflection[currentKey] = spec[currentKey].description
+    return specReflection
+  }, {} as Record<string, any>)
+
   return {
     serialize(value: MapResult<T>, builder: ByteBuffer): void {
       for (const key in spec) {
@@ -55,6 +65,10 @@ export const IMap = <T extends Spec>(spec: T, defaultValue?: Partial<MapResult<T
         ;(newValue as any)[key] = spec[key].create()
       }
       return { ...newValue, ...defaultValue, ...base }
+    },
+    description: {
+      type: MapReflectionType,
+      spec: specReflection
     }
   }
 }

@@ -26,5 +26,8 @@ export const Color4Schema: ISchema<Color4Type> = {
   },
   create() {
     return { r: 0, g: 0, b: 0, a: 0 }
+  },
+  description: {
+    type: 'schemas::v1::color4'
   }
 }

@@ -13,6 +13,9 @@ export const Float32: ISchema<number> = {
   },
   create() {
     return 0.0
+  },
+  description: {
+    type: 'schemas::v1::float32'
   }
 }
 
@@ -28,5 +31,8 @@ export const Float64: ISchema<number> = {
   },
   create() {
     return 0.0
+  },
+  description: {
+    type: 'schemas::v1::float64'
   }
 }

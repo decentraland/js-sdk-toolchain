@@ -4,6 +4,11 @@ import { ISchema } from './ISchema'
 /**
  * @internal
  */
+export const OptionalReflectionType = 'schemas::v1::optional'
+
+/**
+ * @internal
+ */
 export const IOptional = <T>(spec: ISchema<T>): ISchema<T | undefined> => {
   return {
     serialize(value: T | undefined, builder: ByteBuffer): void {
@@ -22,6 +27,10 @@ export const IOptional = <T>(spec: ISchema<T>): ISchema<T | undefined> => {
     },
     create() {
       return undefined
+    },
+    description: {
+      type: OptionalReflectionType,
+      spec: spec.description
     }
   }
 }

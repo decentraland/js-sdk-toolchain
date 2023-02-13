@@ -10,11 +10,27 @@ import { Color4Schema, Color4Type } from './custom/Color4'
 import { EntitySchema } from './custom/Entity'
 import { QuaternionSchema, QuaternionType } from './custom/Quaternion'
 import { Vector3Schema, Vector3Type } from './custom/Vector3'
-import { ISchema } from './ISchema'
+import {
+  ISchema,
+  SchemaDescription,
+  SchemaDescriptionArray,
+  SchemaDescriptionPrimitive,
+  SchemaDescriptionMap
+} from './ISchema'
 import { IMap } from './Map'
 import { IOptional } from './Optional'
 
-export { QuaternionType, Vector3Type, ISchema, Color3Type, Color4Type }
+export {
+  QuaternionType,
+  Vector3Type,
+  ISchema,
+  Color3Type,
+  Color4Type,
+  SchemaDescription,
+  SchemaDescriptionMap,
+  SchemaDescriptionPrimitive,
+  SchemaDescriptionArray
+}
 /**
  * @public
  */

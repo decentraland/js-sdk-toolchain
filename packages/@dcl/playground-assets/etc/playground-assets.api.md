@@ -409,6 +409,8 @@ export interface ComponentDefinition<T> {
     getMutableOrNull(entity: Entity): T | null;
     getOrNull(entity: Entity): DeepReadonly<T> | null;
     has(entity: Entity): boolean;
+    // (undocumented)
+    schema?: ISchema;
     updateFromCrdt(body: CrdtMessageBody): [null | PutComponentMessageBody | DeleteComponentMessageBody, T | null];
 }
 
@@ -985,6 +987,8 @@ export const inputSystem: IInputSystem;
 export interface ISchema<T = any> {
     // (undocumented)
     create(): T;
+    // (undocumented)
+    description: SchemaDescription;
     // (undocumented)
     deserialize(reader: ByteBuffer): T;
     // (undocumented)
@@ -2325,6 +2329,22 @@ export namespace Scalar {
     export function toHex(i: number): string;
     export function withinEpsilon(a: number, b: number, epsilon?: number): boolean;
 }
+
+// @public (undocumented)
+export type SchemaDescription = {
+    type: string;
+} & SchemaDescriptionMap;
+
+// @public (undocumented)
+export type SchemaDescriptionArray = Array<SchemaDescriptionPrimitive | SchemaDescriptionMap | SchemaDescriptionArray>;
+
+// @public (undocumented)
+export type SchemaDescriptionMap = {
+    [key: string]: SchemaDescriptionPrimitive | SchemaDescriptionMap | SchemaDescriptionArray;
+};
+
+// @public (undocumented)
+export type SchemaDescriptionPrimitive = string | number | boolean | null;
 
 // @public (undocumented)
 export namespace Schemas {

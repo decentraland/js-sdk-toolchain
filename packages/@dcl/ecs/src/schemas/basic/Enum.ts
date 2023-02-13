@@ -43,6 +43,11 @@ function validateMemberValuesAreStrings(enumValue: Record<any, any>) {
 /**
  * @internal
  */
+export const IntEnumReflectionType = 'schemas::v1::enum-int'
+
+/**
+ * @internal
+ */
 export const IntEnum = <T>(enumObject: Record<any, any>, defaultValue: T): ISchema<T> => {
   validateMemberValuesAreNumbersAndInRangeInt32(enumObject)
 
@@ -55,9 +60,19 @@ export const IntEnum = <T>(enumObject: Record<any, any>, defaultValue: T): ISche
     },
     create() {
       return defaultValue
+    },
+    description: {
+      type: IntEnumReflectionType,
+      enumObject,
+      defaultValue: defaultValue as any
     }
   }
 }
+
+/**
+ * @internal
+ */
+export const StringEnumReflectionType = 'schemas::v1::enum-string'
 
 /**
  * @internal
@@ -74,6 +89,11 @@ export const StringEnum = <T>(enumObject: Record<any, any>, defaultValue: T): IS
     },
     create() {
       return defaultValue
+    },
+    description: {
+      type: StringEnumReflectionType,
+      enumObject,
+      defaultValue: defaultValue as any
     }
   }
 }

@@ -143,6 +143,11 @@ export interface ComponentDefinition<T> {
    * @internal
    */
   isDirty(entity: Entity): boolean
+
+  /**
+   * @public
+   */
+  schema?: ISchema
 }
 
 export function incrementTimestamp(entity: Entity, timestamps: Map<Entity, number>): number {
@@ -411,6 +416,7 @@ export function createComponentDefinitionFromSchema<T>(
     updateFromCrdt: createUpdateFromCrdt(componentId, timestamps, schema, data),
     deserialize(buffer: ByteBuffer): T {
       return schema.deserialize(buffer)
-    }
+    },
+    schema
   }
 }

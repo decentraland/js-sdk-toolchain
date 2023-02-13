@@ -14,5 +14,8 @@ export const EntitySchema: ISchema<Entity> = {
   },
   create() {
     return 0 as Entity
+  },
+  description: {
+    type: 'schemas::v1::entity'
   }
 }

@@ -7,8 +7,8 @@ EVAL test/snapshots/two-way-crdt.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 15k
-  MALLOC_COUNT = 6425
-  ALIVE_OBJS_DELTA ~= 1.12k
+  MALLOC_COUNT = 6514
+  ALIVE_OBJS_DELTA ~= 1.14k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer->Scene: e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
@@ -47,4 +47,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 4k
   MALLOC_COUNT = -1
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 794.23k bytes
+  MEMORY_USAGE_COUNT ~= 800.04k bytes

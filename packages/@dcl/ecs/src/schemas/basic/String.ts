@@ -13,6 +13,9 @@ export const FlatString: ISchema<string> = {
   },
   create() {
     return ''
+  },
+  description: {
+    type: 'schemas::v1::string'
   }
 }
 

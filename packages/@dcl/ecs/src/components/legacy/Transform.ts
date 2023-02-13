@@ -88,6 +88,9 @@ export const TransformSchema: ISchema<TransformType> = {
       parent: 0 as Entity,
       ...value
     }
+  },
+  description: {
+    type: 'built-in::Transform'
   }
 }
 
