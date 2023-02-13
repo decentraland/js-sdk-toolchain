@@ -1,36 +1,28 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
-import App from './components/Tree'
+import App from './components/tree/Tree'
 import reportWebVitals from './reportWebVitals'
 
-import { Tree } from './components/Tree'
+import { Tree } from './tree'
 
-const tree: Tree = {
-  type: 'directory',
-  value: 'src',
-  childs: [{
-    type: 'directory',
-    value: 'components',
-    childs: [{
-      type: 'file',
-      value: 'Tree.tsx',
-      childs: []
-    }, {
-      type: 'file',
-      value: 'Tree.css',
-      childs: []
-    }]
-  }, {
-    type: 'file',
-    value: 'index.tsx',
-      childs: []
-  }, {
-    type: 'file',
-    value: 'index.css',
-      childs: []
-  }]
-}
+const tree: Tree = new Tree('src', 'directory', true)
+  .addChild(new Tree('components', 'directory')
+    .addChild(new Tree('tree', 'directory')
+      .addChild(new Tree('deep', 'directory')
+        .addChild(new Tree('deep-file.ts'))
+        .addChild(new Tree('other-deep-file.ts'))
+      )
+      .addChild(new Tree('tree.tsx'))
+      .addChild(new Tree('tree.css'))
+    )
+    .addChild(new Tree('modal', 'directory')
+      .addChild(new Tree('modal.tsx'))
+      .addChild(new Tree('modal.css'))
+    )
+  )
+  .addChild(new Tree('index.tsx'))
+  .addChild(new Tree('index.css'))
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
