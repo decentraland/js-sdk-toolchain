@@ -88,14 +88,14 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     ...parseSize(props.minWidth, 'minWidth'),
     ...parseSize(props.maxWidth, 'maxWidth'),
     ...getDisplay(props.display),
-    ...getAlign('alignSelf', props.alignSelf, YGAlign.YGA_AUTO),
+    ...getAlign('alignSelf', props.alignSelf ?? 'auto'),
     ...getJustify(props.justifyContent),
     ...getFlexDirection(props.flexDirection),
     ...getOverflow(props.overflow),
     ...getPoistionType(props.positionType),
     // Optional values
-    ...(alignContent && getAlign('alignContent', alignContent, YGAlign.YGA_FLEX_START)),
-    ...(alignItems && getAlign('alignItems', alignItems, YGAlign.YGA_FLEX_START)),
+    ...(alignContent && getAlign('alignContent', alignContent)),
+    ...(alignItems && getAlign('alignItems', alignItems)),
     ...(flexWrap && getFlexWrap(flexWrap))
   }
 }

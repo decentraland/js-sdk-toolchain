@@ -120,12 +120,8 @@ type AlignProp = 'alignContent' | 'alignItems' | 'alignSelf'
 /**
  * @internal
  */
-export function getAlign<T extends AlignProp>(
-  prop: T,
-  align: AlignType | undefined,
-  defaultValue: YGAlign
-): Record<T, YGAlign> {
-  const value: YGAlign = align ? parseAligns[align] : defaultValue
+export function getAlign<T extends AlignProp>(prop: T, align: AlignType): Record<T, YGAlign> {
+  const value: YGAlign = parseAligns[align]
   return { [prop]: value } as Record<T, YGAlign>
 }
 
