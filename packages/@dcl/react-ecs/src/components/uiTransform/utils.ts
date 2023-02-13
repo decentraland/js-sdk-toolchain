@@ -160,8 +160,8 @@ const parseFlexDirection: Readonly<Record<FlexDirectionType, YGFlexDirection>> =
 /**
  * @internal
  */
-export function getFlexWrap(flexWrap: FlexWrapType | undefined): Record<'flexWrap', YGWrap> {
-  const value: YGWrap = flexWrap ? parseFlexWrap[flexWrap] : YGWrap.YGW_WRAP
+export function getFlexWrap(flexWrap: FlexWrapType): Record<'flexWrap', YGWrap> {
+  const value: YGWrap = parseFlexWrap[flexWrap]
   return { flexWrap: value }
 }
 
