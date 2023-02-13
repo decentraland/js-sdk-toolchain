@@ -32,11 +32,7 @@ export const uiComponent = () => (
         display: 'flex'
       }}
     >
-      <Label
-        value="SDK 7"
-        fontSize={80}
-        uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
-      />
+      <Label value="SDK 7" fontSize={80} uiBackground={{ color: Color4.fromHexString('#fbf0f0') }} />
     </UiEntity>
     <UiEntity
       uiTransform={{
@@ -47,11 +43,7 @@ export const uiComponent = () => (
         display: 'flex'
       }}
     >
-      <Label
-        value={`Counter: ${counter}`}
-        fontSize={60}
-        uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
-      />
+      <Label value={`Counter: ${counter}`} fontSize={60} uiBackground={{ color: Color4.fromHexString('#fbf0f0') }} />
     </UiEntity>
     <UiEntity
       uiTransform={{
@@ -106,10 +98,7 @@ function createCube(x: number, y: number, z: number, spawner = true): Entity {
 
 // Systems
 function circularSystem(dt: number) {
-  const entitiesWithMeshRenderer = engine.getEntitiesWith(
-    MeshRenderer,
-    Transform
-  )
+  const entitiesWithMeshRenderer = engine.getEntitiesWith(MeshRenderer, Transform)
   for (const [entity, _meshRenderer, _transform] of entitiesWithMeshRenderer) {
     const mutableTransform = Transform.getMutable(entity)
 
@@ -123,13 +112,7 @@ function circularSystem(dt: number) {
 function spawnerSystem() {
   const clickedCubes = engine.getEntitiesWith(PointerEvents)
   for (const [entity] of clickedCubes) {
-    if (
-      inputSystem.isTriggered(
-        InputAction.IA_PRIMARY,
-        PointerEventType.PET_DOWN,
-        entity
-      )
-    ) {
+    if (inputSystem.isTriggered(InputAction.IA_PRIMARY, PointerEventType.PET_DOWN, entity)) {
       counter++
     }
   }

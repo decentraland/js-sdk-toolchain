@@ -22,7 +22,7 @@ import { getFont, getTextAlign } from './utils'
 export function Label(props: EntityPropTypes & UiLabelProps) {
   const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...uiTextProps } = props
   const commonProps = parseProps({
-    uiTransform,
+    uiTransform: { ...uiTransform, width: '100%', height: '100%', positionType: 'absolute' },
     uiBackground,
     onMouseDown,
     onMouseUp

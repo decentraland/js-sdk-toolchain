@@ -47,7 +47,8 @@ describe('UiTransform React Ecs', () => {
           alignItems: 'auto',
           display: 'flex',
           positionType: 'absolute',
-          justifyContent: 'flex-end'
+          justifyContent: 'flex-end',
+          alignContent: 'auto'
         }}
       />
     )
@@ -61,7 +62,8 @@ describe('UiTransform React Ecs', () => {
       display: YGDisplay.YGD_FLEX,
       positionType: YGPositionType.YGPT_ABSOLUTE,
       width: 0,
-      justifyContent: YGJustify.YGJ_FLEX_END
+      justifyContent: YGJustify.YGJ_FLEX_END,
+      alignContent: YGAlign.YGA_AUTO
     })
   })
 
