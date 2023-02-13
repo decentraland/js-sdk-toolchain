@@ -24,7 +24,7 @@ export interface AnimatorComponentDefinitionExtended extends LastWriteWinElement
 //
 // @public
 export type AppendMessageBody = {
-    type: CrdtMessageType.PUT_COMPONENT;
+    type: CrdtMessageType.APPEND_COMPONENT;
     entityId: Entity;
     componentId: number;
     timestamp: number;
@@ -90,9 +90,11 @@ export interface BaseComponent<T> {
     // (undocumented)
     readonly componentType: ComponentType;
     entityDeleted(entity: Entity, markAsDirty: boolean): void;
-    get(entity: Entity): DeepReadonly<T>;
+    get(entity: Entity): any;
     getCrdtUpdates(): Iterable<CrdtMessageBody>;
     has(entity: Entity): boolean;
+    // (undocumented)
+    readonly schema: ISchema<T>;
     updateFromCrdt(body: CrdtMessageBody): [null | ConflictResolutionMessage, T | undefined];
 }
 
@@ -455,11 +457,13 @@ export type CrdtMessageHeader = {
 // @public (undocumented)
 export enum CrdtMessageType {
     // (undocumented)
+    APPEND_COMPONENT = 4,
+    // (undocumented)
     DELETE_COMPONENT = 2,
     // (undocumented)
     DELETE_ENTITY = 3,
     // (undocumented)
-    MAX_MESSAGE_TYPE = 4,
+    MAX_MESSAGE_TYPE = 5,
     // (undocumented)
     PUT_COMPONENT = 1,
     // (undocumented)
@@ -482,7 +486,7 @@ export function createEthereumProvider(): {
 export function cyclicParentingChecker(engine: IEngine): () => void;
 
 // @public (undocumented)
-export type DeepReadonly<T> = T extends ReadonlyPrimitive ? T : T extends Map<infer K, infer V> ? DeepReadonlyMap<K, V> : T extends Set<infer M> ? DeepReadonlySet<M> : DeepReadonlyObject<T>;
+export type DeepReadonly<T> = T extends ReadonlyPrimitive ? T : T extends Array<infer K> ? ReadonlyArray<DeepReadonly<K>> : T extends Map<infer K, infer V> ? DeepReadonlyMap<K, V> : T extends Set<infer M> ? DeepReadonlySet<M> : DeepReadonlyObject<T>;
 
 // @public (undocumented)
 export type DeepReadonlyMap<K, V> = ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>;
@@ -690,10 +694,11 @@ export type GlobalInputEventResult = InputEventResult & {
 export const GltfContainer: LastWriteWinElementSetComponentDefinition<PBGltfContainer>;
 
 // @public (undocumented)
-export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<DeepReadonlySet<T>> {
+export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T> {
     addValue(entity: Entity, val: DeepReadonly<T>): DeepReadonlySet<T>;
     // (undocumented)
     readonly componentType: ComponentType.GrowOnlyValueSet;
+    get(entity: Entity): DeepReadonlySet<T>;
 }
 
 // @public (undocumented)
@@ -995,9 +1000,9 @@ export interface ISchema<T = any> {
     // (undocumented)
     deserialize(reader: ByteBuffer): T;
     // (undocumented)
-    extend?: (base?: T) => T;
+    extend?: (base: Partial<DeepReadonly<T>> | undefined) => T;
     // (undocumented)
-    serialize(value: T, builder: ByteBuffer): void;
+    serialize(value: DeepReadonly<T>, builder: ByteBuffer): void;
 }
 
 // Warning: (tsdoc-undefined-tag) The TSDoc tag "@hidden" is not defined in this configuration
@@ -1040,6 +1045,7 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
     create(entity: Entity, val?: T): T;
     createOrReplace(entity: Entity, val?: T): T;
     deleteFrom(entity: Entity): T | null;
+    get(entity: Entity): DeepReadonly<T>;
     getMutable(entity: Entity): T;
     getMutableOrNull(entity: Entity): T | null;
     getOrNull(entity: Entity): DeepReadonly<T> | null;
@@ -1381,7 +1387,7 @@ export class ObserverEventState {
 }
 
 // @public (undocumented)
-export type OnChangeFunction = (entity: Entity, operation: CrdtMessageType, component?: ComponentDefinition<any>) => void;
+export type OnChangeFunction = (entity: Entity, operation: CrdtMessageType, component?: ComponentDefinition<any>, componentValue?: any) => void;
 
 // Warning: (ae-missing-release-tag) "onCommsMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

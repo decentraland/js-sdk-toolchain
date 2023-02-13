@@ -67,7 +67,7 @@ describe('test CRDT flow E2E', () => {
   function updateInt(engine: IEngine, entity: Entity, value: number) {
     const name = 'system'
     function update() {
-      const component = engine.getComponent(ID)!
+      const component = engine.getComponent(ID)! as ReturnType<typeof int8Component>
       component.createOrReplace(entity, value)
       engine.removeSystem(name)
     }

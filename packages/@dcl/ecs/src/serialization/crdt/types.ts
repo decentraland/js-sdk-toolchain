@@ -11,6 +11,7 @@ export enum CrdtMessageType {
   DELETE_COMPONENT = 2,
 
   DELETE_ENTITY = 3,
+  APPEND_COMPONENT = 4,
 
   MAX_MESSAGE_TYPE
 }
@@ -59,7 +60,7 @@ export type PutComponentMessageBody = {
  * @public
  */
 export type AppendMessageBody = {
-  type: CrdtMessageType.PUT_COMPONENT
+  type: CrdtMessageType.APPEND_COMPONENT
   entityId: Entity
   componentId: number
   timestamp: number

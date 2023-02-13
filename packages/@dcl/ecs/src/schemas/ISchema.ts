@@ -1,11 +1,12 @@
+import { DeepReadonly } from '../engine/readonly'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 
 /**
  * @public
  */
 export interface ISchema<T = any> {
-  serialize(value: T, builder: ByteBuffer): void
+  serialize(value: DeepReadonly<T>, builder: ByteBuffer): void
   deserialize(reader: ByteBuffer): T
   create(): T
-  extend?: (base?: T) => T
+  extend?: (base: Partial<DeepReadonly<T>> | undefined) => T
 }

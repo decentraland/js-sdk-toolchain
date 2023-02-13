@@ -80,7 +80,7 @@ export const TransformSchema: ISchema<TransformType> = {
       parent: 0 as Entity
     }
   },
-  extend(value?: TransformType) {
+  extend(value?: Partial<TransformType>) {
     return {
       position: { x: 0, y: 0, z: 0 },
       scale: { x: 1, y: 1, z: 1 },

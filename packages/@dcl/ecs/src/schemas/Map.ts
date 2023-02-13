@@ -1,3 +1,4 @@
+import { DeepReadonly } from '../engine/readonly'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { ISchema } from './ISchema'
 import { ToOptional } from './typing'
@@ -23,14 +24,12 @@ export type MapResultWithOptional<T extends Spec> = ToOptional<{
   [K in keyof T]?: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? MapResult<T[K]> : never
 }>
 
-export type MapSchemaType<T extends Spec> = ISchema<MapResult<T>>
-
 /**
  * @internal
  */
 export const IMap = <T extends Spec>(spec: T, defaultValue?: Partial<MapResult<T>>): ISchema<MapResult<T>> => {
   return {
-    serialize(value: MapResult<T>, builder: ByteBuffer): void {
+    serialize(value: DeepReadonly<MapResult<T>>, builder: ByteBuffer): void {
       for (const key in spec) {
         spec[key].serialize((value as any)[key], builder)
       }
@@ -49,7 +48,7 @@ export const IMap = <T extends Spec>(spec: T, defaultValue?: Partial<MapResult<T
       }
       return { ...newValue, ...defaultValue }
     },
-    extend: (base?: MapResult<T>) => {
+    extend: (base: Partial<DeepReadonly<MapResult<T>>> | undefined) => {
       const newValue: MapResult<T> = {} as any
       for (const key in spec) {
         ;(newValue as any)[key] = spec[key].create()

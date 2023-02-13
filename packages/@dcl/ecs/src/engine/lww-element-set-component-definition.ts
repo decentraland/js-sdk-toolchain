@@ -195,9 +195,7 @@ export function createComponentDefinitionFromSchema<T>(
       // a getter is used here to prevent accidental changes
       return ComponentType.LastWriteWinElementSet as const
     },
-    default() {
-      return schema.create() as DeepReadonly<T>
-    },
+    schema,
     has(entity: Entity): boolean {
       return data.has(entity)
     },
@@ -229,13 +227,15 @@ export function createComponentDefinitionFromSchema<T>(
       if (component) {
         throw new Error(`[create] Component ${componentName} for ${entity} already exists`)
       }
-      const usedValue = value === undefined ? schema.create() : schema.extend ? schema.extend(value) : value
+      const usedValue =
+        value === undefined ? schema.create() : schema.extend ? schema.extend(value as DeepReadonly<T>) : value
       data.set(entity, usedValue)
       dirtyIterator.add(entity)
       return usedValue
     },
     createOrReplace(entity: Entity, value?: T): T {
-      const usedValue = value === undefined ? schema.create() : schema.extend ? schema.extend(value) : value
+      const usedValue =
+        value === undefined ? schema.create() : schema.extend ? schema.extend(value as DeepReadonly<T>) : value
       data.set(entity, usedValue!)
       dirtyIterator.add(entity)
       return usedValue!
@@ -266,19 +266,6 @@ export function createComponentDefinitionFromSchema<T>(
       }
     },
     getCrdtUpdates: createGetCrdtMessagesForLww(componentId, timestamps, dirtyIterator, schema, data),
-    toBinary(entity: Entity): ByteBuffer {
-      const component = data.get(entity)
-      if (!component) {
-        throw new Error(`[toBinary] Component ${componentName} for ${entity} not found`)
-      }
-
-      const writeBuffer = new ReadWriteByteBuffer()
-      schema.serialize(component, writeBuffer)
-      return writeBuffer
-    },
-    updateFromCrdt: createUpdateLwwFromCrdt(componentId, timestamps, schema, data),
-    deserialize(buffer: ByteBuffer): T {
-      return schema.deserialize(buffer)
-    }
+    updateFromCrdt: createUpdateLwwFromCrdt(componentId, timestamps, schema, data)
   }
 }

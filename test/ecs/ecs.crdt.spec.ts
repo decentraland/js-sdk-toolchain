@@ -1,4 +1,11 @@
-import { components, CrdtMessageType, DeleteComponent, IEngine, Schemas } from '../../packages/@dcl/ecs/src'
+import {
+  components,
+  CrdtMessageType,
+  DeleteComponent,
+  IEngine,
+  LastWriteWinElementSetComponentDefinition,
+  Schemas
+} from '../../packages/@dcl/ecs/src'
 import { PutComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt'
 import { Entity, EntityState, EntityUtils, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src/engine/entity'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
@@ -72,7 +79,7 @@ describe('CRDT tests', () => {
     const { engine, spySend } = SandBox.create({ length: 1 })[0]
     const entityA = engine.addEntity()
     const Transform = components.Transform(engine)
-    const Test = engine.getComponent(SandBox.Position.id)
+    const Test = engine.getComponent(SandBox.Position.id) as LastWriteWinElementSetComponentDefinition<Partial<Vector3>>
 
     // Create two basic components for entity A
     Transform.create(entityA, SandBox.DEFAULT_POSITION)
@@ -94,7 +101,7 @@ describe('CRDT tests', () => {
     const { engine, spySend } = SandBox.create({ length: 1 })[0]
     const entityA = engine.addEntity()
     const Transform = components.Transform(engine)
-    const Test = engine.getComponent(SandBox.Position.id)
+    const Test = engine.getComponent(SandBox.Position.id) as LastWriteWinElementSetComponentDefinition<Partial<Vector3>>
 
     // Create two basic components for entity A
     Transform.create(entityA, SandBox.DEFAULT_POSITION)
@@ -169,8 +176,12 @@ describe('CRDT tests', () => {
     }, UPDATE_MS)
 
     clients.forEach(({ engine }) => {
-      const PosCompomnent = engine.getComponent(SandBox.Position.id)
-      const DoorComponent = engine.getComponent(SandBox.Door.id)
+      const PosCompomnent = engine.getComponent(
+        SandBox.Position.id
+      ) as LastWriteWinElementSetComponentDefinition<Vector3>
+      const DoorComponent = engine.getComponent(SandBox.Door.id) as LastWriteWinElementSetComponentDefinition<{
+        open: number
+      }>
       const entity = engine.addEntity()
 
       components.Transform(engine).create(entity, SandBox.DEFAULT_POSITION)
@@ -222,12 +233,6 @@ describe('CRDT tests', () => {
     expect(() => Transform.getMutable(123 as Entity)).toThrow()
   })
 
-  it('toBinary fails for inexistent entity', async () => {
-    const [{ engine }] = SandBox.create({ length: 1 })
-    const Transform = components.Transform(engine)
-    expect(() => Transform.toBinary(123 as Entity)).toThrow()
-  })
-
   it('should resend a crdt message if its outdated', async () => {
     const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
     const entity = engine.addEntity()
@@ -237,13 +242,17 @@ describe('CRDT tests', () => {
     Transform.getMutable(entity).position.x = 8
     await engine.update(1)
     const buffer = new ReadWriteByteBuffer()
-    PutComponentOperation.write(entity, 0, Transform.componentId, Transform.toBinary(entity).toBinary(), buffer)
+    const tmpBuffer1 = new ReadWriteByteBuffer()
+    Transform.schema.serialize(Transform.get(entity), tmpBuffer1)
+    PutComponentOperation.write(entity, 0, Transform.componentId, tmpBuffer1.toBinary(), buffer)
     jest.resetAllMocks()
     transports[0].onmessage!(buffer.toBinary())
     await engine.update(1)
 
     const outdatedBuffer = new ReadWriteByteBuffer()
-    PutComponentOperation.write(entity, 2, Transform.componentId, Transform.toBinary(entity).toBinary(), outdatedBuffer)
+    const tmpBuffer = new ReadWriteByteBuffer()
+    Transform.schema.serialize(Transform.get(entity), tmpBuffer)
+    PutComponentOperation.write(entity, 2, Transform.componentId, tmpBuffer.toBinary(), outdatedBuffer)
     expect(spySend).toBeCalledWith(outdatedBuffer.toBinary())
   })
 
@@ -254,7 +263,9 @@ describe('CRDT tests', () => {
     Transform.create(entity, SandBox.DEFAULT_POSITION)
     await engine.update(1)
     const buffer = new ReadWriteByteBuffer()
-    PutComponentOperation.write(entity, 0, Transform.componentId, Transform.toBinary(entity).toBinary(), buffer)
+    const tmpBuffer = new ReadWriteByteBuffer()
+    Transform.schema.serialize(Transform.get(entity), tmpBuffer)
+    PutComponentOperation.write(entity, 0, Transform.componentId, tmpBuffer.toBinary(), buffer)
     Transform.deleteFrom(entity)
     await engine.update(1)
     jest.resetAllMocks()
@@ -297,13 +308,9 @@ describe('CRDT tests', () => {
     await engine.update(1)
 
     const buffer = new ReadWriteByteBuffer()
-    PutComponentOperation.write(
-      entity,
-      1,
-      customComponent.componentId,
-      customComponent.toBinary(entity).toBinary(),
-      buffer
-    )
+    const buffer2 = new ReadWriteByteBuffer()
+    customComponent.schema.serialize(customComponent.get(entity), buffer2)
+    PutComponentOperation.write(entity, 1, customComponent.componentId, buffer2.toBinary(), buffer)
     serverTransport.onmessage!(buffer.toBinary())
     await serverEngine.update(1)
     expect(customServerComponent.get(entity)).toEqual(customComponent.get(entity))

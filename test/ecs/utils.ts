@@ -51,11 +51,11 @@ export namespace SandBox {
         value: unknown
       }[] = []
       const engine = Engine({
-        onChangeFunction: (entity, operation, component) => {
+        onChangeFunction: (entity, operation, component, value) => {
           operations.push({
             entity,
             operation,
-            value: component ? component.getOrNull(entity) : null
+            value
           })
         }
       })
@@ -154,10 +154,10 @@ export namespace SandBox {
         value: unknown
       }[] = []
       const engine = Engine({
-        onChangeFunction: (entity, _operation, component) => {
+        onChangeFunction: (entity, _operation, component, value) => {
           operations.push({
             entity,
-            value: component ? component.getOrNull(entity) : null
+            value
           })
         }
       })

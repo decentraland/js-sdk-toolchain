@@ -1,4 +1,5 @@
 import { Engine, Entity, components } from '../../../packages/@dcl/ecs/src'
+import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { Quaternion, Vector3 } from '../../../packages/@dcl/sdk/src/math'
 
 describe('Legacy component tests', () => {
@@ -26,24 +27,26 @@ describe('Legacy component tests', () => {
 
     function rotatorSystem(dt: number) {
       const group = engine.getEntitiesWith(Transform)
-      for (const [entity, component] of group) {
+      for (const [, component] of group) {
         Quaternion.multiplyToRef(
           component.rotation,
           Quaternion.fromAngleAxis(dt * 10, Vector3.Up()),
           component.rotation
         )
 
-        const transformData = Transform.toBinary(entity)
+        const transformData = new ReadWriteByteBuffer()
         const transformOriginal = { ...component }
-        const transformReceveid = Transform.deserialize(transformData)
+        Transform.schema.serialize(transformOriginal, transformData)
+        const transformReceveid = Transform.schema.deserialize(transformData)
         expect(transformReceveid).toBeDeepCloseTo(transformOriginal)
       }
 
       const groupBoxShape = engine.getEntitiesWith(MeshRenderer)
-      for (const [entity, component] of groupBoxShape) {
-        const boxShapeData = MeshRenderer.toBinary(entity)
+      for (const [, component] of groupBoxShape) {
+        const boxShapeData = new ReadWriteByteBuffer()
         const boxShapeOriginal = { ...component }
-        const boxShapeReceveid = MeshRenderer.deserialize(boxShapeData)
+        MeshRenderer.schema.serialize(boxShapeOriginal, boxShapeData)
+        const boxShapeReceveid = MeshRenderer.schema.deserialize(boxShapeData)
         expect(boxShapeReceveid).toBeDeepCloseTo(boxShapeOriginal)
       }
     }

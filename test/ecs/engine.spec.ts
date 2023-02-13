@@ -499,7 +499,7 @@ describe('Engine tests', () => {
   it('should return the default component of the transform', async () => {
     const engine = Engine()
     const Transform = components.Transform(engine)
-    expect(TransformSchema.create()).toBeDeepCloseTo(Transform.default())
+    expect(Transform.create(engine.addEntity())).toBeDeepCloseTo(Transform.schema.create())
   })
 
   it('should log the error of cyclic parenting', async () => {

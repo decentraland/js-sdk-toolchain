@@ -15,7 +15,8 @@ import { ReceiveMessage, Transport, TransportMessage } from './types'
 export type OnChangeFunction = (
   entity: Entity,
   operation: CrdtMessageType,
-  component?: ComponentDefinition<any>
+  component?: ComponentDefinition<any>,
+  componentValue?: any
 ) => void
 
 /**
@@ -119,7 +120,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         const component = engine.getComponentOrNull(msg.componentId)
 
         if (component) {
-          const [conflictMessage] = component.updateFromCrdt(msg)
+          const [conflictMessage, value] = component.updateFromCrdt(msg)
 
           if (conflictMessage) {
             const offset = bufferForOutdated.currentWriteOffset()
@@ -144,7 +145,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             // Add message to transport queue to be processed by others transports
             broadcastMessages.push(msg)
 
-            onProcessEntityComponentChange && onProcessEntityComponentChange(msg.entityId, msg.type, component)
+            onProcessEntityComponentChange && onProcessEntityComponentChange(msg.entityId, msg.type, component, value)
           }
         }
       }
@@ -195,7 +196,14 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentWriteOffset())
           })
 
-          onProcessEntityComponentChange && onProcessEntityComponentChange(message.entityId, message.type, component)
+          if (onProcessEntityComponentChange) {
+            const rawValue =
+              message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.APPEND_COMPONENT
+                ? component.get(message.entityId)
+                : undefined
+
+            onProcessEntityComponentChange(message.entityId, message.type, component, rawValue)
+          }
         }
       }
     }

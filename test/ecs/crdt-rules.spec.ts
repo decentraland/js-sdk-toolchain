@@ -1,6 +1,6 @@
 import { CrdtMessageType, Entity } from '../../packages/@dcl/ecs/src'
 import { dataCompare } from '../../packages/@dcl/ecs/src/systems/crdt/utils'
-import { createUpdateLwwFromCrdt } from '../../packages/@dcl/ecs/src/engine/component'
+import { createUpdateLwwFromCrdt } from '../../packages/@dcl/ecs/src/engine/lww-element-set-component-definition'
 import { ByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
 describe('dataCompare', () => {

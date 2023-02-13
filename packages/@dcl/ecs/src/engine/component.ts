@@ -1,3 +1,4 @@
+import { ISchema } from '../schemas'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { CrdtMessageBody, DeleteComponentMessageBody, PutComponentMessageBody } from '../serialization/crdt'
 import { Entity } from './entity'
@@ -26,6 +27,7 @@ export interface BaseComponent<T> {
   readonly componentId: number
   readonly componentName: string
   readonly componentType: ComponentType
+  readonly schema: ISchema<T>
 
   // <SYSTEM INTERFACE METHODS>
 
@@ -69,29 +71,16 @@ export interface BaseComponent<T> {
    * @param entity - Entity that will be used to get the component
    * @returns
    */
-  get(entity: Entity): DeepReadonly<T>
+  get(entity: Entity): any
   // </ USER INTERFACE>
 
   // Unstable and internal APIs
-  /**
-   * Deserializes a ByteBuffer into the type T of the component
-   * @internal
-   * @param buffer - data to deserialize
-   */
-  deserialize(buffer: ByteBuffer): T
 
   /**
    * @internal Use engine.getEntitiesWith(Component) instead.
    * Get the iterator to every entity has the component
    */
-  iterator(): Iterable<[Entity, T]>
-
-  /**
-   * Allocates a buffer and returns a slice of a buffer
-   * @internal
-   * @param entity - Entity to serizalie
-   */
-  toBinary(entity: Entity): ByteBuffer
+  iterator(): Iterable<[Entity, any]>
 
   /**
    * @internal
@@ -105,15 +94,15 @@ export interface BaseComponent<T> {
 export interface LastWriteWinElementSetComponentDefinition<T> extends BaseComponent<T> {
   readonly componentType: ComponentType.LastWriteWinElementSet
 
-  // <EXTENDED METHODS>
-  /**
-   * @internal
-   * Return the default value of the current component
-   */
-  default(): DeepReadonly<T>
-  // </EXTENDED METHODS>
-
   // <USER INTERFACE METHODS>
+  /**
+   * Get the readonly component of the entity (to mutate it, use getMutable instead),
+   * throws an error if the entity doesn't have the component.
+   * @param entity - Entity that will be used to get the component
+   * @returns
+   */
+  get(entity: Entity): DeepReadonly<T>
+
   /**
    * Get the readonly component of the entity (to mutate it, use getMutable instead), or null if the entity doesn't have the component.
    * @param entity - Entity that will be used to try to get the component
@@ -171,7 +160,7 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
 /**
  * @public
  */
-export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<DeepReadonlySet<T>> {
+export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T> {
   readonly componentType: ComponentType.GrowOnlyValueSet
 
   /**
@@ -181,6 +170,14 @@ export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<De
    * the script.
    */
   addValue(entity: Entity, val: DeepReadonly<T>): DeepReadonlySet<T>
+
+  /**
+   * Get the readonly component of the entity (to mutate it, use getMutable instead),
+   * throws an error if the entity doesn't have the component.
+   * @param entity - Entity that will be used to get the component
+   * @returns
+   */
+  get(entity: Entity): DeepReadonlySet<T>
 }
 
 /**
