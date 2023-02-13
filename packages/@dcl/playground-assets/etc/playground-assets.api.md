@@ -2595,7 +2595,9 @@ export const UiDropdownResult: ComponentDefinition<PBUiDropdownResult>;
 // Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
 //
 // @public
-export function UiEntity(props: EntityPropTypes): ReactEcs.JSX.Element;
+export function UiEntity(props: EntityPropTypes & {
+    uiText?: UiLabelProps;
+}): ReactEcs.JSX.Element;
 
 // @public (undocumented)
 export type UiFontType = 'sans-serif' | 'serif' | 'monospace';
