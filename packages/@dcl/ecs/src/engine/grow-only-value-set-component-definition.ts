@@ -1,5 +1,4 @@
 import { ISchema } from '../schemas'
-import { ReadWriteByteBuffer, ByteBuffer } from '../serialization/ByteBuffer'
 import { ComponentType, GrowOnlyValueSetComponentDefinition } from './component'
 import { Entity } from './entity'
 import { DeepReadonly, DeepReadonlySet } from './readonly'

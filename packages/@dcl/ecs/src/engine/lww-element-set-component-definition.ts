@@ -1,5 +1,5 @@
 import { ISchema } from '../schemas'
-import { ReadWriteByteBuffer, ByteBuffer } from '../serialization/ByteBuffer'
+import { ReadWriteByteBuffer } from '../serialization/ByteBuffer'
 import {
   PutComponentMessageBody,
   DeleteComponentMessageBody,

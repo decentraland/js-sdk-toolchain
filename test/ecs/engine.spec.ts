@@ -2,7 +2,6 @@ import { cyclicParentingChecker, RESERVED_STATIC_ENTITIES } from '../../packages
 import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
-import { TransformSchema } from '../../packages/@dcl/ecs/src/components/legacy/Transform'
 import { components } from '../../packages/@dcl/ecs/src'
 import { Vector3 } from '../../packages/@dcl/sdk/src/math'
 

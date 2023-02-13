@@ -1,5 +1,4 @@
 import { ISchema } from '../schemas'
-import { ByteBuffer } from '../serialization/ByteBuffer'
 import { CrdtMessageBody, DeleteComponentMessageBody, PutComponentMessageBody } from '../serialization/crdt'
 import { Entity } from './entity'
 import { DeepReadonly, DeepReadonlySet } from './readonly'
