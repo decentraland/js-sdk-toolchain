@@ -8,7 +8,8 @@ import {
   OverflowType,
   Position,
   PositionType,
-  PositionUnit
+  PositionUnit,
+  PositionShorthand
 } from './types'
 
 function capitalize<T extends string>(value: T): Capitalize<T> {
@@ -40,7 +41,7 @@ function parsePositionUnit(val?: PositionUnit): [number | undefined, YGUnit] {
     return [undefined, YGUnit.YGU_UNDEFINED]
   }
 
-  if (typeof val === 'number') {
+  if (typeof val === 'number' || (typeof val === 'string' && !isNaN(Number(val)))) {
     return [Number(val), YGUnit.YGU_POINT]
   }
 
@@ -55,19 +56,45 @@ function parsePositionUnit(val?: PositionUnit): [number | undefined, YGUnit] {
   return [undefined, YGUnit.YGU_UNDEFINED]
 }
 
-// position: { top: '1px' } => { positionTop: 1, positionTopUnit: YGUnit.YGU_Point }
-export function parsePosition<T extends PropName>(position: Partial<Position> = {}, prop: T) {
-  const obj: Partial<PositionParsed> = {}
-  for (const key in position) {
-    const typedKey: keyof Position = key as keyof Position
-    const propKey: PropKey = `${prop}${capitalize(typedKey)}`
-    const propKeyUnit: PropKeyUnit = `${prop}${capitalize(typedKey)}Unit`
-    const [value, unit] = parsePositionUnit(position[typedKey]!)
-    if (value === undefined) continue
-    obj[propKeyUnit] = unit
-    obj[propKey] = value
+export function parsePosition<T extends PropName>(
+  position: Partial<Position> | PositionShorthand = {},
+  prop: T
+): Partial<PositionParsed> {
+  if (typeof position === 'object') {
+    const obj: Partial<PositionParsed> = {}
+    for (const key in position) {
+      const typedKey: keyof Position = key as keyof Position
+      const propKey: PropKey = `${prop}${capitalize(typedKey)}`
+      const propKeyUnit: PropKeyUnit = `${prop}${capitalize(typedKey)}Unit`
+      const [value, unit] = parsePositionUnit(position[typedKey]!)
+      if (value === undefined) continue
+      obj[propKeyUnit] = unit
+      obj[propKey] = value
+    }
+    return obj
   }
-  return obj
+  if (typeof position === 'number') {
+    return parsePosition({ top: position, left: position, right: position, bottom: position }, prop)
+  }
+  const values = position.split(' ').filter((a) => a !== '') as PositionUnit[]
+
+  if (values.length === 1) {
+    const [value] = values
+    return parsePosition({ top: value, left: value, right: value, bottom: value }, prop)
+  }
+
+  if (values.length === 2) {
+    const [topBottom, rigthLeft] = values
+    return parsePosition({ top: topBottom, left: rigthLeft, right: rigthLeft, bottom: topBottom }, prop)
+  }
+
+  if (values.length === 3) {
+    const [top, rigthLeft, bottom] = values
+    return parsePosition({ top, left: rigthLeft, right: rigthLeft, bottom }, prop)
+  }
+
+  const [top, right, bottom, left] = values
+  return parsePosition({ top, right, bottom, left }, prop)
 }
 
 // Size Props

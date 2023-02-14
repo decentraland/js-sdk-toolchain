@@ -2098,10 +2098,13 @@ export interface Position {
 }
 
 // @public
+export type PositionShorthand = PositionUnit | `${PositionUnit} ${PositionUnit}` | `${PositionUnit} ${PositionUnit} ${PositionUnit}` | `${PositionUnit} ${PositionUnit} ${PositionUnit} ${PositionUnit}`;
+
+// @public
 export type PositionType = 'absolute' | 'relative';
 
 // @public
-export type PositionUnit = `${number}px` | `${number}%` | number;
+export type PositionUnit = `${number}px` | `${number}%` | number | `${number}`;
 
 // Warning: (ae-missing-release-tag) "ProcessMessageResultType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2656,14 +2659,14 @@ export interface UiTransformProps {
     flexWrap?: FlexWrapType;
     height?: PositionUnit;
     justifyContent?: JustifyType;
-    margin?: Partial<Position>;
+    margin?: Partial<Position> | PositionShorthand;
     maxHeight?: PositionUnit;
     maxWidth?: PositionUnit;
     minHeight?: PositionUnit;
     minWidth?: PositionUnit;
     overflow?: OverflowType;
-    padding?: Partial<Position>;
-    position?: Partial<Position>;
+    padding?: Partial<Position> | PositionShorthand;
+    position?: Partial<Position> | PositionShorthand;
     positionType?: PositionType;
     width?: PositionUnit;
 }

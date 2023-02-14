@@ -10,7 +10,7 @@ import {
   YGJustify
 } from '../../packages/@dcl/ecs'
 import { components } from '../../packages/@dcl/ecs/src'
-import { Position, PositionUnit, ReactEcs, UiEntity } from '../../packages/@dcl/react-ecs/src'
+import { Position, PositionUnit, ReactEcs, UiEntity, UiTransformProps } from '../../packages/@dcl/react-ecs/src'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 import { setupEngine } from './utils'
 
@@ -202,6 +202,94 @@ describe('UiTransform React Ecs', () => {
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       width: 0,
       widthUnit: YGUnit.YGU_UNDEFINED
+    })
+  })
+
+  it('should parse margin shorthand props', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    let margin: UiTransformProps['margin'] = '1px'
+
+    const ui = () => <UiEntity uiTransform={{ margin }} />
+
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      parent: CANVAS_ROOT_ENTITY,
+      rightOf: 0,
+      marginTop: 1,
+      marginLeft: 1,
+      marginRight: 1,
+      marginBottom: 1,
+      marginTopUnit: YGUnit.YGU_POINT,
+      marginLeftUnit: YGUnit.YGU_POINT,
+      marginRightUnit: YGUnit.YGU_POINT,
+      marginBottomUnit: YGUnit.YGU_POINT
+    })
+    margin = '1px 10%'
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      marginTop: 1,
+      marginLeft: 10,
+      marginRight: 10,
+      marginBottom: 1,
+      marginTopUnit: YGUnit.YGU_POINT,
+      marginLeftUnit: YGUnit.YGU_PERCENT,
+      marginRightUnit: YGUnit.YGU_PERCENT,
+      marginBottomUnit: YGUnit.YGU_POINT
+    })
+    margin = '1px 100 4%'
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      marginTop: 1,
+      marginLeft: 100,
+      marginRight: 100,
+      marginBottom: 4,
+      marginTopUnit: YGUnit.YGU_POINT,
+      marginLeftUnit: YGUnit.YGU_POINT,
+      marginRightUnit: YGUnit.YGU_POINT,
+      marginBottomUnit: YGUnit.YGU_PERCENT
+    })
+    margin = '1% 100% 4 3px'
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      marginTop: 1,
+      marginLeft: 3,
+      marginRight: 100,
+      marginBottom: 4,
+      marginTopUnit: YGUnit.YGU_PERCENT,
+      marginLeftUnit: YGUnit.YGU_POINT,
+      marginRightUnit: YGUnit.YGU_PERCENT,
+      marginBottomUnit: YGUnit.YGU_POINT
+    })
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    margin = {}
+    await engine.update(1)
+
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      marginRight: 0,
+      marginRightUnit: YGUnit.YGU_UNDEFINED
+    })
+    margin = 8
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      marginTop: 8,
+      marginLeft: 8,
+      marginRight: 8,
+      marginBottom: 8,
+      marginTopUnit: YGUnit.YGU_POINT,
+      marginLeftUnit: YGUnit.YGU_POINT,
+      marginRightUnit: YGUnit.YGU_POINT,
+      marginBottomUnit: YGUnit.YGU_POINT
     })
   })
 })
