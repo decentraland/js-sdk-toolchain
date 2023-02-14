@@ -74,6 +74,14 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             transportId,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
           })
+        } else if (header.type === CrdtMessageType.APPEND_VALUE) {
+          const message = AppendValueOperation.read(buffer)!
+          receivedMessages.push({
+            ...header,
+            ...message,
+            transportId,
+            messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
+          })
 
           // Unknown message, we skip it
         } else {
