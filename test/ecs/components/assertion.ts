@@ -1,10 +1,19 @@
-import { LastWriteWinElementSetComponentDefinition, Entity } from '../../../packages/@dcl/ecs/src'
+import {
+  LastWriteWinElementSetComponentDefinition,
+  Entity,
+  ISchema,
+  DeepReadonly
+} from '../../../packages/@dcl/ecs/src'
 import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
 export function testSerializationIdentity<T>(component: LastWriteWinElementSetComponentDefinition<T>, entity: Entity) {
+  testSchemaSerializationIdentity(component.schema, component.get(entity))
+}
+
+export function testSchemaSerializationIdentity<T>(schema: ISchema<T>, value: DeepReadonly<T>) {
   const buffer = new ReadWriteByteBuffer()
-  component.schema.serialize(component.get(entity), buffer)
-  expect(component.schema.deserialize(buffer)).toBeDeepCloseTo(component.get(entity) as any)
+  schema.serialize(value, buffer)
+  expect(schema.deserialize(buffer)).toBeDeepCloseTo(value as any)
 }
 
 export function testComponentSerialization<T>(component: LastWriteWinElementSetComponentDefinition<T>, value: T) {

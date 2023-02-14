@@ -42,23 +42,25 @@ function* serializeCrdtMessages(prefix: string, data: Uint8Array) {
   let message: CrdtMessage | null
 
   while ((message = readMessage(buffer))) {
+    const ent = `0x${message.entityId.toString(16)}`
+    const preface = `  ${prefix}: ${CrdtMessageType[message.type]} e=${ent}`
     if (
       message.type === CrdtMessageType.PUT_COMPONENT ||
       message.type === CrdtMessageType.DELETE_COMPONENT ||
       message.type === CrdtMessageType.APPEND_VALUE
     ) {
-      const { entityId, componentId, timestamp } = message
+      const { componentId, timestamp } = message
       const data = 'data' in message ? message.data : undefined
 
       const c = engine.getComponent(componentId)
 
-      yield `  ${prefix}: e=0x${entityId.toString(16)} c=${componentId} t=${timestamp} data=${JSON.stringify(
+      yield `${preface} c=${componentId} t=${timestamp} data=${JSON.stringify(
         (data && c.schema.deserialize(new ReadWriteByteBuffer(data))) || null
       )}`
     } else if (message.type === CrdtMessageType.DELETE_ENTITY) {
-      yield `  ${prefix}: e=0x${message.entityId.toString(16)} deleted`
+      yield preface
     } else {
-      yield 'Unknown CrdtMessageType'
+      yield `${preface} Unknown CrdtMessageType`
     }
   }
 }
@@ -69,7 +71,7 @@ async function run(fileName: string) {
 
     async function runRendererFrame(data: Uint8Array) {
       const serverUpdates = await vm.onServerUpdate(data)
-      out.push(...Array.from(serializeCrdtMessages('Renderer->Scene', serverUpdates)))
+      out.push(...Array.from(serializeCrdtMessages('Renderer', serverUpdates)))
 
       if (serverUpdates?.length) {
         return [serverUpdates]
@@ -100,7 +102,7 @@ async function run(fileName: string) {
             },
             async crdtSendToRenderer(payload: { data: Uint8Array }): Promise<{ data: Uint8Array[] }> {
               const data = new Uint8Array(Object.values(payload.data))
-              out.push(...Array.from(serializeCrdtMessages('CRDT', data)))
+              out.push(...Array.from(serializeCrdtMessages('Scene', data)))
               const serverUpdates = await runRendererFrame(data)
               return { data: serverUpdates }
             },

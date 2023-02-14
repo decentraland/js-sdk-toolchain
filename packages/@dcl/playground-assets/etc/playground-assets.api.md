@@ -426,11 +426,6 @@ export type Color4Type = {
 // @public (undocumented)
 export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T> | GrowOnlyValueSetComponentDefinition<T>;
 
-// Warning: (ae-missing-release-tag) "ComponentGetter" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type ComponentGetter<T extends LastWriteWinElementSetComponentDefinition<any>> = (engine: Pick<IEngine, 'defineComponentFromSchema'>) => T;
-
 // @public
 export const enum ComponentType {
     // (undocumented)
@@ -627,7 +622,7 @@ export enum EntityState {
 export const Epsilon = 0.000001;
 
 // @public (undocumented)
-export type EventSystemCallback = (event: PBPointerEventsResult_PointerCommand) => void;
+export type EventSystemCallback = (event: PBPointerEventsResult) => void;
 
 // @public (undocumented)
 export type EventSystemOptions = {
@@ -704,6 +699,11 @@ export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T>
     get(entity: Entity): DeepReadonlySet<T>;
 }
 
+// Warning: (ae-missing-release-tag) "GSetComponentGetter" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type GSetComponentGetter<T extends GrowOnlyValueSetComponentDefinition<any>> = (engine: Pick<IEngine, 'defineValueSetComponentFromSchema'>) => T;
+
 // @public (undocumented)
 export interface IEngine {
     addEntity(dynamic?: boolean): Entity;
@@ -714,6 +714,7 @@ export interface IEngine {
     componentsIter(): Iterable<ComponentDefinition<unknown>>;
     defineComponent<T extends Spec>(componentName: string, spec: T, constructorDefault?: Partial<MapResult<T>>): MapComponentDefinition<MapResult<T>>;
     defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): LastWriteWinElementSetComponentDefinition<T>;
+    defineValueSetComponentFromSchema<T>(componentName: string, spec: ISchema<T>, options: ValueSetOptions<T>): GrowOnlyValueSetComponentDefinition<T>;
     getComponent<T>(componentId: number): ComponentDefinition<T>;
     getComponentOrNull<T>(componentId: number): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
@@ -916,7 +917,7 @@ export interface IEvents {
 export type IInputSystem = {
     isTriggered: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
     isPressed: (inputAction: InputAction) => boolean;
-    getInputCommand: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => PBPointerEventsResult_PointerCommand | null;
+    getInputCommand: (inputAction: InputAction, pointerEventType: PointerEventType, entity: Entity) => PBPointerEventsResult | null;
 };
 
 // @public
@@ -1059,6 +1060,11 @@ export type Listeners = {
     onMouseDown?: Callback;
     onMouseUp?: Callback;
 };
+
+// Warning: (ae-missing-release-tag) "LwwComponentGetter" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type LwwComponentGetter<T extends LastWriteWinElementSetComponentDefinition<any>> = (engine: Pick<IEngine, 'defineComponentFromSchema'>) => T;
 
 // @public
 export interface MapComponentDefinition<T> extends LastWriteWinElementSetComponentDefinition<T> {
@@ -1785,11 +1791,6 @@ export interface PBPointerEvents_Info {
 
 // @public (undocumented)
 export interface PBPointerEventsResult {
-    commands: PBPointerEventsResult_PointerCommand[];
-}
-
-// @public (undocumented)
-export interface PBPointerEventsResult_PointerCommand {
     analog?: number | undefined;
     button: InputAction;
     // (undocumented)
@@ -2085,7 +2086,7 @@ export namespace Plane {
 export const PointerEvents: LastWriteWinElementSetComponentDefinition<PBPointerEvents>;
 
 // @public (undocumented)
-export const PointerEventsResult: LastWriteWinElementSetComponentDefinition<PBPointerEventsResult>;
+export const PointerEventsResult: GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>;
 
 // @public (undocumented)
 export interface PointerEventsSystem {
@@ -2696,6 +2697,12 @@ export interface UiTransformProps {
 
 // @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;
+
+// @public (undocumented)
+export type ValueSetOptions<T> = {
+    timestampFunction: (value: DeepReadonly<T>) => number;
+    maxElements: number;
+};
 
 // @public
 export type Vector3 = Vector3.ReadonlyVector3;

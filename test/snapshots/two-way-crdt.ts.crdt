@@ -7,44 +7,44 @@ EVAL test/snapshots/two-way-crdt.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 15k
-  MALLOC_COUNT = 6352
+  MALLOC_COUNT = 6410
   ALIVE_OBJS_DELTA ~= 1.09k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
-  Renderer->Scene: e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
+  Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
   OPCODES ~= 2k
-  MALLOC_COUNT = 52
+  MALLOC_COUNT = 50
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.0)
   LOG: ["✅ RootEntity has a transform"]
   LOG: ["✅ RootEntity has the correct scale"]
-  CRDT: e=0x0 c=1 t=2 data={"position":{"x":1,"y":1,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
-  CRDT: e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  Scene: PUT_COMPONENT e=0x0 c=1 t=2 data={"position":{"x":1,"y":1,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
+  Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   LOG: ["Adding one to position.y=1"]
-  Renderer->Scene: e=0x0 c=1 t=3 data={"position":{"x":2,"y":1,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
+  Renderer: PUT_COMPONENT e=0x0 c=1 t=3 data={"position":{"x":2,"y":1,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
   OPCODES ~= 11k
   MALLOC_COUNT = 41
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
-  CRDT: e=0x200 c=1 t=2 data=null
-  CRDT: e=0x0 c=1 t=4 data=null
-  CRDT: e=0x200 deleted
-  OPCODES ~= 6k
+  Scene: DELETE_COMPONENT e=0x200 c=1 t=2 data=null
+  Scene: DELETE_COMPONENT e=0x0 c=1 t=4 data=null
+  Scene: DELETE_ENTITY e=0x200
+  OPCODES ~= 9k
   MALLOC_COUNT = -49
   ALIVE_OBJS_DELTA ~= -0.02k
 CALL onUpdate(0.1)
-  CRDT: e=0x0 c=1 t=5 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  Scene: PUT_COMPONENT e=0x0 c=1 t=5 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   LOG: ["Adding one to position.y=0"]
-  Renderer->Scene: e=0x0 c=1 t=6 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 6k
+  Renderer: PUT_COMPONENT e=0x0 c=1 t=6 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  OPCODES ~= 8k
   MALLOC_COUNT = 35
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
   LOG: ["✅ RootEntity has the correct position"]
   LOG: ["✅ RootEntity has the correct scale"]
   LOG: ["Adding one to position.y=0"]
-  Renderer->Scene: e=0x0 c=1 t=7 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 4k
+  Renderer: PUT_COMPONENT e=0x0 c=1 t=7 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  OPCODES ~= 7k
   MALLOC_COUNT = -1
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 795.38k bytes
+  MEMORY_USAGE_COUNT ~= 806.90k bytes

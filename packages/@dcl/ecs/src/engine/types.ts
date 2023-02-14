@@ -2,11 +2,17 @@ import type { ISchema } from '../schemas/ISchema'
 import { MapResult, Spec } from '../schemas/Map'
 import { OnChangeFunction } from '../systems/crdt'
 import { Transport } from '../systems/crdt/types'
-import { ComponentDefinition, LastWriteWinElementSetComponentDefinition } from './component'
+import {
+  ComponentDefinition,
+  GrowOnlyValueSetComponentDefinition,
+  LastWriteWinElementSetComponentDefinition
+} from './component'
 import { Entity, EntityContainer, EntityState } from './entity'
+import { ValueSetOptions } from './grow-only-value-set-component-definition'
 import { ReadonlyComponentSchema } from './readonly'
 import { SystemFn, SystemItem } from './systems'
 export * from './component'
+export { ValueSetOptions }
 
 /**
  * @public
@@ -46,6 +52,7 @@ export type PreEngine = Pick<
   | 'removeSystem'
   | 'defineComponent'
   | 'defineComponentFromSchema'
+  | 'defineValueSetComponentFromSchema'
   | 'registerComponentDefinition'
   | 'getEntitiesWith'
   | 'getComponent'
@@ -172,7 +179,24 @@ export interface IEngine {
    * ```
    */
   defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): LastWriteWinElementSetComponentDefinition<T>
-
+  /**
+   * @public
+   * Defines a value set component.
+   * @param componentName - unique name to identify the component, a hash is calculated for it, it will fail if the hash has collisions.
+   * @param spec - An object with schema fields
+   * @returns The component definition
+   *
+   * @example
+   * ```ts
+   * const StateComponentId = 10023
+   * const StateComponent = engine.defineValueSetComponentFromSchema("my-lib::VisibleComponent", Schemas.Int)
+   * ```
+   */
+  defineValueSetComponentFromSchema<T>(
+    componentName: string,
+    spec: ISchema<T>,
+    options: ValueSetOptions<T>
+  ): GrowOnlyValueSetComponentDefinition<T>
   /**
    * @public
    * Get the component definition from the component id.

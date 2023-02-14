@@ -5,7 +5,7 @@ import {
   components,
   PointerEventType,
   InputAction,
-  PBPointerEventsResult_PointerCommand
+  PBPointerEventsResult
 } from '../../../packages/@dcl/ecs/src'
 
 describe('Events helpers isTriggered', () => {
@@ -30,9 +30,7 @@ describe('Events helpers isTriggered', () => {
     const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
     const { isTriggered } = createInputSystem(newEngine)
-    PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)]
-    })
+    PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN))
 
     expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)).toBe(true)
     expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_UP, entity)).toBe(false)
@@ -44,9 +42,7 @@ describe('Events helpers isTriggered', () => {
     const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
     const { isTriggered } = createInputSystem(newEngine)
-    PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)]
-    })
+    PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN))
 
     expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)).toBe(true)
 
@@ -59,9 +55,7 @@ describe('Events helpers isTriggered', () => {
     const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
     const { isPressed } = createInputSystem(newEngine)
-    PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)]
-    })
+    PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN))
 
     await newEngine.update(0)
     expect(isPressed(InputAction.IA_POINTER)).toBe(true)
@@ -76,7 +70,7 @@ function createTestPointerDownCommand(
   entity: Entity,
   timestamp: number,
   state: PointerEventType
-): PBPointerEventsResult_PointerCommand {
+): PBPointerEventsResult {
   return {
     button: InputAction.IA_POINTER,
     timestamp: timestamp,

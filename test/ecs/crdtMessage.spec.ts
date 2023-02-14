@@ -1,5 +1,5 @@
 import * as components from '../../packages/@dcl/ecs/src/components'
-import { TRANSFORM_LENGTH } from '../../packages/@dcl/ecs/src/components/legacy/Transform'
+import { TRANSFORM_LENGTH } from '../../packages/@dcl/ecs/src/components/manual/Transform'
 import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/src/math'
 

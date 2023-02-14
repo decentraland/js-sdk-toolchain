@@ -1,9 +1,10 @@
 import * as components from '../components'
 import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_events.gen'
-import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
+import { PBPointerEventsResult } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
 import { Schemas } from '../schemas'
 import { Entity } from './entity'
+import { DeepReadonly } from './readonly'
 import { IEngine } from './types'
 
 const InputCommands: InputAction[] = [
@@ -33,7 +34,7 @@ export type IInputSystem = {
    * @param entity - the entity to query, ignore for global events.
    * @returns true if the entity was clicked in the last tick-update
    */
-  isClicked: (inputAction: InputAction, entity?: Entity) => boolean
+  isClicked: (inputAction: InputAction, entity: Entity) => boolean
 
   /**
    * @public
@@ -65,8 +66,8 @@ export type IInputSystem = {
     inputAction: InputAction,
     entity?: Entity
   ) => {
-    up: PBPointerEventsResult_PointerCommand
-    down: PBPointerEventsResult_PointerCommand
+    up: PBPointerEventsResult
+    down: PBPointerEventsResult
   } | null
 
   /**
@@ -80,8 +81,8 @@ export type IInputSystem = {
   getInputCommand: (
     inputAction: InputAction,
     pointerEventType: PointerEventType,
-    entity?: Entity
-  ) => PBPointerEventsResult_PointerCommand | null
+    entity: Entity
+  ) => PBPointerEventsResult | null
 }
 
 const InternalInputStateSchema = {
@@ -122,45 +123,44 @@ export function createInputSystem(engine: IEngine): IInputSystem {
     }
   }
 
-  function* commandIterator() {
-    for (const [, value] of engine.getEntitiesWith(PointerEventsResult)) {
-      yield* value.commands
-    }
-  }
-
   function findLastAction(
     pointerEventType: PointerEventType,
     inputAction: InputAction,
-    entity?: Entity
-  ): PBPointerEventsResult_PointerCommand | undefined {
-    let commandToReturn: PBPointerEventsResult_PointerCommand | undefined = undefined
-
-    for (const command of commandIterator()) {
-      if (
-        command.button === inputAction &&
-        command.state === pointerEventType &&
-        (!entity || (command.hit && entity === command.hit.entityId))
-      ) {
-        if (!commandToReturn || command.timestamp >= commandToReturn.timestamp) commandToReturn = command
+    entity: Entity
+  ): PBPointerEventsResult | undefined {
+    const ascendingTimestampIterator = PointerEventsResult.get(entity)
+    for (const command of Array.from(ascendingTimestampIterator).reverse()) {
+      if (command.button === inputAction && command.state === pointerEventType) {
+        return command
       }
     }
+  }
 
-    return commandToReturn
+  function* findCommandsByActionDescending(
+    inputAction: InputAction,
+    entity: Entity
+  ): Iterable<DeepReadonly<PBPointerEventsResult>> {
+    const ascendingTimestampIterator = PointerEventsResult.get(entity)
+    for (const command of Array.from(ascendingTimestampIterator).reverse()) {
+      if (command.button === inputAction) {
+        yield command
+      }
+    }
   }
 
   function buttonStateUpdateSystem() {
-    const component = PointerEventsResult.getOrNull(engine.RootEntity)
+    const globalState = InternalInputStateComponent.getMutable(engine.RootEntity)
 
-    if (!component) return
-
-    const state = InternalInputStateComponent.getMutable(engine.RootEntity)
-
-    for (const command of commandIterator()) {
-      if (command.timestamp > state.buttonState[command.button].ts) {
-        if (command.state === PointerEventType.PET_DOWN) {
-          state.buttonState[command.button].value = true
-        } else if (command.state === PointerEventType.PET_UP) {
-          state.buttonState[command.button].value = false
+    for (const [, commands] of engine.getEntitiesWith(PointerEventsResult)) {
+      for (const command of Array.from(commands).reverse()) {
+        if (command.timestamp > globalState.buttonState[command.button].ts) {
+          if (command.state === PointerEventType.PET_DOWN) {
+            globalState.buttonState[command.button].value = true
+          } else if (command.state === PointerEventType.PET_UP) {
+            globalState.buttonState[command.button].value = false
+          }
+        } else {
+          break
         }
       }
     }
@@ -171,25 +171,36 @@ export function createInputSystem(engine: IEngine): IInputSystem {
 
   function getClick(inputAction: InputAction, entity?: Entity) {
     if (inputAction !== InputAction.IA_ANY) {
-      return findClick(inputAction, entity)
+      return findClick(inputAction, entity ?? engine.RootEntity)
     }
 
     for (const input of InputCommands) {
-      const cmd = findClick(input, entity)
+      const cmd = findClick(input, entity ?? engine.RootEntity)
       if (cmd) return cmd
     }
     return null
   }
 
-  function findClick(inputAction: InputAction, entity?: Entity) {
-    // We search the last DOWN command sorted by timestamp
-    const down = findLastAction(PointerEventType.PET_DOWN, inputAction, entity)
-    // We search the last UP command sorted by timestamp
-    if (!down) return null
+  function findClick(inputAction: InputAction, entity: Entity) {
+    let down: PBPointerEventsResult | null = null
+    let up: PBPointerEventsResult | null = null
 
-    const up = findLastAction(PointerEventType.PET_UP, inputAction, entity)
+    // We search the last UP & DOWN command sorted by timestamp descending
+    for (const it of findCommandsByActionDescending(inputAction, entity)) {
+      if (!up) {
+        if (it.state === PointerEventType.PET_UP) {
+          up = it
+          continue
+        }
+      } else if (!down) {
+        if (it.state === PointerEventType.PET_DOWN) {
+          down = it
+          continue
+        }
+      }
+    }
 
-    if (!up) return null
+    if (!up || !down) return null
 
     const state = InternalInputStateComponent.get(engine.RootEntity)
 
@@ -207,8 +218,8 @@ export function createInputSystem(engine: IEngine): IInputSystem {
   function getInputCommand(
     inputAction: InputAction,
     pointerEventType: PointerEventType,
-    entity?: Entity
-  ): PBPointerEventsResult_PointerCommand | null {
+    entity: Entity
+  ): PBPointerEventsResult | null {
     if (inputAction !== InputAction.IA_ANY) {
       return findInputCommand(inputAction, pointerEventType, entity)
     }
@@ -223,8 +234,8 @@ export function createInputSystem(engine: IEngine): IInputSystem {
   function findInputCommand(
     inputAction: InputAction,
     pointerEventType: PointerEventType,
-    entity?: Entity
-  ): PBPointerEventsResult_PointerCommand | null {
+    entity: Entity
+  ): PBPointerEventsResult | null {
     // We search the last pointer Event command sorted by timestamp
     const command = findLastAction(pointerEventType, inputAction, entity)
     if (!command) return null
@@ -241,12 +252,12 @@ export function createInputSystem(engine: IEngine): IInputSystem {
     }
   }
 
-  function isClicked(inputAction: InputAction, entity?: Entity) {
+  function isClicked(inputAction: InputAction, entity: Entity) {
     return getClick(inputAction, entity) !== null
   }
 
   function isTriggered(inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) {
-    return getInputCommand(inputAction, pointerEventType, entity) !== null
+    return getInputCommand(inputAction, pointerEventType, entity || engine.RootEntity) !== null
   }
 
   function isPressed(inputAction: InputAction) {

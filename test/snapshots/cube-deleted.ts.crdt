@@ -7,37 +7,37 @@ EVAL test/snapshots/cube-deleted.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 15k
-  MALLOC_COUNT = 6018
+  MALLOC_COUNT = 6073
   ALIVE_OBJS_DELTA ~= 1.00k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 2
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.0)
-  CRDT: e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  CRDT: e=0x201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
+  Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  Scene: PUT_COMPONENT e=0x201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   OPCODES ~= 6k
-  MALLOC_COUNT = 56
+  MALLOC_COUNT = 54
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
-  CRDT: e=0x201 c=1019 t=2 data=null
-  CRDT: e=0x202 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-  CRDT: e=0x201 deleted
-  OPCODES ~= 3k
+  Scene: DELETE_COMPONENT e=0x201 c=1019 t=2 data=null
+  Scene: PUT_COMPONENT e=0x202 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
+  Scene: DELETE_ENTITY e=0x201
+  OPCODES ~= 6k
   MALLOC_COUNT = 8
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
-  CRDT: e=0x202 c=1019 t=2 data=null
-  CRDT: e=0x10201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-  CRDT: e=0x202 deleted
-  OPCODES ~= 3k
+  Scene: DELETE_COMPONENT e=0x202 c=1019 t=2 data=null
+  Scene: PUT_COMPONENT e=0x10201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
+  Scene: DELETE_ENTITY e=0x202
+  OPCODES ~= 6k
   MALLOC_COUNT = 4
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
-  CRDT: e=0x10201 c=1019 t=2 data=null
-  CRDT: e=0x10202 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-  CRDT: e=0x10201 deleted
-  OPCODES ~= 3k
+  Scene: DELETE_COMPONENT e=0x10201 c=1019 t=2 data=null
+  Scene: PUT_COMPONENT e=0x10202 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
+  Scene: DELETE_ENTITY e=0x10201
+  OPCODES ~= 6k
   MALLOC_COUNT = 1
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 792.22k bytes
+  MEMORY_USAGE_COUNT ~= 803.68k bytes

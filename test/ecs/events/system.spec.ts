@@ -17,10 +17,7 @@ describe('Events System', () => {
     let fakeCounter = 0
 
     fakePointer = (entity, pointerType, button) => {
-      const pointerEvents =
-        PointerEventsResult.getMutableOrNull(engine.RootEntity) || PointerEventsResult.create(engine.RootEntity)
-
-      pointerEvents.commands.push(createTestPointerDownCommand(entity, fakeCounter + 1, pointerType, button))
+      PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, fakeCounter + 1, pointerType, button))
       fakeCounter += 1
     }
   })

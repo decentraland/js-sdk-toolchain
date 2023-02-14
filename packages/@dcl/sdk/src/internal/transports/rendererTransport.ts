@@ -33,7 +33,6 @@ export function createRendererTransport(engineApi: EngineApiForTransport): Trans
     filter(message: TransportMessage) {
       // Only send renderer components (Proto Generated)
       if (
-        (message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.DELETE_COMPONENT) &&
         // filter out messages for non-core components
         (message as any).componentId > MAX_STATIC_COMPONENT
       ) {

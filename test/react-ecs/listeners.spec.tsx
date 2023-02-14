@@ -11,9 +11,10 @@ describe('Ui MosueDown React Ecs', () => {
   const uiEntity = ((engine.addEntity() as number) + 1) as Entity
   let fakeCounter = 0
   const mouseDownEvent = () => {
-    PointerEventsResult.createOrReplace(engine.RootEntity, {
-      commands: [createTestPointerDownCommand(uiEntity, fakeCounter + 1, PointerEventType.PET_DOWN)]
-    })
+    PointerEventsResult.addValue(
+      uiEntity,
+      createTestPointerDownCommand(uiEntity, fakeCounter + 1, PointerEventType.PET_DOWN)
+    )
     fakeCounter += 1
   }
   let counter = 0
@@ -75,9 +76,10 @@ describe('Ui MouseUp React Ecs', () => {
   const uiEntity = ((engine.addEntity() as number) + 1) as Entity
   let fakeCounter = 0
   const mouseDownEvent = () => {
-    PointerEventsResult.createOrReplace(engine.RootEntity, {
-      commands: [createTestPointerDownCommand(uiEntity, fakeCounter + 1, PointerEventType.PET_UP)]
-    })
+    PointerEventsResult.addValue(
+      uiEntity,
+      createTestPointerDownCommand(uiEntity, fakeCounter + 1, PointerEventType.PET_UP)
+    )
     fakeCounter += 1
   }
   let counter = 0

@@ -12,6 +12,10 @@ import { Entity, EntityContainer } from './entity'
 import { ReadonlyComponentSchema } from './readonly'
 import { SystemItem, SystemContainer, SystemFn, SYSTEMS_REGULAR_PRIORITY } from './systems'
 import type { IEngine, IEngineOptions, MapComponentDefinition, PreEngine } from './types'
+import {
+  createValueSetComponentDefinitionFromSchema,
+  ValueSetOptions
+} from './grow-only-value-set-component-definition'
 export * from './input'
 export * from './readonly'
 export * from './types'
@@ -84,6 +88,24 @@ function preEngine(): PreEngine {
     const newComponent = createComponentDefinitionFromSchema<T>(componentName, componentId, schema)
     componentsDefinition.set(componentId, newComponent)
     return newComponent as components.LastWriteWinElementSetComponentDefinition<T>
+  }
+
+  function defineValueSetComponentFromSchema<T>(
+    componentName: string,
+    schema: ISchema<T>,
+    options: ValueSetOptions<T>
+  ): components.GrowOnlyValueSetComponentDefinition<T> {
+    /* istanbul ignore next */
+    if (sealed) throw new Error('Engine is already sealed. No components can be added at this stage')
+    const componentId = componentNumberFromName(componentName)
+    const prev = componentsDefinition.get(componentId)
+    if (prev) {
+      // TODO: assert spec === prev.spec
+      return prev as components.GrowOnlyValueSetComponentDefinition<T>
+    }
+    const newComponent = createValueSetComponentDefinitionFromSchema<T>(componentName, componentId, schema, options)
+    componentsDefinition.set(componentId, newComponent)
+    return newComponent as components.GrowOnlyValueSetComponentDefinition<T>
   }
 
   function defineComponent<T extends Spec>(
@@ -206,6 +228,7 @@ function preEngine(): PreEngine {
     removeSystem,
     defineComponent,
     defineComponentFromSchema,
+    defineValueSetComponentFromSchema,
     getEntitiesWith,
     getComponent,
     getComponentOrNull,
@@ -250,6 +273,7 @@ export function Engine(options?: IEngineOptions): IEngine {
     removeSystem: partialEngine.removeSystem,
     defineComponent: partialEngine.defineComponent,
     defineComponentFromSchema: partialEngine.defineComponentFromSchema,
+    defineValueSetComponentFromSchema: partialEngine.defineValueSetComponentFromSchema,
     registerComponentDefinition: partialEngine.registerComponentDefinition,
     getEntitiesWith: partialEngine.getEntitiesWith,
     getComponent: partialEngine.getComponent,

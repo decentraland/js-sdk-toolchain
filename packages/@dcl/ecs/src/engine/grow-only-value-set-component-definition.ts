@@ -24,18 +24,23 @@ function sortByTimestamp(a: { timestamp: number }, b: { timestamp: number }) {
 }
 
 /**
+ * @public
+ */
+export type ValueSetOptions<T> = {
+  // function that returns a timestamp from the value
+  timestampFunction: (value: DeepReadonly<T>) => number
+  // max elements to store in memory, ordered by timestamp
+  maxElements: number
+}
+
+/**
  * @internal
  */
 export function createValueSetComponentDefinitionFromSchema<T>(
   componentName: string,
   componentId: number,
   schema: ISchema<T>,
-  options: {
-    // function that returns a timestamp from the value
-    timestampFunction: (value: DeepReadonly<T>) => number
-    // max elements to store in memory, ordered by timestamp
-    maxElements: number
-  }
+  options: ValueSetOptions<T>
 ): GrowOnlyValueSetComponentDefinition<T> {
   type InternalDatastructure = {
     raw: Array<{ value: DeepReadonly<T>; timestamp: number }>

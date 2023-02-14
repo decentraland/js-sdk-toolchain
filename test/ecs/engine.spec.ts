@@ -488,14 +488,15 @@ describe('Engine tests', () => {
   })
 
   it('should not remove the component after the update', async () => {
+    // TODO: wtf is this test?
     const engine = Engine()
-    const PointerEventsResult = components.PointerEventsResult(engine)
-    PointerEventsResult.create(engine.RootEntity)
+    const Transform = components.Transform(engine)
+    Transform.create(engine.RootEntity, {})
     await engine.update(1 / 30)
-    expect(PointerEventsResult.has(engine.RootEntity)).toBe(true)
+    expect(Transform.has(engine.RootEntity)).toBe(true)
   })
 
-  it('should return the default component of the transform', async () => {
+  it('Component.create(entity) should equal Component.schema.create()', async () => {
     const engine = Engine()
     const Transform = components.Transform(engine)
     expect(Transform.create(engine.addEntity())).toBeDeepCloseTo(Transform.schema.create())
