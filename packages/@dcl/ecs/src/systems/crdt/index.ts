@@ -53,7 +53,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         if (header.type === CrdtMessageType.DELETE_COMPONENT) {
           const message = DeleteComponent.read(buffer)!
           receivedMessages.push({
-            ...header,
             ...message,
             transportId,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
@@ -61,7 +60,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         } else if (header.type === CrdtMessageType.PUT_COMPONENT) {
           const message = PutComponentOperation.read(buffer)!
           receivedMessages.push({
-            ...header,
             ...message,
             transportId,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
@@ -69,7 +67,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
           const message = DeleteEntity.read(buffer)!
           receivedMessages.push({
-            ...header,
             ...message,
             transportId,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
@@ -77,7 +74,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         } else if (header.type === CrdtMessageType.APPEND_VALUE) {
           const message = AppendValueOperation.read(buffer)!
           receivedMessages.push({
-            ...header,
             ...message,
             transportId,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())

@@ -16,22 +16,26 @@ describe('Events helpers isTriggered', () => {
   })
 
   it('no rootEntity', async () => {
+    // TODO: what does this test actually tests?
     const engine = Engine()
     components.PointerEventsResult(engine)
     engine.addEntity()
     createInputSystem(engine)
 
     await engine.update(1)
-    expect(1).toBe(1)
   })
 
-  it('detect pointerEvent', () => {
+  it('detect pointerEvent', async () => {
     const newEngine = Engine()
     const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
     const { isTriggered } = createInputSystem(newEngine)
     PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN))
 
+    // we must run the systems to update the internal inputSystem state
+    await newEngine.update(1)
+
+    // then assert
     expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)).toBe(true)
     expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_UP, entity)).toBe(false)
     expect(isTriggered(InputAction.IA_ACTION_3, PointerEventType.PET_UP, entity)).toBe(false)
@@ -44,8 +48,11 @@ describe('Events helpers isTriggered', () => {
     const { isTriggered } = createInputSystem(newEngine)
     PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN))
 
+    // we must run the systems to update the internal inputSystem state
+    await newEngine.update(1)
     expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)).toBe(true)
 
+    // in the next tick we will no-longer see the entity bing triggered==true
     await newEngine.update(0)
     expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)).toBe(false)
   })

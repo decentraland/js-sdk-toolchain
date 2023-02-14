@@ -1,4 +1,4 @@
-import { Transport, TransportMessage, CrdtMessageType } from '@dcl/ecs'
+import { Transport, TransportMessage } from '@dcl/ecs'
 import { MAX_STATIC_COMPONENT } from '@dcl/ecs/dist/components/component-number'
 import type { CrdtSendToRendererRequest, CrdtSendToResponse } from '~system/EngineApi'
 

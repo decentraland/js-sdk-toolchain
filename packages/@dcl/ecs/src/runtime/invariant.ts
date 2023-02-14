@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 type K = unknown | Promise<unknown>
 
 declare const DEBUG: boolean

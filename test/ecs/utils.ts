@@ -2,7 +2,7 @@ import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/math'
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
 import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { componentNumberFromName } from '../../packages/@dcl/ecs/src/components/component-number'
-import { TransportMessage, Transport, CrdtMessageHeader } from '../../packages/@dcl/ecs/src'
+import { Transport, CrdtMessageHeader } from '../../packages/@dcl/ecs/src'
 import { CrdtMessageProtocol, CrdtMessageType } from './../../packages/@dcl/ecs/src/serialization/crdt'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { components, Schemas } from '../../packages/@dcl/ecs/src'
@@ -12,8 +12,8 @@ export function createNetworkTransport(): Transport {
 
   return {
     send,
-    filter(message: TransportMessage): boolean {
-      return !!message
+    filter(): boolean {
+      return true
     }
   }
 }
@@ -107,6 +107,7 @@ export namespace SandBox {
 
       const Transform = components.Transform(engine)
       const MeshRenderer = components.MeshRenderer(engine)
+      const PointerEventsResult = components.PointerEventsResult(engine)
       const Material = components.Material(engine)
 
       return {
@@ -117,6 +118,7 @@ export namespace SandBox {
         shuffleOutgoingMessages,
         Transform,
         MeshRenderer,
+        PointerEventsResult,
         Material,
         operations
       }
@@ -154,7 +156,7 @@ export namespace SandBox {
         value: unknown
       }[] = []
       const engine = Engine({
-        onChangeFunction: (entity, _operation, component, value) => {
+        onChangeFunction: (entity, operation, component, value) => {
           operations.push({
             entity,
             value

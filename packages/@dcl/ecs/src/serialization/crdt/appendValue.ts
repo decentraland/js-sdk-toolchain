@@ -36,10 +36,12 @@ export namespace AppendValueOperation {
   export function read(buf: ByteBuffer): AppendValueMessage | null {
     const header = CrdtMessageProtocol.readHeader(buf)
 
+    /* istanbul ignore if */
     if (!header) {
       return null
     }
 
+    /* istanbul ignore if */
     if (header.type !== CrdtMessageType.APPEND_VALUE) {
       throw new Error('AppendValueOperation tried to read another message type.')
     }

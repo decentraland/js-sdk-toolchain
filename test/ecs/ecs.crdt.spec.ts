@@ -15,6 +15,7 @@ import { SandBox, wait } from './utils'
 async function simpleScene(engine: IEngine) {
   const Transform = components.Transform(engine)
   const MeshRenderer = components.MeshRenderer(engine)
+  const PointerEventsResult = components.PointerEventsResult(engine)
 
   const entityA = engine.addEntity()
   Transform.create(entityA, { position: Vector3.One() })
@@ -25,6 +26,10 @@ async function simpleScene(engine: IEngine) {
   }
 
   MeshRenderer.setCylinder(entityA)
+
+  PointerEventsResult.addValue(entityA, PointerEventsResult.schema.create())
+
+  await engine.update(1)
 
   const tenEntities: Entity[] = []
   for (let i = 0; i < 10; i++) {
@@ -44,8 +49,12 @@ async function simpleScene(engine: IEngine) {
   await engine.update(1)
 
   const entityShouldReused = engine.addEntity()
-  Transform.create(entityShouldReused, { position: Vector3.Left() })
+  Transform.create(entityShouldReused, { position: Vector3.Right() })
   MeshRenderer.setPlane(entityShouldReused)
+
+  await engine.update(1)
+
+  PointerEventsResult.addValue(entityShouldReused, PointerEventsResult.schema.create())
 
   await engine.update(1)
 
