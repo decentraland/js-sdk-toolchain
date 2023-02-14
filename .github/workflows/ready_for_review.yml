@@ -1,0 +1,32 @@
+name: Manual - Lint & Snapshot update
+
+on:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
+
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - name: install npm v8
+        run: npm i -g npm@8
+      - name: install
+        run: make install
+      - name: lint
+        run: make lint-fix
+      - name: test
+        run: make update-snapshots
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: automatic linter and snapshot tests
