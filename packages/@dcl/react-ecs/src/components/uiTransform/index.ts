@@ -10,7 +10,7 @@ import {
   parseSize
 } from './utils'
 import { UiTransformProps } from './types'
-import { YGAlign, YGUnit } from '@dcl/ecs'
+import { YGAlign, YGDisplay, YGFlexDirection, YGJustify, YGOverflow, YGPositionType, YGUnit } from '@dcl/ecs'
 import { PBUiTransform } from '@dcl/ecs/dist/components'
 
 /**
@@ -18,10 +18,13 @@ import { PBUiTransform } from '@dcl/ecs/dist/components'
  */
 export const CANVAS_ROOT_ENTITY = 0
 
-const defaultUiTransform: Omit<
-  PBUiTransform,
-  'display' | 'justifyContent' | 'alignSelf' | 'overflow' | 'flexDirection' | 'positionType'
-> = {
+const defaultUiTransform: PBUiTransform = {
+  overflow: YGOverflow.YGO_VISIBLE,
+  display: YGDisplay.YGD_FLEX,
+  justifyContent: YGJustify.YGJ_FLEX_START,
+  alignSelf: YGAlign.YGA_AUTO,
+  flexDirection: YGFlexDirection.YGFD_ROW,
+  positionType: YGPositionType.YGPT_RELATIVE,
   parent: CANVAS_ROOT_ENTITY,
   rightOf: 0,
   flexBasis: 0,
@@ -70,7 +73,8 @@ const defaultUiTransform: Omit<
  */
 /*#__PURE__*/
 export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
-  const { height, minHeight, maxHeight, width, minWidth, maxWidth, ...otherProps } = props
+  const { height, minHeight, maxHeight, width, minWidth, maxWidth, alignItems, alignContent, flexWrap, ...otherProps } =
+    props
   return {
     ...defaultUiTransform,
     ...otherProps,
@@ -84,13 +88,14 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     ...parseSize(props.minWidth, 'minWidth'),
     ...parseSize(props.maxWidth, 'maxWidth'),
     ...getDisplay(props.display),
-    ...getAlign('alignContent', props.alignContent, YGAlign.YGA_FLEX_START),
-    ...getAlign('alignSelf', props.alignSelf, YGAlign.YGA_FLEX_START),
-    ...getAlign('alignItems', props.alignItems, YGAlign.YGA_FLEX_START),
+    ...getAlign('alignSelf', props.alignSelf ?? 'auto'),
     ...getJustify(props.justifyContent),
     ...getFlexDirection(props.flexDirection),
-    ...getFlexWrap(props.flexWrap),
     ...getOverflow(props.overflow),
-    ...getPoistionType(props.positionType)
+    ...getPoistionType(props.positionType),
+    // Optional values
+    ...(alignContent && getAlign('alignContent', alignContent)),
+    ...(alignItems && getAlign('alignItems', alignItems)),
+    ...(flexWrap && getFlexWrap(flexWrap))
   }
 }

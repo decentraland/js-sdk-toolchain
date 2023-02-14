@@ -1,9 +1,27 @@
 /**
- * Position unit for the user.
- * i.e. width="100", width="100%", width="100px"
+ * unit value specified. i.e. 1 || '100%' || '1px'
  * @public
  */
-export type PositionUnit = `${number}px` | `${number}%` | number
+export type PositionUnit = `${number}px` | `${number}%` | number | `${number}`
+
+/**
+ * The values are in clockwise order, beginning at the top: top, right, bottom, then left
+
+ * When one value is specified, it applies the same margin to all four sides.
+ *
+ * When two values are specified, the first margin applies to the top and bottom, the second to the left and right.
+ *
+ * When three values are specified, the first margin applies to the top, the second to the left and right, the third to the bottom.
+ *
+When four values are specified, the margins apply to the top, right, bottom, and left in that order (clockwise).
+ * @public
+ */
+export type PositionShorthand =
+  | PositionUnit
+  | `${PositionUnit} ${PositionUnit}`
+  | `${PositionUnit} ${PositionUnit} ${PositionUnit}`
+  | `${PositionUnit} ${PositionUnit} ${PositionUnit} ${PositionUnit}`
+
 /**
  * Type used for defining the position of the element. i.e. margin, padding
  * @public
@@ -79,11 +97,11 @@ export interface UiTransformProps {
   /** The flex-direction property sets how flex items are placed in the flex container defining the main axis and the direction (normal or reversed). */
   flexDirection?: FlexDirectionType
   /** The position property sets how an element is positioned in a document. The top, right, bottom, and left properties determine the final location of positioned elements. */
-  position?: Partial<Position>
+  position?: Partial<Position> | PositionShorthand
   /** The padding shorthand property sets the padding area on all four sides of an element at once. */
-  padding?: Partial<Position>
+  padding?: Partial<Position> | PositionShorthand
   /** The margin shorthand property sets the margin area on all four sides of an element. */
-  margin?: Partial<Position>
+  margin?: Partial<Position> | PositionShorthand
   /** The width property specifies the width of an element. */
   width?: PositionUnit
   /** The height property specifies the height of an element. */
