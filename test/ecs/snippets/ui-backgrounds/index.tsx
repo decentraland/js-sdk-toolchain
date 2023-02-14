@@ -1,11 +1,6 @@
 import { engine } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, {
-  UiEntity,
-  Label,
-  ReactEcsRenderer,
-  Dropdown
-} from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity, Label, ReactEcsRenderer, Dropdown } from '@dcl/sdk/react-ecs'
 
 type GenesisPlazaContent = string
 const src: GenesisPlazaContent = 'images/rounded_alpha_square.png'
@@ -21,11 +16,7 @@ engine.addSystem((t) => {
 let currentValue = 0
 const options = [
   function StretchAndTint() {
-    const tint2 = Color4.lerp(
-      Color4.Red(),
-      Color4.Blue(),
-      1 + Math.sin(dt + Math.cos(dt * 0.3)) * 0.5
-    )
+    const tint2 = Color4.lerp(Color4.Red(), Color4.Blue(), 1 + Math.sin(dt + Math.cos(dt * 0.3)) * 0.5)
     return (
       <UiEntity
         uiTransform={{
@@ -45,11 +36,7 @@ const options = [
     )
   },
   function NineSlicesAndTint() {
-    const tint = Color4.lerp(
-      Color4.Red(),
-      Color4.Blue(),
-      1 + Math.sin(dt + Math.cos(dt * 0.3)) * 0.5
-    )
+    const tint = Color4.lerp(Color4.Red(), Color4.Blue(), 1 + Math.sin(dt + Math.cos(dt * 0.3)) * 0.5)
     return (
       <UiEntity
         uiTransform={{
@@ -64,11 +51,7 @@ const options = [
           }
         }}
       >
-        <Label
-          value="NINE_SLICES + TINT"
-          color={Color4.Black()}
-          fontSize={29}
-        />
+        <Label value="NINE_SLICES + TINT" color={Color4.Black()} fontSize={29} />
       </UiEntity>
     )
   },
@@ -119,11 +102,7 @@ const options = [
           }
         }}
       >
-        <Label
-          value={`NINE_SLICES (with margins ${margin.toFixed(2)})`}
-          color={Color4.Red()}
-          fontSize={29}
-        />
+        <Label value={`NINE_SLICES (with margins ${margin.toFixed(2)})`} color={Color4.Red()} fontSize={29} />
       </UiEntity>
     )
   },

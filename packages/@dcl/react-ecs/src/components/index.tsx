@@ -1,4 +1,7 @@
+import { PBUiText } from '@dcl/ecs'
 import { ReactEcs } from '../react-ecs'
+import { UiLabelProps } from './Label/types'
+import { getFont, getTextAlign } from './Label/utils'
 import { EntityPropTypes } from './types'
 import { parseProps } from './utils'
 
@@ -21,6 +24,14 @@ export { Button } from './Button'
  * @category Component
  */
 /*#__PURE__*/
-export function UiEntity(props: EntityPropTypes) {
-  return <entity {...parseProps(props)} />
+export function UiEntity(props: EntityPropTypes & { uiText?: UiLabelProps }) {
+  const uiText: { uiText: PBUiText } | undefined = props.uiText && {
+    uiText: {
+      ...props.uiText,
+      ...getFont(props.uiText.font),
+      ...getTextAlign(props.uiText.textAlign)
+    } as PBUiText
+  }
+
+  return <entity {...parseProps(props)} {...uiText} />
 }
