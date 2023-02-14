@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
+
 import './Tree.css'
 
-import { Tree, TreeType } from '../../tree'
+import { Tree, TreeType } from '../../utils/tree'
 import { Input } from './input'
 import { Controls } from './controls'
 import initActive from '../../utils/set-value'
+import { Icon } from './icon'
 
 interface Props {
   value: Tree
@@ -82,27 +84,28 @@ function TreeComponent({ tree, update }: TreeProps) {
   }
 
   return (
-    <ul
-      draggable
-      onDragOver={(e: React.DragEvent) => e.preventDefault()}
-      onDragStart={onDragStart}
-      onDrop={onDrop}
-    >
+    <ul draggable onDragOver={(e: React.DragEvent) => e.preventDefault()} onDragStart={onDragStart} onDrop={onDrop}>
       <li>
-        <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
-          {value} <Controls
-            handleEdit={handleToggleEdit}
-            handleNewChild={handleNewChild}
-            handleRemove={handleRemove}
-            canCreate={tree.isDirectory()}
-            canDelete={!!parent}
-          />
-        </span>
-        {editMode && <Input value={value} onCancel={quitEditMode} onSubmit={onChangeEditValue}/>}
-        <span style={getExpandStyles(expanded)}>
-          {childs.map(($, i) => <MemoTree tree={$} key={`${value}-${i}`} update={update} />)}
-        </span>
-        {insertMode && <Input value='' onCancel={quitInsertMode} onSubmit={onChangeNewChild}/>}
+        <div>
+          <Icon fileName={value} expanded={expanded} type={type} />
+          <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
+            {value}{' '}
+            <Controls
+              handleEdit={handleToggleEdit}
+              handleNewChild={handleNewChild}
+              handleRemove={handleRemove}
+              canCreate={tree.isDirectory()}
+              canDelete={!!parent}
+            />
+          </span>
+          {editMode && <Input value={value} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
+        </div>
+        <div style={getExpandStyles(expanded)}>
+          {childs.map(($, i) => (
+            <MemoTree tree={$} key={`${value}-${i}`} update={update} />
+          ))}
+        </div>
+        {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={onChangeNewChild} />}
       </li>
     </ul>
   )

@@ -1,3 +1,35 @@
 .tree {
   background-color: #FFFFFF;
 }
+
+.tree ul {
+  list-style: none;
+}
+
+.tree ul li div:first-child {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  padding: 0.1rem;
+}
+
+.tree ul li div:first-child:hover {
+  background-color: #dedede;
+}
+
+.tree div:first-child svg {
+  margin: 0.1rem 0.3rem 0 0;
+}
+
+.tree div:first-child button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0.2rem;
+  margin: auto;
+}
+
+.tree div:first-child button svg {
+  width: 100%;
+  height: 100%;
+}

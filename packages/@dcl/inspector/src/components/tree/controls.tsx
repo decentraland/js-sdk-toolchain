@@ -1,4 +1,7 @@
-import { TreeType } from '../../tree'
+import { MdOutlineDriveFileRenameOutline } from 'react-icons/md'
+import { AiFillFolderAdd, AiFillFileAdd, AiFillDelete } from 'react-icons/ai'
+
+import { TreeType } from '../../utils/tree'
 
 // TODO: temp component just to run some tests, rework it to be a context menu
 
@@ -10,20 +13,27 @@ interface ControlsProps {
   canDelete: boolean
 }
 
-export const Controls = ({
-  handleEdit,
-  handleNewChild,
-  handleRemove,
-  canCreate,
-  canDelete,
-}: ControlsProps) => {
+export const Controls = ({ handleEdit, handleNewChild, handleRemove, canCreate, canDelete }: ControlsProps) => {
   return (
     <>
-      <button onClick={handleEdit}>Rename</button> {canCreate && (
+      <button onClick={handleEdit}>
+        <MdOutlineDriveFileRenameOutline />
+      </button>{' '}
+      {canCreate && (
         <>
-        <button onClick={handleNewChild('directory')}>New Folder</button> <button onClick={handleNewChild('file')}>New File</button>
+          <button onClick={handleNewChild('directory')}>
+            <AiFillFolderAdd />
+          </button>
+          <button onClick={handleNewChild('file')}>
+            <AiFillFileAdd />
+          </button>
         </>
-      )} {canDelete && <button onClick={handleRemove}>Delete</button>}
+      )}
+      {canDelete && (
+        <button onClick={handleRemove}>
+          <AiFillDelete />
+        </button>
+      )}
     </>
   )
 }

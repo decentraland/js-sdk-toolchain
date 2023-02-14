@@ -4,22 +4,21 @@ import './index.css'
 import App from './components/tree/Tree'
 import reportWebVitals from './reportWebVitals'
 
-import { Tree } from './tree'
+import { Tree } from './utils/tree'
 
+// just an example tree
 const tree: Tree = new Tree('src', 'directory', true)
-  .addChild(new Tree('components', 'directory')
-    .addChild(new Tree('tree', 'directory')
-      .addChild(new Tree('deep', 'directory')
-        .addChild(new Tree('deep-file.ts'))
-        .addChild(new Tree('other-deep-file.ts'))
+  .addChild(
+    new Tree('components', 'directory')
+      .addChild(
+        new Tree('tree', 'directory')
+          .addChild(
+            new Tree('deep', 'directory').addChild(new Tree('deep-file.ts')).addChild(new Tree('other-deep-file.ts'))
+          )
+          .addChild(new Tree('tree.tsx'))
+          .addChild(new Tree('tree.css'))
       )
-      .addChild(new Tree('tree.tsx'))
-      .addChild(new Tree('tree.css'))
-    )
-    .addChild(new Tree('modal', 'directory')
-      .addChild(new Tree('modal.tsx'))
-      .addChild(new Tree('modal.css'))
-    )
+      .addChild(new Tree('modal', 'directory').addChild(new Tree('modal.tsx')).addChild(new Tree('modal.css')))
   )
   .addChild(new Tree('index.tsx'))
   .addChild(new Tree('index.css'))

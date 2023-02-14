@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 interface Props {
   value: string
@@ -10,7 +10,7 @@ const submittingKeys = new Set(['Enter'])
 const cancelingKeys = new Set(['Escape', 'Tab'])
 
 export const Input = ({ value, onCancel, onSubmit }: Props) => {
-  const ref = useRef<HTMLInputElement>(null);
+  const ref = useRef<HTMLInputElement>(null)
   const [stateValue, setStateValue] = useState(value)
 
   useEffect(() => {
@@ -44,12 +44,5 @@ export const Input = ({ value, onCancel, onSubmit }: Props) => {
     setStateValue(e.target.value)
   }
 
-  return (
-    <input
-      ref={ref}
-      type='text'
-      value={stateValue}
-      onChange={handleTextChange}
-    />
-  )
+  return <input ref={ref} type="text" value={stateValue} onChange={handleTextChange} />
 }
