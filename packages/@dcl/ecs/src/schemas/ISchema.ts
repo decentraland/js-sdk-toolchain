@@ -19,12 +19,14 @@ export type JsonMap = {
 export type JsonArray = Array<JsonPrimitive | JsonMap | JsonArray>
 
 /**
- * SchemaDescription must specify the type, and it can has more primitives params.
+ * JsonSchemaExtended must specify the type, and it can has more primitives params.
  * Functions are not allowed.
  * @public
  */
 export type JsonSchemaExtended = {
+  // from json-schemas
   type: 'object' | 'number' | 'integer' | 'string' | 'array' | 'boolean'
+  // @dcl/ecs schemas
   serializationType:
     | 'boolean'
     | 'enum-int'

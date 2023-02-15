@@ -30,9 +30,9 @@ const primitiveSchemas = {
 }
 
 /**
- * Create an ISchema object from the schema jsonSchema
- * @param jsonSchema the SchemaDescription object
- * @returns a ISchema or fail for unsupported jsonSchema
+ * Create an ISchema object from the json-schema
+ * @param jsonSchema
+ * @returns a ISchema or fail for unsupported json-schema
  */
 export function jsonSchemaToSchema(jsonSchema: JsonSchemaExtended): ISchema<any> {
   if (primitiveSchemas[jsonSchema.serializationType]) {

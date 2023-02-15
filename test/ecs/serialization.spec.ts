@@ -571,15 +571,15 @@ describe('Serialization Types', () => {
       mapOf: Schemas.Map(mapWithAllPrimitives)
     })
 
-    const componentDescription = JSON.parse(JSON.stringify(comp.schema.jsonSchema))
-    const schemaFromDescription = jsonSchemaToSchema(componentDescription)
-    const clonedComp = engine.defineComponentFromSchema('test-cloned', schemaFromDescription)
+    const jsonSchemaComponent = JSON.parse(JSON.stringify(comp.schema.jsonSchema))
+    const schemaFromJson = jsonSchemaToSchema(jsonSchemaComponent)
+    const clonedComp = engine.defineComponentFromSchema('test-cloned', schemaFromJson)
 
     expect(comp.schema.create()).toStrictEqual(clonedComp.schema.create())
   })
   it('should fail with unknown schema description', () => {
     expect(() => {
-      const _schemaFromDescription = jsonSchemaToSchema({
+      jsonSchemaToSchema({
         type: 'super-strange-description' as any,
         serializationType: 'sarasa' as any
       })
