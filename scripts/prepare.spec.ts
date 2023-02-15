@@ -1,3 +1,5 @@
+import { readFileSync } from 'fs'
+import { pathExistsSync } from 'fs-extra'
 import { readFile } from 'fs/promises'
 import { resolve } from 'path'
 import {
@@ -19,13 +21,7 @@ flow('build-all', () => {
 
   flow('@dcl/sdk', () => {
     // update dependencies versions and link packages
-    itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, ROLLUP_CONFIG_PATH)
-    itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, ECS7_PATH)
-    itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, REACT_ECS)
-    itInstallsADependencyFromFolderAndCopiesTheVersion(SDK_PATH, JS_RUNTIME)
-    itInstallsADependencyFromFolderAndCopiesTheVersion(ECS7_PATH, JS_RUNTIME)
-    itInstallsADependencyFromFolderAndCopiesTheVersion(PLAYGROUND_ASSETS_PATH, SDK_PATH)
-
+    installCrossDependencies(ROLLUP_CONFIG_PATH, SDK_PATH, ECS7_PATH, REACT_ECS, JS_RUNTIME, PLAYGROUND_ASSETS_PATH)
     checkNoLocalPackages(ROLLUP_CONFIG_PATH, SDK_PATH, ECS7_PATH, REACT_ECS, JS_RUNTIME, PLAYGROUND_ASSETS_PATH)
   })
 
@@ -38,6 +34,23 @@ flow('build-all', () => {
     itExecutes('npm pack', INSPECTOR_PATH)
   })
 })
+
+// this step checks for dependencies in this monorepo and fixes their versions
+function installCrossDependencies(...paths: string[]) {
+  for (const path of paths) {
+    const packageJson = resolve(path, 'package.json')
+    const { dependencies, devDependencies } = JSON.parse(readFileSync(packageJson, 'utf-8'))
+
+    for (const [key] of Object.entries({ ...dependencies, ...devDependencies } as Record<string, string>)) {
+      if (key.startsWith('@dcl')) {
+        const dependencyRootPath = resolve('packages', key)
+        if (pathExistsSync(dependencyRootPath)) {
+          itInstallsADependencyFromFolderAndCopiesTheVersion(path, dependencyRootPath, key in devDependencies)
+        }
+      }
+    }
+  }
+}
 
 function checkNoLocalPackages(...paths: string[]) {
   for (const path of paths) {
