@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@dcl/js-runtime": "file:../js-runtime",
-    "@dcl/protocol": "1.0.0-4114477251.commit-ccb88d6"
+    "@dcl/protocol": "1.0.0-4177500465.commit-247c87f"
   },
   "files": [
     "dist",

@@ -6,17 +6,17 @@ EVAL test/snapshots/cube.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 15k
-  MALLOC_COUNT = 6143
-  ALIVE_OBJS_DELTA ~= 1.04k
+  OPCODES ~= 10k
+  MALLOC_COUNT = 5951
+  ALIVE_OBJS_DELTA ~= 0.96k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 2
+  MALLOC_COUNT = 4
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.0)
-  CRDT: e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 5k
-  MALLOC_COUNT = 33
+  Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  OPCODES ~= 2k
+  MALLOC_COUNT = 29
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
   OPCODES ~= 1k
@@ -30,4 +30,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 785.81k bytes
+  MEMORY_USAGE_COUNT ~= 794.95k bytes

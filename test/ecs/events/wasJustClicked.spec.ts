@@ -14,12 +14,17 @@ describe('Events helpers isClicked', () => {
     const PointerEventsResult = components.PointerEventsResult(newEngine)
     const { isClicked } = createInputSystem(newEngine)
 
-    PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [
-        createTestPointerDownCommand(newEngine.RootEntity, 4, PointerEventType.PET_DOWN),
-        createTestPointerDownCommand(newEngine.RootEntity, 5, PointerEventType.PET_UP)
-      ]
-    })
+    PointerEventsResult.addValue(
+      newEngine.RootEntity,
+      createTestPointerDownCommand(newEngine.RootEntity, 4, PointerEventType.PET_DOWN)
+    )
+
+    PointerEventsResult.addValue(
+      newEngine.RootEntity,
+      createTestPointerDownCommand(newEngine.RootEntity, 5, PointerEventType.PET_UP)
+    )
+
+    await newEngine.update(0)
 
     expect(isClicked(InputAction.IA_POINTER, newEngine.RootEntity)).toBe(true)
     expect(isClicked(InputAction.IA_ACTION_3, newEngine.RootEntity)).toBe(false)
@@ -31,12 +36,10 @@ describe('Events helpers isClicked', () => {
     const entity = newEngine.addEntity()
     const { isClicked } = createInputSystem(newEngine)
 
-    PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [
-        createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN),
-        createTestPointerDownCommand(entity, 5, PointerEventType.PET_UP)
-      ]
-    })
+    PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN))
+    PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 5, PointerEventType.PET_UP))
+
+    await newEngine.update(0)
 
     expect(isClicked(InputAction.IA_POINTER, entity)).toBe(true)
     expect(isClicked(InputAction.IA_ACTION_3, entity)).toBe(false)
@@ -48,16 +51,16 @@ describe('Events helpers isClicked', () => {
     const entity = newEngine.addEntity()
     const { isClicked } = createInputSystem(newEngine)
 
-    PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [
-        createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN),
-        createTestPointerDownCommand(entity, 5, PointerEventType.PET_UP)
-      ]
-    })
+    PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN))
+    PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 5, PointerEventType.PET_UP))
+
+    await newEngine.update(0)
 
     expect(isClicked(InputAction.IA_POINTER, entity)).toBe(true)
     expect(isClicked(InputAction.IA_POINTER, entity)).toBe(true)
+
     await newEngine.update(0)
+
     expect(isClicked(InputAction.IA_POINTER, entity)).toBe(false)
   })
 
@@ -67,12 +70,8 @@ describe('Events helpers isClicked', () => {
     const entity = newEngine.addEntity()
     const { isClicked } = createInputSystem(newEngine)
 
-    PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [
-        createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN),
-        createTestPointerDownCommand(entity, 3, PointerEventType.PET_UP)
-      ]
-    })
+    PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN))
+    PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 3, PointerEventType.PET_UP))
 
     expect(isClicked(InputAction.IA_POINTER, entity)).toBe(false)
     expect(isClicked(InputAction.IA_ACTION_3, entity)).toBe(false)
@@ -84,9 +83,7 @@ describe('Events helpers isClicked', () => {
     const entity = newEngine.addEntity()
     const { isClicked } = createInputSystem(newEngine)
 
-    PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN)]
-    })
+    PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN))
 
     expect(isClicked(InputAction.IA_POINTER, entity)).toBe(false)
     expect(isClicked(InputAction.IA_ACTION_3, entity)).toBe(false)
@@ -97,9 +94,7 @@ describe('Events helpers isClicked', () => {
     const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
 
-    PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [createTestPointerDownCommand(entity, 4, PointerEventType.PET_UP)]
-    })
+    PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 4, PointerEventType.PET_UP))
     const { isClicked } = createInputSystem(newEngine)
 
     expect(isClicked(InputAction.IA_POINTER, entity)).toBe(false)
@@ -111,29 +106,46 @@ describe('Events helpers isClicked', () => {
     const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
 
-    PointerEventsResult.create(newEngine.RootEntity, {
-      commands: [
-        createTestPointerDownCommand(entity, 4, PointerEventType.PET_UP),
-        createTestPointerDownCommand(entity, 3, PointerEventType.PET_DOWN)
-      ]
-    })
     const { isClicked } = createInputSystem(newEngine)
 
-    expect(isClicked(InputAction.IA_POINTER, entity)).toBe(true)
-    await newEngine.update(0)
-    expect(isClicked(InputAction.IA_POINTER, entity)).toBe(false)
+    {
+      // renderer
+      PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 4, PointerEventType.PET_UP))
+      PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 3, PointerEventType.PET_DOWN))
+      // tick
+      await newEngine.update(0)
+      // client
+      expect(isClicked(InputAction.IA_POINTER, entity)).toBe(true)
+    }
 
-    PointerEventsResult.createOrReplace(newEngine.RootEntity, {
-      commands: [
-        createTestPointerDownCommand(entity, 4, PointerEventType.PET_UP),
-        createTestPointerDownCommand(entity, 3, PointerEventType.PET_DOWN),
-        createTestPointerDownCommand(entity, 8, PointerEventType.PET_UP),
-        createTestPointerDownCommand(entity, 5, PointerEventType.PET_DOWN)
-      ]
-    })
+    {
+      // renderer
+      //   (noop)
+      // tick
+      await newEngine.update(0)
+      // client
+      expect(isClicked(InputAction.IA_POINTER, entity)).toBe(false)
+    }
 
-    expect(isClicked(InputAction.IA_POINTER, entity)).toBe(true)
-    await newEngine.update(0)
-    expect(isClicked(InputAction.IA_POINTER, entity)).toBe(false)
+    {
+      // renderer
+      PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 4, PointerEventType.PET_UP))
+      PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 3, PointerEventType.PET_DOWN))
+      PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 8, PointerEventType.PET_UP))
+      PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 5, PointerEventType.PET_DOWN))
+      // tick
+      await newEngine.update(0)
+      // client
+      expect(isClicked(InputAction.IA_POINTER, entity)).toBe(true)
+    }
+
+    {
+      // renderer
+      //   (noop)
+      // tick
+      await newEngine.update(0)
+      // client
+      expect(isClicked(InputAction.IA_POINTER, entity)).toBe(false)
+    }
   })
 })

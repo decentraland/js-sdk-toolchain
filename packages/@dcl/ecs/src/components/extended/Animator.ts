@@ -1,11 +1,12 @@
-import { ComponentDefinition, Entity, IEngine } from '../../engine'
+import { Entity, IEngine } from '../../engine'
+import { LastWriteWinElementSetComponentDefinition } from '../../engine/component'
 import { Animator } from '../generated/index.gen'
 import { PBAnimationState, PBAnimator } from '../generated/pb/decentraland/sdk/components/animator.gen'
 
 /**
  * @public
  */
-export interface AnimatorComponentDefinitionExtended extends ComponentDefinition<PBAnimator> {
+export interface AnimatorComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAnimator> {
   /**
    * @public
    *

@@ -2,6 +2,7 @@ import { Engine } from '../../packages/@dcl/ecs/src/engine'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { ISchema } from '../../packages/@dcl/ecs/src/schemas/ISchema'
 import { schemaDescriptionToSchema } from '../../packages/@dcl/ecs/src/schemas/buildSchema'
+import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
 const Vector3 = Schemas.Map({
   x: Schemas.Float,
@@ -22,10 +23,11 @@ describe('Serialization Types', () => {
       const myInteger = IntegerComponent.create(entity, { value: 33 })
       expect(myInteger.value).toBe(33)
 
-      const buffer = IntegerComponent.toBinary(entity)
+      const buffer = new ReadWriteByteBuffer()
+      IntegerComponent.schema.serialize(IntegerComponent.get(entity), buffer)
       const copiedInteger = IntegerComponent.create(entityCopied, { value: 21 })
       expect(copiedInteger.value).toBe(21)
-      const updatedInteger = IntegerComponent.deserialize(buffer)
+      const updatedInteger = IntegerComponent.schema.deserialize(buffer)
       expect(updatedInteger!.value).toBe(33)
 
       expect(t.create()).toEqual(0)
@@ -45,10 +47,11 @@ describe('Serialization Types', () => {
       const myFloat = FloatComponent.create(entity, { value: testValue })
       expect(myFloat.value).toBe(testValue)
 
-      const buffer = FloatComponent.toBinary(entity)
+      const buffer = new ReadWriteByteBuffer()
+      FloatComponent.schema.serialize(FloatComponent.get(entity), buffer)
       const copiedFloat = FloatComponent.create(entityCopied, { value: 21.22 })
       expect(copiedFloat.value).toBe(21.22)
-      const updatedFloat = FloatComponent.deserialize(buffer)
+      const updatedFloat = FloatComponent.schema.deserialize(buffer)
       expect(updatedFloat!.value).toBe(testValue)
     }
 
@@ -70,10 +73,11 @@ describe('Serialization Types', () => {
     const myFloat = FloatComponent.create(entity, { value: testValue })
     expect(myFloat.value).toBe(testValue)
 
-    const buffer = FloatComponent.toBinary(entity)
+    const buffer = new ReadWriteByteBuffer()
+    FloatComponent.schema.serialize(FloatComponent.get(entity), buffer)
     const copiedFloat = FloatComponent.create(entityCopied, { value: 'n' })
     expect(copiedFloat.value).toBe('n')
-    const updatedFloat = FloatComponent.deserialize(buffer)
+    const updatedFloat = FloatComponent.schema.deserialize(buffer)
     expect(updatedFloat!.value).toBe(testValue)
   })
 
@@ -140,14 +144,15 @@ describe('Serialization Types', () => {
       description: 'this is a description to an enchanting item.'
     })
 
-    const buffer = PlayerComponent.toBinary(myEntity)
+    const buffer = new ReadWriteByteBuffer()
+    PlayerComponent.schema.serialize(PlayerComponent.get(myEntity), buffer)
 
     const otherEntity = engine.addEntity()
 
     PlayerComponent.create(otherEntity, defaultPlayer)
 
     const originalPlayer = PlayerComponent.get(myEntity)
-    const modifiedFromBinaryPlayer = PlayerComponent.deserialize(buffer)
+    const modifiedFromBinaryPlayer = PlayerComponent.schema.deserialize(buffer)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     expect(modifiedFromBinaryPlayer).toBeDeepCloseTo(originalPlayer)
@@ -186,7 +191,9 @@ describe('Serialization Types', () => {
       optionalColor: { r: 1, g: 2, b: 3 }
     })
 
-    const value2 = TestComponent.deserialize(TestComponent.toBinary(entity))!
+    const buffer = new ReadWriteByteBuffer()
+    TestComponent.schema.serialize(TestComponent.get(entity), buffer)
+    const value2 = TestComponent.schema.deserialize(buffer)
 
     expect(value2.hasAlpha).toBe(true)
     expect(value2.optionalColor).toBeUndefined()
@@ -205,7 +212,9 @@ describe('Serialization Types', () => {
 
     TestComponent.create(entity, { optionalColor: true, notVisible: false })
 
-    expect(TestComponent.toBinary(entity).toBinary()).toStrictEqual(new Uint8Array([1, 1, 0, 0]))
+    const buffer = new ReadWriteByteBuffer()
+    TestComponent.schema.serialize(TestComponent.get(entity), buffer)
+    expect(buffer.toBinary()).toStrictEqual(new Uint8Array([1, 1, 0, 0]))
     expect(TestComponent.get(entity).optionalColor).toBe(true)
 
     // Deserialize and update new optional
@@ -216,15 +225,23 @@ describe('Serialization Types', () => {
       notVisible: false
     })
 
-    TestComponent.updateFromCrdt({
-      componentId: TestComponent.componentId,
-      entityId: entity,
-      data: TestComponent.toBinary(newEntity).toBinary(),
-      timestamp: 3,
-      type: 1
-    })
+    {
+      const buffer = new ReadWriteByteBuffer()
+      TestComponent.schema.serialize(TestComponent.get(newEntity), buffer)
+      TestComponent.updateFromCrdt({
+        componentId: TestComponent.componentId,
+        entityId: entity,
+        data: buffer.toBinary(),
+        timestamp: 3,
+        type: 1
+      })
+    }
 
-    expect(TestComponent.toBinary(entity).toBinary()).toStrictEqual(new Uint8Array([1, 1, 1, 1, 0]))
+    {
+      const buffer = new ReadWriteByteBuffer()
+      TestComponent.schema.serialize(TestComponent.get(entity), buffer)
+      expect(buffer.toBinary()).toStrictEqual(new Uint8Array([1, 1, 1, 1, 0]))
+    }
   })
 
   it('should serialize Int Schemas.Enums', () => {
@@ -252,8 +269,9 @@ describe('Serialization Types', () => {
     })
     expect(initialValue).toStrictEqual({ testEnum: ColorToNumber.Green })
 
-    const value2 = TestComponent.deserialize(TestComponent.toBinary(entity))!
-
+    const buffer = new ReadWriteByteBuffer()
+    TestComponent.schema.serialize(TestComponent.get(entity), buffer)
+    const value2 = TestComponent.schema.deserialize(buffer)!
     expect(value2).toStrictEqual({ testEnum: ColorToNumber.Pink })
   })
 
@@ -282,8 +300,9 @@ describe('Serialization Types', () => {
     })
     expect(initialValue).toStrictEqual({ testEnum: ColorToString.Green })
 
-    const value2 = TestComponent.deserialize(TestComponent.toBinary(entity))!
-
+    const buffer = new ReadWriteByteBuffer()
+    TestComponent.schema.serialize(TestComponent.get(entity), buffer)
+    const value2 = TestComponent.schema.deserialize(buffer)!
     expect(value2).toStrictEqual({ testEnum: ColorToString.Pink })
   })
 
@@ -313,9 +332,9 @@ describe('Serialization Types', () => {
       d: 10
     })
 
-    const buffer = TestComponentType.toBinary(entityFilled)
-
-    const modifiedComponent = TestComponentType.deserialize(buffer)
+    const buffer = new ReadWriteByteBuffer()
+    TestComponentType.schema.serialize(TestComponentType.get(entityFilled), buffer)
+    const modifiedComponent = TestComponentType.schema.deserialize(buffer)
     expect(modifiedComponent.a).toBe(myComponent.a)
     expect(modifiedComponent.b).toBe(myComponent.b)
     expect(modifiedComponent.c).toEqual(myComponent.c)
@@ -343,9 +362,10 @@ describe('Serialization Types', () => {
 
       TestComponentType.create(entity, objectValues)
       TestComponentType.create(entityCopied, zeroObjectValues)
-      const buffer = TestComponentType.toBinary(entity)
 
-      expect(TestComponentType.deserialize(buffer)).toStrictEqual(TestComponentType.get(entity))
+      const buffer = new ReadWriteByteBuffer()
+      TestComponentType.schema.serialize(TestComponentType.get(entity), buffer)
+      expect(TestComponentType.schema.deserialize(buffer)).toStrictEqual(TestComponentType.get(entity))
     }
   })
 
@@ -410,8 +430,9 @@ describe('Serialization Types', () => {
       v3: { x: 1.2, y: 1.3, z: 1.4 }
     })
 
-    const buf = MixComponent.toBinary(entity)
-    const value = MixComponent.deserialize(buf)
+    const buf = new ReadWriteByteBuffer()
+    MixComponent.schema.serialize(MixComponent.get(entity), buf)
+    const value = MixComponent.schema.deserialize(buf)
 
     expect(value).toBeDeepCloseTo(originalValue)
   })
@@ -428,10 +449,11 @@ describe('Serialization Types', () => {
     const myEntity = EntityComponent.create(entity, { value: someEntity })
     expect(myEntity.value).toBe(someEntity)
 
-    const buffer = EntityComponent.toBinary(entity)
+    const buffer = new ReadWriteByteBuffer()
+    EntityComponent.schema.serialize(EntityComponent.get(entity), buffer)
     const copiedEntity = EntityComponent.create(entityCopied)
     expect(copiedEntity.value).toBe(engine.RootEntity)
-    const updatedEntity = EntityComponent.deserialize(buffer)
+    const updatedEntity = EntityComponent.schema.deserialize(buffer)
     expect(updatedEntity!.value).toBe(someEntity)
   })
 

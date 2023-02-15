@@ -1,9 +1,9 @@
 import * as components from '../components'
 import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_events.gen'
-import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
-import { Schemas } from '../schemas'
+import { PBPointerEventsResult } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
 import { Entity } from './entity'
+import { DeepReadonly } from './readonly'
 import { IEngine } from './types'
 
 const InputCommands: InputAction[] = [
@@ -33,7 +33,7 @@ export type IInputSystem = {
    * @param entity - the entity to query, ignore for global events.
    * @returns true if the entity was clicked in the last tick-update
    */
-  isClicked: (inputAction: InputAction, entity?: Entity) => boolean
+  isClicked: (inputAction: InputAction, entity: Entity) => boolean
 
   /**
    * @public
@@ -43,7 +43,7 @@ export type IInputSystem = {
    * @param entity - the entity to query, ignore for global
    * @returns boolean
    */
-  isTriggered: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean
+  isTriggered: (inputAction: InputAction, pointerEventType: PointerEventType, entity: Entity) => boolean
 
   /**
    * @public
@@ -56,17 +56,17 @@ export type IInputSystem = {
   /**
    * @internal
    * Get the click info if a click was emmited in the current tick for the input action.
-   * This is defined when an UP event is triggered with a previously DOWN state.
+   * This is defined when an UP event is triggered with a previously DOWN state in the same entity.
    * @param inputAction - the input action to query
    * @param entity - the entity to query, ignore for global events.
    * @returns the click info or undefined if there is no command in the last tick-update
    */
   getClick: (
     inputAction: InputAction,
-    entity?: Entity
+    entity: Entity
   ) => {
-    up: PBPointerEventsResult_PointerCommand
-    down: PBPointerEventsResult_PointerCommand
+    up: PBPointerEventsResult
+    down: PBPointerEventsResult
   } | null
 
   /**
@@ -80,96 +80,91 @@ export type IInputSystem = {
   getInputCommand: (
     inputAction: InputAction,
     pointerEventType: PointerEventType,
-    entity?: Entity
-  ) => PBPointerEventsResult_PointerCommand | null
+    entity: Entity
+  ) => PBPointerEventsResult | null
 }
 
-const InternalInputStateSchema = {
-  timestampLastUpdate: Schemas.Number,
-  currentTimestamp: Schemas.Number,
-  buttonState: Schemas.Array(
-    Schemas.Map({
-      value: Schemas.Boolean,
-      ts: Schemas.Number
-    })
-  )
-}
-
-const TimestampUpdateSystemPriority = 1 << 20
-const ButtonStateUpdateSystemPriority = 0
+const InputStateUpdateSystemPriority = 1 << 20
 
 /**
  * @internal
  */
 export function createInputSystem(engine: IEngine): IInputSystem {
   const PointerEventsResult = components.PointerEventsResult(engine)
-  const InternalInputStateComponent = engine.defineComponent(
-    '@dcl/sdk/InternalInputStateSchema',
-    InternalInputStateSchema
-  )
-
-  InternalInputStateComponent.create(engine.RootEntity, {
-    buttonState: Array.from({ length: InputCommands.length }, () => ({
-      ts: 0,
-      value: false
-    }))
-  })
-
-  function timestampUpdateSystem() {
-    const state = InternalInputStateComponent.get(engine.RootEntity)
-    if (state.currentTimestamp > state.timestampLastUpdate) {
-      InternalInputStateComponent.getMutable(engine.RootEntity).timestampLastUpdate = state.currentTimestamp
-    }
-  }
-
-  function* commandIterator() {
-    for (const [, value] of engine.getEntitiesWith(PointerEventsResult)) {
-      yield* value.commands
-    }
+  const globalState = {
+    previousFrameMaxTimestamp: 0,
+    currentFrameMaxTimestamp: 0,
+    buttonState: new Map<InputAction, PBPointerEventsResult>()
   }
 
   function findLastAction(
     pointerEventType: PointerEventType,
     inputAction: InputAction,
-    entity?: Entity
-  ): PBPointerEventsResult_PointerCommand | undefined {
-    let commandToReturn: PBPointerEventsResult_PointerCommand | undefined = undefined
-
-    for (const command of commandIterator()) {
-      if (
-        command.button === inputAction &&
-        command.state === pointerEventType &&
-        (!entity || (command.hit && entity === command.hit.entityId))
-      ) {
-        if (!commandToReturn || command.timestamp >= commandToReturn.timestamp) commandToReturn = command
+    entity: Entity
+  ): PBPointerEventsResult | undefined {
+    const ascendingTimestampIterator = PointerEventsResult.get(entity)
+    for (const command of Array.from(ascendingTimestampIterator).reverse()) {
+      if (command.button === inputAction && command.state === pointerEventType) {
+        return command
       }
     }
+  }
 
-    return commandToReturn
+  function* findCommandsByActionDescending(
+    inputAction: InputAction,
+    entity: Entity
+  ): Iterable<DeepReadonly<PBPointerEventsResult>> {
+    const ascendingTimestampIterator = PointerEventsResult.get(entity)
+    for (const command of Array.from(ascendingTimestampIterator).reverse()) {
+      if (command.button === inputAction) {
+        yield command
+      }
+    }
   }
 
   function buttonStateUpdateSystem() {
-    const component = PointerEventsResult.getOrNull(engine.RootEntity)
+    // first store the previous' frame timestamp
+    let maxTimestamp = globalState.currentFrameMaxTimestamp
+    globalState.previousFrameMaxTimestamp = maxTimestamp
 
-    if (!component) return
+    // then iterate over all new commands
+    for (const [, commands] of engine.getEntitiesWith(PointerEventsResult)) {
+      // TODO: adapt the gset component to have a cached "reversed" option by default
+      const arrayCommands = Array.from(commands)
+      for (let i = arrayCommands.length - 1; i >= 0; i--) {
+        const command = arrayCommands[i]
+        if (command.timestamp > maxTimestamp) {
+          maxTimestamp = command.timestamp
+        }
 
-    const state = InternalInputStateComponent.getMutable(engine.RootEntity)
-
-    for (const command of commandIterator()) {
-      if (command.timestamp > state.buttonState[command.button].ts) {
-        if (command.state === PointerEventType.PET_DOWN) {
-          state.buttonState[command.button].value = true
-        } else if (command.state === PointerEventType.PET_UP) {
-          state.buttonState[command.button].value = false
+        if (command.state === PointerEventType.PET_UP || command.state === PointerEventType.PET_DOWN) {
+          const prevCommand = globalState.buttonState.get(command.button)
+          if (!prevCommand || command.timestamp > prevCommand.timestamp) {
+            globalState.buttonState.set(command.button, command)
+          } else {
+            // since we are iterating a descending array, we can early finish the
+            // loop
+            break
+          }
         }
       }
     }
+
+    // update current frame's max timestamp
+    globalState.currentFrameMaxTimestamp = maxTimestamp
   }
 
-  engine.addSystem(buttonStateUpdateSystem, ButtonStateUpdateSystemPriority, '@dcl/ecs#buttonStateUpdateSystem')
-  engine.addSystem(timestampUpdateSystem, TimestampUpdateSystemPriority, '@dcl/ecs#timestampUpdateSystem')
+  engine.addSystem(buttonStateUpdateSystem, InputStateUpdateSystemPriority, '@dcl/ecs#inputSystem')
 
-  function getClick(inputAction: InputAction, entity?: Entity) {
+  function timestampIsCurrentFrame(timestamp: number) {
+    if (timestamp > globalState.previousFrameMaxTimestamp && timestamp <= globalState.currentFrameMaxTimestamp) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  function getClick(inputAction: InputAction, entity: Entity) {
     if (inputAction !== InputAction.IA_ANY) {
       return findClick(inputAction, entity)
     }
@@ -181,34 +176,40 @@ export function createInputSystem(engine: IEngine): IInputSystem {
     return null
   }
 
-  function findClick(inputAction: InputAction, entity?: Entity) {
-    // We search the last DOWN command sorted by timestamp
-    const down = findLastAction(PointerEventType.PET_DOWN, inputAction, entity)
-    // We search the last UP command sorted by timestamp
-    if (!down) return null
+  function findClick(inputAction: InputAction, entity: Entity) {
+    let down: PBPointerEventsResult | null = null
+    let up: PBPointerEventsResult | null = null
 
-    const up = findLastAction(PointerEventType.PET_UP, inputAction, entity)
+    // We search the last UP & DOWN command sorted by timestamp descending
+    for (const it of findCommandsByActionDescending(inputAction, entity)) {
+      if (!up) {
+        if (it.state === PointerEventType.PET_UP) {
+          up = it
+          continue
+        }
+      } else if (!down) {
+        if (it.state === PointerEventType.PET_DOWN) {
+          down = it
+          break
+        }
+      }
+    }
 
-    if (!up) return null
-
-    const state = InternalInputStateComponent.get(engine.RootEntity)
+    if (!up || !down) return null
 
     // If the DOWN command has happen before the UP commands, it means that that a clicked has happen
-    if (down.timestamp < up.timestamp && up.timestamp > state.timestampLastUpdate) {
-      InternalInputStateComponent.getMutable(engine.RootEntity).currentTimestamp = Math.max(
-        up.timestamp,
-        state.currentTimestamp
-      )
+    if (down.timestamp < up.timestamp && timestampIsCurrentFrame(up.timestamp)) {
       return { up, down }
     }
+
     return null
   }
 
   function getInputCommand(
     inputAction: InputAction,
     pointerEventType: PointerEventType,
-    entity?: Entity
-  ): PBPointerEventsResult_PointerCommand | null {
+    entity: Entity
+  ): PBPointerEventsResult | null {
     if (inputAction !== InputAction.IA_ANY) {
       return findInputCommand(inputAction, pointerEventType, entity)
     }
@@ -223,46 +224,40 @@ export function createInputSystem(engine: IEngine): IInputSystem {
   function findInputCommand(
     inputAction: InputAction,
     pointerEventType: PointerEventType,
-    entity?: Entity
-  ): PBPointerEventsResult_PointerCommand | null {
+    entity: Entity
+  ): PBPointerEventsResult | null {
     // We search the last pointer Event command sorted by timestamp
     const command = findLastAction(pointerEventType, inputAction, entity)
     if (!command) return null
 
-    const state = InternalInputStateComponent.get(engine.RootEntity)
-    if (command.timestamp > state.timestampLastUpdate) {
-      InternalInputStateComponent.getMutable(engine.RootEntity).currentTimestamp = Math.max(
-        command.timestamp,
-        state.currentTimestamp
-      )
+    if (timestampIsCurrentFrame(command.timestamp)) {
       return command
     } else {
       return null
     }
   }
 
-  function isClicked(inputAction: InputAction, entity?: Entity) {
+  // returns true if there was a DOWN (in any past frame), and then an UP in the last frame
+  function isClicked(inputAction: InputAction, entity: Entity) {
     return getClick(inputAction, entity) !== null
   }
 
-  function isTriggered(inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) {
-    return getInputCommand(inputAction, pointerEventType, entity) !== null
+  // returns true if the provided last action was triggered in the last frame
+  function isTriggered(inputAction: InputAction, pointerEventType: PointerEventType, entity: Entity) {
+    const command = findLastAction(pointerEventType, inputAction, entity)
+    return (command && timestampIsCurrentFrame(command.timestamp)) || false
   }
 
+  // returns the global state of the input. This global state is updated from the system
   function isPressed(inputAction: InputAction) {
-    return InternalInputStateComponent.get(engine.RootEntity).buttonState[inputAction].value
+    return globalState.buttonState.get(inputAction)?.state === PointerEventType.PET_DOWN
   }
 
   return {
-    // @public
     isPressed,
-    // @internal
     getClick,
-    // @public
     getInputCommand,
-    // @internal
     isClicked,
-    // @public
     isTriggered
   }
 }

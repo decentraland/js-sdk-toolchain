@@ -2,10 +2,17 @@ import type { ISchema } from '../schemas/ISchema'
 import { MapResult, Spec } from '../schemas/Map'
 import { OnChangeFunction } from '../systems/crdt'
 import { Transport } from '../systems/crdt/types'
-import { ComponentDefinition } from './component'
+import {
+  ComponentDefinition,
+  GrowOnlyValueSetComponentDefinition,
+  LastWriteWinElementSetComponentDefinition
+} from './component'
 import { Entity, EntityContainer, EntityState } from './entity'
+import { ValueSetOptions } from './grow-only-value-set-component-definition'
 import { ReadonlyComponentSchema } from './readonly'
 import { SystemFn, SystemItem } from './systems'
+export * from './component'
+export { ValueSetOptions }
 
 /**
  * @public
@@ -14,16 +21,9 @@ export type Unpacked<T> = T extends (infer U)[] ? U : T
 
 /**
  * @public
- */
-export type ComponentSchema<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]> = {
-  [K in keyof T]: T[K] extends ComponentDefinition<any> ? ReturnType<T[K]['getMutable']> : never
-}
-
-/**
- * @public
  * Overrides component definition to support partial default values
  */
-export interface MapComponentDefinition<T> extends ComponentDefinition<T> {
+export interface MapComponentDefinition<T> extends LastWriteWinElementSetComponentDefinition<T> {
   /**
    * Add the current component to an entity, throw an error if the component already exists (use `createOrReplace` instead).
    * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
@@ -52,6 +52,7 @@ export type PreEngine = Pick<
   | 'removeSystem'
   | 'defineComponent'
   | 'defineComponentFromSchema'
+  | 'defineValueSetComponentFromSchema'
   | 'registerComponentDefinition'
   | 'getEntitiesWith'
   | 'getComponent'
@@ -177,8 +178,25 @@ export interface IEngine {
    * const StateComponent = engine.defineComponentFromSchema("my-lib::VisibleComponent", Schemas.Bool)
    * ```
    */
-  defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): ComponentDefinition<T>
-
+  defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): LastWriteWinElementSetComponentDefinition<T>
+  /**
+   * @public
+   * Defines a value set component.
+   * @param componentName - unique name to identify the component, a hash is calculated for it, it will fail if the hash has collisions.
+   * @param spec - An object with schema fields
+   * @returns The component definition
+   *
+   * @example
+   * ```ts
+   * const StateComponentId = 10023
+   * const StateComponent = engine.defineValueSetComponentFromSchema("my-lib::VisibleComponent", Schemas.Int)
+   * ```
+   */
+  defineValueSetComponentFromSchema<T>(
+    componentName: string,
+    spec: ISchema<T>,
+    options: ValueSetOptions<T>
+  ): GrowOnlyValueSetComponentDefinition<T>
   /**
    * @public
    * Get the component definition from the component id.

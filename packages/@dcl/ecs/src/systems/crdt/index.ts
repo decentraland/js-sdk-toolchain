@@ -2,7 +2,7 @@ import { Entity, EntityState } from '../../engine/entity'
 import type { ComponentDefinition } from '../../engine'
 import type { PreEngine } from '../../engine/types'
 import { ReadWriteByteBuffer } from '../../serialization/ByteBuffer'
-import { CrdtMessageProtocol } from '../../serialization/crdt'
+import { AppendValueOperation, CrdtMessageProtocol } from '../../serialization/crdt'
 import { DeleteComponent } from '../../serialization/crdt/deleteComponent'
 import { DeleteEntity } from '../../serialization/crdt/deleteEntity'
 import { PutComponentOperation } from '../../serialization/crdt/putComponent'
@@ -15,7 +15,8 @@ import { ReceiveMessage, Transport, TransportMessage } from './types'
 export type OnChangeFunction = (
   entity: Entity,
   operation: CrdtMessageType,
-  component?: ComponentDefinition<any>
+  component?: ComponentDefinition<any>,
+  componentValue?: any
 ) => void
 
 /**
@@ -52,7 +53,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         if (header.type === CrdtMessageType.DELETE_COMPONENT) {
           const message = DeleteComponent.read(buffer)!
           receivedMessages.push({
-            ...header,
             ...message,
             transportId,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
@@ -60,7 +60,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         } else if (header.type === CrdtMessageType.PUT_COMPONENT) {
           const message = PutComponentOperation.read(buffer)!
           receivedMessages.push({
-            ...header,
             ...message,
             transportId,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
@@ -68,7 +67,13 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
           const message = DeleteEntity.read(buffer)!
           receivedMessages.push({
-            ...header,
+            ...message,
+            transportId,
+            messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
+          })
+        } else if (header.type === CrdtMessageType.APPEND_VALUE) {
+          const message = AppendValueOperation.read(buffer)!
+          receivedMessages.push({
             ...message,
             transportId,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
@@ -119,7 +124,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         const component = engine.getComponentOrNull(msg.componentId)
 
         if (component) {
-          const [conflictMessage] = component.updateFromCrdt(msg)
+          const [conflictMessage, value] = component.updateFromCrdt(msg)
 
           if (conflictMessage) {
             const offset = bufferForOutdated.currentWriteOffset()
@@ -132,7 +137,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
                 conflictMessage.data,
                 bufferForOutdated
               )
-            } else {
+            } else if (conflictMessage.type === CrdtMessageType.DELETE_COMPONENT) {
               DeleteComponent.write(msg.entityId, component.componentId, conflictMessage.timestamp, bufferForOutdated)
             }
 
@@ -144,7 +149,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             // Add message to transport queue to be processed by others transports
             broadcastMessages.push(msg)
 
-            onProcessEntityComponentChange && onProcessEntityComponentChange(msg.entityId, msg.type, component)
+            onProcessEntityComponentChange && onProcessEntityComponentChange(msg.entityId, msg.type, component, value)
           }
         }
       }
@@ -188,6 +193,8 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             PutComponentOperation.write(message.entityId, message.timestamp, message.componentId, message.data, buffer)
           } else if (message.type === CrdtMessageType.DELETE_COMPONENT) {
             DeleteComponent.write(message.entityId, component.componentId, message.timestamp, buffer)
+          } else if (message.type === CrdtMessageType.APPEND_VALUE) {
+            AppendValueOperation.write(message.entityId, message.timestamp, message.componentId, message.data, buffer)
           }
 
           crdtMessages.push({
@@ -195,7 +202,14 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentWriteOffset())
           })
 
-          onProcessEntityComponentChange && onProcessEntityComponentChange(message.entityId, message.type, component)
+          if (onProcessEntityComponentChange) {
+            const rawValue =
+              message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.APPEND_VALUE
+                ? component.get(message.entityId)
+                : undefined
+
+            onProcessEntityComponentChange(message.entityId, message.type, component, rawValue)
+          }
         }
       }
     }

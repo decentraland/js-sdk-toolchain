@@ -1,10 +1,11 @@
-import { ComponentDefinition, Entity, IEngine } from '../../engine'
+import { LastWriteWinElementSetComponentDefinition, Entity, IEngine } from '../../engine'
 import { MeshRenderer, PBMeshRenderer } from '../generated/index.gen'
 
 /**
  * @public
  */
-export interface MeshRendererComponentDefinitionExtended extends ComponentDefinition<PBMeshRenderer> {
+export interface MeshRendererComponentDefinitionExtended
+  extends LastWriteWinElementSetComponentDefinition<PBMeshRenderer> {
   /**
    * @public
    * Set a box in the MeshRenderer component

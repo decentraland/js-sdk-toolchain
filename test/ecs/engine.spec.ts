@@ -2,7 +2,6 @@ import { cyclicParentingChecker, RESERVED_STATIC_ENTITIES } from '../../packages
 import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
-import { TransformSchema } from '../../packages/@dcl/ecs/src/components/legacy/Transform'
 import { components } from '../../packages/@dcl/ecs/src'
 import { Vector3 } from '../../packages/@dcl/sdk/src/math'
 
@@ -319,18 +318,19 @@ describe('Engine tests', () => {
     expect(Array.from(Position.dirtyIterator())).toEqual([])
   })
 
-  it('should return isDirty if we mutate the component', async () => {
+  it('should return dirtyIterator.includes(entity)==true if we mutate the component', async () => {
     const engine = Engine()
     const MeshRenderer = components.MeshRenderer(engine)
     const entityA = engine.addEntity()
     MeshRenderer.create(entityA, {
       mesh: { $case: 'box', box: { uvs: [] } }
     })
-    expect(MeshRenderer.isDirty(entityA)).toBe(true)
+
+    expect(Array.from(MeshRenderer.dirtyIterator()).includes(entityA)).toBe(true)
     await engine.update(1)
-    expect(MeshRenderer.isDirty(entityA)).toBe(false)
+    expect(Array.from(MeshRenderer.dirtyIterator()).includes(entityA)).toBe(false)
     MeshRenderer.getMutable(entityA)
-    expect(MeshRenderer.isDirty(entityA)).toBe(true)
+    expect(Array.from(MeshRenderer.dirtyIterator()).includes(entityA)).toBe(true)
   })
 
   // it('should fail to write to byte buffer if the entity not exists', async () => {
@@ -488,17 +488,18 @@ describe('Engine tests', () => {
   })
 
   it('should not remove the component after the update', async () => {
-    const engine = Engine()
-    const PointerEventsResult = components.PointerEventsResult(engine)
-    PointerEventsResult.create(engine.RootEntity)
-    await engine.update(1 / 30)
-    expect(PointerEventsResult.has(engine.RootEntity)).toBe(true)
-  })
-
-  it('should return the default component of the transform', async () => {
+    // TODO: wtf is this test?
     const engine = Engine()
     const Transform = components.Transform(engine)
-    expect(TransformSchema.create()).toBeDeepCloseTo(Transform.default())
+    Transform.create(engine.RootEntity, {})
+    await engine.update(1 / 30)
+    expect(Transform.has(engine.RootEntity)).toBe(true)
+  })
+
+  it('Component.create(entity) should equal Component.schema.create()', async () => {
+    const engine = Engine()
+    const Transform = components.Transform(engine)
+    expect(Transform.create(engine.addEntity())).toBeDeepCloseTo(Transform.schema.create())
   })
 
   it('should log the error of cyclic parenting', async () => {

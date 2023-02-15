@@ -16,31 +16,46 @@ function exportComponent(component: Component) {
 }
 
 function defineComponentDecl(component: Component) {
-  return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: ComponentGetter<ComponentDefinition<PB${component.componentPascalName}>> = engine =>
+  if (component.componentPascalName === 'PointerEventsResult') {
+    return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PB${component.componentPascalName}>> = (
+      engine
+    ) =>
+      engine.defineValueSetComponentFromSchema("core::${component.componentPascalName}", ${component.componentPascalName}Schema, {
+        timestampFunction: (t) => t.timestamp,
+        maxElements: 100
+      })`.trim()
+  } else {
+    return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PB${component.componentPascalName}>> = engine =>
     engine.defineComponentFromSchema("core::${component.componentPascalName}", ${component.componentPascalName}Schema);
   `.trim()
+  }
 }
 
 const skipExposeGlobally: string[] = ['Animator', 'MeshRenderer', 'MeshCollider', 'Material']
 function defineGlobalComponentDecl(component: Component) {
   if (skipExposeGlobally.includes(component.componentPascalName)) return ''
-  return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: ComponentDefinition<PB${component.componentPascalName}> = components.${component.componentPascalName}(engine)`.trim()
+  if (component.componentPascalName === 'PointerEventsResult') {
+    return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: GrowOnlyValueSetComponentDefinition<PB${component.componentPascalName}> = components.${component.componentPascalName}(engine)`.trim()
+  } else {
+    return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: LastWriteWinElementSetComponentDefinition<PB${component.componentPascalName}> = components.${component.componentPascalName}(engine)`.trim()
+  }
 }
 
 const indexTemplate = `import type { IEngine } from '../../engine/types'
-import { ComponentDefinition } from '../../engine/component'
-import * as TransformSchema from '../legacy/Transform'
+import { LastWriteWinElementSetComponentDefinition, GrowOnlyValueSetComponentDefinition } from '../../engine/component'
+
 $componentImports
 $componentExports
 
-export type ComponentGetter<T extends ComponentDefinition<any>> = (engine: Pick<IEngine,'defineComponentFromSchema'>) => T
+export type LwwComponentGetter<T extends LastWriteWinElementSetComponentDefinition<any>> = (engine: Pick<IEngine,'defineComponentFromSchema'>) => T
+export type GSetComponentGetter<T extends GrowOnlyValueSetComponentDefinition<any>> = (engine: Pick<IEngine,'defineValueSetComponentFromSchema'>) => T
 
 $componentDeclarations
 `
 
 const globalTemplate = `
 import { engine } from '../../runtime/initialization'
-import { ComponentDefinition } from '../../engine/component'
+import { LastWriteWinElementSetComponentDefinition, GrowOnlyValueSetComponentDefinition } from '../../engine/component'
 import * as components from './index.gen'
 export * from './index.gen';
 

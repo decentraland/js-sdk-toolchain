@@ -2,14 +2,10 @@ import { exec } from 'child_process'
 import { existsSync, readFileSync, writeFileSync } from 'fs-extra'
 import glob from 'glob'
 import path from 'path'
-import { CrdtMessageType, CrdtMessageHeader, engine } from '../packages/@dcl/ecs/src'
+import { CrdtMessageType, engine } from '../packages/@dcl/ecs/src'
 import { ReadWriteByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import {
-  CrdtMessageProtocol,
-  DeleteComponent,
-  DeleteEntity,
-  PutComponentOperation
-} from '../packages/@dcl/ecs/src/serialization/crdt'
+import { CrdtMessage } from '../packages/@dcl/ecs/src/serialization/crdt'
+import { readMessage } from '../packages/@dcl/ecs/src/serialization/crdt/message'
 import { withQuickJsVm } from './vm'
 import { version as vmVersion } from '@dcl/quickjs-emscripten/package.json'
 
@@ -43,27 +39,28 @@ function testFileSnapshot(fileName: string, workingDirectory: string) {
 function* serializeCrdtMessages(prefix: string, data: Uint8Array) {
   const buffer = new ReadWriteByteBuffer(data)
 
-  let header: CrdtMessageHeader | null
+  let message: CrdtMessage | null
 
-  while ((header = CrdtMessageProtocol.getHeader(buffer))) {
-    if (header.type === CrdtMessageType.PUT_COMPONENT || header.type === CrdtMessageType.DELETE_COMPONENT) {
-      const message =
-        header.type === CrdtMessageType.DELETE_COMPONENT
-          ? DeleteComponent.read(buffer)!
-          : PutComponentOperation.read(buffer)!
-      const { entityId, componentId, timestamp } = message
-      const data = message.type === CrdtMessageType.PUT_COMPONENT ? message.data : undefined
+  while ((message = readMessage(buffer))) {
+    const ent = `0x${message.entityId.toString(16)}`
+    const preface = `  ${prefix}: ${CrdtMessageType[message.type]} e=${ent}`
+    if (
+      message.type === CrdtMessageType.PUT_COMPONENT ||
+      message.type === CrdtMessageType.DELETE_COMPONENT ||
+      message.type === CrdtMessageType.APPEND_VALUE
+    ) {
+      const { componentId, timestamp } = message
+      const data = 'data' in message ? message.data : undefined
 
       const c = engine.getComponent(componentId)
 
-      yield `  ${prefix}: e=0x${entityId.toString(16)} c=${componentId} t=${timestamp} data=${JSON.stringify(
-        (data && c.deserialize(new ReadWriteByteBuffer(data))) || null
+      yield `${preface} c=${componentId} t=${timestamp} data=${JSON.stringify(
+        (data && c.schema.deserialize(new ReadWriteByteBuffer(data))) || null
       )}`
-    } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
-      const entityId = DeleteEntity.read(buffer)!.entityId
-      yield `  ${prefix}: e=0x${entityId?.toString(16)} deleted`
+    } else if (message.type === CrdtMessageType.DELETE_ENTITY) {
+      yield preface
     } else {
-      yield 'Unknown CrdtMessageType'
+      yield `${preface} Unknown CrdtMessageType`
     }
   }
 }
@@ -74,7 +71,7 @@ async function run(fileName: string) {
 
     async function runRendererFrame(data: Uint8Array) {
       const serverUpdates = await vm.onServerUpdate(data)
-      out.push(...Array.from(serializeCrdtMessages('Renderer->Scene', serverUpdates)))
+      out.push(...Array.from(serializeCrdtMessages('Renderer', serverUpdates)))
 
       if (serverUpdates?.length) {
         return [serverUpdates]
@@ -105,7 +102,7 @@ async function run(fileName: string) {
             },
             async crdtSendToRenderer(payload: { data: Uint8Array }): Promise<{ data: Uint8Array[] }> {
               const data = new Uint8Array(Object.values(payload.data))
-              out.push(...Array.from(serializeCrdtMessages('CRDT', data)))
+              out.push(...Array.from(serializeCrdtMessages('Scene', data)))
               const serverUpdates = await runRendererFrame(data)
               return { data: serverUpdates }
             },

@@ -1,3 +1,4 @@
+import { DeepReadonly } from '../engine/readonly'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { ISchema } from './ISchema'
 
@@ -11,10 +12,10 @@ export const ArrayReflectionType = 'schemas::v1::array'
  */
 export const IArray = <T>(type: ISchema<T>): ISchema<Array<T>> => {
   return {
-    serialize(value: Array<T>, builder: ByteBuffer): void {
+    serialize(value: DeepReadonly<Array<T>>, builder: ByteBuffer): void {
       builder.writeUint32(value.length)
       for (const item of value) {
-        type.serialize(item, builder)
+        type.serialize(item as DeepReadonly<T>, builder)
       }
     },
     deserialize(reader: ByteBuffer): Array<T> {

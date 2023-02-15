@@ -11,6 +11,7 @@ export enum CrdtMessageType {
   DELETE_COMPONENT = 2,
 
   DELETE_ENTITY = 3,
+  APPEND_VALUE = 4,
 
   MAX_MESSAGE_TYPE
 }
@@ -50,6 +51,23 @@ export type PutComponentMessageBody = {
 }
 
 /**
+ * Min. length = header (8 bytes) + 16 bytes = 24 bytes
+ *
+ * @param entity - Uint32 number of the entity
+ * @param componentId - Uint32 number of id
+ * @param timestamp - Uint32 timestamp
+ * @param data - Uint8[] data of component => length(4 bytes) + block of bytes[0..length-1]
+ * @public
+ */
+export type AppendValueMessageBody = {
+  type: CrdtMessageType.APPEND_VALUE
+  entityId: Entity
+  componentId: number
+  timestamp: number
+  data: Uint8Array
+}
+
+/**
  * @param entity - Uint32 number of the entity
  * @param componentId - Uint32 number of id
  * @param timestamp - Uint32 Lamport timestamp
@@ -74,6 +92,10 @@ export type DeleteEntityMessageBody = {
 /**
  * @public
  */
+export type AppendValueMessage = CrdtMessageHeader & AppendValueMessageBody
+/**
+ * @public
+ */
 export type PutComponentMessage = CrdtMessageHeader & PutComponentMessageBody
 /**
  * @public
@@ -87,11 +109,16 @@ export type DeleteEntityMessage = CrdtMessageHeader & DeleteEntityMessageBody
 /**
  * @public
  */
-export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage
+export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage | AppendValueMessage
+
 /**
  * @public
  */
-export type CrdtMessageBody = PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessageBody
+export type CrdtMessageBody =
+  | PutComponentMessageBody
+  | DeleteComponentMessageBody
+  | DeleteEntityMessageBody
+  | AppendValueMessageBody
 
 export enum ProcessMessageResultType {
   /**
