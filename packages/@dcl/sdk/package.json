@@ -28,7 +28,7 @@
     "@dcl/mini-comms": "1.0.0",
     "@dcl/protocol": "1.0.0-4114477251.commit-ccb88d6",
     "@dcl/react-ecs": "file:../react-ecs",
-    "@dcl/schemas": "6.6.0",
+    "@dcl/schemas": "6.8.0",
     "@types/inquirer": "^8.2.5",
     "@well-known-components/env-config-provider": "^1.1.2-20220801195549.commit-101c273",
     "@well-known-components/http-server": "^1.1.6-20220927190058.commit-2dfb235",
