@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
+import { useDrag, useDrop } from 'react-dnd'
 
 import './Tree.css'
 
 import { Tree, TreeType } from '../../utils/tree'
 import { Input } from './input'
 import { Controls } from './controls'
-import initActive from '../../utils/set-value'
 import { Icon } from './icon'
 
 interface Props {
@@ -17,7 +17,6 @@ interface TreeProps {
   update: () => void
 }
 
-const active = initActive<Tree>()
 const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : 'block' })
 const getExpandStyles = (active: boolean) => ({ height: active ? 'auto' : '0', overflow: 'hidden', display: 'block' })
 
@@ -28,25 +27,25 @@ function TreeComponent({ tree, update }: TreeProps) {
   const [editMode, setEditMode] = useState(false)
   const [insertMode, setInsertMode] = useState<TreeType | undefined>(undefined)
 
+  const [, drag] = useDrag(
+    () => ({
+      type: 'tree',
+      item: tree
+    }),
+    [tree]
+  )
+
+  const [, drop] = useDrop(() => ({
+    accept: 'tree',
+    drop: (item: typeof tree, monitor) => {
+      if (monitor.didDrop()) return
+      tree.becomeParentOf(item)
+      update()
+    }
+  }))
+
   const quitEditMode = () => setEditMode(false)
   const quitInsertMode = () => setInsertMode(undefined)
-
-  const onDrop = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    const droppedChild = active.get()
-
-    if (!droppedChild) return
-
-    tree.becomeParentOf(droppedChild)
-    active.unset()
-    update()
-  }
-
-  const onDragStart = (e: React.DragEvent) => {
-    e.stopPropagation()
-    if (!parent) return
-    active.set(tree)
-  }
 
   const handleToggleExpand = (_: React.MouseEvent) => {
     tree.toggleExpand()
@@ -84,7 +83,7 @@ function TreeComponent({ tree, update }: TreeProps) {
   }
 
   return (
-    <ul draggable onDragOver={(e: React.DragEvent) => e.preventDefault()} onDragStart={onDragStart} onDrop={onDrop}>
+    <ul ref={(node) => drag(drop(node))}>
       <li>
         <div>
           <Icon fileName={value} expanded={expanded} type={type} />
@@ -100,11 +99,13 @@ function TreeComponent({ tree, update }: TreeProps) {
           </span>
           {editMode && <Input value={value} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
         </div>
-        <div style={getExpandStyles(expanded)}>
-          {childs.map(($, i) => (
-            <MemoTree tree={$} key={`${value}-${i}`} update={update} />
-          ))}
-        </div>
+        {tree.isDirectory() && (
+          <div style={getExpandStyles(expanded)}>
+            {childs.map(($, i) => (
+              <MemoTree tree={$} key={`${value}-${i}`} update={update} />
+            ))}
+          </div>
+        )}
         {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={onChangeNewChild} />}
       </li>
     </ul>
@@ -112,12 +113,12 @@ function TreeComponent({ tree, update }: TreeProps) {
 }
 
 function BuildTree({ value }: Props) {
-  const [tree, setTree] = useState(0)
-  const updateTree = () => setTree(tree + 1)
+  const [_, setTree] = useState(0)
+  const updateTree = () => setTree((tree) => tree + 1)
 
   return (
     <div className="tree">
-      <TreeComponent tree={value} update={updateTree} />
+      <MemoTree tree={value} update={updateTree} />
     </div>
   )
 }
