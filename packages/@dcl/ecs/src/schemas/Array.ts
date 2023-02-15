@@ -23,6 +23,11 @@ export const IArray = <T>(type: ISchema<T>): ISchema<Array<T>> => {
     },
     create() {
       return []
+    },
+    jsonSchema: {
+      type: 'array',
+      items: type.jsonSchema,
+      serializationType: 'array'
     }
   }
 }

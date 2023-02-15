@@ -26,5 +26,15 @@ export const Color4Schema: ISchema<Color4Type> = {
   },
   create() {
     return { r: 0, g: 0, b: 0, a: 0 }
+  },
+  jsonSchema: {
+    type: 'object',
+    properties: {
+      r: { type: 'number' },
+      g: { type: 'number' },
+      b: { type: 'number' },
+      a: { type: 'number' }
+    },
+    serializationType: 'color4'
   }
 }

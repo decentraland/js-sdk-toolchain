@@ -1006,8 +1006,27 @@ export interface ISchema<T = any> {
     // (undocumented)
     extend?: (base: Partial<DeepReadonly<T>> | undefined) => T;
     // (undocumented)
+    jsonSchema: JsonSchemaExtended;
+    // (undocumented)
     serialize(value: DeepReadonly<T>, builder: ByteBuffer): void;
 }
+
+// @public (undocumented)
+export type JsonArray = Array<JsonPrimitive | JsonMap | JsonArray>;
+
+// @public (undocumented)
+export type JsonMap = {
+    [key: string]: JsonPrimitive | JsonMap | JsonArray;
+};
+
+// @public (undocumented)
+export type JsonPrimitive = string | number | boolean | null;
+
+// @public
+export type JsonSchemaExtended = {
+    type: 'object' | 'number' | 'integer' | 'string' | 'array' | 'boolean';
+    serializationType: 'boolean' | 'enum-int' | 'enum-string' | 'int8' | 'int16' | 'int32' | 'int64' | 'float32' | 'float64' | 'vector3' | 'color3' | 'quaternion' | 'color4' | 'map' | 'optional' | 'entity' | 'array' | 'utf8-string' | 'protocol-buffer' | 'transform' | 'unknown';
+} & JsonMap;
 
 // Warning: (tsdoc-undefined-tag) The TSDoc tag "@hidden" is not defined in this configuration
 // Warning: (ae-missing-release-tag) "JSX" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)

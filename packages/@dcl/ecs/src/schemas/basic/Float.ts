@@ -13,6 +13,10 @@ export const Float32: ISchema<number> = {
   },
   create() {
     return 0.0
+  },
+  jsonSchema: {
+    type: 'number',
+    serializationType: 'float32'
   }
 }
 
@@ -28,5 +32,9 @@ export const Float64: ISchema<number> = {
   },
   create() {
     return 0.0
+  },
+  jsonSchema: {
+    type: 'number',
+    serializationType: 'float64'
   }
 }

@@ -1,5 +1,6 @@
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
+import { jsonSchemaToSchema } from '../../packages/@dcl/ecs/src/schemas/buildSchema'
 import { ISchema } from '../../packages/@dcl/ecs/src/schemas/ISchema'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
@@ -528,5 +529,60 @@ describe('Serialization Types', () => {
 
       Schemas.EnumNumber<RightEnum>(RightEnum, RightEnum.Red)
     }).not.toThrowError()
+  })
+
+  it('should the same with schema component', () => {
+    enum StringEnum {
+      FIRST = 'first_item',
+      SECOND = 'second_item',
+      THIRD = '3rd'
+    }
+    enum IntEnum {
+      FIRST = 1,
+      SECOND = 2,
+      THIRD = 3
+    }
+
+    const engine = Engine()
+    const mapWithAllPrimitives = {
+      someBoolean: Schemas.Boolean,
+      someString: Schemas.String,
+      someFloat: Schemas.Float,
+      someDouble: Schemas.Double,
+      someByte: Schemas.Byte,
+      someShort: Schemas.Short,
+      someInt: Schemas.Int,
+      someInt64: Schemas.Int64,
+      someNumber: Schemas.Number,
+      someVector3: Schemas.Vector3,
+      someQuaternion: Schemas.Quaternion,
+      someColor3: Schemas.Color3,
+      someColor4: Schemas.Color4,
+      someEntity: Schemas.Entity,
+      someIntEnum: Schemas.EnumNumber(IntEnum, IntEnum.THIRD),
+      someIntEnum2: Schemas.EnumNumber(IntEnum, IntEnum.SECOND),
+      someStringEnum: Schemas.EnumString(StringEnum, StringEnum.FIRST),
+      someStringEnum2: Schemas.EnumString(StringEnum, StringEnum.THIRD),
+      optionalValue: Schemas.Optional(Schemas.String)
+    }
+
+    const comp = engine.defineComponent('test', {
+      arrayOf: Schemas.Array(Schemas.Map(mapWithAllPrimitives)),
+      mapOf: Schemas.Map(mapWithAllPrimitives)
+    })
+
+    const jsonSchemaComponent = JSON.parse(JSON.stringify(comp.schema.jsonSchema))
+    const schemaFromJson = jsonSchemaToSchema(jsonSchemaComponent)
+    const clonedComp = engine.defineComponentFromSchema('test-cloned', schemaFromJson)
+
+    expect(comp.schema.create()).toStrictEqual(clonedComp.schema.create())
+  })
+  it('should fail with unknown schema description', () => {
+    expect(() => {
+      jsonSchemaToSchema({
+        type: 'super-strange-description' as any,
+        serializationType: 'sarasa' as any
+      })
+    }).toThrowError()
   })
 })

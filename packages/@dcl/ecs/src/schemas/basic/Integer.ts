@@ -13,6 +13,10 @@ export const Int64: ISchema<number> = {
   },
   create() {
     return 0
+  },
+  jsonSchema: {
+    type: 'integer',
+    serializationType: 'int64'
   }
 }
 
@@ -28,6 +32,10 @@ export const Int32: ISchema<number> = {
   },
   create() {
     return 0
+  },
+  jsonSchema: {
+    type: 'integer',
+    serializationType: 'int32'
   }
 }
 
@@ -43,6 +51,10 @@ export const Int16: ISchema<number> = {
   },
   create() {
     return 0
+  },
+  jsonSchema: {
+    type: 'integer',
+    serializationType: 'int16'
   }
 }
 
@@ -58,5 +70,9 @@ export const Int8: ISchema<number> = {
   },
   create() {
     return 0
+  },
+  jsonSchema: {
+    type: 'integer',
+    serializationType: 'int8'
   }
 }

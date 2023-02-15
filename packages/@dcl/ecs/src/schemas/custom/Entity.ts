@@ -14,5 +14,9 @@ export const EntitySchema: ISchema<Entity> = {
   },
   create() {
     return 0 as Entity
+  },
+  jsonSchema: {
+    type: 'integer',
+    serializationType: 'entity'
   }
 }

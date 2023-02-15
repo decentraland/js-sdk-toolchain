@@ -13,6 +13,10 @@ export const FlatString: ISchema<string> = {
   },
   create() {
     return ''
+  },
+  jsonSchema: {
+    type: 'string',
+    serializationType: 'utf8-string'
   }
 }
 

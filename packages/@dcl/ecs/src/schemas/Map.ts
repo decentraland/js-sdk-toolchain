@@ -28,6 +28,11 @@ export type MapResultWithOptional<T extends Spec> = ToOptional<{
  * @internal
  */
 export const IMap = <T extends Spec>(spec: T, defaultValue?: Partial<MapResult<T>>): ISchema<MapResult<T>> => {
+  const specReflection = Object.keys(spec).reduce((specReflection, currentKey) => {
+    specReflection[currentKey] = spec[currentKey].jsonSchema
+    return specReflection
+  }, {} as Record<string, any>)
+
   return {
     serialize(value: DeepReadonly<MapResult<T>>, builder: ByteBuffer): void {
       for (const key in spec) {
@@ -54,6 +59,11 @@ export const IMap = <T extends Spec>(spec: T, defaultValue?: Partial<MapResult<T
         ;(newValue as any)[key] = spec[key].create()
       }
       return { ...newValue, ...defaultValue, ...base }
+    },
+    jsonSchema: {
+      type: 'object',
+      properties: specReflection,
+      serializationType: 'map'
     }
   }
 }

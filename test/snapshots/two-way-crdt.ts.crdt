@@ -7,8 +7,8 @@ EVAL test/snapshots/two-way-crdt.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 11k
-  MALLOC_COUNT = 6240
-  ALIVE_OBJS_DELTA ~= 1.04k
+  MALLOC_COUNT = 6402
+  ALIVE_OBJS_DELTA ~= 1.10k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
@@ -30,14 +30,14 @@ CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x0 c=1 t=4 data=null
   Scene: DELETE_ENTITY e=0x200
   OPCODES ~= 6k
-  MALLOC_COUNT = -49
+  MALLOC_COUNT = -46
   ALIVE_OBJS_DELTA ~= -0.02k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x0 c=1 t=5 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=6 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   OPCODES ~= 6k
-  MALLOC_COUNT = 35
+  MALLOC_COUNT = 32
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
   LOG: ["✅ RootEntity has the correct position"]
@@ -45,6 +45,6 @@ CALL onUpdate(0.1)
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=7 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   OPCODES ~= 4k
-  MALLOC_COUNT = -1
+  MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 804.76k bytes
+  MEMORY_USAGE_COUNT ~= 812.77k bytes

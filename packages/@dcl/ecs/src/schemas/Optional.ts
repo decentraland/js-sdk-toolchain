@@ -23,6 +23,11 @@ export const IOptional = <T>(spec: ISchema<T>): ISchema<T | undefined> => {
     },
     create() {
       return undefined
+    },
+    jsonSchema: {
+      type: spec.jsonSchema.type,
+      serializationType: 'optional',
+      optionalJsonSchema: spec.jsonSchema
     }
   }
 }
