@@ -1,9 +1,10 @@
-import { ByteBuffer, Entity, IEngine } from '../../packages/@dcl/ecs/src/engine'
+import { ByteBuffer, ComponentType, Entity, IEngine } from '../../packages/@dcl/ecs/src/engine'
 import { componentNumberFromName } from '../../packages/@dcl/ecs/src/components/component-number'
-import { createGetCrdtMessages, createUpdateFromCrdt } from '../../packages/@dcl/ecs/src/engine/component'
+import {
+  createGetCrdtMessagesForLww,
+  createUpdateLwwFromCrdt
+} from '../../packages/@dcl/ecs/src/engine/lww-element-set-component-definition'
 import * as components from '../../packages/@dcl/ecs/src/components'
-
-import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
 export const componentName = 'int8'
 export const ID = componentNumberFromName(componentName)
@@ -18,16 +19,20 @@ export const int8Component = (engine: IEngine) => {
     },
     deserialize(reader: ByteBuffer) {
       return reader.readInt8()
+    },
+    create() {
+      return 0
     }
   }
-  type Type = components.ComponentDefinition<any> & { setTestTimestamp(entity: Entity, timestamp: number): void }
+  type Type = components.LastWriteWinElementSetComponentDefinition<any> & {
+    setTestTimestamp(entity: Entity, timestamp: number): void
+  }
   const component: Type = {
     componentId: ID,
     componentName: componentName,
-    updateFromCrdt: createUpdateFromCrdt(ID, timestamps, schema, data),
-    default: function () {
-      return 0
-    },
+    componentType: ComponentType.LastWriteWinElementSet,
+    updateFromCrdt: createUpdateLwwFromCrdt(ID, timestamps, schema, data),
+    schema,
     has: function (entity: Entity): boolean {
       return data.has(entity)
     },
@@ -64,14 +69,6 @@ export const int8Component = (engine: IEngine) => {
     getMutableOrNull: function (_entity: Entity) {
       throw new Error('Function not implemented.')
     },
-    toBinary: function (entity: Entity): ByteBuffer {
-      const b = new ReadWriteByteBuffer()
-      b.writeInt8(data.get(entity)!)
-      return b
-    },
-    deserialize(buffer) {
-      return buffer.readInt8()
-    },
     *iterator() {
       for (const [entity, component] of data) {
         yield [entity, component]
@@ -82,10 +79,7 @@ export const int8Component = (engine: IEngine) => {
         yield entity
       }
     },
-    isDirty: function (entity: Entity): boolean {
-      return dirtyIterator.has(entity)
-    },
-    getCrdtUpdates: createGetCrdtMessages(ID, timestamps, dirtyIterator, schema, data),
+    getCrdtUpdates: createGetCrdtMessagesForLww(ID, timestamps, dirtyIterator, schema, data),
     setTestTimestamp(entity: Entity, timestamp: number) {
       timestamps.set(entity, (timestamps.get(entity) || 0) + timestamp)
     }

@@ -1,10 +1,11 @@
-import { ComponentDefinition, Entity, IEngine } from '../../engine'
+import { LastWriteWinElementSetComponentDefinition, Entity, IEngine } from '../../engine'
 import { ColliderLayer, MeshCollider, PBMeshCollider } from '../generated/index.gen'
 
 /**
  * @public
  */
-export interface MeshColliderComponentDefinitionExtended extends ComponentDefinition<PBMeshCollider> {
+export interface MeshColliderComponentDefinitionExtended
+  extends LastWriteWinElementSetComponentDefinition<PBMeshCollider> {
   /**
    * @public
    * Set a box in the MeshCollider component

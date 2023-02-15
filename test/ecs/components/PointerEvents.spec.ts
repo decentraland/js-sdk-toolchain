@@ -61,22 +61,18 @@ describe('Generated OnPointerDown ProtoBuf', () => {
     await newEngine.update(1 / 30)
 
     // We receive an OnPointerResult
-    PointerEventsResult.create(entity, {
-      commands: [
-        {
-          button: InputAction.IA_ACTION_3,
-          timestamp: 5,
-          hit: {
-            position: { x: 1, y: 2, z: 3 },
-            length: 10,
-            direction: { x: 1, y: 2, z: 3 },
-            normalHit: { x: 1, y: 2, z: 3 },
-            origin: { x: 1, y: 2, z: 3 },
-            meshName: 'mesh'
-          },
-          state: PointerEventType.PET_DOWN
-        }
-      ]
+    PointerEventsResult.addValue(entity, {
+      button: InputAction.IA_ACTION_3,
+      timestamp: 5,
+      hit: {
+        position: { x: 1, y: 2, z: 3 },
+        length: 10,
+        direction: { x: 1, y: 2, z: 3 },
+        normalHit: { x: 1, y: 2, z: 3 },
+        origin: { x: 1, y: 2, z: 3 },
+        meshName: 'mesh'
+      },
+      state: PointerEventType.PET_DOWN
     })
 
     expect(PointerEventsResult.has(entity))

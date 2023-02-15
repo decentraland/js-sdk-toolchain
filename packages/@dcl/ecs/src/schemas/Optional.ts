@@ -1,3 +1,4 @@
+import { DeepReadonly } from '../engine/readonly'
 import { ByteBuffer } from '../serialization/ByteBuffer'
 import { ISchema } from './ISchema'
 
@@ -6,7 +7,7 @@ import { ISchema } from './ISchema'
  */
 export const IOptional = <T>(spec: ISchema<T>): ISchema<T | undefined> => {
   return {
-    serialize(value: T | undefined, builder: ByteBuffer): void {
+    serialize(value: DeepReadonly<T> | undefined, builder: ByteBuffer): void {
       if (value) {
         builder.writeInt8(1)
         spec.serialize(value, builder)

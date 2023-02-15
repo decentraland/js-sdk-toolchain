@@ -1,6 +1,6 @@
 import { CrdtMessageType, Entity } from '../../packages/@dcl/ecs/src'
 import { dataCompare } from '../../packages/@dcl/ecs/src/systems/crdt/utils'
-import { createUpdateFromCrdt } from '../../packages/@dcl/ecs/src/engine/component'
+import { createUpdateLwwFromCrdt } from '../../packages/@dcl/ecs/src/engine/lww-element-set-component-definition'
 import { ByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
 describe('dataCompare', () => {
@@ -41,7 +41,7 @@ describe('Conflict resolution rules for LWW-ElementSet based components', () => 
   const timestamps = new Map<Entity, number>()
   const data = new Map<Entity, number>()
 
-  const updateFn = createUpdateFromCrdt(componentId, timestamps, schema, data)
+  const updateFn = createUpdateLwwFromCrdt(componentId, timestamps, schema, data)
 
   it('PUT an unexistent value should succeed', () => {
     const entityId = 0 as Entity

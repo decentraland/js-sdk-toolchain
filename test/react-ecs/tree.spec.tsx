@@ -58,9 +58,9 @@ describe('RectEcs UI ✨', () => {
     width = 400
     await engine.update(1)
 
-    expect(UiTransform.isDirty(childEntity)).toBe(false)
-    expect(UiTransform.isDirty(rootEntity)).toBe(false)
-    expect(UiTransform.isDirty(entityB)).toBe(false)
+    expect(Array.from(UiTransform.dirtyIterator()).includes(childEntity)).toBe(false)
+    expect(Array.from(UiTransform.dirtyIterator()).includes(rootEntity)).toBe(false)
+    expect(Array.from(UiTransform.dirtyIterator()).includes(entityB)).toBe(false)
     expect(getUi(entityA).width).toBe(400)
   })
   it('should add a child at the beggining and then remove it', async () => {
@@ -112,7 +112,7 @@ describe('RectEcs UI ✨', () => {
     await engine.update(1)
 
     // Root UiEntity doesn't have to change
-    expect(UiTransform.isDirty(rootEntity)).toBe(false)
+    expect(Array.from(UiTransform.dirtyIterator()).includes(rootEntity)).toBe(false)
 
     // Entity added must be the first element.
     expect(getUi(entityAdded)).toMatchObject({

@@ -1,3 +1,4 @@
+import { DeepReadonly } from '../../engine/readonly'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
 import { ISchema } from '../ISchema'
 import { Int32 } from './Integer'
@@ -47,7 +48,7 @@ export const IntEnum = <T>(enumObject: Record<any, any>, defaultValue: T): ISche
   validateMemberValuesAreNumbersAndInRangeInt32(enumObject)
 
   return {
-    serialize(value: T, builder: ByteBuffer): void {
+    serialize(value: DeepReadonly<T>, builder: ByteBuffer): void {
       Int32.serialize(value as number, builder)
     },
     deserialize(reader: ByteBuffer): T {
@@ -66,7 +67,7 @@ export const StringEnum = <T>(enumObject: Record<any, any>, defaultValue: T): IS
   validateMemberValuesAreStrings(enumObject)
 
   return {
-    serialize(value: T, builder: ByteBuffer): void {
+    serialize(value: DeepReadonly<T>, builder: ByteBuffer): void {
       FlatString.serialize(value as string, builder)
     },
     deserialize(reader: ByteBuffer): T {

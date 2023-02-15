@@ -1,5 +1,5 @@
 import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
-import { PBPointerEventsResult_PointerCommand } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
+import { PBPointerEventsResult } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
 import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_events.gen'
 import * as components from '../components'
 import { IEngine } from '../engine/types'
@@ -10,7 +10,7 @@ import { checkNotThenable } from '../runtime/invariant'
 /**
  * @public
  */
-export type EventSystemCallback = (event: PBPointerEventsResult_PointerCommand) => void
+export type EventSystemCallback = (event: PBPointerEventsResult) => void
 
 /**
  * @public

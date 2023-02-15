@@ -1,6 +1,7 @@
 import { Engine, Entity, components } from '../../../packages/@dcl/ecs/src'
 import { Quaternion, Vector3 } from '../../../packages/@dcl/sdk/src/math'
-import { TRANSFORM_LENGTH } from '../../../packages/@dcl/ecs/src/components/legacy/Transform'
+import { TRANSFORM_LENGTH } from '../../../packages/@dcl/ecs/src/components/manual/Transform'
+import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { testComponentSerialization } from './assertion'
 
 describe('Transform component', () => {
@@ -11,16 +12,18 @@ describe('Transform component', () => {
   it('should serialize Transform with 44 bytes', () => {
     const newEngine = Engine()
     const Transform = components.Transform(newEngine)
-    const entity = newEngine.addEntity()
 
-    Transform.create(entity, {
-      position: Vector3.create(Math.PI, Math.LN10, Math.SQRT1_2),
-      rotation: Quaternion.create(Math.PI, Math.E, 0.0, Math.SQRT1_2),
-      scale: Vector3.create(Math.PI, Math.E, Math.LN10),
-      parent: 123456789 as Entity
-    })
+    const buffer = new ReadWriteByteBuffer()
+    Transform.schema.serialize(
+      {
+        position: Vector3.create(Math.PI, Math.LN10, Math.SQRT1_2),
+        rotation: Quaternion.create(Math.PI, Math.E, 0.0, Math.SQRT1_2),
+        scale: Vector3.create(Math.PI, Math.E, Math.LN10),
+        parent: 123456789 as Entity
+      },
+      buffer
+    )
 
-    const buffer = Transform.toBinary(entity)
     expect(Array.from(buffer.toBinary())).toStrictEqual([
       64, 73, 15, 219, 64, 19, 93, 142, 63, 53, 4, 243, 64, 73, 15, 219, 64, 45, 248, 84, 0, 0, 0, 0, 63, 53, 4, 243,
       64, 73, 15, 219, 64, 45, 248, 84, 64, 19, 93, 142, 7, 91, 205, 21

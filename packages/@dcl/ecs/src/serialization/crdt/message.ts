@@ -4,6 +4,7 @@ import { CrdtMessageType, CrdtMessage } from './types'
 import { PutComponentOperation } from './putComponent'
 import { DeleteComponent } from './deleteComponent'
 import { DeleteEntity } from './deleteEntity'
+import { AppendValueOperation } from './appendValue'
 
 export function readMessage(buf: ByteBuffer): CrdtMessage | null {
   const header = CrdtMessageProtocol.getHeader(buf)
@@ -13,6 +14,8 @@ export function readMessage(buf: ByteBuffer): CrdtMessage | null {
     return PutComponentOperation.read(buf)
   } else if (header.type === CrdtMessageType.DELETE_COMPONENT) {
     return DeleteComponent.read(buf)
+  } else if (header.type === CrdtMessageType.APPEND_VALUE) {
+    return AppendValueOperation.read(buf)
   } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
     return DeleteEntity.read(buf)
   }

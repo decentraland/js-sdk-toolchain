@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 /**
  * A class serves as a medium between the observable and its observers
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed
