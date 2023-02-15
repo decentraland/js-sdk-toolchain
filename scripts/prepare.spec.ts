@@ -45,7 +45,11 @@ function installCrossDependencies(...paths: string[]) {
       if (key.startsWith('@dcl')) {
         const dependencyRootPath = resolve('packages', key)
         if (pathExistsSync(dependencyRootPath)) {
-          itInstallsADependencyFromFolderAndCopiesTheVersion(path, dependencyRootPath, key in devDependencies)
+          itInstallsADependencyFromFolderAndCopiesTheVersion(
+            path,
+            dependencyRootPath,
+            (devDependencies && key in devDependencies) || false
+          )
         }
       }
     }
