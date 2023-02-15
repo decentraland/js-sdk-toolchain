@@ -1,7 +1,7 @@
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
+import { jsonSchemaToSchema } from '../../packages/@dcl/ecs/src/schemas/buildSchema'
 import { ISchema } from '../../packages/@dcl/ecs/src/schemas/ISchema'
-import { schemaDescriptionToSchema } from '../../packages/@dcl/ecs/src/schemas/buildSchema'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
 const Vector3 = Schemas.Map({
@@ -571,16 +571,17 @@ describe('Serialization Types', () => {
       mapOf: Schemas.Map(mapWithAllPrimitives)
     })
 
-    const componentDescription = JSON.parse(JSON.stringify(comp.schema?.description))
-    const schemaFromDescription = schemaDescriptionToSchema(componentDescription)
+    const componentDescription = JSON.parse(JSON.stringify(comp.schema.jsonSchema))
+    const schemaFromDescription = jsonSchemaToSchema(componentDescription)
     const clonedComp = engine.defineComponentFromSchema('test-cloned', schemaFromDescription)
 
     expect(comp.schema.create()).toStrictEqual(clonedComp.schema.create())
   })
   it('should fail with unknown schema description', () => {
     expect(() => {
-      const _schemaFromDescription = schemaDescriptionToSchema({
-        type: 'super-strange-description'
+      const _schemaFromDescription = jsonSchemaToSchema({
+        type: 'super-strange-description' as any,
+        serializationType: 'sarasa' as any
       })
     }).toThrowError()
   })

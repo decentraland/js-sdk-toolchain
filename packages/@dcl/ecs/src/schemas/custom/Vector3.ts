@@ -25,7 +25,14 @@ export const Vector3Schema: ISchema<Vector3Type> = {
   create() {
     return { x: 0, y: 0, z: 0 }
   },
-  description: {
-    type: 'schemas::v1::vector3'
+  jsonSchema: {
+    type: 'object',
+    properties: {
+      x: { type: 'number' },
+      y: { type: 'number' },
+      z: { type: 'number' },
+      w: { type: 'number' }
+    },
+    serializationType: 'vector3'
   }
 }

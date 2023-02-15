@@ -24,8 +24,9 @@ export const int8Component = (engine: IEngine) => {
     create() {
       return 0
     },
-    description: {
-      type: 'schemas::v1::int8'
+    jsonSchema: {
+      type: 'integer',
+      serializationType: 'int8'
     }
   }
   type Type = components.LastWriteWinElementSetComponentDefinition<any> & {

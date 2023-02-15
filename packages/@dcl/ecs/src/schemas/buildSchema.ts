@@ -1,85 +1,71 @@
-import { ArrayReflectionType, IArray } from './Array'
+import { IArray } from './Array'
 import { Bool } from './basic/Boolean'
-import { IntEnum, IntEnumReflectionType, StringEnum, StringEnumReflectionType } from './basic/Enum'
+import { IntEnum, StringEnum } from './basic/Enum'
 import { Float32, Float64 } from './basic/Float'
-import { Int16, Int32, Int8, Int64 } from './basic/Integer'
+import { Int16, Int32, Int64, Int8 } from './basic/Integer'
 import { EcsString } from './basic/String'
 import { Color3Schema } from './custom/Color3'
 import { Color4Schema } from './custom/Color4'
 import { EntitySchema } from './custom/Entity'
 import { QuaternionSchema } from './custom/Quaternion'
 import { Vector3Schema } from './custom/Vector3'
-import { ISchema, SchemaDescription } from './ISchema'
-import { IMap, MapReflectionType } from './Map'
-import { IOptional, OptionalReflectionType } from './Optional'
+import { ISchema, JsonSchemaExtended } from './ISchema'
+import { IMap } from './Map'
+import { IOptional } from './Optional'
 
 const primitiveSchemas = {
-  [Bool.description.type]: Bool,
-  [EcsString.description.type]: EcsString,
-  [Float32.description.type]: Float32,
-  [Float64.description.type]: Float64,
-  [Int8.description.type]: Int8,
-  [Int16.description.type]: Int16,
-  [Int32.description.type]: Int32,
-  [Int64.description.type]: Int64,
-  [Vector3Schema.description.type]: Vector3Schema,
-  [QuaternionSchema.description.type]: QuaternionSchema,
-  [Color3Schema.description.type]: Color3Schema,
-  [Color4Schema.description.type]: Color4Schema,
-  [EntitySchema.description.type]: EntitySchema
-}
-
-const generationWithSpecSchemas: Record<string, (spec: ISchema<any>) => ISchema> = {
-  [ArrayReflectionType]: IArray,
-  [OptionalReflectionType]: IOptional
-}
-
-type GenerationWithSpecDescription = SchemaDescription & {
-  spec: SchemaDescription
-}
-
-const enumSchemas: Record<string, (enumObject: Record<string, any>, defaultValue: any) => ISchema> = {
-  [IntEnumReflectionType]: IntEnum,
-  [StringEnumReflectionType]: StringEnum
-}
-
-type EnumSchemaDescriprtion = SchemaDescription & {
-  enumObject: Record<any, any>
-  defaultValue: any
-}
-
-type MapSchemaDescription = SchemaDescription & {
-  spec: Record<string, SchemaDescription>
+  [Bool.jsonSchema.serializationType]: Bool,
+  [EcsString.jsonSchema.serializationType]: EcsString,
+  [Float32.jsonSchema.serializationType]: Float32,
+  [Float64.jsonSchema.serializationType]: Float64,
+  [Int8.jsonSchema.serializationType]: Int8,
+  [Int16.jsonSchema.serializationType]: Int16,
+  [Int32.jsonSchema.serializationType]: Int32,
+  [Int64.jsonSchema.serializationType]: Int64,
+  [Vector3Schema.jsonSchema.serializationType]: Vector3Schema,
+  [QuaternionSchema.jsonSchema.serializationType]: QuaternionSchema,
+  [Color3Schema.jsonSchema.serializationType]: Color3Schema,
+  [Color4Schema.jsonSchema.serializationType]: Color4Schema,
+  [EntitySchema.jsonSchema.serializationType]: EntitySchema
 }
 
 /**
- * Create an ISchema object from the schema description
- * @param description the SchemaDescription object
- * @returns a ISchema or fail for unsupported description
+ * Create an ISchema object from the schema jsonSchema
+ * @param jsonSchema the SchemaDescription object
+ * @returns a ISchema or fail for unsupported jsonSchema
  */
-export function schemaDescriptionToSchema(description: SchemaDescription): ISchema<any> {
-  if (primitiveSchemas[description.type]) {
-    return primitiveSchemas[description.type]
+export function jsonSchemaToSchema(jsonSchema: JsonSchemaExtended): ISchema<any> {
+  if (primitiveSchemas[jsonSchema.serializationType]) {
+    return primitiveSchemas[jsonSchema.serializationType]
   }
 
-  if (description.type === MapReflectionType) {
-    const specDescription = description as MapSchemaDescription
+  if (jsonSchema.serializationType === 'map') {
+    const mapJsonSchema = jsonSchema as JsonSchemaExtended & { properties: Record<string, JsonSchemaExtended> }
     const spec: Record<string, ISchema> = {}
-    for (const key in specDescription.spec) {
-      spec[key] = schemaDescriptionToSchema(specDescription.spec[key])
+    for (const key in mapJsonSchema.properties) {
+      spec[key] = jsonSchemaToSchema(mapJsonSchema.properties[key])
     }
     return IMap(spec)
   }
 
-  if (Object.keys(generationWithSpecSchemas).includes(description.type)) {
-    const withSpecDescription = description as GenerationWithSpecDescription
-    return generationWithSpecSchemas[description.type](schemaDescriptionToSchema(withSpecDescription.spec))
+  if (jsonSchema.serializationType === 'optional') {
+    const withItemsJsonSchema = jsonSchema as JsonSchemaExtended & { optionalJsonSchema: JsonSchemaExtended }
+    return IOptional(jsonSchemaToSchema(withItemsJsonSchema.optionalJsonSchema))
   }
 
-  if (Object.keys(enumSchemas).includes(description.type)) {
-    const enumDescription = description as EnumSchemaDescriprtion
-    return enumSchemas[description.type](enumDescription.enumObject, enumDescription.defaultValue)
+  if (jsonSchema.serializationType === 'array') {
+    const withItemsJsonSchema = jsonSchema as JsonSchemaExtended & { items: JsonSchemaExtended }
+    return IArray(jsonSchemaToSchema(withItemsJsonSchema.items))
   }
 
-  throw new Error(`${description.type} is not supported as reverse schema generation.`)
+  if (jsonSchema.serializationType === 'enum-int') {
+    const enumJsonSchema = jsonSchema as JsonSchemaExtended & { enumObject: Record<any, any>; default: number }
+    return IntEnum(enumJsonSchema.enumObject, enumJsonSchema.default)
+  }
+  if (jsonSchema.serializationType === 'enum-string') {
+    const enumJsonSchema = jsonSchema as JsonSchemaExtended & { enumObject: Record<any, any>; default: string }
+    return StringEnum(enumJsonSchema.enumObject, enumJsonSchema.default)
+  }
+
+  throw new Error(`${jsonSchema.serializationType} is not supported as reverse schema generation.`)
 }

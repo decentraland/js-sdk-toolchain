@@ -14,7 +14,8 @@ export const Bool: ISchema<boolean> = {
   create() {
     return false
   },
-  description: {
-    type: 'schemas::v1::boolean'
+  jsonSchema: {
+    type: 'boolean',
+    serializationType: 'boolean'
   }
 }

@@ -89,8 +89,37 @@ export const TransformSchema: ISchema<TransformType> = {
       ...value
     }
   },
-  description: {
-    type: 'built-in::Transform'
+  jsonSchema: {
+    type: 'object',
+    properties: {
+      position: {
+        type: 'object',
+        properties: {
+          x: { type: 'number' },
+          y: { type: 'number' },
+          z: { type: 'number' }
+        }
+      },
+      scale: {
+        type: 'object',
+        properties: {
+          x: { type: 'number' },
+          y: { type: 'number' },
+          z: { type: 'number' }
+        }
+      },
+      rotation: {
+        type: 'object',
+        properties: {
+          x: { type: 'number' },
+          y: { type: 'number' },
+          z: { type: 'number' },
+          w: { type: 'number' }
+        }
+      },
+      parent: { type: 'integer' }
+    },
+    serializationType: 'transform'
   }
 }
 

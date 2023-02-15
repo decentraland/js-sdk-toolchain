@@ -25,7 +25,13 @@ export const Color3Schema: ISchema<Color3Type> = {
   create() {
     return { r: 0, g: 0, b: 0 }
   },
-  description: {
-    type: 'schemas::v1::color3'
+  jsonSchema: {
+    type: 'object',
+    properties: {
+      r: { type: 'number' },
+      g: { type: 'number' },
+      b: { type: 'number' }
+    },
+    serializationType: 'color3'
   }
 }

@@ -19,8 +19,11 @@ export const $\{ComponentName\}Schema: ISchema<PB$\{ComponentName\}> & { COMPONE
     // TODO: this is a hack.
     return PB$\{ComponentName\}.decode(new Uint8Array())
   },
-  description: {
-    type: "built-in::PB$\{ComponentName\}"
+  jsonSchema: {
+    type: "object",
+    properties: {},
+    serializationType: "protocol-buffer",
+    protocolBuffer: "PB$\{ComponentName\}"
   }
 }
 `

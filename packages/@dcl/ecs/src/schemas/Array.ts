@@ -5,11 +5,6 @@ import { ISchema } from './ISchema'
 /**
  * @internal
  */
-export const ArrayReflectionType = 'schemas::v1::array'
-
-/**
- * @internal
- */
 export const IArray = <T>(type: ISchema<T>): ISchema<Array<T>> => {
   return {
     serialize(value: DeepReadonly<Array<T>>, builder: ByteBuffer): void {
@@ -29,9 +24,10 @@ export const IArray = <T>(type: ISchema<T>): ISchema<Array<T>> => {
     create() {
       return []
     },
-    description: {
-      type: ArrayReflectionType,
-      spec: type.description
+    jsonSchema: {
+      type: 'array',
+      items: type.jsonSchema,
+      serializationType: 'array'
     }
   }
 }

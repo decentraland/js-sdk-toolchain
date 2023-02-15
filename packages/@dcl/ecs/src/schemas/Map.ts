@@ -27,14 +27,9 @@ export type MapResultWithOptional<T extends Spec> = ToOptional<{
 /**
  * @internal
  */
-export const MapReflectionType = 'schemas::v1::map'
-
-/**
- * @internal
- */
 export const IMap = <T extends Spec>(spec: T, defaultValue?: Partial<MapResult<T>>): ISchema<MapResult<T>> => {
   const specReflection = Object.keys(spec).reduce((specReflection, currentKey) => {
-    specReflection[currentKey] = spec[currentKey].description
+    specReflection[currentKey] = spec[currentKey].jsonSchema
     return specReflection
   }, {} as Record<string, any>)
 
@@ -65,9 +60,10 @@ export const IMap = <T extends Spec>(spec: T, defaultValue?: Partial<MapResult<T
       }
       return { ...newValue, ...defaultValue, ...base }
     },
-    description: {
-      type: MapReflectionType,
-      spec: specReflection
+    jsonSchema: {
+      type: 'object',
+      properties: specReflection,
+      serializationType: 'map'
     }
   }
 }

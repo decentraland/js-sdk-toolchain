@@ -14,8 +14,9 @@ export const FlatString: ISchema<string> = {
   create() {
     return ''
   },
-  description: {
-    type: 'schemas::v1::string'
+  jsonSchema: {
+    type: 'string',
+    serializationType: 'utf8-string'
   }
 }
 

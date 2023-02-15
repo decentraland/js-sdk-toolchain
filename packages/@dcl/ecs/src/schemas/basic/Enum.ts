@@ -44,7 +44,7 @@ function validateMemberValuesAreStrings(enumValue: Record<any, any>) {
 /**
  * @internal
  */
-export const IntEnumReflectionType = 'schemas::v1::enum-int'
+export const IntEnumReflectionType = 'enum-int'
 
 /**
  * @internal
@@ -62,10 +62,15 @@ export const IntEnum = <T>(enumObject: Record<any, any>, defaultValue: T): ISche
     create() {
       return defaultValue
     },
-    description: {
-      type: IntEnumReflectionType,
-      enumObject,
-      defaultValue: defaultValue as any
+    jsonSchema: {
+      // JSON-schema
+      type: 'integer',
+      enum: Object.values(enumObject).filter((item) => Number.isInteger(item)),
+      default: defaultValue as any,
+
+      // @dcl/ecs Schema Spec
+      serializationType: IntEnumReflectionType,
+      enumObject
     }
   }
 }
@@ -73,13 +78,15 @@ export const IntEnum = <T>(enumObject: Record<any, any>, defaultValue: T): ISche
 /**
  * @internal
  */
-export const StringEnumReflectionType = 'schemas::v1::enum-string'
+export const StringEnumReflectionType = 'enum-string'
 
 /**
  * @internal
  */
 export const StringEnum = <T>(enumObject: Record<any, any>, defaultValue: T): ISchema<T> => {
   validateMemberValuesAreStrings(enumObject)
+
+  // String enum has the exact mapping from key (our reference in code) to values
 
   return {
     serialize(value: DeepReadonly<T>, builder: ByteBuffer): void {
@@ -91,10 +98,15 @@ export const StringEnum = <T>(enumObject: Record<any, any>, defaultValue: T): IS
     create() {
       return defaultValue
     },
-    description: {
-      type: StringEnumReflectionType,
-      enumObject,
-      defaultValue: defaultValue as any
+    jsonSchema: {
+      // JSON-schema
+      type: 'string',
+      enum: Object.values(enumObject),
+      default: defaultValue as any,
+
+      // @dcl/ecs Schema Spec
+      serializationType: StringEnumReflectionType,
+      enumObject
     }
   }
 }
