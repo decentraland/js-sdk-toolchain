@@ -1,4 +1,5 @@
 import { ByteBuffer, ComponentType, Entity, IEngine } from '../../packages/@dcl/ecs/src/engine'
+import { ISchema } from '../../packages/@dcl/ecs/src/schemas/ISchema'
 import { componentNumberFromName } from '../../packages/@dcl/ecs/src/components/component-number'
 import {
   createGetCrdtMessagesForLww,
@@ -13,15 +14,18 @@ export const int8Component = (engine: IEngine) => {
   const data = new Map<Entity, number>()
   const timestamps = new Map<Entity, number>()
   const dirtyIterator = new Set<Entity>()
-  const schema = {
-    serialize(value: number, builder: ByteBuffer) {
+  const schema: ISchema<number> = {
+    serialize(value: number, builder: ByteBuffer): void {
       builder.writeInt8(value)
     },
-    deserialize(reader: ByteBuffer) {
+    deserialize(reader: ByteBuffer): number {
       return reader.readInt8()
     },
     create() {
       return 0
+    },
+    description: {
+      type: 'schemas::v1::int8'
     }
   }
   type Type = components.LastWriteWinElementSetComponentDefinition<any> & {

@@ -575,7 +575,7 @@ describe('Serialization Types', () => {
     const schemaFromDescription = schemaDescriptionToSchema(componentDescription)
     const clonedComp = engine.defineComponentFromSchema('test-cloned', schemaFromDescription)
 
-    expect(comp.default()).toStrictEqual(clonedComp.default())
+    expect(comp.schema.create()).toStrictEqual(clonedComp.schema.create())
   })
   it('should fail with unknown schema description', () => {
     expect(() => {
