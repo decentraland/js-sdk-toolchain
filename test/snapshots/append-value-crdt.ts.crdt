@@ -7,8 +7,8 @@ EVAL test/snapshots/append-value-crdt.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 15k
-  MALLOC_COUNT = 9850
-  ALIVE_OBJS_DELTA ~= 1.94k
+  MALLOC_COUNT = 9853
+  ALIVE_OBJS_DELTA ~= 1.95k
 CALL onStart()
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"origin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5}
   OPCODES ~= 8k
@@ -22,7 +22,7 @@ CALL onUpdate(0.0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"origin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":0,"timestamp":2,"analog":5}
   OPCODES ~= 16k
-  MALLOC_COUNT = 81
+  MALLOC_COUNT = 82
   ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0.1)
   LOG: ["PointerEventsResult",[{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"origin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5},{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"origin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":0,"timestamp":2,"analog":5}]]
@@ -53,4 +53,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 14k
   MALLOC_COUNT = 33
   ALIVE_OBJS_DELTA ~= 0.01k
-  MEMORY_USAGE_COUNT ~= 1017.49k bytes
+  MEMORY_USAGE_COUNT ~= 1018.97k bytes
