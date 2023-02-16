@@ -3,18 +3,21 @@ import { useDrag, useDrop } from 'react-dnd'
 
 import './Tree.css'
 
-import { Tree, TreeType } from '../../utils/tree'
 import { Input } from './input'
 import { Controls } from './controls'
-import { Icon } from './icon'
+
+export type Tree = {
+  id: string
+  label: string
+  children: Tree[]
+}
 
 interface Props {
   value: Tree
-}
-
-interface TreeProps {
-  tree: Tree
-  update: () => void
+  onSetParent: (id: string, newParentId: string | null) => void
+  onRename: (id: string, newLabel: string) => void
+  onAddChild: (id: string, label: string) => void
+  onRemove: (id: string) => void
 }
 
 const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : 'block' })
@@ -22,34 +25,33 @@ const getExpandStyles = (active: boolean) => ({ height: active ? 'auto' : '0', o
 
 const MemoTree = React.memo(TreeComponent)
 
-function TreeComponent({ tree, update }: TreeProps) {
-  const { value, childs, parent, expanded = false, type } = tree
-  const [editMode, setEditMode] = useState(false)
-  const [insertMode, setInsertMode] = useState<TreeType | undefined>(undefined)
+const canDrop = (target: Tree, source: Tree): boolean => {
+  if (target.id === source.id) return false
+  return target.children.every(($) => canDrop($, source))
+}
 
-  const [, drag] = useDrag(
-    () => ({
-      type: 'tree',
-      item: tree
-    }),
-    [tree]
-  )
+function TreeComponent(props: Props) {
+  const { value, onSetParent, onRename, onAddChild, onRemove } = props
+  const { children, id, label } = value
+  const [expanded, setExpanded] = useState(false)
+  const [editMode, setEditMode] = useState(false)
+  const [insertMode, setInsertMode] = useState(false)
+
+  const [, drag] = useDrag(() => ({ type: 'tree', item: value }), [value])
 
   const [, drop] = useDrop(() => ({
     accept: 'tree',
-    drop: (item: typeof tree, monitor) => {
-      if (monitor.didDrop()) return
-      tree.becomeParentOf(item)
-      update()
+    drop: (tree: Tree, monitor) => {
+      if (monitor.didDrop() || !canDrop(tree, value)) return
+      onSetParent(tree.id, id)
     }
-  }))
+  }), [value])
 
   const quitEditMode = () => setEditMode(false)
-  const quitInsertMode = () => setInsertMode(undefined)
+  const quitInsertMode = () => setInsertMode(false)
 
   const handleToggleExpand = (_: React.MouseEvent) => {
-    tree.toggleExpand()
-    update()
+    setExpanded(!expanded)
   }
 
   const handleToggleEdit = (e: React.MouseEvent) => {
@@ -58,69 +60,49 @@ function TreeComponent({ tree, update }: TreeProps) {
   }
 
   const onChangeEditValue = (newValue: string) => {
-    tree.rename(newValue)
+    onRename(id, newValue)
     setEditMode(false)
-    update()
   }
 
-  const handleNewChild = (type: TreeType) => (e: React.MouseEvent) => {
+  const handleNewChild = (e: React.MouseEvent) => {
     e.stopPropagation()
-    if (tree.canExpand()) tree.expand()
-    setInsertMode(type)
+    setInsertMode(true)
   }
 
-  const onChangeNewChild = (newValue: string) => {
+  const handleAddChild = (childLabel: string) => {
     if (!insertMode) return
-    tree.addChild(new Tree(newValue, insertMode))
+    onAddChild(id, childLabel)
     quitInsertMode()
-    update()
   }
 
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation()
-    tree.becomeOrphan()
-    update()
+    onRemove(id)
   }
 
   return (
     <ul ref={(node) => drag(drop(node))}>
       <li>
         <div>
-          <Icon fileName={value} expanded={expanded} type={type} />
           <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
-            {value}{' '}
+            {label}{' '}
             <Controls
               handleEdit={handleToggleEdit}
               handleNewChild={handleNewChild}
               handleRemove={handleRemove}
-              canCreate={tree.isDirectory()}
-              canDelete={!!parent}
             />
           </span>
-          {editMode && <Input value={value} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
+          {editMode && <Input value={label} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
         </div>
-        {tree.isDirectory() && (
+        {!!children.length && (
           <div style={getExpandStyles(expanded)}>
-            {childs.map(($, i) => (
-              <MemoTree tree={$} key={`${value}-${i}`} update={update} />
-            ))}
+            {children.map(($) => <MemoTree {...props} value={$} key={$.id} />)}
           </div>
         )}
-        {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={onChangeNewChild} />}
+        {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} />}
       </li>
     </ul>
   )
 }
 
-function BuildTree({ value }: Props) {
-  const [_, setTree] = useState(0)
-  const updateTree = () => setTree((tree) => tree + 1)
-
-  return (
-    <div className="tree">
-      <MemoTree tree={value} update={updateTree} />
-    </div>
-  )
-}
-
-export default BuildTree
+export default MemoTree

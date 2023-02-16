@@ -1,36 +1,84 @@
-import React from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import './index.css'
-import TreeComponent from './components/tree/Tree'
+import TreeComponent, { Tree } from './components/tree/Tree'
 import reportWebVitals from './reportWebVitals'
 
-import { Tree } from './utils/tree'
+type Node = {
+  id: string
+  label: string
+  parent: string | null
+}
 
-// just an example tree
-const tree: Tree = new Tree('src', 'directory', true)
-  .addChild(
-    new Tree('components', 'directory')
-      .addChild(
-        new Tree('tree', 'directory')
-          .addChild(
-            new Tree('deep', 'directory').addChild(new Tree('deep-file.ts')).addChild(new Tree('other-deep-file.ts'))
-          )
-          .addChild(new Tree('tree.tsx'))
-          .addChild(new Tree('tree.css'))
-      )
-      .addChild(new Tree('modal', 'directory').addChild(new Tree('modal.tsx')).addChild(new Tree('modal.css')))
+const init = [{
+  id: '0',
+  label: '0',
+  parent: null
+},
+{
+  id: '1',
+  label: '1',
+  parent: null
+},
+{
+  id: '2',
+  label: '2',
+  parent: '0'
+}]
+
+const App = () => {
+  const [nodes, setNodes] = useState<Node[]>(init)
+
+  const toTree = (nodes: Node[], parent: string | null = null): Tree[] => nodes
+    .filter((node) => node.parent === parent)
+    .map<Tree>(({ parent, ...node }) => ({ ...node, children: toTree(nodes, node.id) }))
+
+  const tree = useMemo(() => ({
+    id: 'root',
+    value: 'root',
+    label: 'root',
+    children: toTree(nodes)
+  }), [nodes])
+
+  const handleRename = useCallback((id: string, newLabel: string) =>
+    setNodes((nodes) => nodes.map((node) =>
+      node.id === id ? { ...node, label: newLabel } : node
+    )),
+    [setNodes]
   )
-  .addChild(new Tree('index.tsx'))
-  .addChild(new Tree('index.css'))
+
+  const handleSetParent = useCallback((id: string, newParent: string | null) =>
+    setNodes((nodes) => nodes.map((node) =>
+      node.id === id ? { ...node, parent: newParent } : node
+    )),
+    [setNodes]
+  )
+
+  const handleAddChild = useCallback((parent: string, label: string) =>
+    setNodes((nodes) => [...nodes, { id: (nodes.length + 1).toString(), label, parent }]), [setNodes]
+  )
+
+  const handleRemove = useCallback((id: string) =>
+    setNodes((nodes) => nodes.filter(($) => id !== $.id)), [setNodes]
+  )
+
+  return (<TreeComponent
+    value={tree}
+    onSetParent={handleSetParent}
+    onRename={handleRename}
+    onAddChild={handleAddChild}
+    onRemove={handleRemove}
+  />)
+}
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
     <DndProvider backend={HTML5Backend}>
-      <TreeComponent value={tree} />
+      <App />
     </DndProvider>
   </React.StrictMode>
 )
