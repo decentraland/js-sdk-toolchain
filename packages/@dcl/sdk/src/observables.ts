@@ -2,7 +2,7 @@ import { Observable } from './internal/Observable'
 import { QuaternionType, Vector3Type } from '@dcl/ecs'
 import { ManyEntityAction, SendBatchResponse, subscribe } from '~system/EngineApi'
 
-let subscribeFunction: typeof subscribe = async () => ({})
+let subscribeFunction: typeof subscribe = subscribe
 
 /** @public */
 export type InputEventResult = {
@@ -399,7 +399,6 @@ function createSubscriber(eventName: string) {
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
  */
 export const onEnterSceneObservable = new Observable<IEvents['onEnterScene']>(createSubscriber('onEnterScene'))
-
 /** @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed. Use onEnterSceneObservable instead. */
@@ -480,6 +479,7 @@ export const onCommsMessage = new Observable<IEvents['comms']>(createSubscriber(
 
 /**
  * @internal
+ * Used for testing purpose
  */
 export function setSubscribeFunction(fn: (event: { eventId: string }) => Promise<any>) {
   subscribeFunction = fn
@@ -535,6 +535,10 @@ export async function pollEvents(sendBatch: (body: ManyEntityAction) => Promise<
         }
         case 'playerClicked': {
           onPlayerClickedObservable.notifyObservers(data as IEvents['playerClicked'])
+          break
+        }
+        case 'comms': {
+          onCommsMessage.notifyObservers(data as IEvents['comms'])
           break
         }
       }

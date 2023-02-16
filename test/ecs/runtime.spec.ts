@@ -10,6 +10,7 @@ import {
   onRealmChangedObservable,
   onSceneReadyObservable,
   onVideoEvent,
+  onCommsMessage,
   pollEvents,
   setSubscribeFunction
 } from '../../packages/@dcl/sdk/src/observables'
@@ -38,7 +39,8 @@ describe('Observable tests', () => {
       { eventId: 'playerConnected', eventData: '{}' },
       { eventId: 'playerDisconnected', eventData: '{}' },
       { eventId: 'onRealmChanged', eventData: '{}' },
-      { eventId: 'playerClicked', eventData: '{}' }
+      { eventId: 'playerClicked', eventData: '{}' },
+      { eventId: 'comms', eventData: '{}' }
     ]
     const counter = {
       onEnterSceneObservable: 0,
@@ -50,7 +52,8 @@ describe('Observable tests', () => {
       onPlayerConnectedObservable: 0,
       onPlayerDisconnectedObservable: 0,
       onRealmChangedObservable: 0,
-      onPlayerClickedObservable: 0
+      onPlayerClickedObservable: 0,
+      onCommsMessage: 0
     }
     onEnterSceneObservable.add(() => {
       counter.onEnterSceneObservable++
@@ -76,12 +79,13 @@ describe('Observable tests', () => {
     onPlayerDisconnectedObservable.add(() => {
       counter.onPlayerDisconnectedObservable++
     })
-
+    onCommsMessage.add(() => {
+      counter.onCommsMessage++
+    })
     let counterSubscribe = 0
     setSubscribeFunction(async () => {
       counterSubscribe++
     })
-
     onRealmChangedObservable.add(() => {
       counter.onRealmChangedObservable++
     })
@@ -105,6 +109,7 @@ describe('Observable tests', () => {
     expect(counter.onPlayerDisconnectedObservable).toBe(1)
     expect(counter.onRealmChangedObservable).toBe(1)
     expect(counter.onPlayerClickedObservable).toBe(1)
+    expect(counter.onCommsMessage).toBe(1)
     expect(counterSubscribe).toBe(2)
   })
 })

@@ -73,6 +73,49 @@ describe('Events helpers isTriggered', () => {
   })
 })
 
+describe('Global Events helpers isTriggered, getInputCommand', () => {
+  it('should detect no events', () => {
+    const newEngine = Engine()
+    const { isTriggered } = createInputSystem(newEngine)
+    expect(isTriggered(InputAction.IA_ANY, PointerEventType.PET_DOWN)).toBe(false)
+  })
+
+  it('detect pointerEvent', async () => {
+    const newEngine = Engine()
+    const PointerEventsResult = components.PointerEventsResult(newEngine)
+    const entity = newEngine.addEntity()
+    const { isTriggered, getInputCommand } = createInputSystem(newEngine)
+    PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN))
+
+    // we must run the systems to update the internal inputSystem state
+    await newEngine.update(1)
+
+    // then assert
+    expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN)).toBe(true)
+    expect(getInputCommand(InputAction.IA_POINTER, PointerEventType.PET_DOWN)).not.toBeNull()
+
+    expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_UP)).toBe(false)
+
+    expect(isTriggered(InputAction.IA_ACTION_3, PointerEventType.PET_UP)).toBe(false)
+    expect(getInputCommand(InputAction.IA_ACTION_3, PointerEventType.PET_DOWN)).toBeNull()
+  })
+
+  it('dont detect pointerEventActive after update', async () => {
+    const newEngine = Engine()
+    const PointerEventsResult = components.PointerEventsResult(newEngine)
+    const entity = newEngine.addEntity()
+    const { isTriggered } = createInputSystem(newEngine)
+    PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN))
+
+    // we must run the systems to update the internal inputSystem state
+    await newEngine.update(1)
+    expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN)).toBe(true)
+
+    // in the next tick we will no-longer see the entity bing triggered==true
+    await newEngine.update(0)
+    expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN)).toBe(false)
+  })
+})
 function createTestPointerDownCommand(
   entity: Entity,
   timestamp: number,

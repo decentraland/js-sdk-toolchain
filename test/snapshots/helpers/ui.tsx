@@ -19,11 +19,7 @@ export const uiComponent = () => (
         display: 'flex'
       }}
     >
-      <Label
-        value={'SDK 7'}
-        fontSize={80}
-        uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
-      />
+      <Label value={'SDK 7'} fontSize={80} uiBackground={{ color: Color4.fromHexString('#fbf0f0') }} />
     </UiEntity>
     <UiEntity
       uiTransform={{
@@ -34,11 +30,7 @@ export const uiComponent = () => (
         display: 'flex'
       }}
     >
-      <Label
-        value={`Counter:`}
-        fontSize={60}
-        uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
-      />
+      <Label value={`Counter:`} fontSize={60} uiBackground={{ color: Color4.fromHexString('#fbf0f0') }} />
     </UiEntity>
     <UiEntity
       uiTransform={{
@@ -49,11 +41,7 @@ export const uiComponent = () => (
         display: 'flex'
       }}
     >
-      <Label
-        value={`Player:`}
-        fontSize={40}
-        uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
-      />
+      <Label value={`Player:`} fontSize={40} uiBackground={{ color: Color4.fromHexString('#fbf0f0') }} />
     </UiEntity>
   </UiEntity>
 )
