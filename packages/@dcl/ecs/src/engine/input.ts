@@ -3,7 +3,7 @@ import { InputAction } from '../components/generated/pb/decentraland/sdk/compone
 import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_events.gen'
 import { PBPointerEventsResult } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
 import { Entity } from './entity'
-import { DeepReadonly } from './readonly'
+import { DeepReadonly, DeepReadonlyObject } from './readonly'
 import { IEngine } from './types'
 
 const InputCommands: InputAction[] = [
@@ -43,7 +43,7 @@ export type IInputSystem = {
    * @param entity - the entity to query, ignore for global
    * @returns boolean
    */
-  isTriggered: (inputAction: InputAction, pointerEventType: PointerEventType, entity: Entity) => boolean
+  isTriggered: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean
 
   /**
    * @public
@@ -94,7 +94,8 @@ export function createInputSystem(engine: IEngine): IInputSystem {
   const globalState = {
     previousFrameMaxTimestamp: 0,
     currentFrameMaxTimestamp: 0,
-    buttonState: new Map<InputAction, PBPointerEventsResult>()
+    buttonState: new Map<InputAction, PBPointerEventsResult>(),
+    thisFrameCommands: [] as DeepReadonlyObject<PBPointerEventsResult>[]
   }
 
   function findLastAction(
@@ -126,6 +127,9 @@ export function createInputSystem(engine: IEngine): IInputSystem {
     // first store the previous' frame timestamp
     let maxTimestamp = globalState.currentFrameMaxTimestamp
     globalState.previousFrameMaxTimestamp = maxTimestamp
+    if (globalState.thisFrameCommands.length) {
+      globalState.thisFrameCommands = []
+    }
 
     // then iterate over all new commands
     for (const [, commands] of engine.getEntitiesWith(PointerEventsResult)) {
@@ -135,6 +139,10 @@ export function createInputSystem(engine: IEngine): IInputSystem {
         const command = arrayCommands[i]
         if (command.timestamp > maxTimestamp) {
           maxTimestamp = command.timestamp
+        }
+
+        if (command.timestamp > globalState.previousFrameMaxTimestamp) {
+          globalState.thisFrameCommands.push(command)
         }
 
         if (command.state === PointerEventType.PET_UP || command.state === PointerEventType.PET_DOWN) {
@@ -243,9 +251,18 @@ export function createInputSystem(engine: IEngine): IInputSystem {
   }
 
   // returns true if the provided last action was triggered in the last frame
-  function isTriggered(inputAction: InputAction, pointerEventType: PointerEventType, entity: Entity) {
-    const command = findLastAction(pointerEventType, inputAction, entity)
-    return (command && timestampIsCurrentFrame(command.timestamp)) || false
+  function isTriggered(inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) {
+    if (entity) {
+      const command = findLastAction(pointerEventType, inputAction, entity)
+      return (command && timestampIsCurrentFrame(command.timestamp)) || false
+    } else {
+      for (const command of globalState.thisFrameCommands) {
+        if (command.button === inputAction && command.state === pointerEventType) {
+          return true
+        }
+      }
+      return false
+    }
   }
 
   // returns the global state of the input. This global state is updated from the system
