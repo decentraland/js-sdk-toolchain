@@ -5,8 +5,6 @@ import { sdk } from '@dcl/schemas'
 import { WebSocket } from 'ws'
 import { resolve } from 'path'
 
-import { getSceneFile } from '../preview/project'
-import { CliComponents } from '../../components'
 import { setupBffAndComms } from './bff'
 import { Router } from '@well-known-components/http-server'
 import { setupEcs6Endpoints } from './endpoints'
@@ -45,16 +43,19 @@ export async function wire(components: PreviewComponents, dir: string, watch: bo
     const { clients } = components.ws.ws
     const ignoredContent = await getDCLIgnoreFile(dir)
     const ignored = (ignoredContent?.split('\n') || []).filter(Boolean)
+
+    // by default many files need to be ignored
+    ignored.push('.git', 'node_modules', '**/*.ts', '**/*.tsx')
+
     chokidar
       .watch(resolve(dir), {
         ignored,
         ignoreInitial: false,
         cwd: dir
       })
-      .on('all', async (_, file) => {
-        if (await shouldUpdateScene(components, dir, file)) {
-          return updateScene(dir, clients)
-        }
+      .on('all', async (_, _file) => {
+        // TODO: accumulate changes in an array and debounce
+        return updateScene(dir, clients)
       })
   }
 }
@@ -74,22 +75,6 @@ const initWsConnection = (ws: WebSocket, clients: Set<WebSocket>) => {
     ws.on('open', () => clients.add(ws))
   }
   ws.on('close', () => clients.delete(ws))
-}
-
-const shouldUpdateScene = async (
-  components: Pick<CliComponents, 'fs'>,
-  dir: string,
-  file: string
-): Promise<boolean> => {
-  const sceneFile = await getSceneFile(components, dir)
-  if (resolve(file) !== resolve(dir, sceneFile.main)) {
-    // ignore source files
-    if (file.endsWith('.ts') || file.endsWith('.tsx')) {
-      return false
-    }
-  }
-
-  return true
 }
 
 const updateScene = (dir: string, clients: Set<WebSocket>): void => {

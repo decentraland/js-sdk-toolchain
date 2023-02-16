@@ -52,7 +52,7 @@ export async function main(options: Options) {
       })
       const logs = await createConsoleLogComponent({})
       const ws = await createWsComponent({ logs })
-      const server = await createServerComponent<PreviewComponents>({ config, logs, ws: ws.ws }, { cors: {} })
+      const server = await createServerComponent<PreviewComponents>({ config, logs, ws: ws.ws }, {})
       const rooms = await createRoomsComponent({
         metrics,
         logs,

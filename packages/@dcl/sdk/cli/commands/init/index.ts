@@ -1,7 +1,7 @@
 import { join, resolve } from 'path'
 
 import { getArgs } from '../../utils/args'
-import { confirm } from '../../utils/prompt'
+import { CliError } from '../../utils/error'
 import { CliComponents } from '../../components'
 import { isDirectoryEmpty, download, extract } from '../../utils/fs'
 
@@ -28,9 +28,7 @@ export async function main(options: Options) {
   const yes = options.args['--yes']
 
   if (!isEmpty && !yes) {
-    const answer = await confirm('The folder specified is not empty, continue anyway?')
-
-    if (!answer) return
+    throw new CliError('The target directory specified is not empty. Run this command with --yes to override.')
   }
 
   // download and extract template project
