@@ -73,7 +73,7 @@ describe('Events helpers isTriggered', () => {
   })
 })
 
-describe('Global Events helpers isTriggered', () => {
+describe('Global Events helpers isTriggered, getInputCommand', () => {
   it('should detect no events', () => {
     const newEngine = Engine()
     const { isTriggered } = createInputSystem(newEngine)
@@ -84,7 +84,7 @@ describe('Global Events helpers isTriggered', () => {
     const newEngine = Engine()
     const PointerEventsResult = components.PointerEventsResult(newEngine)
     const entity = newEngine.addEntity()
-    const { isTriggered } = createInputSystem(newEngine)
+    const { isTriggered, getInputCommand } = createInputSystem(newEngine)
     PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN))
 
     // we must run the systems to update the internal inputSystem state
@@ -92,8 +92,12 @@ describe('Global Events helpers isTriggered', () => {
 
     // then assert
     expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN)).toBe(true)
+    expect(getInputCommand(InputAction.IA_POINTER, PointerEventType.PET_DOWN)).not.toBeNull()
+
     expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_UP)).toBe(false)
+
     expect(isTriggered(InputAction.IA_ACTION_3, PointerEventType.PET_UP)).toBe(false)
+    expect(getInputCommand(InputAction.IA_ACTION_3, PointerEventType.PET_DOWN)).toBeNull()
   })
 
   it('dont detect pointerEventActive after update', async () => {
