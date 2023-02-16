@@ -80,7 +80,7 @@ export type IInputSystem = {
   getInputCommand: (
     inputAction: InputAction,
     pointerEventType: PointerEventType,
-    entity: Entity
+    entity?: Entity
   ) => PBPointerEventsResult | null
 }
 
@@ -213,7 +213,7 @@ export function createInputSystem(engine: IEngine): IInputSystem {
     return null
   }
 
-  function getInputCommand(
+  function getInputCommandFromEntity(
     inputAction: InputAction,
     pointerEventType: PointerEventType,
     entity: Entity
@@ -227,6 +227,23 @@ export function createInputSystem(engine: IEngine): IInputSystem {
       if (cmd) return cmd
     }
     return null
+  }
+
+  function getInputCommand(
+    inputAction: InputAction,
+    pointerEventType: PointerEventType,
+    entity?: Entity
+  ): PBPointerEventsResult | null {
+    if (entity) {
+      return getInputCommandFromEntity(inputAction, pointerEventType, entity)
+    } else {
+      for (const command of globalState.thisFrameCommands) {
+        if (command.button === inputAction && command.state === pointerEventType) {
+          return command
+        }
+      }
+      return null
+    }
   }
 
   function findInputCommand(

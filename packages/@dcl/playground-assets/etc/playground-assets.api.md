@@ -917,7 +917,7 @@ export interface IEvents {
 export type IInputSystem = {
     isTriggered: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
     isPressed: (inputAction: InputAction) => boolean;
-    getInputCommand: (inputAction: InputAction, pointerEventType: PointerEventType, entity: Entity) => PBPointerEventsResult | null;
+    getInputCommand: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => PBPointerEventsResult | null;
 };
 
 // @public
