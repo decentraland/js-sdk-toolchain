@@ -15,8 +15,8 @@
     "test/snapshots/package-lock.json": true,
     "packages/@dcl/*/*.tgz": true,
     "packages/@dcl/*/*.js": true,
+    "packages/@dcl/sdk/**/*.d.ts": true,
     "**/*.js": { "when": "$(basename).ts" },
-    "**/*.d.ts": true
   },
   "[typescript]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
