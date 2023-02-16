@@ -479,6 +479,7 @@ export const onCommsMessage = new Observable<IEvents['comms']>(createSubscriber(
 
 /**
  * @internal
+ * Used for testing purpose
  */
 export function setSubscribeFunction(fn: (event: { eventId: string }) => Promise<any>) {
   subscribeFunction = fn
