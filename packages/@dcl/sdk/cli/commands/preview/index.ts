@@ -1,4 +1,4 @@
-import { resolve } from 'path'
+import path, { resolve } from 'path'
 import future from 'fp-future'
 import { Lifecycle, IBaseComponent } from '@well-known-components/interfaces'
 import { roomsMetrics, createRoomsComponent } from '@dcl/mini-comms/dist/adapters/rooms'
@@ -10,11 +10,13 @@ import { createWsComponent } from './ws'
 
 import { CliComponents } from '../../components'
 import { getArgs } from '../../utils/args'
+import { needsDependencies } from '../../commands/build/helpers'
 import { ISignalerComponent, PreviewComponents } from './types'
 import { validateExistingProject, validateSceneOptions } from './project'
 import { previewPort } from './port'
 import { providerInstance } from './eth'
 import { wire } from './wire'
+import { CliError } from '../../utils/error'
 
 export function help() {
   return ``
@@ -40,6 +42,11 @@ export async function main(options: Options) {
   await validateExistingProject(options.components, dir)
   await validateSceneOptions(options.components, dir)
 
+  if (await needsDependencies(options.components, dir)) {
+    const npmModulesPath = path.resolve(dir, 'node_modules')
+    throw new CliError(`Couldn\'t find ${npmModulesPath}, please run: npm install`)
+  }
+
   const port = options.args['--port'] || (await previewPort())
 
   const program = await Lifecycle.run<PreviewComponents>({
@@ -52,7 +59,7 @@ export async function main(options: Options) {
       })
       const logs = await createConsoleLogComponent({})
       const ws = await createWsComponent({ logs })
-      const server = await createServerComponent<PreviewComponents>({ config, logs, ws: ws.ws }, { cors: {} })
+      const server = await createServerComponent<PreviewComponents>({ config, logs, ws: ws.ws }, {})
       const rooms = await createRoomsComponent({
         metrics,
         logs,

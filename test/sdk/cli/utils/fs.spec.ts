@@ -28,10 +28,12 @@ describe('utils/fs', () => {
     expect(writeFileSpy).toBeCalledWith('other/path', Buffer.from(new ArrayBuffer(123)))
   })
 
-  it('existPath', async () => {
+  it('fileExists directoryExists', async () => {
     const fs = createFsComponent()
-    expect(await fs.existPath('package.json')).toBeTruthy()
-    expect(await fs.existPath('noooooooooo.json')).toBeFalsy()
+    expect(await fs.fileExists('package.json')).toBeTruthy()
+    expect(await fs.directoryExists('node_modules')).toBeTruthy()
+    expect(await fs.directoryExists('node_modulesASD')).toBeFalsy()
+    expect(await fs.fileExists('noooooooooo.json')).toBeFalsy()
   })
 
   it("extract: should extract a zip file and return it's destination", async () => {

@@ -47,6 +47,14 @@ test-cli:
 test-coverage:
 	WITH_COVERAGE=true node_modules/.bin/jest --detectOpenHandles --colors --coverage $(TESTARGS)
 
+recreate-test-scene:
+	@rm -rf tmp/scene || true
+	mkdir -p tmp/scene
+	cd tmp/scene; ../packages/@dcl/sdk/cli/index.js init --skip-install
+	cd tmp/scene; npm install ../packages/@dcl/sdk ../packages/@dcl/js-runtime
+	cd tmp/scene; npm run build
+	cd tmp/scene; npm run start
+
 node_modules/.bin/protobuf/bin/protoc:
 	curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v$(PROTOBUF_VERSION)/$(PROTOBUF_ZIP)
 	unzip -o $(PROTOBUF_ZIP) -d node_modules/.bin/protobuf
