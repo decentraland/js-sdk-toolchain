@@ -1,13 +1,15 @@
 import { Router } from '@well-known-components/http-server'
 import { PreviewComponents } from './types'
 import * as path from 'path'
-import * as fs from 'fs'
 import { sync as globSync } from 'glob'
 import { WearableJson } from '@dcl/schemas/dist/sdk'
-import { ContentMapping, Entity, EntityType } from '@dcl/schemas'
+import { ContentMapping, Entity, EntityType, Locale, Wearable } from '@dcl/schemas'
 import ignore from 'ignore'
 import fetch, { Headers } from 'node-fetch'
 import { fetchEntityByPointer } from './catalyst'
+import { CliComponents } from '../../components'
+import { statSync } from 'fs'
+import { getDCLIgnorePatterns } from '../../utils/dcl-ignore'
 
 function getCatalystUrl(): URL {
   return new URL('https://peer.decentraland.org')
@@ -17,13 +19,17 @@ function smartWearableNameToId(name: string) {
   return name.toLocaleLowerCase().replace(/ /g, '-')
 }
 
-export function setupEcs6Endpoints(dir: string, router: Router<PreviewComponents>) {
+type LambdasWearable = Wearable & {
+  baseUrl: string
+}
+
+export function setupEcs6Endpoints(components: CliComponents, dir: string, router: Router<PreviewComponents>) {
   const baseFolders = [dir]
   // handle old preview scene.json
   router.get('/scene.json', async () => {
     return {
       headers: { 'content-type': 'application/json' },
-      body: fs.createReadStream(path.join(dir, 'scene.json'))
+      body: components.fs.createReadStream(path.join(dir, 'scene.json'))
     }
   })
 
@@ -58,10 +64,10 @@ export function setupEcs6Endpoints(dir: string, router: Router<PreviewComponents
     const baseUrl = `${ctx.url.protocol}//${ctx.url.host}/content/contents`
 
     try {
-      const previewWearables = getAllPreviewWearables({
+      const previewWearables = await getAllPreviewWearables(components, {
         baseFolders,
         baseUrl
-      }).map((wearable) => wearable.id)
+      })
 
       if (previewWearables.length === 1) {
         const catalystUrl = getCatalystUrl()
@@ -81,7 +87,7 @@ export function setupEcs6Endpoints(dir: string, router: Router<PreviewComponents
         const deployedProfile = (await req.json()) as any[]
 
         if (deployedProfile?.length === 1) {
-          deployedProfile[0].avatars[0].avatar.wearables.push(...previewWearables)
+          deployedProfile[0].avatars[0].avatar.wearables.push(...previewWearables.map(($) => $.id))
           return {
             headers: {
               'content-type': req.headers.get('content-type') || 'application/binary'
@@ -132,14 +138,14 @@ export function setupEcs6Endpoints(dir: string, router: Router<PreviewComponents
     return res
   })
 
-  serveStatic(dir, router)
+  serveStatic(components, dir, router)
 
   // TODO: get workspace scenes & wearables...
 
-  serveFolders(router, baseFolders)
+  serveFolders(components, router, baseFolders)
 }
 
-function serveFolders(router: Router<PreviewComponents>, baseFolders: string[]) {
+function serveFolders(components: Pick<CliComponents, 'fs'>, router: Router<PreviewComponents>, baseFolders: string[]) {
   router.get('/content/contents/:hash', async (ctx: any, next: any) => {
     if (ctx.params.hash && ctx.params.hash.startsWith('b64-')) {
       const fullPath = path.resolve(Buffer.from(ctx.params.hash.replace(/^b64-/, ''), 'base64').toString('utf8'))
@@ -155,7 +161,7 @@ function serveFolders(router: Router<PreviewComponents>, baseFolders: string[]) 
           'x-sent': true,
           'cache-control': 'no-cache,private,max-age=1'
         },
-        body: fs.createReadStream(fullPath)
+        body: components.fs.createReadStream(fullPath)
       }
     }
 
@@ -171,7 +177,7 @@ function serveFolders(router: Router<PreviewComponents>, baseFolders: string[]) 
       pointers && typeof pointers === 'string' ? [pointers as string] : (pointers as string[])
     )
 
-    const resultEntities = getSceneJson({
+    const resultEntities = await getSceneJson(components, {
       baseFolders,
       pointers: Array.from(requestedPointers)
     })
@@ -203,7 +209,7 @@ function serveFolders(router: Router<PreviewComponents>, baseFolders: string[]) 
 
   router.get('/preview-wearables/:id', async (ctx) => {
     const baseUrl = `${ctx.url.protocol}//${ctx.url.host}/content/contents`
-    const wearables = getAllPreviewWearables({
+    const wearables = await getAllPreviewWearables(components, {
       baseUrl,
       baseFolders
     })
@@ -221,7 +227,7 @@ function serveFolders(router: Router<PreviewComponents>, baseFolders: string[]) 
     return {
       body: {
         ok: true,
-        data: getAllPreviewWearables({ baseUrl, baseFolders })
+        data: await getAllPreviewWearables(components, { baseUrl, baseFolders })
       }
     }
   })
@@ -229,19 +235,22 @@ function serveFolders(router: Router<PreviewComponents>, baseFolders: string[]) 
 
 const defaultHashMaker = (str: string) => 'b64-' + Buffer.from(str).toString('base64')
 
-function getAllPreviewWearables({ baseFolders, baseUrl }: { baseFolders: string[]; baseUrl: string }) {
+async function getAllPreviewWearables(
+  components: Pick<CliComponents, 'fs'>,
+  { baseFolders, baseUrl }: { baseFolders: string[]; baseUrl: string }
+) {
   const wearablePathArray: string[] = []
   for (const wearableDir of baseFolders) {
     const wearableJsonPath = path.resolve(wearableDir, 'wearable.json')
-    if (fs.existsSync(wearableJsonPath)) {
+    if (await components.fs.existPath(wearableJsonPath)) {
       wearablePathArray.push(wearableJsonPath)
     }
   }
 
-  const ret: ReturnType<typeof serveWearable>[] = []
+  const ret: LambdasWearable[] = []
   for (const wearableJsonPath of wearablePathArray) {
     try {
-      ret.push(serveWearable({ wearableJsonPath, baseUrl }))
+      ret.push(await serveWearable(components, { wearableJsonPath, baseUrl }))
     } catch (err) {
       console.error(`Couldn't mock the wearable ${wearableJsonPath}. Please verify the correct format and scheme.`, err)
     }
@@ -249,9 +258,12 @@ function getAllPreviewWearables({ baseFolders, baseUrl }: { baseFolders: string[
   return ret
 }
 
-function serveWearable({ wearableJsonPath, baseUrl }: { wearableJsonPath: string; baseUrl: string }) {
+async function serveWearable(
+  components: Pick<CliComponents, 'fs'>,
+  { wearableJsonPath, baseUrl }: { wearableJsonPath: string; baseUrl: string }
+): Promise<LambdasWearable> {
   const wearableDir = path.dirname(wearableJsonPath)
-  const wearableJson = JSON.parse(fs.readFileSync(wearableJsonPath).toString())
+  const wearableJson = JSON.parse((await components.fs.readFile(wearableJsonPath)).toString())
 
   if (!WearableJson.validate(wearableJson)) {
     const errors = (WearableJson.validate.errors || []).map((a) => `${a.data} ${a.message}`).join('')
@@ -260,16 +272,9 @@ function serveWearable({ wearableJsonPath, baseUrl }: { wearableJsonPath: string
     throw new Error(`Invalid wearable.json (${wearableJsonPath})`)
   }
 
-  const dclIgnorePath = path.resolve(wearableDir, '.dclignore')
-  let ignoreFileContent = ''
-  if (fs.existsSync(dclIgnorePath)) {
-    ignoreFileContent = fs.readFileSync(path.resolve(wearableDir, '.dclignore'), 'utf-8')
-  }
-
-  const hashedFiles = getFilesFromFolder({
+  const hashedFiles = await getFilesFromFolder(components, {
     folder: wearableDir,
-    addOriginalPath: false,
-    ignorePattern: ignoreFileContent
+    addOriginalPath: false
   })
 
   const thumbnailFiltered = hashedFiles.filter(($) => $?.file === 'thumbnail.png')
@@ -291,9 +296,11 @@ function serveWearable({ wearableJsonPath, baseUrl }: { wearableJsonPath: string
   return {
     id: wearableId,
     rarity: wearableJson.rarity,
-    i18n: [{ code: 'en', text: wearableJson.name }],
+    i18n: [{ code: 'en' as Locale, text: wearableJson.name }],
     description: wearableJson.description,
     thumbnail: thumbnail || '',
+    image: thumbnail || '',
+    collectionAddress: '0x0',
     baseUrl: `${baseUrl}/`,
     name: wearableJson.name || '',
     data: {
@@ -301,38 +308,36 @@ function serveWearable({ wearableJsonPath, baseUrl }: { wearableJsonPath: string
       replaces: [],
       hides: [],
       tags: [],
-      scene: hashedFiles,
       representations: representations as any
+      // scene: hashedFiles as any,
     }
   }
 }
 
-function getSceneJson({
-  baseFolders,
-  pointers,
-  customHashMaker
-}: {
-  baseFolders: string[]
-  pointers: string[]
-  customHashMaker?: (str: string) => string
-}): Entity[] {
+async function getSceneJson(
+  components: Pick<CliComponents, 'fs'>,
+  {
+    baseFolders,
+    pointers,
+    customHashMaker
+  }: {
+    baseFolders: string[]
+    pointers: string[]
+    customHashMaker?: (str: string) => string
+  }
+): Promise<Entity[]> {
   const requestedPointers = new Set<string>(pointers)
   const resultEntities: Entity[] = []
 
-  const allDeployments = baseFolders.map((folder) => {
-    const dclIgnorePath = path.resolve(folder, '.dclignore')
-    let ignoreFileContent = ''
-    if (fs.existsSync(dclIgnorePath)) {
-      ignoreFileContent = fs.readFileSync(path.resolve(folder, '.dclignore'), 'utf-8')
-    }
-
-    return entityV3FromFolder({
-      folder,
-      addOriginalPath: false,
-      ignorePattern: ignoreFileContent,
-      customHashMaker
+  const allDeployments = await Promise.all(
+    baseFolders.map(async (folder) => {
+      return entityV3FromFolder(components, {
+        folder,
+        addOriginalPath: false,
+        customHashMaker
+      })
     })
-  })
+  )
 
   for (const pointer of Array.from(requestedPointers)) {
     // get deployment by pointer
@@ -350,7 +355,7 @@ function getSceneJson({
   return resultEntities
 }
 
-function serveStatic(dir: string, router: Router<PreviewComponents>) {
+function serveStatic(components: Pick<CliComponents, 'fs'>, dir: string, router: Router<PreviewComponents>) {
   const sdkPath = path.dirname(
     require.resolve('@dcl/sdk/package.json', {
       paths: [dir]
@@ -387,18 +392,23 @@ function serveStatic(dir: string, router: Router<PreviewComponents>) {
     router.get(route.route, async (_ctx) => {
       return {
         headers: { 'Content-Type': route.type },
-        body: fs.createReadStream(route.path)
+        body: components.fs.createReadStream(route.path)
       }
     })
   }
 
-  function createStaticRoutes(route: string, folder: string, transform = (str: string) => str) {
+  function createStaticRoutes(
+    components: Pick<CliComponents, 'fs'>,
+    route: string,
+    folder: string,
+    transform = (str: string) => str
+  ) {
     router.get(route, async (ctx, next) => {
       const file = ctx.params.path
       const fullPath = path.resolve(folder, transform(file))
 
       // only return files IF the file is within a baseFolder
-      if (!fs.existsSync(fullPath)) {
+      if (!(await components.fs.existPath(fullPath))) {
         return next()
       }
 
@@ -414,14 +424,14 @@ function serveStatic(dir: string, router: Router<PreviewComponents>) {
 
       return {
         headers,
-        body: fs.createReadStream(fullPath)
+        body: components.fs.createReadStream(fullPath)
       }
     })
   }
 
-  createStaticRoutes('/images/decentraland-connect/:path+', dclKernelImagesDecentralandConnect)
-  createStaticRoutes('/default-profile/:path+', dclKernelDefaultProfilePath)
-  createStaticRoutes('/@/explorer/:path+', dclExplorerJsonPath, (filePath) => filePath.replace(/.br+$/, ''))
+  createStaticRoutes(components, '/images/decentraland-connect/:path+', dclKernelImagesDecentralandConnect)
+  createStaticRoutes(components, '/default-profile/:path+', dclKernelDefaultProfilePath)
+  createStaticRoutes(components, '/@/explorer/:path+', dclExplorerJsonPath, (filePath) => filePath.replace(/.br+$/, ''))
 
   router.get('/feature-flags/:file', async (ctx) => {
     const res = await fetch(`https://feature-flags.decentraland.zone/${ctx.params.file}`, {
@@ -435,24 +445,25 @@ function serveStatic(dir: string, router: Router<PreviewComponents>) {
   })
 }
 
-function entityV3FromFolder({
-  folder,
-  addOriginalPath,
-  ignorePattern,
-  customHashMaker
-}: {
-  folder: string
-  addOriginalPath?: boolean
-  ignorePattern?: string
-  customHashMaker?: (str: string) => string
-}): Entity | null {
+async function entityV3FromFolder(
+  components: Pick<CliComponents, 'fs'>,
+  {
+    folder,
+    addOriginalPath,
+    customHashMaker
+  }: {
+    folder: string
+    addOriginalPath?: boolean
+    customHashMaker?: (str: string) => string
+  }
+): Promise<Entity | null> {
   const sceneJsonPath = path.resolve(folder, './scene.json')
   let isParcelScene = true
 
   const wearableJsonPath = path.resolve(folder, './wearable.json')
-  if (fs.existsSync(wearableJsonPath)) {
+  if (await components.fs.existPath(wearableJsonPath)) {
     try {
-      const wearableJson = JSON.parse(fs.readFileSync(wearableJsonPath).toString())
+      const wearableJson = JSON.parse(await components.fs.readFile(wearableJsonPath, 'utf-8'))
       if (!WearableJson.validate(wearableJson)) {
         const errors = (WearableJson.validate.errors || []).map((a) => `${a.data} ${a.message}`).join('')
 
@@ -468,17 +479,16 @@ function entityV3FromFolder({
 
   const hashMaker = customHashMaker ? customHashMaker : defaultHashMaker
 
-  if (fs.existsSync(sceneJsonPath) && isParcelScene) {
-    const sceneJson = JSON.parse(fs.readFileSync(sceneJsonPath).toString())
+  if ((await components.fs.existPath(sceneJsonPath)) && isParcelScene) {
+    const sceneJson = JSON.parse(await components.fs.readFile(sceneJsonPath, 'utf-8'))
     const { base, parcels }: { base: string; parcels: string[] } = sceneJson.scene
     const pointers = new Set<string>()
     pointers.add(base)
     parcels.forEach(($) => pointers.add($))
 
-    const mappedFiles = getFilesFromFolder({
+    const mappedFiles = await getFilesFromFolder(components, {
       folder,
       addOriginalPath,
-      ignorePattern,
       customHashMaker
     })
 
@@ -496,49 +506,30 @@ function entityV3FromFolder({
   return null
 }
 
-const defaultDclIgnore = () =>
-  [
-    '.*',
-    'package.json',
-    'package-lock.json',
-    'yarn-lock.json',
-    'build.json',
-    'export',
-    'tsconfig.json',
-    'tslint.json',
-    'node_modules',
-    '*.ts',
-    '*.tsx',
-    'Dockerfile',
-    'dist',
-    'README.md',
-    '*.blend',
-    '*.fbx',
-    '*.zip',
-    '*.rar'
-  ].join('\n')
-
-export function getFilesFromFolder({
-  folder,
-  addOriginalPath,
-  ignorePattern,
-  customHashMaker
-}: {
-  folder: string
-  addOriginalPath?: boolean
-  ignorePattern?: string
-  customHashMaker?: (str: string) => string
-}): ContentMapping[] {
+export async function getFilesFromFolder(
+  components: Pick<CliComponents, 'fs'>,
+  {
+    folder,
+    addOriginalPath,
+    customHashMaker
+  }: {
+    folder: string
+    addOriginalPath?: boolean
+    customHashMaker?: (str: string) => string
+  }
+): Promise<ContentMapping[]> {
   const hashMaker = customHashMaker ? customHashMaker : defaultHashMaker
+  const ignorePatterns = await getDCLIgnorePatterns(components, folder)
 
   const allFiles = globSync('**/*', {
+    ignore: ignorePatterns,
     cwd: folder,
     dot: false,
     absolute: true
   })
     .map((file) => {
       try {
-        if (!fs.statSync(file).isFile()) return
+        if (!statSync(file).isFile()) return
       } catch (err) {
         return
       }
@@ -548,8 +539,7 @@ export function getFilesFromFolder({
     })
     .filter(($) => !!$) as string[]
 
-  const ensureIgnorePattern = ignorePattern && ignorePattern !== '' ? ignorePattern : defaultDclIgnore()
-  const ig = ignore().add(ensureIgnorePattern)
+  const ig = ignore().add(ignorePatterns)
   const filteredFiles = ig.filter(allFiles)
 
   const ret: (ContentMapping & { original_path: string | undefined })[] = []
@@ -557,9 +547,9 @@ export function getFilesFromFolder({
   for (const file of filteredFiles) {
     const absolutePath = path.resolve(folder, file)
     try {
-      if (!fs.statSync(absolutePath).isFile()) continue
+      if (!statSync(absolutePath).isFile()) continue
     } catch (err) {
-      console.log(err)
+      console.error(err)
       continue
     }
 

@@ -1,22 +1,20 @@
 import path from 'path'
-import fs from 'fs-extra'
 import chokidar from 'chokidar'
 import { sdk } from '@dcl/schemas'
 import { WebSocket } from 'ws'
-import { resolve } from 'path'
-
 import { setupBffAndComms } from './bff'
 import { Router } from '@well-known-components/http-server'
 import { setupEcs6Endpoints } from './endpoints'
 import { CliError } from '../../utils/error'
 import { PreviewComponents } from './types'
 import { upgradeWebSocketResponse } from '@well-known-components/http-server/dist/ws'
+import { getDCLIgnorePatterns } from '../../utils/dcl-ignore'
 
 export async function wire(components: PreviewComponents, dir: string, watch: boolean = false) {
   const npmModulesPath = path.resolve(dir, 'node_modules')
 
   // TODO: dcl.project.needsDependencies() should do this
-  if (!fs.pathExistsSync(npmModulesPath)) {
+  if (await components.fs.existPath(npmModulesPath)) {
     throw new CliError(`Couldn\'t find ${npmModulesPath}, please run: npm install`)
   }
 
@@ -33,7 +31,7 @@ export async function wire(components: PreviewComponents, dir: string, watch: bo
   })
 
   setupBffAndComms(components, router)
-  setupEcs6Endpoints(dir, router)
+  setupEcs6Endpoints(components, dir, router)
 
   components.server.setContext(components)
   components.server.use(router.allowedMethods())
@@ -41,14 +39,10 @@ export async function wire(components: PreviewComponents, dir: string, watch: bo
 
   if (watch) {
     const { clients } = components.ws.ws
-    const ignoredContent = await getDCLIgnoreFile(dir)
-    const ignored = (ignoredContent?.split('\n') || []).filter(Boolean)
-
-    // by default many files need to be ignored
-    ignored.push('.git', 'node_modules', '**/*.ts', '**/*.tsx')
+    const ignored = await getDCLIgnorePatterns(components, dir)
 
     chokidar
-      .watch(resolve(dir), {
+      .watch(path.resolve(dir), {
         ignored,
         ignoreInitial: false,
         cwd: dir
@@ -58,14 +52,6 @@ export async function wire(components: PreviewComponents, dir: string, watch: bo
         return updateScene(dir, clients)
       })
   }
-}
-
-const getDCLIgnoreFile = async (dir: string): Promise<string | null> => {
-  try {
-    return fs.readFile(resolve(dir, '.dclignore'), 'utf8')
-  } catch (e) {}
-
-  return null
 }
 
 const initWsConnection = (ws: WebSocket, clients: Set<WebSocket>) => {
