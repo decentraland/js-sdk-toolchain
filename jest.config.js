@@ -52,6 +52,7 @@ module.exports = {
     "scripts",
     "test",
     "(.)\\.(js)$",
+    "packages/@dcl/inspector"
   ],
   verbose: true,
   testMatch: ["**/*.spec.(ts|tsx)"],
