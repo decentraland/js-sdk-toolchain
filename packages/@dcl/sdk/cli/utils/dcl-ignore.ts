@@ -19,7 +19,8 @@ export const defaultDclIgnore = [
   '*.blend',
   '*.fbx',
   '*.zip',
-  '*.rar'
+  '*.rar',
+  'vscode'
 ]
 
 export async function getDCLIgnoreFileContents(

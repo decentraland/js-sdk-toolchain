@@ -31,7 +31,7 @@ export const args = getArgs({
 
 export function help() {
   return `
-  Usage: 'dcl-commands build [options]'
+  Usage: 'sdk-commands build [options]'
     Options:'
       -h, --help                Displays complete help
       -w, --watch               Watch for file changes and build on change
@@ -41,7 +41,7 @@ export function help() {
 
     Example:
     - Build your scene:
-      '$ dcl-commands build'
+      '$ sdk-commands build'
   `
 }
 

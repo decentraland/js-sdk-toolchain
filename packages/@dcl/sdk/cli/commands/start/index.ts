@@ -35,7 +35,7 @@ export const args = getArgs({
 
 export function help() {
   return `
-  Usage: dcl start [options]
+  Usage: sdk-commands start [options]
 
     Options:
 
@@ -53,11 +53,11 @@ export function help() {
 
     - Start a local development server for a Decentraland Scene at port 3500
 
-      $ dcl start -p 3500
+      $ sdk-commands start -p 3500
 
     - Start a local development server for a Decentraland Scene at a docker container
 
-      $ dcl start --ci
+      $ sdk-commands start --ci
 `
 }
 
