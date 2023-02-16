@@ -47,7 +47,7 @@ describe('build:helpers', () => {
   })
 
   it('needsDependencies: should return true if "node_modules" does not exist', async () => {
-    jest.spyOn(components.fs, 'existPath').mockResolvedValue(false)
+    jest.spyOn(components.fs, 'directoryExists').mockResolvedValue(false)
 
     const res = await helpers.needsDependencies(components, 'some/path')
 
@@ -55,7 +55,7 @@ describe('build:helpers', () => {
   })
 
   it('needsDependencies: should return true if "node_modules" is empty', async () => {
-    jest.spyOn(components.fs, 'existPath').mockResolvedValue(true)
+    jest.spyOn(components.fs, 'directoryExists').mockResolvedValue(true)
     jest.spyOn(components.fs, 'readdir').mockResolvedValue([])
 
     const res = await helpers.needsDependencies(components, 'some/path')
@@ -64,7 +64,7 @@ describe('build:helpers', () => {
   })
 
   it('needsDependencies: should return false if "node_modules" is valid', async () => {
-    jest.spyOn(components.fs, 'existPath').mockResolvedValue(true)
+    jest.spyOn(components.fs, 'directoryExists').mockResolvedValue(true)
     jest.spyOn(components.fs, 'readdir').mockResolvedValue(['some', 'files'])
 
     const res = await helpers.needsDependencies(components, 'some/path')

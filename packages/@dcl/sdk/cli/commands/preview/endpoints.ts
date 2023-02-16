@@ -242,7 +242,7 @@ async function getAllPreviewWearables(
   const wearablePathArray: string[] = []
   for (const wearableDir of baseFolders) {
     const wearableJsonPath = path.resolve(wearableDir, 'wearable.json')
-    if (await components.fs.existPath(wearableJsonPath)) {
+    if (await components.fs.fileExists(wearableJsonPath)) {
       wearablePathArray.push(wearableJsonPath)
     }
   }
@@ -408,7 +408,7 @@ function serveStatic(components: Pick<CliComponents, 'fs'>, dir: string, router:
       const fullPath = path.resolve(folder, transform(file))
 
       // only return files IF the file is within a baseFolder
-      if (!(await components.fs.existPath(fullPath))) {
+      if (!(await components.fs.fileExists(fullPath))) {
         return next()
       }
 
@@ -461,7 +461,7 @@ async function entityV3FromFolder(
   let isParcelScene = true
 
   const wearableJsonPath = path.resolve(folder, './wearable.json')
-  if (await components.fs.existPath(wearableJsonPath)) {
+  if (await components.fs.fileExists(wearableJsonPath)) {
     try {
       const wearableJson = JSON.parse(await components.fs.readFile(wearableJsonPath, 'utf-8'))
       if (!WearableJson.validate(wearableJson)) {
@@ -479,7 +479,7 @@ async function entityV3FromFolder(
 
   const hashMaker = customHashMaker ? customHashMaker : defaultHashMaker
 
-  if ((await components.fs.existPath(sceneJsonPath)) && isParcelScene) {
+  if ((await components.fs.fileExists(sceneJsonPath)) && isParcelScene) {
     const sceneJson = JSON.parse(await components.fs.readFile(sceneJsonPath, 'utf-8'))
     const { base, parcels }: { base: string; parcels: string[] } = sceneJson.scene
     const pointers = new Set<string>()

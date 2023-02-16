@@ -14,14 +14,22 @@ export type IFileSystemComponent = Pick<typeof fs, 'createReadStream'> &
   > & {
     constants: Pick<typeof fs.constants, 'F_OK' | 'R_OK'>
   } & {
-    existPath(path: string): Promise<boolean>
+    fileExists(path: string): Promise<boolean>
+    directoryExists(path: string): Promise<boolean>
     readdir(path: string): Promise<string[]>
   }
 
-async function existPath(path: string): Promise<boolean> {
+async function fileExists(path: string): Promise<boolean> {
   try {
     await fs.promises.access(path, fs.constants.F_OK | fs.constants.R_OK)
     return true
+  } catch (error) {
+    return false
+  }
+}
+async function directoryExists(path: string): Promise<boolean> {
+  try {
+    return (await fs.promises.lstat(path)).isDirectory()
   } catch (error) {
     return false
   }
@@ -48,6 +56,7 @@ export function createFsComponent(): IFileSystemComponent {
       R_OK: fs.constants.R_OK
     },
     rename: fsPromises.rename,
-    existPath
+    fileExists,
+    directoryExists
   }
 }

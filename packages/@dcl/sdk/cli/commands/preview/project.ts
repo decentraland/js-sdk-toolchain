@@ -105,7 +105,7 @@ export async function validateExistingProject(components: { fs: IFileSystemCompo
       throw new CliError(`Main scene format file (${sceneFile.main}) is not a supported format`)
     }
 
-    if (sceneFile.main !== null && !(await components.fs.existPath(resolve(dir, sceneFile.main)))) {
+    if (sceneFile.main !== null && !(await components.fs.fileExists(resolve(dir, sceneFile.main)))) {
       throw new CliError(`Main scene file ${sceneFile.main} is missing in folder ${dir}`)
     }
   }

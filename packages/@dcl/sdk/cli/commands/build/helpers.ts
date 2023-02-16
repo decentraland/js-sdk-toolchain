@@ -61,7 +61,7 @@ export const validatePackageJson = async (
  */
 export const needsDependencies = async (components: { fs: IFileSystemComponent }, dir: string): Promise<boolean> => {
   const nodeModulesPath = resolve(dir, 'node_modules')
-  const hasNodeModulesFolder = await components.fs.existPath(nodeModulesPath)
+  const hasNodeModulesFolder = await components.fs.directoryExists(nodeModulesPath)
   const isNodeModulesEmpty = hasNodeModulesFolder && (await components.fs.readdir(nodeModulesPath)).length === 0
 
   return !hasNodeModulesFolder || isNodeModulesEmpty

@@ -14,7 +14,7 @@ export async function wire(components: PreviewComponents, dir: string, watch: bo
   const npmModulesPath = path.resolve(dir, 'node_modules')
 
   // TODO: dcl.project.needsDependencies() should do this
-  if (await components.fs.existPath(npmModulesPath)) {
+  if (await components.fs.directoryExists(npmModulesPath)) {
     throw new CliError(`Couldn\'t find ${npmModulesPath}, please run: npm install`)
   }
 
