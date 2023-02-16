@@ -59,7 +59,7 @@ export const validatePackageJson = async (
 /*
  * Returns true if the project contains an empty node_modules folder
  */
-export const needsDependencies = async (components: { fs: IFileSystemComponent }, dir: string): Promise<boolean> => {
+export async function needsDependencies(components: { fs: IFileSystemComponent }, dir: string): Promise<boolean> {
   const nodeModulesPath = resolve(dir, 'node_modules')
   const hasNodeModulesFolder = await components.fs.directoryExists(nodeModulesPath)
   const isNodeModulesEmpty = hasNodeModulesFolder && (await components.fs.readdir(nodeModulesPath)).length === 0

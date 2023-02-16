@@ -5,19 +5,11 @@ import { WebSocket } from 'ws'
 import { setupBffAndComms } from './bff'
 import { Router } from '@well-known-components/http-server'
 import { setupEcs6Endpoints } from './endpoints'
-import { CliError } from '../../utils/error'
 import { PreviewComponents } from './types'
 import { upgradeWebSocketResponse } from '@well-known-components/http-server/dist/ws'
 import { getDCLIgnorePatterns } from '../../utils/dcl-ignore'
 
 export async function wire(components: PreviewComponents, dir: string, watch: boolean = false) {
-  const npmModulesPath = path.resolve(dir, 'node_modules')
-
-  // TODO: dcl.project.needsDependencies() should do this
-  if (await components.fs.directoryExists(npmModulesPath)) {
-    throw new CliError(`Couldn\'t find ${npmModulesPath}, please run: npm install`)
-  }
-
   const router = new Router<PreviewComponents>()
 
   const sceneUpdateClients = new Set<WebSocket>()
