@@ -50,9 +50,10 @@ test-coverage:
 recreate-test-scene:
 	@rm -rf tmp/scene || true
 	mkdir -p tmp/scene
-	cd tmp/scene; ../packages/@dcl/sdk/cli/index.js init --skip-install
-	cd tmp/scene; npm install ../packages/@dcl/sdk ../packages/@dcl/js-runtime
+	cd tmp/scene; ../../packages/@dcl/sdk/cli/index.js init --skip-install
+	cd tmp/scene; npm install ../../packages/@dcl/sdk ../../packages/@dcl/js-runtime
 	cd tmp/scene; npm run build
+	cd tmp/scene; ../../packages/@dcl/sdk/cli/index.js export-static --destination static
 	cd tmp/scene; npm run start
 
 node_modules/.bin/protobuf/bin/protoc:

@@ -24,6 +24,7 @@
     "@dcl/ecs": "file:../ecs",
     "@dcl/ecs-math": "2.0.1-20221129185242.commit-40495c1",
     "@dcl/explorer": "1.0.81966-20230215010724.commit-64eb73f",
+    "@dcl/hashing": "^1.1.3",
     "@dcl/js-runtime": "file:../js-runtime",
     "@dcl/mini-comms": "1.0.1-20230216163137.commit-a4c75be",
     "@dcl/protocol": "1.0.0-4114477251.commit-ccb88d6",
