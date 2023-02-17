@@ -6,7 +6,7 @@ import {
 } from '@well-known-components/interfaces'
 import { HTTPProvider } from 'eth-connect'
 import { RoomComponent } from '@dcl/mini-comms/dist/adapters/rooms'
-import { WebSocketComponent } from './ws'
+import { WebSocketComponent } from './server/ws'
 import { CliComponents } from '../../components'
 
 export type PreviewComponents = CliComponents & {

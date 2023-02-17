@@ -1,23 +1,14 @@
 import { resolve } from 'path'
 
 import { CliComponents } from '../../components'
-import { toStringList } from '../../utils/out-messages'
-import { getArgs } from '../../utils/args'
-import { CliError } from '../../utils/error'
+import { getArgs } from '../../logic/args'
 import { compile } from '@dcl/dcl-rollup/compile'
 import future from 'fp-future'
-import {
-  getProjectStructure,
-  installDependencies,
-  needsDependencies,
-  validateProjectStructure,
-  validatePackageJson,
-  REQUIRED_PACKAGE_JSON
-} from './helpers'
+import { assertValidProjectFolder, installDependencies, needsDependencies } from '../../logic/project-validations'
 
 interface Options {
   args: Omit<typeof args, '_'>
-  components: Pick<CliComponents, 'fs'>
+  components: Pick<CliComponents, 'fs' | 'logger'>
 }
 
 export const args = getArgs({
@@ -31,7 +22,7 @@ export const args = getArgs({
 
 export function help() {
   return `
-  Usage: 'dcl-commands build [options]'
+  Usage: 'sdk-commands build [options]'
     Options:'
       -h, --help                Displays complete help
       -w, --watch               Watch for file changes and build on change
@@ -41,32 +32,19 @@ export function help() {
 
     Example:
     - Build your scene:
-      '$ dcl-commands build'
+      '$ sdk-commands build'
   `
 }
 
 export async function main(options: Options) {
-  const dir = resolve(process.cwd(), options.args['--dir'] || '.')
-  const projectStructure = getProjectStructure()
+  const projectRoot = resolve(process.cwd(), options.args['--dir'] || '.')
 
-  const hasValidProjectStructure = await validateProjectStructure(options.components, dir, projectStructure)
+  await assertValidProjectFolder(options.components, projectRoot)
 
-  if (!hasValidProjectStructure) {
-    throw new CliError(`Invalid scene structure found. Required files:
-      ${toStringList(projectStructure)}`)
-  }
-
-  const hasValidPackageJson = await validatePackageJson(options.components, dir, REQUIRED_PACKAGE_JSON)
-
-  if (!hasValidPackageJson) {
-    throw new CliError(`Invalid "package.json" file. Structure required:
-      ${JSON.stringify(REQUIRED_PACKAGE_JSON, null, 2)}`)
-  }
-
-  const shouldInstallDeps = await needsDependencies(options.components, dir)
+  const shouldInstallDeps = await needsDependencies(options.components, projectRoot)
 
   if (shouldInstallDeps && !options.args['--skip-install']) {
-    await installDependencies(dir)
+    await installDependencies(options.components, projectRoot)
   }
 
   const watch = !!options.args['--watch']
@@ -74,7 +52,7 @@ export async function main(options: Options) {
   const watchingFuture = future<any>()
 
   await compile({
-    project: dir,
+    project: projectRoot,
     watch,
     production: !!options.args['--production'],
     watchingFuture

@@ -1,15 +1,12 @@
 import { Router } from '@well-known-components/http-server'
-import { PreviewComponents } from './types'
+import { PreviewComponents } from '../types'
 import * as path from 'path'
-import { sync as globSync } from 'glob'
 import { WearableJson } from '@dcl/schemas/dist/sdk'
-import { ContentMapping, Entity, EntityType, Locale, Wearable } from '@dcl/schemas'
-import ignore from 'ignore'
+import { Entity, EntityType, Locale, Wearable } from '@dcl/schemas'
 import fetch, { Headers } from 'node-fetch'
-import { fetchEntityByPointer } from './catalyst'
-import { CliComponents } from '../../components'
-import { statSync } from 'fs'
-import { getDCLIgnorePatterns } from '../../utils/dcl-ignore'
+import { fetchEntityByPointer } from '../../../logic/catalyst-requests'
+import { CliComponents } from '../../../components'
+import { getProjectContentMappings } from '../../../logic/project-files'
 
 function getCatalystUrl(): URL {
   return new URL('https://peer.decentraland.org')
@@ -177,10 +174,7 @@ function serveFolders(components: Pick<CliComponents, 'fs'>, router: Router<Prev
       pointers && typeof pointers === 'string' ? [pointers as string] : (pointers as string[])
     )
 
-    const resultEntities = await getSceneJson(components, {
-      baseFolders,
-      pointers: Array.from(requestedPointers)
-    })
+    const resultEntities = await getSceneJson(components, baseFolders, Array.from(requestedPointers))
     const catalystUrl = getCatalystUrl()
     const remote = fetchEntityByPointer(
       catalystUrl.toString(),
@@ -233,7 +227,7 @@ function serveFolders(components: Pick<CliComponents, 'fs'>, router: Router<Prev
   })
 }
 
-const defaultHashMaker = (str: string) => 'b64-' + Buffer.from(str).toString('base64')
+const b64HashingFunction = async (str: string) => 'b64-' + Buffer.from(str).toString('base64')
 
 async function getAllPreviewWearables(
   components: Pick<CliComponents, 'fs'>,
@@ -250,7 +244,7 @@ async function getAllPreviewWearables(
   const ret: LambdasWearable[] = []
   for (const wearableJsonPath of wearablePathArray) {
     try {
-      ret.push(await serveWearable(components, { wearableJsonPath, baseUrl }))
+      ret.push(await serveWearable(components, wearableJsonPath, baseUrl))
     } catch (err) {
       console.error(`Couldn't mock the wearable ${wearableJsonPath}. Please verify the correct format and scheme.`, err)
     }
@@ -260,7 +254,8 @@ async function getAllPreviewWearables(
 
 async function serveWearable(
   components: Pick<CliComponents, 'fs'>,
-  { wearableJsonPath, baseUrl }: { wearableJsonPath: string; baseUrl: string }
+  wearableJsonPath: string,
+  baseUrl: string
 ): Promise<LambdasWearable> {
   const wearableDir = path.dirname(wearableJsonPath)
   const wearableJson = JSON.parse((await components.fs.readFile(wearableJsonPath)).toString())
@@ -272,10 +267,7 @@ async function serveWearable(
     throw new Error(`Invalid wearable.json (${wearableJsonPath})`)
   }
 
-  const hashedFiles = await getFilesFromFolder(components, {
-    folder: wearableDir,
-    addOriginalPath: false
-  })
+  const hashedFiles = await getProjectContentMappings(components, wearableDir, b64HashingFunction)
 
   const thumbnailFiltered = hashedFiles.filter(($) => $?.file === 'thumbnail.png')
   const thumbnail =
@@ -316,27 +308,14 @@ async function serveWearable(
 
 async function getSceneJson(
   components: Pick<CliComponents, 'fs'>,
-  {
-    baseFolders,
-    pointers,
-    customHashMaker
-  }: {
-    baseFolders: string[]
-    pointers: string[]
-    customHashMaker?: (str: string) => string
-  }
+  projectRoots: string[],
+  pointers: string[]
 ): Promise<Entity[]> {
   const requestedPointers = new Set<string>(pointers)
   const resultEntities: Entity[] = []
 
   const allDeployments = await Promise.all(
-    baseFolders.map(async (folder) => {
-      return entityV3FromFolder(components, {
-        folder,
-        addOriginalPath: false,
-        customHashMaker
-      })
-    })
+    projectRoots.map(async (projectRoot) => fakeEntityV3FromFolder(components, projectRoot, b64HashingFunction))
   )
 
   for (const pointer of Array.from(requestedPointers)) {
@@ -355,15 +334,15 @@ async function getSceneJson(
   return resultEntities
 }
 
-function serveStatic(components: Pick<CliComponents, 'fs'>, dir: string, router: Router<PreviewComponents>) {
+function serveStatic(components: Pick<CliComponents, 'fs'>, projectRoot: string, router: Router<PreviewComponents>) {
   const sdkPath = path.dirname(
     require.resolve('@dcl/sdk/package.json', {
-      paths: [dir]
+      paths: [projectRoot]
     })
   )
   const dclExplorerJsonPath = path.dirname(
     require.resolve('@dcl/explorer/package.json', {
-      paths: [dir, sdkPath]
+      paths: [projectRoot, sdkPath]
     })
   )
 
@@ -445,22 +424,15 @@ function serveStatic(components: Pick<CliComponents, 'fs'>, dir: string, router:
   })
 }
 
-async function entityV3FromFolder(
+async function fakeEntityV3FromFolder(
   components: Pick<CliComponents, 'fs'>,
-  {
-    folder,
-    addOriginalPath,
-    customHashMaker
-  }: {
-    folder: string
-    addOriginalPath?: boolean
-    customHashMaker?: (str: string) => string
-  }
+  projectRoot: string,
+  hashingFunction: (filePath: string) => Promise<string>
 ): Promise<Entity | null> {
-  const sceneJsonPath = path.resolve(folder, './scene.json')
+  const sceneJsonPath = path.resolve(projectRoot, 'scene.json')
   let isParcelScene = true
 
-  const wearableJsonPath = path.resolve(folder, './wearable.json')
+  const wearableJsonPath = path.resolve(projectRoot, 'wearable.json')
   if (await components.fs.fileExists(wearableJsonPath)) {
     try {
       const wearableJson = JSON.parse(await components.fs.readFile(wearableJsonPath, 'utf-8'))
@@ -477,8 +449,6 @@ async function entityV3FromFolder(
     }
   }
 
-  const hashMaker = customHashMaker ? customHashMaker : defaultHashMaker
-
   if ((await components.fs.fileExists(sceneJsonPath)) && isParcelScene) {
     const sceneJson = JSON.parse(await components.fs.readFile(sceneJsonPath, 'utf-8'))
     const { base, parcels }: { base: string; parcels: string[] } = sceneJson.scene
@@ -486,16 +456,12 @@ async function entityV3FromFolder(
     pointers.add(base)
     parcels.forEach(($) => pointers.add($))
 
-    const mappedFiles = await getFilesFromFolder(components, {
-      folder,
-      addOriginalPath,
-      customHashMaker
-    })
+    const mappedFiles = await getProjectContentMappings(components, projectRoot, hashingFunction)
 
     return {
       version: 'v3',
       type: EntityType.SCENE,
-      id: hashMaker(folder),
+      id: await hashingFunction(projectRoot),
       pointers: Array.from(pointers),
       timestamp: Date.now(),
       metadata: sceneJson,
@@ -504,65 +470,4 @@ async function entityV3FromFolder(
   }
 
   return null
-}
-
-export async function getFilesFromFolder(
-  components: Pick<CliComponents, 'fs'>,
-  {
-    folder,
-    addOriginalPath,
-    customHashMaker
-  }: {
-    folder: string
-    addOriginalPath?: boolean
-    customHashMaker?: (str: string) => string
-  }
-): Promise<ContentMapping[]> {
-  const hashMaker = customHashMaker ? customHashMaker : defaultHashMaker
-  const ignorePatterns = await getDCLIgnorePatterns(components, folder)
-
-  const allFiles = globSync('**/*', {
-    ignore: ignorePatterns,
-    cwd: folder,
-    dot: false,
-    absolute: true
-  })
-    .map((file) => {
-      try {
-        if (!statSync(file).isFile()) return
-      } catch (err) {
-        return
-      }
-      const _folder = folder.replace(/\\/gi, '/')
-      const key = file.replace(_folder, '').replace(/^\/+/, '')
-      return key
-    })
-    .filter(($) => !!$) as string[]
-
-  const ig = ignore().add(ignorePatterns)
-  const filteredFiles = ig.filter(allFiles)
-
-  const ret: (ContentMapping & { original_path: string | undefined })[] = []
-
-  for (const file of filteredFiles) {
-    const absolutePath = path.resolve(folder, file)
-    try {
-      if (!statSync(absolutePath).isFile()) continue
-    } catch (err) {
-      console.error(err)
-      continue
-    }
-
-    const absoluteFolder = folder.replace(/\\/gi, '/')
-
-    const relativeFilePathToFolder = file.replace(absoluteFolder, '').replace(/^\/+/, '')
-
-    ret.push({
-      file: relativeFilePathToFolder.toLowerCase(),
-      original_path: addOriginalPath ? absolutePath : undefined,
-      hash: hashMaker(absolutePath)
-    })
-  }
-
-  return ret
 }

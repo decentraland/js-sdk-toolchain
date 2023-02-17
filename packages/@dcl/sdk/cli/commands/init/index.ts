@@ -1,16 +1,16 @@
 import { join, resolve } from 'path'
 
-import { getArgs } from '../../utils/args'
-import { CliError } from '../../utils/error'
+import { getArgs } from '../../logic/args'
+import { CliError } from '../../logic/error'
 import { CliComponents } from '../../components'
-import { isDirectoryEmpty, download, extract } from '../../utils/fs'
+import { isDirectoryEmpty, download, extract } from '../../logic/fs'
 
 import { get as getRepo } from './repos'
-import { installDependencies, needsDependencies } from '../build/helpers'
+import { installDependencies, needsDependencies } from '../../logic/project-validations'
 
 interface Options {
   args: typeof args
-  components: Pick<CliComponents, 'fetch' | 'fs'>
+  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger'>
 }
 
 export const args = getArgs({
@@ -42,7 +42,7 @@ export async function main(options: Options) {
   // npm install
   const shouldInstallDeps = await needsDependencies(options.components, dir)
   if (shouldInstallDeps && !options.args['--skip-install']) {
-    await installDependencies(dir)
+    await installDependencies(options.components, dir)
   }
 }
 

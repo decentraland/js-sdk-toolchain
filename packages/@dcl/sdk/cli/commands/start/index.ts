@@ -1,23 +1,37 @@
-import os from 'os'
-import { resolve } from 'path'
+import * as os from 'os'
+import * as path from 'path'
 import open from 'open'
+import future from 'fp-future'
 
 import { CliComponents } from '../../components'
 import { main as build } from '../build'
-import { main as preview } from '../preview'
-import { previewPort } from '../preview/port'
-import { getArgs } from '../../utils/args'
-import { npmRun } from '../build/helpers'
+import { getArgs } from '../../logic/args'
+import { needsDependencies, npmRun } from '../../logic/project-validations'
+import { validateSceneJson } from '../../logic/scene-validations'
+import { CliError } from '../../logic/error'
+import { previewPort } from '../../logic/get-free-port'
+import { ISignalerComponent, PreviewComponents } from './types'
+import { createTestMetricsComponent } from '@well-known-components/metrics'
+import { Lifecycle, IBaseComponent } from '@well-known-components/interfaces'
+import { createRecordConfigComponent } from '@well-known-components/env-config-provider'
+import { createRoomsComponent, roomsMetrics } from '@dcl/mini-comms/dist/adapters/rooms'
+import { createServerComponent } from '@well-known-components/http-server'
+import { createConsoleLogComponent } from '@well-known-components/logger'
+import { providerInstance } from '../../components/eth'
+import { createStdoutCliLogger } from '../../components/log'
+import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
+import { wireRouter } from './server/routes'
+import { createWsComponent } from './server/ws'
 
 interface Options {
   args: typeof args
-  components: Pick<CliComponents, 'fetch' | 'fs'>
+  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger'>
 }
 
 export const args = getArgs({
   '--dir': String,
   '--help': Boolean,
-  '--port': String,
+  '--port': Number,
   '--no-debug': Boolean,
   '--no-browser': Boolean,
   '--no-watch': Boolean,
@@ -35,7 +49,7 @@ export const args = getArgs({
 
 export function help() {
   return `
-  Usage: dcl start [options]
+  Usage: sdk-commands start [options]
 
     Options:
 
@@ -53,93 +67,147 @@ export function help() {
 
     - Start a local development server for a Decentraland Scene at port 3500
 
-      $ dcl start -p 3500
+      $ sdk-commands start -p 3500
 
     - Start a local development server for a Decentraland Scene at a docker container
 
-      $ dcl start --ci
+      $ sdk-commands start --ci
 `
 }
 
 export async function main(options: Options) {
-  const dir = resolve(process.cwd(), options.args['--dir'] || '.')
+  const projectRoot = path.resolve(process.cwd(), options.args['--dir'] || '.')
   const isCi = args['--ci'] || process.env.CI || false
   const debug = !args['--no-debug'] && !isCi
   const openBrowser = !args['--no-browser'] && !isCi
   const skipBuild = args['--skip-build']
   const watch = !args['--no-watch']
   const enableWeb3 = args['--web3']
-  const port = parseInt(args['--port']!, 10) || (await previewPort())
   const baseCoords = { x: 0, y: 0 }
   const hasPortableExperience = false
 
-  const comps = { components: options.components }
-
   // first run `npm run build`, this can be disabled with --skip-build
   if (!skipBuild) {
-    await npmRun(dir, 'build')
+    await npmRun(projectRoot, 'build')
   }
 
   // then start the embedded compiler, this can be disabled with --no-watch
   if (watch) {
-    await build({ args: { '--dir': dir, '--watch': watch }, ...comps })
+    await build({ ...options, args: { '--dir': projectRoot, '--watch': watch } })
   }
 
-  // after the watcher is running, start the server
-  const server = await preview({ args: { '--dir': dir, '--port': port, '--watch': watch }, ...comps })
+  await validateSceneJson(options.components, projectRoot)
 
-  const networkInterfaces = os.networkInterfaces()
-  const availableURLs: string[] = []
+  if (await needsDependencies(options.components, projectRoot)) {
+    const npmModulesPath = path.resolve(projectRoot, 'node_modules')
+    throw new CliError(`Couldn\'t find ${npmModulesPath}, please run: npm install`)
+  }
 
-  console.log(`\nPreview server is now running!`)
-  console.log('Available on:\n')
+  const port = options.args['--port'] || (await previewPort())
 
-  Object.keys(networkInterfaces).forEach((dev) => {
-    ;(networkInterfaces[dev] || []).forEach((details) => {
-      if (details.family === 'IPv4') {
-        let addr = `http://${details.address}:${port}?position=${baseCoords.x}%2C${baseCoords.y}&ENABLE_ECS7`
-        if (debug) {
-          addr = `${addr}&SCENE_DEBUG_PANEL`
+  const program = await Lifecycle.run<PreviewComponents>({
+    async initComponents() {
+      const metrics = createTestMetricsComponent(roomsMetrics)
+      const config = createRecordConfigComponent({
+        HTTP_SERVER_PORT: port.toString(),
+        HTTP_SERVER_HOST: '0.0.0.0',
+        ...process.env
+      })
+      const logs = await createConsoleLogComponent({})
+      const ws = await createWsComponent({ logs })
+      const server = await createServerComponent<PreviewComponents>({ config, logs, ws: ws.ws }, {})
+      const rooms = await createRoomsComponent({
+        metrics,
+        logs,
+        config
+      })
+
+      const programClosed = future<void>()
+      const signaler: IBaseComponent & ISignalerComponent = {
+        programClosed,
+        async stop() {
+          // this promise is resolved upon SIGTERM or SIGHUP
+          // or when program.stop is called
+          programClosed.resolve()
         }
-        if (enableWeb3 || hasPortableExperience) {
-          addr = `${addr}&ENABLE_WEB3`
-        }
-
-        availableURLs.push(addr)
       }
-    })
-  })
 
-  // Push localhost and 127.0.0.1 at top
-  const sortedURLs = availableURLs.sort((a, _b) => {
-    return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
-  })
+      return {
+        ...options.components,
+        logger: createStdoutCliLogger(),
+        logs,
+        ethereumProvider: providerInstance,
+        rooms,
+        config,
+        metrics,
+        server,
+        ws,
+        signaler
+      }
+    },
+    async main({ components, startComponents }) {
+      await wireRouter(components, projectRoot)
+      if (watch) {
+        await wireFileWatcherToWebSockets(components, projectRoot)
+      }
+      await startComponents()
 
-  for (const addr of sortedURLs) {
-    console.log(`    ${addr}`)
-  }
+      const networkInterfaces = os.networkInterfaces()
+      const availableURLs: string[] = []
 
-  if (args['--desktop-client']) {
-    console.log('\n  Desktop client:\n')
-    for (const addr of sortedURLs) {
-      const searchParams = new URLSearchParams()
-      searchParams.append('PREVIEW-MODE', addr)
-      console.log(`    dcl://${searchParams.toString()}&`)
+      components.logger.log(`Preview server is now running!`)
+      components.logger.log('Available on:\n')
+
+      Object.keys(networkInterfaces).forEach((dev) => {
+        ;(networkInterfaces[dev] || []).forEach((details) => {
+          if (details.family === 'IPv4') {
+            let addr = `http://${details.address}:${port}?position=${baseCoords.x}%2C${baseCoords.y}&ENABLE_ECS7`
+            if (debug) {
+              addr = `${addr}&SCENE_DEBUG_PANEL`
+            }
+            if (enableWeb3 || hasPortableExperience) {
+              addr = `${addr}&ENABLE_WEB3`
+            }
+
+            availableURLs.push(addr)
+          }
+        })
+      })
+
+      // Push localhost and 127.0.0.1 at top
+      const sortedURLs = availableURLs.sort((a, _b) => {
+        return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
+      })
+
+      for (const addr of sortedURLs) {
+        components.logger.log(`    ${addr}`)
+      }
+
+      if (args['--desktop-client']) {
+        components.logger.log('\n  Desktop client:\n')
+        for (const addr of sortedURLs) {
+          const searchParams = new URLSearchParams()
+          searchParams.append('PREVIEW-MODE', addr)
+          components.logger.log(`    dcl://${searchParams.toString()}&`)
+        }
+      }
+
+      components.logger.log('\n  Details:\n')
+      components.logger.log('\nPress CTRL+C to exit\n')
+
+      // Open preferably localhost/127.0.0.1
+      if (openBrowser && sortedURLs.length && !args['--desktop-client']) {
+        try {
+          await open(sortedURLs[0])
+        } catch (_) {
+          components.logger.warn('Unable to open browser automatically.')
+        }
+      }
     }
-  }
-
-  console.log('\n  Details:\n')
-  console.log('\nPress CTRL+C to exit\n')
-
-  // Open preferably localhost/127.0.0.1
-  if (openBrowser && sortedURLs.length && !args['--desktop-client']) {
-    try {
-      await open(sortedURLs[0])
-    } catch (_) {
-      console.log('Unable to open browser automatically.')
-    }
-  }
+  })
 
   // this signal is resolved by: (wkc)program.stop(), SIGTERM, SIGHUP
-  await server.components.signaler.programClosed
+  // we must wait for it to resolve (when the server stops) to continue with the
+  // program
+  await program.components.signaler.programClosed
 }

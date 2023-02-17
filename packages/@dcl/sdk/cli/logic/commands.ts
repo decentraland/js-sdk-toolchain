@@ -4,7 +4,7 @@ import { CliError } from './error'
 
 export const COMMANDS_PATH = resolve(__dirname, '../commands')
 
-export const getCommands = async ({ fs }: Pick<CliComponents, 'fs'>): Promise<string[]> => {
+export async function getCommands({ fs }: Pick<CliComponents, 'fs'>): Promise<string[]> {
   const commandDirs = await fs.readdir(COMMANDS_PATH)
 
   const commands = commandDirs.map(async (dir) => {

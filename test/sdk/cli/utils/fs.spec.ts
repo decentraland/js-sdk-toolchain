@@ -1,6 +1,6 @@
 jest.mock('../../../../packages/@dcl/sdk/node_modules/extract-zip')
 import * as extractZip from '../../../../packages/@dcl/sdk/node_modules/extract-zip'
-import * as fsUtils from '../../../../packages/@dcl/sdk/cli/utils/fs'
+import * as fsUtils from '../../../../packages/@dcl/sdk/cli/logic/fs'
 import { createFsComponent } from '../../../../packages/@dcl/sdk/cli/components/fs'
 import { createFetchComponent } from '../../../../packages/@dcl/sdk/cli/components/fetch'
 import path, { resolve } from 'path'

@@ -1,7 +1,7 @@
-import * as fsUtils from '../../../../../packages/@dcl/sdk/cli/utils/fs'
+import * as fsUtils from '../../../../../packages/@dcl/sdk/cli/logic/fs'
 import * as init from '../../../../../packages/@dcl/sdk/cli/commands/init/index'
 import { initComponents } from '../../../../../packages/@dcl/sdk/cli/components'
-import * as helpers from '../../../../../packages/@dcl/sdk/cli/commands/build/helpers'
+import * as projectValidations from '../../../../../packages/@dcl/sdk/cli/logic/project-validations'
 
 afterEach(() => {
   jest.clearAllMocks()
@@ -10,7 +10,7 @@ afterEach(() => {
 
 describe('init command', () => {
   beforeEach(() => {
-    jest.spyOn(helpers, 'needsDependencies').mockResolvedValue(true)
+    jest.spyOn(projectValidations, 'needsDependencies').mockResolvedValue(true)
   })
 
   it('help: return void', async () => {
@@ -25,7 +25,7 @@ describe('init command', () => {
   it('main: should throw if directory is not empty and no bypass arg is provided', async () => {
     const downloadSpy = jest.spyOn(fsUtils, 'download')
     const extractSpy = jest.spyOn(fsUtils, 'extract')
-    const installDependenciesSpy = jest.spyOn(helpers, 'installDependencies').mockRejectedValue(undefined)
+    const installDependenciesSpy = jest.spyOn(projectValidations, 'installDependencies').mockRejectedValue(undefined)
 
     const components = initComponents()
 
@@ -44,7 +44,7 @@ describe('init command', () => {
     jest.spyOn(components.fs, 'readdir').mockResolvedValue(['test'])
     jest.spyOn(components.fs, 'rename').mockImplementation()
     jest.spyOn(components.fs, 'rmdir').mockImplementation()
-    const installDependenciesSpy = jest.spyOn(helpers, 'installDependencies').mockResolvedValue(undefined)
+    const installDependenciesSpy = jest.spyOn(projectValidations, 'installDependencies').mockResolvedValue(undefined)
 
     await init.main({ args: { _: [], '--yes': true }, components })
 

@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 
-import { CliError } from '../../../../packages/@dcl/sdk/cli/utils/error'
-import * as commands from '../../../../packages/@dcl/sdk/cli/utils/commands'
+import { CliError } from '../../../../packages/@dcl/sdk/cli/logic/error'
+import * as commands from '../../../../packages/@dcl/sdk/cli/logic/commands'
 import { initComponents } from '../../../../packages/@dcl/sdk/cli/components'
 
 afterEach(() => {

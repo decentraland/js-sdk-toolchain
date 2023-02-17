@@ -5,11 +5,9 @@
   Doesn't make sense to test this file
 */
 
-import { getArgs } from './utils/args'
-import { toStringList } from './utils/out-messages'
-import * as log from './utils/log'
-import { CliError } from './utils/error'
-import { COMMANDS_PATH, getCommands } from './utils/commands'
+import { getArgs } from './logic/args'
+import { CliError } from './logic/error'
+import { COMMANDS_PATH, getCommands } from './logic/commands'
 import { CliComponents, initComponents } from './components'
 
 export interface Options {
@@ -26,15 +24,15 @@ interface FileExports {
   args?: ReturnType<typeof getArgs>
 }
 
-const listCommandsStr = (commands: string[]) => toStringList(commands.map(($) => `npx @dcl/sdk ${$}`))
+const listCommandsStr = (commands: string[]) => commands.map(($) => `\t *sdk-commands ${$} \n`).join('')
 
 const handleError = (err: Error) => {
   if (err instanceof CliError) {
-    log.fail(err.message)
+    console.error(err.message)
   } else {
     // log with console to show stacktrace and debug information
     console.error(err)
-    log.warn(`Developer: All errors thrown must be an instance of "CliError"`)
+    console.warn(`Developer: All errors thrown must be an instance of "CliError"`)
   }
 
   // set an exit code but not finish the program immediately to close any pending work
@@ -63,7 +61,7 @@ async function main() {
 
   if (!commands.includes(command)) {
     if (needsHelp) {
-      log.info(helpMessage(commands))
+      components.logger.info(helpMessage(commands))
       return
     }
     throw new CliError(`Command ${command} is invalid. ${helpMessage(commands)}`)

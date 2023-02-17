@@ -12,6 +12,7 @@ export type Coords = {
 
 /**
  * Returns metaverse coordinates bounds.
+ * TODO: use functions from @dcl/schemas
  */
 export function getBounds(): IBounds {
   return {
@@ -31,7 +32,7 @@ export function getBounds(): IBounds {
  */
 export function parse(coordinates: string): string[] {
   return coordinates.split(';').map((coord: string) => {
-    const [x = 0, y = 0] = coord.split(',').map(($) => {
+    const [x, y] = coord.split(',').map(($) => {
       return parseInt($, 10)
         .toString() // removes spaces :)
         .replace('-0', '0')
@@ -42,64 +43,12 @@ export function parse(coordinates: string): string[] {
 }
 
 /**
- * Returns a promise that resolves `true` if the given set of coordinates is valid.
- * For invalid coordinates, the promise will reject with an error message.
- * *This is meant to be used as an inquirer validator.*
- *
- * Empty inputs will resolve `true`
- * @param answers An string containing coordinates in the `x,y; x,y; ...` format
- */
-export function validate(answers: string): Promise<boolean> {
-  return new Promise((resolve, reject) => {
-    if (answers.trim().length === 0) {
-      resolve(true)
-    } else {
-      answers.split(/;\s/g).forEach((answer) => {
-        if (!isValid(answer)) {
-          reject(new Error(`Invalid coordinate ${answer}`))
-        }
-      })
-      resolve(true)
-    }
-  })
-}
-
-/**
- * Returns true if the given coordinate's format is valid
- *
- * ```
- * isValid('0,0') // returns true
- * isValid(', 0') // returns false
- * ```
- * @param val The coodinate string
- */
-export function isValid(val: string): boolean {
-  if (!val.match(/^(-?\d)+\,(-?\d)+$/g)) {
-    return false
-  }
-  return true
-}
-
-/**
  * Converts a string-based set of coordinates to an object
  * @param coords A string containing a set of coordinates
  */
-export function getObject(coords: string): Coords
-/**
- * Converts a array-based set of coordinates to an object
- * @param coords An array containing a set of coordinates
- */
-export function getObject(coords: number[]): Coords
-export function getObject(coords: number[] | string): Coords {
-  const [x, y] = typeof coords === 'string' ? parse(coords)[0].split(',') : coords
+export function getObject(coords: string): Coords {
+  const [x, y] = parse(coords)[0].split(',')
   return { x: parseInt(x.toString(), 10), y: parseInt(y.toString(), 10) }
-}
-
-/**
- * Converts a Coords object to a string-based set of coordinates
- */
-export function getString({ x, y }: Coords): string {
-  return `${x},${y}`
 }
 
 /**
@@ -121,7 +70,7 @@ export function areConnected(parcels: Coords[]): boolean {
   return visited.length === parcels.length
 }
 
-function visitParcel(parcel: Coords, allParcels: Coords[] = [parcel], visited: Coords[] = []): Coords[] {
+function visitParcel(parcel: Coords, allParcels: Coords[], visited: Coords[] = []): Coords[] {
   const isVisited = visited.some((visitedParcel) => isEqual(visitedParcel, parcel))
   if (!isVisited) {
     visited.push(parcel)

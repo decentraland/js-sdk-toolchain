@@ -1,5 +1,5 @@
 import { handleSocketLinearProtocol } from '@dcl/mini-comms/dist/logic/handle-linear-protocol'
-import { PreviewComponents } from './types'
+import { PreviewComponents } from '../types'
 import { AboutResponse } from '@dcl/protocol/out-ts/decentraland/bff/http_endpoints.gen'
 import { Router } from '@well-known-components/http-server'
 import { upgradeWebSocketResponse } from '@well-known-components/http-server/dist/ws'
@@ -9,7 +9,7 @@ import { upgradeWebSocketResponse } from '@well-known-components/http-server/dis
  * It runs using @dcl/mini-comms implementing RFC-5
  */
 
-export function setupBffAndComms(components: PreviewComponents, router: Router<PreviewComponents>) {
+export function setupRealmAndComms(components: PreviewComponents, router: Router<PreviewComponents>) {
   router.get('/about', async (ctx) => {
     const host = ctx.url.host
 

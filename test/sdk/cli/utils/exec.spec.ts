@@ -14,7 +14,7 @@ jest.mock('child_process', () => ({
 }))
 
 import * as childProcess from 'child_process'
-import * as execUtils from '../../../../packages/@dcl/sdk/cli/utils/exec'
+import * as execUtils from '../../../../packages/@dcl/sdk/cli/logic/exec'
 
 afterEach(() => {
   jest.clearAllMocks()
@@ -22,7 +22,7 @@ afterEach(() => {
 })
 
 describe('utils/exec', () => {
-  it('it should be called with proper params #2', async () => {
+  it('it should be called with proper params #1', async () => {
     const spawnSpy = jest.spyOn(childProcess, 'spawn')
     const pipeSpy = jest.spyOn(spawnMock.stderr, 'pipe')
     spawnMock.on.mockImplementation((_: string, cb: (code: number) => void) => {

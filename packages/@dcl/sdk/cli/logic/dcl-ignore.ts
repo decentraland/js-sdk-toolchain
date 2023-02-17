@@ -33,6 +33,10 @@ export async function getDCLIgnoreFileContents(
   return null
 }
 
+/**
+ * Returns the default .dclignore entries plus the ones provided by the user.
+ * In case of .dclignore not existing, it returns a pre-defined list.
+ */
 export async function getDCLIgnorePatterns(components: Pick<CliComponents, 'fs'>, dir: string): Promise<string[]> {
   const ignoredContent = await getDCLIgnoreFileContents(components, dir)
   const ignored = (ignoredContent?.split('\n') || defaultDclIgnore).filter(Boolean)
