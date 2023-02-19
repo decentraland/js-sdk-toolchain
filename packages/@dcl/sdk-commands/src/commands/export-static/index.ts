@@ -94,7 +94,7 @@ export async function main(options: Options) {
     timestamp: args['--timestamp'] ? new Date(args['--timestamp']).getTime() : Date.now(),
     type: EntityType.SCENE,
     // for now, the only valid export is for scenes
-    metadata: JSON.stringify(project.scene),
+    metadata: project.scene,
     version: 'v3'
   }
 
