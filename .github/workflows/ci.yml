@@ -340,8 +340,8 @@ jobs:
       - name: install npm v8
         run: npm i -g npm@8
       - run: mkdir -p scene
-      - name: npx @dcl/sdk init --skip-install
-        run: npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }} init
+      - name: npx @dcl/sdk-commands init --skip-install
+        run: npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.publish_decentraland_sdk_commands }} init
         working-directory: scene
       - name: install CI version of @dcl/sdk
         run: npm install ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }}
