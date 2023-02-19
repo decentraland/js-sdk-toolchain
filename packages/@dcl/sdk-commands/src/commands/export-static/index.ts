@@ -54,7 +54,7 @@ export async function main(options: Options) {
     throw new CliError(`--baseUrl is mandatory when --realmName is provided`)
   }
 
-  if (willCreateRealm && !/^[a-z][a-z0-9-.]*$/i.test(args['--realmName']!)) {
+  if (willCreateRealm && !/^[a-z][a-z0-9-/]*$/i.test(args['--realmName']!)) {
     throw new CliError(`--realmName has invalid characters`)
   }
 
