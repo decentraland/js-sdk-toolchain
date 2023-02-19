@@ -8,6 +8,7 @@ import { CliError } from '../../logic/error'
 import { Entity, EntityType } from '@dcl/schemas'
 import { colors } from '../../components/log'
 import { printProgressInfo, printProgressStep, printSuccess } from '../../logic/beautiful-logs'
+import { createStaticRealm } from '../../logic/realm'
 
 interface Options {
   args: typeof args
@@ -17,7 +18,9 @@ interface Options {
 export const args = getArgs({
   '--dir': String,
   '--destination': String,
-  '--timestamp': String
+  '--timestamp': String,
+  '--realmName': String,
+  '--baseUrl': String
 })
 
 export async function help() {
@@ -33,6 +36,9 @@ export async function help() {
 
     --dir <directory>         The project's root folder to export
     --destination <directory> A path in which all the assets will be stored
+    --timestamp <timestamp>   A date to use in the deployable entity. Defaults to now()
+    --realmName <name>        Creates a /<name>/about endpoint to expose the current deployment as a realm. Requires --baseUrl
+    --baseUrl <baseUrl>       It is the public URL in which the --destination directory will be avaiable
 `
 }
 
@@ -40,10 +46,19 @@ export async function main(options: Options) {
   const { fs, logger } = options.components
   const projectRoot = resolve(process.cwd(), options.args['--dir'] || '.')
   const destDirectory = resolve(process.cwd(), options.args['--destination'] || '.')
+  const willCreateRealm = !!args['--realmName']
+  let currentStep = 1
+  const maxSteps = 3 + (willCreateRealm ? 1 : 0)
 
-  const maxSteps = 3
+  if (willCreateRealm && !args['--baseUrl']) {
+    throw new CliError(`--baseUrl is mandatory when --realmName is provided`)
+  }
 
-  printProgressStep(logger, 'Reading project files...', 1, maxSteps)
+  if (willCreateRealm && !/^[a-z][a-z0-9-.]*$/i.test(args['--realmName']!)) {
+    throw new CliError(`--realmName has invalid characters`)
+  }
+
+  printProgressStep(logger, 'Reading project files...', currentStep++, maxSteps)
 
   await fs.mkdir(destDirectory, { recursive: true })
   if (!(await fs.directoryExists(destDirectory))) {
@@ -55,7 +70,7 @@ export async function main(options: Options) {
     return await hashV1(fs.createReadStream(resolve(projectRoot, file)))
   })
 
-  printProgressStep(logger, 'Copying files...', 2, maxSteps)
+  printProgressStep(logger, 'Copying files...', currentStep++, maxSteps)
 
   for (const { file, hash } of filesToExport) {
     const src = resolve(projectRoot, file)
@@ -83,7 +98,7 @@ export async function main(options: Options) {
     version: 'v3'
   }
 
-  printProgressStep(logger, 'Generating files...', 3, maxSteps)
+  printProgressStep(logger, 'Generating files...', currentStep++, maxSteps)
 
   // create the entity file and get the entityId
   const entityRaw = Buffer.from(JSON.stringify(entity), 'utf8')
@@ -93,7 +108,33 @@ export async function main(options: Options) {
 
   printProgressInfo(logger, `> ${entityId} -> [ENTITY FILE]`)
 
-  const urn = `urn:decentraland:entity:${entityId}`
+  let urn = `urn:decentraland:entity:${entityId}`
+
+  if (args['--baseUrl']) {
+    urn += '?baseUrl=' + args['--baseUrl']
+    // baseUrl must end with /
+    if (!urn.endsWith('/')) urn += '/'
+  }
+
+  if (willCreateRealm) {
+    // prepare the realm object
+    printProgressStep(logger, 'Creating realm file...', currentStep++, maxSteps)
+    const realm = createStaticRealm()
+    const realmName = args['--realmName']!
+
+    realm.configurations!.scenesUrn = [urn]
+    realm.configurations!.realmName = realmName
+
+    // write the realm file
+    const realmDirectory = resolve(destDirectory, realmName)
+    await fs.mkdir(realmDirectory, { recursive: true })
+    if (!(await fs.directoryExists(realmDirectory))) {
+      throw new CliError(`The destination path ${realmDirectory} is not a directory`)
+    }
+    const dst = resolve(realmDirectory, 'about')
+    await fs.writeFile(dst, JSON.stringify(realm, null, 2))
+    printProgressInfo(logger, `> ${realmName}/about -> [REALM FILE]`)
+  }
 
   printSuccess(logger, `Export finished!`, `=> The entity URN is ${colors.bold(urn)}`)
 
