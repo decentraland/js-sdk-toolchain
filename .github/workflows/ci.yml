@@ -52,6 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       decentraland_sdk_s3_bucket_key: ${{ steps.publish_decentraland_sdk.outputs.s3-bucket-key }}
+      decentraland_sdk_commands_s3_bucket_key: ${{ steps.publish_decentraland_sdk_commands.outputs.s3-bucket-key }}
       decentraland_inspector_s3_bucket_key: ${{ steps.publish_decentraland_inspector.outputs.s3-bucket-key }}
     steps:
       - uses: actions/checkout@master
@@ -85,6 +86,12 @@ jobs:
         uses: menduz/oddish-action@master
         with:
           cwd: packages/@dcl/react-ecs
+          deterministic-snapshot: true
+          only-update-versions: true
+      - name: update version of packages/@dcl/sdk-commands
+        uses: menduz/oddish-action@master
+        with:
+          cwd: packages/@dcl/sdk-commands
           deterministic-snapshot: true
           only-update-versions: true
       - name: update version of packages/@dcl/sdk
@@ -183,15 +190,33 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+      - name: publish @dcl/sdk-commands package
+        uses: menduz/oddish-action@master
+        id: publish_decentraland_sdk_commands
+        with:
+          registry-url: 'https://registry.npmjs.org'
+          access: public
+          cwd: ./packages/@dcl/sdk-commands
+          ## use action runId instead of current date to generate snapshot numbers
+          deterministic-snapshot: true
+
+          ## publish every package to s3
+          s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: (PR) change @dcl/sdk version to s3 url
         working-directory: ./packages/@dcl/sdk
         if: ${{ github.event.pull_request.number }}
-        run: node -e "let pkg=require('./package.json'); pkg.dependencies['@dcl/js-runtime']='$JS_RUNTIME_S3_URL'; pkg.dependencies['@dcl/dcl-rollup']='$ROLLUP_S3_URL'; pkg.dependencies['@dcl/ecs']='$ECS_S3_URL'; pkg.dependencies['@dcl/react-ecs']='$REACT_ECS_S3_URL'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
+        run: node -e "let pkg=require('./package.json'); pkg.dependencies['@dcl/js-runtime']='$JS_RUNTIME_S3_URL'; pkg.dependencies['@dcl/dcl-rollup']='$ROLLUP_S3_URL'; pkg.dependencies['@dcl/ecs']='$ECS_S3_URL'; pkg.dependencies['@dcl/react-ecs']='$REACT_ECS_S3_URL'; pkg.dependencies['@dcl/sdk-commands']='$SDK_COMMANDS_S3_URL'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
         env:
           REACT_ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_react_ecs.outputs.s3-bucket-key }}
           ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_ecs.outputs.s3-bucket-key }}
           ROLLUP_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_rollup.outputs.s3-bucket-key }}
           JS_RUNTIME_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_js_runtime.outputs.s3-bucket-key }}
+          SDK_COMMANDS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_sdk_commands.outputs.s3-bucket-key }}
       # - name: (PR) change @dcl/inspector version to s3 url
       #   working-directory: ./packages/@dcl/inspector
       #   if: ${{ github.event.pull_request.number }}
@@ -289,6 +314,12 @@ jobs:
             - The `@dcl/sdk` package can be tested in scenes by running
                ```bash
                npm install "${{ steps.sdk-url-generator.outputs.body }}"
+               ```
+
+            - To test with `npx init`
+               ```bash
+               export SDK_COMMANDS="${{ secrets.SDK_TEAM_S3_BASE_URL }})/${{ needs.build.outputs.publish_decentraland_sdk_commands }}"
+               npx $SDK_COMMANDS init
                ```
 
             - The `@dcl/inspector` package can be tested by running

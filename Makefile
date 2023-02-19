@@ -42,7 +42,7 @@ test:
 test-cli:
 	@rm -rf tmp
 	@mkdir -p tmp/scene
-	cd tmp/scene; $(PWD)/packages/@dcl/sdk/cli/index.js init
+	cd tmp/scene; $(PWD)/packages/@dcl/sdk-commands/dist/index.js init
 
 test-coverage:
 	WITH_COVERAGE=true node_modules/.bin/jest --detectOpenHandles --colors --coverage $(TESTARGS)
@@ -50,10 +50,10 @@ test-coverage:
 recreate-test-scene:
 	@rm -rf tmp/scene || true
 	mkdir -p tmp/scene
-	cd tmp/scene; ../../packages/@dcl/sdk/cli/index.js init --skip-install
-	cd tmp/scene; npm install ../../packages/@dcl/sdk ../../packages/@dcl/js-runtime
+	cd tmp/scene; ../../packages/@dcl/sdk/dist/index.js init --skip-install
+	cd tmp/scene; npm install ../../packages/@dcl/sdk ../../packages/@dcl/sdk-commands ../../packages/@dcl/js-runtime
 	cd tmp/scene; npm run build
-	cd tmp/scene; ../../packages/@dcl/sdk/cli/index.js export-static --destination static
+	cd tmp/scene; ../../packages/@dcl/sdk/dist/index.js export-static --destination ../static --timestamp 1676821392357
 	cd tmp/scene; npm run start
 
 node_modules/.bin/protobuf/bin/protoc:
@@ -118,9 +118,8 @@ clean:
 	@rm -rf packages/@dcl/dcl-rollup/*.js packages/@dcl/dcl-rollup/*.d.ts
 	@rm -rf packages/@dcl/sdk/*.js packages/@dcl/sdk/*.d.ts packages/@dcl/sdk/internal
 	@rm -rf packages/@dcl/inspector/*.js packages/@dcl/inspector/*.d.ts packages/@dcl/inspector/build
-	@find packages/@dcl/sdk/cli -name "*.js" ! -path "packages/@dcl/sdk/cli/commands/preview/proto/*" -type f -delete
-	@find packages/@dcl/sdk/cli -name "*.d.ts" ! -path "packages/@dcl/sdk/cli/commands/preview/proto/*" -type f -delete
 	@rm -rf packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/
+	@rm -rf packages/@dcl/sdk-commands/dist
 	@rm -rf packages/@dcl/ecs/src/components/generated/ packages/@dcl/ecs/temp/
 	@rm -rf packages/@dcl/js-runtime/apis.d.ts
 	@rm -rf packages/@dcl/react-ecs/dist/ packages/@dcl/react-ecs/src/generated/ packages/@dcl/react-ecs/temp/

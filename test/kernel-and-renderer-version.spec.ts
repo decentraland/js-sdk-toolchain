@@ -28,7 +28,7 @@ describe('Check there is fixed version', () => {
   it('should @dcl/sdk has fixed version dependencies', async () => {
     const sdkDeps = checkDeps(SDK_PATH)
     const requiredDependencies = [
-      '@dcl/dcl-rollup',
+      '@dcl/sdk-commands',
       '@dcl/ecs-math',
       '@dcl/ecs',
       '@dcl/js-runtime',
