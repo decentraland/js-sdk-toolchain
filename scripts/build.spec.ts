@@ -13,6 +13,7 @@ import {
   REACT_ECS,
   ROLLUP_CONFIG_PATH,
   SDK_PATH,
+  SDK_COMMANDS_PATH,
   TSC
 } from './common'
 import {
@@ -97,6 +98,23 @@ flow('build-all', () => {
     })
   })
 
+  flow('@dcl/sdk-commands build', () => {
+    itDeletesFolder('dist', SDK_COMMANDS_PATH)
+    itExecutes(`npm i --silent`, SDK_COMMANDS_PATH)
+
+    // install required dependencies
+    itExecutes(`npm install --silent ${ROLLUP_CONFIG_PATH}`, SDK_COMMANDS_PATH)
+
+    itExecutes('npm run build --silent', SDK_COMMANDS_PATH)
+
+    it('check files exists', () => {
+      ensureFileExists('dist/index.js', SDK_COMMANDS_PATH)
+      ensureFileExists('dist/index.d.ts', SDK_COMMANDS_PATH)
+    })
+
+    itExecutes(`chmod +x dist/index.js`, SDK_COMMANDS_PATH)
+  })
+
   flow('@dcl/sdk build', () => {
     itDeletesFolder('dist', SDK_PATH)
     itExecutes(`npm i --silent`, SDK_PATH)
@@ -104,13 +122,12 @@ flow('build-all', () => {
     itDeletesGlob('types/*.d.ts', SDK_PATH)
 
     // install required dependencies
-    itExecutes(`npm install --silent ${ROLLUP_CONFIG_PATH}`, SDK_PATH)
+    itExecutes(`npm install --silent ${SDK_COMMANDS_PATH}`, SDK_PATH)
     itExecutes(`npm install --silent ${JS_RUNTIME}`, SDK_PATH)
     itExecutes(`npm install --silent ${ECS7_PATH}`, SDK_PATH)
     itExecutes(`npm install --silent ${REACT_ECS}`, SDK_PATH)
 
     itExecutes('npm run build --silent', SDK_PATH)
-    itExecutes('npm run build:cli --silent', SDK_PATH)
 
     it('check files exists', () => {
       ensureFileExists('index.js', SDK_PATH)
@@ -121,11 +138,7 @@ flow('build-all', () => {
       ensureFileExists('ecs.d.ts', SDK_PATH)
       ensureFileExists('react-ecs.js', SDK_PATH)
       ensureFileExists('react-ecs.d.ts', SDK_PATH)
-      ensureFileExists('cli/index.js', SDK_PATH)
-      ensureFileExists('cli/index.d.ts', SDK_PATH)
     })
-
-    itExecutes(`chmod +x cli/index.js`, SDK_PATH)
   })
 
   flow('@dcl/inspector', () => {

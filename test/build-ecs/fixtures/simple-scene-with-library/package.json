@@ -18,6 +18,7 @@
     "@dcl/ecs": "file:../../../../packages/@dcl/ecs",
     "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime",
     "@dcl/sdk": "file:../../../../packages/@dcl/sdk",
+    "@dcl/sdk-commands": "file:../../../../packages/@dcl/sdk-commands",
     "dcl-test-lib-integration": "file:../dcl-test-lib-integration"
   },
   "dependencies": {

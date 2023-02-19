@@ -41,7 +41,7 @@ module.exports = {
       lines: 26,
       statements: 26
     },
-    "packages/@dcl/sdk/cli": {
+    "packages/@dcl/sdk-commands": {
       branches: 100,
       functions: 100,
       lines: 100,
