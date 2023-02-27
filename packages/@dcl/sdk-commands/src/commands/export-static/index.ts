@@ -3,16 +3,18 @@ import { getArgs } from '../../logic/args'
 import { hashV1 } from '@dcl/hashing'
 import { CliComponents } from '../../components'
 import { assertValidProjectFolder } from '../../logic/project-validations'
-import { getProjectContentMappings } from '../../logic/project-files'
+import { getProjectContentMappings, getSceneJson } from '../../logic/project-files'
 import { CliError } from '../../logic/error'
 import { Entity, EntityType } from '@dcl/schemas'
 import { colors } from '../../components/log'
 import { printProgressInfo, printProgressStep, printSuccess } from '../../logic/beautiful-logs'
 import { createStaticRealm } from '../../logic/realm'
+import { b64HashingFunction } from '../start/server/endpoints'
+import { getBaseCoords } from '../../logic/scene-validations'
 
 interface Options {
   args: typeof args
-  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger'>
+  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'dclInfoConfig' | 'analytics'>
 }
 
 export const args = getArgs({
@@ -137,6 +139,13 @@ export async function main(options: Options) {
   }
 
   printSuccess(logger, `Export finished!`, `=> The entity URN is ${colors.bold(urn)}`)
+  const sceneJson = await getSceneJson(options.components, projectRoot)
+  const coords = getBaseCoords(sceneJson)
+
+  options.components.analytics.track('Export static', {
+    projectHash: await b64HashingFunction(projectRoot),
+    coords,
+  })
 
   return { urn, entityId, destination: destDirectory }
 }

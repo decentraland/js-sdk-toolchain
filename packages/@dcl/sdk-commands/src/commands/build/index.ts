@@ -4,14 +4,13 @@ import { getArgs } from '../../logic/args'
 import { compile } from '@dcl/dcl-rollup/compile'
 import future from 'fp-future'
 import { assertValidProjectFolder, installDependencies, needsDependencies } from '../../logic/project-validations'
-import { track } from '../../logic/analytics'
 import { b64HashingFunction } from '../start/server/endpoints'
 import { getBaseCoords } from '../../logic/scene-validations'
 import { getSceneJson } from '../../logic/project-files'
 
 interface Options {
   args: Omit<typeof args, '_'>
-  components: Pick<CliComponents, 'fs' | 'logger'>
+  components: Pick<CliComponents, 'fs' | 'logger' | 'dclInfoConfig' | 'analytics'>
 }
 
 export const args = getArgs({
@@ -66,7 +65,7 @@ export async function main(options: Options) {
   const sceneJson = await getSceneJson(options.components, projectRoot)
   const coords = getBaseCoords(sceneJson)
 
-  await track(options.components, 'Build scene', {
+  await options.components.analytics.track('Build scene', {
     projectHash: await b64HashingFunction(projectRoot),
     coords,
     isWorkspace: false

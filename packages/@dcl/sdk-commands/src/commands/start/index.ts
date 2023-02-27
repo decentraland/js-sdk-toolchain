@@ -22,13 +22,12 @@ import { createStdoutCliLogger } from '../../components/log'
 import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
 import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
-import { track } from '../../logic/analytics'
 import { b64HashingFunction } from './server/endpoints'
 import { getSceneJson } from '../../logic/project-files'
 
 interface Options {
   args: typeof args
-  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger'>
+  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'dclInfoConfig' | 'analytics'>
 }
 
 export const args = getArgs({
@@ -160,7 +159,7 @@ export async function main(options: Options) {
 
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []
-      await track(components, 'Preview started', {
+      await components.analytics.track('Preview started', {
         projectHash: await b64HashingFunction(projectRoot),
         coords: baseCoords,
         isWorkspace: false

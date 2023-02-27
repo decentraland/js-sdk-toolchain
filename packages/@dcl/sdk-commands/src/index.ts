@@ -8,7 +8,6 @@ import { COMMANDS_PATH, getCommands } from './logic/commands'
 import { CliComponents, initComponents } from './components'
 import { printCommand } from './logic/beautiful-logs'
 import { colors } from './components/log'
-import { identifyAnalytics } from './logic/analytics'
 
 export interface Options {
   args: ReturnType<typeof getArgs>
@@ -42,7 +41,7 @@ async function main() {
   const args = getArgs()
   const command = process.argv[2]
   const needsHelp = args['--help']
-  const components: CliComponents = initComponents()
+  const components: CliComponents = await initComponents()
 
   const commands = await getCommands(components)
 
@@ -57,7 +56,7 @@ async function main() {
   const cmd = require(`${COMMANDS_PATH}/${command}`)
 
   if (commandFnsAreValid(cmd)) {
-    await identifyAnalytics(components)
+    await components.analytics.identify()
     const options = { args: cmd.args, components }
     if (needsHelp) {
       await cmd.help(options)

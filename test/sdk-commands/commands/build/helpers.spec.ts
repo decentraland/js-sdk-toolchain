@@ -10,10 +10,9 @@ afterEach(() => {
   jest.restoreAllMocks()
 })
 
-const components = initComponents()
-
 describe('build:helpers', () => {
   it('assertValidProjectFolder: validate e2e with virtual file system', async () => {
+    const components = await initComponents()
     const scene: Scene = {
       main: 'test.js',
       scene: {
@@ -43,6 +42,7 @@ describe('build:helpers', () => {
   })
 
   it('assertValidProjectFolder: should fail on unrecognized file', async () => {
+    const components = await initComponents()
     const fileExists = jest.spyOn(components.fs, 'fileExists').mockImplementation(async (_file) => {
       return _file.endsWith('package.json')
     })
@@ -55,6 +55,7 @@ describe('build:helpers', () => {
   })
 
   it("assertValidProjectFolder: should throw if package.json doesn't exist", async () => {
+    const components = await initComponents()
     const fileExists = jest.spyOn(components.fs, 'fileExists').mockResolvedValue(false)
     jest.spyOn(projectValidation, 'assertValidProjectFolder')
 
@@ -64,6 +65,7 @@ describe('build:helpers', () => {
   })
 
   it('validateSceneJson: should return true if "package.json" has valid structure', async () => {
+    const components = await initComponents()
     const structure: Scene = {
       main: 'test.js',
       scene: {
@@ -81,6 +83,7 @@ describe('build:helpers', () => {
   })
 
   it('validateSceneJson: should return false if "package.json" has invalid structure', async () => {
+    const components = await initComponents()
     const structure = { test: 1 }
     jest.spyOn(components.fs, 'readFile').mockResolvedValue(JSON.stringify(structure))
 
@@ -90,6 +93,7 @@ describe('build:helpers', () => {
   })
 
   it('needsDependencies: should return true if "node_modules" does not exist', async () => {
+    const components = await initComponents()
     jest.spyOn(components.fs, 'directoryExists').mockResolvedValue(false)
 
     const res = await projectValidation.needsDependencies(components, 'some/path')
@@ -98,6 +102,7 @@ describe('build:helpers', () => {
   })
 
   it('needsDependencies: should return true if "node_modules" is empty', async () => {
+    const components = await initComponents()
     jest.spyOn(components.fs, 'directoryExists').mockResolvedValue(true)
     jest.spyOn(components.fs, 'readdir').mockResolvedValue([])
 
@@ -107,6 +112,7 @@ describe('build:helpers', () => {
   })
 
   it('needsDependencies: should return false if "node_modules" is valid', async () => {
+    const components = await initComponents()
     jest.spyOn(components.fs, 'directoryExists').mockResolvedValue(true)
     jest.spyOn(components.fs, 'readdir').mockResolvedValue(['some', 'files'])
 
@@ -116,6 +122,7 @@ describe('build:helpers', () => {
   })
 
   it('installDependencies: should run dependencies installation', async () => {
+    const components = await initComponents()
     const execSpy = jest.spyOn(execUtils, 'exec').mockResolvedValue()
 
     await projectValidation.installDependencies(components, 'some/path')
@@ -124,6 +131,7 @@ describe('build:helpers', () => {
   })
 
   it('npmRun: should build pass on the process.env', async () => {
+    const components = await initComponents()
     const execSpy = jest.spyOn(execUtils, 'exec').mockResolvedValue()
 
     await projectValidation.npmRun('some/path', 'build', 'a')

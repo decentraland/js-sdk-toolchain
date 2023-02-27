@@ -7,11 +7,10 @@ import { isDirectoryEmpty, download, extract } from '../../logic/fs'
 
 import { get as getRepo } from './repos'
 import { installDependencies, needsDependencies } from '../../logic/project-validations'
-import { track } from '../../logic/analytics'
 
 interface Options {
   args: typeof args
-  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger'>
+  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'dclInfoConfig' | 'analytics'>
 }
 
 export const args = getArgs({
@@ -45,7 +44,7 @@ export async function main(options: Options) {
   if (shouldInstallDeps && !options.args['--skip-install']) {
     await installDependencies(options.components, dir)
   }
-  await track(options.components, 'Scene created', { projectType: scene, url })
+  await options.components.analytics.track('Scene created', { projectType: scene, url })
 }
 
 const moveFilesFromDir = async (components: Pick<CliComponents, 'fs'>, dir: string, folder: string) => {
