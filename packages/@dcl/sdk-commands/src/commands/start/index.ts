@@ -7,9 +7,9 @@ import { CliComponents } from '../../components'
 import { main as build } from '../build'
 import { getArgs } from '../../logic/args'
 import { needsDependencies, npmRun } from '../../logic/project-validations'
-import { getBaseCoords, validateSceneJson } from '../../logic/scene-validations'
+import { getBaseCoords, getSceneJson } from '../../logic/scene-validations'
 import { CliError } from '../../logic/error'
-import { previewPort } from '../../logic/get-free-port'
+import { getPort } from '../../logic/get-free-port'
 import { ISignalerComponent, PreviewComponents } from './types'
 import { createTestMetricsComponent } from '@well-known-components/metrics'
 import { Lifecycle, IBaseComponent } from '@well-known-components/interfaces'
@@ -22,7 +22,7 @@ import { createStdoutCliLogger } from '../../components/log'
 import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
 import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
-import { b64HashingFunction, getSceneJson } from '../../logic/project-files'
+import { b64HashingFunction } from '../../logic/project-files'
 
 interface Options {
   args: typeof args
@@ -98,7 +98,6 @@ export async function main(options: Options) {
     await build({ ...options, args: { '--dir': projectRoot, '--watch': watch } })
   }
 
-  await validateSceneJson(options.components, projectRoot)
   const sceneJson = await getSceneJson(options.components, projectRoot)
   const baseCoords = getBaseCoords(sceneJson)
 
@@ -107,7 +106,7 @@ export async function main(options: Options) {
     throw new CliError(`Couldn\'t find ${npmModulesPath}, please run: npm install`)
   }
 
-  const port = options.args['--port'] || (await previewPort())
+  const port = options.args['--port'] || (await getPort())
 
   const program = await Lifecycle.run<PreviewComponents>({
     async initComponents() {

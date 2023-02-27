@@ -3,13 +3,13 @@ import { getArgs } from '../../logic/args'
 import { hashV1 } from '@dcl/hashing'
 import { CliComponents } from '../../components'
 import { assertValidProjectFolder } from '../../logic/project-validations'
-import { b64HashingFunction, getProjectContentMappings, getSceneJson } from '../../logic/project-files'
+import { b64HashingFunction, getProjectContentMappings } from '../../logic/project-files'
 import { CliError } from '../../logic/error'
 import { Entity, EntityType } from '@dcl/schemas'
 import { colors } from '../../components/log'
 import { printProgressInfo, printProgressStep, printSuccess } from '../../logic/beautiful-logs'
 import { createStaticRealm } from '../../logic/realm'
-import { getBaseCoords } from '../../logic/scene-validations'
+import { getSceneJson, getBaseCoords } from '../../logic/scene-validations'
 
 interface Options {
   args: typeof args
