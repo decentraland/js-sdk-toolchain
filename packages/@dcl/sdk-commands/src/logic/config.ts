@@ -1,5 +1,6 @@
-import { readFile, readJSON, writeJSON } from 'fs-extra'
 import path, { resolve } from 'path'
+import { CliComponents } from '../components'
+import { readJSON, writeJSON } from './fs'
 
 interface DCLInfo {
   segmentKey?: string
@@ -12,9 +13,9 @@ export const getDclInfoPath = () =>
 /**
  * Reads the contents of the `.dclinfo` file
  */
-async function getDCLInfoConfig(): Promise<DCLInfo> {
+async function getDCLInfoConfig(components: Pick<CliComponents, 'fs'>): Promise<DCLInfo> {
   try {
-    const content = await readFile(getDclInfoPath(), 'utf8')
+    const content = await components.fs.readFile(getDclInfoPath(), 'utf8')
     return JSON.parse(content) as DCLInfo
   } catch (e) {
     return {}
@@ -24,8 +25,8 @@ async function getDCLInfoConfig(): Promise<DCLInfo> {
 /**
  * Add new configuration to `.dclinfo` file
  */
-export async function writeDCLInfo(value: Partial<DCLInfo>) {
-  return writeJSON(getDclInfoPath(), value)
+export async function writeDCLInfo(components: Pick<CliComponents, 'fs'>, value: Partial<DCLInfo>) {
+  return writeJSON(components, getDclInfoPath(), value)
 }
 
 export function isDevelopment() {
@@ -54,9 +55,9 @@ function getEnvConfig(): Partial<DCLInfo> {
   return removeEmptyKeys(envConfig)
 }
 
-export async function getConfig(): Promise<DCLInfo> {
+export async function getConfig(components: Pick<CliComponents, 'fs'>): Promise<DCLInfo> {
   const defaultConfig = getDefaultConfig()
-  const dclInfoConfig = await getDCLInfoConfig()
+  const dclInfoConfig = await getDCLInfoConfig(components)
   const envConfig = getEnvConfig()
   const config = { ...defaultConfig, ...dclInfoConfig, ...envConfig }
   return config
@@ -78,15 +79,15 @@ export function isEditor() {
   return process.env.EDITOR === 'true'
 }
 
-export async function getInstalledSDKVersion(): Promise<string> {
+export async function getInstalledSDKVersion(components: Pick<CliComponents, 'fs'>): Promise<string> {
   try {
     const sdkPath = path.dirname(
       require.resolve('@dcl/sdk/package.json', {
         paths: [process.cwd()]
       })
     )
-    const packageJson = await readJSON(resolve(sdkPath, 'package.json'))
-    return packageJson.version
+    const packageJson = await readJSON<{ version: string }>(components, resolve(sdkPath, 'package.json'))
+    return packageJson.version ?? 'unknown'
   } catch (e) {
     return 'unknown'
   }

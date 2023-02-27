@@ -66,7 +66,7 @@ export async function main(options: Options) {
   const sceneJson = await getSceneJson(options.components, projectRoot)
   const coords = getBaseCoords(sceneJson)
 
-  await track('Build scene', {
+  await track(options.components, 'Build scene', {
     projectHash: await b64HashingFunction(projectRoot),
     coords,
     isWorkspace: false

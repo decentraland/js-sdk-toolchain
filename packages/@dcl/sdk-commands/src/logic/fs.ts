@@ -2,7 +2,7 @@ import extractZip from 'extract-zip'
 import { resolve } from 'path'
 import { IFileSystemComponent } from '../components/fs'
 import { IFetchComponent } from '../components/fetch'
-import { outputFile, readFile } from 'fs-extra'
+import { CliComponents } from '../components'
 
 /**
  * Check's if directory is empty
@@ -45,8 +45,8 @@ export async function extract(path: string, dest: string): Promise<string> {
  * Reads a file and parses it's JSON content
  * @param path The path to the subject json file
  */
-export async function readJSON<T>(path: string): Promise<T> {
-  const content = await readFile(path, 'utf-8')
+export async function readJSON<T>(components: Pick<CliComponents, 'fs'>, path: string): Promise<T> {
+  const content = await components.fs.readFile(path, 'utf-8')
   return JSON.parse(content) as T
 }
 
@@ -55,11 +55,15 @@ export async function readJSON<T>(path: string): Promise<T> {
  * @param path The path to the subject json file
  * @param content The content to be applied (as a plain object)
  */
-export async function writeJSON<T = unknown>(path: string, content: Partial<T>): Promise<Partial<T>> {
+export async function writeJSON<T = unknown>(
+  components: Pick<CliComponents, 'fs'>,
+  path: string,
+  content: Partial<T>
+): Promise<Partial<T>> {
   let currentFile
 
   try {
-    currentFile = await readJSON<T>(path)
+    currentFile = await readJSON<T>(components, path)
   } catch (e) {
     currentFile = {}
   }
@@ -67,6 +71,6 @@ export async function writeJSON<T = unknown>(path: string, content: Partial<T>):
   const newJson = { ...currentFile, ...content }
   const strContent = JSON.stringify(newJson, null, 2)
 
-  await outputFile(path, strContent)
+  await components.fs.writeFile(path, strContent)
   return newJson
 }

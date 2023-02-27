@@ -4,6 +4,7 @@ import future from 'fp-future'
 
 import { isDevelopment, getConfig, getInstalledSDKVersion, isCI, isEditor, writeDCLInfo } from './config'
 import { colors } from '../components/log'
+import { CliComponents } from '../components'
 
 let analytics: Analytics
 const USER_ID = 'sdk-commands-user'
@@ -25,9 +26,13 @@ type Events = {
   }
 }
 
-export async function track<T extends keyof Events>(eventName: T, eventProps: Events[T]) {
+export async function track<T extends keyof Events>(
+  components: Pick<CliComponents, 'fs'>,
+  eventName: T,
+  eventProps: Events[T]
+) {
   const trackFuture = future<void>()
-  const { userId, trackStats } = await getConfig()
+  const { userId, trackStats } = await getConfig(components)
   if (!trackStats) return
   const trackInfo = {
     userId: USER_ID,
@@ -36,7 +41,7 @@ export async function track<T extends keyof Events>(eventName: T, eventProps: Ev
       ...eventProps,
       os: process.platform,
       nodeVersion: process.version,
-      cliVersion: await getInstalledSDKVersion(),
+      cliVersion: await getInstalledSDKVersion(components),
       isCI: isCI(),
       isEditor: isEditor(),
       devId: userId
@@ -51,8 +56,8 @@ export async function track<T extends keyof Events>(eventName: T, eventProps: Ev
   return trackFuture
 }
 
-export async function identifyAnalytics() {
-  const config = await getConfig()
+export async function identifyAnalytics(components: Pick<CliComponents, 'fs'>) {
+  const config = await getConfig(components)
   if (!config.segmentKey) return
   analytics = new Analytics({ writeKey: config.segmentKey })
   if (!config.userId) {
@@ -63,7 +68,7 @@ export async function identifyAnalytics() {
     )
 
     const userId = uuidv4()
-    await writeDCLInfo({ userId, trackStats: true })
+    await writeDCLInfo(components, { userId, trackStats: true })
     analytics.identify({
       userId: USER_ID,
       traits: {

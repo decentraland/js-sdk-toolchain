@@ -160,7 +160,7 @@ export async function main(options: Options) {
 
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []
-      await track('Preview started', {
+      await track(components, 'Preview started', {
         projectHash: await b64HashingFunction(projectRoot),
         coords: baseCoords,
         isWorkspace: false

@@ -45,7 +45,7 @@ export async function main(options: Options) {
   if (shouldInstallDeps && !options.args['--skip-install']) {
     await installDependencies(options.components, dir)
   }
-  await track('Scene created', { projectType: scene, url })
+  await track(options.components, 'Scene created', { projectType: scene, url })
 }
 
 const moveFilesFromDir = async (components: Pick<CliComponents, 'fs'>, dir: string, folder: string) => {

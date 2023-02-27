@@ -57,7 +57,7 @@ async function main() {
   const cmd = require(`${COMMANDS_PATH}/${command}`)
 
   if (commandFnsAreValid(cmd)) {
-    await identifyAnalytics()
+    await identifyAnalytics(components)
     const options = { args: cmd.args, components }
     if (needsHelp) {
       await cmd.help(options)
