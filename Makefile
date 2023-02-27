@@ -117,7 +117,7 @@ clean:
 	@rm -rf coverage/
 	@rm -rf packages/@dcl/dcl-rollup/*.js packages/@dcl/dcl-rollup/*.d.ts
 	@rm -rf packages/@dcl/sdk/*.js packages/@dcl/sdk/*.d.ts packages/@dcl/sdk/internal
-	@rm -rf packages/@dcl/inspector/*.js packages/@dcl/inspector/*.d.ts packages/@dcl/inspector/build
+	@rm -rf packages/@dcl/inspector/public/*.js packages/@dcl/inspector/public/*.d.ts packages/@dcl/inspector/public/*.map packages/@dcl/inspector/public/*.css
 	@rm -rf packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/
 	@rm -rf packages/@dcl/sdk-commands/dist
 	@rm -rf packages/@dcl/ecs/src/components/generated/ packages/@dcl/ecs/temp/

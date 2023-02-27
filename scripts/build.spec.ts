@@ -147,12 +147,8 @@ flow('build-all', () => {
     itExecutes('npm i --silent', INSPECTOR_PATH)
     itExecutes('npm run build --silent', INSPECTOR_PATH)
     it('check file exists', () => {
-      ensureFileExists('build/index.html', INSPECTOR_PATH)
-      const jsPath = path.resolve(INSPECTOR_PATH, 'build/static/js')
-      const files = readdirSync(jsPath)
-      if (!files.length || !files.find(($) => $.startsWith('main'))) {
-        throw new Error(`Invalid JS files on ${jsPath}`)
-      }
+      ensureFileExists('public/bundle.js', INSPECTOR_PATH)
+      ensureFileExists('public/bundle.css', INSPECTOR_PATH)
     })
   })
 

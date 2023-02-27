@@ -2,9 +2,12 @@ import React, { useCallback, useMemo, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import { engine } from '@dcl/ecs'
 
 import './index.css'
 import TreeComponent, { Tree } from './components/tree/Tree'
+
+engine.addSystem(() => { })
 
 type Node = {
   id: string
