@@ -63,7 +63,7 @@ describe('build command', () => {
     expect(installDependenciesSpy).not.toBeCalled()
   })
 
-  it.only('should build typescript if all conditions are met', async () => {
+  it('should build typescript if all conditions are met', async () => {
     const components = await initComponents()
     jest.spyOn(projectValidation, 'assertValidProjectFolder').mockResolvedValue({ scene: {} as any })
     jest.spyOn(projectValidation, 'needsDependencies').mockResolvedValue(false)

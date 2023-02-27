@@ -6,6 +6,7 @@ import { CliComponents } from '.'
 import { colors } from './log'
 
 export type IAnalyticsComponent = {
+  get(): Analytics
   identify(): Promise<void>
   track<T extends keyof Events>(eventName: T, eventProps: Events[T]): Promise<void>
 }
@@ -38,6 +39,9 @@ export async function createAnalyticsComponent({
   const config = await dclInfoConfig.get()
   const analytics: Analytics = new Analytics({ writeKey: config.segmentKey ?? '' })
   return {
+    get() {
+      return analytics
+    },
     async identify() {
       if (!config.userId) {
         console.log(

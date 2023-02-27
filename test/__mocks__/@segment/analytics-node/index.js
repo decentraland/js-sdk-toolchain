@@ -2,7 +2,6 @@ const Analytics = jest.mock('@segment/analytics-node')
 class AnalyticsClass {
   writeKey
   constructor({ writeKey }) {
-    console.log('called constructor')
     this.writeKey = writeKey
   }
 
@@ -11,6 +10,7 @@ class AnalyticsClass {
   }
 
   track(eventName, cb) {
+    console.log({ eventName, cb })
     return cb()
   }
 }
