@@ -17,6 +17,7 @@
     "build": "node ./build.js"
   },
   "devDependencies": {
-    "esbuild": "^0.17.10"
+    "esbuild": "^0.17.10",
+    "fp-future": "^1.0.1"
   }
 }
