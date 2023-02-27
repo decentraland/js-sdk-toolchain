@@ -29,7 +29,7 @@ describe('Analytics Component', () => {
     expect(trackSpy).toBeCalledTimes(0)
   })
 
-  it.only('should track event', async () => {
+  it('should track event', async () => {
     const fs = createFsComponent()
     const dclInfoConfig = await createDCLInfoConfigComponent({ fs })
     jest.spyOn(dclInfoConfig, 'get').mockResolvedValue({ userId: 'boedo', trackStats: true })

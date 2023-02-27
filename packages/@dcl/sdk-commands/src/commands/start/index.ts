@@ -22,8 +22,7 @@ import { createStdoutCliLogger } from '../../components/log'
 import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
 import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
-import { b64HashingFunction } from './server/endpoints'
-import { getSceneJson } from '../../logic/project-files'
+import { b64HashingFunction, getSceneJson } from '../../logic/project-files'
 
 interface Options {
   args: typeof args

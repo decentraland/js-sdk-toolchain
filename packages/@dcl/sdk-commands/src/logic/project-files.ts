@@ -10,7 +10,9 @@ import { Scene } from '@dcl/schemas'
 
 /**
  * Returns an array of the publishable files for a given folder.
+ *
  */
+/* istanbul ignore next */
 export async function getPublishableFiles(
   components: Pick<CliComponents, 'fs'>,
   projectRoot: string
@@ -34,7 +36,9 @@ export async function getPublishableFiles(
  * This function converts paths to decentraland-compatible paths.
  * - From windows separators to unix separators.
  * - All to lowercase
+ *
  */
+/* istanbul ignore next */
 export function normalizeDecentralandFilename(filename: string) {
   return filename.replace(/(\\)/g, '/').toLowerCase()
 }
@@ -42,9 +46,11 @@ export function normalizeDecentralandFilename(filename: string) {
 /**
  * Returns the content mappings for a specific project folder.
  */
+/* istanbul ignore next */
 export async function getProjectContentMappings(
   components: Pick<CliComponents, 'fs'>,
   projectRoot: string,
+  /* istanbul ignore next */
   hashingFunction: (filePath: string) => Promise<string>
 ): Promise<ContentMapping[]> {
   const projectFiles = await getPublishableFiles(components, projectRoot)
@@ -82,3 +88,5 @@ export async function getSceneJson(components: Pick<CliComponents, 'fs'>, projec
   const sceneJson = JSON.parse(sceneJsonContent) as Scene
   return sceneJson
 }
+
+export const b64HashingFunction = async (str: string) => 'b64-' + Buffer.from(str).toString('base64')

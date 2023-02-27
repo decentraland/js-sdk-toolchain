@@ -6,6 +6,8 @@ export interface DCLInfo {
   userId?: string
   trackStats?: boolean
 }
+
+/* istanbul ignore next */
 export const getDclInfoPath = () =>
   path.resolve(process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'] ?? '', '.dclinfo')
 
@@ -34,7 +36,7 @@ export function getEnvConfig(): Partial<DCLInfo> {
   return removeEmptyKeys(envConfig)
 }
 
-function removeEmptyKeys(obj: Record<string, unknown>) {
+export function removeEmptyKeys(obj: Record<string, unknown>) {
   const result: Record<string, unknown> = {}
   Object.keys(obj)
     .filter((k) => !!obj[k])

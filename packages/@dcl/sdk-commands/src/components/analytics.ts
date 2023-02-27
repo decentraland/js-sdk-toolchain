@@ -83,7 +83,7 @@ export async function createAnalyticsComponent({
       analytics.track(trackInfo, () => {
         trackFuture.resolve()
       })
-      if (dclInfoConfig.isDevelopment()) {
+      if (!dclInfoConfig.isProduction()) {
         console.log(trackInfo)
       }
       return trackFuture

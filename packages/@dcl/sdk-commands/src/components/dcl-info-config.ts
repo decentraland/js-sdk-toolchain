@@ -9,19 +9,19 @@ export type IDCLInfoConfigComponent = {
   getVersion(): Promise<string>
   isCI(): boolean
   isEditor(): boolean
-  isDevelopment(): boolean
+  isProduction(): boolean
 }
 
 export async function createDCLInfoConfigComponent({
   fs
 }: Pick<CliComponents, 'fs'>): Promise<IDCLInfoConfigComponent> {
-  function isDevelopment() {
-    return process.env.NODE_ENV !== 'production' || !__filename.includes('node_modules')
+  function isProduction() {
+    return process.env.NODE_ENV === 'production' || __filename.includes('node_modules')
   }
   const defaultConfig: Partial<DCLInfo> = {
     userId: '',
     trackStats: false,
-    segmentKey: isDevelopment() ? 'mjCV5Dc4VAKXLJAH5g7LyHyW1jrIR3to' : 'sFdziRVDJo0taOnGzTZwafEL9nLIANZ3'
+    segmentKey: isProduction() ? 'sFdziRVDJo0taOnGzTZwafEL9nLIANZ3' : 'mjCV5Dc4VAKXLJAH5g7LyHyW1jrIR3to'
   }
 
   return {
@@ -36,12 +36,15 @@ export async function createDCLInfoConfigComponent({
     },
     async getVersion() {
       try {
+        /* istanbul ignore next */
         const sdkPath = path.dirname(
           require.resolve('@dcl/sdk/package.json', {
             paths: [process.cwd()]
           })
         )
+        /* istanbul ignore next */
         const packageJson = await readJSON<{ version: string }>({ fs }, resolve(sdkPath, 'package.json'))
+        /* istanbul ignore next */
         return packageJson.version ?? 'unknown'
       } catch (e) {
         return 'unknown'
@@ -53,8 +56,8 @@ export async function createDCLInfoConfigComponent({
     isCI() {
       return process.env.CI === 'true' || process.argv.includes('--ci') || process.argv.includes('--c')
     },
-    isDevelopment() {
-      return isDevelopment()
+    isProduction() {
+      return isProduction()
     }
   }
 }

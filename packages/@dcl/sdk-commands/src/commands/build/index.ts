@@ -4,9 +4,8 @@ import { getArgs } from '../../logic/args'
 import { compile } from '@dcl/dcl-rollup/compile'
 import future from 'fp-future'
 import { assertValidProjectFolder, installDependencies, needsDependencies } from '../../logic/project-validations'
-import { b64HashingFunction } from '../start/server/endpoints'
 import { getBaseCoords } from '../../logic/scene-validations'
-import { getSceneJson } from '../../logic/project-files'
+import { b64HashingFunction, getSceneJson } from '../../logic/project-files'
 
 interface Options {
   args: Omit<typeof args, '_'>
