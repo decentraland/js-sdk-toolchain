@@ -41,7 +41,6 @@ export function help() {
 
 export async function main(options: Options) {
   const projectRoot = resolve(process.cwd(), options.args['--dir'] || '.')
-
   await assertValidProjectFolder(options.components, projectRoot)
 
   const shouldInstallDeps = await needsDependencies(options.components, projectRoot)

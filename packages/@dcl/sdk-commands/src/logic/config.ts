@@ -1,5 +1,5 @@
 import { readFile, readJSON, writeJSON } from 'fs-extra'
-import path from 'path'
+import path, { resolve } from 'path'
 
 interface DCLInfo {
   segmentKey?: string
@@ -28,7 +28,7 @@ export async function writeDCLInfo(value: Partial<DCLInfo>) {
   return writeJSON(getDclInfoPath(), value)
 }
 
-function isDevelopment() {
+export function isDevelopment() {
   return process.env.NODE_ENV !== 'production'
 }
 
@@ -79,11 +79,15 @@ export function isEditor() {
 }
 
 export async function getInstalledSDKVersion(): Promise<string> {
-  const sdkPath = path.dirname(
-    require.resolve('@dcl/sdk/package.json', {
-      paths: [process.cwd()]
-    })
-  )
-  const packageJson = await readJSON(sdkPath)
-  return packageJson.version
+  try {
+    const sdkPath = path.dirname(
+      require.resolve('@dcl/sdk/package.json', {
+        paths: [process.cwd()]
+      })
+    )
+    const packageJson = await readJSON(resolve(sdkPath, 'package.json'))
+    return packageJson.version
+  } catch (e) {
+    return 'unknown'
+  }
 }

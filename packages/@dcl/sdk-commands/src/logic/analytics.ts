@@ -1,7 +1,8 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Analytics } from '@segment/analytics-node'
-import { getConfig, getInstalledSDKVersion, isCI, isEditor, writeDCLInfo } from './config'
 import future from 'fp-future'
+
+import { isDevelopment, getConfig, getInstalledSDKVersion, isCI, isEditor, writeDCLInfo } from './config'
 import { colors } from '../components/log'
 
 let analytics: Analytics
@@ -28,24 +29,25 @@ export async function track<T extends keyof Events>(eventName: T, eventProps: Ev
   const trackFuture = future<void>()
   const { userId, trackStats } = await getConfig()
   if (!trackStats) return
-  analytics.track(
-    {
-      userId: USER_ID,
-      event: eventName,
-      properties: {
-        ...eventProps,
-        os: process.platform,
-        nodeVersion: process.version,
-        cliVersion: await getInstalledSDKVersion(),
-        isCI: isCI(),
-        isEditor: isEditor(),
-        devId: userId
-      }
-    },
-    () => {
-      trackFuture.resolve()
+  const trackInfo = {
+    userId: USER_ID,
+    event: eventName,
+    properties: {
+      ...eventProps,
+      os: process.platform,
+      nodeVersion: process.version,
+      cliVersion: await getInstalledSDKVersion(),
+      isCI: isCI(),
+      isEditor: isEditor(),
+      devId: userId
     }
-  )
+  }
+  analytics.track(trackInfo, () => {
+    trackFuture.resolve()
+  })
+  if (isDevelopment()) {
+    console.log(trackInfo)
+  }
   return trackFuture
 }
 
