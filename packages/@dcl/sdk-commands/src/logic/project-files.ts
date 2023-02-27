@@ -5,6 +5,8 @@ import { sync as globSync } from 'glob'
 import ignore from 'ignore'
 import path from 'path'
 import { CliError } from './error'
+import { getSceneFilePath } from './scene-validations'
+import { Scene } from '@dcl/schemas'
 
 /**
  * Returns an array of the publishable files for a given folder.
@@ -73,4 +75,10 @@ export async function getProjectContentMappings(
   }
 
   return ret
+}
+
+export async function getSceneJson(components: Pick<CliComponents, 'fs'>, projectRoot: string): Promise<Scene> {
+  const sceneJsonContent = await components.fs.readFile(getSceneFilePath(projectRoot), 'utf8')
+  const sceneJson = JSON.parse(sceneJsonContent) as Scene
+  return sceneJson
 }

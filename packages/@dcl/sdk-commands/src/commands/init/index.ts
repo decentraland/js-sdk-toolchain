@@ -7,6 +7,7 @@ import { isDirectoryEmpty, download, extract } from '../../logic/fs'
 
 import { get as getRepo } from './repos'
 import { installDependencies, needsDependencies } from '../../logic/project-validations'
+import { track } from '../../logic/analytics'
 
 interface Options {
   args: typeof args
@@ -44,6 +45,7 @@ export async function main(options: Options) {
   if (shouldInstallDeps && !options.args['--skip-install']) {
     await installDependencies(options.components, dir)
   }
+  await track('Scene created', { projectType: scene, url })
 }
 
 const moveFilesFromDir = async (components: Pick<CliComponents, 'fs'>, dir: string, folder: string) => {

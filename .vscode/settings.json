@@ -16,6 +16,7 @@
     "packages/@dcl/*/*.tgz": true,
     "packages/@dcl/*/*.js": true,
     "packages/@dcl/sdk/**/*.d.ts": true,
+    "packages/@dcl/dcl-rollup/**/*.d.ts": true,
     "**/*.js": { "when": "$(basename).ts" },
   },
   "[typescript]": {

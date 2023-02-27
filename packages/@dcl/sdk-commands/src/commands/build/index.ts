@@ -4,6 +4,12 @@ import { getArgs } from '../../logic/args'
 import { compile } from '@dcl/dcl-rollup/compile'
 import future from 'fp-future'
 import { assertValidProjectFolder, installDependencies, needsDependencies } from '../../logic/project-validations'
+import { trace } from 'console'
+import { track } from '../../logic/analytics'
+import { b64HashingFunction } from '../start/server/endpoints'
+import { getBaseCoords, getSceneFilePath } from '../../logic/scene-validations'
+import { Scene } from '@dcl/schemas'
+import { getSceneJson } from '../../logic/project-files'
 
 interface Options {
   args: Omit<typeof args, '_'>
@@ -60,6 +66,14 @@ export async function main(options: Options) {
   if (!watch) {
     watchingFuture.resolve(null)
   }
+  const sceneJson = await getSceneJson(options.components, projectRoot)
+  const coords = getBaseCoords(sceneJson)
+
+  await track('Build scene', {
+    projectHash: await b64HashingFunction(projectRoot),
+    coords,
+    isWorkspace: false
+  })
 
   await watchingFuture
 

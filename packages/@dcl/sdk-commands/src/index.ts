@@ -8,6 +8,7 @@ import { COMMANDS_PATH, getCommands } from './logic/commands'
 import { CliComponents, initComponents } from './components'
 import { printCommand } from './logic/beautiful-logs'
 import { colors } from './components/log'
+import { identifyAnalytics } from './logic/analytics'
 
 export interface Options {
   args: ReturnType<typeof getArgs>
@@ -52,11 +53,11 @@ async function main() {
     }
     throw new CliError(`Command ${command} is invalid. ${helpMessage(commands)}`)
   }
-
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const cmd = require(`${COMMANDS_PATH}/${command}`)
 
   if (commandFnsAreValid(cmd)) {
+    await identifyAnalytics()
     const options = { args: cmd.args, components }
     if (needsHelp) {
       await cmd.help(options)

@@ -227,7 +227,7 @@ function serveFolders(components: Pick<CliComponents, 'fs'>, router: Router<Prev
   })
 }
 
-const b64HashingFunction = async (str: string) => 'b64-' + Buffer.from(str).toString('base64')
+export const b64HashingFunction = async (str: string) => 'b64-' + Buffer.from(str).toString('base64')
 
 async function getAllPreviewWearables(
   components: Pick<CliComponents, 'fs'>,
