@@ -66,17 +66,23 @@ describe('Dcl Info Config Component', () => {
     })
   })
 
-  it('get isProduction', async () => {
+  it('get isProduction & isCI', async () => {
     const originalEnv = process.env
     process.env = {
       ...originalEnv,
-      NODE_ENV: 'production'
+      NODE_ENV: 'production',
+      CI: 'false'
     }
     const fsComponent = createFsComponent()
     const dclInfoConfig = await createDCLInfoConfigComponent({ fs: fsComponent })
-    const isDev = dclInfoConfig.isProduction()
 
-    expect(isDev).toBe(true)
+    expect(dclInfoConfig.isProduction()).toBe(true)
+    expect(dclInfoConfig.isCI()).toBe(false)
+    process.env = {
+      ...originalEnv,
+      CI: 'true'
+    }
+    expect(dclInfoConfig.isCI()).toBe(true)
     process.env = originalEnv
     expect(dclInfoConfig.isProduction()).toBe(false)
   })
