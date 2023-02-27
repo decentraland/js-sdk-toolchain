@@ -1,19 +1,19 @@
 import React, { useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
-import './Tree.css'
-
 import { Input } from './input'
 import { Controls } from './controls'
 
-export type Tree = {
+import './Tree.css'
+
+export type Node = {
   id: string
   label: string
-  children: Tree[]
+  children: Node[]
 }
 
-interface Props {
-  value: Tree
+export type Props = {
+  value: Node
   onSetParent: (id: string, newParentId: string | null) => void
   onRename: (id: string, newLabel: string) => void
   onAddChild: (id: string, label: string) => void
@@ -23,14 +23,12 @@ interface Props {
 const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : 'block' })
 const getExpandStyles = (active: boolean) => ({ height: active ? 'auto' : '0', overflow: 'hidden', display: 'block' })
 
-const MemoTree = React.memo(TreeComponent)
-
-const canDrop = (target: Tree, source: Tree): boolean => {
+const canDrop = (target: Node, source: Node): boolean => {
   if (target.id === source.id) return false
   return target.children.every(($) => canDrop($, source))
 }
 
-function TreeComponent(props: Props) {
+function Tree(props: Props) {
   const { value, onSetParent, onRename, onAddChild, onRemove } = props
   const { children, id, label } = value
   const [expanded, setExpanded] = useState(false)
@@ -42,7 +40,7 @@ function TreeComponent(props: Props) {
   const [, drop] = useDrop(
     () => ({
       accept: 'tree',
-      drop: (tree: Tree, monitor) => {
+      drop: (tree: Node, monitor) => {
         if (monitor.didDrop() || !canDrop(tree, value)) return
         onSetParent(tree.id, id)
       }
@@ -105,5 +103,7 @@ function TreeComponent(props: Props) {
     </ul>
   )
 }
+
+const MemoTree = React.memo(Tree)
 
 export default MemoTree
