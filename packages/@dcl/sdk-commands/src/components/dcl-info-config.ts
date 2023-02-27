@@ -16,7 +16,7 @@ export async function createDCLInfoConfigComponent({
   fs
 }: Pick<CliComponents, 'fs'>): Promise<IDCLInfoConfigComponent> {
   function isDevelopment() {
-    return process.env.NODE_ENV !== 'production'
+    return process.env.NODE_ENV !== 'production' || !__filename.includes('node_modules')
   }
   const defaultConfig: Partial<DCLInfo> = {
     userId: '',

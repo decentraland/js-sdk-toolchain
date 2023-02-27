@@ -142,9 +142,9 @@ export async function main(options: Options) {
   const sceneJson = await getSceneJson(options.components, projectRoot)
   const coords = getBaseCoords(sceneJson)
 
-  options.components.analytics.track('Export static', {
+  await options.components.analytics.track('Export static', {
     projectHash: await b64HashingFunction(projectRoot),
-    coords,
+    coords
   })
 
   return { urn, entityId, destination: destDirectory }

@@ -24,7 +24,7 @@ type Events = {
     projectHash: string
     coords: { x: number; y: number }
     isWorkspace: boolean
-  },
+  }
   'Export static': {
     projectHash: string
     coords: { x: number; y: number }
@@ -51,7 +51,8 @@ export async function createAnalyticsComponent({
         analytics.identify({
           userId: USER_ID,
           traits: {
-            devId: userId
+            devId: userId,
+            createdAt: new Date()
           }
         })
       }
@@ -69,7 +70,7 @@ export async function createAnalyticsComponent({
           ...eventProps,
           os: process.platform,
           nodeVersion: process.version,
-          version: await dclInfoConfig.getVersion(),
+          cliVersion: await dclInfoConfig.getVersion(),
           isCI: dclInfoConfig.isCI(),
           isEditor: dclInfoConfig.isEditor(),
           devId: userId

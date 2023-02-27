@@ -131,7 +131,6 @@ describe('build:helpers', () => {
   })
 
   it('npmRun: should build pass on the process.env', async () => {
-    const components = await initComponents()
     const execSpy = jest.spyOn(execUtils, 'exec').mockResolvedValue()
 
     await projectValidation.npmRun('some/path', 'build', 'a')
