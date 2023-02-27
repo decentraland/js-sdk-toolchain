@@ -39,13 +39,16 @@ function TreeComponent(props: Props) {
 
   const [, drag] = useDrag(() => ({ type: 'tree', item: value }), [value])
 
-  const [, drop] = useDrop(() => ({
-    accept: 'tree',
-    drop: (tree: Tree, monitor) => {
-      if (monitor.didDrop() || !canDrop(tree, value)) return
-      onSetParent(tree.id, id)
-    }
-  }), [value])
+  const [, drop] = useDrop(
+    () => ({
+      accept: 'tree',
+      drop: (tree: Tree, monitor) => {
+        if (monitor.didDrop() || !canDrop(tree, value)) return
+        onSetParent(tree.id, id)
+      }
+    }),
+    [value]
+  )
 
   const quitEditMode = () => setEditMode(false)
   const quitInsertMode = () => setInsertMode(false)
@@ -86,17 +89,15 @@ function TreeComponent(props: Props) {
         <div>
           <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
             {label}{' '}
-            <Controls
-              handleEdit={handleToggleEdit}
-              handleNewChild={handleNewChild}
-              handleRemove={handleRemove}
-            />
+            <Controls handleEdit={handleToggleEdit} handleNewChild={handleNewChild} handleRemove={handleRemove} />
           </span>
           {editMode && <Input value={label} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
         </div>
         {!!children.length && (
           <div style={getExpandStyles(expanded)}>
-            {children.map(($) => <MemoTree {...props} value={$} key={$.id} />)}
+            {children.map(($) => (
+              <MemoTree {...props} value={$} key={$.id} />
+            ))}
           </div>
         )}
         {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} />}
