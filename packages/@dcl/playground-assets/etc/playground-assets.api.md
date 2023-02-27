@@ -550,6 +550,9 @@ export interface EcsElements {
     };
 }
 
+// @public @deprecated
+export function Engine(options?: IEngineOptions): IEngine;
+
 // Warning: (tsdoc-at-sign-in-word) The "@" character looks like part of a TSDoc tag; use a backslash to escape it
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
@@ -728,6 +731,12 @@ export interface IEngine {
     seal(): void;
     // (undocumented)
     update(deltaTime: number): Promise<void>;
+}
+
+// @public (undocumented)
+export interface IEngineOptions {
+    // (undocumented)
+    onChangeFunction: OnChangeFunction;
 }
 
 // Warning: (ae-missing-release-tag) "IEventNames" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
