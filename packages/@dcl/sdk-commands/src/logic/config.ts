@@ -1,19 +1,20 @@
-import { readFile, writeJSON } from 'fs-extra'
-import path from "path"
+import { readFile, readJSON, writeJSON } from 'fs-extra'
+import path from 'path'
 
 interface DCLInfo {
   segmentKey?: string
   userId?: string
   trackStats?: boolean
 }
-export const dclInfoPath = path.resolve(process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'] ?? '', '.dclinfo')
+export const getDclInfoPath = () =>
+  path.resolve(process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'] ?? '', '.dclinfo')
 
 /**
  * Reads the contents of the `.dclinfo` file
  */
 async function getDCLInfoConfig(): Promise<DCLInfo> {
   try {
-    const content = await readFile(dclInfoPath, 'utf8')
+    const content = await readFile(getDclInfoPath(), 'utf8')
     return JSON.parse(content) as DCLInfo
   } catch (e) {
     return {}
@@ -21,17 +22,10 @@ async function getDCLInfoConfig(): Promise<DCLInfo> {
 }
 
 /**
- * Creates the `.dclinfo` file in the HOME directory
- */
-export function createDCLInfo(value: DCLInfo) {
-  return writeJSON(dclInfoPath, value)
-}
-
-/**
  * Add new configuration to `.dclinfo` file
  */
 export async function writeDCLInfo(value: Partial<DCLInfo>) {
-  return writeJSON(dclInfoPath, value)
+  return writeJSON(getDclInfoPath(), value)
 }
 
 function isDevelopment() {
@@ -49,7 +43,7 @@ function getDefaultConfig(): Partial<DCLInfo> {
 
 /**
  * Config that can be override via ENV variables
-*/
+ */
 function getEnvConfig(): Partial<DCLInfo> {
   const { SEGMENT_KEY } = process.env
 
@@ -77,18 +71,19 @@ function removeEmptyKeys(obj: Record<string, unknown>) {
 }
 
 export function isCI() {
-  return (
-    process.env.CI === 'true' ||
-    process.argv.includes('--ci') ||
-    process.argv.includes('--c')
-  )
+  return process.env.CI === 'true' || process.argv.includes('--ci') || process.argv.includes('--c')
 }
 
 export function isEditor() {
   return process.env.EDITOR === 'true'
 }
 
-
-export function getInstalledCLIVersion(): string {
-  return require('../../package.json').version
+export async function getInstalledSDKVersion(): Promise<string> {
+  const sdkPath = path.dirname(
+    require.resolve('@dcl/sdk/package.json', {
+      paths: [process.cwd()]
+    })
+  )
+  const packageJson = await readJSON(sdkPath)
+  return packageJson.version
 }

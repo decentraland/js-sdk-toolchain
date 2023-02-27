@@ -4,11 +4,9 @@ import { getArgs } from '../../logic/args'
 import { compile } from '@dcl/dcl-rollup/compile'
 import future from 'fp-future'
 import { assertValidProjectFolder, installDependencies, needsDependencies } from '../../logic/project-validations'
-import { trace } from 'console'
 import { track } from '../../logic/analytics'
 import { b64HashingFunction } from '../start/server/endpoints'
-import { getBaseCoords, getSceneFilePath } from '../../logic/scene-validations'
-import { Scene } from '@dcl/schemas'
+import { getBaseCoords } from '../../logic/scene-validations'
 import { getSceneJson } from '../../logic/project-files'
 
 interface Options {

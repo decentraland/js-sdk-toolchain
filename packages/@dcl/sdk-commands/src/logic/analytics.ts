@@ -1,7 +1,8 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Analytics } from '@segment/analytics-node'
-import { getConfig, getInstalledCLIVersion, isCI, isEditor, writeDCLInfo } from './config'
+import { getConfig, getInstalledSDKVersion, isCI, isEditor, writeDCLInfo } from './config'
 import future from 'fp-future'
+import { colors } from '../components/log'
 
 let analytics: Analytics
 const USER_ID = 'sdk-commands-user'
@@ -27,22 +28,25 @@ export async function track<T extends keyof Events>(eventName: T, eventProps: Ev
   const trackFuture = future<void>()
   const { userId, trackStats } = await getConfig()
   if (!trackStats) return
-  analytics.track({
-   userId: USER_ID,
-   event: eventName,
-   properties: {
-      ...eventProps,
-      os: process.platform,
-      nodeVersion: process.version,
-      cliVersion: getInstalledCLIVersion(),
-      isCI: isCI(),
-      isEditor: isEditor(),
-      devId: userId
-   }
- }, () => {
-  trackFuture.resolve()
- })
- return trackFuture
+  analytics.track(
+    {
+      userId: USER_ID,
+      event: eventName,
+      properties: {
+        ...eventProps,
+        os: process.platform,
+        nodeVersion: process.version,
+        cliVersion: await getInstalledSDKVersion(),
+        isCI: isCI(),
+        isEditor: isEditor(),
+        devId: userId
+      }
+    },
+    () => {
+      trackFuture.resolve()
+    }
+  )
+  return trackFuture
 }
 
 export async function identifyAnalytics() {
@@ -51,9 +55,9 @@ export async function identifyAnalytics() {
   analytics = new Analytics({ writeKey: config.segmentKey })
   if (!config.userId) {
     console.log(
-        `Decentraland CLI sends anonymous usage stats to improve their products, if you want to disable it change the configuration at ${chalk.bold(
-          '~/.dclinfo'
-        )}\n`
+      `Decentraland CLI sends anonymous usage stats to improve their products, if you want to disable it change the configuration at ${colors.bold(
+        '~/.dclinfo'
+      )}\n`
     )
 
     const userId = uuidv4()

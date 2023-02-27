@@ -72,7 +72,10 @@ export async function validateSceneJson(
   }
 }
 
-export function getBaseCoords(scene: Scene): { x: number, y: number } {
-  const [x, y] = scene.scene.base.replace(/\ /g, '').split(',').map((a) => parseInt(a))
+export function getBaseCoords(scene: Scene): { x: number; y: number } {
+  const [x, y] = scene.scene.base
+    .replace(/\ /g, '')
+    .split(',')
+    .map((a) => parseInt(a))
   return { x, y }
 }
