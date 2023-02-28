@@ -3,7 +3,7 @@ import { resolve } from 'path'
 import { CliComponents } from '../components'
 import { CliError } from './error'
 import { exec } from './exec'
-import { getSceneJson } from './scene-validations'
+import { getValidSceneJson } from './scene-validations'
 
 /**
  * Asserts that the projectRoot is a valid project
@@ -20,7 +20,7 @@ export async function assertValidProjectFolder(
   switch (true) {
     // case wearable
     case await components.fs.fileExists(resolve(projectRoot, 'scene.json')): {
-      return { scene: await getSceneJson(components, projectRoot) }
+      return { scene: await getValidSceneJson(components, projectRoot) }
     }
     default: {
       throw new CliError(`UnknownProjectKind: the kind of project of the folder ${projectRoot} cannot be identified`)

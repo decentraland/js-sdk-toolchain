@@ -7,7 +7,7 @@ import { ethSign, recoverAddressFromEthSignature } from '@dcl/crypto/dist/crypto
 
 import { CliComponents } from '../../components'
 import { main as build } from '../build'
-import { IFile, getFiles, getSceneJson } from '../../logic/scene-validations'
+import { IFile, getFiles, getValidSceneJson, validateFilesSizes } from '../../logic/scene-validations'
 import { getArgs } from '../../logic/args'
 import { npmRun } from '../../logic/project-validations'
 import { link, LinkerResponse } from './linker-dapp/api'
@@ -83,8 +83,11 @@ export async function main(options: Options) {
 
   // Obtain list of files to deploy
   const files = await getFiles(options.components, dir)
+
+  validateFilesSizes(files)
+
   const contentFiles = new Map(files.map((file) => [file.path, file.content]))
-  const sceneJson = await getSceneJson(options.components, dir)
+  const sceneJson = await getValidSceneJson(options.components, dir)
 
   const { entityId, files: entityFiles } = await DeploymentBuilder.buildEntity({
     type: EntityType.SCENE,

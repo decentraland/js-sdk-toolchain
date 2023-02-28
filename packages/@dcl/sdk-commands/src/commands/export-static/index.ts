@@ -9,7 +9,7 @@ import { Entity, EntityType } from '@dcl/schemas'
 import { colors } from '../../components/log'
 import { printProgressInfo, printProgressStep, printSuccess } from '../../logic/beautiful-logs'
 import { createStaticRealm } from '../../logic/realm'
-import { getSceneJson, getBaseCoords } from '../../logic/scene-validations'
+import { getValidSceneJson, getBaseCoords } from '../../logic/scene-validations'
 
 interface Options {
   args: typeof args
@@ -138,7 +138,7 @@ export async function main(options: Options) {
   }
 
   printSuccess(logger, `Export finished!`, `=> The entity URN is ${colors.bold(urn)}`)
-  const sceneJson = await getSceneJson(options.components, projectRoot)
+  const sceneJson = await getValidSceneJson(options.components, projectRoot)
   const coords = getBaseCoords(sceneJson)
 
   await options.components.analytics.track('Export static', {

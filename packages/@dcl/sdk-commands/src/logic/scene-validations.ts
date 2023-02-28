@@ -63,9 +63,9 @@ export function assertValidScene(scene: Scene) {
 }
 
 /**
- * Get Scene JSON
+ * Get valid Scene JSON
  */
-export async function getSceneJson(
+export async function getValidSceneJson(
   components: Pick<CliComponents, 'fs' | 'logger'>,
   projectRoot: string
 ): Promise<Scene> {
@@ -102,10 +102,6 @@ export async function getFiles(components: Pick<CliComponents, 'fs' | 'logger'>,
     const filePath = resolve(dir, file)
     const stat = await components.fs.stat(filePath)
 
-    if (stat.size > MAX_FILE_SIZE_BYTES) {
-      throw new CliError(`Maximum file size exceeded: '${file}' is larger than ${MAX_FILE_SIZE_BYTES / 1e6}MB`)
-    }
-
     const content = await components.fs.readFile(filePath)
 
     data.push({
@@ -114,5 +110,14 @@ export async function getFiles(components: Pick<CliComponents, 'fs' | 'logger'>,
       size: stat.size
     })
   }
+
   return data
+}
+
+export function validateFilesSizes(files: IFile[]) {
+  for (const { path, size } of files) {
+    if (size > MAX_FILE_SIZE_BYTES) {
+      throw new CliError(`Maximum file size exceeded: '${path}' is larger than ${MAX_FILE_SIZE_BYTES / 1e6}MB`)
+    }
+  }
 }

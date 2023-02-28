@@ -7,7 +7,7 @@ import { CliComponents } from '../../components'
 import { main as build } from '../build'
 import { getArgs } from '../../logic/args'
 import { needsDependencies, npmRun } from '../../logic/project-validations'
-import { getBaseCoords, getSceneJson } from '../../logic/scene-validations'
+import { getBaseCoords, getValidSceneJson } from '../../logic/scene-validations'
 import { CliError } from '../../logic/error'
 import { getPort } from '../../logic/get-free-port'
 import { ISignalerComponent, PreviewComponents } from './types'
@@ -98,7 +98,7 @@ export async function main(options: Options) {
     await build({ ...options, args: { '--dir': projectRoot, '--watch': watch } })
   }
 
-  const sceneJson = await getSceneJson(options.components, projectRoot)
+  const sceneJson = await getValidSceneJson(options.components, projectRoot)
   const baseCoords = getBaseCoords(sceneJson)
 
   if (await needsDependencies(options.components, projectRoot)) {
