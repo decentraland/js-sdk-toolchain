@@ -7,6 +7,7 @@ const Transform = components.Transform(engine)
 const Label = engine.defineComponent('inspector::Label', {
   label: Schemas.String
 })
+const Toggle = engine.defineComponent('inspector::Toggle', {})
 
 const root = engine.addEntity()
 Transform.create(root, { position: { x: 8, y: 0, z: 8 } })
@@ -19,4 +20,4 @@ Transform.create(childB, { parent: root, position: { x: 0, y: 1, z: 1 } })
 
 void engine.update(0)
 
-export { engine, Transform, Label }
+export { engine, Transform, Label, Toggle }

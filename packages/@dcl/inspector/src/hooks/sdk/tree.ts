@@ -1,12 +1,13 @@
 import { Entity } from '@dcl/ecs'
 import { useState } from 'react'
 import { Node } from '../../components/Tree'
-import { engine, Label, Transform } from '../../lib/sdk/engine'
+import { engine, Label, Toggle, Transform } from '../../lib/sdk/engine'
 
 type LinkedNode = {
   entity: number
   parent: number
   label?: string
+  open?: boolean
 }
 
 /**
@@ -22,6 +23,7 @@ const toTree = (linkedTree: LinkedNode[], parent: number = 0): Node[] =>
       id: node.entity.toString(),
       value: node.entity,
       label: node.label,
+      open: node.open,
       children: toTree(linkedTree, node.entity)
     }))
 
@@ -53,6 +55,11 @@ const getTree = () => {
       if (Label.has(entity)) {
         label = Label.get(entity).label
       }
+      // Get toggle of the entity if any
+      let open: boolean | undefined
+      if (Toggle.has(entity)) {
+        open = true
+      }
 
       // When the entitiy has a transform, we created a linked node pointing to the parent
       if (Transform.has(entity)) {
@@ -60,10 +67,10 @@ const getTree = () => {
         const parent = transform.parent || 0
         // If the parent has already been processed we link to it
         if (processed.has(parent)) {
-          linkedTree.push({ entity, label, parent })
+          linkedTree.push({ entity, label, open, parent })
         } else {
           // If the parent is now known we link to the root (entity=0). This could happen because the parent has not been processed yet, or because it was deleted
-          const node = { entity, label, parent: 0 }
+          const node = { entity, label, open, parent: 0 }
           linkedTree.push(node)
           // We flag the entity as an orphan for later processing if the parent is processed afterwards
           if (orphansByParent.has(parent)) {
@@ -74,7 +81,7 @@ const getTree = () => {
         }
       } else {
         // When the entity does not have a transform it is shown as a child of the root entity
-        linkedTree.push({ entity, label, parent: 0 })
+        linkedTree.push({ entity, label, open, parent: 0 })
       }
       // We flag the entity as processed
       processed.add(entity)
@@ -115,6 +122,7 @@ export const useTree = () => {
     const parent = Number(newParentId) as Entity
     const transform = Transform.getMutable(entity)
     transform.parent = parent
+    Toggle.createOrReplace(parent)
     await update()
   }
 
@@ -130,5 +138,15 @@ export const useTree = () => {
     await update()
   }
 
-  return { tree, addChild, setParent, rename, remove }
+  const toggle = async (id: string, open: boolean) => {
+    const entity = Number(id) as Entity
+    if (open) {
+      Toggle.createOrReplace(entity)
+    } else {
+      Toggle.deleteFrom(entity)
+    }
+    await update()
+  }
+
+  return { tree, addChild, setParent, rename, remove, toggle }
 }

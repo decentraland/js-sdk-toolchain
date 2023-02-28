@@ -8,8 +8,9 @@ import './Tree.css'
 
 export type Node = {
   id: string
-  label?: string
   children: Node[]
+  label?: string
+  open?: boolean
 }
 
 export type Props = {
@@ -18,6 +19,7 @@ export type Props = {
   onRename: (id: string, newLabel: string) => void
   onAddChild: (id: string, label: string) => void
   onRemove: (id: string) => void
+  onToggle: (id: string, value: boolean) => void
 }
 
 const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : 'block' })
@@ -29,9 +31,8 @@ const canDrop = (target: Node, source: Node): boolean => {
 }
 
 const Tree: React.FC<Props> = (props) => {
-  const { value, onSetParent, onRename, onAddChild, onRemove } = props
-  const { children, id, label } = value
-  const [expanded, setExpanded] = useState(false)
+  const { value, onSetParent, onRename, onAddChild, onRemove, onToggle } = props
+  const { children, id, label, open } = value
   const [editMode, setEditMode] = useState(false)
   const [insertMode, setInsertMode] = useState(false)
 
@@ -52,7 +53,7 @@ const Tree: React.FC<Props> = (props) => {
   const quitInsertMode = () => setInsertMode(false)
 
   const handleToggleExpand = (_: React.MouseEvent) => {
-    setExpanded(!expanded)
+    onToggle(id, !open)
   }
 
   const handleToggleEdit = (e: React.MouseEvent) => {
@@ -74,7 +75,7 @@ const Tree: React.FC<Props> = (props) => {
     if (!insertMode) return
     onAddChild(id, childLabel)
     quitInsertMode()
-    setExpanded(true)
+    onToggle(id, true)
   }
 
   const handleRemove = (e: React.MouseEvent) => {
@@ -92,8 +93,8 @@ const Tree: React.FC<Props> = (props) => {
           </span>
           {editMode && <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
         </div>
-        {!!children.length && expanded && (
-          <div style={getExpandStyles(expanded)}>
+        {!!children.length && open && (
+          <div style={getExpandStyles(open)}>
             {children.map(($) => (
               <MemoTree {...props} value={$} key={$.id} />
             ))}
