@@ -74,6 +74,7 @@ function Tree(props: Props) {
     if (!insertMode) return
     onAddChild(id, childLabel)
     quitInsertMode()
+    setExpanded(true)
   }
 
   const handleRemove = (e: React.MouseEvent) => {
@@ -104,6 +105,6 @@ function Tree(props: Props) {
   )
 }
 
-const MemoTree = React.memo(Tree)
+const MemoTree = Tree
 
 export default MemoTree

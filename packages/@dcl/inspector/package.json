@@ -1,24 +1,26 @@
 {
   "name": "@dcl/inspector",
   "version": "0.1.0",
-  "dependencies": {},
+  "dependencies": {
+    "mitt": "^3.0.0"
+  },
   "scripts": {
     "start": "node ./build.js --watch",
     "build": "node ./build.js"
   },
   "devDependencies": {
+    "@dcl/ecs": "file:../ecs",
+    "@dcl/js-runtime": "file:../js-runtime",
     "@types/node": "^16.18.11",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
+    "esbuild": "^0.17.10",
+    "fp-future": "^1.0.1",
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1",
-    "typescript": "^4.9.4",
-    "@dcl/js-runtime": "file:../js-runtime",
-    "@dcl/ecs": "file:../ecs",
-    "esbuild": "^0.17.10",
-    "fp-future": "^1.0.1"
+    "typescript": "^4.9.4"
   }
 }
