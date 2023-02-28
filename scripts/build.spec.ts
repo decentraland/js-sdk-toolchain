@@ -1,6 +1,6 @@
 import * as path from 'path'
 import { readFileSync, writeFileSync } from 'fs'
-import { readdirSync, copySync, existsSync, mkdirSync, removeSync } from 'fs-extra'
+import { copySync, existsSync, mkdirSync, removeSync } from 'fs-extra'
 import { summary } from '@actions/core'
 
 import {
