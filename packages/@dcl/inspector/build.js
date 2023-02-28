@@ -16,12 +16,32 @@ async function main() {
     minify: PRODUCTION
   })
 
-  const args = ['-p', 'tsconfig.json']
+  if (WATCH_MODE) {
+    let { host, port } = await context.serve({
+      servedir: 'public',
+    })
+    console.log(`> Serving on http://${host}:${port}`)
+  } else {
+    console.time(`> Building static files`)
+    await context.rebuild()
+    await context.dispose()
+    console.timeEnd(`> Building static files`)
+  }
 
+  await runTypeChecker()
+}
+
+main().catch(err => {
+  process.exitCode = 1
+  console.error(err)
+})
+
+function runTypeChecker() {
+  const args = [require.resolve('typescript/lib/tsc'), '-p', 'tsconfig.json']
   if (WATCH_MODE) args.push('--watch')
 
   console.time('> Running typechecker')
-  const ts = child_process.spawn('node_modules/.bin/tsc', args, { env: process.env, cwd: process.cwd(), encoding: 'utf8' })
+  const ts = child_process.spawn('node', args, { env: process.env, cwd: process.cwd(), encoding: 'utf8' })
   const typeCheckerFuture = future()
 
   ts.on('close', (code) => {
@@ -40,21 +60,8 @@ async function main() {
   ts.stderr.pipe(process.stderr)
 
   if (WATCH_MODE) {
-    let { host, port } = await context.serve({
-      servedir: 'public',
-    })
-    console.log(`> Serving on http://${host}:${port}`)
-  } else {
-    console.time(`> Building static files`)
-    await context.rebuild()
-    await context.dispose()
-    console.timeEnd(`> Building static files`)
-
-    await typeCheckerFuture
+    typeCheckerFuture.resolve()
   }
-}
 
-main().catch(err => {
-  process.exitCode = 1
-  console.error(err)
-})
+  return typeCheckerFuture
+}

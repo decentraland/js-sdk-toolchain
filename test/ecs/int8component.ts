@@ -3,6 +3,7 @@ import { ISchema } from '../../packages/@dcl/ecs/src/schemas/ISchema'
 import { componentNumberFromName } from '../../packages/@dcl/ecs/src/components/component-number'
 import {
   createGetCrdtMessagesForLww,
+  createLwwDumpFunctionFromCrdt,
   createUpdateLwwFromCrdt
 } from '../../packages/@dcl/ecs/src/engine/lww-element-set-component-definition'
 import * as components from '../../packages/@dcl/ecs/src/components'
@@ -87,7 +88,8 @@ export const int8Component = (engine: IEngine) => {
     getCrdtUpdates: createGetCrdtMessagesForLww(ID, timestamps, dirtyIterator, schema, data),
     setTestTimestamp(entity: Entity, timestamp: number) {
       timestamps.set(entity, (timestamps.get(entity) || 0) + timestamp)
-    }
+    },
+    dumpCrdtState: createLwwDumpFunctionFromCrdt(ID, timestamps, schema, data)
   }
 
   return engine.registerComponentDefinition(componentName, component) as Type

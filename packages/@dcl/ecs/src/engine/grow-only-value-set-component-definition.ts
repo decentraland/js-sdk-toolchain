@@ -1,6 +1,6 @@
 import { ISchema } from '../schemas'
-import { ReadWriteByteBuffer } from '../serialization/ByteBuffer'
-import { AppendValueMessageBody, CrdtMessageType } from '../serialization/crdt'
+import { ByteBuffer, ReadWriteByteBuffer } from '../serialization/ByteBuffer'
+import { AppendValueMessageBody, AppendValueOperation, CrdtMessageType } from '../serialization/crdt'
 import { ComponentType, GrowOnlyValueSetComponentDefinition } from './component'
 import { __DEV__ } from '../runtime/invariant'
 import { Entity } from './entity'
@@ -156,6 +156,15 @@ export function createValueSetComponentDefinitionFromSchema<T>(
         append(_body.entityId, schema.deserialize(buf) as DeepReadonly<T>)
       }
       return [null, undefined]
+    },
+    dumpCrdtState: function (buffer: ByteBuffer): void {
+      for (const [entity, { raw }] of data) {
+        for (const it of raw) {
+          const buf = new ReadWriteByteBuffer()
+          schema.serialize(it.value, buf)
+          AppendValueOperation.write(entity, 0, componentId, buf.toBinary(), buffer)
+        }
+      }
     }
   }
 

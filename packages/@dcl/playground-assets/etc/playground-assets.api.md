@@ -35,6 +35,15 @@ export type AppendValueMessageBody = {
 };
 
 // @public (undocumented)
+export namespace AppendValueOperation {
+    const // (undocumented)
+    MESSAGE_HEADER_LENGTH = 16;
+    // (undocumented)
+    export function read(buf: ByteBuffer): AppendValueMessage | null;
+    export function write(entity: Entity, timestamp: number, componentId: number, data: Uint8Array, buf: ByteBuffer): void;
+}
+
+// @public (undocumented)
 export const AudioSource: LastWriteWinElementSetComponentDefinition<PBAudioSource>;
 
 // @public (undocumented)
@@ -92,6 +101,7 @@ export interface BaseComponent<T> {
     readonly componentName: string;
     // (undocumented)
     readonly componentType: ComponentType;
+    dumpCrdtState(buffer: ByteBuffer): void;
     entityDeleted(entity: Entity, markAsDirty: boolean): void;
     get(entity: Entity): any;
     getCrdtUpdates(): Iterable<CrdtMessageBody>;
@@ -453,6 +463,14 @@ export type CrdtMessageHeader = {
 };
 
 // @public (undocumented)
+export namespace CrdtMessageProtocol {
+    export function consumeMessage(buf: ByteBuffer): boolean;
+    export function getHeader(buf: ByteBuffer): CrdtMessageHeader | null;
+    export function readHeader(buf: ByteBuffer): CrdtMessageHeader | null;
+    export function validate(buf: ByteBuffer): boolean;
+}
+
+// @public (undocumented)
 export enum CrdtMessageType {
     // (undocumented)
     APPEND_VALUE = 4,
@@ -501,6 +519,15 @@ export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 export const DEG2RAD: number;
 
 // @public (undocumented)
+export namespace DeleteComponent {
+    const // (undocumented)
+    MESSAGE_HEADER_LENGTH = 12;
+    // (undocumented)
+    export function read(buf: ByteBuffer): DeleteComponentMessage | null;
+    export function write(entity: Entity, componentId: number, timestamp: number, buf: ByteBuffer): void;
+}
+
+// @public (undocumented)
 export type DeleteComponentMessage = CrdtMessageHeader & DeleteComponentMessageBody;
 
 // @public (undocumented)
@@ -510,6 +537,16 @@ export type DeleteComponentMessageBody = {
     componentId: number;
     timestamp: number;
 };
+
+// @public (undocumented)
+export namespace DeleteEntity {
+    const // (undocumented)
+    MESSAGE_HEADER_LENGTH = 4;
+    // (undocumented)
+    export function read(buf: ByteBuffer): DeleteEntityMessage | null;
+    // (undocumented)
+    export function write(entity: Entity, buf: ByteBuffer): void;
+}
 
 // @public (undocumented)
 export type DeleteEntityMessage = CrdtMessageHeader & DeleteEntityMessageBody;
@@ -2203,6 +2240,15 @@ export type PutComponentMessageBody = {
     timestamp: number;
     data: Uint8Array;
 };
+
+// @public (undocumented)
+export namespace PutComponentOperation {
+    const // (undocumented)
+    MESSAGE_HEADER_LENGTH = 16;
+    // (undocumented)
+    export function read(buf: ByteBuffer): PutComponentMessage | null;
+    export function write(entity: Entity, timestamp: number, componentId: number, data: Uint8Array, buf: ByteBuffer): void;
+}
 
 // @public
 export type Quaternion = Quaternion.ReadonlyQuaternion;
