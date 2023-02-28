@@ -28,7 +28,7 @@ const canDrop = (target: Node, source: Node): boolean => {
   return target.children.every(($) => canDrop($, source))
 }
 
-function Tree(props: Props) {
+const Tree: React.FC<Props> = (props) => {
   const { value, onSetParent, onRename, onAddChild, onRemove } = props
   const { children, id, label } = value
   const [expanded, setExpanded] = useState(false)
@@ -92,7 +92,7 @@ function Tree(props: Props) {
           </span>
           {editMode && <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
         </div>
-        {!!children.length && (
+        {!!children.length && expanded && (
           <div style={getExpandStyles(expanded)}>
             {children.map(($) => (
               <MemoTree {...props} value={$} key={$.id} />
