@@ -48,7 +48,11 @@ describe('Analytics Component', () => {
           cliVersion: await dclInfoConfig.getVersion(),
           isCI: dclInfoConfig.isCI(),
           isEditor: dclInfoConfig.isEditor(),
-          devId: 'boedo'
+          devId: 'boedo',
+          ecs: {
+            ecsVersion: 'ecs7',
+            packageVersion: 'unknown'
+          }
         }
       },
       expect.anything()
