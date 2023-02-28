@@ -21,7 +21,7 @@ const toTree = (linkedTree: LinkedNode[], parent: number = 0): Node[] =>
     .map<Node>((node) => ({
       id: node.entity.toString(),
       value: node.entity,
-      label: node.label || node.entity.toString(),
+      label: node.label,
       children: toTree(linkedTree, node.entity)
     }))
 
