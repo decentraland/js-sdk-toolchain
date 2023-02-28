@@ -8,7 +8,7 @@ import './Tree.css'
 
 export type Node = {
   id: string
-  label: string
+  label?: string
   children: Node[]
 }
 
@@ -87,10 +87,10 @@ function Tree(props: Props) {
       <li>
         <div>
           <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
-            {label}{' '}
+            {label || id}{' '}
             <Controls handleEdit={handleToggleEdit} handleNewChild={handleNewChild} handleRemove={handleRemove} />
           </span>
-          {editMode && <Input value={label} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
+          {editMode && <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
         </div>
         {!!children.length && (
           <div style={getExpandStyles(expanded)}>
