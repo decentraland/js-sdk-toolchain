@@ -77,7 +77,11 @@ export async function createAnalyticsComponent({
           cliVersion: await dclInfoConfig.getVersion(),
           isCI: dclInfoConfig.isCI(),
           isEditor: dclInfoConfig.isEditor(),
-          devId: userId
+          devId: userId,
+          ecs: {
+            ecsVersion: 'ecs7',
+            packageVersion: await dclInfoConfig.getVersion()
+          }
         }
       }
       analytics.track(trackInfo, () => {
