@@ -3,16 +3,17 @@ import { EntityType, ChainId, Scene } from '@dcl/schemas'
 import { CatalystClient, ContentClient, DeploymentBuilder } from 'dcl-catalyst-client'
 import { Authenticator } from '@dcl/crypto'
 import { hexToBytes } from 'eth-connect'
-import { ethSign, recoverAddressFromEthSignature } from '@dcl/crypto/dist/crypto'
+import { ethSign } from '@dcl/crypto/dist/crypto'
 
 import { CliComponents } from '../../components'
 import { main as build } from '../build'
 import { IFile, getFiles, getValidSceneJson, validateFilesSizes } from '../../logic/scene-validations'
 import { getArgs } from '../../logic/args'
 import { npmRun } from '../../logic/project-validations'
-import { link, LinkerResponse } from './linker-dapp/api'
+import { runLinkerApp, LinkerResponse } from './linker-dapp/api'
 import { CliError } from '../../logic/error'
 import { printProgressInfo, printSuccess } from '../../logic/beautiful-logs'
+import { createWallet } from '../../logic/account'
 
 interface Options {
   args: typeof args
@@ -35,7 +36,7 @@ export const args = getArgs({
   '--yes': Boolean,
   '--no-browser': Boolean,
   '-b': '--no-browser',
-  '--port': String,
+  '--port': Number,
   '-p': '--port'
 })
 
@@ -64,9 +65,7 @@ export async function main(options: Options) {
   const dir = resolve(process.cwd(), options.args['--dir'] || '.')
   const openBrowser = !options.args['--no-browser']
   const skipBuild = options.args['--skip-build']
-  const port = options.args['--port']
-  const parsedPort = typeof port === 'string' ? parseInt(port, 10) : void 0
-  const linkerPort = parsedPort && Number.isInteger(parsedPort) ? parsedPort : void 0
+  const linkerPort = options.args['--port']
   const { error } = options.components.logger
 
   const comps = { components: options.components }
@@ -157,22 +156,6 @@ interface LinkOptions {
   skipValidations: boolean
 }
 
-const runLinkerApp = async (
-  components: CliComponents,
-  rootCID: string,
-  scene: Scene,
-  files: IFile[],
-  options: LinkOptions
-): Promise<LinkerResponse> => {
-  const { linkerPort, ...opts } = options
-  try {
-    const res = await link(components, scene, files, linkerPort!, rootCID, opts)
-    return res
-  } catch (e) {
-    throw new CliError(`Error running linking app: ${e}`)
-  }
-}
-
 async function getAddressAndSignature(
   components: CliComponents,
   messageToSign: string,
@@ -186,23 +169,6 @@ async function getAddressAndSignature(
     return { signature, address: wallet.address }
   }
 
-  return runLinkerApp(components, messageToSign, scene, files, linkOptions)
-}
-
-function createWallet(privateKey: string) {
-  let length = 64
-
-  if (privateKey.startsWith('0x')) {
-    length = 66
-  }
-
-  if (privateKey.length !== length) {
-    throw new CliError('Addresses should be 64 characters length.')
-  }
-
-  const pk = hexToBytes(privateKey)
-  const msg = Math.random().toString()
-  const signature = ethSign(pk, msg)
-  const address: string = recoverAddressFromEthSignature(signature, msg)
-  return { address, privateKey, publicKey: '0x' }
+  const { linkerPort, ...opts } = linkOptions
+  return runLinkerApp(components, scene, files, linkerPort!, messageToSign, opts)
 }

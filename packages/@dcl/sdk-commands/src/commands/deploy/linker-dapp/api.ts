@@ -32,7 +32,7 @@ export interface SceneInfo {
   skipValidations: boolean
 }
 
-export function link(
+export function runLinkerApp(
   cliComponents: Pick<CliComponents, 'fs' | 'logger' | 'fetch'>,
   scene: Scene,
   files: IFile[],

@@ -1,7 +1,7 @@
 import portfinder from 'portfinder'
 
 export async function getPort(port = 0, failoverPort = 2044) {
-  let resolvedPort = port
+  let resolvedPort = port && Number.isInteger(port) ? port : 0
 
   if (!resolvedPort) {
     try {

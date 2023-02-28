@@ -106,7 +106,7 @@ export async function main(options: Options) {
     throw new CliError(`Couldn\'t find ${npmModulesPath}, please run: npm install`)
   }
 
-  const port = options.args['--port'] || (await getPort())
+  const port = await getPort(options.args['--port'])
 
   const program = await Lifecycle.run<PreviewComponents>({
     async initComponents() {
