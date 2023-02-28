@@ -137,7 +137,7 @@ export function initEngine(canvas: HTMLCanvasElement) {
 
   // Watch for browser/canvas resize events
   function resize() {
-    babylon.resize()
+    babylon.resize(false)
   }
   window.addEventListener('resize', resize)
 

@@ -1,29 +1,27 @@
 {
   "name": "@dcl/inspector",
   "version": "0.1.0",
-  "dependencies": {
-    
-  },
   "scripts": {
     "start": "node ./build.js --watch",
     "build": "node ./build.js"
   },
   "devDependencies": {
-    "mitt": "^3.0.0",
     "@babylonjs/core": "^5.48.0",
     "@babylonjs/gui": "^5.48.0",
     "@babylonjs/inspector": "^5.48.0",
     "@babylonjs/loaders": "^5.48.0",
     "@babylonjs/materials": "^5.48.0",
-    "@dcl/ecs-math": "^2.0.1-20221129185242.commit-40495c1",
-    "@dcl/schemas": "^6.11.1",
     "@dcl/ecs": "file:../ecs",
+    "@dcl/ecs-math": "^2.0.1-20221129185242.commit-40495c1",
     "@dcl/js-runtime": "file:../js-runtime",
+    "@dcl/schemas": "^6.11.1",
     "@types/node": "^16.18.11",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
+    "@well-known-components/pushable-channel": "^1.0.3",
     "esbuild": "^0.17.10",
     "fp-future": "^1.0.1",
+    "mitt": "^3.0.0",
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",

@@ -18,3 +18,18 @@ code {
   touch-action: none;
   outline: none;
 }
+
+.with-sidebar {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+#root {
+  flex-basis: 20rem;
+  flex-grow: 1;
+}
+
+#main-editor {
+  flex-basis: 0;
+  flex-grow: 999;
+}

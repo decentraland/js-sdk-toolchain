@@ -1,8 +1,13 @@
 import * as React from 'react'
 import { useTree } from '../../hooks/sdk/tree'
+import { DataLayerInterface } from '../../lib/data-layer'
 import { Tree } from '../Tree'
 
-const Hierarchy: React.FC = () => {
+type Props = {
+  dataLayer: DataLayerInterface
+}
+
+const Hierarchy: React.FC<Props> = (_props) => {
   const { tree, addChild, setParent, remove, rename } = useTree()
   return (
     <>
