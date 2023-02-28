@@ -41,7 +41,7 @@ async function main() {
   const args = getArgs()
   const command = process.argv[2]
   const needsHelp = args['--help']
-  const components: CliComponents = initComponents()
+  const components: CliComponents = await initComponents()
 
   const commands = await getCommands(components)
 
@@ -52,11 +52,11 @@ async function main() {
     }
     throw new CliError(`Command ${command} is invalid. ${helpMessage(commands)}`)
   }
-
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const cmd = require(`${COMMANDS_PATH}/${command}`)
 
   if (commandFnsAreValid(cmd)) {
+    await components.analytics.identify()
     const options = { args: cmd.args, components }
     if (needsHelp) {
       await cmd.help(options)

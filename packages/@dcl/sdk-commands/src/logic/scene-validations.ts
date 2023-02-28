@@ -3,6 +3,7 @@ import { Scene } from '@dcl/schemas'
 import { CliError } from './error'
 import { getObject, inBounds, getBounds, areConnected } from './coordinates'
 import { CliComponents } from '../components'
+import { getSceneJson } from './project-files'
 
 export const SCENE_FILE = 'scene.json'
 
@@ -63,11 +64,18 @@ export async function validateSceneJson(
   projectRoot: string
 ): Promise<Scene> {
   try {
-    const sceneJsonRaw = await components.fs.readFile(getSceneFilePath(projectRoot), 'utf8')
-    const sceneJson = JSON.parse(sceneJsonRaw) as Scene
+    const sceneJson = await getSceneJson(components, projectRoot)
 
     return assertValidScene(sceneJson)
   } catch (err: any) {
     throw new CliError(`Error reading the scene.json file: ${err.message}`)
   }
+}
+
+export function getBaseCoords(scene: Scene): { x: number; y: number } {
+  const [x, y] = scene.scene.base
+    .replace(/\ /g, '')
+    .split(',')
+    .map((a) => parseInt(a))
+  return { x, y }
 }

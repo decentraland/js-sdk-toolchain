@@ -21,6 +21,7 @@
     "@dcl/mini-comms": "1.0.1-20230216163137.commit-a4c75be",
     "@dcl/protocol": "1.0.0-4114477251.commit-ccb88d6",
     "@dcl/schemas": "6.10.0",
+    "@segment/analytics-node": "^1.0.0-beta.22",
     "@well-known-components/env-config-provider": "^1.2.0",
     "@well-known-components/http-server": "^2.0.0-20230216161243.commit-bfe3f0a",
     "@well-known-components/logger": "^3.1.2",
@@ -33,10 +34,12 @@
     "node-fetch": "^2.6.8",
     "open": "^8.4.0",
     "portfinder": "^1.0.32",
-    "undici": "^5.19.1"
+    "undici": "^5.19.1",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/node-fetch": "^2.6.1",
+    "@types/uuid": "^9.0.1",
     "@types/ws": "^8.5.4"
   },
   "minCliVersion": "3.14.1",

@@ -7,7 +7,7 @@ import { CliComponents } from '../../components'
 import { main as build } from '../build'
 import { getArgs } from '../../logic/args'
 import { needsDependencies, npmRun } from '../../logic/project-validations'
-import { validateSceneJson } from '../../logic/scene-validations'
+import { getBaseCoords, validateSceneJson } from '../../logic/scene-validations'
 import { CliError } from '../../logic/error'
 import { previewPort } from '../../logic/get-free-port'
 import { ISignalerComponent, PreviewComponents } from './types'
@@ -22,10 +22,11 @@ import { createStdoutCliLogger } from '../../components/log'
 import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
 import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
+import { b64HashingFunction, getSceneJson } from '../../logic/project-files'
 
 interface Options {
   args: typeof args
-  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger'>
+  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'dclInfoConfig' | 'analytics'>
 }
 
 export const args = getArgs({
@@ -83,7 +84,8 @@ export async function main(options: Options) {
   const skipBuild = args['--skip-build']
   const watch = !args['--no-watch']
   const enableWeb3 = args['--web3']
-  const baseCoords = { x: 0, y: 0 }
+
+  // TODO: FIX this hardcoded values ?
   const hasPortableExperience = false
 
   // first run `npm run build`, this can be disabled with --skip-build
@@ -97,6 +99,8 @@ export async function main(options: Options) {
   }
 
   await validateSceneJson(options.components, projectRoot)
+  const sceneJson = await getSceneJson(options.components, projectRoot)
+  const baseCoords = getBaseCoords(sceneJson)
 
   if (await needsDependencies(options.components, projectRoot)) {
     const npmModulesPath = path.resolve(projectRoot, 'node_modules')
@@ -154,7 +158,11 @@ export async function main(options: Options) {
 
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []
-
+      await components.analytics.track('Preview started', {
+        projectHash: await b64HashingFunction(projectRoot),
+        coords: baseCoords,
+        isWorkspace: false
+      })
       components.logger.log(`Preview server is now running!`)
       components.logger.log('Available on:\n')
 

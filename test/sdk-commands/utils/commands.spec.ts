@@ -9,10 +9,10 @@ afterEach(() => {
   jest.restoreAllMocks()
 })
 
-const components = initComponents()
-
 describe('utils/commands', () => {
   it('should read commands from the defined commands path', async () => {
+    const components = await initComponents()
+
     const readDirSpy = jest.spyOn(components.fs, 'readdir').mockResolvedValue(['test'] as any)
     const stat = {
       isDirectory: jest.fn(() => true),
@@ -30,6 +30,7 @@ describe('utils/commands', () => {
   })
 
   it('should throw if command is not inside a folder', async () => {
+    const components = await initComponents()
     const readDirSpy = jest.spyOn(components.fs, 'readdir').mockResolvedValue(['command1'] as any)
     const stat = {
       isDirectory: jest.fn(() => false),
@@ -50,6 +51,7 @@ describe('utils/commands', () => {
   })
 
   it('should throw if command does not have an "index.ts"', async () => {
+    const components = await initComponents()
     const readDirSpy = jest.spyOn(components.fs, 'readdir').mockResolvedValue(['command'] as any)
     const stat = {
       isDirectory: jest.fn(() => true),
@@ -72,6 +74,7 @@ describe('utils/commands', () => {
   })
 
   it('should return all the commands in the directory', async () => {
+    const components = await initComponents()
     jest.spyOn(components.fs, 'readdir').mockResolvedValue(['command1', 'command2'] as any)
     const stat = {
       isDirectory: jest.fn(() => true),
