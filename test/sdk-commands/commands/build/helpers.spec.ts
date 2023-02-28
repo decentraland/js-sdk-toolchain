@@ -47,7 +47,7 @@ describe('build:helpers', () => {
       return _file.endsWith('package.json')
     })
     jest.spyOn(projectValidation, 'assertValidProjectFolder')
-    jest.spyOn(sceneValidation, 'validateSceneJson').mockResolvedValue('123' as any)
+    jest.spyOn(sceneValidation, 'assertValidScene')
 
     await expect(() => projectValidation.assertValidProjectFolder(components, 'some/path')).rejects.toThrow()
 
@@ -62,34 +62,6 @@ describe('build:helpers', () => {
     await expect(() => projectValidation.assertValidProjectFolder(components, 'some/path')).rejects.toThrow()
 
     expect(fileExists).toBeCalledWith(path.resolve('some/path/package.json'))
-  })
-
-  it('validateSceneJson: should return true if "package.json" has valid structure', async () => {
-    const components = await initComponents()
-    const structure: Scene = {
-      main: 'test.js',
-      scene: {
-        base: '0,0',
-        parcels: ['0,0']
-      }
-    }
-    jest.spyOn(components.fs, 'readFile').mockResolvedValue(JSON.stringify(structure))
-    const warn = jest.spyOn(components.logger, 'warn')
-
-    const res = await sceneValidation.validateSceneJson(components, 'some/path')
-
-    expect(res).toEqual(structure)
-    expect(warn).not.toBeCalled()
-  })
-
-  it('validateSceneJson: should return false if "package.json" has invalid structure', async () => {
-    const components = await initComponents()
-    const structure = { test: 1 }
-    jest.spyOn(components.fs, 'readFile').mockResolvedValue(JSON.stringify(structure))
-
-    await expect(() => sceneValidation.validateSceneJson(components, 'some/path')).rejects.toThrow(
-      /Invalid scene.json file.+/
-    )
   })
 
   it('needsDependencies: should return true if "node_modules" does not exist', async () => {

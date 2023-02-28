@@ -3,13 +3,13 @@ import { getArgs } from '../../logic/args'
 import { hashV1 } from '@dcl/hashing'
 import { CliComponents } from '../../components'
 import { assertValidProjectFolder } from '../../logic/project-validations'
-import { b64HashingFunction, getProjectContentMappings, getSceneJson } from '../../logic/project-files'
+import { b64HashingFunction, getProjectContentMappings } from '../../logic/project-files'
 import { CliError } from '../../logic/error'
 import { Entity, EntityType } from '@dcl/schemas'
 import { colors } from '../../components/log'
 import { printProgressInfo, printProgressStep, printSuccess } from '../../logic/beautiful-logs'
 import { createStaticRealm } from '../../logic/realm'
-import { getBaseCoords } from '../../logic/scene-validations'
+import { getValidSceneJson, getBaseCoords } from '../../logic/scene-validations'
 
 interface Options {
   args: typeof args
@@ -138,7 +138,7 @@ export async function main(options: Options) {
   }
 
   printSuccess(logger, `Export finished!`, `=> The entity URN is ${colors.bold(urn)}`)
-  const sceneJson = await getSceneJson(options.components, projectRoot)
+  const sceneJson = await getValidSceneJson(options.components, projectRoot)
   const coords = getBaseCoords(sceneJson)
 
   await options.components.analytics.track('Export static', {

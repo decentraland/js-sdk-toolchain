@@ -1,5 +1,5 @@
 import * as projectValidation from '../../../../packages/@dcl/sdk-commands/src/logic/project-validations'
-import * as filesValidation from '../../../../packages/@dcl/sdk-commands/src/logic/project-files'
+import * as filesValidation from '../../../../packages/@dcl/sdk-commands/src/logic/scene-validations'
 import * as dclCompiler from '../../../../packages/@dcl/dcl-rollup/compile'
 import * as build from '../../../../packages/@dcl/sdk-commands/src/commands/build/index'
 import { initComponents } from '../../../../packages/@dcl/sdk-commands/src/components'
@@ -67,7 +67,7 @@ describe('build command', () => {
     const components = await initComponents()
     jest.spyOn(projectValidation, 'assertValidProjectFolder').mockResolvedValue({ scene: {} as any })
     jest.spyOn(projectValidation, 'needsDependencies').mockResolvedValue(false)
-    jest.spyOn(filesValidation, 'getSceneJson').mockResolvedValue({ scene: { base: '0,0' } } as any)
+    jest.spyOn(filesValidation, 'getValidSceneJson').mockResolvedValue({ scene: { base: '0,0' } } as any)
     const tsBuildSpy = jest.spyOn(dclCompiler, 'compile').mockResolvedValue(null as any)
 
     await build.main({
