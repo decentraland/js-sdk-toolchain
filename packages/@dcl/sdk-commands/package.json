@@ -48,5 +48,6 @@
     "readmeFile": "./README.md",
     "displayName": "SDK",
     "tsconfig": "./tsconfig.json"
-  }
+  },
+  "files": ["dist"]
 }
