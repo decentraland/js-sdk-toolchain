@@ -71,7 +71,4 @@ export async function main(options: Options) {
   })
 
   await watchingFuture
-
-  // track stuff...
-  // https://github.com/decentraland/cli/blob/main/src/commands/build.ts
 }

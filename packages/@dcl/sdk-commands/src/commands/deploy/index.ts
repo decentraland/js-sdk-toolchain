@@ -7,13 +7,14 @@ import { ethSign } from '@dcl/crypto/dist/crypto'
 
 import { CliComponents } from '../../components'
 import { main as build } from '../build'
-import { IFile, getFiles, getValidSceneJson, validateFilesSizes } from '../../logic/scene-validations'
+import { IFile, getBaseCoords, getFiles, getValidSceneJson, validateFilesSizes } from '../../logic/scene-validations'
 import { getArgs } from '../../logic/args'
 import { npmRun } from '../../logic/project-validations'
 import { runLinkerApp, LinkerResponse } from './linker-dapp/api'
 import { CliError } from '../../logic/error'
 import { printProgressInfo, printSuccess } from '../../logic/beautiful-logs'
 import { createWallet } from '../../logic/account'
+import { b64HashingFunction } from '../../logic/project-files'
 
 interface Options {
   args: typeof args
@@ -62,31 +63,38 @@ export function help() {
 }
 
 export async function main(options: Options) {
-  const dir = resolve(process.cwd(), options.args['--dir'] || '.')
+  const projectRoot = resolve(process.cwd(), options.args['--dir'] || '.')
   const openBrowser = !options.args['--no-browser']
   const skipBuild = options.args['--skip-build']
   const linkerPort = options.args['--port']
   const { error } = options.components.logger
 
-  const comps = { components: options.components }
-
-  if (!skipBuild) {
-    await npmRun(dir, 'build')
-  }
-
-  await build({ args: { '--dir': dir }, ...comps })
-
   if (options.args['--target'] && options.args['--target-content']) {
     throw new CliError(`You can't set both the 'target' and 'target-content' arguments.`)
   }
 
+  const sceneJson = await getValidSceneJson(options.components, projectRoot)
+  const coords = getBaseCoords(sceneJson)
+  const comps = { components: options.components }
+  const analyticsOpts = {
+    projectHash: await b64HashingFunction(projectRoot),
+    coords
+  }
+
+  await options.components.analytics.track('Scene deploy started', analyticsOpts)
+
+  if (!skipBuild) {
+    await npmRun(projectRoot, 'build')
+  }
+
+  await build({ args: { '--dir': projectRoot }, ...comps })
+
   // Obtain list of files to deploy
-  const files = await getFiles(options.components, dir)
+  const files = await getFiles(options.components, projectRoot)
 
   validateFilesSizes(files)
 
   const contentFiles = new Map(files.map((file) => [file.path, file.content]))
-  const sceneJson = await getValidSceneJson(options.components, dir)
 
   const { entityId, files: entityFiles } = await DeploymentBuilder.buildEntity({
     type: EntityType.SCENE,
@@ -135,6 +143,8 @@ export async function main(options: Options) {
     error('Could not upload content:')
     console.log(e)
   }
+
+  await options.components.analytics.track('Scene deploy success', analyticsOpts)
 }
 
 async function getCatalyst(target?: string, targetContent?: string) {
