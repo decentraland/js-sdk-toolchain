@@ -4,6 +4,9 @@ import { initKeyboard } from './input'
 // if NODE_ENV == development
 require('@babylonjs/inspector')
 
+const PARCEL_SIZE = 16
+const sunInclination = -0.31
+
 export namespace ambientConfigurations {
   // TODO: move this configurations inside EnvironmentHelper(options)
   export const groundColor = new BABYLON.Color3(0.1, 0.1, 0.1)
@@ -18,8 +21,6 @@ export namespace ambientConfigurations {
 
 export function initEngine(canvas: HTMLCanvasElement) {
   const babylon = new BABYLON.Engine(canvas, true, {
-    audioEngine: true,
-    autoEnableWebVR: true,
     deterministicLockstep: true,
     lockstepMaxSteps: 4,
     alpha: false,
@@ -55,13 +56,11 @@ export function initEngine(canvas: HTMLCanvasElement) {
   scene.setRenderingAutoClearDepthStencil(0, false)
   scene.setRenderingAutoClearDepthStencil(1, true, true, false)
 
-  canvas.style.width = '100%'
-  canvas.style.height = '100%'
-
   // scene.gravity = new BABYLON.Vector3(0, playerConfigurations.gravity, 0)
   // scene.enablePhysics(scene.gravity, new BABYLON.OimoJSPlugin(2))
   scene.audioEnabled = true
   scene.headphone = true
+  scene.fogEnabled = false
 
   scene.actionManager = new BABYLON.ActionManager(scene)
 
@@ -91,28 +90,32 @@ export function initEngine(canvas: HTMLCanvasElement) {
   BABYLON.Database.IDBStorageEnabled = true
   babylon.enableOfflineSupport = true
 
-  const camera = new BABYLON.ArcRotateCamera(
-    'editorCamera',
-    -Math.PI / 2,
-    Math.PI / 2.5,
-    15,
-    new BABYLON.Vector3(0, 0, 0)
-  )
-
-  camera.attachControl(canvas, true)
-
   const editorColor = BABYLON.Color3.FromHexString('#0e0c12')
   const editorEnvHelper = scene.createDefaultEnvironment({
     environmentTexture: void 0,
     groundColor: editorColor,
-    skyboxColor: editorColor
+    skyboxColor: editorColor,
+    skyboxSize: 200,
+    groundSize: 100
   })!
 
   editorEnvHelper!.ground!.position.y = 0
   editorEnvHelper!.rootMesh.position.y = -0.1
 
-  scene.fogEnabled = false
-  editorEnvHelper.ground!.visibility = 0
+  const camera = new BABYLON.ArcRotateCamera(
+    'editorCamera',
+    -Math.PI / 2,
+    Math.PI / 2.5,
+    15,
+    new BABYLON.Vector3(0, 0, 0),
+    scene
+  )
+
+  camera.lowerRadiusLimit = 3
+  camera.upperRadiusLimit = 15
+  scene.activeCamera?.detachControl()
+  camera.attachControl(canvas, true)
+  scene.activeCamera = camera
 
   const hemiLight = new BABYLON.HemisphericLight('default light', ambientConfigurations.sunPosition, scene)
 
@@ -122,7 +125,10 @@ export function initEngine(canvas: HTMLCanvasElement) {
 
   initKeyboard(scene, camera)
 
+  reposition(editorEnvHelper, hemiLight, camera)
+
   function update() {
+    reposition(editorEnvHelper, hemiLight, camera)
     scene.render()
   }
 
@@ -152,4 +158,29 @@ export function initEngine(canvas: HTMLCanvasElement) {
     highlightLayer,
     dispose
   }
+}
+
+function reposition(
+  envHelper: BABYLON.EnvironmentHelper,
+  hemiLight: BABYLON.HemisphericLight,
+  camera: BABYLON.ArcRotateCamera
+) {
+  // make the skybox follow the camera target
+  envHelper.rootMesh.position.set(camera.target.x, camera.target.y, camera.target.z)
+  // set the ground at 0 always
+  envHelper.ground!.position.set(0, -camera.target.y, 0)
+
+  const theta = Math.PI * sunInclination
+  const phi = Math.PI * -0.4
+
+  ambientConfigurations.sunPositionColor.r = ambientConfigurations.sunPosition.x = 500 * Math.cos(phi)
+  ambientConfigurations.sunPositionColor.g = ambientConfigurations.sunPosition.y = 500 * Math.sin(phi) * Math.sin(theta)
+  ambientConfigurations.sunPositionColor.b = ambientConfigurations.sunPosition.z = 500 * Math.sin(phi) * Math.cos(theta)
+
+  const sunfade = 1.0 - Math.min(Math.max(1.0 - Math.exp(ambientConfigurations.sunPosition.y / 10), 0.0), 0.9)
+  hemiLight.intensity = sunfade
+
+  hemiLight.diffuse.set(sunfade, sunfade, sunfade)
+  hemiLight.groundColor.copyFrom(ambientConfigurations.groundColor).scale(sunfade)
+  hemiLight.specular.copyFrom(ambientConfigurations.sunColor).scale(sunfade)
 }
