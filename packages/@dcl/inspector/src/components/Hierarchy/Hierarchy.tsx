@@ -8,7 +8,7 @@ type Props = {
 }
 
 const Hierarchy: React.FC<Props> = (_props) => {
-  const { tree, addChild, setParent, remove, rename } = useTree()
+  const { tree, addChild, setParent, remove, rename, toggle } = useTree()
   return (
     <>
       {tree.map((node) => (
@@ -19,6 +19,7 @@ const Hierarchy: React.FC<Props> = (_props) => {
           onSetParent={setParent}
           onRemove={remove}
           onRename={rename}
+          onToggle={toggle}
         />
       ))}
     </>
