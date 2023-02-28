@@ -1,8 +1,9 @@
-import { ByteBuffer, ComponentType, Engine, IEngine, Transport } from '@dcl/ecs'
+import { Engine } from '@dcl/ecs'
 import { Color4 } from '@dcl/ecs-math'
+import { AsyncQueue } from '@well-known-components/pushable-channel'
 import * as components from '@dcl/ecs/dist/components'
-import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { LoadableScene, SceneContext } from '../babylon/decentraland/SceneContext'
+import { DataLayerInterface } from '../data-layer'
 
 // this was taken verbatim from my deployed world at menduz.dcl.eth
 export function getHardcodedLoadableScene(_id: string): LoadableScene {
@@ -78,47 +79,14 @@ export function getHardcodedLoadableScene(_id: string): LoadableScene {
   }
 }
 
-export async function connectSceneContextToLocalEngine(ctx: SceneContext, engine: IEngine) {
-  // TODO: engine currently does not accept removing transports
+export async function connectSceneContextToLocalEngine(ctx: SceneContext, dataLayer: DataLayerInterface) {
+  const q = new AsyncQueue<Uint8Array>(() => {})
 
-  let enabled = true
-  const transport: Transport = {
-    filter() {
-      return enabled
-    },
-    async send(message) {
-      if (!enabled) return
-      const response = await ctx.receiveBatch([message])
-      for (const message of response) {
-        transport.onmessage?.call(transport, message)
-      }
+  for await (const message of dataLayer.createTransport(q)) {
+    for (const outgoingMessage of await ctx.receiveBatch([message])) {
+      q.enqueue(outgoingMessage)
     }
   }
-
-  engine.addTransport(transport)
-
-  function serializeEngine(engine: IEngine) {
-    const messages: ByteBuffer = new ReadWriteByteBuffer()
-
-    // TODO: add deleted entities
-
-    // add component values
-    for (const component of engine.componentsIter()) {
-      component.dumpCrdtState(messages)
-    }
-
-    return messages
-  }
-
-  // serialize initial state of the engine
-  await ctx.receiveBatch([serializeEngine(engine).toBinary()])
-
-  function dispose() {
-    transport.onmessage = undefined
-    enabled = false
-  }
-
-  return { dispose }
 }
 
 export function createSameThreadScene() {

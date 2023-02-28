@@ -11,18 +11,21 @@ import {
   getHardcodedLoadableScene,
   createSameThreadScene
 } from './lib/test-local-scene'
+import { getDataLayerRpc } from './lib/data-layer'
+
+const simulatedScene = createSameThreadScene()
+const dataLayer = getDataLayerRpc(simulatedScene)
 
 const App = () => {
-  return <Hierarchy />
+  return <Hierarchy dataLayer={dataLayer} />
 }
 
 async function initScene() {
   const canvas = document.getElementById('renderer') as HTMLCanvasElement // Get the canvas element
   const { babylon, scene } = initEngine(canvas)
 
-  await scene.debugLayer.show({ showExplorer: true, embedMode: true })
+  // await scene.debugLayer.show({ showExplorer: true, embedMode: true })
 
-  const simulatedScene = createSameThreadScene()
   const ctx = new SceneContext(
     babylon,
     scene,
@@ -31,9 +34,9 @@ async function initScene() {
 
   ctx.rootNode.position.set(0, 0, 0)
 
-  await simulatedScene.update(babylon.getDeltaTime() / 1000)
+  await simulatedScene.update(0.0)
 
-  await connectSceneContextToLocalEngine(ctx, simulatedScene)
+  await connectSceneContextToLocalEngine(ctx, dataLayer)
 
   // babylon.onEndFrameObservable.add(async () => {
   //   await simulatedScene.update(babylon.getDeltaTime() / 1000)
