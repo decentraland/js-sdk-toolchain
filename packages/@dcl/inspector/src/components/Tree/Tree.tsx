@@ -30,7 +30,7 @@ const canDrop = (target: Node, source: Node): boolean => {
   return target.children.every(($) => canDrop($, source))
 }
 
-const Tree: React.FC<Props> = (props) => {
+function Tree(props: Props) {
   const { value, onSetParent, onRename, onAddChild, onRemove, onToggle } = props
   const { children, id, label, open } = value
   const [editMode, setEditMode] = useState(false)

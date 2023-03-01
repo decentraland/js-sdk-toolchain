@@ -1,5 +1,3 @@
-import * as BABYLON from '@babylonjs/core'
-
 import { Billboard, ComponentDefinition, GltfContainer, MeshRenderer, PointerEvents } from '@dcl/ecs'
 import { Transform } from '@dcl/ecs'
 import { EcsEntity } from './EcsEntity'

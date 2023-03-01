@@ -64,7 +64,7 @@ export const putMeshRendererComponent: ComponentOperation = (entity, component) 
 
       entity.meshRenderer = mesh
       entity.meshRenderer.parent = entity
-    } else if (newValue?.mesh?.$case == 'plane') {
+    } else if (newValue?.mesh?.$case === 'plane') {
       const mesh = MeshBuilder.CreatePlane('plane-shape', {
         width: 1,
         height: 1,

@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { useTree } from '../../hooks/sdk/tree'
-import { DataLayerInterface } from '../../lib/data-layer'
+import { InspectorEngine } from '../../lib/sdk/engine'
 import { Tree } from '../Tree'
 
 type Props = {
-  dataLayer: DataLayerInterface
+  inspectorEngine: InspectorEngine
 }
 
-const Hierarchy: React.FC<Props> = (_props) => {
-  const { tree, addChild, setParent, remove, rename, toggle } = useTree()
+const Hierarchy: React.FC<Props> = (props) => {
+  const { tree, addChild, setParent, remove, rename, toggle } = useTree(props.inspectorEngine)
   return (
     <>
       {tree.map((node) => (

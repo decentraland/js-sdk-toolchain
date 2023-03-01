@@ -1,7 +1,7 @@
 import { Entity } from '@dcl/ecs'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Node } from '../../components/Tree'
-import { engine, Label, Toggle, Transform } from '../../lib/sdk/engine'
+import { InspectorEngine } from '../../lib/sdk/engine'
 
 type LinkedNode = {
   entity: number
@@ -31,7 +31,9 @@ const toTree = (linkedTree: LinkedNode[], parent: number = 0): Node[] =>
  * Returns a tree of entities
  * @returns
  */
-const getTree = () => {
+const getTree = (inspectorEngine: InspectorEngine) => {
+  const { engine, customComponents, sdkComponents } = inspectorEngine
+
   // We build a linked tree first because it's easier to build by looping the engine state
   const linkedTree: LinkedNode[] = [{ entity: 0, parent: 0 }]
 
@@ -52,18 +54,18 @@ const getTree = () => {
       }
       // Get the label of the entity if it has one
       let label: string | undefined
-      if (Label.has(entity)) {
-        label = Label.get(entity).label
+      if (customComponents.Label.has(entity)) {
+        label = customComponents.Label.get(entity).label
       }
       // Get toggle of the entity if any
       let open: boolean | undefined
-      if (Toggle.has(entity)) {
+      if (customComponents.Toggle.has(entity)) {
         open = true
       }
 
       // When the entitiy has a transform, we created a linked node pointing to the parent
-      if (Transform.has(entity)) {
-        const transform = Transform.get(entity)
+      if (sdkComponents.Transform.has(entity)) {
+        const transform = sdkComponents.Transform.get(entity)
         const parent = transform.parent || 0
         // If the parent has already been processed we link to it
         if (processed.has(parent)) {
@@ -101,34 +103,50 @@ const getTree = () => {
   return toTree(linkedTree)
 }
 
-export const useTree = () => {
-  const [tree, setTree] = useState(getTree())
+export const useTree = (inspectorEngine: InspectorEngine) => {
+  const [tree, setTree] = useState(getTree(inspectorEngine))
+
+  const { engine, customComponents, sdkComponents } = inspectorEngine
 
   const update = async () => {
-    await engine.update(0)
-    setTree(getTree())
+    setTree(getTree(inspectorEngine))
   }
+
+  useEffect(() => {
+    const updateTreeInterval = setInterval(() => {
+      // this engine.update
+      // 1) flushes all the transport incoming messages from the DataLayer
+      // 2) cleans the local dirty state and sends it to the data DataLayer
+      // we keep it here for convenience, it should be reactive.. maybe using onChangeFunction
+      void engine.update(0)
+    }, 16)
+    engine.addSystem(update, -Infinity)
+    return () => {
+      clearInterval(updateTreeInterval)
+      engine.removeSystem(update)
+    }
+  }, [engine])
 
   const addChild = async (id: string, label: string) => {
     const parent = Number(id) as Entity
     const child = engine.addEntity()
-    Transform.create(child, { parent })
-    Label.create(child, { label })
+    sdkComponents.Transform.create(child, { parent })
+    customComponents.Label.create(child, { label })
     await update()
   }
 
   const setParent = async (id: string, newParentId: string | null) => {
     const entity = Number(id) as Entity
     const parent = Number(newParentId) as Entity
-    const transform = Transform.getMutable(entity)
+    const transform = sdkComponents.Transform.getMutable(entity)
     transform.parent = parent
-    Toggle.createOrReplace(parent)
+    customComponents.Toggle.createOrReplace(parent)
     await update()
   }
 
   const rename = async (id: string, label: string) => {
     const entity = Number(id) as Entity
-    Label.createOrReplace(entity, { label })
+    customComponents.Label.createOrReplace(entity, { label })
     await update()
   }
 
@@ -141,9 +159,9 @@ export const useTree = () => {
   const toggle = async (id: string, open: boolean) => {
     const entity = Number(id) as Entity
     if (open) {
-      Toggle.createOrReplace(entity)
+      customComponents.Toggle.createOrReplace(entity)
     } else {
-      Toggle.deleteFrom(entity)
+      customComponents.Toggle.deleteFrom(entity)
     }
     await update()
   }
