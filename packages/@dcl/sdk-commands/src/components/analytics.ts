@@ -30,6 +30,14 @@ type Events = {
     projectHash: string
     coords: { x: number; y: number }
   }
+  'Scene deploy started': {
+    projectHash: string
+    coords: { x: number; y: number }
+  }
+  'Scene deploy success': {
+    projectHash: string
+    coords: { x: number; y: number }
+  }
 }
 
 export async function createAnalyticsComponent({
