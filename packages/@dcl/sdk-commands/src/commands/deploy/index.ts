@@ -6,7 +6,6 @@ import { hexToBytes } from 'eth-connect'
 import { ethSign } from '@dcl/crypto/dist/crypto'
 
 import { CliComponents } from '../../components'
-import { main as build } from '../build'
 import { IFile, getBaseCoords, getFiles, getValidSceneJson, validateFilesSizes } from '../../logic/scene-validations'
 import { getArgs } from '../../logic/args'
 import { npmRun } from '../../logic/project-validations'
@@ -75,7 +74,6 @@ export async function main(options: Options) {
 
   const sceneJson = await getValidSceneJson(options.components, projectRoot)
   const coords = getBaseCoords(sceneJson)
-  const comps = { components: options.components }
   const analyticsOpts = {
     projectHash: await b64HashingFunction(projectRoot),
     coords
@@ -86,8 +84,6 @@ export async function main(options: Options) {
   if (!skipBuild) {
     await npmRun(projectRoot, 'build')
   }
-
-  await build({ args: { '--dir': projectRoot }, ...comps })
 
   // Obtain list of files to deploy
   const files = await getFiles(options.components, projectRoot)
