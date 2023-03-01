@@ -78,7 +78,7 @@ function reparentEntity(entity: EcsEntity) {
   const parentEntityId: Entity | undefined = entity.ecsComponentValues.transform?.parent
 
   if (context) {
-    if (entity.parent && (entity.parent as any)['entityId'] == parentEntityId) return
+    if (entity.parent && (entity.parent as EcsEntity).entityId === parentEntityId) return
     if (!parentEntityId) {
       // parent with the scene root
       entity.parent = context.rootNode

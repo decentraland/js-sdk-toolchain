@@ -1,9 +1,7 @@
 import { Engine } from '@dcl/ecs'
-import { Color4 } from '@dcl/ecs-math'
-import { AsyncQueue } from '@well-known-components/pushable-channel'
+import { Quaternion, Vector3 } from '@dcl/ecs-math'
 import * as components from '@dcl/ecs/dist/components'
-import { LoadableScene, SceneContext } from '../babylon/decentraland/SceneContext'
-import { DataLayerInterface } from '../data-layer'
+import { LoadableScene } from '../babylon/decentraland/SceneContext'
 
 // this was taken verbatim from my deployed world at menduz.dcl.eth
 export function getHardcodedLoadableScene(_id: string): LoadableScene {
@@ -79,22 +77,11 @@ export function getHardcodedLoadableScene(_id: string): LoadableScene {
   }
 }
 
-export async function connectSceneContextToLocalEngine(ctx: SceneContext, dataLayer: DataLayerInterface) {
-  const q = new AsyncQueue<Uint8Array>(() => {})
-
-  for await (const message of dataLayer.createTransport(q)) {
-    for (const outgoingMessage of await ctx.receiveBatch([message])) {
-      q.enqueue(outgoingMessage)
-    }
-  }
-}
-
 export function createSameThreadScene() {
   // create engine and its components
   const engine = Engine()
   const Billboard = components.Billboard(engine)
   const Transform = components.Transform(engine)
-  const Material = components.Material(engine)
   const MeshRenderer = components.MeshRenderer(engine)
   const GltfContainer = components.GltfContainer(engine)
   const TextShape = components.TextShape(engine)
@@ -183,61 +170,36 @@ export function createSameThreadScene() {
 
     Billboard.create(sign, {})
 
-    for (let x = 0.5; x < 16; x += 1) {
-      for (let y = 0.5; y < 16; y += 1) {
+    for (let x = 0.5; x < 4; x += 1) {
+      for (let y = 0.5; y < 4; y += 1) {
         createCube(x, 0, y)
       }
     }
   }
 
-  let hoverState: number = 0
+  const entitiesWithBoxShapes = engine.getEntitiesWith(MeshRenderer, Transform)
 
-  function CircleHoverSystem(dt: number) {
-    hoverState += Math.PI * dt * 0.5
-
-    const entitiesWithBoxShapes = engine.getEntitiesWith(MeshRenderer, Transform)
-
-    // iterate over the entities of the group
-    for (const [entity] of entitiesWithBoxShapes) {
-      const transform = Transform.getMutable(entity)
-
-      // mutate the rotation
-      transform.position.y =
-        Math.cos(
-          hoverState +
-            Math.sqrt(Math.pow(transform.position.x - 8, 2) + Math.pow(transform.position.z - 8, 2)) / Math.PI
-        ) *
-          2 +
-        2
-    }
-  }
-
-  let totalTime: number = 0
-  let color = true
-
-  function MaterialChangerSystem(dt: number) {
-    totalTime += dt
-
-    while (totalTime > 1) {
-      totalTime -= 1
-      color = !color
-    }
-
-    const entitiesWithBoxShapes = engine.getEntitiesWith(MeshRenderer, Transform)
-
-    // iterate over the entities of the group
-    for (const [entity] of entitiesWithBoxShapes) {
-      Material.setPbrMaterial(entity, {
-        albedoColor: color ? Color4.Blue() : Color4.Green()
-      })
-      const { scale } = Transform.getMutable(entity)
-      scale.x = scale.y = scale.z = color ? 0.5 : 1
-    }
-  }
-
+  // create initial cubes
   spawnCubes()
-  engine.addSystem(CircleHoverSystem)
-  engine.addSystem(MaterialChangerSystem)
+
+  // iterate over the entities of the group to set the initial position
+  for (const [entity] of entitiesWithBoxShapes) {
+    const transform = Transform.getMutable(entity)
+
+    // mutate the rotation
+    transform.position.y =
+      Math.cos(Math.sqrt(Math.pow(transform.position.x - 8, 2) + Math.pow(transform.position.z - 8, 2)) / Math.PI) * 2 +
+      2
+
+    transform.scale.x =
+      transform.scale.y =
+      transform.scale.z =
+        Math.sin(Math.sqrt(Math.pow(transform.position.x - 2, 2) + Math.pow(transform.position.z - 8, 2)) / Math.PI) *
+          0.5 +
+        0.5
+
+    transform.rotation = Quaternion.fromAngleAxis(transform.position.z * 10, Vector3.Up())
+  }
 
   return engine
 }

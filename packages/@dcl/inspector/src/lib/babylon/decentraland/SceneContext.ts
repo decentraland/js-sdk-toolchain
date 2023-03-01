@@ -1,9 +1,10 @@
 import * as Schemas from '@dcl/schemas'
-import { ComponentDefinition, CrdtMessageType, Engine, Entity, Transport } from '@dcl/ecs'
+import { ComponentDefinition, CrdtMessageType, Engine, Entity } from '@dcl/ecs'
 import { EcsEntity } from './EcsEntity'
 import * as components from '@dcl/ecs/dist/components'
-import future, { IFuture } from 'fp-future'
+import future from 'fp-future'
 import * as BABYLON from '@babylonjs/core'
+import { createBetterTransport } from '../../data-layer/transport'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -35,60 +36,14 @@ export class SceneContext {
   TextShape = components.TextShape(this.engine)
   PointerEvents = components.PointerEvents(this.engine)
 
-  transport: Transport
-
-  /**
-   * messages that will go to the original engine
-   * @ADR https://adr.decentraland.org/adr/ADR-148
-   */
-  outMessages: Uint8Array[] = []
-  /**
-   * incoming messages from other engines
-   * @ADR https://adr.decentraland.org/adr/ADR-148
-   */
-  incomingMessages: Uint8Array[] = []
-  /**
-   * promises for the next frame update. it is resolved after the engine fully
-   * processed the incoming messages and outgoing changes. the promises are
-   * resolved using the messages that were sent to the transport during
-   * the frame
-   * @ADR https://adr.decentraland.org/adr/ADR-148
-   */
-  nextFrameFutures: Array<IFuture<Uint8Array[]>> = []
-
   // this future is resolved when the scene is disposed
   readonly stopped = future<void>()
 
+  readonly transport = createBetterTransport(this.engine)
+
   constructor(public babylon: BABYLON.Engine, public scene: BABYLON.Scene, public loadableScene: LoadableScene) {
     this.rootNode = new EcsEntity(0 as Entity, this.#weakThis, scene)
-    this.transport = {
-      filter() {
-        return true
-      },
-      send: async (message: Uint8Array) => {
-        if (message.length) {
-          this.outMessages.push(message)
-        }
-      }
-    }
-    this.engine.addTransport(this.transport)
-
     babylon.onEndFrameObservable.add(this.update)
-  }
-
-  /**
-   * Receive all the messages from other CRDT engine. It returns a promise with
-   * the serialized state changes for the other engine, like camera position.
-   *
-   * @ADR https://adr.decentraland.org/adr/ADR-148
-   */
-  async receiveBatch(batch: Uint8Array[]): Promise<Uint8Array[]> {
-    this.incomingMessages.push(...batch)
-
-    // create a promise for the next frame processing
-    const fut = future<Uint8Array[]>()
-    this.nextFrameFutures.push(fut)
-    return fut
   }
 
   private processEcsChange(entityId: Entity, op: CrdtMessageType, component?: ComponentDefinition<any>) {
@@ -152,30 +107,13 @@ export class SceneContext {
   }
 
   readonly update = async () => {
-    // copy the array and clean the incoming messages to prevent information loss
-    const inMessages = this.incomingMessages.splice(0)
-
-    // first process all the messages as per ADR-148
-    for (const message of inMessages) {
-      this.transport.onmessage?.call(null, message)
-    }
-
     // update the engine
     await this.engine.update(this.babylon.getDeltaTime() / 1000)
-
-    // collect updates and clean outMessages
-    const updates = this.outMessages.splice(0)
-
-    // finally resolve the future so the function "receiveBatch" is unblocked
-    // and the next scripting frame is allowed to happen
-    this.nextFrameFutures.forEach((fut) => fut.resolve(updates))
-
-    // finally clean the futures
-    this.nextFrameFutures.length = 0
   }
 
   dispose() {
     this.stopped.resolve()
+    this.transport.dispose()
     for (const [entityId] of this.#entities) {
       this.removeEntity(entityId)
     }

@@ -1,5 +1,5 @@
-import { IEngine, ByteBuffer } from "@dcl/ecs"
-import { ReadWriteByteBuffer } from "@dcl/ecs/dist/serialization/ByteBuffer"
+import { IEngine, ByteBuffer } from '@dcl/ecs'
+import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 
 export function serializeEngine(engine: IEngine) {
   const messages: ByteBuffer = new ReadWriteByteBuffer()

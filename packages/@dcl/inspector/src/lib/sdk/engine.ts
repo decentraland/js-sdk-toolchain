@@ -1,23 +1,50 @@
-import { Engine, Schemas } from '@dcl/ecs'
+import { Engine, IEngine, TransformComponentExtended, Transport } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
+import { DataLayerInterface } from '../data-layer'
+import { AsyncQueue } from '@well-known-components/pushable-channel'
+import { consumeAllMessagesInto } from '../logic/consume-stream'
+import { createEditorComponents, EditorComponents } from './components'
 
-const engine = Engine()
+export type InspectorEngine = {
+  engine: IEngine
+  customComponents: EditorComponents
+  sdkComponents: {
+    Transform: TransformComponentExtended
+  }
+  dispose(): void
+}
 
-const Transform = components.Transform(engine)
-const Label = engine.defineComponent('inspector::Label', {
-  label: Schemas.String
-})
-const Toggle = engine.defineComponent('inspector::Toggle', {})
+export function createInspectorEngine(dataLayer: DataLayerInterface): InspectorEngine {
+  const engine = Engine()
 
-const root = engine.addEntity()
-Transform.create(root, { position: { x: 8, y: 0, z: 8 } })
+  const Transform = components.Transform(engine)
 
-const childA = engine.addEntity()
-Transform.create(childA, { parent: root, position: { x: 1, y: 1, z: 0 } })
+  // <HERE BE DRAGONS (TRANSPORT)>
+  const outgoingMessagesStream = new AsyncQueue<Uint8Array>((_, _action) => {})
+  const transport: Transport = {
+    filter() {
+      return !outgoingMessagesStream.closed
+    },
+    async send(message) {
+      if (outgoingMessagesStream.closed) return
+      outgoingMessagesStream.enqueue(message)
+    }
+  }
+  engine.addTransport(transport)
+  void consumeAllMessagesInto(
+    dataLayer.getEngineUpdates(outgoingMessagesStream),
+    transport.onmessage!,
+    outgoingMessagesStream.close
+  )
+  function dispose() {
+    outgoingMessagesStream.close()
+  }
+  // </HERE BE DRAGONS (TRANSPORT)>
 
-const childB = engine.addEntity()
-Transform.create(childB, { parent: root, position: { x: 0, y: 1, z: 1 } })
-
-void engine.update(0)
-
-export { engine, Transform, Label, Toggle }
+  return {
+    engine,
+    customComponents: createEditorComponents(engine),
+    sdkComponents: { Transform },
+    dispose
+  }
+}
