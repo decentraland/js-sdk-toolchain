@@ -5,6 +5,13 @@ import * as components from '@dcl/ecs/dist/components'
 import future from 'fp-future'
 import * as BABYLON from '@babylonjs/core'
 import { createBetterTransport } from '../../data-layer/transport'
+import { createEditorComponents } from '../../sdk/components'
+import { ComponentOperation } from './component-operations'
+import { putBillboardComponent } from './sdkComponents/billboard'
+import { putGltfContaierComponent } from './sdkComponents/gltf-container'
+import { putMeshRendererComponent } from './sdkComponents/mesh-renderer'
+import { putTransformComponent } from './sdkComponents/transform'
+import { putEntitySelectedComponent } from './editorComponents/entitySelected'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -23,7 +30,8 @@ export class SceneContext {
   }
 
   engine = Engine({
-    onChangeFunction: (entity, op, component) => {
+    onChangeFunction: (entity, op, component, value) => {
+      console.log(entity, op, component, value)
       this.processEcsChange(entity, op, component)
     }
   })
@@ -34,7 +42,16 @@ export class SceneContext {
   MeshRenderer = components.MeshRenderer(this.engine)
   GltfContainer = components.GltfContainer(this.engine)
   TextShape = components.TextShape(this.engine)
-  PointerEvents = components.PointerEvents(this.engine)
+
+  readonly editorComponents = createEditorComponents(this.engine)
+
+  readonly componentPutOperations: Record<number, ComponentOperation> = {
+    [this.Transform.componentId]: putTransformComponent,
+    [this.MeshRenderer.componentId]: putMeshRendererComponent,
+    [this.Billboard.componentId]: putBillboardComponent,
+    [this.GltfContainer.componentId]: putGltfContaierComponent,
+    [this.editorComponents.EntitySelected.componentId]: putEntitySelectedComponent
+  }
 
   // this future is resolved when the scene is disposed
   readonly stopped = future<void>()

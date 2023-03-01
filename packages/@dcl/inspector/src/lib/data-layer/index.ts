@@ -48,6 +48,7 @@ export function getDataLayerRpc(engine: IEngine): DataLayerInterface {
           queue.enqueue(message)
         }
       }
+      Object.assign(transport, { name: 'DataLayerHost' })
       engine.addTransport(transport)
 
       // and lastly wire the new messages from the iterator to the

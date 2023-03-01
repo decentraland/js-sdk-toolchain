@@ -3,7 +3,6 @@ import { ComponentType, PBMeshRenderer } from '@dcl/ecs'
 import { memoize } from '../../../logic/once'
 import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
-import { isEntityPickable } from './pointer-events'
 import * as BABYLON from '@babylonjs/core'
 
 const baseBox = memoize((scene: BABYLON.Scene) => {
@@ -84,7 +83,9 @@ export const putMeshRendererComponent: ComponentOperation = (entity, component) 
 
     // make the renderer interactable only if the entity is Pickable
     if (entity.meshRenderer) {
-      entity.meshRenderer.isPickable = isEntityPickable(entity)
+      entity.meshRenderer.isPickable = true
+      entity.meshRenderer.showBoundingBox =
+        entity.context.deref()?.editorComponents.EntitySelected.has(entity.entityId) || false
     }
   }
 }

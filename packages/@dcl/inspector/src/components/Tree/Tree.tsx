@@ -11,6 +11,7 @@ export type Node = {
   children: Node[]
   label?: string
   open?: boolean
+  selected: boolean
 }
 
 export type Props = {
@@ -32,7 +33,7 @@ const canDrop = (target: Node, source: Node): boolean => {
 
 function Tree(props: Props) {
   const { value, onSetParent, onRename, onAddChild, onRemove, onToggle } = props
-  const { children, id, label, open } = value
+  const { children, id, label, open, selected } = value
   const [editMode, setEditMode] = useState(false)
   const [insertMode, setInsertMode] = useState(false)
 
@@ -88,6 +89,7 @@ function Tree(props: Props) {
       <li>
         <div>
           <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
+            {selected ? '@' : ''}
             {label || id}{' '}
             <Controls handleEdit={handleToggleEdit} handleNewChild={handleNewChild} handleRemove={handleRemove} />
           </span>

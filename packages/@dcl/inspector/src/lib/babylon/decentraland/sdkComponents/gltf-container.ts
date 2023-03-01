@@ -6,7 +6,6 @@ import { markAsCollider } from '../colliders-utils'
 import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
 import { SceneContext } from '../SceneContext'
-import { isEntityPickable } from './pointer-events'
 
 const sceneContextMap = new Map<string /*sceneId*/, WeakRef<SceneContext>>()
 
@@ -249,7 +248,7 @@ function processColliders($: BABYLON.AssetContainer, entity: EcsEntity) {
       mesh.isPickable = false
       markAsCollider(mesh)
     } else {
-      mesh.isPickable = isEntityPickable(entity)
+      mesh.isPickable = true
     }
   }
 }

@@ -1,7 +1,7 @@
-import { IEngine } from '@dcl/ecs'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
 import { DataLayerInterface } from '.'
 import { SceneContext } from '../babylon/decentraland/SceneContext'
+import { serializeCrdtMessages } from './serialize-engine'
 
 export type BidirectionalEngineStream = (
   stream: AsyncIterable<Uint8Array>
@@ -13,9 +13,15 @@ export async function connectSceneContextToLocalEngine(ctx: SceneContext, dataLa
   })
 
   for await (const message of dataLayer.getEngineUpdates(outgoingMessages)) {
-    // console.log('SCENE Receiving from datalayer', message)
+    // if (message.byteLength) console.log('SCENE Receiving from datalayer', message)
+    if (message.byteLength) {
+      Array.from(serializeCrdtMessages('Datalayer>SceneContext', message, ctx.engine)).forEach(($) => console.log($))
+    }
     const res = await ctx.transport.receiveBatch(message)
     // if (res.byteLength) console.log('SCENE Sending to datalayer', res)
+    if (res.byteLength) {
+      Array.from(serializeCrdtMessages('SceneContext>Datalayer', res, ctx.engine)).forEach(($) => console.log($))
+    }
     outgoingMessages.enqueue(res)
   }
 }

@@ -4,10 +4,11 @@ import { DataLayerInterface } from '../data-layer'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
 import { consumeAllMessagesInto } from '../logic/consume-stream'
 import { createEditorComponents, EditorComponents } from './components'
+import { serializeCrdtMessages } from '../data-layer/serialize-engine'
 
 export type InspectorEngine = {
   engine: IEngine
-  customComponents: EditorComponents
+  editorComponents: EditorComponents
   sdkComponents: {
     Transform: TransformComponentExtended
   }
@@ -28,8 +29,12 @@ export function createInspectorEngine(dataLayer: DataLayerInterface): InspectorE
     async send(message) {
       if (outgoingMessagesStream.closed) return
       outgoingMessagesStream.enqueue(message)
+      if (message.byteLength) {
+        Array.from(serializeCrdtMessages('Inspector>Datalayer', message, engine)).forEach(($) => console.log($))
+      }
     }
   }
+  Object.assign(transport, { name: 'InspectorTransportClient' })
   engine.addTransport(transport)
   void consumeAllMessagesInto(
     dataLayer.getEngineUpdates(outgoingMessagesStream),
@@ -43,7 +48,7 @@ export function createInspectorEngine(dataLayer: DataLayerInterface): InspectorE
 
   return {
     engine,
-    customComponents: createEditorComponents(engine),
+    editorComponents: createEditorComponents(engine),
     sdkComponents: { Transform },
     dispose
   }

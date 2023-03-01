@@ -1,8 +1,7 @@
 import * as BABYLON from '@babylonjs/core'
 import { ComponentDefinition, Entity, PBGltfContainer, PBMeshRenderer, PBPointerEvents, TransformType } from '@dcl/ecs'
-import { componentPutOperations } from './component-operations'
 import { SceneContext } from './SceneContext'
-import { createDefaultTransform } from './components/transform'
+import { createDefaultTransform } from './sdkComponents/transform'
 
 export type EcsComponents = Partial<{
   transform: TransformType
@@ -28,12 +27,12 @@ export class EcsEntity extends BABYLON.TransformNode {
 
   putComponent(component: ComponentDefinition<unknown>) {
     this.usedComponents.set(component.componentId, component)
-    componentPutOperations[component.componentId]?.call(null, this, component)
+    this.context.deref()!.componentPutOperations[component.componentId]?.call(null, this, component)
   }
 
   deleteComponent(component: ComponentDefinition<unknown>) {
     this.usedComponents.delete(component.componentId)
-    componentPutOperations[component.componentId]?.call(null, this, component)
+    this.context.deref()!.componentPutOperations[component.componentId]?.call(null, this, component)
   }
 
   /**
