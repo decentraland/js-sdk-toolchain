@@ -16,7 +16,7 @@ type LinkedNode = {
  * @param parent
  * @returns
  */
-const toTree = (linkedTree: LinkedNode[], parent: number = 0): Node[] =>
+const toTree = (engine: InspectorEngine, linkedTree: LinkedNode[], parent: number = 0): Node[] =>
   linkedTree
     .filter((node) => node.entity !== parent && node.parent === parent)
     .map<Node>((node) => ({
@@ -24,7 +24,8 @@ const toTree = (linkedTree: LinkedNode[], parent: number = 0): Node[] =>
       value: node.entity,
       label: node.label,
       open: node.open,
-      children: toTree(linkedTree, node.entity)
+      selected: engine.editorComponents.EntitySelected.has(node.entity as Entity),
+      children: toTree(engine, linkedTree, node.entity)
     }))
 
 /**
@@ -32,7 +33,7 @@ const toTree = (linkedTree: LinkedNode[], parent: number = 0): Node[] =>
  * @returns
  */
 const getTree = (inspectorEngine: InspectorEngine) => {
-  const { engine, customComponents, sdkComponents } = inspectorEngine
+  const { engine, editorComponents, sdkComponents } = inspectorEngine
 
   // We build a linked tree first because it's easier to build by looping the engine state
   const linkedTree: LinkedNode[] = [{ entity: 0, parent: 0 }]
@@ -54,12 +55,12 @@ const getTree = (inspectorEngine: InspectorEngine) => {
       }
       // Get the label of the entity if it has one
       let label: string | undefined
-      if (customComponents.Label.has(entity)) {
-        label = customComponents.Label.get(entity).label
+      if (editorComponents.Label.has(entity)) {
+        label = editorComponents.Label.get(entity).label
       }
       // Get toggle of the entity if any
       let open: boolean | undefined
-      if (customComponents.Toggle.has(entity)) {
+      if (editorComponents.Toggle.has(entity)) {
         open = true
       }
 
@@ -100,13 +101,13 @@ const getTree = (inspectorEngine: InspectorEngine) => {
     }
   }
   // Now we convert the linked tree into an actual tree and return it
-  return toTree(linkedTree)
+  return toTree(inspectorEngine, linkedTree)
 }
 
 export const useTree = (inspectorEngine: InspectorEngine) => {
   const [tree, setTree] = useState(getTree(inspectorEngine))
 
-  const { engine, customComponents, sdkComponents } = inspectorEngine
+  const { engine, editorComponents, sdkComponents } = inspectorEngine
 
   const update = async () => {
     setTree(getTree(inspectorEngine))
@@ -131,7 +132,7 @@ export const useTree = (inspectorEngine: InspectorEngine) => {
     const parent = Number(id) as Entity
     const child = engine.addEntity()
     sdkComponents.Transform.create(child, { parent })
-    customComponents.Label.create(child, { label })
+    editorComponents.Label.create(child, { label })
     await update()
   }
 
@@ -140,13 +141,13 @@ export const useTree = (inspectorEngine: InspectorEngine) => {
     const parent = Number(newParentId) as Entity
     const transform = sdkComponents.Transform.getMutable(entity)
     transform.parent = parent
-    customComponents.Toggle.createOrReplace(parent)
+    editorComponents.Toggle.createOrReplace(parent)
     await update()
   }
 
   const rename = async (id: string, label: string) => {
     const entity = Number(id) as Entity
-    customComponents.Label.createOrReplace(entity, { label })
+    editorComponents.Label.createOrReplace(entity, { label })
     await update()
   }
 
@@ -158,10 +159,18 @@ export const useTree = (inspectorEngine: InspectorEngine) => {
 
   const toggle = async (id: string, open: boolean) => {
     const entity = Number(id) as Entity
+
+    for (const [e] of engine.getEntitiesWith(editorComponents.EntitySelected)) {
+      if (e !== entity) {
+        editorComponents.EntitySelected.deleteFrom(e)
+      }
+    }
+    editorComponents.EntitySelected.createOrReplace(entity, { gizmo: 1 })
+
     if (open) {
-      customComponents.Toggle.createOrReplace(entity)
+      editorComponents.Toggle.createOrReplace(entity)
     } else {
-      customComponents.Toggle.deleteFrom(entity)
+      editorComponents.Toggle.deleteFrom(entity)
     }
     await update()
   }

@@ -17,7 +17,7 @@ async function initScene() {
 
   // await scene.debugLayer.show({ showExplorer: true, embedMode: true })
 
-  // initialize datalayer
+  // initialize DataLayer
   const simulatedScene = createSameThreadScene()
   const dataLayer = getDataLayerRpc(simulatedScene)
 

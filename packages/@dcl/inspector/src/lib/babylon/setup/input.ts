@@ -1,4 +1,5 @@
 import * as BABYLON from '@babylonjs/core'
+import { EcsEntity } from '../decentraland/EcsEntity'
 
 /**
  * This is a map of keys (see enum Keys): boolean
@@ -79,6 +80,18 @@ export function initKeyboard(scene: BABYLON.Scene, camera: BABYLON.ArcRotateCame
       }
     }
   })
+
+  scene.onPointerObservable.add((e) => {
+    if (e.type === BABYLON.PointerEventTypes.POINTERDOWN) {
+      const evt = e.event as PointerEvent
+      scene.getEngine().getRenderingCanvas()!.focus()
+      interactWithScene(scene, 'pointerDown', evt.offsetX, evt.offsetY, evt.pointerId)
+    } else if (e.type === BABYLON.PointerEventTypes.POINTERUP) {
+      const evt = e.event as PointerEvent
+
+      interactWithScene(scene, 'pointerUp', evt.offsetX, evt.offsetY, evt.pointerId)
+    }
+  })
 }
 
 function moveCamera(camera: BABYLON.ArcRotateCamera, directionRotation: BABYLON.Quaternion, speed: number) {
@@ -115,11 +128,15 @@ function applyQuaternion(v: BABYLON.Vector3, q: BABYLON.Quaternion) {
   return v
 }
 
-function findParentEntity<T extends BABYLON.Node & { isDCLEntity?: boolean }>(node: T): any | null {
+function isEcsEntity(x: any): x is EcsEntity {
+  return 'isDCLEntity' in x
+}
+
+function findParentEntity<T extends BABYLON.Node & { isDCLEntity?: boolean }>(node: T): EcsEntity | null {
   // Find the next entity parent to dispatch the event
   let parent: BABYLON.Node | null = node.parent
 
-  while (parent && !('isDCLEntity' in parent)) {
+  while (parent && !isEcsEntity(parent)) {
     parent = parent.parent
 
     // If the element has no parent, stop execution
@@ -142,13 +159,25 @@ export function interactWithScene(
 
   const entity = mesh && findParentEntity(mesh)
 
-  if (entity) {
-    // entity.handleClick(pointerEvent, pointerId, pickingResult!)
-  } else {
-    // for (let [, scene] of loadedSceneWorkers) {
-    //   if (scene.parcelScene instanceof WebGLScene) {
-    //     scene.parcelScene.context.sendPointerEvent(pointerEvent, pointerId, null as any, pickingResult!)
-    //   }
-    // }
+  if (entity && pointerEvent === 'pointerDown') {
+    const context = entity.context.deref()!
+
+    // clean selection
+    const { EntitySelected } = context.editorComponents
+    for (const [e] of context.engine.getEntitiesWith(EntitySelected)) {
+      if (e !== entity.entityId) {
+        EntitySelected.deleteFrom(e)
+      }
+    }
+
+    // then select new
+    if (entity.entityId) {
+      if (!EntitySelected.has(entity.entityId)) {
+        EntitySelected.createOrReplace(entity.entityId, { gizmo: 0 })
+      }
+      const mut = EntitySelected.getMutable(entity.entityId)
+      mut.gizmo++
+      mut.gizmo %= 3
+    }
   }
 }

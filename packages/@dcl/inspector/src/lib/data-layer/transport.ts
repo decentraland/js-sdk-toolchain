@@ -32,6 +32,7 @@ export function createBetterTransport(engine: IEngine) {
       }
     }
   }
+  Object.assign(transport, { name: 'BetterTransport' })
 
   function processIncomingMessages() {
     // copy the array and clean the incoming messages to prevent information loss
