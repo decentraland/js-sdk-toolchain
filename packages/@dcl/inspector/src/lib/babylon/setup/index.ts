@@ -4,7 +4,6 @@ import { initKeyboard } from './input'
 // if NODE_ENV == development
 require('@babylonjs/inspector')
 
-const PARCEL_SIZE = 16
 const sunInclination = -0.31
 
 export namespace ambientConfigurations {

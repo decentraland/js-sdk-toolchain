@@ -54,7 +54,7 @@ export const putGltfContaierComponent: ComponentOperation = (entity, component) 
     entity.ecsComponentValues.gltfContainer = newValue || undefined
 
     // for simplicity of the example, we will remove the Gltf on every update.
-    if (currentValue?.src != newValue?.src) {
+    if (currentValue?.src !== newValue?.src) {
       removeCurrentGltf(entity)
 
       if (newValue?.src) {
@@ -95,7 +95,7 @@ export const putGltfContaierComponent: ComponentOperation = (entity, component) 
             entity.gltfAssetContainer = assetContainer
           },
           null,
-          (_scene, message, exception) => {
+          (_scene, _message, _exception) => {
             debugger
             // const animator: Animator = entity.getBehaviorByName('animator') as Animator
 
@@ -184,6 +184,7 @@ export function processGLTFAssetContainer(assetContainer: BABYLON.AssetContainer
   assetContainer.addAllToScene()
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 function disposeDelegate($: { dispose: Function }) {
   $.dispose()
 }
@@ -238,7 +239,7 @@ export function cleanupAssetContainer(scene: BABYLON.Scene, $: BABYLON.AssetCont
   }
 }
 
-function processColliders($: BABYLON.AssetContainer, entity: EcsEntity) {
+function processColliders($: BABYLON.AssetContainer, _entity: EcsEntity) {
   for (let i = 0; i < $.meshes.length; i++) {
     const mesh = $.meshes[i]
 
