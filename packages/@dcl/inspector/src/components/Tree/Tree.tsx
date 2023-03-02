@@ -6,45 +6,58 @@ import { Controls } from './controls'
 
 import './Tree.css'
 
-export type Node = {
-  id: string
-  children: Node[]
-  label?: string
-  open?: boolean
-  selected: boolean
-}
-
-export type Props = {
-  value: Node
-  onSetParent: (id: string, newParentId: string | null) => void
-  onRename: (id: string, newLabel: string) => void
-  onAddChild: (id: string, label: string) => void
-  onRemove: (id: string) => void
-  onToggle: (id: string, value: boolean) => void
+export type Props<T> = {
+  value: T
+  getId: (value: T) => string
+  getChildren: (value: T) => T[]
+  getLabel: (value: T) => string
+  isOpen: (value: T) => boolean
+  isSelected: (value: T) => boolean
+  onSetParent: (value: T, parent: T) => void
+  onRename: (value: T, label: string) => void
+  onAddChild: (value: T, label: string) => void
+  onRemove: (value: T) => void
+  onToggle: (value: T, isOpen: boolean) => void
 }
 
 const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : 'block' })
 const getExpandStyles = (active: boolean) => ({ height: active ? 'auto' : '0', overflow: 'hidden', display: 'block' })
 
-const canDrop = (target: Node, source: Node): boolean => {
-  if (target.id === source.id) return false
-  return target.children.every(($) => canDrop($, source))
-}
-
-function Tree(props: Props) {
-  const { value, onSetParent, onRename, onAddChild, onRemove, onToggle } = props
-  const { children, id, label, open, selected } = value
+function Tree<T>(props: Props<T>) {
+  const {
+    value,
+    getId,
+    getChildren,
+    getLabel,
+    isOpen,
+    isSelected,
+    onSetParent,
+    onRename,
+    onAddChild,
+    onRemove,
+    onToggle
+  } = props
+  const id = getId(value)
+  const children = getChildren(value)
+  const label = getLabel(value)
+  const open = isOpen(value)
+  const selected = isSelected(value)
   const [editMode, setEditMode] = useState(false)
   const [insertMode, setInsertMode] = useState(false)
 
-  const [, drag] = useDrag(() => ({ type: 'tree', item: value }), [value])
+  const canDrop = (target: T, source: T): boolean => {
+    if (getId(target) === getId(source)) return false
+    return getChildren(target).every(($) => canDrop($, source))
+  }
+
+  const [, drag] = useDrag(() => ({ type: 'tree', item: { entity: value } }), [value])
 
   const [, drop] = useDrop(
     () => ({
       accept: 'tree',
-      drop: (tree: Node, monitor) => {
-        if (monitor.didDrop() || !canDrop(tree, value)) return
-        onSetParent(tree.id, id)
+      drop: ({ entity }: { entity: T }, monitor) => {
+        if (monitor.didDrop() || !canDrop(entity, value)) return
+        onSetParent(entity, value)
       }
     }),
     [value]
@@ -54,7 +67,7 @@ function Tree(props: Props) {
   const quitInsertMode = () => setInsertMode(false)
 
   const handleToggleExpand = (_: React.MouseEvent) => {
-    onToggle(id, !open)
+    onToggle(value, !open)
   }
 
   const handleToggleEdit = (e: React.MouseEvent) => {
@@ -63,7 +76,7 @@ function Tree(props: Props) {
   }
 
   const onChangeEditValue = (newValue: string) => {
-    onRename(id, newValue)
+    onRename(value, newValue)
     setEditMode(false)
   }
 
@@ -74,14 +87,14 @@ function Tree(props: Props) {
 
   const handleAddChild = (childLabel: string) => {
     if (!insertMode) return
-    onAddChild(id, childLabel)
+    onAddChild(value, childLabel)
     quitInsertMode()
-    onToggle(id, true)
+    onToggle(value, true)
   }
 
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation()
-    onRemove(id)
+    onRemove(value)
   }
 
   return (
@@ -98,7 +111,7 @@ function Tree(props: Props) {
         {!!children.length && open && (
           <div style={getExpandStyles(open)}>
             {children.map(($) => (
-              <MemoTree {...props} value={$} key={$.id} />
+              <MemoTree {...props} value={$} key={getId($)} />
             ))}
           </div>
         )}

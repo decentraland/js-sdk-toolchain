@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useTree } from '../../hooks/sdk/tree'
+import { ROOT, useTree } from '../../hooks/sdk/tree'
 import { InspectorEngine } from '../../lib/sdk/engine'
 import { Tree } from '../Tree'
 
@@ -8,18 +8,24 @@ type Props = {
 }
 
 const Hierarchy: React.FC<Props> = (props) => {
-  const { tree, addChild, setParent, remove, rename, toggle } = useTree(props.inspectorEngine)
+  const { tree, addChild, setParent, remove, rename, toggle, getId, getChildren, getLabel, isOpen, isSelected } =
+    useTree(props.inspectorEngine)
   return (
     <>
-      {tree.map((node) => (
+      {Array.from(tree.get(ROOT)!).map((entity) => (
         <Tree
-          key={node.id}
-          value={node}
+          key={getId(entity)}
+          value={entity}
           onAddChild={addChild}
           onSetParent={setParent}
           onRemove={remove}
           onRename={rename}
           onToggle={toggle}
+          getId={getId}
+          getChildren={getChildren}
+          getLabel={getLabel}
+          isOpen={isOpen}
+          isSelected={isSelected}
         />
       ))}
     </>
