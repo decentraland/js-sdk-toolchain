@@ -1,3 +1,2 @@
-import Tree, { Node } from './Tree'
-export type { Node }
+import Tree from './Tree'
 export { Tree }
