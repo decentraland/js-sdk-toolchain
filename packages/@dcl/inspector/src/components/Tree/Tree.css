@@ -1,5 +1,9 @@
 .tree {
   background-color: #ffffff;
+  overflow: scroll;
+  height: 100vh;
+  width: 20rem;
+  border-right: 0.1rem solid #dedede;
 }
 
 .tree ul {

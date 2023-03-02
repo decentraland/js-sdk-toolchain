@@ -1,12 +1,18 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import Hierarchy from './components/Hierarchy/Hierarchy'
-import './index.css'
-import { InspectorEngine } from './lib/sdk/engine'
-import { Renderer } from './components/Renderer'
 
+import { InspectorEngine } from './lib/sdk/engine'
+
+import { AssetsCatalog, ITheme } from './components/AssetsCatalog'
+import Hierarchy from './components/Hierarchy/Hierarchy'
+import { Renderer } from './components/Renderer/Renderer'
+
+import './index.css'
+
+// TODO: move this to data service
+const assetsCatalogJson = require('./components/AssetsCatalog/catalog.json') as ITheme[]
 
 async function initScene() {
   const App = () => {
@@ -15,19 +21,20 @@ async function initScene() {
 
     return (
       <>
-        {inspectorEngine && <Hierarchy inspectorEngine={inspectorEngine} />}
-        <Renderer onLoad={handleOnLoad} />
+        <div className="left">{inspectorEngine && <Hierarchy inspectorEngine={inspectorEngine} />}</div>
+        <div className="right">
+          <Renderer onLoad={handleOnLoad} />
+          <AssetsCatalog value={assetsCatalogJson} />
+        </div>
       </>
     )
   }
 
   const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
   root.render(
-    <React.StrictMode>
-      <DndProvider backend={HTML5Backend}>
-        <App />
-      </DndProvider>
-    </React.StrictMode>
+    <DndProvider backend={HTML5Backend}>
+      <App />
+    </DndProvider>
   )
 }
 

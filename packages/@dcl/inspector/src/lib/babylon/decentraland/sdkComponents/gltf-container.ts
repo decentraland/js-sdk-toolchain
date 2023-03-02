@@ -47,7 +47,7 @@ BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
   }
 })
 
-export const putGltfContaierComponent: ComponentOperation = (entity, component) => {
+export const putGltfContainerComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
     const newValue = component.getOrNull(entity.entityId) as PBGltfContainer | null
     const currentValue = entity.ecsComponentValues.gltfContainer

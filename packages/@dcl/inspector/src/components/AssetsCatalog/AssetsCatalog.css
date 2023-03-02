@@ -1,0 +1,111 @@
+
+.assets-catalog {
+  display: flex;
+  overflow: scroll;
+  height: 100%;
+  background-color: #17141B;
+  padding: 1rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.assets-catalog .theme, .assets-catalog .category .assets > div {
+  display: flex;
+  margin-right: 1rem;
+  width: 200px;
+  height: 80px;
+  align-items: center;
+  padding: 0 16px;
+  border-radius: 8px;
+  background: #36343D;
+  cursor: pointer;
+  margin-bottom: 8px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  position: relative;
+}
+
+.assets-catalog .theme:last-child {
+  margin-right: 0;
+}
+
+.assets-catalog .theme:hover {
+  background: #504E58;
+}
+
+.assets-catalog .theme img {
+  width: 48px;
+  height: 48px;
+  margin-right: 16px;
+  border-radius: 8px;
+}
+
+.assets-catalog h4, .assets-catalog h3 {
+  margin-top: 0;
+  margin-bottom: 0;
+  color: #EEEEEF;
+  font-size: 17px;
+  line-height: 26px;
+  font-weight: 400;
+  text-transform: capitalize;
+}
+
+.assets-catalog .theme div {
+  margin-left: auto;
+  background: url(https://cdn.decentraland.org/@dcl/builder-site/6.35.0/static/media/icons.5ff54946.svg) 41.666666666666664% 21.768707482993197% no-repeat;
+  width: 8px;
+  height: 14px;
+}
+
+.assets-catalog .theme div:before {
+  content: "";
+}
+
+.assets-catalog .categories {
+  display: flex;
+  flex-direction: column;
+}
+
+.assets-catalog .categories > div:first-child {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.assets-catalog .categories span {
+  color: #FFFFFF;
+  width: 18px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.assets-catalog .categories h3 {
+  align-self: center;
+  font-size: 24px;
+}
+
+.assets-catalog .category {
+  display: flex;
+  flex-direction: column;
+}
+
+.assets-catalog .category .assets {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.assets-catalog .category .assets > div {
+  width: 80px;
+  justify-content: center;
+}
+
+.assets-catalog .category .assets > div:hover {
+  background: #504E58;
+}
+
+.assets-catalog .category .assets > div img {
+  width: 60px;
+  height: 60px;
+}
