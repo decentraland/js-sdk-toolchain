@@ -8,9 +8,9 @@ EVAL test/snapshots/ui.js
   REQUIRE: ~system/EngineApi
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 21k
-  MALLOC_COUNT = 14023
-  ALIVE_OBJS_DELTA ~= 2.67k
+  OPCODES ~= 24k
+  MALLOC_COUNT = 23325
+  ALIVE_OBJS_DELTA ~= 3.38k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 4
@@ -59,4 +59,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 52k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1401.17k bytes
+  MEMORY_USAGE_COUNT ~= 4549.62k bytes
