@@ -1,6 +1,5 @@
 import { IEngine, Transport } from '@dcl/ecs'
 import future, { IFuture } from 'fp-future'
-import { serializeEngine } from './serialize-engine'
 
 export function createBetterTransport(engine: IEngine) {
   /**
@@ -63,10 +62,6 @@ export function createBetterTransport(engine: IEngine) {
   engine.addTransport(transport)
   engine.addSystem(processIncomingMessages, Infinity)
   engine.addSystem(resolvePromises, -Infinity)
-
-  // TODO: move this inside engine.addTransport
-  const serializedState = serializeEngine(engine)
-  outMessages.push(serializedState)
 
   return {
     dispose() {

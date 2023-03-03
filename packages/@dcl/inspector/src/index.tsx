@@ -6,7 +6,7 @@ import Hierarchy from './components/Hierarchy/Hierarchy'
 import './index.css'
 import { initEngine } from './lib/babylon/setup'
 import { SceneContext } from './lib/babylon/decentraland/SceneContext'
-import { getHardcodedLoadableScene, createSameThreadScene } from './lib/test-local-scene'
+import { getHardcodedLoadableScene } from './lib/test-local-scene'
 import { getDataLayerRpc } from './lib/data-layer'
 import { createInspectorEngine } from './lib/sdk/engine'
 import { connectSceneContextToLocalEngine } from './lib/data-layer/rpc-engine'
@@ -17,9 +17,7 @@ async function initScene() {
 
   // await scene.debugLayer.show({ showExplorer: true, embedMode: true })
 
-  // initialize DataLayer
-  const simulatedScene = createSameThreadScene()
-  const dataLayer = getDataLayerRpc(simulatedScene)
+  const dataLayer = await getDataLayerRpc()
 
   // initialize babylon scene
   const ctx = new SceneContext(
@@ -31,10 +29,10 @@ async function initScene() {
   void connectSceneContextToLocalEngine(ctx, dataLayer)
 
   // create inspector engine context and components
-  const inspectorEngine = createInspectorEngine(dataLayer)
+  const inspectorEngine = await createInspectorEngine(dataLayer)
 
   // register some globals for debugging
-  Object.assign(globalThis, { simulatedScene, dataLayer, inspectorEngine })
+  Object.assign(globalThis, { dataLayer, inspectorEngine })
 
   const App = () => {
     return <Hierarchy inspectorEngine={inspectorEngine} />

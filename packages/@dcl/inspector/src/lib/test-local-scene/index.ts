@@ -1,5 +1,4 @@
 import { Engine } from '@dcl/ecs'
-import { Quaternion, Vector3 } from '@dcl/ecs-math'
 import * as components from '@dcl/ecs/dist/components'
 import { LoadableScene } from '../babylon/decentraland/SceneContext'
 import { createEditorComponents } from '../sdk/components'

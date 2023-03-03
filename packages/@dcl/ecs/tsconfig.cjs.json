@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "stripInternal": true,
+    "downlevelIteration": true,
+    "preserveConstEnums": true,
+    "outDir": "dist/cjs",
+    "lib": ["ES2020"],
+    "types": ["@dcl/js-runtime"]
+  },
+  "include": ["src"],
+  "files": ["node_modules/protobufjs/minimal.d.ts"],
+  "exclude": ["dist"]
+}
