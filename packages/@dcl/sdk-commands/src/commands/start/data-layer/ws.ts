@@ -1,12 +1,22 @@
-import { RpcServer } from '@dcl/rpc'
 import { WebSocketTransport } from '@dcl/rpc/dist/transports/WebSocket'
+import path from 'path'
 import { WebSocket } from 'ws'
-import { DataLayerContext } from './rpc'
-import { createFakeScene } from './rpc-engine'
+import { RpcServer } from '@dcl/rpc'
 
-export async function handleDataLayerWs(ws: WebSocket, rpcServer: RpcServer<DataLayerContext>) {
+import { CliComponents } from '../../../components'
+import { DataLayerContext } from './rpc'
+import { createEngine } from './rpc-engine'
+
+export async function handleDataLayerWs(
+  components: Pick<CliComponents, 'fs'>,
+  ws: WebSocket,
+  rpcServer: RpcServer<DataLayerContext>,
+  projectRoot: string
+) {
+  const engineState = JSON.parse(await components.fs.readFile(path.resolve(projectRoot, 'engine-state.json'), 'utf8'))
+  const engine = await createEngine(engineState)
   const wsTransport = WebSocketTransport(ws as any)
-  rpcServer.attachTransport(wsTransport, { engine: await createFakeScene() })
+  rpcServer.attachTransport(wsTransport, { engine })
 
   ws.on('error', (error: any) => {
     console.error(error)
