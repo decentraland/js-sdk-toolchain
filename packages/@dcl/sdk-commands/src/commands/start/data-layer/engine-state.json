@@ -1,0 +1,99 @@
+// TODO: Remove this file. It's just the editor sample
+{
+  "512": {
+    "1": {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "parent": 0
+    },
+    "1018": {
+      "mesh": {
+        "$case": "box",
+        "box": {
+          "uvs": []
+        }
+      }
+    },
+    "508774728": {
+      "label": "Parent A"
+    }
+  },
+  "513": {
+    "1": {
+      "position": {
+        "x": 2,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "parent": 0
+    },
+    "1018": {
+      "mesh": {
+        "$case": "box",
+        "box": {
+          "uvs": []
+        }
+      }
+    },
+    "508774728": {
+      "label": "Parent B oedo"
+    }
+  },
+  "514": {
+    "1": {
+      "position": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "parent": 512
+    },
+    "1018": {
+      "mesh": {
+        "$case": "box",
+        "box": {
+          "uvs": []
+        }
+      }
+    },
+    "508774728": {
+      "label": "Child"
+    }
+  }
+}
