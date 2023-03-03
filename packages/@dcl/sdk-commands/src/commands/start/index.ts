@@ -23,6 +23,7 @@ import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
 import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
 import { b64HashingFunction } from '../../logic/project-files'
+import { createDataLayerRpc } from './data-layer/rpc'
 
 interface Options {
   args: typeof args
@@ -48,7 +49,7 @@ export const args = getArgs({
   '--desktop-client': Boolean
 })
 
-export function help() {
+export async function help() {
   return `
   Usage: sdk-commands start [options]
 
@@ -149,7 +150,8 @@ export async function main(options: Options) {
       }
     },
     async main({ components, startComponents }) {
-      await wireRouter(components, projectRoot)
+      const rpcServer = createDataLayerRpc()
+      await wireRouter(components, projectRoot, rpcServer)
       if (watch) {
         await wireFileWatcherToWebSockets(components, projectRoot)
       }

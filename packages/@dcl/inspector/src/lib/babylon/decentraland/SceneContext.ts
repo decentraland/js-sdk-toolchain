@@ -61,6 +61,7 @@ export class SceneContext {
   constructor(public babylon: BABYLON.Engine, public scene: BABYLON.Scene, public loadableScene: LoadableScene) {
     this.rootNode = new EcsEntity(0 as Entity, this.#weakThis, scene)
     babylon.onEndFrameObservable.add(this.update)
+    Object.assign(globalThis, { babylon: this.engine })
   }
 
   private processEcsChange(entityId: Entity, op: CrdtMessageType, component?: ComponentDefinition<any>) {

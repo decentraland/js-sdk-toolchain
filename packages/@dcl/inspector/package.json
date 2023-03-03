@@ -27,6 +27,7 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "@dcl/rpc": "^1.1.1"
   }
 }

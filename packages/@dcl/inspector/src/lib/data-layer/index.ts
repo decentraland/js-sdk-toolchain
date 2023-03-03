@@ -1,60 +1,29 @@
-import { IEngine, Transport } from '@dcl/ecs'
-import { AsyncQueue } from '@well-known-components/pushable-channel'
-import { consumeAllMessagesInto } from '../logic/consume-stream'
-import { serializeEngine } from './serialize-engine'
+import { IEngine } from '@dcl/ecs'
+import { createRpcClient } from '@dcl/rpc'
+import { WebSocketTransport } from '@dcl/rpc/dist/transports/WebSocket'
+import * as codegen from '@dcl/rpc/dist/codegen'
 
-export type DataLayerInterface = {
-  undo(): Promise<any>
-  redo(): Promise<any>
-  getEngineUpdates(iter: AsyncIterable<Uint8Array>): AsyncGenerator<Uint8Array>
-}
+import { DataServiceDefinition } from './todo-protobuf'
 
-export function getDataLayerRpc(engine: IEngine): DataLayerInterface {
-  // the server (datalayer) should also keep its internal "game loop" to process
-  // all the incoming messages. we have this interval easy solution to mock that
-  // game loop for the time being.
-  // since the servers DO NOT run any game system, the only thing it does is to
-  // process incoming and outgoing messages + dirty states
-  setInterval(() => {
-    engine.update(0.016).catch(($) => {
-      console.error($)
-      debugger
-    })
-  }, 16)
+type Unpacked<T> = T extends (infer U)[]
+  ? U
+  : T extends (...args: any[]) => infer U
+  ? U
+  : T extends Promise<infer U>
+  ? U
+  : T
 
-  return {
-    async undo() {},
-    async redo() {},
-    // This method receives an incoming message iterator
-    // and returns an async iterable. consumption and production of messages
-    // are decoupled operations
-    getEngineUpdates(iter) {
-      const queue = new AsyncQueue<Uint8Array>((_, action) => {
-        if (action === 'close') {
-          // cleanup
-        }
-      })
+export type DataLayerInterface = Unpacked<ReturnType<typeof getDataLayerRpc>>
 
-      // first we send the fully serialized state over the wire
-      queue.enqueue(serializeEngine(engine))
-
-      // then create and add the transport
-      const transport: Transport = {
-        filter() {
-          return !queue.closed
-        },
-        async send(message) {
-          if (queue.closed) return
-          queue.enqueue(message)
-        }
-      }
-      Object.assign(transport, { name: 'DataLayerHost' })
-      engine.addTransport(transport)
-
-      // and lastly wire the new messages from the iterator to the
-      void consumeAllMessagesInto(iter, transport.onmessage!, queue.close)
-
-      return queue
-    }
-  }
+export async function getDataLayerRpc() {
+  // TODO: get port
+  const ws = new WebSocket('ws://localhost:8001/data-layer')
+  const clientTransport = WebSocketTransport(ws)
+  const client = await createRpcClient(clientTransport)
+  const clientPort = await client.createPort('Scene')
+  const serviceClient = codegen.loadService<{ engine: IEngine }, DataServiceDefinition>(
+    clientPort,
+    DataServiceDefinition
+  )
+  return serviceClient
 }
