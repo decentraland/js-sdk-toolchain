@@ -6,7 +6,7 @@
   background-color: #17141B;
   padding: 1rem;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .assets-catalog .theme, .assets-catalog .category .assets > div {

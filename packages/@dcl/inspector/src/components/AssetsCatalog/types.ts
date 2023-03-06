@@ -43,7 +43,7 @@ export interface ThemeProps {
 }
 
 export interface CategoriesProps {
-  goBack: () => void
+  onGoBack: () => void
   value: ITheme
 }
 

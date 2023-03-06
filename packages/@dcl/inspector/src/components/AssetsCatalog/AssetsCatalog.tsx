@@ -13,7 +13,7 @@ export function AssetsCatalog({ value }: Props) {
   return (
     <div className="assets-catalog">
       {!selectedTheme && value.map(($) => <ThemeCell key={$.id} onClick={handleThemeChange} value={$} />)}
-      {selectedTheme && <Categories goBack={handleThemeChange} value={selectedTheme} />}
+      {selectedTheme && <Categories onGoBack={handleThemeChange} value={selectedTheme} />}
     </div>
   )
 }
@@ -34,11 +34,11 @@ function ThemeCell({ value, onClick }: ThemeProps) {
   )
 }
 
-function Categories({ goBack, value }: CategoriesProps) {
+function Categories({ onGoBack, value }: CategoriesProps) {
   const assetsByCategory = useMemo(() => getAssetsByCategory(value.assets), [value.id, value.assets])
   const handleGoBack = (e: React.MouseEvent) => {
     e.stopPropagation()
-    goBack()
+    onGoBack()
   }
 
   return (
@@ -46,6 +46,7 @@ function Categories({ goBack, value }: CategoriesProps) {
       <div><span onClick={handleGoBack}>&lt;</span><h3>{value.title}</h3></div>
       {Array.from(assetsByCategory, ($) => {
         const [category, assets] = $
+        if (!assets.length) return null
         return (
           <div className="category" key={category}>
             <h4>{category}</h4>
