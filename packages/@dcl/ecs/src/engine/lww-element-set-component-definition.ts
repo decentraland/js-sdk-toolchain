@@ -20,7 +20,7 @@ export function incrementTimestamp(entity: Entity, timestamps: Map<Entity, numbe
   return newTimestamp
 }
 
-export function createLwwDumpFunctionFromCrdt(
+export function createDumpLwwFunctionFromCrdt(
   componentId: number,
   timestamps: Map<Entity, number>,
   schema: Pick<ISchema<any>, 'serialize' | 'deserialize'>,
@@ -288,6 +288,6 @@ export function createComponentDefinitionFromSchema<T>(
     },
     getCrdtUpdates: createGetCrdtMessagesForLww(componentId, timestamps, dirtyIterator, schema, data),
     updateFromCrdt: createUpdateLwwFromCrdt(componentId, timestamps, schema, data),
-    dumpCrdtState: createLwwDumpFunctionFromCrdt(componentId, timestamps, schema, data)
+    dumpCrdtState: createDumpLwwFunctionFromCrdt(componentId, timestamps, schema, data)
   }
 }
