@@ -27,7 +27,7 @@ describe('init command', () => {
     const extractSpy = jest.spyOn(fsUtils, 'extract')
     const installDependenciesSpy = jest.spyOn(projectValidations, 'installDependencies').mockRejectedValue(undefined)
 
-    const components = initComponents()
+    const components = await initComponents()
 
     await expect(() => init.main({ args: { _: [] }, components })).rejects.toThrow()
 
@@ -37,7 +37,7 @@ describe('init command', () => {
   })
 
   it('main: should download & extract if directory is not empty and "--yes" arg is provided', async () => {
-    const components = initComponents()
+    const components = await initComponents()
     const downloadSpy = jest.spyOn(fsUtils, 'download').mockImplementation()
     const extractSpy = jest.spyOn(fsUtils, 'extract').mockImplementation()
     const removeSpy = jest.spyOn(components.fs, 'unlink').mockImplementation()
@@ -45,8 +45,9 @@ describe('init command', () => {
     jest.spyOn(components.fs, 'rename').mockImplementation()
     jest.spyOn(components.fs, 'rmdir').mockImplementation()
     const installDependenciesSpy = jest.spyOn(projectValidations, 'installDependencies').mockResolvedValue(undefined)
-
+    console.log('checkpoint 1')
     await init.main({ args: { _: [], '--yes': true }, components })
+    console.log('checkpoint 2')
 
     expect(downloadSpy).toBeCalled()
     expect(extractSpy).toBeCalled()
@@ -55,7 +56,7 @@ describe('init command', () => {
   })
 
   it('main: should move files out of dirs', async () => {
-    const components = initComponents()
+    const components = await initComponents()
     const downloadSpy = jest.spyOn(fsUtils, 'download').mockImplementation()
     const extractSpy = jest.spyOn(fsUtils, 'extract').mockImplementation()
     const removeSpy = jest.spyOn(components.fs, 'unlink').mockImplementation()
@@ -78,7 +79,7 @@ describe('init command', () => {
       throw new Error()
     })
 
-    const components = initComponents()
+    const components = await initComponents()
 
     await expect(() =>
       init.main({ args: { _: [], '--yes': true, '--skip-install': true }, components })
