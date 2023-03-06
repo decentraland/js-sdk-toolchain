@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
-import { Input } from './input'
-import { Controls } from './controls'
+import { Input } from './Input'
+import { Controls } from './Controls'
 
 import './Tree.css'
 

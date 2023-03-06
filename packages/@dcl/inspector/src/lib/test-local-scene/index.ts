@@ -216,7 +216,7 @@ export function createSameThreadScene() {
   // const entitiesWithBoxShapes = engine.getEntitiesWith(MeshRenderer, Transform)
 
   // create initial cubes
-  spawnCubes()
+  // spawnCubes()
 
   // // iterate over the entities of the group to set the initial position
   // for (const [entity] of entitiesWithBoxShapes) {
