@@ -1117,6 +1117,7 @@ export class Material extends ObservableComponent {
     metallic?: number;
     microSurface?: number;
     reflectivityColor?: Color3;
+    renderQueue?: number;
     roughness?: number;
     specularIntensity?: number;
     transparencyMode: TransparencyMode;

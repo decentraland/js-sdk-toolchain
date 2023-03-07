@@ -21300,6 +21300,35 @@
             },
             {
               "kind": "Property",
+              "canonicalReference": "@dcl/legacy-ecs!Material#renderQueue:member",
+              "docComment": "/**\n * Order in which the alpha blend materials will appear Defaults to 0.5\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "renderQueue?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "renderQueue",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false
+            },
+            {
+              "kind": "Property",
               "canonicalReference": "@dcl/legacy-ecs!Material#roughness:member",
               "docComment": "/**\n * Specifies the roughness scalar of the metallic/roughness workflow. Can also be used to scale the roughness values of the metallic texture. Defaults to 0.5.\n */\n",
               "excerptTokens": [

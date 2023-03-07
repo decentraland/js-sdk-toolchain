@@ -925,6 +925,13 @@ export class Material extends ObservableComponent {
    */
   @ObservableComponent.field
   transparencyMode: TransparencyMode = TransparencyMode.AUTO
+
+  /**
+   * Order in which the alpha blend materials will appear
+   * Defaults to 0.5
+   */
+  @ObservableComponent.field
+  renderQueue?: number
 }
 
 /**

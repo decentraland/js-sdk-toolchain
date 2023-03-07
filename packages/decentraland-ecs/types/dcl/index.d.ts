@@ -2079,6 +2079,11 @@ declare class Material extends ObservableComponent {
      * | 4     | AUTO (ALPHABLEND if alpha OPAQUE otherwise     |
      */
     transparencyMode: TransparencyMode;
+    /**
+     * Order in which the alpha blend materials will appear
+     * Defaults to 0.5
+     */
+    renderQueue?: number;
 }
 
 /**
