@@ -18,7 +18,6 @@ type Unpacked<T> = T extends (infer U)[]
 export type DataLayerInterface = Unpacked<ReturnType<typeof getDataLayerRpc>>
 
 export async function getDataLayerRpc() {
-  console.log({ asd: process.env.NO_RPC })
   if (process.env.NO_RPC) {
     const engine = createSameThreadScene()
     return getLocalDataLayerRpc(engine)
