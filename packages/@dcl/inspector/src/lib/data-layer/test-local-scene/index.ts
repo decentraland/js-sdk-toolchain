@@ -1,4 +1,5 @@
 import { Engine } from '@dcl/ecs'
+import * as components from '@dcl/ecs/dist/components'
 import { ITheme } from '../../../components/AssetsCatalog/types'
 import { LoadableScene } from '../../babylon/decentraland/SceneContext'
 
@@ -45,11 +46,11 @@ export function createSameThreadScene() {
   // create engine and its components
   const engine = Engine()
 
-  // const Billboard = components.Billboard(engine)
-  // const Transform = components.Transform(engine)
-  // const MeshRenderer = components.MeshRenderer(engine)
-  // const GltfContainer = components.GltfContainer(engine)
-  // const TextShape = components.TextShape(engine)
+  const Billboard = components.Billboard(engine)
+  const Transform = components.Transform(engine)
+  const MeshRenderer = components.MeshRenderer(engine)
+  const GltfContainer = components.GltfContainer(engine)
+  const TextShape = components.TextShape(engine)
 
   return engine
 }
