@@ -5,7 +5,7 @@ import { RpcServer } from '@dcl/rpc'
 
 import { CliComponents } from '../../../components'
 import { DataLayerContext } from './rpc'
-import { createEngine } from './rpc-engine'
+import { createEngine } from './engine'
 
 export async function handleDataLayerWs(
   components: Pick<CliComponents, 'fs'>,
