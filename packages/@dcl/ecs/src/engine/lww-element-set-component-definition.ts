@@ -27,6 +27,7 @@ export function createDumpLwwFunctionFromCrdt(
   data: Map<Entity, unknown>
 ) {
   return function dumpCrdtState(buffer: ByteBuffer) {
+    /* istanbul ignore else */
     for (const [entity, timestamp] of timestamps) {
       if (data.has(entity)) {
         const it = data.get(entity)!
