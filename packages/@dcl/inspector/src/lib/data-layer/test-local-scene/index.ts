@@ -1,7 +1,7 @@
 import { Engine } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
-import { LoadableScene } from '../babylon/decentraland/SceneContext'
-import { createEditorComponents } from '../sdk/components'
+import { LoadableScene } from '../../babylon/decentraland/SceneContext'
+import { createEditorComponents } from '../../sdk/components'
 
 // this was taken verbatim from my deployed world at menduz.dcl.eth
 export function getHardcodedLoadableScene(_id: string): LoadableScene {

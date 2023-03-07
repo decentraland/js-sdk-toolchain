@@ -2,9 +2,9 @@ import { IEngine, Transport } from '@dcl/ecs'
 import { createRpcServer, RpcServerPort } from '@dcl/rpc'
 import * as codegen from '@dcl/rpc/dist/codegen'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
-import { serializeEngine } from './rpc-engine'
+import { DataServiceDefinition, StreamReqRes } from '@dcl/protocol/out-ts/decentraland/sdk/editor/data_service.gen'
 
-import { DataServiceDefinition, StreamReqRes } from './todo-protobuf'
+import { serializeEngine } from './rpc-engine'
 
 export type DataLayerContext = {
   engine: IEngine
@@ -29,6 +29,9 @@ function registerDataService(port: RpcServerPort<DataLayerContext>) {
     async undo() {
       return {}
     },
+
+    // DataLayer <---> Inspector
+    // DataLayer <---> Babylon
     stream(req: AsyncIterable<StreamReqRes>, { engine }: DataLayerContext) {
       const queue = new AsyncQueue<StreamReqRes>(() => {})
       queue.enqueue({ data: serializeEngine(engine) })

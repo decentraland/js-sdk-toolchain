@@ -16,7 +16,7 @@ export type InspectorEngine = {
   dispose(): void
 }
 
-export async function createInspectorEngine(dataLayer: DataLayerInterface): Promise<InspectorEngine> {
+export function createInspectorEngine(dataLayer: DataLayerInterface): InspectorEngine {
   const engine = Engine()
 
   const Transform = components.Transform(engine)
