@@ -8,7 +8,7 @@ import { createBetterTransport } from '../../data-layer/transport'
 import { createEditorComponents } from '../../sdk/components'
 import { ComponentOperation } from './component-operations'
 import { putBillboardComponent } from './sdkComponents/billboard'
-import { putGltfContaierComponent } from './sdkComponents/gltf-container'
+import { putGltfContainerComponent } from './sdkComponents/gltf-container'
 import { putMeshRendererComponent } from './sdkComponents/mesh-renderer'
 import { putTransformComponent } from './sdkComponents/transform'
 import { putEntitySelectedComponent } from './editorComponents/entitySelected'
@@ -49,7 +49,7 @@ export class SceneContext {
     [this.Transform.componentId]: putTransformComponent,
     [this.MeshRenderer.componentId]: putMeshRendererComponent,
     [this.Billboard.componentId]: putBillboardComponent,
-    [this.GltfContainer.componentId]: putGltfContaierComponent,
+    [this.GltfContainer.componentId]: putGltfContainerComponent,
     [this.editorComponents.EntitySelected.componentId]: putEntitySelectedComponent
   }
 

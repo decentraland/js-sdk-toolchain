@@ -123,6 +123,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
         const component = engine.getComponentOrNull(msg.componentId)
 
+        /* istanbul ignore else */
         if (component) {
           const [conflictMessage, value] = component.updateFromCrdt(msg)
 

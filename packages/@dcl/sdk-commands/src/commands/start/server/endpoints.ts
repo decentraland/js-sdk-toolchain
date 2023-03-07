@@ -6,7 +6,7 @@ import { Entity, EntityType, Locale, Wearable } from '@dcl/schemas'
 import fetch, { Headers } from 'node-fetch'
 import { fetchEntityByPointer } from '../../../logic/catalyst-requests'
 import { CliComponents } from '../../../components'
-import { getProjectContentMappings } from '../../../logic/project-files'
+import { b64HashingFunction, getProjectContentMappings } from '../../../logic/project-files'
 
 function getCatalystUrl(): URL {
   return new URL('https://peer.decentraland.org')
@@ -226,8 +226,6 @@ function serveFolders(components: Pick<CliComponents, 'fs'>, router: Router<Prev
     }
   })
 }
-
-const b64HashingFunction = async (str: string) => 'b64-' + Buffer.from(str).toString('base64')
 
 async function getAllPreviewWearables(
   components: Pick<CliComponents, 'fs'>,

@@ -75,9 +75,7 @@ export const useTree = (inspectorEngine: InspectorEngine) => {
 
   const { engine, editorComponents, sdkComponents } = inspectorEngine
 
-  const update = async () => {
-    setTree(getTree(inspectorEngine))
-  }
+  const update = () => setTree(getTree(inspectorEngine))
 
   const { Label, Toggle, EntitySelected } = editorComponents
 
@@ -106,24 +104,24 @@ export const useTree = (inspectorEngine: InspectorEngine) => {
     const child = engine.addEntity()
     sdkComponents.Transform.create(child, { parent })
     editorComponents.Label.create(child, { label })
-    await update()
+    update()
   }
 
   const setParent = async (entity: Entity, parent: Entity) => {
     const transform = sdkComponents.Transform.getMutable(entity)
     transform.parent = parent
     editorComponents.Toggle.createOrReplace(parent)
-    await update()
+    update()
   }
 
   const rename = async (entity: Entity, label: string) => {
     editorComponents.Label.createOrReplace(entity, { label })
-    await update()
+    update()
   }
 
   const remove = async (entity: Entity) => {
     engine.removeEntity(entity)
-    await update()
+    update()
   }
 
   const toggle = async (entity: Entity, open: boolean) => {
@@ -139,7 +137,7 @@ export const useTree = (inspectorEngine: InspectorEngine) => {
     } else {
       editorComponents.Toggle.deleteFrom(entity)
     }
-    await update()
+    update()
   }
 
   return { tree, addChild, setParent, rename, remove, toggle, getId, getChildren, getLabel, isOpen, isSelected }

@@ -7,9 +7,9 @@ import { CliComponents } from '../../components'
 import { main as build } from '../build'
 import { getArgs } from '../../logic/args'
 import { needsDependencies, npmRun } from '../../logic/project-validations'
-import { validateSceneJson } from '../../logic/scene-validations'
+import { getBaseCoords, getValidSceneJson } from '../../logic/scene-validations'
 import { CliError } from '../../logic/error'
-import { previewPort } from '../../logic/get-free-port'
+import { getPort } from '../../logic/get-free-port'
 import { ISignalerComponent, PreviewComponents } from './types'
 import { createTestMetricsComponent } from '@well-known-components/metrics'
 import { Lifecycle, IBaseComponent } from '@well-known-components/interfaces'
@@ -23,10 +23,11 @@ import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
 import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
 import { createDataLayerRpc } from './data-layer/rpc'
+import { b64HashingFunction } from '../../logic/project-files'
 
 interface Options {
   args: typeof args
-  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger'>
+  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'dclInfoConfig' | 'analytics'>
 }
 
 export const args = getArgs({
@@ -86,7 +87,8 @@ export async function main(options: Options) {
   const watch = !args['--no-watch']
   const withDataLayer = args['--data-layer']
   const enableWeb3 = args['--web3']
-  const baseCoords = { x: 0, y: 0 }
+
+  // TODO: FIX this hardcoded values ?
   const hasPortableExperience = false
 
   // first run `npm run build`, this can be disabled with --skip-build
@@ -99,14 +101,15 @@ export async function main(options: Options) {
     await build({ ...options, args: { '--dir': projectRoot, '--watch': watch } })
   }
 
-  await validateSceneJson(options.components, projectRoot)
+  const sceneJson = await getValidSceneJson(options.components, projectRoot)
+  const baseCoords = getBaseCoords(sceneJson)
 
   if (await needsDependencies(options.components, projectRoot)) {
     const npmModulesPath = path.resolve(projectRoot, 'node_modules')
     throw new CliError(`Couldn\'t find ${npmModulesPath}, please run: npm install`)
   }
 
-  const port = options.args['--port'] || (await previewPort())
+  const port = await getPort(options.args['--port'])
 
   const program = await Lifecycle.run<PreviewComponents>({
     async initComponents() {
@@ -158,7 +161,11 @@ export async function main(options: Options) {
 
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []
-
+      await components.analytics.track('Preview started', {
+        projectHash: await b64HashingFunction(projectRoot),
+        coords: baseCoords,
+        isWorkspace: false
+      })
       components.logger.log(`Preview server is now running!`)
       components.logger.log('Available on:\n')
 

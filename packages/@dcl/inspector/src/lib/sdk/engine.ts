@@ -1,4 +1,10 @@
-import { Engine, IEngine, TransformComponentExtended, Transport } from '@dcl/ecs'
+import {
+  Engine,
+  IEngine,
+  TransformComponentExtended,
+  MeshRendererComponentDefinitionExtended,
+  Transport
+} from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import { DataLayerInterface } from '../data-layer'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
@@ -11,6 +17,8 @@ export type InspectorEngine = {
   engine: IEngine
   editorComponents: EditorComponents
   sdkComponents: {
+    GltfContainer: ReturnType<typeof components.GltfContainer>
+    MeshRenderer: MeshRendererComponentDefinitionExtended
     Transform: TransformComponentExtended
   }
   dispose(): void
@@ -20,6 +28,8 @@ export function createInspectorEngine(dataLayer: DataLayerInterface): InspectorE
   const engine = Engine()
 
   const Transform = components.Transform(engine)
+  const GltfContainer = components.GltfContainer(engine)
+  const MeshRenderer = components.MeshRenderer(engine)
 
   // <HERE BE DRAGONS (TRANSPORT)>
   const outgoingMessagesStream = new AsyncQueue<StreamReqRes>((_, _action) => {})
@@ -51,7 +61,7 @@ export function createInspectorEngine(dataLayer: DataLayerInterface): InspectorE
   return {
     engine,
     editorComponents: createEditorComponents(engine),
-    sdkComponents: { Transform },
+    sdkComponents: { GltfContainer, MeshRenderer, Transform },
     dispose
   }
 }
