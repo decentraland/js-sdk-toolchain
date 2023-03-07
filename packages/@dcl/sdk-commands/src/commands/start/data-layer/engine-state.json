@@ -1,7 +1,6 @@
-// TODO: Remove this file. It's just the editor sample
 {
   "512": {
-    "1": {
+    "core::Transform": {
       "position": {
         "x": 0,
         "y": 0,
@@ -20,20 +19,20 @@
       },
       "parent": 0
     },
-    "1018": {
+    "inspector::Label": {
+      "label": "Parent A"
+    },
+    "core::MeshRenderer": {
       "mesh": {
         "$case": "box",
         "box": {
           "uvs": []
         }
       }
-    },
-    "508774728": {
-      "label": "Parent A"
     }
   },
   "513": {
-    "1": {
+    "core::Transform": {
       "position": {
         "x": 2,
         "y": 0,
@@ -52,20 +51,20 @@
       },
       "parent": 0
     },
-    "1018": {
+    "inspector::Label": {
+      "label": "Parent B oedo"
+    },
+    "core::MeshRenderer": {
       "mesh": {
         "$case": "box",
         "box": {
           "uvs": []
         }
       }
-    },
-    "508774728": {
-      "label": "Parent B oedo"
     }
   },
   "514": {
-    "1": {
+    "core::Transform": {
       "position": {
         "x": 1,
         "y": 1,
@@ -84,16 +83,16 @@
       },
       "parent": 512
     },
-    "1018": {
+    "inspector::Label": {
+      "label": "Child"
+    },
+    "core::MeshRenderer": {
       "mesh": {
         "$case": "box",
         "box": {
           "uvs": []
         }
       }
-    },
-    "508774728": {
-      "label": "Child"
     }
   }
 }

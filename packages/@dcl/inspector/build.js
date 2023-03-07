@@ -15,7 +15,7 @@ async function main() {
     outfile: 'public/bundle.js',
     sourcemap: 'linked',
     minify: PRODUCTION,
-    define: NO_RPC ? { 'process.env.NO_RPC': 'true' } : {}
+    define: { 'process.env.NO_RPC': `${NO_RPC}` }
   })
 
   if (WATCH_MODE) {

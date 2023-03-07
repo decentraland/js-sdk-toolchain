@@ -2,9 +2,9 @@ import { IEngine, Transport } from '@dcl/ecs'
 import { createRpcServer, RpcServerPort } from '@dcl/rpc'
 import * as codegen from '@dcl/rpc/dist/codegen'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
-import { DataServiceDefinition, StreamReqRes } from '@dcl/protocol/out-ts/decentraland/sdk/editor/data_service.gen'
+import { DataServiceDefinition, StreamReqRes } from '@dcl/protocol/out-js/decentraland/sdk/editor/data_service.gen'
 
-import { serializeEngine } from './rpc-engine'
+import { serializeEngine } from './engine'
 
 export type DataLayerContext = {
   engine: IEngine

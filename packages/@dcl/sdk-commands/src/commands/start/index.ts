@@ -46,7 +46,8 @@ export const args = getArgs({
   '-b': '--no-browser',
   '-w': '--no-watch',
   '--skip-build': Boolean,
-  '--desktop-client': Boolean
+  '--desktop-client': Boolean,
+  '--data-layer': Boolean
 })
 
 export async function help() {
@@ -84,6 +85,7 @@ export async function main(options: Options) {
   const openBrowser = !args['--no-browser'] && !isCi
   const skipBuild = args['--skip-build']
   const watch = !args['--no-watch']
+  const withDataLayer = args['--data-layer']
   const enableWeb3 = args['--web3']
 
   // TODO: FIX this hardcoded values ?
@@ -150,7 +152,7 @@ export async function main(options: Options) {
       }
     },
     async main({ components, startComponents }) {
-      const rpcServer = createDataLayerRpc()
+      const rpcServer = withDataLayer ? createDataLayerRpc() : undefined
       await wireRouter(components, projectRoot, rpcServer)
       if (watch) {
         await wireFileWatcherToWebSockets(components, projectRoot)
