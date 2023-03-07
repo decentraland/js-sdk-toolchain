@@ -1,26 +1,20 @@
 import * as components from '@dcl/ecs/dist/cjs/components'
-import { Schemas, IEngine, Engine, Entity, DeepReadonly, CrdtMessageType } from '@dcl/ecs'
+import { Schemas, IEngine, Engine, Entity, DeepReadonly, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
 import { ByteBuffer, ReadWriteByteBuffer } from '@dcl/ecs/dist/cjs/serialization/ByteBuffer'
 import { CliComponents } from '../../../components'
 import { resolve } from 'path'
 
-type ComponentId = number
-type EngineState = Record<number, Record<ComponentId, DeepReadonly<unknown>>>
+type ComponentName = string
+type EngineState = Record<number, Record<ComponentName, DeepReadonly<unknown>>>
 
 function getEngineState(engine: IEngine): EngineState {
   const entities: EngineState = {}
 
-  function ensureEntityExists(entity: Entity) {
-    if (!entities[entity]) {
-      entities[entity] = {}
-    }
-    return entities[entity]
-  }
-
   for (const component of engine.componentsIter()) {
     for (const [entity, componentValue] of engine.getEntitiesWith(component)) {
-      const data = ensureEntityExists(entity)
-      data[component.componentId] = componentValue
+      // Initialize if its empty
+      entities[entity] ??= {}
+      entities[entity][component.componentName] = componentValue
     }
   }
 
@@ -76,21 +70,12 @@ export async function createEngine(state: EngineState): Promise<IEngine> {
   /**
    * Start engine from engine-state.json file
    */
-  for (const entity in state) {
+  for (const entityString in state) {
+    const entity: Entity = Number(entityString) as Entity
     const entityComponents = state[entity]
-    for (const componentKey in entityComponents) {
-      const valueBuf = new ReadWriteByteBuffer()
-      const componentId = Number(componentKey)
-      const component = engine.getComponent(componentId)
-      component.schema.serialize(entityComponents[componentId], valueBuf)
-
-      component.updateFromCrdt({
-        type: CrdtMessageType.PUT_COMPONENT,
-        entityId: Number(entity) as Entity,
-        componentId,
-        timestamp: 1,
-        data: valueBuf.toBinary()
-      })
+    for (const componentName in entityComponents) {
+      const component = engine.getComponent(componentName) as LastWriteWinElementSetComponentDefinition<unknown>
+      component.createOrReplace(entity, entityComponents[componentName])
     }
   }
 

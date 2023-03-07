@@ -5,6 +5,7 @@ const { future } = require('fp-future')
 
 const WATCH_MODE = process.argv.includes('--watch')
 const PRODUCTION = process.argv.includes('--production')
+const NO_RPC = process.argv.includes('--no-rpc')
 
 async function main() {
   const context = await esbuild.context({
@@ -13,7 +14,8 @@ async function main() {
     platform: 'browser',
     outfile: 'public/bundle.js',
     sourcemap: 'linked',
-    minify: PRODUCTION
+    minify: PRODUCTION,
+    define: NO_RPC ? { 'process.env.NO_RPC': 'true' } : {}
   })
 
   if (WATCH_MODE) {

@@ -1,6 +1,6 @@
 import { Engine } from '@dcl/ecs'
-import { ITheme } from '../../components/AssetsCatalog'
-import { LoadableScene } from '../babylon/decentraland/SceneContext'
+import { ITheme } from '../../../components/AssetsCatalog/types'
+import { LoadableScene } from '../../babylon/decentraland/SceneContext'
 
 // this was taken verbatim from my deployed world at menduz.dcl.eth
 export function getHardcodedLoadableScene(_id: string, catalog: ITheme[]): LoadableScene {
