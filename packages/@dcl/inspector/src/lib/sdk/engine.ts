@@ -10,7 +10,7 @@ import { DataLayerInterface } from '../data-layer'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
 import { consumeAllMessagesInto } from '../logic/consume-stream'
 import { createEditorComponents, EditorComponents } from './components'
-import { serializeCrdtMessages } from '../data-layer/crdt-logger'
+import { serializeCrdtMessages } from './crdt-logger'
 import { StreamReqRes } from '../data-layer/todo-protobuf'
 
 export type InspectorEngine = {

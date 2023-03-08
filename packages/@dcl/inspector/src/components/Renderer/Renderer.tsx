@@ -7,7 +7,6 @@ import { SceneContext } from '../../lib/babylon/decentraland/SceneContext'
 import { getHardcodedLoadableScene } from '../../lib/data-layer/test-local-scene'
 import { getDataLayerRpc } from '../../lib/data-layer'
 import { InspectorEngine, createInspectorEngine } from '../../lib/sdk/engine'
-import { connectSceneContextToLocalEngine } from '../../lib/data-layer/rpc-engine'
 import { IAsset } from '../AssetsCatalog/types'
 import { ROOT } from '../../hooks/sdk/tree'
 import { Props } from './types'
@@ -47,7 +46,8 @@ export function Renderer({ onLoad }: Props) {
         )
       )
       ctx.rootNode.position.set(0, 0, 0)
-      void connectSceneContextToLocalEngine(ctx, dataLayer)
+      // Connect babylon engine with dataLayer transport
+      void ctx.connectDataLayer(dataLayer)
 
       // create inspector engine context and components
       const inspectorEngine = createInspectorEngine(dataLayer)
