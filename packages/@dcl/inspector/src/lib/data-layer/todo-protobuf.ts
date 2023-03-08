@@ -3,12 +3,6 @@ import _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "decentraland.sdk.editor";
 
-export interface InitResponse {
-}
-
-export interface InitRequest {
-}
-
 export interface StreamReqRes {
   data: Uint8Array;
 }
@@ -19,91 +13,6 @@ export interface UndoReq {
 export interface UndoResp {
 }
 
-function createBaseInitResponse(): InitResponse {
-  return {};
-}
-
-export const InitResponse = {
-  encode(_: InitResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): InitResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseInitResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(_: any): InitResponse {
-    return {};
-  },
-
-  toJSON(_: InitResponse): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<InitResponse>, I>>(base?: I): InitResponse {
-    return InitResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<InitResponse>, I>>(_: I): InitResponse {
-    const message = createBaseInitResponse();
-    return message;
-  },
-};
-
-function createBaseInitRequest(): InitRequest {
-  return {};
-}
-
-export const InitRequest = {
-  encode(_: InitRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): InitRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseInitRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(_: any): InitRequest {
-    return {};
-  },
-
-  toJSON(_: InitRequest): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<InitRequest>, I>>(base?: I): InitRequest {
-    return InitRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<InitRequest>, I>>(_: I): InitRequest {
-    const message = createBaseInitRequest();
-    return message;
-  },
-};
 
 function createBaseStreamReqRes(): StreamReqRes {
   return { data: new Uint8Array() };
@@ -248,14 +157,6 @@ export const DataServiceDefinition = {
   name: "DataService",
   fullName: "decentraland.sdk.editor.DataService",
   methods: {
-    init: {
-      name: "Init",
-      requestType: InitRequest,
-      requestStream: false,
-      responseType: InitResponse,
-      responseStream: false,
-      options: {},
-    },
     stream: {
       name: "Stream",
       requestType: StreamReqRes,

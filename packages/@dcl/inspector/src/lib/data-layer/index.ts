@@ -4,23 +4,12 @@ import { WebSocketTransport } from '@dcl/rpc/dist/transports/WebSocket'
 import * as codegen from '@dcl/rpc/dist/codegen'
 
 import { DataServiceDefinition } from './todo-protobuf'
-import { createSameThreadScene } from './test-local-scene'
-import { getLocalDataLayerRpc } from './test-local-scene/rpc'
+import { getLocalDataLayerRpc } from './local-data-layer'
+import { DataLayerInterface } from './types'
 
-type Unpacked<T> = T extends (infer U)[]
-  ? U
-  : T extends (...args: any[]) => infer U
-  ? U
-  : T extends Promise<infer U>
-  ? U
-  : T
-
-export type DataLayerInterface = Unpacked<ReturnType<typeof getDataLayerRpc>>
-
-export async function getDataLayerRpc() {
+export async function getDataLayerRpc(): Promise<DataLayerInterface> {
   if (process.env.NO_RPC) {
-    const engine = createSameThreadScene()
-    return getLocalDataLayerRpc(engine)
+    return getLocalDataLayerRpc()
   }
 
   // TODO: get port
