@@ -6,7 +6,7 @@ import {
   Transport
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
-import { DataLayerInterface } from '../data-layer'
+import { DataLayerInterface } from '../data-layer/types'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
 import { consumeAllMessagesInto } from '../logic/consume-stream'
 import { createEditorComponents, EditorComponents } from './components'

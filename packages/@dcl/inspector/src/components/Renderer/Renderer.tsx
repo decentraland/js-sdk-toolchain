@@ -4,7 +4,7 @@ import { useDrop } from 'react-dnd'
 
 import { initEngine } from '../../lib/babylon/setup'
 import { SceneContext } from '../../lib/babylon/decentraland/SceneContext'
-import { getHardcodedLoadableScene } from '../../lib/data-layer/test-local-scene'
+import { getHardcodedLoadableScene } from '../../lib/sdk/test-local-scene'
 import { getDataLayerRpc } from '../../lib/data-layer'
 import { InspectorEngine, createInspectorEngine } from '../../lib/sdk/engine'
 import { IAsset } from '../AssetsCatalog/types'

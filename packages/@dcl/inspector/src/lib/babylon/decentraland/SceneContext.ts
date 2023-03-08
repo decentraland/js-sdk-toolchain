@@ -6,7 +6,7 @@ import future from 'fp-future'
 import * as BABYLON from '@babylonjs/core'
 
 import { createEditorComponents } from '../../sdk/components'
-import { DataLayerInterface } from '../../data-layer'
+import { DataLayerInterface } from '../../data-layer/types'
 import { StreamReqRes } from '../../data-layer/todo-protobuf'
 import { serializeCrdtMessages } from '../../sdk/crdt-logger'
 import { EcsEntity } from './EcsEntity'
