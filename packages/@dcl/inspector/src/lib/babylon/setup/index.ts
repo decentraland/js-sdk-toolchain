@@ -132,6 +132,8 @@ export function initEngine(canvas: HTMLCanvasElement) {
     scene.render()
   }
 
+  void scene.debugLayer.show({ showExplorer: true, embedMode: true })
+
   // Register a render loop to repeatedly render the scene
   babylon.runRenderLoop(update)
 

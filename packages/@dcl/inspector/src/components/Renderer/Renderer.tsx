@@ -12,21 +12,33 @@ import { IAsset } from '../AssetsCatalog/types'
 import { ROOT } from '../../hooks/sdk/tree'
 import { Props } from './types'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
+import { getStorageUrl } from '../AssetsCatalog/utils'
 
 export function Renderer({ onLoad }: Props) {
   const [state, setState] = useState<InspectorEngine & { scene: Scene }>()
+  const [mappings, setMappings] = useState<{ file: string; hash: string }[]>([])
+
+  useEffect(() => console.log(mappings), [mappings])
 
   const addAsset = async (asset: IAsset) => {
     if (!state) return
 
     const { engine, sdkComponents, editorComponents, scene } = state
     const child = engine.addEntity()
+    setMappings([
+      ...mappings,
+      ...Object.keys(asset.contents).map((file) => ({
+        file,
+        hash: asset.contents[file]
+      }))
+    ])
+
     const { x, y, z } = await getPointerCoords(scene)
     editorComponents.Label.create(child, { label: asset.name })
     sdkComponents.Transform.create(child, { parent: ROOT, position: { x, y, z } })
     sdkComponents.MeshRenderer.setBox(child)
     // // replace MeshRenderer with line below...
-    // // sdkComponents.GltfContainer.create(child, { src: getAssetThumbnailUrl(asset.contents[asset.main]) })
+    sdkComponents.GltfContainer.create(child, { src: asset.main })
   }
 
   useEffect(() => {
@@ -40,11 +52,10 @@ export function Renderer({ onLoad }: Props) {
     const dataLayer = getDataLayerRpc(simulatedScene)
 
     // initialize babylon scene
-    const ctx = new SceneContext(
-      babylon,
-      scene,
-      getHardcodedLoadableScene('urn:decentraland:entity:bafkreid44xhavttoz4nznidmyj3rjnrgdza7v6l7kd46xdmleor5lmsxfm1')
+    const loadableScene = getHardcodedLoadableScene(
+      'urn:decentraland:entity:bafkreid44xhavttoz4nznidmyj3rjnrgdza7v6l7kd46xdmleor5lmsxfm1'
     )
+    const ctx = new SceneContext(babylon, scene, loadableScene)
     ctx.rootNode.position.set(0, 0, 0)
     void connectSceneContextToLocalEngine(ctx, dataLayer)
 

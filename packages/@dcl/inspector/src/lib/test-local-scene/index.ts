@@ -7,7 +7,7 @@ import { createEditorComponents } from '../sdk/components'
 // this was taken verbatim from my deployed world at menduz.dcl.eth
 export function getHardcodedLoadableScene(_id: string): LoadableScene {
   return {
-    baseUrl: 'https://worlds-content-server.decentraland.org/ipfs/',
+    baseUrl: 'https://builder-api.decentraland.org/v1/storage/contents/',
     id: 'urn:decentraland:entity:bafkreid44xhavttoz4nznidmyj3rjnrgdza7v6l7kd46xdmleor5lmsxfm',
     entity: {
       version: 'v3',
@@ -15,46 +15,10 @@ export function getHardcodedLoadableScene(_id: string): LoadableScene {
       pointers: ['0,0', '0,1'],
       timestamp: 1665777069759,
       content: [
-        {
-          file: 'bin/game.js',
-          hash: 'bafkreibyndfz2k2vw7qegxgdhcqb5vlyepcszycpk445snt4cxfqpsvasu'
-        },
-        {
-          file: 'bin/game.js.map',
-          hash: 'bafybeigh74j7s6jkl4gwilwu6ftlb2qrhliy4an5l3cxsma6dkg4rp4lse'
-        },
-        {
-          file: 'models/Fish_01.glb',
-          hash: 'bafkreigllbmvlnhgdbal5w23rzpvdgpfgw5izytvygc2jz7api7d45xrdy'
-        },
-        {
-          file: 'models/Fish_03.glb',
-          hash: 'bafkreichq7bpfxz53kxi2a7vs7goj4nd6mwmg6ov6oh5pcueqyid6j4cwi'
-        },
-        {
-          file: 'models/Fish_04.glb',
-          hash: 'bafkreian3us5uykagt57wehzoutjfom2jctj2hsee6eulr36m7dnctmpqa'
-        },
-        {
-          file: 'models/Image_0.png',
-          hash: 'bafkreih5kqir5ykts43262cxm755la4s3pjfel7wf5gqacsj4tdpferevi'
-        },
-        {
-          file: 'models/PiratesPack_TX.png.png',
-          hash: 'bafkreibtlcu5xu4u7qloyhi6s36e722qu7y7ths2xaspwqgqynpnl5aukq'
-        },
-        {
-          file: 'models/Underwater_floor.glb',
-          hash: 'bafybeicyrwyoet7lhcpjedfq3taitm5e2ap6j6nqc3mkgwmbylrlu3qp5y'
-        },
-        {
-          file: 'models/shark.glb',
-          hash: 'bafkreigwbedamc5bfsqawkllabrccaftw6hjzxugu7jk4ey2krrnvgjrhy'
-        },
-        {
-          file: 'scene.json',
-          hash: 'bafkreievaypmaxhrsg3bts4gjs6fcyrrsltkkuxxcqmuor2sw3og6i7up4'
-        }
+        { file: 'pebbles.glb', hash: 'QmWvKrw2SekVNLYyGg4nAqqh5Hgkz64EeGowMB1vFWKr6v' },
+        { file: 'Barbacue_01/Barbacue_01.glb', hash: 'QmR1QAy5PWKUGho2fzt7NBLNobGwUT3ghFz9DxXGoGLvQn' },
+        { file: 'Barbacue_01/file1.png', hash: 'QmYACL8SnbXEonXQeRHdWYbfm8vxvaFAWnsLHUaDG4ABp5' },
+        { file: 'Barbacue_01/thumbnail.png', hash: 'QmRBuZoF2TiD8Egonw5Y6g7AfqgVKGihPwtE4pG5uxLtHX' }
       ],
       metadata: {
         display: {
