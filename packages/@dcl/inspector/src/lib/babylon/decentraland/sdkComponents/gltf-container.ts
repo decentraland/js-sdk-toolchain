@@ -17,7 +17,6 @@ BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
     plugin.createInstances = true
     plugin.animationStartMode = 0
     plugin.preprocessUrlAsync = async function (url: string) {
-      debugger
       // HERE BE DRAGONS 🐉:
       //  To hack the GLTF loader to use Decentraland's file system, we must
       //  access private properties to get the parent context to resolve individual
@@ -40,7 +39,6 @@ BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
           if (ret) {
             return ctx.loadableScene.baseUrl + ret
           }
-          debugger
         }
       }
       throw new Error('Cannot resolve file ' + url)
@@ -83,7 +81,6 @@ export const putGltfContainerComponent: ComponentOperation = (entity, component)
           file,
           entity.getScene(),
           (assetContainer) => {
-            debugger
             processGLTFAssetContainer(assetContainer, entity)
 
             // Fin the main mesh and add it as the BasicShape.nameInEntity component.

@@ -15,26 +15,15 @@ import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 
 export function Renderer({ onLoad }: Props) {
   const [state, setState] = useState<InspectorEngine & { scene: Scene }>()
-  const [mappings, setMappings] = useState<{ file: string; hash: string }[]>([])
-
-  useEffect(() => console.log(mappings), [mappings])
 
   const addAsset = async (asset: IAsset) => {
     if (!state) return
 
     const { engine, sdkComponents, editorComponents, scene } = state
     const child = engine.addEntity()
-    setMappings([
-      ...mappings,
-      ...Object.keys(asset.contents).map((file) => ({
-        file,
-        hash: asset.contents[file]
-      }))
-    ])
-
-    const { x, y, z } = await getPointerCoords(scene)
+    const { x, _y, z } = await getPointerCoords(scene)
     editorComponents.Label.create(child, { label: asset.name })
-    sdkComponents.Transform.create(child, { parent: ROOT, position: { x, y, z } })
+    sdkComponents.Transform.create(child, { parent: ROOT, position: { x, y: 0, z } })
     sdkComponents.GltfContainer.create(child, { src: asset.main })
   }
 
