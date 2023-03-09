@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@dcl/js-runtime": "file:../js-runtime",
-    "@dcl/protocol": "1.0.0-4177500465.commit-247c87f"
+    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-4369574256.commit-93e3bc2.tgz"
   },
   "files": [
     "dist",

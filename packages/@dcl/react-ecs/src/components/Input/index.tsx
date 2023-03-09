@@ -11,6 +11,7 @@ function parseUiInput(props: Partial<UiInputProps>): PBUiInput {
   return {
     disabled: false,
     placeholder: '',
+    textValue: '',
     ...otherProps,
     ...getTextAlign(textAlign),
     ...getFont(font)
