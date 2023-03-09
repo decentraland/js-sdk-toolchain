@@ -53,6 +53,8 @@ export const putGltfContainerComponent: ComponentOperation = (entity, component)
     const currentValue = entity.ecsComponentValues.gltfContainer
     entity.ecsComponentValues.gltfContainer = newValue || undefined
 
+    debugger
+
     // for simplicity of the example, we will remove the Gltf on every update.
     if (currentValue?.src !== newValue?.src) {
       removeCurrentGltf(entity)

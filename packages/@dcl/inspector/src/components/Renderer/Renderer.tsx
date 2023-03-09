@@ -25,8 +25,7 @@ export function Renderer({ onLoad }: Props) {
     editorComponents.Label.create(child, { label: asset.name })
     sdkComponents.Transform.create(child, { parent: ROOT, position: { x, y, z } })
     sdkComponents.MeshRenderer.setBox(child)
-    // // replace MeshRenderer with line below...
-    // // sdkComponents.GltfContainer.create(child, { src: getAssetThumbnailUrl(asset.contents[asset.main]) })
+    sdkComponents.GltfContainer.create(child, { src: asset.main })
   }
 
   useEffect(() => {
