@@ -3,6 +3,8 @@ import { engine } from '@dcl/ecs'
 import { pollEvents } from './observables'
 import { sendBatch, crdtSendToRenderer, crdtGetState } from '~system/EngineApi'
 import { createRendererTransport } from './internal/transports/rendererTransport'
+import { createCompositeProvider } from './composite/provider'
+import { instanceComposite } from './composite'
 
 // Attach CRDT transport
 const rendererTransport = createRendererTransport({ crdtSendToRenderer })
@@ -18,6 +20,12 @@ export async function onUpdate(deltaTime: number) {
  * Function that is called before the first update and after the evaluation of the code.
  */
 export async function onStart() {
+  const compositeProvider = await createCompositeProvider()
+  const mainComposite = compositeProvider.getCompositeOrNull('main')
+  if (mainComposite) {
+    instanceComposite(mainComposite, () => engine.addEntity(), compositeProvider, engine.addEntity())
+  }
+
   await engine.seal()
 
   const response = await crdtGetState({ data: new Uint8Array() })
