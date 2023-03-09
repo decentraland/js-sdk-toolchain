@@ -20,22 +20,17 @@
     "docs",
     "LICENSE",
     "docs-yaml",
-    "artifacts",
-    "src/setupProxy.js",
-    "src/setupExport.js",
-    "src/cli/*.js",
-    "src/cli/**/*.js"
+    "artifacts"
   ],
   "dependencies": {
     "@dcl/amd": "file:../@dcl/amd",
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
-    "@dcl/kernel": "2.0.0-3564938880.commit-ac21951",
+    "@dcl/explorer": "1.0.88362-20230308185024.commit-9c62a7d",
     "@dcl/posix": "^1.0.4",
     "@dcl/schemas": "^5.14.0",
-    "@dcl/unity-renderer": "1.0.64444-20221125155434.commit-fcef3c4",
     "glob": "^7.1.7",
     "http-proxy-middleware": "^2.0.3",
     "ignore": "^5.1.8"
   },
-  "minCliVersion": "3.12.3"
+  "minCliVersion": "3.16.2"
 }
