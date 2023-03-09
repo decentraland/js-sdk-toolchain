@@ -434,6 +434,25 @@ export const enum ComponentType {
     LastWriteWinElementSet = 0
 }
 
+// Warning: (ae-missing-release-tag) "Composite" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type Composite = {
+    id: string;
+    components: {
+        name: string;
+        schema?: JsonSchemaExtended;
+        data: Map<Entity, unknown>;
+    }[];
+};
+
+// Warning: (ae-missing-release-tag) "CompositeProvider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type CompositeProvider = {
+    getCompositeOrNull: (id: string) => Composite | null;
+};
+
 // @public
 export type ConflictResolutionMessage = PutComponentMessageBody | DeleteComponentMessageBody;
 
@@ -715,8 +734,8 @@ export interface IEngine {
     defineComponent<T extends Spec>(componentName: string, spec: T, constructorDefault?: Partial<MapResult<T>>): MapComponentDefinition<MapResult<T>>;
     defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): LastWriteWinElementSetComponentDefinition<T>;
     defineValueSetComponentFromSchema<T>(componentName: string, spec: ISchema<T>, options: ValueSetOptions<T>): GrowOnlyValueSetComponentDefinition<T>;
-    getComponent<T>(componentId: number): ComponentDefinition<T>;
-    getComponentOrNull<T>(componentId: number): ComponentDefinition<T> | null;
+    getComponent<T>(componentId: number | string): ComponentDefinition<T>;
+    getComponentOrNull<T>(componentId: number | string): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     getEntityState(entity: Entity): EntityState;
     readonly PlayerEntity: Entity;
@@ -996,6 +1015,13 @@ export type InputEventResult = {
 
 // @public
 export const inputSystem: IInputSystem;
+
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+//
+// @public
+export function instanceComposite(engine: IEngine, compositeData: Composite, getNextAvailableEntity: () => Entity | null, compositeProvider: CompositeProvider, alreadyRequestedId?: string[], rootEntity?: Entity): Entity;
 
 // @public (undocumented)
 export interface ISchema<T = any> {
