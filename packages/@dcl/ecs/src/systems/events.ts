@@ -99,8 +99,23 @@ export function createPointerEventSystem(engine: IEngine, inputSystem: IInputSys
 
   function setPointerEvent(entity: Entity, type: PointerEventType, opts: EventSystemOptions) {
     if (opts.hoverText || opts.showFeedback) {
-      const pointerEvent = PointerEvents.getMutableOrNull(entity) || PointerEvents.create(entity)
+      const existingPointerEvent = PointerEvents.getMutableOrNull(entity)
+      //
+      if (existingPointerEvent) {
+        const alreadyExist = existingPointerEvent.pointerEvents.find(
+          (item) =>
+            item.eventType === type &&
+            item.eventInfo &&
+            item.eventInfo.button === opts.button &&
+            item.eventInfo.showFeedback === opts.showFeedback &&
+            item.eventInfo.hoverText === opts.hoverText &&
+            item.eventInfo.maxDistance === opts.maxDistance
+        )
 
+        if (alreadyExist) return
+      }
+
+      const pointerEvent = existingPointerEvent || PointerEvents.create(entity)
       pointerEvent.pointerEvents.push({
         eventType: type,
         eventInfo: {
