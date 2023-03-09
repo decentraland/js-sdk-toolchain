@@ -12,7 +12,6 @@ import { IAsset } from '../AssetsCatalog/types'
 import { ROOT } from '../../hooks/sdk/tree'
 import { Props } from './types'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
-import { getStorageUrl } from '../AssetsCatalog/utils'
 
 export function Renderer({ onLoad }: Props) {
   const [state, setState] = useState<InspectorEngine & { scene: Scene }>()
@@ -36,8 +35,6 @@ export function Renderer({ onLoad }: Props) {
     const { x, y, z } = await getPointerCoords(scene)
     editorComponents.Label.create(child, { label: asset.name })
     sdkComponents.Transform.create(child, { parent: ROOT, position: { x, y, z } })
-    sdkComponents.MeshRenderer.setBox(child)
-    // // replace MeshRenderer with line below...
     sdkComponents.GltfContainer.create(child, { src: asset.main })
   }
 

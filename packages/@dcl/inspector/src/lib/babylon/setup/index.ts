@@ -92,7 +92,6 @@ export function initEngine(canvas: HTMLCanvasElement) {
 
   const editorColor = BABYLON.Color3.FromHexString('#0e0c12')
   const editorEnvHelper = scene.createDefaultEnvironment({
-    environmentTexture: void 0,
     groundColor: editorColor,
     skyboxColor: editorColor,
     skyboxSize: 200,
