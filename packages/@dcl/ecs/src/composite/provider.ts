@@ -1,5 +1,5 @@
-import { Entity } from '@dcl/ecs'
 import { getSceneInfo } from '~system/Scene'
+import { Entity } from '../engine/entity'
 import { Composite, CompositeProvider } from './types'
 
 // function compositeFromBinary(binaryComposite: Uint8Array): Composite {
@@ -47,6 +47,7 @@ function compositeFromJson(jsonComposite: any): Composite {
   return composite
 }
 
+// @internal
 export async function createContentFetchCompositeProvider(): Promise<CompositeProvider> {
   const scene = await getSceneInfo({})
   const compositesContent = scene.contents.filter((item) => {

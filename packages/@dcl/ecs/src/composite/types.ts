@@ -1,4 +1,5 @@
-import { Entity, JsonSchemaExtended } from '@dcl/ecs'
+import { Entity } from '../engine/entity'
+import { JsonSchemaExtended } from '../schemas/ISchema'
 
 export type Composite = {
   id: string

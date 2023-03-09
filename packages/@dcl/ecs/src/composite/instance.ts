@@ -1,7 +1,10 @@
-import { Entity, engine, LastWriteWinElementSetComponentDefinition, Transform, TransformType, Schemas } from '@dcl/ecs'
+import { Transform } from '../components'
+import { TransformType } from '../components/manual/Transform'
+import { Entity } from '../engine/entity'
+import { IEngine, LastWriteWinElementSetComponentDefinition } from '../engine/types'
+import { Schemas } from '../schemas'
 import { CompositeRoot } from './components'
 import { Composite, CompositeProvider } from './types'
-import { getComponentFromNameOrNull } from './temp'
 
 /**
  * Return the entity mapping or fail if there is no more
@@ -31,14 +34,18 @@ function getEntityMapping(
  * @param compositeData state serialized by the CRDT protocol
  * @param getNextAvailableEntity function that gives unused entities
  * @param rootEntity (optional) suggested mapped rootEntity for the composite
+ *
+ * @public
  */
 export function instanceComposite(
+  engine: IEngine,
   compositeData: Composite,
   getNextAvailableEntity: () => Entity | null,
   compositeProvider: CompositeProvider,
   alreadyRequestedId: string[] = [],
   rootEntity?: Entity
 ) {
+  const CompositeRootComponent = CompositeRoot(engine)
   // Key => EntityNumber from the composite
   // Value => EntityNumber in current engine
   const mappedEntities: Map<Entity, Entity> = new Map()
@@ -57,10 +64,10 @@ export function instanceComposite(
   // If there are more composite inside this one, we instance first.
   // => This is not only a copy, we need to instance.
   // => Other reason for composite instanciation first is the overides. If we instance first and then load the component, the override
-  const childrenComposite = compositeData.components.find((item) => item.name === CompositeRoot.componentName)
+  const childrenComposite = compositeData.components.find((item) => item.name === CompositeRootComponent.componentName)
   if (childrenComposite) {
     for (const [entity, childComposite] of childrenComposite.data) {
-      const compositeRoot = childComposite as ReturnType<typeof CompositeRoot['create']>
+      const compositeRoot = childComposite as ReturnType<typeof CompositeRootComponent['create']>
       const composite = compositeProvider.getCompositeOrNull(compositeRoot.id)
       if (composite) {
         if (alreadyRequestedId.includes(compositeRoot.id) || compositeRoot.id === compositeData.id) {
@@ -72,6 +79,7 @@ export function instanceComposite(
         }
 
         instanceComposite(
+          engine,
           composite,
           getNextAvailableEntity,
           compositeProvider,
@@ -86,12 +94,12 @@ export function instanceComposite(
   // Then, we copy the all rest of the components (skipping the Composite ones)
   for (const component of compositeData.components) {
     // We already instanced the composite
-    if (component.name === CompositeRoot.componentName) continue
+    if (component.name === CompositeRootComponent.componentName) continue
 
     // ## 3a ##
     // We find the component definition
     let componentDefinition
-    const existingComponentDefinition = getComponentFromNameOrNull(component.name)
+    const existingComponentDefinition = engine.getComponentOrNull(component.name)
 
     if (!existingComponentDefinition) {
       if (!component.schema) {
@@ -111,7 +119,7 @@ export function instanceComposite(
       // ## 3c ##
       // All entities referenced in the composite probably has a different resolved EntityNumber
       // We'll know with the mappedEntityes
-      if (Transform.componentId === componentDefinition.componentId) {
+      if (Transform(engine).componentId === componentDefinition.componentId) {
         const transform = componentValue as TransformType
         if (transform.parent) {
           transform.parent = getCompositeEntity(transform.parent)
@@ -122,7 +130,8 @@ export function instanceComposite(
     }
   }
 
-  const composite = CompositeRoot.getMutableOrNull(compositeRootEntity) || CompositeRoot.create(compositeRootEntity)
+  const composite =
+    CompositeRootComponent.getMutableOrNull(compositeRootEntity) || CompositeRootComponent.create(compositeRootEntity)
   for (const [entitySource, targetEntity] of mappedEntities) {
     composite.entities.push({
       src: entitySource,
