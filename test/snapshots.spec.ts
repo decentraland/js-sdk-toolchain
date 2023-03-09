@@ -111,6 +111,14 @@ async function run(fileName: string) {
               return { data: serverUpdates }
             }
           }
+        } else if (moduleName === '~system/Scene') {
+          return {
+            async getSceneInfo(data: Record<string, any>) {
+              return {
+                contents: []
+              }
+            }
+          }
         }
 
         throw new Error('Unknown module ' + moduleName)

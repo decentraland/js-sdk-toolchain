@@ -4,15 +4,16 @@
   ALIVE_OBJS_DELTA ~= 0.19k
 EVAL test/snapshots/billboard.js
   REQUIRE: ~system/EngineApi
+  REQUIRE: ~system/Scene
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 25k
-  MALLOC_COUNT = 12390
-  ALIVE_OBJS_DELTA ~= 2.33k
+  OPCODES ~= 29k
+  MALLOC_COUNT = 12673
+  ALIVE_OBJS_DELTA ~= 2.38k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 2
-  ALIVE_OBJS_DELTA ~= 0.00k
+  MALLOC_COUNT = 8
+  ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":8,"y":3,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1 t=1 data={"position":{"x":12,"y":3,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
@@ -49,7 +50,7 @@ CALL onUpdate(0.0)
   Scene: PUT_COMPONENT e=0x204 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   Scene: PUT_COMPONENT e=0x205 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   OPCODES ~= 104k
-  MALLOC_COUNT = 59
+  MALLOC_COUNT = 57
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":8,"y":3.0420734882354736,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
@@ -75,4 +76,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 9k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1230.70k bytes
+  MEMORY_USAGE_COUNT ~= 1251.07k bytes

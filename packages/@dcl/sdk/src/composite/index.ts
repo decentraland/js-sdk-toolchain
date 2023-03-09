@@ -1,6 +1,5 @@
-import { Entity, engine, LastWriteWinElementSetComponentDefinition, Transform, TransformType } from '@dcl/ecs'
+import { Entity, engine, LastWriteWinElementSetComponentDefinition, Transform, TransformType, Schemas } from '@dcl/ecs'
 import { CompositeRoot } from './components'
-import { jsonSchemaToSchema } from '@dcl/ecs/src/schemas/buildSchema'
 import { Composite, CompositeProvider } from './types'
 import { getComponentFromNameOrNull } from './temp'
 
@@ -83,7 +82,7 @@ export function instanceComposite(
       if (!component.schema) {
         throw new Error(`${component.name} is not defined and there is no schema to define it.`)
       }
-      componentDefinition = engine.defineComponentFromSchema(component.name, jsonSchemaToSchema(component.schema))
+      componentDefinition = engine.defineComponentFromSchema(component.name, Schemas.fromJson(component.schema))
     } else {
       componentDefinition = existingComponentDefinition as LastWriteWinElementSetComponentDefinition<unknown>
     }

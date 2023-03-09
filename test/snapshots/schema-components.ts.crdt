@@ -4,17 +4,18 @@
   ALIVE_OBJS_DELTA ~= 0.19k
 EVAL test/snapshots/schema-components.js
   REQUIRE: ~system/EngineApi
+  REQUIRE: ~system/Scene
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 13k
-  MALLOC_COUNT = 5086
-  ALIVE_OBJS_DELTA ~= 0.81k
+  OPCODES ~= 18k
+  MALLOC_COUNT = 6457
+  ALIVE_OBJS_DELTA ~= 1.10k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 4
-  ALIVE_OBJS_DELTA ~= 0.00k
+  MALLOC_COUNT = 10
+  ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.0)
-  OPCODES ~= 1k
+  OPCODES ~= 2k
   MALLOC_COUNT = 27
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
@@ -29,4 +30,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 708.20k bytes
+  MEMORY_USAGE_COUNT ~= 824.78k bytes

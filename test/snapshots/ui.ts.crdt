@@ -4,15 +4,16 @@
   ALIVE_OBJS_DELTA ~= 0.19k
 EVAL test/snapshots/ui.js
   REQUIRE: ~system/EngineApi
+  REQUIRE: ~system/Scene
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 24k
-  MALLOC_COUNT = 23106
-  ALIVE_OBJS_DELTA ~= 3.35k
+  OPCODES ~= 28k
+  MALLOC_COUNT = 23389
+  ALIVE_OBJS_DELTA ~= 3.41k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 4
-  ALIVE_OBJS_DELTA ~= 0.00k
+  MALLOC_COUNT = 10
+  ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x200 c=1062 t=1 data={"pointerEvents":[{"eventType":1,"eventInfo":{"button":1,"hoverText":"Press E to spawn","maxDistance":100,"showFeedback":true}}]}
@@ -33,12 +34,12 @@ CALL onUpdate(0.0)
   Scene: PUT_COMPONENT e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x200 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   OPCODES ~= 80k
-  MALLOC_COUNT = 396
+  MALLOC_COUNT = 394
   ALIVE_OBJS_DELTA ~= 0.14k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.008726535364985466,"z":0,"w":0.9999619126319885},"scale":{"x":1,"y":1,"z":1},"parent":0}
   OPCODES ~= 53k
-  MALLOC_COUNT = 181
+  MALLOC_COUNT = 179
   ALIVE_OBJS_DELTA ~= 0.08k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=3 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.017452405765652657,"z":0,"w":0.9998477101325989},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -50,4 +51,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 51k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 4544.10k bytes
+  MEMORY_USAGE_COUNT ~= 4564.42k bytes

@@ -4,16 +4,17 @@
   ALIVE_OBJS_DELTA ~= 0.19k
 EVAL test/snapshots/append-value-crdt.js
   REQUIRE: ~system/EngineApi
+  REQUIRE: ~system/Scene
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 15k
-  MALLOC_COUNT = 9867
-  ALIVE_OBJS_DELTA ~= 1.95k
+  OPCODES ~= 20k
+  MALLOC_COUNT = 10153
+  ALIVE_OBJS_DELTA ~= 2.01k
 CALL onStart()
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"origin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5}
   OPCODES ~= 8k
-  MALLOC_COUNT = 92
-  ALIVE_OBJS_DELTA ~= 0.03k
+  MALLOC_COUNT = 96
+  ALIVE_OBJS_DELTA ~= 0.04k
 CALL onUpdate(0.0)
   LOG: ["PointerEventsResult",[{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"origin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5}]]
   LOG: ["✅ First state is pressed"]
@@ -53,4 +54,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 14k
   MALLOC_COUNT = 33
   ALIVE_OBJS_DELTA ~= 0.01k
-  MEMORY_USAGE_COUNT ~= 1020.51k bytes
+  MEMORY_USAGE_COUNT ~= 1040.96k bytes

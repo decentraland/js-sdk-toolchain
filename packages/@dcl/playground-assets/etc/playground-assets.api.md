@@ -2419,6 +2419,8 @@ export namespace Schemas {
     Map: <T extends Spec>(spec: T, defaultValue?: Partial<MapResult<T>> | undefined) => ISchema<MapResult<T>>;
     const // (undocumented)
     Optional: <T>(spec: ISchema<T>) => ISchema<T | undefined>;
+    const // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+    fromJson: (json: JsonSchemaExtended) => ISchema<unknown>;
 }
 
 // @public (undocumented)

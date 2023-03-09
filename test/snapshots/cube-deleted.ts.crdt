@@ -4,15 +4,16 @@
   ALIVE_OBJS_DELTA ~= 0.19k
 EVAL test/snapshots/cube-deleted.js
   REQUIRE: ~system/EngineApi
+  REQUIRE: ~system/Scene
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 10k
-  MALLOC_COUNT = 6082
-  ALIVE_OBJS_DELTA ~= 1.02k
+  OPCODES ~= 14k
+  MALLOC_COUNT = 6368
+  ALIVE_OBJS_DELTA ~= 1.07k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 4
-  ALIVE_OBJS_DELTA ~= 0.00k
+  MALLOC_COUNT = 10
+  ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
@@ -40,4 +41,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 3k
   MALLOC_COUNT = 1
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 812.46k bytes
+  MEMORY_USAGE_COUNT ~= 832.97k bytes
