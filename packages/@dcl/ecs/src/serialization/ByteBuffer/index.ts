@@ -20,7 +20,7 @@ const defaultInitialCapacity = 10240
  *
  * - Use read and write function to generate or consume data.
  * - Use set and get only if you are sure that you're doing.
- * 
+ *
  * It always passes littleEndian param as true
  */
 export class ReadWriteByteBuffer implements ByteBuffer {
