@@ -7,25 +7,13 @@ EVAL test/snapshots/pointer-events.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 16k
-  MALLOC_COUNT = 9588
+  MALLOC_COUNT = 9589
   ALIVE_OBJS_DELTA ~= 1.89k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 4
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.0)
-  Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":15,"y":1,"z":15},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  Scene: PUT_COMPONENT e=0x201 c=1 t=1 data={"position":{"x":13,"y":1,"z":15},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  Scene: PUT_COMPONENT e=0x202 c=1 t=1 data={"position":{"x":11,"y":1,"z":15},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  Scene: PUT_COMPONENT e=0x200 c=1062 t=1 data={"pointerEvents":[{"eventType":1,"eventInfo":{"button":1,"hoverText":"PrimaryDown","maxDistance":5,"showFeedback":true}}]}
-  Scene: PUT_COMPONENT e=0x201 c=1062 t=1 data={"pointerEvents":[{"eventType":0,"eventInfo":{"button":2,"hoverText":"Secondary Up","maxDistance":5,"showFeedback":true}}]}
-  Scene: PUT_COMPONENT e=0x202 c=1062 t=1 data={"pointerEvents":[{"eventType":2,"eventInfo":{"button":3,"hoverText":"Infinity Hover","maxDistance":10000000,"showFeedback":true}}]}
-  Scene: PUT_COMPONENT e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  Scene: PUT_COMPONENT e=0x201 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  Scene: PUT_COMPONENT e=0x202 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  Scene: PUT_COMPONENT e=0x200 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-  Scene: PUT_COMPONENT e=0x201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-  Scene: PUT_COMPONENT e=0x202 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   OPCODES ~= 21k
   MALLOC_COUNT = 39
   ALIVE_OBJS_DELTA ~= 0.02k
@@ -41,4 +29,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 2k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1001.62k bytes
+  MEMORY_USAGE_COUNT ~= 1003.19k bytes
