@@ -6,3 +6,8 @@ export type DataLayerInterface = {
   // redo(): Promise<any>
   stream(iter: AsyncIterable<{ data: Uint8Array }>): AsyncGenerator<{ data: Uint8Array }>
 }
+
+export type Fs = {
+  readFile: unknown
+  writeFile: unknown
+}
