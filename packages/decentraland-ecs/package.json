@@ -26,11 +26,7 @@
     "@dcl/amd": "file:../@dcl/amd",
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
     "@dcl/explorer": "1.0.88362-20230308185024.commit-9c62a7d",
-    "@dcl/posix": "^1.0.4",
-    "@dcl/schemas": "^5.14.0",
-    "glob": "^7.1.7",
-    "http-proxy-middleware": "^2.0.3",
-    "ignore": "^5.1.8"
+    "@dcl/posix": "^1.0.4"
   },
   "minCliVersion": "3.16.2"
 }
