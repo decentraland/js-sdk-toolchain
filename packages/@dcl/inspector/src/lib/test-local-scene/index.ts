@@ -1,6 +1,7 @@
 import { Engine } from '@dcl/ecs'
 import { Quaternion, Vector3 } from '@dcl/ecs-math'
 import * as components from '@dcl/ecs/dist/components'
+import { catalog } from '../../catalog'
 import { LoadableScene } from '../babylon/decentraland/SceneContext'
 import { createEditorComponents } from '../sdk/components'
 
@@ -14,12 +15,13 @@ export function getHardcodedLoadableScene(_id: string): LoadableScene {
       type: 'scene' as any,
       pointers: ['0,0', '0,1'],
       timestamp: 1665777069759,
-      content: [
-        { file: 'pebbles.glb', hash: 'QmWvKrw2SekVNLYyGg4nAqqh5Hgkz64EeGowMB1vFWKr6v' },
-        { file: 'Barbacue_01/Barbacue_01.glb', hash: 'QmR1QAy5PWKUGho2fzt7NBLNobGwUT3ghFz9DxXGoGLvQn' },
-        { file: 'Barbacue_01/file1.png', hash: 'QmYACL8SnbXEonXQeRHdWYbfm8vxvaFAWnsLHUaDG4ABp5' },
-        { file: 'Barbacue_01/thumbnail.png', hash: 'QmRBuZoF2TiD8Egonw5Y6g7AfqgVKGihPwtE4pG5uxLtHX' }
-      ],
+      content: catalog
+        .map((assetPack) =>
+          assetPack.assets
+            .map((asset) => Object.keys(asset.contents).map((file) => ({ file, hash: asset.contents[file] })))
+            .reduce((assetPackContents, assetContents) => assetPackContents.concat(assetContents), [])
+        )
+        .reduce((allContents, assetPackContents) => allContents.concat(assetPackContents), []),
       metadata: {
         display: {
           title: 'DCL Scene',
