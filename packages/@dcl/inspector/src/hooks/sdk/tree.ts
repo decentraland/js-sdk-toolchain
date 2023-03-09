@@ -72,7 +72,7 @@ const getTree = (inspectorEngine: InspectorEngine) => {
 
 export const useTree = (inspectorEngine: InspectorEngine) => {
   const [tree, setTree] = useState(getTree(inspectorEngine))
-
+  console.log(tree)
   const { engine, editorComponents, sdkComponents } = inspectorEngine
 
   const update = () => setTree(getTree(inspectorEngine))
@@ -80,7 +80,10 @@ export const useTree = (inspectorEngine: InspectorEngine) => {
   const { Label, Toggle, EntitySelected } = editorComponents
 
   const getId = (entity: Entity) => entity.toString()
-  const getChildren = (entity: Entity) => Array.from(tree.get(entity)!)
+  const getChildren = (entity: Entity): Entity[] => {
+    const children = tree.get(entity)
+    return children ? Array.from(children) : []
+  }
   const getLabel = (entity: Entity) => (Label.has(entity) ? Label.get(entity).label : entity.toString())
   const isOpen = (entity: Entity) => Toggle.has(entity)
   const isSelected = (entity: Entity) => EntitySelected.has(entity)
