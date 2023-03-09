@@ -36,6 +36,7 @@ export function instanceComposite(
   compositeData: Composite,
   getNextAvailableEntity: () => Entity | null,
   compositeProvider: CompositeProvider,
+  alreadyRequestedId: string[] = [],
   rootEntity?: Entity
 ) {
   // Key => EntityNumber from the composite
@@ -62,7 +63,21 @@ export function instanceComposite(
       const compositeRoot = childComposite as ReturnType<typeof CompositeRoot['create']>
       const composite = compositeProvider.getCompositeOrNull(compositeRoot.id)
       if (composite) {
-        instanceComposite(composite, getNextAvailableEntity, compositeProvider, entity)
+        if (alreadyRequestedId.includes(compositeRoot.id) || compositeRoot.id === compositeData.id) {
+          throw new Error(
+            `Composite ${compositeRoot.id} has a recursive instanciation while try to instance ${
+              compositeData.id
+            }. Previous instances: ${alreadyRequestedId.toString()}`
+          )
+        }
+
+        instanceComposite(
+          composite,
+          getNextAvailableEntity,
+          compositeProvider,
+          [...alreadyRequestedId, compositeData.id],
+          entity
+        )
       }
     }
   }

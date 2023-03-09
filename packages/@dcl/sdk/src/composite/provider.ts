@@ -47,7 +47,7 @@ function compositeFromJson(jsonComposite: any): Composite {
   return composite
 }
 
-export async function createCompositeProvider(): Promise<CompositeProvider> {
+export async function createContentFetchCompositeProvider(): Promise<CompositeProvider> {
   const scene = await getSceneInfo({})
   const compositesContent = scene.contents.filter((item) => {
     const path = item.file.toLowerCase()
