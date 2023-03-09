@@ -17,11 +17,12 @@ export function serializeEngine(engine: IEngine) {
 export function createEngine(): IEngine {
   // create engine and its components
   const engine = Engine()
-  const _Billboard = components.Billboard(engine)
-  const _Transform = components.Transform(engine)
-  const _MeshRenderer = components.MeshRenderer(engine)
-  const _GltfContainer = components.GltfContainer(engine)
-  const _TextShape = components.TextShape(engine)
+
+  components.Billboard(engine)
+  components.Transform(engine)
+  components.MeshRenderer(engine)
+  components.GltfContainer(engine)
+  components.TextShape(engine)
 
   createEditorComponents(engine)
   return engine
