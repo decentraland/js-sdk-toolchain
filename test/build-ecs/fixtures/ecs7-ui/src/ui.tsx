@@ -6,8 +6,9 @@ import ReactEcs, {
   Dropdown,
   Label,
   Button
-} from '../../../../../packages/@dcl/react-ecs/dist'
+} from '../../../../../packages/@dcl/react-ecs'
 
+let selectedIndex: number = 0
 const uiComponent = () => (
   <UiEntity
     onMouseDown={() => {
@@ -47,6 +48,11 @@ const uiComponent = () => (
       color={Color4.Red()}
       options={['BOEDO', 'CASLA']}
       uiTransform={{ width: 200, height: 36 }}
+      onChange={(e) => {
+        selectedIndex = e
+        console.log(e)
+      }}
+      selectedIndex={selectedIndex}
     />
     <Input
       placeholder={'SARASA'}
@@ -58,12 +64,7 @@ const uiComponent = () => (
       }}
       uiTransform={{ width: 200, height: 36 }}
     />
-    <Label
-      color={{ r: 1, g: 1, b: 1, a: 1 }}
-      value="Some text"
-      fontSize={16}
-      textAlign="middle-center"
-    />
+    <Label color={{ r: 1, g: 1, b: 1, a: 1 }} value="Some text" fontSize={16} textAlign="middle-center" />
     <Button variant="primary" value="Primary Button" />
     <Button variant="secondary" value="Secondary Button" />
   </UiEntity>

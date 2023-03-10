@@ -8,7 +8,7 @@
   "license": "Apache-2.0",
   "description": "My new Decentraland project",
   "scripts": {
-    "start": "dcl start",
+    "start": "sdk-commands start",
     "build": "sdk-commands build",
     "build-prod": "sdk-commands build --production",
     "watch": "sdk-commands build --watch"
