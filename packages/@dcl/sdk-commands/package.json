@@ -51,5 +51,7 @@
     "displayName": "SDK",
     "tsconfig": "./tsconfig.json"
   },
-  "files": ["dist"]
+  "files": [
+    "dist"
+  ]
 }
