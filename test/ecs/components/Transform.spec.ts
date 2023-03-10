@@ -83,6 +83,21 @@ describe('Transform component', () => {
     })
   })
 
+  it('should create a valid transform component with default values if partial values are provided', () => {
+    const newEngine = Engine()
+    const Transform = components.Transform(newEngine)
+    const entity = newEngine.addEntity()
+
+    const t1 = Transform.create(entity, { position: { x: 1, y: 1, z: 1 } })
+
+    expect(t1).toEqual({
+      position: { x: 1, y: 1, z: 1 },
+      scale: { x: 1, y: 1, z: 1 },
+      rotation: { x: 0, y: 0, z: 0, w: 1 },
+      parent: 0 as Entity
+    })
+  })
+
   it('should create a valid empty transform component if no value argument is passed in getOrCreate', () => {
     const newEngine = Engine()
     const Transform = components.Transform(newEngine)
