@@ -1,6 +1,6 @@
 import { version as vmVersion } from '@dcl/quickjs-emscripten/package.json'
 import { exec } from 'child_process'
-import { existsSync, readFileSync, writeFileSync } from 'fs-extra'
+import { existsSync, readFileSync, stat, writeFileSync } from 'fs-extra'
 import glob from 'glob'
 import path from 'path'
 import { CrdtMessageType, engine } from '../packages/@dcl/ecs/src'
@@ -21,8 +21,13 @@ describe('Runs the snapshots', () => {
 
 function testFileSnapshot(fileName: string, workingDirectory: string) {
   it(`tests the file ${fileName}`, async () => {
-    await compile(fileName, workingDirectory)
-    const { result, leaking } = await run(fileName.replace(/\.ts$/, '.js'))
+    await compile(fileName, workingDirectory, true)
+    const jsSizeBytesProd = (await stat(fileName.replace(/\.ts$/, '.js'))).size
+    const jsProdSize = (jsSizeBytesProd / 1000).toLocaleString('en', { maximumFractionDigits: 2 })
+
+    const { result: resultFromRun, leaking } = await run(fileName.replace(/\.ts$/, '.js'))
+
+    const result = `SCENE_COMPILED_JS_SIZE_PROD=${jsProdSize}k bytes\n` + `This run is in PROD mode.\n` + resultFromRun
 
     const compareToFileName = fileName + '.crdt'
     const compareFileExists = existsSync(compareToFileName)
@@ -201,9 +206,14 @@ async function run(fileName: string) {
   })
 }
 
-async function compile(filename: string, workingDirectory: string) {
+async function compile(filename: string, workingDirectory: string, production?: boolean) {
   const cwd = path.resolve(workingDirectory)
-  await runCommand(`npm run build --silent -- --single ${JSON.stringify(path.relative(cwd, filename))}`, cwd, ENV)
+  const producctionBuild = production ? '--production' : ''
+  await runCommand(
+    `npm run build --silent -- ${producctionBuild} --single ${JSON.stringify(path.relative(cwd, filename))}`,
+    cwd,
+    ENV
+  )
 }
 
 export function runCommand(command: string, cwd: string, env?: Record<string, string>): Promise<string> {
