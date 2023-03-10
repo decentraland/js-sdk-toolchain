@@ -39,7 +39,6 @@ BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
           if (ret) {
             return ctx.loadableScene.baseUrl + ret
           }
-          debugger
         }
       }
       throw new Error('Cannot resolve file ' + url)

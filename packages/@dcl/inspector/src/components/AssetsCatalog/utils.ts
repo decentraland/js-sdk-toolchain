@@ -4,8 +4,8 @@ export function getThemeThumbnailUrl(thumbnail: string) {
   return `https://builder-api.decentraland.org/v1/storage/assetPacks/${thumbnail}`
 }
 
-export function getAssetThumbnailUrl(thumbnail: string) {
-  return `https://builder-api.decentraland.org/v1/storage/contents/${thumbnail}`
+export function getStorageUrl(hash: string) {
+  return `https://builder-api.decentraland.org/v1/storage/contents/${hash}`
 }
 
 export function getAssetsByCategory(assets: IAsset[]) {

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { useDrag } from 'react-dnd'
 
 import { AssetProps, CategoriesProps, ITheme, Props, ThemeProps } from './types'
-import { getAssetThumbnailUrl, getAssetsByCategory, getThemeThumbnailUrl } from './utils'
+import { getStorageUrl, getAssetsByCategory, getThemeThumbnailUrl } from './utils'
 
 import './AssetsCatalog.css'
 
@@ -18,7 +18,6 @@ export function AssetsCatalog({ value }: Props) {
   )
 }
 
-
 function ThemeCell({ value, onClick }: ThemeProps) {
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -27,7 +26,7 @@ function ThemeCell({ value, onClick }: ThemeProps) {
 
   return (
     <div onClick={handleClick} className="theme">
-      <img src={getThemeThumbnailUrl(value.thumbnail)} alt={value.title}/>
+      <img src={getThemeThumbnailUrl(value.thumbnail)} alt={value.title} />
       <h4>{value.title}</h4>
       <div></div>
     </div>
@@ -43,7 +42,10 @@ function Categories({ onGoBack, value }: CategoriesProps) {
 
   return (
     <div className="categories">
-      <div><span onClick={handleGoBack}>&lt;</span><h3>{value.title}</h3></div>
+      <div>
+        <span onClick={handleGoBack}>&lt;</span>
+        <h3>{value.title}</h3>
+      </div>
       {Array.from(assetsByCategory, ($) => {
         const [category, assets] = $
         if (!assets.length) return null
@@ -51,7 +53,9 @@ function Categories({ onGoBack, value }: CategoriesProps) {
           <div className="category" key={category}>
             <h4>{category}</h4>
             <div className="assets">
-              {assets.map(($$) => <AssetCell key={$$.id} value={$$} />)}
+              {assets.map(($$) => (
+                <AssetCell key={$$.id} value={$$} />
+              ))}
             </div>
           </div>
         )
@@ -65,7 +69,7 @@ function AssetCell({ value }: AssetProps) {
 
   return (
     <div ref={drag}>
-      <img src={getAssetThumbnailUrl(value.thumbnail)} alt={value.tags.join(', ')}/>
+      <img src={getStorageUrl(value.thumbnail)} alt={value.tags.join(', ')} />
     </div>
   )
 }

@@ -5,17 +5,16 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import { InspectorEngine } from './lib/sdk/engine'
 
-import { AssetsCatalog, ITheme } from './components/AssetsCatalog'
+import { AssetsCatalog } from './components/AssetsCatalog'
 import Hierarchy from './components/Hierarchy/Hierarchy'
 import { Renderer } from './components/Renderer/Renderer'
+import { useCatalog } from './hooks/catalog/useCatalog'
 
 import './index.css'
 
-// TODO: move this to data service
-const assetsCatalogJson = require('./components/AssetsCatalog/catalog.json') as ITheme[]
-
 async function initScene() {
   const App = () => {
+    const [catalog] = useCatalog()
     const [inspectorEngine, setInspectorEngine] = useState<InspectorEngine>()
     const handleOnLoad = (value: InspectorEngine) => setInspectorEngine(value)
 
@@ -24,7 +23,7 @@ async function initScene() {
         <div className="left">{inspectorEngine && <Hierarchy inspectorEngine={inspectorEngine} />}</div>
         <div className="right">
           <Renderer onLoad={handleOnLoad} />
-          <AssetsCatalog value={assetsCatalogJson} />
+          {catalog && <AssetsCatalog value={catalog} />}
         </div>
       </>
     )
