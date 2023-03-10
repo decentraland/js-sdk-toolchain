@@ -6,20 +6,23 @@ Use the Decentraland Software Development Kit v7 to create experiences for the D
 
 ## Create a scene and preview it locally
 
-1. Download the SDK by running `npm install -g @dcl/sdk`.
-2. Run `dcl init` on an empty folder, or `dcl init my-scene` to create a folder named `my-scene` with a new project.
-3. Preview it with `dcl start`!
+1. Run `npx @dcl/sdk-commands init` on an empty folder.
+2. Preview it with `npm run start`!
 
 ## Repository guide
 
 This repository consists of the following components, packaged for the `nodejs`/`npm` ecosystem (find them under the respective subfolder in `packages`):
 * `@dcl/react-ecs`: a framework to create scenes using the [React](https://reactjs.org) framework
-* `@dcl/sdk`: contains the command line interface and the `dcl` binary
+* `@dcl/sdk`: contains all the packages that a scene needs to work.
 * `@dcl/ecs`: an engine used to render things on screen
+* `@dcl/sdk-commands`: contains the command line interface
+* `@dcl/inspector`: Editor interface.
 
 And some internal or maybe useful packages if you're digging deeper into how the Decentraland runtime works:
 * `@dcl/js-runtime`: the `js-runtime` contains the typings for the environment variables available in the sandboxed execution environment for scenes
 * `@dcl/rollup`: configuration for the [rollup](https://rollupjs.org/) bundle and packaging system for javascript projects
+* `@dcl/playground-assets`: contains the files needed by the playground. https://playground.decentraland.org/
+
 
 ### Versioning notes
 
