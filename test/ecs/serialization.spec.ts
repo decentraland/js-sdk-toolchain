@@ -372,6 +372,7 @@ describe('Serialization Types', () => {
   it('should prefill with default value', () => {
     const engine = Engine()
     const entityWithDefault = engine.addEntity() // 0
+    const entityWithDefault2 = engine.addEntity()
     const entityEmpty = engine.addEntity() // 1
     const COMPONENT_ID = 888
 
@@ -398,6 +399,8 @@ describe('Serialization Types', () => {
 
     TestComponentType.create(entityWithDefault)
 
+    TestComponentType.createOrReplace(entityWithDefault2)
+
     expect(TestComponentType.get(entityEmpty)).toStrictEqual({
       a: 0,
       b: 0,
@@ -406,6 +409,13 @@ describe('Serialization Types', () => {
     })
 
     expect(TestComponentType.get(entityWithDefault)).toStrictEqual({
+      a: 123,
+      b: 123,
+      c: [11, 22, 33],
+      d: 12
+    })
+
+    expect(TestComponentType.get(entityWithDefault2)).toStrictEqual({
       a: 123,
       b: 123,
       c: [11, 22, 33],
