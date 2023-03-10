@@ -79,8 +79,14 @@ describe('Engine tests', () => {
       position.x = 80
     }
     expect(Position.get(entity)).toStrictEqual({ x: 80 })
+
     engine.removeComponentDefinition(888)
     expect(() => engine.getComponent(888)).toThrowError()
+
+    engine.seal()
+    expect(() => engine.removeComponentDefinition(888)).toThrowError(
+      'Engine is already sealed. No components can be removed at this stage'
+    )
   })
 
   it('should fail if we try to fetch a component not deifned', async () => {

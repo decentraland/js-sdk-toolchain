@@ -193,6 +193,8 @@ function preEngine(): PreEngine {
   }
 
   function removeComponentDefinition(componentIdOrName: number | string) {
+    if (sealed) throw new Error('Engine is already sealed. No components can be removed at this stage')
+
     const componentId =
       typeof componentIdOrName === 'number' ? componentIdOrName : componentNumberFromName(componentIdOrName)
     componentsDefinition.delete(componentId)
