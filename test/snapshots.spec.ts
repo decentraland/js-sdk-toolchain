@@ -25,17 +25,9 @@ function testFileSnapshot(fileName: string, workingDirectory: string) {
     const jsSizeBytesProd = (await stat(fileName.replace(/\.ts$/, '.js'))).size
     const jsProdSize = (jsSizeBytesProd / 1000).toLocaleString('en', { maximumFractionDigits: 2 })
 
-    await compile(fileName, workingDirectory)
-    const jsSizeBytesDev = (await stat(fileName.replace(/\.ts$/, '.js'))).size
-    const jsDevSize = (jsSizeBytesDev / 1000).toLocaleString('en', { maximumFractionDigits: 2 })
-
     const { result: resultFromRun, leaking } = await run(fileName.replace(/\.ts$/, '.js'))
 
-    const result =
-      `SCENE_COMPILED_JS_SIZE_DEV=${jsDevSize}k bytes\n` +
-      `SCENE_COMPILED_JS_SIZE_PROD=${jsProdSize}k bytes\n` +
-      `This run is in DEV mode.\n` +
-      resultFromRun
+    const result = `SCENE_COMPILED_JS_SIZE_PROD=${jsProdSize}k bytes\n` + `This run is in PROD mode.\n` + resultFromRun
 
     const compareToFileName = fileName + '.crdt'
     const compareFileExists = existsSync(compareToFileName)

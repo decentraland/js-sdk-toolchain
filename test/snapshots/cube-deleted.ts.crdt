@@ -1,6 +1,5 @@
-SCENE_COMPILED_JS_SIZE_DEV=2,538.72k bytes
 SCENE_COMPILED_JS_SIZE_PROD=105.73k bytes
-This run is in DEV mode.
+This run is in PROD mode.
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -10,8 +9,8 @@ EVAL test/snapshots/cube-deleted.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 10k
-  MALLOC_COUNT = 6082
-  ALIVE_OBJS_DELTA ~= 1.02k
+  MALLOC_COUNT = 5032
+  ALIVE_OBJS_DELTA ~= 1.00k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 4
@@ -43,4 +42,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 3k
   MALLOC_COUNT = 1
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 812.46k bytes
+  MEMORY_USAGE_COUNT ~= 508.66k bytes
