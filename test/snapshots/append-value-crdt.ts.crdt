@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=152.83k bytes
+SCENE_COMPILED_JS_SIZE_PROD=152.88k bytes
 This run is in PROD mode.
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -56,4 +56,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 14k
   MALLOC_COUNT = 31
   ALIVE_OBJS_DELTA ~= 0.01k
-  MEMORY_USAGE_COUNT ~= 688.50k bytes
+  MEMORY_USAGE_COUNT ~= 688.64k bytes
