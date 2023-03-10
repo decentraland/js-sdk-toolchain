@@ -11,7 +11,6 @@ export function compositeFromJson(jsonComposite: any): Composite {
 
   // TODO: Should be there a .version to identify the schema version?
 
-  if (!jsonComposite.components) throw new Error(`Composite '${compositeId}' doesn't have 'components' field`)
   if (!Array.isArray(jsonComposite.components))
     throw new Error(`Composite '${compositeId}' fields 'components' is not an array`)
 
