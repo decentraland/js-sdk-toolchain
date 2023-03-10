@@ -66,7 +66,7 @@ export type PreEngine = Pick<
 }
 
 /**
- * @internal
+ * @public
  */
 export interface IEngineOptions {
   onChangeFunction: OnChangeFunction

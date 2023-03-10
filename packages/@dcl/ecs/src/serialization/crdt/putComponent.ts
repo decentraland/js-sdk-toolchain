@@ -4,7 +4,7 @@ import { ByteBuffer } from '../ByteBuffer'
 import { CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH, PutComponentMessage } from './types'
 
 /**
- * @internal
+ * @public
  */
 export namespace PutComponentOperation {
   export const MESSAGE_HEADER_LENGTH = 16

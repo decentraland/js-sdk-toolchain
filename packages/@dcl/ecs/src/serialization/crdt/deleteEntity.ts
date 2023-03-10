@@ -4,7 +4,7 @@ import { ByteBuffer } from '../ByteBuffer'
 import { CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH, DeleteEntityMessage } from './types'
 
 /**
- * @internal
+ * @public
  */
 export namespace DeleteEntity {
   export const MESSAGE_HEADER_LENGTH = 4

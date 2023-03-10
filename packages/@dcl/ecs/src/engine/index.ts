@@ -250,7 +250,9 @@ function preEngine(): PreEngine {
 }
 
 /**
- * @internal
+ * Internal constructor of new engines, this is an internal API
+ * @public
+ * @deprecated Prevent manual usage prefer "engine" for scene development
  */
 export function Engine(options?: IEngineOptions): IEngine {
   const partialEngine = preEngine()

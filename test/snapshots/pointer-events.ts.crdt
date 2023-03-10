@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=151.34k bytes
+SCENE_COMPILED_JS_SIZE_PROD=151.83k bytes
 This run is in PROD mode.
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -10,8 +10,8 @@ EVAL test/snapshots/pointer-events.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 16k
-  MALLOC_COUNT = 8400
-  ALIVE_OBJS_DELTA ~= 1.86k
+  MALLOC_COUNT = 8616
+  ALIVE_OBJS_DELTA ~= 1.89k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 10
@@ -44,4 +44,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 2k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 672.47k bytes
+  MEMORY_USAGE_COUNT ~= 676.51k bytes
