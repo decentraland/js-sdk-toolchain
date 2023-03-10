@@ -2,7 +2,7 @@ import { ByteBuffer } from '../ByteBuffer'
 import { CrdtMessageType, CrdtMessageHeader, CRDT_MESSAGE_HEADER_LENGTH } from './types'
 
 /**
- * @internal
+ * @public
  */
 export namespace CrdtMessageProtocol {
   /**

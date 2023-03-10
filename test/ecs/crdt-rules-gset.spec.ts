@@ -1,5 +1,5 @@
 import { CrdtMessageType, Entity, Schemas } from '../../packages/@dcl/ecs/src'
-import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import { ByteBuffer, ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { TransformSchema } from '../../packages/@dcl/ecs/src/components/manual/Transform'
 import { createValueSetComponentDefinitionFromSchema } from '../../packages/@dcl/ecs/src/engine/grow-only-value-set-component-definition'
 
@@ -334,5 +334,23 @@ describe('Conflict resolution rules for GrowOnlyValueSet based components with S
     ])
 
     expect(Array.from(component.iterator())).toEqual([[entityId, new Set([3])]])
+  })
+})
+
+describe('When dumping the CRDT state of a component', () => {
+  it('should concat the binary data into the byte buffer provided', () => {
+    const component = createValueSetComponentDefinitionFromSchema('test', 1, Schemas.Int, {
+      maxElements: 10,
+      timestampFunction(value) {
+        return value
+      }
+    })
+    const entityId = 0 as Entity
+    component.addValue(entityId, 3)
+    const messages: ByteBuffer = new ReadWriteByteBuffer()
+    component.dumpCrdtState(messages)
+    expect(messages.toBinary()).toEqual(
+      new Uint8Array([28, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 3, 0, 0, 0])
+    )
   })
 })

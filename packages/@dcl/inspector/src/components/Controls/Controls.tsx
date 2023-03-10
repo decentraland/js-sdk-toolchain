@@ -1,5 +1,6 @@
 import { MdOutlineDriveFileRenameOutline } from 'react-icons/md'
 import { AiFillFileAdd, AiFillDelete } from 'react-icons/ai'
+import React from 'react'
 
 // TODO: temp component just to run some tests, rework it to be a context menu
 
@@ -9,7 +10,7 @@ interface ControlsProps {
   handleRemove: (e: React.MouseEvent) => void
 }
 
-export const Controls = ({ handleEdit, handleNewChild, handleRemove }: ControlsProps) => {
+const Controls = ({ handleEdit, handleNewChild, handleRemove }: ControlsProps) => {
   return (
     <>
       <button onClick={handleEdit}>
@@ -24,3 +25,5 @@ export const Controls = ({ handleEdit, handleNewChild, handleRemove }: ControlsP
     </>
   )
 }
+
+export default React.memo(Controls)

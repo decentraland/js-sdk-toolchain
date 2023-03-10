@@ -1,4 +1,5 @@
 import { ISchema } from '../schemas'
+import { ByteBuffer } from '../serialization/ByteBuffer'
 import { CrdtMessageBody, DeleteComponentMessageBody, PutComponentMessageBody } from '../serialization/crdt'
 import { Entity } from './entity'
 import { DeepReadonly, DeepReadonlySet } from './readonly'
@@ -45,6 +46,12 @@ export interface BaseComponent<T> {
    * @public
    */
   getCrdtUpdates(): Iterable<CrdtMessageBody>
+
+  /**
+   * This function writes the whole state of the component into a ByteBuffer
+   * @public
+   */
+  dumpCrdtState(buffer: ByteBuffer): void
 
   /**
    * @public
