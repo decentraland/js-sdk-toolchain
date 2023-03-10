@@ -43,8 +43,8 @@ export function instanceComposite(
   compositeData: Composite,
   getNextAvailableEntity: () => Entity | null,
   compositeProvider: CompositeProvider,
-  alreadyRequestedId: string[] = [],
-  rootEntity?: Entity
+  rootEntity?: Entity,
+  alreadyRequestedId: Set<string> = new Set()
 ) {
   const TransformComponentNumber = componentNumberFromName('core::Transform')
   const CompositeRootComponent = CompositeRoot(engine)
@@ -72,7 +72,7 @@ export function instanceComposite(
       const compositeRoot = childComposite as ReturnType<typeof CompositeRootComponent['create']>
       const composite = compositeProvider.getCompositeOrNull(compositeRoot.id)
       if (composite) {
-        if (alreadyRequestedId.includes(compositeRoot.id) || compositeRoot.id === compositeData.id) {
+        if (alreadyRequestedId.has(compositeRoot.id) || compositeRoot.id === compositeData.id) {
           throw new Error(
             `Composite ${compositeRoot.id} has a recursive instanciation while try to instance ${
               compositeData.id
@@ -85,8 +85,8 @@ export function instanceComposite(
           composite,
           getNextAvailableEntity,
           compositeProvider,
-          [...alreadyRequestedId, compositeData.id],
-          entity
+          entity,
+          new Set(alreadyRequestedId).add(compositeData.id)
         )
       }
     }

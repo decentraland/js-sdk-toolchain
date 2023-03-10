@@ -34,7 +34,7 @@ describe('composite instantiation', () => {
   const invalidComposites = getCompositeFrom(`${COMPOSITE_BASE_PATH}/invalid/*.composite.json`)
   const composites = [...validComposites, ...invalidComposites]
 
-  function instanceById(engine: IEngine, id: string, rootEntity?: Entity, alreadyRequestedId: string[] = []) {
+  function instanceById(engine: IEngine, id: string, rootEntity?: Entity, alreadyRequestedId?: Set<string>) {
     const compositeProvider: CompositeProvider = {
       getCompositeOrNull(id: string) {
         return composites.find((item) => item.id === id) || null
@@ -46,8 +46,8 @@ describe('composite instantiation', () => {
       throw new Error(`Composite ${id} not found`)
     }
 
-    if (rootEntity || alreadyRequestedId.length) {
-      instanceComposite(engine, composite, () => engine.addEntity(), compositeProvider, alreadyRequestedId, rootEntity)
+    if (rootEntity || alreadyRequestedId) {
+      instanceComposite(engine, composite, () => engine.addEntity(), compositeProvider, rootEntity, alreadyRequestedId)
     } else {
       instanceComposite(engine, composite, () => engine.addEntity(), compositeProvider)
     }
