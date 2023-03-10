@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=107.11k bytes
+SCENE_COMPILED_JS_SIZE_PROD=107.45k bytes
 This run is in PROD mode.
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -9,8 +9,8 @@ EVAL test/snapshots/two-way-crdt.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 11k
-  MALLOC_COUNT = 6484
-  ALIVE_OBJS_DELTA ~= 1.11k
+  MALLOC_COUNT = 5407
+  ALIVE_OBJS_DELTA ~= 1.10k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
@@ -49,4 +49,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 4k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 819.72k bytes
+  MEMORY_USAGE_COUNT ~= 512.69k bytes
