@@ -108,17 +108,12 @@ describe('composite from json function', () => {
     })
   })
 
-  it(`should fail with invalid component`, () => {
-    const values = [{ id: 'test' }, ...invalidFalseValues.map((item) => ({ id: 'test', components: item }))]
-    values.forEach((json) => {
-      expect(() => {
-        compositeFromJson(json)
-      }).toThrowError(`Composite 'test' doesn't have 'components' field`)
-    })
-  })
-
-  it(`should fail with non-array component`, () => {
-    const values = [{ id: 'test', components: { test: 'asd' } }]
+  it(`should fail with invalid and non-array component `, () => {
+    const values = [
+      { id: 'test' },
+      ...invalidFalseValues.map((item) => ({ id: 'test', components: item })),
+      { id: 'test', components: { test: 'asd' } }
+    ]
     values.forEach((json) => {
       expect(() => {
         compositeFromJson(json)
