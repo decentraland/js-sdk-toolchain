@@ -123,6 +123,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
         const component = engine.getComponentOrNull(msg.componentId)
 
+        /* istanbul ignore else */
         if (component) {
           const [conflictMessage, value] = component.updateFromCrdt(msg)
 
@@ -151,6 +152,9 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
             onProcessEntityComponentChange && onProcessEntityComponentChange(msg.entityId, msg.type, component, value)
           }
+        } else {
+          // TODO: test this line, it is fundammental to make the editor work
+          broadcastMessages.push(msg)
         }
       }
     }

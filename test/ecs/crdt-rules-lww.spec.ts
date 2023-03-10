@@ -1,7 +1,10 @@
 import { CrdtMessageType, Entity } from '../../packages/@dcl/ecs/src'
+import { ByteBuffer, ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { dataCompare } from '../../packages/@dcl/ecs/src/systems/crdt/utils'
-import { createUpdateLwwFromCrdt } from '../../packages/@dcl/ecs/src/engine/lww-element-set-component-definition'
-import { ByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import {
+  createUpdateLwwFromCrdt,
+  createDumpLwwFunctionFromCrdt
+} from '../../packages/@dcl/ecs/src/engine/lww-element-set-component-definition'
 
 describe('dataCompare', () => {
   const testCases = [
@@ -42,6 +45,7 @@ describe('Conflict resolution rules for LWW-ElementSet based components', () => 
   const data = new Map<Entity, number>()
 
   const updateFn = createUpdateLwwFromCrdt(componentId, timestamps, schema, data)
+  const dumpFn = createDumpLwwFunctionFromCrdt(componentId, timestamps, schema, data)
 
   it('PUT an unexistent value should succeed', () => {
     const entityId = 0 as Entity
@@ -327,5 +331,13 @@ describe('Conflict resolution rules for LWW-ElementSet based components', () => 
     // state assertions
     expect(data.get(entityId)).toEqual(10)
     expect(timestamps.get(entityId)).toEqual(3)
+  })
+  describe('when using the dump function', () => {
+    it('should concat all the binary data in the byte buffer', () => {
+      const buffer: ByteBuffer = new ReadWriteByteBuffer()
+      expect(buffer.toBinary()).toHaveLength(0)
+      dumpFn(buffer)
+      expect(buffer.toBinary().length).toBeGreaterThan(0)
+    })
   })
 })

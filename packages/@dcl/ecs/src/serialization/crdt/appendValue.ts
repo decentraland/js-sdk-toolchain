@@ -4,7 +4,7 @@ import { ByteBuffer } from '../ByteBuffer'
 import { AppendValueMessage, CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH } from './types'
 
 /**
- * @internal
+ * @public
  */
 export namespace AppendValueOperation {
   export const MESSAGE_HEADER_LENGTH = 16

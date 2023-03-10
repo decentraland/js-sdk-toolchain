@@ -1,11 +1,13 @@
 import { ISchema } from '../schemas'
-import { ReadWriteByteBuffer } from '../serialization/ByteBuffer'
+import { ByteBuffer, ReadWriteByteBuffer } from '../serialization/ByteBuffer'
 import {
   PutComponentMessageBody,
   DeleteComponentMessageBody,
   ProcessMessageResultType,
   CrdtMessageType,
-  CrdtMessageBody
+  CrdtMessageBody,
+  PutComponentOperation,
+  DeleteComponent
 } from '../serialization/crdt'
 import { dataCompare } from '../systems/crdt/utils'
 import { LastWriteWinElementSetComponentDefinition, ComponentType } from './component'
@@ -18,6 +20,26 @@ export function incrementTimestamp(entity: Entity, timestamps: Map<Entity, numbe
   return newTimestamp
 }
 
+export function createDumpLwwFunctionFromCrdt(
+  componentId: number,
+  timestamps: Map<Entity, number>,
+  schema: Pick<ISchema<any>, 'serialize' | 'deserialize'>,
+  data: Map<Entity, unknown>
+) {
+  return function dumpCrdtState(buffer: ByteBuffer) {
+    for (const [entity, timestamp] of timestamps) {
+      /* istanbul ignore else */
+      if (data.has(entity)) {
+        const it = data.get(entity)!
+        const buf = new ReadWriteByteBuffer()
+        schema.serialize(it, buf)
+        PutComponentOperation.write(entity, timestamp, componentId, buf.toBinary(), buffer)
+      } else {
+        DeleteComponent.write(entity, componentId, timestamp, buffer)
+      }
+    }
+  }
+}
 export function createUpdateLwwFromCrdt(
   componentId: number,
   timestamps: Map<Entity, number>,
@@ -266,6 +288,7 @@ export function createComponentDefinitionFromSchema<T>(
       }
     },
     getCrdtUpdates: createGetCrdtMessagesForLww(componentId, timestamps, dirtyIterator, schema, data),
-    updateFromCrdt: createUpdateLwwFromCrdt(componentId, timestamps, schema, data)
+    updateFromCrdt: createUpdateLwwFromCrdt(componentId, timestamps, schema, data),
+    dumpCrdtState: createDumpLwwFunctionFromCrdt(componentId, timestamps, schema, data)
   }
 }

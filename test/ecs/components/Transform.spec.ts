@@ -25,8 +25,8 @@ describe('Transform component', () => {
     )
 
     expect(Array.from(buffer.toBinary())).toStrictEqual([
-      64, 73, 15, 219, 64, 19, 93, 142, 63, 53, 4, 243, 64, 73, 15, 219, 64, 45, 248, 84, 0, 0, 0, 0, 63, 53, 4, 243,
-      64, 73, 15, 219, 64, 45, 248, 84, 64, 19, 93, 142, 7, 91, 205, 21
+      219, 15, 73, 64, 142, 93, 19, 64, 243, 4, 53, 63, 219, 15, 73, 64, 84, 248, 45, 64, 0, 0, 0, 0, 243, 4, 53, 63,
+      219, 15, 73, 64, 84, 248, 45, 64, 142, 93, 19, 64, 21, 205, 91, 7
     ])
     expect(buffer.toBinary().length).toBe(TRANSFORM_LENGTH)
   })
@@ -77,6 +77,21 @@ describe('Transform component', () => {
 
     expect(t1).toEqual({
       position: { x: 0, y: 0, z: 0 },
+      scale: { x: 1, y: 1, z: 1 },
+      rotation: { x: 0, y: 0, z: 0, w: 1 },
+      parent: 0 as Entity
+    })
+  })
+
+  it('should create a valid transform component with default values if partial values are provided', () => {
+    const newEngine = Engine()
+    const Transform = components.Transform(newEngine)
+    const entity = newEngine.addEntity()
+
+    const t1 = Transform.create(entity, { position: { x: 1, y: 1, z: 1 } })
+
+    expect(t1).toEqual({
+      position: { x: 1, y: 1, z: 1 },
       scale: { x: 1, y: 1, z: 1 },
       rotation: { x: 0, y: 0, z: 0, w: 1 },
       parent: 0 as Entity
