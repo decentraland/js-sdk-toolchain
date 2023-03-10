@@ -135,10 +135,10 @@ export function defineTransformComponent(
   return {
     ...transformDef,
     create(entity: Entity, val?: TransformTypeWithOptionals) {
-      return transformDef.create(entity, val as TransformType)
+      return transformDef.create(entity, TransformSchema.extend!(val))
     },
     createOrReplace(entity: Entity, val?: TransformTypeWithOptionals) {
-      return transformDef.createOrReplace(entity, val as TransformType)
+      return transformDef.createOrReplace(entity, TransformSchema.extend!(val))
     }
   }
 }
