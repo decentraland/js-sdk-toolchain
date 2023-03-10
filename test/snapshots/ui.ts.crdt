@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=291.52k bytes
+SCENE_COMPILED_JS_SIZE_PROD=291.62k bytes
 This run is in PROD mode.
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -46,7 +46,7 @@ CALL onUpdate(0.0)
   ALIVE_OBJS_DELTA ~= 0.19k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.008726535364985466,"z":0,"w":0.9999619126319885},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 53k
+  OPCODES ~= 54k
   MALLOC_COUNT = 210
   ALIVE_OBJS_DELTA ~= 0.10k
 CALL onUpdate(0.1)
@@ -59,4 +59,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 52k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1400.79k bytes
+  MEMORY_USAGE_COUNT ~= 1401.05k bytes
