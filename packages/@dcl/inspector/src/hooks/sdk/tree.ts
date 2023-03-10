@@ -72,7 +72,6 @@ const getTree = (inspectorEngine: InspectorEngine) => {
 
 export const useTree = (inspectorEngine: InspectorEngine) => {
   const [tree, setTree] = useState(getTree(inspectorEngine))
-  console.log(tree)
   const { engine, editorComponents, sdkComponents } = inspectorEngine
 
   const update = () => setTree(getTree(inspectorEngine))
