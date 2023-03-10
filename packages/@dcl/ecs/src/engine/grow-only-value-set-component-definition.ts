@@ -157,7 +157,7 @@ export function createValueSetComponentDefinitionFromSchema<T>(
       }
       return [null, undefined]
     },
-    dumpCrdtState: function (buffer: ByteBuffer): void {
+    dumpCrdtStateToBuffer: function (buffer: ByteBuffer): void {
       for (const [entity, { raw }] of data) {
         for (const it of raw) {
           const buf = new ReadWriteByteBuffer()

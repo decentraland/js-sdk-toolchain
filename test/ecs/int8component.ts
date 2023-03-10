@@ -89,7 +89,7 @@ export const int8Component = (engine: IEngine) => {
     setTestTimestamp(entity: Entity, timestamp: number) {
       timestamps.set(entity, (timestamps.get(entity) || 0) + timestamp)
     },
-    dumpCrdtState: createDumpLwwFunctionFromCrdt(ID, timestamps, schema, data)
+    dumpCrdtStateToBuffer: createDumpLwwFunctionFromCrdt(ID, timestamps, schema, data)
   }
 
   return engine.registerComponentDefinition(componentName, component) as Type
