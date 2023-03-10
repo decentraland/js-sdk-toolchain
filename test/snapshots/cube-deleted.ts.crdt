@@ -1,3 +1,6 @@
+SCENE_COMPILED_JS_SIZE_DEV=2,538.72k bytes
+SCENE_COMPILED_JS_SIZE_PROD=105.73k bytes
+This run is in DEV mode.
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
