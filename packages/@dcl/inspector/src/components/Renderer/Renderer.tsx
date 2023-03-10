@@ -12,9 +12,11 @@ import { IAsset } from '../AssetsCatalog/types'
 import { ROOT } from '../../hooks/sdk/tree'
 import { Props } from './types'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
+import { useCatalog } from '../../hooks/catalog/useCatalog'
 
 export function Renderer({ onLoad }: Props) {
   const [state, setState] = useState<InspectorEngine & { scene: Scene }>()
+  const [catalog] = useCatalog()
 
   const addAsset = async (asset: IAsset) => {
     if (!state) return
@@ -28,6 +30,7 @@ export function Renderer({ onLoad }: Props) {
   }
 
   useEffect(() => {
+    if (!catalog) return
     const canvas = document.getElementById('renderer') as HTMLCanvasElement // Get the canvas element
     const { babylon, scene } = initEngine(canvas)
 
@@ -39,7 +42,8 @@ export function Renderer({ onLoad }: Props) {
 
     // initialize babylon scene
     const loadableScene = getHardcodedLoadableScene(
-      'urn:decentraland:entity:bafkreid44xhavttoz4nznidmyj3rjnrgdza7v6l7kd46xdmleor5lmsxfm1'
+      'urn:decentraland:entity:bafkreid44xhavttoz4nznidmyj3rjnrgdza7v6l7kd46xdmleor5lmsxfm1',
+      catalog
     )
     const ctx = new SceneContext(babylon, scene, loadableScene)
     ctx.rootNode.position.set(0, 0, 0)
@@ -53,7 +57,7 @@ export function Renderer({ onLoad }: Props) {
 
     // register some globals for debugging
     Object.assign(globalThis, { simulatedScene, dataLayer, inspectorEngine })
-  }, [])
+  }, [catalog])
 
   const [, drop] = useDrop(
     () => ({
