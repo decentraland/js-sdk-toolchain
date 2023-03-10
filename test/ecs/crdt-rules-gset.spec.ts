@@ -350,7 +350,7 @@ describe('When dumping the CRDT state of a component', () => {
     const messages: ByteBuffer = new ReadWriteByteBuffer()
     component.dumpCrdtState(messages)
     expect(messages.toBinary()).toEqual(
-      new Uint8Array([0, 0, 0, 28, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 3])
+      new Uint8Array([28, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 3, 0, 0, 0])
     )
   })
 })
