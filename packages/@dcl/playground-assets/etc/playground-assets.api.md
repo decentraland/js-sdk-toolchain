@@ -1061,7 +1061,7 @@ export const inputSystem: IInputSystem;
 // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 //
 // @public
-export function instanceComposite(engine: IEngine, compositeData: Composite, getNextAvailableEntity: () => Entity | null, compositeProvider: CompositeProvider, alreadyRequestedId?: string[], rootEntity?: Entity): Entity;
+export function instanceComposite(engine: IEngine, compositeData: Composite, getNextAvailableEntity: () => Entity | null, compositeProvider: CompositeProvider, rootEntity?: Entity, alreadyRequestedId?: Set<string>): Entity;
 
 // @public (undocumented)
 export interface ISchema<T = any> {
