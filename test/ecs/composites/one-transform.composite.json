@@ -1,0 +1,17 @@
+{
+    "id": "one-transform",
+    "components": [
+        {
+            "name": "core::Transform",
+            "data": {
+                "518": {
+                    "position": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 1
+                    }
+                }
+            }
+        }
+    ]
+}

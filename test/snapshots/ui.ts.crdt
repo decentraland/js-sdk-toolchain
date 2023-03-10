@@ -7,9 +7,9 @@ EVAL test/snapshots/ui.js
   REQUIRE: ~system/Scene
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 28k
-  MALLOC_COUNT = 23392
-  ALIVE_OBJS_DELTA ~= 3.41k
+  OPCODES ~= 24k
+  MALLOC_COUNT = 23243
+  ALIVE_OBJS_DELTA ~= 3.36k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 10
@@ -33,7 +33,7 @@ CALL onUpdate(0.0)
   Scene: PUT_COMPONENT e=0x207 c=1050 t=1 data={"parent":0,"rightOf":0,"positionType":0,"alignSelf":0,"flexDirection":0,"justifyContent":0,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":1,"width":700,"heightUnit":1,"height":400,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":1,"marginLeft":500,"marginTopUnit":1,"marginTop":35,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":0,"paddingBottom":0}
   Scene: PUT_COMPONENT e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x200 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-  OPCODES ~= 80k
+  OPCODES ~= 81k
   MALLOC_COUNT = 394
   ALIVE_OBJS_DELTA ~= 0.14k
 CALL onUpdate(0.1)
@@ -51,4 +51,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 51k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 4565.22k bytes
+  MEMORY_USAGE_COUNT ~= 4565.92k bytes

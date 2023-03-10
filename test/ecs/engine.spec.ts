@@ -1,5 +1,5 @@
-import { cyclicParentingChecker, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src'
-import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
+import { cyclicParentingChecker, MapResult, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src'
+import { Engine, Entity, LastWriteWinElementSetComponentDefinition } from '../../packages/@dcl/ecs/src/engine'
 import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { components } from '../../packages/@dcl/ecs/src'
@@ -658,5 +658,18 @@ describe('Engine tests', () => {
     expect(() => {
       engine.addSystem(testSystem)
     }).toThrowError()
+  })
+
+  it('define and remove component from component name', async () => {
+    const engine = Engine()
+    engine.defineComponent('PositionSchema', PositionSchema)
+
+    const Position = engine.getComponent('PositionSchema') as LastWriteWinElementSetComponentDefinition<
+      MapResult<typeof PositionSchema>
+    >
+    expect(Position).not.toBeNull()
+
+    engine.removeComponentDefinition('PositionSchema')
+    expect(() => engine.getComponent('PositionSchema')).toThrowError()
   })
 })

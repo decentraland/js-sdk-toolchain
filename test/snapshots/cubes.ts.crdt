@@ -7,9 +7,9 @@ EVAL test/snapshots/cubes.js
   REQUIRE: ~system/Scene
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 61k
-  MALLOC_COUNT = 14066
-  ALIVE_OBJS_DELTA ~= 3.42k
+  OPCODES ~= 57k
+  MALLOC_COUNT = 13917
+  ALIVE_OBJS_DELTA ~= 3.37k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 10
@@ -1651,4 +1651,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 615k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1207.17k bytes
+  MEMORY_USAGE_COUNT ~= 1207.87k bytes

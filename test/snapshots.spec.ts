@@ -1,3 +1,4 @@
+import { version as vmVersion } from '@dcl/quickjs-emscripten/package.json'
 import { exec } from 'child_process'
 import { existsSync, readFileSync, writeFileSync } from 'fs-extra'
 import glob from 'glob'
@@ -7,7 +8,6 @@ import { ReadWriteByteBuffer } from '../packages/@dcl/ecs/src/serialization/Byte
 import { CrdtMessage } from '../packages/@dcl/ecs/src/serialization/crdt'
 import { readMessage } from '../packages/@dcl/ecs/src/serialization/crdt/message'
 import { withQuickJsVm } from './vm'
-import { version as vmVersion } from '@dcl/quickjs-emscripten/package.json'
 
 const ENV: Record<string, string> = { ...process.env } as any
 const writeToFile = process.env.UPDATE_SNAPSHOTS
@@ -113,7 +113,7 @@ async function run(fileName: string) {
           }
         } else if (moduleName === '~system/Scene') {
           return {
-            async getSceneInfo(data: Record<string, any>) {
+            async getSceneInfo(_data: Record<string, any>) {
               return {
                 contents: []
               }

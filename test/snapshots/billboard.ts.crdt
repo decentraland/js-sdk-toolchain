@@ -7,9 +7,9 @@ EVAL test/snapshots/billboard.js
   REQUIRE: ~system/Scene
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 29k
-  MALLOC_COUNT = 12676
-  ALIVE_OBJS_DELTA ~= 2.38k
+  OPCODES ~= 25k
+  MALLOC_COUNT = 12529
+  ALIVE_OBJS_DELTA ~= 2.34k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 8
@@ -76,4 +76,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 9k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1251.87k bytes
+  MEMORY_USAGE_COUNT ~= 1252.64k bytes

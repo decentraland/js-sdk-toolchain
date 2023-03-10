@@ -426,6 +426,41 @@ export type Color4Type = {
 // @public (undocumented)
 export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T> | GrowOnlyValueSetComponentDefinition<T>;
 
+// Warning: (ae-missing-release-tag) "componentDefinitionByName" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export const componentDefinitionByName: {
+    "core::Animator": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAnimator>>;
+    "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
+    "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
+    "core::AvatarAttach": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarAttach>>;
+    "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
+    "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
+    "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
+    "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
+    "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
+    "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
+    "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
+    "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
+    "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
+    "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
+    "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
+    "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
+    "core::PointerLock": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerLock>>;
+    "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
+    "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
+    "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
+    "core::UiBackground": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiBackground>>;
+    "core::UiDropdown": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdown>>;
+    "core::UiDropdownResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdownResult>>;
+    "core::UiInput": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInput>>;
+    "core::UiInputResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputResult>>;
+    "core::UiText": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiText>>;
+    "core::UiTransform": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiTransform>>;
+    "core::VideoPlayer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVideoPlayer>>;
+    "core::VisibilityComponent": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVisibilityComponent>>;
+};
+
 // @public
 export const enum ComponentType {
     // (undocumented)
@@ -445,6 +480,11 @@ export type Composite = {
         data: Map<Entity, unknown>;
     }[];
 };
+
+// Warning: (ae-missing-release-tag) "compositeFromJson" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function compositeFromJson(jsonComposite: any): Composite;
 
 // Warning: (ae-missing-release-tag) "CompositeProvider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

@@ -1,0 +1,13 @@
+{
+    "id": "custom-component-incomplete",
+    "components": [
+        {
+            "name": "my-lib::custom::InexistentComponent",
+            "data": {
+                "512": {
+                    "test": 111
+                }
+            }
+        }
+    ]
+}

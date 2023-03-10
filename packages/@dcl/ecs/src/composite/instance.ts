@@ -1,4 +1,5 @@
-import { Transform } from '../components'
+import { componentDefinitionByName } from '../components'
+import { componentNumberFromName } from '../components/component-number'
 import { TransformType } from '../components/manual/Transform'
 import { Entity } from '../engine/entity'
 import { IEngine, LastWriteWinElementSetComponentDefinition } from '../engine/types'
@@ -45,6 +46,7 @@ export function instanceComposite(
   alreadyRequestedId: string[] = [],
   rootEntity?: Entity
 ) {
+  const TransformComponentNumber = componentNumberFromName('core::Transform')
   const CompositeRootComponent = CompositeRoot(engine)
   // Key => EntityNumber from the composite
   // Value => EntityNumber in current engine
@@ -102,10 +104,17 @@ export function instanceComposite(
     const existingComponentDefinition = engine.getComponentOrNull(component.name)
 
     if (!existingComponentDefinition) {
-      if (!component.schema) {
+      if (component.schema) {
+        componentDefinition = engine.defineComponentFromSchema(component.name, Schemas.fromJson(component.schema))
+      } else if (component.name.startsWith('core::')) {
+        if (Object.keys(componentDefinitionByName).includes(component.name)) {
+          componentDefinition = (componentDefinitionByName as any)[component.name](engine)
+        } else {
+          throw new Error(`The core component ${component.name} was not found.`)
+        }
+      } else {
         throw new Error(`${component.name} is not defined and there is no schema to define it.`)
       }
-      componentDefinition = engine.defineComponentFromSchema(component.name, Schemas.fromJson(component.schema))
     } else {
       componentDefinition = existingComponentDefinition as LastWriteWinElementSetComponentDefinition<unknown>
     }
@@ -119,7 +128,7 @@ export function instanceComposite(
       // ## 3c ##
       // All entities referenced in the composite probably has a different resolved EntityNumber
       // We'll know with the mappedEntityes
-      if (Transform(engine).componentId === componentDefinition.componentId) {
+      if (componentDefinition.componentId === TransformComponentNumber) {
         const transform = componentValue as TransformType
         if (transform.parent) {
           transform.parent = getCompositeEntity(transform.parent)
