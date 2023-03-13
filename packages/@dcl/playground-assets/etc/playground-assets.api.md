@@ -985,6 +985,8 @@ export type IncludeUndefined<T> = {
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 // Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
 //
@@ -1985,6 +1987,8 @@ export interface PBUiInput {
     placeholder: string;
     placeholderColor?: PBColor4 | undefined;
     textAlign?: TextAlignMode | undefined;
+    // (undocumented)
+    value?: string | undefined;
 }
 
 // @public (undocumented)
