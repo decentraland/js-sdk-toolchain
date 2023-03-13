@@ -9,7 +9,7 @@ export function serializeEngine(engine: IEngine) {
 
   // add component values
   for (const component of engine.componentsIter()) {
-    component.dumpCrdtState(messages)
+    component.dumpCrdtStateToBuffer(messages)
   }
 
   return messages.toBinary()
