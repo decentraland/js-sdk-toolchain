@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=292.25k bytes
+SCENE_COMPILED_JS_SIZE_PROD=292.38k bytes
 This run is in PROD mode.
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -9,7 +9,7 @@ EVAL test/snapshots/ui.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 21k
-  MALLOC_COUNT = 14239
+  MALLOC_COUNT = 14246
   ALIVE_OBJS_DELTA ~= 2.70k
 CALL onStart()
   OPCODES ~= 0k
@@ -46,17 +46,18 @@ CALL onUpdate(0.0)
   ALIVE_OBJS_DELTA ~= 0.19k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.008726535364985466,"z":0,"w":0.9999619126319885},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 54k
-  MALLOC_COUNT = 210
+  Scene: PUT_COMPONENT e=0x204 c=1062 t=2 data={"pointerEvents":[{"eventType":1,"eventInfo":{"button":0,"showFeedback":true}}]}
+  OPCODES ~= 56k
+  MALLOC_COUNT = 211
   ALIVE_OBJS_DELTA ~= 0.10k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=3 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.017452405765652657,"z":0,"w":0.9998477101325989},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 52k
+  OPCODES ~= 53k
   MALLOC_COUNT = 29
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=4 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.026176948100328445,"z":0,"w":0.9996573328971863},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 52k
+  OPCODES ~= 53k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1405.38k bytes
+  MEMORY_USAGE_COUNT ~= 1405.88k bytes

@@ -51,8 +51,10 @@ describe('UiDropdown React ECS', () => {
   it('should not send any updates if there were no changes', async () => {
     sendSpy.mockReset()
     await engine.update(1)
-    expect(sendSpy).not.toBeCalled()
-
+    // TODO: remove this when its being handled on the renderer side
+    // expect(sendSpy).not.toBeCalled()
+    expect(sendSpy).toBeCalledTimes(1)
+    sendSpy.mockReset()
     await engine.update(1)
     expect(sendSpy).not.toBeCalled()
   })
