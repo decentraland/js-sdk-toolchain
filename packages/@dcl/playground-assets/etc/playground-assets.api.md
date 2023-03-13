@@ -755,8 +755,8 @@ export interface IEngine {
     defineComponent<T extends Spec>(componentName: string, spec: T, constructorDefault?: Partial<MapResult<T>>): MapComponentDefinition<MapResult<T>>;
     defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): LastWriteWinElementSetComponentDefinition<T>;
     defineValueSetComponentFromSchema<T>(componentName: string, spec: ISchema<T>, options: ValueSetOptions<T>): GrowOnlyValueSetComponentDefinition<T>;
-    getComponent<T>(componentId: number): ComponentDefinition<T>;
-    getComponentOrNull<T>(componentId: number): ComponentDefinition<T> | null;
+    getComponent<T>(componentId: number | string): ComponentDefinition<T>;
+    getComponentOrNull<T>(componentId: number | string): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     getEntityState(entity: Entity): EntityState;
     readonly PlayerEntity: Entity;

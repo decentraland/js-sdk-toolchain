@@ -62,7 +62,7 @@ export function Renderer({ onLoad }: Props) {
       Object.assign(globalThis, { dataLayer, inspectorEngine })
     }
     init().catch((err) => console.log(err))
-  }, [])
+  }, [catalog])
 
   const [, drop] = useDrop(
     () => ({
