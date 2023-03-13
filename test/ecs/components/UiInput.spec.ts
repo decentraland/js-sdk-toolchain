@@ -9,7 +9,7 @@ describe('UiInput component', () => {
 
     testComponentSerialization(UiInput, {
       placeholder: 'Boedo its carnaval',
-      textValue: '',
+      value: '',
       disabled: false,
       color: Color4.Red(),
       placeholderColor: Color4.Blue(),
