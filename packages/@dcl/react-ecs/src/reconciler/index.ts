@@ -1,4 +1,4 @@
-import { Entity, IEngine, InputAction, PointerEventsSystem, PointerEventType } from '@dcl/ecs'
+import { Entity, IEngine, InputAction, PointerEvents, PointerEventsSystem, PointerEventType } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
 import { Callback, isListener, Listeners } from '../components'
@@ -143,6 +143,7 @@ export function createReconciler(
   function removeChildEntity(instance: Instance) {
     changeEvents.delete(instance.entity)
     engine.removeEntity(instance.entity)
+    pointerEventTick.delete(instance.entity)
     for (const child of instance._child) {
       removeChildEntity(child)
     }
@@ -325,11 +326,20 @@ export function createReconciler(
     }
   }
 
+  const pointerEventTick = new Set<Entity>()
   return {
     update: function (component: ReactEcs.JSX.Element) {
       if (changeEvents.size) {
         handleOnChange(UiInput.componentId, UiInputResult)
         handleOnChange(UiDropdown.componentId, UiDropdownResult)
+      }
+      for (const [entity] of engine.getEntitiesWith(PointerEvents)) {
+        if (pointerEventTick.has(entity)) {
+          return
+        }
+        pointerEventTick.add(entity)
+        // Re-send this pointer-event because of #issue
+        PointerEvents.getMutable(entity)
       }
       return reconciler.updateContainer(component as any, root, null)
     },
