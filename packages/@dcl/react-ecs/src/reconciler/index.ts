@@ -1,4 +1,4 @@
-import { Entity, IEngine, InputAction, PointerEvents, PointerEventsSystem, PointerEventType } from '@dcl/ecs'
+import { Entity, IEngine, InputAction, PointerEventsSystem, PointerEventType } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
 import { Callback, isListener, Listeners } from '../components'
@@ -56,6 +56,7 @@ export function createReconciler(
   const UiInputResult = components.UiInputResult(engine)
   const UiDropdown = components.UiDropdown(engine)
   const UiDropdownResult = components.UiDropdownResult(engine)
+  const PointerEvents = components.PointerEvents(engine)
 
   // Component ID Helper
   const getComponentId: {
@@ -333,9 +334,10 @@ export function createReconciler(
         handleOnChange(UiInput.componentId, UiInputResult)
         handleOnChange(UiDropdown.componentId, UiDropdownResult)
       }
-      for (const [entity] of engine.getEntitiesWith(PointerEvents)) {
+
+      for (const [entity] of engine.getEntitiesWith(UiTransform, PointerEvents)) {
         if (pointerEventTick.has(entity)) {
-          return
+          continue
         }
         pointerEventTick.add(entity)
         // Re-send this pointer-event because of #issue
