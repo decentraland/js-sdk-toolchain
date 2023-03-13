@@ -1986,7 +1986,7 @@ export interface PBUiInput {
     placeholderColor?: PBColor4 | undefined;
     textAlign?: TextAlignMode | undefined;
     // (undocumented)
-    textValue?: string | undefined;
+    value?: string | undefined;
 }
 
 // @public (undocumented)
