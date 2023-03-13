@@ -289,6 +289,6 @@ export function createComponentDefinitionFromSchema<T>(
     },
     getCrdtUpdates: createGetCrdtMessagesForLww(componentId, timestamps, dirtyIterator, schema, data),
     updateFromCrdt: createUpdateLwwFromCrdt(componentId, timestamps, schema, data),
-    dumpCrdtState: createDumpLwwFunctionFromCrdt(componentId, timestamps, schema, data)
+    dumpCrdtStateToBuffer: createDumpLwwFunctionFromCrdt(componentId, timestamps, schema, data)
   }
 }
