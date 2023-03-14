@@ -37,7 +37,7 @@ export function dataCompare<T>(a: T, b: T): number {
         return res > 0 ? 1 : -1
       }
     }
-    
+
     // the data is exactly the same
     return 0
   }
