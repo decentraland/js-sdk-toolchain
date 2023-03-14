@@ -18,6 +18,14 @@ export type DataLayerRPC = {
 
 export function createDataLayerRpc({ fs }: Pick<CliComponents, 'fs'>): DataLayerRPC {
   const engine = createEngine()
+
+  setInterval(() => {
+    engine.update(0.016).catch(($) => {
+      console.error($)
+      debugger
+    })
+  }, 16)
+
   const dataLayer = initRpcMethods(fs, engine)
   const rpcServer = createRpcServer<DataLayerContext>({})
   rpcServer.setHandler(rpcHandler)
