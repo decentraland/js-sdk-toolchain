@@ -11,16 +11,19 @@ describe('Button React Ecs', () => {
     const UiTransform = components.UiTransform(engine)
     const UiText = components.UiText(engine)
     const UiBackground = components.UiBackground(engine)
+    const uiPointerEvent = components.PointerEvents(engine)
     const entityIndex = engine.addEntity() as number
-
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
     const getUiTransform = (entity: Entity) => UiTransform.get(entity)
     const getText = (entity: Entity) => UiText.get(entity)
     const getBackground = (entity: Entity) => UiBackground.getOrNull(entity)
+    const getPointerEvent = (entity: Entity) => uiPointerEvent.getOrNull(entity)
+
     let text = 'CASLA'
     let color: Color4 | undefined = undefined
     let type: UiButtonProps['variant'] = 'primary'
+    let disabled: boolean = false
     const ui = () => (
       <Button
         variant={type}
@@ -29,11 +32,14 @@ describe('Button React Ecs', () => {
         color={color}
         font="sans-serif"
         textAlign="bottom-center"
+        disabled={disabled}
       />
     )
 
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
+
+    expect(getPointerEvent(rootDivEntity) !== null)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
@@ -54,11 +60,14 @@ describe('Button React Ecs', () => {
     })
 
     type = 'secondary'
+
     // Update values
     text = 'BOEDO'
     color = { r: 1, g: 1, b: 1, a: 1 }
+    disabled = true
 
     await engine.update(1)
+    expect(getPointerEvent(rootDivEntity) === null)
     expect(getText(rootDivEntity)).toMatchObject({
       value: 'BOEDO',
       color: { r: 1, g: 1, b: 1, a: 1 }
