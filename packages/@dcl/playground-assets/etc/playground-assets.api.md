@@ -479,9 +479,7 @@ export const enum ComponentType {
     LastWriteWinElementSet = 0
 }
 
-// Warning: (ae-missing-release-tag) "Composite" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export type Composite = {
     id: string;
     components: {
@@ -491,14 +489,10 @@ export type Composite = {
     }[];
 };
 
-// Warning: (ae-missing-release-tag) "compositeFromJson" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export function compositeFromJson(jsonComposite: any): Composite;
 
-// Warning: (ae-missing-release-tag) "CompositeProvider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export type CompositeProvider = {
     getCompositeOrNull: (id: string) => Composite | null;
 };
@@ -1108,7 +1102,7 @@ export const inputSystem: IInputSystem;
 // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 //
-// @public
+// @public @deprecated
 export function instanceComposite(engine: IEngine, compositeData: Composite, getNextAvailableEntity: () => Entity | null, compositeProvider: CompositeProvider, rootEntity?: Entity, alreadyRequestedId?: Set<string>): Entity;
 
 // @public (undocumented)
