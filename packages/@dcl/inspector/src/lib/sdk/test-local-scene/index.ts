@@ -1,5 +1,3 @@
-import { Engine } from '@dcl/ecs'
-import * as components from '@dcl/ecs/dist/components'
 import { ITheme } from '../../../components/AssetsCatalog/types'
 import { LoadableScene } from '../../babylon/decentraland/SceneContext'
 
