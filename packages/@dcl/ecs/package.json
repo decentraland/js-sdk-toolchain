@@ -2,8 +2,7 @@
   "name": "@dcl/ecs",
   "version": "7.0.0",
   "description": "Decentraland ECS",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/index.js",
+  "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
   "types": "./dist/index.d.ts",
   "scripts": {
