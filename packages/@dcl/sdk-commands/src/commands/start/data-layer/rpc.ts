@@ -20,8 +20,8 @@ export function createDataLayerRpc({ fs }: Pick<CliComponents, 'fs'>): DataLayer
   const engine = createEngine()
 
   setInterval(() => {
-    engine.update(0.016).catch(($) => {
-      console.error($)
+    engine.update(0.016).catch((err: any) => {
+      console.error(err)
       debugger
     })
   }, 16)
