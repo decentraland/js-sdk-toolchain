@@ -2,7 +2,11 @@ import { Entity } from '../engine'
 import { IEngine, LastWriteWinElementSetComponentDefinition } from '../engine/types'
 import { Schemas } from '../schemas'
 
-type CompositeRoot = {
+/**
+ * @public
+ * @deprecated composite is not being supported so far, please do not use this feature
+ */
+export type CompositeRootType = {
   id: string
   entities: {
     src: Entity
@@ -10,11 +14,15 @@ type CompositeRoot = {
   }[]
 }
 
-export function CompositeRoot(engine: IEngine): LastWriteWinElementSetComponentDefinition<CompositeRoot> {
+/**
+ * @public
+ * @deprecated composite is not being supported so far, please do not use this feature
+ */
+export function CompositeRoot(engine: IEngine): LastWriteWinElementSetComponentDefinition<CompositeRootType> {
   const component = engine.getComponentOrNull('composite::root')
 
   if (component) {
-    return component as LastWriteWinElementSetComponentDefinition<CompositeRoot>
+    return component as LastWriteWinElementSetComponentDefinition<CompositeRootType>
   }
 
   return engine.defineComponent('composite::root', {

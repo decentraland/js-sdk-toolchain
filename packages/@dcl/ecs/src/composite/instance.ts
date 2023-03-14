@@ -37,6 +37,8 @@ function getEntityMapping(
  * @param rootEntity (optional) suggested mapped rootEntity for the composite
  *
  * @public
+ * @deprecated composite is not being supported so far, please do not use this feature
+ *
  */
 export function instanceComposite(
   engine: IEngine,

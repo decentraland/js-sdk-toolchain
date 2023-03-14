@@ -1,7 +1,10 @@
 import { Entity } from '../engine/entity'
 import { Composite } from './types'
 
-// @public
+/**
+ * @public
+ * @deprecated composite is not being supported so far, please do not use this feature
+ */
 export function compositeFromJson(jsonComposite: any): Composite {
   if (!jsonComposite) throw new Error('Composite is not well defined')
   if (!jsonComposite.id || typeof jsonComposite.id !== 'string')
