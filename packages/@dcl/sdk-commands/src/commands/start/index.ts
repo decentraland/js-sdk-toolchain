@@ -172,7 +172,7 @@ export async function main(options: Options) {
       Object.keys(networkInterfaces).forEach((dev) => {
         ;(networkInterfaces[dev] || []).forEach((details) => {
           if (details.family === 'IPv4') {
-            let addr = `http://${details.address}:${port}?position=${baseCoords.x}%2C${baseCoords.y}&ENABLE_ECS7`
+            let addr = `http://${details.address}:${port}?position=${baseCoords.x}%2C${baseCoords.y}`
             if (debug) {
               addr = `${addr}&SCENE_DEBUG_PANEL`
             }
