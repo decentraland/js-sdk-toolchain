@@ -21,7 +21,9 @@ describe('dataCompare', () => {
     [1, null, 1],
     ['a', null, 1],
     ['a', 'a', 0],
-    ['a', 'b', -1]
+    ['a', 'b', -1],
+    ['aa', 'b', 1],
+    ['a', 'bb', -1]
   ] as const
   let i = 0
   for (const [a, b, result] of testCases) {

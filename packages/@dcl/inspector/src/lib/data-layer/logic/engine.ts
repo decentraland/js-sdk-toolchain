@@ -7,7 +7,7 @@ export function serializeEngine(engine: IEngine) {
   const messages: ByteBuffer = new ReadWriteByteBuffer()
 
   for (const component of engine.componentsIter()) {
-    component.dumpCrdtState(messages)
+    component.dumpCrdtStateToBuffer(messages)
   }
   return messages.toBinary()
 }
