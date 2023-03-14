@@ -53,10 +53,11 @@ export function Button(props: UiButtonProps) {
     height: 36,
     ...uiTransform
   })
+
   return (
     <entity
-      onMouseDown={onMouseDown}
-      onMouseUp={onMouseUp}
+      onMouseDown={props.disabled ? undefined : onMouseDown}
+      onMouseUp={props.disabled ? undefined : onMouseUp}
       uiTransform={uiTransformProps}
       uiText={textProps}
       uiBackground={uiBackgroundProps}
