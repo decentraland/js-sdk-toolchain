@@ -6,7 +6,6 @@ const { builtinModules } = require('module')
 
 const WATCH_MODE = process.argv.includes('--watch')
 const PRODUCTION = process.argv.includes('--production')
-const NO_RPC = process.argv.includes('--no-rpc')
 
 // the following modules will not be embedded in the NodeJs bundle.
 // we create a bundle because many dependencies are exported as ESM and Node
@@ -108,6 +107,6 @@ function getNotBundledModules() {
   traverseDependencies(ret)
 
   // now remove the ESM dependencies
-  const esmModulesToBundle = ['@dcl/sdk', '@dcl/ecs', '@dcl/protocol']
+  const esmModulesToBundle = ['@dcl/sdk', '@dcl/ecs']
   return Array.from(externalModules).concat(builtinModules).filter($ => !esmModulesToBundle.includes($))
 }
