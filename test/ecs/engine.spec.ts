@@ -88,6 +88,13 @@ describe('Engine tests', () => {
     expect(() => engine.getComponent(1238)).toThrowError()
   })
 
+  it('should return component by name', async () => {
+    const engine = Engine()
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
+    expect(engine.getComponent('PositionSchema').componentId).toBe(Position.componentId)
+    expect(engine.getComponentOrNull('PositionSchema')!.componentId).toBe(Position.componentId)
+  })
+
   it('iterate multiple components', async () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0

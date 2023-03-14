@@ -137,7 +137,8 @@ function preEngine(): PreEngine {
     return newComponent
   }
 
-  function getComponent<T>(componentId: number): ComponentDefinition<T> {
+  function getComponent<T>(value: number | string): ComponentDefinition<T> {
+    const componentId: number = typeof value === 'string' ? componentNumberFromName(value) : value
     const component = componentsDefinition.get(componentId)
     if (!component) {
       throw new Error(
@@ -147,7 +148,8 @@ function preEngine(): PreEngine {
     return component as ComponentDefinition<T>
   }
 
-  function getComponentOrNull<T>(componentId: number): ComponentDefinition<T> | null {
+  function getComponentOrNull<T>(value: number | string): ComponentDefinition<T> | null {
+    const componentId: number = typeof value === 'string' ? componentNumberFromName(value) : value
     return (
       (componentsDefinition.get(componentId) as ComponentDefinition<T>) ??
       /* istanbul ignore next */

@@ -207,7 +207,7 @@ export interface IEngine {
    * const StateComponent = engine.getComponent(StateComponentId)
    * ```
    */
-  getComponent<T>(componentId: number): ComponentDefinition<T>
+  getComponent<T>(componentId: number | string): ComponentDefinition<T>
 
   /**
    * Get the component definition from the component id.
@@ -218,7 +218,7 @@ export interface IEngine {
    * const StateComponent = engine.getComponent(StateComponentId)
    * ```
    */
-  getComponentOrNull<T>(componentId: number): ComponentDefinition<T> | null
+  getComponentOrNull<T>(componentId: number | string): ComponentDefinition<T> | null
 
   /**
    * @public

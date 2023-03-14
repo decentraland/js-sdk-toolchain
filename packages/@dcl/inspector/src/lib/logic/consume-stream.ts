@@ -1,12 +1,14 @@
+import { StreamMessage } from '../data-layer/types'
+
 export async function consumeAllMessagesInto(
-  iter: AsyncIterable<Uint8Array>,
+  iter: AsyncIterable<StreamMessage>,
   cb: (data: Uint8Array) => void,
   onClose: () => void
 ) {
   try {
     for await (const it of iter) {
-      if (it.byteLength) {
-        cb(it)
+      if (it.data.byteLength) {
+        cb(it.data)
       }
     }
   } catch (err) {

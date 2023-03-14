@@ -1,19 +1,6 @@
-import { IEngine, ByteBuffer, CrdtMessage, CrdtMessageType } from '@dcl/ecs'
+import { IEngine, CrdtMessage, CrdtMessageType } from '@dcl/ecs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { readMessage } from '@dcl/ecs/dist/serialization/crdt/message'
-
-export function serializeEngine(engine: IEngine) {
-  const messages: ByteBuffer = new ReadWriteByteBuffer()
-
-  // TODO: add deleted entities messages
-
-  // add component values
-  for (const component of engine.componentsIter()) {
-    component.dumpCrdtStateToBuffer(messages)
-  }
-
-  return messages.toBinary()
-}
 
 export function* serializeCrdtMessages(prefix: string, data: Uint8Array, engine: IEngine) {
   const buffer = new ReadWriteByteBuffer(data)

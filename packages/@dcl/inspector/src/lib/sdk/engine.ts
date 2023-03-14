@@ -6,11 +6,11 @@ import {
   Transport
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
-import { DataLayerInterface } from '../data-layer'
+import { DataLayerInterface, StreamMessage } from '../data-layer/types'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
 import { consumeAllMessagesInto } from '../logic/consume-stream'
 import { createEditorComponents, EditorComponents } from './components'
-import { serializeCrdtMessages } from '../data-layer/serialize-engine'
+import { serializeCrdtMessages } from './crdt-logger'
 
 export type InspectorEngine = {
   engine: IEngine
@@ -31,14 +31,14 @@ export function createInspectorEngine(dataLayer: DataLayerInterface): InspectorE
   const MeshRenderer = components.MeshRenderer(engine)
 
   // <HERE BE DRAGONS (TRANSPORT)>
-  const outgoingMessagesStream = new AsyncQueue<Uint8Array>((_, _action) => {})
+  const outgoingMessagesStream = new AsyncQueue<StreamMessage>((_, _action) => {})
   const transport: Transport = {
     filter() {
       return !outgoingMessagesStream.closed
     },
     async send(message) {
       if (outgoingMessagesStream.closed) return
-      outgoingMessagesStream.enqueue(message)
+      outgoingMessagesStream.enqueue({ data: message })
       if (message.byteLength) {
         Array.from(serializeCrdtMessages('Inspector>Datalayer', message, engine)).forEach(($) => console.log($))
       }
@@ -46,11 +46,13 @@ export function createInspectorEngine(dataLayer: DataLayerInterface): InspectorE
   }
   Object.assign(transport, { name: 'InspectorTransportClient' })
   engine.addTransport(transport)
-  void consumeAllMessagesInto(
-    dataLayer.getEngineUpdates(outgoingMessagesStream),
+
+  consumeAllMessagesInto(
+    dataLayer.stream(outgoingMessagesStream),
     transport.onmessage!,
     outgoingMessagesStream.close
-  )
+  ).catch((e) => console.log(e))
+
   function dispose() {
     outgoingMessagesStream.close()
   }

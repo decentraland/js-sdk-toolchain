@@ -4,11 +4,23 @@ import { Router } from '@well-known-components/http-server'
 import { setupEcs6Endpoints } from './endpoints'
 import { PreviewComponents } from '../types'
 import { upgradeWebSocketResponse } from '@well-known-components/http-server/dist/ws'
+import { handleDataLayerWs } from '../data-layer/ws'
+import { DataLayerRPC } from '../data-layer/rpc'
 
-export async function wireRouter(components: PreviewComponents, dir: string) {
+export async function wireRouter(components: PreviewComponents, dir: string, dataLayer?: DataLayerRPC) {
   const router = new Router<PreviewComponents>()
 
   const sceneUpdateClients = new Set<WebSocket>()
+
+  if (dataLayer) {
+    router.get('/data-layer', async (ctx, next) => {
+      if (ctx.request.headers.get('upgrade') === 'websocket') {
+        return upgradeWebSocketResponse((ws) => handleDataLayerWs(ws, dataLayer))
+      }
+
+      return next()
+    })
+  }
 
   router.get('/', async (ctx, next) => {
     if (ctx.request.headers.get('upgrade') === 'websocket') {
