@@ -88,6 +88,12 @@ jobs:
           cwd: packages/@dcl/react-ecs
           deterministic-snapshot: true
           only-update-versions: true
+      - name: update version of packages/@dcl/inspector
+        uses: menduz/oddish-action@master
+        with:
+          cwd: packages/@dcl/inspector
+          deterministic-snapshot: true
+          only-update-versions: true
       - name: update version of packages/@dcl/sdk-commands
         uses: menduz/oddish-action@master
         with:
@@ -98,12 +104,6 @@ jobs:
         uses: menduz/oddish-action@master
         with:
           cwd: packages/@dcl/sdk
-          deterministic-snapshot: true
-          only-update-versions: true
-      - name: update version of packages/@dcl/inspector
-        uses: menduz/oddish-action@master
-        with:
-          cwd: packages/@dcl/inspector
           deterministic-snapshot: true
           only-update-versions: true
       - name: update version of packages/@dcl/playground-assets
@@ -122,7 +122,7 @@ jobs:
           name: built-artifacts
           path: 'packages/**/*.tgz'
           retention-days: 5
-      
+
       - name: publish @dcl/js-runtime package
         id: publish_dcl_js_runtime
         uses: menduz/oddish-action@master
@@ -197,6 +197,23 @@ jobs:
         run: node -e "let pkg=require('./package.json'); pkg.dependencies['@dcl/dcl-rollup']='$ROLLUP_S3_URL'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
         env:
           REACT_ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_react_ecs.outputs.s3-bucket-key }}
+      - name: publish @dcl/inspector package
+        uses: menduz/oddish-action@master
+        id: publish_decentraland_inspector
+        with:
+          registry-url: 'https://registry.npmjs.org'
+          access: public
+          cwd: ./packages/@dcl/inspector
+          ## use action runId instead of current date to generate snapshot numbers
+          deterministic-snapshot: true
+
+          ## publish every package to s3
+          s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/inspector'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
       - name: publish @dcl/sdk-commands package
         uses: menduz/oddish-action@master
         id: publish_decentraland_sdk_commands
@@ -246,23 +263,6 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
-      - name: publish @dcl/inspector package
-        uses: menduz/oddish-action@master
-        id: publish_decentraland_inspector
-        with:
-          registry-url: 'https://registry.npmjs.org'
-          access: public
-          cwd: ./packages/@dcl/inspector
-          ## use action runId instead of current date to generate snapshot numbers
-          deterministic-snapshot: true
-
-          ## publish every package to s3
-          s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/inspector'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
