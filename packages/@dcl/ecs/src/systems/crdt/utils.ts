@@ -25,19 +25,29 @@ export function dataCompare<T>(a: T, b: T): number {
   if (a !== null && b === null) return 1
 
   if (a instanceof Uint8Array && b instanceof Uint8Array) {
+    const lengthDifference: number = a.byteLength - b.byteLength
+    if (lengthDifference !== 0) {
+      return lengthDifference > 0 ? 1 : -1
+    }
+
     let res: number
-    const n = a.byteLength > b.byteLength ? b.byteLength : a.byteLength
-    for (let i = 0; i < n; i++) {
+    for (let i = 0, n = a.byteLength; i < n; i++) {
       res = a[i] - b[i]
       if (res !== 0) {
         return res > 0 ? 1 : -1
       }
     }
-    res = a.byteLength - b.byteLength
-    return res > 0 ? 1 : res < 0 ? -1 : 0
+    
+    // the data is exactly the same
+    return 0
   }
 
   if (typeof a === 'string') {
+    const lengthDifference: number = a.length - (b as string).length
+    if (lengthDifference !== 0) {
+      return lengthDifference > 0 ? 1 : -1
+    }
+
     return a.localeCompare(b as string)
   }
 
