@@ -6,8 +6,7 @@ import future from 'fp-future'
 import * as BABYLON from '@babylonjs/core'
 
 import { createEditorComponents } from '../../sdk/components'
-import { DataLayerInterface } from '../../data-layer/types'
-import { StreamReqRes } from '../../data-layer/todo-protobuf'
+import { DataLayerInterface, StreamMessage } from '../../data-layer/types'
 import { serializeCrdtMessages } from '../../sdk/crdt-logger'
 import { EcsEntity } from './EcsEntity'
 import { createBetterTransport } from './transport'
@@ -146,7 +145,7 @@ export class SceneContext {
   }
 
   async connectDataLayer(dataLayer: DataLayerInterface) {
-    const outgoingMessages = new AsyncQueue<StreamReqRes>((_, _action) => {
+    const outgoingMessages = new AsyncQueue<StreamMessage>((_, _action) => {
       // console.log('SCENE QUEUE', action)
     })
 

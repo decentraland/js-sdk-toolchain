@@ -1,6 +1,6 @@
-import { stream } from './logic/stream'
 import { createEngine } from './logic/engine'
 import { DataLayerInterface, Fs } from './types'
+import { initRpcMethods } from './logic/rpc-methods'
 
 export function createLocalDataLayer(_fs: Fs): DataLayerInterface {
   const engine = createEngine()
@@ -16,15 +16,5 @@ export function createLocalDataLayer(_fs: Fs): DataLayerInterface {
     })
   }, 16)
 
-  return {
-    async undo() {
-      return {}
-    },
-    // This method receives an incoming message iterator
-    // and returns an async iterable. consumption and production of messages
-    // are decoupled operations
-    stream: function (iter) {
-      return stream(iter, { engine })
-    }
-  }
+  return initRpcMethods(_fs, engine)
 }

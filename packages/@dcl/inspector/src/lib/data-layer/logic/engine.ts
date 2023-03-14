@@ -6,10 +6,8 @@ import { createEditorComponents } from '../../sdk/components'
 export function serializeEngine(engine: IEngine) {
   const messages: ByteBuffer = new ReadWriteByteBuffer()
 
-  // TODO: add deleted entities messages
-  // add component values
   for (const component of engine.componentsIter()) {
-    component.dumpCrdtStateToBuffer(messages)
+    component.dumpCrdtState(messages)
   }
   return messages.toBinary()
 }

@@ -20,8 +20,7 @@ async function main() {
     platform: 'browser',
     outfile: 'public/bundle.js',
     sourcemap: 'linked',
-    minify: PRODUCTION,
-    define: { 'process.env.NO_RPC': `${NO_RPC}` }
+    minify: PRODUCTION
   })
 
   if (WATCH_MODE) {
@@ -109,6 +108,6 @@ function getNotBundledModules() {
   traverseDependencies(ret)
 
   // now remove the ESM dependencies
-  const esmModulesToBundle = ['@dcl/sdk', '@dcl/ecs']
+  const esmModulesToBundle = ['@dcl/sdk', '@dcl/ecs', '@dcl/protocol']
   return Array.from(externalModules).concat(builtinModules).filter($ => !esmModulesToBundle.includes($))
 }

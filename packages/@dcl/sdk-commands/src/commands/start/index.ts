@@ -152,8 +152,8 @@ export async function main(options: Options) {
       }
     },
     async main({ components, startComponents }) {
-      const rpcServer = withDataLayer ? createDataLayerRpc() : undefined
-      await wireRouter(components, projectRoot, rpcServer)
+      const dataLayerRpc = withDataLayer ? createDataLayerRpc({ fs: components.fs }) : undefined
+      await wireRouter(components, projectRoot, dataLayerRpc)
       if (watch) {
         await wireFileWatcherToWebSockets(components, projectRoot)
       }

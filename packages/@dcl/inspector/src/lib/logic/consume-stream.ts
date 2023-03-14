@@ -1,7 +1,7 @@
-import { StreamReqRes } from '../data-layer/todo-protobuf'
+import { StreamMessage } from '../data-layer/types'
 
 export async function consumeAllMessagesInto(
-  iter: AsyncIterable<StreamReqRes>,
+  iter: AsyncIterable<StreamMessage>,
   cb: (data: Uint8Array) => void,
   onClose: () => void
 ) {

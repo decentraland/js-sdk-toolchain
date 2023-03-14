@@ -1,19 +1,30 @@
-import { createRpcServer, RpcServerPort } from '@dcl/rpc'
+import { createRpcServer, RpcServer, RpcServerPort } from '@dcl/rpc'
 import * as codegen from '@dcl/rpc/dist/codegen'
-import { DataServiceDefinition } from '@dcl/protocol/out-js/decentraland/sdk/editor/data_service.gen'
-import { createRemoteDataLayer } from '@dcl/inspector/src/lib/data-layer/remote-data-layer'
+import { createEngine, initRpcMethods, DataLayerProto } from '@dcl/inspector'
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-export type DataLayerContext = {}
+import { CliComponents } from '../../../components'
 
-export function createDataLayerRpc() {
-  const dataLayer = createRemoteDataLayer({} as any)
+export type IEngine = ReturnType<typeof createEngine>
+export type DataLayerContext = {
+  engine: IEngine
+}
+export type DataLayerRPC = {
+  rpcServer: RpcServer<DataLayerContext>
+  /**
+   * we use the same engine with multiple transports for all the contexts.
+   */
+  engine: IEngine
+}
+
+export function createDataLayerRpc({ fs }: Pick<CliComponents, 'fs'>): DataLayerRPC {
+  const engine = createEngine()
+  const dataLayer = initRpcMethods(fs, engine)
   const rpcServer = createRpcServer<DataLayerContext>({})
   rpcServer.setHandler(rpcHandler)
 
   async function rpcHandler(serverPort: RpcServerPort<DataLayerContext>) {
-    codegen.registerService(serverPort, DataServiceDefinition, async () => dataLayer)
+    codegen.registerService(serverPort, DataLayerProto.DataServiceDefinition, async () => dataLayer)
   }
 
-  return rpcServer
+  return { rpcServer, engine }
 }

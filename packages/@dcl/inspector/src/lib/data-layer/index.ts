@@ -2,24 +2,32 @@ import { IEngine } from '@dcl/ecs'
 import { createRpcClient } from '@dcl/rpc'
 import { WebSocketTransport } from '@dcl/rpc/dist/transports/WebSocket'
 import * as codegen from '@dcl/rpc/dist/codegen'
+import fp from 'fp-future'
+import { DataServiceDefinition } from '@dcl/protocol/out-ts/decentraland/sdk/editor/data_service.gen'
 
-import { DataServiceDefinition } from './todo-protobuf'
 import { createLocalDataLayer } from './local-data-layer'
 import { DataLayerInterface, Fs } from './types'
 
+const dataLayerWs = new URLSearchParams(window.location.search).get('ws')
+
 export async function getDataLayerRpc(): Promise<DataLayerInterface> {
-  if (process.env.NO_RPC) {
-    return createLocalDataLayer({} as Fs)
+  const future = fp<DataLayerInterface>()
+  if (!dataLayerWs) {
+    future.resolve(createLocalDataLayer({} as Fs))
+  } else {
+    const ws = new WebSocket(dataLayerWs)
+
+    ws.onopen = async () => {
+      const clientTransport = WebSocketTransport(ws)
+      const client = await createRpcClient(clientTransport)
+      const clientPort = await client.createPort('scene-ctx')
+      const serviceClient: DataLayerInterface = codegen.loadService<{ engine: IEngine }, DataServiceDefinition>(
+        clientPort,
+        DataServiceDefinition
+      )
+      future.resolve(serviceClient)
+    }
   }
 
-  // TODO: get port
-  const ws = new WebSocket('ws://localhost:8001/data-layer')
-  const clientTransport = WebSocketTransport(ws)
-  const client = await createRpcClient(clientTransport)
-  const clientPort = await client.createPort('Scene')
-  const serviceClient = codegen.loadService<{ engine: IEngine }, DataServiceDefinition>(
-    clientPort,
-    DataServiceDefinition
-  )
-  return serviceClient
+  return future
 }

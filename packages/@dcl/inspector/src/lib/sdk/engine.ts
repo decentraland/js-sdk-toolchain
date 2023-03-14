@@ -6,12 +6,11 @@ import {
   Transport
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
-import { DataLayerInterface } from '../data-layer/types'
+import { DataLayerInterface, StreamMessage } from '../data-layer/types'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
 import { consumeAllMessagesInto } from '../logic/consume-stream'
 import { createEditorComponents, EditorComponents } from './components'
 import { serializeCrdtMessages } from './crdt-logger'
-import { StreamReqRes } from '../data-layer/todo-protobuf'
 
 export type InspectorEngine = {
   engine: IEngine
@@ -32,7 +31,7 @@ export function createInspectorEngine(dataLayer: DataLayerInterface): InspectorE
   const MeshRenderer = components.MeshRenderer(engine)
 
   // <HERE BE DRAGONS (TRANSPORT)>
-  const outgoingMessagesStream = new AsyncQueue<StreamReqRes>((_, _action) => {})
+  const outgoingMessagesStream = new AsyncQueue<StreamMessage>((_, _action) => {})
   const transport: Transport = {
     filter() {
       return !outgoingMessagesStream.closed
@@ -47,11 +46,12 @@ export function createInspectorEngine(dataLayer: DataLayerInterface): InspectorE
   }
   Object.assign(transport, { name: 'InspectorTransportClient' })
   engine.addTransport(transport)
-  void consumeAllMessagesInto(
+
+  consumeAllMessagesInto(
     dataLayer.stream(outgoingMessagesStream),
     transport.onmessage!,
     outgoingMessagesStream.close
-  )
+  ).catch((e) => console.log(e))
 
   function dispose() {
     outgoingMessagesStream.close()
