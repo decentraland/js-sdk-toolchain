@@ -6,9 +6,8 @@ export type StreamMessage = {
 }
 
 export type DataLayerInterface = {
-  init(req: EmptyObject): Promise<EmptyObject>
   undo(req: EmptyObject): Promise<EmptyObject>
-  // redo(): Promise<any>
+  redo(req: EmptyObject): Promise<EmptyObject>
   stream(iter: AsyncIterable<StreamMessage>): AsyncGenerator<StreamMessage>
 }
 

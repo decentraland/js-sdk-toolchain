@@ -4,7 +4,7 @@ import { stream } from './stream'
 
 export function initRpcMethods(fs: Fs, engine: IEngine): DataLayerInterface {
   return {
-    async init() {
+    async redo() {
       return {}
     },
     async undo() {
