@@ -3,4 +3,4 @@
  */
 export { createEngine } from './logic/engine'
 export { initRpcMethods } from './logic/rpc-methods'
-export * as DataLayerProto from '@dcl/protocol/out-ts/decentraland/sdk/editor/data_service.gen'
+export * as DataLayerProto from './proto'

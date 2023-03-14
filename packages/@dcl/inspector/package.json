@@ -18,7 +18,6 @@
     "@dcl/ecs": "file:../ecs",
     "@dcl/ecs-math": "^2.0.1-20221129185242.commit-40495c1",
     "@dcl/js-runtime": "file:../js-runtime",
-    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-4416868324.commit-3030a70.tgz",
     "@dcl/rpc": "^1.1.1",
     "@dcl/schemas": "^6.11.1",
     "@types/node": "^16.18.11",

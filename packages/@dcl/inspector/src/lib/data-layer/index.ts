@@ -3,8 +3,8 @@ import { createRpcClient } from '@dcl/rpc'
 import { WebSocketTransport } from '@dcl/rpc/dist/transports/WebSocket'
 import * as codegen from '@dcl/rpc/dist/codegen'
 import fp from 'fp-future'
-import { DataServiceDefinition } from '@dcl/protocol/out-ts/decentraland/sdk/editor/data_service.gen'
 
+import { DataServiceDefinition } from './proto'
 import { createLocalDataLayer } from './local-data-layer'
 import { DataLayerInterface, Fs } from './types'
 
