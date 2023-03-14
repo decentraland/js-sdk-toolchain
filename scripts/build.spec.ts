@@ -98,6 +98,17 @@ flow('build-all', () => {
     })
   })
 
+  flow('@dcl/inspector', () => {
+    itDeletesFolder('build', INSPECTOR_PATH)
+
+    itExecutes('npm i --silent', INSPECTOR_PATH)
+    itExecutes('npm run build --silent', INSPECTOR_PATH)
+    it('check file exists', () => {
+      ensureFileExists('public/bundle.js', INSPECTOR_PATH)
+      ensureFileExists('public/bundle.css', INSPECTOR_PATH)
+    })
+  })
+
   flow('@dcl/sdk-commands build', () => {
     itDeletesFolder('dist', SDK_COMMANDS_PATH)
     itExecutes(`npm i --silent`, SDK_COMMANDS_PATH)
@@ -138,17 +149,6 @@ flow('build-all', () => {
       ensureFileExists('ecs.d.ts', SDK_PATH)
       ensureFileExists('react-ecs.js', SDK_PATH)
       ensureFileExists('react-ecs.d.ts', SDK_PATH)
-    })
-  })
-
-  flow('@dcl/inspector', () => {
-    itDeletesFolder('build', INSPECTOR_PATH)
-
-    itExecutes('npm i --silent', INSPECTOR_PATH)
-    itExecutes('npm run build --silent', INSPECTOR_PATH)
-    it('check file exists', () => {
-      ensureFileExists('public/bundle.js', INSPECTOR_PATH)
-      ensureFileExists('public/bundle.css', INSPECTOR_PATH)
     })
   })
 

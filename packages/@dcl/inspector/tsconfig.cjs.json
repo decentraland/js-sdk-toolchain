@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "CommonJS",
+    "outDir": "dist/cjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "stripInternal": true,
+    "downlevelIteration": true,
+    "preserveConstEnums": true,
+    "lib": ["ES2020"]
+  },
+  "include": ["src/lib/data-layer"],
+  "exclude": ["dist"]
+}

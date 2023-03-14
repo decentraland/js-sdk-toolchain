@@ -31,6 +31,7 @@ function parseUiInput(props: Partial<UiInputProps>): PBUiInput {
       }}
       uiBackground={{ color: Color4.Red() }}
       uiTransform={{ width: 200, height: 36 }}
+      value={textValue}
     />
  *
  * @category Component

@@ -23,6 +23,7 @@ import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
 import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
 import { b64HashingFunction } from '../../logic/project-files'
+import { createDataLayerRpc } from './data-layer/rpc'
 
 interface Options {
   args: typeof args
@@ -45,10 +46,11 @@ export const args = getArgs({
   '-b': '--no-browser',
   '-w': '--no-watch',
   '--skip-build': Boolean,
-  '--desktop-client': Boolean
+  '--desktop-client': Boolean,
+  '--data-layer': Boolean
 })
 
-export function help() {
+export async function help() {
   return `
   Usage: sdk-commands start [options]
 
@@ -83,6 +85,7 @@ export async function main(options: Options) {
   const openBrowser = !args['--no-browser'] && !isCi
   const skipBuild = args['--skip-build']
   const watch = !args['--no-watch']
+  const withDataLayer = args['--data-layer']
   const enableWeb3 = args['--web3']
 
   // TODO: FIX this hardcoded values ?
@@ -149,7 +152,8 @@ export async function main(options: Options) {
       }
     },
     async main({ components, startComponents }) {
-      await wireRouter(components, projectRoot)
+      const dataLayerRpc = withDataLayer ? createDataLayerRpc({ fs: components.fs }) : undefined
+      await wireRouter(components, projectRoot, dataLayerRpc)
       if (watch) {
         await wireFileWatcherToWebSockets(components, projectRoot)
       }
@@ -168,7 +172,7 @@ export async function main(options: Options) {
       Object.keys(networkInterfaces).forEach((dev) => {
         ;(networkInterfaces[dev] || []).forEach((details) => {
           if (details.family === 'IPv4') {
-            let addr = `http://${details.address}:${port}?position=${baseCoords.x}%2C${baseCoords.y}&ENABLE_ECS7`
+            let addr = `http://${details.address}:${port}?position=${baseCoords.x}%2C${baseCoords.y}`
             if (debug) {
               addr = `${addr}&SCENE_DEBUG_PANEL`
             }

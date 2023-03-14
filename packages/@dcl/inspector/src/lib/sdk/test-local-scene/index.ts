@@ -1,6 +1,5 @@
-import { Engine } from '@dcl/ecs'
-import { ITheme } from '../../components/AssetsCatalog'
-import { LoadableScene } from '../babylon/decentraland/SceneContext'
+import { ITheme } from '../../../components/AssetsCatalog/types'
+import { LoadableScene } from '../../babylon/decentraland/SceneContext'
 
 // this was taken verbatim from my deployed world at menduz.dcl.eth
 export function getHardcodedLoadableScene(_id: string, catalog: ITheme[]): LoadableScene {
@@ -39,17 +38,4 @@ export function getHardcodedLoadableScene(_id: string, catalog: ITheme[]): Loada
       }
     }
   }
-}
-
-export function createSameThreadScene() {
-  // create engine and its components
-  const engine = Engine()
-
-  // const Billboard = components.Billboard(engine)
-  // const Transform = components.Transform(engine)
-  // const MeshRenderer = components.MeshRenderer(engine)
-  // const GltfContainer = components.GltfContainer(engine)
-  // const TextShape = components.TextShape(engine)
-
-  return engine
 }

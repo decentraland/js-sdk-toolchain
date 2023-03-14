@@ -1,11 +1,15 @@
+import { AsyncQueue } from '@well-known-components/pushable-channel'
 import * as Schemas from '@dcl/schemas'
 import { ComponentDefinition, CrdtMessageType, Engine, Entity } from '@dcl/ecs'
-import { EcsEntity } from './EcsEntity'
 import * as components from '@dcl/ecs/dist/components'
 import future from 'fp-future'
 import * as BABYLON from '@babylonjs/core'
-import { createBetterTransport } from '../../data-layer/transport'
+
 import { createEditorComponents } from '../../sdk/components'
+import { DataLayerInterface, StreamMessage } from '../../data-layer/types'
+import { serializeCrdtMessages } from '../../sdk/crdt-logger'
+import { EcsEntity } from './EcsEntity'
+import { createBetterTransport } from './transport'
 import { ComponentOperation } from './component-operations'
 import { putBillboardComponent } from './sdkComponents/billboard'
 import { putGltfContainerComponent } from './sdkComponents/gltf-container'
@@ -61,6 +65,7 @@ export class SceneContext {
   constructor(public babylon: BABYLON.Engine, public scene: BABYLON.Scene, public loadableScene: LoadableScene) {
     this.rootNode = new EcsEntity(0 as Entity, this.#weakThis, scene)
     babylon.onEndFrameObservable.add(this.update)
+    Object.assign(globalThis, { babylon: this.engine })
   }
 
   private processEcsChange(entityId: Entity, op: CrdtMessageType, component?: ComponentDefinition<any>) {
@@ -137,6 +142,28 @@ export class SceneContext {
     this.rootNode.parent = null
     this.rootNode.dispose()
     this.babylon.onEndFrameObservable.removeCallback(this.update)
+  }
+
+  async connectDataLayer(dataLayer: DataLayerInterface) {
+    const outgoingMessages = new AsyncQueue<StreamMessage>((_, _action) => {
+      // console.log('SCENE QUEUE', action)
+    })
+
+    for await (const message of dataLayer.stream(outgoingMessages)) {
+      if (message.data.byteLength) {
+        Array.from(serializeCrdtMessages('Datalayer>SceneContext', message.data, this.engine)).forEach(($) =>
+          console.log($)
+        )
+      }
+
+      // Wait till next tick
+      const res = await this.transport.receiveBatch(message.data)
+
+      if (res.byteLength) {
+        Array.from(serializeCrdtMessages('SceneContext>Datalayer', res, this.engine)).forEach(($) => console.log($))
+      }
+      outgoingMessages.enqueue({ data: res })
+    }
   }
 }
 
