@@ -32,6 +32,12 @@ module.exports = {
       lines: 1,
       statements: 1
     },
+    "packages/@dcl/ecs/src/composite/proto/gen": {
+      branches: 1,
+      functions: 1,
+      lines: 1,
+      statements: 1
+    },
     "packages/@dcl/ecs/src/components/generated/index.gen.ts": {
       functions: 10,
     },
@@ -46,7 +52,7 @@ module.exports = {
       functions: 100,
       lines: 100,
       statements: 100,
-    }
+    },
   },
   coveragePathIgnorePatterns: [
     "scripts",
