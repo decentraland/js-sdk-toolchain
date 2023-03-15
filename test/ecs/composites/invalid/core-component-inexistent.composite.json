@@ -1,0 +1,13 @@
+{
+    "id": "core-component-inexistent",
+    "components": [
+        {
+            "name": "core::InexistentComponent",
+            "data": {
+                "512": {
+                    "randomData": 324
+                }
+            }
+        }
+    ]
+}

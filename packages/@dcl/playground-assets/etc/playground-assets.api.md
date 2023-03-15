@@ -436,6 +436,41 @@ export type Color4Type = {
 // @public (undocumented)
 export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T> | GrowOnlyValueSetComponentDefinition<T>;
 
+// Warning: (ae-missing-release-tag) "componentDefinitionByName" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export const componentDefinitionByName: {
+    "core::Animator": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAnimator>>;
+    "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
+    "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
+    "core::AvatarAttach": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarAttach>>;
+    "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
+    "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
+    "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
+    "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
+    "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
+    "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
+    "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
+    "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
+    "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
+    "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
+    "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
+    "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
+    "core::PointerLock": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerLock>>;
+    "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
+    "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
+    "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
+    "core::UiBackground": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiBackground>>;
+    "core::UiDropdown": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdown>>;
+    "core::UiDropdownResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdownResult>>;
+    "core::UiInput": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInput>>;
+    "core::UiInputResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputResult>>;
+    "core::UiText": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiText>>;
+    "core::UiTransform": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiTransform>>;
+    "core::VideoPlayer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVideoPlayer>>;
+    "core::VisibilityComponent": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVisibilityComponent>>;
+};
+
 // @public
 export const enum ComponentType {
     // (undocumented)
@@ -443,6 +478,24 @@ export const enum ComponentType {
     // (undocumented)
     LastWriteWinElementSet = 0
 }
+
+// @public @deprecated (undocumented)
+export type Composite = {
+    id: string;
+    components: {
+        name: string;
+        schema?: JsonSchemaExtended;
+        data: Map<Entity, unknown>;
+    }[];
+};
+
+// @public @deprecated (undocumented)
+export function compositeFromJson(jsonComposite: any): Composite;
+
+// @public @deprecated (undocumented)
+export type CompositeProvider = {
+    getCompositeOrNull: (id: string) => Composite | null;
+};
 
 // @public
 export type ConflictResolutionMessage = PutComponentMessageBody | DeleteComponentMessageBody;
@@ -755,8 +808,8 @@ export interface IEngine {
     defineComponent<T extends Spec>(componentName: string, spec: T, constructorDefault?: Partial<MapResult<T>>): MapComponentDefinition<MapResult<T>>;
     defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): LastWriteWinElementSetComponentDefinition<T>;
     defineValueSetComponentFromSchema<T>(componentName: string, spec: ISchema<T>, options: ValueSetOptions<T>): GrowOnlyValueSetComponentDefinition<T>;
-    getComponent<T>(componentId: number): ComponentDefinition<T>;
-    getComponentOrNull<T>(componentId: number): ComponentDefinition<T> | null;
+    getComponent<T>(componentId: number | string): ComponentDefinition<T>;
+    getComponentOrNull<T>(componentId: number | string): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     getEntityState(entity: Entity): EntityState;
     readonly PlayerEntity: Entity;
@@ -1044,6 +1097,13 @@ export type InputEventResult = {
 
 // @public
 export const inputSystem: IInputSystem;
+
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+//
+// @public @deprecated
+export function instanceComposite(engine: IEngine, compositeData: Composite, getNextAvailableEntity: () => Entity | null, compositeProvider: CompositeProvider, rootEntity?: Entity, alreadyRequestedId?: Set<string>): Entity;
 
 // @public (undocumented)
 export interface ISchema<T = any> {
@@ -2478,6 +2538,8 @@ export namespace Schemas {
     Map: <T extends Spec>(spec: T, defaultValue?: Partial<MapResult<T>> | undefined) => ISchema<MapResult<T>>;
     const // (undocumented)
     Optional: <T>(spec: ISchema<T>) => ISchema<T | undefined>;
+    const // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+    fromJson: (json: JsonSchemaExtended) => ISchema<unknown>;
 }
 
 // @public (undocumented)

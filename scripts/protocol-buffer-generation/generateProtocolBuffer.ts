@@ -3,6 +3,7 @@ import * as fs from 'fs-extra'
 import { FileDescriptorStandardOption, runCommand } from '../utils/shellCommand'
 import { Component } from './generateComponent'
 import { getFilePathsSync } from '../utils/getFilePathsSync'
+import { PROTO_COMPILER_PATH, TS_PROTO_PLUGIN_PATH } from './protoConst'
 
 export async function generateProtocolBuffer(params: {
   components: Component[]
@@ -20,12 +21,8 @@ export async function generateProtocolBuffer(params: {
 
   const protoFiles = components.map((item) => path.resolve(definitionsPath, `${item.componentFile}.proto`)).join(' ')
 
-  const protoCompilerPath = path.resolve(process.cwd(), 'node_modules/.bin/protobuf/bin/protoc')
-
-  const tsProtoPluginPath = path.resolve(process.cwd(), 'node_modules/.bin/protoc-gen-ts_proto')
-
   const protoCommandArgs: string[] = [
-    `--plugin=${tsProtoPluginPath}`,
+    `--plugin=${TS_PROTO_PLUGIN_PATH}`,
     `--ts_proto_opt=esModuleInterop=true`,
     `--ts_proto_opt=outputJsonMethods=false`,
     `--ts_proto_opt=forceLong=false`,
@@ -38,11 +35,11 @@ export async function generateProtocolBuffer(params: {
     protoFiles
   ]
   const commandWorkingDir = process.cwd()
-  process.stderr.write(`Command is ${protoCompilerPath} \\ ${protoCommandArgs.join('\\\n  ')}\n`)
+  process.stderr.write(`Command is ${PROTO_COMPILER_PATH} \\ ${protoCommandArgs.join('\\\n  ')}\n`)
 
   try {
     await runCommand({
-      command: protoCompilerPath,
+      command: PROTO_COMPILER_PATH,
       workingDir: commandWorkingDir,
       args: protoCommandArgs,
       fdStandards: FileDescriptorStandardOption.ONLY_IF_THROW
@@ -75,7 +72,7 @@ export function getComponentId(protoContent: string) {
   return parseInt(componentIdLine[0].split('=')[1])
 }
 
-function fixTsGeneratedByProto(filePath: string) {
+export function fixTsGeneratedByProto(filePath: string) {
   let content = fs.readFileSync(filePath, 'utf8')
 
   /**

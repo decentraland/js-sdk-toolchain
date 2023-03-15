@@ -95,8 +95,9 @@ compile_apis: ${PBS_TS}
 deep-clean-and-snapshot:
 	git clean -fxd
 	make install
+	make lint-fix
 	make build
-	make test update-snapshots lint-fix
+	make update-snapshots 
 
 .PHONY: build test install docs deep-clean-and-snapshot update-snapshots
 

@@ -1,0 +1,13 @@
+{
+    "id": "recursive-composite",
+    "components": [
+        {
+            "name": "composite::root",
+            "data": {
+                "512": {
+                    "id": "recursive-composite"
+                }
+            }
+        }
+    ]
+}

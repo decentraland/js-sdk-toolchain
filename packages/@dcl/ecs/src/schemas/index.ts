@@ -13,6 +13,7 @@ import { Vector3Schema, Vector3Type } from './custom/Vector3'
 import { ISchema, JsonSchemaExtended, JsonArray, JsonMap, JsonPrimitive } from './ISchema'
 import { IMap } from './Map'
 import { IOptional } from './Optional'
+import { jsonSchemaToSchema } from './buildSchema'
 
 export {
   QuaternionType,
@@ -77,4 +78,11 @@ export namespace Schemas {
   export const Map = IMap
   /** @public */
   export const Optional = IOptional
+
+  /**
+   * @public Create an ISchema object from the json-schema
+   * @param jsonSchema
+   * @returns a ISchema or fail for unsupported json-schema
+   */
+  export const fromJson: (json: JsonSchemaExtended) => ISchema<unknown> = jsonSchemaToSchema
 }

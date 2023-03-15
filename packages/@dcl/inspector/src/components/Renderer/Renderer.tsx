@@ -4,10 +4,9 @@ import { useDrop } from 'react-dnd'
 
 import { initEngine } from '../../lib/babylon/setup'
 import { SceneContext } from '../../lib/babylon/decentraland/SceneContext'
-import { getHardcodedLoadableScene, createSameThreadScene } from '../../lib/test-local-scene'
+import { getHardcodedLoadableScene } from '../../lib/sdk/test-local-scene'
 import { getDataLayerRpc } from '../../lib/data-layer'
 import { InspectorEngine, createInspectorEngine } from '../../lib/sdk/engine'
-import { connectSceneContextToLocalEngine } from '../../lib/data-layer/rpc-engine'
 import { IAsset } from '../AssetsCatalog/types'
 import { ROOT } from '../../hooks/sdk/tree'
 import { Props } from './types'
@@ -30,33 +29,39 @@ export function Renderer({ onLoad }: Props) {
   }
 
   useEffect(() => {
-    if (!catalog) return
-    const canvas = document.getElementById('renderer') as HTMLCanvasElement // Get the canvas element
-    const { babylon, scene } = initEngine(canvas)
+    async function init() {
+      if (!catalog) return
+      const canvas = document.getElementById('renderer') as HTMLCanvasElement // Get the canvas element
+      const { babylon, scene } = initEngine(canvas)
 
-    // await scene.debugLayer.show({ showExplorer: true, embedMode: true })
+      // await scene.debugLayer.show({ showExplorer: true, embedMode: true })
 
-    // initialize DataLayer
-    const simulatedScene = createSameThreadScene()
-    const dataLayer = getDataLayerRpc(simulatedScene)
+      // initialize DataLayer
+      const dataLayer = await getDataLayerRpc()
 
-    // initialize babylon scene
-    const loadableScene = getHardcodedLoadableScene(
-      'urn:decentraland:entity:bafkreid44xhavttoz4nznidmyj3rjnrgdza7v6l7kd46xdmleor5lmsxfm1',
-      catalog
-    )
-    const ctx = new SceneContext(babylon, scene, loadableScene)
-    ctx.rootNode.position.set(0, 0, 0)
-    void connectSceneContextToLocalEngine(ctx, dataLayer)
+      // initialize babylon scene
+      const ctx = new SceneContext(
+        babylon,
+        scene,
+        getHardcodedLoadableScene(
+          'urn:decentraland:entity:bafkreid44xhavttoz4nznidmyj3rjnrgdza7v6l7kd46xdmleor5lmsxfm1',
+          catalog
+        )
+      )
+      ctx.rootNode.position.set(0, 0, 0)
+      // Connect babylon engine with dataLayer transport
+      void ctx.connectDataLayer(dataLayer)
 
-    // create inspector engine context and components
-    const inspectorEngine = createInspectorEngine(dataLayer)
+      // create inspector engine context and components
+      const inspectorEngine = createInspectorEngine(dataLayer)
 
-    setState({ ...inspectorEngine, scene })
-    onLoad(inspectorEngine)
+      setState({ ...inspectorEngine, scene })
+      onLoad(inspectorEngine)
 
-    // register some globals for debugging
-    Object.assign(globalThis, { simulatedScene, dataLayer, inspectorEngine })
+      // register some globals for debugging
+      Object.assign(globalThis, { dataLayer, inspectorEngine })
+    }
+    init().catch((err) => console.log(err))
   }, [catalog])
 
   const [, drop] = useDrop(

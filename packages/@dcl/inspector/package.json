@@ -2,9 +2,13 @@
   "name": "@dcl/inspector",
   "version": "0.1.0",
   "scripts": {
-    "start": "node ./build.js --watch",
+    "start": "node ./build.js --watch --no-rpc",
+    "start-rpc": "node ./build.js --watch",
     "build": "node ./build.js"
   },
+  "main": "dist/tooling-entrypoint.js",
+  "types": "dist/tooling-entrypoint.d.ts",
+  "typings": "dist/tooling-entrypoint.d.ts",
   "devDependencies": {
     "@babylonjs/core": "^5.48.0",
     "@babylonjs/gui": "^5.48.0",
@@ -14,6 +18,7 @@
     "@dcl/ecs": "file:../ecs",
     "@dcl/ecs-math": "^2.0.1-20221129185242.commit-40495c1",
     "@dcl/js-runtime": "file:../js-runtime",
+    "@dcl/rpc": "^1.1.1",
     "@dcl/schemas": "^6.11.1",
     "@types/node": "^16.18.11",
     "@types/react": "^18.0.27",
@@ -28,5 +33,9 @@
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1",
     "typescript": "^4.9.4"
-  }
+  },
+  "files": [
+    "dist",
+    "public"
+  ]
 }

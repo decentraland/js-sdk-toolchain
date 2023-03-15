@@ -1,5 +1,5 @@
-import { cyclicParentingChecker, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src'
-import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
+import { cyclicParentingChecker, MapResult, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src'
+import { Engine, Entity, LastWriteWinElementSetComponentDefinition } from '../../packages/@dcl/ecs/src/engine'
 import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { components } from '../../packages/@dcl/ecs/src'
@@ -79,13 +79,26 @@ describe('Engine tests', () => {
       position.x = 80
     }
     expect(Position.get(entity)).toStrictEqual({ x: 80 })
+
     engine.removeComponentDefinition(888)
     expect(() => engine.getComponent(888)).toThrowError()
+
+    engine.seal()
+    expect(() => engine.removeComponentDefinition(888)).toThrowError(
+      'Engine is already sealed. No components can be removed at this stage'
+    )
   })
 
   it('should fail if we try to fetch a component not deifned', async () => {
     const engine = Engine()
     expect(() => engine.getComponent(1238)).toThrowError()
+  })
+
+  it('should return component by name', async () => {
+    const engine = Engine()
+    const Position = engine.defineComponent('PositionSchema', PositionSchema)
+    expect(engine.getComponent('PositionSchema').componentId).toBe(Position.componentId)
+    expect(engine.getComponentOrNull('PositionSchema')!.componentId).toBe(Position.componentId)
   })
 
   it('iterate multiple components', async () => {
@@ -658,5 +671,18 @@ describe('Engine tests', () => {
     expect(() => {
       engine.addSystem(testSystem)
     }).toThrowError()
+  })
+
+  it('define and remove component from component name', async () => {
+    const engine = Engine()
+    engine.defineComponent('PositionSchema', PositionSchema)
+
+    const Position = engine.getComponent('PositionSchema') as LastWriteWinElementSetComponentDefinition<
+      MapResult<typeof PositionSchema>
+    >
+    expect(Position).not.toBeNull()
+
+    engine.removeComponentDefinition('PositionSchema')
+    expect(() => engine.getComponent('PositionSchema')).toThrowError()
   })
 })

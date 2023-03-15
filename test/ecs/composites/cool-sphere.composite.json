@@ -1,0 +1,46 @@
+{
+    "id": "cool-sphere",
+    "components": [
+        {
+            "name": "core::Transform",
+            "data": {
+                "512": {
+                    "position": {
+                        "x": 8,
+                        "y": 1,
+                        "z": 1
+                    }
+                }
+            }
+        },
+        {
+            "name": "core::MeshRenderer",
+            "data": {
+                "512": {
+                    "mesh": {
+                        "$case": "sphere",
+                        "sphere": {}
+                    }
+                }
+            }
+        },
+        {
+            "name": "core::Material",
+            "data": {
+                "512": {
+                    "material": {
+                        "$case": "pbr",
+                        "pbr": {
+                            "albedoColor": {
+                                "r": 0.8,
+                                "g": 0.1,
+                                "b": 0.1,
+                                "a": 1.0
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
