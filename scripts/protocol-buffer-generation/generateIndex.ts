@@ -56,7 +56,7 @@ export type GSetComponentGetter<T extends GrowOnlyValueSetComponentDefinition<an
 
 $componentDeclarations
 
-/** public */
+/** public *//*#__PURE__*/
 export const componentDefinitionByName = {
 $allKeyNameValueDefinition
 }
