@@ -1,11 +1,14 @@
 import { copySync, mkdirSync, readFileSync, removeSync } from 'fs-extra'
-import { resolve } from 'path'
 import { compareFolders } from '../utils/compareFolder'
 import { getFilePathsSync } from '../utils/getFilePathsSync'
 import { Component, generateComponent } from './generateComponent'
-import { generateProtocolBuffer, getComponentId } from './generateProtocolBuffer'
+import { fixTsGeneratedByProto, generateProtocolBuffer, getComponentId } from './generateProtocolBuffer'
 import { generateIndex, generateNameMappings } from './generateIndex'
 import { snakeToPascal } from '../utils/snakeToPascal'
+import path, { resolve } from 'path'
+import fs from 'fs-extra'
+import { FileDescriptorStandardOption, runCommand } from '../utils/shellCommand'
+import { PROTO_COMPILER_PATH, TS_PROTO_PLUGIN_PATH } from './protoConst'
 
 const NON_EXPOSED_LIST: number[] = []
 
@@ -104,5 +107,63 @@ export function compileEcsComponents(
         process.exit(1)
       }
     }
+  })
+}
+
+/**
+ *
+ */
+export function buildDataLayerInterface(outTsPath: string, protobufferFilesPath: string) {
+  it('compile the data layer protocol buffer files', async () => {
+    const pbGeneratedPath = path.resolve(outTsPath, 'gen')
+
+    fs.removeSync(pbGeneratedPath)
+    fs.mkdirSync(pbGeneratedPath, { recursive: true })
+
+    const protoFiles = getFilePathsSync(protobufferFilesPath, false)
+      .filter((filePath) => filePath.toLowerCase().endsWith('.proto'))
+      .join(' ')
+
+    const protoCommandArgs: string[] = [
+      `--plugin=${TS_PROTO_PLUGIN_PATH}`,
+      `--ts_proto_opt=${[
+        'esModuleInterop=true',
+        'returnObservable=false',
+        'outputServices=generic-definitions',
+        'fileSuffix=.gen',
+        'oneof=unions',
+        'useMapType=true'
+        // 'outputJsonMethods=false',
+        // 'forceLong=false',
+        // 'outputPartialMethods=false',
+        // 'unrecognizedEnum=false'
+      ].join(',')}`,
+      `--ts_proto_out=${pbGeneratedPath}`,
+      `--proto_path=${protobufferFilesPath}`,
+      protoFiles
+    ]
+
+    const commandWorkingDir = process.cwd()
+    process.stderr.write(`Command is ${PROTO_COMPILER_PATH} \\ ${protoCommandArgs.join('\\\n  ')}\n`)
+
+    try {
+      await runCommand({
+        command: PROTO_COMPILER_PATH,
+        workingDir: commandWorkingDir,
+        args: protoCommandArgs,
+        fdStandards: FileDescriptorStandardOption.ONLY_IF_THROW
+      })
+
+      const generatedFiles = getFilePathsSync(pbGeneratedPath, true)
+      for (const generatedFile of generatedFiles) {
+        fixTsGeneratedByProto(path.resolve(pbGeneratedPath, generatedFile))
+      }
+
+      return true
+    } catch (err) {
+      console.error(`Couldn't run protoc command properly.`, err)
+    }
+
+    return false
   })
 }
