@@ -20,7 +20,7 @@ export async function createContentFetchCompositeProvider(): Promise<CompositePr
       } else {
         const compositeBinaryData: Uint8Array = await (response as any).arrayBuffer()
         const composite = compositeFromBinary(compositeBinaryData)
-        return null
+        return composite
       }
     } catch (err) {
       console.error(`Error loading composite ${compositeUrl}: ${(err as any).toString()}`)

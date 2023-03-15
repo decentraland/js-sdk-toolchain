@@ -1,3 +1,3 @@
 export * from './types'
-export { instanceComposite } from './instance'
 export * from './serialization'
+export { instanceComposite } from './instance'
