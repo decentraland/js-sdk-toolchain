@@ -54,10 +54,19 @@ export function Button(props: UiButtonProps) {
     ...uiTransform
   })
 
+  if(!textProps.color) {
+    textProps.color = { r: 1, g: 1, b: 1, a: 1 }
+  }
+  const disabled : boolean = props.disabled ? props.disabled : false
+  if(disabled) {
+    textProps.color.a = 0.5
+    if(uiBackgroundProps && uiBackgroundProps.color) uiBackgroundProps.color.a = 0.5
+  }
+
   return (
     <entity
-      onMouseDown={props.disabled ? undefined : onMouseDown}
-      onMouseUp={props.disabled ? undefined : onMouseUp}
+      onMouseDown={disabled ? undefined : onMouseDown}
+      onMouseUp={disabled ? undefined : onMouseUp}
       uiTransform={uiTransformProps}
       uiText={textProps}
       uiBackground={uiBackgroundProps}

@@ -59,21 +59,20 @@ describe('Button React Ecs', () => {
       textAlign: TextAlignMode.TAM_BOTTOM_CENTER
     })
 
-    type = 'secondary'
-
     // Update values
+    type = 'secondary' // changes background color to white
     text = 'BOEDO'
-    color = { r: 1, g: 1, b: 1, a: 1 }
-    disabled = true
+    color = { r: 1, g: 0.2, b: 0.3, a: 1 } // changes text color
+    disabled = true // changes text and background color alpha value
 
     await engine.update(1)
     expect(getPointerEvent(rootDivEntity) === null)
     expect(getText(rootDivEntity)).toMatchObject({
       value: 'BOEDO',
-      color: { r: 1, g: 1, b: 1, a: 1 }
+      color: { r: 1, g: 0.2, b: 0.3, a: 0.5 }
     })
     expect(getBackground(rootDivEntity)).toMatchObject({
-      color: { r: 1, g: 1, b: 1, a: 1 }
+      color: { r: 1, g: 1, b: 1, a: 0.5 }
     })
 
     type = undefined
