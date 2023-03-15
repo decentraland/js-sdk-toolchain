@@ -14,15 +14,13 @@ import { ComponentData, Composite, CompositeComponent, CompositeProvider } from 
  */
 export function getComponentValue<T = unknown>(
   componentDefinition: ComponentDefinition<T>,
-  component?: ComponentData
-): T | null {
-  if (!component) return null
-
-  if (component.data?.$case === 'json') return component.data.json
-  if (component.data?.$case === 'binary')
-    return componentDefinition.schema.deserialize(new ReadWriteByteBuffer(component.data.binary))
-
-  return null
+  component: ComponentData
+): T {
+  if (component.data?.$case === 'json') {
+    return component.data.json
+  } else {
+    return componentDefinition.schema.deserialize(new ReadWriteByteBuffer(component.data?.binary))
+  }
 }
 
 /**
@@ -121,8 +119,6 @@ export function instanceComposite(
   if (childrenComposite) {
     for (const [entity, childComposite] of childrenComposite.data) {
       const compositeRoot = getComponentValue(CompositeRootComponent, childComposite)
-      if (!compositeRoot) continue
-
       const composite = compositeProvider.getCompositeOrNull(compositeRoot.id)
       if (composite) {
         if (alreadyRequestedId.has(compositeRoot.id) || compositeRoot.id === compositeData.id) {
@@ -162,8 +158,6 @@ export function instanceComposite(
     // Iterating over all the entities with this component and create the replica
     for (const [entity, compositeComponentValue] of component.data) {
       const componentValueDeserialized = getComponentValue(componentDefinition, compositeComponentValue)
-      if (componentValueDeserialized === null) continue
-
       const targetEntity = getCompositeEntity(entity)
       const componentValue = componentDefinition.create(targetEntity, componentValueDeserialized)
 

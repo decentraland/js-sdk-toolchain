@@ -1,6 +1,8 @@
-import { Composite, ComponentData, CompositeComponent, CompositeComponent_DataEntry } from './proto/gen/composite.gen'
+import type { ComponentData, CompositeComponent, CompositeComponent_DataEntry } from './proto/gen/composite.gen'
+export type { ComponentData, CompositeComponent, CompositeComponent_DataEntry }
 
-export { Composite, ComponentData, CompositeComponent, CompositeComponent_DataEntry }
+import { Composite } from './proto/gen/composite.gen'
+export { Composite }
 
 /**
  * @public
