@@ -36,7 +36,7 @@ export async function createContentFetchCompositeProvider(): Promise<CompositePr
     }
   })
 
-  const composites = (await Promise.all(compositePromises)).filter((item) => item !== null) as Composite[]
+  const composites = (await Promise.all(compositePromises)).filter((item) => !!item) as Composite[]
 
   return {
     getCompositeOrNull(id: string) {

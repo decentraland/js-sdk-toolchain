@@ -4,7 +4,7 @@ import { TransformType } from '../components/manual/Transform'
 import { Entity } from '../engine/entity'
 import { IEngine, LastWriteWinElementSetComponentDefinition } from '../engine/types'
 import { Schemas } from '../schemas'
-import { CompositeRoot } from './components'
+import { getCompositeRootComponent } from './components'
 import { Composite, CompositeProvider } from './types'
 
 /**
@@ -49,7 +49,7 @@ export function instanceComposite(
   alreadyRequestedId: Set<string> = new Set()
 ) {
   const TransformComponentNumber = componentNumberFromName('core::Transform')
-  const CompositeRootComponent = CompositeRoot(engine)
+  const CompositeRootComponent = getCompositeRootComponent(engine)
   // Key => EntityNumber from the composite
   // Value => EntityNumber in current engine
   const mappedEntities: Map<Entity, Entity> = new Map()
@@ -66,8 +66,8 @@ export function instanceComposite(
 
   // ## 2 ##
   // If there are more composite inside this one, we instance first.
-  // => This is not only a copy, we need to instance.
-  // => Other reason for composite instanciation first is the overides. If we instance first and then load the component, the override
+  // => This is not only a copy, we need to instance. Otherwise, we'd be missing that branches
+  // => TODO: in the future, the instanciation is first, then the overides (to parameterize Composite, e.g. house with different wall colors)
   const childrenComposite = compositeData.components.find((item) => item.name === CompositeRootComponent.componentName)
   if (childrenComposite) {
     for (const [entity, childComposite] of childrenComposite.data) {
@@ -109,7 +109,7 @@ export function instanceComposite(
       if (component.schema) {
         componentDefinition = engine.defineComponentFromSchema(component.name, Schemas.fromJson(component.schema))
       } else if (component.name.startsWith('core::')) {
-        if (Object.keys(componentDefinitionByName).includes(component.name)) {
+        if (component.name in componentDefinitionByName) {
           componentDefinition = (componentDefinitionByName as any)[component.name](engine)
         } else {
           throw new Error(`The core component ${component.name} was not found.`)
@@ -135,6 +135,8 @@ export function instanceComposite(
         if (transform.parent) {
           transform.parent = getCompositeEntity(transform.parent)
         }
+
+        // TODO: is it going to be necessary to remap assets? e.g. src param from AudioSource and GltfContainer
       } else {
         // TODO: with static reflection, look for `Schema.Entity` in custom components
       }

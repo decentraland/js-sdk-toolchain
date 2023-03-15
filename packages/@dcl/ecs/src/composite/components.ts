@@ -18,7 +18,9 @@ export type CompositeRootType = {
  * @public
  * @deprecated composite is not being supported so far, please do not use this feature
  */
-export function CompositeRoot(engine: IEngine): LastWriteWinElementSetComponentDefinition<CompositeRootType> {
+export function getCompositeRootComponent(
+  engine: IEngine
+): LastWriteWinElementSetComponentDefinition<CompositeRootType> {
   const component = engine.getComponentOrNull('composite::root')
 
   if (component) {
