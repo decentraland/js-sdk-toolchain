@@ -110,7 +110,7 @@ export function compileEcsComponents(
   })
 }
 
-export async function buildProtobuf(outTsPath: string, protobufferFilesPath: string) {
+export async function buildProtobuf(outTsPath: string, protobufferFilesPath: string, protoOptions: string[]) {
   const pbGeneratedPath = path.resolve(outTsPath, 'gen')
 
   fs.removeSync(pbGeneratedPath)
@@ -122,18 +122,7 @@ export async function buildProtobuf(outTsPath: string, protobufferFilesPath: str
 
   const protoCommandArgs: string[] = [
     `--plugin=${TS_PROTO_PLUGIN_PATH}`,
-    `--ts_proto_opt=${[
-      'esModuleInterop=true',
-      'returnObservable=false',
-      'outputServices=generic-definitions',
-      'fileSuffix=.gen',
-      'oneof=unions',
-      'useMapType=true'
-      // 'outputJsonMethods=false',
-      // 'forceLong=false',
-      // 'outputPartialMethods=false',
-      // 'unrecognizedEnum=false'
-    ].join(',')}`,
+    `--ts_proto_opt=${protoOptions.join(',')}`,
     `--ts_proto_out=${pbGeneratedPath}`,
     `--proto_path=${protobufferFilesPath}`,
     protoFiles

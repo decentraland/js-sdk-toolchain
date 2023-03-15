@@ -2,10 +2,27 @@ import { componentDefinitionByName } from '../components'
 import { componentNumberFromName } from '../components/component-number'
 import { TransformType } from '../components/manual/Transform'
 import { Entity } from '../engine/entity'
-import { IEngine, LastWriteWinElementSetComponentDefinition } from '../engine/types'
+import { ComponentDefinition, IEngine, LastWriteWinElementSetComponentDefinition } from '../engine/types'
 import { Schemas } from '../schemas'
+import { ReadWriteByteBuffer } from '../serialization/ByteBuffer'
 import { getCompositeRootComponent } from './components'
-import { Composite, CompositeProvider } from './types'
+import { ComponentData, Composite, CompositeProvider } from './types'
+
+/**
+ * Return the component value from composite data
+ */
+function getComponentValue<T = unknown>(
+  componentDefinition: ComponentDefinition<T>,
+  component?: ComponentData
+): T | null {
+  if (!component) return null
+
+  if (component.data?.$case === 'json') return component.data.json
+  if (component.data?.$case === 'binary')
+    return componentDefinition.schema.deserialize(new ReadWriteByteBuffer(component.data.binary))
+
+  return null
+}
 
 /**
  * Return the entity mapping or fail if there is no more
@@ -72,7 +89,9 @@ export function instanceComposite(
   const childrenComposite = compositeData.components.find((item) => item.name === CompositeRootComponent.componentName)
   if (childrenComposite) {
     for (const [entity, childComposite] of childrenComposite.data) {
-      const compositeRoot = childComposite as ReturnType<typeof CompositeRootComponent['create']>
+      const compositeRoot = getComponentValue(CompositeRootComponent, childComposite)
+      if (!compositeRoot) continue
+
       const composite = compositeProvider.getCompositeOrNull(compositeRoot.id)
       if (composite) {
         if (alreadyRequestedId.has(compositeRoot.id) || compositeRoot.id === compositeData.id) {
@@ -103,7 +122,7 @@ export function instanceComposite(
 
     // ## 3a ##
     // We find the component definition
-    let componentDefinition
+    let componentDefinition: LastWriteWinElementSetComponentDefinition<unknown>
     const existingComponentDefinition = engine.getComponentOrNull(component.name)
 
     if (!existingComponentDefinition) {
@@ -111,7 +130,9 @@ export function instanceComposite(
         componentDefinition = engine.defineComponentFromSchema(component.name, Schemas.fromJson(component.jsonSchema))
       } else if (component.name.startsWith('core::')) {
         if (component.name in componentDefinitionByName) {
-          componentDefinition = (componentDefinitionByName as any)[component.name](engine)
+          componentDefinition = (componentDefinitionByName as any)[component.name](
+            engine
+          ) as LastWriteWinElementSetComponentDefinition<unknown>
         } else {
           throw new Error(`The core component ${component.name} was not found.`)
         }
@@ -125,8 +146,11 @@ export function instanceComposite(
     // ## 3b ##
     // Iterating over all the entities with this component and create the replica
     for (const [entity, compositeComponentValue] of component.data) {
+      const componentValueDeserialized = getComponentValue(componentDefinition, compositeComponentValue)
+      if (componentValueDeserialized === null) continue
+
       const targetEntity = getCompositeEntity(entity)
-      const componentValue = componentDefinition.create(targetEntity, compositeComponentValue)
+      const componentValue = componentDefinition.create(targetEntity, componentValueDeserialized)
 
       // ## 3c ##
       // All entities referenced in the composite probably has a different resolved EntityNumber

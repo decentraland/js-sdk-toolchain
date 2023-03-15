@@ -5,7 +5,10 @@
             "name": "core::InexistentComponent",
             "data": {
                 "512": {
-                    "randomData": 324
+                    "$case": "json",
+                    "json": {
+                        "randomData": 324
+                    }
                 }
             }
         }

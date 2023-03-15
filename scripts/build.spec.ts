@@ -84,7 +84,17 @@ flow('build-all', () => {
 
     const ECS_COMPOSITE_PATH = path.resolve(ECS7_PATH, 'src/composite/proto')
     it('compile the data layer protocol buffer files', async () => {
-      await buildProtobuf(ECS_COMPOSITE_PATH, ECS_COMPOSITE_PATH)
+      await buildProtobuf(ECS_COMPOSITE_PATH, ECS_COMPOSITE_PATH, [
+        'esModuleInterop=true',
+        'returnObservable=false',
+        'outputServices=generic-definitions',
+        'fileSuffix=.gen',
+        'oneof=unions',
+        'useMapType=true',
+        'outputPartialMethods=false',
+        'forceLong=false',
+        'unrecognizedEnum=false'
+      ])
     })
 
     itExecutes('npm run build --silent', ECS7_PATH)
@@ -109,7 +119,14 @@ flow('build-all', () => {
 
     const DATA_LAYER_PROTO_PATH = path.resolve(INSPECTOR_PATH, 'src/lib/data-layer/proto')
     it('compile the data layer protocol buffer files', async () => {
-      await buildProtobuf(DATA_LAYER_PROTO_PATH, DATA_LAYER_PROTO_PATH)
+      await buildProtobuf(DATA_LAYER_PROTO_PATH, DATA_LAYER_PROTO_PATH, [
+        'esModuleInterop=true',
+        'returnObservable=false',
+        'outputServices=generic-definitions',
+        'fileSuffix=.gen',
+        'oneof=unions',
+        'useMapType=true'
+      ])
     })
 
     itExecutes('npm i --silent', INSPECTOR_PATH)
