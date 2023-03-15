@@ -54,7 +54,7 @@ describe('Button React Ecs', () => {
 
     expect(getText(rootDivEntity)).toMatchObject({
       value: 'CASLA',
-      color: undefined,
+      color: { r: 1, g: 1, b: 1, a: 1 },
       font: Font.F_SANS_SERIF,
       textAlign: TextAlignMode.TAM_BOTTOM_CENTER
     })
