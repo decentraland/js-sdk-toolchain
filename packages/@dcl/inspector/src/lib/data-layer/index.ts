@@ -4,7 +4,7 @@ import { WebSocketTransport } from '@dcl/rpc/dist/transports/WebSocket'
 import * as codegen from '@dcl/rpc/dist/codegen'
 import fp from 'fp-future'
 
-import { DataServiceDefinition } from './proto'
+import { DataServiceDefinition } from './proto/gen/data-layer.gen'
 import { createLocalDataLayer } from './local-data-layer'
 import { DataLayerInterface, Fs } from './types'
 

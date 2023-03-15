@@ -25,7 +25,7 @@ import {
   itExecutes,
   runCommand
 } from './helpers'
-import { compileEcsComponents } from './protocol-buffer-generation'
+import { buildDataLayerInterface, compileEcsComponents } from './protocol-buffer-generation'
 import { compileProtoApi } from './rpc-api-generation'
 import { getSnippetsfile } from './utils/getFilePathsSync'
 
@@ -101,7 +101,11 @@ flow('build-all', () => {
   flow('@dcl/inspector', () => {
     itDeletesFolder('build', INSPECTOR_PATH)
 
+    const DATA_LAYER_PROTO_PATH = path.resolve(INSPECTOR_PATH, 'src/lib/data-layer/proto')
+    buildDataLayerInterface(DATA_LAYER_PROTO_PATH, DATA_LAYER_PROTO_PATH)
+
     itExecutes('npm i --silent', INSPECTOR_PATH)
+
     itExecutes('npm run build --silent', INSPECTOR_PATH)
     it('check file exists', () => {
       ensureFileExists('public/bundle.js', INSPECTOR_PATH)
