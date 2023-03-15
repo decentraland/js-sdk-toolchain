@@ -62,6 +62,7 @@ async function buildCommonJsDistributable() {
 main().catch(err => {
   process.exitCode = 1
   console.error(err)
+  process.exit(1)
 })
 
 function runTypeChecker() {

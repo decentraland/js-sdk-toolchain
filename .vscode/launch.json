@@ -26,6 +26,20 @@
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
       "autoAttachChildProcesses": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Build Inspector",
+      "program": "${workspaceFolder}/packages/@dcl/inspector/build.js",
+      "runtimeArgs": [
+        "--async-stack-traces"
+      ],
+      "args": [],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "autoAttachChildProcesses": true,
+      "cwd": "${workspaceFolder}/packages/@dcl/inspector"
     }
   ]
 }
