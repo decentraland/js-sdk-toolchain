@@ -124,6 +124,9 @@ export function processGLTFAssetContainer(assetContainer: BABYLON.AssetContainer
       if (mesh.geometry && !assetContainer.geometries.includes(mesh.geometry)) {
         assetContainer.geometries.push(mesh.geometry)
       }
+      if (mesh.material instanceof BABYLON.Material) {
+        mesh.material.alphaMode = 0
+      }
     }
     mesh.subMeshes &&
       mesh.subMeshes.forEach((subMesh) => {
