@@ -6,12 +6,13 @@ import { ComponentDefinition, IEngine, LastWriteWinElementSetComponentDefinition
 import { Schemas } from '../schemas'
 import { ReadWriteByteBuffer } from '../serialization/ByteBuffer'
 import { getCompositeRootComponent } from './components'
-import { ComponentData, Composite, CompositeProvider } from './types'
+import { ComponentData, Composite, CompositeComponent, CompositeProvider } from './types'
 
 /**
  * Return the component value from composite data
+ * @internal
  */
-function getComponentValue<T = unknown>(
+export function getComponentValue<T = unknown>(
   componentDefinition: ComponentDefinition<T>,
   component?: ComponentData
 ): T | null {
@@ -25,9 +26,39 @@ function getComponentValue<T = unknown>(
 }
 
 /**
- * Return the entity mapping or fail if there is no more
+ * Return the component definition from composite info
+ * @internal
  */
-function getEntityMapping(
+export function getComponentDefinition(
+  engine: IEngine,
+  component: CompositeComponent
+): LastWriteWinElementSetComponentDefinition<unknown> {
+  const existingComponentDefinition = engine.getComponentOrNull(component.name)
+
+  if (!existingComponentDefinition) {
+    if (component.jsonSchema) {
+      return engine.defineComponentFromSchema(component.name, Schemas.fromJson(component.jsonSchema))
+    } else if (component.name.startsWith('core::')) {
+      if (component.name in componentDefinitionByName) {
+        return (componentDefinitionByName as any)[component.name](
+          engine
+        ) as LastWriteWinElementSetComponentDefinition<unknown>
+      } else {
+        throw new Error(`The core component ${component.name} was not found.`)
+      }
+    } else {
+      throw new Error(`${component.name} is not defined and there is no schema to define it.`)
+    }
+  } else {
+    return existingComponentDefinition as LastWriteWinElementSetComponentDefinition<unknown>
+  }
+}
+
+/**
+ * Return the entity mapping or fail if there is no more
+ * @internal
+ */
+export function getEntityMapping(
   compositeEntity: Entity,
   mappedEntities: Map<Entity, Entity>,
   getNextAvailableEntity: () => Entity | null
@@ -122,26 +153,10 @@ export function instanceComposite(
 
     // ## 3a ##
     // We find the component definition
-    let componentDefinition: LastWriteWinElementSetComponentDefinition<unknown>
-    const existingComponentDefinition = engine.getComponentOrNull(component.name)
-
-    if (!existingComponentDefinition) {
-      if (component.jsonSchema) {
-        componentDefinition = engine.defineComponentFromSchema(component.name, Schemas.fromJson(component.jsonSchema))
-      } else if (component.name.startsWith('core::')) {
-        if (component.name in componentDefinitionByName) {
-          componentDefinition = (componentDefinitionByName as any)[component.name](
-            engine
-          ) as LastWriteWinElementSetComponentDefinition<unknown>
-        } else {
-          throw new Error(`The core component ${component.name} was not found.`)
-        }
-      } else {
-        throw new Error(`${component.name} is not defined and there is no schema to define it.`)
-      }
-    } else {
-      componentDefinition = existingComponentDefinition as LastWriteWinElementSetComponentDefinition<unknown>
-    }
+    const componentDefinition: LastWriteWinElementSetComponentDefinition<unknown> = getComponentDefinition(
+      engine,
+      component
+    )
 
     // ## 3b ##
     // Iterating over all the entities with this component and create the replica

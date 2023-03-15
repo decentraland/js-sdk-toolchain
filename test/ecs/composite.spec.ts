@@ -1,21 +1,31 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import glob from 'glob'
 import {
+  Composite,
+  compositeFromBinary,
   compositeFromJson,
   CompositeProvider,
   Engine,
   Entity,
   IEngine,
-  instanceComposite
+  instanceComposite,
+  LastWriteWinElementSetComponentDefinition
 } from './../../packages/@dcl/ecs/src'
+import { ReadWriteByteBuffer } from './../../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import { getComponentDefinition, getComponentValue } from './../../packages/@dcl/ecs/src/composite/instance'
+import { getCompositeRootComponent } from './../../packages/@dcl/ecs/src/composite/components'
 
 const writeToFile = process.env.UPDATE_SNAPSHOTS
 const COMPOSITE_BASE_PATH = 'test/ecs/composites'
 
-function getCompositeFrom(globPath: string) {
+function getJsonCompositeFrom(globPath: string) {
   const compositeFileContent = glob.sync(globPath, { absolute: true }).map((item) => readFileSync(item).toString())
-
   return compositeFileContent.map((item) => compositeFromJson(JSON.parse(item)))
+}
+
+function getBinaryCompositeFrom(globPath: string) {
+  const compositeFileContent = glob.sync(globPath, { absolute: true }).map((item) => readFileSync(item))
+  return compositeFileContent.map((item) => compositeFromBinary(new Uint8Array(item)))
 }
 
 function getStateAsString(engine: IEngine) {
@@ -30,9 +40,56 @@ function getStateAsString(engine: IEngine) {
   return JSON.stringify(state, null, 2)
 }
 
+/**
+ * Mutate the composite to hold binary data
+ * @param composite
+ */
+function convertCompositeComponentDataToBinary(composite: Composite) {
+  const engine = Engine()
+  getCompositeRootComponent(engine)
+  for (const component of composite.components) {
+    const componentDefinition: LastWriteWinElementSetComponentDefinition<unknown> = getComponentDefinition(
+      engine,
+      component
+    )
+
+    for (const [, item] of component.data) {
+      if (item.data?.$case === 'json') {
+        const buf = new ReadWriteByteBuffer()
+        const value = componentDefinition.createOrReplace(0 as Entity, getComponentValue(componentDefinition, item))
+        componentDefinition.schema.serialize(value as any, buf)
+        item.data = {
+          $case: 'binary',
+          binary: buf.toBinary()
+        }
+      }
+    }
+  }
+}
+
+describe.skip('convert non-binary.composite.json', () => {
+  const composite = getJsonCompositeFrom(`${COMPOSITE_BASE_PATH}/non-binary.composite.json`)
+  const binaryComposite = composite[0]
+  convertCompositeComponentDataToBinary(binaryComposite)
+
+  binaryComposite.id = 'data-binary'
+  writeFileSync(
+    `${COMPOSITE_BASE_PATH}/data-binary.composite.json`,
+    JSON.stringify(Composite.toJSON(binaryComposite), null, 2)
+  )
+
+  binaryComposite.id = 'full-binary'
+  const writer = Composite.encode(binaryComposite)
+  const buffer = writer.finish()
+  writeFileSync(`${COMPOSITE_BASE_PATH}/full-binary.composite`, buffer)
+})
+
 describe('composite instantiation', () => {
-  const validComposites = getCompositeFrom(`${COMPOSITE_BASE_PATH}/*.composite.json`)
-  const invalidComposites = getCompositeFrom(`${COMPOSITE_BASE_PATH}/invalid/*.composite.json`)
+  const validComposites = [
+    ...getJsonCompositeFrom(`${COMPOSITE_BASE_PATH}/*.composite.json`),
+    ...getBinaryCompositeFrom(`${COMPOSITE_BASE_PATH}/*.composite`)
+  ]
+  const invalidComposites = getJsonCompositeFrom(`${COMPOSITE_BASE_PATH}/invalid/*.composite.json`)
   const composites = [...validComposites, ...invalidComposites]
 
   function instanceById(engine: IEngine, id: string, rootEntity?: Entity, alreadyRequestedId?: Set<string>) {
