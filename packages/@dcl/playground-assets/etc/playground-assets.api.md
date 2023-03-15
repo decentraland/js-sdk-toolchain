@@ -434,6 +434,18 @@ export type Color4Type = {
 };
 
 // @public (undocumented)
+export interface ComponentData {
+    // (undocumented)
+    data?: {
+        $case: "json";
+        json: any | undefined;
+    } | {
+        $case: "binary";
+        binary: Uint8Array;
+    };
+}
+
+// @public (undocumented)
 export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T> | GrowOnlyValueSetComponentDefinition<T>;
 
 // Warning: (ae-missing-release-tag) "componentDefinitionByName" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -479,18 +491,41 @@ export const enum ComponentType {
     LastWriteWinElementSet = 0
 }
 
-// @public @deprecated (undocumented)
-export type Composite = {
+// @public (undocumented)
+export interface Composite {
+    // (undocumented)
+    components: CompositeComponent[];
+    // (undocumented)
     id: string;
-    components: {
-        name: string;
-        schema?: JsonSchemaExtended;
-        data: Map<Entity, unknown>;
-    }[];
-};
+}
 
-// @public @deprecated (undocumented)
-export function compositeFromJson(jsonComposite: any): Composite;
+// @public (undocumented)
+export interface CompositeComponent {
+    // (undocumented)
+    data: Map<number, ComponentData>;
+    // (undocumented)
+    jsonSchema: any | undefined;
+    // (undocumented)
+    name: string;
+}
+
+// @public (undocumented)
+export interface CompositeComponent_DataEntry {
+    // (undocumented)
+    key: number;
+    // (undocumented)
+    value: ComponentData | undefined;
+}
+
+// Warning: (ae-missing-release-tag) "compositeFromBinary" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function compositeFromBinary(buffer: Uint8Array): Composite;
+
+// Warning: (ae-missing-release-tag) "compositeFromJson" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function compositeFromJson(object: any): Composite;
 
 // @public @deprecated (undocumented)
 export type CompositeProvider = {

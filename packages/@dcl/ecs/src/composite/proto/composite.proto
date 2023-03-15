@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+import "google/protobuf/struct.proto";
+message ComponentData { 
+    oneof data {
+        google.protobuf.Value json = 1;
+        bytes binary = 2;
+    }
+}
+  
+message CompositeComponent {
+    string name = 1;
+    google.protobuf.Value json_schema = 2;
+    map<int32, ComponentData> data = 3;
+}
+
+message Composite {
+    string id = 1;
+    repeated CompositeComponent components = 2;
+}

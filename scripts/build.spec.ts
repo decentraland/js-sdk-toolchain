@@ -25,7 +25,7 @@ import {
   itExecutes,
   runCommand
 } from './helpers'
-import { buildDataLayerInterface, compileEcsComponents } from './protocol-buffer-generation'
+import { buildProtobuf, compileEcsComponents } from './protocol-buffer-generation'
 import { compileProtoApi } from './rpc-api-generation'
 import { getSnippetsfile } from './utils/getFilePathsSync'
 
@@ -81,6 +81,12 @@ flow('build-all', () => {
       `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
       `${ECS7_PATH}/node_modules/@dcl/protocol/proto/`
     )
+
+    const ECS_COMPOSITE_PATH = path.resolve(ECS7_PATH, 'src/composite/proto')
+    it('compile the data layer protocol buffer files', async () => {
+      await buildProtobuf(ECS_COMPOSITE_PATH, ECS_COMPOSITE_PATH)
+    })
+
     itExecutes('npm run build --silent', ECS7_PATH)
     it('check file exists', () => {
       ensureFileExists('dist/index.d.ts', ECS7_PATH)
@@ -102,7 +108,9 @@ flow('build-all', () => {
     itDeletesFolder('build', INSPECTOR_PATH)
 
     const DATA_LAYER_PROTO_PATH = path.resolve(INSPECTOR_PATH, 'src/lib/data-layer/proto')
-    buildDataLayerInterface(DATA_LAYER_PROTO_PATH, DATA_LAYER_PROTO_PATH)
+    it('compile the data layer protocol buffer files', async () => {
+      await buildProtobuf(DATA_LAYER_PROTO_PATH, DATA_LAYER_PROTO_PATH)
+    })
 
     itExecutes('npm i --silent', INSPECTOR_PATH)
 

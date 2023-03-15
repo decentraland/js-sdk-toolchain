@@ -88,7 +88,7 @@ export function instanceComposite(
           composite,
           getNextAvailableEntity,
           compositeProvider,
-          entity,
+          entity as Entity,
           new Set(alreadyRequestedId).add(compositeData.id)
         )
       }
@@ -107,8 +107,8 @@ export function instanceComposite(
     const existingComponentDefinition = engine.getComponentOrNull(component.name)
 
     if (!existingComponentDefinition) {
-      if (component.schema) {
-        componentDefinition = engine.defineComponentFromSchema(component.name, Schemas.fromJson(component.schema))
+      if (component.jsonSchema) {
+        componentDefinition = engine.defineComponentFromSchema(component.name, Schemas.fromJson(component.jsonSchema))
       } else if (component.name.startsWith('core::')) {
         if (component.name in componentDefinitionByName) {
           componentDefinition = (componentDefinitionByName as any)[component.name](engine)

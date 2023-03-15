@@ -1,18 +1,6 @@
-import { Entity } from '../engine/entity'
-import { JsonSchemaExtended } from '../schemas/ISchema'
+import { Composite, ComponentData, CompositeComponent, CompositeComponent_DataEntry } from './proto/gen/composite.gen'
 
-/**
- * @public
- * @deprecated composite is not being supported so far, please do not use this feature
- */
-export type Composite = {
-  id: string
-  components: {
-    name: string
-    schema?: JsonSchemaExtended
-    data: Map<Entity, unknown>
-  }[]
-}
+export { Composite, ComponentData, CompositeComponent, CompositeComponent_DataEntry }
 
 /**
  * @public
