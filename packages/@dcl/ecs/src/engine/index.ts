@@ -137,8 +137,9 @@ function preEngine(): PreEngine {
     return newComponent
   }
 
-  function getComponent<T>(value: number | string): ComponentDefinition<T> {
-    const componentId: number = typeof value === 'string' ? componentNumberFromName(value) : value
+  function getComponent<T>(componentIdOrName: number | string): ComponentDefinition<T> {
+    const componentId =
+      typeof componentIdOrName === 'number' ? componentIdOrName : componentNumberFromName(componentIdOrName)
     const component = componentsDefinition.get(componentId)
     if (!component) {
       throw new Error(
@@ -148,8 +149,9 @@ function preEngine(): PreEngine {
     return component as ComponentDefinition<T>
   }
 
-  function getComponentOrNull<T>(value: number | string): ComponentDefinition<T> | null {
-    const componentId: number = typeof value === 'string' ? componentNumberFromName(value) : value
+  function getComponentOrNull<T>(componentIdOrName: number | string): ComponentDefinition<T> | null {
+    const componentId =
+      typeof componentIdOrName === 'number' ? componentIdOrName : componentNumberFromName(componentIdOrName)
     return (
       (componentsDefinition.get(componentId) as ComponentDefinition<T>) ??
       /* istanbul ignore next */
@@ -190,7 +192,11 @@ function preEngine(): PreEngine {
     return componentsDefinition.values()
   }
 
-  function removeComponentDefinition(componentId: number) {
+  function removeComponentDefinition(componentIdOrName: number | string) {
+    if (sealed) throw new Error('Engine is already sealed. No components can be removed at this stage')
+
+    const componentId =
+      typeof componentIdOrName === 'number' ? componentIdOrName : componentNumberFromName(componentIdOrName)
     componentsDefinition.delete(componentId)
   }
 

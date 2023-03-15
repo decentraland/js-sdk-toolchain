@@ -1,0 +1,22 @@
+{
+    "id": "2-level-deep",
+    "components": [
+        {
+            "name": "composite::root",
+            "data": {
+                "512": {
+                    "id": "empty"
+                },
+                "513": {
+                    "id": "one-transform"
+                },
+                "514": {
+                    "id": "cube-scene"
+                },
+                "515": {
+                    "id": "only-children"
+                }
+            }
+        }
+    ]
+}

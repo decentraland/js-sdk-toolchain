@@ -1,0 +1,19 @@
+{
+    "id": "only-children",
+    "components": [
+        {
+            "name": "composite::root",
+            "data": {
+                "512": {
+                    "id": "empty"
+                },
+                "513": {
+                    "id": "one-transform"
+                },
+                "514": {
+                    "id": "cube-scene"
+                }
+            }
+        }
+    ]
+}

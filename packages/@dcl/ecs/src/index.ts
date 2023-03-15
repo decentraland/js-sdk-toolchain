@@ -37,3 +37,5 @@ export * from './components/generated/global.gen'
 export * from './components/generated/types.gen'
 
 export * from './serialization/crdt'
+
+export * from './composite'

@@ -1,8 +1,8 @@
 /** @alpha THIS FILE INITIALIZES THE DECENTRALAND RUNTIME. WILL CHANGE SOON */
 import { engine } from '@dcl/ecs'
-import { pollEvents } from './observables'
-import { sendBatch, crdtSendToRenderer, crdtGetState } from '~system/EngineApi'
+import { crdtGetState, crdtSendToRenderer, sendBatch } from '~system/EngineApi'
 import { createRendererTransport } from './internal/transports/rendererTransport'
+import { pollEvents } from './observables'
 
 // Attach CRDT transport
 const rendererTransport = createRendererTransport({ crdtSendToRenderer })

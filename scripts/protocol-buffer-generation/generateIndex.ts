@@ -41,6 +41,10 @@ function defineGlobalComponentDecl(component: Component) {
   }
 }
 
+function keyNameValueDefinition(component: Component) {
+  return `\t"core::${component.componentPascalName}": ${component.componentPascalName},`
+}
+
 const indexTemplate = `import type { IEngine } from '../../engine/types'
 import { LastWriteWinElementSetComponentDefinition, GrowOnlyValueSetComponentDefinition } from '../../engine/component'
 
@@ -51,6 +55,11 @@ export type LwwComponentGetter<T extends LastWriteWinElementSetComponentDefiniti
 export type GSetComponentGetter<T extends GrowOnlyValueSetComponentDefinition<any>> = (engine: Pick<IEngine,'defineValueSetComponentFromSchema'>) => T
 
 $componentDeclarations
+
+/** public *//*#__PURE__*/
+export const componentDefinitionByName = {
+$allKeyNameValueDefinition
+}
 `
 
 const globalTemplate = `
@@ -72,6 +81,7 @@ export function generateIndex(param: { components: Component[]; generatedPath: s
     .replace('$componentDeclarations', componentWithoutIndex.map(defineComponentDecl).join('\n'))
     .replace('$componentImports', componentWithoutIndex.map(importComponent).join('\n'))
     .replace('$componentExports', componentWithoutIndex.map(exportComponent).join('\n'))
+    .replace('$allKeyNameValueDefinition', componentWithoutIndex.map(keyNameValueDefinition).join('\n'))
 
   fs.writeFileSync(path.resolve(generatedPath, 'index.gen.ts'), indexContent)
 

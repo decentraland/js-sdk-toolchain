@@ -197,6 +197,7 @@ export interface IEngine {
     spec: ISchema<T>,
     options: ValueSetOptions<T>
   ): GrowOnlyValueSetComponentDefinition<T>
+
   /**
    * @public
    * Get the component definition from the component id.
@@ -245,9 +246,9 @@ export interface IEngine {
 
   /**
    * @internal
-   * @param componentId - componentId
+   * @param componentId - component number or name
    */
-  removeComponentDefinition(componentId: number): void
+  removeComponentDefinition(componentId: number | string): void
 
   /**
    * @public
