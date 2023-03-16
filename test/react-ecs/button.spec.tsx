@@ -21,7 +21,7 @@ describe('Button React Ecs', () => {
     const getPointerEvent = (entity: Entity) => uiPointerEvent.getOrNull(entity)
 
     let text = 'CASLA'
-    let color: Color4 | undefined = undefined
+    const color: { color?: Color4 } = {}
     let type: UiButtonProps['variant'] = 'primary'
     let disabled: boolean = false
     const ui = () => (
@@ -29,18 +29,17 @@ describe('Button React Ecs', () => {
         variant={type}
         uiTransform={{ width: 100 }}
         value={text}
-        color={color}
         font="sans-serif"
         textAlign="bottom-center"
         disabled={disabled}
+        {...color}
       />
     )
 
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
 
-    expect(getPointerEvent(rootDivEntity) !== null)
-
+    expect(getPointerEvent(rootDivEntity)).toBeDefined()
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
       rightOf: 0,
@@ -62,7 +61,7 @@ describe('Button React Ecs', () => {
     // Update values
     type = 'secondary' // changes background color to white
     text = 'BOEDO'
-    color = { r: 1, g: 0.2, b: 0.3, a: 1 } // changes text color
+    color.color = { r: 1, g: 0.2, b: 0.3, a: 1 } // changes text color
     disabled = true // changes text and background color alpha value
 
     await engine.update(1)
@@ -77,6 +76,8 @@ describe('Button React Ecs', () => {
 
     type = undefined
     await engine.update(1)
-    expect(getBackground(rootDivEntity)).toBe(null)
+    expect(getBackground(rootDivEntity)).toMatchObject({
+      color: { r: 0.98, g: 0.17, b: 0.33, a: 1 / 2 }
+    })
   })
 })
