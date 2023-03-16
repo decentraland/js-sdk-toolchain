@@ -59,8 +59,8 @@ export function Button(props: UiButtonProps) {
   }
   const disabled : boolean = props.disabled ? props.disabled : false
   if(disabled) {
-    textProps.color.a = 0.5
-    if(uiBackgroundProps && uiBackgroundProps.color) uiBackgroundProps.color.a = 0.5
+    textProps.color.a /= 2
+    if(uiBackgroundProps && uiBackgroundProps.color) uiBackgroundProps.color.a /= 2
   }
 
   return (
