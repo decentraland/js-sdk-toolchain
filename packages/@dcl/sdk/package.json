@@ -18,7 +18,7 @@
   "dependencies": {
     "@dcl/ecs": "file:../ecs",
     "@dcl/ecs-math": "2.0.1-20221129185242.commit-40495c1",
-    "@dcl/explorer": "1.0.90114-20230313164447.commit-7c028ca",
+    "@dcl/explorer": "^1.0.90919-20230315154144.commit-30d0e51",
     "@dcl/js-runtime": "file:../js-runtime",
     "@dcl/react-ecs": "file:../react-ecs",
     "@dcl/sdk-commands": "file:../sdk-commands"
