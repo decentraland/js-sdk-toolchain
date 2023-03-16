@@ -129,4 +129,19 @@ describe('UiBackground React Ecs', () => {
       }
     })
   })
+
+  it('should text undefined background', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiBackground = components.UiBackground(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getBackground = () => UiBackground.getOrNull(rootDivEntity)
+    const ui = () => <UiEntity uiTransform={{ width: 100 }} uiBackground={{}} />
+
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getBackground()?.color).toBe(undefined)
+  })
 })
