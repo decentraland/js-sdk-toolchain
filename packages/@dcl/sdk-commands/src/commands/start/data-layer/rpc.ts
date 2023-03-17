@@ -26,13 +26,15 @@ export async function createDataLayerRpc({ fs }: Pick<CliComponents, 'fs'>): Pro
     })
   }, 16)
 
-  // TODO: fs is not matching the types here
+  // TODO: fs is not matching the types here (fs as any)
   const dataLayer = await initRpcMethods(fs as any, engine)
+
   const rpcServer = createRpcServer<DataLayerContext>({})
   rpcServer.setHandler(rpcHandler)
 
   async function rpcHandler(serverPort: RpcServerPort<DataLayerContext>) {
-    codegen.registerService(serverPort, DataLayerProto.DataServiceDefinition, async (port, ctx) => dataLayer)
+    // TODO: dataLayer as any
+    codegen.registerService(serverPort, DataLayerProto.DataServiceDefinition, async (port, ctx) => dataLayer as any)
   }
 
   return { rpcServer, engine }

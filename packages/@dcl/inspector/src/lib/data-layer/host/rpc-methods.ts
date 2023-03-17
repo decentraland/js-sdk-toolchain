@@ -1,5 +1,5 @@
 import { IEngine } from '@dcl/ecs'
-import { DataLayerRpcClient, DataLayerRpcServer, FileSystemInterface } from '../types'
+import { DataLayerRpcServer, FileSystemInterface } from '../types'
 import { stream } from './stream'
 
 export function initRpcMethods(fs: FileSystemInterface, engine: IEngine): DataLayerRpcServer {
