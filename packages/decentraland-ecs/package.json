@@ -25,7 +25,7 @@
   "dependencies": {
     "@dcl/amd": "file:../@dcl/amd",
     "@dcl/build-ecs": "file:../@dcl/build-ecs",
-    "@dcl/explorer": "1.0.88362-20230308185024.commit-9c62a7d",
+    "@dcl/explorer": "1.0.91848-20230316193823.commit-3058d4d",
     "@dcl/posix": "^1.0.4"
   },
   "minCliVersion": "3.16.2"
