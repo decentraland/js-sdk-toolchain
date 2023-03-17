@@ -8,7 +8,6 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "downlevelIteration": true,
-    "keyofStringsOnly": true,
     "suppressExcessPropertyErrors": false,
     "exactOptionalPropertyTypes": false,
     "inlineSourceMap": true,

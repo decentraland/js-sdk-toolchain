@@ -11,30 +11,35 @@ describe('Button React Ecs', () => {
     const UiTransform = components.UiTransform(engine)
     const UiText = components.UiText(engine)
     const UiBackground = components.UiBackground(engine)
+    const uiPointerEvent = components.PointerEvents(engine)
     const entityIndex = engine.addEntity() as number
-
     // Helpers
     const rootDivEntity = (entityIndex + 1) as Entity
     const getUiTransform = (entity: Entity) => UiTransform.get(entity)
     const getText = (entity: Entity) => UiText.get(entity)
     const getBackground = (entity: Entity) => UiBackground.getOrNull(entity)
+    const getPointerEvent = (entity: Entity) => uiPointerEvent.getOrNull(entity)
+
     let text = 'CASLA'
-    let color: Color4 | undefined = undefined
+    const color: { color?: Color4 } = {}
     let type: UiButtonProps['variant'] = 'primary'
+    let disabled: boolean = false
     const ui = () => (
       <Button
         variant={type}
         uiTransform={{ width: 100 }}
         value={text}
-        color={color}
         font="sans-serif"
         textAlign="bottom-center"
+        disabled={disabled}
+        {...color}
       />
     )
 
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
 
+    expect(getPointerEvent(rootDivEntity)).toBeDefined()
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
       rightOf: 0,
@@ -48,27 +53,31 @@ describe('Button React Ecs', () => {
 
     expect(getText(rootDivEntity)).toMatchObject({
       value: 'CASLA',
-      color: undefined,
+      color: { r: 1, g: 1, b: 1, a: 1 },
       font: Font.F_SANS_SERIF,
       textAlign: TextAlignMode.TAM_BOTTOM_CENTER
     })
 
-    type = 'secondary'
     // Update values
+    type = 'secondary' // changes background color to white
     text = 'BOEDO'
-    color = { r: 1, g: 1, b: 1, a: 1 }
+    color.color = { r: 1, g: 0.2, b: 0.3, a: 1 } // changes text color
+    disabled = true // changes text and background color alpha value
 
     await engine.update(1)
+    expect(getPointerEvent(rootDivEntity) === null)
     expect(getText(rootDivEntity)).toMatchObject({
       value: 'BOEDO',
-      color: { r: 1, g: 1, b: 1, a: 1 }
+      color: { r: 1, g: 0.2, b: 0.3, a: 0.5 }
     })
     expect(getBackground(rootDivEntity)).toMatchObject({
-      color: { r: 1, g: 1, b: 1, a: 1 }
+      color: { r: 1, g: 1, b: 1, a: 0.5 }
     })
 
     type = undefined
     await engine.update(1)
-    expect(getBackground(rootDivEntity)).toBe(null)
+    expect(getBackground(rootDivEntity)).toMatchObject({
+      color: { r: 0.98, g: 0.17, b: 0.33, a: 1 / 2 }
+    })
   })
 })
