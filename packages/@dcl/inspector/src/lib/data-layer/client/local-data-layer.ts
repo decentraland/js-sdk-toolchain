@@ -1,5 +1,5 @@
 import { createEngine } from '../host/engine'
-import { DataLayerRpcClient, FileSystemInterface } from '../types'
+import { DataLayerRpcClient, DataLayerRpcServer, FileSystemInterface } from '../types'
 import { initRpcMethods } from '../host/rpc-methods'
 import { Composite, compositeFromJson, CompositeProvider, instanceComposite } from '@dcl/ecs'
 
@@ -33,6 +33,10 @@ export async function createFsCompositeProvider(fs: FileSystemInterface): Promis
   }
 }
 
+function wrapRpcClientFromRpcServer(server: DataLayerRpcServer): DataLayerRpcClient {
+  return server as any as DataLayerRpcClient
+}
+
 /**
  * This RpcClient creates internally the server, implementing its own file system interface and engine.
  * @param fs
@@ -61,5 +65,5 @@ export async function createLocalDataLayerRpcClient(fs: FileSystemInterface): Pr
     })
   }, 16)
 
-  return initRpcMethods(fs, engine)
+  return wrapRpcClientFromRpcServer(initRpcMethods(fs, engine))
 }

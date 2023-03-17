@@ -1,5 +1,5 @@
 import { IEngine } from '@dcl/ecs'
-import { RpcClientModule } from '@dcl/rpc/dist/codegen'
+import { RpcClientModule, RpcServerModule } from '@dcl/rpc/dist/codegen'
 import { DataServiceDefinition } from './proto/gen/data-layer.gen'
 
 export type SupportedFormat =
@@ -27,3 +27,4 @@ export type DataLayerContext = {
 }
 
 export type DataLayerRpcClient = RpcClientModule<DataServiceDefinition, DataLayerContext>
+export type DataLayerRpcServer = RpcServerModule<DataServiceDefinition, DataLayerContext>

@@ -8,7 +8,7 @@ export type IEngine = ReturnType<typeof createEngine>
 export type DataLayerContext = {
   engine: IEngine
 }
-export type DataLayerRPC = {
+export type DataLayerRpc = {
   rpcServer: RpcServer<DataLayerContext>
   /**
    * we use the same engine with multiple transports for all the contexts.
@@ -16,7 +16,7 @@ export type DataLayerRPC = {
   engine: IEngine
 }
 
-export function createDataLayerRpc({ fs }: Pick<CliComponents, 'fs'>): DataLayerRPC {
+export async function createDataLayerRpc({ fs }: Pick<CliComponents, 'fs'>): Promise<DataLayerRpc> {
   const engine = createEngine()
 
   setInterval(() => {
@@ -26,7 +26,8 @@ export function createDataLayerRpc({ fs }: Pick<CliComponents, 'fs'>): DataLayer
     })
   }, 16)
 
-  const dataLayer = initRpcMethods(fs, engine)
+  // TODO: fs is not matching the types here
+  const dataLayer = await initRpcMethods(fs as any, engine)
   const rpcServer = createRpcServer<DataLayerContext>({})
   rpcServer.setHandler(rpcHandler)
 

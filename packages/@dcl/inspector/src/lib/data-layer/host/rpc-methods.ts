@@ -1,8 +1,8 @@
 import { IEngine } from '@dcl/ecs'
-import { DataLayerRpcClient, FileSystemInterface } from '../types'
+import { DataLayerRpcClient, DataLayerRpcServer, FileSystemInterface } from '../types'
 import { stream } from './stream'
 
-export function initRpcMethods(fs: FileSystemInterface, engine: IEngine): DataLayerRpcClient {
+export function initRpcMethods(fs: FileSystemInterface, engine: IEngine): DataLayerRpcServer {
   return {
     async redo() {
       return {}
@@ -14,7 +14,10 @@ export function initRpcMethods(fs: FileSystemInterface, engine: IEngine): DataLa
     // and returns an async iterable. consumption and production of messages
     // are decoupled operations
     async *stream(iter, ctx) {
-      return stream(iter, { engine })
+      const gen = stream(iter, { engine })
+      for await (const it of gen) {
+        yield it
+      }
     }
   }
 }
