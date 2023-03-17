@@ -11,12 +11,17 @@ import {
   instanceComposite,
   LastWriteWinElementSetComponentDefinition
 } from './../../packages/@dcl/ecs/src'
-import { ReadWriteByteBuffer } from './../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { getComponentDefinition, getComponentValue } from './../../packages/@dcl/ecs/src/composite/instance'
 import { getCompositeRootComponent } from './../../packages/@dcl/ecs/src/composite/components'
+import { getComponentDefinition, getComponentValue } from './../../packages/@dcl/ecs/src/composite/instance'
+import { EntityMappingMode } from './../../packages/@dcl/ecs/src/composite'
+import { ReadWriteByteBuffer } from './../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
 const writeToFile = process.env.UPDATE_SNAPSHOTS
 const COMPOSITE_BASE_PATH = 'test/ecs/composites'
+
+// ########
+// ## Helpers
+// ########
 
 function getJsonCompositeFrom(globPath: string) {
   const compositeFileContent = glob.sync(globPath, { absolute: true }).map((item) => readFileSync(item).toString())
@@ -67,6 +72,10 @@ function convertCompositeComponentDataToBinary(composite: Composite) {
   }
 }
 
+// ########
+// ## Helper-test
+// ########
+
 describe.skip('convert non-binary.composite.json', () => {
   const composite = getJsonCompositeFrom(`${COMPOSITE_BASE_PATH}/non-binary.composite.json`)
   const binaryComposite = composite[0]
@@ -84,30 +93,33 @@ describe.skip('convert non-binary.composite.json', () => {
   writeFileSync(`${COMPOSITE_BASE_PATH}/full-binary.composite`, buffer)
 })
 
-describe('composite instantiation', () => {
+// ########
+// ## Tests
+// ########
+
+describe('composite instantiation system', () => {
   const validComposites = [
     ...getJsonCompositeFrom(`${COMPOSITE_BASE_PATH}/*.composite.json`),
     ...getBinaryCompositeFrom(`${COMPOSITE_BASE_PATH}/*.composite`)
   ]
   const invalidComposites = getJsonCompositeFrom(`${COMPOSITE_BASE_PATH}/invalid/*.composite.json`)
   const composites = [...validComposites, ...invalidComposites]
+  const compositeProvider: CompositeProvider = {
+    getCompositeOrNull(id: string) {
+      return composites.find((item) => item.id === id) || null
+    }
+  }
 
   function instanceById(engine: IEngine, id: string, rootEntity?: Entity, alreadyRequestedId?: Set<string>) {
-    const compositeProvider: CompositeProvider = {
-      getCompositeOrNull(id: string) {
-        return composites.find((item) => item.id === id) || null
-      }
-    }
-
     const composite = compositeProvider.getCompositeOrNull(id)
     if (!composite) {
       throw new Error(`Composite ${id} not found`)
     }
 
     if (rootEntity || alreadyRequestedId) {
-      instanceComposite(engine, composite, () => engine.addEntity(), compositeProvider, rootEntity, alreadyRequestedId)
+      instanceComposite(engine, composite, compositeProvider, { rootEntity, alreadyRequestedId })
     } else {
-      instanceComposite(engine, composite, () => engine.addEntity(), compositeProvider)
+      instanceComposite(engine, composite, compositeProvider)
     }
   }
 
@@ -146,7 +158,62 @@ describe('composite instantiation', () => {
       instanceById(engine, 'empty')
     }).toThrow()
   })
+
+  describe(`should work with a entity offset`, () => {
+    it('with EMM_NEXT_AVAILABLE option', () => {
+      const engine = Engine()
+      const composite = compositeProvider.getCompositeOrNull('2-level-deep')!
+
+      const entityOffset = 10000
+
+      let counter = entityOffset
+      instanceComposite(engine, composite, compositeProvider, {
+        entityMapping: {
+          type: EntityMappingMode.EMM_NEXT_AVAILABLE,
+          getNextAvailableEntity: () => counter++ as Entity
+        }
+      })
+      const entities = []
+      for (const compDef of engine.componentsIter()) {
+        for (const [entity, _] of compDef.iterator()) {
+          entities.push(entity)
+        }
+      }
+
+      expect(entities.filter((item) => item < entityOffset)).toStrictEqual([])
+    })
+
+    it('with EMM_DIRECT_MAPPING option', () => {
+      const engine = Engine()
+      const composite = compositeProvider.getCompositeOrNull('2-level-deep')!
+
+      const entityOffset = 20000
+      instanceComposite(engine, composite, compositeProvider, {
+        entityMapping: {
+          type: EntityMappingMode.EMM_DIRECT_MAPPING,
+          getCompositeEntity: (compositeEntity: Entity | number) => (entityOffset + compositeEntity) as Entity
+        }
+      })
+      const entities: Set<Entity> = new Set()
+      for (const compDef of engine.componentsIter()) {
+        for (const [entity, _] of compDef.iterator()) {
+          entities.add(entity)
+        }
+      }
+
+      const subCompositesEntities = Array.from(entities).filter((item) => item < entityOffset)
+      const mainCompositeEntity = Array.from(entities).filter((item) => item >= entityOffset)
+
+      // This number remains from the composite definition, see '2-level-deep' and count the entities that should be created :)
+      expect(subCompositesEntities.length).toBe(7) // the sub composite entities
+      expect(mainCompositeEntity.length).toBe(5) // only CompositeRoot (children and the root)
+    })
+  })
 })
+
+// ########
+// ## Mosly deprecated tests
+// ########
 
 describe('composite from json function', () => {
   const invalidFalseValues = [null, undefined, false, 0]

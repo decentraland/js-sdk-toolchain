@@ -24,7 +24,7 @@ export type InstanceCompositeOptions = {
       }
     | {
         type: EntityMappingMode.EMM_DIRECT_MAPPING
-        getCompositeEntity?: (compositeEntity: Entity | number) => Entity
+        getCompositeEntity: (compositeEntity: Entity | number) => Entity
       }
   rootEntity?: Entity
   alreadyRequestedId?: Set<string>
@@ -90,8 +90,9 @@ export function getEntityMapping(
   }
 
   if (entityMapping?.type === EntityMappingMode.EMM_DIRECT_MAPPING) {
-    mappedEntities.set(compositeEntity, compositeEntity)
-    return compositeEntity
+    const entity = entityMapping.getCompositeEntity(compositeEntity)
+    mappedEntities.set(compositeEntity, entity)
+    return entity
   }
 
   // This function in runtime can be just `engine.addEntity()`
@@ -150,9 +151,10 @@ export function instanceComposite(
   // => TODO: in the future, the instanciation is first, then the overides (to parameterize Composite, e.g. house with different wall colors)
   const childrenComposite = compositeData.components.find((item) => item.name === CompositeRootComponent.componentName)
   if (childrenComposite) {
-    for (const [entity, childComposite] of childrenComposite.data) {
+    for (const [compositeEntity, childComposite] of childrenComposite.data) {
       const compositeRoot = getComponentValue(CompositeRootComponent, childComposite)
       const composite = compositeProvider.getCompositeOrNull(compositeRoot.id)
+      const targetEntity = getCompositeEntity(compositeEntity)
       if (composite) {
         if (alreadyRequestedId.has(compositeRoot.id) || compositeRoot.id === compositeData.id) {
           throw new Error(
@@ -163,7 +165,7 @@ export function instanceComposite(
         }
 
         instanceComposite(engine, composite, compositeProvider, {
-          rootEntity: entity as Entity,
+          rootEntity: targetEntity as Entity,
           alreadyRequestedId: new Set(alreadyRequestedId).add(compositeData.id),
           entityMapping: entityMapping?.type === EntityMappingMode.EMM_NEXT_AVAILABLE ? entityMapping : undefined
         })
