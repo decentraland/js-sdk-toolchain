@@ -35,8 +35,10 @@ pointerEventsSystem.onPointerDown(
   cubeEntity,
   () => {
     Raycast.createOrReplace(raycastEntity, {
-      origin: Vector3.create(8, 1, 0.1),
-      direction: Vector3.create(0, 0, 1),
+      direction: {
+        $case: 'localDirection',
+        localDirection: Vector3.Forward()
+      },
       maxDistance: 16,
       queryType: RaycastQueryType.RQT_QUERY_ALL
     })
