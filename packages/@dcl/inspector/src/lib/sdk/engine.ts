@@ -1,30 +1,57 @@
-import {
-  Engine,
-  IEngine,
-  TransformComponentExtended,
-  MeshRendererComponentDefinitionExtended,
-  Transport
-} from '@dcl/ecs'
+import mitt, { Emitter } from 'mitt'
+import { Scene } from '@babylonjs/core'
+import { Engine, IEngine, Transport, Entity, CrdtMessageType, ComponentDefinition } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
-import { DataLayerInterface, StreamMessage } from '../data-layer/types'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
 import { consumeAllMessagesInto } from '../logic/consume-stream'
-import { createEditorComponents, EditorComponents } from './components'
+import { createEditorComponents, EditorComponents, SdkComponents } from './components'
 import { serializeCrdtMessages } from './crdt-logger'
+import { initRenderer } from '../babylon/setup'
+import { getHardcodedLoadableScene } from './test-local-scene'
+import { SceneContext } from '../babylon/decentraland/SceneContext'
+import { getDataLayerRpc } from '../data-layer'
+import { ITheme } from '../../components/AssetsCatalog'
+import { StreamMessage } from '../data-layer/types'
 
-export type InspectorEngine = {
+export type SdkContextEvents = {
+  change: { entity: Entity; operation: CrdtMessageType; component?: ComponentDefinition<any>; value?: any }
+  dispose: undefined
+}
+
+export type SdkContextValue = {
   engine: IEngine
-  editorComponents: EditorComponents
-  sdkComponents: {
-    GltfContainer: ReturnType<typeof components.GltfContainer>
-    MeshRenderer: MeshRendererComponentDefinitionExtended
-    Transform: TransformComponentExtended
-  }
+  components: EditorComponents & SdkComponents
+  scene: Scene
+  events: Emitter<SdkContextEvents>
   dispose(): void
 }
 
-export function createInspectorEngine(dataLayer: DataLayerInterface): InspectorEngine {
-  const engine = Engine()
+export async function createSdkContext(canvas: HTMLCanvasElement, catalog: ITheme[]): Promise<SdkContextValue> {
+  const { babylon, scene } = initRenderer(canvas)
+
+  // initialize DataLayer
+  const dataLayer = await getDataLayerRpc()
+
+  // create scene context
+  const ctx = new SceneContext(
+    babylon,
+    scene,
+    getHardcodedLoadableScene(
+      'urn:decentraland:entity:bafkreid44xhavttoz4nznidmyj3rjnrgdza7v6l7kd46xdmleor5lmsxfm1',
+      catalog
+    )
+  )
+  ctx.rootNode.position.set(0, 0, 0)
+
+  // Connect babylon engine with dataLayer transport
+  void ctx.connectDataLayer(dataLayer)
+
+  // create inspector engine context and components
+  const events = mitt<SdkContextEvents>()
+  const engine = Engine({
+    onChangeFunction: (entity, operation, component, value) =>
+      events.emit('change', { entity, operation, component, value })
+  })
 
   const Transform = components.Transform(engine)
   const GltfContainer = components.GltfContainer(engine)
@@ -55,13 +82,23 @@ export function createInspectorEngine(dataLayer: DataLayerInterface): InspectorE
 
   function dispose() {
     outgoingMessagesStream.close()
+    events.emit('dispose')
   }
   // </HERE BE DRAGONS (TRANSPORT)>
 
+  // register some globals for debugging
+  Object.assign(globalThis, { dataLayer, inspectorEngine: engine })
+
   return {
     engine,
-    editorComponents: createEditorComponents(engine),
-    sdkComponents: { GltfContainer, MeshRenderer, Transform },
+    components: {
+      ...createEditorComponents(engine),
+      GltfContainer,
+      MeshRenderer,
+      Transform
+    },
+    events,
+    scene,
     dispose
   }
 }
