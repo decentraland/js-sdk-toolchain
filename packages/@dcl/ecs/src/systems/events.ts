@@ -1,6 +1,6 @@
 import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { PBPointerEventsResult } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
-import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/pointer_events.gen'
+import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import * as components from '../components'
 import { IEngine } from '../engine/types'
 import { Entity, EntityState } from '../engine/entity'

@@ -69,7 +69,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
         length: 10,
         direction: { x: 1, y: 2, z: 3 },
         normalHit: { x: 1, y: 2, z: 3 },
-        origin: { x: 1, y: 2, z: 3 },
+        globalOrigin: { x: 1, y: 2, z: 3 },
         meshName: 'mesh'
       },
       state: PointerEventType.PET_DOWN

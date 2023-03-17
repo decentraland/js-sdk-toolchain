@@ -8,12 +8,12 @@ describe('Generated RaycastResult ProtoBuf', () => {
 
     testComponentSerialization(RaycastResult, {
       timestamp: 12,
-      origin: { x: 1, y: 2, z: 4 },
+      globalOrigin: { x: 1, y: 2, z: 4 },
       direction: { x: 1, y: 2, z: 4 },
       hits: [
         {
           position: { x: 1, z: 2, y: 3 },
-          origin: { x: 1, z: 2, y: 3 },
+          globalOrigin: { x: 1, z: 2, y: 3 },
           meshName: '{ x: 1, z: 2, y: 3 }',
           entityId: 123,
           normalHit: { x: 1, z: 2, y: 3 },
@@ -25,7 +25,7 @@ describe('Generated RaycastResult ProtoBuf', () => {
 
     testComponentSerialization(RaycastResult, {
       timestamp: 0,
-      origin: undefined,
+      globalOrigin: undefined,
       direction: undefined,
       hits: []
     })

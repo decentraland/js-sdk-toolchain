@@ -13,7 +13,7 @@ describe('Generated PointerEventsResult ProtoBuf', () => {
         length: 10,
         direction: { x: 1, y: 2, z: 3 },
         normalHit: { x: 1, y: 2, z: 3 },
-        origin: { x: 1, y: 2, z: 3 },
+        globalOrigin: { x: 1, y: 2, z: 3 },
         meshName: 'mesh',
         entityId: 515
       },
@@ -29,7 +29,7 @@ describe('Generated PointerEventsResult ProtoBuf', () => {
         length: 15,
         direction: { x: 3, y: 4, z: 5 },
         normalHit: { x: 3, y: 4, z: 5 },
-        origin: { x: 3, y: 4, z: 5 },
+        globalOrigin: { x: 3, y: 4, z: 5 },
         meshName: 'meshNew',
         entityId: 5154
       },
@@ -46,7 +46,7 @@ describe('Generated PointerEventsResult ProtoBuf', () => {
         entityId: undefined,
         direction: { x: 3, y: 4, z: 5 },
         normalHit: { x: 3, y: 4, z: 5 },
-        origin: { x: 3, y: 4, z: 5 },
+        globalOrigin: { x: 3, y: 4, z: 5 },
         meshName: 'meshNew'
       },
       state: PointerEventType.PET_UP,

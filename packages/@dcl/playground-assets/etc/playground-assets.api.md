@@ -69,9 +69,7 @@ export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAva
 
 // @public (undocumented)
 export const enum AvatarModifierType {
-    // (undocumented)
     AMT_DISABLE_PASSPORTS = 1,
-    // (undocumented)
     AMT_HIDE_AVATARS = 0
 }
 
@@ -116,7 +114,6 @@ export const Billboard: LastWriteWinElementSetComponentDefinition<PBBillboard>;
 
 // @public (undocumented)
 export const enum BillboardMode {
-    // (undocumented)
     BM_ALL = 7,
     // (undocumented)
     BM_NONE = 0,
@@ -263,6 +260,7 @@ export const CameraModeArea: LastWriteWinElementSetComponentDefinition<PBCameraM
 
 // @public (undocumented)
 export const enum CameraType {
+    CT_CINEMATIC = 2,
     // (undocumented)
     CT_FIRST_PERSON = 0,
     // (undocumented)
@@ -277,11 +275,30 @@ export type Children = unknown;
 // @public (undocumented)
 export const enum ColliderLayer {
     // (undocumented)
+    CL_CUSTOM1 = 256,
+    // (undocumented)
+    CL_CUSTOM2 = 512,
+    // (undocumented)
+    CL_CUSTOM3 = 1024,
+    // (undocumented)
+    CL_CUSTOM4 = 2048,
+    // (undocumented)
+    CL_CUSTOM5 = 4096,
     CL_NONE = 0,
-    // (undocumented)
     CL_PHYSICS = 2,
+    CL_POINTER = 1,
     // (undocumented)
-    CL_POINTER = 1
+    CL_RESERVED1 = 4,
+    // (undocumented)
+    CL_RESERVED2 = 8,
+    // (undocumented)
+    CL_RESERVED3 = 16,
+    // (undocumented)
+    CL_RESERVED4 = 32,
+    // (undocumented)
+    CL_RESERVED5 = 64,
+    // (undocumented)
+    CL_RESERVED6 = 128
 }
 
 // @public
@@ -1720,14 +1737,10 @@ export type OverflowType = 'hidden' | 'scroll' | 'visible';
 
 // @public (undocumented)
 export interface PBAnimationState {
-    // (undocumented)
     clip: string;
     loop?: boolean | undefined;
-    // (undocumented)
     name: string;
-    // (undocumented)
     playing?: boolean | undefined;
-    // (undocumented)
     shouldReset?: boolean | undefined;
     speed?: number | undefined;
     weight?: number | undefined;
@@ -1735,45 +1748,35 @@ export interface PBAnimationState {
 
 // @public (undocumented)
 export interface PBAnimator {
-    // (undocumented)
     states: PBAnimationState[];
 }
 
 // @public (undocumented)
 export interface PBAudioSource {
-    // (undocumented)
     audioClipUrl: string;
-    // (undocumented)
     loop?: boolean | undefined;
     pitch?: number | undefined;
-    // (undocumented)
     playing?: boolean | undefined;
     volume?: number | undefined;
 }
 
 // @public (undocumented)
 export interface PBAudioStream {
-    // (undocumented)
     playing?: boolean | undefined;
-    // (undocumented)
     url: string;
     volume?: number | undefined;
 }
 
 // @public (undocumented)
 export interface PBAvatarAttach {
-    // (undocumented)
     anchorPointId: AvatarAnchorPointType;
     avatarId?: string | undefined;
 }
 
 // @public (undocumented)
 export interface PBAvatarModifierArea {
-    // (undocumented)
     area: PBVector3 | undefined;
-    // (undocumented)
     excludeIds: string[];
-    // (undocumented)
     modifiers: AvatarModifierType[];
 }
 
@@ -1781,16 +1784,13 @@ export interface PBAvatarModifierArea {
 export interface PBAvatarShape {
     bodyShape?: string | undefined;
     emotes: string[];
-    // (undocumented)
     expressionTriggerId?: string | undefined;
     expressionTriggerTimestamp?: number | undefined;
     eyeColor?: PBColor3 | undefined;
     hairColor?: PBColor3 | undefined;
-    // (undocumented)
     id: string;
     name?: string | undefined;
     skinColor?: PBColor3 | undefined;
-    // (undocumented)
     talking?: boolean | undefined;
     wearables: string[];
 }
@@ -1802,15 +1802,12 @@ export interface PBBillboard {
 
 // @public (undocumented)
 export interface PBCameraMode {
-    // (undocumented)
     mode: CameraType;
 }
 
 // @public (undocumented)
 export interface PBCameraModeArea {
-    // (undocumented)
     area: PBVector3 | undefined;
-    // (undocumented)
     mode: CameraType;
 }
 
@@ -1938,7 +1935,6 @@ export interface PBMeshRenderer {
 
 // @public (undocumented)
 export interface PBMeshRenderer_BoxMesh {
-    // (undocumented)
     uvs: number[];
 }
 
@@ -1950,7 +1946,6 @@ export interface PBMeshRenderer_CylinderMesh {
 
 // @public (undocumented)
 export interface PBMeshRenderer_PlaneMesh {
-    // (undocumented)
     uvs: number[];
 }
 
@@ -1961,22 +1956,18 @@ export interface PBMeshRenderer_SphereMesh {
 // @public (undocumented)
 export interface PBNftShape {
     color?: PBColor3 | undefined;
-    // (undocumented)
     src: string;
     style?: NftFrameType | undefined;
 }
 
 // @public (undocumented)
 export interface PBPointerEvents {
-    // (undocumented)
     pointerEvents: PBPointerEvents_Entry[];
 }
 
 // @public (undocumented)
 export interface PBPointerEvents_Entry {
-    // (undocumented)
     eventInfo: PBPointerEvents_Info | undefined;
-    // (undocumented)
     eventType: PointerEventType;
 }
 
@@ -2001,7 +1992,6 @@ export interface PBPointerEventsResult {
 
 // @public (undocumented)
 export interface PBPointerLock {
-    // (undocumented)
     isPointerLocked: boolean;
 }
 
@@ -2017,56 +2007,51 @@ export interface PBPosition {
 
 // @public (undocumented)
 export interface PBRaycast {
+    collisionMask?: number | undefined;
+    continuous: boolean;
     // (undocumented)
-    direction: PBVector3 | undefined;
-    // (undocumented)
+    direction?: {
+        $case: "localDirection";
+        localDirection: PBVector3;
+    } | {
+        $case: "globalDirection";
+        globalDirection: PBVector3;
+    } | {
+        $case: "globalTarget";
+        globalTarget: PBVector3;
+    };
     maxDistance: number;
-    // (undocumented)
-    origin: PBVector3 | undefined;
-    // (undocumented)
+    originOffset?: PBVector3 | undefined;
     queryType: RaycastQueryType;
+    timestamp: number;
 }
 
 // @public (undocumented)
 export interface PBRaycastResult {
-    // (undocumented)
     direction: PBVector3 | undefined;
-    // (undocumented)
+    globalOrigin: PBVector3 | undefined;
     hits: RaycastHit[];
-    // (undocumented)
-    origin: PBVector3 | undefined;
-    // (undocumented)
     timestamp: number;
 }
 
 // @public (undocumented)
 export interface PBTextShape {
     font?: Font | undefined;
-    // (undocumented)
     fontAutoSize?: boolean | undefined;
     fontSize?: number | undefined;
     height?: number | undefined;
     lineCount?: number | undefined;
     lineSpacing?: number | undefined;
     outlineColor?: PBColor3 | undefined;
-    // (undocumented)
     outlineWidth?: number | undefined;
-    // (undocumented)
     paddingBottom?: number | undefined;
-    // (undocumented)
     paddingLeft?: number | undefined;
-    // (undocumented)
     paddingRight?: number | undefined;
-    // (undocumented)
     paddingTop?: number | undefined;
-    // (undocumented)
     shadowBlur?: number | undefined;
     shadowColor?: PBColor3 | undefined;
-    // (undocumented)
     shadowOffsetX?: number | undefined;
-    // (undocumented)
     shadowOffsetY?: number | undefined;
-    // (undocumented)
     text: string;
     textAlign?: TextAlignMode | undefined;
     textColor?: PBColor4 | undefined;
@@ -2135,7 +2120,6 @@ export interface PBUiText {
     font?: Font | undefined;
     fontSize?: number | undefined;
     textAlign?: TextAlignMode | undefined;
-    // (undocumented)
     value: string;
 }
 
@@ -2453,19 +2437,12 @@ export const Raycast: LastWriteWinElementSetComponentDefinition<PBRaycast>;
 
 // @public (undocumented)
 export interface RaycastHit {
-    // (undocumented)
     direction: PBVector3 | undefined;
-    // (undocumented)
     entityId?: number | undefined;
-    // (undocumented)
+    globalOrigin: PBVector3 | undefined;
     length: number;
-    // (undocumented)
     meshName?: string | undefined;
-    // (undocumented)
     normalHit: PBVector3 | undefined;
-    // (undocumented)
-    origin: PBVector3 | undefined;
-    // (undocumented)
     position: PBVector3 | undefined;
 }
 
