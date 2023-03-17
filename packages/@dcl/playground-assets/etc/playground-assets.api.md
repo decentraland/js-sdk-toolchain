@@ -1161,7 +1161,7 @@ export type InstanceCompositeOptions = {
         getNextAvailableEntity: () => Entity | null;
     } | {
         type: EntityMappingMode.EMM_DIRECT_MAPPING;
-        getCompositeEntity?: (compositeEntity: Entity | number) => Entity;
+        getCompositeEntity: (compositeEntity: Entity | number) => Entity;
     };
     rootEntity?: Entity;
     alreadyRequestedId?: Set<string>;
