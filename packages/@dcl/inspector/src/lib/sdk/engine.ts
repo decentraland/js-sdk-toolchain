@@ -6,11 +6,12 @@ import {
   Transport
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
-import { DataLayerInterface, StreamMessage } from '../data-layer/types'
+import { DataLayerRpcClient } from '../data-layer/types'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
 import { consumeAllMessagesInto } from '../logic/consume-stream'
 import { createEditorComponents, EditorComponents } from './components'
 import { serializeCrdtMessages } from './crdt-logger'
+import { StreamMessage } from '../data-layer/proto/gen/data-layer.gen'
 
 export type InspectorEngine = {
   engine: IEngine
@@ -23,7 +24,7 @@ export type InspectorEngine = {
   dispose(): void
 }
 
-export function createInspectorEngine(dataLayer: DataLayerInterface): InspectorEngine {
+export function createInspectorEngine(dataLayer: DataLayerRpcClient): InspectorEngine {
   const engine = Engine()
 
   const Transform = components.Transform(engine)

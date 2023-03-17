@@ -5,7 +5,7 @@ import { useDrop } from 'react-dnd'
 import { initEngine } from '../../lib/babylon/setup'
 import { SceneContext } from '../../lib/babylon/decentraland/SceneContext'
 import { getHardcodedLoadableScene } from '../../lib/sdk/test-local-scene'
-import { getDataLayerRpc } from '../../lib/data-layer'
+import { createDataLayerClientRpc } from '../../lib/data-layer/client'
 import { InspectorEngine, createInspectorEngine } from '../../lib/sdk/engine'
 import { IAsset } from '../AssetsCatalog/types'
 import { ROOT } from '../../hooks/sdk/tree'
@@ -37,7 +37,7 @@ export function Renderer({ onLoad }: Props) {
       // await scene.debugLayer.show({ showExplorer: true, embedMode: true })
 
       // initialize DataLayer
-      const dataLayer = await getDataLayerRpc()
+      const dataLayer = await createDataLayerClientRpc()
 
       // initialize babylon scene
       const ctx = new SceneContext(

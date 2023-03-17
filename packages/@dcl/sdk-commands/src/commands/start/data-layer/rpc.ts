@@ -31,7 +31,7 @@ export function createDataLayerRpc({ fs }: Pick<CliComponents, 'fs'>): DataLayer
   rpcServer.setHandler(rpcHandler)
 
   async function rpcHandler(serverPort: RpcServerPort<DataLayerContext>) {
-    codegen.registerService(serverPort, DataLayerProto.DataServiceDefinition, async () => dataLayer)
+    codegen.registerService(serverPort, DataLayerProto.DataServiceDefinition, async (port, ctx) => dataLayer)
   }
 
   return { rpcServer, engine }

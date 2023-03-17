@@ -102,7 +102,7 @@ function Tree<T>(props: Props<T>) {
       <li>
         <div>
           <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
-            {selected ? '@' : ''}
+            {selected ? '[ST]' : ''}
             {label || id}{' '}
             <Controls handleEdit={handleToggleEdit} handleNewChild={handleNewChild} handleRemove={handleRemove} />
           </span>

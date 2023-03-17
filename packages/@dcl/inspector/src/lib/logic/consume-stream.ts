@@ -1,4 +1,4 @@
-import { StreamMessage } from '../data-layer/types'
+import { StreamMessage } from '../data-layer/proto/gen/data-layer.gen'
 
 export async function consumeAllMessagesInto(
   iter: AsyncIterable<StreamMessage>,
