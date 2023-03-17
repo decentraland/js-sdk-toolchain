@@ -2008,7 +2008,7 @@ export interface PBPosition {
 // @public (undocumented)
 export interface PBRaycast {
     collisionMask?: number | undefined;
-    continuous: boolean;
+    continuous?: boolean | undefined;
     // (undocumented)
     direction?: {
         $case: "localDirection";
@@ -2023,7 +2023,7 @@ export interface PBRaycast {
     maxDistance: number;
     originOffset?: PBVector3 | undefined;
     queryType: RaycastQueryType;
-    timestamp: number;
+    timestamp?: number | undefined;
 }
 
 // @public (undocumented)
