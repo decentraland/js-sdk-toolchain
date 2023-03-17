@@ -1,18 +1,17 @@
-import mitt, { Emitter } from 'mitt'
 import { Scene } from '@babylonjs/core'
-import { Engine, IEngine, Transport, Entity, CrdtMessageType, ComponentDefinition } from '@dcl/ecs'
+import { ComponentDefinition, CrdtMessageType, Engine, Entity, IEngine, Transport } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
-import { DataLayerRpcClient } from '../data-layer/types'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
+import mitt, { Emitter } from 'mitt'
+import { ITheme } from '../../components/AssetsCatalog'
+import { SceneContext } from '../babylon/decentraland/SceneContext'
+import { initRenderer } from '../babylon/setup'
+import { createDataLayerClientRpc } from '../data-layer/client'
+import { StreamMessage } from '../data-layer/proto/gen/data-layer.gen'
 import { consumeAllMessagesInto } from '../logic/consume-stream'
 import { createEditorComponents, EditorComponents, SdkComponents } from './components'
 import { serializeCrdtMessages } from './crdt-logger'
-import { initRenderer } from '../babylon/setup'
 import { getHardcodedLoadableScene } from './test-local-scene'
-import { SceneContext } from '../babylon/decentraland/SceneContext'
-import { getDataLayerRpc } from '../data-layer'
-import { ITheme } from '../../components/AssetsCatalog'
-import { StreamMessage } from '../data-layer/proto/gen/data-layer.gen'
 
 export type SdkContextEvents = {
   change: { entity: Entity; operation: CrdtMessageType; component?: ComponentDefinition<any>; value?: any }
@@ -27,12 +26,11 @@ export type SdkContextValue = {
   dispose(): void
 }
 
-
 export async function createSdkContext(canvas: HTMLCanvasElement, catalog: ITheme[]): Promise<SdkContextValue> {
   const { babylon, scene } = initRenderer(canvas)
 
   // initialize DataLayer
-  const dataLayer = await getDataLayerRpc()
+  const dataLayer = await createDataLayerClientRpc()
 
   // create scene context
   const ctx = new SceneContext(
