@@ -1,22 +1,32 @@
 import { createEngine } from '../host/engine'
 import { DataLayerRpcClient, DataLayerRpcServer, FileSystemInterface } from '../types'
 import { initRpcMethods } from '../host/rpc-methods'
-import { Composite, compositeFromJson, CompositeProvider, instanceComposite } from '@dcl/ecs'
+import {
+  Composite,
+  compositeFromBinary,
+  compositeFromJson,
+  CompositeProvider,
+  instanceComposite,
+  Entity,
+  EntityMappingMode
+} from '@dcl/ecs'
 
 export async function createFsCompositeProvider(fs: FileSystemInterface): Promise<CompositeProvider> {
-  const compositePaths = (await fs.getDirectoryFiles('/')).filter(
+  const compositePaths = (await fs.getDirectoryFiles('')).filter(
     (item) => item.endsWith('.composite.json') || item.endsWith('.composite')
   )
+
   const compositePromises = compositePaths.map(async (itemPath) => {
     try {
       if (itemPath.endsWith('.json')) {
         const compositeContent = await fs.readFile<string>(itemPath, 'string')
-        const json = JSON.parse(await fs.readFile(itemPath, 'string'))
+        const json = JSON.parse(compositeContent)
         const composite = compositeFromJson(json)
         return composite
       } else {
-        // todo
-        return null
+        const compositeContent = await fs.readFile<Uint8Array>(itemPath, 'uint8array')
+        const composite = compositeFromBinary(compositeContent)
+        return composite
       }
     } catch (err) {
       console.error(`Error loading composite ${itemPath}: ${(err as any).toString()}`)
@@ -50,7 +60,12 @@ export async function createLocalDataLayerRpcClient(fs: FileSystemInterface): Pr
   const mainComposite = compositeProvider.getCompositeOrNull('main')
 
   if (mainComposite) {
-    instanceComposite(engine, mainComposite, () => engine.addEntity(), compositeProvider)
+    instanceComposite(engine, mainComposite, compositeProvider, {
+      entityMapping: {
+        type: EntityMappingMode.EMM_DIRECT_MAPPING,
+        getCompositeEntity: (entity: number | Entity) => entity as Entity
+      }
+    })
   }
 
   // the server (datalayer) should also keep its internal "game loop" to process

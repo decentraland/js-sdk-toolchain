@@ -1,6 +1,6 @@
 import { createRpcServer, RpcServer, RpcServerPort } from '@dcl/rpc'
 import * as codegen from '@dcl/rpc/dist/codegen'
-import { createEngine, initRpcMethods, DataLayerProto } from '@dcl/inspector'
+import { createEngine, DataServiceDefinition, initRpcMethods } from '@dcl/inspector'
 
 import { CliComponents } from '../../../components'
 
@@ -34,7 +34,7 @@ export async function createDataLayerRpc({ fs }: Pick<CliComponents, 'fs'>): Pro
 
   async function rpcHandler(serverPort: RpcServerPort<DataLayerContext>) {
     // TODO: dataLayer as any
-    codegen.registerService(serverPort, DataLayerProto.DataServiceDefinition, async (port, ctx) => dataLayer as any)
+    codegen.registerService(serverPort, DataServiceDefinition, async (port, ctx) => dataLayer as any)
   }
 
   return { rpcServer, engine }

@@ -8,6 +8,28 @@ import { ReadWriteByteBuffer } from '../serialization/ByteBuffer'
 import { getCompositeRootComponent } from './components'
 import { ComponentData, Composite, CompositeComponent, CompositeProvider } from './types'
 
+// @public
+export enum EntityMappingMode {
+  EMM_NONE = 0,
+  EMM_NEXT_AVAILABLE = 1,
+  EMM_DIRECT_MAPPING = 2
+}
+
+// @public
+export type InstanceCompositeOptions = {
+  entityMapping?:
+    | {
+        type: EntityMappingMode.EMM_NEXT_AVAILABLE
+        getNextAvailableEntity: () => Entity | null
+      }
+    | {
+        type: EntityMappingMode.EMM_DIRECT_MAPPING
+        getCompositeEntity?: (compositeEntity: Entity | number) => Entity
+      }
+  rootEntity?: Entity
+  alreadyRequestedId?: Set<string>
+}
+
 /**
  * Return the component value from composite data
  * @internal
@@ -57,17 +79,27 @@ export function getComponentDefinition(
  * @internal
  */
 export function getEntityMapping(
+  engine: IEngine,
   compositeEntity: Entity,
   mappedEntities: Map<Entity, Entity>,
-  getNextAvailableEntity: () => Entity | null
+  { entityMapping }: InstanceCompositeOptions
 ): Entity {
   const existingEntity = mappedEntities.get(compositeEntity)
   if (existingEntity) {
     return existingEntity
   }
 
+  if (entityMapping?.type === EntityMappingMode.EMM_DIRECT_MAPPING) {
+    mappedEntities.set(compositeEntity, compositeEntity)
+    return compositeEntity
+  }
+
   // This function in runtime can be just `engine.addEntity()`
-  const newEntity = getNextAvailableEntity()
+  const newEntity =
+    entityMapping?.type === EntityMappingMode.EMM_NEXT_AVAILABLE
+      ? entityMapping.getNextAvailableEntity()
+      : engine.addEntity()
+
   if (newEntity === null) {
     throw new Error('There is no more entities to allocate')
   }
@@ -90,18 +122,19 @@ export function getEntityMapping(
 export function instanceComposite(
   engine: IEngine,
   compositeData: Composite,
-  getNextAvailableEntity: () => Entity | null,
   compositeProvider: CompositeProvider,
-  rootEntity?: Entity,
-  alreadyRequestedId: Set<string> = new Set()
+  options: InstanceCompositeOptions = {}
 ) {
+  const { rootEntity, alreadyRequestedId: optionalAlreadyRequestedId, entityMapping } = options
+  const alreadyRequestedId = optionalAlreadyRequestedId || new Set<string>()
+
   const TransformComponentNumber = componentNumberFromName('core::Transform')
   const CompositeRootComponent = getCompositeRootComponent(engine)
   // Key => EntityNumber from the composite
   // Value => EntityNumber in current engine
   const mappedEntities: Map<Entity, Entity> = new Map()
   const getCompositeEntity = (compositeEntity: Entity | number) =>
-    getEntityMapping(compositeEntity as Entity, mappedEntities, getNextAvailableEntity)
+    getEntityMapping(engine, compositeEntity as Entity, mappedEntities, options)
 
   // ## 1 ##
   // First entity that I want to map, the root entity from the composite to the target entity in the engine
@@ -129,14 +162,11 @@ export function instanceComposite(
           )
         }
 
-        instanceComposite(
-          engine,
-          composite,
-          getNextAvailableEntity,
-          compositeProvider,
-          entity as Entity,
-          new Set(alreadyRequestedId).add(compositeData.id)
-        )
+        instanceComposite(engine, composite, compositeProvider, {
+          rootEntity: entity as Entity,
+          alreadyRequestedId: new Set(alreadyRequestedId).add(compositeData.id),
+          entityMapping: entityMapping?.type === EntityMappingMode.EMM_NEXT_AVAILABLE ? entityMapping : undefined
+        })
       }
     }
   }

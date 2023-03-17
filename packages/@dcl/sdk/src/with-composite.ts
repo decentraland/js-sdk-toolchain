@@ -12,7 +12,7 @@ export const onUpdate = basicOnUpdate
   const compositeProvider = await createContentFetchCompositeProvider()
   const mainComposite = compositeProvider.getCompositeOrNull('main')
   if (mainComposite) {
-    instanceComposite(engine, mainComposite, () => engine.addEntity(), compositeProvider)
+    instanceComposite(engine, mainComposite, compositeProvider)
   }
 
   await basicOnStart()

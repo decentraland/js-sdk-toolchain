@@ -7,10 +7,13 @@ const mainComposite = {
       name: 'core::Transform',
       data: {
         '512': {
-          position: {
-            x: 8,
-            y: 0.8,
-            z: 8
+          $case: 'json',
+          json: {
+            position: {
+              x: 8,
+              y: 0.8,
+              z: 8
+            }
           }
         }
       }
@@ -19,10 +22,13 @@ const mainComposite = {
       name: 'core::MeshRenderer',
       data: {
         '512': {
-          mesh: {
-            $case: 'box',
-            box: {
-              uvs: []
+          $case: 'json',
+          json: {
+            mesh: {
+              $case: 'box',
+              box: {
+                uvs: []
+              }
             }
           }
         }
@@ -32,34 +38,48 @@ const mainComposite = {
       name: 'core::MeshCollider',
       data: {
         '512': {
-          mesh: {
-            $case: 'box',
-            box: {}
+          $case: 'json',
+          json: {
+            mesh: {
+              $case: 'box',
+              box: {}
+            }
           }
         }
       }
     },
     {
       name: 'cube-id',
+      jsonSchema: {
+        type: 'object',
+        properties: {},
+        serializationType: 'map'
+      },
       data: {
-        '512': {}
+        '512': {
+          $case: 'json',
+          json: {}
+        }
       }
     },
     {
       name: 'core::PointerEvents',
       data: {
         '512': {
-          pointerEvents: [
-            {
-              eventType: 1,
-              eventInfo: {
-                button: 1,
-                hoverText: 'Press F to spawn',
-                maxDistance: 100,
-                showFeedback: true
+          $case: 'json',
+          json: {
+            pointerEvents: [
+              {
+                eventType: 1,
+                eventInfo: {
+                  button: 1,
+                  hoverText: 'Press E to spawn',
+                  maxDistance: 100,
+                  showFeedback: true
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       }
     },
@@ -67,14 +87,17 @@ const mainComposite = {
       name: 'core::Material',
       data: {
         '512': {
-          material: {
-            $case: 'pbr',
-            pbr: {
-              albedoColor: {
-                r: 0.0,
-                g: 0.85,
-                b: 0.42,
-                a: 1.0
+          $case: 'json',
+          json: {
+            material: {
+              $case: 'pbr',
+              pbr: {
+                albedoColor: {
+                  r: 1.0,
+                  g: 0.85,
+                  b: 0.42,
+                  a: 1.0
+                }
               }
             }
           }

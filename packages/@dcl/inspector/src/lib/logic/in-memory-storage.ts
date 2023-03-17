@@ -1,4 +1,4 @@
-import { FileSystemInterface, SupportedFormat } from '../data-layer/types'
+import { FileSystemInterface } from '../data-layer/types'
 
 export function createInMemoryStorage<T = string>(initialFs: Record<string, T> = {}) {
   const storage: Map<string, T> = new Map()

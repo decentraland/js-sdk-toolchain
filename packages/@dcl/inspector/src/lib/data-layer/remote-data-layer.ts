@@ -3,4 +3,6 @@
  */
 export { createEngine } from './host/engine'
 export { initRpcMethods } from './host/rpc-methods'
-export * as DataLayerProto from './proto/gen/data-layer.gen'
+
+export * from './proto/gen/data-layer.gen'
+export * from './types'
