@@ -5,7 +5,10 @@
             "name": "composite::root",
             "data": {
                 "512": {
-                    "id": "recursive-composite"
+                    "$case": "json",
+                    "json": {
+                        "id": "recursive-composite"
+                    }
                 }
             }
         }

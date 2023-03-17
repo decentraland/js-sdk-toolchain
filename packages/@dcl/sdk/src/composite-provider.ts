@@ -1,9 +1,5 @@
-import { Composite, compositeFromJson, CompositeProvider } from '@dcl/ecs'
+import { CompositeProvider, Composite, compositeFromBinary, compositeFromJson } from '@dcl/ecs'
 import { getSceneInfo } from '~system/Scene'
-
-// function compositeFromBinary(binaryComposite: Uint8Array): Composite {
-//   throw new Error('To implement')
-// }
 
 // @public
 export async function createContentFetchCompositeProvider(): Promise<CompositeProvider> {
@@ -22,13 +18,9 @@ export async function createContentFetchCompositeProvider(): Promise<CompositePr
         const composite = compositeFromJson(compositeJson)
         return composite
       } else {
-        // TODO: fetch doesn't have arrayBuffer()
-        // const compositeBinaryData = await response.text()
-
-        // TODO: implement compositeFromBinary
-        // const composite = compositeFromBinary(compositeBinaryData)
-
-        return null
+        const compositeBinaryData: Uint8Array = await (response as any).arrayBuffer()
+        const composite = compositeFromBinary(compositeBinaryData)
+        return composite
       }
     } catch (err) {
       console.error(`Error loading composite ${compositeUrl}: ${(err as any).toString()}`)

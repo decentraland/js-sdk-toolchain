@@ -5,13 +5,22 @@
             "name": "composite::root",
             "data": {
                 "512": {
-                    "id": "empty"
+                    "$case": "json",
+                    "json": {
+                        "id": "empty"
+                    }
                 },
                 "513": {
-                    "id": "one-transform"
+                    "$case": "json",
+                    "json": {
+                        "id": "one-transform"
+                    }
                 },
                 "514": {
-                    "id": "cube-scene"
+                    "$case": "json",
+                    "json": {
+                        "id": "cube-scene"
+                    }
                 }
             }
         }

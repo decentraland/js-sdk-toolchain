@@ -2,15 +2,61 @@ import { componentDefinitionByName } from '../components'
 import { componentNumberFromName } from '../components/component-number'
 import { TransformType } from '../components/manual/Transform'
 import { Entity } from '../engine/entity'
-import { IEngine, LastWriteWinElementSetComponentDefinition } from '../engine/types'
+import { ComponentDefinition, IEngine, LastWriteWinElementSetComponentDefinition } from '../engine/types'
 import { Schemas } from '../schemas'
+import { ReadWriteByteBuffer } from '../serialization/ByteBuffer'
 import { getCompositeRootComponent } from './components'
-import { Composite, CompositeProvider } from './types'
+import { ComponentData, Composite, CompositeComponent, CompositeProvider } from './types'
+
+/**
+ * Return the component value from composite data
+ * @internal
+ */
+export function getComponentValue<T = unknown>(
+  componentDefinition: ComponentDefinition<T>,
+  component: ComponentData
+): T {
+  if (component.data?.$case === 'json') {
+    return component.data.json
+  } else {
+    return componentDefinition.schema.deserialize(new ReadWriteByteBuffer(component.data?.binary))
+  }
+}
+
+/**
+ * Return the component definition from composite info
+ * @internal
+ */
+export function getComponentDefinition(
+  engine: IEngine,
+  component: CompositeComponent
+): LastWriteWinElementSetComponentDefinition<unknown> {
+  const existingComponentDefinition = engine.getComponentOrNull(component.name)
+
+  if (!existingComponentDefinition) {
+    if (component.jsonSchema) {
+      return engine.defineComponentFromSchema(component.name, Schemas.fromJson(component.jsonSchema))
+    } else if (component.name.startsWith('core::')) {
+      if (component.name in componentDefinitionByName) {
+        return (componentDefinitionByName as any)[component.name](
+          engine
+        ) as LastWriteWinElementSetComponentDefinition<unknown>
+      } else {
+        throw new Error(`The core component ${component.name} was not found.`)
+      }
+    } else {
+      throw new Error(`${component.name} is not defined and there is no schema to define it.`)
+    }
+  } else {
+    return existingComponentDefinition as LastWriteWinElementSetComponentDefinition<unknown>
+  }
+}
 
 /**
  * Return the entity mapping or fail if there is no more
+ * @internal
  */
-function getEntityMapping(
+export function getEntityMapping(
   compositeEntity: Entity,
   mappedEntities: Map<Entity, Entity>,
   getNextAvailableEntity: () => Entity | null
@@ -72,7 +118,7 @@ export function instanceComposite(
   const childrenComposite = compositeData.components.find((item) => item.name === CompositeRootComponent.componentName)
   if (childrenComposite) {
     for (const [entity, childComposite] of childrenComposite.data) {
-      const compositeRoot = childComposite as ReturnType<typeof CompositeRootComponent['create']>
+      const compositeRoot = getComponentValue(CompositeRootComponent, childComposite)
       const composite = compositeProvider.getCompositeOrNull(compositeRoot.id)
       if (composite) {
         if (alreadyRequestedId.has(compositeRoot.id) || compositeRoot.id === compositeData.id) {
@@ -88,7 +134,7 @@ export function instanceComposite(
           composite,
           getNextAvailableEntity,
           compositeProvider,
-          entity,
+          entity as Entity,
           new Set(alreadyRequestedId).add(compositeData.id)
         )
       }
@@ -103,30 +149,17 @@ export function instanceComposite(
 
     // ## 3a ##
     // We find the component definition
-    let componentDefinition
-    const existingComponentDefinition = engine.getComponentOrNull(component.name)
-
-    if (!existingComponentDefinition) {
-      if (component.schema) {
-        componentDefinition = engine.defineComponentFromSchema(component.name, Schemas.fromJson(component.schema))
-      } else if (component.name.startsWith('core::')) {
-        if (component.name in componentDefinitionByName) {
-          componentDefinition = (componentDefinitionByName as any)[component.name](engine)
-        } else {
-          throw new Error(`The core component ${component.name} was not found.`)
-        }
-      } else {
-        throw new Error(`${component.name} is not defined and there is no schema to define it.`)
-      }
-    } else {
-      componentDefinition = existingComponentDefinition as LastWriteWinElementSetComponentDefinition<unknown>
-    }
+    const componentDefinition: LastWriteWinElementSetComponentDefinition<unknown> = getComponentDefinition(
+      engine,
+      component
+    )
 
     // ## 3b ##
     // Iterating over all the entities with this component and create the replica
     for (const [entity, compositeComponentValue] of component.data) {
+      const componentValueDeserialized = getComponentValue(componentDefinition, compositeComponentValue)
       const targetEntity = getCompositeEntity(entity)
-      const componentValue = componentDefinition.create(targetEntity, compositeComponentValue)
+      const componentValue = componentDefinition.create(targetEntity, componentValueDeserialized)
 
       // ## 3c ##
       // All entities referenced in the composite probably has a different resolved EntityNumber

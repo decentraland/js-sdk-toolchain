@@ -5,7 +5,10 @@
             "name": "my-lib::custom::InexistentComponent",
             "data": {
                 "512": {
-                    "test": 111
+                    "$case": "json",
+                    "json": {
+                        "test": 111
+                    }
                 }
             }
         }
