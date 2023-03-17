@@ -25,7 +25,7 @@ describe('Analytics Component', () => {
     jest.spyOn(dclInfoConfig, 'get').mockResolvedValue({ trackStats: false })
     const analytics = await createAnalyticsComponent({ dclInfoConfig })
     const trackSpy = jest.spyOn(analytics.get(), 'track')
-    await analytics.track('Scene created', { projectType: '', url: '' })
+    await analytics.track('Scene created', { projectType: '', url: '', args: {} })
     expect(trackSpy).toBeCalledTimes(0)
   })
 
@@ -35,7 +35,7 @@ describe('Analytics Component', () => {
     jest.spyOn(dclInfoConfig, 'get').mockResolvedValue({ userId: 'boedo', trackStats: true })
     const analytics = await createAnalyticsComponent({ dclInfoConfig })
     const trackSpy = jest.spyOn(analytics.get(), 'track')
-    await analytics.track('Scene created', { projectType: '', url: '' })
+    await analytics.track('Scene created', { projectType: '', url: '', args: {} })
     expect(trackSpy).toBeCalledWith(
       {
         userId: 'sdk-commands-user',
