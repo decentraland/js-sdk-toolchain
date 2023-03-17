@@ -1,0 +1,306 @@
+{
+  "core::Transform": {
+    "513": {
+      "position": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "parent": 0
+    },
+    "514": {
+      "position": {
+        "x": 8,
+        "y": 0.8,
+        "z": 8
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "parent": 0
+    },
+    "515": {
+      "position": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "parent": 0
+    },
+    "516": {
+      "position": {
+        "x": 8,
+        "y": 0.8,
+        "z": 8
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "parent": 0
+    },
+    "517": {
+      "position": {
+        "x": 8,
+        "y": 0.800000011920929,
+        "z": 8
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "parent": 0
+    }
+  },
+  "composite::root": {
+    "512": {
+      "id": "full-binary",
+      "entities": [
+        {
+          "src": 0,
+          "dest": 512
+        },
+        {
+          "src": 0,
+          "dest": 512
+        },
+        {
+          "src": 0,
+          "dest": 512
+        },
+        {
+          "src": 512,
+          "dest": 517
+        }
+      ]
+    },
+    "513": {
+      "id": "one-transform",
+      "entities": [
+        {
+          "src": 0,
+          "dest": 513
+        },
+        {
+          "src": 518,
+          "dest": 513
+        },
+        {
+          "src": 0,
+          "dest": 513
+        },
+        {
+          "src": 518,
+          "dest": 515
+        }
+      ]
+    },
+    "514": {
+      "id": "cube-scene",
+      "entities": [
+        {
+          "src": 0,
+          "dest": 514
+        },
+        {
+          "src": 512,
+          "dest": 514
+        },
+        {
+          "src": 0,
+          "dest": 514
+        },
+        {
+          "src": 512,
+          "dest": 516
+        }
+      ]
+    },
+    "515": {
+      "id": "only-children",
+      "entities": [
+        {
+          "src": 0,
+          "dest": 515
+        }
+      ]
+    }
+  },
+  "core::MeshRenderer": {
+    "514": {
+      "mesh": {
+        "$case": "box",
+        "box": {
+          "uvs": []
+        }
+      }
+    },
+    "516": {
+      "mesh": {
+        "$case": "box",
+        "box": {
+          "uvs": []
+        }
+      }
+    },
+    "517": {
+      "mesh": {
+        "$case": "box",
+        "box": {
+          "uvs": []
+        }
+      }
+    }
+  },
+  "core::MeshCollider": {
+    "514": {
+      "mesh": {
+        "$case": "box",
+        "box": {}
+      }
+    },
+    "516": {
+      "mesh": {
+        "$case": "box",
+        "box": {}
+      }
+    },
+    "517": {
+      "mesh": {
+        "$case": "box",
+        "box": {}
+      }
+    }
+  },
+  "cube-id": {
+    "514": {},
+    "516": {},
+    "517": {}
+  },
+  "core::PointerEvents": {
+    "514": {
+      "pointerEvents": [
+        {
+          "eventType": 1,
+          "eventInfo": {
+            "button": 1,
+            "hoverText": "Press E to spawn",
+            "maxDistance": 100,
+            "showFeedback": true
+          }
+        }
+      ]
+    },
+    "516": {
+      "pointerEvents": [
+        {
+          "eventType": 1,
+          "eventInfo": {
+            "button": 1,
+            "hoverText": "Press E to spawn",
+            "maxDistance": 100,
+            "showFeedback": true
+          }
+        }
+      ]
+    },
+    "517": {
+      "pointerEvents": [
+        {
+          "eventType": 1,
+          "eventInfo": {
+            "button": 1,
+            "hoverText": "Press E to spawn",
+            "maxDistance": 100,
+            "showFeedback": true
+          }
+        }
+      ]
+    }
+  },
+  "core::Material": {
+    "514": {
+      "material": {
+        "$case": "pbr",
+        "pbr": {
+          "albedoColor": {
+            "r": 1,
+            "g": 0.85,
+            "b": 0.42,
+            "a": 1
+          }
+        }
+      }
+    },
+    "516": {
+      "material": {
+        "$case": "pbr",
+        "pbr": {
+          "albedoColor": {
+            "r": 1,
+            "g": 0.85,
+            "b": 0.42,
+            "a": 1
+          }
+        }
+      }
+    },
+    "517": {
+      "material": {
+        "$case": "pbr",
+        "pbr": {
+          "albedoColor": {
+            "r": 1,
+            "g": 0.8500000238418579,
+            "b": 0.41999998688697815,
+            "a": 1
+          }
+        }
+      }
+    }
+  }
+}

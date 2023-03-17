@@ -1,0 +1,75 @@
+{
+  "id": "data-binary",
+  "components": [
+    {
+      "name": "core::Transform",
+      "data": {
+        "512": {
+          "binary": "AAAAQc3MTD8AAABBAAAAAAAAAAAAAAAAAACAPwAAgD8AAIA/AACAPwAAAAA="
+        }
+      }
+    },
+    {
+      "name": "core::MeshRenderer",
+      "data": {
+        "512": {
+          "binary": "CgIKAA=="
+        }
+      }
+    },
+    {
+      "name": "core::MeshCollider",
+      "data": {
+        "512": {
+          "binary": "EgA="
+        }
+      }
+    },
+    {
+      "name": "cube-id",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {},
+        "serializationType": "map"
+      },
+      "data": {
+        "512": {
+          "binary": ""
+        }
+      }
+    },
+    {
+      "name": "core::PointerEvents",
+      "data": {
+        "512": {
+          "binary": "Ch8IARIbCAESEFByZXNzIEUgdG8gc3Bhd24dAADIQiAB"
+        }
+      }
+    },
+    {
+      "name": "core::Material",
+      "data": {
+        "512": {
+          "binary": "EhY6FA0AAIA/FZqZWT8dPQrXPiUAAIA/"
+        }
+      }
+    },
+    {
+      "name": "composite::root",
+      "data": {
+        "512": {
+          "binary": "BQAAAGVtcHR5AAAAAA=="
+        },
+        "513": {
+          "binary": "DQAAAG9uZS10cmFuc2Zvcm0AAAAA"
+        },
+        "514": {
+          "binary": "CgAAAGN1YmUtc2NlbmUAAAAA"
+        },
+        "515": {
+          "binary": "DQAAAG9ubHktY2hpbGRyZW4AAAAA"
+        }
+      }
+    }
+  ]
+}

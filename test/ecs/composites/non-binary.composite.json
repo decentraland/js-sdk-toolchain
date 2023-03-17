@@ -1,5 +1,5 @@
 {
-    "id": "cube-scene",
+    "id": "non-binary-composite",
     "components": [
         {
             "name": "core::Transform",
@@ -98,6 +98,35 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        {
+            "name": "composite::root",
+            "data": {
+                "512": {
+                    "$case": "json",
+                    "json": {
+                        "id": "empty"
+                    }
+                },
+                "513": {
+                    "$case": "json",
+                    "json": {
+                        "id": "one-transform"
+                    }
+                },
+                "514": {
+                    "$case": "json",
+                    "json": {
+                        "id": "cube-scene"
+                    }
+                },
+                "515": {
+                    "$case": "json",
+                    "json": {
+                        "id": "only-children"
                     }
                 }
             }
