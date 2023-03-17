@@ -19,7 +19,7 @@ export namespace ambientConfigurations {
   export const BLUE = BABYLON.Color3.FromHexString('#00beff')
 }
 
-export function initEngine(canvas: HTMLCanvasElement) {
+export function initRenderer(canvas: HTMLCanvasElement) {
   const babylon = new BABYLON.Engine(canvas, true, {
     deterministicLockstep: true,
     lockstepMaxSteps: 4,
