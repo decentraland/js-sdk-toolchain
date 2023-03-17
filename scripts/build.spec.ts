@@ -78,8 +78,8 @@ flow('build-all', () => {
     itExecutes('npm i --silent', ECS7_PATH)
     compileEcsComponents(
       `${ECS7_PATH}/src/components`,
-      `${ECS7_PATH}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
-      `${ECS7_PATH}/node_modules/@dcl/protocol/proto/`
+      `${process.cwd()}/node_modules/@dcl/protocol/proto/decentraland/sdk/components`,
+      `${process.cwd()}/node_modules/@dcl/protocol/proto/`
     )
 
     const ECS_COMPOSITE_PATH = path.resolve(ECS7_PATH, 'src/composite/proto')

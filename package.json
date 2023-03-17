@@ -4,6 +4,7 @@
   "description": "",
   "dependencies": {
     "@actions/core": "^1.10.0",
+    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-4449150501.commit-27c8499.tgz",
     "@dcl/quickjs-emscripten": "^0.21.0-3680274614.commit-1808aa1",
     "@types/fs-extra": "^9.0.12",
     "@types/jest": "^28.1.8",
