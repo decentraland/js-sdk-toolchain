@@ -5,6 +5,7 @@ export interface DCLInfo {
   segmentKey?: string
   userId?: string
   trackStats?: boolean
+  userIdentified?: boolean
 }
 
 /* istanbul ignore next */

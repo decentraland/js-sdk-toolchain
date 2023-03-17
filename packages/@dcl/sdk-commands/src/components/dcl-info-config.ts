@@ -24,14 +24,19 @@ export async function createDCLInfoConfigComponent({
     segmentKey: isProduction() ? 'sFdziRVDJo0taOnGzTZwafEL9nLIANZ3' : 'mjCV5Dc4VAKXLJAH5g7LyHyW1jrIR3to'
   }
 
+  let dclInfoConfig: DCLInfo
+
   return {
     async get() {
-      const dclInfoConfig = await getDCLInfoConfig({ fs })
+      if (!dclInfoConfig) {
+        dclInfoConfig = await getDCLInfoConfig({ fs })
+      }
       const envConfig = getEnvConfig()
       const config = { ...defaultConfig, ...dclInfoConfig, ...envConfig }
       return config
     },
     updateDCLInfo(value: Partial<DCLInfo>) {
+      dclInfoConfig = { ...dclInfoConfig, ...value }
       return writeJSON({ fs }, getDclInfoPath(), value)
     },
     async getVersion() {

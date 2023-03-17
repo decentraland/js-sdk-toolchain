@@ -9,34 +9,52 @@ export type IAnalyticsComponent = {
   get(): Analytics
   identify(): Promise<void>
   track<T extends keyof Events>(eventName: T, eventProps: Events[T]): Promise<void>
+  trackSync<T extends keyof Events>(eventName: T, eventProps: Events[T]): void
+  stop(): Promise<void>
 }
 
-type Events = {
+export type Events = {
   'Scene created': {
     projectType: string
     url: string
+    args: Record<string, unknown>
   }
   'Preview started': {
     projectHash: string
     coords: { x: number; y: number }
     isWorkspace: boolean
+    args: Record<string, unknown>
   }
   'Build scene': {
     projectHash: string
     coords: { x: number; y: number }
     isWorkspace: boolean
+    args: Record<string, unknown>
   }
   'Export static': {
     projectHash: string
     coords: { x: number; y: number }
+    args: Record<string, unknown>
   }
   'Scene deploy started': {
     projectHash: string
     coords: { x: number; y: number }
+    isWorld: boolean
+    args: Record<string, unknown>
   }
   'Scene deploy success': {
     projectHash: string
     coords: { x: number; y: number }
+    isWorld: boolean
+    args: Record<string, unknown>
+    dependencies: string[]
+  }
+  'Scene deploy failure': {
+    projectHash: string
+    coords: { x: number; y: number }
+    isWorld: boolean
+    args: Record<string, unknown>
+    error: string
   }
 }
 
@@ -46,20 +64,60 @@ export async function createAnalyticsComponent({
   const USER_ID = 'sdk-commands-user'
   const config = await dclInfoConfig.get()
   const analytics: Analytics = new Analytics({ writeKey: config.segmentKey ?? '' })
+  const promises: Promise<void>[] = []
+
+  async function track<T extends keyof Events>(eventName: T, eventProps: Events[T]) {
+    const trackFuture = future<void>()
+    const { userId, trackStats } = await dclInfoConfig.get()
+    const version = await dclInfoConfig.getVersion()
+    if (!trackStats) {
+      return trackFuture.resolve()
+    }
+
+    const trackInfo = {
+      userId: USER_ID,
+      event: eventName,
+      properties: {
+        ...eventProps,
+        os: process.platform,
+        nodeVersion: process.version,
+        cliVersion: version,
+        isCI: dclInfoConfig.isCI(),
+        isEditor: dclInfoConfig.isEditor(),
+        devId: userId,
+        ecs: {
+          ecsVersion: 'ecs7',
+          packageVersion: version
+        }
+      }
+    }
+    analytics.track(trackInfo, () => {
+      trackFuture.resolve()
+    })
+    if (!dclInfoConfig.isProduction()) {
+      console.log(trackInfo)
+    }
+    return trackFuture
+  }
   return {
     get() {
       return analytics
     },
     async identify() {
+      if (config.userId && !config.trackStats) {
+        return
+      }
+      const userId = config.userId ?? uuidv4()
       if (!config.userId) {
         console.log(
           `Decentraland CLI sends anonymous usage stats to improve their products, if you want to disable it change the configuration at ${colors.bold(
             '~/.dclinfo'
           )}\n`
         )
-
-        const userId = uuidv4()
         await dclInfoConfig.updateDCLInfo({ userId, trackStats: true })
+      }
+      if (!config.userIdentified) {
+        await dclInfoConfig.updateDCLInfo({ userIdentified: true })
         analytics.identify({
           userId: USER_ID,
           traits: {
@@ -69,36 +127,18 @@ export async function createAnalyticsComponent({
         })
       }
     },
-    async track<T extends keyof Events>(eventName: T, eventProps: Events[T]) {
-      const trackFuture = future<void>()
-      const { userId, trackStats } = await dclInfoConfig.get()
-      if (!trackStats) {
-        return trackFuture.resolve()
-      }
-      const trackInfo = {
-        userId: USER_ID,
-        event: eventName,
-        properties: {
-          ...eventProps,
-          os: process.platform,
-          nodeVersion: process.version,
-          cliVersion: await dclInfoConfig.getVersion(),
-          isCI: dclInfoConfig.isCI(),
-          isEditor: dclInfoConfig.isEditor(),
-          devId: userId,
-          ecs: {
-            ecsVersion: 'ecs7',
-            packageVersion: await dclInfoConfig.getVersion()
-          }
-        }
-      }
-      analytics.track(trackInfo, () => {
-        trackFuture.resolve()
-      })
-      if (!dclInfoConfig.isProduction()) {
-        console.log(trackInfo)
-      }
-      return trackFuture
+    trackSync(eventName, eventProps) {
+      const futurePromise = future<void>()
+      promises.push(futurePromise)
+      track(eventName, eventProps)
+        .then(() => {
+          futurePromise.resolve()
+        })
+        .catch((e) => console.log(e))
+    },
+    track,
+    async stop() {
+      await Promise.all(promises)
     }
   }
 }
