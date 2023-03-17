@@ -14,7 +14,6 @@
     "downlevelIteration": true,
     "allowJs": true,
     "resolveJsonModule": true,
-    "keyofStringsOnly": true,
     "strict": true,
     "strictNullChecks": true,
     "strictBindCallApply": true,

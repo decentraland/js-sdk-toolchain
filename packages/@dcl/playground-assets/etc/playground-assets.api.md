@@ -2777,6 +2777,7 @@ export interface UiBackgroundProps {
 
 // @public
 export interface UiButtonProps extends UiLabelProps, EntityPropTypes {
+    disabled?: boolean;
     variant?: 'primary' | 'secondary';
 }
 

@@ -17,7 +17,6 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": false,
     "downlevelIteration": true,
-    "keyofStringsOnly": true,
     "noUnusedLocals": true,
     "lib": ["ES2020"],
     "types": []
