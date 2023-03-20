@@ -1,8 +1,9 @@
+import { createEngine, DataServiceDefinition, initRpcMethods } from '@dcl/inspector'
 import { createRpcServer, RpcServer, RpcServerPort } from '@dcl/rpc'
 import * as codegen from '@dcl/rpc/dist/codegen'
-import { createEngine, DataServiceDefinition, initRpcMethods } from '@dcl/inspector'
 
 import { CliComponents } from '../../../components'
+import { createFsFromNode } from './fs'
 
 export type IEngine = ReturnType<typeof createEngine>
 export type DataLayerContext = {
@@ -17,8 +18,12 @@ export type DataLayerRpc = {
 }
 
 export async function createDataLayerRpc({ fs }: Pick<CliComponents, 'fs'>): Promise<DataLayerRpc> {
-  const engine = createEngine()
-
+  const callbackFunctions: any[] = []
+  const engine = createEngine({
+    onChangeFunction: (entity, operation, component, componentValue) => {
+      callbackFunctions.forEach((func) => func(entity, operation, component, componentValue))
+    }
+  })
   setInterval(() => {
     engine.update(0.016).catch((err: any) => {
       console.error(err)
@@ -26,8 +31,7 @@ export async function createDataLayerRpc({ fs }: Pick<CliComponents, 'fs'>): Pro
     })
   }, 16)
 
-  // TODO: fs is not matching the types here (fs as any)
-  const dataLayer = await initRpcMethods(fs as any, engine)
+  const dataLayer = await initRpcMethods(createFsFromNode(), engine, callbackFunctions)
 
   const rpcServer = createRpcServer<DataLayerContext>({})
   rpcServer.setHandler(rpcHandler)
