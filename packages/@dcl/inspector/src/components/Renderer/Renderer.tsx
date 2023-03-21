@@ -8,9 +8,8 @@ import { ROOT } from '../../lib/sdk/tree'
 
 export function Renderer() {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
-
+  useRenderer(() => canvasRef)
   const sdk = useSdk()
-  const renderer = useRenderer()
 
   const addAsset = async (asset: IAsset) => {
     if (!sdk) return
@@ -38,7 +37,7 @@ export function Renderer() {
     [addAsset]
   )
 
-  drop(renderer(canvasRef))
+  drop(canvasRef)
 
   return (
     <div id="main-editor">

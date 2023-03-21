@@ -10,6 +10,9 @@ import { useCatalog } from './hooks/catalog/useCatalog'
 
 import './index.css'
 
+import { Buffer as MaybeBuffer } from 'buffer'
+globalThis.Buffer = MaybeBuffer
+
 async function initScene() {
   const App = () => {
     const [catalog] = useCatalog()
