@@ -5,9 +5,9 @@ import { setupEcs6Endpoints } from './endpoints'
 import { PreviewComponents } from '../types'
 import { upgradeWebSocketResponse } from '@well-known-components/http-server/dist/ws'
 import { handleDataLayerWs } from '../data-layer/ws'
-import { DataLayerRPC } from '../data-layer/rpc'
+import { DataLayerRpc } from '../data-layer/rpc'
 
-export async function wireRouter(components: PreviewComponents, dir: string, dataLayer?: DataLayerRPC) {
+export async function wireRouter(components: PreviewComponents, dir: string, dataLayer?: DataLayerRpc) {
   const router = new Router<PreviewComponents>()
 
   const sceneUpdateClients = new Set<WebSocket>()

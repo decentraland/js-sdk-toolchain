@@ -6,7 +6,7 @@ import future from 'fp-future'
 import * as BABYLON from '@babylonjs/core'
 
 import { createEditorComponents } from '../../sdk/components'
-import { DataLayerInterface, StreamMessage } from '../../data-layer/types'
+import { DataLayerRpcClient } from '../../data-layer/types'
 import { serializeCrdtMessages } from '../../sdk/crdt-logger'
 import { EcsEntity } from './EcsEntity'
 import { createBetterTransport } from './transport'
@@ -16,6 +16,7 @@ import { putGltfContainerComponent } from './sdkComponents/gltf-container'
 import { putMeshRendererComponent } from './sdkComponents/mesh-renderer'
 import { putTransformComponent } from './sdkComponents/transform'
 import { putEntitySelectedComponent } from './editorComponents/entitySelected'
+import { StreamMessage } from '../../data-layer/proto/gen/data-layer.gen'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -144,7 +145,7 @@ export class SceneContext {
     this.babylon.onEndFrameObservable.removeCallback(this.update)
   }
 
-  async connectDataLayer(dataLayer: DataLayerInterface) {
+  async connectDataLayer(dataLayer: DataLayerRpcClient) {
     const outgoingMessages = new AsyncQueue<StreamMessage>((_, _action) => {
       // console.log('SCENE QUEUE', action)
     })

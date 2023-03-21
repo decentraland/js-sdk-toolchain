@@ -1,9 +1,9 @@
 import { WebSocketTransport } from '@dcl/rpc/dist/transports/WebSocket'
 import { WebSocket } from 'ws'
 
-import { DataLayerRPC } from './rpc'
+import { DataLayerRpc } from './rpc'
 
-export async function handleDataLayerWs(ws: WebSocket, { rpcServer, engine }: DataLayerRPC) {
+export async function handleDataLayerWs(ws: WebSocket, { rpcServer, engine }: DataLayerRpc) {
   const wsTransport = WebSocketTransport(ws as any)
   rpcServer.attachTransport(wsTransport, { engine })
 

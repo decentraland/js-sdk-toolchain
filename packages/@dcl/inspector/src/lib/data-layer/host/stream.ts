@@ -10,8 +10,10 @@ export function stream(
 ): AsyncGenerator<{ data: Uint8Array }> {
   const queue = new AsyncQueue<{ data: Uint8Array }>((_) => {})
 
+  const engineSerialized = serializeEngine(ctx.engine)
+  debugger
   // first we send the fully serialized state over the wire
-  queue.enqueue({ data: serializeEngine(ctx.engine) })
+  queue.enqueue({ data: engineSerialized })
 
   // then create and add the transport
   const transport: Transport = {

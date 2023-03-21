@@ -1,6 +1,6 @@
 import { createRpcServer, RpcServer, RpcServerPort } from '@dcl/rpc'
 import * as codegen from '@dcl/rpc/dist/codegen'
-import { createEngine, initRpcMethods, DataLayerProto } from '@dcl/inspector'
+import { createEngine, DataServiceDefinition, initRpcMethods } from '@dcl/inspector'
 
 import { CliComponents } from '../../../components'
 
@@ -8,7 +8,7 @@ export type IEngine = ReturnType<typeof createEngine>
 export type DataLayerContext = {
   engine: IEngine
 }
-export type DataLayerRPC = {
+export type DataLayerRpc = {
   rpcServer: RpcServer<DataLayerContext>
   /**
    * we use the same engine with multiple transports for all the contexts.
@@ -16,7 +16,7 @@ export type DataLayerRPC = {
   engine: IEngine
 }
 
-export function createDataLayerRpc({ fs }: Pick<CliComponents, 'fs'>): DataLayerRPC {
+export async function createDataLayerRpc({ fs }: Pick<CliComponents, 'fs'>): Promise<DataLayerRpc> {
   const engine = createEngine()
 
   setInterval(() => {
@@ -26,12 +26,15 @@ export function createDataLayerRpc({ fs }: Pick<CliComponents, 'fs'>): DataLayer
     })
   }, 16)
 
-  const dataLayer = initRpcMethods(fs, engine)
+  // TODO: fs is not matching the types here (fs as any)
+  const dataLayer = await initRpcMethods(fs as any, engine)
+
   const rpcServer = createRpcServer<DataLayerContext>({})
   rpcServer.setHandler(rpcHandler)
 
   async function rpcHandler(serverPort: RpcServerPort<DataLayerContext>) {
-    codegen.registerService(serverPort, DataLayerProto.DataServiceDefinition, async () => dataLayer)
+    // TODO: dataLayer as any
+    codegen.registerService(serverPort, DataServiceDefinition, async (port, ctx) => dataLayer as any)
   }
 
   return { rpcServer, engine }
