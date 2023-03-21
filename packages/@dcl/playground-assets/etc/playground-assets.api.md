@@ -532,6 +532,16 @@ export type CompositeProvider = {
     getCompositeOrNull: (id: string) => Composite | null;
 };
 
+// Warning: (ae-missing-release-tag) "compositeToBinary" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function compositeToBinary(composite: Composite): Uint8Array;
+
+// Warning: (ae-missing-release-tag) "compositeToJson" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function compositeToJson(composite: Composite): any;
+
 // @public
 export type ConflictResolutionMessage = PutComponentMessageBody | DeleteComponentMessageBody;
 

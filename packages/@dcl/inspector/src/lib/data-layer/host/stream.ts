@@ -1,5 +1,5 @@
-import { AsyncQueue } from '@well-known-components/pushable-channel'
 import { IEngine, Transport } from '@dcl/ecs'
+import { AsyncQueue } from '@well-known-components/pushable-channel'
 
 import { consumeAllMessagesInto } from '../../logic/consume-stream'
 import { serializeEngine } from './engine'
@@ -11,7 +11,6 @@ export function stream(
   const queue = new AsyncQueue<{ data: Uint8Array }>((_) => {})
 
   const engineSerialized = serializeEngine(ctx.engine)
-  debugger
   // first we send the fully serialized state over the wire
   queue.enqueue({ data: engineSerialized })
 

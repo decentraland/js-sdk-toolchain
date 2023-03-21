@@ -1,3 +1,4 @@
+import { OnChangeFunction } from '@dcl/ecs'
 import { createEngine } from '../host/engine'
 import { initRpcMethods } from '../host/rpc-methods'
 import { DataLayerRpcClient, DataLayerRpcServer, FileSystemInterface } from '../types'
@@ -12,7 +13,12 @@ function wrapRpcClientFromRpcServer(server: DataLayerRpcServer): DataLayerRpcCli
  * @returns
  */
 export async function createLocalDataLayerRpcClient(fs: FileSystemInterface): Promise<DataLayerRpcClient> {
-  const engine = createEngine()
+  const callbackFunctions: OnChangeFunction[] = []
+  const engine = createEngine({
+    onChangeFunction: (entity, operation, component, componentValue) => {
+      callbackFunctions.forEach((func) => func(entity, operation, component, componentValue))
+    }
+  })
 
   // the server (datalayer) should also keep its internal "game loop" to process
   // all the incoming messages. we have this interval easy solution to mock that
@@ -26,7 +32,7 @@ export async function createLocalDataLayerRpcClient(fs: FileSystemInterface): Pr
     })
   }, 16)
 
-  const hostRpc = await initRpcMethods(fs, engine)
+  const hostRpc = await initRpcMethods(fs, engine, callbackFunctions)
 
   return wrapRpcClientFromRpcServer(hostRpc)
 }

@@ -1,50 +1,14 @@
-import { IEngine } from '@dcl/ecs'
+import { Entity, EntityMappingMode, IEngine, instanceComposite, OnChangeFunction } from '@dcl/ecs'
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
+import { dumpEngineToComposite } from './engine-to-composite'
+import { createFsCompositeProvider } from './fs-composite-provider'
 import { stream } from './stream'
 
-import {
-  Composite,
-  compositeFromBinary,
-  compositeFromJson,
-  CompositeProvider,
-  Entity,
-  EntityMappingMode,
-  instanceComposite
-} from '@dcl/ecs'
-
-export async function createFsCompositeProvider(fs: FileSystemInterface): Promise<CompositeProvider> {
-  const compositePaths = (await fs.getDirectoryFiles('')).filter(
-    (item) => item.endsWith('.composite.json') || item.endsWith('.composite')
-  )
-
-  const compositePromises = compositePaths.map(async (itemPath) => {
-    try {
-      if (itemPath.endsWith('.json')) {
-        const compositeContent = await fs.readFile<string>(itemPath, 'string')
-        const json = JSON.parse(compositeContent)
-        const composite = compositeFromJson(json)
-        return composite
-      } else {
-        const compositeContent = await fs.readFile<Uint8Array>(itemPath, 'uint8array')
-        const composite = compositeFromBinary(compositeContent)
-        return composite
-      }
-    } catch (err) {
-      console.error(`Error loading composite ${itemPath}: ${(err as any).toString()}`)
-      return null
-    }
-  })
-
-  const composites = (await Promise.all(compositePromises)).filter((item) => !!item) as Composite[]
-
-  return {
-    getCompositeOrNull(id: string) {
-      return composites.find((item) => item.id === id) || null
-    }
-  }
-}
-
-export async function initRpcMethods(fs: FileSystemInterface, engine: IEngine): Promise<DataLayerRpcServer> {
+export async function initRpcMethods(
+  fs: FileSystemInterface,
+  engine: IEngine,
+  onChanges: OnChangeFunction[]
+): Promise<DataLayerRpcServer> {
   // Look for a composite
   const compositeProvider = await createFsCompositeProvider(fs)
   const mainComposite = compositeProvider.getCompositeOrNull('main')
@@ -57,6 +21,24 @@ export async function initRpcMethods(fs: FileSystemInterface, engine: IEngine): 
       }
     })
   }
+
+  let dirty = false
+  onChanges.push(() => {
+    dirty = true
+  })
+
+  engine.addSystem(function () {
+    if (dirty) {
+      dirty = false
+
+      // TODO: hardcoded for the moment
+      const composite = dumpEngineToComposite(engine, 'json')
+      // TODO: the ID should be the selected composite id name
+      composite.id = 'main'
+
+      compositeProvider.save(composite, 'json').catch((err) => console.error(`Save composite fails: `, err))
+    }
+  }, -1_000_000_000)
 
   return {
     async redo() {
