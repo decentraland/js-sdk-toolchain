@@ -90,6 +90,7 @@ interface PackageJson {
   devDependencies: Record<string, string>
 }
 
+/* istanbul ignore next */
 export async function getPackageJson(components: Pick<CliComponents, 'fs'>, projectRoot: string) {
   try {
     const packageJsonRaw = await components.fs.readFile(resolve(projectRoot, 'package.json'), 'utf8')

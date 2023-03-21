@@ -1,12 +1,6 @@
 import path from 'path'
 import { CliComponents } from '../components'
-
-export interface DCLInfo {
-  segmentKey?: string
-  userId?: string
-  trackStats?: boolean
-  userIdentified?: boolean
-}
+import { DCLInfo } from './dcl-info'
 
 /* istanbul ignore next */
 export const getDclInfoPath = () =>

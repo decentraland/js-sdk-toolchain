@@ -1,6 +1,7 @@
 import path, { resolve } from 'path'
 import { CliComponents } from '.'
-import { DCLInfo, getDCLInfoConfig, getDclInfoPath, getEnvConfig } from '../logic/config'
+import { getDCLInfoConfig, getDclInfoPath, getEnvConfig } from '../logic/config'
+import { DCLInfo } from '../logic/dcl-info'
 import { readJSON, writeJSON } from '../logic/fs'
 
 export type IDCLInfoConfigComponent = {

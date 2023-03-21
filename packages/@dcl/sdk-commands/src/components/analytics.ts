@@ -4,6 +4,7 @@ import future from 'fp-future'
 
 import { CliComponents } from '.'
 import { colors } from './log'
+import { DCLInfo } from '../logic/dcl-info'
 
 export type IAnalyticsComponent = {
   get(): Analytics
@@ -108,16 +109,17 @@ export async function createAnalyticsComponent({
         return
       }
       const userId = config.userId ?? uuidv4()
+      let dclInfo: DCLInfo = {}
       if (!config.userId) {
+        dclInfo = { userId, trackStats: true }
         console.log(
           `Decentraland CLI sends anonymous usage stats to improve their products, if you want to disable it change the configuration at ${colors.bold(
             '~/.dclinfo'
           )}\n`
         )
-        await dclInfoConfig.updateDCLInfo({ userId, trackStats: true })
       }
       if (!config.userIdentified) {
-        await dclInfoConfig.updateDCLInfo({ userIdentified: true })
+        dclInfo.userIdentified = true
         analytics.identify({
           userId: USER_ID,
           traits: {
@@ -126,15 +128,16 @@ export async function createAnalyticsComponent({
           }
         })
       }
+      if (Object.keys(dclInfo).length) {
+        await dclInfoConfig.updateDCLInfo(dclInfo)
+      }
     },
     trackSync(eventName, eventProps) {
       const futurePromise = future<void>()
       promises.push(futurePromise)
-      track(eventName, eventProps)
-        .then(() => {
-          futurePromise.resolve()
-        })
-        .catch((e) => console.log(e))
+      void track(eventName, eventProps).then(() => {
+        futurePromise.resolve()
+      })
     },
     track,
     async stop() {
