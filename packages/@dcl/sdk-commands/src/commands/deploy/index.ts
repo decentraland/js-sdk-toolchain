@@ -7,13 +7,14 @@ import { ethSign } from '@dcl/crypto/dist/crypto'
 
 import { CliComponents } from '../../components'
 import { IFile, getBaseCoords, getFiles, getValidSceneJson, validateFilesSizes } from '../../logic/scene-validations'
-import { getArgs } from '../../logic/args'
+import { getArgs, getArgsUsed } from '../../logic/args'
 import { npmRun } from '../../logic/project-validations'
 import { runLinkerApp, LinkerResponse } from './linker-dapp/api'
 import { CliError } from '../../logic/error'
 import { printProgressInfo, printSuccess } from '../../logic/beautiful-logs'
 import { createWallet } from '../../logic/account'
-import { b64HashingFunction } from '../../logic/project-files'
+import { b64HashingFunction, getPackageJson } from '../../logic/project-files'
+import { Events } from '../../components/analytics'
 
 interface Options {
   args: typeof args
@@ -74,12 +75,19 @@ export async function main(options: Options) {
 
   const sceneJson = await getValidSceneJson(options.components, projectRoot)
   const coords = getBaseCoords(sceneJson)
-  const analyticsOpts = {
+  const isWorld = !!Object.keys(sceneJson.worldConfiguration || {}).length
+  const trackProps: Events['Scene deploy started'] = {
     projectHash: await b64HashingFunction(projectRoot),
-    coords
+    coords,
+    isWorld,
+    args: getArgsUsed(options.args)
   }
+  const packageJson = await getPackageJson(options.components, projectRoot)
+  const dependencies = Array.from(
+    new Set([...Object.keys(packageJson.dependencies || {}), ...Object.keys(packageJson.devDependencies || {})])
+  )
 
-  await options.components.analytics.track('Scene deploy started', analyticsOpts)
+  options.components.analytics.trackSync('Scene deploy started', trackProps)
 
   if (!skipBuild) {
     await npmRun(projectRoot, 'build')
@@ -137,10 +145,10 @@ export async function main(options: Options) {
     printSuccess(options.components.logger, 'Content uploaded', sceneUrl)
   } catch (e: any) {
     error('Could not upload content:')
-    console.log(e)
+    console.log(e.message)
+    options.components.analytics.trackSync('Scene deploy failure', { ...trackProps, error: e.message ?? '' })
   }
-
-  await options.components.analytics.track('Scene deploy success', analyticsOpts)
+  options.components.analytics.trackSync('Scene deploy success', { ...trackProps, dependencies })
 }
 
 async function getCatalyst(target?: string, targetContent?: string) {

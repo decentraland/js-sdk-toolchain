@@ -5,7 +5,7 @@ import future from 'fp-future'
 
 import { CliComponents } from '../../components'
 import { main as build } from '../build'
-import { getArgs } from '../../logic/args'
+import { getArgs, getArgsUsed } from '../../logic/args'
 import { needsDependencies, npmRun } from '../../logic/project-validations'
 import { getBaseCoords, getValidSceneJson } from '../../logic/scene-validations'
 import { CliError } from '../../logic/error'
@@ -98,7 +98,7 @@ export async function main(options: Options) {
 
   // then start the embedded compiler, this can be disabled with --no-watch
   if (watch) {
-    await build({ ...options, args: { '--dir': projectRoot, '--watch': watch } })
+    await build({ ...options, args: { '--dir': projectRoot, '--watch': watch, _: [] } })
   }
 
   const sceneJson = await getValidSceneJson(options.components, projectRoot)
@@ -110,7 +110,6 @@ export async function main(options: Options) {
   }
 
   const port = await getPort(options.args['--port'])
-
   const program = await Lifecycle.run<PreviewComponents>({
     async initComponents() {
       const metrics = createTestMetricsComponent(roomsMetrics)
@@ -161,10 +160,11 @@ export async function main(options: Options) {
 
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []
-      await components.analytics.track('Preview started', {
+      components.analytics.trackSync('Preview started', {
         projectHash: await b64HashingFunction(projectRoot),
         coords: baseCoords,
-        isWorkspace: false
+        isWorkspace: false,
+        args: getArgsUsed(options.args)
       })
       components.logger.log(`Preview server is now running!`)
       components.logger.log('Available on:\n')

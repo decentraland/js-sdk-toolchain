@@ -1,6 +1,6 @@
 import { resolve } from 'path'
 import { CliComponents } from '../../components'
-import { getArgs } from '../../logic/args'
+import { getArgs, getArgsUsed } from '../../logic/args'
 import { compile } from '@dcl/dcl-rollup/compile'
 import future from 'fp-future'
 import { assertValidProjectFolder, installDependencies, needsDependencies } from '../../logic/project-validations'
@@ -8,7 +8,7 @@ import { getBaseCoords, getValidSceneJson } from '../../logic/scene-validations'
 import { b64HashingFunction } from '../../logic/project-files'
 
 interface Options {
-  args: Omit<typeof args, '_'>
+  args: typeof args
   components: Pick<CliComponents, 'fs' | 'logger' | 'dclInfoConfig' | 'analytics'>
 }
 
@@ -64,10 +64,11 @@ export async function main(options: Options) {
   const sceneJson = await getValidSceneJson(options.components, projectRoot)
   const coords = getBaseCoords(sceneJson)
 
-  await options.components.analytics.track('Build scene', {
+  options.components.analytics.trackSync('Build scene', {
     projectHash: await b64HashingFunction(projectRoot),
     coords,
-    isWorkspace: false
+    isWorkspace: false,
+    args: getArgsUsed(options.args)
   })
 
   await watchingFuture
