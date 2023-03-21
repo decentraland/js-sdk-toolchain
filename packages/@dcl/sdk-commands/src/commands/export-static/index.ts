@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { getArgs } from '../../logic/args'
+import { getArgs, getArgsUsed } from '../../logic/args'
 import { hashV1 } from '@dcl/hashing'
 import { CliComponents } from '../../components'
 import { assertValidProjectFolder } from '../../logic/project-validations'
@@ -141,9 +141,10 @@ export async function main(options: Options) {
   const sceneJson = await getValidSceneJson(options.components, projectRoot)
   const coords = getBaseCoords(sceneJson)
 
-  await options.components.analytics.track('Export static', {
+  options.components.analytics.trackSync('Export static', {
     projectHash: await b64HashingFunction(projectRoot),
-    coords
+    coords,
+    args: getArgsUsed(options.args)
   })
 
   return { urn, entityId, destination: destDirectory }

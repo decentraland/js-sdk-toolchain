@@ -14,9 +14,10 @@ export function removeEmptyKeys(obj: Record<string, unknown>) {
 }
 
 export type DCLInfo = {
+  userIdentified?: boolean
   fileExists?: boolean
-  userId: string
-  trackStats: boolean
+  userId?: string
+  trackStats?: boolean
   provider?: string
   MANAToken?: string
   LANDRegistry?: string

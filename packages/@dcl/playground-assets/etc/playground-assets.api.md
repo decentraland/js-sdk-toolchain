@@ -730,6 +730,18 @@ export type EntityContainer = {
     updateUsedEntity(entity: Entity): boolean;
 };
 
+// Warning: (ae-missing-release-tag) "EntityMappingMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export enum EntityMappingMode {
+    // (undocumented)
+    EMM_DIRECT_MAPPING = 2,
+    // (undocumented)
+    EMM_NEXT_AVAILABLE = 1,
+    // (undocumented)
+    EMM_NONE = 0
+}
+
 // @public
 export interface EntityPropTypes extends Listeners {
     key?: Key;
@@ -1138,7 +1150,22 @@ export const inputSystem: IInputSystem;
 // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 //
 // @public @deprecated
-export function instanceComposite(engine: IEngine, compositeData: Composite, getNextAvailableEntity: () => Entity | null, compositeProvider: CompositeProvider, rootEntity?: Entity, alreadyRequestedId?: Set<string>): Entity;
+export function instanceComposite(engine: IEngine, compositeData: Composite, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): Entity;
+
+// Warning: (ae-missing-release-tag) "InstanceCompositeOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type InstanceCompositeOptions = {
+    entityMapping?: {
+        type: EntityMappingMode.EMM_NEXT_AVAILABLE;
+        getNextAvailableEntity: () => Entity | null;
+    } | {
+        type: EntityMappingMode.EMM_DIRECT_MAPPING;
+        getCompositeEntity: (compositeEntity: Entity | number) => Entity;
+    };
+    rootEntity?: Entity;
+    alreadyRequestedId?: Set<string>;
+};
 
 // @public (undocumented)
 export interface ISchema<T = any> {

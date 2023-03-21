@@ -3,7 +3,7 @@ import { CliComponents } from '../components'
 import { getDCLIgnorePatterns } from './dcl-ignore'
 import { sync as globSync } from 'glob'
 import ignore from 'ignore'
-import path from 'path'
+import path, { resolve } from 'path'
 import { CliError } from './error'
 
 /**
@@ -84,3 +84,19 @@ export async function getProjectContentMappings(
 }
 
 export const b64HashingFunction = async (str: string) => 'b64-' + Buffer.from(str).toString('base64')
+
+interface PackageJson {
+  dependencies: Record<string, string>
+  devDependencies: Record<string, string>
+}
+
+/* istanbul ignore next */
+export async function getPackageJson(components: Pick<CliComponents, 'fs'>, projectRoot: string) {
+  try {
+    const packageJsonRaw = await components.fs.readFile(resolve(projectRoot, 'package.json'), 'utf8')
+    const packageJson = JSON.parse(packageJsonRaw) as PackageJson
+    return packageJson
+  } catch (err: any) {
+    throw new CliError(`Error reading the package.json file: ${err.message}`)
+  }
+}

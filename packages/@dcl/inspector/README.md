@@ -1,12 +1,10 @@
-#### This project was bootstrapped using Create React App. Check official [README.md](https://github.com/facebook/create-react-app/blob/main/packages/cra-template/template/README.md) file.
 
 # Inspector
 
-## Installing dependencies
-Run `make install`, this will run the `npm install` and other dependencies
+## Developing 
+Run `npm start` to spawn esbuild in `watch` mode. This serves the `public/` folder, every change triggers rebuilding the `bundle.js` and you'll need refresh the page. The server created is in `localhost:8000` by default, an initial message is printed but it probably quickly missed. 
 
-## Building
-Run `make build`
+This also rebuilds the library section (data-layer) and exposes in `dist/` folder.
 
-## Testing
-Run `make test`, you can also debug the test in VS code, selecting the launch `Jest current file` or just `Jest` (this will run all test)
+## Build
+The `make build ` in the repo root builds all the necessary for package publishment. 
