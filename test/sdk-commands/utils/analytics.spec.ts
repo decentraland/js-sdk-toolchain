@@ -11,12 +11,16 @@ describe('Analytics Component', () => {
   it('should create dclinfo file', async () => {
     const fs = createFsComponent()
     const dclInfoConfig = await createDCLInfoConfigComponent({ fs })
-    jest.spyOn(dclInfoConfig, 'get').mockResolvedValue({ userId: '' })
+    jest.spyOn(dclInfoConfig, 'get').mockResolvedValue({ userId: undefined })
     const analytics = await createAnalyticsComponent({ dclInfoConfig })
 
     const updateDclInfoSpy = jest.spyOn(dclInfoConfig, 'updateDCLInfo').mockImplementation()
     await analytics.identify()
-    expect(updateDclInfoSpy).toBeCalledTimes(1)
+    expect(updateDclInfoSpy).toBeCalledWith({
+      userId: expect.stringMatching('-'),
+      trackStats: true,
+      userIdentified: true
+    })
   })
 
   it('should not track if trackStats is false', async () => {
@@ -25,7 +29,7 @@ describe('Analytics Component', () => {
     jest.spyOn(dclInfoConfig, 'get').mockResolvedValue({ trackStats: false })
     const analytics = await createAnalyticsComponent({ dclInfoConfig })
     const trackSpy = jest.spyOn(analytics.get(), 'track')
-    await analytics.track('Scene created', { projectType: '', url: '' })
+    await analytics.track('Scene created', { projectType: '', url: '', args: {} })
     expect(trackSpy).toBeCalledTimes(0)
   })
 
@@ -35,7 +39,7 @@ describe('Analytics Component', () => {
     jest.spyOn(dclInfoConfig, 'get').mockResolvedValue({ userId: 'boedo', trackStats: true })
     const analytics = await createAnalyticsComponent({ dclInfoConfig })
     const trackSpy = jest.spyOn(analytics.get(), 'track')
-    await analytics.track('Scene created', { projectType: '', url: '' })
+    await analytics.track('Scene created', { projectType: '', url: '', args: {} })
     expect(trackSpy).toBeCalledWith(
       {
         userId: 'sdk-commands-user',
@@ -52,10 +56,41 @@ describe('Analytics Component', () => {
           ecs: {
             ecsVersion: 'ecs7',
             packageVersion: 'unknown'
-          }
+          },
+          args: {}
         }
       },
       expect.anything()
     )
+  })
+  it('should not call identify if it has been identified.', async () => {
+    const fs = createFsComponent()
+    const dclInfoConfig = await createDCLInfoConfigComponent({ fs })
+    jest.spyOn(dclInfoConfig, 'get').mockResolvedValue({ userId: 'boedo', trackStats: true, userIdentified: true })
+    const analytics = await createAnalyticsComponent({ dclInfoConfig })
+    const spyIdentify = jest.spyOn(analytics.get(), 'identify')
+    await analytics.identify()
+    expect(spyIdentify).not.toBeCalled()
+  })
+
+  it('should not call identify if trackStats is false', async () => {
+    const fs = createFsComponent()
+    const dclInfoConfig = await createDCLInfoConfigComponent({ fs })
+    jest.spyOn(dclInfoConfig, 'get').mockResolvedValue({ userId: 'boedo', trackStats: false })
+    const analytics = await createAnalyticsComponent({ dclInfoConfig })
+    const spyIdentify = jest.spyOn(analytics.get(), 'identify')
+    await analytics.identify()
+    expect(spyIdentify).not.toBeCalled()
+  })
+
+  it('should wait for promises to finished', async () => {
+    const fs = createFsComponent()
+    const dclInfoConfig = await createDCLInfoConfigComponent({ fs })
+    jest.spyOn(dclInfoConfig, 'get').mockResolvedValue({ userId: 'boedo', trackStats: true, userIdentified: true })
+    const analytics = await createAnalyticsComponent({ dclInfoConfig })
+    const spyTrack = jest.spyOn(analytics.get(), 'track')
+    analytics.trackSync('Build scene', {} as any)
+    await analytics.stop()
+    expect(spyTrack).toBeCalled()
   })
 })

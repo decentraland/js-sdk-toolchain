@@ -1,6 +1,6 @@
 import { join, resolve } from 'path'
 
-import { getArgs } from '../../logic/args'
+import { getArgs, getArgsUsed } from '../../logic/args'
 import { CliError } from '../../logic/error'
 import { CliComponents } from '../../components'
 import { isDirectoryEmpty, download, extract } from '../../logic/fs'
@@ -44,7 +44,7 @@ export async function main(options: Options) {
   if (shouldInstallDeps && !options.args['--skip-install']) {
     await installDependencies(options.components, dir)
   }
-  await options.components.analytics.track('Scene created', { projectType: scene, url })
+  options.components.analytics.trackSync('Scene created', { projectType: scene, url, args: getArgsUsed(options.args) })
 }
 
 const moveFilesFromDir = async (components: Pick<CliComponents, 'fs'>, dir: string, folder: string) => {
