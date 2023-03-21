@@ -133,11 +133,7 @@ export async function createAnalyticsComponent({
       }
     },
     trackSync(eventName, eventProps) {
-      const futurePromise = future<void>()
-      promises.push(futurePromise)
-      void track(eventName, eventProps).then(() => {
-        futurePromise.resolve()
-      })
+      promises.push(track(eventName, eventProps))
     },
     track,
     async stop() {
