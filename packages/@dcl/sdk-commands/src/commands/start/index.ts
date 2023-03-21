@@ -23,7 +23,7 @@ import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
 import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
 import { b64HashingFunction } from '../../logic/project-files'
-import { createDataLayerRpc } from './data-layer/rpc'
+import { createDataLayer } from './data-layer/rpc'
 
 interface Options {
   args: typeof args
@@ -151,7 +151,7 @@ export async function main(options: Options) {
       }
     },
     async main({ components, startComponents }) {
-      const dataLayerRpc = withDataLayer ? await createDataLayerRpc({ fs: components.fs }) : undefined
+      const dataLayerRpc = withDataLayer ? await createDataLayer({ fs: components.fs }) : undefined
       await wireRouter(components, projectRoot, dataLayerRpc)
       if (watch) {
         await wireFileWatcherToWebSockets(components, projectRoot)

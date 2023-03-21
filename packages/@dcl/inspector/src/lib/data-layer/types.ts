@@ -2,23 +2,12 @@ import { IEngine } from '@dcl/ecs'
 import { RpcClientModule, RpcServerModule } from '@dcl/rpc/dist/codegen'
 import { DataServiceDefinition } from './proto/gen/data-layer.gen'
 
-export type SupportedFormat =
-  | {
-      type: 'string'
-      format: string
-    }
-  | {
-      type: 'uint8array'
-      format: Uint8Array
-    }
-
+// minimal file system interface based on Node.js FileSystem API
 export type FileSystemInterface = {
   existFile: (filePath: string) => Promise<boolean>
-  readFile: <T = string | Uint8Array>(filePath: string, format: 'string' | 'uint8array') => Promise<T>
-
-  writeFile: (filePath: string, content: Uint8Array | string) => Promise<void>
-
-  getDirectoryFiles: (dirPath: string) => Promise<string[]>
+  readFile: (filePath: string) => Promise<Buffer>
+  writeFile: (filePath: string, content: Buffer) => Promise<void>
+  readdir: (dirPath: string) => Promise<{ name: string; isDirectory: boolean }[]>
 }
 
 export type DataLayerContext = {

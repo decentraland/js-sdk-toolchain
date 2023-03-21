@@ -13,14 +13,14 @@ export type CompositeManager = CompositeProvider & {
 }
 
 export async function createFsCompositeProvider(fs: FileSystemInterface): Promise<CompositeManager> {
-  const compositePaths = (await fs.getDirectoryFiles('')).filter(
-    (item) => item.endsWith('.composite.json') || item.endsWith('.composite')
-  )
+  const compositePaths = (await fs.readdir('./'))
+    .filter((item) => item.name.endsWith('.composite.json') || item.name.endsWith('.composite'))
+    .map((item) => item.name)
 
   const compositePromises = compositePaths.map(async (itemPath) => {
     try {
       if (itemPath.endsWith('.json')) {
-        const compositeContent = await fs.readFile<string>(itemPath, 'string')
+        const compositeContent = (await fs.readFile(itemPath)).toString()
         const json = JSON.parse(compositeContent)
         const composite = compositeFromJson(json)
         return {
@@ -28,7 +28,7 @@ export async function createFsCompositeProvider(fs: FileSystemInterface): Promis
           composite
         }
       } else {
-        const compositeContent = await fs.readFile<Uint8Array>(itemPath, 'uint8array')
+        const compositeContent = new Uint8Array(await fs.readFile(itemPath))
         const composite = compositeFromBinary(compositeContent)
         return {
           filePath: itemPath,
@@ -53,9 +53,12 @@ export async function createFsCompositeProvider(fs: FileSystemInterface): Promis
       const oldComposite = composites.find((item) => item?.composite.id === composite.id)
       if (oldComposite?.filePath) {
         if (type === 'binary') {
-          await fs.writeFile(oldComposite.filePath, compositeToBinary(composite))
+          await fs.writeFile(oldComposite.filePath, Buffer.from(compositeToBinary(composite)))
         } else {
-          await fs.writeFile(oldComposite.filePath, JSON.stringify(compositeToJson(composite), null, 2))
+          await fs.writeFile(
+            oldComposite.filePath,
+            Buffer.from(JSON.stringify(compositeToJson(composite), null, 2), 'utf-8')
+          )
         }
       }
     }

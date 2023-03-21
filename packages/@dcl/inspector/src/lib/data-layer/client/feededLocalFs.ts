@@ -109,6 +109,6 @@ const mainComposite = {
 
 export function feededFileSystem() {
   return createFsInMemory({
-    'assets/main.composite.json': JSON.stringify(mainComposite)
+    'assets/main.composite.json': Buffer.from(JSON.stringify(mainComposite), 'utf-8')
   })
 }
