@@ -6,6 +6,8 @@ import { createEditorComponents } from '../../sdk/components'
 export function serializeEngine(engine: IEngine) {
   const messages: ByteBuffer = new ReadWriteByteBuffer()
 
+  debugger
+
   for (const component of engine.componentsIter()) {
     component.dumpCrdtStateToBuffer(messages)
   }

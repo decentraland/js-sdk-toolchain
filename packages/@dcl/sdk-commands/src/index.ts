@@ -70,7 +70,7 @@ async function main() {
       }
     }
   }
-
+  await components.analytics.stop()
   // rollup watcher leaves many open FSWatcher even in build mode. we must call
   // process.exit at this point to prevent the program halting forever
   process.exit(process.exitCode || 0)
