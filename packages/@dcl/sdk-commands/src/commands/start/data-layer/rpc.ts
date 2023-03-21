@@ -1,10 +1,6 @@
 import { createEngine, DataServiceDefinition, initRpcMethods } from '@dcl/inspector'
 import { createRpcServer, RpcServer, RpcServerPort } from '@dcl/rpc'
 import * as codegen from '@dcl/rpc/dist/codegen'
-<<<<<<< HEAD
-import { createEngine, DataServiceDefinition, initRpcMethods } from '@dcl/inspector'
-=======
->>>>>>> feat/integrate-data-layer-filesystem
 
 import { CliComponents } from '../../../components'
 import { createFsFromNode } from './fs'
