@@ -26,7 +26,7 @@ describe('build command', () => {
     const installDependenciesSpy = jest.spyOn(projectValidation, 'installDependencies').mockRejectedValue(undefined)
 
     try {
-      await build.main({ args: {}, components })
+      await build.main({ args: { _: [] }, components })
     } catch (_) {}
 
     expect(needsDependenciesSpy).toBeCalledWith(components, process.cwd())
@@ -41,7 +41,7 @@ describe('build command', () => {
     const installDependenciesSpy = jest.spyOn(projectValidation, 'installDependencies').mockRejectedValue(undefined)
 
     try {
-      await build.main({ args: {}, components })
+      await build.main({ args: { _: [] }, components })
     } catch (_) {}
 
     expect(needsDependenciesSpy).toBeCalledWith(components, process.cwd())
@@ -57,7 +57,7 @@ describe('build command', () => {
     const installDependenciesSpy = jest.spyOn(projectValidation, 'installDependencies').mockRejectedValue(undefined)
 
     try {
-      await build.main({ args: { '--skip-install': true }, components })
+      await build.main({ args: { _: [], '--skip-install': true }, components })
     } catch (_) {}
     expect(needsDependenciesSpy).toBeCalledWith(components, process.cwd())
     expect(installDependenciesSpy).not.toBeCalled()
@@ -71,7 +71,7 @@ describe('build command', () => {
     const tsBuildSpy = jest.spyOn(dclCompiler, 'compile').mockResolvedValue(null as any)
 
     await build.main({
-      args: { '--watch': false, '--production': true },
+      args: { _: [], '--watch': false, '--production': true },
       components
     })
 

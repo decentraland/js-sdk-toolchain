@@ -17,3 +17,8 @@ export function getArgs<T extends Args>(args: T): Result<typeof DEFAULT_ARGS & T
 export function getArgs<T extends Args>(args?: T) {
   return arg({ ...DEFAULT_ARGS, ...args }, { permissive: true })
 }
+
+export function getArgsUsed(value: Result<typeof DEFAULT_ARGS>): Record<string, unknown> {
+  const { _, ...args } = value
+  return args
+}
