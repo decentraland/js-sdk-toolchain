@@ -30,6 +30,10 @@ export function createInMemoryStorage(initialFs: Record<string, Buffer> = {}) {
 
 export function createFsInMemory(initialFs: Record<string, Buffer> = {}): FileSystemInterface {
   const fs = createInMemoryStorage(initialFs)
+  debugger
+  // BEGIN: FOR DEBUGGING PROPORSES (You can inspect it in the console)
+  ;(globalThis as any).inMemoryStorage = fs
+  // END: FOR DEBUGGING PROPORSES
 
   return {
     async existFile(filePath: string): Promise<boolean> {
@@ -42,10 +46,14 @@ export function createFsInMemory(initialFs: Record<string, Buffer> = {}): FileSy
       return fs.writeFile(filePath, content)
     },
     async readdir(dirPath: string): Promise<{ name: string; isDirectory: boolean }[]> {
-      const filesInDirectory = Array.from(fs.storage.keys()).filter((item) => item.startsWith(dirPath))
-
       // TODO:
-      return []
+      //  => This implementation doesn't match with Nodejs one, it aproaches to a more recursive one
+      //  => To match it, filter deeper file path is neccesary, in the Internal Storage map, there is no directory
+      //    so it's also necessary to generate them on the fly
+
+      return Array.from(fs.storage.keys())
+        .filter((item) => item.startsWith(dirPath))
+        .map((name) => ({ name, isDirectory: false }))
     }
   }
 }
