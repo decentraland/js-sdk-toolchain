@@ -30,10 +30,9 @@ export function createInMemoryStorage(initialFs: Record<string, Buffer> = {}) {
 
 export function createFsInMemory(initialFs: Record<string, Buffer> = {}): FileSystemInterface {
   const fs = createInMemoryStorage(initialFs)
-  debugger
-  // BEGIN: FOR DEBUGGING PROPORSES (You can inspect it in the console)
+
+  // FOR DEBUGGING PROPORSES (You can inspect it in the console)
   ;(globalThis as any).inMemoryStorage = fs
-  // END: FOR DEBUGGING PROPORSES
 
   return {
     async existFile(filePath: string): Promise<boolean> {

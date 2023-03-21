@@ -14,7 +14,7 @@ export type DataLayer = {
   context: DataLayerContext
 }
 
-export async function createDataLayer({ fs }: Pick<CliComponents, 'fs'>): Promise<DataLayer> {
+export async function createDataLayer({ fs: _fs }: Pick<CliComponents, 'fs'>): Promise<DataLayer> {
   // TODO: implement createFsFromIFileSystemComponent(fs)
   const dataLayerHost = await createDataLayerHost(createFsFromNode())
   const context: DataLayerContext = {
@@ -24,7 +24,7 @@ export async function createDataLayer({ fs }: Pick<CliComponents, 'fs'>): Promis
 
   async function rpcHandler(serverPort: RpcServerPort<DataLayerContext>) {
     // TODO: dataLayer as any
-    codegen.registerService(serverPort, DataServiceDefinition, async (_port, ctx) => dataLayerHost.rpcMethods as any)
+    codegen.registerService(serverPort, DataServiceDefinition, async (_port, _ctx) => dataLayerHost.rpcMethods as any)
   }
   rpcServer.setHandler(rpcHandler)
 
