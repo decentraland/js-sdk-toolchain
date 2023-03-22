@@ -11,13 +11,27 @@ flow('build-all', () => {
 
   const graph = getMonorepoGraph()
 
-  flow('@dcl/sdk', () => {
+  function resolveProjectPath(packageName: string) {
+    return resolve(process.cwd(), './packages/', packageName)
+  }
+
+  flow('monorepo has no dependency cycles', () => {
     detectCyclesTest(graph)
+  })
 
-    function resolveProjectPath(packageName: string) {
-      return resolve(process.cwd(), './packages/', packageName)
+  flow('update versions of packages.json copying it from @dcl/sdk', () => {
+    const { version } = JSON.parse(readFileSync(resolve('./packages/@dcl/sdk/package.json'), 'utf8'))
+
+    for (const dependency of processWithOptimisticDependencies(graph)) {
+      const projectDirectory = resolveProjectPath(dependency)
+      itExecutes(
+        `npm version ${JSON.stringify(version)} --force --no-git-tag-version --allow-same-version`,
+        projectDirectory
+      )
     }
+  })
 
+  flow('resolve and install dependencies', () => {
     for (const dependency of processWithOptimisticDependencies(graph)) {
       const projectDirectory = resolveProjectPath(dependency)
       installCrossDependencies(projectDirectory)

@@ -1,0 +1,9 @@
+{
+  "versionGroups": [
+    {
+      "packages": ["**"],
+      "dependencies": ["@dcl/dcl-rollup", "@dcl/ecs", "@dcl/inspector", "@dcl/js-runtime", "@dcl/playground-assets", "@dcl/sdk", "@dcl/sdk-commands", "@dcl/react-ecs"],
+      "isIgnored": true
+    }
+  ]
+}

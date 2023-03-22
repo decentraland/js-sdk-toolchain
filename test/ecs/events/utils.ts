@@ -1,11 +1,11 @@
-import { PointerEventType, InputAction, Entity } from '../../../packages/@dcl/ecs/src'
+import { PointerEventType, InputAction, Entity, PBPointerEventsResult } from '../../../packages/@dcl/ecs/src'
 
 export function createTestPointerDownCommand(
   entity: Entity,
   timestamp: number,
   state: PointerEventType,
   button: InputAction = InputAction.IA_POINTER
-) {
+): PBPointerEventsResult {
   return {
     button,
     timestamp: timestamp,
@@ -14,7 +14,7 @@ export function createTestPointerDownCommand(
       length: 10,
       direction: { x: 1, y: 2, z: 3 },
       normalHit: { x: 1, y: 2, z: 3 },
-      origin: { x: 1, y: 2, z: 3 },
+      globalOrigin: { x: 1, y: 2, z: 3 },
       meshName: 'mesh',
       entityId: entity as number
     },

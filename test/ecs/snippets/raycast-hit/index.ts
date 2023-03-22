@@ -34,8 +34,12 @@ pointerEventsSystem.onPointerDown(
   cubeEntity,
   () => {
     Raycast.createOrReplace(raycastEntity, {
-      origin: Vector3.create(8, 1, 0.1),
-      direction: Vector3.create(0, 0, 1),
+      continuous: true,
+      timestamp: 0,
+      direction: {
+        $case: 'localDirection',
+        localDirection: Vector3.Forward()
+      },
       maxDistance: 16,
       queryType: RaycastQueryType.RQT_HIT_FIRST
     })
@@ -50,8 +54,9 @@ pointerEventsSystem.onPointerDown(
 let lastRaycastTimestamp = -1
 engine.addSystem(() => {
   for (const [_entity, result] of engine.getEntitiesWith(RaycastResult)) {
-    if (result.hits?.length === 0 || result.timestamp <= lastRaycastTimestamp) continue
-    lastRaycastTimestamp = result.timestamp
+    const timestamp = result.timestamp ?? 0
+    if (result.hits?.length === 0 || timestamp <= lastRaycastTimestamp) continue
+    lastRaycastTimestamp = timestamp
 
     if (result.hits[0] && result.hits[0].position) {
       createCube(result.hits[0].position.x, result.hits[0].position.y, result.hits[0].position.z, 0.3)

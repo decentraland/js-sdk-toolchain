@@ -1,45 +1,40 @@
 {
   "name": "@dcl/react-ecs",
-  "version": "0.0.1",
   "description": "Decentraland ECS",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "scripts": {
-    "build": "tsc -p tsconfig.json"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/decentraland/js-sdk-toolchain.git"
-  },
-  "keywords": [
-    "dcl",
-    "react",
-    "ecs",
-    "@dcl/react-ecs"
-  ],
+  "version": "0.0.1",
   "author": "DCL",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/decentraland/js-sdk-toolchain/issues"
-  },
-  "homepage": "https://github.com/decentraland/js-sdk-toolchain#readme",
-  "devDependencies": {
-    "@types/react": "^18.0.18",
-    "@types/react-reconciler": "^0.28.0"
-  },
+  "bugs": "https://github.com/decentraland/js-sdk-toolchain/issues",
   "dependencies": {
     "@dcl/ecs": "file:../ecs",
     "react": "^18.2.0",
     "react-reconciler": "^0.29.0"
   },
+  "devDependencies": {
+    "@types/react": "^18.0.27",
+    "@types/react-reconciler": "^0.28.0"
+  },
   "files": [
     "dist",
     "tsconfig.json"
   ],
+  "homepage": "https://github.com/decentraland/js-sdk-toolchain#readme",
+  "keywords": [
+    "@dcl/react-ecs",
+    "dcl",
+    "ecs",
+    "react"
+  ],
+  "license": "Apache-2.0",
+  "main": "./dist/index.js",
+  "repository": "decentraland/js-sdk-toolchain.git",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
   "typedoc": {
     "entryPoint": "./src/index.ts",
     "readmeFile": "./README.md",
     "displayName": "React ECS",
     "tsconfig": "./tsconfig.json"
-  }
+  },
+  "types": "./dist/index.d.ts"
 }

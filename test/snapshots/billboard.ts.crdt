@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=182.14k bytes
+SCENE_COMPILED_JS_SIZE_PROD=183.08k bytes
 This run is in PROD mode.
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -9,7 +9,7 @@ EVAL test/snapshots/billboard.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 25k
-  MALLOC_COUNT = 10733
+  MALLOC_COUNT = 10740
   ALIVE_OBJS_DELTA ~= 2.32k
 CALL onStart()
   OPCODES ~= 0k
@@ -77,4 +77,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 9k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 827.34k bytes
+  MEMORY_USAGE_COUNT ~= 829.57k bytes

@@ -20,8 +20,8 @@ SED_OPTION=-i ""
 endif
 
 PROTOC = node_modules/.bin/protobuf/bin/protoc
-SCENE_PROTO_FILES := $(wildcard packages/@dcl/ecs/node_modules/@dcl/protocol/proto/decentraland/kernel/apis/*.proto)
-PBS_TS = $(SCENE_PROTO_FILES:packages/@dcl/ecs/node_modules/@dcl/protocol/proto/decentraland/kernel/apis/%.proto=scripts/rpc-api-generation/src/proto/%.gen.ts)
+SCENE_PROTO_FILES := $(wildcard node_modules/@dcl/protocol/proto/decentraland/kernel/apis/*.proto)
+PBS_TS = $(SCENE_PROTO_FILES:node_modules/@dcl/protocol/proto/decentraland/kernel/apis/%.proto=scripts/rpc-api-generation/src/proto/%.gen.ts)
 
 
 install:
@@ -34,6 +34,8 @@ lint:
 
 lint-fix:
 	node_modules/.bin/eslint . --ext .ts --fix
+	node_modules/.bin/syncpack format --config .syncpackrc.json  --source "packages/@dcl/*/package.json" --source "package.json"
+	node_modules/.bin/syncpack fix-mismatches --config .syncpackrc.jsonnode_modules/.bin/syncpack format --config .syncpackrc.json --source "packages/@dcl/*/package.json" --source "package.json"
 
 TESTARGS ?= test/
 test:
@@ -79,7 +81,10 @@ build:
 prepare:
 	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/prepare.spec.ts
 
-scripts/rpc-api-generation/src/proto/%.gen.ts: packages/@dcl/ecs/node_modules/@dcl/protocol/proto/decentraland/kernel/apis/%.proto node_modules/.bin/protobuf/bin/protoc
+lint-packages:
+	node_modules/.bin/syncpack list-mismatchesnode_modules/.bin/syncpack format --config .syncpackrc.json  --source "packages/@dcl/*/package.json" --source "package.json"
+
+scripts/rpc-api-generation/src/proto/%.gen.ts: node_modules/@dcl/protocol/proto/decentraland/kernel/apis/%.proto node_modules/.bin/protobuf/bin/protoc
 	@${PROTOC}  \
 			--plugin=./node_modules/.bin/protoc-gen-ts_proto \
 			--ts_proto_opt=esModuleInterop=true,returnObservable=false,outputServices=generic-definitions \
@@ -87,8 +92,8 @@ scripts/rpc-api-generation/src/proto/%.gen.ts: packages/@dcl/ecs/node_modules/@d
 			--ts_proto_opt=onlyTypes=true \
 			--ts_proto_out="$(PWD)/scripts/rpc-api-generation/src/proto" \
 			-I="$(PWD)/scripts/rpc-api-generation/src/proto" \
-			-I="$(PWD)/packages/@dcl/ecs/node_modules/@dcl/protocol/proto/" \
-			"$(PWD)/packages/@dcl/ecs/node_modules/@dcl/protocol/proto/decentraland/kernel/apis/$*.proto";
+			-I="$(PWD)/node_modules/@dcl/protocol/proto/" \
+			"$(PWD)/node_modules/@dcl/protocol/proto/decentraland/kernel/apis/$*.proto";
 
 compile_apis: ${PBS_TS}
 
@@ -99,7 +104,7 @@ deep-clean-and-snapshot:
 	make build
 	make update-snapshots 
 
-.PHONY: build test install docs deep-clean-and-snapshot update-snapshots
+.PHONY: build test install docs deep-clean-and-snapshot update-snapshots lint-packages
 
 deep-clean:
 	rm -rf node_modules/ \

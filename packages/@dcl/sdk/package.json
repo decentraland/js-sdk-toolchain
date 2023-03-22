@@ -1,20 +1,8 @@
 {
   "name": "@dcl/sdk",
-  "version": "7.0.0",
   "description": "",
-  "main": "./index.js",
-  "typings": "./index.d.ts",
-  "types": "./index.d.ts",
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "start": "npm run build && tsc -p tsconfig.json --watch"
-  },
-  "keywords": [],
-  "tsdoc": {
-    "tsdocFlavor": "AEDoc"
-  },
+  "version": "7.0.0",
   "author": "Decentraland",
-  "license": "Apache-2.0",
   "dependencies": {
     "@dcl/ecs": "file:../ecs",
     "@dcl/ecs-math": "2.0.1-20221129185242.commit-40495c1",
@@ -23,11 +11,23 @@
     "@dcl/react-ecs": "file:../react-ecs",
     "@dcl/sdk-commands": "file:../sdk-commands"
   },
+  "keywords": [],
+  "license": "Apache-2.0",
+  "main": "./index.js",
   "minCliVersion": "3.14.1",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "npm run build && tsc -p tsconfig.json --watch"
+  },
+  "tsdoc": {
+    "tsdocFlavor": "AEDoc"
+  },
   "typedoc": {
     "entryPoint": "./src/index.ts",
     "readmeFile": "./README.md",
     "displayName": "SDK",
     "tsconfig": "./tsconfig.json"
-  }
+  },
+  "types": "./index.d.ts",
+  "typings": "./index.d.ts"
 }

@@ -1,19 +1,18 @@
 {
   "name": "@dcl/js-runtime",
-  "version": "7.0.0",
   "description": "JavaScript runtime definitions for Decentraland environments",
-  "scripts": {},
-  "keywords": [],
+  "version": "7.0.0",
   "author": "",
   "files": [
     "index.d.ts",
     "apis.d.ts",
     "tsconfig.json"
   ],
+  "keywords": [],
   "license": "Apache-2.0",
-  "types": "./index.d.ts",
-  "typings": "./index.d.ts",
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "types": "./index.d.ts",
+  "typings": "./index.d.ts"
 }

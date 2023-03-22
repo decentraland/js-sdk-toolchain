@@ -95,7 +95,10 @@ function runTypeChecker() {
 }
 
 function getNotBundledModules() {
-  const ret = JSON.parse(child_process.execSync("npm ls --all --json").toString())
+  // || true is added because `npm ls` fails installing a package from S3
+  const child = child_process.execSync("npm ls --all --json || true", { })
+  const ret = JSON.parse(child.toString())
+
   const externalModules = new Set()
   function traverseDependencies(obj) {
     if (obj.dependencies)
