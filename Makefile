@@ -34,8 +34,8 @@ lint:
 
 lint-fix:
 	node_modules/.bin/eslint . --ext .ts --fix
-	node_modules/.bin/syncpack format --source "packages/@dcl/*/package.json" --source "package.json"
-	node_modules/.bin/syncpack fix-mismatches --source "packages/@dcl/*/package.json" --source "package.json"
+	node_modules/.bin/syncpack format --config .syncpackrc.json  --source "packages/@dcl/*/package.json" --source "package.json"
+	node_modules/.bin/syncpack fix-mismatches --config .syncpackrc.jsonnode_modules/.bin/syncpack format --config .syncpackrc.json --source "packages/@dcl/*/package.json" --source "package.json"
 
 TESTARGS ?= test/
 test:
@@ -82,7 +82,7 @@ prepare:
 	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/prepare.spec.ts
 
 lint-packages:
-	node_modules/.bin/syncpack list-mismatches --source "packages/@dcl/*/package.json" --source "package.json"
+	node_modules/.bin/syncpack list-mismatchesnode_modules/.bin/syncpack format --config .syncpackrc.json  --source "packages/@dcl/*/package.json" --source "package.json"
 
 scripts/rpc-api-generation/src/proto/%.gen.ts: node_modules/@dcl/protocol/proto/decentraland/kernel/apis/%.proto node_modules/.bin/protobuf/bin/protoc
 	@${PROTOC}  \

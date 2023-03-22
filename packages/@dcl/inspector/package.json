@@ -8,7 +8,7 @@
     "@babylonjs/loaders": "^5.48.0",
     "@babylonjs/materials": "^5.48.0",
     "@dcl/ecs": "file:../ecs",
-    "@dcl/ecs-math": "^2.0.1-20221129185242.commit-40495c1",
+    "@dcl/ecs-math": "2.0.1-20221129185242.commit-40495c1",
     "@dcl/js-runtime": "file:../js-runtime",
     "@dcl/rpc": "^1.1.1",
     "@dcl/schemas": "^6.11.1",
