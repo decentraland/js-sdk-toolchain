@@ -38,7 +38,7 @@ export function stream(
 
   // and lastly wire the new messages from the iterator to the
   consumeAllMessagesInto(stream, processMessage, closeCallback).catch((err) => {
-    console.log(err)
+    console.error('consumeAllMessagesInto failed: ', err)
   })
 
   return queue
