@@ -16,6 +16,7 @@ export type CliComponents = {
 export async function initComponents(): Promise<CliComponents> {
   const fsComponent = createFsComponent()
   const dclInfoConfig = await createDCLInfoConfigComponent({ fs: fsComponent })
+
   return {
     fs: fsComponent,
     fetch: createFetchComponent(),
