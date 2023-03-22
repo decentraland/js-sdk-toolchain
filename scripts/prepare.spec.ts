@@ -24,7 +24,10 @@ flow('build-all', () => {
 
     for (const dependency of processWithOptimisticDependencies(graph)) {
       const projectDirectory = resolveProjectPath(dependency)
-      itExecutes(`npm version ${JSON.stringify(version)} --force --no-git-tag-version --allow-same-version`, projectDirectory) 
+      itExecutes(
+        `npm version ${JSON.stringify(version)} --force --no-git-tag-version --allow-same-version`,
+        projectDirectory
+      )
     }
   })
 
