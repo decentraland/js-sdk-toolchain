@@ -2,17 +2,13 @@ import { existsSync, readFileSync, writeFileSync } from 'fs'
 import glob from 'glob'
 import {
   Composite,
-  compositeFromBinary,
-  compositeFromJson,
-  CompositeProvider,
   Engine,
   Entity,
   IEngine,
-  instanceComposite,
-  LastWriteWinElementSetComponentDefinition
+  LastWriteWinElementSetComponentDefinition,
+  EntityMappingMode
 } from './../../packages/@dcl/ecs/src'
-import { compositeToBinary, compositeToJson, EntityMappingMode } from './../../packages/@dcl/ecs/src/composite'
-import { getCompositeRootComponent } from './../../packages/@dcl/ecs/src/composite/components'
+import { getCompositeRootComponent } from './../../packages/@dcl/ecs/src/composite'
 import { getComponentDefinition, getComponentValue } from './../../packages/@dcl/ecs/src/composite/instance'
 import { ReadWriteByteBuffer } from './../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
@@ -25,12 +21,12 @@ const COMPOSITE_BASE_PATH = 'test/ecs/composites'
 
 function getJsonCompositeFrom(globPath: string) {
   const compositeFileContent = glob.sync(globPath, { absolute: true }).map((item) => readFileSync(item).toString())
-  return compositeFileContent.map((item) => compositeFromJson(JSON.parse(item)))
+  return compositeFileContent.map((item) => Composite.fromJson(JSON.parse(item)))
 }
 
 function getBinaryCompositeFrom(globPath: string) {
   const compositeFileContent = glob.sync(globPath, { absolute: true }).map((item) => readFileSync(item))
-  return compositeFileContent.map((item) => compositeFromBinary(new Uint8Array(item)))
+  return compositeFileContent.map((item) => Composite.fromBinary(new Uint8Array(item)))
 }
 
 function getStateAsString(engine: IEngine) {
@@ -84,12 +80,11 @@ describe.skip('convert non-binary.composite.json', () => {
   binaryComposite.id = 'data-binary'
   writeFileSync(
     `${COMPOSITE_BASE_PATH}/data-binary.composite.json`,
-    JSON.stringify(Composite.toJSON(binaryComposite), null, 2)
+    JSON.stringify(Composite.toJson(binaryComposite), null, 2)
   )
 
   binaryComposite.id = 'full-binary'
-  const writer = Composite.encode(binaryComposite)
-  const buffer = writer.finish()
+  const buffer = Composite.toBinary(binaryComposite)
   writeFileSync(`${COMPOSITE_BASE_PATH}/full-binary.composite`, buffer)
 })
 
@@ -104,7 +99,7 @@ describe('composite instantiation system', () => {
   ]
   const invalidComposites = getJsonCompositeFrom(`${COMPOSITE_BASE_PATH}/invalid/*.composite.json`)
   const composites = [...validComposites, ...invalidComposites]
-  const compositeProvider: CompositeProvider = {
+  const compositeProvider: Composite.Provider = {
     getCompositeOrNull(id: string) {
       return composites.find((item) => item.id === id) || null
     }
@@ -117,9 +112,9 @@ describe('composite instantiation system', () => {
     }
 
     if (rootEntity || alreadyRequestedId) {
-      instanceComposite(engine, composite, compositeProvider, { rootEntity, alreadyRequestedId })
+      Composite.instance(engine, composite, compositeProvider, { rootEntity, alreadyRequestedId })
     } else {
-      instanceComposite(engine, composite, compositeProvider)
+      Composite.instance(engine, composite, compositeProvider)
     }
   }
 
@@ -167,7 +162,7 @@ describe('composite instantiation system', () => {
       const entityOffset = 10000
 
       let counter = entityOffset
-      instanceComposite(engine, composite, compositeProvider, {
+      Composite.instance(engine, composite, compositeProvider, {
         entityMapping: {
           type: EntityMappingMode.EMM_NEXT_AVAILABLE,
           getNextAvailableEntity: () => counter++ as Entity
@@ -188,7 +183,7 @@ describe('composite instantiation system', () => {
       const composite = compositeProvider.getCompositeOrNull('2-level-deep')!
 
       const entityOffset = 20000
-      instanceComposite(engine, composite, compositeProvider, {
+      Composite.instance(engine, composite, compositeProvider, {
         entityMapping: {
           type: EntityMappingMode.EMM_DIRECT_MAPPING,
           getCompositeEntity: (compositeEntity: Entity | number) => (entityOffset + compositeEntity) as Entity
@@ -219,10 +214,10 @@ describe('composite serialization', () => {
 
   describe('should serialize to binary and get the same composite', () => {
     const composite = validComposites.find((item) => item.id === 'non-binary-composite')!
-    const unpackedComposite = compositeFromBinary(compositeToBinary(composite))
+    const unpackedComposite = Composite.fromBinary(Composite.toBinary(composite))
 
     it('in binary', () => {
-      expect(compositeToBinary(composite)).toStrictEqual(compositeToBinary(unpackedComposite))
+      expect(Composite.toBinary(composite)).toStrictEqual(Composite.toBinary(unpackedComposite))
     })
 
     it('raw', () => {
@@ -232,14 +227,14 @@ describe('composite serialization', () => {
 
   describe('should serialize to json and get the same composite', () => {
     const composite = validComposites.find((item) => item.id === 'non-binary-composite')!
-    const unpackedComposite = compositeFromBinary(compositeToBinary(composite))
+    const unpackedComposite = Composite.fromBinary(Composite.toBinary(composite))
 
     it('in json (raw)', () => {
-      expect(compositeToJson(composite)).toStrictEqual(compositeToJson(unpackedComposite))
+      expect(Composite.toJson(composite)).toStrictEqual(Composite.toJson(unpackedComposite))
     })
 
     it('in json (string)', () => {
-      expect(JSON.stringify(compositeToJson(composite))).toBe(JSON.stringify(compositeToJson(unpackedComposite)))
+      expect(JSON.stringify(Composite.toJson(composite))).toBe(JSON.stringify(Composite.toJson(unpackedComposite)))
     })
 
     it('raw', () => {
@@ -255,31 +250,31 @@ describe('composite serialization', () => {
 describe('composite from json function', () => {
   const invalidFalseValues = [null, undefined, false, 0]
 
-  // TODO: the compositeFromJson doesn't pannic, but the resulting Composite should be validated
+  // TODO: the Composite.fromJson doesn't pannic, but the resulting Composite should be validated
   describe.skip(`should fail with non object or without id field: `, () => {
     invalidFalseValues.forEach((value) => {
       it(`${value}`, () => {
         expect(() => {
-          compositeFromJson(value)
+          Composite.fromJson(value)
         }).toThrow()
       })
     })
   })
 
-  // TODO: the compositeFromJson doesn't pannic, but the resulting Composite should be validated
+  // TODO: the Composite.fromJson doesn't pannic, but the resulting Composite should be validated
   describe.skip(`should fail with defined object but without id file, or invalid id: `, () => {
     ;[true, [], {}, 123, { sarasa: 33 }, { id: 213 }, { id: [234] }, { id: { asd: 'test' } }].forEach(
       (value, index) => {
         it(`[${index}] = ${value.toString()}`, () => {
           expect(() => {
-            compositeFromJson(value)
+            Composite.fromJson(value)
           }).toThrow()
         })
       }
     )
   })
 
-  // TODO: the compositeFromJson doesn't pannic, but the resulting Composite should be validated
+  // TODO: the Composite.fromJson doesn't pannic, but the resulting Composite should be validated
   describe.skip(`should fail with invalid and non-array component `, () => {
     const values = [
       { id: 'test' },
@@ -289,13 +284,13 @@ describe('composite from json function', () => {
     values.forEach((json, index) => {
       it(`[${index}] = ${json.toString()}`, () => {
         expect(() => {
-          compositeFromJson(json)
+          Composite.fromJson(json)
         }).toThrow()
       })
     })
   })
 
-  // TODO: the compositeFromJson doesn't pannic, but the resulting Composite should be validated
+  // TODO: the Composite.fromJson doesn't pannic, but the resulting Composite should be validated
   describe.skip(`should fail with invalid component (name)`, () => {
     const values = [
       { id: 'test', components: [{ test: 'asd' }] },
@@ -304,13 +299,13 @@ describe('composite from json function', () => {
     values.forEach((json, index) => {
       it(`[${index}] = ${json.toString()}`, () => {
         expect(() => {
-          compositeFromJson(json)
+          Composite.fromJson(json)
         }).toThrow()
       })
     })
   })
 
-  // TODO: the compositeFromJson doesn't pannic, but the resulting Composite should be validated
+  // TODO: the Composite.fromJson doesn't pannic, but the resulting Composite should be validated
   describe.skip(`should fail with invalid component (data)`, () => {
     const values = [
       { id: 'test', components: [{ name: 'no-core', data: [] }] },
@@ -319,7 +314,7 @@ describe('composite from json function', () => {
     values.forEach((json, index) => {
       it(`[${index}] = ${json.toString()}`, () => {
         expect(() => {
-          compositeFromJson(json)
+          Composite.fromJson(json)
         }).toThrow()
       })
     })
@@ -329,7 +324,7 @@ describe('composite from json function', () => {
     const values = [{ id: 'test', components: [{ name: 'no-core', data: { '1111': 'test' } }] }]
     values.forEach((json) => {
       expect(() => {
-        compositeFromJson(json)
+        Composite.fromJson(json)
       }).not.toThrow()
     })
   })
