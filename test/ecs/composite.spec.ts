@@ -11,9 +11,9 @@ import {
   instanceComposite,
   LastWriteWinElementSetComponentDefinition
 } from './../../packages/@dcl/ecs/src'
+import { compositeToBinary, compositeToJson, EntityMappingMode } from './../../packages/@dcl/ecs/src/composite'
 import { getCompositeRootComponent } from './../../packages/@dcl/ecs/src/composite/components'
 import { getComponentDefinition, getComponentValue } from './../../packages/@dcl/ecs/src/composite/instance'
-import { EntityMappingMode } from './../../packages/@dcl/ecs/src/composite'
 import { ReadWriteByteBuffer } from './../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
 const writeToFile = process.env.UPDATE_SNAPSHOTS
@@ -207,6 +207,43 @@ describe('composite instantiation system', () => {
       // This number remains from the composite definition, see '2-level-deep' and count the entities that should be created :)
       expect(subCompositesEntities.length).toBe(7) // the sub composite entities
       expect(mainCompositeEntity.length).toBe(5) // only CompositeRoot (children and the root)
+    })
+  })
+})
+
+describe('composite serialization', () => {
+  const validComposites = [
+    ...getJsonCompositeFrom(`${COMPOSITE_BASE_PATH}/*.composite.json`),
+    ...getBinaryCompositeFrom(`${COMPOSITE_BASE_PATH}/*.composite`)
+  ]
+
+  describe('should serialize to binary and get the same composite', () => {
+    const composite = validComposites.find((item) => item.id === 'non-binary-composite')!
+    const unpackedComposite = compositeFromBinary(compositeToBinary(composite))
+
+    it('in binary', () => {
+      expect(compositeToBinary(composite)).toStrictEqual(compositeToBinary(unpackedComposite))
+    })
+
+    it('raw', () => {
+      expect(composite).toStrictEqual(unpackedComposite)
+    })
+  })
+
+  describe('should serialize to json and get the same composite', () => {
+    const composite = validComposites.find((item) => item.id === 'non-binary-composite')!
+    const unpackedComposite = compositeFromBinary(compositeToBinary(composite))
+
+    it('in json (raw)', () => {
+      expect(compositeToJson(composite)).toStrictEqual(compositeToJson(unpackedComposite))
+    })
+
+    it('in json (string)', () => {
+      expect(JSON.stringify(compositeToJson(composite))).toBe(JSON.stringify(compositeToJson(unpackedComposite)))
+    })
+
+    it('raw', () => {
+      expect(composite).toStrictEqual(unpackedComposite)
     })
   })
 })

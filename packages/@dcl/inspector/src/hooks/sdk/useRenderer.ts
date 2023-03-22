@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { SdkContext } from '../../components/SdkProvider/SdkProvider'
 
-export const useRenderer = () => {
+export const useRenderer = (cb: () => React.RefObject<HTMLCanvasElement>) => {
   const { renderer } = React.useContext(SdkContext)
-  return renderer
+  useEffect(() => {
+    renderer(cb())
+  }, [])
 }
