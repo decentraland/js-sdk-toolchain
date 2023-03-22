@@ -80,6 +80,8 @@ build:
 
 prepare:
 	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/prepare.spec.ts
+
+lint-packages:
 	node_modules/.bin/syncpack list-mismatches --source "packages/@dcl/*/package.json" --source "package.json"
 
 scripts/rpc-api-generation/src/proto/%.gen.ts: node_modules/@dcl/protocol/proto/decentraland/kernel/apis/%.proto node_modules/.bin/protobuf/bin/protoc
@@ -102,7 +104,7 @@ deep-clean-and-snapshot:
 	make build
 	make update-snapshots 
 
-.PHONY: build test install docs deep-clean-and-snapshot update-snapshots
+.PHONY: build test install docs deep-clean-and-snapshot update-snapshots lint-packages
 
 deep-clean:
 	rm -rf node_modules/ \

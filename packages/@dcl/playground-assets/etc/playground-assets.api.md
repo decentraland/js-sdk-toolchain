@@ -284,11 +284,15 @@ export const enum ColliderLayer {
     CL_CUSTOM4 = 2048,
     // (undocumented)
     CL_CUSTOM5 = 4096,
+    // (undocumented)
+    CL_CUSTOM6 = 8192,
+    // (undocumented)
+    CL_CUSTOM7 = 16384,
+    // (undocumented)
+    CL_CUSTOM8 = 32768,
     CL_NONE = 0,
     CL_PHYSICS = 2,
     CL_POINTER = 1,
-    // (undocumented)
-    CL_RESERVED1 = 4,
     // (undocumented)
     CL_RESERVED2 = 8,
     // (undocumented)
@@ -298,7 +302,8 @@ export const enum ColliderLayer {
     // (undocumented)
     CL_RESERVED5 = 64,
     // (undocumented)
-    CL_RESERVED6 = 128
+    CL_RESERVED6 = 128,
+    CL_VISIBLE_MESHES = 4
 }
 
 // @public
@@ -2019,6 +2024,9 @@ export interface PBRaycast {
     } | {
         $case: "globalTarget";
         globalTarget: PBVector3;
+    } | {
+        $case: "targetEntity";
+        targetEntity: number;
     };
     maxDistance: number;
     originOffset?: PBVector3 | undefined;
@@ -2031,7 +2039,7 @@ export interface PBRaycastResult {
     direction: PBVector3 | undefined;
     globalOrigin: PBVector3 | undefined;
     hits: RaycastHit[];
-    timestamp: number;
+    timestamp?: number | undefined;
 }
 
 // @public (undocumented)
@@ -2448,9 +2456,8 @@ export interface RaycastHit {
 
 // @public (undocumented)
 export const enum RaycastQueryType {
-    // (undocumented)
     RQT_HIT_FIRST = 0,
-    // (undocumented)
+    RQT_NONE = 2,
     RQT_QUERY_ALL = 1
 }
 
