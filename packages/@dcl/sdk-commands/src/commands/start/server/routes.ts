@@ -1,13 +1,13 @@
-import { WebSocket } from 'ws'
-import { setupRealmAndComms } from './realm'
 import { Router } from '@well-known-components/http-server'
-import { setupEcs6Endpoints } from './endpoints'
-import { PreviewComponents } from '../types'
 import { upgradeWebSocketResponse } from '@well-known-components/http-server/dist/ws'
+import { WebSocket } from 'ws'
+import { DataLayer } from '../data-layer/rpc'
 import { handleDataLayerWs } from '../data-layer/ws'
-import { DataLayerRpc } from '../data-layer/rpc'
+import { PreviewComponents } from '../types'
+import { setupEcs6Endpoints } from './endpoints'
+import { setupRealmAndComms } from './realm'
 
-export async function wireRouter(components: PreviewComponents, dir: string, dataLayer?: DataLayerRpc) {
+export async function wireRouter(components: PreviewComponents, dir: string, dataLayer?: DataLayer) {
   const router = new Router<PreviewComponents>()
 
   const sceneUpdateClients = new Set<WebSocket>()

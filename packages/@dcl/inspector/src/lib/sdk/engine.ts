@@ -78,7 +78,9 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
     dataLayer.stream(outgoingMessagesStream),
     transport.onmessage!,
     outgoingMessagesStream.close
-  ).catch((e) => console.log(e))
+  ).catch((e) => {
+    console.error('consumeAllMessagesInto failed: ', e)
+  })
 
   function dispose() {
     outgoingMessagesStream.close()

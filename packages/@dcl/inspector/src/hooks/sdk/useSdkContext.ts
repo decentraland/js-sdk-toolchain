@@ -20,7 +20,10 @@ export const useSdkContext = () => {
       .then((ctx) => {
         setSdk(ctx)
       })
-      .catch((e) => setError(e))
+      .catch((e) => {
+        console.error(`createSdkContext failed: `, e)
+        setError(e)
+      })
       .finally(() => setIsLoading(false))
   }, [catalog, canvas, sdk, isLoading])
 
