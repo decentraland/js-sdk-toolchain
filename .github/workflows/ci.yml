@@ -67,59 +67,10 @@ jobs:
       - name: install
         run: make install
 
-      - name: update version of packages/@dcl/dcl-rollup
+      - name: update version of packages/@dcl/sdk/package.json, this version will be used for all packages
         uses: menduz/oddish-action@master
         with:
-          cwd: packages/@dcl/dcl-rollup
-          deterministic-snapshot: true
-          only-update-versions: true
-
-      - name: update version of packages/@dcl/js-runtime
-        uses: menduz/oddish-action@master
-        with:
-          cwd: packages/@dcl/js-runtime
-          deterministic-snapshot: true
-          only-update-versions: true
-
-      - name: update version of packages/@dcl/ecs
-        uses: menduz/oddish-action@master
-        with:
-          cwd: packages/@dcl/ecs
-          deterministic-snapshot: true
-          only-update-versions: true
-
-      - name: update version of packages/@dcl/react-ecs
-        uses: menduz/oddish-action@master
-        with:
-          cwd: packages/@dcl/react-ecs
-          deterministic-snapshot: true
-          only-update-versions: true
-
-      - name: update version of packages/@dcl/inspector
-        uses: menduz/oddish-action@master
-        with:
-          cwd: packages/@dcl/inspector
-          deterministic-snapshot: true
-          only-update-versions: true
-
-      - name: update version of packages/@dcl/sdk-commands
-        uses: menduz/oddish-action@master
-        with:
-          cwd: packages/@dcl/sdk-commands
-          deterministic-snapshot: true
-          only-update-versions: true
-
-      - name: update version of packages/@dcl/sdk
-        uses: menduz/oddish-action@master
-        with:
-          cwd: packages/@dcl/sdk
-          deterministic-snapshot: true
-          only-update-versions: true
-
-      - name: update version of packages/@dcl/playground-assets
-        uses: menduz/oddish-action@master
-        with:
-          cwd: packages/@dcl/playground-assets
+          cwd: ./packages/@dcl/sdk
           deterministic-snapshot: true
           only-update-versions: true
 
