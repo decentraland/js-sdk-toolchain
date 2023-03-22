@@ -1,20 +1,11 @@
 {
   "name": "@dcl/dcl-rollup",
-  "version": "7.0.0",
   "description": "",
-  "main": "./configs.js",
-  "scripts": {
-    "build": "tsc && chmod +x index.js"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "keywords": [],
+  "version": "7.0.0",
   "author": "",
   "bin": {
     "build-ecs": "./index.js"
   },
-  "license": "Apache-2.0",
   "dependencies": {
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
@@ -33,5 +24,14 @@
   "files": [
     "*.js",
     "*.d.ts"
-  ]
+  ],
+  "keywords": [],
+  "license": "Apache-2.0",
+  "main": "./configs.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc && chmod +x index.js"
+  }
 }

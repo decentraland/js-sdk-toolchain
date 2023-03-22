@@ -1,42 +1,37 @@
 {
   "name": "@dcl/ecs",
-  "version": "7.0.0",
   "description": "Decentraland ECS",
-  "main": "./dist/index.js",
-  "typings": "./dist/index.d.ts",
-  "types": "./dist/index.d.ts",
-  "scripts": {
-    "build": "tsc -p tsconfig.json"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/decentraland/ecs.git"
-  },
-  "keywords": [
-    "dcl",
-    "ecs",
-    "@dcl/sdk"
-  ],
+  "version": "7.0.0",
   "author": "DCL",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/decentraland/ecs/issues"
-  },
-  "homepage": "https://github.com/decentraland/ecs#readme",
-  "devDependencies": {
-    "ts-proto": "^1.112.0"
-  },
+  "bugs": "https://github.com/decentraland/ecs/issues",
   "dependencies": {
     "@dcl/js-runtime": "file:../js-runtime"
+  },
+  "devDependencies": {
+    "ts-proto": "^1.122.0"
   },
   "files": [
     "dist",
     "etc"
   ],
+  "homepage": "https://github.com/decentraland/ecs#readme",
+  "keywords": [
+    "@dcl/sdk",
+    "dcl",
+    "ecs"
+  ],
+  "license": "Apache-2.0",
+  "main": "./dist/index.js",
+  "repository": "decentraland/ecs.git",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
   "typedoc": {
     "entryPoint": "./src/index.ts",
     "readmeFile": "./README.md",
     "displayName": "ECS",
     "tsconfig": "./tsconfig.json"
-  }
+  },
+  "types": "./dist/index.d.ts",
+  "typings": "./dist/index.d.ts"
 }
