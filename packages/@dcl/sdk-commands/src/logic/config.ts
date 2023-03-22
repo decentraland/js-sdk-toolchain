@@ -22,10 +22,11 @@ export async function getDCLInfoConfig(components: Pick<CliComponents, 'fs'>): P
  * Config that can be override via ENV variables
  */
 export function getEnvConfig(): Partial<DCLInfo> {
-  const { SEGMENT_KEY } = process.env
+  const { SEGMENT_KEY, TRACK_STATS } = process.env
 
-  const envConfig = {
-    segmentKey: SEGMENT_KEY
+  const envConfig: DCLInfo = {
+    segmentKey: SEGMENT_KEY,
+    trackStats: TRACK_STATS !== undefined ? TRACK_STATS === 'true' : undefined
   }
 
   return removeEmptyKeys(envConfig)

@@ -1,6 +1,7 @@
 import { createAnalyticsComponent } from '../../../packages/@dcl/sdk-commands/src/components/analytics'
 import { createFsComponent } from '../../../packages/@dcl/sdk-commands/src/components/fs'
 import { createDCLInfoConfigComponent } from '../../../packages/@dcl/sdk-commands/src/components/dcl-info-config'
+import * as config from '../../../packages/@dcl/sdk-commands/src/logic/config'
 
 afterEach(() => {
   jest.clearAllMocks()
@@ -92,5 +93,20 @@ describe('Analytics Component', () => {
     analytics.trackSync('Build scene', {} as any)
     await analytics.stop()
     expect(spyTrack).toBeCalled()
+  })
+
+  it('should not track if trackstats is defined in the env var', async () => {
+    const oldEnv = process.env
+    globalThis.process.env = {
+      ...oldEnv,
+      TRACK_STATS: 'false'
+    }
+    const fs = createFsComponent()
+    const dclInfoConfig = await createDCLInfoConfigComponent({ fs })
+    jest.spyOn(config, 'getDCLInfoConfig').mockResolvedValue({ userId: 'boedo' })
+    const analytics = await createAnalyticsComponent({ dclInfoConfig })
+    const spyTrack = jest.spyOn(analytics.get(), 'track')
+    await analytics.track('Build scene', {} as any)
+    expect(spyTrack).not.toBeCalled()
   })
 })
