@@ -18,7 +18,7 @@ import { createRoomsComponent, roomsMetrics } from '@dcl/mini-comms/dist/adapter
 import { createServerComponent } from '@well-known-components/http-server'
 import { createConsoleLogComponent } from '@well-known-components/logger'
 import { providerInstance } from '../../components/eth'
-import { createStdoutCliLogger } from '../../components/log'
+import { createStderrCliLogger } from '../../components/log'
 import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
 import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
@@ -139,7 +139,7 @@ export async function main(options: Options) {
 
       return {
         ...options.components,
-        logger: createStdoutCliLogger(),
+        logger: createStderrCliLogger(),
         logs,
         ethereumProvider: providerInstance,
         rooms,

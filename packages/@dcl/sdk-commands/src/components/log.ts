@@ -22,7 +22,7 @@ export const colors = createColors({
   useColor: process.env.FORCE_COLOR !== '0' && !process.env.NO_COLOR
 })
 
-export function createStdoutCliLogger(): ILoggerComponent.ILogger {
+export function createStderrCliLogger(): ILoggerComponent.ILogger {
   return {
     log(message, extra) {
       writeToStderr(message, extra && JSON.stringify(extra))

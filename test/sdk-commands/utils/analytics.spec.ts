@@ -2,6 +2,7 @@ import { createAnalyticsComponent } from '../../../packages/@dcl/sdk-commands/sr
 import { createFsComponent } from '../../../packages/@dcl/sdk-commands/src/components/fs'
 import { createDCLInfoConfigComponent } from '../../../packages/@dcl/sdk-commands/src/components/dcl-info-config'
 import * as config from '../../../packages/@dcl/sdk-commands/src/logic/config'
+import { createStderrCliLogger } from '../../../packages/@dcl/sdk-commands/src/components/log'
 
 afterEach(() => {
   jest.clearAllMocks()
@@ -11,9 +12,10 @@ afterEach(() => {
 describe('Analytics Component', () => {
   it('should create dclinfo file', async () => {
     const fs = createFsComponent()
+    const logger = createStderrCliLogger()
     const dclInfoConfig = await createDCLInfoConfigComponent({ fs })
     jest.spyOn(dclInfoConfig, 'get').mockResolvedValue({ userId: undefined })
-    const analytics = await createAnalyticsComponent({ dclInfoConfig })
+    const analytics = await createAnalyticsComponent({ dclInfoConfig, logger })
 
     const updateDclInfoSpy = jest.spyOn(dclInfoConfig, 'updateDCLInfo').mockImplementation()
     await analytics.identify()
@@ -26,9 +28,10 @@ describe('Analytics Component', () => {
 
   it('should not track if trackStats is false', async () => {
     const fs = createFsComponent()
+    const logger = createStderrCliLogger()
     const dclInfoConfig = await createDCLInfoConfigComponent({ fs })
     jest.spyOn(dclInfoConfig, 'get').mockResolvedValue({ trackStats: false })
-    const analytics = await createAnalyticsComponent({ dclInfoConfig })
+    const analytics = await createAnalyticsComponent({ dclInfoConfig, logger })
     const trackSpy = jest.spyOn(analytics.get(), 'track')
     await analytics.track('Scene created', { projectType: '', url: '', args: {} })
     expect(trackSpy).toBeCalledTimes(0)
@@ -36,9 +39,10 @@ describe('Analytics Component', () => {
 
   it('should track event', async () => {
     const fs = createFsComponent()
+    const logger = createStderrCliLogger()
     const dclInfoConfig = await createDCLInfoConfigComponent({ fs })
     jest.spyOn(dclInfoConfig, 'get').mockResolvedValue({ userId: 'boedo', trackStats: true })
-    const analytics = await createAnalyticsComponent({ dclInfoConfig })
+    const analytics = await createAnalyticsComponent({ dclInfoConfig, logger })
     const trackSpy = jest.spyOn(analytics.get(), 'track')
     await analytics.track('Scene created', { projectType: '', url: '', args: {} })
     expect(trackSpy).toBeCalledWith(
@@ -66,9 +70,10 @@ describe('Analytics Component', () => {
   })
   it('should not call identify if it has been identified.', async () => {
     const fs = createFsComponent()
+    const logger = createStderrCliLogger()
     const dclInfoConfig = await createDCLInfoConfigComponent({ fs })
     jest.spyOn(dclInfoConfig, 'get').mockResolvedValue({ userId: 'boedo', trackStats: true, userIdentified: true })
-    const analytics = await createAnalyticsComponent({ dclInfoConfig })
+    const analytics = await createAnalyticsComponent({ dclInfoConfig, logger })
     const spyIdentify = jest.spyOn(analytics.get(), 'identify')
     await analytics.identify()
     expect(spyIdentify).not.toBeCalled()
@@ -76,9 +81,10 @@ describe('Analytics Component', () => {
 
   it('should not call identify if trackStats is false', async () => {
     const fs = createFsComponent()
+    const logger = createStderrCliLogger()
     const dclInfoConfig = await createDCLInfoConfigComponent({ fs })
     jest.spyOn(dclInfoConfig, 'get').mockResolvedValue({ userId: 'boedo', trackStats: false })
-    const analytics = await createAnalyticsComponent({ dclInfoConfig })
+    const analytics = await createAnalyticsComponent({ dclInfoConfig, logger })
     const spyIdentify = jest.spyOn(analytics.get(), 'identify')
     await analytics.identify()
     expect(spyIdentify).not.toBeCalled()
@@ -86,9 +92,10 @@ describe('Analytics Component', () => {
 
   it('should wait for promises to finished', async () => {
     const fs = createFsComponent()
+    const logger = createStderrCliLogger()
     const dclInfoConfig = await createDCLInfoConfigComponent({ fs })
     jest.spyOn(dclInfoConfig, 'get').mockResolvedValue({ userId: 'boedo', trackStats: true, userIdentified: true })
-    const analytics = await createAnalyticsComponent({ dclInfoConfig })
+    const analytics = await createAnalyticsComponent({ dclInfoConfig, logger })
     const spyTrack = jest.spyOn(analytics.get(), 'track')
     analytics.trackSync('Build scene', {} as any)
     await analytics.stop()
@@ -102,9 +109,10 @@ describe('Analytics Component', () => {
       TRACK_STATS: 'false'
     }
     const fs = createFsComponent()
+    const logger = createStderrCliLogger()
     const dclInfoConfig = await createDCLInfoConfigComponent({ fs })
     jest.spyOn(config, 'getDCLInfoConfig').mockResolvedValue({ userId: 'boedo' })
-    const analytics = await createAnalyticsComponent({ dclInfoConfig })
+    const analytics = await createAnalyticsComponent({ dclInfoConfig, logger })
     const spyTrack = jest.spyOn(analytics.get(), 'track')
     await analytics.track('Build scene', {} as any)
     expect(spyTrack).not.toBeCalled()
