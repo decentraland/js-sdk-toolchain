@@ -1,7 +1,0 @@
-export function assert(condition, error) {
-    if (!condition)
-        console.error('❌ ' + error);
-    else
-        console.log('✅ ' + error);
-}
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYXNzZXJ0aW9ucy5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImFzc2VydGlvbnMudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsTUFBTSxVQUFVLE1BQU0sQ0FBQyxTQUFrQixFQUFFLEtBQWE7SUFDdEQsSUFBSSxDQUFDLFNBQVM7UUFBRSxPQUFPLENBQUMsS0FBSyxDQUFDLElBQUksR0FBRyxLQUFLLENBQUMsQ0FBQTs7UUFDdEMsT0FBTyxDQUFDLEdBQUcsQ0FBQyxJQUFJLEdBQUcsS0FBSyxDQUFDLENBQUE7QUFDaEMsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImV4cG9ydCBmdW5jdGlvbiBhc3NlcnQoY29uZGl0aW9uOiBib29sZWFuLCBlcnJvcjogc3RyaW5nKSB7XG4gIGlmICghY29uZGl0aW9uKSBjb25zb2xlLmVycm9yKCfinYwgJyArIGVycm9yKVxuICBlbHNlIGNvbnNvbGUubG9nKCfinIUgJyArIGVycm9yKVxufVxuIl19
