@@ -7,7 +7,7 @@ import { CliError } from './logic/error'
 import { COMMANDS_PATH, getCommands } from './logic/commands'
 import { CliComponents, initComponents } from './components'
 import { printCommand } from './logic/beautiful-logs'
-import { colors } from './components/log'
+import { colors, writeToStderr } from './components/log'
 
 export interface Options {
   args: ReturnType<typeof getArgs>
@@ -78,11 +78,12 @@ async function main() {
 
 main().catch(function handleError(err: Error) {
   if (err instanceof CliError) {
-    console.error(colors.redBright('Error: ') + err.message)
+    writeToStderr(colors.redBright('Error: ') + err.message)
   } else {
     // log with console to show stacktrace and debug information
+    // eslint-disable-next-line no-console
     console.error(err)
-    console.warn(`Developer: All errors thrown must be an instance of "CliError"`)
+    writeToStderr(`Developer: All errors thrown must be an instance of "CliError"`)
   }
 
   // set an exit code but not finish the program immediately to close any pending work

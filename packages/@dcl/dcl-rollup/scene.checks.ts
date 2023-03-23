@@ -1,5 +1,6 @@
 import * as ts from 'typescript'
 import { inspect } from 'util'
+import { writeToStderr } from './compile'
 
 export type PackageJson = {
   main: string
@@ -15,7 +16,6 @@ export type SceneJson = {
 
 function validateSceneJson(sceneJson: SceneJson) {
   if (!sceneJson.main) {
-    console.dir(sceneJson)
     throw new Error(`field "main" in scene.json is missing.`)
   }
 }
@@ -58,7 +58,7 @@ export function checkConfiguration() {
   const tsconfigContent = ts.sys.readFile(tsconfigPath)
 
   if (!tsconfigContent) {
-    console.error(`! Error: missing tsconfig.json file`)
+    writeToStderr(`! Error: missing tsconfig.json file`)
     process.exit(1)
   }
 
@@ -76,15 +76,15 @@ export function checkConfiguration() {
   // should this project be compiled as a lib? or as a scene?
 
   if (!sceneJson) {
-    console.error('! Error: project of type scene must have a scene.json')
+    writeToStderr('! Error: project of type scene must have a scene.json')
     process.exit(1)
   }
 
   validateSceneJson(sceneJson!)
 
   if (hasError) {
-    console.log('tsconfig.json:')
-    console.log(inspect(tsconfig, false, 10, true))
+    writeToStderr('tsconfig.json:')
+    writeToStderr(inspect(tsconfig, false, 10, true))
     process.exit(1)
   }
 }
@@ -93,13 +93,13 @@ function printDiagnostic(diagnostic: ts.Diagnostic) {
   const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
   if (diagnostic.file) {
     const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start!)
-    console.log(
+    writeToStderr(
       `  Error ${diagnostic.file.fileName.replace(ts.sys.getCurrentDirectory(), '')} (${line + 1},${
         character + 1
       }): ${message}`
     )
   } else {
-    console.log(`  Error: ${message}`)
+    writeToStderr(`  Error: ${message}`)
   }
 }
 
@@ -112,7 +112,7 @@ export function loadArtifact(path: string): string {
 
     throw new Error()
   } catch (e) {
-    console.error(`! Error: ${path} not found. ` + e)
+    writeToStderr(`! Error: ${path} not found. ` + e)
     process.exit(2)
   }
 }

@@ -17,6 +17,7 @@
   },
   "rules": {
     "no-param-reassign": "warn",
+    "no-console": "error",
     "@typescript-eslint/no-unused-vars": [
       "warn",
       {
@@ -26,5 +27,19 @@
         "caughtErrorsIgnorePattern": "^_"
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "packages/@dcl/inspector/**/*.ts",
+        "packages/@dcl/ecs/**/*.ts",
+        "packages/@dcl/sdk/**/*.ts",
+        "scripts/**/*.ts",
+        "test/**/*.ts"
+      ],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
 }

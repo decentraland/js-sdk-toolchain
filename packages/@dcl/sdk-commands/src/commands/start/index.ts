@@ -151,6 +151,7 @@ export async function main(options: Options) {
       }
     },
     async main({ components, startComponents }) {
+      // TODO: dataLayerRpc should be an optional component
       const dataLayerRpc = withDataLayer ? await createDataLayer({ fs: components.fs }) : undefined
       await wireRouter(components, projectRoot, dataLayerRpc)
       if (watch) {
