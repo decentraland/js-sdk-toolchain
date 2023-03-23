@@ -1,8 +1,8 @@
-import { createStdoutCliLogger } from '../../../packages/@dcl/sdk-commands/src/components/log'
+import { createStderrCliLogger } from '../../../packages/@dcl/sdk-commands/src/components/log'
 
 describe('utils/log', () => {
   it('Call the log functions to test everything works', () => {
-    const logs = createStdoutCliLogger()
+    const logs = createStderrCliLogger()
     logs.log('raw raw', { extraData: 1 })
     logs.error('fail fail', { extraData: 1 })
     logs.info('info info', { extraData: 1 })

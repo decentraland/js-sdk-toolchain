@@ -7,7 +7,7 @@ import { checkConfiguration } from './scene.checks'
 import { createColors } from 'colorette'
 
 // log to stderr to keep `rollup main.js > bundle.js` from breaking
-const stderr = (...parameters: readonly unknown[]) => process.stderr.write(`${parameters.join('')}\n`)
+export const writeToStderr = (...parameters: readonly unknown[]) => process.stderr.write(`${parameters.join('')}\n`)
 
 // @see https://no-color.org
 // @see https://www.npmjs.com/package/chalk
@@ -48,8 +48,8 @@ export async function compile(options: CompileOptions) {
   ts.sys.getCurrentDirectory = () => CWD
   ts.sys.resolvePath = (path: string) => resolve(ts.sys.getCurrentDirectory(), path)
 
-  stderr(colors.greenBright('Mode: ') + (options.production ? 'Production (optimized)' : 'Development'))
-  stderr(colors.greenBright(`Working directory: `) + ts.sys.getCurrentDirectory())
+  writeToStderr(colors.greenBright('Mode: ') + (options.production ? 'Production (optimized)' : 'Development'))
+  writeToStderr(colors.greenBright(`Working directory: `) + ts.sys.getCurrentDirectory())
 
   checkConfiguration()
 
@@ -84,29 +84,31 @@ export async function compile(options: CompileOptions) {
         options.watchingFuture.resolve(watcher)
       }
       if (options.watch) {
-        console.log('\nThe compiler is watching file changes...\n')
+        writeToStderr('\nThe compiler is watching file changes...\n')
       } else {
         finished.resolve()
       }
     } else if (event.code === 'BUNDLE_START') {
       for (const out of event.output) {
-        stderr(colors.greenBright(`Creating bundle: `) + out)
+        writeToStderr(colors.greenBright(`Creating bundle: `) + out)
       }
     } else if (event.code === 'BUNDLE_END') {
       for (const out of event.output) {
-        stderr(colors.greenBright(`Wrote: `) + out + ' ' + colors.dim(`(${(event.duration / 1000).toFixed(1)}sec)`))
+        writeToStderr(
+          colors.greenBright(`Wrote: `) + out + ' ' + colors.dim(`(${(event.duration / 1000).toFixed(1)}sec)`)
+        )
       }
     } else if (event.code === 'START') {
       if (options.watch) {
         // print blank lines until it covers the screen
-        stderr('\u001B[2J')
+        writeToStderr('\u001B[2J')
         // clear the scrollback
-        stderr('\u001b[H\u001b[2J\u001b[3J')
+        writeToStderr('\u001b[H\u001b[2J\u001b[3J')
       }
     } else if (event.code === 'ERROR') {
       handleRollupError(event.error, true)
     } else {
-      console.dir(event)
+      writeToStderr(JSON.stringify(event))
     }
     // event.code can be one of:
     //   START        — the watcher is (re)starting
@@ -152,7 +154,6 @@ export async function compile(options: CompileOptions) {
   //   /* a file was modified */
   // })
   watcher.on('restart', () => {
-    console.clear()
     /* a new run was triggered */
   })
 
@@ -187,27 +188,27 @@ export function handleRollupError(error: RollupError, recover = false): void {
   const pluginSection = error.plugin ? `(plugin ${error.plugin}) ` : ''
   const message = `${pluginSection}${nameSection}${error.message}`
 
-  stderr(colors.bold(colors.red(`[!] ${colors.bold(message.toString())}`)))
+  writeToStderr(colors.bold(colors.red(`[!] ${colors.bold(message.toString())}`)))
 
   if (error.url) {
-    stderr(colors.cyan(error.url))
+    writeToStderr(colors.cyan(error.url))
   }
 
   if (error.loc) {
-    stderr(`${relativeId((error.loc.file || error.id)!)} (${error.loc.line}:${error.loc.column})`)
+    writeToStderr(`${relativeId((error.loc.file || error.id)!)} (${error.loc.line}:${error.loc.column})`)
   } else if (error.id) {
-    stderr(relativeId(error.id))
+    writeToStderr(relativeId(error.id))
   }
 
   if (error.frame) {
-    stderr(colors.dim(error.frame))
+    writeToStderr(colors.dim(error.frame))
   }
 
   if (error.stack && !recover) {
-    stderr(colors.dim(error.stack))
+    writeToStderr(colors.dim(error.stack))
   }
 
-  stderr('')
+  writeToStderr('')
 
   if (!recover) process.exit(1)
 }

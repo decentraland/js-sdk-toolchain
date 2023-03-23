@@ -55,7 +55,7 @@ export async function fetchEntityByPointer(
 }
 
 export async function getPointers(
-  components: Pick<CliComponents, 'fetch'>,
+  components: Pick<CliComponents, 'fetch' | 'logger'>,
   pointer: string,
   network: Network = 'mainnet'
 ) {
@@ -70,7 +70,7 @@ export async function getPointers(
 
       catalystInfo.push({ timestamp, entityId, url: baseUrl })
     } catch (err: any) {
-      console.log('Error fetching catalyst pointers', err)
+      components.logger.log('Error fetching catalyst pointers', err)
     }
   }
 

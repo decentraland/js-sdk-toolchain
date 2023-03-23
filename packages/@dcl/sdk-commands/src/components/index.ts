@@ -3,7 +3,7 @@ import { createAnalyticsComponent, IAnalyticsComponent } from './analytics'
 import { createDCLInfoConfigComponent, IDCLInfoConfigComponent } from './dcl-info-config'
 import { createFetchComponent, IFetchComponent } from './fetch'
 import { createFsComponent, IFileSystemComponent } from './fs'
-import { createStdoutCliLogger } from './log'
+import { createStderrCliLogger } from './log'
 
 export type CliComponents = {
   fs: IFileSystemComponent
@@ -16,12 +16,13 @@ export type CliComponents = {
 export async function initComponents(): Promise<CliComponents> {
   const fsComponent = createFsComponent()
   const dclInfoConfig = await createDCLInfoConfigComponent({ fs: fsComponent })
+  const logger = createStderrCliLogger()
 
   return {
     fs: fsComponent,
     fetch: createFetchComponent(),
-    logger: createStdoutCliLogger(),
+    logger,
     dclInfoConfig,
-    analytics: await createAnalyticsComponent({ dclInfoConfig })
+    analytics: await createAnalyticsComponent({ dclInfoConfig, logger })
   }
 }

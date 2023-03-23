@@ -45,16 +45,16 @@ export function setupRealmAndComms(components: PreviewComponents, router: Router
     return upgradeWebSocketResponse((ws: any) => {
       if (ws.protocol === 'rfc5' || ws.protocol === 'rfc4') {
         ws.on('error', (error: any) => {
-          console.error(error)
+          components.logger.error(error)
           ws.close()
         })
 
         ws.on('close', () => {
-          console.debug('Websocket closed')
+          components.logger.debug('Websocket closed')
         })
 
         handleSocketLinearProtocol(components, ws, ctx.params.roomId).catch((err: any) => {
-          console.info(err)
+          components.logger.info(err)
           ws.close()
         })
       }

@@ -70,7 +70,6 @@ export function runLinkerApp(
         components.server.use(router.allowedMethods())
         components.server.use(router.middleware())
 
-        console.log('\x1Bc')
         await startComponents()
         if (openBrowser) await browse(cliComponents, url, queryParams)
 
