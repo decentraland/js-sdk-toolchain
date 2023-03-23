@@ -93,8 +93,9 @@ export function setupEcs6Endpoints(components: CliComponents, dir: string, route
           }
         }
       }
-    } catch (err) {
-      console.warn(`Failed to catch profile and fill with preview wearables.`, err)
+    } catch (err: any) {
+      components.logger.warn(`Failed to catch profile and fill with preview wearables.`)
+      components.logger.error(err)
     }
 
     return next()
@@ -125,7 +126,6 @@ export function setupEcs6Endpoints(components: CliComponents, dir: string, route
   router.post('/content/entities', async (ctx) => {
     const catalystUrl = getCatalystUrl()
     const headers = new Headers()
-    console.log(ctx.request.headers)
     const res = await fetch(`${catalystUrl.toString()}/content/entities`, {
       method: 'post',
       headers,
@@ -142,7 +142,11 @@ export function setupEcs6Endpoints(components: CliComponents, dir: string, route
   serveFolders(components, router, baseFolders)
 }
 
-function serveFolders(components: Pick<CliComponents, 'fs'>, router: Router<PreviewComponents>, baseFolders: string[]) {
+function serveFolders(
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  router: Router<PreviewComponents>,
+  baseFolders: string[]
+) {
   router.get('/content/contents/:hash', async (ctx: any, next: any) => {
     if (ctx.params.hash && ctx.params.hash.startsWith('b64-')) {
       const fullPath = path.resolve(Buffer.from(ctx.params.hash.replace(/^b64-/, ''), 'base64').toString('utf8'))
@@ -228,7 +232,7 @@ function serveFolders(components: Pick<CliComponents, 'fs'>, router: Router<Prev
 }
 
 async function getAllPreviewWearables(
-  components: Pick<CliComponents, 'fs'>,
+  components: Pick<CliComponents, 'fs' | 'logger'>,
   { baseFolders, baseUrl }: { baseFolders: string[]; baseUrl: string }
 ) {
   const wearablePathArray: string[] = []
@@ -244,14 +248,16 @@ async function getAllPreviewWearables(
     try {
       ret.push(await serveWearable(components, wearableJsonPath, baseUrl))
     } catch (err) {
-      console.error(`Couldn't mock the wearable ${wearableJsonPath}. Please verify the correct format and scheme.`, err)
+      components.logger.error(
+        `Couldn't mock the wearable ${wearableJsonPath}. Please verify the correct format and scheme.` + err
+      )
     }
   }
   return ret
 }
 
 async function serveWearable(
-  components: Pick<CliComponents, 'fs'>,
+  components: Pick<CliComponents, 'fs' | 'logger'>,
   wearableJsonPath: string,
   baseUrl: string
 ): Promise<LambdasWearable> {
@@ -261,7 +267,7 @@ async function serveWearable(
   if (!WearableJson.validate(wearableJson)) {
     const errors = (WearableJson.validate.errors || []).map((a) => `${a.data} ${a.message}`).join('')
 
-    console.error(`Unable to validate wearable.json properly, please check it.`, errors)
+    components.logger.error(`Unable to validate wearable.json properly, please check it.` + errors)
     throw new Error(`Invalid wearable.json (${wearableJsonPath})`)
   }
 
@@ -305,7 +311,7 @@ async function serveWearable(
 }
 
 async function getSceneJson(
-  components: Pick<CliComponents, 'fs'>,
+  components: Pick<CliComponents, 'fs' | 'logger'>,
   projectRoots: string[],
   pointers: string[]
 ): Promise<Entity[]> {
@@ -423,7 +429,7 @@ function serveStatic(components: Pick<CliComponents, 'fs'>, projectRoot: string,
 }
 
 async function fakeEntityV3FromFolder(
-  components: Pick<CliComponents, 'fs'>,
+  components: Pick<CliComponents, 'fs' | 'logger'>,
   projectRoot: string,
   hashingFunction: (filePath: string) => Promise<string>
 ): Promise<Entity | null> {
@@ -437,13 +443,14 @@ async function fakeEntityV3FromFolder(
       if (!WearableJson.validate(wearableJson)) {
         const errors = (WearableJson.validate.errors || []).map((a) => `${a.data} ${a.message}`).join('')
 
-        console.error(`Unable to validate wearable.json properly, please check it.`, errors)
-        console.error(`Invalid wearable.json (${wearableJsonPath})`)
+        components.logger.error(`Unable to validate wearable.json properly, please check its schema.` + errors)
+        components.logger.error(`Invalid wearable.json (${wearableJsonPath})`)
       } else {
         isParcelScene = false
       }
-    } catch (err) {
-      console.error(`Unable to load wearable.json properly`, err)
+    } catch (err: any) {
+      components.logger.error(`Unable to load wearable.json`)
+      components.logger.error(err)
     }
   }
 

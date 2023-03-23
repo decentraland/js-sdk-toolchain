@@ -60,8 +60,9 @@ export type Events = {
 }
 
 export async function createAnalyticsComponent({
-  dclInfoConfig
-}: Pick<CliComponents, 'dclInfoConfig'>): Promise<IAnalyticsComponent> {
+  dclInfoConfig,
+  logger
+}: Pick<CliComponents, 'dclInfoConfig' | 'logger'>): Promise<IAnalyticsComponent> {
   const USER_ID = 'sdk-commands-user'
   const config = await dclInfoConfig.get()
   const analytics: Analytics = new Analytics({ writeKey: config.segmentKey ?? '' })
@@ -96,7 +97,8 @@ export async function createAnalyticsComponent({
       trackFuture.resolve()
     })
     if (!dclInfoConfig.isProduction()) {
-      console.log(trackInfo)
+      // TODO: what is this supposed to do?
+      logger.info('TrackingInfo: ' + JSON.stringify(trackInfo))
     }
     return trackFuture
   }
@@ -112,7 +114,7 @@ export async function createAnalyticsComponent({
       let dclInfo: DCLInfo = {}
       if (!config.userId) {
         dclInfo = { userId, trackStats: true }
-        console.log(
+        logger.info(
           `Decentraland CLI sends anonymous usage stats to improve their products, if you want to disable it change the configuration at ${colors.bold(
             '~/.dclinfo'
           )}\n`

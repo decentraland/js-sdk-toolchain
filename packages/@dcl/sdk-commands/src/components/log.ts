@@ -12,7 +12,7 @@ import { CliError } from '../logic/error'
  *        ^
  */
 
-const stderr = (...parameters: readonly unknown[]) => {
+export const writeToStderr = (...parameters: readonly unknown[]) => {
   process.stderr.write(`${parameters.filter(($) => $ !== undefined).join('')}\n`)
 }
 
@@ -22,27 +22,32 @@ export const colors = createColors({
   useColor: process.env.FORCE_COLOR !== '0' && !process.env.NO_COLOR
 })
 
-export function createStdoutCliLogger(): ILoggerComponent.ILogger {
+export function createStderrCliLogger(): ILoggerComponent.ILogger {
   return {
     log(message, extra) {
-      stderr(message, extra && JSON.stringify(extra))
+      writeToStderr(message, extra && JSON.stringify(extra))
     },
     debug(message, extra) {
-      stderr(colors.blueBright('debug: '), message, extra && JSON.stringify(extra))
+      writeToStderr(colors.blueBright('debug: '), message, extra && JSON.stringify(extra))
     },
     error(error, extra) {
-      stderr(colors.redBright('error: '), error, extra && JSON.stringify(extra))
+      writeToStderr(colors.redBright('error: '), error, extra && JSON.stringify(extra))
       /* istanbul ignore next */
-      if (!(error instanceof CliError) || process.env.DEBUG) {
-        // print the stacktrace if it is not a CliError
-        console.error(error)
+      if (!(error instanceof CliError)) {
+        if (error instanceof Error && error.stack) {
+          // print the stacktrace if it is not a CliError
+          writeToStderr(error.stack)
+        } else if (process.env.DEBUG) {
+          // print the stacktrace if it is not a CliError
+          writeToStderr(error.toString())
+        }
       }
     },
     info(message, extra) {
-      stderr(colors.blueBright('info: '), message, extra && JSON.stringify(extra))
+      writeToStderr(colors.blueBright('info: '), message, extra && JSON.stringify(extra))
     },
     warn(message, extra) {
-      stderr(colors.yellow('warning: '), message, extra && JSON.stringify(extra))
+      writeToStderr(colors.yellow('warning: '), message, extra && JSON.stringify(extra))
     }
   }
 }

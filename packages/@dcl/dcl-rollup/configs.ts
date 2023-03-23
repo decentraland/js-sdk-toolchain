@@ -10,13 +10,17 @@ import * as path from 'path'
 
 import { pathToFileURL } from 'url'
 
+function assert(condition: any, message: string) {
+  if (!condition) throw new Error(message)
+}
+
 export function createEcsConfig(_options: { PROD: boolean }): RollupOptions {
   const packageJsonPath = sys.resolvePath('./package.json')
   const packageJson = JSON.parse(sys.readFile(packageJsonPath)!)
 
-  console.assert(packageJson.name, 'package.json .name must be present')
-  console.assert(packageJson.main, 'package.json .main must be present')
-  console.assert(packageJson.typings, 'package.json .typings must be present')
+  assert(packageJson.name, 'package.json .name must be present')
+  assert(packageJson.main, 'package.json .main must be present')
+  assert(packageJson.typings, 'package.json .typings must be present')
 
   const out = packageJson.main // .replace(/\.js$/, '.bundled.js')
 
@@ -69,8 +73,8 @@ export function createSceneConfig(options: { PROD: boolean; single?: string }): 
   const sceneJsonPath = sys.resolvePath('./scene.json')
   const sceneJson = JSON.parse(sys.readFile(sceneJsonPath)!)
 
-  console.assert(sceneJson.main, 'scene.json .main must be present')
-  console.assert(sceneJson.runtimeVersion === '7', 'scene.json `"runtimeVersion": "7"` must be present')
+  assert(sceneJson.main, 'scene.json .main must be present')
+  assert(sceneJson.runtimeVersion === '7', 'scene.json `"runtimeVersion": "7"` must be present')
 
   const out = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
 
@@ -169,9 +173,9 @@ export function createPlaygroundEcsConfig(_options: { PROD: boolean }): RollupOp
   const packageJsonPath = sys.resolvePath('./package.json')
   const packageJson = JSON.parse(sys.readFile(packageJsonPath)!)
 
-  console.assert(packageJson.name, 'package.json .name must be present')
-  console.assert(packageJson.main, 'package.json .main must be present')
-  console.assert(packageJson.typings, 'package.json .typings must be present')
+  assert(packageJson.name, 'package.json .name must be present')
+  assert(packageJson.main, 'package.json .main must be present')
+  assert(packageJson.typings, 'package.json .typings must be present')
 
   const out = packageJson.main // .replace(/\.js$/, '.bundled.js')
 
