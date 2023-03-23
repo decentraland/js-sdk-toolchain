@@ -49,7 +49,7 @@ export async function installDependencies(components: Pick<CliComponents, 'logge
   components.logger.info('Installing dependencies...')
   // TODO: test in windows
   await exec(directory, npm, ['install'])
-  components.logger.log('Installing dependencies... ✅')
+  components.logger.info('Installing dependencies... ✅')
 }
 
 /**

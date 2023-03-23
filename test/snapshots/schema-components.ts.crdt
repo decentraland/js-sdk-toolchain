@@ -1,34 +1,21 @@
-SCENE_COMPILED_JS_SIZE_PROD=78.03k bytes
+SCENE_COMPILED_JS_SIZE_PROD=135.05k bytes
 This run is in PROD mode.
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
   ALIVE_OBJS_DELTA ~= 0.19k
-EVAL test/snapshots/schema-components.js
-  REQUIRE: ~system/EngineApi
+EVAL test/snapshots/bin/schema-components.js
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 12k
-  MALLOC_COUNT = 3795
-  ALIVE_OBJS_DELTA ~= 0.74k
+  REQUIRE: ~system/EngineApi
+  REQUIRE: ~system/EngineApi
+  OPCODES ~= 37k
+  MALLOC_COUNT = 10716
+  ALIVE_OBJS_DELTA ~= 2.38k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 4
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.0)
-  OPCODES ~= 1k
-  MALLOC_COUNT = 27
-  ALIVE_OBJS_DELTA ~= 0.01k
-CALL onUpdate(0.1)
-  OPCODES ~= 1k
-  MALLOC_COUNT = 0
-  ALIVE_OBJS_DELTA ~= 0.00k
-CALL onUpdate(0.1)
-  OPCODES ~= 1k
-  MALLOC_COUNT = 0
-  ALIVE_OBJS_DELTA ~= 0.00k
-CALL onUpdate(0.1)
-  OPCODES ~= 1k
-  MALLOC_COUNT = 0
-  ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 392.44k bytes
+  ERR! TypeError: not a function
+    at <eval> (onUpdate)

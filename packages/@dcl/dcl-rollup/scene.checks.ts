@@ -32,18 +32,6 @@ function loadSceneJson(): SceneJson {
   }
 }
 
-export function readPackageJson(): PackageJson {
-  const content = ts.sys.readFile('package.json')
-  if (content === undefined) {
-    throw new Error('package.json not found')
-  }
-  try {
-    return JSON.parse(content)
-  } catch {
-    throw new Error('Error reading package.json')
-  }
-}
-
 export function checkConfiguration() {
   const host: ts.ParseConfigHost = {
     useCaseSensitiveFileNames: ts.sys.useCaseSensitiveFileNames,
@@ -101,46 +89,4 @@ function printDiagnostic(diagnostic: ts.Diagnostic) {
   } else {
     writeToStderr(`  Error: ${message}`)
   }
-}
-
-export function loadArtifact(path: string): string {
-  try {
-    const resolved = resolveFile(path)
-    if (resolved) {
-      return ts.sys.readFile(resolved)!
-    }
-
-    throw new Error()
-  } catch (e) {
-    writeToStderr(`! Error: ${path} not found. ` + e)
-    process.exit(2)
-  }
-}
-
-export function resolveFile(path: string): string | null {
-  let resolved = ts.sys.resolvePath(path)
-
-  if (ts.sys.fileExists(resolved)) {
-    return resolved
-  }
-
-  resolved = ts.sys.resolvePath('node_modules/' + path)
-
-  if (ts.sys.fileExists(resolved)) {
-    return resolved
-  }
-
-  resolved = ts.sys.resolvePath('../node_modules/' + path)
-
-  if (ts.sys.fileExists(resolved)) {
-    return resolved
-  }
-
-  resolved = ts.sys.resolvePath('../../node_modules/' + path)
-
-  if (ts.sys.fileExists(resolved)) {
-    return resolved
-  }
-
-  return null
 }

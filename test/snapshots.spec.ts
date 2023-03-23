@@ -2,7 +2,7 @@ import { version as vmVersion } from '@dcl/quickjs-emscripten/package.json'
 import { exec } from 'child_process'
 import { existsSync, readFileSync, stat, writeFileSync } from 'fs-extra'
 import glob from 'glob'
-import path from 'path'
+import path, { basename, dirname, join } from 'path'
 import { CrdtMessageType, engine } from '../packages/@dcl/ecs/src'
 import { ReadWriteByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { CrdtMessage } from '../packages/@dcl/ecs/src/serialization/crdt'
@@ -22,10 +22,13 @@ describe('Runs the snapshots', () => {
 function testFileSnapshot(fileName: string, workingDirectory: string) {
   it(`tests the file ${fileName}`, async () => {
     await compile(fileName, workingDirectory, true)
-    const jsSizeBytesProd = (await stat(fileName.replace(/\.ts$/, '.js'))).size
+
+    const binFile = join(dirname(fileName), 'bin', basename(fileName).replace(/\.ts$/, '.js'))
+
+    const jsSizeBytesProd = (await stat(binFile)).size
     const jsProdSize = (jsSizeBytesProd / 1000).toLocaleString('en', { maximumFractionDigits: 2 })
 
-    const { result: resultFromRun, leaking } = await run(fileName.replace(/\.ts$/, '.js'))
+    const { result: resultFromRun, leaking } = await run(binFile)
 
     const result = `SCENE_COMPILED_JS_SIZE_PROD=${jsProdSize}k bytes\n` + `This run is in PROD mode.\n` + resultFromRun
 

@@ -1,11 +1,10 @@
 import { resolve } from 'path'
 import { CliComponents } from '../../components'
 import { getArgs, getArgsUsed } from '../../logic/args'
-import { compile } from '@dcl/dcl-rollup/compile'
-import future from 'fp-future'
 import { assertValidProjectFolder, installDependencies, needsDependencies } from '../../logic/project-validations'
-import { getBaseCoords, getValidSceneJson } from '../../logic/scene-validations'
+import { getBaseCoords } from '../../logic/scene-validations'
 import { b64HashingFunction } from '../../logic/project-files'
+import { bundleProject } from '../../logic/bundle'
 
 interface Options {
   args: typeof args
@@ -16,6 +15,7 @@ export const args = getArgs({
   '--watch': Boolean,
   '-w': '--watch',
   '--production': Boolean,
+  '--single': String,
   '-p': '--production',
   '--skip-install': Boolean,
   '--dir': String
@@ -38,38 +38,34 @@ export function help() {
 }
 
 export async function main(options: Options) {
-  const projectRoot = resolve(process.cwd(), options.args['--dir'] || '.')
-  await assertValidProjectFolder(options.components, projectRoot)
+  const workingDirectory = resolve(process.cwd(), options.args['--dir'] || '.')
+  await assertValidProjectFolder(options.components, workingDirectory)
 
-  const shouldInstallDeps = await needsDependencies(options.components, projectRoot)
+  const shouldInstallDeps = await needsDependencies(options.components, workingDirectory)
 
   if (shouldInstallDeps && !options.args['--skip-install']) {
-    await installDependencies(options.components, projectRoot)
+    await installDependencies(options.components, workingDirectory)
   }
 
   const watch = !!options.args['--watch']
 
-  const watchingFuture = future<any>()
-
-  await compile({
-    project: projectRoot,
+  const { sceneJson } = await bundleProject(options.components, {
+    workingDirectory,
     watch,
-    production: !!options.args['--production'],
-    watchingFuture
+    single: options.args['--single'],
+    production: !!options.args['--production']
   })
 
-  if (!watch) {
-    watchingFuture.resolve(null)
-  }
-  const sceneJson = await getValidSceneJson(options.components, projectRoot)
   const coords = getBaseCoords(sceneJson)
 
   options.components.analytics.trackSync('Build scene', {
-    projectHash: await b64HashingFunction(projectRoot),
+    projectHash: await b64HashingFunction(workingDirectory),
     coords,
     isWorkspace: false,
     args: getArgsUsed(options.args)
   })
 
-  await watchingFuture
+  if (watch) {
+    await new Promise(() => void 0)
+  }
 }

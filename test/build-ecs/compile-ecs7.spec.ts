@@ -33,7 +33,7 @@ describe('build-ecs: side-effect-free-build', () => {
   itDeletesFolder('./node_modules', cwd)
 
   itExecutes('npm i --silent --no-progress', cwd)
-  itExecutes('npm run build --silent', cwd)
+  itExecutes('npm run build --silent -- --production', cwd)
 
   it('ensure files exist', () => {
     const binPath = ensureFileExists('bin/game.js', cwd)
