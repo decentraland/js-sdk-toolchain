@@ -33,8 +33,7 @@
   "main": "dist/tooling-entrypoint.js",
   "scripts": {
     "build": "node ./build.js",
-    "start": "node ./build.js --watch --no-rpc",
-    "start-rpc": "node ./build.js --watch"
+    "start": "node ./build.js --watch"
   },
   "types": "dist/tooling-entrypoint.d.ts",
   "typings": "dist/tooling-entrypoint.d.ts"

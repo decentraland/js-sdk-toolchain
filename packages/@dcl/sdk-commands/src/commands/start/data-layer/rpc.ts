@@ -3,7 +3,7 @@ import { createRpcServer, RpcServer, RpcServerPort } from '@dcl/rpc'
 
 import * as codegen from '@dcl/rpc/dist/codegen'
 import { CliComponents } from '../../../components'
-import { createFsFromNode } from './fs'
+import { createFileSystemInterfaceFromFsComponent } from './fs'
 
 export type DataLayerContext = {
   dataLayerHost: DataLayerHost
@@ -14,9 +14,8 @@ export type DataLayer = {
   context: DataLayerContext
 }
 
-export async function createDataLayer({ fs: _fs }: Pick<CliComponents, 'fs'>): Promise<DataLayer> {
-  // TODO: implement createFsFromIFileSystemComponent(fs)
-  const dataLayerHost = await createDataLayerHost(createFsFromNode())
+export async function createDataLayer({ fs }: Pick<CliComponents, 'fs'>): Promise<DataLayer> {
+  const dataLayerHost = await createDataLayerHost(createFileSystemInterfaceFromFsComponent({ fs }))
   const context: DataLayerContext = {
     dataLayerHost
   }

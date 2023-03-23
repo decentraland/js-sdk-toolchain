@@ -26,3 +26,4 @@ test/snapshots/package-lock.json
 test/snapshots/*.js
 tmp
 scene
+test-scene

@@ -1,10 +1,10 @@
 import { FileSystemInterface } from '@dcl/inspector'
-import fs from 'fs-extra'
+import { CliComponents } from '../../../components'
 
-export function createFsFromNode(): FileSystemInterface {
+export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliComponents, 'fs'>): FileSystemInterface {
   return {
     async existFile(filePath: string): Promise<boolean> {
-      return fs.existsSync(filePath)
+      return fs.fileExists(filePath)
     },
     async readFile(filePath: string): Promise<Buffer> {
       return fs.readFile(filePath)
