@@ -13,5 +13,19 @@ CALL onStart()
   MALLOC_COUNT = 4
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.0)
-  ERR! TypeError: not a function
-    at <eval> (onUpdate)
+  OPCODES ~= 0k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 0k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 0k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 0k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 55.96k bytes

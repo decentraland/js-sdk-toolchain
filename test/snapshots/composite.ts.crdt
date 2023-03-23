@@ -15,8 +15,24 @@ EVAL test/snapshots/bin/composite.js
   ALIVE_OBJS_DELTA ~= 2.43k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 4
-  ALIVE_OBJS_DELTA ~= 0.00k
+  MALLOC_COUNT = 12
+  ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.0)
-  ERR! TypeError: not a function
-    at <eval> (onUpdate)
+  Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  Scene: PUT_COMPONENT e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
+  OPCODES ~= 4k
+  MALLOC_COUNT = 37
+  ALIVE_OBJS_DELTA ~= 0.01k
+CALL onUpdate(0.1)
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 735.84k bytes

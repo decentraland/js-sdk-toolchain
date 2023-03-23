@@ -14,8 +14,22 @@ EVAL test/snapshots/bin/schema-components.js
   ALIVE_OBJS_DELTA ~= 2.38k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 4
+  MALLOC_COUNT = 6
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.0)
-  ERR! TypeError: not a function
-    at <eval> (onUpdate)
+  OPCODES ~= 2k
+  MALLOC_COUNT = 25
+  ALIVE_OBJS_DELTA ~= 0.01k
+CALL onUpdate(0.1)
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 688.42k bytes

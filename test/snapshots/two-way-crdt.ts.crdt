@@ -16,8 +16,11 @@ EVAL test/snapshots/bin/two-way-crdt.js
   ALIVE_OBJS_DELTA ~= 3.34k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 4
+  MALLOC_COUNT = 6
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.0)
-  ERR! TypeError: not a function
-    at <eval> (onUpdate)
+  ERROR: ["❌ RootEntity has a transform"]
+  ERROR: ["❌ RootEntity has the correct scale"]
+  ERR! TypeError: cannot read property 'position' of null
+    at <anonymous> (test/snapshots/bin/two-way-crdt.js)
+    at r (test/snapshots/bin/two-way-crdt.js)

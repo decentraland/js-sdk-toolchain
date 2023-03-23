@@ -16,8 +16,41 @@ EVAL test/snapshots/bin/append-value-crdt.js
   ALIVE_OBJS_DELTA ~= 3.38k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 4
+  MALLOC_COUNT = 6
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.0)
-  ERR! TypeError: not a function
-    at <eval> (onUpdate)
+  LOG: ["PointerEventsResult",[]]
+  ERROR: ["❌ First state is pressed"]
+  ERROR: ["❌ Was triggered"]
+  ERROR: ["❌ Has DOWN command"]
+  Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  OPCODES ~= 3k
+  MALLOC_COUNT = 31
+  ALIVE_OBJS_DELTA ~= 0.01k
+CALL onUpdate(0.1)
+  LOG: ["PointerEventsResult",[]]
+  LOG: ["✅ Second state is not pressed"]
+  LOG: ["✅ DOWN Was not triggered"]
+  ERROR: ["❌ UP Was triggered"]
+  LOG: ["✅ Doesn't have DOWN command"]
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  LOG: ["PointerEventsResult",[]]
+  ERROR: ["❌ Third state is pressed"]
+  ERROR: ["❌ Was triggered"]
+  ERROR: ["❌ Has DOWN command"]
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  LOG: ["PointerEventsResult",[]]
+  LOG: ["isPressed",false]
+  LOG: ["isTriggered(entity)=",false]
+  LOG: ["isTriggered(RootEntity)=",false]
+  LOG: ["getCommand(RootEntity)=",null]
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 994.62k bytes

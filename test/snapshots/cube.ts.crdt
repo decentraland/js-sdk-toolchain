@@ -14,8 +14,23 @@ EVAL test/snapshots/bin/cube.js
   ALIVE_OBJS_DELTA ~= 2.35k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 4
+  MALLOC_COUNT = 6
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.0)
-  ERR! TypeError: not a function
-    at <eval> (onUpdate)
+  Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  OPCODES ~= 3k
+  MALLOC_COUNT = 27
+  ALIVE_OBJS_DELTA ~= 0.01k
+CALL onUpdate(0.1)
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 685.77k bytes
