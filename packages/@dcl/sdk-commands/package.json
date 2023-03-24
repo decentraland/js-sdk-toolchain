@@ -26,6 +26,7 @@
     "esbuild": "^0.17.12",
     "extract-zip": "2.0.1",
     "fp-future": "^1.0.1",
+    "glob": "^9.3.2",
     "ignore": "^5.2.4",
     "node-fetch": "^2.6.8",
     "open": "^8.4.0",
