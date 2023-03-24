@@ -1,14 +1,11 @@
 import { TransformType } from '@dcl/ecs'
 import { Quaternion } from '@dcl/ecs-math'
-import isEqual from 'deep-equal'
 
-import { NestedKey, setValue } from '../../lib/logic/get-set-value'
-import { useComponent } from '../../hooks/sdk/useComponent'
+import { isValidNumericInput, useComponentInput } from '../../hooks/sdk/useComponentInput'
 import { withSdk } from '../../hoc/withSdk'
 import { Props, TransformProps } from './types'
 
 import './EntityInspector.css'
-import { useCallback, useEffect, useState } from 'react'
 
 export const EntityInspector: React.FC<Props> = ({ entity }) => {
   return (
@@ -18,7 +15,7 @@ export const EntityInspector: React.FC<Props> = ({ entity }) => {
   )
 }
 
-type TransformInputs = {
+type TransformInput = {
   position: {
     x: string
     y: string
@@ -36,7 +33,7 @@ type TransformInputs = {
   }
 }
 
-function fromTranform(value: TransformType): TransformInputs {
+function fromTranform(value: TransformType): TransformInput {
   const angles = Quaternion.toEulerAngles(value.rotation)
   return {
     position: {
@@ -62,20 +59,7 @@ function formatAngle(angle: number) {
   return value === '360.00' ? '0.00' : value
 }
 
-function isNumeric(value: string) {
-  return !isNaN(Number(value))
-}
-
-function isValid(inputs: TransformInputs): boolean {
-  return Object.values(inputs).every((value) => {
-    if (typeof value === 'object') {
-      return Object.values(value).every((value) => value.length > 0 && isNumeric(value))
-    }
-    return isNumeric(value)
-  })
-}
-
-function toTransform(inputs: TransformInputs): TransformType {
+function toTransform(inputs: TransformInput): TransformType {
   const rotation = Quaternion.fromEulerDegrees(
     Number(inputs.rotation.x),
     Number(inputs.rotation.y),
@@ -99,45 +83,7 @@ function toTransform(inputs: TransformInputs): TransformType {
 const Transform = withSdk<TransformProps>(({ sdk, entity }) => {
   const { Transform } = sdk.components
 
-  const [transform, setTransform] = useComponent<TransformType>(entity, Transform)
-  const [inputs, setInputs] = useState<TransformInputs>(fromTranform(transform))
-  const [isFocused, setIsFocused] = useState(false)
-
-  const handleUpdate = (path: NestedKey<TransformInputs>) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newInputs = setValue(inputs, path, event.target.value)
-    setInputs(newInputs)
-  }
-
-  const handleFocus = useCallback(() => {
-    setIsFocused(true)
-  }, [])
-
-  const handleBlur = useCallback(() => {
-    setIsFocused(false)
-    setInputs(fromTranform(transform))
-  }, [transform])
-
-  // sync inputs -> engine
-  useEffect(() => {
-    if (isValid(inputs)) {
-      const newTransform = toTransform(inputs)
-      if (!isEqual(newTransform, transform)) {
-        setTransform(newTransform)
-      }
-    }
-  }, [inputs])
-
-  // sync engine -> inputs
-  useEffect(() => {
-    if (isFocused) {
-      // skip sync from state while editing, to avoid overriding the user input
-      return
-    }
-    const newInputs = fromTranform(transform)
-    if (!isEqual(newInputs, inputs)) {
-      setInputs(newInputs)
-    }
-  }, [transform])
+  const getProps = useComponentInput(entity, Transform, fromTranform, toTransform, isValidNumericInput)
 
   if (!Transform.has(entity)) return null
 
@@ -146,100 +92,37 @@ const Transform = withSdk<TransformProps>(({ sdk, entity }) => {
       <div className="block">
         <h4>Position:</h4>
         <span>
-          x
-          <input
-            type="number"
-            onChange={handleUpdate('position.x')}
-            value={inputs.position.x}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-          />
+          x<input type="number" {...getProps('position.x')} />
         </span>
         <span>
-          y
-          <input
-            type="number"
-            onChange={handleUpdate('position.y')}
-            value={inputs.position.y}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-          />
+          y<input type="number" {...getProps('position.y')} />
         </span>
         <span>
-          z
-          <input
-            type="number"
-            onChange={handleUpdate('position.z')}
-            value={inputs.position.z}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-          />
+          z<input type="number" {...getProps('position.z')} />
         </span>
       </div>
       <div className="block">
         <h4>Scale:</h4>
         <span>
-          x
-          <input
-            type="number"
-            onChange={handleUpdate('scale.x')}
-            value={inputs.scale.x}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-          />
+          x<input type="number" {...getProps('scale.x')} />
         </span>
         <span>
-          y
-          <input
-            type="number"
-            onChange={handleUpdate('scale.y')}
-            value={inputs.scale.y}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-          />
+          y<input type="number" {...getProps('scale.y')} />
         </span>
         <span>
-          z
-          <input
-            type="number"
-            onChange={handleUpdate('scale.z')}
-            value={inputs.scale.z}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-          />
+          z<input type="number" {...getProps('scale.z')} />
         </span>
       </div>
       <div className="block">
         <h4>Rotation:</h4>
         <span>
-          x
-          <input
-            type="number"
-            onChange={handleUpdate('rotation.x')}
-            value={inputs.rotation.x}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-          />
+          x<input type="number" {...getProps('rotation.x')} />
         </span>
         <span>
-          y
-          <input
-            type="number"
-            onChange={handleUpdate('rotation.y')}
-            value={inputs.rotation.y}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-          />
+          y<input type="number" {...getProps('rotation.y')} />
         </span>
         <span>
-          z
-          <input
-            type="number"
-            onChange={handleUpdate('rotation.z')}
-            value={inputs.rotation.z}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-          />
+          z<input type="number" {...getProps('rotation.z')} />
         </span>
       </div>
     </>

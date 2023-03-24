@@ -11,34 +11,34 @@ function isLastWriteWinComponent<T = unknown>(
   return !!(component as LastWriteWinElementSetComponentDefinition<unknown>).createOrReplace
 }
 
-export function useComponent<T>(entity: Entity, component: Component<T>) {
-  const [state, setState] = useState<T>(component.get(entity) as T)
+export function useComponentValue<T>(entity: Entity, component: Component<T>) {
+  const [value, setValue] = useState<T>(component.get(entity) as T)
 
   // sync state -> engine
   useEffect(() => {
     const stateInEngine = component.get(entity)
-    if (isEqual(state, stateInEngine)) {
+    if (isEqual(value, stateInEngine)) {
       return
     }
     if (isLastWriteWinComponent(component)) {
-      component.createOrReplace(entity, state)
+      component.createOrReplace(entity, value)
     } else {
       // TODO: handle update for GrowOnlyValueSetComponentDefinition
       debugger
     }
-  }, [state])
+  }, [value])
 
   // sync engine -> state
   useChange((event) => {
-    if (
-      entity === event.entity &&
-      component.componentId === event.component?.componentId &&
-      event.operation === CrdtMessageType.PUT_COMPONENT &&
-      !!event.value
-    ) {
-      setState(event.value)
+    if (entity === event.entity && component.componentId === event.component?.componentId && !!event.value) {
+      if (event.operation === CrdtMessageType.PUT_COMPONENT) {
+        setValue(event.value)
+      } else {
+        // TODO: handle update for GrowOnlyValueSetComponentDefinition
+        debugger
+      }
     }
   })
 
-  return [state, setState] as const
+  return [value, setValue] as const
 }
