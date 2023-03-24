@@ -21,7 +21,7 @@ test/sdk/simple-scene
 test/build-ecs/fixtures/*/package-lock.json
 packages/@dcl/playground-assets/etc/playground-assets.api.json
 test/snapshots/package-lock.json
-test/snapshots/*.js
+test/snapshots/**/*.js
 tmp
 scene
 test/snapshots/bin
