@@ -4,7 +4,7 @@ This run is in PROD mode.
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
   ALIVE_OBJS_DELTA ~= 0.19k
-EVAL test/snapshots/bin/two-way-crdt.js
+EVAL test/snapshots/two-way-crdt.js
   REQUIRE: buffer
   REQUIRE: long
   REQUIRE: buffer
@@ -52,4 +52,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 5k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 984.84k bytes
+  MEMORY_USAGE_COUNT ~= 984.83k bytes

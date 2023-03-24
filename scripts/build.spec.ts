@@ -11,7 +11,6 @@ import {
   JS_RUNTIME,
   PLAYGROUND_ASSETS_PATH,
   REACT_ECS,
-  ROLLUP_CONFIG_PATH,
   SDK_PATH,
   SDK_COMMANDS_PATH
 } from './common'
@@ -131,8 +130,6 @@ flow('build-all', () => {
     itExecutes(`npm i --silent`, SDK_COMMANDS_PATH)
 
     // install required dependencies
-    itExecutes(`npm install --silent ${ROLLUP_CONFIG_PATH}`, SDK_COMMANDS_PATH)
-
     itExecutes('npm run build --silent', SDK_COMMANDS_PATH)
 
     it('check files exists', () => {

@@ -4,7 +4,7 @@ This run is in PROD mode.
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
   ALIVE_OBJS_DELTA ~= 0.19k
-EVAL test/snapshots/bin/cubes.js
+EVAL test/snapshots/cubes.js
   REQUIRE: buffer
   REQUIRE: long
   REQUIRE: ~system/EngineApi
@@ -1653,4 +1653,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 638k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1000.93k bytes
+  MEMORY_USAGE_COUNT ~= 1000.92k bytes

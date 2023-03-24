@@ -4,7 +4,7 @@ import { future } from 'fp-future'
 import { CliComponents } from '../components'
 import { CliError } from './error'
 import { getValidSceneJson } from './scene-validations'
-import { dirname, join } from 'path'
+import { join } from 'path'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 

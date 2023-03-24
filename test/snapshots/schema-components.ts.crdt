@@ -4,7 +4,7 @@ This run is in PROD mode.
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
   ALIVE_OBJS_DELTA ~= 0.19k
-EVAL test/snapshots/bin/schema-components.js
+EVAL test/snapshots/schema-components.js
   REQUIRE: buffer
   REQUIRE: long
   REQUIRE: ~system/EngineApi

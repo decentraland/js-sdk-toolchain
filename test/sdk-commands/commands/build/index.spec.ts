@@ -1,6 +1,6 @@
 import * as projectValidation from '../../../../packages/@dcl/sdk-commands/src/logic/project-validations'
 import * as filesValidation from '../../../../packages/@dcl/sdk-commands/src/logic/scene-validations'
-import * as dclCompiler from '../../../../packages/@dcl/dcl-rollup/compile'
+import * as dclCompiler from '../../../../packages/@dcl/sdk-commands/src/logic/bundle'
 import * as build from '../../../../packages/@dcl/sdk-commands/src/commands/build/index'
 import { initComponents } from '../../../../packages/@dcl/sdk-commands/src/components'
 
@@ -67,19 +67,20 @@ describe('build command', () => {
     const components = await initComponents()
     jest.spyOn(projectValidation, 'assertValidProjectFolder').mockResolvedValue({ scene: {} as any })
     jest.spyOn(projectValidation, 'needsDependencies').mockResolvedValue(false)
-    jest.spyOn(filesValidation, 'getValidSceneJson').mockResolvedValue({ scene: { base: '0,0' } } as any)
-    const tsBuildSpy = jest.spyOn(dclCompiler, 'compile').mockResolvedValue(null as any)
+    const sceneJson = { scene: { base: '0,0' } } as any
+    const tsBuildSpy = jest.spyOn(dclCompiler, 'bundleProject').mockResolvedValue({ sceneJson, context: null as any })
 
     await build.main({
       args: { _: [], '--watch': false, '--production': true },
       components
     })
 
-    expect(tsBuildSpy).toBeCalledWith({
-      project: process.cwd(),
+    expect(tsBuildSpy).toBeCalledWith(components, {
+      workingDirectory: process.cwd(),
+      emitDeclaration: false,
       watch: false,
-      production: true,
-      watchingFuture: expect.anything()
+      single: undefined,
+      production: true
     })
   })
 })

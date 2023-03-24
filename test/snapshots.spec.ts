@@ -23,7 +23,7 @@ function testFileSnapshot(fileName: string, workingDirectory: string) {
   it(`tests the file ${fileName}`, async () => {
     await compile(fileName, workingDirectory, true)
 
-    const binFile = basename(fileName).replace(/\.ts$/, '.js')
+    const binFile = fileName.replace(/\.ts$/, '.js')
 
     const jsSizeBytesProd = (await stat(binFile)).size
     const jsProdSize = (jsSizeBytesProd / 1000).toLocaleString('en', { maximumFractionDigits: 2 })
