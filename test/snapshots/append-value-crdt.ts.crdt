@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=208.84k bytes
+SCENE_COMPILED_JS_SIZE_PROD=208.83k bytes
 This run is in PROD mode.
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -12,45 +12,50 @@ EVAL test/snapshots/bin/append-value-crdt.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 58k
-  MALLOC_COUNT = 15110
+  MALLOC_COUNT = 15109
   ALIVE_OBJS_DELTA ~= 3.38k
 CALL onStart()
-  OPCODES ~= 0k
-  MALLOC_COUNT = 6
-  ALIVE_OBJS_DELTA ~= 0.00k
+  Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5}
+  OPCODES ~= 8k
+  MALLOC_COUNT = 92
+  ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0.0)
-  LOG: ["PointerEventsResult",[]]
-  ERROR: ["❌ First state is pressed"]
-  ERROR: ["❌ Was triggered"]
-  ERROR: ["❌ Has DOWN command"]
+  LOG: ["PointerEventsResult",[{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5}]]
+  LOG: ["✅ First state is pressed"]
+  LOG: ["✅ Was triggered"]
+  LOG: ["✅ Has DOWN command"]
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 3k
+  Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":0,"timestamp":2,"analog":5}
+  OPCODES ~= 16k
+  MALLOC_COUNT = 79
+  ALIVE_OBJS_DELTA ~= 0.03k
+CALL onUpdate(0.1)
+  LOG: ["PointerEventsResult",[{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5},{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":0,"timestamp":2,"analog":5}]]
+  LOG: ["✅ Second state is not pressed"]
+  LOG: ["✅ DOWN Was not triggered"]
+  LOG: ["✅ UP Was triggered"]
+  LOG: ["✅ Doesn't have DOWN command"]
+  Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":3,"analog":5}
+  OPCODES ~= 13k
   MALLOC_COUNT = 31
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
-  LOG: ["PointerEventsResult",[]]
-  LOG: ["✅ Second state is not pressed"]
-  LOG: ["✅ DOWN Was not triggered"]
-  ERROR: ["❌ UP Was triggered"]
-  LOG: ["✅ Doesn't have DOWN command"]
-  OPCODES ~= 2k
-  MALLOC_COUNT = 0
-  ALIVE_OBJS_DELTA ~= 0.00k
+  LOG: ["PointerEventsResult",[{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5},{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":0,"timestamp":2,"analog":5},{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":3,"analog":5}]]
+  LOG: ["✅ Third state is pressed"]
+  LOG: ["✅ Was triggered"]
+  LOG: ["✅ Has DOWN command"]
+  Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":0,"timestamp":4,"analog":5}
+  OPCODES ~= 13k
+  MALLOC_COUNT = 31
+  ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
-  LOG: ["PointerEventsResult",[]]
-  ERROR: ["❌ Third state is pressed"]
-  ERROR: ["❌ Was triggered"]
-  ERROR: ["❌ Has DOWN command"]
-  OPCODES ~= 2k
-  MALLOC_COUNT = 0
-  ALIVE_OBJS_DELTA ~= 0.00k
-CALL onUpdate(0.1)
-  LOG: ["PointerEventsResult",[]]
+  LOG: ["PointerEventsResult",[{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5},{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":0,"timestamp":2,"analog":5},{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":3,"analog":5},{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":0,"timestamp":4,"analog":5}]]
   LOG: ["isPressed",false]
   LOG: ["isTriggered(entity)=",false]
   LOG: ["isTriggered(RootEntity)=",false]
   LOG: ["getCommand(RootEntity)=",null]
-  OPCODES ~= 2k
-  MALLOC_COUNT = 0
-  ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 994.62k bytes
+  Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":5,"analog":5}
+  OPCODES ~= 13k
+  MALLOC_COUNT = 31
+  ALIVE_OBJS_DELTA ~= 0.01k
+  MEMORY_USAGE_COUNT ~= 1011.11k bytes

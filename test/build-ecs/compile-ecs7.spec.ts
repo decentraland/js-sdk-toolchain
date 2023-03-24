@@ -2,7 +2,7 @@ import { resolve } from 'path'
 import { readFileSync } from 'fs'
 import { itExecutes, ensureFileExists, itDeletesFolder } from '../../scripts/helpers'
 
-describe('build-ecs: simple scene compilation', () => {
+describe('build: simple scene compilation', () => {
   const cwd = resolve(__dirname, './fixtures/ecs7-scene')
 
   itDeletesFolder('./bin', cwd)
@@ -26,7 +26,7 @@ describe('build-ecs: simple scene compilation', () => {
   })
 })
 
-describe('build-ecs: side-effect-free-build', () => {
+describe('build: side-effect-free-build', () => {
   const cwd = resolve(__dirname, './fixtures/side-effect-free-build')
 
   itDeletesFolder('./bin', cwd)

@@ -3,9 +3,6 @@
   "description": "",
   "version": "7.0.0",
   "author": "",
-  "bin": {
-    "build-ecs": "./index.js"
-  },
   "dependencies": {
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-node-resolve": "^15.0.1",

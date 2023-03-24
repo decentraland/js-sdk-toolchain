@@ -119,7 +119,7 @@ export function getEntityMapping(
  * @deprecated composite is not being supported so far, please do not use this feature
  *
  */
-/*#__PURE__*/
+/* @__PURE__ */
 export function instanceComposite(
   engine: IEngine,
   compositeData: Composite,
