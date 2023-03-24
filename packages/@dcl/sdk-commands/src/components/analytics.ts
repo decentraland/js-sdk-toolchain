@@ -96,10 +96,6 @@ export async function createAnalyticsComponent({
     analytics.track(trackInfo, () => {
       trackFuture.resolve()
     })
-    if (!dclInfoConfig.isProduction()) {
-      // TODO: what is this supposed to do?
-      logger.info('TrackingInfo: ' + JSON.stringify(trackInfo))
-    }
     return trackFuture
   }
   return {

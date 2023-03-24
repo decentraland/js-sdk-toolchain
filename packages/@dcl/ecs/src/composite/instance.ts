@@ -6,17 +6,24 @@ import { ComponentDefinition, IEngine, LastWriteWinElementSetComponentDefinition
 import { Schemas } from '../schemas'
 import { ReadWriteByteBuffer } from '../serialization/ByteBuffer'
 import { getCompositeRootComponent } from './components'
-import { ComponentData, Composite, CompositeComponent, CompositeProvider } from './types'
+import { ComponentData, CompositeComponent, CompositeDefinition } from './proto/gen/composite.gen'
 
-// @public
+/**
+ * @public
+ */
+export type CompositeProvider = {
+  getCompositeOrNull(id: string): CompositeDefinition | null
+}
+
+/** @public */
 /* @__PURE__ */
-export const enum EntityMappingMode {
+export enum EntityMappingMode {
   EMM_NONE = 0,
   EMM_NEXT_AVAILABLE = 1,
   EMM_DIRECT_MAPPING = 2
 }
 
-// @public
+/** @public  */
 export type InstanceCompositeOptions = {
   entityMapping?:
     | {
@@ -111,21 +118,14 @@ export function getEntityMapping(
 }
 
 /**
- * Instance a composite and returns its root entity
- * @param compositeData state serialized by the CRDT protocol
- * @param getNextAvailableEntity function that gives unused entities
- * @param rootEntity (optional) suggested mapped rootEntity for the composite
- *
- * @public
- * @deprecated composite is not being supported so far, please do not use this feature
- *
+ * @internal
  */
 /* @__PURE__ */
 export function instanceComposite(
   engine: IEngine,
-  compositeData: Composite,
+  compositeData: CompositeDefinition,
   compositeProvider: CompositeProvider,
-  options: InstanceCompositeOptions = {}
+  options: InstanceCompositeOptions
 ) {
   const { rootEntity, alreadyRequestedId: optionalAlreadyRequestedId, entityMapping } = options
   const alreadyRequestedId = optionalAlreadyRequestedId || new Set<string>()

@@ -513,12 +513,24 @@ export const enum ComponentType {
     LastWriteWinElementSet = 0
 }
 
-// @public (undocumented)
-export interface Composite {
+// @public @deprecated (undocumented)
+export type Composite = CompositeDefinition;
+
+// @public @deprecated (undocumented)
+export namespace Composite {
     // (undocumented)
-    components: CompositeComponent[];
+    export function fromBinary(buffer: Uint8Array): Composite.Type;
     // (undocumented)
-    id: string;
+    export function fromJson(object: any): Composite.Type;
+    export function instance(engine: IEngine, compositeData: Composite.Type, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): void;
+    // (undocumented)
+    export type Provider = CompositeProvider;
+    // (undocumented)
+    export function toBinary(composite: Composite.Type): Uint8Array;
+    // (undocumented)
+    export function toJson(composite: Composite.Type): any;
+    // (undocumented)
+    export type Type = CompositeDefinition;
 }
 
 // @public (undocumented)
@@ -539,30 +551,27 @@ export interface CompositeComponent_DataEntry {
     value: ComponentData | undefined;
 }
 
-// Warning: (ae-missing-release-tag) "compositeFromBinary" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
-export function compositeFromBinary(buffer: Uint8Array): Composite;
+export interface CompositeDefinition {
+    // (undocumented)
+    components: CompositeComponent[];
+    // (undocumented)
+    id: string;
+}
 
-// Warning: (ae-missing-release-tag) "compositeFromJson" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
-export function compositeFromJson(object: any): Composite;
-
-// @public @deprecated (undocumented)
 export type CompositeProvider = {
-    getCompositeOrNull: (id: string) => Composite | null;
+    getCompositeOrNull(id: string): CompositeDefinition | null;
 };
 
-// Warning: (ae-missing-release-tag) "compositeToBinary" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function compositeToBinary(composite: Composite): Uint8Array;
-
-// Warning: (ae-missing-release-tag) "compositeToJson" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function compositeToJson(composite: Composite): any;
+// @public @deprecated (undocumented)
+export type CompositeRootType = {
+    id: string;
+    entities: {
+        src: Entity;
+        dest: Entity;
+    }[];
+};
 
 // @public
 export type ConflictResolutionMessage = PutComponentMessageBody | DeleteComponentMessageBody;
@@ -762,10 +771,8 @@ export type EntityContainer = {
     updateUsedEntity(entity: Entity): boolean;
 };
 
-// Warning: (ae-missing-release-tag) "EntityMappingMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
-export const enum EntityMappingMode {
+export enum EntityMappingMode {
     // (undocumented)
     EMM_DIRECT_MAPPING = 2,
     // (undocumented)
@@ -830,6 +837,9 @@ export const enum Font {
     // (undocumented)
     F_SERIF = 1
 }
+
+// @public @deprecated (undocumented)
+export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementSetComponentDefinition<CompositeRootType>;
 
 // Warning: (ae-missing-release-tag) "GizmoDragEndEvent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -1177,15 +1187,6 @@ export type InputEventResult = {
 // @public
 export const inputSystem: IInputSystem;
 
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-//
-// @public @deprecated
-export function instanceComposite(engine: IEngine, compositeData: Composite, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): Entity;
-
-// Warning: (ae-missing-release-tag) "InstanceCompositeOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type InstanceCompositeOptions = {
     entityMapping?: {

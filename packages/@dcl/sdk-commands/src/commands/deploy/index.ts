@@ -89,7 +89,7 @@ export async function main(options: Options) {
   options.components.analytics.trackSync('Scene deploy started', trackProps)
 
   if (!skipBuild) {
-    await npmRun(projectRoot, 'build')
+    await npmRun(options.components, projectRoot, 'build')
   }
 
   // Obtain list of files to deploy

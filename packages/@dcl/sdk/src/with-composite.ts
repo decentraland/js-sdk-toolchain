@@ -1,4 +1,4 @@
-import { engine, instanceComposite } from '@dcl/ecs'
+import { engine, Composite } from '@dcl/ecs'
 import { createContentFetchCompositeProvider } from './composite-provider'
 import { onStart as basicOnStart, onUpdate as basicOnUpdate } from './index'
 
@@ -12,7 +12,7 @@ export const onUpdate = basicOnUpdate
   const compositeProvider = await createContentFetchCompositeProvider()
   const mainComposite = compositeProvider.getCompositeOrNull('main')
   if (mainComposite) {
-    instanceComposite(engine, mainComposite, compositeProvider)
+    Composite.instance(engine, mainComposite, compositeProvider)
   }
 
   await basicOnStart()
