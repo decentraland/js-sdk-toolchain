@@ -1,3 +1,8 @@
+// this file is tested extensively to build scenes in the `make test` command
+// but since it runs outiside the testing harness, coverage is not collected
+
+/* istanbul ignore file */
+
 import esbuild from 'esbuild'
 import child_process from 'child_process'
 import { future } from 'fp-future'

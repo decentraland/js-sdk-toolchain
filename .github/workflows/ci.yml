@@ -31,7 +31,11 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
-      - name: lint
+      - name: install npm v8
+        run: npm i -g npm@8
+      - name: install
+        run: make install
+      - name: docs
         run: make docs
   test:
     runs-on: ubuntu-latest

@@ -71,6 +71,7 @@ describe('Dcl Info Config Component', () => {
     process.env = {
       ...originalEnv,
       NODE_ENV: 'production',
+      DEVELOPER_MODE: '',
       CI: 'false'
     }
     const fsComponent = createFsComponent()
