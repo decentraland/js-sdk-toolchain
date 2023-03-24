@@ -95,7 +95,7 @@ describe('build:helpers', () => {
 
   it('installDependencies: should run dependencies installation', async () => {
     const components = await initComponents()
-    const execSpy = jest.spyOn(execUtils, 'exec').mockResolvedValue()
+    const execSpy = jest.spyOn(components.spawner, 'exec').mockResolvedValue()
 
     await projectValidation.installDependencies(components, 'some/path')
 
@@ -103,9 +103,10 @@ describe('build:helpers', () => {
   })
 
   it('npmRun: should build pass on the process.env', async () => {
-    const execSpy = jest.spyOn(execUtils, 'exec').mockResolvedValue()
+    const components = await initComponents()
+    const execSpy = jest.spyOn(components.spawner, 'exec').mockResolvedValue()
 
-    await projectValidation.npmRun('some/path', 'build', 'a')
+    await projectValidation.npmRun(components, 'some/path', 'build', 'a')
 
     expect(execSpy).toBeCalledWith('some/path', 'npm', ['run', 'build', '--silent', '--', 'a'], {
       env: process.env

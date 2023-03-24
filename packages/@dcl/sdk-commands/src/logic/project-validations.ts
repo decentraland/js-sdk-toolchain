@@ -2,7 +2,6 @@ import { Scene } from '@dcl/schemas'
 import { resolve } from 'path'
 import { CliComponents } from '../components'
 import { CliError } from './error'
-import { exec } from './exec'
 import { getValidSceneJson } from './scene-validations'
 
 /**
@@ -45,17 +44,25 @@ export const npm = /^win/.test(process.platform) ? 'npm.cmd' : 'npm'
 /*
  * Runs "npm install" for desired project
  */
-export async function installDependencies(components: Pick<CliComponents, 'logger'>, directory: string): Promise<void> {
+export async function installDependencies(
+  components: Pick<CliComponents, 'logger' | 'spawner'>,
+  directory: string
+): Promise<void> {
   components.logger.info('Installing dependencies...')
   // TODO: test in windows
-  await exec(directory, npm, ['install'])
+  await components.spawner.exec(directory, npm, ['install'])
   components.logger.info('Installing dependencies... ✅')
 }
 
 /**
  * Run NPM commands
  */
-export async function npmRun(cwd: string, command: string, ...args: string[]): Promise<void> {
+export async function npmRun(
+  components: Pick<CliComponents, 'spawner'>,
+  cwd: string,
+  command: string,
+  ...args: string[]
+): Promise<void> {
   // TODO: test in windows
-  await exec(cwd, npm, ['run', command, '--silent', '--', ...args], { env: process.env as any })
+  await components.spawner.exec(cwd, npm, ['run', command, '--silent', '--', ...args], { env: process.env as any })
 }

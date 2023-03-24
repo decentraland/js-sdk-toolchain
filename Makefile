@@ -32,9 +32,9 @@ lint:
 	node_modules/.bin/eslint . --ext .ts
 
 lint-fix:
-	node_modules/.bin/eslint . --ext .ts --fix
 	node_modules/.bin/syncpack format --config .syncpackrc.json  --source "packages/@dcl/*/package.json" --source "package.json"
 	node_modules/.bin/syncpack fix-mismatches --config .syncpackrc.jsonnode_modules/.bin/syncpack format --config .syncpackrc.json --source "packages/@dcl/*/package.json" --source "package.json"
+	node_modules/.bin/eslint . --ext .ts --fix
 
 TESTARGS ?= test/
 test:

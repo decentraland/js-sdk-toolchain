@@ -27,7 +27,7 @@ import { createDataLayer } from './data-layer/rpc'
 
 interface Options {
   args: typeof args
-  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'dclInfoConfig' | 'analytics'>
+  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'dclInfoConfig' | 'analytics' | 'spawner'>
 }
 
 export const args = getArgs({
@@ -93,7 +93,7 @@ export async function main(options: Options) {
 
   // first run `npm run build`, this can be disabled with --skip-build
   if (!skipBuild) {
-    await npmRun(projectRoot, 'build')
+    await npmRun(options.components, projectRoot, 'build')
   }
 
   // then start the embedded compiler, this can be disabled with --no-watch

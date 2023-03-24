@@ -8,7 +8,7 @@ import { bundleProject } from '../../logic/bundle'
 
 interface Options {
   args: typeof args
-  components: Pick<CliComponents, 'fs' | 'logger' | 'dclInfoConfig' | 'analytics'>
+  components: Pick<CliComponents, 'fs' | 'logger' | 'dclInfoConfig' | 'analytics' | 'spawner'>
 }
 
 export const args = getArgs({

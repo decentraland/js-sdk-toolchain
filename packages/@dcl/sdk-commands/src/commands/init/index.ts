@@ -10,7 +10,7 @@ import { installDependencies, needsDependencies } from '../../logic/project-vali
 
 interface Options {
   args: typeof args
-  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'dclInfoConfig' | 'analytics'>
+  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'dclInfoConfig' | 'analytics' | 'spawner'>
 }
 
 export const args = getArgs({

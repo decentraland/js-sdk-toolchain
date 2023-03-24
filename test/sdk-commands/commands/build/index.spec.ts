@@ -1,5 +1,4 @@
 import * as projectValidation from '../../../../packages/@dcl/sdk-commands/src/logic/project-validations'
-import * as filesValidation from '../../../../packages/@dcl/sdk-commands/src/logic/scene-validations'
 import * as dclCompiler from '../../../../packages/@dcl/sdk-commands/src/logic/bundle'
 import * as build from '../../../../packages/@dcl/sdk-commands/src/commands/build/index'
 import { initComponents } from '../../../../packages/@dcl/sdk-commands/src/components'
