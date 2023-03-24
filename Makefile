@@ -66,12 +66,13 @@ node_modules/.bin/protobuf/bin/protoc:
 	rm $(PROTOBUF_ZIP)
 	chmod +x ./node_modules/.bin/protobuf/bin/protoc
 
-docs:
+docs: build
 	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/docs.spec.ts
 # Cloudflare doesn't allow a directory called functions. 🪄🎩
 	mv api-docs/functions api-docs/funcs
+	cp -r packages/@dcl/inspector/public api-docs/inspector
 	find ./api-docs -type f -name '*.html' \
-  | xargs sed ${SED_OPTION} -E 's:(href="[^"]+)functions/:\1funcs/:g'
+  	| xargs sed ${SED_OPTION} -E 's:(href="[^"]+)functions/:\1funcs/:g'
 
 test-watch:
 	node_modules/.bin/jest --detectOpenHandles --colors --watch --roots "test"
