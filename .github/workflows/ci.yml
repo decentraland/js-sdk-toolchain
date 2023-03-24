@@ -33,8 +33,6 @@ jobs:
           cache: 'npm'
       - name: install npm v8
         run: npm i -g npm@8
-      - name: install
-        run: make install
       - name: docs
         run: make docs
   test:
