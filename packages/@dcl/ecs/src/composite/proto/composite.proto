@@ -14,7 +14,7 @@ message CompositeComponent {
     map<int32, ComponentData> data = 3;
 }
 
-message Composite {
+message CompositeDefinition {
     string id = 1;
     repeated CompositeComponent components = 2;
 }

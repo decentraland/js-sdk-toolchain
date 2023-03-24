@@ -6,9 +6,9 @@ import {
   DeepReadonly,
   Entity,
   IEngine,
-  LastWriteWinElementSetComponentDefinition
+  LastWriteWinElementSetComponentDefinition,
+  getCompositeRootComponent
 } from '@dcl/ecs'
-import { getCompositeRootComponent } from '@dcl/ecs/dist/composite/components'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 
 function componentToCompositeComponentData<T>(
