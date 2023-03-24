@@ -5,7 +5,7 @@ import { CliComponents } from '../components'
 import { CliError } from './error'
 import { getValidSceneJson } from './scene-validations'
 import { join } from 'path'
-import { printProgressInfo, printProgressStep, printSuccess } from './beautiful-logs'
+import { printProgressInfo, printProgressStep } from './beautiful-logs'
 import { colors } from '../components/log'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
@@ -30,6 +30,7 @@ export type CompileOptions = {
 }
 
 const MAX_STEP = 3
+
 export async function bundleProject(components: BundleComponents, options: CompileOptions) {
   const sceneJson = await getValidSceneJson(components, options.workingDirectory)
   const tsconfig = join(options.workingDirectory, 'tsconfig.json')
@@ -58,7 +59,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
     bundle: true,
     platform: 'browser',
     format: 'cjs',
-    preserveSymlinks: true,
+    preserveSymlinks: false,
     outfile: join(options.workingDirectory, output),
     allowOverwrite: false,
     sourcemap: options.production ? 'external' : 'inline',
