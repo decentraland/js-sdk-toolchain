@@ -22,6 +22,9 @@ export type CompileOptions = {
 
   // build a project folder
   workingDirectory: string
+
+  // emit typescript declarations
+  emitDeclaration: boolean
 }
 
 export async function bundleProject(components: BundleComponents, options: CompileOptions) {
@@ -34,7 +37,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
     throw new CliError('scene.json `"runtimeVersion": "7"` must be present')
   }
 
-  const out = !options.single ? sceneJson.main : join(dirname(sceneJson.main), options.single.replace(/\.ts$/, '.js'))
+  const out = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
 
   const context = await esbuild.context({
     entryPoints: [options.single ?? 'src/index.ts'],
@@ -63,9 +66,8 @@ export async function bundleProject(components: BundleComponents, options: Compi
     await context.watch({})
   } else {
     components.logger.info(`> Building file ${options.single ?? 'src/index.ts'} in folder ${options.workingDirectory}`)
-    const t = await context.rebuild()
+    await context.rebuild()
     await context.dispose()
-    console.dir(t)
     components.logger.info(`> Bundle emitted to ${out}`)
   }
 
@@ -75,7 +77,12 @@ export async function bundleProject(components: BundleComponents, options: Compi
 }
 
 function runTypeChecker(components: BundleComponents, options: CompileOptions) {
-  const args = [require.resolve('typescript/lib/tsc'), '-p', 'tsconfig.json']
+  const args = [
+    require.resolve('typescript/lib/tsc'),
+    '-p',
+    'tsconfig.json',
+    options.emitDeclaration ? '--emitDeclarationOnly' : '--noEmit'
+  ]
   if (options.watch) args.push('--watch')
 
   components.logger.info('> Running typechecker')

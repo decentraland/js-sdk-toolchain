@@ -27,7 +27,6 @@ PBS_TS = $(SCENE_PROTO_FILES:node_modules/@dcl/protocol/proto/decentraland/kerne
 install:
 	npm i
 	make node_modules/.bin/protobuf/bin/protoc
-	cd packages/@dcl/dcl-rollup; npm ci
 
 lint:
 	node_modules/.bin/eslint . --ext .ts
@@ -108,7 +107,6 @@ deep-clean-and-snapshot:
 
 deep-clean:
 	rm -rf node_modules/ \
-		packages/@dcl/dcl-rollup/node_modules/ \
 		packages/@dcl/ecs/node_modules/ \
 		packages/@dcl/react-ecs/node_modules/ \
 		packages/@dcl/sdk/node_modules/ \
@@ -121,7 +119,6 @@ update-snapshots: test
 clean:
 	@echo "> Cleaning all folders"
 	@rm -rf coverage/
-	@rm -rf packages/@dcl/dcl-rollup/*.js packages/@dcl/dcl-rollup/*.d.ts
 	@rm -rf packages/@dcl/sdk/*.js packages/@dcl/sdk/*.d.ts packages/@dcl/sdk/internal
 	@rm -rf packages/@dcl/inspector/public/*.js packages/@dcl/inspector/public/*.d.ts packages/@dcl/inspector/public/*.map packages/@dcl/inspector/public/*.css
 	@rm -rf packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/

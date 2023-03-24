@@ -5,8 +5,6 @@ export const flow = describe
 
 // TOOLS
 export const TSC = resolve(process.cwd(), './node_modules/typescript/bin/tsc')
-export const TERSER = resolve(process.cwd(), './packages/@dcl/dcl-rollup/node_modules/.bin/terser')
-export const ROLLUP = resolve(process.cwd(), './packages/@dcl/dcl-rollup/node_modules/.bin/rollup')
 
 // WORKING DIRECTORIES
 export const ROLLUP_CONFIG_PATH = resolve(process.cwd(), './packages/@dcl/dcl-rollup')
@@ -21,7 +19,5 @@ export const REACT_ECS = resolve(process.cwd(), './packages/@dcl/react-ecs')
 export function commonChecks() {
   test('tooling is installed', () => {
     ensureFileExists(TSC)
-    ensureFileExists(TERSER)
-    ensureFileExists(ROLLUP)
   })
 }

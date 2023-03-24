@@ -16,6 +16,7 @@ export const args = getArgs({
   '-w': '--watch',
   '--production': Boolean,
   '--single': String,
+  '--emitDeclaration': Boolean,
   '-p': '--production',
   '--skip-install': Boolean,
   '--dir': String
@@ -53,7 +54,8 @@ export async function main(options: Options) {
     workingDirectory,
     watch,
     single: options.args['--single'],
-    production: !!options.args['--production']
+    production: !!options.args['--production'],
+    emitDeclaration: !!options.args['--emitDeclaration']
   })
 
   const coords = getBaseCoords(sceneJson)

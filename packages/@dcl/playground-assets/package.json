@@ -19,8 +19,8 @@
   "minCliVersion": "3.12.3",
   "scripts": {
     "build": "npm run build-playground && node_modules/.bin/api-extractor run",
-    "build-playground": "./../dcl-rollup/node_modules/.bin/rollup -c ./../dcl-rollup/playground-ecs.config.js",
-    "build-local": "npm run build-playground && node_modules/.bin/api-extractor run --local --verbose --diagnostics"
+    "build-local": "npm run build-playground && node_modules/.bin/api-extractor run --local --verbose --diagnostics",
+    "build-playground": "./../sdk-commands/dist/index.js build --production --emitDeclaration"
   },
   "tsdoc": {
     "tsdocFlavor": "AEDoc"

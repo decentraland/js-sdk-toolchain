@@ -7,7 +7,6 @@
     "sdk-commands": "./dist/index.js"
   },
   "dependencies": {
-    "@dcl/dcl-rollup": "file:../dcl-rollup",
     "@dcl/hashing": "1.1.3",
     "@dcl/inspector": "file:../inspector",
     "@dcl/linker-dapp": "0.7.0",

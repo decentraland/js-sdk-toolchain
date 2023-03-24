@@ -135,7 +135,11 @@ export async function withQuickJsVm<T>(
         return dumpAndDispose(vm, resolvedHandle)
       },
       async onServerUpdate(data: Uint8Array) {
-        const result = callFunctionFromEval(vm, '(module.exports.onServerUpdate || (async () => (new Uint8Array())))', data)
+        const result = callFunctionFromEval(
+          vm,
+          '(module.exports.onServerUpdate || (async () => (new Uint8Array())))',
+          data
+        )
 
         const promiseHandle = vm.unwrapResult(result)
 
