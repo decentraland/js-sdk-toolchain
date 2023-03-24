@@ -7,6 +7,8 @@ import {
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 
+export type Component<T = unknown> = LastWriteWinElementSetComponentDefinition<T>
+
 export type EditorComponentsTypes = {
   label: { label: string }
   entitySelected: { gizmo: number }

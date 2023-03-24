@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
-import { CrdtMessageType, Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
 import isEqual from 'deep-equal'
+import { CrdtMessageType, Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
+import { Component } from '../../lib/sdk/components'
 import { useChange } from './useChange'
-
-export type Component<T = unknown> = LastWriteWinElementSetComponentDefinition<T>
 
 function isLastWriteWinComponent<T = unknown>(
   component: Component
@@ -11,8 +10,8 @@ function isLastWriteWinComponent<T = unknown>(
   return !!(component as LastWriteWinElementSetComponentDefinition<unknown>).createOrReplace
 }
 
-export function useComponentValue<T>(entity: Entity, component: Component<T>) {
-  const [value, setValue] = useState<T>(component.get(entity) as T)
+export const useComponentValue = <ComponentValueType>(entity: Entity, component: Component<ComponentValueType>) => {
+  const [value, setValue] = useState<ComponentValueType>(component.get(entity) as ComponentValueType)
 
   // sync state -> engine
   useEffect(() => {

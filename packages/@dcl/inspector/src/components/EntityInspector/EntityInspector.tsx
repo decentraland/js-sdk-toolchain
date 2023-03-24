@@ -2,6 +2,7 @@ import { TransformType } from '@dcl/ecs'
 import { Quaternion } from '@dcl/ecs-math'
 
 import { isValidNumericInput, useComponentInput } from '../../hooks/sdk/useComponentInput'
+import { useHasComponent } from '../../hooks/sdk/useHasComponent'
 import { withSdk } from '../../hoc/withSdk'
 import { Props, TransformProps } from './types'
 
@@ -82,10 +83,12 @@ function toTransform(inputs: TransformInput): TransformType {
 
 const Transform = withSdk<TransformProps>(({ sdk, entity }) => {
   const { Transform } = sdk.components
-
+  const hasTransform = useHasComponent(entity, Transform)
   const getProps = useComponentInput(entity, Transform, fromTranform, toTransform, isValidNumericInput)
 
-  if (!Transform.has(entity)) return null
+  if (!hasTransform) {
+    return null
+  }
 
   return (
     <>

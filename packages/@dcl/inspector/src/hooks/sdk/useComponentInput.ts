@@ -2,7 +2,8 @@ import { InputHTMLAttributes, useCallback, useEffect, useState } from 'react'
 import isEqual from 'deep-equal'
 import { Entity } from '@dcl/ecs'
 import { getValue, NestedKey, setValue } from '../../lib/logic/get-set-value'
-import { Component, useComponentValue } from './useComponentValue'
+import { Component } from '../../lib/sdk/components'
+import { useComponentValue } from './useComponentValue'
 
 type Input = {
   [key: string]: string | Record<string, string | Input>
@@ -15,13 +16,13 @@ export function isValidNumericInput(input: Input | string): boolean {
   return input.length > 0 && !isNaN(Number(input))
 }
 
-export function useComponentInput<ComponentValueType extends object, InputType extends Input>(
+export const useComponentInput = <ComponentValueType extends object, InputType extends Input>(
   entity: Entity,
   component: Component<ComponentValueType>,
   fromComponentValueToInput: (componentValue: ComponentValueType) => InputType,
   fromInputToComponentValue: (input: InputType) => ComponentValueType,
   isValidInput: (input: InputType) => boolean = () => true
-) {
+) => {
   const [componentValue, setComponentValue] = useComponentValue<ComponentValueType>(entity, component)
   const [input, setInput] = useState<InputType>(fromComponentValueToInput(componentValue))
   const [isFocused, setIsFocused] = useState(false)
