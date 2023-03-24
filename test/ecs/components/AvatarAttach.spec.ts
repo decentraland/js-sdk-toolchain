@@ -1,4 +1,4 @@
-﻿import { Engine, components } from '../../../packages/@dcl/ecs/src'
+﻿import { Engine, components, AvatarAnchorPointType } from '../../../packages/@dcl/ecs/src'
 import { testComponentSerialization } from './assertion'
 
 describe('Generated AvatarAttach ProtoBuf', () => {
@@ -8,12 +8,12 @@ describe('Generated AvatarAttach ProtoBuf', () => {
 
     testComponentSerialization(AvatarAttach, {
       avatarId: 'string',
-      anchorPointId: 5
+      anchorPointId: AvatarAnchorPointType.AAPT_POSITION
     })
 
     testComponentSerialization(AvatarAttach, {
       avatarId: 'e6',
-      anchorPointId: 4
+      anchorPointId: AvatarAnchorPointType.AAPT_RIGHT_HAND
     })
   })
 })

@@ -25,11 +25,11 @@ import {
 } from './components/types'
 
 // export components for global engine
-/* @__PURE__*/ export const Transform: TransformComponentExtended = components.Transform(engine)
-/* @__PURE__*/ export const Animator: AnimatorComponentDefinitionExtended = components.Animator(engine)
-/* @__PURE__*/ export const Material: MaterialComponentDefinitionExtended = components.Material(engine)
-/* @__PURE__*/ export const MeshRenderer: MeshRendererComponentDefinitionExtended = components.MeshRenderer(engine)
-/* @__PURE__*/ export const MeshCollider: MeshColliderComponentDefinitionExtended = components.MeshCollider(engine)
+export const Transform: TransformComponentExtended = /* @__PURE__*/ components.Transform(engine)
+export const Animator: AnimatorComponentDefinitionExtended = /* @__PURE__*/ components.Animator(engine)
+export const Material: MaterialComponentDefinitionExtended = /* @__PURE__*/ components.Material(engine)
+export const MeshRenderer: MeshRendererComponentDefinitionExtended = /* @__PURE__*/ components.MeshRenderer(engine)
+export const MeshCollider: MeshColliderComponentDefinitionExtended = /* @__PURE__*/ components.MeshCollider(engine)
 
 // export components for global engine
 export * from './components/generated/global.gen'

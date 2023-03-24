@@ -20,8 +20,7 @@ import { createInputSystem, IInputSystem } from './../../engine/input'
  * engine.addSystem(someSystemFunction)
  *
  */
-/* @__PURE__ */
-export const engine: IEngine = Engine()
+export const engine: IEngine = /* @__PURE__ */ Engine()
 
 /**
  * @public
@@ -31,24 +30,21 @@ export const engine: IEngine = Engine()
  * inputSystem.isPressed: Returns true if an input is currently being pressed down. It will return true on every tick until the button goes up again.
  * inputSystem.getInputCommand: Returns an object with data about the input action.
  */
-/* @__PURE__ */
-export const inputSystem: IInputSystem = createInputSystem(engine)
+export const inputSystem: IInputSystem = /* @__PURE__ */ createInputSystem(engine)
 export { IInputSystem }
 
 /**
  * @public
  * Register callback functions to a particular entity.
  */
-/* @__PURE__ */
-export const pointerEventsSystem: PointerEventsSystem = createPointerEventSystem(engine, inputSystem)
+export const pointerEventsSystem: PointerEventsSystem = /* @__PURE__ */ createPointerEventSystem(engine, inputSystem)
 export { PointerEventsSystem }
 
 /**
  * @public
  * Runs an async function
  */
-/* @__PURE__ */
-export const executeTask = createTaskSystem(engine).executeTask
+export const executeTask = /* @__PURE__ */ createTaskSystem(engine)
 
 /**
  * @public

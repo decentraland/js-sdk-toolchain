@@ -6,7 +6,7 @@ declare let process: any
 describe('Execute Task', () => {
   it('should run async tasks in the engine', async () => {
     const engine = Engine()
-    const { executeTask } = createTaskSystem(engine)
+    const executeTask = createTaskSystem(engine)
 
     let counter = 0
 
@@ -25,7 +25,7 @@ describe('Execute Task', () => {
   it('should catch the error and log it', async () => {
     const error = jest.spyOn(console, 'error')
     const engine = Engine()
-    const { executeTask } = createTaskSystem(engine)
+    const executeTask = createTaskSystem(engine)
     async function errorFn() {
       throw 'Error bubbles to console'
     }

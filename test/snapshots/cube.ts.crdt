@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=134.98k bytes
+SCENE_COMPILED_JS_SIZE_PROD=75.5k bytes
 This run is in PROD mode.
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -9,28 +9,28 @@ EVAL test/snapshots/cube.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 33k
-  MALLOC_COUNT = 10590
-  ALIVE_OBJS_DELTA ~= 2.35k
+  OPCODES ~= 27k
+  MALLOC_COUNT = 5634
+  ALIVE_OBJS_DELTA ~= 1.14k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 3k
-  MALLOC_COUNT = 27
+  OPCODES ~= 2k
+  MALLOC_COUNT = 25
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
-  OPCODES ~= 2k
+  OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
-  OPCODES ~= 2k
+  OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
-  OPCODES ~= 2k
+  OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 685.77k bytes
+  MEMORY_USAGE_COUNT ~= 429.02k bytes

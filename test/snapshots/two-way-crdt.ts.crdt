@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=205.27k bytes
+SCENE_COMPILED_JS_SIZE_PROD=145.76k bytes
 This run is in PROD mode.
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -11,9 +11,9 @@ EVAL test/snapshots/two-way-crdt.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 58k
-  MALLOC_COUNT = 14957
-  ALIVE_OBJS_DELTA ~= 3.34k
+  OPCODES ~= 52k
+  MALLOC_COUNT = 10008
+  ALIVE_OBJS_DELTA ~= 2.13k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
@@ -27,21 +27,21 @@ CALL onUpdate(0.0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   LOG: ["Adding one to position.y=1"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=3 data={"position":{"x":2,"y":1,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
-  OPCODES ~= 9k
+  OPCODES ~= 8k
   MALLOC_COUNT = 39
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x200 c=1 t=2 data=null
   Scene: DELETE_COMPONENT e=0x0 c=1 t=4 data=null
   Scene: DELETE_ENTITY e=0x200
-  OPCODES ~= 7k
+  OPCODES ~= 5k
   MALLOC_COUNT = -46
   ALIVE_OBJS_DELTA ~= -0.02k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x0 c=1 t=5 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=6 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 6k
+  OPCODES ~= 5k
   MALLOC_COUNT = 32
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
@@ -49,7 +49,7 @@ CALL onUpdate(0.1)
   LOG: ["✅ RootEntity has the correct scale"]
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=7 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 5k
+  OPCODES ~= 4k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 984.83k bytes
+  MEMORY_USAGE_COUNT ~= 730.92k bytes

@@ -5,6 +5,8 @@ import { CliComponents } from '../components'
 import { CliError } from './error'
 import { getValidSceneJson } from './scene-validations'
 import { join } from 'path'
+import { printProgressInfo, printProgressStep, printSuccess } from './beautiful-logs'
+import { colors } from '../components/log'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -27,29 +29,45 @@ export type CompileOptions = {
   emitDeclaration: boolean
 }
 
+const MAX_STEP = 3
 export async function bundleProject(components: BundleComponents, options: CompileOptions) {
   const sceneJson = await getValidSceneJson(components, options.workingDirectory)
+  const tsconfig = join(options.workingDirectory, 'tsconfig.json')
+
+  printProgressStep(components.logger, `Validating project structure`, 1, MAX_STEP)
 
   if (!options.single && !sceneJson.main) {
     throw new CliError('scene.json .main must be present')
   }
+
   if ((sceneJson as any).runtimeVersion !== '7') {
     throw new CliError('scene.json `"runtimeVersion": "7"` must be present')
   }
 
-  const out = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
+  if (!(await components.fs.fileExists(tsconfig))) {
+    throw new CliError(`File ${tsconfig} must exist to compile the Typescript project`)
+  }
+
+  const input = options.single ?? 'src/index.ts'
+  const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
+
+  printProgressStep(components.logger, `Bundling file ${colors.bold(input)}`, 2, MAX_STEP)
 
   const context = await esbuild.context({
-    entryPoints: [options.single ?? 'src/index.ts'],
+    entryPoints: [input],
     bundle: true,
     platform: 'browser',
     format: 'cjs',
     preserveSymlinks: true,
-    outfile: join(options.workingDirectory, out),
+    outfile: join(options.workingDirectory, output),
     allowOverwrite: false,
     sourcemap: options.production ? 'external' : 'inline',
     minify: options.production,
-    treeShaking: options.production,
+    minifyIdentifiers: options.production,
+    minifySyntax: options.production,
+    minifyWhitespace: options.production,
+    treeShaking: true,
+    metafile: true,
     absWorkingDir: options.workingDirectory,
     target: 'es2020',
     external: ['~system/*'],
@@ -59,17 +77,26 @@ export async function bundleProject(components: BundleComponents, options: Compi
       DEBUG: options.production ? 'false' : 'true',
       'globalThis.DEBUG': options.production ? 'false' : 'true',
       'process.env.NODE_ENV': JSON.stringify(options.production ? 'production' : 'development')
+    },
+    tsconfig: join(options.workingDirectory, 'tsconfig.json'),
+    supported: {
+      'import-assertions': false,
+      'import-meta': false,
+      'dynamic-import': false,
+      hashbang: false
     }
   })
 
   if (options.watch) {
     await context.watch({})
   } else {
-    components.logger.info(`> Building file ${options.single ?? 'src/index.ts'} in folder ${options.workingDirectory}`)
     await context.rebuild()
     await context.dispose()
-    components.logger.info(`> Bundle emitted to ${out}`)
   }
+
+  printProgressInfo(components.logger, `Bundle saved ${colors.bold(output)}`)
+
+  if (options.watch) printProgressInfo(components.logger, `The compiler is watching for changes`)
 
   await runTypeChecker(components, options)
 
@@ -81,17 +108,18 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
     require.resolve('typescript/lib/tsc'),
     '-p',
     'tsconfig.json',
+    '--preserveWatchOutput',
     options.emitDeclaration ? '--emitDeclarationOnly' : '--noEmit'
   ]
   if (options.watch) args.push('--watch')
 
-  components.logger.info('> Running typechecker')
+  printProgressStep(components.logger, `Running type checker`, 3, MAX_STEP)
   const ts = child_process.spawn('node', args, { env: process.env, cwd: options.workingDirectory })
   const typeCheckerFuture = future<number>()
 
   ts.on('close', (code) => {
     if (code === 0) {
-      components.logger.debug('  Type checker completed succesfully')
+      printProgressInfo(components.logger, `Type checking completed without errors`)
     } else {
       typeCheckerFuture.reject(new Error(`Typechecker exited with code ${code}.`))
       return

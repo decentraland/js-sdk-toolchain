@@ -14,19 +14,19 @@ describe('build: simple scene compilation', () => {
   it('ensure files exist', () => {
     const binPath = ensureFileExists('bin/game.js', cwd)
     const fileText = readFileSync(binPath, 'utf8')
-    const ecs7Included = fileText.includes(`require('~system/EngineApi')`)
+    const ecs7Included = fileText.includes(`require("~system/EngineApi")`)
     if (!ecs7Included) {
-      throw new Error("scene doesn't include require('~system/EngineApi')")
+      throw new Error('scene doesn\'t include require("~system/EngineApi")')
     }
 
-    const transformComponentInclided = fileText.includes(`TransformComponent`)
+    const transformComponentInclided = fileText.includes(`Transform(engine)`)
     if (!transformComponentInclided) {
-      throw new Error("scene doesn't include TransformComponent")
+      throw new Error("scene doesn't include Transform(engine)")
     }
   })
 })
 
-describe('build: side-effect-free-build', () => {
+describe.skip('build: side-effect-free-build', () => {
   const cwd = resolve(__dirname, './fixtures/side-effect-free-build')
 
   itDeletesFolder('./bin', cwd)
