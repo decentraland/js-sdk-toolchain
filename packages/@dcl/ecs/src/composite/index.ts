@@ -1,4 +1,3 @@
 export * from './types'
 export * from './serialization'
-export { instanceComposite, InstanceCompositeOptions } from './instance'
-export type { EntityMappingMode } from './instance'
+export { EntityMappingMode, instanceComposite, InstanceCompositeOptions } from './instance'

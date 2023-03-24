@@ -23,6 +23,16 @@ jobs:
         run: make install
       - name: lint
         run: make lint
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - name: lint
+        run: make docs
   test:
     runs-on: ubuntu-latest
     steps:

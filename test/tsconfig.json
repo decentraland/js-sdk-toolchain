@@ -12,7 +12,7 @@
     "esModuleInterop": true,
     "declaration": false,
     "downlevelIteration": true,
-    "allowJs": true,
+    "allowJs": false,
     "resolveJsonModule": true,
     "strict": true,
     "strictNullChecks": true,

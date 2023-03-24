@@ -765,7 +765,7 @@ export type EntityContainer = {
 // Warning: (ae-missing-release-tag) "EntityMappingMode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export enum EntityMappingMode {
+export const enum EntityMappingMode {
     // (undocumented)
     EMM_DIRECT_MAPPING = 2,
     // (undocumented)

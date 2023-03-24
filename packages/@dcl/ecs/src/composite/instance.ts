@@ -9,7 +9,8 @@ import { getCompositeRootComponent } from './components'
 import { ComponentData, Composite, CompositeComponent, CompositeProvider } from './types'
 
 // @public
-export declare const enum EntityMappingMode {
+/* @__PURE__ */
+export const enum EntityMappingMode {
   EMM_NONE = 0,
   EMM_NEXT_AVAILABLE = 1,
   EMM_DIRECT_MAPPING = 2

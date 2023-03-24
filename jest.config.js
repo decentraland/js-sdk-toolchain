@@ -1,13 +1,10 @@
 module.exports = {
   // preset: "ts-jest/presets/js-with-ts",
-  globals: {
-    "ts-jest": {
-      tsconfig: "test/tsconfig.json",
-    },
-  },
   moduleFileExtensions: ["ts", "js", "tsx", "jsx"],
   transform: {
-    "^.+\\.(js|jsx|ts|tsx)$": "ts-jest",
+    "^.+\\.(js|jsx|ts|tsx)$": ["ts-jest", {
+      tsconfig: "test/tsconfig.json",
+    }]
   },
   transformIgnorePatterns: [
     "node_modules/(?!(@dcl/ecs-math)/)",
