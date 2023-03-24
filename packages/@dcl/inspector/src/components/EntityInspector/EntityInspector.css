@@ -1,0 +1,13 @@
+.entity-inspector {
+  display: flex;
+  flex-direction: column;
+}
+
+.entity-inspector .block {
+  display: flex;
+  flex-direction: column;
+}
+
+.entity-inspector .block h4 {
+  margin: 0;
+}

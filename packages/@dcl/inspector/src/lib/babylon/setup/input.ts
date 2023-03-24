@@ -33,14 +33,14 @@ enum Keys {
 
 export { keyState, Keys }
 
-export function initKeyboard(scene: BABYLON.Scene, camera: BABYLON.ArcRotateCamera) {
-  document.body.addEventListener('keydown', (e) => {
+export function initKeyboard(canvas: HTMLCanvasElement, scene: BABYLON.Scene, camera: BABYLON.ArcRotateCamera) {
+  canvas.addEventListener('keydown', (e) => {
     keyState[Keys.KEY_SHIFT] = e.shiftKey
     keyState[Keys.KEY_CTRL] = e.ctrlKey
     keyState[e.keyCode] = true
   })
 
-  document.body.addEventListener('keyup', (e) => {
+  canvas.addEventListener('keyup', (e) => {
     // if (!e.shiftKey) {
     //   firstPersonCamera.speed = playerConfigurations.speed
     // }

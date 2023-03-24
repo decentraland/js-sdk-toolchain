@@ -1,16 +1,18 @@
 import { useEffect } from 'react'
-import { SdkContextEvents } from '../../lib/sdk/engine'
+import { SdkContextEvents, SdkContextValue } from '../../lib/sdk/engine'
 import { useSdk } from './useSdk'
 
 /**
  * This can be used to register a callback for every time there is a change in the engine
  * @param callback
  */
-export const useChange = (callback: (event: SdkContextEvents['change']) => void) => {
+export const useChange = (callback: (event: SdkContextEvents['change'], sdk: SdkContextValue) => void) => {
   const sdk = useSdk()
   useEffect(() => {
     function handleChange(event: SdkContextEvents['change']) {
-      callback(event)
+      if (sdk) {
+        callback(event, sdk)
+      }
     }
     if (sdk) {
       sdk.events.on('change', handleChange)

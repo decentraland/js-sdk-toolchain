@@ -12,9 +12,9 @@ export type WithSdk<P extends object> = P & WithSdkProps
  * @param Component
  * @returns
  */
-export function withSdk<P extends object>(Component: React.ComponentType<P>): React.FC<Omit<P, 'loading'>> {
-  // add typings to wrapped component
-  const sdk = useSdk()
-  const ComponentWithSdk = Component as React.ComponentType<WithSdk<P>>
-  return ({ ...props }) => (sdk ? <ComponentWithSdk sdk={sdk} {...(props as P)} /> : null)
+export function withSdk<P extends object>(Component: React.ComponentType<WithSdk<P>>): React.FC<Omit<P, 'sdk'>> {
+  return ({ ...props }) => {
+    const sdk = useSdk()
+    return sdk ? <Component sdk={sdk} {...(props as P)} /> : null
+  }
 }
