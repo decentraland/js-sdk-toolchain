@@ -96,7 +96,11 @@ export async function bundleProject(components: BundleComponents, options: Compi
   if (options.watch) {
     await context.watch({})
   } else {
-    await context.rebuild()
+    try {
+      await context.rebuild()
+    } catch (err: any) {
+      throw new CliError(err.toString())
+    }
     await context.dispose()
   }
 
@@ -127,7 +131,7 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
     if (code === 0) {
       printProgressInfo(components.logger, `Type checking completed without errors`)
     } else {
-      typeCheckerFuture.reject(new Error(`Typechecker exited with code ${code}.`))
+      typeCheckerFuture.reject(new CliError(`Typechecker exited with code ${code}.`))
       return
     }
 

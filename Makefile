@@ -70,7 +70,11 @@ docs: build
 	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/docs.spec.ts
 # Cloudflare doesn't allow a directory called functions. 🪄🎩
 	mv api-docs/functions api-docs/funcs
+# copy inspector
 	cp -r packages/@dcl/inspector/public api-docs/inspector
+# big files need to be removed for cloudflare pages
+	rm api-docs/inspector/bundle.js.map
+# replace the paths of /functions to /funcs
 	find ./api-docs -type f -name '*.html' \
   	| xargs sed ${SED_OPTION} -E 's:(href="[^"]+)functions/:\1funcs/:g'
 
