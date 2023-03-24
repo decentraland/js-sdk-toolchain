@@ -23,6 +23,9 @@ PROTOC = node_modules/.bin/protobuf/bin/protoc
 SCENE_PROTO_FILES := $(wildcard node_modules/@dcl/protocol/proto/decentraland/kernel/apis/*.proto)
 PBS_TS = $(SCENE_PROTO_FILES:node_modules/@dcl/protocol/proto/decentraland/kernel/apis/%.proto=scripts/rpc-api-generation/src/proto/%.gen.ts)
 
+# this DEVELOPER_MODE is important to not send developer's events to the same segment
+# stream as the production ones. Look for it's usage on the analytics component
+export DEVELOPER_MODE=true
 
 install:
 	npm i

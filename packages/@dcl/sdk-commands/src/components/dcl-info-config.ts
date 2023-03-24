@@ -16,8 +16,10 @@ export type IDCLInfoConfigComponent = {
 export async function createDCLInfoConfigComponent({
   fs
 }: Pick<CliComponents, 'fs'>): Promise<IDCLInfoConfigComponent> {
+  // this function is used to select the segmentKey to not mix the developers events
+  // with real ones. the DEVELOPER_MODE=true is set by the Makefile
   function isProduction() {
-    return process.env.NODE_ENV === 'production' || __filename.includes('node_modules')
+    return !process.env.DEVELOPER_MODE
   }
   const defaultConfig: Partial<DCLInfo> = {
     userId: '',
