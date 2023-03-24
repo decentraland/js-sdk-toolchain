@@ -1,7 +1,6 @@
 import * as projectValidation from '../../../../packages/@dcl/sdk-commands/src/logic/project-validations'
 import * as sceneValidation from '../../../../packages/@dcl/sdk-commands/src/logic/scene-validations'
 import { Scene } from '../../../../packages/@dcl/sdk-commands/node_modules/@dcl/schemas'
-import * as execUtils from '../../../../packages/@dcl/sdk-commands/src/logic/exec'
 import { initComponents } from '../../../../packages/@dcl/sdk-commands/src/components'
 import path from 'path'
 
