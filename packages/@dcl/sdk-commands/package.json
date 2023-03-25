@@ -41,7 +41,8 @@
     "@types/ws": "^8.5.4"
   },
   "files": [
-    "dist"
+    "dist",
+    ".dclrc"
   ],
   "keywords": [],
   "license": "Apache-2.0",
