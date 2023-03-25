@@ -2,12 +2,28 @@ syntax = "proto3";
 
 message Empty {}
 
-message StreamMessage {
+message CrdtStreamMessage {
   bytes data = 1;
 }
 
+message AssetData {
+  bytes data = 1;
+}
+
+message Asset {
+  string path = 1;
+}
+
+message AssetCatalogResponse {
+  string base_path = 1;
+  repeated Asset assets = 2;
+}
+
 service DataService {
-  rpc Stream(stream StreamMessage) returns (stream StreamMessage) {}
+  rpc CrdtStream(stream CrdtStreamMessage) returns (stream CrdtStreamMessage) {}
   rpc Undo(Empty) returns (Empty) {}
   rpc Redo(Empty) returns (Empty) {}
+
+  rpc GetAssetCatalog(Empty) returns (AssetCatalogResponse) {}
+  rpc GetAssetData(Asset) returns (AssetData) {}
 }

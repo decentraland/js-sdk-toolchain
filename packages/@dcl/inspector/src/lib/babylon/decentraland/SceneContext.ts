@@ -16,7 +16,7 @@ import { putGltfContainerComponent } from './sdkComponents/gltf-container'
 import { putMeshRendererComponent } from './sdkComponents/mesh-renderer'
 import { putTransformComponent } from './sdkComponents/transform'
 import { putEntitySelectedComponent } from './editorComponents/entitySelected'
-import { StreamMessage } from '../../data-layer/proto/gen/data-layer.gen'
+import { CrdtStreamMessage } from '../../data-layer/proto/gen/data-layer.gen'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -63,7 +63,7 @@ export class SceneContext {
 
   readonly transport = createBetterTransport(this.engine)
 
-  constructor(public babylon: BABYLON.Engine, public scene: BABYLON.Scene, public loadableScene: LoadableScene) {
+  constructor(public babylon: BABYLON.Engine, public scene: BABYLON.Scene, public loadableScene: LoadableScene, public dataLayer: DataLayerRpcClient) {
     this.rootNode = new EcsEntity(0 as Entity, this.#weakThis, scene)
     babylon.onEndFrameObservable.add(this.update)
     Object.assign(globalThis, { babylon: this.engine })
@@ -121,6 +121,16 @@ export class SceneContext {
     return null
   }
 
+  async getFile(src: string): Promise<Uint8Array | null> {
+    try {
+      const response = await this.dataLayer.getAssetData({ path: src})
+      return response.data
+    } catch(err) {
+      console.error('Error fetching file ' + src)
+      return null
+    }
+  }
+
   resolveFileAbsolute(src: string): string | null {
     const resolved = this.resolveFile(src)
 
@@ -145,12 +155,12 @@ export class SceneContext {
     this.babylon.onEndFrameObservable.removeCallback(this.update)
   }
 
-  async connectDataLayer(dataLayer: DataLayerRpcClient) {
-    const outgoingMessages = new AsyncQueue<StreamMessage>((_, _action) => {
+  async connectCrdtTransport(crdtStream: DataLayerRpcClient['crdtStream']) {
+    const outgoingMessages = new AsyncQueue<CrdtStreamMessage>((_, _action) => {
       // console.log('SCENE QUEUE', action)
     })
 
-    for await (const message of dataLayer.stream(outgoingMessages)) {
+    for await (const message of crdtStream(outgoingMessages)) {
       if (message.data.byteLength) {
         Array.from(serializeCrdtMessages('Datalayer>SceneContext', message.data, this.engine)).forEach(($) =>
           console.log($)

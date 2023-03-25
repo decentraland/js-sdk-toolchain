@@ -50,7 +50,7 @@ export async function initRpcMethods(
     // This method receives an incoming message iterator
     // and returns an async iterable. consumption and production of messages
     // are decoupled operations
-    async *stream(iter) {
+    async *crdtStream(iter) {
       // TODO: check this types, in the meantime, the lines below do the same
       // return stream(iter, { engine })
 
@@ -58,6 +58,18 @@ export async function initRpcMethods(
       for await (const it of gen) {
         yield it
       }
+    },
+    async getAssetData(req) {
+      if (await fs.existFile(req.path)) {
+        return { 
+          data: await fs.readFile(req.path)
+        }
+      }
+      
+      throw new Error("Couldn't find the asset " + req.path)
+    },
+    async getAssetCatalog() {
+      return {} as any
     }
   }
 }

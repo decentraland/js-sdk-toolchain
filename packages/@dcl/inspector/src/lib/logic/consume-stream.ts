@@ -1,7 +1,7 @@
-import { StreamMessage } from '../data-layer/proto/gen/data-layer.gen'
+import { CrdtStreamMessage } from '../data-layer/proto/gen/data-layer.gen'
 
 export async function consumeAllMessagesInto(
-  iter: AsyncIterable<StreamMessage>,
+  iter: AsyncIterable<CrdtStreamMessage>,
   cb: (data: Uint8Array) => void,
   onClose: () => void
 ) {

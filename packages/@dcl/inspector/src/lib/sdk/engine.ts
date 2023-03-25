@@ -7,7 +7,7 @@ import { ITheme } from '../../components/AssetsCatalog'
 import { SceneContext } from '../babylon/decentraland/SceneContext'
 import { initRenderer } from '../babylon/setup'
 import { createDataLayerClientRpc } from '../data-layer/client'
-import { StreamMessage } from '../data-layer/proto/gen/data-layer.gen'
+import { CrdtStreamMessage } from '../data-layer/proto/gen/data-layer.gen'
 import { consumeAllMessagesInto } from '../logic/consume-stream'
 import { createEditorComponents, EditorComponents, SdkComponents } from './components'
 import { serializeCrdtMessages } from './crdt-logger'
@@ -32,6 +32,8 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
   // initialize DataLayer
   const dataLayer = await createDataLayerClientRpc()
 
+  const assetCatalog = await dataLayer.getAssetCatalog({})
+
   // create scene context
   const ctx = new SceneContext(
     babylon,
@@ -39,12 +41,13 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
     getHardcodedLoadableScene(
       'urn:decentraland:entity:bafkreid44xhavttoz4nznidmyj3rjnrgdza7v6l7kd46xdmleor5lmsxfm1',
       catalog
-    )
+    ),
+    dataLayer
   )
   ctx.rootNode.position.set(0, 0, 0)
 
-  // Connect babylon engine with dataLayer transport
-  void ctx.connectDataLayer(dataLayer)
+  // Connect babylon engine with dataLayer crdt transport
+  void ctx.connectCrdtTransport(dataLayer.crdtStream)
 
   // create inspector engine context and components
   const events = mitt<SdkContextEvents>()
@@ -58,7 +61,7 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
   const MeshRenderer = components.MeshRenderer(engine)
 
   // <HERE BE DRAGONS (TRANSPORT)>
-  const outgoingMessagesStream = new AsyncQueue<StreamMessage>((_, _action) => {})
+  const outgoingMessagesStream = new AsyncQueue<CrdtStreamMessage>((_, _action) => {})
   const transport: Transport = {
     filter() {
       return !outgoingMessagesStream.closed
@@ -75,7 +78,7 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
   engine.addTransport(transport)
 
   consumeAllMessagesInto(
-    dataLayer.stream(outgoingMessagesStream),
+    dataLayer.crdtStream(outgoingMessagesStream),
     transport.onmessage!,
     outgoingMessagesStream.close
   ).catch((e) => {
