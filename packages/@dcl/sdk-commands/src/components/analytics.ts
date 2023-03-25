@@ -4,13 +4,11 @@ import future from 'fp-future'
 
 import { CliComponents } from '.'
 import { colors } from './log'
-import { DCLInfo } from '../logic/dcl-info'
+import { getGlobalDclRcPath, readStringConfig, writeGlobalConfig } from './config'
+import { getInstalledPackageVersion, getSdkCommandsVersion, getSegmentKey, isCI, isEditor } from '../logic/config'
 
 export type IAnalyticsComponent = {
-  get(): Analytics
-  identify(): Promise<void>
-  track<T extends keyof Events>(eventName: T, eventProps: Events[T]): Promise<void>
-  trackSync<T extends keyof Events>(eventName: T, eventProps: Events[T]): void
+  track<T extends keyof Events>(eventName: T, eventProps: Events[T]): void
   stop(): Promise<void>
 }
 
@@ -59,79 +57,86 @@ export type Events = {
   }
 }
 
-export async function createAnalyticsComponent({
-  dclInfoConfig,
-  logger
-}: Pick<CliComponents, 'dclInfoConfig' | 'logger'>): Promise<IAnalyticsComponent> {
+const noopAnalytics: IAnalyticsComponent = {
+  track() {},
+  async stop() {}
+}
+
+export async function createAnalyticsComponent(components: Pick<CliComponents, 'config' | 'logger' | 'fs'>) {
+  const analyticsEnabled = (await readStringConfig(components, 'DCL_DISABLE_ANALYTICS')) !== 'true'
+
+  if (!analyticsEnabled) {
+    return noopAnalytics
+  }
+
   const USER_ID = 'sdk-commands-user'
-  const config = await dclInfoConfig.get()
-  const analytics: Analytics = new Analytics({ writeKey: config.segmentKey ?? '' })
+  let anonId = await readStringConfig(components, 'DCL_ANON_ID')
+
+  const analytics: Analytics = new Analytics({ writeKey: getSegmentKey() ?? '' })
+
+  if (!anonId) {
+    anonId = uuidv4()
+    await writeGlobalConfig(components, 'DCL_ANON_ID', anonId)
+
+    analytics.identify({
+      userId: USER_ID,
+      traits: {
+        devId: anonId,
+        createdAt: new Date()
+      }
+    })
+
+    components.logger.info(
+      [
+        `By default, Decentraland CLI sends anonymous usage stats to improve the products, if you want to disable it, add the following line to the configuration file at ${colors.bold(
+          getGlobalDclRcPath()
+        )}.`,
+        `  DCL_DISABLE_ANALYTICS=true`,
+        `More info https://dcl.gg/sdk/analytics`
+      ].join('\n')
+    )
+  }
+
   const promises: Promise<void>[] = []
 
-  async function track<T extends keyof Events>(eventName: T, eventProps: Events[T]) {
-    const trackFuture = future<void>()
-    const { userId, trackStats } = await dclInfoConfig.get()
-    const version = await dclInfoConfig.getVersion()
-    if (!trackStats) {
-      return trackFuture.resolve()
+  const sdkVersion = await getInstalledPackageVersion(components, '@dcl/sdk', process.cwd())
+
+  // the following properties are added to every telemetry report
+  const baseTelemetryProperties = {
+    os: process.platform,
+    nodeVersion: process.version,
+    cliVersion: await getSdkCommandsVersion(),
+    isCI: isCI(),
+    isEditor: isEditor(),
+    devId: anonId,
+    ecs: {
+      ecsVersion: 'ecs7',
+      packageVersion: sdkVersion
     }
+  }
+
+  function track<T extends keyof Events>(eventName: T, eventProps: Events[T]) {
+    const trackFuture = future<void>()
 
     const trackInfo = {
       userId: USER_ID,
       event: eventName,
       properties: {
         ...eventProps,
-        os: process.platform,
-        nodeVersion: process.version,
-        cliVersion: version,
-        isCI: dclInfoConfig.isCI(),
-        isEditor: dclInfoConfig.isEditor(),
-        devId: userId,
-        ecs: {
-          ecsVersion: 'ecs7',
-          packageVersion: version
-        }
+        ...baseTelemetryProperties
       }
     }
+
     analytics.track(trackInfo, () => {
       trackFuture.resolve()
     })
-    return trackFuture
+
+    promises.push(trackFuture)
   }
+
   return {
     get() {
       return analytics
-    },
-    async identify() {
-      if (config.userId && !config.trackStats) {
-        return
-      }
-      const userId = config.userId ?? uuidv4()
-      let dclInfo: DCLInfo = {}
-      if (!config.userId) {
-        dclInfo = { userId, trackStats: true }
-        logger.info(
-          `Decentraland CLI sends anonymous usage stats to improve their products, if you want to disable it change the configuration at ${colors.bold(
-            '~/.dclinfo'
-          )}\n`
-        )
-      }
-      if (!config.userIdentified) {
-        dclInfo.userIdentified = true
-        analytics.identify({
-          userId: USER_ID,
-          traits: {
-            devId: userId,
-            createdAt: new Date()
-          }
-        })
-      }
-      if (Object.keys(dclInfo).length) {
-        await dclInfoConfig.updateDCLInfo(dclInfo)
-      }
-    },
-    trackSync(eventName, eventProps) {
-      promises.push(track(eventName, eventProps))
     },
     track,
     async stop() {

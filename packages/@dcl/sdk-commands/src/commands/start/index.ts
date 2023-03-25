@@ -27,7 +27,7 @@ import { createExitSignalComponent } from '../../components/exit-signal'
 
 interface Options {
   args: typeof args
-  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'dclInfoConfig' | 'analytics' | 'spawner'>
+  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'analytics' | 'spawner'>
 }
 
 export const args = getArgs({
@@ -153,7 +153,7 @@ export async function main(options: Options) {
 
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []
-      components.analytics.trackSync('Preview started', {
+      components.analytics.track('Preview started', {
         projectHash: await b64HashingFunction(projectRoot),
         coords: baseCoords,
         isWorkspace: false,

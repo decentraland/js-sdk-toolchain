@@ -8,11 +8,11 @@ import querystring from 'querystring'
 import open from 'open'
 
 import { getPort } from '../../../logic/get-free-port'
-import { getCustomConfig } from '../../../logic/dcl-info'
 import { IFile } from '../../../logic/scene-validations'
 import { CliComponents } from '../../../components'
 import { printSuccess } from '../../../logic/beautiful-logs'
 import { setRoutes } from './routes'
+import { getEstateRegistry, getLandRegistry } from '../../../logic/config'
 
 export interface LinkerResponse {
   address: string
@@ -33,7 +33,7 @@ export interface SceneInfo {
 }
 
 export function runLinkerApp(
-  cliComponents: Pick<CliComponents, 'fs' | 'logger' | 'fetch'>,
+  cliComponents: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,
   scene: Scene,
   files: IFile[],
   port: number,
@@ -41,9 +41,8 @@ export function runLinkerApp(
   { isHttps, skipValidations, openBrowser }: { isHttps: boolean; skipValidations: boolean; openBrowser: boolean }
 ): Promise<LinkerResponse> {
   return new Promise(async (resolve) => {
-    const { logger } = cliComponents
     const resolvedPort = await getPort(port, 4044)
-    const sceneInfo = await getSceneInfo(scene, rootCID, skipValidations)
+    const sceneInfo = await getSceneInfo(cliComponents, scene, rootCID, skipValidations)
     const protocol = isHttps ? 'https' : 'http'
     const queryParams = querystring.stringify(sceneInfo)
     const url = `${protocol}://localhost:${resolvedPort}`
@@ -57,28 +56,27 @@ export function runLinkerApp(
         })
         const logs = await createConsoleLogComponent({})
 
-        const components = { config, logs }
         const https = isHttps ? await getCredentials(cliComponents) : undefined
 
-        const server = await createServerComponent(components, { https })
+        const server = await createServerComponent({ ...cliComponents, logs }, { https })
 
-        return { config, logs, server }
+        return { ...cliComponents, config, logs, server }
       },
       async main({ components, startComponents }) {
-        const { router, futureSignature } = setRoutes(cliComponents, files, sceneInfo)
+        const { router, futureSignature } = setRoutes(components, files, sceneInfo)
         components.server.setContext(components)
         components.server.use(router.allowedMethods())
         components.server.use(router.middleware())
 
         await startComponents()
-        if (openBrowser) await browse(cliComponents, url, queryParams)
+        if (openBrowser) await browse(components, url, queryParams)
 
         const value = await futureSignature
 
-        printSuccess(cliComponents.logger, `\nContent successfully signed.`, '')
-        logger.info(`Address: ${value.address}`)
-        logger.info(`Signature: ${value.signature}`)
-        logger.info(`Network: ${getChainName(value.chainId!)}`)
+        printSuccess(components.logger, `\nContent successfully signed.`, '')
+        components.logger.info(`Address: ${value.address}`)
+        components.logger.info(`Signature: ${value.signature}`)
+        components.logger.info(`Network: ${getChainName(value.chainId!)}`)
         resolve(value)
       }
     })
@@ -107,8 +105,12 @@ async function getCredentials({ fs }: Pick<CliComponents, 'fs' | 'logger'>) {
   return { key: privateKey, cert: certificate }
 }
 
-async function getSceneInfo(scene: Scene, rootCID: string, skipValidations: boolean) {
-  const { LANDRegistry, EstateRegistry } = getCustomConfig()
+async function getSceneInfo(
+  components: Pick<CliComponents, 'config'>,
+  scene: Scene,
+  rootCID: string,
+  skipValidations: boolean
+) {
   const {
     scene: { parcels, base },
     display
@@ -118,8 +120,8 @@ async function getSceneInfo(scene: Scene, rootCID: string, skipValidations: bool
     baseParcel: base,
     parcels,
     rootCID,
-    landRegistry: LANDRegistry,
-    estateRegistry: EstateRegistry,
+    landRegistry: await getLandRegistry(components),
+    estateRegistry: await getEstateRegistry(components),
     debug: !!process.env.DEBUG,
     title: display?.title,
     description: display?.description,

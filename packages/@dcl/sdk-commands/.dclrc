@@ -1,0 +1,19 @@
+# This file provides the default configurations for sdk-commands
+
+# Several .dcl.rc configuration files are loaded for each session, each key of the file
+# overrides the previously loaded, and finally it uses env vars if present. Meaning:
+# - multiple keys can be present in the same file
+# - the last file overrides the first file
+# - env vars override the config files entirely
+
+# DCL_ANON_ID=0000000-0000000000-0000000
+DCL_DISABLE_ANALYTICS=false
+
+# Address of the LAND_REGISTRY smart contract
+#DCL_LAND_REGISTRY_ADDRESS=
+
+# Address of the ESTATE_REGISTRY smart contract
+#DCL_ESTATE_REGISTRY_ADDRESS=
+
+# Default catalyst node
+DCL_CATALYST=https://peer.decentraland.org

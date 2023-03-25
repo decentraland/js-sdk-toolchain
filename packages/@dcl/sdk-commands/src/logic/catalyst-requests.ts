@@ -1,5 +1,6 @@
 import { Entity } from '@dcl/schemas'
 import { CliComponents } from '../components'
+import { getCatalystBaseUrl } from './config'
 
 export type DAOCatalyst = {
   baseUrl: string
@@ -16,11 +17,12 @@ type CatalystInfo = {
 export type Network = 'mainnet' | 'goerli'
 
 export async function daoCatalysts(
-  { fetch }: Pick<CliComponents, 'fetch'>,
-  network: Network = 'mainnet'
+  components: Pick<CliComponents, 'fetch' | 'config'>,
+  network: Network
 ): Promise<Array<DAOCatalyst>> {
   const tld = network === 'mainnet' ? 'org' : 'zone'
-  const resp = await (await fetch.fetch(`https://peer.decentraland.${tld}/lambdas/contracts/servers`)).json()
+  const catalystUrl = network === 'mainnet' ? await getCatalystBaseUrl(components) : `https://peer.decentraland.${tld}`
+  const resp = await (await components.fetch.fetch(`${catalystUrl}/lambdas/contracts/servers`)).json()
   return resp as DAOCatalyst[]
 }
 
@@ -55,9 +57,9 @@ export async function fetchEntityByPointer(
 }
 
 export async function getPointers(
-  components: Pick<CliComponents, 'fetch' | 'logger'>,
+  components: Pick<CliComponents, 'fetch' | 'logger' | 'config'>,
   pointer: string,
-  network: Network = 'mainnet'
+  network: Network
 ) {
   const catalysts = await daoCatalysts(components, network)
   const catalystInfo: CatalystInfo[] = []
