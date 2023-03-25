@@ -9,9 +9,10 @@ import { future } from 'fp-future'
 import { CliComponents } from '../components'
 import { CliError } from './error'
 import { getValidSceneJson } from './scene-validations'
-import { join } from 'path'
+import { join, dirname } from 'path'
 import { printProgressInfo, printProgressStep } from './beautiful-logs'
 import { colors } from '../components/log'
+import { pathToFileURL } from 'url'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -56,6 +57,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
 
   const input = options.single ?? 'src/index.ts'
   const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
+  const outfile = join(options.workingDirectory, output)
 
   printProgressStep(components.logger, `Bundling file ${colors.bold(input)}`, 2, MAX_STEP)
 
@@ -65,7 +67,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
     platform: 'browser',
     format: 'cjs',
     preserveSymlinks: false,
-    outfile: join(options.workingDirectory, output),
+    outfile,
     allowOverwrite: false,
     sourcemap: options.production ? 'external' : 'inline',
     minify: options.production,
@@ -77,6 +79,8 @@ export async function bundleProject(components: BundleComponents, options: Compi
     absWorkingDir: options.workingDirectory,
     target: 'es2020',
     external: ['~system/*'],
+    // convert filesystem paths into file:// to enable VSCode debugger
+    sourceRoot: pathToFileURL(dirname(outfile)).toString(),
     define: {
       document: 'undefined',
       window: 'undefined',

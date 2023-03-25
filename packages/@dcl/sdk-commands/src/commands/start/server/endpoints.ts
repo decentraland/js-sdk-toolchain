@@ -143,7 +143,7 @@ export function setupEcs6Endpoints(components: CliComponents, dir: string, route
 }
 
 function serveFolders(
-  components: Pick<CliComponents, 'fs' | 'logger'>,
+  components: Pick<CliComponents, 'fs' | 'logger' | 'fetch'>,
   router: Router<PreviewComponents>,
   baseFolders: string[]
 ) {
@@ -181,6 +181,7 @@ function serveFolders(
     const resultEntities = await getSceneJson(components, baseFolders, Array.from(requestedPointers))
     const catalystUrl = getCatalystUrl()
     const remote = fetchEntityByPointer(
+      components,
       catalystUrl.toString(),
       pointers.filter(($: string) => !$.match(/-?\d+,-?\d+/))
     )

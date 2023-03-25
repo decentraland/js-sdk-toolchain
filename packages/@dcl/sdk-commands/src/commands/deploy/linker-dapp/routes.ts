@@ -4,7 +4,7 @@ import { Router } from '@well-known-components/http-server'
 import { ChainId } from '@dcl/schemas'
 import future from 'fp-future'
 
-import { getPointers } from './catalyst-pointers'
+import { getPointers } from '../../../logic/catalyst-requests'
 import { getObject } from '../../../logic/coordinates'
 import { CliComponents } from '../../../components'
 import { IFile } from '../../../logic/scene-validations'

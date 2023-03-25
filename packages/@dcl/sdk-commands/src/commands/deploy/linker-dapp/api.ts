@@ -94,7 +94,7 @@ async function browse({ logger }: Pick<CliComponents, 'logger'>, url: string, pa
     try {
       await open(`${url}?${params}`)
     } catch (e) {
-      logger.error(`Unable to open browser automatically`)
+      logger.error(`Unable to open browser automatically. Please manually navigate to:\n  ${url}?${params}`)
     }
   }, 5000)
 

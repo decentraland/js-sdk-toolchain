@@ -66,10 +66,4 @@ export async function main(options: Options) {
     isWorkspace: false,
     args: getArgsUsed(options.args)
   })
-
-  /* istanbul ignore if */
-  if (watch) {
-    // this IF ensures that the watch mode hangs the process until manually closed
-    await new Promise(() => void 0)
-  }
 }
