@@ -19,7 +19,7 @@ describe('Analytics Component', () => {
       /* empty config files */
     })
     const logger = createStderrCliLogger()
-    const appendSpy = jest.spyOn(fs, 'appendFile')
+    const appendSpy = jest.spyOn(fs, 'appendFile').mockImplementation(async () => {})
 
     await createAnalyticsComponent({ config, logger, fs })
 
@@ -36,7 +36,7 @@ describe('Analytics Component', () => {
       DCL_ANON_ID: 'fb3f84b2-4ddc-4a7e-96bf-1e8992c294dd'
     })
     const logger = createStderrCliLogger()
-    const appendSpy = jest.spyOn(fs, 'appendFile')
+    const appendSpy = jest.spyOn(fs, 'appendFile').mockImplementation(async () => {})
 
     await createAnalyticsComponent({ config, logger, fs })
 
@@ -49,7 +49,7 @@ describe('Analytics Component', () => {
       DCL_DISABLE_ANALYTICS: 'true'
     })
     const logger = createStderrCliLogger()
-    const appendSpy = jest.spyOn(fs, 'appendFile')
+    const appendSpy = jest.spyOn(fs, 'appendFile').mockImplementation(async () => {})
 
     await createAnalyticsComponent({ config, logger, fs })
 
