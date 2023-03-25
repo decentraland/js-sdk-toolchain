@@ -1,4 +1,4 @@
-import { Entity, EntityMappingMode, IEngine, instanceComposite, OnChangeFunction } from '@dcl/ecs'
+import { Entity, EntityMappingMode, IEngine, Composite, OnChangeFunction } from '@dcl/ecs'
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
 import { dumpEngineToComposite } from './engine-to-composite'
 import { createFsCompositeProvider } from './fs-composite-provider'
@@ -14,7 +14,7 @@ export async function initRpcMethods(
   const mainComposite = compositeProvider.getCompositeOrNull('main')
 
   if (mainComposite) {
-    instanceComposite(engine, mainComposite, compositeProvider, {
+    Composite.instance(engine, mainComposite, compositeProvider, {
       entityMapping: {
         type: EntityMappingMode.EMM_DIRECT_MAPPING,
         getCompositeEntity: (entity: number | Entity) => entity as Entity

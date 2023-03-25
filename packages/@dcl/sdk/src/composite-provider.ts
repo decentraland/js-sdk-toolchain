@@ -1,8 +1,8 @@
-import { CompositeProvider, Composite, compositeFromBinary, compositeFromJson } from '@dcl/ecs'
+import { Composite } from '@dcl/ecs'
 import { getSceneInfo } from '~system/Scene'
 
 // @public
-export async function createContentFetchCompositeProvider(): Promise<CompositeProvider> {
+export async function createContentFetchCompositeProvider(): Promise<Composite.Provider> {
   const scene = await getSceneInfo({})
   const compositesContent = scene.contents.filter((item) => {
     const path = item.file.toLowerCase()
@@ -15,11 +15,11 @@ export async function createContentFetchCompositeProvider(): Promise<CompositePr
       const response = await fetch(compositeUrl)
       if (item.file.endsWith('.json')) {
         const compositeJson = await response.json()
-        const composite = compositeFromJson(compositeJson)
+        const composite = Composite.fromJson(compositeJson)
         return composite
       } else {
         const compositeBinaryData: Uint8Array = await (response as any).arrayBuffer()
-        const composite = compositeFromBinary(compositeBinaryData)
+        const composite = Composite.fromBinary(compositeBinaryData)
         return composite
       }
     } catch (err) {
@@ -28,7 +28,7 @@ export async function createContentFetchCompositeProvider(): Promise<CompositePr
     }
   })
 
-  const composites = (await Promise.all(compositePromises)).filter((item) => !!item) as Composite[]
+  const composites = (await Promise.all(compositePromises)).filter((item) => !!item) as Composite.Type[]
 
   return {
     getCompositeOrNull(id: string) {
