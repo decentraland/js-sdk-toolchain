@@ -72,7 +72,7 @@ export async function createAnalyticsComponent(components: Pick<CliComponents, '
   const USER_ID = 'sdk-commands-user'
   let anonId = await readStringConfig(components, 'DCL_ANON_ID')
 
-  const analytics: Analytics = new Analytics({ writeKey: getSegmentKey() ?? '' })
+  const analytics: Analytics = new Analytics({ writeKey: getSegmentKey() })
 
   if (!anonId) {
     anonId = uuidv4()
