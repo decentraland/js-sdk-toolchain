@@ -51,8 +51,9 @@ describe('Analytics Component', () => {
     const logger = createStderrCliLogger()
     const appendSpy = jest.spyOn(fs, 'appendFile').mockImplementation(async () => {})
 
-    await createAnalyticsComponent({ config, logger, fs })
-
+    const analytics = await createAnalyticsComponent({ config, logger, fs })
+    analytics.track('Build scene', {} as any)
+    await analytics.stop()
     expect(appendSpy).not.toHaveBeenCalled()
   })
 
