@@ -3,8 +3,6 @@ import { useMemo } from 'react'
 import { useEntitiesWith } from '../../hooks/sdk/useEntitiesWith'
 import { Transform } from './Transform'
 
-import './EntityInspector.css'
-
 export const EntityInspector: React.FC = () => {
   const selectedEntities = useEntitiesWith((components) => components.EntitySelected)
   const entity = useMemo(() => (selectedEntities.length > 0 ? selectedEntities[0] : null), [selectedEntities])
