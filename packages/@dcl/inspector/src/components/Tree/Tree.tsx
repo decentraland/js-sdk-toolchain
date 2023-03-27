@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
+import { MdOutlineDriveFileRenameOutline } from 'react-icons/md'
+import { AiFillDelete, AiFillFileAdd } from 'react-icons/ai'
 
 import { Input } from '../Input'
-import { Controls } from '../Controls'
 
 import './Tree.css'
 
@@ -13,6 +14,10 @@ export type Props<T> = {
   getLabel: (value: T) => string
   isOpen: (value: T) => boolean
   isSelected: (value: T) => boolean
+  canRename?: (value: T) => boolean
+  canAddChild?: (value: T) => boolean
+  canRemove?: (value: T) => boolean
+  canToggle?: (value: T) => boolean
   onSetParent: (value: T, parent: T) => void
   onRename: (value: T, label: string) => void
   onAddChild: (value: T, label: string) => void
@@ -32,6 +37,10 @@ function Tree<T>(props: Props<T>) {
     isOpen,
     isSelected,
     onSetParent,
+    canRename,
+    canAddChild,
+    canRemove,
+    canToggle,
     onRename,
     onAddChild,
     onRemove,
@@ -42,32 +51,41 @@ function Tree<T>(props: Props<T>) {
   const label = getLabel(value)
   const open = isOpen(value)
   const selected = isSelected(value)
+  const enableRename = canRename ? canRename(value) : true
+  const enableAddChild = canAddChild ? canAddChild(value) : true
+  const enableRemove = canRemove ? canRemove(value) : true
+  const enableToggle = canToggle ? canToggle(value) : true
   const [editMode, setEditMode] = useState(false)
   const [insertMode, setInsertMode] = useState(false)
 
-  const canDrop = (target: T, source: T): boolean => {
-    if (getId(target) === getId(source)) return false
-    return getChildren(target).every(($) => canDrop($, source))
-  }
+  const canDrop = useCallback(
+    (target: T, source: T): boolean => {
+      if (getId(target) === getId(source)) return false
+      return getChildren(target).every(($) => canDrop($, source))
+    },
+    [getId, getChildren]
+  )
 
-  const [, drag] = useDrag(() => ({ type: 'tree', item: { entity: value } }), [value])
+  const [, drag] = useDrag(() => ({ type: 'tree', item: { value } }), [value])
 
   const [, drop] = useDrop(
     () => ({
       accept: 'tree',
-      drop: ({ entity }: { entity: T }, monitor) => {
-        if (monitor.didDrop() || !canDrop(entity, value)) return
-        onSetParent(entity, value)
+      drop: ({ value: other }: { value: T }, monitor) => {
+        if (monitor.didDrop() || !canDrop(other, value)) return
+        onSetParent(other, value)
       }
     }),
-    [value]
+    [value, onSetParent, canDrop]
   )
 
   const quitEditMode = () => setEditMode(false)
   const quitInsertMode = () => setInsertMode(false)
 
   const handleToggleExpand = (_: React.MouseEvent) => {
-    onToggle(value, !selected || !open)
+    if (enableToggle) {
+      onToggle(value, !selected || !open)
+    }
   }
 
   const handleToggleEdit = (e: React.MouseEvent) => {
@@ -104,7 +122,21 @@ function Tree<T>(props: Props<T>) {
           <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
             {selected ? '[ST]' : ''}
             {label || id}{' '}
-            <Controls handleEdit={handleToggleEdit} handleNewChild={handleNewChild} handleRemove={handleRemove} />
+            {enableRename && (
+              <button onClick={handleToggleEdit}>
+                <MdOutlineDriveFileRenameOutline />
+              </button>
+            )}
+            {enableAddChild && (
+              <button onClick={handleNewChild}>
+                <AiFillFileAdd />
+              </button>
+            )}
+            {enableRemove && (
+              <button onClick={handleRemove}>
+                <AiFillDelete />
+              </button>
+            )}
           </span>
           {editMode && <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
         </div>
