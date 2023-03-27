@@ -67,7 +67,6 @@ export async function main(options: Options) {
   const openBrowser = !options.args['--no-browser']
   const skipBuild = options.args['--skip-build']
   const linkerPort = options.args['--port']
-  const { error } = options.components.logger
 
   if (options.args['--target'] && options.args['--target-content']) {
     throw new CliError(`You can't set both the 'target' and 'target-content' arguments.`)
@@ -144,8 +143,8 @@ export async function main(options: Options) {
     }
     printSuccess(options.components.logger, 'Content uploaded', sceneUrl)
   } catch (e: any) {
-    error('Could not upload content:')
-    console.log(e.message)
+    options.components.logger.error('Could not upload content:')
+    options.components.logger.error(e)
     options.components.analytics.trackSync('Scene deploy failure', { ...trackProps, error: e.message ?? '' })
   }
   options.components.analytics.trackSync('Scene deploy success', { ...trackProps, dependencies })

@@ -1,14 +1,7 @@
-import {
-  Composite,
-  compositeFromBinary,
-  compositeFromJson,
-  CompositeProvider,
-  compositeToBinary,
-  compositeToJson
-} from '@dcl/ecs'
+import { Composite } from '@dcl/ecs'
 import { FileSystemInterface } from '../types'
 
-export type CompositeManager = CompositeProvider & {
+export type CompositeManager = Composite.Provider & {
   save: (composite: Composite, type: 'json' | 'binary') => Promise<void>
 }
 
@@ -22,14 +15,14 @@ export async function createFsCompositeProvider(fs: FileSystemInterface): Promis
       if (itemPath.endsWith('.json')) {
         const compositeContent = (await fs.readFile(itemPath)).toString()
         const json = JSON.parse(compositeContent)
-        const composite = compositeFromJson(json)
+        const composite = Composite.fromJson(json)
         return {
           filePath: itemPath,
           composite
         }
       } else {
         const compositeContent = new Uint8Array(await fs.readFile(itemPath))
-        const composite = compositeFromBinary(compositeContent)
+        const composite = Composite.fromBinary(compositeContent)
         return {
           filePath: itemPath,
           composite
@@ -53,11 +46,11 @@ export async function createFsCompositeProvider(fs: FileSystemInterface): Promis
       const oldComposite = composites.find((item) => item?.composite.id === composite.id)
       if (oldComposite?.filePath) {
         if (type === 'binary') {
-          await fs.writeFile(oldComposite.filePath, Buffer.from(compositeToBinary(composite)))
+          await fs.writeFile(oldComposite.filePath, Buffer.from(Composite.toBinary(composite)))
         } else {
           await fs.writeFile(
             oldComposite.filePath,
-            Buffer.from(JSON.stringify(compositeToJson(composite), null, 2), 'utf-8')
+            Buffer.from(JSON.stringify(Composite.toJson(composite), null, 2), 'utf-8')
           )
         }
       }
