@@ -28,7 +28,7 @@ function getContentType(type: string) {
 }
 
 export function setRoutes(
-  components: Pick<CliComponents, 'fs' | 'logger' | 'fetch'>,
+  components: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,
   files: IFile[],
   sceneInfo: SceneInfo
 ) {

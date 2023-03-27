@@ -86,7 +86,7 @@ export async function main(options: Options) {
     new Set([...Object.keys(packageJson.dependencies || {}), ...Object.keys(packageJson.devDependencies || {})])
   )
 
-  options.components.analytics.trackSync('Scene deploy started', trackProps)
+  options.components.analytics.track('Scene deploy started', trackProps)
 
   if (!skipBuild) {
     await npmRun(options.components, projectRoot, 'build')
@@ -145,9 +145,9 @@ export async function main(options: Options) {
   } catch (e: any) {
     options.components.logger.error('Could not upload content:')
     options.components.logger.error(e)
-    options.components.analytics.trackSync('Scene deploy failure', { ...trackProps, error: e.message ?? '' })
+    options.components.analytics.track('Scene deploy failure', { ...trackProps, error: e.message ?? '' })
   }
-  options.components.analytics.trackSync('Scene deploy success', { ...trackProps, dependencies })
+  options.components.analytics.track('Scene deploy success', { ...trackProps, dependencies })
 }
 
 async function getCatalyst(target?: string, targetContent?: string) {

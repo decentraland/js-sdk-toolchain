@@ -8,7 +8,7 @@ import { bundleProject } from '../../logic/bundle'
 
 interface Options {
   args: typeof args
-  components: Pick<CliComponents, 'fs' | 'logger' | 'dclInfoConfig' | 'analytics' | 'spawner'>
+  components: Pick<CliComponents, 'fs' | 'logger' | 'analytics' | 'spawner'>
 }
 
 export const args = getArgs({
@@ -60,7 +60,7 @@ export async function main(options: Options) {
 
   const coords = getBaseCoords(sceneJson)
 
-  options.components.analytics.trackSync('Build scene', {
+  options.components.analytics.track('Build scene', {
     projectHash: await b64HashingFunction(workingDirectory),
     coords,
     isWorkspace: false,
