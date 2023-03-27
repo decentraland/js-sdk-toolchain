@@ -1,5 +1,5 @@
 import { DataLayerRpcClient } from '../types'
-import { feededFileSystem } from './feededLocalFs'
+import { feededFileSystem } from './feeded-local-fs'
 import { createLocalDataLayerRpcClient } from './local-data-layer'
 import { createWebSocketDataLayerRpcClient } from './ws-data-layer'
 

@@ -1,6 +1,6 @@
 import React, { Children, useMemo } from 'react'
 import { useSdkContext } from '../../hooks/sdk/useSdkContext'
-import { SdkContextValue } from '../../lib/sdk/engine'
+import { SdkContextValue } from '../../lib/sdk/context'
 
 /**
  * This is used internally to make the SDK context available easily on the usdSdk hook

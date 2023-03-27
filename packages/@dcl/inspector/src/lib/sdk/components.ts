@@ -23,8 +23,26 @@ export type EditorComponents = {
 
 export type SdkComponents = {
   GltfContainer: ReturnType<typeof components.GltfContainer>
+  Billboard: ReturnType<typeof components.Billboard>
   MeshRenderer: MeshRendererComponentDefinitionExtended
   Transform: TransformComponentExtended
+  TextShape: ReturnType<typeof components.TextShape>
+}
+
+export function createComponents(engine: IEngine): SdkComponents {
+  const GltfContainer = components.GltfContainer(engine)
+  const Billboard = components.Billboard(engine)
+  const MeshRenderer = components.MeshRenderer(engine)
+  const Transform = components.Transform(engine)
+  const TextShape = components.TextShape(engine)
+
+  return {
+    GltfContainer,
+    Billboard,
+    MeshRenderer,
+    Transform,
+    TextShape
+  }
 }
 
 export function createEditorComponents(engine: IEngine): EditorComponents {
