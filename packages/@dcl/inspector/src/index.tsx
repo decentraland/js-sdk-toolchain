@@ -6,6 +6,7 @@ import { AssetsCatalog } from './components/AssetsCatalog'
 import Hierarchy from './components/Hierarchy/Hierarchy'
 import { SdkProvider } from './components/SdkProvider'
 import { Renderer } from './components/Renderer/Renderer'
+import { EntityInspector } from './components/EntityInspector'
 import { useCatalog } from './hooks/catalog/useCatalog'
 
 import './index.css'
@@ -21,6 +22,7 @@ async function initScene() {
       <>
         <div className="left">
           <Hierarchy />
+          <EntityInspector />
         </div>
         <div className="right">
           <Renderer />
