@@ -1,29 +1,16 @@
-import React, { useState } from 'react'
-import { CrdtMessageType, Entity } from '@dcl/ecs'
+import React, { useMemo } from 'react'
 import { useTree } from '../../hooks/sdk/useTree'
-import { useChange } from '../../hooks/sdk/useChange'
 import { EntityInspector } from '../EntityInspector/EntityInspector'
 import { ROOT } from '../../lib/sdk/tree'
 import { Tree } from '../Tree'
+import { useEntitiesWith } from '../../hooks/sdk/useEntitiesWith'
 
 const Hierarchy: React.FC = () => {
-  const [selectedEntity, setSelectedEntity] = useState<Entity>()
   const { tree, addChild, setParent, remove, rename, toggle, getId, getChildren, getLabel, isOpen, isSelected } =
     useTree()
 
-  useChange((event, sdk) => {
-    const { entity, component, operation } = event
-    const {
-      components: { EntitySelected }
-    } = sdk
-    if (
-      component?.componentId === EntitySelected.componentId &&
-      operation === CrdtMessageType.PUT_COMPONENT &&
-      entity !== selectedEntity
-    ) {
-      setSelectedEntity(entity)
-    }
-  })
+  const selectedEntities = useEntitiesWith((components) => components.EntitySelected)
+  const selectedEntity = useMemo(() => (selectedEntities.length > 0 ? selectedEntities[0] : null), [selectedEntities])
 
   return (
     <>
