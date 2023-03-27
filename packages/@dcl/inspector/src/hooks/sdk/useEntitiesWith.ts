@@ -1,7 +1,7 @@
 import { Entity, IEngine } from '@dcl/ecs'
 import { useState } from 'react'
 import { Component } from '../../lib/sdk/components'
-import { SdkContextValue } from '../../lib/sdk/engine'
+import { SdkContextValue } from '../../lib/sdk/context'
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
 
