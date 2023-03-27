@@ -61,11 +61,11 @@ export async function initRpcMethods(
     },
     async getAssetData(req) {
       if (await fs.existFile(req.path)) {
-        return { 
+        return {
           data: await fs.readFile(req.path)
         }
       }
-      
+
       throw new Error("Couldn't find the asset " + req.path)
     },
     async getAssetCatalog() {
