@@ -64,7 +64,7 @@ const mainComposite = {
         '513': {
           $case: 'json',
           json: {
-            src: 'assets/models/flag.glb'
+            src: 'assets/models/test-glb.glb'
           }
         }
       }
@@ -127,34 +127,28 @@ const mainComposite = {
     }
   ]
 }
-const genesisPlazaMappings: Record<string, string> = {
-  'assets/models/flag.glb': 'bafkreihas5dhllg6cb7gyofmygawzk6met7zst5njizdenpaqsvhe3nf2u',
-  'assets/models/Genesis_TX.png': 'bafkreid2aswbhebm5lwcjtsuwrrpz2jczgwvwavbelb22n7myftlhcpa4q',
-  'assets/models/Texturas_A.png': 'bafybeihzu22c4msac7o5vvkczwjqrttjfmckml4fm7z5nrbmempqb55pdq'
+
+const builderMappings: Record<string, string> = {
+  'assets/models/test-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB'
 }
 
 export async function feededFileSystem() {
-  const baseUrl = 'https://peer.decentraland.org/content/contents/'
+  const fileContent: Record<string, Buffer> = {}
 
-  const genesisContent: Record<string, Buffer> = {}
-  const genesisContentFetchPromises = Object.keys(genesisPlazaMappings).map(
-    (path) =>
-      new Promise<void>(async (resolve) => {
-        try {
-          const url = `${baseUrl}${genesisPlazaMappings[path]}`
-          const content = await (await fetch(url)).arrayBuffer()
-          genesisContent[path] = Buffer.from(content)
-        } catch (err) {
-          console.error('Error fetching an asset for feed in-memory storage ' + path)
-        }
-        resolve()
-      })
+  await Promise.all(
+    Object.entries(builderMappings).map(async ([path, contentHash]) => {
+      try {
+        const url = `https://builder-api.decentraland.org/v1/storage/contents/${contentHash}`
+        const content = await (await fetch(url)).arrayBuffer()
+        fileContent[path] = Buffer.from(content)
+      } catch (err) {
+        console.error('Error fetching an asset for feed in-memory storage ' + path)
+      }
+    })
   )
 
-  await Promise.all(genesisContentFetchPromises)
-
   return createFsInMemory({
-    ...genesisContent,
+    ...fileContent,
     './assets/main.composite.json': Buffer.from(JSON.stringify(mainComposite), 'utf-8')
   })
 }

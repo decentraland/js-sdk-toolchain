@@ -32,6 +32,7 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
   // initialize DataLayer
   const dataLayer = await createDataLayerClientRpc()
 
+  // TODO: this should be showed
   const assetCatalog = await dataLayer.getAssetCatalog({})
 
   // create scene context
@@ -106,4 +107,28 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
     scene,
     dispose
   }
+}
+
+export function getNextFreeEntity(engine: IEngine) {
+  // const Label = engine.getComponent('inspector::Label')
+  for (let i = 512; i < 65536; i++) {
+    let foundComponent = false
+    for (const compfDef of engine.componentsIter()) {
+      if (compfDef.has(i as Entity)) {
+        foundComponent = true
+        break
+      }
+    }
+
+    if (!foundComponent) {
+      return i as Entity
+    }
+
+    // The ideal implmementation, but we have to be sure that EVERY entity has a Label
+    // if (!Label.has(i as Entity)) {
+    //   return i as Entity
+    // }
+  }
+
+  throw new Error("Couldn't get next free entity, all entities' numbers have Label")
 }

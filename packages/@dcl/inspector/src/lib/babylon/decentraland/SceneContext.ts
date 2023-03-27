@@ -1,22 +1,22 @@
-import { AsyncQueue } from '@well-known-components/pushable-channel'
-import * as Schemas from '@dcl/schemas'
+import * as BABYLON from '@babylonjs/core'
 import { ComponentDefinition, CrdtMessageType, Engine, Entity } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
+import * as Schemas from '@dcl/schemas'
+import { AsyncQueue } from '@well-known-components/pushable-channel'
 import future from 'fp-future'
-import * as BABYLON from '@babylonjs/core'
 
-import { createEditorComponents } from '../../sdk/components'
+import { CrdtStreamMessage } from '../../data-layer/proto/gen/data-layer.gen'
 import { DataLayerRpcClient } from '../../data-layer/types'
+import { createEditorComponents } from '../../sdk/components'
 import { serializeCrdtMessages } from '../../sdk/crdt-logger'
-import { EcsEntity } from './EcsEntity'
-import { createBetterTransport } from './transport'
 import { ComponentOperation } from './component-operations'
+import { EcsEntity } from './EcsEntity'
+import { putEntitySelectedComponent } from './editorComponents/entitySelected'
 import { putBillboardComponent } from './sdkComponents/billboard'
 import { putGltfContainerComponent } from './sdkComponents/gltf-container'
 import { putMeshRendererComponent } from './sdkComponents/mesh-renderer'
 import { putTransformComponent } from './sdkComponents/transform'
-import { putEntitySelectedComponent } from './editorComponents/entitySelected'
-import { CrdtStreamMessage } from '../../data-layer/proto/gen/data-layer.gen'
+import { createBetterTransport } from './transport'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -63,7 +63,12 @@ export class SceneContext {
 
   readonly transport = createBetterTransport(this.engine)
 
-  constructor(public babylon: BABYLON.Engine, public scene: BABYLON.Scene, public loadableScene: LoadableScene, public dataLayer: DataLayerRpcClient) {
+  constructor(
+    public babylon: BABYLON.Engine,
+    public scene: BABYLON.Scene,
+    public loadableScene: LoadableScene,
+    public dataLayer: DataLayerRpcClient
+  ) {
     this.rootNode = new EcsEntity(0 as Entity, this.#weakThis, scene)
     babylon.onEndFrameObservable.add(this.update)
     Object.assign(globalThis, { babylon: this.engine })
@@ -123,10 +128,10 @@ export class SceneContext {
 
   async getFile(src: string): Promise<Uint8Array | null> {
     try {
-      const response = await this.dataLayer.getAssetData({ path: src})
+      const response = await this.dataLayer.getAssetData({ path: src })
       return response.data
-    } catch(err) {
-      console.error('Error fetching file ' + src)
+    } catch (err) {
+      console.error('Error fetching file ' + src, err)
       return null
     }
   }

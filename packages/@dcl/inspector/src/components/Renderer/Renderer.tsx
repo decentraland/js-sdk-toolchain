@@ -5,6 +5,7 @@ import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 import { useSdk } from '../../hooks/sdk/useSdk'
 import { useRenderer } from '../../hooks/sdk/useRenderer'
 import { ROOT } from '../../lib/sdk/tree'
+import { getNextFreeEntity } from '../../lib/sdk/engine'
 
 export function Renderer() {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
@@ -18,7 +19,7 @@ export function Renderer() {
       scene,
       components: { Label, Transform, GltfContainer }
     } = sdk
-    const child = engine.addEntity()
+    const child = getNextFreeEntity(engine)
     const { x, z } = await getPointerCoords(scene)
     Label.create(child, { label: asset.name })
     Transform.create(child, { parent: ROOT, position: { x, y: 0, z } })
