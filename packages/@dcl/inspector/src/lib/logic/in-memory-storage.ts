@@ -50,9 +50,24 @@ export function createFsInMemory(initialFs: Record<string, Buffer> = {}): FileSy
       //  => To match it, filter deeper file path is neccesary, in the Internal Storage map, there is no directory
       //    so it's also necessary to generate them on the fly
 
-      return Array.from(fs.storage.keys())
-        .filter((item) => item.startsWith(dirPath))
-        .map((name) => ({ name, isDirectory: false }))
+      const resolvedDirPath = dirPath === '.' || dirPath === '' ? './' : dirPath
+
+      const files: { name: string; isDirectory: boolean }[] = []
+      for (const path of Array.from(fs.storage.keys())) {
+        if (!path.startsWith(resolvedDirPath)) continue
+
+        const fileName = path.substring(resolvedDirPath.length)
+        const slashPosition = fileName.indexOf('/')
+        if (slashPosition !== -1) {
+          const directoryName = fileName.substring(0, slashPosition)
+          if (!files.find((item) => item.name === directoryName)) {
+            files.push({ name: directoryName, isDirectory: true })
+          }
+        } else {
+          files.push({ name: fileName, isDirectory: false })
+        }
+      }
+      return files
     }
   }
 }

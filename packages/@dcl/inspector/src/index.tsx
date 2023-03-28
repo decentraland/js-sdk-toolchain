@@ -1,22 +1,22 @@
-import ReactDOM from 'react-dom/client'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import ReactDOM from 'react-dom/client'
 
-import { AssetsCatalog } from './components/AssetsCatalog'
 import Hierarchy from './components/Hierarchy/Hierarchy'
-import { SdkProvider } from './components/SdkProvider'
 import { Renderer } from './components/Renderer/Renderer'
-import { useCatalog } from './hooks/catalog/useCatalog'
+import { SdkProvider } from './components/SdkProvider'
 
 import './index.css'
 
 import { Buffer as MaybeBuffer } from 'buffer'
+import { ProjectAssetExplorer } from './components/ProjectAssetExplorer'
+import { useCatalog } from './hooks/catalog/useCatalog'
+import { AssetsCatalog } from './components/AssetsCatalog'
 globalThis.Buffer = MaybeBuffer
 
 async function initScene() {
   const App = () => {
     const [catalog] = useCatalog()
-
     return (
       <>
         <div className="left">
@@ -24,7 +24,10 @@ async function initScene() {
         </div>
         <div className="right">
           <Renderer />
-          {catalog && <AssetsCatalog value={catalog} />}
+          <div>
+            <ProjectAssetExplorer />
+            {catalog && <AssetsCatalog value={catalog} />}
+          </div>
         </div>
       </>
     )

@@ -69,7 +69,22 @@ export async function initRpcMethods(
       throw new Error("Couldn't find the asset " + req.path)
     },
     async getAssetCatalog() {
-      return {} as any
+      async function getFiles(dirPath: string, files: string[]) {
+        // debugger
+        const currentDirFiles = await fs.readdir(dirPath)
+        for (const currentPath of currentDirFiles) {
+          const fullPath = dirPath + (dirPath.endsWith('/') ? '' : '/') + currentPath.name
+          if (currentPath.isDirectory) {
+            await getFiles(fullPath, files)
+          } else {
+            files.push(fullPath)
+          }
+        }
+        return files
+      }
+      const files = await getFiles('./', [])
+
+      return { basePath: '.', assets: files.map((item) => ({ path: item })) }
     }
   }
 }

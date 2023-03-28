@@ -1,0 +1,111 @@
+
+.project-asset-catalog {
+  display: flex;
+  overflow: scroll;
+  height: 100%;
+  background-color: #17141B;
+  padding: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.project-asset-catalog .theme, .project-asset-catalog .category .assets > div {
+  display: flex;
+  margin-right: 1rem;
+  width: 200px;
+  height: 80px;
+  align-items: center;
+  padding: 0 16px;
+  border-radius: 8px;
+  background: #36343D;
+  cursor: pointer;
+  margin-bottom: 8px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  position: relative;
+}
+
+.project-asset-catalog .theme:last-child {
+  margin-right: 0;
+}
+
+.project-asset-catalog .theme:hover {
+  background: #504E58;
+}
+
+.project-asset-catalog .theme img {
+  width: 48px;
+  height: 48px;
+  margin-right: 16px;
+  border-radius: 8px;
+}
+
+.project-asset-catalog h4, .project-asset-catalog h3 {
+  margin-top: 0;
+  margin-bottom: 0;
+  color: #EEEEEF;
+  font-size: 17px;
+  line-height: 26px;
+  font-weight: 400;
+  text-transform: capitalize;
+}
+
+.project-asset-catalog .theme div {
+  margin-left: auto;
+  background: url(https://cdn.decentraland.org/@dcl/builder-site/6.35.0/static/media/icons.5ff54946.svg) 41.666666666666664% 21.768707482993197% no-repeat;
+  width: 8px;
+  height: 14px;
+}
+
+.project-asset-catalog .theme div:before {
+  content: "";
+}
+
+.project-asset-catalog .categories {
+  display: flex;
+  flex-direction: column;
+}
+
+.project-asset-catalog .categories > div:first-child {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-asset-catalog .categories span {
+  color: #FFFFFF;
+  width: 18px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.project-asset-catalog .categories h3 {
+  align-self: center;
+  font-size: 24px;
+}
+
+.project-asset-catalog .category {
+  display: flex;
+  flex-direction: column;
+}
+
+.project-asset-catalog .category .assets {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.project-asset-catalog .category .assets > div {
+  width: 80px;
+  justify-content: center;
+}
+
+.project-asset-catalog .category .assets > div:hover {
+  background: #504E58;
+}
+
+.project-asset-catalog .category .assets > div img {
+  width: 60px;
+  height: 60px;
+}

@@ -8,6 +8,7 @@ import { SceneContext } from '../babylon/decentraland/SceneContext'
 import { initRenderer } from '../babylon/setup'
 import { createDataLayerClientRpc } from '../data-layer/client'
 import { CrdtStreamMessage } from '../data-layer/proto/gen/data-layer.gen'
+import { DataLayerRpcClient } from '../data-layer/types'
 import { consumeAllMessagesInto } from '../logic/consume-stream'
 import { createEditorComponents, EditorComponents, SdkComponents } from './components'
 import { serializeCrdtMessages } from './crdt-logger'
@@ -23,6 +24,7 @@ export type SdkContextValue = {
   components: EditorComponents & SdkComponents
   scene: Scene
   events: Emitter<SdkContextEvents>
+  dataLayer: DataLayerRpcClient
   dispose(): void
 }
 
@@ -31,9 +33,6 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
 
   // initialize DataLayer
   const dataLayer = await createDataLayerClientRpc()
-
-  // TODO: this should be showed
-  const assetCatalog = await dataLayer.getAssetCatalog({})
 
   // create scene context
   const ctx = new SceneContext(
@@ -105,6 +104,7 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
     },
     events,
     scene,
+    dataLayer,
     dispose
   }
 }
