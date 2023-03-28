@@ -44,7 +44,7 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
   // sync inputs -> engine
   useEffect(() => {
     if (isValidInput(input)) {
-      const newComponentValue = fromInputToComponentValue(input)
+      const newComponentValue = { ...componentValue, ...fromInputToComponentValue(input) }
       if (!isEqual(newComponentValue, componentValue)) {
         setComponentValue(newComponentValue)
       }
