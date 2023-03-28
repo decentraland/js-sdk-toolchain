@@ -8,6 +8,7 @@ import { createDataLayerClientRpc } from '../data-layer/client'
 import { EditorComponents, SdkComponents } from './components'
 import { getHardcodedLoadableScene } from './test-local-scene'
 import { createInspectorEngine } from './inspector-engine'
+import { DataLayerRpcClient } from '../data-layer/types'
 
 export type SdkContextEvents = {
   change: { entity: Entity; operation: CrdtMessageType; component?: ComponentDefinition<any>; value?: any }
@@ -19,6 +20,7 @@ export type SdkContextValue = {
   components: EditorComponents & SdkComponents
   scene: Scene
   events: Emitter<SdkContextEvents>
+  dataLayer: DataLayerRpcClient
   dispose(): void
 }
 
@@ -35,12 +37,13 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
     getHardcodedLoadableScene(
       'urn:decentraland:entity:bafkreid44xhavttoz4nznidmyj3rjnrgdza7v6l7kd46xdmleor5lmsxfm1',
       catalog
-    )
+    ),
+    dataLayer
   )
   ctx.rootNode.position.set(0, 0, 0)
 
   // Connect babylon engine with dataLayer transport
-  void ctx.connectDataLayer(dataLayer)
+  void ctx.connectCrdtTransport(dataLayer.crdtStream)
 
   // create inspector engine context and components
   const { engine, components, events, dispose } = createInspectorEngine(dataLayer)
@@ -52,6 +55,7 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
     components,
     events,
     scene,
-    dispose
+    dispose,
+    dataLayer
   }
 }

@@ -54,7 +54,7 @@ export async function initRpcMethods(
     // and returns an async iterable. consumption and production of messages
     // are decoupled operations
     async *crdtStream(iter) {
-      return stream(iter, { engine })
+      return stream(iter, { engine }) as any
     },
     async getAssetData(req) {
       if (await fs.existFile(req.path)) {

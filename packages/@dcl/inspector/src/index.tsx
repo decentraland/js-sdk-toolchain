@@ -9,9 +9,10 @@ import { SdkProvider } from './components/SdkProvider'
 import './index.css'
 
 import { Buffer as MaybeBuffer } from 'buffer'
+import { AssetsCatalog } from './components/AssetsCatalog'
+import { EntityInspector } from './components/EntityInspector'
 import { ProjectAssetExplorer } from './components/ProjectAssetExplorer'
 import { useCatalog } from './hooks/catalog/useCatalog'
-import { AssetsCatalog } from './components/AssetsCatalog'
 globalThis.Buffer = MaybeBuffer
 
 async function initScene() {

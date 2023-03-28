@@ -1,11 +1,9 @@
 import React from 'react'
 import { useDrop } from 'react-dnd'
-import { IAsset } from '../AssetsCatalog/types'
-import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
-import { useSdk } from '../../hooks/sdk/useSdk'
 import { useRenderer } from '../../hooks/sdk/useRenderer'
+import { useSdk } from '../../hooks/sdk/useSdk'
+import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 import { ROOT } from '../../lib/sdk/tree'
-import { getNextFreeEntity } from '../../lib/sdk/engine'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 
 export function Renderer() {
@@ -20,7 +18,7 @@ export function Renderer() {
       scene,
       components: { Label, Transform, GltfContainer }
     } = sdk
-    const child = getNextFreeEntity(engine)
+    const child = engine.addEntity()
     const { x, z } = await getPointerCoords(scene)
     Label.create(child, { label: asset.name })
     Transform.create(child, { parent: ROOT, position: { x, y: 0, z } })

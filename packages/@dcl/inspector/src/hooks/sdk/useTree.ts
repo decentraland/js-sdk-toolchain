@@ -1,6 +1,5 @@
 import { Entity } from '@dcl/ecs'
 import { useCallback, useState } from 'react'
-import { getNextFreeEntity } from '../../lib/sdk/engine'
 import { getEmptyTree, getTreeFromEngine } from '../../lib/sdk/tree'
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
@@ -55,7 +54,7 @@ export const useTree = () => {
 
   const addChild = async (parent: Entity, label: string) => {
     const { Transform, Label } = sdk!.components
-    const child = getNextFreeEntity(sdk!.engine)
+    const child = sdk!.engine.addEntity()
     Transform.create(child, { parent })
     Label.create(child, { label })
     handleUpdate()

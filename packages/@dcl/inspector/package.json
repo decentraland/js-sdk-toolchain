@@ -1,6 +1,9 @@
 {
   "name": "@dcl/inspector",
   "version": "0.1.0",
+  "dependencies": {
+    "deep-equal": "^2.2.0"
+  },
   "devDependencies": {
     "@babylonjs/core": "^5.48.0",
     "@babylonjs/gui": "^5.48.0",
@@ -37,8 +40,5 @@
     "start": "node ./build.js --watch"
   },
   "types": "dist/tooling-entrypoint.d.ts",
-  "typings": "dist/tooling-entrypoint.d.ts",
-  "dependencies": {
-    "deep-equal": "^2.2.0"
-  }
+  "typings": "dist/tooling-entrypoint.d.ts"
 }
