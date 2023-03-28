@@ -1,6 +1,6 @@
 import { createFsInMemory } from '../../logic/in-memory-storage'
 
-const mainComposite = {
+export const mainComposite = {
   id: 'main',
   components: [
     {
@@ -11,7 +11,7 @@ const mainComposite = {
           json: {
             position: {
               x: 8,
-              y: 0.8,
+              y: 1,
               z: 8
             }
           }

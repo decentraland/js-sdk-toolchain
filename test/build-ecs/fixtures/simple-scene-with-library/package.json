@@ -14,7 +14,6 @@
     "watch": "sdk-commands build --watch"
   },
   "devDependencies": {
-    "@dcl/dcl-rollup": "file:../../../../packages/@dcl/dcl-rollup",
     "@dcl/ecs": "file:../../../../packages/@dcl/ecs",
     "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime",
     "@dcl/sdk": "file:../../../../packages/@dcl/sdk",

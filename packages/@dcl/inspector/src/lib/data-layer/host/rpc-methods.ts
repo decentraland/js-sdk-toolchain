@@ -23,6 +23,9 @@ export async function initRpcMethods(
   }
 
   let dirty = false
+
+  // TODO: remove this mutation.
+  // Its hard to follow when you add this onChanges fn and the side-effects
   onChanges.push(() => {
     dirty = true
   })
@@ -51,13 +54,7 @@ export async function initRpcMethods(
     // and returns an async iterable. consumption and production of messages
     // are decoupled operations
     async *crdtStream(iter) {
-      // TODO: check this types, in the meantime, the lines below do the same
-      // return stream(iter, { engine })
-
-      const gen = stream(iter, { engine })
-      for await (const it of gen) {
-        yield it
-      }
+      return stream(iter, { engine })
     },
     async getAssetData(req) {
       if (await fs.existFile(req.path)) {

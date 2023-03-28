@@ -13,7 +13,7 @@ import { getValidSceneJson, getBaseCoords } from '../../logic/scene-validations'
 
 interface Options {
   args: typeof args
-  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'dclInfoConfig' | 'analytics'>
+  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'analytics' | 'config'>
 }
 
 export const args = getArgs({
@@ -120,7 +120,7 @@ export async function main(options: Options) {
   if (willCreateRealm) {
     // prepare the realm object
     printProgressStep(logger, 'Creating realm file...', currentStep++, maxSteps)
-    const realm = createStaticRealm()
+    const realm = await createStaticRealm(options.components)
     const realmName = args['--realmName']!
 
     realm.configurations!.scenesUrn = [urn]
@@ -141,7 +141,7 @@ export async function main(options: Options) {
   const sceneJson = await getValidSceneJson(options.components, projectRoot)
   const coords = getBaseCoords(sceneJson)
 
-  options.components.analytics.trackSync('Export static', {
+  options.components.analytics.track('Export static', {
     projectHash: await b64HashingFunction(projectRoot),
     coords,
     args: getArgsUsed(options.args)

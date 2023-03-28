@@ -7,10 +7,7 @@ import fetch, { Headers } from 'node-fetch'
 import { fetchEntityByPointer } from '../../../logic/catalyst-requests'
 import { CliComponents } from '../../../components'
 import { b64HashingFunction, getProjectContentMappings } from '../../../logic/project-files'
-
-function getCatalystUrl(): URL {
-  return new URL('https://peer.decentraland.org')
-}
+import { getCatalystBaseUrl } from '../../../logic/config'
 
 function smartWearableNameToId(name: string) {
   return name.toLocaleLowerCase().replace(/ /g, '-')
@@ -20,7 +17,9 @@ type LambdasWearable = Wearable & {
   baseUrl: string
 }
 
-export function setupEcs6Endpoints(components: CliComponents, dir: string, router: Router<PreviewComponents>) {
+export async function setupEcs6Endpoints(components: CliComponents, dir: string, router: Router<PreviewComponents>) {
+  const catalystUrl = new URL(await getCatalystBaseUrl(components))
+
   const baseFolders = [dir]
   // handle old preview scene.json
   router.get('/scene.json', async () => {
@@ -67,8 +66,6 @@ export function setupEcs6Endpoints(components: CliComponents, dir: string, route
       })
 
       if (previewWearables.length === 1) {
-        const catalystUrl = getCatalystUrl()
-
         const u = new URL(ctx.url.toString())
         u.host = catalystUrl.host
         u.protocol = catalystUrl.protocol
@@ -102,7 +99,6 @@ export function setupEcs6Endpoints(components: CliComponents, dir: string, route
   })
 
   router.all('/lambdas/:path+', async (ctx) => {
-    const catalystUrl = getCatalystUrl()
     const u = new URL(ctx.url.toString())
     u.host = catalystUrl.host
     u.protocol = catalystUrl.protocol
@@ -124,7 +120,6 @@ export function setupEcs6Endpoints(components: CliComponents, dir: string, route
   })
 
   router.post('/content/entities', async (ctx) => {
-    const catalystUrl = getCatalystUrl()
     const headers = new Headers()
     const res = await fetch(`${catalystUrl.toString()}/content/entities`, {
       method: 'post',
@@ -139,14 +134,16 @@ export function setupEcs6Endpoints(components: CliComponents, dir: string, route
 
   // TODO: get workspace scenes & wearables...
 
-  serveFolders(components, router, baseFolders)
+  await serveFolders(components, router, baseFolders)
 }
 
-function serveFolders(
-  components: Pick<CliComponents, 'fs' | 'logger'>,
+async function serveFolders(
+  components: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,
   router: Router<PreviewComponents>,
   baseFolders: string[]
 ) {
+  const catalystUrl = await getCatalystBaseUrl(components)
+
   router.get('/content/contents/:hash', async (ctx: any, next: any) => {
     if (ctx.params.hash && ctx.params.hash.startsWith('b64-')) {
       const fullPath = path.resolve(Buffer.from(ctx.params.hash.replace(/^b64-/, ''), 'base64').toString('utf8'))
@@ -179,8 +176,8 @@ function serveFolders(
     )
 
     const resultEntities = await getSceneJson(components, baseFolders, Array.from(requestedPointers))
-    const catalystUrl = getCatalystUrl()
     const remote = fetchEntityByPointer(
+      components,
       catalystUrl.toString(),
       pointers.filter(($: string) => !$.match(/-?\d+,-?\d+/))
     )

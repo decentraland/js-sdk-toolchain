@@ -18,7 +18,7 @@ import { getFont, getTextAlign } from './utils'
  * @category Component
  */
 
-/*#__PURE__*/
+/* @__PURE__ */
 export function Label(props: EntityPropTypes & UiLabelProps) {
   const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...uiTextProps } = props
   const commonProps = parseProps({

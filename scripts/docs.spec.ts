@@ -2,12 +2,10 @@ import { readFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
 
 import { flow } from './common'
-import { itExecutes, runCommand } from './helpers'
+import { itExecutes } from './helpers'
 
 flow('build docs site', () => {
-  const SDK_TOOLCHAIN_PATH = resolve(process.cwd())
-  itExecutes('make install', SDK_TOOLCHAIN_PATH)
-  it('make build', async () => await runCommand('make build', SDK_TOOLCHAIN_PATH), 600000)
+  const SDK_TOOLCHAIN_PATH = process.cwd()
   itExecutes('./node_modules/.bin/typedoc', SDK_TOOLCHAIN_PATH)
 
   it('fix html page', async () => {

@@ -35,8 +35,7 @@ export class SceneContext {
   }
 
   engine = Engine({
-    onChangeFunction: (entity, op, component, value) => {
-      console.log(entity, op, component, value)
+    onChangeFunction: (entity, op, component, _value) => {
       this.processEcsChange(entity, op, component)
     }
   })
@@ -174,7 +173,6 @@ export class SceneContext {
 
       // Wait till next tick
       const res = await this.transport.receiveBatch(message.data)
-
       if (res.byteLength) {
         Array.from(serializeCrdtMessages('SceneContext>Datalayer', res, this.engine)).forEach(($) => console.log($))
       }

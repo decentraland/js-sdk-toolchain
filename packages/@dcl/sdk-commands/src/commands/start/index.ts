@@ -1,7 +1,6 @@
 import * as os from 'os'
 import * as path from 'path'
 import open from 'open'
-import future from 'fp-future'
 
 import { CliComponents } from '../../components'
 import { main as build } from '../build'
@@ -10,9 +9,9 @@ import { needsDependencies, npmRun } from '../../logic/project-validations'
 import { getBaseCoords, getValidSceneJson } from '../../logic/scene-validations'
 import { CliError } from '../../logic/error'
 import { getPort } from '../../logic/get-free-port'
-import { ISignalerComponent, PreviewComponents } from './types'
+import { PreviewComponents } from './types'
 import { createTestMetricsComponent } from '@well-known-components/metrics'
-import { Lifecycle, IBaseComponent } from '@well-known-components/interfaces'
+import { Lifecycle } from '@well-known-components/interfaces'
 import { createRecordConfigComponent } from '@well-known-components/env-config-provider'
 import { createRoomsComponent, roomsMetrics } from '@dcl/mini-comms/dist/adapters/rooms'
 import { createServerComponent } from '@well-known-components/http-server'
@@ -24,10 +23,11 @@ import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
 import { b64HashingFunction } from '../../logic/project-files'
 import { createDataLayer } from './data-layer/rpc'
+import { createExitSignalComponent } from '../../components/exit-signal'
 
 interface Options {
   args: typeof args
-  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'dclInfoConfig' | 'analytics'>
+  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'analytics' | 'spawner'>
 }
 
 export const args = getArgs({
@@ -93,7 +93,7 @@ export async function main(options: Options) {
 
   // first run `npm run build`, this can be disabled with --skip-build
   if (!skipBuild) {
-    await npmRun(projectRoot, 'build')
+    await npmRun(options.components, projectRoot, 'build')
   }
 
   // then start the embedded compiler, this can be disabled with --no-watch
@@ -111,7 +111,7 @@ export async function main(options: Options) {
 
   const port = await getPort(options.args['--port'])
   const program = await Lifecycle.run<PreviewComponents>({
-    async initComponents() {
+    async initComponents(): Promise<PreviewComponents> {
       const metrics = createTestMetricsComponent(roomsMetrics)
       const config = createRecordConfigComponent({
         HTTP_SERVER_PORT: port.toString(),
@@ -127,15 +127,7 @@ export async function main(options: Options) {
         config
       })
 
-      const programClosed = future<void>()
-      const signaler: IBaseComponent & ISignalerComponent = {
-        programClosed,
-        async stop() {
-          // this promise is resolved upon SIGTERM or SIGHUP
-          // or when program.stop is called
-          programClosed.resolve()
-        }
-      }
+      const signaler = createExitSignalComponent()
 
       return {
         ...options.components,
@@ -152,8 +144,8 @@ export async function main(options: Options) {
     },
     async main({ components, startComponents }) {
       // TODO: dataLayerRpc should be an optional component
-      const dataLayerRpc = withDataLayer ? await createDataLayer({ fs: components.fs }) : undefined
-      await wireRouter(components, projectRoot, dataLayerRpc)
+      const dataLayer = withDataLayer ? await createDataLayer(components) : undefined
+      await wireRouter(components, projectRoot, dataLayer)
       if (watch) {
         await wireFileWatcherToWebSockets(components, projectRoot)
       }
@@ -161,7 +153,7 @@ export async function main(options: Options) {
 
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []
-      components.analytics.trackSync('Preview started', {
+      components.analytics.track('Preview started', {
         projectHash: await b64HashingFunction(projectRoot),
         coords: baseCoords,
         isWorkspace: false,

@@ -23,6 +23,18 @@ jobs:
         run: make install
       - name: lint
         run: make lint
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - name: install npm v8
+        run: npm i -g npm@8
+      - name: docs
+        run: make docs
   test:
     runs-on: ubuntu-latest
     steps:
@@ -105,24 +117,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
-      - name: publish @dcl/dcl-rollup package
-        uses: menduz/oddish-action@master
-        id: publish_dcl_rollup
-        with:
-          registry-url: 'https://registry.npmjs.org'
-          access: public
-          cwd: ./packages/@dcl/dcl-rollup
-          ## use action runId instead of current date to generate snapshot numbers
-          deterministic-snapshot: true
-
-          ## publish every package to s3
-          s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/dcl-rollup'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
-
       - name: publish @dcl/ecs package
         uses: menduz/oddish-action@master
         id: publish_ecs
@@ -177,6 +171,13 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
+      - name: (PR) change @dcl/sdk-commands dependencies versions to point to s3 url
+        working-directory: ./packages/@dcl/sdk-commands
+        if: ${{ github.event.pull_request.number }}
+        run: node -e "let pkg=require('./package.json'); pkg.dependencies['@dcl/inspector']='$INSPECTOR_URL'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
+        env:
+          INSPECTOR_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_inspector.outputs.s3-bucket-key }}
+
       - name: publish @dcl/sdk-commands package
         uses: menduz/oddish-action@master
         id: publish_decentraland_sdk_commands
@@ -206,7 +207,7 @@ jobs:
       - name: (PR) change @dcl/sdk version to s3 url
         working-directory: ./packages/@dcl/sdk
         if: ${{ github.event.pull_request.number }}
-        run: node -e "let pkg=require('./package.json'); pkg.dependencies['@dcl/inspector']='$INSPECTOR_URL'; pkg.dependencies['@dcl/js-runtime']='$JS_RUNTIME_S3_URL'; pkg.dependencies['@dcl/dcl-rollup']='$ROLLUP_S3_URL'; pkg.dependencies['@dcl/ecs']='$ECS_S3_URL'; pkg.dependencies['@dcl/react-ecs']='$REACT_ECS_S3_URL'; pkg.dependencies['@dcl/sdk-commands']='$SDK_COMMANDS_S3_URL'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
+        run: node -e "let pkg=require('./package.json'); pkg.dependencies['@dcl/inspector']='$INSPECTOR_URL'; pkg.dependencies['@dcl/js-runtime']='$JS_RUNTIME_S3_URL'; pkg.dependencies['@dcl/ecs']='$ECS_S3_URL'; pkg.dependencies['@dcl/react-ecs']='$REACT_ECS_S3_URL'; pkg.dependencies['@dcl/sdk-commands']='$SDK_COMMANDS_S3_URL'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
         env:
           INSPECTOR_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_inspector.outputs.s3-bucket-key }}
           REACT_ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_react_ecs.outputs.s3-bucket-key }}

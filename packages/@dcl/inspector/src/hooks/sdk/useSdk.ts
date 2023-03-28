@@ -1,6 +1,6 @@
 import React from 'react'
 import { SdkContext } from '../../components/SdkProvider'
-import { SdkContextValue } from '../../lib/sdk/engine'
+import { SdkContextValue } from '../../lib/sdk/context'
 
 /**
  * This can be used to get the SDK context, which can be uninitialized, or as an effect, to be run once the SDK context is available

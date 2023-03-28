@@ -13,11 +13,13 @@ export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliCompone
       await fs.writeFile(filePath, content)
     },
     async readdir(dirPath: string): Promise<{ name: string; isDirectory: boolean }[]> {
-      const result = await fs.readdir(dirPath, { withFileTypes: true })
-      return result.map((item) => ({
-        name: item.name,
-        isDirectory: item.isDirectory()
-      }))
+      const result = await fs.readdir(dirPath)
+      return Promise.all(
+        result.map(async (name) => ({
+          name: name,
+          isDirectory: await fs.directoryExists(name)
+        }))
+      )
     }
   }
 }

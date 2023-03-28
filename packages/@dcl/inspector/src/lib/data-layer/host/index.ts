@@ -13,6 +13,12 @@ export type DataLayerHost = {
  * @param fs
  * @returns
  */
+
+let interval: NodeJS.Timeout
+export function stopEngine() {
+  clearInterval(interval)
+}
+
 export async function createDataLayerHost(fs: FileSystemInterface): Promise<DataLayerHost> {
   const callbackFunctions: OnChangeFunction[] = []
   const engine = createEngine({
@@ -20,13 +26,14 @@ export async function createDataLayerHost(fs: FileSystemInterface): Promise<Data
       callbackFunctions.forEach((func) => func(entity, operation, component, componentValue))
     }
   })
+  Object.assign(globalThis, { dataLayerEngine: engine })
 
   // the server (datalayer) should also keep its internal "game loop" to process
   // all the incoming messages. we have this interval easy solution to mock that
   // game loop for the time being.
   // since the servers DO NOT run any game system, the only thing it does is to
   // process incoming and outgoing messages + dirty states
-  setInterval(() => {
+  interval = setInterval(() => {
     engine.update(0.016).catch(($) => {
       console.error($)
       debugger

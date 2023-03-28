@@ -17,16 +17,16 @@ function exportComponent(component: Component) {
 
 function defineComponentDecl(component: Component) {
   if (component.componentPascalName === 'PointerEventsResult') {
-    return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PB${component.componentPascalName}>> = (
+    return `/** @public */ export const ${component.componentPascalName}: GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PB${component.componentPascalName}>> = (
       engine
-    ) =>
+    ) => /* @__PURE__ */
       engine.defineValueSetComponentFromSchema("core::${component.componentPascalName}", ${component.componentPascalName}Schema, {
         timestampFunction: (t) => t.timestamp,
         maxElements: 100
       })`.trim()
   } else {
-    return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PB${component.componentPascalName}>> = engine =>
-    engine.defineComponentFromSchema("core::${component.componentPascalName}", ${component.componentPascalName}Schema);
+    return `/** @public */ export const ${component.componentPascalName}: LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PB${component.componentPascalName}>> = engine =>
+    /* @__PURE__ */ engine.defineComponentFromSchema("core::${component.componentPascalName}", ${component.componentPascalName}Schema);
   `.trim()
   }
 }
@@ -35,9 +35,9 @@ const skipExposeGlobally: string[] = ['Animator', 'MeshRenderer', 'MeshCollider'
 function defineGlobalComponentDecl(component: Component) {
   if (skipExposeGlobally.includes(component.componentPascalName)) return ''
   if (component.componentPascalName === 'PointerEventsResult') {
-    return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: GrowOnlyValueSetComponentDefinition<PB${component.componentPascalName}> = components.${component.componentPascalName}(engine)`.trim()
+    return `/** @public */ export const ${component.componentPascalName}: GrowOnlyValueSetComponentDefinition<PB${component.componentPascalName}> = /* @__PURE__ */ components.${component.componentPascalName}(engine)`.trim()
   } else {
-    return `/** @public *//*#__PURE__*/ export const ${component.componentPascalName}: LastWriteWinElementSetComponentDefinition<PB${component.componentPascalName}> = components.${component.componentPascalName}(engine)`.trim()
+    return `/** @public */ export const ${component.componentPascalName}: LastWriteWinElementSetComponentDefinition<PB${component.componentPascalName}> = /* @__PURE__ */ components.${component.componentPascalName}(engine)`.trim()
   }
 }
 
@@ -56,8 +56,8 @@ export type GSetComponentGetter<T extends GrowOnlyValueSetComponentDefinition<an
 
 $componentDeclarations
 
-/** public *//*#__PURE__*/
-export const componentDefinitionByName = {
+/** public */
+export const componentDefinitionByName = /* @__PURE__ */ {
 $allKeyNameValueDefinition
 }
 `

@@ -1,41 +1,71 @@
 import path from 'path'
 import { CliComponents } from '../components'
-import { DCLInfo } from './dcl-info'
+import { readStringConfig, requireStringConfig } from '../components/config'
+import { readJson } from './fs'
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { version: sdkCommandsVersion } = require('../../package.json')
+
+/**
+ * Returns the version of the sdk-commands that is running
+ */
+export async function getSdkCommandsVersion() {
+  return sdkCommandsVersion
+}
+
+/**
+ * Returns the installed version of a certain package in the current working directory.
+ * Returns "unknown" if the package is not installed.
+ */
+export async function getInstalledPackageVersion(
+  components: Pick<CliComponents, 'fs'>,
+  packageName: string,
+  workingDirectory: string
+) {
+  try {
+    const sdkPath = path.dirname(
+      require.resolve(`${packageName}/package.json`, {
+        paths: [workingDirectory]
+      })
+    )
+    const packageJson = await readJson<{ version: string }>(components, path.resolve(sdkPath, 'package.json'))
+
+    return packageJson.version ?? /* istanbul ignore next */ 'unknown'
+  } catch (e) {
+    return 'unknown'
+  }
+}
+
+/**
+ * Returns true if the Decentraland Editor is running.
+ * TODO: EDITOR is a unix reserved env var. Change it for something more specific.
+ */
+export function isEditor() {
+  return process.env.EDITOR === 'true'
+}
+
+export function isCI() {
+  return process.env.CI === 'true' || process.argv.includes('--ci') || process.argv.includes('--c')
+}
+
+export async function getCatalystBaseUrl(components: Pick<CliComponents, 'config'>): Promise<string> {
+  const url = (await readStringConfig(components, 'DCL_CATALYST')) ?? 'https://peer.decentraland.org'
+  return url.replace(/\/$/, '')
+}
+
+export function getSegmentKey() {
+  const isProduction = !process.env.DEVELOPER_MODE
+  return isProduction
+    ? /* istanbul ignore next */ 'sFdziRVDJo0taOnGzTZwafEL9nLIANZ3'
+    : 'mjCV5Dc4VAKXLJAH5g7LyHyW1jrIR3to'
+}
 
 /* istanbul ignore next */
-export const getDclInfoPath = () =>
-  path.resolve(process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'] ?? '', '.dclinfo')
-
-/**
- * Reads the contents of the `.dclinfo` file
- */
-export async function getDCLInfoConfig(components: Pick<CliComponents, 'fs'>): Promise<DCLInfo> {
-  try {
-    const content = await components.fs.readFile(getDclInfoPath(), 'utf8')
-    return JSON.parse(content) as DCLInfo
-  } catch (e) {
-    return {}
-  }
+export async function getLandRegistry(components: Pick<CliComponents, 'config'>) {
+  return requireStringConfig(components, 'DCL_LAND_REGISTRY_ADDRESS')
 }
 
-/**
- * Config that can be override via ENV variables
- */
-export function getEnvConfig(): Partial<DCLInfo> {
-  const { SEGMENT_KEY, TRACK_STATS } = process.env
-
-  const envConfig: DCLInfo = {
-    segmentKey: SEGMENT_KEY,
-    trackStats: TRACK_STATS !== undefined ? TRACK_STATS === 'true' : undefined
-  }
-
-  return removeEmptyKeys(envConfig)
-}
-
-export function removeEmptyKeys(obj: Record<string, unknown>) {
-  const result: Record<string, unknown> = {}
-  Object.keys(obj)
-    .filter((k) => !!obj[k])
-    .forEach((k) => (result[k] = obj[k]))
-  return result
+/* istanbul ignore next */
+export async function getEstateRegistry(components: Pick<CliComponents, 'config'>) {
+  return requireStringConfig(components, 'DCL_ESTATE_REGISTRY_ADDRESS')
 }

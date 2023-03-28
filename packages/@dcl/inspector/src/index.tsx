@@ -21,6 +21,7 @@ async function initScene() {
       <>
         <div className="left">
           <Hierarchy />
+          <EntityInspector />
         </div>
         <div className="right">
           <Renderer />

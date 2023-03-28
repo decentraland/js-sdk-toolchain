@@ -19,7 +19,7 @@ export async function createDataLayer({ fs }: Pick<CliComponents, 'fs'>): Promis
   const context: DataLayerContext = {
     dataLayerHost
   }
-  const rpcServer = createRpcServer<DataLayerContext>({})
+  const rpcServer = createRpcServer<DataLayerContext>({ logger })
 
   async function rpcHandler(serverPort: RpcServerPort<DataLayerContext>) {
     // TODO: dataLayer as any

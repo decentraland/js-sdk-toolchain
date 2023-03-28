@@ -4,5 +4,6 @@
     "baseUrl": "."
   },
   "extends": "@dcl/sdk/types/tsconfig.ecs7.json",
-  "compileOnSave": false
+  "compileOnSave": false,
+  "exclude": ["bin"]
 }

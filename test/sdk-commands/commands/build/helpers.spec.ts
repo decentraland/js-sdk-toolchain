@@ -1,7 +1,6 @@
 import * as projectValidation from '../../../../packages/@dcl/sdk-commands/src/logic/project-validations'
 import * as sceneValidation from '../../../../packages/@dcl/sdk-commands/src/logic/scene-validations'
 import { Scene } from '../../../../packages/@dcl/sdk-commands/node_modules/@dcl/schemas'
-import * as execUtils from '../../../../packages/@dcl/sdk-commands/src/logic/exec'
 import { initComponents } from '../../../../packages/@dcl/sdk-commands/src/components'
 import path from 'path'
 
@@ -95,7 +94,7 @@ describe('build:helpers', () => {
 
   it('installDependencies: should run dependencies installation', async () => {
     const components = await initComponents()
-    const execSpy = jest.spyOn(execUtils, 'exec').mockResolvedValue()
+    const execSpy = jest.spyOn(components.spawner, 'exec').mockResolvedValue()
 
     await projectValidation.installDependencies(components, 'some/path')
 
@@ -103,9 +102,10 @@ describe('build:helpers', () => {
   })
 
   it('npmRun: should build pass on the process.env', async () => {
-    const execSpy = jest.spyOn(execUtils, 'exec').mockResolvedValue()
+    const components = await initComponents()
+    const execSpy = jest.spyOn(components.spawner, 'exec').mockResolvedValue()
 
-    await projectValidation.npmRun('some/path', 'build', 'a')
+    await projectValidation.npmRun(components, 'some/path', 'build', 'a')
 
     expect(execSpy).toBeCalledWith('some/path', 'npm', ['run', 'build', '--silent', '--', 'a'], {
       env: process.env

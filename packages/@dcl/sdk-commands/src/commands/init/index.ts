@@ -10,7 +10,7 @@ import { installDependencies, needsDependencies } from '../../logic/project-vali
 
 interface Options {
   args: typeof args
-  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'dclInfoConfig' | 'analytics'>
+  components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'analytics' | 'spawner'>
 }
 
 export const args = getArgs({
@@ -44,7 +44,7 @@ export async function main(options: Options) {
   if (shouldInstallDeps && !options.args['--skip-install']) {
     await installDependencies(options.components, dir)
   }
-  options.components.analytics.trackSync('Scene created', { projectType: scene, url, args: getArgsUsed(options.args) })
+  options.components.analytics.track('Scene created', { projectType: scene, url, args: getArgsUsed(options.args) })
 }
 
 const moveFilesFromDir = async (components: Pick<CliComponents, 'fs'>, dir: string, folder: string) => {
