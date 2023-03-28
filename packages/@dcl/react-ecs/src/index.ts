@@ -13,7 +13,9 @@ export * from './react-ecs'
  * import { ReactEcsRenderer } from '@dcl/sdk/react-ecs'
  * ReactEcsRenderer.setUiRenderer(uiComponent)
  */
-/*#__PURE__*/
-export const ReactEcsRenderer: ReactBasedUiSystem = createReactBasedUiSystem(engine, pointerEventsSystem)
+export const ReactEcsRenderer: ReactBasedUiSystem = /* @__PURE__ */ createReactBasedUiSystem(
+  engine,
+  pointerEventsSystem
+)
 
 export default ReactEcs

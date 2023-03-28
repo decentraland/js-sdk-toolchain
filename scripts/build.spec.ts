@@ -11,10 +11,8 @@ import {
   JS_RUNTIME,
   PLAYGROUND_ASSETS_PATH,
   REACT_ECS,
-  ROLLUP_CONFIG_PATH,
   SDK_PATH,
-  SDK_COMMANDS_PATH,
-  TSC
+  SDK_COMMANDS_PATH
 } from './common'
 import {
   copyFile,
@@ -60,17 +58,6 @@ flow('build-all', () => {
       ensureFileExists('apis.d.ts', JS_RUNTIME)
       ensureFileExists('index.d.ts', JS_RUNTIME)
     })
-  })
-
-  flow('@dcl/dcl-rollup', () => {
-    itDeletesFolder('dist', ROLLUP_CONFIG_PATH)
-    itExecutes(`npm i --silent`, ROLLUP_CONFIG_PATH)
-    itExecutes(`${TSC} -p tsconfig.json`, ROLLUP_CONFIG_PATH)
-    it('check file exists', () => {
-      ensureFileExists('index.js', ROLLUP_CONFIG_PATH)
-      ensureFileExists('index.d.ts', ROLLUP_CONFIG_PATH)
-    })
-    itExecutes(`chmod +x index.js`, ROLLUP_CONFIG_PATH)
   })
 
   flow('@dcl/ecs build', () => {
@@ -143,8 +130,6 @@ flow('build-all', () => {
     itExecutes(`npm i --silent`, SDK_COMMANDS_PATH)
 
     // install required dependencies
-    itExecutes(`npm install --silent ${ROLLUP_CONFIG_PATH}`, SDK_COMMANDS_PATH)
-
     itExecutes('npm run build --silent', SDK_COMMANDS_PATH)
 
     it('check files exists', () => {

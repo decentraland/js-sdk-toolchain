@@ -1,13 +1,10 @@
 module.exports = {
   // preset: "ts-jest/presets/js-with-ts",
-  globals: {
-    "ts-jest": {
-      tsconfig: "test/tsconfig.json",
-    },
-  },
   moduleFileExtensions: ["ts", "js", "tsx", "jsx"],
   transform: {
-    "^.+\\.(js|jsx|ts|tsx)$": "ts-jest",
+    "^.+\\.(js|jsx|ts|tsx)$": ["ts-jest", {
+      tsconfig: "test/tsconfig.json",
+    }]
   },
   transformIgnorePatterns: [
     "node_modules/(?!(@dcl/ecs-math)/)"
@@ -18,12 +15,6 @@ module.exports = {
   coverageDirectory: "coverage",
   coverageThreshold: {
     global: {
-      branches: 100,
-      functions: 100,
-      lines: 100,
-      statements: 100,
-    },
-    "packages/@dcl/sdk-commands": {
       branches: 100,
       functions: 100,
       lines: 100,

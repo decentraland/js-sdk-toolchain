@@ -1,9 +1,12 @@
 import { AboutResponse } from '@dcl/protocol/out-js/decentraland/bff/http_endpoints.gen'
+import { CliComponents } from '../components'
+import { getCatalystBaseUrl } from './config'
 
-export function createStaticRealm(): AboutResponse {
+export async function createStaticRealm(components: Pick<CliComponents, 'config'>): Promise<AboutResponse> {
+  const catalystUrl = await getCatalystBaseUrl(components)
   return {
     acceptingUsers: true,
-    bff: { healthy: false, publicUrl: `https://peer.decentraland.org/bff` },
+    bff: { healthy: false, publicUrl: `${catalystUrl}/bff` },
     comms: {
       healthy: true,
       protocol: 'v3',
@@ -17,11 +20,11 @@ export function createStaticRealm(): AboutResponse {
     },
     content: {
       healthy: true,
-      publicUrl: `https://peer.decentraland.org/content`
+      publicUrl: `${catalystUrl}/content`
     },
     lambdas: {
       healthy: true,
-      publicUrl: `https://peer.decentraland.org/lambdas`
+      publicUrl: `${catalystUrl}/lambdas`
     },
     healthy: true
   }

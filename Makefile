@@ -23,19 +23,21 @@ PROTOC = node_modules/.bin/protobuf/bin/protoc
 SCENE_PROTO_FILES := $(wildcard node_modules/@dcl/protocol/proto/decentraland/kernel/apis/*.proto)
 PBS_TS = $(SCENE_PROTO_FILES:node_modules/@dcl/protocol/proto/decentraland/kernel/apis/%.proto=scripts/rpc-api-generation/src/proto/%.gen.ts)
 
+# this DEVELOPER_MODE is important to not send developer's events to the same segment
+# stream as the production ones. Look for it's usage on the analytics component
+export DEVELOPER_MODE=true
 
 install:
 	npm i
 	make node_modules/.bin/protobuf/bin/protoc
-	cd packages/@dcl/dcl-rollup; npm ci
 
 lint:
 	node_modules/.bin/eslint . --ext .ts
 
 lint-fix:
-	node_modules/.bin/eslint . --ext .ts --fix
 	node_modules/.bin/syncpack format --config .syncpackrc.json  --source "packages/@dcl/*/package.json" --source "package.json"
 	node_modules/.bin/syncpack fix-mismatches --config .syncpackrc.jsonnode_modules/.bin/syncpack format --config .syncpackrc.json --source "packages/@dcl/*/package.json" --source "package.json"
+	node_modules/.bin/eslint . --ext .ts --fix
 
 TESTARGS ?= test/
 test:
@@ -69,12 +71,17 @@ node_modules/.bin/protobuf/bin/protoc:
 	rm $(PROTOBUF_ZIP)
 	chmod +x ./node_modules/.bin/protobuf/bin/protoc
 
-docs:
+docs: | install build
 	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/docs.spec.ts
 # Cloudflare doesn't allow a directory called functions. 🪄🎩
 	mv api-docs/functions api-docs/funcs
+# copy inspector
+	cp -r packages/@dcl/inspector/public api-docs/inspector
+# big files need to be removed for cloudflare pages
+	rm api-docs/inspector/bundle.js.map
+# replace the paths of /functions to /funcs
 	find ./api-docs -type f -name '*.html' \
-  | xargs sed ${SED_OPTION} -E 's:(href="[^"]+)functions/:\1funcs/:g'
+  	| xargs sed ${SED_OPTION} -E 's:(href="[^"]+)functions/:\1funcs/:g'
 
 test-watch:
 	node_modules/.bin/jest --detectOpenHandles --colors --watch --roots "test"
@@ -113,7 +120,6 @@ deep-clean-and-snapshot:
 
 deep-clean:
 	rm -rf node_modules/ \
-		packages/@dcl/dcl-rollup/node_modules/ \
 		packages/@dcl/ecs/node_modules/ \
 		packages/@dcl/react-ecs/node_modules/ \
 		packages/@dcl/sdk/node_modules/ \
@@ -126,7 +132,6 @@ update-snapshots: test
 clean:
 	@echo "> Cleaning all folders"
 	@rm -rf coverage/
-	@rm -rf packages/@dcl/dcl-rollup/*.js packages/@dcl/dcl-rollup/*.d.ts
 	@rm -rf packages/@dcl/sdk/*.js packages/@dcl/sdk/*.d.ts packages/@dcl/sdk/internal
 	@rm -rf packages/@dcl/inspector/public/*.js packages/@dcl/inspector/public/*.d.ts packages/@dcl/inspector/public/*.map packages/@dcl/inspector/public/*.css
 	@rm -rf packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/

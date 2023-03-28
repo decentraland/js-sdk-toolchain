@@ -8,6 +8,7 @@ import { HTTPProvider } from 'eth-connect'
 import { RoomComponent } from '@dcl/mini-comms/dist/adapters/rooms'
 import { WebSocketComponent } from './server/ws'
 import { CliComponents } from '../../components'
+import { ISignalerComponent } from '../../components/exit-signal'
 
 export type PreviewComponents = CliComponents & {
   logs: ILoggerComponent
@@ -18,9 +19,4 @@ export type PreviewComponents = CliComponents & {
   rooms: RoomComponent
   ws: WebSocketComponent
   signaler: ISignalerComponent
-}
-
-export type ISignalerComponent = {
-  // programClosed resolves when the component is stopped
-  programClosed: Promise<void>
 }

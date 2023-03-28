@@ -1,4 +1,5 @@
 import { createStderrCliLogger } from '../../../packages/@dcl/sdk-commands/src/components/log'
+import * as bl from '../../../packages/@dcl/sdk-commands/src/logic/beautiful-logs'
 
 describe('utils/log', () => {
   it('Call the log functions to test everything works', () => {
@@ -13,5 +14,13 @@ describe('utils/log', () => {
     logs.info('info info')
     logs.debug('succeed succeed')
     logs.warn('warn warn')
+  })
+
+  test('beautiful logs?', () => {
+    const logs = createStderrCliLogger()
+    bl.printCommand(logs, 'command')
+    bl.printProgressInfo(logs, 'info')
+    bl.printProgressStep(logs, 'step', 1, 3)
+    bl.printSuccess(logs, 'step', 'asd')
   })
 })

@@ -8,8 +8,6 @@ packages/**/*.js
 !packages/@dcl/inspector/test/jest-transformer.js
 !packages/@dcl/inspector/test/jest.config.js
 packages/@dcl/sdk/package-lock.json
-packages/@dcl/dcl-rollup/*.js
-packages/@dcl/dcl-rollup/*.d.ts
 packages/@dcl/sdk/*.js
 packages/@dcl/sdk/*.d.ts
 api-docs
@@ -24,6 +22,7 @@ test/sdk/simple-scene
 test/build-ecs/fixtures/*/package-lock.json
 packages/@dcl/playground-assets/etc/playground-assets.api.json
 test/snapshots/package-lock.json
-test/snapshots/*.js
+test/snapshots/**/*.js
 tmp
 scene
+test/snapshots/bin

@@ -1,5 +1,5 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { UiEntity, Label, Input, Dropdown } from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity, Label, Input, Dropdown, Button } from '@dcl/sdk/react-ecs'
 
 export const uiComponent = () => (
   <UiEntity
@@ -65,5 +65,7 @@ export const uiComponent = () => (
     >
       <Label value={`Player:`} fontSize={40} uiBackground={{ color: Color4.fromHexString('#fbf0f0') }} />
     </UiEntity>
+    <Input onChange={() => {}} />
+    <Button value="some value" onMouseDown={() => {}} onMouseUp={() => {}} />
   </UiEntity>
 )

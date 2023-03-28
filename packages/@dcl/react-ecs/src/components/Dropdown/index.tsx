@@ -36,7 +36,7 @@ function parseUiDropdown(props: UiDropdownProps): PBUiDropdown {
  *
  * @category Component
  */
-/*#__PURE__*/
+/* @__PURE__ */
 export function Dropdown(props: UiDropdownProps) {
   const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...otherProps } = props
   const dropdownProps = parseUiDropdown(otherProps)

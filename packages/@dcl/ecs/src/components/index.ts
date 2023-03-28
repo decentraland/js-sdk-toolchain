@@ -15,21 +15,21 @@ export type {
   GSetComponentGetter
 }
 
-/*#__PURE__*/
+/* @__PURE__ */
 export const Transform: LwwComponentGetter<TransformComponentExtended> = (engine) => defineTransformComponent(engine)
 
-/*#__PURE__*/
+/* @__PURE__ */
 export const Material: LwwComponentGetter<MaterialComponentDefinitionExtended> = (engine) =>
   defineMaterialComponent(engine)
 
-/*#__PURE__*/
+/* @__PURE__ */
 export const Animator: LwwComponentGetter<AnimatorComponentDefinitionExtended> = (engine) =>
   defineAnimatorComponent(engine)
 
-/*#__PURE__*/
+/* @__PURE__ */
 export const MeshRenderer: LwwComponentGetter<MeshRendererComponentDefinitionExtended> = (engine) =>
   defineMeshRendererComponent(engine)
 
-/*#__PURE__*/
+/* @__PURE__ */
 export const MeshCollider: LwwComponentGetter<MeshColliderComponentDefinitionExtended> = (engine) =>
   defineMeshColliderComponent(engine)
