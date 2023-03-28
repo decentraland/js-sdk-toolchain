@@ -34,9 +34,10 @@ export function ProjectAssetExplorer() {
 
       <div className="category">
         <div className="assets">
-          {assets.map((item) => (
-            <AssetCell value={item} />
-          ))}
+          {assets.map((item) => {
+            if (item.asset.type === 'gltf') return <GltfAssetCell value={item} />
+            return <UnknownAssetCell value={item} />
+          })}
         </div>
       </div>
     </div>
@@ -59,11 +60,20 @@ function FolderCell({ folder, onClick, back }: FolderCellProp) {
   )
 }
 
-function AssetCell({ value }: AssetCellProp) {
-  const [, drag] = useDrag(() => ({ type: 'project-asset', item: { asset: value } }), [value])
+function GltfAssetCell({ value }: AssetCellProp) {
+  const [, drag] = useDrag(() => ({ type: 'project-asset-gltf', item: { asset: value } }), [value])
 
   return (
     <div ref={drag}>
+      <img src={''} />
+      <h4>{value.name}</h4>
+      <div></div>
+    </div>
+  )
+}
+function UnknownAssetCell({ value }: AssetCellProp) {
+  return (
+    <div>
       <img src={''} />
       <h4>{value.name}</h4>
       <div></div>

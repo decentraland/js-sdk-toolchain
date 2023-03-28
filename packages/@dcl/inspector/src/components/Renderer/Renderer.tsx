@@ -28,7 +28,7 @@ export function Renderer() {
 
   const [, drop] = useDrop(
     () => ({
-      accept: ['asset', 'project-asset'],
+      accept: ['project-asset-gltf'],
       drop: ({ asset }: { asset: AssetNodeItem }, monitor) => {
         if (monitor.didDrop()) return
         void addAsset(asset)

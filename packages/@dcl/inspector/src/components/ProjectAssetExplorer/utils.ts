@@ -20,13 +20,15 @@ export function buildAssetTree(paths: string[]): AssetNodeFolder {
           currentNode.children.push(childNode)
           currentNode = childNode
         } else {
+          const lowerPath = path.toLowerCase()
+          const assetType = lowerPath.endsWith('.gltf') || lowerPath.endsWith('.glb') ? 'gltf' : 'unknown'
           childNode = {
             name: parts[i],
             parent: currentNode,
             type: 'asset',
             asset: {
               src: path,
-              type: 'unknown'
+              type: assetType
             }
           }
           currentNode.children.push(childNode)
