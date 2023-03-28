@@ -14,8 +14,7 @@
     "@types/react-reconciler": "^0.28.0"
   },
   "files": [
-    "dist",
-    "tsconfig.json"
+    "dist"
   ],
   "homepage": "https://github.com/decentraland/js-sdk-toolchain#readme",
   "keywords": [

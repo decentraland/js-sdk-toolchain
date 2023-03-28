@@ -56,7 +56,6 @@ async function main() {
   const cmd = require(`${COMMANDS_PATH}/${command}`)
 
   if (commandFnsAreValid(cmd)) {
-    await components.analytics.identify()
     const options = { args: cmd.args, components }
     if (needsHelp) {
       await cmd.help(options)
@@ -87,5 +86,5 @@ main().catch(function handleError(err: Error) {
   }
 
   // set an exit code but not finish the program immediately to close any pending work
-  process.exitCode = 1
+  process.exit(process.exitCode ?? 1)
 })

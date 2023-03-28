@@ -31,9 +31,7 @@ export function createTaskSystem(engine: IEngine) {
 
   engine.addSystem(executeTasks)
 
-  return {
-    executeTask(task: Task) {
-      tasks.push(task)
-    }
+  return function (task: Task) {
+    tasks.push(task)
   }
 }

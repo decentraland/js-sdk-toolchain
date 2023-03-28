@@ -71,7 +71,7 @@ const defaultUiTransform: PBUiTransform = {
 /**
  * @public
  */
-/*#__PURE__*/
+/* @__PURE__ */
 export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
   const { height, minHeight, maxHeight, width, minWidth, maxWidth, alignItems, alignContent, flexWrap, ...otherProps } =
     props

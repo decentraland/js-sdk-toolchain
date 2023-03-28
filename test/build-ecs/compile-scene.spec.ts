@@ -1,5 +1,8 @@
-import { resolve } from 'path'
+import { join, resolve } from 'path'
+import { createFsComponent } from '../../packages/@dcl/sdk-commands/src/components/fs'
+import { getInstalledPackageVersion } from '../../packages/@dcl/sdk-commands/src/logic/config'
 import { itExecutes, ensureFileExists, itDeletesFolder } from '../../scripts/helpers'
+import { assertFilesExist, loadSourceMap } from './sourcemaps'
 
 const ecsLocation = resolve(__dirname, '../../packages/@dcl/sdk')
 
@@ -13,8 +16,13 @@ describe('build-ecs: simple scene compilation', () => {
   itExecutes('npm i --silent --no-progress', cwd)
   itExecutes('npm run --silent build', cwd)
 
-  it('ensure files exist', () => {
+  it('ensure files exist', async () => {
     ensureFileExists('bin/game.js', cwd)
+
+    expect(await getInstalledPackageVersion({ fs: createFsComponent() }, '@dcl/sdk', cwd)).toEqual('7.0.0')
+
+    const { map } = await loadSourceMap(join(cwd, 'bin/game.js'))
+    assertFilesExist(map)
   })
 })
 

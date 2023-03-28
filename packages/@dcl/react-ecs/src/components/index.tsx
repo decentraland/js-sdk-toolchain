@@ -23,7 +23,7 @@ export { Button } from './Button'
  * @public
  * @category Component
  */
-/*#__PURE__*/
+/* @__PURE__ */
 export function UiEntity(props: EntityPropTypes & { uiText?: UiLabelProps }) {
   const uiText: { uiText: PBUiText } | undefined = props.uiText && {
     uiText: {

@@ -16,6 +16,7 @@ export type CompositeProvider = {
 }
 
 /** @public */
+/* @__PURE__ */
 export enum EntityMappingMode {
   EMM_NONE = 0,
   EMM_NEXT_AVAILABLE = 1,
@@ -119,6 +120,7 @@ export function getEntityMapping(
 /**
  * @internal
  */
+/* @__PURE__ */
 export function instanceComposite(
   engine: IEngine,
   compositeData: CompositeDefinition,

@@ -33,7 +33,7 @@ function getButtonProps(props: UiButtonProps) {
  *
  * @category Component
  */
-/*#__PURE__*/
+/* @__PURE__ */
 export function Button(props: UiButtonProps) {
   const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...otherProps } = props
   const buttonProps = getButtonProps(props)
