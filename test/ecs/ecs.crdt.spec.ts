@@ -159,6 +159,9 @@ describe('CRDT tests', () => {
     await wait(SandBox.WS_SEND_DELAY)
     await clientB.engine.update(1 / 30)
 
+    const entityB = clientB.engine.addEntity()
+    expect(entityB).toBe(entityA + 1)
+
     expect(SandBox.DEFAULT_POSITION).toBeDeepCloseTo(TransformB.get(entityA))
     expect(posA).toBeDeepCloseTo(PositionB.get(entityA))
     expect(clientA.spySend).toBeCalledTimes(1)

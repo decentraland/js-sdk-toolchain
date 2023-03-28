@@ -1,0 +1,13 @@
+.Transform {
+  display: flex;
+  flex-direction: column;
+}
+
+.Transform .block {
+  display: flex;
+  flex-direction: column;
+}
+
+.Transform .block h4 {
+  margin: 0;
+}

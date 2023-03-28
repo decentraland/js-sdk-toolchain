@@ -42,6 +42,11 @@ lint-fix:
 TESTARGS ?= test/
 test:
 	node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS)
+	make test-inspector
+
+test-inspector:
+	node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS) --config ./packages/@dcl/inspector/test/jest.config.js
+
 
 test-cli:
 	@rm -rf tmp
@@ -109,7 +114,7 @@ deep-clean-and-snapshot:
 	make install
 	make lint-fix
 	make build
-	make update-snapshots 
+	make update-snapshots
 
 .PHONY: build test install docs deep-clean-and-snapshot update-snapshots lint-packages
 

@@ -7,7 +7,10 @@ module.exports = {
     }]
   },
   transformIgnorePatterns: [
-    "node_modules/(?!(@dcl/ecs-math)/)",
+    "node_modules/(?!(@dcl/ecs-math)/)"
+  ],
+  modulePathIgnorePatterns: [
+    "packages/@dcl/inspector"
   ],
   coverageDirectory: "coverage",
   coverageThreshold: {
@@ -49,7 +52,12 @@ module.exports = {
     "scripts",
     "test",
     "(.)\\.(js)$",
-    "packages/@dcl/inspector"
+    "packages/@dcl/inspector",
+    "packages/@dcl/dcl-rollup",
+    "packages/@dcl/ecs/src/components/generated/pb",
+    "packages/@dcl/ecs/src/composite/proto/gen",
+    "packages/@dcl/ecs/src/components/generated/index.gen.ts",
+    "packages/@dcl/sdk/src/internal"
   ],
   verbose: true,
   testMatch: ["**/*.spec.(ts|tsx)"],

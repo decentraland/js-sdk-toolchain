@@ -1,6 +1,6 @@
-import { Engine, Entity, IEngine, TransformComponentExtended } from '../../../../packages/@dcl/ecs'
-import * as components from '../../../../packages/@dcl/ecs/dist/components'
-import { getEmptyTree, getTreeFromEngine, ROOT } from '../../../../packages/@dcl/inspector/src/lib/sdk/tree'
+import { Engine, Entity, IEngine, TransformComponentExtended } from '../../../../ecs'
+import * as components from '../../../../ecs/dist/components'
+import { getEmptyTree, getTreeFromEngine, ROOT } from '../../../src/lib/sdk/tree'
 
 describe('getTreeFromEngine', () => {
   let engine: IEngine

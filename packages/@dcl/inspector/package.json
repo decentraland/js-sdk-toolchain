@@ -12,6 +12,7 @@
     "@dcl/js-runtime": "file:../js-runtime",
     "@dcl/rpc": "^1.1.1",
     "@dcl/schemas": "^6.11.1",
+    "@types/deep-equal": "^1.0.1",
     "@types/node": "^18.11.18",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
@@ -37,5 +38,8 @@
     "start-rpc": "node ./build.js --watch"
   },
   "types": "dist/tooling-entrypoint.d.ts",
-  "typings": "dist/tooling-entrypoint.d.ts"
+  "typings": "dist/tooling-entrypoint.d.ts",
+  "dependencies": {
+    "deep-equal": "^2.2.0"
+  }
 }

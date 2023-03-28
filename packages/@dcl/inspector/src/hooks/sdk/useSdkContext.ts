@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { createSdkContext, SdkContextValue } from '../../lib/sdk/engine'
+import { createSdkContext, SdkContextValue } from '../../lib/sdk/context'
 import { useCatalog } from '../catalog/useCatalog'
 
 /**

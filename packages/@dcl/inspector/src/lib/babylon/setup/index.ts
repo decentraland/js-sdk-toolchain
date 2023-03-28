@@ -122,7 +122,7 @@ export function initRenderer(canvas: HTMLCanvasElement) {
   hemiLight.groundColor = ambientConfigurations.groundColor.clone()
   hemiLight.specular = ambientConfigurations.sunColor.clone()
 
-  initKeyboard(scene, camera)
+  initKeyboard(canvas, scene, camera)
 
   reposition(editorEnvHelper, hemiLight, camera)
 
