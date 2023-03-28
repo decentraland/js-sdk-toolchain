@@ -143,7 +143,7 @@ function Tree<T>(props: Props<T>) {
         {!!children.length && open && (
           <div style={getExpandStyles(open)}>
             {children.map(($) => (
-              <MemoTree {...props} value={$} key={getId($)} />
+              <Tree {...props} value={$} key={getId($)} />
             ))}
           </div>
         )}
@@ -153,6 +153,4 @@ function Tree<T>(props: Props<T>) {
   )
 }
 
-const MemoTree = Tree
-
-export default MemoTree
+export default Tree
