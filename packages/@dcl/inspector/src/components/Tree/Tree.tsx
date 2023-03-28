@@ -67,7 +67,7 @@ function Tree<T>(props: Props<T>) {
   const quitInsertMode = () => setInsertMode(false)
 
   const handleToggleExpand = (_: React.MouseEvent) => {
-    onToggle(value, !open)
+    onToggle(value, !selected || !open)
   }
 
   const handleToggleEdit = (e: React.MouseEvent) => {
