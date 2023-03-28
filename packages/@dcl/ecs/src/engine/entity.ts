@@ -120,6 +120,10 @@ export function EntityContainer(): EntityContainer {
       : 0
     const entity = EntityUtils.toEntityId(entityNumber, entityVersion)
 
+    if (usedEntities.has(entity)) {
+      return generateNewEntity()
+    }
+
     usedEntities.add(entity)
     return entity
   }

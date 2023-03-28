@@ -1,0 +1,57 @@
+import { Scene } from '@babylonjs/core'
+import { ComponentDefinition, CrdtMessageType, Entity, IEngine } from '@dcl/ecs'
+import { Emitter } from 'mitt'
+import { ITheme } from '../../components/AssetsCatalog'
+import { SceneContext } from '../babylon/decentraland/SceneContext'
+import { initRenderer } from '../babylon/setup'
+import { createDataLayerClientRpc } from '../data-layer/client'
+import { EditorComponents, SdkComponents } from './components'
+import { getHardcodedLoadableScene } from './test-local-scene'
+import { createInspectorEngine } from './inspector-engine'
+
+export type SdkContextEvents = {
+  change: { entity: Entity; operation: CrdtMessageType; component?: ComponentDefinition<any>; value?: any }
+  dispose: undefined
+}
+
+export type SdkContextValue = {
+  engine: IEngine
+  components: EditorComponents & SdkComponents
+  scene: Scene
+  events: Emitter<SdkContextEvents>
+  dispose(): void
+}
+
+export async function createSdkContext(canvas: HTMLCanvasElement, catalog: ITheme[]): Promise<SdkContextValue> {
+  const { babylon, scene } = initRenderer(canvas)
+
+  // initialize DataLayer
+  const dataLayer = await createDataLayerClientRpc()
+
+  // create scene context
+  const ctx = new SceneContext(
+    babylon,
+    scene,
+    getHardcodedLoadableScene(
+      'urn:decentraland:entity:bafkreid44xhavttoz4nznidmyj3rjnrgdza7v6l7kd46xdmleor5lmsxfm1',
+      catalog
+    )
+  )
+  ctx.rootNode.position.set(0, 0, 0)
+
+  // Connect babylon engine with dataLayer transport
+  void ctx.connectDataLayer(dataLayer)
+
+  // create inspector engine context and components
+  const { engine, components, events, dispose } = createInspectorEngine(dataLayer)
+  // register some globals for debugging
+  Object.assign(globalThis, { dataLayer, inspectorEngine: engine })
+
+  return {
+    engine,
+    components,
+    events,
+    scene,
+    dispose
+  }
+}

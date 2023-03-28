@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { SdkContextEvents, SdkContextValue } from '../../lib/sdk/engine'
+import { SdkContextEvents, SdkContextValue } from '../../lib/sdk/context'
 import { useSdk } from './useSdk'
 
 /**
