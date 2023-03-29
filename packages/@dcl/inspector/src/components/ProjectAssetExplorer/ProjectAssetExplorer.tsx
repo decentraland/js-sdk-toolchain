@@ -27,6 +27,7 @@ export function ProjectAssetExplorer() {
 
   return (
     <div className="assets-catalog">
+      <h1>{selectedFolder.name}</h1>
       {selectedFolder.parent && <FolderCell onClick={handleFolderClick} folder={selectedFolder.parent} back={true} />}
       {folders.map((folder) => (
         <FolderCell onClick={handleFolderClick} folder={folder} />

@@ -72,11 +72,14 @@ export async function initRpcMethods(
       throw new Error("Couldn't find the asset " + req.path)
     },
     async getAssetCatalog() {
-      async function getFiles(dirPath: string, files: string[]) {
+      async function getFiles(dirPath: string, files: string[], ignore: string[] = []) {
         const currentDirFiles = await fs.readdir(dirPath)
         for (const currentPath of currentDirFiles) {
+          if (ignore.includes(currentPath.name)) continue
+
           const slashIfRequire = (dirPath.length && !dirPath.endsWith('/') && '/') || ''
           const fullPath = dirPath + slashIfRequire + currentPath.name
+
           if (currentPath.isDirectory) {
             await getFiles(fullPath, files)
           } else {
@@ -85,7 +88,14 @@ export async function initRpcMethods(
         }
         return files
       }
-      const files = await getFiles('', [])
+
+      const extensions = ['.glb', '.png', '.composite', '.composite.json', '.gltf', '.jpg']
+      const ignore = ['.git', 'node_modules']
+
+      const files = (await getFiles('', [], ignore)).filter((item) => {
+        const itemLower = item.toLowerCase()
+        return extensions.some((ext) => itemLower.endsWith(ext))
+      })
 
       return { basePath: '.', assets: files.map((item) => ({ path: item })) }
     }

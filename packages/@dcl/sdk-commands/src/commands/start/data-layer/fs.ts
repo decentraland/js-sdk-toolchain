@@ -13,7 +13,11 @@ export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliCompone
       await fs.writeFile(filePath, content)
     },
     async readdir(dirPath: string): Promise<{ name: string; isDirectory: boolean }[]> {
-      const result = await fs.readdir(dirPath)
+      if (dirPath.indexOf('/../') !== -1) {
+        throw new Error('The usage of /../ is not allowed')
+      }
+
+      const result = await fs.readdir(dirPath.length > 0 ? dirPath : process.cwd())
       return Promise.all(
         result.map(async (name) => ({
           name: name,
