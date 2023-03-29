@@ -17,7 +17,10 @@ export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliCompone
         throw new Error('The usage of /../ is not allowed')
       }
 
-      const result = await fs.readdir(dirPath.length > 0 ? dirPath : process.cwd())
+      let path = dirPath.replace(/^\.\/|^\.+/g, '')
+      if (path.length === 0) path = process.cwd()
+
+      const result = await fs.readdir(path)
       return Promise.all(
         result.map(async (name) => ({
           name: name,
