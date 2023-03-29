@@ -1,4 +1,4 @@
-import { AssetNodeFolder } from './types'
+import { AssetNode, AssetNodeFolder } from './types'
 
 export function AssetNodeRootNull(): AssetNodeFolder {
   return { name: '', parent: null, type: 'folder', children: [] }
@@ -42,4 +42,14 @@ export function buildAssetTree(paths: string[]): AssetNodeFolder {
   }
 
   return root
+}
+
+export function getFullNodePath(item: AssetNode) {
+  let path = ''
+  let it = item
+  while (it.parent !== null && item.name !== '') {
+    path = item.name + '/' + path
+    it = it.parent
+  }
+  return path
 }

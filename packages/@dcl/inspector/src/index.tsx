@@ -25,10 +25,14 @@ async function initScene() {
           <EntityInspector />
         </div>
         <div className="right">
-          <Renderer />
           <div>
-            <ProjectAssetExplorer />
-            {catalog && <AssetsCatalog value={catalog} />}
+            <Renderer />
+          </div>
+          <div style={{ flex: '1', display: 'flex', overflow: 'auto' }}>
+            <div style={{ width: '50%', overflow: 'auto' }}>
+              <ProjectAssetExplorer />
+            </div>
+            <div style={{ width: '50%', overflow: 'auto' }}>{catalog && <AssetsCatalog value={catalog} />}</div>
           </div>
         </div>
       </>

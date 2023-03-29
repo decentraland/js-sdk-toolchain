@@ -1,4 +1,5 @@
 import { FileSystemInterface } from '@dcl/inspector'
+import path from 'path'
 import { CliComponents } from '../../../components'
 
 export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliComponents, 'fs'>): FileSystemInterface {
@@ -10,6 +11,10 @@ export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliCompone
       return fs.readFile(filePath)
     },
     async writeFile(filePath: string, content: Buffer): Promise<void> {
+      const folder = path.dirname(filePath)
+      if (!(await fs.directoryExists(folder))) {
+        await fs.mkdir(folder, { recursive: true })
+      }
       await fs.writeFile(filePath, content)
     },
     async readdir(dirPath: string): Promise<{ name: string; isDirectory: boolean }[]> {

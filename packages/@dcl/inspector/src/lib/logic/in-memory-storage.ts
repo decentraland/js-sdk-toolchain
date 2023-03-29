@@ -36,16 +36,17 @@ export function createFsInMemory(initialFs: Record<string, Buffer> = {}): FileSy
 
   return {
     async existFile(filePath: string): Promise<boolean> {
-      return fs.exist(filePath)
+      return fs.exist(filePath.replace(/^\/+/g, ''))
     },
     async readFile(filePath: string): Promise<Buffer> {
-      return fs.readFile(filePath)
+      return fs.readFile(filePath.replace(/^\/+/g, ''))
     },
     async writeFile(filePath: string, content: Buffer): Promise<void> {
-      return fs.writeFile(filePath, content)
+      return fs.writeFile(filePath.replace(/^\/+/g, ''), content)
     },
     async readdir(dirPath: string): Promise<{ name: string; isDirectory: boolean }[]> {
-      const resolvedDirPath = dirPath.replace(/^\.\/|^\.+/g, '')
+      const resolvedDirPath = dirPath.replace(/^\/+/g, '').replace(/^\.\/|^\.+/g, '')
+
       const files: { name: string; isDirectory: boolean }[] = []
       for (const path of Array.from(fs.storage.keys())) {
         if (!path.startsWith(resolvedDirPath)) continue

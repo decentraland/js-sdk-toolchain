@@ -1,4 +1,4 @@
-import { Entity, EntityMappingMode, IEngine, Composite, OnChangeFunction } from '@dcl/ecs'
+import { Composite, Entity, EntityMappingMode, IEngine, OnChangeFunction } from '@dcl/ecs'
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
 import { dumpEngineToComposite } from './engine-to-composite'
 import { createFsCompositeProvider } from './fs-composite-provider'
@@ -98,6 +98,17 @@ export async function initRpcMethods(
       })
 
       return { basePath: '.', assets: files.map((item) => ({ path: item })) }
+    },
+
+    async importAsset(req) {
+      const baseFolder = (req.basePath.length ? req.basePath + '/' : '') + req.assetPackageName + '/'
+
+      for (const [fileName, fileContent] of req.content) {
+        const filePath = (baseFolder + fileName).replaceAll('//', '/')
+        await fs.writeFile(filePath, Buffer.from(fileContent))
+      }
+
+      return {}
     }
   }
 }
