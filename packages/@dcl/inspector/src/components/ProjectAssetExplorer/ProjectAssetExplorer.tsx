@@ -6,13 +6,17 @@ import { AssetCellProp, AssetNode, AssetNodeFolder, FolderCellProp, AssetNodeIte
 import { useSdk } from '../../hooks/sdk/useSdk'
 import './ProjectAssetExplorer.css'
 import { AssetNodeRootNull, buildAssetTree } from './utils'
+import { useIsMounted } from '../../hooks/useIsMounted'
 
 export function ProjectAssetExplorer() {
+  const isMounted = useIsMounted()
   const [root, setRoot] = useState<AssetNode>(AssetNodeRootNull())
   const [selectedFolder, setSelectedFolder] = useState<AssetNodeFolder>(AssetNodeRootNull())
 
   const sdk = useSdk(async ({ dataLayer }) => {
     const assetcatalog = await dataLayer.getAssetCatalog({})
+    if (!isMounted()) return
+
     const tree = buildAssetTree(assetcatalog.assets.map((item) => item.path))
     setRoot(tree)
     setSelectedFolder(tree)
