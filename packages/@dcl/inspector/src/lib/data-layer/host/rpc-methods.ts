@@ -73,10 +73,10 @@ export async function initRpcMethods(
     },
     async getAssetCatalog() {
       async function getFiles(dirPath: string, files: string[]) {
-        // debugger
         const currentDirFiles = await fs.readdir(dirPath)
         for (const currentPath of currentDirFiles) {
-          const fullPath = dirPath + (dirPath.endsWith('/') ? '' : '/') + currentPath.name
+          const slashIfRequire = (dirPath.length && !dirPath.endsWith('/') && '/') || ''
+          const fullPath = dirPath + slashIfRequire + currentPath.name
           if (currentPath.isDirectory) {
             await getFiles(fullPath, files)
           } else {
@@ -85,7 +85,7 @@ export async function initRpcMethods(
         }
         return files
       }
-      const files = await getFiles('./', [])
+      const files = await getFiles('', [])
 
       return { basePath: '.', assets: files.map((item) => ({ path: item })) }
     }

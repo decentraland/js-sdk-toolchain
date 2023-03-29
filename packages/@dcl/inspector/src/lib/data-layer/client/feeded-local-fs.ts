@@ -129,7 +129,7 @@ export const mainComposite = {
 }
 
 const builderMappings: Record<string, string> = {
-  './assets/models/test-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB'
+  'assets/models/test-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB'
 }
 
 export async function feededFileSystem() {
@@ -149,6 +149,6 @@ export async function feededFileSystem() {
 
   return createFsInMemory({
     ...fileContent,
-    './assets/main.composite.json': Buffer.from(JSON.stringify(mainComposite), 'utf-8')
+    'assets/main.composite.json': Buffer.from(JSON.stringify(mainComposite), 'utf-8')
   })
 }

@@ -45,13 +45,7 @@ export function createFsInMemory(initialFs: Record<string, Buffer> = {}): FileSy
       return fs.writeFile(filePath, content)
     },
     async readdir(dirPath: string): Promise<{ name: string; isDirectory: boolean }[]> {
-      // TODO:
-      //  => This implementation doesn't match with Nodejs one, it aproaches to a more recursive one
-      //  => To match it, filter deeper file path is neccesary, in the Internal Storage map, there is no directory
-      //    so it's also necessary to generate them on the fly
-
-      const resolvedDirPath = dirPath === '.' || dirPath === '' ? './' : dirPath
-
+      const resolvedDirPath = dirPath.replace(/^\.\/|^\.+/g, '')
       const files: { name: string; isDirectory: boolean }[] = []
       for (const path of Array.from(fs.storage.keys())) {
         if (!path.startsWith(resolvedDirPath)) continue
