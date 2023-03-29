@@ -1,5 +1,5 @@
 import { IEngine, OnChangeFunction } from '@dcl/ecs'
-import { createEngine } from '../host/engine'
+import { createEngine } from './utils/engine'
 import { initRpcMethods } from '../host/rpc-methods'
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
 

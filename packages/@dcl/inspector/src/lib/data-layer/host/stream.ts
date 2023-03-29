@@ -2,11 +2,12 @@ import { IEngine, Transport } from '@dcl/ecs'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
 
 import { consumeAllMessagesInto } from '../../logic/consume-stream'
-import { serializeEngine } from './engine'
+import { DataLayerContext } from '../types'
+import { serializeEngine } from './utils/engine'
 
 export function stream(
   stream: AsyncIterable<{ data: Uint8Array }>,
-  ctx: { engine: IEngine }
+  ctx: Omit<DataLayerContext, 'fs'>
 ): AsyncGenerator<{ data: Uint8Array }> {
   const queue = new AsyncQueue<{ data: Uint8Array }>((_) => {})
 

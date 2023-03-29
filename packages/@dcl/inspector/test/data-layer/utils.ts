@@ -65,6 +65,10 @@ export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
       if (!dataLayer) throw new Error('You can only access the dataLayer inside a test')
       return getDataLayerEngine()
     },
+    get dataLayer() {
+      if (!dataLayer) throw new Error('You can only access the dataLayer inside a test')
+      return dataLayer
+    },
     async updateInspector() {
       await inspector.engine.update(1)
       await getDataLayerEngine().update(1)
