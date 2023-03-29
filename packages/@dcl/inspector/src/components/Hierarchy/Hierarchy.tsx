@@ -4,30 +4,41 @@ import { ROOT } from '../../lib/sdk/tree'
 import { Tree } from '../Tree'
 
 const Hierarchy: React.FC = () => {
-  const { tree, addChild, setParent, remove, rename, toggle, getId, getChildren, getLabel, isOpen, isSelected } =
-    useTree()
+  const {
+    addChild,
+    setParent,
+    remove,
+    rename,
+    toggle,
+    getId,
+    getChildren,
+    getLabel,
+    isOpen,
+    isSelected,
+    canRename,
+    canRemove,
+    canToggle
+  } = useTree()
 
   return (
-    <>
-      <div className="Hierarchy">
-        {Array.from(tree.get(ROOT)!).map((entity) => (
-          <Tree
-            key={getId(entity)}
-            value={entity}
-            onAddChild={addChild}
-            onSetParent={setParent}
-            onRemove={remove}
-            onRename={rename}
-            onToggle={toggle}
-            getId={getId}
-            getChildren={getChildren}
-            getLabel={getLabel}
-            isOpen={isOpen}
-            isSelected={isSelected}
-          />
-        ))}
-      </div>
-    </>
+    <div className="Hierarchy">
+      <Tree
+        value={ROOT}
+        onAddChild={addChild}
+        onSetParent={setParent}
+        onRemove={remove}
+        onRename={rename}
+        onToggle={toggle}
+        getId={getId}
+        getChildren={getChildren}
+        getLabel={getLabel}
+        isOpen={isOpen}
+        isSelected={isSelected}
+        canRename={canRename}
+        canRemove={canRemove}
+        canToggle={canToggle}
+      />
+    </div>
   )
 }
 
