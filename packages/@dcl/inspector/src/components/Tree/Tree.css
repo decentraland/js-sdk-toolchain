@@ -1,39 +1,70 @@
-.tree {
-  background-color: #ffffff;
-  overflow: scroll;
-  height: 100vh;
-  width: 20rem;
-  border-right: 0.1rem solid #dedede;
-}
-
-.tree ul {
-  list-style: none;
-}
-
-.tree ul li div:first-child {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  padding: 0.1rem;
-}
-
-.tree ul li div:first-child:hover {
-  background-color: #dedede;
-}
-
-.tree div:first-child svg {
-  margin: 0.1rem 0.3rem 0 0;
-}
-
-.tree div:first-child button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0 0.2rem;
-  margin: auto;
-}
-
-.tree div:first-child button svg {
+.Hierarchy {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 14px;
+  background-color: #252526;
+  color: #fff;
   width: 100%;
-  height: 100%;
+}
+
+.Hierarchy .main {
+  margin: 0;
+  padding: 0;
+}
+
+.Hierarchy .main {
+  border-top: 1px solid #333333;
+}
+
+.Hierarchy .main > div:first-child {
+  padding: 5px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 20px;
+}
+
+.Hierarchy .main > div:first-child:hover,
+.Hierarchy .main.selected > div:first-child {
+  background-color: #333333;
+}
+
+.Hierarchy .main > div:first-child:hover span,
+.Hierarchy .main.selected > div:first-child span {
+  text-decoration: underline;
+  width: 100%;
+}
+
+.Hierarchy .main > div:first-child > span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.Hierarchy .main > div:first-child > span svg {
+  margin-right: 3px;
+  margin-bottom: -2px;
+}
+
+.Hierarchy .main > div:first-child > span span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.Hierarchy .main .arrow {
+  margin-right: 5px;
+}
+
+.Hierarchy .main > div:first-child > span,
+.Hierarchy .main input {
+  margin-right: 10px;
+}
+
+.Hierarchy .main input {
+  border: none;
+  background-color: #D8D8D8;
+  outline: #cdcccc;
+  border-radius: 3px;
+  width: 100%;
 }

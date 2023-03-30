@@ -10,11 +10,11 @@ const App = () => {
   const [catalog] = useCatalog()
   return (
     <>
-      <div className="left">
+      <div className="sidebar">
         <Hierarchy />
         <EntityInspector />
       </div>
-      <div className="right">
+      <div className="editor">
         <div>
           <Renderer />
         </div>

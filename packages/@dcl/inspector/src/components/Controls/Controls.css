@@ -1,0 +1,42 @@
+.component.controls {
+  padding: 3px;
+  border-radius: 1px;
+}
+
+.component.controls:hover,
+.component.controls.active {
+  background-color: #424141;
+}
+
+.component.controls > div:first-child {
+  display: flex;
+  align-items: center;
+}
+
+.component.controls > div:nth-child(2) {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  margin-left: -3px;
+  width: 150px;
+  box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.50);
+  border: 1px solid #b9b9b9;
+  background-color: #D8D8D8;
+  border-radius: 2px;
+}
+
+.component.controls > div:nth-child(2) button {
+  border: none;
+  display: flex;
+  padding: 8px;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.component.controls > div:nth-child(2) button:hover {
+  background-color: #e4e4e4;
+}
+
+.component.controls > div:nth-child(2) button svg {
+  margin-right: 6px;
+}

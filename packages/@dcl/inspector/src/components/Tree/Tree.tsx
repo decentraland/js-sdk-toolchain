@@ -1,14 +1,15 @@
 import React, { useCallback, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
-import { MdOutlineDriveFileRenameOutline } from 'react-icons/md'
-import { AiFillDelete, AiFillFileAdd } from 'react-icons/ai'
 
 import { Input } from '../Input'
+import { Controls } from '../Controls'
+import { RxDoubleArrowRight as ArrowRight, RxDoubleArrowDown as ArrowDown } from 'react-icons/rx'
 
 import './Tree.css'
 
 export type Props<T> = {
   value: T
+  level?: number
   getId: (value: T) => string
   getChildren: (value: T) => T[]
   getLabel: (value: T) => string
@@ -25,12 +26,15 @@ export type Props<T> = {
   onToggle: (value: T, isOpen: boolean) => void
 }
 
-const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : 'block' })
+const getDefaultLevel = () => 1
+const getLevelStyles = (level: number) => ({ paddingLeft: `${level * 10}px` })
 const getExpandStyles = (active: boolean) => ({ height: active ? 'auto' : '0', overflow: 'hidden', display: 'block' })
+const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : '' })
 
 function Tree<T>(props: Props<T>) {
   const {
     value,
+    level = getDefaultLevel(),
     getId,
     getChildren,
     getLabel,
@@ -47,7 +51,6 @@ function Tree<T>(props: Props<T>) {
     onToggle
   } = props
   const id = getId(value)
-  const children = getChildren(value)
   const label = getLabel(value)
   const open = isOpen(value)
   const selected = isSelected(value)
@@ -115,41 +118,50 @@ function Tree<T>(props: Props<T>) {
     onRemove(value)
   }
 
+  const ref = (node: HTMLDivElement | null) => drag(drop(node))
+
+  const controlsProps = {
+    enableAdd: enableAddChild,
+    enableEdit: enableRename,
+    enableRemove,
+    handleEdit: handleToggleEdit,
+    handleAdd: handleNewChild,
+    handleRemove: handleRemove
+  }
+
   return (
-    <ul ref={(node) => drag(drop(node))}>
-      <li>
-        <div>
-          <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
-            {selected ? '[ST]' : ''}
-            {label || id}{' '}
-            {enableRename && (
-              <button onClick={handleToggleEdit}>
-                <MdOutlineDriveFileRenameOutline />
-              </button>
-            )}
-            {enableAddChild && (
-              <button onClick={handleNewChild}>
-                <AiFillFileAdd />
-              </button>
-            )}
-            {enableRemove && (
-              <button onClick={handleRemove}>
-                <AiFillDelete />
-              </button>
-            )}
-          </span>
-          {editMode && <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
-        </div>
-        {!!children.length && open && (
-          <div style={getExpandStyles(open)}>
-            {children.map(($) => (
-              <Tree {...props} value={$} key={getId($)} />
-            ))}
-          </div>
-        )}
-        {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} />}
-      </li>
-    </ul>
+    <div ref={ref} className="main">
+      <div style={getLevelStyles(level)} className={selected ? 'selected' : ''}>
+        <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
+          <Arrow isOpen={open} />
+          <span>{label || id}</span>
+        </span>
+        {editMode && <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
+        <Controls {...controlsProps} />
+      </div>
+      <TreeChildren {...props} />
+      {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} />}
+    </div>
+  )
+}
+
+function Arrow({ isOpen }: { isOpen: boolean }) {
+  return <>{isOpen ? <ArrowDown /> : <ArrowRight />}</>
+}
+
+function TreeChildren<T>(props: Props<T>) {
+  const { value, level = getDefaultLevel(), getChildren, getId, isOpen } = props
+  const children = getChildren(value)
+  const open = isOpen(value)
+
+  if (!children.length || !open) return null
+
+  return (
+    <div style={getExpandStyles(open)}>
+      {children.map(($) => (
+        <Tree {...props} value={$} level={level + 1} key={getId($)} />
+      ))}
+    </div>
   )
 }
 
