@@ -1,5 +1,5 @@
 {
-    "id": "core-component-inexistent",
+    "version": 1,
     "components": [
         {
             "name": "core::InexistentComponent",

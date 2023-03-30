@@ -1,5 +1,5 @@
 {
-    "id": "cool-sphere",
+    "version": 1,
     "components": [
         {
             "name": "core::Transform",

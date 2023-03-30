@@ -11,8 +11,13 @@ import { ComponentData, CompositeComponent, CompositeDefinition } from './proto/
 /**
  * @public
  */
+export type CompositeResource = { src: string; composite: CompositeDefinition }
+
+/**
+ * @public
+ */
 export type CompositeProvider = {
-  getCompositeOrNull(id: string): CompositeDefinition | null
+  getCompositeOrNull(src: string, currentPath?: string): CompositeResource | null
 }
 
 /** @public */
@@ -35,7 +40,7 @@ export type InstanceCompositeOptions = {
         getCompositeEntity: (compositeEntity: Entity | number) => Entity
       }
   rootEntity?: Entity
-  alreadyRequestedId?: Set<string>
+  alreadyRequestedSrc?: Set<string>
 }
 
 /**
@@ -123,12 +128,12 @@ export function getEntityMapping(
 /* @__PURE__ */
 export function instanceComposite(
   engine: IEngine,
-  compositeData: CompositeDefinition,
+  compositeResource: CompositeResource,
   compositeProvider: CompositeProvider,
   options: InstanceCompositeOptions
 ) {
-  const { rootEntity, alreadyRequestedId: optionalAlreadyRequestedId, entityMapping } = options
-  const alreadyRequestedId = optionalAlreadyRequestedId || new Set<string>()
+  const { rootEntity, alreadyRequestedSrc: optionalAlreadyRequestedSrc, entityMapping } = options
+  const alreadyRequestedSrc = optionalAlreadyRequestedSrc || new Set<string>()
 
   const TransformComponentNumber = componentNumberFromName('core::Transform')
   const CompositeRootComponent = getCompositeRootComponent(engine)
@@ -150,24 +155,29 @@ export function instanceComposite(
   // If there are more composite inside this one, we instance first.
   // => This is not only a copy, we need to instance. Otherwise, we'd be missing that branches
   // => TODO: in the future, the instanciation is first, then the overides (to parameterize Composite, e.g. house with different wall colors)
-  const childrenComposite = compositeData.components.find((item) => item.name === CompositeRootComponent.componentName)
+  const childrenComposite = compositeResource.composite.components.find(
+    (item) => item.name === CompositeRootComponent.componentName
+  )
   if (childrenComposite) {
     for (const [compositeEntity, childComposite] of childrenComposite.data) {
       const compositeRoot = getComponentValue(CompositeRootComponent, childComposite)
-      const composite = compositeProvider.getCompositeOrNull(compositeRoot.id)
+      const childCompositeResource = compositeProvider.getCompositeOrNull(compositeRoot.src, compositeResource.src)
       const targetEntity = getCompositeEntity(compositeEntity)
-      if (composite) {
-        if (alreadyRequestedId.has(compositeRoot.id) || compositeRoot.id === compositeData.id) {
+      if (childCompositeResource) {
+        if (
+          alreadyRequestedSrc.has(childCompositeResource.src) ||
+          childCompositeResource.src === compositeResource.src
+        ) {
           throw new Error(
-            `Composite ${compositeRoot.id} has a recursive instanciation while try to instance ${
-              compositeData.id
-            }. Previous instances: ${alreadyRequestedId.toString()}`
+            `Composite ${compositeResource.src} has a recursive instanciation while try to instance ${
+              childCompositeResource.src
+            }. Previous instances: ${alreadyRequestedSrc.toString()}`
           )
         }
 
-        instanceComposite(engine, composite, compositeProvider, {
+        instanceComposite(engine, childCompositeResource, compositeProvider, {
           rootEntity: targetEntity as Entity,
-          alreadyRequestedId: new Set(alreadyRequestedId).add(compositeData.id),
+          alreadyRequestedSrc: new Set(alreadyRequestedSrc).add(childCompositeResource.src),
           entityMapping: entityMapping?.type === EntityMappingMode.EMM_NEXT_AVAILABLE ? entityMapping : undefined
         })
       }
@@ -176,7 +186,7 @@ export function instanceComposite(
 
   // ## 3 ##
   // Then, we copy the all rest of the components (skipping the Composite ones)
-  for (const component of compositeData.components) {
+  for (const component of compositeResource.composite.components) {
     // We already instanced the composite
     if (component.name === CompositeRootComponent.componentName) continue
 
@@ -218,7 +228,7 @@ export function instanceComposite(
       dest: targetEntity
     })
   }
-  composite.id = compositeData.id
+  composite.src = compositeResource.src
 
   return compositeRootEntity
 }

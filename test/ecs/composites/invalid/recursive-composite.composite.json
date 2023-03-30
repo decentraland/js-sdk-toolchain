@@ -1,5 +1,5 @@
 {
-    "id": "recursive-composite",
+    "version": 1,
     "components": [
         {
             "name": "composite::root",

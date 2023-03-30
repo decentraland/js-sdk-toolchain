@@ -38,9 +38,9 @@ export async function initRpcMethods(
       // TODO: hardcoded for the moment
       const composite = dumpEngineToComposite(engine, 'json')
       // TODO: the ID should be the selected composite id name
-      composite.id = 'main'
+      // composite.id = 'main'
 
-      compositeProvider.save(composite, 'json').catch((err) => console.error(`Save composite fails: `, err))
+      // compositeProvider.save(composite, 'json').catch((err) => console.error(`Save composite fails: `, err))
     }
   }, -1_000_000_000)
 

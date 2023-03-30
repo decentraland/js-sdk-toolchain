@@ -1,5 +1,5 @@
 {
-    "id": "parented-transform",
+    "version": 1,
     "components": [
         {
             "name": "core::Transform",

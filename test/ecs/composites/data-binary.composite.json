@@ -1,5 +1,5 @@
 {
-  "id": "data-binary",
+  "version": 1,
   "components": [
     {
       "name": "core::Transform",
@@ -58,16 +58,16 @@
       "name": "composite::root",
       "data": {
         "512": {
-          "binary": "BQAAAGVtcHR5AAAAAA=="
+          "binary": "AAAAAAAAAAA="
         },
         "513": {
-          "binary": "DQAAAG9uZS10cmFuc2Zvcm0AAAAA"
+          "binary": "AAAAAAAAAAA="
         },
         "514": {
-          "binary": "CgAAAGN1YmUtc2NlbmUAAAAA"
+          "binary": "AAAAAAAAAAA="
         },
         "515": {
-          "binary": "DQAAAG9ubHktY2hpbGRyZW4AAAAA"
+          "binary": "AAAAAAAAAAA="
         }
       }
     }

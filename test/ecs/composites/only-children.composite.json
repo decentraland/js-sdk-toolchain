@@ -1,5 +1,5 @@
 {
-    "id": "only-children",
+    "version": 1,
     "components": [
         {
             "name": "composite::root",

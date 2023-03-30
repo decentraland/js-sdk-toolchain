@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import glob from 'glob'
+import path from 'path'
 import {
   Composite,
   Engine,
@@ -12,21 +13,34 @@ import { getCompositeRootComponent } from './../../packages/@dcl/ecs/src/composi
 import { getComponentDefinition, getComponentValue } from './../../packages/@dcl/ecs/src/composite/instance'
 import { ReadWriteByteBuffer } from './../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
-const writeToFile = process.env.UPDATE_SNAPSHOTS
+const writeToFile = true // process.env.UPDATE_SNAPSHOTS
 const COMPOSITE_BASE_PATH = 'test/ecs/composites'
+const nonBinaryCompositeJsonPath = 'non-binary.composite.json'
 
 // ########
 // ## Helpers
 // ########
 
-function getJsonCompositeFrom(globPath: string) {
-  const compositeFileContent = glob.sync(globPath, { absolute: true }).map((item) => readFileSync(item).toString())
-  return compositeFileContent.map((item) => Composite.fromJson(JSON.parse(item)))
+function getJsonCompositeFrom(globPath: string, cwd: string): Composite.Resource[] {
+  const compositeFileContent = glob.sync(globPath, { cwd }).map((item) => ({
+    src: item,
+    content: readFileSync(path.resolve(cwd, item)).toString()
+  }))
+  return compositeFileContent.map((item) => ({
+    composite: Composite.fromJson(JSON.parse(item.content)),
+    src: item.src
+  }))
 }
 
-function getBinaryCompositeFrom(globPath: string) {
-  const compositeFileContent = glob.sync(globPath, { absolute: true }).map((item) => readFileSync(item))
-  return compositeFileContent.map((item) => Composite.fromBinary(new Uint8Array(item)))
+function getBinaryCompositeFrom(globPath: string, cwd: string) {
+  const compositeFileContent = glob.sync(globPath, { cwd }).map((item) => ({
+    src: item,
+    content: readFileSync(path.resolve(cwd, item))
+  }))
+  return compositeFileContent.map((item) => ({
+    composite: Composite.fromBinary(new Uint8Array(item.content)),
+    src: item.src
+  }))
 }
 
 function getStateAsString(engine: IEngine) {
@@ -73,18 +87,16 @@ function convertCompositeComponentDataToBinary(composite: Composite) {
 // ########
 
 describe.skip('convert non-binary.composite.json', () => {
-  const composite = getJsonCompositeFrom(`${COMPOSITE_BASE_PATH}/non-binary.composite.json`)
+  const composite = getJsonCompositeFrom(nonBinaryCompositeJsonPath, COMPOSITE_BASE_PATH)
   const binaryComposite = composite[0]
-  convertCompositeComponentDataToBinary(binaryComposite)
+  convertCompositeComponentDataToBinary(binaryComposite.composite)
 
-  binaryComposite.id = 'data-binary'
   writeFileSync(
     `${COMPOSITE_BASE_PATH}/data-binary.composite.json`,
-    JSON.stringify(Composite.toJson(binaryComposite), null, 2)
+    JSON.stringify(Composite.toJson(binaryComposite.composite), null, 2)
   )
 
-  binaryComposite.id = 'full-binary'
-  const buffer = Composite.toBinary(binaryComposite)
+  const buffer = Composite.toBinary(binaryComposite.composite)
   writeFileSync(`${COMPOSITE_BASE_PATH}/full-binary.composite`, buffer)
 })
 
@@ -94,39 +106,39 @@ describe.skip('convert non-binary.composite.json', () => {
 
 describe('composite instantiation system', () => {
   const validComposites = [
-    ...getJsonCompositeFrom(`${COMPOSITE_BASE_PATH}/*.composite.json`),
-    ...getBinaryCompositeFrom(`${COMPOSITE_BASE_PATH}/*.composite`)
+    ...getJsonCompositeFrom('*.composite.json', COMPOSITE_BASE_PATH),
+    ...getBinaryCompositeFrom('*.composite', COMPOSITE_BASE_PATH)
   ]
-  const invalidComposites = getJsonCompositeFrom(`${COMPOSITE_BASE_PATH}/invalid/*.composite.json`)
+  const invalidComposites = getJsonCompositeFrom('/invalid/*.composite.json', COMPOSITE_BASE_PATH)
   const composites = [...validComposites, ...invalidComposites]
   const compositeProvider: Composite.Provider = {
-    getCompositeOrNull(id: string) {
-      return composites.find((item) => item.id === id) || null
+    getCompositeOrNull(src: string, currentPath?: string) {
+      return composites.find((item) => item.src === src) || null
     }
   }
 
-  function instanceById(engine: IEngine, id: string, rootEntity?: Entity, alreadyRequestedId?: Set<string>) {
+  function instanceBySource(engine: IEngine, id: string, rootEntity?: Entity, alreadyRequestedSrc?: Set<string>) {
     const composite = compositeProvider.getCompositeOrNull(id)
     if (!composite) {
       throw new Error(`Composite ${id} not found`)
     }
 
-    if (rootEntity || alreadyRequestedId) {
-      Composite.instance(engine, composite, compositeProvider, { rootEntity, alreadyRequestedId })
+    if (rootEntity || alreadyRequestedSrc) {
+      Composite.instance(engine, composite, compositeProvider, { rootEntity, alreadyRequestedSrc })
     } else {
       Composite.instance(engine, composite, compositeProvider)
     }
   }
 
   validComposites.forEach((composite) => {
-    it(`should instance '${composite.id}' composite`, () => {
+    it(`should instance '${composite.src}' composite`, () => {
       const engine = Engine()
       expect(() => {
-        instanceById(engine, composite.id)
+        instanceBySource(engine, composite.src)
       }).not.toThrow()
 
       const currentStateString = getStateAsString(engine)
-      const stateFilePath = `${COMPOSITE_BASE_PATH}/${composite.id}.scene-snapshot.json`
+      const stateFilePath = `${COMPOSITE_BASE_PATH}/${composite.src}.scene-snapshot.json`
       const lastStateSavedString = existsSync(stateFilePath) ? readFileSync(stateFilePath).toString() : ''
 
       if (writeToFile) {
@@ -138,10 +150,10 @@ describe('composite instantiation system', () => {
   })
 
   invalidComposites.forEach((composite) => {
-    it(`should fail the instanciation '${composite.id}' composite`, () => {
+    it(`should fail the instanciation '${composite.src}' composite`, () => {
       expect(() => {
         const engine = Engine()
-        instanceById(engine, composite.id)
+        instanceBySource(engine, composite.src)
       }).toThrow()
     })
   })
@@ -150,7 +162,7 @@ describe('composite instantiation system', () => {
     expect(() => {
       const engine = Engine()
       ;(engine as any).addEntity = () => null
-      instanceById(engine, 'empty')
+      instanceBySource(engine, 'empty')
     }).toThrow()
   })
 
@@ -208,16 +220,16 @@ describe('composite instantiation system', () => {
 
 describe('composite serialization', () => {
   const validComposites = [
-    ...getJsonCompositeFrom(`${COMPOSITE_BASE_PATH}/*.composite.json`),
-    ...getBinaryCompositeFrom(`${COMPOSITE_BASE_PATH}/*.composite`)
+    ...getJsonCompositeFrom('*.composite.json', COMPOSITE_BASE_PATH),
+    ...getBinaryCompositeFrom('*.composite', COMPOSITE_BASE_PATH)
   ]
 
   describe('should serialize to binary and get the same composite', () => {
-    const composite = validComposites.find((item) => item.id === 'non-binary-composite')!
-    const unpackedComposite = Composite.fromBinary(Composite.toBinary(composite))
+    const composite = validComposites.find((item) => item.src === nonBinaryCompositeJsonPath)!
+    const unpackedComposite = Composite.fromBinary(Composite.toBinary(composite.composite))
 
     it('in binary', () => {
-      expect(Composite.toBinary(composite)).toStrictEqual(Composite.toBinary(unpackedComposite))
+      expect(Composite.toBinary(composite.composite)).toStrictEqual(Composite.toBinary(unpackedComposite))
     })
 
     it('raw', () => {
@@ -226,15 +238,17 @@ describe('composite serialization', () => {
   })
 
   describe('should serialize to json and get the same composite', () => {
-    const composite = validComposites.find((item) => item.id === 'non-binary-composite')!
-    const unpackedComposite = Composite.fromBinary(Composite.toBinary(composite))
+    const composite = validComposites.find((item) => item.src === nonBinaryCompositeJsonPath)!
+    const unpackedComposite = Composite.fromBinary(Composite.toBinary(composite.composite))
 
     it('in json (raw)', () => {
-      expect(Composite.toJson(composite)).toStrictEqual(Composite.toJson(unpackedComposite))
+      expect(Composite.toJson(composite.composite)).toStrictEqual(Composite.toJson(unpackedComposite))
     })
 
     it('in json (string)', () => {
-      expect(JSON.stringify(Composite.toJson(composite))).toBe(JSON.stringify(Composite.toJson(unpackedComposite)))
+      expect(JSON.stringify(Composite.toJson(composite.composite))).toBe(
+        JSON.stringify(Composite.toJson(unpackedComposite))
+      )
     })
 
     it('raw', () => {
