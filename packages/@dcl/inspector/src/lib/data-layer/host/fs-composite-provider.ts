@@ -1,14 +1,15 @@
 import { Composite } from '@dcl/ecs'
 import { FileSystemInterface } from '../types'
+import { getFilesInDirectory } from './fs-utils'
 
 export type CompositeManager = Composite.Provider & {
   save: (composite: Composite, type: 'json' | 'binary') => Promise<void>
 }
 
 export async function createFsCompositeProvider(fs: FileSystemInterface): Promise<CompositeManager> {
-  const compositePaths = (await fs.readdir('./'))
-    .filter((item) => item.name.endsWith('.composite.json') || item.name.endsWith('.composite'))
-    .map((item) => item.name)
+  const compositePaths = (await getFilesInDirectory(fs, '', [], true))
+    .filter((item) => item.endsWith('.composite.json') || item.endsWith('.composite'))
+    .map((item) => item)
 
   const compositePromises = compositePaths.map(async (itemPath) => {
     try {

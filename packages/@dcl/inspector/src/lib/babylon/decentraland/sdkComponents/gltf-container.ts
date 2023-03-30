@@ -34,10 +34,12 @@ BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
         const sceneId = params.get('sceneId')!
         const ctx = sceneContextMap.get(sceneId)?.deref()
         if (ctx) {
-          const relative = url.replace(ctx.loadableScene.baseUrl, base ? base + '/' : '')
-          const ret = ctx.resolveFile(relative)
-          if (ret) {
-            return ctx.loadableScene.baseUrl + ret
+          const filePath = base + '/' + url
+          console.log(`Fetching ${filePath}`)
+          const content = await ctx.getFile(filePath)
+          if (content) {
+            // TODO: this works with File, but it doesn't match the types (it requires string)
+            return new File([content], _gltfFilename) as any
           }
         }
       }
@@ -58,55 +60,65 @@ export const putGltfContainerComponent: ComponentOperation = (entity, component)
 
       if (newValue?.src) {
         const context = entity.context.deref()
-
         if (!context) return
 
         // store a WeakRef to the sceneContext to enable file resolver
         sceneContextMap.set(context.loadableScene.id, entity.context)
 
-        let file = context.resolveFile(newValue.src)
-
-        if (!file) {
-          debugger
-          return
-        }
-
-        const extension = newValue.src.toLowerCase().endsWith('.gltf') ? '.gltf' : '.glb'
-
-        const base = newValue.src.split('/').slice(0, -1).join('/')
-        file = file + '?sceneId=' + encodeURIComponent(context.loadableScene.id) + '&base=' + encodeURIComponent(base)
-
-        BABYLON.SceneLoader.LoadAssetContainer(
-          context.loadableScene.baseUrl,
-          file,
-          entity.getScene(),
-          (assetContainer) => {
-            processGLTFAssetContainer(assetContainer, entity)
-
-            // Fin the main mesh and add it as the BasicShape.nameInEntity component.
-            assetContainer.meshes
-              .filter(($) => $.name === '__root__')
-              .forEach((mesh) => {
-                mesh.parent = entity
-                entity.gltfContainer = mesh
-              })
-
-            entity.gltfAssetContainer = assetContainer
-          },
-          null,
-          (_scene, _message, _exception) => {
-            debugger
-            // const animator: Animator = entity.getBehaviorByName('animator') as Animator
-
-            // if (animator) {
-            //   animator.transformValue(animator.value!)
-            // }
-          },
-          extension
-        )
+        tryLoadGltfAsync(context.loadableScene.id, entity, newValue.src).catch((err) => {
+          console.error('Error trying to load gltf ' + newValue.src, err)
+        })
       }
     }
   }
+}
+
+async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: string) {
+  const content = await entity.context.deref()!.getFile(filePath)
+  if (!content) {
+    return
+  }
+
+  const contextStillAlive = sceneContextMap.get(sceneId)?.deref()
+  if (!contextStillAlive) {
+    return
+  }
+
+  const base = filePath.split('/').slice(0, -1).join('/')
+  const finalSrc = filePath + '?sceneId=' + encodeURIComponent(sceneId) + '&base=' + encodeURIComponent(base)
+
+  const file = new File([content], finalSrc)
+  const extension = filePath.toLowerCase().endsWith('.gltf') ? '.gltf' : '.glb'
+
+  BABYLON.SceneLoader.LoadAssetContainer(
+    '',
+    file,
+    entity.getScene(),
+    (assetContainer) => {
+      processGLTFAssetContainer(assetContainer, entity)
+
+      // Fin the main mesh and add it as the BasicShape.nameInEntity component.
+      assetContainer.meshes
+        .filter(($) => $.name === '__root__')
+        .forEach((mesh) => {
+          mesh.parent = entity
+          entity.gltfContainer = mesh
+        })
+
+      entity.gltfAssetContainer = assetContainer
+    },
+    null,
+    (_scene, _message, _exception) => {
+      console.error('Error while calling LoadAssetContainer: ', _message, _exception)
+      // debugger
+      // const animator: Animator = entity.getBehaviorByName('animator') as Animator
+
+      // if (animator) {
+      //   animator.transformValue(animator.value!)
+      // }
+    },
+    extension
+  )
 }
 
 function removeCurrentGltf(entity: EcsEntity) {

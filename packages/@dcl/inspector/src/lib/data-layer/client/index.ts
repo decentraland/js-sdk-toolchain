@@ -7,7 +7,8 @@ const dataLayerWs = new URLSearchParams(window.location.search).get('ws')
 
 export async function createDataLayerClientRpc(): Promise<DataLayerRpcClient> {
   if (!dataLayerWs) {
-    return createLocalDataLayerRpcClient(feededFileSystem())
+    const fs = await feededFileSystem()
+    return createLocalDataLayerRpcClient(fs)
   } else {
     return createWebSocketDataLayerRpcClient(dataLayerWs)
   }

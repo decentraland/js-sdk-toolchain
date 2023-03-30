@@ -2,7 +2,7 @@ import { Engine, Transport } from '@dcl/ecs'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
 import mitt from 'mitt'
 
-import { StreamMessage } from '../data-layer/proto/gen/data-layer.gen'
+import { CrdtStreamMessage } from '../data-layer/proto/gen/data-layer.gen'
 import { DataLayerRpcClient } from '../data-layer/types'
 import { consumeAllMessagesInto } from '../logic/consume-stream'
 import { createComponents, createEditorComponents } from './components'
@@ -22,7 +22,7 @@ export function createInspectorEngine(dataLayer: DataLayerRpcClient): Omit<SdkCo
   }
 
   // <HERE BE DRAGONS (TRANSPORT)>
-  const outgoingMessagesStream = new AsyncQueue<StreamMessage>((_, _action) => {})
+  const outgoingMessagesStream = new AsyncQueue<CrdtStreamMessage>((_, _action) => {})
   const transport: Transport = {
     filter() {
       return !outgoingMessagesStream.closed
@@ -45,7 +45,7 @@ export function createInspectorEngine(dataLayer: DataLayerRpcClient): Omit<SdkCo
     transport.onmessage!(message)
   }
 
-  consumeAllMessagesInto(dataLayer.stream(outgoingMessagesStream), onMessage, outgoingMessagesStream.close).catch(
+  consumeAllMessagesInto(dataLayer.crdtStream(outgoingMessagesStream), onMessage, outgoingMessagesStream.close).catch(
     (e) => {
       console.error('consumeAllMessagesInto failed: ', e)
     }
@@ -60,6 +60,7 @@ export function createInspectorEngine(dataLayer: DataLayerRpcClient): Omit<SdkCo
     engine,
     components,
     events,
-    dispose
+    dispose,
+    dataLayer
   }
 }

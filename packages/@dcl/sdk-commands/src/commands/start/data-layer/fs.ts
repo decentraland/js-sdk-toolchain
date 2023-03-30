@@ -1,28 +1,35 @@
 import { FileSystemInterface } from '@dcl/inspector'
-import { IFileSystemComponent } from '../../../components/fs'
+import path from 'path'
+import { CliComponents } from '../../../components'
 
-export function createFsFromFsComponent(fs: IFileSystemComponent): FileSystemInterface {
+export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliComponents, 'fs'>): FileSystemInterface {
   return {
     async existFile(filePath: string): Promise<boolean> {
-      try {
-        await fs.access(filePath, fs.constants.F_OK | fs.constants.R_OK)
-        return true
-      } catch (error) {
-        return false
-      }
+      return fs.fileExists(filePath)
     },
     async readFile(filePath: string): Promise<Buffer> {
       return fs.readFile(filePath)
     },
     async writeFile(filePath: string, content: Buffer): Promise<void> {
+      const folder = path.dirname(filePath)
+      if (!(await fs.directoryExists(folder))) {
+        await fs.mkdir(folder, { recursive: true })
+      }
       await fs.writeFile(filePath, content)
     },
     async readdir(dirPath: string): Promise<{ name: string; isDirectory: boolean }[]> {
-      const result = await fs.readdir(dirPath)
+      if (dirPath.indexOf('/../') !== -1) {
+        throw new Error('The usage of /../ is not allowed')
+      }
+
+      const root = dirPath === '.' || dirPath === './' || dirPath === ''
+      const resolvedPath = root ? process.cwd() : dirPath
+
+      const result = await fs.readdir(resolvedPath)
       return Promise.all(
         result.map(async (name) => ({
           name: name,
-          isDirectory: await fs.directoryExists(name)
+          isDirectory: await fs.directoryExists(path.resolve(dirPath, name))
         }))
       )
     }

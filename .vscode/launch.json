@@ -27,6 +27,33 @@
       "protocol": "inspector",
       "autoAttachChildProcesses": true
     },
+    
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "(Inspector) Jest current file",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
+      "cwd": "${workspaceFolder}/packages/@dcl/inspector",
+      "runtimeArgs": [
+        "--async-stack-traces"
+      ],
+      "args": [
+        "${fileBasename}",
+        "--verbose",
+        "--no-cache",
+        "-i",
+        "--config", 
+        "${workspaceFolder}/packages/@dcl/inspector/test/jest.config.js"
+      ],
+      "skipFiles": [
+        "<node_internals>/**/*.js",
+        "node_modules/**/*.js"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "protocol": "inspector",
+      "autoAttachChildProcesses": true
+    },
     {
       "type": "node",
       "request": "launch",
@@ -40,6 +67,44 @@
       "internalConsoleOptions": "neverOpen",
       "autoAttachChildProcesses": true,
       "cwd": "${workspaceFolder}/packages/@dcl/inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug sdk-commands start test-scene",
+      "program": "${workspaceFolder}/packages/@dcl/sdk-commands/dist/index.js",
+      "runtimeArgs": [
+        "--async-stack-traces"
+      ],
+      "args": [
+        "start",
+        "--data-layer",
+        "--no-browser"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "autoAttachChildProcesses": true,
+      "cwd": "${workspaceFolder}/test-scene"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Serve inspector",
+      "program": "${workspaceFolder}/packages/@dcl/inspector/build.js",
+      "args": [
+        "--watch"
+      ],
+      "cwd": "${workspaceFolder}/packages/@dcl/inspector"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Inspector with data-layer in `sdk-commands`",
+      "configurations": [
+        "Debug sdk-commands start test-scene",
+        "Serve inspector"
+      ],
+      "stopAll": true
     }
   ]
 }

@@ -1,17 +1,17 @@
 import React from 'react'
 import { useDrop } from 'react-dnd'
-import { IAsset } from '../AssetsCatalog/types'
-import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
-import { useSdk } from '../../hooks/sdk/useSdk'
 import { useRenderer } from '../../hooks/sdk/useRenderer'
+import { useSdk } from '../../hooks/sdk/useSdk'
+import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 import { ROOT } from '../../lib/sdk/tree'
+import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 
 export function Renderer() {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
   useRenderer(() => canvasRef)
   const sdk = useSdk()
 
-  const addAsset = async (asset: IAsset) => {
+  const addAsset = async (asset: AssetNodeItem) => {
     if (!sdk) return
     const {
       engine,
@@ -22,14 +22,14 @@ export function Renderer() {
     const { x, z } = await getPointerCoords(scene)
     Label.create(child, { label: asset.name })
     Transform.create(child, { parent: ROOT, position: { x, y: 0, z } })
-    GltfContainer.create(child, { src: asset.main })
+    GltfContainer.create(child, { src: asset.asset.src })
     await engine.update(0)
   }
 
   const [, drop] = useDrop(
     () => ({
-      accept: ['asset'],
-      drop: ({ asset }: { asset: IAsset }, monitor) => {
+      accept: ['project-asset-gltf'],
+      drop: ({ asset }: { asset: AssetNodeItem }, monitor) => {
         if (monitor.didDrop()) return
         void addAsset(asset)
       }

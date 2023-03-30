@@ -1,7 +1,8 @@
-import { Entity, EntityMappingMode, IEngine, Composite, OnChangeFunction } from '@dcl/ecs'
+import { Composite, Entity, EntityMappingMode, IEngine, OnChangeFunction } from '@dcl/ecs'
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
 import { dumpEngineToComposite } from './engine-to-composite'
 import { createFsCompositeProvider } from './fs-composite-provider'
+import { getFilesInDirectory } from './fs-utils'
 import { stream } from './stream'
 
 export async function initRpcMethods(
@@ -53,8 +54,45 @@ export async function initRpcMethods(
     // This method receives an incoming message iterator
     // and returns an async iterable. consumption and production of messages
     // are decoupled operations
-    stream(iter) {
-      return stream(iter, { engine })
+    async *crdtStream(iter) {
+      // TODO: check this types, in the meantime, the lines below do the same
+      // return stream(iter, { engine })
+
+      const gen = stream(iter, { engine })
+      for await (const it of gen) {
+        yield it
+      }
+    },
+    async getAssetData(req) {
+      if (await fs.existFile(req.path)) {
+        return {
+          data: await fs.readFile(req.path)
+        }
+      }
+
+      throw new Error("Couldn't find the asset " + req.path)
+    },
+    async getAssetCatalog() {
+      const extensions = ['.glb', '.png', '.composite', '.composite.json', '.gltf', '.jpg']
+      const ignore = ['.git', 'node_modules']
+
+      const files = (await getFilesInDirectory(fs, '', [], true, ignore)).filter((item) => {
+        const itemLower = item.toLowerCase()
+        return extensions.some((ext) => itemLower.endsWith(ext))
+      })
+
+      return { basePath: '.', assets: files.map((item) => ({ path: item })) }
+    },
+
+    async importAsset(req) {
+      const baseFolder = (req.basePath.length ? req.basePath + '/' : '') + req.assetPackageName + '/'
+
+      for (const [fileName, fileContent] of req.content) {
+        const filePath = (baseFolder + fileName).replaceAll('//', '/')
+        await fs.writeFile(filePath, Buffer.from(fileContent))
+      }
+
+      return {}
     }
   }
 }

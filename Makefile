@@ -45,7 +45,7 @@ test:
 	make test-inspector
 
 test-inspector:
-	node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS) --config ./packages/@dcl/inspector/test/jest.config.js
+	WITH_COVERAGE=true node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS) --config ./packages/@dcl/inspector/test/jest.config.js
 
 
 test-cli:
@@ -147,3 +147,7 @@ clean:
 	@rm -rf test/build-ecs/fixtures/simple-scene-with-library/bin/ test/build-ecs/fixtures/simple-scene-with-library/node_modules/
 	@rm -rf test/build-ecs/fixtures/simple-scene/bin/ test/build-ecs/fixtures/simple-scene/node_modules/
 	@rm -rf test/ecs/snippets/dist/
+
+init-test-scene:
+	git clone https://github.com/decentraland/sdk7-scene-template test-scene
+	cd test-scene && npm i ./../packages/@dcl/sdk  && npm i ./../packages/@dcl/sdk-commands  && npm i ./../packages/@dcl/js-runtime

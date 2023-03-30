@@ -14,6 +14,9 @@ export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
   let inspector: Omit<SdkContextValue, 'scene'>
 
   beforeAll(async () => {
+    const fs = await feededFileSystem({})
+    dataLayer = await createLocalDataLayerRpcClient(fs)
+
     const engine = new BABYLON.NullEngine({
       renderWidth: 512,
       renderHeight: 256,
@@ -21,17 +24,19 @@ export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
       deterministicLockstep: true,
       lockstepMaxSteps: 4
     })
+
     const scene = new BABYLON.Scene(engine)
-    sceneCtx = new SceneContext(engine, scene, loadableScene)
+    sceneCtx = new SceneContext(engine, scene, loadableScene, dataLayer)
 
     // engine.runRenderLoop(() => {
     // process.stderr.write('RENDER FRAME\n')
     // })
 
-    dataLayer = await createLocalDataLayerRpcClient(feededFileSystem())
     inspector = createInspectorEngine(dataLayer)
-    void sceneCtx.connectDataLayer(dataLayer)
+    void sceneCtx.connectCrdtTransport(dataLayer.crdtStream)
     stopEngine()
+
+    console.log('initTestEngine started')
   })
 
   afterAll(() => {
@@ -67,8 +72,11 @@ export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
       // TODO: babylon engine needs some more ticks to update. Needs review.
       // Maybe related to the stream & asyn-queue waiting for the updateBatch promises
       await sceneCtx.update()
+      await new Promise((resolve) => setTimeout(resolve, 100))
       await sceneCtx.update()
+      await new Promise((resolve) => setTimeout(resolve, 100))
       await sceneCtx.update()
+      await new Promise((resolve) => setTimeout(resolve, 100))
     },
     async updateRenderer() {
       // TODO: same as above
