@@ -58,16 +58,16 @@
       "name": "composite::root",
       "data": {
         "512": {
-          "binary": "AAAAAAAAAAA="
+          "binary": "FAAAAGVtcHR5LmNvbXBvc2l0ZS5qc29uAAAAAA=="
         },
         "513": {
-          "binary": "AAAAAAAAAAA="
+          "binary": "HAAAAG9uZS10cmFuc2Zvcm0uY29tcG9zaXRlLmpzb24AAAAA"
         },
         "514": {
-          "binary": "AAAAAAAAAAA="
+          "binary": "GQAAAGN1YmUtc2NlbmUuY29tcG9zaXRlLmpzb24AAAAA"
         },
         "515": {
-          "binary": "AAAAAAAAAAA="
+          "binary": "HAAAAG9ubHktY2hpbGRyZW4uY29tcG9zaXRlLmpzb24AAAAA"
         }
       }
     }

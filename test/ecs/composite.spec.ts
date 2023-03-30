@@ -13,7 +13,7 @@ import { getCompositeRootComponent } from './../../packages/@dcl/ecs/src/composi
 import { getComponentDefinition, getComponentValue } from './../../packages/@dcl/ecs/src/composite/instance'
 import { ReadWriteByteBuffer } from './../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
-const writeToFile = true // process.env.UPDATE_SNAPSHOTS
+const writeToFile = false // process.env.UPDATE_SNAPSHOTS
 const COMPOSITE_BASE_PATH = 'test/ecs/composites'
 const nonBinaryCompositeJsonPath = 'non-binary.composite.json'
 
@@ -86,7 +86,7 @@ function convertCompositeComponentDataToBinary(composite: Composite) {
 // ## Helper-test
 // ########
 
-describe.skip('convert non-binary.composite.json', () => {
+describe.only('convert non-binary.composite.json', () => {
   const composite = getJsonCompositeFrom(nonBinaryCompositeJsonPath, COMPOSITE_BASE_PATH)
   const binaryComposite = composite[0]
   convertCompositeComponentDataToBinary(binaryComposite.composite)
@@ -233,7 +233,7 @@ describe('composite serialization', () => {
     })
 
     it('raw', () => {
-      expect(composite).toStrictEqual(unpackedComposite)
+      expect(composite.composite).toStrictEqual(unpackedComposite)
     })
   })
 
@@ -252,7 +252,7 @@ describe('composite serialization', () => {
     })
 
     it('raw', () => {
-      expect(composite).toStrictEqual(unpackedComposite)
+      expect(composite.composite).toStrictEqual(unpackedComposite)
     })
   })
 })
