@@ -13,6 +13,7 @@ import { join, dirname } from 'path'
 import { printProgressInfo, printProgressStep } from './beautiful-logs'
 import { colors } from '../components/log'
 import { pathToFileURL } from 'url'
+import { globSync } from 'glob'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -55,19 +56,20 @@ export async function bundleProject(components: BundleComponents, options: Compi
     throw new CliError(`File ${tsconfig} must exist to compile the Typescript project`)
   }
 
-  const input = options.single ?? 'src/index.ts'
+  const input = globSync(options.single ?? 'src/index.ts')
   const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
   const outfile = join(options.workingDirectory, output)
 
-  printProgressStep(components.logger, `Bundling file ${colors.bold(input)}`, 2, MAX_STEP)
+  printProgressStep(components.logger, `Bundling file ${colors.bold(input.join(','))}`, 2, MAX_STEP)
 
   const context = await esbuild.context({
-    entryPoints: [input],
+    entryPoints: input,
     bundle: true,
     platform: 'browser',
     format: 'cjs',
     preserveSymlinks: false,
-    outfile,
+    outfile: input.length > 1 ? undefined : outfile,
+    outdir: input.length > 1 ? dirname(outfile) : undefined,
     allowOverwrite: false,
     sourcemap: options.production ? 'external' : 'inline',
     minify: options.production,
@@ -99,16 +101,24 @@ export async function bundleProject(components: BundleComponents, options: Compi
 
   if (options.watch) {
     await context.watch({})
+
+    printProgressInfo(components.logger, `Bundle saved ${colors.bold(output)}`)
   } else {
     try {
-      await context.rebuild()
+      const ctx = await context.rebuild()
+      printProgressInfo(
+        components.logger,
+        `Bundle saved ${colors.bold(
+          Object.keys(ctx.metafile.outputs)
+            .filter((_) => _.endsWith('.js'))
+            .join(',') || outfile
+        )}`
+      )
     } catch (err: any) {
       throw new CliError(err.toString())
     }
     await context.dispose()
   }
-
-  printProgressInfo(components.logger, `Bundle saved ${colors.bold(output)}`)
 
   if (options.watch) printProgressInfo(components.logger, `The compiler is watching for changes`)
 

@@ -22,8 +22,12 @@
 				"dbaeumer.vscode-eslint"
 			]
 		}
-	}
+	},
 
+  "containerEnv": {
+    "DCL_DISABLE_ANALYTICS": "true",
+    "SHELL": "/usr/bin/zsh"
+  }
 	// Configure tool-specific properties.
 	// "customizations": {},
 
