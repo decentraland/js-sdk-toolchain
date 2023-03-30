@@ -23,13 +23,13 @@ export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliCompone
       }
 
       const root = dirPath === '.' || dirPath === './' || dirPath === ''
-      const path = root ? process.cwd() : dirPath
+      const resolvedPath = root ? process.cwd() : dirPath
 
-      const result = await fs.readdir(path)
+      const result = await fs.readdir(resolvedPath)
       return Promise.all(
         result.map(async (name) => ({
           name: name,
-          isDirectory: await fs.directoryExists(name)
+          isDirectory: await fs.directoryExists(path.resolve(dirPath, name))
         }))
       )
     }

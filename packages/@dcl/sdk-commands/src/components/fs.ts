@@ -10,22 +10,13 @@ export type IFileSystemComponent = Pick<typeof fs, 'createReadStream'> &
   Pick<typeof fs, 'createWriteStream'> &
   Pick<
     typeof fsPromises,
-    | 'access'
-    | 'opendir'
-    | 'stat'
-    | 'unlink'
-    | 'mkdir'
-    | 'readFile'
-    | 'writeFile'
-    | 'rename'
-    | 'rmdir'
-    | 'readdir'
-    | 'appendFile'
+    'access' | 'opendir' | 'stat' | 'unlink' | 'mkdir' | 'readFile' | 'writeFile' | 'rename' | 'rmdir' | 'appendFile'
   > & {
     constants: Pick<typeof fs.constants, 'F_OK' | 'R_OK'>
   } & {
     fileExists(path: string): Promise<boolean>
     directoryExists(path: string): Promise<boolean>
+    readdir(path: string): Promise<string[]>
   }
 
 async function fileExists(path: string): Promise<boolean> {
