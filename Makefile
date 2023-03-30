@@ -45,7 +45,7 @@ test:
 	make test-inspector
 
 test-inspector:
-	node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS) --config ./packages/@dcl/inspector/test/jest.config.js
+	WITH_COVERAGE=true node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS) --config ./packages/@dcl/inspector/test/jest.config.js
 
 
 test-cli:

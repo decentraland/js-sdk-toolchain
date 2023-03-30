@@ -53,6 +53,8 @@ jobs:
         run: make test-coverage
       - name: test-cli
         run: make test-cli
+      - name: test-inspector
+        run: make test-inspector
       - uses: codecov/codecov-action@v3
         if: always()
         with:

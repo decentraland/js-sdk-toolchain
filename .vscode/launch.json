@@ -27,6 +27,33 @@
       "protocol": "inspector",
       "autoAttachChildProcesses": true
     },
+    
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "(Inspector) Jest current file",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
+      "cwd": "${workspaceFolder}/packages/@dcl/inspector",
+      "runtimeArgs": [
+        "--async-stack-traces"
+      ],
+      "args": [
+        "${fileBasename}",
+        "--verbose",
+        "--no-cache",
+        "-i",
+        "--config", 
+        "${workspaceFolder}/packages/@dcl/inspector/test/jest.config.js"
+      ],
+      "skipFiles": [
+        "<node_internals>/**/*.js",
+        "node_modules/**/*.js"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "protocol": "inspector",
+      "autoAttachChildProcesses": true
+    },
     {
       "type": "node",
       "request": "launch",

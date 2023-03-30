@@ -20,7 +20,8 @@
     "strictPropertyInitialization": true,
     "alwaysStrict": true,
     "jsx": "react",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "inlineSourceMap": true
   },
   "exclude": ["jest-transformer.js", "jest.config.js"]
 }
