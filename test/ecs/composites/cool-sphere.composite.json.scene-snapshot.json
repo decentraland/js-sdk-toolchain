@@ -22,7 +22,7 @@
   },
   "composite::root": {
     "512": {
-      "id": "cool-sphere",
+      "src": "cool-sphere.composite.json",
       "entities": [
         {
           "src": 0,

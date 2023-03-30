@@ -7,7 +7,7 @@
                 "512": {
                     "$case": "json",
                     "json": {
-                        "id": "recursive-composite"
+                        "src": "recursive-composite.composite.json"
                     }
                 }
             }

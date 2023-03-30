@@ -79,7 +79,7 @@
   },
   "composite::root": {
     "512": {
-      "id": "2-level-deep",
+      "src": "2-level-deep.composite.json",
       "entities": [
         {
           "src": 0,
@@ -104,7 +104,7 @@
       ]
     },
     "513": {
-      "id": "empty",
+      "src": "empty.composite.json",
       "entities": [
         {
           "src": 0,
@@ -113,7 +113,7 @@
       ]
     },
     "514": {
-      "id": "one-transform",
+      "src": "one-transform.composite.json",
       "entities": [
         {
           "src": 0,
@@ -126,7 +126,7 @@
       ]
     },
     "516": {
-      "id": "cube-scene",
+      "src": "cube-scene.composite.json",
       "entities": [
         {
           "src": 0,
@@ -139,7 +139,7 @@
       ]
     },
     "518": {
-      "id": "only-children",
+      "src": "only-children.composite.json",
       "entities": [
         {
           "src": 0,
@@ -160,7 +160,7 @@
       ]
     },
     "519": {
-      "id": "empty",
+      "src": "empty.composite.json",
       "entities": [
         {
           "src": 0,
@@ -169,7 +169,7 @@
       ]
     },
     "520": {
-      "id": "one-transform",
+      "src": "one-transform.composite.json",
       "entities": [
         {
           "src": 0,
@@ -182,7 +182,7 @@
       ]
     },
     "522": {
-      "id": "cube-scene",
+      "src": "cube-scene.composite.json",
       "entities": [
         {
           "src": 0,
