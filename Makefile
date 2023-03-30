@@ -34,9 +34,11 @@ install:
 lint:
 	node_modules/.bin/eslint . --ext .ts
 
-lint-fix:
+sync-deps:
 	node_modules/.bin/syncpack format --config .syncpackrc.json  --source "packages/@dcl/*/package.json" --source "package.json"
 	node_modules/.bin/syncpack fix-mismatches --config .syncpackrc.jsonnode_modules/.bin/syncpack format --config .syncpackrc.json --source "packages/@dcl/*/package.json" --source "package.json"
+
+lint-fix:
 	node_modules/.bin/eslint . --ext .ts --fix
 
 TESTARGS ?= test/
@@ -46,7 +48,6 @@ test:
 
 test-inspector:
 	WITH_COVERAGE=true node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS) --config ./packages/@dcl/inspector/test/jest.config.js
-
 
 test-cli:
 	@rm -rf tmp
@@ -132,7 +133,7 @@ update-snapshots: test
 clean:
 	@echo "> Cleaning all folders"
 	@rm -rf coverage/
-	@rm -rf packages/@dcl/sdk/*.js packages/@dcl/sdk/*.d.ts packages/@dcl/sdk/internal
+	@rm -rf packages/@dcl/sdk/*.js packages/@dcl/sdk/*.d.ts
 	@rm -rf packages/@dcl/inspector/public/*.js packages/@dcl/inspector/public/*.d.ts packages/@dcl/inspector/public/*.map packages/@dcl/inspector/public/*.css
 	@rm -rf packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/
 	@rm -rf packages/@dcl/sdk-commands/dist

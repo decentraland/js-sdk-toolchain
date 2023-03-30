@@ -6,7 +6,7 @@
   "bugs": "https://github.com/decentraland/js-sdk-toolchain/issues",
   "dependencies": {
     "@actions/core": "^1.10.0",
-    "@dcl/protocol": "1.0.0-4493564897.commit-c858f8a",
+    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-4566257236.commit-1dd1d08.tgz",
     "@dcl/quickjs-emscripten": "^0.21.0-3680274614.commit-1808aa1",
     "@types/fs-extra": "^9.0.12",
     "@types/jest": "^28.1.8",
@@ -28,11 +28,11 @@
     "syncpack": "^9.8.4",
     "typedoc": "^0.23.28"
   },
-  "engines": {
-    "npm": ">=8.0.0 <9.0.0"
-  },
   "homepage": "https://github.com/decentraland/js-sdk-toolchain#readme",
   "keywords": [],
   "license": "Apache-2.0",
-  "repository": "decentraland/js-sdk-toolchain.git"
+  "repository": "decentraland/js-sdk-toolchain.git",
+  "scripts": {
+    "postinstall": "make sync-deps"
+  }
 }

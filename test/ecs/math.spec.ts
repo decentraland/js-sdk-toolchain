@@ -1,4 +1,4 @@
-import * as Math from '../../packages/@dcl/sdk/src/math'
+import * as Math from '../../packages/@dcl/sdk/math'
 
 describe('Events System', () => {
   it('should get Math exported fns', () => {

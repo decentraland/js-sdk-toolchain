@@ -14,7 +14,9 @@
     "preserveConstEnums": true,
     "outDir": "dist",
     "lib": ["ES2020"],
-    "types": []
+    "types": [
+      "@dcl/js-runtime",
+    ]
   },
   "include": ["src"],
   "exclude": ["dist"]

@@ -11,7 +11,6 @@ packages/@dcl/sdk/package-lock.json
 packages/@dcl/sdk/*.js
 packages/@dcl/sdk/*.d.ts
 api-docs
-packages/@dcl/sdk/internal
 test/ecs/snippets/**/*.js
 **/*.tgz
 test/sdk/simple-scene

@@ -1,6 +1,6 @@
 {
   "entryPoints": [
-    "packages/@dcl/sdk/src",
+    "packages/@dcl/sdk",
     "packages/@dcl/js-runtime/apis.d.ts"
   ],
   "tsconfig": "packages/@dcl/sdk/tsconfig.json",
@@ -21,10 +21,11 @@
   "entryPointStrategy": "expand",
   "out": "api-docs",
   "exclude": [
-    "packages/@dcl/sdk/src/internal/**/*.ts",
-    "packages/@dcl/sdk/src/message-bus.ts",
-    "packages/@dcl/sdk/src/observables.ts",
-    "packages/@dcl/sdk/src/index.ts"
+    "packages/@dcl/sdk/internal/**/*.ts",
+    "packages/@dcl/sdk/testing/**/*.ts",
+    "packages/@dcl/sdk/message-bus.ts",
+    "packages/@dcl/sdk/observables.ts",
+    "packages/@dcl/sdk/index.ts"
   ],
   "treatWarningsAsErrors": true,
   "plugin": [],

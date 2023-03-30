@@ -1,6 +1,6 @@
 import { Engine, Entity, components } from '../../../packages/@dcl/ecs/src'
 import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { Quaternion, Vector3 } from '../../../packages/@dcl/sdk/src/math'
+import { Quaternion, Vector3 } from '../../../packages/@dcl/sdk/math'
 
 describe('Legacy component tests', () => {
   it('cube example scene', async () => {

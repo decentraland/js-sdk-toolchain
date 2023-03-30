@@ -1,9 +1,9 @@
 import { cyclicParentingChecker, MapResult, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src'
 import { Engine, Entity, LastWriteWinElementSetComponentDefinition } from '../../packages/@dcl/ecs/src/engine'
-import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
+import { createRendererTransport } from '../../packages/@dcl/sdk/internal/transports/rendererTransport'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { components } from '../../packages/@dcl/ecs/src'
-import { Vector3 } from '../../packages/@dcl/sdk/src/math'
+import { Vector3 } from '../../packages/@dcl/sdk/math'
 
 const PositionSchema = {
   x: Schemas.Float

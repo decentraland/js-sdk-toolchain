@@ -13,16 +13,13 @@ import { withQuickJsVm } from './vm'
 const ENV: Record<string, string> = { ...process.env } as any
 const writeToFile = process.env.UPDATE_SNAPSHOTS
 
-const PRODUCTION_BUILD = true
-
 describe('Runs the snapshots', () => {
   it('runs npm install in the target folder', async () => {
     await runCommand('npm install --silent', 'test/snapshots', ENV)
   }, 15000)
 
-  const producctionBuild = PRODUCTION_BUILD ? '--production' : ''
-
-  itExecutes(`npm run build -- ${producctionBuild} "--single=*.ts"`, path.resolve('test/snapshots'), ENV)
+  itExecutes(`npm run build -- --production "--single=*!(.test).ts"`, path.resolve('test/snapshots'), ENV)
+  itExecutes(`npm run build -- "--single=*.test.ts"`, path.resolve('test/snapshots'), ENV)
 
   glob.sync('test/snapshots/*.ts', { absolute: false }).forEach((file) => testFileSnapshot(file))
 })
@@ -36,7 +33,7 @@ function testFileSnapshot(fileName: string) {
 
     const { result: resultFromRun, leaking } = await run(binFile)
 
-    const result = `SCENE_COMPILED_JS_SIZE_PROD=${jsProdSize}k bytes\n` + `This run is in PROD mode.\n` + resultFromRun
+    const result = `SCENE_COMPILED_JS_SIZE_PROD=${jsProdSize}k bytes\n` + resultFromRun
 
     const compareToFileName = fileName + '.crdt'
     const compareFileExists = existsSync(compareToFileName)
@@ -131,6 +128,21 @@ async function run(fileName: string) {
               return {
                 contents: []
               }
+            }
+          }
+        } else if (moduleName === '~system/Testing') {
+          return {
+            async logTestResult(result: any) {
+              out.push('  logTestResult: ' + JSON.stringify(result))
+              return {}
+            },
+            async plan(data: any) {
+              out.push('  testPlan: ' + JSON.stringify(data))
+              return {}
+            },
+            async setCameraPosition(transform: any) {
+              out.push('   setCameraPosition: ' + JSON.stringify(transform))
+              return {}
             }
           }
         }

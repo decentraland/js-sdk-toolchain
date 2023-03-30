@@ -5,7 +5,6 @@
     "stripInternal": true,
     "outDir": "."
   },
-  "include": ["src"],
-  "exclude": ["dist"],
-  "extends": "./types/tsconfig.ecs7.strict.json"
+  "exclude": [],
+  "extends": "./types/tsconfig.ecs7.json"
 }
