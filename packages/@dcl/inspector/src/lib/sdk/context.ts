@@ -22,6 +22,7 @@ export type SdkContextValue = {
   events: Emitter<SdkContextEvents>
   dataLayer: DataLayerRpcClient
   dispose(): void
+  dataLayer: DataLayerRpcClient
 }
 
 export async function createSdkContext(canvas: HTMLCanvasElement, catalog: ITheme[]): Promise<SdkContextValue> {

@@ -5,6 +5,7 @@ import { useSdk } from '../../hooks/sdk/useSdk'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 import { ROOT } from '../../lib/sdk/tree'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
+import { Toolbar } from '../Toolbar'
 
 const Renderer: React.FC = () => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
@@ -41,7 +42,10 @@ const Renderer: React.FC = () => {
 
   return (
     <div id="main-editor">
-      <canvas ref={canvasRef} id="renderer" touch-action="none"></canvas>
+      <div>
+        <Toolbar />
+        <canvas ref={canvasRef} id="renderer" touch-action="none"></canvas>
+      </div>
     </div>
   )
 }
