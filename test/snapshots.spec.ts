@@ -7,22 +7,28 @@ import { CrdtMessageType, engine } from '../packages/@dcl/ecs/src'
 import { ReadWriteByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { CrdtMessage } from '../packages/@dcl/ecs/src/serialization/crdt'
 import { readMessage } from '../packages/@dcl/ecs/src/serialization/crdt/message'
+import { itExecutes } from '../scripts/helpers'
 import { withQuickJsVm } from './vm'
 
 const ENV: Record<string, string> = { ...process.env } as any
 const writeToFile = process.env.UPDATE_SNAPSHOTS
 
+const PRODUCTION_BUILD = true
+
 describe('Runs the snapshots', () => {
   it('runs npm install in the target folder', async () => {
     await runCommand('npm install --silent', 'test/snapshots', ENV)
   }, 15000)
-  glob.sync('test/snapshots/*.ts', { absolute: false }).forEach((file) => testFileSnapshot(file, 'test/snapshots'))
+
+  const producctionBuild = PRODUCTION_BUILD ? '--production' : ''
+
+  itExecutes(`npm run build -- ${producctionBuild} "--single=*.ts"`, path.resolve('test/snapshots'), ENV)
+
+  glob.sync('test/snapshots/*.ts', { absolute: false }).forEach((file) => testFileSnapshot(file))
 })
 
-function testFileSnapshot(fileName: string, workingDirectory: string) {
+function testFileSnapshot(fileName: string) {
   it(`tests the file ${fileName}`, async () => {
-    await compile(fileName, workingDirectory, true)
-
     const binFile = fileName.replace(/\.ts$/, '.js')
 
     const jsSizeBytesProd = (await stat(binFile)).size
@@ -207,16 +213,6 @@ async function run(fileName: string) {
 
     return out.join('\n')
   })
-}
-
-async function compile(filename: string, workingDirectory: string, production?: boolean) {
-  const cwd = path.resolve(workingDirectory)
-  const producctionBuild = production ? '--production' : ''
-  await runCommand(
-    `npm run build --silent -- ${producctionBuild} --single ${JSON.stringify(path.relative(cwd, filename))}`,
-    cwd,
-    ENV
-  )
 }
 
 export function runCommand(command: string, cwd: string, env?: Record<string, string>): Promise<string> {

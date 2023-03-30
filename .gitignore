@@ -26,3 +26,5 @@ test/snapshots/**/*.js
 tmp
 scene
 test/snapshots/bin
+
+test/snapshots/tsconfig.tsbuildinfo
