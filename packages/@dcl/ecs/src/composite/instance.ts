@@ -7,11 +7,16 @@ import { Schemas } from '../schemas'
 import { ReadWriteByteBuffer } from '../serialization/ByteBuffer'
 import { getCompositeRootComponent } from './components'
 import { ComponentData, CompositeComponent, CompositeDefinition } from './proto/gen/composite.gen'
+import * as path from './path'
 
 /**
  * @public
  */
-export type CompositeResource = { src: string; composite: CompositeDefinition }
+export type CompositeResource = {
+  // The source in a composite resource needs to be well-resolved with path.resolve(), so it's common
+  src: string
+  composite: CompositeDefinition
+}
 
 /**
  * @public
@@ -134,6 +139,8 @@ export function instanceComposite(
 ) {
   const { rootEntity, alreadyRequestedSrc: optionalAlreadyRequestedSrc, entityMapping } = options
   const alreadyRequestedSrc = optionalAlreadyRequestedSrc || new Set<string>()
+
+  const compositeDirectoryPath = path.dirname(path.resolve(compositeResource.src))
 
   const TransformComponentNumber = componentNumberFromName('core::Transform')
   const CompositeRootComponent = getCompositeRootComponent(engine)
