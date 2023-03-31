@@ -42,4 +42,4 @@ const Hierarchy: React.FC = () => {
   )
 }
 
-export default Hierarchy
+export default React.memo(Hierarchy)

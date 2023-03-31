@@ -1,0 +1,10 @@
+.Block {
+  display: flex;
+  flex-direction: column;
+}
+
+.Block>label {
+  margin: 8px 0px 4px 0px;
+  color: var(--text);
+  font-size: 14px;
+}
