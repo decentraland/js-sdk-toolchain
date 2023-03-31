@@ -5,6 +5,7 @@ tsdoc-metadata.json
 coverage
 **/.DS_Store
 packages/**/*.js
+!packages/@dcl/inspector/hot-reload.js
 !packages/@dcl/inspector/test/jest-transformer.js
 !packages/@dcl/inspector/test/jest.config.js
 packages/@dcl/sdk/package-lock.json

@@ -1,0 +1,15 @@
+.Container {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  background-color: var(--modal);
+  border-radius: 8px;
+  margin: 12px;
+}
+
+.Container>label {
+  margin: px 0px 4px 0px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+}

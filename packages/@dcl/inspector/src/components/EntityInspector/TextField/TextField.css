@@ -1,0 +1,47 @@
+.TextField {
+  padding: 4px 6px;
+  border: 1px solid var(--secondary-text);
+  display: flex;
+}
+
+.TextField+.TextField {
+  border-top: none;
+}
+
+.TextField:first-child {
+  border-radius: 8px 8px 0px 0px;
+}
+
+.TextField:last-child {
+  margin-bottom: 0px;
+  border-radius: 0px 0px 8px 8px;
+}
+
+.TextField>label {
+  color: var(--secondary-text);
+  flex: none;
+  padding-right: 8px;
+}
+
+.TextField>input {
+  flex: 1 1 auto;
+  color: var(--text);
+  background-color: transparent;
+  outline: none;
+  text-align: right;
+  border: none;
+}
+
+/* Chrome, Safari, Edge, Opera */
+.TextField>input::-webkit-outer-spin-button,
+.TextField>input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.TextField>input[type=number] {
+  -moz-appearance: textfield;
+  appearance: none;
+  ;
+}
