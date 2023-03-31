@@ -1,2 +1,2 @@
-import { Transform } from './Transform'
+import Transform from './Transform'
 export { Transform }

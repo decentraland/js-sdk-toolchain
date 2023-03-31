@@ -3,6 +3,8 @@ const esbuild = require('esbuild')
 const child_process = require('child_process')
 const { future } = require('fp-future')
 const { builtinModules } = require('module')
+const path = require('path')
+const fs = require('fs')
 
 const WATCH_MODE = process.argv.includes('--watch')
 const PRODUCTION = process.argv.includes('--production')
@@ -19,10 +21,23 @@ async function main() {
     platform: 'browser',
     outfile: 'public/bundle.js',
     sourcemap: 'linked',
-    minify: PRODUCTION
+    minify: PRODUCTION,
+    loader: {
+      '.png': 'dataurl',
+      '.svg': 'dataurl',
+      '.eot': 'dataurl',
+      '.woff': 'dataurl',
+      '.woff2': 'dataurl',
+      '.ttf': 'dataurl',
+    },
+    banner: {
+      // prepend hot-reload script to the bundle when in development mode
+      js: PRODUCTION ? '' : `;(() => {${fs.readFileSync(path.resolve(__dirname, './hot-reload.js'), 'utf-8')}})();`
+    }
   })
 
   if (WATCH_MODE) {
+    await context.watch()
     let { host, port } = await context.serve({
       servedir: 'public',
     })
@@ -96,7 +111,7 @@ function runTypeChecker() {
 
 function getNotBundledModules() {
   // || true is added because `npm ls` fails installing a package from S3
-  const child = child_process.execSync("npm ls --all --json || true", { })
+  const child = child_process.execSync("npm ls --all --json || true", {})
   const ret = JSON.parse(child.toString())
 
   const externalModules = new Set()

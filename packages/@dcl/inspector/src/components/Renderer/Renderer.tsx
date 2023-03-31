@@ -6,7 +6,7 @@ import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 import { ROOT } from '../../lib/sdk/tree'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 
-export function Renderer() {
+const Renderer: React.FC = () => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
   useRenderer(() => canvasRef)
   const sdk = useSdk()
@@ -45,3 +45,5 @@ export function Renderer() {
     </div>
   )
 }
+
+export default React.memo(Renderer)
