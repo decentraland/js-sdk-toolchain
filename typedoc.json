@@ -1,18 +1,16 @@
 {
   "entryPoints": [
-    "packages/@dcl/sdk",
+    "packages/@dcl/sdk/index.ts",
     "packages/@dcl/js-runtime/apis.d.ts"
   ],
   "tsconfig": "packages/@dcl/sdk/tsconfig.json",
   "includeVersion": true,
   "cleanOutputDir": true,
   "json": "api-docs/docs.json",
-  "name": "SDK Documentation",
+  "name": "Decentraland SDK Documentation",
   "categorizeByGroup": true,
   "defaultCategory" : " ",
-  "searchCategoryBoosts": {
-    "Component": 1,
-  },
+  "searchCategoryBoosts": {},
   "hideGenerator": true,
   "excludeExternals": false,
   "excludeInternal": true,
@@ -20,13 +18,7 @@
   "excludeNotDocumented": false,
   "entryPointStrategy": "expand",
   "out": "api-docs",
-  "exclude": [
-    "packages/@dcl/sdk/internal/**/*.ts",
-    "packages/@dcl/sdk/testing/**/*.ts",
-    "packages/@dcl/sdk/message-bus.ts",
-    "packages/@dcl/sdk/observables.ts",
-    "packages/@dcl/sdk/index.ts"
-  ],
+  "exclude": [],
   "treatWarningsAsErrors": true,
   "plugin": [],
   "kindSortOrder": [
