@@ -86,18 +86,20 @@ function convertCompositeComponentDataToBinary(composite: Composite) {
 // ## Helper-test
 // ########
 
-describe.only('convert non-binary.composite.json', () => {
-  const composite = getJsonCompositeFrom(nonBinaryCompositeJsonPath, COMPOSITE_BASE_PATH)
-  const binaryComposite = composite[0]
-  convertCompositeComponentDataToBinary(binaryComposite.composite)
+describe('convert non-binary.composite.json', () => {
+  it.skip('to binary', () => {
+    const composite = getJsonCompositeFrom(nonBinaryCompositeJsonPath, COMPOSITE_BASE_PATH)
+    const binaryComposite = composite[0]
+    convertCompositeComponentDataToBinary(binaryComposite.composite)
 
-  writeFileSync(
-    `${COMPOSITE_BASE_PATH}/data-binary.composite.json`,
-    JSON.stringify(Composite.toJson(binaryComposite.composite), null, 2)
-  )
+    writeFileSync(
+      `${COMPOSITE_BASE_PATH}/data-binary.composite.json`,
+      JSON.stringify(Composite.toJson(binaryComposite.composite), null, 2)
+    )
 
-  const buffer = Composite.toBinary(binaryComposite.composite)
-  writeFileSync(`${COMPOSITE_BASE_PATH}/full-binary.composite`, buffer)
+    const buffer = Composite.toBinary(binaryComposite.composite)
+    writeFileSync(`${COMPOSITE_BASE_PATH}/full-binary.composite`, buffer)
+  })
 })
 
 // ########
@@ -169,7 +171,7 @@ describe('composite instantiation system', () => {
   describe(`should work with a entity offset`, () => {
     it('with EMM_NEXT_AVAILABLE option', () => {
       const engine = Engine()
-      const composite = compositeProvider.getCompositeOrNull('2-level-deep')!
+      const composite = compositeProvider.getCompositeOrNull('2-level-deep.composite.json')!
 
       const entityOffset = 10000
 
@@ -192,7 +194,7 @@ describe('composite instantiation system', () => {
 
     it('with EMM_DIRECT_MAPPING option', () => {
       const engine = Engine()
-      const composite = compositeProvider.getCompositeOrNull('2-level-deep')!
+      const composite = compositeProvider.getCompositeOrNull('2-level-deep.composite.json')!
 
       const entityOffset = 20000
       Composite.instance(engine, composite, compositeProvider, {

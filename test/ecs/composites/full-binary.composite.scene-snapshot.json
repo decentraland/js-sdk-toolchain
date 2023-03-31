@@ -98,7 +98,7 @@
   },
   "composite::root": {
     "512": {
-      "src": "full-binary.composite.json",
+      "src": "full-binary.composite",
       "entities": [
         {
           "src": 0,

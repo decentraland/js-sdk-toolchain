@@ -98,7 +98,7 @@
   },
   "composite::root": {
     "512": {
-      "src": "non-binary-composite.composite.json",
+      "src": "non-binary.composite.json",
       "entities": [
         {
           "src": 0,
