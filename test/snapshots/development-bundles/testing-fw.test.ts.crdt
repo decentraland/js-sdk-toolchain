@@ -1,9 +1,9 @@
-SCENE_COMPILED_JS_SIZE_PROD=1,263.11k bytes
+SCENE_COMPILED_JS_SIZE_PROD=1,264.2k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
   ALIVE_OBJS_DELTA ~= 0.19k
-EVAL test/snapshots/two-way-crdt.test.js
+EVAL test/snapshots/development-bundles/testing-fw.test.js
   REQUIRE: buffer
   REQUIRE: long
   REQUIRE: ~system/Testing
@@ -18,7 +18,7 @@ CALL onStart()
   OPCODES ~= 3k
   MALLOC_COUNT = 50
   ALIVE_OBJS_DELTA ~= 0.02k
-CALL onUpdate(0.0)
+CALL onUpdate(0)
   testPlan: {"testName":["two way communication"]}
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=2 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
@@ -53,4 +53,8 @@ CALL onUpdate(0.1)
   OPCODES ~= 5k
   MALLOC_COUNT = 32
   ALIVE_OBJS_DELTA ~= 0.01k
-  MEMORY_USAGE_COUNT ~= 908.07k bytes
+  ERR! Error: There are no planned test
+    at assertTests (/workspaces/js-sdk-toolchain/test/snapshots.spec.ts:110:43)
+    at /workspaces/js-sdk-toolchain/test/snapshots.spec.ts:268:7
+    at withQuickJsVm (/workspaces/js-sdk-toolchain/test/vm.ts:106:14)
+    at Object.<anonymous> (/workspaces/js-sdk-toolchain/test/snapshots.spec.ts:40:48)

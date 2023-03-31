@@ -1,9 +1,9 @@
-SCENE_COMPILED_JS_SIZE_PROD=142.22k bytes
+SCENE_COMPILED_JS_SIZE_PROD=142.2k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
   ALIVE_OBJS_DELTA ~= 0.19k
-EVAL test/snapshots/composite.js
+EVAL test/snapshots/production-bundles/composite.js
   REQUIRE: buffer
   REQUIRE: long
   REQUIRE: ~system/Scene
@@ -16,7 +16,7 @@ CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 14
   ALIVE_OBJS_DELTA ~= 0.01k
-CALL onUpdate(0.0)
+CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   OPCODES ~= 3k
@@ -34,4 +34,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 647.19k bytes
+  MEMORY_USAGE_COUNT ~= 647.21k bytes

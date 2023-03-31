@@ -9,27 +9,33 @@ import { CrdtMessage } from '../packages/@dcl/ecs/src/serialization/crdt'
 import { readMessage } from '../packages/@dcl/ecs/src/serialization/crdt/message'
 import { itExecutes } from '../scripts/helpers'
 import { withQuickJsVm } from './vm'
+import type { TestPlan, TestResult } from '~system/Testing'
 
 const ENV: Record<string, string> = { ...process.env } as any
 const writeToFile = process.env.UPDATE_SNAPSHOTS
 
 describe('Runs the snapshots', () => {
-  it('runs npm install in the target folder', async () => {
-    await runCommand('npm install --silent', 'test/snapshots', ENV)
-  }, 15000)
+  itExecutes(`npm install --silent`, path.resolve('test/snapshots/production-bundles'), ENV)
+  itExecutes(`npm run build -- --production "--single=*.ts"`, path.resolve('test/snapshots/production-bundles'), ENV)
 
-  itExecutes(`npm run build -- --production "--single=*!(.test).ts"`, path.resolve('test/snapshots'), ENV)
-  itExecutes(`npm run build -- "--single=*.test.ts"`, path.resolve('test/snapshots'), ENV)
+  itExecutes(`npm install --silent`, path.resolve('test/snapshots/development-bundles'), ENV)
+  itExecutes(`npm run build -- "--single=*.ts"`, path.resolve('test/snapshots/development-bundles'), ENV)
 
-  glob.sync('test/snapshots/*.ts', { absolute: false }).forEach((file) => testFileSnapshot(file))
+  glob
+    .sync('test/snapshots/production-bundles/*.ts', { absolute: false })
+    .forEach((file) => testFileSnapshot(file, true))
+
+  glob
+    .sync('test/snapshots/development-bundles/*.ts', { absolute: false })
+    .forEach((file) => testFileSnapshot(file, false))
 })
 
-function testFileSnapshot(fileName: string) {
+function testFileSnapshot(fileName: string, _productionBuild: boolean) {
   it(`tests the file ${fileName}`, async () => {
     const binFile = fileName.replace(/\.ts$/, '.js')
 
     const jsSizeBytesProd = (await stat(binFile)).size
-    const jsProdSize = (jsSizeBytesProd / 1000).toLocaleString('en', { maximumFractionDigits: 2 })
+    const jsProdSize = (jsSizeBytesProd / 1000).toLocaleString('en', { maximumFractionDigits: 1 })
 
     const { result: resultFromRun, leaking } = await run(binFile)
 
@@ -91,6 +97,43 @@ async function run(fileName: string) {
       }
     }
 
+    // snapshots including .test.[tj]s are expected to present a plan, and execute it to completion
+    const shouldRunTests = fileName.includes('.test.')
+
+    const testResults: TestResult[] = []
+    const pendingTests = new Set<string>()
+
+    // this function asserts that there are no pending tests, no tests at all or failed tests
+    function assertTests() {
+      if (!shouldRunTests) return
+
+      if (testResults.length === 0) throw new Error('There are no planned test')
+
+      const failures = testResults.filter(($) => !$.ok)
+      const errors: string[] = []
+
+      if (failures.length) {
+        for (const failedTest of failures) {
+          errors.push(`! Test failed: ${failedTest.name}`)
+          errors.push(`  Error ${failedTest.error}`)
+          console.error(failedTest.error)
+          out.push(`  🔴 Test failed ${failedTest.name}`)
+          out.push(`     ${JSON.stringify(failedTest.error)}`)
+        }
+      }
+
+      if (pendingTests.size) {
+        for (const pendingTest of pendingTests) {
+          errors.push(`Test timed out: ${pendingTest}`)
+          out.push(`  🔴 Test timed out ${pendingTest}`)
+        }
+      }
+
+      if (errors.length) {
+        throw new Error(errors.join('\n'))
+      }
+    }
+
     vm.provide({
       log(...args) {
         out.push('  LOG: ' + JSON.stringify(args))
@@ -132,12 +175,14 @@ async function run(fileName: string) {
           }
         } else if (moduleName === '~system/Testing') {
           return {
-            async logTestResult(result: any) {
+            async logTestResult(result: TestResult) {
               out.push('  logTestResult: ' + JSON.stringify(result))
+              testResults.push(result)
               return {}
             },
-            async plan(data: any) {
+            async plan(data: TestPlan) {
               out.push('  testPlan: ' + JSON.stringify(data))
+              data.testName.forEach((testName) => pendingTests.add(testName))
               return {}
             },
             async setCameraPosition(transform: any) {
@@ -191,6 +236,12 @@ async function run(fileName: string) {
       out.push(`  MEMORY_USAGE_COUNT ~= ${hundredsNotation(memory.memory_used_size, 2)} bytes`)
     }
 
+    async function runUpdate(dt: number) {
+      out.push(`CALL onUpdate(${dt})`)
+      await vm.onUpdate(dt)
+      addStats()
+    }
+
     try {
       addStats()
       out.push('EVAL ' + fileName)
@@ -200,18 +251,22 @@ async function run(fileName: string) {
       await vm.onStart()
       addStats()
 
-      out.push('CALL onUpdate(0.0)')
-      await vm.onUpdate(0.0)
-      addStats()
-      out.push('CALL onUpdate(0.1)')
-      await vm.onUpdate(0.1)
-      addStats()
-      out.push('CALL onUpdate(0.1)')
-      await vm.onUpdate(0.1)
-      addStats()
-      out.push('CALL onUpdate(0.1)')
-      await vm.onUpdate(0.1)
-      addStats()
+      if (!pendingTests.size) {
+        // if there are no tests, then run 4 frames
+        await runUpdate(0.0)
+        await runUpdate(0.1)
+        await runUpdate(0.1)
+        await runUpdate(0.1)
+      } else {
+        // otherwise run until it finishes, with a total timeout of 5sec
+        const now = Date.now()
+        while (pendingTests.size && Date.now() - now < 5000) {
+          await runUpdate(0.1)
+        }
+      }
+
+      assertTests()
+
       addMemoryUsage()
     } catch (err: any) {
       if (err.stack?.includes('Host: QuickJSUnwrapError')) {

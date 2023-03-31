@@ -1,9 +1,9 @@
-SCENE_COMPILED_JS_SIZE_PROD=0.53k bytes
+SCENE_COMPILED_JS_SIZE_PROD=0.5k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
   ALIVE_OBJS_DELTA ~= 0.19k
-EVAL test/snapshots/simple.js
+EVAL test/snapshots/production-bundles/simple.js
   OPCODES ~= 0k
   MALLOC_COUNT = 84
   ALIVE_OBJS_DELTA ~= 0.02k
@@ -11,7 +11,7 @@ CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 4
   ALIVE_OBJS_DELTA ~= 0.00k
-CALL onUpdate(0.0)
+CALL onUpdate(0)
   OPCODES ~= 0k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
@@ -27,4 +27,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 0k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 55.96k bytes
+  MEMORY_USAGE_COUNT ~= 55.98k bytes

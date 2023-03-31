@@ -11,7 +11,7 @@ import {
 } from '@dcl/sdk/ecs'
 import { Vector3, Quaternion } from '@dcl/sdk/math'
 import { ReactEcsRenderer } from '@dcl/sdk/react-ecs'
-import { uiComponent } from 'helpers/ui'
+import { uiComponent } from '../helpers/ui'
 export * from '@dcl/sdk'
 
 ReactEcsRenderer.setUiRenderer(uiComponent)

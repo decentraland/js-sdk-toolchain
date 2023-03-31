@@ -1,9 +1,9 @@
-SCENE_COMPILED_JS_SIZE_PROD=144.97k bytes
+SCENE_COMPILED_JS_SIZE_PROD=145k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
   ALIVE_OBJS_DELTA ~= 0.19k
-EVAL test/snapshots/append-value-crdt.js
+EVAL test/snapshots/production-bundles/append-value-crdt.js
   REQUIRE: buffer
   REQUIRE: long
   REQUIRE: ~system/EngineApi
@@ -16,7 +16,7 @@ CALL onStart()
   OPCODES ~= 8k
   MALLOC_COUNT = 92
   ALIVE_OBJS_DELTA ~= 0.03k
-CALL onUpdate(0.0)
+CALL onUpdate(0)
   LOG: ["PointerEventsResult",[{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5}]]
   LOG: ["✅ First state is pressed"]
   LOG: ["✅ Was triggered"]
@@ -55,4 +55,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 12k
   MALLOC_COUNT = 31
   ALIVE_OBJS_DELTA ~= 0.01k
-  MEMORY_USAGE_COUNT ~= 678.00k bytes
+  MEMORY_USAGE_COUNT ~= 678.02k bytes
