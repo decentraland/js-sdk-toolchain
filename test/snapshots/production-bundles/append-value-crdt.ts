@@ -9,8 +9,8 @@ import {
   Transform
 } from '@dcl/sdk/ecs'
 import * as components from '@dcl/ecs/dist/components'
-import { withRenderer } from './helpers/with-renderer'
-import { assert } from './helpers/assertions'
+import { withRenderer } from '../helpers/with-renderer'
+import { assert } from '../helpers/assertions'
 export * from '@dcl/sdk'
 
 const entity = 512 as Entity

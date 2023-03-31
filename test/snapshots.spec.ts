@@ -9,18 +9,16 @@ import { CrdtMessage } from '../packages/@dcl/ecs/src/serialization/crdt'
 import { readMessage } from '../packages/@dcl/ecs/src/serialization/crdt/message'
 import { itExecutes } from '../scripts/helpers'
 import { withQuickJsVm } from './vm'
-import type { TestPlan, TestResult } from '~system/Testing'
 import { prepareTestingFramework } from './snapshots/jest-snapshots-helpers'
 
 const ENV: Record<string, string> = { ...process.env } as any
 const writeToFile = process.env.UPDATE_SNAPSHOTS
 
 describe('Runs the snapshots', () => {
-  itExecutes(`npm install --silent`, path.resolve('test/snapshots/production-bundles'), ENV)
-  itExecutes(`npm run build -- --production "--single=*.ts"`, path.resolve('test/snapshots/production-bundles'), ENV)
+  itExecutes(`npm install --silent`, path.resolve('test/snapshots'), ENV)
 
-  itExecutes(`npm install --silent`, path.resolve('test/snapshots/development-bundles'), ENV)
-  itExecutes(`npm run build -- "--single=*.ts"`, path.resolve('test/snapshots/development-bundles'), ENV)
+  itExecutes(`npm run build -- --production "--single=production-bundles/*.ts"`, path.resolve('test/snapshots'), ENV)
+  itExecutes(`npm run build -- "--single=development-bundles/*.ts"`, path.resolve('test/snapshots'), ENV)
 
   glob
     .sync('test/snapshots/production-bundles/*.ts', { absolute: false })

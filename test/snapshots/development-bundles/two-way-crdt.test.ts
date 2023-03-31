@@ -1,8 +1,8 @@
 import { engine, Transform } from '@dcl/sdk/ecs'
 import { test } from '@dcl/sdk/testing'
 import * as components from '@dcl/ecs/dist/components'
-import { withRenderer } from '../production-bundles/helpers/with-renderer'
-import { assert } from '../production-bundles/helpers/assertions'
+import { withRenderer } from '../helpers/with-renderer'
+import { assert } from '../helpers/assertions'
 export * from '@dcl/sdk'
 
 withRenderer((engine) => {
