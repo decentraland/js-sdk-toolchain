@@ -267,6 +267,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Deployment Notification
     steps:
+      - uses: actions/github-script@v6
+        id: get-cloudflare-url
+        env:
+          BRANCH: ${{ github.head_ref || github.ref }}
+        with:
+          script: return `${process.env.BRANCH.replaceAll('/', '-').substr(0, 28)}.${context.repo.repo}.pages.dev`
+          result-encoding: string
       - name: Find Comment
         uses: peter-evans/find-comment@v1
         id: fc
@@ -292,10 +299,11 @@ jobs:
                npx $SDK_COMMANDS init
                ```
 
-            - The `@dcl/inspector` package can be tested by running
-               ```bash
-               npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_inspector_s3_bucket_key }}"
-               ```
+            - The `@dcl/inspector` package can be tested by visiting [this url](https://${{steps.get-cloudflare-url.outputs.result}}/inspector)
+              - Or by installing it via NPM
+              ```bash
+              npm install "https://sdk-team-cdn.decentraland.org/@dcl/js-sdk-toolchain/branch/update/entity-inspector-styles/@dcl/inspector/dcl-inspector-7.1.4-4576030040.commit-7ed8231.tgz"
+              ```
 
             - The `/changerealm` command to test [test in-world](https://play.decentraland.zone/?realm=${{ secrets.SDK_TEAM_S3_BASE_URL }}/ipfs/${{ github.head_ref || github.ref }}-e2e)
                ```
