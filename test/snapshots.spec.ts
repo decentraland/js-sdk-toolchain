@@ -10,6 +10,7 @@ import { readMessage } from '../packages/@dcl/ecs/src/serialization/crdt/message
 import { itExecutes } from '../scripts/helpers'
 import { withQuickJsVm } from './vm'
 import type { TestPlan, TestResult } from '~system/Testing'
+import { prepareTestingFramework } from './snapshots/jest-snapshots-helpers'
 
 const ENV: Record<string, string> = { ...process.env } as any
 const writeToFile = process.env.UPDATE_SNAPSHOTS
@@ -100,39 +101,11 @@ async function run(fileName: string) {
     // snapshots including .test.[tj]s are expected to present a plan, and execute it to completion
     const shouldRunTests = fileName.includes('.test.')
 
-    const testResults: TestResult[] = []
-    const pendingTests = new Set<string>()
-
-    // this function asserts that there are no pending tests, no tests at all or failed tests
-    function assertTests() {
-      if (!shouldRunTests) return
-
-      if (testResults.length === 0) throw new Error('There are no planned test')
-
-      const failures = testResults.filter(($) => !$.ok)
-      const errors: string[] = []
-
-      if (failures.length) {
-        for (const failedTest of failures) {
-          errors.push(`! Test failed: ${failedTest.name}`)
-          errors.push(`  Error ${failedTest.error}`)
-          console.error(failedTest.error)
-          out.push(`  🔴 Test failed ${failedTest.name}`)
-          out.push(`     ${JSON.stringify(failedTest.error)}`)
-        }
+    const testingFramework = prepareTestingFramework({
+      log(message) {
+        out.push(message)
       }
-
-      if (pendingTests.size) {
-        for (const pendingTest of pendingTests) {
-          errors.push(`Test timed out: ${pendingTest}`)
-          out.push(`  🔴 Test timed out ${pendingTest}`)
-        }
-      }
-
-      if (errors.length) {
-        throw new Error(errors.join('\n'))
-      }
-    }
+    })
 
     vm.provide({
       log(...args) {
@@ -174,22 +147,7 @@ async function run(fileName: string) {
             }
           }
         } else if (moduleName === '~system/Testing') {
-          return {
-            async logTestResult(result: TestResult) {
-              out.push('  logTestResult: ' + JSON.stringify(result))
-              testResults.push(result)
-              return {}
-            },
-            async plan(data: TestPlan) {
-              out.push('  testPlan: ' + JSON.stringify(data))
-              data.testName.forEach((testName) => pendingTests.add(testName))
-              return {}
-            },
-            async setCameraPosition(transform: any) {
-              out.push('   setCameraPosition: ' + JSON.stringify(transform))
-              return {}
-            }
-          }
+          return testingFramework.module
         }
 
         throw new Error('Unknown module ' + moduleName)
@@ -251,21 +209,22 @@ async function run(fileName: string) {
       await vm.onStart()
       addStats()
 
-      if (!pendingTests.size) {
-        // if there are no tests, then run 4 frames
-        await runUpdate(0.0)
-        await runUpdate(0.1)
-        await runUpdate(0.1)
-        await runUpdate(0.1)
-      } else {
+      // by protocol, the first update always run with 0.0 delta time
+      await runUpdate(0.0)
+
+      if (shouldRunTests) {
         // otherwise run until it finishes, with a total timeout of 5sec
-        const now = Date.now()
-        while (pendingTests.size && Date.now() - now < 5000) {
+        const start = Date.now()
+        while (testingFramework.hasPendingTests() && Date.now() - start < 5000) {
           await runUpdate(0.1)
         }
+        testingFramework.assert()
+      } else {
+        // if there are no tests, then run 3 frames
+        await runUpdate(0.1)
+        await runUpdate(0.1)
+        await runUpdate(0.1)
       }
-
-      assertTests()
 
       addMemoryUsage()
     } catch (err: any) {
@@ -274,6 +233,7 @@ async function run(fileName: string) {
       } else {
         out.push(`  ERR! ` + err.stack)
       }
+      process.exitCode = 1
     }
 
     console.log(vm.dumpMemory())
