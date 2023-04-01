@@ -10,9 +10,16 @@ import { readMessage } from '../packages/@dcl/ecs/src/serialization/crdt/message
 import { itExecutes } from '../scripts/helpers'
 import { withQuickJsVm } from './vm'
 import { prepareTestingFramework } from './snapshots/jest-snapshots-helpers'
+import { readFile } from 'fs/promises'
 
 const ENV: Record<string, string> = { ...process.env } as any
 const writeToFile = process.env.UPDATE_SNAPSHOTS
+
+// snapshot file zies will fail if sourcemaps include different absolute paths
+function removeSourceMaps(source: string): string {
+  const [file] = source.split('//# sourceMappingURL=data:application/json;base64,')
+  return file
+}
 
 describe('Runs the snapshots', () => {
   itExecutes(`npm install --silent`, path.resolve('test/snapshots'), ENV)
@@ -33,13 +40,25 @@ function testFileSnapshot(fileName: string, _productionBuild: boolean) {
   it(`tests the file ${fileName}`, async () => {
     const binFile = fileName.replace(/\.ts$/, '.js')
 
-    const jsSizeBytesProd = (await stat(binFile)).size
+    const binContent = await readFile(binFile, 'utf8')
+    const binContentWitoutSourceMaps = removeSourceMaps(binContent)
+
+    const hasSourceMaps = binContent !== binContentWitoutSourceMaps
+
+    const jsSizeBytesProd = binContentWitoutSourceMaps.length
     const jsProdSize = (jsSizeBytesProd / 1000).toLocaleString('en', { maximumFractionDigits: 1 })
 
-    const { result: resultFromRun, leaking } = await run(binFile)
+    const { result: resultFromRun, leaking } = await run(binFile, binContentWitoutSourceMaps)
 
-    const result = `SCENE_COMPILED_JS_SIZE_PROD=${jsProdSize}k bytes\n` + resultFromRun
+    const results = [`SCENE_COMPILED_JS_SIZE_PROD=${jsProdSize}k bytes`]
 
+    if (hasSourceMaps) {
+      results.push(`THE BUNDLE HAS SOURCEMAPS`)
+    }
+
+    results.push(resultFromRun)
+
+    const result = results.join('\n')
     const compareToFileName = fileName + '.crdt'
     const compareFileExists = existsSync(compareToFileName)
     const compareTo = compareFileExists ? readFileSync(compareToFileName).toString().replace(/\r\n/g, '\n') : ''
@@ -81,7 +100,7 @@ function* serializeCrdtMessages(prefix: string, data: Uint8Array) {
   }
 }
 
-async function run(fileName: string) {
+async function run(fileName: string, fileContents: string) {
   return withQuickJsVm(async (vm) => {
     const out: string[] = [`(start empty vm ${vmVersion})`]
 
@@ -201,7 +220,7 @@ async function run(fileName: string) {
     try {
       addStats()
       out.push('EVAL ' + fileName)
-      vm.eval(readFileSync(fileName).toString(), fileName)
+      vm.eval(fileContents, fileName)
       addStats()
       out.push('CALL onStart()')
       await vm.onStart()
