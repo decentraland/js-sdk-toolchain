@@ -64,7 +64,9 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
   }, [componentValue])
 
   const getProps = useCallback(
-    (path: NestedKey<InputType>): InputHTMLAttributes<HTMLElement> => {
+    (
+      path: NestedKey<InputType>
+    ): Pick<InputHTMLAttributes<HTMLElement>, 'value' | 'onChange' | 'onFocus' | 'onBlur'> => {
       const value = getValue(input, path) || ''
       return {
         value: value.toString(),

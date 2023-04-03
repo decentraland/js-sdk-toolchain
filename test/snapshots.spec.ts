@@ -9,35 +9,56 @@ import { CrdtMessage } from '../packages/@dcl/ecs/src/serialization/crdt'
 import { readMessage } from '../packages/@dcl/ecs/src/serialization/crdt/message'
 import { itExecutes } from '../scripts/helpers'
 import { withQuickJsVm } from './vm'
+import { prepareTestingFramework } from './snapshots/jest-snapshots-helpers'
+import { readFile } from 'fs/promises'
 
 const ENV: Record<string, string> = { ...process.env } as any
 const writeToFile = process.env.UPDATE_SNAPSHOTS
 
-const PRODUCTION_BUILD = true
+// snapshot file zies will fail if sourcemaps include different absolute paths
+function removeSourceMaps(source: string): string {
+  const [file] = source.split('//# sourceMappingURL=data:application/json;base64,')
+  return file
+}
 
 describe('Runs the snapshots', () => {
-  it('runs npm install in the target folder', async () => {
-    await runCommand('npm install --silent', 'test/snapshots', ENV)
-  }, 15000)
+  itExecutes(`npm install --silent`, path.resolve('test/snapshots'), ENV)
 
-  const producctionBuild = PRODUCTION_BUILD ? '--production' : ''
+  itExecutes(`npm run build -- --production "--single=production-bundles/*.ts"`, path.resolve('test/snapshots'), ENV)
+  itExecutes(`npm run build -- "--single=development-bundles/*.ts"`, path.resolve('test/snapshots'), ENV)
 
-  itExecutes(`npm run build -- ${producctionBuild} "--single=*.ts"`, path.resolve('test/snapshots'), ENV)
+  glob
+    .sync('test/snapshots/production-bundles/*.ts', { absolute: false })
+    .forEach((file) => testFileSnapshot(file, true))
 
-  glob.sync('test/snapshots/*.ts', { absolute: false }).forEach((file) => testFileSnapshot(file))
+  glob
+    .sync('test/snapshots/development-bundles/*.ts', { absolute: false })
+    .forEach((file) => testFileSnapshot(file, false))
 })
 
-function testFileSnapshot(fileName: string) {
+function testFileSnapshot(fileName: string, _productionBuild: boolean) {
   it(`tests the file ${fileName}`, async () => {
     const binFile = fileName.replace(/\.ts$/, '.js')
 
-    const jsSizeBytesProd = (await stat(binFile)).size
-    const jsProdSize = (jsSizeBytesProd / 1000).toLocaleString('en', { maximumFractionDigits: 2 })
+    const binContent = await readFile(binFile, 'utf8')
+    const binContentWitoutSourceMaps = removeSourceMaps(binContent)
 
-    const { result: resultFromRun, leaking } = await run(binFile)
+    const hasSourceMaps = binContent !== binContentWitoutSourceMaps
 
-    const result = `SCENE_COMPILED_JS_SIZE_PROD=${jsProdSize}k bytes\n` + `This run is in PROD mode.\n` + resultFromRun
+    const jsSizeBytesProd = binContentWitoutSourceMaps.length
+    const jsProdSize = (jsSizeBytesProd / 1000).toLocaleString('en', { maximumFractionDigits: 1 })
 
+    const { result: resultFromRun, leaking } = await run(binFile, binContentWitoutSourceMaps)
+
+    const results = [`SCENE_COMPILED_JS_SIZE_PROD=${jsProdSize}k bytes`]
+
+    if (hasSourceMaps) {
+      results.push(`THE BUNDLE HAS SOURCEMAPS`)
+    }
+
+    results.push(resultFromRun)
+
+    const result = results.join('\n')
     const compareToFileName = fileName + '.crdt'
     const compareFileExists = existsSync(compareToFileName)
     const compareTo = compareFileExists ? readFileSync(compareToFileName).toString().replace(/\r\n/g, '\n') : ''
@@ -79,7 +100,7 @@ function* serializeCrdtMessages(prefix: string, data: Uint8Array) {
   }
 }
 
-async function run(fileName: string) {
+async function run(fileName: string, fileContents: string) {
   return withQuickJsVm(async (vm) => {
     const out: string[] = [`(start empty vm ${vmVersion})`]
 
@@ -93,6 +114,15 @@ async function run(fileName: string) {
         return []
       }
     }
+
+    // snapshots including .test.[tj]s are expected to present a plan, and execute it to completion
+    const shouldRunTests = fileName.includes('.test.')
+
+    const testingFramework = prepareTestingFramework({
+      log(message) {
+        out.push(message)
+      }
+    })
 
     vm.provide({
       log(...args) {
@@ -133,6 +163,8 @@ async function run(fileName: string) {
               }
             }
           }
+        } else if (moduleName === '~system/Testing') {
+          return testingFramework.module
         }
 
         throw new Error('Unknown module ' + moduleName)
@@ -179,27 +211,38 @@ async function run(fileName: string) {
       out.push(`  MEMORY_USAGE_COUNT ~= ${hundredsNotation(memory.memory_used_size, 2)} bytes`)
     }
 
+    async function runUpdate(dt: number) {
+      out.push(`CALL onUpdate(${dt})`)
+      await vm.onUpdate(dt)
+      addStats()
+    }
+
     try {
       addStats()
       out.push('EVAL ' + fileName)
-      vm.eval(readFileSync(fileName).toString(), fileName)
+      vm.eval(fileContents, fileName)
       addStats()
       out.push('CALL onStart()')
       await vm.onStart()
       addStats()
 
-      out.push('CALL onUpdate(0.0)')
-      await vm.onUpdate(0.0)
-      addStats()
-      out.push('CALL onUpdate(0.1)')
-      await vm.onUpdate(0.1)
-      addStats()
-      out.push('CALL onUpdate(0.1)')
-      await vm.onUpdate(0.1)
-      addStats()
-      out.push('CALL onUpdate(0.1)')
-      await vm.onUpdate(0.1)
-      addStats()
+      // by protocol, the first update always run with 0.0 delta time
+      await runUpdate(0.0)
+
+      if (shouldRunTests) {
+        // otherwise run until it finishes, with a total timeout of 5sec
+        const start = Date.now()
+        while (testingFramework.hasPendingTests() && Date.now() - start < 5000) {
+          await runUpdate(0.1)
+        }
+        testingFramework.assert()
+      } else {
+        // if there are no tests, then run 3 frames
+        await runUpdate(0.1)
+        await runUpdate(0.1)
+        await runUpdate(0.1)
+      }
+
       addMemoryUsage()
     } catch (err: any) {
       if (err.stack?.includes('Host: QuickJSUnwrapError')) {
@@ -207,6 +250,7 @@ async function run(fileName: string) {
       } else {
         out.push(`  ERR! ` + err.stack)
       }
+      process.exitCode = 1
     }
 
     console.log(vm.dumpMemory())

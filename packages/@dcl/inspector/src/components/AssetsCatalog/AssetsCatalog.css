@@ -2,7 +2,8 @@
 .assets-catalog {
   display: flex;
   overflow: scroll;
-  background-color: #17141B;
+  height: 100%;
+  background-color: #252526;
   padding: 1rem;
   flex-wrap: wrap;
   justify-content: center;

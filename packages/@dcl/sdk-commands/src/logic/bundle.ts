@@ -57,6 +57,9 @@ export async function bundleProject(components: BundleComponents, options: Compi
   }
 
   const input = globSync(options.single ?? 'src/index.ts')
+
+  if (!input.length) throw new CliError(`There are no input files to build: ${options.single ?? 'src/index.ts'}`)
+
   const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
   const outfile = join(options.workingDirectory, output)
 

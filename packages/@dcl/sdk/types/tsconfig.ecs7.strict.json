@@ -1,6 +1,4 @@
 {
-  "compilerOptions": {
-    
-  },
+  "compilerOptions": {},
   "extends": "./tsconfig.ecs7.json"
 }

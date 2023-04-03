@@ -38,10 +38,9 @@ export async function getInstalledPackageVersion(
 
 /**
  * Returns true if the Decentraland Editor is running.
- * TODO: EDITOR is a unix reserved env var. Change it for something more specific.
  */
 export function isEditor() {
-  return process.env.EDITOR === 'true'
+  return process.env.EDITOR_SDK7 === 'true'
 }
 
 export function isCI() {

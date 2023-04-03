@@ -1,22 +1,21 @@
-SCENE_COMPILED_JS_SIZE_PROD=142.47k bytes
-This run is in PROD mode.
+SCENE_COMPILED_JS_SIZE_PROD=142.5k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
   ALIVE_OBJS_DELTA ~= 0.19k
-EVAL test/snapshots/schema-components.js
+EVAL test/snapshots/production-bundles/schema-components.js
   REQUIRE: buffer
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 33k
-  MALLOC_COUNT = 7886
+  MALLOC_COUNT = 7891
   ALIVE_OBJS_DELTA ~= 1.66k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
   ALIVE_OBJS_DELTA ~= 0.00k
-CALL onUpdate(0.0)
+CALL onUpdate(0)
   OPCODES ~= 1k
   MALLOC_COUNT = 23
   ALIVE_OBJS_DELTA ~= 0.01k
@@ -32,4 +31,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 631.88k bytes
+  MEMORY_USAGE_COUNT ~= 636.21k bytes

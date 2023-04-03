@@ -294,6 +294,8 @@ export const enum ColliderLayer {
     CL_PHYSICS = 2,
     CL_POINTER = 1,
     // (undocumented)
+    CL_RESERVED1 = 4,
+    // (undocumented)
     CL_RESERVED2 = 8,
     // (undocumented)
     CL_RESERVED3 = 16,
@@ -302,8 +304,7 @@ export const enum ColliderLayer {
     // (undocumented)
     CL_RESERVED5 = 64,
     // (undocumented)
-    CL_RESERVED6 = 128,
-    CL_VISIBLE_MESHES = 4
+    CL_RESERVED6 = 128
 }
 
 // @public
@@ -527,6 +528,7 @@ export namespace Composite {
     export function instance(engine: IEngine, compositeData: Composite.Resource, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): void;
     // (undocumented)
     export type Provider = CompositeProvider;
+    export function resolveAndNormalizePath(src: string, cwd?: string): string;
     // (undocumented)
     export type Resource = CompositeResource;
     // (undocumented)
