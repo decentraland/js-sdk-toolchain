@@ -8,5 +8,3 @@ artifacts
 types/env/index.d.ts
 rpc-modules/
 composite
-**/*.d.ts
-**/*.js.map

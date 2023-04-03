@@ -9,8 +9,8 @@ packages/**/*.js
 !packages/@dcl/inspector/test/jest-transformer.js
 !packages/@dcl/inspector/test/jest.config.js
 packages/@dcl/sdk/package-lock.json
-packages/@dcl/sdk/*.js
-packages/@dcl/sdk/*.d.ts
+packages/@dcl/sdk/**/*.js
+packages/@dcl/sdk/**/*.d.ts
 api-docs
 packages/@dcl/sdk/internal
 packages/@dcl/sdk/testing
