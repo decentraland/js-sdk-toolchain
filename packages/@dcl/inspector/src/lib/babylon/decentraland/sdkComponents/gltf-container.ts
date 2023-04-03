@@ -125,7 +125,7 @@ function removeCurrentGltf(entity: EcsEntity) {
   if (entity.gltfContainer) {
     entity.gltfContainer.setEnabled(false)
     entity.gltfContainer.parent = null
-    entity.gltfContainer.dispose(true, true)
+    entity.gltfContainer.dispose(false, true)
     delete entity.gltfContainer
   }
 }
