@@ -133,5 +133,6 @@ export function dirname(path: string) {
 }
 
 export function resolveComposite(path: string, cwd: string) {
-  return path.startsWith('.') ? resolve(cwd, path) : resolve(path)
+  const absolutePath = path.startsWith('.') ? resolve(cwd, path) : resolve(path)
+  return absolutePath.substring(1)
 }
