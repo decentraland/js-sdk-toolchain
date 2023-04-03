@@ -8,8 +8,6 @@ import { SdkProvider } from './components/SdkProvider'
 import 'decentraland-ui/lib/styles.css'
 import 'decentraland-ui/lib/dark-theme.css'
 
-import './index.css'
-
 import { Buffer as MaybeBuffer } from 'buffer'
 globalThis.Buffer = MaybeBuffer
 

@@ -3,7 +3,6 @@
   display: flex;
   overflow: scroll;
   height: 100%;
-  background-color: #252526;
   padding: 1rem;
   flex-wrap: wrap;
   justify-content: center;
@@ -17,7 +16,7 @@
   align-items: center;
   padding: 0 16px;
   border-radius: 8px;
-  background: #36343D;
+  background: var(--list-item-bg-color);
   cursor: pointer;
   margin-bottom: 8px;
   -webkit-user-select: none;
@@ -31,7 +30,7 @@
 }
 
 .assets-catalog .theme:hover {
-  background: #504E58;
+  background: var(--list-item-hover-bg-color);
 }
 
 .assets-catalog .theme img {
@@ -44,7 +43,7 @@
 .assets-catalog h4, .assets-catalog h3 {
   margin-top: 0;
   margin-bottom: 0;
-  color: #EEEEEF;
+  color: var(--title);
   font-size: 17px;
   line-height: 26px;
   font-weight: 400;
@@ -75,7 +74,7 @@
 }
 
 .assets-catalog .categories span {
-  color: #FFFFFF;
+  color: var(--white);
   width: 18px;
   height: 14px;
   cursor: pointer;
@@ -102,7 +101,7 @@
 }
 
 .assets-catalog .category .assets > div:hover {
-  background: #504E58;
+  background: var(--list-item-hover-bg-color);
 }
 
 .assets-catalog .category .assets > div img {

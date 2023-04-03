@@ -26,12 +26,14 @@ code {
 .sidebar {
   max-width: 300px;
   min-width: 300px;
+  background: var(--main-bg-color);
 }
 
 .editor {
   display: flex;
   flex-direction: column;
   width: 100%;
+  background: var(--main-bg-color);
 }
 
 #main-editor {

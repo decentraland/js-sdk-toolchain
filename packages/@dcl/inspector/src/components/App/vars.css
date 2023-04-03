@@ -1,0 +1,19 @@
+:root {
+  --main-bg-color: var(--vscode-editor-background, var(--background));
+  --dropdown-bg-color: var(--vscode-dropdown-background, #D8D8D8);
+  --dropdown-border-color: var(--vscode-dropdown-border, #b9b9b9);
+  --dropdown-hover-bg-color: var(--vscode-list-hoverBackground, #e4e4e4);
+  --transparent-color: transparent;
+  --list-item-bg-color: var(--vscode-list-dropBackground, #36343D);
+  --list-item-hover-bg-color: var(--vscode-list-hoverBackground, #504E58);
+  --tree-bg-color: var(--vscode-panel-background, #252526);
+  --tree-border-color: var(--vscode-panel-border, #333333);
+  --input-bg-color: var(--vscode-input-background, #D8D8D8);
+  --input-border-color: var(--vscode-input-border, #cdcccc);
+  --button-color: var(--vscode-button-foreground, var(--black));
+  --title: #EEEEEF;
+
+  /* Color definitions */
+  --white: #FFFFFF;
+  --black: #000000;
+}
