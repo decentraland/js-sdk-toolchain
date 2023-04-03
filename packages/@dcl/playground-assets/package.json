@@ -4,6 +4,7 @@
   "version": "7.0.0",
   "author": "Decentraland",
   "dependencies": {
+    "@dcl/js-runtime": "file:../js-runtime",
     "@dcl/sdk": "file:../sdk"
   },
   "devDependencies": {

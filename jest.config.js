@@ -30,7 +30,8 @@ module.exports = {
     "packages/@dcl/ecs/src/components/generated/pb",
     "packages/@dcl/ecs/src/composite/proto/gen",
     "packages/@dcl/ecs/src/components/generated/index.gen.ts",
-    "packages/@dcl/sdk/src/internal"
+    "packages/@dcl/sdk/src/internal",
+    "packages/@dcl/sdk/src/testing"
   ],
   verbose: true,
   testMatch: ["**/*.spec.(ts|tsx)"],

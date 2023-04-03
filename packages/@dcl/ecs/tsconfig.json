@@ -17,6 +17,5 @@
     "types": ["@dcl/js-runtime"]
   },
   "include": ["src"],
-  "files": ["node_modules/protobufjs/minimal.d.ts"],
   "exclude": ["dist"]
 }
