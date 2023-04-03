@@ -74,6 +74,7 @@ function Tree<T>(props: Tree<T>) {
   const enableToggle = canToggle ? canToggle(value) : true
   const [editMode, setEditMode] = useState(false)
   const [insertMode, setInsertMode] = useState(false)
+  const [contextMenuPosition, setContextMenuPosition] = useState<Position | undefined>(undefined)
 
   const canDrop = useCallback(
     (target: T, source: T): boolean => {
