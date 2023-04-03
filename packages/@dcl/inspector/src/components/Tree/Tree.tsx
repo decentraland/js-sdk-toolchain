@@ -1,14 +1,25 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
-import { MdOutlineDriveFileRenameOutline } from 'react-icons/md'
-import { AiFillDelete, AiFillFileAdd } from 'react-icons/ai'
 
 import { Input } from '../Input'
+import { Controls, Position } from '../Controls'
+import { RxDoubleArrowRight as ArrowRight, RxDoubleArrowDown as ArrowDown } from 'react-icons/rx'
 
 import './Tree.css'
 
-export type Props<T> = {
+interface ContextMenu<T> {
   value: T
+  position: Position
+}
+
+interface ContextMenuProps<T> {
+  contextMenu?: ContextMenu<T>
+  onContextMenuChange: (value?: ContextMenu<T>) => void
+}
+
+type Props<T> = {
+  value: T
+  level?: number
   getId: (value: T) => string
   getChildren: (value: T) => T[]
   getLabel: (value: T) => string
@@ -25,12 +36,17 @@ export type Props<T> = {
   onToggle: (value: T, isOpen: boolean) => void
 }
 
-const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : 'block' })
-const getExpandStyles = (active: boolean) => ({ height: active ? 'auto' : '0', overflow: 'hidden', display: 'block' })
+type Tree<T> = Props<T> & ContextMenuProps<T>
 
-function Tree<T>(props: Props<T>) {
+const getDefaultLevel = () => 1
+const getLevelStyles = (level: number) => ({ paddingLeft: `${level * 10}px` })
+const getExpandStyles = (active: boolean) => ({ height: active ? 'auto' : '0', overflow: 'hidden', display: 'block' })
+const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : '' })
+
+function Tree<T>(props: Tree<T>) {
   const {
     value,
+    level = getDefaultLevel(),
     getId,
     getChildren,
     getLabel,
@@ -44,10 +60,11 @@ function Tree<T>(props: Props<T>) {
     onRename,
     onAddChild,
     onRemove,
-    onToggle
+    onToggle,
+    contextMenu,
+    onContextMenuChange
   } = props
   const id = getId(value)
-  const children = getChildren(value)
   const label = getLabel(value)
   const open = isOpen(value)
   const selected = isSelected(value)
@@ -115,42 +132,63 @@ function Tree<T>(props: Props<T>) {
     onRemove(value)
   }
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    onContextMenuChange({ value, position: { x: e.pageX, y: e.pageY } })
+  }
+
+  const handleContextMenuCancel = () => onContextMenuChange(undefined)
+
+  const ref = (node: HTMLDivElement | null) => drag(drop(node))
+
+  const controlsProps = {
+    active: contextMenu && getId(contextMenu.value) === id,
+    enableAdd: enableAddChild,
+    enableEdit: enableRename,
+    enableRemove,
+    onAdd: handleNewChild,
+    onCancel: handleContextMenuCancel,
+    onEdit: handleToggleEdit,
+    onRemove: handleRemove,
+    position: contextMenu?.position
+  }
+
   return (
-    <ul ref={(node) => drag(drop(node))}>
-      <li>
-        <div>
-          <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
-            {selected ? '[ST]' : ''}
-            {label || id}{' '}
-            {enableRename && (
-              <button onClick={handleToggleEdit}>
-                <MdOutlineDriveFileRenameOutline />
-              </button>
-            )}
-            {enableAddChild && (
-              <button onClick={handleNewChild}>
-                <AiFillFileAdd />
-              </button>
-            )}
-            {enableRemove && (
-              <button onClick={handleRemove}>
-                <AiFillDelete />
-              </button>
-            )}
-          </span>
-          {editMode && <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
-        </div>
-        {!!children.length && open && (
-          <div style={getExpandStyles(open)}>
-            {children.map(($) => (
-              <Tree {...props} value={$} key={getId($)} />
-            ))}
-          </div>
-        )}
-        {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} />}
-      </li>
-    </ul>
+    <div ref={ref} className="Tree" onContextMenu={handleContextMenu}>
+      <div style={getLevelStyles(level)} className={selected ? 'selected' : ''}>
+        <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
+          {open ? <ArrowDown /> : <ArrowRight />}
+          <span>{label || id}</span>
+        </span>
+        {editMode && <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
+        <Controls {...controlsProps} />
+      </div>
+      <TreeChildren {...props} />
+      {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} />}
+    </div>
   )
 }
 
-export default Tree
+function TreeChildren<T>(props: Tree<T>) {
+  const { value, level = getDefaultLevel(), getChildren, getId, isOpen } = props
+  const children = getChildren(value)
+  const open = isOpen(value)
+
+  if (!children.length || !open) return null
+
+  return (
+    <div style={getExpandStyles(open)}>
+      {children.map(($) => (
+        <Tree {...props} value={$} level={level + 1} key={getId($)} />
+      ))}
+    </div>
+  )
+}
+
+export default function Main<T>(props: Props<T>) {
+  const [activeContextMenu, setActiveContextMenu] = useState<ContextMenu<T> | undefined>(undefined)
+  const handleContextMenuChange = (value?: ContextMenu<T>) => setActiveContextMenu(value)
+
+  return <Tree {...props} contextMenu={activeContextMenu} onContextMenuChange={handleContextMenuChange} />
+}

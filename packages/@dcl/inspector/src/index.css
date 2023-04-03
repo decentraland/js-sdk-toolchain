@@ -23,12 +23,12 @@ code {
   width: 100%;
 }
 
-.left {
+.sidebar {
   max-width: 300px;
   min-width: 300px;
 }
 
-.right {
+.editor {
   display: flex;
   flex-direction: column;
   width: 100%;
