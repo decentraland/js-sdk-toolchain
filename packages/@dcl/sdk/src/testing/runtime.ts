@@ -4,13 +4,21 @@
 
 import { IEngine, Transform } from '@dcl/ecs'
 import { assertEquals } from './assert'
-import type { TestingModule, TestPlanEntry, RunnerEnvironment, TestFunction, TestHelpers } from './types'
+import type { TestingModule, TestFunction, TestHelpers } from './types'
 
 // This function creates a test runtime that can be used to define and run tests.
 // It takes a `TestingModule` instance (loaded from require('~system/Testing')) and an `IEngine` instance (from Decentraland's SDK).
 // It returns an object with a `test` function that can be used to define tests.
 /* @__PURE__ */
 export function createTestRuntime(testingModule: TestingModule, engine: IEngine) {
+  type TestPlanEntry = { name: string; fn: TestFunction }
+  type RunnerEnvironment = {
+    resolve: () => void
+    reject: (error: any) => void
+    helpers: TestHelpers
+    generator: Generator
+  }
+
   // this flag ensures no tests are added asynchronously
   let runtimeFrozen = false
 
