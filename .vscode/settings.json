@@ -15,7 +15,6 @@
     "test/snapshots/package-lock.json": true,
     "packages/@dcl/*/*.tgz": true,
     "**/*.js": { "when": "$(basename).ts" },
-    "**/*.d.ts": { "when": "$(basename).ts" },
     "packages/@dcl/inspector/build.js": false,
     "packages/@dcl/inspector/hot-reload.js": false
   },

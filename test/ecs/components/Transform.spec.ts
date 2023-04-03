@@ -1,5 +1,5 @@
 import { Engine, Entity, components } from '../../../packages/@dcl/ecs/src'
-import { Quaternion, Vector3 } from '../../../packages/@dcl/sdk/math'
+import { Quaternion, Vector3 } from '../../../packages/@dcl/sdk/src/math'
 import { TRANSFORM_LENGTH } from '../../../packages/@dcl/ecs/src/components/manual/Transform'
 import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { testComponentSerialization } from './assertion'

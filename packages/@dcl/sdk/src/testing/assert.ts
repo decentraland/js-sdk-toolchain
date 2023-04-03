@@ -1,6 +1,6 @@
 // VERBATIM COPY OF https://github.com/LemonPi/deep-close-to
 
-import { Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
+import type { Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
 
 const pSlice = Array.prototype.slice
 

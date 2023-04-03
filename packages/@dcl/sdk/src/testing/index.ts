@@ -23,15 +23,15 @@ function createTestFunction() {
 
     testingModule = {
       async logTestResult(data) {
-        console.log(`mocked '~system/Testing'.logResult`, data)
+        console.log(`🧪 mocked '~system/Testing'.logResult`, data)
         return {}
       },
       async plan(data) {
-        console.log(`mocked '~system/Testing'.plan`, data)
+        console.log(`🧪 mocked '~system/Testing'.plan`, data)
         return {}
       },
       async setCameraTransform(transform) {
-        console.log(`mocked '~system/Testing'.setCameraPosition`, transform)
+        console.log(`🧪 mocked '~system/Testing'.setCameraTransform`, transform)
         return {}
       }
     }

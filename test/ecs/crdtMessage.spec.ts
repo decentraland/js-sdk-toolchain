@@ -1,7 +1,7 @@
 import * as components from '../../packages/@dcl/ecs/src/components'
 import { TRANSFORM_LENGTH } from '../../packages/@dcl/ecs/src/components/manual/Transform'
 import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
-import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/math'
+import { Quaternion, Vector3 } from '../../packages/@dcl/sdk/src/math'
 
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import {

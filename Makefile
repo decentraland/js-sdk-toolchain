@@ -135,7 +135,7 @@ update-snapshots: test
 clean:
 	@echo "> Cleaning all folders"
 	@rm -rf coverage/
-	@rm -rf packages/@dcl/sdk/*.js packages/@dcl/sdk/*.d.ts
+	@rm -rf packages/@dcl/sdk/*.js packages/@dcl/sdk/*.d.ts packages/@dcl/sdk/internal packages/@dcl/sdk/testing
 	@rm -rf packages/@dcl/inspector/public/*.js packages/@dcl/inspector/public/*.d.ts packages/@dcl/inspector/public/*.map packages/@dcl/inspector/public/*.css
 	@rm -rf packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/
 	@rm -rf packages/@dcl/sdk-commands/dist

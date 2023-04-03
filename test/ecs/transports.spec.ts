@@ -1,6 +1,6 @@
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { Engine, components } from '../../packages/@dcl/ecs/src'
-import { createRendererTransport } from '../../packages/@dcl/sdk/internal/transports/rendererTransport'
+import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
 
 declare const process: any
 

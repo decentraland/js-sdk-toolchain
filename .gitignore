@@ -12,6 +12,8 @@ packages/@dcl/sdk/package-lock.json
 packages/@dcl/sdk/*.js
 packages/@dcl/sdk/*.d.ts
 api-docs
+packages/@dcl/sdk/internal
+packages/@dcl/sdk/testing
 test/ecs/snippets/**/*.js
 **/*.tgz
 test/sdk/simple-scene
@@ -21,7 +23,7 @@ test/sdk/simple-scene
 
 test/build-ecs/fixtures/*/package-lock.json
 packages/@dcl/playground-assets/etc/playground-assets.api.json
-test/snapshots/*/package-lock.json
+test/snapshots/package-lock.json
 test/snapshots/**/*.js
 test/snapshots/**/*.js.map
 tmp

@@ -1,5 +1,5 @@
 import { engine, Transform } from '@dcl/sdk/ecs'
-import { test } from '@dcl/sdk/testing'
+import { test } from '@dcl/sdk/src/testing'
 import * as components from '@dcl/ecs/dist/components'
 import { withRenderer } from '../helpers/with-renderer'
 import { assert } from '../helpers/assertions'
