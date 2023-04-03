@@ -12,7 +12,7 @@ export async function initRpcMethods(
 ): Promise<DataLayerRpcServer> {
   // Look for a composite
   const compositeProvider = await createFsCompositeProvider(fs)
-  const mainComposite = compositeProvider.getCompositeOrNull('main')
+  const mainComposite = compositeProvider.getCompositeOrNull('main.composite.json')
 
   if (mainComposite) {
     Composite.instance(engine, mainComposite, compositeProvider, {
