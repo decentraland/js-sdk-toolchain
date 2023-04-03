@@ -8,9 +8,13 @@ import { Renderer } from '../Renderer'
 
 const App = () => {
   const [catalog] = useCatalog()
+
   return (
     <>
-      <div className="sidebar">
+      <div
+        className="sidebar"
+        data-vscode-context='{"webviewSection": "sidebar", "preventDefaultContextMenuItems": true}'
+      >
         <Hierarchy />
         <EntityInspector />
       </div>

@@ -1,19 +1,4 @@
 .Controls {
-  padding: 3px;
-  border-radius: 1px;
-}
-
-.Controls:hover,
-.Controls.active {
-  background-color: #424141;
-}
-
-.Controls .bullets {
-  display: flex;
-  align-items: center;
-}
-
-.Controls .actions {
   position: fixed;
   display: flex;
   flex-direction: column;
@@ -25,7 +10,7 @@
   border-radius: 2px;
 }
 
-.Controls .actions button {
+.Controls button {
   border: none;
   display: flex;
   padding: 8px;
@@ -33,10 +18,10 @@
   background-color: transparent;
 }
 
-.Controls .actions button:hover {
+.Controls button:hover {
   background-color: #e4e4e4;
 }
 
-.Controls .actions button svg {
+.Controls button svg {
   margin-right: 6px;
 }

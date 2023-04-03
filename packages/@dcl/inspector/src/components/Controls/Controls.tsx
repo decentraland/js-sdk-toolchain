@@ -1,17 +1,24 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { MouseEventHandler, useCallback, useEffect } from 'react'
 import { MdOutlineDriveFileRenameOutline } from 'react-icons/md'
 import { AiFillFileAdd, AiFillDelete } from 'react-icons/ai'
-import { RxListBullet } from 'react-icons/rx'
 
 import './Controls.css'
 
+export interface Position {
+  x: number
+  y: number
+}
+
 interface ControlsProps {
+  active?: boolean
+  position?: Position
   enableAdd?: boolean
   enableEdit?: boolean
   enableRemove?: boolean
-  handleEdit: (e: React.MouseEvent) => void
-  handleAdd: (e: React.MouseEvent) => void
-  handleRemove: (e: React.MouseEvent) => void
+  onCancel: () => void
+  onEdit: (e: React.MouseEvent) => void
+  onAdd: (e: React.MouseEvent) => void
+  onRemove: (e: React.MouseEvent) => void
 }
 
 const cancelingKeys = new Set(['Escape', 'Tab'])
@@ -19,77 +26,66 @@ const cancelingKeys = new Set(['Escape', 'Tab'])
 const getActiveClass = (active: boolean) => (active ? 'active' : '')
 
 const Controls = ({
+  active = false,
+  position = { x: 0, y: 0 },
   enableAdd = true,
   enableEdit = true,
   enableRemove = true,
-  handleEdit,
-  handleAdd,
-  handleRemove
+  onCancel,
+  onEdit,
+  onAdd,
+  onRemove
 }: ControlsProps) => {
-  const [active, setActive] = useState(false)
-
-  const onCancel = useCallback((e: Event) => {
+  const handleCancel = useCallback((e: Event | React.MouseEvent) => {
     e.stopPropagation()
-    setActive(false)
+    onCancel()
   }, [])
 
-  const onKeyUp = useCallback((e: KeyboardEvent) => {
-    if (cancelingKeys.has(e.key)) onCancel(e)
+  const handleKeyUp = useCallback((e: KeyboardEvent) => {
+    if (cancelingKeys.has(e.key)) handleCancel(e)
   }, [])
 
   useEffect(() => {
     if (active) {
-      document.body.addEventListener('click', onCancel)
-      document.body.addEventListener('keyup', onKeyUp)
+      document.body.addEventListener('click', handleCancel)
+      document.body.addEventListener('keyup', handleKeyUp)
     }
 
     return () => {
-      document.body.removeEventListener('click', onCancel)
-      document.body.removeEventListener('keyup', onKeyUp)
+      document.body.removeEventListener('click', handleCancel)
+      document.body.removeEventListener('keyup', handleKeyUp)
     }
   }, [active])
 
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
-    setActive(!active)
-  }, [])
-
   const handleAction = useCallback(
     (cb: (e: React.MouseEvent) => void) => (e: React.MouseEvent) => {
-      setActive(false)
       cb(e)
+      handleCancel(e)
     },
     []
   )
 
   const someActionIsEnabled = enableAdd || enableEdit || enableRemove
-  const shouldRenderActions = someActionIsEnabled && active
+  const shouldRender = someActionIsEnabled && active
+
+  if (!shouldRender) return null
 
   return (
-    <div className={`Controls ${getActiveClass(active)}`}>
-      {someActionIsEnabled && (
-        <div onClick={handleClick} className="bullets">
-          <RxListBullet />
-        </div>
+    <div className={`Controls ${getActiveClass(active)}`} style={{ top: position.y, left: position.x }}>
+      {enableEdit && (
+        <button onClick={handleAction(onEdit)}>
+          <MdOutlineDriveFileRenameOutline /> Rename
+        </button>
       )}
-      {shouldRenderActions && (
-        <div className="actions">
-          {enableEdit && (
-            <button onClick={handleAction(handleEdit)}>
-              <MdOutlineDriveFileRenameOutline /> Rename
-            </button>
-          )}
-          {enableAdd && (
-            <button onClick={handleAction(handleAdd)}>
-              <AiFillFileAdd /> Add child
-            </button>
-          )}
-          {enableRemove && (
-            <button onClick={handleAction(handleRemove)}>
-              <AiFillDelete /> Delete
-            </button>
-          )}
-        </div>
+      {enableAdd && (
+        <button onClick={handleAction(onAdd)}>
+          <AiFillFileAdd /> Add child
+        </button>
+      )}
+      {enableRemove && (
+        <button onClick={handleAction(onRemove)}>
+          <AiFillDelete /> Delete
+        </button>
       )}
     </div>
   )

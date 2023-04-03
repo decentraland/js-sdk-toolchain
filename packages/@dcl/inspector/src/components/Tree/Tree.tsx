@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
 import { Input } from '../Input'
@@ -6,6 +6,7 @@ import { Controls } from '../Controls'
 import { RxDoubleArrowRight as ArrowRight, RxDoubleArrowDown as ArrowDown } from 'react-icons/rx'
 
 import './Tree.css'
+import { Position } from '../Controls/Controls'
 
 export type Props<T> = {
   value: T
@@ -60,6 +61,7 @@ function Tree<T>(props: Props<T>) {
   const enableToggle = canToggle ? canToggle(value) : true
   const [editMode, setEditMode] = useState(false)
   const [insertMode, setInsertMode] = useState(false)
+  const [contextMenuPosition, setContextMenuPosition] = useState<Position | undefined>(undefined)
 
   const canDrop = useCallback(
     (target: T, source: T): boolean => {
@@ -118,19 +120,30 @@ function Tree<T>(props: Props<T>) {
     onRemove(value)
   }
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setContextMenuPosition({ x: e.pageX, y: e.pageY })
+  }
+
+  const handleContextMenuCancel = () => setContextMenuPosition(undefined)
+
   const ref = (node: HTMLDivElement | null) => drag(drop(node))
 
   const controlsProps = {
+    active: !!contextMenuPosition,
     enableAdd: enableAddChild,
     enableEdit: enableRename,
     enableRemove,
-    handleEdit: handleToggleEdit,
-    handleAdd: handleNewChild,
-    handleRemove: handleRemove
+    onAdd: handleNewChild,
+    onCancel: handleContextMenuCancel,
+    onEdit: handleToggleEdit,
+    onRemove: handleRemove,
+    position: contextMenuPosition
   }
 
   return (
-    <div ref={ref} className="Tree">
+    <div ref={ref} className="Tree" onContextMenu={handleContextMenu}>
       <div style={getLevelStyles(level)} className={selected ? 'selected' : ''}>
         <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
           {open ? <ArrowDown /> : <ArrowRight />}
