@@ -22,7 +22,7 @@ export type CompositeResource = {
  * @public
  */
 export type CompositeProvider = {
-  getCompositeOrNull(src: string, currentPath?: string): CompositeResource | null
+  getCompositeOrNull(src: string): CompositeResource | null
 }
 
 /** @public */
@@ -166,10 +166,11 @@ export function instanceComposite(
     (item) => item.name === CompositeRootComponent.componentName
   )
   if (childrenComposite) {
-    for (const [compositeEntity, childComposite] of childrenComposite.data) {
-      const compositeRoot = getComponentValue(CompositeRootComponent, childComposite)
-      const childCompositeResource = compositeProvider.getCompositeOrNull(compositeRoot.src, compositeResource.src)
-      const targetEntity = getCompositeEntity(compositeEntity)
+    for (const [childCompositeEntity, compositeRawData] of childrenComposite.data) {
+      const childComposite = getComponentValue(CompositeRootComponent, compositeRawData)
+      const childCompositePath = path.resolveComposite(childComposite.src, compositeDirectoryPath)
+      const childCompositeResource = compositeProvider.getCompositeOrNull(childCompositePath)
+      const targetEntity = getCompositeEntity(childCompositeEntity)
       if (childCompositeResource) {
         if (
           alreadyRequestedSrc.has(childCompositeResource.src) ||

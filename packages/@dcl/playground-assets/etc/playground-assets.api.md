@@ -563,7 +563,7 @@ export interface CompositeDefinition {
 
 // @public (undocumented)
 export type CompositeProvider = {
-    getCompositeOrNull(src: string, currentPath?: string): CompositeResource | null;
+    getCompositeOrNull(src: string): CompositeResource | null;
 };
 
 // @public (undocumented)

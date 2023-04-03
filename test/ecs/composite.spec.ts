@@ -13,7 +13,7 @@ import { getCompositeRootComponent } from './../../packages/@dcl/ecs/src/composi
 import { getComponentDefinition, getComponentValue } from './../../packages/@dcl/ecs/src/composite/instance'
 import { ReadWriteByteBuffer } from './../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
-const writeToFile = false // process.env.UPDATE_SNAPSHOTS
+const writeToFile = process.env.UPDATE_SNAPSHOTS
 const COMPOSITE_BASE_PATH = 'test/ecs/composites'
 const nonBinaryCompositeJsonPath = 'non-binary.composite.json'
 
@@ -108,13 +108,14 @@ describe('convert non-binary.composite.json', () => {
 
 describe('composite instantiation system', () => {
   const validComposites = [
+    ...getJsonCompositeFrom('relative/**/*.composite.json', COMPOSITE_BASE_PATH),
     ...getJsonCompositeFrom('*.composite.json', COMPOSITE_BASE_PATH),
     ...getBinaryCompositeFrom('*.composite', COMPOSITE_BASE_PATH)
   ]
   const invalidComposites = getJsonCompositeFrom('/invalid/*.composite.json', COMPOSITE_BASE_PATH)
   const composites = [...validComposites, ...invalidComposites]
   const compositeProvider: Composite.Provider = {
-    getCompositeOrNull(src: string, currentPath?: string) {
+    getCompositeOrNull(src: string) {
       return composites.find((item) => item.src === src) || null
     }
   }

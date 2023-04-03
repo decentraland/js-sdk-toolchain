@@ -1,3 +1,5 @@
+const currentWorkingDir = '/'
+
 // Resolves . and .. elements in a path with directory names
 function normalizeStringPosix(path: string, allowAboveRoot: boolean = false) {
   let res = ''
@@ -62,19 +64,69 @@ function normalizeStringPosix(path: string, allowAboveRoot: boolean = false) {
   return res
 }
 
-function resolve(...args: string[]) {
+export function resolve(...args: string[]) {
   let resolvedPath = ''
-  for (let i = args.length - 1; i >= 0; i--) {
+  let resolvedAbsolute = false
+  let cwd
+
+  for (let i = args.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+    let path
+    if (i >= 0) path = args[i]
+    else {
+      if (cwd === undefined) cwd = currentWorkingDir
+      path = cwd
+    }
     // Skip empty entries
-    if (args[i].length === 0) {
+    if (path.length === 0) {
       continue
     }
-    resolvedPath = args[i] + '/' + resolvedPath
+
+    resolvedPath = path + '/' + resolvedPath
+    resolvedAbsolute = path.charCodeAt(0) === 47 /*/*/
   }
 
-  // Normalize the path
-  resolvedPath = normalizeStringPosix(resolvedPath, false)
+  // At this point the path should be resolved to a full absolute path, but
+  // handle relative paths to be safe (might happen when process.cwd() fails)
 
-  if (resolvedPath.length > 0) return '/' + resolvedPath
-  else return '/'
+  // Normalize the path
+  resolvedPath = normalizeStringPosix(resolvedPath, !resolvedAbsolute)
+
+  if (resolvedAbsolute) {
+    if (resolvedPath.length > 0) return '/' + resolvedPath
+    else return '/'
+  } else if (resolvedPath.length > 0) {
+    return resolvedPath
+  } else {
+    return '.'
+  }
+}
+
+export function dirname(path: string) {
+  if (path.length === 0) return '.'
+  let code = path.charCodeAt(0)
+  const hasRoot = code === 47 /*/*/
+  let end = -1
+  let matchedSlash = true
+  for (let i = path.length - 1; i >= 1; --i) {
+    code = path.charCodeAt(i)
+    if (code === 47 /*/*/) {
+      if (!matchedSlash) {
+        end = i
+        break
+      }
+    } else {
+      // We saw the first non-path separator
+      matchedSlash = false
+    }
+  }
+
+  if (end === -1) return hasRoot ? '/' : '.'
+  if (hasRoot && end === 1) return '//'
+  return path.slice(0, end)
+}
+
+export function resolveComposite(path: string, cwd: string) {
+  const absolutePath = path.startsWith('.') ? resolve(cwd, path) : resolve(path)
+  const isAbsolute = absolutePath.length && absolutePath.charCodeAt(0) === 47
+  return isAbsolute ? absolutePath.substring(1) : absolutePath
 }

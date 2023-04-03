@@ -1,0 +1,20 @@
+{
+    "version": 1,
+    "components": [
+        {
+            "name": "core::Transform",
+            "data": {
+                "518": {
+                    "$case": "json",
+                    "json": {
+                        "position": {
+                            "x": 5,
+                            "y": 5,
+                            "z": 5
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
