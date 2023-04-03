@@ -2,13 +2,22 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
 import { Input } from '../Input'
-import { Controls } from '../Controls'
+import { Controls, Position } from '../Controls'
 import { RxDoubleArrowRight as ArrowRight, RxDoubleArrowDown as ArrowDown } from 'react-icons/rx'
 
 import './Tree.css'
-import { Position } from '../Controls/Controls'
 
-export type Props<T> = {
+interface ContextMenu<T> {
+  value: T
+  position: Position
+}
+
+interface ContextMenuProps<T> {
+  contextMenu?: ContextMenu<T>
+  onContextMenuChange: (value?: ContextMenu<T>) => void
+}
+
+type Props<T> = {
   value: T
   level?: number
   getId: (value: T) => string
@@ -27,12 +36,14 @@ export type Props<T> = {
   onToggle: (value: T, isOpen: boolean) => void
 }
 
+type Tree<T> = Props<T> & ContextMenuProps<T>
+
 const getDefaultLevel = () => 1
 const getLevelStyles = (level: number) => ({ paddingLeft: `${level * 10}px` })
 const getExpandStyles = (active: boolean) => ({ height: active ? 'auto' : '0', overflow: 'hidden', display: 'block' })
 const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : '' })
 
-function Tree<T>(props: Props<T>) {
+function Tree<T>(props: Tree<T>) {
   const {
     value,
     level = getDefaultLevel(),
@@ -49,7 +60,9 @@ function Tree<T>(props: Props<T>) {
     onRename,
     onAddChild,
     onRemove,
-    onToggle
+    onToggle,
+    contextMenu,
+    onContextMenuChange
   } = props
   const id = getId(value)
   const label = getLabel(value)
@@ -61,7 +74,6 @@ function Tree<T>(props: Props<T>) {
   const enableToggle = canToggle ? canToggle(value) : true
   const [editMode, setEditMode] = useState(false)
   const [insertMode, setInsertMode] = useState(false)
-  const [contextMenuPosition, setContextMenuPosition] = useState<Position | undefined>(undefined)
 
   const canDrop = useCallback(
     (target: T, source: T): boolean => {
@@ -123,15 +135,15 @@ function Tree<T>(props: Props<T>) {
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    setContextMenuPosition({ x: e.pageX, y: e.pageY })
+    onContextMenuChange({ value, position: { x: e.pageX, y: e.pageY } })
   }
 
-  const handleContextMenuCancel = () => setContextMenuPosition(undefined)
+  const handleContextMenuCancel = () => onContextMenuChange(undefined)
 
   const ref = (node: HTMLDivElement | null) => drag(drop(node))
 
   const controlsProps = {
-    active: !!contextMenuPosition,
+    active: contextMenu && getId(contextMenu.value) === id,
     enableAdd: enableAddChild,
     enableEdit: enableRename,
     enableRemove,
@@ -139,7 +151,7 @@ function Tree<T>(props: Props<T>) {
     onCancel: handleContextMenuCancel,
     onEdit: handleToggleEdit,
     onRemove: handleRemove,
-    position: contextMenuPosition
+    position: contextMenu?.position
   }
 
   return (
@@ -158,7 +170,7 @@ function Tree<T>(props: Props<T>) {
   )
 }
 
-function TreeChildren<T>(props: Props<T>) {
+function TreeChildren<T>(props: Tree<T>) {
   const { value, level = getDefaultLevel(), getChildren, getId, isOpen } = props
   const children = getChildren(value)
   const open = isOpen(value)
@@ -174,4 +186,9 @@ function TreeChildren<T>(props: Props<T>) {
   )
 }
 
-export default Tree
+export default function Main<T>(props: Props<T>) {
+  const [activeContextMenu, setActiveContextMenu] = useState<ContextMenu<T> | undefined>(undefined)
+  const handleContextMenuChange = (value?: ContextMenu<T>) => setActiveContextMenu(value)
+
+  return <Tree {...props} contextMenu={activeContextMenu} onContextMenuChange={handleContextMenuChange} />
+}
