@@ -30,7 +30,7 @@ function createTestFunction() {
         console.log(`mocked '~system/Testing'.plan`, data)
         return {}
       },
-      async setCameraPosition(transform) {
+      async setCameraTransform(transform) {
         console.log(`mocked '~system/Testing'.setCameraPosition`, transform)
         return {}
       }

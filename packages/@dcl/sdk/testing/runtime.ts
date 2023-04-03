@@ -14,6 +14,9 @@ export function createTestRuntime(testingModule: TestingModule, engine: IEngine)
   // this flag ensures no tests are added asynchronously
   let runtimeFrozen = false
 
+  let currentFrameCounter = 0
+  let currentFrameTime = 0
+
   // array to hold the scheduled tests
   const scheduledTests: TestPlanEntry[] = []
 
@@ -29,6 +32,8 @@ export function createTestRuntime(testingModule: TestingModule, engine: IEngine)
 
   // add a system to the engine that resolves all promises in the `nextTickFuture` array
   engine.addSystem(function TestingFrameworkCoroutineRunner(dt) {
+    currentFrameCounter++
+    currentFrameTime += dt
     // resolve all nextTick futures.
     nextTickFuture.splice(0, nextTickFuture.length).forEach((_) => _(dt))
   })
@@ -87,6 +92,8 @@ export function createTestRuntime(testingModule: TestingModule, engine: IEngine)
   function runTests() {
     if (scheduledTests.length) {
       const entry = scheduledTests.shift()!
+      const initialFrame = currentFrameCounter
+      const startTime = currentFrameTime
 
       let resolved = false
 
@@ -100,7 +107,9 @@ export function createTestRuntime(testingModule: TestingModule, engine: IEngine)
         testingModule
           .logTestResult({
             name: entry.name,
-            ok: true
+            ok: true,
+            totalFrames: currentFrameCounter - initialFrame,
+            totalTime: currentFrameTime - startTime
           })
           .finally(scheduleNextRun)
       }
@@ -117,7 +126,9 @@ export function createTestRuntime(testingModule: TestingModule, engine: IEngine)
             name: entry.name,
             ok: false,
             error: err.toString(),
-            stack: err && typeof err === 'object' && err.stack
+            stack: err && typeof err === 'object' && err.stack,
+            totalFrames: currentFrameCounter - initialFrame,
+            totalTime: currentFrameTime - startTime
           })
           .finally(scheduleNextRun)
       }
@@ -127,7 +138,7 @@ export function createTestRuntime(testingModule: TestingModule, engine: IEngine)
 
         const testHelpers: TestHelpers = {
           async setCameraTransform(transform) {
-            await testingModule.setCameraPosition(transform)
+            await testingModule.setCameraTransform(transform)
             await nextTick()
 
             const TransformComponent = engine.getComponent(Transform.componentId) as typeof Transform
@@ -172,10 +183,7 @@ export function createTestRuntime(testingModule: TestingModule, engine: IEngine)
     if (!scheduledTests.length) return
 
     // inform the test runner about the plans for this test run
-    testingModule
-      .plan({ testName: scheduledTests.map((_) => _.name) })
-      .then(scheduleNextRun)
-      .catch(globalFail)
+    testingModule.plan({ tests: scheduledTests }).then(scheduleNextRun).catch(globalFail)
   })
 
   // this is the function that is used to plan a test functionn

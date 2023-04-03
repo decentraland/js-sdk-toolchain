@@ -1,22 +1,22 @@
 import type {
   logTestResult,
   plan,
-  setCameraPosition,
+  setCameraTransform,
   TestPlan,
   TestResult,
-  SetCameraPositionTestCommand
+  TestPlan_TestPlanEntry
 } from '~system/Testing'
 
 export type TestingModule = {
   logTestResult: typeof logTestResult
   plan: typeof plan
-  setCameraPosition: typeof setCameraPosition
+  setCameraTransform: typeof setCameraTransform
 }
 
 export function prepareTestingFramework(options: { log: (message: string) => void }) {
   const testResults: TestResult[] = []
 
-  const pendingTests = new Set<string>()
+  const pendingTests = new Map<string, TestPlan_TestPlanEntry>()
 
   const module: TestingModule = {
     async logTestResult(result: TestResult) {
@@ -27,11 +27,11 @@ export function prepareTestingFramework(options: { log: (message: string) => voi
     },
     async plan(data: TestPlan) {
       options.log('   ~system/Testing: plan ' + JSON.stringify(data))
-      data.testName.forEach((test) => pendingTests.add(test))
+      data.tests.forEach((test) => pendingTests.set(test.name, test))
       return {}
     },
-    async setCameraPosition(transform: SetCameraPositionTestCommand) {
-      options.log('   ~system/Testing: setCameraPosition ' + JSON.stringify(transform))
+    async setCameraTransform(transform) {
+      options.log('   ~system/Testing: setCameraTransform ' + JSON.stringify(transform))
 
       return {}
     }

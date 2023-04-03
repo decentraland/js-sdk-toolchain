@@ -1,5 +1,5 @@
 import type { TransformType } from '@dcl/ecs'
-import type { logTestResult, plan, setCameraPosition } from '~system/Testing'
+import type { logTestResult, plan, setCameraTransform } from '~system/Testing'
 
 export type TestHelpers = {
   /**
@@ -28,5 +28,5 @@ export type RunnerEnvironment = {
 export type TestingModule = {
   logTestResult: typeof logTestResult
   plan: typeof plan
-  setCameraPosition: typeof setCameraPosition
+  setCameraTransform: typeof setCameraTransform
 }
