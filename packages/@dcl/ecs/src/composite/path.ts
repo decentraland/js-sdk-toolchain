@@ -1,6 +1,11 @@
 const currentWorkingDir = '/'
 
-// Resolves . and .. elements in a path with directory names
+/**
+ * The functions `normalizeStringPosix`, `dirname` and `resolve`
+ * were extracted from package @browserify/path
+ */
+
+/* istanbul ignore next */
 function normalizeStringPosix(path: string, allowAboveRoot: boolean = false) {
   let res = ''
   let lastSegmentLength = 0
@@ -64,6 +69,7 @@ function normalizeStringPosix(path: string, allowAboveRoot: boolean = false) {
   return res
 }
 
+/* istanbul ignore next */
 export function resolve(...args: string[]) {
   let resolvedPath = ''
   let resolvedAbsolute = false
@@ -101,6 +107,7 @@ export function resolve(...args: string[]) {
   }
 }
 
+/* istanbul ignore next */
 export function dirname(path: string) {
   if (path.length === 0) return '.'
   let code = path.charCodeAt(0)
@@ -126,7 +133,5 @@ export function dirname(path: string) {
 }
 
 export function resolveComposite(path: string, cwd: string) {
-  const absolutePath = path.startsWith('.') ? resolve(cwd, path) : resolve(path)
-  const isAbsolute = absolutePath.length && absolutePath.charCodeAt(0) === 47
-  return isAbsolute ? absolutePath.substring(1) : absolutePath
+  return path.startsWith('.') ? resolve(cwd, path) : resolve(path)
 }

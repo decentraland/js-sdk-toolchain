@@ -4,9 +4,10 @@ import {
   CompositeProvider,
   CompositeResource,
   EntityMappingMode,
-  instanceComposite,
-  InstanceCompositeOptions
+  InstanceCompositeOptions,
+  instanceComposite
 } from './instance'
+import { resolveComposite } from './path'
 import type { ComponentData, CompositeComponent, CompositeComponent_DataEntry } from './proto/gen/composite.gen'
 import { CompositeDefinition } from './proto/gen/composite.gen'
 export type {
@@ -77,5 +78,17 @@ export namespace Composite {
     options: InstanceCompositeOptions = {}
   ) {
     instanceComposite(engine, compositeData, compositeProvider, options)
+  }
+
+  /**
+   * Resolve and normalize a composite path
+   * @param src - the source path
+   * @param cwd - the directory from the resolve should start to resolve
+   *
+   * @returns the absolute resolved path without slash at the beginning
+   * @public
+   */
+  /*#__PURE__*/ export function resolveAndNormalizePath(src: string, cwd: string = '/') {
+    return resolveComposite(src, cwd)
   }
 }

@@ -19,6 +19,7 @@ export type CompositeResource = {
 }
 
 /**
+ * @param src - the source path of the composite
  * @public
  */
 export type CompositeProvider = {

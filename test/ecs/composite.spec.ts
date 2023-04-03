@@ -9,6 +9,7 @@ import {
   LastWriteWinElementSetComponentDefinition,
   EntityMappingMode
 } from './../../packages/@dcl/ecs/src'
+
 import { getCompositeRootComponent } from './../../packages/@dcl/ecs/src/composite'
 import { getComponentDefinition, getComponentValue } from './../../packages/@dcl/ecs/src/composite/instance'
 import { ReadWriteByteBuffer } from './../../packages/@dcl/ecs/src/serialization/ByteBuffer'
@@ -61,7 +62,6 @@ function getStateAsString(engine: IEngine) {
  */
 function convertCompositeComponentDataToBinary(composite: Composite) {
   const engine = Engine()
-  getCompositeRootComponent(engine)
   for (const component of composite.components) {
     const componentDefinition: LastWriteWinElementSetComponentDefinition<unknown> = getComponentDefinition(
       engine,
@@ -112,7 +112,7 @@ describe('composite instantiation system', () => {
     ...getJsonCompositeFrom('*.composite.json', COMPOSITE_BASE_PATH),
     ...getBinaryCompositeFrom('*.composite', COMPOSITE_BASE_PATH)
   ]
-  const invalidComposites = getJsonCompositeFrom('/invalid/*.composite.json', COMPOSITE_BASE_PATH)
+  const invalidComposites = getJsonCompositeFrom('invalid/*.composite.json', COMPOSITE_BASE_PATH)
   const composites = [...validComposites, ...invalidComposites]
   const compositeProvider: Composite.Provider = {
     getCompositeOrNull(src: string) {
@@ -136,9 +136,15 @@ describe('composite instantiation system', () => {
   validComposites.forEach((composite) => {
     it(`should instance '${composite.src}' composite`, () => {
       const engine = Engine()
+      const CompositeRootComponent = getCompositeRootComponent(engine)
       expect(() => {
         instanceBySource(engine, composite.src)
       }).not.toThrow()
+
+      const composites = Array.from(CompositeRootComponent.iterator())
+
+      // It should instance at least the requested composite
+      expect(composites.length).toBeGreaterThan(0)
 
       const currentStateString = getStateAsString(engine)
       const stateFilePath = `${COMPOSITE_BASE_PATH}/${composite.src}.scene-snapshot.json`
@@ -165,7 +171,7 @@ describe('composite instantiation system', () => {
     expect(() => {
       const engine = Engine()
       ;(engine as any).addEntity = () => null
-      instanceBySource(engine, 'empty')
+      instanceBySource(engine, 'empty.composite.json')
     }).toThrow()
   })
 
@@ -343,6 +349,41 @@ describe('composite from json function', () => {
       expect(() => {
         Composite.fromJson(json)
       }).not.toThrow()
+    })
+  })
+})
+
+describe('composite path resolver', () => {
+  const someCwdPath = '/path/to/deep/level'
+  const testCases = [
+    // Without current working directory
+    ['./composite.json', '', 'composite.json'],
+    ['/composite.json', '', 'composite.json'],
+    ['composite.json', '', 'composite.json'],
+
+    // invalid one
+    ['../impossible.json', '', 'impossible.json'],
+
+    // With an specific path current
+    ['./composite.json', someCwdPath, `path/to/deep/level/composite.json`],
+    ['composite.json', someCwdPath, `composite.json`],
+    ['/composite.json', someCwdPath, `composite.json`],
+    ['../composite.json', someCwdPath, `path/to/deep/composite.json`],
+    ['./../composite.json', someCwdPath, `path/to/deep/composite.json`]
+  ]
+
+  describe('should resolve path correclty', () => {
+    testCases.forEach((item) => {
+      it(`'${item[0]}' with cwd:'${item[1]}' => '${item[2]}'`, () => {
+        const src = item[0]
+        const expectResult = item[2]
+        const cwd = item[1]
+        if (cwd.length) {
+          expect(Composite.resolveAndNormalizePath(src, cwd)).toBe(expectResult)
+        } else {
+          expect(Composite.resolveAndNormalizePath(src)).toBe(expectResult)
+        }
+      })
     })
   })
 })
