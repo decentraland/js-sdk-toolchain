@@ -31,8 +31,6 @@ export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
     inspector = createInspectorEngine(dataLayer)
     void sceneCtx.connectCrdtTransport(dataLayer.crdtStream)
     stopEngine()
-
-    console.log('initTestEngine started')
   })
 
   afterAll(() => {
@@ -68,24 +66,11 @@ export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
     async updateInspector() {
       await inspector.engine.update(1)
       await getDataLayerEngine().update(1)
-
-      // TODO: babylon engine needs some more ticks to update. Needs review.
-      // Maybe related to the stream & asyn-queue waiting for the updateBatch promises
       await sceneCtx.update()
-      await new Promise((resolve) => setTimeout(resolve, 100))
-      await sceneCtx.update()
-      await new Promise((resolve) => setTimeout(resolve, 100))
-      await sceneCtx.update()
-      await new Promise((resolve) => setTimeout(resolve, 100))
     },
     async updateRenderer() {
-      // TODO: same as above
       await sceneCtx.update()
       await getDataLayerEngine().update(1)
-      await sceneCtx.update()
-      await getDataLayerEngine().update(1)
-      // END TODO
-
       await inspector.engine.update(1)
     },
     async tick() {}

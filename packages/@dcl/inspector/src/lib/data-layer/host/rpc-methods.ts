@@ -57,12 +57,10 @@ export async function initRpcMethods(
 
   return {
     async redo() {
-      console.log('redo')
       await undoRedo.redo()
       return {}
     },
     async undo() {
-      console.log('undo')
       await undoRedo.undo()
       return {}
     },
