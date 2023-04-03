@@ -69,7 +69,7 @@ export async function initRpcMethods(
     // This method receives an incoming message iterator
     // and returns an async iterable. consumption and production of messages
     // are decoupled operations
-    async crdtStream(iter) {
+    crdtStream(iter) {
       return stream(iter, { engine })
     },
     async getAssetData(req) {

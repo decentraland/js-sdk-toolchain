@@ -60,7 +60,6 @@ export function createInspectorEngine(dataLayer: DataLayerRpcClient): Omit<SdkCo
     engine,
     components,
     events,
-    dispose,
-    dataLayer
+    dispose
   }
 }

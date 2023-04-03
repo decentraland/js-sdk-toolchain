@@ -11,7 +11,7 @@ import { IEngine } from '@dcl/ecs'
 export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
   let sceneCtx: SceneContext
   let dataLayer: DataLayerRpcClient
-  let inspector: Omit<SdkContextValue, 'scene'>
+  let inspector: Omit<SdkContextValue, 'scene' | 'dataLayer'>
 
   beforeAll(async () => {
     const fs = await feededFileSystem({})
@@ -27,10 +27,6 @@ export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
 
     const scene = new BABYLON.Scene(engine)
     sceneCtx = new SceneContext(engine, scene, loadableScene, dataLayer)
-
-    // engine.runRenderLoop(() => {
-    // process.stderr.write('RENDER FRAME\n')
-    // })
 
     inspector = createInspectorEngine(dataLayer)
     void sceneCtx.connectCrdtTransport(dataLayer.crdtStream)
