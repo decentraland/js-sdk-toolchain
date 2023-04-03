@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=142.23k bytes
+SCENE_COMPILED_JS_SIZE_PROD=143.61k bytes
 This run is in PROD mode.
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -11,7 +11,7 @@ EVAL test/snapshots/composite.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 29k
-  MALLOC_COUNT = 7929
+  MALLOC_COUNT = 7956
   ALIVE_OBJS_DELTA ~= 1.66k
 CALL onStart()
   OPCODES ~= 0k
@@ -35,4 +35,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 647.19k bytes
+  MEMORY_USAGE_COUNT ~= 657.10k bytes
