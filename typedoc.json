@@ -22,6 +22,7 @@
   "out": "api-docs",
   "exclude": [
     "packages/@dcl/sdk/src/internal/**/*.ts",
+    "packages/@dcl/sdk/src/testing/**/*.ts",
     "packages/@dcl/sdk/src/message-bus.ts",
     "packages/@dcl/sdk/src/observables.ts",
     "packages/@dcl/sdk/src/index.ts"
