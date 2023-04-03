@@ -1,19 +1,19 @@
-.component.controls {
+.Controls {
   padding: 3px;
   border-radius: 1px;
 }
 
-.component.controls:hover,
-.component.controls.active {
+.Controls:hover,
+.Controls.active {
   background-color: #424141;
 }
 
-.component.controls > div:first-child {
+.Controls .bullets {
   display: flex;
   align-items: center;
 }
 
-.component.controls > div:nth-child(2) {
+.Controls .actions {
   position: fixed;
   display: flex;
   flex-direction: column;
@@ -25,7 +25,7 @@
   border-radius: 2px;
 }
 
-.component.controls > div:nth-child(2) button {
+.Controls .actions button {
   border: none;
   display: flex;
   padding: 8px;
@@ -33,10 +33,10 @@
   background-color: transparent;
 }
 
-.component.controls > div:nth-child(2) button:hover {
+.Controls .actions button:hover {
   background-color: #e4e4e4;
 }
 
-.component.controls > div:nth-child(2) button svg {
+.Controls .actions button svg {
   margin-right: 6px;
 }

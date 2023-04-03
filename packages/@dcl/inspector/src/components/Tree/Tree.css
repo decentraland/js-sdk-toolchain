@@ -1,4 +1,4 @@
-.Hierarchy {
+.Tree {
   font-family: "Segoe UI", Arial, sans-serif;
   font-size: 14px;
   background-color: #252526;
@@ -6,16 +6,16 @@
   width: 100%;
 }
 
-.Hierarchy .main {
+.Tree {
   margin: 0;
   padding: 0;
 }
 
-.Hierarchy .main {
+.Tree {
   border-top: 1px solid #333333;
 }
 
-.Hierarchy .main > div:first-child {
+.Tree > div:first-child {
   padding: 5px 10px;
   cursor: pointer;
   display: flex;
@@ -24,44 +24,44 @@
   height: 20px;
 }
 
-.Hierarchy .main > div:first-child:hover,
-.Hierarchy .main.selected > div:first-child {
+.Tree > div:first-child:hover,
+.Tree.selected > div:first-child {
   background-color: #333333;
 }
 
-.Hierarchy .main > div:first-child:hover span,
-.Hierarchy .main.selected > div:first-child span {
+.Tree > div:first-child:hover span,
+.Tree.selected > div:first-child span {
   text-decoration: underline;
   width: 100%;
 }
 
-.Hierarchy .main > div:first-child > span {
+.Tree > div:first-child > span {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.Hierarchy .main > div:first-child > span svg {
+.Tree > div:first-child > span svg {
   margin-right: 3px;
   margin-bottom: -2px;
 }
 
-.Hierarchy .main > div:first-child > span span {
+.Tree > div:first-child > span span {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.Hierarchy .main .arrow {
+.Tree .arrow {
   margin-right: 5px;
 }
 
-.Hierarchy .main > div:first-child > span,
-.Hierarchy .main input {
+.Tree > div:first-child > span,
+.Tree input {
   margin-right: 10px;
 }
 
-.Hierarchy .main input {
+.Tree input {
   border: none;
   background-color: #D8D8D8;
   outline: #cdcccc;

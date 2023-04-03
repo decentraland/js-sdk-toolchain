@@ -130,10 +130,10 @@ function Tree<T>(props: Props<T>) {
   }
 
   return (
-    <div ref={ref} className="main">
+    <div ref={ref} className="Tree">
       <div style={getLevelStyles(level)} className={selected ? 'selected' : ''}>
         <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
-          <Arrow isOpen={open} />
+          {open ? <ArrowDown /> : <ArrowRight />}
           <span>{label || id}</span>
         </span>
         {editMode && <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
@@ -143,10 +143,6 @@ function Tree<T>(props: Props<T>) {
       {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} />}
     </div>
   )
-}
-
-function Arrow({ isOpen }: { isOpen: boolean }) {
-  return <>{isOpen ? <ArrowDown /> : <ArrowRight />}</>
 }
 
 function TreeChildren<T>(props: Props<T>) {
