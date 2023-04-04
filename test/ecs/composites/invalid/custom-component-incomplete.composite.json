@@ -1,5 +1,5 @@
 {
-    "id": "custom-component-incomplete",
+    "version": 1,
     "components": [
         {
             "name": "my-lib::custom::InexistentComponent",

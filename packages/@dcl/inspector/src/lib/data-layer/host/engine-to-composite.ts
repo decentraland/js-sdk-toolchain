@@ -37,8 +37,8 @@ function componentToCompositeComponentData<T>(
 
 export function dumpEngineToComposite(engine: IEngine, internalDataType: 'json' | 'binary'): Composite {
   const ignoreEntities: Set<Entity> = new Set()
-  const composite: Composite = {
-    id: 'unknown-composite',
+  const composite: Composite.Definition = {
+    version: 1,
     components: []
   }
 
@@ -59,7 +59,7 @@ export function dumpEngineToComposite(engine: IEngine, internalDataType: 'json' 
       const componentData: ComponentData = componentToCompositeComponentData(
         internalDataType,
         {
-          id: compositeRootValue.id,
+          src: compositeRootValue.src,
           entities: []
         },
         CompositeRoot

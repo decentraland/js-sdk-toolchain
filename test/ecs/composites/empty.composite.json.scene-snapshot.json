@@ -2,7 +2,7 @@
   "core::Transform": {},
   "composite::root": {
     "512": {
-      "id": "empty",
+      "src": "empty.composite.json",
       "entities": [
         {
           "src": 0,

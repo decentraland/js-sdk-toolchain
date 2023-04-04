@@ -2,9 +2,9 @@
   "core::Transform": {
     "513": {
       "position": {
-        "x": 1,
-        "y": 1,
-        "z": 1
+        "x": 5,
+        "y": 5,
+        "z": 5
       },
       "scale": {
         "x": 1,
@@ -18,30 +18,11 @@
         "w": 1
       },
       "parent": 0
-    },
-    "514": {
-      "position": {
-        "x": 1,
-        "y": 1,
-        "z": 1
-      },
-      "scale": {
-        "x": 1,
-        "y": 1,
-        "z": 1
-      },
-      "rotation": {
-        "x": 0,
-        "y": 0,
-        "z": 0,
-        "w": 1
-      },
-      "parent": 513
     }
   },
   "composite::root": {
     "512": {
-      "id": "parented-transform",
+      "src": "relative/second-level/one-transform.composite.json",
       "entities": [
         {
           "src": 0,
@@ -50,10 +31,6 @@
         {
           "src": 518,
           "dest": 513
-        },
-        {
-          "src": 519,
-          "dest": 514
         }
       ]
     }
