@@ -1,10 +1,11 @@
-import { resolve } from 'path'
+import path from 'path'
 import { CliComponents } from '../../components'
 import { getArgs, getArgsUsed } from '../../logic/args'
-import { assertValidProjectFolder, installDependencies, needsDependencies } from '../../logic/project-validations'
+import { assertValidProjectFolder, installNpmDependencies, needsDependencies } from '../../logic/project-validations'
 import { getBaseCoords } from '../../logic/scene-validations'
 import { b64HashingFunction } from '../../logic/project-files'
 import { bundleProject } from '../../logic/bundle'
+import { CliError } from '../../logic/error'
 
 interface Options {
   args: typeof args
@@ -39,13 +40,29 @@ export function help() {
 }
 
 export async function main(options: Options) {
-  const workingDirectory = resolve(process.cwd(), options.args['--dir'] || '.')
-  await assertValidProjectFolder(options.components, workingDirectory)
+  const workingDirectory = path.resolve(process.cwd(), options.args['--dir'] || '.')
+  const project = await assertValidProjectFolder(options.components, workingDirectory)
 
+  /* istanbul ignore else */
+  if (project.workspace) {
+    /* istanbul ignore if */
+    if (options.args['--watch']) throw new CliError('--watch is currently unavailable for workspaces')
+
+    for (const folder of project.workspace.folders) {
+      return await buildScene(options, path.join(workingDirectory, folder.path))
+    }
+  } else if (project.scene) {
+    return await buildScene(options, workingDirectory)
+  } else {
+    throw new CliError(`Unknown project type to build: ${Object.keys(project)}`)
+  }
+}
+
+async function buildScene(options: Options, workingDirectory: string) {
   const shouldInstallDeps = await needsDependencies(options.components, workingDirectory)
 
   if (shouldInstallDeps && !options.args['--skip-install']) {
-    await installDependencies(options.components, workingDirectory)
+    await installNpmDependencies(options.components, workingDirectory)
   }
 
   const watch = !!options.args['--watch']

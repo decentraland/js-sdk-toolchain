@@ -6,7 +6,7 @@ import { CliComponents } from '../../components'
 import { isDirectoryEmpty, download, extract } from '../../logic/fs'
 
 import { get as getRepo } from './repos'
-import { installDependencies, needsDependencies } from '../../logic/project-validations'
+import { installNpmDependencies, needsDependencies } from '../../logic/project-validations'
 
 interface Options {
   args: typeof args
@@ -42,7 +42,7 @@ export async function main(options: Options) {
   // npm install
   const shouldInstallDeps = await needsDependencies(options.components, dir)
   if (shouldInstallDeps && !options.args['--skip-install']) {
-    await installDependencies(options.components, dir)
+    await installNpmDependencies(options.components, dir)
   }
   options.components.analytics.track('Scene created', { projectType: scene, url, args: getArgsUsed(options.args) })
 }
