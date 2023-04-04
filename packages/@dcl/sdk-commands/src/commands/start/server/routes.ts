@@ -1,13 +1,14 @@
 import { Router } from '@well-known-components/http-server'
 import { upgradeWebSocketResponse } from '@well-known-components/http-server/dist/ws'
 import { WebSocket } from 'ws'
+import { Workspace } from '../../../logic/workspace-validations'
 import { DataLayer } from '../data-layer/rpc'
 import { handleDataLayerWs } from '../data-layer/ws'
 import { PreviewComponents } from '../types'
 import { setupEcs6Endpoints } from './endpoints'
 import { setupRealmAndComms } from './realm'
 
-export async function wireRouter(components: PreviewComponents, dir: string, dataLayer?: DataLayer) {
+export async function wireRouter(components: PreviewComponents, workspace: Workspace, dataLayer?: DataLayer) {
   const router = new Router<PreviewComponents>()
 
   const sceneUpdateClients = new Set<WebSocket>()
@@ -31,7 +32,7 @@ export async function wireRouter(components: PreviewComponents, dir: string, dat
   })
 
   setupRealmAndComms(components, router)
-  await setupEcs6Endpoints(components, dir, router)
+  await setupEcs6Endpoints(components, router, workspace)
 
   components.server.setContext(components)
   components.server.use(router.allowedMethods())

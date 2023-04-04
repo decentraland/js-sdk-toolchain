@@ -8,12 +8,12 @@ import child_process from 'child_process'
 import { future } from 'fp-future'
 import { CliComponents } from '../components'
 import { CliError } from './error'
-import { getValidSceneJson } from './scene-validations'
 import { join, dirname } from 'path'
 import { printProgressInfo, printProgressStep } from './beautiful-logs'
 import { colors } from '../components/log'
 import { pathToFileURL } from 'url'
 import { globSync } from 'glob'
+import { Scene } from '@dcl/schemas'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -38,8 +38,7 @@ export type CompileOptions = {
 
 const MAX_STEP = 3
 
-export async function bundleProject(components: BundleComponents, options: CompileOptions) {
-  const sceneJson = await getValidSceneJson(components, options.workingDirectory)
+export async function bundleProject(components: BundleComponents, options: CompileOptions, sceneJson: Scene) {
   const tsconfig = join(options.workingDirectory, 'tsconfig.json')
 
   printProgressStep(components.logger, `Validating project structure`, 1, MAX_STEP)
@@ -56,7 +55,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
     throw new CliError(`File ${tsconfig} must exist to compile the Typescript project`)
   }
 
-  const input = globSync(options.single ?? 'src/index.ts')
+  const input = globSync(options.single ?? 'src/index.ts', { cwd: options.workingDirectory, absolute: true })
 
   if (!input.length) throw new CliError(`There are no input files to build: ${options.single ?? 'src/index.ts'}`)
 

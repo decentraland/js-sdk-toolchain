@@ -19,7 +19,9 @@ describe('build command', () => {
 
   it('should install dependencies if needed', async () => {
     const components = await initComponents()
-    jest.spyOn(projectValidation, 'assertValidProjectFolder').mockResolvedValue({ scene: {} as any })
+    jest
+      .spyOn(projectValidation, 'assertValidProjectFolder')
+      .mockResolvedValue({ kind: 'scene', scene: {} as any, workingDirectory: process.cwd() })
 
     const needsDependenciesSpy = jest.spyOn(projectValidation, 'needsDependencies').mockResolvedValue(true)
     const installDependenciesSpy = jest.spyOn(projectValidation, 'installDependencies').mockRejectedValue(undefined)
@@ -34,7 +36,9 @@ describe('build command', () => {
 
   it('should avoid installing dependencies if not needed', async () => {
     const components = await initComponents()
-    jest.spyOn(projectValidation, 'assertValidProjectFolder').mockResolvedValue({ scene: {} as any })
+    jest
+      .spyOn(projectValidation, 'assertValidProjectFolder')
+      .mockResolvedValue({ kind: 'scene', scene: {} as any, workingDirectory: process.cwd() })
 
     const needsDependenciesSpy = jest.spyOn(projectValidation, 'needsDependencies').mockResolvedValue(false)
     const installDependenciesSpy = jest.spyOn(projectValidation, 'installDependencies').mockRejectedValue(undefined)
@@ -49,7 +53,9 @@ describe('build command', () => {
 
   it('should avoid installing dependencies if "--skip-install" is provided', async () => {
     const components = await initComponents()
-    jest.spyOn(projectValidation, 'assertValidProjectFolder').mockResolvedValue({ scene: {} as any })
+    jest
+      .spyOn(projectValidation, 'assertValidProjectFolder')
+      .mockResolvedValue({ kind: 'scene', scene: {} as any, workingDirectory: process.cwd() })
 
     const needsDependenciesSpy = jest.spyOn(projectValidation, 'needsDependencies').mockResolvedValue(true)
 
@@ -64,7 +70,9 @@ describe('build command', () => {
 
   it('should build typescript if all conditions are met', async () => {
     const components = await initComponents()
-    jest.spyOn(projectValidation, 'assertValidProjectFolder').mockResolvedValue({ scene: {} as any })
+    jest
+      .spyOn(projectValidation, 'assertValidProjectFolder')
+      .mockResolvedValue({ kind: 'scene', scene: {} as any, workingDirectory: process.cwd() })
     jest.spyOn(projectValidation, 'needsDependencies').mockResolvedValue(false)
     const sceneJson = { scene: { base: '0,0' } } as any
     const tsBuildSpy = jest.spyOn(dclCompiler, 'bundleProject').mockResolvedValue({ sceneJson, context: null as any })

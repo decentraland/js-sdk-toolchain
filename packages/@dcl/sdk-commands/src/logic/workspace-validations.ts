@@ -2,19 +2,19 @@ import path, { resolve } from 'path'
 import { generateLazyValidator, JSONSchema, ValidateFunction } from '@dcl/schemas'
 import { CliError } from './error'
 import { CliComponents } from '../components'
-import { assertValidProjectFolder } from './project-validations'
+import { assertValidProjectFolder, ProjectUnion } from './project-validations'
 
-export type Workspace = {
+export type WorkspaceJson = {
   folders: Array<{ path: string }>
 }
 
-export namespace Workspace {
-  export const schema: JSONSchema<Workspace> = {
+export namespace WorkspaceJson {
+  export const schema: JSONSchema<WorkspaceJson> = {
     type: 'object',
+    additionalProperties: true,
     properties: {
       folders: {
         type: 'array',
-        additionalProperties: true,
         minItems: 1,
         items: {
           type: 'object',
@@ -30,7 +30,12 @@ export namespace Workspace {
     },
     required: ['folders']
   }
-  export const validate: ValidateFunction<Workspace> = generateLazyValidator(schema)
+  export const validate: ValidateFunction<WorkspaceJson> = generateLazyValidator(schema)
+}
+
+export type Workspace = {
+  rootWorkingDirectory: string
+  projects: Array<ProjectUnion>
 }
 
 // this is "overridable" by env var to test integrations like ".code-workspace" instead
@@ -44,11 +49,11 @@ export function getWorkspaceFilePath(projectRoot: string): string {
   return resolve(projectRoot, WORKSPACE_FILE)
 }
 
-export function assertValidWorkspace(workspace: Workspace) {
-  if (!Workspace.validate(workspace)) {
+export function assertValidWorkspace(workspace: WorkspaceJson) {
+  if (!WorkspaceJson.validate(workspace)) {
     const errors: string[] = []
-    if (Workspace.validate.errors) {
-      for (const error of Workspace.validate.errors) {
+    if (WorkspaceJson.validate.errors) {
+      for (const error of WorkspaceJson.validate.errors) {
         errors.push(`Error validating ${WORKSPACE_FILE}: ${error.message}`)
       }
     }
@@ -56,30 +61,56 @@ export function assertValidWorkspace(workspace: Workspace) {
   }
 }
 
+// This function takes a list of folders and returns a workspace containing the projects in the folders.
+// The working directory of each project is the absolute path of the folder.
+// The root working directory of the workspace is the absolute path of the working directory.
+export async function workspaceFromFolders(
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  workingDirectory: string,
+  folders: string[]
+): Promise<Workspace> {
+  const ret: Workspace = {
+    rootWorkingDirectory: workingDirectory,
+    projects: []
+  }
+
+  for (const folder of folders) {
+    const wd = path.resolve(workingDirectory, folder)
+    const project = await assertValidProjectFolder(components, wd)
+    ret.projects.push(project)
+  }
+
+  return ret
+}
+
 /**
- * Get valid workspace to work on
+ * Returns a workspace by loading the workspace file or generating a single-folder workspace on the fly.
  */
 export async function getValidWorkspace(
   components: Pick<CliComponents, 'fs' | 'logger'>,
   projectRoot: string
 ): Promise<Workspace> {
-  try {
-    const workspaceJsonRaw = await components.fs.readFile(getWorkspaceFilePath(projectRoot), 'utf8')
-    const workspaceJson = JSON.parse(workspaceJsonRaw) as Workspace
+  const workspaceFile = getWorkspaceFilePath(projectRoot)
 
-    // assert valid data structure
-    assertValidWorkspace(workspaceJson)
+  if (await components.fs.fileExists(workspaceFile)) {
+    // either we load a workspace
+    try {
+      const workspaceJsonRaw = await components.fs.readFile(workspaceFile, 'utf8')
+      const workspaceJson = JSON.parse(workspaceJsonRaw) as WorkspaceJson
 
-    // validate all folders are valid projects
-    for (const folder of workspaceJson.folders) {
-      const result = await assertValidProjectFolder(components, path.join(projectRoot, folder.path))
+      // assert valid data structure
+      assertValidWorkspace(workspaceJson)
 
-      if (result.workspace)
-        throw new CliError(`It is not allowed to have nested workspaces. Root=${projectRoot}, Child=${folder.path}`)
+      return await workspaceFromFolders(
+        components,
+        projectRoot,
+        workspaceJson.folders.map((f) => f.path)
+      )
+    } catch (err: any) {
+      throw new CliError(`Error reading the ${getWorkspaceFilePath(projectRoot)} file: ${err.message}`)
     }
-
-    return workspaceJson
-  } catch (err: any) {
-    throw new CliError(`Error reading the ${getWorkspaceFilePath(projectRoot)} file: ${err.message}`)
+  } else {
+    // or generate a single-folder workspace on the fly
+    return await workspaceFromFolders(components, projectRoot, ['.'])
   }
 }

@@ -30,6 +30,9 @@ export async function wireFileWatcherToWebSockets(
     })
 }
 
+/*
+ * IMPORTANT: this is a legacy protocol and needs to be revisited for SDK7
+ */
 function updateScene(dir: string, clients: Set<WebSocket>): void {
   for (const client of clients) {
     if (client.readyState === WebSocket.OPEN) {

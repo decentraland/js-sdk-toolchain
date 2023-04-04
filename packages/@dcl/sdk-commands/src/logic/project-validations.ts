@@ -3,31 +3,33 @@ import path from 'path'
 import { CliComponents } from '../components'
 import { CliError } from './error'
 import { getSceneFilePath, getValidSceneJson } from './scene-validations'
-import { getValidWorkspace, getWorkspaceFilePath, Workspace } from './workspace-validations'
+
+export type BaseProject = { workingDirectory: string }
+export type SceneProject = { kind: 'scene'; scene: Scene } & BaseProject
+export type ProjectUnion = SceneProject // | WearableProject
+
 /**
- * Asserts that the projectRoot is a valid project
+ * Asserts that the workingDirectory is a valid project
  */
 export async function assertValidProjectFolder(
   components: Pick<CliComponents, 'fs' | 'logger'>,
-  projectRoot: string
-): Promise<Partial<{ scene: Scene; workspace: Workspace }>> {
+  workingDirectory: string
+): Promise<ProjectUnion> {
   // no validations for now, only check that it exists
-  if (!(await components.fs.fileExists(path.resolve(projectRoot, 'package.json'))))
+  if (!(await components.fs.fileExists(path.resolve(workingDirectory, 'package.json'))))
     throw new CliError(`The project root doesn't have a package.json file`)
 
   // now we will iterate over different file to evaluate the project kind
   switch (true) {
     // TODO: case wearable
-    // case workspace
-    case await components.fs.fileExists(getWorkspaceFilePath(projectRoot)): {
-      return { workspace: await getValidWorkspace(components, projectRoot) }
-    }
     // case scene
-    case await components.fs.fileExists(getSceneFilePath(projectRoot)): {
-      return { scene: await getValidSceneJson(components, projectRoot) }
+    case await components.fs.fileExists(getSceneFilePath(workingDirectory)): {
+      return { kind: 'scene', scene: await getValidSceneJson(components, workingDirectory), workingDirectory }
     }
     default: {
-      throw new CliError(`UnknownProjectKind: the kind of project of the folder ${projectRoot} cannot be identified`)
+      throw new CliError(
+        `UnknownProjectKind: the kind of project of the folder ${workingDirectory} cannot be identified`
+      )
     }
   }
 }

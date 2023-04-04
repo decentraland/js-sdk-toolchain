@@ -2,14 +2,15 @@ import path from 'path'
 import { getArgs, getArgsUsed } from '../../logic/args'
 import { hashV1 } from '@dcl/hashing'
 import { CliComponents } from '../../components'
-import { assertValidProjectFolder } from '../../logic/project-validations'
+import { SceneProject } from '../../logic/project-validations'
 import { b64HashingFunction, getProjectContentMappings } from '../../logic/project-files'
 import { CliError } from '../../logic/error'
-import { Entity, EntityType, Scene } from '@dcl/schemas'
+import { Entity, EntityType } from '@dcl/schemas'
 import { colors } from '../../components/log'
-import { printProgressInfo, printProgressStep, printSuccess } from '../../logic/beautiful-logs'
+import { printCurrentProjectStarting, printProgressInfo, printProgressStep, printSuccess } from '../../logic/beautiful-logs'
 import { createStaticRealm } from '../../logic/realm'
-import { getBaseCoords, getValidSceneJson } from '../../logic/scene-validations'
+import { getBaseCoords } from '../../logic/scene-validations'
+import { getValidWorkspace } from '../../logic/workspace-validations'
 
 interface Options {
   args: typeof args
@@ -68,21 +69,14 @@ export async function main(options: Options) {
 
   const scenesUrn: string[] = []
 
-  const project = await assertValidProjectFolder(options.components, workingDirectory)
+  const workspace = await getValidWorkspace(options.components, workingDirectory)
 
-  /* istanbul ignore else */
-  if (project.workspace) {
-    for (const folder of project.workspace.folders) {
-      const wd = path.join(workingDirectory, folder.path)
-      const scene = await getValidSceneJson(options.components, wd)
-      const result = await prepareSceneFiles(options, wd, scene, outputDirectory)
+  for (const project of workspace.projects) {
+    printCurrentProjectStarting(options.components.logger, project, workspace)
+    if (project.kind === 'scene') {
+      const result = await prepareSceneFiles(options, project, outputDirectory)
       scenesUrn.push(result.urn)
     }
-  } else if (project.scene) {
-    const result = await prepareSceneFiles(options, workingDirectory, project.scene, outputDirectory)
-    scenesUrn.push(result.urn)
-  } else {
-    throw new CliError(`Unknown project type to export: ${Object.keys(project)}`)
   }
 
   if (willCreateRealm) {
@@ -105,27 +99,26 @@ export async function main(options: Options) {
     printProgressInfo(logger, `> ${realmName}/about -> [REALM FILE]`)
   }
 
-  printSuccess(logger, `Export finished!`, `=> The entity URN are ${colors.bold(scenesUrn.join(','))}`)
+  printSuccess(
+    logger,
+    `Export finished!`,
+    `=> The entity URN are:${colors.bold(scenesUrn.map(($) => '\n - ' + $).join(''))}`
+  )
 
   return { scenesUrn, destination: outputDirectory }
 }
 
-export async function prepareSceneFiles(
-  options: Options,
-  workingDirectory: string,
-  scene: Scene,
-  outputDirectory: string
-) {
+export async function prepareSceneFiles(options: Options, project: SceneProject, outputDirectory: string) {
   const { fs, logger } = options.components
 
-  const filesToExport = await getProjectContentMappings(options.components, workingDirectory, async (file) => {
-    return await hashV1(fs.createReadStream(path.resolve(workingDirectory, file)))
+  const filesToExport = await getProjectContentMappings(options.components, project.workingDirectory, async (file) => {
+    return await hashV1(fs.createReadStream(path.resolve(project.workingDirectory, file)))
   })
 
   printProgressInfo(logger, 'Copying files...')
 
   for (const { file, hash } of filesToExport) {
-    const src = path.resolve(workingDirectory, file)
+    const src = path.resolve(project.workingDirectory, file)
     const dst = path.resolve(outputDirectory, hash)
 
     if (src.startsWith(outputDirectory)) continue
@@ -146,7 +139,7 @@ export async function prepareSceneFiles(
     timestamp: args['--timestamp'] ? new Date(args['--timestamp']).getTime() : Date.now(),
     type: EntityType.SCENE,
     // for now, the only valid export is for scenes
-    metadata: scene,
+    metadata: project.scene,
     version: 'v3'
   }
 
@@ -169,8 +162,8 @@ export async function prepareSceneFiles(
   }
 
   options.components.analytics.track('Export static', {
-    projectHash: await b64HashingFunction(workingDirectory),
-    coords: getBaseCoords(scene),
+    projectHash: await b64HashingFunction(project.workingDirectory),
+    coords: getBaseCoords(project.scene),
     args: getArgsUsed(options.args)
   })
 
