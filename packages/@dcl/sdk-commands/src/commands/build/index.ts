@@ -1,7 +1,7 @@
 import path from 'path'
 import { CliComponents } from '../../components'
 import { getArgs, getArgsUsed } from '../../logic/args'
-import { assertValidProjectFolder, installNpmDependencies, needsDependencies } from '../../logic/project-validations'
+import { assertValidProjectFolder, installDependencies, needsDependencies } from '../../logic/project-validations'
 import { getBaseCoords } from '../../logic/scene-validations'
 import { b64HashingFunction } from '../../logic/project-files'
 import { bundleProject } from '../../logic/bundle'
@@ -62,7 +62,7 @@ async function buildScene(options: Options, workingDirectory: string) {
   const shouldInstallDeps = await needsDependencies(options.components, workingDirectory)
 
   if (shouldInstallDeps && !options.args['--skip-install']) {
-    await installNpmDependencies(options.components, workingDirectory)
+    await installDependencies(options.components, workingDirectory)
   }
 
   const watch = !!options.args['--watch']

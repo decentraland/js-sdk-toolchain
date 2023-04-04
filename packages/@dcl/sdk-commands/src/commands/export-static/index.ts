@@ -75,10 +75,12 @@ export async function main(options: Options) {
     for (const folder of project.workspace.folders) {
       const wd = path.join(workingDirectory, folder.path)
       const scene = await getValidSceneJson(options.components, wd)
-      await prepareSceneFiles(options, wd, scene, outputDirectory)
+      const result = await prepareSceneFiles(options, wd, scene, outputDirectory)
+      scenesUrn.push(result.urn)
     }
   } else if (project.scene) {
-    await prepareSceneFiles(options, workingDirectory, project.scene, outputDirectory)
+    const result = await prepareSceneFiles(options, workingDirectory, project.scene, outputDirectory)
+    scenesUrn.push(result.urn)
   } else {
     throw new CliError(`Unknown project type to export: ${Object.keys(project)}`)
   }

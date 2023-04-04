@@ -52,7 +52,7 @@ const npmBin = /^win/.test(process.platform) ? 'npm.cmd' : 'npm'
 /*
  * Runs "npm install" for desired project
  */
-export async function installNpmDependencies(
+export async function installDependencies(
   components: Pick<CliComponents, 'logger' | 'spawner' | 'fs'>,
   workingDirectory: string
 ): Promise<void> {
