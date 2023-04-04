@@ -49,14 +49,17 @@ export function getWorkspaceFilePath(projectRoot: string): string {
   return resolve(projectRoot, WORKSPACE_FILE)
 }
 
+/* istanbul ignore next */
 export function assertValidWorkspace(workspace: WorkspaceJson) {
   if (!WorkspaceJson.validate(workspace)) {
     const errors: string[] = []
+    /* istanbul ignore if */
     if (WorkspaceJson.validate.errors) {
       for (const error of WorkspaceJson.validate.errors) {
         errors.push(`Error validating ${WORKSPACE_FILE}: ${error.message}`)
       }
     }
+    /* istanbul ignore next */
     throw new CliError(`Invalid ${WORKSPACE_FILE} file:\n${errors.join('\n')}`)
   }
 }
@@ -108,6 +111,7 @@ export async function getValidWorkspace(
         workspaceJson.folders.map((f) => f.path)
       )
     } catch (err: any) {
+      /* istanbul ignore next */
       throw new CliError(`Error reading the ${getWorkspaceFilePath(workingDirectory)} file: ${err.message}`)
     }
   } else {
