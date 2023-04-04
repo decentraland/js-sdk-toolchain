@@ -520,18 +520,21 @@ export type Composite = CompositeDefinition;
 // @public @deprecated (undocumented)
 export namespace Composite {
     // (undocumented)
-    export function fromBinary(buffer: Uint8Array): Composite.Type;
+    export type Definition = CompositeDefinition;
     // (undocumented)
-    export function fromJson(object: any): Composite.Type;
-    export function instance(engine: IEngine, compositeData: Composite.Type, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): void;
+    export function fromBinary(buffer: Uint8Array): Composite.Definition;
+    // (undocumented)
+    export function fromJson(object: any): Composite.Definition;
+    export function instance(engine: IEngine, compositeData: Composite.Resource, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): void;
     // (undocumented)
     export type Provider = CompositeProvider;
+    export function resolveAndNormalizePath(src: string, cwd?: string): string;
     // (undocumented)
-    export function toBinary(composite: Composite.Type): Uint8Array;
+    export type Resource = CompositeResource;
     // (undocumented)
-    export function toJson(composite: Composite.Type): any;
+    export function toBinary(composite: Composite.Definition): Uint8Array;
     // (undocumented)
-    export type Type = CompositeDefinition;
+    export function toJson(composite: Composite.Definition): any;
 }
 
 // @public (undocumented)
@@ -557,17 +560,23 @@ export interface CompositeDefinition {
     // (undocumented)
     components: CompositeComponent[];
     // (undocumented)
-    id: string;
+    version: number;
 }
 
 // @public (undocumented)
 export type CompositeProvider = {
-    getCompositeOrNull(id: string): CompositeDefinition | null;
+    getCompositeOrNull(src: string): CompositeResource | null;
+};
+
+// @public (undocumented)
+export type CompositeResource = {
+    src: string;
+    composite: CompositeDefinition;
 };
 
 // @public @deprecated (undocumented)
 export type CompositeRootType = {
-    id: string;
+    src: string;
     entities: {
         src: Entity;
         dest: Entity;
@@ -1198,7 +1207,7 @@ export type InstanceCompositeOptions = {
         getCompositeEntity: (compositeEntity: Entity | number) => Entity;
     };
     rootEntity?: Entity;
-    alreadyRequestedId?: Set<string>;
+    alreadyRequestedSrc?: Set<string>;
 };
 
 // @public (undocumented)

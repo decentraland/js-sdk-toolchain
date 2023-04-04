@@ -9,30 +9,35 @@ export async function createContentFetchCompositeProvider(): Promise<Composite.P
     return path.endsWith('.composite') || path.endsWith('.composite.json')
   })
 
-  const compositePromises = compositesContent.map(async (item) => {
+  async function fetchComposite(item: { hash: string; file: string }): Promise<Composite.Resource | null> {
+    const src = item.file.toLowerCase()
     const compositeUrl = `${scene.baseUrl}${item.hash}`
     try {
       const response = await fetch(compositeUrl)
       if (item.file.endsWith('.json')) {
         const compositeJson = await response.json()
         const composite = Composite.fromJson(compositeJson)
-        return composite
+        return { src, composite }
       } else {
         const compositeBinaryData: Uint8Array = await (response as any).arrayBuffer()
         const composite = Composite.fromBinary(compositeBinaryData)
-        return composite
+        return { src, composite }
       }
     } catch (err) {
       console.error(`Error loading composite ${compositeUrl}: ${(err as any).toString()}`)
       return null
     }
-  })
+  }
 
-  const composites = (await Promise.all(compositePromises)).filter((item) => !!item) as Composite.Type[]
+  const compositePromises = compositesContent.map(fetchComposite)
+
+  const composites = (await Promise.all(compositePromises)).filter((item) => !!item) as Composite.Resource[]
 
   return {
-    getCompositeOrNull(id: string) {
-      return composites.find((item) => item.id === id) || null
+    getCompositeOrNull(src: string, currentPath?: string) {
+      // TODO: resolve path from src and currentPath
+
+      return composites.find((item) => item.src === src) || null
     }
   }
 }

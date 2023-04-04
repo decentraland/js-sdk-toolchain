@@ -7,7 +7,7 @@ import { Schemas } from '../schemas'
  * @deprecated composite is not being supported so far, please do not use this feature
  */
 export type CompositeRootType = {
-  id: string
+  src: string
   entities: {
     src: Entity
     dest: Entity
@@ -28,7 +28,7 @@ export function getCompositeRootComponent(
   }
 
   return engine.defineComponent('composite::root', {
-    id: Schemas.String,
+    src: Schemas.String,
     entities: Schemas.Array(
       Schemas.Map({
         src: Schemas.Entity,

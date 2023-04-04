@@ -151,6 +151,6 @@ export async function feededFileSystem(mappings: Record<string, string> = builde
 
   return createFsInMemory({
     ...fileContent,
-    'assets/main.composite.json': Buffer.from(JSON.stringify(mainComposite), 'utf-8')
+    'main.composite.json': Buffer.from(JSON.stringify(mainComposite), 'utf-8')
   })
 }
