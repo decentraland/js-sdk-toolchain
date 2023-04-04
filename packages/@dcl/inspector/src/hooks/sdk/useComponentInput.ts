@@ -1,5 +1,4 @@
 import { InputHTMLAttributes, useCallback, useEffect, useState } from 'react'
-import isEqual from 'deep-equal'
 import { Entity } from '@dcl/ecs'
 import { getValue, NestedKey, setValue } from '../../lib/logic/get-set-value'
 import { Component } from '../../lib/sdk/components'
@@ -23,7 +22,7 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
   fromInputToComponentValue: (input: InputType) => ComponentValueType,
   isValidInput: (input: InputType) => boolean = () => true
 ) => {
-  const [componentValue, setComponentValue] = useComponentValue<ComponentValueType>(entity, component)
+  const [componentValue, setComponentValue, isEqual] = useComponentValue<ComponentValueType>(entity, component)
   const [input, setInput] = useState<InputType>(fromComponentValueToInput(componentValue))
   const [isFocused, setIsFocused] = useState(false)
 
@@ -45,9 +44,12 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
   useEffect(() => {
     if (isValidInput(input)) {
       const newComponentValue = { ...componentValue, ...fromInputToComponentValue(input) }
-      if (!isEqual(newComponentValue, componentValue)) {
-        setComponentValue(newComponentValue)
+
+      if (isEqual(newComponentValue)) {
+        return
       }
+
+      setComponentValue(newComponentValue)
     }
   }, [input])
 
@@ -58,9 +60,7 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
       return
     }
     const newInputs = fromComponentValueToInput(componentValue)
-    if (!isEqual(newInputs, input)) {
-      setInput(newInputs)
-    }
+    setInput(newInputs)
   }, [componentValue])
 
   const getProps = useCallback(

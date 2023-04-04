@@ -15,11 +15,13 @@
   border-radius: 4px;
   cursor: pointer;
 }
+
+.toolbar button:hover {
+  background-color: #999;
+}
+
 .toolbar svg {
   width: 24px;
   height: 24px;
 }
 
-button:hover {
-  background-color: #999;
-}

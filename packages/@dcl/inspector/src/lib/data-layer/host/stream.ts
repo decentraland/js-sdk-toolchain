@@ -1,9 +1,12 @@
-import { IEngine, Transport } from '@dcl/ecs'
+import { Transport } from '@dcl/ecs'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
+import mitt from 'mitt'
 
 import { consumeAllMessagesInto } from '../../logic/consume-stream'
 import { DataLayerContext } from '../types'
 import { serializeEngine } from './utils/engine'
+
+export const streamEvent = mitt<{ streamStart: unknown; streamEnd: unknown }>()
 
 export function stream(
   stream: AsyncIterable<{ data: Uint8Array }>,
@@ -29,8 +32,9 @@ export function stream(
   ctx.engine.addTransport(transport)
 
   function processMessage(message: Uint8Array) {
+    streamEvent.emit('streamStart')
     transport.onmessage!(message)
-    void ctx.engine.update(1)
+    void ctx.engine.update(1).then(() => streamEvent.emit('streamEnd'))
   }
 
   function closeCallback() {

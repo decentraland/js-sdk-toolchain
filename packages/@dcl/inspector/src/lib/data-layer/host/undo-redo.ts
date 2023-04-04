@@ -6,6 +6,7 @@ import {
   IEngine,
   LastWriteWinElementSetComponentDefinition
 } from '@dcl/ecs'
+import { streamEvent } from './stream'
 
 export type UndoRedo = {
   entity: Entity
@@ -15,8 +16,22 @@ export type UndoRedo = {
 }
 
 export function initUndoRedo(engine: IEngine, getComposite: () => CompositeDefinition) {
-  const undoList: UndoRedo[] = []
-  const redoList: UndoRedo[] = []
+  const undoList: UndoRedo[][] = []
+  const redoList: UndoRedo[][] = []
+  const acc: UndoRedo[] = []
+
+  function getAndCleanArray(arr: unknown[]): unknown[] {
+    return arr.splice(0, arr.length)
+  }
+
+  streamEvent.on('streamStart', () => {
+    getAndCleanArray(redoList)
+    getAndCleanArray(acc)
+  })
+
+  streamEvent.on('streamEnd', () => {
+    undoList.push(getAndCleanArray(acc) as UndoRedo[])
+  })
 
   function onChange(
     entity: Entity,
@@ -27,60 +42,54 @@ export function initUndoRedo(engine: IEngine, getComposite: () => CompositeDefin
     if (!getComposite()) {
       return
     }
-    // Check if the changes are because of an undo or is something new
-    const hasRedo = redoList[redoList.length - 1]
-    if (hasRedo && hasRedo.entity === entity && hasRedo.componentName === component?.componentName) {
-      return
-    }
-
-    // clean redoList
-    redoList.length = 0
-
     // Add undo operation
-    if (operation === CrdtMessageType.PUT_COMPONENT) {
+    // TODO: entitySelected doesn't exists on composite
+    if (operation === CrdtMessageType.PUT_COMPONENT || operation === CrdtMessageType.DELETE_COMPONENT) {
       const prevValue = findValue(getComposite(), component!.componentName, entity)
-      undoList.push({ entity, operation, componentName: component!.componentName, value: prevValue })
+      acc.push({ entity, operation, componentName: component!.componentName, value: prevValue })
     }
   }
 
   function findValue(composite: CompositeDefinition, componentName: string, entity: Entity) {
     const component = composite.components.find((c) => c.name === componentName)
-    // console.log(JSON.stringify(composite, null, 2))
     const value = component?.data.get(entity)
 
     if (value?.data?.$case !== 'json') {
       return null
     }
+
     return value.data.json
   }
 
-  async function updateOperation(operation: UndoRedo) {
-    const component = engine.getComponent(operation.componentName) as LastWriteWinElementSetComponentDefinition<unknown>
+  function updateOperation(operations: UndoRedo[]) {
+    const opAcc: UndoRedo[] = []
 
-    if (operation.value === null) {
-      component.deleteFrom(operation.entity)
-    } else {
-      component.createOrReplace(operation.entity, operation.value)
+    for (const operation of operations) {
+      const component = engine.getComponent(
+        operation.componentName
+      ) as LastWriteWinElementSetComponentDefinition<unknown>
+      const oldValue = component.getOrNull(operation.entity)
+      opAcc.push({ ...operation, value: oldValue })
+
+      if (operation.value === null) {
+        component.deleteFrom(operation.entity)
+      } else {
+        component.createOrReplace(operation.entity, operation.value)
+      }
     }
-    await engine.update(1 / 16)
+    return opAcc
   }
 
   return {
     async redo() {
       const lastMsg = redoList.pop()
       if (!lastMsg) return {}
-
-      await updateOperation(lastMsg)
+      undoList.push(updateOperation(lastMsg))
     },
     async undo() {
       const lastMsg = undoList.pop()
       if (!lastMsg) return {}
-      // Add message to Redo List
-      const value = engine.getComponent(lastMsg.componentName).get(lastMsg.entity)
-      redoList.push({ ...lastMsg, value })
-
-      // Update component
-      await updateOperation(lastMsg)
+      redoList.push(updateOperation(lastMsg))
     },
     onChange
   }

@@ -3,8 +3,6 @@ import { BiUndo, BiRedo } from 'react-icons/bi'
 import { useSdk } from '../../hooks/sdk/useSdk'
 import './Toolbar.css'
 
-function noop() {}
-
 function Toolbar() {
   const sdk = useSdk()
 
