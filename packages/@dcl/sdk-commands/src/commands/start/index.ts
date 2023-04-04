@@ -5,9 +5,7 @@ import open from 'open'
 import { CliComponents } from '../../components'
 import { buildScene } from '../build'
 import { getArgs, getArgsUsed } from '../../logic/args'
-import { needsDependencies, npmRun } from '../../logic/project-validations'
 import { getBaseCoords } from '../../logic/scene-validations'
-import { CliError } from '../../logic/error'
 import { getPort } from '../../logic/get-free-port'
 import { PreviewComponents } from './types'
 import { createTestMetricsComponent } from '@well-known-components/metrics'
@@ -104,16 +102,11 @@ export async function main(options: Options) {
     printCurrentProjectStarting(options.components.logger, project, workspace)
 
     // first run `npm run build`, this can be disabled with --skip-build
-    if (!skipBuild) {
-      await npmRun(options.components, project.workingDirectory, 'build')
-    } else if (await needsDependencies(options.components, project.workingDirectory)) {
-      const npmModulesPath = path.resolve(project.workingDirectory, 'node_modules')
-      throw new CliError(`Couldn\'t find ${npmModulesPath}, please run: npm install`)
-    }
-
     // then start the embedded compiler, this can be disabled with --no-watch
     if (watch) {
-      await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': watch, _: [] } }, project)
+      await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': true, _: [] } }, project)
+    } else if (!skipBuild) {
+      await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': false, _: [] } }, project)
     }
 
     // track the event

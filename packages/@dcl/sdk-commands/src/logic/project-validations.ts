@@ -1,6 +1,8 @@
 import { Scene } from '@dcl/schemas'
 import path from 'path'
 import { CliComponents } from '../components'
+import { colors } from '../components/log'
+import { printProgressInfo } from './beautiful-logs'
 import { CliError } from './error'
 import { getSceneFilePath, getValidSceneJson } from './scene-validations'
 
@@ -58,10 +60,10 @@ export async function installDependencies(
   components: Pick<CliComponents, 'logger' | 'spawner' | 'fs'>,
   workingDirectory: string
 ): Promise<void> {
-  components.logger.info('Installing dependencies...')
+  printProgressInfo(components.logger, 'Installing dependencies...')
   // TODO: test in windows
   await components.spawner.exec(workingDirectory, npmBin, ['install'])
-  components.logger.info('Installing dependencies... ✅')
+  printProgressInfo(components.logger, colors.white('✅ Installing dependencies...'))
 }
 
 /**
