@@ -90,7 +90,8 @@ export async function getValidWorkspace(
   components: Pick<CliComponents, 'fs' | 'logger'>,
   projectRoot: string
 ): Promise<Workspace> {
-  const workspaceFile = getWorkspaceFilePath(projectRoot)
+  const workingDirectory = path.resolve(projectRoot)
+  const workspaceFile = getWorkspaceFilePath(workingDirectory)
 
   if (await components.fs.fileExists(workspaceFile)) {
     // either we load a workspace
@@ -103,14 +104,14 @@ export async function getValidWorkspace(
 
       return await workspaceFromFolders(
         components,
-        projectRoot,
+        workingDirectory,
         workspaceJson.folders.map((f) => f.path)
       )
     } catch (err: any) {
-      throw new CliError(`Error reading the ${getWorkspaceFilePath(projectRoot)} file: ${err.message}`)
+      throw new CliError(`Error reading the ${getWorkspaceFilePath(workingDirectory)} file: ${err.message}`)
     }
   } else {
     // or generate a single-folder workspace on the fly
-    return await workspaceFromFolders(components, projectRoot, ['.'])
+    return await workspaceFromFolders(components, workingDirectory, ['.'])
   }
 }

@@ -55,7 +55,7 @@ export async function main(options: Options) {
   const outputDirectory = path.resolve(process.cwd(), options.args['--destination'] || '.')
   const willCreateRealm = !!args['--realmName']
   let currentStep = 1
-  const maxSteps = 3 + (willCreateRealm ? 1 : 0)
+  const maxSteps = 1 + (willCreateRealm ? 1 : 0)
 
   if (willCreateRealm && !args['--baseUrl']) {
     throw new CliError(`--baseUrl is mandatory when --realmName is provided`)

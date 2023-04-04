@@ -82,7 +82,7 @@ main().catch(function handleError(err: Error) {
     // log with console to show stacktrace and debug information
     // eslint-disable-next-line no-console
     console.error(err)
-    writeToStderr(`Developer: All errors thrown must be an instance of "CliError"`)
+    writeToStderr(`Developer: All errors thrown must be an instance of "CliError"` + err.stack)
   }
 
   // set an exit code but not finish the program immediately to close any pending work
