@@ -36,12 +36,10 @@ export type CompileOptions = {
   emitDeclaration: boolean
 }
 
-const MAX_STEP = 3
+const MAX_STEP = 2
 
 export async function bundleProject(components: BundleComponents, options: CompileOptions, sceneJson: Scene) {
   const tsconfig = join(options.workingDirectory, 'tsconfig.json')
-
-  printProgressStep(components.logger, `Validating project structure`, 1, MAX_STEP)
 
   if (!options.single && !sceneJson.main) {
     throw new CliError('scene.json .main must be present')
@@ -62,7 +60,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
   const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
   const outfile = join(options.workingDirectory, output)
 
-  printProgressStep(components.logger, `Bundling file ${colors.bold(input.join(','))}`, 2, MAX_STEP)
+  printProgressStep(components.logger, `Bundling file ${colors.bold(input.join(','))}`, 1, MAX_STEP)
 
   const context = await esbuild.context({
     entryPoints: input,
@@ -139,7 +137,7 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   ]
   if (options.watch) args.push('--watch')
 
-  printProgressStep(components.logger, `Running type checker`, 3, MAX_STEP)
+  printProgressStep(components.logger, `Running type checker`, 2, MAX_STEP)
   const ts = child_process.spawn('node', args, { env: process.env, cwd: options.workingDirectory })
   const typeCheckerFuture = future<number>()
 

@@ -21,6 +21,9 @@ describe('utils/log', () => {
     bl.printCommand(logs, 'command')
     bl.printProgressInfo(logs, 'info')
     bl.printProgressStep(logs, 'step', 1, 3)
+    const project = { scene: {} as any, type: 'scene', workingDirectory: process.cwd() }
+    bl.printCurrentProjectStarting(logs, project, { projects: [project], rootWorkingDirectory: process.cwd() })
+    bl.printCurrentProjectStarting(logs, project, { projects: [project, project], rootWorkingDirectory: process.cwd() })
     bl.printSuccess(logs, 'step', 'asd')
   })
 })

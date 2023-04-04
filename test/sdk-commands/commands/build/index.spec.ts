@@ -82,12 +82,16 @@ describe('build command', () => {
       components
     })
 
-    expect(tsBuildSpy).toBeCalledWith(components, {
-      workingDirectory: process.cwd(),
-      emitDeclaration: false,
-      watch: false,
-      single: undefined,
-      production: true
-    })
+    expect(tsBuildSpy).toBeCalledWith(
+      components,
+      {
+        workingDirectory: process.cwd(),
+        emitDeclaration: false,
+        watch: false,
+        single: undefined,
+        production: true
+      },
+      expect.anything() /* workspace */
+    )
   })
 })
