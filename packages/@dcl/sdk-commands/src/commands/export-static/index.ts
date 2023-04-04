@@ -7,7 +7,12 @@ import { b64HashingFunction, getProjectContentMappings } from '../../logic/proje
 import { CliError } from '../../logic/error'
 import { Entity, EntityType } from '@dcl/schemas'
 import { colors } from '../../components/log'
-import { printCurrentProjectStarting, printProgressInfo, printProgressStep, printSuccess } from '../../logic/beautiful-logs'
+import {
+  printCurrentProjectStarting,
+  printProgressInfo,
+  printProgressStep,
+  printSuccess
+} from '../../logic/beautiful-logs'
 import { createStaticRealm } from '../../logic/realm'
 import { getBaseCoords } from '../../logic/scene-validations'
 import { getValidWorkspace } from '../../logic/workspace-validations'

@@ -1,6 +1,6 @@
 import { version as vmVersion } from '@dcl/quickjs-emscripten/package.json'
 import { exec } from 'child_process'
-import { existsSync, readFileSync, stat, writeFileSync } from 'fs-extra'
+import { existsSync, readFileSync, writeFileSync } from 'fs-extra'
 import glob from 'glob'
 import path from 'path'
 import { CrdtMessageType, engine } from '../packages/@dcl/ecs/src'
