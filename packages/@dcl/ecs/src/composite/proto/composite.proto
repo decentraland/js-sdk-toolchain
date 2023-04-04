@@ -15,6 +15,6 @@ message CompositeComponent {
 }
 
 message CompositeDefinition {
-    string id = 1;
+    int32 version = 1;
     repeated CompositeComponent components = 2;
 }

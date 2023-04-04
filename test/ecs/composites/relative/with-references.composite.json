@@ -7,7 +7,7 @@
                 "512": {
                     "$case": "json",
                     "json": {
-                        "src": "empty.composite.json"
+                        "src": "../one-transform.composite.json"
                     }
                 },
                 "513": {
@@ -19,13 +19,25 @@
                 "514": {
                     "$case": "json",
                     "json": {
-                        "src": "cube-scene.composite.json"
+                        "src": "/one-transform.composite.json"
                     }
                 },
                 "515": {
                     "$case": "json",
                     "json": {
-                        "src": "only-children.composite.json"
+                        "src": "./second-level/one-transform.composite.json"
+                    }
+                },
+                "516": {
+                    "$case": "json",
+                    "json": {
+                        "src": "/relative/second-level/one-transform.composite.json"
+                    }
+                },
+                "517": {
+                    "$case": "json",
+                    "json": {
+                        "src": "relative/second-level/one-transform.composite.json"
                     }
                 }
             }
