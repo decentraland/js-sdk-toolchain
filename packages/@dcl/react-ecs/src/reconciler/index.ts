@@ -56,7 +56,6 @@ export function createReconciler(
   const UiInputResult = components.UiInputResult(engine)
   const UiDropdown = components.UiDropdown(engine)
   const UiDropdownResult = components.UiDropdownResult(engine)
-  const PointerEvents = components.PointerEvents(engine)
 
   // Component ID Helper
   const getComponentId: {
@@ -144,7 +143,6 @@ export function createReconciler(
   function removeChildEntity(instance: Instance) {
     changeEvents.delete(instance.entity)
     engine.removeEntity(instance.entity)
-    pointerEventTick.delete(instance.entity)
     for (const child of instance._child) {
       removeChildEntity(child)
     }
@@ -327,21 +325,11 @@ export function createReconciler(
     }
   }
 
-  const pointerEventTick = new Set<Entity>()
   return {
     update: function (component: ReactEcs.JSX.Element) {
       if (changeEvents.size) {
         handleOnChange(UiInput.componentId, UiInputResult)
         handleOnChange(UiDropdown.componentId, UiDropdownResult)
-      }
-
-      for (const [entity] of engine.getEntitiesWith(UiTransform, PointerEvents)) {
-        if (pointerEventTick.has(entity)) {
-          continue
-        }
-        pointerEventTick.add(entity)
-        // Re-send this pointer-event because of #issue
-        PointerEvents.getMutable(entity)
       }
       return reconciler.updateContainer(component as any, root, null)
     },
