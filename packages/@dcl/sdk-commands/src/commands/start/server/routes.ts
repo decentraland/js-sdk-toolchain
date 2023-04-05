@@ -16,7 +16,7 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
   if (dataLayer) {
     router.get('/data-layer', async (ctx, next) => {
       if (ctx.request.headers.get('upgrade') === 'websocket') {
-        return upgradeWebSocketResponse((ws) => handleDataLayerWs(components, ws, dataLayer))
+        return upgradeWebSocketResponse((ws) => handleDataLayerWs(components, ws as any, dataLayer))
       }
 
       return next()

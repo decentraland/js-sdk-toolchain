@@ -16,43 +16,36 @@ export type Events = {
   'Scene created': {
     projectType: string
     url: string
-    args: Record<string, unknown>
   }
   'Preview started': {
     projectHash: string
     coords: { x: number; y: number }
     isWorkspace: boolean
-    args: Record<string, unknown>
   }
   'Build scene': {
     projectHash: string
     coords: { x: number; y: number }
     isWorkspace: boolean
-    args: Record<string, unknown>
   }
   'Export static': {
     projectHash: string
     coords: { x: number; y: number }
-    args: Record<string, unknown>
   }
   'Scene deploy started': {
     projectHash: string
     coords: { x: number; y: number }
     isWorld: boolean
-    args: Record<string, unknown>
   }
   'Scene deploy success': {
     projectHash: string
     coords: { x: number; y: number }
     isWorld: boolean
-    args: Record<string, unknown>
     dependencies: string[]
   }
   'Scene deploy failure': {
     projectHash: string
     coords: { x: number; y: number }
     isWorld: boolean
-    args: Record<string, unknown>
     error: string
   }
 }

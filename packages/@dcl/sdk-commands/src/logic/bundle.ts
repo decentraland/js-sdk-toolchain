@@ -1,8 +1,6 @@
 // this file is tested extensively to build scenes in the `make test` command
 // but since it runs outiside the testing harness, coverage is not collected
 
-/* istanbul ignore file */
-
 import esbuild from 'esbuild'
 import child_process from 'child_process'
 import { future } from 'fp-future'
@@ -41,20 +39,24 @@ const MAX_STEP = 2
 export async function bundleProject(components: BundleComponents, options: CompileOptions, sceneJson: Scene) {
   const tsconfig = join(options.workingDirectory, 'tsconfig.json')
 
+  /* istanbul ignore if */
   if (!options.single && !sceneJson.main) {
     throw new CliError('scene.json .main must be present')
   }
 
+  /* istanbul ignore if */
   if ((sceneJson as any).runtimeVersion !== '7') {
     throw new CliError('scene.json `"runtimeVersion": "7"` must be present')
   }
 
+  /* istanbul ignore if */
   if (!(await components.fs.fileExists(tsconfig))) {
     throw new CliError(`File ${tsconfig} must exist to compile the Typescript project`)
   }
 
   const input = globSync(options.single ?? 'src/index.ts', { cwd: options.workingDirectory, absolute: true })
 
+  /* istanbul ignore if */
   if (!input.length) throw new CliError(`There are no input files to build: ${options.single ?? 'src/index.ts'}`)
 
   const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
@@ -99,6 +101,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
     }
   })
 
+  /* istanbul ignore if */
   if (options.watch) {
     await context.watch({})
 
@@ -115,6 +118,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
         )}`
       )
     } catch (err: any) {
+      /* istanbul ignore next */
       throw new CliError(err.toString())
     }
     await context.dispose()
@@ -135,6 +139,8 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
     '--preserveWatchOutput',
     options.emitDeclaration ? '--emitDeclarationOnly' : '--noEmit'
   ]
+
+  /* istanbul ignore if */
   if (options.watch) args.push('--watch')
 
   printProgressStep(components.logger, `Running type checker`, 2, MAX_STEP)
@@ -142,6 +148,7 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   const typeCheckerFuture = future<number>()
 
   ts.on('close', (code) => {
+    /* istanbul ignore else */
     if (code === 0) {
       printProgressInfo(components.logger, `Type checking completed without errors`)
     } else {
@@ -155,6 +162,7 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   ts.stdout.pipe(process.stdout)
   ts.stderr.pipe(process.stderr)
 
+  /* istanbul ignore if */
   if (options.watch) {
     typeCheckerFuture.resolve(-1)
   }

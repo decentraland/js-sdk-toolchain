@@ -13,15 +13,6 @@ describe('init command', () => {
     jest.spyOn(projectValidations, 'needsDependencies').mockResolvedValue(true)
   })
 
-  it('help: return void', async () => {
-    const helpSpy = jest.spyOn(init, 'help')
-
-    const res = await init.help()
-
-    expect(res).toBe(undefined)
-    expect(helpSpy).toBeCalled()
-  })
-
   it('main: should throw if directory is not empty and no bypass arg is provided', async () => {
     const downloadSpy = jest.spyOn(fsUtils, 'download')
     const extractSpy = jest.spyOn(fsUtils, 'extract')

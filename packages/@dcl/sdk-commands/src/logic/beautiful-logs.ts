@@ -15,6 +15,10 @@ export function printProgressInfo(logger: ILoggerComponent.ILogger, log: string)
   logger.log(colors.dim(log))
 }
 
+export function printStep(logger: ILoggerComponent.ILogger, log: string) {
+  logger.log(log)
+}
+
 /**
  * If there are more than one project, we print the current project as "progress info"
  */
@@ -26,7 +30,7 @@ export function printCurrentProjectStarting(
   if (workspace.projects.length > 1) {
     const relativePath = path.relative(workspace.rootWorkingDirectory, project.workingDirectory)
     const progress = colors.dim(`[${workspace.projects.indexOf(project) + 1}/${workspace.projects.length}]`)
-    logger.log(colors.cyan(`in ${relativePath} ${progress}`))
+    logger.log(colors.cyan(`\n${progress} in ${relativePath}:`))
   }
 }
 

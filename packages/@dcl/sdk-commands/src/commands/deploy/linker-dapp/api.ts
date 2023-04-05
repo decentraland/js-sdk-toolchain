@@ -41,7 +41,7 @@ export function runLinkerApp(
   { isHttps, skipValidations, openBrowser }: { isHttps: boolean; skipValidations: boolean; openBrowser: boolean }
 ): Promise<LinkerResponse> {
   return new Promise(async (resolve) => {
-    const resolvedPort = await getPort(port, 4044)
+    const resolvedPort = await getPort(port)
     const sceneInfo = await getSceneInfo(cliComponents, scene, rootCID, skipValidations)
     const protocol = isHttps ? 'https' : 'http'
     const queryParams = querystring.stringify(sceneInfo)

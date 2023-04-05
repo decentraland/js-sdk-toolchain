@@ -4,6 +4,7 @@ import * as fsUtils from '../../../packages/@dcl/sdk-commands/src/logic/fs'
 import { createFsComponent } from '../../../packages/@dcl/sdk-commands/src/components/fs'
 import { createFetchComponent } from '../../../packages/@dcl/sdk-commands/src/components/fetch'
 import path, { resolve } from 'path'
+import { normalizeDecentralandFilename } from '../../../packages/@dcl/sdk-commands/src/logic/project-files'
 
 afterEach(() => {
   jest.clearAllMocks()
@@ -46,4 +47,11 @@ describe('utils/fs', () => {
       dir: resolve(dist)
     })
   })
+})
+
+test('filename normalization works as expected', () => {
+  expect(normalizeDecentralandFilename('/a/root/folder', '/a/root/folder/models/a.gltf')).toEqual('models/a.gltf')
+  expect(normalizeDecentralandFilename('/a/root/folder', '/a/root/folder/models/B.GLTF')).toEqual('models/b.gltf')
+  expect(normalizeDecentralandFilename('/a/root/folder', 'modeLS/C.GLTF')).toEqual('models/c.gltf')
+  expect(normalizeDecentralandFilename('/a/root/folder', 'modeLS/a/../d.GLTF')).toEqual('models/d.gltf')
 })
