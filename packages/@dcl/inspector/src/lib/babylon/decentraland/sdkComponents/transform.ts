@@ -8,7 +8,6 @@ export const putTransformComponent: ComponentOperation = (entity, component) => 
     const newValue = component.getOrNull(entity.entityId) as TransformType | null
     const currentValue = entity.ecsComponentValues.transform
     entity.ecsComponentValues.transform = newValue || undefined
-
     let needsReparenting = false
 
     if (!currentValue && newValue) {

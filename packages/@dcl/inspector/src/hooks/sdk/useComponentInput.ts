@@ -48,7 +48,6 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
       if (isEqual(newComponentValue)) {
         return
       }
-
       setComponentValue(newComponentValue)
     }
   }, [input])
@@ -68,6 +67,7 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
       path: NestedKey<InputType>
     ): Pick<InputHTMLAttributes<HTMLElement>, 'value' | 'onChange' | 'onFocus' | 'onBlur'> => {
       const value = getValue(input, path) || ''
+
       return {
         value: value.toString(),
         onChange: handleUpdate(path),

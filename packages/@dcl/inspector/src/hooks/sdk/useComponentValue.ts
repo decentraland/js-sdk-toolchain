@@ -15,11 +15,11 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
   const [value, setValue] = useState<ComponentValueType>(component.get(entity) as ComponentValueType)
 
   function isEqual(val: ComponentValueType) {
-    const buf = new ReadWriteByteBuffer()
-    const buf2 = new ReadWriteByteBuffer()
-    component.schema.serialize(val as DeepReadonly<ComponentValueType>, buf)
-    component.schema.serialize(component.get(entity), buf2)
-    return dataCompare(buf.toBinary(), buf2.toBinary()) === 0
+    const current = new ReadWriteByteBuffer()
+    const newValue = new ReadWriteByteBuffer()
+    component.schema.serialize(val as DeepReadonly<ComponentValueType>, newValue)
+    component.schema.serialize(component.get(entity), current)
+    return dataCompare(current.toBinary(), newValue.toBinary()) === 0
   }
 
   // sync state -> engine
