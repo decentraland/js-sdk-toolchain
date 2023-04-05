@@ -5,7 +5,6 @@ import { createInspectorEngine } from '../../src/lib/sdk/inspector-engine'
 import { createLocalDataLayerRpcClient } from '../../src/lib/data-layer/client/local-data-layer'
 import { feededFileSystem } from '../../src/lib/data-layer/client/feeded-local-fs'
 import { DataLayerRpcClient } from '../../src/lib/data-layer/types'
-import { stopEngine } from '../../src/lib/data-layer/host'
 import { IEngine } from '@dcl/ecs'
 
 export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
@@ -30,7 +29,6 @@ export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
 
     inspector = createInspectorEngine(dataLayer)
     void sceneCtx.connectCrdtTransport(dataLayer.crdtStream)
-    stopEngine()
   })
 
   afterAll(() => {

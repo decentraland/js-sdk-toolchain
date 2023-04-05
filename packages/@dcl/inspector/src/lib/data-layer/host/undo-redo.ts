@@ -30,7 +30,10 @@ export function initUndoRedo(engine: IEngine, getComposite: () => CompositeDefin
   })
 
   streamEvent.on('streamEnd', () => {
-    undoList.push(getAndCleanArray(acc) as UndoRedo[])
+    const changes = getAndCleanArray(acc) as UndoRedo[]
+    if (changes.length) {
+      undoList.push(changes)
+    }
   })
 
   function onChange(
@@ -82,14 +85,18 @@ export function initUndoRedo(engine: IEngine, getComposite: () => CompositeDefin
 
   return {
     async redo() {
-      const lastMsg = redoList.pop()
-      if (!lastMsg) return {}
-      undoList.push(updateOperation(lastMsg))
+      const msg = redoList.pop()
+      if (msg) {
+        undoList.push(updateOperation(msg))
+        await engine.update(1 / 16)
+      }
     },
     async undo() {
-      const lastMsg = undoList.pop()
-      if (!lastMsg) return {}
-      redoList.push(updateOperation(lastMsg))
+      const msg = undoList.pop()
+      if (msg) {
+        redoList.push(updateOperation(msg))
+        await engine.update(1 / 16)
+      }
     },
     onChange
   }

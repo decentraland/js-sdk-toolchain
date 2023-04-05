@@ -46,5 +46,8 @@ export function stream(
     console.error('consumeAllMessagesInto failed: ', err)
   })
 
+  // Send initial message (engineSerialized)
+  void ctx.engine.update(1)
+
   return queue
 }
