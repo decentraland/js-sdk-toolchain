@@ -51,8 +51,8 @@ export const args = declareArgs({
   '--data-layer': Boolean
 })
 
-export async function help() {
-  return `
+export async function help(options: Options) {
+  options.components.logger.log(`
   Usage: sdk-commands start [options]
 
     Options:
@@ -76,7 +76,7 @@ export async function help() {
     - Start a local development server for a Decentraland Scene at a docker container
 
       $ sdk-commands start --ci
-`
+`)
 }
 
 export async function main(options: Options) {
@@ -121,7 +121,7 @@ export async function main(options: Options) {
 
   printProgressInfo(options.components.logger, 'Starting preview server')
 
-  const port = await getPort(options.args['--port'])
+  const port = await getPort(options.args['--port'] || 0)
   const program = await Lifecycle.run<PreviewComponents>({
     async initComponents(): Promise<PreviewComponents> {
       const metrics = createTestMetricsComponent(roomsMetrics)

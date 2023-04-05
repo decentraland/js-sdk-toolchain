@@ -7,7 +7,7 @@ export type Args = {
 
 export function parseArgs<T extends Args>(argv: string[], args: T): Result<T> {
   try {
-    return arg(args, { permissive: false, argv })
+    return arg({ '--json': Boolean, '-h': '--help', '--help': Boolean, ...args }, { permissive: false, argv })
   } catch (err: any) {
     if (err.name === 'ArgError') throw new CliError(`Argument error: ` + err.message)
     /* istanbul ignore next */

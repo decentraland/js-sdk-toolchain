@@ -42,8 +42,8 @@ export const args = declareArgs({
   '-p': '--port'
 })
 
-export function help() {
-  return `
+export function help(options: Options) {
+  options.components.logger.log(`
   Usage: 'sdk-commands build [options]'
     Options:
       -h, --help                Displays complete help
@@ -60,7 +60,7 @@ export function help() {
       $ sdk-commands deploy
     - Deploy your scene to a specific content server:
       $ sdk-commands deploy --target my-favorite-catalyst-server.org:2323
-`
+`)
 }
 
 export async function main(options: Options) {

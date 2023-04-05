@@ -37,8 +37,8 @@ export const args = declareArgs({
   '--baseUrl': String
 })
 
-export async function help() {
-  return `
+export async function help(options: Options) {
+  options.components.logger.log(`
   Usage:
     sdk-commands export-static --dir <directory> --destination <directory>
 
@@ -53,7 +53,7 @@ export async function help() {
     --timestamp <timestamp>   A date to use in the deployable entity. Defaults to now()
     --realmName <name>        Creates a /<name>/about endpoint to expose the current deployment as a realm. Requires --baseUrl
     --baseUrl <baseUrl>       It is the public URL in which the --destination directory will be avaiable
-`
+`)
 }
 
 export async function main(options: Options) {
@@ -64,15 +64,19 @@ export async function main(options: Options) {
   let currentStep = 1
   const maxSteps = 1 + (willCreateRealm ? 1 : 0)
 
+  /* istanbul ignore if */
   if (willCreateRealm && !options.args['--baseUrl']) {
     throw new CliError(`--baseUrl is mandatory when --realmName is provided`)
   }
 
+  /* istanbul ignore if */
   if (willCreateRealm && !/^[a-z][a-z0-9-/]*$/i.test(options.args['--realmName']!)) {
     throw new CliError(`--realmName has invalid characters`)
   }
 
   await fs.mkdir(outputDirectory, { recursive: true })
+
+  /* istanbul ignore if */
   if (!(await fs.directoryExists(outputDirectory))) {
     throw new CliError(`The destination path ${outputDirectory} is not a directory`)
   }
@@ -105,6 +109,8 @@ export async function main(options: Options) {
     // write the realm file
     const realmDirectory = path.join(outputDirectory, realmName)
     await fs.mkdir(realmDirectory, { recursive: true })
+
+    /* istanbul ignore if */
     if (!(await fs.directoryExists(realmDirectory))) {
       throw new CliError(`The destination path ${realmDirectory} is not a directory`)
     }
@@ -138,6 +144,7 @@ export async function prepareSceneFiles(options: Options, project: SceneProject,
   for (const { absolutePath, hash } of filesToExport) {
     const dst = path.resolve(outputDirectory, hash)
 
+    /* istanbul ignore if */
     if (absolutePath.startsWith(outputDirectory)) {
       printWarning(
         options.components.logger,

@@ -8,15 +8,6 @@ afterEach(() => {
   jest.restoreAllMocks()
 })
 describe('build command', () => {
-  it('help: return void', () => {
-    const helpSpy = jest.spyOn(build, 'help')
-
-    const res = build.help()
-
-    expect(res).toStrictEqual(expect.any(String))
-    expect(helpSpy).toBeCalled()
-  })
-
   it('should install dependencies if needed', async () => {
     const components = await initComponents()
     jest

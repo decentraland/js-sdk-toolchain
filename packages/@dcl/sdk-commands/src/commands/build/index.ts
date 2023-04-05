@@ -25,8 +25,8 @@ export const args = declareArgs({
   '--dir': String
 })
 
-export function help() {
-  return `
+export function help(options: Options) {
+  options.components.logger.log(`
   Usage: 'sdk-commands build [options]'
     Options:'
       -h, --help                Displays complete help
@@ -38,7 +38,7 @@ export function help() {
     Example:
     - Build your scene:
       '$ sdk-commands build'
-  `
+  `)
 }
 
 export async function main(options: Options) {

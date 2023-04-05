@@ -67,7 +67,7 @@ describe('Analytics Component', () => {
     if (!('get' in analytics)) throw new Error('analytics.get is not defined')
 
     const trackSpy = jest.spyOn(analytics.get(), 'track')
-    await analytics.track('Scene created', { projectType: '', url: '', args: {} })
+    analytics.track('Scene created', { projectType: '', url: '' })
     expect(trackSpy).toHaveBeenCalledWith(
       {
         userId: 'sdk-commands-user',
@@ -84,8 +84,7 @@ describe('Analytics Component', () => {
           ecs: {
             ecsVersion: 'ecs7',
             packageVersion: 'unknown'
-          },
-          args: {}
+          }
         }
       },
       expect.anything()

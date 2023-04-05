@@ -10,13 +10,14 @@ export async function getCommands({ fs }: Pick<CliComponents, 'fs'>): Promise<st
   const commands = commandDirs.map(async (dir) => {
     const path = resolve(COMMANDS_PATH, dir)
 
-    const statDir = await fs.stat(path)
-
-    if (!statDir.isDirectory()) {
+    if (!(await fs.directoryExists(path))) {
       throw new CliError('Developer: All commands must be inside a folder')
     }
 
-    if (!require.resolve(`${path}`)) {
+    try {
+      require.resolve(`${path}`)
+    } catch {
+      /* istanbul ignore next */
       throw new CliError('Developer: All commands must have an "index.js" file inside')
     }
 

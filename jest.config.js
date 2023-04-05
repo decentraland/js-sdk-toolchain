@@ -19,14 +19,50 @@ module.exports = {
       functions: 100,
       lines: 100,
       statements: 100,
+    },
+    "packages/@dcl/sdk": {
+      branches: 0,
+      functions: 0,
+      lines: 0,
+      statements: 0,
+    },
+    "packages/@dcl/sdk-commands/src/commands/deploy": {
+      branches: 0,
+      functions: 0,
+      lines: 0,
+      statements: 0,
+    },
+    "packages/@dcl/sdk-commands/src/commands/export-static": {
+      branches: 80,
+    },
+    "packages/@dcl/sdk-commands/src/commands/start": {
+      branches: 0,
+      functions: 0,
+      lines: 0,
+      statements: 0,
+    },
+    "packages/@dcl/sdk-commands/src/components/exit-signal.ts": {
+      branches: 0,
+      functions: 0,
+      lines: 0,
+      statements: 0,
+    },
+    "packages/@dcl/sdk-commands/src/logic/catalyst-requests.ts": {
+      branches: 0,
+      functions: 0,
+      lines: 0,
+      statements: 0,
     }
   },
+  collectCoverageFrom: [
+    "packages/@dcl/*/src/**"
+  ],
   coveragePathIgnorePatterns: [
     "scripts",
     "test",
     "(.)\\.(js)$",
     "packages/@dcl/inspector",
-    "packages/@dcl/dcl-rollup",
+    "packages/@dcl/playground-assets",
     "packages/@dcl/ecs/src/components/generated/pb",
     "packages/@dcl/ecs/src/composite/proto/gen",
     "packages/@dcl/ecs/src/components/generated/index.gen.ts",

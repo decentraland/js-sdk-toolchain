@@ -15,7 +15,6 @@ export type ProjectFile = {
  * Returns an array of the publishable files for a given folder.
  *
  */
-/* istanbul ignore next */
 export async function getPublishableFiles(
   components: Pick<CliComponents, 'fs'>,
   projectRoot: string
@@ -71,7 +70,6 @@ export function projectFilesToContentMappings(projectRoot: string, files: Projec
 export async function getProjectPublishableFilesWithHashes(
   components: Pick<CliComponents, 'fs'>,
   projectRoot: string,
-  /* istanbul ignore next */
   hashingFunction: (filePath: string) => Promise<string>
 ): Promise<ProjectFile[]> {
   const projectFiles = await getPublishableFiles(components, projectRoot)

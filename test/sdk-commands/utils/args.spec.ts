@@ -3,5 +3,7 @@ import { runSdkCommand } from '../../../packages/@dcl/sdk-commands/src/run-comma
 
 test('invalid argument', async () => {
   const components = await initComponents()
-  await expect(runSdkCommand(components, 'export-static', ['--invalid-argument'])).rejects.toThrow('assssssss')
+  await expect(runSdkCommand(components, 'export-static', ['--invalid-argument'])).rejects.toThrow(
+    'Argument error: unknown or unexpected option: --invalid-argument'
+  )
 })
