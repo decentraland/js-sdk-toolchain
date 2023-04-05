@@ -6,6 +6,8 @@ import { Hierarchy } from '../Hierarchy'
 import { ProjectAssetExplorer } from '../ProjectAssetExplorer'
 import { Renderer } from '../Renderer'
 
+import './App.css'
+
 const App = () => {
   const [catalog] = useCatalog()
 
