@@ -4,7 +4,7 @@ import open from 'open'
 
 import { CliComponents } from '../../components'
 import { buildScene } from '../build'
-import { getArgs, getArgsUsed } from '../../logic/args'
+import { declareArgs } from '../../logic/args'
 import { getBaseCoords } from '../../logic/scene-validations'
 import { getPort } from '../../logic/get-free-port'
 import { PreviewComponents } from './types'
@@ -24,13 +24,14 @@ import { createDataLayer } from './data-layer/rpc'
 import { createExitSignalComponent } from '../../components/exit-signal'
 import { getValidWorkspace } from '../../logic/workspace-validations'
 import { printCurrentProjectStarting, printProgressInfo, printWarning } from '../../logic/beautiful-logs'
+import { Result } from 'arg'
 
 interface Options {
-  args: typeof args
+  args: Result<typeof args>
   components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'analytics' | 'spawner'>
 }
 
-export const args = getArgs({
+export const args = declareArgs({
   '--dir': String,
   '--help': Boolean,
   '--port': Number,
@@ -81,13 +82,13 @@ export async function help() {
 export async function main(options: Options) {
   let baseCoords = { x: 0, y: 0 }
   const workingDirectory = path.resolve(process.cwd(), options.args['--dir'] || '.')
-  const isCi = args['--ci'] || process.env.CI || false
-  const debug = !args['--no-debug'] && !isCi
-  const openBrowser = !args['--no-browser'] && !isCi
-  const skipBuild = args['--skip-build']
-  const watch = !args['--no-watch']
-  const withDataLayer = args['--data-layer']
-  const enableWeb3 = args['--web3']
+  const isCi = options.args['--ci'] || process.env.CI || false
+  const debug = !options.args['--no-debug'] && !isCi
+  const openBrowser = !options.args['--no-browser'] && !isCi
+  const skipBuild = options.args['--skip-build']
+  const watch = !options.args['--no-watch']
+  const withDataLayer = options.args['--data-layer']
+  const enableWeb3 = options.args['--web3']
 
   // TODO: FIX this hardcoded values ?
   const hasPortableExperience = false
@@ -114,8 +115,7 @@ export async function main(options: Options) {
     options.components.analytics.track('Preview started', {
       projectHash: await b64HashingFunction(project.workingDirectory),
       coords: baseCoords,
-      isWorkspace: false,
-      args: getArgsUsed(options.args)
+      isWorkspace: false
     })
   }
 
@@ -196,7 +196,7 @@ export async function main(options: Options) {
         components.logger.log(`    ${addr}`)
       }
 
-      if (args['--desktop-client']) {
+      if (options.args['--desktop-client']) {
         components.logger.log('\n  Desktop client:\n')
         for (const addr of sortedURLs) {
           const searchParams = new URLSearchParams()
@@ -209,7 +209,7 @@ export async function main(options: Options) {
       components.logger.log('\nPress CTRL+C to exit\n')
 
       // Open preferably localhost/127.0.0.1
-      if (openBrowser && sortedURLs.length && !args['--desktop-client']) {
+      if (openBrowser && sortedURLs.length && !options.args['--desktop-client']) {
         try {
           await open(sortedURLs[0])
         } catch (_) {

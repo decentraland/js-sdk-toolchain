@@ -1,19 +1,20 @@
 import { join, resolve } from 'path'
 
-import { getArgs, getArgsUsed } from '../../logic/args'
+import { declareArgs } from '../../logic/args'
 import { CliError } from '../../logic/error'
 import { CliComponents } from '../../components'
 import { isDirectoryEmpty, download, extract } from '../../logic/fs'
 
 import { get as getRepo } from './repos'
 import { installDependencies, needsDependencies } from '../../logic/project-validations'
+import { Result } from 'arg'
 
 interface Options {
-  args: typeof args
+  args: Result<typeof args>
   components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'analytics' | 'spawner'>
 }
 
-export const args = getArgs({
+export const args = declareArgs({
   '--yes': Boolean,
   '-y': '--yes',
   '--dir': String,
@@ -44,7 +45,7 @@ export async function main(options: Options) {
   if (shouldInstallDeps && !options.args['--skip-install']) {
     await installDependencies(options.components, dir)
   }
-  options.components.analytics.track('Scene created', { projectType: scene, url, args: getArgsUsed(options.args) })
+  options.components.analytics.track('Scene created', { projectType: scene, url })
 }
 
 const moveFilesFromDir = async (components: Pick<CliComponents, 'fs'>, dir: string, folder: string) => {

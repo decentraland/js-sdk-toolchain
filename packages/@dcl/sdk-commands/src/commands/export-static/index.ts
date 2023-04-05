@@ -1,9 +1,13 @@
 import path from 'path'
-import { getArgs, getArgsUsed } from '../../logic/args'
+import { declareArgs } from '../../logic/args'
 import { hashV1 } from '@dcl/hashing'
 import { CliComponents } from '../../components'
 import { SceneProject } from '../../logic/project-validations'
-import { b64HashingFunction, getProjectContentMappings } from '../../logic/project-files'
+import {
+  getProjectPublishableFilesWithHashes,
+  b64HashingFunction,
+  projectFilesToContentMappings
+} from '../../logic/project-files'
 import { CliError } from '../../logic/error'
 import { Entity, EntityType } from '@dcl/schemas'
 import { colors } from '../../components/log'
@@ -11,18 +15,21 @@ import {
   printCurrentProjectStarting,
   printProgressInfo,
   printProgressStep,
-  printSuccess
+  printStep,
+  printSuccess,
+  printWarning
 } from '../../logic/beautiful-logs'
 import { createStaticRealm } from '../../logic/realm'
 import { getBaseCoords } from '../../logic/scene-validations'
 import { getValidWorkspace } from '../../logic/workspace-validations'
+import { Result } from 'arg'
 
 interface Options {
-  args: typeof args
+  args: Result<typeof args>
   components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'analytics' | 'config'>
 }
 
-export const args = getArgs({
+export const args = declareArgs({
   '--dir': String,
   '--destination': String,
   '--timestamp': String,
@@ -53,19 +60,17 @@ export async function main(options: Options) {
   const { fs, logger } = options.components
   const workingDirectory = path.resolve(process.cwd(), options.args['--dir'] || '.')
   const outputDirectory = path.resolve(process.cwd(), options.args['--destination'] || '.')
-  const willCreateRealm = !!args['--realmName']
+  const willCreateRealm = !!options.args['--realmName']
   let currentStep = 1
   const maxSteps = 1 + (willCreateRealm ? 1 : 0)
 
-  if (willCreateRealm && !args['--baseUrl']) {
+  if (willCreateRealm && !options.args['--baseUrl']) {
     throw new CliError(`--baseUrl is mandatory when --realmName is provided`)
   }
 
-  if (willCreateRealm && !/^[a-z][a-z0-9-/]*$/i.test(args['--realmName']!)) {
+  if (willCreateRealm && !/^[a-z][a-z0-9-/]*$/i.test(options.args['--realmName']!)) {
     throw new CliError(`--realmName has invalid characters`)
   }
-
-  printProgressStep(logger, 'Reading project files...', currentStep++, maxSteps)
 
   await fs.mkdir(outputDirectory, { recursive: true })
   if (!(await fs.directoryExists(outputDirectory))) {
@@ -73,14 +78,18 @@ export async function main(options: Options) {
   }
 
   const scenesUrn: string[] = []
+  const entities: string[] = []
 
   const workspace = await getValidWorkspace(options.components, workingDirectory)
+
+  printProgressStep(logger, `Exporting ${workspace.projects.length} project(s)`, currentStep++, maxSteps)
 
   for (const project of workspace.projects) {
     printCurrentProjectStarting(options.components.logger, project, workspace)
     if (project.kind === 'scene') {
       const result = await prepareSceneFiles(options, project, outputDirectory)
       scenesUrn.push(result.urn)
+      entities.push(result.entityId)
     }
   }
 
@@ -88,7 +97,7 @@ export async function main(options: Options) {
     // prepare the realm object
     printProgressStep(logger, 'Creating realm file...', currentStep++, maxSteps)
     const realm = await createStaticRealm(options.components)
-    const realmName = args['--realmName']!
+    const realmName = options.args['--realmName']!
 
     realm.configurations!.scenesUrn = scenesUrn
     realm.configurations!.realmName = realmName
@@ -101,7 +110,7 @@ export async function main(options: Options) {
     }
     const dst = path.join(realmDirectory, 'about')
     await fs.writeFile(dst, JSON.stringify(realm, null, 2))
-    printProgressInfo(logger, `> ${realmName}/about -> [REALM FILE]`)
+    printProgressInfo(logger, `> ${realmName}/about ← [REALM FILE]`)
   }
 
   printSuccess(
@@ -110,28 +119,37 @@ export async function main(options: Options) {
     `=> The entity URN are:${colors.bold(scenesUrn.map(($) => '\n - ' + $).join(''))}`
   )
 
-  return { scenesUrn, destination: outputDirectory }
+  return { scenesUrn, destination: outputDirectory, entities }
 }
 
 export async function prepareSceneFiles(options: Options, project: SceneProject, outputDirectory: string) {
   const { fs, logger } = options.components
 
-  const filesToExport = await getProjectContentMappings(options.components, project.workingDirectory, async (file) => {
-    return await hashV1(fs.createReadStream(path.resolve(project.workingDirectory, file)))
-  })
+  const filesToExport = await getProjectPublishableFilesWithHashes(
+    options.components,
+    project.workingDirectory,
+    async (file) => {
+      return await hashV1(fs.createReadStream(path.resolve(project.workingDirectory, file)))
+    }
+  )
 
-  printProgressInfo(logger, 'Copying files...')
+  printStep(logger, 'Exporting static project')
 
-  for (const { file, hash } of filesToExport) {
-    const src = path.resolve(project.workingDirectory, file)
+  for (const { absolutePath, hash } of filesToExport) {
     const dst = path.resolve(outputDirectory, hash)
 
-    if (src.startsWith(outputDirectory)) continue
+    if (absolutePath.startsWith(outputDirectory)) {
+      printWarning(
+        options.components.logger,
+        `The file ${absolutePath} was omitted because it overwrites an input directory`
+      )
+      continue
+    }
 
-    printProgressInfo(logger, `> ${hash} -> ${colors.reset(file)}`)
+    printProgressInfo(logger, `> ${hash} ← ${colors.reset(absolutePath)}`)
 
     if (!(await fs.fileExists(dst))) {
-      const content = await fs.readFile(src)
+      const content = await fs.readFile(absolutePath)
       await fs.writeFile(dst, content)
     }
   }
@@ -139,16 +157,14 @@ export async function prepareSceneFiles(options: Options, project: SceneProject,
   // entity with ID are the deployed ones, when we generate the entity the ID is not
   // available because it is the result of hashing the following structure
   const entity: Omit<Entity, 'id'> = {
-    content: filesToExport,
+    content: projectFilesToContentMappings(project.workingDirectory, filesToExport),
     pointers: [],
-    timestamp: args['--timestamp'] ? new Date(args['--timestamp']).getTime() : Date.now(),
+    timestamp: options.args['--timestamp'] ? new Date(options.args['--timestamp']).getTime() : Date.now(),
     type: EntityType.SCENE,
     // for now, the only valid export is for scenes
     metadata: project.scene,
     version: 'v3'
   }
-
-  printProgressInfo(logger, 'Generating files...')
 
   // create the entity file and get the entityId
   const entityRaw = Buffer.from(JSON.stringify(entity), 'utf8')
@@ -156,20 +172,19 @@ export async function prepareSceneFiles(options: Options, project: SceneProject,
   const dst = path.resolve(outputDirectory, entityId)
   await fs.writeFile(dst, entityRaw)
 
-  printProgressInfo(logger, `> ${entityId} -> ${colors.reset('[ENTITY FILE]')}`)
+  printStep(logger, `> ${entityId} ← ${colors.reset('[ENTITY FILE]')}`)
 
   let urn = `urn:decentraland:entity:${entityId}`
 
-  if (args['--baseUrl']) {
-    urn += '?baseUrl=' + args['--baseUrl']
+  if (options.args['--baseUrl']) {
+    urn += '?baseUrl=' + options.args['--baseUrl']
     // baseUrl must end with /
     if (!urn.endsWith('/')) urn += '/'
   }
 
   options.components.analytics.track('Export static', {
     projectHash: await b64HashingFunction(project.workingDirectory),
-    coords: getBaseCoords(project.scene),
-    args: getArgsUsed(options.args)
+    coords: getBaseCoords(project.scene)
   })
 
   return { urn, entityId, destination: outputDirectory }

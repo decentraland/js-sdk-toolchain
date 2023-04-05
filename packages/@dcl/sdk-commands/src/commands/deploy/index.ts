@@ -7,21 +7,22 @@ import { ethSign } from '@dcl/crypto/dist/crypto'
 
 import { CliComponents } from '../../components'
 import { IFile, getBaseCoords, getFiles, getValidSceneJson, validateFilesSizes } from '../../logic/scene-validations'
-import { getArgs, getArgsUsed } from '../../logic/args'
+import { declareArgs } from '../../logic/args'
 import { npmRun } from '../../logic/project-validations'
 import { runLinkerApp, LinkerResponse } from './linker-dapp/api'
 import { CliError } from '../../logic/error'
 import { printProgressInfo, printSuccess } from '../../logic/beautiful-logs'
 import { createWallet } from '../../logic/account'
-import { b64HashingFunction, getPackageJson } from '../../logic/project-files'
+import { getPackageJson, b64HashingFunction } from '../../logic/project-files'
 import { Events } from '../../components/analytics'
+import { Result } from 'arg'
 
 interface Options {
-  args: typeof args
+  args: Result<typeof args>
   components: CliComponents
 }
 
-export const args = getArgs({
+export const args = declareArgs({
   '--dir': String,
   '--help': Boolean,
   '-h': '--help',
@@ -78,8 +79,7 @@ export async function main(options: Options) {
   const trackProps: Events['Scene deploy started'] = {
     projectHash: await b64HashingFunction(projectRoot),
     coords,
-    isWorld,
-    args: getArgsUsed(options.args)
+    isWorld
   }
   const packageJson = await getPackageJson(options.components, projectRoot)
   const dependencies = Array.from(

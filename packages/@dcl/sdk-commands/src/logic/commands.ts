@@ -16,8 +16,7 @@ export async function getCommands({ fs }: Pick<CliComponents, 'fs'>): Promise<st
       throw new CliError('Developer: All commands must be inside a folder')
     }
 
-    const statIndex = await fs.stat(`${path}/index.js`)
-    if (!statIndex.isFile()) {
+    if (!require.resolve(`${path}`)) {
       throw new CliError('Developer: All commands must have an "index.js" file inside')
     }
 

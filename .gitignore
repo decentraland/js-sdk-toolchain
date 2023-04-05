@@ -32,3 +32,5 @@ test-scene
 test/snapshots/bin
 
 test/snapshots/tsconfig.tsbuildinfo
+
+test/build-ecs/fixtures/ecs7-scene/aCaseSensitiveReadme.md

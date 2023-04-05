@@ -1,19 +1,20 @@
 import path from 'path'
 import { CliComponents } from '../../components'
-import { getArgs, getArgsUsed } from '../../logic/args'
+import { declareArgs } from '../../logic/args'
 import { installDependencies, needsDependencies, SceneProject } from '../../logic/project-validations'
 import { getBaseCoords } from '../../logic/scene-validations'
 import { b64HashingFunction } from '../../logic/project-files'
 import { bundleProject } from '../../logic/bundle'
 import { printCurrentProjectStarting } from '../../logic/beautiful-logs'
 import { getValidWorkspace } from '../../logic/workspace-validations'
+import { Result } from 'arg'
 
 interface Options {
-  args: typeof args
+  args: Result<typeof args>
   components: Pick<CliComponents, 'fs' | 'logger' | 'analytics' | 'spawner'>
 }
 
-export const args = getArgs({
+export const args = declareArgs({
   '--watch': Boolean,
   '-w': '--watch',
   '--production': Boolean,
@@ -79,7 +80,6 @@ export async function buildScene(options: Options, project: SceneProject) {
   options.components.analytics.track('Build scene', {
     projectHash: await b64HashingFunction(project.workingDirectory),
     coords,
-    isWorkspace: false,
-    args: getArgsUsed(options.args)
+    isWorkspace: false
   })
 }
