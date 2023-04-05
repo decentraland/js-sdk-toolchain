@@ -8,6 +8,7 @@ import { fetchEntityByPointer } from '../../../logic/catalyst-requests'
 import { CliComponents } from '../../../components'
 import { b64HashingFunction, getProjectContentMappings } from '../../../logic/project-files'
 import { getCatalystBaseUrl } from '../../../logic/config'
+import { Workspace } from '../../../logic/workspace-validations'
 
 function smartWearableNameToId(name: string) {
   return name.toLocaleLowerCase().replace(/ /g, '-')
@@ -17,15 +18,20 @@ type LambdasWearable = Wearable & {
   baseUrl: string
 }
 
-export async function setupEcs6Endpoints(components: CliComponents, dir: string, router: Router<PreviewComponents>) {
+export async function setupEcs6Endpoints(
+  components: CliComponents,
+  router: Router<PreviewComponents>,
+  workspace: Workspace
+) {
   const catalystUrl = new URL(await getCatalystBaseUrl(components))
 
-  const baseFolders = [dir]
+  const baseFolders = workspace.projects.map(($) => $.workingDirectory)
+
   // handle old preview scene.json
   router.get('/scene.json', async () => {
     return {
       headers: { 'content-type': 'application/json' },
-      body: components.fs.createReadStream(path.join(dir, 'scene.json'))
+      body: components.fs.createReadStream(path.join(baseFolders[0], 'scene.json'))
     }
   })
 
@@ -130,7 +136,7 @@ export async function setupEcs6Endpoints(components: CliComponents, dir: string,
     return res
   })
 
-  serveStatic(components, dir, router)
+  serveStatic(components, workspace, router)
 
   // TODO: get workspace scenes & wearables...
 
@@ -335,15 +341,15 @@ async function getSceneJson(
   return resultEntities
 }
 
-function serveStatic(components: Pick<CliComponents, 'fs'>, projectRoot: string, router: Router<PreviewComponents>) {
+function serveStatic(components: Pick<CliComponents, 'fs'>, workspace: Workspace, router: Router<PreviewComponents>) {
   const sdkPath = path.dirname(
     require.resolve('@dcl/sdk/package.json', {
-      paths: [projectRoot]
+      paths: [workspace.rootWorkingDirectory, ...workspace.projects.map(($) => $.workingDirectory)]
     })
   )
   const dclExplorerJsonPath = path.dirname(
     require.resolve('@dcl/explorer/package.json', {
-      paths: [projectRoot, sdkPath]
+      paths: [workspace.rootWorkingDirectory, ...workspace.projects.map(($) => $.workingDirectory), sdkPath]
     })
   )
 

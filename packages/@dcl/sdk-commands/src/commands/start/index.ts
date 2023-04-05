@@ -3,11 +3,9 @@ import * as path from 'path'
 import open from 'open'
 
 import { CliComponents } from '../../components'
-import { main as build } from '../build'
+import { buildScene } from '../build'
 import { getArgs, getArgsUsed } from '../../logic/args'
-import { needsDependencies, npmRun } from '../../logic/project-validations'
-import { getBaseCoords, getValidSceneJson } from '../../logic/scene-validations'
-import { CliError } from '../../logic/error'
+import { getBaseCoords } from '../../logic/scene-validations'
 import { getPort } from '../../logic/get-free-port'
 import { PreviewComponents } from './types'
 import { createTestMetricsComponent } from '@well-known-components/metrics'
@@ -24,6 +22,8 @@ import { createWsComponent } from './server/ws'
 import { b64HashingFunction } from '../../logic/project-files'
 import { createDataLayer } from './data-layer/rpc'
 import { createExitSignalComponent } from '../../components/exit-signal'
+import { getValidWorkspace } from '../../logic/workspace-validations'
+import { printCurrentProjectStarting, printProgressInfo, printWarning } from '../../logic/beautiful-logs'
 
 interface Options {
   args: typeof args
@@ -79,7 +79,8 @@ export async function help() {
 }
 
 export async function main(options: Options) {
-  const projectRoot = path.resolve(process.cwd(), options.args['--dir'] || '.')
+  let baseCoords = { x: 0, y: 0 }
+  const workingDirectory = path.resolve(process.cwd(), options.args['--dir'] || '.')
   const isCi = args['--ci'] || process.env.CI || false
   const debug = !args['--no-debug'] && !isCi
   const openBrowser = !args['--no-browser'] && !isCi
@@ -91,23 +92,34 @@ export async function main(options: Options) {
   // TODO: FIX this hardcoded values ?
   const hasPortableExperience = false
 
-  // first run `npm run build`, this can be disabled with --skip-build
-  if (!skipBuild) {
-    await npmRun(options.components, projectRoot, 'build')
+  const workspace = await getValidWorkspace(options.components, workingDirectory)
+
+  /* istanbul ignore if */
+  if (workspace.projects.length > 1)
+    printWarning(options.components.logger, 'Support for multiple projects is still experimental.')
+
+  for (const project of workspace.projects) {
+    printCurrentProjectStarting(options.components.logger, project, workspace)
+
+    // first run `npm run build`, this can be disabled with --skip-build
+    // then start the embedded compiler, this can be disabled with --no-watch
+    if (watch) {
+      await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': true, _: [] } }, project)
+    } else if (!skipBuild) {
+      await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': false, _: [] } }, project)
+    }
+
+    // track the event
+    baseCoords = getBaseCoords(project.scene)
+    options.components.analytics.track('Preview started', {
+      projectHash: await b64HashingFunction(project.workingDirectory),
+      coords: baseCoords,
+      isWorkspace: false,
+      args: getArgsUsed(options.args)
+    })
   }
 
-  // then start the embedded compiler, this can be disabled with --no-watch
-  if (watch) {
-    await build({ ...options, args: { '--dir': projectRoot, '--watch': watch, _: [] } })
-  }
-
-  const sceneJson = await getValidSceneJson(options.components, projectRoot)
-  const baseCoords = getBaseCoords(sceneJson)
-
-  if (await needsDependencies(options.components, projectRoot)) {
-    const npmModulesPath = path.resolve(projectRoot, 'node_modules')
-    throw new CliError(`Couldn\'t find ${npmModulesPath}, please run: npm install`)
-  }
+  printProgressInfo(options.components.logger, 'Starting preview server')
 
   const port = await getPort(options.args['--port'])
   const program = await Lifecycle.run<PreviewComponents>({
@@ -145,21 +157,18 @@ export async function main(options: Options) {
     async main({ components, startComponents }) {
       // TODO: dataLayerRpc should be an optional component
       const dataLayer = withDataLayer ? await createDataLayer(components) : undefined
-      await wireRouter(components, projectRoot, dataLayer)
+      await wireRouter(components, workspace, dataLayer)
       if (watch) {
-        await wireFileWatcherToWebSockets(components, projectRoot)
+        for (const project of workspace.projects) {
+          await wireFileWatcherToWebSockets(components, project.workingDirectory)
+        }
       }
       await startComponents()
 
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []
-      components.analytics.track('Preview started', {
-        projectHash: await b64HashingFunction(projectRoot),
-        coords: baseCoords,
-        isWorkspace: false,
-        args: getArgsUsed(options.args)
-      })
-      components.logger.log(`Preview server is now running!`)
+
+      printProgressInfo(options.components.logger, 'Preview server is now running!')
       components.logger.log('Available on:\n')
 
       Object.keys(networkInterfaces).forEach((dev) => {

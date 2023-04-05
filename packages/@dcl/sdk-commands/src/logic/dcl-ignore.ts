@@ -28,7 +28,8 @@ export async function getDCLIgnoreFileContents(
   dir: string
 ): Promise<string | null> {
   try {
-    return components.fs.readFile(path.resolve(dir, '.dclignore'), 'utf8')
+    return await components.fs.readFile(path.resolve(dir, '.dclignore'), 'utf8')
+    //     ^^^^^ never remove that await.
   } catch (e) {}
 
   return null

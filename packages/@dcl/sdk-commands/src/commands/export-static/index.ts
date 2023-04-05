@@ -1,15 +1,21 @@
-import { resolve } from 'path'
+import path from 'path'
 import { getArgs, getArgsUsed } from '../../logic/args'
 import { hashV1 } from '@dcl/hashing'
 import { CliComponents } from '../../components'
-import { assertValidProjectFolder } from '../../logic/project-validations'
+import { SceneProject } from '../../logic/project-validations'
 import { b64HashingFunction, getProjectContentMappings } from '../../logic/project-files'
 import { CliError } from '../../logic/error'
 import { Entity, EntityType } from '@dcl/schemas'
 import { colors } from '../../components/log'
-import { printProgressInfo, printProgressStep, printSuccess } from '../../logic/beautiful-logs'
+import {
+  printCurrentProjectStarting,
+  printProgressInfo,
+  printProgressStep,
+  printSuccess
+} from '../../logic/beautiful-logs'
 import { createStaticRealm } from '../../logic/realm'
-import { getValidSceneJson, getBaseCoords } from '../../logic/scene-validations'
+import { getBaseCoords } from '../../logic/scene-validations'
+import { getValidWorkspace } from '../../logic/workspace-validations'
 
 interface Options {
   args: typeof args
@@ -45,11 +51,11 @@ export async function help() {
 
 export async function main(options: Options) {
   const { fs, logger } = options.components
-  const projectRoot = resolve(process.cwd(), options.args['--dir'] || '.')
-  const destDirectory = resolve(process.cwd(), options.args['--destination'] || '.')
+  const workingDirectory = path.resolve(process.cwd(), options.args['--dir'] || '.')
+  const outputDirectory = path.resolve(process.cwd(), options.args['--destination'] || '.')
   const willCreateRealm = !!args['--realmName']
   let currentStep = 1
-  const maxSteps = 3 + (willCreateRealm ? 1 : 0)
+  const maxSteps = 1 + (willCreateRealm ? 1 : 0)
 
   if (willCreateRealm && !args['--baseUrl']) {
     throw new CliError(`--baseUrl is mandatory when --realmName is provided`)
@@ -61,25 +67,68 @@ export async function main(options: Options) {
 
   printProgressStep(logger, 'Reading project files...', currentStep++, maxSteps)
 
-  await fs.mkdir(destDirectory, { recursive: true })
-  if (!(await fs.directoryExists(destDirectory))) {
-    throw new CliError(`The destination path ${destDirectory} is not a directory`)
+  await fs.mkdir(outputDirectory, { recursive: true })
+  if (!(await fs.directoryExists(outputDirectory))) {
+    throw new CliError(`The destination path ${outputDirectory} is not a directory`)
   }
 
-  const project = await assertValidProjectFolder(options.components, projectRoot)
-  const filesToExport = await getProjectContentMappings(options.components, projectRoot, async (file) => {
-    return await hashV1(fs.createReadStream(resolve(projectRoot, file)))
+  const scenesUrn: string[] = []
+
+  const workspace = await getValidWorkspace(options.components, workingDirectory)
+
+  for (const project of workspace.projects) {
+    printCurrentProjectStarting(options.components.logger, project, workspace)
+    if (project.kind === 'scene') {
+      const result = await prepareSceneFiles(options, project, outputDirectory)
+      scenesUrn.push(result.urn)
+    }
+  }
+
+  if (willCreateRealm) {
+    // prepare the realm object
+    printProgressStep(logger, 'Creating realm file...', currentStep++, maxSteps)
+    const realm = await createStaticRealm(options.components)
+    const realmName = args['--realmName']!
+
+    realm.configurations!.scenesUrn = scenesUrn
+    realm.configurations!.realmName = realmName
+
+    // write the realm file
+    const realmDirectory = path.join(outputDirectory, realmName)
+    await fs.mkdir(realmDirectory, { recursive: true })
+    if (!(await fs.directoryExists(realmDirectory))) {
+      throw new CliError(`The destination path ${realmDirectory} is not a directory`)
+    }
+    const dst = path.join(realmDirectory, 'about')
+    await fs.writeFile(dst, JSON.stringify(realm, null, 2))
+    printProgressInfo(logger, `> ${realmName}/about -> [REALM FILE]`)
+  }
+
+  printSuccess(
+    logger,
+    `Export finished!`,
+    `=> The entity URN are:${colors.bold(scenesUrn.map(($) => '\n - ' + $).join(''))}`
+  )
+
+  return { scenesUrn, destination: outputDirectory }
+}
+
+export async function prepareSceneFiles(options: Options, project: SceneProject, outputDirectory: string) {
+  const { fs, logger } = options.components
+
+  const filesToExport = await getProjectContentMappings(options.components, project.workingDirectory, async (file) => {
+    return await hashV1(fs.createReadStream(path.resolve(project.workingDirectory, file)))
   })
 
-  printProgressStep(logger, 'Copying files...', currentStep++, maxSteps)
+  printProgressInfo(logger, 'Copying files...')
 
   for (const { file, hash } of filesToExport) {
-    const src = resolve(projectRoot, file)
-    const dst = resolve(destDirectory, hash)
+    const src = path.resolve(project.workingDirectory, file)
+    const dst = path.resolve(outputDirectory, hash)
 
-    if (src.startsWith(destDirectory)) continue
+    if (src.startsWith(outputDirectory)) continue
 
-    printProgressInfo(logger, `> ${hash} -> ${file}`)
+    printProgressInfo(logger, `> ${hash} -> ${colors.reset(file)}`)
 
     if (!(await fs.fileExists(dst))) {
       const content = await fs.readFile(src)
@@ -99,15 +148,15 @@ export async function main(options: Options) {
     version: 'v3'
   }
 
-  printProgressStep(logger, 'Generating files...', currentStep++, maxSteps)
+  printProgressInfo(logger, 'Generating files...')
 
   // create the entity file and get the entityId
   const entityRaw = Buffer.from(JSON.stringify(entity), 'utf8')
   const entityId = await hashV1(entityRaw)
-  const dst = resolve(destDirectory, entityId)
+  const dst = path.resolve(outputDirectory, entityId)
   await fs.writeFile(dst, entityRaw)
 
-  printProgressInfo(logger, `> ${entityId} -> [ENTITY FILE]`)
+  printProgressInfo(logger, `> ${entityId} -> ${colors.reset('[ENTITY FILE]')}`)
 
   let urn = `urn:decentraland:entity:${entityId}`
 
@@ -117,35 +166,11 @@ export async function main(options: Options) {
     if (!urn.endsWith('/')) urn += '/'
   }
 
-  if (willCreateRealm) {
-    // prepare the realm object
-    printProgressStep(logger, 'Creating realm file...', currentStep++, maxSteps)
-    const realm = await createStaticRealm(options.components)
-    const realmName = args['--realmName']!
-
-    realm.configurations!.scenesUrn = [urn]
-    realm.configurations!.realmName = realmName
-
-    // write the realm file
-    const realmDirectory = resolve(destDirectory, realmName)
-    await fs.mkdir(realmDirectory, { recursive: true })
-    if (!(await fs.directoryExists(realmDirectory))) {
-      throw new CliError(`The destination path ${realmDirectory} is not a directory`)
-    }
-    const dst = resolve(realmDirectory, 'about')
-    await fs.writeFile(dst, JSON.stringify(realm, null, 2))
-    printProgressInfo(logger, `> ${realmName}/about -> [REALM FILE]`)
-  }
-
-  printSuccess(logger, `Export finished!`, `=> The entity URN is ${colors.bold(urn)}`)
-  const sceneJson = await getValidSceneJson(options.components, projectRoot)
-  const coords = getBaseCoords(sceneJson)
-
   options.components.analytics.track('Export static', {
-    projectHash: await b64HashingFunction(projectRoot),
-    coords,
+    projectHash: await b64HashingFunction(project.workingDirectory),
+    coords: getBaseCoords(project.scene),
     args: getArgsUsed(options.args)
   })
 
-  return { urn, entityId, destination: destDirectory }
+  return { urn, entityId, destination: outputDirectory }
 }

@@ -1,10 +1,12 @@
-import { resolve } from 'path'
+import path from 'path'
 import { CliComponents } from '../../components'
 import { getArgs, getArgsUsed } from '../../logic/args'
-import { assertValidProjectFolder, installDependencies, needsDependencies } from '../../logic/project-validations'
+import { installDependencies, needsDependencies, SceneProject } from '../../logic/project-validations'
 import { getBaseCoords } from '../../logic/scene-validations'
 import { b64HashingFunction } from '../../logic/project-files'
 import { bundleProject } from '../../logic/bundle'
+import { printCurrentProjectStarting } from '../../logic/beautiful-logs'
+import { getValidWorkspace } from '../../logic/workspace-validations'
 
 interface Options {
   args: typeof args
@@ -39,29 +41,43 @@ export function help() {
 }
 
 export async function main(options: Options) {
-  const workingDirectory = resolve(process.cwd(), options.args['--dir'] || '.')
-  await assertValidProjectFolder(options.components, workingDirectory)
+  const workingDirectory = path.resolve(process.cwd(), options.args['--dir'] || '.')
 
-  const shouldInstallDeps = await needsDependencies(options.components, workingDirectory)
+  const workspace = await getValidWorkspace(options.components, workingDirectory)
+
+  for (const project of workspace.projects) {
+    printCurrentProjectStarting(options.components.logger, project, workspace)
+    if (project.kind === 'scene') {
+      await buildScene(options, project)
+    }
+  }
+}
+
+export async function buildScene(options: Options, project: SceneProject) {
+  const shouldInstallDeps = await needsDependencies(options.components, project.workingDirectory)
 
   if (shouldInstallDeps && !options.args['--skip-install']) {
-    await installDependencies(options.components, workingDirectory)
+    await installDependencies(options.components, project.workingDirectory)
   }
 
   const watch = !!options.args['--watch']
 
-  const { sceneJson } = await bundleProject(options.components, {
-    workingDirectory,
-    watch,
-    single: options.args['--single'],
-    production: !!options.args['--production'],
-    emitDeclaration: !!options.args['--emitDeclaration']
-  })
+  const { sceneJson } = await bundleProject(
+    options.components,
+    {
+      workingDirectory: project.workingDirectory,
+      watch,
+      single: options.args['--single'],
+      production: !!options.args['--production'],
+      emitDeclaration: !!options.args['--emitDeclaration']
+    },
+    project.scene
+  )
 
   const coords = getBaseCoords(sceneJson)
 
   options.components.analytics.track('Build scene', {
-    projectHash: await b64HashingFunction(workingDirectory),
+    projectHash: await b64HashingFunction(project.workingDirectory),
     coords,
     isWorkspace: false,
     args: getArgsUsed(options.args)

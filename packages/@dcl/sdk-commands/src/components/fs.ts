@@ -1,3 +1,5 @@
+/// <reference types="@types/node" />
+
 import * as fs from 'fs'
 import * as fsPromises from 'fs/promises'
 

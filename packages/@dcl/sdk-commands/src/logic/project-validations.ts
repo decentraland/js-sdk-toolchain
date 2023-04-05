@@ -1,28 +1,37 @@
 import { Scene } from '@dcl/schemas'
-import { resolve } from 'path'
+import path from 'path'
 import { CliComponents } from '../components'
+import { colors } from '../components/log'
+import { printProgressInfo } from './beautiful-logs'
 import { CliError } from './error'
-import { getValidSceneJson } from './scene-validations'
+import { getSceneFilePath, getValidSceneJson } from './scene-validations'
+
+export type BaseProject = { workingDirectory: string }
+export type SceneProject = { kind: 'scene'; scene: Scene } & BaseProject
+export type ProjectUnion = SceneProject // | WearableProject
 
 /**
- * Asserts that the projectRoot is a valid project
+ * Asserts that the workingDirectory is a valid project
  */
 export async function assertValidProjectFolder(
   components: Pick<CliComponents, 'fs' | 'logger'>,
-  projectRoot: string
-): Promise<{ scene: Scene }> {
+  workingDirectory: string
+): Promise<ProjectUnion> {
   // no validations for now, only check that it exists
-  if (!(await components.fs.fileExists(resolve(projectRoot, 'package.json'))))
+  if (!(await components.fs.fileExists(path.resolve(workingDirectory, 'package.json'))))
     throw new CliError(`The project root doesn't have a package.json file`)
 
   // now we will iterate over different file to evaluate the project kind
   switch (true) {
-    // case wearable
-    case await components.fs.fileExists(resolve(projectRoot, 'scene.json')): {
-      return { scene: await getValidSceneJson(components, projectRoot) }
+    // TODO: case wearable
+    // case scene
+    case await components.fs.fileExists(getSceneFilePath(workingDirectory)): {
+      return { kind: 'scene', scene: await getValidSceneJson(components, workingDirectory), workingDirectory }
     }
     default: {
-      throw new CliError(`UnknownProjectKind: the kind of project of the folder ${projectRoot} cannot be identified`)
+      throw new CliError(
+        `UnknownProjectKind: the kind of project of the folder ${workingDirectory} cannot be identified`
+      )
     }
   }
 }
@@ -30,8 +39,11 @@ export async function assertValidProjectFolder(
 /*
  * Returns true if the project contains an empty node_modules folder
  */
-export async function needsDependencies(components: Pick<CliComponents, 'fs'>, dir: string): Promise<boolean> {
-  const nodeModulesPath = resolve(dir, 'node_modules')
+export async function needsDependencies(
+  components: Pick<CliComponents, 'fs'>,
+  workingDirectory: string
+): Promise<boolean> {
+  const nodeModulesPath = path.join(workingDirectory, 'node_modules')
   const hasNodeModulesFolder = await components.fs.directoryExists(nodeModulesPath)
   const isNodeModulesEmpty = hasNodeModulesFolder && (await components.fs.readdir(nodeModulesPath)).length === 0
 
@@ -39,19 +51,19 @@ export async function needsDependencies(components: Pick<CliComponents, 'fs'>, d
 }
 
 /* istanbul ignore next */
-export const npm = /^win/.test(process.platform) ? 'npm.cmd' : 'npm'
+const npmBin = /^win/.test(process.platform) ? 'npm.cmd' : 'npm'
 
 /*
  * Runs "npm install" for desired project
  */
 export async function installDependencies(
-  components: Pick<CliComponents, 'logger' | 'spawner'>,
-  directory: string
+  components: Pick<CliComponents, 'logger' | 'spawner' | 'fs'>,
+  workingDirectory: string
 ): Promise<void> {
-  components.logger.info('Installing dependencies...')
+  printProgressInfo(components.logger, 'Installing dependencies...')
   // TODO: test in windows
-  await components.spawner.exec(directory, npm, ['install'])
-  components.logger.info('Installing dependencies... ✅')
+  await components.spawner.exec(workingDirectory, npmBin, ['install'])
+  printProgressInfo(components.logger, colors.white('✅ Installing dependencies...'))
 }
 
 /**
@@ -64,5 +76,5 @@ export async function npmRun(
   ...args: string[]
 ): Promise<void> {
   // TODO: test in windows
-  await components.spawner.exec(cwd, npm, ['run', command, '--silent', '--', ...args], { env: process.env as any })
+  await components.spawner.exec(cwd, npmBin, ['run', command, '--silent', '--', ...args], { env: process.env as any })
 }

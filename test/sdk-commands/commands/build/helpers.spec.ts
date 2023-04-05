@@ -35,7 +35,7 @@ describe('build:helpers', () => {
 
     const res = await projectValidation.assertValidProjectFolder(components, 'some/path')
 
-    expect(res).toEqual({ scene })
+    expect(res).toEqual({ kind: 'scene', scene, workingDirectory: 'some/path' })
     expect(fileExists).toBeCalledWith(path.resolve('some/path/package.json'))
     expect(readFile).toBeCalledWith(path.resolve('some/path/scene.json'), 'utf8')
   })

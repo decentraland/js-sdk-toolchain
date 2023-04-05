@@ -45,9 +45,7 @@ describe('init command', () => {
     jest.spyOn(components.fs, 'rename').mockImplementation()
     jest.spyOn(components.fs, 'rmdir').mockImplementation()
     const installDependenciesSpy = jest.spyOn(projectValidations, 'installDependencies').mockResolvedValue(undefined)
-    console.log('checkpoint 1')
     await init.main({ args: { _: [], '--yes': true }, components })
-    console.log('checkpoint 2')
 
     expect(downloadSpy).toBeCalled()
     expect(extractSpy).toBeCalled()

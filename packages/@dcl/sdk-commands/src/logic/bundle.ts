@@ -8,12 +8,12 @@ import child_process from 'child_process'
 import { future } from 'fp-future'
 import { CliComponents } from '../components'
 import { CliError } from './error'
-import { getValidSceneJson } from './scene-validations'
 import { join, dirname } from 'path'
 import { printProgressInfo, printProgressStep } from './beautiful-logs'
 import { colors } from '../components/log'
 import { pathToFileURL } from 'url'
 import { globSync } from 'glob'
+import { Scene } from '@dcl/schemas'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -36,13 +36,10 @@ export type CompileOptions = {
   emitDeclaration: boolean
 }
 
-const MAX_STEP = 3
+const MAX_STEP = 2
 
-export async function bundleProject(components: BundleComponents, options: CompileOptions) {
-  const sceneJson = await getValidSceneJson(components, options.workingDirectory)
+export async function bundleProject(components: BundleComponents, options: CompileOptions, sceneJson: Scene) {
   const tsconfig = join(options.workingDirectory, 'tsconfig.json')
-
-  printProgressStep(components.logger, `Validating project structure`, 1, MAX_STEP)
 
   if (!options.single && !sceneJson.main) {
     throw new CliError('scene.json .main must be present')
@@ -56,14 +53,14 @@ export async function bundleProject(components: BundleComponents, options: Compi
     throw new CliError(`File ${tsconfig} must exist to compile the Typescript project`)
   }
 
-  const input = globSync(options.single ?? 'src/index.ts')
+  const input = globSync(options.single ?? 'src/index.ts', { cwd: options.workingDirectory, absolute: true })
 
   if (!input.length) throw new CliError(`There are no input files to build: ${options.single ?? 'src/index.ts'}`)
 
   const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
   const outfile = join(options.workingDirectory, output)
 
-  printProgressStep(components.logger, `Bundling file ${colors.bold(input.join(','))}`, 2, MAX_STEP)
+  printProgressStep(components.logger, `Bundling file ${colors.bold(input.join(','))}`, 1, MAX_STEP)
 
   const context = await esbuild.context({
     entryPoints: input,
@@ -140,7 +137,7 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   ]
   if (options.watch) args.push('--watch')
 
-  printProgressStep(components.logger, `Running type checker`, 3, MAX_STEP)
+  printProgressStep(components.logger, `Running type checker`, 2, MAX_STEP)
   const ts = child_process.spawn('node', args, { env: process.env, cwd: options.workingDirectory })
   const typeCheckerFuture = future<number>()
 

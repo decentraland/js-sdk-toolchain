@@ -34,7 +34,7 @@ export async function createContentFetchCompositeProvider(): Promise<Composite.P
   const composites = (await Promise.all(compositePromises)).filter((item) => !!item) as Composite.Resource[]
 
   return {
-    getCompositeOrNull(src: string, currentPath?: string) {
+    getCompositeOrNull(src: string, _currentPath?: string) {
       // TODO: resolve path from src and currentPath
 
       return composites.find((item) => item.src === src) || null

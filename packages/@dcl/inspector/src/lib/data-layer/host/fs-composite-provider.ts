@@ -39,7 +39,7 @@ export async function createFsCompositeProvider(fs: FileSystemInterface): Promis
   const composites = (await Promise.all(compositePromises)).filter((item) => item) as Composite.Resource[]
 
   return {
-    getCompositeOrNull(src: string, currentPath?: string) {
+    getCompositeOrNull(src: string, _currentPath?: string) {
       return composites.find((item) => item.src === src) || null
     },
     // a lot of questions with this method, it's temporal
