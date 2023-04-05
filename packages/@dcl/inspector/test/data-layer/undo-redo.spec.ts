@@ -14,6 +14,10 @@ describe('[UNDO] Inspector<->DataLayer<->Babylon', () => {
     const Transform = components.Transform(engine)
     return Transform
   }
+  function getGLTFCointainer(engine: IEngine) {
+    const Transform = components.GltfContainer(engine)
+    return Transform
+  }
   let cachedEntity: Entity
 
   it('initialize dataLayer composite and send it to inspector', async () => {
@@ -46,9 +50,9 @@ describe('[UNDO] Inspector<->DataLayer<->Babylon', () => {
     const { inspectorEngine, dataLayer } = context
     await dataLayer.undo({})
     await context.updateInspector()
+    await context.updateRenderer()
     expect(getTransform(inspectorEngine).get(cachedEntity).position.x).toBe(8)
   })
-
   it('undo the create transform operation, so the transform now will be deleted', async () => {
     const { inspectorEngine, dataLayer } = context
     await dataLayer.undo({})
@@ -77,5 +81,31 @@ describe('[UNDO] Inspector<->DataLayer<->Babylon', () => {
 
     // Nothing done
     expect(getTransform(inspectorEngine).get(cachedEntity).position.x).toBe(8)
+  })
+  it('should create an entity with multiple components', async () => {
+    const { inspectorEngine, dataLayerEngine, babylonEngine } = context
+    const Transform = getTransform(inspectorEngine)
+    const GLTFContainer = getGLTFCointainer(inspectorEngine)
+    const entity = (cachedEntity = inspectorEngine.addEntity())
+    Transform.create(entity, { position: { x: 8, y: 8, z: 8 } })
+    GLTFContainer.create(entity)
+    await context.updateInspector()
+    expect(getTransform(dataLayerEngine).get(entity).position).toMatchObject({ x: 8, y: 8, z: 8 })
+    expect(getTransform(inspectorEngine).get(entity).position).toMatchObject({ x: 8, y: 8, z: 8 })
+    expect(getTransform(babylonEngine).get(entity).position).toMatchObject({ x: 8, y: 8, z: 8 })
+    expect(getGLTFCointainer(dataLayerEngine).has(entity)).toBe(true)
+    expect(getGLTFCointainer(inspectorEngine).has(entity)).toBe(true)
+    expect(getGLTFCointainer(babylonEngine).has(entity)).toBe(true)
+  })
+  it('should remove all components at once when undo the previous action', async () => {
+    const { inspectorEngine, dataLayer, babylonEngine, dataLayerEngine } = context
+    await dataLayer.undo({})
+    await context.updateInspector()
+    expect(getTransform(dataLayerEngine).has(cachedEntity)).toBe(false)
+    expect(getTransform(inspectorEngine).has(cachedEntity)).toBe(false)
+    expect(getTransform(babylonEngine).has(cachedEntity)).toBe(false)
+    expect(getGLTFCointainer(dataLayerEngine).has(cachedEntity)).toBe(false)
+    expect(getGLTFCointainer(inspectorEngine).has(cachedEntity)).toBe(false)
+    expect(getGLTFCointainer(babylonEngine).has(cachedEntity)).toBe(false)
   })
 })

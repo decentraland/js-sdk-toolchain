@@ -41,7 +41,7 @@ export async function initRpcMethods(
       dirty = false
 
       // TODO: hardcoded for the moment
-      const _composite = dumpEngineToComposite(engine, 'json')
+      composite = dumpEngineToComposite(engine, 'json')
       // TODO: the ID should be the selected composite id name
       // composite.id = 'main'
 
