@@ -1,8 +1,8 @@
 .Tree {
   font-family: "Segoe UI", Arial, sans-serif;
   font-size: 14px;
-  background-color: #252526;
-  color: #fff;
+  background-color: var(--tree-bg-color);
+  color: var(--white);
   width: 100%;
 }
 
@@ -12,7 +12,7 @@
 }
 
 .Tree {
-  border-top: 1px solid #333333;
+  border-top: 1px solid var(--tree-border-color);
 }
 
 .Tree > div:first-child {
@@ -26,7 +26,7 @@
 
 .Tree > div:first-child:hover,
 .Tree.selected > div:first-child {
-  background-color: #333333;
+  background-color: var(--tree-border-color);
 }
 
 .Tree > div:first-child:hover span,
@@ -63,8 +63,8 @@
 
 .Tree input {
   border: none;
-  background-color: #D8D8D8;
-  outline: #cdcccc;
+  background-color: var(--input-bg-color);
+  outline: var(--input-border-color);
   border-radius: 3px;
   width: 100%;
 }

@@ -26,7 +26,7 @@
 .TextField>input {
   flex: 1 1 auto;
   color: var(--text);
-  background-color: transparent;
+  background-color: var(--transparent-color);
   outline: none;
   text-align: right;
   border: none;
