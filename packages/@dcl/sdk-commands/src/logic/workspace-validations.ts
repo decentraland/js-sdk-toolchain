@@ -53,7 +53,6 @@ export function getWorkspaceFilePath(projectRoot: string): string {
 export function assertValidWorkspace(workspace: WorkspaceJson) {
   if (!WorkspaceJson.validate(workspace)) {
     const errors: string[] = []
-    /* istanbul ignore if */
     if (WorkspaceJson.validate.errors) {
       for (const error of WorkspaceJson.validate.errors) {
         errors.push(`Error validating ${WORKSPACE_FILE}: ${error.message}`)

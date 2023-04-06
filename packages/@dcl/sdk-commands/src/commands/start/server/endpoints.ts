@@ -6,7 +6,11 @@ import { Entity, EntityType, Locale, Wearable } from '@dcl/schemas'
 import fetch, { Headers } from 'node-fetch'
 import { fetchEntityByPointer } from '../../../logic/catalyst-requests'
 import { CliComponents } from '../../../components'
-import { b64HashingFunction, getProjectContentMappings } from '../../../logic/project-files'
+import {
+  b64HashingFunction,
+  getProjectPublishableFilesWithHashes,
+  projectFilesToContentMappings
+} from '../../../logic/project-files'
 import { getCatalystBaseUrl } from '../../../logic/config'
 import { Workspace } from '../../../logic/workspace-validations'
 
@@ -274,18 +278,19 @@ async function serveWearable(
     throw new Error(`Invalid wearable.json (${wearableJsonPath})`)
   }
 
-  const hashedFiles = await getProjectContentMappings(components, wearableDir, b64HashingFunction)
+  const projectFiles = await getProjectPublishableFilesWithHashes(components, wearableDir, b64HashingFunction)
+  const contentFiles = projectFilesToContentMappings(wearableDir, projectFiles)
 
-  const thumbnailFiltered = hashedFiles.filter(($) => $?.file === 'thumbnail.png')
+  const thumbnailFiltered = contentFiles.filter(($) => $.file === 'thumbnail.png')
   const thumbnail =
-    thumbnailFiltered.length > 0 && thumbnailFiltered[0]?.hash && `${baseUrl}/${thumbnailFiltered[0].hash}`
+    thumbnailFiltered.length > 0 && thumbnailFiltered[0]!.hash && `${baseUrl}/${thumbnailFiltered[0].hash}`
 
   const wearableId = 'urn:8dc2d7ad-97e3-44d0-ba89-e8305d795a6a'
 
   const representations = wearableJson.data.representations.map((representation) => ({
     ...representation,
     mainFile: `male/${representation.mainFile}`,
-    contents: hashedFiles.map(($) => ({
+    contents: contentFiles.map(($) => ({
       key: `male/${$?.file}`,
       url: `${baseUrl}/${$?.hash}`,
       hash: $?.hash
@@ -464,7 +469,8 @@ async function fakeEntityV3FromFolder(
     pointers.add(base)
     parcels.forEach(($) => pointers.add($))
 
-    const mappedFiles = await getProjectContentMappings(components, projectRoot, hashingFunction)
+    const projectFiles = await getProjectPublishableFilesWithHashes(components, projectRoot, hashingFunction)
+    const contentFiles = projectFilesToContentMappings(projectRoot, projectFiles)
 
     return {
       version: 'v3',
@@ -473,7 +479,7 @@ async function fakeEntityV3FromFolder(
       pointers: Array.from(pointers),
       timestamp: Date.now(),
       metadata: sceneJson,
-      content: mappedFiles
+      content: contentFiles
     }
   }
 

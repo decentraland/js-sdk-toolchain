@@ -1,8 +1,7 @@
-import { resolve } from 'path'
-
 import { CliError } from '../../../packages/@dcl/sdk-commands/src/logic/error'
 import * as commands from '../../../packages/@dcl/sdk-commands/src/logic/commands'
 import { initComponents } from '../../../packages/@dcl/sdk-commands/src/components'
+import { runSdkCommand } from '../../../packages/@dcl/sdk-commands/src/run-command'
 
 afterEach(() => {
   jest.clearAllMocks()
@@ -10,80 +9,48 @@ afterEach(() => {
 })
 
 describe('utils/commands', () => {
-  it('should read commands from the defined commands path', async () => {
+  it('should not throw if command exists', async () => {
     const components = await initComponents()
 
-    const readDirSpy = jest.spyOn(components.fs, 'readdir').mockResolvedValue(['test'] as any)
-    const stat = {
-      isDirectory: jest.fn(() => true),
-      isFile: jest.fn(() => true)
-    }
-    const statSpy = jest.spyOn(components.fs, 'stat').mockResolvedValue(stat as any)
+    const result = await commands.getCommands(components)
 
-    await commands.getCommands(components)
-
-    expect(readDirSpy).toBeCalledWith(commands.COMMANDS_PATH)
-    expect(statSpy).toBeCalledWith(resolve(commands.COMMANDS_PATH, 'test'))
-    expect(statSpy).toBeCalledWith(resolve(commands.COMMANDS_PATH, 'test', 'index.js'))
-    expect(stat.isDirectory).toBeCalled()
-    expect(stat.isFile).toBeCalled()
+    expect(result).toContain('build')
+    expect(result).toContain('deploy')
+    expect(result).toContain('export-static')
+    expect(result).toContain('init')
+    expect(result).toContain('start')
   })
 
-  it('should throw if command is not inside a folder', async () => {
+  it('should throw if command does not have an "index"', async () => {
     const components = await initComponents()
-    const readDirSpy = jest.spyOn(components.fs, 'readdir').mockResolvedValue(['command1'] as any)
-    const stat = {
-      isDirectory: jest.fn(() => false),
-      isFile: jest.fn(() => true)
-    }
-    jest.spyOn(components.fs, 'stat').mockResolvedValue(stat as any)
+    const readDirSpy = jest.spyOn(components.fs, 'readdir').mockResolvedValue(['unexistent-command'] as any)
 
-    let error
+    await expect(commands.getCommands(components)).rejects.toThrow(CliError)
 
-    try {
-      await commands.getCommands(components)
-    } catch (e) {
-      error = e
-    }
-    expect(readDirSpy).toBeCalled()
-    expect(stat.isDirectory).toBeCalled()
-    expect(error).toBeInstanceOf(CliError)
+    expect(readDirSpy).toHaveBeenCalled()
   })
 
-  it('should throw if command does not have an "index.ts"', async () => {
+  test('runs a help command', async () => {
     const components = await initComponents()
-    const readDirSpy = jest.spyOn(components.fs, 'readdir').mockResolvedValue(['command'] as any)
-    const stat = {
-      isDirectory: jest.fn(() => true),
-      isFile: jest.fn(() => false)
-    }
-    jest.spyOn(components.fs, 'stat').mockResolvedValue(stat as any)
 
-    let error
-
-    try {
-      await commands.getCommands(components)
-    } catch (e) {
-      error = e
-    }
-
-    expect(readDirSpy).toBeCalled()
-    expect(stat.isDirectory).toBeCalled()
-    expect(stat.isFile).toBeCalled()
-    expect(error).toBeInstanceOf(CliError)
+    await runSdkCommand(components, 'help', ['--help'])
   })
 
-  it('should return all the commands in the directory', async () => {
+  it('runs a help command over all commands', async () => {
     const components = await initComponents()
-    jest.spyOn(components.fs, 'readdir').mockResolvedValue(['command1', 'command2'] as any)
-    const stat = {
-      isDirectory: jest.fn(() => true),
-      isFile: jest.fn(() => true)
+
+    const result = await commands.getCommands(components)
+
+    for (const command of result) {
+      console.log(command)
+      try {
+        await runSdkCommand(components, command, ['--help'])
+      } catch (e: any) {
+        console.dir(e)
+        console.error(e)
+        throw e
+      }
+      console.log(command)
     }
-    jest.spyOn(components.fs, 'stat').mockResolvedValue(stat as any)
-
-    const res = await commands.getCommands(components)
-
-    expect(res).toStrictEqual(['command1', 'command2'])
   })
 })

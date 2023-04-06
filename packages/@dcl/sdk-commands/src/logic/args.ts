@@ -1,24 +1,20 @@
 import arg, { Result } from 'arg'
+import { CliError } from './error'
 
 export type Args = {
   [key: string]: string | StringConstructor | NumberConstructor | BooleanConstructor
 }
 
-// updating to TS 4.9 will prevent losing types when
-// enforcing type to be "Args" by using "satisfies Args"
-export const DEFAULT_ARGS = {
-  '--help': Boolean,
-  '--json': Boolean,
-  '-h': '--help'
+export function parseArgs<T extends Args>(argv: string[], args: T): Result<T> {
+  try {
+    return arg({ '--json': Boolean, '-h': '--help', '--help': Boolean, ...args }, { permissive: false, argv })
+  } catch (err: any) {
+    if (err.name === 'ArgError') throw new CliError(`Argument error: ` + err.message)
+    /* istanbul ignore next */
+    throw err
+  }
 }
 
-export function getArgs(): Result<typeof DEFAULT_ARGS>
-export function getArgs<T extends Args>(args: T): Result<typeof DEFAULT_ARGS & T>
-export function getArgs<T extends Args>(args?: T) {
-  return arg({ ...DEFAULT_ARGS, ...args }, { permissive: true })
-}
-
-export function getArgsUsed(value: Result<typeof DEFAULT_ARGS>): Record<string, unknown> {
-  const { _, ...args } = value
+export function declareArgs<T extends Args>(args: T): T {
   return args
 }

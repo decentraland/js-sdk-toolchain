@@ -6,11 +6,15 @@ import ignore from 'ignore'
 import path, { resolve } from 'path'
 import { CliError } from './error'
 
+export type ProjectFile = {
+  absolutePath: string
+  hash: string
+}
+
 /**
  * Returns an array of the publishable files for a given folder.
  *
  */
-/* istanbul ignore next */
 export async function getPublishableFiles(
   components: Pick<CliComponents, 'fs'>,
   projectRoot: string
@@ -34,25 +38,42 @@ export async function getPublishableFiles(
  * This function converts paths to decentraland-compatible paths.
  * - From windows separators to unix separators.
  * - All to lowercase
- *
  */
-/* istanbul ignore next */
-export function normalizeDecentralandFilename(filename: string) {
-  return filename.replace(/(\\)/g, '/').toLowerCase()
+export function normalizeDecentralandFilename(projectRoot: string, filename: string) {
+  const newAbsolute = path.resolve(projectRoot, filename)
+  const relativePath = path.relative(projectRoot, newAbsolute)
+  // 1. win->unix style
+  // 2. remove heading /
+  return relativePath.replace(/(\\)/g, '/').replace(/^\/+/, '').toLowerCase()
+}
+
+/**
+ * This function normalizes the content mappings of a project to be used by the
+ * Decentraland file system
+ */
+export function projectFilesToContentMappings(projectRoot: string, files: ProjectFile[]): ContentMapping[] {
+  return files.map((file) => {
+    return {
+      file: normalizeDecentralandFilename(projectRoot, file.absolutePath),
+      hash: file.hash
+    }
+  })
 }
 
 /**
  * Returns the content mappings for a specific project folder.
+ * NOTE: the result of this function IS NOT NORMALIZED. Paths sould be normalized
+ * with normalizeDecentralandFilename before usage
+ *
+ * TODO: Unit test this function
  */
-/* istanbul ignore next */
-export async function getProjectContentMappings(
+export async function getProjectPublishableFilesWithHashes(
   components: Pick<CliComponents, 'fs'>,
   projectRoot: string,
-  /* istanbul ignore next */
   hashingFunction: (filePath: string) => Promise<string>
-): Promise<ContentMapping[]> {
+): Promise<ProjectFile[]> {
   const projectFiles = await getPublishableFiles(components, projectRoot)
-  const ret: ContentMapping[] = []
+  const ret: ProjectFile[] = []
 
   const usedFilenames = new Set<string>()
 
@@ -62,8 +83,7 @@ export async function getProjectContentMappings(
     /* istanbul ignore if */
     if (!(await components.fs.fileExists(absolutePath))) continue
 
-    // remove heading '/'
-    const normalizedFile = normalizeDecentralandFilename(file).replace(/^\/+/, '')
+    const normalizedFile = normalizeDecentralandFilename(projectRoot, file)
 
     /* istanbul ignore if */
     if (usedFilenames.has(normalizedFile)) {
@@ -75,7 +95,7 @@ export async function getProjectContentMappings(
     usedFilenames.add(normalizedFile)
 
     ret.push({
-      file: normalizedFile,
+      absolutePath,
       hash: await hashingFunction(absolutePath)
     })
   }
@@ -84,6 +104,7 @@ export async function getProjectContentMappings(
 }
 
 export const b64HashingFunction = async (str: string) => 'b64-' + Buffer.from(str).toString('base64')
+// export const ipfsHashingFunction = async (str: string) => hashV1(Buffer.from(str, 'utf8'))
 
 interface PackageJson {
   dependencies: Record<string, string>
