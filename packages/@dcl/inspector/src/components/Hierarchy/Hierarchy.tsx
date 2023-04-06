@@ -6,6 +6,7 @@ import { Tree } from '../Tree'
 
 const Hierarchy: React.FC = () => {
   const {
+    addComponent,
     addChild,
     setParent,
     remove,
@@ -13,6 +14,7 @@ const Hierarchy: React.FC = () => {
     toggle,
     getId,
     getChildren,
+    getEntityComponents,
     getLabel,
     isOpen,
     isSelected,
@@ -25,6 +27,7 @@ const Hierarchy: React.FC = () => {
     <div className="Hierarchy">
       <Tree
         value={ROOT}
+        onAddComponent={addComponent}
         onAddChild={addChild}
         onSetParent={setParent}
         onRemove={remove}
@@ -32,6 +35,7 @@ const Hierarchy: React.FC = () => {
         onToggle={toggle}
         getId={getId}
         getChildren={getChildren}
+        getEntityComponents={getEntityComponents}
         getLabel={getLabel}
         isOpen={isOpen}
         isSelected={isSelected}

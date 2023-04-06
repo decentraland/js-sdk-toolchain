@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 import { MdOutlineDriveFileRenameOutline } from 'react-icons/md'
-import { AiFillFileAdd, AiFillDelete } from 'react-icons/ai'
+import { AiFillFileAdd, AiFillDelete, AiOutlineArrowRight } from 'react-icons/ai'
 
 import './Controls.css'
 
@@ -9,31 +9,43 @@ export interface Position {
   y: number
 }
 
-interface ControlsProps {
+export interface ControlsProps {
   active?: boolean
+  components?: Map<number, string>
   position?: Position
   enableAdd?: boolean
   enableEdit?: boolean
   enableRemove?: boolean
+  onAddComponent: (e: React.MouseEvent, componentId: number) => void
+  onAddChild: (e: React.MouseEvent) => void
   onCancel: () => void
   onEdit: (e: React.MouseEvent) => void
-  onAdd: (e: React.MouseEvent) => void
   onRemove: (e: React.MouseEvent) => void
 }
 
-const cancelingKeys = new Set(['Escape', 'Tab'])
+// TODO: enumerate better the components names
+const ENABLED_COMPONENTS = new Set([
+  'core::Transform',
+  'core::Billboard',
+  'core::TextShape',
+  'core::MeshRenderer'
+])
 
-const getActiveClass = (active: boolean) => (active ? 'active' : '')
+const cancelingKeys = new Set(['Escape', 'Tab'])
+const getComponentName = (value: string) => (value.match(/[^:]*$/) || [])[0]
+const isComponentEnabled = (value: string) => ENABLED_COMPONENTS.has(value)
 
 const Controls = ({
   active = false,
+  components = new Map(),
   position = { x: 0, y: 0 },
   enableAdd = true,
   enableEdit = true,
   enableRemove = true,
+  onAddComponent,
+  onAddChild,
   onCancel,
   onEdit,
-  onAdd,
   onRemove
 }: ControlsProps) => {
   const handleCancel = useCallback((e: Event | React.MouseEvent) => {
@@ -58,8 +70,8 @@ const Controls = ({
   }, [active])
 
   const handleAction = useCallback(
-    (cb: (e: React.MouseEvent) => void) => (e: React.MouseEvent) => {
-      cb(e)
+    (cb: (e: React.MouseEvent, ...params: any) => void, ...params: any) => (e: React.MouseEvent) => {
+      cb(e, ...params)
       handleCancel(e)
     },
     []
@@ -71,21 +83,36 @@ const Controls = ({
   if (!shouldRender) return null
 
   return (
-    <div className={`Controls ${getActiveClass(active)}`} style={{ top: position.y, left: position.x }}>
+    <div className="Controls" style={{ top: position.y, left: position.x }}>
       {enableEdit && (
-        <button onClick={handleAction(onEdit)}>
+        <div className="button" onClick={handleAction(onEdit)}>
           <MdOutlineDriveFileRenameOutline /> Rename
-        </button>
+        </div>
       )}
       {enableAdd && (
-        <button onClick={handleAction(onAdd)}>
+        <div className="button" onClick={handleAction(onAddChild)}>
           <AiFillFileAdd /> Add child
-        </button>
+        </div>
       )}
       {enableRemove && (
-        <button onClick={handleAction(onRemove)}>
+        <div className="button" onClick={handleAction(onRemove)}>
           <AiFillDelete /> Delete
-        </button>
+        </div>
+      )}
+      {enableEdit && (
+        <div className="submenu">
+          Add component <AiOutlineArrowRight />
+          <div className="Controls">
+            {Array.from(components.entries()).map(([id, name]) => {
+              if (!isComponentEnabled(name)) return null
+              return (
+                <div key={id} className="button" onClick={handleAction(onAddComponent, id)}>
+                  {getComponentName(name)}
+                </div>
+              )
+            })}
+          </div>
+        </div>
       )}
     </div>
   )

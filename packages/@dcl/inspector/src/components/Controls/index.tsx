@@ -1,2 +1,2 @@
-import Controls, { Position } from './Controls'
-export { Controls, Position }
+import Controls, { ControlsProps, Position } from './Controls'
+export { Controls, ControlsProps, Position }

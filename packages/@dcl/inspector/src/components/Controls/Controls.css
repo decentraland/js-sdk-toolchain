@@ -10,19 +10,35 @@
   border-radius: 2px;
 }
 
-.Controls button {
+.Controls > div {
   border: none;
   display: flex;
   padding: 8px;
   cursor: pointer;
   background-color: var(--transparent-color);
-  color: var(--button-color)
+  color: var(--button-color);
+  align-items: center;
 }
 
-.Controls button:hover {
+.Controls > div:hover {
   background-color: var(--dropdown-hover-bg-color)
 }
 
-.Controls button svg {
+.Controls > div svg {
   margin-right: 6px;
+}
+
+.Controls .submenu {
+  justify-content: space-between;
+}
+
+.Controls .submenu > div {
+  display: none;
+  max-height: 300px;
+  margin-left: 140px;
+  margin-top: 30px;
+}
+
+.Controls .submenu:hover > div {
+  display: flex;
 }

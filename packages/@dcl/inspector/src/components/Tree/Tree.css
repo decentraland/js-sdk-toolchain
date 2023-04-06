@@ -25,7 +25,7 @@
 }
 
 .Tree > div:first-child:hover,
-.Tree.selected > div:first-child {
+.Tree .selected {
   background-color: var(--tree-border-color);
 }
 

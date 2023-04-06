@@ -5,16 +5,14 @@ import { useChange } from './useChange'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { dataCompare } from '@dcl/ecs/dist/systems/crdt/utils'
 
-function isLastWriteWinComponent<T = unknown>(
+export function isLastWriteWinComponent<T = unknown>(
   component: Component
 ): component is LastWriteWinElementSetComponentDefinition<T> {
   return !!(component as LastWriteWinElementSetComponentDefinition<unknown>).createOrReplace
 }
 
-export const useComponentValue = <ComponentValueType>(entity: Entity, component: Component<ComponentValueType>) => {
-  const [value, setValue] = useState<ComponentValueType | null>(
-    component.getOrNull(entity) as ComponentValueType | null
-  )
+export const useComponentValue = <ComponentValueType>(entity: Entity, component: Component<unknown>) => {
+  const [value, setValue] = useState<ComponentValueType>(component.get(entity) as ComponentValueType)
 
   function isEqual(val: ComponentValueType) {
     const current = new ReadWriteByteBuffer()

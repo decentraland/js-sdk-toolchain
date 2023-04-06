@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react'
 import { getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk/tree'
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
+import { isLastWriteWinComponent } from './useComponentValue'
 
 /**
  * Used to get a tree and the functions to work with it
@@ -36,6 +37,22 @@ export const useTree = () => {
     (entity: Entity): Entity[] => {
       const children = tree.get(entity)
       return children ? Array.from(children) : []
+    },
+    [tree]
+  )
+
+  const getEntityComponents = useCallback(
+    (entity: Entity, missing?: boolean): Map<number, string> => {
+      const components = new Map<number, string>()
+      if (sdk) {
+        for (const component of sdk.engine.componentsIter()) {
+          if (missing ? !component.has(entity) : component.has(entity)) {
+            components.set(component.componentId, component.componentName)
+          }
+        }
+      }
+
+      return components
     },
     [tree]
   )
@@ -135,6 +152,19 @@ export const useTree = () => {
     },
     [sdk, handleUpdate]
   )
+
+  const addComponent = useCallback(
+    (entity: Entity, componentId: number) => {
+      if (!sdk) return
+      const component = sdk.engine.getComponent(componentId)
+      if (isLastWriteWinComponent(component)) {
+        component.create(entity)
+      }
+      handleUpdate()
+    },
+    [sdk, handleUpdate]
+  )
+
   const isNotRoot = useCallback((entity: Entity) => entity !== ROOT, [])
   const canRename = isNotRoot
   const canRemove = isNotRoot
@@ -142,6 +172,7 @@ export const useTree = () => {
 
   return {
     tree,
+    addComponent,
     addChild,
     setParent,
     rename,
@@ -149,6 +180,7 @@ export const useTree = () => {
     toggle,
     getId,
     getChildren,
+    getEntityComponents,
     getLabel,
     isOpen,
     isSelected,
