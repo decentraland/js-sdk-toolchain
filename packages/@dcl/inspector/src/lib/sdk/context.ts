@@ -1,6 +1,7 @@
 import { Scene } from '@babylonjs/core'
 import { ComponentDefinition, CrdtMessageType, Entity, IEngine } from '@dcl/ecs'
 import { Emitter } from 'mitt'
+
 import { ITheme } from '../../components/AssetsCatalog'
 import { SceneContext } from '../babylon/decentraland/SceneContext'
 import { initRenderer } from '../babylon/setup'
@@ -20,8 +21,8 @@ export type SdkContextValue = {
   components: EditorComponents & SdkComponents
   scene: Scene
   events: Emitter<SdkContextEvents>
-  dataLayer: DataLayerRpcClient
   dispose(): void
+  dataLayer: DataLayerRpcClient
 }
 
 export async function createSdkContext(canvas: HTMLCanvasElement, catalog: ITheme[]): Promise<SdkContextValue> {

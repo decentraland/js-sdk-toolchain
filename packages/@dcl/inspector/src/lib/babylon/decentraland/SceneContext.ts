@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core'
-import { ComponentDefinition, CrdtMessageType, Engine, Entity } from '@dcl/ecs'
+import { ComponentDefinition, CrdtMessageType, Engine, Entity, Transport } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import * as Schemas from '@dcl/schemas'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
@@ -16,7 +16,7 @@ import { putBillboardComponent } from './sdkComponents/billboard'
 import { putGltfContainerComponent } from './sdkComponents/gltf-container'
 import { putMeshRendererComponent } from './sdkComponents/mesh-renderer'
 import { putTransformComponent } from './sdkComponents/transform'
-import { createBetterTransport } from './transport'
+import { consumeAllMessagesInto } from '../../logic/consume-stream'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -60,8 +60,6 @@ export class SceneContext {
   // this future is resolved when the scene is disposed
   readonly stopped = future<void>()
 
-  readonly transport = createBetterTransport(this.engine)
-
   constructor(
     public babylon: BABYLON.Engine,
     public scene: BABYLON.Scene,
@@ -71,6 +69,25 @@ export class SceneContext {
     this.rootNode = new EcsEntity(0 as Entity, this.#weakThis, scene)
     babylon.onEndFrameObservable.add(this.update)
     Object.assign(globalThis, { babylon: this.engine })
+  }
+
+  addTransport(stream: AsyncQueue<CrdtStreamMessage>) {
+    const engine = this.engine
+    const transport: Transport = {
+      filter() {
+        return !stream.closed
+      },
+      async send(message) {
+        if (stream.closed) return
+        stream.enqueue({ data: message })
+        if (message.byteLength) {
+          Array.from(serializeCrdtMessages('Babylon>Datalayer', message, engine)).forEach(($) => console.log($))
+        }
+      }
+    }
+    Object.assign(transport, { name: 'BabylonTransportClient' })
+    this.engine.addTransport(transport)
+    return transport
   }
 
   private processEcsChange(entityId: Entity, op: CrdtMessageType, component?: ComponentDefinition<any>) {
@@ -150,7 +167,6 @@ export class SceneContext {
 
   dispose() {
     this.stopped.resolve()
-    this.transport.dispose()
     for (const [entityId] of this.#entities) {
       this.removeEntity(entityId)
     }
@@ -163,21 +179,19 @@ export class SceneContext {
     const outgoingMessages = new AsyncQueue<CrdtStreamMessage>((_, _action) => {
       // console.log('SCENE QUEUE', action)
     })
+    const transport = this.addTransport(outgoingMessages)
+    const engine = this.engine
 
-    for await (const message of crdtStream(outgoingMessages)) {
-      if (message.data.byteLength) {
-        Array.from(serializeCrdtMessages('Datalayer>SceneContext', message.data, this.engine)).forEach(($) =>
-          console.log($)
-        )
+    function onMessage(message: Uint8Array) {
+      if (message.byteLength) {
+        Array.from(serializeCrdtMessages('DataLayer>Babylon', message, engine)).forEach(($) => console.log($))
       }
-
-      // Wait till next tick
-      const res = await this.transport.receiveBatch(message.data)
-      if (res.byteLength) {
-        Array.from(serializeCrdtMessages('SceneContext>Datalayer', res, this.engine)).forEach(($) => console.log($))
-      }
-      outgoingMessages.enqueue({ data: res })
+      transport.onmessage!(message)
     }
+
+    consumeAllMessagesInto(crdtStream(outgoingMessages), onMessage, outgoingMessages.close).catch((e) => {
+      console.error('consumeAllMessagesInto failed: ', e)
+    })
   }
 }
 

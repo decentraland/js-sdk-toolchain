@@ -1,7 +1,7 @@
 import { ByteBuffer, Engine, IEngine, IEngineOptions } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
-import { createEditorComponents } from '../../sdk/components'
+import { createEditorComponents } from '../../../sdk/components'
 
 export function serializeEngine(engine: IEngine) {
   const messages: ByteBuffer = new ReadWriteByteBuffer()

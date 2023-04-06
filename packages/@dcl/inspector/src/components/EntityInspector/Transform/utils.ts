@@ -6,14 +6,14 @@ export function fromTranform(value: TransformType): TransformInput {
   const angles = Quaternion.toEulerAngles(value.rotation)
   return {
     position: {
-      x: value.position.x.toFixed(2),
-      y: value.position.y.toFixed(2),
-      z: value.position.z.toFixed(2)
+      x: value.position.x.toString(),
+      y: value.position.y.toString(),
+      z: value.position.z.toString()
     },
     scale: {
-      x: value.scale.x.toFixed(2),
-      y: value.scale.y.toFixed(2),
-      z: value.scale.z.toFixed(2)
+      x: value.scale.x.toString(),
+      y: value.scale.y.toString(),
+      z: value.scale.z.toString()
     },
     rotation: {
       x: formatAngle(angles.x),
@@ -24,7 +24,7 @@ export function fromTranform(value: TransformType): TransformInput {
 }
 
 function formatAngle(angle: number) {
-  const value = angle.toFixed(2)
+  const value = angle.toString()
   return value === '360.00' ? '0.00' : value
 }
 

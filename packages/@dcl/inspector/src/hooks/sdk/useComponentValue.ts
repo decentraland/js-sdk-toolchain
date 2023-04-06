@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import isEqual from 'deep-equal'
-import { CrdtMessageType, Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
+import { CrdtMessageType, DeepReadonly, Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
 import { Component } from '../../lib/sdk/components'
 import { useChange } from './useChange'
+import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
+import { dataCompare } from '@dcl/ecs/dist/systems/crdt/utils'
 
 function isLastWriteWinComponent<T = unknown>(
   component: Component
@@ -13,10 +14,17 @@ function isLastWriteWinComponent<T = unknown>(
 export const useComponentValue = <ComponentValueType>(entity: Entity, component: Component<ComponentValueType>) => {
   const [value, setValue] = useState<ComponentValueType>(component.get(entity) as ComponentValueType)
 
+  function isEqual(val: ComponentValueType) {
+    const current = new ReadWriteByteBuffer()
+    const newValue = new ReadWriteByteBuffer()
+    component.schema.serialize(val as DeepReadonly<ComponentValueType>, newValue)
+    component.schema.serialize(component.get(entity), current)
+    return dataCompare(current.toBinary(), newValue.toBinary()) === 0
+  }
+
   // sync state -> engine
   useEffect(() => {
-    const stateInEngine = component.get(entity)
-    if (isEqual(value, stateInEngine)) {
+    if (isEqual(value)) {
       return
     }
     if (isLastWriteWinComponent(component)) {
@@ -31,6 +39,9 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
   useChange((event) => {
     if (entity === event.entity && component.componentId === event.component?.componentId && !!event.value) {
       if (event.operation === CrdtMessageType.PUT_COMPONENT) {
+        // TODO: This setValue is generating a isEqual comparission.
+        // Maybe we have to use two two pure functions instead of an effect.
+        // Same happens with the input & componentValue.
         setValue(event.value)
       } else {
         // TODO: handle update for GrowOnlyValueSetComponentDefinition
@@ -39,5 +50,5 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
     }
   })
 
-  return [value, setValue] as const
+  return [value, setValue, isEqual] as const
 }
