@@ -2608,6 +2608,7 @@ export namespace Schemas {
     Optional: <T>(spec: ISchema<T>) => ISchema<T | undefined>;
     const // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     fromJson: (json: JsonSchemaExtended) => ISchema<unknown>;
+    const mutateNestedValues: (jsonSchema: JsonSchemaExtended, value: unknown, mutateFn: (value: unknown, valueType: JsonSchemaExtended) => [true, any] | [false]) => void;
 }
 
 // @public (undocumented)

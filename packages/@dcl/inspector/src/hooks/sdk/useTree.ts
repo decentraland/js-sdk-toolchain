@@ -86,12 +86,12 @@ export const useTree = () => {
       console.log('setParent', entity, parent)
       if (entity === ROOT || !sdk) return
       const { EntityNode, Transform, Toggle } = sdk.components
-      
+
       EntityNode.getOrCreateMutable(entity).parent = parent
 
       const transform = Transform.getMutableOrNull(entity)
       if (transform) transform.parent = parent
-      
+
       Toggle.createOrReplace(parent)
       handleUpdate()
     },
