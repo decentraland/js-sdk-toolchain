@@ -1,0 +1,27 @@
+.toolbar {
+  display: flex;
+  justify-content: center;
+  background-color: #29262f;
+  padding: 8px;
+}
+
+.toolbar button {
+  border: none;
+  padding: 0px 16px;
+  margin: 0 8px;
+  color: #fff;
+  background-color: #4b4852;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.toolbar button:hover {
+  background-color: #999;
+}
+
+.toolbar svg {
+  width: 24px;
+  height: 24px;
+}
+

@@ -1,12 +1,16 @@
-import { IEngine, Transport } from '@dcl/ecs'
+import { Transport } from '@dcl/ecs'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
+import mitt from 'mitt'
 
 import { consumeAllMessagesInto } from '../../logic/consume-stream'
-import { serializeEngine } from './engine'
+import { DataLayerContext } from '../types'
+import { serializeEngine } from './utils/engine'
+
+export const streamEvent = mitt<{ streamStart: unknown; streamEnd: unknown }>()
 
 export function stream(
   stream: AsyncIterable<{ data: Uint8Array }>,
-  ctx: { engine: IEngine }
+  ctx: Omit<DataLayerContext, 'fs'>
 ): AsyncGenerator<{ data: Uint8Array }> {
   const queue = new AsyncQueue<{ data: Uint8Array }>((_) => {})
 
@@ -28,8 +32,9 @@ export function stream(
   ctx.engine.addTransport(transport)
 
   function processMessage(message: Uint8Array) {
+    streamEvent.emit('streamStart')
     transport.onmessage!(message)
-    void ctx.engine.update(1)
+    void ctx.engine.update(1).then(() => streamEvent.emit('streamEnd'))
   }
 
   function closeCallback() {
@@ -40,6 +45,9 @@ export function stream(
   consumeAllMessagesInto(stream, processMessage, closeCallback).catch((err) => {
     console.error('consumeAllMessagesInto failed: ', err)
   })
+
+  // Send initial message (engineSerialized)
+  void ctx.engine.update(1)
 
   return queue
 }

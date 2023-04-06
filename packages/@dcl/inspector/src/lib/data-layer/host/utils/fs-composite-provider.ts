@@ -1,6 +1,6 @@
 import { Composite } from '@dcl/ecs'
-import { FileSystemInterface } from '../types'
-import { getFilesInDirectory } from './fs-utils'
+import { getFilesInDirectory } from '../fs-utils'
+import { FileSystemInterface } from '../../types'
 
 export type CompositeManager = Composite.Provider & {
   save: (composite: Composite.Resource, type: 'json' | 'binary') => Promise<void>

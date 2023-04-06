@@ -8,5 +8,5 @@ import { DataLayerRpcClient, FileSystemInterface } from '../types'
  */
 export async function createLocalDataLayerRpcClient(fs: FileSystemInterface): Promise<DataLayerRpcClient> {
   const localDataLayerHost = await createDataLayerHost(fs)
-  return localDataLayerHost.rpcMethods as any as DataLayerRpcClient
+  return localDataLayerHost.rpcMethods as DataLayerRpcClient
 }

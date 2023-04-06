@@ -15,7 +15,7 @@ export default CrdtUtils
 
 /**
  * Compare raw data.
- * @internal
+ * @public
  * @returns 0 if is the same data, 1 if a > b, -1 if b > a
  */
 export function dataCompare<T>(a: T, b: T): number {

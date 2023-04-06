@@ -20,19 +20,19 @@ export default withSdk<Props>(({ sdk, entity }) => {
   return (
     <Container label="Transform" className="Transform">
       <Block label="Position">
-        <TextField label="X" type="number" {...getInputProps('position.x')} />
-        <TextField label="Y" type="number" {...getInputProps('position.y')} />
-        <TextField label="Z" type="number" {...getInputProps('position.z')} />
+        <TextField label="X" type="number" fractionDigits={2} {...getInputProps('position.x')} />
+        <TextField label="Y" type="number" fractionDigits={2} {...getInputProps('position.y')} />
+        <TextField label="Z" type="number" fractionDigits={2} {...getInputProps('position.z')} />
       </Block>
       <Block label="Scale">
-        <TextField label="X" type="number" {...getInputProps('scale.x')} />
-        <TextField label="Y" type="number" {...getInputProps('scale.y')} />
-        <TextField label="Z" type="number" {...getInputProps('scale.z')} />
+        <TextField label="X" type="number" fractionDigits={2} {...getInputProps('scale.x')} />
+        <TextField label="Y" type="number" fractionDigits={2} {...getInputProps('scale.y')} />
+        <TextField label="Z" type="number" fractionDigits={2} {...getInputProps('scale.z')} />
       </Block>
       <Block label="Rotation">
-        <TextField label="X" type="number" {...getInputProps('rotation.x')} />
-        <TextField label="Y" type="number" {...getInputProps('rotation.y')} />
-        <TextField label="Z" type="number" {...getInputProps('rotation.z')} />
+        <TextField label="X" type="number" fractionDigits={2} {...getInputProps('rotation.x')} />
+        <TextField label="Y" type="number" fractionDigits={2} {...getInputProps('rotation.y')} />
+        <TextField label="Z" type="number" fractionDigits={2} {...getInputProps('rotation.z')} />
       </Block>
     </Container>
   )
