@@ -16,11 +16,11 @@ const Renderer: React.FC = () => {
     const {
       engine,
       scene,
-      components: { Label, Transform, GltfContainer }
+      components: { EntityNode, Transform, GltfContainer }
     } = sdk
     const child = engine.addEntity()
     const { x, z } = await getPointerCoords(scene)
-    Label.create(child, { label: asset.name })
+    EntityNode.create(child, { label: asset.name, parent: ROOT })
     Transform.create(child, { parent: ROOT, position: { x, y: 0, z } })
     GltfContainer.create(child, { src: asset.asset.src })
     await engine.update(0)

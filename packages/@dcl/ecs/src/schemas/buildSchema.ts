@@ -69,3 +69,36 @@ export function jsonSchemaToSchema(jsonSchema: JsonSchemaExtended): ISchema<any>
 
   throw new Error(`${jsonSchema.serializationType} is not supported as reverse schema generation.`)
 }
+
+export function mutateValues(
+  jsonSchema: JsonSchemaExtended,
+  value: unknown,
+  mutateFn: (value: unknown, valueType: JsonSchemaExtended) => [true, any] | [false]
+): void {
+  if (jsonSchema.serializationType === 'map') {
+    const mapJsonSchema = jsonSchema as JsonSchemaExtended & { properties: Record<string, JsonSchemaExtended> }
+    const mapValue = value as Record<string, unknown>
+
+    for (const key in mapJsonSchema.properties) {
+      const valueType = mapJsonSchema.properties[key]
+      if (valueType.serializationType === 'array' || valueType.serializationType === 'map') {
+        mutateValues(mapJsonSchema.properties[key], mapValue[key], mutateFn)
+      } else if (valueType.serializationType === 'entity') {
+        const newValue = mutateFn(value, valueType)
+        if (newValue[0]) {
+          mapValue[key] = newValue[1]
+        }
+      }
+    }
+  } else if (jsonSchema.serializationType === 'array') {
+    const withItemsJsonSchema = jsonSchema as JsonSchemaExtended & { items: JsonSchemaExtended }
+    const arrayValue = value as unknown[]
+
+    for (let i = 0, n = arrayValue.length; i < n; i++) {
+      const newValue = mutateFn(value, withItemsJsonSchema.items)
+      if (newValue[0]) {
+        arrayValue[i] = newValue[1]
+      }
+    }
+  }
+}

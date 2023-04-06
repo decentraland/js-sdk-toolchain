@@ -11,9 +11,9 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const { Transform } = sdk.components
 
   const hasTransform = useHasComponent(entity, Transform)
-  const getInputProps = useComponentInput(entity, Transform, fromTranform, toTransform, isValidNumericInput)
+  const getInputProps = hasTransform && useComponentInput(entity, Transform, fromTranform, toTransform, isValidNumericInput)
 
-  if (!hasTransform) {
+  if (!getInputProps) {
     return null
   }
 

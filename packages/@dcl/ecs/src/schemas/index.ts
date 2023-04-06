@@ -13,7 +13,7 @@ import { Vector3Schema, Vector3Type } from './custom/Vector3'
 import { ISchema, JsonSchemaExtended, JsonArray, JsonMap, JsonPrimitive } from './ISchema'
 import { IMap } from './Map'
 import { IOptional } from './Optional'
-import { jsonSchemaToSchema } from './buildSchema'
+import { jsonSchemaToSchema, mutateValues } from './buildSchema'
 
 export {
   QuaternionType,
@@ -85,4 +85,21 @@ export namespace Schemas {
    * @returns a ISchema or fail for unsupported json-schema
    */
   export const fromJson: (json: JsonSchemaExtended) => ISchema<unknown> = jsonSchemaToSchema
+
+  /**
+   * Traverses and mutates values in a JSON schema-based structure, applying the given mutation function to each value.
+   * The function is designed to work with nested maps and arrays, recursively processing each element.
+   *
+   * @param jsonSchema The JSON schema object that describes the structure of the value.
+   *                   It must have a serializationType of 'map', 'array', or other custom types like 'entity'.
+   * @param value      The value to be mutated, which should conform to the provided JSON schema.
+   * @param mutateFn   A function that takes a value and its corresponding valueType (JsonSchemaExtended) as arguments
+   *                   and returns a tuple [boolean, any]. The boolean indicates whether the mutation should be applied,
+   *                   and the second element is the mutated value.
+   */
+  export const mutateNestedValues: (
+    jsonSchema: JsonSchemaExtended,
+    value: unknown,
+    mutateFn: (value: unknown, valueType: JsonSchemaExtended) => [true, any] | [false]
+  ) => void = mutateValues
 }

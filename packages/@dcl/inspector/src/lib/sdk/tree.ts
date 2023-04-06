@@ -1,4 +1,5 @@
-import { Entity, IEngine, TransformComponent } from '@dcl/ecs'
+import { Entity, IEngine } from '@dcl/ecs'
+import { EditorComponents } from './components'
 
 export const ROOT = 0 as Entity
 
@@ -6,7 +7,7 @@ export const ROOT = 0 as Entity
  * Returns a tree of in the shape of Map<Entity, Set<Entity>> where the key is the parent and the value is the children
  * @returns
  */
-export const getTreeFromEngine = (engine: IEngine, Transform: TransformComponent) => {
+export const getTreeFromEngine = (engine: IEngine, EntityNode: EditorComponents['EntityNode']) => {
   // We build a map of children by their parent entity
   const childrenByParent = getEmptyTree()
 
@@ -47,10 +48,10 @@ export const getTreeFromEngine = (engine: IEngine, Transform: TransformComponent
         continue
       }
 
-      // When the entitiy has a transform, we created a linked node pointing to the parent
-      if (Transform.has(entity)) {
-        const transform = Transform.get(entity)
-        const parent = transform.parent || ROOT
+      // When the entitiy has a EntityNode, we created a linked node pointing to the parent
+      if (EntityNode.has(entity)) {
+        const entityNode = EntityNode.get(entity)
+        const parent = entityNode.parent || ROOT
         // If the parent has already been processed we set it as parent of the current entity as long as it does not create a cycle
         if (childrenByParent.has(parent) && !isAncestor(entity, parent)) {
           setParent(entity, parent)

@@ -1284,6 +1284,7 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
     get(entity: Entity): DeepReadonly<T>;
     getMutable(entity: Entity): T;
     getMutableOrNull(entity: Entity): T | null;
+    getOrCreateMutable(entity: Entity, initialValue?: T): T;
     getOrNull(entity: Entity): DeepReadonly<T> | null;
 }
 

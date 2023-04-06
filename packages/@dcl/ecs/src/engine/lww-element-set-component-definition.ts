@@ -270,6 +270,15 @@ export function createComponentDefinitionFromSchema<T>(
       dirtyIterator.add(entity)
       return component
     },
+    getOrCreateMutable(entity: Entity, value?: T): T {
+      const component = data.get(entity)
+      if (!component) {
+        return this.create(entity, value)
+      } else {
+        dirtyIterator.add(entity)
+        return component
+      }
+    },
     getMutable(entity: Entity): T {
       const component = this.getMutableOrNull(entity)
       if (component === null) {
