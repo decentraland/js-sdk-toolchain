@@ -50,20 +50,13 @@
             "name": "cube-id",
             "jsonSchema": {
                 "type": "object",
-                "properties": {
-                    "withId": {
-                        "type": "string",
-                        "serializationType": "utf8-string"
-                    }
-                },
+                "properties": {},
                 "serializationType": "map"
             },
             "data": {
                 "512": {
                     "$case": "json",
-                    "json": {
-                        "withId": ""
-                    }
+                    "json": {}
                 }
             }
         },
