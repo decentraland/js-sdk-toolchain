@@ -12,6 +12,12 @@
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <div id="root"></div>
   <link href="bundle.css" rel="stylesheet" />
+  <script>
+    const config = '$CONFIG'
+    if (config !== '$CONFIG') {
+      globalThis.InspectorConfig = JSON.parse(config)
+    }
+  </script>
   <script src="bundle.js"></script>
 </body>
 

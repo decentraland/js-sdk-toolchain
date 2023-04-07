@@ -3,7 +3,10 @@ import { feededFileSystem } from './feeded-local-fs'
 import { createLocalDataLayerRpcClient } from './local-data-layer'
 import { createWebSocketDataLayerRpcClient } from './ws-data-layer'
 
-const dataLayerWs = new URLSearchParams(window.location.search).get('ws')
+const dataLayerWsByQueryParams = new URLSearchParams(window.location.search).get('ws')
+const dataLayerWsByGlobalThis = ((globalThis as any).InspectorConfig?.dataLayerRpcWsUrl as string) || null
+
+const dataLayerWs: string | null = dataLayerWsByQueryParams || dataLayerWsByGlobalThis || null
 
 export async function createDataLayerClientRpc(): Promise<DataLayerRpcClient> {
   if (!dataLayerWs) {
