@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
 import { Input } from '../Input'
@@ -22,7 +22,7 @@ type Props<T> = {
   level?: number
   getId: (value: T) => string
   getChildren: (value: T) => T[]
-  getLabel: (value: T) => string
+  getLabel: (value: T) => string | JSX.Element
   isOpen: (value: T) => boolean
   isSelected: (value: T) => boolean
   canRename?: (value: T) => boolean
@@ -34,6 +34,7 @@ type Props<T> = {
   onAddChild: (value: T, label: string) => void
   onRemove: (value: T) => void
   onToggle: (value: T, isOpen: boolean) => void
+  getIcon?: (value: T) => JSX.Element
 }
 
 type Tree<T> = Props<T> & ContextMenuProps<T>
@@ -157,12 +158,14 @@ function Tree<T>(props: Tree<T>) {
 
   return (
     <div ref={ref} className="Tree" onContextMenu={handleContextMenu}>
-      <div style={getLevelStyles(level)} className={selected ? 'selected' : ''}>
+      <div style={getLevelStyles(level)} className={selected ? 'item selected' : 'item'}>
         <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
-          {open ? <ArrowDown /> : <ArrowRight />}
-          <span>{label || id}</span>
+          {props.getIcon ? props.getIcon(value) : open ? <ArrowDown /> : <ArrowRight />}
+          {label ? <span>{label || id}</span> : <label />}
         </span>
-        {editMode && <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
+        {editMode && typeof label === 'string' && (
+          <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />
+        )}
         <Controls {...controlsProps} />
       </div>
       <TreeChildren {...props} />

@@ -33,18 +33,64 @@ code {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100vh;
   background: var(--main-bg-color);
 }
 
-#main-editor {
-  flex-basis: 0;
-  flex-grow: 999;
-  height: 500px;
+/* Inspector settings */
+#embed-host {
+  position: absolute !important;
 }
 
+/* Babylon frame */
+#main-editor {
+  height: 100vh;
+}
+#main-editor > div:first-child {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 #renderer {
   width: 100%;
   height: 100%;
   touch-action: none;
   outline: none;
+}
+
+/* Editor assets */
+.editor-assets {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  bottom: 0px;
+  height: 48px;
+}
+
+.editor-assets.expanded {
+  height: 300px;
+  background: var(--tree-bg-color);
+}
+
+.editor-assets.expanded > div {
+  flex: 1 1 0;
+}
+
+.editor-assets.expanded .editor-assets-title {
+  width: auto;
+  flex: 1 1 300;
+}
+
+.editor-assets-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 48px;
+  width: 200px;
+  background: var(--tree-bg-color);
+  cursor: pointer;
+}
+
+.editor-assets-title > span {
+  margin-left: 8px;
 }

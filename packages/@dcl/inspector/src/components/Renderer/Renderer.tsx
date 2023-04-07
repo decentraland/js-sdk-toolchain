@@ -1,5 +1,6 @@
 import React from 'react'
 import { useDrop } from 'react-dnd'
+
 import { useRenderer } from '../../hooks/sdk/useRenderer'
 import { useSdk } from '../../hooks/sdk/useSdk'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
@@ -44,7 +45,7 @@ const Renderer: React.FC = () => {
     <div id="main-editor">
       <div>
         <Toolbar />
-        <canvas ref={canvasRef} id="renderer" touch-action="none"></canvas>
+        <canvas ref={canvasRef} id="renderer" touch-action="none" />
       </div>
     </div>
   )

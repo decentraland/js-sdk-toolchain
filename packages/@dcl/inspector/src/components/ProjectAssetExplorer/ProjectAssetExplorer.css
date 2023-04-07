@@ -1,53 +1,11 @@
-.asset-explorer-container {
-  display: flex;
-  flex-wrap: wrap;
-  height: 100%;
-  overflow: auto;
+.editor .testing .item {
+  padding: 16px;
 }
 
-.asset-explorer-left {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  background-color: #d34d4d;
+.editor .Tree {
+  border: none;
 }
 
-.asset-explorer-top {
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  background-color: #11a661;
-  flex-grow: 1;
-}
-
-.asset-explorer-bottom {
-  display: flex;
-  padding: 10px;
-  background-color: #541a43;
-}
-
-.asset-explorer-scrollable {
-  overflow-y: auto;
-}
-
-.asset-explorer-item {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  cursor: pointer;
-}
-
-.asset-explorer-item:hover {
-  background-color: #bfcb1b;
-}
-
-.asset-explorer-item i {
-  margin-right: 10px;
-}
-
-.asset-explorer-right {
-  flex: 1;
-  background-color: #088270;
-  padding: 20px;
-  overflow: scroll;
+.editor .Tree span {
+  text-decoration: none !important;
 }

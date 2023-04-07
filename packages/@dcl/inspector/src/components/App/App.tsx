@@ -1,16 +1,17 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useCatalog } from '../../hooks/catalog/useCatalog'
 import { AssetsCatalog } from '../AssetsCatalog'
 import { EntityInspector } from '../EntityInspector'
 import { Hierarchy } from '../Hierarchy'
 import { ProjectAssetExplorer } from '../ProjectAssetExplorer'
 import { Renderer } from '../Renderer'
-
+import { MdImageSearch } from 'react-icons/md'
 import './App.css'
 
 const App = () => {
   const [catalog] = useCatalog()
-
+  const [toggle, setToggle] = useState(false)
+  const expandedClass = toggle && 'expanded'
   return (
     <>
       <div
@@ -21,14 +22,16 @@ const App = () => {
         <EntityInspector />
       </div>
       <div className="editor">
-        <div>
-          <Renderer />
-        </div>
-        <div style={{ flex: '1', display: 'flex', overflow: 'auto' }}>
-          <div style={{ width: '50%', overflow: 'auto' }}>
-            <ProjectAssetExplorer />
+        <Renderer />
+        <div className={`editor-assets ${expandedClass}`}>
+          <div className="project-assets">
+            <div className="editor-assets-title" onClick={() => setToggle(!toggle)}>
+              <MdImageSearch />
+              <span>Assets Pack</span>
+            </div>
+            {expandedClass && <ProjectAssetExplorer />}
           </div>
-          <div style={{ width: '50%', overflow: 'auto' }}>{catalog && <AssetsCatalog value={catalog} />}</div>
+          {catalog && expandedClass && <AssetsCatalog value={catalog} />}
         </div>
       </div>
     </>
