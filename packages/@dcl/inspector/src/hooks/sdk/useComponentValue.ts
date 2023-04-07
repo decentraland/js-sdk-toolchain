@@ -12,7 +12,9 @@ function isLastWriteWinComponent<T = unknown>(
 }
 
 export const useComponentValue = <ComponentValueType>(entity: Entity, component: Component<ComponentValueType>) => {
-  const [value, setValue] = useState<ComponentValueType>(component.get(entity) as ComponentValueType)
+  const [value, setValue] = useState<ComponentValueType | null>(
+    component.getOrNull(entity) as ComponentValueType | null
+  )
 
   function isEqual(val: ComponentValueType) {
     const current = new ReadWriteByteBuffer()
@@ -24,6 +26,7 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
 
   // sync state -> engine
   useEffect(() => {
+    if (value === null) return
     if (isEqual(value)) {
       return
     }

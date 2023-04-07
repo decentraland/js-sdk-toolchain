@@ -1,7 +1,9 @@
 import { useMemo } from 'react'
 
 import { useEntitiesWith } from '../../hooks/sdk/useEntitiesWith'
-import { Transform } from './Transform'
+import { TransformInspector } from './TransformInspector'
+import { SceneInspector } from './SceneInspector'
+import { ROOT } from '../../lib/sdk/tree'
 
 export const EntityInspector: React.FC = () => {
   const selectedEntities = useEntitiesWith((components) => components.EntitySelected)
@@ -11,7 +13,8 @@ export const EntityInspector: React.FC = () => {
 
   return (
     <div className="EntityInspector" key={entity}>
-      <Transform entity={entity} />
+      <TransformInspector entity={entity} />
+      <SceneInspector entity={ROOT} />
     </div>
   )
 }
