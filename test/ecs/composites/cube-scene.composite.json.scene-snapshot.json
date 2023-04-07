@@ -54,7 +54,9 @@
     }
   },
   "cube-id": {
-    "513": {}
+    "513": {
+      "withId": ""
+    }
   },
   "core::PointerEvents": {
     "513": {

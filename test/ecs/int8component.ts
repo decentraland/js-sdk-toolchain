@@ -75,6 +75,9 @@ export const int8Component = (engine: IEngine) => {
     getMutableOrNull: function (_entity: Entity) {
       throw new Error('Function not implemented.')
     },
+    getOrCreateMutable: function (_entity: Entity) {
+      throw new Error('Function not implemented.')
+    },
     *iterator() {
       for (const [entity, component] of data) {
         yield [entity, component]

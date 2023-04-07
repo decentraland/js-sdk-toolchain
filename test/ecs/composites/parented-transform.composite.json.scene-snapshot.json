@@ -57,5 +57,13 @@
         }
       ]
     }
+  },
+  "custom-parenter": {
+    "513": {
+      "customParent": 512
+    },
+    "514": {
+      "customParent": 513
+    }
   }
 }

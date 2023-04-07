@@ -1,6 +1,6 @@
-import { Engine } from '../../packages/@dcl/ecs/src/engine'
+import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
-import { jsonSchemaToSchema } from '../../packages/@dcl/ecs/src/schemas/buildSchema'
+import { jsonSchemaToSchema, mutateValues } from '../../packages/@dcl/ecs/src/schemas/buildSchema'
 import { ISchema } from '../../packages/@dcl/ecs/src/schemas/ISchema'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
@@ -10,7 +10,7 @@ const Vector3 = Schemas.Map({
   z: Schemas.Float
 })
 
-describe('Serialization Types', () => {
+describe('test schema serialization', () => {
   it('should serialize Ints', () => {
     const engine = Engine()
     const entity = engine.addEntity()
@@ -540,8 +540,9 @@ describe('Serialization Types', () => {
       Schemas.EnumNumber<RightEnum>(RightEnum, RightEnum.Red)
     }).not.toThrowError()
   })
-
-  it('should the same with schema component', () => {
+})
+describe('test json-schema function', () => {
+  it('should get the same schema with json', () => {
     enum StringEnum {
       FIRST = 'first_item',
       SECOND = 'second_item',
@@ -587,6 +588,7 @@ describe('Serialization Types', () => {
 
     expect(comp.schema.create()).toStrictEqual(clonedComp.schema.create())
   })
+
   it('should fail with unknown schema description', () => {
     expect(() => {
       jsonSchemaToSchema({
@@ -594,5 +596,66 @@ describe('Serialization Types', () => {
         serializationType: 'sarasa' as any
       })
     }).toThrowError()
+  })
+
+  it('should mutate each value', () => {
+    const MySchemaDefinition = {
+      someImportantEntity: Schemas.Entity,
+      manyEntities: Schemas.Array(Schemas.Entity),
+      valueWithoutChanges: Schemas.Int,
+      manyPairOfEntities: Schemas.Array(Schemas.Array(Schemas.Entity)),
+      nestedMap: Schemas.Map({
+        someImportantEntity: Schemas.Entity,
+        manyEntities: Schemas.Array(Schemas.Entity),
+        valueWithoutChanges: Schemas.Int,
+        manyPairOfEntities: Schemas.Array(Schemas.Array(Schemas.Entity))
+      })
+    }
+
+    const MySchema = Schemas.Map(MySchemaDefinition)
+
+    const someValue = MySchema.create()
+    someValue.someImportantEntity = 1 as Entity
+    someValue.manyEntities = [2, 3, 4] as Entity[]
+    someValue.manyPairOfEntities = [
+      [5, 6, 7, 8],
+      [9, 10, 11, 12]
+    ] as Entity[][]
+    someValue.valueWithoutChanges = 13
+
+    someValue.nestedMap.someImportantEntity = 14 as Entity
+    someValue.nestedMap.manyEntities = [15, 16, 17] as Entity[]
+    someValue.nestedMap.manyPairOfEntities = [
+      [18, 19, 20, 21],
+      [22, 23, 24, 25]
+    ] as Entity[][]
+    someValue.nestedMap.valueWithoutChanges = 26
+
+    mutateValues(MySchema.jsonSchema, someValue, (currentValue, valueType) => {
+      if (valueType.serializationType === 'entity') {
+        return [true, (currentValue as number) + 1000]
+      }
+      return [false]
+    })
+
+    expect(someValue).toStrictEqual({
+      someImportantEntity: 1001 as Entity,
+      manyEntities: [1002, 1003, 1004] as Entity[],
+      manyPairOfEntities: [
+        [1005, 1006, 1007, 1008],
+        [1009, 1010, 1011, 1012]
+      ] as Entity[][],
+      valueWithoutChanges: 13,
+
+      nestedMap: {
+        someImportantEntity: 1014 as Entity,
+        manyEntities: [1015, 1016, 1017] as Entity[],
+        manyPairOfEntities: [
+          [1018, 1019, 1020, 1021],
+          [1022, 1023, 1024, 1025]
+        ] as Entity[][],
+        valueWithoutChanges: 26
+      }
+    })
   })
 })

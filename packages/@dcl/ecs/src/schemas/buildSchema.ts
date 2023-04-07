@@ -83,8 +83,8 @@ export function mutateValues(
       const valueType = mapJsonSchema.properties[key]
       if (valueType.serializationType === 'array' || valueType.serializationType === 'map') {
         mutateValues(mapJsonSchema.properties[key], mapValue[key], mutateFn)
-      } else if (valueType.serializationType === 'entity') {
-        const newValue = mutateFn(value, valueType)
+      } else {
+        const newValue = mutateFn(mapValue[key], valueType)
         if (newValue[0]) {
           mapValue[key] = newValue[1]
         }
@@ -93,11 +93,17 @@ export function mutateValues(
   } else if (jsonSchema.serializationType === 'array') {
     const withItemsJsonSchema = jsonSchema as JsonSchemaExtended & { items: JsonSchemaExtended }
     const arrayValue = value as unknown[]
+    const nestedMutateValues =
+      withItemsJsonSchema.items.serializationType === 'array' || withItemsJsonSchema.items.serializationType === 'map'
 
     for (let i = 0, n = arrayValue.length; i < n; i++) {
-      const newValue = mutateFn(value, withItemsJsonSchema.items)
-      if (newValue[0]) {
-        arrayValue[i] = newValue[1]
+      if (nestedMutateValues) {
+        mutateValues(withItemsJsonSchema.items, arrayValue[i], mutateFn)
+      } else {
+        const newValue = mutateFn(arrayValue[i], withItemsJsonSchema.items)
+        if (newValue[0]) {
+          arrayValue[i] = newValue[1]
+        }
       }
     }
   }
