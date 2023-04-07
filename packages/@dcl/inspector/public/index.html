@@ -13,7 +13,12 @@
   <div id="root"></div>
   <link href="bundle.css" rel="stylesheet" />
   <script>
+    // The next line should be replace with the next regex 
+    //  indexHtmlContent
+    //    .replace(/(const config = ')(\$CONFIG)(')/gi, `$1${JSON.stringify(config)}$3`)
+    // Where config is the object will be in globalThis.InspectorConfig
     const config = '$CONFIG'
+
     if (config !== '$CONFIG') {
       globalThis.InspectorConfig = JSON.parse(config)
     }
