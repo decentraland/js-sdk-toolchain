@@ -14,7 +14,7 @@ import { getCompositeRootComponent } from './../../packages/@dcl/ecs/src/composi
 import { getComponentDefinition, getComponentValue } from './../../packages/@dcl/ecs/src/composite/instance'
 import { ReadWriteByteBuffer } from './../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
-const writeToFile = true //process.env.UPDATE_SNAPSHOTS
+const writeToFile = process.env.UPDATE_SNAPSHOTS
 const COMPOSITE_BASE_PATH = 'test/ecs/composites'
 const nonBinaryCompositeJsonPath = 'non-binary.composite.json'
 
