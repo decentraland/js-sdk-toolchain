@@ -60,10 +60,12 @@
   },
   "custom-parenter": {
     "513": {
-      "customParent": 512
+      "customParent": 512,
+      "untransformedProperty": 0
     },
     "514": {
-      "customParent": 513
+      "customParent": 513,
+      "untransformedProperty": 518
     }
   }
 }

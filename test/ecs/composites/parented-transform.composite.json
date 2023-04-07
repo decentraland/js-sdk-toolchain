@@ -34,6 +34,10 @@
                     "customParent": {
                         "type": "integer",
                         "serializationType": "entity"
+                    },
+                    "untransformedProperty": {
+                        "type": "integer",
+                        "serializationType": "int32"
                     }
                 },
                 "serializationType": "map"
@@ -42,13 +46,15 @@
                 "518": {
                     "$case": "json",
                     "json": {
-                        "customParent": 0
+                        "customParent": 0,
+                        "untransformedProperty": 0
                     }
                 },
                 "519": {
                     "$case": "json",
                     "json": {
-                        "customParent": 518
+                        "customParent": 518,
+                        "untransformedProperty": 518
                     }
                 }
             }
