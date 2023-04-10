@@ -1,11 +1,11 @@
-.editor .testing .item {
+.editor .editor-assets-tree .item {
   padding: 16px;
 }
 
-.editor .Tree {
+.editor .editor-assets-tree .Tree {
   border: none;
 }
 
-.editor .Tree span {
+.editor .editor-assets-tree .Tree span {
   text-decoration: none !important;
 }

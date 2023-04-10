@@ -16,4 +16,7 @@
   /* Color definitions */
   --white: #FFFFFF;
   --black: #000000;
+
+  /* Margins */
+  --sidebar: 300px
 }

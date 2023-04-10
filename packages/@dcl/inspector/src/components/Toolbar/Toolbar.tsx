@@ -18,7 +18,7 @@ function Toolbar() {
   }, [sdk])
 
   return (
-    <div className="toolbar">
+    <div className="toolbar bordered">
       <button className="undo" onClick={sdk?.dataLayer.undo}>
         <BiUndo />
       </button>

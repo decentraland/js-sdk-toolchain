@@ -24,8 +24,9 @@ code {
 }
 
 .sidebar {
-  max-width: 300px;
-  min-width: 300px;
+  height: 100%;
+  max-width: var(--sidebar);
+  min-width: var(--sidebar);
   background: var(--main-bg-color);
 }
 
@@ -42,15 +43,12 @@ code {
   position: absolute !important;
 }
 
+.main-editor {
+  height: calc(100vh - 54px);
+}
+
+
 /* Babylon frame */
-#main-editor {
-  height: 100vh;
-}
-#main-editor > div:first-child {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
 #renderer {
   width: 100%;
   height: 100%;
@@ -59,38 +57,36 @@ code {
 }
 
 /* Editor assets */
-.editor-assets {
-  display: flex;
-  flex-direction: row;
+.footer {
+  padding: 8px;
   position: absolute;
   bottom: 0px;
-  height: 48px;
-}
-
-.editor-assets.expanded {
-  height: 300px;
-  background: var(--tree-bg-color);
-}
-
-.editor-assets.expanded > div {
-  flex: 1 1 0;
-}
-
-.editor-assets.expanded .editor-assets-title {
-  width: auto;
-  flex: 1 1 300;
-}
-
-.editor-assets-title {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 48px;
-  width: 200px;
+  flex-direction: column;
+  width: calc(100% - var(--sidebar) - 16px) !important;
+}
+.footer > div:first-child {
+  padding: 1px !important;
+}
+
+.footer .footer-buttons {
+  display: flex;
   background: var(--tree-bg-color);
+  height: 36px;
+}
+
+.footer .footer-buttons > div {
+  display: flex;
+  align-items: center;
+  padding: 8px;
   cursor: pointer;
 }
 
-.editor-assets-title > span {
+.footer-buttons .footer-title > span {
   margin-left: 8px;
+}
+
+.footer .footer-content {
+  background: var(--tree-bg-color) !important;
+  height: 250px !important;
 }

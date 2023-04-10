@@ -43,10 +43,8 @@ const Renderer: React.FC = () => {
 
   return (
     <div id="main-editor">
-      <div>
-        <Toolbar />
-        <canvas ref={canvasRef} id="renderer" touch-action="none" />
-      </div>
+      <Toolbar />
+      <canvas ref={canvasRef} id="renderer" touch-action="none" />
     </div>
   )
 }

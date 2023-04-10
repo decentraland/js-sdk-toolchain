@@ -1,10 +1,10 @@
 
 .assets-catalog {
   display: flex;
-  overflow: scroll;
   height: 100%;
   padding: 1rem;
   flex-wrap: wrap;
+  overflow-y: auto;
   justify-content: center;
 }
 

@@ -6,6 +6,7 @@ import { Controls, Position } from '../Controls'
 import { RxDoubleArrowRight as ArrowRight, RxDoubleArrowDown as ArrowDown } from 'react-icons/rx'
 
 import './Tree.css'
+import { className } from '@babylonjs/core'
 
 interface ContextMenu<T> {
   value: T
@@ -19,6 +20,7 @@ interface ContextMenuProps<T> {
 
 type Props<T> = {
   value: T
+  className?: string
   level?: number
   getId: (value: T) => string
   getChildren: (value: T) => T[]
@@ -46,6 +48,7 @@ const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : '' 
 
 function Tree<T>(props: Tree<T>) {
   const {
+    className,
     value,
     level = getDefaultLevel(),
     getId,
@@ -157,7 +160,7 @@ function Tree<T>(props: Tree<T>) {
   }
 
   return (
-    <div ref={ref} className="Tree" onContextMenu={handleContextMenu}>
+    <div ref={ref} className={`Tree ${className || ''}`} onContextMenu={handleContextMenu}>
       <div style={getLevelStyles(level)} className={selected ? 'item selected' : 'item'}>
         <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
           {props.getIcon ? props.getIcon(value) : open ? <ArrowDown /> : <ArrowRight />}
