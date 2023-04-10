@@ -23,10 +23,13 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
   isValidInput: (input: InputType) => boolean = () => true
 ) => {
   const [componentValue, setComponentValue, isEqual] = useComponentValue<ComponentValueType>(entity, component)
-  const [input, setInput] = useState<InputType>(fromComponentValueToInput(componentValue))
+  const [input, setInput] = useState<InputType | null>(
+    componentValue === null ? null : fromComponentValueToInput(componentValue)
+  )
   const [isFocused, setIsFocused] = useState(false)
 
   const handleUpdate = (path: NestedKey<InputType>) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (input === null) return
     const newInputs = setValue(input, path, event.target.value as any)
     setInput(newInputs)
   }
@@ -36,13 +39,14 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
   }, [])
 
   const handleBlur = useCallback(() => {
+    if (componentValue === null) return
     setIsFocused(false)
     setInput(fromComponentValueToInput(componentValue))
   }, [componentValue])
 
   // sync inputs -> engine
   useEffect(() => {
-    if (isValidInput(input)) {
+    if (input !== null && isValidInput(input)) {
       const newComponentValue = { ...componentValue, ...fromInputToComponentValue(input) }
 
       if (isEqual(newComponentValue)) {
@@ -54,6 +58,7 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
 
   // sync engine -> inputs
   useEffect(() => {
+    if (componentValue === null) return
     if (isFocused) {
       // skip sync from state while editing, to avoid overriding the user input
       return
