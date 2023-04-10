@@ -51,7 +51,7 @@ test:
 	make test-inspector
 
 test-inspector:
-	cd ./packages/@dcl/inspector/; WITH_COVERAGE=true ./../../../node_modules/.bin/jest --coverage --detectOpenHandles --colors $(TESTARGS) --config ./jest.config.js
+	cd ./packages/@dcl/inspector/; WITH_COVERAGE=true ./../../../node_modules/.bin/jest --coverage --detectOpenHandles --colors --config ./jest.config.js
 
 test-cli:
 	@rm -rf tmp

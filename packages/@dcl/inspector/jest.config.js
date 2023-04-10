@@ -1,7 +1,10 @@
 module.exports = {
   moduleFileExtensions: ["ts", "js", "jsx", "tsx"],
   transform: {
-    "^.+\\.[tj]sx?$": require.resolve('./test/jest-transformer')
+    "^.+\\.(js|jsx|ts|tsx)$": ["ts-jest", {
+      tsconfig: "test/tsconfig.json", 
+      isolatedModules: true
+    }]
   },
   coverageDirectory: "coverage",
   coverageProvider: 'v8',

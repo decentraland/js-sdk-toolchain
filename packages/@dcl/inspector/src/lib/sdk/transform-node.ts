@@ -23,15 +23,18 @@ function getCloserTransformParent(
   return parent
 }
 
+export const CheckIntervalSeconds = 1.0
+
 export function getTransformNodeChecker(engine: IEngine, EntityNode: EditorComponents['EntityNode']) {
   const Transform = components.Transform(engine)
-  const CheckIntervalSeconds = 1.0
 
   let t = 0
   return (dt: number) => {
     t += dt
     if (t < CheckIntervalSeconds) {
       return
+    } else {
+      t = 0
     }
 
     for (const [entity, _, transform] of engine.getEntitiesWith(EntityNode, Transform)) {

@@ -43,7 +43,7 @@
         "--no-cache",
         "-i",
         "--config", 
-        "${workspaceFolder}/packages/@dcl/inspector/test/jest.config.js"
+        "${workspaceFolder}/packages/@dcl/inspector/jest.config.js"
       ],
       "skipFiles": [
         "<node_internals>/**/*.js",

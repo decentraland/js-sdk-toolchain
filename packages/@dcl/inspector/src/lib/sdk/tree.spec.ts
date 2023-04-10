@@ -1,6 +1,6 @@
-import { Engine, Entity, IEngine } from '../../../../ecs'
-import { EditorComponents, createEditorComponents } from '../../../src/lib/sdk/components'
-import { getEmptyTree, getTreeFromEngine, ROOT } from '../../../src/lib/sdk/tree'
+import { Engine, Entity, IEngine } from '@dcl/ecs'
+import { EditorComponents, createEditorComponents } from './components'
+import { getEmptyTree, getTreeFromEngine, ROOT } from './tree'
 
 describe('getTreeFromEngine', () => {
   let engine: IEngine
