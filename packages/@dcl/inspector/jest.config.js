@@ -1,11 +1,11 @@
 module.exports = {
   moduleFileExtensions: ["ts", "js", "jsx", "tsx"],
   transform: {
-    "^.+\\.[tj]sx?$": require.resolve('./jest-transformer')
+    "^.+\\.[tj]sx?$": require.resolve('./test/jest-transformer')
   },
   coverageDirectory: "coverage",
   coverageProvider: 'v8',
-  collectCoverageFrom: ["./src/**/*.ts"],
+  collectCoverageFrom: ["src/**/*.ts"],
   verbose: true,
   testMatch: ["**/*.spec.(ts)"],
   testEnvironment: "node",
