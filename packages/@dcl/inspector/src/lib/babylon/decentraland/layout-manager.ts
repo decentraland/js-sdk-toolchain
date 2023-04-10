@@ -15,7 +15,8 @@ import {
 import { memoize } from '../../logic/once'
 import { Layout } from '../../sdk/layout'
 import { GridMaterial } from '@babylonjs/materials'
-import { PARCEL_SIZE } from '../setup'
+
+const PARCEL_SIZE = 16
 
 function disableGizmo(gizmo: IAxisDragGizmo) {
   gizmo.dragBehavior.detach()
@@ -32,6 +33,7 @@ function copyColors(source: StandardMaterial, target: StandardMaterial) {
 }
 
 function center(scene: Scene, layout: Layout) {
+  if (!scene.activeCamera) return
   const { base, parcels } = layout
   const minX = Math.min(...parcels.map((parcel) => parcel.x))
   const minY = Math.min(...parcels.map((parcel) => parcel.y))

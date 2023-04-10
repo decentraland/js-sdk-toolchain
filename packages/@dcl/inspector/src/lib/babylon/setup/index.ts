@@ -3,9 +3,11 @@ import { initKeyboard } from './input'
 import { GridMaterial } from '@babylonjs/materials'
 
 // if NODE_ENV == development
-require('@babylonjs/inspector')
+if (!process.env.DEVELOPER_MODE) {
+  require('@babylonjs/inspector')
+}
 
-export const PARCEL_SIZE = 16
+const PARCEL_SIZE = 16
 const sunInclination = -0.31
 
 export namespace ambientConfigurations {
