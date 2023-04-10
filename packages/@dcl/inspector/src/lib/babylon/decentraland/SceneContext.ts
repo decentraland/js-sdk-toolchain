@@ -17,6 +17,7 @@ import { putGltfContainerComponent } from './sdkComponents/gltf-container'
 import { putMeshRendererComponent } from './sdkComponents/mesh-renderer'
 import { putTransformComponent } from './sdkComponents/transform'
 import { consumeAllMessagesInto } from '../../logic/consume-stream'
+import { putSceneComponent } from './editorComponents/scene'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -54,7 +55,8 @@ export class SceneContext {
     [this.MeshRenderer.componentId]: putMeshRendererComponent,
     [this.Billboard.componentId]: putBillboardComponent,
     [this.GltfContainer.componentId]: putGltfContainerComponent,
-    [this.editorComponents.EntitySelected.componentId]: putEntitySelectedComponent
+    [this.editorComponents.EntitySelected.componentId]: putEntitySelectedComponent,
+    [this.editorComponents.Scene.componentId]: putSceneComponent
   }
 
   // this future is resolved when the scene is disposed

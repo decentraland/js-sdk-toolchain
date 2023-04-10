@@ -1,10 +1,11 @@
 import * as BABYLON from '@babylonjs/core'
 import { initKeyboard } from './input'
+import { GridMaterial } from '@babylonjs/materials'
+import { PARCEL_SIZE } from '../../utils/scene'
 
 // if NODE_ENV == development
 require('@babylonjs/inspector')
 
-export const PARCEL_SIZE = 16
 const sunInclination = -0.31
 
 export namespace ambientConfigurations {
@@ -90,31 +91,32 @@ export function initRenderer(canvas: HTMLCanvasElement) {
   BABYLON.Database.IDBStorageEnabled = true
   babylon.enableOfflineSupport = true
 
-  const editorColor = BABYLON.Color3.FromHexString('#0e0c12')
+  const editorColor = BABYLON.Color3.FromHexString('#17141B')
   const editorEnvHelper = scene.createDefaultEnvironment({
     groundColor: editorColor,
     skyboxColor: editorColor,
-    skyboxSize: 200,
-    groundSize: 100
+    skyboxSize: 1000,
+    groundSize: 1000
   })!
 
-  editorEnvHelper!.ground!.position.y = 0
-  editorEnvHelper!.rootMesh.position.y = -0.1
+  // const ground = MeshBuilder.CreateGround('ground', { width: 200, height: 200 }, scene)
+  const grid = new GridMaterial('grid', scene)
+  grid.gridRatio = 1
+  grid.majorUnitFrequency = 4
+  grid.lineColor = BABYLON.Color3.FromHexString('#676370')
+  grid.mainColor = BABYLON.Color3.FromHexString('#36343D')
+  editorEnvHelper.ground!.material = grid
 
-  const camera = new BABYLON.ArcRotateCamera(
-    'editorCamera',
-    -Math.PI / 2,
-    Math.PI / 2.5,
-    15,
-    new BABYLON.Vector3(0, 0, 0),
-    scene
-  )
+  const center = new BABYLON.Vector3(PARCEL_SIZE / 2, 0, PARCEL_SIZE / 2)
+  const camera = new BABYLON.ArcRotateCamera('editorCamera', -Math.PI / 2, Math.PI / 2.5, 15, center, scene)
 
   camera.lowerRadiusLimit = 3
   camera.upperRadiusLimit = 15
   scene.activeCamera?.detachControl()
   camera.attachControl(canvas, true)
   scene.activeCamera = camera
+  const size = center.length()
+  camera.position = center.subtractFromFloats(size, -size * 1.5, size * 2)
 
   const hemiLight = new BABYLON.HemisphericLight('default light', ambientConfigurations.sunPosition, scene)
 
