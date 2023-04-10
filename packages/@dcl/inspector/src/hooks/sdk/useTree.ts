@@ -44,7 +44,7 @@ export const useTree = () => {
   const getEntityComponents = useCallback(
     (entity: Entity, missing?: boolean): Map<number, string> => {
       const components = new Map<number, string>()
-      if (sdk) {
+      if (sdk && entity !== ROOT) {
         for (const component of sdk.engine.componentsIter()) {
           if (missing ? !component.has(entity) : component.has(entity)) {
             components.set(component.componentId, component.componentName)
@@ -155,7 +155,7 @@ export const useTree = () => {
 
   const addComponent = useCallback(
     (entity: Entity, componentId: number) => {
-      if (!sdk) return
+      if (!sdk || entity === ROOT) return
       const component = sdk.engine.getComponent(componentId)
       if (isLastWriteWinComponent(component)) {
         component.create(entity)

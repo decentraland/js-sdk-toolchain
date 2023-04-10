@@ -1,17 +1,27 @@
+import { useCallback } from 'react'
+import { Menu, Item } from 'react-contexify';
+import { AiFillDelete as DeleteIcon} from 'react-icons/ai'
+
 import { isValidNumericInput, useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
-import { withSdk } from '../../../hoc/withSdk'
+import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
+
 import { Props } from './types'
 import { fromTranform, toTransform } from './utils'
 import { Block } from '../Block'
 import { Container } from '../Container'
 import { TextField } from '../TextField'
+import { withContextMenu } from '../../../hoc/withContextMenu'
+import { useContextMenu } from '../../../hooks/sdk/useContextMenu';
 
-export default withSdk<Props>(({ sdk, entity }) => {
+export default withSdk<Props>(withContextMenu<WithSdkProps & Props>(({ sdk, entity, onRemove, contextMenuId }) => {
   const { Transform } = sdk.components
 
   const hasTransform = useHasComponent(entity, Transform)
   const getInputProps = useComponentInput(entity, Transform, fromTranform, toTransform, isValidNumericInput)
+  const { handleAction } = useContextMenu()
+
+  const handleRemove = useCallback(() => onRemove(entity, Transform.componentId), [])
 
   if (!hasTransform) {
     return null
@@ -19,6 +29,9 @@ export default withSdk<Props>(({ sdk, entity }) => {
 
   return (
     <Container label="Transform" className="Transform">
+      <Menu id={contextMenuId}>
+        <Item id="delete" onClick={handleAction(handleRemove)}><DeleteIcon /> Delete</Item>
+      </Menu>
       <Block label="Position">
         <TextField label="X" type="number" fractionDigits={2} {...getInputProps('position.x')} />
         <TextField label="Y" type="number" fractionDigits={2} {...getInputProps('position.y')} />
@@ -36,4 +49,4 @@ export default withSdk<Props>(({ sdk, entity }) => {
       </Block>
     </Container>
   )
-})
+}))

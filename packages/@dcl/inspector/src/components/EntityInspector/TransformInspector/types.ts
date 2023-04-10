@@ -2,6 +2,7 @@ import { Entity } from '@dcl/ecs'
 
 export interface Props {
   entity: Entity
+  onRemove: (entity: Entity, componentId: number) => void
 }
 
 export type TransformInput = {
