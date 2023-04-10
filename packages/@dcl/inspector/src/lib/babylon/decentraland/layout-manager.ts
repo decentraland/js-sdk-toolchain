@@ -15,8 +15,7 @@ import {
 import { memoize } from '../../logic/once'
 import { Layout } from '../../sdk/layout'
 import { GridMaterial } from '@babylonjs/materials'
-
-const PARCEL_SIZE = 16
+import { PARCEL_SIZE } from '../../utils/scene'
 
 function disableGizmo(gizmo: IAxisDragGizmo) {
   gizmo.dragBehavior.detach()
