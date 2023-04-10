@@ -7,6 +7,7 @@ import {
   TransformComponentExtended
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
+import { Layout } from './layout'
 
 export type Component<T = unknown> = LastWriteWinElementSetComponentDefinition<T>
 
@@ -14,12 +15,14 @@ export type EditorComponentsTypes = {
   entityNode: { label: string; parent: Entity }
   entitySelected: { gizmo: number }
   toggle: object
+  scene: { layout: Layout }
 }
 
 export type EditorComponents = {
   EntityNode: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['entityNode']>
   EntitySelected: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['entitySelected']>
   Toggle: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['toggle']>
+  Scene: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['scene']>
 }
 
 export type SdkComponents = {
@@ -58,5 +61,17 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
 
   const Toggle = engine.defineComponent('inspector::Toggle', {})
 
-  return { EntityNode, EntitySelected, Toggle }
+  const Coords = Schemas.Map({
+    x: Schemas.Int,
+    y: Schemas.Int
+  })
+
+  const Scene = engine.defineComponent('inspector::Scene', {
+    layout: Schemas.Map({
+      base: Coords,
+      parcels: Schemas.Array(Coords)
+    })
+  })
+
+  return { EntitySelected, Toggle, Scene, EntityNode }
 }

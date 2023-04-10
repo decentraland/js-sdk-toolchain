@@ -135,6 +135,72 @@ export const mainComposite = {
           }
         }
       }
+    },
+    {
+      name: 'inspector::Scene',
+      jsonSchema: {
+        type: 'object',
+        properties: {
+          layout: {
+            type: 'object',
+            properties: {
+              base: {
+                type: 'object',
+                properties: {
+                  x: {
+                    type: 'integer'
+                  },
+                  y: {
+                    type: 'integer'
+                  }
+                }
+              },
+              parcels: {
+                type: 'array',
+                item: {
+                  type: 'object',
+                  properties: {
+                    x: {
+                      type: 'integer'
+                    },
+                    y: {
+                      type: 'integer'
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        serializationType: 'map'
+      },
+      data: {
+        '0': {
+          $case: 'json',
+          json: {
+            layout: {
+              base: {
+                x: 0,
+                y: 0
+              },
+              parcels: [
+                {
+                  x: 0,
+                  y: 0
+                },
+                {
+                  x: 0,
+                  y: 1
+                },
+                {
+                  x: 1,
+                  y: 0
+                }
+              ]
+            }
+          }
+        }
+      }
     }
   ]
 }
