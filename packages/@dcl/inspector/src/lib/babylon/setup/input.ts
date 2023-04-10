@@ -163,9 +163,11 @@ export function interactWithScene(
     const context = entity.context.deref()!
 
     // clean selection
+    let gizmo = 0
     const { EntitySelected } = context.editorComponents
     for (const [e] of context.engine.getEntitiesWith(EntitySelected)) {
       if (e !== entity.entityId) {
+        gizmo = EntitySelected.get(e).gizmo
         EntitySelected.deleteFrom(e)
       }
     }
@@ -173,11 +175,8 @@ export function interactWithScene(
     // then select new
     if (entity.entityId) {
       if (!EntitySelected.has(entity.entityId)) {
-        EntitySelected.createOrReplace(entity.entityId, { gizmo: 0 })
+        EntitySelected.createOrReplace(entity.entityId, { gizmo })
       }
-      const mut = EntitySelected.getMutable(entity.entityId)
-      mut.gizmo++
-      mut.gizmo %= 3
     }
   }
 }

@@ -122,12 +122,14 @@ export const useTree = () => {
     (entity: Entity, open: boolean) => {
       if (entity === ROOT || !sdk) return
       const { Toggle, EntitySelected } = sdk.components
+      let gizmo = 0
       for (const [_entity] of sdk.engine.getEntitiesWith(EntitySelected)) {
         if (_entity !== entity && EntitySelected.has(_entity)) {
+          gizmo = EntitySelected.get(_entity).gizmo
           EntitySelected.deleteFrom(_entity)
         }
       }
-      EntitySelected.createOrReplace(entity, { gizmo: 1 })
+      EntitySelected.createOrReplace(entity, { gizmo })
 
       if (open) {
         Toggle.createOrReplace(entity)

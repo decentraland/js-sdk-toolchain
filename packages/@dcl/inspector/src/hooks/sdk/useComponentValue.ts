@@ -17,10 +17,10 @@ export function isLastWriteWinComponent<T = unknown>(
   return !!(component as LastWriteWinElementSetComponentDefinition<unknown>).createOrReplace
 }
 
-const getComponentValue = (entity: Entity, component: Component<unknown>): DeepReadonlySet<unknown> =>
+const getComponentValue = <T>(entity: Entity, component: Component<T>): DeepReadonlySet<T> =>
   (isLastWriteWinComponent(component)
     ? component.getOrNull(entity) || component.schema.create()
-    : component.get(entity)) as DeepReadonlySet<unknown>
+    : component.get(entity)) as DeepReadonlySet<T>
 
 export const useComponentValue = <ComponentValueType>(entity: Entity, component: Component<unknown>) => {
   const componentValueType = getComponentValue(entity, component)
@@ -33,6 +33,11 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
     component.schema.serialize(getComponentValue(entity, component), current)
     return dataCompare(current.toBinary(), newValue.toBinary()) === 0
   }
+
+  // sync entity changed
+  useEffect(() => {
+    setValue(getComponentValue(entity, component) as ComponentValueType)
+  }, [entity])
 
   // sync state -> engine
   useEffect(() => {
@@ -49,19 +54,22 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
   }, [value])
 
   // sync engine -> state
-  useChange((event) => {
-    if (entity === event.entity && component.componentId === event.component?.componentId && !!event.value) {
-      if (event.operation === CrdtMessageType.PUT_COMPONENT) {
-        // TODO: This setValue is generating a isEqual comparission.
-        // Maybe we have to use two two pure functions instead of an effect.
-        // Same happens with the input & componentValue.
-        setValue(event.value)
-      } else {
-        // TODO: handle update for GrowOnlyValueSetComponentDefinition
-        debugger
+  useChange(
+    (event) => {
+      if (entity === event.entity && component.componentId === event.component?.componentId && !!event.value) {
+        if (event.operation === CrdtMessageType.PUT_COMPONENT) {
+          // TODO: This setValue is generating a isEqual comparission.
+          // Maybe we have to use two two pure functions instead of an effect.
+          // Same happens with the input & componentValue.
+          setValue(event.value)
+        } else {
+          // TODO: handle update for GrowOnlyValueSetComponentDefinition
+          debugger
+        }
       }
-    }
-  })
+    },
+    [entity, component]
+  )
 
   return [value, setValue, isEqual] as const
 }

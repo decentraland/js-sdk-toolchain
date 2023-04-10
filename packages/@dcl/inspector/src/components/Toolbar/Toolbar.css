@@ -1,4 +1,4 @@
-.toolbar {
+.Toolbar {
   display: flex;
   justify-content: center;
   background-color: #29262f;
@@ -7,7 +7,7 @@
   width: calc(100% - var(--sidebar) - 26px);
 }
 
-.toolbar button {
+.Toolbar button {
   border: none;
   padding: 0px 16px;
   margin: 0 8px;
@@ -18,12 +18,45 @@
   cursor: pointer;
 }
 
-.toolbar button:hover {
+.Toolbar button:hove:not(:disabled) {
   background-color: #999;
 }
 
-.toolbar svg {
+.Toolbar button:disabled {
+  opacity: 0.5;
+  cursor: default
+}
+
+.Toolbar svg {
   width: 24px;
   height: 24px;
 }
 
+.Toolbar button.gizmo {
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.Toolbar button.gizmo.active {
+  background-color: #6c6974;
+}
+
+.Toolbar .gizmo.translate {
+  margin-right: 1px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  background-image: url(./icons/translate.svg);
+}
+
+.Toolbar .gizmo.rotate {
+  margin: 0px;
+  border-radius: 0px;
+  background-image: url(./icons/rotate.svg);
+}
+
+.Toolbar .gizmo.scale {
+  margin-left: 1px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  background-image: url(./icons/scale.svg);
+}
