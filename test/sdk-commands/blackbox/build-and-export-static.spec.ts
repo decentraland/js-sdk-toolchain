@@ -71,8 +71,9 @@ describe('blackbox: build', () => {
 
     expect(json).toMatchObject({
       scenesUrn: expect.arrayContaining([
-        expect.stringMatching(/^urn:.+\?baseUrl=https:\/\/decentraland.org\//),
-        expect.stringMatching(/^urn:.+\?baseUrl=https:\/\/decentraland.org\//)
+        expect.stringMatching(/^urn:.+\?=dcl&baseUrl=https:\/\/decentraland.org\//),
+        //                             ?=dcl& <- this is required to create compliant URNs https://datatracker.ietf.org/doc/html/rfc8141#page-10 (ADR-207)
+        expect.stringMatching(/^urn:.+\?=dcl&baseUrl=https:\/\/decentraland.org\//)
       ]),
       entities: expect.arrayContaining([expect.stringMatching(/^ba.+/), expect.stringMatching(/^ba.+/)]),
       destination: path.resolve('tmp/ipfs')
