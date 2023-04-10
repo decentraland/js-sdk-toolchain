@@ -17,7 +17,7 @@
         "z": 0,
         "w": 1
       },
-      "parent": 0
+      "parent": 513
     },
     "516": {
       "position": {
@@ -36,7 +36,7 @@
         "z": 0,
         "w": 1
       },
-      "parent": 0
+      "parent": 515
     },
     "518": {
       "position": {
@@ -55,7 +55,7 @@
         "z": 0,
         "w": 1
       },
-      "parent": 0
+      "parent": 517
     },
     "520": {
       "position": {
@@ -74,7 +74,7 @@
         "z": 0,
         "w": 1
       },
-      "parent": 0
+      "parent": 519
     },
     "522": {
       "position": {
@@ -93,7 +93,7 @@
         "z": 0,
         "w": 1
       },
-      "parent": 0
+      "parent": 521
     },
     "524": {
       "position": {
@@ -112,7 +112,7 @@
         "z": 0,
         "w": 1
       },
-      "parent": 0
+      "parent": 523
     }
   },
   "composite::root": {

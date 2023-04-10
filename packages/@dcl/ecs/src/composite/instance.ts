@@ -220,6 +220,8 @@ export function instanceComposite(
         const transform = componentValue as TransformType
         if (transform.parent) {
           transform.parent = getCompositeEntity(transform.parent)
+        } else {
+          transform.parent = getCompositeEntity(0)
         }
 
         // TODO: is it going to be necessary to remap assets? e.g. src param from AudioSource and GltfContainer
