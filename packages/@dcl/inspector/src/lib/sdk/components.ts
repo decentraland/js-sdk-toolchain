@@ -1,4 +1,5 @@
 import {
+  ComponentDefinition,
   IEngine,
   LastWriteWinElementSetComponentDefinition,
   MeshRendererComponentDefinitionExtended,
@@ -8,7 +9,7 @@ import {
 import * as components from '@dcl/ecs/dist/components'
 import { Layout } from './layout'
 
-export type Component<T = unknown> = LastWriteWinElementSetComponentDefinition<T>
+export type Component<T = unknown> = ComponentDefinition<T>
 
 export type EditorComponentsTypes = {
   label: { label: string }

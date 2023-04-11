@@ -16,4 +16,25 @@
   /* Color definitions */
   --white: #FFFFFF;
   --black: #000000;
+
+  /* Context menu */
+  --contexify-zIndex: 999;
+  --contexify-menu-minWidth: 220px;
+  --contexify-menu-padding: 6px;
+  --contexify-menu-radius: 2px;
+  --contexify-menu-bgColor: var(--dropdown-bg-color);
+  --contexify-menu-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.50);
+  --contexify-menu-negatePadding: var(--contexify-menu-padding);
+
+  --contexify-separator-color: rgba(0, 0, 0, 0.2);
+  --contexify-separator-margin: 5px;
+  --contexify-itemContent-padding: 6px;
+  --contexify-activeItem-radius: 4px;
+  --contexify-item-color: #333;
+  --contexify-activeItem-color: #333;
+  --contexify-activeItem-bgColor: var(--dropdown-hover-bg-color);
+  --contexify-rightSlot-color: #6f6e77;
+  --contexify-activeRightSlot-color: #fff;
+  --contexify-arrow-color: var(--contexify-item-color);
+  --contexify-activeArrow-color: var(--contexify-arrow-color);
 }

@@ -10,5 +10,6 @@ export const useHasComponent = (entity: Entity, component: Component) => {
       setHasComponent(component.has(entity))
     }
   })
+
   return hasComponent
 }

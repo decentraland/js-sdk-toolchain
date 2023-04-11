@@ -3,6 +3,7 @@ import React from 'react'
 import { useTree } from '../../hooks/sdk/useTree'
 import { ROOT } from '../../lib/sdk/tree'
 import { Tree } from '../Tree'
+import { ContextMenu } from './ContextMenu'
 
 const Hierarchy: React.FC = () => {
   const {
@@ -25,6 +26,7 @@ const Hierarchy: React.FC = () => {
     <div className="Hierarchy">
       <Tree
         value={ROOT}
+        getExtraContextMenu={ContextMenu}
         onAddChild={addChild}
         onSetParent={setParent}
         onRemove={remove}
