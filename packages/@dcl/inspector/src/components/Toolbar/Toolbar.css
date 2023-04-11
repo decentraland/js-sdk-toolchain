@@ -3,6 +3,8 @@
   justify-content: center;
   background-color: #29262f;
   padding: 8px;
+  position: absolute;
+  width: calc(100% - var(--sidebar) - 26px);
 }
 
 .toolbar button {
