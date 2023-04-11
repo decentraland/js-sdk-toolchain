@@ -43,10 +43,6 @@ code {
   position: absolute !important;
 }
 
-.main-editor {
-  height: calc(100vh - 54px);
-}
-
 
 /* Babylon frame */
 #renderer {
@@ -71,7 +67,7 @@ code {
   height: 36px;
 }
 
-.footer .footer-buttons > div {
+.footer .footer-buttons>div {
   display: flex;
   align-items: center;
   padding: 8px;

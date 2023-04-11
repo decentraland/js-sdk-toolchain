@@ -3,7 +3,7 @@ import { memoize } from '../../logic/once'
 import { EcsEntity } from './EcsEntity'
 import { Entity } from '@dcl/ecs'
 import { getLayoutManager } from './layout-manager'
-import { inBounds } from '../../sdk/layout'
+import { inBounds } from '../../utils/layout'
 
 export const getGizmoManager = memoize((scene: Scene) => {
   // Create and initialize gizmo

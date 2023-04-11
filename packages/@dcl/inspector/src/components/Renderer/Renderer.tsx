@@ -63,7 +63,6 @@ const Renderer: React.FC = () => {
           return
         }
         if (monitor.didDrop()) return
-        console.log(val.asset)
         void addAsset(val.asset as AssetNodeItem)
       }
     }),
@@ -73,7 +72,7 @@ const Renderer: React.FC = () => {
   drop(canvasRef)
 
   return (
-    <div id="main-editor">
+    <div id="Renderer">
       <canvas ref={canvasRef} id="renderer" touch-action="none" />
     </div>
   )

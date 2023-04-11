@@ -8,22 +8,30 @@ import {
   TransformComponentExtended
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
-import { Layout } from './layout'
+import { Layout } from '../utils/layout'
+import { GizmoType } from '../utils/gizmo'
 
 export type Component<T = unknown> = ComponentDefinition<T>
 
+export enum EditorComponentIds {
+  EntityNode = 'inspector::Label',
+  Selection = 'inspector::Selection',
+  Toggle = 'inspector::Toggle',
+  Scene = 'inspector::Scene'
+}
+
 export type EditorComponentsTypes = {
-  entityNode: { label: string; parent: Entity }
-  entitySelected: { gizmo: number }
-  toggle: object
-  scene: { layout: Layout }
+  EntityNode: { label: string; parent: Entity }
+  Selection: { gizmo: GizmoType }
+  Toggle: object
+  Scene: { layout: Layout }
 }
 
 export type EditorComponents = {
-  EntityNode: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['entityNode']>
-  EntitySelected: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['entitySelected']>
-  Toggle: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['toggle']>
-  Scene: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['scene']>
+  EntityNode: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['EntityNode']>
+  Selection: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Selection']>
+  Toggle: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Toggle']>
+  Scene: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Scene']>
 }
 
 export type SdkComponents = {
@@ -56,23 +64,23 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     parent: Schemas.Entity
   })
 
-  const EntitySelected = engine.defineComponent('editor::EntitySelected', {
+  const Selection = engine.defineComponent(EditorComponentIds.Selection, {
     gizmo: Schemas.Int
   })
 
-  const Toggle = engine.defineComponent('inspector::Toggle', {})
+  const Toggle = engine.defineComponent(EditorComponentIds.Toggle, {})
 
   const Coords = Schemas.Map({
     x: Schemas.Int,
     y: Schemas.Int
   })
 
-  const Scene = engine.defineComponent('inspector::Scene', {
+  const Scene = engine.defineComponent(EditorComponentIds.Scene, {
     layout: Schemas.Map({
       base: Coords,
       parcels: Schemas.Array(Coords)
     })
   })
 
-  return { EntitySelected, Toggle, Scene, EntityNode }
+  return { Selection, Toggle, Scene, EntityNode }
 }

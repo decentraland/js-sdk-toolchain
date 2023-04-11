@@ -1,16 +1,17 @@
+import { useCallback } from 'react'
 import { BiUndo, BiRedo } from 'react-icons/bi'
+import classNames from 'classnames'
 import { withSdk } from '../../hoc/withSdk'
 import { useSelectedEntity } from '../../hooks/sdk/useSelectedEntity'
 import { useComponentValue } from '../../hooks/sdk/useComponentValue'
+import { GizmoType } from '../../lib/utils/gizmo'
 import { ROOT } from '../../lib/sdk/tree'
 import './Toolbar.css'
-import classNames from 'classnames'
-import { useCallback } from 'react'
 
 const Toolbar = withSdk(({ sdk }) => {
   const entity = useSelectedEntity()
 
-  const [selectedEntityValue, setSelectedEntityValue] = useComponentValue(entity || ROOT, sdk.components.EntitySelected)
+  const [selectedEntityValue, setSelectedEntityValue] = useComponentValue(entity || ROOT, sdk.components.Selection)
 
   const disableGizmos = !selectedEntityValue
 
@@ -25,7 +26,7 @@ const Toolbar = withSdk(({ sdk }) => {
   }, [sdk])
 
   return (
-    <div className="Toolbar bordered">
+    <div className="Toolbar">
       <button className="undo" onClick={sdk?.dataLayer.undo}>
         <BiUndo />
       </button>
@@ -33,17 +34,17 @@ const Toolbar = withSdk(({ sdk }) => {
         <BiRedo />
       </button>
       <button
-        className={classNames('gizmo', 'translate', { active: selectedEntityValue?.gizmo === 0 })}
+        className={classNames('gizmo', 'translate', { active: selectedEntityValue?.gizmo === GizmoType.TRANSLATE })}
         disabled={disableGizmos}
         onClick={() => setSelectedEntityValue({ gizmo: 0 })}
       ></button>
       <button
-        className={classNames('gizmo', 'rotate', { active: selectedEntityValue?.gizmo === 1 })}
+        className={classNames('gizmo', 'rotate', { active: selectedEntityValue?.gizmo === GizmoType.ROTATE })}
         disabled={disableGizmos}
         onClick={() => setSelectedEntityValue({ gizmo: 1 })}
       ></button>
       <button
-        className={classNames('gizmo', 'scale', { active: selectedEntityValue?.gizmo === 2 })}
+        className={classNames('gizmo', 'scale', { active: selectedEntityValue?.gizmo === GizmoType.SCALE })}
         disabled={disableGizmos}
         onClick={() => setSelectedEntityValue({ gizmo: 2 })}
       ></button>

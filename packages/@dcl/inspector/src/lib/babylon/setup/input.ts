@@ -1,5 +1,6 @@
 import * as BABYLON from '@babylonjs/core'
 import { EcsEntity } from '../decentraland/EcsEntity'
+import { changeSelectedEntity } from '../../utils/gizmo'
 
 /**
  * This is a map of keys (see enum Keys): boolean
@@ -161,22 +162,6 @@ export function interactWithScene(
 
   if (entity && pointerEvent === 'pointerDown') {
     const context = entity.context.deref()!
-
-    // clean selection
-    let gizmo = 0
-    const { EntitySelected } = context.editorComponents
-    for (const [e] of context.engine.getEntitiesWith(EntitySelected)) {
-      if (e !== entity.entityId) {
-        gizmo = EntitySelected.get(e).gizmo
-        EntitySelected.deleteFrom(e)
-      }
-    }
-
-    // then select new
-    if (entity.entityId) {
-      if (!EntitySelected.has(entity.entityId)) {
-        EntitySelected.createOrReplace(entity.entityId, { gizmo })
-      }
-    }
+    changeSelectedEntity(entity.entityId, context.engine)
   }
 }

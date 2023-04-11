@@ -40,7 +40,7 @@ const App = () => {
         </div>
       </Box>
       <div className="editor">
-        <Box className="main-editor">
+        <Box className="composite-renderer">
           <Toolbar />
           <Renderer />
         </Box>
