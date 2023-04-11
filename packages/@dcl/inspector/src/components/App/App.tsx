@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
+import { MdImageSearch } from 'react-icons/md'
+import { AiFillFolder } from 'react-icons/ai'
+
 import { useCatalog } from '../../hooks/catalog/useCatalog'
 import { AssetsCatalog } from '../AssetsCatalog'
 import { EntityInspector } from '../EntityInspector'
 import { Hierarchy } from '../Hierarchy'
 import { ProjectAssetExplorer } from '../ProjectAssetExplorer'
 import { Renderer } from '../Renderer'
-import { MdImageSearch } from 'react-icons/md'
-import './App.css'
 import { Box } from '../Box'
+
+import './App.css'
 
 enum Tab {
   FileSystem = 'FileSystem',
@@ -48,7 +51,7 @@ const App = () => {
           )}
           <div className="footer-buttons">
             <div onClick={() => handleTabClick(Tab.FileSystem)}>
-              <MdImageSearch />
+              <AiFillFolder />
               <span>File System</span>
             </div>
             <div onClick={() => handleTabClick(Tab.AssetsPack)}>
