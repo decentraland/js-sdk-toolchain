@@ -65,10 +65,6 @@ code {
   width: calc(100% - var(--sidebar) - 16px) !important;
 }
 
-.footer>div:first-child {
-  padding: 1px !important;
-}
-
 .footer .footer-buttons {
   display: flex;
   background: var(--tree-bg-color);

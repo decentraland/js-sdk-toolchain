@@ -17,7 +17,7 @@
 }
 
 .bordered-box>div:first-child {
-  padding: .8px;
+  padding: 1px;
   background: var(--main-bg-color);
 }
 
