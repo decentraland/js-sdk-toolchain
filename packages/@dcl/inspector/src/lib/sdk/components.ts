@@ -1,4 +1,5 @@
 import {
+  Entity,
   ComponentDefinition,
   IEngine,
   LastWriteWinElementSetComponentDefinition,
@@ -12,14 +13,14 @@ import { Layout } from './layout'
 export type Component<T = unknown> = ComponentDefinition<T>
 
 export type EditorComponentsTypes = {
-  label: { label: string }
+  entityNode: { label: string; parent: Entity }
   entitySelected: { gizmo: number }
   toggle: object
   scene: { layout: Layout }
 }
 
 export type EditorComponents = {
-  Label: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['label']>
+  EntityNode: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['entityNode']>
   EntitySelected: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['entitySelected']>
   Toggle: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['toggle']>
   Scene: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['scene']>
@@ -50,8 +51,9 @@ export function createComponents(engine: IEngine): SdkComponents {
 }
 
 export function createEditorComponents(engine: IEngine): EditorComponents {
-  const Label = engine.defineComponent('inspector::Label', {
-    label: Schemas.String
+  const EntityNode = engine.defineComponent('editor::EntityNode', {
+    label: Schemas.String,
+    parent: Schemas.Entity
   })
 
   const EntitySelected = engine.defineComponent('editor::EntitySelected', {
@@ -72,5 +74,5 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     })
   })
 
-  return { Label, EntitySelected, Toggle, Scene }
+  return { EntitySelected, Toggle, Scene, EntityNode }
 }

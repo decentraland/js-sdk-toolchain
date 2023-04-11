@@ -17,7 +17,7 @@
         "z": 0,
         "w": 1
       },
-      "parent": 0
+      "parent": 512
     },
     "514": {
       "position": {
@@ -56,6 +56,16 @@
           "dest": 514
         }
       ]
+    }
+  },
+  "custom-parenter": {
+    "513": {
+      "customParent": 512,
+      "untransformedProperty": 0
+    },
+    "514": {
+      "customParent": 513,
+      "untransformedProperty": 518
     }
   }
 }

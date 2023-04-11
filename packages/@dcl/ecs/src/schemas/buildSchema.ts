@@ -69,3 +69,42 @@ export function jsonSchemaToSchema(jsonSchema: JsonSchemaExtended): ISchema<any>
 
   throw new Error(`${jsonSchema.serializationType} is not supported as reverse schema generation.`)
 }
+
+export function mutateValues(
+  jsonSchema: JsonSchemaExtended,
+  value: unknown,
+  mutateFn: (value: unknown, valueType: JsonSchemaExtended) => { changed: boolean; value?: any }
+): void {
+  if (jsonSchema.serializationType === 'map') {
+    const mapJsonSchema = jsonSchema as JsonSchemaExtended & { properties: Record<string, JsonSchemaExtended> }
+    const mapValue = value as Record<string, unknown>
+
+    for (const key in mapJsonSchema.properties) {
+      const valueType = mapJsonSchema.properties[key]
+      if (valueType.serializationType === 'array' || valueType.serializationType === 'map') {
+        mutateValues(mapJsonSchema.properties[key], mapValue[key], mutateFn)
+      } else {
+        const newValue = mutateFn(mapValue[key], valueType)
+        if (newValue.changed) {
+          mapValue[key] = newValue.value
+        }
+      }
+    }
+  } else if (jsonSchema.serializationType === 'array') {
+    const withItemsJsonSchema = jsonSchema as JsonSchemaExtended & { items: JsonSchemaExtended }
+    const arrayValue = value as unknown[]
+    const nestedMutateValues =
+      withItemsJsonSchema.items.serializationType === 'array' || withItemsJsonSchema.items.serializationType === 'map'
+
+    for (let i = 0, n = arrayValue.length; i < n; i++) {
+      if (nestedMutateValues) {
+        mutateValues(withItemsJsonSchema.items, arrayValue[i], mutateFn)
+      } else {
+        const newValue = mutateFn(arrayValue[i], withItemsJsonSchema.items)
+        if (newValue.changed) {
+          arrayValue[i] = newValue.value
+        }
+      }
+    }
+  }
+}

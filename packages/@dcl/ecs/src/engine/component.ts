@@ -161,6 +161,14 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
    * @param entity - Entity to get the component from
    */
   getMutableOrNull(entity: Entity): T | null
+
+  /**
+   * Get the mutable component of the entity. If the entity doesn't have the component, it's created.
+   * - Internal comment: This method adds the &lt;entity,component&gt; to the list to be reviewed next frame
+   * @param entity - Entity to get the component from
+   * @param val - The initial value if it doesn't exist
+   */
+  getOrCreateMutable(entity: Entity, initialValue?: T): T
 }
 
 /**

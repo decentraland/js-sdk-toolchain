@@ -1,7 +1,7 @@
 import { EntityType } from '@dcl/schemas'
 import * as components from '@dcl/ecs/dist/components'
 
-import { initTestEngine } from './utils'
+import { initTestEngine } from '../../../../test/data-layer/utils'
 import { Entity, IEngine } from '@dcl/ecs'
 
 describe('[UNDO] Inspector<->DataLayer<->Babylon', () => {

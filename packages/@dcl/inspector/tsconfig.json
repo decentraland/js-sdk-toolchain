@@ -19,8 +19,11 @@
     "emitDeclarationOnly": true,
     "declaration": true,
     "declarationDir": "dist",
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "sourceMap": true,
+    "rootDir": "src/"
   },
+  "exclude": ["**/*.spec.ts"],
   "include": [
     "src"
   ]

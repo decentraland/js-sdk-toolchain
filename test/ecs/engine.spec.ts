@@ -685,4 +685,21 @@ describe('Engine tests', () => {
     engine.removeComponentDefinition('PositionSchema')
     expect(() => engine.getComponent('PositionSchema')).toThrowError()
   })
+
+  describe('should return mutable obj if use component.getOrCreateMutable()', () => {
+    const engine = Engine()
+    const COMPONENT_ID = 'COMPONENT_ID'
+    const Position = engine.defineComponent(COMPONENT_ID, PositionSchema)
+
+    it('with existing component', async () => {
+      const entity = engine.addEntity()
+      Position.create(entity, { x: 10 })
+      expect(Position.getOrCreateMutable(entity)).toStrictEqual({ x: 10 })
+    })
+
+    it('with non-existing component', async () => {
+      const entity = engine.addEntity()
+      expect(Position.getOrCreateMutable(entity, { x: 12 })).toStrictEqual({ x: 12 })
+    })
+  })
 })

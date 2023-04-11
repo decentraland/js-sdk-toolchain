@@ -17,7 +17,7 @@
         "z": 0,
         "w": 1
       },
-      "parent": 0
+      "parent": 514
     },
     "517": {
       "position": {
@@ -36,7 +36,7 @@
         "z": 0,
         "w": 1
       },
-      "parent": 0
+      "parent": 516
     },
     "521": {
       "position": {
@@ -55,7 +55,7 @@
         "z": 0,
         "w": 1
       },
-      "parent": 0
+      "parent": 520
     },
     "523": {
       "position": {
@@ -74,7 +74,7 @@
         "z": 0,
         "w": 1
       },
-      "parent": 0
+      "parent": 522
     }
   },
   "composite::root": {

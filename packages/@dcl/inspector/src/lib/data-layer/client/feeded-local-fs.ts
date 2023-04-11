@@ -23,6 +23,17 @@ export const mainComposite = {
               x: 4,
               y: 0.8,
               z: 8
+            },
+            parent: 514
+          }
+        },
+        '514': {
+          $case: 'json',
+          json: {
+            position: {
+              x: 4,
+              y: 0.8,
+              z: 8
             }
           }
         }

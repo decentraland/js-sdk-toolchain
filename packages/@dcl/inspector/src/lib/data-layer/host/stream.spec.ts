@@ -1,6 +1,6 @@
 import { EntityType } from '@dcl/schemas'
 import * as components from '@dcl/ecs/dist/components'
-import { initTestEngine } from './utils'
+import { initTestEngine } from '../../../../test/data-layer/utils'
 import { Entity } from '@dcl/ecs'
 
 describe('Inspector<->DataLayer<->Babylon. [Stream]', () => {
