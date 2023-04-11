@@ -11,9 +11,9 @@ import './Toolbar.css'
 const Toolbar = withSdk(({ sdk }) => {
   const entity = useSelectedEntity()
 
-  const [selectedEntityValue, setSelectedEntityValue] = useComponentValue(entity || ROOT, sdk.components.Selection)
+  const [selection, setSelection] = useComponentValue(entity || ROOT, sdk.components.Selection)
 
-  const disableGizmos = !selectedEntityValue
+  const disableGizmos = !selection
 
   const handleInspector = useCallback(() => {
     if (!sdk) return
@@ -34,19 +34,19 @@ const Toolbar = withSdk(({ sdk }) => {
         <BiRedo />
       </button>
       <button
-        className={classNames('gizmo', 'translate', { active: selectedEntityValue?.gizmo === GizmoType.TRANSLATE })}
+        className={classNames('gizmo', 'translate', { active: selection?.gizmo === GizmoType.TRANSLATE })}
         disabled={disableGizmos}
-        onClick={() => setSelectedEntityValue({ gizmo: 0 })}
+        onClick={() => setSelection({ gizmo: 0 })}
       ></button>
       <button
-        className={classNames('gizmo', 'rotate', { active: selectedEntityValue?.gizmo === GizmoType.ROTATE })}
+        className={classNames('gizmo', 'rotate', { active: selection?.gizmo === GizmoType.ROTATE })}
         disabled={disableGizmos}
-        onClick={() => setSelectedEntityValue({ gizmo: 1 })}
+        onClick={() => setSelection({ gizmo: 1 })}
       ></button>
       <button
-        className={classNames('gizmo', 'scale', { active: selectedEntityValue?.gizmo === GizmoType.SCALE })}
+        className={classNames('gizmo', 'scale', { active: selection?.gizmo === GizmoType.SCALE })}
         disabled={disableGizmos}
-        onClick={() => setSelectedEntityValue({ gizmo: 2 })}
+        onClick={() => setSelection({ gizmo: 2 })}
       ></button>
     </div>
   )

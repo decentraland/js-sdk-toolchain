@@ -1,11 +1,5 @@
 import { useEffect, useState } from 'react'
-import {
-  CrdtMessageType,
-  DeepReadonly,
-  DeepReadonlySet,
-  Entity,
-  LastWriteWinElementSetComponentDefinition
-} from '@dcl/ecs'
+import { CrdtMessageType, DeepReadonly, Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
 import { Component } from '../../lib/sdk/components'
 import { useChange } from './useChange'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
@@ -17,12 +11,12 @@ export function isLastWriteWinComponent<T = unknown>(
   return !!(component as LastWriteWinElementSetComponentDefinition<unknown>).createOrReplace
 }
 
-const getComponentValue = <T>(entity: Entity, component: Component<T>): DeepReadonlySet<T> =>
+const getComponentValue = <T>(entity: Entity, component: Component<T>): DeepReadonly<T> =>
   (isLastWriteWinComponent(component)
     ? component.getOrNull(entity) || component.schema.create()
-    : component.get(entity)) as DeepReadonlySet<T>
+    : component.get(entity)) as DeepReadonly<T>
 
-export const useComponentValue = <ComponentValueType>(entity: Entity, component: Component<unknown>) => {
+export const useComponentValue = <ComponentValueType>(entity: Entity, component: Component<ComponentValueType>) => {
   const componentValueType = getComponentValue(entity, component)
   const [value, setValue] = useState<ComponentValueType>(componentValueType as ComponentValueType)
 
