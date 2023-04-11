@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=180.1k bytes
+=======
+SCENE_COMPILED_JS_SIZE_PROD=185k bytes
+>>>>>>> main
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -563,7 +567,7 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x2b4 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x2b5 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x2b6 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  OPCODES ~= 923k
+  OPCODES ~= 916k
   MALLOC_COUNT = 1840
   ALIVE_OBJS_DELTA ~= 0.74k
 CALL onUpdate(0.1)
@@ -925,7 +929,7 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x2b4 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b5 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b6 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
-  OPCODES ~= 637k
+  OPCODES ~= 636k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
@@ -1287,7 +1291,7 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x2b4 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b5 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b6 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
-  OPCODES ~= 637k
+  OPCODES ~= 636k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
@@ -1649,7 +1653,11 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x2b4 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b5 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b6 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
-  OPCODES ~= 637k
+  OPCODES ~= 636k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 973.09k bytes
+=======
+  MEMORY_USAGE_COUNT ~= 980.17k bytes
+>>>>>>> main

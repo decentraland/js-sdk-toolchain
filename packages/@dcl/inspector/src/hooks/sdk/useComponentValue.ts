@@ -1,26 +1,36 @@
 import { useEffect, useState } from 'react'
-import { CrdtMessageType, DeepReadonly, Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
+import {
+  CrdtMessageType,
+  DeepReadonly,
+  DeepReadonlySet,
+  Entity,
+  LastWriteWinElementSetComponentDefinition
+} from '@dcl/ecs'
 import { Component } from '../../lib/sdk/components'
 import { useChange } from './useChange'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { dataCompare } from '@dcl/ecs/dist/systems/crdt/utils'
 
-function isLastWriteWinComponent<T = unknown>(
+export function isLastWriteWinComponent<T = unknown>(
   component: Component
 ): component is LastWriteWinElementSetComponentDefinition<T> {
   return !!(component as LastWriteWinElementSetComponentDefinition<unknown>).createOrReplace
 }
 
-export const useComponentValue = <ComponentValueType>(entity: Entity, component: Component<ComponentValueType>) => {
-  const [value, setValue] = useState<ComponentValueType | null>(
-    component.getOrNull(entity) as ComponentValueType | null
-  )
+const getComponentValue = (entity: Entity, component: Component<unknown>): DeepReadonlySet<unknown> =>
+  (isLastWriteWinComponent(component)
+    ? component.getOrNull(entity) || component.schema.create()
+    : component.get(entity)) as DeepReadonlySet<unknown>
+
+export const useComponentValue = <ComponentValueType>(entity: Entity, component: Component<unknown>) => {
+  const componentValueType = getComponentValue(entity, component)
+  const [value, setValue] = useState<ComponentValueType>(componentValueType as ComponentValueType)
 
   function isEqual(val: ComponentValueType) {
     const current = new ReadWriteByteBuffer()
     const newValue = new ReadWriteByteBuffer()
     component.schema.serialize(val as DeepReadonly<ComponentValueType>, newValue)
-    component.schema.serialize(component.get(entity), current)
+    component.schema.serialize(getComponentValue(entity, component), current)
     return dataCompare(current.toBinary(), newValue.toBinary()) === 0
   }
 

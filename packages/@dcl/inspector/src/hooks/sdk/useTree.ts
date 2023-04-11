@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react'
 import { getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk/tree'
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
+import { isLastWriteWinComponent } from './useComponentValue'
 
 /**
  * Used to get a tree and the functions to work with it
@@ -138,6 +139,7 @@ export const useTree = () => {
     },
     [sdk, handleUpdate]
   )
+
   const isNotRoot = useCallback((entity: Entity) => entity !== ROOT, [])
   const canRename = isNotRoot
   const canRemove = isNotRoot

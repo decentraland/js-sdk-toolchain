@@ -184,7 +184,7 @@ export async function prepareSceneFiles(options: Options, project: SceneProject,
   let urn = `urn:decentraland:entity:${entityId}`
 
   if (options.args['--baseUrl']) {
-    urn += '?=dcl&baseUrl=' + options.args['--baseUrl']
+    urn += '?=&baseUrl=' + options.args['--baseUrl']
     // baseUrl must end with /
     if (!urn.endsWith('/')) urn += '/'
   }

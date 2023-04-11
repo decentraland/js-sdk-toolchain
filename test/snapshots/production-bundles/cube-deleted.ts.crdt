@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=143.7k bytes
+=======
+SCENE_COMPILED_JS_SIZE_PROD=148.6k bytes
+>>>>>>> main
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -42,4 +46,8 @@ CALL onUpdate(0.1)
   OPCODES ~= 3k
   MALLOC_COUNT = 1
   ALIVE_OBJS_DELTA ~= 0.00k
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 657.46k bytes
+=======
+  MEMORY_USAGE_COUNT ~= 664.79k bytes
+>>>>>>> main
