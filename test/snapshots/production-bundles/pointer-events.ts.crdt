@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=143.9k bytes
+SCENE_COMPILED_JS_SIZE_PROD=149.4k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -28,7 +28,7 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   Scene: PUT_COMPONENT e=0x201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   Scene: PUT_COMPONENT e=0x202 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-  OPCODES ~= 21k
+  OPCODES ~= 20k
   MALLOC_COUNT = 35
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
@@ -43,4 +43,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 664.10k bytes
+  MEMORY_USAGE_COUNT ~= 673.63k bytes
