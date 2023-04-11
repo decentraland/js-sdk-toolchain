@@ -73,7 +73,7 @@ export function jsonSchemaToSchema(jsonSchema: JsonSchemaExtended): ISchema<any>
 export function mutateValues(
   jsonSchema: JsonSchemaExtended,
   value: unknown,
-  mutateFn: (value: unknown, valueType: JsonSchemaExtended) => [true, any] | [false]
+  mutateFn: (value: unknown, valueType: JsonSchemaExtended) => { changed: boolean; value?: any }
 ): void {
   if (jsonSchema.serializationType === 'map') {
     const mapJsonSchema = jsonSchema as JsonSchemaExtended & { properties: Record<string, JsonSchemaExtended> }
@@ -85,8 +85,8 @@ export function mutateValues(
         mutateValues(mapJsonSchema.properties[key], mapValue[key], mutateFn)
       } else {
         const newValue = mutateFn(mapValue[key], valueType)
-        if (newValue[0]) {
-          mapValue[key] = newValue[1]
+        if (newValue.changed) {
+          mapValue[key] = newValue.value
         }
       }
     }
@@ -101,8 +101,8 @@ export function mutateValues(
         mutateValues(withItemsJsonSchema.items, arrayValue[i], mutateFn)
       } else {
         const newValue = mutateFn(arrayValue[i], withItemsJsonSchema.items)
-        if (newValue[0]) {
-          arrayValue[i] = newValue[1]
+        if (newValue.changed) {
+          arrayValue[i] = newValue.value
         }
       }
     }

@@ -633,9 +633,9 @@ describe('test json-schema function', () => {
 
     mutateValues(MySchema.jsonSchema, someValue, (currentValue, valueType) => {
       if (valueType.serializationType === 'entity') {
-        return [true, (currentValue as number) + 1000]
+        return { changed: true, value: (currentValue as number) + 1000 }
       }
-      return [false]
+      return { changed: false }
     })
 
     expect(someValue).toStrictEqual({

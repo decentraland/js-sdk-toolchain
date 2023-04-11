@@ -102,6 +102,6 @@ export namespace Schemas {
   export const mutateNestedValues: (
     jsonSchema: JsonSchemaExtended,
     value: unknown,
-    mutateFn: (value: unknown, valueType: JsonSchemaExtended) => [true, any] | [false]
+    mutateFn: (value: unknown, valueType: JsonSchemaExtended) => { changed: boolean; value?: any }
   ) => void = mutateValues
 }

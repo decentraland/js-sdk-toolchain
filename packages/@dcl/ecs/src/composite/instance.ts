@@ -228,9 +228,9 @@ export function instanceComposite(
       } else {
         Schemas.mutateNestedValues(componentDefinition.schema.jsonSchema, componentValue, (value, valueType) => {
           if (valueType.serializationType === 'entity') {
-            return [true, getCompositeEntity(value as Entity)]
+            return { changed: true, value: getCompositeEntity(value as Entity) }
           } else {
-            return [false]
+            return { changed: false }
           }
         })
       }
