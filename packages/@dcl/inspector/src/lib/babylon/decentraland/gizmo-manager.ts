@@ -15,7 +15,6 @@ export const getGizmoManager = memoize((scene: Scene) => {
   gizmoManager.positionGizmoEnabled = false
   gizmoManager.rotationGizmoEnabled = false
   gizmoManager.scaleGizmoEnabled = false
-  gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = false
   gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh = false
 
   const layoutManager = getLayoutManager(scene)
