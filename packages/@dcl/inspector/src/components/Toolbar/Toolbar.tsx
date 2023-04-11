@@ -13,6 +13,10 @@ const Toolbar = withSdk(({ sdk }) => {
 
   const [selection, setSelection] = useComponentValue(entity || ROOT, sdk.components.Selection)
 
+  const handleTranslateGizmo = useCallback(() => setSelection({ gizmo: GizmoType.TRANSLATE }), [setSelection])
+  const handleRotateGizmo = useCallback(() => setSelection({ gizmo: GizmoType.ROTATE }), [setSelection])
+  const handleScaleGizmo = useCallback(() => setSelection({ gizmo: GizmoType.SCALE }), [setSelection])
+
   const disableGizmos = !selection
 
   const handleInspector = useCallback(() => {
@@ -36,17 +40,17 @@ const Toolbar = withSdk(({ sdk }) => {
       <button
         className={classNames('gizmo', 'translate', { active: selection?.gizmo === GizmoType.TRANSLATE })}
         disabled={disableGizmos}
-        onClick={() => setSelection({ gizmo: 0 })}
+        onClick={handleTranslateGizmo}
       ></button>
       <button
         className={classNames('gizmo', 'rotate', { active: selection?.gizmo === GizmoType.ROTATE })}
         disabled={disableGizmos}
-        onClick={() => setSelection({ gizmo: 1 })}
+        onClick={handleRotateGizmo}
       ></button>
       <button
         className={classNames('gizmo', 'scale', { active: selection?.gizmo === GizmoType.SCALE })}
         disabled={disableGizmos}
-        onClick={() => setSelection({ gizmo: 2 })}
+        onClick={handleScaleGizmo}
       ></button>
     </div>
   )
