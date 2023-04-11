@@ -6,7 +6,6 @@ import { Controls, Position } from '../Controls'
 import { RxDoubleArrowRight as ArrowRight, RxDoubleArrowDown as ArrowDown } from 'react-icons/rx'
 
 import './Tree.css'
-import { className } from '@babylonjs/core'
 
 interface ContextMenu<T> {
   value: T

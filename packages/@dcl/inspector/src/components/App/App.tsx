@@ -52,11 +52,11 @@ const App = () => {
           <div className="footer-buttons">
             <div onClick={() => handleTabClick(Tab.FileSystem)}>
               <AiFillFolder />
-              <span>File System</span>
+              <span>Asset Catalog</span>
             </div>
             <div onClick={() => handleTabClick(Tab.AssetsPack)}>
               <MdImageSearch />
-              <span>Assets Pack</span>
+              <span>World Assets Pack</span>
             </div>
           </div>
         </Box>
