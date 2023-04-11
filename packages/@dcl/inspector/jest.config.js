@@ -1,10 +1,16 @@
+const useTsJestTransform = process.env['TS_JEST_TRANSFORMER'] !== undefined
+const transformer = useTsJestTransform ?
+  ["ts-jest", {
+    tsconfig: "test/tsconfig.json",
+    isolatedModules: true
+  }]
+  :
+  require.resolve('./test/jest-transformer')
+
 module.exports = {
   moduleFileExtensions: ["ts", "js", "jsx", "tsx"],
   transform: {
-    "^.+\\.(js|jsx|ts|tsx)$": ["ts-jest", {
-      tsconfig: "test/tsconfig.json", 
-      isolatedModules: true
-    }]
+    "^.+\\.(js|jsx|ts|tsx)$": transformer
   },
   coverageDirectory: "coverage",
   coverageProvider: 'v8',

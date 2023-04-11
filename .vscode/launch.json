@@ -27,7 +27,6 @@
       "protocol": "inspector",
       "autoAttachChildProcesses": true
     },
-    
     {
       "type": "node",
       "request": "launch",
@@ -42,13 +41,16 @@
         "--verbose",
         "--no-cache",
         "-i",
-        "--config", 
+        "--config",
         "${workspaceFolder}/packages/@dcl/inspector/jest.config.js"
       ],
       "skipFiles": [
         "<node_internals>/**/*.js",
         "node_modules/**/*.js"
       ],
+      "env": {
+        "TS_JEST_TRANSFORMER": "true"
+      },
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
