@@ -17,9 +17,9 @@ export const useTree = () => {
     if (sdk) {
       const {
         engine,
-        components: { Transform }
+        components: { EntityNode }
       } = sdk
-      return getTreeFromEngine(engine, Transform)
+      return getTreeFromEngine(engine, EntityNode)
     } else {
       return getEmptyTree()
     }
@@ -45,8 +45,8 @@ export const useTree = () => {
     (entity: Entity) => {
       if (entity === ROOT) return 'Root'
       if (!sdk) return entity.toString()
-      const { Label } = sdk.components
-      return Label.has(entity) ? Label.get(entity).label : entity.toString()
+      const { EntityNode } = sdk.components
+      return EntityNode.has(entity) ? EntityNode.get(entity).label : entity.toString()
     },
     [sdk]
   )
@@ -74,10 +74,9 @@ export const useTree = () => {
   const addChild = useCallback(
     (parent: Entity, label: string) => {
       if (!sdk) return
-      const { Transform, Label } = sdk.components
+      const { EntityNode } = sdk.components
       const child = sdk.engine.addEntity()
-      Transform.create(child, { parent })
-      Label.create(child, { label })
+      EntityNode.create(child, { label, parent })
       handleUpdate()
     },
     [sdk, handleUpdate]
@@ -87,9 +86,13 @@ export const useTree = () => {
     (entity: Entity, parent: Entity) => {
       console.log('setParent', entity, parent)
       if (entity === ROOT || !sdk) return
-      const { Transform, Toggle } = sdk.components
-      const transform = Transform.getMutable(entity)
-      transform.parent = parent
+      const { EntityNode, Transform, Toggle } = sdk.components
+
+      EntityNode.getOrCreateMutable(entity).parent = parent
+
+      const transform = Transform.getMutableOrNull(entity)
+      if (transform) transform.parent = parent
+
       Toggle.createOrReplace(parent)
       handleUpdate()
     },
@@ -99,8 +102,8 @@ export const useTree = () => {
   const rename = useCallback(
     (entity: Entity, label: string) => {
       if (entity === ROOT || !sdk) return
-      const { Label } = sdk.components
-      Label.createOrReplace(entity, { label })
+      const { EntityNode } = sdk.components
+      EntityNode.getOrCreateMutable(entity).label = label
       handleUpdate()
     },
     [sdk, handleUpdate]

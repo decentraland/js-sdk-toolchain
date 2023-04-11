@@ -10,6 +10,7 @@ import { EditorComponents, SdkComponents } from './components'
 import { getHardcodedLoadableScene } from './test-local-scene'
 import { createInspectorEngine } from './inspector-engine'
 import { DataLayerRpcClient } from '../data-layer/types'
+import { getTransformNodeChecker } from './transform-node'
 
 export type SdkContextEvents = {
   change: { entity: Entity; operation: CrdtMessageType; component?: ComponentDefinition<any>; value?: any }
@@ -48,6 +49,10 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
 
   // create inspector engine context and components
   const { engine, components, events, dispose } = createInspectorEngine(dataLayer)
+
+  // add auto parenting
+  engine.addSystem(getTransformNodeChecker(engine, components.EntityNode))
+
   // register some globals for debugging
   Object.assign(globalThis, { dataLayer, inspectorEngine: engine })
 

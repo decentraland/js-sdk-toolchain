@@ -23,5 +23,5 @@
     "skipLibCheck": true,
     "inlineSourceMap": true
   },
-  "exclude": ["jest-transformer.js", "jest.config.js"]
+  "include": ["./../**/*.ts"]
 }

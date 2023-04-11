@@ -220,11 +220,19 @@ export function instanceComposite(
         const transform = componentValue as TransformType
         if (transform.parent) {
           transform.parent = getCompositeEntity(transform.parent)
+        } else {
+          transform.parent = getCompositeEntity(0)
         }
 
         // TODO: is it going to be necessary to remap assets? e.g. src param from AudioSource and GltfContainer
       } else {
-        // TODO: with static reflection, look for `Schema.Entity` in custom components
+        Schemas.mutateNestedValues(componentDefinition.schema.jsonSchema, componentValue, (value, valueType) => {
+          if (valueType.serializationType === 'entity') {
+            return { changed: true, value: getCompositeEntity(value as Entity) }
+          } else {
+            return { changed: false }
+          }
+        })
       }
     }
   }

@@ -26,19 +26,6 @@
       }
     },
     {
-      "name": "cube-id",
-      "jsonSchema": {
-        "type": "object",
-        "properties": {},
-        "serializationType": "map"
-      },
-      "data": {
-        "512": {
-          "binary": ""
-        }
-      }
-    },
-    {
       "name": "core::PointerEvents",
       "data": {
         "512": {

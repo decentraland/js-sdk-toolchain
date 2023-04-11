@@ -47,20 +47,6 @@
             }
         },
         {
-            "name": "cube-id",
-            "jsonSchema": {
-                "type": "object",
-                "properties": {},
-                "serializationType": "map"
-            },
-            "data": {
-                "512": {
-                    "$case": "json",
-                    "json": {}
-                }
-            }
-        },
-        {
             "name": "core::PointerEvents",
             "data": {
                 "512": {
