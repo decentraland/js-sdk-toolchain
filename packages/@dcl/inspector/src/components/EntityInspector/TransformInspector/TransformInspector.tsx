@@ -14,14 +14,14 @@ import { TextField } from '../TextField'
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu';
 
-export default withSdk<Props>(withContextMenu<WithSdkProps & Props>(({ sdk, entity, onRemove, contextMenuId }) => {
+export default withSdk<Props>(withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
   const { Transform } = sdk.components
 
   const hasTransform = useHasComponent(entity, Transform)
   const getInputProps = useComponentInput(entity, Transform, fromTranform, toTransform, isValidNumericInput)
   const { handleAction } = useContextMenu()
 
-  const handleRemove = useCallback(() => onRemove(entity, Transform.componentId), [])
+  const handleRemove = useCallback(() => Transform.deleteFrom(entity), [])
 
   if (!hasTransform) {
     return null

@@ -3,10 +3,10 @@ import React from 'react'
 import { useTree } from '../../hooks/sdk/useTree'
 import { ROOT } from '../../lib/sdk/tree'
 import { Tree } from '../Tree'
+import { ContextMenu } from './ContextMenu'
 
 const Hierarchy: React.FC = () => {
   const {
-    addComponent,
     addChild,
     setParent,
     remove,
@@ -14,7 +14,6 @@ const Hierarchy: React.FC = () => {
     toggle,
     getId,
     getChildren,
-    getEntityComponents,
     getLabel,
     isOpen,
     isSelected,
@@ -27,7 +26,7 @@ const Hierarchy: React.FC = () => {
     <div className="Hierarchy">
       <Tree
         value={ROOT}
-        onAddComponent={addComponent}
+        getExtraContextMenu={ContextMenu}
         onAddChild={addChild}
         onSetParent={setParent}
         onRemove={remove}
@@ -35,7 +34,6 @@ const Hierarchy: React.FC = () => {
         onToggle={toggle}
         getId={getId}
         getChildren={getChildren}
-        getEntityComponents={getEntityComponents}
         getLabel={getLabel}
         isOpen={isOpen}
         isSelected={isSelected}

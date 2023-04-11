@@ -41,22 +41,6 @@ export const useTree = () => {
     [tree]
   )
 
-  const getEntityComponents = useCallback(
-    (entity: Entity, missing?: boolean): Map<number, string> => {
-      const components = new Map<number, string>()
-      if (sdk && entity !== ROOT) {
-        for (const component of sdk.engine.componentsIter()) {
-          if (missing ? !component.has(entity) : component.has(entity)) {
-            components.set(component.componentId, component.componentName)
-          }
-        }
-      }
-
-      return components
-    },
-    [tree]
-  )
-
   const getLabel = useCallback(
     (entity: Entity) => {
       if (entity === ROOT) return 'Root'
@@ -153,18 +137,6 @@ export const useTree = () => {
     [sdk, handleUpdate]
   )
 
-  const addComponent = useCallback(
-    (entity: Entity, componentId: number) => {
-      if (!sdk || entity === ROOT) return
-      const component = sdk.engine.getComponent(componentId)
-      if (isLastWriteWinComponent(component)) {
-        component.create(entity)
-      }
-      handleUpdate()
-    },
-    [sdk, handleUpdate]
-  )
-
   const isNotRoot = useCallback((entity: Entity) => entity !== ROOT, [])
   const canRename = isNotRoot
   const canRemove = isNotRoot
@@ -172,7 +144,6 @@ export const useTree = () => {
 
   return {
     tree,
-    addComponent,
     addChild,
     setParent,
     rename,
@@ -180,7 +151,6 @@ export const useTree = () => {
     toggle,
     getId,
     getChildren,
-    getEntityComponents,
     getLabel,
     isOpen,
     isSelected,
