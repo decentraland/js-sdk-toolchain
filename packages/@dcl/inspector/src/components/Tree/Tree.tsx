@@ -10,11 +10,13 @@ import './Tree.css'
 
 type Props<T> = {
   value: T
+  className?: string
   getExtraContextMenu?: (value: T) => JSX.Element | null
   level?: number
   getId: (value: T) => string
   getChildren: (value: T) => T[]
-  getLabel: (value: T) => string
+  getIcon?: (value: T) => JSX.Element
+  getLabel: (value: T) => string | JSX.Element
   isOpen: (value: T) => boolean
   isSelected: (value: T) => boolean
   canRename?: (value: T) => boolean
@@ -37,6 +39,7 @@ function Tree<T>(_props: Props<T>) {
   const Component = withContextMenu<Props<T>>((props) => {
     const {
       getExtraContextMenu,
+      className,
       contextMenuId,
       value,
       level = getDefaultLevel(),
@@ -135,14 +138,14 @@ function Tree<T>(_props: Props<T>) {
     }
 
     return (
-      <div ref={ref} className="Tree">
-        <div style={getLevelStyles(level)} className={selected ? 'selected' : ''}>
+      <div ref={ref} className={`Tree ${className || ''}`}>
+        <div style={getLevelStyles(level)} className={selected ? 'selected item' : 'item'}>
           <ContextMenu {...controlsProps} />
           <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
-            {open ? <ArrowDown /> : <ArrowRight />}
-            <span>{label || id}</span>
+            {props.getIcon ? props.getIcon(value) : open ? <ArrowDown /> : <ArrowRight />}
+            {label ? <span>{label || id}</span> : <label />}
           </span>
-          {editMode && <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
+          {editMode && typeof label === 'string' && <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
         </div>
         <TreeChildren {...props} />
         {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} />}

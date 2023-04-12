@@ -24,8 +24,9 @@ code {
 }
 
 .sidebar {
-  max-width: 300px;
-  min-width: 300px;
+  height: 100%;
+  max-width: var(--sidebar);
+  min-width: var(--sidebar);
   background: var(--main-bg-color);
 }
 
@@ -33,18 +34,55 @@ code {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100vh;
   background: var(--main-bg-color);
 }
 
-#main-editor {
-  flex-basis: 0;
-  flex-grow: 999;
-  height: 500px;
+/* Inspector settings */
+#embed-host {
+  position: absolute !important;
 }
 
+.main-editor {
+  height: calc(100vh - 54px);
+}
+
+
+/* Babylon frame */
 #renderer {
   width: 100%;
   height: 100%;
   touch-action: none;
   outline: none;
+}
+
+/* Editor assets */
+.footer {
+  position: absolute;
+  bottom: 0px;
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - var(--sidebar) - 16px) !important;
+}
+
+.footer .footer-buttons {
+  display: flex;
+  background: var(--tree-bg-color);
+  height: 36px;
+}
+
+.footer .footer-buttons > div {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.footer-buttons .footer-title>span {
+  margin-left: 8px;
+}
+
+.footer .footer-content {
+  background: var(--tree-bg-color) !important;
+  height: 250px !important;
 }

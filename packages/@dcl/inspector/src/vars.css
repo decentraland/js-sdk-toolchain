@@ -37,4 +37,8 @@
   --contexify-activeRightSlot-color: #fff;
   --contexify-arrow-color: var(--contexify-item-color);
   --contexify-activeArrow-color: var(--contexify-arrow-color);
+
+
+  /* Margins */
+  --sidebar: 300px
 }
