@@ -12,6 +12,8 @@
   --input-border-color: var(--vscode-input-border, #cdcccc);
   --button-color: var(--vscode-button-foreground, var(--black));
   --title: #EEEEEF;
+  --sub-text: #ffffffcf;
+  --border-focused: #127fd4;
 
   /* Color definitions */
   --white: #FFFFFF;

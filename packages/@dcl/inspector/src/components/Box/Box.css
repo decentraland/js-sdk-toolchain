@@ -22,5 +22,5 @@
 }
 
 .bordered-box>div:first-child:hover {
-  background: #127fd4;
+  background: var(--border-focused);
 }

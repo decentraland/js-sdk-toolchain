@@ -17,7 +17,6 @@
     "@types/react-dom": "^18.0.10",
     "@vscode/webview-ui-toolkit": "^1.2.2",
     "@well-known-components/pushable-channel": "^1.0.3",
-    "classnames": "^2.3.2",
     "decentraland-ui": "^3.87.2",
     "esbuild": "^0.17.12",
     "fp-future": "^1.0.1",
