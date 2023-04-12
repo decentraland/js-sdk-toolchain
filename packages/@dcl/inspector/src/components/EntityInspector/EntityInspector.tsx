@@ -4,7 +4,6 @@ import { useEntitiesWith } from '../../hooks/sdk/useEntitiesWith'
 import { TransformInspector } from './TransformInspector'
 import { SceneInspector } from './SceneInspector'
 import { ROOT } from '../../lib/sdk/tree'
-import { useSdk } from '../../hooks/sdk/useSdk'
 
 export const EntityInspector: React.FC = () => {
   const selectedEntities = useEntitiesWith((components) => components.EntitySelected)

@@ -7,9 +7,23 @@
   margin: 12px;
 }
 
-.Container>label {
-  margin: px 0px 4px 0px;
+.Container .title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+}
+
+.Container .title svg {
+  width: 14px;
+  height: 14px;
+  margin-right: 4px;
+}
+
+.Container > span {
+  margin: 0px 0px 4px 0px;
   color: var(--text);
   font-size: 14px;
   font-weight: 600;
+  cursor: pointer;
 }

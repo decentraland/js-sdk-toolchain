@@ -2,39 +2,33 @@
   padding: 4px 6px;
   border: 1px solid var(--secondary-text);
   display: flex;
+  margin-right: 8px;
+  border-radius: 1.6px;
+  flex-grow: 1;
+  width: 0;
 }
 
-.TextField+.TextField {
-  border-top: none;
+.TextField:focus-within {
+  border-color: var(--border-focused);
 }
 
-.TextField:first-child {
-  border-radius: 8px 8px 0px 0px;
-}
-
-.TextField:last-child {
-  margin-bottom: 0px;
-  border-radius: 0px 0px 8px 8px;
-}
-
-.TextField>label {
+.TextField > label {
   color: var(--secondary-text);
-  flex: none;
-  padding-right: 8px;
+  display: block;
+  margin-right: 8px;
 }
 
-.TextField>input {
-  flex: 1 1 auto;
+.TextField > input {
+  width: 100%;
   color: var(--text);
   background-color: var(--transparent-color);
   outline: none;
-  text-align: right;
   border: none;
 }
 
 /* Chrome, Safari, Edge, Opera */
-.TextField>input::-webkit-outer-spin-button,
-.TextField>input::-webkit-inner-spin-button {
+.TextField > input::-webkit-outer-spin-button,
+.TextField > input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
@@ -43,5 +37,4 @@
 .TextField>input[type=number] {
   -moz-appearance: textfield;
   appearance: none;
-  ;
 }

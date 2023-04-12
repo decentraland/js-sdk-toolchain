@@ -3,8 +3,14 @@
   flex-direction: column;
 }
 
-.Block>label {
+.Block > label {
   margin: 8px 0px 4px 0px;
-  color: var(--text);
-  font-size: 14px;
+  color: var(--sub-text);
+  font-size: 13px;
+}
+
+.Block .content {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
 }
