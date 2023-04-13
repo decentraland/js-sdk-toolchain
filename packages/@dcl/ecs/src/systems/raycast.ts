@@ -1,9 +1,8 @@
-// import { PBRaycastResult } from '../components/generated/pb/decentraland/sdk/components/raycast_result.gen'
 import * as components from '../components'
 import { ColliderLayer, PBRaycastResult, RaycastQueryType } from '../components'
 import { Entity, IEngine } from "../engine";
 import { Vector3 } from "../components/generated/pb/decentraland/common/vectors.gen";
-
+import { EntityState } from "../engine/entity";
 
 /**
  * @public
@@ -46,10 +45,10 @@ export interface RaycastEventSystem {
    * @public
    * Execute callback when the entity receives a RaycastResult component update
    * @param entity - Entity to attach the callback
-   * @param cb - Function to execute when the entity's RaycastResult component is updated
-   * @param opts - Raycast configuration opts
+   * @param callback - Function to execute when the entity's RaycastResult component is updated
+   * @param options - Raycast configuration options
    */
-  onRaycast(entity: Entity, cb: RaycastEventSystemCallback, opts?: Partial<RaycastEventSystemOptions>): void
+  onRaycast(entity: Entity, callback: RaycastEventSystemCallback, options?: Partial<RaycastEventSystemOptions>): void
 }
 
 /**
@@ -57,72 +56,83 @@ export interface RaycastEventSystem {
  */
 export function createRaycastEventSystem(engine: IEngine): RaycastEventSystem {
   const raycastComponent = components.Raycast(engine)
+  const raycastResultComponent = components.RaycastResult(engine)
+  const entitiesCallbackResultMap = new Map<Entity, {
+    callback: RaycastEventSystemCallback,
+    options: RaycastEventSystemOptions
+    result?: PBRaycastResult
+  }>()
 
-  const getDefaultOpts = (opts: Partial<RaycastEventSystemOptions> = {}): RaycastEventSystemOptions => ({
+  const getDefaultoptions = (options: Partial<RaycastEventSystemOptions> = {}): RaycastEventSystemOptions => ({
     maxDistance: 16,
     queryType: RaycastQueryType.RQT_HIT_FIRST,
     timestamp: 0,
     continuous: false,
     collisionMask: ColliderLayer.CL_PHYSICS,
-    // TODO: HOW DO I USE VECTOR3.ZERO or VECTOR3.CREATE HERE ???
-    // originOffset: Vector3.zero(),
-    // direction: {
-    //   $case: "localDirection",
-    //   localDirection: Vector3.forward
-    // },
-    ...opts
+    originOffset: { x: 0, y:0, z:0 },
+    direction: {
+      $case: "localDirection",
+      localDirection: { x: 0, y:0, z:1 }
+    },
+    ...options
   })
 
-  function setRaycast(entity: Entity, opts: RaycastEventSystemOptions) {
-    const raycast = raycastComponent.getMutableOrNull(entity) || raycastComponent.create(entity)
-    raycast.maxDistance = opts.maxDistance
-    raycast.timestamp = opts.timestamp
-    raycast.originOffset = opts.originOffset
-    raycast.collisionMask = opts.collisionMask
-    raycast.direction = opts.direction
-    raycast.continuous = opts.continuous
-    raycast.queryType = opts.queryType
+  function setRaycast(entity: Entity, callback: RaycastEventSystemCallback, options: RaycastEventSystemOptions) {
+    const raycast = raycastComponent.getOrCreateMutable(entity)
+    raycast.maxDistance = options.maxDistance
+    raycast.timestamp = options.timestamp
+    raycast.originOffset = options.originOffset
+    raycast.collisionMask = options.collisionMask
+    raycast.direction = options.direction
+    raycast.continuous = options.continuous
+    raycast.queryType = options.queryType
+
+    entitiesCallbackResultMap.set(entity, { callback: callback, options: options })
   }
 
   function removeRaycast(entity: Entity) {
     // TODO: should the component be removed or not ???
-    const raycast = raycastComponent.getMutableOrNull(entity)
-    if(raycast)
+    const raycast = raycastComponent.getOrNull(entity)
+    if (raycast)
       raycastComponent.deleteFrom(entity)
+
+    entitiesCallbackResultMap.delete(entity)
   }
 
   // @internal
-  // engine.addSystem(function EventSystem() {
-  //   for (const [entity, event] of eventsMap) {
-  //     if (engine.getEntityState(entity) === EntityState.Removed) {
-  //       eventsMap.delete(entity)
-  //       continue
-  //     }
-  //
-  //     for (const [eventType, { cb, opts }] of event) {
-  //       if (eventType === EventType.Click) {
-  //         const command = inputSystem.getClick(opts.button, entity)
-  //         if (command)
-  //           checkNotThenable(cb(command.up), 'Click event returned a thenable. Only synchronous functions are allowed')
-  //       }
-  //
-  //       if (eventType === EventType.Down || eventType === EventType.Up) {
-  //         const command = inputSystem.getInputCommand(opts.button, getPointerEvent(eventType), entity)
-  //         if (command) {
-  //           checkNotThenable(cb(command), 'Event handler returned a thenable. Only synchronous functions are allowed')
-  //         }
-  //       }
-  //     }
-  //   }
-  // })
+  engine.addSystem(function EventSystem() {
+    for (const [entity, data] of entitiesCallbackResultMap) {
+      if (engine.getEntityState(entity) === EntityState.Removed
+      || !raycastComponent.getOrNull(entity)) {
+        entitiesCallbackResultMap.delete(entity)
+        continue
+      }
 
-  // TODO: try just returning an object with the corresponding implementations instead of having the
-  // implementations in the functions and then being called in the returned object...
+      // To be able to use only `raycastResultComponent.getOrNull(entity)`, the map should support
+      // DeepReadableObject...
+      const currentResult = raycastResultComponent.getMutableOrNull(entity)
+      if (!currentResult) continue
+
+      if (!data.options.continuous && data.result
+        && data.result.timestamp == currentResult.timestamp)
+        continue
+
+      // update map with new result
+      // data.result = currentResult;
+      entitiesCallbackResultMap.set(entity, { callback: data.callback, options: data.options, result: currentResult })
+
+      data.callback(currentResult)
+    }
+  })
+
   return {
     removeRaycast(entity: Entity) {
+      removeRaycast(entity)
     },
 
-    onRaycast(entity: Entity, cb: RaycastEventSystemCallback, opts?: Partial<RaycastEventSystemOptions>) {
+    onRaycast(entity: Entity, callback: RaycastEventSystemCallback, opts?: Partial<RaycastEventSystemOptions>) {
+      const options = getDefaultoptions(opts)
+      setRaycast(entity, callback, options)
     }
   }
 }
