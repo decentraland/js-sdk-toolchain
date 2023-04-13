@@ -100,23 +100,25 @@ export async function main(options: Options) {
     printWarning(options.components.logger, 'Support for multiple projects is still experimental.')
 
   for (const project of workspace.projects) {
-    printCurrentProjectStarting(options.components.logger, project, workspace)
+    if (project.kind === 'scene') {
+      printCurrentProjectStarting(options.components.logger, project, workspace)
 
-    // first run `npm run build`, this can be disabled with --skip-build
-    // then start the embedded compiler, this can be disabled with --no-watch
-    if (watch) {
-      await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': true, _: [] } }, project)
-    } else if (!skipBuild) {
-      await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': false, _: [] } }, project)
+      // first run `npm run build`, this can be disabled with --skip-build
+      // then start the embedded compiler, this can be disabled with --no-watch
+      if (watch) {
+        await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': true, _: [] } }, project)
+      } else if (!skipBuild) {
+        await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': false, _: [] } }, project)
+      }
+
+      // track the event
+      baseCoords = getBaseCoords(project.scene)
+      options.components.analytics.track('Preview started', {
+        projectHash: await b64HashingFunction(project.workingDirectory),
+        coords: baseCoords,
+        isWorkspace: false
+      })
     }
-
-    // track the event
-    baseCoords = getBaseCoords(project.scene)
-    options.components.analytics.track('Preview started', {
-      projectHash: await b64HashingFunction(project.workingDirectory),
-      coords: baseCoords,
-      isWorkspace: false
-    })
   }
 
   printProgressInfo(options.components.logger, 'Starting preview server')
