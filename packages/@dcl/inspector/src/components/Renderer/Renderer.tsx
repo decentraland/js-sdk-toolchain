@@ -8,6 +8,8 @@ import { ROOT } from '../../lib/sdk/tree'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { IAsset } from '../AssetsCatalog/types'
 
+import './Renderer.css'
+
 const cachedFiles = new Set()
 
 const Renderer: React.FC = () => {
@@ -72,8 +74,8 @@ const Renderer: React.FC = () => {
   drop(canvasRef)
 
   return (
-    <div id="Renderer">
-      <canvas ref={canvasRef} id="renderer" touch-action="none" />
+    <div className="Renderer">
+      <canvas ref={canvasRef} id="canvas" touch-action="none" />
     </div>
   )
 }

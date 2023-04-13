@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { BiUndo, BiRedo } from 'react-icons/bi'
-import classNames from 'classnames'
+import { RiListSettingsLine } from 'react-icons/ri'
+import classnames from 'classnames'
 import { withSdk } from '../../hoc/withSdk'
 import { useSelectedEntity } from '../../hooks/sdk/useSelectedEntity'
 import { useComponentValue } from '../../hooks/sdk/useComponentValue'
@@ -17,17 +18,16 @@ const Toolbar = withSdk(({ sdk }) => {
   const handleRotateGizmo = useCallback(() => setSelection({ gizmo: GizmoType.ROTATE }), [setSelection])
   const handleScaleGizmo = useCallback(() => setSelection({ gizmo: GizmoType.SCALE }), [setSelection])
 
-  const disableGizmos = !selection
+  const disableGizmos = !entity
 
   const handleInspector = useCallback(() => {
-    if (!sdk) return
     const { debugLayer } = sdk.scene
     if (debugLayer.isVisible()) {
       debugLayer.hide()
     } else {
       void debugLayer.show({ showExplorer: true, embedMode: true })
     }
-  }, [sdk])
+  }, [])
 
   return (
     <div className="Toolbar">
@@ -38,20 +38,23 @@ const Toolbar = withSdk(({ sdk }) => {
         <BiRedo />
       </button>
       <button
-        className={classNames('gizmo', 'translate', { active: selection?.gizmo === GizmoType.TRANSLATE })}
+        className={classnames('gizmo translate', { active: selection?.gizmo === GizmoType.TRANSLATE })}
         disabled={disableGizmos}
         onClick={handleTranslateGizmo}
       ></button>
       <button
-        className={classNames('gizmo', 'rotate', { active: selection?.gizmo === GizmoType.ROTATE })}
+        className={classnames('gizmo rotate', { active: selection?.gizmo === GizmoType.ROTATE })}
         disabled={disableGizmos}
         onClick={handleRotateGizmo}
       ></button>
       <button
-        className={classNames('gizmo', 'scale', { active: selection?.gizmo === GizmoType.SCALE })}
+        className={classnames('gizmo scale', { active: selection?.gizmo === GizmoType.SCALE })}
         disabled={disableGizmos}
         onClick={handleScaleGizmo}
       ></button>
+      <button className="babylonjs-inspector" onClick={handleInspector}>
+        <RiListSettingsLine />
+      </button>
     </div>
   )
 })
