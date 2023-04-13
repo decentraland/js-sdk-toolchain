@@ -2,7 +2,7 @@ import { TransformType } from '@dcl/ecs'
 import { Quaternion } from '@dcl/ecs-math'
 import { TransformInput } from './types'
 
-export function fromTranform(value: TransformType): TransformInput {
+export function fromTransform(value: TransformType): TransformInput {
   const angles = Quaternion.toEulerAngles(value.rotation)
   return {
     position: {

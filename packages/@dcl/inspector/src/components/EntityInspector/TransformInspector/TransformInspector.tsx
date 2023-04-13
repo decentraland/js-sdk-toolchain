@@ -9,7 +9,7 @@ import { withContextMenu } from '../../../hoc/withContextMenu'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 
 import { Props } from './types'
-import { fromTranform, toTransform } from './utils'
+import { fromTransform, toTransform } from './utils'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { TextField } from '../TextField'
@@ -20,7 +20,7 @@ export default withSdk<Props>(
 
     const hasTransform = useHasComponent(entity, Transform)
     const getInputProps =
-      hasTransform && useComponentInput(entity, Transform, fromTranform, toTransform, isValidNumericInput)
+      hasTransform && useComponentInput(entity, Transform, fromTransform, toTransform, isValidNumericInput)
     const { handleAction } = useContextMenu()
 
     const handleRemove = useCallback(() => Transform.deleteFrom(entity), [])
