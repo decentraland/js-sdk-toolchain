@@ -70,7 +70,7 @@ export function dumpEngineToComposite(engine: IEngine, internalDataType: 'json' 
     composite.components.push(compositeComponent)
   }
 
-  const ignoreComponentNames = ['editor::EntitySelected', 'editor::Toggle', CompositeRoot.componentName]
+  const ignoreComponentNames = ['inspector:Selection', 'editor::Toggle', CompositeRoot.componentName]
 
   for (const itComponentDefinition of engine.componentsIter()) {
     if (ignoreComponentNames.includes(itComponentDefinition.componentName)) continue
