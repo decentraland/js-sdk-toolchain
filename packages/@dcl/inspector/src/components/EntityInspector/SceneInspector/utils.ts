@@ -1,7 +1,7 @@
 import { SceneInput } from './types'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
-export function fromScene(value: EditorComponentsTypes['scene']): SceneInput {
+export function fromScene(value: EditorComponentsTypes['Scene']): SceneInput {
   const base = value.layout.base.x + ',' + value.layout.base.y
   const parcels = value.layout.parcels.map((parcel) => parcel.x + ',' + parcel.y).join(' ')
   return {
@@ -12,7 +12,7 @@ export function fromScene(value: EditorComponentsTypes['scene']): SceneInput {
   }
 }
 
-export function toScene(inputs: SceneInput): EditorComponentsTypes['scene'] {
+export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
   const base = inputs.layout.base.split(',')
   return {
     layout: {

@@ -1,0 +1,12 @@
+.Renderer {
+  flex: 1 1 auto;
+  position: relative;
+}
+
+.Renderer>#canvas {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  outline: none;
+  position: absolute;
+}

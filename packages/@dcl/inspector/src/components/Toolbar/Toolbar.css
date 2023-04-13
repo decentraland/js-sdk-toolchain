@@ -1,29 +1,84 @@
-.toolbar {
+.Toolbar {
   display: flex;
   justify-content: center;
   background-color: #29262f;
   padding: 8px;
-  position: absolute;
-  width: calc(100% - var(--sidebar) - 26px);
 }
 
-.toolbar button {
+.Toolbar button {
   border: none;
-  padding: 0px 16px;
+  padding: 0px 2px;
   margin: 0 8px;
   color: #fff;
   background-color: #4b4852;
   font-size: 16px;
   border-radius: 4px;
   cursor: pointer;
+  min-width: 32px;
 }
 
-.toolbar button:hover {
-  background-color: #999;
+.Toolbar button:hover:not(:disabled) {
+  background-color: #6c6974;
 }
 
-.toolbar svg {
+.Toolbar button:disabled {
+  opacity: 0.5;
+  cursor: default
+}
+
+.Toolbar button.active {
+  background-color: #6c6974;
+}
+
+.Toolbar svg {
   width: 24px;
   height: 24px;
 }
 
+.Toolbar .undo svg,
+.Toolbar .redo svg {
+  transform: translateY(2px);
+}
+
+.Toolbar .undo {
+  margin-right: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+.Toolbar .redo {
+  margin-left: 1px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
+.Toolbar button.gizmo {
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.Toolbar .gizmo.translate {
+  margin-right: 1px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  background-image: url(./icons/translate.svg);
+}
+
+.Toolbar .gizmo.rotate {
+  margin: 0px;
+  border-radius: 0px;
+  background-image: url(./icons/rotate.svg);
+}
+
+.Toolbar .gizmo.scale {
+  margin-left: 1px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  background-image: url(./icons/scale.svg);
+}
+
+.Toolbar .babylonjs-inspector svg {
+  width: 18px;
+  height: 18px;
+  transform: translateY(2px);
+}

@@ -6,8 +6,9 @@ import { useSdk } from '../../hooks/sdk/useSdk'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 import { ROOT } from '../../lib/sdk/tree'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
-import { Toolbar } from '../Toolbar'
 import { IAsset } from '../AssetsCatalog/types'
+
+import './Renderer.css'
 
 const cachedFiles = new Set()
 
@@ -52,7 +53,7 @@ const Renderer: React.FC = () => {
       assetPackageName
     })
     const path = Object.keys(fileContent)[0]
-    await addAsset({ asset: { ...asset, src: `${destFolder}/${assetPackageName}/${path}`  }, name: asset.name })
+    await addAsset({ asset: { ...asset, src: `${destFolder}/${assetPackageName}/${path}` }, name: asset.name })
   }
 
   const [, drop] = useDrop(
@@ -64,7 +65,6 @@ const Renderer: React.FC = () => {
           return
         }
         if (monitor.didDrop()) return
-        console.log(val.asset)
         void addAsset(val.asset as AssetNodeItem)
       }
     }),
@@ -74,9 +74,8 @@ const Renderer: React.FC = () => {
   drop(canvasRef)
 
   return (
-    <div id="main-editor">
-      <Toolbar />
-      <canvas ref={canvasRef} id="renderer" touch-action="none" />
+    <div className="Renderer">
+      <canvas ref={canvasRef} id="canvas" touch-action="none" />
     </div>
   )
 }
