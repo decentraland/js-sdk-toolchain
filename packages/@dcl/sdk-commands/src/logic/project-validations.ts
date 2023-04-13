@@ -8,7 +8,8 @@ import { getSceneFilePath, getValidSceneJson } from './scene-validations'
 
 export type BaseProject = { workingDirectory: string }
 export type SceneProject = { kind: 'scene'; scene: Scene } & BaseProject
-export type ProjectUnion = SceneProject // | WearableProject
+export type WearableProject = { kind: 'wearable'; wearable: any } & BaseProject
+export type ProjectUnion = SceneProject | WearableProject
 
 /**
  * Asserts that the workingDirectory is a valid project
