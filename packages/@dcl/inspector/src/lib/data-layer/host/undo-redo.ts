@@ -46,7 +46,7 @@ export function initUndoRedo(engine: IEngine, getComposite: () => CompositeDefin
       return
     }
     // Add undo operation
-    // TODO: entitySelected doesn't exists on composite
+    // TODO: selection doesn't exists on composite
     if (operation === CrdtMessageType.PUT_COMPONENT || operation === CrdtMessageType.DELETE_COMPONENT) {
       const prevValue = findValue(getComposite(), component!.componentName, entity)
       acc.push({ entity, operation, componentName: component!.componentName, value: prevValue })

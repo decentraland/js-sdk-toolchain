@@ -1,14 +1,10 @@
-import { useMemo } from 'react'
-
-import { useEntitiesWith } from '../../hooks/sdk/useEntitiesWith'
+import { useSelectedEntity } from '../../hooks/sdk/useSelectedEntity'
+import { ROOT } from '../../lib/sdk/tree'
 import { TransformInspector } from './TransformInspector'
 import { SceneInspector } from './SceneInspector'
-import { ROOT } from '../../lib/sdk/tree'
 
 export const EntityInspector: React.FC = () => {
-  const selectedEntities = useEntitiesWith((components) => components.EntitySelected)
-  const entity = useMemo(() => (selectedEntities.length > 0 ? selectedEntities[0] : null), [selectedEntities])
-
+  const entity = useSelectedEntity()
   if (!entity) return null
 
   return (

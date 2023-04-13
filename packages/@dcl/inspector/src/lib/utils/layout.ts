@@ -1,5 +1,5 @@
 import { Vector3 } from '@babylonjs/core'
-import { PARCEL_SIZE } from '../utils/scene'
+import { PARCEL_SIZE } from './scene'
 
 export type Coords = {
   x: number

@@ -38,31 +38,28 @@ code {
   background: var(--main-bg-color);
 }
 
+.composite-renderer {
+  flex: 1 1 auto;
+}
+
+.composite-renderer>.content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+}
+
 /* Inspector settings */
 #embed-host {
   position: absolute !important;
 }
 
-.main-editor {
-  height: calc(100vh - 54px);
-}
-
-
-/* Babylon frame */
-#renderer {
-  width: 100%;
-  height: 100%;
-  touch-action: none;
-  outline: none;
-}
 
 /* Editor assets */
 .footer {
-  position: absolute;
-  bottom: 0px;
   display: flex;
   flex-direction: column;
-  width: calc(100% - var(--sidebar) - 16px) !important;
+  flex: none;
 }
 
 .footer .footer-buttons {
@@ -71,7 +68,7 @@ code {
   height: 36px;
 }
 
-.footer .footer-buttons > div {
+.footer .footer-buttons>div {
   display: flex;
   align-items: center;
   padding: 8px;
