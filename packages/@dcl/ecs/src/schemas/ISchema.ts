@@ -48,6 +48,7 @@ export type JsonSchemaExtended = {
     | 'utf8-string'
     | 'protocol-buffer'
     | 'transform'
+    | 'one-of'
     | 'unknown'
 } & JsonMap
 
