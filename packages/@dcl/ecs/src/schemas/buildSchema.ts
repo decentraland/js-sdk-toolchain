@@ -86,11 +86,38 @@ const isOneOfJsonSchema = (
 ): type is JsonSchemaExtended & { properties: Record<string, JsonSchemaExtended> } =>
   type.serializationType === 'one-of'
 
+type UnknownSchema = { type: JsonSchemaExtended; value: unknown }
+
+const getUnkownSchema = (): UnknownSchema => ({
+  type: { type: 'object', serializationType: 'unknown' },
+  value: undefined
+})
+
+const isCompoundType = (type: JsonSchemaExtended): boolean =>
+  type.serializationType === 'array' || type.serializationType === 'map'
+
 const getTypeAndValue = (
   properties: Record<string, JsonSchemaExtended>,
   value: Record<string, unknown>,
   key: string
-) => ({ type: properties[key], value: value[key] })
+): UnknownSchema => {
+  const type = properties[key]
+  const valueKey = value[key]
+
+  if (isOneOfJsonSchema(type)) {
+    const typedMapValue = valueKey as ReturnType<ReturnType<typeof IOneOf>['deserialize']>
+    if (!typedMapValue.$case) return getUnkownSchema()
+
+    const propType = type.properties[typedMapValue.$case]
+
+    // transform { $case: string; value: unknown } => { [$case]: value }
+    if (isCompoundType(propType)) value[key] = { [typedMapValue.$case]: typedMapValue.value }
+
+    return { type: propType, value: typedMapValue.value }
+  }
+
+  return { type, value: valueKey }
+}
 
 export function mutateValues(
   jsonSchema: JsonSchemaExtended,
@@ -103,26 +130,9 @@ export function mutateValues(
 
     for (const key in properties) {
       const { type, value: mapValue } = getTypeAndValue(properties, typedValue, key)
-
-      if (type.serializationType === 'array' || type.serializationType === 'map') {
+      if (type.serializationType === 'unknown') continue
+      if (isCompoundType(type)) {
         mutateValues(type, mapValue, mutateFn)
-      } else if (isOneOfJsonSchema(type)) {
-        const typedMapValue = mapValue as ReturnType<ReturnType<typeof IOneOf>['deserialize']>
-        const propType = type.properties[typedMapValue.$case]
-
-        if (!typedMapValue.$case) continue
-
-        // console.log(propType, typedMapValue, typedValue)
-
-        if (propType.serializationType === 'array' || propType.serializationType === 'map') {
-          typedValue[key] = { [typedMapValue.$case]: typedMapValue.value }
-          mutateValues(propType, typedMapValue.value, mutateFn)
-        } else {
-          const newValue = mutateFn(typedMapValue.value, propType)
-          if (newValue.changed) {
-            typedValue[key] = newValue.value
-          }
-        }
       } else {
         const newValue = mutateFn(mapValue, type)
         if (newValue.changed) {
@@ -133,11 +143,9 @@ export function mutateValues(
   } else if (jsonSchema.serializationType === 'array') {
     const withItemsJsonSchema = jsonSchema as JsonSchemaExtended & { items: JsonSchemaExtended }
     const arrayValue = value as unknown[]
-    const nestedMutateValues =
-      withItemsJsonSchema.items.serializationType === 'array' || withItemsJsonSchema.items.serializationType === 'map'
 
     for (let i = 0, n = arrayValue.length; i < n; i++) {
-      if (nestedMutateValues) {
+      if (isCompoundType(withItemsJsonSchema.items)) {
         mutateValues(withItemsJsonSchema.items, arrayValue[i], mutateFn)
       } else {
         const newValue = mutateFn(arrayValue[i], withItemsJsonSchema.items)
