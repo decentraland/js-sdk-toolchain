@@ -13,7 +13,7 @@ import {
   Vector3
 } from '@babylonjs/core'
 import { memoize } from '../../logic/once'
-import { Layout } from '../../sdk/layout'
+import { Layout } from '../../utils/layout'
 import { GridMaterial } from '@babylonjs/materials'
 import { PARCEL_SIZE } from '../../utils/scene'
 

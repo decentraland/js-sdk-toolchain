@@ -10,67 +10,9 @@ import {
   PointerEventType
 } from '@dcl/sdk/ecs'
 import { Vector3, Color4, Quaternion } from '@dcl/sdk/math'
-import ReactEcs, { UiEntity, Label, ReactEcsRenderer } from '@dcl/sdk/react-ecs'
+import { ReactEcs, UiEntity, Label, ReactEcsRenderer, Button } from '@dcl/sdk/react-ecs'
 
 let counter = 0
-
-export const uiComponent = () => (
-  <UiEntity
-    uiTransform={{
-      width: 700,
-      height: 400,
-      margin: { top: '35px', left: '500px' }
-    }}
-    uiBackground={{ color: Color4.create(0.5, 0.8, 0.1, 0.6) }}
-  >
-    <UiEntity
-      uiTransform={{
-        width: '100%',
-        height: '20%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        display: 'flex'
-      }}
-    >
-      <Label value="SDK 7" fontSize={80} uiBackground={{ color: Color4.fromHexString('#fbf0f0') }} />
-    </UiEntity>
-    <UiEntity
-      uiTransform={{
-        width: '100%',
-        height: '20%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        display: 'flex'
-      }}
-    >
-      <Label value={`Counter: ${counter}`} fontSize={60} uiBackground={{ color: Color4.fromHexString('#fbf0f0') }} />
-    </UiEntity>
-    <UiEntity
-      uiTransform={{
-        width: '100%',
-        height: '100px',
-        justifyContent: 'center',
-        alignItems: 'center',
-        display: 'flex'
-      }}
-    >
-      <Label
-        value={`Player: ${getPlayerPosition()}`}
-        fontSize={40}
-        uiBackground={{ color: Color4.fromHexString('#fbf0f0') }}
-      />
-    </UiEntity>
-  </UiEntity>
-)
-
-function getPlayerPosition() {
-  const playerPosition = Transform.getOrNull(engine.PlayerEntity)
-  if (!playerPosition) return ''
-  const { x, y, z } = playerPosition.position
-  return `{x: ${x.toFixed(2)}, y: ${y.toFixed(2)}, z: ${z.toFixed(2)} }`
-}
-
-ReactEcsRenderer.setUiRenderer(uiComponent)
 
 // Cube factory
 function createCube(x: number, y: number, z: number, spawner = true): Entity {
@@ -122,5 +64,78 @@ function spawnerSystem() {
 createCube(8, 1, 8)
 engine.addSystem(circularSystem)
 engine.addSystem(spawnerSystem)
+
+type GenesisPlazaContent = string
+const sceneThumbnail: GenesisPlazaContent = 'models/Magazinev1.png'
+
+const uiComponent = () => (
+  <UiEntity
+    uiTransform={{
+      width: 400,
+      height: 230,
+      //  { top: 16, right: 0, bottom: 8 left: 270 },
+      margin: '16px 0 8px 270px',
+      // { top: 4, bottom: 4, left: 4, right: 4 },
+      padding: 4,
+    }}
+    uiBackground={{ color: Color4.create(0.5, 0.8, 0.1, 0.6) }}
+  >
+    <UiEntity
+      uiTransform={{
+        width: '100%',
+        height: '100%',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}
+      uiBackground={{ color: Color4.fromHexString("#70ac76ff") }}
+    >
+      <UiEntity
+        uiTransform={{
+          width: '100%',
+          height: 50,
+          margin: '8px 0'
+        }}
+        uiBackground={{
+          textureMode: 'center',
+          texture: {
+            src: sceneThumbnail,
+          },
+        }}
+        uiText={{ value: 'SDK7', fontSize: 18 }}
+      />
+      <Label
+        onMouseDown={() => {console.log('Player Position clicked !')}}
+        value={`Player: ${getPlayerPosition()}`}
+        fontSize={18}
+        uiTransform={{ width: '100%', height: 30 } }
+      />
+      <Label
+        onMouseDown={() => {console.log('# Cubes clicked !')}}
+        value={`# Cubes: ${[...engine.getEntitiesWith(MeshRenderer)].length}`}
+        fontSize={18}
+        uiTransform={{ width: '100%', height: 30 } }
+      />
+      <Button
+        uiTransform={{ width: 100, height: 40, margin: 8 }}
+        value='Spawn cube'
+        variant='primary'
+        fontSize={14}
+        onMouseDown={() => {
+          createCube(1 + Math.random() * 8, Math.random() * 8, 1 + Math.random() * 8, false)
+        }}
+      />
+    </UiEntity>
+  </UiEntity>
+)
+
+function getPlayerPosition() {
+  const playerPosition = Transform.getOrNull(engine.PlayerEntity)
+  if (!playerPosition) return ' no data yet'
+  const { x, y, z } = playerPosition.position
+  return `{X: ${x.toFixed(2)}, Y: ${y.toFixed(2)}, z: ${z.toFixed(2)} }`
+}
+
+ReactEcsRenderer.setUiRenderer(uiComponent)
 
 export {}

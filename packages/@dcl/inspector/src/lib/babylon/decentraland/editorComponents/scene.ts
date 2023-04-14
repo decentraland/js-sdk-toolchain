@@ -1,6 +1,6 @@
 import { ComponentType } from '@dcl/ecs'
 import type { ComponentOperation } from '../component-operations'
-import { Layout } from '../../../sdk/layout'
+import { Layout } from '../../../utils/layout'
 import { getLayoutManager } from '../layout-manager'
 
 export const putSceneComponent: ComponentOperation = (entity, component) => {

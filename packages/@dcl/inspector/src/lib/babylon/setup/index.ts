@@ -141,6 +141,7 @@ export function initRenderer(canvas: HTMLCanvasElement) {
     babylon.resize(false)
   }
   window.addEventListener('resize', resize)
+  new ResizeObserver(resize).observe(canvas)
 
   function dispose() {
     babylon.dispose()

@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react'
 import { getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk/tree'
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
-import { isLastWriteWinComponent } from './useComponentValue'
+import { changeSelectedEntity } from '../../lib/utils/gizmo'
 
 /**
  * Used to get a tree and the functions to work with it
@@ -65,8 +65,8 @@ export const useTree = () => {
     (entity: Entity) => {
       if (entity === ROOT) return false
       if (!sdk) return false
-      const { EntitySelected } = sdk.components
-      return EntitySelected.has(entity)
+      const { Selection } = sdk.components
+      return Selection.has(entity)
     },
     [sdk]
   )
@@ -121,13 +121,9 @@ export const useTree = () => {
   const toggle = useCallback(
     (entity: Entity, open: boolean) => {
       if (entity === ROOT || !sdk) return
-      const { Toggle, EntitySelected } = sdk.components
-      for (const [_entity] of sdk.engine.getEntitiesWith(EntitySelected)) {
-        if (_entity !== entity && EntitySelected.has(_entity)) {
-          EntitySelected.deleteFrom(_entity)
-        }
-      }
-      EntitySelected.createOrReplace(entity, { gizmo: 1 })
+      const { Toggle } = sdk.components
+
+      changeSelectedEntity(entity, sdk.engine)
 
       if (open) {
         Toggle.createOrReplace(entity)

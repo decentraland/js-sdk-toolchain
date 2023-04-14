@@ -13,6 +13,7 @@ import {
 } from '../../../logic/project-files'
 import { getCatalystBaseUrl } from '../../../logic/config'
 import { Workspace } from '../../../logic/workspace-validations'
+import { ProjectUnion, WearableProject } from '../../../logic/project-validations'
 
 function smartWearableNameToId(name: string) {
   return name.toLocaleLowerCase().replace(/ /g, '-')
@@ -29,13 +30,11 @@ export async function setupEcs6Endpoints(
 ) {
   const catalystUrl = new URL(await getCatalystBaseUrl(components))
 
-  const baseFolders = workspace.projects.map(($) => $.workingDirectory)
-
-  // handle old preview scene.json
+  // handle old preview scene.json DEPRECATED
   router.get('/scene.json', async () => {
     return {
       headers: { 'content-type': 'application/json' },
-      body: components.fs.createReadStream(path.join(baseFolders[0], 'scene.json'))
+      body: components.fs.createReadStream(path.join(workspace.projects[0].workingDirectory, 'scene.json'))
     }
   })
 
@@ -70,8 +69,7 @@ export async function setupEcs6Endpoints(
     const baseUrl = `${ctx.url.protocol}//${ctx.url.host}/content/contents`
 
     try {
-      const previewWearables = await getAllPreviewWearables(components, {
-        baseFolders,
+      const previewWearables = await getAllPreviewWearables(components, workspace, {
         baseUrl
       })
 
@@ -144,29 +142,52 @@ export async function setupEcs6Endpoints(
 
   // TODO: get workspace scenes & wearables...
 
-  await serveFolders(components, router, baseFolders)
+  await serveFolders(components, router, workspace)
 }
 
 async function serveFolders(
   components: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,
   router: Router<PreviewComponents>,
-  baseFolders: string[]
+  workspace: Workspace
 ) {
   const catalystUrl = await getCatalystBaseUrl(components)
 
-  router.get('/content/contents/:hash', async (ctx: any, next: any) => {
+  router.get('/content/contents/:hash', async (ctx, next) => {
     if (ctx.params.hash && ctx.params.hash.startsWith('b64-')) {
       const fullPath = path.resolve(Buffer.from(ctx.params.hash.replace(/^b64-/, ''), 'base64').toString('utf8'))
 
+      // find a project that we are talking about. NOTE: this filter is not exhaustive
+      //   relative paths should be used instead
+      const baseProject = workspace.projects.find((project) => fullPath.startsWith(project.workingDirectory))
+
       // only return files IF the file is within a baseFolder
-      if (!baseFolders.find((folder: string) => fullPath.startsWith(folder))) {
+      if (!baseProject) {
         return next()
       }
 
+      if (path.resolve(fullPath) === path.resolve(baseProject.workingDirectory)) {
+        // if we are talking about the root directory, then we must return the json of the entity
+        const entity = await fakeEntityV3FromProject(components, baseProject, b64HashingFunction)
+
+        if (!entity) return { status: 404 }
+
+        return {
+          headers: {
+            'x-timestamp': Date.now().toString(),
+            'x-sent': 'true',
+            'cache-control': 'no-cache,private,max-age=1'
+          },
+          body: entity
+        }
+      }
+
+      if (!(await components.fs.fileExists(fullPath))) return { status: 404 }
+      if (await components.fs.directoryExists(fullPath)) return { status: 404 }
+
       return {
         headers: {
-          'x-timestamp': Date.now(),
-          'x-sent': true,
+          'x-timestamp': Date.now().toString(),
+          'x-sent': 'true',
           'cache-control': 'no-cache,private,max-age=1'
         },
         body: components.fs.createReadStream(fullPath)
@@ -185,7 +206,8 @@ async function serveFolders(
       pointers && typeof pointers === 'string' ? [pointers as string] : (pointers as string[])
     )
 
-    const resultEntities = await getSceneJson(components, baseFolders, Array.from(requestedPointers))
+    const resultEntities = await getSceneJson(components, workspace, Array.from(requestedPointers))
+
     const remote = fetchEntityByPointer(
       components,
       catalystUrl.toString(),
@@ -214,9 +236,8 @@ async function serveFolders(
 
   router.get('/preview-wearables/:id', async (ctx) => {
     const baseUrl = `${ctx.url.protocol}//${ctx.url.host}/content/contents`
-    const wearables = await getAllPreviewWearables(components, {
-      baseUrl,
-      baseFolders
+    const wearables = await getAllPreviewWearables(components, workspace, {
+      baseUrl
     })
     const wearableId = ctx.params.id
     return {
@@ -232,7 +253,7 @@ async function serveFolders(
     return {
       body: {
         ok: true,
-        data: await getAllPreviewWearables(components, { baseUrl, baseFolders })
+        data: await getAllPreviewWearables(components, workspace, { baseUrl })
       }
     }
   })
@@ -240,35 +261,41 @@ async function serveFolders(
 
 async function getAllPreviewWearables(
   components: Pick<CliComponents, 'fs' | 'logger'>,
-  { baseFolders, baseUrl }: { baseFolders: string[]; baseUrl: string }
+  workspace: Workspace,
+  { baseUrl }: { baseUrl: string }
 ) {
+  // NOTE: the explorers should use the /entities/active endpoint to retrieve the wearables. This endpoint should be removed
   const wearablePathArray: string[] = []
-  for (const wearableDir of baseFolders) {
-    const wearableJsonPath = path.resolve(wearableDir, 'wearable.json')
-    if (await components.fs.fileExists(wearableJsonPath)) {
-      wearablePathArray.push(wearableJsonPath)
+
+  for (const project of workspace.projects) {
+    if (project.kind === 'wearable') {
+      const wearableJsonPath = path.resolve(project.workingDirectory, 'wearable.json')
+      if (await components.fs.fileExists(wearableJsonPath)) {
+        wearablePathArray.push(wearableJsonPath)
+      }
     }
   }
 
   const ret: LambdasWearable[] = []
-  for (const wearableJsonPath of wearablePathArray) {
+  for (const project of workspace.projects) {
     try {
-      ret.push(await serveWearable(components, wearableJsonPath, baseUrl))
+      if (project.kind === 'wearable') ret.push(await serveWearable(components, project, baseUrl))
     } catch (err) {
       components.logger.error(
-        `Couldn't mock the wearable ${wearableJsonPath}. Please verify the correct format and scheme.` + err
+        `Couldn't mock the wearable ${project.workingDirectory}. Please verify the correct format and scheme.` + err
       )
     }
   }
+
   return ret
 }
 
 async function serveWearable(
   components: Pick<CliComponents, 'fs' | 'logger'>,
-  wearableJsonPath: string,
+  project: WearableProject,
   baseUrl: string
 ): Promise<LambdasWearable> {
-  const wearableDir = path.dirname(wearableJsonPath)
+  const wearableJsonPath = path.join(project.workingDirectory, 'wearable.json')
   const wearableJson = JSON.parse((await components.fs.readFile(wearableJsonPath)).toString())
 
   if (!WearableJson.validate(wearableJson)) {
@@ -278,8 +305,12 @@ async function serveWearable(
     throw new Error(`Invalid wearable.json (${wearableJsonPath})`)
   }
 
-  const projectFiles = await getProjectPublishableFilesWithHashes(components, wearableDir, b64HashingFunction)
-  const contentFiles = projectFilesToContentMappings(wearableDir, projectFiles)
+  const projectFiles = await getProjectPublishableFilesWithHashes(
+    components,
+    project.workingDirectory,
+    b64HashingFunction
+  )
+  const contentFiles = projectFilesToContentMappings(project.workingDirectory, projectFiles)
 
   const thumbnailFiltered = contentFiles.filter(($) => $.file === 'thumbnail.png')
   const thumbnail =
@@ -320,19 +351,20 @@ async function serveWearable(
 
 async function getSceneJson(
   components: Pick<CliComponents, 'fs' | 'logger'>,
-  projectRoots: string[],
+  workspace: Workspace,
   pointers: string[]
 ): Promise<Entity[]> {
   const requestedPointers = new Set<string>(pointers)
   const resultEntities: Entity[] = []
 
   const allDeployments = await Promise.all(
-    projectRoots.map(async (projectRoot) => fakeEntityV3FromFolder(components, projectRoot, b64HashingFunction))
+    workspace.projects.map((project) => fakeEntityV3FromProject(components, project, b64HashingFunction))
   )
 
   for (const pointer of Array.from(requestedPointers)) {
     // get deployment by pointer
     const theDeployment = allDeployments.find(($) => $ && $.pointers.includes(pointer))
+
     if (theDeployment) {
       // remove all the required pointers from the requestedPointers set
       // to prevent sending duplicated entities
@@ -403,6 +435,10 @@ function serveStatic(components: Pick<CliComponents, 'fs'>, workspace: Workspace
         return next()
       }
 
+      if (await components.fs.directoryExists(fullPath)) {
+        return { status: 404 }
+      }
+
       const headers: Record<string, any> = {
         'x-timestamp': Date.now(),
         'x-sent': true,
@@ -436,16 +472,33 @@ function serveStatic(components: Pick<CliComponents, 'fs'>, workspace: Workspace
   })
 }
 
-async function fakeEntityV3FromFolder(
+async function fakeEntityV3FromProject(
   components: Pick<CliComponents, 'fs' | 'logger'>,
-  projectRoot: string,
+  project: ProjectUnion,
   hashingFunction: (filePath: string) => Promise<string>
 ): Promise<Entity | null> {
-  const sceneJsonPath = path.resolve(projectRoot, 'scene.json')
-  let isParcelScene = true
+  const projectFiles = await getProjectPublishableFilesWithHashes(components, project.workingDirectory, hashingFunction)
+  const contentFiles = projectFilesToContentMappings(project.workingDirectory, projectFiles)
 
-  const wearableJsonPath = path.resolve(projectRoot, 'wearable.json')
-  if (await components.fs.fileExists(wearableJsonPath)) {
+  if (project.kind === 'scene') {
+    const sceneJsonPath = path.resolve(project.workingDirectory, 'scene.json')
+    const sceneJson = JSON.parse(await components.fs.readFile(sceneJsonPath, 'utf-8'))
+    const { base, parcels }: { base: string; parcels: string[] } = sceneJson.scene
+    const pointers = new Set<string>()
+    pointers.add(base)
+    parcels.forEach(($) => pointers.add($))
+
+    return {
+      version: 'v3',
+      type: EntityType.SCENE,
+      id: await hashingFunction(project.workingDirectory),
+      pointers: Array.from(pointers),
+      timestamp: Date.now(),
+      metadata: sceneJson,
+      content: contentFiles
+    }
+  } else if (project.kind === 'wearable') {
+    const wearableJsonPath = path.resolve(project.workingDirectory, 'wearable.json')
     try {
       const wearableJson = JSON.parse(await components.fs.readFile(wearableJsonPath, 'utf-8'))
       if (!WearableJson.validate(wearableJson)) {
@@ -453,33 +506,20 @@ async function fakeEntityV3FromFolder(
 
         components.logger.error(`Unable to validate wearable.json properly, please check its schema.` + errors)
         components.logger.error(`Invalid wearable.json (${wearableJsonPath})`)
-      } else {
-        isParcelScene = false
+      }
+
+      return {
+        version: 'v3',
+        type: EntityType.WEARABLE,
+        id: await hashingFunction(project.workingDirectory),
+        pointers: Array.from([await hashingFunction(project.workingDirectory)]),
+        timestamp: Date.now(),
+        metadata: wearableJson,
+        content: contentFiles
       }
     } catch (err: any) {
       components.logger.error(`Unable to load wearable.json`)
       components.logger.error(err)
-    }
-  }
-
-  if ((await components.fs.fileExists(sceneJsonPath)) && isParcelScene) {
-    const sceneJson = JSON.parse(await components.fs.readFile(sceneJsonPath, 'utf-8'))
-    const { base, parcels }: { base: string; parcels: string[] } = sceneJson.scene
-    const pointers = new Set<string>()
-    pointers.add(base)
-    parcels.forEach(($) => pointers.add($))
-
-    const projectFiles = await getProjectPublishableFilesWithHashes(components, projectRoot, hashingFunction)
-    const contentFiles = projectFilesToContentMappings(projectRoot, projectFiles)
-
-    return {
-      version: 'v3',
-      type: EntityType.SCENE,
-      id: await hashingFunction(projectRoot),
-      pointers: Array.from(pointers),
-      timestamp: Date.now(),
-      metadata: sceneJson,
-      content: contentFiles
     }
   }
 

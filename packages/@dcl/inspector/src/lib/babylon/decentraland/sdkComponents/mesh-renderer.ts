@@ -85,7 +85,7 @@ export const putMeshRendererComponent: ComponentOperation = (entity, component) 
     if (entity.meshRenderer) {
       entity.meshRenderer.isPickable = true
       entity.meshRenderer.showBoundingBox =
-        entity.context.deref()?.editorComponents.EntitySelected.has(entity.entityId) || false
+        entity.context.deref()?.editorComponents.Selection.has(entity.entityId) || false
     }
   }
 }
