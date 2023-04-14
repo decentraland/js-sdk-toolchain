@@ -1,13 +1,13 @@
 import * as components from '../components'
-import { ColliderLayer, PBRaycastResult, RaycastQueryType } from '../components'
-import { Entity, IEngine } from "../engine";
+import { ColliderLayer, RaycastQueryType, PBRaycastResult } from '../components'
+import { DeepReadonlyObject, Entity, IEngine } from "../engine";
 import { Vector3 } from "../components/generated/pb/decentraland/common/vectors.gen";
 import { EntityState } from "../engine/entity";
 
 /**
  * @public
  */
-export type RaycastEventsSystemCallback = (event: PBRaycastResult) => void
+export type RaycastEventsSystemCallback = (event: DeepReadonlyObject<PBRaycastResult>) => void
 
 /**
  * @public
@@ -57,11 +57,7 @@ export interface RaycastEventsSystem {
 export function createRaycastEventsSystem(engine: IEngine): RaycastEventsSystem {
   const raycastComponent = components.Raycast(engine)
   const raycastResultComponent = components.RaycastResult(engine)
-  const entitiesCallbackResultMap = new Map<Entity, {
-    callback: RaycastEventsSystemCallback,
-    options: RaycastEventsSystemOptions
-    result?: PBRaycastResult
-  }>()
+  const entitiesCallbackResultMap = new Map<Entity, { callback: RaycastEventsSystemCallback }>()
 
   const getDefaultOptions = (options: Partial<RaycastEventsSystemOptions> = {}): RaycastEventsSystemOptions => ({
     maxDistance: 16,
@@ -87,42 +83,30 @@ export function createRaycastEventsSystem(engine: IEngine): RaycastEventsSystem 
     raycast.continuous = options.continuous
     raycast.queryType = options.queryType
 
-    entitiesCallbackResultMap.set(entity, { callback: callback, options: options })
+    entitiesCallbackResultMap.set(entity, { callback: callback })
   }
 
   function removeRaycast(entity: Entity) {
-    const raycast = raycastComponent.getOrNull(entity)
-    if (raycast)
-      raycastComponent.deleteFrom(entity)
-
+    raycastComponent.deleteFrom(entity)
+    raycastResultComponent.deleteFrom(entity)
     entitiesCallbackResultMap.delete(entity)
   }
 
   // @internal
   engine.addSystem(function EventSystem() {
     for (const [entity, data] of entitiesCallbackResultMap) {
-      if (engine.getEntityState(entity) === EntityState.Removed
-      || !raycastComponent.getOrNull(entity)) {
+      const raycast = raycastComponent.getOrNull(entity)
+      if (engine.getEntityState(entity) === EntityState.Removed || !raycast) {
         entitiesCallbackResultMap.delete(entity)
         continue
       }
 
-      // To be able to use only `raycastResultComponent.getOrNull(entity)`, the map should support
-      // DeepReadableObject...
-      const currentResult = raycastResultComponent.getMutableOrNull(entity)
+      const currentResult = raycastResultComponent.getOrNull(entity)
       if (!currentResult) continue
-
-      if (!data.options.continuous && data.result
-        && data.result.timestamp == currentResult.timestamp)
-        continue
-
-      // update map with new result
-      // data.result = currentResult;
-      entitiesCallbackResultMap.set(entity, { callback: data.callback, options: data.options, result: currentResult })
 
       data.callback(currentResult)
 
-      if (!data.options.continuous)
+      if (!raycast.continuous)
         removeRaycast(entity)
     }
   })

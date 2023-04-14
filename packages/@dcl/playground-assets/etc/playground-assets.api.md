@@ -2465,7 +2465,7 @@ export interface RaycastEventsSystem {
 export const raycastEventsSystem: RaycastEventsSystem;
 
 // @public (undocumented)
-export type RaycastEventsSystemCallback = (event: PBRaycastResult) => void;
+export type RaycastEventsSystemCallback = (event: DeepReadonlyObject<PBRaycastResult>) => void;
 
 // @public (undocumented)
 export type RaycastEventsSystemOptions = {
