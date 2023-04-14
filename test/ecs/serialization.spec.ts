@@ -109,7 +109,8 @@ describe('test schema serialization', () => {
       hp: Schemas.Float,
       position: Vector3,
       targets: Schemas.Array(Vector3),
-      items: Schemas.Array(ItemType)
+      items: Schemas.Array(ItemType),
+      pet: Schemas.OneOf({ cat: Schemas.Entity, dog: Schemas.Entity })
     })
 
     const defaultPlayer = {
@@ -119,7 +120,8 @@ describe('test schema serialization', () => {
       hp: 0.0,
       position: { x: 1.0, y: 50.0, z: 50.0 },
       targets: [],
-      items: []
+      items: [],
+      pet: { $case: 'dog' as const, value: 3146 as Entity }
     }
 
     const myPlayer = PlayerComponent.create(myEntity, defaultPlayer)
@@ -143,6 +145,7 @@ describe('test schema serialization', () => {
       itemAmount: 10,
       description: 'this is a description to an enchanting item.'
     })
+    myPlayer.pet = { $case: 'cat', value: 2019 as Entity }
 
     const buffer = new ReadWriteByteBuffer()
     PlayerComponent.schema.serialize(PlayerComponent.get(myEntity), buffer)
@@ -579,7 +582,8 @@ describe('test json-schema function', () => {
 
     const comp = engine.defineComponent('test', {
       arrayOf: Schemas.Array(Schemas.Map(mapWithAllPrimitives)),
-      mapOf: Schemas.Map(mapWithAllPrimitives)
+      mapOf: Schemas.Map(mapWithAllPrimitives),
+      oneOf: Schemas.OneOf(mapWithAllPrimitives)
     })
 
     const jsonSchemaComponent = JSON.parse(JSON.stringify(comp.schema.jsonSchema))
@@ -609,12 +613,27 @@ describe('test json-schema function', () => {
         manyEntities: Schemas.Array(Schemas.Entity),
         valueWithoutChanges: Schemas.Int,
         manyPairOfEntities: Schemas.Array(Schemas.Array(Schemas.Entity))
-      })
+      }),
+      oneOrTheOther: Schemas.OneOf({ someEntity: Schemas.Entity, someBool: Schemas.Boolean }),
+      oneOrTheOtherMap: Schemas.OneOf({
+        first: Schemas.Map({ anEntity: Schemas.Entity }),
+        second: Schemas.Map({ aNumber: Schemas.Number })
+      }),
+      oneOrOtherArray: Schemas.Array(Schemas.OneOf({ someEntity: Schemas.Entity, someBool: Schemas.Boolean })),
+      oneOrTheOtherWithoutChanges: Schemas.OneOf({ someEntity: Schemas.Entity, someBool: Schemas.Boolean }),
+      nestedOneOrTheOtherWithoutChanges: Schemas.OneOf({
+        first: Schemas.Map({ anEntity: Schemas.Entity }),
+        second: Schemas.Map({ aNumber: Schemas.Number })
+      }),
+      arrayOfOneOrTheOtherWithoutChanges: Schemas.Array(
+        Schemas.OneOf({ someEntity: Schemas.Entity, someBool: Schemas.Boolean })
+      )
     }
 
     const MySchema = Schemas.Map(MySchemaDefinition)
 
     const someValue = MySchema.create()
+
     someValue.someImportantEntity = 1 as Entity
     someValue.manyEntities = [2, 3, 4] as Entity[]
     someValue.manyPairOfEntities = [
@@ -630,6 +649,9 @@ describe('test json-schema function', () => {
       [22, 23, 24, 25]
     ] as Entity[][]
     someValue.nestedMap.valueWithoutChanges = 26
+    someValue.oneOrTheOther = { $case: 'someEntity', value: 27 as Entity }
+    someValue.oneOrTheOtherMap = { $case: 'first', value: { anEntity: 28 as Entity } }
+    someValue.oneOrOtherArray = [{ $case: 'someEntity', value: 29 as Entity }]
 
     mutateValues(MySchema.jsonSchema, someValue, (currentValue, valueType) => {
       if (valueType.serializationType === 'entity') {
@@ -646,7 +668,6 @@ describe('test json-schema function', () => {
         [1009, 1010, 1011, 1012]
       ] as Entity[][],
       valueWithoutChanges: 13,
-
       nestedMap: {
         someImportantEntity: 1014 as Entity,
         manyEntities: [1015, 1016, 1017] as Entity[],
@@ -655,7 +676,13 @@ describe('test json-schema function', () => {
           [1022, 1023, 1024, 1025]
         ] as Entity[][],
         valueWithoutChanges: 26
-      }
+      },
+      oneOrTheOther: 1027 as Entity,
+      oneOrTheOtherMap: { first: { anEntity: 1028 as Entity } },
+      oneOrOtherArray: [1029],
+      oneOrTheOtherWithoutChanges: {},
+      nestedOneOrTheOtherWithoutChanges: {},
+      arrayOfOneOrTheOtherWithoutChanges: []
     })
   })
 })
