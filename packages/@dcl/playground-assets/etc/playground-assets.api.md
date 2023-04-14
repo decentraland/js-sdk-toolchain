@@ -2456,6 +2456,41 @@ export const RAD2DEG: number;
 export const Raycast: LastWriteWinElementSetComponentDefinition<PBRaycast>;
 
 // @public (undocumented)
+export interface RaycastEventsSystem {
+    registerRaycasterEntity(entity: Entity, callback: RaycastEventsSystemCallback, options?: Partial<RaycastEventsSystemOptions>): void;
+    removeRaycasterEntity(entity: Entity): void;
+}
+
+// @public
+export const raycastEventsSystem: RaycastEventsSystem;
+
+// @public (undocumented)
+export type RaycastEventsSystemCallback = (event: PBRaycastResult) => void;
+
+// @public (undocumented)
+export type RaycastEventsSystemOptions = {
+    timestamp?: number | undefined;
+    originOffset?: PBVector3 | undefined;
+    direction?: {
+        $case: "localDirection";
+        localDirection: PBVector3;
+    } | {
+        $case: "globalDirection";
+        globalDirection: PBVector3;
+    } | {
+        $case: "globalTarget";
+        globalTarget: PBVector3;
+    } | {
+        $case: "targetEntity";
+        targetEntity: number;
+    };
+    maxDistance: number;
+    queryType: RaycastQueryType;
+    continuous?: boolean | undefined;
+    collisionMask?: number | undefined;
+};
+
+// @public (undocumented)
 export interface RaycastHit {
     direction: PBVector3 | undefined;
     entityId?: number | undefined;

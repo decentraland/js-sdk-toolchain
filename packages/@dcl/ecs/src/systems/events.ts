@@ -76,7 +76,7 @@ export interface PointerEventsSystem {
 /**
  * @internal
  */
-export function createPointerEventSystem(engine: IEngine, inputSystem: IInputSystem): PointerEventsSystem {
+export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSystem): PointerEventsSystem {
   const PointerEvents = components.PointerEvents(engine)
 
   enum EventType {

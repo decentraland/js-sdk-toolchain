@@ -7,12 +7,12 @@ import { EntityState } from "../engine/entity";
 /**
  * @public
  */
-export type RaycastEventSystemCallback = (event: PBRaycastResult) => void
+export type RaycastEventsSystemCallback = (event: PBRaycastResult) => void
 
 /**
  * @public
  */
-export type RaycastEventSystemOptions = {
+export type RaycastEventsSystemOptions = {
   timestamp?:
     | number
     | undefined;
@@ -33,13 +33,13 @@ export type RaycastEventSystemOptions = {
 /**
  * @public
  */
-export interface RaycastEventSystem {
+export interface RaycastEventsSystem {
   /**
    * @public
    * Remove the callback for raycast event
    * @param entity - Entity where the callback was attached
    */
-  removeRaycast(entity: Entity): void
+  removeRaycasterEntity(entity: Entity): void
 
   /**
    * @public
@@ -48,22 +48,22 @@ export interface RaycastEventSystem {
    * @param callback - Function to execute when the entity's RaycastResult component is updated
    * @param options - Raycast configuration options
    */
-  onRaycast(entity: Entity, callback: RaycastEventSystemCallback, options?: Partial<RaycastEventSystemOptions>): void
+  registerRaycasterEntity(entity: Entity, callback: RaycastEventsSystemCallback, options?: Partial<RaycastEventsSystemOptions>): void
 }
 
 /**
  * @internal
  */
-export function createRaycastEventSystem(engine: IEngine): RaycastEventSystem {
+export function createRaycastEventsSystem(engine: IEngine): RaycastEventsSystem {
   const raycastComponent = components.Raycast(engine)
   const raycastResultComponent = components.RaycastResult(engine)
   const entitiesCallbackResultMap = new Map<Entity, {
-    callback: RaycastEventSystemCallback,
-    options: RaycastEventSystemOptions
+    callback: RaycastEventsSystemCallback,
+    options: RaycastEventsSystemOptions
     result?: PBRaycastResult
   }>()
 
-  const getDefaultoptions = (options: Partial<RaycastEventSystemOptions> = {}): RaycastEventSystemOptions => ({
+  const getDefaultOptions = (options: Partial<RaycastEventsSystemOptions> = {}): RaycastEventsSystemOptions => ({
     maxDistance: 16,
     queryType: RaycastQueryType.RQT_HIT_FIRST,
     timestamp: 0,
@@ -77,7 +77,7 @@ export function createRaycastEventSystem(engine: IEngine): RaycastEventSystem {
     ...options
   })
 
-  function setRaycast(entity: Entity, callback: RaycastEventSystemCallback, options: RaycastEventSystemOptions) {
+  function registerRaycast(entity: Entity, callback: RaycastEventsSystemCallback, options: RaycastEventsSystemOptions) {
     const raycast = raycastComponent.getOrCreateMutable(entity)
     raycast.maxDistance = options.maxDistance
     raycast.timestamp = options.timestamp
@@ -91,7 +91,6 @@ export function createRaycastEventSystem(engine: IEngine): RaycastEventSystem {
   }
 
   function removeRaycast(entity: Entity) {
-    // TODO: should the component be removed or not ???
     const raycast = raycastComponent.getOrNull(entity)
     if (raycast)
       raycastComponent.deleteFrom(entity)
@@ -122,17 +121,20 @@ export function createRaycastEventSystem(engine: IEngine): RaycastEventSystem {
       entitiesCallbackResultMap.set(entity, { callback: data.callback, options: data.options, result: currentResult })
 
       data.callback(currentResult)
+
+      if (!data.options.continuous)
+        removeRaycast(entity)
     }
   })
 
   return {
-    removeRaycast(entity: Entity) {
+    removeRaycasterEntity(entity: Entity) {
       removeRaycast(entity)
     },
 
-    onRaycast(entity: Entity, callback: RaycastEventSystemCallback, opts?: Partial<RaycastEventSystemOptions>) {
-      const options = getDefaultoptions(opts)
-      setRaycast(entity, callback, options)
+    registerRaycasterEntity(entity: Entity, callback: RaycastEventsSystemCallback, opts?: Partial<RaycastEventsSystemOptions>) {
+      const options = getDefaultOptions(opts)
+      registerRaycast(entity, callback, options)
     }
   }
 }

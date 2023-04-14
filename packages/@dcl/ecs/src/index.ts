@@ -6,6 +6,7 @@ export * from './runtime/types'
 
 export { cyclicParentingChecker } from './systems/cyclicParentingChecker'
 export * from './systems/events'
+export * from './systems/raycast'
 export * from './systems/async-task'
 export * from './engine/entity'
 export * from './components/types'
