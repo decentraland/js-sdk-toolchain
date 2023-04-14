@@ -616,7 +616,15 @@ describe('test json-schema function', () => {
         first: Schemas.Map({ anEntity: Schemas.Entity }),
         second: Schemas.Map({ aNumber: Schemas.Number })
       }),
-      oneOrOtherArray: Schemas.Array(Schemas.OneOf({ someEntity: Schemas.Entity, someBool: Schemas.Boolean }))
+      oneOrOtherArray: Schemas.Array(Schemas.OneOf({ someEntity: Schemas.Entity, someBool: Schemas.Boolean })),
+      oneOrTheOtherWithoutChanges: Schemas.OneOf({ someEntity: Schemas.Entity, someBool: Schemas.Boolean }),
+      nestedOneOrTheOtherWithoutChanges: Schemas.OneOf({
+        first: Schemas.Map({ anEntity: Schemas.Entity }),
+        second: Schemas.Map({ aNumber: Schemas.Number })
+      }),
+      arrayOfOneOrTheOtherWithoutChanges: Schemas.Array(
+        Schemas.OneOf({ someEntity: Schemas.Entity, someBool: Schemas.Boolean })
+      )
     }
 
     const MySchema = Schemas.Map(MySchemaDefinition)
@@ -668,7 +676,10 @@ describe('test json-schema function', () => {
       },
       oneOrTheOther: 1027 as Entity,
       oneOrTheOtherMap: { first: { anEntity: 1028 as Entity } },
-      oneOrOtherArray: [1029]
+      oneOrOtherArray: [1029],
+      oneOrTheOtherWithoutChanges: {},
+      nestedOneOrTheOtherWithoutChanges: {},
+      arrayOfOneOrTheOtherWithoutChanges: []
     })
   })
 })
