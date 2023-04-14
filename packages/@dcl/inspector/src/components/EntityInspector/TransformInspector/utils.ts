@@ -1,9 +1,9 @@
 import { TransformType } from '@dcl/ecs'
-import { Quaternion } from '@dcl/ecs-math'
+import { Quaternion } from '@babylonjs/core'
 import { TransformInput } from './types'
 
 export function fromTransform(value: TransformType): TransformInput {
-  const angles = Quaternion.toEulerAngles(value.rotation)
+  const angles = new Quaternion(value.rotation.x, value.rotation.y, value.rotation.z, value.rotation.w).toEulerAngles()
   return {
     position: {
       x: value.position.x.toFixed(2),
@@ -16,9 +16,9 @@ export function fromTransform(value: TransformType): TransformInput {
       z: value.scale.z.toFixed(2)
     },
     rotation: {
-      x: formatAngle(angles.x),
-      y: formatAngle(angles.y),
-      z: formatAngle(angles.z)
+      x: formatAngle((angles.x * 180) / Math.PI),
+      y: formatAngle((angles.y * 180) / Math.PI),
+      z: formatAngle((angles.z * 180) / Math.PI)
     }
   }
 }
@@ -29,10 +29,10 @@ function formatAngle(angle: number) {
 }
 
 export function toTransform(inputs: TransformInput): TransformType {
-  const rotation = Quaternion.fromEulerDegrees(
-    Number(inputs.rotation.x),
-    Number(inputs.rotation.y),
-    Number(inputs.rotation.z)
+  const quaternion = Quaternion.RotationYawPitchRoll(
+    (Number(inputs.rotation.y) * Math.PI) / 180,
+    (Number(inputs.rotation.x) * Math.PI) / 180,
+    (Number(inputs.rotation.z) * Math.PI) / 180
   )
   return {
     position: {
@@ -45,6 +45,11 @@ export function toTransform(inputs: TransformInput): TransformType {
       y: Number(inputs.scale.y),
       z: Number(inputs.scale.z)
     },
-    rotation
+    rotation: {
+      x: quaternion.x,
+      y: quaternion.y,
+      z: quaternion.z,
+      w: quaternion.w
+    }
   }
 }
