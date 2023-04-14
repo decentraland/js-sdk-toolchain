@@ -1,18 +1,19 @@
-import { IArray } from './Array'
-import { Bool } from './basic/Boolean'
-import { IntEnum, StringEnum } from './basic/Enum'
-import { Float32, Float64 } from './basic/Float'
-import { Int16, Int32, Int64, Int8 } from './basic/Integer'
-import { EcsString } from './basic/String'
-import { Color3Schema } from './custom/Color3'
-import { Color4Schema } from './custom/Color4'
-import { EntitySchema } from './custom/Entity'
-import { QuaternionSchema } from './custom/Quaternion'
-import { Vector3Schema } from './custom/Vector3'
-import { ISchema, JsonSchemaExtended } from './ISchema'
-import { IMap } from './Map'
-import { IOneOf } from './OneOf'
-import { IOptional } from './Optional'
+import { IArray } from '../Array'
+import { Bool } from '../basic/Boolean'
+import { IntEnum, StringEnum } from '../basic/Enum'
+import { Float32, Float64 } from '../basic/Float'
+import { Int16, Int32, Int64, Int8 } from '../basic/Integer'
+import { EcsString } from '../basic/String'
+import { Color3Schema } from '../custom/Color3'
+import { Color4Schema } from '../custom/Color4'
+import { EntitySchema } from '../custom/Entity'
+import { QuaternionSchema } from '../custom/Quaternion'
+import { Vector3Schema } from '../custom/Vector3'
+import { ISchema, JsonSchemaExtended } from '../ISchema'
+import { IMap } from '../Map'
+import { IOneOf } from '../OneOf'
+import { IOptional } from '../Optional'
+import { getTypeAndValue, isCompoundType } from './utils'
 
 const primitiveSchemas = {
   [Bool.jsonSchema.serializationType]: Bool,
@@ -79,45 +80,6 @@ export function jsonSchemaToSchema(jsonSchema: JsonSchemaExtended): ISchema<any>
   }
 
   throw new Error(`${jsonSchema.serializationType} is not supported as reverse schema generation.`)
-}
-
-const isSchemaType = (value: JsonSchemaExtended, types: JsonSchemaExtended['serializationType'][]) =>
-  types.includes(value.serializationType)
-
-const isOneOfJsonSchema = (
-  type: JsonSchemaExtended
-): type is JsonSchemaExtended & { properties: Record<string, JsonSchemaExtended> } => isSchemaType(type, ['one-of'])
-
-type UnknownSchema = { type: JsonSchemaExtended; value: unknown }
-
-const getUnknownSchema = (): UnknownSchema => ({
-  type: { type: 'object', serializationType: 'unknown' },
-  value: undefined
-})
-
-const isCompoundType = (type: JsonSchemaExtended): boolean => isSchemaType(type, ['array', 'map'])
-
-const getTypeAndValue = (
-  properties: Record<string, JsonSchemaExtended>,
-  value: Record<string, unknown>,
-  key: string
-): UnknownSchema => {
-  const type = properties[key]
-  const valueKey = value[key]
-
-  if (isOneOfJsonSchema(type)) {
-    const typedMapValue = valueKey as ReturnType<ReturnType<typeof IOneOf>['deserialize']>
-    if (!typedMapValue.$case) return getUnknownSchema()
-
-    const propType = type.properties[typedMapValue.$case]
-
-    // transform { $case: string; value: unknown } => { [$case]: value }
-    if (isCompoundType(propType)) value[key] = { [typedMapValue.$case]: typedMapValue.value }
-
-    return { type: propType, value: typedMapValue.value }
-  }
-
-  return { type, value: valueKey }
 }
 
 export function mutateValues(

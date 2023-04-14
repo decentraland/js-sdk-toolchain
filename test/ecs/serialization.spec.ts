@@ -612,12 +612,10 @@ describe('test json-schema function', () => {
         manyPairOfEntities: Schemas.Array(Schemas.Array(Schemas.Entity))
       }),
       oneOrTheOther: Schemas.OneOf({ someEntity: Schemas.Entity, someBool: Schemas.Boolean }),
-
       oneOrTheOtherMap: Schemas.OneOf({
         first: Schemas.Map({ anEntity: Schemas.Entity }),
         second: Schemas.Map({ aNumber: Schemas.Number })
       }),
-
       oneOrOtherArray: Schemas.Array(Schemas.OneOf({ someEntity: Schemas.Entity, someBool: Schemas.Boolean }))
     }
 
