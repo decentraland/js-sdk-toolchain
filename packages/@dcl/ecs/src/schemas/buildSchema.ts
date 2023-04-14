@@ -81,20 +81,21 @@ export function jsonSchemaToSchema(jsonSchema: JsonSchemaExtended): ISchema<any>
   throw new Error(`${jsonSchema.serializationType} is not supported as reverse schema generation.`)
 }
 
+const isSchemaType = (value: JsonSchemaExtended, types: JsonSchemaExtended['serializationType'][]) =>
+  types.includes(value.serializationType)
+
 const isOneOfJsonSchema = (
   type: JsonSchemaExtended
-): type is JsonSchemaExtended & { properties: Record<string, JsonSchemaExtended> } =>
-  type.serializationType === 'one-of'
+): type is JsonSchemaExtended & { properties: Record<string, JsonSchemaExtended> } => isSchemaType(type, ['one-of'])
 
 type UnknownSchema = { type: JsonSchemaExtended; value: unknown }
 
-const getUnkownSchema = (): UnknownSchema => ({
+const getUnknownSchema = (): UnknownSchema => ({
   type: { type: 'object', serializationType: 'unknown' },
   value: undefined
 })
 
-const isCompoundType = (type: JsonSchemaExtended): boolean =>
-  type.serializationType === 'array' || type.serializationType === 'map'
+const isCompoundType = (type: JsonSchemaExtended): boolean => isSchemaType(type, ['array', 'map'])
 
 const getTypeAndValue = (
   properties: Record<string, JsonSchemaExtended>,
@@ -106,7 +107,7 @@ const getTypeAndValue = (
 
   if (isOneOfJsonSchema(type)) {
     const typedMapValue = valueKey as ReturnType<ReturnType<typeof IOneOf>['deserialize']>
-    if (!typedMapValue.$case) return getUnkownSchema()
+    if (!typedMapValue.$case) return getUnknownSchema()
 
     const propType = type.properties[typedMapValue.$case]
 
@@ -141,14 +142,16 @@ export function mutateValues(
       }
     }
   } else if (jsonSchema.serializationType === 'array') {
-    const withItemsJsonSchema = jsonSchema as JsonSchemaExtended & { items: JsonSchemaExtended }
+    const { items } = jsonSchema as JsonSchemaExtended & { items: JsonSchemaExtended }
     const arrayValue = value as unknown[]
 
     for (let i = 0, n = arrayValue.length; i < n; i++) {
-      if (isCompoundType(withItemsJsonSchema.items)) {
-        mutateValues(withItemsJsonSchema.items, arrayValue[i], mutateFn)
+      const { type, value } = getTypeAndValue({ items: items }, { items: arrayValue[i] }, 'items')
+      if (type.serializationType === 'unknown') continue
+      if (isCompoundType(type)) {
+        mutateValues(type, value, mutateFn)
       } else {
-        const newValue = mutateFn(arrayValue[i], withItemsJsonSchema.items)
+        const newValue = mutateFn(value, type)
         if (newValue.changed) {
           arrayValue[i] = newValue.value
         }

@@ -601,45 +601,48 @@ describe('test json-schema function', () => {
 
   it('should mutate each value', () => {
     const MySchemaDefinition = {
-      // someImportantEntity: Schemas.Entity,
-      // manyEntities: Schemas.Array(Schemas.Entity),
-      // valueWithoutChanges: Schemas.Int,
-      // manyPairOfEntities: Schemas.Array(Schemas.Array(Schemas.Entity)),
-      // nestedMap: Schemas.Map({
-      //   someImportantEntity: Schemas.Entity
-      // manyEntities: Schemas.Array(Schemas.Entity),
-      // valueWithoutChanges: Schemas.Int,
-      // manyPairOfEntities: Schemas.Array(Schemas.Array(Schemas.Entity))
-      // }),
+      someImportantEntity: Schemas.Entity,
+      manyEntities: Schemas.Array(Schemas.Entity),
+      valueWithoutChanges: Schemas.Int,
+      manyPairOfEntities: Schemas.Array(Schemas.Array(Schemas.Entity)),
+      nestedMap: Schemas.Map({
+        someImportantEntity: Schemas.Entity,
+        manyEntities: Schemas.Array(Schemas.Entity),
+        valueWithoutChanges: Schemas.Int,
+        manyPairOfEntities: Schemas.Array(Schemas.Array(Schemas.Entity))
+      }),
       oneOrTheOther: Schemas.OneOf({ someEntity: Schemas.Entity, someBool: Schemas.Boolean }),
 
       oneOrTheOtherMap: Schemas.OneOf({
         first: Schemas.Map({ anEntity: Schemas.Entity }),
         second: Schemas.Map({ aNumber: Schemas.Number })
-      })
+      }),
+
+      oneOrOtherArray: Schemas.Array(Schemas.OneOf({ someEntity: Schemas.Entity, someBool: Schemas.Boolean }))
     }
 
     const MySchema = Schemas.Map(MySchemaDefinition)
 
     const someValue = MySchema.create()
 
-    // someValue.someImportantEntity = 1 as Entity
-    // someValue.manyEntities = [2, 3, 4] as Entity[]
-    // someValue.manyPairOfEntities = [
-    //   [5, 6, 7, 8],
-    //   [9, 10, 11, 12]
-    // ] as Entity[][]
-    // someValue.valueWithoutChanges = 13
+    someValue.someImportantEntity = 1 as Entity
+    someValue.manyEntities = [2, 3, 4] as Entity[]
+    someValue.manyPairOfEntities = [
+      [5, 6, 7, 8],
+      [9, 10, 11, 12]
+    ] as Entity[][]
+    someValue.valueWithoutChanges = 13
 
-    // someValue.nestedMap.someImportantEntity = 14 as Entity
-    // someValue.nestedMap.manyEntities = [15, 16, 17] as Entity[]
-    // someValue.nestedMap.manyPairOfEntities = [
-    //   [18, 19, 20, 21],
-    //   [22, 23, 24, 25]
-    // ] as Entity[][]
-    // someValue.nestedMap.valueWithoutChanges = 26
+    someValue.nestedMap.someImportantEntity = 14 as Entity
+    someValue.nestedMap.manyEntities = [15, 16, 17] as Entity[]
+    someValue.nestedMap.manyPairOfEntities = [
+      [18, 19, 20, 21],
+      [22, 23, 24, 25]
+    ] as Entity[][]
+    someValue.nestedMap.valueWithoutChanges = 26
     someValue.oneOrTheOther = { $case: 'someEntity', value: 27 as Entity }
     someValue.oneOrTheOtherMap = { $case: 'first', value: { anEntity: 28 as Entity } }
+    someValue.oneOrOtherArray = [{ $case: 'someEntity', value: 29 as Entity }]
 
     mutateValues(MySchema.jsonSchema, someValue, (currentValue, valueType) => {
       if (valueType.serializationType === 'entity') {
@@ -649,24 +652,25 @@ describe('test json-schema function', () => {
     })
 
     expect(someValue).toStrictEqual({
-      // someImportantEntity: 1001 as Entity,
-      // manyEntities: [1002, 1003, 1004] as Entity[],
-      // manyPairOfEntities: [
-      //   [1005, 1006, 1007, 1008],
-      //   [1009, 1010, 1011, 1012]
-      // ] as Entity[][],
-      // valueWithoutChanges: 13,
-      // nestedMap: {
-      //   someImportantEntity: 1014 as Entity,
-      //   manyEntities: [1015, 1016, 1017] as Entity[],
-      //   manyPairOfEntities: [
-      //     [1018, 1019, 1020, 1021],
-      //     [1022, 1023, 1024, 1025]
-      //   ] as Entity[][],
-      //   valueWithoutChanges: 26
-      // },
+      someImportantEntity: 1001 as Entity,
+      manyEntities: [1002, 1003, 1004] as Entity[],
+      manyPairOfEntities: [
+        [1005, 1006, 1007, 1008],
+        [1009, 1010, 1011, 1012]
+      ] as Entity[][],
+      valueWithoutChanges: 13,
+      nestedMap: {
+        someImportantEntity: 1014 as Entity,
+        manyEntities: [1015, 1016, 1017] as Entity[],
+        manyPairOfEntities: [
+          [1018, 1019, 1020, 1021],
+          [1022, 1023, 1024, 1025]
+        ] as Entity[][],
+        valueWithoutChanges: 26
+      },
       oneOrTheOther: 1027 as Entity,
-      oneOrTheOtherMap: { first: { anEntity: 1028 as Entity } }
+      oneOrTheOtherMap: { first: { anEntity: 1028 as Entity } },
+      oneOrOtherArray: [1029]
     })
   })
 })
