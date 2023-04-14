@@ -11,18 +11,24 @@ type OneOfType<T extends Spec> = {
 }[keyof T]
 
 export const IOneOf = <T extends Spec>(specs: T): ISchema<OneOfType<T>> => {
-  const specReflection = Object.keys(specs).reduce((specReflection, currentKey) => {
+  const specKeys = Object.keys(specs)
+  const keyToIndex = specKeys.reduce((dict: Record<string, number>, key, index) => {
+    dict[key] = index
+    return dict
+  }, {})
+  const specReflection = specKeys.reduce((specReflection, currentKey) => {
     specReflection[currentKey] = specs[currentKey].jsonSchema
     return specReflection
   }, {} as Record<string, any>)
 
   return {
     serialize({ $case, value }: DeepReadonly<OneOfType<T>>, builder: ByteBuffer): void {
-      builder.writeUtf8String($case.toString())
+      const _value = keyToIndex[$case.toString()] + 1
+      builder.writeUint8(_value)
       ;(specs as any)[$case].serialize(value, builder)
     },
     deserialize(reader: ByteBuffer) {
-      const $case = reader.readUtf8String()
+      const $case = specKeys[reader.readInt8() - 1]
       const value = specs[$case].deserialize(reader)
       return { $case, value }
     },
