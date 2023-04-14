@@ -1238,7 +1238,7 @@ export type JsonPrimitive = string | number | boolean | null;
 // @public
 export type JsonSchemaExtended = {
     type: 'object' | 'number' | 'integer' | 'string' | 'array' | 'boolean';
-    serializationType: 'boolean' | 'enum-int' | 'enum-string' | 'int8' | 'int16' | 'int32' | 'int64' | 'float32' | 'float64' | 'vector3' | 'color3' | 'quaternion' | 'color4' | 'map' | 'optional' | 'entity' | 'array' | 'utf8-string' | 'protocol-buffer' | 'transform' | 'unknown';
+    serializationType: 'boolean' | 'enum-int' | 'enum-string' | 'int8' | 'int16' | 'int32' | 'int64' | 'float32' | 'float64' | 'vector3' | 'color3' | 'quaternion' | 'color4' | 'map' | 'optional' | 'entity' | 'array' | 'utf8-string' | 'protocol-buffer' | 'transform' | 'one-of' | 'unknown';
 } & JsonMap;
 
 // Warning: (tsdoc-undefined-tag) The TSDoc tag "@hidden" is not defined in this configuration
@@ -2606,6 +2606,11 @@ export namespace Schemas {
     Map: <T extends Spec>(spec: T, defaultValue?: Partial<MapResult<T>> | undefined) => ISchema<MapResult<T>>;
     const // (undocumented)
     Optional: <T>(spec: ISchema<T>) => ISchema<T | undefined>;
+    const // (undocumented)
+    OneOf: <T extends Spec>(specs: T) => ISchema<{ [K in keyof T]: {
+            readonly $case: K;
+            readonly value: ReturnType<T[K]["deserialize"]>;
+        }; }[keyof T]>;
     const // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     fromJson: (json: JsonSchemaExtended) => ISchema<unknown>;
     const mutateNestedValues: (jsonSchema: JsonSchemaExtended, value: unknown, mutateFn: (value: unknown, valueType: JsonSchemaExtended) => {
