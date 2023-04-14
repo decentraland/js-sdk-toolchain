@@ -109,7 +109,6 @@ export function mutateValues(
 
     for (let i = 0, n = arrayValue.length; i < n; i++) {
       const { type, value } = getTypeAndValue({ items: items }, { items: arrayValue[i] }, 'items')
-      if (type.serializationType === 'unknown') continue
       if (isCompoundType(type)) {
         mutateValues(type, value, mutateFn)
       } else {

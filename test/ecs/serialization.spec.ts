@@ -109,7 +109,8 @@ describe('test schema serialization', () => {
       hp: Schemas.Float,
       position: Vector3,
       targets: Schemas.Array(Vector3),
-      items: Schemas.Array(ItemType)
+      items: Schemas.Array(ItemType),
+      pet: Schemas.OneOf({ cat: Schemas.Entity, dog: Schemas.Entity })
     })
 
     const defaultPlayer = {
@@ -119,7 +120,8 @@ describe('test schema serialization', () => {
       hp: 0.0,
       position: { x: 1.0, y: 50.0, z: 50.0 },
       targets: [],
-      items: []
+      items: [],
+      pet: { $case: 'dog' as const, value: 3146 as Entity }
     }
 
     const myPlayer = PlayerComponent.create(myEntity, defaultPlayer)
@@ -143,6 +145,7 @@ describe('test schema serialization', () => {
       itemAmount: 10,
       description: 'this is a description to an enchanting item.'
     })
+    myPlayer.pet = { $case: 'cat', value: 2019 as Entity }
 
     const buffer = new ReadWriteByteBuffer()
     PlayerComponent.schema.serialize(PlayerComponent.get(myEntity), buffer)
