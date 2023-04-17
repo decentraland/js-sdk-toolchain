@@ -31,5 +31,5 @@ export function ProjectAssetExplorer() {
 
   const folders = selectedFolder.children.filter((item) => item.type === 'folder') as AssetNodeFolder[]
 
-return <ProjectView folders={folders} />
+  return <ProjectView folders={folders} />
 }
