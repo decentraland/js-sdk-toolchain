@@ -4,6 +4,7 @@ import { useDrag } from 'react-dnd'
 
 import { Tree } from '../Tree'
 import { AssetNode, AssetNodeFolder } from './types'
+import { AiFillFolder } from 'react-icons/ai'
 
 function noop() {}
 // eslint-disable-next-line prettier/prettier
@@ -91,7 +92,7 @@ function NodeLabel({ value }: { value: TreeNode }) {
 
 function NodeIcon({ value, isOpen }: { value: TreeNode, isOpen: boolean }) {
   if (value.type === 'folder') {
-    return isOpen ? <IoIosArrowDown /> : <IoIosArrowForward />
+    return isOpen ? <><IoIosArrowDown /><AiFillFolder/></> : <><IoIosArrowForward /><AiFillFolder/></>
   }
   return <IoIosImage />
 }
