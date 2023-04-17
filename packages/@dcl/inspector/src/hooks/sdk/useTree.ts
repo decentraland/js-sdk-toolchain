@@ -84,7 +84,6 @@ export const useTree = () => {
 
   const setParent = useCallback(
     (entity: Entity, parent: Entity) => {
-      console.log('setParent', entity, parent)
       if (entity === ROOT || !sdk) return
       const { EntityNode, Transform, Toggle } = sdk.components
 

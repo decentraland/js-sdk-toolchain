@@ -8,9 +8,6 @@
 
 .editor .item > span:first-child {
   position: relative;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  padding-left: 15px;
 }
 /* .editor .item > span:first-child::before {
   position: absolute;
