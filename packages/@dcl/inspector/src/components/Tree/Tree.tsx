@@ -143,7 +143,7 @@ function Tree<T>(_props: Props<T>) {
           <ContextMenu {...controlsProps} />
           <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
             {props.getIcon ? props.getIcon(value) : open ? <ArrowDown /> : <ArrowRight />}
-            {label ? <span>{label || id}</span> : <label />}
+            <span>{label || id}</span>
           </span>
           {editMode && typeof label === 'string' && <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
         </div>
