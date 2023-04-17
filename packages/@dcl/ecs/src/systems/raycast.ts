@@ -13,9 +13,6 @@ export type RaycastEventsSystemCallback = (event: DeepReadonlyObject<PBRaycastRe
  * @public
  */
 export type RaycastEventsSystemOptions = {
-  timestamp?:
-    | number
-    | undefined;
   originOffset?: Vector3 | undefined;
 
   // @internal
@@ -116,7 +113,6 @@ export function createRaycastEventsSystem(engine: IEngine): RaycastEventsSystem 
   const defaultOptions: RaycastEventsSystemOptions = {
     maxDistance: 16,
     queryType: RaycastQueryType.RQT_HIT_FIRST,
-    timestamp: 0,
     continuous: false,
     originOffset: { x: 0, y:0, z:0 },
     collisionMask: ColliderLayer.CL_PHYSICS
@@ -158,7 +154,6 @@ export function createRaycastEventsSystem(engine: IEngine): RaycastEventsSystem 
     const raycast = raycastComponent.getOrCreateMutable(entity)
     Object.assign(raycast, {
       maxDistance: options.maxDistance,
-      timestamp: options.timestamp,
       originOffset: options.originOffset,
       collisionMask: options.collisionMask,
       direction: options.directionRawValue,

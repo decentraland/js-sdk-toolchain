@@ -2508,7 +2508,6 @@ export type RaycastEventsSystemCallback = (event: DeepReadonlyObject<PBRaycastRe
 
 // @public (undocumented)
 export type RaycastEventsSystemOptions = {
-    timestamp?: number | undefined;
     originOffset?: PBVector3 | undefined;
     maxDistance: number;
     queryType: RaycastQueryType;
