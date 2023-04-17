@@ -31,7 +31,7 @@ type Props<T> = {
 }
 
 const getDefaultLevel = () => 1
-const getLevelStyles = (level: number) => ({ paddingLeft: `${level * 10}px` })
+const getLevelStyles = (level: number) => ({ paddingLeft: `${(level - 1) * 10}px` })
 const getExpandStyles = (active: boolean) => ({ height: active ? 'auto' : '0', overflow: 'hidden', display: 'block' })
 const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : '' })
 

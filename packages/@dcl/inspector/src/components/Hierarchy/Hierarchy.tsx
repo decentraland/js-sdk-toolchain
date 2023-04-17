@@ -8,7 +8,6 @@ import { Tree } from '../Tree'
 import { ContextMenu } from './ContextMenu'
 import { Container } from '../Container'
 import { Entity } from '@dcl/ecs'
-import { Block } from '../Block'
 
 const Hierarchy: React.FC = () => {
   const {
@@ -28,7 +27,7 @@ const Hierarchy: React.FC = () => {
   } = useTree()
 
   return (
-    <Container label="Entity Inspector">
+    <Container label="">
       <Tree
         value={ROOT}
         getExtraContextMenu={ContextMenu}
@@ -42,8 +41,11 @@ const Hierarchy: React.FC = () => {
         getLabel={getLabel}
         getIcon={(val: Entity) => {
           const hasChildrens = !!getChildren(val).length
-          if (!hasChildrens || val === ROOT) {
-            return <FiHexagon />
+          if (val === ROOT) {
+            return <span style={{ marginRight: '14px' }} />
+          }
+          if (!hasChildrens) {
+            return <><span style={{ marginLeft: '14px' }} /><FiHexagon /></>
           }
           const ArrowComponent = isOpen(val) ? <IoIosArrowDown /> : <IoIosArrowForward/>
           return <>{ArrowComponent}<FiHexagon /></>
