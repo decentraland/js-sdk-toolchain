@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useSdk } from '../sdk/useSdk'
 import { AssetCatalogResponse } from '../../tooling-entrypoint'
 
+/* istanbul ignore next */
 export const useFileSystem = () => {
   const [files, setFiles] = useState<AssetCatalogResponse>({ basePath: '', assets: [] })
 

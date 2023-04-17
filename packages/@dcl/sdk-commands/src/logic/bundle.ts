@@ -124,6 +124,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
     await context.dispose()
   }
 
+  /* istanbul ignore next */
   if (options.watch) printProgressInfo(components.logger, `The compiler is watching for changes`)
 
   await runTypeChecker(components, options)

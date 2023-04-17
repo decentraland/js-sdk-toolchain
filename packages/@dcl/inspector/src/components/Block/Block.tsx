@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useDrop } from 'react-dnd'
 
 import { Props } from './types'
@@ -9,18 +9,27 @@ const Block: React.FC<React.PropsWithChildren<Props>> = ({
   acceptDropTypes = [],
   label,
   children,
-  onDrop,
+  onDrop  = () => null,
+  onDropHover = () => null
 }) => {
-  const [, drop] = onDrop ? useDrop(
+  const [{ isActive }, drop] = useDrop(
     () => ({
       accept: acceptDropTypes,
       drop: (val, monitor) => {
         if (monitor.didDrop()) return
         onDrop(val)
-      }
+      },
+      collect: (monitor) => ({
+        isActive: monitor.canDrop() && monitor.isOver(),
+      })
     }),
     [label, children]
-  ) : [null, null]
+  )
+
+  useEffect(() => {
+    onDropHover(isActive)
+    return () => onDropHover(false)
+  }, [isActive])
 
   return (
     <div ref={drop} className="Block">

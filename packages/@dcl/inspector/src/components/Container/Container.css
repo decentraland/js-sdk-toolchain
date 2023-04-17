@@ -7,6 +7,10 @@
   margin: 12px;
 }
 
+.Container.hover {
+  background-color: var(--list-item-hover-bg-color);
+}
+
 .Container .title {
   display: flex;
   flex-direction: row;
