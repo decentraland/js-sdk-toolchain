@@ -7,7 +7,7 @@ import { Engine, IEngine } from '../../engine'
 import { Task, createTaskSystem } from '../../systems/async-task'
 import { createPointerEventsSystem, PointerEventsSystem } from '../../systems/events'
 import { createInputSystem, IInputSystem } from './../../engine/input'
-import { createRaycastEventsSystem, RaycastEventsSystem } from "../../systems/raycast";
+import { createRaycastEventsSystem, RaycastEventsSystem } from '../../systems/raycast'
 
 /**
  * @public
