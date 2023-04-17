@@ -873,12 +873,36 @@ export type GizmoSelectedEvent = {
     entities: string[];
 };
 
+// Warning: (ae-missing-release-tag) "GlobalDirectionRaycastEventsSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type GlobalDirectionRaycastEventsSystemOptions = {
+    direction?: PBVector3;
+};
+
+// Warning: (ae-missing-release-tag) "GlobalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type GlobalDirectionRaycastOptions = RaycastEventsSystemOptions & GlobalDirectionRaycastEventsSystemOptions;
+
 // Warning: (ae-missing-release-tag) "GlobalInputEventResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export type GlobalInputEventResult = InputEventResult & {
     type: 0 | 1;
 };
+
+// Warning: (ae-missing-release-tag) "GlobalTargetRaycastEventsSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type GlobalTargetRaycastEventsSystemOptions = {
+    target?: PBVector3;
+};
+
+// Warning: (ae-missing-release-tag) "GlobalTargetRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type GlobalTargetRaycastOptions = RaycastEventsSystemOptions & GlobalTargetRaycastEventsSystemOptions;
 
 // @public (undocumented)
 export const GltfContainer: LastWriteWinElementSetComponentDefinition<PBGltfContainer>;
@@ -1293,6 +1317,18 @@ export type Listeners = {
     onMouseDown?: Callback;
     onMouseUp?: Callback;
 };
+
+// Warning: (ae-missing-release-tag) "LocalDirectionRaycastEventsSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type LocalDirectionRaycastEventsSystemOptions = {
+    direction?: PBVector3;
+};
+
+// Warning: (ae-missing-release-tag) "LocalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type LocalDirectionRaycastOptions = RaycastEventsSystemOptions & LocalDirectionRaycastEventsSystemOptions;
 
 // Warning: (ae-missing-release-tag) "LwwComponentGetter" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2457,7 +2493,10 @@ export const Raycast: LastWriteWinElementSetComponentDefinition<PBRaycast>;
 
 // @public (undocumented)
 export interface RaycastEventsSystem {
-    registerRaycasterEntity(entity: Entity, callback: RaycastEventsSystemCallback, options?: Partial<RaycastEventsSystemOptions>): void;
+    registerGlobalDirectionRaycast(entity: Entity, callback: RaycastEventsSystemCallback, options?: Partial<GlobalDirectionRaycastOptions>): void;
+    registerGlobalTargetRaycast(entity: Entity, callback: RaycastEventsSystemCallback, options?: Partial<GlobalTargetRaycastOptions>): void;
+    registerLocalDirectionRaycast(entity: Entity, callback: RaycastEventsSystemCallback, options?: Partial<LocalDirectionRaycastOptions>): void;
+    registerTargetEntityRaycast(entity: Entity, callback: RaycastEventsSystemCallback, options?: Partial<TargetEntityRaycastOptions>): void;
     removeRaycasterEntity(entity: Entity): void;
 }
 
@@ -2471,19 +2510,6 @@ export type RaycastEventsSystemCallback = (event: DeepReadonlyObject<PBRaycastRe
 export type RaycastEventsSystemOptions = {
     timestamp?: number | undefined;
     originOffset?: PBVector3 | undefined;
-    direction?: {
-        $case: "localDirection";
-        localDirection: PBVector3;
-    } | {
-        $case: "globalDirection";
-        globalDirection: PBVector3;
-    } | {
-        $case: "globalTarget";
-        globalTarget: PBVector3;
-    } | {
-        $case: "targetEntity";
-        targetEntity: number;
-    };
     maxDistance: number;
     queryType: RaycastQueryType;
     continuous?: boolean | undefined;
@@ -2666,6 +2692,18 @@ export type SystemItem = {
     priority: number;
     name?: string;
 };
+
+// Warning: (ae-missing-release-tag) "TargetEntityRaycastEventsSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type TargetEntityRaycastEventsSystemOptions = {
+    targetEntity?: number;
+};
+
+// Warning: (ae-missing-release-tag) "TargetEntityRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type TargetEntityRaycastOptions = RaycastEventsSystemOptions & TargetEntityRaycastEventsSystemOptions;
 
 // Warning: (ae-missing-release-tag) "Task" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
