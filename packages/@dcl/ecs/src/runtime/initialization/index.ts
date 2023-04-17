@@ -7,7 +7,7 @@ import { Engine, IEngine } from '../../engine'
 import { Task, createTaskSystem } from '../../systems/async-task'
 import { createPointerEventsSystem, PointerEventsSystem } from '../../systems/events'
 import { createInputSystem, IInputSystem } from './../../engine/input'
-import { createRaycastEventsSystem, RaycastEventsSystem } from '../../systems/raycast'
+import { createRaycastHelperSystem, RaycastHelperSystem } from '../../systems/raycast'
 
 /**
  * @public
@@ -45,8 +45,8 @@ export { PointerEventsSystem }
  * @public
  * Register callback functions to a particular entity on raycast events.
  */
-export const raycastEventsSystem: RaycastEventsSystem = /* @__PURE__ */ createRaycastEventsSystem(engine)
-export { RaycastEventsSystem }
+export const raycastEventsSystem: RaycastHelperSystem = /* @__PURE__ */ createRaycastHelperSystem(engine)
+export { RaycastHelperSystem }
 
 /**
  * @public
