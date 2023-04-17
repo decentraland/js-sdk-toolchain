@@ -28,6 +28,8 @@ type Props<T> = {
   onAddChild: (value: T, label: string) => void
   onRemove: (value: T) => void
   onToggle: (value: T, isOpen: boolean) => void
+  getDragValue?: (value: T) => unknown
+  dndType?: string
 }
 
 const getDefaultLevel = () => 1
@@ -57,6 +59,8 @@ function Tree<T>(_props: Props<T>) {
       onAddChild,
       onRemove,
       onToggle,
+      getDragValue = (val) => val,
+      dndType = 'tree'
     } = props
     const id = getId(value)
     const label = getLabel(value)
@@ -78,11 +82,11 @@ function Tree<T>(_props: Props<T>) {
       [getId, getChildren]
     )
 
-    const [, drag] = useDrag(() => ({ type: 'tree', item: { value } }), [value])
+    const [, drag] = useDrag(() => ({ type: dndType, item: { value: getDragValue(value) } }), [value])
 
     const [, drop] = useDrop(
       () => ({
-        accept: 'tree',
+        accept: dndType,
         drop: ({ value: other }: { value: T }, monitor) => {
           if (monitor.didDrop() || !canDrop(other, value)) return
           onSetParent(other, value)
