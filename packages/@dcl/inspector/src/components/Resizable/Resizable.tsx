@@ -3,6 +3,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import './Resizable.css'
 import { PropTypes } from './types'
 
+// TODO: Only width/horizontal resize options for the moment
 function Resizable(props: React.PropsWithChildren<PropTypes>) {
   const ref = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState<[number | null, number | null]>([props.initialWidth ?? null, null])

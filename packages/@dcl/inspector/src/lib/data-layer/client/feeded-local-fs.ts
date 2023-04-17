@@ -206,7 +206,8 @@ export const mainComposite = {
 }
 
 const builderMappings: Record<string, string> = {
-  'assets/models/test-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB'
+  'assets/models/test-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
+  'assets/models2/test2-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB'
 }
 
 export async function feededFileSystem(mappings: Record<string, string> = builderMappings) {

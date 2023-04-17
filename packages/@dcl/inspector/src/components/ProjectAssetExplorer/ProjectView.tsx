@@ -32,7 +32,6 @@ function ProjectView({ folders }: Props) {
       for (const children of node.children) {
         if (children.type === 'folder') {
           generateTree(children)
-          return
         } else {
           tree.set(children.name, children)
         }
@@ -57,7 +56,6 @@ function ProjectView({ folders }: Props) {
   }, [open, setOpen])
 
   if (!folders.length) return null
-
   return (
     <MyTree
       className="editor-assets-tree"
@@ -69,18 +67,19 @@ function ProjectView({ folders }: Props) {
       onToggle={canToggle}
       getId={(value: string) => value.toString()}
       getChildren={(name: string) => [...tree.get(name)?.children || []]}
-      getLabel={(val: string) => <NodeLabel value={tree.get(val)!} />}
+      getLabel={(val: string) =><NodeLabel value={tree.get(val)} />}
       isOpen={(val: string) => open.has(val)}
       isSelected={(val: string) => open.has(val)}
       canRename={() => false}
       canRemove={() => false}
       canToggle={() => true}
-      getIcon={(val) => <NodeIcon value={tree.get(val)!} isOpen={open.has(val)} />}
+      getIcon={(val) => <NodeIcon value={tree.get(val)} isOpen={open.has(val)} />}
     />
   )
 }
 
-function NodeLabel({ value }: { value: TreeNode }) {
+function NodeLabel({ value }: { value?: TreeNode }) {
+  if (!value) return null
   if (value.type === 'asset') {
     const [, drag] = useDrag(() => ({ type: 'project-asset-gltf', item: { asset: value } }), [value])
     return <span ref={drag}>{value.name}</span>
@@ -90,7 +89,8 @@ function NodeLabel({ value }: { value: TreeNode }) {
 
 }
 
-function NodeIcon({ value, isOpen }: { value: TreeNode, isOpen: boolean }) {
+function NodeIcon({ value, isOpen }: { value?: TreeNode, isOpen: boolean }) {
+  if (!value) return null
   if (value.type === 'folder') {
     return isOpen ? <><IoIosArrowDown /><AiFillFolder/></> : <><IoIosArrowForward /><AiFillFolder/></>
   }

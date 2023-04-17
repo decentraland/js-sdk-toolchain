@@ -1,5 +1,4 @@
 .Tree {
-  font-family: "Segoe UI", Arial, sans-serif;
   font-size: 14px;
   background-color: var(--tree-bg-color);
   color: var(--white);
@@ -9,10 +8,6 @@
 .Tree {
   margin: 0;
   padding: 0;
-}
-
-.Tree {
-  border-top: 1px solid var(--tree-border-color);
 }
 
 .Tree > div:first-child {
@@ -29,36 +24,17 @@
   background-color: var(--tree-border-color);
 }
 
-.Tree > div:first-child:hover span,
-.Tree.selected > div:first-child span {
-  text-decoration: underline;
-  width: 100%;
-}
-
 .Tree > div:first-child > span {
-  overflow: hidden;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.Tree > div:first-child span {
+  /* overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.Tree > div:first-child > span svg {
-  margin-right: 3px;
-  margin-bottom: -2px;
-}
-
-.Tree > div:first-child > span span {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.Tree .arrow {
-  margin-right: 5px;
-}
-
-.Tree > div:first-child > span,
-.Tree input {
-  margin-right: 10px;
+  text-overflow: ellipsis; */
 }
 
 .Tree input {
@@ -67,4 +43,8 @@
   outline: var(--input-border-color);
   border-radius: 3px;
   width: 100%;
+}
+
+.Tree > .item > span > svg {
+  margin-right: 4px;
 }
