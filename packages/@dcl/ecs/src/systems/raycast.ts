@@ -174,14 +174,12 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
 
   function registerRaycast(entity: Entity, callback: RaycastSystemCallback, options: RaycastSystemOptions) {
     const raycast = raycastComponent.getOrCreateMutable(entity)
-    Object.assign(raycast, {
-      maxDistance: options.maxDistance,
-      originOffset: options.originOffset,
-      collisionMask: options.collisionMask,
-      direction: options.directionRawValue,
-      continuous: options.continuous,
-      queryType: options.queryType
-    })
+    raycast.maxDistance = options.maxDistance
+    raycast.originOffset = options.originOffset
+    raycast.collisionMask = options.collisionMask
+    raycast.direction = options.directionRawValue
+    raycast.continuous = options.continuous
+    raycast.queryType = options.queryType
 
     entitiesCallbackResultMap.set(entity, { callback: callback })
   }
