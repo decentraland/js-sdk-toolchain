@@ -7,12 +7,12 @@ import { EntityState } from '../engine/entity'
 /**
  * @public
  */
-export type RaycastHelperSystemCallback = (event: DeepReadonlyObject<PBRaycastResult>) => void
+export type RaycastSystemCallback = (event: DeepReadonlyObject<PBRaycastResult>) => void
 
 /**
  * @public
  */
-export type RaycastHelperSystemOptions = {
+export type RaycastSystemOptions = {
   originOffset?: Vector3 | undefined
 
   // @internal
@@ -28,30 +28,30 @@ export type RaycastHelperSystemOptions = {
   collisionMask?: number | undefined
 }
 
-export type LocalDirectionRaycastHelperSystemOptions = {
+export type LocalDirectionRaycastSystemOptions = {
   direction?: Vector3
 }
-export type LocalDirectionRaycastOptions = RaycastHelperSystemOptions & LocalDirectionRaycastHelperSystemOptions
+export type LocalDirectionRaycastOptions = RaycastSystemOptions & LocalDirectionRaycastSystemOptions
 
-export type GlobalDirectionRaycastHelperSystemOptions = {
+export type GlobalDirectionRaycastSystemOptions = {
   direction?: Vector3
 }
-export type GlobalDirectionRaycastOptions = RaycastHelperSystemOptions & GlobalDirectionRaycastHelperSystemOptions
+export type GlobalDirectionRaycastOptions = RaycastSystemOptions & GlobalDirectionRaycastSystemOptions
 
-export type GlobalTargetRaycastHelperSystemOptions = {
+export type GlobalTargetRaycastSystemOptions = {
   target?: Vector3
 }
-export type GlobalTargetRaycastOptions = RaycastHelperSystemOptions & GlobalTargetRaycastHelperSystemOptions
+export type GlobalTargetRaycastOptions = RaycastSystemOptions & GlobalTargetRaycastSystemOptions
 
-export type TargetEntityRaycastHelperSystemOptions = {
+export type TargetEntityRaycastSystemOptions = {
   targetEntity?: number
 }
-export type TargetEntityRaycastOptions = RaycastHelperSystemOptions & TargetEntityRaycastHelperSystemOptions
+export type TargetEntityRaycastOptions = RaycastSystemOptions & TargetEntityRaycastSystemOptions
 
 /**
  * @public
  */
-export interface RaycastHelperSystem {
+export interface RaycastSystem {
   /**
    * @public
    * Remove the callback for raycast event
@@ -69,7 +69,7 @@ export interface RaycastHelperSystem {
    */
   registerLocalDirectionRaycast(
     entity: Entity,
-    callback: RaycastHelperSystemCallback,
+    callback: RaycastSystemCallback,
     options?: Partial<LocalDirectionRaycastOptions>
   ): void
 
@@ -83,7 +83,7 @@ export interface RaycastHelperSystem {
    */
   registerGlobalDirectionRaycast(
     entity: Entity,
-    callback: RaycastHelperSystemCallback,
+    callback: RaycastSystemCallback,
     options?: Partial<GlobalDirectionRaycastOptions>
   ): void
 
@@ -97,7 +97,7 @@ export interface RaycastHelperSystem {
    */
   registerGlobalTargetRaycast(
     entity: Entity,
-    callback: RaycastHelperSystemCallback,
+    callback: RaycastSystemCallback,
     options?: Partial<GlobalTargetRaycastOptions>
   ): void
 
@@ -111,7 +111,7 @@ export interface RaycastHelperSystem {
    */
   registerTargetEntityRaycast(
     entity: Entity,
-    callback: RaycastHelperSystemCallback,
+    callback: RaycastSystemCallback,
     options?: Partial<TargetEntityRaycastOptions>
   ): void
 }
@@ -119,12 +119,12 @@ export interface RaycastHelperSystem {
 /**
  * @internal
  */
-export function createRaycastHelperSystem(engine: IEngine): RaycastHelperSystem {
+export function createRaycastSystem(engine: IEngine): RaycastSystem {
   const raycastComponent = components.Raycast(engine)
   const raycastResultComponent = components.RaycastResult(engine)
-  const entitiesCallbackResultMap = new Map<Entity, { callback: RaycastHelperSystemCallback }>()
+  const entitiesCallbackResultMap = new Map<Entity, { callback: RaycastSystemCallback }>()
 
-  const defaultOptions: RaycastHelperSystemOptions = {
+  const defaultOptions: RaycastSystemOptions = {
     maxDistance: 16,
     queryType: RaycastQueryType.RQT_HIT_FIRST,
     continuous: false,
@@ -133,7 +133,7 @@ export function createRaycastHelperSystem(engine: IEngine): RaycastHelperSystem 
   }
   const getLocalDirectionRaycastDefaultOptions = (
     options: Partial<LocalDirectionRaycastOptions> = {}
-  ): RaycastHelperSystemOptions => ({
+  ): RaycastSystemOptions => ({
     ...defaultOptions,
     directionRawValue: {
       $case: 'localDirection',
@@ -143,7 +143,7 @@ export function createRaycastHelperSystem(engine: IEngine): RaycastHelperSystem 
   })
   const getGlobalDirectionRaycastDefaultOptions = (
     options: Partial<GlobalDirectionRaycastOptions> = {}
-  ): RaycastHelperSystemOptions => ({
+  ): RaycastSystemOptions => ({
     ...defaultOptions,
     directionRawValue: {
       $case: 'globalDirection',
@@ -153,7 +153,7 @@ export function createRaycastHelperSystem(engine: IEngine): RaycastHelperSystem 
   })
   const getGlobalTargetRaycastDefaultOptions = (
     options: Partial<GlobalTargetRaycastOptions> = {}
-  ): RaycastHelperSystemOptions => ({
+  ): RaycastSystemOptions => ({
     ...defaultOptions,
     directionRawValue: {
       $case: 'globalTarget',
@@ -163,7 +163,7 @@ export function createRaycastHelperSystem(engine: IEngine): RaycastHelperSystem 
   })
   const getTargetEntityRaycastDefaultOptions = (
     options: Partial<TargetEntityRaycastOptions> = {}
-  ): RaycastHelperSystemOptions => ({
+  ): RaycastSystemOptions => ({
     ...defaultOptions,
     directionRawValue: {
       $case: 'targetEntity',
@@ -172,7 +172,7 @@ export function createRaycastHelperSystem(engine: IEngine): RaycastHelperSystem 
     ...options
   })
 
-  function registerRaycast(entity: Entity, callback: RaycastHelperSystemCallback, options: RaycastHelperSystemOptions) {
+  function registerRaycast(entity: Entity, callback: RaycastSystemCallback, options: RaycastSystemOptions) {
     const raycast = raycastComponent.getOrCreateMutable(entity)
     Object.assign(raycast, {
       maxDistance: options.maxDistance,
@@ -216,28 +216,28 @@ export function createRaycastHelperSystem(engine: IEngine): RaycastHelperSystem 
     },
     registerLocalDirectionRaycast(
       entity: Entity,
-      callback: RaycastHelperSystemCallback,
+      callback: RaycastSystemCallback,
       opts?: Partial<LocalDirectionRaycastOptions>
     ) {
       registerRaycast(entity, callback, getLocalDirectionRaycastDefaultOptions(opts))
     },
     registerGlobalDirectionRaycast(
       entity: Entity,
-      callback: RaycastHelperSystemCallback,
+      callback: RaycastSystemCallback,
       opts?: Partial<GlobalDirectionRaycastOptions>
     ) {
       registerRaycast(entity, callback, getGlobalDirectionRaycastDefaultOptions(opts))
     },
     registerGlobalTargetRaycast(
       entity: Entity,
-      callback: RaycastHelperSystemCallback,
+      callback: RaycastSystemCallback,
       opts?: Partial<GlobalTargetRaycastOptions>
     ) {
       registerRaycast(entity, callback, getGlobalTargetRaycastDefaultOptions(opts))
     },
     registerTargetEntityRaycast(
       entity: Entity,
-      callback: RaycastHelperSystemCallback,
+      callback: RaycastSystemCallback,
       opts?: Partial<TargetEntityRaycastOptions>
     ) {
       registerRaycast(entity, callback, getTargetEntityRaycastDefaultOptions(opts))

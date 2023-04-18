@@ -873,17 +873,17 @@ export type GizmoSelectedEvent = {
     entities: string[];
 };
 
-// Warning: (ae-missing-release-tag) "GlobalDirectionRaycastHelperSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type GlobalDirectionRaycastHelperSystemOptions = {
-    direction?: PBVector3;
-};
-
 // Warning: (ae-missing-release-tag) "GlobalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type GlobalDirectionRaycastOptions = RaycastHelperSystemOptions & GlobalDirectionRaycastHelperSystemOptions;
+export type GlobalDirectionRaycastOptions = RaycastSystemOptions & GlobalDirectionRaycastSystemOptions;
+
+// Warning: (ae-missing-release-tag) "GlobalDirectionRaycastSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type GlobalDirectionRaycastSystemOptions = {
+    direction?: PBVector3;
+};
 
 // Warning: (ae-missing-release-tag) "GlobalInputEventResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -892,17 +892,17 @@ export type GlobalInputEventResult = InputEventResult & {
     type: 0 | 1;
 };
 
-// Warning: (ae-missing-release-tag) "GlobalTargetRaycastHelperSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type GlobalTargetRaycastHelperSystemOptions = {
-    target?: PBVector3;
-};
-
 // Warning: (ae-missing-release-tag) "GlobalTargetRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type GlobalTargetRaycastOptions = RaycastHelperSystemOptions & GlobalTargetRaycastHelperSystemOptions;
+export type GlobalTargetRaycastOptions = RaycastSystemOptions & GlobalTargetRaycastSystemOptions;
+
+// Warning: (ae-missing-release-tag) "GlobalTargetRaycastSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type GlobalTargetRaycastSystemOptions = {
+    target?: PBVector3;
+};
 
 // @public (undocumented)
 export const GltfContainer: LastWriteWinElementSetComponentDefinition<PBGltfContainer>;
@@ -1318,17 +1318,17 @@ export type Listeners = {
     onMouseUp?: Callback;
 };
 
-// Warning: (ae-missing-release-tag) "LocalDirectionRaycastHelperSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type LocalDirectionRaycastHelperSystemOptions = {
-    direction?: PBVector3;
-};
-
 // Warning: (ae-missing-release-tag) "LocalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type LocalDirectionRaycastOptions = RaycastHelperSystemOptions & LocalDirectionRaycastHelperSystemOptions;
+export type LocalDirectionRaycastOptions = RaycastSystemOptions & LocalDirectionRaycastSystemOptions;
+
+// Warning: (ae-missing-release-tag) "LocalDirectionRaycastSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type LocalDirectionRaycastSystemOptions = {
+    direction?: PBVector3;
+};
 
 // Warning: (ae-missing-release-tag) "LwwComponentGetter" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2492,30 +2492,6 @@ export const RAD2DEG: number;
 export const Raycast: LastWriteWinElementSetComponentDefinition<PBRaycast>;
 
 // @public (undocumented)
-export interface RaycastHelperSystem {
-    registerGlobalDirectionRaycast(entity: Entity, callback: RaycastHelperSystemCallback, options?: Partial<GlobalDirectionRaycastOptions>): void;
-    registerGlobalTargetRaycast(entity: Entity, callback: RaycastHelperSystemCallback, options?: Partial<GlobalTargetRaycastOptions>): void;
-    registerLocalDirectionRaycast(entity: Entity, callback: RaycastHelperSystemCallback, options?: Partial<LocalDirectionRaycastOptions>): void;
-    registerTargetEntityRaycast(entity: Entity, callback: RaycastHelperSystemCallback, options?: Partial<TargetEntityRaycastOptions>): void;
-    removeRaycasterEntity(entity: Entity): void;
-}
-
-// @public
-export const raycastHelperSystem: RaycastHelperSystem;
-
-// @public (undocumented)
-export type RaycastHelperSystemCallback = (event: DeepReadonlyObject<PBRaycastResult>) => void;
-
-// @public (undocumented)
-export type RaycastHelperSystemOptions = {
-    originOffset?: PBVector3 | undefined;
-    maxDistance: number;
-    queryType: RaycastQueryType;
-    continuous?: boolean | undefined;
-    collisionMask?: number | undefined;
-};
-
-// @public (undocumented)
 export interface RaycastHit {
     direction: PBVector3 | undefined;
     entityId?: number | undefined;
@@ -2544,6 +2520,30 @@ export type RaycastResponsePayload<T> = {
 
 // @public (undocumented)
 export const RaycastResult: LastWriteWinElementSetComponentDefinition<PBRaycastResult>;
+
+// @public (undocumented)
+export interface RaycastSystem {
+    registerGlobalDirectionRaycast(entity: Entity, callback: RaycastSystemCallback, options?: Partial<GlobalDirectionRaycastOptions>): void;
+    registerGlobalTargetRaycast(entity: Entity, callback: RaycastSystemCallback, options?: Partial<GlobalTargetRaycastOptions>): void;
+    registerLocalDirectionRaycast(entity: Entity, callback: RaycastSystemCallback, options?: Partial<LocalDirectionRaycastOptions>): void;
+    registerTargetEntityRaycast(entity: Entity, callback: RaycastSystemCallback, options?: Partial<TargetEntityRaycastOptions>): void;
+    removeRaycasterEntity(entity: Entity): void;
+}
+
+// @public
+export const raycastSystem: RaycastSystem;
+
+// @public (undocumented)
+export type RaycastSystemCallback = (event: DeepReadonlyObject<PBRaycastResult>) => void;
+
+// @public (undocumented)
+export type RaycastSystemOptions = {
+    originOffset?: PBVector3 | undefined;
+    maxDistance: number;
+    queryType: RaycastQueryType;
+    continuous?: boolean | undefined;
+    collisionMask?: number | undefined;
+};
 
 // @public (undocumented)
 export interface ReactBasedUiSystem {
@@ -2697,17 +2697,17 @@ export type SystemItem = {
     name?: string;
 };
 
-// Warning: (ae-missing-release-tag) "TargetEntityRaycastHelperSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type TargetEntityRaycastHelperSystemOptions = {
-    targetEntity?: number;
-};
-
 // Warning: (ae-missing-release-tag) "TargetEntityRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type TargetEntityRaycastOptions = RaycastHelperSystemOptions & TargetEntityRaycastHelperSystemOptions;
+export type TargetEntityRaycastOptions = RaycastSystemOptions & TargetEntityRaycastSystemOptions;
+
+// Warning: (ae-missing-release-tag) "TargetEntityRaycastSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type TargetEntityRaycastSystemOptions = {
+    targetEntity?: number;
+};
 
 // Warning: (ae-missing-release-tag) "Task" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
