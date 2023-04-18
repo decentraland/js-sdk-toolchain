@@ -73,7 +73,7 @@ function ProjectView({ folders }: Props) {
       canRemove={() => false}
       canToggle={() => true}
       getIcon={(val) => <NodeIcon value={tree.get(val)!} isOpen={open.has(val)} />}
-      getDragValue={(val) => tree.get(val)!}
+      getDragContext={() => ({ tree })}
       dndType="project-asset-gltf"
     />
   )

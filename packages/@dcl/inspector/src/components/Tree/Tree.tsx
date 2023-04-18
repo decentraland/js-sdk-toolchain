@@ -28,7 +28,7 @@ type Props<T> = {
   onAddChild: (value: T, label: string) => void
   onRemove: (value: T) => void
   onToggle: (value: T, isOpen: boolean) => void
-  getDragValue?: (value: T) => unknown
+  getDragContext?: () => any
   dndType?: string
 }
 
@@ -59,7 +59,7 @@ function Tree<T>(_props: Props<T>) {
       onAddChild,
       onRemove,
       onToggle,
-      getDragValue = (val) => val,
+      getDragContext = () => ({}),
       dndType = 'tree'
     } = props
     const id = getId(value)
@@ -82,7 +82,7 @@ function Tree<T>(_props: Props<T>) {
       [getId, getChildren]
     )
 
-    const [, drag] = useDrag(() => ({ type: dndType, item: { value: getDragValue(value) } }), [value])
+    const [, drag] = useDrag(() => ({ type: dndType, item: { value, context: getDragContext() } }), [value])
 
     const [, drop] = useDrop(
       () => ({
@@ -149,7 +149,9 @@ function Tree<T>(_props: Props<T>) {
             {props.getIcon ? props.getIcon(value) : open ? <IoIosArrowDown /> : <IoIosArrowForward />}
             <span>{label || id}</span>
           </span>
-          {editMode && typeof label === 'string' && <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
+          {editMode && typeof label === 'string' && (
+            <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />
+          )}
         </div>
         <TreeChildren {...props} />
         {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} />}
