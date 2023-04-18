@@ -12,13 +12,13 @@
   border-color: var(--border-focused);
 }
 
-.TextField > label {
+.TextField>label {
   color: var(--secondary-text);
   display: block;
   margin-right: 8px;
 }
 
-.TextField > input {
+.TextField>input {
   width: 100%;
   color: var(--text);
   background-color: var(--transparent-color);
@@ -26,9 +26,13 @@
   border: none;
 }
 
+.TextField:last-child {
+  margin-right: 0px;
+}
+
 /* Chrome, Safari, Edge, Opera */
-.TextField > input::-webkit-outer-spin-button,
-.TextField > input::-webkit-inner-spin-button {
+.TextField>input::-webkit-outer-spin-button,
+.TextField>input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }

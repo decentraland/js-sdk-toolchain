@@ -23,7 +23,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
         <TextField label="" {...getInputProps('layout.base')} />
       </Block>
       <Block label="Parcels">
-        <TextField label="" {...getInputProps('layout.base')} />
+        <TextField label="" {...getInputProps('layout.parcels')} />
       </Block>
     </Container>
   )
