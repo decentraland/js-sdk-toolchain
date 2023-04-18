@@ -45,7 +45,7 @@ export { PointerEventsSystem }
  * @public
  * Register callback functions to a particular entity on raycast events.
  */
-export const raycastEventsSystem: RaycastHelperSystem = /* @__PURE__ */ createRaycastHelperSystem(engine)
+export const raycastHelperSystem: RaycastHelperSystem = /* @__PURE__ */ createRaycastHelperSystem(engine)
 export { RaycastHelperSystem }
 
 /**

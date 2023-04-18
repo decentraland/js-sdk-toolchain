@@ -2491,9 +2491,6 @@ export const RAD2DEG: number;
 // @public (undocumented)
 export const Raycast: LastWriteWinElementSetComponentDefinition<PBRaycast>;
 
-// @public
-export const raycastEventsSystem: RaycastHelperSystem;
-
 // @public (undocumented)
 export interface RaycastHelperSystem {
     registerGlobalDirectionRaycast(entity: Entity, callback: RaycastHelperSystemCallback, options?: Partial<GlobalDirectionRaycastOptions>): void;
@@ -2502,6 +2499,9 @@ export interface RaycastHelperSystem {
     registerTargetEntityRaycast(entity: Entity, callback: RaycastHelperSystemCallback, options?: Partial<TargetEntityRaycastOptions>): void;
     removeRaycasterEntity(entity: Entity): void;
 }
+
+// @public
+export const raycastHelperSystem: RaycastHelperSystem;
 
 // @public (undocumented)
 export type RaycastHelperSystemCallback = (event: DeepReadonlyObject<PBRaycastResult>) => void;
