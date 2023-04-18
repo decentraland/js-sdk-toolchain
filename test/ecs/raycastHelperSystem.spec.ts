@@ -258,6 +258,22 @@ describe('Raycast Helper System should', () => {
     expect(attachedRaycast.originOffset).toEqual(Vector3.Zero())
   })
 
+  it('create default values correctly for LocalDirection without opts', async () => {
+    const raycastEntity = engine.addEntity()
+    raycastHelperSystem.registerLocalDirectionRaycast(raycastEntity, (_result) => {})
+
+    const attachedRaycast = raycastComponent.get(raycastEntity)
+    expect(attachedRaycast.continuous).toBe(false)
+    expect(attachedRaycast.direction).toEqual({
+      $case: 'localDirection',
+      localDirection: Vector3.Forward()
+    })
+    expect(attachedRaycast.queryType).toBe(RaycastQueryType.RQT_HIT_FIRST)
+    expect(attachedRaycast.collisionMask).toBe(ColliderLayer.CL_PHYSICS)
+    expect(attachedRaycast.maxDistance).toBe(16)
+    expect(attachedRaycast.originOffset).toEqual(Vector3.Zero())
+  })
+
   it('create default values correctly for GlobalDirection', async () => {
     const raycastEntity = engine.addEntity()
     raycastHelperSystem.registerGlobalDirectionRaycast(raycastEntity, (result) => {}, {
@@ -272,6 +288,22 @@ describe('Raycast Helper System should', () => {
       globalDirection: Vector3.Forward()
     })
     expect(attachedRaycast.queryType).toBe(RaycastQueryType.RQT_QUERY_ALL)
+    expect(attachedRaycast.collisionMask).toBe(ColliderLayer.CL_PHYSICS)
+    expect(attachedRaycast.maxDistance).toBe(16)
+    expect(attachedRaycast.originOffset).toEqual(Vector3.Zero())
+  })
+
+  it('create default values correctly for GlobalDirection without opts', async () => {
+    const raycastEntity = engine.addEntity()
+    raycastHelperSystem.registerGlobalDirectionRaycast(raycastEntity, (_result) => {})
+
+    const attachedRaycast = raycastComponent.get(raycastEntity)
+    expect(attachedRaycast.continuous).toBe(false)
+    expect(attachedRaycast.direction).toEqual({
+      $case: 'globalDirection',
+      globalDirection: Vector3.Forward()
+    })
+    expect(attachedRaycast.queryType).toBe(RaycastQueryType.RQT_HIT_FIRST)
     expect(attachedRaycast.collisionMask).toBe(ColliderLayer.CL_PHYSICS)
     expect(attachedRaycast.maxDistance).toBe(16)
     expect(attachedRaycast.originOffset).toEqual(Vector3.Zero())
@@ -292,6 +324,22 @@ describe('Raycast Helper System should', () => {
       globalTarget: globalTarget
     })
     expect(attachedRaycast.queryType).toBe(RaycastQueryType.RQT_QUERY_ALL)
+    expect(attachedRaycast.collisionMask).toBe(ColliderLayer.CL_PHYSICS)
+    expect(attachedRaycast.maxDistance).toBe(16)
+    expect(attachedRaycast.originOffset).toEqual(Vector3.Zero())
+  })
+
+  it('create default values correctly for GlobalTarget without opts', async () => {
+    const raycastEntity = engine.addEntity()
+    raycastHelperSystem.registerGlobalTargetRaycast(raycastEntity, (_result) => {})
+
+    const attachedRaycast = raycastComponent.get(raycastEntity)
+    expect(attachedRaycast.continuous).toBe(false)
+    expect(attachedRaycast.direction).toEqual({
+      $case: 'globalTarget',
+      globalTarget: Vector3.Zero()
+    })
+    expect(attachedRaycast.queryType).toBe(RaycastQueryType.RQT_HIT_FIRST)
     expect(attachedRaycast.collisionMask).toBe(ColliderLayer.CL_PHYSICS)
     expect(attachedRaycast.maxDistance).toBe(16)
     expect(attachedRaycast.originOffset).toEqual(Vector3.Zero())
