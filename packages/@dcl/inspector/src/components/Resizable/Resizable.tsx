@@ -28,8 +28,7 @@ function Resizable(props: React.PropsWithChildren<PropTypes>) {
   }, [props.minWidth])
 
   function getParentWidth() {
-    if (!ref.current) return 0
-    return ref.current?.parentElement?.parentElement?.offsetWidth!
+    return ref.current?.parentElement?.parentElement?.offsetWidth ?? 0
   }
 
   const handleDrag = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -52,11 +51,10 @@ function Resizable(props: React.PropsWithChildren<PropTypes>) {
   }, [])
 
   return (
-    <div className="Resizable" onMouseMove={handleDrag} onDrag={(e) => {
-      e.stopPropagation()
-      e.preventDefault()
-    }}>
-      <div ref={ref} style={{ width: width[0] ?? 'auto' }}>{children[0]}</div>
+    <div className="Resizable" onMouseMove={handleDrag}>
+      <div ref={ref} style={{ width: width[0] ?? 'auto' }}>
+        {children[0]}
+      </div>
       <div className="resize-handle" style={{ left: width[0] ?? 0 }} onMouseDown={() => setDragging(true)} />
       <div style={{ width: width[1] ?? 'auto' }}>{children[1]}</div>
     </div>

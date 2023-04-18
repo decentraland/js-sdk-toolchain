@@ -62,7 +62,7 @@ function getStateAsString(engine: IEngine) {
  */
 function convertCompositeComponentDataToBinary(composite: Composite) {
   const engine = Engine()
-  const compositeRoot = getCompositeRootComponent(engine)
+  const _compositeRoot = getCompositeRootComponent(engine)
 
   for (const component of composite.components) {
     const componentDefinition: LastWriteWinElementSetComponentDefinition<unknown> = getComponentDefinition(

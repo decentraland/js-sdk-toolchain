@@ -9,25 +9,3 @@
 .editor .item > span:first-child {
   position: relative;
 }
-/* .editor .item > span:first-child::before {
-  position: absolute;
-  top: 15px;
-  left: 0;
-  width: 10px;
-  height: 1px;
-  margin: auto;
-  content: '';
-  background-color: #666;
-}
-.editor .item > span:first-child::after {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 1px;
-  height: 100%;
-  content: '';
-  background-color: #666;
-}
-
-.editor .item > span:first-child::after */
