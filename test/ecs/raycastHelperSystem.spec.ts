@@ -316,4 +316,33 @@ describe('Raycast Helper System should', () => {
     expect(attachedRaycast.maxDistance).toBe(16)
     expect(attachedRaycast.originOffset).toEqual(Vector3.Zero())
   })
+
+  it('wait until entity has raycastResult to run callback', async () => {
+    const raycastEntity = engine.addEntity()
+    let callbacksCounter = 0
+    raycastHelperSystem.registerLocalDirectionRaycast(
+      raycastEntity,
+      (result) => {
+        callbacksCounter++
+      },
+      {
+        direction: Vector3.Forward(),
+        queryType: RaycastQueryType.RQT_HIT_FIRST
+      }
+    )
+
+    // update without raycastResult attachment
+    await engine.update(1)
+    expect(callbacksCounter).toBe(0)
+
+    // Simulate client-side result attachment
+    raycastResultComponent.create(raycastEntity, {
+      hits: [],
+      direction: Vector3.Zero(),
+      globalOrigin: Vector3.Zero()
+    })
+
+    await engine.update(1)
+    expect(callbacksCounter).toBe(1)
+  })
 })
