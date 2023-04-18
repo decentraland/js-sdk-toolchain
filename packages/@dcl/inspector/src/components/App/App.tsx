@@ -12,6 +12,7 @@ import { Box } from '../Box'
 import { Toolbar } from '../Toolbar'
 
 import './App.css'
+import { Resizable } from '../Resizable'
 
 enum Tab {
   FileSystem = 'FileSystem',
@@ -21,6 +22,7 @@ enum Tab {
 const App = () => {
   const [catalog] = useCatalog()
   const [tab, setTab] = useState<Tab | undefined>(undefined)
+
   function handleTabClick(value: Tab) {
     if (tab === value) {
       return setTab(undefined)
@@ -29,7 +31,7 @@ const App = () => {
   }
 
   return (
-    <>
+    <Resizable minWidth={220} initialWidth={250} >
       <Box>
         <div
           className="sidebar"
@@ -63,7 +65,7 @@ const App = () => {
           </div>
         </Box>
       </div>
-    </>
+    </Resizable>
   )
 }
 

@@ -6,6 +6,6 @@
   border: none;
 }
 
-.editor .editor-assets-tree .Tree span {
-  text-decoration: none !important;
+.editor .item > span:first-child {
+  position: relative;
 }

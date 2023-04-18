@@ -8,8 +8,8 @@ import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 
 import { Props } from './types'
 import { fromTranform, toTransform } from './utils'
-import { Block } from '../Block'
-import { Container } from '../Container'
+import { Block } from '../../Block'
+import { Container } from '../../Container'
 import { TextField } from '../TextField'
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu';

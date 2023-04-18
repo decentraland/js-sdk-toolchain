@@ -1,8 +1,8 @@
 .Toolbar {
   display: flex;
-  justify-content: center;
   background-color: #29262f;
   padding: 8px;
+  width: 100%;
 }
 
 .Toolbar button {

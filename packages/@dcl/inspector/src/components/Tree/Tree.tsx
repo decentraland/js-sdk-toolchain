@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
-import { RxDoubleArrowRight as ArrowRight, RxDoubleArrowDown as ArrowDown } from 'react-icons/rx'
+import { IoIosArrowDown, IoIosArrowForward, IoIosImage } from 'react-icons/io'
 
 import { withContextMenu } from '../../hoc/withContextMenu'
 import { Input } from '../Input'
@@ -31,7 +31,7 @@ type Props<T> = {
 }
 
 const getDefaultLevel = () => 1
-const getLevelStyles = (level: number) => ({ paddingLeft: `${level * 10}px` })
+const getLevelStyles = (level: number) => ({ paddingLeft: `${(level - 1) * 10}px` })
 const getExpandStyles = (active: boolean) => ({ height: active ? 'auto' : '0', overflow: 'hidden', display: 'block' })
 const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : '' })
 
@@ -142,8 +142,8 @@ function Tree<T>(_props: Props<T>) {
         <div style={getLevelStyles(level)} className={selected ? 'selected item' : 'item'}>
           <ContextMenu {...controlsProps} />
           <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
-            {props.getIcon ? props.getIcon(value) : open ? <ArrowDown /> : <ArrowRight />}
-            {label ? <span>{label || id}</span> : <label />}
+            {props.getIcon ? props.getIcon(value) : open ? <IoIosArrowDown /> : <IoIosArrowForward />}
+            <span>{label || id}</span>
           </span>
           {editMode && typeof label === 'string' && <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
         </div>
