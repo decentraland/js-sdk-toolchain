@@ -96,7 +96,7 @@ async function browse({ logger }: Pick<CliComponents, 'logger'>, url: string, pa
     }
   }, 5000)
 
-  logger.info(`Signing app ready at ${url}`)
+  logger.info(`Signing app ready at ${url}?${params}`)
 }
 
 async function getCredentials({ fs }: Pick<CliComponents, 'fs' | 'logger'>) {
