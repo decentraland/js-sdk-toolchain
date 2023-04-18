@@ -26,5 +26,7 @@ module.exports = {
   verbose: true,
   testMatch: ["**/*.spec.(ts)"],
   testEnvironment: "node",
-  transformIgnorePatterns: [`/node_modules/(?!@babylonjs)`],
+  transformIgnorePatterns: [
+    `/node_modules/(?!(@babylonjs)|(@dcl/ecs-math))`,
+  ],
 }
