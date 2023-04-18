@@ -51,7 +51,7 @@ test:
 	make test-inspector
 
 test-inspector:
-	cd ./packages/@dcl/inspector/; WITH_COVERAGE=true ./../../../node_modules/.bin/jest --coverage --detectOpenHandles --colors --config ./jest.config.js
+	cd ./packages/@dcl/inspector/; ./../../../node_modules/.bin/jest --coverage --detectOpenHandles --colors --config ./jest.config.js $(FILES)
 
 test-cli:
 	@rm -rf tmp
@@ -59,7 +59,7 @@ test-cli:
 	cd tmp/scene; $(PWD)/packages/@dcl/sdk-commands/dist/index.js init
 
 test-coverage:
-	WITH_COVERAGE=true node_modules/.bin/jest --detectOpenHandles --colors --coverage $(TESTARGS)
+	node_modules/.bin/jest --detectOpenHandles --colors --coverage $(TESTARGS)
 
 recreate-test-scene:
 	@rm -rf tmp/scene || true
