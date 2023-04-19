@@ -13,6 +13,7 @@ import { CliComponents } from '../../../components'
 import { printSuccess } from '../../../logic/beautiful-logs'
 import { setRoutes } from './routes'
 import { getEstateRegistry, getLandRegistry } from '../../../logic/config'
+import future from 'fp-future'
 
 export interface LinkerResponse {
   address: string
@@ -32,57 +33,53 @@ export interface SceneInfo {
   skipValidations: boolean
 }
 
-export function runLinkerApp(
+export async function runLinkerApp(
   cliComponents: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,
   scene: Scene,
   files: IFile[],
   port: number,
   rootCID: string,
   { isHttps, skipValidations, openBrowser }: { isHttps: boolean; skipValidations: boolean; openBrowser: boolean }
-): Promise<LinkerResponse> {
-  return new Promise(async (resolve) => {
-    const resolvedPort = await getPort(port)
-    const sceneInfo = await getSceneInfo(cliComponents, scene, rootCID, skipValidations)
-    const protocol = isHttps ? 'https' : 'http'
-    const queryParams = querystring.stringify(sceneInfo)
-    const url = `${protocol}://localhost:${resolvedPort}`
+) {
+  const resolvedPort = await getPort(port)
+  const sceneInfo = await getSceneInfo(cliComponents, scene, rootCID, skipValidations)
+  const protocol = isHttps ? 'https' : 'http'
+  const queryParams = querystring.stringify(sceneInfo)
+  const url = `${protocol}://localhost:${resolvedPort}`
+  const futureResponse = future<LinkerResponse>()
+  const program = await Lifecycle.run({
+    async initComponents() {
+      const config = createRecordConfigComponent({
+        HTTP_SERVER_PORT: resolvedPort.toString(),
+        HTTP_SERVER_HOST: '0.0.0.0',
+        ...process.env
+      })
+      const logs = await createConsoleLogComponent({})
 
-    const program = await Lifecycle.run({
-      async initComponents() {
-        const config = createRecordConfigComponent({
-          HTTP_SERVER_PORT: resolvedPort.toString(),
-          HTTP_SERVER_HOST: '0.0.0.0',
-          ...process.env
-        })
-        const logs = await createConsoleLogComponent({})
+      const https = isHttps ? await getCredentials(cliComponents) : undefined
 
-        const https = isHttps ? await getCredentials(cliComponents) : undefined
+      const server = await createServerComponent({ ...cliComponents, config, logs }, { https })
 
-        const server = await createServerComponent({ ...cliComponents, config, logs }, { https })
+      return { ...cliComponents, config, logs, server }
+    },
+    async main({ components, startComponents }) {
+      const { router, futureSignature } = setRoutes(components, files, sceneInfo)
+      components.server.setContext(components)
+      components.server.use(router.allowedMethods())
+      components.server.use(router.middleware())
 
-        return { ...cliComponents, config, logs, server }
-      },
-      async main({ components, startComponents }) {
-        const { router, futureSignature } = setRoutes(components, files, sceneInfo)
-        components.server.setContext(components)
-        components.server.use(router.allowedMethods())
-        components.server.use(router.middleware())
+      await startComponents()
+      if (openBrowser) await browse(components, url, queryParams)
 
-        await startComponents()
-        if (openBrowser) await browse(components, url, queryParams)
-
-        const value = await futureSignature
-
-        printSuccess(components.logger, `\nContent successfully signed.`, '')
-        components.logger.info(`Address: ${value.address}`)
-        components.logger.info(`Signature: ${value.signature}`)
-        components.logger.info(`Network: ${getChainName(value.chainId!)}`)
-        resolve(value)
-      }
-    })
-
-    return program
+      const value = await futureSignature
+      printSuccess(components.logger, `\nContent successfully signed.`, '')
+      components.logger.info(`Address: ${value.address}`)
+      components.logger.info(`Signature: ${value.signature}`)
+      components.logger.info(`Network: ${getChainName(value.chainId!)}`)
+      futureResponse.resolve(value)
+    }
   })
+  return { program, linkerResponse: futureResponse }
 }
 
 async function browse({ logger }: Pick<CliComponents, 'logger'>, url: string, params: string) {
