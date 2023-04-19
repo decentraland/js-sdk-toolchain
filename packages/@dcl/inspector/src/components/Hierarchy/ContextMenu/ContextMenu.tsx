@@ -5,13 +5,10 @@ import { ROOT } from '../../../lib/sdk/tree'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu';
 import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent';
 
-
 // TODO: enumerate better the components we want to show...
 const ENABLED_COMPONENTS_SET = new Set([
   'core::Transform',
-  'core::Billboard',
-  'core::TextShape',
-  'core::MeshRenderer'
+  'core::GltfContainer'
 ])
 
 const getComponentName = (value: string) => (value.match(/[^:]*$/) || [])[0]

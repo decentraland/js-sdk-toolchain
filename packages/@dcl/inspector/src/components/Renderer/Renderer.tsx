@@ -10,8 +10,6 @@ import { IAsset } from '../AssetsCatalog/types'
 
 import './Renderer.css'
 
-const cachedFiles = new Set()
-
 const Renderer: React.FC = () => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
   useRenderer(() => canvasRef)
@@ -59,13 +57,13 @@ const Renderer: React.FC = () => {
   const [, drop] = useDrop(
     () => ({
       accept: ['project-asset-gltf', 'builder-asset'],
-      drop: (val: { asset: AssetNodeItem | IAsset }, monitor) => {
+      drop: ({ value }: { value: AssetNodeItem | IAsset }, monitor) => {
         if (monitor.getItemType() === 'builder-asset') {
-          void importBuilderAsset(val.asset as IAsset)
+          void importBuilderAsset(value as IAsset)
           return
         }
         if (monitor.didDrop()) return
-        void addAsset(val.asset as AssetNodeItem)
+        void addAsset(value as AssetNodeItem)
       }
     }),
     [addAsset]
