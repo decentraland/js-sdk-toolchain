@@ -1,10 +1,11 @@
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import { Menu, Item } from 'react-contexify'
 import { useDrop } from 'react-dnd'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import cx from 'classnames'
 
-import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
+import { memoize } from '../../../lib/logic/once'
+import { TreeNode } from '../../ProjectAssetExplorer/ProjectView'
 
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
@@ -18,13 +19,29 @@ import { Container } from '../../Container'
 import { TextField } from '../TextField'
 import { Props } from './types'
 import { fromGltf, toGltf, isValidInput } from './utils'
+import { isAssetNode } from '../../ProjectAssetExplorer/utils'
+import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
 
 const DROP_TYPES = ['project-asset-gltf']
 
 interface IDrop {
   value: string;
-  context: { tree: Map<string, AssetNodeItem> }
+  context: { tree: Map<string, TreeNode> }
 }
+
+const isModel = (node: TreeNode): node is AssetNodeItem => isAssetNode(node) && (node.name.endsWith('.gltf') || node.name.endsWith('.glb'))
+
+const getModel = memoize((node: TreeNode, tree: Map<string, TreeNode>): AssetNodeItem | null => {
+  if (isModel(node)) return node
+
+  const children = node.children || []
+  for (const child of children) {
+    const childNode = tree.get(child)!
+    if (isModel(childNode)) return childNode
+  }
+
+  return null
+})
 
 export default withSdk<Props>(
   withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
@@ -37,8 +54,8 @@ export default withSdk<Props>(
     const getInputProps = useComponentInput(entity, GltfContainer, fromGltf, toGltf, handleInputValidation)
 
     const handleRemove = useCallback(() => GltfContainer.deleteFrom(entity), [])
-    const handleDrop = useCallback((value: AssetNodeItem) => {
-      GltfContainer.createOrReplace(entity, { src: value.asset.src })
+    const handleDrop = useCallback((src: string) => {
+      GltfContainer.createOrReplace(entity, { src })
     }, [])
 
     const [{ isHover }, drop] = useDrop(
@@ -46,7 +63,13 @@ export default withSdk<Props>(
         accept: DROP_TYPES,
         drop: ({ value, context }: IDrop, monitor) => {
           if (monitor.didDrop()) return
-          handleDrop(context.tree.get(value)!)
+          const node = context.tree.get(value)!
+          const model = getModel(node, context.tree)
+          if (model) handleDrop(model.asset.src)
+        },
+        canDrop: ({ value, context }: IDrop) => {
+          const node = context.tree.get(value)!
+          return !!getModel(node, context.tree)
         },
         collect: (monitor) => ({
           isHover: monitor.canDrop() && monitor.isOver()
