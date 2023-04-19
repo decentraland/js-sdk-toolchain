@@ -16,7 +16,7 @@ type Props = {
 const ROOT = 'File System'
 
 
-type TreeNode = Omit<AssetNode, 'children'> & { children?: string[] }
+export type TreeNode = Omit<AssetNode, 'children'> & { children?: string[] }
 
 function ProjectView({ folders }: Props) {
   const [open, setOpen] = useState(new Set<string>())
