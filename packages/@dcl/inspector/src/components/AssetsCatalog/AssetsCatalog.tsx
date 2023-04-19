@@ -65,7 +65,7 @@ function Categories({ onGoBack, value }: CategoriesProps) {
 }
 
 function AssetCell({ value }: AssetProps) {
-  const [, drag] = useDrag(() => ({ type: 'builder-asset', item: { asset: value } }), [value])
+  const [, drag] = useDrag(() => ({ type: 'builder-asset', item: { value } }), [value])
 
   return (
     <div ref={drag}>
