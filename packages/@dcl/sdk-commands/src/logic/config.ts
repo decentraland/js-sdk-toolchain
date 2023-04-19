@@ -1,6 +1,6 @@
 import path from 'path'
 import { CliComponents } from '../components'
-import { readStringConfig, requireStringConfig } from '../components/config'
+import { readStringConfig } from '../components/config'
 import { readJson } from './fs'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -61,10 +61,10 @@ export function getSegmentKey() {
 
 /* istanbul ignore next */
 export async function getLandRegistry(components: Pick<CliComponents, 'config'>) {
-  return requireStringConfig(components, 'DCL_LAND_REGISTRY_ADDRESS')
+  return readStringConfig(components, 'DCL_LAND_REGISTRY_ADDRESS')
 }
 
 /* istanbul ignore next */
 export async function getEstateRegistry(components: Pick<CliComponents, 'config'>) {
-  return requireStringConfig(components, 'DCL_ESTATE_REGISTRY_ADDRESS')
+  return readStringConfig(components, 'DCL_ESTATE_REGISTRY_ADDRESS')
 }

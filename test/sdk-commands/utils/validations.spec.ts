@@ -1,7 +1,7 @@
-import * as projectValidation from '../../../../packages/@dcl/sdk-commands/src/logic/project-validations'
-import * as sceneValidation from '../../../../packages/@dcl/sdk-commands/src/logic/scene-validations'
-import { Scene } from '../../../../packages/@dcl/sdk-commands/node_modules/@dcl/schemas'
-import { initComponents } from '../../../../packages/@dcl/sdk-commands/src/components'
+import * as projectValidation from '../../../packages/@dcl/sdk-commands/src/logic/project-validations'
+import * as sceneValidation from '../../../packages/@dcl/sdk-commands/src/logic/scene-validations'
+import { Scene } from '../../../packages/@dcl/sdk-commands/node_modules/@dcl/schemas/dist'
+import { initComponents } from '../../../packages/@dcl/sdk-commands/src/components'
 import path from 'path'
 
 afterEach(() => {
