@@ -25,11 +25,12 @@ import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
 const DROP_TYPES = ['project-asset-gltf']
 
 interface IDrop {
-  value: string;
+  value: string
   context: { tree: Map<string, TreeNode> }
 }
 
-const isModel = (node: TreeNode): node is AssetNodeItem => isAssetNode(node) && (node.name.endsWith('.gltf') || node.name.endsWith('.glb'))
+const isModel = (node: TreeNode): node is AssetNodeItem =>
+  isAssetNode(node) && (node.name.endsWith('.gltf') || node.name.endsWith('.glb'))
 
 const getModel = memoize((node: TreeNode, tree: Map<string, TreeNode>): AssetNodeItem | null => {
   if (isModel(node)) return node

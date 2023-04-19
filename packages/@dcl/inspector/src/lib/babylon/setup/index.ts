@@ -1,6 +1,5 @@
 import * as BABYLON from '@babylonjs/core'
 import { initKeyboard } from './input'
-import { GridMaterial } from '@babylonjs/materials'
 import { PARCEL_SIZE } from '../../utils/scene'
 
 // if NODE_ENV == development
@@ -99,13 +98,10 @@ export function initRenderer(canvas: HTMLCanvasElement) {
     groundSize: 1000
   })!
 
-  // const ground = MeshBuilder.CreateGround('ground', { width: 200, height: 200 }, scene)
-  const grid = new GridMaterial('grid', scene)
-  grid.gridRatio = 1
-  grid.majorUnitFrequency = 4
-  grid.lineColor = BABYLON.Color3.FromHexString('#676370')
-  grid.mainColor = BABYLON.Color3.FromHexString('#36343D')
-  editorEnvHelper.ground!.material = grid
+  const groundMaterial = new BABYLON.StandardMaterial('ground', scene)
+  groundMaterial.diffuseColor = BABYLON.Color3.FromHexString('#48434e')
+  groundMaterial.specularColor = new BABYLON.Color3(0, 0, 0)
+  editorEnvHelper.ground!.material = groundMaterial
 
   const center = new BABYLON.Vector3(PARCEL_SIZE / 2, 0, PARCEL_SIZE / 2)
   const camera = new BABYLON.ArcRotateCamera('editorCamera', -Math.PI / 2, Math.PI / 2.5, 15, center, scene)
