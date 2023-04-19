@@ -16,7 +16,7 @@ import { ReadWriteByteBuffer } from './../../packages/@dcl/ecs/src/serialization
 
 const writeToFile = process.env.UPDATE_SNAPSHOTS
 const COMPOSITE_BASE_PATH = 'test/ecs/composites'
-const nonBinaryCompositeJsonPath = 'non-binary.composite.json'
+const nonBinaryCompositeJsonPath = 'non-binary.composite'
 
 // ########
 // ## Helpers
@@ -88,19 +88,19 @@ function convertCompositeComponentDataToBinary(composite: Composite) {
 // ## Helper-test
 // ########
 
-describe('convert non-binary.composite.json', () => {
+describe('convert non-binary.composite', () => {
   it.skip('to binary', () => {
     const composite = getJsonCompositeFrom(nonBinaryCompositeJsonPath, COMPOSITE_BASE_PATH)
     const binaryComposite = composite[0]
     convertCompositeComponentDataToBinary(binaryComposite.composite)
 
     writeFileSync(
-      `${COMPOSITE_BASE_PATH}/data-binary.composite.json`,
+      `${COMPOSITE_BASE_PATH}/data-binary.composite`,
       JSON.stringify(Composite.toJson(binaryComposite.composite), null, 2)
     )
 
     const buffer = Composite.toBinary(binaryComposite.composite)
-    writeFileSync(`${COMPOSITE_BASE_PATH}/full-binary.composite`, buffer)
+    writeFileSync(`${COMPOSITE_BASE_PATH}/full-binary.composite.bin`, buffer)
   })
 })
 
@@ -110,11 +110,11 @@ describe('convert non-binary.composite.json', () => {
 
 describe('composite instantiation system', () => {
   const validComposites = [
-    ...getJsonCompositeFrom('relative/**/*.composite.json', COMPOSITE_BASE_PATH),
-    ...getJsonCompositeFrom('*.composite.json', COMPOSITE_BASE_PATH),
-    ...getBinaryCompositeFrom('*.composite', COMPOSITE_BASE_PATH)
+    ...getJsonCompositeFrom('relative/**/*.composite', COMPOSITE_BASE_PATH),
+    ...getJsonCompositeFrom('*.composite', COMPOSITE_BASE_PATH),
+    ...getBinaryCompositeFrom('*.composite.bin', COMPOSITE_BASE_PATH)
   ]
-  const invalidComposites = getJsonCompositeFrom('invalid/*.composite.json', COMPOSITE_BASE_PATH)
+  const invalidComposites = getJsonCompositeFrom('invalid/*.composite', COMPOSITE_BASE_PATH)
   const composites = [...validComposites, ...invalidComposites]
   const compositeProvider: Composite.Provider = {
     getCompositeOrNull(src: string) {
@@ -173,14 +173,14 @@ describe('composite instantiation system', () => {
     expect(() => {
       const engine = Engine()
       ;(engine as any).addEntity = () => null
-      instanceBySource(engine, 'empty.composite.json')
+      instanceBySource(engine, 'empty.composite')
     }).toThrow()
   })
 
   describe(`should work with a entity offset`, () => {
     it('with EMM_NEXT_AVAILABLE option', () => {
       const engine = Engine()
-      const composite = compositeProvider.getCompositeOrNull('2-level-deep.composite.json')!
+      const composite = compositeProvider.getCompositeOrNull('2-level-deep.composite')!
 
       const entityOffset = 10000
 
@@ -203,7 +203,7 @@ describe('composite instantiation system', () => {
 
     it('with EMM_DIRECT_MAPPING option', () => {
       const engine = Engine()
-      const composite = compositeProvider.getCompositeOrNull('2-level-deep.composite.json')!
+      const composite = compositeProvider.getCompositeOrNull('2-level-deep.composite')!
 
       const entityOffset = 20000
       Composite.instance(engine, composite, compositeProvider, {
@@ -231,8 +231,8 @@ describe('composite instantiation system', () => {
 
 describe('composite serialization', () => {
   const validComposites = [
-    ...getJsonCompositeFrom('*.composite.json', COMPOSITE_BASE_PATH),
-    ...getBinaryCompositeFrom('*.composite', COMPOSITE_BASE_PATH)
+    ...getJsonCompositeFrom('*.composite', COMPOSITE_BASE_PATH),
+    ...getBinaryCompositeFrom('*.composite.bin', COMPOSITE_BASE_PATH)
   ]
 
   describe('should serialize to binary and get the same composite', () => {
@@ -359,19 +359,19 @@ describe('composite path resolver', () => {
   const someCwdPath = '/path/to/deep/level'
   const testCases = [
     // Without current working directory
-    ['./composite.json', '', 'composite.json'],
-    ['/composite.json', '', 'composite.json'],
-    ['composite.json', '', 'composite.json'],
+    ['./composite', '', 'composite'],
+    ['/composite', '', 'composite'],
+    ['composite', '', 'composite'],
 
     // invalid one
-    ['../impossible.json', '', 'impossible.json'],
+    ['../impossible', '', 'impossible'],
 
     // With an specific path current
-    ['./composite.json', someCwdPath, `path/to/deep/level/composite.json`],
-    ['composite.json', someCwdPath, `composite.json`],
-    ['/composite.json', someCwdPath, `composite.json`],
-    ['../composite.json', someCwdPath, `path/to/deep/composite.json`],
-    ['./../composite.json', someCwdPath, `path/to/deep/composite.json`]
+    ['./composite', someCwdPath, `path/to/deep/level/composite`],
+    ['composite', someCwdPath, `composite`],
+    ['/composite', someCwdPath, `composite`],
+    ['../composite', someCwdPath, `path/to/deep/composite`],
+    ['./../composite', someCwdPath, `path/to/deep/composite`]
   ]
 
   describe('should resolve path correclty', () => {

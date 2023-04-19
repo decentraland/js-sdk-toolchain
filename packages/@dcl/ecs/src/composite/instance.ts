@@ -75,9 +75,7 @@ export function getComponentDefinition(
   const existingComponentDefinition = engine.getComponentOrNull(component.name)
 
   if (!existingComponentDefinition) {
-    if (component.jsonSchema) {
-      return engine.defineComponentFromSchema(component.name, Schemas.fromJson(component.jsonSchema))
-    } else if (component.name.startsWith('core::')) {
+    if (component.name.startsWith('core::')) {
       if (component.name in componentDefinitionByName) {
         return (componentDefinitionByName as any)[component.name](
           engine
@@ -85,6 +83,8 @@ export function getComponentDefinition(
       } else {
         throw new Error(`The core component ${component.name} was not found.`)
       }
+    } else if (component.jsonSchema) {
+      return engine.defineComponentFromSchema(component.name, Schemas.fromJson(component.jsonSchema))
     } else {
       throw new Error(`${component.name} is not defined and there is no schema to define it.`)
     }

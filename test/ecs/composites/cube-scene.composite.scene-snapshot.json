@@ -22,7 +22,7 @@
   },
   "composite::root": {
     "512": {
-      "src": "cube-scene.composite.json",
+      "src": "cube-scene.composite",
       "entities": [
         {
           "src": 0,

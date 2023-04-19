@@ -41,7 +41,7 @@
   },
   "composite::root": {
     "512": {
-      "src": "only-children.composite.json",
+      "src": "only-children.composite",
       "entities": [
         {
           "src": 0,
@@ -62,7 +62,7 @@
       ]
     },
     "513": {
-      "src": "empty.composite.json",
+      "src": "empty.composite",
       "entities": [
         {
           "src": 0,
@@ -71,7 +71,7 @@
       ]
     },
     "514": {
-      "src": "one-transform.composite.json",
+      "src": "one-transform.composite",
       "entities": [
         {
           "src": 0,
@@ -84,7 +84,7 @@
       ]
     },
     "516": {
-      "src": "cube-scene.composite.json",
+      "src": "cube-scene.composite",
       "entities": [
         {
           "src": 0,
