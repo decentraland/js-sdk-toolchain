@@ -17,12 +17,10 @@ describe('Raycast Helper System should', () => {
 
   it('run callback on raycast result for LocalDirection', async () => {
     const raycastEntity = engine.addEntity()
-    let callbacksCounter = 0
+    let fn = jest.fn()
     raycastHelperSystem.registerLocalDirectionRaycast(
       raycastEntity,
-      (result) => {
-        callbacksCounter++
-      },
+      fn,
       {
         direction: Vector3.Forward(),
         queryType: RaycastQueryType.RQT_HIT_FIRST
@@ -37,17 +35,15 @@ describe('Raycast Helper System should', () => {
     })
 
     await engine.update(1)
-    expect(callbacksCounter).toBe(1)
+    expect(fn).toHaveBeenCalled()
   })
 
   it('run callback on raycast result for GlobalDirection', async () => {
     const raycastEntity = engine.addEntity()
-    let callbacksCounter = 0
+    let fn = jest.fn()
     raycastHelperSystem.registerGlobalDirectionRaycast(
       raycastEntity,
-      (result) => {
-        callbacksCounter++
-      },
+      fn,
       {
         direction: Vector3.Forward(),
         queryType: RaycastQueryType.RQT_HIT_FIRST
@@ -62,17 +58,15 @@ describe('Raycast Helper System should', () => {
     })
 
     await engine.update(1)
-    expect(callbacksCounter).toBe(1)
+    expect(fn).toHaveBeenCalled()
   })
 
   it('run callback on raycast result for GlobalTarget', async () => {
     const raycastEntity = engine.addEntity()
-    let callbacksCounter = 0
+    let fn = jest.fn()
     raycastHelperSystem.registerGlobalTargetRaycast(
       raycastEntity,
-      (result) => {
-        callbacksCounter++
-      },
+      fn,
       {
         target: Vector3.create(10, 10, 10),
         queryType: RaycastQueryType.RQT_HIT_FIRST
@@ -87,19 +81,17 @@ describe('Raycast Helper System should', () => {
     })
 
     await engine.update(1)
-    expect(callbacksCounter).toBe(1)
+    expect(fn).toHaveBeenCalled()
   })
 
   it('run callback on raycast result for TargetEntity', async () => {
     const raycastEntity = engine.addEntity()
     const targetEntity = engine.addEntity()
 
-    let callbacksCounter = 0
+    let fn = jest.fn()
     raycastHelperSystem.registerTargetEntityRaycast(
       raycastEntity,
-      (result) => {
-        callbacksCounter++
-      },
+      fn,
       {
         targetEntity: targetEntity,
         queryType: RaycastQueryType.RQT_HIT_FIRST
@@ -114,17 +106,15 @@ describe('Raycast Helper System should', () => {
     })
 
     await engine.update(1)
-    expect(callbacksCounter).toBe(1)
+    expect(fn).toHaveBeenCalled()
   })
 
   it('remove raycast and raycastResult of non-continuous raycast entity', async () => {
     const continuousRaycastEntity = engine.addEntity()
-    let callbacksCounter = 0
+    let fn = jest.fn()
     raycastHelperSystem.registerLocalDirectionRaycast(
       continuousRaycastEntity,
-      (result) => {
-        callbacksCounter++
-      },
+      fn,
       {
         direction: Vector3.Forward(),
         queryType: RaycastQueryType.RQT_HIT_FIRST,
@@ -160,7 +150,7 @@ describe('Raycast Helper System should', () => {
 
     await engine.update(1)
 
-    expect(callbacksCounter).toBe(2)
+    expect(fn).toHaveBeenCalledTimes(2)
     expect(raycastResultComponent.getOrNull(continuousRaycastEntity)).toBeDefined()
     expect(raycastComponent.getOrNull(continuousRaycastEntity)).toBeDefined()
   })
@@ -168,12 +158,10 @@ describe('Raycast Helper System should', () => {
   it('remove raycast entity correctly', async () => {
     const raycastEntity = engine.addEntity()
 
-    let callbacksCounter = 0
+    let fn = jest.fn()
     raycastHelperSystem.registerLocalDirectionRaycast(
       raycastEntity,
-      (result) => {
-        callbacksCounter++
-      },
+      fn,
       {
         direction: Vector3.Zero(),
         queryType: RaycastQueryType.RQT_HIT_FIRST,
@@ -189,15 +177,15 @@ describe('Raycast Helper System should', () => {
     })
 
     await engine.update(1)
-    expect(callbacksCounter).toBe(1)
+    expect(fn).toHaveBeenCalledTimes(1)
 
     await engine.update(1)
-    expect(callbacksCounter).toBe(2)
+    expect(fn).toHaveBeenCalledTimes(2)
 
     raycastHelperSystem.removeRaycasterEntity(raycastEntity)
 
     await engine.update(1)
-    expect(callbacksCounter).toBe(2)
+    expect(fn).toHaveBeenCalledTimes(2)
     expect(raycastResultComponent.getOrNull(raycastEntity)).toBeNull()
     expect(raycastComponent.getOrNull(raycastEntity)).toBeNull()
   })
@@ -205,12 +193,10 @@ describe('Raycast Helper System should', () => {
   it('handle deleted entities correctly', async () => {
     const raycastEntity = engine.addEntity()
 
-    let callbacksCounter = 0
+    let fn = jest.fn()
     raycastHelperSystem.registerLocalDirectionRaycast(
       raycastEntity,
-      (result) => {
-        callbacksCounter++
-      },
+      fn,
       {
         direction: Vector3.Zero(),
         queryType: RaycastQueryType.RQT_HIT_FIRST,
@@ -226,15 +212,15 @@ describe('Raycast Helper System should', () => {
     })
 
     await engine.update(1)
-    expect(callbacksCounter).toBe(1)
+    expect(fn).toHaveBeenCalledTimes(1)
 
     await engine.update(1)
-    expect(callbacksCounter).toBe(2)
+    expect(fn).toHaveBeenCalledTimes(2)
 
     engine.removeEntity(raycastEntity)
 
     await engine.update(1)
-    expect(callbacksCounter).toBe(2)
+    expect(fn).toHaveBeenCalledTimes(2)
     expect(raycastResultComponent.getOrNull(raycastEntity)).toBeNull()
     expect(raycastComponent.getOrNull(raycastEntity)).toBeNull()
   })
@@ -383,12 +369,10 @@ describe('Raycast Helper System should', () => {
 
   it('wait until entity has raycastResult to run callback', async () => {
     const raycastEntity = engine.addEntity()
-    let callbacksCounter = 0
+    let fn = jest.fn()
     raycastHelperSystem.registerLocalDirectionRaycast(
       raycastEntity,
-      (result) => {
-        callbacksCounter++
-      },
+      fn,
       {
         direction: Vector3.Forward(),
         queryType: RaycastQueryType.RQT_HIT_FIRST
@@ -397,7 +381,7 @@ describe('Raycast Helper System should', () => {
 
     // update without raycastResult attachment
     await engine.update(1)
-    expect(callbacksCounter).toBe(0)
+    expect(fn).toHaveBeenCalledTimes(0)
 
     // Simulate client-side result attachment
     raycastResultComponent.create(raycastEntity, {
@@ -407,6 +391,6 @@ describe('Raycast Helper System should', () => {
     })
 
     await engine.update(1)
-    expect(callbacksCounter).toBe(1)
+    expect(fn).toHaveBeenCalled()
   })
 })
