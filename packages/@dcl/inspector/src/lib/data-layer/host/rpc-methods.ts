@@ -6,6 +6,7 @@ import { dumpEngineToComposite } from './utils/engine-to-composite'
 import { createFsCompositeProvider } from './utils/fs-composite-provider'
 import { stream } from './stream'
 import { initUndoRedo } from './undo-redo'
+import { minimalComposite } from '../client/feeded-local-fs'
 
 export async function initRpcMethods(
   fs: FileSystemInterface,
@@ -13,9 +14,14 @@ export async function initRpcMethods(
   onChanges: OnChangeFunction[]
 ): Promise<DataLayerRpcServer> {
   // Look for a composite
-  const compositeProvider = await createFsCompositeProvider(fs)
-  const mainComposite = compositeProvider.getCompositeOrNull('main.composite.json')
+  const currentCompositeResourcePath = 'main.composite'
 
+  if (!(await fs.existFile(currentCompositeResourcePath))) {
+    await fs.writeFile(currentCompositeResourcePath, Buffer.from(JSON.stringify(minimalComposite), 'utf-8'))
+  }
+
+  const compositeProvider = await createFsCompositeProvider(fs)
+  const mainComposite = compositeProvider.getCompositeOrNull(currentCompositeResourcePath)
   if (mainComposite) {
     Composite.instance(engine, mainComposite, compositeProvider, {
       entityMapping: {
@@ -23,6 +29,8 @@ export async function initRpcMethods(
         getCompositeEntity: (entity: number | Entity) => entity as Entity
       }
     })
+  } else {
+    // TODO: log the error
   }
 
   let dirty = false
@@ -51,7 +59,9 @@ export async function initRpcMethods(
         onChanges.push(undoRedo.onChange)
       }
 
-      // compositeProvider.save(composite, 'json').catch((err) => console.error(`Save composite fails: `, err))
+      compositeProvider
+        .save({ src: currentCompositeResourcePath, composite }, 'json')
+        .catch((err) => console.error(`Save composite ${currentCompositeResourcePath} fails: `, err))
     }
   }, -1_000_000_000)
 
@@ -80,7 +90,7 @@ export async function initRpcMethods(
       throw new Error("Couldn't find the asset " + req.path)
     },
     async getAssetCatalog() {
-      const extensions = ['.glb', '.png', '.composite', '.composite.json', '.gltf', '.jpg']
+      const extensions = ['.glb', '.png', '.composite', '.composite.bin', '.gltf', '.jpg']
       const ignore = ['.git', 'node_modules']
 
       const files = (await getFilesInDirectory(fs, '', [], true, ignore)).filter((item) => {

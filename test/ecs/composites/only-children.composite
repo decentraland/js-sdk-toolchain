@@ -7,25 +7,19 @@
                 "512": {
                     "$case": "json",
                     "json": {
-                        "src": "empty.composite.json"
+                        "src": "empty.composite"
                     }
                 },
                 "513": {
                     "$case": "json",
                     "json": {
-                        "src": "one-transform.composite.json"
+                        "src": "one-transform.composite"
                     }
                 },
                 "514": {
                     "$case": "json",
                     "json": {
-                        "src": "cube-scene.composite.json"
-                    }
-                },
-                "515": {
-                    "$case": "json",
-                    "json": {
-                        "src": "only-children.composite.json"
+                        "src": "cube-scene.composite"
                     }
                 }
             }

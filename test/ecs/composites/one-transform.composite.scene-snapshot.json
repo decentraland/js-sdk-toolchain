@@ -2,7 +2,7 @@
   "core::Transform": {
     "513": {
       "position": {
-        "x": 8,
+        "x": 1,
         "y": 1,
         "z": 1
       },
@@ -22,40 +22,17 @@
   },
   "composite::root": {
     "512": {
-      "src": "cool-sphere.composite.json",
+      "src": "one-transform.composite",
       "entities": [
         {
           "src": 0,
           "dest": 512
         },
         {
-          "src": 512,
+          "src": 518,
           "dest": 513
         }
       ]
-    }
-  },
-  "core::MeshRenderer": {
-    "513": {
-      "mesh": {
-        "$case": "sphere",
-        "sphere": {}
-      }
-    }
-  },
-  "core::Material": {
-    "513": {
-      "material": {
-        "$case": "pbr",
-        "pbr": {
-          "albedoColor": {
-            "r": 0.8,
-            "g": 0.1,
-            "b": 0.1,
-            "a": 1
-          }
-        }
-      }
     }
   }
 }

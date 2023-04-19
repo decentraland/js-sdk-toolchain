@@ -22,7 +22,7 @@
   },
   "composite::root": {
     "512": {
-      "src": "relative/second-level/one-transform.composite.json",
+      "src": "relative/second-level/one-transform.composite",
       "entities": [
         {
           "src": 0,

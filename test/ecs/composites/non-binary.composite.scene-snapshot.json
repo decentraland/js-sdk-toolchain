@@ -1,5 +1,24 @@
 {
   "core::Transform": {
+    "513": {
+      "position": {
+        "x": 8,
+        "y": 0.8,
+        "z": 8
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "parent": 512
+    },
     "515": {
       "position": {
         "x": 1,
@@ -79,7 +98,7 @@
   },
   "composite::root": {
     "512": {
-      "src": "2-level-deep.composite.json",
+      "src": "non-binary.composite",
       "entities": [
         {
           "src": 0,
@@ -104,7 +123,7 @@
       ]
     },
     "513": {
-      "src": "empty.composite.json",
+      "src": "empty.composite",
       "entities": [
         {
           "src": 0,
@@ -113,7 +132,7 @@
       ]
     },
     "514": {
-      "src": "one-transform.composite.json",
+      "src": "one-transform.composite",
       "entities": [
         {
           "src": 0,
@@ -126,7 +145,7 @@
       ]
     },
     "516": {
-      "src": "cube-scene.composite.json",
+      "src": "cube-scene.composite",
       "entities": [
         {
           "src": 0,
@@ -139,7 +158,7 @@
       ]
     },
     "518": {
-      "src": "only-children.composite.json",
+      "src": "only-children.composite",
       "entities": [
         {
           "src": 0,
@@ -160,7 +179,7 @@
       ]
     },
     "519": {
-      "src": "empty.composite.json",
+      "src": "empty.composite",
       "entities": [
         {
           "src": 0,
@@ -169,7 +188,7 @@
       ]
     },
     "520": {
-      "src": "one-transform.composite.json",
+      "src": "one-transform.composite",
       "entities": [
         {
           "src": 0,
@@ -182,7 +201,7 @@
       ]
     },
     "522": {
-      "src": "cube-scene.composite.json",
+      "src": "cube-scene.composite",
       "entities": [
         {
           "src": 0,
@@ -196,6 +215,14 @@
     }
   },
   "core::MeshRenderer": {
+    "513": {
+      "mesh": {
+        "$case": "box",
+        "box": {
+          "uvs": []
+        }
+      }
+    },
     "517": {
       "mesh": {
         "$case": "box",
@@ -214,6 +241,12 @@
     }
   },
   "core::MeshCollider": {
+    "513": {
+      "mesh": {
+        "$case": "box",
+        "box": {}
+      }
+    },
     "517": {
       "mesh": {
         "$case": "box",
@@ -232,6 +265,19 @@
     "523": {}
   },
   "core::PointerEvents": {
+    "513": {
+      "pointerEvents": [
+        {
+          "eventType": 1,
+          "eventInfo": {
+            "button": 1,
+            "hoverText": "Press E to spawn",
+            "maxDistance": 100,
+            "showFeedback": true
+          }
+        }
+      ]
+    },
     "517": {
       "pointerEvents": [
         {
@@ -260,6 +306,19 @@
     }
   },
   "core::Material": {
+    "513": {
+      "material": {
+        "$case": "pbr",
+        "pbr": {
+          "albedoColor": {
+            "r": 1,
+            "g": 0.85,
+            "b": 0.42,
+            "a": 1
+          }
+        }
+      }
+    },
     "517": {
       "material": {
         "$case": "pbr",

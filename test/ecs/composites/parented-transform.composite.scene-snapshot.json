@@ -41,7 +41,7 @@
   },
   "composite::root": {
     "512": {
-      "src": "parented-transform.composite.json",
+      "src": "parented-transform.composite",
       "entities": [
         {
           "src": 0,

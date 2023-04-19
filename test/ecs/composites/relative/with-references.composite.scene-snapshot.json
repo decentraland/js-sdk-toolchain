@@ -117,7 +117,7 @@
   },
   "composite::root": {
     "512": {
-      "src": "relative/with-references.composite.json",
+      "src": "relative/with-references.composite",
       "entities": [
         {
           "src": 0,
@@ -150,7 +150,7 @@
       ]
     },
     "513": {
-      "src": "one-transform.composite.json",
+      "src": "one-transform.composite",
       "entities": [
         {
           "src": 0,
@@ -163,7 +163,7 @@
       ]
     },
     "515": {
-      "src": "one-transform.composite.json",
+      "src": "one-transform.composite",
       "entities": [
         {
           "src": 0,
@@ -176,7 +176,7 @@
       ]
     },
     "517": {
-      "src": "one-transform.composite.json",
+      "src": "one-transform.composite",
       "entities": [
         {
           "src": 0,
@@ -189,7 +189,7 @@
       ]
     },
     "519": {
-      "src": "relative/second-level/one-transform.composite.json",
+      "src": "relative/second-level/one-transform.composite",
       "entities": [
         {
           "src": 0,
@@ -202,7 +202,7 @@
       ]
     },
     "521": {
-      "src": "relative/second-level/one-transform.composite.json",
+      "src": "relative/second-level/one-transform.composite",
       "entities": [
         {
           "src": 0,
@@ -215,7 +215,7 @@
       ]
     },
     "523": {
-      "src": "relative/second-level/one-transform.composite.json",
+      "src": "relative/second-level/one-transform.composite",
       "entities": [
         {
           "src": 0,

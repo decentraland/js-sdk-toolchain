@@ -6,7 +6,7 @@ export async function createContentFetchCompositeProvider(): Promise<Composite.P
   const scene = await getSceneInfo({})
   const compositesContent = scene.contents.filter((item) => {
     const path = item.file.toLowerCase()
-    return path.endsWith('.composite') || path.endsWith('.composite.json')
+    return path.endsWith('.composite') || path.endsWith('.composite.bin')
   })
 
   async function fetchComposite(item: { hash: string; file: string }): Promise<Composite.Resource | null> {
@@ -14,13 +14,13 @@ export async function createContentFetchCompositeProvider(): Promise<Composite.P
     const compositeUrl = `${scene.baseUrl}${item.hash}`
     try {
       const response = await fetch(compositeUrl)
-      if (item.file.endsWith('.json')) {
-        const compositeJson = await response.json()
-        const composite = Composite.fromJson(compositeJson)
-        return { src, composite }
-      } else {
+      if (item.file.endsWith('.bin')) {
         const compositeBinaryData: Uint8Array = await (response as any).arrayBuffer()
         const composite = Composite.fromBinary(compositeBinaryData)
+        return { src, composite }
+      } else {
+        const compositeJson = await response.json()
+        const composite = Composite.fromJson(compositeJson)
         return { src, composite }
       }
     } catch (err) {
