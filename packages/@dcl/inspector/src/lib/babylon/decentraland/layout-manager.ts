@@ -70,7 +70,9 @@ export const getLayoutManager = memoize((scene: Scene) => {
   groundGrid.lineColor = Color3.FromHexString('#cccccc')
   groundGrid.backFaceCulling = false
   groundGrid.opacity = 0.1
-  groundGrid.zOffset = -0.5
+  groundGrid.zOffset = -0.1
+  groundGrid.zOffsetUnits = 3
+  groundGrid.disableDepthWrite = true
   ground.material = groundGrid
 
   const layoutGrid = new GridMaterial('layout_grid', scene)
@@ -80,8 +82,9 @@ export const getLayoutManager = memoize((scene: Scene) => {
   layoutGrid.mainColor = Color3.FromHexString('#504E58')
   layoutGrid.lineColor = Color3.FromHexString('#ffffff')
   layoutGrid.backFaceCulling = false
+  layoutGrid.zOffset = -0.1
+  layoutGrid.zOffsetUnits = 3
   layoutGrid.opacity = 0.5
-  layoutGrid.zOffset = -1
 
   const planes: Mesh[] = []
 
@@ -124,7 +127,7 @@ export const getLayoutManager = memoize((scene: Scene) => {
       plane.parent = layoutNode
       plane.position.x = x * PARCEL_SIZE
       plane.position.z = y * PARCEL_SIZE
-      plane.position.y = 0.01
+      plane.position.y = 0
       plane.rotate(Axis.X, Math.PI / 2, Space.WORLD)
       plane.translate(Axis.X, PARCEL_SIZE / 2, Space.WORLD)
       plane.translate(Axis.Z, PARCEL_SIZE / 2, Space.WORLD)
