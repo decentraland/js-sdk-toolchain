@@ -3,8 +3,8 @@ import { setupEngine } from '.'
 
 describe('When setting up the engine', () => {
   const xhrMockClass = () => ({
-    open            : jest.fn(),
-    send            : jest.fn(),
+    open: jest.fn(),
+    send: jest.fn(),
     setRequestHeader: jest.fn(),
     addEventListener: jest.fn()
   })
