@@ -874,11 +874,35 @@ export type GizmoSelectedEvent = {
     entities: string[];
 };
 
+// Warning: (ae-missing-release-tag) "GlobalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type GlobalDirectionRaycastOptions = RaycastSystemOptions & GlobalDirectionRaycastSystemOptions;
+
+// Warning: (ae-missing-release-tag) "GlobalDirectionRaycastSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type GlobalDirectionRaycastSystemOptions = {
+    direction?: PBVector3;
+};
+
 // Warning: (ae-missing-release-tag) "GlobalInputEventResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export type GlobalInputEventResult = InputEventResult & {
     type: 0 | 1;
+};
+
+// Warning: (ae-missing-release-tag) "GlobalTargetRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type GlobalTargetRaycastOptions = RaycastSystemOptions & GlobalTargetRaycastSystemOptions;
+
+// Warning: (ae-missing-release-tag) "GlobalTargetRaycastSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type GlobalTargetRaycastSystemOptions = {
+    target?: PBVector3;
 };
 
 // @public (undocumented)
@@ -1293,6 +1317,18 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
 export type Listeners = {
     onMouseDown?: Callback;
     onMouseUp?: Callback;
+};
+
+// Warning: (ae-missing-release-tag) "LocalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type LocalDirectionRaycastOptions = RaycastSystemOptions & LocalDirectionRaycastSystemOptions;
+
+// Warning: (ae-missing-release-tag) "LocalDirectionRaycastSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type LocalDirectionRaycastSystemOptions = {
+    direction?: PBVector3;
 };
 
 // Warning: (ae-missing-release-tag) "LwwComponentGetter" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2495,6 +2531,30 @@ export type RaycastResponsePayload<T> = {
 export const RaycastResult: LastWriteWinElementSetComponentDefinition<PBRaycastResult>;
 
 // @public (undocumented)
+export interface RaycastSystem {
+    registerGlobalDirectionRaycast(entity: Entity, callback: RaycastSystemCallback, options?: Partial<GlobalDirectionRaycastOptions>): void;
+    registerGlobalTargetRaycast(entity: Entity, callback: RaycastSystemCallback, options?: Partial<GlobalTargetRaycastOptions>): void;
+    registerLocalDirectionRaycast(entity: Entity, callback: RaycastSystemCallback, options?: Partial<LocalDirectionRaycastOptions>): void;
+    registerTargetEntityRaycast(entity: Entity, callback: RaycastSystemCallback, options?: Partial<TargetEntityRaycastOptions>): void;
+    removeRaycasterEntity(entity: Entity): void;
+}
+
+// @public
+export const raycastSystem: RaycastSystem;
+
+// @public (undocumented)
+export type RaycastSystemCallback = (event: DeepReadonlyObject<PBRaycastResult>) => void;
+
+// @public (undocumented)
+export type RaycastSystemOptions = {
+    originOffset?: PBVector3 | undefined;
+    maxDistance: number;
+    queryType: RaycastQueryType;
+    continuous?: boolean | undefined;
+    collisionMask?: number | undefined;
+};
+
+// @public (undocumented)
 export interface ReactBasedUiSystem {
     // (undocumented)
     destroy(): void;
@@ -2656,6 +2716,18 @@ export type SystemItem = {
     fn: SystemFn;
     priority: number;
     name?: string;
+};
+
+// Warning: (ae-missing-release-tag) "TargetEntityRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type TargetEntityRaycastOptions = RaycastSystemOptions & TargetEntityRaycastSystemOptions;
+
+// Warning: (ae-missing-release-tag) "TargetEntityRaycastSystemOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type TargetEntityRaycastSystemOptions = {
+    targetEntity?: number;
 };
 
 // Warning: (ae-missing-release-tag) "Task" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)

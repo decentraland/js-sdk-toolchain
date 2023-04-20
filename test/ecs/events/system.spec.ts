@@ -1,6 +1,6 @@
 import { Engine, Entity, IEngine, components, PointerEventType, InputAction } from '../../../packages/@dcl/ecs/src'
 import { createInputSystem } from '../../../packages/@dcl/ecs/src/engine/input'
-import { createPointerEventSystem, PointerEventsSystem } from '../../../packages/@dcl/ecs/src/systems/events'
+import { createPointerEventsSystem, PointerEventsSystem } from '../../../packages/@dcl/ecs/src/systems/events'
 import { createTestPointerDownCommand } from './utils'
 
 let engine: IEngine
@@ -11,7 +11,7 @@ describe('Events System', () => {
   beforeEach(() => {
     engine = Engine()
     const Input = createInputSystem(engine)
-    EventsSystem = createPointerEventSystem(engine, Input)
+    EventsSystem = createPointerEventsSystem(engine, Input)
 
     const PointerEventsResult = components.PointerEventsResult(engine)
     let fakeCounter = 0
