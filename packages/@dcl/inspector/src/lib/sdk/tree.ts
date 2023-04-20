@@ -66,8 +66,9 @@ export const getTreeFromEngine = (engine: IEngine, EntityNode: EditorComponents[
           }
         }
       } else {
-        // When the entity does not have a transform it is shown as a child of the root entity
+        // When the entity does not have a EntityNode it is shown as a child of the root entity
         childrenByParent.get(ROOT)!.add(entity)
+        EntityNode.createOrReplace(entity)
       }
       // We flag the entity as processed
       childrenByParent.set(entity, new Set())
@@ -80,8 +81,10 @@ export const getTreeFromEngine = (engine: IEngine, EntityNode: EditorComponents[
             // If the orphan is already an ancestor of the entity, we skip it otherwise we would create a cycle
             continue
           }
+          const { label } = EntityNode.get(orphan)
           // Add orphan to parent's children
           setParent(orphan, entity)
+          EntityNode.createOrReplace(orphan, { label, parent: entity })
           // Delete orphan from root's children
           childrenByParent.get(ROOT)!.delete(orphan)
           // Delete orphan from orphans list

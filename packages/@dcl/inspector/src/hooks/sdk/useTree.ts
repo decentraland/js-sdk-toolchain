@@ -74,10 +74,9 @@ export const useTree = () => {
   const addChild = useCallback(
     (parent: Entity, label: string) => {
       if (!sdk) return
-      const { EntityNode, Transform } = sdk.components
+      const { EntityNode } = sdk.components
       const child = sdk.engine.addEntity()
       EntityNode.create(child, { label, parent })
-      Transform.create(child, { parent })
       handleUpdate()
     },
     [sdk, handleUpdate]
@@ -112,7 +111,13 @@ export const useTree = () => {
   const remove = useCallback(
     (entity: Entity) => {
       if (entity === ROOT || !sdk) return
-      sdk.engine.removeEntityWithChildren(entity)
+      const { EntityNode } = sdk.components
+      const { getComponentEntityTree, removeEntity } = sdk.engine
+
+      for (const _entity of getComponentEntityTree(entity, EntityNode)) {
+        removeEntity(_entity)
+      }
+
       handleUpdate()
     },
     [sdk, handleUpdate]
