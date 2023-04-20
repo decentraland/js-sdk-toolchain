@@ -21,18 +21,42 @@ export namespace ambientConfigurations {
 }
 
 export function initRenderer(canvas: HTMLCanvasElement) {
-  const babylon = new BABYLON.Engine(canvas, true, {
+  const engine = new BABYLON.Engine(canvas, true, {
     deterministicLockstep: true,
     lockstepMaxSteps: 4,
     alpha: false,
     antialias: true,
     stencil: true
   })
+  const renderer = setupEngine(engine)
 
+  // attach camera control to canvas
+  renderer.editorCamera.attachControl(canvas, true)
+
+  // resize renderer when window is resized
+  function resize() {
+    engine.resize(false)
+  }
+  window.addEventListener('resize', resize)
+  new ResizeObserver(resize).observe(canvas)
+  function dispose() {
+    engine.dispose()
+    if (window) {
+      window.removeEventListener('resize', resize)
+    }
+  }
+
+  // init keyboard
+  initKeyboard(canvas, renderer.scene, renderer.editorCamera)
+
+  return { ...renderer, dispose }
+}
+
+export function setupEngine(engine: BABYLON.Engine) {
   /**
    * This is the main scene of the engine.
    */
-  const scene = new BABYLON.Scene(babylon)
+  const scene = new BABYLON.Scene(engine)
   const audioEngine = BABYLON.Engine.audioEngine
   const effectLayers: BABYLON.EffectLayer[] = []
 
@@ -65,7 +89,7 @@ export function initRenderer(canvas: HTMLCanvasElement) {
 
   scene.actionManager = new BABYLON.ActionManager(scene)
 
-  babylon.disableManifestCheck = true
+  engine.disableManifestCheck = true
 
   scene.getBoundingBoxRenderer().showBackLines = false
 
@@ -89,7 +113,7 @@ export function initRenderer(canvas: HTMLCanvasElement) {
   })
 
   BABYLON.Database.IDBStorageEnabled = true
-  babylon.enableOfflineSupport = true
+  engine.enableOfflineSupport = true
 
   const editorColor = BABYLON.Color3.FromHexString('#17141B')
   const editorEnvHelper = scene.createDefaultEnvironment({
@@ -112,7 +136,6 @@ export function initRenderer(canvas: HTMLCanvasElement) {
   camera.lowerRadiusLimit = 3
   camera.upperRadiusLimit = 15
   scene.activeCamera?.detachControl()
-  camera.attachControl(canvas, true)
   scene.activeCamera = camera
   const size = center.length()
   camera.position = center.subtractFromFloats(size, -size * 1.5, size * 2)
@@ -123,8 +146,6 @@ export function initRenderer(canvas: HTMLCanvasElement) {
   hemiLight.groundColor = ambientConfigurations.groundColor.clone()
   hemiLight.specular = ambientConfigurations.sunColor.clone()
 
-  initKeyboard(canvas, scene, camera)
-
   reposition(editorEnvHelper, hemiLight, camera)
 
   function update() {
@@ -133,31 +154,15 @@ export function initRenderer(canvas: HTMLCanvasElement) {
   }
 
   // Register a render loop to repeatedly render the scene
-  babylon.runRenderLoop(update)
-
-  // Watch for browser/canvas resize events
-  function resize() {
-    babylon.resize(false)
-  }
-  window.addEventListener('resize', resize)
-  new ResizeObserver(resize).observe(canvas)
-
-  function dispose() {
-    babylon.dispose()
-    if (window) {
-      window.removeEventListener('resize', resize)
-    }
-  }
+  engine.runRenderLoop(update)
 
   return {
     editorCamera: camera,
-    canvas,
-    babylon,
+    engine,
     scene,
     audioEngine,
     effectLayers,
-    highlightLayer,
-    dispose
+    highlightLayer
   }
 }
 

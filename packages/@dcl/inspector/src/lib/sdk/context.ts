@@ -27,14 +27,15 @@ export type SdkContextValue = {
 }
 
 export async function createSdkContext(canvas: HTMLCanvasElement, catalog: ITheme[]): Promise<SdkContextValue> {
-  const { babylon, scene } = initRenderer(canvas)
+  const renderer = initRenderer(canvas)
+  const { scene } = renderer
 
   // initialize DataLayer
   const dataLayer = await createDataLayerClientRpc()
 
   // create scene context
   const ctx = new SceneContext(
-    babylon,
+    renderer.engine,
     scene,
     getHardcodedLoadableScene(
       'urn:decentraland:entity:bafkreid44xhavttoz4nznidmyj3rjnrgdza7v6l7kd46xdmleor5lmsxfm1',
