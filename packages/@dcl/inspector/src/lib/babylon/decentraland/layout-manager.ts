@@ -61,30 +61,14 @@ export const getLayoutManager = memoize((scene: Scene) => {
   disableGizmo(positionGizmo.yGizmo)
   disableGizmo(positionGizmo.zGizmo)
 
-  const ground = MeshBuilder.CreateGround('ground', { width: 1000, height: 1000 }, scene)
-  const groundGrid = new GridMaterial('ground_grid', scene)
-  groundGrid.gridRatio = 1
-  groundGrid.majorUnitFrequency = 4
-  groundGrid.minorUnitVisibility = 1
-  groundGrid.mainColor = Color3.FromHexString('#504E58')
-  groundGrid.lineColor = Color3.FromHexString('#cccccc')
-  groundGrid.backFaceCulling = false
-  groundGrid.opacity = 0.1
-  groundGrid.zOffset = -0.1
-  groundGrid.zOffsetUnits = 3
-  groundGrid.disableDepthWrite = true
-  ground.material = groundGrid
-
-  const layoutGrid = new GridMaterial('layout_grid', scene)
-  layoutGrid.gridRatio = 1
-  layoutGrid.majorUnitFrequency = 4
-  layoutGrid.minorUnitVisibility = 1
-  layoutGrid.mainColor = Color3.FromHexString('#504E58')
-  layoutGrid.lineColor = Color3.FromHexString('#ffffff')
-  layoutGrid.backFaceCulling = false
-  layoutGrid.zOffset = -0.1
-  layoutGrid.zOffsetUnits = 3
-  layoutGrid.opacity = 0.5
+  const grid = new GridMaterial('layout_grid', scene)
+  grid.gridRatio = 1
+  grid.majorUnitFrequency = 4
+  grid.lineColor = Color3.FromHexString('#ffffff')
+  grid.mainColor = Color3.FromHexString('#504E58')
+  grid.zOffset = -0.1
+  grid.zOffsetUnits = 3
+  grid.opacity = 0.9
 
   const planes: Mesh[] = []
 
@@ -132,7 +116,7 @@ export const getLayoutManager = memoize((scene: Scene) => {
       plane.translate(Axis.X, PARCEL_SIZE / 2, Space.WORLD)
       plane.translate(Axis.Z, PARCEL_SIZE / 2, Space.WORLD)
       plane.isPickable = false
-      plane.material = layoutGrid
+      plane.material = grid
       planes.push(plane)
     }
   }

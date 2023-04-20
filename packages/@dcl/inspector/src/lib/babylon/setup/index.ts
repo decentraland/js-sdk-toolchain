@@ -1,5 +1,6 @@
 import * as BABYLON from '@babylonjs/core'
 import { initKeyboard } from './input'
+import { GridMaterial } from '@babylonjs/materials'
 import { PARCEL_SIZE } from '../../utils/scene'
 
 // if NODE_ENV == development
@@ -98,10 +99,12 @@ export function initRenderer(canvas: HTMLCanvasElement) {
     groundSize: 1000
   })!
 
-  const groundMaterial = new BABYLON.StandardMaterial('ground', scene)
-  groundMaterial.diffuseColor = BABYLON.Color3.FromHexString('#48434e')
-  groundMaterial.specularColor = new BABYLON.Color3(0, 0, 0)
-  editorEnvHelper.ground!.material = groundMaterial
+  const grid = new GridMaterial('grid', scene)
+  grid.gridRatio = 1
+  grid.majorUnitFrequency = 4
+  grid.lineColor = BABYLON.Color3.FromHexString('#504E58')
+  grid.mainColor = BABYLON.Color3.FromHexString('#36343D')
+  editorEnvHelper.ground!.material = grid
 
   const center = new BABYLON.Vector3(PARCEL_SIZE / 2, 0, PARCEL_SIZE / 2)
   const camera = new BABYLON.ArcRotateCamera('editorCamera', -Math.PI / 2, Math.PI / 2.5, 15, center, scene)
@@ -163,10 +166,16 @@ function reposition(
   hemiLight: BABYLON.HemisphericLight,
   camera: BABYLON.ArcRotateCamera
 ) {
+  // set the ground at 0 always and round position towards PARCEL_SIZE
+  envHelper.ground!.position.set(
+    Math.floor(camera.globalPosition.x / PARCEL_SIZE) * PARCEL_SIZE - camera.globalPosition.x,
+    -camera.globalPosition.y,
+    Math.floor(camera.globalPosition.z / PARCEL_SIZE) * PARCEL_SIZE - camera.globalPosition.z
+  )
+
   // make the skybox follow the camera target
-  envHelper.rootMesh.position.set(camera.target.x, camera.target.y, camera.target.z)
-  // set the ground at 0 always
-  envHelper.ground!.position.set(0, -camera.target.y, 0)
+  envHelper.skybox!.position.set(camera.globalPosition.x, camera.globalPosition.y, camera.globalPosition.z)
+  envHelper.rootMesh.position.set(camera.globalPosition.x, camera.globalPosition.y, camera.globalPosition.z)
 
   const theta = Math.PI * sunInclination
   const phi = Math.PI * -0.4
