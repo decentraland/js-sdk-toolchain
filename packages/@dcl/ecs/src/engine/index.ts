@@ -202,23 +202,31 @@ function preEngine(): PreEngine {
 
   const Transform = components.Transform({ defineComponentFromSchema })
 
-  function* getTreeEntityArray(firstEntity: Entity, proccesedEntities: Entity[]): Generator<Entity> {
-    // This avoid infinite loop when there is a cyclic parenting
-    if (proccesedEntities.find((value) => firstEntity === value)) return
-    proccesedEntities.push(firstEntity)
+  function getComponentEntityTree<T>(
+    entity: Entity,
+    component: ComponentDefinition<T & { parent?: Entity }>
+  ): Generator<Entity> {
+    const entities = new Map(getEntitiesWith(component))
+    return genEntityTree(entity, entities)
+  }
 
-    for (const [entity, value] of getEntitiesWith(Transform)) {
-      if (value.parent === firstEntity) {
-        yield* getTreeEntityArray(entity, proccesedEntities)
+  function* genEntityTree<T>(entity: Entity, entities: Map<Entity, T & { parent?: Entity }>): Generator<Entity> {
+    // This avoid infinite loop when there is a cyclic parenting
+    if (!entities.has(entity)) return
+    entities.delete(entity)
+
+    for (const [_entity, value] of entities) {
+      if (value.parent === entity) {
+        yield* genEntityTree(_entity, entities)
       }
     }
 
-    yield firstEntity
+    yield entity
   }
 
-  function removeEntityWithChildren(firstEntity: Entity) {
-    for (const entity of getTreeEntityArray(firstEntity, [])) {
-      removeEntity(entity)
+  function removeEntityWithChildren(entity: Entity) {
+    for (const _entity of getComponentEntityTree(entity, Transform)) {
+      removeEntity(_entity)
     }
   }
 
@@ -240,6 +248,7 @@ function preEngine(): PreEngine {
     getEntitiesWith,
     getComponent,
     getComponentOrNull,
+    getComponentEntityTree,
     removeComponentDefinition,
     removeEntityWithChildren,
     registerComponentDefinition,
@@ -288,6 +297,7 @@ export function Engine(options?: IEngineOptions): IEngine {
     getEntitiesWith: partialEngine.getEntitiesWith,
     getComponent: partialEngine.getComponent,
     getComponentOrNull: partialEngine.getComponentOrNull,
+    getComponentEntityTree: partialEngine.getComponentEntityTree,
     removeComponentDefinition: partialEngine.removeComponentDefinition,
     componentsIter: partialEngine.componentsIter,
     seal: partialEngine.seal,

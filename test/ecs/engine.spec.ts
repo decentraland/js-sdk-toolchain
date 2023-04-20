@@ -635,6 +635,36 @@ describe('Engine tests', () => {
     expect(MeshCollider.getOrNull(e_recursive)).toBeNull()
   })
 
+  it('should return all entities as a tree (or the provided entity if there is no valid tree)', () => {
+    const engine = Engine()
+    const MeshCollider = components.MeshCollider(engine)
+    const TreeComponent = engine.defineComponent('test::TreeComponent', {
+      parent: Schemas.Entity
+    })
+    function createCube(parent?: Entity): Entity {
+      const entity = engine.addEntity()
+      MeshCollider.create(entity, {
+        mesh: { $case: 'box', box: {} }
+      })
+      TreeComponent.create(entity, { parent })
+      return entity
+    }
+
+    const e_A = createCube()
+    const e_A1 = createCube(e_A)
+    const e_A2 = createCube(e_A)
+    const e_A3 = createCube(e_A)
+    const e_A1_1 = createCube(e_A1)
+    const e_A1_2 = createCube(e_A1)
+    const e_A1_3 = createCube(e_A1)
+
+    const entitiesWithValidComponent = Array.from(engine.getComponentEntityTree(e_A, TreeComponent))
+    const entitiesWithInvalidComponent = Array.from(engine.getComponentEntityTree(e_A, MeshCollider))
+
+    expect(entitiesWithValidComponent).toEqual(expect.arrayContaining([e_A, e_A1, e_A2, e_A3, e_A1_1, e_A1_2, e_A1_3]))
+    expect(entitiesWithInvalidComponent).toEqual([e_A])
+  })
+
   it('should throw an error if the system is a thenable', async () => {
     const engine = Engine()
     engine.addSystem(async function () {
