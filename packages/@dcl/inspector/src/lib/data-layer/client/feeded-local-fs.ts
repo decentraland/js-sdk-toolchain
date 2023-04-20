@@ -1,7 +1,130 @@
 import { createFsInMemory } from '../../logic/in-memory-storage'
 
+export const minimalComposite = {
+  version: 1,
+  components: [
+    {
+      name: 'core::Transform',
+      data: {
+        '512': {
+          $case: 'json',
+          json: {
+            position: {
+              x: 8,
+              y: 1,
+              z: 8
+            }
+          }
+        }
+      }
+    },
+    {
+      name: 'core::MeshRenderer',
+      data: {
+        '512': {
+          $case: 'json',
+          json: {
+            mesh: {
+              $case: 'box',
+              box: {
+                uvs: []
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      name: 'core::MeshCollider',
+      data: {
+        '512': {
+          $case: 'json',
+          json: {
+            mesh: {
+              $case: 'box',
+              box: {}
+            }
+          }
+        }
+      }
+    },
+    {
+      name: 'cube-id',
+      jsonSchema: {
+        type: 'object',
+        properties: {},
+        serializationType: 'map'
+      },
+      data: {
+        '512': {
+          $case: 'json',
+          json: {}
+        }
+      }
+    },
+    {
+      name: 'inspector::Scene',
+      jsonSchema: {
+        type: 'object',
+        properties: {
+          layout: {
+            type: 'object',
+            properties: {
+              base: {
+                type: 'object',
+                properties: {
+                  x: {
+                    type: 'integer'
+                  },
+                  y: {
+                    type: 'integer'
+                  }
+                }
+              },
+              parcels: {
+                type: 'array',
+                item: {
+                  type: 'object',
+                  properties: {
+                    x: {
+                      type: 'integer'
+                    },
+                    y: {
+                      type: 'integer'
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        serializationType: 'map'
+      },
+      data: {
+        '0': {
+          $case: 'json',
+          json: {
+            layout: {
+              base: {
+                x: 0,
+                y: 0
+              },
+              parcels: [
+                {
+                  x: 0,
+                  y: 0
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}
+
 export const mainComposite = {
-  id: 'main',
+  version: 1,
   components: [
     {
       name: 'core::Transform',
@@ -206,7 +329,8 @@ export const mainComposite = {
 }
 
 const builderMappings: Record<string, string> = {
-  'assets/models/test-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB'
+  'assets/models/test-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
+  'assets/models2/test2-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB'
 }
 
 export async function feededFileSystem(mappings: Record<string, string> = builderMappings) {
@@ -228,6 +352,6 @@ export async function feededFileSystem(mappings: Record<string, string> = builde
 
   return createFsInMemory({
     ...fileContent,
-    'main.composite.json': Buffer.from(JSON.stringify(mainComposite), 'utf-8')
+    'main.composite': Buffer.from(JSON.stringify(mainComposite), 'utf-8')
   })
 }

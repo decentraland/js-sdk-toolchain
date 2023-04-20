@@ -58,6 +58,7 @@ export function createComponents(engine: IEngine): SdkComponents {
   }
 }
 
+/* istanbul ignore next */
 export function createEditorComponents(engine: IEngine): EditorComponents {
   const EntityNode = engine.defineComponent('editor::EntityNode', {
     label: Schemas.String,

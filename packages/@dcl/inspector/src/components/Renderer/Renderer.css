@@ -3,7 +3,11 @@
   position: relative;
 }
 
-.Renderer>#canvas {
+.Renderer > div:first-child {
+  display: flex;
+}
+
+.Renderer > canvas {
   width: 100%;
   height: 100%;
   touch-action: none;

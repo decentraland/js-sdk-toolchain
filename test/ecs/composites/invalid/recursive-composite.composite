@@ -1,0 +1,16 @@
+{
+    "version": 1,
+    "components": [
+        {
+            "name": "composite::root",
+            "data": {
+                "512": {
+                    "$case": "json",
+                    "json": {
+                        "src": "./recursive-composite.composite"
+                    }
+                }
+            }
+        }
+    ]
+}

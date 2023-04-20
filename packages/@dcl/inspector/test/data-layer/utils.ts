@@ -1,11 +1,11 @@
 import * as BABYLON from '@babylonjs/core'
+import { IEngine } from '@dcl/ecs'
 import { SceneContext, LoadableScene } from '../../src/lib/babylon/decentraland/SceneContext'
 import { SdkContextValue } from '../../src/lib/sdk/context'
 import { createInspectorEngine } from '../../src/lib/sdk/inspector-engine'
 import { createLocalDataLayerRpcClient } from '../../src/lib/data-layer/client/local-data-layer'
 import { feededFileSystem } from '../../src/lib/data-layer/client/feeded-local-fs'
 import { DataLayerRpcClient } from '../../src/lib/data-layer/types'
-import { IEngine } from '@dcl/ecs'
 
 export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
   let sceneCtx: SceneContext

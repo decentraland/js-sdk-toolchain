@@ -1,9 +1,13 @@
 import React from 'react'
+import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
+import { FiHexagon } from 'react-icons/fi'
 
 import { useTree } from '../../hooks/sdk/useTree'
 import { ROOT } from '../../lib/sdk/tree'
 import { Tree } from '../Tree'
 import { ContextMenu } from './ContextMenu'
+import { Container } from '../Container'
+import { Entity } from '@dcl/ecs'
 
 const Hierarchy: React.FC = () => {
   const {
@@ -23,7 +27,7 @@ const Hierarchy: React.FC = () => {
   } = useTree()
 
   return (
-    <div className="Hierarchy">
+    <Container label="">
       <Tree
         value={ROOT}
         getExtraContextMenu={ContextMenu}
@@ -35,13 +39,24 @@ const Hierarchy: React.FC = () => {
         getId={getId}
         getChildren={getChildren}
         getLabel={getLabel}
+        getIcon={(val: Entity) => {
+          const hasChildrens = !!getChildren(val).length
+          if (val === ROOT) {
+            return <span style={{ marginRight: '14px' }} />
+          }
+          if (!hasChildrens) {
+            return <><span style={{ marginLeft: '14px' }} /><FiHexagon /></>
+          }
+          const ArrowComponent = isOpen(val) ? <IoIosArrowDown /> : <IoIosArrowForward/>
+          return <>{ArrowComponent}<FiHexagon /></>
+        }}
         isOpen={isOpen}
         isSelected={isSelected}
         canRename={canRename}
         canRemove={canRemove}
         canToggle={canToggle}
       />
-    </div>
+    </Container>
   )
 }
 

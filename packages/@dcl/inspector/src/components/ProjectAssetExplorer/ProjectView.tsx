@@ -1,9 +1,9 @@
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { IoIosArrowDown, IoIosArrowForward, IoIosImage } from 'react-icons/io'
-import { useDrag } from 'react-dnd'
 
 import { Tree } from '../Tree'
 import { AssetNode, AssetNodeFolder } from './types'
+import { AiFillFolder } from 'react-icons/ai'
 
 function noop() {}
 // eslint-disable-next-line prettier/prettier
@@ -16,7 +16,7 @@ type Props = {
 const ROOT = 'File System'
 
 
-type TreeNode = Omit<AssetNode, 'children'> & { children?: string[] }
+export type TreeNode = Omit<AssetNode, 'children'> & { children?: string[] }
 
 function ProjectView({ folders }: Props) {
   const [open, setOpen] = useState(new Set<string>())
@@ -31,7 +31,6 @@ function ProjectView({ folders }: Props) {
       for (const children of node.children) {
         if (children.type === 'folder') {
           generateTree(children)
-          return
         } else {
           tree.set(children.name, children)
         }
@@ -56,7 +55,6 @@ function ProjectView({ folders }: Props) {
   }, [open, setOpen])
 
   if (!folders.length) return null
-
   return (
     <MyTree
       className="editor-assets-tree"
@@ -68,30 +66,22 @@ function ProjectView({ folders }: Props) {
       onToggle={canToggle}
       getId={(value: string) => value.toString()}
       getChildren={(name: string) => [...tree.get(name)?.children || []]}
-      getLabel={(val: string) => <NodeLabel value={tree.get(val)!} />}
+      getLabel={(val: string) => tree.has(val) ? tree.get(val)!.name : ''}
       isOpen={(val: string) => open.has(val)}
       isSelected={(val: string) => open.has(val)}
       canRename={() => false}
       canRemove={() => false}
       canToggle={() => true}
       getIcon={(val) => <NodeIcon value={tree.get(val)!} isOpen={open.has(val)} />}
+      getDragContext={() => ({ tree })}
+      dndType="project-asset-gltf"
     />
   )
 }
 
-function NodeLabel({ value }: { value: TreeNode }) {
-  if (value.type === 'asset') {
-    const [, drag] = useDrag(() => ({ type: 'project-asset-gltf', item: { asset: value } }), [value])
-    return <span ref={drag}>{value.name}</span>
-  }
-
-  return <span>{value.name}</span>
-
-}
-
 function NodeIcon({ value, isOpen }: { value: TreeNode, isOpen: boolean }) {
   if (value.type === 'folder') {
-    return isOpen ? <IoIosArrowDown /> : <IoIosArrowForward />
+    return isOpen ? <><IoIosArrowDown /><AiFillFolder/></> : <><IoIosArrowForward /><AiFillFolder/></>
   }
   return <IoIosImage />
 }

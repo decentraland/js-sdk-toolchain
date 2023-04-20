@@ -24,9 +24,9 @@ code {
 }
 
 .sidebar {
-  height: 100%;
-  max-width: var(--sidebar);
-  min-width: var(--sidebar);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 13px) !important;
   background: var(--main-bg-color);
 }
 
@@ -51,6 +51,7 @@ code {
 
 /* Inspector settings */
 #embed-host {
+  top: -30px;
   position: absolute !important;
 }
 
@@ -68,14 +69,18 @@ code {
   height: 36px;
 }
 
-.footer .footer-buttons>div {
+.footer .footer-buttons > div {
   display: flex;
   align-items: center;
   padding: 8px;
   cursor: pointer;
 }
 
-.footer-buttons .footer-title>span {
+.footer .footer-buttons > div > svg {
+  margin-right: 4px;
+}
+
+.footer-buttons .footer-title > span {
   margin-left: 8px;
 }
 

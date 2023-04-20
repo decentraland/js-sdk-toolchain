@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "name": "core::Transform",
+      "data": {
+        "512": {
+          "binary": "AAAAQc3MTD8AAABBAAAAAAAAAAAAAAAAAACAPwAAgD8AAIA/AACAPwAAAAA="
+        }
+      }
+    },
+    {
+      "name": "core::MeshRenderer",
+      "data": {
+        "512": {
+          "binary": "CgIKAA=="
+        }
+      }
+    },
+    {
+      "name": "core::MeshCollider",
+      "data": {
+        "512": {
+          "binary": "EgA="
+        }
+      }
+    },
+    {
+      "name": "core::PointerEvents",
+      "data": {
+        "512": {
+          "binary": "Ch8IARIbCAESEFByZXNzIEUgdG8gc3Bhd24dAADIQiAB"
+        }
+      }
+    },
+    {
+      "name": "core::Material",
+      "data": {
+        "512": {
+          "binary": "EhY6FA0AAIA/FZqZWT8dPQrXPiUAAIA/"
+        }
+      }
+    },
+    {
+      "name": "composite::root",
+      "data": {
+        "512": {
+          "binary": "DwAAAGVtcHR5LmNvbXBvc2l0ZQAAAAA="
+        },
+        "513": {
+          "binary": "FwAAAG9uZS10cmFuc2Zvcm0uY29tcG9zaXRlAAAAAA=="
+        },
+        "514": {
+          "binary": "FAAAAGN1YmUtc2NlbmUuY29tcG9zaXRlAAAAAA=="
+        },
+        "515": {
+          "binary": "FwAAAG9ubHktY2hpbGRyZW4uY29tcG9zaXRlAAAAAA=="
+        }
+      }
+    }
+  ]
+}

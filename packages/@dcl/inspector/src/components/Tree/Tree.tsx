@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
-import { RxDoubleArrowRight as ArrowRight, RxDoubleArrowDown as ArrowDown } from 'react-icons/rx'
+import { IoIosArrowDown, IoIosArrowForward, IoIosImage } from 'react-icons/io'
 
 import { withContextMenu } from '../../hoc/withContextMenu'
 import { Input } from '../Input'
@@ -28,10 +28,12 @@ type Props<T> = {
   onAddChild: (value: T, label: string) => void
   onRemove: (value: T) => void
   onToggle: (value: T, isOpen: boolean) => void
+  getDragContext?: () => any
+  dndType?: string
 }
 
 const getDefaultLevel = () => 1
-const getLevelStyles = (level: number) => ({ paddingLeft: `${level * 10}px` })
+const getLevelStyles = (level: number) => ({ paddingLeft: `${(level - 1) * 10}px` })
 const getExpandStyles = (active: boolean) => ({ height: active ? 'auto' : '0', overflow: 'hidden', display: 'block' })
 const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : '' })
 
@@ -57,6 +59,8 @@ function Tree<T>(_props: Props<T>) {
       onAddChild,
       onRemove,
       onToggle,
+      getDragContext = () => ({}),
+      dndType = 'tree'
     } = props
     const id = getId(value)
     const label = getLabel(value)
@@ -78,11 +82,11 @@ function Tree<T>(_props: Props<T>) {
       [getId, getChildren]
     )
 
-    const [, drag] = useDrag(() => ({ type: 'tree', item: { value } }), [value])
+    const [, drag] = useDrag(() => ({ type: dndType, item: { value, context: getDragContext() } }), [value])
 
     const [, drop] = useDrop(
       () => ({
-        accept: 'tree',
+        accept: dndType,
         drop: ({ value: other }: { value: T }, monitor) => {
           if (monitor.didDrop() || !canDrop(other, value)) return
           onSetParent(other, value)
@@ -142,10 +146,12 @@ function Tree<T>(_props: Props<T>) {
         <div style={getLevelStyles(level)} className={selected ? 'selected item' : 'item'}>
           <ContextMenu {...controlsProps} />
           <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
-            {props.getIcon ? props.getIcon(value) : open ? <ArrowDown /> : <ArrowRight />}
-            {label ? <span>{label || id}</span> : <label />}
+            {props.getIcon ? props.getIcon(value) : open ? <IoIosArrowDown /> : <IoIosArrowForward />}
+            <span>{label || id}</span>
           </span>
-          {editMode && typeof label === 'string' && <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />}
+          {editMode && typeof label === 'string' && (
+            <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />
+          )}
         </div>
         <TreeChildren {...props} />
         {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} />}

@@ -10,7 +10,7 @@ export const onUpdate = basicOnUpdate
  */
 /* @__PURE__ */ export async function onStart() {
   const compositeProvider = await createContentFetchCompositeProvider()
-  const mainComposite = compositeProvider.getCompositeOrNull('main.composite.json')
+  const mainComposite = compositeProvider.getCompositeOrNull('main.composite')
   if (mainComposite) {
     Composite.instance(engine, mainComposite, compositeProvider)
   }

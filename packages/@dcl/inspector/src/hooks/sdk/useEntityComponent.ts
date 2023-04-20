@@ -1,5 +1,5 @@
-import { CrdtMessageType, Entity } from '@dcl/ecs'
-import { useCallback, useState } from 'react'
+import { Entity } from '@dcl/ecs'
+import { useCallback } from 'react'
 
 import { useSdk } from './useSdk'
 import { isLastWriteWinComponent } from './useComponentValue'

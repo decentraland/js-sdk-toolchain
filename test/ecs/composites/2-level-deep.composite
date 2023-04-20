@@ -1,0 +1,34 @@
+{
+    "version": 1,
+    "components": [
+        {
+            "name": "composite::root",
+            "data": {
+                "512": {
+                    "$case": "json",
+                    "json": {
+                        "src": "empty.composite"
+                    }
+                },
+                "513": {
+                    "$case": "json",
+                    "json": {
+                        "src": "one-transform.composite"
+                    }
+                },
+                "514": {
+                    "$case": "json",
+                    "json": {
+                        "src": "cube-scene.composite"
+                    }
+                },
+                "515": {
+                    "$case": "json",
+                    "json": {
+                        "src": "only-children.composite"
+                    }
+                }
+            }
+        }
+    ]
+}

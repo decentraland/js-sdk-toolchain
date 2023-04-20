@@ -1,0 +1,14 @@
+{
+  "core::Transform": {},
+  "composite::root": {
+    "512": {
+      "src": "empty.composite",
+      "entities": [
+        {
+          "src": 0,
+          "dest": 512
+        }
+      ]
+    }
+  }
+}

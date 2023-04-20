@@ -1,0 +1,11 @@
+.Resizable {
+  display: flex;
+}
+
+/* TODO: Maybe position absolute ? */
+.Resizable .resize-handle {
+  position: absolute;
+  width: 10px;
+  height: 100%;
+  cursor: col-resize;
+}

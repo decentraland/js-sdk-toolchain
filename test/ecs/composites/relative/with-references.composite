@@ -1,0 +1,46 @@
+{
+    "version": 1,
+    "components": [
+        {
+            "name": "composite::root",
+            "data": {
+                "512": {
+                    "$case": "json",
+                    "json": {
+                        "src": "../one-transform.composite"
+                    }
+                },
+                "513": {
+                    "$case": "json",
+                    "json": {
+                        "src": "one-transform.composite"
+                    }
+                },
+                "514": {
+                    "$case": "json",
+                    "json": {
+                        "src": "/one-transform.composite"
+                    }
+                },
+                "515": {
+                    "$case": "json",
+                    "json": {
+                        "src": "./second-level/one-transform.composite"
+                    }
+                },
+                "516": {
+                    "$case": "json",
+                    "json": {
+                        "src": "/relative/second-level/one-transform.composite"
+                    }
+                },
+                "517": {
+                    "$case": "json",
+                    "json": {
+                        "src": "relative/second-level/one-transform.composite"
+                    }
+                }
+            }
+        }
+    ]
+}

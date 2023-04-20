@@ -1,21 +1,18 @@
 import { resolve } from 'path'
-import { EntityType, ChainId, Scene } from '@dcl/schemas'
-import { CatalystClient, ContentClient, DeploymentBuilder } from 'dcl-catalyst-client'
+import { EntityType, ChainId } from '@dcl/schemas'
 import { Authenticator } from '@dcl/crypto'
-import { hexToBytes } from 'eth-connect'
-import { ethSign } from '@dcl/crypto/dist/crypto'
 
 import { CliComponents } from '../../components'
-import { IFile, getBaseCoords, getFiles, getValidSceneJson, validateFilesSizes } from '../../logic/scene-validations'
+import { getBaseCoords, getFiles, getValidSceneJson, validateFilesSizes } from '../../logic/scene-validations'
 import { declareArgs } from '../../logic/args'
 import { npmRun } from '../../logic/project-validations'
-import { runLinkerApp, LinkerResponse } from './linker-dapp/api'
 import { CliError } from '../../logic/error'
 import { printProgressInfo, printSuccess } from '../../logic/beautiful-logs'
-import { createWallet } from '../../logic/account'
 import { getPackageJson, b64HashingFunction } from '../../logic/project-files'
 import { Events } from '../../components/analytics'
 import { Result } from 'arg'
+import { getAddressAndSignature, getCatalyst } from './utils'
+import { DeploymentBuilder } from 'dcl-catalyst-client'
 
 interface Options {
   args: Result<typeof args>
@@ -108,7 +105,7 @@ export async function main(options: Options) {
 
   // Signing message
   const messageToSign = entityId
-  const { signature, address, chainId } = await getAddressAndSignature(
+  const { linkerResponse, program } = await getAddressAndSignature(
     options.components,
     messageToSign,
     sceneJson,
@@ -121,6 +118,7 @@ export async function main(options: Options) {
         !!options.args['--skip-validations'] || !!options.args['--target'] || !!options.args['--target-content']
     }
   )
+  const { address, signature, chainId } = await linkerResponse
   const authChain = Authenticator.createSimpleAuthChain(entityId, address, signature)
 
   // Uploading data
@@ -146,42 +144,8 @@ export async function main(options: Options) {
     options.components.logger.error('Could not upload content:')
     options.components.logger.error(e)
     options.components.analytics.track('Scene deploy failure', { ...trackProps, error: e.message ?? '' })
+  } finally {
+    await program?.stop()
   }
   options.components.analytics.track('Scene deploy success', { ...trackProps, dependencies })
-}
-
-async function getCatalyst(target?: string, targetContent?: string) {
-  if (target) {
-    return new CatalystClient({ catalystUrl: target.endsWith('/') ? target.slice(0, -1) : target })
-  }
-
-  if (targetContent) {
-    return new ContentClient({ contentUrl: targetContent })
-  }
-
-  return CatalystClient.connectedToCatalystIn({ network: 'mainnet' })
-}
-
-interface LinkOptions {
-  openBrowser: boolean
-  linkerPort?: number
-  isHttps: boolean
-  skipValidations: boolean
-}
-
-async function getAddressAndSignature(
-  components: CliComponents,
-  messageToSign: string,
-  scene: Scene,
-  files: IFile[],
-  linkOptions: LinkOptions
-): Promise<LinkerResponse> {
-  if (process.env.DCL_PRIVATE_KEY) {
-    const wallet = createWallet(process.env.DCL_PRIVATE_KEY)
-    const signature = ethSign(hexToBytes(wallet.privateKey), messageToSign)
-    return { signature, address: wallet.address }
-  }
-
-  const { linkerPort, ...opts } = linkOptions
-  return runLinkerApp(components, scene, files, linkerPort!, messageToSign, opts)
 }
