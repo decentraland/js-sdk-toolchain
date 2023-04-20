@@ -637,6 +637,7 @@ describe('Engine tests', () => {
 
   it('should return all entities as a tree (or the provided entity if there is no valid tree)', () => {
     const engine = Engine()
+    const Transform = components.Transform(engine)
     const MeshCollider = components.MeshCollider(engine)
     const TreeComponent = engine.defineComponent('test::TreeComponent', {
       parent: Schemas.Entity
@@ -660,9 +661,11 @@ describe('Engine tests', () => {
 
     const entitiesWithValidComponent = Array.from(engine.getComponentEntityTree(e_A, TreeComponent))
     const entitiesWithInvalidComponent = Array.from(engine.getComponentEntityTree(e_A, MeshCollider))
+    const noEntitiesWithComponent = Array.from(engine.getComponentEntityTree(e_A, Transform))
 
     expect(entitiesWithValidComponent).toEqual(expect.arrayContaining([e_A, e_A1, e_A2, e_A3, e_A1_1, e_A1_2, e_A1_3]))
     expect(entitiesWithInvalidComponent).toEqual([e_A])
+    expect(noEntitiesWithComponent).toEqual([])
   })
 
   it('should throw an error if the system is a thenable', async () => {

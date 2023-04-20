@@ -248,12 +248,12 @@ export interface IEngine {
    * Example:
    * ```ts
    * const TreeComponent = engine.defineComponent('custom::TreeComponent', {
-   *  label: Schemas.String,
-   *  parent: Schemas.Entity
+   *    label: Schemas.String,
+   *    parent: Schemas.Entity
    * })
    *
    * for (const entity of getComponentEntityTree(entity, TreeComponent)) {
-   *  // entity in the tree
+   *    // entity in the tree
    * }
    * ```
    */

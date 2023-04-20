@@ -933,6 +933,9 @@ export interface IEngine {
     defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): LastWriteWinElementSetComponentDefinition<T>;
     defineValueSetComponentFromSchema<T>(componentName: string, spec: ISchema<T>, options: ValueSetOptions<T>): GrowOnlyValueSetComponentDefinition<T>;
     getComponent<T>(componentId: number | string): ComponentDefinition<T>;
+    getComponentEntityTree<T>(entity: Entity, component: ComponentDefinition<T & {
+        parent?: Entity;
+    }>): Generator<Entity>;
     getComponentOrNull<T>(componentId: number | string): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     getEntityState(entity: Entity): EntityState;
