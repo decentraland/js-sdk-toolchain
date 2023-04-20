@@ -1,20 +1,24 @@
 import { NullEngine } from '@babylonjs/core/Engines/nullEngine'
 import { setupEngine } from '.'
+import { mockXMLHttpRequest } from '../../../../test/utils'
+import { Engine } from '@babylonjs/core'
 
 describe('When setting up the engine', () => {
-  const xhrMockClass = () => ({
-    open: jest.fn(),
-    send: jest.fn(),
-    setRequestHeader: jest.fn(),
-    addEventListener: jest.fn()
+  let engine: Engine
+  let resetMockXMLHttpRequest: () => void
+
+  beforeEach(() => {
+    engine = new NullEngine()
+    resetMockXMLHttpRequest = mockXMLHttpRequest()
   })
 
-  ;(globalThis as any).XMLHttpRequest = jest.fn().mockImplementation(xhrMockClass)
+  afterEach(() => {
+    engine.dispose()
+    resetMockXMLHttpRequest()
+  })
 
   it('should create a scene', () => {
-    const engine = new NullEngine()
     const { scene } = setupEngine(engine)
     expect(scene).toBeDefined()
-    engine.stopRenderLoop()
   })
 })
