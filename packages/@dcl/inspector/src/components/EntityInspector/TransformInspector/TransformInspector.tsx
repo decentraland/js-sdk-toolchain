@@ -19,13 +19,12 @@ export default withSdk<Props>(
     const { Transform } = sdk.components
 
     const hasTransform = useHasComponent(entity, Transform)
-    const getInputProps =
-      hasTransform && useComponentInput(entity, Transform, fromTransform, toTransform, isValidNumericInput)
+    const getInputProps = useComponentInput(entity, Transform, fromTransform, toTransform, isValidNumericInput)
     const { handleAction } = useContextMenu()
 
     const handleRemove = useCallback(() => Transform.deleteFrom(entity), [])
 
-    if (!getInputProps) {
+    if (!hasTransform) {
       return null
     }
 
