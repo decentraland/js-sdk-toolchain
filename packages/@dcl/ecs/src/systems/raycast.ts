@@ -135,41 +135,41 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
     options: Partial<LocalDirectionRaycastOptions> = {}
   ): RaycastSystemOptions => ({
     ...defaultOptions,
+    ...options,
     directionRawValue: {
       $case: 'localDirection',
       localDirection: options.direction || { x: 0, y: 0, z: 1 }
-    },
-    ...options
+    }
   })
   const getGlobalDirectionRaycastDefaultOptions = (
     options: Partial<GlobalDirectionRaycastOptions> = {}
   ): RaycastSystemOptions => ({
     ...defaultOptions,
+    ...options,
     directionRawValue: {
       $case: 'globalDirection',
       globalDirection: options.direction || { x: 0, y: 0, z: 1 }
-    },
-    ...options
+    }
   })
   const getGlobalTargetRaycastDefaultOptions = (
     options: Partial<GlobalTargetRaycastOptions> = {}
   ): RaycastSystemOptions => ({
     ...defaultOptions,
+    ...options,
     directionRawValue: {
       $case: 'globalTarget',
       globalTarget: options.target || { x: 0, y: 0, z: 0 }
-    },
-    ...options
+    }
   })
   const getTargetEntityRaycastDefaultOptions = (
     options: Partial<TargetEntityRaycastOptions> = {}
   ): RaycastSystemOptions => ({
     ...defaultOptions,
+    ...options,
     directionRawValue: {
       $case: 'targetEntity',
       targetEntity: options.targetEntity || 0
-    },
-    ...options
+    }
   })
 
   function registerRaycast(entity: Entity, callback: RaycastSystemCallback, options: RaycastSystemOptions) {
