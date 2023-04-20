@@ -496,6 +496,7 @@ export const componentDefinitionByName: {
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::UiBackground": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiBackground>>;
+    "core::UiCanvasInformation": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>>;
     "core::UiDropdown": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdown>>;
     "core::UiDropdownResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdownResult>>;
     "core::UiInput": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInput>>;
@@ -2091,6 +2092,14 @@ export interface PBUiBackground {
 }
 
 // @public (undocumented)
+export interface PBUiCanvasInformation {
+    devicePixelRatio: number;
+    height: number;
+    interactableArea: BorderRect | undefined;
+    width: number;
+}
+
+// @public (undocumented)
 export interface PBUiDropdown {
     // (undocumented)
     acceptEmpty: boolean;
@@ -2528,6 +2537,18 @@ export type ReceiveMessage = CrdtMessageBody & {
     messageBuffer: Uint8Array;
 };
 
+// @public (undocumented)
+export interface Rect {
+    // (undocumented)
+    height: number;
+    // (undocumented)
+    width: number;
+    // (undocumented)
+    x: number;
+    // (undocumented)
+    y: number;
+}
+
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -2822,6 +2843,9 @@ export interface UiButtonProps extends UiLabelProps, EntityPropTypes {
     disabled?: boolean;
     variant?: 'primary' | 'secondary';
 }
+
+// @public (undocumented)
+export const UiCanvasInformation: LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>;
 
 // @public (undocumented)
 export type UiComponent = () => ReactEcs.JSX.Element;
