@@ -4,7 +4,7 @@ import { Emitter } from 'mitt'
 
 import { ITheme } from '../../components/AssetsCatalog'
 import { SceneContext } from '../babylon/decentraland/SceneContext'
-import { initRenderer } from '../babylon/setup'
+import { initRenderer } from '../babylon/setup/init'
 import { createDataLayerClientRpc } from '../data-layer/client'
 import { EditorComponents, SdkComponents } from './components'
 import { getHardcodedLoadableScene } from './test-local-scene'

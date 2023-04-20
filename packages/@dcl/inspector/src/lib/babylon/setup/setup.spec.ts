@@ -1,7 +1,7 @@
 import { NullEngine } from '@babylonjs/core/Engines/nullEngine'
-import { setupEngine } from '.'
-import { mockXMLHttpRequest } from '../../../../test/utils'
 import { Engine } from '@babylonjs/core'
+import { setupEngine } from './setup'
+import { mockXMLHttpRequest } from '../../../../test/utils'
 
 describe('When setting up the engine', () => {
   let engine: Engine

@@ -1,5 +1,4 @@
 import * as BABYLON from '@babylonjs/core'
-import { initKeyboard } from './input'
 import { GridMaterial } from '@babylonjs/materials'
 import { PARCEL_SIZE } from '../../utils/scene'
 
@@ -18,38 +17,6 @@ export namespace ambientConfigurations {
   export const RED = BABYLON.Color3.FromHexString('#ff004f')
   export const GREEN = BABYLON.Color3.FromHexString('#00e57a')
   export const BLUE = BABYLON.Color3.FromHexString('#00beff')
-}
-
-export function initRenderer(canvas: HTMLCanvasElement) {
-  const engine = new BABYLON.Engine(canvas, true, {
-    deterministicLockstep: true,
-    lockstepMaxSteps: 4,
-    alpha: false,
-    antialias: true,
-    stencil: true
-  })
-  const renderer = setupEngine(engine)
-
-  // attach camera control to canvas
-  renderer.editorCamera.attachControl(canvas, true)
-
-  // resize renderer when window is resized
-  function resize() {
-    engine.resize(false)
-  }
-  window.addEventListener('resize', resize)
-  new ResizeObserver(resize).observe(canvas)
-  function dispose() {
-    engine.dispose()
-    if (window) {
-      window.removeEventListener('resize', resize)
-    }
-  }
-
-  // init keyboard
-  initKeyboard(canvas, renderer.scene, renderer.editorCamera)
-
-  return { ...renderer, dispose }
 }
 
 export function setupEngine(engine: BABYLON.Engine) {
