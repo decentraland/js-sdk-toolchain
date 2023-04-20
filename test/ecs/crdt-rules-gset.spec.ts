@@ -258,11 +258,6 @@ describe('Conflict resolution rules for GrowOnlyValueSet based components', () =
     component.entityDeleted(0 as Entity, false)
     expect(component.get(0 as Entity)).toEqual(new Set([]))
   })
-
-  it('DELETE an existent entity clears out its value', () => {
-    component.entityDeleted(0 as Entity, false)
-    expect(component.get(0 as Entity)).toEqual(new Set([]))
-  })
 })
 
 describe('Conflict resolution rules for GrowOnlyValueSet based components with Extended Schema', () => {
