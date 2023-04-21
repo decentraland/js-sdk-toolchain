@@ -18,6 +18,7 @@ function* genEntityTree<T>(entity: Entity, entities: Map<Entity, T & { parent?: 
 
 /**
  * Get an iterator of entities that follow a tree structure for a component
+ * @public
  * @param engine - the engine running the entities
  * @param entity - the root entity of the tree
  * @param component - the parenting component to filter by
@@ -30,7 +31,7 @@ function* genEntityTree<T>(entity: Entity, entities: Map<Entity, T & { parent?: 
  *    parent: Schemas.Entity
  * })
  *
- * for (const entity of getComponentEntityTree(entity, TreeComponent)) {
+ * for (const entity of getComponentEntityTree(engine, entity, TreeComponent)) {
  *    // entity in the tree
  * }
  * ```
@@ -48,6 +49,7 @@ export function getComponentEntityTree<T>(
  * Remove all components of each entity in the tree made with Transform parenting
  * @param engine - the engine running the entities
  * @param firstEntity - the root entity of the tree
+ * @public
  */
 export function removeEntityWithChildren(engine: IEngine, entity: Entity) {
   const Transform = components.Transform(engine)

@@ -849,6 +849,11 @@ export const enum Font {
     F_SERIF = 1
 }
 
+// @public
+export function getComponentEntityTree<T>(engine: IEngine, entity: Entity, component: ComponentDefinition<T & {
+    parent?: Entity;
+}>): Generator<Entity>;
+
 // @public @deprecated (undocumented)
 export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementSetComponentDefinition<CompositeRootType>;
 
@@ -933,16 +938,12 @@ export interface IEngine {
     defineComponentFromSchema<T>(componentName: string, spec: ISchema<T>): LastWriteWinElementSetComponentDefinition<T>;
     defineValueSetComponentFromSchema<T>(componentName: string, spec: ISchema<T>, options: ValueSetOptions<T>): GrowOnlyValueSetComponentDefinition<T>;
     getComponent<T>(componentId: number | string): ComponentDefinition<T>;
-    getComponentEntityTree<T>(entity: Entity, component: ComponentDefinition<T & {
-        parent?: Entity;
-    }>): Generator<Entity>;
     getComponentOrNull<T>(componentId: number | string): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     getEntityState(entity: Entity): EntityState;
     readonly PlayerEntity: Entity;
     registerComponentDefinition<T>(componentName: string, componentDefinition: ComponentDefinition<T>): ComponentDefinition<T>;
     removeEntity(entity: Entity): void;
-    removeEntityWithChildren(firstEntity: Entity): void;
     removeSystem(selector: string | SystemFn): boolean;
     readonly RootEntity: Entity;
     seal(): void;
@@ -2611,6 +2612,9 @@ export interface Rect {
     // (undocumented)
     y: number;
 }
+
+// @public
+export function removeEntityWithChildren(engine: IEngine, entity: Entity): void;
 
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

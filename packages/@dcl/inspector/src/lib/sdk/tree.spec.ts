@@ -84,7 +84,6 @@ describe('getTreeFromEngine', () => {
          */
         expect(tree.get(ROOT)).toEqual(new Set([A, C]))
         expect(tree.get(A)).toEqual(new Set([B]))
-
       })
       describe('and then reparenting C as children of A', () => {
         beforeEach(() => {

@@ -200,6 +200,8 @@ function preEngine(): PreEngine {
     componentsDefinition.delete(componentId)
   }
 
+  components.Transform({ defineComponentFromSchema })
+
   function seal() {
     if (!sealed) {
       sealed = true
