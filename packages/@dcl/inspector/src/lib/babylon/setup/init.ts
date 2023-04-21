@@ -1,5 +1,3 @@
-/* istanbul ignore file */
-
 import * as BABYLON from '@babylonjs/core'
 import { initKeyboard } from './input'
 import { setupEngine } from './setup'
