@@ -1,5 +1,4 @@
 import * as BABYLON from '@babylonjs/core'
-import { initKeyboard } from './input'
 import { GridMaterial } from '@babylonjs/materials'
 import { PARCEL_SIZE } from '../../utils/scene'
 
@@ -20,19 +19,11 @@ export namespace ambientConfigurations {
   export const BLUE = BABYLON.Color3.FromHexString('#00beff')
 }
 
-export function initRenderer(canvas: HTMLCanvasElement) {
-  const babylon = new BABYLON.Engine(canvas, true, {
-    deterministicLockstep: true,
-    lockstepMaxSteps: 4,
-    alpha: false,
-    antialias: true,
-    stencil: true
-  })
-
+export function setupEngine(engine: BABYLON.Engine) {
   /**
    * This is the main scene of the engine.
    */
-  const scene = new BABYLON.Scene(babylon)
+  const scene = new BABYLON.Scene(engine)
   const audioEngine = BABYLON.Engine.audioEngine
   const effectLayers: BABYLON.EffectLayer[] = []
 
@@ -65,7 +56,7 @@ export function initRenderer(canvas: HTMLCanvasElement) {
 
   scene.actionManager = new BABYLON.ActionManager(scene)
 
-  babylon.disableManifestCheck = true
+  engine.disableManifestCheck = true
 
   scene.getBoundingBoxRenderer().showBackLines = false
 
@@ -89,7 +80,7 @@ export function initRenderer(canvas: HTMLCanvasElement) {
   })
 
   BABYLON.Database.IDBStorageEnabled = true
-  babylon.enableOfflineSupport = true
+  engine.enableOfflineSupport = true
 
   const editorColor = BABYLON.Color3.FromHexString('#17141B')
   const editorEnvHelper = scene.createDefaultEnvironment({
@@ -99,11 +90,10 @@ export function initRenderer(canvas: HTMLCanvasElement) {
     groundSize: 1000
   })!
 
-  // const ground = MeshBuilder.CreateGround('ground', { width: 200, height: 200 }, scene)
   const grid = new GridMaterial('grid', scene)
   grid.gridRatio = 1
   grid.majorUnitFrequency = 4
-  grid.lineColor = BABYLON.Color3.FromHexString('#676370')
+  grid.lineColor = BABYLON.Color3.FromHexString('#504E58')
   grid.mainColor = BABYLON.Color3.FromHexString('#36343D')
   editorEnvHelper.ground!.material = grid
 
@@ -113,7 +103,6 @@ export function initRenderer(canvas: HTMLCanvasElement) {
   camera.lowerRadiusLimit = 3
   camera.upperRadiusLimit = 15
   scene.activeCamera?.detachControl()
-  camera.attachControl(canvas, true)
   scene.activeCamera = camera
   const size = center.length()
   camera.position = center.subtractFromFloats(size, -size * 1.5, size * 2)
@@ -124,8 +113,6 @@ export function initRenderer(canvas: HTMLCanvasElement) {
   hemiLight.groundColor = ambientConfigurations.groundColor.clone()
   hemiLight.specular = ambientConfigurations.sunColor.clone()
 
-  initKeyboard(canvas, scene, camera)
-
   reposition(editorEnvHelper, hemiLight, camera)
 
   function update() {
@@ -134,31 +121,15 @@ export function initRenderer(canvas: HTMLCanvasElement) {
   }
 
   // Register a render loop to repeatedly render the scene
-  babylon.runRenderLoop(update)
-
-  // Watch for browser/canvas resize events
-  function resize() {
-    babylon.resize(false)
-  }
-  window.addEventListener('resize', resize)
-  new ResizeObserver(resize).observe(canvas)
-
-  function dispose() {
-    babylon.dispose()
-    if (window) {
-      window.removeEventListener('resize', resize)
-    }
-  }
+  engine.runRenderLoop(update)
 
   return {
     editorCamera: camera,
-    canvas,
-    babylon,
+    engine,
     scene,
     audioEngine,
     effectLayers,
-    highlightLayer,
-    dispose
+    highlightLayer
   }
 }
 
@@ -167,10 +138,16 @@ function reposition(
   hemiLight: BABYLON.HemisphericLight,
   camera: BABYLON.ArcRotateCamera
 ) {
+  // set the ground at 0 always and round position towards PARCEL_SIZE
+  envHelper.ground!.position.set(
+    Math.floor(camera.globalPosition.x / PARCEL_SIZE) * PARCEL_SIZE - camera.globalPosition.x,
+    -camera.globalPosition.y,
+    Math.floor(camera.globalPosition.z / PARCEL_SIZE) * PARCEL_SIZE - camera.globalPosition.z
+  )
+
   // make the skybox follow the camera target
-  envHelper.rootMesh.position.set(camera.target.x, camera.target.y, camera.target.z)
-  // set the ground at 0 always
-  envHelper.ground!.position.set(0, -camera.target.y, 0)
+  envHelper.skybox!.position.set(camera.globalPosition.x, camera.globalPosition.y, camera.globalPosition.z)
+  envHelper.rootMesh.position.set(camera.globalPosition.x, camera.globalPosition.y, camera.globalPosition.z)
 
   const theta = Math.PI * sunInclination
   const phi = Math.PI * -0.4

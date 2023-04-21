@@ -66,7 +66,9 @@ export const getLayoutManager = memoize((scene: Scene) => {
   grid.majorUnitFrequency = 4
   grid.lineColor = Color3.FromHexString('#ffffff')
   grid.mainColor = Color3.FromHexString('#504E58')
-  grid.zOffset = -1
+  grid.zOffset = -0.1
+  grid.zOffsetUnits = 3
+  grid.opacity = 0.9
 
   const planes: Mesh[] = []
 
