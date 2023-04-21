@@ -1,4 +1,4 @@
-import { Entity } from '@dcl/ecs'
+import { Entity, getComponentEntityTree } from '@dcl/ecs'
 import { useCallback, useState } from 'react'
 import { getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk/tree'
 import { useChange } from './useChange'
@@ -112,9 +112,9 @@ export const useTree = () => {
     (entity: Entity) => {
       if (entity === ROOT || !sdk) return
       const { EntityNode } = sdk.components
-      const { getComponentEntityTree, removeEntity } = sdk.engine
+      const { removeEntity } = sdk.engine
 
-      for (const _entity of getComponentEntityTree(entity, EntityNode)) {
+      for (const _entity of getComponentEntityTree(sdk.engine, entity, EntityNode)) {
         removeEntity(_entity)
       }
 
