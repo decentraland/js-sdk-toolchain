@@ -47,7 +47,6 @@ export type PreEngine = Pick<
   IEngine,
   | 'addEntity'
   | 'removeEntity'
-  | 'removeEntityWithChildren'
   | 'addSystem'
   | 'removeSystem'
   | 'defineComponent'
@@ -57,7 +56,6 @@ export type PreEngine = Pick<
   | 'getEntitiesWith'
   | 'getComponent'
   | 'getComponentOrNull'
-  | 'getComponentEntityTree'
   | 'removeComponentDefinition'
   | 'componentsIter'
   | 'seal'
@@ -91,12 +89,6 @@ export interface IEngine {
    * @param entity - entity
    */
   removeEntity(entity: Entity): void
-
-  /**
-   * Remove all components of each entity in the tree made with Transform parenting
-   * @param firstEntity - the root entity of the tree
-   */
-  removeEntityWithChildren(firstEntity: Entity): void
 
   /**
    *
@@ -238,26 +230,6 @@ export interface IEngine {
   getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(
     ...components: T
   ): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>
-
-  /**
-   * Get an iterator of entities that follow a tree structure for a component
-   * @param entity - the root entity of the tree
-   * @param component - the parenting component to filter by
-   * @returns An iterator of an array as [entity, entity2, ...]
-   *
-   * Example:
-   * ```ts
-   * const TreeComponent = engine.defineComponent('custom::TreeComponent', {
-   *    label: Schemas.String,
-   *    parent: Schemas.Entity
-   * })
-   *
-   * for (const entity of getComponentEntityTree(entity, TreeComponent)) {
-   *    // entity in the tree
-   * }
-   * ```
-   */
-  getComponentEntityTree<T>(entity: Entity, component: ComponentDefinition<T & { parent?: Entity }>): Generator<Entity>
 
   /**
    * @public
