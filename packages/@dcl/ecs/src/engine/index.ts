@@ -200,27 +200,7 @@ function preEngine(): PreEngine {
     componentsDefinition.delete(componentId)
   }
 
-  const Transform = components.Transform({ defineComponentFromSchema })
-
-  function* getTreeEntityArray(firstEntity: Entity, proccesedEntities: Entity[]): Generator<Entity> {
-    // This avoid infinite loop when there is a cyclic parenting
-    if (proccesedEntities.find((value) => firstEntity === value)) return
-    proccesedEntities.push(firstEntity)
-
-    for (const [entity, value] of getEntitiesWith(Transform)) {
-      if (value.parent === firstEntity) {
-        yield* getTreeEntityArray(entity, proccesedEntities)
-      }
-    }
-
-    yield firstEntity
-  }
-
-  function removeEntityWithChildren(firstEntity: Entity) {
-    for (const entity of getTreeEntityArray(firstEntity, [])) {
-      removeEntity(entity)
-    }
-  }
+  components.Transform({ defineComponentFromSchema })
 
   function seal() {
     if (!sealed) {
@@ -241,7 +221,6 @@ function preEngine(): PreEngine {
     getComponent,
     getComponentOrNull,
     removeComponentDefinition,
-    removeEntityWithChildren,
     registerComponentDefinition,
     entityContainer,
     componentsIter,
@@ -278,7 +257,6 @@ export function Engine(options?: IEngineOptions): IEngine {
   return {
     addEntity: partialEngine.addEntity,
     removeEntity: partialEngine.removeEntity,
-    removeEntityWithChildren: partialEngine.removeEntityWithChildren,
     addSystem: partialEngine.addSystem,
     removeSystem: partialEngine.removeSystem,
     defineComponent: partialEngine.defineComponent,

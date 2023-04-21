@@ -1,4 +1,10 @@
-import { cyclicParentingChecker, MapResult, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src'
+import {
+  cyclicParentingChecker,
+  getComponentEntityTree,
+  MapResult,
+  removeEntityWithChildren,
+  RESERVED_STATIC_ENTITIES
+} from '../../packages/@dcl/ecs/src'
 import { Engine, Entity, LastWriteWinElementSetComponentDefinition } from '../../packages/@dcl/ecs/src/engine'
 import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
@@ -579,7 +585,7 @@ describe('Engine tests', () => {
     expect(MeshCollider.getOrNull(e_A3)).not.toBeNull()
     expect(MeshCollider.getOrNull(e_A)).not.toBeNull()
 
-    engine.removeEntityWithChildren(e_A)
+    removeEntityWithChildren(engine, e_A)
 
     expect(MeshCollider.getOrNull(e_A1_3)).toBeNull()
     expect(MeshCollider.getOrNull(e_A1_2)).toBeNull()
@@ -624,7 +630,7 @@ describe('Engine tests', () => {
     expect(MeshCollider.getOrNull(e_A)).not.toBeNull()
     expect(MeshCollider.getOrNull(e_recursive)).not.toBeNull()
 
-    engine.removeEntityWithChildren(e_A)
+    removeEntityWithChildren(engine, e_A)
 
     expect(MeshCollider.getOrNull(e_A1_3)).toBeNull()
     expect(MeshCollider.getOrNull(e_A1_2)).toBeNull()
@@ -633,6 +639,39 @@ describe('Engine tests', () => {
     expect(MeshCollider.getOrNull(e_A3)).toBeNull()
     expect(MeshCollider.getOrNull(e_A)).toBeNull()
     expect(MeshCollider.getOrNull(e_recursive)).toBeNull()
+  })
+
+  it('should return all entities as a tree (or the provided entity if there is no valid tree)', () => {
+    const engine = Engine()
+    const Transform = components.Transform(engine)
+    const MeshCollider = components.MeshCollider(engine)
+    const TreeComponent = engine.defineComponent('test::TreeComponent', {
+      parent: Schemas.Entity
+    })
+    function createCube(parent?: Entity): Entity {
+      const entity = engine.addEntity()
+      MeshCollider.create(entity, {
+        mesh: { $case: 'box', box: {} }
+      })
+      TreeComponent.create(entity, { parent })
+      return entity
+    }
+
+    const e_A = createCube()
+    const e_A1 = createCube(e_A)
+    const e_A2 = createCube(e_A)
+    const e_A3 = createCube(e_A)
+    const e_A1_1 = createCube(e_A1)
+    const e_A1_2 = createCube(e_A1)
+    const e_A1_3 = createCube(e_A1)
+
+    const entitiesWithValidComponent = Array.from(getComponentEntityTree(engine, e_A, TreeComponent))
+    const entitiesWithInvalidComponent = Array.from(getComponentEntityTree(engine, e_A, MeshCollider))
+    const noEntitiesWithComponent = Array.from(getComponentEntityTree(engine, e_A, Transform))
+
+    expect(entitiesWithValidComponent).toEqual(expect.arrayContaining([e_A, e_A1, e_A2, e_A3, e_A1_1, e_A1_2, e_A1_3]))
+    expect(entitiesWithInvalidComponent).toEqual([e_A])
+    expect(noEntitiesWithComponent).toEqual([])
   })
 
   it('should throw an error if the system is a thenable', async () => {

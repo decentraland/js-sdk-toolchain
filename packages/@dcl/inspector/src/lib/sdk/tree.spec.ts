@@ -1,4 +1,4 @@
-import { Engine, Entity, IEngine } from '@dcl/ecs'
+import { Engine, Entity, IEngine, getComponentEntityTree } from '@dcl/ecs'
 import { EditorComponents, createEditorComponents } from './components'
 import { getEmptyTree, getTreeFromEngine, ROOT } from './tree'
 
@@ -19,6 +19,10 @@ describe('getTreeFromEngine', () => {
 
   function remove(entity: Entity) {
     engine.removeEntity(entity)
+  }
+
+  function getTreeEntitiesList(entity: Entity) {
+    return Array.from(getComponentEntityTree(engine, entity, EntityNode))
   }
 
   beforeEach(() => {
@@ -63,6 +67,7 @@ describe('getTreeFromEngine', () => {
        */
       expect(tree.get(ROOT)).toEqual(new Set([A]))
       expect(tree.get(A)).toEqual(new Set([B]))
+      expect(getTreeEntitiesList(A)).toEqual(expect.arrayContaining([A, B]))
     })
     describe('and then adding a third entity as sibling of A', () => {
       let C: Entity
@@ -94,6 +99,7 @@ describe('getTreeFromEngine', () => {
            */
           expect(tree.get(ROOT)).toEqual(new Set([A]))
           expect(tree.get(A)).toEqual(new Set([B, C]))
+          expect(getTreeEntitiesList(A)).toEqual(expect.arrayContaining([A, B, C]))
         })
       })
       describe('and then reparenting C as children of B', () => {
