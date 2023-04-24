@@ -4,8 +4,6 @@ import { useDrop } from 'react-dnd'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import cx from 'classnames'
 
-import { memoize } from '../../../lib/logic/once'
-import { TreeNode } from '../../ProjectAssetExplorer/ProjectView'
 
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
@@ -18,31 +16,10 @@ import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { TextField } from '../TextField'
 import { Props } from './types'
-import { fromGltf, toGltf, isValidInput } from './utils'
-import { isAssetNode } from '../../ProjectAssetExplorer/utils'
-import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
+import { fromGltf, toGltf, isValidInput, getModel } from './utils'
+import { ProjectAssetDrop } from '../../../lib/sdk/drag-drop'
 
 const DROP_TYPES = ['project-asset-gltf']
-
-interface IDrop {
-  value: string
-  context: { tree: Map<string, TreeNode> }
-}
-
-const isModel = (node: TreeNode): node is AssetNodeItem =>
-  isAssetNode(node) && (node.name.endsWith('.gltf') || node.name.endsWith('.glb'))
-
-const getModel = memoize((node: TreeNode, tree: Map<string, TreeNode>): AssetNodeItem | null => {
-  if (isModel(node)) return node
-
-  const children = node.children || []
-  for (const child of children) {
-    const childNode = tree.get(child)!
-    if (isModel(childNode)) return childNode
-  }
-
-  return null
-})
 
 export default withSdk<Props>(
   withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
@@ -62,13 +39,13 @@ export default withSdk<Props>(
     const [{ isHover }, drop] = useDrop(
       () => ({
         accept: DROP_TYPES,
-        drop: ({ value, context }: IDrop, monitor) => {
+        drop: ({ value, context }: ProjectAssetDrop, monitor) => {
           if (monitor.didDrop()) return
           const node = context.tree.get(value)!
           const model = getModel(node, context.tree)
           if (model) handleDrop(model.asset.src)
         },
-        canDrop: ({ value, context }: IDrop) => {
+        canDrop: ({ value, context }: ProjectAssetDrop) => {
           const node = context.tree.get(value)!
           return !!getModel(node, context.tree)
         },

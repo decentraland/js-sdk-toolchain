@@ -1,12 +1,14 @@
 import React from 'react'
 import { useDrop } from 'react-dnd'
 
+import { BuilderAsset, DROP_TYPES, IDrop, ProjectAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
 import { useRenderer } from '../../hooks/sdk/useRenderer'
 import { useSdk } from '../../hooks/sdk/useSdk'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 import { ROOT } from '../../lib/sdk/tree'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { IAsset } from '../AssetsCatalog/types'
+import { getModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 
 import './Renderer.css'
 
@@ -15,7 +17,7 @@ const Renderer: React.FC = () => {
   useRenderer(() => canvasRef)
   const sdk = useSdk()
 
-  const addAsset = async (asset: Pick<AssetNodeItem, 'asset' | 'name'>) => {
+  const addAsset = async (asset: AssetNodeItem) => {
     if (!sdk) return
     const {
       engine,
@@ -45,25 +47,41 @@ const Renderer: React.FC = () => {
         }
       })
     )
+    const path = Object.keys(fileContent).find(($) => isAsset($))
+    if (!path) {
+      throw new Error('Invalid asset format: should contain at least one gltf/glb file')
+    }
     await sdk!.dataLayer.importAsset({
       content: new Map(Object.entries(fileContent)),
       basePath: destFolder,
       assetPackageName
     })
-    const path = Object.keys(fileContent)[0]
-    await addAsset({ asset: { ...asset, src: `${destFolder}/${assetPackageName}/${path}` }, name: asset.name })
+    const model: AssetNodeItem = {
+      type: 'asset',
+      name: asset.name,
+      parent: null,
+      asset: { type: 'gltf', src: `${destFolder}/${assetPackageName}/${path}` }
+    }
+    await addAsset(model)
   }
 
   const [, drop] = useDrop(
     () => ({
-      accept: ['project-asset-gltf', 'builder-asset'],
-      drop: ({ value }: { value: AssetNodeItem | IAsset }, monitor) => {
-        if (monitor.getItemType() === 'builder-asset') {
-          void importBuilderAsset(value as IAsset)
+      accept: DROP_TYPES,
+      drop: (item: IDrop, monitor) => {
+        if (monitor.didDrop()) return
+        const itemType = monitor.getItemType()
+
+        if (isDropType<BuilderAsset>(item, itemType, 'builder-asset')) {
+          void importBuilderAsset(item.value)
           return
         }
-        if (monitor.didDrop()) return
-        void addAsset(value as AssetNodeItem)
+
+        if (isDropType<ProjectAssetDrop>(item, itemType, 'project-asset-gltf')) {
+          const node = item.context.tree.get(item.value)!
+          const model = getModel(node, item.context.tree)
+          if (model) void addAsset(model)
+        }
       }
     }),
     [addAsset]
