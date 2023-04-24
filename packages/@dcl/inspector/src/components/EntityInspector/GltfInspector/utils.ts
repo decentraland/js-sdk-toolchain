@@ -16,7 +16,7 @@ export function isValidInput({ assets }: AssetCatalogResponse, src: string): boo
   return !!assets.find(($) => $.path === src)
 }
 
-export const isAsset = (value: string): boolean => (value.endsWith('.gltf') || value.endsWith('.glb'))
+export const isAsset = (value: string): boolean => value.endsWith('.gltf') || value.endsWith('.glb')
 
 export const isModel = (node: TreeNode): node is AssetNodeItem => isAssetNode(node) && isAsset(node.name)
 
@@ -25,8 +25,8 @@ export const getModel = memoize((node: TreeNode, tree: Map<string, TreeNode>): A
 
   const children = node.children || []
   for (const child of children) {
-    const childNode = tree.get(child)!
-    if (isModel(childNode)) return childNode
+    const childNode = tree.get(child)
+    if (childNode && isModel(childNode)) return childNode
   }
 
   return null

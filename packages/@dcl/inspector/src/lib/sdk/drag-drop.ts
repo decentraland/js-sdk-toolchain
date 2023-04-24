@@ -13,7 +13,7 @@ export type BuilderAsset = Drop<IAsset>
 
 export type IDrop = ProjectAssetDrop | BuilderAsset
 
-enum DropTypesEnum {
+export enum DropTypesEnum {
   ProjectAsset = 'project-asset-gltf',
   BuilderAsset = 'builder-asset'
 }
