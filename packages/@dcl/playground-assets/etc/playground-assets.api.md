@@ -503,6 +503,7 @@ export const componentDefinitionByName: {
     "core::UiInputResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputResult>>;
     "core::UiText": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiText>>;
     "core::UiTransform": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiTransform>>;
+    "core::VideoEvent": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVideoEvent>>;
     "core::VideoPlayer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVideoPlayer>>;
     "core::VisibilityComponent": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVisibilityComponent>>;
 };
@@ -1893,6 +1894,8 @@ export interface PBColor4 {
 
 // @public (undocumented)
 export interface PBGltfContainer {
+    createPointerColliders?: boolean | undefined;
+    disablePhysicsColliders?: boolean | undefined;
     src: string;
 }
 
@@ -2285,6 +2288,16 @@ export interface PBVector3 {
     y: number;
     // (undocumented)
     z: number;
+}
+
+// @public (undocumented)
+export interface PBVideoEvent {
+    // (undocumented)
+    currentOffset: number;
+    // (undocumented)
+    state: VideoState;
+    // (undocumented)
+    videoLength: number;
 }
 
 // @public (undocumented)
@@ -3134,7 +3147,26 @@ export type Vector3Type = {
 };
 
 // @public (undocumented)
+export const VideoEvent: LastWriteWinElementSetComponentDefinition<PBVideoEvent>;
+
+// @public (undocumented)
 export const VideoPlayer: LastWriteWinElementSetComponentDefinition<PBVideoPlayer>;
+
+// @public (undocumented)
+export const enum VideoState {
+    // (undocumented)
+    VS_BUFFERING = 5,
+    // (undocumented)
+    VS_ERROR = 1,
+    // (undocumented)
+    VS_LOADING = 2,
+    // (undocumented)
+    VS_NONE = 0,
+    // (undocumented)
+    VS_PLAYING = 4,
+    // (undocumented)
+    VS_READY = 3
+}
 
 // @public (undocumented)
 export interface VideoTexture {
