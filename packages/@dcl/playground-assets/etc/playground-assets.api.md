@@ -3187,6 +3187,20 @@ export type Vector3Type = {
 export const VideoEvent: LastWriteWinElementSetComponentDefinition<PBVideoEvent>;
 
 // @public (undocumented)
+export interface VideoEventsSystem {
+    // (undocumented)
+    registerVideoEventsEntity(entity: Entity, callback: VideoEventsSystemCallback): void;
+    // (undocumented)
+    removeVideoEventsEntity(entity: Entity): void;
+}
+
+// @public
+export const videoEventsSystem: VideoEventsSystem;
+
+// @public (undocumented)
+export type VideoEventsSystemCallback = (event: DeepReadonlyObject<PBVideoEvent>) => void;
+
+// @public (undocumented)
 export const VideoPlayer: LastWriteWinElementSetComponentDefinition<PBVideoPlayer>;
 
 // @public (undocumented)

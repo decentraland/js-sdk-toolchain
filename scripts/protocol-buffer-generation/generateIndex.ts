@@ -34,6 +34,7 @@ function defineComponentDecl(component: Component) {
 const skipExposeGlobally: string[] = ['Animator', 'MeshRenderer', 'MeshCollider', 'Material']
 function defineGlobalComponentDecl(component: Component) {
   if (skipExposeGlobally.includes(component.componentPascalName)) return ''
+  // if (component.componentPascalName === 'PointerEventsResult' || component.componentPascalName === 'PointerEventsResult') {
   if (component.componentPascalName === 'PointerEventsResult') {
     return `/** @public */ export const ${component.componentPascalName}: GrowOnlyValueSetComponentDefinition<PB${component.componentPascalName}> = /* @__PURE__ */ components.${component.componentPascalName}(engine)`.trim()
   } else {
