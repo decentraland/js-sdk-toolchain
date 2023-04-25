@@ -27,11 +27,17 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
     componentValue === null ? null : fromComponentValueToInput(componentValue)
   )
   const [isFocused, setIsFocused] = useState(false)
+  const [skipSync, setSkipSync] = useState(false)
+
+  const updateInputs = useCallback((value: InputType | null, skipSync = false) => {
+    setSkipSync(skipSync)
+    setInput(value)
+  }, [])
 
   const handleUpdate = (path: NestedKey<InputType>) => (event: React.ChangeEvent<HTMLInputElement>) => {
     if (input === null) return
     const newInputs = setValue(input, path, event.target.value as any)
-    setInput(newInputs)
+    updateInputs(newInputs)
   }
 
   const handleFocus = useCallback(() => {
@@ -41,11 +47,12 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
   const handleBlur = useCallback(() => {
     if (componentValue === null) return
     setIsFocused(false)
-    setInput(fromComponentValueToInput(componentValue))
+    updateInputs(fromComponentValueToInput(componentValue))
   }, [componentValue])
 
   // sync inputs -> engine
   useEffect(() => {
+    if (skipSync) return
     if (input !== null && isValidInput(input)) {
       const newComponentValue = { ...componentValue, ...fromInputToComponentValue(input) }
 
@@ -64,7 +71,8 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
       return
     }
     const newInputs = fromComponentValueToInput(componentValue)
-    setInput(newInputs)
+    // set "skipSync" to avoid cyclic component value change
+    updateInputs(newInputs, true)
   }, [componentValue])
 
   const getProps = useCallback(
