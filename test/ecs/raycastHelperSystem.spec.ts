@@ -27,7 +27,8 @@ describe('Raycast Helper System should', () => {
     raycastResultComponent.create(raycastEntity, {
       hits: [],
       direction: Vector3.Zero(),
-      globalOrigin: Vector3.Zero()
+      globalOrigin: Vector3.Zero(),
+      tickNumber: 0
     })
 
     await engine.update(1)
@@ -46,7 +47,8 @@ describe('Raycast Helper System should', () => {
     raycastResultComponent.create(raycastEntity, {
       hits: [],
       direction: Vector3.Zero(),
-      globalOrigin: Vector3.Zero()
+      globalOrigin: Vector3.Zero(),
+      tickNumber: 0
     })
 
     await engine.update(1)
@@ -65,7 +67,8 @@ describe('Raycast Helper System should', () => {
     raycastResultComponent.create(raycastEntity, {
       hits: [],
       direction: Vector3.Zero(),
-      globalOrigin: Vector3.Zero()
+      globalOrigin: Vector3.Zero(),
+      tickNumber: 0
     })
 
     await engine.update(1)
@@ -86,7 +89,8 @@ describe('Raycast Helper System should', () => {
     raycastResultComponent.create(raycastEntity, {
       hits: [],
       direction: Vector3.Zero(),
-      globalOrigin: Vector3.Zero()
+      globalOrigin: Vector3.Zero(),
+      tickNumber: 0
     })
 
     await engine.update(1)
@@ -103,7 +107,7 @@ describe('Raycast Helper System should', () => {
     })
 
     const nonContinuousRaycastEntity = engine.addEntity()
-    raycastHelperSystem.registerLocalDirectionRaycast(nonContinuousRaycastEntity, (result) => {}, {
+    raycastHelperSystem.registerLocalDirectionRaycast(nonContinuousRaycastEntity, (_result) => {}, {
       direction: Vector3.Forward(),
       queryType: RaycastQueryType.RQT_HIT_FIRST,
       continuous: false
@@ -113,12 +117,14 @@ describe('Raycast Helper System should', () => {
     raycastResultComponent.create(continuousRaycastEntity, {
       hits: [],
       direction: Vector3.Zero(),
-      globalOrigin: Vector3.Zero()
+      globalOrigin: Vector3.Zero(),
+      tickNumber: 0
     })
     raycastResultComponent.create(nonContinuousRaycastEntity, {
       hits: [],
       direction: Vector3.Zero(),
-      globalOrigin: Vector3.Zero()
+      globalOrigin: Vector3.Zero(),
+      tickNumber: 0
     })
 
     await engine.update(1)
@@ -149,7 +155,8 @@ describe('Raycast Helper System should', () => {
     raycastResultComponent.create(raycastEntity, {
       hits: [],
       direction: Vector3.Zero(),
-      globalOrigin: Vector3.Zero()
+      globalOrigin: Vector3.Zero(),
+      tickNumber: 0
     })
 
     await engine.update(1)
@@ -180,7 +187,8 @@ describe('Raycast Helper System should', () => {
     raycastResultComponent.create(raycastEntity, {
       hits: [],
       direction: Vector3.Zero(),
-      globalOrigin: Vector3.Zero()
+      globalOrigin: Vector3.Zero(),
+      tickNumber: 0
     })
 
     await engine.update(1)
@@ -199,7 +207,7 @@ describe('Raycast Helper System should', () => {
 
   it('create default values correctly for LocalDirection', async () => {
     const raycastEntity = engine.addEntity()
-    raycastHelperSystem.registerLocalDirectionRaycast(raycastEntity, (result) => {}, {
+    raycastHelperSystem.registerLocalDirectionRaycast(raycastEntity, (_result) => {}, {
       direction: Vector3.Forward(),
       queryType: RaycastQueryType.RQT_QUERY_ALL
     })
@@ -234,7 +242,7 @@ describe('Raycast Helper System should', () => {
 
   it('create default values correctly for GlobalDirection', async () => {
     const raycastEntity = engine.addEntity()
-    raycastHelperSystem.registerGlobalDirectionRaycast(raycastEntity, (result) => {}, {
+    raycastHelperSystem.registerGlobalDirectionRaycast(raycastEntity, (_result) => {}, {
       direction: Vector3.Forward(),
       queryType: RaycastQueryType.RQT_QUERY_ALL
     })
@@ -270,7 +278,7 @@ describe('Raycast Helper System should', () => {
   it('create default values correctly for GlobalTarget', async () => {
     const raycastEntity = engine.addEntity()
     const globalTarget: Vector3 = Vector3.create(15, 8, 6)
-    raycastHelperSystem.registerGlobalTargetRaycast(raycastEntity, (result) => {}, {
+    raycastHelperSystem.registerGlobalTargetRaycast(raycastEntity, (_result) => {}, {
       target: globalTarget,
       queryType: RaycastQueryType.RQT_QUERY_ALL
     })
@@ -355,7 +363,8 @@ describe('Raycast Helper System should', () => {
     raycastResultComponent.create(raycastEntity, {
       hits: [],
       direction: Vector3.Zero(),
-      globalOrigin: Vector3.Zero()
+      globalOrigin: Vector3.Zero(),
+      tickNumber: 0
     })
 
     await engine.update(1)

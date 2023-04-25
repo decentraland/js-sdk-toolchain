@@ -18,7 +18,8 @@ describe('Generated PointerEventsResult ProtoBuf', () => {
         entityId: 515
       },
       state: PointerEventType.PET_DOWN,
-      analog: 5
+      analog: 5,
+      tickNumber: 0
     })
 
     testSchemaSerializationIdentity(PointerEventsResult.schema, {
@@ -34,7 +35,8 @@ describe('Generated PointerEventsResult ProtoBuf', () => {
         entityId: 5154
       },
       state: PointerEventType.PET_UP,
-      analog: 55
+      analog: 55,
+      tickNumber: 0
     })
 
     testSchemaSerializationIdentity(PointerEventsResult.schema, {
@@ -50,7 +52,8 @@ describe('Generated PointerEventsResult ProtoBuf', () => {
         meshName: 'meshNew'
       },
       state: PointerEventType.PET_UP,
-      analog: 523
+      analog: 523,
+      tickNumber: 0
     })
   })
 })

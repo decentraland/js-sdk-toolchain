@@ -134,6 +134,7 @@ function createTestPointerDownCommand(
       entityId: entity as number
     },
     state: state,
-    analog: 5
+    analog: 5,
+    tickNumber: 0
   }
 }

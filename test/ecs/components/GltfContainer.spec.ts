@@ -7,7 +7,9 @@ describe('Generated GltfContainer ProtoBuf', () => {
     const GltfContainer = components.GltfContainer(newEngine)
 
     testComponentSerialization(GltfContainer, {
-      src: 'test/src'
+      src: 'test/src',
+      createPointerColliders: undefined,
+      disablePhysicsColliders: undefined
     })
   })
 })

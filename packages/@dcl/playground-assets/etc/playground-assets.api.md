@@ -484,7 +484,9 @@ export const componentDefinitionByName: {
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
+    "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
+    "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
@@ -745,6 +747,9 @@ export type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = {
     data: Readonly<V>;
 };
 
+// @public (undocumented)
+export const EngineInfo: LastWriteWinElementSetComponentDefinition<PBEngineInfo>;
+
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
@@ -912,6 +917,9 @@ export type GlobalTargetRaycastSystemOptions = {
 
 // @public (undocumented)
 export const GltfContainer: LastWriteWinElementSetComponentDefinition<PBGltfContainer>;
+
+// @public (undocumented)
+export const GltfContainerLoadingState: LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>;
 
 // @public (undocumented)
 export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T> {
@@ -1322,6 +1330,20 @@ export type Listeners = {
     onMouseDown?: Callback;
     onMouseUp?: Callback;
 };
+
+// @public (undocumented)
+export const enum LoadingState {
+    // (undocumented)
+    FINISHED = 4,
+    // (undocumented)
+    FINISHED_WITH_ERROR = 3,
+    // (undocumented)
+    LOADING = 1,
+    // (undocumented)
+    NOT_FOUND = 2,
+    // (undocumented)
+    UNKNOWN = 0
+}
 
 // Warning: (ae-missing-release-tag) "LocalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -1892,8 +1914,23 @@ export interface PBColor4 {
 }
 
 // @public (undocumented)
+export interface PBEngineInfo {
+    frameNumber: number;
+    tickNumber: number;
+    totalRuntime: number;
+}
+
+// @public (undocumented)
 export interface PBGltfContainer {
+    createPointerColliders?: boolean | undefined;
+    disablePhysicsColliders?: boolean | undefined;
     src: string;
+}
+
+// @public (undocumented)
+export interface PBGltfContainerLoadingState {
+    // (undocumented)
+    currentState: LoadingState;
 }
 
 // @public (undocumented)
@@ -2045,6 +2082,7 @@ export interface PBPointerEventsResult {
     hit: RaycastHit | undefined;
     // (undocumented)
     state: PointerEventType;
+    tickNumber: number;
     timestamp: number;
 }
 
@@ -2092,6 +2130,7 @@ export interface PBRaycastResult {
     direction: PBVector3 | undefined;
     globalOrigin: PBVector3 | undefined;
     hits: RaycastHit[];
+    tickNumber: number;
     timestamp?: number | undefined;
 }
 
