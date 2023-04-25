@@ -34,7 +34,7 @@ install:
 update-protocol:
 	npm i --save-exact @dcl/protocol@next
 	cd packages/@dcl/sdk-commands; npm i --save-exact @dcl/protocol@next
-	$(MAKE) sync-deps
+	$(MAKE) sync-deps compile_apis
 
 lint:
 	node_modules/.bin/eslint . --ext .ts

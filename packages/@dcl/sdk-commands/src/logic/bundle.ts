@@ -82,7 +82,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
     metafile: true,
     absWorkingDir: options.workingDirectory,
     target: 'es2020',
-    external: ['~system/*'],
+    external: ['~system/*', '@dcl/inspector', '@dcl/inspector/*' /* ban importing the inspector from the SDK */],
     // convert filesystem paths into file:// to enable VSCode debugger
     sourceRoot: pathToFileURL(dirname(outfile)).toString(),
     define: {
