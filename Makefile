@@ -36,6 +36,9 @@ update-protocol:
 	cd packages/@dcl/sdk-commands; npm i --save-exact @dcl/protocol@next
 	$(MAKE) sync-deps compile_apis
 
+update-renderer:
+	cd packages/@dcl/sdk; npm i --save-exact @dcl/explorer@latest
+
 lint:
 	node_modules/.bin/eslint . --ext .ts
 
