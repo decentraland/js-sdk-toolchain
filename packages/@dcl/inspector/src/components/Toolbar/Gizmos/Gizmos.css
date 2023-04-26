@@ -1,0 +1,25 @@
+.Gizmos .gizmo {
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 100%;
+}
+
+.Gizmos .gizmo.translate {
+  margin-right: 1px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  background-image: url(./icons/translate.svg);
+}
+
+.Gizmos .gizmo.rotate {
+  margin: 0px;
+  border-radius: 0px;
+  background-image: url(./icons/rotate.svg);
+}
+
+.Gizmos .gizmo.scale {
+  margin-left: 1px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  background-image: url(./icons/scale.svg);
+}
