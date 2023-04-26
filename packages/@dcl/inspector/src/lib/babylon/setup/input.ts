@@ -35,18 +35,20 @@ enum Keys {
 
 export { keyState, Keys }
 
+let isSnapEnabled = snapManager.isEnabled()
+
 export function initKeyboard(canvas: HTMLCanvasElement, scene: BABYLON.Scene, camera: BABYLON.ArcRotateCamera) {
   canvas.addEventListener('keydown', (e) => {
     keyState[Keys.KEY_SHIFT] = e.shiftKey
     keyState[Keys.KEY_CTRL] = e.ctrlKey
     keyState[e.keyCode] = true
     if (e.shiftKey) {
-      snapManager.setEnabled(false)
+      isSnapEnabled = snapManager.toggle()
     }
   })
 
   canvas.addEventListener('keyup', (e) => {
-    snapManager.setEnabled(true)
+    snapManager.setEnabled(!isSnapEnabled)
 
     keyState[Keys.KEY_SHIFT] = e.shiftKey
     keyState[Keys.KEY_CTRL] = e.ctrlKey

@@ -1,10 +1,10 @@
-import { GizmoManager, IAxisDragGizmo, Quaternion, Scene, Vector3 } from '@babylonjs/core'
+import { GizmoManager, IAxisDragGizmo, Scene, Vector3 } from '@babylonjs/core'
 import { memoize } from '../../logic/once'
 import { EcsEntity } from './EcsEntity'
 import { Entity } from '@dcl/ecs'
 import { getLayoutManager } from './layout-manager'
 import { inBounds } from '../../utils/layout'
-import { snapManager } from './snap-manager'
+import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
 
 export const getGizmoManager = memoize((scene: Scene) => {
   // Create and initialize gizmo
@@ -55,14 +55,13 @@ export const getGizmoManager = memoize((scene: Scene) => {
   gizmoManager.gizmos.rotationGizmo?.onDragEndObservable.add(update)
 
   // snap
-  gizmoManager.gizmos.positionGizmo!.snapDistance = snapManager.getPositionSnap()
-  gizmoManager.gizmos.scaleGizmo!.snapDistance = snapManager.getScaleSnap()
-  gizmoManager.gizmos.rotationGizmo!.snapDistance = snapManager.getRotationSnap()
-  snapManager.onChange(({ positionSnap, rotationSnap, scaleSnap, enabled }) => {
-    gizmoManager.gizmos.positionGizmo!.snapDistance = enabled ? positionSnap : 0
-    gizmoManager.gizmos.scaleGizmo!.snapDistance = enabled ? scaleSnap : 0
-    gizmoManager.gizmos.rotationGizmo!.snapDistance = enabled ? rotationSnap : 0
-  })
+  function updateSnap() {
+    gizmoManager.gizmos.positionGizmo!.snapDistance = snapManager.isEnabled() ? snapManager.getPositionSnap() : 0
+    gizmoManager.gizmos.scaleGizmo!.snapDistance = snapManager.isEnabled() ? snapManager.getScaleSnap() : 0
+    gizmoManager.gizmos.rotationGizmo!.snapDistance = snapManager.isEnabled() ? snapManager.getRotationSnap() : 0
+  }
+  snapManager.onChange(updateSnap)
+  updateSnap()
 
   return {
     gizmoManager,
@@ -73,28 +72,3 @@ export const getGizmoManager = memoize((scene: Scene) => {
     }
   }
 })
-
-function snapValue(value: number, snap: number) {
-  return Math.round(value / snap) * snap
-}
-
-function snapVector(vector: Vector3, snap: number) {
-  return new Vector3(snapValue(vector.x, snap), snapValue(vector.y, snap), snapValue(vector.z, snap))
-}
-
-function snapQuaternion(quaternion: Quaternion, snap: number) {
-  const angles = snapVector(quaternion.toEulerAngles(), snap)
-  return Quaternion.FromEulerVector(angles)
-}
-
-function snapPosition(position: Vector3) {
-  return snapManager.isEnabled() ? snapVector(position, snapManager.getPositionSnap()) : position
-}
-
-function snapScale(scale: Vector3) {
-  return snapManager.isEnabled() ? snapVector(scale, snapManager.getScaleSnap()) : scale
-}
-
-function snapRotation(rotation: Quaternion) {
-  return snapManager.isEnabled() ? snapQuaternion(rotation, snapManager.getRotationSnap()) : rotation
-}

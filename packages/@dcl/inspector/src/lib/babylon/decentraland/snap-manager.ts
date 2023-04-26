@@ -1,16 +1,21 @@
+import { Quaternion, Vector3 } from '@babylonjs/core'
 import mitt from 'mitt'
 
 const getSnapManager = () => {
+  // defaults
   let positionSnap = 0.25
   let rotationSnap = 15 * (Math.PI / 180)
   let scaleSnap = 0.1
   let enabled = true
+
+  // events
   const events = mitt<{ change: void }>()
 
   function getPositionSnap() {
     return positionSnap
   }
 
+  // getters/setters
   function setPositionSnap(value: number) {
     positionSnap = value * (Math.PI / 180)
     events.emit('change')
@@ -43,6 +48,13 @@ const getSnapManager = () => {
     events.emit('change')
   }
 
+  function toggle() {
+    const value = !isEnabled()
+    setEnabled(value)
+    return value
+  }
+
+  // handlers
   function onChange(
     cb: (values: { positionSnap: number; rotationSnap: number; scaleSnap: number; enabled: boolean }) => void
   ) {
@@ -60,8 +72,34 @@ const getSnapManager = () => {
     setScaleSnap,
     isEnabled,
     setEnabled,
-    onChange
+    onChange,
+    toggle
   }
 }
 
 export const snapManager = getSnapManager()
+
+export function snapValue(value: number, snap: number) {
+  return Math.round(value / snap) * snap
+}
+
+export function snapVector(vector: Vector3, snap: number) {
+  return new Vector3(snapValue(vector.x, snap), snapValue(vector.y, snap), snapValue(vector.z, snap))
+}
+
+export function snapQuaternion(quaternion: Quaternion, snap: number) {
+  const angles = snapVector(quaternion.toEulerAngles(), snap)
+  return Quaternion.FromEulerVector(angles)
+}
+
+export function snapPosition(position: Vector3) {
+  return snapManager.isEnabled() ? snapVector(position, snapManager.getPositionSnap()) : position
+}
+
+export function snapScale(scale: Vector3) {
+  return snapManager.isEnabled() ? snapVector(scale, snapManager.getScaleSnap()) : scale
+}
+
+export function snapRotation(rotation: Quaternion) {
+  return snapManager.isEnabled() ? snapQuaternion(rotation, snapManager.getRotationSnap()) : rotation
+}
