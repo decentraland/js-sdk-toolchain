@@ -74,6 +74,7 @@ code {
   align-items: center;
   padding: 8px;
   cursor: pointer;
+  user-select: none;
 }
 
 .footer .footer-buttons > div > svg {
