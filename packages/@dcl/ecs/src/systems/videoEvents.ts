@@ -1,7 +1,7 @@
 import * as components from '../components'
-import { DeepReadonlyObject, Entity, IEngine } from "../engine";
-import { PBVideoEvent } from "../components";
-import { EntityState } from "../engine/entity";
+import { DeepReadonlyObject, Entity, IEngine } from '../engine'
+import { PBVideoEvent } from '../components'
+import { EntityState } from '../engine/entity'
 
 /**
  * @public
@@ -23,17 +23,20 @@ export interface VideoEventsSystem {
 export function createVideoEventsSystem(engine: IEngine): VideoEventsSystem {
   const videoPlayerComponent = components.VideoPlayer(engine)
   const videoEventComponent = components.VideoEvent(engine)
-  const entitiesCallbackVideoStateMap = new Map<Entity, {
-    callback: VideoEventsSystemCallback,
-    lastVideoState?: number
-  }>()
+  const entitiesCallbackVideoStateMap = new Map<
+    Entity,
+    {
+      callback: VideoEventsSystemCallback
+      lastVideoState?: number
+    }
+  >()
 
-  function registerVideoEventsEntity (entity: Entity, callback: VideoEventsSystemCallback) {
+  function registerVideoEventsEntity(entity: Entity, callback: VideoEventsSystemCallback) {
     videoEventComponent.getOrCreateMutable(entity)
     entitiesCallbackVideoStateMap.set(entity, { callback: callback })
   }
 
-  function removeVideoEventsEntity (entity: Entity) {
+  function removeVideoEventsEntity(entity: Entity) {
     entitiesCallbackVideoStateMap.delete(entity)
     videoEventComponent.deleteFrom(entity)
   }
@@ -43,17 +46,24 @@ export function createVideoEventsSystem(engine: IEngine): VideoEventsSystem {
     for (const [entity, data] of entitiesCallbackVideoStateMap) {
       const videoPlayer = videoPlayerComponent.getOrNull(entity)
       if (engine.getEntityState(entity) === EntityState.Removed || !videoPlayer) {
-        entitiesCallbackVideoStateMap.delete(entity)
+        removeVideoEventsEntity(entity)
         continue
       }
 
       const videoEvent = videoEventComponent.getOrNull(entity)
-      if (!videoEvent || (data.lastVideoState != undefined && data.lastVideoState == videoEvent.state)) continue
+      if (!videoEvent) {
+        entitiesCallbackVideoStateMap.delete(entity)
+        continue
+      }
+
+      if (data.lastVideoState != undefined && data.lastVideoState == videoEvent.state) continue
 
       data.callback(videoEvent)
+
+      // save state
       entitiesCallbackVideoStateMap.set(entity, {
         callback: data.callback,
-        lastVideoState: videoEvent.state // save state
+        lastVideoState: videoEvent.state
       })
     }
   })
