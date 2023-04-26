@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { MdImageSearch } from 'react-icons/md'
 import { AiFillFolder } from 'react-icons/ai'
 
@@ -23,22 +23,21 @@ const App = () => {
   const [catalog] = useCatalog()
   const [tab, setTab] = useState<Tab | undefined>(undefined)
 
-  function handleTabClick(value: Tab) {
-    if (tab === value) {
-      return setTab(undefined)
-    }
-    setTab(value)
-  }
+  const handleTabClick = useCallback((value: Tab) => () => {
+    setTab(tab === value ? undefined : value)
+  }, [tab])
 
   return (
-    <Resizable minWidth={220} initialWidth={250} >
+    <Resizable type="horizontal" min={280} initial={280}>
       <Box>
         <div
           className="sidebar"
           data-vscode-context='{"webviewSection": "sidebar", "preventDefaultContextMenuItems": true}'
         >
-          <Hierarchy />
-          <EntityInspector />
+          <Resizable type="vertical" min={130} initial={130} max={730}>
+            <Hierarchy />
+            <EntityInspector />
+          </Resizable>
         </div>
       </Box>
       <div className="editor">
@@ -54,11 +53,11 @@ const App = () => {
             </div>
           )}
           <div className="footer-buttons">
-            <div onClick={() => handleTabClick(Tab.FileSystem)}>
+            <div onClick={handleTabClick(Tab.FileSystem)}>
               <AiFillFolder />
               <span>Asset Catalog</span>
             </div>
-            <div onClick={() => handleTabClick(Tab.AssetsPack)}>
+            <div onClick={handleTabClick(Tab.AssetsPack)}>
               <MdImageSearch />
               <span>World Assets Pack</span>
             </div>

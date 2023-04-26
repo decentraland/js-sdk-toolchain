@@ -2,10 +2,29 @@
   display: flex;
 }
 
-/* TODO: Maybe position absolute ? */
 .Resizable .resize-handle {
   position: absolute;
   width: 10px;
   height: 100%;
   cursor: col-resize;
+}
+
+.Resizable.vertical {
+  display: flex;
+  flex-direction: column;
+}
+
+.Resizable.vertical .resize-handle {
+  width: 100%;
+  height: 10px;
+  cursor: row-resize;
+}
+
+.Resizable.vertical > div:first-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.Resizable.vertical > div:nth-child(3) {
+  overflow-y: auto;
 }
