@@ -5,6 +5,8 @@
   background-color: var(--modal);
   border-radius: 8px;
   margin: 12px;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .Container.hover {
