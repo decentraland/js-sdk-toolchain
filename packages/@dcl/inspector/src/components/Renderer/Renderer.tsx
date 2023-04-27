@@ -19,7 +19,6 @@ const Renderer: React.FC = () => {
   const sdk = useSdk()
 
   const addAsset = async (asset: AssetNodeItem) => {
-    console.log({ asset })
     if (!sdk) return
     const {
       engine,

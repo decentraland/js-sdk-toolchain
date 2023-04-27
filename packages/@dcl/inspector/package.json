@@ -27,6 +27,7 @@
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
+    "react-dropzone": "^14.2.3",
     "react-icons": "^4.7.1",
     "typescript": "^5.0.2"
   },
@@ -40,8 +41,5 @@
     "start": "node ./build.js --watch"
   },
   "types": "dist/tooling-entrypoint.d.ts",
-  "typings": "dist/tooling-entrypoint.d.ts",
-  "dependencies": {
-    "react-dropzone": "^14.2.3"
-  }
+  "typings": "dist/tooling-entrypoint.d.ts"
 }

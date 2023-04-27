@@ -106,7 +106,6 @@ export async function initRpcMethods(
 
       for (const [fileName, fileContent] of req.content) {
         const filePath = (baseFolder + fileName).replaceAll('//', '/')
-        console.log(filePath)
         await fs.writeFile(filePath, Buffer.from(fileContent))
       }
 

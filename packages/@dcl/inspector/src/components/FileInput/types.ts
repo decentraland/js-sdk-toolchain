@@ -1,4 +1,4 @@
-import { Accept } from "react-dropzone"
+import { Accept } from 'react-dropzone'
 
 export interface PropTypes {
   onDrop(files: File[]): void

@@ -7,9 +7,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overflow: hidden;
 }
-* {
-  font-family: var(--font-family) !important;
-}
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
