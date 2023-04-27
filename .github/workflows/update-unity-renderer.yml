@@ -13,7 +13,7 @@ jobs:
           node-version: 16.x
       - uses: actions/checkout@v2
       - name: Update explorer
-        run: npm i @dcl/explorer@latest
+        run: npm i --save-exact @dcl/explorer@latest
         working-directory: packages/@dcl/sdk
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3

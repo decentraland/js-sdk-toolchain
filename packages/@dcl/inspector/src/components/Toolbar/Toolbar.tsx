@@ -7,6 +7,8 @@ import { useSelectedEntity } from '../../hooks/sdk/useSelectedEntity'
 import { useComponentValue } from '../../hooks/sdk/useComponentValue'
 import { GizmoType } from '../../lib/utils/gizmo'
 import { ROOT } from '../../lib/sdk/tree'
+import Button from '../Button'
+
 import './Toolbar.css'
 
 const Toolbar = withSdk(({ sdk }) => {
@@ -31,30 +33,30 @@ const Toolbar = withSdk(({ sdk }) => {
 
   return (
     <div className="Toolbar">
-      <button className="undo" onClick={sdk?.dataLayer.undo}>
+      <Button className="undo" onClick={sdk?.dataLayer.undo}>
         <BiUndo />
-      </button>
-      <button className="redo" onClick={sdk?.dataLayer.redo}>
+      </Button>
+      <Button className="redo" onClick={sdk?.dataLayer.redo}>
         <BiRedo />
-      </button>
-      <button
+      </Button>
+      <Button
         className={classnames('gizmo translate', { active: selection?.gizmo === GizmoType.TRANSLATE })}
         disabled={disableGizmos}
         onClick={handleTranslateGizmo}
-      ></button>
-      <button
+      ></Button>
+      <Button
         className={classnames('gizmo rotate', { active: selection?.gizmo === GizmoType.ROTATE })}
         disabled={disableGizmos}
         onClick={handleRotateGizmo}
-      ></button>
-      <button
+      ></Button>
+      <Button
         className={classnames('gizmo scale', { active: selection?.gizmo === GizmoType.SCALE })}
         disabled={disableGizmos}
         onClick={handleScaleGizmo}
-      ></button>
-      <button className="babylonjs-inspector" onClick={handleInspector}>
+      ></Button>
+      <Button className="babylonjs-inspector" onClick={handleInspector}>
         <RiListSettingsLine />
-      </button>
+      </Button>
     </div>
   )
 })

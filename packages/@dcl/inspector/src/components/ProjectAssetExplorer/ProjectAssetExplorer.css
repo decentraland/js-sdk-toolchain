@@ -9,3 +9,13 @@
 .editor .item > span:first-child {
   position: relative;
 }
+
+.ProjectView {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ProjectView .with-context-menu {
+  height: 100%;
+}

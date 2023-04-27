@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { MdImageSearch } from 'react-icons/md'
 import { AiFillFolder } from 'react-icons/ai'
+import { HiOutlinePlus } from 'react-icons/hi'
 
 import { useCatalog } from '../../hooks/catalog/useCatalog'
 import { AssetsCatalog } from '../AssetsCatalog'
@@ -13,10 +14,12 @@ import { Toolbar } from '../Toolbar'
 
 import './App.css'
 import { Resizable } from '../Resizable'
+import ImportAsset from '../ImportAsset'
 
 enum Tab {
   FileSystem = 'FileSystem',
-  AssetsPack = 'AssetsPack'
+  AssetsPack = 'AssetsPack',
+  Import = 'Import'
 }
 
 const App = () => {
@@ -49,13 +52,18 @@ const App = () => {
           {tab && (
             <div className="footer-content">
               {tab === Tab.AssetsPack && catalog && <AssetsCatalog value={catalog} />}
-              {tab === Tab.FileSystem && <ProjectAssetExplorer />}
+              {tab === Tab.FileSystem && <ProjectAssetExplorer onImportAsset={handleTabClick(Tab.Import)} />}
+              {tab === Tab.Import && <ImportAsset onSave={handleTabClick(Tab.FileSystem)} />}
             </div>
           )}
           <div className="footer-buttons">
             <div onClick={handleTabClick(Tab.FileSystem)}>
               <AiFillFolder />
               <span>Asset Catalog</span>
+            </div>
+            <div onClick={handleTabClick(Tab.Import)}>
+              <HiOutlinePlus />
+              <span>Import Asset</span>
             </div>
             <div onClick={handleTabClick(Tab.AssetsPack)}>
               <MdImageSearch />

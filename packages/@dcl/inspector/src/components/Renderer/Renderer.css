@@ -14,3 +14,7 @@
   outline: none;
   position: absolute;
 }
+
+.Tree.editor-assets-tree > div:first-child > span {
+  padding: 16px;
+}

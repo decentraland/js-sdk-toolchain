@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { IoIosArrowDown, IoIosArrowForward, IoIosImage } from 'react-icons/io'
+import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
 
 import { Props } from './types'
 
@@ -12,7 +12,7 @@ const Container: React.FC<React.PropsWithChildren<Props>> = (props) => {
     <div className={`Container ${props.className ?? ''}`}>
       {props.label && <div className="title" onClick={() => setOpen(!open)}>
         {Icon}
-        <span >{props.label}</span>
+        <span>{props.label}</span>
       </div>}
       {open && <div className="content">{props.children}</div>}
     </div>

@@ -14,5 +14,5 @@ export const useFileSystem = () => {
 
   // TODO: attach to some kind if "onChange" event on dataLayer to refresh files
 
-  return { files }
+  return [files]
 }
