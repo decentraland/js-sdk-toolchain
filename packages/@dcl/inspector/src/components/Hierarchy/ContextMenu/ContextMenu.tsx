@@ -1,15 +1,12 @@
-import { Item, Submenu, Separator } from 'react-contexify';
-import { Entity } from '@dcl/ecs';
+import { Item, Submenu, Separator } from 'react-contexify'
+import { Entity } from '@dcl/ecs'
 
 import { ROOT } from '../../../lib/sdk/tree'
-import { useContextMenu } from '../../../hooks/sdk/useContextMenu';
-import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent';
+import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
+import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent'
 
 // TODO: enumerate better the components we want to show...
-const ENABLED_COMPONENTS_SET = new Set([
-  'core::Transform',
-  'core::GltfContainer'
-])
+const ENABLED_COMPONENTS_SET = new Set(['core::Transform', 'core::GltfContainer'])
 
 const getComponentName = (value: string) => (value.match(/[^:]*$/) || [])[0]
 const isComponentEnabled = (value: string) => ENABLED_COMPONENTS_SET.has(value)
@@ -27,7 +24,7 @@ const ContextMenu = (value: Entity) => {
   if (value === ROOT || !_components.length) return null
 
   return (
-    (<>
+    <>
       <Separator />
       <Submenu label="Add component">
         {_components.map(([id, name]) => (
@@ -36,7 +33,7 @@ const ContextMenu = (value: Entity) => {
           </Item>
         ))}
       </Submenu>
-    </>)
+    </>
   )
 }
 

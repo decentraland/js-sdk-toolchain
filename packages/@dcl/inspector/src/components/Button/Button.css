@@ -1,0 +1,26 @@
+.Button {
+  border: none;
+  color: #fff;
+  background-color: #4b4852;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.Button:hover:not(:disabled) {
+  background-color: #6c6974;
+}
+
+.Button:disabled {
+  opacity: 0.5;
+  cursor: default
+}
+
+.Button.active {
+  background-color: #6c6974;
+}
+
+.Button svg {
+  width: 24px;
+  height: 24px;
+}

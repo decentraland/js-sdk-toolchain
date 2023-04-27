@@ -8,8 +8,8 @@ describe('Generated GltfContainer ProtoBuf', () => {
 
     testComponentSerialization(GltfContainer, {
       src: 'test/src',
-      createPointerColliders: undefined,
-      disablePhysicsColliders: undefined
+      visibleMeshesCollisionMask: undefined,
+      invisibleMeshesCollisionMask: undefined
     })
   })
 })

@@ -1932,9 +1932,9 @@ export interface PBEngineInfo {
 
 // @public (undocumented)
 export interface PBGltfContainer {
-    createPointerColliders?: boolean | undefined;
-    disablePhysicsColliders?: boolean | undefined;
+    invisibleMeshesCollisionMask?: number | undefined;
     src: string;
+    visibleMeshesCollisionMask?: number | undefined;
 }
 
 // @public (undocumented)
