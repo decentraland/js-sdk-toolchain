@@ -1922,15 +1922,7 @@ export interface PBEngineInfo {
 
 // @public (undocumented)
 export interface PBGltfContainer {
-<<<<<<< HEAD
-<<<<<<< HEAD
     invisibleMeshesCollisionMask?: number | undefined;
-=======
->>>>>>> de2eb68 (import glb & gltf self-contained assets)
-=======
-    createPointerColliders?: boolean | undefined;
-    disablePhysicsColliders?: boolean | undefined;
->>>>>>> 5bb70f0 (fix build)
     src: string;
     visibleMeshesCollisionMask?: number | undefined;
 }
