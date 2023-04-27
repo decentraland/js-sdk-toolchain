@@ -1,5 +1,5 @@
 import { IEngine } from '../engine'
-import { CompositeRootType, getCompositeRootComponent } from './components'
+import { CompositeRootSchema, CompositeRootType, getCompositeRootComponent } from './components'
 import {
   CompositeProvider,
   CompositeResource,
@@ -21,7 +21,7 @@ export type {
   CompositeResource
 }
 export { EntityMappingMode }
-export { getCompositeRootComponent }
+export { getCompositeRootComponent, CompositeRootSchema }
 
 /**
  * @public

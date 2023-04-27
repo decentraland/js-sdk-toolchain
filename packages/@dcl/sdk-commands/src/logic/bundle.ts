@@ -70,7 +70,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
   originalInput.forEach((filePath) => {
     const entryPointPath = path.resolve(dclFolderPath, `index-${++counter}.ts`)
     const entryPointCode = `
-    ${hasComposites ? `export * from '@dcl/sdk'` : `export * from '@dcl/sdk/with-composite'`}
+    ${hasComposites ? `export * from '@dcl/sdk/with-composite'` : `export * from '@dcl/sdk'`}
     export * from '${filePath}'
     `
     writeFileSync(entryPointPath, entryPointCode)
@@ -88,7 +88,12 @@ export async function bundleProject(components: BundleComponents, options: Compi
   const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
   const outfile = join(options.workingDirectory, output)
 
-  printProgressStep(components.logger, `Bundling file ${colors.bold(input.join(','))}`, 1, MAX_STEP)
+  printProgressStep(
+    components.logger,
+    `Bundling file ${colors.bold(input.join(','))} (withComposite=${hasComposites})`,
+    1,
+    MAX_STEP
+  )
 
   const context = await esbuild.context({
     entryPoints: input,

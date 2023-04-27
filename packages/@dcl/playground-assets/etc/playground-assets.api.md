@@ -582,8 +582,17 @@ export type CompositeResource = {
     composite: CompositeDefinition;
 };
 
-// Warning: (ae-forgotten-export) The symbol "CompositeRootSchema" needs to be exported by the entry point index.d.ts
+// Warning: (ae-missing-release-tag) "CompositeRootSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
+// @public (undocumented)
+export const CompositeRootSchema: {
+    src: ISchema<string>;
+    entities: ISchema<MapResult<{
+    src: ISchema<Entity>;
+    dest: ISchema<Entity>;
+    }>[]>;
+};
+
 // @public @deprecated (undocumented)
 export type CompositeRootType = MapResult<typeof CompositeRootSchema>;
 
@@ -2655,6 +2664,11 @@ export interface Rect {
 
 // @public
 export function removeEntityWithChildren(engine: IEngine, entity: Entity): void;
+
+// Warning: (ae-missing-release-tag) "rendererTransport" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const rendererTransport: Transport;
 
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
