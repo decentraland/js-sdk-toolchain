@@ -528,6 +528,11 @@ export namespace Composite {
     export function fromBinary(buffer: Uint8Array): Composite.Definition;
     // (undocumented)
     export function fromJson(object: any): Composite.Definition;
+    // (undocumented)
+    export function getDedendenciesFrom(compositeResource: CompositeResource): {
+        path: string;
+        resolvedPath: string;
+    }[];
     export function instance(engine: IEngine, compositeData: Composite.Resource, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): void;
     // (undocumented)
     export type Provider = CompositeProvider;
@@ -577,14 +582,10 @@ export type CompositeResource = {
     composite: CompositeDefinition;
 };
 
+// Warning: (ae-forgotten-export) The symbol "CompositeRootSchema" needs to be exported by the entry point index.d.ts
+//
 // @public @deprecated (undocumented)
-export type CompositeRootType = {
-    src: string;
-    entities: {
-        src: Entity;
-        dest: Entity;
-    }[];
-};
+export type CompositeRootType = MapResult<typeof CompositeRootSchema>;
 
 // @public
 export type ConflictResolutionMessage = PutComponentMessageBody | DeleteComponentMessageBody;

@@ -102,7 +102,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
       'dynamic-import': false,
       hashbang: false
     },
-    plugins: [compositeLoader(components, getAllComposite(components))]
+    plugins: [compositeLoader(components, getAllComposite(components)), entryPointLoader(components)]
   })
 
   /* istanbul ignore if */
@@ -184,42 +184,15 @@ function compositeLoader(components: BundleComponents, composites: Record<string
       compositeLines.push(`'${compositeName}':new Uint8Array(${JSON.stringify(Array.from(bin))})`)
     } else {
       const textDecoder = new TextDecoder()
-      compositeLines.push(`'${compositeName}':'${JSON.stringify(textDecoder.decode(bin))}'`)
+      const json = JSON.stringify(JSON.parse(textDecoder.decode(bin)))
+      compositeLines.push(`'${compositeName}':'${json}'`)
     }
   }
 
   const contents = `
-import { Composite } from '@dcl/ecs'
-import { getSceneInfo } from '~system/Scene'
+export const compositeFromLoader: Record<string, string | Uint8Array> = {${compositeLines.join(',')}}
+// const composites: Composite.Resource[] = []
 
-const compositeFromLoader: Record<string, string | Uint8Array> = {${compositeLines.join(',')}}
-const composites: Composite.Resource[] = []
-
-// @public
-export const provider: Promise<Composite.Provider> = {
-  getCompositeOrNull(src: string, _currentPath?: string) {
-    // TODO: resolve path from src and currentPath
-
-    const fromLoader = compositeFromLoader[src]
-    if (fromLoader) {
-      try {
-        if (src.endsWith('.bin')) {
-          const composite = Composite.fromBinary(fromLoader)
-          composites.push({ src, composite})
-        } else {
-          const composite = Composite.fromJson(JSON.parse(fromLoader))
-          composites.push({ src, composite})
-        }
-      } catch(err) {
-        console.error(err)
-      }
-
-      delete compositeFromLoader[src]
-    }
-
-    return composites.find((item) => item.src === src) || null
-  }
-}
 `
   return {
     name: 'composite-loader',
@@ -250,6 +223,13 @@ function getAllComposite(_components: BundleComponents): Record<string, Uint8Arr
     ret[file] = readFileSync(file)
   }
   return ret
+}
+
+function entryPointLoader(components: BundleComponents): esbuild.Plugin {
+  return {
+    name: 'entry-point-loader',
+    setup(build) {}
+  }
 }
 
 // function loadComposite(filePath: string) {
