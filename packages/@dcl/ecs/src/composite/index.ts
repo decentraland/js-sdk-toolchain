@@ -91,4 +91,10 @@ export namespace Composite {
   /*#__PURE__*/ export function resolveAndNormalizePath(src: string, cwd: string = '/') {
     return resolveComposite(src, cwd)
   }
+
+  /*#__PURE__*/ export function getDedendenciesFrom(
+    compositeResource: CompositeResource
+  ): { path: string; resolvedPath: string }[] {
+    return getDedendenciesFrom(compositeResource)
+  }
 }

@@ -1,17 +1,18 @@
 // this file is tested extensively to build scenes in the `make test` command
 // but since it runs outiside the testing harness, coverage is not collected
 
-import esbuild from 'esbuild'
-import child_process from 'child_process'
-import { future } from 'fp-future'
-import { CliComponents } from '../components'
-import { CliError } from './error'
-import { join, dirname } from 'path'
-import { printProgressInfo, printProgressStep } from './beautiful-logs'
-import { colors } from '../components/log'
-import { pathToFileURL } from 'url'
-import { globSync } from 'glob'
 import { Scene } from '@dcl/schemas'
+import child_process from 'child_process'
+import esbuild from 'esbuild'
+import { future } from 'fp-future'
+import { globSync } from 'glob'
+import { dirname, join } from 'path'
+import { pathToFileURL } from 'url'
+import { CliComponents } from '../components'
+import { colors } from '../components/log'
+import { printProgressInfo, printProgressStep } from './beautiful-logs'
+import { CliError } from './error'
+import { readFileSync } from 'fs'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -64,6 +65,8 @@ export async function bundleProject(components: BundleComponents, options: Compi
 
   printProgressStep(components.logger, `Bundling file ${colors.bold(input.join(','))}`, 1, MAX_STEP)
 
+  getAllComposite(components)
+
   const context = await esbuild.context({
     entryPoints: input,
     bundle: true,
@@ -98,7 +101,8 @@ export async function bundleProject(components: BundleComponents, options: Compi
       'import-meta': false,
       'dynamic-import': false,
       hashbang: false
-    }
+    },
+    plugins: [compositeLoader(components, getAllComposite(components))]
   })
 
   /* istanbul ignore if */
@@ -170,3 +174,106 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
 
   return typeCheckerFuture
 }
+
+function compositeLoader(components: BundleComponents, composites: Record<string, Uint8Array>): esbuild.Plugin {
+  const compositeLines: string[] = []
+
+  for (const compositeName in composites) {
+    const bin = composites[compositeName]
+    if (compositeName.endsWith('.bin')) {
+      compositeLines.push(`'${compositeName}':new Uint8Array(${JSON.stringify(Array.from(bin))})`)
+    } else {
+      const textDecoder = new TextDecoder()
+      compositeLines.push(`'${compositeName}':'${JSON.stringify(textDecoder.decode(bin))}'`)
+    }
+  }
+
+  const contents = `
+import { Composite } from '@dcl/ecs'
+import { getSceneInfo } from '~system/Scene'
+
+const compositeFromLoader: Record<string, string | Uint8Array> = {${compositeLines.join(',')}}
+const composites: Composite.Resource[] = []
+
+// @public
+export const provider: Promise<Composite.Provider> = {
+  getCompositeOrNull(src: string, _currentPath?: string) {
+    // TODO: resolve path from src and currentPath
+
+    const fromLoader = compositeFromLoader[src]
+    if (fromLoader) {
+      try {
+        if (src.endsWith('.bin')) {
+          const composite = Composite.fromBinary(fromLoader)
+          composites.push({ src, composite})
+        } else {
+          const composite = Composite.fromJson(JSON.parse(fromLoader))
+          composites.push({ src, composite})
+        }
+      } catch(err) {
+        console.error(err)
+      }
+
+      delete compositeFromLoader[src]
+    }
+
+    return composites.find((item) => item.src === src) || null
+  }
+}
+`
+  return {
+    name: 'composite-loader',
+    setup(build) {
+      build.onResolve({ filter: /~sdk\/all-composites/ }, (_args) => {
+        components.logger.log('composite resolver!')
+        return {
+          namespace: 'sdk-composite',
+          path: 'all-composites'
+        }
+      })
+
+      build.onLoad({ filter: /.*/, namespace: 'sdk-composite' }, (_args) => {
+        components.logger.log('composite loader!')
+        return {
+          loader: 'ts',
+          contents
+        }
+      })
+    }
+  }
+}
+function getAllComposite(_components: BundleComponents): Record<string, Uint8Array> {
+  const ret: Record<string, Uint8Array> = {}
+  const files = globSync('**/*.{composite,composite.bin}', { cwd: process.cwd() })
+
+  for (const file of files) {
+    ret[file] = readFileSync(file)
+  }
+  return ret
+}
+
+// function loadComposite(filePath: string) {
+//   if (filePath.endsWith('.bin')) {
+//     return Composite.fromBinary(readFileSync(filePath))
+//   } else {
+//     return Composite.fromJson(readFileSync(filePath))
+//   }
+// }
+// function getRecursiveDependencies(composite: Composite.Resource, dependencies: Set<any>) {
+//   const ret = []
+//   const compositeDependencies = Composite.getDedendenciesFrom({
+//     composite: entryCompositePoint,
+//     src: compositeEntryPoint
+//   })
+//   for (const dependency of compositeDependencies) {
+//     const composite = loadComposite(path.resolve(process.cwd(), dependency.resolvedPath))
+//     ret.push(
+//       getRecursiveDependencies({
+//         composite,
+//         src: dependency.resolvedPath
+//       })
+//     )
+//   }
+// }
+// const entryCompositePoint = loadComposite(path.resolve(process.cwd(), compositeEntryPoint))
+// const dependencies = Composite.getDedendenciesFrom({ composite: entryCompositePoint, src: compositeEntryPoint })
