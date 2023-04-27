@@ -29,16 +29,3 @@
 .TextField:last-child {
   margin-right: 0px;
 }
-
-/* Chrome, Safari, Edge, Opera */
-.TextField>input::-webkit-outer-spin-button,
-.TextField>input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Firefox */
-.TextField>input[type=number] {
-  -moz-appearance: textfield;
-  appearance: none;
-}

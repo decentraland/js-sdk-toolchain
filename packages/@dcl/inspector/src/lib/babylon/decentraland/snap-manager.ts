@@ -17,7 +17,7 @@ const getSnapManager = () => {
 
   // getters/setters
   function setPositionSnap(value: number) {
-    positionSnap = value * (Math.PI / 180)
+    positionSnap = value
     events.emit('change')
   }
 
@@ -80,7 +80,7 @@ const getSnapManager = () => {
 export const snapManager = getSnapManager()
 
 export function snapValue(value: number, snap: number) {
-  return Math.round(value / snap) * snap
+  return snap > 0 ? Math.round(value / snap) * snap : value
 }
 
 export function snapVector(vector: Vector3, snap: number) {
