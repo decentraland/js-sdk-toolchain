@@ -1,5 +1,5 @@
 import { IEngine } from '../engine'
-import { CompositeRootSchema, CompositeRootType, getCompositeRootComponent } from './components'
+import { CompositeRootType, getCompositeRootComponent } from './components'
 import {
   CompositeProvider,
   CompositeResource,
@@ -21,7 +21,7 @@ export type {
   CompositeResource
 }
 export { EntityMappingMode }
-export { getCompositeRootComponent, CompositeRootSchema }
+export { getCompositeRootComponent }
 
 /**
  * @public
@@ -90,11 +90,5 @@ export namespace Composite {
    */
   /*#__PURE__*/ export function resolveAndNormalizePath(src: string, cwd: string = '/') {
     return resolveComposite(src, cwd)
-  }
-
-  /*#__PURE__*/ export function getDedendenciesFrom(
-    compositeResource: CompositeResource
-  ): { path: string; resolvedPath: string }[] {
-    return getDedendenciesFrom(compositeResource)
   }
 }
