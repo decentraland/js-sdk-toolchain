@@ -1,4 +1,4 @@
-.Button {
+.ToolbarButton {
   border: none;
   padding: 0px 2px;
   margin: 0 8px;
@@ -10,20 +10,20 @@
   min-width: 32px;
 }
 
-.Button:hover:not(:disabled) {
+.ToolbarButton:hover:not(:disabled) {
   background-color: #6c6974;
 }
 
-.Button:disabled {
+.ToolbarButton:disabled {
   opacity: 0.5;
   cursor: default
 }
 
-.Button.active {
+.ToolbarButton.active {
   background-color: #6c6974;
 }
 
-.Button svg {
+.ToolbarButton svg {
   width: 24px;
   height: 24px;
 }

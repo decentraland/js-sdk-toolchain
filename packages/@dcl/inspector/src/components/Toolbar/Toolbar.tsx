@@ -3,7 +3,7 @@ import { BiUndo, BiRedo } from 'react-icons/bi'
 import { RiListSettingsLine } from 'react-icons/ri'
 import { withSdk } from '../../hoc/withSdk'
 import { Gizmos } from './Gizmos'
-import { Button } from './Button'
+import { ToolbarButton } from './ToolbarButton'
 import './Toolbar.css'
 
 const Toolbar = withSdk(({ sdk }) => {
@@ -18,16 +18,16 @@ const Toolbar = withSdk(({ sdk }) => {
 
   return (
     <div className="Toolbar">
-      <Button className="undo" onClick={sdk?.dataLayer.undo}>
+      <ToolbarButton className="undo" onClick={sdk?.dataLayer.undo}>
         <BiUndo />
-      </Button>
-      <Button className="redo" onClick={sdk?.dataLayer.redo}>
+      </ToolbarButton>
+      <ToolbarButton className="redo" onClick={sdk?.dataLayer.redo}>
         <BiRedo />
-      </Button>
+      </ToolbarButton>
       <Gizmos />
-      <Button className="babylonjs-inspector" onClick={handleInspector}>
+      <ToolbarButton className="babylonjs-inspector" onClick={handleInspector}>
         <RiListSettingsLine />
-      </Button>
+      </ToolbarButton>
     </div>
   )
 })

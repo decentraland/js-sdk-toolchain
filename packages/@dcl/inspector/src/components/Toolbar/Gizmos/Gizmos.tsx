@@ -9,7 +9,7 @@ import { useOutsideClick } from '../../../hooks/useOutsideClick'
 import { useSnapToggle } from '../../../hooks/editor/useSnap'
 import { ROOT } from '../../../lib/sdk/tree'
 import { GizmoType } from '../../../lib/utils/gizmo'
-import { Button } from '../Button'
+import { ToolbarButton } from '../ToolbarButton'
 import { Snap } from './Snap'
 import './Gizmos.css'
 
@@ -36,17 +36,17 @@ export const Gizmos = withSdk(({ sdk }) => {
 
   return (
     <div className="Gizmos">
-      <Button
+      <ToolbarButton
         className={cx('gizmo translate', { active: selection?.gizmo === GizmoType.TRANSLATE })}
         disabled={disableGizmos}
         onClick={handleTranslateGizmo}
       />
-      <Button
+      <ToolbarButton
         className={cx('gizmo rotate', { active: selection?.gizmo === GizmoType.ROTATE })}
         disabled={disableGizmos}
         onClick={handleRotateGizmo}
       />
-      <Button
+      <ToolbarButton
         className={cx('gizmo scale', { active: selection?.gizmo === GizmoType.SCALE })}
         disabled={disableGizmos}
         onClick={handleScaleGizmo}
