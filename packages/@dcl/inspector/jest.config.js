@@ -25,7 +25,7 @@ module.exports = {
   collectCoverageFrom: ["src/**/*.ts"],
   verbose: true,
   testMatch: ["**/*.spec.(ts)"],
-  testEnvironment: "node",
+  testEnvironment: "jsdom",
   transformIgnorePatterns: [
     `/node_modules/(?!(@babylonjs)|(@dcl/ecs-math))`,
   ],
