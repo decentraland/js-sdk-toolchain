@@ -14,7 +14,6 @@ function getSnapValue(gizmo: GizmoType) {
 }
 
 function setSnapValue(value: number, gizmo: GizmoType) {
-  console.log('set snap', value, gizmo)
   switch (gizmo) {
     case GizmoType.TRANSLATE:
       return snapManager.setPositionSnap(value)
@@ -40,17 +39,14 @@ export const useSnapState = (gizmo: GizmoType) => {
     const current = getSnapValue(gizmo)
     const numeric = Number(snap)
     if (snap === '' || isNaN(numeric) || numeric === current || numeric < 0) return
-    console.log('update snap')
     setSnapValue(numeric, gizmo)
   }, [snap])
 
   // receive update from snap manager
   useEffect(() => {
     const unsuscribe = snapManager.onChange(() => {
-      console.log()
       const value = getSnapValue(gizmo).toString()
       if (value === snap) return
-      console.log('snap changed')
       setSnap(value, true) // skip sync to avoid endless loop
     })
     return () => unsuscribe()
