@@ -9,6 +9,7 @@ const rendererTransport = createRendererTransport({ crdtSendToRenderer })
 engine.addTransport(rendererTransport)
 
 export async function onUpdate(deltaTime: number) {
+  await engine.seal()
   await engine.update(deltaTime)
   await pollEvents(sendBatch)
 }
@@ -18,8 +19,6 @@ export async function onUpdate(deltaTime: number) {
  * Function that is called before the first update and after the evaluation of the code.
  */
 export async function onStart() {
-  await engine.seal()
-
   const response = await crdtGetState({ data: new Uint8Array() })
   if (!!rendererTransport.onmessage) {
     if (response && response.data && response.data.length) {
