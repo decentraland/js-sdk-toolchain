@@ -528,11 +528,6 @@ export namespace Composite {
     export function fromBinary(buffer: Uint8Array): Composite.Definition;
     // (undocumented)
     export function fromJson(object: any): Composite.Definition;
-    // (undocumented)
-    export function getDedendenciesFrom(compositeResource: CompositeResource): {
-        path: string;
-        resolvedPath: string;
-    }[];
     export function instance(engine: IEngine, compositeData: Composite.Resource, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): void;
     // (undocumented)
     export type Provider = CompositeProvider;
@@ -582,19 +577,14 @@ export type CompositeResource = {
     composite: CompositeDefinition;
 };
 
-// Warning: (ae-missing-release-tag) "CompositeRootSchema" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const CompositeRootSchema: {
-    src: ISchema<string>;
-    entities: ISchema<MapResult<{
-    src: ISchema<Entity>;
-    dest: ISchema<Entity>;
-    }>[]>;
-};
-
 // @public @deprecated (undocumented)
-export type CompositeRootType = MapResult<typeof CompositeRootSchema>;
+export type CompositeRootType = {
+    src: string;
+    entities: {
+        src: Entity;
+        dest: Entity;
+    }[];
+};
 
 // @public
 export type ConflictResolutionMessage = PutComponentMessageBody | DeleteComponentMessageBody;
@@ -1932,9 +1922,9 @@ export interface PBEngineInfo {
 
 // @public (undocumented)
 export interface PBGltfContainer {
-    invisibleMeshesCollisionMask?: number | undefined;
+    createPointerColliders?: boolean | undefined;
+    disablePhysicsColliders?: boolean | undefined;
     src: string;
-    visibleMeshesCollisionMask?: number | undefined;
 }
 
 // @public (undocumented)
