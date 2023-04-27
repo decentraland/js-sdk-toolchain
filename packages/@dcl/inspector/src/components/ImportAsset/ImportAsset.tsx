@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { HiOutlineUpload } from 'react-icons/hi'
 import { RxCross2 } from 'react-icons/rx'
 import { IoIosImage } from 'react-icons/io'
@@ -56,22 +56,24 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
     setFile(undefined)
   }
 
-  const invalidName = !!systemFiles.assets.find(
-    (asset) => {
-      const [_, packageName] = asset.path.split('/')
-      return packageName?.toLocaleLowerCase() === assetPackageName?.toLocaleLowerCase()
+  const invalidName = !!systemFiles.assets.find((asset) => {
+    const [_, packageName] = asset.path.split('/')
+    return packageName?.toLocaleLowerCase() === assetPackageName?.toLocaleLowerCase()
   })
 
   return (
     <div className="ImportAsset">
-      <FileInput disabled={!!file} maxFiles={1} onDrop={handleDrop}  accept={{ 'model/gltf-binary': ['.gltf', '.glb'] }}>
+      <FileInput disabled={!!file} onDrop={handleDrop} accept={{ 'model/gltf-binary': ['.gltf', '.glb'] }}>
         <span>Import Asset Pack</span>
         {!file && (
           <>
             <div className="upload-icon">
               <HiOutlineUpload />
             </div>
-            <span>Drag and drop a single GLB, GLTF file here,<br/> or click to select a file.</span>
+            <span>
+              Drag and drop a single GLB, GLTF file here,
+              <br /> or click to select a file.
+            </span>
           </>
         )}
         {file && (
@@ -85,9 +87,15 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
             </Container>
             <div className={classNames({ error: !!invalidName })}>
               <Block label="Asset Pack Name">
-                <TextField label="" value={assetPackageName} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setAssetPackageName(event.target.value)} />
+                <TextField
+                  label=""
+                  value={assetPackageName}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => setAssetPackageName(event.target.value)}
+                />
               </Block>
-              <Button disabled={invalidName} onClick={handleSave}>Save asset</Button>
+              <Button disabled={invalidName} onClick={handleSave}>
+                Save asset
+              </Button>
             </div>
           </div>
         )}
