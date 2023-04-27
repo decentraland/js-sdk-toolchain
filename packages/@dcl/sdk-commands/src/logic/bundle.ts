@@ -5,9 +5,9 @@ import { Scene } from '@dcl/schemas'
 import child_process from 'child_process'
 import esbuild from 'esbuild'
 import { future } from 'fp-future'
+import { readFileSync, writeFileSync } from 'fs-extra'
 import { globSync } from 'glob'
 import path, { dirname, join } from 'path'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs-extra'
 import { pathToFileURL } from 'url'
 import { CliComponents } from '../components'
 import { colors } from '../components/log'
@@ -55,10 +55,10 @@ export async function bundleProject(components: BundleComponents, options: Compi
     throw new CliError(`File ${tsconfig} must exist to compile the Typescript project`)
   }
 
-  const dclFolderPath = path.resolve(process.cwd(), '.decentraland')
-  if (!existsSync(dclFolderPath)) {
-    mkdirSync(dclFolderPath)
-  }
+  const dclFolderPath = path.resolve(process.cwd(), '.decentraland', 'ts-entry-points')
+  try {
+    await components.fs.mkdir(dclFolderPath, { recursive: true })
+  } catch (err) {}
 
   const composites = getAllComposite(components)
   const hasComposites = Object.entries(composites).length > 0
@@ -130,7 +130,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
       'dynamic-import': false,
       hashbang: false
     },
-    plugins: [compositeLoader(components, getAllComposite(components)), entryPointLoader(components)]
+    plugins: [compositeLoader(components, getAllComposite(components))]
   })
 
   /* istanbul ignore if */
@@ -248,62 +248,3 @@ function getAllComposite(_components: BundleComponents): Record<string, Uint8Arr
   }
   return ret
 }
-
-function entryPointLoader(components: BundleComponents): esbuild.Plugin {
-  return {
-    name: 'entry-point-loader',
-    setup(build) {}
-  }
-}
-
-// function loadComposite(filePath: string) {
-//   if (filePath.endsWith('.bin')) {
-//     return Composite.fromBinary(readFileSync(filePath))
-//   } else {
-//     return Composite.fromJson(readFileSync(filePath))
-//   }
-// }
-// function getRecursiveDependencies(composite: Composite.Resource, dependencies: Set<any>) {
-//   const ret = []
-//   const compositeDependencies = Composite.getDedendenciesFrom({
-//     composite: entryCompositePoint,
-//     src: compositeEntryPoint
-//   })
-//   for (const dependency of compositeDependencies) {
-//     const composite = loadComposite(path.resolve(process.cwd(), dependency.resolvedPath))
-//     ret.push(
-//       getRecursiveDependencies({
-//         composite,
-//         src: dependency.resolvedPath
-//       })
-//     )
-//   }
-// }
-// const entryCompositePoint = loadComposite(path.resolve(process.cwd(), compositeEntryPoint))
-// const dependencies = Composite.getDedendenciesFrom({ composite: entryCompositePoint, src: compositeEntryPoint })
-// function AnothercompositeLoader(components: BundleComponents): esbuild.Plugin {
-//   return {
-//     name: 'composite-loader',
-//     async setup(build: esbuild.PluginBuild) {
-//       build.onResolve({ filter: /\.composite$/ }, async (args) => {
-//         components.logger.log(`on resolve ${args.path} with ${args.resolveDir}`)
-//         const compositePath = path.resolve(args.resolveDir, args.path).substr(process.cwd().length)
-//         return {
-//           namespace: 'composite',
-//           path: compositePath
-//         }
-//       })
-
-//       async function onLoad(
-//         args: esbuild.OnLoadArgs,
-//         binary: boolean
-//       ): Promise<esbuild.OnLoadResult | null | undefined> {
-//         components.logger.log(`on load ${args.path} with ${args}`)
-
-//         return
-//       }
-
-//       build.onLoad({ filter: /\.composite$/, namespace: '' }, (args) => onLoad(args, false))
-//     }
-//   }
-// }
