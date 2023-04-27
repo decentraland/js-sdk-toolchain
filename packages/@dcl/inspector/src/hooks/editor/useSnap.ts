@@ -44,12 +44,12 @@ export const useSnapState = (gizmo: GizmoType) => {
 
   // receive update from snap manager
   useEffect(() => {
-    const unsuscribe = snapManager.onChange(() => {
+    const unsubscribe = snapManager.onChange(() => {
       const value = getSnapValue(gizmo).toString()
       if (value === snap) return
       setSnap(value, true) // skip sync to avoid endless loop
     })
-    return () => unsuscribe()
+    return () => unsubscribe()
   }, [])
 
   return [snap, setSnap] as const
@@ -72,10 +72,10 @@ export const useSnapToggle = () => {
 
   // receive update from snap manager
   useEffect(() => {
-    const unsuscribe = snapManager.onChange(() => {
+    const unsubscribe = snapManager.onChange(() => {
       setEnabled(snapManager.isEnabled(), true) // skip sync to avoid endless loop
     })
-    return () => unsuscribe()
+    return () => unsubscribe()
   }, [])
 
   return { isEnabled, setEnabled, toggle }
