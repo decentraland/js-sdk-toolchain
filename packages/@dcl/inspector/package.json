@@ -1,9 +1,6 @@
 {
   "name": "@dcl/inspector",
   "version": "0.1.0",
-  "dependencies": {
-    "classnames": "^2.3.2"
-  },
   "devDependencies": {
     "@babylonjs/core": "^5.48.0",
     "@babylonjs/gui": "^5.48.0",
@@ -43,5 +40,8 @@
     "start": "node ./build.js --watch"
   },
   "types": "dist/tooling-entrypoint.d.ts",
-  "typings": "dist/tooling-entrypoint.d.ts"
+  "typings": "dist/tooling-entrypoint.d.ts",
+  "dependencies": {
+    "react-dropzone": "^14.2.3"
+  }
 }

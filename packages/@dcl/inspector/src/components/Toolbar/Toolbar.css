@@ -6,33 +6,9 @@
 }
 
 .Toolbar button {
-  border: none;
-  padding: 0px 2px;
+  padding: 0px 2px !important;
   margin: 0 8px;
-  color: #fff;
-  background-color: #4b4852;
-  font-size: 16px;
-  border-radius: 4px;
-  cursor: pointer;
   min-width: 32px;
-}
-
-.Toolbar button:hover:not(:disabled) {
-  background-color: #6c6974;
-}
-
-.Toolbar button:disabled {
-  opacity: 0.5;
-  cursor: default
-}
-
-.Toolbar button.active {
-  background-color: #6c6974;
-}
-
-.Toolbar svg {
-  width: 24px;
-  height: 24px;
 }
 
 .Toolbar .undo svg,
