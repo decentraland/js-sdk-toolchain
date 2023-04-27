@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { snapManager } from '../../lib/babylon/decentraland/snap-manager'
 import { GizmoType } from '../../lib/utils/gizmo'
 
@@ -26,16 +26,15 @@ function setSnapValue(value: number, gizmo: GizmoType) {
 
 export const useSnapState = (gizmo: GizmoType) => {
   const [snap, setSnapInternal] = useState<string>(getSnapValue(gizmo).toString())
-  // TODO: useRef, avoid re-renders
-  const [skipSync, setSkipSync] = useState<boolean>(false)
+  const skipSyncRef = useRef(false)
   const setSnap = useCallback((value: string, skipSync = false) => {
-    setSkipSync(skipSync)
+    skipSyncRef.current = skipSync
     setSnapInternal(value)
   }, [])
 
   // send update to snap manager
   useEffect(() => {
-    if (skipSync) return
+    if (skipSyncRef.current) return
     const current = getSnapValue(gizmo)
     const numeric = Number(snap)
     if (snap === '' || isNaN(numeric) || numeric === current || numeric < 0) return
@@ -57,16 +56,16 @@ export const useSnapState = (gizmo: GizmoType) => {
 
 export const useSnapToggle = () => {
   const [isEnabled, setEnabledInternal] = useState<boolean>(snapManager.isEnabled())
-  const [skipSync, setSkipSync] = useState<boolean>(false)
+  const skipSyncRef = useRef(false)
   const setEnabled = useCallback((value: boolean, skipSync = false) => {
-    setSkipSync(skipSync)
+    skipSyncRef.current = skipSync
     setEnabledInternal(value)
   }, [])
   const toggle = useCallback(() => setEnabled(!isEnabled), [isEnabled])
 
   // send update to snap manager
   useEffect(() => {
-    if (skipSync) return
+    if (skipSyncRef.current) return
     snapManager.setEnabled(isEnabled)
   }, [isEnabled])
 
