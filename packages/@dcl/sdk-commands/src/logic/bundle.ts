@@ -5,23 +5,14 @@ import { Scene } from '@dcl/schemas'
 import child_process from 'child_process'
 import esbuild from 'esbuild'
 import { future } from 'fp-future'
-<<<<<<< Updated upstream
-import { globSync } from 'glob'
-import { dirname, join } from 'path'
-=======
-import { existsSync, mkdirSync, writeFileSync } from 'fs-extra'
 import { globSync } from 'glob'
 import path, { dirname, join } from 'path'
->>>>>>> Stashed changes
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs-extra'
 import { pathToFileURL } from 'url'
 import { CliComponents } from '../components'
 import { colors } from '../components/log'
 import { printProgressInfo, printProgressStep } from './beautiful-logs'
 import { CliError } from './error'
-<<<<<<< Updated upstream
-import { readFileSync } from 'fs'
-=======
->>>>>>> Stashed changes
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -69,6 +60,9 @@ export async function bundleProject(components: BundleComponents, options: Compi
     mkdirSync(dclFolderPath)
   }
 
+  const composites = getAllComposite(components)
+  const hasComposites = Object.entries(composites).length > 0
+
   const originalInput = globSync(options.single ?? 'src/index.ts', { cwd: options.workingDirectory, absolute: true })
 
   let counter = 0
@@ -76,7 +70,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
   originalInput.forEach((filePath) => {
     const entryPointPath = path.resolve(dclFolderPath, `index-${++counter}.ts`)
     const entryPointCode = `
-    export * from '@dcl/sdk'
+    ${hasComposites ? `export * from '@dcl/sdk'` : `export * from '@dcl/sdk/with-composite'`}
     export * from '${filePath}'
     `
     writeFileSync(entryPointPath, entryPointCode)
@@ -96,8 +90,6 @@ export async function bundleProject(components: BundleComponents, options: Compi
 
   printProgressStep(components.logger, `Bundling file ${colors.bold(input.join(','))}`, 1, MAX_STEP)
 
-  getAllComposite(components)
-
   const context = await esbuild.context({
     entryPoints: input,
     bundle: true,
@@ -116,15 +108,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
     metafile: true,
     absWorkingDir: options.workingDirectory,
     target: 'es2020',
-<<<<<<< Updated upstream
     external: ['~system/*', '@dcl/inspector', '@dcl/inspector/*' /* ban importing the inspector from the SDK */],
-=======
-    loader: {
-      '.composite': 'json',
-      '.composite.bin': 'binary'
-    },
-    external: ['~system/*'],
->>>>>>> Stashed changes
     // convert filesystem paths into file:// to enable VSCode debugger
     sourceRoot: pathToFileURL(dirname(outfile)).toString(),
     define: {
@@ -141,11 +125,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
       'dynamic-import': false,
       hashbang: false
     },
-<<<<<<< Updated upstream
     plugins: [compositeLoader(components, getAllComposite(components)), entryPointLoader(components)]
-=======
-    plugins: [compositeLoader(components)]
->>>>>>> Stashed changes
   })
 
   /* istanbul ignore if */
@@ -218,7 +198,6 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   return typeCheckerFuture
 }
 
-<<<<<<< Updated upstream
 function compositeLoader(components: BundleComponents, composites: Record<string, Uint8Array>): esbuild.Plugin {
   const compositeLines: string[] = []
 
@@ -233,11 +212,7 @@ function compositeLoader(components: BundleComponents, composites: Record<string
     }
   }
 
-  const contents = `
-export const compositeFromLoader: Record<string, string | Uint8Array> = {${compositeLines.join(',')}}
-// const composites: Composite.Resource[] = []
-
-`
+  const contents = `export const compositeFromLoader = {${compositeLines.join(',')}}`
   return {
     name: 'composite-loader',
     setup(build) {
@@ -252,7 +227,7 @@ export const compositeFromLoader: Record<string, string | Uint8Array> = {${compo
       build.onLoad({ filter: /.*/, namespace: 'sdk-composite' }, (_args) => {
         components.logger.log('composite loader!')
         return {
-          loader: 'ts',
+          loader: 'js',
           contents
         }
       })
@@ -301,34 +276,29 @@ function entryPointLoader(components: BundleComponents): esbuild.Plugin {
 // }
 // const entryCompositePoint = loadComposite(path.resolve(process.cwd(), compositeEntryPoint))
 // const dependencies = Composite.getDedendenciesFrom({ composite: entryCompositePoint, src: compositeEntryPoint })
-=======
-function compositeLoader(components: BundleComponents): esbuild.Plugin {
-  return {
-    name: 'composite-loader',
-    async setup(build: esbuild.PluginBuild) {
-      build.onResolve({ filter: /\.composite$/ }, async (args) => {
-        components.logger.log(`on resolve ${args.path} with ${args.resolveDir}`)
-        const compositePath = path.resolve(args.resolveDir, args.path).substr(process.cwd().length)
-        return {
-          namespace: 'composite',
-          path: compositePath
-        }
-      })
+// function AnothercompositeLoader(components: BundleComponents): esbuild.Plugin {
+//   return {
+//     name: 'composite-loader',
+//     async setup(build: esbuild.PluginBuild) {
+//       build.onResolve({ filter: /\.composite$/ }, async (args) => {
+//         components.logger.log(`on resolve ${args.path} with ${args.resolveDir}`)
+//         const compositePath = path.resolve(args.resolveDir, args.path).substr(process.cwd().length)
+//         return {
+//           namespace: 'composite',
+//           path: compositePath
+//         }
+//       })
 
-      async function onLoad(
-        args: esbuild.OnLoadArgs,
-        binary: boolean
-      ): Promise<esbuild.OnLoadResult | null | undefined> {
-        components.logger.log(`on load ${args.path} with ${args}`)
+//       async function onLoad(
+//         args: esbuild.OnLoadArgs,
+//         binary: boolean
+//       ): Promise<esbuild.OnLoadResult | null | undefined> {
+//         components.logger.log(`on load ${args.path} with ${args}`)
 
-        
+//         return
+//       }
 
-
-        return
-      }
-
-      build.onLoad({ filter: /\.composite$/, namespace: '' }, (args) => onLoad(args, false))
-    }
-  }
-}
->>>>>>> Stashed changes
+//       build.onLoad({ filter: /\.composite$/, namespace: '' }, (args) => onLoad(args, false))
+//     }
+//   }
+// }

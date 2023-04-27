@@ -5,7 +5,7 @@ import { createRendererTransport } from './internal/transports/rendererTransport
 import { pollEvents } from './observables'
 
 // Attach CRDT transport
-const rendererTransport = createRendererTransport({ crdtSendToRenderer })
+export const rendererTransport = createRendererTransport({ crdtSendToRenderer })
 engine.addTransport(rendererTransport)
 
 export async function onUpdate(deltaTime: number) {

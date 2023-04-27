@@ -1,43 +1,30 @@
+import { compositeFromLoader } from '~sdk/all-composites'
 import { Composite } from '@dcl/ecs'
-import { getSceneInfo } from '~system/Scene'
+
+const composites: Composite.Resource[] = []
 
 // @public
-export async function createContentFetchCompositeProvider(): Promise<Composite.Provider> {
-  const scene = await getSceneInfo({})
-  const compositesContent = scene.contents.filter((item) => {
-    const path = item.file.toLowerCase()
-    return path.endsWith('.composite') || path.endsWith('.composite.bin')
-  })
+export const compositeProvider: Composite.Provider = {
+  getCompositeOrNull(src: string, _currentPath?: string) {
+    // TODO: resolve path from src and currentPath
 
-  async function fetchComposite(item: { hash: string; file: string }): Promise<Composite.Resource | null> {
-    const src = item.file.toLowerCase()
-    const compositeUrl = `${scene.baseUrl}${item.hash}`
-    try {
-      const response = await fetch(compositeUrl)
-      if (item.file.endsWith('.bin')) {
-        const compositeBinaryData: Uint8Array = await (response as any).arrayBuffer()
-        const composite = Composite.fromBinary(compositeBinaryData)
-        return { src, composite }
-      } else {
-        const compositeJson = await response.json()
-        const composite = Composite.fromJson(compositeJson)
-        return { src, composite }
+    const fromLoader = compositeFromLoader[src]
+    if (fromLoader) {
+      try {
+        if (src.endsWith('.bin') && fromLoader instanceof Uint8Array) {
+          const composite = Composite.fromBinary(fromLoader)
+          composites.push({ src, composite })
+        } else if (typeof fromLoader === 'string') {
+          const composite = Composite.fromJson(JSON.parse(fromLoader))
+          composites.push({ src, composite })
+        }
+      } catch (err) {
+        console.error(err)
       }
-    } catch (err) {
-      console.error(`Error loading composite ${compositeUrl}: ${(err as any).toString()}`)
-      return null
+
+      delete compositeFromLoader[src]
     }
-  }
 
-  const compositePromises = compositesContent.map(fetchComposite)
-
-  const composites = (await Promise.all(compositePromises)).filter((item) => !!item) as Composite.Resource[]
-
-  return {
-    getCompositeOrNull(src: string, _currentPath?: string) {
-      // TODO: resolve path from src and currentPath
-
-      return composites.find((item) => item.src === src) || null
-    }
+    return composites.find((item) => item.src === src) || null
   }
 }
