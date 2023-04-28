@@ -5,7 +5,6 @@ import { Scene } from '@dcl/schemas'
 import child_process from 'child_process'
 import esbuild from 'esbuild'
 import { future } from 'fp-future'
-import { readFileSync, writeFileSync } from 'fs-extra'
 import { globSync } from 'glob'
 import path, { dirname, join } from 'path'
 import { pathToFileURL } from 'url'
@@ -63,13 +62,13 @@ export async function bundleProject(components: BundleComponents, options: Compi
     await components.fs.mkdir(dclFolderPath, { recursive: true })
   } catch (err) {}
 
-  const composites = options.ignoreComposite ? {} : getAllComposite(options)
+  const composites = options.ignoreComposite ? {} : await getAllComposite(components, options)
   const hasComposites = Object.entries(composites).length > 0
 
   const originalInput = globSync(options.single ?? 'src/index.ts', { cwd: options.workingDirectory, absolute: true })
 
   const entryPoints: { src: string; dest: string }[] = []
-  originalInput.forEach((filePath) => {
+  for (const filePath of originalInput) {
     const entryPointPath = path.resolve(dclFolderPath, path.basename(filePath))
     const entryPointCode = options.customEntryPoint
       ? `export * from '${filePath}'`
@@ -77,12 +76,13 @@ export async function bundleProject(components: BundleComponents, options: Compi
       ? `import * as user from '${filePath}'; export * from '@dcl/sdk/with-composite'; user`
       : `import * as user from '${filePath}'; export * from '@dcl/sdk'; user`
 
-    writeFileSync(entryPointPath, entryPointCode)
+    await components.fs.writeFile(entryPointPath, entryPointCode)
+
     entryPoints.push({
       src: filePath,
       dest: entryPointPath
     })
-  })
+  }
 
   const input = entryPoints.map((item) => item.dest)
 
@@ -241,12 +241,16 @@ function compositeLoader(composites: Record<string, Uint8Array>): esbuild.Plugin
     }
   }
 }
-function getAllComposite(options: CompileOptions): Record<string, Uint8Array> {
+
+async function getAllComposite(
+  components: BundleComponents,
+  options: CompileOptions
+): Promise<Record<string, Uint8Array>> {
   const ret: Record<string, Uint8Array> = {}
   const files = globSync('**/*.{composite,composite.bin}', { cwd: options.workingDirectory })
 
   for (const file of files) {
-    ret[file] = readFileSync(file)
+    ret[file] = await components.fs.readFile(file)
   }
   return ret
 }
