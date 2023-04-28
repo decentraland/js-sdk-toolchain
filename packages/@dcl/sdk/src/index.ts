@@ -9,7 +9,7 @@ export const rendererTransport = createRendererTransport({ crdtSendToRenderer })
 engine.addTransport(rendererTransport)
 
 export async function onUpdate(deltaTime: number) {
-  await engine.seal()
+  engine.seal()
   await engine.update(deltaTime)
   await pollEvents(sendBatch)
 }
