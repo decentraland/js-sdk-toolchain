@@ -25,7 +25,10 @@
   ],
   "license": "Apache-2.0",
   "main": "./dist/index.js",
-  "repository": "decentraland/js-sdk-toolchain.git",
+  "repository": {
+    "url": "git+https://github.com/decentraland/js-sdk-toolchain",
+    "directory": "packages/@dcl/react-ecs"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json"
   },

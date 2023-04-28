@@ -37,6 +37,10 @@
     "public"
   ],
   "main": "dist/tooling-entrypoint.js",
+  "repository": {
+    "url": "git+https://github.com/decentraland/js-sdk-toolchain",
+    "directory": "packages/@dcl/inspector"
+  },
   "scripts": {
     "build": "node ./build.js",
     "start": "node ./build.js --watch"

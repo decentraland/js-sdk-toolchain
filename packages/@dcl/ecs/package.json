@@ -22,7 +22,10 @@
   ],
   "license": "Apache-2.0",
   "main": "./dist/index.js",
-  "repository": "decentraland/ecs.git",
+  "repository": {
+    "url": "git+https://github.com/decentraland/js-sdk-toolchain",
+    "directory": "packages/@dcl/ecs"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json"
   },
