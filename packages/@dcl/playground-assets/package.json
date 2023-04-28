@@ -18,6 +18,10 @@
   "license": "Apache-2.0",
   "main": "./dist/index.js",
   "minCliVersion": "3.12.3",
+  "repository": {
+    "url": "git+https://github.com/decentraland/js-sdk-toolchain",
+    "directory": "packages/@dcl/playground-assets"
+  },
   "scripts": {
     "build": "npm run build-playground && node_modules/.bin/api-extractor run",
     "build-local": "npm run build-playground && node_modules/.bin/api-extractor run --local --verbose --diagnostics",

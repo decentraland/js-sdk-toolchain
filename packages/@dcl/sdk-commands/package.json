@@ -47,6 +47,10 @@
   "keywords": [],
   "license": "Apache-2.0",
   "minCliVersion": "3.14.1",
+  "repository": {
+    "url": "git+https://github.com/decentraland/js-sdk-toolchain",
+    "directory": "packages/@dcl/sdk-commands"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "tsc -p tsconfig.json --watch"
