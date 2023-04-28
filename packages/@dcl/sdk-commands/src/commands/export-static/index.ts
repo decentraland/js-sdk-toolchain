@@ -53,7 +53,7 @@ export async function help(options: Options) {
     --destination <directory> A path in which all the assets will be stored
     --timestamp <timestamp>   A date to use in the deployable entity. Defaults to now()
     --realmName <name>        Creates a /<name>/about endpoint to expose the current deployment as a realm. Requires --baseUrl
-    --commsAdapter <name>     URL of the communications adapter
+    --commsAdapter <url>      URL of the communications adapter (https://adr.decentraland.org/adr/ADR-180)
     --baseUrl <baseUrl>       It is the public URL in which the --destination directory will be avaiable
 `)
 }
