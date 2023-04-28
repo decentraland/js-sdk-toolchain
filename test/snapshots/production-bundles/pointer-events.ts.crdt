@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=154.9k bytes
+SCENE_COMPILED_JS_SIZE_PROD=155.3k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -9,11 +9,11 @@ EVAL test/snapshots/production-bundles/pointer-events.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 32k
-  MALLOC_COUNT = 8574
+  MALLOC_COUNT = 8593
   ALIVE_OBJS_DELTA ~= 1.83k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 6
+  MALLOC_COUNT = 8
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":15,"y":1,"z":15},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -43,4 +43,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 692.07k bytes
+  MEMORY_USAGE_COUNT ~= 693.64k bytes

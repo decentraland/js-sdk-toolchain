@@ -253,11 +253,8 @@ function entryPointLoader(components: BundleComponents, inputs: string[], option
     name: 'entry-point-loader',
     setup(build) {
       build.onLoad({ filter }, async (args) => {
-        components.logger.log(JSON.stringify(args))
-
-        const exportSdk = options.customEntryPoint ? '' : `export * from '@dcl/sdk'`
-        const contents = (await components.fs.readFile(args.path)) + exportSdk
-
+        const exportSdk = options.customEntryPoint ? '' : `;export * from '@dcl/sdk';`
+        const contents = exportSdk + (await components.fs.readFile(args.path))
         return {
           loader: 'ts',
           contents
