@@ -6,35 +6,46 @@ import {
   IEngine,
   LastWriteWinElementSetComponentDefinition
 } from '@dcl/ecs'
-import { streamEvent } from './stream'
+import upsertAsset from './upsert-asset'
+import { FileSystemInterface } from '../types'
 
-export type UndoRedo = {
+export type UndoRedoCrdt = { $case: 'crdt'; operations: CrdtOperation[] }
+export type CrdtOperation = {
   entity: Entity
   componentName: string
-  value: unknown
+  prevValue: unknown
+  newValue: unknown
   operation: CrdtMessageType
 }
+export type UndoRedoFile = { $case: 'file'; operations: FileOperation[] }
+export type FileOperation = {
+  path: string
+  prevValue: Uint8Array | null
+  newValue: Uint8Array | null
+}
 
-export function initUndoRedo(engine: IEngine, getComposite: () => CompositeDefinition) {
-  const undoList: UndoRedo[][] = []
-  const redoList: UndoRedo[][] = []
-  const acc: UndoRedo[] = []
+export type UndoRedo = UndoRedoFile | UndoRedoCrdt
+export const isCrdtOperation = (undoRedo: UndoRedo): undoRedo is UndoRedoCrdt => {
+  return undoRedo.$case === 'crdt'
+}
 
-  function getAndCleanArray(arr: unknown[]): unknown[] {
-    return arr.splice(0, arr.length)
+function getAndCleanArray<T = unknown>(arr: T[]): T[] {
+  return arr.splice(0, arr.length)
+}
+
+function findPrevValue(composite: CompositeDefinition, componentName: string, entity: Entity) {
+  const component = composite.components.find((c) => c.name === componentName)
+  const value = component?.data.get(entity)
+  if (value?.data?.$case !== 'json') {
+    return null
   }
+  return value.data.json
+}
 
-  streamEvent.on('streamStart', () => {
-    getAndCleanArray(redoList)
-    getAndCleanArray(acc)
-  })
-
-  streamEvent.on('streamEnd', () => {
-    const changes = getAndCleanArray(acc) as UndoRedo[]
-    if (changes.length) {
-      undoList.push(changes)
-    }
-  })
+export function initUndoRedo(fs: FileSystemInterface, engine: IEngine, getComposite: () => CompositeDefinition) {
+  const undoList: UndoRedo[] = []
+  const redoList: UndoRedo[] = []
+  const crdtAcc: CrdtOperation[] = []
 
   function onChange(
     entity: Entity,
@@ -45,59 +56,76 @@ export function initUndoRedo(engine: IEngine, getComposite: () => CompositeDefin
     if (!getComposite()) {
       return
     }
-    // Add undo operation
+
     // TODO: selection doesn't exists on composite
     if (operation === CrdtMessageType.PUT_COMPONENT || operation === CrdtMessageType.DELETE_COMPONENT) {
-      const prevValue = findValue(getComposite(), component!.componentName, entity)
-      acc.push({ entity, operation, componentName: component!.componentName, value: prevValue })
+      const prevValue = findPrevValue(getComposite(), component!.componentName, entity)
+      crdtAcc.push({
+        entity,
+        operation,
+        componentName: component!.componentName,
+        prevValue,
+        newValue: _componentValue
+      })
     }
   }
 
-  function findValue(composite: CompositeDefinition, componentName: string, entity: Entity) {
-    const component = composite.components.find((c) => c.name === componentName)
-    const value = component?.data.get(entity)
+  async function undoRedoLogic(message: UndoRedo): Promise<void> {
+    if (message.$case === 'crdt') {
+      for (const operation of message.operations) {
+        const component = engine.getComponent(
+          operation.componentName
+        ) as LastWriteWinElementSetComponentDefinition<unknown>
 
-    if (value?.data?.$case !== 'json') {
-      return null
-    }
-
-    return value.data.json
-  }
-
-  function updateOperation(operations: UndoRedo[]) {
-    const opAcc: UndoRedo[] = []
-
-    for (const operation of operations) {
-      const component = engine.getComponent(
-        operation.componentName
-      ) as LastWriteWinElementSetComponentDefinition<unknown>
-      const oldValue = component.getOrNull(operation.entity)
-      opAcc.push({ ...operation, value: oldValue })
-
-      if (operation.value === null) {
-        component.deleteFrom(operation.entity)
-      } else {
-        component.createOrReplace(operation.entity, operation.value)
+        if (operation.prevValue === null) {
+          component.deleteFrom(operation.entity)
+        } else {
+          component.createOrReplace(operation.entity, operation.prevValue)
+        }
+      }
+    } else if (message.$case === 'file') {
+      for (const operation of message.operations) {
+        await upsertAsset(fs, operation.path, operation.prevValue)
       }
     }
-    return opAcc
+  }
+
+  function invertMessage<T extends UndoRedo>(message: T): T {
+    const opAcc: T['operations'] = []
+    for (const operation of message.operations) {
+      opAcc.push({ ...operation, prevValue: operation.newValue, newValue: operation.prevValue } as any)
+    }
+    return { ...message, operations: opAcc }
   }
 
   return {
     async redo() {
       const msg = redoList.pop()
       if (msg) {
-        undoList.push(updateOperation(msg))
+        await undoRedoLogic(msg)
+        undoList.push(invertMessage(msg))
         await engine.update(1 / 16)
       }
     },
     async undo() {
       const msg = undoList.pop()
       if (msg) {
-        redoList.push(updateOperation(msg))
+        await undoRedoLogic(msg)
+        redoList.push(invertMessage(msg))
         await engine.update(1 / 16)
       }
     },
-    onChange
+    onChange,
+    addUndoFile(operations: FileOperation[]) {
+      getAndCleanArray(redoList)
+      undoList.push({ $case: 'file', operations })
+    },
+    addUndoCrdt() {
+      getAndCleanArray(redoList)
+      const changes = getAndCleanArray(crdtAcc)
+      if (changes.length) {
+        undoList.push({ $case: 'crdt', operations: changes })
+      }
+    }
   }
 }

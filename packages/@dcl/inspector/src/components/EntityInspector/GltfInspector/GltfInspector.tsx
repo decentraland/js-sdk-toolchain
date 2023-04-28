@@ -4,19 +4,18 @@ import { useDrop } from 'react-dnd'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import cx from 'classnames'
 
-
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useFileSystem } from '../../../hooks/catalog/useFileSystem'
+import { ProjectAssetDrop } from '../../../lib/sdk/drag-drop'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { TextField } from '../TextField'
 import { Props } from './types'
 import { fromGltf, toGltf, isValidInput, getModel } from './utils'
-import { ProjectAssetDrop } from '../../../lib/sdk/drag-drop'
 
 const DROP_TYPES = ['project-asset-gltf']
 
