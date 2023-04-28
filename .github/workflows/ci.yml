@@ -17,8 +17,8 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
-      - name: install npm v8
-        run: npm i -g npm@8
+      - name: install npm
+        run: npm i -g npm
       - name: install
         run: make install
       - name: lint
@@ -31,8 +31,8 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
-      - name: install npm v8
-        run: npm i -g npm@8
+      - name: install npm
+        run: npm i -g npm
       - name: docs
         run: make docs
   test:
@@ -43,8 +43,8 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
-      - name: install npm v8
-        run: npm i -g npm@8
+      - name: install npm
+        run: npm i -g npm
       - name: install
         run: make install
       - name: build
@@ -75,8 +75,8 @@ jobs:
           node-version: 18
           cache: 'npm'
 
-      - name: install npm v8
-        run: npm i -g npm@8
+      - name: install npm
+        run: npm i -g npm
 
       - name: install
         run: make install
@@ -331,8 +331,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: install npm v8
-        run: npm i -g npm@8
+      - name: install npm
+        run: npm i -g npm
       - run: mkdir -p scene
       - name: npx @dcl/sdk-commands init --skip-install
         run: npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_commands_s3_bucket_key }} init
@@ -351,6 +351,7 @@ jobs:
           npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_commands_s3_bucket_key }} \
             export-static \
               --realmName ${{ github.head_ref || github.ref }}-e2e \
+              --commsAdapter ws-room:ws-room-service.decentraland.org/rooms/sdk-${{ github.sha }} \
               --baseUrl ${{ secrets.SDK_TEAM_S3_BASE_URL }}/ipfs \
               --dir scene \
               --destination $(pwd)/out-static
