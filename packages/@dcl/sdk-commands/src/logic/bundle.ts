@@ -57,28 +57,6 @@ export async function bundleProject(components: BundleComponents, options: Compi
     throw new CliError(`File ${tsconfig} must exist to compile the Typescript project`)
   }
 
-  // const dclFolderPath = path.resolve(options.workingDirectory, '.decentraland', 'ts-entry-points')
-  // try {
-  //   await components.fs.mkdir(dclFolderPath, { recursive: true })
-  // } catch (err) {}
-
-  // const originalInput = globSync(options.single ?? 'src/index.ts', { cwd: options.workingDirectory, absolute: true })
-
-  // const entryPoints: { src: string; dest: string }[] = []
-  // for (const filePath of originalInput) {
-  //   const entryPointPath = path.resolve(dclFolderPath, path.basename(filePath))
-  //   const entryPointCode = options.customEntryPoint
-  //     ? `export * from '${filePath}'`
-  //     : `import * as user from '${filePath}'; export * from '@dcl/sdk'; user`
-
-  //   await components.fs.writeFile(entryPointPath, entryPointCode)
-
-  //   entryPoints.push({
-  //     src: filePath,
-  //     dest: entryPointPath
-  //   })
-  // }
-
   const input = globSync(options.single ?? 'src/index.ts', { cwd: options.workingDirectory, absolute: true }) // entryPoints.map((item) => item.dest)
 
   /* istanbul ignore if */
@@ -248,7 +226,8 @@ async function getAllComposite(
 }
 
 function entryPointLoader(components: BundleComponents, inputs: string[], options: CompileOptions): esbuild.Plugin {
-  const filter = new RegExp(`(${inputs.join('|')})`)
+  const escapedInputs = inputs.map(($) => $.replace(/\\/g, '\\\\'))
+  const filter = new RegExp(`(${escapedInputs.join('|')})`)
   return {
     name: 'entry-point-loader',
     setup(build) {
