@@ -6,6 +6,7 @@
   "files": [
     "index.d.ts",
     "apis.d.ts",
+    "sdk.d.ts",
     "tsconfig.json"
   ],
   "keywords": [],
