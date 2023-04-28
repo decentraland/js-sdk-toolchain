@@ -4,6 +4,7 @@ import { EcsEntity } from './EcsEntity'
 import { Entity } from '@dcl/ecs'
 import { getLayoutManager } from './layout-manager'
 import { inBounds } from '../../utils/layout'
+import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
 
 export const getGizmoManager = memoize((scene: Scene) => {
   // Create and initialize gizmo
@@ -41,9 +42,9 @@ export const getGizmoManager = memoize((scene: Scene) => {
       const context = lastEntity.context.deref()!
       const parent = context.Transform.getOrNull(lastEntity.entityId)?.parent || (0 as Entity)
       context.Transform.createOrReplace(lastEntity.entityId, {
-        position: lastEntity.position.clone(),
-        scale: lastEntity.scaling.clone(),
-        rotation: lastEntity.rotationQuaternion!.clone(),
+        position: snapPosition(lastEntity.position),
+        scale: snapScale(lastEntity.scaling),
+        rotation: snapRotation(lastEntity.rotationQuaternion!),
         parent
       })
     }
@@ -52,6 +53,15 @@ export const getGizmoManager = memoize((scene: Scene) => {
   gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.add(update)
   gizmoManager.gizmos.positionGizmo?.onDragEndObservable.add(update)
   gizmoManager.gizmos.rotationGizmo?.onDragEndObservable.add(update)
+
+  // snap
+  function updateSnap() {
+    gizmoManager.gizmos.positionGizmo!.snapDistance = snapManager.isEnabled() ? snapManager.getPositionSnap() : 0
+    gizmoManager.gizmos.scaleGizmo!.snapDistance = snapManager.isEnabled() ? snapManager.getScaleSnap() : 0
+    gizmoManager.gizmos.rotationGizmo!.snapDistance = snapManager.isEnabled() ? snapManager.getRotationSnap() : 0
+  }
+  snapManager.onChange(updateSnap)
+  updateSnap()
 
   return {
     gizmoManager,

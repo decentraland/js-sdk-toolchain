@@ -5,12 +5,6 @@
   width: 100%;
 }
 
-.Toolbar button {
-  padding: 0px 2px !important;
-  margin: 0 8px;
-  min-width: 32px;
-}
-
 .Toolbar .undo svg,
 .Toolbar .redo svg {
   transform: translateY(2px);
@@ -26,31 +20,6 @@
   margin-left: 1px;
   border-top-left-radius: 0px;
   border-bottom-left-radius: 0px;
-}
-
-.Toolbar button.gizmo {
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.Toolbar .gizmo.translate {
-  margin-right: 1px;
-  border-top-right-radius: 0px;
-  border-bottom-right-radius: 0px;
-  background-image: url(./icons/translate.svg);
-}
-
-.Toolbar .gizmo.rotate {
-  margin: 0px;
-  border-radius: 0px;
-  background-image: url(./icons/rotate.svg);
-}
-
-.Toolbar .gizmo.scale {
-  margin-left: 1px;
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 0px;
-  background-image: url(./icons/scale.svg);
 }
 
 .Toolbar .babylonjs-inspector svg {
