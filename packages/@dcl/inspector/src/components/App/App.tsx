@@ -26,12 +26,15 @@ const App = () => {
   const [catalog] = useCatalog()
   const [tab, setTab] = useState<Tab | undefined>(undefined)
 
-  const handleTabClick = useCallback((value: Tab) => () => {
-    setTab(tab === value ? undefined : value)
-  }, [tab])
+  const handleTabClick = useCallback(
+    (value: Tab) => () => {
+      setTab(tab === value ? undefined : value)
+    },
+    [tab]
+  )
 
   return (
-    <Resizable type="horizontal" min={280} initial={280}>
+    <Resizable type="horizontal" min={300} initial={300}>
       <Box>
         <div
           className="sidebar"

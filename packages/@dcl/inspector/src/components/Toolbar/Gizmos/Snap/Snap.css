@@ -1,0 +1,24 @@
+.Snap {
+  display: flex;
+}
+
+.Snap>.label {
+  flex: none;
+  margin-right: 8px;
+  color: var(--secondary-text);
+}
+
+.Snap>input {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: right;
+  background: none;
+  color: var(--text);
+  border: none;
+  outline: none;
+}
+
+.Snap>input:disabled {
+  user-select: none;
+  color: var(--secondary-text);
+}
