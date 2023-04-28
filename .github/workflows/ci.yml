@@ -64,6 +64,9 @@ jobs:
         run: make prepare
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     outputs:
       decentraland_sdk_s3_bucket_key: ${{ steps.publish_decentraland_sdk.outputs.s3-bucket-key }}
       decentraland_sdk_commands_s3_bucket_key: ${{ steps.publish_decentraland_sdk_commands.outputs.s3-bucket-key }}
@@ -110,7 +113,8 @@ jobs:
           cwd: ./packages/@dcl/js-runtime
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
-
+          ## sign the deployment
+          provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/js-runtime'
@@ -128,7 +132,8 @@ jobs:
           cwd: ./packages/@dcl/ecs
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
-
+          ## sign the deployment
+          provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/ecs'
@@ -146,7 +151,8 @@ jobs:
           cwd: ./packages/@dcl/react-ecs
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
-
+          ## sign the deployment
+          provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/react-ecs'
@@ -164,7 +170,8 @@ jobs:
           cwd: ./packages/@dcl/inspector
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
-
+          ## sign the deployment
+          provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/inspector'
@@ -189,7 +196,8 @@ jobs:
           cwd: ./packages/@dcl/sdk-commands
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
-
+          ## sign the deployment
+          provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
@@ -233,7 +241,8 @@ jobs:
           cwd: ./packages/@dcl/sdk
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
-
+          ## sign the deployment
+          provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
@@ -251,7 +260,8 @@ jobs:
           cwd: ./packages/@dcl/playground-assets
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
-
+          ## sign the deployment
+          provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
