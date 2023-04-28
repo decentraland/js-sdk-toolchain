@@ -17,20 +17,20 @@ export const putEntitySelectedComponent: ComponentOperation = (entity, component
 const updateGizmoManager = (entity: EcsEntity, value: { gizmo: number } | null) => {
   const context = entity.context.deref()!
   const gm = getGizmoManager(context.scene)
-  let atLeastOne = 0
+  let processedSomeEntity = false
 
   for (const [_entity] of context.engine.getEntitiesWith(context.editorComponents.Selection)) {
-    atLeastOne++
+    processedSomeEntity = true
     if (entity.entityId === _entity) {
-        gm.setEntity(entity)
-        gm.gizmoManager.positionGizmoEnabled = value?.gizmo === 0
-        gm.gizmoManager.rotationGizmoEnabled = value?.gizmo === 1
-        gm.gizmoManager.scaleGizmoEnabled = value?.gizmo === 2
-        return
+      gm.setEntity(entity)
+      gm.gizmoManager.positionGizmoEnabled = value?.gizmo === 0
+      gm.gizmoManager.rotationGizmoEnabled = value?.gizmo === 1
+      gm.gizmoManager.scaleGizmoEnabled = value?.gizmo === 2
+      return
     }
   }
 
-  if (atLeastOne === 0) {
+  if (!processedSomeEntity) {
     gm.unsetEntity()
     gm.gizmoManager.positionGizmoEnabled = false
     gm.gizmoManager.rotationGizmoEnabled = false

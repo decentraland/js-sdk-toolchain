@@ -75,6 +75,7 @@ export const getGizmoManager = memoize((scene: Scene) => {
     },
     unsetEntity() {
       lastEntity = null
+      gizmoManager.attachToNode(lastEntity)
     }
   }
 })

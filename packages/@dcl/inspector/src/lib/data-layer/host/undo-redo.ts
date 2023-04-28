@@ -118,7 +118,7 @@ export function initUndoRedo(fs: FileSystemInterface, engine: IEngine, getCompos
       undoList.push({ $case: 'file', operations })
     },
     addUndoCrdt() {
-      // TODO: when we delete an entity it's sending a delete EntityNdoe that idk from where its comming
+      // TODO: when we delete an entity it's sending a delete EntityNode that idk from where its comming
       // and its breaking the whole undo/redo logic.
       const lostEntityNodeBug = crdtAcc.length === 1 && crdtAcc[0].componentName === 'editor::EntityNode'
       const changes = getAndCleanArray(crdtAcc)
