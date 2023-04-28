@@ -12,6 +12,7 @@ export { onUpdate }
 /* @__PURE__ */ export async function onStart() {
   const response = await crdtGetState({ data: new Uint8Array() })
 
+  // when this condition is true something like `main.crdt` was pre-loaded from the runtime, we don't need to instance the main.composite
   if (!response.hasEntities) {
     const mainComposite = compositeProvider.getCompositeOrNull('main.composite')
     if (mainComposite) {

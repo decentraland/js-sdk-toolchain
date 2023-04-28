@@ -2655,11 +2655,6 @@ export interface Rect {
 // @public
 export function removeEntityWithChildren(engine: IEngine, entity: Entity): void;
 
-// Warning: (ae-missing-release-tag) "rendererTransport" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const rendererTransport: Transport;
-
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)

@@ -5,6 +5,7 @@ import { createRendererTransport } from './internal/transports/rendererTransport
 import { pollEvents } from './observables'
 
 // Attach CRDT transport
+// @internal
 export const rendererTransport = createRendererTransport({ crdtSendToRenderer })
 engine.addTransport(rendererTransport)
 
