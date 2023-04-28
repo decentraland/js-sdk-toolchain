@@ -30,7 +30,12 @@ export function assertFilesExist(map: BasicSourceMapConsumer) {
   expect(map.sources.length).toBeGreaterThan(0)
   for (const file of map.sources) {
     expect(file.startsWith('file://')).toBeTruthy()
-    expect(existsSync(fileURLToPath(file))).toBeTruthy()
+
+    // TODO: what should we do with virtual files?
+    if (file.endsWith('sdk-composite:all-composites')) continue
+
+    const fileExist = existsSync(fileURLToPath(file)) ? file : 'does not exit'
+    expect(fileExist).toBe(file)
   }
 
   // to ensure a good developer experience we must provide sourcemaps for each file

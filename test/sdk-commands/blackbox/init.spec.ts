@@ -10,6 +10,6 @@ describe('blackbox: init', () => {
     await components.fs.mkdir('tmp/blackbox-scene', { recursive: true })
 
     await runSdkCommand(components, 'init', ['--dir=tmp/blackbox-scene'])
-    await runSdkCommand(components, 'build', ['--dir=tmp/blackbox-scene'])
+    await runSdkCommand(components, 'build', ['--dir=tmp/blackbox-scene', '--customEntryPoint'])
   }, 60000)
 })
