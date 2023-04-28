@@ -45,13 +45,14 @@ export function initUndoRedo(fs: FileSystemInterface, engine: IEngine, getCompos
     component: ComponentDefinition<unknown> | undefined,
     _componentValue: unknown
   ) {
-    if (!getComposite()) {
+    const composite = getComposite()
+    if (!composite) {
       return
     }
 
     // TODO: selection doesn't exists on composite
     if (operation === CrdtMessageType.PUT_COMPONENT || operation === CrdtMessageType.DELETE_COMPONENT) {
-      const prevValue = findPrevValue(getComposite(), component!.componentName, entity)
+      const prevValue = findPrevValue(composite, component!.componentName, entity)
       crdtAcc.push({
         entity,
         operation,
