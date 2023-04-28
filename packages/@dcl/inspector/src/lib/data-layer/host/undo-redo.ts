@@ -8,7 +8,7 @@ import {
 } from '@dcl/ecs'
 import upsertAsset from './upsert-asset'
 import { FileSystemInterface } from '../types'
-import { findPrevValue, isEqual } from './utils/component'
+import { findPrevValue } from './utils/component'
 
 export type UndoRedoCrdt = { $case: 'crdt'; operations: CrdtOperation[] }
 export type CrdtOperation = {
@@ -51,19 +51,6 @@ export function initUndoRedo(fs: FileSystemInterface, engine: IEngine, getCompos
 
     // TODO: selection doesn't exists on composite
     if (operation === CrdtMessageType.PUT_COMPONENT || operation === CrdtMessageType.DELETE_COMPONENT) {
-      const lastRedo = redoList[redoList.length - 1]
-      if (
-        lastRedo &&
-        lastRedo.$case === 'crdt' &&
-        lastRedo.operations.find(
-          ($) =>
-            $.componentName === component?.componentName &&
-            $.entity === entity &&
-            isEqual(component!, _componentValue, $.newValue)
-        )
-      ) {
-        return
-      }
       const prevValue = findPrevValue(getComposite(), component!.componentName, entity)
       crdtAcc.push({
         entity,
