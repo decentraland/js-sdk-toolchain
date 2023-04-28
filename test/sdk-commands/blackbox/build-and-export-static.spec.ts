@@ -7,19 +7,24 @@ import path from 'path'
 describe('blackbox: build', () => {
   test('build integration test with workspace', async () => {
     const components = await initComponents()
-    await runSdkCommand(components, 'build', ['--dir=test/build-ecs/fixtures'])
+    await runSdkCommand(components, 'build', ['--dir=test/build-ecs/fixtures', '--customEntryPoint'])
   }, 15000)
 
   test('build integration test with single scene', async () => {
     const components = await initComponents()
-    await runSdkCommand(components, 'build', ['--dir=test/build-ecs/fixtures/ecs7-scene', '--skip-install'])
+    await runSdkCommand(components, 'build', [
+      '--dir=test/build-ecs/fixtures/ecs7-scene',
+      '--skip-install',
+      '--customEntryPoint'
+    ])
   }, 15000)
 
   test('build integration test with --single file', async () => {
     const components = await initComponents()
     await runSdkCommand(components, 'build', [
       '--dir=test/snapshots',
-      '--single=development-bundles/testing-fw.test.ts'
+      '--single=development-bundles/testing-fw.test.ts',
+      '--customEntryPoint'
     ])
   }, 15000)
 
@@ -28,13 +33,18 @@ describe('blackbox: build', () => {
     await runSdkCommand(components, 'build', [
       '--dir=test/snapshots',
       '--production',
-      '--single=development-bundles/testing-fw.test.ts'
+      '--single=development-bundles/testing-fw.test.ts',
+      '--customEntryPoint'
     ])
   }, 15000)
 
   test('build integration test with --single wildcard', async () => {
     const components = await initComponents()
-    await runSdkCommand(components, 'build', ['--dir=test/snapshots', '--single=development-bundles/*.test.ts'])
+    await runSdkCommand(components, 'build', [
+      '--dir=test/snapshots',
+      '--single=development-bundles/*.test.ts',
+      '--customEntryPoint'
+    ])
   }, 15000)
 
   test('export-static integration test', async () => {
