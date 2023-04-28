@@ -234,7 +234,7 @@ async function getAllComposite(
     } else {
       const textDecoder = new TextDecoder()
       const json = JSON.stringify(JSON.parse(textDecoder.decode(bin)))
-      compositeLines.push(`'${compositeName}':'${json}'`)
+      compositeLines.push(`'${compositeName}':${JSON.stringify(json)}`)
     }
   }
 
