@@ -74,8 +74,8 @@ export async function bundleProject(components: BundleComponents, options: Compi
     const entryPointCode = options.customEntryPoint
       ? `export * from '${filePath}'`
       : hasComposites
-      ? `export * from '@dcl/sdk/with-composite'`
-      : `export * from '@dcl/sdk'`
+      ? `import * as user from '${filePath}'; export * from '@dcl/sdk/with-composite'; user`
+      : `import * as user from '${filePath}'; export * from '@dcl/sdk'; user`
 
     writeFileSync(entryPointPath, entryPointCode)
     entryPoints.push({

@@ -80,7 +80,9 @@ describe('build command', () => {
         emitDeclaration: false,
         watch: false,
         single: undefined,
-        production: true
+        production: true,
+        customEntryPoint: false,
+        ignoreComposite: false
       },
       expect.anything() /* workspace */
     )
