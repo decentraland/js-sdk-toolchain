@@ -6,7 +6,7 @@ import child_process from 'child_process'
 import esbuild from 'esbuild'
 import { future } from 'fp-future'
 import { globSync } from 'glob'
-import path, { dirname, join } from 'path'
+import { dirname, join } from 'path'
 import { pathToFileURL } from 'url'
 import { CliComponents } from '../components'
 import { colors } from '../components/log'
@@ -57,34 +57,29 @@ export async function bundleProject(components: BundleComponents, options: Compi
     throw new CliError(`File ${tsconfig} must exist to compile the Typescript project`)
   }
 
-  const dclFolderPath = path.resolve(process.cwd(), '.decentraland', 'ts-entry-points')
-  try {
-    await components.fs.mkdir(dclFolderPath, { recursive: true })
-  } catch (err) {}
+  // const dclFolderPath = path.resolve(options.workingDirectory, '.decentraland', 'ts-entry-points')
+  // try {
+  //   await components.fs.mkdir(dclFolderPath, { recursive: true })
+  // } catch (err) {}
 
-  const composites = options.ignoreComposite ? {} : await getAllComposite(components, options)
-  const hasComposites = Object.entries(composites).length > 0
+  // const originalInput = globSync(options.single ?? 'src/index.ts', { cwd: options.workingDirectory, absolute: true })
 
-  const originalInput = globSync(options.single ?? 'src/index.ts', { cwd: options.workingDirectory, absolute: true })
+  // const entryPoints: { src: string; dest: string }[] = []
+  // for (const filePath of originalInput) {
+  //   const entryPointPath = path.resolve(dclFolderPath, path.basename(filePath))
+  //   const entryPointCode = options.customEntryPoint
+  //     ? `export * from '${filePath}'`
+  //     : `import * as user from '${filePath}'; export * from '@dcl/sdk'; user`
 
-  const entryPoints: { src: string; dest: string }[] = []
-  for (const filePath of originalInput) {
-    const entryPointPath = path.resolve(dclFolderPath, path.basename(filePath))
-    const entryPointCode = options.customEntryPoint
-      ? `export * from '${filePath}'`
-      : hasComposites
-      ? `import * as user from '${filePath}'; export * from '@dcl/sdk/with-composite'; user`
-      : `import * as user from '${filePath}'; export * from '@dcl/sdk'; user`
+  //   await components.fs.writeFile(entryPointPath, entryPointCode)
 
-    await components.fs.writeFile(entryPointPath, entryPointCode)
+  //   entryPoints.push({
+  //     src: filePath,
+  //     dest: entryPointPath
+  //   })
+  // }
 
-    entryPoints.push({
-      src: filePath,
-      dest: entryPointPath
-    })
-  }
-
-  const input = entryPoints.map((item) => item.dest)
+  const input = globSync(options.single ?? 'src/index.ts', { cwd: options.workingDirectory, absolute: true }) // entryPoints.map((item) => item.dest)
 
   /* istanbul ignore if */
   if (!input.length) throw new CliError(`There are no input files to build: ${options.single ?? 'src/index.ts'}`)
@@ -92,12 +87,9 @@ export async function bundleProject(components: BundleComponents, options: Compi
   const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
   const outfile = join(options.workingDirectory, output)
 
-  printProgressStep(
-    components.logger,
-    `Bundling file ${colors.bold(input.join(','))} (withComposite=${hasComposites})`,
-    1,
-    MAX_STEP
-  )
+  const composites = options.ignoreComposite ? {} : await getAllComposite(components, options)
+
+  printProgressStep(components.logger, `Bundling file ${colors.bold(input.join(','))}`, 1, MAX_STEP)
 
   const context = await esbuild.context({
     entryPoints: input,
@@ -134,7 +126,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
       'dynamic-import': false,
       hashbang: false
     },
-    plugins: [compositeLoader(composites)]
+    plugins: [entryPointLoader(components, input, options), compositeLoader(composites)]
   })
 
   /* istanbul ignore if */
@@ -253,4 +245,24 @@ async function getAllComposite(
     ret[file] = await components.fs.readFile(file)
   }
   return ret
+}
+
+function entryPointLoader(components: BundleComponents, inputs: string[], options: CompileOptions): esbuild.Plugin {
+  const filter = new RegExp(`(${inputs.join('|')})`)
+  return {
+    name: 'entry-point-loader',
+    setup(build) {
+      build.onLoad({ filter }, async (args) => {
+        components.logger.log(JSON.stringify(args))
+
+        const exportSdk = options.customEntryPoint ? '' : `export * from '@dcl/sdk'`
+        const contents = (await components.fs.readFile(args.path)) + exportSdk
+
+        return {
+          loader: 'ts',
+          contents
+        }
+      })
+    }
+  }
 }
