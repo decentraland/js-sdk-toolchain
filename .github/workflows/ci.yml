@@ -177,8 +177,7 @@ jobs:
         working-directory: ./packages/@dcl/sdk-commands
         if: ${{ github.event.pull_request.number }}
         run: |
-          node -e 
-          "\
+          node -e "\
             let pkg=require('./package.json');\
             pkg.dependencies['@dcl/inspector']='$INSPECTOR_URL';\
             require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));\
@@ -208,8 +207,7 @@ jobs:
         working-directory: ./packages/@dcl/sdk
         if: ${{ github.event.pull_request.number }}
         run: |
-          node -e 
-          "\
+          node -e "\
             let pkg=require('./package.json');\
             pkg.dependencies['@dcl/inspector']='$INSPECTOR_URL';\
             pkg.dependencies['@dcl/js-runtime']='$JS_RUNTIME_S3_URL';\
