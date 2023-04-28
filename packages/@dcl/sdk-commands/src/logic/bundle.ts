@@ -1,17 +1,17 @@
 // this file is tested extensively to build scenes in the `make test` command
 // but since it runs outiside the testing harness, coverage is not collected
 
-import esbuild from 'esbuild'
-import child_process from 'child_process'
-import { future } from 'fp-future'
-import { CliComponents } from '../components'
-import { CliError } from './error'
-import { join, dirname } from 'path'
-import { printProgressInfo, printProgressStep } from './beautiful-logs'
-import { colors } from '../components/log'
-import { pathToFileURL } from 'url'
-import { globSync } from 'glob'
 import { Scene } from '@dcl/schemas'
+import child_process from 'child_process'
+import esbuild from 'esbuild'
+import { future } from 'fp-future'
+import { globSync } from 'glob'
+import { dirname, join } from 'path'
+import { pathToFileURL } from 'url'
+import { CliComponents } from '../components'
+import { colors } from '../components/log'
+import { printProgressInfo, printProgressStep } from './beautiful-logs'
+import { CliError } from './error'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -32,6 +32,9 @@ export type CompileOptions = {
 
   // emit typescript declarations
   emitDeclaration: boolean
+
+  ignoreComposite: boolean
+  customEntryPoint: boolean
 }
 
 const MAX_STEP = 2
@@ -54,13 +57,15 @@ export async function bundleProject(components: BundleComponents, options: Compi
     throw new CliError(`File ${tsconfig} must exist to compile the Typescript project`)
   }
 
-  const input = globSync(options.single ?? 'src/index.ts', { cwd: options.workingDirectory, absolute: true })
+  const input = globSync(options.single ?? 'src/index.ts', { cwd: options.workingDirectory, absolute: true }) // entryPoints.map((item) => item.dest)
 
   /* istanbul ignore if */
   if (!input.length) throw new CliError(`There are no input files to build: ${options.single ?? 'src/index.ts'}`)
 
   const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
   const outfile = join(options.workingDirectory, output)
+
+  const composites = options.ignoreComposite ? {} : await getAllComposite(components, options)
 
   printProgressStep(components.logger, `Bundling file ${colors.bold(input.join(','))}`, 1, MAX_STEP)
 
@@ -98,7 +103,8 @@ export async function bundleProject(components: BundleComponents, options: Compi
       'import-meta': false,
       'dynamic-import': false,
       hashbang: false
-    }
+    },
+    plugins: [entryPointLoader(components, input, options), compositeLoader(composites)]
   })
 
   /* istanbul ignore if */
@@ -169,4 +175,70 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   }
 
   return typeCheckerFuture
+}
+
+function compositeLoader(composites: Record<string, Uint8Array>): esbuild.Plugin {
+  const compositeLines: string[] = []
+
+  for (const compositeName in composites) {
+    const bin = composites[compositeName]
+    if (compositeName.endsWith('.bin')) {
+      compositeLines.push(`'${compositeName}':new Uint8Array(${JSON.stringify(Array.from(bin))})`)
+    } else {
+      const textDecoder = new TextDecoder()
+      const json = JSON.stringify(JSON.parse(textDecoder.decode(bin)))
+      compositeLines.push(`'${compositeName}':'${json}'`)
+    }
+  }
+
+  const contents = `export const compositeFromLoader = {${compositeLines.join(',')}}`
+  return {
+    name: 'composite-loader',
+    setup(build) {
+      build.onResolve({ filter: /~sdk\/all-composites/ }, (_args) => {
+        return {
+          namespace: 'sdk-composite',
+          path: 'all-composites'
+        }
+      })
+
+      build.onLoad({ filter: /.*/, namespace: 'sdk-composite' }, (_args) => {
+        return {
+          loader: 'js',
+          contents
+        }
+      })
+    }
+  }
+}
+
+async function getAllComposite(
+  components: BundleComponents,
+  options: CompileOptions
+): Promise<Record<string, Uint8Array>> {
+  const ret: Record<string, Uint8Array> = {}
+  const files = globSync('**/*.{composite,composite.bin}', { cwd: options.workingDirectory })
+
+  for (const file of files) {
+    ret[file] = await components.fs.readFile(file)
+  }
+  return ret
+}
+
+function entryPointLoader(components: BundleComponents, inputs: string[], options: CompileOptions): esbuild.Plugin {
+  const escapedInputs = inputs.map(($) => $.replace(/\\/g, '\\\\'))
+  const filter = new RegExp(`(${escapedInputs.join('|')})`)
+  return {
+    name: 'entry-point-loader',
+    setup(build) {
+      build.onLoad({ filter }, async (args) => {
+        const exportSdk = options.customEntryPoint ? '' : `;export * from '@dcl/sdk';`
+        const contents = exportSdk + (await components.fs.readFile(args.path))
+        return {
+          loader: 'ts',
+          contents
+        }
+      })
+    }
+  }
 }
