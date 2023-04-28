@@ -95,10 +95,10 @@ function* serializeCrdtMessages(prefix: string, data: Uint8Array) {
       const { componentId, timestamp } = message
       const data = 'data' in message ? message.data : undefined
 
-      const c = engine.getComponent(componentId)
+      const c = engine.getComponentOrNull(componentId)
 
       yield `${preface} c=${componentId} t=${timestamp} data=${JSON.stringify(
-        (data && c.schema.deserialize(new ReadWriteByteBuffer(data))) || null
+        (data && c && c.schema.deserialize(new ReadWriteByteBuffer(data))) || null
       )}`
     } else if (message.type === CrdtMessageType.DELETE_ENTITY) {
       yield preface
@@ -132,6 +132,9 @@ async function run(fileName: string, fileContents: string) {
       }
     })
 
+    const mainCrdtFileName = fileName + '-main.crdt'
+    const shouldLoadMainCrdt = existsSync(mainCrdtFileName)
+
     vm.provide({
       log(...args) {
         out.push('  LOG: ' + JSON.stringify(args))
@@ -158,9 +161,19 @@ async function run(fileName: string, fileContents: string) {
               const serverUpdates = await runRendererFrame(data)
               return { data: serverUpdates }
             },
-            async crdtGetState(_payload: { data: Uint8Array }): Promise<{ data: Uint8Array[] }> {
+            async crdtGetState(_payload: { data: Uint8Array }): Promise<{ data: Uint8Array[]; hasEntities: boolean }> {
+              const hasEntities = shouldLoadMainCrdt
               const serverUpdates = await runRendererFrame(new Uint8Array())
-              return { data: serverUpdates }
+
+              if (shouldLoadMainCrdt) {
+                // prepend the main.crdt to the serverUpdates
+                const content = await readFile(mainCrdtFileName)
+                const data = new Uint8Array(content.buffer)
+                serverUpdates.unshift(data)
+                out.push(...Array.from(serializeCrdtMessages('main.crdt', data)))
+              }
+
+              return { data: serverUpdates, hasEntities }
             }
           }
         } else if (moduleName === '~system/Scene') {
