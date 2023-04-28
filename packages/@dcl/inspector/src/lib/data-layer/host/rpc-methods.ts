@@ -61,12 +61,12 @@ export async function initRpcMethods(
 
   return {
     async redo() {
-      await undoRedo.redo()
-      return {}
+      const type = await undoRedo.redo()
+      return type
     },
     async undo() {
-      await undoRedo.undo()
-      return {}
+      const type = await undoRedo.undo()
+      return type
     },
     /**
      * This method receives an incoming message iterator and returns an async iterable.

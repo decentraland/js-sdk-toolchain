@@ -112,6 +112,7 @@ export function initUndoRedo(fs: FileSystemInterface, engine: IEngine, getCompos
         await engine.update(1 / 16)
       }
       getAndCleanArray(crdtAcc)
+      return { type: msg?.$case ?? '' }
     },
     async undo() {
       const msg = undoList.pop()
@@ -121,6 +122,7 @@ export function initUndoRedo(fs: FileSystemInterface, engine: IEngine, getCompos
         await engine.update(1 / 16)
       }
       getAndCleanArray(crdtAcc)
+      return { type: msg?.$case ?? '' }
     },
     onChange,
     addUndoFile(operations: FileOperation[]) {
