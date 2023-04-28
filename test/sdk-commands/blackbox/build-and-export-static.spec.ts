@@ -66,6 +66,7 @@ describe('blackbox: build', () => {
       '--dir=test/build-ecs/fixtures',
       '--destination=tmp/ipfs',
       '--realmName=hola',
+      '--commsAdapter=offline:simulator',
       '--baseUrl=https://decentraland.org'
     ])
 
