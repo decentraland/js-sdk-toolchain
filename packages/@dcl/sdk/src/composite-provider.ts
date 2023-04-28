@@ -15,7 +15,7 @@ export const compositeProvider: Composite.Provider = {
           const composite = Composite.fromBinary(fromLoader)
           composites.push({ src, composite })
         } else if (typeof fromLoader === 'string') {
-          const composite = Composite.fromJson(JSON.parse(fromLoader))
+          const composite = Composite.fromJson(JSON.parse(JSON.parse(fromLoader)))
           composites.push({ src, composite })
         }
       } catch (err) {
