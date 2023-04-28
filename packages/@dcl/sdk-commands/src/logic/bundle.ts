@@ -177,8 +177,8 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
 
 function compositeLoader(components: BundleComponents, options: CompileOptions): esbuild.Plugin {
   let shouldReload = true
-  let contents = ''
-  let watchFiles: string[] = []
+  let contents = `export const compositeFromLoader = {}` // default exports nothing
+  let watchFiles: string[] = [] // no files to watch
 
   return {
     name: 'composite-loader',
@@ -194,10 +194,13 @@ function compositeLoader(components: BundleComponents, options: CompileOptions):
       })
 
       build.onLoad({ filter: /.*/, namespace: 'sdk-composite' }, async (_) => {
-        if (!options.ignoreComposite && shouldReload) {
-          const data = await getAllComposite(components, options)
-          contents = `export const compositeFromLoader = {${data.compositeLines.join(',')}}`
-          watchFiles = data.watchFiles
+        if (shouldReload) {
+          if (!options.ignoreComposite) {
+            const data = await getAllComposite(components, options)
+            contents = `export const compositeFromLoader = {${data.compositeLines.join(',')}}`
+            watchFiles = data.watchFiles
+          }
+          shouldReload = false
         }
 
         return {
