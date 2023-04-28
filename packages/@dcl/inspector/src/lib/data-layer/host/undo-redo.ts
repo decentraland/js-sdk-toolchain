@@ -8,6 +8,7 @@ import {
 } from '@dcl/ecs'
 import upsertAsset from './upsert-asset'
 import { FileSystemInterface } from '../types'
+import { findPrevValue, isEqual } from './utils/component'
 
 export type UndoRedoCrdt = { $case: 'crdt'; operations: CrdtOperation[] }
 export type CrdtOperation = {
@@ -33,15 +34,6 @@ function getAndCleanArray<T = unknown>(arr: T[]): T[] {
   return arr.splice(0, arr.length)
 }
 
-function findPrevValue(composite: CompositeDefinition, componentName: string, entity: Entity) {
-  const component = composite.components.find((c) => c.name === componentName)
-  const value = component?.data.get(entity)
-  if (value?.data?.$case !== 'json') {
-    return null
-  }
-  return value.data.json
-}
-
 export function initUndoRedo(fs: FileSystemInterface, engine: IEngine, getComposite: () => CompositeDefinition) {
   const undoList: UndoRedo[] = []
   const redoList: UndoRedo[] = []
@@ -59,6 +51,19 @@ export function initUndoRedo(fs: FileSystemInterface, engine: IEngine, getCompos
 
     // TODO: selection doesn't exists on composite
     if (operation === CrdtMessageType.PUT_COMPONENT || operation === CrdtMessageType.DELETE_COMPONENT) {
+      const lastRedo = redoList[redoList.length - 1]
+      if (
+        lastRedo &&
+        lastRedo.$case === 'crdt' &&
+        lastRedo.operations.find(
+          ($) =>
+            $.componentName === component?.componentName &&
+            $.entity === entity &&
+            isEqual(component!, _componentValue, $.newValue)
+        )
+      ) {
+        return
+      }
       const prevValue = findPrevValue(getComposite(), component!.componentName, entity)
       crdtAcc.push({
         entity,
@@ -102,18 +107,20 @@ export function initUndoRedo(fs: FileSystemInterface, engine: IEngine, getCompos
     async redo() {
       const msg = redoList.pop()
       if (msg) {
-        await undoRedoLogic(msg)
         undoList.push(invertMessage(msg))
+        await undoRedoLogic(msg)
         await engine.update(1 / 16)
       }
+      getAndCleanArray(crdtAcc)
     },
     async undo() {
       const msg = undoList.pop()
       if (msg) {
-        await undoRedoLogic(msg)
         redoList.push(invertMessage(msg))
+        await undoRedoLogic(msg)
         await engine.update(1 / 16)
       }
+      getAndCleanArray(crdtAcc)
     },
     onChange,
     addUndoFile(operations: FileOperation[]) {
@@ -121,9 +128,12 @@ export function initUndoRedo(fs: FileSystemInterface, engine: IEngine, getCompos
       undoList.push({ $case: 'file', operations })
     },
     addUndoCrdt() {
-      getAndCleanArray(redoList)
+      // TODO: when we delete an entity it's sending a delete EntityNdoe that idk from where its comming
+      // and its breaking the whole undo/redo logic.
+      const lostEntityNodeBug = crdtAcc.length === 1 && crdtAcc[0].componentName === 'editor::EntityNode'
       const changes = getAndCleanArray(crdtAcc)
-      if (changes.length) {
+      if (changes.length && !lostEntityNodeBug) {
+        getAndCleanArray(redoList)
         undoList.push({ $case: 'crdt', operations: changes })
       }
     }
