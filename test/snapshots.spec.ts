@@ -24,8 +24,16 @@ function removeSourceMaps(source: string): string {
 describe('Runs the snapshots', () => {
   itExecutes(`npm install --silent`, path.resolve('test/snapshots'), ENV)
 
-  itExecutes(`npm run build -- --production "--single=production-bundles/*.ts"`, path.resolve('test/snapshots'), ENV)
-  itExecutes(`npm run build -- "--single=development-bundles/*.ts"`, path.resolve('test/snapshots'), ENV)
+  itExecutes(
+    `npm run build -- --production --customEntryPoint --ignoreComposite  "--single=production-bundles/*.ts"`,
+    path.resolve('test/snapshots'),
+    ENV
+  )
+  itExecutes(
+    `npm run build -- --customEntryPoint --ignoreComposite  "--single=development-bundles/*.ts"`,
+    path.resolve('test/snapshots'),
+    ENV
+  )
 
   glob
     .sync('test/snapshots/production-bundles/*.ts', { absolute: false })

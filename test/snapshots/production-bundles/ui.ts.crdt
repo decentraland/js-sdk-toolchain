@@ -8,8 +8,8 @@ EVAL test/snapshots/production-bundles/ui.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 40k
-  MALLOC_COUNT = 15815
+  OPCODES ~= 41k
+  MALLOC_COUNT = 15824
   ALIVE_OBJS_DELTA ~= 2.99k
 CALL onStart()
   OPCODES ~= 0k
@@ -65,4 +65,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 61k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1489.41k bytes
+  MEMORY_USAGE_COUNT ~= 1489.70k bytes

@@ -20,6 +20,8 @@ export const args = declareArgs({
   '--production': Boolean,
   '--single': String,
   '--emitDeclaration': Boolean,
+  '--ignoreComposite': Boolean,
+  '--customEntryPoint': Boolean,
   '-p': '--production',
   '--skip-install': Boolean,
   '--dir': String
@@ -70,7 +72,9 @@ export async function buildScene(options: Options, project: SceneProject) {
       watch,
       single: options.args['--single'],
       production: !!options.args['--production'],
-      emitDeclaration: !!options.args['--emitDeclaration']
+      emitDeclaration: !!options.args['--emitDeclaration'],
+      ignoreComposite: !!options.args['--ignoreComposite'],
+      customEntryPoint: !!options.args['--customEntryPoint']
     },
     project.scene
   )

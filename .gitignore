@@ -32,4 +32,6 @@ test-scene
 test/snapshots/bin
 **/*.tsbuildinfo
 
+**/.decentraland/ts-entry-points
+
 test/build-ecs/fixtures/ecs7-scene/aCaseSensitiveReadme.md

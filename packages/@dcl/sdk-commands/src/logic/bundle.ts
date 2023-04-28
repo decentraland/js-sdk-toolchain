@@ -33,6 +33,9 @@ export type CompileOptions = {
 
   // emit typescript declarations
   emitDeclaration: boolean
+
+  ignoreComposite: boolean
+  customEntryPoint: boolean
 }
 
 const MAX_STEP = 2
@@ -60,19 +63,20 @@ export async function bundleProject(components: BundleComponents, options: Compi
     await components.fs.mkdir(dclFolderPath, { recursive: true })
   } catch (err) {}
 
-  const composites = getAllComposite(components)
+  const composites = options.ignoreComposite ? {} : getAllComposite(options)
   const hasComposites = Object.entries(composites).length > 0
 
   const originalInput = globSync(options.single ?? 'src/index.ts', { cwd: options.workingDirectory, absolute: true })
 
-  let counter = 0
   const entryPoints: { src: string; dest: string }[] = []
   originalInput.forEach((filePath) => {
-    const entryPointPath = path.resolve(dclFolderPath, `index-${++counter}.ts`)
-    const entryPointCode = `
-    ${hasComposites ? `export * from '@dcl/sdk/with-composite'` : `export * from '@dcl/sdk'`}
-    export * from '${filePath}'
-    `
+    const entryPointPath = path.resolve(dclFolderPath, path.basename(filePath))
+    const entryPointCode = options.customEntryPoint
+      ? `export * from '${filePath}'`
+      : hasComposites
+      ? `export * from '@dcl/sdk/with-composite'`
+      : `export * from '@dcl/sdk'`
+
     writeFileSync(entryPointPath, entryPointCode)
     entryPoints.push({
       src: filePath,
@@ -130,7 +134,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
       'dynamic-import': false,
       hashbang: false
     },
-    plugins: [compositeLoader(components, getAllComposite(components))]
+    plugins: [compositeLoader(composites)]
   })
 
   /* istanbul ignore if */
@@ -203,7 +207,7 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   return typeCheckerFuture
 }
 
-function compositeLoader(components: BundleComponents, composites: Record<string, Uint8Array>): esbuild.Plugin {
+function compositeLoader(composites: Record<string, Uint8Array>): esbuild.Plugin {
   const compositeLines: string[] = []
 
   for (const compositeName in composites) {
@@ -222,7 +226,6 @@ function compositeLoader(components: BundleComponents, composites: Record<string
     name: 'composite-loader',
     setup(build) {
       build.onResolve({ filter: /~sdk\/all-composites/ }, (_args) => {
-        components.logger.log('composite resolver!')
         return {
           namespace: 'sdk-composite',
           path: 'all-composites'
@@ -230,7 +233,6 @@ function compositeLoader(components: BundleComponents, composites: Record<string
       })
 
       build.onLoad({ filter: /.*/, namespace: 'sdk-composite' }, (_args) => {
-        components.logger.log('composite loader!')
         return {
           loader: 'js',
           contents
@@ -239,9 +241,9 @@ function compositeLoader(components: BundleComponents, composites: Record<string
     }
   }
 }
-function getAllComposite(_components: BundleComponents): Record<string, Uint8Array> {
+function getAllComposite(options: CompileOptions): Record<string, Uint8Array> {
   const ret: Record<string, Uint8Array> = {}
-  const files = globSync('**/*.{composite,composite.bin}', { cwd: process.cwd() })
+  const files = globSync('**/*.{composite,composite.bin}', { cwd: options.workingDirectory })
 
   for (const file of files) {
     ret[file] = readFileSync(file)
