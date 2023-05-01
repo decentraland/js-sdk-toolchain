@@ -1,4 +1,4 @@
-import { Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
+import { DeepReadonly, Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
 import { DataLayerContext, DispatchOperation, UpdateValue } from '../../remote-data-layer'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 
@@ -11,8 +11,13 @@ export async function updateValue(operation: UpdateValue, { engine }: Omit<DataL
   await engine.update(1 / 16)
 }
 
-export function updateValueOperation(entityId: number, componentId: number, value: Uint8Array): DispatchOperation {
-  return { operation: { $case: 'updateValue', updateValue: { entityId, componentId, data: value } } }
+export function updateValueOperation<T = unknown>(entityId: Entity, component: LastWriteWinElementSetComponentDefinition<T>, value: T): DispatchOperation {
+  const componentId = component.componentId
+  const buffer = new ReadWriteByteBuffer()
+  component.schema.serialize(value as DeepReadonly<T>, buffer)
+
+  const data = buffer.toBinary()
+  return { operation: { $case: 'updateValue', updateValue: { entityId: entityId as number, componentId, data } } }
 }
 
 export default updateValue

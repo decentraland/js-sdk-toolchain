@@ -34,10 +34,7 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
       return
     }
     if (isLastWriteWinComponent(component)) {
-      const buffer = new ReadWriteByteBuffer()
-      component.schema.serialize(value!, buffer)
-      console.log(value)
-      sdk.dataLayer.dispatch(updateValueOperation(entity, component.componentId, buffer.toBinary()))
+      sdk.dataLayer.dispatch(updateValueOperation(entity, component, value))
     } else {
       // TODO: handle update for GrowOnlyValueSetComponentDefinition
       debugger
