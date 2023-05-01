@@ -1,4 +1,4 @@
-import { withQuickJsVm } from './vm'
+import { withQuickJsVm } from '../packages/@dcl/sdk-runners/src/quick-js'
 
 describe('ensure that VM works', () => {
   it('runs no code and vm has no leaks', async () => withQuickJsVm(async () => {}))
@@ -13,6 +13,13 @@ describe('ensure that VM works', () => {
       expect(opts.eval(`void 0`)).toEqual(void 0)
       expect(opts.eval(`1==1`)).toEqual(true)
     }))
+
+  it('test error handling', async () =>
+    expect(
+      withQuickJsVm(async (opts) => {
+        opts.eval(`undefined.a = 1`)
+      })
+    ).rejects.toThrow("cannot set property 'a' of undefined"))
 
   it('converts qjs types to js', async () =>
     withQuickJsVm(async (opts) => {
@@ -49,8 +56,8 @@ describe('ensure that VM works', () => {
         log(...args) {
           values.push(args)
         },
-        error() {
-          throw new Error('not implemented')
+        error(...args) {
+          values.push(args)
         },
         require() {
           throw new Error('not implemented')
@@ -64,7 +71,7 @@ describe('ensure that VM works', () => {
         console.log(123)
         console.log("123")
         console.log(["123"])
-        console.log((() => ({a: "123"}))())
+        console.error((() => ({a: "123"}))())
         console.log(new Uint8Array([1,2,3]))
       `)
 
@@ -188,6 +195,60 @@ describe('ensure that VM works', () => {
       expect(logs).toEqual(['onStart', 'onUpdate', 0, 'onUpdate', 1])
     }))
 
+  it('eval graceful failure', async () =>
+    expect(
+      withQuickJsVm(async (opts) => {
+        opts.eval(`
+        function test () {
+          throw new Error('test error')
+        }
+        test()
+      `)
+      })
+    ).rejects.toThrow('test error'))
+
+  it('eval syntax graceful failure', async () =>
+    expect(
+      withQuickJsVm(async (opts) => {
+        opts.eval(`as{d`)
+      })
+    ).rejects.toThrow("expecting ';'"))
+
+  it('onStart graceful failure', async () =>
+    expect(
+      withQuickJsVm(async (opts) => {
+        opts.eval(`
+        module.exports.onStart = async function () {
+          throw new Error('onStart error')
+        }
+      `)
+
+        await opts.onStart()
+      })
+    ).rejects.toThrow('onStart error'))
+
+  it('onStart graceful failure', async () =>
+    expect(
+      withQuickJsVm(async (opts) => {
+        opts.eval(`
+      module.exports.onStart = async function () {
+        throw new Error('onStart error')
+      }
+    `)
+
+        await opts.onStart()
+      })
+    ).rejects.toThrow('onStart error'))
+
+  it('onUpdate graceful failure', async () =>
+    expect(
+      withQuickJsVm(async (opts) => {
+        opts.eval(`module.exports.onUpdate = undefined`)
+
+        await opts.onUpdate(1)
+      })
+    ).rejects.toThrow('not a function'))
+
   it('setImmediate works resolving promise', async () =>
     withQuickJsVm(async (opts) => {
       const logs: any[] = []
@@ -214,6 +275,36 @@ describe('ensure that VM works', () => {
       await opts.onUpdate(1)
 
       expect(logs).toEqual(['onUpdate', 'onUpdateEnd'])
+    }))
+
+  it("setImmediate execution won't break if a set immediate throws", async () =>
+    withQuickJsVm(async (opts) => {
+      const logs: any[] = []
+      opts.provide({
+        log(...args) {
+          logs.push(...args)
+        },
+        error() {
+          throw 'Not implemented'
+        },
+        require() {
+          throw 'Not implemented'
+        }
+      })
+
+      opts.eval(`
+      module.exports.onStart = async function () {
+        console.log('onStart')
+        setImmediate(() => { throw new Error('Error from setImmediate, this error is expected') })
+        console.log('onStartEnd')
+      }
+      module.exports.onUpdate = async function () {}
+    `)
+
+      await opts.onStart()
+      await opts.onUpdate(0)
+
+      expect(logs).toEqual(['onStart', 'onStartEnd'])
     }))
 
   it('onStart and onUpdate fail', async () =>

@@ -1,0 +1,33 @@
+{
+  "name": "@dcl/sdk-runners",
+  "description": "",
+  "version": "7.0.0",
+  "author": "Decentraland",
+  "dependencies": {
+    "@dcl/quickjs-emscripten": "^0.21.0-3680274614.commit-1808aa1",
+    "@dcl/schemas": "^6.17.0",
+    "@dcl/sdk": "^7.1.9"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [],
+  "license": "Apache-2.0",
+  "repository": {
+    "url": "git+https://github.com/decentraland/js-sdk-toolchain",
+    "directory": "packages/@dcl/sdk-runners"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "tsc -p tsconfig.json --watch"
+  },
+  "tsdoc": {
+    "tsdocFlavor": "AEDoc"
+  },
+  "typedoc": {
+    "entryPoint": "./src/index.ts",
+    "readmeFile": "./README.md",
+    "displayName": "SDK Runners",
+    "tsconfig": "./tsconfig.json"
+  }
+}

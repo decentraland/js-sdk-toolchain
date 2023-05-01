@@ -1,4 +1,4 @@
-import { version as vmVersion } from '@dcl/quickjs-emscripten/package.json'
+import { version as vmVersion } from '../packages/@dcl/sdk-runners/node_modules/@dcl/quickjs-emscripten/package.json'
 import { exec } from 'child_process'
 import { existsSync, readFileSync, writeFileSync } from 'fs-extra'
 import glob from 'glob'
@@ -8,7 +8,7 @@ import { ReadWriteByteBuffer } from '../packages/@dcl/ecs/src/serialization/Byte
 import { CrdtMessage } from '../packages/@dcl/ecs/src/serialization/crdt'
 import { readMessage } from '../packages/@dcl/ecs/src/serialization/crdt/message'
 import { itExecutes } from '../scripts/helpers'
-import { withQuickJsVm } from './vm'
+import { withQuickJsVm } from '../packages/@dcl/sdk-runners/src/quick-js'
 import { prepareTestingFramework } from './snapshots/jest-snapshots-helpers'
 import { readFile } from 'fs/promises'
 

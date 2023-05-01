@@ -12,6 +12,7 @@ import {
   PLAYGROUND_ASSETS_PATH,
   REACT_ECS,
   SDK_PATH,
+  SDK_RUNNERS_PATH,
   SDK_COMMANDS_PATH
 } from './common'
 import {
@@ -123,6 +124,14 @@ flow('build-all', () => {
       ensureFileExists('public/bundle.js', INSPECTOR_PATH)
       ensureFileExists('public/bundle.css', INSPECTOR_PATH)
     })
+  })
+
+  flow('@dcl/sdk-runners build', () => {
+    itDeletesFolder('dist', SDK_RUNNERS_PATH)
+    itExecutes(`npm i --silent`, SDK_RUNNERS_PATH)
+
+    // install required dependencies
+    itExecutes('npm run build --silent', SDK_RUNNERS_PATH)
   })
 
   flow('@dcl/sdk-commands build', () => {

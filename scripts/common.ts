@@ -9,6 +9,7 @@ export const TSC = resolve(process.cwd(), './node_modules/typescript/bin/tsc')
 // WORKING DIRECTORIES
 export const SDK_PATH = resolve(process.cwd(), './packages/@dcl/sdk')
 export const SDK_COMMANDS_PATH = resolve(process.cwd(), './packages/@dcl/sdk-commands')
+export const SDK_RUNNERS_PATH = resolve(process.cwd(), './packages/@dcl/sdk-runners')
 export const INSPECTOR_PATH = resolve(process.cwd(), './packages/@dcl/inspector')
 export const PLAYGROUND_ASSETS_PATH = resolve(process.cwd(), './packages/@dcl/playground-assets')
 export const ECS7_PATH = resolve(process.cwd(), './packages/@dcl/ecs')

@@ -13,7 +13,7 @@
     "@dcl/mini-comms": "1.0.1-20230216163137.commit-a4c75be",
     "@dcl/protocol": "1.0.0-4810686946.commit-7c034e3",
     "@dcl/rpc": "^1.1.1",
-    "@dcl/schemas": "^6.11.1",
+    "@dcl/schemas": "^6.17.0",
     "@segment/analytics-node": "^1.0.0-beta.22",
     "@well-known-components/env-config-provider": "^1.2.0",
     "@well-known-components/http-server": "^2.0.0-20230501134558.commit-be9a25d",
