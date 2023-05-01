@@ -43,6 +43,7 @@ export function createInspectorEngine(dataLayer: DataLayerRpcClient): Omit<SdkCo
       Array.from(serializeCrdtMessages('DataLayer>Inspector', message, engine)).forEach(($) => console.log($))
     }
     transport.onmessage!(message)
+    engine.update(1 / 16)
   }
 
   consumeAllMessagesInto(dataLayer.crdtStream(outgoingMessagesStream), onMessage, outgoingMessagesStream.close).catch(

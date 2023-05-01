@@ -3,6 +3,7 @@ import { CrdtMessageType, DeepReadonly, Entity, LastWriteWinElementSetComponentD
 import { Component } from '../../lib/sdk/components'
 import { useChange } from './useChange'
 import { isEqual } from '../../lib/data-layer/host/utils/component'
+import { useSdk } from './use-sdk'
 
 export function isLastWriteWinComponent<T = unknown>(
   component: Component
@@ -18,6 +19,7 @@ const getComponentValue = <T>(entity: Entity, component: Component<T>): DeepRead
 export const useComponentValue = <ComponentValueType>(entity: Entity, component: Component<ComponentValueType>) => {
   const componentValueType = getComponentValue(entity, component)
   const [value, setValue] = useState<ComponentValueType>(componentValueType as ComponentValueType)
+  const sdk = useSdk()
 
   // sync entity changed
   useEffect(() => {
@@ -32,6 +34,7 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
     }
     if (isLastWriteWinComponent(component)) {
       component.createOrReplace(entity, value)
+      sdk?.engine.update(1 / 16)
     } else {
       // TODO: handle update for GrowOnlyValueSetComponentDefinition
       debugger
