@@ -69,7 +69,6 @@ export class SceneContext {
     public dataLayer: DataLayerRpcClient
   ) {
     this.rootNode = new EcsEntity(0 as Entity, this.#weakThis, scene)
-    babylon.onEndFrameObservable.add(this.update)
     Object.assign(globalThis, { babylon: this.engine })
   }
 
@@ -162,11 +161,6 @@ export class SceneContext {
     return null
   }
 
-  readonly update = async () => {
-    // update the engine
-    await this.engine.update(this.babylon.getDeltaTime() / 1000)
-  }
-
   dispose() {
     this.stopped.resolve()
     for (const [entityId] of this.#entities) {
@@ -174,8 +168,7 @@ export class SceneContext {
     }
     this.rootNode.parent = null
     this.rootNode.dispose()
-    this.babylon.onEndFrameObservable.removeCallback(this.update)
-  }
+    }
 
   async connectCrdtTransport(crdtStream: DataLayerRpcClient['crdtStream']) {
     const outgoingMessages = new AsyncQueue<CrdtStreamMessage>((_, _action) => {
@@ -189,6 +182,7 @@ export class SceneContext {
         Array.from(serializeCrdtMessages('DataLayer>Babylon', message, engine)).forEach(($) => console.log($))
       }
       transport.onmessage!(message)
+      engine.update(1)
     }
 
     consumeAllMessagesInto(crdtStream(outgoingMessages), onMessage, outgoingMessages.close).catch((e) => {

@@ -47,6 +47,7 @@ export const getGizmoManager = memoize((scene: Scene) => {
         rotation: snapRotation(lastEntity.rotationQuaternion!),
         parent
       })
+      context.engine.update(1)
     }
   }
 
