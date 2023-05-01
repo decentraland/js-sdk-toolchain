@@ -10,7 +10,7 @@ import { useSdk } from '../../hooks/sdk/useSdk'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 import { snapPosition } from '../../lib/babylon/decentraland/snap-manager'
 import { ROOT } from '../../lib/sdk/tree'
-import { changeSelectedEntity } from '../../lib/utils/gizmo'
+import { updateSelectedEntity } from '../../lib/sdk/operations/update-selected-entity'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { IAsset } from '../AssetsCatalog/types'
 import { getModel, isAsset } from '../EntityInspector/GltfInspector/utils'
@@ -40,7 +40,7 @@ const Renderer: React.FC = () => {
     EntityNode.create(child, { label: asset.name, parent: ROOT })
     Transform.create(child, { parent: ROOT, position })
     GltfContainer.create(child, { src: asset.asset.src })
-    changeSelectedEntity(child, engine)
+    updateSelectedEntity(engine)(child)
     await engine.update(0)
   }
 

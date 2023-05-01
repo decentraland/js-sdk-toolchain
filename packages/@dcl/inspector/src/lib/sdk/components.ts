@@ -9,7 +9,7 @@ import {
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import { Layout } from '../utils/layout'
-import { GizmoType } from '../utils/gizmo'
+import { GizmoType } from './operations/update-selected-entity'
 
 export type Component<T = unknown> = ComponentDefinition<T>
 
@@ -60,7 +60,7 @@ export function createComponents(engine: IEngine): SdkComponents {
 
 /* istanbul ignore next */
 export function createEditorComponents(engine: IEngine): EditorComponents {
-  const EntityNode = engine.defineComponent('editor::EntityNode', {
+  const EntityNode = engine.defineComponent(EditorComponentIds.EntityNode, {
     label: Schemas.String,
     parent: Schemas.Entity
   })

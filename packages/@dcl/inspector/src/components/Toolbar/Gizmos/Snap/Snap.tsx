@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import cx from 'classnames'
-import { GizmoType } from '../../../../lib/utils/gizmo'
+import { GizmoType } from '../../../../lib/sdk/operations/update-selected-entity'
 import { useSnapState, useSnapToggle } from '../../../../hooks/editor/useSnap'
 import './Snap.css'
 

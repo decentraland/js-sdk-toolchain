@@ -12,7 +12,6 @@ export const useSdkContext = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   const [catalog] = useCatalog()
-
   useEffect(() => {
     if (!catalog || !canvas || sdk || isLoading) return
     setIsLoading(true)
