@@ -67,9 +67,7 @@ export const useTree = () => {
   const addChild = useCallback(
     (parent: Entity, label: string) => {
       if (!sdk || !operations) return
-      console.log(sdk.components.EntityNode, sdk.engine.getComponentOrNull(sdk.components.EntityNode.componentId))
-      void operations.addChild(parent, label)
-      void operations.dispatch().then(handleUpdate)
+      void operations.addChild(parent, label, true)?.then(handleUpdate)
     },
     [sdk, handleUpdate, operations]
   )
