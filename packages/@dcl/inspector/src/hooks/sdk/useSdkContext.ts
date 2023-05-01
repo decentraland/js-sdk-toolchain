@@ -27,15 +27,6 @@ export const useSdkContext = () => {
       .finally(() => setIsLoading(false))
   }, [catalog, canvas, sdk, isLoading])
 
-  useEffect(() => {
-    const updateInterval = setInterval(() => {
-      void sdk?.engine.update(0)
-    }, 16)
-    return () => {
-      clearInterval(updateInterval)
-    }
-  }, [sdk])
-
   const renderer = useCallback(
     (ref: React.RefObject<HTMLCanvasElement>) => {
       if (!canvas && ref.current) {

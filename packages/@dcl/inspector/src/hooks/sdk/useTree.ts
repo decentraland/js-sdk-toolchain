@@ -1,9 +1,10 @@
-import { Entity, getComponentEntityTree } from '@dcl/ecs'
+import { Entity, getComponentEntityTree, removeEntityWithChildren } from '@dcl/ecs'
 import { useCallback, useState } from 'react'
 import { getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk/tree'
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
 import { changeSelectedEntity } from '../../lib/utils/gizmo'
+import { deleteEntityOperation } from '../../lib/data-layer/host/operations/delete-entity'
 
 /**
  * Used to get a tree and the functions to work with it
@@ -109,15 +110,9 @@ export const useTree = () => {
   )
 
   const remove = useCallback(
-    (entity: Entity) => {
+    async (entity: Entity) => {
       if (entity === ROOT || !sdk) return
-      const { EntityNode } = sdk.components
-      const { removeEntity } = sdk.engine
-
-      for (const _entity of getComponentEntityTree(sdk.engine, entity, EntityNode)) {
-        removeEntity(_entity)
-      }
-
+      await sdk.dataLayer.dispatch(deleteEntityOperation(entity))
       handleUpdate()
     },
     [sdk, handleUpdate]

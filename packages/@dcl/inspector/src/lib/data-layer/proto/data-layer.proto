@@ -30,7 +30,25 @@ message ImportAssetRequest {
   map<string, bytes> content = 3;
 }
 
+message UpdateValue {
+  uint32 entity_id = 1;
+  uint32 component_id = 2;
+  bytes data = 3;
+}
+
+message DeleteEntity {
+  uint32 entity_id = 1;
+}
+
+message DispatchOperation {
+  oneof operation {
+    UpdateValue update_value = 1;
+    DeleteEntity delete_entity = 2;
+  }
+}
+
 service DataService {
+  rpc Dispatch(DispatchOperation) returns (Empty) {}
   rpc CrdtStream(stream CrdtStreamMessage) returns (stream CrdtStreamMessage) {}
   rpc Undo(Empty) returns (UndoRedoResponse) {}
   rpc Redo(Empty) returns (UndoRedoResponse) {}

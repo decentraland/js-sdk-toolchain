@@ -3,6 +3,9 @@ import { CrdtMessageType, DeepReadonly, Entity, LastWriteWinElementSetComponentD
 import { Component } from '../../lib/sdk/components'
 import { useChange } from './useChange'
 import { isEqual } from '../../lib/data-layer/host/utils/component'
+import { useSdk } from './useSdk'
+import { updateValueOperation } from '../../lib/data-layer/host/operations/update-operation'
+import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 
 export function isLastWriteWinComponent<T = unknown>(
   component: Component
@@ -18,7 +21,7 @@ const getComponentValue = <T>(entity: Entity, component: Component<T>): DeepRead
 export const useComponentValue = <ComponentValueType>(entity: Entity, component: Component<ComponentValueType>) => {
   const componentValueType = getComponentValue(entity, component)
   const [value, setValue] = useState<ComponentValueType>(componentValueType as ComponentValueType)
-
+  const sdk = useSdk()
   // sync entity changed
   useEffect(() => {
     setValue(getComponentValue(entity, component) as ComponentValueType)
@@ -26,12 +29,15 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
 
   // sync state -> engine
   useEffect(() => {
-    if (value === null) return
+    if (value === null || !sdk) return
     if (isEqual(component, getComponentValue(entity, component), value)) {
       return
     }
     if (isLastWriteWinComponent(component)) {
-      component.createOrReplace(entity, value)
+      const buffer = new ReadWriteByteBuffer()
+      component.schema.serialize(value!, buffer)
+      console.log(value)
+      sdk.dataLayer.dispatch(updateValueOperation(entity, component.componentId, buffer.toBinary()))
     } else {
       // TODO: handle update for GrowOnlyValueSetComponentDefinition
       debugger

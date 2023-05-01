@@ -8,6 +8,8 @@ import { stream } from './stream'
 import { FileOperation, initUndoRedo } from './undo-redo'
 import { minimalComposite } from '../client/feeded-local-fs'
 import upsertAsset from './upsert-asset'
+import deleteEntity from './operations/delete-entity'
+import updateValue from './operations/update-operation'
 
 export async function initRpcMethods(
   fs: FileSystemInterface,
@@ -60,6 +62,15 @@ export async function initRpcMethods(
   }, -1_000_000_000)
 
   return {
+    async dispatch(req) {
+      if (req.operation?.$case === 'deleteEntity') {
+        await deleteEntity(req.operation.deleteEntity, { engine })
+      }
+      if (req.operation?.$case === 'updateValue') {
+        await updateValue(req.operation.updateValue, { engine })
+      }
+      return {}
+    },
     async redo() {
       const type = await undoRedo.redo()
       return type
