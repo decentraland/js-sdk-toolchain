@@ -54,7 +54,7 @@ export const getLayoutManager = memoize((scene: Scene) => {
   }
 
   const layoutNode = new TransformNode('layout', scene)
-  const positionGizmo = new PositionGizmo()
+  const positionGizmo = new PositionGizmo(undefined, 0.5)
   positionGizmo.attachedNode = layoutNode
 
   disableGizmo(positionGizmo.xGizmo)

@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react'
 import { CrdtMessageType, DeepReadonly, Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
 import { Component } from '../../lib/sdk/components'
 import { useChange } from './useChange'
-import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
-import { dataCompare } from '@dcl/ecs/dist/systems/crdt/utils'
+import { isEqual } from '../../lib/data-layer/host/utils/component'
 
 export function isLastWriteWinComponent<T = unknown>(
   component: Component
@@ -20,14 +19,6 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
   const componentValueType = getComponentValue(entity, component)
   const [value, setValue] = useState<ComponentValueType>(componentValueType as ComponentValueType)
 
-  function isEqual(val: ComponentValueType) {
-    const current = new ReadWriteByteBuffer()
-    const newValue = new ReadWriteByteBuffer()
-    component.schema.serialize(val as DeepReadonly<ComponentValueType>, newValue)
-    component.schema.serialize(getComponentValue(entity, component), current)
-    return dataCompare(current.toBinary(), newValue.toBinary()) === 0
-  }
-
   // sync entity changed
   useEffect(() => {
     setValue(getComponentValue(entity, component) as ComponentValueType)
@@ -36,7 +27,7 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
   // sync state -> engine
   useEffect(() => {
     if (value === null) return
-    if (isEqual(value)) {
+    if (isEqual(component, getComponentValue(entity, component), value)) {
       return
     }
     if (isLastWriteWinComponent(component)) {
@@ -65,5 +56,9 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
     [entity, component]
   )
 
-  return [value, setValue, isEqual] as const
+  function isComponentEqual(val: ComponentValueType) {
+    return isEqual(component, value, val)
+  }
+
+  return [value, setValue, isComponentEqual] as const
 }

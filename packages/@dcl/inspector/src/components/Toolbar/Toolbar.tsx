@@ -5,6 +5,7 @@ import { withSdk } from '../../hoc/withSdk'
 import { Gizmos } from './Gizmos'
 import { ToolbarButton } from './ToolbarButton'
 import './Toolbar.css'
+import { fileSystemEvent } from '../../hooks/catalog/useFileSystem'
 
 const Toolbar = withSdk(({ sdk }) => {
   const handleInspector = useCallback(() => {
@@ -16,12 +17,22 @@ const Toolbar = withSdk(({ sdk }) => {
     }
   }, [])
 
+  const handleUndoRedo = useCallback(
+    (fn: typeof sdk.dataLayer.undo) => async () => {
+      const { type } = await fn({})
+      if (type === 'file') {
+        fileSystemEvent.emit('change')
+      }
+    },
+    []
+  )
+
   return (
     <div className="Toolbar">
-      <ToolbarButton className="undo" onClick={sdk?.dataLayer.undo}>
+      <ToolbarButton className="undo" onClick={handleUndoRedo(sdk?.dataLayer.undo)}>
         <BiUndo />
       </ToolbarButton>
-      <ToolbarButton className="redo" onClick={sdk?.dataLayer.redo}>
+      <ToolbarButton className="redo" onClick={handleUndoRedo(sdk?.dataLayer.redo)}>
         <BiRedo />
       </ToolbarButton>
       <Gizmos />

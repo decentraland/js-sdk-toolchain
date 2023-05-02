@@ -2,6 +2,11 @@ syntax = "proto3";
 
 message Empty {}
 
+// TODO: Maybe when we implement the list of undo/redo available we dont need this.
+message UndoRedoResponse {
+  string type = 1;
+}
+
 message CrdtStreamMessage {
   bytes data = 1;
 }
@@ -27,8 +32,8 @@ message ImportAssetRequest {
 
 service DataService {
   rpc CrdtStream(stream CrdtStreamMessage) returns (stream CrdtStreamMessage) {}
-  rpc Undo(Empty) returns (Empty) {}
-  rpc Redo(Empty) returns (Empty) {}
+  rpc Undo(Empty) returns (UndoRedoResponse) {}
+  rpc Redo(Empty) returns (UndoRedoResponse) {}
 
   rpc GetAssetCatalog(Empty) returns (AssetCatalogResponse) {}
   rpc GetAssetData(Asset) returns (AssetData) {}
