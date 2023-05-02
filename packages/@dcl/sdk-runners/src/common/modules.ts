@@ -2,13 +2,18 @@
  * This file contains the module bindings for the client VM of the SDK.
  */
 
-import { EngineApiServiceDefinition, CrdtSendToRendererRequest } from '@dcl/protocol/out-ts/decentraland/kernel/apis/engine_api.gen'
-import { TestingServiceDefinition } from '@dcl/protocol/out-ts/decentraland/kernel/apis/testing.gen'
+import {
+  EngineApiServiceDefinition,
+  CrdtSendToRendererRequest
+} from '@dcl/protocol/out-js/decentraland/kernel/apis/engine_api.gen'
+import { TestingServiceDefinition } from '@dcl/protocol/out-js/decentraland/kernel/apis/testing.gen'
 import { RpcClientPort } from '@dcl/rpc'
 import * as codegen from '@dcl/rpc/dist/codegen'
 import { coerceMaybeU8Array } from '../quick-js/convert-values'
-import { RuntimeServiceDefinition } from '@dcl/protocol/out-ts/decentraland/kernel/apis/runtime.gen'
-import { UserIdentityServiceDefinition } from '@dcl/protocol/out-ts/decentraland/kernel/apis/user_identity.gen'
+import { RuntimeServiceDefinition } from '@dcl/protocol/out-js/decentraland/kernel/apis/runtime.gen'
+import { UserIdentityServiceDefinition } from '@dcl/protocol/out-js/decentraland/kernel/apis/user_identity.gen'
+
+// TODO: this file could be auto-generated
 
 export function loadModuleForPort(port: RpcClientPort, moduleName: string) {
   switch (moduleName) {
@@ -30,6 +35,6 @@ export function loadModuleForPort(port: RpcClientPort, moduleName: string) {
     case '~system/Testing':
       return codegen.loadService(port, TestingServiceDefinition)
     default:
-      throw new Error('Unknown module ' + moduleName)
+      throw new Error('The following module is not available ' + moduleName)
   }
 }

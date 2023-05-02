@@ -1,4 +1,4 @@
-import { RuntimeAbstraction } from "./types"
+import { RuntimeAbstraction } from './types'
 
 const MIN_FRAME_TIME = 8
 
@@ -30,6 +30,5 @@ export async function defaultUpdateLoop(opts: RuntimeAbstraction) {
 }
 
 async function sleep(ms: number) {
-  if (ms > 1)
-    return new Promise(resolve => setTimeout(resolve, ms))
+  if (ms > 1) return new Promise((resolve) => setTimeout(resolve, ms))
 }

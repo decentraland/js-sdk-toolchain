@@ -1,6 +1,5 @@
-import { QuickJSContext, QuickJSHandle } from "@dcl/quickjs-emscripten"
-import { MaybeUint8Array } from "./types"
-
+import { QuickJSContext, QuickJSHandle } from '@dcl/quickjs-emscripten'
+import { MaybeUint8Array } from './types'
 
 /**
  * dumpAndDispose converts a QuickJSHandle into a native JS type outside the sandbox.
@@ -19,7 +18,6 @@ export function dumpAndDispose(vm: QuickJSContext, val: QuickJSHandle) {
     return ret
   }
 }
-
 
 /**
  * This function converts a native JS type into a QuickJSHandle to be passed onto the VM

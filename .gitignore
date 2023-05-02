@@ -20,7 +20,7 @@ test/sdk/simple-scene
 **/bin/game.js
 **/bin/game.js.map
 **/*.js.map
-
+!packages/@dcl/sdk-runners/src/throw.js
 test/build-ecs/fixtures/*/package-lock.json
 packages/@dcl/playground-assets/etc/playground-assets.api.json
 test/snapshots/*/package-lock.json

@@ -2,7 +2,7 @@
   "versionGroups": [
     {
       "packages": ["**"],
-      "dependencies": ["@dcl/ecs", "@dcl/inspector", "@dcl/js-runtime", "@dcl/playground-assets", "@dcl/sdk", "@dcl/sdk-commands", "@dcl/react-ecs"],
+      "dependencies": ["@dcl/ecs", "@dcl/inspector", "@dcl/js-runtime", "@dcl/sdk-runners", "@dcl/playground-assets", "@dcl/sdk", "@dcl/sdk-commands", "@dcl/react-ecs"],
       "isIgnored": true
     }
   ]

@@ -6,7 +6,8 @@
   "dependencies": {
     "@dcl/quickjs-emscripten": "^0.21.0-3680274614.commit-1808aa1",
     "@dcl/schemas": "^6.17.0",
-    "@dcl/sdk": "^7.1.9"
+    "@dcl/sdk": "^7.1.9",
+    "fp-future": "^1.0.1"
   },
   "files": [
     "dist"

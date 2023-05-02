@@ -16,6 +16,7 @@ This repository consists of the following components, packaged for the `nodejs`/
 * `@dcl/sdk`: contains all the packages that a scene needs to work.
 * `@dcl/ecs`: an engine used to render things on screen
 * `@dcl/sdk-commands`: contains the command line interface
+* `@dcl/sdk-runners`: contains helpers to run scenes in different environments
 * `@dcl/inspector`: Editor interface.
 
 And some internal or maybe useful packages if you're digging deeper into how the Decentraland runtime works:
