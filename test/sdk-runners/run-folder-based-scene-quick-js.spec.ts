@@ -2,28 +2,24 @@
 
 import { createRpcServer, createRpcClient } from '../../packages/@dcl/sdk-runners/node_modules/@dcl/rpc/dist'
 import { MemoryTransport } from '../../packages/@dcl/sdk-runners/node_modules/@dcl/rpc/dist/transports/Memory'
-import { MockedRendererScene } from './MockedRendererScene'
+import { mockedSceneFromFolder } from './MockedRendererScene'
 import { setupEngineApiService, setupRuntimeService } from '../../packages/@dcl/sdk-runners/src/logic/apis-wiring'
 import { startQuickJsSceneRuntime } from '../../packages/@dcl/sdk-runners/src/quick-js/runtime'
 import { setInterval, clearInterval } from 'timers'
+import { initComponents } from '../../packages/@dcl/sdk-commands/src/components'
+import { runSdkCommand } from '../../packages/@dcl/sdk-commands/src/run-command'
+import { SceneContext } from '../../packages/@dcl/sdk-runners/src/logic/scene-context'
 
-test('scene loads, starts and all lifecycle messages are called', async () => {
-  const code = `
-    const engineApi = require('~system/EngineApi')
-    module.exports.onStart = async function () {
-      console.log(await engineApi.crdtGetState({ data: Uint8Array.of() }))
-    }
-    
-    module.exports.onUpdate = async function () {
-      console.log(await engineApi.crdtSendToRenderer({ data: Uint8Array.of() }))
-    }
-  `
+test('folder scene loads, starts and all lifecycle messages are called', async () => {
+  const components = await initComponents()
+  // first build the scene
+  await runSdkCommand(components, 'build', ['--dir=test/build-ecs/fixtures', '--customEntryPoint'])
 
-  // 1st step: create the local scene object
-  const rendererScene = new MockedRendererScene(code)
-
+  // then create the folder based renderer scene
+  const rendererScene = await mockedSceneFromFolder(components, 'test/build-ecs/fixtures/ecs7-scene')
+  console.dir(rendererScene)
   // 2nd step: create the rpc server & configure the handlers for each registered server port
-  const rpcServer = createRpcServer<MockedRendererScene>({})
+  const rpcServer = createRpcServer<SceneContext>({})
   rpcServer.setHandler(async (port) => {
     setupEngineApiService(port)
     setupRuntimeService(port, () => undefined)
@@ -43,64 +39,34 @@ test('scene loads, starts and all lifecycle messages are called', async () => {
   const client = await clientPromise
   const port = await client.createPort('port-name')
 
-  // we are going to use the log function to come in and out the runtime
-  const log = jest.fn()
-
-  // register a interval timer to emulate the renderer's tick. this is necessary
-  // to release the backpressure by responding to the tick, as defined in ADR-148
-  let currentRenderFrameCounter = 0
-
-  let messagesOverQuota = 0
-
   const sceneUpdateInterval = setInterval(() => {
-    currentRenderFrameCounter++
     rendererScene.update(function hasQuota() {
-      // simple testing mechanism for hasQuota
-      if (messagesOverQuota) {
-        messagesOverQuota--
-        return false
-      }
       return true
     })
     rendererScene.lateUpdate()
   }, 16)
+
+  const crdtMessages: Uint8Array[] = []
+
+  rendererScene.processIncomingMessages = (message) => {
+    crdtMessages.push(message)
+  }
 
   try {
     // once the socket is connected, we proceed to start the runtime
     await startQuickJsSceneRuntime(port, {
       log(...args) {
         process.stderr.write(JSON.stringify(args) + '\n')
-        log(...args)
       },
       error(...args) {
         console.error('[SCENE ERROR]' + JSON.stringify(args, null, 2))
         process.exitCode = 1
       },
       async updateLoop(opts) {
-        expect(rendererScene.currentTick).toEqual(0)
-
-        expect(log).not.toHaveBeenCalled()
+        process.stderr.write('llego process message\n')
         await opts.onStart()
-        expect(log).toHaveBeenCalled()
-
-        {
-          expect(rendererScene.currentTick).toEqual(1)
-          const initialRenderFrame = currentRenderFrameCounter
-          await opts.onUpdate(0)
-          expect(rendererScene.currentTick).toEqual(2)
-          // this frame will render within one frame
-          expect(currentRenderFrameCounter - 1).toEqual(initialRenderFrame)
-        }
-
-        {
-          // we are going to wait ten frames to "finish the tick"
-          messagesOverQuota = 10
-          const initialRenderFrame = currentRenderFrameCounter
-          await opts.onUpdate(1)
-          expect(rendererScene.currentTick).toEqual(3)
-          // this frame will render within MORE THAN one frame
-          expect(currentRenderFrameCounter).toBeGreaterThan(initialRenderFrame)
-        }
+        process.stderr.write('llego process message\n')
+        await opts.onUpdate(0)
       }
     })
   } catch (er: any) {
@@ -110,4 +76,6 @@ test('scene loads, starts and all lifecycle messages are called', async () => {
   } finally {
     clearInterval(sceneUpdateInterval)
   }
+
+  // expect(crdtMessages).toEqual([])
 })

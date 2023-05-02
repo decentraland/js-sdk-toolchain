@@ -1,4 +1,4 @@
-import { withQuickJsVm } from '../packages/@dcl/sdk-runners/src/quick-js'
+import { withQuickJsVm } from '../../packages/@dcl/sdk-runners/src/quick-js'
 
 describe('ensure that VM works', () => {
   it('runs no code and vm has no leaks', async () => withQuickJsVm(async () => {}))
