@@ -45,3 +45,8 @@
 .Tree > .item > span > svg:nth-child(2) {
   margin-right: 4px;
 }
+
+.Tree .contexify svg {
+  color: var(--contexify-item-color);
+  margin-right: 4px;
+}
