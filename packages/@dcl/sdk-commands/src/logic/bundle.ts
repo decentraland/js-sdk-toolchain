@@ -241,6 +241,19 @@ async function getAllComposite(
   return { compositeLines, watchFiles }
 }
 
+const preIndexTsCode = `
+// BEGIN AUTO GENERATED CODE
+export * from '@dcl/sdk'
+import { executeTask as _INTERNAL_startupInitialTask } from '@dcl/sdk/ecs'
+declare const main: (() => void) | undefined;
+// END AUTO GENERATED CODE\n\n`
+const postIndexTsCode = `\n\n;
+// BEGIN AUTO GENERATED CODE
+if (main) {
+  _INTERNAL_startupInitialTask(async () => {main()})
+}
+// END AUTO GENERATED CODE\n\n`
+
 function entryPointLoader(components: BundleComponents, inputs: string[], options: CompileOptions): esbuild.Plugin {
   const escapedInputs = inputs.map(($) => $.replace(/\\/g, '\\\\'))
   const filter = new RegExp(`(${escapedInputs.join('|')})`)
@@ -248,8 +261,9 @@ function entryPointLoader(components: BundleComponents, inputs: string[], option
     name: 'entry-point-loader',
     setup(build) {
       build.onLoad({ filter }, async (args) => {
-        const exportSdk = options.customEntryPoint ? '' : `;export * from '@dcl/sdk';`
-        const contents = exportSdk + (await components.fs.readFile(args.path))
+        const preContent = options.customEntryPoint ? '' : preIndexTsCode
+        const postContent = options.customEntryPoint ? '' : postIndexTsCode
+        const contents = preContent + (await components.fs.readFile(args.path)) + postContent
         return {
           loader: 'ts',
           contents
