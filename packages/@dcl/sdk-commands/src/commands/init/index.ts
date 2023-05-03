@@ -1,13 +1,13 @@
 import { join, resolve } from 'path'
 
+import { CliComponents } from '../../components'
 import { declareArgs } from '../../logic/args'
 import { CliError } from '../../logic/error'
-import { CliComponents } from '../../components'
-import { isDirectoryEmpty, download, extract } from '../../logic/fs'
+import { download, extract, isDirectoryEmpty } from '../../logic/fs'
 
-import { get as getRepo } from './repos'
-import { installDependencies, needsDependencies } from '../../logic/project-validations'
 import { Result } from 'arg'
+import { installDependencies, needsDependencies } from '../../logic/project-validations'
+import { ScaffoldedScene, existScaffoldedScene, getScaffoldedSceneRepo, scaffoldedSceneOptions } from './repos'
 
 interface Options {
   args: Result<typeof args>
@@ -18,7 +18,8 @@ export const args = declareArgs({
   '--yes': Boolean,
   '-y': '--yes',
   '--dir': String,
-  '--skip-install': Boolean
+  '--skip-install': Boolean,
+  '--scene': String
 })
 
 export async function help() {}
@@ -27,14 +28,21 @@ export async function main(options: Options) {
   const dir = resolve(process.cwd(), options.args['--dir'] || '.')
   const isEmpty = await isDirectoryEmpty(options.components, dir)
   const yes = options.args['--yes']
+  const requestedScene = options.args['--scene']
 
   if (!isEmpty && !yes) {
     throw new CliError('The target directory specified is not empty. Run this command with --yes to override.')
   }
 
+  if (requestedScene && !existScaffoldedScene(requestedScene)) {
+    throw new CliError(
+      `The requested scene doesn't exist empty. Valid options are: ${scaffoldedSceneOptions().join(', ')}`
+    )
+  }
+
   // download and extract template project
-  const scene = 'scene-template'
-  const { url, contentFolders } = getRepo(scene)
+  const scene = (requestedScene as ScaffoldedScene) || 'scene-template'
+  const { url, contentFolders } = getScaffoldedSceneRepo(scene)
   const zip = await download(options.components, url, join(dir, `${scene}.zip`))
   await extract(zip, dir)
   await options.components.fs.unlink(zip)
