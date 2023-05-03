@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react'
 import { getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk/tree'
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
-import { changeSelectedEntity } from '../../lib/utils/gizmo'
+import { changeSelectedEntity, removeSelectedEntities } from '../../lib/utils/gizmo'
 import { isLastWriteWinComponent } from './useComponentValue'
 
 /**
@@ -44,7 +44,7 @@ export const useTree = () => {
 
   const getLabel = useCallback(
     (entity: Entity) => {
-      if (entity === ROOT) return 'Root'
+      if (entity === ROOT) return 'Scene'
       if (!sdk) return entity.toString()
       const { EntityNode } = sdk.components
       return EntityNode.has(entity) ? EntityNode.get(entity).label : entity.toString()
@@ -58,16 +58,6 @@ export const useTree = () => {
       if (!sdk) return false
       const { Toggle } = sdk.components
       return Toggle.has(entity)
-    },
-    [sdk]
-  )
-
-  const isSelected = useCallback(
-    (entity: Entity) => {
-      if (entity === ROOT) return false
-      if (!sdk) return false
-      const { Selection } = sdk.components
-      return Selection.has(entity)
     },
     [sdk]
   )
@@ -132,9 +122,10 @@ export const useTree = () => {
 
   const toggle = useCallback(
     (entity: Entity, open: boolean) => {
-      if (entity === ROOT || !sdk) return
-      const { Toggle } = sdk.components
+      if (!sdk) return
+      if (entity === ROOT) return removeSelectedEntities(sdk.engine)
 
+      const { Toggle } = sdk.components
       changeSelectedEntity(entity, sdk.engine)
 
       if (open) {
@@ -151,7 +142,7 @@ export const useTree = () => {
   const isNotRoot = useCallback((entity: Entity) => entity !== ROOT, [])
   const canRename = isNotRoot
   const canRemove = isNotRoot
-  const canToggle = isNotRoot
+  const canToggle = useCallback(() => true, [])
 
   return {
     tree,
@@ -164,7 +155,6 @@ export const useTree = () => {
     getChildren,
     getLabel,
     isOpen,
-    isSelected,
     canRename,
     canRemove,
     canToggle

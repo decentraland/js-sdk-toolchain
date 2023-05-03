@@ -12,7 +12,7 @@ export const EntityInspector: React.FC = () => {
     <div className="EntityInspector" key={entity}>
       {entity && <TransformInspector entity={entity} />}
       {entity && <GltfInspector entity={entity} />}
-      <SceneInspector entity={ROOT} />
+      {!entity && <SceneInspector entity={ROOT} />}
     </div>
   )
 }

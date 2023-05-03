@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { useCallback } from 'react'
+import { Entity } from '@dcl/ecs'
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
 import { FiHexagon } from 'react-icons/fi'
 
-import { useTree } from '../../hooks/sdk/useTree'
 import { ROOT } from '../../lib/sdk/tree'
+import { useSelectedEntity } from '../../hooks/sdk/useSelectedEntity'
+import { useTree } from '../../hooks/sdk/useTree'
+import { Container } from '../Container'
 import { Tree } from '../Tree'
 import { ContextMenu } from './ContextMenu'
-import { Container } from '../Container'
-import { Entity } from '@dcl/ecs'
 
 const Hierarchy: React.FC = () => {
   const {
@@ -20,11 +21,18 @@ const Hierarchy: React.FC = () => {
     getChildren,
     getLabel,
     isOpen,
-    isSelected,
     canRename,
     canRemove,
     canToggle
   } = useTree()
+  const selectedEntity = useSelectedEntity()
+
+  const isSelected = useCallback((entity: Entity) => {
+      if (entity === ROOT) return !selectedEntity
+      return selectedEntity === entity
+    },
+    [selectedEntity]
+  )
 
   return (
     <Container>
