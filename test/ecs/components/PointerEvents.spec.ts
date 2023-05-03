@@ -72,7 +72,8 @@ describe('Generated OnPointerDown ProtoBuf', () => {
         globalOrigin: { x: 1, y: 2, z: 3 },
         meshName: 'mesh'
       },
-      state: PointerEventType.PET_DOWN
+      state: PointerEventType.PET_DOWN,
+      tickNumber: 0
     })
 
     expect(PointerEventsResult.has(entity))

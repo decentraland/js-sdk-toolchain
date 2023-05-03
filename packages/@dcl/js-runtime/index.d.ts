@@ -1,5 +1,6 @@
 /// --- FETCH ---
 /// <reference path="./apis.d.ts" />
+/// <reference path="./sdk.d.ts" />
 
 type RequestRedirect = 'follow' | 'error' | 'manual'
 type ResponseType = 'basic' | 'cors' | 'default' | 'error' | 'opaque' | 'opaqueredirect'

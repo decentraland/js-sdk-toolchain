@@ -12,7 +12,17 @@ export type IFileSystemComponent = Pick<typeof fs, 'createReadStream'> &
   Pick<typeof fs, 'createWriteStream'> &
   Pick<
     typeof fsPromises,
-    'access' | 'opendir' | 'stat' | 'unlink' | 'mkdir' | 'readFile' | 'writeFile' | 'rename' | 'rmdir' | 'appendFile'
+    | 'access'
+    | 'opendir'
+    | 'stat'
+    | 'unlink'
+    | 'mkdir'
+    | 'readFile'
+    | 'writeFile'
+    | 'rename'
+    | 'rmdir'
+    | 'appendFile'
+    | 'rm'
   > & {
     constants: Pick<typeof fs.constants, 'F_OK' | 'R_OK'>
   } & {
@@ -52,6 +62,7 @@ export function createFsComponent(): IFileSystemComponent {
     unlink: fsPromises.unlink,
     mkdir: fsPromises.mkdir,
     rmdir: fsPromises.rmdir,
+    rm: fsPromises.rm,
     readdir: fsPromises.readdir,
     readFile: fsPromises.readFile,
     constants: {

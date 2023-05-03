@@ -17,8 +17,8 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
-      - name: install npm v8
-        run: npm i -g npm@8
+      - name: install npm
+        run: npm i -g npm
       - name: install
         run: make install
       - name: lint
@@ -31,8 +31,8 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
-      - name: install npm v8
-        run: npm i -g npm@8
+      - name: install npm
+        run: npm i -g npm
       - name: docs
         run: make docs
   test:
@@ -43,8 +43,8 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
-      - name: install npm v8
-        run: npm i -g npm@8
+      - name: install npm
+        run: npm i -g npm
       - name: install
         run: make install
       - name: build
@@ -64,6 +64,9 @@ jobs:
         run: make prepare
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     outputs:
       decentraland_sdk_s3_bucket_key: ${{ steps.publish_decentraland_sdk.outputs.s3-bucket-key }}
       decentraland_sdk_commands_s3_bucket_key: ${{ steps.publish_decentraland_sdk_commands.outputs.s3-bucket-key }}
@@ -75,8 +78,8 @@ jobs:
           node-version: 18
           cache: 'npm'
 
-      - name: install npm v8
-        run: npm i -g npm@8
+      - name: install npm
+        run: npm i -g npm
 
       - name: install
         run: make install
@@ -110,7 +113,8 @@ jobs:
           cwd: ./packages/@dcl/js-runtime
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
-
+          ## sign the deployment
+          provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/js-runtime'
@@ -128,7 +132,8 @@ jobs:
           cwd: ./packages/@dcl/ecs
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
-
+          ## sign the deployment
+          provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/ecs'
@@ -146,7 +151,8 @@ jobs:
           cwd: ./packages/@dcl/react-ecs
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
-
+          ## sign the deployment
+          provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/react-ecs'
@@ -164,7 +170,8 @@ jobs:
           cwd: ./packages/@dcl/inspector
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
-
+          ## sign the deployment
+          provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/inspector'
@@ -176,7 +183,12 @@ jobs:
       - name: (PR) change @dcl/sdk-commands dependencies versions to point to s3 url
         working-directory: ./packages/@dcl/sdk-commands
         if: ${{ github.event.pull_request.number }}
-        run: node -e "let pkg=require('./package.json'); pkg.dependencies['@dcl/inspector']='$INSPECTOR_URL'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
+        run: |
+          node -e "\
+            let pkg=require('./package.json');\
+            pkg.dependencies['@dcl/inspector']='$INSPECTOR_URL';\
+            require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));\
+          "
         env:
           INSPECTOR_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_inspector.outputs.s3-bucket-key }}
 
@@ -189,7 +201,8 @@ jobs:
           cwd: ./packages/@dcl/sdk-commands
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
-
+          ## sign the deployment
+          provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
@@ -198,18 +211,19 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
-      - name: (PR) change @dcl/sdk-commands dependencies versions to point to s3 url
-        working-directory: ./packages/@dcl/sdk-commands
-        if: ${{ github.event.pull_request.number }}
-        run: node -e "let pkg=require('./package.json'); pkg.dependencies['@dcl/dcl-rollup']='$ROLLUP_S3_URL';pkg.dependencies['@dcl/inspector']='$INSPECTOR_URL'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
-        env:
-          INSPECTOR_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_inspector.outputs.s3-bucket-key }}
-          ROLLUP_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_rollup.outputs.s3-bucket-key }}
-
       - name: (PR) change @dcl/sdk version to s3 url
         working-directory: ./packages/@dcl/sdk
         if: ${{ github.event.pull_request.number }}
-        run: node -e "let pkg=require('./package.json'); pkg.dependencies['@dcl/inspector']='$INSPECTOR_URL'; pkg.dependencies['@dcl/js-runtime']='$JS_RUNTIME_S3_URL'; pkg.dependencies['@dcl/ecs']='$ECS_S3_URL'; pkg.dependencies['@dcl/react-ecs']='$REACT_ECS_S3_URL'; pkg.dependencies['@dcl/sdk-commands']='$SDK_COMMANDS_S3_URL'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
+        run: |
+          node -e "\
+            let pkg=require('./package.json');\
+            pkg.dependencies['@dcl/inspector']='$INSPECTOR_URL';\
+            pkg.dependencies['@dcl/js-runtime']='$JS_RUNTIME_S3_URL';\
+            pkg.dependencies['@dcl/ecs']='$ECS_S3_URL';\
+            pkg.dependencies['@dcl/react-ecs']='$REACT_ECS_S3_URL';\
+            pkg.dependencies['@dcl/sdk-commands']='$SDK_COMMANDS_S3_URL';\
+            require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));\
+          "
         env:
           INSPECTOR_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_inspector.outputs.s3-bucket-key }}
           REACT_ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_react_ecs.outputs.s3-bucket-key }}
@@ -217,12 +231,6 @@ jobs:
           ROLLUP_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_rollup.outputs.s3-bucket-key }}
           JS_RUNTIME_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_js_runtime.outputs.s3-bucket-key }}
           SDK_COMMANDS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_sdk_commands.outputs.s3-bucket-key }}
-
-      - name: playground upload to s3
-        run: npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder $(pwd)/packages/@dcl/playground-assets/dist --bucket-folder '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/playground-assets'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
       - name: publish @dcl/sdk package
         uses: menduz/oddish-action@master
@@ -233,12 +241,19 @@ jobs:
           cwd: ./packages/@dcl/sdk
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
-
+          ## sign the deployment
+          provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+
+      - name: playground upload to s3
+        run: npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder $(pwd)/packages/@dcl/playground-assets/dist --bucket-folder '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/playground-assets'
+        env:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
@@ -251,7 +266,8 @@ jobs:
           cwd: ./packages/@dcl/playground-assets
           ## use action runId instead of current date to generate snapshot numbers
           deterministic-snapshot: true
-
+          ## sign the deployment
+          provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
@@ -325,8 +341,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: install npm v8
-        run: npm i -g npm@8
+      - name: install npm
+        run: npm i -g npm
       - run: mkdir -p scene
       - name: npx @dcl/sdk-commands init --skip-install
         run: npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_commands_s3_bucket_key }} init
@@ -345,6 +361,7 @@ jobs:
           npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_commands_s3_bucket_key }} \
             export-static \
               --realmName ${{ github.head_ref || github.ref }}-e2e \
+              --commsAdapter ws-room:ws-room-service.decentraland.org/rooms/sdk-${{ github.sha }} \
               --baseUrl ${{ secrets.SDK_TEAM_S3_BASE_URL }}/ipfs \
               --dir scene \
               --destination $(pwd)/out-static

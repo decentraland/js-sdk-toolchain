@@ -4,21 +4,23 @@ import { IoIosArrowDown, IoIosArrowForward, IoIosImage } from 'react-icons/io'
 import { Tree } from '../Tree'
 import { AssetNode, AssetNodeFolder } from './types'
 import { AiFillFolder } from 'react-icons/ai'
+import ContextMenu from './ContextMenu'
 
 function noop() {}
 // eslint-disable-next-line prettier/prettier
 const MyTree = Tree<string>;
 
 type Props = {
+  onImportAsset(): void
   folders: AssetNodeFolder[]
 }
 
-const ROOT = 'File System'
+export const ROOT = 'File System'
 
 
 export type TreeNode = Omit<AssetNode, 'children'> & { children?: string[] }
 
-function ProjectView({ folders }: Props) {
+function ProjectView({ folders, onImportAsset }: Props) {
   const [open, setOpen] = useState(new Set<string>())
   const getTree = useCallback(() => {
     const tree = new Map<string, TreeNode>()
@@ -55,27 +57,32 @@ function ProjectView({ folders }: Props) {
   }, [open, setOpen])
 
   if (!folders.length) return null
+
   return (
-    <MyTree
-      className="editor-assets-tree"
-      value={ROOT}
-      onAddChild={noop}
-      onSetParent={noop}
-      onRemove={noop}
-      onRename={noop}
-      onToggle={canToggle}
-      getId={(value: string) => value.toString()}
-      getChildren={(name: string) => [...tree.get(name)?.children || []]}
-      getLabel={(val: string) => tree.has(val) ? tree.get(val)!.name : ''}
-      isOpen={(val: string) => open.has(val)}
-      isSelected={(val: string) => open.has(val)}
-      canRename={() => false}
-      canRemove={() => false}
-      canToggle={() => true}
-      getIcon={(val) => <NodeIcon value={tree.get(val)!} isOpen={open.has(val)} />}
-      getDragContext={() => ({ tree })}
-      dndType="project-asset-gltf"
-    />
+    <div className="ProjectView">
+      <MyTree
+        className="editor-assets-tree"
+        value={ROOT}
+        onAddChild={noop}
+        onSetParent={noop}
+        onRemove={noop}
+        onRename={noop}
+        onToggle={canToggle}
+        getId={(value: string) => value.toString()}
+        getChildren={(name: string) => [...tree.get(name)?.children || []]}
+        getLabel={(val: string) => tree.has(val) ? tree.get(val)!.name : ''}
+        isOpen={(val: string) => open.has(val)}
+        isSelected={(val: string) => open.has(val)}
+        canRename={() => false}
+        canRemove={() => false}
+        canToggle={() => true}
+        canAddChild={() => false}
+        getIcon={(val) => <NodeIcon value={tree.get(val)!} isOpen={open.has(val)} />}
+        getDragContext={() => ({ tree })}
+        dndType="project-asset-gltf"
+        getExtraContextMenu={(value) => <ContextMenu value={tree.get(value)} onImportAsset={onImportAsset} />}
+      />
+    </div>
   )
 }
 

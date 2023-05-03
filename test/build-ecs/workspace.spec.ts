@@ -12,7 +12,10 @@ test('write a case-sensitive file to a destination folder', async () => {
 describe('workspace: build a workspace using the CLI', () => {
   const cwd = resolve(__dirname, './fixtures')
 
-  itExecutes(path.resolve(process.cwd(), './packages/@dcl/sdk-commands/dist/index.js') + ' build', cwd)
+  itExecutes(
+    path.resolve(process.cwd(), './packages/@dcl/sdk-commands/dist/index.js') + ' build --customEntryPoint',
+    cwd
+  )
 })
 
 describe('workspace: export-static a workspace using the CLI', () => {

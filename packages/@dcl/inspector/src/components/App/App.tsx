@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { MdImageSearch } from 'react-icons/md'
 import { AiFillFolder } from 'react-icons/ai'
+import { HiOutlinePlus } from 'react-icons/hi'
 
 import { useCatalog } from '../../hooks/catalog/useCatalog'
 import { AssetsCatalog } from '../AssetsCatalog'
@@ -13,32 +14,36 @@ import { Toolbar } from '../Toolbar'
 
 import './App.css'
 import { Resizable } from '../Resizable'
+import ImportAsset from '../ImportAsset'
 
 enum Tab {
   FileSystem = 'FileSystem',
-  AssetsPack = 'AssetsPack'
+  AssetsPack = 'AssetsPack',
+  Import = 'Import'
 }
 
 const App = () => {
   const [catalog] = useCatalog()
   const [tab, setTab] = useState<Tab | undefined>(undefined)
 
-  function handleTabClick(value: Tab) {
-    if (tab === value) {
-      return setTab(undefined)
-    }
-    setTab(value)
-  }
+  const handleTabClick = useCallback(
+    (value: Tab) => () => {
+      setTab(tab === value ? undefined : value)
+    },
+    [tab]
+  )
 
   return (
-    <Resizable minWidth={220} initialWidth={250} >
+    <Resizable type="horizontal" min={300} initial={300}>
       <Box>
         <div
           className="sidebar"
           data-vscode-context='{"webviewSection": "sidebar", "preventDefaultContextMenuItems": true}'
         >
-          <Hierarchy />
-          <EntityInspector />
+          <Resizable type="vertical" min={130} initial={130} max={730}>
+            <Hierarchy />
+            <EntityInspector />
+          </Resizable>
         </div>
       </Box>
       <div className="editor">
@@ -50,15 +55,20 @@ const App = () => {
           {tab && (
             <div className="footer-content">
               {tab === Tab.AssetsPack && catalog && <AssetsCatalog value={catalog} />}
-              {tab === Tab.FileSystem && <ProjectAssetExplorer />}
+              {tab === Tab.FileSystem && <ProjectAssetExplorer onImportAsset={handleTabClick(Tab.Import)} />}
+              {tab === Tab.Import && <ImportAsset onSave={handleTabClick(Tab.FileSystem)} />}
             </div>
           )}
           <div className="footer-buttons">
-            <div onClick={() => handleTabClick(Tab.FileSystem)}>
+            <div onClick={handleTabClick(Tab.FileSystem)}>
               <AiFillFolder />
               <span>Asset Catalog</span>
             </div>
-            <div onClick={() => handleTabClick(Tab.AssetsPack)}>
+            <div onClick={handleTabClick(Tab.Import)}>
+              <HiOutlinePlus />
+              <span>Import Asset</span>
+            </div>
+            <div onClick={handleTabClick(Tab.AssetsPack)}>
               <MdImageSearch />
               <span>World Assets Pack</span>
             </div>

@@ -1,0 +1,71 @@
+.Gizmos {
+  position: relative;
+}
+
+.Gizmos .gizmo {
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 100%;
+}
+
+.Gizmos .gizmo.translate {
+  margin-right: 1px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  background-image: url(./icons/translate.svg);
+}
+
+.Gizmos .gizmo.rotate {
+  margin: 0px;
+  border-radius: 0px;
+  background-image: url(./icons/rotate.svg);
+}
+
+.Gizmos .gizmo.scale {
+  margin-left: 1px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  background-image: url(./icons/scale.svg);
+}
+
+.Gizmos .open-panel {
+  cursor: pointer;
+  height: 100%;
+  margin-right: 10px;
+}
+
+.Gizmos .panel {
+  display: none;
+  position: absolute;
+  top: calc(100% - 5px);
+  right: 5px;
+  width: 150px;
+  background-color: #1e1e1e;
+  z-index: 1;
+  padding: 12px;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.Gizmos .panel.visible {
+  display: block;
+}
+
+.Gizmos .panel .title {
+  position: relative;
+  color: var(--text);
+  font-weight: bold;
+  margin-bottom: 6px;
+  line-height: 14px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.Gizmos .panel .icon {
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  right: -5px;
+  top: -5px;
+}

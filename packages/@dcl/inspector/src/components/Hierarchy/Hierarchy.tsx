@@ -27,7 +27,7 @@ const Hierarchy: React.FC = () => {
   } = useTree()
 
   return (
-    <Container label="">
+    <Container>
       <Tree
         value={ROOT}
         getExtraContextMenu={ContextMenu}

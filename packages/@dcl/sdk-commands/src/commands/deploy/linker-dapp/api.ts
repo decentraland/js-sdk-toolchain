@@ -58,7 +58,7 @@ export async function runLinkerApp(
 
       const https = isHttps ? await getCredentials(cliComponents) : undefined
 
-      const server = await createServerComponent({ ...cliComponents, config, logs }, { https })
+      const server = await createServerComponent({ ...cliComponents, config, logs }, { https, cors: {} })
 
       return { ...cliComponents, config, logs, server }
     },

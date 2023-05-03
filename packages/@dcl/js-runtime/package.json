@@ -6,12 +6,17 @@
   "files": [
     "index.d.ts",
     "apis.d.ts",
+    "sdk.d.ts",
     "tsconfig.json"
   ],
   "keywords": [],
   "license": "Apache-2.0",
   "publishConfig": {
     "access": "public"
+  },
+  "repository": {
+    "url": "git+https://github.com/decentraland/js-sdk-toolchain",
+    "directory": "packages/@dcl/js-runtime"
   },
   "types": "./index.d.ts",
   "typings": "./index.d.ts"

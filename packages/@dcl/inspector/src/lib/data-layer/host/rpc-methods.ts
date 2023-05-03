@@ -2,11 +2,12 @@ import { Entity, EntityMappingMode, IEngine, Composite, OnChangeFunction, Compos
 
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
 import { getFilesInDirectory } from './fs-utils'
-import { dumpEngineToComposite } from './utils/engine-to-composite'
+import { dumpEngineToComposite, dumpEngineToCrdtCommands } from './utils/engine-to-composite'
 import { createFsCompositeProvider } from './utils/fs-composite-provider'
 import { stream } from './stream'
-import { initUndoRedo } from './undo-redo'
+import { FileOperation, initUndoRedo } from './undo-redo'
 import { minimalComposite } from '../client/feeded-local-fs'
+import upsertAsset from './upsert-asset'
 
 export async function initRpcMethods(
   fs: FileSystemInterface,
@@ -34,16 +35,15 @@ export async function initRpcMethods(
   }
 
   let dirty = false
-
-  // TODO: remove this mutation.
-  // Its hard to follow when you add this onChanges fn and the side-effects
-  onChanges.push(() => {
-    dirty = true
-  })
-
   let composite: CompositeDefinition
-  let undoRedo: ReturnType<typeof initUndoRedo>
+  const undoRedo = initUndoRedo(fs, engine, () => composite)
 
+  // Create undo/redo container and attach onChange logic.
+  onChanges.push(undoRedo.onChange)
+
+  // TODO: review this
+  // Dump composite to the FS on every tick
+  onChanges.push(() => (dirty = true))
   engine.addSystem(function () {
     if (dirty) {
       dirty = false
@@ -53,11 +53,8 @@ export async function initRpcMethods(
       // TODO: the ID should be the selected composite id name
       // composite.id = 'main'
 
-      // TODO: TBD 🫠
-      if (!undoRedo) {
-        undoRedo = initUndoRedo(engine, () => composite)
-        onChanges.push(undoRedo.onChange)
-      }
+      const mainCrdt = dumpEngineToCrdtCommands(engine)
+      fs.writeFile('main.crdt', Buffer.from(mainCrdt)).catch((err) => console.error(`Failed saving main.crdt: `, err))
 
       compositeProvider
         .save({ src: currentCompositeResourcePath, composite }, 'json')
@@ -67,18 +64,19 @@ export async function initRpcMethods(
 
   return {
     async redo() {
-      await undoRedo.redo()
-      return {}
+      const type = await undoRedo.redo()
+      return type
     },
     async undo() {
-      await undoRedo.undo()
-      return {}
+      const type = await undoRedo.undo()
+      return type
     },
-    // This method receives an incoming message iterator
-    // and returns an async iterable. consumption and production of messages
-    // are decoupled operations
+    /**
+     * This method receives an incoming message iterator and returns an async iterable.
+     * It adds the undo's operations of the components changed (grouped) on every tick
+     */
     crdtStream(iter) {
-      return stream(iter, { engine })
+      return stream(iter, { engine }, () => undoRedo?.addUndoCrdt())
     },
     async getAssetData(req) {
       if (await fs.existFile(req.path)) {
@@ -100,15 +98,20 @@ export async function initRpcMethods(
 
       return { basePath: '.', assets: files.map((item) => ({ path: item })) }
     },
-
+    /**
+     * Import asset into the file system.
+     * It generates an undo opreation.
+     */
     async importAsset(req) {
       const baseFolder = (req.basePath.length ? req.basePath + '/' : '') + req.assetPackageName + '/'
-
+      const undoAcc: FileOperation[] = []
       for (const [fileName, fileContent] of req.content) {
         const filePath = (baseFolder + fileName).replaceAll('//', '/')
-        await fs.writeFile(filePath, Buffer.from(fileContent))
+        const prevValue = (await fs.existFile(filePath)) ? await fs.readFile(filePath) : null
+        undoAcc.push({ prevValue, newValue: fileContent, path: filePath })
+        await upsertAsset(fs, filePath, fileContent)
       }
-
+      undoRedo.addUndoFile(undoAcc)
       return {}
     }
   }

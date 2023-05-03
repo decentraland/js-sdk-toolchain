@@ -17,6 +17,9 @@ export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliCompone
       }
       await fs.writeFile(filePath, content)
     },
+    async rm(filePath: string) {
+      await fs.rm(filePath)
+    },
     async readdir(dirPath: string): Promise<{ name: string; isDirectory: boolean }[]> {
       if (dirPath.indexOf('/../') !== -1) {
         throw new Error('The usage of /../ is not allowed')

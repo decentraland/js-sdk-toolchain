@@ -6,11 +6,14 @@ import { useRenderer } from '../../hooks/sdk/useRenderer'
 import { useSdk } from '../../hooks/sdk/useSdk'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 import { ROOT } from '../../lib/sdk/tree'
+import { changeSelectedEntity } from '../../lib/utils/gizmo'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { IAsset } from '../AssetsCatalog/types'
 import { getModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 
 import './Renderer.css'
+import { snapPosition } from '../../lib/babylon/decentraland/snap-manager'
+import { Vector3 } from '@babylonjs/core'
 
 const Renderer: React.FC = () => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
@@ -25,10 +28,12 @@ const Renderer: React.FC = () => {
       components: { EntityNode, Transform, GltfContainer }
     } = sdk
     const child = engine.addEntity()
-    const { x, z } = await getPointerCoords(scene)
+    const pointerCoords = await getPointerCoords(scene)
     EntityNode.create(child, { label: asset.name, parent: ROOT })
-    Transform.create(child, { parent: ROOT, position: { x, y: 0, z } })
+    const { x, y, z } = snapPosition(new Vector3(pointerCoords.x, 0, pointerCoords.z))
+    Transform.create(child, { parent: ROOT, position: { x, y, z } })
     GltfContainer.create(child, { src: asset.asset.src })
+    changeSelectedEntity(child, engine)
     await engine.update(0)
   }
 

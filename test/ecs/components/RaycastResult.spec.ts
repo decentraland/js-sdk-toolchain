@@ -20,14 +20,16 @@ describe('Generated RaycastResult ProtoBuf', () => {
           length: 2,
           direction: { x: 1, z: 2, y: 3 }
         }
-      ]
+      ],
+      tickNumber: 0
     })
 
     testComponentSerialization(RaycastResult, {
       timestamp: 0,
       globalOrigin: undefined,
       direction: undefined,
-      hits: []
+      hits: [],
+      tickNumber: 0
     })
   })
 })

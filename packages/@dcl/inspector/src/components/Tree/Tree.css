@@ -1,6 +1,5 @@
 .Tree {
   font-size: 14px;
-  background-color: var(--tree-bg-color);
   color: var(--white);
   width: 100%;
 }

@@ -23,6 +23,7 @@
     "jsx": "react",
     "jsxFactory": "ReactEcs.createElement",
     "skipLibCheck": true,
-    "typeRoots": ["../packages", "../node_modules/@types"]
+    "typeRoots": ["../packages", "../node_modules/@types"],
+    "incremental": true
   }
 }

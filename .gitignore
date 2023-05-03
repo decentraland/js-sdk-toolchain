@@ -30,7 +30,8 @@ tmp
 scene
 test-scene
 test/snapshots/bin
+**/*.tsbuildinfo
 
-test/snapshots/tsconfig.tsbuildinfo
+**/.decentraland/ts-entry-points
 
 test/build-ecs/fixtures/ecs7-scene/aCaseSensitiveReadme.md

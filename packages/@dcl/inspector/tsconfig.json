@@ -21,7 +21,8 @@
     "declarationDir": "dist",
     "jsx": "react-jsx",
     "sourceMap": true,
-    "rootDir": "src/"
+    "rootDir": "src/",
+    "incremental": true
   },
   "exclude": ["**/*.spec.ts"],
   "include": [

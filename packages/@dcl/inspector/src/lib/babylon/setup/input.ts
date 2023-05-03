@@ -1,6 +1,7 @@
 import * as BABYLON from '@babylonjs/core'
 import { EcsEntity } from '../decentraland/EcsEntity'
 import { changeSelectedEntity } from '../../utils/gizmo'
+import { snapManager } from '../decentraland/snap-manager'
 
 /**
  * This is a map of keys (see enum Keys): boolean
@@ -34,17 +35,20 @@ enum Keys {
 
 export { keyState, Keys }
 
+let isSnapEnabled = snapManager.isEnabled()
+
 export function initKeyboard(canvas: HTMLCanvasElement, scene: BABYLON.Scene, camera: BABYLON.ArcRotateCamera) {
   canvas.addEventListener('keydown', (e) => {
     keyState[Keys.KEY_SHIFT] = e.shiftKey
     keyState[Keys.KEY_CTRL] = e.ctrlKey
     keyState[e.keyCode] = true
+    if (e.shiftKey) {
+      isSnapEnabled = snapManager.toggle()
+    }
   })
 
   canvas.addEventListener('keyup', (e) => {
-    // if (!e.shiftKey) {
-    //   firstPersonCamera.speed = playerConfigurations.speed
-    // }
+    snapManager.setEnabled(!isSnapEnabled)
 
     keyState[Keys.KEY_SHIFT] = e.shiftKey
     keyState[Keys.KEY_CTRL] = e.ctrlKey

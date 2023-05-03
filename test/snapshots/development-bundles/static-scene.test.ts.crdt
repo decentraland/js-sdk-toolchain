@@ -1,0 +1,59 @@
+SCENE_COMPILED_JS_SIZE_PROD=353.9k bytes
+THE BUNDLE HAS SOURCEMAPS
+(start empty vm 0.21.0-3680274614.commit-1808aa1)
+  OPCODES ~= 0k
+  MALLOC_COUNT = 1005
+  ALIVE_OBJS_DELTA ~= 0.19k
+EVAL test/snapshots/development-bundles/static-scene.test.js
+  REQUIRE: buffer
+  REQUIRE: long
+  REQUIRE: ~system/Testing
+  REQUIRE: ~system/EngineApi
+  REQUIRE: ~system/EngineApi
+  OPCODES ~= 30k
+  MALLOC_COUNT = 9781
+  ALIVE_OBJS_DELTA ~= 1.81k
+CALL onStart()
+  main.crdt: PUT_COMPONENT e=0x200 c=1 t=0 data={"position":{"x":5.880000114440918,"y":2.7916901111602783,"z":7.380000114440918},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  main.crdt: PUT_COMPONENT e=0x202 c=1 t=0 data={"position":{"x":4,"y":0.800000011920929,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  main.crdt: PUT_COMPONENT e=0x203 c=1 t=0 data={"position":{"x":5.960000038146973,"y":0,"z":4.391744613647461},"rotation":{"x":0.45911476016044617,"y":0,"z":0,"w":0.8883769512176514},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  main.crdt: PUT_COMPONENT e=0x204 c=1 t=0 data={"position":{"x":3.1857755184173584,"y":0,"z":7.300000190734863},"rotation":{"x":0,"y":0,"z":-0.42625299096107483,"w":0.9046040177345276},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  main.crdt: PUT_COMPONENT e=0x205 c=1 t=0 data={"position":{"x":5.819584846496582,"y":0,"z":9.819999694824219},"rotation":{"x":-0.39542919397354126,"y":0,"z":0,"w":0.9184964895248413},"scale":{"x":1,"y":0.9999997615814209,"z":0.9999997615814209},"parent":0}
+  main.crdt: PUT_COMPONENT e=0x206 c=1 t=0 data={"position":{"x":8.520587921142578,"y":0,"z":7.400000095367432},"rotation":{"x":0,"y":0,"z":0.4564768970012665,"w":0.8897352814674377},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  main.crdt: PUT_COMPONENT e=0x200 c=1018 t=0 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
+  main.crdt: PUT_COMPONENT e=0x203 c=1041 t=0 data={"src":"assets/models/test-glb.glb"}
+  main.crdt: PUT_COMPONENT e=0x204 c=1041 t=0 data={"src":"assets/models/test-glb.glb"}
+  main.crdt: PUT_COMPONENT e=0x205 c=1041 t=0 data={"src":"assets/models/test-glb.glb"}
+  main.crdt: PUT_COMPONENT e=0x206 c=1041 t=0 data={"src":"assets/models/test-glb.glb"}
+  main.crdt: PUT_COMPONENT e=0x200 c=3628987482 t=0 data=null
+  main.crdt: PUT_COMPONENT e=0x202 c=3628987482 t=0 data=null
+  main.crdt: PUT_COMPONENT e=0x10201 c=3628987482 t=0 data=null
+  main.crdt: PUT_COMPONENT e=0x203 c=3628987482 t=0 data=null
+  main.crdt: PUT_COMPONENT e=0x204 c=3628987482 t=0 data=null
+  main.crdt: PUT_COMPONENT e=0x205 c=3628987482 t=0 data=null
+  main.crdt: PUT_COMPONENT e=0x206 c=3628987482 t=0 data=null
+  main.crdt: PUT_COMPONENT e=0x200 c=967516382 t=0 data=null
+  main.crdt: PUT_COMPONENT e=0x10201 c=1396410152 t=0 data=null
+  main.crdt: PUT_COMPONENT e=0x200 c=1396410152 t=0 data=null
+  main.crdt: PUT_COMPONENT e=0x0 c=2864191593 t=0 data=null
+  main.crdt: PUT_COMPONENT e=0x0 c=2548763028 t=0 data=null
+  main.crdt: PUT_COMPONENT e=0x200 c=1019 t=0 data={"mesh":{"$case":"box","box":{}}}
+  main.crdt: PUT_COMPONENT e=0x200 c=1270506178 t=0 data=null
+  main.crdt: PUT_COMPONENT e=0x200 c=1062 t=0 data={"pointerEvents":[{"eventType":1,"eventInfo":{"button":1,"hoverText":"Press E to spawn","maxDistance":100,"showFeedback":true}}]}
+  main.crdt: PUT_COMPONENT e=0x200 c=1017 t=0 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":1,"g":0.8500000238418579,"b":0.41999998688697815,"a":1}}}}
+  OPCODES ~= 22k
+  MALLOC_COUNT = 234
+  ALIVE_OBJS_DELTA ~= 0.09k
+CALL onUpdate(0)
+   ~system/Testing: plan {"tests":[{"name":"ensure that cubes are in the scene on the first frame"}]}
+  OPCODES ~= 12k
+  MALLOC_COUNT = -87
+  ALIVE_OBJS_DELTA ~= -0.04k
+CALL onUpdate(0.1)
+  LOG: ["🧪 Running test ensure that cubes are in the scene on the first frame"]
+  LOG: ["🟢 Test passed ensure that cubes are in the scene on the first frame"]
+  ~system/Testing: logTestResult {"name":"ensure that cubes are in the scene on the first frame","ok":true,"totalFrames":0,"totalTime":0}
+  OPCODES ~= 2k
+  MALLOC_COUNT = -3
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 962.76k bytes
