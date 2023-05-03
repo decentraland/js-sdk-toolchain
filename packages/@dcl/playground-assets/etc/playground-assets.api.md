@@ -1923,9 +1923,9 @@ export interface PBEngineInfo {
 
 // @public (undocumented)
 export interface PBGltfContainer {
-    createPointerColliders?: boolean | undefined;
-    disablePhysicsColliders?: boolean | undefined;
+    invisibleMeshesCollisionMask?: number | undefined;
     src: string;
+    visibleMeshesCollisionMask?: number | undefined;
 }
 
 // @public (undocumented)
@@ -3194,6 +3194,8 @@ export interface VideoEventsSystem {
     removeVideoEventsEntity(entity: Entity): void;
 }
 
+// Warning: (ae-extra-release-tag) The doc comment should not contain more than one release tag
+//
 // @public
 export const videoEventsSystem: VideoEventsSystem;
 
