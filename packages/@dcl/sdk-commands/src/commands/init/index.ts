@@ -1,4 +1,4 @@
-import { join, resolve } from 'path'
+import path from 'path'
 
 import { CliComponents } from '../../components'
 import { declareArgs } from '../../logic/args'
@@ -7,7 +7,7 @@ import { download, extract, isDirectoryEmpty } from '../../logic/fs'
 
 import { Result } from 'arg'
 import { installDependencies, needsDependencies } from '../../logic/project-validations'
-import { ScaffoldedScene, existScaffoldedScene, getScaffoldedSceneRepo, scaffoldedSceneOptions } from './repos'
+import { ScaffoldedProject, existScaffoldedProject, getScaffoldedProjectUrl, scaffoldedProjectOptions } from './repos'
 
 interface Options {
   args: Result<typeof args>
@@ -19,59 +19,79 @@ export const args = declareArgs({
   '-y': '--yes',
   '--dir': String,
   '--skip-install': Boolean,
-  '--scene': String
+  '--template': String,
+  '--project': String
 })
 
 export async function help() {}
 
 export async function main(options: Options) {
-  const dir = resolve(process.cwd(), options.args['--dir'] || '.')
+  const dir = path.resolve(process.cwd(), options.args['--dir'] || '.')
   const isEmpty = await isDirectoryEmpty(options.components, dir)
   const yes = options.args['--yes']
-  const requestedScene = options.args['--scene']
+  const requestedTemplateZipUrl = options.args['--template']
+  const requestedProjectTemplate = options.args['--project']
 
   if (!isEmpty && !yes) {
     throw new CliError('The target directory specified is not empty. Run this command with --yes to override.')
   }
 
-  if (requestedScene && !existScaffoldedScene(requestedScene)) {
+  if (requestedTemplateZipUrl && requestedProjectTemplate) {
     throw new CliError(
-      `The requested scene doesn't exist empty. Valid options are: ${scaffoldedSceneOptions().join(', ')}`
+      `Specifying --template and --project at the same time is not allowed. Please specify only one of them.`
+    )
+  }
+
+  if (requestedProjectTemplate && !existScaffoldedProject(requestedProjectTemplate)) {
+    throw new CliError(
+      `The requested scene doesn't exist empty. Valid options are: ${scaffoldedProjectOptions().join(', ')}`
     )
   }
 
   // download and extract template project
-  const scene = (requestedScene as ScaffoldedScene) || 'scene-template'
-  const { url, contentFolders } = getScaffoldedSceneRepo(scene)
-  const zip = await download(options.components, url, join(dir, `${scene}.zip`))
-  await extract(zip, dir)
-  await options.components.fs.unlink(zip)
-  await moveFilesFromDirs(options.components, dir, contentFolders)
+  const projectTemplate = (requestedProjectTemplate as ScaffoldedProject) || 'scene-template'
+  const url = requestedTemplateZipUrl || getScaffoldedProjectUrl(projectTemplate)
+  await downloadAndUnzipUrl(url, dir, options)
 
   // npm install
   const shouldInstallDeps = await needsDependencies(options.components, dir)
   if (shouldInstallDeps && !options.args['--skip-install']) {
     await installDependencies(options.components, dir)
   }
-  options.components.analytics.track('Scene created', { projectType: scene, url })
+  options.components.analytics.track('Scene created', {
+    projectType: requestedTemplateZipUrl ? 'custom-template-url' : projectTemplate,
+    url
+  })
 }
 
-const moveFilesFromDir = async (components: Pick<CliComponents, 'fs'>, dir: string, folder: string) => {
-  const files = await components.fs.readdir(folder)
-  await Promise.all(
-    files.map(($) => {
-      const filePath = resolve(folder, $)
-      return components.fs.rename(filePath, resolve(dir, $))
-    })
-  )
-  await components.fs.rmdir(folder)
-}
+export async function downloadAndUnzipUrl(url: string, dest: string, options: Options) {
+  const zipFilePath = path.resolve(dest, 'temp-zip-project.zip')
+  const zip = await download(options.components, url, zipFilePath)
 
-const moveFilesFromDirs = async (components: Pick<CliComponents, 'fs'>, dir: string, folders: string[]) => {
-  await Promise.all(
-    folders.map(($) => {
-      const folderPath = resolve(dir, $)
-      return moveFilesFromDir(components, dir, folderPath)
-    })
-  )
+  const oldFiles = await options.components.fs.readdir(dest)
+
+  try {
+    await extract(zip, dest)
+  } catch (err) {
+    options.components.logger.log(`Couldn't extract the zip of the repository.`)
+    throw err
+  }
+
+  const newFiles = await options.components.fs.readdir(dest)
+
+  const directoryCreated = newFiles.filter((value) => !oldFiles.includes(value))
+
+  if (directoryCreated.length !== 1) {
+    throw new Error('Please, make sure not to modify the directory while the example repository is downloading.')
+  }
+
+  const extractedPath = path.resolve(dest, directoryCreated[0])
+  const filesToMove = await options.components.fs.readdir(extractedPath)
+
+  for (const filePath of filesToMove) {
+    await options.components.fs.rename(path.resolve(extractedPath, filePath), path.resolve(dest, filePath))
+  }
+
+  await options.components.fs.rm(extractedPath)
+  await options.components.fs.rm(zipFilePath)
 }
