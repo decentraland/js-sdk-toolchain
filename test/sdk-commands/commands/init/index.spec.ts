@@ -30,7 +30,9 @@ describe('init command', () => {
   it('main: should download & extract if directory is not empty and "--yes" arg is provided', async () => {
     const components = await initComponents()
     const downloadSpy = jest.spyOn(fsUtils, 'download').mockImplementation()
-    const extractSpy = jest.spyOn(fsUtils, 'extract').mockImplementation()
+    const extractSpy = jest
+      .spyOn(fsUtils, 'extract')
+      .mockImplementation(async (_, destPath) => ({ destPath, topLevelFolders: ['test'] }))
     const removeSpy = jest.spyOn(components.fs, 'unlink').mockImplementation()
     jest.spyOn(components.fs, 'readdir').mockResolvedValue(['test'])
     jest.spyOn(components.fs, 'rename').mockImplementation()
@@ -47,7 +49,9 @@ describe('init command', () => {
   it('main: should move files out of dirs', async () => {
     const components = await initComponents()
     const downloadSpy = jest.spyOn(fsUtils, 'download').mockImplementation()
-    const extractSpy = jest.spyOn(fsUtils, 'extract').mockImplementation()
+    const extractSpy = jest
+      .spyOn(fsUtils, 'extract')
+      .mockImplementation(async (_, destPath) => ({ destPath, topLevelFolders: ['test'] }))
     const removeSpy = jest.spyOn(components.fs, 'unlink').mockImplementation()
     const readdirSpy = jest.spyOn(components.fs, 'readdir').mockResolvedValue(['test'])
     const renameSpy = jest.spyOn(components.fs, 'rename').mockImplementation()

@@ -51,7 +51,7 @@ export async function main(options: Options) {
   // download and extract template project
   const projectTemplate = (requestedProjectTemplate as ScaffoldedProject) || 'scene-template'
   const url = requestedTemplateZipUrl || getScaffoldedProjectUrl(projectTemplate)
-  await downloadAndUnzipUrl(url, dir, options)
+  await downloadAndUnzipUrlContainFolder(url, dir, options)
 
   // npm install
   const shouldInstallDeps = await needsDependencies(options.components, dir)
@@ -64,34 +64,22 @@ export async function main(options: Options) {
   })
 }
 
-export async function downloadAndUnzipUrl(url: string, dest: string, options: Options) {
+export async function downloadAndUnzipUrlContainFolder(url: string, dest: string, options: Options) {
   const zipFilePath = path.resolve(dest, 'temp-zip-project.zip')
   const zip = await download(options.components, url, zipFilePath)
 
-  const oldFiles = await options.components.fs.readdir(dest)
-
-  try {
-    await extract(zip, dest)
-  } catch (err) {
-    options.components.logger.log(`Couldn't extract the zip of the repository.`)
-    throw err
+  const zipExtracted = await extract(zip, dest)
+  if (zipExtracted.topLevelFolders.length !== 1) {
+    throw new Error('The zip downloaded has many folder on the root, make sure it has only one folder on the root.')
   }
 
-  const newFiles = await options.components.fs.readdir(dest)
-
-  const directoryCreated = newFiles.filter((value) => !oldFiles.includes(value))
-
-  if (directoryCreated.length !== 1) {
-    throw new Error('Please, make sure not to modify the directory while the example repository is downloading.')
-  }
-
-  const extractedPath = path.resolve(dest, directoryCreated[0])
+  const extractedPath = path.resolve(dest, zipExtracted.topLevelFolders[0])
   const filesToMove = await options.components.fs.readdir(extractedPath)
 
   for (const filePath of filesToMove) {
     await options.components.fs.rename(path.resolve(extractedPath, filePath), path.resolve(dest, filePath))
   }
 
-  await options.components.fs.rm(extractedPath)
-  await options.components.fs.rm(zipFilePath)
+  await options.components.fs.rmdir(extractedPath)
+  await options.components.fs.unlink(zipFilePath)
 }

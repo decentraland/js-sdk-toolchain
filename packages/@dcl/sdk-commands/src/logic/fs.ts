@@ -35,10 +35,17 @@ export async function download(
  * @param url Path of the zip file
  * @param dest Path to where to extract the zip file
  */
-export async function extract(path: string, dest: string): Promise<string> {
+export async function extract(path: string, dest: string): Promise<{ destPath: string; topLevelFolders: string[] }> {
   const destPath = resolve(dest)
-  await extractZip(resolve(path), { dir: destPath })
-  return destPath
+  const topLevelFolders = new Set<string>()
+  await extractZip(resolve(path), {
+    dir: destPath,
+    onEntry(entry, _zipfile) {
+      const topLevel = entry.fileName.split('/')[0]
+      topLevelFolders.add(topLevel)
+    }
+  })
+  return { destPath, topLevelFolders: Array.from(topLevelFolders) }
 }
 
 /**
