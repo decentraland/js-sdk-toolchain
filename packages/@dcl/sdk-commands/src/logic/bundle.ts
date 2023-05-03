@@ -65,8 +65,6 @@ export async function bundleProject(components: BundleComponents, options: Compi
   const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
   const outfile = join(options.workingDirectory, output)
 
-  const composites = options.ignoreComposite ? {} : await getAllComposite(components, options)
-
   printProgressStep(components.logger, `Bundling file ${colors.bold(input.join(','))}`, 1, MAX_STEP)
 
   const context = await esbuild.context({
@@ -104,7 +102,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
       'dynamic-import': false,
       hashbang: false
     },
-    plugins: [entryPointLoader(components, input, options), compositeLoader(composites)]
+    plugins: [entryPointLoader(components, input, options), compositeLoader(components, options)]
   })
 
   /* istanbul ignore if */
@@ -177,24 +175,17 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   return typeCheckerFuture
 }
 
-function compositeLoader(composites: Record<string, Uint8Array>): esbuild.Plugin {
-  const compositeLines: string[] = []
+function compositeLoader(components: BundleComponents, options: CompileOptions): esbuild.Plugin {
+  let shouldReload = true
+  let contents = `export const compositeFromLoader = {}` // default exports nothing
+  let watchFiles: string[] = [] // no files to watch
 
-  for (const compositeName in composites) {
-    const bin = composites[compositeName]
-    if (compositeName.endsWith('.bin')) {
-      compositeLines.push(`'${compositeName}':new Uint8Array(${JSON.stringify(Array.from(bin))})`)
-    } else {
-      const textDecoder = new TextDecoder()
-      const json = JSON.stringify(JSON.parse(textDecoder.decode(bin)))
-      compositeLines.push(`'${compositeName}':'${json}'`)
-    }
-  }
-
-  const contents = `export const compositeFromLoader = {${compositeLines.join(',')}}`
   return {
     name: 'composite-loader',
     setup(build) {
+      build.onStart(() => {
+        shouldReload = true
+      })
       build.onResolve({ filter: /~sdk\/all-composites/ }, (_args) => {
         return {
           namespace: 'sdk-composite',
@@ -202,10 +193,20 @@ function compositeLoader(composites: Record<string, Uint8Array>): esbuild.Plugin
         }
       })
 
-      build.onLoad({ filter: /.*/, namespace: 'sdk-composite' }, (_args) => {
+      build.onLoad({ filter: /.*/, namespace: 'sdk-composite' }, async (_) => {
+        if (shouldReload) {
+          if (!options.ignoreComposite) {
+            const data = await getAllComposite(components, options)
+            contents = `export const compositeFromLoader = {${data.compositeLines.join(',')}}`
+            watchFiles = data.watchFiles
+          }
+          shouldReload = false
+        }
+
         return {
           loader: 'js',
-          contents
+          contents,
+          watchFiles
         }
       })
     }
@@ -215,14 +216,29 @@ function compositeLoader(composites: Record<string, Uint8Array>): esbuild.Plugin
 async function getAllComposite(
   components: BundleComponents,
   options: CompileOptions
-): Promise<Record<string, Uint8Array>> {
-  const ret: Record<string, Uint8Array> = {}
+): Promise<{ watchFiles: string[]; compositeLines: string[] }> {
+  const composites: Record<string, Uint8Array> = {}
   const files = globSync('**/*.{composite,composite.bin}', { cwd: options.workingDirectory })
 
   for (const file of files) {
-    ret[file] = await components.fs.readFile(file)
+    composites[file] = await components.fs.readFile(file)
   }
-  return ret
+
+  const watchFiles = Object.keys(composites)
+  const compositeLines: string[] = []
+
+  for (const compositeName in composites) {
+    const bin = composites[compositeName]
+    if (compositeName.endsWith('.bin')) {
+      compositeLines.push(`'${compositeName}':new Uint8Array(${JSON.stringify(Array.from(bin))})`)
+    } else {
+      const textDecoder = new TextDecoder()
+      const json = JSON.stringify(JSON.parse(textDecoder.decode(bin)))
+      compositeLines.push(`'${compositeName}':${JSON.stringify(json)}`)
+    }
+  }
+
+  return { compositeLines, watchFiles }
 }
 
 function entryPointLoader(components: BundleComponents, inputs: string[], options: CompileOptions): esbuild.Plugin {

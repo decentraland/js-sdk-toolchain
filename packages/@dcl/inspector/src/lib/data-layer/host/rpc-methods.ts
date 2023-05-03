@@ -2,7 +2,7 @@ import { Entity, EntityMappingMode, IEngine, Composite, OnChangeFunction, Compos
 
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
 import { getFilesInDirectory } from './fs-utils'
-import { dumpEngineToComposite } from './utils/engine-to-composite'
+import { dumpEngineToComposite, dumpEngineToCrdtCommands } from './utils/engine-to-composite'
 import { createFsCompositeProvider } from './utils/fs-composite-provider'
 import { stream } from './stream'
 import { FileOperation, initUndoRedo } from './undo-redo'
@@ -52,6 +52,9 @@ export async function initRpcMethods(
       composite = dumpEngineToComposite(engine, 'json')
       // TODO: the ID should be the selected composite id name
       // composite.id = 'main'
+
+      const mainCrdt = dumpEngineToCrdtCommands(engine)
+      fs.writeFile('main.crdt', Buffer.from(mainCrdt)).catch((err) => console.error(`Failed saving main.crdt: `, err))
 
       compositeProvider
         .save({ src: currentCompositeResourcePath, composite }, 'json')

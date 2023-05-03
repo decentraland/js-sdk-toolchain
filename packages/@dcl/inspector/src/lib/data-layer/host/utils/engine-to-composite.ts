@@ -7,6 +7,7 @@ import {
   Entity,
   IEngine,
   LastWriteWinElementSetComponentDefinition,
+  PutComponentOperation,
   getCompositeRootComponent
 } from '@dcl/ecs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
@@ -104,4 +105,28 @@ export function dumpEngineToComposite(engine: IEngine, internalDataType: 'json' 
   }
 
   return composite
+}
+
+export function dumpEngineToCrdtCommands(engine: IEngine): Uint8Array {
+  const componentBuffer = new ReadWriteByteBuffer()
+  const crdtBuffer = new ReadWriteByteBuffer()
+
+  for (const itComponentDefinition of engine.componentsIter()) {
+    for (const [entity, value] of engine.getEntitiesWith(itComponentDefinition)) {
+      if (value) {
+        componentBuffer.resetBuffer()
+        itComponentDefinition.schema.serialize(value, componentBuffer)
+
+        PutComponentOperation.write(
+          entity,
+          0,
+          itComponentDefinition.componentId,
+          componentBuffer.toBinary(),
+          crdtBuffer
+        )
+      }
+    }
+  }
+
+  return crdtBuffer.toBinary()
 }
