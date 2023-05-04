@@ -15,6 +15,8 @@ export interface VideoEventsSystem {
   removeVideoEventsEntity(entity: Entity): void
 
   registerVideoEventsEntity(entity: Entity, callback: VideoEventsSystemCallback): void
+
+  hasVideoEventsEntity(entity: Entity): boolean
 }
 
 /**
@@ -35,6 +37,10 @@ export function createVideoEventsSystem(engine: IEngine): VideoEventsSystem {
     entitiesCallbackVideoStateMap.delete(entity)
   }
 
+  function hasVideoEventsEntity(entity: Entity) {
+    return entitiesCallbackVideoStateMap.has(entity)
+  }
+
   // @internal
   engine.addSystem(function EventSystem() {
     for (const [entity, callback] of entitiesCallbackVideoStateMap) {
@@ -51,11 +57,9 @@ export function createVideoEventsSystem(engine: IEngine): VideoEventsSystem {
       let lastVideoEvent = undefined
       let newVideoEvent = undefined
       let index = 0
-      for (let value of values) {
-        if (index == valuesAmount-2)
-          lastVideoEvent = value
-        else if (index == valuesAmount-1)
-          newVideoEvent = value
+      for (const value of values) {
+        if (index == valuesAmount - 2) lastVideoEvent = value
+        else if (index == valuesAmount - 1) newVideoEvent = value
 
         index++
       }
@@ -71,6 +75,9 @@ export function createVideoEventsSystem(engine: IEngine): VideoEventsSystem {
     },
     registerVideoEventsEntity(entity: Entity, callback: VideoEventsSystemCallback) {
       registerVideoEventsEntity(entity, callback)
+    },
+    hasVideoEventsEntity(entity: Entity) {
+      return hasVideoEventsEntity(entity)
     }
   }
 }

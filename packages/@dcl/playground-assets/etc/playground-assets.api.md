@@ -3190,6 +3190,8 @@ export const VideoEvent: GrowOnlyValueSetComponentDefinition<PBVideoEvent>;
 // @public (undocumented)
 export interface VideoEventsSystem {
     // (undocumented)
+    hasVideoEventsEntity(entity: Entity): boolean;
+    // (undocumented)
     registerVideoEventsEntity(entity: Entity, callback: VideoEventsSystemCallback): void;
     // (undocumented)
     removeVideoEventsEntity(entity: Entity): void;
