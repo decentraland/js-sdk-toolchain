@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useDrop } from 'react-dnd'
 import { Vector3 } from '@babylonjs/core'
+import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
+import { Dimmer } from 'decentraland-ui/dist/components/Dimmer/Dimmer'
 
 import { BuilderAsset, DROP_TYPES, IDrop, ProjectAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
 import { useRenderer } from '../../hooks/sdk/useRenderer'
@@ -14,11 +16,14 @@ import { IAsset } from '../AssetsCatalog/types'
 import { getModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 
 import './Renderer.css'
+import { useIsMounted } from '../../hooks/useIsMounted'
 
 const Renderer: React.FC = () => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
   useRenderer(() => canvasRef)
   const sdk = useSdk()
+  const [isLoading, setIsLoading] = useState(false)
+  const isMounted = useIsMounted()
 
   const getDropPosition = async () => {
     const pointerCoords = await getPointerCoords(sdk!.scene)
@@ -45,6 +50,7 @@ const Renderer: React.FC = () => {
     const destFolder = 'world-assets'
     const assetPackageName = asset.name.trim().replaceAll(' ', '_').toLowerCase()
     const path = Object.keys(asset.contents).find(($) => isAsset($))
+    setIsLoading(true)
     await Promise.all(
       Object.entries(asset.contents).map(async ([path, contentHash]) => {
         try {
@@ -64,6 +70,8 @@ const Renderer: React.FC = () => {
       basePath: destFolder,
       assetPackageName
     })
+    if (!isMounted()) return
+    setIsLoading(false)
     const model: AssetNodeItem = {
       type: 'asset',
       name: asset.name,
@@ -102,6 +110,12 @@ const Renderer: React.FC = () => {
 
   return (
     <div className="Renderer">
+      {isLoading && (
+        <div className="loading">
+          <Loader active />
+          <Dimmer active />
+        </div>
+      )}
       <canvas ref={canvasRef} id="canvas" touch-action="none" />
     </div>
   )
