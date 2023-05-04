@@ -39,6 +39,35 @@ export type CompileOptions = {
 
 const MAX_STEP = 2
 
+/**
+ * Generate the entry-point code for a given original entry-point
+ * @param entrypointPath - file to be imported as original entry point
+ * @param forceCustomExport
+ * @returns the Typescript code
+ */
+
+function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean) {
+  return `// BEGIN AUTO GENERATED CODE "~sdk/scene-entrypoint"
+import * as entrypoint from '${entrypointPath}'
+import { engine } from '@dcl/sdk/ecs'
+  
+${forceCustomExport ? '' : `import * as sdk from '@dcl/sdk'`}
+
+if ((entrypoint as any).main !== undefined) {
+  async function _INTERNAL_startup_system() {
+    await (entrypoint as any).main
+    engine.removeSystem(_INTERNAL_startup_system)
+  }
+  engine.addSystem(_INTERNAL_startup_system, Infinity)
+}
+
+module.exports = { 
+  onUpdate: entrypoint.onUpdate${forceCustomExport ? '' : ' || sdk.onUpdate'}, 
+  onStart: entrypoint.onStart${forceCustomExport ? '' : ' || sdk.onStart'}
+}
+`
+}
+
 export async function bundleProject(components: BundleComponents, options: CompileOptions, sceneJson: Scene) {
   const tsconfig = join(options.workingDirectory, 'tsconfig.json')
 
@@ -57,24 +86,42 @@ export async function bundleProject(components: BundleComponents, options: Compi
     throw new CliError(`File ${tsconfig} must exist to compile the Typescript project`)
   }
 
-  const input = globSync(options.single ?? 'src/index.ts', { cwd: options.workingDirectory, absolute: true }) // entryPoints.map((item) => item.dest)
+  const entrypointSource = options.single ?? 'src/index.ts'
+  const entrypoints = globSync(entrypointSource, { cwd: options.workingDirectory, absolute: true })
 
   /* istanbul ignore if */
-  if (!input.length) throw new CliError(`There are no input files to build: ${options.single ?? 'src/index.ts'}`)
+  if (!entrypoints.length) throw new CliError(`There are no input files to build: ${entrypointSource}`)
 
-  const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
-  const outfile = join(options.workingDirectory, output)
+  const inputs: { entrypoint: string; outputFile: string }[] = options.single
+    ? entrypoints.map((entrypoint) => ({ entrypoint, outputFile: entrypoint.replace(/\.ts$/, '.js') }))
+    : [{ entrypoint: entrypoints[0], outputFile: sceneJson.main }]
 
-  printProgressStep(components.logger, `Bundling file ${colors.bold(input.join(','))}`, 1, MAX_STEP)
+  for (const input of inputs) {
+    await bundleSingleProject(components, {
+      ...options,
+      tsconfig,
+      ...input
+    })
+  }
+
+  return { sceneJson, inputs }
+}
+
+type SingleProjectOptions = CompileOptions & {
+  tsconfig: string
+  entrypoint: string
+  outputFile: string
+}
+
+export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
+  printProgressStep(components.logger, `Bundling file ${colors.bold(options.entrypoint)}`, 1, MAX_STEP)
 
   const context = await esbuild.context({
-    entryPoints: input,
     bundle: true,
     platform: 'browser',
     format: 'cjs',
     preserveSymlinks: false,
-    outfile: input.length > 1 ? undefined : outfile,
-    outdir: input.length > 1 ? dirname(outfile) : undefined,
+    outfile: options.outputFile,
     allowOverwrite: false,
     sourcemap: options.production ? 'external' : 'inline',
     minify: options.production,
@@ -87,7 +134,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
     target: 'es2020',
     external: ['~system/*', '@dcl/inspector', '@dcl/inspector/*' /* ban importing the inspector from the SDK */],
     // convert filesystem paths into file:// to enable VSCode debugger
-    sourceRoot: pathToFileURL(dirname(outfile)).toString(),
+    sourceRoot: pathToFileURL(dirname(options.outputFile)).toString(),
     define: {
       document: 'undefined',
       window: 'undefined',
@@ -102,25 +149,27 @@ export async function bundleProject(components: BundleComponents, options: Compi
       'dynamic-import': false,
       hashbang: false
     },
-    plugins: [entryPointLoader(components, input, options), compositeLoader(components, options)]
+    logOverride: {
+      'import-is-undefined': 'silent'
+    },
+    plugins: [compositeLoader(components, options)],
+    stdin: {
+      contents: getEntrypointCode(options.entrypoint, options.customEntryPoint),
+      resolveDir: options.workingDirectory,
+      sourcefile: 'entry-point.ts',
+      loader: 'ts'
+    }
   })
 
   /* istanbul ignore if */
   if (options.watch) {
     await context.watch({})
 
-    printProgressInfo(components.logger, `Bundle saved ${colors.bold(output)}`)
+    printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
   } else {
     try {
-      const ctx = await context.rebuild()
-      printProgressInfo(
-        components.logger,
-        `Bundle saved ${colors.bold(
-          Object.keys(ctx.metafile.outputs)
-            .filter((_) => _.endsWith('.js'))
-            .join(',') || outfile
-        )}`
-      )
+      await context.rebuild()
+      printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
     } catch (err: any) {
       /* istanbul ignore next */
       throw new CliError(err.toString())
@@ -132,8 +181,6 @@ export async function bundleProject(components: BundleComponents, options: Compi
   if (options.watch) printProgressInfo(components.logger, `The compiler is watching for changes`)
 
   await runTypeChecker(components, options)
-
-  return { context, sceneJson }
 }
 
 function runTypeChecker(components: BundleComponents, options: CompileOptions) {
@@ -175,7 +222,7 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   return typeCheckerFuture
 }
 
-function compositeLoader(components: BundleComponents, options: CompileOptions): esbuild.Plugin {
+function compositeLoader(components: BundleComponents, options: SingleProjectOptions): esbuild.Plugin {
   let shouldReload = true
   let contents = `export const compositeFromLoader = {}` // default exports nothing
   let watchFiles: string[] = [] // no files to watch
@@ -239,36 +286,4 @@ async function getAllComposite(
   }
 
   return { compositeLines, watchFiles }
-}
-
-const preIndexTsCode = `
-// BEGIN AUTO GENERATED CODE
-export * from '@dcl/sdk'
-import { executeTask as _INTERNAL_startupInitialTask } from '@dcl/sdk/ecs'
-declare const main: (() => void) | undefined;
-// END AUTO GENERATED CODE\n\n`
-const postIndexTsCode = `\n\n;
-// BEGIN AUTO GENERATED CODE
-if (main) {
-  _INTERNAL_startupInitialTask(async () => {main()})
-}
-// END AUTO GENERATED CODE\n\n`
-
-function entryPointLoader(components: BundleComponents, inputs: string[], options: CompileOptions): esbuild.Plugin {
-  const escapedInputs = inputs.map(($) => $.replace(/\\/g, '\\\\'))
-  const filter = new RegExp(`(${escapedInputs.join('|')})`)
-  return {
-    name: 'entry-point-loader',
-    setup(build) {
-      build.onLoad({ filter }, async (args) => {
-        const preContent = options.customEntryPoint ? '' : preIndexTsCode
-        const postContent = options.customEntryPoint ? '' : postIndexTsCode
-        const contents = preContent + (await components.fs.readFile(args.path)) + postContent
-        return {
-          loader: 'ts',
-          contents
-        }
-      })
-    }
-  }
 }

@@ -1,6 +1,6 @@
 import { engine, GltfContainer, MeshRenderer, Transform } from '@dcl/sdk/ecs'
 
-function main() {
+export function main() {
   const cube = engine.addEntity()
   Transform.create(cube)
   MeshRenderer.setBox(cube)
