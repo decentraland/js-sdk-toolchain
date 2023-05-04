@@ -1,10 +1,12 @@
 import React from 'react'
 import { useDrop } from 'react-dnd'
+import { Vector3 } from '@babylonjs/core'
 
 import { BuilderAsset, DROP_TYPES, IDrop, ProjectAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
 import { useRenderer } from '../../hooks/sdk/useRenderer'
 import { useSdk } from '../../hooks/sdk/useSdk'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
+import { snapPosition } from '../../lib/babylon/decentraland/snap-manager'
 import { ROOT } from '../../lib/sdk/tree'
 import { changeSelectedEntity } from '../../lib/utils/gizmo'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
@@ -12,35 +14,37 @@ import { IAsset } from '../AssetsCatalog/types'
 import { getModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 
 import './Renderer.css'
-import { snapPosition } from '../../lib/babylon/decentraland/snap-manager'
-import { Vector3 } from '@babylonjs/core'
 
 const Renderer: React.FC = () => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
   useRenderer(() => canvasRef)
   const sdk = useSdk()
 
-  const addAsset = async (asset: AssetNodeItem) => {
+  const getDropPosition = async () => {
+    const pointerCoords = await getPointerCoords(sdk!.scene)
+    return snapPosition(new Vector3(pointerCoords.x, 0, pointerCoords.z))
+  }
+
+  const addAsset = async (asset: AssetNodeItem, position: Vector3) => {
     if (!sdk) return
     const {
       engine,
-      scene,
       components: { EntityNode, Transform, GltfContainer }
     } = sdk
     const child = engine.addEntity()
-    const pointerCoords = await getPointerCoords(scene)
     EntityNode.create(child, { label: asset.name, parent: ROOT })
-    const { x, y, z } = snapPosition(new Vector3(pointerCoords.x, 0, pointerCoords.z))
-    Transform.create(child, { parent: ROOT, position: { x, y, z } })
+    Transform.create(child, { parent: ROOT, position })
     GltfContainer.create(child, { src: asset.asset.src })
     changeSelectedEntity(child, engine)
     await engine.update(0)
   }
 
   const importBuilderAsset = async (asset: IAsset) => {
+    const position = await getDropPosition()
     const fileContent: Record<string, Uint8Array> = {}
     const destFolder = 'world-assets'
     const assetPackageName = asset.name.trim().replaceAll(' ', '_').toLowerCase()
+    const path = Object.keys(asset.contents).find(($) => isAsset($))
     await Promise.all(
       Object.entries(asset.contents).map(async ([path, contentHash]) => {
         try {
@@ -52,7 +56,6 @@ const Renderer: React.FC = () => {
         }
       })
     )
-    const path = Object.keys(fileContent).find(($) => isAsset($))
     if (!path) {
       throw new Error('Invalid asset format: should contain at least one gltf/glb file')
     }
@@ -67,13 +70,13 @@ const Renderer: React.FC = () => {
       parent: null,
       asset: { type: 'gltf', src: `${destFolder}/${assetPackageName}/${path}` }
     }
-    await addAsset(model)
+    await addAsset(model, position)
   }
 
   const [, drop] = useDrop(
     () => ({
       accept: DROP_TYPES,
-      drop: (item: IDrop, monitor) => {
+      drop: async (item: IDrop, monitor) => {
         if (monitor.didDrop()) return
         const itemType = monitor.getItemType()
 
@@ -85,7 +88,10 @@ const Renderer: React.FC = () => {
         if (isDropType<ProjectAssetDrop>(item, itemType, 'project-asset-gltf')) {
           const node = item.context.tree.get(item.value)!
           const model = getModel(node, item.context.tree)
-          if (model) void addAsset(model)
+          if (model) {
+            const position = await getDropPosition()
+            await addAsset(model, position)
+          }
         }
       }
     }),
