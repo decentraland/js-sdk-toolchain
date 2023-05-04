@@ -8,7 +8,7 @@ EVAL test/snapshots/production-bundles/billboard.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 42k
+  OPCODES ~= 41k
   MALLOC_COUNT = 11021
   ALIVE_OBJS_DELTA ~= 2.31k
 CALL onStart()

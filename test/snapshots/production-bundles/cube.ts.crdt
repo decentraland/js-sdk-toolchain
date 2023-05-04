@@ -8,7 +8,7 @@ EVAL test/snapshots/production-bundles/cube.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 31k
+  OPCODES ~= 30k
   MALLOC_COUNT = 8091
   ALIVE_OBJS_DELTA ~= 1.70k
 CALL onStart()
