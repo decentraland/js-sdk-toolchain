@@ -505,7 +505,7 @@ export const componentDefinitionByName: {
     "core::UiInputResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputResult>>;
     "core::UiText": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiText>>;
     "core::UiTransform": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiTransform>>;
-    "core::VideoEvent": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVideoEvent>>;
+    "core::VideoEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBVideoEvent>>;
     "core::VideoPlayer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVideoPlayer>>;
     "core::VisibilityComponent": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVisibilityComponent>>;
 };
@@ -2333,6 +2333,7 @@ export interface PBVideoEvent {
     currentOffset: number;
     // (undocumented)
     state: VideoState;
+    timestamp: number;
     // (undocumented)
     videoLength: number;
 }
@@ -3184,7 +3185,7 @@ export type Vector3Type = {
 };
 
 // @public (undocumented)
-export const VideoEvent: LastWriteWinElementSetComponentDefinition<PBVideoEvent>;
+export const VideoEvent: GrowOnlyValueSetComponentDefinition<PBVideoEvent>;
 
 // @public (undocumented)
 export interface VideoEventsSystem {

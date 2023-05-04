@@ -23,48 +23,45 @@ export interface VideoEventsSystem {
 export function createVideoEventsSystem(engine: IEngine): VideoEventsSystem {
   const videoPlayerComponent = components.VideoPlayer(engine)
   const videoEventComponent = components.VideoEvent(engine)
-  const entitiesCallbackVideoStateMap = new Map<
-    Entity,
-    {
-      callback: VideoEventsSystemCallback
-      lastVideoState?: number
-    }
-  >()
+  const entitiesCallbackVideoStateMap = new Map<Entity, VideoEventsSystemCallback>()
 
   function registerVideoEventsEntity(entity: Entity, callback: VideoEventsSystemCallback) {
-    videoEventComponent.getOrCreateMutable(entity)
-    entitiesCallbackVideoStateMap.set(entity, { callback: callback })
+    // video event component is not added here because the renderer adds it
+    // to every entity with a VideoPlayer component
+    entitiesCallbackVideoStateMap.set(entity, callback)
   }
 
   function removeVideoEventsEntity(entity: Entity) {
     entitiesCallbackVideoStateMap.delete(entity)
-    videoEventComponent.deleteFrom(entity)
   }
 
   // @internal
   engine.addSystem(function EventSystem() {
-    for (const [entity, data] of entitiesCallbackVideoStateMap) {
+    for (const [entity, callback] of entitiesCallbackVideoStateMap) {
       const videoPlayer = videoPlayerComponent.getOrNull(entity)
       if (engine.getEntityState(entity) === EntityState.Removed || !videoPlayer) {
         removeVideoEventsEntity(entity)
         continue
       }
 
-      const videoEvent = videoEventComponent.getOrNull(entity)
-      if (!videoEvent) {
-        entitiesCallbackVideoStateMap.delete(entity)
-        continue
+      // Compare with last state
+      const videoEvent = videoEventComponent.get(entity)
+      const values = videoEvent.values()
+      const valuesAmount = videoEvent.size
+      let lastVideoEvent = undefined
+      let newVideoEvent = undefined
+      let index = 0
+      for (let value of values) {
+        if (index == valuesAmount-2)
+          lastVideoEvent = value
+        else if (index == valuesAmount-1)
+          newVideoEvent = value
+
+        index++
       }
+      if (!newVideoEvent || (lastVideoEvent && lastVideoEvent.state == newVideoEvent.state)) continue
 
-      if (data.lastVideoState != undefined && data.lastVideoState == videoEvent.state) continue
-
-      data.callback(videoEvent)
-
-      // save state
-      entitiesCallbackVideoStateMap.set(entity, {
-        callback: data.callback,
-        lastVideoState: videoEvent.state
-      })
+      callback(newVideoEvent)
     }
   })
 

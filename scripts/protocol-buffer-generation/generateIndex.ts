@@ -15,8 +15,12 @@ function exportComponent(component: Component) {
   return `export * from './pb/decentraland/sdk/components/${component.componentFile}.gen'`
 }
 
+function isGrowOnlyValueSet(component: Component): boolean {
+  return component.componentPascalName === 'PointerEventsResult' || component.componentPascalName === 'VideoEvent'
+}
+
 function defineComponentDecl(component: Component) {
-  if (component.componentPascalName === 'PointerEventsResult') {
+  if (isGrowOnlyValueSet(component)) {
     return `/** @public */ export const ${component.componentPascalName}: GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PB${component.componentPascalName}>> = (
       engine
     ) => /* @__PURE__ */
@@ -34,8 +38,7 @@ function defineComponentDecl(component: Component) {
 const skipExposeGlobally: string[] = ['Animator', 'MeshRenderer', 'MeshCollider', 'Material']
 function defineGlobalComponentDecl(component: Component) {
   if (skipExposeGlobally.includes(component.componentPascalName)) return ''
-  // if (component.componentPascalName === 'PointerEventsResult' || component.componentPascalName === 'PointerEventsResult') {
-  if (component.componentPascalName === 'PointerEventsResult') {
+  if (isGrowOnlyValueSet(component)) {
     return `/** @public */ export const ${component.componentPascalName}: GrowOnlyValueSetComponentDefinition<PB${component.componentPascalName}> = /* @__PURE__ */ components.${component.componentPascalName}(engine)`.trim()
   } else {
     return `/** @public */ export const ${component.componentPascalName}: LastWriteWinElementSetComponentDefinition<PB${component.componentPascalName}> = /* @__PURE__ */ components.${component.componentPascalName}(engine)`.trim()
