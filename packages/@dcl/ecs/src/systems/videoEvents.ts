@@ -65,12 +65,12 @@ export function createVideoEventsSystem(engine: IEngine): VideoEventsSystem {
       // get latest component state
       let index = 0
       for (const value of values) {
-        if (index == valuesAmount - 1) latestVideoEventComponentState = value
+        if (index === valuesAmount - 1) latestVideoEventComponentState = value
         index++
       }
       if (
-        latestVideoEventComponentState == undefined ||
-        (data.lastVideoState != undefined && data.lastVideoState == latestVideoEventComponentState.state)
+        latestVideoEventComponentState === undefined ||
+        (data.lastVideoState !== undefined && data.lastVideoState === latestVideoEventComponentState.state)
       )
         continue
 
