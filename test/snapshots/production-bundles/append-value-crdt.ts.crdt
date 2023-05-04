@@ -8,8 +8,8 @@ EVAL test/snapshots/production-bundles/append-value-crdt.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 31k
-  MALLOC_COUNT = 8714
+  OPCODES ~= 32k
+  MALLOC_COUNT = 8705
   ALIVE_OBJS_DELTA ~= 1.86k
 CALL onStart()
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5,"tickNumber":0}
@@ -55,4 +55,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 13k
   MALLOC_COUNT = 31
   ALIVE_OBJS_DELTA ~= 0.01k
-  MEMORY_USAGE_COUNT ~= 711.07k bytes
+  MEMORY_USAGE_COUNT ~= 710.85k bytes
