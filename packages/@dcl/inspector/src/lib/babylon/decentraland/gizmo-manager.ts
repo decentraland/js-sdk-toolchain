@@ -69,6 +69,13 @@ export const getGizmoManager = memoize((scene: Scene) => {
       if (entity === lastEntity) return
       gizmoManager.attachToNode(entity)
       lastEntity = entity
+    },
+    getEntity() {
+      return lastEntity
+    },
+    unsetEntity() {
+      lastEntity = null
+      gizmoManager.attachToNode(lastEntity)
     }
   }
 })

@@ -4,6 +4,7 @@ import { getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk/tree'
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
 import { changeSelectedEntity } from '../../lib/utils/gizmo'
+import { isLastWriteWinComponent } from './useComponentValue'
 
 /**
  * Used to get a tree and the functions to work with it
@@ -112,10 +113,16 @@ export const useTree = () => {
     (entity: Entity) => {
       if (entity === ROOT || !sdk) return
       const { EntityNode } = sdk.components
-      const { removeEntity } = sdk.engine
 
+      // we cannot use "engine.removeEntity" (or similar) since undoing that won't be possible
+      // because entities cannot be re-created. It's easier to remove all the components from the entity,
+      // and in case of an undo, recreate them...
       for (const _entity of getComponentEntityTree(sdk.engine, entity, EntityNode)) {
-        removeEntity(_entity)
+        for (const component of sdk.engine.componentsIter()) {
+          if (component.has(_entity) && isLastWriteWinComponent(component)) {
+            component.deleteFrom(_entity)
+          }
+        }
       }
 
       handleUpdate()
