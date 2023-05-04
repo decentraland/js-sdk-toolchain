@@ -4,7 +4,6 @@ import { Transport } from '@dcl/ecs'
 import { IEngine, Engine } from '@dcl/ecs/dist/engine'
 
 let called = false
-declare const module: any
 
 export function withRenderer(cb: (engine: IEngine) => void) {
   if (called) throw new Error('Only call withRenderer once')
@@ -26,7 +25,7 @@ export function withRenderer(cb: (engine: IEngine) => void) {
   engine.addTransport(rendererTransport)
 
   cb(engine)
-  ;(module as any).exports.onServerUpdate = async function (data: Uint8Array) {
+  return async function (data: Uint8Array) {
     if (rendererTransport.onmessage) {
       rendererTransport.onmessage(data)
 

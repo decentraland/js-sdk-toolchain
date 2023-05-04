@@ -1,0 +1,34 @@
+SCENE_COMPILED_JS_SIZE_PROD=155.9k bytes
+(start empty vm 0.21.0-3680274614.commit-1808aa1)
+  OPCODES ~= 0k
+  MALLOC_COUNT = 1005
+  ALIVE_OBJS_DELTA ~= 0.19k
+EVAL test/snapshots/production-bundles/with-main-function.js
+  REQUIRE: buffer
+  REQUIRE: long
+  REQUIRE: ~system/EngineApi
+  REQUIRE: ~system/EngineApi
+  OPCODES ~= 31k
+  MALLOC_COUNT = 8429
+  ALIVE_OBJS_DELTA ~= 1.78k
+CALL onStart()
+  OPCODES ~= 0k
+  MALLOC_COUNT = 8
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0)
+  OPCODES ~= 1k
+  MALLOC_COUNT = 17
+  ALIVE_OBJS_DELTA ~= 0.01k
+CALL onUpdate(0.1)
+  OPCODES ~= 1k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 1k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 1k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 681.43k bytes
