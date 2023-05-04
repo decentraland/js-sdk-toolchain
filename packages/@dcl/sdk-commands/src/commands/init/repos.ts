@@ -1,17 +1,18 @@
-type Scene = 'scene-template'
+export type ScaffoldedProject = 'scene-template' | 'editor-scene-template'
 
-type Repos = {
-  [key in Scene]: {
-    url: string
-    contentFolders: string[]
-  }
+const scaffoldedProjectUrls: Record<ScaffoldedProject, string> = {
+  'scene-template': 'https://github.com/decentraland/sdk7-scene-template/archive/refs/heads/main.zip',
+  'editor-scene-template': 'https://github.com/decentraland/editor-sdk7-scene-template/archive/refs/heads/main.zip'
 }
 
-const REPOS: Repos = {
-  'scene-template': {
-    url: 'https://github.com/decentraland/sdk7-scene-template/archive/refs/heads/main.zip',
-    contentFolders: ['sdk7-scene-template-main']
-  }
+export function getScaffoldedProjectUrl(scene: ScaffoldedProject): string {
+  return scaffoldedProjectUrls[scene]
 }
 
-export const get = (scene: Scene): Repos[Scene] => REPOS[scene]
+export function existScaffoldedProject(maybeProject: string): boolean {
+  return maybeProject in scaffoldedProjectUrls
+}
+
+export function scaffoldedProjectOptions(): ScaffoldedProject[] {
+  return Object.keys(scaffoldedProjectUrls) as ScaffoldedProject[]
+}

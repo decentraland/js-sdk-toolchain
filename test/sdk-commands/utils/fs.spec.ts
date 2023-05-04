@@ -42,10 +42,13 @@ describe('utils/fs', () => {
 
     const dist = await fsUtils.extract('some/path', './other/path')
 
-    expect(dist).toBe(path.resolve('./other/path'))
-    expect(extractSpy).toBeCalledWith(resolve('some/path'), {
-      dir: resolve(dist)
-    })
+    expect(dist).toStrictEqual({ destPath: path.resolve('./other/path'), topLevelFolders: [] })
+    expect(extractSpy).toBeCalledWith(
+      resolve('some/path'),
+      expect.objectContaining({
+        dir: resolve(dist.destPath)
+      })
+    )
   })
 })
 
