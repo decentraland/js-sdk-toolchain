@@ -6,7 +6,7 @@ import child_process from 'child_process'
 import esbuild from 'esbuild'
 import { future } from 'fp-future'
 import { globSync } from 'glob'
-import { dirname, join } from 'path'
+import { basename, dirname, join } from 'path'
 import { pathToFileURL } from 'url'
 import { CliComponents } from '../components'
 import { colors } from '../components/log'
@@ -56,16 +56,14 @@ import * as sdk from '@dcl/sdk'
 
 if ((entrypoint as any).main !== undefined) {
   async function _INTERNAL_startup_system() {
-    await (entrypoint as any).main
+    await (entrypoint as any).main()
     engine.removeSystem(_INTERNAL_startup_system)
   }
   engine.addSystem(_INTERNAL_startup_system, Infinity)
 }
 
-module.exports = { 
-  onUpdate: entrypoint.onUpdate || sdk.onUpdate, 
-  onStart: entrypoint.onStart || sdk.onStart
-}
+export * from '@dcl/sdk'
+export * from '${entrypointPath}'
 `
 }
 
@@ -143,7 +141,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
       'globalThis.DEBUG': options.production ? 'false' : 'true',
       'process.env.NODE_ENV': JSON.stringify(options.production ? 'production' : 'development')
     },
-    tsconfig: join(options.workingDirectory, 'tsconfig.json'),
+    tsconfig: options.tsconfig,
     supported: {
       'import-assertions': false,
       'import-meta': false,
@@ -156,8 +154,8 @@ export async function bundleSingleProject(components: BundleComponents, options:
     plugins: [compositeLoader(components, options)],
     stdin: {
       contents: getEntrypointCode(options.entrypoint, options.customEntryPoint),
-      resolveDir: options.workingDirectory,
-      sourcefile: 'entry-point.ts',
+      resolveDir: dirname(options.entrypoint),
+      sourcefile: basename(options.entrypoint) + '.entry-point.ts',
       loader: 'ts'
     }
   })
