@@ -4,19 +4,6 @@
     "source.fixAll.eslint": true
   },
   "files.exclude": {
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.DS_Store": true,
-    "**/Thumbs.db": true,
-    "test/snapshots/*.js.map": true,
-    "test/snapshots/node_modules": true,
-    "test/snapshots/package-lock.json": true,
-    "packages/@dcl/*/*.tgz": true,
-    "**/*.js": { "when": "$(basename).ts" },
-    "packages/@dcl/inspector/build.js": false,
-    "packages/@dcl/inspector/hot-reload.js": false
   },
   "[typescript]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"

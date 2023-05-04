@@ -47,11 +47,12 @@ const MAX_STEP = 2
  */
 
 function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean) {
+  if (forceCustomExport) return `export * from '${entrypointPath}'`
+
   return `// BEGIN AUTO GENERATED CODE "~sdk/scene-entrypoint"
 import * as entrypoint from '${entrypointPath}'
 import { engine } from '@dcl/sdk/ecs'
-  
-${forceCustomExport ? '' : `import * as sdk from '@dcl/sdk'`}
+import * as sdk from '@dcl/sdk'
 
 if ((entrypoint as any).main !== undefined) {
   async function _INTERNAL_startup_system() {
@@ -62,8 +63,8 @@ if ((entrypoint as any).main !== undefined) {
 }
 
 module.exports = { 
-  onUpdate: entrypoint.onUpdate${forceCustomExport ? '' : ' || sdk.onUpdate'}, 
-  onStart: entrypoint.onStart${forceCustomExport ? '' : ' || sdk.onStart'}
+  onUpdate: entrypoint.onUpdate || sdk.onUpdate, 
+  onStart: entrypoint.onStart || sdk.onStart
 }
 `
 }
