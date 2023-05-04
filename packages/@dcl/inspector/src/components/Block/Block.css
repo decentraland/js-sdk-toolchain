@@ -14,3 +14,9 @@
   flex-direction: row;
   flex-grow: 1;
 }
+
+.Block.broken {
+  border: 1px #d33c3c dashed;
+  padding: 0 5px 8px 5px;
+  border-radius: 2px;
+}

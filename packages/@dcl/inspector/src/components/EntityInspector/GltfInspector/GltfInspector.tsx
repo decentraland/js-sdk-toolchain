@@ -21,13 +21,13 @@ const DROP_TYPES = ['project-asset-gltf']
 
 export default withSdk<Props>(
   withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
-    const [files] = useFileSystem()
+    const [files, init] = useFileSystem()
     const { handleAction } = useContextMenu()
     const { GltfContainer } = sdk.components
 
     const hasGltf = useHasComponent(entity, GltfContainer)
     const handleInputValidation = useCallback(({ src }: { src: string }) => isValidInput(files, src), [files])
-    const getInputProps = useComponentInput(entity, GltfContainer, fromGltf, toGltf, handleInputValidation)
+    const { getInputProps, monitor } = useComponentInput(entity, GltfContainer, fromGltf, toGltf, handleInputValidation, [files])
 
     const handleRemove = useCallback(() => GltfContainer.deleteFrom(entity), [])
     const handleDrop = useCallback((src: string) => {
@@ -56,6 +56,8 @@ export default withSdk<Props>(
 
     if (!hasGltf) return null
 
+    const inputProps = getInputProps('src')
+
     return (
       <Container label="Gltf" className={cx('Gltf', { hover: isHover })}>
         <Menu id={contextMenuId}>
@@ -63,8 +65,8 @@ export default withSdk<Props>(
             <DeleteIcon /> Delete
           </Item>
         </Menu>
-        <Block label="Path" ref={drop}>
-          <TextField type="text" {...getInputProps('src')} />
+        <Block label="Path" ref={drop} broken={init && !monitor.isValid}>
+          <TextField type="text" {...inputProps} />
         </Block>
       </Container>
     )

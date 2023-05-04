@@ -5,6 +5,8 @@ import { Tree } from '../Tree'
 import { AssetNode, AssetNodeFolder } from './types'
 import { AiFillFolder } from 'react-icons/ai'
 import ContextMenu from './ContextMenu'
+import { useSdk } from '../../hooks/sdk/useSdk'
+import { getFullNodePath } from './utils'
 
 function noop() {}
 // eslint-disable-next-line prettier/prettier
@@ -17,11 +19,11 @@ type Props = {
 
 export const ROOT = 'File System'
 
-
 export type TreeNode = Omit<AssetNode, 'children'> & { children?: string[] }
 
 function ProjectView({ folders, onImportAsset }: Props) {
   const [open, setOpen] = useState(new Set<string>())
+  const sdk = useSdk()
   const getTree = useCallback(() => {
     const tree = new Map<string, TreeNode>()
     tree.set(ROOT, { children: folders.map(f => f.name), name: ROOT, type: 'folder', parent: null })
@@ -56,6 +58,11 @@ function ProjectView({ folders, onImportAsset }: Props) {
     setOpen(new Set(open))
   }, [open, setOpen])
 
+  const handleRemove = useCallback((value: string) => {
+    const node = tree.get(value)!
+    sdk?.dataLayer.removeAsset({ path: getFullNodePath(node) })
+  }, [open, setOpen])
+
   if (!folders.length) return null
 
   return (
@@ -65,7 +72,7 @@ function ProjectView({ folders, onImportAsset }: Props) {
         value={ROOT}
         onAddChild={noop}
         onSetParent={noop}
-        onRemove={noop}
+        onRemove={handleRemove}
         onRename={noop}
         onToggle={canToggle}
         getId={(value: string) => value.toString()}
@@ -74,13 +81,13 @@ function ProjectView({ folders, onImportAsset }: Props) {
         isOpen={(val: string) => open.has(val)}
         isSelected={(val: string) => open.has(val)}
         canRename={() => false}
-        canRemove={() => false}
+        canRemove={(val) => tree.get(val)!.type === 'asset'}
         canToggle={() => true}
         canAddChild={() => false}
         getIcon={(val) => <NodeIcon value={tree.get(val)!} isOpen={open.has(val)} />}
         getDragContext={() => ({ tree })}
         dndType="project-asset-gltf"
-        getExtraContextMenu={(value) => <ContextMenu value={tree.get(value)} onImportAsset={onImportAsset} />}
+        getExtraContextMenu={(val) => <ContextMenu value={tree.get(val)} onImportAsset={onImportAsset} />}
       />
     </div>
   )
