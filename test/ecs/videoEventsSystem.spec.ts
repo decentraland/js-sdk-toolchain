@@ -41,6 +41,44 @@ describe('Video events helper system should', () => {
     expect(fn).toHaveBeenCalled()
   })
 
+  it('run callback once per status change', async () => {
+    const fn = jest.fn()
+
+    const videoPlayerEntity = engine.addEntity()
+    videoPlayerComponent.create(videoPlayerEntity)
+    // simulate video event attach in renderer
+    videoEventComponent.addValue(videoPlayerEntity, {
+      state: VideoState.VS_LOADING,
+      currentOffset: 0,
+      videoLength: 5,
+      timestamp: 1
+    })
+
+    videoEventsSystem.registerVideoEventsEntity(videoPlayerEntity, fn)
+
+    // simulate video state change in renderer
+    videoEventComponent.addValue(videoPlayerEntity, {
+      state: VideoState.VS_PLAYING,
+      currentOffset: 1,
+      videoLength: 5,
+      timestamp: 2
+    })
+
+    await engine.update(1)
+
+    videoEventComponent.addValue(videoPlayerEntity, {
+      state: VideoState.VS_PLAYING,
+      currentOffset: 1,
+      videoLength: 5,
+      timestamp: 2
+    })
+
+    await engine.update(1)
+    await engine.update(1)
+
+    expect(fn).toHaveBeenCalledTimes(1)
+  })
+
   it('remove subscribed entity when video player is removed', async () => {
     const fn = jest.fn()
 
