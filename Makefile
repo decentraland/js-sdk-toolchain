@@ -35,7 +35,7 @@ install:
 
 update-protocol:
 	npm i --save-exact $(UPDATE_PROTOCOL_VERSION)
-	cd packages/@dcl/sdk-commands; npm i --save-exact $(UPDATE_PROTOCOL_VERSION)
+	cd packages/@dcl/sdk-commands; npm i --save-exact @dcl/protocol@next
 	$(MAKE) sync-deps compile_apis
 
 update-renderer:
