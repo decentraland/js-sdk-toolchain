@@ -38,7 +38,7 @@ export function stream(
     if (!queue.closed) queue.close()
   }
 
-  // and lastly wire the new messages from the iterator to the
+  // and lastly wire the new messages from the renderer engine
   consumeAllMessagesInto(stream, processMessage, closeCallback).catch((err) => {
     console.error('consumeAllMessagesInto failed: ', err)
   })
