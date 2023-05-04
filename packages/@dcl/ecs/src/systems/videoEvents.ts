@@ -68,7 +68,11 @@ export function createVideoEventsSystem(engine: IEngine): VideoEventsSystem {
         if (index == valuesAmount - 1) latestVideoEventComponentState = value
         index++
       }
-      if (latestVideoEventComponentState == undefined || (data.lastVideoState != undefined && data.lastVideoState == latestVideoEventComponentState.state)) continue
+      if (
+        latestVideoEventComponentState == undefined ||
+        (data.lastVideoState != undefined && data.lastVideoState == latestVideoEventComponentState.state)
+      )
+        continue
 
       data.callback(latestVideoEventComponentState)
 
