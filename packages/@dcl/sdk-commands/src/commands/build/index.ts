@@ -65,7 +65,7 @@ export async function buildScene(options: Options, project: SceneProject) {
 
   const watch = !!options.args['--watch']
 
-  const { sceneJson, inputs } = await bundleProject(
+  const { sceneJson } = await bundleProject(
     options.components,
     {
       workingDirectory: project.workingDirectory,
@@ -84,6 +84,6 @@ export async function buildScene(options: Options, project: SceneProject) {
   options.components.analytics.track('Build scene', {
     projectHash: await b64HashingFunction(project.workingDirectory),
     coords,
-    isWorkspace: inputs.length > 1
+    isWorkspace: false
   })
 }
