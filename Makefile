@@ -23,6 +23,8 @@ PROTOC = node_modules/.bin/protobuf/bin/protoc
 SCENE_PROTO_FILES := $(wildcard node_modules/@dcl/protocol/proto/decentraland/kernel/apis/*.proto)
 PBS_TS = $(SCENE_PROTO_FILES:node_modules/@dcl/protocol/proto/decentraland/kernel/apis/%.proto=scripts/rpc-api-generation/src/proto/%.gen.ts)
 
+UPDATE_PROTOCOL_VERSION := @dcl/protocol@next
+
 # this DEVELOPER_MODE is important to not send developer's events to the same segment
 # stream as the production ones. Look for it's usage on the analytics component
 export DEVELOPER_MODE=true
@@ -32,8 +34,8 @@ install:
 	make node_modules/.bin/protobuf/bin/protoc
 
 update-protocol:
-	npm i --save-exact @dcl/protocol@next
-	cd packages/@dcl/sdk-commands; npm i --save-exact @dcl/protocol@next
+	npm i --save-exact $(UPDATE_PROTOCOL_VERSION)
+	cd packages/@dcl/sdk-commands; npm i --save-exact $(UPDATE_PROTOCOL_VERSION)
 	$(MAKE) sync-deps compile_apis
 
 update-renderer:

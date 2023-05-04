@@ -65,6 +65,15 @@ export const enum AvatarAnchorPointType {
 export const AvatarAttach: LastWriteWinElementSetComponentDefinition<PBAvatarAttach>;
 
 // @public (undocumented)
+export const AvatarCustomization: LastWriteWinElementSetComponentDefinition<PBAvatarCustomization>;
+
+// @public (undocumented)
+export const AvatarEmoteCommand: LastWriteWinElementSetComponentDefinition<PBAvatarEmoteCommand>;
+
+// @public (undocumented)
+export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
+
+// @public (undocumented)
 export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>;
 
 // @public (undocumented)
@@ -479,6 +488,9 @@ export const componentDefinitionByName: {
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
     "core::AvatarAttach": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarAttach>>;
+    "core::AvatarCustomization": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarCustomization>>;
+    "core::AvatarEmoteCommand": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEmoteCommand>>;
+    "core::AvatarEquippedData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>>;
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
@@ -491,6 +503,7 @@ export const componentDefinitionByName: {
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
+    "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
     "core::PointerLock": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerLock>>;
@@ -1847,6 +1860,36 @@ export interface PBAvatarAttach {
 }
 
 // @public (undocumented)
+export interface PBAvatarCustomization {
+    // (undocumented)
+    bodyShapeUrn: string;
+    // (undocumented)
+    eyesColor: PBColor4 | undefined;
+    // (undocumented)
+    hairColor: PBColor4 | undefined;
+    // (undocumented)
+    skinColor: PBColor4 | undefined;
+}
+
+// @public (undocumented)
+export interface PBAvatarEmoteCommand {
+    // (undocumented)
+    emoteUrn: string;
+    // (undocumented)
+    loop: boolean;
+    // (undocumented)
+    timestamp: number;
+}
+
+// @public (undocumented)
+export interface PBAvatarEquippedData {
+    // (undocumented)
+    emotes: string[];
+    // (undocumented)
+    urns: string[];
+}
+
+// @public (undocumented)
 export interface PBAvatarModifierArea {
     area: PBVector3 | undefined;
     excludeIds: string[];
@@ -2046,6 +2089,11 @@ export interface PBNftShape {
     color?: PBColor3 | undefined;
     src: string;
     style?: NftFrameType | undefined;
+}
+
+// @public (undocumented)
+export interface PBPlayerIdentityData {
+    address: string;
 }
 
 // @public (undocumented)
@@ -2379,6 +2427,9 @@ export namespace Plane {
     export function signedDistanceToPlaneFromPositionAndNormal(origin: Vector3.ReadonlyVector3, normal: Vector3.ReadonlyVector3, point: Vector3.ReadonlyVector3): number;
     export function transform(plane: ReadonlyPlane, transformation: Matrix.ReadonlyMatrix): MutablePlane;
 }
+
+// @public (undocumented)
+export const PlayerIdentityData: LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>;
 
 // @public (undocumented)
 export const PointerEvents: LastWriteWinElementSetComponentDefinition<PBPointerEvents>;
