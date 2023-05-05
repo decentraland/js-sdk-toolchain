@@ -26,5 +26,7 @@ describe('Generated VideoEvent ProtoBuf', () => {
       videoLength: 50,
       currentOffset: 13
     })
+
+    testSchemaSerializationIdentity(VideoEvent.schema, VideoEvent.schema.create())
   })
 })
