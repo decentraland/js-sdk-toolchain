@@ -35,8 +35,8 @@
   --contexify-separator-margin: 5px;
   --contexify-itemContent-padding: 6px;
   --contexify-activeItem-radius: 4px;
-  --contexify-item-color: #333;
-  --contexify-activeItem-color: #333;
+  --contexify-item-color: var(--vscode-dropdown-foreground, #333);
+  --contexify-activeItem-color: var(--vscode-dropdown-foreground, #333);
   --contexify-activeItem-bgColor: var(--dropdown-hover-bg-color);
   --contexify-rightSlot-color: #6f6e77;
   --contexify-activeRightSlot-color: #fff;

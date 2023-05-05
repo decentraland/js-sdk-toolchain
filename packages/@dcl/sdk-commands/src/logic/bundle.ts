@@ -6,7 +6,7 @@ import child_process from 'child_process'
 import esbuild from 'esbuild'
 import { future } from 'fp-future'
 import { globSync } from 'glob'
-import { dirname, join } from 'path'
+import path from 'path'
 import { pathToFileURL } from 'url'
 import { CliComponents } from '../components'
 import { colors } from '../components/log'
@@ -40,7 +40,7 @@ export type CompileOptions = {
 const MAX_STEP = 2
 
 export async function bundleProject(components: BundleComponents, options: CompileOptions, sceneJson: Scene) {
-  const tsconfig = join(options.workingDirectory, 'tsconfig.json')
+  const tsconfig = path.join(options.workingDirectory, 'tsconfig.json')
 
   /* istanbul ignore if */
   if (!options.single && !sceneJson.main) {
@@ -63,7 +63,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
   if (!input.length) throw new CliError(`There are no input files to build: ${options.single ?? 'src/index.ts'}`)
 
   const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
-  const outfile = join(options.workingDirectory, output)
+  const outfile = path.join(options.workingDirectory, output)
 
   printProgressStep(components.logger, `Bundling file ${colors.bold(input.join(','))}`, 1, MAX_STEP)
 
@@ -74,7 +74,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
     format: 'cjs',
     preserveSymlinks: false,
     outfile: input.length > 1 ? undefined : outfile,
-    outdir: input.length > 1 ? dirname(outfile) : undefined,
+    outdir: input.length > 1 ? path.dirname(outfile) : undefined,
     allowOverwrite: false,
     sourcemap: options.production ? 'external' : 'inline',
     minify: options.production,
@@ -87,7 +87,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
     target: 'es2020',
     external: ['~system/*', '@dcl/inspector', '@dcl/inspector/*' /* ban importing the inspector from the SDK */],
     // convert filesystem paths into file:// to enable VSCode debugger
-    sourceRoot: pathToFileURL(dirname(outfile)).toString(),
+    sourceRoot: pathToFileURL(path.dirname(outfile)).toString(),
     define: {
       document: 'undefined',
       window: 'undefined',
@@ -95,7 +95,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
       'globalThis.DEBUG': options.production ? 'false' : 'true',
       'process.env.NODE_ENV': JSON.stringify(options.production ? 'production' : 'development')
     },
-    tsconfig: join(options.workingDirectory, 'tsconfig.json'),
+    tsconfig: path.join(options.workingDirectory, 'tsconfig.json'),
     supported: {
       'import-assertions': false,
       'import-meta': false,
@@ -196,7 +196,11 @@ function compositeLoader(components: BundleComponents, options: CompileOptions):
       build.onLoad({ filter: /.*/, namespace: 'sdk-composite' }, async (_) => {
         if (shouldReload) {
           if (!options.ignoreComposite) {
-            const data = await getAllComposite(components, options)
+            const data = await getAllComposites(
+              components,
+              // we pass the build.initialOptions.absWorkingDir to build projects with multiple roots at once
+              build.initialOptions.absWorkingDir ?? options.workingDirectory
+            )
             contents = `export const compositeFromLoader = {${data.compositeLines.join(',')}}`
             watchFiles = data.watchFiles
           }
@@ -213,15 +217,15 @@ function compositeLoader(components: BundleComponents, options: CompileOptions):
   }
 }
 
-async function getAllComposite(
+async function getAllComposites(
   components: BundleComponents,
-  options: CompileOptions
+  workingDirectory: string
 ): Promise<{ watchFiles: string[]; compositeLines: string[] }> {
   const composites: Record<string, Uint8Array> = {}
-  const files = globSync('**/*.{composite,composite.bin}', { cwd: options.workingDirectory })
+  const files = globSync('**/*.{composite,composite.bin}', { cwd: workingDirectory })
 
   for (const file of files) {
-    composites[file] = await components.fs.readFile(file)
+    composites[file] = await components.fs.readFile(path.join(workingDirectory, file))
   }
 
   const watchFiles = Object.keys(composites)
