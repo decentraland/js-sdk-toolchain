@@ -23,7 +23,8 @@ describe('Video events helper system should', () => {
       state: VideoState.VS_LOADING,
       currentOffset: 0,
       videoLength: 5,
-      timestamp: 1
+      timestamp: 1,
+      tickNumber: 1
     })
 
     videoEventsSystem.registerVideoEventsEntity(videoPlayerEntity, fn)
@@ -33,7 +34,8 @@ describe('Video events helper system should', () => {
       state: VideoState.VS_PLAYING,
       currentOffset: 1,
       videoLength: 5,
-      timestamp: 2
+      timestamp: 2,
+      tickNumber: 1
     })
 
     await engine.update(1)
@@ -51,7 +53,8 @@ describe('Video events helper system should', () => {
       state: VideoState.VS_LOADING,
       currentOffset: 0,
       videoLength: 5,
-      timestamp: 1
+      timestamp: 1,
+      tickNumber: 1
     })
 
     videoEventsSystem.registerVideoEventsEntity(videoPlayerEntity, fn)
@@ -61,7 +64,8 @@ describe('Video events helper system should', () => {
       state: VideoState.VS_PLAYING,
       currentOffset: 1,
       videoLength: 5,
-      timestamp: 2
+      timestamp: 2,
+      tickNumber: 2
     })
 
     await engine.update(1)
@@ -70,7 +74,8 @@ describe('Video events helper system should', () => {
       state: VideoState.VS_PLAYING,
       currentOffset: 1,
       videoLength: 5,
-      timestamp: 2
+      timestamp: 2,
+      tickNumber: 3
     })
 
     await engine.update(1)
@@ -89,7 +94,8 @@ describe('Video events helper system should', () => {
       state: VideoState.VS_LOADING,
       currentOffset: 0,
       videoLength: 5,
-      timestamp: 1
+      timestamp: 1,
+      tickNumber: 1
     })
 
     videoEventsSystem.registerVideoEventsEntity(videoPlayerEntity, fn)
@@ -111,7 +117,8 @@ describe('Video events helper system should', () => {
       state: VideoState.VS_LOADING,
       currentOffset: 0,
       videoLength: 5,
-      timestamp: 1
+      timestamp: 1,
+      tickNumber: 1
     })
 
     videoEventsSystem.registerVideoEventsEntity(videoPlayerEntity, () => {})
@@ -129,7 +136,8 @@ describe('Video events helper system should', () => {
       state: VideoState.VS_LOADING,
       currentOffset: 0,
       videoLength: 5,
-      timestamp: 1
+      timestamp: 1,
+      tickNumber: 1
     })
 
     videoEventsSystem.registerVideoEventsEntity(videoPlayerEntity, () => {})
