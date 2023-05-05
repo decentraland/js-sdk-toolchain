@@ -6,7 +6,7 @@ import { useChange } from './useChange'
 import { useSdk } from './useSdk'
 
 function getEntities(engine: IEngine, component: Component) {
-  return Array.from(engine.getEntitiesWith(component)).map(([entity]) => entity)
+  return Array.from(engine.getEntitiesWith(component), ([entity]) => entity)
 }
 
 export const useEntitiesWith = (getComponent: (components: SdkContextValue['components']) => Component) => {
