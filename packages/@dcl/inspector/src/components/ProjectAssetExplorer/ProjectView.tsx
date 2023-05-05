@@ -1,11 +1,15 @@
 import { useCallback, useState } from 'react'
 import { IoIosArrowDown, IoIosArrowForward, IoIosImage } from 'react-icons/io'
-
-import { Tree } from '../Tree'
-import { AssetNode, AssetNodeFolder } from './types'
 import { AiFillFolder } from 'react-icons/ai'
-import ContextMenu from './ContextMenu'
+
 import { useSdk } from '../../hooks/sdk/useSdk'
+import { fileSystemEvent } from '../../hooks/catalog/useFileSystem'
+import { Tree } from '../Tree'
+import { Modal } from '../Modal'
+import Button from '../Button'
+
+import ContextMenu from './ContextMenu'
+import { AssetNode, AssetNodeFolder } from './types'
 import { getFullNodePath } from './utils'
 
 function noop() {}
@@ -22,8 +26,9 @@ export const ROOT = 'File System'
 export type TreeNode = Omit<AssetNode, 'children'> & { children?: string[] }
 
 function ProjectView({ folders, onImportAsset }: Props) {
-  const [open, setOpen] = useState(new Set<string>())
   const sdk = useSdk()
+  const [open, setOpen] = useState(new Set<string>())
+  const [modal, setModal] = useState<{ isOpen: boolean; value: string } | undefined>(undefined)
   const getTree = useCallback(() => {
     const tree = new Map<string, TreeNode>()
     tree.set(ROOT, { children: folders.map(f => f.name), name: ROOT, type: 'folder', parent: null })
@@ -58,15 +63,48 @@ function ProjectView({ folders, onImportAsset }: Props) {
     setOpen(new Set(open))
   }, [open, setOpen])
 
-  const handleRemove = useCallback((value: string) => {
-    const node = tree.get(value)!
-    sdk?.dataLayer.removeAsset({ path: getFullNodePath(node) })
+  const shouldOpenModal = useCallback((value: string) => {
+    if (!sdk || modal?.isOpen) return false
+    const { GltfContainer } = sdk.components
+    for (const [_, _value] of sdk.engine.getEntitiesWith(GltfContainer)) {
+      if (_value.src === value) {
+        return true
+      }
+    }
+    return false
+  }, [])
+
+  const handleRemove = useCallback(async (value: string) => {
+    const path = getFullNodePath(tree.get(value)!).slice(1)
+    if (shouldOpenModal(path)) return setModal({ isOpen: true, value: path })
+    await removeAsset(path)
   }, [open, setOpen])
+
+  const removeAsset = useCallback(async (path: string) => {
+    if (!sdk) return
+    await sdk.dataLayer.removeAsset({ path })
+    fileSystemEvent.emit('change')
+  }, [])
+
+  const handleConfirm = useCallback(async () => {
+    if (!modal) return
+    await removeAsset(modal.value)
+    setModal(undefined)
+  }, [modal, setModal])
+
+  const handleModalClose = useCallback(() => setModal(undefined), [])
 
   if (!folders.length) return null
 
   return (
     <div className="ProjectView">
+      <Modal isOpen={!!modal?.isOpen} onRequestClose={handleModalClose} className="RemoveAsset">
+        <h2>⚠️ Removing this asset will break some components</h2>
+        <div>
+          <Button type="danger" size="big" onClick={handleConfirm}>Delete anyway</Button>
+          <Button size="big" onClick={handleModalClose}>Cancel</Button>
+        </div>
+      </Modal>
       <MyTree
         className="editor-assets-tree"
         value={ROOT}

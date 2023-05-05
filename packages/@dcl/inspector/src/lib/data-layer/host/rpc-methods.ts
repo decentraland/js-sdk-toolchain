@@ -1,4 +1,4 @@
-import { Transform, Entity, EntityMappingMode, IEngine, Composite, OnChangeFunction, CompositeDefinition } from '@dcl/ecs'
+import { Entity, EntityMappingMode, IEngine, Composite, OnChangeFunction, CompositeDefinition } from '@dcl/ecs'
 
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
 import { getFilesInDirectory } from './fs-utils'
@@ -121,8 +121,6 @@ export async function initRpcMethods(
         const prevValue = await fs.readFile(filePath)
         await fs.rm(filePath)
         undoRedo.addUndoFile([{ prevValue, newValue: null, path: filePath }])
-        const asd = engine.addEntity()
-        Transform.create(asd)
       }
       return {}
     }

@@ -52,7 +52,10 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
     updateInputs(fromComponentValueToInput(componentValue))
   }, [componentValue])
 
-  const validate = useCallback((input: InputType | null): input is InputType => input !== null && validateInput(input), [input, ...deps])
+  const validate = useCallback(
+    (input: InputType | null): input is InputType => input !== null && validateInput(input),
+    [input, ...deps]
+  )
 
   // sync inputs -> engine
   useEffect(() => {
