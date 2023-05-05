@@ -8,7 +8,7 @@ export enum GizmoType {
 }
 
 export function updateSelectedEntity(engine: IEngine) {
-  return function(entity: Entity, updateEngine = false) {
+  return function updateSelectedEntity(entity: Entity) {
     let gizmo = GizmoType.TRANSLATE
 
     // clear selection
@@ -24,7 +24,6 @@ export function updateSelectedEntity(engine: IEngine) {
     if (!Selection.has(entity)) {
       Selection.createOrReplace(entity, { gizmo })
     }
-    if (updateEngine) return engine.update(1)
   }
 }
 

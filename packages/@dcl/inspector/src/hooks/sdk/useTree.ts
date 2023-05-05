@@ -1,10 +1,8 @@
-import { Entity, engine, getComponentEntityTree } from '@dcl/ecs'
+import { Entity } from '@dcl/ecs'
 import { useCallback, useMemo, useState } from 'react'
 import { getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk/tree'
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
-import { changeSelectedEntity, removeSelectedEntities } from '../../lib/utils/gizmo'
-import { isLastWriteWinComponent } from './useComponentValue'
 import { createOperations } from '../../lib/sdk/operations'
 
 /**
@@ -65,64 +63,70 @@ export const useTree = () => {
   )
 
   const addChild = useCallback(
-    (parent: Entity, label: string) => {
+    async (parent: Entity, label: string) => {
       if (!sdk || !operations) return
-      void operations.addChild(parent, label, true)?.then(handleUpdate)
+      operations.addChild(parent, label)
+      await operations.dispatch()
+      handleUpdate()
     },
     [sdk, handleUpdate, operations]
   )
 
   const setParent = useCallback(
-    (entity: Entity, parent: Entity) => {
-      if (entity === ROOT || !sdk) return
-      const { EntityNode, Transform, Toggle } = sdk.components
-
-      EntityNode.getOrCreateMutable(entity).parent = parent
-
-      const transform = Transform.getMutableOrNull(entity)
-      if (transform) transform.parent = parent
-
+    async (entity: Entity, parent: Entity) => {
+      if (entity === ROOT || !sdk || !operations) return
+      const { Toggle } = sdk.components
+      operations.setParent(entity, parent)
       Toggle.createOrReplace(parent)
+      await operations.dispatch()
       handleUpdate()
     },
     [sdk, handleUpdate]
   )
 
   const rename = useCallback(
-    (entity: Entity, label: string) => {
+    async (entity: Entity, label: string) => {
       if (entity === ROOT || !sdk || !operations) return
       const { EntityNode } = sdk.components
-      void operations.updateValue(entity, EntityNode, { label }, true)?.then(handleUpdate)
+      operations.updateValue(entity, EntityNode, { label })
+      await operations.dispatch()
+      handleUpdate()
     },
     [sdk, handleUpdate, operations]
   )
 
   const remove = useCallback(
-    (entity: Entity) => {
+    async (entity: Entity) => {
       if (entity === ROOT || !operations) return
-      void operations.removeEntity(entity, true)?.then(handleUpdate)
+      operations.removeEntity(entity)
+      await operations.dispatch()
+      handleUpdate()
     },
     [operations, handleUpdate]
   )
 
   const toggle = useCallback(
-    (entity: Entity, open: boolean) => {
-      if (!sdk) return
-      if (entity === ROOT) return removeSelectedEntities(sdk.engine)
+    async (entity: Entity, open: boolean) => {
+      if (!sdk || !operations) return
+      if (entity === ROOT) {
+        operations.removeSelectedEntities()
+        await operations.dispatch()
+      } else {
+        operations.updateSelectedEntity(entity)
 
-      void operations?.updateSelectedEntity(entity)
-
-      // TODO: why we have a toggle component?
-      // If it's a flag maybe we can use a state ?
-      const { Toggle } = sdk.components
-      if (open) {
-        Toggle.createOrReplace(entity)
-      } else if (Toggle.has(entity)) {
-        Toggle.deleteFrom(entity)
+        // TODO: why we have a toggle component?
+        // If it's a flag maybe we can use a state ?
+        const { Toggle } = sdk.components
+        if (open) {
+          Toggle.createOrReplace(entity)
+        } else if (Toggle.has(entity)) {
+          Toggle.deleteFrom(entity)
+        }
+        // END TODO.
       }
-      // END TODO.
 
-      void operations?.dispatch().then(handleUpdate)
+      await operations.dispatch()
+      handleUpdate()
     },
     [sdk, handleUpdate]
   )
