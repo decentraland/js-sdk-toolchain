@@ -2333,6 +2333,7 @@ export interface PBVideoEvent {
     currentOffset: number;
     // (undocumented)
     state: VideoState;
+    tickNumber: number;
     timestamp: number;
     // (undocumented)
     videoLength: number;
