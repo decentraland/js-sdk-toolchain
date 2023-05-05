@@ -7,7 +7,7 @@ EVAL test/snapshots/production-bundles/composite.js
   REQUIRE: buffer
   REQUIRE: long
   OPCODES ~= 30k
-  MALLOC_COUNT = 7945
+  MALLOC_COUNT = 7934
   ALIVE_OBJS_DELTA ~= 1.66k
 CALL onStart()
   OPCODES ~= 0k
