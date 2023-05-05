@@ -41,6 +41,9 @@ export type Events = {
     coords: { x: number; y: number }
     isWorld: boolean
     dependencies: string[]
+    sceneId: string
+    targetContentServer: string
+    worldName: string | undefined
   }
   'Scene deploy failure': {
     projectHash: string
