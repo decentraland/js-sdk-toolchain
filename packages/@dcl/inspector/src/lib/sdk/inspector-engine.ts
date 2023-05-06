@@ -9,7 +9,9 @@ import { createComponents, createEditorComponents } from './components'
 import { serializeCrdtMessages } from './crdt-logger'
 import { SdkContextEvents, SdkContextValue } from './context'
 
-export function createInspectorEngine(dataLayer: DataLayerRpcClient): Omit<SdkContextValue, 'scene' | 'dataLayer'> {
+export function createInspectorEngine(
+  dataLayer: DataLayerRpcClient
+): Omit<SdkContextValue, 'scene' | 'dataLayer' | 'operations'> {
   const events = mitt<SdkContextEvents>()
   const engine = Engine({
     onChangeFunction: (entity, operation, component, value) =>

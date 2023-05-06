@@ -18,6 +18,7 @@ import { putMeshRendererComponent } from './sdkComponents/mesh-renderer'
 import { putTransformComponent } from './sdkComponents/transform'
 import { consumeAllMessagesInto } from '../../logic/consume-stream'
 import { putSceneComponent } from './editorComponents/scene'
+import { createOperations } from '../../sdk/operations'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -40,6 +41,8 @@ export class SceneContext {
       this.processEcsChange(entity, op, component)
     }
   })
+
+  operations = createOperations(this.engine)
 
   Billboard = components.Billboard(this.engine)
   Transform = components.Transform(this.engine)
@@ -168,7 +171,7 @@ export class SceneContext {
     }
     this.rootNode.parent = null
     this.rootNode.dispose()
-    }
+  }
 
   async connectCrdtTransport(crdtStream: DataLayerRpcClient['crdtStream']) {
     const outgoingMessages = new AsyncQueue<CrdtStreamMessage>((_, _action) => {

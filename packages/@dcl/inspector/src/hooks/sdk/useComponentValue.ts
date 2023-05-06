@@ -4,7 +4,6 @@ import { Component } from '../../lib/sdk/components'
 import { useChange } from './useChange'
 import { isEqual } from '../../lib/data-layer/host/utils/component'
 import { useSdk } from './useSdk'
-import updateValue from '../../lib/sdk/operations/update-value'
 
 export function isLastWriteWinComponent<T = unknown>(
   component: Component
@@ -33,7 +32,8 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
       return
     }
     if (isLastWriteWinComponent(component) && sdk) {
-      updateValue(sdk.engine)(entity, component, value!, true)
+      sdk.operations.updateValue(entity, component, value!)
+      void sdk.operations.dispatch()
     } else {
       // TODO: handle update for GrowOnlyValueSetComponentDefinition
       debugger

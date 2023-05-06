@@ -166,6 +166,8 @@ export function interactWithScene(
 
   if (entity && pointerEvent === 'pointerDown') {
     const context = entity.context.deref()!
-    updateSelectedEntity(context.engine)(entity.entityId, true)
+    // TODO: pass operations as a parameter
+    updateSelectedEntity(context.engine)(entity.entityId)
+    void context.engine.update(1)
   }
 }

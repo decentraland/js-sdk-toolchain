@@ -1,9 +1,8 @@
 import { Entity } from '@dcl/ecs'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk/tree'
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
-import { createOperations } from '../../lib/sdk/operations'
 
 /**
  * Used to get a tree and the functions to work with it
@@ -32,7 +31,6 @@ export const useTree = () => {
   useChange(handleUpdate)
 
   const getId = useCallback((entity: Entity) => entity.toString(), [])
-  const operations = useMemo(() => sdk && createOperations(sdk.engine), [sdk])
 
   const getChildren = useCallback(
     (entity: Entity): Entity[] => {
@@ -64,21 +62,21 @@ export const useTree = () => {
 
   const addChild = useCallback(
     async (parent: Entity, label: string) => {
-      if (!sdk || !operations) return
-      operations.addChild(parent, label)
-      await operations.dispatch()
+      if (!sdk) return
+      sdk.operations.addChild(parent, label)
+      await sdk.operations.dispatch()
       handleUpdate()
     },
-    [sdk, handleUpdate, operations]
+    [sdk, handleUpdate]
   )
 
   const setParent = useCallback(
     async (entity: Entity, parent: Entity) => {
-      if (entity === ROOT || !sdk || !operations) return
+      if (entity === ROOT || !sdk) return
       const { Toggle } = sdk.components
-      operations.setParent(entity, parent)
+      sdk.operations.setParent(entity, parent)
       Toggle.createOrReplace(parent)
-      await operations.dispatch()
+      await sdk.operations.dispatch()
       handleUpdate()
     },
     [sdk, handleUpdate]
@@ -86,33 +84,33 @@ export const useTree = () => {
 
   const rename = useCallback(
     async (entity: Entity, label: string) => {
-      if (entity === ROOT || !sdk || !operations) return
+      if (entity === ROOT || !sdk) return
       const { EntityNode } = sdk.components
-      operations.updateValue(entity, EntityNode, { label })
-      await operations.dispatch()
+      sdk.operations.updateValue(entity, EntityNode, { label })
+      await sdk.operations.dispatch()
       handleUpdate()
     },
-    [sdk, handleUpdate, operations]
+    [sdk, handleUpdate]
   )
 
   const remove = useCallback(
     async (entity: Entity) => {
-      if (entity === ROOT || !operations) return
-      operations.removeEntity(entity)
-      await operations.dispatch()
+      if (entity === ROOT || !sdk) return
+      sdk.operations.removeEntity(entity)
+      await sdk.operations.dispatch()
       handleUpdate()
     },
-    [operations, handleUpdate]
+    [sdk, handleUpdate]
   )
 
   const toggle = useCallback(
     async (entity: Entity, open: boolean) => {
-      if (!sdk || !operations) return
+      if (!sdk) return
       if (entity === ROOT) {
-        operations.removeSelectedEntities()
-        await operations.dispatch()
+        sdk.operations.removeSelectedEntities()
+        await sdk.operations.dispatch()
       } else {
-        operations.updateSelectedEntity(entity)
+        sdk.operations.updateSelectedEntity(entity)
 
         // TODO: why we have a toggle component?
         // If it's a flag maybe we can use a state ?
@@ -125,7 +123,7 @@ export const useTree = () => {
         // END TODO.
       }
 
-      await operations.dispatch()
+      await sdk.operations.dispatch()
       handleUpdate()
     },
     [sdk, handleUpdate]
