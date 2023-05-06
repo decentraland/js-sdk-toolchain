@@ -185,7 +185,7 @@ export class SceneContext {
         Array.from(serializeCrdtMessages('DataLayer>Babylon', message, engine)).forEach(($) => console.log($))
       }
       transport.onmessage!(message)
-      engine.update(1)
+      void engine.update(1)
     }
 
     consumeAllMessagesInto(crdtStream(outgoingMessages), onMessage, outgoingMessages.close).catch((e) => {
