@@ -5,12 +5,14 @@ import addChild from './add-child'
 import updateSelectedEntity from './update-selected-entity'
 import setParent from './set-parent'
 import removeSelectedEntities from './remove-selected-entities'
+import addAsset from './add-asset'
 
 export function createOperations(engine: IEngine) {
   return {
     removeEntity: removeEntity(engine),
     updateValue: updateValue(engine),
     addChild: addChild(engine),
+    addAsset: addAsset(engine),
     setParent: setParent(engine),
     updateSelectedEntity: updateSelectedEntity(engine),
     removeSelectedEntities: removeSelectedEntities(engine),

@@ -33,16 +33,9 @@ const Renderer: React.FC = () => {
 
   const addAsset = async (asset: AssetNodeItem, position: Vector3) => {
     if (!sdk) return
-    const {
-      engine,
-      components: { EntityNode, Transform, GltfContainer }
-    } = sdk
-    const child = engine.addEntity()
-    EntityNode.create(child, { label: asset.name, parent: ROOT })
-    Transform.create(child, { parent: ROOT, position })
-    GltfContainer.create(child, { src: asset.asset.src })
-    sdk.operations.updateSelectedEntity(child)
-    await engine.update(0)
+    const { operations } = sdk
+    operations.addAsset(ROOT, asset.asset.src, asset.name, position)
+    await operations.dispatch()
   }
 
   const importBuilderAsset = async (asset: IAsset) => {

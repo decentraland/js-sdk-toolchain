@@ -6,11 +6,12 @@ import { createInspectorEngine } from '../../src/lib/sdk/inspector-engine'
 import { createLocalDataLayerRpcClient } from '../../src/lib/data-layer/client/local-data-layer'
 import { feededFileSystem } from '../../src/lib/data-layer/client/feeded-local-fs'
 import { DataLayerRpcClient } from '../../src/lib/data-layer/types'
+import { createOperations } from '../../src/lib/sdk/operations'
 
 export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
   let sceneCtx: SceneContext
   let dataLayer: DataLayerRpcClient
-  let inspector: Omit<SdkContextValue, 'scene' | 'dataLayer'>
+  let inspector: Omit<SdkContextValue, 'scene' | 'dataLayer' | 'operations'>
 
   beforeAll(async () => {
     const fs = await feededFileSystem({})
@@ -45,7 +46,7 @@ export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
       if (!sceneCtx) throw new Error('You can only access the sceneCtx inside a test')
       return sceneCtx
     },
-    get babylonEngine() {
+    get rendererEngine() {
       if (!sceneCtx) throw new Error('You can only access the sceneCtx inside a test')
       return sceneCtx.engine
     },
@@ -64,13 +65,23 @@ export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
     async updateInspector() {
       await inspector.engine.update(1)
       await getDataLayerEngine().update(1)
-      await sceneCtx.update()
+      await sceneCtx.engine.update(1)
     },
     async updateRenderer() {
-      await sceneCtx.update()
+      await sceneCtx.engine.update(1)
       await getDataLayerEngine().update(1)
       await inspector.engine.update(1)
     },
-    async tick() {}
+    get inspectorOperations() {
+      return createOperations(inspector.engine)
+    },
+    get rendererOperations() {
+      return createOperations(sceneCtx.engine)
+    },
+    async tick() {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 0)
+      })
+    }
   }
 }
