@@ -1,11 +1,6 @@
 import { Entity, IEngine } from '@dcl/ecs'
 import { EditorComponentIds, EditorComponents } from '../components'
-
-export enum GizmoType {
-  TRANSLATE = 0,
-  ROTATE = 1,
-  SCALE = 2
-}
+import { GizmoType } from '../../utils/gizmo'
 
 export function updateSelectedEntity(engine: IEngine) {
   return function updateSelectedEntity(entity: Entity) {

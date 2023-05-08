@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+
 import { snapManager } from '../../lib/babylon/decentraland/snap-manager'
-import { GizmoType } from '../../lib/sdk/operations/update-selected-entity'
+import { GizmoType } from '../../lib/utils/gizmo'
 
 function getSnapValue(gizmo: GizmoType) {
   switch (gizmo) {

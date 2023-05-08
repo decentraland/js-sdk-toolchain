@@ -34,7 +34,6 @@ export function stream(
     transport.onmessage!(message)
     await ctx.engine.update(1)
     addUndoCrdt()
-    console.log('tick finished')
   }
 
   function closeCallback() {

@@ -9,7 +9,7 @@ import {
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import { Layout } from '../utils/layout'
-import { GizmoType } from './operations/update-selected-entity'
+import { GizmoType } from '../utils/gizmo'
 
 export type Component<T = unknown> = ComponentDefinition<T>
 

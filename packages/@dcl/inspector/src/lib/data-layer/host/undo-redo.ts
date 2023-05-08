@@ -40,8 +40,6 @@ export function initUndoRedo(fs: FileSystemInterface, engine: IEngine, getCompos
   const redoList: UndoRedo[] = []
   const crdtAcc: CrdtOperation[] = []
 
-  Object.assign(globalThis, { undoList, redoList, crdtAcc })
-
   function onChange(
     entity: Entity,
     operation: CrdtMessageType,
