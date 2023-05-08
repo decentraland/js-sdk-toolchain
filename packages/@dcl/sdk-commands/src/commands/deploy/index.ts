@@ -147,5 +147,11 @@ export async function main(options: Options) {
   } finally {
     await program?.stop()
   }
-  options.components.analytics.track('Scene deploy success', { ...trackProps, dependencies })
+  options.components.analytics.track('Scene deploy success', {
+    ...trackProps,
+    sceneId: entityId,
+    targetContentServer: catalyst.getContentUrl(),
+    worldName: sceneJson.worldConfiguration?.name,
+    dependencies
+  })
 }
