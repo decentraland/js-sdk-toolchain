@@ -26,8 +26,8 @@ export const Gizmos = withSdk(({ sdk }) => {
 
   const [selection, setSelection] = useComponentValue(entity || ROOT, sdk.components.Selection)
 
-  const handleTranslateGizmo = useCallback(() => setSelection({ gizmo: GizmoType.TRANSLATE }), [setSelection])
-  const handleRotateGizmo = useCallback(() => setSelection({ gizmo: GizmoType.ROTATE }), [setSelection])
+  const handlePositionGizmo = useCallback(() => setSelection({ gizmo: GizmoType.POSITION }), [setSelection])
+  const handleRotationGizmo = useCallback(() => setSelection({ gizmo: GizmoType.ROTATION }), [setSelection])
   const handleScaleGizmo = useCallback(() => setSelection({ gizmo: GizmoType.SCALE }), [setSelection])
 
   const disableGizmos = !entity
@@ -39,14 +39,14 @@ export const Gizmos = withSdk(({ sdk }) => {
   return (
     <div className="Gizmos">
       <ToolbarButton
-        className={cx('gizmo translate', { active: selection?.gizmo === GizmoType.TRANSLATE })}
+        className={cx('gizmo position', { active: selection?.gizmo === GizmoType.POSITION })}
         disabled={disableGizmos}
-        onClick={handleTranslateGizmo}
+        onClick={handlePositionGizmo}
       />
       <ToolbarButton
-        className={cx('gizmo rotate', { active: selection?.gizmo === GizmoType.ROTATE })}
+        className={cx('gizmo rotation', { active: selection?.gizmo === GizmoType.ROTATION })}
         disabled={disableGizmos}
-        onClick={handleRotateGizmo}
+        onClick={handleRotationGizmo}
       />
       <ToolbarButton
         className={cx('gizmo scale', { active: selection?.gizmo === GizmoType.SCALE })}
@@ -59,8 +59,8 @@ export const Gizmos = withSdk(({ sdk }) => {
           <label>Snap</label>
           <SnapToggleIcon className="icon" onClick={toggle} />
         </div>
-        <Snap gizmo={GizmoType.TRANSLATE} />
-        <Snap gizmo={GizmoType.ROTATE} />
+        <Snap gizmo={GizmoType.POSITION} />
+        <Snap gizmo={GizmoType.ROTATION} />
         <Snap gizmo={GizmoType.SCALE} />
       </div>
     </div>
