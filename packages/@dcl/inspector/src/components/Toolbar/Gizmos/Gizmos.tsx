@@ -14,6 +14,7 @@ import { ToolbarButton } from '../ToolbarButton'
 import { Snap } from './Snap'
 
 import './Gizmos.css'
+import { useGizmoAlignment } from '../../../hooks/editor/useGizmoAlignment'
 
 export const Gizmos = withSdk(({ sdk }) => {
   const [showPanel, setShowPanel] = useState(false)
@@ -30,9 +31,18 @@ export const Gizmos = withSdk(({ sdk }) => {
   const handleRotationGizmo = useCallback(() => setSelection({ gizmo: GizmoType.ROTATION }), [setSelection])
   const handleScaleGizmo = useCallback(() => setSelection({ gizmo: GizmoType.SCALE }), [setSelection])
 
+  const {
+    isPositionGizmoWorldAligned,
+    isRotationGizmoWorldAligned,
+    setPositionGizmoWorldAligned,
+    setRotationGizmoWorldAligned
+  } = useGizmoAlignment()
+
   const disableGizmos = !entity
 
   const SnapToggleIcon = isEnabled ? BiCheckboxChecked : BiCheckbox
+  const PositionAlignmentIcon = isPositionGizmoWorldAligned ? BiCheckboxChecked : BiCheckbox
+  const RotationAlignmentIcon = isRotationGizmoWorldAligned ? BiCheckboxChecked : BiCheckbox
 
   const ref = useOutsideClick(handleClosePanel)
 
@@ -59,9 +69,28 @@ export const Gizmos = withSdk(({ sdk }) => {
           <label>Snap</label>
           <SnapToggleIcon className="icon" onClick={toggle} />
         </div>
-        <Snap gizmo={GizmoType.POSITION} />
-        <Snap gizmo={GizmoType.ROTATION} />
-        <Snap gizmo={GizmoType.SCALE} />
+        <div className="snaps">
+          <Snap gizmo={GizmoType.POSITION} />
+          <Snap gizmo={GizmoType.ROTATION} />
+          <Snap gizmo={GizmoType.SCALE} />
+        </div>
+        <div className="title">
+          <label>Align to world</label>
+        </div>
+        <div className="alignment">
+          <label>Position</label>
+          <PositionAlignmentIcon
+            className="icon"
+            onClick={() => setPositionGizmoWorldAligned(!isPositionGizmoWorldAligned)}
+          />
+        </div>
+        <div className="alignment">
+          <label>Rotation</label>
+          <RotationAlignmentIcon
+            className="icon"
+            onClick={() => setRotationGizmoWorldAligned(!isRotationGizmoWorldAligned)}
+          />
+        </div>
       </div>
     </div>
   )

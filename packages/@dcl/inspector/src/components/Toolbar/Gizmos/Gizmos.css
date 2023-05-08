@@ -69,3 +69,11 @@
   right: -5px;
   top: -5px;
 }
+
+.Gizmos .panel .snaps {
+  margin-bottom: 10px;
+}
+
+.Gizmos .panel .alignment {
+  position: relative;
+}

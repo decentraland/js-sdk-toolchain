@@ -1,3 +1,4 @@
+import mitt from 'mitt'
 import { GizmoManager, IAxisDragGizmo, Scene, Vector3 } from '@babylonjs/core'
 import { memoize } from '../../logic/once'
 import { EcsEntity } from './EcsEntity'
@@ -8,6 +9,9 @@ import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manag
 import { Operations } from '../../sdk/operations'
 
 export const getGizmoManager = memoize((scene: Scene, operations: Operations) => {
+  // events
+  const events = mitt<{ change: void }>()
+
   // Create and initialize gizmo
   const gizmoManager = new GizmoManager(scene)
   gizmoManager.usePointerToAttachGizmos = false
@@ -18,6 +22,7 @@ export const getGizmoManager = memoize((scene: Scene, operations: Operations) =>
   gizmoManager.rotationGizmoEnabled = false
   gizmoManager.scaleGizmoEnabled = false
   gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh = false
+  gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = true
 
   const layoutManager = getLayoutManager(scene)
 
@@ -71,6 +76,7 @@ export const getGizmoManager = memoize((scene: Scene, operations: Operations) =>
       if (entity === lastEntity) return
       gizmoManager.attachToNode(entity)
       lastEntity = entity
+      events.emit('change')
     },
     getEntity() {
       return lastEntity
@@ -78,6 +84,25 @@ export const getGizmoManager = memoize((scene: Scene, operations: Operations) =>
     unsetEntity() {
       lastEntity = null
       gizmoManager.attachToNode(lastEntity)
+      events.emit('change')
+    },
+    isPositionGizmoWorldAligned() {
+      return !!gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh
+    },
+    setPositionGizmoWorldAligned(worldAligned: boolean) {
+      gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh = worldAligned
+      events.emit('change')
+    },
+    isRotationGizmoWorldAligned() {
+      return !!gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh
+    },
+    setRotationGizmoWorldAligned(worldAligned: boolean) {
+      gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = worldAligned
+      events.emit('change')
+    },
+    onChange: (cb: () => void) => {
+      events.on('change', cb)
+      return () => events.off('change', cb)
     }
   }
 })
