@@ -505,6 +505,7 @@ export const componentDefinitionByName: {
     "core::UiInputResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputResult>>;
     "core::UiText": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiText>>;
     "core::UiTransform": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiTransform>>;
+    "core::VideoEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBVideoEvent>>;
     "core::VideoPlayer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVideoPlayer>>;
     "core::VisibilityComponent": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVisibilityComponent>>;
 };
@@ -2327,6 +2328,18 @@ export interface PBVector3 {
 }
 
 // @public (undocumented)
+export interface PBVideoEvent {
+    // (undocumented)
+    currentOffset: number;
+    // (undocumented)
+    state: VideoState;
+    tickNumber: number;
+    timestamp: number;
+    // (undocumented)
+    videoLength: number;
+}
+
+// @public (undocumented)
 export interface PBVideoPlayer {
     loop?: boolean | undefined;
     playbackRate?: number | undefined;
@@ -3173,7 +3186,48 @@ export type Vector3Type = {
 };
 
 // @public (undocumented)
+export const VideoEvent: GrowOnlyValueSetComponentDefinition<PBVideoEvent>;
+
+// @public (undocumented)
+export interface VideoEventsSystem {
+    // (undocumented)
+    hasVideoEventsEntity(entity: Entity): boolean;
+    // (undocumented)
+    registerVideoEventsEntity(entity: Entity, callback: VideoEventsSystemCallback): void;
+    // (undocumented)
+    removeVideoEventsEntity(entity: Entity): void;
+}
+
+// Warning: (ae-extra-release-tag) The doc comment should not contain more than one release tag
+//
+// @public
+export const videoEventsSystem: VideoEventsSystem;
+
+// @public (undocumented)
+export type VideoEventsSystemCallback = (event: DeepReadonlyObject<PBVideoEvent>) => void;
+
+// @public (undocumented)
 export const VideoPlayer: LastWriteWinElementSetComponentDefinition<PBVideoPlayer>;
+
+// @public (undocumented)
+export const enum VideoState {
+    // (undocumented)
+    VS_BUFFERING = 5,
+    // (undocumented)
+    VS_ERROR = 1,
+    // (undocumented)
+    VS_LOADING = 2,
+    // (undocumented)
+    VS_NONE = 0,
+    // (undocumented)
+    VS_PAUSED = 7,
+    // (undocumented)
+    VS_PLAYING = 4,
+    // (undocumented)
+    VS_READY = 3,
+    // (undocumented)
+    VS_SEEKING = 6
+}
 
 // @public (undocumented)
 export interface VideoTexture {

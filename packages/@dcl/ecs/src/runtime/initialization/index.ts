@@ -8,6 +8,7 @@ import { Task, createTaskSystem } from '../../systems/async-task'
 import { createPointerEventsSystem, PointerEventsSystem } from '../../systems/events'
 import { createInputSystem, IInputSystem } from './../../engine/input'
 import { createRaycastSystem, RaycastSystem } from '../../systems/raycast'
+import { createVideoEventsSystem, VideoEventsSystem } from '../../systems/videoEvents'
 
 /**
  * @public
@@ -47,6 +48,14 @@ export { PointerEventsSystem }
  */
 export const raycastSystem: RaycastSystem = /* @__PURE__ */ createRaycastSystem(engine)
 export { RaycastSystem }
+
+/**
+ * @alpha
+ * @public
+ * Register callback functions to a particular entity on video events.
+ */
+export const videoEventsSystem: VideoEventsSystem = /* @__PURE__ */ createVideoEventsSystem(engine)
+export { VideoEventsSystem }
 
 /**
  * @public
