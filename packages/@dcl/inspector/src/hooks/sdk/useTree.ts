@@ -26,6 +26,7 @@ export const useTree = () => {
   }, [sdk])
 
   const [tree, setTree] = useState(getTree())
+  const entitiesToggle = new Set<Entity>()
 
   useEffect(() => {
     setTree(getTree())
@@ -58,10 +59,8 @@ export const useTree = () => {
 
   const isOpen = useCallback(
     (entity: Entity) => {
-      if (entity === ROOT || !sdk) return true
-      if (!sdk) return false
-      const { Toggle } = sdk.components
-      return Toggle.has(entity)
+      if (entity === ROOT) return true
+      return entitiesToggle.has(entity)
     },
     [sdk]
   )
@@ -79,9 +78,8 @@ export const useTree = () => {
   const setParent = useCallback(
     async (entity: Entity, parent: Entity) => {
       if (entity === ROOT || !sdk) return
-      const { Toggle } = sdk.components
       sdk.operations.setParent(entity, parent)
-      Toggle.createOrReplace(parent)
+      entitiesToggle.add(parent)
       await sdk.operations.dispatch()
       handleUpdate()
     },
@@ -114,19 +112,9 @@ export const useTree = () => {
       if (!sdk) return
       if (entity === ROOT) {
         sdk.operations.removeSelectedEntities()
-        await sdk.operations.dispatch()
       } else {
         sdk.operations.updateSelectedEntity(entity)
-
-        // TODO: why we have a toggle component?
-        // If it's a flag maybe we can use a state ?
-        const { Toggle } = sdk.components
-        if (open) {
-          Toggle.createOrReplace(entity)
-        } else if (Toggle.has(entity)) {
-          Toggle.deleteFrom(entity)
-        }
-        // END TODO.
+        open ? entitiesToggle.add(entity) : entitiesToggle.delete(entity)
       }
 
       await sdk.operations.dispatch()

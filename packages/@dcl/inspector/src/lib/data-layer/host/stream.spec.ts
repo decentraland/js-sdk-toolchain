@@ -33,7 +33,7 @@ describe('Inspector<->DataLayer<->Babylon. [Stream]', () => {
     const entity = rendererEngine.addEntity()
     rendererOperations.updateValue(components.Transform(rendererEngine), entity, {})
 
-    await context.updateRenderer()
+    await rendererOperations.dispatch()
     await tick()
     expect(dataLayerEngine.getComponent(Transform.componentId).get(entity)).toBeDefined()
     expect(rendererEngine.getComponent(Transform.componentId).get(entity)).toBeDefined()
