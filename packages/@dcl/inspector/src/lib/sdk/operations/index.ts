@@ -17,3 +17,5 @@ export function createOperations(engine: IEngine) {
     dispatch: () => engine.update(1)
   }
 }
+
+export type Operations = ReturnType<typeof createOperations>

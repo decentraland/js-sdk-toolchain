@@ -83,6 +83,7 @@ export class SceneContext {
       },
       async send(message) {
         if (stream.closed) return
+        console.log('babylon send:')
         stream.enqueue({ data: message })
         if (message.byteLength) {
           Array.from(serializeCrdtMessages('Babylon>Datalayer', message, engine)).forEach(($) => console.log($))
@@ -180,12 +181,12 @@ export class SceneContext {
     const transport = this.addTransport(outgoingMessages)
     const engine = this.engine
 
-    function onMessage(message: Uint8Array) {
+    async function onMessage(message: Uint8Array) {
       if (message.byteLength) {
         Array.from(serializeCrdtMessages('DataLayer>Babylon', message, engine)).forEach(($) => console.log($))
       }
       transport.onmessage!(message)
-      void engine.update(1)
+      await engine.update(1)
     }
 
     consumeAllMessagesInto(crdtStream(outgoingMessages), onMessage, outgoingMessages.close).catch((e) => {

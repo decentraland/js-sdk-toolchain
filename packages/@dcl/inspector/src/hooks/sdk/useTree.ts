@@ -1,5 +1,6 @@
+import { useCallback, useState, useEffect } from 'react'
 import { Entity } from '@dcl/ecs'
-import { useCallback, useState } from 'react'
+
 import { getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk/tree'
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
@@ -15,15 +16,20 @@ export const useTree = () => {
     if (sdk) {
       const {
         engine,
-        components: { EntityNode }
+        components: { EntityNode },
+        operations
       } = sdk
-      return getTreeFromEngine(engine, EntityNode)
+      return getTreeFromEngine(engine, operations, EntityNode)
     } else {
       return getEmptyTree()
     }
   }, [sdk])
 
   const [tree, setTree] = useState(getTree())
+
+  useEffect(() => {
+    setTree(getTree())
+  }, [sdk])
 
   // Update tree when a change happens in the engine
   // TODO: are we sure about this ? It seems to expensive 🤔
@@ -86,7 +92,7 @@ export const useTree = () => {
     async (entity: Entity, label: string) => {
       if (entity === ROOT || !sdk) return
       const { EntityNode } = sdk.components
-      sdk.operations.updateValue(entity, EntityNode, { label })
+      sdk.operations.updateValue(EntityNode, entity, { label })
       await sdk.operations.dispatch()
       handleUpdate()
     },

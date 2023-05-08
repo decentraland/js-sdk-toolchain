@@ -2,8 +2,8 @@ import { Entity, IEngine, LastWriteWinElementSetComponentDefinition } from '@dcl
 
 export function updateValue(_engine: IEngine) {
   return function updateValue<T = unknown>(
-    entity: Entity,
     component: LastWriteWinElementSetComponentDefinition<T>,
+    entity: Entity,
     data: Partial<T>
   ) {
     const value = component.getOrCreateMutable(entity)

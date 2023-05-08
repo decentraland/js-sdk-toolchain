@@ -31,6 +31,7 @@ export function createInspectorEngine(
     },
     async send(message) {
       if (outgoingMessagesStream.closed) return
+      console.log('inspector send: ')
       outgoingMessagesStream.enqueue({ data: message })
       if (message.byteLength) {
         Array.from(serializeCrdtMessages('Inspector>Datalayer', message, engine)).forEach(($) => console.log($))

@@ -140,7 +140,6 @@ function Tree<T>(_props: Props<T>) {
       onRemove: handleRemove,
       extra: extraContextMenu
     }
-
     return (
       <div ref={ref} className={`Tree ${className || ''}`}>
         <div style={getLevelStyles(level)} className={selected ? 'selected item' : 'item'}>

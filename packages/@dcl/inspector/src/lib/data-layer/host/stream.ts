@@ -29,9 +29,12 @@ export function stream(
   Object.assign(transport, { name: 'DataLayerHost' })
   ctx.engine.addTransport(transport)
 
-  function processMessage(message: Uint8Array) {
+  async function processMessage(message: Uint8Array) {
+    console.log('tick')
     transport.onmessage!(message)
-    void ctx.engine.update(1).then(addUndoCrdt)
+    await ctx.engine.update(1)
+    addUndoCrdt()
+    console.log('tick finished')
   }
 
   function closeCallback() {

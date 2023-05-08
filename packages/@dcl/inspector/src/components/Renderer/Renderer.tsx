@@ -10,13 +10,14 @@ import { useSdk } from '../../hooks/sdk/useSdk'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 import { snapPosition } from '../../lib/babylon/decentraland/snap-manager'
 import { ROOT } from '../../lib/sdk/tree'
-import { updateSelectedEntity } from '../../lib/sdk/operations/update-selected-entity'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { IAsset } from '../AssetsCatalog/types'
 import { getModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 
 import './Renderer.css'
 import { useIsMounted } from '../../hooks/useIsMounted'
+
+const fixedNumber = (val: number) => Math.round(val * 1e2) / 1e2
 
 const Renderer: React.FC = () => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
@@ -27,7 +28,7 @@ const Renderer: React.FC = () => {
 
   const getDropPosition = async () => {
     const pointerCoords = await getPointerCoords(sdk!.scene)
-    return snapPosition(new Vector3(pointerCoords.x, 0, pointerCoords.z))
+    return snapPosition(new Vector3(fixedNumber(pointerCoords.x), 0, fixedNumber(pointerCoords.z)))
   }
 
   const addAsset = async (asset: AssetNodeItem, position: Vector3) => {
@@ -40,7 +41,7 @@ const Renderer: React.FC = () => {
     EntityNode.create(child, { label: asset.name, parent: ROOT })
     Transform.create(child, { parent: ROOT, position })
     GltfContainer.create(child, { src: asset.asset.src })
-    updateSelectedEntity(engine)(child)
+    sdk.operations.updateSelectedEntity(child)
     await engine.update(0)
   }
 

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { CrdtMessageType, DeepReadonly, Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
+import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
+
 import { Component } from '../../lib/sdk/components'
 import { useChange } from './useChange'
 import { isEqual } from '../../lib/data-layer/host/utils/component'
@@ -31,8 +33,14 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
     if (isEqual(component, getComponentValue(entity, component), value)) {
       return
     }
+    const isEqualValue = isEqual(component, getComponentValue(entity, component), value)
+    const sameValue = !recursiveCheck(getComponentValue(entity, component), value, 2)
+    if (sameValue && !isEqualValue) {
+      // TODO: maybe use this isEqual instead of the Uint8Array ?
+      console.log('Aca fallo')
+    }
     if (isLastWriteWinComponent(component) && sdk) {
-      sdk.operations.updateValue(entity, component, value!)
+      sdk.operations.updateValue(component, entity, value!)
       void sdk.operations.dispatch()
     } else {
       // TODO: handle update for GrowOnlyValueSetComponentDefinition
