@@ -1,10 +1,13 @@
 import { Engine, Entity, IEngine, getComponentEntityTree } from '@dcl/ecs'
+
 import { EditorComponents, createEditorComponents } from './components'
 import { getEmptyTree, getTreeFromEngine, ROOT } from './tree'
+import { Operations, createOperations } from './operations'
 
 describe('getTreeFromEngine', () => {
   let engine: IEngine
   let EntityNode: EditorComponents['EntityNode']
+  let operations: Operations
 
   function add(parent?: Entity) {
     const entity = engine.addEntity()
@@ -28,10 +31,11 @@ describe('getTreeFromEngine', () => {
   beforeEach(() => {
     engine = Engine()
     EntityNode = createEditorComponents(engine).EntityNode
+    operations = createOperations(engine)
   })
   describe('when getting a tree from an empty engine', () => {
     it('should return an empty tree', () => {
-      expect(getTreeFromEngine(engine, EntityNode)).toEqual(getEmptyTree())
+      expect(getTreeFromEngine(engine, operations, EntityNode)).toEqual(getEmptyTree())
     })
   })
   describe('when getting a tree from an engine with two sibling entities A and B', () => {
@@ -42,7 +46,7 @@ describe('getTreeFromEngine', () => {
       B = add()
     })
     it('should return a tree with entities A and B as children of ROOT', () => {
-      const tree = getTreeFromEngine(engine, EntityNode)
+      const tree = getTreeFromEngine(engine, operations, EntityNode)
       /**
        * ROOT
        * ├─> A
@@ -59,7 +63,7 @@ describe('getTreeFromEngine', () => {
       B = add(A)
     })
     it('should return a tree with entity A as children of ROOT, and B as children of A', () => {
-      const tree = getTreeFromEngine(engine, EntityNode)
+      const tree = getTreeFromEngine(engine, operations, EntityNode)
       /**
        * ROOT
        * ├─> A
@@ -75,7 +79,7 @@ describe('getTreeFromEngine', () => {
         C = add()
       })
       it('should return a tree with entities A and C as children of ROOT, and B as child of A', () => {
-        const tree = getTreeFromEngine(engine, EntityNode)
+        const tree = getTreeFromEngine(engine, operations, EntityNode)
         /**
          * ROOT
          * ├─> A
@@ -90,7 +94,7 @@ describe('getTreeFromEngine', () => {
           setParent(C, A)
         })
         it('should return a tree with entity A as children of ROOT, and entities B and C as children of A', () => {
-          const tree = getTreeFromEngine(engine, EntityNode)
+          const tree = getTreeFromEngine(engine, operations, EntityNode)
           /**
            * ROOT
            * └─> A
@@ -107,7 +111,7 @@ describe('getTreeFromEngine', () => {
           setParent(C, B)
         })
         it('should return a tree with entity A as children of ROOT, entity B as children of A, and entity C as children of B', () => {
-          const tree = getTreeFromEngine(engine, EntityNode)
+          const tree = getTreeFromEngine(engine, operations, EntityNode)
           /**
            * ROOT
            * └─> A
@@ -123,7 +127,7 @@ describe('getTreeFromEngine', () => {
             remove(A)
           })
           it('should return a tree with entity B as children of ROOT because A does not exist, and entity C as children of B', () => {
-            const tree = getTreeFromEngine(engine, EntityNode)
+            const tree = getTreeFromEngine(engine, operations, EntityNode)
             /**
              * ROOT
              * └─> B
@@ -138,7 +142,7 @@ describe('getTreeFromEngine', () => {
               D = add(C)
             })
             it('should return a tree with entity B as children of ROOT, entity C as children of B, and entity D as children of C', () => {
-              const tree = getTreeFromEngine(engine, EntityNode)
+              const tree = getTreeFromEngine(engine, operations, EntityNode)
               /**
                * ROOT
                * └─> B
@@ -154,7 +158,7 @@ describe('getTreeFromEngine', () => {
                 setParent(B, D)
               })
               it("should return a tree with entity B as children of ROOT (because it can't create a cycle), entity C as children of B, and entity D as children of C", () => {
-                const tree = getTreeFromEngine(engine, EntityNode)
+                const tree = getTreeFromEngine(engine, operations, EntityNode)
                 /**
                  * ROOT
                  * └─> B (stays in the same place because it can't create a cycle)
@@ -170,7 +174,7 @@ describe('getTreeFromEngine', () => {
                   setParent(D, ROOT)
                 })
                 it('should return a tree with entity D as children of ROOT, entity B as children of D, and entity C as children of B', () => {
-                  const tree = getTreeFromEngine(engine, EntityNode)
+                  const tree = getTreeFromEngine(engine, operations, EntityNode)
                   /**
                    * ROOT
                    * └─> D
