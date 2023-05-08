@@ -30,14 +30,16 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
   // sync state -> engine
   useEffect(() => {
     if (value === null) return
-    if (isEqual(component, getComponentValue(entity, component), value)) {
+    const isEqualValue = isEqual(component, getComponentValue(entity, component), value)
+
+    if (isEqualValue) {
       return
     }
-    const isEqualValue = isEqual(component, getComponentValue(entity, component), value)
     const sameValue = !recursiveCheck(getComponentValue(entity, component), value, 2)
     if (sameValue && !isEqualValue) {
-      // TODO: maybe use this isEqual instead of the Uint8Array ?
-      console.log('Aca fallo')
+      console.log(
+        'TODO: maybe use this isEqual instead of the Uint8Array. Value is the same, but not for Uint8Array compare'
+      )
     }
     if (isLastWriteWinComponent(component) && sdk) {
       sdk.operations.updateValue(component, entity, value!)

@@ -83,7 +83,6 @@ export class SceneContext {
       },
       async send(message) {
         if (stream.closed) return
-        console.log('babylon send:')
         stream.enqueue({ data: message })
         if (message.byteLength) {
           Array.from(serializeCrdtMessages('Babylon>Datalayer', message, engine)).forEach(($) => console.log($))
