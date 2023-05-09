@@ -59,7 +59,7 @@ test:
 	make test-inspector
 
 test-inspector:
-	cd ./packages/@dcl/inspector/; ./../../../node_modules/.bin/jest --coverage --detectOpenHandles --colors --config ./jest.config.js $(FILES)
+	cd ./packages/@dcl/inspector/; TS_JEST_TRANSFORMER=true ./../../../node_modules/.bin/jest --coverage --detectOpenHandles --colors --config ./jest.config.js $(FILES)
 
 test-cli:
 	@rm -rf tmp
