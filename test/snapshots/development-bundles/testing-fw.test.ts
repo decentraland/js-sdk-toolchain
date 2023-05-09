@@ -5,7 +5,7 @@ import { withRenderer } from '../helpers/with-renderer'
 import { assert } from '../helpers/assertions'
 export * from '@dcl/sdk'
 
-withRenderer((engine) => {
+export const onServerUpdate = withRenderer((engine) => {
   // this helper creates a second engine and prints all the messages to emulate
   // the renderer counterpart of the CRDT
   const Transform = components.Transform(engine)
