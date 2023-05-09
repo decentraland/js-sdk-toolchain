@@ -11,11 +11,9 @@ export const useGizmoAlignment = () => {
     if (gizmoManagerRef.current) {
       const gm = gizmoManagerRef.current
       if (gm.isPositionGizmoWorldAligned() !== isPositionGizmoWorldAligned) {
-        console.log('updating state position gizmo', gm.isPositionGizmoWorldAligned(), isPositionGizmoWorldAligned)
         setPositionGizmoWorldAligned(gm.isPositionGizmoWorldAligned())
       }
       if (gm.isRotationGizmoWorldAligned() !== isRotationGizmoWorldAligned) {
-        console.log('updating state rotation gizmo', gm.isRotationGizmoWorldAligned(), isRotationGizmoWorldAligned)
         setRotationGizmoWorldAligned(gm.isRotationGizmoWorldAligned())
       }
     }
@@ -24,22 +22,10 @@ export const useGizmoAlignment = () => {
   const updateRenderer = () => {
     if (gizmoManagerRef.current) {
       const gm = gizmoManagerRef.current
-      console.log(
-        'values before updating renderer: position',
-        gm.isPositionGizmoWorldAligned(),
-        isPositionGizmoWorldAligned
-      )
-      console.log(
-        'values before updating renderer: rotation',
-        gm.isRotationGizmoWorldAligned(),
-        isRotationGizmoWorldAligned
-      )
       if (gm.isPositionGizmoWorldAligned() !== isPositionGizmoWorldAligned) {
-        console.log('updating renderer position gizmo', gm.isPositionGizmoWorldAligned(), isPositionGizmoWorldAligned)
         gm.setPositionGizmoWorldAligned(isPositionGizmoWorldAligned)
       }
       if (gm.isRotationGizmoWorldAligned() !== isRotationGizmoWorldAligned) {
-        console.log('updating renderer rotation gizmo', gm.isRotationGizmoWorldAligned(), isRotationGizmoWorldAligned)
         gm.setRotationGizmoWorldAligned(isRotationGizmoWorldAligned)
       }
     }
@@ -50,13 +36,11 @@ export const useGizmoAlignment = () => {
     gizmoManagerRef.current = gm
     updateState()
     return gm.onChange(() => {
-      console.log('renderer changed')
       updateState()
     })
   })
 
   useEffect(() => {
-    console.log('state changed')
     updateRenderer()
   }, [isPositionGizmoWorldAligned, isRotationGizmoWorldAligned])
 
