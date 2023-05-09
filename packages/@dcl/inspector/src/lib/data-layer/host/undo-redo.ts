@@ -9,6 +9,7 @@ import {
 import upsertAsset from './upsert-asset'
 import { FileSystemInterface } from '../types'
 import { findPrevValue } from './utils/component'
+import { EditorComponentIds } from '../../sdk/components'
 
 export type UndoRedoCrdt = { $case: 'crdt'; operations: CrdtOperation[] }
 export type CrdtOperation = {
@@ -120,7 +121,7 @@ export function initUndoRedo(fs: FileSystemInterface, engine: IEngine, getCompos
     addUndoCrdt() {
       // TODO: when we delete an entity it's sending a delete EntityNode that idk from where its comming
       // and its breaking the whole undo/redo logic.
-      const lostEntityNodeBug = crdtAcc.length === 1 && crdtAcc[0].componentName === 'editor::EntityNode'
+      const lostEntityNodeBug = crdtAcc.length === 1 && crdtAcc[0].componentName === EditorComponentIds.EntityNode
       const changes = getAndCleanArray(crdtAcc)
       if (changes.length && !lostEntityNodeBug) {
         getAndCleanArray(redoList)

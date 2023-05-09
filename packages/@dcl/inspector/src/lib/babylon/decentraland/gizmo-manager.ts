@@ -5,8 +5,9 @@ import { Entity } from '@dcl/ecs'
 import { getLayoutManager } from './layout-manager'
 import { inBounds } from '../../utils/layout'
 import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
+import { Operations } from '../../sdk/operations'
 
-export const getGizmoManager = memoize((scene: Scene) => {
+export const getGizmoManager = memoize((scene: Scene, operations: Operations) => {
   // Create and initialize gizmo
   const gizmoManager = new GizmoManager(scene)
   gizmoManager.usePointerToAttachGizmos = false
@@ -41,12 +42,13 @@ export const getGizmoManager = memoize((scene: Scene) => {
     if (lastEntity) {
       const context = lastEntity.context.deref()!
       const parent = context.Transform.getOrNull(lastEntity.entityId)?.parent || (0 as Entity)
-      context.Transform.createOrReplace(lastEntity.entityId, {
+      operations.updateValue(context.Transform, lastEntity.entityId, {
         position: snapPosition(lastEntity.position),
         scale: snapScale(lastEntity.scaling),
         rotation: snapRotation(lastEntity.rotationQuaternion!),
         parent
       })
+      void operations.dispatch()
     }
   }
 

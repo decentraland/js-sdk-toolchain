@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+
 import { snapManager } from '../../lib/babylon/decentraland/snap-manager'
 import { GizmoType } from '../../lib/utils/gizmo'
 

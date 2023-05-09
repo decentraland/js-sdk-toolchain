@@ -10,6 +10,27 @@ import { Container } from '../Container'
 import { Tree } from '../Tree'
 import { ContextMenu } from './ContextMenu'
 
+function HierarchyIcon({ value, hasChildrens, isOpen }: { value: Entity; hasChildrens: boolean; isOpen: boolean }) {
+  if (value === ROOT) {
+    return <span style={{ marginRight: '14px' }} />
+  }
+  if (!hasChildrens) {
+    return (
+      <>
+        <span style={{ marginLeft: '14px' }} />
+        <FiHexagon />
+      </>
+    )
+  }
+  const ArrowComponent = isOpen ? <IoIosArrowDown /> : <IoIosArrowForward />
+  return (
+    <>
+      {ArrowComponent}
+      <FiHexagon />
+    </>
+  )
+}
+
 const Hierarchy: React.FC = () => {
   const {
     addChild,
@@ -27,13 +48,13 @@ const Hierarchy: React.FC = () => {
   } = useTree()
   const selectedEntity = useSelectedEntity()
 
-  const isSelected = useCallback((entity: Entity) => {
+  const isSelected = useCallback(
+    (entity: Entity) => {
       if (entity === ROOT) return !selectedEntity
       return selectedEntity === entity
     },
     [selectedEntity]
   )
-
   return (
     <Container>
       <Tree
@@ -47,17 +68,9 @@ const Hierarchy: React.FC = () => {
         getId={getId}
         getChildren={getChildren}
         getLabel={getLabel}
-        getIcon={(val: Entity) => {
-          const hasChildrens = !!getChildren(val).length
-          if (val === ROOT) {
-            return <span style={{ marginRight: '14px' }} />
-          }
-          if (!hasChildrens) {
-            return <><span style={{ marginLeft: '14px' }} /><FiHexagon /></>
-          }
-          const ArrowComponent = isOpen(val) ? <IoIosArrowDown /> : <IoIosArrowForward/>
-          return <>{ArrowComponent}<FiHexagon /></>
-        }}
+        getIcon={(val: Entity) => (
+          <HierarchyIcon value={val} isOpen={isOpen(val)} hasChildrens={!!getChildren(val).length} />
+        )}
         isOpen={isOpen}
         isSelected={isSelected}
         canRename={canRename}

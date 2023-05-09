@@ -9,7 +9,9 @@ import { createComponents, createEditorComponents } from './components'
 import { serializeCrdtMessages } from './crdt-logger'
 import { SdkContextEvents, SdkContextValue } from './context'
 
-export function createInspectorEngine(dataLayer: DataLayerRpcClient): Omit<SdkContextValue, 'scene' | 'dataLayer'> {
+export function createInspectorEngine(
+  dataLayer: DataLayerRpcClient
+): Omit<SdkContextValue, 'scene' | 'dataLayer' | 'operations'> {
   const events = mitt<SdkContextEvents>()
   const engine = Engine({
     onChangeFunction: (entity, operation, component, value) =>
@@ -43,6 +45,7 @@ export function createInspectorEngine(dataLayer: DataLayerRpcClient): Omit<SdkCo
       Array.from(serializeCrdtMessages('DataLayer>Inspector', message, engine)).forEach(($) => console.log($))
     }
     transport.onmessage!(message)
+    void engine.update(1)
   }
 
   consumeAllMessagesInto(dataLayer.crdtStream(outgoingMessagesStream), onMessage, outgoingMessagesStream.close).catch(

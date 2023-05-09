@@ -16,21 +16,18 @@ export type Component<T = unknown> = ComponentDefinition<T>
 export enum EditorComponentIds {
   EntityNode = 'inspector::Label',
   Selection = 'inspector::Selection',
-  Toggle = 'inspector::Toggle',
   Scene = 'inspector::Scene'
 }
 
 export type EditorComponentsTypes = {
   EntityNode: { label: string; parent: Entity }
   Selection: { gizmo: GizmoType }
-  Toggle: object
   Scene: { layout: Layout }
 }
 
 export type EditorComponents = {
   EntityNode: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['EntityNode']>
   Selection: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Selection']>
-  Toggle: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Toggle']>
   Scene: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Scene']>
 }
 
@@ -60,7 +57,7 @@ export function createComponents(engine: IEngine): SdkComponents {
 
 /* istanbul ignore next */
 export function createEditorComponents(engine: IEngine): EditorComponents {
-  const EntityNode = engine.defineComponent('editor::EntityNode', {
+  const EntityNode = engine.defineComponent(EditorComponentIds.EntityNode, {
     label: Schemas.String,
     parent: Schemas.Entity
   })
@@ -68,8 +65,6 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
   const Selection = engine.defineComponent(EditorComponentIds.Selection, {
     gizmo: Schemas.Int
   })
-
-  const Toggle = engine.defineComponent(EditorComponentIds.Toggle, {})
 
   const Coords = Schemas.Map({
     x: Schemas.Int,
@@ -83,5 +78,5 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     })
   })
 
-  return { Selection, Toggle, Scene, EntityNode }
+  return { Selection, Scene, EntityNode }
 }

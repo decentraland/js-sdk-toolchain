@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react'
 import { BsCaretDown } from 'react-icons/bs'
 import { BiCheckbox, BiCheckboxChecked } from 'react-icons/bi'
 import cx from 'classnames'
+
 import { withSdk } from '../../../hoc/withSdk'
 import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useSelectedEntity } from '../../../hooks/sdk/useSelectedEntity'
@@ -11,6 +12,7 @@ import { ROOT } from '../../../lib/sdk/tree'
 import { GizmoType } from '../../../lib/utils/gizmo'
 import { ToolbarButton } from '../ToolbarButton'
 import { Snap } from './Snap'
+
 import './Gizmos.css'
 
 export const Gizmos = withSdk(({ sdk }) => {

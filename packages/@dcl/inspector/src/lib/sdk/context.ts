@@ -11,6 +11,7 @@ import { getHardcodedLoadableScene } from './test-local-scene'
 import { createInspectorEngine } from './inspector-engine'
 import { DataLayerRpcClient } from '../data-layer/types'
 import { getTransformNodeChecker } from './transform-node'
+import { createOperations } from './operations'
 
 export type SdkContextEvents = {
   change: { entity: Entity; operation: CrdtMessageType; component?: ComponentDefinition<any>; value?: any }
@@ -24,6 +25,7 @@ export type SdkContextValue = {
   events: Emitter<SdkContextEvents>
   dispose(): void
   dataLayer: DataLayerRpcClient
+  operations: ReturnType<typeof createOperations>
 }
 
 export async function createSdkContext(canvas: HTMLCanvasElement, catalog: ITheme[]): Promise<SdkContextValue> {
@@ -63,6 +65,7 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
     events,
     scene,
     dispose,
-    dataLayer
+    dataLayer,
+    operations: createOperations(engine)
   }
 }

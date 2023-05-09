@@ -3,7 +3,7 @@ import { useSdkContext } from '../../hooks/sdk/useSdkContext'
 import { SdkContextValue } from '../../lib/sdk/context'
 
 /**
- * This is used internally to make the SDK context available easily on the usdSdk hook
+ * This is used internally to make the SDK context available easily on the useSdk hook
  */
 export const SdkContext = React.createContext<{
   sdk: SdkContextValue | null
