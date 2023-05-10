@@ -29,7 +29,7 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
   )
   const [isFocused, setIsFocused] = useState(false)
   const [skipSync, setSkipSync] = useState(false)
-  const [monitor, setMonitor] = useState({ isValid: false })
+  const [isValid, setIsValid] = useState(false)
 
   const updateInputs = useCallback((value: InputType | null, skipSync = false) => {
     setSkipSync(skipSync)
@@ -83,9 +83,7 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
   }, [componentValue])
 
   useEffect(() => {
-    setMonitor({
-      isValid: validate(input)
-    })
+    setIsValid(validate(input))
   }, [input, ...deps])
 
   const getProps = useCallback(
@@ -104,5 +102,5 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
     [handleUpdate, handleFocus, handleBlur, input]
   )
 
-  return { getInputProps: getProps, monitor }
+  return { getInputProps: getProps, isValid }
 }

@@ -1,3 +1,4 @@
+import { Entity } from '@dcl/ecs'
 import { useCallback, useState } from 'react'
 import { IoIosArrowDown, IoIosArrowForward, IoIosImage } from 'react-icons/io'
 import { AiFillFolder } from 'react-icons/ai'
@@ -21,6 +22,12 @@ type Props = {
   folders: AssetNodeFolder[]
 }
 
+interface ModalState {
+  isOpen: boolean
+  value: string
+  entities: Entity[]
+}
+
 export const ROOT = 'File System'
 
 export type TreeNode = Omit<AssetNode, 'children'> & { children?: string[] }
@@ -28,7 +35,7 @@ export type TreeNode = Omit<AssetNode, 'children'> & { children?: string[] }
 function ProjectView({ folders, onImportAsset }: Props) {
   const sdk = useSdk()
   const [open, setOpen] = useState(new Set<string>())
-  const [modal, setModal] = useState<{ isOpen: boolean; value: string } | undefined>(undefined)
+  const [modal, setModal] = useState<ModalState | undefined>(undefined)
   const getTree = useCallback(() => {
     const tree = new Map<string, TreeNode>()
     tree.set(ROOT, { children: folders.map(f => f.name), name: ROOT, type: 'folder', parent: null })
@@ -63,32 +70,36 @@ function ProjectView({ folders, onImportAsset }: Props) {
     setOpen(new Set(open))
   }, [open, setOpen])
 
-  const shouldOpenModal = useCallback((value: string) => {
-    if (!sdk || modal?.isOpen) return false
+  const getEntitiesWithAsset = useCallback((value: string): Entity[] => {
+    if (!sdk || modal?.isOpen) return []
+    const entitiesWithAsset: Entity[] = []
     const { GltfContainer } = sdk.components
-    for (const [_, _value] of sdk.engine.getEntitiesWith(GltfContainer)) {
+    for (const [entity, _value] of sdk.engine.getEntitiesWith(GltfContainer)) {
       if (_value.src === value) {
-        return true
+        entitiesWithAsset.push(entity)
       }
     }
-    return false
+    return entitiesWithAsset
   }, [])
 
   const handleRemove = useCallback(async (value: string) => {
     const path = getFullNodePath(tree.get(value)!).slice(1)
-    if (shouldOpenModal(path)) return setModal({ isOpen: true, value: path })
+    const entitiesWithAsset = getEntitiesWithAsset(path)
+    if (entitiesWithAsset.length) return setModal({ isOpen: true, value: path, entities: entitiesWithAsset })
     await removeAsset(path)
   }, [open, setOpen])
 
-  const removeAsset = useCallback(async (path: string) => {
+  const removeAsset = useCallback(async (path: string, entities: Entity[] = []) => {
     if (!sdk) return
-    await sdk.dataLayer.removeAsset({ path })
+    const { dataLayer, components, operations } = sdk
     fileSystemEvent.emit('change')
+    entities.forEach(($) => operations.updateValue(components.GltfContainer, $, { src: '' }))
+    await Promise.all([dataLayer.removeAsset({ path }), operations.dispatch()])
   }, [])
 
   const handleConfirm = useCallback(async () => {
     if (!modal) return
-    await removeAsset(modal.value)
+    await removeAsset(modal.value, modal.entities)
     setModal(undefined)
   }, [modal, setModal])
 

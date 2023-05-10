@@ -1,4 +1,4 @@
 export type Props = {
   label?: string
-  broken?: boolean
+  error?: boolean
 }
