@@ -2,7 +2,7 @@ import mitt from 'mitt'
 import { GizmoManager, IAxisDragGizmo, Scene, Vector3 } from '@babylonjs/core'
 import { memoize } from '../../logic/once'
 import { EcsEntity } from './EcsEntity'
-import { Entity } from '@dcl/ecs'
+import { Entity, TransformType } from '@dcl/ecs'
 import { getLayoutManager } from './layout-manager'
 import { inBounds } from '../../utils/layout'
 import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
@@ -42,17 +42,31 @@ export const getGizmoManager = memoize((scene: Scene, operations: Operations) =>
   dragBehavior(gizmoManager.gizmos.positionGizmo!.zGizmo)
 
   let lastEntity: EcsEntity | null = null
+  let restoreRotationGizmoToLocal = false
+
+  function fixRotationGizmoAlignment(value: TransformType) {
+    const isProportional = value.scale.x === value.scale.y && value.scale.y === value.scale.z
+    if (!isProportional && !isRotationGizmoWorldAligned()) {
+      restoreRotationGizmoToLocal = true
+      setRotationGizmoWorldAligned(true) // set to world
+    } else if (restoreRotationGizmoToLocal && isProportional) {
+      restoreRotationGizmoToLocal = false
+      setRotationGizmoWorldAligned(false) // restore to local
+    }
+  }
 
   function update() {
     if (lastEntity) {
       const context = lastEntity.context.deref()!
       const parent = context.Transform.getOrNull(lastEntity.entityId)?.parent || (0 as Entity)
-      operations.updateValue(context.Transform, lastEntity.entityId, {
+      const value = {
         position: snapPosition(lastEntity.position),
         scale: snapScale(lastEntity.scaling),
         rotation: snapRotation(lastEntity.rotationQuaternion!),
         parent
-      })
+      }
+      fixRotationGizmoAlignment(value)
+      operations.updateValue(context.Transform, lastEntity.entityId, value)
       void operations.dispatch()
     }
   }
@@ -70,6 +84,21 @@ export const getGizmoManager = memoize((scene: Scene, operations: Operations) =>
   snapManager.onChange(updateSnap)
   updateSnap()
 
+  function isPositionGizmoWorldAligned() {
+    return !gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh
+  }
+  function setPositionGizmoWorldAligned(worldAligned: boolean) {
+    gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh = !worldAligned
+    events.emit('change')
+  }
+  function isRotationGizmoWorldAligned() {
+    return !gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh
+  }
+  function setRotationGizmoWorldAligned(worldAligned: boolean) {
+    gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = !worldAligned
+    events.emit('change')
+  }
+
   return {
     gizmoManager,
     setEntity(entity: EcsEntity | null) {
@@ -86,20 +115,11 @@ export const getGizmoManager = memoize((scene: Scene, operations: Operations) =>
       gizmoManager.attachToNode(lastEntity)
       events.emit('change')
     },
-    isPositionGizmoWorldAligned() {
-      return !!gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh
-    },
-    setPositionGizmoWorldAligned(worldAligned: boolean) {
-      gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh = worldAligned
-      events.emit('change')
-    },
-    isRotationGizmoWorldAligned() {
-      return !!gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh
-    },
-    setRotationGizmoWorldAligned(worldAligned: boolean) {
-      gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = worldAligned
-      events.emit('change')
-    },
+    isPositionGizmoWorldAligned,
+    setPositionGizmoWorldAligned,
+    isRotationGizmoWorldAligned,
+    setRotationGizmoWorldAligned,
+    fixRotationGizmoAlignment,
     onChange: (cb: () => void) => {
       events.on('change', cb)
       return () => events.off('change', cb)

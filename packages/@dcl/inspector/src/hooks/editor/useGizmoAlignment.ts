@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { getGizmoManager } from '../../lib/babylon/decentraland/gizmo-manager'
 import { useSdk } from '../sdk/useSdk'
+import { useChange } from '../sdk/useChange'
 
 export const useGizmoAlignment = () => {
   const gizmoManagerRef = useRef<ReturnType<typeof getGizmoManager> | null>(null)
@@ -18,6 +19,18 @@ export const useGizmoAlignment = () => {
       }
     }
   }
+
+  useChange((event, sdk) => {
+    if (gizmoManagerRef.current) {
+      const gm = gizmoManagerRef.current
+      const currentEntity = gm.getEntity()
+      const isSelectedEntity = currentEntity && currentEntity.entityId === event.entity
+      const isTransformComponent = event.component?.componentId === sdk.components.Transform.componentId
+      if (isSelectedEntity && isTransformComponent) {
+        gm.fixRotationGizmoAlignment(event.value)
+      }
+    }
+  })
 
   const updateRenderer = () => {
     if (gizmoManagerRef.current) {
