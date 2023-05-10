@@ -4,7 +4,7 @@ import { GizmoType } from '../../utils/gizmo'
 
 export function updateSelectedEntity(engine: IEngine) {
   return function updateSelectedEntity(entity: Entity) {
-    let gizmo = GizmoType.TRANSLATE
+    let gizmo = GizmoType.POSITION
 
     // clear selection
     const Selection = engine.getComponent(EditorComponentIds.Selection) as EditorComponents['Selection']
