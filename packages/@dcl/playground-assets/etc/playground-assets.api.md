@@ -2052,8 +2052,9 @@ export interface PBMeshRenderer_SphereMesh {
 // @public (undocumented)
 export interface PBNftShape {
     color?: PBColor3 | undefined;
-    src: string;
     style?: NftFrameType | undefined;
+    // (undocumented)
+    urn: string;
 }
 
 // @public (undocumented)
