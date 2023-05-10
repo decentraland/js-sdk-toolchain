@@ -15,6 +15,7 @@ import { Toolbar } from '../Toolbar'
 import './App.css'
 import { Resizable } from '../Resizable'
 import ImportAsset from '../ImportAsset'
+import { fileSystemEvent } from '../../hooks/catalog/useFileSystem'
 
 enum Tab {
   FileSystem = 'FileSystem',
@@ -32,6 +33,11 @@ const App = () => {
     },
     [tab]
   )
+
+  const handleSave = useCallback(() => {
+    setTab(Tab.FileSystem)
+    fileSystemEvent.emit('change')
+  }, [])
 
   return (
     <Resizable type="horizontal" min={300} initial={300}>
@@ -56,7 +62,7 @@ const App = () => {
             <div className="footer-content">
               {tab === Tab.AssetsPack && catalog && <AssetsCatalog value={catalog} />}
               {tab === Tab.FileSystem && <ProjectAssetExplorer onImportAsset={handleTabClick(Tab.Import)} />}
-              {tab === Tab.Import && <ImportAsset onSave={handleTabClick(Tab.FileSystem)} />}
+              {tab === Tab.Import && <ImportAsset onSave={handleSave} />}
             </div>
           )}
           <div className="footer-buttons">

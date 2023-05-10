@@ -3,7 +3,6 @@
   --dropdown-bg-color: var(--vscode-dropdown-background, #D8D8D8);
   --dropdown-border-color: var(--vscode-dropdown-border, #b9b9b9);
   --dropdown-hover-bg-color: var(--vscode-list-hoverBackground, #e4e4e4);
-  --transparent-color: transparent;
   --list-item-bg-color: var(--vscode-list-dropBackground, #36343D);
   --list-item-hover-bg-color: var(--vscode-list-hoverBackground, #504E58);
   --tree-bg-color: var(--vscode-panel-background, #252526);
@@ -17,10 +16,12 @@
 
   /* DCL Colors */
   --primary: #ff2d55;
+  --primary-darker: #cc2443;
 
   /* Color definitions */
   --white: #FFFFFF;
   --black: #000000;
+  --transparent: transparent;
 
   /* Context menu */
   --contexify-zIndex: 999;
@@ -43,6 +44,10 @@
   --contexify-arrow-color: var(--contexify-item-color);
   --contexify-activeArrow-color: var(--contexify-arrow-color);
 
+  /* Modal */
+  --modal-content-bg-color: var(--tree-bg-color);
+  --modal-content-border-color: var(--tree-border-color);
+  --modal-overlay-bg-color: rgba(0, 0, 0, 0.6);
 
   /* Margins */
   --sidebar: 314px

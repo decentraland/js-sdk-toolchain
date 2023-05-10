@@ -1,12 +1,11 @@
-import React from 'react'
-import classNames from 'classnames'
+import cx from 'classnames'
 
 import { PropTypes } from './types'
 import './Button.css'
 
-function Button(props: PropTypes) {
+function Button({ size, type, ...props }: PropTypes) {
   return (
-    <button {...props} className={classNames('Button', props.className)}>
+    <button {...props} className={cx('Button', size, type, props.className)}>
       {props.children}
     </button>
   )

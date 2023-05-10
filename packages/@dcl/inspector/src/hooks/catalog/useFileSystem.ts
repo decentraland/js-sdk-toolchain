@@ -8,8 +8,9 @@ type FileSystemEvent = { change: unknown }
 export const fileSystemEvent = mitt<FileSystemEvent>()
 
 /* istanbul ignore next */
-export const useFileSystem = () => {
+export const useFileSystem = (): [AssetCatalogResponse, boolean] => {
   const [files, setFiles] = useState<AssetCatalogResponse>({ basePath: '', assets: [] })
+  const [init, setInit] = useState(false)
   useSdk(async ({ dataLayer }) => {
     async function fetchFiles() {
       const assets = await dataLayer.getAssetCatalog({})
@@ -17,7 +18,8 @@ export const useFileSystem = () => {
     }
     fileSystemEvent.on('change', fetchFiles)
     await fetchFiles()
+    setInit(true)
   })
 
-  return [files]
+  return [files, init]
 }

@@ -21,7 +21,7 @@ export function createInMemoryStorage(initialFs: Record<string, Buffer> = {}) {
       }
       return content
     },
-    async delete(fileId: string): Promise<boolean> {
+    delete(fileId: string): boolean {
       return storage.delete(fileId)
     },
     storage
@@ -45,7 +45,7 @@ export function createFsInMemory(initialFs: Record<string, Buffer> = {}): FileSy
       return fs.writeFile(filePath.replace(/^\/+/g, ''), content)
     },
     async rm(filePath: string): Promise<void> {
-      await fs.delete(filePath)
+      fs.delete(filePath.replace(/^\/+/g, ''))
     },
     async readdir(dirPath: string): Promise<{ name: string; isDirectory: boolean }[]> {
       const resolvedDirPath = dirPath.replace(/^\/+/g, '').replace(/^\.\/|^\.+/g, '')

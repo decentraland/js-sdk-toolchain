@@ -11,7 +11,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const { Scene } = sdk.components
 
   const hasScene = useHasComponent(entity, Scene)
-  const getInputProps = useComponentInput(entity, Scene, fromScene, toScene, isValidInput)
+  const { getInputProps } = useComponentInput(entity, Scene, fromScene, toScene, isValidInput)
 
   if (!hasScene) {
     return null

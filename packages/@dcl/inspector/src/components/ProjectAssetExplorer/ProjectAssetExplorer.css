@@ -19,3 +19,7 @@
 .ProjectView .with-context-menu {
   height: 100%;
 }
+
+.RemoveAsset.Modal > div button {
+  margin-right: 12px;
+}

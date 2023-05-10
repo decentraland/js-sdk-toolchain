@@ -21,7 +21,7 @@
 .TextField>input {
   width: 100%;
   color: var(--text);
-  background-color: var(--transparent-color);
+  background-color: var(--transparent);
   outline: none;
   border: none;
 }
