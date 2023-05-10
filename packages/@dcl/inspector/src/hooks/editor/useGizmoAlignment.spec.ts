@@ -17,7 +17,7 @@ import mitt from 'mitt'
 import { renderHook } from '@testing-library/react'
 import { act } from 'react-dom/test-utils'
 jest.mock('../../lib/babylon/decentraland/gizmo-manager')
-const getGizmoManagerMock = getGizmoManager as jest.MockedFunction<typeof getGizmoManager>
+const getGizmoManagerMock = getGizmoManager as jest.MockedFn<typeof getGizmoManager>
 const gizmoManagerEvents = mitt()
 const gizmoManagerMock = {
   isPositionGizmoWorldAligned: jest.fn().mockReturnValue(true),
@@ -26,7 +26,7 @@ const gizmoManagerMock = {
   setRotationGizmoWorldAligned: jest.fn(),
   onChange: jest.fn().mockImplementation((cb) => gizmoManagerEvents.on('*', cb))
 }
-getGizmoManagerMock.mockReturnValue(gizmoManagerMock)
+getGizmoManagerMock.mockReturnValue(gizmoManagerMock as unknown as ReturnType<typeof getGizmoManager>)
 
 describe('useGizmoAlignment', () => {
   afterEach(() => {

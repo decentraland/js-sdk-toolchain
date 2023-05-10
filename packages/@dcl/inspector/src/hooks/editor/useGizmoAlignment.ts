@@ -31,8 +31,8 @@ export const useGizmoAlignment = () => {
     }
   }
 
-  useSdk(({ scene }) => {
-    const gm = getGizmoManager(scene)
+  useSdk(({ scene, operations }) => {
+    const gm = getGizmoManager(scene, operations)
     gizmoManagerRef.current = gm
     updateState()
     return gm.onChange(() => {
