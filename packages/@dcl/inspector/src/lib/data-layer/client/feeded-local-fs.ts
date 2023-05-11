@@ -33,7 +33,7 @@ function generateMinimalComposite() {
   tmp.Transform.create(entity, { position: { x: 8, y: 1, z: 8 } })
   tmp.MeshRenderer.setBox(entity)
   cubeIdComponent.create(entity)
-  tmp.EntityNode.create(entity, { label: 'Magic Cube', parent: tmp.engine.RootEntity})
+  tmp.EntityNode.create(entity, { label: 'Magic Cube', parent: tmp.engine.RootEntity })
 
   // scene
   tmp.Scene.create(tmp.engine.RootEntity, {
@@ -87,7 +87,7 @@ function generateMainComposite() {
       a: 1.0
     }
   })
-  tmp.EntityNode.create(entity, { label: 'Magic Cube', parent: tmp.engine.RootEntity})
+  tmp.EntityNode.create(entity, { label: 'Magic Cube', parent: tmp.engine.RootEntity })
 
   const gltfEntity = tmp.engine.addEntity()
   tmp.Transform.create(gltfEntity, {
@@ -99,7 +99,7 @@ function generateMainComposite() {
   })
   tmp.GltfContainer.create(gltfEntity, { src: 'assets/models/test-glb.glb' })
   cubeIdComponent.create(gltfEntity)
-  tmp.EntityNode.create(gltfEntity, { label: 'Gltf Test', parent: tmp.engine.RootEntity})
+  tmp.EntityNode.create(gltfEntity, { label: 'Gltf Test', parent: tmp.engine.RootEntity })
 
   // scene
   tmp.Scene.create(tmp.engine.RootEntity, {
