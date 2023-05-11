@@ -356,11 +356,17 @@ jobs:
       - name: npm run build
         run: npm run build
         working-directory: scene
+        
+      - name: Set Realm Name
+        env:
+          name: "${{ github.head_ref || github.ref }}"
+        run: |
+          echo "REALM_NAME=${name/\//-}" >> $GITHUB_ENV
       - name: export-static
         run: >
           npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_commands_s3_bucket_key }} \
             export-static \
-              --realmName ${{ github.head_ref || github.ref }}-e2e \
+              --realmName ${{ env.REALM_NAME }}-e2e \
               --commsAdapter ws-room:ws-room-service.decentraland.org/rooms/sdk-${{ github.sha }} \
               --baseUrl ${{ secrets.SDK_TEAM_S3_BASE_URL }}/ipfs \
               --dir scene \
