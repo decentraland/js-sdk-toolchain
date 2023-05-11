@@ -5,9 +5,9 @@ import { GizmoType } from '../../lib/utils/gizmo'
 
 function getSnapValue(gizmo: GizmoType) {
   switch (gizmo) {
-    case GizmoType.TRANSLATE:
+    case GizmoType.POSITION:
       return snapManager.getPositionSnap()
-    case GizmoType.ROTATE:
+    case GizmoType.ROTATION:
       return Math.round(snapManager.getRotationSnap() * (180 / Math.PI))
     case GizmoType.SCALE:
       return snapManager.getScaleSnap()
@@ -16,9 +16,9 @@ function getSnapValue(gizmo: GizmoType) {
 
 function setSnapValue(value: number, gizmo: GizmoType) {
   switch (gizmo) {
-    case GizmoType.TRANSLATE:
+    case GizmoType.POSITION:
       return snapManager.setPositionSnap(value)
-    case GizmoType.ROTATE:
+    case GizmoType.ROTATION:
       return snapManager.setRotationSnap(value * (Math.PI / 180))
     case GizmoType.SCALE:
       return snapManager.setScaleSnap(value)

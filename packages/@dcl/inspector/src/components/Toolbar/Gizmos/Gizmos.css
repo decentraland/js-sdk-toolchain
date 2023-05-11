@@ -8,17 +8,17 @@
   height: 100%;
 }
 
-.Gizmos .gizmo.translate {
+.Gizmos .gizmo.position {
   margin-right: 1px;
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
-  background-image: url(./icons/translate.svg);
+  background-image: url(./icons/position.svg);
 }
 
-.Gizmos .gizmo.rotate {
+.Gizmos .gizmo.rotation {
   margin: 0px;
   border-radius: 0px;
-  background-image: url(./icons/rotate.svg);
+  background-image: url(./icons/rotation.svg);
 }
 
 .Gizmos .gizmo.scale {
@@ -68,4 +68,17 @@
   position: absolute;
   right: -5px;
   top: -5px;
+}
+
+.Gizmos .panel .snaps {
+  margin-bottom: 10px;
+}
+
+.Gizmos .panel .alignment {
+  position: relative;
+}
+
+.Gizmos .panel .alignment.disabled .icon {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
