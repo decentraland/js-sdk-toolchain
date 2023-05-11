@@ -360,7 +360,7 @@ jobs:
       - name: Set Realm Name
         run: |
           modified_realm=$(echo "${{ github.head_ref || github.ref }}" | tr '/' '-' | tr -d '@')
-          echo "REALM_NAME=${name/\//-}" >> $GITHUB_ENV
+          echo "REALM_NAME=${modified_realm}" >> $GITHUB_ENV
       - name: export-static
         run: >
           npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_commands_s3_bucket_key }} \
