@@ -1864,11 +1864,11 @@ export interface PBAvatarCustomization {
     // (undocumented)
     bodyShapeUrn: string;
     // (undocumented)
-    eyesColor: PBColor4 | undefined;
+    eyesColor: PBColor3 | undefined;
     // (undocumented)
-    hairColor: PBColor4 | undefined;
+    hairColor: PBColor3 | undefined;
     // (undocumented)
-    skinColor: PBColor4 | undefined;
+    skinColor: PBColor3 | undefined;
 }
 
 // @public (undocumented)

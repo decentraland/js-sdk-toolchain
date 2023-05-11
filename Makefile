@@ -37,6 +37,7 @@ update-protocol:
 	npm i --save-exact $(UPDATE_PROTOCOL_VERSION)
 	cd packages/@dcl/sdk-commands; npm i --save-exact @dcl/protocol@next
 	$(MAKE) sync-deps compile_apis
+	$(MAKE) build update-snapshots
 
 update-renderer:
 	cd packages/@dcl/sdk; npm i --save-exact @dcl/explorer@latest
@@ -139,8 +140,8 @@ deep-clean:
 		packages/@dcl/inspector/node_modules/
 	make clean
 
-update-snapshots: export UPDATE_SNAPSHOTS=true
-update-snapshots: test
+update-snapshots:
+	UPDATE_SNAPSHOTS=true $(MAKE) test TESTARGS=test/snapshots.spec.ts
 
 clean:
 	@echo "> Cleaning all folders"
