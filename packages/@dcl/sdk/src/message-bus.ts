@@ -32,6 +32,7 @@ export class MessageBus {
   emit(message: string, payload: Record<any, any>) {
     const messageToSend = JSON.stringify({ message, payload })
     this.sendRaw(messageToSend)
+    onCommsMessage.notifyObservers({ message: messageToSend, sender: 'self' })
   }
 
   private flush() {

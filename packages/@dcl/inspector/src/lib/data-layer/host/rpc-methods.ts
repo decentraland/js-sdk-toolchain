@@ -100,7 +100,7 @@ export async function initRpcMethods(
     },
     /**
      * Import asset into the file system.
-     * It generates an undo opreation.
+     * It generates an undo operation.
      */
     async importAsset(req) {
       const baseFolder = (req.basePath.length ? req.basePath + '/' : '') + req.assetPackageName + '/'
@@ -112,6 +112,16 @@ export async function initRpcMethods(
         await upsertAsset(fs, filePath, fileContent)
       }
       undoRedo.addUndoFile(undoAcc)
+      return {}
+    },
+    async removeAsset(req) {
+      const filePath = req.path
+      // TODO: remove ALL gltf/glb related files...
+      if (await fs.existFile(filePath)) {
+        const prevValue = await fs.readFile(filePath)
+        await fs.rm(filePath)
+        undoRedo.addUndoFile([{ prevValue, newValue: null, path: filePath }])
+      }
       return {}
     }
   }

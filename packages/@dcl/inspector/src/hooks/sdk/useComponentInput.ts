@@ -20,7 +20,8 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
   component: Component<ComponentValueType>,
   fromComponentValueToInput: (componentValue: ComponentValueType) => InputType,
   fromInputToComponentValue: (input: InputType) => ComponentValueType,
-  isValidInput: (input: InputType) => boolean = () => true
+  validateInput: (input: InputType) => boolean = () => true,
+  deps: unknown[] = []
 ) => {
   const [componentValue, setComponentValue, isEqual] = useComponentValue<ComponentValueType>(entity, component)
   const [input, setInput] = useState<InputType | null>(
@@ -28,6 +29,7 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
   )
   const [isFocused, setIsFocused] = useState(false)
   const [skipSync, setSkipSync] = useState(false)
+  const [isValid, setIsValid] = useState(false)
 
   const updateInputs = useCallback((value: InputType | null, skipSync = false) => {
     setSkipSync(skipSync)
@@ -50,10 +52,15 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
     updateInputs(fromComponentValueToInput(componentValue))
   }, [componentValue])
 
+  const validate = useCallback(
+    (input: InputType | null): input is InputType => input !== null && validateInput(input),
+    [input, ...deps]
+  )
+
   // sync inputs -> engine
   useEffect(() => {
     if (skipSync) return
-    if (input !== null && isValidInput(input)) {
+    if (validate(input)) {
       const newComponentValue = { ...componentValue, ...fromInputToComponentValue(input) }
 
       if (isEqual(newComponentValue)) {
@@ -75,6 +82,10 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
     updateInputs(newInputs, true)
   }, [componentValue])
 
+  useEffect(() => {
+    setIsValid(validate(input))
+  }, [input, ...deps])
+
   const getProps = useCallback(
     (
       path: NestedKey<InputType>
@@ -91,5 +102,5 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
     [handleUpdate, handleFocus, handleBlur, input]
   )
 
-  return getProps
+  return { getInputProps: getProps, isValid }
 }

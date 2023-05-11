@@ -1695,14 +1695,6 @@ export class ObserverEventState {
 // @public (undocumented)
 export type OnChangeFunction = (entity: Entity, operation: CrdtMessageType, component?: ComponentDefinition<any>, componentValue?: any) => void;
 
-// Warning: (ae-missing-release-tag) "onCommsMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const onCommsMessage: Observable<{
-    sender: string;
-    message: string;
-}>;
-
 // Warning: (ae-missing-release-tag) "onEnterScene" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)

@@ -472,7 +472,7 @@ export const onRealmChangedObservable = new Observable<IEvents['onRealmChanged']
 export const onPlayerClickedObservable = new Observable<IEvents['playerClicked']>(createSubscriber('playerClicked'))
 
 /**
- * @interternal
+ * @internal
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed.
  */
 export const onCommsMessage = new Observable<IEvents['comms']>(createSubscriber('comms'))
