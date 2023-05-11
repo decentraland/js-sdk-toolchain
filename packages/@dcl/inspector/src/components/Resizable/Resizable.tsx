@@ -56,9 +56,14 @@ function Resizable(props: React.PropsWithChildren<PropTypes>) {
     }
   }, [])
 
+  const styles = {
+    [css.childs]: value[0] ?? 'auto',
+    [`min-${css.childs}`]: minValue
+  }
+
   return (
     <div className={`Resizable ${props.type}`} onMouseMove={handleDrag}>
-      <div ref={ref} style={{ [css.childs]: value[0] ?? 'auto' }}>{children[0]}</div>
+      <div ref={ref} style={styles}>{children[0]}</div>
       <div className="resize-handle" onMouseDown={() => setDragging(true)} />
       <div style={{ [css.childs]: value[1] ?? 'auto' }}>{children[1]}</div>
     </div>
