@@ -14,6 +14,7 @@ const gizmoManagerMock = {
   getEntity: jest.fn().mockReturnValue({ entityId: mockEntity } as EcsEntity),
   isPositionGizmoWorldAligned: jest.fn().mockReturnValue(true),
   isRotationGizmoWorldAligned: jest.fn().mockReturnValue(true),
+  isRotationGizmoAlignmentDisabled: jest.fn().mockReturnValue(false),
   setPositionGizmoWorldAligned: jest.fn(),
   setRotationGizmoWorldAligned: jest.fn(),
   fixRotationGizmoAlignment: jest.fn(),
@@ -49,11 +50,7 @@ const mockEvent = {
   value: {}
 }
 useChangeMock.mockImplementation((cb) => {
-  cb &&
-    engineEvents.on('*', () => {
-      console.log('EVENTOOO')
-      cb(mockEvent, sdkMock)
-    })
+  cb && engineEvents.on('*', () => cb(mockEvent, sdkMock))
 })
 
 describe('useGizmoAlignment', () => {
@@ -93,8 +90,8 @@ describe('useGizmoAlignment', () => {
       const { setPositionGizmoWorldAligned, setRotationGizmoWorldAligned } = result.current
       expect(result.current.isPositionGizmoWorldAligned).toBe(true)
       expect(result.current.isRotationGizmoWorldAligned).toBe(true)
-      gizmoManagerMock.isPositionGizmoWorldAligned.mockReturnValueOnce(false)
-      gizmoManagerMock.isRotationGizmoWorldAligned.mockReturnValueOnce(false)
+      gizmoManagerMock.isPositionGizmoWorldAligned.mockReturnValue(true)
+      gizmoManagerMock.isRotationGizmoWorldAligned.mockReturnValue(true)
       act(() => {
         setPositionGizmoWorldAligned(false)
         setRotationGizmoWorldAligned(false)
@@ -110,9 +107,12 @@ describe('useGizmoAlignment', () => {
       renderHook(() => useGizmoAlignment())
       gizmoManagerMock.isPositionGizmoWorldAligned.mockClear()
       gizmoManagerMock.isRotationGizmoWorldAligned.mockClear()
+      gizmoManagerMock.isRotationGizmoAlignmentDisabled.mockReset()
+      gizmoManagerMock.isRotationGizmoAlignmentDisabled.mockReturnValue(true)
       gizmoManagerEvents.emit('*')
       expect(gizmoManagerMock.isPositionGizmoWorldAligned).toHaveBeenCalled()
       expect(gizmoManagerMock.isRotationGizmoWorldAligned).toHaveBeenCalled()
+      expect(gizmoManagerMock.isRotationGizmoAlignmentDisabled).toHaveBeenCalled()
     })
   })
   describe('When a change happens in the engine', () => {
