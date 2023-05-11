@@ -77,3 +77,8 @@
 .Gizmos .panel .alignment {
   position: relative;
 }
+
+.Gizmos .panel .alignment.disabled .icon {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

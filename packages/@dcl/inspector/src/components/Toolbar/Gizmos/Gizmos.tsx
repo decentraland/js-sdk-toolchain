@@ -35,7 +35,8 @@ export const Gizmos = withSdk(({ sdk }) => {
     isPositionGizmoWorldAligned,
     isRotationGizmoWorldAligned,
     setPositionGizmoWorldAligned,
-    setRotationGizmoWorldAligned
+    setRotationGizmoWorldAligned,
+    isRotationGizmoAlignmentDisabled
   } = useGizmoAlignment()
 
   const disableGizmos = !entity
@@ -64,7 +65,7 @@ export const Gizmos = withSdk(({ sdk }) => {
         onClick={handleScaleGizmo}
       />
       <BsCaretDown className="open-panel" onClick={handleTogglePanel} />
-      <div ref={ref} className={cx('panel', { visible: showPanel })}>
+      <div ref={ref} className={cx('panel', { visible: true })}>
         <div className="title">
           <label>Snap</label>
           <SnapToggleIcon className="icon" onClick={toggle} />
@@ -84,7 +85,7 @@ export const Gizmos = withSdk(({ sdk }) => {
             onClick={() => setPositionGizmoWorldAligned(!isPositionGizmoWorldAligned)}
           />
         </div>
-        <div className="alignment">
+        <div className={cx('alignment', { disabled: isRotationGizmoAlignmentDisabled })}>
           <label>Rotation</label>
           <RotationAlignmentIcon
             className="icon"

@@ -1,66 +1,88 @@
-import { useEffect, useRef, useState } from 'react'
-import { getGizmoManager } from '../../lib/babylon/decentraland/gizmo-manager'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSdk } from '../sdk/useSdk'
 import { useChange } from '../sdk/useChange'
+import { Gizmos } from '../../lib/babylon/decentraland/gizmo-manager'
 
 export const useGizmoAlignment = () => {
-  const gizmoManagerRef = useRef<ReturnType<typeof getGizmoManager> | null>(null)
+  const gizmosRef = useRef<Gizmos | null>(null)
   const [isPositionGizmoWorldAligned, setPositionGizmoWorldAligned] = useState(false)
   const [isRotationGizmoWorldAligned, setRotationGizmoWorldAligned] = useState(false)
+  const [isRotationGizmoAlignmentDisabled, setIsRotationGizmoAlignmentDisabled] = useState(false)
 
-  const updateState = () => {
-    if (gizmoManagerRef.current) {
-      const gm = gizmoManagerRef.current
-      if (gm.isPositionGizmoWorldAligned() !== isPositionGizmoWorldAligned) {
-        setPositionGizmoWorldAligned(gm.isPositionGizmoWorldAligned())
+  // update rotation gizmo alginment only if is not disabled
+  const safeSetRotationGizmoWorldAligned = useCallback(
+    (value: boolean) => {
+      if (!isRotationGizmoAlignmentDisabled) {
+        setRotationGizmoWorldAligned(value)
       }
-      if (gm.isRotationGizmoWorldAligned() !== isRotationGizmoWorldAligned) {
-        setRotationGizmoWorldAligned(gm.isRotationGizmoWorldAligned())
+    },
+    [isRotationGizmoAlignmentDisabled]
+  )
+
+  // sync from renderer to hook state
+  const updateState = useCallback(() => {
+    if (gizmosRef.current) {
+      const gizmos = gizmosRef.current
+      if (isPositionGizmoWorldAligned !== gizmos.isPositionGizmoWorldAligned()) {
+        setPositionGizmoWorldAligned(gizmos.isPositionGizmoWorldAligned())
+      }
+      if (isRotationGizmoWorldAligned !== gizmos.isRotationGizmoWorldAligned()) {
+        setRotationGizmoWorldAligned(gizmos.isRotationGizmoWorldAligned())
+      }
+      if (isRotationGizmoAlignmentDisabled !== gizmos.isRotationGizmoAlignmentDisabled()) {
+        setIsRotationGizmoAlignmentDisabled(gizmos.isRotationGizmoAlignmentDisabled())
       }
     }
-  }
+  }, [isPositionGizmoWorldAligned, isRotationGizmoWorldAligned, isRotationGizmoAlignmentDisabled])
 
+  // listen to changes in the engine, fix the rotation gizmo alignemnt if necessary
   useChange((event, sdk) => {
-    if (gizmoManagerRef.current) {
-      const gm = gizmoManagerRef.current
-      const currentEntity = gm.getEntity()
+    if (gizmosRef.current) {
+      const gizmos = gizmosRef.current
+      const currentEntity = gizmos.getEntity()
       const isSelectedEntity = currentEntity && currentEntity.entityId === event.entity
       const isTransformComponent = event.component?.componentId === sdk.components.Transform.componentId
       if (isSelectedEntity && isTransformComponent) {
-        gm.fixRotationGizmoAlignment(event.value)
+        gizmos.fixRotationGizmoAlignment(event.value)
       }
     }
-  })
+  }, [])
 
-  const updateRenderer = () => {
-    if (gizmoManagerRef.current) {
-      const gm = gizmoManagerRef.current
-      if (gm.isPositionGizmoWorldAligned() !== isPositionGizmoWorldAligned) {
-        gm.setPositionGizmoWorldAligned(isPositionGizmoWorldAligned)
+  // sync from hook state to renderer
+  const updateRenderer = useCallback(() => {
+    if (gizmosRef.current) {
+      const gizmos = gizmosRef.current
+      if (gizmos.isPositionGizmoWorldAligned() !== isPositionGizmoWorldAligned) {
+        gizmos.setPositionGizmoWorldAligned(isPositionGizmoWorldAligned)
       }
-      if (gm.isRotationGizmoWorldAligned() !== isRotationGizmoWorldAligned) {
-        gm.setRotationGizmoWorldAligned(isRotationGizmoWorldAligned)
+      if (gizmos.isRotationGizmoWorldAligned() !== isRotationGizmoWorldAligned) {
+        gizmos.setRotationGizmoWorldAligned(isRotationGizmoWorldAligned)
       }
     }
-  }
+  }, [isPositionGizmoWorldAligned, isRotationGizmoWorldAligned])
 
-  useSdk(({ scene, operations }) => {
-    const gm = getGizmoManager(scene, operations)
-    gizmoManagerRef.current = gm
-    updateState()
-    return gm.onChange(() => {
-      updateState()
-    })
-  })
+  // bind changes on renderer to update hook state
+  useSdk(
+    ({ gizmos }) => {
+      if (!gizmosRef.current) {
+        gizmosRef.current = gizmos
+        updateState()
+      }
+      return gizmos.onChange(updateState)
+    },
+    [updateState]
+  )
 
+  // bind changes in hook state to update renderer
   useEffect(() => {
     updateRenderer()
-  }, [isPositionGizmoWorldAligned, isRotationGizmoWorldAligned])
+  }, [updateRenderer])
 
   return {
     isPositionGizmoWorldAligned,
     isRotationGizmoWorldAligned,
     setPositionGizmoWorldAligned,
-    setRotationGizmoWorldAligned
+    setRotationGizmoWorldAligned: safeSetRotationGizmoWorldAligned,
+    isRotationGizmoAlignmentDisabled
   }
 }

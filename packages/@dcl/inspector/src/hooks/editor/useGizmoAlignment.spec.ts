@@ -1,26 +1,13 @@
 import { SdkContextValue } from '../../lib/sdk/context'
 import { useGizmoAlignment } from './useGizmoAlignment'
 
-// useSdk mock
-import { useSdk } from '../sdk/useSdk'
-jest.mock('../sdk/useSdk')
-const useSdkMock = useSdk as jest.MockedFunction<typeof useSdk>
-const sdkMock = {
-  scene: {},
-  components: { Transform: { componentId: 'core::Transform' } }
-} as unknown as SdkContextValue
-useSdkMock.mockImplementation((cb) => {
-  cb && cb(sdkMock)
-  return sdkMock
-})
-
 // gizmoManager mock
-import { getGizmoManager } from '../../lib/babylon/decentraland/gizmo-manager'
+import { createGizmoManager } from '../../lib/babylon/decentraland/gizmo-manager'
 import mitt from 'mitt'
 import { renderHook } from '@testing-library/react'
 import { act } from 'react-dom/test-utils'
 jest.mock('../../lib/babylon/decentraland/gizmo-manager')
-const getGizmoManagerMock = getGizmoManager as jest.MockedFn<typeof getGizmoManager>
+const createGizmoManagerMock = createGizmoManager as jest.MockedFn<typeof createGizmoManager>
 const gizmoManagerEvents = mitt()
 const mockEntity = 0 as Entity
 const gizmoManagerMock = {
@@ -32,7 +19,21 @@ const gizmoManagerMock = {
   fixRotationGizmoAlignment: jest.fn(),
   onChange: jest.fn().mockImplementation((cb) => gizmoManagerEvents.on('*', cb))
 }
-getGizmoManagerMock.mockReturnValue(gizmoManagerMock as unknown as ReturnType<typeof getGizmoManager>)
+createGizmoManagerMock.mockReturnValue(gizmoManagerMock as unknown as ReturnType<typeof createGizmoManager>)
+
+// useSdk mock
+import { useSdk } from '../sdk/useSdk'
+jest.mock('../sdk/useSdk')
+const useSdkMock = useSdk as jest.MockedFunction<typeof useSdk>
+const sdkMock = {
+  scene: {},
+  components: { Transform: { componentId: 'core::Transform' } },
+  gizmos: gizmoManagerMock
+} as unknown as SdkContextValue
+useSdkMock.mockImplementation((cb) => {
+  cb && cb(sdkMock)
+  return sdkMock
+})
 
 // useChange mock
 import { useChange } from '../sdk/useChange'
@@ -58,7 +59,7 @@ useChangeMock.mockImplementation((cb) => {
 describe('useGizmoAlignment', () => {
   afterEach(() => {
     useSdkMock.mockClear()
-    getGizmoManagerMock.mockClear()
+    createGizmoManagerMock.mockClear()
     gizmoManagerMock.isPositionGizmoWorldAligned.mockClear()
     gizmoManagerMock.isRotationGizmoWorldAligned.mockClear()
     gizmoManagerMock.setPositionGizmoWorldAligned.mockClear()
