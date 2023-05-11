@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=374.5k bytes
+SCENE_COMPILED_JS_SIZE_PROD=372.9k bytes
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -11,7 +11,7 @@ EVAL test/snapshots/development-bundles/testing-fw.test.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 32k
-  MALLOC_COUNT = 10059
+  MALLOC_COUNT = 10041
   ALIVE_OBJS_DELTA ~= 1.88k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
@@ -64,4 +64,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 4k
   MALLOC_COUNT = -40
   ALIVE_OBJS_DELTA ~= -0.01k
-  MEMORY_USAGE_COUNT ~= 981.86k bytes
+  MEMORY_USAGE_COUNT ~= 979.05k bytes
