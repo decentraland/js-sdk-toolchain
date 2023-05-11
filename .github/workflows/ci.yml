@@ -358,9 +358,8 @@ jobs:
         working-directory: scene
         
       - name: Set Realm Name
-        env:
-          name: "${{ github.head_ref || github.ref }}"
         run: |
+          modified_realm=$(echo "${{ github.head_ref || github.ref }}" | tr '/' '-' | tr -d '@')
           echo "REALM_NAME=${name/\//-}" >> $GITHUB_ENV
       - name: export-static
         run: >
