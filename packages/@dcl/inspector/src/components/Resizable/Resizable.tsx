@@ -5,6 +5,7 @@ import { PropTypes, TypeProps, HORIZONTAL_PROPS, VERTICAL_PROPS } from './types'
 import './Resizable.css'
 
 const getProperties = (type: PropTypes['type']): TypeProps => type === 'horizontal' ? HORIZONTAL_PROPS : VERTICAL_PROPS
+const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1)
 
 function Resizable(props: React.PropsWithChildren<PropTypes>) {
   const ref = useRef<HTMLDivElement>(null)
@@ -58,7 +59,7 @@ function Resizable(props: React.PropsWithChildren<PropTypes>) {
 
   const styles = {
     [css.childs]: value[0] ?? 'auto',
-    [`min-${css.childs}`]: minValue
+    [`min${capitalize(css.childs)}`]: minValue
   }
 
   return (
