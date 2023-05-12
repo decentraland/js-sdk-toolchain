@@ -32,10 +32,10 @@ const Snap: React.FC<Props> = ({ gizmo }) => {
 
   let label = ''
   switch (gizmo) {
-    case GizmoType.TRANSLATE:
+    case GizmoType.POSITION:
       label = 'Position'
       break
-    case GizmoType.ROTATE:
+    case GizmoType.ROTATION:
       label = 'Rotation'
       break
     case GizmoType.SCALE:

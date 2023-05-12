@@ -14,6 +14,7 @@ import { ToolbarButton } from '../ToolbarButton'
 import { Snap } from './Snap'
 
 import './Gizmos.css'
+import { useGizmoAlignment } from '../../../hooks/editor/useGizmoAlignment'
 
 export const Gizmos = withSdk(({ sdk }) => {
   const [showPanel, setShowPanel] = useState(false)
@@ -26,27 +27,37 @@ export const Gizmos = withSdk(({ sdk }) => {
 
   const [selection, setSelection] = useComponentValue(entity || ROOT, sdk.components.Selection)
 
-  const handleTranslateGizmo = useCallback(() => setSelection({ gizmo: GizmoType.TRANSLATE }), [setSelection])
-  const handleRotateGizmo = useCallback(() => setSelection({ gizmo: GizmoType.ROTATE }), [setSelection])
+  const handlePositionGizmo = useCallback(() => setSelection({ gizmo: GizmoType.POSITION }), [setSelection])
+  const handleRotationGizmo = useCallback(() => setSelection({ gizmo: GizmoType.ROTATION }), [setSelection])
   const handleScaleGizmo = useCallback(() => setSelection({ gizmo: GizmoType.SCALE }), [setSelection])
+
+  const {
+    isPositionGizmoWorldAligned,
+    isRotationGizmoWorldAligned,
+    setPositionGizmoWorldAligned,
+    setRotationGizmoWorldAligned,
+    isRotationGizmoAlignmentDisabled
+  } = useGizmoAlignment()
 
   const disableGizmos = !entity
 
   const SnapToggleIcon = isEnabled ? BiCheckboxChecked : BiCheckbox
+  const PositionAlignmentIcon = isPositionGizmoWorldAligned ? BiCheckboxChecked : BiCheckbox
+  const RotationAlignmentIcon = isRotationGizmoWorldAligned ? BiCheckboxChecked : BiCheckbox
 
   const ref = useOutsideClick(handleClosePanel)
 
   return (
     <div className="Gizmos">
       <ToolbarButton
-        className={cx('gizmo translate', { active: selection?.gizmo === GizmoType.TRANSLATE })}
+        className={cx('gizmo position', { active: selection?.gizmo === GizmoType.POSITION })}
         disabled={disableGizmos}
-        onClick={handleTranslateGizmo}
+        onClick={handlePositionGizmo}
       />
       <ToolbarButton
-        className={cx('gizmo rotate', { active: selection?.gizmo === GizmoType.ROTATE })}
+        className={cx('gizmo rotation', { active: selection?.gizmo === GizmoType.ROTATION })}
         disabled={disableGizmos}
-        onClick={handleRotateGizmo}
+        onClick={handleRotationGizmo}
       />
       <ToolbarButton
         className={cx('gizmo scale', { active: selection?.gizmo === GizmoType.SCALE })}
@@ -59,9 +70,28 @@ export const Gizmos = withSdk(({ sdk }) => {
           <label>Snap</label>
           <SnapToggleIcon className="icon" onClick={toggle} />
         </div>
-        <Snap gizmo={GizmoType.TRANSLATE} />
-        <Snap gizmo={GizmoType.ROTATE} />
-        <Snap gizmo={GizmoType.SCALE} />
+        <div className="snaps">
+          <Snap gizmo={GizmoType.POSITION} />
+          <Snap gizmo={GizmoType.ROTATION} />
+          <Snap gizmo={GizmoType.SCALE} />
+        </div>
+        <div className="title">
+          <label>Align to world</label>
+        </div>
+        <div className="alignment">
+          <label>Position</label>
+          <PositionAlignmentIcon
+            className="icon"
+            onClick={() => setPositionGizmoWorldAligned(!isPositionGizmoWorldAligned)}
+          />
+        </div>
+        <div className={cx('alignment', { disabled: isRotationGizmoAlignmentDisabled })}>
+          <label>Rotation</label>
+          <RotationAlignmentIcon
+            className="icon"
+            onClick={() => setRotationGizmoWorldAligned(!isRotationGizmoWorldAligned)}
+          />
+        </div>
       </div>
     </div>
   )

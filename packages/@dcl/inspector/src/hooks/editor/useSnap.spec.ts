@@ -6,12 +6,12 @@ import { snapManager } from '../../lib/babylon/decentraland/snap-manager'
 describe('useSnapState', () => {
   describe('When getting the snap value', () => {
     it('should read the snap position value', () => {
-      const { result } = renderHook(() => useSnapState(GizmoType.TRANSLATE))
+      const { result } = renderHook(() => useSnapState(GizmoType.POSITION))
       const [snap] = result.current
       expect(snap).toBe('0.25')
     })
     it('should read the snap rotation value', () => {
-      const { result } = renderHook(() => useSnapState(GizmoType.ROTATE))
+      const { result } = renderHook(() => useSnapState(GizmoType.ROTATION))
       const [snap] = result.current
       expect(snap).toBe('15')
     })
@@ -27,13 +27,13 @@ describe('useSnapState', () => {
     })
     it('should update the snap value from the hook', () => {
       // translate
-      const { result: position } = renderHook(() => useSnapState(GizmoType.TRANSLATE))
+      const { result: position } = renderHook(() => useSnapState(GizmoType.POSITION))
       const [_positionSnap, setPositionSnap] = position.current
       act(() => setPositionSnap('0.5'))
       const [positionSnap] = position.current
       expect(positionSnap).toBe('0.5')
       // translate
-      const { result: rotation } = renderHook(() => useSnapState(GizmoType.ROTATE))
+      const { result: rotation } = renderHook(() => useSnapState(GizmoType.ROTATION))
       const [_rotationSnap, setRotationSnap] = rotation.current
       act(() => setRotationSnap('30'))
       const [rotationSnap] = rotation.current
@@ -46,7 +46,7 @@ describe('useSnapState', () => {
       expect(scaleSnap).toBe('0.5')
     })
     it('should update the snap value in the snap manager', () => {
-      const { result } = renderHook(() => useSnapState(GizmoType.TRANSLATE))
+      const { result } = renderHook(() => useSnapState(GizmoType.POSITION))
       const [_, setSnap] = result.current
       act(() => setSnap('0.5'))
       expect(snapManager.getPositionSnap()).toBe(0.5)
@@ -58,7 +58,7 @@ describe('useSnapState', () => {
       snapManager.setPositionSnap(0.25)
     })
     it('should update the snap value from the hook if the value is different', () => {
-      const { result } = renderHook(() => useSnapState(GizmoType.TRANSLATE))
+      const { result } = renderHook(() => useSnapState(GizmoType.POSITION))
       const [snap1] = result.current
       expect(snap1).toBe('0.25')
       act(() => snapManager.setPositionSnap(0.5))
@@ -66,7 +66,7 @@ describe('useSnapState', () => {
       expect(snap2).toBe('0.5')
     })
     it('should not update the snap value from the hook if the value is the same', () => {
-      const { result } = renderHook(() => useSnapState(GizmoType.TRANSLATE))
+      const { result } = renderHook(() => useSnapState(GizmoType.POSITION))
       const [snap1] = result.current
       expect(snap1).toBe('0.25')
       act(() => snapManager.setPositionSnap(0.25))
