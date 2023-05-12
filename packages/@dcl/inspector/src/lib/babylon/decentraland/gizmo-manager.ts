@@ -59,7 +59,7 @@ export function createGizmoManager(context: SceneContext) {
     }
   }
 
-  function update() {
+  function getTransform(): TransformType {
     if (lastEntity) {
       const parent = context.Transform.getOrNull(lastEntity.entityId)?.parent || (0 as Entity)
       const value = {
@@ -68,8 +68,17 @@ export function createGizmoManager(context: SceneContext) {
         rotation: snapRotation(lastEntity.rotationQuaternion!),
         parent
       }
-      fixRotationGizmoAlignment(value)
-      context.operations.updateValue(context.Transform, lastEntity.entityId, value)
+      return value
+    } else {
+      throw new Error('No entity selected')
+    }
+  }
+
+  function update() {
+    if (lastEntity) {
+      const transform = getTransform()
+      fixRotationGizmoAlignment(transform)
+      context.operations.updateValue(context.Transform, lastEntity.entityId, transform)
       void context.operations.dispatch()
     }
   }
@@ -123,6 +132,9 @@ export function createGizmoManager(context: SceneContext) {
       if (entity === lastEntity) return
       gizmoManager.attachToNode(entity)
       lastEntity = entity
+      // fix gizmo rotation if necessary
+      const transform = getTransform()
+      fixRotationGizmoAlignment(transform)
       events.emit('change')
     },
     getEntity() {
