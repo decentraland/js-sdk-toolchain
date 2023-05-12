@@ -43,15 +43,19 @@ export function createGizmoManager(context: SceneContext) {
 
   let lastEntity: EcsEntity | null = null
   let rotationGizmoAlignmentDisabled = false
+  let shouldRestorRotationGizmoAlignment = false
 
   function fixRotationGizmoAlignment(value: TransformType) {
     const isProportional = value.scale.x === value.scale.y && value.scale.y === value.scale.z
+    rotationGizmoAlignmentDisabled = !isProportional
     if (!isProportional && !isRotationGizmoWorldAligned()) {
-      rotationGizmoAlignmentDisabled = true
       setRotationGizmoWorldAligned(true) // set to world
-    } else if (rotationGizmoAlignmentDisabled && isProportional) {
-      rotationGizmoAlignmentDisabled = false
+      shouldRestorRotationGizmoAlignment = true
+    } else if (shouldRestorRotationGizmoAlignment && isProportional) {
       setRotationGizmoWorldAligned(false) // restore to local
+      shouldRestorRotationGizmoAlignment = false
+    } else {
+      events.emit('change')
     }
   }
 

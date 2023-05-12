@@ -65,7 +65,7 @@ export const Gizmos = withSdk(({ sdk }) => {
         onClick={handleScaleGizmo}
       />
       <BsCaretDown className="open-panel" onClick={handleTogglePanel} />
-      <div ref={ref} className={cx('panel', { visible: showPanel })}>
+      <div ref={ref} className={cx('panel', { visible: true })}>
         <div className="title">
           <label>Snap</label>
           <SnapToggleIcon className="icon" onClick={toggle} />
