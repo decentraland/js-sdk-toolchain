@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=159.4k bytes
+SCENE_COMPILED_JS_SIZE_PROD=165.3k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -8,9 +8,9 @@ EVAL test/snapshots/production-bundles/append-value-crdt.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 32k
-  MALLOC_COUNT = 8803
-  ALIVE_OBJS_DELTA ~= 1.88k
+  OPCODES ~= 33k
+  MALLOC_COUNT = 8851
+  ALIVE_OBJS_DELTA ~= 1.89k
 CALL onStart()
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5,"tickNumber":0}
   OPCODES ~= 8k
@@ -55,4 +55,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 13k
   MALLOC_COUNT = 31
   ALIVE_OBJS_DELTA ~= 0.01k
-  MEMORY_USAGE_COUNT ~= 716.27k bytes
+  MEMORY_USAGE_COUNT ~= 723.68k bytes

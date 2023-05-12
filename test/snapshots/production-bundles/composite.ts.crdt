@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=151k bytes
+SCENE_COMPILED_JS_SIZE_PROD=156.9k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -6,9 +6,9 @@ SCENE_COMPILED_JS_SIZE_PROD=151k bytes
 EVAL test/snapshots/production-bundles/composite.js
   REQUIRE: buffer
   REQUIRE: long
-  OPCODES ~= 30k
-  MALLOC_COUNT = 7934
-  ALIVE_OBJS_DELTA ~= 1.66k
+  OPCODES ~= 31k
+  MALLOC_COUNT = 7983
+  ALIVE_OBJS_DELTA ~= 1.67k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 4
