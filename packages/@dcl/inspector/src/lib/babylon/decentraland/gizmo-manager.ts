@@ -46,7 +46,8 @@ export function createGizmoManager(context: SceneContext) {
   let shouldRestorRotationGizmoAlignment = false
 
   function fixRotationGizmoAlignment(value: TransformType) {
-    const isProportional = value.scale.x === value.scale.y && value.scale.y === value.scale.z
+    const isProportional =
+      Math.abs(value.scale.x) === Math.abs(value.scale.y) && Math.abs(value.scale.y) === value.scale.z
     rotationGizmoAlignmentDisabled = !isProportional
     if (!isProportional && !isRotationGizmoWorldAligned()) {
       setRotationGizmoWorldAligned(true) // set to world
