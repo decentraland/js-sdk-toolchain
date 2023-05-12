@@ -13,7 +13,6 @@ export type EcsComponents = Partial<{
 export class EcsEntity extends BABYLON.TransformNode {
   readonly isDCLEntity = true
   usedComponents = new Map<number, ComponentDefinition<unknown>>()
-
   meshRenderer?: BABYLON.AbstractMesh
   gltfContainer?: BABYLON.AbstractMesh
   gltfAssetContainer?: BABYLON.AssetContainer

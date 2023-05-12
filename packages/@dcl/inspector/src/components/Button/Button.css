@@ -24,3 +24,17 @@
   width: 24px;
   height: 24px;
 }
+
+.Button.big {
+  padding: 16px;
+  font-size: 16px;
+}
+
+.Button.danger {
+  background-color: var(--primary);
+}
+
+.Button.danger:hover,
+.Button.danger.active {
+  background-color: var(--primary-darker)
+}

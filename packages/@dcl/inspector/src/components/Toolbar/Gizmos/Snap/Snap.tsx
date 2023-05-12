@@ -1,7 +1,9 @@
 import React, { useCallback } from 'react'
 import cx from 'classnames'
-import { GizmoType } from '../../../../lib/utils/gizmo'
+
 import { useSnapState, useSnapToggle } from '../../../../hooks/editor/useSnap'
+import { GizmoType } from '../../../../lib/utils/gizmo'
+
 import './Snap.css'
 
 type Props = {
@@ -30,10 +32,10 @@ const Snap: React.FC<Props> = ({ gizmo }) => {
 
   let label = ''
   switch (gizmo) {
-    case GizmoType.TRANSLATE:
+    case GizmoType.POSITION:
       label = 'Position'
       break
-    case GizmoType.ROTATE:
+    case GizmoType.ROTATION:
       label = 'Rotation'
       break
     case GizmoType.SCALE:

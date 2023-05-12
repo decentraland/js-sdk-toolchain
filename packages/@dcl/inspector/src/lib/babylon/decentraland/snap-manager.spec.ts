@@ -112,7 +112,7 @@ describe('snapManager', () => {
         })
       )
     })
-    it('should stop calling the handler afer unsuscribing', () => {
+    it('should stop calling the handler afer unsubscribing', () => {
       unsubscribe()
       snapManager.setEnabled(false)
       expect(handler).not.toHaveBeenCalled()

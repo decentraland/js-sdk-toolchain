@@ -8,11 +8,17 @@ import { SdkContextValue } from '../../lib/sdk/context'
  * @param deps
  * @returns
  */
-export const useSdk = (cb?: (sdk: SdkContextValue) => void, deps: React.DependencyList = []) => {
+export const useSdk = (cb?: (sdk: SdkContextValue) => (() => void) | void, deps: React.DependencyList = []) => {
   const { sdk } = React.useContext(SdkContext)
   React.useEffect(() => {
+    let unsubscribe: (() => void) | void
     if (sdk && cb) {
-      cb(sdk)
+      unsubscribe = cb(sdk)
+    }
+    return () => {
+      if (unsubscribe && typeof unsubscribe === 'function') {
+        unsubscribe()
+      }
     }
   }, [sdk, ...deps])
   return sdk

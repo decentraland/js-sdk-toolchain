@@ -1,10 +1,10 @@
 .Resizable {
   display: flex;
+  width: 100%;
 }
 
 .Resizable .resize-handle {
-  position: absolute;
-  width: 10px;
+  width: 3px;
   height: 100%;
   cursor: col-resize;
 }

@@ -18,6 +18,8 @@ import { putMeshRendererComponent } from './sdkComponents/mesh-renderer'
 import { putTransformComponent } from './sdkComponents/transform'
 import { consumeAllMessagesInto } from '../../logic/consume-stream'
 import { putSceneComponent } from './editorComponents/scene'
+import { createOperations } from '../../sdk/operations'
+import { createGizmoManager } from './gizmo-manager'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -40,6 +42,9 @@ export class SceneContext {
       this.processEcsChange(entity, op, component)
     }
   })
+
+  operations = createOperations(this.engine)
+  gizmos = createGizmoManager(this)
 
   Billboard = components.Billboard(this.engine)
   Transform = components.Transform(this.engine)
@@ -69,7 +74,6 @@ export class SceneContext {
     public dataLayer: DataLayerRpcClient
   ) {
     this.rootNode = new EcsEntity(0 as Entity, this.#weakThis, scene)
-    babylon.onEndFrameObservable.add(this.update)
     Object.assign(globalThis, { babylon: this.engine })
   }
 
@@ -162,11 +166,6 @@ export class SceneContext {
     return null
   }
 
-  readonly update = async () => {
-    // update the engine
-    await this.engine.update(this.babylon.getDeltaTime() / 1000)
-  }
-
   dispose() {
     this.stopped.resolve()
     for (const [entityId] of this.#entities) {
@@ -174,7 +173,6 @@ export class SceneContext {
     }
     this.rootNode.parent = null
     this.rootNode.dispose()
-    this.babylon.onEndFrameObservable.removeCallback(this.update)
   }
 
   async connectCrdtTransport(crdtStream: DataLayerRpcClient['crdtStream']) {
@@ -184,11 +182,12 @@ export class SceneContext {
     const transport = this.addTransport(outgoingMessages)
     const engine = this.engine
 
-    function onMessage(message: Uint8Array) {
+    async function onMessage(message: Uint8Array) {
       if (message.byteLength) {
         Array.from(serializeCrdtMessages('DataLayer>Babylon', message, engine)).forEach(($) => console.log($))
       }
       transport.onmessage!(message)
+      await engine.update(1)
     }
 
     consumeAllMessagesInto(crdtStream(outgoingMessages), onMessage, outgoingMessages.close).catch((e) => {

@@ -1,332 +1,136 @@
+import { Engine } from '@dcl/ecs'
+import { defineTransformComponent } from '@dcl/ecs/dist/components/manual/Transform'
 import { createFsInMemory } from '../../logic/in-memory-storage'
+import { defineMeshRendererComponent } from '@dcl/ecs/dist/components/extended/MeshRenderer'
+import { createEditorComponents } from '../../sdk/components'
+import { dumpEngineToComposite } from '../host/utils/engine-to-composite'
+import { Composite } from '@dcl/ecs'
+import { GltfContainer, Material, PointerEvents } from '@dcl/ecs/dist/components'
+import { defineMaterialComponent } from '@dcl/ecs/dist/components/extended/Material'
+import { defineMeshColliderComponent } from '@dcl/ecs/dist/components/extended/MeshCollider'
 
-export const minimalComposite = {
-  version: 1,
-  components: [
-    {
-      name: 'core::Transform',
-      data: {
-        '512': {
-          $case: 'json',
-          json: {
-            position: {
-              x: 8,
-              y: 1,
-              z: 8
-            }
-          }
-        }
-      }
-    },
-    {
-      name: 'core::MeshRenderer',
-      data: {
-        '512': {
-          $case: 'json',
-          json: {
-            mesh: {
-              $case: 'box',
-              box: {
-                uvs: []
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      name: 'core::MeshCollider',
-      data: {
-        '512': {
-          $case: 'json',
-          json: {
-            mesh: {
-              $case: 'box',
-              box: {}
-            }
-          }
-        }
-      }
-    },
-    {
-      name: 'cube-id',
-      jsonSchema: {
-        type: 'object',
-        properties: {},
-        serializationType: 'map'
-      },
-      data: {
-        '512': {
-          $case: 'json',
-          json: {}
-        }
-      }
-    },
-    {
-      name: 'inspector::Scene',
-      jsonSchema: {
-        type: 'object',
-        properties: {
-          layout: {
-            type: 'object',
-            properties: {
-              base: {
-                type: 'object',
-                properties: {
-                  x: {
-                    type: 'integer'
-                  },
-                  y: {
-                    type: 'integer'
-                  }
-                }
-              },
-              parcels: {
-                type: 'array',
-                item: {
-                  type: 'object',
-                  properties: {
-                    x: {
-                      type: 'integer'
-                    },
-                    y: {
-                      type: 'integer'
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        serializationType: 'map'
-      },
-      data: {
-        '0': {
-          $case: 'json',
-          json: {
-            layout: {
-              base: {
-                x: 0,
-                y: 0
-              },
-              parcels: [
-                {
-                  x: 0,
-                  y: 0
-                }
-              ]
-            }
-          }
-        }
-      }
-    }
-  ]
+function createTempEngine() {
+  const engine = Engine()
+  return {
+    engine,
+    Transform: defineTransformComponent(engine),
+    MeshRenderer: defineMeshRendererComponent(engine),
+    MeshCollider: defineMeshColliderComponent(engine),
+    Material: defineMaterialComponent(engine),
+    GltfContainer: GltfContainer(engine),
+    PointerEvents: PointerEvents(engine),
+    ...createEditorComponents(engine)
+  }
 }
 
-export const mainComposite = {
-  version: 1,
-  components: [
-    {
-      name: 'core::Transform',
-      data: {
-        '512': {
-          $case: 'json',
-          json: {
-            position: {
-              x: 8,
-              y: 1,
-              z: 8
-            }
-          }
-        },
-        '513': {
-          $case: 'json',
-          json: {
-            position: {
-              x: 4,
-              y: 0.8,
-              z: 8
-            },
-            parent: 514
-          }
-        },
-        '514': {
-          $case: 'json',
-          json: {
-            position: {
-              x: 4,
-              y: 0.8,
-              z: 8
-            }
-          }
-        }
-      }
-    },
-    {
-      name: 'core::MeshRenderer',
-      data: {
-        '512': {
-          $case: 'json',
-          json: {
-            mesh: {
-              $case: 'box',
-              box: {
-                uvs: []
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      name: 'core::MeshCollider',
-      data: {
-        '512': {
-          $case: 'json',
-          json: {
-            mesh: {
-              $case: 'box',
-              box: {}
-            }
-          }
-        }
-      }
-    },
-    {
-      name: 'core::GltfContainer',
-      data: {
-        '513': {
-          $case: 'json',
-          json: {
-            src: 'assets/models/test-glb.glb'
-          }
-        }
-      }
-    },
-    {
-      name: 'cube-id',
-      jsonSchema: {
-        type: 'object',
-        properties: {},
-        serializationType: 'map'
+function generateMinimalComposite() {
+  const tmp = createTempEngine()
+  // custom component
+  const cubeIdComponent = tmp.engine.defineComponent('cube-id', {})
+
+  // main box
+  const entity = tmp.engine.addEntity()
+  tmp.Transform.create(entity, { position: { x: 8, y: 1, z: 8 } })
+  tmp.MeshRenderer.setBox(entity)
+  cubeIdComponent.create(entity)
+  tmp.EntityNode.create(entity, { label: 'Magic Cube', parent: tmp.engine.RootEntity })
+
+  // scene
+  tmp.Scene.create(tmp.engine.RootEntity, {
+    layout: {
+      base: {
+        x: 0,
+        y: 0
       },
-      data: {
-        '512': {
-          $case: 'json',
-          json: {}
+      parcels: [
+        {
+          x: 0,
+          y: 0
         }
-      }
-    },
-    {
-      name: 'core::PointerEvents',
-      data: {
-        '512': {
-          $case: 'json',
-          json: {
-            pointerEvents: [
-              {
-                eventType: 1,
-                eventInfo: {
-                  button: 1,
-                  hoverText: 'Press E to spawn',
-                  maxDistance: 100,
-                  showFeedback: true
-                }
-              }
-            ]
-          }
-        }
-      }
-    },
-    {
-      name: 'core::Material',
-      data: {
-        '512': {
-          $case: 'json',
-          json: {
-            material: {
-              $case: 'pbr',
-              pbr: {
-                albedoColor: {
-                  r: 1.0,
-                  g: 0.85,
-                  b: 0.42,
-                  a: 1.0
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      name: 'inspector::Scene',
-      jsonSchema: {
-        type: 'object',
-        properties: {
-          layout: {
-            type: 'object',
-            properties: {
-              base: {
-                type: 'object',
-                properties: {
-                  x: {
-                    type: 'integer'
-                  },
-                  y: {
-                    type: 'integer'
-                  }
-                }
-              },
-              parcels: {
-                type: 'array',
-                item: {
-                  type: 'object',
-                  properties: {
-                    x: {
-                      type: 'integer'
-                    },
-                    y: {
-                      type: 'integer'
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        serializationType: 'map'
-      },
-      data: {
-        '0': {
-          $case: 'json',
-          json: {
-            layout: {
-              base: {
-                x: 0,
-                y: 0
-              },
-              parcels: [
-                {
-                  x: 0,
-                  y: 0
-                },
-                {
-                  x: 0,
-                  y: 1
-                },
-                {
-                  x: 1,
-                  y: 0
-                }
-              ]
-            }
-          }
-        }
-      }
+      ]
     }
-  ]
+  })
+
+  const composite = dumpEngineToComposite(tmp.engine, 'json')
+  return Composite.toJson(composite)
 }
+
+function generateMainComposite() {
+  const tmp = createTempEngine()
+  // custom component
+  const cubeIdComponent = tmp.engine.defineComponent('cube-id', {})
+
+  // main box
+
+  const entity = tmp.engine.addEntity()
+  tmp.Transform.create(entity, { position: { x: 8, y: 1, z: 8 } })
+  tmp.MeshRenderer.setBox(entity)
+  cubeIdComponent.create(entity)
+  tmp.PointerEvents.create(entity, {
+    pointerEvents: [
+      {
+        eventType: 1,
+        eventInfo: {
+          button: 1,
+          hoverText: 'Press E to spawn',
+          maxDistance: 100,
+          showFeedback: true
+        }
+      }
+    ]
+  })
+  tmp.Material.setPbrMaterial(entity, {
+    albedoColor: {
+      r: 1.0,
+      g: 0.85,
+      b: 0.42,
+      a: 1.0
+    }
+  })
+  tmp.EntityNode.create(entity, { label: 'Magic Cube', parent: tmp.engine.RootEntity })
+
+  const gltfEntity = tmp.engine.addEntity()
+  tmp.Transform.create(gltfEntity, {
+    position: {
+      x: 4,
+      y: 0.8,
+      z: 8
+    }
+  })
+  tmp.GltfContainer.create(gltfEntity, { src: 'assets/models/test-glb.glb' })
+  cubeIdComponent.create(gltfEntity)
+  tmp.EntityNode.create(gltfEntity, { label: 'Gltf Test', parent: tmp.engine.RootEntity })
+
+  // scene
+  tmp.Scene.create(tmp.engine.RootEntity, {
+    layout: {
+      base: {
+        x: 0,
+        y: 0
+      },
+      parcels: [
+        {
+          x: 0,
+          y: 0
+        },
+        {
+          x: 0,
+          y: 1
+        },
+        {
+          x: 1,
+          y: 0
+        }
+      ]
+    }
+  })
+
+  const composite = dumpEngineToComposite(tmp.engine, 'json')
+  return Composite.toJson(composite)
+}
+
+export const mainComposite = generateMainComposite()
+export const minimalComposite = generateMinimalComposite()
 
 const builderMappings: Record<string, string> = {
   'assets/models/test-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',

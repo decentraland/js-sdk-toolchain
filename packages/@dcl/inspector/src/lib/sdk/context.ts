@@ -11,6 +11,8 @@ import { getHardcodedLoadableScene } from './test-local-scene'
 import { createInspectorEngine } from './inspector-engine'
 import { DataLayerRpcClient } from '../data-layer/types'
 import { getTransformNodeChecker } from './transform-node'
+import { createOperations } from './operations'
+import { Gizmos } from '../babylon/decentraland/gizmo-manager'
 
 export type SdkContextEvents = {
   change: { entity: Entity; operation: CrdtMessageType; component?: ComponentDefinition<any>; value?: any }
@@ -24,6 +26,8 @@ export type SdkContextValue = {
   events: Emitter<SdkContextEvents>
   dispose(): void
   dataLayer: DataLayerRpcClient
+  operations: ReturnType<typeof createOperations>
+  gizmos: Gizmos
 }
 
 export async function createSdkContext(canvas: HTMLCanvasElement, catalog: ITheme[]): Promise<SdkContextValue> {
@@ -57,12 +61,16 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
   // register some globals for debugging
   Object.assign(globalThis, { dataLayer, inspectorEngine: engine })
 
+  // TODO: volar el getGizmoManager
+
   return {
     engine,
     components,
     events,
     scene,
     dispose,
-    dataLayer
+    dataLayer,
+    operations: createOperations(engine),
+    gizmos: ctx.gizmos
   }
 }

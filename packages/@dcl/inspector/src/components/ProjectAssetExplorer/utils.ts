@@ -48,7 +48,7 @@ export function buildAssetTree(paths: string[]): AssetNodeFolder {
 export function getFullNodePath(item: AssetNode | TreeNode): string {
   let path = ''
   let it: AssetNode | TreeNode | null = item
-  while (it) {
+  while (it && it.name) {
     path = '/' + it.name + path
     it = it.parent
   }

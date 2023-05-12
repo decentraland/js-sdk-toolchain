@@ -1,5 +1,6 @@
 import { Entity, IEngine } from '@dcl/ecs'
 import { EditorComponents } from './components'
+import { Operations } from './operations'
 
 export const ROOT = 0 as Entity
 
@@ -7,10 +8,14 @@ export const ROOT = 0 as Entity
  * Returns a tree of in the shape of Map<Entity, Set<Entity>> where the key is the parent and the value is the children
  * @returns
  */
-export const getTreeFromEngine = (engine: IEngine, EntityNode: EditorComponents['EntityNode']) => {
+export const getTreeFromEngine = (
+  engine: IEngine,
+  operations: Operations,
+  EntityNode: EditorComponents['EntityNode']
+): Map<Entity, Set<Entity>> => {
   // We build a map of children by their parent entity
   const childrenByParent = getEmptyTree()
-
+  let dirtyEngine = false
   // This is a map of parent -> orphans[], it's used to keep track of orphans until the parent shows up
   const orphansByParent = new Map<Entity, Set<Entity>>()
 
@@ -68,7 +73,8 @@ export const getTreeFromEngine = (engine: IEngine, EntityNode: EditorComponents[
       } else {
         // When the entity does not have a EntityNode it is shown as a child of the root entity
         childrenByParent.get(ROOT)!.add(entity)
-        EntityNode.createOrReplace(entity)
+        dirtyEngine = true
+        operations.updateValue(EntityNode, entity, {})
       }
       // We flag the entity as processed
       childrenByParent.set(entity, new Set())
@@ -84,7 +90,8 @@ export const getTreeFromEngine = (engine: IEngine, EntityNode: EditorComponents[
           const { label } = EntityNode.get(orphan)
           // Add orphan to parent's children
           setParent(orphan, entity)
-          EntityNode.createOrReplace(orphan, { label, parent: entity })
+          operations.updateValue(EntityNode, orphan, { label, parent: entity })
+          dirtyEngine = true
           // Delete orphan from root's children
           childrenByParent.get(ROOT)!.delete(orphan)
           // Delete orphan from orphans list
@@ -92,6 +99,10 @@ export const getTreeFromEngine = (engine: IEngine, EntityNode: EditorComponents[
         }
       }
     }
+  }
+
+  if (dirtyEngine) {
+    void operations.dispatch()
   }
 
   return childrenByParent

@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
 import { CrdtMessageType, DeepReadonly, Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
+import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
+
 import { Component } from '../../lib/sdk/components'
 import { useChange } from './useChange'
 import { isEqual } from '../../lib/data-layer/host/utils/component'
+import { useSdk } from './useSdk'
 
 export function isLastWriteWinComponent<T = unknown>(
   component: Component
@@ -18,7 +21,7 @@ const getComponentValue = <T>(entity: Entity, component: Component<T>): DeepRead
 export const useComponentValue = <ComponentValueType>(entity: Entity, component: Component<ComponentValueType>) => {
   const componentValueType = getComponentValue(entity, component)
   const [value, setValue] = useState<ComponentValueType>(componentValueType as ComponentValueType)
-
+  const sdk = useSdk()
   // sync entity changed
   useEffect(() => {
     setValue(getComponentValue(entity, component) as ComponentValueType)
@@ -27,11 +30,20 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
   // sync state -> engine
   useEffect(() => {
     if (value === null) return
-    if (isEqual(component, getComponentValue(entity, component), value)) {
+    const isEqualValue = isEqual(component, getComponentValue(entity, component), value)
+
+    if (isEqualValue) {
       return
     }
-    if (isLastWriteWinComponent(component)) {
-      component.createOrReplace(entity, value)
+    const sameValue = !recursiveCheck(getComponentValue(entity, component), value, 2)
+    if (sameValue && !isEqualValue) {
+      console.log(
+        'TODO: maybe use this isEqual instead of the Uint8Array. Value is the same, but not for Uint8Array compare'
+      )
+    }
+    if (isLastWriteWinComponent(component) && sdk) {
+      sdk.operations.updateValue(component, entity, value!)
+      void sdk.operations.dispatch()
     } else {
       // TODO: handle update for GrowOnlyValueSetComponentDefinition
       debugger

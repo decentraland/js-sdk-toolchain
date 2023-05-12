@@ -1,6 +1,5 @@
 import * as BABYLON from '@babylonjs/core'
 import { EcsEntity } from '../decentraland/EcsEntity'
-import { changeSelectedEntity } from '../../utils/gizmo'
 import { snapManager } from '../decentraland/snap-manager'
 
 /**
@@ -166,6 +165,7 @@ export function interactWithScene(
 
   if (entity && pointerEvent === 'pointerDown') {
     const context = entity.context.deref()!
-    changeSelectedEntity(entity.entityId, context.engine)
+    context.operations.updateSelectedEntity(entity.entityId)
+    void context.operations.dispatch()
   }
 }

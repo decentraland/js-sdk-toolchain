@@ -21,91 +21,94 @@ describe('[UNDO] Inspector<->DataLayer<->Babylon', () => {
   let cachedEntity: Entity
 
   it('initialize dataLayer composite and send it to inspector', async () => {
-    const { dataLayerEngine } = context
+    const { dataLayerEngine, tick } = context
     await dataLayerEngine.update(1)
-    await context.updateInspector()
+    await tick()
   })
 
   it('creates a new entity with a Transform component', async () => {
-    const { inspectorEngine, dataLayerEngine } = context
+    const { inspectorEngine, dataLayerEngine, inspectorOperations, tick } = context
     const Transform = getTransform(inspectorEngine)
     const entity = (cachedEntity = inspectorEngine.addEntity())
-    Transform.create(entity, { position: { x: 8, y: 8, z: 8 } })
+    inspectorOperations.updateValue(Transform, entity, { position: { x: 8, y: 8, z: 8 } })
 
-    await context.updateInspector()
+    await inspectorOperations.dispatch()
+    await tick()
     expect(getTransform(dataLayerEngine).get(entity).position).toMatchObject({ x: 8, y: 8, z: 8 })
     expect(getTransform(inspectorEngine).get(entity).position).toMatchObject({ x: 8, y: 8, z: 8 })
   })
 
   it('modifies the Transform component', async () => {
-    const { inspectorEngine, dataLayerEngine } = context
+    const { inspectorEngine, dataLayerEngine, inspectorOperations, tick } = context
     const Transform = getTransform(inspectorEngine)
-    Transform.getMutable(cachedEntity).position.x = 9
-    await context.updateInspector()
+    inspectorOperations.updateValue(Transform, cachedEntity, { position: { x: 9, y: 8, z: 8 } })
+    await inspectorOperations.dispatch()
+    await tick()
     expect(getTransform(dataLayerEngine).get(cachedEntity).position.x).toBe(9)
     expect(getTransform(inspectorEngine).get(cachedEntity).position.x).toBe(9)
   })
 
   it('undo the transform update (8 -> 9)', async () => {
-    const { inspectorEngine, dataLayer } = context
+    const { inspectorEngine, dataLayer, tick } = context
     await dataLayer.undo({})
-    await context.updateInspector()
-    await context.updateRenderer()
+    await tick()
     expect(getTransform(inspectorEngine).get(cachedEntity).position.x).toBe(8)
   })
   it('undo the create transform operation, so the transform now will be deleted', async () => {
-    const { inspectorEngine, dataLayer } = context
+    const { inspectorEngine, dataLayer, tick } = context
     await dataLayer.undo({})
-    await context.updateInspector()
+    await tick()
     expect(getTransform(inspectorEngine).getOrNull(cachedEntity)).toBe(null)
   })
 
   it('redo and create the transform again', async () => {
-    const { inspectorEngine, dataLayer } = context
+    const { inspectorEngine, dataLayer, tick } = context
     await dataLayer.redo({})
-    await context.updateInspector()
+    await tick()
     expect(getTransform(inspectorEngine).get(cachedEntity).position).toMatchObject({ x: 8, y: 8, z: 8 })
   })
 
   it('generates a new component', async () => {
-    const { inspectorEngine } = context
+    const { inspectorEngine, inspectorOperations, tick } = context
     const entity = inspectorEngine.addEntity()
-    getTransform(inspectorEngine).create(entity)
-    await context.updateInspector()
+    inspectorOperations.updateValue(getTransform(inspectorEngine), entity, { position: { x: 9, y: 8, z: 8 } })
+    await inspectorOperations.dispatch()
+    await tick()
   })
 
   it('should clean the redoList.', async () => {
-    const { inspectorEngine, dataLayer } = context
+    const { inspectorEngine, dataLayer, tick } = context
     await dataLayer.redo({})
-    await context.updateInspector()
+    await tick()
 
     // Nothing done
     expect(getTransform(inspectorEngine).get(cachedEntity).position.x).toBe(8)
   })
   it('should create an entity with multiple components', async () => {
-    const { inspectorEngine, dataLayerEngine, babylonEngine } = context
-    const Transform = getTransform(inspectorEngine)
-    const GLTFContainer = getGLTFCointainer(inspectorEngine)
-    const entity = (cachedEntity = inspectorEngine.addEntity())
-    Transform.create(entity, { position: { x: 8, y: 8, z: 8 } })
-    GLTFContainer.create(entity)
-    await context.updateInspector()
+    const { inspectorEngine, dataLayerEngine, rendererEngine, inspectorOperations, tick } = context
+    const entity = (cachedEntity = inspectorOperations.addAsset(0 as Entity, 'boedo/casla', 'boedo', {
+      x: 8,
+      y: 8,
+      z: 8
+    }))
+    await inspectorOperations.dispatch()
+    await tick()
     expect(getTransform(dataLayerEngine).get(entity).position).toMatchObject({ x: 8, y: 8, z: 8 })
     expect(getTransform(inspectorEngine).get(entity).position).toMatchObject({ x: 8, y: 8, z: 8 })
-    expect(getTransform(babylonEngine).get(entity).position).toMatchObject({ x: 8, y: 8, z: 8 })
+    expect(getTransform(rendererEngine).get(entity).position).toMatchObject({ x: 8, y: 8, z: 8 })
     expect(getGLTFCointainer(dataLayerEngine).has(entity)).toBe(true)
     expect(getGLTFCointainer(inspectorEngine).has(entity)).toBe(true)
-    expect(getGLTFCointainer(babylonEngine).has(entity)).toBe(true)
+    expect(getGLTFCointainer(rendererEngine).has(entity)).toBe(true)
   })
   it('should remove all components at once when undo the previous action', async () => {
-    const { inspectorEngine, dataLayer, babylonEngine, dataLayerEngine } = context
+    const { inspectorEngine, dataLayer, rendererEngine, dataLayerEngine, tick } = context
     await dataLayer.undo({})
-    await context.updateInspector()
+    await tick()
     expect(getTransform(dataLayerEngine).has(cachedEntity)).toBe(false)
     expect(getTransform(inspectorEngine).has(cachedEntity)).toBe(false)
-    expect(getTransform(babylonEngine).has(cachedEntity)).toBe(false)
+    expect(getTransform(rendererEngine).has(cachedEntity)).toBe(false)
     expect(getGLTFCointainer(dataLayerEngine).has(cachedEntity)).toBe(false)
     expect(getGLTFCointainer(inspectorEngine).has(cachedEntity)).toBe(false)
-    expect(getGLTFCointainer(babylonEngine).has(cachedEntity)).toBe(false)
+    expect(getGLTFCointainer(rendererEngine).has(cachedEntity)).toBe(false)
   })
 })

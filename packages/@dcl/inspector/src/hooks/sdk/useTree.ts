@@ -1,10 +1,9 @@
-import { Entity, getComponentEntityTree } from '@dcl/ecs'
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
+import { Entity } from '@dcl/ecs'
+
 import { getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk/tree'
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
-import { changeSelectedEntity, removeSelectedEntities } from '../../lib/utils/gizmo'
-import { isLastWriteWinComponent } from './useComponentValue'
 
 /**
  * Used to get a tree and the functions to work with it
@@ -12,23 +11,29 @@ import { isLastWriteWinComponent } from './useComponentValue'
  */
 export const useTree = () => {
   const sdk = useSdk()
-
   // Generate a tree if the sdk is available, or an empty tree otherwise
   const getTree = useCallback(() => {
     if (sdk) {
       const {
         engine,
-        components: { EntityNode }
+        components: { EntityNode },
+        operations
       } = sdk
-      return getTreeFromEngine(engine, EntityNode)
+      return getTreeFromEngine(engine, operations, EntityNode)
     } else {
       return getEmptyTree()
     }
   }, [sdk])
 
   const [tree, setTree] = useState(getTree())
+  const entitiesToggle = new Set<Entity>()
+
+  useEffect(() => {
+    setTree(getTree())
+  }, [sdk])
 
   // Update tree when a change happens in the engine
+  // TODO: are we sure about this ? It seems to expensive 🤔
   const handleUpdate = useCallback(() => setTree(getTree()), [setTree, getTree])
   useChange(handleUpdate)
 
@@ -54,86 +59,65 @@ export const useTree = () => {
 
   const isOpen = useCallback(
     (entity: Entity) => {
-      if (entity === ROOT || !sdk) return true
-      if (!sdk) return false
-      const { Toggle } = sdk.components
-      return Toggle.has(entity)
+      if (entity === ROOT) return true
+      return entitiesToggle.has(entity)
     },
     [sdk]
   )
 
   const addChild = useCallback(
-    (parent: Entity, label: string) => {
+    async (parent: Entity, label: string) => {
       if (!sdk) return
-      const { EntityNode } = sdk.components
-      const child = sdk.engine.addEntity()
-      EntityNode.create(child, { label, parent })
+      sdk.operations.addChild(parent, label)
+      await sdk.operations.dispatch()
       handleUpdate()
     },
     [sdk, handleUpdate]
   )
 
   const setParent = useCallback(
-    (entity: Entity, parent: Entity) => {
+    async (entity: Entity, parent: Entity) => {
       if (entity === ROOT || !sdk) return
-      const { EntityNode, Transform, Toggle } = sdk.components
-
-      EntityNode.getOrCreateMutable(entity).parent = parent
-
-      const transform = Transform.getMutableOrNull(entity)
-      if (transform) transform.parent = parent
-
-      Toggle.createOrReplace(parent)
+      sdk.operations.setParent(entity, parent)
+      entitiesToggle.add(parent)
+      await sdk.operations.dispatch()
       handleUpdate()
     },
     [sdk, handleUpdate]
   )
 
   const rename = useCallback(
-    (entity: Entity, label: string) => {
+    async (entity: Entity, label: string) => {
       if (entity === ROOT || !sdk) return
       const { EntityNode } = sdk.components
-      EntityNode.getOrCreateMutable(entity).label = label
+      sdk.operations.updateValue(EntityNode, entity, { label })
+      await sdk.operations.dispatch()
       handleUpdate()
     },
     [sdk, handleUpdate]
   )
 
   const remove = useCallback(
-    (entity: Entity) => {
+    async (entity: Entity) => {
       if (entity === ROOT || !sdk) return
-      const { EntityNode } = sdk.components
-
-      // we cannot use "engine.removeEntity" (or similar) since undoing that won't be possible
-      // because entities cannot be re-created. It's easier to remove all the components from the entity,
-      // and in case of an undo, recreate them...
-      for (const _entity of getComponentEntityTree(sdk.engine, entity, EntityNode)) {
-        for (const component of sdk.engine.componentsIter()) {
-          if (component.has(_entity) && isLastWriteWinComponent(component)) {
-            component.deleteFrom(_entity)
-          }
-        }
-      }
-
+      sdk.operations.removeEntity(entity)
+      await sdk.operations.dispatch()
       handleUpdate()
     },
     [sdk, handleUpdate]
   )
 
   const toggle = useCallback(
-    (entity: Entity, open: boolean) => {
+    async (entity: Entity, open: boolean) => {
       if (!sdk) return
-      if (entity === ROOT) return removeSelectedEntities(sdk.engine)
-
-      const { Toggle } = sdk.components
-      changeSelectedEntity(entity, sdk.engine)
-
-      if (open) {
-        Toggle.createOrReplace(entity)
-      } else if (Toggle.has(entity)) {
-        Toggle.deleteFrom(entity)
+      if (entity === ROOT) {
+        sdk.operations.removeSelectedEntities()
+      } else {
+        sdk.operations.updateSelectedEntity(entity)
+        open ? entitiesToggle.add(entity) : entitiesToggle.delete(entity)
       }
 
+      await sdk.operations.dispatch()
       handleUpdate()
     },
     [sdk, handleUpdate]
