@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSdk } from '../sdk/useSdk'
 import { useChange } from '../sdk/useChange'
 import { Gizmos } from '../../lib/babylon/decentraland/gizmo-manager'
+import { CrdtMessageType } from '@dcl/ecs'
 
 export const useGizmoAlignment = () => {
   const gizmosRef = useRef<Gizmos | null>(null)
@@ -9,7 +10,7 @@ export const useGizmoAlignment = () => {
   const [isRotationGizmoWorldAligned, setRotationGizmoWorldAligned] = useState(false)
   const [isRotationGizmoAlignmentDisabled, setIsRotationGizmoAlignmentDisabled] = useState(false)
 
-  // update rotation gizmo alginment only if is not disabled
+  // update rotation gizmo alignment only if is not disabled
   const safeSetRotationGizmoWorldAligned = useCallback(
     (value: boolean) => {
       if (!isRotationGizmoAlignmentDisabled) {
@@ -35,14 +36,15 @@ export const useGizmoAlignment = () => {
     }
   }, [isPositionGizmoWorldAligned, isRotationGizmoWorldAligned, isRotationGizmoAlignmentDisabled])
 
-  // listen to changes in the engine, fix the rotation gizmo alignemnt if necessary
+  // listen to changes in the engine, fix the rotation gizmo alignment if necessary
   useChange((event, sdk) => {
     if (gizmosRef.current) {
       const gizmos = gizmosRef.current
       const currentEntity = gizmos.getEntity()
-      const isSelectedEntity = currentEntity && currentEntity.entityId === event.entity
+      const isSelectedEntity = currentEntity?.entityId === event.entity
       const isTransformComponent = event.component?.componentId === sdk.components.Transform.componentId
-      if (isSelectedEntity && isTransformComponent) {
+      const isDeleteOperation = event.operation === CrdtMessageType.DELETE_COMPONENT
+      if (isSelectedEntity && isTransformComponent && !isDeleteOperation) {
         gizmos.fixRotationGizmoAlignment(event.value)
       }
     }
