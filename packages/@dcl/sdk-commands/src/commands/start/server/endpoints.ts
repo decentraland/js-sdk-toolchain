@@ -197,7 +197,7 @@ async function serveFolders(
     return next()
   })
 
-  async function pointerRequestHandler(pointers: string[]) {
+  async function pointerRequestHandler(pointers: string[]): Promise<Entity[]> {
     if (!pointers || pointers.length === 0) {
       return []
     }
