@@ -30,7 +30,6 @@ export function stream(
   ctx.engine.addTransport(transport)
 
   async function processMessage(message: Uint8Array) {
-    console.log('tick')
     transport.onmessage!(message)
     await ctx.engine.update(1)
     addUndoCrdt()
