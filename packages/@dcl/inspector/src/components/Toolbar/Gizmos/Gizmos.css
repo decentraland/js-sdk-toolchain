@@ -78,6 +78,10 @@
   position: relative;
 }
 
+.Gizmos .panel .alignment label {
+  color: var(--secondary-text);
+}
+
 .Gizmos .panel .alignment.disabled .icon {
   cursor: not-allowed;
   opacity: 0.5;
