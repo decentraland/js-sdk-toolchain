@@ -8,13 +8,13 @@ describe('Generated NftShape ProtoBuf', () => {
 
     testComponentSerialization(NftShape, {
       color: { r: 1, g: 1, b: 1 },
-      src: 'testSrc',
+      urn: 'testSrc',
       style: 5
     })
 
     testComponentSerialization(NftShape, {
       color: { r: 0, g: 0, b: 0 },
-      src: 'NotestSrc',
+      urn: 'NotestSrc',
       style: 2
     })
   })
