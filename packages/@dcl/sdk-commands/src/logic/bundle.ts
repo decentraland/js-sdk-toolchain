@@ -232,6 +232,7 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
   let shouldReload = true
   let contents = `export const compositeFromLoader = {}` // default exports nothing
   let watchFiles: string[] = [] // no files to watch
+  let lastBuiltSuccessful = false
 
   return {
     name: 'composite-loader',
@@ -262,7 +263,10 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
                 components.logger,
                 'Some composites are not included because of errors while compiling them. There can be unexpected behavior in the scene, check the errors and try to fix them.'
               )
+            } else if (!lastBuiltSuccessful) {
+              components.logger.log('Composites built without errors.')
             }
+            lastBuiltSuccessful = !data.withErrors
           }
           shouldReload = false
         }
