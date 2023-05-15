@@ -5,6 +5,7 @@ import { PropTypes, TypeProps, HORIZONTAL_PROPS, VERTICAL_PROPS } from './types'
 import './Resizable.css'
 
 const getProperties = (type: PropTypes['type']): TypeProps => type === 'horizontal' ? HORIZONTAL_PROPS : VERTICAL_PROPS
+const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1)
 
 function Resizable(props: React.PropsWithChildren<PropTypes>) {
   const ref = useRef<HTMLDivElement>(null)
@@ -36,11 +37,15 @@ function Resizable(props: React.PropsWithChildren<PropTypes>) {
   }, [value])
 
   const handleDrag = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    const clientValue = event[eventClientValue]
-    const diff = getParentOffset() - clientValue
-    if (!dragging || clientValue <= minValue || clientValue > (props.max || Infinity)) return
-    setValue([clientValue, diff])
-    if (props.onChange) props.onChange([clientValue, diff])
+    if (!dragging) return
+    resize(event[eventClientValue])
+  }
+
+  const resize = (value: number) => {
+    const diff = getParentOffset() - value
+    if (value <= minValue || value > (props.max || Infinity)) return
+    setValue([value, diff])
+    if (props.onChange) props.onChange([value, diff])
   }
 
   const handleMouseUp = useCallback(() => setDragging(false), [])
@@ -52,10 +57,15 @@ function Resizable(props: React.PropsWithChildren<PropTypes>) {
     }
   }, [])
 
+  const styles = {
+    [css.childs]: value[0] ?? 'auto',
+    [`min${capitalize(css.childs)}`]: minValue
+  }
+
   return (
     <div className={`Resizable ${props.type}`} onMouseMove={handleDrag}>
-      <div ref={ref} style={{ [css.childs]: value[0] ?? 'auto' }}>{children[0]}</div>
-      <div className="resize-handle" style={{ [css.handle]: value[0] ?? 0 }} onMouseDown={() => setDragging(true)} />
+      <div ref={ref} style={styles}>{children[0]}</div>
+      <div className="resize-handle" onMouseDown={() => setDragging(true)} />
       <div style={{ [css.childs]: value[1] ?? 'auto' }}>{children[1]}</div>
     </div>
   )

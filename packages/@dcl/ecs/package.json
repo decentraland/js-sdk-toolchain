@@ -7,9 +7,6 @@
   "dependencies": {
     "@dcl/js-runtime": "file:../js-runtime"
   },
-  "devDependencies": {
-    "ts-proto": "^1.122.0"
-  },
   "files": [
     "dist",
     "etc"

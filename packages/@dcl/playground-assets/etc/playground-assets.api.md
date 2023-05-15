@@ -4,6 +4,8 @@
 
 ```ts
 
+import _m0 from 'protobufjs/minimal';
+
 // @public (undocumented)
 export type AlignType = 'auto' | 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline' | 'space-between' | 'space-around';
 
@@ -85,6 +87,14 @@ export interface AvatarTexture {
 }
 
 // @public (undocumented)
+export namespace AvatarTexture {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): AvatarTexture;
+    // (undocumented)
+    export function encode(message: AvatarTexture, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export const enum BackgroundTextureMode {
     CENTER = 1,
     NINE_SLICES = 0,
@@ -135,6 +145,14 @@ export interface BorderRect {
     right: number;
     // (undocumented)
     top: number;
+}
+
+// @public (undocumented)
+export namespace BorderRect {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): BorderRect;
+    // (undocumented)
+    export function encode(message: BorderRect, writer?: _m0.Writer): _m0.Writer;
 }
 
 // Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
@@ -469,6 +487,18 @@ export interface ComponentData {
 }
 
 // @public (undocumented)
+export namespace ComponentData {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): ComponentData;
+    // (undocumented)
+    export function encode(message: ComponentData, writer?: _m0.Writer): _m0.Writer;
+    // (undocumented)
+    export function fromJSON(object: any): ComponentData;
+    // (undocumented)
+    export function toJSON(message: ComponentData): unknown;
+}
+
+// @public (undocumented)
 export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T> | GrowOnlyValueSetComponentDefinition<T>;
 
 // Warning: (ae-missing-release-tag) "componentDefinitionByName" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -552,6 +582,18 @@ export interface CompositeComponent {
 }
 
 // @public (undocumented)
+export namespace CompositeComponent {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): CompositeComponent;
+    // (undocumented)
+    export function encode(message: CompositeComponent, writer?: _m0.Writer): _m0.Writer;
+    // (undocumented)
+    export function fromJSON(object: any): CompositeComponent;
+    // (undocumented)
+    export function toJSON(message: CompositeComponent): unknown;
+}
+
+// @public (undocumented)
 export interface CompositeComponent_DataEntry {
     // (undocumented)
     key: number;
@@ -560,11 +602,35 @@ export interface CompositeComponent_DataEntry {
 }
 
 // @public (undocumented)
+export namespace CompositeComponent_DataEntry {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): CompositeComponent_DataEntry;
+    // (undocumented)
+    export function encode(message: CompositeComponent_DataEntry, writer?: _m0.Writer): _m0.Writer;
+    // (undocumented)
+    export function fromJSON(object: any): CompositeComponent_DataEntry;
+    // (undocumented)
+    export function toJSON(message: CompositeComponent_DataEntry): unknown;
+}
+
+// @public (undocumented)
 export interface CompositeDefinition {
     // (undocumented)
     components: CompositeComponent[];
     // (undocumented)
     version: number;
+}
+
+// @public (undocumented)
+export namespace CompositeDefinition {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): CompositeDefinition;
+    // (undocumented)
+    export function encode(message: CompositeDefinition, writer?: _m0.Writer): _m0.Writer;
+    // (undocumented)
+    export function fromJSON(object: any): CompositeDefinition;
+    // (undocumented)
+    export function toJSON(message: CompositeDefinition): unknown;
 }
 
 // @public (undocumented)
@@ -1820,8 +1886,24 @@ export interface PBAnimationState {
 }
 
 // @public (undocumented)
+export namespace PBAnimationState {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAnimationState;
+    // (undocumented)
+    export function encode(message: PBAnimationState, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBAnimator {
     states: PBAnimationState[];
+}
+
+// @public (undocumented)
+export namespace PBAnimator {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAnimator;
+    // (undocumented)
+    export function encode(message: PBAnimator, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -1834,10 +1916,26 @@ export interface PBAudioSource {
 }
 
 // @public (undocumented)
+export namespace PBAudioSource {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioSource;
+    // (undocumented)
+    export function encode(message: PBAudioSource, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBAudioStream {
     playing?: boolean | undefined;
     url: string;
     volume?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBAudioStream {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioStream;
+    // (undocumented)
+    export function encode(message: PBAudioStream, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -1847,10 +1945,26 @@ export interface PBAvatarAttach {
 }
 
 // @public (undocumented)
+export namespace PBAvatarAttach {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarAttach;
+    // (undocumented)
+    export function encode(message: PBAvatarAttach, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBAvatarModifierArea {
     area: PBVector3 | undefined;
     excludeIds: string[];
     modifiers: AvatarModifierType[];
+}
+
+// @public (undocumented)
+export namespace PBAvatarModifierArea {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarModifierArea;
+    // (undocumented)
+    export function encode(message: PBAvatarModifierArea, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -1869,8 +1983,24 @@ export interface PBAvatarShape {
 }
 
 // @public (undocumented)
+export namespace PBAvatarShape {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarShape;
+    // (undocumented)
+    export function encode(message: PBAvatarShape, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBBillboard {
     billboardMode?: BillboardMode | undefined;
+}
+
+// @public (undocumented)
+export namespace PBBillboard {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBBillboard;
+    // (undocumented)
+    export function encode(message: PBBillboard, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -1879,9 +2009,25 @@ export interface PBCameraMode {
 }
 
 // @public (undocumented)
+export namespace PBCameraMode {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBCameraMode;
+    // (undocumented)
+    export function encode(message: PBCameraMode, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBCameraModeArea {
     area: PBVector3 | undefined;
     mode: CameraType;
+}
+
+// @public (undocumented)
+export namespace PBCameraModeArea {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBCameraModeArea;
+    // (undocumented)
+    export function encode(message: PBCameraModeArea, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -1892,6 +2038,14 @@ export interface PBColor3 {
     g: number;
     // (undocumented)
     r: number;
+}
+
+// @public (undocumented)
+export namespace PBColor3 {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBColor3;
+    // (undocumented)
+    export function encode(message: PBColor3, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -1907,10 +2061,26 @@ export interface PBColor4 {
 }
 
 // @public (undocumented)
+export namespace PBColor4 {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBColor4;
+    // (undocumented)
+    export function encode(message: PBColor4, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBEngineInfo {
     frameNumber: number;
     tickNumber: number;
     totalRuntime: number;
+}
+
+// @public (undocumented)
+export namespace PBEngineInfo {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBEngineInfo;
+    // (undocumented)
+    export function encode(message: PBEngineInfo, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -1921,9 +2091,25 @@ export interface PBGltfContainer {
 }
 
 // @public (undocumented)
+export namespace PBGltfContainer {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfContainer;
+    // (undocumented)
+    export function encode(message: PBGltfContainer, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBGltfContainerLoadingState {
     // (undocumented)
     currentState: LoadingState;
+}
+
+// @public (undocumented)
+export namespace PBGltfContainerLoadingState {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfContainerLoadingState;
+    // (undocumented)
+    export function encode(message: PBGltfContainerLoadingState, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -1936,6 +2122,14 @@ export interface PBMaterial {
         $case: "pbr";
         pbr: PBMaterial_PbrMaterial;
     };
+}
+
+// @public (undocumented)
+export namespace PBMaterial {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMaterial;
+    // (undocumented)
+    export function encode(message: PBMaterial, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -1959,11 +2153,27 @@ export interface PBMaterial_PbrMaterial {
 }
 
 // @public (undocumented)
+export namespace PBMaterial_PbrMaterial {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMaterial_PbrMaterial;
+    // (undocumented)
+    export function encode(message: PBMaterial_PbrMaterial, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBMaterial_UnlitMaterial {
     alphaTest?: number | undefined;
     castShadows?: boolean | undefined;
     diffuseColor?: PBColor4 | undefined;
     texture?: TextureUnion | undefined;
+}
+
+// @public (undocumented)
+export namespace PBMaterial_UnlitMaterial {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMaterial_UnlitMaterial;
+    // (undocumented)
+    export function encode(message: PBMaterial_UnlitMaterial, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -1986,7 +2196,23 @@ export interface PBMeshCollider {
 }
 
 // @public (undocumented)
+export namespace PBMeshCollider {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider;
+    // (undocumented)
+    export function encode(message: PBMeshCollider, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBMeshCollider_BoxMesh {
+}
+
+// @public (undocumented)
+export namespace PBMeshCollider_BoxMesh {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_BoxMesh;
+    // (undocumented)
+    export function encode(_: PBMeshCollider_BoxMesh, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -1996,11 +2222,35 @@ export interface PBMeshCollider_CylinderMesh {
 }
 
 // @public (undocumented)
+export namespace PBMeshCollider_CylinderMesh {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_CylinderMesh;
+    // (undocumented)
+    export function encode(message: PBMeshCollider_CylinderMesh, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBMeshCollider_PlaneMesh {
 }
 
 // @public (undocumented)
+export namespace PBMeshCollider_PlaneMesh {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_PlaneMesh;
+    // (undocumented)
+    export function encode(_: PBMeshCollider_PlaneMesh, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBMeshCollider_SphereMesh {
+}
+
+// @public (undocumented)
+export namespace PBMeshCollider_SphereMesh {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_SphereMesh;
+    // (undocumented)
+    export function encode(_: PBMeshCollider_SphereMesh, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2022,8 +2272,24 @@ export interface PBMeshRenderer {
 }
 
 // @public (undocumented)
+export namespace PBMeshRenderer {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer;
+    // (undocumented)
+    export function encode(message: PBMeshRenderer, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBMeshRenderer_BoxMesh {
     uvs: number[];
+}
+
+// @public (undocumented)
+export namespace PBMeshRenderer_BoxMesh {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_BoxMesh;
+    // (undocumented)
+    export function encode(message: PBMeshRenderer_BoxMesh, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2033,12 +2299,36 @@ export interface PBMeshRenderer_CylinderMesh {
 }
 
 // @public (undocumented)
+export namespace PBMeshRenderer_CylinderMesh {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_CylinderMesh;
+    // (undocumented)
+    export function encode(message: PBMeshRenderer_CylinderMesh, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBMeshRenderer_PlaneMesh {
     uvs: number[];
 }
 
 // @public (undocumented)
+export namespace PBMeshRenderer_PlaneMesh {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_PlaneMesh;
+    // (undocumented)
+    export function encode(message: PBMeshRenderer_PlaneMesh, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBMeshRenderer_SphereMesh {
+}
+
+// @public (undocumented)
+export namespace PBMeshRenderer_SphereMesh {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_SphereMesh;
+    // (undocumented)
+    export function encode(_: PBMeshRenderer_SphereMesh, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2049,8 +2339,24 @@ export interface PBNftShape {
 }
 
 // @public (undocumented)
+export namespace PBNftShape {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBNftShape;
+    // (undocumented)
+    export function encode(message: PBNftShape, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBPointerEvents {
     pointerEvents: PBPointerEvents_Entry[];
+}
+
+// @public (undocumented)
+export namespace PBPointerEvents {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEvents;
+    // (undocumented)
+    export function encode(message: PBPointerEvents, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2060,11 +2366,27 @@ export interface PBPointerEvents_Entry {
 }
 
 // @public (undocumented)
+export namespace PBPointerEvents_Entry {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEvents_Entry;
+    // (undocumented)
+    export function encode(message: PBPointerEvents_Entry, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBPointerEvents_Info {
     button?: InputAction | undefined;
     hoverText?: string | undefined;
     maxDistance?: number | undefined;
     showFeedback?: boolean | undefined;
+}
+
+// @public (undocumented)
+export namespace PBPointerEvents_Info {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEvents_Info;
+    // (undocumented)
+    export function encode(message: PBPointerEvents_Info, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2080,8 +2402,24 @@ export interface PBPointerEventsResult {
 }
 
 // @public (undocumented)
+export namespace PBPointerEventsResult {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerEventsResult;
+    // (undocumented)
+    export function encode(message: PBPointerEventsResult, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBPointerLock {
     isPointerLocked: boolean;
+}
+
+// @public (undocumented)
+export namespace PBPointerLock {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPointerLock;
+    // (undocumented)
+    export function encode(message: PBPointerLock, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2092,6 +2430,14 @@ export interface PBPosition {
     y: number;
     // (undocumented)
     z: number;
+}
+
+// @public (undocumented)
+export namespace PBPosition {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPosition;
+    // (undocumented)
+    export function encode(message: PBPosition, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2119,12 +2465,28 @@ export interface PBRaycast {
 }
 
 // @public (undocumented)
+export namespace PBRaycast {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBRaycast;
+    // (undocumented)
+    export function encode(message: PBRaycast, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBRaycastResult {
     direction: PBVector3 | undefined;
     globalOrigin: PBVector3 | undefined;
     hits: RaycastHit[];
     tickNumber: number;
     timestamp?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBRaycastResult {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBRaycastResult;
+    // (undocumented)
+    export function encode(message: PBRaycastResult, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2153,6 +2515,14 @@ export interface PBTextShape {
 }
 
 // @public (undocumented)
+export namespace PBTextShape {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTextShape;
+    // (undocumented)
+    export function encode(message: PBTextShape, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBUiBackground {
     color?: PBColor4 | undefined;
     // (undocumented)
@@ -2164,11 +2534,27 @@ export interface PBUiBackground {
 }
 
 // @public (undocumented)
+export namespace PBUiBackground {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiBackground;
+    // (undocumented)
+    export function encode(message: PBUiBackground, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBUiCanvasInformation {
     devicePixelRatio: number;
     height: number;
     interactableArea: BorderRect | undefined;
     width: number;
+}
+
+// @public (undocumented)
+export namespace PBUiCanvasInformation {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiCanvasInformation;
+    // (undocumented)
+    export function encode(message: PBUiCanvasInformation, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2189,9 +2575,25 @@ export interface PBUiDropdown {
 }
 
 // @public (undocumented)
+export namespace PBUiDropdown {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiDropdown;
+    // (undocumented)
+    export function encode(message: PBUiDropdown, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBUiDropdownResult {
     // (undocumented)
     value: number;
+}
+
+// @public (undocumented)
+export namespace PBUiDropdownResult {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiDropdownResult;
+    // (undocumented)
+    export function encode(message: PBUiDropdownResult, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2210,9 +2612,25 @@ export interface PBUiInput {
 }
 
 // @public (undocumented)
+export namespace PBUiInput {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiInput;
+    // (undocumented)
+    export function encode(message: PBUiInput, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBUiInputResult {
     // (undocumented)
     value: string;
+}
+
+// @public (undocumented)
+export namespace PBUiInputResult {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiInputResult;
+    // (undocumented)
+    export function encode(message: PBUiInputResult, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2222,6 +2640,14 @@ export interface PBUiText {
     fontSize?: number | undefined;
     textAlign?: TextAlignMode | undefined;
     value: string;
+}
+
+// @public (undocumented)
+export namespace PBUiText {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiText;
+    // (undocumented)
+    export function encode(message: PBUiText, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2302,11 +2728,27 @@ export interface PBUiTransform {
 }
 
 // @public (undocumented)
+export namespace PBUiTransform {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiTransform;
+    // (undocumented)
+    export function encode(message: PBUiTransform, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBVector2 {
     // (undocumented)
     x: number;
     // (undocumented)
     y: number;
+}
+
+// @public (undocumented)
+export namespace PBVector2 {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBVector2;
+    // (undocumented)
+    export function encode(message: PBVector2, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2317,6 +2759,14 @@ export interface PBVector3 {
     y: number;
     // (undocumented)
     z: number;
+}
+
+// @public (undocumented)
+export namespace PBVector3 {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBVector3;
+    // (undocumented)
+    export function encode(message: PBVector3, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2332,6 +2782,14 @@ export interface PBVideoEvent {
 }
 
 // @public (undocumented)
+export namespace PBVideoEvent {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBVideoEvent;
+    // (undocumented)
+    export function encode(message: PBVideoEvent, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBVideoPlayer {
     loop?: boolean | undefined;
     playbackRate?: number | undefined;
@@ -2342,8 +2800,24 @@ export interface PBVideoPlayer {
 }
 
 // @public (undocumented)
+export namespace PBVideoPlayer {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBVideoPlayer;
+    // (undocumented)
+    export function encode(message: PBVideoPlayer, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBVisibilityComponent {
     visible?: boolean | undefined;
+}
+
+// @public (undocumented)
+export namespace PBVisibilityComponent {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBVisibilityComponent;
+    // (undocumented)
+    export function encode(message: PBVisibilityComponent, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public
@@ -2560,6 +3034,14 @@ export interface RaycastHit {
 }
 
 // @public (undocumented)
+export namespace RaycastHit {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): RaycastHit;
+    // (undocumented)
+    export function encode(message: RaycastHit, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export const enum RaycastQueryType {
     RQT_HIT_FIRST = 0,
     RQT_NONE = 2,
@@ -2655,6 +3137,14 @@ export interface Rect {
     x: number;
     // (undocumented)
     y: number;
+}
+
+// @public (undocumented)
+export namespace Rect {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): Rect;
+    // (undocumented)
+    export function encode(message: Rect, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public
@@ -2823,6 +3313,14 @@ export interface Texture {
 }
 
 // @public (undocumented)
+export namespace Texture {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): Texture;
+    // (undocumented)
+    export function encode(message: Texture, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export const enum TextureFilterMode {
     // (undocumented)
     TFM_BILINEAR = 1,
@@ -2861,6 +3359,14 @@ export interface TextureUnion {
         $case: "videoTexture";
         videoTexture: VideoTexture;
     };
+}
+
+// @public (undocumented)
+export namespace TextureUnion {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): TextureUnion;
+    // (undocumented)
+    export function encode(message: TextureUnion, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3227,6 +3733,14 @@ export interface VideoTexture {
     // (undocumented)
     videoPlayerEntity: number;
     wrapMode?: TextureWrapMode | undefined;
+}
+
+// @public (undocumented)
+export namespace VideoTexture {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): VideoTexture;
+    // (undocumented)
+    export function encode(message: VideoTexture, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
