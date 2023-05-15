@@ -9,6 +9,7 @@
   },
   "files": [
     "dist",
+    "dist-cjs",
     "etc"
   ],
   "homepage": "https://github.com/decentraland/ecs#readme",
@@ -24,7 +25,7 @@
     "directory": "packages/@dcl/ecs"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json"
   },
   "typedoc": {
     "entryPoint": "./src/index.ts",

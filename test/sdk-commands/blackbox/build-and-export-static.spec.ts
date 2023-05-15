@@ -8,7 +8,7 @@ describe('blackbox: build', () => {
   test('build integration test with workspace', async () => {
     const components = await initComponents()
     await runSdkCommand(components, 'build', ['--dir=test/build-ecs/fixtures', '--customEntryPoint'])
-  }, 15000)
+  }, 45000)
 
   test('build integration test with single scene', async () => {
     const components = await initComponents()

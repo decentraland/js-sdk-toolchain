@@ -5,3 +5,4 @@ tsdoc-metadata.json
 coverage
 src/components/generated
 src/composite/proto/gen
+dist-cjs
