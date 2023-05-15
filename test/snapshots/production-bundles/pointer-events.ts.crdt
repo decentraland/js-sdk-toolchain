@@ -8,15 +8,9 @@ EVAL test/snapshots/production-bundles/pointer-events.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-<<<<<<< HEAD
-  OPCODES ~= 32k
-  MALLOC_COUNT = 8692
-  ALIVE_OBJS_DELTA ~= 1.85k
-=======
-  OPCODES ~= 34k
+  OPCODES ~= 33k
   MALLOC_COUNT = 8757
   ALIVE_OBJS_DELTA ~= 1.87k
->>>>>>> origin/main
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 8
