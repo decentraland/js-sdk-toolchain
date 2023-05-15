@@ -11,7 +11,7 @@ import { ToolbarButton } from './ToolbarButton'
 import './Toolbar.css'
 
 const Toolbar = withSdk(({ sdk }) => {
-  const [isDirty] = useSave()
+  const [save, isDirty] = useSave()
   const handleInspector = useCallback(() => {
     const { debugLayer } = sdk.scene
     if (debugLayer.isVisible()) {
@@ -31,13 +31,9 @@ const Toolbar = withSdk(({ sdk }) => {
     []
   )
 
-  const handleSave = useCallback(async () => {
-    await sdk.dataLayer.save({})
-  }, [])
-
   return (
     <div className="Toolbar">
-      <ToolbarButton className="save" onClick={handleSave}>
+      <ToolbarButton className="save" onClick={save}>
         {isDirty ? <BiSave /> : <BiBadgeCheck/>}
       </ToolbarButton>
       <ToolbarButton className="undo" onClick={handleUndoRedo(sdk?.dataLayer.undo)}>
