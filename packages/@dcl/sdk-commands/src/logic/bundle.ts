@@ -10,7 +10,7 @@ import path from 'path'
 import { pathToFileURL } from 'url'
 import { CliComponents } from '../components'
 import { colors } from '../components/log'
-import { printProgressInfo, printProgressStep } from './beautiful-logs'
+import { printProgressInfo, printProgressStep, printWarning } from './beautiful-logs'
 import { CliError } from './error'
 import { getAllComposites } from './composite'
 
@@ -206,8 +206,9 @@ function compositeLoader(components: BundleComponents, options: CompileOptions):
             watchFiles = data.watchFiles
 
             if (data.withErrors) {
-              components.logger.log(
-                'Warning: some composites are not included because of errors while compiling them. There can be unexpected behavior in the scene, check the errors and try to fix them.'
+              printWarning(
+                components.logger,
+                'Some composites are not included because of errors while compiling them. There can be unexpected behavior in the scene, check the errors and try to fix them.'
               )
             }
           }

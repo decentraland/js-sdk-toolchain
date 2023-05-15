@@ -2,6 +2,7 @@ import { globSync } from 'glob'
 import path from 'path'
 import { CliComponents } from '../components'
 import { Composite, Engine } from '@dcl/ecs/dist-cjs'
+import { printError } from './beautiful-logs'
 
 type CompositeComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -20,8 +21,10 @@ export async function getAllComposites(
       const json = JSON.parse(textDecoder.decode(fileBuffer))
       composites[file] = Composite.fromJson(json)
     } catch (err: any) {
-      components.logger.log(
-        `Composite '${file}' can't be read. Please check if is a valid JSON and composite formated. ${err.stack}`
+      printError(
+        components.logger,
+        `Composite '${file}' can't be read. Please check if is a valid JSON and composite formated.`,
+        err
       )
       withErrors = true
     }
@@ -45,7 +48,7 @@ export async function getAllComposites(
       Composite.instance(engine, composite, compositeProvider)
       compositeLines.push(`'${composite.src}':${JSON.stringify(Composite.toJson(composite.composite))}`)
     } catch (err: any) {
-      components.logger.log(`Composite '${compositeSource}' can't be instanced ${err.stack}`)
+      printError(components.logger, `Composite '${compositeSource}' can't be instanced.`, err)
       withErrors = true
     }
   }
