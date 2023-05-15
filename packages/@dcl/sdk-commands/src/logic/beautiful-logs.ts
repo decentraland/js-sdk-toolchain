@@ -50,3 +50,8 @@ export function printSuccess(logger: ILoggerComponent.ILogger, operationSuccessf
     logger.log(summary)
   }
 }
+
+export function printError(logger: ILoggerComponent.ILogger, comment: string, error: Error) {
+  logger.log(colors.redBright(comment))
+  logger.error(error)
+}
