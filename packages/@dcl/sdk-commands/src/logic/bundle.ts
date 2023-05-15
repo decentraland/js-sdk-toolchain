@@ -12,6 +12,7 @@ import { CliComponents } from '../components'
 import { colors } from '../components/log'
 import { printProgressInfo, printProgressStep } from './beautiful-logs'
 import { CliError } from './error'
+import { getAllComposites } from './composite'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -251,6 +252,12 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
             )
             contents = `export const compositeFromLoader = {${data.compositeLines.join(',')}}`
             watchFiles = data.watchFiles
+
+            if (data.withErrors) {
+              components.logger.log(
+                'Warning: some composites are not included because of errors while compiling them. There can be unexpected behavior in the scene, check the errors and try to fix them.'
+              )
+            }
           }
           shouldReload = false
         }
@@ -263,32 +270,4 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
       })
     }
   }
-}
-
-async function getAllComposites(
-  components: BundleComponents,
-  workingDirectory: string
-): Promise<{ watchFiles: string[]; compositeLines: string[] }> {
-  const composites: Record<string, Uint8Array> = {}
-  const files = globSync('**/*.{composite,composite.bin}', { cwd: workingDirectory })
-
-  for (const file of files) {
-    composites[file] = await components.fs.readFile(path.join(workingDirectory, file))
-  }
-
-  const watchFiles = Object.keys(composites)
-  const compositeLines: string[] = []
-
-  for (const compositeName in composites) {
-    const bin = composites[compositeName]
-    if (compositeName.endsWith('.bin')) {
-      compositeLines.push(`'${compositeName}':new Uint8Array(${JSON.stringify(Array.from(bin))})`)
-    } else {
-      const textDecoder = new TextDecoder()
-      const json = JSON.stringify(JSON.parse(textDecoder.decode(bin)))
-      compositeLines.push(`'${compositeName}':${JSON.stringify(json)}`)
-    }
-  }
-
-  return { compositeLines, watchFiles }
 }

@@ -1,0 +1,8 @@
+.Warnings {
+  position: absolute;
+  bottom: 5px;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}

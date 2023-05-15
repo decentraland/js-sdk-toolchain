@@ -23,14 +23,14 @@ export async function generateProtocolBuffer(params: {
 
   const protoCommandArgs: string[] = [
     `--plugin=${TS_PROTO_PLUGIN_PATH}`,
-    `--ts_proto_opt=esModuleInterop=true`,
-    `--ts_proto_opt=outputJsonMethods=false`,
-    `--ts_proto_opt=forceLong=false`,
-    `--ts_proto_opt=outputPartialMethods=false`,
-    `--ts_proto_opt=fileSuffix=.gen`,
-    `--ts_proto_opt=unrecognizedEnum=false`,
-    `--ts_proto_opt=oneof=unions`,
-    `--ts_proto_out=${pbGeneratedPath}`,
+    `--dcl_ts_proto_opt=esModuleInterop=true`,
+    `--dcl_ts_proto_opt=outputJsonMethods=false`,
+    `--dcl_ts_proto_opt=forceLong=false`,
+    `--dcl_ts_proto_opt=outputPartialMethods=false`,
+    `--dcl_ts_proto_opt=fileSuffix=.gen`,
+    `--dcl_ts_proto_opt=unrecognizedEnum=false`,
+    `--dcl_ts_proto_opt=oneof=unions`,
+    `--dcl_ts_proto_out=${pbGeneratedPath}`,
     `--proto_path=${protocolPath}`,
     protoFiles
   ]

@@ -33,7 +33,7 @@ export const useTree = () => {
   }, [sdk])
 
   // Update tree when a change happens in the engine
-  // TODO: are we sure about this ? It seems to expensive 🤔
+  // TODO: are we sure about this ? It seems too expensive 🤔
   const handleUpdate = useCallback(() => setTree(getTree()), [setTree, getTree])
   useChange(handleUpdate)
 
