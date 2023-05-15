@@ -57,8 +57,11 @@ import { engine } from '@dcl/sdk/ecs'
 import * as sdk from '@dcl/sdk'
 
 if ((entrypoint as any).main !== undefined) {
-  async function _INTERNAL_startup_system() {
-    await (entrypoint as any).main()
+  function _INTERNAL_startup_system() {
+    const maybePromise = (entrypoint as any).main()
+    if (maybePromise && typeof maybePromise === 'object' && typeof (maybePromise as unknown as Promise<unknown>).then === 'function') {
+      maybePromise.catch(console.error)
+    }
     engine.removeSystem(_INTERNAL_startup_system)
   }
   engine.addSystem(_INTERNAL_startup_system, Infinity)
