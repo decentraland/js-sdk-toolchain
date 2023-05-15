@@ -27,7 +27,12 @@ export async function onStart() {
   if (!response.hasEntities) {
     const mainComposite = compositeProvider.getCompositeOrNull('main.composite')
     if (mainComposite) {
-      Composite.instance(engine, mainComposite, compositeProvider)
+      try {
+        Composite.instance(engine, mainComposite, compositeProvider)
+      } catch (err) {
+        console.log(`Warning: main.composite couldn't be instanced.`)
+        console.error(err)
+      }
     }
   }
 
