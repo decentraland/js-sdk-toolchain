@@ -197,7 +197,7 @@ async function serveFolders(
     return next()
   })
 
-  async function pointerRequestHandler(pointers: string[]) {
+  async function pointerRequestHandler(pointers: string[]): Promise<Entity[]> {
     if (!pointers || pointers.length === 0) {
       return []
     }
@@ -208,13 +208,13 @@ async function serveFolders(
 
     const resultEntities = await getSceneJson(components, workspace, Array.from(requestedPointers))
 
-    const remote = fetchEntityByPointer(
+    const remote = await fetchEntityByPointer(
       components,
       catalystUrl.toString(),
       pointers.filter(($: string) => !$.match(/-?\d+,-?\d+/))
     )
 
-    const serverEntities = Array.isArray(remote) ? remote : []
+    const serverEntities = Array.isArray(remote.deployments) ? remote.deployments : []
 
     return [...resultEntities, ...serverEntities]
   }
