@@ -11,11 +11,14 @@ export const compositeProvider: Composite.Provider = {
     const fromLoader = compositeFromLoader[src]
     if (fromLoader) {
       try {
-        if (src.endsWith('.bin') && fromLoader instanceof Uint8Array) {
+        if (fromLoader instanceof Uint8Array) {
           const composite = Composite.fromBinary(fromLoader)
           composites.push({ src, composite })
         } else if (typeof fromLoader === 'string') {
           const composite = Composite.fromJson(JSON.parse(fromLoader))
+          composites.push({ src, composite })
+        } else if (typeof fromLoader === 'object') {
+          const composite = Composite.fromJson(fromLoader)
           composites.push({ src, composite })
         }
       } catch (err) {
