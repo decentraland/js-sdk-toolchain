@@ -48,11 +48,12 @@ const MAX_STEP = 2
  */
 
 function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean) {
-  if (forceCustomExport) return `;"use strict";export * from '${entrypointPath}'`
+  const unixEntrypointPath = entrypointPath.replace(/(\\)/g, '/')
+  if (forceCustomExport) return `;"use strict";export * from '${unixEntrypointPath}'`
 
   return `// BEGIN AUTO GENERATED CODE "~sdk/scene-entrypoint"
 "use strict";
-import * as entrypoint from '${entrypointPath}'
+import * as entrypoint from '${unixEntrypointPath}'
 import { engine } from '@dcl/sdk/ecs'
 import * as sdk from '@dcl/sdk'
 
