@@ -69,7 +69,7 @@ if ((entrypoint as any).main !== undefined) {
 }
 
 export * from '@dcl/sdk'
-export * from '${entrypointPath}'
+export * from '${unixEntrypointPath}'
 `
 }
 
