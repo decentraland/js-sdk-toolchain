@@ -30,6 +30,11 @@ describe('Runs the snapshots', () => {
     ENV
   )
   itExecutes(
+    `npm run build -- --production --ignoreComposite "--single=production-bundles/with-main-function.ts"`,
+    path.resolve('test/snapshots'),
+    ENV
+  )
+  itExecutes(
     `npm run build -- --customEntryPoint --ignoreComposite  "--single=development-bundles/*.ts"`,
     path.resolve('test/snapshots'),
     ENV
