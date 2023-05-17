@@ -1,13 +1,17 @@
 import { useCallback } from 'react'
-import { BiUndo, BiRedo } from 'react-icons/bi'
+import { BiUndo, BiRedo, BiSave, BiBadgeCheck } from 'react-icons/bi'
 import { RiListSettingsLine } from 'react-icons/ri'
+
+import { fileSystemEvent } from '../../hooks/catalog/useFileSystem'
+import { useSave } from '../../hooks/editor/useSave'
 import { withSdk } from '../../hoc/withSdk'
 import { Gizmos } from './Gizmos'
 import { ToolbarButton } from './ToolbarButton'
+
 import './Toolbar.css'
-import { fileSystemEvent } from '../../hooks/catalog/useFileSystem'
 
 const Toolbar = withSdk(({ sdk }) => {
+  const [save, isDirty] = useSave()
   const handleInspector = useCallback(() => {
     const { debugLayer } = sdk.scene
     if (debugLayer.isVisible()) {
@@ -29,6 +33,9 @@ const Toolbar = withSdk(({ sdk }) => {
 
   return (
     <div className="Toolbar">
+      <ToolbarButton className="save" onClick={save}>
+        {isDirty ? <BiSave /> : <BiBadgeCheck/>}
+      </ToolbarButton>
       <ToolbarButton className="undo" onClick={handleUndoRedo(sdk?.dataLayer.undo)}>
         <BiUndo />
       </ToolbarButton>

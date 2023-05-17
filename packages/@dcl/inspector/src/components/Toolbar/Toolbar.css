@@ -6,7 +6,8 @@
 }
 
 .Toolbar .undo svg,
-.Toolbar .redo svg {
+.Toolbar .redo svg,
+.Toolbar .save svg {
   transform: translateY(2px);
 }
 
