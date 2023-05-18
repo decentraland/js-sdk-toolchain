@@ -9,6 +9,7 @@
     "@dcl/protocol": "1.0.0-4982615619.commit-96dba07",
     "@dcl/quickjs-emscripten": "^0.21.0-3680274614.commit-1808aa1",
     "@dcl/ts-proto": "^1.146.2",
+    "@lottiefiles/react-lottie-player": "^3.5.3",
     "@types/fs-extra": "^9.0.12",
     "@types/jest": "^28.1.8",
     "@types/rimraf": "^3.0.0",

@@ -130,3 +130,8 @@
 .AiBox .ui.dimmer {
   opacity: 0.3;
 }
+
+.ai-box__container .row .ai-box__error {
+  color: red;
+  margin-top: 20px;
+}
