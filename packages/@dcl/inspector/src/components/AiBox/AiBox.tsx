@@ -61,7 +61,7 @@ const AiBox = withSdk<PropTypes>(({ sdk, onSave }) => {
       }) */
       const filename = value.replace(/\s+/gi, '-')
       setLoading(true)
-      const response = await fetch(`http://0.0.0.0:3000/render?prompt=${encodeURI(value)}`)
+      const response = await fetch(`http://0.0.0.0:3000/render?prompt=${encodeURI(value)}&sampler=shap_e`)
       const blob = (await response.blob()) as File
       const file = new File([blob], `${filename}.glb`)
       setLoading(false)
