@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react'
 import { MdImageSearch } from 'react-icons/md'
 import { AiFillFolder } from 'react-icons/ai'
 import { HiOutlinePlus } from 'react-icons/hi'
-import { BsCloudUpload } from 'react-icons/bs'
+import { BsMagic } from 'react-icons/bs'
 
 import { useCatalog } from '../../hooks/catalog/useCatalog'
 import { AssetsCatalog } from '../AssetsCatalog'
@@ -83,8 +83,8 @@ const App = () => {
               <span>World Assets Pack</span>
             </div>
             <div onClick={handleTabClick(Tab.Ai)}>
-              <BsCloudUpload />
-              <span>AI Promt</span>
+              <BsMagic />
+              <span>ShibuGPT</span>
             </div>
           </div>
         </Box>

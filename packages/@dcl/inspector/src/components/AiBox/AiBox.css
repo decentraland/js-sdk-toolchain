@@ -1,9 +1,10 @@
 .AiBox {
   height: 100%;
   padding: 8px;
+  position: relative;
 }
 
-.AiBox > div:first-child {
+.AiBox>div:first-child {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -14,15 +15,14 @@
   padding: 24px;
   border: 2px dashed #666;
   border-radius: 8px;
-  cursor: pointer;
 }
 
-.AiBox > div > span:first-of-type {
+.AiBox>div>span:first-of-type {
   font-size: 24px;
   padding: 8px;
 }
 
-.AiBox > div > span:last-of-type {
+.AiBox>div>span:last-of-type {
   text-align: center;
 }
 
@@ -58,6 +58,7 @@
   justify-content: center;
   position: relative;
 }
+
 .AiBox .Container .remove-icon {
   display: none;
 }
@@ -87,6 +88,7 @@
   flex-direction: row;
   margin-top: 16px;
 }
+
 .AiBox .file-container .Container {
   width: 120px;
 }
@@ -100,16 +102,31 @@
   border-color: red;
 }
 
-.AiBox .file-container > div:nth-child(2) {
+.AiBox .file-container>div:nth-child(2) {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
 }
 
-.AiBox .file-container > div:nth-child(2) button {
+.AiBox .file-container>div:nth-child(2) button {
   background-color: var(--primary);
+}
+
+.ai-box__container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .ai-box__container .TextField {
   width: 300px;
+}
+
+.ai-box__container .row {
+  display: flex;
+  align-items: center;
+}
+
+.AiBox .ui.dimmer {
+  opacity: 0.3;
 }
