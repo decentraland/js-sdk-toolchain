@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react'
 import { MdImageSearch } from 'react-icons/md'
 import { AiFillFolder } from 'react-icons/ai'
 import { HiOutlinePlus } from 'react-icons/hi'
+import { BsCloudUpload } from 'react-icons/bs'
 
 import { useCatalog } from '../../hooks/catalog/useCatalog'
 import { AssetsCatalog } from '../AssetsCatalog'
@@ -16,11 +17,13 @@ import './App.css'
 import { Resizable } from '../Resizable'
 import ImportAsset from '../ImportAsset'
 import { fileSystemEvent } from '../../hooks/catalog/useFileSystem'
+import AiBox from '../AiBox'
 
 enum Tab {
   FileSystem = 'FileSystem',
   AssetsPack = 'AssetsPack',
-  Import = 'Import'
+  Import = 'Import',
+  Ai = 'Ai'
 }
 
 const App = () => {
@@ -63,6 +66,7 @@ const App = () => {
               {tab === Tab.AssetsPack && catalog && <AssetsCatalog value={catalog} />}
               {tab === Tab.FileSystem && <ProjectAssetExplorer onImportAsset={handleTabClick(Tab.Import)} />}
               {tab === Tab.Import && <ImportAsset onSave={handleSave} />}
+              {tab === Tab.Ai && <AiBox onSave={handleSave} />}
             </div>
           )}
           <div className="footer-buttons">
@@ -77,6 +81,10 @@ const App = () => {
             <div onClick={handleTabClick(Tab.AssetsPack)}>
               <MdImageSearch />
               <span>World Assets Pack</span>
+            </div>
+            <div onClick={handleTabClick(Tab.Ai)}>
+              <BsCloudUpload />
+              <span>AI Promt</span>
             </div>
           </div>
         </Box>
