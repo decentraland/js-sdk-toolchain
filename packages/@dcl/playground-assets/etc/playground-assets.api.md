@@ -540,6 +540,7 @@ export const componentDefinitionByName: {
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
+    "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::UiBackground": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiBackground>>;
     "core::UiCanvasInformation": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>>;
     "core::UiDropdown": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdown>>;
@@ -2607,6 +2608,86 @@ export namespace PBTextShape {
 }
 
 // @public (undocumented)
+export interface PBTween {
+    duration: number;
+    // (undocumented)
+    tweenFunction: PBTween_TweenFunction;
+}
+
+// @public (undocumented)
+export namespace PBTween {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTween;
+    // (undocumented)
+    export function encode(message: PBTween, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export const enum PBTween_TweenFunction {
+    // (undocumented)
+    TF_EASE_IN_BACK = 23,
+    // (undocumented)
+    TF_EASE_IN_BOUNCE = 29,
+    // (undocumented)
+    TF_EASE_IN_CIRC = 20,
+    // (undocumented)
+    TF_EASE_IN_CUBIC = 5,
+    // (undocumented)
+    TF_EASE_IN_ELASTIC = 26,
+    // (undocumented)
+    TF_EASE_IN_EXPO = 17,
+    // (undocumented)
+    TF_EASE_IN_OUT_BACK = 25,
+    // (undocumented)
+    TF_EASE_IN_OUT_BOUNCE = 30,
+    // (undocumented)
+    TF_EASE_IN_OUT_CIRC = 22,
+    // (undocumented)
+    TF_EASE_IN_OUT_CUBIC = 7,
+    // (undocumented)
+    TF_EASE_IN_OUT_ELASTIC = 28,
+    // (undocumented)
+    TF_EASE_IN_OUT_EXPO = 19,
+    // (undocumented)
+    TF_EASE_IN_OUT_QUAD = 4,
+    // (undocumented)
+    TF_EASE_IN_OUT_QUART = 10,
+    // (undocumented)
+    TF_EASE_IN_OUT_QUINT = 13,
+    // (undocumented)
+    TF_EASE_IN_OUT_SINE = 16,
+    // (undocumented)
+    TF_EASE_IN_QUAD = 2,
+    // (undocumented)
+    TF_EASE_IN_QUART = 8,
+    // (undocumented)
+    TF_EASE_IN_QUINT = 11,
+    // (undocumented)
+    TF_EASE_IN_SINE = 14,
+    // (undocumented)
+    TF_EASE_OUT_BACK = 24,
+    // (undocumented)
+    TF_EASE_OUT_BOUNCE = 31,
+    // (undocumented)
+    TF_EASE_OUT_CIRC = 21,
+    // (undocumented)
+    TF_EASE_OUT_CUBIC = 6,
+    // (undocumented)
+    TF_EASE_OUT_ELASTIC = 27,
+    // (undocumented)
+    TF_EASE_OUT_EXPO = 18,
+    // (undocumented)
+    TF_EASE_OUT_QUAD = 3,
+    // (undocumented)
+    TF_EASE_OUT_QUART = 9,
+    // (undocumented)
+    TF_EASE_OUT_QUINT = 12,
+    // (undocumented)
+    TF_EASE_OUT_SINE = 15,
+    TF_LINEAR = 0
+}
+
+// @public (undocumented)
 export interface PBUiBackground {
     color?: PBColor4 | undefined;
     // (undocumented)
@@ -3529,6 +3610,9 @@ export type Transport = {
 
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
+
+// @public (undocumented)
+export const Tween: LastWriteWinElementSetComponentDefinition<PBTween>;
 
 // @public
 export interface UiAvatarTexture {
