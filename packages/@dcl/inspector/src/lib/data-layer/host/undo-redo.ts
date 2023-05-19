@@ -9,7 +9,6 @@ import {
 import upsertAsset from './upsert-asset'
 import { FileSystemInterface } from '../types'
 import { findPrevValue } from './utils/component'
-import { EditorComponentIds } from '../../sdk/components'
 
 export type UndoRedoCrdt = { $case: 'crdt'; operations: CrdtOperation[] }
 export type UndoRedoFile = { $case: 'file'; operations: FileOperation[] }

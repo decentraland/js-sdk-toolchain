@@ -5,7 +5,7 @@ import { defineMeshRendererComponent } from '@dcl/ecs/dist/components/extended/M
 import { createEditorComponents } from '../../sdk/components'
 import { dumpEngineToComposite } from '../host/utils/engine-to-composite'
 import { Composite } from '@dcl/ecs'
-import { GltfContainer, Material, PointerEvents } from '@dcl/ecs/dist/components'
+import { GltfContainer, PointerEvents } from '@dcl/ecs/dist/components'
 import { defineMaterialComponent } from '@dcl/ecs/dist/components/extended/Material'
 import { defineMeshColliderComponent } from '@dcl/ecs/dist/components/extended/MeshCollider'
 

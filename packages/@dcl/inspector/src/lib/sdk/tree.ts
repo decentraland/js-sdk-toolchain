@@ -86,7 +86,6 @@ export const getTreeFromEngine = (
             // If the orphan is already an ancestor of the entity, we skip it otherwise we would create a cycle
             continue
           }
-          const { label } = EntityNode.get(orphan)
           // Add orphan to parent's children
           setParent(orphan, entity)
           dirtyEngine = true
