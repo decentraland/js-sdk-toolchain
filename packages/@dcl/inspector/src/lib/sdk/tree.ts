@@ -74,7 +74,6 @@ export const getTreeFromEngine = (
         // When the entity does not have a EntityNode it is shown as a child of the root entity
         childrenByParent.get(ROOT)!.add(entity)
         dirtyEngine = true
-        operations.updateValue(EntityNode, entity, {})
       }
       // We flag the entity as processed
       childrenByParent.set(entity, new Set())
@@ -87,10 +86,8 @@ export const getTreeFromEngine = (
             // If the orphan is already an ancestor of the entity, we skip it otherwise we would create a cycle
             continue
           }
-          const { label } = EntityNode.get(orphan)
           // Add orphan to parent's children
           setParent(orphan, entity)
-          operations.updateValue(EntityNode, orphan, { label, parent: entity })
           dirtyEngine = true
           // Delete orphan from root's children
           childrenByParent.get(ROOT)!.delete(orphan)

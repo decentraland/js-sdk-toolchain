@@ -15,7 +15,7 @@ export * from '@dcl/sdk'
 
 const entity = 512 as Entity
 
-withRenderer((engine) => {
+export const onServerUpdate = withRenderer((engine) => {
   const PointerEventsResult = components.PointerEventsResult(engine)
 
   let count = 0

@@ -66,7 +66,7 @@ describe('build command', () => {
       .mockResolvedValue({ kind: 'scene', scene: {} as any, workingDirectory: process.cwd() })
     jest.spyOn(projectValidation, 'needsDependencies').mockResolvedValue(false)
     const sceneJson = { scene: { base: '0,0' } } as any
-    const tsBuildSpy = jest.spyOn(dclCompiler, 'bundleProject').mockResolvedValue({ sceneJson, context: null as any })
+    const tsBuildSpy = jest.spyOn(dclCompiler, 'bundleProject').mockResolvedValue({ sceneJson, inputs: [] })
 
     await build.main({
       args: { _: [], '--watch': false, '--production': true },

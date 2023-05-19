@@ -5,12 +5,7 @@ import { Props } from './types'
 
 import './Modal.css'
 
-const Modal = ({
-  children,
-  className = '',
-  overlayClassName = '',
-  ...props
-}: Props) => {
+const Modal = ({ children, className = '', overlayClassName = '', ...props }: Props) => {
   return (
     <_Modal
       ariaHideApp={false}

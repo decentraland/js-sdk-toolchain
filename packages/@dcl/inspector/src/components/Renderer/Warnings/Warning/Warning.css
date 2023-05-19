@@ -1,0 +1,15 @@
+.Warning {
+  color: var(--white);
+  background-color: var(--tree-bg-color);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.Warning .icon {
+  color: var(--danger);
+  margin-right: 4px;
+  width: 16px;
+  height: 16px;
+}

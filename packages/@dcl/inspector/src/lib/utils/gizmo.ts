@@ -1,5 +1,5 @@
 export enum GizmoType {
-  TRANSLATE = 0,
-  ROTATE = 1,
+  POSITION = 0,
+  ROTATION = 1,
   SCALE = 2
 }

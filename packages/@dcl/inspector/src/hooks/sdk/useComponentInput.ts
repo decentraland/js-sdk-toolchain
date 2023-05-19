@@ -1,4 +1,4 @@
-import { InputHTMLAttributes, useCallback, useEffect, useState } from 'react'
+import { InputHTMLAttributes, useCallback, useEffect, useRef, useState } from 'react'
 import { Entity } from '@dcl/ecs'
 import { getValue, NestedKey, setValue } from '../../lib/logic/get-set-value'
 import { Component } from '../../lib/sdk/components'
@@ -28,11 +28,11 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
     componentValue === null ? null : fromComponentValueToInput(componentValue)
   )
   const [isFocused, setIsFocused] = useState(false)
-  const [skipSync, setSkipSync] = useState(false)
+  const skipSyncRef = useRef(false)
   const [isValid, setIsValid] = useState(false)
 
   const updateInputs = useCallback((value: InputType | null, skipSync = false) => {
-    setSkipSync(skipSync)
+    skipSyncRef.current = skipSync
     setInput(value)
   }, [])
 
@@ -59,7 +59,7 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
 
   // sync inputs -> engine
   useEffect(() => {
-    if (skipSync) return
+    if (skipSyncRef.current) return
     if (validate(input)) {
       const newComponentValue = { ...componentValue, ...fromInputToComponentValue(input) }
 

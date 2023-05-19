@@ -3,11 +3,42 @@ import { Entity, EntityMappingMode, IEngine, Composite, OnChangeFunction, Compos
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
 import { getFilesInDirectory } from './fs-utils'
 import { dumpEngineToComposite, dumpEngineToCrdtCommands } from './utils/engine-to-composite'
-import { createFsCompositeProvider } from './utils/fs-composite-provider'
+import { CompositeManager, createFsCompositeProvider } from './utils/fs-composite-provider'
 import { stream } from './stream'
 import { FileOperation, initUndoRedo } from './undo-redo'
 import { minimalComposite } from '../client/feeded-local-fs'
 import upsertAsset from './upsert-asset'
+
+function setupEngineDump(
+  fs: FileSystemInterface,
+  engine: IEngine,
+  compositeProvider: CompositeManager,
+  compositePath: string
+) {
+  return function dumpEngineAndGetComposite(dump: boolean = true): CompositeDefinition {
+    // TODO: hardcoded for the moment
+    const composite = dumpEngineToComposite(engine, 'json')
+    // TODO: the ID should be the selected composite id name
+    // composite.id = 'main'
+
+    if (!dump) return composite
+
+    const mainCrdt = dumpEngineToCrdtCommands(engine)
+    fs.writeFile('main.crdt', Buffer.from(mainCrdt)).catch((err) => console.error(`Failed saving main.crdt: `, err))
+
+    compositeProvider
+      .save({ src: compositePath, composite }, 'json')
+      .catch((err) => console.error(`Save composite ${compositePath} fails: `, err))
+
+    return composite
+  }
+}
+
+// TODO: placeholder just for making things clear. We should replace this
+// with proper user settings when we have them...
+const userSettings = {
+  autoSave: true
+}
 
 export async function initRpcMethods(
   fs: FileSystemInterface,
@@ -22,6 +53,7 @@ export async function initRpcMethods(
   }
 
   const compositeProvider = await createFsCompositeProvider(fs)
+  const dumpEngineAndGetComposite = setupEngineDump(fs, engine, compositeProvider, currentCompositeResourcePath)
   const mainComposite = compositeProvider.getCompositeOrNull(currentCompositeResourcePath)
   if (mainComposite) {
     Composite.instance(engine, mainComposite, compositeProvider, {
@@ -44,23 +76,18 @@ export async function initRpcMethods(
   // TODO: review this
   // Dump composite to the FS on every tick
   onChanges.push(() => (dirty = true))
-  engine.addSystem(function () {
-    if (dirty) {
-      dirty = false
 
-      // TODO: hardcoded for the moment
-      composite = dumpEngineToComposite(engine, 'json')
-      // TODO: the ID should be the selected composite id name
-      // composite.id = 'main'
-
-      const mainCrdt = dumpEngineToCrdtCommands(engine)
-      fs.writeFile('main.crdt', Buffer.from(mainCrdt)).catch((err) => console.error(`Failed saving main.crdt: `, err))
-
-      compositeProvider
-        .save({ src: currentCompositeResourcePath, composite }, 'json')
-        .catch((err) => console.error(`Save composite ${currentCompositeResourcePath} fails: `, err))
-    }
+  engine.addSystem(() => {
+    save(userSettings.autoSave)
   }, -1_000_000_000)
+
+  // TODO: review this to avoid this side-effect asignation...
+  const save = (dump: boolean = true) => {
+    if (dirty) {
+      composite = dumpEngineAndGetComposite(dump)
+      dirty = false
+    }
+  }
 
   return {
     async redo() {
@@ -122,6 +149,10 @@ export async function initRpcMethods(
         await fs.rm(filePath)
         undoRedo.addUndoFile([{ prevValue, newValue: null, path: filePath }])
       }
+      return {}
+    },
+    async save() {
+      save()
       return {}
     }
   }

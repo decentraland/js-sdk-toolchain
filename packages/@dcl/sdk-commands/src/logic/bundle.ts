@@ -10,8 +10,9 @@ import path from 'path'
 import { pathToFileURL } from 'url'
 import { CliComponents } from '../components'
 import { colors } from '../components/log'
-import { printProgressInfo, printProgressStep } from './beautiful-logs'
+import { printProgressInfo, printProgressStep, printWarning } from './beautiful-logs'
 import { CliError } from './error'
+import { getAllComposites } from './composite'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -39,6 +40,39 @@ export type CompileOptions = {
 
 const MAX_STEP = 2
 
+/**
+ * Generate the entry-point code for a given original entry-point
+ * @param entrypointPath - file to be imported as original entry point
+ * @param forceCustomExport
+ * @returns the Typescript code
+ */
+
+function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean) {
+  const unixEntrypointPath = entrypointPath.replace(/(\\)/g, '/')
+  if (forceCustomExport) return `;"use strict";export * from '${unixEntrypointPath}'`
+
+  return `// BEGIN AUTO GENERATED CODE "~sdk/scene-entrypoint"
+"use strict";
+import * as entrypoint from '${unixEntrypointPath}'
+import { engine } from '@dcl/sdk/ecs'
+import * as sdk from '@dcl/sdk'
+
+if ((entrypoint as any).main !== undefined) {
+  function _INTERNAL_startup_system() {
+    const maybePromise = (entrypoint as any).main()
+    if (maybePromise && typeof maybePromise === 'object' && typeof (maybePromise as unknown as Promise<unknown>).then === 'function') {
+      maybePromise.catch(console.error)
+    }
+    engine.removeSystem(_INTERNAL_startup_system)
+  }
+  engine.addSystem(_INTERNAL_startup_system, Infinity)
+}
+
+export * from '@dcl/sdk'
+export * from '${unixEntrypointPath}'
+`
+}
+
 export async function bundleProject(components: BundleComponents, options: CompileOptions, sceneJson: Scene) {
   const tsconfig = path.join(options.workingDirectory, 'tsconfig.json')
 
@@ -57,24 +91,44 @@ export async function bundleProject(components: BundleComponents, options: Compi
     throw new CliError(`File ${tsconfig} must exist to compile the Typescript project`)
   }
 
-  const input = globSync(options.single ?? 'src/index.ts', { cwd: options.workingDirectory, absolute: true }) // entryPoints.map((item) => item.dest)
+  const entrypointSource = options.single ?? 'src/index.ts'
+  const entrypoints = globSync(entrypointSource, { cwd: options.workingDirectory, absolute: true })
 
   /* istanbul ignore if */
-  if (!input.length) throw new CliError(`There are no input files to build: ${options.single ?? 'src/index.ts'}`)
+  if (!entrypoints.length) throw new CliError(`There are no input files to build: ${entrypointSource}`)
 
-  const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
-  const outfile = path.join(options.workingDirectory, output)
+  // const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
+  // const outfile = path.join(options.workingDirectory, output)
+  const inputs: { entrypoint: string; outputFile: string }[] = options.single
+    ? entrypoints.map((entrypoint) => ({ entrypoint, outputFile: entrypoint.replace(/\.ts$/, '.js') }))
+    : [{ entrypoint: entrypoints[0], outputFile: sceneJson.main }]
 
-  printProgressStep(components.logger, `Bundling file ${colors.bold(input.join(','))}`, 1, MAX_STEP)
+  for (const input of inputs) {
+    await bundleSingleProject(components, {
+      ...options,
+      tsconfig,
+      ...input
+    })
+  }
+
+  return { sceneJson, inputs }
+}
+
+type SingleProjectOptions = CompileOptions & {
+  tsconfig: string
+  entrypoint: string
+  outputFile: string
+}
+
+export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
+  printProgressStep(components.logger, `Bundling file ${colors.bold(options.entrypoint)}`, 1, MAX_STEP)
 
   const context = await esbuild.context({
-    entryPoints: input,
     bundle: true,
     platform: 'browser',
     format: 'cjs',
     preserveSymlinks: false,
-    outfile: input.length > 1 ? undefined : outfile,
-    outdir: input.length > 1 ? path.dirname(outfile) : undefined,
+    outfile: options.outputFile,
     allowOverwrite: false,
     sourcemap: options.production ? 'external' : 'inline',
     minify: options.production,
@@ -87,7 +141,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
     target: 'es2020',
     external: ['~system/*', '@dcl/inspector', '@dcl/inspector/*' /* ban importing the inspector from the SDK */],
     // convert filesystem paths into file:// to enable VSCode debugger
-    sourceRoot: pathToFileURL(path.dirname(outfile)).toString(),
+    sourceRoot: pathToFileURL(path.dirname(options.outputFile)).toString(),
     define: {
       document: 'undefined',
       window: 'undefined',
@@ -95,32 +149,34 @@ export async function bundleProject(components: BundleComponents, options: Compi
       'globalThis.DEBUG': options.production ? 'false' : 'true',
       'process.env.NODE_ENV': JSON.stringify(options.production ? 'production' : 'development')
     },
-    tsconfig: path.join(options.workingDirectory, 'tsconfig.json'),
+    tsconfig: options.tsconfig,
     supported: {
       'import-assertions': false,
       'import-meta': false,
       'dynamic-import': false,
       hashbang: false
     },
-    plugins: [entryPointLoader(components, input, options), compositeLoader(components, options)]
+    logOverride: {
+      'import-is-undefined': 'silent'
+    },
+    plugins: [compositeLoader(components, options)],
+    stdin: {
+      contents: getEntrypointCode(options.entrypoint, options.customEntryPoint),
+      resolveDir: path.dirname(options.entrypoint),
+      sourcefile: path.basename(options.entrypoint) + '.entry-point.ts',
+      loader: 'ts'
+    }
   })
 
   /* istanbul ignore if */
   if (options.watch) {
     await context.watch({})
 
-    printProgressInfo(components.logger, `Bundle saved ${colors.bold(output)}`)
+    printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
   } else {
     try {
-      const ctx = await context.rebuild()
-      printProgressInfo(
-        components.logger,
-        `Bundle saved ${colors.bold(
-          Object.keys(ctx.metafile.outputs)
-            .filter((_) => _.endsWith('.js'))
-            .join(',') || outfile
-        )}`
-      )
+      await context.rebuild()
+      printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
     } catch (err: any) {
       /* istanbul ignore next */
       throw new CliError(err.toString())
@@ -132,8 +188,6 @@ export async function bundleProject(components: BundleComponents, options: Compi
   if (options.watch) printProgressInfo(components.logger, `The compiler is watching for changes`)
 
   await runTypeChecker(components, options)
-
-  return { context, sceneJson }
 }
 
 function runTypeChecker(components: BundleComponents, options: CompileOptions) {
@@ -175,10 +229,11 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   return typeCheckerFuture
 }
 
-function compositeLoader(components: BundleComponents, options: CompileOptions): esbuild.Plugin {
+function compositeLoader(components: BundleComponents, options: SingleProjectOptions): esbuild.Plugin {
   let shouldReload = true
   let contents = `export const compositeFromLoader = {}` // default exports nothing
   let watchFiles: string[] = [] // no files to watch
+  let lastBuiltSuccessful = false
 
   return {
     name: 'composite-loader',
@@ -203,6 +258,16 @@ function compositeLoader(components: BundleComponents, options: CompileOptions):
             )
             contents = `export const compositeFromLoader = {${data.compositeLines.join(',')}}`
             watchFiles = data.watchFiles
+
+            if (data.withErrors) {
+              printWarning(
+                components.logger,
+                'Some composites are not included because of errors while compiling them. There can be unexpected behavior in the scene, check the errors and try to fix them.'
+              )
+            } else if (!lastBuiltSuccessful) {
+              components.logger.log('Composites built without errors.')
+            }
+            lastBuiltSuccessful = !data.withErrors
           }
           shouldReload = false
         }
@@ -211,52 +276,6 @@ function compositeLoader(components: BundleComponents, options: CompileOptions):
           loader: 'js',
           contents,
           watchFiles
-        }
-      })
-    }
-  }
-}
-
-async function getAllComposites(
-  components: BundleComponents,
-  workingDirectory: string
-): Promise<{ watchFiles: string[]; compositeLines: string[] }> {
-  const composites: Record<string, Uint8Array> = {}
-  const files = globSync('**/*.{composite,composite.bin}', { cwd: workingDirectory })
-
-  for (const file of files) {
-    composites[file] = await components.fs.readFile(path.join(workingDirectory, file))
-  }
-
-  const watchFiles = Object.keys(composites)
-  const compositeLines: string[] = []
-
-  for (const compositeName in composites) {
-    const bin = composites[compositeName]
-    if (compositeName.endsWith('.bin')) {
-      compositeLines.push(`'${compositeName}':new Uint8Array(${JSON.stringify(Array.from(bin))})`)
-    } else {
-      const textDecoder = new TextDecoder()
-      const json = JSON.stringify(JSON.parse(textDecoder.decode(bin)))
-      compositeLines.push(`'${compositeName}':${JSON.stringify(json)}`)
-    }
-  }
-
-  return { compositeLines, watchFiles }
-}
-
-function entryPointLoader(components: BundleComponents, inputs: string[], options: CompileOptions): esbuild.Plugin {
-  const escapedInputs = inputs.map(($) => $.replace(/\\/g, '\\\\'))
-  const filter = new RegExp(`(${escapedInputs.join('|')})`)
-  return {
-    name: 'entry-point-loader',
-    setup(build) {
-      build.onLoad({ filter }, async (args) => {
-        const exportSdk = options.customEntryPoint ? '' : `;export * from '@dcl/sdk';`
-        const contents = exportSdk + (await components.fs.readFile(args.path))
-        return {
-          loader: 'ts',
-          contents
         }
       })
     }

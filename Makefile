@@ -62,7 +62,7 @@ test:
 	make test-inspector
 
 test-inspector:
-	cd ./packages/@dcl/inspector/; ./../../../node_modules/.bin/jest --coverage --detectOpenHandles --colors --config ./jest.config.js $(FILES)
+	cd ./packages/@dcl/inspector/; TS_JEST_TRANSFORMER=true ./../../../node_modules/.bin/jest --coverage --detectOpenHandles --colors --config ./jest.config.js $(FILES)
 
 test-cli:
 	@rm -rf tmp
@@ -112,11 +112,11 @@ prepare:
 
 scripts/rpc-api-generation/src/proto/%.gen.ts: node_modules/@dcl/protocol/proto/decentraland/kernel/apis/%.proto node_modules/.bin/protobuf/bin/protoc
 	@${PROTOC}  \
-			--plugin=./node_modules/.bin/protoc-gen-ts_proto \
-			--ts_proto_opt=esModuleInterop=true,returnObservable=false,outputServices=generic-definitions \
-			--ts_proto_opt=fileSuffix=.gen \
-			--ts_proto_opt=onlyTypes=true \
-			--ts_proto_out="$(PWD)/scripts/rpc-api-generation/src/proto" \
+			--plugin=./node_modules/.bin/protoc-gen-dcl_ts_proto \
+			--dcl_ts_proto_opt=esModuleInterop=true,returnObservable=false,outputServices=generic-definitions \
+			--dcl_ts_proto_opt=fileSuffix=.gen \
+			--dcl_ts_proto_opt=onlyTypes=true \
+			--dcl_ts_proto_out="$(PWD)/scripts/rpc-api-generation/src/proto" \
 			-I="$(PWD)/scripts/rpc-api-generation/src/proto" \
 			-I="$(PWD)/node_modules/@dcl/protocol/proto/" \
 			"$(PWD)/node_modules/@dcl/protocol/proto/decentraland/kernel/apis/$*.proto";

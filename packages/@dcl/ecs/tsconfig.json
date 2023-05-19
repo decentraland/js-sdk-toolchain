@@ -17,5 +17,5 @@
     "types": ["@dcl/js-runtime"]
   },
   "include": ["src"],
-  "exclude": ["dist"]
+  "exclude": ["dist", "dist-cjs"]
 }

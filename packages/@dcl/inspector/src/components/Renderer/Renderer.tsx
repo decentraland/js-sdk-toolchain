@@ -13,9 +13,10 @@ import { ROOT } from '../../lib/sdk/tree'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { IAsset } from '../AssetsCatalog/types'
 import { getModel, isAsset } from '../EntityInspector/GltfInspector/utils'
+import { useIsMounted } from '../../hooks/useIsMounted'
+import { Warnings } from './Warnings'
 
 import './Renderer.css'
-import { useIsMounted } from '../../hooks/useIsMounted'
 
 const fixedNumber = (val: number) => Math.round(val * 1e2) / 1e2
 
@@ -110,6 +111,7 @@ const Renderer: React.FC = () => {
           <Dimmer active />
         </div>
       )}
+      <Warnings />
       <canvas ref={canvasRef} id="canvas" touch-action="none" />
     </div>
   )

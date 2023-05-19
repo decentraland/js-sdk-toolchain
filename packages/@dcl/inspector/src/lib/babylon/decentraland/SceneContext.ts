@@ -19,6 +19,7 @@ import { putTransformComponent } from './sdkComponents/transform'
 import { consumeAllMessagesInto } from '../../logic/consume-stream'
 import { putSceneComponent } from './editorComponents/scene'
 import { createOperations } from '../../sdk/operations'
+import { createGizmoManager } from './gizmo-manager'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -43,6 +44,7 @@ export class SceneContext {
   })
 
   operations = createOperations(this.engine)
+  gizmos = createGizmoManager(this)
 
   Billboard = components.Billboard(this.engine)
   Transform = components.Transform(this.engine)

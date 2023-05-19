@@ -39,4 +39,5 @@ service DataService {
   rpc GetAssetData(Asset) returns (AssetData) {}
   rpc ImportAsset(ImportAssetRequest) returns (Empty) {}
   rpc RemoveAsset(Asset) returns (Empty) {}
+  rpc Save(Empty) returns (Empty) {}
 }
