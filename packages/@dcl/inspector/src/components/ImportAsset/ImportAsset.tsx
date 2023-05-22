@@ -14,6 +14,9 @@ import { useFileSystem } from '../../hooks/catalog/useFileSystem'
 import './ImportAsset.css'
 import classNames from 'classnames'
 
+const ONE_MB_IN_BYTES = 1_048_576
+const ONE_GB_IN_BYTES = ONE_MB_IN_BYTES * 1024
+
 interface PropTypes {
   onSave(): void
 }
@@ -61,6 +64,8 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
     return packageName?.toLocaleLowerCase() === assetPackageName?.toLocaleLowerCase()
   })
 
+  const validSize = (file?.size || 0) <= ONE_GB_IN_BYTES
+
   return (
     <div className="ImportAsset">
       <FileInput disabled={!!file} onDrop={handleDrop} accept={{ 'model/gltf-binary': ['.gltf', '.glb'] }}>
@@ -85,7 +90,7 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
               <IoIosImage />
               <div className="file-title">{file.name}</div>
             </Container>
-            <div className={classNames({ error: !!invalidName })}>
+            <div className={classNames({ error: !!invalidName || !validSize })}>
               <Block label="Asset Pack Name">
                 <TextField
                   label=""
@@ -93,9 +98,10 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => setAssetPackageName(event.target.value)}
                 />
               </Block>
-              <Button disabled={invalidName} onClick={handleSave}>
+              <Button disabled={invalidName || !validSize} onClick={handleSave}>
                 Save asset
               </Button>
+              <span>{!validSize && 'Asset size must be under 1GB'}</span>
             </div>
           </div>
         )}
