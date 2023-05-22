@@ -42,7 +42,7 @@ export type UiTexture = {
 /**
  * @public
  */
-export type TextureWrapType = 'repeat' | 'clamp' | 'mirror' | 'mirror-once'
+export type TextureWrapType = 'repeat' | 'clamp' | 'mirror'
 /**
  * @public
  */

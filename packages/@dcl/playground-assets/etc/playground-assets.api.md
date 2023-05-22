@@ -2037,6 +2037,7 @@ export namespace PBAvatarAttach {
 
 // @public (undocumented)
 export interface PBAvatarCustomization {
+    // (undocumented)
     bodyShapeUrn: string;
     // (undocumented)
     eyesColor: PBColor3 | undefined;
@@ -3560,13 +3561,11 @@ export const enum TextureWrapMode {
     // (undocumented)
     TWM_MIRROR = 2,
     // (undocumented)
-    TWM_MIRROR_ONCE = 3,
-    // (undocumented)
     TWM_REPEAT = 0
 }
 
 // @public (undocumented)
-export type TextureWrapType = 'repeat' | 'clamp' | 'mirror' | 'mirror-once';
+export type TextureWrapType = 'repeat' | 'clamp' | 'mirror';
 
 // @public
 export const ToGammaSpace: number;
