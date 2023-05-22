@@ -104,7 +104,7 @@ describe('Generated Material ProtoBuf', () => {
           tex: {
             $case: 'texture',
             texture: {
-              wrapMode: TextureWrapMode.TWM_MIRROR_ONCE,
+              wrapMode: TextureWrapMode.TWM_MIRROR,
               filterMode: TextureFilterMode.TFM_TRILINEAR,
               src: 'not-casla'
             }
