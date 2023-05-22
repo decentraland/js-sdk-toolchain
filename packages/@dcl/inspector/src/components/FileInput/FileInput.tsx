@@ -14,16 +14,17 @@ function parseAccept(accept: PropTypes['accept']) {
 export function FileInput(props: PropsWithChildren<PropTypes>) {
   const { onDrop } = props
   const inputRef = useRef<HTMLInputElement>(null)
+  const acceptExtensions = Object.values(props.accept ?? []).flat()
+
   const [_, drop] = useDrop(
     () => ({
       accept: [NativeTypes.FILE],
       drop(item: { files: File[] }) {
-        const acceptExtensions = Object.values(props.accept ?? []).flat()
-        const canDrop = item.files.every((file) => !!acceptExtensions.find((ext) => file.name.endsWith(ext)))
-        if (onDrop && canDrop) {
-          onDrop(item.files)
-        }
-      }
+        if (onDrop) onDrop(item.files)
+      },
+      canDrop(item: { files: File[] }) {
+        return item.files.every((file) => !!acceptExtensions.find((ext) => file.name.endsWith(ext)))
+      },
     }),
     [props]
   )
