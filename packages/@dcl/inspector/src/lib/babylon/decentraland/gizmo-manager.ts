@@ -8,6 +8,11 @@ import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manag
 import { SceneContext } from './SceneContext'
 import { GizmoType } from '../../utils/gizmo'
 
+function areProportional(a: number, b: number) {
+  // this leeway is here to account for rounding errors due to serializing/deserializing floating point numbers
+  return Math.abs(a - b) < 1e-6
+}
+
 export function createGizmoManager(context: SceneContext) {
   // events
   const events = mitt<{ change: void }>()
@@ -47,7 +52,7 @@ export function createGizmoManager(context: SceneContext) {
 
   function fixRotationGizmoAlignment(value: TransformType) {
     const isProportional =
-      Math.abs(value.scale.x) === Math.abs(value.scale.y) && Math.abs(value.scale.y) === value.scale.z
+      areProportional(value.scale.x, value.scale.y) && areProportional(value.scale.y, value.scale.z)
     rotationGizmoAlignmentDisabled = !isProportional
     if (!isProportional && !isRotationGizmoWorldAligned()) {
       setRotationGizmoWorldAligned(true) // set to world
