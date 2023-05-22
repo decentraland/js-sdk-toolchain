@@ -526,6 +526,7 @@ export const componentDefinitionByName: {
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
+    "core::DelayedInterpolation": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBDelayedInterpolation>>;
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
@@ -742,6 +743,9 @@ export type DeepReadonlySet<T> = ReadonlySet<DeepReadonly<T>>;
 export const DEG2RAD: number;
 
 // @public (undocumented)
+export const DelayedInterpolation: LastWriteWinElementSetComponentDefinition<PBDelayedInterpolation>;
+
+// @public (undocumented)
 export namespace DeleteComponent {
     const // (undocumented)
     MESSAGE_HEADER_LENGTH = 12;
@@ -800,6 +804,71 @@ export type DisplayType = 'flex' | 'none';
 //
 // @public
 export function Dropdown(props: UiDropdownProps): ReactEcs.JSX.Element;
+
+// @public (undocumented)
+export const enum EasingFunction {
+    // (undocumented)
+    TF_EASE_IN_BACK = 23,
+    // (undocumented)
+    TF_EASE_IN_BOUNCE = 29,
+    // (undocumented)
+    TF_EASE_IN_CIRC = 20,
+    // (undocumented)
+    TF_EASE_IN_CUBIC = 5,
+    // (undocumented)
+    TF_EASE_IN_ELASTIC = 26,
+    // (undocumented)
+    TF_EASE_IN_EXPO = 17,
+    // (undocumented)
+    TF_EASE_IN_OUT_BACK = 25,
+    // (undocumented)
+    TF_EASE_IN_OUT_BOUNCE = 30,
+    // (undocumented)
+    TF_EASE_IN_OUT_CIRC = 22,
+    // (undocumented)
+    TF_EASE_IN_OUT_CUBIC = 7,
+    // (undocumented)
+    TF_EASE_IN_OUT_ELASTIC = 28,
+    // (undocumented)
+    TF_EASE_IN_OUT_EXPO = 19,
+    // (undocumented)
+    TF_EASE_IN_OUT_QUAD = 4,
+    // (undocumented)
+    TF_EASE_IN_OUT_QUART = 10,
+    // (undocumented)
+    TF_EASE_IN_OUT_QUINT = 13,
+    // (undocumented)
+    TF_EASE_IN_OUT_SINE = 16,
+    // (undocumented)
+    TF_EASE_IN_QUAD = 2,
+    // (undocumented)
+    TF_EASE_IN_QUART = 8,
+    // (undocumented)
+    TF_EASE_IN_QUINT = 11,
+    // (undocumented)
+    TF_EASE_IN_SINE = 14,
+    // (undocumented)
+    TF_EASE_OUT_BACK = 24,
+    // (undocumented)
+    TF_EASE_OUT_BOUNCE = 31,
+    // (undocumented)
+    TF_EASE_OUT_CIRC = 21,
+    // (undocumented)
+    TF_EASE_OUT_CUBIC = 6,
+    // (undocumented)
+    TF_EASE_OUT_ELASTIC = 27,
+    // (undocumented)
+    TF_EASE_OUT_EXPO = 18,
+    // (undocumented)
+    TF_EASE_OUT_QUAD = 3,
+    // (undocumented)
+    TF_EASE_OUT_QUART = 9,
+    // (undocumented)
+    TF_EASE_OUT_QUINT = 12,
+    // (undocumented)
+    TF_EASE_OUT_SINE = 15,
+    TF_LINEAR = 0
+}
 
 // @public (undocumented)
 export interface EcsElements {
@@ -1968,7 +2037,6 @@ export namespace PBAvatarAttach {
 
 // @public (undocumented)
 export interface PBAvatarCustomization {
-    // (undocumented)
     bodyShapeUrn: string;
     // (undocumented)
     eyesColor: PBColor3 | undefined;
@@ -2007,9 +2075,9 @@ export namespace PBAvatarEmoteCommand {
 // @public (undocumented)
 export interface PBAvatarEquippedData {
     // (undocumented)
-    emotes: string[];
+    emotesUrns: string[];
     // (undocumented)
-    urns: string[];
+    wearableUrns: string[];
 }
 
 // @public (undocumented)
@@ -2134,6 +2202,19 @@ export namespace PBColor4 {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBColor4;
     // (undocumented)
     export function encode(message: PBColor4, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBDelayedInterpolation {
+    timeTravelDuration: number;
+}
+
+// @public (undocumented)
+export namespace PBDelayedInterpolation {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBDelayedInterpolation;
+    // (undocumented)
+    export function encode(message: PBDelayedInterpolation, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2611,7 +2692,7 @@ export namespace PBTextShape {
 export interface PBTween {
     duration: number;
     // (undocumented)
-    tweenFunction: PBTween_TweenFunction;
+    tweenFunction: EasingFunction;
 }
 
 // @public (undocumented)
@@ -2620,71 +2701,6 @@ export namespace PBTween {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTween;
     // (undocumented)
     export function encode(message: PBTween, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export const enum PBTween_TweenFunction {
-    // (undocumented)
-    TF_EASE_IN_BACK = 23,
-    // (undocumented)
-    TF_EASE_IN_BOUNCE = 29,
-    // (undocumented)
-    TF_EASE_IN_CIRC = 20,
-    // (undocumented)
-    TF_EASE_IN_CUBIC = 5,
-    // (undocumented)
-    TF_EASE_IN_ELASTIC = 26,
-    // (undocumented)
-    TF_EASE_IN_EXPO = 17,
-    // (undocumented)
-    TF_EASE_IN_OUT_BACK = 25,
-    // (undocumented)
-    TF_EASE_IN_OUT_BOUNCE = 30,
-    // (undocumented)
-    TF_EASE_IN_OUT_CIRC = 22,
-    // (undocumented)
-    TF_EASE_IN_OUT_CUBIC = 7,
-    // (undocumented)
-    TF_EASE_IN_OUT_ELASTIC = 28,
-    // (undocumented)
-    TF_EASE_IN_OUT_EXPO = 19,
-    // (undocumented)
-    TF_EASE_IN_OUT_QUAD = 4,
-    // (undocumented)
-    TF_EASE_IN_OUT_QUART = 10,
-    // (undocumented)
-    TF_EASE_IN_OUT_QUINT = 13,
-    // (undocumented)
-    TF_EASE_IN_OUT_SINE = 16,
-    // (undocumented)
-    TF_EASE_IN_QUAD = 2,
-    // (undocumented)
-    TF_EASE_IN_QUART = 8,
-    // (undocumented)
-    TF_EASE_IN_QUINT = 11,
-    // (undocumented)
-    TF_EASE_IN_SINE = 14,
-    // (undocumented)
-    TF_EASE_OUT_BACK = 24,
-    // (undocumented)
-    TF_EASE_OUT_BOUNCE = 31,
-    // (undocumented)
-    TF_EASE_OUT_CIRC = 21,
-    // (undocumented)
-    TF_EASE_OUT_CUBIC = 6,
-    // (undocumented)
-    TF_EASE_OUT_ELASTIC = 27,
-    // (undocumented)
-    TF_EASE_OUT_EXPO = 18,
-    // (undocumented)
-    TF_EASE_OUT_QUAD = 3,
-    // (undocumented)
-    TF_EASE_OUT_QUART = 9,
-    // (undocumented)
-    TF_EASE_OUT_QUINT = 12,
-    // (undocumented)
-    TF_EASE_OUT_SINE = 15,
-    TF_LINEAR = 0
 }
 
 // @public (undocumented)
