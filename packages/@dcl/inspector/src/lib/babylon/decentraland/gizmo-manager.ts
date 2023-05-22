@@ -10,7 +10,7 @@ import { GizmoType } from '../../utils/gizmo'
 
 function areProportional(a: number, b: number) {
   // this leeway is here to account for rounding errors due to serializing/deserializing floating point numbers
-  return Math.abs(a - b) < 1e-6
+  return Math.abs(a - b) < 1e-5
 }
 
 export function createGizmoManager(context: SceneContext) {
