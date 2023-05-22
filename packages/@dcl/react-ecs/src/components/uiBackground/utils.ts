@@ -58,8 +58,7 @@ function parseTexture<T = unknown>(texture: CommonTexture<T>): Texture<T> {
 const parseWrap: Readonly<Record<TextureWrapType, TextureWrapMode>> = {
   repeat: TextureWrapMode.TWM_REPEAT,
   clamp: TextureWrapMode.TWM_CLAMP,
-  mirror: TextureWrapMode.TWM_MIRROR,
-  'mirror-once': TextureWrapMode.TWM_MIRROR_ONCE
+  mirror: TextureWrapMode.TWM_MIRROR
 }
 const parseFilter: Readonly<Record<TextureFilterType, TextureFilterMode>> = {
   point: TextureFilterMode.TFM_POINT,
