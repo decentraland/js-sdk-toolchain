@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { BsCaretDown } from 'react-icons/bs'
 import { BiCheckbox, BiCheckboxChecked } from 'react-icons/bi'
 import cx from 'classnames'
@@ -47,8 +47,12 @@ export const Gizmos = withSdk(({ sdk }) => {
 
   const ref = useOutsideClick(handleClosePanel)
 
+  useEffect(() => {
+    setShowPanel(false)
+  }, [selection])
+
   return (
-    <div className="Gizmos">
+    <div className="Gizmos" ref={ref}>
       <ToolbarButton
         className={cx('gizmo position', { active: selection?.gizmo === GizmoType.POSITION })}
         disabled={disableGizmos}
@@ -65,7 +69,7 @@ export const Gizmos = withSdk(({ sdk }) => {
         onClick={handleScaleGizmo}
       />
       <BsCaretDown className="open-panel" onClick={handleTogglePanel} />
-      <div ref={ref} className={cx('panel', { visible: showPanel })}>
+      <div className={cx('panel', { visible: showPanel })}>
         <div className="title">
           <label>Snap</label>
           <SnapToggleIcon className="icon" onClick={toggle} />
