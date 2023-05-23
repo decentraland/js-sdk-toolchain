@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { CrdtMessageType } from '@dcl/ecs'
 import { useSdk } from '../sdk/useSdk'
 import { useChange } from '../sdk/useChange'
 import { Gizmos } from '../../lib/babylon/decentraland/gizmo-manager'
-import { CrdtMessageType } from '@dcl/ecs'
 
 export const useGizmoAlignment = () => {
   const gizmosRef = useRef<Gizmos | null>(null)

@@ -110,3 +110,6 @@
   background-color: var(--primary);
 }
 
+.ImportAsset .file-container .error {
+  color: var(--primary);
+}

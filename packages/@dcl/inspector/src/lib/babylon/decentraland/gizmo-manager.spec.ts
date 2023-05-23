@@ -69,7 +69,7 @@ describe('GizmoManager', () => {
             entity.scaling = new Vector3(1, 2, 1)
           })
           afterEach(() => {
-            entity.scaling = Vector3.Zero()
+            entity.scaling = new Vector3(1, 1, 1)
           })
           describe('and the rotation gizmo is not world aligned', () => {
             beforeEach(() => {
@@ -118,6 +118,22 @@ describe('GizmoManager', () => {
                 expect(handler).toHaveBeenCalled()
               })
             })
+          })
+        })
+        describe('and the entity is almost proportionally scaled except for a tiny rounding error', () => {
+          beforeEach(() => {
+            entity.scaling = new Vector3(1.0000001192092896, 0.9999998807907104, 1)
+          })
+          afterEach(() => {
+            entity.scaling = new Vector3(1, 1, 1)
+          })
+          it('should not force the rotation gizmo to be world aligned', () => {
+            gizmos.setRotationGizmoWorldAligned(false)
+            expect(gizmos.isRotationGizmoWorldAligned()).toBe(false)
+            expect(gizmos.isRotationGizmoAlignmentDisabled()).toBe(false)
+            gizmos.gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.notifyObservers({} as any)
+            expect(gizmos.isRotationGizmoWorldAligned()).toBe(false)
+            expect(gizmos.isRotationGizmoAlignmentDisabled()).toBe(false)
           })
         })
       })
