@@ -11,7 +11,7 @@ export const EntityInspector: React.FC = () => {
 
   return (
     <div className="EntityInspector" key={entity}>
-      {inspectors.map((Compoment, index) => entity !== null && <Compoment key={index} entity={entity} />)}
+      {inspectors.map((Inspector, index) => entity !== null && <Inspector key={index} entity={entity} />)}
     </div>
   )
 }
