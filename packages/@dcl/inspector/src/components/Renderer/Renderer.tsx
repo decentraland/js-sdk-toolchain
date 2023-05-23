@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDrop } from 'react-dnd'
 import { Vector3 } from '@babylonjs/core'
 import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
@@ -7,8 +7,10 @@ import { Dimmer } from 'decentraland-ui/dist/components/Dimmer/Dimmer'
 import { BuilderAsset, DROP_TYPES, IDrop, ProjectAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
 import { useRenderer } from '../../hooks/sdk/useRenderer'
 import { useSdk } from '../../hooks/sdk/useSdk'
+import { useFileSystem } from '../../hooks/catalog/useFileSystem'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 import { snapPosition } from '../../lib/babylon/decentraland/snap-manager'
+import { loadGltf, removeGltf } from '../../lib/babylon/decentraland/sdkComponents/gltf-container'
 import { ROOT } from '../../lib/sdk/tree'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { IAsset } from '../AssetsCatalog/types'
@@ -27,6 +29,22 @@ const Renderer: React.FC = () => {
   const sdk = useSdk()
   const [isLoading, setIsLoading] = useState(false)
   const isMounted = useIsMounted()
+  const [files, init] = useFileSystem()
+
+  useEffect(() => {
+    if (sdk && init) {
+      const { GltfContainer } = sdk.components
+      const fileSet = new Set(files.assets.map(($) => $.path))
+
+      for (const [entity, value] of sdk.engine.getEntitiesWith(GltfContainer)) {
+        const sceneEntity = sdk.sceneContext.getEntityOrNull(entity)
+        if (!sceneEntity) continue
+
+        if (!fileSet.has(value.src)) removeGltf(sceneEntity)
+        else loadGltf(sceneEntity, value.src)
+      }
+    }
+  }, [files])
 
   const getDropPosition = async () => {
     const pointerCoords = await getPointerCoords(sdk!.scene)

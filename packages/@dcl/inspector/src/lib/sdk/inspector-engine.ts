@@ -11,7 +11,7 @@ import { SdkContextEvents, SdkContextValue } from './context'
 
 export function createInspectorEngine(
   dataLayer: DataLayerRpcClient
-): Omit<SdkContextValue, 'scene' | 'dataLayer' | 'operations' | 'gizmos' | 'editorCamera'> {
+): Omit<SdkContextValue, 'scene' | 'sceneContext' | 'dataLayer' | 'operations' | 'gizmos' | 'editorCamera'> {
   const events = mitt<SdkContextEvents>()
   const engine = Engine({
     onChangeFunction: (entity, operation, component, value) =>

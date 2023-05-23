@@ -55,21 +55,36 @@ export const putGltfContainerComponent: ComponentOperation = (entity, component)
     entity.ecsComponentValues.gltfContainer = newValue || undefined
 
     // for simplicity of the example, we will remove the Gltf on every update.
-    if (currentValue?.src !== newValue?.src) {
-      removeCurrentGltf(entity)
-
-      if (newValue?.src) {
-        const context = entity.context.deref()
-        if (!context) return
-
-        // store a WeakRef to the sceneContext to enable file resolver
-        sceneContextMap.set(context.loadableScene.id, entity.context)
-
-        tryLoadGltfAsync(context.loadableScene.id, entity, newValue.src).catch((err) => {
-          console.error('Error trying to load gltf ' + newValue.src, err)
-        })
-      }
+    if (newValue && currentValue?.src !== newValue?.src) {
+      removeGltf(entity)
+      loadGltf(entity, newValue.src)
     }
+  }
+}
+
+export function loadGltf(entity: EcsEntity, value: string) {
+  const context = entity.context.deref()
+  if (!context || sceneContextMap.has(context.loadableScene.id)) return
+
+  // store a WeakRef to the sceneContext to enable file resolver
+  sceneContextMap.set(context.loadableScene.id, entity.context)
+
+  tryLoadGltfAsync(context.loadableScene.id, entity, value).catch((err) => {
+    console.error('Error trying to load gltf ' + value, err)
+  })
+}
+
+export function removeGltf(entity: EcsEntity) {
+  const context = entity.context.deref()
+  if (!context) return
+
+  sceneContextMap.delete(context.loadableScene.id)
+
+  if (entity.gltfContainer) {
+    entity.gltfContainer.setEnabled(false)
+    entity.gltfContainer.parent = null
+    entity.gltfContainer.dispose(false, true)
+    delete entity.gltfContainer
   }
 }
 
@@ -119,15 +134,6 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
     },
     extension
   )
-}
-
-function removeCurrentGltf(entity: EcsEntity) {
-  if (entity.gltfContainer) {
-    entity.gltfContainer.setEnabled(false)
-    entity.gltfContainer.parent = null
-    entity.gltfContainer.dispose(false, true)
-    delete entity.gltfContainer
-  }
 }
 
 export function processGLTFAssetContainer(assetContainer: BABYLON.AssetContainer, entity: EcsEntity) {
