@@ -11,6 +11,8 @@ import { Block } from '../Block'
 import Button from '../Button'
 import { useFileSystem } from '../../hooks/catalog/useFileSystem'
 
+import { GLTFValidation } from '@babylonjs/loaders'
+
 import './ImportAsset.css'
 import classNames from 'classnames'
 
@@ -21,9 +23,45 @@ interface PropTypes {
   onSave(): void
 }
 
+type ValidationError = string | null
+
+async function validateGltf(data: ArrayBuffer): Promise<ValidationError> {
+  let result
+  try {
+    result = await GLTFValidation.ValidateAsync(
+      data, '', '', (uri) => { throw new Error('external references are not supported yet')}
+    )
+  } catch (error) {
+    return `Invalid GLTF: ${error}`
+  }
+
+  if (result.issues.numErrors > 0) {
+    for (const issue of result.issues.messages) {
+      /*
+        Babylon's type declarations incorrectly state that result.issues.messages
+        is an Array<string>. In fact, it's an array of objects with useful properties.
+      */
+      type BabylonValidationIssue = {severity: number, code: string}
+      const severity = (issue as unknown as BabylonValidationIssue).severity
+      /*
+        Severity codes are Error (0), Warning (1), Information (2), Hint (3).
+        https://github.com/KhronosGroup/glTF-Validator/blob/main/lib/src/errors.dart
+      */
+      if (severity == 0) {
+        const message = (issue as unknown as BabylonValidationIssue).code
+        return `Invalid GLTF: ${message}`
+      }
+    }
+    return 'Invalid GLTF: unknown reason'
+  } else {
+    return null
+  }
+}
+
 const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
   // TODO: multiple files
   const [file, setFile] = useState<File>()
+  const [validationError, setValidationError] = useState<ValidationError>(null)
   const [assetPackageName, setAssetPackageName] = useState<string>('')
   const [systemFiles] = useFileSystem()
 
@@ -32,6 +70,7 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
     const file = acceptedFiles[0]
     if (!file) return
     setFile(file)
+    setValidationError(null)
     setAssetPackageName(file.name.trim().replaceAll(' ', '_').toLowerCase().split('.')[0])
   }
 
@@ -41,6 +80,18 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
     if (!file) return
     reader.onload = async () => {
       const binary: ArrayBuffer = reader.result as ArrayBuffer
+
+      if (binary.byteLength > ONE_GB_IN_BYTES) {
+        setValidationError('Files bigger than 1GB are not accepted')
+        return
+      }
+
+      const gltfValidationError = await validateGltf(binary)
+      if (gltfValidationError != null) {
+        setValidationError(gltfValidationError)
+        return
+      }
+
       const content: Map<string, Uint8Array> = new Map()
       content.set(file.name, new Uint8Array(binary))
 
@@ -57,6 +108,7 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
   function removeFile(e: React.MouseEvent<HTMLDivElement>) {
     e.stopPropagation()
     setFile(undefined)
+    setValidationError(null)
   }
 
   const invalidName = !!systemFiles.assets.find((asset) => {
@@ -64,12 +116,10 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
     return packageName?.toLocaleLowerCase() === assetPackageName?.toLocaleLowerCase()
   })
 
-  const validSize = (file?.size || 0) <= ONE_GB_IN_BYTES
-
   return (
     <div className="ImportAsset">
       <FileInput disabled={!!file} onDrop={handleDrop} accept={{ 'model/gltf-binary': ['.gltf', '.glb'] }}>
-        <span>Import Asset Pack</span>
+        <span>Import asset</span>
         {!file && (
           <>
             <div className="upload-icon">
@@ -90,18 +140,18 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
               <IoIosImage />
               <div className="file-title">{file.name}</div>
             </Container>
-            <div className={classNames({ error: !!invalidName || !validSize })}>
-              <Block label="Asset Pack Name">
+            <div className={classNames({ error: !!invalidName })}>
+              <Block label="Asset name">
                 <TextField
                   label=""
                   value={assetPackageName}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => setAssetPackageName(event.target.value)}
                 />
               </Block>
-              <Button disabled={invalidName || !validSize} onClick={handleSave}>
-                Save asset
+              <Button disabled={invalidName || !!validationError} onClick={handleSave}>
+                Import
               </Button>
-              <span>{!validSize && 'Asset size must be under 1GB'}</span>
+              <span className='error'>{validationError}</span>
             </div>
           </div>
         )}
