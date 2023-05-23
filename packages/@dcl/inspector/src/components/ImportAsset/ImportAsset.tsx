@@ -57,7 +57,7 @@ async function validateGltf(data: ArrayBuffer): Promise<ValidationError> {
 const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
   // TODO: multiple files
   const [file, setFile] = useState<File>()
-  const [validationError, setValidationError] = useState<string | null>(null)
+  const [validationError, setValidationError] = useState<ValidationError>(null)
   const [assetPackageName, setAssetPackageName] = useState<string>('')
   const [systemFiles] = useFileSystem()
 
