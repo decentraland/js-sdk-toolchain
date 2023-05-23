@@ -1,0 +1,24 @@
+{
+  "name": "door-and-house-library",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decentraland/js-sdk-toolchain.git"
+  },
+  "license": "Apache-2.0",
+  "version": "1.0.0",
+  "description": "My new Decentraland project",
+  "main": "./bin/index.js",
+  "types": "./bin/index.d.ts",
+  "scripts": {
+    "start": "dcl start",
+    "build": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@dcl/ecs": "file:../../../../packages/@dcl/ecs",
+    "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime",
+    "@dcl/sdk": "file:../../../../packages/@dcl/sdk"
+  },
+  "dependencies": {
+    "typescript": "*"
+  }
+}

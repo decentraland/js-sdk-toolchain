@@ -1,0 +1,25 @@
+{
+  "name": "simple-scene-with-library",
+  "version": "1.0.0",
+  "description": "My new Decentraland project",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decentraland/js-sdk-toolchain.git"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "start": "dcl start",
+    "build": "sdk-commands build",
+    "build-prod": "sdk-commands build --production",
+    "watch": "sdk-commands build --watch"
+  },
+  "devDependencies": {
+    "@dcl/ecs": "file:../../../../packages/@dcl/ecs",
+    "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime",
+    "@dcl/sdk": "file:../../../../packages/@dcl/sdk",
+    "@dcl/sdk-commands": "file:../../../../packages/@dcl/sdk-commands"
+  },
+  "dependencies": {
+    "library-with-other-libraries": "file:../library-with-other-libraries"
+  }
+}

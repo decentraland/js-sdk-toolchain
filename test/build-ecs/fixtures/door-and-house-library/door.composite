@@ -1,0 +1,223 @@
+{
+    "version": 1,
+    "components": [
+        {
+            "name": "core::Transform",
+            "data": {
+                "512": {
+                    "$case": "json",
+                    "json": {
+                        "position": {
+                            "x": 4,
+                            "y": 1.5,
+                            "z": 4
+                        }
+                    }
+                },
+                "513": {
+                    "$case": "json",
+                    "json": {
+                        "position": {
+                            "x": 0.45,
+                            "y": 0,
+                            "z": 0
+                        },
+                        "parent": 512
+                    }
+                },
+                "514": {
+                    "$case": "json",
+                    "json": {
+                        "scale": {
+                            "x": 0.9,
+                            "y": 2,
+                            "z": 0.05
+                        },
+                        "parent": 513
+                    }
+                },
+                "515": {
+                    "$case": "json",
+                    "json": {
+                        "position": {
+                            "x": 0.2,
+                            "y": 0,
+                            "z": 0
+                        },
+                        "scale": {
+                            "x": 0.2,
+                            "y": 0.05,
+                            "z": 0.12
+                        },
+                        "parent": 513
+                    }
+                },
+                "516": {
+                    "$case": "json",
+                    "json": {
+                        "scale": {
+                            "x": 2,
+                            "y": 4,
+                            "z": 1
+                        },
+                        "parent": 515
+                    }
+                },
+                "517": {
+                    "$case": "json",
+                    "json": {
+                        "scale": {
+                            "x": 0.1,
+                            "y": 2,
+                            "z": 0.1
+                        },
+                        "parent": 512
+                    }
+                }
+            }
+        },
+        {
+            "name": "core::MeshRenderer",
+            "data": {
+                "514": {
+                    "$case": "json",
+                    "json": {
+                        "mesh": {
+                            "$case": "box",
+                            "box": {
+                                "uvs": []
+                            }
+                        }
+                    }
+                },
+                "515": {
+                    "$case": "json",
+                    "json": {
+                        "mesh": {
+                            "$case": "box",
+                            "box": {
+                                "uvs": []
+                            }
+                        }
+                    }
+                },
+                "517": {
+                    "$case": "json",
+                    "json": {
+                        "mesh": {
+                            "$case": "box",
+                            "box": {
+                                "uvs": []
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "name": "core::MeshCollider",
+            "data": {
+                "514": {
+                    "$case": "json",
+                    "json": {
+                        "mesh": {
+                            "$case": "box",
+                            "box": {
+                                "uvs": []
+                            }
+                        }
+                    }
+                },
+                "516": {
+                    "$case": "json",
+                    "json": {
+                        "mesh": {
+                            "$case": "box",
+                            "box": {
+                                "uvs": []
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "name": "core::Material",
+            "data": {
+                "515": {
+                    "$case": "json",
+                    "json": {
+                        "material": {
+                            "$case": "pbr",
+                            "pbr": {
+                                "albedoColor": {
+                                    "r": 1,
+                                    "g": 0.85,
+                                    "b": 0.42,
+                                    "a": 1
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "name": "core::PointerEvents",
+            "data": {
+                "516": {
+                    "$case": "json",
+                    "json": {
+                        "pointerEvents": [
+                            {
+                                "eventType": 1,
+                                "eventInfo": {
+                                    "button": 1,
+                                    "hoverText": "Open/close",
+                                    "maxDistance": 100,
+                                    "showFeedback": true
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "name": "test-door-component",
+            "jsonSchema": {
+                "type": "object",
+                "properties": {
+                    "open": {
+                        "type": "boolean",
+                        "serializationType": "boolean"
+                    },
+                    "angle": {
+                        "type": "number",
+                        "serializationType": "float32"
+                    },
+                    "changingState": {
+                        "type": "boolean",
+                        "serializationType": "boolean"
+                    },
+                    "handleEntity": {
+                        "type": "integer",
+                        "serializationType": "entity"
+                    }
+                },
+                "serializationType": "map"
+            },
+            "data": {
+                "512": {
+                    "$case": "json",
+                    "json": {
+                        "open": false,
+                        "handleEntity": 516,
+                        "factor": 0.0,
+                        "changingState": false
+                    }
+                }
+            }
+        }
+    ]
+}
