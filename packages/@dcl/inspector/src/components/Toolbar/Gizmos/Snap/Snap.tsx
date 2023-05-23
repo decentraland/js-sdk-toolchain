@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react'
-import cx from 'classnames'
 
-import { useSnapState, useSnapToggle } from '../../../../hooks/editor/useSnap'
+import { useSnapState } from '../../../../hooks/editor/useSnap'
 import { GizmoType } from '../../../../lib/utils/gizmo'
 
 import './Snap.css'
@@ -12,7 +11,6 @@ type Props = {
 
 const Snap: React.FC<Props> = ({ gizmo }) => {
   const [snap, setSnap] = useSnapState(gizmo)
-  const { isEnabled } = useSnapToggle()
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,7 +42,7 @@ const Snap: React.FC<Props> = ({ gizmo }) => {
   }
 
   return (
-    <div className={cx('Snap', { disabled: !isEnabled })}>
+    <div className="Snap">
       <div className="label">{label}</div>
       <input type="number" value={snap} onChange={handleChange} onBlur={handleBlur} />
     </div>
