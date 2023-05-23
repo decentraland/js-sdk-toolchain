@@ -2,7 +2,6 @@ import { Entity } from '@dcl/ecs'
 import { useCallback } from 'react'
 
 import { useSdk } from './useSdk'
-import { isLastWriteWinComponent } from './useComponentValue'
 
 export const useEntityComponent = () => {
   const sdk = useSdk()
@@ -24,12 +23,10 @@ export const useEntityComponent = () => {
   )
 
   const addComponent = useCallback(
-    (entity: Entity, componentId: number) => {
+    async (entity: Entity, componentId: number) => {
       if (!sdk) return
-      const component = sdk.engine.getComponent(componentId)
-      if (isLastWriteWinComponent(component)) {
-        component.create(entity)
-      }
+      await sdk.operations.addComponent(entity, componentId)
+      await sdk.operations.dispatch()
     },
     [sdk]
   )
