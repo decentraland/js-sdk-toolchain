@@ -46,7 +46,7 @@ const Snap: React.FC<Props> = ({ gizmo }) => {
   return (
     <div className={cx('Snap', { disabled: !isEnabled })}>
       <div className="label">{label}</div>
-      <input type="number" value={snap} onChange={handleChange} onBlur={handleBlur} disabled={!isEnabled} />
+      <input type="number" value={snap} onChange={handleChange} onBlur={handleBlur} />
     </div>
   )
 }
