@@ -26,28 +26,31 @@ interface PropTypes {
 type ValidationError = string | null
 
 async function validateGltf(data: ArrayBuffer): Promise<ValidationError> {
+  let result
   try {
-    const result = await GLTFValidation.ValidateAsync(
+    result = await GLTFValidation.ValidateAsync(
       data, '', '', (uri) => { throw new Error('external references are not supported yet')}
     )
-    if (result.issues.numErrors > 0) {
-      let message = 'unknown reason'
-      for (const issue of result.issues.messages) {
-        /*
-          Babylon's type declarations incorrectly state that result.issues.messages
-          is an Array<string>. In fact, it's an array of objects with useful properties.
-        */
-        type BabylonValidationIssue = {severity: number, code: string}
-        const severity = (issue as unknown as BabylonValidationIssue).severity
-        if (severity == 0)
-          message = (issue as unknown as BabylonValidationIssue).code
-      }
-      return `Invalid GLTF: ${message}`
-    } else {
-      return null
-    }
   } catch (error) {
     return `Invalid GLTF: ${error}`
+  }
+
+  if (result.issues.numErrors > 0) {
+    for (const issue of result.issues.messages) {
+      /*
+        Babylon's type declarations incorrectly state that result.issues.messages
+        is an Array<string>. In fact, it's an array of objects with useful properties.
+      */
+      type BabylonValidationIssue = {severity: number, code: string}
+      const severity = (issue as unknown as BabylonValidationIssue).severity
+      if (severity == 0) {
+        const message = (issue as unknown as BabylonValidationIssue).code
+        return `Invalid GLTF: ${message}`
+      }
+    }
+    return 'unknown reason'
+  } else {
+    return null
   }
 }
 
