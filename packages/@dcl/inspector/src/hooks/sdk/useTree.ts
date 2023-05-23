@@ -110,12 +110,8 @@ export const useTree = () => {
   const toggle = useCallback(
     async (entity: Entity, open: boolean) => {
       if (!sdk) return
-      if (entity === ROOT) {
-        sdk.operations.removeSelectedEntities()
-      } else {
-        sdk.operations.updateSelectedEntity(entity)
-        open ? entitiesToggle.add(entity) : entitiesToggle.delete(entity)
-      }
+      sdk.operations.updateSelectedEntity(entity)
+      open ? entitiesToggle.add(entity) : entitiesToggle.delete(entity)
 
       await sdk.operations.dispatch()
       handleUpdate()
@@ -126,7 +122,6 @@ export const useTree = () => {
   const isNotRoot = useCallback((entity: Entity) => entity !== ROOT, [])
   const canRename = isNotRoot
   const canRemove = isNotRoot
-  const canToggle = useCallback(() => true, [])
 
   return {
     tree,
@@ -140,7 +135,6 @@ export const useTree = () => {
     getLabel,
     isOpen,
     canRename,
-    canRemove,
-    canToggle
+    canRemove
   }
 }

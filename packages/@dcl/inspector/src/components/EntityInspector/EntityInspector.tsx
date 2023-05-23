@@ -1,18 +1,17 @@
 import { useSelectedEntity } from '../../hooks/sdk/useSelectedEntity'
-import { ROOT } from '../../lib/sdk/tree'
 
-import { GltfInspector } from './GltfInspector'
 import { SceneInspector } from './SceneInspector'
 import { TransformInspector } from './TransformInspector'
+import { GltfInspector } from './GltfInspector'
 
 export const EntityInspector: React.FC = () => {
   const entity = useSelectedEntity()
 
+  const inspectors = [SceneInspector, TransformInspector, GltfInspector]
+
   return (
     <div className="EntityInspector" key={entity}>
-      {entity && <TransformInspector entity={entity} />}
-      {entity && <GltfInspector entity={entity} />}
-      {!entity && <SceneInspector entity={ROOT} />}
+      {inspectors.map((Compoment, index) => entity !== null && <Compoment key={index} entity={entity} />)}
     </div>
   )
 }
