@@ -48,7 +48,7 @@ async function validateGltf(data: ArrayBuffer): Promise<ValidationError> {
         return `Invalid GLTF: ${message}`
       }
     }
-    return 'unknown reason'
+    return 'Invalid GLTF: unknown reason'
   } else {
     return null
   }
