@@ -23,10 +23,10 @@ export const useEntityComponent = () => {
   )
 
   const addComponent = useCallback(
-    async (entity: Entity, componentId: number) => {
+    (entity: Entity, componentId: number) => {
       if (!sdk) return
-      await sdk.operations.addComponent(entity, componentId)
-      await sdk.operations.dispatch()
+      sdk.operations.addComponent(entity, componentId)
+      sdk.operations.dispatch()
     },
     [sdk]
   )
