@@ -1,5 +1,25 @@
-.editor .editor-assets-tree .item {
-  padding: 16px;
+.ProjectView > .with-context-menu > .editor-assets-tree {
+  overflow-y: auto;
+  width: 260px;
+  height: 100%;
+  padding: 8px;
+}
+
+.editor .editor-assets-tree .item > div {
+  display: flex;
+  align-items: center;
+}
+
+.editor .editor-assets-tree .item svg {
+  margin: 0 2px;
+}
+
+.editor .editor-assets-tree .item span {
+  line-height: 16px;
+}
+
+.editor .editor-assets-tree .item svg:nth-child(2) {
+  margin-right: 6px;
 }
 
 .editor .editor-assets-tree .Tree {
@@ -12,7 +32,7 @@
 
 .ProjectView {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   height: 100%;
 }
 
@@ -22,4 +42,38 @@
 
 .RemoveAsset.Modal > div button {
   margin-right: 12px;
+}
+
+.ProjectView .FolderView {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+.ProjectView .FolderView .NodeView {
+  display: flex;
+  flex-direction: column;
+  margin: 8px;
+  align-items: center;
+  height: 72px;
+  width: 72px;
+  border-radius: 8px;
+  background-color: var(--tree-border-color);
+  cursor: pointer;
+  justify-content: space-evenly;
+}
+
+.ProjectView .FolderView .NodeView span {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  width: inherit;
+  padding: 0 8px;
+  text-align: center;
+  font-size: 10px;
+}
+.ProjectView .FolderView .NodeView svg {
+  width: 42px;
+  height: 42px;
 }

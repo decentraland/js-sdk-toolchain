@@ -1,5 +1,5 @@
 .Tree {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--white);
   width: 100%;
 }
@@ -20,7 +20,7 @@
 
 .Tree > div:first-child:hover,
 .Tree .selected {
-  background-color: var(--tree-border-color);
+  background-color: var(--vscode-accent-blue);
 }
 
 .Tree > div:first-child > span {

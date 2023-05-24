@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { MdImageSearch } from 'react-icons/md'
-import { AiFillFolder } from 'react-icons/ai'
 import { HiOutlinePlus } from 'react-icons/hi'
+import cx from 'classnames'
 
 import { useCatalog } from '../../hooks/catalog/useCatalog'
 import { AssetsCatalog } from '../AssetsCatalog'
@@ -11,6 +11,7 @@ import { ProjectAssetExplorer } from '../ProjectAssetExplorer'
 import { Renderer } from '../Renderer'
 import { Box } from '../Box'
 import { Toolbar } from '../Toolbar'
+import { FolderOpen } from '../Icons/Folder'
 
 import './App.css'
 import { Resizable } from '../Resizable'
@@ -25,7 +26,7 @@ enum Tab {
 
 const App = () => {
   const [catalog] = useCatalog()
-  const [tab, setTab] = useState<Tab | undefined>(undefined)
+  const [tab, setTab] = useState<Tab | undefined>(Tab.FileSystem)
 
   const handleTabClick = useCallback(
     (value: Tab) => () => {
@@ -58,6 +59,23 @@ const App = () => {
           <Renderer />
         </Box>
         <Box className="footer">
+          <div className="footer-buttons">
+            <div onClick={handleTabClick(Tab.FileSystem)}>
+              <div className={cx({underlined: tab === Tab.FileSystem })}>
+                <FolderOpen />
+                <span>LOCAL ASSETS</span>
+              </div>
+            </div>
+            <div onClick={handleTabClick(Tab.AssetsPack)}>
+              <div className={cx({underlined: tab === Tab.AssetsPack })}>
+                <MdImageSearch />
+                <span>ASSETS PACKS</span>
+              </div>
+            </div>
+            <div onClick={handleTabClick(Tab.Import)}>
+              <HiOutlinePlus />
+            </div>
+          </div>
           {tab && (
             <div className="footer-content">
               {tab === Tab.AssetsPack && catalog && <AssetsCatalog value={catalog} />}
@@ -65,20 +83,6 @@ const App = () => {
               {tab === Tab.Import && <ImportAsset onSave={handleSave} />}
             </div>
           )}
-          <div className="footer-buttons">
-            <div onClick={handleTabClick(Tab.FileSystem)}>
-              <AiFillFolder />
-              <span>Asset Catalog</span>
-            </div>
-            <div onClick={handleTabClick(Tab.Import)}>
-              <HiOutlinePlus />
-              <span>Import Asset</span>
-            </div>
-            <div onClick={handleTabClick(Tab.AssetsPack)}>
-              <MdImageSearch />
-              <span>World Assets Pack</span>
-            </div>
-          </div>
         </Box>
       </div>
     </Resizable>
