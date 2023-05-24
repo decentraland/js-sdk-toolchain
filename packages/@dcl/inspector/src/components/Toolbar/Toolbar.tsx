@@ -3,7 +3,7 @@ import { BiUndo, BiRedo, BiSave, BiBadgeCheck } from 'react-icons/bi'
 import { RiListSettingsLine } from 'react-icons/ri'
 
 import { fileSystemEvent } from '../../hooks/catalog/useFileSystem'
-import { useSave } from '../../hooks/editor/useSave'
+import { saveEvent, useSave } from '../../hooks/editor/useSave'
 import { withSdk } from '../../hoc/withSdk'
 import { Gizmos } from './Gizmos'
 import { ToolbarButton } from './ToolbarButton'
@@ -27,6 +27,7 @@ const Toolbar = withSdk(({ sdk }) => {
       if (type === 'file') {
         fileSystemEvent.emit('change')
       }
+      saveEvent.emit('change', true)
     },
     []
   )
@@ -34,7 +35,7 @@ const Toolbar = withSdk(({ sdk }) => {
   return (
     <div className="Toolbar">
       <ToolbarButton className="save" onClick={save}>
-        {isDirty ? <BiSave /> : <BiBadgeCheck/>}
+        {isDirty ? <BiSave /> : <BiBadgeCheck />}
       </ToolbarButton>
       <ToolbarButton className="undo" onClick={handleUndoRedo(sdk?.dataLayer.undo)}>
         <BiUndo />
