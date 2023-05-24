@@ -26,7 +26,7 @@ enum Tab {
 
 const App = () => {
   const [catalog] = useCatalog()
-  const [tab, setTab] = useState<Tab | undefined>(Tab.FileSystem)
+  const [tab, setTab] = useState<Tab | undefined>(undefined)
 
   const handleTabClick = useCallback(
     (value: Tab) => () => {
