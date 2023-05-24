@@ -17,9 +17,11 @@ const updateGizmoManager = (entity: EcsEntity, value: { gizmo: number } | null) 
   const context = entity.context.deref()!
   let processedSomeEntity = false
 
+  const Transform = context.engine.getComponent('core::Transform')
+
   for (const [_entity] of context.engine.getEntitiesWith(context.editorComponents.Selection)) {
     processedSomeEntity = true
-    if (entity.entityId === _entity) {
+    if (entity.entityId === _entity && Transform.has(_entity)) {
       context.gizmos.setEntity(entity)
       const types = context.gizmos.getGizmoTypes()
       const type = types[value?.gizmo || 0]

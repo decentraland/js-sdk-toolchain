@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
-import { IoIosArrowDown, IoIosArrowForward, IoIosImage } from 'react-icons/io'
+import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
 
 import { withContextMenu } from '../../hoc/withContextMenu'
 import { Input } from '../Input'

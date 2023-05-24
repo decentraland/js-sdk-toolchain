@@ -1,5 +1,5 @@
 import mitt from 'mitt'
-import { GizmoManager, IAxisDragGizmo, Vector3 } from '@babylonjs/core'
+import { GizmoManager, IAxisDragGizmo, Quaternion, Vector3 } from '@babylonjs/core'
 import { EcsEntity } from './EcsEntity'
 import { Entity, TransformType } from '@dcl/ecs'
 import { getLayoutManager } from './layout-manager'
@@ -71,7 +71,7 @@ export function createGizmoManager(context: SceneContext) {
       const value = {
         position: snapPosition(lastEntity.position),
         scale: snapScale(lastEntity.scaling),
-        rotation: snapRotation(lastEntity.rotationQuaternion!),
+        rotation: lastEntity.rotationQuaternion ? snapRotation(lastEntity.rotationQuaternion) : Quaternion.Zero(),
         parent
       }
       return value
