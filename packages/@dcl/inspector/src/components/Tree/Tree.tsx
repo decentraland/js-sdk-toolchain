@@ -28,7 +28,7 @@ type Props<T> = {
   onAddChild: (value: T, label: string) => void
   onRemove: (value: T) => void
   onToggle: (value: T, isOpen: boolean) => void
-  getDragContext?: () => any
+  getDragContext?: () => unknown
   dndType?: string
 }
 
@@ -142,12 +142,12 @@ function Tree<T>(_props: Props<T>) {
     }
     return (
       <div ref={ref} className={`Tree ${className || ''}`}>
-        <div style={getLevelStyles(level)} className={selected ? 'selected item' : 'item'}>
+        <div style={getLevelStyles(level)} onClick={handleToggleExpand} className={selected ? 'selected item' : 'item'}>
           <ContextMenu {...controlsProps} />
-          <span onClick={handleToggleExpand} style={getEditModeStyles(editMode)}>
+          <div style={getEditModeStyles(editMode)}>
             {props.getIcon ? props.getIcon(value) : open ? <IoIosArrowDown /> : <IoIosArrowForward />}
             <span>{label || id}</span>
-          </span>
+          </div>
           {editMode && typeof label === 'string' && (
             <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />
           )}

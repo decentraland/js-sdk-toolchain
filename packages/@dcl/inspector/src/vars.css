@@ -17,11 +17,13 @@
   /* DCL Colors */
   --primary: #ff2d55;
   --primary-darker: #cc2443;
-
   /* Color definitions */
   --white: #FFFFFF;
+  --white-gray: #E7E7E7;
   --black: #000000;
   --transparent: transparent;
+  --vscode-accent-blue: #094771;
+  --vscode-blue: var(--border-focused);
 
   /* Context menu */
   --contexify-zIndex: 999;
