@@ -30,7 +30,7 @@ const CameraSpeed = withSdk(({ sdk }) => {
 
   return (
     <div className={classNames('CameraSpeed', {visible: visible, invisible: !visible})}>
-        Camera speed: {speed}
+        Camera speed: {speed.toFixed(1)} m/s
     </div>
   )
 })

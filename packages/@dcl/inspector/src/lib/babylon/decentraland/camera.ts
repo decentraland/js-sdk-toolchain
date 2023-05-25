@@ -5,12 +5,13 @@ import mitt, { Emitter } from 'mitt'
 
 type SpeedChangeEvent = { change: number }
 
-let SPEEDS = [...Array(20).keys()].map((_, i) => {
-  return i + 1
+let SPEEDS = [...Array(40).keys()].map((_, i) => {
+  return (i + 1) * 0.5
 })
-SPEEDS = SPEEDS.concat([30, 40, 50, 60, 70, 80, 90, 100])
+SPEEDS = SPEEDS.concat([25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100])
 
 const CAMERA_MIN_Y = 1
+const WHEEL_MOVE_SPEED = 1
 
 enum SpeedIncrement {
   FASTER = 1,
@@ -79,7 +80,7 @@ export class CameraManager {
           else if (browserEvent.deltaY > 0) this.changeSpeed(SpeedIncrement.SLOWER)
         } else {
           const direction = camera.target.subtract(camera.position)
-          direction.normalize().scaleInPlace(5)
+          direction.normalize().scaleInPlace(WHEEL_MOVE_SPEED)
           if (browserEvent.deltaY > 0) direction.negateInPlace()
           camera.position.addInPlace(direction)
         }
