@@ -2,7 +2,7 @@
   border: none;
   background-color: var(--background-gray);
   outline: var(--input-border-color);
-  color: var(--white-gray);
+  /* color: var(--white-gray); */
   font-size: 13px;
   padding: 4px;
   width: 100%;
