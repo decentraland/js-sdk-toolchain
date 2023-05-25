@@ -63,10 +63,43 @@ code {
   flex: none;
 }
 
+.footer .footer-buttons span {
+  font-size: 11px;
+  line-height: 13px;
+  font-weight: 500;
+}
+
 .footer .footer-buttons {
+  padding-left: 8px;
   display: flex;
   background: var(--tree-bg-color);
   height: 36px;
+  position: relative;
+}
+
+.footer .footer-buttons > div > div {
+  display: flex;
+  position: relative;
+}
+
+.footer .footer-buttons > div:hover > div::after,
+.footer .footer-buttons > div > div.underlined::after {
+  width: 100%;
+}
+
+.footer .footer-buttons > div > div::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  height: 1px;
+  /* adjust the thickness of the underline */
+  background: var(--white-gray);
+  /* color of the underline */
+}
+
+.footer .footer-buttons > div span {
+  margin-left: 4px;
 }
 
 .footer .footer-buttons > div {
@@ -77,12 +110,15 @@ code {
   user-select: none;
 }
 
-.footer .footer-buttons > div > svg {
-  margin-right: 4px;
+.footer .footer-buttons>div:last-child svg {
+  width: 16px;
+  height: 16px;
 }
 
-.footer-buttons .footer-title > span {
-  margin-left: 8px;
+.footer .footer-buttons>div:last-child {
+  position: absolute;
+  right: 0px;
+  margin-right: 8px;
 }
 
 .footer .footer-content {

@@ -1,5 +1,5 @@
 .Tree {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--white);
   width: 100%;
 }
@@ -20,10 +20,10 @@
 
 .Tree > div:first-child:hover,
 .Tree .selected {
-  background-color: var(--tree-border-color);
+  background-color: var(--vscode-accent-blue);
 }
 
-.Tree > div:first-child > span {
+.Tree > div:first-child > div {
   width: 100%;
   display: flex;
   align-items: center;
@@ -38,11 +38,11 @@
   width: 100%;
 }
 
-.Tree > .item > span > svg:only-child {
+.Tree > .item > div > svg:only-child {
   margin-right: 4px;
 }
 
-.Tree > .item > span > svg:nth-child(2) {
+.Tree > .item > div > svg:nth-child(2) {
   margin-right: 4px;
 }
 
