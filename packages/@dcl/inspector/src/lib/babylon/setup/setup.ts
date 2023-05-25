@@ -128,11 +128,7 @@ export function setupEngine(engine: BABYLON.Engine, canvas: HTMLCanvasElement) {
   }
 }
 
-function reposition(
-  envHelper: BABYLON.EnvironmentHelper,
-  hemiLight: BABYLON.HemisphericLight,
-  camera: BABYLON.Camera
-) {
+function reposition(envHelper: BABYLON.EnvironmentHelper, hemiLight: BABYLON.HemisphericLight, camera: BABYLON.Camera) {
   // set the ground at 0 always and round position towards PARCEL_SIZE
   envHelper.ground!.position.set(
     Math.floor(camera.globalPosition.x / PARCEL_SIZE) * PARCEL_SIZE - camera.globalPosition.x,

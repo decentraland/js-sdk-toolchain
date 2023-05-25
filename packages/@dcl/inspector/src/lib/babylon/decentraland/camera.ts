@@ -3,9 +3,11 @@ import { Keys, keyState } from './keys'
 import { PARCEL_SIZE } from '../../utils/scene'
 import mitt, { Emitter } from 'mitt'
 
-type SpeedChangeEvent = {change: number}
+type SpeedChangeEvent = { change: number }
 
-let SPEEDS = [...Array(20).keys()].map((_, i) => { return i + 1 })
+let SPEEDS = [...Array(20).keys()].map((_, i) => {
+  return i + 1
+})
 SPEEDS = SPEEDS.concat([30, 40, 50, 60, 70, 80, 90, 100])
 
 enum SpeedIncrement {
@@ -52,38 +54,31 @@ export class CameraManager {
     camera.keysRight = [Keys.KEY_D, Keys.KEY_RIGHT]
 
     function isCameraMoving(): boolean {
-      for (let key of camera.keysDown)
-        if (keyState[key]) return true
-      for (let key of camera.keysUp)
-        if (keyState[key]) return true
-      for (let key of camera.keysLeft)
-        if (keyState[key]) return true
-      for (let key of camera.keysRight)
-        if (keyState[key]) return true
+      for (const key of camera.keysDown) if (keyState[key]) return true
+      for (const key of camera.keysUp) if (keyState[key]) return true
+      for (const key of camera.keysLeft) if (keyState[key]) return true
+      for (const key of camera.keysRight) if (keyState[key]) return true
       return false
     }
 
     let holdingMouseButton = false
     scene.onPointerObservable.add((ev) => {
-      if (ev.type == BABYLON.PointerEventTypes.POINTERDOWN) {
+      if (ev.type === BABYLON.PointerEventTypes.POINTERDOWN) {
         holdingMouseButton = true
       }
-      if (ev.type == BABYLON.PointerEventTypes.POINTERUP) {
+      if (ev.type === BABYLON.PointerEventTypes.POINTERUP) {
         holdingMouseButton = false
       }
-      if (ev.type == BABYLON.PointerEventTypes.POINTERWHEEL) {
+      if (ev.type === BABYLON.PointerEventTypes.POINTERWHEEL) {
         const browserEvent = ev.event as BABYLON.IWheelEvent
 
         if (holdingMouseButton || isCameraMoving()) {
-          if (browserEvent.deltaY < 0)
-            this.changeSpeed(SpeedIncrement.FASTER)
-          else if (browserEvent.deltaY > 0)
-            this.changeSpeed(SpeedIncrement.SLOWER)
+          if (browserEvent.deltaY < 0) this.changeSpeed(SpeedIncrement.FASTER)
+          else if (browserEvent.deltaY > 0) this.changeSpeed(SpeedIncrement.SLOWER)
         } else {
           const direction = camera.target.subtract(camera.position)
           direction.normalize().scaleInPlace(5)
-          if (browserEvent.deltaY > 0)
-            direction.negateInPlace()
+          if (browserEvent.deltaY > 0) direction.negateInPlace()
           camera.position.addInPlace(direction)
         }
       }
@@ -92,15 +87,12 @@ export class CameraManager {
   }
 
   private changeSpeed(increment: SpeedIncrement) {
-    if (increment == SpeedIncrement.FASTER) {
-      if (this.speedIndex < SPEEDS.length - 1)
-        this.speedIndex += 1
+    if (increment === SpeedIncrement.FASTER) {
+      if (this.speedIndex < SPEEDS.length - 1) this.speedIndex += 1
     } else {
-      if (this.speedIndex > 0)
-        this.speedIndex -= 1
+      if (this.speedIndex > 0) this.speedIndex -= 1
     }
     this.camera.speed = SPEEDS[this.speedIndex]
     this.speedChangeObservable.emit('change', this.camera.speed)
   }
 }
-
