@@ -1,4 +1,4 @@
-import { useId } from 'react'
+import { useEffect, useId } from 'react'
 import { useContextMenu } from 'react-contexify'
 
 export type ContextMenuProps<T> = T & { contextMenuId: string }
