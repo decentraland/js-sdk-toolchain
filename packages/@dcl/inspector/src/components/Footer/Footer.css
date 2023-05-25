@@ -1,0 +1,66 @@
+.Footer {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+}
+
+.Footer .Footer-buttons span {
+  font-size: 11px;
+  line-height: 13px;
+  font-weight: 500;
+}
+
+.Footer .Footer-buttons {
+  padding-left: 8px;
+  display: flex;
+  background: var(--tree-bg-color);
+  height: 36px;
+  position: relative;
+}
+
+.Footer .Footer-buttons>div>div {
+  display: flex;
+  position: relative;
+}
+
+.Footer .Footer-buttons>div:hover>div::after,
+.Footer .Footer-buttons>div>div.underlined::after {
+  width: 100%;
+}
+
+.Footer .Footer-buttons>div>div::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  height: 1px;
+  background: var(--white-gray);
+}
+
+.Footer .Footer-buttons>div span {
+  margin-left: 4px;
+}
+
+.Footer .Footer-buttons>div {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.Footer .Footer-buttons>div:last-child svg {
+  width: 16px;
+  height: 16px;
+}
+
+.Footer .Footer-buttons>div:last-child {
+  position: absolute;
+  right: 0px;
+  margin-right: 8px;
+}
+
+.Footer .Footer-content {
+  background: var(--tree-bg-color) !important;
+  height: 250px !important;
+}
