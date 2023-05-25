@@ -14,7 +14,7 @@ import { GizmoType } from '../utils/gizmo'
 export type Component<T = unknown> = ComponentDefinition<T>
 
 export enum EditorComponentIds {
-  EntityNode = 'inspector::Label',
+  EntityNode = 'inspector::EntityNode',
   Selection = 'inspector::Selection',
   Scene = 'inspector::Scene'
 }
