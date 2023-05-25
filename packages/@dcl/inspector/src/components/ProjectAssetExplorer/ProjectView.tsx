@@ -52,7 +52,7 @@ function ProjectView({ folders, onImportAsset }: Props) {
     open.add(ROOT)
 
     function hasMatch (name: string) {
-      return name.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+      return search && name.toLocaleLowerCase().includes(search.toLocaleLowerCase())
     }
 
     function generateTree(node: AssetNodeFolder, parentName: string = ''): string[] {
@@ -65,10 +65,14 @@ function ProjectView({ folders, onImportAsset }: Props) {
         } else {
           const name = getPath(namePath, children.name)
           if (hasMatch(name)) {
+            open.add(name)
             matches.push(name)
           }
           tree.set(name, { ...children, matches, parent: null })
         }
+      }
+      if (matches.length) {
+        open.add(namePath)
       }
       tree.set(namePath, { ...node, children: childrens, parent: null, matches })
       return matches
@@ -141,7 +145,7 @@ function ProjectView({ folders, onImportAsset }: Props) {
     setLastSelected(val)
   }, [setLastSelected])
   const handleDragContext = useCallback(() => ({ tree }), [tree])
-  const isOpen = useCallback((val: string) => !!search.length || open.has(val), [open, search])
+  const isOpen = useCallback((val: string) => open.has(val), [open])
 
   const getChildren = useCallback((val: string) => {
     const value = tree.get(val)
