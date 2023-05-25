@@ -9,10 +9,10 @@ export function UndoRedoArray(maxEntries: number, maxSize: number = ONE_GB_IN_BY
 
   function valueSize(val?: UndoRedo) {
     let fileSize: number = 0
-    if (val?.$case === 'file' && val) {
-      for (const opreation of val.operations) {
-        fileSize += opreation.newValue?.length ?? 0
-        fileSize += opreation.prevValue?.length ?? 0
+    if (val?.$case === 'file') {
+      for (const operation of val.operations) {
+        fileSize += operation.newValue?.length ?? 0
+        fileSize += operation.prevValue?.length ?? 0
       }
     }
     return fileSize
