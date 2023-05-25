@@ -10,6 +10,8 @@ let SPEEDS = [...Array(20).keys()].map((_, i) => {
 })
 SPEEDS = SPEEDS.concat([30, 40, 50, 60, 70, 80, 90, 100])
 
+const CAMERA_MIN_Y = 1
+
 enum SpeedIncrement {
   FASTER = 1,
   SLOWER = -1
@@ -81,6 +83,12 @@ export class CameraManager {
           if (browserEvent.deltaY > 0) direction.negateInPlace()
           camera.position.addInPlace(direction)
         }
+      }
+    })
+
+    scene.registerBeforeRender(() => {
+      if (camera.position.y <= CAMERA_MIN_Y) {
+        camera.position.y = CAMERA_MIN_Y
       }
     })
     return camera
