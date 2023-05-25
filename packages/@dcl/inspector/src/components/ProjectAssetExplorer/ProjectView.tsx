@@ -52,7 +52,7 @@ function ProjectView({ folders, onImportAsset }: Props) {
     open.add(ROOT)
 
     function hasMatch (name: string) {
-      return name.includes(search)
+      return name.toLocaleLowerCase().includes(search.toLocaleLowerCase())
     }
 
     function generateTree(node: AssetNodeFolder, parentName: string = ''): string[] {
@@ -61,7 +61,7 @@ function ProjectView({ folders, onImportAsset }: Props) {
       const matches: string[] = []
       for (const children of node.children) {
         if (children.type === 'folder') {
-          matches.push(...generateTree(children, node.name), )
+          matches.push(...generateTree(children, node.name))
         } else {
           const name = getPath(namePath, children.name)
           if (hasMatch(name)) {
@@ -165,7 +165,7 @@ function ProjectView({ folders, onImportAsset }: Props) {
       </Modal>
       <div className="ProjectView">
         <div className="Tree-View">
-          <Search value={search} onChange={(val) => { tree.clear(); setSearch(val)}} placeholder="Search local assets" />
+          <Search value={search} onChange={setSearch} placeholder="Search local assets" />
           <MyTree
             tree={tree}
             className="editor-assets-tree"
