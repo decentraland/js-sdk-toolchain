@@ -1,18 +1,43 @@
-import { UndoRedoBuffer } from './undo-redo-buffer'
+import { UndoRedoArray } from './undo-redo-array'
 import { UndoRedo, UndoRedoFile } from '../undo-redo'
+import { CrdtMessageType, Entity } from '@dcl/ecs'
 
-describe('UndoRedoBuffer', () => {
-  let buffer: UndoRedoBuffer
+describe('UndoRedoArray', () => {
+  let buffer: ReturnType<typeof UndoRedoArray>
 
   beforeEach(() => {
-    buffer = new UndoRedoBuffer(10, (val) => val.newValue, 10)
+    buffer = UndoRedoArray(10, 10)
+  })
+
+  it('Max entries size limit', () => {
+    const myBuff = UndoRedoArray(2, 10)
+    const undoRedo = (value: string): UndoRedo => ({
+      $case: 'crdt',
+      operations: [
+        {
+          entity: 1 as Entity,
+          componentName: 'boedo',
+          prevValue: null,
+          newValue: value,
+          operation: CrdtMessageType.PUT_COMPONENT
+        }
+      ]
+    })
+    myBuff.push(undoRedo('casla'))
+    myBuff.push(undoRedo('casla-2'))
+    myBuff.push(undoRedo('casla-3'))
+    myBuff.push(undoRedo('casla-4'))
+    const values = myBuff.values()
+    expect(values[0].operations[0].newValue).toBe('casla-3')
+    expect(values[1].operations[0].newValue).toBe('casla-4')
+    expect(values[2]).toBeUndefined()
   })
 
   it('should push values to the buffer', () => {
     const undoRedo: UndoRedo = { $case: 'file', operations: [] }
     buffer.push(undoRedo)
 
-    expect(buffer.get()).toEqual([undoRedo])
+    expect(buffer.values()).toEqual([undoRedo])
   })
 
   it('should pop values from the buffer', () => {
@@ -22,7 +47,7 @@ describe('UndoRedoBuffer', () => {
     buffer.push(undoRedo2)
 
     expect(buffer.pop()).toEqual(undoRedo2)
-    expect(buffer.get()).toEqual([undoRedo1])
+    expect(buffer.values()).toEqual([undoRedo1])
   })
 
   it('should handle pushing more than the maximum size', () => {
@@ -31,7 +56,7 @@ describe('UndoRedoBuffer', () => {
       buffer.push(undoRedo)
     }
 
-    expect(buffer.get().length).toEqual(10)
+    expect(buffer.values().length).toEqual(10)
   })
 
   it('should handle overwriting values when maximum entries size is reached', () => {
@@ -39,13 +64,13 @@ describe('UndoRedoBuffer', () => {
     for (let i = 0; i < 15; i++) {
       const undoRedo: UndoRedo = {
         $case: 'file',
-        operations: [{ path: `/file${i + 1}`, prevValue: null, newValue: new Uint8Array([i + 1]) }]
+        operations: []
       }
       buffer.push(undoRedo)
       acc.push(undoRedo)
     }
 
-    const value = buffer.get()
+    const value = buffer.values()
     expect(value.length).toEqual(10)
     expect(value).toEqual(acc.slice(5))
   })
@@ -59,7 +84,7 @@ describe('UndoRedoBuffer', () => {
     buffer.push(undoRedo)
     buffer.clear()
 
-    expect(buffer.get()).toEqual([])
+    expect(buffer.values()).toEqual([])
   })
 
   it('should correctly calculate the size of the buffer', () => {
@@ -69,7 +94,7 @@ describe('UndoRedoBuffer', () => {
     buffer.push(undoRedo2)
     buffer.pop()
 
-    expect(buffer.size).toEqual(1)
+    expect(buffer.values().length).toEqual(1)
   })
 
   it('should handle pushing file operations based on memory size', () => {
@@ -84,8 +109,8 @@ describe('UndoRedoBuffer', () => {
 
     buffer.push(undoRedo)
 
-    expect(buffer.get()).toEqual([undoRedo])
-    expect(buffer.inMemorySize).toEqual(9)
+    expect(buffer.values()).toEqual([undoRedo])
+    expect(buffer.memorySize).toEqual(9)
   })
 
   it('should handle popping file operations based on memory size', () => {
@@ -101,11 +126,11 @@ describe('UndoRedoBuffer', () => {
     buffer.push(undoRedo)
     buffer.pop()
 
-    expect(buffer.get()).toEqual([])
-    expect(buffer.inMemorySize).toEqual(0)
+    expect(buffer.values()).toEqual([])
+    expect(buffer.memorySize).toEqual(0)
   })
 
-  it('should throw when file operation exceeds max memory limit', () => {
+  it('should not add file if operation exceeds max memory limit', () => {
     const undoRedo: UndoRedoFile = {
       $case: 'file',
       operations: [
@@ -116,10 +141,10 @@ describe('UndoRedoBuffer', () => {
       ]
     }
 
-    expect(() => buffer.push(undoRedo)).toThrow()
-    expect(buffer.inMemorySize).toEqual(0)
-    expect(buffer.size).toEqual(0)
-    expect(buffer.get()).toEqual([])
+    expect(buffer.memorySize).toEqual(0)
+    expect(buffer.push(undoRedo)).toBeUndefined()
+    expect(buffer.values().length).toEqual(0)
+    expect(buffer.values()).toEqual([])
   })
 
   it('should handle popping file operations when memory exceeds the limit', () => {
@@ -139,8 +164,8 @@ describe('UndoRedoBuffer', () => {
     buffer.push(undoRedo)
     buffer.push(undoRedo2)
 
-    expect(buffer.inMemorySize).toEqual(3)
-    expect(buffer.get()).toEqual([undoRedo2])
+    expect(buffer.memorySize).toEqual(3)
+    expect(buffer.values()).toEqual([undoRedo2])
 
     const undoRedo3: UndoRedoFile = {
       $case: 'file',
@@ -149,6 +174,6 @@ describe('UndoRedoBuffer', () => {
 
     buffer.push(undoRedo3)
 
-    expect(buffer.get()).toEqual([undoRedo2, undoRedo3])
+    expect(buffer.values()).toEqual([undoRedo2, undoRedo3])
   })
 })
