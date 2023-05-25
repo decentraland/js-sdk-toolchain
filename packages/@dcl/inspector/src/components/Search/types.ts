@@ -1,5 +1,3 @@
-export interface PropTypes {
-  value: string
-  onChange(value: string): void
-  placeholder?: string
-}
+import { PropTypes as InputTypes } from '../Input/types'
+
+export type PropTypes = InputTypes

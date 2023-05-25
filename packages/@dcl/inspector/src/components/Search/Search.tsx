@@ -10,7 +10,7 @@ function Search(props: PropTypes) {
   return (
     <div className="Search" onContextMenu={(e) => e.stopPropagation()}>
       <SearchIcon />
-      <Input value={props.value} onChange={props.onChange} placeholder={props.placeholder ?? ''} />
+      <Input {...props} />
     </div>
   )
 }

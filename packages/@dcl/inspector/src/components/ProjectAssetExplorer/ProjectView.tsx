@@ -165,7 +165,7 @@ function ProjectView({ folders, onImportAsset }: Props) {
       </Modal>
       <div className="ProjectView">
         <div className="Tree-View">
-          <Search value={search} onChange={setSearch} placeholder="Search local assets" />
+          <Search value={search} onChange={setSearch} placeholder="Search local assets" onCancel={() => setSearch('')} />
           <MyTree
             tree={tree}
             className="editor-assets-tree"
