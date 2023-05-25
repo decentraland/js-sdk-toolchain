@@ -35,7 +35,7 @@ export function UndoRedoArray(maxEntries: number, maxSize: number = ONE_GB_IN_BY
 
       // if we reach the max_size limit, start removing files.
       while (memorySize >= maxSize) {
-        for (let index = 0; index <= valueList.length - 1; index ++) {
+        for (let index = 0; index <= valueList.length - 1; index++) {
           const size = valueSize(valueList[index])
           if (size) {
             memorySize -= size
