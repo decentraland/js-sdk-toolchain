@@ -1,6 +1,7 @@
 import * as BABYLON from '@babylonjs/core'
 import { GridMaterial } from '@babylonjs/materials'
 import { PARCEL_SIZE } from '../../utils/scene'
+import { CameraManager } from '../decentraland/camera'
 
 // if NODE_ENV == development
 require('@babylonjs/inspector')
@@ -19,7 +20,7 @@ export namespace ambientConfigurations {
   export const BLUE = BABYLON.Color3.FromHexString('#00beff')
 }
 
-export function setupEngine(engine: BABYLON.Engine) {
+export function setupEngine(engine: BABYLON.Engine, canvas: HTMLCanvasElement) {
   /**
    * This is the main scene of the engine.
    */
@@ -97,26 +98,20 @@ export function setupEngine(engine: BABYLON.Engine) {
   grid.mainColor = BABYLON.Color3.FromHexString('#36343D')
   editorEnvHelper.ground!.material = grid
 
-  const center = new BABYLON.Vector3(PARCEL_SIZE / 2, 0, PARCEL_SIZE / 2)
-  const camera = new BABYLON.ArcRotateCamera('editorCamera', -Math.PI / 2, Math.PI / 2.5, 15, center, scene)
-
-  camera.lowerRadiusLimit = 3
-  camera.upperRadiusLimit = 15
+  const cameraManager = new CameraManager(scene)
   scene.activeCamera?.detachControl()
-  scene.activeCamera = camera
-  const size = center.length()
-  camera.position = center.subtractFromFloats(size, -size * 1.5, size * 2)
+  scene.activeCamera = cameraManager.getCamera()
+  scene.activeCamera.attachControl(canvas, true)
 
   const hemiLight = new BABYLON.HemisphericLight('default light', ambientConfigurations.sunPosition, scene)
-
   hemiLight.diffuse = BABYLON.Color3.White()
   hemiLight.groundColor = ambientConfigurations.groundColor.clone()
   hemiLight.specular = ambientConfigurations.sunColor.clone()
 
-  reposition(editorEnvHelper, hemiLight, camera)
+  reposition(editorEnvHelper, hemiLight, cameraManager.getCamera())
 
   function update() {
-    reposition(editorEnvHelper, hemiLight, camera)
+    reposition(editorEnvHelper, hemiLight, cameraManager.getCamera())
     scene.render()
   }
 
@@ -124,7 +119,7 @@ export function setupEngine(engine: BABYLON.Engine) {
   engine.runRenderLoop(update)
 
   return {
-    editorCamera: camera,
+    editorCamera: cameraManager,
     engine,
     scene,
     audioEngine,
@@ -136,7 +131,7 @@ export function setupEngine(engine: BABYLON.Engine) {
 function reposition(
   envHelper: BABYLON.EnvironmentHelper,
   hemiLight: BABYLON.HemisphericLight,
-  camera: BABYLON.ArcRotateCamera
+  camera: BABYLON.Camera
 ) {
   // set the ground at 0 always and round position towards PARCEL_SIZE
   envHelper.ground!.position.set(

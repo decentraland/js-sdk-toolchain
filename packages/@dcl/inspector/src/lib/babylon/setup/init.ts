@@ -15,10 +15,7 @@ export function initRenderer(canvas: HTMLCanvasElement) {
     antialias: true,
     stencil: true
   })
-  const renderer = setupEngine(engine)
-
-  // attach camera control to canvas
-  renderer.editorCamera.attachControl(canvas, true)
+  const renderer = setupEngine(engine, canvas)
 
   // resize renderer when window is resized
   function resize() {
@@ -33,8 +30,7 @@ export function initRenderer(canvas: HTMLCanvasElement) {
     }
   }
 
-  // init keyboard
-  initKeyboard(canvas, renderer.scene, renderer.editorCamera)
+  initKeyboard(canvas, renderer.scene)
 
   return { ...renderer, dispose }
 }

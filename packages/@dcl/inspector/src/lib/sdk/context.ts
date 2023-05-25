@@ -13,6 +13,7 @@ import { DataLayerRpcClient } from '../data-layer/types'
 import { getTransformNodeChecker } from './transform-node'
 import { createOperations } from './operations'
 import { Gizmos } from '../babylon/decentraland/gizmo-manager'
+import { CameraManager } from '../babylon/decentraland/camera'
 
 export type SdkContextEvents = {
   change: { entity: Entity; operation: CrdtMessageType; component?: ComponentDefinition<any>; value?: any }
@@ -28,6 +29,7 @@ export type SdkContextValue = {
   dataLayer: DataLayerRpcClient
   operations: ReturnType<typeof createOperations>
   gizmos: Gizmos
+  editorCamera: CameraManager
 }
 
 export async function createSdkContext(canvas: HTMLCanvasElement, catalog: ITheme[]): Promise<SdkContextValue> {
@@ -71,6 +73,7 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
     dispose,
     dataLayer,
     operations: createOperations(engine),
-    gizmos: ctx.gizmos
+    gizmos: ctx.gizmos,
+    editorCamera: renderer.editorCamera
   }
 }
