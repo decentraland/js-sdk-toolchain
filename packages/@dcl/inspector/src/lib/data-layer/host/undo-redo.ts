@@ -9,7 +9,7 @@ import {
 import upsertAsset from './upsert-asset'
 import { FileSystemInterface } from '../types'
 import { findPrevValue } from './utils/component'
-import { UndoRedoBuffer } from './utils/undo-redo-buffer'
+import { UndoRedoArray } from './utils/undo-redo-array'
 
 export type UndoRedoCrdt = { $case: 'crdt'; operations: CrdtOperation[] }
 export type UndoRedoFile = { $case: 'file'; operations: FileOperation[] }
@@ -40,8 +40,8 @@ const getUndoValue: UndoRedoGetter = (val) => val.prevValue
 const getRedoValue: UndoRedoGetter = (val) => val.newValue
 
 export function initUndoRedo(fs: FileSystemInterface, engine: IEngine, getComposite: () => CompositeDefinition) {
-  const undoList = new UndoRedoBuffer(1024, getUndoValue)
-  const redoList = new UndoRedoBuffer(1024, getRedoValue)
+  const undoList = UndoRedoArray(1024)
+  const redoList = UndoRedoArray(1024)
   const crdtAcc: CrdtOperation[] = []
 
   function onChange(

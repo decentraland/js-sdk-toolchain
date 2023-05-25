@@ -23,7 +23,7 @@
   background-color: var(--vscode-accent-blue);
 }
 
-.Tree > div:first-child > div {
+.Tree > div:first-child > div:not(.contexify) {
   width: 100%;
   display: flex;
   align-items: center;
