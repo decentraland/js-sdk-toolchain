@@ -20,6 +20,8 @@
   /* Color definitions */
   --white: #FFFFFF;
   --white-gray: #E7E7E7;
+  --background-gray: #3C3C3C;
+  --border-gray: #454545;
   --black: #000000;
   --transparent: transparent;
   --vscode-accent-blue: #094771;

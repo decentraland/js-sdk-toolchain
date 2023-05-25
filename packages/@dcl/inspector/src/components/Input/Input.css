@@ -1,0 +1,14 @@
+.Input {
+  border: none;
+  background-color: var(--background-gray);
+  outline: var(--input-border-color);
+  color: var(--white-gray);
+  font-size: 13px;
+  padding: 4px;
+  width: 100%;
+  font-weight: 500;
+}
+
+.Input::placeholder {
+  color: var(--white)
+}

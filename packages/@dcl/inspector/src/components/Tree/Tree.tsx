@@ -30,6 +30,7 @@ type Props<T> = {
   onToggle: (value: T, isOpen: boolean) => void
   getDragContext?: () => unknown
   dndType?: string
+  tree?: unknown
 }
 
 const getDefaultLevel = () => 1
