@@ -8,7 +8,7 @@ import { Toolbar } from '../Toolbar'
 
 import './App.css'
 import { Resizable } from '../Resizable'
-import Footer from '../Footer'
+import Assets from '../Assets'
 
 const App = () => {
   return (
@@ -29,7 +29,7 @@ const App = () => {
           <Toolbar />
           <Renderer />
         </Box>
-        <Footer />
+        <Assets />
       </div>
     </Resizable>
   )
