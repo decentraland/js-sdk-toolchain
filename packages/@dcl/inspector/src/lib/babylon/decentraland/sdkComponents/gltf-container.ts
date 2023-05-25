@@ -2,6 +2,7 @@ import * as BABYLON from '@babylonjs/core'
 import { GLTFFileLoader, GLTFLoaderAnimationStartMode } from '@babylonjs/loaders'
 import { GLTFLoader } from '@babylonjs/loaders/glTF/2.0'
 import { ComponentType, PBGltfContainer } from '@dcl/ecs'
+
 import { markAsCollider } from '../colliders-utils'
 import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
@@ -64,7 +65,7 @@ export const putGltfContainerComponent: ComponentOperation = (entity, component)
 
 export function loadGltf(entity: EcsEntity, value: string) {
   const context = entity.context.deref()
-  if (!context || sceneContextMap.has(context.loadableScene.id)) return
+  if (!context || !!entity.gltfContainer) return
 
   // store a WeakRef to the sceneContext to enable file resolver
   sceneContextMap.set(context.loadableScene.id, entity.context)
@@ -99,6 +100,18 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
     return
   }
 
+  if (entity.isGltfPathLoading()) {
+    const loadingFilePath = await entity.getGltfPathLoading()
+    if (loadingFilePath === filePath) {
+      console.warn(
+        `Asset ${filePath} for entity ${entity.entityId} is already being loaded. This call will be dismissed`
+      )
+      return
+    }
+  }
+
+  entity.setGltfPathLoading()
+
   const base = filePath.split('/').slice(0, -1).join('/')
   const finalSrc = filePath + '?sceneId=' + encodeURIComponent(sceneId) + '&base=' + encodeURIComponent(base)
 
@@ -121,10 +134,12 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
         })
 
       entity.gltfAssetContainer = assetContainer
+      entity.resolveGltfPathLoading(filePath)
     },
     null,
     (_scene, _message, _exception) => {
       console.error('Error while calling LoadAssetContainer: ', _message, _exception)
+      entity.resolveGltfPathLoading(filePath)
       // debugger
       // const animator: Animator = entity.getBehaviorByName('animator') as Animator
 
