@@ -26,7 +26,7 @@ const Input = ({ value, onCancel, onSubmit, onChange, placeholder }: PropTypes) 
       if (submittingKeys.has(e.key)) onSubmit && onSubmit(getValue())
     }
 
-    const onBlur = (_: Event) => onCancel && onCancel()
+    const onBlur = (_: Event) => onSubmit && onSubmit(getValue())
 
     document.body.addEventListener('click', onBodyClick)
     ref.current?.addEventListener('keyup', onKeyUp)
