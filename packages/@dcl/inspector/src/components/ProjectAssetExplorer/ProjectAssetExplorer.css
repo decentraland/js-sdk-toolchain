@@ -2,6 +2,7 @@
   border-top: 0.1px solid;
   border-color: var(--border-gray);
 }
+
 .ProjectView > .Tree-View {
   border-right: 0.1px solid;
   border-color: var(--border-gray);
@@ -59,6 +60,8 @@
   flex-direction: row;
   flex-wrap: wrap;
   align-content: flex-start;
+  justify-content: center;
+  overflow-y: auto;
 }
 
 .ProjectView .FolderView .NodeView {
