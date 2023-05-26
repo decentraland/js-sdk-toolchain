@@ -18,8 +18,8 @@
   height: 20px;
 }
 
-.Tree > div:first-child:hover,
-.Tree .selected {
+.Tree > div:first-child:hover:not(:has(input)),
+.Tree .selected:not(:has(input)) {
   background-color: var(--vscode-accent-blue);
 }
 
@@ -36,6 +36,7 @@
   outline: var(--input-border-color);
   border-radius: 3px;
   width: 100%;
+  color: var(--black)
 }
 
 .Tree > .item > div > svg:only-child {
