@@ -58,24 +58,25 @@ function ProjectView({ folders, onImportAsset }: Props) {
     function generateTree(node: AssetNodeFolder, parentName: string = ''): string[] {
       const namePath = getPath(parentName, node.name)
       const childrens = node.children.map(c => `${namePath}/${c.name}`)
-      const matches: string[] = []
+      const matchesList: string[] = []
       for (const children of node.children) {
         if (children.type === 'folder') {
-          matches.push(...generateTree(children, node.name))
+          matchesList.push(...generateTree(children, node.name))
         } else {
           const name = getPath(namePath, children.name)
-          if (hasMatch(name)) {
+          const matches = hasMatch(name)
+          if (matches) {
             open.add(name)
-            matches.push(name)
+            matchesList.push(name)
           }
-          tree.set(name, { ...children, matches, parent: null })
+          tree.set(name, { ...children, matches: matches ? [name] : [], parent: null })
         }
       }
-      if (matches.length) {
+      if (matchesList.length) {
         open.add(namePath)
       }
-      tree.set(namePath, { ...node, children: childrens, parent: null, matches })
-      return matches
+      tree.set(namePath, { ...node, children: childrens, parent: null, matches: matchesList })
+      return matchesList
     }
 
     for (const f of folders) {
@@ -221,7 +222,7 @@ function NodeIcon({ value, isOpen }: { value?: TreeNode, isOpen: boolean }) {
   if (value.type === 'folder') {
     return isOpen ? <><IoIosArrowDown /><FolderIcon/></> : <><IoIosArrowForward /><FolderIcon/></>
   }
-  return <><svg style={{ width: '4px' }} /><IoIosImage /></>
+  return <><svg style={{ width: '4px', height: '4px' }} /><IoIosImage /></>
 }
 
 export default ProjectView
