@@ -12,6 +12,7 @@ import FolderIcon from '../Icons/Folder'
 import ContextMenu from './ContextMenu'
 import { AssetNode, AssetNodeFolder } from './types'
 import { getFullNodePath } from './utils'
+import Search from '../Search'
 
 function noop() {}
 // eslint-disable-next-line prettier/prettier
@@ -32,38 +33,67 @@ export const ROOT = 'File System'
 
 export const DRAG_N_DROP_ASSET_KEY = 'project-asset-gltf'
 
-export type TreeNode = Omit<AssetNode, 'children'> & { children?: string[] }
+export type TreeNode = Omit<AssetNode, 'children'> & { children?: string[]; matches?: string[] }
 
 function ProjectView({ folders, onImportAsset }: Props) {
   const sdk = useSdk()
   const [open, setOpen] = useState(new Set<string>())
   const [modal, setModal] = useState<ModalState | undefined>(undefined)
   const [lastSelected, setLastSelected] = useState<string>()
+  const [search, setSearch] = useState<string>('')
+
   const getTree = useCallback(() => {
+    function getPath(node: string, children: string) {
+      if (!node) return children
+      return `${node}/${children}`
+    }
     const tree = new Map<string, TreeNode>()
     tree.set(ROOT, { children: folders.map(f => f.name), name: ROOT, type: 'folder', parent: null })
     open.add(ROOT)
-    function generateTree(node: AssetNodeFolder) {
-      const childrens = node.children.map(c => c.name)
-      tree.set(node.name, { ...node, children: childrens })
 
+    function hasMatch (name: string) {
+      return search && name.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+    }
+
+    function generateTree(node: AssetNodeFolder, parentName: string = ''): string[] {
+      const namePath = getPath(parentName, node.name)
+      const childrens = node.children.map(c => `${namePath}/${c.name}`)
+      const matchesList: string[] = []
       for (const children of node.children) {
         if (children.type === 'folder') {
-          generateTree(children)
+          matchesList.push(...generateTree(children, node.name))
         } else {
-          tree.set(children.name, children)
+          const name = getPath(namePath, children.name)
+          const matches = hasMatch(name)
+          if (matches) {
+            open.add(name)
+            matchesList.push(name)
+          }
+          tree.set(name, { ...children, matches: matches ? [name] : [], parent: null })
         }
       }
+      if (matchesList.length) {
+        open.add(namePath)
+      }
+      tree.set(namePath, { ...node, children: childrens, parent: null, matches: matchesList })
+      return matchesList
     }
 
     for (const f of folders) {
       generateTree(f)
     }
-
     return tree
-  }, [folders])
-  const tree = getTree()
+  }, [folders, search])
 
+  /**
+   * Values
+   */
+  const tree = getTree()
+  const selectedTreeNode = tree.get(lastSelected ?? ROOT)
+
+  /**
+   * Callbacks
+   */
   const onToggle = useCallback((value: string, toggle: boolean) => {
     setLastSelected(value)
     if (toggle) {
@@ -116,9 +146,19 @@ function ProjectView({ folders, onImportAsset }: Props) {
     setLastSelected(val)
   }, [setLastSelected])
   const handleDragContext = useCallback(() => ({ tree }), [tree])
+  const isOpen = useCallback((val: string) => open.has(val), [open])
 
-  if (!folders.length) return null
-  const selectedTreeNode = tree.get(lastSelected ?? ROOT)
+  const getChildren = useCallback((val: string) => {
+    const value = tree.get(val)
+    if (!value?.children?.length) return []
+    if (!search.length) return value.children
+
+    return value.children.filter(($) => {
+      const childrenValue = tree.get($)
+      return !!childrenValue?.matches?.length
+    })
+  }, [tree, search])
+
   return (
     <>
       <Modal isOpen={!!modal?.isOpen} onRequestClose={handleModalClose} className="RemoveAsset">
@@ -129,32 +169,36 @@ function ProjectView({ folders, onImportAsset }: Props) {
         </div>
       </Modal>
       <div className="ProjectView">
-        <MyTree
-          className="editor-assets-tree"
-          value={ROOT}
-          onAddChild={noop}
-          onSetParent={noop}
-          onRemove={handleRemove}
-          onRename={noop}
-          onToggle={onToggle}
-          getId={(value: string) => value.toString()}
-          getChildren={(name: string) => [...tree.get(name)?.children || []]}
-          getLabel={(val: string) => <span >{tree.get(val)?.name ?? ''}</span>}
-          isOpen={(val: string) => open.has(val)}
-          isSelected={(val: string) => lastSelected === val}
-          canRename={() => false}
-          canRemove={(val) => tree.get(val)!.type === 'asset'}
-          canToggle={() => true}
-          canAddChild={() => false}
-          getIcon={(val) => <NodeIcon value={tree.get(val)!} isOpen={open.has(val)} />}
-          getDragContext={handleDragContext}
-          dndType={DRAG_N_DROP_ASSET_KEY}
-          getExtraContextMenu={(val) => <ContextMenu value={tree.get(val)} onImportAsset={onImportAsset} />}
-        />
+        <div className="Tree-View">
+          <Search value={search} onChange={setSearch} placeholder="Search local assets" onCancel={() => setSearch('')} />
+          <MyTree
+            tree={tree}
+            className="editor-assets-tree"
+            value={ROOT}
+            onAddChild={noop}
+            onSetParent={noop}
+            onRemove={handleRemove}
+            onRename={noop}
+            onToggle={onToggle}
+            getId={(value: string) => value.toString()}
+            getChildren={getChildren}
+            getLabel={(val: string) => <span >{tree.get(val)?.name ?? val}</span>}
+            isOpen={isOpen}
+            isSelected={(val: string) => lastSelected === val}
+            canRename={() => false}
+            canRemove={(val) => tree.get(val)?.type === 'asset'}
+            canToggle={() => true}
+            canAddChild={() => false}
+            getIcon={(val) => <NodeIcon value={tree.get(val)} isOpen={isOpen(val)} />}
+            getDragContext={handleDragContext}
+            dndType={DRAG_N_DROP_ASSET_KEY}
+            getExtraContextMenu={(val) => <ContextMenu value={tree.get(val)} onImportAsset={onImportAsset} />}
+          />
+        </div>
         <div className="FolderView">
           {selectedTreeNode?.type === 'folder'
-            ? selectedTreeNode?.children?.map($ => <NodeView key={$} getDragContext={handleDragContext} value={tree.get($)} onSelect={handleClickFolder($)} />)
-            : !!selectedTreeNode && <NodeView value={selectedTreeNode} onSelect={handleClickFolder(selectedTreeNode.name)} getDragContext={handleDragContext}/>
+            ? selectedTreeNode?.children?.map($ => <NodeView key={$} valueId={$} getDragContext={handleDragContext} value={tree.get($)} onSelect={handleClickFolder($)} />)
+            : !!selectedTreeNode && lastSelected && <NodeView valueId={lastSelected} value={selectedTreeNode} onSelect={handleClickFolder(selectedTreeNode.name)} getDragContext={handleDragContext}/>
           }
         </div>
       </div>
@@ -162,9 +206,8 @@ function ProjectView({ folders, onImportAsset }: Props) {
   )
 }
 
-function NodeView({ value, onSelect, getDragContext }: { value?: TreeNode, onSelect: () => void, getDragContext: () => unknown }) {
+function NodeView({ valueId, value, onSelect, getDragContext }: { value?: TreeNode, onSelect: () => void, getDragContext: () => unknown, valueId: string }) {
   if (!value) return null
-  const valueId = value.name
   const [, drag] = useDrag(() => ({ type: DRAG_N_DROP_ASSET_KEY, item: { value: valueId, context: getDragContext() } }), [valueId])
   return (
     <div ref={drag} className="NodeView" key={value.name} onDoubleClick={onSelect}>
@@ -174,11 +217,12 @@ function NodeView({ value, onSelect, getDragContext }: { value?: TreeNode, onSel
   )
 }
 
-function NodeIcon({ value, isOpen }: { value: TreeNode, isOpen: boolean }) {
+function NodeIcon({ value, isOpen }: { value?: TreeNode, isOpen: boolean }) {
+  if (!value) return null
   if (value.type === 'folder') {
     return isOpen ? <><IoIosArrowDown /><FolderIcon/></> : <><IoIosArrowForward /><FolderIcon/></>
   }
-  return <><svg style={{ width: '4px' }} /><IoIosImage /></>
+  return <><svg style={{ width: '4px', height: '4px' }} /><IoIosImage /></>
 }
 
 export default ProjectView
