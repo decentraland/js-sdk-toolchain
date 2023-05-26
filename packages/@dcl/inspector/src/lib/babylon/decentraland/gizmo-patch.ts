@@ -27,7 +27,6 @@ import {
     Actual patch is marked with PATCH FIX comment.
 */
 
-/* istanbul ignore next */
 export class PatchedPlaneRotationGizmo extends PlaneRotationGizmo {
   constructor(
     planeNormal: any,
@@ -287,7 +286,6 @@ export class PatchedPlaneRotationGizmo extends PlaneRotationGizmo {
   }
 }
 
-/* istanbul ignore next */
 export class PatchedRotationGizmo extends RotationGizmo {
   constructor(
     gizmoLayer: any,
@@ -363,7 +361,6 @@ export class PatchedRotationGizmo extends RotationGizmo {
   }
 }
 
-/* istanbul ignore next */
 export class PatchedGizmoManager extends GizmoManager {
   set rotationGizmoEnabled(value: boolean) {
     if (value) {
