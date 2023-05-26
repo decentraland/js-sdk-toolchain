@@ -30,6 +30,7 @@ type Props<T> = {
   onToggle: (value: T, isOpen: boolean) => void
   getDragContext?: () => unknown
   dndType?: string
+  tree?: unknown
 }
 
 const getDefaultLevel = () => 1
@@ -73,7 +74,6 @@ function Tree<T>(_props: Props<T>) {
     const extraContextMenu = getExtraContextMenu ? getExtraContextMenu(value) : null
     const [editMode, setEditMode] = useState(false)
     const [insertMode, setInsertMode] = useState(false)
-
     const canDrop = useCallback(
       (target: T, source: T): boolean => {
         if (getId(target) === getId(source)) return false
