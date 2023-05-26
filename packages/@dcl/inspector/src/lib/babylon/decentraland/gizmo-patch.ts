@@ -384,4 +384,8 @@ export class PatchedGizmoManager extends GizmoManager {
     }
     this._gizmosEnabled.rotationGizmo = value
   }
+
+  get rotationGizmoEnabled() {
+    return this._gizmosEnabled.rotationGizmo;
+  }
 }
