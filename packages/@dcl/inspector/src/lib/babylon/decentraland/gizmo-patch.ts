@@ -23,7 +23,7 @@ import {
     Patched PlaneRotationGizmo is used by patched version of RotationGizmo.
     Finally, patched RotationGizmo is used by patched version of GizmoManager.
 
-    The code is copied mostly verbatim, with "anys" sprinkled here in there to appease type checker and linter.
+    The code is copied mostly verbatim, with "anys" sprinkled here in there to appease type checker.
     Actual patch is marked with PATCH FIX comment.
 */
 
