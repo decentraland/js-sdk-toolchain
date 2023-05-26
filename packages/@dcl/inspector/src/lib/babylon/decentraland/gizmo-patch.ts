@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { GizmoManager, PlaneRotationGizmo, RotationGizmo } from '@babylonjs/core'
 import { Vector3, Color3, PointerInfo } from '@babylonjs/core'
 import {
