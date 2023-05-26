@@ -1,5 +1,5 @@
 import mitt from 'mitt'
-import { GizmoManager, IAxisDragGizmo, Quaternion, Vector3 } from '@babylonjs/core'
+import { IAxisDragGizmo, Quaternion, Vector3 } from '@babylonjs/core'
 import { EcsEntity } from './EcsEntity'
 import { Entity, TransformType } from '@dcl/ecs'
 import { getLayoutManager } from './layout-manager'
