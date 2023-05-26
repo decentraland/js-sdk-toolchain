@@ -39,15 +39,15 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x20a c=1052 t=1 data={"value":"some value","color":{"r":1,"g":1,"b":1,"a":1}}
   Scene: PUT_COMPONENT e=0x201 c=1053 t=1 data={"color":{"r":0,"g":0,"b":1,"a":1},"textureMode":1,"uvs":[]}
   Scene: PUT_COMPONENT e=0x202 c=1053 t=1 data={"color":{"r":1,"g":0,"b":0,"a":1},"textureMode":1,"uvs":[]}
-  Scene: PUT_COMPONENT e=0x203 c=1053 t=1 data={"color":{"r":0,"g":0,"b":0,"a":0},"textureMode":1,"uvs":[]}
-  Scene: PUT_COMPONENT e=0x205 c=1053 t=1 data={"color":{"r":0,"g":0,"b":0,"a":0},"textureMode":1,"uvs":[]}
-  Scene: PUT_COMPONENT e=0x207 c=1053 t=1 data={"color":{"r":0,"g":0,"b":0,"a":0},"textureMode":1,"uvs":[]}
+  Scene: PUT_COMPONENT e=0x203 c=1053 t=1 data={"color":{"r":0.9843137264251709,"g":0.9411764740943909,"b":0.9411764740943909,"a":1},"textureMode":1,"uvs":[]}
+  Scene: PUT_COMPONENT e=0x205 c=1053 t=1 data={"color":{"r":0.9843137264251709,"g":0.9411764740943909,"b":0.9411764740943909,"a":1},"textureMode":1,"uvs":[]}
+  Scene: PUT_COMPONENT e=0x207 c=1053 t=1 data={"color":{"r":0.9843137264251709,"g":0.9411764740943909,"b":0.9411764740943909,"a":1},"textureMode":1,"uvs":[]}
   Scene: PUT_COMPONENT e=0x20a c=1053 t=1 data={"color":{"r":0.9800000190734863,"g":0.17000000178813934,"b":0.33000001311302185,"a":1},"textureMode":1,"uvs":[]}
   Scene: PUT_COMPONENT e=0x20b c=1053 t=1 data={"color":{"r":0.5,"g":0.800000011920929,"b":0.10000000149011612,"a":0.6000000238418579},"textureMode":1,"uvs":[]}
   Scene: PUT_COMPONENT e=0x202 c=1093 t=1 data={"placeholder":"SARASA","disabled":false}
   Scene: PUT_COMPONENT e=0x209 c=1093 t=1 data={"placeholder":"","disabled":false}
   Scene: PUT_COMPONENT e=0x201 c=1094 t=1 data={"acceptEmpty":false,"options":["BOEDO","CASLA"],"selectedIndex":0,"disabled":false,"color":{"r":1,"g":0,"b":0,"a":1}}
-  OPCODES ~= 117k
+  OPCODES ~= 119k
   MALLOC_COUNT = 680
   ALIVE_OBJS_DELTA ~= 0.24k
 CALL onUpdate(0.1)
@@ -65,4 +65,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 61k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1506.12k bytes
+  MEMORY_USAGE_COUNT ~= 1506.18k bytes
