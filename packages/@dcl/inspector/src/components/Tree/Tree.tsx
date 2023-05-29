@@ -153,7 +153,7 @@ function Tree<T>(_props: Props<T>) {
           )}
         </div>
         <TreeChildren {...props} />
-        {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} />}
+        {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} onBlur={quitInsertMode}/>}
       </div>
     )
   })
