@@ -1,6 +1,22 @@
-import { engine, Entity, InputAction, MeshCollider, MeshRenderer, Transform, pointerEventsSystem } from '@dcl/ecs'
+import { getHeaders } from '~system/SignedFetch'
+
+import {
+  engine,
+  Entity,
+  InputAction,
+  MeshCollider,
+  MeshRenderer,
+  Transform,
+  pointerEventsSystem,
+  executeTask
+} from '@dcl/ecs'
 import { Vector3, Quaternion } from '@dcl/sdk/math'
 export * from '@dcl/sdk'
+
+executeTask(async () => {
+  const { headers } = await getHeaders({ url: 'ws://boedo.casla' })
+  console.log(headers)
+})
 
 // Cube factory
 function createCube(x: number, y: number, z: number): Entity {
