@@ -54,38 +54,3 @@ code {
   top: -30px;
   position: absolute !important;
 }
-
-
-/* Editor assets */
-.footer {
-  display: flex;
-  flex-direction: column;
-  flex: none;
-}
-
-.footer .footer-buttons {
-  display: flex;
-  background: var(--tree-bg-color);
-  height: 36px;
-}
-
-.footer .footer-buttons > div {
-  display: flex;
-  align-items: center;
-  padding: 8px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.footer .footer-buttons > div > svg {
-  margin-right: 4px;
-}
-
-.footer-buttons .footer-title > span {
-  margin-left: 8px;
-}
-
-.footer .footer-content {
-  background: var(--tree-bg-color) !important;
-  height: 250px !important;
-}

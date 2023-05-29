@@ -2,6 +2,8 @@ import { ComponentDefinition, CompositeDefinition, DeepReadonlyObject, Entity } 
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { dataCompare } from '@dcl/ecs/dist/systems/crdt/utils'
 
+import { EditorComponentsTypes } from '../../../sdk/components'
+
 export function isEqual(component: ComponentDefinition<unknown>, prevValue: unknown, newValue: unknown) {
   if (prevValue === newValue || (!prevValue && !newValue)) return true
   if ((!prevValue && newValue) || (prevValue && !newValue)) return false
@@ -19,4 +21,13 @@ export function findPrevValue(composite: CompositeDefinition, componentName: str
     return null
   }
   return value.data.json
+}
+
+export function parseSceneFromComponent(value: DeepReadonlyObject<EditorComponentsTypes['Scene']>) {
+  return {
+    scene: {
+      parcels: value.layout.parcels.map(($) => `${$.x},${$.y}`),
+      base: `${value.layout.base.x},${value.layout.base.y}`
+    }
+  }
 }

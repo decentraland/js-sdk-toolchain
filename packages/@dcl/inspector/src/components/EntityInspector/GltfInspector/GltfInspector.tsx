@@ -27,9 +27,19 @@ export default withSdk<Props>(
 
     const hasGltf = useHasComponent(entity, GltfContainer)
     const handleInputValidation = useCallback(({ src }: { src: string }) => isValidInput(files, src), [files])
-    const { getInputProps, isValid } = useComponentInput(entity, GltfContainer, fromGltf, toGltf, handleInputValidation, [files])
+    const { getInputProps, isValid } = useComponentInput(
+      entity,
+      GltfContainer,
+      fromGltf,
+      toGltf,
+      handleInputValidation,
+      [files]
+    )
 
-    const handleRemove = useCallback(() => GltfContainer.deleteFrom(entity), [])
+    const handleRemove = useCallback(() => {
+      sdk.operations.removeComponent(entity, GltfContainer.componentId)
+      sdk.operations.dispatch()
+    }, [])
     const handleDrop = useCallback(async (src: string) => {
       const { operations } = sdk
       operations.updateValue(GltfContainer, entity, { src })
@@ -43,7 +53,7 @@ export default withSdk<Props>(
           if (monitor.didDrop()) return
           const node = context.tree.get(value)!
           const model = getModel(node, context.tree)
-          if (model) handleDrop(model.asset.src)
+          if (model) void handleDrop(model.asset.src)
         },
         canDrop: ({ value, context }: ProjectAssetDrop) => {
           const node = context.tree.get(value)!

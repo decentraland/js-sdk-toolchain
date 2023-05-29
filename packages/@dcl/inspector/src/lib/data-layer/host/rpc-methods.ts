@@ -8,6 +8,7 @@ import { stream } from './stream'
 import { FileOperation, initUndoRedo } from './undo-redo'
 import { minimalComposite } from '../client/feeded-local-fs'
 import upsertAsset from './upsert-asset'
+import { initSceneProvider } from './scene'
 
 function setupEngineDump(
   fs: FileSystemInterface,
@@ -24,7 +25,7 @@ function setupEngineDump(
     if (!dump) return composite
 
     const mainCrdt = dumpEngineToCrdtCommands(engine)
-    fs.writeFile('main.crdt', Buffer.from(mainCrdt)).catch((err) => console.error(`Failed saving main.crdt: `, err))
+    fs.writeFile('main.crdt', Buffer.from(mainCrdt)).catch((err) => console.error('Failed saving main.crdt: ', err))
 
     compositeProvider
       .save({ src: compositePath, composite }, 'json')
@@ -69,9 +70,11 @@ export async function initRpcMethods(
   let dirty = false
   let composite: CompositeDefinition
   const undoRedo = initUndoRedo(fs, engine, () => composite)
+  const scene = initSceneProvider(fs)
 
-  // Create undo/redo container and attach onChange logic.
+  // Create containers and attach onChange logic.
   onChanges.push(undoRedo.onChange)
+  onChanges.push(scene.onChange)
 
   // TODO: review this
   // Dump composite to the FS on every tick

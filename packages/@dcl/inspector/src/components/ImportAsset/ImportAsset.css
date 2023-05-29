@@ -58,11 +58,8 @@
   justify-content: center;
   position: relative;
 }
-.ImportAsset .Container .remove-icon {
-  display: none;
-}
 
-.ImportAsset .Container:hover .remove-icon {
+.ImportAsset .Container .remove-icon {
   position: absolute;
   display: flex;
   align-items: center;
@@ -110,3 +107,6 @@
   background-color: var(--primary);
 }
 
+.ImportAsset .file-container .error {
+  color: var(--primary);
+}

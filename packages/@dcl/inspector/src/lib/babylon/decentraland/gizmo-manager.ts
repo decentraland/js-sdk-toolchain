@@ -1,5 +1,5 @@
 import mitt from 'mitt'
-import { GizmoManager, IAxisDragGizmo, Vector3 } from '@babylonjs/core'
+import { IAxisDragGizmo, Quaternion, Vector3 } from '@babylonjs/core'
 import { EcsEntity } from './EcsEntity'
 import { Entity, TransformType } from '@dcl/ecs'
 import { getLayoutManager } from './layout-manager'
@@ -7,13 +7,19 @@ import { inBounds } from '../../utils/layout'
 import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
 import { SceneContext } from './SceneContext'
 import { GizmoType } from '../../utils/gizmo'
+import { PatchedGizmoManager } from './gizmo-patch'
+
+function areProportional(a: number, b: number) {
+  // this leeway is here to account for rounding errors due to serializing/deserializing floating point numbers
+  return Math.abs(a - b) < 1e-5
+}
 
 export function createGizmoManager(context: SceneContext) {
   // events
   const events = mitt<{ change: void }>()
 
   // Create and initialize gizmo
-  const gizmoManager = new GizmoManager(context.scene)
+  const gizmoManager = new PatchedGizmoManager(context.scene)
   gizmoManager.usePointerToAttachGizmos = false
   gizmoManager.positionGizmoEnabled = true
   gizmoManager.rotationGizmoEnabled = true
@@ -47,7 +53,7 @@ export function createGizmoManager(context: SceneContext) {
 
   function fixRotationGizmoAlignment(value: TransformType) {
     const isProportional =
-      Math.abs(value.scale.x) === Math.abs(value.scale.y) && Math.abs(value.scale.y) === value.scale.z
+      areProportional(value.scale.x, value.scale.y) && areProportional(value.scale.y, value.scale.z)
     rotationGizmoAlignmentDisabled = !isProportional
     if (!isProportional && !isRotationGizmoWorldAligned()) {
       setRotationGizmoWorldAligned(true) // set to world
@@ -66,7 +72,7 @@ export function createGizmoManager(context: SceneContext) {
       const value = {
         position: snapPosition(lastEntity.position),
         scale: snapScale(lastEntity.scaling),
-        rotation: snapRotation(lastEntity.rotationQuaternion!),
+        rotation: lastEntity.rotationQuaternion ? snapRotation(lastEntity.rotationQuaternion) : Quaternion.Zero(),
         parent
       }
       return value

@@ -9,6 +9,8 @@ import updateSelectedEntity from './update-selected-entity'
 import setParent from './set-parent'
 import removeSelectedEntities from './remove-selected-entities'
 import addAsset from './add-asset'
+import addComponent from './add-component'
+import removeComponent from './remove-component'
 
 export interface Dispatch {
   dirty?: boolean
@@ -21,6 +23,8 @@ export function createOperations(engine: IEngine) {
     addChild: addChild(engine),
     addAsset: addAsset(engine),
     setParent: setParent(engine),
+    addComponent: addComponent(engine),
+    removeComponent: removeComponent(engine),
     updateSelectedEntity: updateSelectedEntity(engine),
     removeSelectedEntities: removeSelectedEntities(engine),
     dispatch: ({ dirty = true }: Dispatch = {}) => {

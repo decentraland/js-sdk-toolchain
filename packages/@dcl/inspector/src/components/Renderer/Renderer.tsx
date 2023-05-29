@@ -15,6 +15,7 @@ import { IAsset } from '../AssetsCatalog/types'
 import { getModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 import { useIsMounted } from '../../hooks/useIsMounted'
 import { Warnings } from './Warnings'
+import { CameraSpeed } from './CameraSpeed'
 
 import './Renderer.css'
 
@@ -112,6 +113,7 @@ const Renderer: React.FC = () => {
         </div>
       )}
       <Warnings />
+      <CameraSpeed />
       <canvas ref={canvasRef} id="canvas" touch-action="none" />
     </div>
   )

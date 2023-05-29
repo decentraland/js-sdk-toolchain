@@ -1,5 +1,5 @@
 .Tree {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--white);
   width: 100%;
 }
@@ -18,12 +18,12 @@
   height: 20px;
 }
 
-.Tree > div:first-child:hover,
-.Tree .selected {
-  background-color: var(--tree-border-color);
+.Tree > div:first-child:hover:not(:has(input)),
+.Tree .selected:not(:has(input)) {
+  background-color: var(--vscode-accent-blue);
 }
 
-.Tree > div:first-child > span {
+.Tree > div:first-child > div:not(.contexify) {
   width: 100%;
   display: flex;
   align-items: center;
@@ -36,13 +36,14 @@
   outline: var(--input-border-color);
   border-radius: 3px;
   width: 100%;
+  color: var(--black)
 }
 
-.Tree > .item > span > svg:only-child {
+.Tree > .item > div > svg:only-child {
   margin-right: 4px;
 }
 
-.Tree > .item > span > svg:nth-child(2) {
+.Tree > .item > div > svg:nth-child(2) {
   margin-right: 4px;
 }
 
