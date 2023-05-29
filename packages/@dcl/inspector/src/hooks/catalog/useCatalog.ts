@@ -25,6 +25,7 @@ export const useCatalog = () => {
         } else {
           setError(new Error('Could not load catalog'))
         }
+        setCatalog([])
       })
   }, [])
   return [catalog, error] as const
