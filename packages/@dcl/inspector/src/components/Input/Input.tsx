@@ -22,8 +22,14 @@ const Input = ({ value, onCancel, onSubmit, onChange, placeholder }: PropTypes) 
     }
 
     const onKeyUp = (e: KeyboardEvent) => {
-      if (cancelingKeys.has(e.key)) onCancel && onCancel()
-      if (submittingKeys.has(e.key)) onSubmit && onSubmit(getValue())
+      if (cancelingKeys.has(e.key)) {
+        ref.current?.removeEventListener('blur', onBlur)
+        onCancel && onCancel()
+      }
+      if (submittingKeys.has(e.key)) {
+        ref.current?.removeEventListener('blur', onBlur)
+        onSubmit && onSubmit(getValue())
+      }
     }
 
     const onBlur = (_: Event) => onSubmit && onSubmit(getValue())
