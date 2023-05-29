@@ -7,7 +7,6 @@ import { Input } from '../Input'
 import { ContextMenu } from './ContextMenu'
 
 import './Tree.css'
-import { BlurBehavior } from '../Input/types'
 
 type Props<T> = {
   value: T
@@ -154,7 +153,7 @@ function Tree<T>(_props: Props<T>) {
           )}
         </div>
         <TreeChildren {...props} />
-        {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} blurBehavior={BlurBehavior.CANCEL}/>}
+        {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} onBlur={quitInsertMode}/>}
       </div>
     )
   })

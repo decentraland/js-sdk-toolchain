@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-import { BlurBehavior, PropTypes } from './types'
+import { PropTypes } from './types'
 
 import './Input.css'
 
 const submittingKeys = new Set(['Enter'])
 const cancelingKeys = new Set(['Escape', 'Tab'])
 
-const Input = ({ value, onCancel, onSubmit, onChange, placeholder, blurBehavior }: PropTypes) => {
+const Input = ({ value, onCancel, onSubmit, onChange, onBlur, placeholder }: PropTypes) => {
   const ref = useRef<HTMLInputElement>(null)
   const [stateValue, setStateValue] = useState(value)
 
@@ -22,15 +22,13 @@ const Input = ({ value, onCancel, onSubmit, onChange, placeholder, blurBehavior 
       if (submittingKeys.has(e.key)) onSubmit && onSubmit(getValue())
     }
 
-    const onBlur = (_: Event) => {
-      if (blurBehavior == BlurBehavior.CANCEL) onCancel && onCancel()
-    }
+    const onBlurCallback = (e: FocusEvent) => { onBlur && onBlur(e) }
 
     ref.current?.addEventListener('keyup', onKeyUp)
-    ref.current?.addEventListener('blur', onBlur)
+    ref.current?.addEventListener('blur', onBlurCallback)
     return () => {
       ref.current?.removeEventListener('keyup', onKeyUp)
-      ref.current?.removeEventListener('blur', onBlur)
+      ref.current?.removeEventListener('blur', onBlurCallback)
     }
   }, [])
 
