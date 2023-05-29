@@ -22,11 +22,9 @@ const Input = ({ value, onCancel, onSubmit, onChange, placeholder, blurBehavior 
       if (submittingKeys.has(e.key)) onSubmit && onSubmit(getValue())
     }
 
-    let onBlur: (e: Event) => void
-    if (blurBehavior == BlurBehavior.CANCEL)
-      onBlur = (_: Event) => onCancel && onCancel()
-    else
-      onBlur = (_: Event) => {}
+    const onBlur = (_: Event) => {
+      if (blurBehavior == BlurBehavior.CANCEL) onCancel && onCancel()
+    }
 
     ref.current?.addEventListener('keyup', onKeyUp)
     ref.current?.addEventListener('blur', onBlur)
