@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-import { PropTypes } from './types'
+import { BlurBehavior, PropTypes } from './types'
 
 import './Input.css'
 
 const submittingKeys = new Set(['Enter'])
 const cancelingKeys = new Set(['Escape', 'Tab'])
 
-const Input = ({ value, onCancel, onSubmit, onChange, placeholder }: PropTypes) => {
+const Input = ({ value, onCancel, onSubmit, onChange, placeholder, blurBehavior }: PropTypes) => {
   const ref = useRef<HTMLInputElement>(null)
   const [stateValue, setStateValue] = useState(value)
 
@@ -17,28 +17,22 @@ const Input = ({ value, onCancel, onSubmit, onChange, placeholder }: PropTypes) 
 
     const getValue = () => ref.current?.value || value
 
-    const onBodyClick = (e: MouseEvent) => {
-      if (e.target !== ref.current) onSubmit && onSubmit(getValue())
-    }
-
     const onKeyUp = (e: KeyboardEvent) => {
-      if (cancelingKeys.has(e.key)) {
-        ref.current?.removeEventListener('blur', onBlur)
-        onCancel && onCancel()
-      }
-      if (submittingKeys.has(e.key)) {
-        ref.current?.removeEventListener('blur', onBlur)
-        onSubmit && onSubmit(getValue())
-      }
+      if (cancelingKeys.has(e.key)) onCancel && onCancel()
+      if (submittingKeys.has(e.key)) onSubmit && onSubmit(getValue())
     }
 
-    const onBlur = (_: Event) => onSubmit && onSubmit(getValue())
+    let onBlur: (e: Event) => void
+    if (blurBehavior == BlurBehavior.SUBMIT)
+      onBlur = (_: Event) => onSubmit && onSubmit(getValue())
+    else if (blurBehavior == BlurBehavior.CANCEL)
+      onBlur = (_: Event) => onCancel && onCancel()
+    else
+      onBlur = (_: Event) => {}
 
-    document.body.addEventListener('click', onBodyClick)
     ref.current?.addEventListener('keyup', onKeyUp)
     ref.current?.addEventListener('blur', onBlur)
     return () => {
-      document.body.removeEventListener('click', onBodyClick)
       ref.current?.removeEventListener('keyup', onKeyUp)
       ref.current?.removeEventListener('blur', onBlur)
     }
