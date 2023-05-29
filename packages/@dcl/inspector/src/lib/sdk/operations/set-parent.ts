@@ -6,7 +6,7 @@ import { EditorComponentIds, EditorComponents } from '../components'
 export function setParent(engine: IEngine) {
   return function setParent(entity: Entity, parent: Entity) {
     const EntityNode = engine.getComponentOrNull(EditorComponentIds.EntityNode) as EditorComponents['EntityNode']
-    const Transform = components.Transform(engine)
+    const Transform = engine.getComponentOrNull("core::Transform")
 
     EntityNode.getOrCreateMutable(entity).parent = parent
 
