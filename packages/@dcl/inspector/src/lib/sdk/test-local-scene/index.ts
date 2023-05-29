@@ -1,16 +1,13 @@
+import { LoadableScene } from 'decentraland-babylon/src/lib/decentraland/scene/content-server-entity'
 import { ITheme } from '../../../components/AssetsCatalog/types'
-import { LoadableScene } from '../../babylon/decentraland/SceneContext'
 
 // this was taken verbatim from my deployed world at menduz.dcl.eth
 export function getHardcodedLoadableScene(_id: string, catalog: ITheme[]): LoadableScene {
   return {
     baseUrl: 'https://builder-api.decentraland.org/v1/storage/contents/',
-    id: 'urn:decentraland:entity:bafkreid44xhavttoz4nznidmyj3rjnrgdza7v6l7kd46xdmleor5lmsxfm',
+    urn: 'urn:decentraland:entity:bafkreid44xhavttoz4nznidmyj3rjnrgdza7v6l7kd46xdmleor5lmsxfm',
     entity: {
-      version: 'v3',
       type: 'scene' as any,
-      pointers: ['0,0', '0,1'],
-      timestamp: 1665777069759,
       content: catalog
         .map((assetPack) =>
           assetPack.assets

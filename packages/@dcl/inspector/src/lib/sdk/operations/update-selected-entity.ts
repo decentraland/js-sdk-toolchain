@@ -6,7 +6,7 @@ export function updateSelectedEntity(engine: IEngine) {
   return function updateSelectedEntity(entity: Entity) {
     let gizmo = GizmoType.POSITION
 
-    // clear selection
+    // clear selection and find used gizmo
     const Selection = engine.getComponent(EditorComponentIds.Selection) as EditorComponents['Selection']
     for (const [currentlySelectedEntity] of engine.getEntitiesWith(Selection)) {
       if (currentlySelectedEntity !== entity) {

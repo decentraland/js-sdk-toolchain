@@ -26,7 +26,7 @@ export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
     })
 
     const scene = new BABYLON.Scene(engine)
-    sceneCtx = new SceneContext(engine, scene, loadableScene, dataLayer)
+    sceneCtx = new SceneContext(scene, loadableScene, dataLayer)
 
     inspector = createInspectorEngine(dataLayer)
     void sceneCtx.connectCrdtTransport(dataLayer.crdtStream)

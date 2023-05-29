@@ -1,7 +1,8 @@
 import * as BABYLON from '@babylonjs/core'
-import { EcsEntity } from '../decentraland/EcsEntity'
 import { snapManager } from '../decentraland/snap-manager'
 import { keyState, Keys } from '../decentraland/keys'
+import { BabylonEntity } from 'decentraland-babylon/src/lib/babylon/scene/BabylonEntity'
+import { SceneContext } from '../decentraland/SceneContext'
 
 let isSnapEnabled = snapManager.isEnabled()
 
@@ -35,11 +36,11 @@ export function initKeyboard(canvas: HTMLCanvasElement, scene: BABYLON.Scene) {
   })
 }
 
-function isEcsEntity(x: any): x is EcsEntity {
-  return 'isDCLEntity' in x
+function isEcsEntity(x: any): x is BabylonEntity {
+  return x instanceof BabylonEntity
 }
 
-function findParentEntity<T extends BABYLON.Node & { isDCLEntity?: boolean }>(node: T): EcsEntity | null {
+function findParentEntity<T extends BABYLON.Node & { isDCLEntity?: boolean }>(node: T): BabylonEntity | null {
   // Find the next entity parent to dispatch the event
   let parent: BABYLON.Node | null = node.parent
 
@@ -67,8 +68,7 @@ export function interactWithScene(
   const entity = mesh && findParentEntity(mesh)
 
   if (entity && pointerEvent === 'pointerDown') {
-    const context = entity.context.deref()!
-    context.operations.updateSelectedEntity(entity.entityId)
-    void context.operations.dispatch()
+    const context = entity.context.deref()! as SceneContext
+    context.updateSelectedEntity(entity.entityId)
   }
 }

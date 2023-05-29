@@ -1,13 +1,15 @@
 import mitt from 'mitt'
 import { IAxisDragGizmo, Quaternion, Vector3 } from '@babylonjs/core'
-import { EcsEntity } from './EcsEntity'
-import { Entity, TransformType } from '@dcl/ecs'
+import { BabylonEntity } from 'decentraland-babylon/src/lib/babylon/scene/BabylonEntity'
+import { Entity } from '@dcl/ecs'
 import { getLayoutManager } from './layout-manager'
 import { inBounds } from '../../utils/layout'
 import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
 import { SceneContext } from './SceneContext'
 import { GizmoType } from '../../utils/gizmo'
 import { PatchedGizmoManager } from './gizmo-patch'
+import { Transform } from 'decentraland-babylon/src/lib/decentraland/sdk-components/transform-component'
+import { saveEvent } from '../../../hooks/editor/useSave'
 
 function areProportional(a: number, b: number) {
   // this leeway is here to account for rounding errors due to serializing/deserializing floating point numbers
@@ -19,7 +21,7 @@ export function createGizmoManager(context: SceneContext) {
   const events = mitt<{ change: void }>()
 
   // Create and initialize gizmo
-  const gizmoManager = new PatchedGizmoManager(context.scene)
+  const gizmoManager = new PatchedGizmoManager(context.babylonScene)
   gizmoManager.usePointerToAttachGizmos = false
   gizmoManager.positionGizmoEnabled = true
   gizmoManager.rotationGizmoEnabled = true
@@ -30,7 +32,7 @@ export function createGizmoManager(context: SceneContext) {
   gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh = false
   gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = true
 
-  const layoutManager = getLayoutManager(context.scene)
+  const layoutManager = getLayoutManager(context.babylonScene)
 
   function dragBehavior(gizmo: IAxisDragGizmo) {
     gizmo.dragBehavior.validateDrag = function validateDrag(targetPosition: Vector3) {
@@ -47,11 +49,11 @@ export function createGizmoManager(context: SceneContext) {
   dragBehavior(gizmoManager.gizmos.positionGizmo!.yGizmo)
   dragBehavior(gizmoManager.gizmos.positionGizmo!.zGizmo)
 
-  let lastEntity: EcsEntity | null = null
+  let lastEntity: BabylonEntity | null = null
   let rotationGizmoAlignmentDisabled = false
   let shouldRestorRotationGizmoAlignment = false
 
-  function fixRotationGizmoAlignment(value: TransformType) {
+  function fixRotationGizmoAlignment(value: Transform) {
     const isProportional =
       areProportional(value.scale.x, value.scale.y) && areProportional(value.scale.y, value.scale.z)
     rotationGizmoAlignmentDisabled = !isProportional
@@ -66,9 +68,9 @@ export function createGizmoManager(context: SceneContext) {
     }
   }
 
-  function getTransform(): TransformType {
+  function getTransform() {
     if (lastEntity) {
-      const parent = context.Transform.getOrNull(lastEntity.entityId)?.parent || (0 as Entity)
+      const parent = context.components[1 /* transform */].getOrNull(lastEntity.entityId)?.parent || (0 as Entity)
       const value = {
         position: snapPosition(lastEntity.position),
         scale: snapScale(lastEntity.scaling),
@@ -85,8 +87,9 @@ export function createGizmoManager(context: SceneContext) {
     if (lastEntity) {
       const transform = getTransform()
       fixRotationGizmoAlignment(transform)
-      context.operations.updateValue(context.Transform, lastEntity.entityId, transform)
-      void context.operations.dispatch()
+      context.components[1 /* transform */].createOrReplace(lastEntity.entityId, transform)
+      // TODO: void context.operations.dispatch()
+      saveEvent.emit('change', true)
     }
   }
 
@@ -135,7 +138,7 @@ export function createGizmoManager(context: SceneContext) {
 
   return {
     gizmoManager,
-    setEntity(entity: EcsEntity | null) {
+    setEntity(entity: BabylonEntity | null) {
       if (entity === lastEntity) return
       gizmoManager.attachToNode(entity)
       lastEntity = entity

@@ -41,7 +41,6 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
 
   // create scene context
   const ctx = new SceneContext(
-    renderer.engine,
     scene,
     getHardcodedLoadableScene(
       'urn:decentraland:entity:bafkreid44xhavttoz4nznidmyj3rjnrgdza7v6l7kd46xdmleor5lmsxfm1',
@@ -50,6 +49,14 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
     dataLayer
   )
   ctx.rootNode.position.set(0, 0, 0)
+
+  // this is ADR-148
+  scene.onBeforeAnimationsObservable.add(() => {
+    ctx.update(() => true)
+  })
+  scene.onAfterRenderObservable.add(() => {
+    ctx.lateUpdate()
+  })
 
   // Connect babylon engine with dataLayer transport
   void ctx.connectCrdtTransport(dataLayer.crdtStream)
@@ -62,8 +69,6 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
 
   // register some globals for debugging
   Object.assign(globalThis, { dataLayer, inspectorEngine: engine })
-
-  // TODO: volar el getGizmoManager
 
   return {
     engine,

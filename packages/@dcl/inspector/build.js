@@ -81,7 +81,7 @@ main().catch(err => {
 })
 
 function runTypeChecker() {
-  const args = [require.resolve('typescript/lib/tsc'), '-p', 'tsconfig.json']
+  const args = [require.resolve('typescript/lib/tsc'), '-p', 'tsconfig.json', '--preserveWatchOutput']
   if (WATCH_MODE) args.push('--watch')
 
   console.time('> Running typechecker')

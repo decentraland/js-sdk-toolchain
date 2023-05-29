@@ -55,28 +55,32 @@ export function createComponents(engine: IEngine): SdkComponents {
   }
 }
 
+export const SelectionSchema = {
+  gizmo: Schemas.Int
+}
+
+const Coords = Schemas.Map({
+  x: Schemas.Int,
+  y: Schemas.Int
+})
+
+export const SceneSchema = {
+  layout: Schemas.Map({
+    base: Coords,
+    parcels: Schemas.Array(Coords)
+  })
+}
+
+export const EntityNodeSchema = {
+  label: Schemas.String,
+  parent: Schemas.Entity
+}
+
 /* istanbul ignore next */
 export function createEditorComponents(engine: IEngine): EditorComponents {
-  const EntityNode = engine.defineComponent(EditorComponentIds.EntityNode, {
-    label: Schemas.String,
-    parent: Schemas.Entity
-  })
-
-  const Selection = engine.defineComponent(EditorComponentIds.Selection, {
-    gizmo: Schemas.Int
-  })
-
-  const Coords = Schemas.Map({
-    x: Schemas.Int,
-    y: Schemas.Int
-  })
-
-  const Scene = engine.defineComponent(EditorComponentIds.Scene, {
-    layout: Schemas.Map({
-      base: Coords,
-      parcels: Schemas.Array(Coords)
-    })
-  })
+  const EntityNode = engine.defineComponent(EditorComponentIds.EntityNode, EntityNodeSchema)
+  const Selection = engine.defineComponent(EditorComponentIds.Selection, SelectionSchema)
+  const Scene = engine.defineComponent(EditorComponentIds.Scene, SceneSchema)
 
   return { Selection, Scene, EntityNode }
 }

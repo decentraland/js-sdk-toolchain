@@ -2,7 +2,7 @@ import { IEngine, CrdtMessage, CrdtMessageType } from '@dcl/ecs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { readMessage } from '@dcl/ecs/dist/serialization/crdt/message'
 
-export function* serializeCrdtMessages(prefix: string, data: Uint8Array, engine: IEngine) {
+export function* serializeCrdtMessages(prefix: string, data: Uint8Array, engine?: Pick<IEngine, 'getComponent'>) {
   const buffer = new ReadWriteByteBuffer(data)
 
   let message: CrdtMessage | null
@@ -19,11 +19,14 @@ export function* serializeCrdtMessages(prefix: string, data: Uint8Array, engine:
       const data = 'data' in message ? message.data : undefined
 
       try {
-        const c = engine.getComponent(componentId)
-
-        yield `${preface} c=${c.componentName} t=${timestamp} data=${JSON.stringify(
-          (data && c.schema.deserialize(new ReadWriteByteBuffer(data))) || null
-        )}`
+        const c = engine?.getComponent(componentId)
+        if (c) {
+          yield `${preface} c=${c.componentName} t=${timestamp} data=${JSON.stringify(
+            (data && c.schema.deserialize(new ReadWriteByteBuffer(data))) || null
+          )}`
+        } else {
+          yield `${preface} c=${componentId} t=${timestamp} data=?`
+        }
       } catch {
         yield `${preface} c=${componentId} t=${timestamp} data=?`
       }
