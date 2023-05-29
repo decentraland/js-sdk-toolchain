@@ -1,7 +1,6 @@
 export enum BlurBehavior {
-  SUBMIT = 0,
-  CANCEL = 1,
-  DO_NOTHING = 2
+  CANCEL = 0,
+  DO_NOTHING = 1
 }
 
 export interface PropTypes {

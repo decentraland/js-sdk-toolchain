@@ -23,9 +23,7 @@ const Input = ({ value, onCancel, onSubmit, onChange, placeholder, blurBehavior 
     }
 
     let onBlur: (e: Event) => void
-    if (blurBehavior == BlurBehavior.SUBMIT)
-      onBlur = (_: Event) => onSubmit && onSubmit(getValue())
-    else if (blurBehavior == BlurBehavior.CANCEL)
+    if (blurBehavior == BlurBehavior.CANCEL)
       onBlur = (_: Event) => onCancel && onCancel()
     else
       onBlur = (_: Event) => {}
