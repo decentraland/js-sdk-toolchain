@@ -69,7 +69,7 @@ function ProjectView({ folders, onImportAsset }: Props) {
             open.add(name)
             matchesList.push(name)
           }
-          tree.set(name, { ...children, matches: matches ? [name] : [], parent: null })
+          tree.set(name, { ...children, matches: matches ? [name] : [], parent: node })
         }
       }
       if (matchesList.length) {
@@ -192,7 +192,6 @@ function ProjectView({ folders, onImportAsset }: Props) {
             getIcon={(val) => <NodeIcon value={tree.get(val)} isOpen={isOpen(val)} />}
             getDragContext={handleDragContext}
             dndType={DRAG_N_DROP_ASSET_KEY}
-            getExtraContextMenu={(val) => <ContextMenu value={tree.get(val)} onImportAsset={onImportAsset} />}
           />
         </div>
         <div className="FolderView">
