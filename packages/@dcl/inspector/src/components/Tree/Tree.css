@@ -51,3 +51,7 @@
   color: var(--contexify-item-color);
   margin-right: 4px;
 }
+
+.Tree .contexify_item {
+  width: 100%;
+}
