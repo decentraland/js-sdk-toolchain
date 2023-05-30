@@ -3072,10 +3072,10 @@ export const RaycastResult: LastWriteWinElementSetComponentDefinition<PBRaycastR
 
 // @public (undocumented)
 export interface RaycastSystem {
-    getGlobalDirectionRaycastDefaultOptions(options: Partial<GlobalDirectionRaycastOptions>): RaycastSystemOptions;
-    getGlobalTargetRaycastDefaultOptions(options: Partial<GlobalTargetRaycastOptions>): RaycastSystemOptions;
-    getLocalDirectionRaycastDefaultOptions(options: Partial<LocalDirectionRaycastOptions>): RaycastSystemOptions;
-    getTargetEntityRaycastDefaultOptions(options: Partial<TargetEntityRaycastOptions>): RaycastSystemOptions;
+    getGlobalDirectionRaycastDefaultOptions(options?: Partial<GlobalDirectionRaycastOptions>): RaycastSystemOptions;
+    getGlobalTargetRaycastDefaultOptions(options?: Partial<GlobalTargetRaycastOptions>): RaycastSystemOptions;
+    getLocalDirectionRaycastDefaultOptions(options?: Partial<LocalDirectionRaycastOptions>): RaycastSystemOptions;
+    getTargetEntityRaycastDefaultOptions(options?: Partial<TargetEntityRaycastOptions>): RaycastSystemOptions;
     registerGlobalDirectionRaycast(raycastData: {
         entity: Entity;
         opts?: Partial<GlobalDirectionRaycastOptions>;

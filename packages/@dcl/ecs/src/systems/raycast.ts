@@ -158,22 +158,22 @@ export interface RaycastSystem {
    * @public
    * Creates Raycast local direction opts with defaults
    */
-  getLocalDirectionRaycastDefaultOptions(options: Partial<LocalDirectionRaycastOptions>): RaycastSystemOptions
+  getLocalDirectionRaycastDefaultOptions(options?: Partial<LocalDirectionRaycastOptions>): RaycastSystemOptions
   /**
    * @public
    * Creates Raycast global direction opts with defaults
    */
-  getGlobalDirectionRaycastDefaultOptions(options: Partial<GlobalDirectionRaycastOptions>): RaycastSystemOptions
+  getGlobalDirectionRaycastDefaultOptions(options?: Partial<GlobalDirectionRaycastOptions>): RaycastSystemOptions
   /**
    * @public
    * Creates Raycast global target direction opts with defaults
    */
-  getGlobalTargetRaycastDefaultOptions(options: Partial<GlobalTargetRaycastOptions>): RaycastSystemOptions
+  getGlobalTargetRaycastDefaultOptions(options?: Partial<GlobalTargetRaycastOptions>): RaycastSystemOptions
   /**
    * @public
    * Creates Raycast target entity opts with defaults
    */
-  getTargetEntityRaycastDefaultOptions(options: Partial<TargetEntityRaycastOptions>): RaycastSystemOptions
+  getTargetEntityRaycastDefaultOptions(options?: Partial<TargetEntityRaycastOptions>): RaycastSystemOptions
 
   /**
    * @public

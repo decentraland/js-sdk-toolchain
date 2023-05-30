@@ -15,6 +15,43 @@ describe('Raycast Helper System should', () => {
   const raycastComponent = components.Raycast(engine)
   const raycastResultComponent = components.RaycastResult(engine)
 
+  it('validates raycast default options helper', async () => {
+    const defaultOpts = {
+      maxDistance: 16,
+      queryType: RaycastQueryType.RQT_HIT_FIRST,
+      continuous: false,
+      originOffset: { x: 0, y: 0, z: 0 },
+      collisionMask: ColliderLayer.CL_PHYSICS
+    }
+    expect(raycastHelperSystem.getLocalDirectionRaycastDefaultOptions()).toMatchObject({
+      ...defaultOpts,
+      directionRawValue: {
+        $case: 'localDirection',
+        localDirection: { x: 0, y: 0, z: 1 }
+      }
+    })
+    expect(raycastHelperSystem.getGlobalDirectionRaycastDefaultOptions()).toMatchObject({
+      ...defaultOpts,
+      directionRawValue: {
+        $case: 'globalDirection',
+        globalDirection: { x: 0, y: 0, z: 1 }
+      }
+    })
+    expect(raycastHelperSystem.getGlobalTargetRaycastDefaultOptions()).toMatchObject({
+      ...defaultOpts,
+      directionRawValue: {
+        $case: 'globalTarget',
+        globalTarget: { x: 0, y: 0, z: 0 }
+      }
+    })
+    expect(raycastHelperSystem.getTargetEntityRaycastDefaultOptions()).toMatchObject({
+      ...defaultOpts,
+      directionRawValue: {
+        $case: 'targetEntity',
+        targetEntity: 0
+      }
+    })
+  })
   it('runs raycast immediate helper', async () => {
     const raycastEntity = engine.addEntity()
     function raycastSystem(dt: number) {
