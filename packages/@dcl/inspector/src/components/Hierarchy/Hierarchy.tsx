@@ -31,6 +31,8 @@ function HierarchyIcon({ value, hasChildrens, isOpen }: { value: Entity; hasChil
   )
 }
 
+const EntityTree = Tree<Entity>()
+
 const Hierarchy: React.FC = () => {
   const { addChild, setParent, remove, rename, toggle, getId, getChildren, getLabel, isOpen, canRename, canRemove } =
     useTree()
@@ -44,7 +46,7 @@ const Hierarchy: React.FC = () => {
   )
   return (
     <Container>
-      <Tree
+      <EntityTree
         value={ROOT}
         getExtraContextMenu={ContextMenu}
         onAddChild={addChild}

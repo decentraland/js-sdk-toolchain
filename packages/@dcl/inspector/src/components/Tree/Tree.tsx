@@ -38,8 +38,8 @@ const getLevelStyles = (level: number) => ({ paddingLeft: `${(level - 1) * 10}px
 const getExpandStyles = (active: boolean) => ({ height: active ? 'auto' : '0', overflow: 'hidden', display: 'block' })
 const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : '' })
 
-function Tree<T>(_props: Props<T>) {
-  const Component = withContextMenu<Props<T>>((props) => {
+export function Tree<T>() {
+  return React.memo(withContextMenu<Props<T>>((props) => {
     const {
       getExtraContextMenu,
       className,
@@ -140,6 +140,7 @@ function Tree<T>(_props: Props<T>) {
       onRemove: handleRemove,
       extra: extraContextMenu
     }
+
     return (
       <div ref={ref} className={`Tree ${className || ''}`}>
         <div style={getLevelStyles(level)} onClick={handleToggleExpand} className={selected ? 'selected item' : 'item'}>
@@ -156,11 +157,11 @@ function Tree<T>(_props: Props<T>) {
         {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} onBlur={quitInsertMode}/>}
       </div>
     )
-  })
-  return <Component {..._props} />
+  }))
 }
 
 function TreeChildren<T>(props: Props<T>) {
+  const CompTree = Tree<T>()
   const { value, level = getDefaultLevel(), getChildren, getId, isOpen } = props
   const children = getChildren(value)
   const open = isOpen(value)
@@ -170,7 +171,7 @@ function TreeChildren<T>(props: Props<T>) {
   return (
     <div style={getExpandStyles(open)}>
       {children.map(($) => (
-        <Tree {...props} value={$} level={level + 1} key={getId($)} />
+        <CompTree {...props} value={$} level={level + 1} key={getId($)} />
       ))}
     </div>
   )
