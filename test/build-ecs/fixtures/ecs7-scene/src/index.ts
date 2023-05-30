@@ -45,15 +45,11 @@ function circularSystem(dt: number) {
 const initEntity = createCube(8, 1, 8)
 
 pointerEventsSystem.onPointerDown(
-  initEntity,
+  { entity: initEntity, opts: { button: InputAction.IA_ANY, hoverText: 'CASLA' } },
   function (event) {
     console.log('Button: ' + event.button)
     createCube(1 + Math.random() * 8, Math.random() * 8, 1 + Math.random() * 8)
     // EventsSystem.removeOnPointerDown(initEntity)
-  },
-  {
-    button: InputAction.IA_ANY,
-    hoverText: 'CASLA - BOEDO'
   }
 )
 

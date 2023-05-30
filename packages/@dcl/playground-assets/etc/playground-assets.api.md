@@ -2862,7 +2862,17 @@ export const PointerEventsResult: GrowOnlyValueSetComponentDefinition<PBPointerE
 
 // @public (undocumented)
 export interface PointerEventsSystem {
+    onPointerDown(opts: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    // @deprecated (undocumented)
     onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
+    onPointerUp(opts: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    // @deprecated (undocumented)
     onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
     removeOnPointerDown(entity: Entity): void;
     removeOnPointerUp(entity: Entity): void;
