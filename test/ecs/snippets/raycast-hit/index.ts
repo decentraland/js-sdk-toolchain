@@ -7,7 +7,9 @@ import {
   pointerEventsSystem,
   Raycast,
   RaycastQueryType,
-  RaycastResult
+  RaycastResult,
+  inputSystem,
+  PointerEventType
 } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
 

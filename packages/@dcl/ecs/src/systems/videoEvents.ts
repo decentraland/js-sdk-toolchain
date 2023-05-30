@@ -20,7 +20,7 @@ export interface VideoEventsSystem {
 
   /**
    * Returns the latest state of the VideoEvent
-   * @param entity
+   * @param entity - Entity to retrieve the video status
    */
   getVideoState(entity: Entity): DeepReadonlyObject<PBVideoEvent> | undefined
 }
@@ -89,7 +89,7 @@ export function createVideoEventsSystem(engine: IEngine): VideoEventsSystem {
     hasVideoEventsEntity(entity: Entity) {
       return hasVideoEventsEntity(entity)
     },
-    getLatestVideoState(entity: Entity) {
+    getVideoState(entity: Entity) {
       const videoEvent = videoEventComponent.get(entity)
       const values = Array.from(videoEvent.values())
       const lastValue = values[videoEvent.size - 1]

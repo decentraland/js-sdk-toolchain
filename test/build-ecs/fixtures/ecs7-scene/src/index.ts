@@ -44,6 +44,7 @@ function circularSystem(dt: number) {
 // Init
 const initEntity = createCube(8, 1, 8)
 
+pointerEventsSystem.onPointerDown(initEntity, () => {})
 pointerEventsSystem.onPointerDown(
   { entity: initEntity, opts: { button: InputAction.IA_ANY, hoverText: 'CASLA' } },
   function (event) {

@@ -13,6 +13,22 @@ describe('Video events helper system should', () => {
   const videoEventComponent = components.VideoEvent(engine)
   const videoPlayerComponent = components.VideoPlayer(engine)
 
+  it('gets the latest state of a video', async () => {
+    const videoPlayerEntity = engine.addEntity()
+    videoPlayerComponent.create(videoPlayerEntity)
+    // simulate video event attach in renderer
+    videoEventComponent.addValue(videoPlayerEntity, {
+      state: VideoState.VS_LOADING,
+      currentOffset: 0,
+      videoLength: 5,
+      timestamp: 1,
+      tickNumber: 1
+    })
+    await engine.update(1)
+    const state = videoEventsSystem.getVideoState(videoPlayerEntity)
+    expect(state?.state).toBe(VideoState.VS_LOADING)
+  })
+
   it('run callback on video status change', async () => {
     const fn = jest.fn()
 

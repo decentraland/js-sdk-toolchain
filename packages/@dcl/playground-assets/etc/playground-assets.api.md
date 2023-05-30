@@ -2862,13 +2862,13 @@ export const PointerEventsResult: GrowOnlyValueSetComponentDefinition<PBPointerE
 
 // @public (undocumented)
 export interface PointerEventsSystem {
-    onPointerDown(opts: {
+    onPointerDown(pointerData: {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;
     }, cb: EventSystemCallback): void;
     // @deprecated (undocumented)
     onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
-    onPointerUp(opts: {
+    onPointerUp(pointerData: {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;
     }, cb: EventSystemCallback): void;
@@ -3072,9 +3072,34 @@ export const RaycastResult: LastWriteWinElementSetComponentDefinition<PBRaycastR
 
 // @public (undocumented)
 export interface RaycastSystem {
+    getGlobalDirectionRaycastDefaultOptions(options: Partial<GlobalDirectionRaycastOptions>): RaycastSystemOptions;
+    getGlobalTargetRaycastDefaultOptions(options: Partial<GlobalTargetRaycastOptions>): RaycastSystemOptions;
+    getLocalDirectionRaycastDefaultOptions(options: Partial<LocalDirectionRaycastOptions>): RaycastSystemOptions;
+    getTargetEntityRaycastDefaultOptions(options: Partial<TargetEntityRaycastOptions>): RaycastSystemOptions;
+    registerGlobalDirectionRaycast(raycastData: {
+        entity: Entity;
+        opts?: Partial<GlobalDirectionRaycastOptions>;
+    }, callback: RaycastSystemCallback): void;
+    // @deprecated (undocumented)
     registerGlobalDirectionRaycast(entity: Entity, callback: RaycastSystemCallback, options?: Partial<GlobalDirectionRaycastOptions>): void;
+    registerGlobalTargetRaycast(raycastData: {
+        entity: Entity;
+        opts?: Partial<GlobalTargetRaycastOptions>;
+    }, callback: RaycastSystemCallback): void;
+    // @deprecated (undocumented)
     registerGlobalTargetRaycast(entity: Entity, callback: RaycastSystemCallback, options?: Partial<GlobalTargetRaycastOptions>): void;
+    registerLocalDirectionRaycast(raycastData: {
+        entity: Entity;
+        opts?: Partial<LocalDirectionRaycastOptions>;
+    }, callback: RaycastSystemCallback): void;
+    // @deprecated (undocumented)
     registerLocalDirectionRaycast(entity: Entity, callback: RaycastSystemCallback, options?: Partial<LocalDirectionRaycastOptions>): void;
+    registerRaycast(entity: Entity, options: RaycastSystemOptions): DeepReadonlyObject<PBRaycastResult> | null;
+    registerTargetEntityRaycast(raycastData: {
+        entity: Entity;
+        opts?: Partial<TargetEntityRaycastOptions>;
+    }, callback: RaycastSystemCallback): void;
+    // @deprecated (undocumented)
     registerTargetEntityRaycast(entity: Entity, callback: RaycastSystemCallback, options?: Partial<TargetEntityRaycastOptions>): void;
     removeRaycasterEntity(entity: Entity): void;
 }
@@ -3696,6 +3721,7 @@ export const VideoEvent: GrowOnlyValueSetComponentDefinition<PBVideoEvent>;
 
 // @public (undocumented)
 export interface VideoEventsSystem {
+    getVideoState(entity: Entity): DeepReadonlyObject<PBVideoEvent> | undefined;
     // (undocumented)
     hasVideoEventsEntity(entity: Entity): boolean;
     // (undocumented)
