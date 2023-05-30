@@ -238,7 +238,7 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
     }
   })
 
-  function registerRaycastCallback(
+  function registerRaycastWithCallback(
     entity: Entity,
     raycastValue: RaycastSystemOptions,
     callback: RaycastSystemCallback
@@ -284,7 +284,7 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
       return registerLocalDirectionRaycast({ entity: data, opts: maybeOpts ?? {} }, cb)
     }
     const { entity, opts } = data
-    registerRaycastCallback(entity, getLocalDirectionRaycastDefaultOptions(opts), cb)
+    registerRaycastWithCallback(entity, getLocalDirectionRaycastDefaultOptions(opts), cb)
   }
   const registerGlobalDirectionRaycast: RaycastSystem['registerGlobalDirectionRaycast'] = (...args) => {
     const [data, cb, maybeOpts] = args
@@ -292,7 +292,7 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
       return registerGlobalDirectionRaycast({ entity: data, opts: maybeOpts ?? {} }, cb)
     }
     const { entity, opts } = data
-    registerRaycastCallback(entity, getGlobalDirectionRaycastDefaultOptions(opts), cb)
+    registerRaycastWithCallback(entity, getGlobalDirectionRaycastDefaultOptions(opts), cb)
   }
   const registerGlobalTargetRaycast: RaycastSystem['registerGlobalTargetRaycast'] = (...args) => {
     const [data, cb, maybeOpts] = args
@@ -300,7 +300,7 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
       return registerGlobalTargetRaycast({ entity: data, opts: maybeOpts ?? {} }, cb)
     }
     const { entity, opts } = data
-    registerRaycastCallback(entity, getGlobalTargetRaycastDefaultOptions(opts), cb)
+    registerRaycastWithCallback(entity, getGlobalTargetRaycastDefaultOptions(opts), cb)
   }
   const registerTargetEntityRaycast: RaycastSystem['registerTargetEntityRaycast'] = (...args) => {
     const [data, cb, maybeOpts] = args
@@ -308,7 +308,7 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
       return registerTargetEntityRaycast({ entity: data, opts: maybeOpts ?? {} }, cb)
     }
     const { entity, opts } = data
-    registerRaycastCallback(entity, getTargetEntityRaycastDefaultOptions(opts), cb)
+    registerRaycastWithCallback(entity, getTargetEntityRaycastDefaultOptions(opts), cb)
   }
 
   return {
