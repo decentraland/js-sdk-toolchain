@@ -320,10 +320,14 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
     registerGlobalTargetRaycast,
     registerTargetEntityRaycast,
     registerRaycast(entity, opts) {
-      Raycast.createOrReplace(entity, opts)
+      const raycast = Raycast.getOrNull(entity)
+      if (!raycast) Raycast.create(entity, { ...opts, direction: opts.directionRawValue })
       const value = RaycastResult.getOrNull(entity)
       if (value) {
-        RaycastResult.deleteFrom(entity)
+        if (!opts.continuous) {
+          RaycastResult.deleteFrom(entity)
+          Raycast.deleteFrom(entity)
+        }
       }
       return value
     },
