@@ -352,6 +352,7 @@ declare class AvatarShape extends ObservableComponent {
     eyeColor: ReadOnlyColor4;
     useDummyModel: boolean;
     talking: boolean;
+    forceRender: string[];
     static Dummy(): AvatarShape;
 }
 

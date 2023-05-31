@@ -222,6 +222,8 @@ export class AvatarShape extends ObservableComponent {
     // (undocumented)
     eyeColor: ReadOnlyColor4;
     // (undocumented)
+    forceRender: string[];
+    // (undocumented)
     hairColor: ReadOnlyColor4;
     // (undocumented)
     id: string;
