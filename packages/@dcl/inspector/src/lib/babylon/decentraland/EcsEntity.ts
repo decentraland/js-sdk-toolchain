@@ -1,5 +1,6 @@
 import * as BABYLON from '@babylonjs/core'
 import { ComponentDefinition, Entity, PBGltfContainer, PBMeshRenderer, PBPointerEvents, TransformType } from '@dcl/ecs'
+import future, { IFuture } from 'fp-future'
 import { SceneContext } from './SceneContext'
 import { createDefaultTransform } from './sdkComponents/transform'
 
@@ -17,9 +18,11 @@ export class EcsEntity extends BABYLON.TransformNode {
   gltfContainer?: BABYLON.AbstractMesh
   gltfAssetContainer?: BABYLON.AssetContainer
 
+  #gltfPathLoading?: IFuture<string>
+
   ecsComponentValues: EcsComponents = {}
 
-  constructor(public entityId: Entity, public context: WeakRef<SceneContext>, scene: BABYLON.Scene) {
+  constructor(public entityId: Entity, public context: WeakRef<SceneContext>, public scene: BABYLON.Scene) {
     super(`ecs-${entityId.toString(16)}`, scene)
     createDefaultTransform(this)
   }
@@ -70,6 +73,23 @@ export class EcsEntity extends BABYLON.TransformNode {
       max = BABYLON.Vector3.Maximize(max, boundingInfo.boundingBox.maximumWorld)
     }
     return new BABYLON.BoundingInfo(min, max)
+  }
+
+  isGltfPathLoading() {
+    return !!this.#gltfPathLoading
+  }
+
+  getGltfPathLoading() {
+    return this.#gltfPathLoading
+  }
+
+  resolveGltfPathLoading(filePath: string) {
+    this.#gltfPathLoading?.resolve(filePath)
+    this.#gltfPathLoading = undefined
+  }
+
+  setGltfPathLoading() {
+    this.#gltfPathLoading = future()
   }
 }
 

@@ -27,8 +27,8 @@ export function createOperations(engine: IEngine) {
     removeComponent: removeComponent(engine),
     updateSelectedEntity: updateSelectedEntity(engine),
     removeSelectedEntities: removeSelectedEntities(engine),
-    dispatch: ({ dirty = true }: Dispatch = {}) => {
-      void engine.update(1)
+    dispatch: async ({ dirty = true }: Dispatch = {}) => {
+      await engine.update(1)
       saveEvent.emit('change', dirty)
     }
   }

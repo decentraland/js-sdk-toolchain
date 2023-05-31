@@ -127,13 +127,12 @@ function ProjectView({ folders }: Props) {
     await removeAsset(path)
   }, [open, setOpen])
 
-  const removeAsset = useCallback(async (path: string, entities: Entity[] = []) => {
+  const removeAsset = useCallback(async (path: string, _: Entity[] = []) => {
     if (!sdk) return
-    const { dataLayer, components, operations } = sdk
+    const { dataLayer } = sdk
     fileSystemEvent.emit('change')
-    entities.forEach(($) => operations.updateValue(components.GltfContainer, $, { src: '' }))
-    await Promise.all([dataLayer.removeAsset({ path }), operations.dispatch()])
-  }, [sdk])
+    await dataLayer.removeAsset({ path })
+  }, [])
 
   const handleConfirm = useCallback(async () => {
     if (!modal) return
