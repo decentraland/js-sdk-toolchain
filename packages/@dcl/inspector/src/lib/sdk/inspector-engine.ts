@@ -33,7 +33,9 @@ export function createInspectorEngine(
       if (outgoingMessagesStream.closed) return
       outgoingMessagesStream.enqueue({ data: message })
       if (message.byteLength) {
+        console.groupCollapsed('Inspector>Datalayer ...')
         Array.from(serializeCrdtMessages('Inspector>Datalayer', message, engine)).forEach(($) => console.log($))
+        console.groupEnd()
       }
     }
   }
@@ -42,7 +44,9 @@ export function createInspectorEngine(
 
   function onMessage(message: Uint8Array) {
     if (message.byteLength) {
+      console.groupCollapsed('DataLayer>Inspector ...')
       Array.from(serializeCrdtMessages('DataLayer>Inspector', message, engine)).forEach(($) => console.log($))
+      console.groupEnd()
     }
     transport.onmessage!(message)
     void engine.update(1)

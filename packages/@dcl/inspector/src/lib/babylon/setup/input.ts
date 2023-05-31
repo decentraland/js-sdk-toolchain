@@ -69,6 +69,6 @@ export function interactWithScene(
 
   if (entity && pointerEvent === 'pointerDown') {
     const context = entity.context.deref()! as SceneContext
-    context.updateSelectedEntity(entity.entityId)
+    context.updateSelectedEntity(entity)
   }
 }

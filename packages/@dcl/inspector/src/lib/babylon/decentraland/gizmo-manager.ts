@@ -1,7 +1,6 @@
 import mitt from 'mitt'
 import { IAxisDragGizmo, Quaternion, Vector3 } from '@babylonjs/core'
 import { BabylonEntity } from 'decentraland-babylon/src/lib/babylon/scene/BabylonEntity'
-import { Entity } from '@dcl/ecs'
 import { getLayoutManager } from './layout-manager'
 import { inBounds } from '../../utils/layout'
 import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
@@ -9,7 +8,7 @@ import { SceneContext } from './SceneContext'
 import { GizmoType } from '../../utils/gizmo'
 import { PatchedGizmoManager } from './gizmo-patch'
 import { Transform } from 'decentraland-babylon/src/lib/decentraland/sdk-components/transform-component'
-import { saveEvent } from '../../../hooks/editor/useSave'
+import { StaticEntities } from 'decentraland-babylon/src/lib/babylon/scene/logic/static-entities'
 
 function areProportional(a: number, b: number) {
   // this leeway is here to account for rounding errors due to serializing/deserializing floating point numbers
@@ -70,12 +69,12 @@ export function createGizmoManager(context: SceneContext) {
 
   function getTransform() {
     if (lastEntity) {
-      const parent = context.components[1 /* transform */].getOrNull(lastEntity.entityId)?.parent || (0 as Entity)
+      const currentValue = context.components[1 /* transform */].getOrNull(lastEntity.entityId)
       const value = {
-        position: snapPosition(lastEntity.position),
-        scale: snapScale(lastEntity.scaling),
-        rotation: lastEntity.rotationQuaternion ? snapRotation(lastEntity.rotationQuaternion) : Quaternion.Zero(),
-        parent
+        position: snapPosition(currentValue?.position ?? Vector3.Zero()),
+        scale: snapScale(currentValue?.scale ?? Vector3.One()),
+        rotation: snapRotation(currentValue?.rotation ?? Quaternion.Identity()),
+        parent: currentValue?.parent ?? StaticEntities.RootEntity
       }
       return value
     } else {
@@ -88,14 +87,34 @@ export function createGizmoManager(context: SceneContext) {
       const transform = getTransform()
       fixRotationGizmoAlignment(transform)
       context.components[1 /* transform */].createOrReplace(lastEntity.entityId, transform)
-      // TODO: void context.operations.dispatch()
-      saveEvent.emit('change', true)
+      context.dispatchChanges()
     }
   }
 
-  gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.add(update)
-  gizmoManager.gizmos.positionGizmo?.onDragEndObservable.add(update)
-  gizmoManager.gizmos.rotationGizmo?.onDragEndObservable.add(update)
+  function updateFinal() {
+    if (lastEntity) {
+      const transform = getTransform()
+      fixRotationGizmoAlignment(transform)
+      context.components[1 /* transform */].createOrReplace(lastEntity.entityId, transform)
+      context.dispatchChanges()
+    }
+    context.isDragging = false
+  }
+
+  // the transform component is calculated by the scene main loop and it uses information
+  // from various components like billboard and attachment points. to enable dragging behaviors
+  // we must stop the update loop of the scene while we drag
+  function startDrag() {
+    context.isDragging = true
+  }
+
+  gizmoManager.gizmos.scaleGizmo?.onDragStartObservable.add(startDrag)
+  gizmoManager.gizmos.positionGizmo?.onDragStartObservable.add(startDrag)
+  gizmoManager.gizmos.positionGizmo?.onDragStartObservable.add(startDrag)
+
+  gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.add(updateFinal)
+  gizmoManager.gizmos.positionGizmo?.onDragEndObservable.add(updateFinal)
+  gizmoManager.gizmos.rotationGizmo?.onDragEndObservable.add(updateFinal)
 
   // snap
   function updateSnap() {
@@ -140,11 +159,15 @@ export function createGizmoManager(context: SceneContext) {
     gizmoManager,
     setEntity(entity: BabylonEntity | null) {
       if (entity === lastEntity) return
+      if (lastEntity) {
+        ;(lastEntity as any).isDragging = false
+      }
       gizmoManager.attachToNode(entity)
       lastEntity = entity
       // fix gizmo rotation if necessary
       const transform = getTransform()
       fixRotationGizmoAlignment(transform)
+      context.isDragging = false
       events.emit('change')
     },
     getEntity() {
@@ -156,6 +179,7 @@ export function createGizmoManager(context: SceneContext) {
       gizmoManager.positionGizmoEnabled = false
       gizmoManager.rotationGizmoEnabled = false
       gizmoManager.scaleGizmoEnabled = false
+      context.isDragging = false
       events.emit('change')
     },
     getGizmoTypes() {
