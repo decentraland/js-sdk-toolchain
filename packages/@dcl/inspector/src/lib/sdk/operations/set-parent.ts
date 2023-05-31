@@ -1,12 +1,11 @@
-import { Entity, IEngine } from '@dcl/ecs'
-import * as components from '@dcl/ecs/dist/components'
+import { Entity, IEngine, Transform as _Transform, TransformComponentExtended } from '@dcl/ecs'
 
 import { EditorComponentIds, EditorComponents } from '../components'
 
 export function setParent(engine: IEngine) {
   return function setParent(entity: Entity, parent: Entity) {
     const EntityNode = engine.getComponentOrNull(EditorComponentIds.EntityNode) as EditorComponents['EntityNode']
-    const Transform = components.Transform(engine)
+    const Transform = engine.getComponent(_Transform.componentId) as TransformComponentExtended
 
     EntityNode.getOrCreateMutable(entity).parent = parent
 
