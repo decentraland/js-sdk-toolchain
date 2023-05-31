@@ -2889,7 +2889,7 @@
             },
             {
               "kind": "Content",
-              "text": "[];\n}"
+              "text": "[];\n    forceRender: string[];\n}"
             },
             {
               "kind": "Content",

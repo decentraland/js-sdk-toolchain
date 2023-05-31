@@ -179,6 +179,7 @@ export type AvatarForRenderer = {
     hairColor: ReadOnlyColor4;
     eyeColor: ReadOnlyColor4;
     wearables: WearableId[];
+    forceRender: string[];
 };
 
 // @public
