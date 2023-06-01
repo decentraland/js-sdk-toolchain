@@ -1,11 +1,11 @@
-import React, { useRef } from 'react'
+import React from 'react'
+import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels'
 
 import { EntityInspector } from '../EntityInspector'
 import { Hierarchy } from '../Hierarchy'
 import { Renderer } from '../Renderer'
 import { Box } from '../Box'
 import { Toolbar } from '../Toolbar'
-import { PanelGroup, Panel, PanelResizeHandle, ImperativePanelHandle } from 'react-resizable-panels'
 
 import './App.css'
 import Assets from '../Assets'
