@@ -11,5 +11,5 @@ export function ProjectAssetExplorer({ onImportAsset }: PropTypes) {
   const { tree } = useAssetTree(files)
   const folders = tree.children.filter((item) => item.type === 'folder') as AssetNodeFolder[]
 
-  return <ProjectView folders={folders} onImportAsset={onImportAsset} />
+  return <ProjectView folders={folders} />
 }

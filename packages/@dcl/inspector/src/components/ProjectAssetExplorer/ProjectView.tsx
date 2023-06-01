@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useDrag } from 'react-dnd'
 import { Entity } from '@dcl/ecs'
 import { IoIosArrowDown, IoIosArrowForward, IoIosImage } from 'react-icons/io'
@@ -9,17 +9,13 @@ import { Tree } from '../Tree'
 import { Modal } from '../Modal'
 import Button from '../Button'
 import FolderIcon from '../Icons/Folder'
-import ContextMenu from './ContextMenu'
 import { AssetNode, AssetNodeFolder } from './types'
 import { getFullNodePath } from './utils'
 import Search from '../Search'
 
 function noop() {}
-// eslint-disable-next-line prettier/prettier
-const MyTree = Tree<string>;
 
 type Props = {
-  onImportAsset(): void
   folders: AssetNodeFolder[]
 }
 
@@ -35,12 +31,15 @@ export const DRAG_N_DROP_ASSET_KEY = 'project-asset-gltf'
 
 export type TreeNode = Omit<AssetNode, 'children'> & { children?: string[]; matches?: string[] }
 
-function ProjectView({ folders, onImportAsset }: Props) {
+const FilesTree = Tree<string>()
+
+function ProjectView({ folders }: Props) {
   const sdk = useSdk()
   const [open, setOpen] = useState(new Set<string>())
   const [modal, setModal] = useState<ModalState | undefined>(undefined)
   const [lastSelected, setLastSelected] = useState<string>()
   const [search, setSearch] = useState<string>('')
+  const [tree, setTree] = useState<Map<string, TreeNode>>(new Map())
 
   const getTree = useCallback(() => {
     function getPath(node: string, children: string) {
@@ -85,10 +84,13 @@ function ProjectView({ folders, onImportAsset }: Props) {
     return tree
   }, [folders, search])
 
+  useEffect(() => {
+    setTree(getTree())
+  }, [folders, search])
+
   /**
    * Values
    */
-  const tree = getTree()
   const selectedTreeNode = tree.get(lastSelected ?? ROOT)
 
   /**
@@ -125,13 +127,12 @@ function ProjectView({ folders, onImportAsset }: Props) {
     await removeAsset(path)
   }, [open, setOpen])
 
-  const removeAsset = useCallback(async (path: string, entities: Entity[] = []) => {
+  const removeAsset = useCallback(async (path: string, _: Entity[] = []) => {
     if (!sdk) return
-    const { dataLayer, components, operations } = sdk
+    const { dataLayer } = sdk
     fileSystemEvent.emit('change')
-    entities.forEach(($) => operations.updateValue(components.GltfContainer, $, { src: '' }))
-    await Promise.all([dataLayer.removeAsset({ path }), operations.dispatch()])
-  }, [sdk])
+    await dataLayer.removeAsset({ path })
+  }, [])
 
   const handleConfirm = useCallback(async () => {
     if (!modal) return
@@ -171,7 +172,7 @@ function ProjectView({ folders, onImportAsset }: Props) {
       <div className="ProjectView">
         <div className="Tree-View">
           <Search value={search} onChange={setSearch} placeholder="Search local assets" onCancel={() => setSearch('')} />
-          <MyTree
+          <FilesTree
             tree={tree}
             className="editor-assets-tree"
             value={ROOT}
@@ -224,4 +225,4 @@ function NodeIcon({ value, isOpen }: { value?: TreeNode, isOpen: boolean }) {
   return <><svg style={{ width: '4px', height: '4px' }} /><IoIosImage /></>
 }
 
-export default ProjectView
+export default React.memo(ProjectView)
