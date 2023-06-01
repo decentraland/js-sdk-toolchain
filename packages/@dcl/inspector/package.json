@@ -32,6 +32,7 @@
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1",
     "react-modal": "^3.16.1",
+    "react-resizable-panels": "^0.0.48",
     "typescript": "^5.0.2"
   },
   "files": [
@@ -48,8 +49,5 @@
     "start": "node ./build.js --watch"
   },
   "types": "dist/tooling-entrypoint.d.ts",
-  "typings": "dist/tooling-entrypoint.d.ts",
-  "dependencies": {
-    "react-resizable-panels": "^0.0.48"
-  }
+  "typings": "dist/tooling-entrypoint.d.ts"
 }
