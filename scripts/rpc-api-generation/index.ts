@@ -41,15 +41,12 @@ const NON_EXPOSED_LIST_NAMES: string[] = [
 ]
 
 async function internalCompile() {
-  const outModulesPath = path.resolve(__dirname, 'src', 'modules')
+  const outModulesPath = path.resolve(__dirname, 'src', '~system')
   const apiArray = await preprocessProtoGeneration(
     path.resolve(__dirname, 'src', 'proto', 'decentraland', 'kernel', 'apis')
   )
-
   removeSync(outModulesPath)
   mkdirSync(outModulesPath)
-
-  let apisDTsContent = ''
   for (const api of apiArray) {
     if (NON_EXPOSED_LIST_NAMES.includes(api.name)) continue
     const types: Set<string> = new Set()
@@ -86,18 +83,7 @@ async function internalCompile() {
 
     const moduleDTsPath = path.resolve(apiModuleDirPath, 'index.d.ts')
     processDeclarations(api.name, moduleDTsPath)
-
-    apisDTsContent += `
-/**
-  * ${api.name}
-  */
-`
-    apisDTsContent += readFileSync(moduleDTsPath).toString()
-
-    rmSync(apiModuleDirPath, { recursive: true, force: true })
   }
-
-  writeFileSync(path.resolve(outModulesPath, 'index.d.ts'), apisDTsContent)
 }
 
 async function preprocessProtoGeneration(protoPath: string) {

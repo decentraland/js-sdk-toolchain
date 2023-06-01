@@ -19,6 +19,6 @@
     "downlevelIteration": true,
     "noUnusedLocals": true,
     "lib": ["ES2020"],
-    "types": []
+    "types": [],
   }
 }

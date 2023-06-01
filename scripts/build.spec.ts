@@ -1,6 +1,6 @@
 import * as path from 'path'
 import { readFileSync, writeFileSync } from 'fs'
-import { copySync, existsSync, mkdirSync, removeSync } from 'fs-extra'
+import { copySync, existsSync, mkdirSync, removeSync, readdir } from 'fs-extra'
 import { summary } from '@actions/core'
 
 import {
@@ -41,21 +41,25 @@ flow('build-all', () => {
 
     it('compile protos', async () => {
       const rpcProtoPath = path.resolve(__dirname, 'rpc-api-generation', 'src', 'proto')
+      const systemPath = path.resolve(JS_RUNTIME, '~system')
       removeSync(rpcProtoPath)
+      removeSync(systemPath)
       mkdirSync(rpcProtoPath)
       writeFileSync(path.resolve(rpcProtoPath, 'README.md'), '# Generated code')
 
       await runCommand(`make compile_apis`, path.resolve(__dirname, '..'))
       await compileProtoApi()
-
-      copySync(
-        path.resolve(__dirname, 'rpc-api-generation/src/modules', 'index.d.ts'),
-        path.resolve(JS_RUNTIME, 'apis.d.ts')
-      )
+      copySync(path.resolve(__dirname, 'rpc-api-generation/src/~system'), systemPath)
+      const dirs = await readdir(path.resolve(JS_RUNTIME, '~system'))
+      const referenceToAdd: string = dirs.map((dir) => {
+        return `/// <reference path="./${dir}/index.d.ts" />`
+      }).join(`
+      `)
+      writeFileSync(path.resolve(systemPath, 'index.d.ts'), referenceToAdd)
     }, 60000)
 
     it('check file exists', () => {
-      ensureFileExists('apis.d.ts', JS_RUNTIME)
+      ensureFileExists('index.d.ts', path.resolve(JS_RUNTIME, '~system'))
       ensureFileExists('index.d.ts', JS_RUNTIME)
     })
   })
@@ -251,19 +255,21 @@ flow('build-all', () => {
 
     it('playground copy minified files', async () => {
       const playgroundDistPath = path.resolve(PLAYGROUND_ASSETS_PATH, 'dist', 'playground')
+      const distPlaygroundSdkPath = path.resolve(playgroundDistPath, 'sdk')
+
+      copySync(path.resolve(JS_RUNTIME, '~system'), distPlaygroundSdkPath)
 
       // Copy minified ecs
       const filesToCopy = [
         {
-          from: path.resolve(JS_RUNTIME, 'apis.d.ts'),
-          fileName: 'apis.d.ts'
+          from: path.resolve(JS_RUNTIME, 'index.d.ts'),
+          fileName: 'index.d.ts'
         },
         {
           from: path.resolve(SDK_PATH, 'package.json'),
           fileName: 'dcl-sdk.package.json'
         }
       ]
-      const distPlaygroundSdkPath = path.resolve(playgroundDistPath, 'sdk')
       for (const file of filesToCopy) {
         const filePath = ensureFileExists(file.from)
         const destPath = path.resolve(distPlaygroundSdkPath, file.fileName)
