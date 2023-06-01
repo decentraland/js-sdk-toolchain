@@ -1,18 +1,32 @@
 import { useMemo, useState } from 'react'
 import { useDrag } from 'react-dnd'
 
-import { AssetProps, CategoriesProps, ITheme, Props, ThemeProps } from './types'
+import { AssetProps, CategoriesProps, ITheme, ThemeProps } from './types'
 import { getStorageUrl, getAssetsByCategory, getThemeThumbnailUrl } from './utils'
+import { useCatalog } from '../../hooks/catalog/useCatalog'
 
 import './AssetsCatalog.css'
 
-export function AssetsCatalog({ value }: Props) {
+export function AssetsCatalog() {
+  const [catalog, error] = useCatalog()
   const [selectedTheme, setSelectedTheme] = useState<ITheme>()
   const handleThemeChange = (value?: ITheme) => setSelectedTheme(value)
 
+  if (error) {
+    return (
+      <div className="assets-catalog">
+        <div className="error">{error.message}</div>
+      </div>
+    )
+  }
+
+  if (!catalog) {
+    return null
+  }
+
   return (
     <div className="assets-catalog">
-      {!selectedTheme && value.map(($) => <ThemeCell key={$.id} onClick={handleThemeChange} value={$} />)}
+      {!selectedTheme && catalog.map(($) => <ThemeCell key={$.id} onClick={handleThemeChange} value={$} />)}
       {selectedTheme && <Categories onGoBack={handleThemeChange} value={selectedTheme} />}
     </div>
   )

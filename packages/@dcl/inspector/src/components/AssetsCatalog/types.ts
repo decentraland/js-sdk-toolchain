@@ -11,10 +11,6 @@ export const CATEGORIES = [
   'year of the pig'
 ].sort()
 
-export interface Props {
-  value: ITheme[]
-}
-
 export interface ITheme {
   id: string
   title: string
