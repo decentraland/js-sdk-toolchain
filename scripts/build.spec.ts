@@ -50,16 +50,9 @@ flow('build-all', () => {
       await runCommand(`make compile_apis`, path.resolve(__dirname, '..'))
       await compileProtoApi()
       copySync(path.resolve(__dirname, 'rpc-api-generation/src/~system'), systemPath)
-      const dirs = await readdir(path.resolve(JS_RUNTIME, '~system'))
-      const referenceToAdd: string = dirs.map((dir) => {
-        return `/// <reference path="./${dir}/index.d.ts" />`
-      }).join(`
-      `)
-      writeFileSync(path.resolve(systemPath, 'index.d.ts'), referenceToAdd)
     }, 60000)
 
     it('check file exists', () => {
-      ensureFileExists('index.d.ts', path.resolve(JS_RUNTIME, '~system'))
       ensureFileExists('index.d.ts', JS_RUNTIME)
     })
   })
@@ -155,6 +148,15 @@ flow('build-all', () => {
     itExecutes(`npm install --silent ${JS_RUNTIME}`, SDK_PATH)
     itExecutes(`npm install --silent ${ECS7_PATH}`, SDK_PATH)
     itExecutes(`npm install --silent ${REACT_ECS}`, SDK_PATH)
+
+    it('copy ~system files (vscode bug)', async () => {
+      copySync(path.resolve(JS_RUNTIME, '~system'), path.resolve(SDK_PATH, 'types', '~system'))
+      const systemTypes = (await readdir(path.resolve(JS_RUNTIME, '~system'))).map((name) => `~system/${name}`)
+      const tsconfigJson = JSON.parse(readFileSync(path.resolve(SDK_PATH, 'types', 'tsconfig.ecs7.json')).toString())
+
+      tsconfigJson.compilerOptions.types = systemTypes.concat('@dcl/js-runtime')
+      writeFileSync(path.resolve(SDK_PATH, 'types', 'tsconfig.ecs7.json'), JSON.stringify(tsconfigJson, null, 2))
+    })
 
     itExecutes('npm run build --silent', SDK_PATH)
 

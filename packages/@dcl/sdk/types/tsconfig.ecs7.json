@@ -29,7 +29,23 @@
       "ES2020"
     ],
     "types": [
-      "@dcl/js-runtime",
+      "~system/CommunicationsController",
+      "~system/EngineApi",
+      "~system/EnvironmentApi",
+      "~system/EthereumController",
+      "~system/Players",
+      "~system/PortableExperiences",
+      "~system/RestrictedActions",
+      "~system/Runtime",
+      "~system/Scene",
+      "~system/SignedFetch",
+      "~system/Testing",
+      "~system/UserActionModule",
+      "~system/UserIdentity",
+      "@dcl/js-runtime"
+    ],
+    "typeRoots": [
+      "."
     ]
   }
 }
