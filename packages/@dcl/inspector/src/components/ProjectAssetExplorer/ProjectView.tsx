@@ -136,12 +136,15 @@ function ProjectView({ folders }: Props) {
     [open, setOpen]
   )
 
-  const removeAsset = useCallback(async (path: string, _: Entity[] = []) => {
-    if (!sdk) return
-    const { dataLayer } = sdk
-    fileSystemEvent.emit('change')
-    await dataLayer.removeAsset({ path })
-  }, [])
+  const removeAsset = useCallback(
+    async (path: string, _: Entity[] = []) => {
+      if (!sdk) return
+      const { dataLayer } = sdk
+      fileSystemEvent.emit('change')
+      await dataLayer.removeAsset({ path })
+    },
+    [sdk]
+  )
 
   const handleConfirm = useCallback(async () => {
     if (!modal) return
