@@ -41,6 +41,8 @@ const userSettings = {
   autoSave: true
 }
 
+const USER_PREFERENCES_FILE_PATH = 'user-preferences.json'
+
 export async function initRpcMethods(
   fs: FileSystemInterface,
   engine: IEngine,
@@ -159,9 +161,15 @@ export async function initRpcMethods(
       return {}
     },
     async getUserPreferences() {
-      return {camera: {invertXAxis: false, invertYAxis: false}}
+      const fileExists = await fs.existFile(USER_PREFERENCES_FILE_PATH)
+      if (!fileExists)
+        return {camera: {invertXAxis: false, invertYAxis: false}}
+
+      const fileContent = await fs.readFile(USER_PREFERENCES_FILE_PATH)
+      return JSON.parse(fileContent.toString('utf-8'))
     },
     async setUserPreferences(req) {
+      await fs.writeFile(USER_PREFERENCES_FILE_PATH, Buffer.from(JSON.stringify(req, null, 2), 'utf-8'))
       return {}
     }
   }

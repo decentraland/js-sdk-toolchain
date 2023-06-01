@@ -19,11 +19,13 @@ export const Camera = withSdk(({ sdk }) => {
 
   const handleToggleInvertXAxis = useCallback(() => {
     sdk.editorCamera.setInvertXAxis(!invertXAxis)
+    sdk.userPreferences.setCameraInvertXAxis(!invertXAxis)
     setInvertXAxis(!invertXAxis)
   }, [invertXAxis])
 
   const handleToggleInvertYAxis = useCallback(() => {
     sdk.editorCamera.setInvertYAxis(!invertYAxis)
+    sdk.userPreferences.setCameraInvertYAxis(!invertYAxis)
     setInvertYAxis(!invertYAxis)
   }, [invertYAxis])
 
@@ -32,7 +34,7 @@ export const Camera = withSdk(({ sdk }) => {
 
   return (
     <div className="Camera" ref={ref}>
-      <ToolbarButton onClick={handleTogglePanel}>
+      <ToolbarButton className="camera" onClick={handleTogglePanel}>
         <BiCameraMovie />
       </ToolbarButton>
       <div className={cx('panel', { visible: showPanel })}>
