@@ -18,9 +18,7 @@ const App = () => {
   const { height } = useWindowSize()
 
   // Footer's height is 36 pixels, so we need to calculate the percentage of the screen that it takes to pass as the minSize prop for the Panel
-  const footerMin = (50 / height!) * 100
-
-  console.log(footerMin)
+  const footerMin = (48 / height!) * 100
 
   return (
     <div className="App">
