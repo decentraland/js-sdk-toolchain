@@ -1,11 +1,12 @@
 import { useCallback } from 'react'
-import { BiUndo, BiRedo, BiSave, BiBadgeCheck } from 'react-icons/bi'
+import { BiUndo, BiRedo, BiSave, BiBadgeCheck, BiCameraMovie } from 'react-icons/bi'
 import { RiListSettingsLine } from 'react-icons/ri'
 
 import { fileSystemEvent } from '../../hooks/catalog/useFileSystem'
 import { saveEvent, useSave } from '../../hooks/editor/useSave'
 import { withSdk } from '../../hoc/withSdk'
 import { Gizmos } from './Gizmos'
+import { Camera } from './Camera'
 import { ToolbarButton } from './ToolbarButton'
 
 import './Toolbar.css'
@@ -44,6 +45,7 @@ const Toolbar = withSdk(({ sdk }) => {
         <BiRedo />
       </ToolbarButton>
       <Gizmos />
+      <Camera />
       <ToolbarButton className="babylonjs-inspector" onClick={handleInspector}>
         <RiListSettingsLine />
       </ToolbarButton>
