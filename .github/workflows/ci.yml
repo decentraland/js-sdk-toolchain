@@ -282,7 +282,7 @@ jobs:
       - name: lint-packages
         run: make lint-packages
   notify_deployment:
-    needs: [build, cli_e2e]
+    needs: [build]
     if: ${{ github.event.pull_request.number }}
     runs-on: ubuntu-latest
     name: Deployment Notification
@@ -345,22 +345,24 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+      - name: sarasa
+        run: echo ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }}
       - name: install npm
         run: npm i -g npm
-      - run: mkdir -p scene
+      - run: mkdir -p test-cli-scene
       - name: npx @dcl/sdk-commands init --skip-install
         run: npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_commands_s3_bucket_key }} init
-        working-directory: scene
+        working-directory: test-cli-scene
       - name: install CI version of @dcl/sdk
         run: npm install ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }}
-        working-directory: scene
+        working-directory: test-cli-scene
       - name: install rest of the dependencies
         run: npm install
-        working-directory: scene
+        working-directory: test-cli-scene
       - name: npm run build
         run: npm run build
-        working-directory: scene
-        
+        working-directory: test-cli-scene
+
       - name: Set Realm Name
         run: |
           modified_realm=$(echo "${{ github.head_ref || github.ref }}" | tr '/' '-' | tr -d '@')
@@ -372,7 +374,7 @@ jobs:
               --realmName ${{ env.REALM_NAME }}-e2e \
               --commsAdapter ws-room:ws-room-service.decentraland.org/rooms/sdk-${{ github.sha }} \
               --baseUrl ${{ secrets.SDK_TEAM_S3_BASE_URL }}/ipfs \
-              --dir scene \
+              --dir test-cli-scene \
               --destination $(pwd)/out-static
       - name: upload to s3
         run: >

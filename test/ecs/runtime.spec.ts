@@ -15,7 +15,7 @@ import {
   setSubscribeFunction
 } from '../../packages/@dcl/sdk/src/observables'
 import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
-import { SendBatchResponse } from '~system/EngineApi'
+import type { SendBatchResponse } from '~system/EngineApi'
 
 describe('Observable tests', () => {
   beforeEach(() => {

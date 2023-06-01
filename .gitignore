@@ -27,7 +27,7 @@ test/snapshots/*/package-lock.json
 test/snapshots/**/*.js
 test/snapshots/**/*.js.map
 tmp
-scene
+test-cli-scene/
 test-scene
 test/snapshots/bin
 **/*.tsbuildinfo
