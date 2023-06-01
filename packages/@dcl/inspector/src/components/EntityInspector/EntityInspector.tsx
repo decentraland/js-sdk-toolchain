@@ -3,6 +3,7 @@ import { useSelectedEntity } from '../../hooks/sdk/useSelectedEntity'
 import { SceneInspector } from './SceneInspector'
 import { TransformInspector } from './TransformInspector'
 import { GltfInspector } from './GltfInspector'
+import './EntityInspector.css'
 
 export const EntityInspector: React.FC = () => {
   const entity = useSelectedEntity()

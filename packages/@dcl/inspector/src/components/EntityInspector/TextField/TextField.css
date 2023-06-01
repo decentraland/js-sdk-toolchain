@@ -1,6 +1,6 @@
 .TextField {
   padding: 4px 6px;
-  border: 1px solid var(--secondary-text);
+  border: 1px solid var(--border-gray);
   display: flex;
   margin-right: 8px;
   border-radius: 1.6px;
