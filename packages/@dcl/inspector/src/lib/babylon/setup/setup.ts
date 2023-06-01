@@ -6,6 +6,14 @@ import { CameraManager } from '../decentraland/camera'
 // if NODE_ENV == development
 require('@babylonjs/inspector')
 
+// Camera settings
+const CAMERA_SPEEDS = [...Array(40).keys()].map((_, i) => {
+  return (i + 1) * 0.5
+}).concat([25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100])
+const CAMERA_DEFAULT_SPEED_INDEX = 20
+const CAMERA_MIN_Y = 1
+const CAMERA_ZOOM_SENSITIVITY = 1
+
 const sunInclination = -0.31
 
 export namespace ambientConfigurations {
@@ -98,20 +106,17 @@ export function setupEngine(engine: BABYLON.Engine, canvas: HTMLCanvasElement) {
   grid.mainColor = BABYLON.Color3.FromHexString('#36343D')
   editorEnvHelper.ground!.material = grid
 
-  const cameraManager = new CameraManager(scene)
-  scene.activeCamera?.detachControl()
-  scene.activeCamera = cameraManager.getCamera()
-  scene.activeCamera.attachControl(canvas, true)
+  const cameraManager = new CameraManager(scene, canvas, CAMERA_SPEEDS, CAMERA_DEFAULT_SPEED_INDEX, CAMERA_MIN_Y, CAMERA_ZOOM_SENSITIVITY)
 
   const hemiLight = new BABYLON.HemisphericLight('default light', ambientConfigurations.sunPosition, scene)
   hemiLight.diffuse = BABYLON.Color3.White()
   hemiLight.groundColor = ambientConfigurations.groundColor.clone()
   hemiLight.specular = ambientConfigurations.sunColor.clone()
 
-  reposition(editorEnvHelper, hemiLight, cameraManager.getCamera())
+  reposition(editorEnvHelper, hemiLight, cameraManager)
 
   function update() {
-    reposition(editorEnvHelper, hemiLight, cameraManager.getCamera())
+    reposition(editorEnvHelper, hemiLight, cameraManager)
     scene.render()
   }
 
@@ -128,17 +133,19 @@ export function setupEngine(engine: BABYLON.Engine, canvas: HTMLCanvasElement) {
   }
 }
 
-function reposition(envHelper: BABYLON.EnvironmentHelper, hemiLight: BABYLON.HemisphericLight, camera: BABYLON.Camera) {
+function reposition(envHelper: BABYLON.EnvironmentHelper, hemiLight: BABYLON.HemisphericLight, camera: CameraManager) {
+  const cameraPosition = camera.getGlobalPosition()
+
   // set the ground at 0 always and round position towards PARCEL_SIZE
   envHelper.ground!.position.set(
-    Math.floor(camera.globalPosition.x / PARCEL_SIZE) * PARCEL_SIZE - camera.globalPosition.x,
-    -camera.globalPosition.y,
-    Math.floor(camera.globalPosition.z / PARCEL_SIZE) * PARCEL_SIZE - camera.globalPosition.z
+    Math.floor(cameraPosition.x / PARCEL_SIZE) * PARCEL_SIZE - cameraPosition.x,
+    -cameraPosition.y,
+    Math.floor(cameraPosition.z / PARCEL_SIZE) * PARCEL_SIZE - cameraPosition.z
   )
 
   // make the skybox follow the camera target
-  envHelper.skybox!.position.set(camera.globalPosition.x, camera.globalPosition.y, camera.globalPosition.z)
-  envHelper.rootMesh.position.set(camera.globalPosition.x, camera.globalPosition.y, camera.globalPosition.z)
+  envHelper.skybox!.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
+  envHelper.rootMesh.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
 
   const theta = Math.PI * sunInclination
   const phi = Math.PI * -0.4
