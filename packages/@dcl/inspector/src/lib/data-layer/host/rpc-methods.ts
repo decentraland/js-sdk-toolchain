@@ -157,6 +157,12 @@ export async function initRpcMethods(
     async save() {
       save()
       return {}
+    },
+    async getUserPreferences() {
+      return {camera: {invertXAxis: false, invertYAxis: false}}
+    },
+    async setUserPreferences(req) {
+      return {}
     }
   }
 }
