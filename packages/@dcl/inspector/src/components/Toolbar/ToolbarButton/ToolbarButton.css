@@ -3,7 +3,7 @@
   padding: 0px 2px;
   margin: 0 8px;
   color: #fff;
-  background-color: #4b4852;
+  background-color: var(--tree-border-color);
   font-size: 16px;
   border-radius: 4px;
   cursor: pointer;
@@ -11,7 +11,7 @@
 }
 
 .ToolbarButton:hover:not(:disabled) {
-  background-color: #6c6974;
+  background-color: var(--background-gray);
 }
 
 .ToolbarButton:disabled {
@@ -20,7 +20,7 @@
 }
 
 .ToolbarButton.active {
-  background-color: #6c6974;
+  background-color: var(--vscode-accent-blue) !important;
 }
 
 .ToolbarButton svg {
