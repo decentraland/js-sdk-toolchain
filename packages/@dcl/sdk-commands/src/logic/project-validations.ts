@@ -99,7 +99,7 @@ export async function npmCommand(
 export async function startValidations(components: Pick<CliComponents, 'spawner' | 'fs' | 'logger'>, cwd: string) {
   try {
     const sdkVersion = await getInstalledPackageVersion(components, '@dcl/sdk', cwd)
-    await npmCommand(components, cwd, `install --save-exact @dcl/js-runtime@${sdkVersion}`)
+    await npmCommand(components, cwd, `install --save-exact -D @dcl/js-runtime@${sdkVersion}`)
   } catch (_) {
     components.logger.error('Failed to run scene validations')
   }
