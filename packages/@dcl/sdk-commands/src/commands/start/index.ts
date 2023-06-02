@@ -25,6 +25,7 @@ import { createExitSignalComponent } from '../../components/exit-signal'
 import { getValidWorkspace } from '../../logic/workspace-validations'
 import { printCurrentProjectStarting, printProgressInfo, printWarning } from '../../logic/beautiful-logs'
 import { Result } from 'arg'
+import { startValidations } from '../../logic/project-validations'
 
 interface Options {
   args: Result<typeof args>
@@ -109,6 +110,10 @@ export async function main(options: Options) {
         await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': true, _: [] } }, project)
       } else if (!skipBuild) {
         await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': false, _: [] } }, project)
+      }
+
+      if (watch || !skipBuild) {
+        await startValidations(options.components, project.workingDirectory)
       }
 
       // track the event

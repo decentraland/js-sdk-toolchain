@@ -26,7 +26,7 @@ export const useEntityComponent = () => {
     (entity: Entity, componentId: number) => {
       if (!sdk) return
       sdk.operations.addComponent(entity, componentId)
-      sdk.operations.dispatch()
+      void sdk.operations.dispatch()
     },
     [sdk]
   )

@@ -24,6 +24,7 @@ export type SdkContextValue = {
   engine: IEngine
   components: EditorComponents & SdkComponents
   scene: Scene
+  sceneContext: SceneContext
   events: Emitter<SdkContextEvents>
   dispose(): void
   dataLayer: DataLayerRpcClient
@@ -70,6 +71,7 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
     components,
     events,
     scene,
+    sceneContext: ctx,
     dispose,
     dataLayer,
     operations: createOperations(engine),

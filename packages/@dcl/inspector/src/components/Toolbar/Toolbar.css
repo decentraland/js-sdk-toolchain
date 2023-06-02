@@ -1,6 +1,6 @@
 .Toolbar {
   display: flex;
-  background-color: #29262f;
+  background-color: var(--tree-bg-color);
   padding: 8px;
   width: 100%;
 }
