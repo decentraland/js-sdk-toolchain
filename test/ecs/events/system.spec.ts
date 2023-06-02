@@ -26,13 +26,9 @@ describe('Events System', () => {
     const entity = engine.addEntity()
     const PointerEvents = components.PointerEvents(engine)
     let counter = 0
-    EventsSystem.onClick(
-      entity,
-      () => {
-        counter += 1
-      },
-      { button: InputAction.IA_ANY }
-    )
+    EventsSystem.onClick({ entity, opts: { button: InputAction.IA_ANY } }, () => {
+      counter += 1
+    })
     fakePointer(entity, PointerEventType.PET_DOWN, InputAction.IA_ACTION_3)
     fakePointer(entity, PointerEventType.PET_UP, InputAction.IA_ACTION_3)
     await engine.update(1)
@@ -43,7 +39,7 @@ describe('Events System', () => {
   it('should create pointer hover components', async () => {
     const entity = engine.addEntity()
     const PointerEvents = components.PointerEvents(engine)
-    EventsSystem.onClick(entity, () => {}, { hoverText: 'Boedo' })
+    EventsSystem.onClick({ entity, opts: { hoverText: 'Boedo' } }, () => {})
     fakePointer(entity, PointerEventType.PET_DOWN)
     fakePointer(entity, PointerEventType.PET_UP)
     await engine.update(1)
@@ -56,14 +52,10 @@ describe('Events System', () => {
     const entity = engine.addEntity()
     const PointerEvents = components.PointerEvents(engine)
     let counter = 0
-    EventsSystem.onClick(
-      entity,
-      () => {
-        counter += 1
-        EventsSystem.removeOnClick(entity)
-      },
-      { hoverText: 'Boedo', button: InputAction.IA_JUMP }
-    )
+    EventsSystem.onClick({ entity, opts: { hoverText: 'Boedo', button: InputAction.IA_JUMP } }, () => {
+      counter += 1
+      EventsSystem.removeOnClick(entity)
+    })
     fakePointer(entity, PointerEventType.PET_DOWN, InputAction.IA_JUMP)
     fakePointer(entity, PointerEventType.PET_UP, InputAction.IA_JUMP)
 
@@ -164,7 +156,7 @@ describe('Events System', () => {
     EventsSystem.onPointerDown(entity, () => {
       downCounter += 1
     })
-    EventsSystem.onClick(entity, () => {
+    EventsSystem.onClick({ entity }, () => {
       clickCounter += 1
     })
     EventsSystem.onPointerUp(
@@ -210,13 +202,9 @@ describe('Events System', () => {
   it('should delete events callbacks if the entity was removed', async () => {
     const entity = engine.addEntity()
     let counter = 0
-    EventsSystem.onClick(
-      entity,
-      () => {
-        counter += 1
-      },
-      { button: InputAction.IA_ANY }
-    )
+    EventsSystem.onClick({ entity, opts: { button: InputAction.IA_ANY } }, () => {
+      counter += 1
+    })
     fakePointer(entity, PointerEventType.PET_DOWN, InputAction.IA_ACTION_3)
     fakePointer(entity, PointerEventType.PET_UP, InputAction.IA_ACTION_3)
     await engine.update(1)

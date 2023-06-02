@@ -32,7 +32,7 @@ const raycastEntity = engine.addEntity()
 
 // Add OnPointerDown component to cube entity to trigger ray casting on interaction
 pointerEventsSystem.onPointerDown(
-  cubeEntity,
+  { entity: cubeEntity, opts: { button: InputAction.IA_POINTER, hoverText: 'CAST RAY' } },
   () => {
     Raycast.createOrReplace(raycastEntity, {
       direction: {
@@ -42,10 +42,6 @@ pointerEventsSystem.onPointerDown(
       maxDistance: 16,
       queryType: RaycastQueryType.RQT_QUERY_ALL
     })
-  },
-  {
-    button: InputAction.IA_POINTER,
-    hoverText: 'CAST RAY'
   }
 )
 
