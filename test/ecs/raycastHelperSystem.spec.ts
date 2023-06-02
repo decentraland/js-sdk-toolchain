@@ -23,28 +23,28 @@ describe('Raycast Helper System should', () => {
       originOffset: { x: 0, y: 0, z: 0 },
       collisionMask: ColliderLayer.CL_PHYSICS
     }
-    expect(raycastHelperSystem.getLocalDirectionRaycastDefaultOptions()).toMatchObject({
+    expect(raycastHelperSystem.localDirectionOptions()).toMatchObject({
       ...defaultOpts,
       directionRawValue: {
         $case: 'localDirection',
         localDirection: { x: 0, y: 0, z: 1 }
       }
     })
-    expect(raycastHelperSystem.getGlobalDirectionRaycastDefaultOptions()).toMatchObject({
+    expect(raycastHelperSystem.globalDirectionOptions()).toMatchObject({
       ...defaultOpts,
       directionRawValue: {
         $case: 'globalDirection',
         globalDirection: { x: 0, y: 0, z: 1 }
       }
     })
-    expect(raycastHelperSystem.getGlobalTargetRaycastDefaultOptions()).toMatchObject({
+    expect(raycastHelperSystem.globalTargetOptions()).toMatchObject({
       ...defaultOpts,
       directionRawValue: {
         $case: 'globalTarget',
         globalTarget: { x: 0, y: 0, z: 0 }
       }
     })
-    expect(raycastHelperSystem.getTargetEntityRaycastDefaultOptions()).toMatchObject({
+    expect(raycastHelperSystem.targetEntitytOptions()).toMatchObject({
       ...defaultOpts,
       directionRawValue: {
         $case: 'targetEntity',
@@ -57,7 +57,7 @@ describe('Raycast Helper System should', () => {
     function raycastSystem(dt: number) {
       const value = raycastHelperSystem.registerRaycast(
         raycastEntity,
-        raycastHelperSystem.getLocalDirectionRaycastDefaultOptions({
+        raycastHelperSystem.localDirectionOptions({
           direction: Vector3.Forward(),
           queryType: RaycastQueryType.RQT_HIT_FIRST
         })

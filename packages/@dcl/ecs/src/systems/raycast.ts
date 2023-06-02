@@ -158,26 +158,28 @@ export interface RaycastSystem {
    * @public
    * Creates Raycast local direction opts with defaults
    */
-  getLocalDirectionRaycastDefaultOptions(options?: Partial<LocalDirectionRaycastOptions>): RaycastSystemOptions
+  localDirectionOptions(options?: Partial<LocalDirectionRaycastOptions>): RaycastSystemOptions
   /**
    * @public
    * Creates Raycast global direction opts with defaults
    */
-  getGlobalDirectionRaycastDefaultOptions(options?: Partial<GlobalDirectionRaycastOptions>): RaycastSystemOptions
+  globalDirectionOptions(options?: Partial<GlobalDirectionRaycastOptions>): RaycastSystemOptions
   /**
    * @public
    * Creates Raycast global target direction opts with defaults
    */
-  getGlobalTargetRaycastDefaultOptions(options?: Partial<GlobalTargetRaycastOptions>): RaycastSystemOptions
+  globalTargetOptions(options?: Partial<GlobalTargetRaycastOptions>): RaycastSystemOptions
   /**
    * @public
    * Creates Raycast target entity opts with defaults
    */
-  getTargetEntityRaycastDefaultOptions(options?: Partial<TargetEntityRaycastOptions>): RaycastSystemOptions
+  targetEntitytOptions(options?: Partial<TargetEntityRaycastOptions>): RaycastSystemOptions
 
   /**
    * @public
    * Immediate mode Raycast to be used on a sytem rather than callbacks
+   *
+   * Use the options helper to create the specified raycast i.e. localDirectionOptions(opts)
    */
   registerRaycast(entity: Entity, options: RaycastSystemOptions): DeepReadonlyObject<PBRaycastResult> | null
 }
@@ -331,9 +333,9 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
       }
       return value
     },
-    getLocalDirectionRaycastDefaultOptions,
-    getGlobalDirectionRaycastDefaultOptions,
-    getGlobalTargetRaycastDefaultOptions,
-    getTargetEntityRaycastDefaultOptions
+    localDirectionOptions: getLocalDirectionRaycastDefaultOptions,
+    globalDirectionOptions: getGlobalDirectionRaycastDefaultOptions,
+    globalTargetOptions: getGlobalTargetRaycastDefaultOptions,
+    targetEntitytOptions: getTargetEntityRaycastDefaultOptions
   }
 }
