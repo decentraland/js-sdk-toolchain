@@ -6,9 +6,9 @@ import { FiHexagon } from 'react-icons/fi'
 import { ROOT } from '../../lib/sdk/tree'
 import { useSelectedEntity } from '../../hooks/sdk/useSelectedEntity'
 import { useTree } from '../../hooks/sdk/useTree'
-import { Container } from '../Container'
 import { Tree } from '../Tree'
 import { ContextMenu } from './ContextMenu'
+import './Hierarchy.css'
 
 function HierarchyIcon({ value, hasChildrens, isOpen }: { value: Entity; hasChildrens: boolean; isOpen: boolean }) {
   if (value === ROOT) {
@@ -45,7 +45,7 @@ const Hierarchy: React.FC = () => {
     [selectedEntity]
   )
   return (
-    <Container>
+    <div className="Hierarchy">
       <EntityTree
         value={ROOT}
         getExtraContextMenu={ContextMenu}
@@ -65,7 +65,7 @@ const Hierarchy: React.FC = () => {
         canRename={canRename}
         canRemove={canRemove}
       />
-    </Container>
+    </div>
   )
 }
 
