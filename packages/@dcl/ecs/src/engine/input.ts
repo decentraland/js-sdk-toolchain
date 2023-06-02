@@ -238,7 +238,10 @@ export function createInputSystem(engine: IEngine): IInputSystem {
       return getInputCommandFromEntity(inputAction, pointerEventType, entity)
     } else {
       for (const command of globalState.thisFrameCommands) {
-        if (command.button === inputAction && command.state === pointerEventType) {
+        if (
+          (command.button === inputAction || inputAction === InputAction.IA_ANY) &&
+          command.state === pointerEventType
+        ) {
           return command
         }
       }
@@ -274,7 +277,10 @@ export function createInputSystem(engine: IEngine): IInputSystem {
       return (command && timestampIsCurrentFrame(command.timestamp)) || false
     } else {
       for (const command of globalState.thisFrameCommands) {
-        if (command.button === inputAction && command.state === pointerEventType) {
+        if (
+          (command.button === inputAction || inputAction === InputAction.IA_ANY) &&
+          command.state === pointerEventType
+        ) {
           return true
         }
       }
