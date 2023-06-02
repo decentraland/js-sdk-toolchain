@@ -345,8 +345,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: sarasa
-        run: echo ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }}
       - name: install npm
         run: npm i -g npm
       - run: mkdir -p test-cli-scene

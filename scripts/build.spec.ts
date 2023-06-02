@@ -57,11 +57,19 @@ flow('build-all', () => {
       `)
       writeFileSync(path.resolve(systemPath, 'index.d.ts'), referenceToAdd)
 
-      // Add types to @dcl/sdk/types/tsconfig.ecs7.json
+      // Add types to @dcl/sdk/types/tsconfig.ecs7.json and test/tsconfig.json
       const systemTypes = dirs.map((name) => `~system/${name}`)
       const tsconfigJson = JSON.parse(readFileSync(path.resolve(SDK_PATH, 'types', 'tsconfig.ecs7.json')).toString())
+      const testTsconfigJson = JSON.parse(readFileSync(path.resolve('test', 'tsconfig.json')).toString())
       tsconfigJson.compilerOptions.types = systemTypes.concat('@dcl/js-runtime')
+      testTsconfigJson.compilerOptions.types = Array.from(
+        new Set([
+          ...(testTsconfigJson.compilerOptions.types ?? []).filter((c: string) => !c.startsWith('~')),
+          ...systemTypes
+        ])
+      )
       writeFileSync(path.resolve(SDK_PATH, 'types', 'tsconfig.ecs7.json'), JSON.stringify(tsconfigJson, null, 2))
+      writeFileSync(path.resolve('test', 'tsconfig.json'), JSON.stringify(testTsconfigJson, null, 2))
       // End
     }, 60000)
 
@@ -162,8 +170,12 @@ flow('build-all', () => {
     itExecutes(`npm install --silent ${JS_RUNTIME}`, SDK_PATH)
     itExecutes(`npm install --silent ${ECS7_PATH}`, SDK_PATH)
     itExecutes(`npm install --silent ${REACT_ECS}`, SDK_PATH)
-    itExecutes('npm run build --silent', SDK_PATH)
 
+    it('copy system (vscode bug)', () => {
+      copySync(path.resolve(JS_RUNTIME, '~system'), path.resolve(SDK_PATH, 'types', '~system'))
+    })
+
+    itExecutes('npm run build --silent', SDK_PATH)
     it('check files exists', () => {
       ensureFileExists('index.js', SDK_PATH)
       ensureFileExists('index.d.ts', SDK_PATH)

@@ -45,7 +45,8 @@
       "@dcl/js-runtime"
     ],
     "typeRoots": [
-      "../../js-runtime",
+      ".",
+      "../..",
       "../../../"
     ]
   }

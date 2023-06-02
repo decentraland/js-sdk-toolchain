@@ -4,7 +4,22 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "pretty": true,
-    "types": ["jest", "@dcl/js-runtime"],
+    "types": [
+      "jest",
+      "~system/CommunicationsController",
+      "~system/EngineApi",
+      "~system/EnvironmentApi",
+      "~system/EthereumController",
+      "~system/Players",
+      "~system/PortableExperiences",
+      "~system/RestrictedActions",
+      "~system/Runtime",
+      "~system/Scene",
+      "~system/SignedFetch",
+      "~system/Testing",
+      "~system/UserActionModule",
+      "~system/UserIdentity"
+    ],
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
@@ -23,7 +38,10 @@
     "jsx": "react",
     "jsxFactory": "ReactEcs.createElement",
     "skipLibCheck": true,
-    "typeRoots": ["../packages", "../node_modules/@types"],
+    "typeRoots": [
+      "../node_modules/@types",
+      "../packages/@dcl/sdk/types"
+    ],
     "incremental": true
   }
 }
