@@ -100,6 +100,21 @@ describe('Global Events helpers isTriggered, getInputCommand', () => {
     expect(getInputCommand(InputAction.IA_ACTION_3, PointerEventType.PET_DOWN)).toBeNull()
   })
 
+  it('detect any pointerEvent', async () => {
+    const newEngine = Engine()
+    const PointerEventsResult = components.PointerEventsResult(newEngine)
+    const entity = newEngine.addEntity()
+    const { isTriggered, getInputCommand } = createInputSystem(newEngine)
+    PointerEventsResult.addValue(entity, createTestPointerDownCommand(entity, 4, PointerEventType.PET_DOWN))
+
+    // we must run the systems to update the internal inputSystem state
+    await newEngine.update(1)
+
+    // then assert
+    expect(isTriggered(InputAction.IA_ANY, PointerEventType.PET_DOWN)).toBe(true)
+    expect(getInputCommand(InputAction.IA_ANY, PointerEventType.PET_DOWN)).not.toBeNull()
+  })
+
   it('dont detect pointerEventActive after update', async () => {
     const newEngine = Engine()
     const PointerEventsResult = components.PointerEventsResult(newEngine)
@@ -116,6 +131,7 @@ describe('Global Events helpers isTriggered, getInputCommand', () => {
     expect(isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN)).toBe(false)
   })
 })
+
 function createTestPointerDownCommand(
   entity: Entity,
   timestamp: number,

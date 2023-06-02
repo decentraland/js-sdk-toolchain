@@ -15,6 +15,80 @@ describe('Raycast Helper System should', () => {
   const raycastComponent = components.Raycast(engine)
   const raycastResultComponent = components.RaycastResult(engine)
 
+  it('validates raycast default options helper', async () => {
+    const defaultOpts = {
+      maxDistance: 16,
+      queryType: RaycastQueryType.RQT_HIT_FIRST,
+      continuous: false,
+      originOffset: { x: 0, y: 0, z: 0 },
+      collisionMask: ColliderLayer.CL_PHYSICS
+    }
+    expect(raycastHelperSystem.localDirectionOptions()).toMatchObject({
+      ...defaultOpts,
+      directionRawValue: {
+        $case: 'localDirection',
+        localDirection: { x: 0, y: 0, z: 1 }
+      }
+    })
+    expect(raycastHelperSystem.globalDirectionOptions()).toMatchObject({
+      ...defaultOpts,
+      directionRawValue: {
+        $case: 'globalDirection',
+        globalDirection: { x: 0, y: 0, z: 1 }
+      }
+    })
+    expect(raycastHelperSystem.globalTargetOptions()).toMatchObject({
+      ...defaultOpts,
+      directionRawValue: {
+        $case: 'globalTarget',
+        globalTarget: { x: 0, y: 0, z: 0 }
+      }
+    })
+    expect(raycastHelperSystem.targetEntitytOptions()).toMatchObject({
+      ...defaultOpts,
+      directionRawValue: {
+        $case: 'targetEntity',
+        targetEntity: 0
+      }
+    })
+  })
+  it('runs raycast immediate helper', async () => {
+    const raycastEntity = engine.addEntity()
+    function raycastSystem(dt: number) {
+      const value = raycastHelperSystem.registerRaycast(
+        raycastEntity,
+        raycastHelperSystem.localDirectionOptions({
+          direction: Vector3.Forward(),
+          queryType: RaycastQueryType.RQT_HIT_FIRST
+        })
+      )
+      if (dt === 0) expect(value).toBe(null)
+      if (dt === 1)
+        expect(value).toMatchObject({
+          hits: [],
+          direction: Vector3.Zero(),
+          globalOrigin: Vector3.Zero(),
+          tickNumber: 0
+        })
+    }
+
+    engine.addSystem(raycastSystem)
+    // dt = 0 => first iteration - null
+    await engine.update(0)
+    expect(raycastComponent.get(raycastEntity).queryType).toBe(RaycastQueryType.RQT_HIT_FIRST)
+    // Simulate client-side result attachment
+    raycastResultComponent.create(raycastEntity, {
+      hits: [],
+      direction: Vector3.Zero(),
+      globalOrigin: Vector3.Zero(),
+      tickNumber: 0
+    })
+
+    // dt = 1 => second iteration - raycast result
+    await engine.update(1)
+    engine.removeSystem(raycastSystem)
+  })
+
   it('run callback on raycast result for LocalDirection', async () => {
     const raycastEntity = engine.addEntity()
     const fn = jest.fn()

@@ -27,11 +27,10 @@ function circularSystem(dt: number) {
 // Init
 const initEntity = createCube(8, 1, 8)
 pointerEventsSystem.onPointerDown(
-  initEntity,
+  { entity: initEntity, opts: { button: InputAction.IA_PRIMARY, hoverText: 'Press E to spawn' } },
   () => {
     createCube(1 + Math.random() * 8, Math.random() * 8, 1 + Math.random() * 8)
-  },
-  { button: InputAction.IA_PRIMARY, hoverText: 'Press E to spawn' }
+  }
 )
 
 engine.addSystem(circularSystem)

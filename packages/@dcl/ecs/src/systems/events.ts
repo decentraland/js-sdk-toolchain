@@ -49,15 +49,20 @@ export interface PointerEventsSystem {
   /**
    * @internal
    * Execute callback when the user clicks the entity.
-   * @param entity - Entity to attach the callback
+   * @param entity - Entity to attach the callback - Opts to trigger Feedback and Button
    * @param cb - Function to execute when onPointerDown fires
-   * @param opts - Opts to trigger Feedback and Button
    */
-  onClick(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void
+  onClick(opts: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
 
   /**
    * @public
    * Execute callback when the user press the InputButton pointing at the entity
+   * @param pointerData - Entity to attach the callback, Opts to trigger Feedback and Button
+   * @param cb - Function to execute when click fires
+   */
+  onPointerDown(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
+  /**
+   * @deprecated Use onPointerDown with (pointerData, cb)
    * @param entity - Entity to attach the callback
    * @param cb - Function to execute when click fires
    * @param opts - Opts to trigger Feedback and Button
@@ -66,6 +71,12 @@ export interface PointerEventsSystem {
   /**
    * @public
    * Execute callback when the user releases the InputButton pointing at the entity
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when click fires
+   */
+  onPointerUp(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
+  /**
+   * @deprecated Use onPointerUp with (pointerData, cb)
    * @param entity - Entity to attach the callback
    * @param cb - Function to execute when click fires
    * @param opts - Opts to trigger Feedback and Button
@@ -164,6 +175,30 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     }
   })
 
+  const onPointerDown: PointerEventsSystem['onPointerDown'] = (...args) => {
+    const [data, cb, maybeOpts] = args
+    if (typeof data === 'number') {
+      return onPointerDown({ entity: data, opts: maybeOpts ?? {} }, cb)
+    }
+    const { entity, opts } = data
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.Down)
+    getEvent(entity).set(EventType.Down, { cb, opts: options })
+    setPointerEvent(entity, PointerEventType.PET_DOWN, options)
+  }
+
+  const onPointerUp: PointerEventsSystem['onPointerUp'] = (...args) => {
+    const [data, cb, maybeOpts] = args
+    if (typeof data === 'number') {
+      return onPointerUp({ entity: data, opts: maybeOpts ?? {} }, cb)
+    }
+    const { entity, opts } = data
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.Up)
+    getEvent(entity).set(EventType.Up, { cb, opts: options })
+    setPointerEvent(entity, PointerEventType.PET_UP, options)
+  }
+
   return {
     removeOnClick(entity: Entity) {
       removeEvent(entity, EventType.Click)
@@ -177,8 +212,9 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
       removeEvent(entity, EventType.Up)
     },
 
-    onClick(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>) {
-      const options = getDefaultOpts(opts)
+    onClick(value, cb) {
+      const { entity } = value
+      const options = getDefaultOpts(value.opts)
       // Clear previous event with over feedback included
       removeEvent(entity, EventType.Click)
 
@@ -187,18 +223,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
       setPointerEvent(entity, PointerEventType.PET_DOWN, options)
     },
 
-    onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>) {
-      const options = getDefaultOpts(opts)
-      removeEvent(entity, EventType.Down)
-      getEvent(entity).set(EventType.Down, { cb, opts: options })
-      setPointerEvent(entity, PointerEventType.PET_DOWN, options)
-    },
-
-    onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>) {
-      const options = getDefaultOpts(opts)
-      removeEvent(entity, EventType.Up)
-      getEvent(entity).set(EventType.Up, { cb, opts: options })
-      setPointerEvent(entity, PointerEventType.PET_UP, options)
-    }
+    onPointerDown,
+    onPointerUp
   }
 }
