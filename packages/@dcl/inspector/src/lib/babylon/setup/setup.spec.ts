@@ -19,7 +19,7 @@ describe('When setting up the engine', () => {
   })
 
   it('should create a scene', () => {
-    const { scene } = setupEngine(engine, undefined as unknown as HTMLCanvasElement, getDefaultInspectorPreferences())
+    const { scene } = setupEngine(engine, null as unknown as HTMLCanvasElement, getDefaultInspectorPreferences())
     expect(scene).toBeDefined()
   })
 })
