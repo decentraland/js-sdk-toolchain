@@ -1,14 +1,14 @@
 import * as BABYLON from '@babylonjs/core'
 import { initKeyboard } from './input'
 import { setupEngine } from './setup'
-import { UserPreferencesManager } from '../../logic/user-preferences'
+import { InspectorPreferencesManager } from '../../logic/preferences/manager'
 
 /* 
   I refactored the piece that uses canvas and window into this file and ignored it from coverage 
   because it's not possible to test it without jsdom, and we can't use jsdom because of the ecs 
 */
 
-export function initRenderer(canvas: HTMLCanvasElement, userPreferencesManager: UserPreferencesManager) {
+export function initRenderer(canvas: HTMLCanvasElement, preferencesManager: InspectorPreferencesManager) {
   const engine = new BABYLON.Engine(canvas, true, {
     deterministicLockstep: true,
     lockstepMaxSteps: 4,
@@ -16,7 +16,7 @@ export function initRenderer(canvas: HTMLCanvasElement, userPreferencesManager: 
     antialias: true,
     stencil: true
   })
-  const renderer = setupEngine(engine, canvas, userPreferencesManager)
+  const renderer = setupEngine(engine, canvas, preferencesManager)
 
   // resize renderer when window is resized
   function resize() {

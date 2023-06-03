@@ -2,7 +2,7 @@ import * as BABYLON from '@babylonjs/core'
 import { GridMaterial } from '@babylonjs/materials'
 import { PARCEL_SIZE } from '../../utils/scene'
 import { CameraManager } from '../decentraland/camera'
-import { UserPreferencesManager } from '../../logic/user-preferences'
+import { InspectorPreferencesManager } from '../../logic/preferences/manager'
 
 // if NODE_ENV == development
 require('@babylonjs/inspector')
@@ -31,7 +31,7 @@ export namespace ambientConfigurations {
   export const BLUE = BABYLON.Color3.FromHexString('#00beff')
 }
 
-export function setupEngine(engine: BABYLON.Engine, canvas: HTMLCanvasElement, userPreferencesManager: UserPreferencesManager) {
+export function setupEngine(engine: BABYLON.Engine, canvas: HTMLCanvasElement, inspectorPreferencesManager: InspectorPreferencesManager) {
   /**
    * This is the main scene of the engine.
    */
@@ -117,8 +117,8 @@ export function setupEngine(engine: BABYLON.Engine, canvas: HTMLCanvasElement, u
     CAMERA_MIN_Y,
     CAMERA_ZOOM_SENSITIVITY
   )
-  cameraManager.setInvertXAxis(userPreferencesManager.preferences.camera.invertXAxis)
-  cameraManager.setInvertYAxis(userPreferencesManager.preferences.camera.invertYAxis)
+  cameraManager.setInvertXAxis(inspectorPreferencesManager.data.cameraInvertXAxis)
+  cameraManager.setInvertYAxis(inspectorPreferencesManager.data.cameraInvertYAxis)
 
   const hemiLight = new BABYLON.HemisphericLight('default light', ambientConfigurations.sunPosition, scene)
   hemiLight.diffuse = BABYLON.Color3.White()

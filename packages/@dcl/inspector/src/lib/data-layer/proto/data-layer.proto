@@ -30,12 +30,10 @@ message ImportAssetRequest {
   map<string, bytes> content = 3;
 }
 
-message UserPreferences {
-  message Camera {
-    bool invert_x_axis = 1;
-    bool invert_y_axis = 2;
-  }
-  Camera camera = 1;
+message InspectorPreferencesMessage {
+  bool camera_invert_x_axis = 1;
+  bool camera_invert_y_axis = 2;
+  bool autosave_enabled = 3;
 }
 
 service DataService {
@@ -48,6 +46,6 @@ service DataService {
   rpc ImportAsset(ImportAssetRequest) returns (Empty) {}
   rpc RemoveAsset(Asset) returns (Empty) {}
   rpc Save(Empty) returns (Empty) {}
-  rpc GetUserPreferences(Empty) returns (UserPreferences) {}
-  rpc SetUserPreferences(UserPreferences) returns (Empty) {}
+  rpc GetInspectorPreferences(Empty) returns (InspectorPreferencesMessage) {}
+  rpc SetInspectorPreferences(InspectorPreferencesMessage) returns (Empty) {}
 }

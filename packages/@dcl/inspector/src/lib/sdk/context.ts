@@ -14,7 +14,7 @@ import { getTransformNodeChecker } from './transform-node'
 import { createOperations } from './operations'
 import { Gizmos } from '../babylon/decentraland/gizmo-manager'
 import { CameraManager } from '../babylon/decentraland/camera'
-import { UserPreferencesManager } from '../logic/user-preferences'
+import { InspectorPreferencesManager } from '../logic/preferences/manager'
 
 export type SdkContextEvents = {
   change: { entity: Entity; operation: CrdtMessageType; component?: ComponentDefinition<any>; value?: any }
@@ -32,7 +32,7 @@ export type SdkContextValue = {
   operations: ReturnType<typeof createOperations>
   gizmos: Gizmos
   editorCamera: CameraManager
-  userPreferences: UserPreferencesManager
+  preferences: InspectorPreferencesManager
 }
 
 export async function createSdkContext(canvas: HTMLCanvasElement, catalog: ITheme[]): Promise<SdkContextValue> {
@@ -40,10 +40,10 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
   const dataLayer = await createDataLayerClientRpc()
 
   // fetch user preferences from the data layer
-  const userPreferences = await dataLayer.getUserPreferences({})
-  const userPreferencesManager = new UserPreferencesManager(userPreferences, dataLayer)
+  const preferences = await dataLayer.getInspectorPreferences({})
+  const preferencesManager = new InspectorPreferencesManager(preferences, dataLayer)
 
-  const renderer = initRenderer(canvas, userPreferencesManager)
+  const renderer = initRenderer(canvas, preferencesManager)
   const { scene } = renderer
 
   // create scene context
@@ -83,6 +83,6 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
     operations: createOperations(engine),
     gizmos: ctx.gizmos,
     editorCamera: renderer.editorCamera,
-    userPreferences: userPreferencesManager
+    preferences: preferencesManager
   }
 }

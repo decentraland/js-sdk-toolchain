@@ -9,6 +9,9 @@ import { FileOperation, initUndoRedo } from './undo-redo'
 import { minimalComposite } from '../client/feeded-local-fs'
 import upsertAsset from './upsert-asset'
 import { initSceneProvider } from './scene'
+import { readPreferencesFromFile, serializeInspectorPreferences } from '../../logic/preferences/io'
+
+const INSPECTOR_PREFERENCES_PATH = 'user-preferences.json'
 
 function setupEngineDump(
   fs: FileSystemInterface,
@@ -35,19 +38,13 @@ function setupEngineDump(
   }
 }
 
-// TODO: placeholder just for making things clear. We should replace this
-// with proper user settings when we have them...
-const userSettings = {
-  autoSave: true
-}
-
-const USER_PREFERENCES_FILE_PATH = 'user-preferences.json'
-
 export async function initRpcMethods(
   fs: FileSystemInterface,
   engine: IEngine,
   onChanges: OnChangeFunction[]
 ): Promise<DataLayerRpcServer> {
+  const inspectorPreferences = await readPreferencesFromFile(fs, INSPECTOR_PREFERENCES_PATH)
+
   // Look for a composite
   const currentCompositeResourcePath = 'main.composite'
 
@@ -83,7 +80,7 @@ export async function initRpcMethods(
   onChanges.push(() => (dirty = true))
 
   engine.addSystem(() => {
-    save(userSettings.autoSave)
+    save(inspectorPreferences.autosaveEnabled)
   }, -1_000_000_000)
 
   // TODO: review this to avoid this side-effect asignation...
@@ -160,16 +157,11 @@ export async function initRpcMethods(
       save()
       return {}
     },
-    async getUserPreferences() {
-      const fileExists = await fs.existFile(USER_PREFERENCES_FILE_PATH)
-      if (!fileExists)
-        return {camera: {invertXAxis: false, invertYAxis: false}}
-
-      const fileContent = await fs.readFile(USER_PREFERENCES_FILE_PATH)
-      return JSON.parse(fileContent.toString('utf-8'))
+    async getInspectorPreferences() {
+      return readPreferencesFromFile(fs, INSPECTOR_PREFERENCES_PATH)
     },
-    async setUserPreferences(req) {
-      await fs.writeFile(USER_PREFERENCES_FILE_PATH, Buffer.from(JSON.stringify(req, null, 2), 'utf-8'))
+    async setInspectorPreferences(req) {
+      await fs.writeFile(INSPECTOR_PREFERENCES_PATH, serializeInspectorPreferences(req))
       return {}
     }
   }

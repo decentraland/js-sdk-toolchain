@@ -19,13 +19,13 @@ export const Camera = withSdk(({ sdk }) => {
 
   const handleToggleInvertXAxis = useCallback(() => {
     sdk.editorCamera.setInvertXAxis(!invertXAxis)
-    sdk.userPreferences.setCameraInvertXAxis(!invertXAxis)
+    sdk.preferences.setCameraInvertXAxis(!invertXAxis)
     setInvertXAxis(!invertXAxis)
   }, [invertXAxis])
 
   const handleToggleInvertYAxis = useCallback(() => {
     sdk.editorCamera.setInvertYAxis(!invertYAxis)
-    sdk.userPreferences.setCameraInvertYAxis(!invertYAxis)
+    sdk.preferences.setCameraInvertYAxis(!invertYAxis)
     setInvertYAxis(!invertYAxis)
   }, [invertYAxis])
 
