@@ -43,7 +43,7 @@ export async function initRpcMethods(
   engine: IEngine,
   onChanges: OnChangeFunction[]
 ): Promise<DataLayerRpcServer> {
-  const inspectorPreferences = await readPreferencesFromFile(fs, INSPECTOR_PREFERENCES_PATH)
+  let inspectorPreferences = await readPreferencesFromFile(fs, INSPECTOR_PREFERENCES_PATH)
 
   // Look for a composite
   const currentCompositeResourcePath = 'main.composite'
@@ -158,9 +158,10 @@ export async function initRpcMethods(
       return {}
     },
     async getInspectorPreferences() {
-      return readPreferencesFromFile(fs, INSPECTOR_PREFERENCES_PATH)
+      return inspectorPreferences
     },
     async setInspectorPreferences(req) {
+      inspectorPreferences = req
       await fs.writeFile(INSPECTOR_PREFERENCES_PATH, serializeInspectorPreferences(req))
       return {}
     }
