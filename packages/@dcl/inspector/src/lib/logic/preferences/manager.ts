@@ -12,11 +12,11 @@ export class InspectorPreferencesManager {
 
   setCameraInvertXAxis(value: boolean) {
     this.data.cameraInvertXAxis = value
-    this.dataLayer.setInspectorPreferences(this.data)
+    void this.dataLayer.setInspectorPreferences(this.data)
   }
 
   setCameraInvertYAxis(value: boolean) {
     this.data.cameraInvertYAxis = value
-    this.dataLayer.setInspectorPreferences(this.data)
+    void this.dataLayer.setInspectorPreferences(this.data)
   }
 }

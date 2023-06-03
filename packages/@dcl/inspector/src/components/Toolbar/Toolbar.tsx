@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { BiUndo, BiRedo, BiSave, BiBadgeCheck, BiCameraMovie } from 'react-icons/bi'
+import { BiUndo, BiRedo, BiSave, BiBadgeCheck } from 'react-icons/bi'
 import { RiListSettingsLine } from 'react-icons/ri'
 
 import { fileSystemEvent } from '../../hooks/catalog/useFileSystem'

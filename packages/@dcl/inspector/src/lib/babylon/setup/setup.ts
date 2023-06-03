@@ -31,7 +31,11 @@ export namespace ambientConfigurations {
   export const BLUE = BABYLON.Color3.FromHexString('#00beff')
 }
 
-export function setupEngine(engine: BABYLON.Engine, canvas: HTMLCanvasElement, inspectorPreferencesManager: InspectorPreferencesManager) {
+export function setupEngine(
+  engine: BABYLON.Engine,
+  canvas: HTMLCanvasElement,
+  inspectorPreferencesManager: InspectorPreferencesManager
+) {
   /**
    * This is the main scene of the engine.
    */

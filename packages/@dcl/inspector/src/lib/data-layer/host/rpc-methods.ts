@@ -11,7 +11,7 @@ import upsertAsset from './upsert-asset'
 import { initSceneProvider } from './scene'
 import { readPreferencesFromFile, serializeInspectorPreferences } from '../../logic/preferences/io'
 
-const INSPECTOR_PREFERENCES_PATH = 'user-preferences.json'
+const INSPECTOR_PREFERENCES_PATH = 'inspector-preferences.json'
 
 function setupEngineDump(
   fs: FileSystemInterface,

@@ -1,6 +1,6 @@
 export type InspectorPreferences = {
-  cameraInvertXAxis: boolean,
-  cameraInvertYAxis: boolean,
+  cameraInvertXAxis: boolean
+  cameraInvertYAxis: boolean
   autosaveEnabled: boolean
 }
 

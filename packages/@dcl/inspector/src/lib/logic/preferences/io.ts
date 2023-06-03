@@ -1,13 +1,12 @@
-import Ajv, { JTDDataType } from "ajv/dist/jtd"
-import { FileSystemInterface } from "../../data-layer/types"
-import { InspectorPreferences, getDefaultInspectorPreferences } from "./types"
+import Ajv, { JTDDataType } from 'ajv/dist/jtd'
+import { FileSystemInterface } from '../../data-layer/types'
+import { InspectorPreferences, getDefaultInspectorPreferences } from './types'
 
 function fromPartialToFull<Type extends object>(partial: Partial<Type>, defaultFull: Type): Type {
-  const result = {...defaultFull}
-  for (let key in partial) {
+  const result = { ...defaultFull }
+  for (const key in partial) {
     const value = partial[key]
-    if (value !== undefined && value !== null)
-      result[key] = value
+    if (value !== undefined && value !== null) result[key] = value
   }
   return result
 }
@@ -28,15 +27,15 @@ function fromPartialToFull<Type extends object>(partial: Partial<Type>, defaultF
 */
 const shellSchema = {
   properties: {
-    version: {type: 'uint16'},
-    data: {properties: {}, additionalProperties: true}
+    version: { type: 'uint16' },
+    data: { properties: {}, additionalProperties: true }
   }
 }
 const v1Schema = {
   optionalProperties: {
-    cameraInvertXAxis: {type: 'boolean'},
-    cameraInvertYAxis: {type: 'boolean'},
-    autosaveEnabled: {type: 'boolean'}
+    cameraInvertXAxis: { type: 'boolean' },
+    cameraInvertYAxis: { type: 'boolean' },
+    autosaveEnabled: { type: 'boolean' }
   }
 } as const
 type JsonPreferencesV1 = JTDDataType<typeof v1Schema>
@@ -72,8 +71,7 @@ export function parseInspectorPreferences(content: string): InspectorPreferences
 
 export async function readPreferencesFromFile(fs: FileSystemInterface, path: string): Promise<InspectorPreferences> {
   const fileExists = await fs.existFile(path)
-  if (!fileExists)
-    return getDefaultInspectorPreferences()
+  if (!fileExists) return getDefaultInspectorPreferences()
 
   const fileContent = await fs.readFile(path)
   try {
@@ -85,9 +83,9 @@ export async function readPreferencesFromFile(fs: FileSystemInterface, path: str
     } else {
       throw error
     }
-  }  
+  }
 }
 
 export function serializeInspectorPreferences(value: InspectorPreferences): Buffer {
-  return Buffer.from(JSON.stringify({version: 1, data: value}, null, 2), 'utf-8')
+  return Buffer.from(JSON.stringify({ version: 1, data: value }, null, 2), 'utf-8')
 }

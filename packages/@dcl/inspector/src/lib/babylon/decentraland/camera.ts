@@ -141,7 +141,7 @@ class CameraMouseInput extends BABYLON.FreeCameraMouseInput {
   private invertYAxis = 1
 
   public getInvertXAxis() {
-    return this.invertXAxis == -1
+    return this.invertXAxis === -1
   }
 
   public setInvertXAxis(invert: boolean) {
@@ -149,7 +149,7 @@ class CameraMouseInput extends BABYLON.FreeCameraMouseInput {
   }
 
   public getInvertYAxis() {
-    return this.invertYAxis == -1
+    return this.invertYAxis === -1
   }
 
   public setInvertYAxis(invert: boolean) {
