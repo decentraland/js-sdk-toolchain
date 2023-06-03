@@ -17,6 +17,12 @@ export interface VideoEventsSystem {
   registerVideoEventsEntity(entity: Entity, callback: VideoEventsSystemCallback): void
 
   hasVideoEventsEntity(entity: Entity): boolean
+
+  /**
+   * Returns the latest state of the VideoEvent
+   * @param entity - Entity to retrieve the video status
+   */
+  getVideoState(entity: Entity): DeepReadonlyObject<PBVideoEvent> | undefined
 }
 
 /**
@@ -58,27 +64,17 @@ export function createVideoEventsSystem(engine: IEngine): VideoEventsSystem {
 
       // Compare with last state
       const videoEvent = videoEventComponent.get(entity)
-      const values = videoEvent.values()
-      const valuesAmount = videoEvent.size
-      let latestVideoEventComponentState = undefined
+      const values = Array.from(videoEvent.values())
+      const lastValue = values[videoEvent.size - 1]
 
-      // get latest component state
-      let index = 0
-      for (const value of values) {
-        if (index === valuesAmount - 1) latestVideoEventComponentState = value
-        index++
-      }
-      if (
-        latestVideoEventComponentState === undefined ||
-        (data.lastVideoState !== undefined && data.lastVideoState === latestVideoEventComponentState.state)
-      )
+      if (lastValue === undefined || (data.lastVideoState !== undefined && data.lastVideoState === lastValue.state))
         continue
 
-      data.callback(latestVideoEventComponentState)
+      data.callback(lastValue)
 
       entitiesCallbackVideoStateMap.set(entity, {
         callback: data.callback,
-        lastVideoState: latestVideoEventComponentState.state
+        lastVideoState: lastValue.state
       })
     }
   })
@@ -92,6 +88,12 @@ export function createVideoEventsSystem(engine: IEngine): VideoEventsSystem {
     },
     hasVideoEventsEntity(entity: Entity) {
       return hasVideoEventsEntity(entity)
+    },
+    getVideoState(entity: Entity) {
+      const videoEvent = videoEventComponent.get(entity)
+      const values = Array.from(videoEvent.values())
+      const lastValue = values[videoEvent.size - 1]
+      return lastValue
     }
   }
 }

@@ -111,4 +111,15 @@ describe('build:helpers', () => {
       env: process.env
     })
   })
+
+  it('npmCommand: should build pass on the process.env', async () => {
+    const components = await initComponents()
+    const execSpy = jest.spyOn(components.spawner, 'exec').mockResolvedValue()
+
+    await projectValidation.npmCommand(components, 'some/path', 'install', 'boedo')
+
+    expect(execSpy).toBeCalledWith('some/path', 'npm', ['install', 'boedo', '--silent'], {
+      env: process.env
+    })
+  })
 })

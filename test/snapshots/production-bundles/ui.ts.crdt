@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=317.8k bytes
+SCENE_COMPILED_JS_SIZE_PROD=318.1k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -9,7 +9,7 @@ EVAL test/snapshots/production-bundles/ui.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 42k
-  MALLOC_COUNT = 16004
+  MALLOC_COUNT = 16006
   ALIVE_OBJS_DELTA ~= 3.03k
 CALL onStart()
   OPCODES ~= 0k
@@ -47,7 +47,7 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x202 c=1093 t=1 data={"placeholder":"SARASA","disabled":false}
   Scene: PUT_COMPONENT e=0x209 c=1093 t=1 data={"placeholder":"","disabled":false}
   Scene: PUT_COMPONENT e=0x201 c=1094 t=1 data={"acceptEmpty":false,"options":["BOEDO","CASLA"],"selectedIndex":0,"disabled":false,"color":{"r":1,"g":0,"b":0,"a":1}}
-  OPCODES ~= 119k
+  OPCODES ~= 120k
   MALLOC_COUNT = 680
   ALIVE_OBJS_DELTA ~= 0.24k
 CALL onUpdate(0.1)
@@ -65,4 +65,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 61k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1506.18k bytes
+  MEMORY_USAGE_COUNT ~= 1507.10k bytes
