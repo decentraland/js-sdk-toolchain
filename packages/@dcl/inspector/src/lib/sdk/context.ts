@@ -41,9 +41,8 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
 
   // fetch user preferences from the data layer
   const preferences = await dataLayer.getInspectorPreferences({})
-  const preferencesManager = new InspectorPreferencesManager(preferences, dataLayer)
 
-  const renderer = initRenderer(canvas, preferencesManager)
+  const renderer = initRenderer(canvas, preferences)
   const { scene } = renderer
 
   // create scene context
@@ -83,6 +82,6 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
     operations: createOperations(engine),
     gizmos: ctx.gizmos,
     editorCamera: renderer.editorCamera,
-    preferences: preferencesManager
+    preferences: new InspectorPreferencesManager(preferences, dataLayer)
   }
 }
