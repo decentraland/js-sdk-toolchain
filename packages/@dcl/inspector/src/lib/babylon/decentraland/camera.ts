@@ -53,16 +53,8 @@ export class CameraManager {
     return this.speedChangeObservable
   }
 
-  getInvertXAxis() {
-    return this.mouseInput.getInvertXAxis()
-  }
-
   setInvertXAxis(invert: boolean) {
     this.mouseInput.setInvertXAxis(invert)
-  }
-
-  getInvertYAxis() {
-    return this.mouseInput.getInvertYAxis()
   }
 
   setInvertYAxis(invert: boolean) {
