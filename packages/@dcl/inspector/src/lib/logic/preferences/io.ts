@@ -6,9 +6,9 @@ import { InspectorPreferences, getDefaultInspectorPreferences } from './types'
   Preferences file is a JSON dictionary with version and data fields.
   This outer structure is called 'shell'.
   Version 1's data is a 1-level deep dictionary, i.e.
-  type dataV1 = {[key: string]: string | number | boolean}.
+  type dataV1 = {[key: string]: string | number | boolean | enum}.
   Every preference (key) is treated as optional.
-  Example of valid file:
+  Example of valid V1 file:
   {
     "version": 1,
     "data": {
@@ -18,7 +18,7 @@ import { InspectorPreferences, getDefaultInspectorPreferences } from './types'
 
   Versioning policy:
   1. Adding new fields is OK.
-  2. Renaming existing field or changing its type is not OK, requires new version.
+  2. Deleting or renaming field or changing its type is not OK, requires new version.
 */
 const shellSchema = {
   properties: {

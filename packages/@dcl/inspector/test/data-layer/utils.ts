@@ -20,12 +20,11 @@ export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
   beforeAll(async () => {
     const fs = await feededFileSystem({})
     dataLayer = await createLocalDataLayerRpcClient(fs)
-    // Setting autosave enabled to improve test coverage
-    const preferences = {
+    // Enable autosave to improve test coverage
+    await dataLayer.setInspectorPreferences({
       ...getDefaultInspectorPreferences(),
       autosaveEnabled: true
-    }
-    await dataLayer.setInspectorPreferences(preferences)
+    })
 
     const engine = new BABYLON.NullEngine({
       renderWidth: 512,
