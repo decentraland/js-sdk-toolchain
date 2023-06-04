@@ -10,13 +10,8 @@ export class InspectorPreferencesManager {
     this.dataLayer = dataLayer
   }
 
-  setCameraInvertXAxis(value: boolean) {
-    this.data.cameraInvertXAxis = value
-    void this.dataLayer.setInspectorPreferences(this.data)
-  }
-
-  setCameraInvertYAxis(value: boolean) {
-    this.data.cameraInvertYAxis = value
+  setFreeCameraInvertRotation(invert: boolean) {
+    this.data.freeCameraInvertRotation = invert
     void this.dataLayer.setInspectorPreferences(this.data)
   }
 }

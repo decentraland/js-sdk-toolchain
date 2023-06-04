@@ -2,7 +2,6 @@ import * as BABYLON from '@babylonjs/core'
 import { Keys, keyState } from './keys'
 import { PARCEL_SIZE } from '../../utils/scene'
 import mitt, { Emitter } from 'mitt'
-import { CameraMouseInput } from './camera-input-patch'
 
 type SpeedChangeEvent = { change: number }
 
@@ -12,13 +11,13 @@ enum SpeedIncrement {
 }
 
 export class CameraManager {
+  private static ANGULAR_SENSIBILITY = 500
   private speeds: Array<number>
   private speedIndex: number
   private minY: number
   private zoomSensitivity: number
-  private camera: BABYLON.TargetCamera
+  private camera: BABYLON.FreeCamera
   private speedChangeObservable: Emitter<SpeedChangeEvent>
-  private mouseInput: CameraMouseInput
 
   constructor(
     scene: BABYLON.Scene,
@@ -33,7 +32,6 @@ export class CameraManager {
     this.minY = minY
     this.zoomSensitivity = zoomSensitivity
     this.speedChangeObservable = mitt<SpeedChangeEvent>()
-    this.mouseInput = new CameraMouseInput()
 
     this.camera = this.createCamera(scene)
     scene.activeCamera?.detachControl()
@@ -53,12 +51,9 @@ export class CameraManager {
     return this.speedChangeObservable
   }
 
-  setInvertXAxis(invert: boolean) {
-    this.mouseInput.setInvertXAxis(invert)
-  }
-
-  setInvertYAxis(invert: boolean) {
-    this.mouseInput.setInvertYAxis(invert)
+  setFreeCameraInvertRotation(invert: boolean) {
+    const sign = invert ? -1 : 1
+    this.camera.angularSensibility = sign * CameraManager.ANGULAR_SENSIBILITY
   }
 
   private createCamera(scene: BABYLON.Scene) {
@@ -67,12 +62,9 @@ export class CameraManager {
     const camera = new BABYLON.FreeCamera('editorCamera', center.subtractFromFloats(size, -size * 1.5, size * 2))
     camera.target = center
 
-    camera.inputs.removeMouse()
-    camera.inputs.add(this.mouseInput)
-
     camera.inertia = 0
     camera.speed = this.speeds[this.speedIndex]
-    camera.angularSensibility = 500
+    camera.angularSensibility = CameraManager.ANGULAR_SENSIBILITY
 
     camera.keysDown = [Keys.KEY_S, Keys.KEY_DOWN]
     camera.keysUp = [Keys.KEY_W, Keys.KEY_UP]

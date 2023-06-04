@@ -33,8 +33,7 @@ const shellSchema = {
 }
 const v1Schema = {
   optionalProperties: {
-    cameraInvertXAxis: { type: 'boolean' },
-    cameraInvertYAxis: { type: 'boolean' },
+    freeCameraInvertRotation: { type: 'boolean' },
     autosaveEnabled: { type: 'boolean' }
   }
 } as const

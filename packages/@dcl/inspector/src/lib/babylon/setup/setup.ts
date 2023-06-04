@@ -117,8 +117,7 @@ export function setupEngine(engine: BABYLON.Engine, canvas: HTMLCanvasElement, p
     CAMERA_MIN_Y,
     CAMERA_ZOOM_SENSITIVITY
   )
-  cameraManager.setInvertXAxis(preferences.cameraInvertXAxis)
-  cameraManager.setInvertYAxis(preferences.cameraInvertYAxis)
+  cameraManager.setFreeCameraInvertRotation(preferences.freeCameraInvertRotation)
 
   const hemiLight = new BABYLON.HemisphericLight('default light', ambientConfigurations.sunPosition, scene)
   hemiLight.diffuse = BABYLON.Color3.White()

@@ -31,9 +31,8 @@ message ImportAssetRequest {
 }
 
 message InspectorPreferencesMessage {
-  bool camera_invert_x_axis = 1;
-  bool camera_invert_y_axis = 2;
-  bool autosave_enabled = 3;
+  bool free_camera_invert_rotation = 1;
+  bool autosave_enabled = 2;
 }
 
 service DataService {

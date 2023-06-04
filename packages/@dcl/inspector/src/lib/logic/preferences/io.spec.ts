@@ -28,20 +28,20 @@ describe('Parsing inspector preferences', () => {
 
   it('throws InvalidPreferences if v1 data is invalid', () => {
     expect(() => {
-      parseInspectorPreferences('{"version": 1, "data": {"cameraInvertXAxis": 1}}')
+      parseInspectorPreferences('{"version": 1, "data": {"freeCameraInvertRotation": 1}}')
     }).toThrow(InvalidPreferences)
   })
 
   it('correctly parses v1 data and returns full set of preferences even if some are omitted in input', () => {
     const preferences = getDefaultInspectorPreferences()
-    preferences.cameraInvertXAxis = true
-    expect(parseInspectorPreferences('{"version": 1, "data": {"cameraInvertXAxis": true}}')).toEqual(preferences)
+    preferences.freeCameraInvertRotation = true
+    expect(parseInspectorPreferences('{"version": 1, "data": {"freeCameraInvertRotation": true}}')).toEqual(preferences)
   })
 })
 
 describe('Reading preferences file', () => {
   const memoryFs = createFsInMemory({
-    goodFile: Buffer.from('{"version": 1, "data": {"cameraInvertXAxis": true}}'),
+    goodFile: Buffer.from('{"version": 1, "data": {"freeCameraInvertRotation": true}}'),
     badFile: Buffer.from('{"value":}')
   })
 
@@ -57,7 +57,7 @@ describe('Reading preferences file', () => {
 
   it('returns correct preferences if file is well-formed', async () => {
     const preferences = getDefaultInspectorPreferences()
-    preferences.cameraInvertXAxis = true
+    preferences.freeCameraInvertRotation = true
     expect(await readPreferencesFromFile(memoryFs, 'goodFile')).toEqual(preferences)
   })
 })
@@ -67,7 +67,7 @@ describe('Writing preferences file', () => {
 
   it('correctly writes preferences to a file', async () => {
     const preferences = getDefaultInspectorPreferences()
-    preferences.cameraInvertXAxis = true
+    preferences.freeCameraInvertRotation = true
     await memoryFs.writeFile('goodFile', serializeInspectorPreferences(preferences))
     expect(await readPreferencesFromFile(memoryFs, 'goodFile')).toEqual(preferences)
   })

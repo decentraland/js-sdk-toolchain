@@ -1,13 +1,11 @@
 export type InspectorPreferences = {
-  cameraInvertXAxis: boolean
-  cameraInvertYAxis: boolean
+  freeCameraInvertRotation: boolean
   autosaveEnabled: boolean
 }
 
 export function getDefaultInspectorPreferences(): InspectorPreferences {
   return {
-    cameraInvertXAxis: false,
-    cameraInvertYAxis: false,
+    freeCameraInvertRotation: false,
     autosaveEnabled: false
   }
 }
