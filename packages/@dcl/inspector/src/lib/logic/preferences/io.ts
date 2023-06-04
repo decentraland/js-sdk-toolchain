@@ -24,6 +24,10 @@ function fromPartialToFull<Type extends object>(partial: Partial<Type>, defaultF
       "autosaveEnabled": true
     }
   }
+
+  Versioning policy:
+  1. Adding new fields is OK.
+  2. Renaming existing field or changing its type is not OK, requires new version.
 */
 const shellSchema = {
   properties: {
