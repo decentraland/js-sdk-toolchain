@@ -2,15 +2,6 @@ import Ajv, { JTDDataType } from 'ajv/dist/jtd'
 import { FileSystemInterface } from '../../data-layer/types'
 import { InspectorPreferences, getDefaultInspectorPreferences } from './types'
 
-function fromPartialToFull<Type extends object>(partial: Partial<Type>, defaultFull: Type): Type {
-  const result = { ...defaultFull }
-  for (const key in partial) {
-    const value = partial[key]
-    if (value !== undefined && value !== null) result[key] = value
-  }
-  return result
-}
-
 /*
   Preferences file is a JSON dictionary with version and data fields.
   This outer structure is called 'shell'.
@@ -63,7 +54,10 @@ export function parseInspectorPreferences(content: string): InspectorPreferences
 
   if (jsonContent.version === 1) {
     if (validateV1(jsonContent.data)) {
-      return fromPartialToFull(jsonContent.data, getDefaultInspectorPreferences())
+      return {
+        ...getDefaultInspectorPreferences(),
+        ...jsonContent.data
+      }
     } else {
       throw new InvalidPreferences(`invalid v1 data: ${ajv.errorsText(validateV1.errors)}`)
     }

@@ -33,8 +33,10 @@ describe('Parsing inspector preferences', () => {
   })
 
   it('correctly parses v1 data and returns full set of preferences even if some are omitted in input', () => {
-    const preferences = getDefaultInspectorPreferences()
-    preferences.freeCameraInvertRotation = true
+    const preferences = {
+      ...getDefaultInspectorPreferences(),
+      freeCameraInvertRotation: true
+    }
     expect(parseInspectorPreferences('{"version": 1, "data": {"freeCameraInvertRotation": true}}')).toEqual(preferences)
   })
 })
@@ -56,8 +58,10 @@ describe('Reading preferences file', () => {
   })
 
   it('returns correct preferences if file is well-formed', async () => {
-    const preferences = getDefaultInspectorPreferences()
-    preferences.freeCameraInvertRotation = true
+    const preferences = {
+      ...getDefaultInspectorPreferences(),
+      freeCameraInvertRotation: true
+    }
     expect(await readPreferencesFromFile(memoryFs, 'goodFile')).toEqual(preferences)
   })
 })
@@ -66,8 +70,10 @@ describe('Writing preferences file', () => {
   const memoryFs = createFsInMemory({})
 
   it('correctly writes preferences to a file', async () => {
-    const preferences = getDefaultInspectorPreferences()
-    preferences.freeCameraInvertRotation = true
+    const preferences = {
+      ...getDefaultInspectorPreferences(),
+      freeCameraInvertRotation: true
+    }
     await memoryFs.writeFile('goodFile', serializeInspectorPreferences(preferences))
     expect(await readPreferencesFromFile(memoryFs, 'goodFile')).toEqual(preferences)
   })
