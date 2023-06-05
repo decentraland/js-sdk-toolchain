@@ -27,7 +27,9 @@ When *Transform subset* has one entity: show gizmo anchored to local (0, 0, 0) o
 When *Transform subset* has multiple entities:
 
 * Translation tool: show gizmo anchored at geometric mean of local (0, 0, 0) of entities that belong to *root subset* of *Transform subset*. Apply relative translation of gizmo to those entities. Gizmo is world-axes aligned.
+
 * Rotation tool: show gizmo anchored at geometric mean of local (0, 0, 0) of entities that belong to *root subset* of *Transform subset*. Rotate those entities about gizmo's axes (not local world-aligned axes). Gizmo is world-axes aligned.
+
 * Scaling tool: show gizmo anchored at geometric mean of local (0, 0, 0) of entities that belong to *root subset* of *Transform subset*. Apply scaling of gizmo to those entities.
 
 ## Visuals in entity inspector
@@ -37,6 +39,9 @@ If exactly one entity is selected, show its components, otherwise, show nothing.
 ## Operations
 
 * `Left-click` on an entity in either composite inspector or renderer clears a selected set and then adds a target entity to it. Supports undo/redo.
+
 * `Ctrl + left-click` on an entity in either composite inspector or renderer adds an entity to a selected set if it is not in already, and removes it from selected set otherwise. Supports undo/redo.
+
 * Select subtree: a context menu option. Clears selected set and adds all entities that belong to target entity's subtree to selected set. Supports undo/redo.
+
 * Invert selection: a context menu option. Every selected entity in a currently selected composite becomes unselected, every unselected entity becomes selected. Supports undo/redo.
