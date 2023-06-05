@@ -7,15 +7,24 @@ import { createLocalDataLayerRpcClient } from '../../src/lib/data-layer/client/l
 import { feededFileSystem } from '../../src/lib/data-layer/client/feeded-local-fs'
 import { DataLayerRpcClient } from '../../src/lib/data-layer/types'
 import { createOperations } from '../../src/lib/sdk/operations'
+import { getDefaultInspectorPreferences } from '../../src/lib/logic/preferences/types'
 
 export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
   let sceneCtx: SceneContext
   let dataLayer: DataLayerRpcClient
-  let inspector: Omit<SdkContextValue, 'scene' | 'dataLayer' | 'operations'>
+  let inspector: Omit<
+    SdkContextValue,
+    'scene' | 'dataLayer' | 'operations' | 'editorCamera' | 'sceneContext' | 'gizmos' | 'preferences'
+  >
 
   beforeAll(async () => {
     const fs = await feededFileSystem({})
     dataLayer = await createLocalDataLayerRpcClient(fs)
+    // Enable autosave to improve test coverage
+    await dataLayer.setInspectorPreferences({
+      ...getDefaultInspectorPreferences(),
+      autosaveEnabled: true
+    })
 
     const engine = new BABYLON.NullEngine({
       renderWidth: 512,

@@ -47,6 +47,16 @@
   margin-right: 4px;
 }
 
+.Tree .item svg {
+  flex-shrink: 0;
+}
+
+.Tree .entity-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .Tree .contexify svg {
   color: var(--contexify-item-color);
   margin-right: 4px;

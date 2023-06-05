@@ -1,0 +1,46 @@
+.Camera {
+  position: relative;
+}
+
+.Camera .camera {
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 100%;
+}
+
+.Camera .camera svg {
+  transform: translateX(1px) translateY(2px);
+}
+
+.Camera .panel {
+  display: none;
+  position: absolute;
+  top: 100%;
+  width: 150px;
+  background-color: #1e1e1e;
+  z-index: 1;
+  padding: 12px;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.Camera .panel.visible {
+  display: block;
+}
+
+.Camera .panel .icon {
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  right: -5px;
+  top: -5px;
+}
+
+.Camera .panel .axis {
+  position: relative;
+}
+
+.Camera .panel .axis label {
+  color: var(--secondary-text);
+}

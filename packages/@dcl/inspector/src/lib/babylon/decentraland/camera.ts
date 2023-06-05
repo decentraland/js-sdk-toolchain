@@ -5,40 +5,55 @@ import mitt, { Emitter } from 'mitt'
 
 type SpeedChangeEvent = { change: number }
 
-let SPEEDS = [...Array(40).keys()].map((_, i) => {
-  return (i + 1) * 0.5
-})
-SPEEDS = SPEEDS.concat([25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100])
-
-const CAMERA_MIN_Y = 1
-const WHEEL_MOVE_SPEED = 1
-
 enum SpeedIncrement {
   FASTER = 1,
   SLOWER = -1
 }
 
 export class CameraManager {
+  private static ANGULAR_SENSIBILITY = 500
+  private speeds: Array<number>
   private speedIndex: number
-  private camera: BABYLON.TargetCamera
+  private minY: number
+  private zoomSensitivity: number
+  private camera: BABYLON.FreeCamera
   private speedChangeObservable: Emitter<SpeedChangeEvent>
 
-  constructor(scene: BABYLON.Scene) {
-    this.speedIndex = 10
-    this.camera = this.createCamera(scene)
+  constructor(
+    scene: BABYLON.Scene,
+    inputSource: HTMLElement,
+    speeds: Array<number>,
+    initialSpeedIndex: number,
+    minY: number,
+    zoomSensitivity: number
+  ) {
+    this.speeds = speeds
+    this.speedIndex = initialSpeedIndex
+    this.minY = minY
+    this.zoomSensitivity = zoomSensitivity
     this.speedChangeObservable = mitt<SpeedChangeEvent>()
+
+    this.camera = this.createCamera(scene)
+    scene.activeCamera?.detachControl()
+    scene.activeCamera = this.camera
+    scene.activeCamera.attachControl(inputSource, true)
   }
 
-  getCamera() {
-    return this.camera
+  getGlobalPosition() {
+    return this.camera.globalPosition
   }
 
   getSpeed() {
-    return SPEEDS[this.speedIndex]
+    return this.speeds[this.speedIndex]
   }
 
   getSpeedChangeObservable() {
     return this.speedChangeObservable
+  }
+
+  setFreeCameraInvertRotation(invert: boolean) {
+    const sign = invert ? -1 : 1
+    this.camera.angularSensibility = sign * CameraManager.ANGULAR_SENSIBILITY
   }
 
   private createCamera(scene: BABYLON.Scene) {
@@ -48,8 +63,8 @@ export class CameraManager {
     camera.target = center
 
     camera.inertia = 0
-    camera.speed = SPEEDS[this.speedIndex]
-    camera.angularSensibility = 500
+    camera.speed = this.speeds[this.speedIndex]
+    camera.angularSensibility = CameraManager.ANGULAR_SENSIBILITY
 
     camera.keysDown = [Keys.KEY_S, Keys.KEY_DOWN]
     camera.keysUp = [Keys.KEY_W, Keys.KEY_UP]
@@ -80,7 +95,7 @@ export class CameraManager {
           else if (browserEvent.deltaY > 0) this.changeSpeed(SpeedIncrement.SLOWER)
         } else {
           const direction = camera.target.subtract(camera.position)
-          direction.normalize().scaleInPlace(WHEEL_MOVE_SPEED)
+          direction.normalize().scaleInPlace(this.zoomSensitivity)
           if (browserEvent.deltaY > 0) direction.negateInPlace()
           camera.position.addInPlace(direction)
         }
@@ -88,8 +103,8 @@ export class CameraManager {
     })
 
     scene.registerBeforeRender(() => {
-      if (camera.position.y <= CAMERA_MIN_Y) {
-        camera.position.y = CAMERA_MIN_Y
+      if (camera.position.y <= this.minY) {
+        camera.position.y = this.minY
       }
     })
     return camera
@@ -97,11 +112,11 @@ export class CameraManager {
 
   private changeSpeed(increment: SpeedIncrement) {
     if (increment === SpeedIncrement.FASTER) {
-      if (this.speedIndex < SPEEDS.length - 1) this.speedIndex += 1
+      if (this.speedIndex < this.speeds.length - 1) this.speedIndex += 1
     } else {
       if (this.speedIndex > 0) this.speedIndex -= 1
     }
-    this.camera.speed = SPEEDS[this.speedIndex]
+    this.camera.speed = this.speeds[this.speedIndex]
     this.speedChangeObservable.emit('change', this.camera.speed)
   }
 }

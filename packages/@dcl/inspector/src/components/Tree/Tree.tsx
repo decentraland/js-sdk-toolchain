@@ -147,7 +147,7 @@ export function Tree<T>() {
           <ContextMenu {...controlsProps} />
           <div style={getEditModeStyles(editMode)}>
             {props.getIcon ? props.getIcon(value) : open ? <IoIosArrowDown /> : <IoIosArrowForward />}
-            <span>{label || id}</span>
+            <span className="entity-label">{label || id}</span>
           </div>
           {editMode && typeof label === 'string' && (
             <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />

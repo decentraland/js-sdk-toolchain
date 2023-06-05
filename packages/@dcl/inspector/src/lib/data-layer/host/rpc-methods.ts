@@ -9,6 +9,9 @@ import { FileOperation, initUndoRedo } from './undo-redo'
 import { minimalComposite } from '../client/feeded-local-fs'
 import upsertAsset from './upsert-asset'
 import { initSceneProvider } from './scene'
+import { readPreferencesFromFile, serializeInspectorPreferences } from '../../logic/preferences/io'
+
+const INSPECTOR_PREFERENCES_PATH = 'inspector-preferences.json'
 
 function setupEngineDump(
   fs: FileSystemInterface,
@@ -35,17 +38,13 @@ function setupEngineDump(
   }
 }
 
-// TODO: placeholder just for making things clear. We should replace this
-// with proper user settings when we have them...
-const userSettings = {
-  autoSave: true
-}
-
 export async function initRpcMethods(
   fs: FileSystemInterface,
   engine: IEngine,
   onChanges: OnChangeFunction[]
 ): Promise<DataLayerRpcServer> {
+  let inspectorPreferences = await readPreferencesFromFile(fs, INSPECTOR_PREFERENCES_PATH)
+
   // Look for a composite
   const currentCompositeResourcePath = 'main.composite'
 
@@ -81,7 +80,7 @@ export async function initRpcMethods(
   onChanges.push(() => (dirty = true))
 
   engine.addSystem(() => {
-    save(userSettings.autoSave)
+    save(inspectorPreferences.autosaveEnabled)
   }, -1_000_000_000)
 
   // TODO: review this to avoid this side-effect asignation...
@@ -156,6 +155,14 @@ export async function initRpcMethods(
     },
     async save() {
       save()
+      return {}
+    },
+    async getInspectorPreferences() {
+      return inspectorPreferences
+    },
+    async setInspectorPreferences(req) {
+      inspectorPreferences = req
+      await fs.writeFile(INSPECTOR_PREFERENCES_PATH, serializeInspectorPreferences(req))
       return {}
     }
   }

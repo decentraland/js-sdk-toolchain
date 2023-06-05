@@ -17,7 +17,7 @@ function HierarchyIcon({ value, hasChildrens, isOpen }: { value: Entity; hasChil
   if (!hasChildrens) {
     return (
       <>
-        <span style={{ marginLeft: '14px' }} />
+        <span style={{ marginLeft: '13px' }} />
         <FiHexagon />
       </>
     )
