@@ -4,7 +4,7 @@ For every composite the Editor maintains a set of selected entities.
 
 *Subtree* of an entity is set comprised of entity itself and all its descendants.
 
-*Transform subset* is subset of entity set that includes only entities endowed with Transform component.
+*Transform subset* is a subset of entity set which includes only entities endowed with Transform component.
 
 *Root subset* is a subset of entity set such that: subtrees of *root subset* entities do not intersect and cover all entities of a set. In the example below `(S2, S4)` is a *root subset* of selected set `(S2, S4, S4)`.
 
