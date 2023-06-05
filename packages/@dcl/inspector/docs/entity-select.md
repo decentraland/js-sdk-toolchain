@@ -2,11 +2,11 @@
 
 For every composite the Editor maintains a set of selected entities.
 
-*Subtree* of an entity is set comprised of entity itself and all its descendants.
+*Subtree* of an entity is a set comprised of entity itself and all its descendants.
 
-*Transform subset* is a subset of entity set which includes only entities endowed with Transform component.
+*Transform subset* is a subset of an entity set which includes only entities endowed with Transform component.
 
-*Root subset* is a subset of entity set such that: subtrees of *root subset* entities do not intersect and cover all entities of a set. In the example below `(S2, S4)` is a *root subset* of selected set `(S2, S4, S4)`.
+*Root subset* is a subset of an entity set such that: subtrees of *root subset* entities do not intersect and cover all entities of a set. In the example below `(S2, S4)` is a *root subset* of selected set `(S2, S4, S4)`.
 
 ```
 E1 -> S2 -> S3 -> E4
@@ -26,11 +26,11 @@ When *Transform subset* has one entity: show gizmo anchored to local (0, 0, 0) o
 
 When *Transform subset* has multiple entities:
 
-* Translation tool: show gizmo anchored at geometric mean of local (0, 0, 0) of entities that belong to *root subset* of *Transform subset*. Apply relative translation of gizmo to those entities. Gizmo is world-axes aligned.
+* Translation tool: show gizmo anchored to geometric mean of local (0, 0, 0) of entities that belong to a *root subset* of *Transform subset*. Apply relative translation of gizmo to those entities. Gizmo is world-axes aligned.
 
-* Rotation tool: show gizmo anchored at geometric mean of local (0, 0, 0) of entities that belong to *root subset* of *Transform subset*. Rotate those entities about gizmo's axes (not local world-aligned axes). Gizmo is world-axes aligned.
+* Rotation tool: show gizmo anchored to geometric mean of local (0, 0, 0) of entities that belong to a *root subset* of *Transform subset*. Rotate those entities about gizmo's axes (not local world-aligned axes). Gizmo is world-axes aligned.
 
-* Scaling tool: show gizmo anchored at geometric mean of local (0, 0, 0) of entities that belong to *root subset* of *Transform subset*. Apply scaling of gizmo to those entities.
+* Scaling tool: show gizmo anchored to geometric mean of local (0, 0, 0) of entities that belong to a *root subset* of *Transform subset*. Apply relative scaling of gizmo to those entities.
 
 ## Visuals in entity inspector
 
