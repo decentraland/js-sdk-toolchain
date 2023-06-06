@@ -1,38 +1,55 @@
-import { ComponentDefinition, CrdtMessageType, Entity } from '@dcl/ecs'
+import { CrdtMessageType, OnChangeFunction } from '@dcl/ecs'
 import { Scene } from '@dcl/schemas'
 
 import { FileSystemInterface } from '../types'
 import { parseSceneFromComponent } from './utils/component'
 import { EditorComponentIds, EditorComponentsTypes } from '../../sdk/components'
 
-function getUpdatedSceneBuffer(sceneBuffer: Buffer, value: EditorComponentsTypes['Scene']) {
-  const scene: Scene = JSON.parse(sceneBuffer.toString())
-  const updatedScene: Scene = {
+export interface SceneProvider {
+  onChange: OnChangeFunction
+  getScene: () => Scene
+}
+
+function bufferToScene(sceneBuffer: Buffer): Scene {
+  return JSON.parse(sceneBuffer.toString())
+}
+
+function sceneToBuffer(scene: Scene): Buffer {
+  return Buffer.from(JSON.stringify(scene), 'utf-8')
+}
+
+function updateScene(scene: Scene, value: EditorComponentsTypes['Scene']): Scene {
+  return {
     ...scene,
     ...parseSceneFromComponent(value)
   }
-
-  return Buffer.from(JSON.stringify(updatedScene), 'utf-8')
 }
 
-export function initSceneProvider(fs: FileSystemInterface) {
+async function getScene(fs: FileSystemInterface): Promise<Scene> {
+  try {
+    return bufferToScene(await fs.readFile('scene.json'))
+  } catch (e) {
+    console.error('Reading scene.json file failed: ', e)
+  }
+
+  // maybe some defaults? idk...
+  return {} as Scene
+}
+
+export async function initSceneProvider(fs: FileSystemInterface): Promise<SceneProvider> {
+  let scene: Scene = await getScene(fs)
+
   return {
-    onChange: function onChange(
-      _: Entity,
-      operation: CrdtMessageType,
-      component: ComponentDefinition<unknown> | undefined,
-      componentValue: unknown
-    ) {
+    onChange(_, operation, component, componentValue) {
       if (operation === CrdtMessageType.PUT_COMPONENT && component?.componentName === EditorComponentIds.Scene) {
-        fs.readFile('scene.json')
-          .then((content) => {
-            const value = componentValue as EditorComponentsTypes['Scene']
-            fs.writeFile('scene.json', getUpdatedSceneBuffer(content, value)).catch((err) =>
-              console.error('Failed saving scene.json: ', err)
-            )
-          })
-          .catch((err) => console.error('Reading scene.json file failed: ', err))
+        scene = updateScene(scene, componentValue as EditorComponentsTypes['Scene'])
+        fs.writeFile('scene.json', sceneToBuffer(scene)).catch((err) =>
+          console.error('Failed saving scene.json: ', err)
+        )
       }
+    },
+    getScene() {
+      return scene
     }
   }
 }

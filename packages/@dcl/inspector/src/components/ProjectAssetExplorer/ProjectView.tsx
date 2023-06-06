@@ -221,6 +221,7 @@ function ProjectView({ folders }: Props) {
             getLabel={(val: string) => <span>{tree.get(val)?.name ?? val}</span>}
             isOpen={isOpen}
             isSelected={(val: string) => lastSelected === val}
+            isHidden={(val: string) => val === ROOT}
             canRename={() => false}
             canRemove={(val) => tree.get(val)?.type === 'asset'}
             canAddChild={() => false}

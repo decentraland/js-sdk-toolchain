@@ -74,7 +74,6 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
     setAssetPackageName(file.name.trim().replaceAll(' ', '_').toLowerCase().split('.')[0])
   }
 
-  const destFolder = 'assets/'
   const handleSave = () => {
     const reader = new FileReader()
     if (!file) return
@@ -95,9 +94,11 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
       const content: Map<string, Uint8Array> = new Map()
       content.set(file.name, new Uint8Array(binary))
 
+      const basePath = (await sdk!.dataLayer.getProjectData({})).path
+
       await sdk!.dataLayer.importAsset({
         content,
-        basePath: destFolder,
+        basePath,
         assetPackageName
       })
       onSave()

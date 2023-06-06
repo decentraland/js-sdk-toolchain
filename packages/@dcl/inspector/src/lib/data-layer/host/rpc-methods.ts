@@ -1,7 +1,7 @@
 import { Entity, EntityMappingMode, IEngine, Composite, OnChangeFunction, CompositeDefinition } from '@dcl/ecs'
 
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
-import { getFilesInDirectory } from './fs-utils'
+import { createAssetsFs, getFilesInDirectory } from './fs-utils'
 import { dumpEngineToComposite, dumpEngineToCrdtCommands } from './utils/engine-to-composite'
 import { CompositeManager, createFsCompositeProvider } from './utils/fs-composite-provider'
 import { stream } from './stream'
@@ -43,17 +43,17 @@ export async function initRpcMethods(
   engine: IEngine,
   onChanges: OnChangeFunction[]
 ): Promise<DataLayerRpcServer> {
+  const assetsFs = createAssetsFs(fs)
   let inspectorPreferences = await readPreferencesFromFile(fs, INSPECTOR_PREFERENCES_PATH)
 
-  // Look for a composite
-  const currentCompositeResourcePath = 'main.composite'
+  const currentCompositeResourcePath = 'scene/main.composite'
 
-  if (!(await fs.existFile(currentCompositeResourcePath))) {
-    await fs.writeFile(currentCompositeResourcePath, Buffer.from(JSON.stringify(minimalComposite), 'utf-8'))
+  if (!(await assetsFs.existFile(currentCompositeResourcePath))) {
+    await assetsFs.writeFile(currentCompositeResourcePath, Buffer.from(JSON.stringify(minimalComposite), 'utf-8'))
   }
 
-  const compositeProvider = await createFsCompositeProvider(fs)
-  const dumpEngineAndGetComposite = setupEngineDump(fs, engine, compositeProvider, currentCompositeResourcePath)
+  const compositeProvider = await createFsCompositeProvider(assetsFs)
+  const dumpEngineAndGetComposite = setupEngineDump(assetsFs, engine, compositeProvider, currentCompositeResourcePath)
   const mainComposite = compositeProvider.getCompositeOrNull(currentCompositeResourcePath)
   if (mainComposite) {
     Composite.instance(engine, mainComposite, compositeProvider, {
@@ -68,12 +68,12 @@ export async function initRpcMethods(
 
   let dirty = false
   let composite: CompositeDefinition
-  const undoRedo = initUndoRedo(fs, engine, () => composite)
-  const scene = initSceneProvider(fs)
+  const undoRedo = initUndoRedo(assetsFs, engine, () => composite)
+  const sceneProvider = await initSceneProvider(fs)
 
   // Create containers and attach onChange logic.
   onChanges.push(undoRedo.onChange)
-  onChanges.push(scene.onChange)
+  onChanges.push(sceneProvider.onChange)
 
   // TODO: review this
   // Dump composite to the FS on every tick
@@ -108,9 +108,9 @@ export async function initRpcMethods(
       return stream(iter, { engine }, () => undoRedo?.addUndoCrdt())
     },
     async getAssetData(req) {
-      if (await fs.existFile(req.path)) {
+      if (await assetsFs.existFile(req.path)) {
         return {
-          data: await fs.readFile(req.path)
+          data: await assetsFs.readFile(req.path)
         }
       }
 
@@ -120,7 +120,7 @@ export async function initRpcMethods(
       const extensions = ['.glb', '.png', '.composite', '.composite.bin', '.gltf', '.jpg']
       const ignore = ['.git', 'node_modules']
 
-      const files = (await getFilesInDirectory(fs, '', [], true, ignore)).filter((item) => {
+      const files = (await getFilesInDirectory(assetsFs, '', [], true, ignore)).filter((item) => {
         const itemLower = item.toLowerCase()
         return extensions.some((ext) => itemLower.endsWith(ext))
       })
@@ -136,9 +136,9 @@ export async function initRpcMethods(
       const undoAcc: FileOperation[] = []
       for (const [fileName, fileContent] of req.content) {
         const filePath = (baseFolder + fileName).replaceAll('//', '/')
-        const prevValue = (await fs.existFile(filePath)) ? await fs.readFile(filePath) : null
+        const prevValue = (await assetsFs.existFile(filePath)) ? await assetsFs.readFile(filePath) : null
         undoAcc.push({ prevValue, newValue: fileContent, path: filePath })
-        await upsertAsset(fs, filePath, fileContent)
+        await upsertAsset(assetsFs, filePath, fileContent)
       }
       undoRedo.addUndoFile(undoAcc)
       return {}
@@ -146,9 +146,9 @@ export async function initRpcMethods(
     async removeAsset(req) {
       const filePath = req.path
       // TODO: remove ALL gltf/glb related files...
-      if (await fs.existFile(filePath)) {
-        const prevValue = await fs.readFile(filePath)
-        await fs.rm(filePath)
+      if (await assetsFs.existFile(filePath)) {
+        const prevValue = await assetsFs.readFile(filePath)
+        await assetsFs.rm(filePath)
         undoRedo.addUndoFile([{ prevValue, newValue: null, path: filePath }])
       }
       return {}
@@ -164,6 +164,12 @@ export async function initRpcMethods(
       inspectorPreferences = req
       await fs.writeFile(INSPECTOR_PREFERENCES_PATH, serializeInspectorPreferences(req))
       return {}
+    },
+    async getProjectData() {
+      const scene = sceneProvider.getScene()
+      return {
+        path: scene.display?.title || (await fs.cwd())
+      }
     }
   }
 }

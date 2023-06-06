@@ -23,7 +23,7 @@ function HierarchyIcon({ value }: { value: Entity }) {
 const EntityTree = Tree<Entity>()
 
 const Hierarchy: React.FC = () => {
-  const { addChild, setParent, remove, rename, select, setOpen, getId, getChildren, getLabel, isOpen, canRename, canRemove } =
+  const { addChild, setParent, remove, rename, select, setOpen, getId, getChildren, getLabel, isOpen, isHidden, canRename, canRemove } =
     useTree()
   const selectedEntity = useSelectedEntity()
 
@@ -52,6 +52,7 @@ const Hierarchy: React.FC = () => {
         )}
         isOpen={isOpen}
         isSelected={isSelected}
+        isHidden={isHidden}
         canRename={canRename}
         canRemove={canRemove}
       />

@@ -23,6 +23,10 @@
   background-color: var(--vscode-accent-blue);
 }
 
+.Tree .item.hidden {
+  display: none;
+}
+
 .Tree > div:first-child > div:not(.contexify) {
   width: 100%;
   display: flex;

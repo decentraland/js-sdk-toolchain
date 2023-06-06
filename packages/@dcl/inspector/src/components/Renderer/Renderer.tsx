@@ -61,7 +61,7 @@ const Renderer: React.FC = () => {
   const importBuilderAsset = async (asset: IAsset) => {
     const position = await getDropPosition()
     const fileContent: Record<string, Uint8Array> = {}
-    const destFolder = 'world-assets'
+    const destFolder = 'builder'
     const assetPackageName = asset.name.trim().replaceAll(' ', '_').toLowerCase()
     const path = Object.keys(asset.contents).find(($) => isAsset($))
     setIsLoading(true)

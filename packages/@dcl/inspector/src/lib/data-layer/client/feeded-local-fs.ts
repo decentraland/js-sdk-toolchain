@@ -101,7 +101,7 @@ function generateMainComposite({ engine, components }: TempEngine) {
       z: 8
     }
   })
-  components.GltfContainer.create(gltfEntity, { src: 'assets/models/test-glb.glb' })
+  components.GltfContainer.create(gltfEntity, { src: 'scene/models/test-glb.glb' })
   cubeIdComponent.create(gltfEntity)
   components.EntityNode.create(gltfEntity, { label: 'Gltf Test', parent: engine.RootEntity })
 
@@ -140,20 +140,20 @@ export const mainComposite = generateMainComposite(mainEngine)
 export const minimalComposite = generateMinimalComposite(minimalEngine)
 
 const builderMappings: Record<string, string> = {
-  'assets/models/test-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
-  'assets/models2/test2-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
-  'assets/models2/test-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
-  'assets/models2/casla-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
-  'assets/models2/boedo-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
-  'assets/models3/bird-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
-  'assets/models4/romagnoli-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
-  'assets/models5/romeo-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
-  'assets/models6/ortigoza-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
-  'assets/models7/hernandez-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
-  'assets/models8/torrico-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
-  'assets/models9/correa-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
-  'assets/models9/pipi-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
-  'assets/models10/san-lorenzo-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB'
+  'assets/scene/models/test-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
+  'assets/scene/models2/test2-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
+  'assets/scene/models2/test-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
+  'assets/scene/models2/casla-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
+  'assets/scene/models2/boedo-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
+  'assets/scene/models3/bird-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
+  'assets/scene/models4/romagnoli-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
+  'assets/scene/models5/romeo-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
+  'assets/scene/models6/ortigoza-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
+  'assets/scene/models7/hernandez-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
+  'assets/scene/models8/torrico-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
+  'assets/scene/models9/correa-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
+  'assets/scene/models9/pipi-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
+  'assets/scene/models10/san-lorenzo-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB'
 }
 
 function getFeededEngineAndComposite() {
@@ -182,7 +182,7 @@ export async function feededFileSystem(mappings: Record<string, string> = builde
 
   return createFsInMemory({
     ...fileContent,
-    'main.composite': Buffer.from(JSON.stringify(composite), 'utf-8'),
+    'assets/scene/main.composite': Buffer.from(JSON.stringify(composite), 'utf-8'),
     'scene.json': Buffer.from(JSON.stringify(scene), 'utf-8')
   })
 }
