@@ -42,7 +42,7 @@ export const MeshCollider: LwwComponentGetter<MeshColliderComponentDefinitionExt
 // Label is defined via the editor in the composite.json, so we dont need to re-define it.
 /* @__PURE__ */
 export const Label: (
-  engine: Pick<IEngine, 'defineComponentFromSchema' | 'getComponentOrNull'>
+  engine: Pick<IEngine, 'getComponentOrNull'>
 ) => ReadOnlyLastWriteWinElementSetComponentDefinition<{ label: string }> = (engine) => {
   const LabelComponent = engine.getComponentOrNull(
     'inspector::EntityNode'
