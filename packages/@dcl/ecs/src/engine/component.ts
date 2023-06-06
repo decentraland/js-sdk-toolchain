@@ -170,6 +170,19 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
    */
   getOrCreateMutable(entity: Entity, initialValue?: T): T
 }
+/**
+ * @public
+ */
+export type ReadOnlyLastWriteWinElementSetComponentDefinition<T> = Omit<
+  LastWriteWinElementSetComponentDefinition<T>,
+  | 'create'
+  | 'createOrReplace'
+  | 'deleteFrom'
+  | 'getMutable'
+  | 'getMutableOrNull'
+  | 'getOrCreateMutable'
+  | 'updateFromCrdt'
+>
 
 /**
  * @public
@@ -193,6 +206,11 @@ export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T>
    */
   get(entity: Entity): DeepReadonlySet<T>
 }
+
+/**
+ * @public
+ */
+export type ReadOnlyGrowOnlyValueSetComponentDefinition<T> = Omit<GrowOnlyValueSetComponentDefinition<T>, 'addValue'>
 
 /**
  * @public

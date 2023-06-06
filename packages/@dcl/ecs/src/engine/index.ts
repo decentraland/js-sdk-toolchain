@@ -77,14 +77,14 @@ function preEngine(): PreEngine {
   }
 
   function defineComponentFromSchema<T>(componentName: string, schema: ISchema<T>) {
-    /* istanbul ignore next */
-    if (sealed) throw new Error('Engine is already sealed. No components can be added at this stage')
     const componentId = componentNumberFromName(componentName)
     const prev = componentsDefinition.get(componentId)
     if (prev) {
       // TODO: assert spec === prev.spec
       return prev as components.LastWriteWinElementSetComponentDefinition<T>
     }
+    /* istanbul ignore next */
+    if (sealed) throw new Error('Engine is already sealed. No components can be added at this stage')
     const newComponent = createComponentDefinitionFromSchema<T>(componentName, componentId, schema)
     componentsDefinition.set(componentId, newComponent)
     return newComponent as components.LastWriteWinElementSetComponentDefinition<T>
@@ -95,14 +95,14 @@ function preEngine(): PreEngine {
     schema: ISchema<T>,
     options: ValueSetOptions<T>
   ): components.GrowOnlyValueSetComponentDefinition<T> {
-    /* istanbul ignore next */
-    if (sealed) throw new Error('Engine is already sealed. No components can be added at this stage')
     const componentId = componentNumberFromName(componentName)
     const prev = componentsDefinition.get(componentId)
     if (prev) {
       // TODO: assert spec === prev.spec
       return prev as components.GrowOnlyValueSetComponentDefinition<T>
     }
+    /* istanbul ignore next */
+    if (sealed) throw new Error('Engine is already sealed. No components can be added at this stage')
     const newComponent = createValueSetComponentDefinitionFromSchema<T>(componentName, componentId, schema, options)
     componentsDefinition.set(componentId, newComponent)
     return newComponent as components.GrowOnlyValueSetComponentDefinition<T>
@@ -113,13 +113,13 @@ function preEngine(): PreEngine {
     mapSpec: T,
     constructorDefault?: Partial<MapResult<T>>
   ) {
-    if (sealed) throw new Error('Engine is already sealed. No components can be added at this stage')
     const componentId = componentNumberFromName(componentName)
     const prev = componentsDefinition.get(componentId)
     if (prev) {
       // TODO: assert spec === prev.spec
       return prev as MapComponentDefinition<MapResult<T>>
     }
+    if (sealed) throw new Error('Engine is already sealed. No components can be added at this stage')
 
     const schemaSpec = Schemas.Map(mapSpec, constructorDefault)
     const def = createComponentDefinitionFromSchema<MapResult<T>>(componentName, componentId, schemaSpec)
@@ -165,6 +165,14 @@ function preEngine(): PreEngine {
     for (const [entity, ...groupComp] of getComponentDefGroup(...components)) {
       yield [entity, ...groupComp.map((c) => c.get(entity))] as [Entity, ...ReadonlyComponentSchema<T>]
     }
+  }
+
+  function getEntityOrNullByLabel(label: string) {
+    const LabelComponent = components.Label({ defineComponentFromSchema, getComponentOrNull })
+    for (const [entity, value] of getEntitiesWith(LabelComponent)) {
+      if (value.label === label) return entity
+    }
+    return null
   }
 
   function* getComponentDefGroup<T extends ComponentDefinition<any>[]>(...args: T): Iterable<[Entity, ...T]> {
@@ -220,6 +228,7 @@ function preEngine(): PreEngine {
     getEntitiesWith,
     getComponent,
     getComponentOrNull,
+    getEntityOrNullByLabel,
     removeComponentDefinition,
     registerComponentDefinition,
     entityContainer,
@@ -269,6 +278,7 @@ export function Engine(options?: IEngineOptions): IEngine {
     removeComponentDefinition: partialEngine.removeComponentDefinition,
     componentsIter: partialEngine.componentsIter,
     seal: partialEngine.seal,
+    getEntityOrNullByLabel: partialEngine.getEntityOrNullByLabel,
 
     update,
 

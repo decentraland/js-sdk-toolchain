@@ -1015,6 +1015,7 @@ export interface IEngine {
     getComponent<T>(componentId: number | string): ComponentDefinition<T>;
     getComponentOrNull<T>(componentId: number | string): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
+    getEntityOrNullByLabel(label: string): Entity | null;
     getEntityState(entity: Entity): EntityState;
     readonly PlayerEntity: Entity;
     registerComponentDefinition<T>(componentName: string, componentDefinition: ComponentDefinition<T>): ComponentDefinition<T>;

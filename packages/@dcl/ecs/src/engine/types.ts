@@ -60,6 +60,7 @@ export type PreEngine = Pick<
   | 'componentsIter'
   | 'seal'
   | 'entityContainer'
+  | 'getEntityOrNullByLabel'
 > & {
   getSystems: () => SystemItem[]
 }
@@ -230,6 +231,13 @@ export interface IEngine {
   getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(
     ...components: T
   ): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>
+
+  /**
+   * @public
+   * Search for the entity that matches de label string defined in the editor.
+   * @param label - Label name
+   */
+  getEntityOrNullByLabel(label: string): Entity | null
 
   /**
    * @public

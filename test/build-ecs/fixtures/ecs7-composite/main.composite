@@ -1,0 +1,178 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "name": "composite::root",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {
+          "src": {
+            "type": "string",
+            "serializationType": "utf8-string"
+          },
+          "entities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "src": {
+                  "type": "integer",
+                  "serializationType": "entity"
+                },
+                "dest": {
+                  "type": "integer",
+                  "serializationType": "entity"
+                }
+              },
+              "serializationType": "map"
+            },
+            "serializationType": "array"
+          }
+        },
+        "serializationType": "map"
+      },
+      "data": {}
+    },
+    {
+      "name": "core::Transform",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {
+          "position": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              },
+              "z": {
+                "type": "number"
+              }
+            }
+          },
+          "scale": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              },
+              "z": {
+                "type": "number"
+              }
+            }
+          },
+          "rotation": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              },
+              "z": {
+                "type": "number"
+              },
+              "w": {
+                "type": "number"
+              }
+            }
+          },
+          "parent": {
+            "type": "integer"
+          }
+        },
+        "serializationType": "transform"
+      },
+      "data": {
+        "512": {
+          "json": {
+            "position": {
+              "x": 1.25,
+              "y": 0,
+              "z": 1.75
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "parent": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "core::GltfContainer",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {},
+        "serializationType": "protocol-buffer",
+        "protocolBuffer": "PBGltfContainer"
+      },
+      "data": {
+        "512": {
+          "json": {
+            "src": "world-assets/snow/snow.glb"
+          }
+        }
+      }
+    },
+    {
+      "name": "inspector::EntityNode",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "serializationType": "utf8-string"
+          },
+          "parent": {
+            "type": "integer",
+            "serializationType": "entity"
+          }
+        },
+        "serializationType": "map"
+      },
+      "data": {
+        "512": {
+          "json": {
+            "label": "Snow",
+            "parent": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "inspector::Selection",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {
+          "gizmo": {
+            "type": "integer",
+            "serializationType": "int32"
+          }
+        },
+        "serializationType": "map"
+      },
+      "data": {
+        "512": {
+          "json": {
+            "gizmo": 0
+          }
+        }
+      }
+    }
+  ]
+}
