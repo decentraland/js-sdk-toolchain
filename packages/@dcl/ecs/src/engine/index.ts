@@ -168,7 +168,7 @@ function preEngine(): PreEngine {
   }
 
   function getEntityOrNullByLabel(label: string) {
-    const LabelComponent = components.Label({ defineComponentFromSchema, getComponentOrNull })
+    const LabelComponent = components.Label({ getComponentOrNull: getComponentOrNull as IEngine['getComponentOrNull'] })
     for (const [entity, value] of getEntitiesWith(LabelComponent)) {
       if (value.label === label) return entity
     }
@@ -227,7 +227,7 @@ function preEngine(): PreEngine {
     defineValueSetComponentFromSchema,
     getEntitiesWith,
     getComponent,
-    getComponentOrNull,
+    getComponentOrNull: getComponentOrNull as IEngine['getComponentOrNull'],
     getEntityOrNullByLabel,
     removeComponentDefinition,
     registerComponentDefinition,

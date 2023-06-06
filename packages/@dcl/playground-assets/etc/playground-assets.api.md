@@ -499,7 +499,7 @@ export namespace ComponentData {
 }
 
 // @public (undocumented)
-export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T> | GrowOnlyValueSetComponentDefinition<T>;
+export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T> | GrowOnlyValueSetComponentDefinition<T> | ReadOnlyGrowOnlyValueSetComponentDefinition<T> | ReadOnlyLastWriteWinElementSetComponentDefinition<T>;
 
 // Warning: (ae-missing-release-tag) "componentDefinitionByName" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -3155,6 +3155,12 @@ export type ReadonlyComponentSchema<T extends [ComponentDefinition<unknown>, ...
 };
 
 // @public (undocumented)
+export type ReadOnlyGrowOnlyValueSetComponentDefinition<T> = Omit<GrowOnlyValueSetComponentDefinition<T>, 'addValue'>;
+
+// @public (undocumented)
+export type ReadOnlyLastWriteWinElementSetComponentDefinition<T> = Omit<LastWriteWinElementSetComponentDefinition<T>, 'create' | 'createOrReplace' | 'deleteFrom' | 'getMutable' | 'getMutableOrNull' | 'getOrCreateMutable'>;
+
+// @public (undocumented)
 export type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
 
 // @public (undocumented)
@@ -3294,6 +3300,11 @@ export type SystemItem = {
     priority: number;
     name?: string;
 };
+
+// Warning: (ae-missing-release-tag) "SYSTEMS_REGULAR_PRIORITY" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const SYSTEMS_REGULAR_PRIORITY = 100000;
 
 // Warning: (ae-missing-release-tag) "TargetEntityRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

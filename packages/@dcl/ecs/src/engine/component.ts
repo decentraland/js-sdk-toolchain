@@ -175,13 +175,7 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
  */
 export type ReadOnlyLastWriteWinElementSetComponentDefinition<T> = Omit<
   LastWriteWinElementSetComponentDefinition<T>,
-  | 'create'
-  | 'createOrReplace'
-  | 'deleteFrom'
-  | 'getMutable'
-  | 'getMutableOrNull'
-  | 'getOrCreateMutable'
-  | 'updateFromCrdt'
+  'create' | 'createOrReplace' | 'deleteFrom' | 'getMutable' | 'getMutableOrNull' | 'getOrCreateMutable'
 >
 
 /**
@@ -218,3 +212,5 @@ export type ReadOnlyGrowOnlyValueSetComponentDefinition<T> = Omit<GrowOnlyValueS
 export type ComponentDefinition<T> =
   | LastWriteWinElementSetComponentDefinition<T>
   | GrowOnlyValueSetComponentDefinition<T>
+  | ReadOnlyGrowOnlyValueSetComponentDefinition<T>
+  | ReadOnlyLastWriteWinElementSetComponentDefinition<T>
