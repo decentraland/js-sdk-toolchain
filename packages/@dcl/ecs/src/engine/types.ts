@@ -233,7 +233,7 @@ export interface IEngine {
   ): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>
 
   /**
-   * @public
+   * @alpha
    * Search for the entity that matches de label string defined in the editor.
    * @param label - Label name
    */

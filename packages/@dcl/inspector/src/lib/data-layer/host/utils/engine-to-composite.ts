@@ -93,7 +93,7 @@ export function dumpEngineToComposite(engine: IEngine, internalDataType: 'json' 
       const componentData: ComponentData = componentToCompositeComponentData(
         internalDataType,
         value,
-        itComponentDefinition
+        itComponentDefinition as LastWriteWinElementSetComponentDefinition<unknown>
       )
       itCompositeComponent.data.set(entity, componentData)
     }

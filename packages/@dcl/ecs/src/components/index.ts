@@ -39,7 +39,10 @@ export const MeshRenderer: LwwComponentGetter<MeshRendererComponentDefinitionExt
 export const MeshCollider: LwwComponentGetter<MeshColliderComponentDefinitionExtended> = (engine) =>
   defineMeshColliderComponent(engine)
 
-// Label is defined via the editor in the composite.json, so we dont need to re-define it.
+/**
+ * @alpha
+ * Label is defined via the editor in the composite.json, so we dont need to re-define it.
+ */
 /* @__PURE__ */
 export const Label: (
   engine: Pick<IEngine, 'getComponentOrNull'>
