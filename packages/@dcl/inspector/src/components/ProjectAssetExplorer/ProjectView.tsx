@@ -60,7 +60,7 @@ function ProjectView({ folders }: Props) {
       const matchesList: string[] = []
       for (const children of node.children) {
         if (children.type === 'folder') {
-          matchesList.push(...generateTree(children, node.name))
+          matchesList.push(...generateTree(children, namePath))
         } else {
           const name = getPath(namePath, children.name)
           const matches = hasMatch(name)
