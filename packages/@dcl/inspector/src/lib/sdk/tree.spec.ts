@@ -1,6 +1,6 @@
 import { Engine, Entity, IEngine, getComponentEntityTree } from '@dcl/ecs'
 
-import { EditorComponents, SdkComponents, createComponents, createEditorComponents } from './components'
+import { SdkComponents, createComponents } from './components'
 import { getEmptyTree, getTreeFromEngine, ROOT } from './tree'
 import { Operations, createOperations } from './operations'
 
