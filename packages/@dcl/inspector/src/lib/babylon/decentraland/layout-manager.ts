@@ -52,6 +52,7 @@ export const getLayoutManager = memoize((scene: Scene) => {
     base: { x: 0, y: 0 },
     parcels: [{ x: 0, y: 0 }]
   }
+  let layoutWasSetExternally = false
 
   const layoutNode = new TransformNode('layout', scene)
   const positionGizmo = new PositionGizmo(undefined, 0.5)
@@ -94,7 +95,8 @@ export const getLayoutManager = memoize((scene: Scene) => {
   }
 
   function setLayout(_layout: Layout) {
-    if (isSameLayout(layout, _layout)) return
+    if (layoutWasSetExternally && isSameLayout(layout, _layout)) return
+    layoutWasSetExternally = true
     clear()
     layout = _layout
     fill()
