@@ -96,17 +96,24 @@ function ProjectView({ folders }: Props) {
   /**
    * Callbacks
    */
-  const onToggle = useCallback(
-    (value: string, toggle: boolean) => {
+
+  const onSelect = useCallback(
+    (value: string) => {
       setLastSelected(value)
-      if (toggle) {
+    },
+    [setLastSelected]
+  )
+
+  const onSetOpen = useCallback(
+    (value: string, isOpen: boolean) => {
+      if (isOpen) {
         open.add(value)
       } else {
         open.delete(value)
       }
       setOpen(new Set(open))
     },
-    [open, setOpen, setLastSelected]
+    [open, setOpen]
   )
 
   const getEntitiesWithAsset = useCallback(
@@ -207,7 +214,8 @@ function ProjectView({ folders }: Props) {
             onSetParent={noop}
             onRemove={handleRemove}
             onRename={noop}
-            onToggle={onToggle}
+            onSelect={onSelect}
+            onSetOpen={onSetOpen}
             getId={(value: string) => value.toString()}
             getChildren={getChildren}
             getLabel={(val: string) => <span>{tree.get(val)?.name ?? val}</span>}
@@ -215,9 +223,8 @@ function ProjectView({ folders }: Props) {
             isSelected={(val: string) => lastSelected === val}
             canRename={() => false}
             canRemove={(val) => tree.get(val)?.type === 'asset'}
-            canToggle={() => true}
             canAddChild={() => false}
-            getIcon={(val) => <NodeIcon value={tree.get(val)} isOpen={isOpen(val)} />}
+            getIcon={(val) => <NodeIcon value={tree.get(val)} />}
             getDragContext={handleDragContext}
             dndType={DRAG_N_DROP_ASSET_KEY}
           />
@@ -272,25 +279,16 @@ function NodeView({
   )
 }
 
-function NodeIcon({ value, isOpen }: { value?: TreeNode; isOpen: boolean }) {
+function NodeIcon({ value }: { value?: TreeNode }) {
   if (!value) return null
   if (value.type === 'folder') {
-    return isOpen ? (
-      <>
-        <IoIosArrowDown />
-        <FolderIcon />
-      </>
-    ) : (
-      <>
-        <IoIosArrowForward />
-        <FolderIcon />
-      </>
-    )
+    return <div style={{ marginRight: '4px', marginLeft: '2px', marginTop: '2px' }}><FolderIcon /></div>
   }
+  else
   return (
     <>
       <svg style={{ width: '4px', height: '4px' }} />
-      <IoIosImage />
+      <IoIosImage style={{ marginRight: '4px'}} />
     </>
   )
 }

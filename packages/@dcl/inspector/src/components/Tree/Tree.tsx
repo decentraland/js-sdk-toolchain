@@ -22,12 +22,12 @@ type Props<T> = {
   canRename?: (value: T) => boolean
   canAddChild?: (value: T) => boolean
   canRemove?: (value: T) => boolean
-  canToggle?: (value: T) => boolean
+  onSetOpen: (value: T, isOpen: boolean) => void
+  onSelect: (value: T) => void
   onSetParent: (value: T, parent: T) => void
   onRename: (value: T, label: string) => void
   onAddChild: (value: T, label: string) => void
   onRemove: (value: T) => void
-  onToggle: (value: T, isOpen: boolean) => void
   getDragContext?: () => unknown
   dndType?: string
   tree?: unknown
@@ -51,15 +51,15 @@ export function Tree<T>() {
       getLabel,
       isOpen,
       isSelected,
+      onSelect,
       onSetParent,
       canRename,
       canAddChild,
       canRemove,
-      canToggle,
       onRename,
       onAddChild,
       onRemove,
-      onToggle,
+      onSetOpen,
       getDragContext = () => ({}),
       dndType = 'tree'
     } = props
@@ -70,7 +70,7 @@ export function Tree<T>() {
     const enableRename = canRename ? canRename(value) : true
     const enableAddChild = canAddChild ? canAddChild(value) : true
     const enableRemove = canRemove ? canRemove(value) : true
-    const enableToggle = canToggle ? canToggle(value) : true
+    const enableOpen = getChildren(value).length > 0
     const extraContextMenu = getExtraContextMenu ? getExtraContextMenu(value) : null
     const [editMode, setEditMode] = useState(false)
     const [insertMode, setInsertMode] = useState(false)
@@ -98,10 +98,12 @@ export function Tree<T>() {
     const quitEditMode = () => setEditMode(false)
     const quitInsertMode = () => setInsertMode(false)
 
-    const handleToggleExpand = (_: React.MouseEvent) => {
-      if (enableToggle) {
-        onToggle(value, !selected || !open)
-      }
+    const handleSelect = (_: React.MouseEvent) => {
+      onSelect(value)
+    }
+
+    const handleOpen = (_: React.MouseEvent) => {
+      onSetOpen(value, !open)
     }
 
     const handleToggleEdit = () => {
@@ -121,7 +123,7 @@ export function Tree<T>() {
       if (!insertMode) return
       onAddChild(value, childLabel)
       quitInsertMode()
-      onToggle(value, true)
+      onSetOpen(value, true)
     }
 
     const handleRemove = () => {
@@ -143,11 +145,14 @@ export function Tree<T>() {
 
     return (
       <div ref={ref} className={`Tree ${className || ''}`}>
-        <div style={getLevelStyles(level)} onClick={handleToggleExpand} className={selected ? 'selected item' : 'item'}>
+        <div style={getLevelStyles(level)} className={selected ? 'selected item' : 'item'}>
           <ContextMenu {...controlsProps} />
-          <div style={getEditModeStyles(editMode)}>
-            {props.getIcon ? props.getIcon(value) : open ? <IoIosArrowDown /> : <IoIosArrowForward />}
-            <span className="entity-label">{label || id}</span>
+          <div style={getEditModeStyles(editMode)} className='item-area'>
+            { enableOpen ? open ? <IoIosArrowDown onClick={handleOpen} /> : <IoIosArrowForward onClick={handleOpen} /> : <span style={{marginLeft: '12px'}}></span> }
+            <div onClick={handleSelect} className='selectable-area'>
+              { props.getIcon ? props.getIcon(value) : <></> }
+              <div>{label || id}</div>
+            </div>
           </div>
           {editMode && typeof label === 'string' && (
             <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />

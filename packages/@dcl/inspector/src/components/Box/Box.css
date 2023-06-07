@@ -3,8 +3,8 @@
 }
 
 .Box.with-border {
-  margin: 2.4px;
-  padding: 3.2px;
+  margin: 1.2px;
+  padding: 1.2px;
   border-radius: 2.4px;
   background: #21262f;
 }

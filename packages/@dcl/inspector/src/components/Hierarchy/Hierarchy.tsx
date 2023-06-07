@@ -10,31 +10,20 @@ import { Tree } from '../Tree'
 import { ContextMenu } from './ContextMenu'
 import './Hierarchy.css'
 
-function HierarchyIcon({ value, hasChildrens, isOpen }: { value: Entity; hasChildrens: boolean; isOpen: boolean }) {
+function HierarchyIcon({ value }: { value: Entity }) {
   if (value === ROOT) {
-    return <span style={{ marginRight: '14px' }} />
-  }
-  if (!hasChildrens) {
+    return <span style={{ marginRight: '4px' }}></span>
+  } else {
     return (
-      <>
-        <span style={{ marginLeft: '13px' }} />
-        <FiHexagon />
-      </>
+      <FiHexagon style={{ marginRight: '4px' }}/>
     )
   }
-  const ArrowComponent = isOpen ? <IoIosArrowDown /> : <IoIosArrowForward />
-  return (
-    <>
-      {ArrowComponent}
-      <FiHexagon />
-    </>
-  )
 }
 
 const EntityTree = Tree<Entity>()
 
 const Hierarchy: React.FC = () => {
-  const { addChild, setParent, remove, rename, toggle, getId, getChildren, getLabel, isOpen, canRename, canRemove } =
+  const { addChild, setParent, remove, rename, select, setOpen, getId, getChildren, getLabel, isOpen, canRename, canRemove } =
     useTree()
   const selectedEntity = useSelectedEntity()
 
@@ -53,12 +42,13 @@ const Hierarchy: React.FC = () => {
         onSetParent={setParent}
         onRemove={remove}
         onRename={rename}
-        onToggle={toggle}
+        onSelect={select}
+        onSetOpen={setOpen}
         getId={getId}
         getChildren={getChildren}
         getLabel={getLabel}
         getIcon={(val: Entity) => (
-          <HierarchyIcon value={val} isOpen={isOpen(val)} hasChildrens={!!getChildren(val).length} />
+          <HierarchyIcon value={val} />
         )}
         isOpen={isOpen}
         isSelected={isSelected}

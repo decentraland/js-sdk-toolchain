@@ -39,7 +39,7 @@ function Assets() {
         <div onClick={handleTabClick(AssetsTab.AssetsPack)}>
           <div className={cx({ underlined: tab === AssetsTab.AssetsPack })}>
             <MdImageSearch />
-            <span>ASSETS PACKS</span>
+            <span>BUILDER ASSETS</span>
           </div>
         </div>
         <div onClick={handleTabClick(AssetsTab.Import)}>

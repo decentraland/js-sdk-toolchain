@@ -1,11 +1,12 @@
 .TextField {
-  padding: 4px 6px;
+  padding: 2px 3px;
   border: 1px solid var(--border-gray);
   display: flex;
   margin-right: 8px;
   border-radius: 1.6px;
   flex-grow: 1;
   width: 0;
+  font-size: 12px;
 }
 
 .TextField:focus-within {

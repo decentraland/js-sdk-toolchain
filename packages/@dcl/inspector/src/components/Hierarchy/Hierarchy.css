@@ -1,4 +1,6 @@
 .Hierarchy {
   height: 100%;
   background: var(--tree-bg-color);
+  overflow-y: auto;
+  padding: 6px;
 }
