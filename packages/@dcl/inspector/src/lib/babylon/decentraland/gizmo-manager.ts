@@ -36,6 +36,8 @@ export function createGizmoManager(context: SceneContext) {
     gizmo.dragBehavior.validateDrag = function validateDrag(targetPosition: Vector3) {
       const yIsInBounds = targetPosition.y >= 0 || (!!lastEntity && lastEntity.position.y < targetPosition.y)
       const layout = layoutManager.getLayout()
+      if (!layout)
+        return true
       const isAlreadyOutOfBounds = !!lastEntity && !inBounds(layout, lastEntity?.position)
       const xzIsInBounds = inBounds(layout, targetPosition)
       // Allow drag if target position is within bounds, or if the gizmo is already out of bounds (it can get there by modifiying the transform values manually)
