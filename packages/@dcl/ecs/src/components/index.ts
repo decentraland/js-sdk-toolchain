@@ -1,14 +1,11 @@
-import {
-  GrowOnlyValueSetComponentDefinition,
-  LastWriteWinElementSetComponentDefinition,
-  ReadOnlyLastWriteWinElementSetComponentDefinition
-} from '../engine/component'
+import { GrowOnlyValueSetComponentDefinition, LastWriteWinElementSetComponentDefinition } from '../engine/component'
 import { IEngine } from '../engine/types'
 import { AnimatorComponentDefinitionExtended, defineAnimatorComponent } from './extended/Animator'
 import { defineMaterialComponent, MaterialComponentDefinitionExtended } from './extended/Material'
 import { defineMeshColliderComponent, MeshColliderComponentDefinitionExtended } from './extended/MeshCollider'
 import { defineMeshRendererComponent, MeshRendererComponentDefinitionExtended } from './extended/MeshRenderer'
 import { LwwComponentGetter, GSetComponentGetter } from './generated/index.gen'
+import defineNameComponent, { NameType } from './manual/Name'
 import { defineTransformComponent, TransformComponentExtended } from './manual/Transform'
 
 export * from './generated/index.gen'
@@ -41,17 +38,8 @@ export const MeshCollider: LwwComponentGetter<MeshColliderComponentDefinitionExt
 
 /**
  * @alpha
- * Label is defined via the editor in the composite.json, so we dont need to re-define it.
  */
 /* @__PURE__ */
-export const Label: (
-  engine: Pick<IEngine, 'getComponentOrNull'>
-) => ReadOnlyLastWriteWinElementSetComponentDefinition<{ label: string }> = (engine) => {
-  const LabelComponent = engine.getComponentOrNull(
-    'inspector::EntityNode'
-  ) as ReadOnlyLastWriteWinElementSetComponentDefinition<{
-    label: string
-  }>
-  if (!LabelComponent) throw new Error('Label Component not found. Be sure you create this scene with the editor.')
-  return LabelComponent
-}
+export const Name: (engine: Pick<IEngine, 'defineComponent'>) => LastWriteWinElementSetComponentDefinition<NameType> = (
+  engine
+) => defineNameComponent(engine)

@@ -167,10 +167,10 @@ function preEngine(): PreEngine {
     }
   }
 
-  function getEntityOrNullByLabel(label: string) {
-    const LabelComponent = components.Label({ getComponentOrNull: getComponentOrNull as IEngine['getComponentOrNull'] })
-    for (const [entity, value] of getEntitiesWith(LabelComponent)) {
-      if (value.label === label) return entity
+  function getEntityOrNullByName(value: string) {
+    const LabelComponent = components.Name({ defineComponent })
+    for (const [entity, name] of getEntitiesWith(LabelComponent)) {
+      if (name.value === value) return entity
     }
     return null
   }
@@ -228,7 +228,7 @@ function preEngine(): PreEngine {
     getEntitiesWith,
     getComponent,
     getComponentOrNull: getComponentOrNull as IEngine['getComponentOrNull'],
-    getEntityOrNullByLabel,
+    getEntityOrNullByName,
     removeComponentDefinition,
     registerComponentDefinition,
     entityContainer,
@@ -278,7 +278,7 @@ export function Engine(options?: IEngineOptions): IEngine {
     removeComponentDefinition: partialEngine.removeComponentDefinition,
     componentsIter: partialEngine.componentsIter,
     seal: partialEngine.seal,
-    getEntityOrNullByLabel: partialEngine.getEntityOrNullByLabel,
+    getEntityOrNullByName: partialEngine.getEntityOrNullByName,
 
     update,
 

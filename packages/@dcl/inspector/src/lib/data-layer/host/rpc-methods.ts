@@ -29,7 +29,6 @@ function setupEngineDump(
 
     const mainCrdt = dumpEngineToCrdtCommands(engine)
     fs.writeFile('main.crdt', Buffer.from(mainCrdt)).catch((err) => console.error('Failed saving main.crdt: ', err))
-
     compositeProvider
       .save({ src: compositePath, composite }, 'json')
       .catch((err) => console.error(`Save composite ${compositePath} fails: `, err))
@@ -154,6 +153,7 @@ export async function initRpcMethods(
       return {}
     },
     async save() {
+      // TODO: add true param here ?
       save()
       return {}
     },

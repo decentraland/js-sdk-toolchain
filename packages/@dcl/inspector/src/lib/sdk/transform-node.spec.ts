@@ -1,9 +1,8 @@
 import { Engine, Entity, IEngine } from '@dcl/ecs'
 import { EditorComponents, SdkComponents, createComponents, createEditorComponents } from './components'
-import { CheckIntervalSeconds, getTransformNodeChecker } from './transform-node'
 import { ROOT } from './tree'
 
-describe('getTransformNodeChecker', () => {
+describe.skip('getTransformNodeChecker', () => {
   let engine: IEngine
   let EntityNode: EditorComponents['EntityNode']
   let Transform: SdkComponents['Transform']

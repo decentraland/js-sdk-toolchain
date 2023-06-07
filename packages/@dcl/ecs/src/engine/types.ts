@@ -60,7 +60,7 @@ export type PreEngine = Pick<
   | 'componentsIter'
   | 'seal'
   | 'entityContainer'
-  | 'getEntityOrNullByLabel'
+  | 'getEntityOrNullByName'
 > & {
   getSystems: () => SystemItem[]
 }
@@ -235,9 +235,9 @@ export interface IEngine {
   /**
    * @alpha
    * Search for the entity that matches de label string defined in the editor.
-   * @param label - Label name
+   * @param value - Name value string
    */
-  getEntityOrNullByLabel(label: string): Entity | null
+  getEntityOrNullByName(label: string): Entity | null
 
   /**
    * @public

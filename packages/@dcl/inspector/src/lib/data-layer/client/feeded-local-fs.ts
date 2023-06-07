@@ -1,26 +1,20 @@
 import { Engine } from '@dcl/ecs'
-import { defineTransformComponent } from '@dcl/ecs/dist/components/manual/Transform'
-import { defineMeshRendererComponent } from '@dcl/ecs/dist/components/extended/MeshRenderer'
 import { Composite } from '@dcl/ecs'
-import { GltfContainer, PointerEvents } from '@dcl/ecs/dist/components'
+import { PointerEvents } from '@dcl/ecs/dist/components'
 import { defineMaterialComponent } from '@dcl/ecs/dist/components/extended/Material'
-import { defineMeshColliderComponent } from '@dcl/ecs/dist/components/extended/MeshCollider'
 
 import { parseSceneFromComponent } from '../host/utils/component'
 import { dumpEngineToComposite } from '../host/utils/engine-to-composite'
 import { createFsInMemory } from '../../logic/in-memory-storage'
-import { createEditorComponents } from '../../sdk/components'
+import { createComponents, createEditorComponents } from '../../sdk/components'
 
 function createTempEngine() {
   const engine = Engine()
   return {
     engine,
     components: {
-      Transform: defineTransformComponent(engine),
-      MeshRenderer: defineMeshRendererComponent(engine),
-      MeshCollider: defineMeshColliderComponent(engine),
+      ...createComponents(engine),
       Material: defineMaterialComponent(engine),
-      GltfContainer: GltfContainer(engine),
       PointerEvents: PointerEvents(engine),
       ...createEditorComponents(engine)
     }
@@ -35,10 +29,10 @@ function generateMinimalComposite({ engine, components }: TempEngine) {
 
   // main box
   const entity = engine.addEntity()
-  components.Transform.create(entity, { position: { x: 8, y: 1, z: 8 } })
+  components.Transform.create(entity, { position: { x: 8, y: 1, z: 8 }, parent: engine.RootEntity })
   components.MeshRenderer.setBox(entity)
   cubeIdComponent.create(entity)
-  components.EntityNode.create(entity, { label: 'Magic Cube', parent: engine.RootEntity })
+  components.Name.create(entity, { value: 'Magic Cube' })
 
   // scene
   components.Scene.create(engine.RootEntity, {
@@ -91,7 +85,7 @@ function generateMainComposite({ engine, components }: TempEngine) {
       a: 1.0
     }
   })
-  components.EntityNode.create(entity, { label: 'Magic Cube', parent: engine.RootEntity })
+  components.Name.create(entity, { value: 'Magic Cube' })
 
   const gltfEntity = engine.addEntity()
   components.Transform.create(gltfEntity, {
@@ -103,7 +97,7 @@ function generateMainComposite({ engine, components }: TempEngine) {
   })
   components.GltfContainer.create(gltfEntity, { src: 'assets/models/test-glb.glb' })
   cubeIdComponent.create(gltfEntity)
-  components.EntityNode.create(gltfEntity, { label: 'Gltf Test', parent: engine.RootEntity })
+  components.Name.create(gltfEntity, { value: 'Gltf Test' })
 
   // scene
   components.Scene.create(engine.RootEntity, {

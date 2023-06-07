@@ -26,6 +26,7 @@ import {
   TransformComponentExtended,
   AnimatorComponentDefinitionExtended
 } from './components/types'
+import { NameComponent } from './components/manual/Name'
 
 // export components for global engine
 export const Transform: TransformComponentExtended = /* @__PURE__*/ components.Transform(engine)
@@ -33,6 +34,7 @@ export const Animator: AnimatorComponentDefinitionExtended = /* @__PURE__*/ comp
 export const Material: MaterialComponentDefinitionExtended = /* @__PURE__*/ components.Material(engine)
 export const MeshRenderer: MeshRendererComponentDefinitionExtended = /* @__PURE__*/ components.MeshRenderer(engine)
 export const MeshCollider: MeshColliderComponentDefinitionExtended = /* @__PURE__*/ components.MeshCollider(engine)
+export const Name: NameComponent = /* @__PURE__*/ components.Name(engine)
 
 // export components for global engine
 export * from './components/generated/global.gen'

@@ -1,10 +1,8 @@
-import { engine } from '@dcl/sdk/ecs'
-import * as components from '@dcl/ecs/dist/components'
+import { engine, Name } from '@dcl/sdk/ecs'
 
 export function main() {
-  const Label = components.Label(engine)
-  console.log({ label: engine.getEntityOrNullByLabel('Snow') })
-  for (const [entity] of engine.getEntitiesWith(Label)) {
+  console.log({ name1: engine.getEntityOrNullByName('Magic Cube') })
+  for (const [entity] of engine.getEntitiesWith(Name)) {
     console.log({ entity })
   }
 }

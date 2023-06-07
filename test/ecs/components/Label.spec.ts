@@ -8,13 +8,13 @@ describe('Generated Raycast ProtoBuf', () => {
       label: Schemas.String
     })
 
-    const Label = components.Label(newEngine)
+    const Label = components.Name(newEngine)
 
     testComponentSerialization(Label as LastWriteWinElementSetComponentDefinition<unknown>, {
       label: 'CASLA'
     })
 
-    expect(newEngine.getEntityOrNullByLabel('CASLA')).toBeDefined()
-    expect(newEngine.getEntityOrNullByLabel('Boedo')).toBe(null)
+    expect(newEngine.getEntityOrNullByName('CASLA')).toBeDefined()
+    expect(newEngine.getEntityOrNullByName('Boedo')).toBe(null)
   })
 })

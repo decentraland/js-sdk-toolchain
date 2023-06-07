@@ -93,9 +93,14 @@
         "512": {
           "json": {
             "position": {
-              "x": 1.25,
-              "y": 0,
-              "z": 1.75
+              "x": 8,
+              "y": 1,
+              "z": 8
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
             },
             "rotation": {
               "x": 0,
@@ -103,12 +108,49 @@
               "z": 0,
               "w": 1
             },
+            "parent": 0
+          }
+        },
+        "513": {
+          "json": {
+            "position": {
+              "x": 11,
+              "y": 3,
+              "z": 10.75
+            },
             "scale": {
               "x": 1,
               "y": 1,
               "z": 1
             },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
             "parent": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "core::MeshRenderer",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {},
+        "serializationType": "protocol-buffer",
+        "protocolBuffer": "PBMeshRenderer"
+      },
+      "data": {
+        "512": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
           }
         }
       }
@@ -122,7 +164,7 @@
         "protocolBuffer": "PBGltfContainer"
       },
       "data": {
-        "512": {
+        "513": {
           "json": {
             "src": "world-assets/snow/snow.glb"
           }
@@ -130,17 +172,13 @@
       }
     },
     {
-      "name": "inspector::EntityNode",
+      "name": "core-schema::Name",
       "jsonSchema": {
         "type": "object",
         "properties": {
-          "label": {
+          "value": {
             "type": "string",
             "serializationType": "utf8-string"
-          },
-          "parent": {
-            "type": "integer",
-            "serializationType": "entity"
           }
         },
         "serializationType": "map"
@@ -148,8 +186,12 @@
       "data": {
         "512": {
           "json": {
-            "label": "Snow",
-            "parent": 0
+            "value": "Magic Cube"
+          }
+        },
+        "513": {
+          "json": {
+            "value": "Github link"
           }
         }
       }
@@ -167,10 +209,88 @@
         "serializationType": "map"
       },
       "data": {
-        "512": {
+        "513": {
           "json": {
             "gizmo": 0
           }
+        }
+      }
+    },
+    {
+      "name": "inspector::Scene",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {
+          "layout": {
+            "type": "object",
+            "properties": {
+              "base": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "integer",
+                    "serializationType": "int32"
+                  },
+                  "y": {
+                    "type": "integer",
+                    "serializationType": "int32"
+                  }
+                },
+                "serializationType": "map"
+              },
+              "parcels": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "integer",
+                      "serializationType": "int32"
+                    },
+                    "y": {
+                      "type": "integer",
+                      "serializationType": "int32"
+                    }
+                  },
+                  "serializationType": "map"
+                },
+                "serializationType": "array"
+              }
+            },
+            "serializationType": "map"
+          }
+        },
+        "serializationType": "map"
+      },
+      "data": {
+        "0": {
+          "json": {
+            "layout": {
+              "base": {
+                "x": 0,
+                "y": 0
+              },
+              "parcels": [
+                {
+                  "x": 0,
+                  "y": 0
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "cube-id",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {},
+        "serializationType": "map"
+      },
+      "data": {
+        "512": {
+          "json": {}
         }
       }
     }

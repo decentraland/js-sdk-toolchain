@@ -10,7 +10,6 @@ import { EditorComponents, SdkComponents } from './components'
 import { getHardcodedLoadableScene } from './test-local-scene'
 import { createInspectorEngine } from './inspector-engine'
 import { DataLayerRpcClient } from '../data-layer/types'
-import { getTransformNodeChecker } from './transform-node'
 import { createOperations } from './operations'
 import { Gizmos } from '../babylon/decentraland/gizmo-manager'
 import { CameraManager } from '../babylon/decentraland/camera'
@@ -62,9 +61,6 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
 
   // create inspector engine context and components
   const { engine, components, events, dispose } = createInspectorEngine(dataLayer)
-
-  // add auto parenting
-  engine.addSystem(getTransformNodeChecker(engine, components.EntityNode))
 
   // register some globals for debugging
   Object.assign(globalThis, { dataLayer, inspectorEngine: engine })
