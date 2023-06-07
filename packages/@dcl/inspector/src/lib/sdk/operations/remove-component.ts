@@ -1,14 +1,8 @@
-import { Entity, IEngine } from '@dcl/ecs'
-import { isLastWriteWinComponent } from '../../../hooks/sdk/useComponentValue'
+import { Entity, IEngine, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
 
-export function removeComponent(engine: IEngine) {
-  return function removeComponent(entity: Entity, componentId: number) {
-    const component = engine.getComponent(componentId)
-    if (isLastWriteWinComponent(component)) {
-      component.deleteFrom(entity)
-    } else {
-      throw new Error('Cannot add component: it must be an LWW component')
-    }
+export function removeComponent(_engine: IEngine) {
+  return function removeComponent<T>(entity: Entity, component: LastWriteWinElementSetComponentDefinition<T>) {
+    component.deleteFrom(entity)
   }
 }
 

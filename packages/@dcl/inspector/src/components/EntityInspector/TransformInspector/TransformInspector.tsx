@@ -23,7 +23,7 @@ export default withSdk<Props>(
     const { handleAction } = useContextMenu()
 
     const handleRemove = useCallback(() => {
-      sdk.operations.removeComponent(entity, Transform.componentId)
+      sdk.operations.removeComponent(entity, Transform)
       sdk.operations.dispatch()
     }, [])
 
