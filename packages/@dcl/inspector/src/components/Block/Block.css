@@ -1,12 +1,14 @@
 .Block {
   display: flex;
   flex-direction: column;
+  margin-bottom: 2px;
+  margin-top: 4px;
 }
 
 .Block > label {
-  margin: 8px 0px 4px 0px;
+  margin: 0px 0px 2px 0px;
   color: var(--sub-text);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .Block .content {

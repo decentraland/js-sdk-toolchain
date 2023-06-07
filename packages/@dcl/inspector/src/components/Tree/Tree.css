@@ -1,5 +1,5 @@
 .Tree {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--white);
   width: 100%;
 }
@@ -51,7 +51,18 @@
   flex-shrink: 0;
 }
 
-.Tree .entity-label {
+.Tree .item-area {
+  display: flex;
+  align-items: center;
+}
+
+.Tree .selectable-area {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.Tree .selectable-area div {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

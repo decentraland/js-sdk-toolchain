@@ -9,6 +9,7 @@ import { useSdk } from './useSdk'
  * Used to get a tree and the functions to work with it
  * @returns
  */
+/* istanbul ignore next */
 export const useTree = () => {
   const sdk = useSdk()
   // Generate a tree if the sdk is available, or an empty tree otherwise
@@ -26,7 +27,7 @@ export const useTree = () => {
   }, [sdk])
 
   const [tree, setTree] = useState(getTree())
-  const entitiesToggle = new Set<Entity>()
+  const entitiesToggle = new Set<Entity>([ROOT])
 
   useEffect(() => {
     setTree(getTree())
@@ -59,7 +60,6 @@ export const useTree = () => {
 
   const isOpen = useCallback(
     (entity: Entity) => {
-      if (entity === ROOT) return true
       return entitiesToggle.has(entity)
     },
     [sdk]
@@ -107,13 +107,19 @@ export const useTree = () => {
     [sdk, handleUpdate]
   )
 
-  const toggle = useCallback(
-    async (entity: Entity, open: boolean) => {
+  const select = useCallback(
+    async (entity: Entity) => {
       if (!sdk) return
       sdk.operations.updateSelectedEntity(entity)
-      open ? entitiesToggle.add(entity) : entitiesToggle.delete(entity)
-
       await sdk.operations.dispatch()
+      handleUpdate()
+    },
+    [sdk, handleUpdate]
+  )
+
+  const setOpen = useCallback(
+    async (entity: Entity, open: boolean) => {
+      open ? entitiesToggle.add(entity) : entitiesToggle.delete(entity)
       handleUpdate()
     },
     [sdk, handleUpdate]
@@ -129,10 +135,11 @@ export const useTree = () => {
     setParent,
     rename,
     remove,
-    toggle,
+    select,
     getId,
     getChildren,
     getLabel,
+    setOpen,
     isOpen,
     canRename,
     canRemove

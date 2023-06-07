@@ -1,7 +1,7 @@
 .Container {
   display: flex;
   flex-direction: column;
-  padding: 12px;
+  padding: 6px;
   height: 100%;
   overflow-y: auto;
   border-bottom: 1px solid var(--border-gray);
@@ -25,10 +25,10 @@
   margin-right: 4px;
 }
 
-.Container>span {
-  margin: 0px 0px 4px 0px;
+.Container .title span {
+  margin: 0px 0px 0px 0px;
   color: var(--text);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
 }
