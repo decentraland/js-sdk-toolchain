@@ -36,9 +36,9 @@ export default withSdk<Props>(
       [files]
     )
 
-    const handleRemove = useCallback(() => {
-      sdk.operations.removeComponent(entity, GltfContainer.componentId)
-      sdk.operations.dispatch()
+    const handleRemove = useCallback(async () => {
+      sdk.operations.removeComponent(entity, GltfContainer)
+      await sdk.operations.dispatch()
     }, [])
     const handleDrop = useCallback(async (src: string) => {
       const { operations } = sdk

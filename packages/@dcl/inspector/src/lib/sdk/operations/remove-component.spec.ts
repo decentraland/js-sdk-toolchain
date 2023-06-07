@@ -1,4 +1,4 @@
-import { Entity, IEngine } from '@dcl/ecs'
+import { Entity, IEngine, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
 import removeComponent from './remove-component'
 
 describe('removeComponent', () => {
@@ -19,37 +19,21 @@ describe('removeComponent', () => {
     })
     describe('and then passing the entity and the component id to the removeComponent operation', () => {
       let entity: Entity
-      let componentId: number
       let removeComponentOperation: ReturnType<typeof removeComponent>
       const deleteFromMock = jest.fn()
-      const componentMock = {
-        createOrReplace: jest.fn(),
+      const component = {
         deleteFrom: deleteFromMock
-      } as unknown
+      } as unknown as LastWriteWinElementSetComponentDefinition<unknown>
       beforeEach(() => {
         entity = 0 as Entity
-        componentId = 0
         removeComponentOperation = removeComponent(engine)
-        getComponentMock.mockReturnValue(componentMock)
       })
       afterEach(() => {
-        getComponentMock.mockReset()
         deleteFromMock.mockReset()
       })
-      it('should add the component to the entity', () => {
-        removeComponentOperation(entity, componentId)
+      it('should remove the component to the entity', () => {
+        removeComponentOperation(entity, component)
         expect(deleteFromMock).toHaveBeenCalledWith(entity)
-      })
-      describe('and the component is not an LWW component', () => {
-        beforeEach(() => {
-          getComponentMock.mockReturnValue({})
-        })
-        afterEach(() => {
-          getComponentMock.mockReset()
-        })
-        it('should throw an error', () => {
-          expect(() => removeComponentOperation(entity, componentId)).toThrowError()
-        })
       })
     })
   })
