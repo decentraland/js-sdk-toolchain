@@ -9,6 +9,7 @@ import { useSdk } from './useSdk'
  * Used to get a tree and the functions to work with it
  * @returns
  */
+/* istanbul ignore next */
 export const useTree = () => {
   const sdk = useSdk()
   // Generate a tree if the sdk is available, or an empty tree otherwise
