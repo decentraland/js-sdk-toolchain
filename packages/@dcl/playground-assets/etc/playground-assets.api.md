@@ -1020,6 +1020,8 @@ export interface IEngine {
     getEntityState(entity: Entity): EntityState;
     readonly PlayerEntity: Entity;
     registerComponentDefinition<T>(componentName: string, componentDefinition: ComponentDefinition<T>): ComponentDefinition<T>;
+    // (undocumented)
+    removeComponentDefinition(componentId: number | string): void;
     removeEntity(entity: Entity): void;
     removeSystem(selector: string | SystemFn): boolean;
     readonly RootEntity: Entity;
