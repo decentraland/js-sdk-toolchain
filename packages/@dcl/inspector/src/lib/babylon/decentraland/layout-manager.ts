@@ -48,10 +48,7 @@ function center(scene: Scene, layout: Layout) {
 }
 
 export const getLayoutManager = memoize((scene: Scene) => {
-  let layout: Layout = {
-    base: { x: 0, y: 0 },
-    parcels: [{ x: 0, y: 0 }]
-  }
+  let layout: Layout | null = null
 
   const layoutNode = new TransformNode('layout', scene)
   const positionGizmo = new PositionGizmo(undefined, 0.5)
@@ -94,14 +91,14 @@ export const getLayoutManager = memoize((scene: Scene) => {
   }
 
   function setLayout(_layout: Layout) {
-    if (isSameLayout(layout, _layout)) return
+    if (layout && isSameLayout(layout, _layout)) return
     clear()
     layout = _layout
-    fill()
+    fill(layout)
     center(scene, layout)
   }
 
-  function fill() {
+  function fill(layout: Layout) {
     const { base, parcels } = layout
     for (const parcel of parcels) {
       const x = parcel.x - base.x
