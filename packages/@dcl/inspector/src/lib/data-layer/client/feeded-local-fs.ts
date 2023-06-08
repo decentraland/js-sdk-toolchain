@@ -1,4 +1,3 @@
-import { Engine } from '@dcl/ecs'
 import { Composite } from '@dcl/ecs'
 import { PointerEvents } from '@dcl/ecs/dist/components'
 import { defineMaterialComponent } from '@dcl/ecs/dist/components/extended/Material'
@@ -6,22 +5,21 @@ import { defineMaterialComponent } from '@dcl/ecs/dist/components/extended/Mater
 import { parseSceneFromComponent } from '../host/utils/component'
 import { dumpEngineToComposite } from '../host/utils/engine-to-composite'
 import { createFsInMemory } from '../../logic/in-memory-storage'
-import { createComponents, createEditorComponents } from '../../sdk/components'
+import { createEngineContext } from '../host/utils/engine'
 
-function createTempEngine() {
-  const engine = Engine()
+function createTempEngineContext() {
+  const { engine, components } = createEngineContext()
   return {
     engine,
     components: {
-      ...createComponents(engine),
+      ...components,
       Material: defineMaterialComponent(engine),
-      PointerEvents: PointerEvents(engine),
-      ...createEditorComponents(engine)
+      PointerEvents: PointerEvents(engine)
     }
   }
 }
 
-type TempEngine = ReturnType<typeof createTempEngine>
+type TempEngine = ReturnType<typeof createTempEngineContext>
 
 function generateMinimalComposite({ engine, components }: TempEngine) {
   // custom component
@@ -54,7 +52,7 @@ function generateMinimalComposite({ engine, components }: TempEngine) {
   return Composite.toJson(composite)
 }
 
-function generateMainComposite({ engine, components }: TempEngine) {
+export function generateMainComposite({ engine, components }: TempEngine) {
   // custom component
   const cubeIdComponent = engine.defineComponent('cube-id', {})
 
@@ -127,11 +125,7 @@ function generateMainComposite({ engine, components }: TempEngine) {
   return Composite.toJson(composite)
 }
 
-const mainEngine = createTempEngine()
-const minimalEngine = createTempEngine()
-
-export const mainComposite = generateMainComposite(mainEngine)
-export const minimalComposite = generateMinimalComposite(minimalEngine)
+export const getMinimalComposite = () => generateMinimalComposite(createTempEngineContext())
 
 const builderMappings: Record<string, string> = {
   'assets/models/test-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
@@ -151,7 +145,8 @@ const builderMappings: Record<string, string> = {
 }
 
 function getFeededEngineAndComposite() {
-  return { engine: mainEngine, composite: mainComposite }
+  const context = createTempEngineContext()
+  return { engineContext: context, composite: generateMainComposite(context) }
 }
 
 export async function feededFileSystem(mappings: Record<string, string> = builderMappings) {
@@ -171,8 +166,8 @@ export async function feededFileSystem(mappings: Record<string, string> = builde
   const assetPromises = Object.entries(mappings).map(downloadAndAssignAsset)
   await Promise.all(assetPromises)
 
-  const { engine, composite } = getFeededEngineAndComposite()
-  const scene = parseSceneFromComponent(engine.components.Scene.get(engine.engine.RootEntity))
+  const { engineContext, composite } = getFeededEngineAndComposite()
+  const scene = parseSceneFromComponent(engineContext.components.Scene.get(engineContext.engine.RootEntity))
 
   return createFsInMemory({
     ...fileContent,

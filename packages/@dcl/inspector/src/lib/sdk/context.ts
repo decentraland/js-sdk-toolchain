@@ -65,8 +65,6 @@ export async function createSdkContext(canvas: HTMLCanvasElement, catalog: IThem
   // register some globals for debugging
   Object.assign(globalThis, { dataLayer, inspectorEngine: engine })
 
-  // TODO: volar el getGizmoManager
-
   return {
     engine,
     components,

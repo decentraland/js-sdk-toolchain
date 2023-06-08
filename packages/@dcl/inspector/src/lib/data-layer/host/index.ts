@@ -1,5 +1,5 @@
 import { IEngine, OnChangeFunction } from '@dcl/ecs'
-import { createEngine } from './utils/engine'
+import { createEngineContext } from './utils/engine'
 import { initRpcMethods } from '../host/rpc-methods'
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
 
@@ -16,7 +16,7 @@ export type DataLayerHost = {
 
 export async function createDataLayerHost(fs: FileSystemInterface): Promise<DataLayerHost> {
   const callbackFunctions: OnChangeFunction[] = []
-  const engine = createEngine({
+  const { engine } = createEngineContext({
     onChangeFunction: (entity, operation, component, componentValue) => {
       callbackFunctions.forEach((func) => func(entity, operation, component, componentValue))
     }

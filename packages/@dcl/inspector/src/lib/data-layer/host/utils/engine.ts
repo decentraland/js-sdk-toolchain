@@ -11,11 +11,13 @@ export function serializeEngine(engine: IEngine) {
   return messages.toBinary()
 }
 
-export function createEngine(opts?: IEngineOptions): IEngine {
+export function createEngineContext(opts?: IEngineOptions) {
   // create engine and its components
   const engine = Engine(opts)
 
-  createComponents(engine)
-  createEditorComponents(engine)
-  return engine
+  const components = {
+    ...createComponents(engine),
+    ...createEditorComponents(engine)
+  }
+  return { engine, components }
 }

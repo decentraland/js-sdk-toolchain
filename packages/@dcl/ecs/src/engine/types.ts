@@ -246,7 +246,7 @@ export interface IEngine {
   update(deltaTime: number): Promise<void>
 
   /**
-   * @internal
+   * @public
    * @param componentId - component number or name
    */
   removeComponentDefinition(componentId: number | string): void

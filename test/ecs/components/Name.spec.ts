@@ -1,16 +1,12 @@
-﻿import { Engine, components, Schemas, LastWriteWinElementSetComponentDefinition } from '../../../packages/@dcl/ecs/src'
+﻿import { Engine, components } from '../../../packages/@dcl/ecs/src'
 import { testComponentSerialization } from './assertion'
 
 describe('Generated Raycast ProtoBuf', () => {
   it('should serialize/deserialize Raycast', () => {
     const newEngine = Engine()
-    newEngine.defineComponent('inspector::EntityNode', {
-      label: Schemas.String
-    })
+    const Name = components.Name(newEngine)
 
-    const Label = components.Name(newEngine)
-
-    testComponentSerialization(Label as LastWriteWinElementSetComponentDefinition<unknown>, {
+    testComponentSerialization(Name, {
       value: 'CASLA'
     })
 
