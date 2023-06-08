@@ -1,12 +1,12 @@
 import { Composite, OnChangeFunction, Schemas, Name, Transform } from '@dcl/ecs'
 import { initRpcMethods } from './rpc-methods'
 import { createEngineContext } from './utils/engine'
-import * as feededFS from '../client/feeded-local-fs'
+import { feededFileSystem } from '../client/feeded-local-fs'
 import { dumpEngineToComposite } from './utils/engine-to-composite'
 
 async function mockedRpcInit() {
   const callbackFunctions: OnChangeFunction[] = []
-  const fs = await feededFS.feededFileSystem()
+  const fs = await feededFileSystem()
   const engineContext = createEngineContext({
     onChangeFunction: (entity, operation, component, componentValue) => {
       callbackFunctions.forEach((func) => func(entity, operation, component, componentValue))

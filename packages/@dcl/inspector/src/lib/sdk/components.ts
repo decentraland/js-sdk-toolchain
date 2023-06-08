@@ -12,7 +12,7 @@ import { GizmoType } from '../utils/gizmo'
 
 export type Component<T = unknown> = ComponentDefinition<T>
 
-export enum EditorComponentIds {
+export enum EditorComponentNames {
   Selection = 'inspector::Selection',
   Scene = 'inspector::Scene'
 }
@@ -56,7 +56,7 @@ export function createComponents(engine: IEngine): SdkComponents {
 
 /* istanbul ignore next */
 export function createEditorComponents(engine: IEngine): EditorComponents {
-  const Selection = engine.defineComponent(EditorComponentIds.Selection, {
+  const Selection = engine.defineComponent(EditorComponentNames.Selection, {
     gizmo: Schemas.Int
   })
 
@@ -65,7 +65,7 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     y: Schemas.Int
   })
 
-  const Scene = engine.defineComponent(EditorComponentIds.Scene, {
+  const Scene = engine.defineComponent(EditorComponentNames.Scene, {
     layout: Schemas.Map({
       base: Coords,
       parcels: Schemas.Array(Coords)

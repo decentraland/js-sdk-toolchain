@@ -1,5 +1,5 @@
 import { Entity, IEngine } from '@dcl/ecs'
-import { EditorComponentIds, EditorComponents } from '../components'
+import { EditorComponentNames, EditorComponents } from '../components'
 import { GizmoType } from '../../utils/gizmo'
 
 export function updateSelectedEntity(engine: IEngine) {
@@ -7,7 +7,7 @@ export function updateSelectedEntity(engine: IEngine) {
     let gizmo = GizmoType.POSITION
 
     // clear selection
-    const Selection = engine.getComponent(EditorComponentIds.Selection) as EditorComponents['Selection']
+    const Selection = engine.getComponent(EditorComponentNames.Selection) as EditorComponents['Selection']
     for (const [currentlySelectedEntity] of engine.getEntitiesWith(Selection)) {
       if (currentlySelectedEntity !== entity) {
         gizmo = Selection.get(currentlySelectedEntity).gizmo

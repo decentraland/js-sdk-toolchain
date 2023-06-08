@@ -7,7 +7,9 @@ import {
   CompositeDefinition,
   LastWriteWinElementSetComponentDefinition,
   Name,
-  Transform
+  Transform,
+  CrdtMessageType,
+  ComponentDefinition
 } from '@dcl/ecs'
 
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
@@ -20,8 +22,18 @@ import { getMinimalComposite } from '../client/feeded-local-fs'
 import upsertAsset from './upsert-asset'
 import { initSceneProvider } from './scene'
 import { readPreferencesFromFile, serializeInspectorPreferences } from '../../logic/preferences/io'
+import { EditorComponentNames } from '../../sdk/components'
 
 const INSPECTOR_PREFERENCES_PATH = 'inspector-preferences.json'
+
+enum DirtyEnum {
+  // No changes
+  None,
+  // Changes but that it doesnt affect the composite
+  Dirty,
+  // Changes that need to be sync with the composite
+  DirtyAndDump
+}
 
 export async function initRpcMethods(
   fs: FileSystemInterface,
@@ -43,7 +55,6 @@ export async function initRpcMethods(
     const composite = dumpEngineToComposite(engine, 'json')
 
     if (!dump) return composite
-
     const mainCrdt = dumpEngineToCrdtCommands(engine)
     fs.writeFile('main.crdt', Buffer.from(mainCrdt)).catch((err) => console.error('Failed saving main.crdt: ', err))
     compositeProvider
@@ -96,21 +107,47 @@ export async function initRpcMethods(
   engine.addSystem(legacyEntityNode)
   // END Legacy Entity Node
 
-  let dirty = false
+  let dirty: DirtyEnum = DirtyEnum.None
   let composite: CompositeDefinition
   const undoRedo = initUndoRedo(fs, engine, () => composite)
   const scene = initSceneProvider(fs)
 
   // Create containers and attach onChange logic.
   onChanges.push(undoRedo.onChange)
+
+  // Scene Component logic
   onChanges.push(scene.onChange)
-  onChanges.push(() => (dirty = true))
+
+  // Dirty Save Logic
+  onChanges.push(
+    (
+      _entity: Entity,
+      operation: CrdtMessageType,
+      component: ComponentDefinition<unknown> | undefined,
+      _componentValue: unknown
+    ) => {
+      // // No create dirty state if the changes are not needed to be dumped
+      if (
+        !component ||
+        component.componentName === EditorComponentNames.Scene ||
+        component.componentName === EditorComponentNames.Selection
+      ) {
+        if (dirty === DirtyEnum.None) dirty = DirtyEnum.Dirty
+        return
+      }
+      // // No create dirty state if its an invalid operation
+      if (operation !== CrdtMessageType.PUT_COMPONENT && operation !== CrdtMessageType.DELETE_COMPONENT) {
+        return
+      }
+      dirty = DirtyEnum.DirtyAndDump
+    }
+  )
 
   engine.addSystem(() => {
-    if (dirty) {
-      saveComposite(inspectorPreferences.autosaveEnabled)
+    if (dirty !== DirtyEnum.None) {
+      saveComposite(inspectorPreferences.autosaveEnabled && dirty === DirtyEnum.DirtyAndDump)
     }
-    dirty = false
+    dirty = DirtyEnum.None
   }, -1_000_000_000)
 
   return {
@@ -130,13 +167,14 @@ export async function initRpcMethods(
       return stream(iter, { engine }, () => undoRedo?.addUndoCrdt())
     },
     async getAssetData(req) {
+      if (!req.path) throw new Error('Invalid path')
       if (await fs.existFile(req.path)) {
         return {
           data: await fs.readFile(req.path)
         }
       }
 
-      throw new Error("Couldn't find the asset " + req.path)
+      throw new Error(`Couldn't find the asset ${req.path}`)
     },
     async getAssetCatalog() {
       const extensions = ['.glb', '.png', '.composite', '.composite.bin', '.gltf', '.jpg']

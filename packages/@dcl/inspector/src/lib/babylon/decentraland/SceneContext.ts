@@ -150,6 +150,7 @@ export class SceneContext {
   }
 
   async getFile(src: string): Promise<Uint8Array | null> {
+    if (!src) return null
     try {
       const response = await this.dataLayer.getAssetData({ path: src })
       return response.data

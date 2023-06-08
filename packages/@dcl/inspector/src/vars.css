@@ -7,7 +7,6 @@
   --list-item-hover-bg-color: var(--vscode-list-hoverBackground, #504E58);
   --tree-bg-color: var(--vscode-panel-background, #252526);
   --tree-border-color: var(--vscode-panel-border, #333333);
-  --input-bg-color: var(--vscode-input-background, #D8D8D8);
   --input-border-color: var(--vscode-input-border, #cdcccc);
   --button-color: var(--vscode-button-foreground, var(--black));
   --title: #EEEEEF;
@@ -26,6 +25,7 @@
   --transparent: transparent;
   --vscode-accent-blue: #094771;
   --vscode-blue: var(--border-focused);
+  --input-bg-color: #D8D8D8;
 
   /* Context menu */
   --contexify-zIndex: 999;

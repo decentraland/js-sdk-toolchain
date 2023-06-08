@@ -4,6 +4,7 @@ import { WebSocket } from 'ws'
 import chokidar from 'chokidar'
 import { getDCLIgnorePatterns } from '../../../logic/dcl-ignore'
 import { PreviewComponents } from '../types'
+import { sceneUpdateClients } from './routes'
 
 /**
  * This function gets file modification events and sends them to all the connected
@@ -15,7 +16,7 @@ export async function wireFileWatcherToWebSockets(
   components: Pick<PreviewComponents, 'fs' | 'ws'>,
   projectRoot: string
 ) {
-  const { clients } = components.ws.ws
+  const clients = sceneUpdateClients
   const ignored = await getDCLIgnorePatterns(components, projectRoot)
 
   chokidar

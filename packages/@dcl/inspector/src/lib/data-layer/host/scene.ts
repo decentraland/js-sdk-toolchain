@@ -3,7 +3,7 @@ import { Scene } from '@dcl/schemas'
 
 import { FileSystemInterface } from '../types'
 import { parseSceneFromComponent } from './utils/component'
-import { EditorComponentIds, EditorComponentsTypes } from '../../sdk/components'
+import { EditorComponentNames, EditorComponentsTypes } from '../../sdk/components'
 
 function getUpdatedSceneBuffer(sceneBuffer: Buffer, value: EditorComponentsTypes['Scene']) {
   const scene: Scene = JSON.parse(sceneBuffer.toString())
@@ -23,7 +23,7 @@ export function initSceneProvider(fs: FileSystemInterface) {
       component: ComponentDefinition<unknown> | undefined,
       componentValue: unknown
     ) {
-      if (operation === CrdtMessageType.PUT_COMPONENT && component?.componentName === EditorComponentIds.Scene) {
+      if (operation === CrdtMessageType.PUT_COMPONENT && component?.componentName === EditorComponentNames.Scene) {
         fs.readFile('scene.json')
           .then((content) => {
             const value = componentValue as EditorComponentsTypes['Scene']
