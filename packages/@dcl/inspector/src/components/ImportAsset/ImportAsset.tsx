@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { HiOutlineUpload } from 'react-icons/hi'
 import { RxCross2 } from 'react-icons/rx'
 import { IoIosImage } from 'react-icons/io'
@@ -112,6 +112,10 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
     setValidationError(null)
   }
 
+  const handleNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setAssetPackageName(event.target.value)
+  }, [])
+
   const invalidName = !!systemFiles.assets.find((asset) => {
     const [_, packageName] = asset.path.split('/')
     return packageName?.toLocaleLowerCase() === assetPackageName?.toLocaleLowerCase()
@@ -146,7 +150,7 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
                 <TextField
                   label=""
                   value={assetPackageName}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => setAssetPackageName(event.target.value)}
+                  onChange={handleNameChange}
                 />
               </Block>
               <Button disabled={invalidName || !!validationError} onClick={handleSave}>

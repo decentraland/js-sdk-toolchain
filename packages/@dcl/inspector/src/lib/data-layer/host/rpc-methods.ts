@@ -1,7 +1,7 @@
 import { Entity, EntityMappingMode, IEngine, Composite, OnChangeFunction, CompositeDefinition } from '@dcl/ecs'
 
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
-import { createAssetsFs, getFilesInDirectory } from './fs-utils'
+import { EXTENSIONS, createAssetsFs, getFileName, getFilesInDirectory } from './fs-utils'
 import { dumpEngineToComposite, dumpEngineToCrdtCommands } from './utils/engine-to-composite'
 import { CompositeManager, createFsCompositeProvider } from './utils/fs-composite-provider'
 import { stream } from './stream'
@@ -43,10 +43,13 @@ export async function initRpcMethods(
   engine: IEngine,
   onChanges: OnChangeFunction[]
 ): Promise<DataLayerRpcServer> {
+  const sceneProvider = await initSceneProvider(fs)
   const assetsFs = createAssetsFs(fs)
+  const scenePath = sceneProvider.getScene().display.title
+
   let inspectorPreferences = await readPreferencesFromFile(fs, INSPECTOR_PREFERENCES_PATH)
 
-  const currentCompositeResourcePath = 'scene/main.composite'
+  const currentCompositeResourcePath = `${scenePath}/main.composite`
 
   if (!(await assetsFs.existFile(currentCompositeResourcePath))) {
     await assetsFs.writeFile(currentCompositeResourcePath, Buffer.from(JSON.stringify(minimalComposite), 'utf-8'))
@@ -69,7 +72,6 @@ export async function initRpcMethods(
   let dirty = false
   let composite: CompositeDefinition
   const undoRedo = initUndoRedo(assetsFs, engine, () => composite)
-  const sceneProvider = await initSceneProvider(fs)
 
   // Create containers and attach onChange logic.
   onChanges.push(undoRedo.onChange)
@@ -117,12 +119,11 @@ export async function initRpcMethods(
       throw new Error("Couldn't find the asset " + req.path)
     },
     async getAssetCatalog() {
-      const extensions = ['.glb', '.png', '.composite', '.composite.bin', '.gltf', '.jpg']
       const ignore = ['.git', 'node_modules']
 
       const files = (await getFilesInDirectory(assetsFs, '', [], true, ignore)).filter((item) => {
         const itemLower = item.toLowerCase()
-        return extensions.some((ext) => itemLower.endsWith(ext))
+        return EXTENSIONS.some((ext) => itemLower.endsWith(ext))
       })
 
       return { basePath: '.', assets: files.map((item) => ({ path: item })) }
@@ -131,11 +132,13 @@ export async function initRpcMethods(
      * Import asset into the file system.
      * It generates an undo operation.
      */
-    async importAsset(req) {
-      const baseFolder = (req.basePath.length ? req.basePath + '/' : '') + req.assetPackageName + '/'
+    async importAsset({ assetPackageName, basePath, content }) {
+      const baseFolder = basePath.length ? basePath + '/' : ''
       const undoAcc: FileOperation[] = []
-      for (const [fileName, fileContent] of req.content) {
-        const filePath = (baseFolder + fileName).replaceAll('//', '/')
+      for (const [fileName, fileContent] of content) {
+        const ext = fileName.split('.')[1]
+        const importName = assetPackageName ? getFileName(assetPackageName, ext) : fileName
+        const filePath = (baseFolder + importName).replaceAll('//', '/')
         const prevValue = (await assetsFs.existFile(filePath)) ? await assetsFs.readFile(filePath) : null
         undoAcc.push({ prevValue, newValue: fileContent, path: filePath })
         await upsertAsset(assetsFs, filePath, fileContent)
@@ -168,7 +171,7 @@ export async function initRpcMethods(
     async getProjectData() {
       const scene = sceneProvider.getScene()
       return {
-        path: scene.display?.title || (await fs.cwd())
+        path: scene.display.title
       }
     }
   }

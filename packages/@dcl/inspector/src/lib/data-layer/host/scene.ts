@@ -5,9 +5,15 @@ import { FileSystemInterface } from '../types'
 import { parseSceneFromComponent } from './utils/component'
 import { EditorComponentIds, EditorComponentsTypes } from '../../sdk/components'
 
+type SceneWithDefaults = Scene & {
+  display: {
+    title: string
+  }
+}
+
 export interface SceneProvider {
   onChange: OnChangeFunction
-  getScene: () => Scene
+  getScene: () => SceneWithDefaults
 }
 
 function bufferToScene(sceneBuffer: Buffer): Scene {
@@ -25,24 +31,38 @@ function updateScene(scene: Scene, value: EditorComponentsTypes['Scene']): Scene
   }
 }
 
-async function getScene(fs: FileSystemInterface): Promise<Scene> {
+async function getScene(fs: FileSystemInterface): Promise<SceneWithDefaults> {
+  let scene: Scene = {} as Scene
   try {
-    return bufferToScene(await fs.readFile('scene.json'))
+    scene = bufferToScene(await fs.readFile('scene.json'))
   } catch (e) {
     console.error('Reading scene.json file failed: ', e)
   }
 
-  // maybe some defaults? idk...
-  return {} as Scene
+  const sceneWithDefaults = await augmentDefaults(fs, scene)
+  return sceneWithDefaults
+}
+
+async function augmentDefaults(fs: FileSystemInterface, scene: Scene): Promise<SceneWithDefaults> {
+  return {
+    ...scene,
+    display: {
+      ...scene.display,
+      title: scene.display?.title || (await fs.cwd())
+    }
+  }
 }
 
 export async function initSceneProvider(fs: FileSystemInterface): Promise<SceneProvider> {
-  let scene: Scene = await getScene(fs)
+  let scene: SceneWithDefaults = await getScene(fs)
 
   return {
     onChange(_, operation, component, componentValue) {
       if (operation === CrdtMessageType.PUT_COMPONENT && component?.componentName === EditorComponentIds.Scene) {
-        scene = updateScene(scene, componentValue as EditorComponentsTypes['Scene'])
+        const updatedScene = updateScene(scene, componentValue as EditorComponentsTypes['Scene'])
+        augmentDefaults(fs, updatedScene)
+          .then(($) => (scene = $))
+          .catch((err) => console.error('Augmenting defaults for scene.json failed', err))
         fs.writeFile('scene.json', sceneToBuffer(scene)).catch((err) =>
           console.error('Failed saving scene.json: ', err)
         )

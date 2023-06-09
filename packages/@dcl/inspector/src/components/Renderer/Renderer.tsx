@@ -81,7 +81,7 @@ const Renderer: React.FC = () => {
     }
     await sdk!.dataLayer.importAsset({
       content: new Map(Object.entries(fileContent)),
-      basePath: destFolder,
+      basePath: `${destFolder}/${assetPackageName}`,
       assetPackageName
     })
     if (!isMounted()) return
