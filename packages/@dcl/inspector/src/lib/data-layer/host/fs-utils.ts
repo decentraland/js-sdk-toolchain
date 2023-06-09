@@ -1,4 +1,5 @@
 import { FileSystemInterface } from '../types'
+import { SceneProvider } from './scene'
 
 export async function getFilesInDirectory(
   fs: FileSystemInterface,
@@ -36,4 +37,9 @@ export function withAssetDir(filePath: string = '') {
 export function getFileName(fileName: string, ext: string) {
   if (EXTENSIONS.some(($) => fileName.endsWith($))) return fileName
   return `${fileName}.${ext}`
+}
+
+export function getCurrentCompositePath(sceneProvider: SceneProvider) {
+  const scenePath = sceneProvider.getScene().display.title
+  return withAssetDir(`${scenePath}/main.composite`)
 }

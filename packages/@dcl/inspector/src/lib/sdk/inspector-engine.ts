@@ -1,13 +1,13 @@
-import { Engine, Transport } from '@dcl/ecs'
+import { Transport } from '@dcl/ecs'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
 import mitt from 'mitt'
 
 import { CrdtStreamMessage } from '../data-layer/proto/gen/data-layer.gen'
 import { DataLayerRpcClient } from '../data-layer/types'
 import { consumeAllMessagesInto } from '../logic/consume-stream'
-import { createComponents, createEditorComponents } from './components'
 import { serializeCrdtMessages } from './crdt-logger'
 import { SdkContextEvents, SdkContextValue } from './context'
+import { createEngineContext } from '../data-layer/host/utils/engine'
 
 export function createInspectorEngine(
   dataLayer: DataLayerRpcClient
@@ -16,15 +16,10 @@ export function createInspectorEngine(
   'scene' | 'sceneContext' | 'dataLayer' | 'operations' | 'gizmos' | 'editorCamera' | 'preferences'
 > {
   const events = mitt<SdkContextEvents>()
-  const engine = Engine({
+  const { engine, components } = createEngineContext({
     onChangeFunction: (entity, operation, component, value) =>
       events.emit('change', { entity, operation, component, value })
   })
-
-  const components = {
-    ...createEditorComponents(engine),
-    ...createComponents(engine)
-  }
 
   // <HERE BE DRAGONS (TRANSPORT)>
   const outgoingMessagesStream = new AsyncQueue<CrdtStreamMessage>((_, _action) => {})

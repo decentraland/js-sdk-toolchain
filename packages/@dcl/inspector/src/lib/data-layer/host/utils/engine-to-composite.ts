@@ -93,7 +93,7 @@ export function dumpEngineToComposite(engine: IEngine, internalDataType: 'json' 
       const componentData: ComponentData = componentToCompositeComponentData(
         internalDataType,
         value,
-        itComponentDefinition
+        itComponentDefinition as LastWriteWinElementSetComponentDefinition<unknown>
       )
       itCompositeComponent.data.set(entity, componentData)
     }
@@ -103,14 +103,12 @@ export function dumpEngineToComposite(engine: IEngine, internalDataType: 'json' 
       composite.components.push(itCompositeComponent)
     }
   }
-
   return composite
 }
 
 export function dumpEngineToCrdtCommands(engine: IEngine): Uint8Array {
   const componentBuffer = new ReadWriteByteBuffer()
   const crdtBuffer = new ReadWriteByteBuffer()
-
   for (const itComponentDefinition of engine.componentsIter()) {
     for (const [entity, value] of engine.getEntitiesWith(itComponentDefinition)) {
       if (value) {

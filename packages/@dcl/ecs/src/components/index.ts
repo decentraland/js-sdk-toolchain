@@ -1,9 +1,11 @@
 import { GrowOnlyValueSetComponentDefinition, LastWriteWinElementSetComponentDefinition } from '../engine/component'
+import { IEngine } from '../engine/types'
 import { AnimatorComponentDefinitionExtended, defineAnimatorComponent } from './extended/Animator'
 import { defineMaterialComponent, MaterialComponentDefinitionExtended } from './extended/Material'
 import { defineMeshColliderComponent, MeshColliderComponentDefinitionExtended } from './extended/MeshCollider'
 import { defineMeshRendererComponent, MeshRendererComponentDefinitionExtended } from './extended/MeshRenderer'
 import { LwwComponentGetter, GSetComponentGetter } from './generated/index.gen'
+import defineNameComponent, { NameType } from './manual/Name'
 import { defineTransformComponent, TransformComponentExtended } from './manual/Transform'
 
 export * from './generated/index.gen'
@@ -33,3 +35,11 @@ export const MeshRenderer: LwwComponentGetter<MeshRendererComponentDefinitionExt
 /* @__PURE__ */
 export const MeshCollider: LwwComponentGetter<MeshColliderComponentDefinitionExtended> = (engine) =>
   defineMeshColliderComponent(engine)
+
+/**
+ * @alpha
+ */
+/* @__PURE__ */
+export const Name: (engine: Pick<IEngine, 'defineComponent'>) => LastWriteWinElementSetComponentDefinition<NameType> = (
+  engine
+) => defineNameComponent(engine)

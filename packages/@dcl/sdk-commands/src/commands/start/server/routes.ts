@@ -8,10 +8,9 @@ import { PreviewComponents } from '../types'
 import { setupEcs6Endpoints } from './endpoints'
 import { setupRealmAndComms } from './realm'
 
+export const sceneUpdateClients = new Set<WebSocket>()
 export async function wireRouter(components: PreviewComponents, workspace: Workspace, dataLayer?: DataLayer) {
   const router = new Router<PreviewComponents>()
-
-  const sceneUpdateClients = new Set<WebSocket>()
 
   if (dataLayer) {
     router.get('/data-layer', async (ctx, next) => {

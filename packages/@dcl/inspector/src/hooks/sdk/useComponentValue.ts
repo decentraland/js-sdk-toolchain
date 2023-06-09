@@ -4,7 +4,6 @@ import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
 import { Component } from '../../lib/sdk/components'
 import { useChange } from './useChange'
-import { isEqual } from '../../lib/data-layer/host/utils/component'
 import { useSdk } from './useSdk'
 
 export function isLastWriteWinComponent<T = unknown>(
@@ -30,16 +29,10 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
   // sync state -> engine
   useEffect(() => {
     if (value === null) return
-    const isEqualValue = isEqual(component, getComponentValue(entity, component), value)
+    const isEqualValue = !recursiveCheck(getComponentValue(entity, component), value, 2)
 
     if (isEqualValue) {
       return
-    }
-    const sameValue = !recursiveCheck(getComponentValue(entity, component), value, 2)
-    if (sameValue && !isEqualValue) {
-      console.log(
-        'TODO: maybe use this isEqual instead of the Uint8Array. Value is the same, but not for Uint8Array compare'
-      )
     }
     if (isLastWriteWinComponent(component) && sdk) {
       sdk.operations.updateValue(component, entity, value!)
@@ -69,7 +62,7 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
   )
 
   function isComponentEqual(val: ComponentValueType) {
-    return isEqual(component, value, val)
+    return !recursiveCheck(getComponentValue(entity, component), val, 2)
   }
 
   return [value, setValue, isComponentEqual] as const

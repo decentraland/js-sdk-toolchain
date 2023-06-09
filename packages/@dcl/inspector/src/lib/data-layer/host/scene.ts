@@ -3,7 +3,7 @@ import { Scene } from '@dcl/schemas'
 
 import { FileSystemInterface } from '../types'
 import { parseSceneFromComponent } from './utils/component'
-import { EditorComponentIds, EditorComponentsTypes } from '../../sdk/components'
+import { EditorComponentNames, EditorComponentsTypes } from '../../sdk/components'
 
 type SceneWithDefaults = Scene & {
   display: {
@@ -58,7 +58,7 @@ export async function initSceneProvider(fs: FileSystemInterface): Promise<SceneP
 
   return {
     onChange(_, operation, component, componentValue) {
-      if (operation === CrdtMessageType.PUT_COMPONENT && component?.componentName === EditorComponentIds.Scene) {
+      if (operation === CrdtMessageType.PUT_COMPONENT && component?.componentName === EditorComponentNames.Scene) {
         const updatedScene = updateScene(scene, componentValue as EditorComponentsTypes['Scene'])
         augmentDefaults(fs, updatedScene)
           .then(($) => (scene = $))

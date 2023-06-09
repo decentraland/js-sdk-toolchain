@@ -1,5 +1,4 @@
 import {
-  Entity,
   ComponentDefinition,
   IEngine,
   LastWriteWinElementSetComponentDefinition,
@@ -13,20 +12,17 @@ import { GizmoType } from '../utils/gizmo'
 
 export type Component<T = unknown> = ComponentDefinition<T>
 
-export enum EditorComponentIds {
-  EntityNode = 'inspector::EntityNode',
+export enum EditorComponentNames {
   Selection = 'inspector::Selection',
   Scene = 'inspector::Scene'
 }
 
 export type EditorComponentsTypes = {
-  EntityNode: { label: string; parent: Entity }
   Selection: { gizmo: GizmoType }
   Scene: { layout: Layout }
 }
 
 export type EditorComponents = {
-  EntityNode: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['EntityNode']>
   Selection: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Selection']>
   Scene: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Scene']>
 }
@@ -37,6 +33,7 @@ export type SdkComponents = {
   MeshRenderer: MeshRendererComponentDefinitionExtended
   Transform: TransformComponentExtended
   TextShape: ReturnType<typeof components.TextShape>
+  Name: ReturnType<typeof components.Name>
 }
 
 export function createComponents(engine: IEngine): SdkComponents {
@@ -45,24 +42,21 @@ export function createComponents(engine: IEngine): SdkComponents {
   const MeshRenderer = components.MeshRenderer(engine)
   const Transform = components.Transform(engine)
   const TextShape = components.TextShape(engine)
+  const Name = components.Name(engine)
 
   return {
     GltfContainer,
     Billboard,
     MeshRenderer,
     Transform,
-    TextShape
+    TextShape,
+    Name
   }
 }
 
 /* istanbul ignore next */
 export function createEditorComponents(engine: IEngine): EditorComponents {
-  const EntityNode = engine.defineComponent(EditorComponentIds.EntityNode, {
-    label: Schemas.String,
-    parent: Schemas.Entity
-  })
-
-  const Selection = engine.defineComponent(EditorComponentIds.Selection, {
+  const Selection = engine.defineComponent(EditorComponentNames.Selection, {
     gizmo: Schemas.Int
   })
 
@@ -71,12 +65,12 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     y: Schemas.Int
   })
 
-  const Scene = engine.defineComponent(EditorComponentIds.Scene, {
+  const Scene = engine.defineComponent(EditorComponentNames.Scene, {
     layout: Schemas.Map({
       base: Coords,
       parcels: Schemas.Array(Coords)
     })
   })
 
-  return { Selection, Scene, EntityNode }
+  return { Selection, Scene }
 }
