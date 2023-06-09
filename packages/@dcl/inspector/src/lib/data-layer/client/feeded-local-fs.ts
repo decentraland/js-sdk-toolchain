@@ -1,33 +1,25 @@
-import { Engine } from '@dcl/ecs'
-import { defineTransformComponent } from '@dcl/ecs/dist/components/manual/Transform'
-import { defineMeshRendererComponent } from '@dcl/ecs/dist/components/extended/MeshRenderer'
 import { Composite } from '@dcl/ecs'
-import { GltfContainer, PointerEvents } from '@dcl/ecs/dist/components'
+import { PointerEvents } from '@dcl/ecs/dist/components'
 import { defineMaterialComponent } from '@dcl/ecs/dist/components/extended/Material'
-import { defineMeshColliderComponent } from '@dcl/ecs/dist/components/extended/MeshCollider'
 
 import { parseSceneFromComponent } from '../host/utils/component'
 import { dumpEngineToComposite } from '../host/utils/engine-to-composite'
 import { createFsInMemory } from '../../logic/in-memory-storage'
-import { createEditorComponents } from '../../sdk/components'
+import { createEngineContext } from '../host/utils/engine'
 
-function createTempEngine() {
-  const engine = Engine()
+function createTempEngineContext() {
+  const { engine, components } = createEngineContext()
   return {
     engine,
     components: {
-      Transform: defineTransformComponent(engine),
-      MeshRenderer: defineMeshRendererComponent(engine),
-      MeshCollider: defineMeshColliderComponent(engine),
+      ...components,
       Material: defineMaterialComponent(engine),
-      GltfContainer: GltfContainer(engine),
-      PointerEvents: PointerEvents(engine),
-      ...createEditorComponents(engine)
+      PointerEvents: PointerEvents(engine)
     }
   }
 }
 
-type TempEngine = ReturnType<typeof createTempEngine>
+type TempEngine = ReturnType<typeof createTempEngineContext>
 
 function generateMinimalComposite({ engine, components }: TempEngine) {
   // custom component
@@ -35,10 +27,10 @@ function generateMinimalComposite({ engine, components }: TempEngine) {
 
   // main box
   const entity = engine.addEntity()
-  components.Transform.create(entity, { position: { x: 8, y: 1, z: 8 } })
+  components.Transform.create(entity, { position: { x: 8, y: 1, z: 8 }, parent: engine.RootEntity })
   components.MeshRenderer.setBox(entity)
   cubeIdComponent.create(entity)
-  components.EntityNode.create(entity, { label: 'Magic Cube', parent: engine.RootEntity })
+  components.Name.create(entity, { value: 'Magic Cube' })
 
   // scene
   components.Scene.create(engine.RootEntity, {
@@ -60,7 +52,7 @@ function generateMinimalComposite({ engine, components }: TempEngine) {
   return Composite.toJson(composite)
 }
 
-function generateMainComposite({ engine, components }: TempEngine) {
+export function generateMainComposite({ engine, components }: TempEngine) {
   // custom component
   const cubeIdComponent = engine.defineComponent('cube-id', {})
 
@@ -91,7 +83,7 @@ function generateMainComposite({ engine, components }: TempEngine) {
       a: 1.0
     }
   })
-  components.EntityNode.create(entity, { label: 'Magic Cube', parent: engine.RootEntity })
+  components.Name.create(entity, { value: 'Magic Cube' })
 
   const gltfEntity = engine.addEntity()
   components.Transform.create(gltfEntity, {
@@ -103,7 +95,7 @@ function generateMainComposite({ engine, components }: TempEngine) {
   })
   components.GltfContainer.create(gltfEntity, { src: 'assets/models/test-glb.glb' })
   cubeIdComponent.create(gltfEntity)
-  components.EntityNode.create(gltfEntity, { label: 'Gltf Test', parent: engine.RootEntity })
+  components.Name.create(gltfEntity, { value: 'Gltf Test' })
 
   // scene
   components.Scene.create(engine.RootEntity, {
@@ -133,11 +125,7 @@ function generateMainComposite({ engine, components }: TempEngine) {
   return Composite.toJson(composite)
 }
 
-const mainEngine = createTempEngine()
-const minimalEngine = createTempEngine()
-
-export const mainComposite = generateMainComposite(mainEngine)
-export const minimalComposite = generateMinimalComposite(minimalEngine)
+export const getMinimalComposite = () => generateMinimalComposite(createTempEngineContext())
 
 const builderMappings: Record<string, string> = {
   'assets/models/test-glb.glb': 'QmWtwaLMbfMioQCshdqwnuRCzZAz6nnAWARvZKnqfnu4LB',
@@ -157,7 +145,8 @@ const builderMappings: Record<string, string> = {
 }
 
 function getFeededEngineAndComposite() {
-  return { engine: mainEngine, composite: mainComposite }
+  const context = createTempEngineContext()
+  return { engineContext: context, composite: generateMainComposite(context) }
 }
 
 export async function feededFileSystem(mappings: Record<string, string> = builderMappings) {
@@ -177,8 +166,8 @@ export async function feededFileSystem(mappings: Record<string, string> = builde
   const assetPromises = Object.entries(mappings).map(downloadAndAssignAsset)
   await Promise.all(assetPromises)
 
-  const { engine, composite } = getFeededEngineAndComposite()
-  const scene = parseSceneFromComponent(engine.components.Scene.get(engine.engine.RootEntity))
+  const { engineContext, composite } = getFeededEngineAndComposite()
+  const scene = parseSceneFromComponent(engineContext.components.Scene.get(engineContext.engine.RootEntity))
 
   return createFsInMemory({
     ...fileContent,

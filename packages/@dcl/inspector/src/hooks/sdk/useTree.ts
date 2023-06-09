@@ -17,10 +17,10 @@ export const useTree = () => {
     if (sdk) {
       const {
         engine,
-        components: { EntityNode },
+        components: { Transform },
         operations
       } = sdk
-      return getTreeFromEngine(engine, operations, EntityNode)
+      return getTreeFromEngine(engine, operations, Transform)
     } else {
       return getEmptyTree()
     }
@@ -52,8 +52,8 @@ export const useTree = () => {
     (entity: Entity) => {
       if (entity === ROOT) return 'Scene'
       if (!sdk) return entity.toString()
-      const { EntityNode } = sdk.components
-      return EntityNode.has(entity) ? EntityNode.get(entity).label : entity.toString()
+      const { Name } = sdk.components
+      return Name.has(entity) ? Name.get(entity).value : entity.toString()
     },
     [sdk]
   )
@@ -87,10 +87,10 @@ export const useTree = () => {
   )
 
   const rename = useCallback(
-    async (entity: Entity, label: string) => {
+    async (entity: Entity, value: string) => {
       if (entity === ROOT || !sdk) return
-      const { EntityNode } = sdk.components
-      sdk.operations.updateValue(EntityNode, entity, { label })
+      const { Name } = sdk.components
+      sdk.operations.updateValue(Name, entity, { value })
       await sdk.operations.dispatch()
       handleUpdate()
     },

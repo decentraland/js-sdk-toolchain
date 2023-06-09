@@ -3,3 +3,4 @@ export type { MeshRendererComponentDefinitionExtended } from './extended/MeshRen
 export type { MeshColliderComponentDefinitionExtended } from './extended/MeshCollider'
 export type { TextureHelper, MaterialComponentDefinitionExtended } from './extended/Material'
 export type { TransformComponentExtended, TransformTypeWithOptionals } from './manual/Transform'
+export type { NameComponent, NameType } from './manual/Name'

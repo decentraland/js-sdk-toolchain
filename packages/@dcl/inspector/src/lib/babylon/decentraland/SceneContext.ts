@@ -52,6 +52,7 @@ export class SceneContext {
   MeshRenderer = components.MeshRenderer(this.engine)
   GltfContainer = components.GltfContainer(this.engine)
   TextShape = components.TextShape(this.engine)
+  Name = components.Name(this.engine)
 
   readonly editorComponents = createEditorComponents(this.engine)
 
@@ -149,6 +150,7 @@ export class SceneContext {
   }
 
   async getFile(src: string): Promise<Uint8Array | null> {
+    if (!src) return null
     try {
       const response = await this.dataLayer.getAssetData({ path: src })
       return response.data

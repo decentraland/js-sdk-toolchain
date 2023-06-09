@@ -1,7 +1,6 @@
 import { ByteBuffer, Engine, IEngine, IEngineOptions } from '@dcl/ecs'
-import * as components from '@dcl/ecs/dist/components'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
-import { createEditorComponents } from '../../../sdk/components'
+import { createComponents, createEditorComponents } from '../../../sdk/components'
 
 export function serializeEngine(engine: IEngine) {
   const messages: ByteBuffer = new ReadWriteByteBuffer()
@@ -12,16 +11,13 @@ export function serializeEngine(engine: IEngine) {
   return messages.toBinary()
 }
 
-export function createEngine(opts?: IEngineOptions): IEngine {
+export function createEngineContext(opts?: IEngineOptions) {
   // create engine and its components
   const engine = Engine(opts)
 
-  components.Billboard(engine)
-  components.Transform(engine)
-  components.MeshRenderer(engine)
-  components.GltfContainer(engine)
-  components.TextShape(engine)
-
-  createEditorComponents(engine)
-  return engine
+  const components = {
+    ...createComponents(engine),
+    ...createEditorComponents(engine)
+  }
+  return { engine, components }
 }
