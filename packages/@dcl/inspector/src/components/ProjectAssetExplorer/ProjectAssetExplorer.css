@@ -63,3 +63,7 @@
   justify-content: left;
   overflow-y: auto;
 }
+
+.ProjectView .FolderView .with-context-menu {
+  height: auto;
+}
