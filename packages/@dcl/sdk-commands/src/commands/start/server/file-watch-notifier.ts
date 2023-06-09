@@ -6,6 +6,13 @@ import { getDCLIgnorePatterns } from '../../../logic/dcl-ignore'
 import { PreviewComponents } from '../types'
 import { sceneUpdateClients } from './routes'
 
+function debounce<T extends (...args: any[]) => void>(callback: T, delay: number) {
+  let debounceTimer: NodeJS.Timeout
+  return (...args: Parameters<T>) => {
+    clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => callback(...args), delay)
+  }
+}
 /**
  * This function gets file modification events and sends them to all the connected
  * websockets, it is used to hot-reload assets of the scene.
@@ -16,7 +23,6 @@ export async function wireFileWatcherToWebSockets(
   components: Pick<PreviewComponents, 'fs' | 'ws'>,
   projectRoot: string
 ) {
-  const clients = sceneUpdateClients
   const ignored = await getDCLIgnorePatterns(components, projectRoot)
 
   chokidar
@@ -25,10 +31,13 @@ export async function wireFileWatcherToWebSockets(
       ignoreInitial: false,
       cwd: projectRoot
     })
-    .on('all', async (_, _file) => {
-      // TODO: accumulate changes in an array and debounce
-      return updateScene(projectRoot, clients)
-    })
+    .on(
+      'all',
+      debounce(async (_, _file) => {
+        // TODO: accumulate changes in an array and debounce
+        return updateScene(projectRoot, sceneUpdateClients)
+      }, 100)
+    )
 }
 
 /*
