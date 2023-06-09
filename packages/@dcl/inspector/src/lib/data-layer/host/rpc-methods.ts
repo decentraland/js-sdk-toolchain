@@ -1,7 +1,7 @@
 import { Entity, EntityMappingMode, IEngine, Composite, OnChangeFunction, CompositeDefinition } from '@dcl/ecs'
 
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
-import { EXTENSIONS, createAssetsFs, getFileName, getFilesInDirectory } from './fs-utils'
+import { EXTENSIONS, getFileName, getFilesInDirectory, withAssetDir } from './fs-utils'
 import { dumpEngineToComposite, dumpEngineToCrdtCommands } from './utils/engine-to-composite'
 import { CompositeManager, createFsCompositeProvider } from './utils/fs-composite-provider'
 import { stream } from './stream'
@@ -44,19 +44,18 @@ export async function initRpcMethods(
   onChanges: OnChangeFunction[]
 ): Promise<DataLayerRpcServer> {
   const sceneProvider = await initSceneProvider(fs)
-  const assetsFs = createAssetsFs(fs)
   const scenePath = sceneProvider.getScene().display.title
 
   let inspectorPreferences = await readPreferencesFromFile(fs, INSPECTOR_PREFERENCES_PATH)
 
-  const currentCompositeResourcePath = `${scenePath}/main.composite`
+  const currentCompositeResourcePath = withAssetDir(`${scenePath}/main.composite`)
 
-  if (!(await assetsFs.existFile(currentCompositeResourcePath))) {
-    await assetsFs.writeFile(currentCompositeResourcePath, Buffer.from(JSON.stringify(minimalComposite), 'utf-8'))
+  if (!(await fs.existFile(currentCompositeResourcePath))) {
+    await fs.writeFile(currentCompositeResourcePath, Buffer.from(JSON.stringify(minimalComposite), 'utf-8'))
   }
 
-  const compositeProvider = await createFsCompositeProvider(assetsFs)
-  const dumpEngineAndGetComposite = setupEngineDump(assetsFs, engine, compositeProvider, currentCompositeResourcePath)
+  const compositeProvider = await createFsCompositeProvider(fs, withAssetDir())
+  const dumpEngineAndGetComposite = setupEngineDump(fs, engine, compositeProvider, currentCompositeResourcePath)
   const mainComposite = compositeProvider.getCompositeOrNull(currentCompositeResourcePath)
   if (mainComposite) {
     Composite.instance(engine, mainComposite, compositeProvider, {
@@ -71,7 +70,7 @@ export async function initRpcMethods(
 
   let dirty = false
   let composite: CompositeDefinition
-  const undoRedo = initUndoRedo(assetsFs, engine, () => composite)
+  const undoRedo = initUndoRedo(fs, engine, () => composite)
 
   // Create containers and attach onChange logic.
   onChanges.push(undoRedo.onChange)
@@ -110,9 +109,9 @@ export async function initRpcMethods(
       return stream(iter, { engine }, () => undoRedo?.addUndoCrdt())
     },
     async getAssetData(req) {
-      if (await assetsFs.existFile(req.path)) {
+      if (await fs.existFile(req.path)) {
         return {
-          data: await assetsFs.readFile(req.path)
+          data: await fs.readFile(req.path)
         }
       }
 
@@ -120,13 +119,14 @@ export async function initRpcMethods(
     },
     async getAssetCatalog() {
       const ignore = ['.git', 'node_modules']
+      const basePath = withAssetDir()
 
-      const files = (await getFilesInDirectory(assetsFs, '', [], true, ignore)).filter((item) => {
+      const files = (await getFilesInDirectory(fs, basePath, [], true, ignore)).filter((item) => {
         const itemLower = item.toLowerCase()
         return EXTENSIONS.some((ext) => itemLower.endsWith(ext))
       })
 
-      return { basePath: '.', assets: files.map((item) => ({ path: item })) }
+      return { basePath, assets: files.map(($) => ({ path: $.replace(basePath + '/', '') })) }
     },
     /**
      * Import asset into the file system.
@@ -139,9 +139,9 @@ export async function initRpcMethods(
         const ext = fileName.split('.')[1]
         const importName = assetPackageName ? getFileName(assetPackageName, ext) : fileName
         const filePath = (baseFolder + importName).replaceAll('//', '/')
-        const prevValue = (await assetsFs.existFile(filePath)) ? await assetsFs.readFile(filePath) : null
+        const prevValue = (await fs.existFile(filePath)) ? await fs.readFile(filePath) : null
         undoAcc.push({ prevValue, newValue: fileContent, path: filePath })
-        await upsertAsset(assetsFs, filePath, fileContent)
+        await upsertAsset(fs, filePath, fileContent)
       }
       undoRedo.addUndoFile(undoAcc)
       return {}
@@ -149,9 +149,9 @@ export async function initRpcMethods(
     async removeAsset(req) {
       const filePath = req.path
       // TODO: remove ALL gltf/glb related files...
-      if (await assetsFs.existFile(filePath)) {
-        const prevValue = await assetsFs.readFile(filePath)
-        await assetsFs.rm(filePath)
+      if (await fs.existFile(filePath)) {
+        const prevValue = await fs.readFile(filePath)
+        await fs.rm(filePath)
         undoRedo.addUndoFile([{ prevValue, newValue: null, path: filePath }])
       }
       return {}

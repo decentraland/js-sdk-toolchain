@@ -20,6 +20,7 @@ import { Warnings } from './Warnings'
 import { CameraSpeed } from './CameraSpeed'
 
 import './Renderer.css'
+import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
 
 const fixedNumber = (val: number) => Math.round(val * 1e2) / 1e2
 
@@ -79,9 +80,12 @@ const Renderer: React.FC = () => {
     if (!path) {
       throw new Error('Invalid asset format: should contain at least one gltf/glb file')
     }
+
+    const basePath = `${destFolder}/${assetPackageName}`
+
     await sdk!.dataLayer.importAsset({
       content: new Map(Object.entries(fileContent)),
-      basePath: `${destFolder}/${assetPackageName}`,
+      basePath: withAssetDir(basePath),
       assetPackageName
     })
     if (!isMounted()) return
@@ -90,7 +94,7 @@ const Renderer: React.FC = () => {
       type: 'asset',
       name: asset.name,
       parent: null,
-      asset: { type: 'gltf', src: `${destFolder}/${assetPackageName}/${path}` }
+      asset: { type: 'gltf', src: `${basePath}/${path}` }
     }
     await addAsset(model, position)
   }

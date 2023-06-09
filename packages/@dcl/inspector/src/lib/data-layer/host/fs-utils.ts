@@ -29,21 +29,8 @@ export const DIRECTORY = {
 
 export const EXTENSIONS = ['.glb', '.png', '.composite', '.composite.bin', '.gltf', '.jpg']
 
-export function createAssetsFs(fs: FileSystemInterface): FileSystemInterface {
-  const ASSETS_PATH = DIRECTORY.ASSETS
-
-  function withAssetDir(filePath: string = '') {
-    return `${ASSETS_PATH}/${filePath}`
-  }
-
-  return {
-    existFile: (filePath: string) => fs.existFile(withAssetDir(filePath)),
-    readFile: (filePath: string) => fs.readFile(withAssetDir(filePath)),
-    writeFile: (filePath: string, content: Buffer) => fs.writeFile(withAssetDir(filePath), content),
-    readdir: (filePath: string) => fs.readdir(withAssetDir(filePath)),
-    rm: (filePath: string) => fs.rm(withAssetDir(filePath)),
-    cwd: async () => ASSETS_PATH
-  }
+export function withAssetDir(filePath: string = '') {
+  return filePath ? `${DIRECTORY.ASSETS}/${filePath}` : DIRECTORY.ASSETS
 }
 
 export function getFileName(fileName: string, ext: string) {

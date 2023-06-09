@@ -12,6 +12,7 @@ import FolderIcon from '../Icons/Folder'
 import { AssetNode, AssetNodeFolder } from './types'
 import { getFullNodePath } from './utils'
 import Search from '../Search'
+import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
 
 function noop() {}
 

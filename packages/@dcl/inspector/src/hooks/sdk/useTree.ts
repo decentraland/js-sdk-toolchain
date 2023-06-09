@@ -69,7 +69,7 @@ export const useTree = () => {
     (_: Entity) => {
       return false
     },
-    [sdk]
+    []
   )
 
   const addChild = useCallback(

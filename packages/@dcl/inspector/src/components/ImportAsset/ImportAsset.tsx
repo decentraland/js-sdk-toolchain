@@ -15,6 +15,7 @@ import { GLTFValidation } from '@babylonjs/loaders'
 
 import './ImportAsset.css'
 import classNames from 'classnames'
+import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
 
 const ONE_MB_IN_BYTES = 1_048_576
 const ONE_GB_IN_BYTES = ONE_MB_IN_BYTES * 1024
@@ -94,7 +95,7 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
       const content: Map<string, Uint8Array> = new Map()
       content.set(file.name, new Uint8Array(binary))
 
-      const basePath = (await sdk!.dataLayer.getProjectData({})).path
+      const basePath = withAssetDir((await sdk!.dataLayer.getProjectData({})).path)
 
       await sdk!.dataLayer.importAsset({
         content,
