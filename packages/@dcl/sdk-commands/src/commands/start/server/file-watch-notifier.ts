@@ -36,7 +36,7 @@ export async function wireFileWatcherToWebSockets(
       debounce(async (_, _file) => {
         // TODO: accumulate changes in an array and debounce
         return updateScene(projectRoot, sceneUpdateClients)
-      }, 100)
+      }, 500)
     )
 }
 

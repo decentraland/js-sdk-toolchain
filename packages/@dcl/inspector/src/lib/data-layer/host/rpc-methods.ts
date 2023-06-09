@@ -1,39 +1,16 @@
-import {
-  Entity,
-  EntityMappingMode,
-  IEngine,
-  Composite,
-  OnChangeFunction,
-  CompositeDefinition,
-  LastWriteWinElementSetComponentDefinition,
-  Name,
-  Transform,
-  CrdtMessageType,
-  ComponentDefinition
-} from '@dcl/ecs'
+import { IEngine, OnChangeFunction } from '@dcl/ecs'
 
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
 import { getFilesInDirectory } from './fs-utils'
-import { dumpEngineToComposite, dumpEngineToCrdtCommands } from './utils/engine-to-composite'
-import { createFsCompositeProvider } from './utils/fs-composite-provider'
 import { stream } from './stream'
 import { FileOperation, initUndoRedo } from './undo-redo'
-import { getMinimalComposite } from '../client/feeded-local-fs'
 import upsertAsset from './upsert-asset'
 import { initSceneProvider } from './scene'
 import { readPreferencesFromFile, serializeInspectorPreferences } from '../../logic/preferences/io'
-import { EditorComponentNames } from '../../sdk/components'
+import { removeLegacyEntityNodeComponents } from './utils/legacy-entity-node'
+import { compositeAndDirty } from './utils/composite-dirty'
 
 const INSPECTOR_PREFERENCES_PATH = 'inspector-preferences.json'
-
-enum DirtyEnum {
-  // No changes
-  None,
-  // Changes but that it doesnt affect the composite
-  Dirty,
-  // Changes that need to be sync with the composite
-  DirtyAndDump
-}
 
 export async function initRpcMethods(
   fs: FileSystemInterface,
@@ -42,121 +19,29 @@ export async function initRpcMethods(
 ): Promise<DataLayerRpcServer> {
   let inspectorPreferences = await readPreferencesFromFile(fs, INSPECTOR_PREFERENCES_PATH)
 
-  // Look for a composite
-  const currentCompositeResourcePath = 'main.composite'
+  // Handle old EntityNode components
+  removeLegacyEntityNodeComponents(engine)
 
-  if (!(await fs.existFile(currentCompositeResourcePath))) {
-    await fs.writeFile(currentCompositeResourcePath, Buffer.from(JSON.stringify(getMinimalComposite()), 'utf-8'))
-  }
-
-  function dumpEngineAndGetComposite(dump: boolean = true): CompositeDefinition {
-    // TODO: hardcoded for the moment. the ID should be the selected composite id name.
-    // composite.id = 'main'
-    const composite = dumpEngineToComposite(engine, 'json')
-
-    if (!dump) return composite
-    const mainCrdt = dumpEngineToCrdtCommands(engine)
-    fs.writeFile('main.crdt', Buffer.from(mainCrdt)).catch((err) => console.error('Failed saving main.crdt: ', err))
-    compositeProvider
-      .save({ src: currentCompositeResourcePath, composite }, 'json')
-      .catch((err) => console.error(`Save composite ${currentCompositeResourcePath} fails: `, err))
-
-    return composite
-  }
-
-  function saveComposite(dump: boolean = true) {
-    composite = dumpEngineAndGetComposite(dump)
-  }
-
-  const compositeProvider = await createFsCompositeProvider(fs)
-  const mainComposite = compositeProvider.getCompositeOrNull(currentCompositeResourcePath)
-  if (mainComposite) {
-    Composite.instance(engine, mainComposite, compositeProvider, {
-      entityMapping: {
-        type: EntityMappingMode.EMM_DIRECT_MAPPING,
-        getCompositeEntity: (entity: number | Entity) => entity as Entity
-      }
-    })
-  } else {
-    // TODO: log the error
-  }
-
-  // Legacy EntityNode for backwards-compability
-  function legacyEntityNode() {
-    engine.removeSystem(legacyEntityNode)
-    const LegacyEntityNodeComponent = engine.getComponentOrNull(
-      'inspector::EntityNode'
-    ) as LastWriteWinElementSetComponentDefinition<{ label: string; parent: Entity }>
-    if (!LegacyEntityNodeComponent) return
-
-    for (const [entity, entityNodeValue] of engine.getEntitiesWith(LegacyEntityNodeComponent)) {
-      LegacyEntityNodeComponent.deleteFrom(entity)
-      const NameComponent = engine.getComponent(Name.componentId) as typeof Name
-      const TransformComponent = engine.getComponent(Transform.componentId) as typeof Transform
-      NameComponent.createOrReplace(entity, { value: entityNodeValue.label })
-      const transform = TransformComponent.getMutableOrNull(entity)
-      if (transform) {
-        transform.parent = entityNodeValue.parent
-      } else {
-        TransformComponent.create(entity, { parent: entityNodeValue.parent })
-      }
-    }
-    engine.removeComponentDefinition(LegacyEntityNodeComponent.componentId)
-    void dumpEngineAndGetComposite(true)
-  }
-  engine.addSystem(legacyEntityNode)
-  // END Legacy Entity Node
-
-  let dirty: DirtyEnum = DirtyEnum.None
-  let composite: CompositeDefinition
-  const undoRedo = initUndoRedo(fs, engine, () => composite)
+  const compositeManager = await compositeAndDirty(fs, engine, inspectorPreferences)
+  const undoRedoManager = initUndoRedo(fs, engine, () => compositeManager.composite)
   const scene = initSceneProvider(fs)
 
   // Create containers and attach onChange logic.
-  onChanges.push(undoRedo.onChange)
+  onChanges.push(undoRedoManager.onChange)
 
   // Scene Component logic
   onChanges.push(scene.onChange)
 
   // Dirty Save Logic
-  onChanges.push(
-    (
-      _entity: Entity,
-      operation: CrdtMessageType,
-      component: ComponentDefinition<unknown> | undefined,
-      _componentValue: unknown
-    ) => {
-      // // No create dirty state if the changes are not needed to be dumped
-      if (
-        !component ||
-        component.componentName === EditorComponentNames.Scene ||
-        component.componentName === EditorComponentNames.Selection
-      ) {
-        if (dirty === DirtyEnum.None) dirty = DirtyEnum.Dirty
-        return
-      }
-      // // No create dirty state if its an invalid operation
-      if (operation !== CrdtMessageType.PUT_COMPONENT && operation !== CrdtMessageType.DELETE_COMPONENT) {
-        return
-      }
-      dirty = DirtyEnum.DirtyAndDump
-    }
-  )
-
-  engine.addSystem(() => {
-    if (dirty !== DirtyEnum.None) {
-      saveComposite(inspectorPreferences.autosaveEnabled && dirty === DirtyEnum.DirtyAndDump)
-    }
-    dirty = DirtyEnum.None
-  }, -1_000_000_000)
+  onChanges.push(compositeManager.onChange)
 
   return {
     async redo() {
-      const type = await undoRedo.redo()
+      const type = await undoRedoManager.redo()
       return type
     },
     async undo() {
-      const type = await undoRedo.undo()
+      const type = await undoRedoManager.undo()
       return type
     },
     /**
@@ -164,7 +49,7 @@ export async function initRpcMethods(
      * It adds the undo's operations of the components changed (grouped) on every tick
      */
     crdtStream(iter) {
-      return stream(iter, { engine }, () => undoRedo?.addUndoCrdt())
+      return stream(iter, { engine }, () => undoRedoManager?.addUndoCrdt())
     },
     async getAssetData(req) {
       if (!req.path) throw new Error('Invalid path')
@@ -200,7 +85,7 @@ export async function initRpcMethods(
         undoAcc.push({ prevValue, newValue: fileContent, path: filePath })
         await upsertAsset(fs, filePath, fileContent)
       }
-      undoRedo.addUndoFile(undoAcc)
+      undoRedoManager.addUndoFile(undoAcc)
       return {}
     },
     async removeAsset(req) {
@@ -209,12 +94,12 @@ export async function initRpcMethods(
       if (await fs.existFile(filePath)) {
         const prevValue = await fs.readFile(filePath)
         await fs.rm(filePath)
-        undoRedo.addUndoFile([{ prevValue, newValue: null, path: filePath }])
+        undoRedoManager.addUndoFile([{ prevValue, newValue: null, path: filePath }])
       }
       return {}
     },
     async save() {
-      saveComposite(true)
+      await compositeManager.saveComposite(true)
       return {}
     },
     async getInspectorPreferences() {
