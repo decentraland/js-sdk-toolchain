@@ -6,8 +6,11 @@ export type CompositeManager = Composite.Provider & {
   save: (composite: Composite.Resource, type: 'json' | 'binary') => Promise<void>
 }
 
-export async function createFsCompositeProvider(fs: FileSystemInterface): Promise<CompositeManager> {
-  const files = await getFilesInDirectory(fs, '', [], true)
+export async function createFsCompositeProvider(
+  fs: FileSystemInterface,
+  dirPath: string = ''
+): Promise<CompositeManager> {
+  const files = await getFilesInDirectory(fs, dirPath, [], true)
   const compositePaths = files
     .filter((item) => item.endsWith('.composite') || item.endsWith('.composite.bin'))
     .map((item) => item)

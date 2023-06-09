@@ -35,6 +35,9 @@ export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliCompone
           isDirectory: await fs.directoryExists(path.resolve(dirPath, name))
         }))
       )
+    },
+    async cwd(): Promise<string> {
+      return path.basename(process.cwd())
     }
   }
 }

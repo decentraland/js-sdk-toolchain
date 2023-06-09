@@ -44,14 +44,14 @@ async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, pa
 export async function compositeAndDirty(
   fs: FileSystemInterface,
   engine: IEngine,
-  inspectorPreferences: InspectorPreferences
+  inspectorPreferences: InspectorPreferences,
+  compositePath: string
 ) {
   let composite: CompositeDefinition
   let dirty: DirtyEnum = DirtyEnum.None
 
   // Look for a composite
-  const currentCompositeResourcePath = 'main.composite'
-  const compositeProvider = await instanciateComposite(fs, engine, currentCompositeResourcePath)
+  const compositeProvider = await instanciateComposite(fs, engine, compositePath)
 
   async function dumpEngineAndGetComposite(dump: boolean = true): Promise<CompositeDefinition | null> {
     try {
@@ -65,7 +65,7 @@ export async function compositeAndDirty(
 
       const mainCrdt = dumpEngineToCrdtCommands(engine)
       await fs.writeFile('main.crdt', Buffer.from(mainCrdt))
-      await compositeProvider.save({ src: currentCompositeResourcePath, composite }, 'json')
+      await compositeProvider.save({ src: compositePath, composite }, 'json')
 
       return composite
     } catch (e) {

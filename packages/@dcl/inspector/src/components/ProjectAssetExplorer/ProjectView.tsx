@@ -12,6 +12,7 @@ import FolderIcon from '../Icons/Folder'
 import { AssetNode, AssetNodeFolder } from './types'
 import { getFullNodePath } from './utils'
 import Search from '../Search'
+import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
 
 function noop() {}
 
@@ -221,6 +222,7 @@ function ProjectView({ folders }: Props) {
             getLabel={(val: string) => <span>{tree.get(val)?.name ?? val}</span>}
             isOpen={isOpen}
             isSelected={(val: string) => lastSelected === val}
+            isHidden={(val: string) => val === ROOT}
             canRename={() => false}
             canRemove={(val) => tree.get(val)?.type === 'asset'}
             canAddChild={() => false}

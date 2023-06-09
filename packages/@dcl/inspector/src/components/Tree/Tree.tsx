@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
+import cx from 'classnames'
 
 import { withContextMenu } from '../../hoc/withContextMenu'
 import { Input } from '../Input'
@@ -19,6 +20,7 @@ type Props<T> = {
   getLabel: (value: T) => string | JSX.Element
   isOpen: (value: T) => boolean
   isSelected: (value: T) => boolean
+  isHidden: (value: T) => boolean
   canRename?: (value: T) => boolean
   canAddChild?: (value: T) => boolean
   canRemove?: (value: T) => boolean
@@ -52,6 +54,7 @@ export function Tree<T>() {
       isOpen,
       isSelected,
       onSelect,
+      isHidden,
       onSetParent,
       canRename,
       canAddChild,
@@ -67,6 +70,7 @@ export function Tree<T>() {
     const label = getLabel(value)
     const open = isOpen(value)
     const selected = isSelected(value)
+    const hidden = isHidden(value)
     const enableRename = canRename ? canRename(value) : true
     const enableAddChild = canAddChild ? canAddChild(value) : true
     const enableRemove = canRemove ? canRemove(value) : true
@@ -143,9 +147,11 @@ export function Tree<T>() {
       extra: extraContextMenu
     }
 
+    const nodeClassnames = cx({ selected, item: true, hidden })
+
     return (
       <div ref={ref} className={`Tree ${className || ''}`}>
-        <div style={getLevelStyles(level)} className={selected ? 'selected item' : 'item'}>
+        <div style={getLevelStyles(level)} className={nodeClassnames}>
           <ContextMenu {...controlsProps} />
           <div style={getEditModeStyles(editMode)} className='item-area'>
             { enableOpen ? open ? <IoIosArrowDown onClick={handleOpen} /> : <IoIosArrowForward onClick={handleOpen} /> : <span style={{marginLeft: '12px'}}></span> }
@@ -167,16 +173,17 @@ export function Tree<T>() {
 
 function TreeChildren<T>(props: Props<T>) {
   const CompTree = Tree<T>()
-  const { value, level = getDefaultLevel(), getChildren, getId, isOpen } = props
+  const { value, level = getDefaultLevel(), getChildren, getId, isOpen, isHidden } = props
   const children = getChildren(value)
   const open = isOpen(value)
+  const hidden = isHidden(value)
 
   if (!children.length || !open) return null
 
   return (
     <div style={getExpandStyles(open)}>
       {children.map(($) => (
-        <CompTree {...props} value={$} level={level + 1} key={getId($)} />
+        <CompTree {...props} value={$} level={hidden ? level : level + 1} key={getId($)} />
       ))}
     </div>
   )

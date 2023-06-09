@@ -9,6 +9,7 @@ export type FileSystemInterface = {
   writeFile: (filePath: string, content: Buffer) => Promise<void>
   readdir: (dirPath: string) => Promise<{ name: string; isDirectory: boolean }[]>
   rm: (filePath: string) => Promise<void>
+  cwd: () => Promise<string>
 }
 
 export type DataLayerContext = {

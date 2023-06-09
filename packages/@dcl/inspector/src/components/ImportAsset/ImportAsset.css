@@ -42,6 +42,7 @@
   height: unset;
   background-color: var(--list-item-hover-bg-color);
   overflow: visible;
+  margin-right: 20px;
 }
 
 .ImportAsset .Container svg {
@@ -77,6 +78,10 @@
 
 .ImportAsset .Container .file-title {
   margin-top: 8px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  width: inherit;
 }
 
 .ImportAsset .file-container {

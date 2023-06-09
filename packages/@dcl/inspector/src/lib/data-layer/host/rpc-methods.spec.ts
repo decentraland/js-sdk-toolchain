@@ -3,6 +3,8 @@ import { initRpcMethods } from './rpc-methods'
 import { createEngineContext } from './utils/engine'
 import { feededFileSystem } from '../client/feeded-local-fs'
 import { dumpEngineToComposite } from './utils/engine-to-composite'
+import { initSceneProvider } from './scene'
+import { getCurrentCompositePath } from './fs-utils'
 
 async function mockedRpcInit() {
   const callbackFunctions: OnChangeFunction[] = []
@@ -41,6 +43,7 @@ describe('Init RPC Methods', () => {
 
   it('should create a legacy entity node and create the Name component instead', async () => {
     const mocked = await mockedRpcInit()
+    const sceneProvider = await initSceneProvider(mocked.fs)
     const tempContext = createEngineContext()
 
     const LegacyEntityNode = tempContext.engine.defineComponent('inspector::EntityNode', {
@@ -51,7 +54,8 @@ describe('Init RPC Methods', () => {
     LegacyEntityNode.create(entity, { label: 'Boedo', parent: 10 })
     const composite = dumpEngineToComposite(tempContext.engine, 'json')
     const jsonComposite = Composite.toJson(composite)
-    await mocked.fs.writeFile('main.composite', Buffer.from(JSON.stringify(jsonComposite), 'utf-8'))
+    const compositeDest = getCurrentCompositePath(sceneProvider)
+    await mocked.fs.writeFile(compositeDest, Buffer.from(JSON.stringify(jsonComposite), 'utf-8'))
     await initRpcMethods(mocked.fs, mocked.engine, mocked.callbackFunctions)
 
     const EntityNodeComponent = mocked.engine.getComponentOrNull('inspector::EntityNode')

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { HiOutlineUpload } from 'react-icons/hi'
 import { RxCross2 } from 'react-icons/rx'
 import { IoIosImage } from 'react-icons/io'
@@ -15,6 +15,7 @@ import { GLTFValidation } from '@babylonjs/loaders'
 
 import './ImportAsset.css'
 import classNames from 'classnames'
+import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
 
 const ONE_MB_IN_BYTES = 1_048_576
 const ONE_GB_IN_BYTES = ONE_MB_IN_BYTES * 1024
@@ -74,7 +75,6 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
     setAssetPackageName(file.name.trim().replaceAll(' ', '_').toLowerCase().split('.')[0])
   }
 
-  const destFolder = 'assets/'
   const handleSave = () => {
     const reader = new FileReader()
     if (!file) return
@@ -95,9 +95,11 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
       const content: Map<string, Uint8Array> = new Map()
       content.set(file.name, new Uint8Array(binary))
 
+      const basePath = withAssetDir((await sdk!.dataLayer.getProjectData({})).path)
+
       await sdk!.dataLayer.importAsset({
         content,
-        basePath: destFolder,
+        basePath,
         assetPackageName
       })
       onSave()
@@ -110,6 +112,10 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
     setFile(undefined)
     setValidationError(null)
   }
+
+  const handleNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setAssetPackageName(event.target.value)
+  }, [])
 
   const invalidName = !!systemFiles.assets.find((asset) => {
     const [_, packageName] = asset.path.split('/')
@@ -145,7 +151,7 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
                 <TextField
                   label=""
                   value={assetPackageName}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => setAssetPackageName(event.target.value)}
+                  onChange={handleNameChange}
                 />
               </Block>
               <Button disabled={invalidName || !!validationError} onClick={handleSave}>

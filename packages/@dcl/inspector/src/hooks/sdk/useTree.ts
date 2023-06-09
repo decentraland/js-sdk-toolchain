@@ -65,6 +65,10 @@ export const useTree = () => {
     [sdk]
   )
 
+  const isHidden = useCallback((_: Entity) => {
+    return false
+  }, [])
+
   const addChild = useCallback(
     async (parent: Entity, label: string) => {
       if (!sdk) return
@@ -141,6 +145,7 @@ export const useTree = () => {
     getLabel,
     setOpen,
     isOpen,
+    isHidden,
     canRename,
     canRemove
   }

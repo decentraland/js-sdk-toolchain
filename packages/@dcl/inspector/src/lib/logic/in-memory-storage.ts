@@ -66,6 +66,9 @@ export function createFsInMemory(initialFs: Record<string, Buffer> = {}): FileSy
         }
       }
       return files
+    },
+    async cwd(): Promise<string> {
+      return 'scene'
     }
   }
 }
