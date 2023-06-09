@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { useDrag } from 'react-dnd'
 import { Entity } from '@dcl/ecs'
-import { IoIosArrowDown, IoIosArrowForward, IoIosImage } from 'react-icons/io'
+import { IoIosImage } from 'react-icons/io'
 
 import { useSdk } from '../../hooks/sdk/useSdk'
 import { fileSystemEvent } from '../../hooks/catalog/useFileSystem'
+import { Tile } from './Tile'
 import { Tree } from '../Tree'
 import { Modal } from '../Modal'
 import Button from '../Button'
@@ -140,7 +140,7 @@ function ProjectView({ folders }: Props) {
       }
       await removeAsset(path)
     },
-    [open, setOpen]
+    [open, setOpen, selectedTreeNode, lastSelected]
   )
 
   const removeAsset = useCallback(
@@ -232,50 +232,30 @@ function ProjectView({ folders }: Props) {
         <div className="FolderView">
           {selectedTreeNode?.type === 'folder'
             ? selectedTreeNode?.children?.map(($) => (
-                <NodeView
+                <Tile
                   key={$}
                   valueId={$}
-                  getDragContext={handleDragContext}
                   value={tree.get($)}
+                  getDragContext={handleDragContext}
                   onSelect={handleClickFolder($)}
+                  onRemove={handleRemove}
+                  dndType={DRAG_N_DROP_ASSET_KEY}
                 />
               ))
             : !!selectedTreeNode &&
               lastSelected && (
-                <NodeView
+                <Tile
                   valueId={lastSelected}
                   value={selectedTreeNode}
+                  getDragContext= {handleDragContext}
                   onSelect={handleClickFolder(selectedTreeNode.name)}
-                  getDragContext={handleDragContext}
+                  onRemove={handleRemove}
+                  dndType={DRAG_N_DROP_ASSET_KEY}
                 />
               )}
         </div>
       </div>
     </>
-  )
-}
-
-function NodeView({
-  valueId,
-  value,
-  onSelect,
-  getDragContext
-}: {
-  value?: TreeNode
-  onSelect: () => void
-  getDragContext: () => unknown
-  valueId: string
-}) {
-  if (!value) return null
-  const [, drag] = useDrag(
-    () => ({ type: DRAG_N_DROP_ASSET_KEY, item: { value: valueId, context: getDragContext() } }),
-    [valueId]
-  )
-  return (
-    <div ref={drag} className="NodeView" key={value.name} onDoubleClick={onSelect}>
-      {value.type === 'folder' ? <FolderIcon /> : <IoIosImage />}
-      <span>{value.name}</span>
-    </div>
   )
 }
 

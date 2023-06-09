@@ -63,30 +63,3 @@
   justify-content: left;
   overflow-y: auto;
 }
-
-.ProjectView .FolderView .NodeView {
-  display: flex;
-  flex-direction: column;
-  margin: 8px;
-  align-items: center;
-  height: 72px;
-  width: 72px;
-  border-radius: 8px;
-  background-color: var(--tree-border-color);
-  cursor: pointer;
-  justify-content: space-evenly;
-}
-
-.ProjectView .FolderView .NodeView span {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  width: inherit;
-  padding: 0 8px;
-  text-align: center;
-  font-size: 10px;
-}
-.ProjectView .FolderView .NodeView svg {
-  width: 42px;
-  height: 42px;
-}
