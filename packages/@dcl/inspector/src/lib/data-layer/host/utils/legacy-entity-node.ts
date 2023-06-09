@@ -15,9 +15,7 @@ export function removeLegacyEntityNodeComponents(engine: IEngine) {
       const TransformComponent = engine.getComponent(Transform.componentId) as typeof Transform
       NameComponent.createOrReplace(entity, { value: entityNodeValue.label })
       const transform = TransformComponent.getMutableOrNull(entity)
-      if (transform) {
-        transform.parent = entityNodeValue.parent
-      } else {
+      if (!transform) {
         TransformComponent.create(entity, { parent: entityNodeValue.parent })
       }
     }
