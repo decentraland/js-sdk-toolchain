@@ -27,10 +27,10 @@ export function initKeyboard(canvas: HTMLCanvasElement, scene: BABYLON.Scene) {
     if (e.type === BABYLON.PointerEventTypes.POINTERDOWN) {
       const evt = e.event as PointerEvent
       scene.getEngine().getRenderingCanvas()!.focus()
-      interactWithScene(scene, 'pointerDown', evt.offsetX, evt.offsetY, evt.pointerId)
+      if (evt.button === 0) interactWithScene(scene, 'pointerDown', evt.offsetX, evt.offsetY, evt.pointerId)
     } else if (e.type === BABYLON.PointerEventTypes.POINTERUP) {
       const evt = e.event as PointerEvent
-      interactWithScene(scene, 'pointerUp', evt.offsetX, evt.offsetY, evt.pointerId)
+      if (evt.button === 0) interactWithScene(scene, 'pointerUp', evt.offsetX, evt.offsetY, evt.pointerId)
     }
   })
 }

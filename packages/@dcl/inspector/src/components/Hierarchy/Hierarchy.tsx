@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react'
 import { Entity } from '@dcl/ecs'
-import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
 import { FiHexagon } from 'react-icons/fi'
 
 import { ROOT } from '../../lib/sdk/tree'

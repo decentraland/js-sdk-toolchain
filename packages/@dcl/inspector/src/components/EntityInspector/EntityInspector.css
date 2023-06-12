@@ -5,3 +5,10 @@
   background-color: var(--tree-bg-color);
   overflow-y: auto;
 }
+
+.EntityInspector .entity-label {
+  padding: 6px;
+  font-weight: 600;
+  text-align: left;
+  border-bottom: 1px solid var(--border-gray);
+}
