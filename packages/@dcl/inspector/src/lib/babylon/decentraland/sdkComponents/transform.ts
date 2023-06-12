@@ -59,8 +59,8 @@ export function createDefaultTransform(entity: EcsEntity) {
     if (reparentQueue?.size) {
       const ctx = entity.context.deref()
       for (const child of reparentQueue) {
-        const childEnity = ctx?.getEntityOrNull(child)
-        childEnity && reparentEntity(childEnity)
+        const childEntity = ctx?.getEntityOrNull(child)
+        if (childEntity) childEntity.parent = entity
       }
       reparentQueue.clear()
     }
@@ -134,11 +134,9 @@ const transformContextSymbol = Symbol('transform-component-context')
 function getTransformContextForEntity(entity: EcsEntity): InternalTransformContext | undefined {
   const ctx = entity.context.deref() as any
   if (ctx) {
-    let current = ctx[transformContextSymbol]
-    if (!current) {
-      current = { pendingParentQueues: new Map() }
-      ctx[transformContextSymbol] = current
+    if (!ctx[transformContextSymbol]) {
+      ctx[transformContextSymbol] = { pendingParentQueues: new Map() }
     }
-    return current
+    return ctx[transformContextSymbol]
   }
 }
