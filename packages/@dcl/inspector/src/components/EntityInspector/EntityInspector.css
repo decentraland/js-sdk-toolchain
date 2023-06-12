@@ -7,6 +7,7 @@
 }
 
 .EntityInspector .entity-label {
+  font-size: 13px;
   padding: 6px;
   font-weight: 600;
   text-align: left;

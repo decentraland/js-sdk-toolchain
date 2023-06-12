@@ -71,7 +71,7 @@ export default withSdk<Props>(
     const inputProps = getInputProps('src')
 
     return (
-      <Container label="Gltf" className={cx('Gltf', { hover: isHover })}>
+      <Container label="GLTF container" className={cx('Gltf', { hover: isHover })}>
         <Menu id={contextMenuId}>
           <Item id="delete" onClick={handleAction(handleRemove)}>
             <DeleteIcon /> Delete
