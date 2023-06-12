@@ -43,7 +43,7 @@ export const Tile = withContextMenu<Props>(({
           </MenuItem>
         </Menu>
       )}
-      <div ref={drag} className="Tile" key={value.name} onDoubleClick={onSelect}>
+      <div ref={drag} className="Tile" key={value.name} onDoubleClick={onSelect} title={value.name}>
         {value.type === 'folder' ? <FolderIcon /> : <IoIosImage />}
         <span>{value.name}</span>
       </div>

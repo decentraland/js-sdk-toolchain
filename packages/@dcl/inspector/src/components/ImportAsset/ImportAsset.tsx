@@ -63,7 +63,8 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
   // TODO: multiple files
   const [file, setFile] = useState<File>()
   const [validationError, setValidationError] = useState<ValidationError>(null)
-  const [assetPackageName, setAssetPackageName] = useState<string>('')
+  const [assetName, setAssetName] = useState<string>('')
+  const [assetExtension, setAssetExtension] = useState<string>('')
   const [systemFiles] = useFileSystem()
 
   const handleDrop = async (acceptedFiles: File[]) => {
@@ -72,7 +73,11 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
     if (!file) return
     setFile(file)
     setValidationError(null)
-    setAssetPackageName(file.name.trim().replaceAll(' ', '_').toLowerCase().split('.')[0])
+    const normalizedName = file.name.trim().replaceAll(' ', '_').toLowerCase()
+    const splitName = normalizedName.split('.')
+    const extensionName = splitName.pop()
+    setAssetName(splitName.join(''))
+    setAssetExtension(extensionName ? extensionName : '')
   }
 
   const handleSave = () => {
@@ -100,7 +105,7 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
       await sdk!.dataLayer.importAsset({
         content,
         basePath,
-        assetPackageName
+        assetPackageName: assetName
       })
       onSave()
     }
@@ -114,25 +119,27 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
   }
 
   const handleNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setAssetPackageName(event.target.value)
+    setAssetName(event.target.value)
   }, [])
 
   const invalidName = !!systemFiles.assets.find((asset) => {
-    const [_, packageName] = asset.path.split('/')
-    return packageName?.toLocaleLowerCase() === assetPackageName?.toLocaleLowerCase()
+    const [packageName, otherAssetName] = asset.path.split('/')
+    if (packageName === 'builder')
+      return false
+    else
+      return otherAssetName?.toLocaleLowerCase() === (assetName?.toLocaleLowerCase() + '.' + assetExtension)
   })
 
   return (
     <div className="ImportAsset">
       <FileInput disabled={!!file} onDrop={handleDrop} accept={{ 'model/gltf-binary': ['.gltf', '.glb'] }}>
-        <span>Import asset</span>
         {!file && (
           <>
             <div className="upload-icon">
               <HiOutlineUpload />
             </div>
             <span>
-              Drag and drop a single GLB, GLTF file here,
+              To import an asset drag and drop a single GLB or GLTF file
               <br /> or click to select a file.
             </span>
           </>
@@ -150,7 +157,7 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
               <Block label="Asset name">
                 <TextField
                   label=""
-                  value={assetPackageName}
+                  value={assetName}
                   onChange={handleNameChange}
                 />
               </Block>

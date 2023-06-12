@@ -16,7 +16,7 @@
   flex-direction: row;
   align-items: center;
   cursor: pointer;
-  user-select: none
+  user-select: none;
 }
 
 .Container .title svg {
@@ -29,6 +29,5 @@
   margin: 0px 0px 0px 0px;
   color: var(--text);
   font-size: 13px;
-  font-weight: 600;
   cursor: pointer;
 }

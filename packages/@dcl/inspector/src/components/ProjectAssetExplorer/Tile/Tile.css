@@ -1,10 +1,10 @@
 .Tile {
   display: flex;
   flex-direction: column;
-  margin: 8px;
+  margin: 4px;
   align-items: center;
   height: 72px;
-  width: 72px;
+  width: 84px;
   border-radius: 8px;
   background-color: var(--tree-border-color);
   cursor: pointer;
@@ -16,7 +16,7 @@
   overflow: hidden;
   white-space: nowrap;
   width: inherit;
-  padding: 0 8px;
+  padding: 0 6px;
   text-align: center;
   font-size: 10px;
 }
