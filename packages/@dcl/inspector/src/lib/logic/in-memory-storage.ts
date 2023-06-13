@@ -29,7 +29,8 @@ export function createInMemoryStorage(initialFs: Record<string, Buffer> = {}) {
 }
 
 function normalizePath(path: string) {
-  return path.replace(/^\/+/g, '')
+  const regex = /^\/+/g // matches a "/" character at the beggining of a string
+  return path.replace(regex, '')
 }
 
 export function createFsInMemory(initialFs: Record<string, Buffer> = {}): FileSystemInterface {
