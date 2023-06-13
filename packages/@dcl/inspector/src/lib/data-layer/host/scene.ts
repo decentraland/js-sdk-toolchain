@@ -43,12 +43,12 @@ async function getScene(fs: FileSystemInterface): Promise<SceneWithDefaults> {
   return sceneWithDefaults
 }
 
-async function augmentDefaults(fs: FileSystemInterface, scene: Scene): Promise<SceneWithDefaults> {
+function augmentDefaults(fs: FileSystemInterface, scene: Scene): SceneWithDefaults {
   return {
     ...scene,
     display: {
       ...scene.display,
-      title: scene.display?.title || (await fs.cwd())
+      title: scene.display?.title || fs.cwd()
     }
   }
 }
@@ -60,9 +60,7 @@ export async function initSceneProvider(fs: FileSystemInterface): Promise<SceneP
     onChange(_, operation, component, componentValue) {
       if (operation === CrdtMessageType.PUT_COMPONENT && component?.componentName === EditorComponentNames.Scene) {
         const updatedScene = updateScene(scene, componentValue as EditorComponentsTypes['Scene'])
-        augmentDefaults(fs, updatedScene)
-          .then(($) => (scene = $))
-          .catch((err) => console.error('Augmenting defaults for scene.json failed', err))
+        scene = augmentDefaults(fs, updatedScene)
         fs.writeFile('scene.json', sceneToBuffer(scene)).catch((err) =>
           console.error('Failed saving scene.json: ', err)
         )

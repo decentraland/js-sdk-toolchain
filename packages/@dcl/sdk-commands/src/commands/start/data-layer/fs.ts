@@ -4,6 +4,15 @@ import { CliComponents } from '../../../components'
 
 export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliComponents, 'fs'>): FileSystemInterface {
   return {
+    dirname(_path: string): string {
+      return path.dirname(_path)
+    },
+    basename(_path: string): string {
+      return path.basename(_path)
+    },
+    join(...paths: string[]): string {
+      return path.join(...paths)
+    },
     async existFile(filePath: string): Promise<boolean> {
       return fs.fileExists(filePath)
     },
@@ -36,7 +45,7 @@ export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliCompone
         }))
       )
     },
-    async cwd(): Promise<string> {
+    cwd(): string {
       return path.basename(process.cwd())
     }
   }

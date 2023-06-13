@@ -13,16 +13,15 @@ export async function createFsCompositeProvider(
   const files = await getFilesInDirectory(fs, dirPath, [], true)
   const compositePaths = files
     .filter((item) => item.endsWith('.composite') || item.endsWith('.composite.bin'))
-    .map((item) => item)
+    .map((item) => fs.join(fs.dirname(item), fs.basename(item).toLowerCase()))
 
   const compositePromises = compositePaths.map(async (itemPath) => {
-    const src = itemPath.toLowerCase()
     try {
       if (itemPath.endsWith('.bin')) {
         const compositeContent = new Uint8Array(await fs.readFile(itemPath))
         const composite = Composite.fromBinary(compositeContent)
         return {
-          src,
+          src: itemPath,
           composite
         }
       } else {
@@ -30,7 +29,7 @@ export async function createFsCompositeProvider(
         const json = JSON.parse(compositeContent)
         const composite = Composite.fromJson(json)
         return {
-          src,
+          src: itemPath,
           composite
         }
       }

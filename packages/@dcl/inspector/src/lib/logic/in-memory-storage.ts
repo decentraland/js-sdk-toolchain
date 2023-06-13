@@ -28,6 +28,10 @@ export function createInMemoryStorage(initialFs: Record<string, Buffer> = {}) {
   }
 }
 
+function normalizePath(path: string) {
+  return path.replace(/^\/+/g, '')
+}
+
 export function createFsInMemory(initialFs: Record<string, Buffer> = {}): FileSystemInterface {
   const fs = createInMemoryStorage(initialFs)
 
@@ -35,20 +39,29 @@ export function createFsInMemory(initialFs: Record<string, Buffer> = {}): FileSy
   ;(globalThis as any).inMemoryStorage = fs
 
   return {
+    dirname(path: string): string {
+      return normalizePath(path).substring(0, path.lastIndexOf('/'))
+    },
+    basename(path: string): string {
+      return normalizePath(path).split('/').pop() || ''
+    },
+    join(...paths: string[]): string {
+      return paths.map(($) => normalizePath($)).join('/')
+    },
     async existFile(filePath: string): Promise<boolean> {
-      return fs.exist(filePath.replace(/^\/+/g, ''))
+      return fs.exist(normalizePath(filePath))
     },
     async readFile(filePath: string): Promise<Buffer> {
-      return fs.readFile(filePath.replace(/^\/+/g, ''))
+      return fs.readFile(normalizePath(filePath))
     },
     async writeFile(filePath: string, content: Buffer): Promise<void> {
-      return fs.writeFile(filePath.replace(/^\/+/g, ''), content)
+      return fs.writeFile(normalizePath(filePath), content)
     },
     async rm(filePath: string): Promise<void> {
-      fs.delete(filePath.replace(/^\/+/g, ''))
+      fs.delete(normalizePath(filePath))
     },
     async readdir(dirPath: string): Promise<{ name: string; isDirectory: boolean }[]> {
-      const resolvedDirPath = dirPath.replace(/^\/+/g, '').replace(/^\.\/|^\.+/g, '')
+      const resolvedDirPath = normalizePath(dirPath).replace(/^\.\/|^\.+/g, '')
 
       const files: { name: string; isDirectory: boolean }[] = []
       for (const path of Array.from(fs.storage.keys())) {
@@ -67,7 +80,7 @@ export function createFsInMemory(initialFs: Record<string, Buffer> = {}): FileSy
       }
       return files
     },
-    async cwd(): Promise<string> {
+    cwd(): string {
       return 'scene'
     }
   }
