@@ -4,7 +4,6 @@ import { connectSaga } from './connect'
 import { reconnectSaga } from './reconnect'
 
 export function* dataLayerSaga() {
-  console.log(connect.type)
   yield takeEvery(connect.type, connectSaga)
   yield takeEvery(reconnect.type, reconnectSaga)
 }

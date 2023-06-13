@@ -17,7 +17,10 @@ function getWsUrl() {
   return dataLayerWsByQueryParams || dataLayerWsByGlobalThis || null
 }
 
-// Function to create an event channel
+function createWebSocketConnection(url: string): WebSocket {
+  return new WebSocket(url)
+}
+
 function createSocketChannel(socket: WebSocket): EventChannel<WsActions> {
   return eventChannel((emit) => {
     socket.onclose = () => {
@@ -53,15 +56,15 @@ export function* connectSaga() {
     yield put(connected({ dataLayer }))
     return
   }
-  const ws = new WebSocket(wsUrl)
+  const ws: WebSocket = yield call(createWebSocketConnection, wsUrl)
   const socketChannel: EventChannel<WsActions> = yield call(createSocketChannel, ws)
   try {
     while (true) {
       const wsEvent: WsActions = yield take(socketChannel)
       if (wsEvent.type === 'WS_OPENED') {
         const clientTransport = WebSocketTransport(ws)
-        const client: RpcClient = yield call(() => createRpcClient(clientTransport))
-        const clientPort: RpcClientPort = yield call(() => client.createPort('scene-ctx'))
+        const client: RpcClient = yield call(createRpcClient, clientTransport)
+        const clientPort: RpcClientPort = yield call(client.createPort, 'scene-ctx')
         const dataLayer: DataLayerRpcClient = codegen.loadService<{ engine: IEngine }, DataServiceDefinition>(
           clientPort,
           DataServiceDefinition
