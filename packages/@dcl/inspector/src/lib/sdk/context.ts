@@ -5,7 +5,6 @@ import { Emitter } from 'mitt'
 import { ITheme } from '../../components/AssetsCatalog'
 import { SceneContext } from '../babylon/decentraland/SceneContext'
 import { initRenderer } from '../babylon/setup/init'
-import { createDataLayerClientRpc } from '../data-layer/client'
 import { EditorComponents, SdkComponents } from './components'
 import { getHardcodedLoadableScene } from './test-local-scene'
 import { createInspectorEngine } from './inspector-engine'
@@ -34,10 +33,11 @@ export type SdkContextValue = {
   preferences: InspectorPreferencesManager
 }
 
-export async function createSdkContext(canvas: HTMLCanvasElement, catalog: ITheme[]): Promise<SdkContextValue> {
-  // initialize DataLayer
-  const dataLayer = await createDataLayerClientRpc()
-
+export async function createSdkContext(
+  dataLayer: DataLayerRpcClient,
+  canvas: HTMLCanvasElement,
+  catalog: ITheme[]
+): Promise<SdkContextValue> {
   // fetch user preferences from the data layer
   const preferences = await dataLayer.getInspectorPreferences({})
 

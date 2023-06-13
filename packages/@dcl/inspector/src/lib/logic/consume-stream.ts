@@ -12,9 +12,9 @@ export async function consumeAllMessagesInto(
       }
     }
   } catch (err) {
-    debugger
+    // debugger
   } finally {
     onClose()
   }
-  debugger
+  // debugger
 }

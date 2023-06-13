@@ -30,7 +30,7 @@ const Toolbar = withSdk(({ sdk }) => {
       }
       saveEvent.emit('change', true)
     },
-    []
+    [sdk.dataLayer]
   )
 
   return (

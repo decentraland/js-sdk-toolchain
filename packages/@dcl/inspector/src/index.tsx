@@ -1,7 +1,9 @@
+import { Provider } from 'react-redux'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import ReactDOM from 'react-dom/client'
 
+import { store } from './redux/store'
 import { App } from './components/App'
 import { SdkProvider } from './components/SdkProvider'
 
@@ -17,8 +19,10 @@ globalThis.Buffer = MaybeBuffer
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <DndProvider backend={HTML5Backend}>
-    <SdkProvider>
-      <App />
-    </SdkProvider>
+    <Provider store={store}>
+      <SdkProvider>
+        <App />
+      </SdkProvider>
+    </Provider>
   </DndProvider>
 )

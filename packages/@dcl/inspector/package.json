@@ -11,11 +11,13 @@
     "@dcl/ecs-math": "2.0.2",
     "@dcl/rpc": "^1.1.1",
     "@dcl/schemas": "^6.11.1",
+    "@reduxjs/toolkit": "^1.9.5",
     "@testing-library/react": "^14.0.0",
     "@types/node": "^18.11.18",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
     "@types/react-modal": "^3.16.0",
+    "@types/redux-saga": "^0.10.5",
     "@vscode/webview-ui-toolkit": "^1.2.2",
     "@well-known-components/pushable-channel": "^1.0.3",
     "classnames": "^2.3.2",
@@ -32,6 +34,8 @@
     "react-icons": "^4.7.1",
     "react-modal": "^3.16.1",
     "react-resizable-panels": "^0.0.48",
+    "react-redux": "^8.1.0",
+    "redux-saga": "^1.2.3",
     "typescript": "^5.0.2"
   },
   "files": [
