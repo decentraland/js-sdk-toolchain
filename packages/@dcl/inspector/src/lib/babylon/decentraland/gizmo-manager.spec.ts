@@ -59,7 +59,15 @@ describe('GizmoManager', () => {
         })
       })
       describe('and dragging a gizmo', () => {
-        it('should update the transform value', () => {
+        it('should execute SDK operations if transform was not changed', () => {
+          gizmos.gizmoManager.gizmos.positionGizmo?.onDragStartObservable.notifyObservers({} as any)
+          gizmos.gizmoManager.gizmos.positionGizmo?.onDragEndObservable.notifyObservers({} as any)
+          expect(context.operations.updateValue).toBeCalledTimes(0)
+          expect(context.operations.dispatch).toBeCalledTimes(0)
+        })
+        it('should not execute SDK operations if transform was changed', () => {
+          gizmos.gizmoManager.gizmos.positionGizmo?.onDragStartObservable.notifyObservers({} as any)
+          entity.position = new Vector3(10, 10, 10)
           gizmos.gizmoManager.gizmos.positionGizmo?.onDragEndObservable.notifyObservers({} as any)
           expect(context.operations.updateValue).toHaveBeenCalled()
           expect(context.operations.dispatch).toHaveBeenCalled()
@@ -74,6 +82,7 @@ describe('GizmoManager', () => {
           describe('and the rotation gizmo is not world aligned', () => {
             beforeEach(() => {
               gizmos.setRotationGizmoWorldAligned(false)
+              gizmos.gizmoManager.gizmos.scaleGizmo?.onDragStartObservable.notifyObservers({} as any)
               gizmos.gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.notifyObservers({} as any)
             })
             it('should force the rotation gizmo to be world aligned', () => {
@@ -102,6 +111,7 @@ describe('GizmoManager', () => {
             })
             describe('and the entity is then proportionally scaled', () => {
               beforeEach(() => {
+                gizmos.gizmoManager.gizmos.scaleGizmo?.onDragStartObservable.notifyObservers({} as any)
                 entity.scaling = new Vector3(1, 1, 1)
                 gizmos.gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.notifyObservers({} as any)
               })
