@@ -15,7 +15,7 @@ function areProportional(a: number, b: number) {
   return Math.abs(a - b) < 1e-5
 }
 
-// should be in ecs-math
+// should be moved to ecs-math
 function areQuaternionsEqual(a: DclQuaternion, b: DclQuaternion) {
   return a.x === b.x && a.y === b.y && a.z === b.z && a.w === b.w
 }
