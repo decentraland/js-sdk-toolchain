@@ -21,7 +21,7 @@ function bufferToScene(sceneBuffer: Buffer): Scene {
 }
 
 function sceneToBuffer(scene: Scene): Buffer {
-  return Buffer.from(JSON.stringify(scene), 'utf-8')
+  return Buffer.from(JSON.stringify(scene, null, 2), 'utf-8')
 }
 
 function updateScene(scene: Scene, value: EditorComponentsTypes['Scene']): Scene {

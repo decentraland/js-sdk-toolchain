@@ -1,10 +1,12 @@
-import { Scene, NullEngine, Engine, TransformNode, Quaternion, Vector3 } from '@babylonjs/core'
+import { Scene, NullEngine, Engine, Quaternion, Vector3 } from '@babylonjs/core'
 import { Gizmos, createGizmoManager } from './gizmo-manager'
 import { SceneContext } from './SceneContext'
-import { TransformComponentExtended } from '@dcl/ecs'
-import { Operations } from '../../sdk/operations'
 import { EcsEntity } from './EcsEntity'
 import { GizmoType } from '../../utils/gizmo'
+import { EntityType } from '@dcl/schemas'
+import { DataLayerRpcClient } from '../../data-layer/types'
+import { Operations } from '../../sdk/operations'
+import { Entity } from '@dcl/ecs'
 
 describe('GizmoManager', () => {
   let engine: Engine
@@ -13,14 +15,20 @@ describe('GizmoManager', () => {
   beforeEach(() => {
     engine = new NullEngine()
     scene = new Scene(engine)
-    context = {
+    context = new SceneContext(
+      engine,
       scene,
-      operations: {
-        updateValue: jest.fn(),
-        dispatch: jest.fn()
-      } as unknown as Operations,
-      Transform: { getOrNull: jest.fn() } as unknown as TransformComponentExtended
-    } as SceneContext
+      {
+        baseUrl: '/',
+        entity: { content: [], metadata: {}, version: 'v3', type: EntityType.SCENE, timestamp: 1, pointers: ['0, 0'] },
+        id: '123'
+      },
+      {} as DataLayerRpcClient
+    )
+    context.operations = {
+      updateValue: jest.fn(),
+      dispatch: jest.fn()
+    } as unknown as Operations
   })
   describe('When creating a new gizmo manager', () => {
     let gizmos: Gizmos
@@ -31,21 +39,25 @@ describe('GizmoManager', () => {
       expect(gizmos).toBeDefined()
     })
     describe('When setting an entity', () => {
-      let entity: TransformNode
+      let dclEntity: Entity
+      let babylonEntity: EcsEntity
       let handler: jest.Mock
       beforeEach(() => {
-        entity = new TransformNode('entity', scene)
-        entity.rotationQuaternion = new Quaternion(0, 0, 0, 1)
+        dclEntity = context.engine.addEntity()
+        context.Transform.create(dclEntity)
+        babylonEntity = context.getOrCreateEntity(dclEntity)
+        babylonEntity.rotationQuaternion = new Quaternion(0, 0, 0, 1)
         handler = jest.fn()
         gizmos.onChange(handler)
-        gizmos.setEntity(entity as EcsEntity)
+        gizmos.setEntity(babylonEntity)
       })
       afterEach(() => {
-        entity.dispose()
+        babylonEntity.dispose()
+        context.engine.removeEntity(dclEntity)
         gizmos.unsetEntity()
       })
       it('should set the entity', () => {
-        expect(gizmos.getEntity()).toBe(entity)
+        expect(gizmos.getEntity()).toBe(babylonEntity)
       })
       it('should emit a change event', () => {
         expect(handler).toHaveBeenCalled()
@@ -54,22 +66,28 @@ describe('GizmoManager', () => {
         it('should skip setting the entity', () => {
           const handler = jest.fn()
           gizmos.onChange(handler)
-          gizmos.setEntity(entity as EcsEntity)
+          gizmos.setEntity(babylonEntity)
           expect(handler).not.toHaveBeenCalled()
         })
       })
       describe('and dragging a gizmo', () => {
-        it('should update the transform value', () => {
+        it('should not execute SDK operations if transform was not changed', () => {
+          gizmos.gizmoManager.gizmos.positionGizmo?.onDragEndObservable.notifyObservers({} as any)
+          expect(context.operations.updateValue).toBeCalledTimes(0)
+          expect(context.operations.dispatch).toBeCalledTimes(0)
+        })
+        it('should execute SDK operations if transform was changed', () => {
+          babylonEntity.position = new Vector3(10, 10, 10)
           gizmos.gizmoManager.gizmos.positionGizmo?.onDragEndObservable.notifyObservers({} as any)
           expect(context.operations.updateValue).toHaveBeenCalled()
           expect(context.operations.dispatch).toHaveBeenCalled()
         })
         describe('and the entity is not proportionally scaled', () => {
           beforeEach(() => {
-            entity.scaling = new Vector3(1, 2, 1)
+            babylonEntity.scaling = new Vector3(1, 2, 1)
           })
           afterEach(() => {
-            entity.scaling = new Vector3(1, 1, 1)
+            babylonEntity.scaling = new Vector3(1, 1, 1)
           })
           describe('and the rotation gizmo is not world aligned', () => {
             beforeEach(() => {
@@ -102,7 +120,7 @@ describe('GizmoManager', () => {
             })
             describe('and the entity is then proportionally scaled', () => {
               beforeEach(() => {
-                entity.scaling = new Vector3(1, 1, 1)
+                babylonEntity.scaling = new Vector3(1, 1, 1)
                 gizmos.gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.notifyObservers({} as any)
               })
               it('should enable the rotation gizmo alignment', () => {
@@ -122,10 +140,10 @@ describe('GizmoManager', () => {
         })
         describe('and the entity is almost proportionally scaled except for a tiny rounding error', () => {
           beforeEach(() => {
-            entity.scaling = new Vector3(1.0000001192092896, 0.9999998807907104, 1)
+            babylonEntity.scaling = new Vector3(1.0000001192092896, 0.9999998807907104, 1)
           })
           afterEach(() => {
-            entity.scaling = new Vector3(1, 1, 1)
+            babylonEntity.scaling = new Vector3(1, 1, 1)
           })
           it('should not force the rotation gizmo to be world aligned', () => {
             gizmos.setRotationGizmoWorldAligned(false)

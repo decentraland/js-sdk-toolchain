@@ -8,10 +8,16 @@ import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manag
 import { SceneContext } from './SceneContext'
 import { GizmoType } from '../../utils/gizmo'
 import { PatchedGizmoManager } from './gizmo-patch'
+import { Vector3 as DclVector3, Quaternion as DclQuaternion } from '@dcl/ecs-math'
 
 function areProportional(a: number, b: number) {
   // this leeway is here to account for rounding errors due to serializing/deserializing floating point numbers
   return Math.abs(a - b) < 1e-5
+}
+
+// should be moved to ecs-math
+function areQuaternionsEqual(a: DclQuaternion, b: DclQuaternion) {
+  return a.x === b.x && a.y === b.y && a.z === b.z && a.w === b.w
 }
 
 export function createGizmoManager(context: SceneContext) {
@@ -82,18 +88,24 @@ export function createGizmoManager(context: SceneContext) {
     }
   }
 
-  function update() {
-    if (lastEntity) {
-      const transform = getTransform()
-      fixRotationGizmoAlignment(transform)
-      context.operations.updateValue(context.Transform, lastEntity.entityId, transform)
-      void context.operations.dispatch()
-    }
+  function updateTransform() {
+    if (lastEntity === null) return
+    const oldTransform = context.Transform.get(lastEntity.entityId)
+    const newTransform = getTransform()
+    fixRotationGizmoAlignment(newTransform)
+    if (
+      DclVector3.equals(newTransform.position, oldTransform.position) &&
+      DclVector3.equals(newTransform.scale, oldTransform.scale) &&
+      areQuaternionsEqual(newTransform.rotation, oldTransform.rotation)
+    )
+      return
+    context.operations.updateValue(context.Transform, lastEntity.entityId, newTransform)
+    void context.operations.dispatch()
   }
 
-  gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.add(update)
-  gizmoManager.gizmos.positionGizmo?.onDragEndObservable.add(update)
-  gizmoManager.gizmos.rotationGizmo?.onDragEndObservable.add(update)
+  gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.add(updateTransform)
+  gizmoManager.gizmos.positionGizmo?.onDragEndObservable.add(updateTransform)
+  gizmoManager.gizmos.rotationGizmo?.onDragEndObservable.add(updateTransform)
 
   // snap
   function updateSnap() {
