@@ -81,8 +81,7 @@ export async function initRpcMethods(
       const baseFolder = basePath.length ? basePath + '/' : ''
       const undoAcc: FileOperation[] = []
       for (const [fileName, fileContent] of content) {
-        const ext = fileName.split('.')[1]
-        const importName = assetPackageName ? getFileName(assetPackageName, ext) : fileName
+        const importName = assetPackageName ? `${assetPackageName}/${fileName}` : fileName
         const filePath = (baseFolder + importName).replaceAll('//', '/')
         const prevValue = (await fs.existFile(filePath)) ? await fs.readFile(filePath) : null
         undoAcc.push({ prevValue, newValue: fileContent, path: filePath })
