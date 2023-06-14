@@ -55,7 +55,6 @@ export function createGizmoManager(context: SceneContext) {
   dragBehavior(gizmoManager.gizmos.positionGizmo!.zGizmo)
 
   let lastEntity: EcsEntity | null = null
-  let transformBeforeDrag: TransformType | null = null
   let rotationGizmoAlignmentDisabled = false
   let shouldRestorRotationGizmoAlignment = false
 
@@ -89,40 +88,24 @@ export function createGizmoManager(context: SceneContext) {
     }
   }
 
-  function onDragStart() {
+  function updateTransform() {
     if (lastEntity === null) return
-    const transform = getTransform()
-    const position = transform.position
-    const rotation = transform.rotation
-    const scale = transform.scale
-    transformBeforeDrag = {
-      position: DclVector3.create(position.x, position.y, position.z),
-      rotation: DclQuaternion.create(rotation.x, rotation.y, rotation.z, rotation.w),
-      scale: DclVector3.create(scale.x, scale.y, scale.z)
-    }
-  }
-
-  function onDragEnd() {
-    if (lastEntity === null || transformBeforeDrag === null) return
-    const transform = getTransform()
-    fixRotationGizmoAlignment(transform)
+    const oldTransform = context.Transform.get(lastEntity.entityId)
+    const newTransform = getTransform()
+    fixRotationGizmoAlignment(newTransform)
     if (
-      DclVector3.equals(transform.position, transformBeforeDrag.position) &&
-      DclVector3.equals(transform.scale, transformBeforeDrag.scale) &&
-      areQuaternionsEqual(transform.rotation, transformBeforeDrag.rotation)
+      DclVector3.equals(newTransform.position, oldTransform.position) &&
+      DclVector3.equals(newTransform.scale, oldTransform.scale) &&
+      areQuaternionsEqual(newTransform.rotation, oldTransform.rotation)
     )
       return
-    context.operations.updateValue(context.Transform, lastEntity.entityId, transform)
+    context.operations.updateValue(context.Transform, lastEntity.entityId, newTransform)
     void context.operations.dispatch()
   }
 
-  gizmoManager.gizmos.scaleGizmo?.onDragStartObservable.add(onDragStart)
-  gizmoManager.gizmos.positionGizmo?.onDragStartObservable.add(onDragStart)
-  gizmoManager.gizmos.rotationGizmo?.onDragStartObservable.add(onDragStart)
-
-  gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.add(onDragEnd)
-  gizmoManager.gizmos.positionGizmo?.onDragEndObservable.add(onDragEnd)
-  gizmoManager.gizmos.rotationGizmo?.onDragEndObservable.add(onDragEnd)
+  gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.add(updateTransform)
+  gizmoManager.gizmos.positionGizmo?.onDragEndObservable.add(updateTransform)
+  gizmoManager.gizmos.rotationGizmo?.onDragEndObservable.add(updateTransform)
 
   // snap
   function updateSnap() {
