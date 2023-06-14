@@ -65,7 +65,13 @@ const Renderer: React.FC = () => {
     const destFolder = 'builder'
     const assetPackageName = asset.name.trim().replaceAll(' ', '_').toLowerCase()
     const path = Object.keys(asset.contents).find(($) => isAsset($))
+
+    if (!path) {
+      throw new Error('Invalid asset format: should contain at least one gltf/glb file')
+    }
+
     setIsLoading(true)
+
     await Promise.all(
       Object.entries(asset.contents).map(async ([path, contentHash]) => {
         try {
@@ -77,24 +83,21 @@ const Renderer: React.FC = () => {
         }
       })
     )
-    if (!path) {
-      throw new Error('Invalid asset format: should contain at least one gltf/glb file')
-    }
-
-    const basePath = `${destFolder}/${assetPackageName}`
 
     await sdk!.dataLayer.importAsset({
       content: new Map(Object.entries(fileContent)),
-      basePath: withAssetDir(basePath),
+      basePath: withAssetDir(destFolder),
       assetPackageName
     })
+
     if (!isMounted()) return
     setIsLoading(false)
+
     const model: AssetNodeItem = {
       type: 'asset',
       name: asset.name,
       parent: null,
-      asset: { type: 'gltf', src: `${basePath}/${path}` }
+      asset: { type: 'gltf', src: `${destFolder}/${assetPackageName}/${path}` }
     }
     await addAsset(model, position)
   }
