@@ -1,5 +1,6 @@
 .Gizmos {
   position: relative;
+  display: flex;
 }
 
 .Gizmos .gizmo {
