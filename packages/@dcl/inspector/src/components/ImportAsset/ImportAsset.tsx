@@ -98,14 +98,14 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
       }
 
       const content: Map<string, Uint8Array> = new Map()
-      content.set(file.name, new Uint8Array(binary))
+      content.set(assetName + '.' + assetExtension, new Uint8Array(binary))
 
       const basePath = withAssetDir((await sdk!.dataLayer.getProjectData({})).path)
 
       await sdk!.dataLayer.importAsset({
         content,
         basePath,
-        assetPackageName: assetName
+        assetPackageName: ''
       })
       onSave()
     }
