@@ -40,8 +40,6 @@ All operations support undo/redo.
 
 * `Ctrl + left-click` on an entity in either composite inspector or renderer adds an entity to a selected set if it is not in already, and removes it from selected set otherwise.
 
-* Clear selection: all selected entities become unselected.
-
-* Select subtree: a context menu option. Adds all entities that belong to target entity's subtree to a selected set.
+* Clear selection: a context menu option. All selected entities become unselected.
 
 * Invert selection: a context menu option. Every selected entity in a currently selected composite becomes unselected, every unselected entity becomes selected.
