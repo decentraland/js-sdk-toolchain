@@ -50,7 +50,7 @@ function Assets() {
       </div>
       <div className="Assets-content">
         {tab === AssetsTab.AssetsPack && <AssetsCatalog />}
-        {tab === AssetsTab.FileSystem && <ProjectAssetExplorer onImportAsset={handleTabClick(AssetsTab.Import)} />}
+        {tab === AssetsTab.FileSystem && <ProjectAssetExplorer />}
         {tab === AssetsTab.Import && <ImportAsset onSave={handleSave} />}
       </div>
     </div>

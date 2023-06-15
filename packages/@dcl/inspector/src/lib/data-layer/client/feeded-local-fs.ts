@@ -93,7 +93,7 @@ export function generateMainComposite({ engine, components }: TempEngine) {
       z: 8
     }
   })
-  components.GltfContainer.create(gltfEntity, { src: 'scene/models/test-glb.glb' })
+  components.GltfContainer.create(gltfEntity, { src: 'assets/scene/models/test-glb.glb' })
   cubeIdComponent.create(gltfEntity)
   components.Name.create(gltfEntity, { value: 'Gltf Test' })
 

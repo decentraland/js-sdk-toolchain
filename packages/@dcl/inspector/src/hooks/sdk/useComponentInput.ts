@@ -80,7 +80,7 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
     const newInputs = fromComponentValueToInput(componentValue)
     // set "skipSync" to avoid cyclic component value change
     updateInputs(newInputs, true)
-  }, [componentValue])
+  }, [componentValue, ...deps])
 
   useEffect(() => {
     setIsValid(validate(input))

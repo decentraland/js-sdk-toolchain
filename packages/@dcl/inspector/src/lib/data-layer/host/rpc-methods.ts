@@ -1,7 +1,7 @@
 import { IEngine, OnChangeFunction } from '@dcl/ecs'
 
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
-import { EXTENSIONS, getCurrentCompositePath, getFileName, getFilesInDirectory, withAssetDir } from './fs-utils'
+import { EXTENSIONS, getCurrentCompositePath, getFilesInDirectory, withAssetDir } from './fs-utils'
 import { stream } from './stream'
 import { FileOperation, initUndoRedo } from './undo-redo'
 import upsertAsset from './upsert-asset'
@@ -71,7 +71,7 @@ export async function initRpcMethods(
         return EXTENSIONS.some((ext) => itemLower.endsWith(ext))
       })
 
-      return { basePath, assets: files.map(($) => ({ path: $.replace(basePath + '/', '') })) }
+      return { basePath, assets: files.map(($) => ({ path: $ })) }
     },
     /**
      * Import asset into the file system.

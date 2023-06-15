@@ -1,7 +1,3 @@
-export interface PropTypes {
-  onImportAsset(): void
-}
-
 export interface IAsset {
   src: string
   type: 'unknown' | 'gltf' | 'composite'
