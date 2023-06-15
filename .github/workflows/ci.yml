@@ -50,14 +50,10 @@ jobs:
       - name: build
         run: make build
       - name: test
-        env:
-          NODE_OPTIONS: "--max_old_space_size=4096"
         run: make test-coverage
       - name: test-cli
         run: make test-cli
       - name: test-inspector
-        env:
-          NODE_OPTIONS: "--max_old_space_size=4096"
         run: make test-inspector
       - uses: codecov/codecov-action@v3
         if: always()
@@ -364,7 +360,7 @@ jobs:
       - name: npm run build
         run: npm run build
         working-directory: scene
-
+        
       - name: Set Realm Name
         run: |
           modified_realm=$(echo "${{ github.head_ref || github.ref }}" | tr '/' '-' | tr -d '@')
