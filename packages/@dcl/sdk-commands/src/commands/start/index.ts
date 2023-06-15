@@ -86,7 +86,7 @@ export async function main(options: Options) {
   const isCi = options.args['--ci'] || process.env.CI || false
   const debug = !options.args['--no-debug'] && !isCi
   const openBrowser = !options.args['--no-browser'] && !isCi
-  const skipBuild = options.args['--skip-build']
+  const build = !options.args['--skip-build']
   const watch = !options.args['--no-watch']
   const withDataLayer = options.args['--data-layer']
   const enableWeb3 = options.args['--web3']
@@ -106,13 +106,8 @@ export async function main(options: Options) {
 
       // first run `npm run build`, this can be disabled with --skip-build
       // then start the embedded compiler, this can be disabled with --no-watch
-      if (watch) {
-        await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': true, _: [] } }, project)
-      } else if (!skipBuild) {
-        await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': false, _: [] } }, project)
-      }
-
-      if (watch || !skipBuild) {
+      if (watch || build) {
+        await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': watch, _: [] } }, project)
         await startValidations(options.components, project.workingDirectory)
       }
 
