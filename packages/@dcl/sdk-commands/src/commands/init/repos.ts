@@ -1,8 +1,7 @@
-export type ScaffoldedProject = 'scene-template' | 'editor-scene-template'
+export type ScaffoldedProject = 'scene-template'
 
 const scaffoldedProjectUrls: Record<ScaffoldedProject, string> = {
-  'scene-template': 'https://github.com/decentraland/sdk7-scene-template/archive/refs/heads/main.zip',
-  'editor-scene-template': 'https://github.com/decentraland/editor-sdk7-scene-template/archive/refs/heads/main.zip'
+  'scene-template': 'https://github.com/decentraland/sdk7-scene-template/archive/refs/heads/main.zip'
 }
 
 export function getScaffoldedProjectUrl(scene: ScaffoldedProject): string {
