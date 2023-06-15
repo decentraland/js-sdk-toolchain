@@ -4,9 +4,6 @@
   "version": "7.0.0",
   "author": "DCL",
   "bugs": "https://github.com/decentraland/ecs/issues",
-  "dependencies": {
-    "@dcl/js-runtime": "file:../js-runtime"
-  },
   "files": [
     "dist",
     "dist-cjs",

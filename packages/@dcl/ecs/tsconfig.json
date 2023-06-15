@@ -13,8 +13,7 @@
     "downlevelIteration": true,
     "preserveConstEnums": true,
     "outDir": "dist",
-    "lib": ["ES2020"],
-    "types": ["@dcl/js-runtime"]
+    "lib": ["ES2020"]
   },
   "include": ["src"],
   "exclude": ["dist", "dist-cjs"]
