@@ -367,12 +367,6 @@ jobs:
       - name: npx @dcl/sdk-commands init --skip-install
         run: npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_commands_s3_bucket_key }} init --skip-install
         working-directory: scene
-      - name: install CI version of @dcl/js-runtime
-        run: npm install ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_js_runtime_s3_bucket_key }}
-        working-directory: scene
-      - name: install CI version of @dcl/ecs
-        run: npm install ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_ecs_bucket_key }}
-        working-directory: scene
       - name: install CI version of @dcl/sdk
         run: npm install ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }}
         working-directory: scene
