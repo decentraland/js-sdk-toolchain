@@ -75,6 +75,7 @@ jobs:
       decentraland_sdk_s3_bucket_key: ${{ steps.publish_decentraland_sdk.outputs.s3-bucket-key }}
       decentraland_sdk_commands_s3_bucket_key: ${{ steps.publish_decentraland_sdk_commands.outputs.s3-bucket-key }}
       decentraland_inspector_s3_bucket_key: ${{ steps.publish_decentraland_inspector.outputs.s3-bucket-key }}
+      decentraland_js_runtime_s3_bucket_key: ${{ steps.publish_dcl_js_runtime.outputs.s3-bucket-key }}
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
@@ -353,7 +354,10 @@ jobs:
         run: npm i -g npm
       - run: mkdir -p scene
       - name: npx @dcl/sdk-commands init --skip-install
-        run: npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_commands_s3_bucket_key }} init
+        run: npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_commands_s3_bucket_key }} init --skip-install
+        working-directory: scene
+      - name: install CI version of @dcl/js-runtime
+        run: npm install ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_js_runtime_s3_bucket_key }}
         working-directory: scene
       - name: install CI version of @dcl/sdk
         run: npm install ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }}
