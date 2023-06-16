@@ -16,6 +16,7 @@ import { Container } from '../../Container'
 import { TextField } from '../TextField'
 import { Props } from './types'
 import { fromGltf, toGltf, isValidInput, getModel } from './utils'
+import { withAssetDir } from '../../../lib/data-layer/host/fs-utils'
 
 const DROP_TYPES = ['project-asset-gltf']
 
@@ -30,8 +31,8 @@ export default withSdk<Props>(
     const { getInputProps, isValid } = useComponentInput(
       entity,
       GltfContainer,
-      fromGltf,
-      toGltf,
+      fromGltf(files.basePath),
+      toGltf(files.basePath),
       handleInputValidation,
       [files]
     )
@@ -53,7 +54,7 @@ export default withSdk<Props>(
           if (monitor.didDrop()) return
           const node = context.tree.get(value)!
           const model = getModel(node, context.tree)
-          if (model) void handleDrop(model.asset.src)
+          if (model) void handleDrop(withAssetDir(model.asset.src))
         },
         canDrop: ({ value, context }: ProjectAssetDrop) => {
           const node = context.tree.get(value)!

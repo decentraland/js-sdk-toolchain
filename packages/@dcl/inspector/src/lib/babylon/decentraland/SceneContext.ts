@@ -7,7 +7,6 @@ import future from 'fp-future'
 
 import { CrdtStreamMessage } from '../../data-layer/proto/gen/data-layer.gen'
 import { DataLayerRpcClient } from '../../data-layer/types'
-import { withAssetDir } from '../../data-layer/host/fs-utils'
 import { createEditorComponents } from '../../sdk/components'
 import { serializeCrdtMessages } from '../../sdk/crdt-logger'
 import { ComponentOperation } from './component-operations'
@@ -153,7 +152,7 @@ export class SceneContext {
   async getFile(src: string): Promise<Uint8Array | null> {
     if (!src) return null
     try {
-      const response = await this.dataLayer.getAssetData({ path: withAssetDir(src) })
+      const response = await this.dataLayer.getAssetData({ path: src })
       return response.data
     } catch (err) {
       console.error('Error fetching file ' + src, err)

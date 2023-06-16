@@ -134,7 +134,7 @@ function ProjectView({ folders }: Props) {
 
   const handleRemove = useCallback(
     async (value: string) => {
-      const path = getFullNodePath(tree.get(value)!).slice(1)
+      const path = withAssetDir(getFullNodePath(tree.get(value)!).slice(1))
       const entitiesWithAsset = getEntitiesWithAsset(path)
       if (entitiesWithAsset.length) {
         return setModal({ isOpen: true, value: path, entities: entitiesWithAsset })
@@ -148,8 +148,8 @@ function ProjectView({ folders }: Props) {
     async (path: string, _: Entity[] = []) => {
       if (!sdk) return
       const { dataLayer } = sdk
-      fileSystemEvent.emit('change')
       await dataLayer.removeAsset({ path })
+      fileSystemEvent.emit('change')
     },
     [sdk]
   )

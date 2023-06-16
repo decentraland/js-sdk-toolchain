@@ -55,7 +55,7 @@ const Renderer: React.FC = () => {
   const addAsset = async (asset: AssetNodeItem, position: Vector3) => {
     if (!sdk) return
     const { operations } = sdk
-    operations.addAsset(ROOT, asset.asset.src, asset.name, position)
+    operations.addAsset(ROOT, withAssetDir(asset.asset.src), asset.name, position)
     await operations.dispatch()
   }
 

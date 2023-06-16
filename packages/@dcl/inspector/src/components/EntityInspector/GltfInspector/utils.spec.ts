@@ -6,13 +6,13 @@ describe('GltfInspector/utils', () => {
   describe('fromGltf', () => {
     it('should return a "PBGltfContainer" schema', () => {
       const result = { src: 'some-path' }
-      expect(utils.fromGltf(result)).toStrictEqual(result)
+      expect(utils.fromGltf('')(result)).toStrictEqual(result)
     })
   })
   describe('toGltf', () => {
     it('should return a "PBGltfContainer" schema', () => {
       const result = { src: 'some-path' }
-      expect(utils.fromGltf(result)).toStrictEqual(result)
+      expect(utils.fromGltf('')(result)).toStrictEqual(result)
     })
   })
   describe('isValidInput', () => {
@@ -25,7 +25,7 @@ describe('GltfInspector/utils', () => {
           }
         ]
       }
-      expect(utils.isValidInput(assets, 'root/path')).toBe(true)
+      expect(utils.isValidInput(assets, 'path')).toBe(true)
     })
     it('should return false when the file is not found', () => {
       const assets = {

@@ -9,7 +9,7 @@ import { Container } from '../Container'
 import { TextField } from '../EntityInspector/TextField'
 import { Block } from '../Block'
 import Button from '../Button'
-import { useFileSystem } from '../../hooks/catalog/useFileSystem'
+import { removeBasePath, useFileSystem } from '../../hooks/catalog/useFileSystem'
 
 import { GLTFValidation } from '@babylonjs/loaders'
 
@@ -65,7 +65,7 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
   const [validationError, setValidationError] = useState<ValidationError>(null)
   const [assetName, setAssetName] = useState<string>('')
   const [assetExtension, setAssetExtension] = useState<string>('')
-  const [systemFiles] = useFileSystem()
+  const [{ basePath, assets }] = useFileSystem()
 
   const handleDrop = async (acceptedFiles: File[]) => {
     // TODO: handle zip file. GLB with multiple external image references
@@ -122,8 +122,8 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
     setAssetName(event.target.value)
   }, [])
 
-  const invalidName = !!systemFiles.assets.find((asset) => {
-    const [packageName, otherAssetName] = asset.path.split('/')
+  const invalidName = !!assets.find((asset) => {
+    const [packageName, otherAssetName] = removeBasePath(basePath, asset.path).split('/')
     if (packageName === 'builder')
       return false
     else

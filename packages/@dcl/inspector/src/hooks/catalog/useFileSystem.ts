@@ -7,6 +7,10 @@ import { AssetCatalogResponse } from '../../tooling-entrypoint'
 type FileSystemEvent = { change: unknown }
 export const fileSystemEvent = mitt<FileSystemEvent>()
 
+export const removeBasePath = (basePath: string, path: string) => {
+  return basePath ? path.replace(basePath + '/', '') : path
+}
+
 /* istanbul ignore next */
 export const useFileSystem = (): [AssetCatalogResponse, boolean] => {
   const [files, setFiles] = useState<AssetCatalogResponse>({ basePath: '', assets: [] })

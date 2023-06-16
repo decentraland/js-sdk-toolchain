@@ -5,15 +5,18 @@ import { TreeNode } from '../../ProjectAssetExplorer/ProjectView'
 import { isAssetNode } from '../../ProjectAssetExplorer/utils'
 import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
 import { AssetCatalogResponse } from '../../../tooling-entrypoint'
+import { removeBasePath } from '../../../hooks/catalog/useFileSystem'
 
-export function fromGltf(value: PBGltfContainer) {
-  return { src: value.src }
+export const fromGltf = (base: string) => (value: PBGltfContainer) => {
+  return { src: removeBasePath(base, value.src) }
 }
 
-export const toGltf = fromGltf
+export const toGltf = (base: string) => (value: PBGltfContainer) => {
+  return { src: base ? base + '/' + value.src : value.src }
+}
 
-export function isValidInput({ assets }: AssetCatalogResponse, src: string): boolean {
-  return !!assets.find(($) => $.path === src)
+export function isValidInput({ basePath, assets }: AssetCatalogResponse, src: string): boolean {
+  return !!assets.find(($) => (basePath ? basePath + '/' + src : src) === $.path)
 }
 
 export const isAsset = (value: string): boolean => value.endsWith('.gltf') || value.endsWith('.glb')
