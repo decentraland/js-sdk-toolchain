@@ -176,26 +176,6 @@ export class SceneContext {
     this.rootNode.parent = null
     this.rootNode.dispose()
   }
-
-  async connectCrdtTransport(crdtStream: DataLayerRpcClient['crdtStream']) {
-    const outgoingMessages = new AsyncQueue<CrdtStreamMessage>((_, _action) => {
-      // console.log('SCENE QUEUE', action)
-    })
-    const transport = this.addTransport(outgoingMessages)
-    const engine = this.engine
-
-    async function onMessage(message: Uint8Array) {
-      if (message.byteLength) {
-        Array.from(serializeCrdtMessages('DataLayer>Babylon', message, engine)).forEach(($) => console.log($))
-      }
-      transport.onmessage!(message)
-      await engine.update(1)
-    }
-
-    consumeAllMessagesInto(crdtStream(outgoingMessages), onMessage, outgoingMessages.close).catch((e) => {
-      console.error('consumeAllMessagesInto failed: ', e)
-    })
-  }
 }
 
 // an entity only exists if it has any component attached to it

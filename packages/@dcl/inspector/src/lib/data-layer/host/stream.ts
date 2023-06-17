@@ -40,8 +40,9 @@ export function stream(
   }
 
   // and lastly wire the new messages from the renderer engine
-  consumeAllMessagesInto(stream, processMessage, closeCallback).catch((err) => {
-    console.error('consumeAllMessagesInto failed: ', err)
+  consumeAllMessagesInto(stream, processMessage).catch((err) => {
+    console.error('x failed: ', err)
+    closeCallback()
   })
 
   // Send initial message (engineSerialized)

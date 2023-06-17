@@ -16,7 +16,7 @@ import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { IAsset } from '../AssetsCatalog/types'
 import { getModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 import { useIsMounted } from '../../hooks/useIsMounted'
-import { Warnings } from './Warnings'
+import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
 
 import './Renderer.css'

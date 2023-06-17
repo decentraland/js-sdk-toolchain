@@ -56,9 +56,6 @@ export async function createSdkContext(
   )
   ctx.rootNode.position.set(0, 0, 0)
 
-  // Connect babylon engine with dataLayer transport
-  void ctx.connectCrdtTransport(dataLayer.crdtStream)
-
   // create inspector engine context and components
   const { engine, components, events, dispose } = createInspectorEngine(dataLayer)
 

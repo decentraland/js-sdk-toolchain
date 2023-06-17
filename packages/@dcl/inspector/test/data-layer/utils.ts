@@ -38,7 +38,6 @@ export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
     sceneCtx = new SceneContext(engine, scene, loadableScene, dataLayer)
 
     inspector = createInspectorEngine(dataLayer)
-    void sceneCtx.connectCrdtTransport(dataLayer.crdtStream)
   })
 
   afterAll(() => {

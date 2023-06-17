@@ -29,9 +29,9 @@ type ValidationError = string | null
 async function validateGltf(data: ArrayBuffer): Promise<ValidationError> {
   let result
   try {
-    result = await GLTFValidation.ValidateAsync(
-      data, '', '', (uri) => { throw new Error('external references are not supported yet')}
-    )
+    result = await GLTFValidation.ValidateAsync(data, '', '', (uri) => {
+      throw new Error('external references are not supported yet')
+    })
   } catch (error) {
     return `Invalid GLTF: ${error}`
   }
@@ -42,13 +42,13 @@ async function validateGltf(data: ArrayBuffer): Promise<ValidationError> {
         Babylon's type declarations incorrectly state that result.issues.messages
         is an Array<string>. In fact, it's an array of objects with useful properties.
       */
-      type BabylonValidationIssue = {severity: number, code: string}
+      type BabylonValidationIssue = { severity: number; code: string }
       const severity = (issue as unknown as BabylonValidationIssue).severity
       /*
         Severity codes are Error (0), Warning (1), Information (2), Hint (3).
         https://github.com/KhronosGroup/glTF-Validator/blob/main/lib/src/errors.dart
       */
-      if (severity == 0) {
+      if (severity === 0) {
         const message = (issue as unknown as BabylonValidationIssue).code
         return `Invalid GLTF: ${message}`
       }
@@ -92,7 +92,7 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
       }
 
       const gltfValidationError = await validateGltf(binary)
-      if (gltfValidationError != null) {
+      if (gltfValidationError !== null) {
         setValidationError(gltfValidationError)
         return
       }
@@ -124,10 +124,8 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
 
   const invalidName = !!assets.find((asset) => {
     const [packageName, otherAssetName] = removeBasePath(basePath, asset.path).split('/')
-    if (packageName === 'builder')
-      return false
-    else
-      return otherAssetName?.toLocaleLowerCase() === (assetName?.toLocaleLowerCase() + '.' + assetExtension)
+    if (packageName === 'builder') return false
+    else return otherAssetName?.toLocaleLowerCase() === assetName?.toLocaleLowerCase() + '.' + assetExtension
   })
 
   return (
@@ -155,16 +153,12 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
             </Container>
             <div className={classNames({ error: !!invalidName })}>
               <Block label="Asset name">
-                <TextField
-                  label=""
-                  value={assetName}
-                  onChange={handleNameChange}
-                />
+                <TextField label="" value={assetName} onChange={handleNameChange} />
               </Block>
               <Button disabled={invalidName || !!validationError} onClick={handleSave}>
                 Import
               </Button>
-              <span className='error'>{validationError}</span>
+              <span className="error">{validationError}</span>
             </div>
           </div>
         )}

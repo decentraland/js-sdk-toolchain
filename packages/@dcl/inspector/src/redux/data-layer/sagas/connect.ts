@@ -1,3 +1,5 @@
+import { IEngine } from '@dcl/ecs'
+import { END, EventChannel, eventChannel } from 'redux-saga'
 import * as codegen from '@dcl/rpc/dist/codegen'
 import { call, put, take } from 'redux-saga/effects'
 import { createRpcClient, RpcClient, RpcClientPort } from '@dcl/rpc'
@@ -7,8 +9,6 @@ import { connected, DataLayerState, reconnect } from '../'
 import { createLocalDataLayerRpcClient } from '../../../lib/data-layer/client/local-data-layer'
 import { DataServiceDefinition } from '../../..//lib/data-layer/proto/gen/data-layer.gen'
 import { DataLayerRpcClient } from '../../../lib/data-layer/types'
-import { IEngine } from '@dcl/ecs'
-import { END, EventChannel, eventChannel } from 'redux-saga'
 
 function getWsUrl() {
   const dataLayerWsByQueryParams = new URLSearchParams(window.location.search).get('ws')
