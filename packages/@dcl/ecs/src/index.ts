@@ -34,7 +34,7 @@ export const Animator: AnimatorComponentDefinitionExtended = /* @__PURE__*/ comp
 export const Material: MaterialComponentDefinitionExtended = /* @__PURE__*/ components.Material(engine)
 export const MeshRenderer: MeshRendererComponentDefinitionExtended = /* @__PURE__*/ components.MeshRenderer(engine)
 export const MeshCollider: MeshColliderComponentDefinitionExtended = /* @__PURE__*/ components.MeshCollider(engine)
-export const Name: NameComponent = /* @__PURE__*/ components.Name(engine)
+export const Name: NameComponent = components.Name(engine)
 
 // export components for global engine
 export * from './components/generated/global.gen'
