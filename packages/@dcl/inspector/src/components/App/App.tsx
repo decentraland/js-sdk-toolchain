@@ -11,6 +11,8 @@ import './App.css'
 import Assets from '../Assets'
 import { useSelectedEntity } from '../../hooks/sdk/useSelectedEntity'
 import { useWindowSize } from '../../hooks/useWindowSize'
+import { useAppSelector } from '../../redux/hooks'
+import { getError } from '../../redux/data-layer'
 
 const App = () => {
   const selectedEntity = useSelectedEntity()
@@ -19,9 +21,9 @@ const App = () => {
 
   // Footer's height is 48 pixels, so we need to calculate the percentage of the screen that it takes to pass as the minSize prop for the Panel
   const footerMin = (48 / height!) * 100
-
+  const disconnected = useAppSelector(getError)
   return (
-    <div className="App">
+    <div className="App" style={{ pointerEvents: disconnected ? 'none' : 'auto' }}>
       <PanelGroup direction="vertical" autoSaveId="vertical">
         <Panel>
           <PanelGroup direction="horizontal" autoSaveId="horizontal">
