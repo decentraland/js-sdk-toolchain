@@ -33,9 +33,10 @@
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1",
     "react-modal": "^3.16.1",
-    "react-resizable-panels": "^0.0.48",
     "react-redux": "^8.1.0",
+    "react-resizable-panels": "^0.0.48",
     "redux-saga": "^1.2.3",
+    "redux-saga-test-plan": "^4.0.6",
     "typescript": "^5.0.2"
   },
   "files": [

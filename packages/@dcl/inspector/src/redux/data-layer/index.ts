@@ -10,14 +10,12 @@ export enum ErrorType {
 export interface DataLayerState {
   dataLayer: DataLayerRpcClient | undefined
   reconnectAttempts: number
-  ws: WebSocket | undefined
   error: ErrorType | undefined
 }
 
-const initialState: DataLayerState = {
+export const initialState: DataLayerState = {
   dataLayer: undefined,
   reconnectAttempts: 0,
-  ws: undefined,
   error: undefined
 }
 
@@ -33,7 +31,6 @@ export const dataLayer = createSlice({
       console.log('[WS] Reconnecting')
       state.error = ErrorType.Reconnecting
       state.dataLayer = undefined
-      state.ws = undefined
     },
     connected: (state, { payload }: PayloadAction<{ dataLayer: DataLayerState['dataLayer'] }>) => {
       console.log('[WS] Connected')
@@ -51,7 +48,6 @@ export const dataLayer = createSlice({
 export const { connect, connected, reconnect, error } = dataLayer.actions
 export const getError = (state: RootState) => state.dataLayer.error
 export const getDataLayer = (state: RootState) => state.dataLayer.dataLayer
-export const getDataLayerWs = (state: RootState) => state.dataLayer.ws
 export const getDataLayerReconnectAttempts = (state: RootState) => state.dataLayer.reconnectAttempts
 
 export default dataLayer.reducer

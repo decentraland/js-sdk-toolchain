@@ -3,7 +3,7 @@ import { put, select, delay } from 'redux-saga/effects'
 import { ErrorType, connect, error, getDataLayerReconnectAttempts } from '../'
 
 const RECONNECT_TIMEOUT = 1000
-const MAX_RETRY_TIMES = 6
+export const MAX_RETRY_TIMES = 6
 
 export function* reconnectSaga() {
   const reconnectAttempts: number = yield select(getDataLayerReconnectAttempts)
@@ -13,7 +13,6 @@ export function* reconnectSaga() {
     yield put(error({ error: ErrorType.Disconnected }))
     return
   }
-
   yield delay(RECONNECT_TIMEOUT * reconnectAttempts)
   yield put(connect())
 }

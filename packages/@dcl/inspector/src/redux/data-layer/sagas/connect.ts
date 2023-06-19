@@ -2,7 +2,7 @@ import { IEngine } from '@dcl/ecs'
 import { END, EventChannel, eventChannel } from 'redux-saga'
 import * as codegen from '@dcl/rpc/dist/codegen'
 import { call, put, take } from 'redux-saga/effects'
-import { createRpcClient, RpcClient, RpcClientPort } from '@dcl/rpc'
+import { createRpcClient, RpcClient, RpcClientPort, Transport } from '@dcl/rpc'
 import { WebSocketTransport } from '@dcl/rpc/dist/transports/WebSocket'
 
 import { connected, DataLayerState, reconnect } from '../'
@@ -10,37 +10,33 @@ import { createLocalDataLayerRpcClient } from '../../../lib/data-layer/client/lo
 import { DataServiceDefinition } from '../../..//lib/data-layer/proto/gen/data-layer.gen'
 import { DataLayerRpcClient } from '../../../lib/data-layer/types'
 
-function getWsUrl() {
+export function getWsUrl() {
   const dataLayerWsByQueryParams = new URLSearchParams(window.location.search).get('ws')
   const dataLayerWsByGlobalThis = ((globalThis as any).InspectorConfig?.dataLayerRpcWsUrl as string) || null
 
   return dataLayerWsByQueryParams || dataLayerWsByGlobalThis || null
 }
 
-function createWebSocketConnection(url: string): WebSocket {
+export function createWebSocketConnection(url: string): WebSocket {
   return new WebSocket(url)
 }
 
-function createSocketChannel(socket: WebSocket): EventChannel<WsActions> {
+export function createSocketChannel(socket: WebSocket): EventChannel<WsActions> {
   return eventChannel((emit) => {
-    socket.onclose = () => {
-      console.log('closed ')
+    socket.addEventListener('close', () => {
       emit(END)
-    }
-    socket.onerror = (error) => {
+    })
+    socket.addEventListener('error', (error) => {
       emit({ type: 'WS_ERROR', error })
-    }
-    socket.onopen = () => {
+    })
+    socket.addEventListener('open', () => {
       emit({ type: 'WS_OPENED' })
-    }
-    const unsubscribe = () => {
-      socket.onmessage = null
-    }
-    return unsubscribe
+    })
+    return () => {}
   })
 }
 
-type WsActions =
+export type WsActions =
   | {
       type: 'WS_OPENED'
     }
@@ -51,6 +47,7 @@ type WsActions =
 
 export function* connectSaga() {
   const wsUrl: string | undefined = yield call(getWsUrl)
+
   if (!wsUrl) {
     const dataLayer: DataLayerState['dataLayer'] = yield call(createLocalDataLayerRpcClient)
     yield put(connected({ dataLayer }))
@@ -61,8 +58,9 @@ export function* connectSaga() {
   try {
     while (true) {
       const wsEvent: WsActions = yield take(socketChannel)
+
       if (wsEvent.type === 'WS_OPENED') {
-        const clientTransport = WebSocketTransport(ws)
+        const clientTransport: Transport = yield call(WebSocketTransport, ws)
         const client: RpcClient = yield call(createRpcClient, clientTransport)
         const clientPort: RpcClientPort = yield call(client.createPort, 'scene-ctx')
         const dataLayer: DataLayerRpcClient = codegen.loadService<{ engine: IEngine }, DataServiceDefinition>(

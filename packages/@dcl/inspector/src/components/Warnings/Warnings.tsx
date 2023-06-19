@@ -1,7 +1,9 @@
 import React from 'react'
+
 import { RotationGizmoLocalAlignmentDisabled } from './RotationGizmoLocalAlignmentDisabled'
-import './Warnings.css'
 import { SocketConnection } from './SocketConnection'
+
+import './Warnings.css'
 
 const Warnings: React.FC = () => {
   return (

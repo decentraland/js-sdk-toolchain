@@ -1,13 +1,14 @@
 import * as BABYLON from '@babylonjs/core'
 import { IEngine } from '@dcl/ecs'
+
 import { SceneContext, LoadableScene } from '../../src/lib/babylon/decentraland/SceneContext'
 import { SdkContextValue } from '../../src/lib/sdk/context'
 import { createInspectorEngine } from '../../src/lib/sdk/inspector-engine'
 import { createLocalDataLayerRpcClient } from '../../src/lib/data-layer/client/local-data-layer'
-import { feededFileSystem } from '../../src/lib/data-layer/client/feeded-local-fs'
 import { DataLayerRpcClient } from '../../src/lib/data-layer/types'
 import { createOperations } from '../../src/lib/sdk/operations'
 import { getDefaultInspectorPreferences } from '../../src/lib/logic/preferences/types'
+import { connectCrdtToEngine } from '../../src/lib/sdk/connect-stream'
 
 export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
   let sceneCtx: SceneContext
@@ -18,8 +19,7 @@ export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
   >
 
   beforeAll(async () => {
-    const fs = await feededFileSystem({})
-    dataLayer = await createLocalDataLayerRpcClient(fs)
+    dataLayer = await createLocalDataLayerRpcClient()
     // Enable autosave to improve test coverage
     await dataLayer.setInspectorPreferences({
       ...getDefaultInspectorPreferences(),
@@ -36,8 +36,9 @@ export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
 
     const scene = new BABYLON.Scene(engine)
     sceneCtx = new SceneContext(engine, scene, loadableScene, dataLayer)
-
     inspector = createInspectorEngine(dataLayer)
+    connectCrdtToEngine(sceneCtx.engine, dataLayer.crdtStream, 'renderer')
+    connectCrdtToEngine(inspector.engine, dataLayer.crdtStream, 'inspector')
   })
 
   afterAll(() => {

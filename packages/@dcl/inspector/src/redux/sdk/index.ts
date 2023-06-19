@@ -7,7 +7,7 @@ export interface EngineState {
   rendererEngine: IEngine | undefined
 }
 
-const initialState: EngineState = {
+export const initialState: EngineState = {
   inspectorEngine: undefined,
   rendererEngine: undefined
 }

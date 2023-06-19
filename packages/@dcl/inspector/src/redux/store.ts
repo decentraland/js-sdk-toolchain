@@ -16,6 +16,7 @@ export const store = configureStore({
     return getDefaultMiddleware({ thunk: false, serializableCheck: false }).concat(sagaMiddleware)
   }
 })
+
 sagaMiddleware.run(sagas)
 
 export type AppDispatch = typeof store.dispatch
