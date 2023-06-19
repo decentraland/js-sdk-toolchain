@@ -15,7 +15,10 @@ export const useSave = (): [() => Promise<void>, boolean] => {
     setIsDirty(false)
   }, [sdk])
 
-  saveEvent.on('change', (value: boolean) => setIsDirty(value))
+  saveEvent.on('change', (value: boolean) => {
+    if (value && !sdk?.preferences.data.autosaveEnabled) setIsDirty(true)
+    else setIsDirty(false)
+  })
 
   return [saveFn, isDirty]
 }

@@ -1,22 +1,23 @@
-.Camera {
+.Preferences {
   position: relative;
 }
 
-.Camera .camera {
+.Preferences .preferences {
   background-repeat: no-repeat;
   background-position: center;
   height: 100%;
 }
 
-.Camera .camera svg {
-  transform: translateX(1px) translateY(2px);
+.Preferences .preferences svg {
+  transform: translateX(0.5px) translateY(2px);
 }
 
-.Camera .panel {
+.Preferences .panel {
   display: none;
   position: absolute;
   top: 100%;
-  width: 150px;
+  right: 15%;
+  width: 190px;
   background-color: #1e1e1e;
   z-index: 1;
   padding: 12px;
@@ -24,23 +25,24 @@
   user-select: none;
 }
 
-.Camera .panel.visible {
+.Preferences .panel.visible {
   display: block;
 }
 
-.Camera .panel .icon {
+.Preferences .panel .icon {
   cursor: pointer;
   width: 24px;
   height: 24px;
   position: absolute;
   right: -5px;
-  top: -5px;
+  top: -2px;
 }
 
-.Camera .panel .axis {
+.Preferences .panel .preference-row {
   position: relative;
+  padding-bottom: 2px;
 }
 
-.Camera .panel .axis label {
+.Preferences .panel .preference-row label {
   color: var(--secondary-text);
 }

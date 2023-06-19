@@ -24,7 +24,14 @@ export async function initRpcMethods(
   // Handle old EntityNode components
   removeLegacyEntityNodeComponents(engine)
 
-  const compositeManager = await compositeAndDirty(fs, engine, inspectorPreferences, currentCompositeResourcePath)
+  const compositeManager = await compositeAndDirty(
+    fs,
+    engine,
+    () => {
+      return inspectorPreferences
+    },
+    currentCompositeResourcePath
+  )
   const undoRedoManager = initUndoRedo(fs, engine, () => compositeManager.composite)
 
   // Create containers and attach onChange logic.
