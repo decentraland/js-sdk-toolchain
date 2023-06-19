@@ -99,11 +99,12 @@ export function createGizmoManager(context: SceneContext) {
       areQuaternionsEqual(newTransform.rotation, oldTransform.rotation)
     )
       return
-    const { position, scale, rotation } = newTransform
+    const { position, scale, rotation, parent } = newTransform
     context.operations.updateValue(context.Transform, lastEntity.entityId, {
       position: DclVector3.create(position.x, position.y, position.z),
       rotation: DclQuaternion.create(rotation.x, rotation.y, rotation.z, rotation.w),
-      scale: DclVector3.create(scale.x, scale.y, scale.z)
+      scale: DclVector3.create(scale.x, scale.y, scale.z),
+      parent: parent
     })
     void context.operations.dispatch()
   }
