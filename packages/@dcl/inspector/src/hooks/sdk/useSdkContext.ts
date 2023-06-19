@@ -35,7 +35,7 @@ export const useSdkContext = () => {
         setError(e)
       })
       .finally(() => setIsLoading(false))
-  }, [catalog, canvas, sdk, isLoading, dispatch])
+  }, [catalog, canvas, sdk, isLoading, dispatch, dataLayer])
 
   const renderer = useCallback(
     (ref: React.RefObject<HTMLCanvasElement>) => {

@@ -4,7 +4,6 @@ import { RxCross2 } from 'react-icons/rx'
 import { IoIosImage } from 'react-icons/io'
 
 import FileInput from '../FileInput'
-import { withSdk } from '../../hoc/withSdk'
 import { Container } from '../Container'
 import { TextField } from '../EntityInspector/TextField'
 import { Block } from '../Block'
@@ -16,6 +15,8 @@ import { GLTFValidation } from '@babylonjs/loaders'
 import './ImportAsset.css'
 import classNames from 'classnames'
 import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
+import { getDataLayer } from '../../redux/data-layer'
+import { useAppSelector } from '../../redux/hooks'
 
 const ONE_MB_IN_BYTES = 1_048_576
 const ONE_GB_IN_BYTES = ONE_MB_IN_BYTES * 1024
@@ -59,8 +60,10 @@ async function validateGltf(data: ArrayBuffer): Promise<ValidationError> {
   }
 }
 
-const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
+const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
   // TODO: multiple files
+  const dataLayer = useAppSelector(getDataLayer)
+
   const [file, setFile] = useState<File>()
   const [validationError, setValidationError] = useState<ValidationError>(null)
   const [assetName, setAssetName] = useState<string>('')
@@ -100,9 +103,9 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
       const content: Map<string, Uint8Array> = new Map()
       content.set(assetName + '.' + assetExtension, new Uint8Array(binary))
 
-      const basePath = withAssetDir((await sdk!.dataLayer.getProjectData({})).path)
+      const basePath = withAssetDir((await dataLayer!.getProjectData({})).path)
 
-      await sdk!.dataLayer.importAsset({
+      await dataLayer?.importAsset({
         content,
         basePath,
         assetPackageName: ''
@@ -165,6 +168,6 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
       </FileInput>
     </div>
   )
-})
+}
 
 export default ImportAsset

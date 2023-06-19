@@ -1,12 +1,9 @@
 import mitt from 'mitt'
 
-import { DataLayerRpcClient } from '../data-layer/types'
 import { SdkContextEvents, SdkContextValue } from './context'
 import { createEngineContext } from '../data-layer/host/utils/engine'
 
-export function createInspectorEngine(
-  _dataLayer: DataLayerRpcClient
-): Omit<
+export function createInspectorEngine(): Omit<
   SdkContextValue,
   'scene' | 'sceneContext' | 'dataLayer' | 'operations' | 'gizmos' | 'editorCamera' | 'preferences'
 > {

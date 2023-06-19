@@ -8,10 +8,13 @@ import { withSdk } from '../../hoc/withSdk'
 import { Gizmos } from './Gizmos'
 import { Preferences } from './Preferences'
 import { ToolbarButton } from './ToolbarButton'
-
 import './Toolbar.css'
+import { getDataLayer } from '../../redux/data-layer'
+import { useAppSelector } from '../../redux/hooks'
+import { DataLayerRpcClient } from '../../lib/data-layer/types'
 
 const Toolbar = withSdk(({ sdk }) => {
+  const dataLayer = useAppSelector(getDataLayer)
   const [save, isDirty] = useSave()
   const handleInspector = useCallback(() => {
     const { debugLayer } = sdk.scene
@@ -23,14 +26,15 @@ const Toolbar = withSdk(({ sdk }) => {
   }, [])
 
   const handleUndoRedo = useCallback(
-    (fn: typeof sdk.dataLayer.undo) => async () => {
+    (fn?: DataLayerRpcClient['undo']) => async () => {
+      if (!fn) return
       const { type } = await fn({})
       if (type === 'file') {
         fileSystemEvent.emit('change')
       }
       saveEvent.emit('change', true)
     },
-    [sdk.dataLayer]
+    [dataLayer]
   )
 
   return (
@@ -38,10 +42,10 @@ const Toolbar = withSdk(({ sdk }) => {
       <ToolbarButton className="save" onClick={save} title={isDirty ? 'Save changes' : 'All changes saved'}>
         {isDirty ? <BiSave /> : <BiBadgeCheck />}
       </ToolbarButton>
-      <ToolbarButton className="undo" title='Undo' onClick={handleUndoRedo(sdk?.dataLayer.undo)}>
+      <ToolbarButton className="undo" title="Undo" onClick={handleUndoRedo(dataLayer?.undo)}>
         <BiUndo />
       </ToolbarButton>
-      <ToolbarButton className="redo" title='Redo' onClick={handleUndoRedo(sdk?.dataLayer.redo)}>
+      <ToolbarButton className="redo" title="Redo" onClick={handleUndoRedo(dataLayer?.redo)}>
         <BiRedo />
       </ToolbarButton>
       <Gizmos />

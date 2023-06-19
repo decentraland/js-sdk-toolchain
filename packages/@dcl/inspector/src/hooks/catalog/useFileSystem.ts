@@ -1,8 +1,9 @@
 import mitt from 'mitt'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
-import { useSdk } from '../sdk/useSdk'
 import { AssetCatalogResponse } from '../../tooling-entrypoint'
+import { useAppSelector } from '../../redux/hooks'
+import { getDataLayer } from '../../redux/data-layer'
 
 type FileSystemEvent = { change: unknown }
 export const fileSystemEvent = mitt<FileSystemEvent>()
@@ -14,15 +15,16 @@ export const removeBasePath = (basePath: string, path: string) => {
 /* istanbul ignore next */
 export const useFileSystem = (): [AssetCatalogResponse, boolean] => {
   const [files, setFiles] = useState<AssetCatalogResponse>({ basePath: '', assets: [] })
+  const dataLayer = useAppSelector(getDataLayer)
+
   const [init, setInit] = useState(false)
-  useSdk(({ dataLayer }) => {
-    async function fetchFiles() {
-      const assets = await dataLayer.getAssetCatalog({})
-      setFiles(assets)
-    }
-    fileSystemEvent.on('change', fetchFiles)
-    void fetchFiles().then(() => setInit(true))
-  })
+  const fetchFiles = useCallback(async () => {
+    if (!dataLayer) return
+    const assets = await dataLayer.getAssetCatalog({})
+    setFiles(assets)
+  }, [dataLayer])
+  fileSystemEvent.on('change', fetchFiles)
+  void fetchFiles().then(() => setInit(true))
 
   return [files, init]
 }

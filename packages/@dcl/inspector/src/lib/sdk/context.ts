@@ -26,7 +26,6 @@ export type SdkContextValue = {
   sceneContext: SceneContext
   events: Emitter<SdkContextEvents>
   dispose(): void
-  dataLayer: DataLayerRpcClient
   operations: ReturnType<typeof createOperations>
   gizmos: Gizmos
   editorCamera: CameraManager
@@ -51,13 +50,12 @@ export async function createSdkContext(
     getHardcodedLoadableScene(
       'urn:decentraland:entity:bafkreid44xhavttoz4nznidmyj3rjnrgdza7v6l7kd46xdmleor5lmsxfm1',
       catalog
-    ),
-    dataLayer
+    )
   )
   ctx.rootNode.position.set(0, 0, 0)
 
   // create inspector engine context and components
-  const { engine, components, events, dispose } = createInspectorEngine(dataLayer)
+  const { engine, components, events, dispose } = createInspectorEngine()
 
   // register some globals for debugging
   Object.assign(globalThis, { dataLayer, inspectorEngine: engine })
@@ -69,7 +67,6 @@ export async function createSdkContext(
     scene,
     sceneContext: ctx,
     dispose,
-    dataLayer,
     operations: createOperations(engine),
     gizmos: ctx.gizmos,
     editorCamera: renderer.editorCamera,

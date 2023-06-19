@@ -16,10 +16,10 @@ import { putBillboardComponent } from './sdkComponents/billboard'
 import { putGltfContainerComponent } from './sdkComponents/gltf-container'
 import { putMeshRendererComponent } from './sdkComponents/mesh-renderer'
 import { putTransformComponent } from './sdkComponents/transform'
-import { consumeAllMessagesInto } from '../../logic/consume-stream'
 import { putSceneComponent } from './editorComponents/scene'
 import { createOperations } from '../../sdk/operations'
 import { createGizmoManager } from './gizmo-manager'
+import { store } from '../../../redux/store'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -68,12 +68,7 @@ export class SceneContext {
   // this future is resolved when the scene is disposed
   readonly stopped = future<void>()
 
-  constructor(
-    public babylon: BABYLON.Engine,
-    public scene: BABYLON.Scene,
-    public loadableScene: LoadableScene,
-    public dataLayer: DataLayerRpcClient
-  ) {
+  constructor(public babylon: BABYLON.Engine, public scene: BABYLON.Scene, public loadableScene: LoadableScene) {
     this.rootNode = new EcsEntity(0 as Entity, this.#weakThis, scene)
     Object.assign(globalThis, { babylon: this.engine })
   }
@@ -152,7 +147,9 @@ export class SceneContext {
   async getFile(src: string): Promise<Uint8Array | null> {
     if (!src) return null
     try {
-      const response = await this.dataLayer.getAssetData({ path: src })
+      const { dataLayer } = store.getState().dataLayer
+      if (!dataLayer) return null
+      const response = await dataLayer.getAssetData({ path: src })
       return response.data
     } catch (err) {
       console.error('Error fetching file ' + src, err)
