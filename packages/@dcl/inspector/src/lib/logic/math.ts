@@ -6,7 +6,7 @@ export function getWorldMatrix(entity: Entity, transformComponent: TransformComp
   if (!transform) return Matrix.Identity()
 
   const localMatrix = Matrix.compose(transform.scale, transform.rotation, transform.position)
-
   if (!transform.parent) return localMatrix
-  else return Matrix.multiply(localMatrix, getWorldMatrix(transform.parent, transformComponent))
+
+  return Matrix.multiply(localMatrix, getWorldMatrix(transform.parent, transformComponent))
 }

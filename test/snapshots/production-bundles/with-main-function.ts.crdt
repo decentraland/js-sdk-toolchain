@@ -8,9 +8,9 @@ EVAL test/snapshots/production-bundles/with-main-function.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 37k
-  MALLOC_COUNT = 8661
-  ALIVE_OBJS_DELTA ~= 1.84k
+  OPCODES ~= 33k
+  MALLOC_COUNT = 8527
+  ALIVE_OBJS_DELTA ~= 1.80k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -18,7 +18,7 @@ CALL onStart()
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  OPCODES ~= 4k
+  OPCODES ~= 3k
   MALLOC_COUNT = 69
   ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0.1)
@@ -36,4 +36,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 2k
   MALLOC_COUNT = 5
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 706.16k bytes
+  MEMORY_USAGE_COUNT ~= 703.18k bytes
