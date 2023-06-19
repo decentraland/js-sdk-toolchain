@@ -10,13 +10,3 @@ export function getWorldMatrix(entity: Entity, transformComponent: TransformComp
   if (!transform.parent) return localMatrix
   else return Matrix.multiply(localMatrix, getWorldMatrix(transform.parent, transformComponent))
 }
-
-export function getLocalMatrixAfterReparenting(
-  child: Entity,
-  parent: Entity,
-  transformComponent: TransformComponentExtended
-) {
-  const childWorld = getWorldMatrix(child, transformComponent)
-  const parentWorld = getWorldMatrix(parent, transformComponent)
-  return Matrix.multiply(childWorld, Matrix.invert(parentWorld))
-}
