@@ -1,6 +1,7 @@
 import { Entity, IEngine, Transform as TransformEngine } from '@dcl/ecs'
-import { getLocalMatrixAfterReparenting, decomposeMatrixSRT } from '../../logic/math'
+import { getLocalMatrixAfterReparenting } from '../../logic/math'
 import { Quaternion, Vector3 } from '@dcl/ecs-math'
+import { Matrix } from '@dcl/ecs-math/dist/Matrix'
 
 export function setParent(engine: IEngine) {
   return function setParent(entity: Entity, parent: Entity) {
@@ -11,7 +12,7 @@ export function setParent(engine: IEngine) {
     const scale = Vector3.create()
     const rotation = Quaternion.create()
 
-    if (decomposeMatrixSRT(localMatrix, scale, rotation, position)) {
+    if (Matrix.decompose(localMatrix, scale, rotation, position)) {
       Transform.createOrReplace(entity, { parent, position, scale, rotation })
     } else {
       Transform.createOrReplace(entity, { parent })
