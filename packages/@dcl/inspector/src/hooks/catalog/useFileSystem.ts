@@ -1,5 +1,5 @@
 import mitt from 'mitt'
-import { useCallback, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { AssetCatalogResponse } from '../../tooling-entrypoint'
 import { useAppSelector } from '../../redux/hooks'
@@ -18,13 +18,20 @@ export const useFileSystem = (): [AssetCatalogResponse, boolean] => {
   const dataLayer = useAppSelector(getDataLayer)
 
   const [init, setInit] = useState(false)
-  const fetchFiles = useCallback(async () => {
+
+  const fetchFiles = async () => {
     if (!dataLayer) return
     const assets = await dataLayer.getAssetCatalog({})
     setFiles(assets)
+  }
+
+  useEffect(() => {
+    fileSystemEvent.on('change', fetchFiles)
+  }, [])
+
+  useEffect(() => {
+    void fetchFiles().then(() => setInit(true))
   }, [dataLayer])
-  fileSystemEvent.on('change', fetchFiles)
-  void fetchFiles().then(() => setInit(true))
 
   return [files, init]
 }
