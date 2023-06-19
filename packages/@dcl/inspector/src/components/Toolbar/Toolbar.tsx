@@ -6,7 +6,7 @@ import { fileSystemEvent } from '../../hooks/catalog/useFileSystem'
 import { saveEvent, useSave } from '../../hooks/editor/useSave'
 import { withSdk } from '../../hoc/withSdk'
 import { Gizmos } from './Gizmos'
-import { Camera } from './Camera'
+import { Preferences } from './Preferences'
 import { ToolbarButton } from './ToolbarButton'
 
 import './Toolbar.css'
@@ -35,17 +35,17 @@ const Toolbar = withSdk(({ sdk }) => {
 
   return (
     <div className="Toolbar">
-      <ToolbarButton className="save" onClick={save}>
+      <ToolbarButton className="save" onClick={save} title={isDirty ? 'Save changes' : 'All changes saved'}>
         {isDirty ? <BiSave /> : <BiBadgeCheck />}
       </ToolbarButton>
-      <ToolbarButton className="undo" onClick={handleUndoRedo(sdk?.dataLayer.undo)}>
+      <ToolbarButton className="undo" title='Undo' onClick={handleUndoRedo(sdk?.dataLayer.undo)}>
         <BiUndo />
       </ToolbarButton>
-      <ToolbarButton className="redo" onClick={handleUndoRedo(sdk?.dataLayer.redo)}>
+      <ToolbarButton className="redo" title='Redo' onClick={handleUndoRedo(sdk?.dataLayer.redo)}>
         <BiRedo />
       </ToolbarButton>
       <Gizmos />
-      <Camera />
+      <Preferences />
       <ToolbarButton className="babylonjs-inspector" onClick={handleInspector}>
         <RiListSettingsLine />
       </ToolbarButton>
