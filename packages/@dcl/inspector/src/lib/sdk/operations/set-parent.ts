@@ -4,7 +4,7 @@ import { Quaternion, Vector3 } from '@dcl/ecs-math'
 
 export function setParent(engine: IEngine) {
   return function setParent(entity: Entity, parent: Entity) {
-    // world position of an entity should not change unless SRT decomposition is impossible
+    // world matrix of an entity should not change unless SRT decomposition of adjusted local matrix is impossible
     const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
     const localMatrix = getLocalMatrixAfterReparenting(entity, parent, Transform)
     const position = Vector3.create()

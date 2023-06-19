@@ -2,6 +2,7 @@ import { Entity, TransformComponentExtended } from '@dcl/ecs'
 import { Quaternion, Vector3 } from '@dcl/ecs-math'
 import { Matrix } from '@dcl/ecs-math/dist/Matrix'
 
+// ECS-math version is buggy, use this one until ECS-math is fixed
 export function decomposeMatrixSRT(
   self: Matrix.ReadonlyMatrix,
   scale?: Vector3.MutableVector3,
@@ -10,13 +11,20 @@ export function decomposeMatrixSRT(
 ): boolean {
   if (self.isIdentity) {
     if (translation) {
-      translation = Vector3.create(0, 0, 0)
+      translation.x = 0
+      translation.y = 0
+      translation.z = 0
     }
     if (scale) {
-      scale = Vector3.create(0, 0, 0)
+      scale.x = 1
+      scale.y = 1
+      scale.z = 1
     }
     if (rotation) {
-      rotation = Quaternion.create(0, 0, 0, 1)
+      rotation.x = 0
+      rotation.y = 0
+      rotation.z = 0
+      rotation.w = 1
     }
     return true
   }
@@ -39,7 +47,10 @@ export function decomposeMatrixSRT(
 
   if (usedScale.x === 0 || usedScale.y === 0 || usedScale.z === 0) {
     if (rotation) {
-      rotation = Quaternion.create(0, 0, 0, 1)
+      rotation.x = 0
+      rotation.y = 0
+      rotation.z = 0
+      rotation.w = 1
     }
     return false
   }
