@@ -44,7 +44,7 @@ async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, pa
 export async function compositeAndDirty(
   fs: FileSystemInterface,
   engine: IEngine,
-  inspectorPreferences: InspectorPreferences,
+  getInspectorPreferences: () => InspectorPreferences,
   compositePath: string
 ) {
   let composite: CompositeDefinition
@@ -80,7 +80,7 @@ export async function compositeAndDirty(
 
   engine.addSystem(() => {
     if (dirty !== DirtyEnum.None) {
-      void saveComposite(inspectorPreferences.autosaveEnabled && dirty === DirtyEnum.DirtyAndDump)
+      void saveComposite(getInspectorPreferences().autosaveEnabled && dirty === DirtyEnum.DirtyAndDump)
     }
     dirty = DirtyEnum.None
   }, -1_000_000_000)

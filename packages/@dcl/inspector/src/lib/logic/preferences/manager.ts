@@ -14,4 +14,9 @@ export class InspectorPreferencesManager {
     this.data.freeCameraInvertRotation = invert
     void this.dataLayer.setInspectorPreferences(this.data)
   }
+
+  setAutosaveEnabled(enabled: boolean) {
+    this.data.autosaveEnabled = enabled
+    void this.dataLayer.setInspectorPreferences(this.data)
+  }
 }
