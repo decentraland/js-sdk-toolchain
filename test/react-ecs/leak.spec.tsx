@@ -1,4 +1,4 @@
-import { components, Transport } from '../../packages/@dcl/ecs/src'
+import { components } from '../../packages/@dcl/ecs/src'
 import { Button, Dropdown, Input, ReactEcs, UiEntity } from '../../packages/@dcl/react-ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
 import { setupEngine } from './utils'

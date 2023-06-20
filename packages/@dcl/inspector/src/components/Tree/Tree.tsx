@@ -43,143 +43,153 @@ const getExpandStyles = (active: boolean) => ({ height: active ? 'auto' : '0', o
 const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : '' })
 
 export function Tree<T>() {
-  return React.memo(withContextMenu<Props<T>>((props) => {
-    const {
-      getExtraContextMenu,
-      className,
-      contextMenuId,
-      value,
-      level = getDefaultLevel(),
-      getId,
-      getChildren,
-      getLabel,
-      isOpen,
-      isSelected,
-      onSelect,
-      isHidden,
-      onSetParent,
-      canRename,
-      canAddChild,
-      canRemove,
-      canDuplicate,
-      onRename,
-      onAddChild,
-      onRemove,
-      onDuplicate,
-      onSetOpen,
-      getDragContext = () => ({}),
-      dndType = 'tree'
-    } = props
-    const id = getId(value)
-    const label = getLabel(value)
-    const open = isOpen(value)
-    const selected = isSelected(value)
-    const hidden = isHidden(value)
-    const enableRename = canRename ? canRename(value) : true
-    const enableAddChild = canAddChild ? canAddChild(value) : true
-    const enableRemove = canRemove ? canRemove(value) : true
-    const enableOpen = getChildren(value).length > 0
-    const enableDuplicate = canDuplicate ? canDuplicate(value) : true
-    const extraContextMenu = getExtraContextMenu ? getExtraContextMenu(value) : null
-    const [editMode, setEditMode] = useState(false)
-    const [insertMode, setInsertMode] = useState(false)
-    const canDrop = useCallback(
-      (target: T, source: T): boolean => {
-        if (getId(target) === getId(source)) return false
-        return getChildren(target).every(($) => canDrop($, source))
-      },
-      [getId, getChildren]
-    )
+  return React.memo(
+    withContextMenu<Props<T>>((props) => {
+      const {
+        getExtraContextMenu,
+        className,
+        contextMenuId,
+        value,
+        level = getDefaultLevel(),
+        getId,
+        getChildren,
+        getLabel,
+        isOpen,
+        isSelected,
+        onSelect,
+        isHidden,
+        onSetParent,
+        canRename,
+        canAddChild,
+        canRemove,
+        canDuplicate,
+        onRename,
+        onAddChild,
+        onRemove,
+        onDuplicate,
+        onSetOpen,
+        getDragContext = () => ({}),
+        dndType = 'tree'
+      } = props
+      const id = getId(value)
+      const label = getLabel(value)
+      const open = isOpen(value)
+      const selected = isSelected(value)
+      const hidden = isHidden(value)
+      const enableRename = canRename ? canRename(value) : true
+      const enableAddChild = canAddChild ? canAddChild(value) : true
+      const enableRemove = canRemove ? canRemove(value) : true
+      const enableOpen = getChildren(value).length > 0
+      const enableDuplicate = canDuplicate ? canDuplicate(value) : true
+      const extraContextMenu = getExtraContextMenu ? getExtraContextMenu(value) : null
+      const [editMode, setEditMode] = useState(false)
+      const [insertMode, setInsertMode] = useState(false)
+      const canDrop = useCallback(
+        (target: T, source: T): boolean => {
+          if (getId(target) === getId(source)) return false
+          return getChildren(target).every(($) => canDrop($, source))
+        },
+        [getId, getChildren]
+      )
 
-    const [, drag] = useDrag(() => ({ type: dndType, item: { value, context: getDragContext() } }), [value])
+      const [, drag] = useDrag(() => ({ type: dndType, item: { value, context: getDragContext() } }), [value])
 
-    const [, drop] = useDrop(
-      () => ({
-        accept: dndType,
-        drop: ({ value: other }: { value: T }, monitor) => {
-          if (monitor.didDrop() || !canDrop(other, value)) return
-          onSetParent(other, value)
-        }
-      }),
-      [value, onSetParent, canDrop]
-    )
+      const [, drop] = useDrop(
+        () => ({
+          accept: dndType,
+          drop: ({ value: other }: { value: T }, monitor) => {
+            if (monitor.didDrop() || !canDrop(other, value)) return
+            onSetParent(other, value)
+          }
+        }),
+        [value, onSetParent, canDrop]
+      )
 
-    const quitEditMode = () => setEditMode(false)
-    const quitInsertMode = () => setInsertMode(false)
+      const quitEditMode = () => setEditMode(false)
+      const quitInsertMode = () => setInsertMode(false)
 
-    const handleSelect = (_: React.MouseEvent) => {
-      onSelect(value)
-    }
+      const handleSelect = (_: React.MouseEvent) => {
+        onSelect(value)
+      }
 
-    const handleOpen = (_: React.MouseEvent) => {
-      onSetOpen(value, !open)
-    }
+      const handleOpen = (_: React.MouseEvent) => {
+        onSetOpen(value, !open)
+      }
 
-    const handleToggleEdit = () => {
-      setEditMode(true)
-    }
+      const handleToggleEdit = () => {
+        setEditMode(true)
+      }
 
-    const onChangeEditValue = (newValue: string) => {
-      onRename(value, newValue)
-      setEditMode(false)
-    }
+      const onChangeEditValue = (newValue: string) => {
+        onRename(value, newValue)
+        setEditMode(false)
+      }
 
-    const handleNewChild = () => {
-      setInsertMode(true)
-    }
+      const handleNewChild = () => {
+        setInsertMode(true)
+      }
 
-    const handleAddChild = (childLabel: string) => {
-      if (!insertMode) return
-      onAddChild(value, childLabel)
-      quitInsertMode()
-      onSetOpen(value, true)
-    }
+      const handleAddChild = (childLabel: string) => {
+        if (!insertMode) return
+        onAddChild(value, childLabel)
+        quitInsertMode()
+        onSetOpen(value, true)
+      }
 
-    const handleRemove = () => {
-      onRemove(value)
-    }
+      const handleRemove = () => {
+        onRemove(value)
+      }
 
-    const handleDuplicate = () => {
-      onDuplicate(value)
-    }
+      const handleDuplicate = () => {
+        onDuplicate(value)
+      }
 
-    const ref = (node: HTMLDivElement | null) => drag(drop(node))
+      const ref = (node: HTMLDivElement | null) => drag(drop(node))
 
-    const controlsProps = {
-      id: contextMenuId,
-      enableAdd: enableAddChild,
-      enableEdit: enableRename,
-      enableRemove,
-      enableDuplicate,
-      onAddChild: handleNewChild,
-      onEdit: handleToggleEdit,
-      onRemove: handleRemove,
-      onDuplicate: handleDuplicate,
-      extra: extraContextMenu
-    }
+      const controlsProps = {
+        id: contextMenuId,
+        enableAdd: enableAddChild,
+        enableEdit: enableRename,
+        enableRemove,
+        enableDuplicate,
+        onAddChild: handleNewChild,
+        onEdit: handleToggleEdit,
+        onRemove: handleRemove,
+        onDuplicate: handleDuplicate,
+        extra: extraContextMenu
+      }
 
-    const nodeClassnames = cx({ selected, item: true, hidden })
+      const nodeClassnames = cx({ selected, item: true, hidden })
 
-    return (
-      <div ref={ref} className={`Tree ${className || ''}`}>
-        <div style={getLevelStyles(level)} className={nodeClassnames}>
-          <ContextMenu {...controlsProps} />
-          <div style={getEditModeStyles(editMode)} className='item-area'>
-            { enableOpen ? open ? <IoIosArrowDown onClick={handleOpen} /> : <IoIosArrowForward onClick={handleOpen} /> : <span style={{marginLeft: '12px'}}></span> }
-            <div onClick={handleSelect} className='selectable-area'>
-              { props.getIcon ? props.getIcon(value) : <></> }
-              <div>{label || id}</div>
+      return (
+        <div ref={ref} className={`Tree ${className || ''}`}>
+          <div style={getLevelStyles(level)} className={nodeClassnames}>
+            <ContextMenu {...controlsProps} />
+            <div style={getEditModeStyles(editMode)} className="item-area">
+              {enableOpen ? (
+                open ? (
+                  <IoIosArrowDown onClick={handleOpen} />
+                ) : (
+                  <IoIosArrowForward onClick={handleOpen} />
+                )
+              ) : (
+                <span style={{ marginLeft: '12px' }}></span>
+              )}
+              <div onClick={handleSelect} className="selectable-area">
+                {props.getIcon ? props.getIcon(value) : <></>}
+                <div>{label || id}</div>
+              </div>
             </div>
+            {editMode && typeof label === 'string' && (
+              <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />
+            )}
           </div>
-          {editMode && typeof label === 'string' && (
-            <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />
-          )}
+          <TreeChildren {...props} />
+          {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} onBlur={quitInsertMode} />}
         </div>
-        <TreeChildren {...props} />
-        {insertMode && <Input value="" onCancel={quitInsertMode} onSubmit={handleAddChild} onBlur={quitInsertMode}/>}
-      </div>
-    )
-  }))
+      )
+    })
+  )
 }
 
 function TreeChildren<T>(props: Props<T>) {

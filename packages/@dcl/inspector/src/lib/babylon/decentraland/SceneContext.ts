@@ -6,7 +6,6 @@ import { AsyncQueue } from '@well-known-components/pushable-channel'
 import future from 'fp-future'
 
 import { CrdtStreamMessage } from '../../data-layer/proto/gen/data-layer.gen'
-import { DataLayerRpcClient } from '../../data-layer/types'
 import { createEditorComponents } from '../../sdk/components'
 import { serializeCrdtMessages } from '../../sdk/crdt-logger'
 import { ComponentOperation } from './component-operations'

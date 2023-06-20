@@ -1,24 +1,7 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, {
-  UiEntity,
-  Label,
-  ReactEcsRenderer,
-  Dropdown
-} from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity, Label, ReactEcsRenderer, Dropdown } from '@dcl/sdk/react-ecs'
 
-const colorList = [
-  'Red',
-  'Green',
-  'Blue',
-  'Black',
-  'White',
-  'Purple',
-  'Magenta',
-  'Yellow',
-  'Gray',
-  'Teal',
-  'Clear'
-]
+const colorList = ['Red', 'Green', 'Blue', 'Black', 'White', 'Purple', 'Magenta', 'Yellow', 'Gray', 'Teal', 'Clear']
 
 let selectedColorIndex = 0
 

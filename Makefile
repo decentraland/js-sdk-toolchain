@@ -40,7 +40,7 @@ update-renderer:
 	cd packages/@dcl/sdk; npm i --save-exact @dcl/explorer@latest
 
 lint:
-	node_modules/.bin/eslint . --ext .ts
+	node_modules/.bin/eslint . --ext .ts,.tsx
 
 sync-deps:
 	node_modules/.bin/syncpack format --config .syncpackrc.json  --source "packages/@dcl/*/package.json" --source "package.json"
@@ -51,7 +51,7 @@ lint-packages:
 	node_modules/.bin/syncpack format --config .syncpackrc.json  --source "packages/@dcl/*/package.json" --source "package.json"
 
 lint-fix: sync-deps
-	node_modules/.bin/eslint . --ext .ts --fix
+	node_modules/.bin/eslint . --ext .ts,.tsx --fix
 
 TESTARGS ?= test/
 test:

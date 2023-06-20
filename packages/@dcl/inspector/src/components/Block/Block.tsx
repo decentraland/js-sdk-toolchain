@@ -7,7 +7,7 @@ import './Block.css'
 
 const Block = React.forwardRef<null, React.PropsWithChildren<Props>>(({ label, error, children }, ref) => {
   return (
-    <div ref={ref} className={cx("Block", { error })}>
+    <div ref={ref} className={cx('Block', { error })}>
       {label && <label>{label}</label>}
       <div className="content">{children}</div>
     </div>

@@ -24,7 +24,7 @@ export function FileInput(props: PropsWithChildren<PropTypes>) {
       },
       canDrop(item: { files: File[] }) {
         return item.files.every((file) => !!acceptExtensions.find((ext) => file.name.endsWith(ext)))
-      },
+      }
     }),
     [props]
   )

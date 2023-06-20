@@ -8,7 +8,9 @@ export type ContextMenuProps<T> = T & { contextMenuId: string }
  * @param Component
  * @returns
  */
-export function withContextMenu<P extends object>(Component: React.ComponentType<ContextMenuProps<P>>): React.FC<Omit<P, 'contextMenuId'>> {
+export function withContextMenu<P extends object>(
+  Component: React.ComponentType<ContextMenuProps<P>>
+): React.FC<Omit<P, 'contextMenuId'>> {
   return ({ ...props }) => {
     const id = useId()
     const { show } = useContextMenu({ id: id })
