@@ -1,3 +1,9 @@
+export interface Props {
+  catalog: ITheme[]
+  error: Error | null
+  isLoading: boolean
+}
+
 // categories obtained from "builder.decentraland.org" catalog
 export const CATEGORIES = [
   'decorations',

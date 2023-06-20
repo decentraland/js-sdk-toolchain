@@ -1,16 +1,14 @@
 import { useMemo, useState } from 'react'
 import { useDrag } from 'react-dnd'
 
-import { useCatalog } from '../../hooks/catalog/useCatalog'
 import { Loading } from '../Loading'
 
-import { AssetProps, CategoriesProps, ITheme, ThemeProps } from './types'
+import { AssetProps, CategoriesProps, ITheme, Props, ThemeProps } from './types'
 import { getStorageUrl, getAssetsByCategory, getThemeThumbnailUrl } from './utils'
 
 import './AssetsCatalog.css'
 
-export function AssetsCatalog() {
-  const [catalog, error, isLoading] = useCatalog()
+export function AssetsCatalog({ catalog, error, isLoading }: Props) {
   const [selectedTheme, setSelectedTheme] = useState<ITheme>()
   const handleThemeChange = (value?: ITheme) => setSelectedTheme(value)
 
