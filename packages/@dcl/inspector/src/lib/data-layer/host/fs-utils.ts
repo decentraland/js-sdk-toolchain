@@ -25,7 +25,8 @@ export async function getFilesInDirectory(
 }
 
 export const DIRECTORY = {
-  ASSETS: 'assets'
+  ASSETS: 'assets',
+  SCENE: 'scene'
 }
 
 export const EXTENSIONS = ['.glb', '.png', '.composite', '.composite.bin', '.gltf', '.jpg']
@@ -39,7 +40,6 @@ export function getFileName(fileName: string, ext: string) {
   return `${fileName}.${ext}`
 }
 
-export function getCurrentCompositePath(sceneProvider: SceneProvider) {
-  const scenePath = sceneProvider.getScene().display.title
-  return withAssetDir(`${scenePath}/main.composite`)
+export function getCurrentCompositePath() {
+  return withAssetDir(`${DIRECTORY.SCENE}/main.composite`)
 }
