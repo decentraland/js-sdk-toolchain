@@ -1,4 +1,10 @@
 const useTsJestTransform = process.env['TS_JEST_TRANSFORMER'] !== undefined
+const isE2E = process.env['IS_E2E'] !== undefined
+
+if (isE2E) {
+  console.log('Is E2E')
+}
+
 const transformer = useTsJestTransform ?
   ["ts-jest", {
     tsconfig: "test/tsconfig.json",
@@ -7,7 +13,11 @@ const transformer = useTsJestTransform ?
   :
   require.resolve('./test/jest-transformer')
 
-module.exports = {
+module.exports = isE2E ? {
+  moduleFileExtensions: ["ts", "js", "jsx", "tsx"],
+  testMatch: ["**/e2e/*.spec.(ts)"],
+  preset: "jest-puppeteer"
+} : {
   moduleFileExtensions: ["ts", "js", "jsx", "tsx"],
   transform: {
     "^.+\\.(js|jsx|ts|tsx)$": transformer
@@ -29,5 +39,6 @@ module.exports = {
   testEnvironment: "jsdom",
   transformIgnorePatterns: [
     `/node_modules/(?!(@babylonjs)|(@dcl/ecs-math))`,
-  ],
+  ]
 }
+

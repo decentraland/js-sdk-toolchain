@@ -22,10 +22,15 @@
     "jsx": "react-jsx",
     "sourceMap": true,
     "rootDir": "src/",
-    "incremental": true
+    "incremental": true,
+    "types": [
+       "puppeteer",
+       "jest-environment-puppeteer",
+       "expect-puppeteer"
+     ]
   },
   "exclude": ["**/*.spec.ts"],
   "include": [
     "src"
-  ]
+, "test/e2e"  ]
 }
