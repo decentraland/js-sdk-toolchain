@@ -1,14 +1,16 @@
 import { useMemo, useState } from 'react'
 import { useDrag } from 'react-dnd'
 
+import { useCatalog } from '../../hooks/catalog/useCatalog'
+import { Loading } from '../Loading'
+
 import { AssetProps, CategoriesProps, ITheme, ThemeProps } from './types'
 import { getStorageUrl, getAssetsByCategory, getThemeThumbnailUrl } from './utils'
-import { useCatalog } from '../../hooks/catalog/useCatalog'
 
 import './AssetsCatalog.css'
 
 export function AssetsCatalog() {
-  const [catalog, error] = useCatalog()
+  const [catalog, error, isLoading] = useCatalog()
   const [selectedTheme, setSelectedTheme] = useState<ITheme>()
   const handleThemeChange = (value?: ITheme) => setSelectedTheme(value)
 
@@ -18,6 +20,10 @@ export function AssetsCatalog() {
         <div className="error">{error.message}</div>
       </div>
     )
+  }
+
+  if (isLoading) {
+    return <Loading dimmer={false} />
   }
 
   if (!catalog) {
