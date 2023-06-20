@@ -39,7 +39,7 @@ async function getScene(fs: FileSystemInterface): Promise<SceneWithDefaults> {
     console.error('Reading scene.json file failed: ', e)
   }
 
-  const sceneWithDefaults = await augmentDefaults(fs, scene)
+  const sceneWithDefaults = augmentDefaults(fs, scene)
   return sceneWithDefaults
 }
 

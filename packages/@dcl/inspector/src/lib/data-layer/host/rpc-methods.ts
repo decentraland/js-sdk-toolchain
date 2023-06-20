@@ -1,7 +1,7 @@
 import { IEngine, OnChangeFunction } from '@dcl/ecs'
 
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
-import { EXTENSIONS, getCurrentCompositePath, getFilesInDirectory, withAssetDir } from './fs-utils'
+import { DIRECTORY, EXTENSIONS, getCurrentCompositePath, getFilesInDirectory, withAssetDir } from './fs-utils'
 import { stream } from './stream'
 import { FileOperation, initUndoRedo } from './undo-redo'
 import upsertAsset from './upsert-asset'
@@ -18,7 +18,7 @@ export async function initRpcMethods(
   onChanges: OnChangeFunction[]
 ): Promise<DataLayerRpcServer> {
   const sceneProvider = await initSceneProvider(fs)
-  const currentCompositeResourcePath = getCurrentCompositePath(sceneProvider)
+  const currentCompositeResourcePath = getCurrentCompositePath()
   let inspectorPreferences = await readPreferencesFromFile(fs, INSPECTOR_PREFERENCES_PATH)
 
   // Handle old EntityNode components
@@ -120,9 +120,8 @@ export async function initRpcMethods(
       return {}
     },
     async getProjectData() {
-      const scene = sceneProvider.getScene()
       return {
-        path: scene.display.title
+        path: DIRECTORY.SCENE
       }
     }
   }
