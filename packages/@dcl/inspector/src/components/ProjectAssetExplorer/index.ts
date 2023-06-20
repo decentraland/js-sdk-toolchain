@@ -1,2 +1,2 @@
-import { ProjectAssetExplorer } from './ProjectAssetExplorer'
+import ProjectAssetExplorer from './ProjectAssetExplorer'
 export { ProjectAssetExplorer }

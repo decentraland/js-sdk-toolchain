@@ -13,6 +13,8 @@ import { AssetNode, AssetNodeFolder } from './types'
 import { getFullNodePath } from './utils'
 import Search from '../Search'
 import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
+import { getDataLayer } from '../../redux/data-layer'
+import { useAppSelector } from '../../redux/hooks'
 
 function noop() {}
 
@@ -36,6 +38,8 @@ const FilesTree = Tree<string>()
 
 function ProjectView({ folders }: Props) {
   const sdk = useSdk()
+  const dataLayer = useAppSelector(getDataLayer)
+
   const [open, setOpen] = useState(new Set<string>())
   const [modal, setModal] = useState<ModalState | undefined>(undefined)
   const [lastSelected, setLastSelected] = useState<string>()
@@ -146,12 +150,11 @@ function ProjectView({ folders }: Props) {
 
   const removeAsset = useCallback(
     async (path: string, _: Entity[] = []) => {
-      if (!sdk) return
-      const { dataLayer } = sdk
+      if (!dataLayer) return
       await dataLayer.removeAsset({ path })
       fileSystemEvent.emit('change')
     },
-    [sdk]
+    [dataLayer]
   )
 
   const handleConfirm = useCallback(async () => {
@@ -251,7 +254,7 @@ function ProjectView({ folders }: Props) {
                 <Tile
                   valueId={lastSelected}
                   value={selectedTreeNode}
-                  getDragContext= {handleDragContext}
+                  getDragContext={handleDragContext}
                   onSelect={handleClickFolder(selectedTreeNode.name)}
                   onRemove={handleRemove}
                   dndType={DRAG_N_DROP_ASSET_KEY}
@@ -266,15 +269,18 @@ function ProjectView({ folders }: Props) {
 function NodeIcon({ value }: { value?: TreeNode }) {
   if (!value) return null
   if (value.type === 'folder') {
-    return <div style={{ marginRight: '4px', marginLeft: '2px', marginTop: '2px' }}><FolderIcon /></div>
-  }
-  else
-  return (
-    <>
-      <svg style={{ width: '4px', height: '4px' }} />
-      <IoIosImage style={{ marginRight: '4px'}} />
-    </>
-  )
+    return (
+      <div style={{ marginRight: '4px', marginLeft: '2px', marginTop: '2px' }}>
+        <FolderIcon />
+      </div>
+    )
+  } else
+    return (
+      <>
+        <svg style={{ width: '4px', height: '4px' }} />
+        <IoIosImage style={{ marginRight: '4px' }} />
+      </>
+    )
 }
 
 export default React.memo(ProjectView)

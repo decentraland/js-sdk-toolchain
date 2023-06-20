@@ -4,7 +4,6 @@ import { RxCross2 } from 'react-icons/rx'
 import { IoIosImage } from 'react-icons/io'
 
 import FileInput from '../FileInput'
-import { withSdk } from '../../hoc/withSdk'
 import { Container } from '../Container'
 import { TextField } from '../EntityInspector/TextField'
 import { Block } from '../Block'
@@ -16,6 +15,8 @@ import { GLTFValidation } from '@babylonjs/loaders'
 import './ImportAsset.css'
 import classNames from 'classnames'
 import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
+import { getDataLayer } from '../../redux/data-layer'
+import { useAppSelector } from '../../redux/hooks'
 
 const ONE_MB_IN_BYTES = 1_048_576
 const ONE_GB_IN_BYTES = ONE_MB_IN_BYTES * 1024
@@ -29,9 +30,9 @@ type ValidationError = string | null
 async function validateGltf(data: ArrayBuffer): Promise<ValidationError> {
   let result
   try {
-    result = await GLTFValidation.ValidateAsync(
-      data, '', '', (uri) => { throw new Error('external references are not supported yet')}
-    )
+    result = await GLTFValidation.ValidateAsync(data, '', '', (uri) => {
+      throw new Error('external references are not supported yet')
+    })
   } catch (error) {
     return `Invalid GLTF: ${error}`
   }
@@ -42,13 +43,13 @@ async function validateGltf(data: ArrayBuffer): Promise<ValidationError> {
         Babylon's type declarations incorrectly state that result.issues.messages
         is an Array<string>. In fact, it's an array of objects with useful properties.
       */
-      type BabylonValidationIssue = {severity: number, code: string}
+      type BabylonValidationIssue = { severity: number; code: string }
       const severity = (issue as unknown as BabylonValidationIssue).severity
       /*
         Severity codes are Error (0), Warning (1), Information (2), Hint (3).
         https://github.com/KhronosGroup/glTF-Validator/blob/main/lib/src/errors.dart
       */
-      if (severity == 0) {
+      if (severity === 0) {
         const message = (issue as unknown as BabylonValidationIssue).code
         return `Invalid GLTF: ${message}`
       }
@@ -59,8 +60,10 @@ async function validateGltf(data: ArrayBuffer): Promise<ValidationError> {
   }
 }
 
-const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
+const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
   // TODO: multiple files
+  const dataLayer = useAppSelector(getDataLayer)
+
   const [file, setFile] = useState<File>()
   const [validationError, setValidationError] = useState<ValidationError>(null)
   const [assetName, setAssetName] = useState<string>('')
@@ -92,7 +95,7 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
       }
 
       const gltfValidationError = await validateGltf(binary)
-      if (gltfValidationError != null) {
+      if (gltfValidationError !== null) {
         setValidationError(gltfValidationError)
         return
       }
@@ -100,9 +103,9 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
       const content: Map<string, Uint8Array> = new Map()
       content.set(assetName + '.' + assetExtension, new Uint8Array(binary))
 
-      const basePath = withAssetDir((await sdk!.dataLayer.getProjectData({})).path)
+      const basePath = withAssetDir((await dataLayer!.getProjectData({})).path)
 
-      await sdk!.dataLayer.importAsset({
+      await dataLayer?.importAsset({
         content,
         basePath,
         assetPackageName: ''
@@ -124,10 +127,8 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
 
   const invalidName = !!assets.find((asset) => {
     const [packageName, otherAssetName] = removeBasePath(basePath, asset.path).split('/')
-    if (packageName === 'builder')
-      return false
-    else
-      return otherAssetName?.toLocaleLowerCase() === (assetName?.toLocaleLowerCase() + '.' + assetExtension)
+    if (packageName === 'builder') return false
+    else return otherAssetName?.toLocaleLowerCase() === assetName?.toLocaleLowerCase() + '.' + assetExtension
   })
 
   return (
@@ -155,22 +156,18 @@ const ImportAsset = withSdk<PropTypes>(({ sdk, onSave }) => {
             </Container>
             <div className={classNames({ error: !!invalidName })}>
               <Block label="Asset name">
-                <TextField
-                  label=""
-                  value={assetName}
-                  onChange={handleNameChange}
-                />
+                <TextField label="" value={assetName} onChange={handleNameChange} />
               </Block>
               <Button disabled={invalidName || !!validationError} onClick={handleSave}>
                 Import
               </Button>
-              <span className='error'>{validationError}</span>
+              <span className="error">{validationError}</span>
             </div>
           </div>
         )}
       </FileInput>
     </div>
   )
-})
+}
 
 export default ImportAsset

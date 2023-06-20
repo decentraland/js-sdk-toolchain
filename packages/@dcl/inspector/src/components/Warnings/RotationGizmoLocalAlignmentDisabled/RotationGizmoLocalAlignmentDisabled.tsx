@@ -1,11 +1,11 @@
 import React from 'react'
 import { Warning } from '../Warning'
-import { useGizmoAlignment } from '../../../../hooks/editor/useGizmoAlignment'
-import { useSelectedEntity } from '../../../../hooks/sdk/useSelectedEntity'
-import { ROOT } from '../../../../lib/sdk/tree'
-import { withSdk } from '../../../../hoc/withSdk'
-import { useComponentValue } from '../../../../hooks/sdk/useComponentValue'
-import { GizmoType } from '../../../../lib/utils/gizmo'
+import { useGizmoAlignment } from '../../../hooks/editor/useGizmoAlignment'
+import { useSelectedEntity } from '../../../hooks/sdk/useSelectedEntity'
+import { ROOT } from '../../../lib/sdk/tree'
+import { withSdk } from '../../../hoc/withSdk'
+import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
+import { GizmoType } from '../../../lib/utils/gizmo'
 
 const RotationGizmoLocalAlignmentDisabled: React.FC = withSdk(({ sdk }) => {
   const selectedEntity = useSelectedEntity()

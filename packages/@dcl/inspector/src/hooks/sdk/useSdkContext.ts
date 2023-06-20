@@ -1,22 +1,33 @@
 import { useCallback, useEffect, useState } from 'react'
 import { createSdkContext, SdkContextValue } from '../../lib/sdk/context'
 import { useCatalog } from '../catalog/useCatalog'
+import { useAppDispatch, useAppSelector } from '../../redux/hooks'
+import { getDataLayer, connect as connectDataLayer } from '../../redux/data-layer'
+import { addEngines } from '../../redux/sdk'
 
 /**
  *
  * @returns This hook is only meant to be used by the SdkProvider, use useSdk instead
  */
 export const useSdkContext = () => {
+  const dataLayer = useAppSelector(getDataLayer)
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null)
   const [sdk, setSdk] = useState<SdkContextValue | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   const [catalog] = useCatalog()
+  const dispatch = useAppDispatch()
+
   useEffect(() => {
-    if (!catalog || !canvas || sdk || isLoading) return
+    dispatch(connectDataLayer())
+  }, [dispatch])
+
+  useEffect(() => {
+    if (!catalog || !canvas || sdk || isLoading || !dataLayer) return
     setIsLoading(true)
-    createSdkContext(canvas, catalog)
+    createSdkContext(dataLayer, canvas, catalog)
       .then((ctx) => {
+        dispatch(addEngines({ inspector: ctx.engine, babylon: ctx.sceneContext.engine }))
         setSdk(ctx)
       })
       .catch((e) => {
@@ -24,7 +35,7 @@ export const useSdkContext = () => {
         setError(e)
       })
       .finally(() => setIsLoading(false))
-  }, [catalog, canvas, sdk, isLoading])
+  }, [catalog, canvas, sdk, isLoading, dispatch, dataLayer])
 
   const renderer = useCallback(
     (ref: React.RefObject<HTMLCanvasElement>) => {

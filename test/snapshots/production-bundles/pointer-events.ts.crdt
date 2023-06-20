@@ -8,9 +8,9 @@ EVAL test/snapshots/production-bundles/pointer-events.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 33k
-  MALLOC_COUNT = 8776
-  ALIVE_OBJS_DELTA ~= 1.87k
+  OPCODES ~= 37k
+  MALLOC_COUNT = 8910
+  ALIVE_OBJS_DELTA ~= 1.91k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 8
@@ -28,7 +28,7 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   Scene: PUT_COMPONENT e=0x201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   Scene: PUT_COMPONENT e=0x202 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-  OPCODES ~= 20k
+  OPCODES ~= 21k
   MALLOC_COUNT = 35
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
@@ -43,4 +43,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 709.87k bytes
+  MEMORY_USAGE_COUNT ~= 712.87k bytes

@@ -4,6 +4,9 @@ import { Vector3 } from '@babylonjs/core'
 import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
 import { Dimmer } from 'decentraland-ui/dist/components/Dimmer/Dimmer'
 
+import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
+import { useAppSelector } from '../../redux/hooks'
+import { getDataLayer } from '../../redux/data-layer'
 import { BuilderAsset, DROP_TYPES, IDrop, ProjectAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
 import { useRenderer } from '../../hooks/sdk/useRenderer'
 import { useSdk } from '../../hooks/sdk/useSdk'
@@ -16,11 +19,10 @@ import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { IAsset } from '../AssetsCatalog/types'
 import { getModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 import { useIsMounted } from '../../hooks/useIsMounted'
-import { Warnings } from './Warnings'
+import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
 
 import './Renderer.css'
-import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
 
 const fixedNumber = (val: number) => Math.round(val * 1e2) / 1e2
 
@@ -28,6 +30,8 @@ const Renderer: React.FC = () => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
   useRenderer(() => canvasRef)
   const sdk = useSdk()
+  const dataLayer = useAppSelector(getDataLayer)
+
   const [isLoading, setIsLoading] = useState(false)
   const isMounted = useIsMounted()
   const [files, init] = useFileSystem()
@@ -84,7 +88,7 @@ const Renderer: React.FC = () => {
       })
     )
 
-    await sdk!.dataLayer.importAsset({
+    await dataLayer?.importAsset({
       content: new Map(Object.entries(fileContent)),
       basePath: withAssetDir(destFolder),
       assetPackageName
