@@ -11,6 +11,7 @@ import removeSelectedEntities from './remove-selected-entities'
 import addAsset from './add-asset'
 import addComponent from './add-component'
 import removeComponent from './remove-component'
+import duplicateEntity from './duplicate-entity'
 
 export interface Dispatch {
   dirty?: boolean
@@ -27,6 +28,7 @@ export function createOperations(engine: IEngine) {
     removeComponent: removeComponent(engine),
     updateSelectedEntity: updateSelectedEntity(engine),
     removeSelectedEntities: removeSelectedEntities(engine),
+    duplicateEntity: duplicateEntity(engine),
     dispatch: async ({ dirty = true }: Dispatch = {}) => {
       await engine.update(1)
       saveEvent.emit('change', dirty)

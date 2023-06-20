@@ -24,12 +24,14 @@ type Props<T> = {
   canRename?: (value: T) => boolean
   canAddChild?: (value: T) => boolean
   canRemove?: (value: T) => boolean
+  canDuplicate?: (value: T) => boolean
   onSetOpen: (value: T, isOpen: boolean) => void
   onSelect: (value: T) => void
   onSetParent: (value: T, parent: T) => void
   onRename: (value: T, label: string) => void
   onAddChild: (value: T, label: string) => void
   onRemove: (value: T) => void
+  onDuplicate: (value: T) => void
   getDragContext?: () => unknown
   dndType?: string
   tree?: unknown
@@ -59,9 +61,11 @@ export function Tree<T>() {
       canRename,
       canAddChild,
       canRemove,
+      canDuplicate,
       onRename,
       onAddChild,
       onRemove,
+      onDuplicate,
       onSetOpen,
       getDragContext = () => ({}),
       dndType = 'tree'
@@ -75,6 +79,7 @@ export function Tree<T>() {
     const enableAddChild = canAddChild ? canAddChild(value) : true
     const enableRemove = canRemove ? canRemove(value) : true
     const enableOpen = getChildren(value).length > 0
+    const enableDuplicate = canDuplicate ? canDuplicate(value) : true
     const extraContextMenu = getExtraContextMenu ? getExtraContextMenu(value) : null
     const [editMode, setEditMode] = useState(false)
     const [insertMode, setInsertMode] = useState(false)
@@ -134,6 +139,10 @@ export function Tree<T>() {
       onRemove(value)
     }
 
+    const handleDuplicate = () => {
+      onDuplicate(value)
+    }
+
     const ref = (node: HTMLDivElement | null) => drag(drop(node))
 
     const controlsProps = {
@@ -141,9 +150,11 @@ export function Tree<T>() {
       enableAdd: enableAddChild,
       enableEdit: enableRename,
       enableRemove,
+      enableDuplicate,
       onAddChild: handleNewChild,
       onEdit: handleToggleEdit,
       onRemove: handleRemove,
+      onDuplicate: handleDuplicate,
       extra: extraContextMenu
     }
 

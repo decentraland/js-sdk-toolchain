@@ -220,6 +220,7 @@ function ProjectView({ folders }: Props) {
             onRename={noop}
             onSelect={onSelect}
             onSetOpen={onSetOpen}
+            onDuplicate={noop}
             getId={(value: string) => value.toString()}
             getChildren={getChildren}
             getLabel={(val: string) => <span>{tree.get(val)?.name ?? val}</span>}
@@ -228,6 +229,7 @@ function ProjectView({ folders }: Props) {
             isHidden={(val: string) => val === ROOT}
             canRename={() => false}
             canRemove={(val) => tree.get(val)?.type === 'asset'}
+            canDuplicate={() => false}
             canAddChild={() => false}
             getIcon={(val) => <NodeIcon value={tree.get(val)} />}
             getDragContext={handleDragContext}
