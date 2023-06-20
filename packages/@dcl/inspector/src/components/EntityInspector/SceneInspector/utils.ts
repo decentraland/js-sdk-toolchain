@@ -1,32 +1,34 @@
 import { SceneInput } from './types'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
+import { Coords } from '../../../lib/utils/layout'
 
 export function fromScene(value: EditorComponentsTypes['Scene']): SceneInput {
-  const base = value.layout.base.x + ',' + value.layout.base.y
   const parcels = value.layout.parcels.map((parcel) => parcel.x + ',' + parcel.y).join(' ')
   return {
     layout: {
-      base,
       parcels
     }
   }
 }
 
 export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
-  const base = inputs.layout.base.split(',')
+  let base: Coords = { x: Infinity, y: Infinity }
+  const parcels = Array.from(new Set(inputs.layout.parcels.split(' '))).map((parcel) => {
+    const [x, y] = parcel.split(',').map(($) => parseInt($))
+
+    // base should be bottom-left parcel
+    // https://docs.decentraland.org/creator/development-guide/sdk7/scene-metadata/#scene-parcels
+    if (base.y >= y) {
+      base = { x: Math.min(base.x, x), y }
+    }
+
+    return { x, y }
+  })
+
   return {
     layout: {
-      base: {
-        x: parseInt(base[0]),
-        y: parseInt(base[1])
-      },
-      parcels: Array.from(new Set(inputs.layout.parcels.split(' '))).map((parcel) => {
-        const coords = parcel.split(',')
-        return {
-          x: parseInt(coords[0]),
-          y: parseInt(coords[1])
-        }
-      })
+      base,
+      parcels
     }
   }
 }
@@ -37,5 +39,6 @@ function areValidCoords(value: string): boolean {
 }
 
 export function isValidInput(input: SceneInput): boolean {
-  return areValidCoords(input.layout.base) && input.layout.parcels.split(' ').every(areValidCoords)
+  const parcels = input.layout.parcels.split(' ')
+  return !!parcels.length && parcels.every(($) => areValidCoords($))
 }

@@ -6,7 +6,6 @@ export interface Props {
 
 export type SceneInput = {
   layout: {
-    base: string
     parcels: string
   }
 }
