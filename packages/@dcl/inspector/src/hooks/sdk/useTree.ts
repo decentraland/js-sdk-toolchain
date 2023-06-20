@@ -121,6 +121,16 @@ export const useTree = () => {
     [sdk, handleUpdate]
   )
 
+  const duplicate = useCallback(
+    async (entity: Entity) => {
+      if (entity === ROOT || !sdk) return
+      sdk.operations.duplicateEntity(entity)
+      await sdk.operations.dispatch()
+      handleUpdate()
+    },
+    [sdk, handleUpdate]
+  )
+
   const setOpen = useCallback(
     async (entity: Entity, open: boolean) => {
       open ? entitiesToggle.add(entity) : entitiesToggle.delete(entity)
@@ -132,6 +142,7 @@ export const useTree = () => {
   const isNotRoot = useCallback((entity: Entity) => entity !== ROOT, [])
   const canRename = isNotRoot
   const canRemove = isNotRoot
+  const canDuplicate = isNotRoot
 
   return {
     tree,
@@ -140,6 +151,7 @@ export const useTree = () => {
     rename,
     remove,
     select,
+    duplicate,
     getId,
     getChildren,
     getLabel,
@@ -147,6 +159,7 @@ export const useTree = () => {
     isOpen,
     isHidden,
     canRename,
-    canRemove
+    canRemove,
+    canDuplicate
   }
 }
