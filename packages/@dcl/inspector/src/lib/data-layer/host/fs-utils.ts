@@ -30,15 +30,11 @@ export const DIRECTORY = {
 
 export const EXTENSIONS = ['.glb', '.png', '.composite', '.composite.bin', '.gltf', '.jpg']
 
-export function withAssetDir(filePath: string = '') {
-  return filePath ? `${DIRECTORY.ASSETS}/${filePath}` : DIRECTORY.ASSETS
-}
-
 export function getFileName(fileName: string, ext: string) {
   if (EXTENSIONS.some(($) => fileName.endsWith($))) return fileName
   return `${fileName}.${ext}`
 }
 
-export function getCurrentCompositePath() {
-  return withAssetDir(`${DIRECTORY.SCENE}/main.composite`)
+export function getCurrentCompositePath(fs: FileSystemInterface) {
+  return fs.join(DIRECTORY.ASSETS, DIRECTORY.SCENE, 'main.composite')
 }

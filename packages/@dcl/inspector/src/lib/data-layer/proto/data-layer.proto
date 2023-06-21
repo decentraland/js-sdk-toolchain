@@ -39,6 +39,14 @@ message ProjectData {
   string path = 1;
 }
 
+message PathJoinMessage {
+  repeated string path = 1;
+}
+
+message PathJoinResponse {
+  string path = 1;
+}
+
 service DataService {
   rpc CrdtStream(stream CrdtStreamMessage) returns (stream CrdtStreamMessage) {}
   rpc Undo(Empty) returns (UndoRedoResponse) {}
@@ -52,4 +60,5 @@ service DataService {
   rpc GetInspectorPreferences(Empty) returns (InspectorPreferencesMessage) {}
   rpc SetInspectorPreferences(InspectorPreferencesMessage) returns (Empty) {}
   rpc GetProjectData(Empty) returns (ProjectData) {}
+  rpc PathJoin(PathJoinMessage) returns (PathJoinResponse) {}
 }

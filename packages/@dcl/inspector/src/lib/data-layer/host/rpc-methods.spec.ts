@@ -54,7 +54,7 @@ describe('Init RPC Methods', () => {
     LegacyEntityNode.create(entity, { label: 'Boedo', parent: 10 })
     const composite = dumpEngineToComposite(tempContext.engine, 'json')
     const jsonComposite = Composite.toJson(composite)
-    const compositeDest = getCurrentCompositePath(sceneProvider)
+    const compositeDest = getCurrentCompositePath(mocked.fs)
     await mocked.fs.writeFile(compositeDest, Buffer.from(JSON.stringify(jsonComposite), 'utf-8'))
     await initRpcMethods(mocked.fs, mocked.engine, mocked.callbackFunctions)
 

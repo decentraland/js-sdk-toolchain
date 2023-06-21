@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { useDrop } from 'react-dnd'
 import { Vector3 } from '@babylonjs/core'
 
-import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { useAppSelector } from '../../redux/hooks'
 import { getDataLayer } from '../../redux/data-layer'
 import { BuilderAsset, DROP_TYPES, IDrop, ProjectAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
@@ -22,6 +21,7 @@ import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
 
 import './Renderer.css'
+import { DIRECTORY } from '../../lib/data-layer/host/fs-utils'
 
 const fixedNumber = (val: number) => Math.round(val * 1e2) / 1e2
 
@@ -58,7 +58,8 @@ const Renderer: React.FC = () => {
   const addAsset = async (asset: AssetNodeItem, position: Vector3) => {
     if (!sdk) return
     const { operations } = sdk
-    operations.addAsset(ROOT, withAssetDir(asset.asset.src), asset.name, position)
+    const { path } = await dataLayer!.pathJoin({ path: [DIRECTORY.ASSETS, asset.asset.src] })
+    operations.addAsset(ROOT, path, asset.name, position)
     await operations.dispatch()
   }
 
@@ -87,9 +88,11 @@ const Renderer: React.FC = () => {
       })
     )
 
+    const basePath = (await dataLayer!.pathJoin({ path: [DIRECTORY.ASSETS, destFolder] })).path
+
     await dataLayer?.importAsset({
       content: new Map(Object.entries(fileContent)),
-      basePath: withAssetDir(destFolder),
+      basePath,
       assetPackageName
     })
 

@@ -16,7 +16,9 @@ import { Container } from '../../Container'
 import { TextField } from '../TextField'
 import { Props } from './types'
 import { fromGltf, toGltf, isValidInput, getModel } from './utils'
-import { withAssetDir } from '../../../lib/data-layer/host/fs-utils'
+import { getDataLayer } from '../../../redux/data-layer'
+import { useAppSelector } from '../../../redux/hooks'
+import { DIRECTORY } from '../../../lib/data-layer/host/fs-utils'
 
 const DROP_TYPES = ['project-asset-gltf']
 
@@ -24,6 +26,7 @@ export default withSdk<Props>(
   withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
     const [files, init] = useFileSystem()
     const { handleAction } = useContextMenu()
+    const dataLayer = useAppSelector(getDataLayer)
     const { GltfContainer } = sdk.components
 
     const hasGltf = useHasComponent(entity, GltfContainer)
@@ -50,11 +53,14 @@ export default withSdk<Props>(
     const [{ isHover }, drop] = useDrop(
       () => ({
         accept: DROP_TYPES,
-        drop: ({ value, context }: ProjectAssetDrop, monitor) => {
+        drop: async ({ value, context }: ProjectAssetDrop, monitor) => {
           if (monitor.didDrop()) return
           const node = context.tree.get(value)!
           const model = getModel(node, context.tree)
-          if (model) void handleDrop(withAssetDir(model.asset.src))
+          if (model) {
+            const { path } = await dataLayer!.pathJoin({ path: [DIRECTORY.ASSETS, model.asset.src] })
+            void handleDrop(path)
+          }
         },
         canDrop: ({ value, context }: ProjectAssetDrop) => {
           const node = context.tree.get(value)!

@@ -12,9 +12,9 @@ import FolderIcon from '../Icons/Folder'
 import { AssetNode, AssetNodeFolder } from './types'
 import { getFullNodePath } from './utils'
 import Search from '../Search'
-import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { getDataLayer } from '../../redux/data-layer'
 import { useAppSelector } from '../../redux/hooks'
+import { DIRECTORY } from '../../lib/data-layer/host/fs-utils'
 
 function noop() {}
 
@@ -138,7 +138,8 @@ function ProjectView({ folders }: Props) {
 
   const handleRemove = useCallback(
     async (value: string) => {
-      const path = withAssetDir(getFullNodePath(tree.get(value)!).slice(1))
+      const nodePath = getFullNodePath(tree.get(value)!).slice(1)
+      const { path } = await dataLayer!.pathJoin({ path: [DIRECTORY.ASSETS, nodePath] })
       const entitiesWithAsset = getEntitiesWithAsset(path)
       if (entitiesWithAsset.length) {
         return setModal({ isOpen: true, value: path, entities: entitiesWithAsset })

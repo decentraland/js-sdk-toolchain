@@ -14,9 +14,9 @@ import { GLTFValidation } from '@babylonjs/loaders'
 
 import './ImportAsset.css'
 import classNames from 'classnames'
-import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { getDataLayer } from '../../redux/data-layer'
 import { useAppSelector } from '../../redux/hooks'
+import { DIRECTORY } from '../../lib/data-layer/host/fs-utils'
 
 const ONE_MB_IN_BYTES = 1_048_576
 const ONE_GB_IN_BYTES = ONE_MB_IN_BYTES * 1024
@@ -103,7 +103,8 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
       const content: Map<string, Uint8Array> = new Map()
       content.set(assetName + '.' + assetExtension, new Uint8Array(binary))
 
-      const basePath = withAssetDir((await dataLayer!.getProjectData({})).path)
+      const projectPath = (await dataLayer!.getProjectData({})).path
+      const basePath = (await dataLayer!.pathJoin({ path: [DIRECTORY.ASSETS, projectPath] })).path
 
       await dataLayer?.importAsset({
         content,

@@ -1,7 +1,7 @@
 import { IEngine, OnChangeFunction } from '@dcl/ecs'
 
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
-import { DIRECTORY, EXTENSIONS, getCurrentCompositePath, getFilesInDirectory, withAssetDir } from './fs-utils'
+import { DIRECTORY, EXTENSIONS, getCurrentCompositePath, getFilesInDirectory } from './fs-utils'
 import { stream } from './stream'
 import { FileOperation, initUndoRedo } from './undo-redo'
 import upsertAsset from './upsert-asset'
@@ -18,7 +18,7 @@ export async function initRpcMethods(
   onChanges: OnChangeFunction[]
 ): Promise<DataLayerRpcServer> {
   const sceneProvider = await initSceneProvider(fs)
-  const currentCompositeResourcePath = getCurrentCompositePath()
+  const currentCompositeResourcePath = getCurrentCompositePath(fs)
   let inspectorPreferences = await readPreferencesFromFile(fs, INSPECTOR_PREFERENCES_PATH)
 
   // Handle old EntityNode components
@@ -71,7 +71,7 @@ export async function initRpcMethods(
     },
     async getAssetCatalog() {
       const ignore = ['.git', 'node_modules']
-      const basePath = withAssetDir()
+      const basePath = DIRECTORY.ASSETS
 
       const files = (await getFilesInDirectory(fs, basePath, [], true, ignore)).filter((item) => {
         const itemLower = item.toLowerCase()
@@ -123,6 +123,9 @@ export async function initRpcMethods(
       return {
         path: DIRECTORY.SCENE
       }
+    },
+    async pathJoin(req) {
+      return { path: fs.join(...req.path) }
     }
   }
 }
