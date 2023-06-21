@@ -43,8 +43,11 @@ export async function createFsCompositeProvider(
 
   return {
     getCompositeOrNull(src: string, _currentPath?: string) {
-      console.log({ src, _currentPath, composites })
-      return composites.find((item) => item.src === src) || null
+      function normalizePath(val: string) {
+        return val.replace(/\\/g, '/').toLocaleLowerCase()
+      }
+      console.log({ src, composites })
+      return composites.find((item) => normalizePath(item.src) === normalizePath(src)) || null
     },
     // a lot of questions with this method, it's temporal
     // => what should they be the params?, it overides? it's a save&replace, save as..., etc

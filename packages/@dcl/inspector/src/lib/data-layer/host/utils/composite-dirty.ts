@@ -38,6 +38,7 @@ async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, pa
       getCompositeEntity: (entity: number | Entity) => entity as Entity
     }
   })
+
   return compositeProvider
 }
 
