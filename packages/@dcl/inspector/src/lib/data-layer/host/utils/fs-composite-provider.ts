@@ -43,6 +43,7 @@ export async function createFsCompositeProvider(
 
   return {
     getCompositeOrNull(src: string, _currentPath?: string) {
+      console.log({ src, _currentPath, composites })
       return composites.find((item) => item.src === src) || null
     },
     // a lot of questions with this method, it's temporal

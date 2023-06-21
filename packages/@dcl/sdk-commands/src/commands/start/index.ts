@@ -20,7 +20,7 @@ import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
 import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
 import { b64HashingFunction } from '../../logic/project-files'
-import { createDataLayer } from './data-layer/rpc'
+import { DataLayer, createDataLayer } from './data-layer/rpc'
 import { createExitSignalComponent } from '../../components/exit-signal'
 import { getValidWorkspace } from '../../logic/workspace-validations'
 import { printCurrentProjectStarting, printProgressInfo, printWarning } from '../../logic/beautiful-logs'
@@ -157,8 +157,15 @@ export async function main(options: Options) {
       }
     },
     async main({ components, startComponents }) {
-      // TODO: dataLayerRpc should be an optional component
-      const dataLayer = withDataLayer ? await createDataLayer(components) : undefined
+      let dataLayer: DataLayer | undefined
+      if (withDataLayer) {
+        try {
+          dataLayer = await createDataLayer(components)
+        } catch (e: unknown) {
+          components.logger.error(e as Error)
+        }
+      }
+
       await wireRouter(components, workspace, dataLayer)
       if (watch) {
         for (const project of workspace.projects) {
