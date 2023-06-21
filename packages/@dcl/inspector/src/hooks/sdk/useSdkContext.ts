@@ -25,7 +25,7 @@ export const useSdkContext = () => {
   }, [dispatch])
 
   useEffect(() => {
-    if (!catalog || !canvas || sdk || isLoading || !dataLayer || !preferences) return
+    if (!catalog || !canvas || sdk || isLoading || !preferences) return
     setIsLoading(true)
     createSdkContext(canvas, catalog, preferences)
       .then((ctx) => {
@@ -37,7 +37,7 @@ export const useSdkContext = () => {
         setError(e)
       })
       .finally(() => setIsLoading(false))
-  }, [catalog, canvas, sdk, isLoading, dispatch, dataLayer, preferences])
+  }, [catalog, canvas, sdk, isLoading, dispatch, preferences])
 
   const renderer = useCallback(
     (ref: React.RefObject<HTMLCanvasElement>) => {

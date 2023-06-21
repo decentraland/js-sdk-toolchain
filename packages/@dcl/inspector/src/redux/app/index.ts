@@ -23,7 +23,6 @@ export const appState = createSlice({
       state.canSave = isDirty
     },
     updatePreferences: (state, { payload }: PayloadAction<{ preferences: InspectorPreferences }>) => {
-      console.log(' UPDATED ', payload.preferences)
       state.preferences = payload.preferences
     }
   }
@@ -34,7 +33,6 @@ export const getCanSave = (state: RootState): boolean => state.app.canSave
 export const getInspectorPreferences = (state: RootState): InspectorPreferences => {
   if (!state.app.preferences) {
     // TODO: send to sentry
-    console.log('invalid inspector preferences')
     return getDefaultInspectorPreferences()
   }
   return state.app.preferences
