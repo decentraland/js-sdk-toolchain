@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDrop } from 'react-dnd'
 import { Vector3 } from '@babylonjs/core'
-import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
-import { Dimmer } from 'decentraland-ui/dist/components/Dimmer/Dimmer'
 
 import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { useAppSelector } from '../../redux/hooks'
@@ -17,6 +15,7 @@ import { loadGltf, removeGltf } from '../../lib/babylon/decentraland/sdkComponen
 import { ROOT } from '../../lib/sdk/tree'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { IAsset } from '../AssetsCatalog/types'
+import { Loading } from '../Loading'
 import { getModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 import { useIsMounted } from '../../hooks/useIsMounted'
 import { Warnings } from '../Warnings'
@@ -135,12 +134,7 @@ const Renderer: React.FC = () => {
 
   return (
     <div className="Renderer">
-      {isLoading && (
-        <div className="loading">
-          <Loader active />
-          <Dimmer active />
-        </div>
-      )}
+      {isLoading && <Loading />}
       <Warnings />
       <CameraSpeed />
       <canvas ref={canvasRef} id="canvas" touch-action="none" />

@@ -1,5 +1,4 @@
 import { FileSystemInterface } from '../types'
-import { SceneProvider } from './scene'
 
 export async function getFilesInDirectory(
   fs: FileSystemInterface,

@@ -41,19 +41,21 @@ describe('useCatalog', () => {
       renderHook(() => useCatalog())
       expect(fetchMock).toHaveBeenCalledWith(CATALOG_URL)
     })
-    it('should start with a null catalog and null error', () => {
+    it('should start with an empty catalog, null error and true isLoading', () => {
       const { result } = renderHook(() => useCatalog())
-      const [catalog, error] = result.current
-      expect(catalog).toBe(null)
+      const [catalog, error, isLoading] = result.current
+      expect(catalog).toStrictEqual([])
       expect(error).toBe(null)
+      expect(isLoading).toBe(true)
     })
     describe('and the catalog is fetched successfully', () => {
-      it('should resolve to the catalog asset packs and have no error', async () => {
+      it('should resolve to the catalog asset packs, have no error and set isLoading', async () => {
         const { result } = renderHook(() => useCatalog())
         await waitFor(() => {
-          const [catalog, error] = result.current
+          const [catalog, error, isLoading] = result.current
           expect(catalog).toHaveLength(1)
           expect(error).toBe(null)
+          expect(isLoading).toBe(false)
         })
       })
     })
@@ -69,12 +71,13 @@ describe('useCatalog', () => {
       afterEach(() => {
         fetchMock.mockReset()
       })
-      it('should set the catalog to an empty list and set the error', async () => {
+      it('should set the catalog to an empty list, set the error and and set isLoading', async () => {
         const { result } = renderHook(() => useCatalog())
         await waitFor(() => {
-          const [catalog, error] = result.current
+          const [catalog, error, isLoading] = result.current
           expect(catalog).toEqual([])
           expect(error).toEqual(new Error('Something went wrong'))
+          expect(isLoading).toBe(false)
         })
       })
     })
