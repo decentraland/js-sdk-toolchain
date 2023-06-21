@@ -1,3 +1,4 @@
+import { areConnected } from '@dcl/ecs'
 import { SceneInput } from './types'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
 import { Coords } from '../../../lib/utils/layout'
@@ -33,12 +34,17 @@ export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
   }
 }
 
-function areValidCoords(value: string): boolean {
-  const coords = value.split(',')
-  return coords.length === 2 && !isNaN(parseInt(coords[0])) && !isNaN(parseInt(coords[1]))
-}
-
 export function isValidInput(input: SceneInput): boolean {
   const parcels = input.layout.parcels.split(' ')
-  return !!parcels.length && parcels.every(($) => areValidCoords($))
+  const coordsList: Coords[] = []
+
+  for (const parcel of parcels) {
+    const coords = parcel.split(',')
+    const x = parseInt(coords[0])
+    const y = parseInt(coords[1])
+    if (coords.length !== 2 || isNaN(x) || isNaN(y)) return false
+    coordsList.push({ x, y })
+  }
+
+  return areConnected(coordsList)
 }
