@@ -1,8 +1,9 @@
 import { resolve } from 'path'
-import { Scene } from '@dcl/schemas'
+import { Scene, getWorld, isInsideWorldLimits } from '@dcl/schemas'
+import { areConnected } from '@dcl/ecs/dist-cjs'
 
 import { CliError } from './error'
-import { getObject, inBounds, getBounds, areConnected } from './coordinates'
+import { getObject } from './coordinates'
 import { CliComponents } from '../components'
 import { getPublishableFiles } from './project-files'
 
@@ -21,6 +22,15 @@ export const MAX_FILE_SIZE_BYTES = 50 * 1e6 // 50mb
  */
 export function getSceneFilePath(projectRoot: string): string {
   return resolve(projectRoot, SCENE_FILE)
+}
+
+function getWorldRangesConstraintsMessage(): string {
+  const ranges = getWorld().validWorldRanges
+  let str = ''
+  for (const range of ranges) {
+    str += `"x" from ${range.xMin} to ${range.xMax} and "y" from ${range.yMin} to ${range.yMax}\n`
+  }
+  return str
 }
 
 export function assertValidScene(scene: Scene) {
@@ -46,11 +56,11 @@ export function assertValidScene(scene: Scene) {
 
   const objParcels = scene.scene?.parcels?.map(getObject)
   objParcels.forEach(({ x, y }) => {
-    if (inBounds(x, y)) {
+    if (isInsideWorldLimits(x, y)) {
       return
     }
-    const { minX, maxX } = getBounds()
-    throw new CliError(`Coordinates ${x},${y} are outside of allowed limits (from ${minX} to ${maxX})`)
+    const constraints = getWorldRangesConstraintsMessage()
+    throw new CliError(`Coordinates ${x},${y} are outside of allowed limits: \n\n${constraints}`)
   })
 
   if (!areConnected(objParcels)) {

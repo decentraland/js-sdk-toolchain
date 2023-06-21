@@ -45,6 +45,11 @@ export namespace AppendValueOperation {
     export function write(entity: Entity, timestamp: number, componentId: number, data: Uint8Array, buf: ByteBuffer): void;
 }
 
+// Warning: (ae-missing-release-tag) "areConnected" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export function areConnected(parcels: Coords[]): boolean;
+
 // @public (undocumented)
 export const AudioSource: LastWriteWinElementSetComponentDefinition<PBAudioSource>;
 
@@ -655,6 +660,14 @@ export type CompositeRootType = {
 
 // @public
 export type ConflictResolutionMessage = PutComponentMessageBody | DeleteComponentMessageBody;
+
+// Warning: (ae-missing-release-tag) "Coords" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type Coords = {
+    x: number;
+    y: number;
+};
 
 // @public (undocumented)
 export const CRDT_MESSAGE_HEADER_LENGTH = 8;
@@ -1331,6 +1344,11 @@ export interface ISchema<T = any> {
     // (undocumented)
     serialize(value: DeepReadonly<T>, builder: ByteBuffer): void;
 }
+
+// Warning: (ae-missing-release-tag) "isEqual" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export function isEqual(p1: Coords, p2: Coords): boolean;
 
 // @public (undocumented)
 export type JsonArray = Array<JsonPrimitive | JsonMap | JsonArray>;
