@@ -43,10 +43,11 @@ export async function createFsCompositeProvider(
 
   return {
     getCompositeOrNull(src: string, _currentPath?: string) {
+      // compositePaths uses fs.join() to generate the .composite file and in windows generates paths like assets\\main.composite
+      // and the src: string parameter has assets/main.composite path.
       function normalizePath(val: string) {
         return val.replace(/\\/g, '/').toLocaleLowerCase()
       }
-      console.log({ src, composites })
       return composites.find((item) => normalizePath(item.src) === normalizePath(src)) || null
     },
     // a lot of questions with this method, it's temporal
