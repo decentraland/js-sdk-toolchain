@@ -6,7 +6,10 @@ import { ErrorType, getError } from '../../../redux/data-layer'
 
 const mapError = {
   [ErrorType.Disconnected]: 'Socket disconnected. Please refresh the page',
-  [ErrorType.Reconnecting]: 'Disconnected. Trying to reconnect...'
+  [ErrorType.Reconnecting]: 'Disconnected. Trying to reconnect...',
+  [ErrorType.Save]: 'Failed to save. Please try again.',
+  [ErrorType.GetPreferences]: 'Failed to get inspector settings.',
+  [ErrorType.SetPreferences]: 'Failed to save inspector settings.'
 }
 
 const SocketConnection: React.FC = () => {

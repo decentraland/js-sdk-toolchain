@@ -7,14 +7,14 @@ import { ToolbarButton } from '../ToolbarButton'
 import { useOutsideClick } from '../../../hooks/useOutsideClick'
 
 import './Preferences.css'
+import { useAppSelector, useAppDispatch } from '../../../redux/hooks'
+import { getInspectorPreferences } from '../../../redux/app'
+import { setInspectorPreferences } from '../../../redux/data-layer'
 
 export const Preferences = withSdk(({ sdk }) => {
   const [showPanel, setShowPanel] = useState(false)
-  const [freeCameraInvertRotation, setFreeCameraInvertRotation] = useState(
-    sdk.preferences.data.freeCameraInvertRotation
-  )
-  const [autosaveEnabled, setAutosaveEnabled] = useState(sdk.preferences.data.autosaveEnabled)
-
+  const preferences = useAppSelector(getInspectorPreferences)
+  const dispatch = useAppDispatch()
   const togglePanel = useCallback(() => {
     setShowPanel(!showPanel)
   }, [showPanel])
@@ -22,18 +22,21 @@ export const Preferences = withSdk(({ sdk }) => {
   const ref = useOutsideClick(handleClosePanel)
 
   const toggleFreeCameraInvertRotation = useCallback(() => {
-    sdk.editorCamera.setFreeCameraInvertRotation(!freeCameraInvertRotation)
-    sdk.preferences.setFreeCameraInvertRotation(!freeCameraInvertRotation)
-    setFreeCameraInvertRotation(!freeCameraInvertRotation)
-  }, [freeCameraInvertRotation])
+    dispatch(
+      setInspectorPreferences({
+        freeCameraInvertRotation: !preferences.freeCameraInvertRotation
+      })
+    )
+    // TODO: this should be done by the saga but we dont have the sdk.editorCamera on the store
+    sdk.editorCamera.setFreeCameraInvertRotation(!preferences.freeCameraInvertRotation)
+  }, [preferences.freeCameraInvertRotation])
 
   const toggleAutosaveEnabled = useCallback(() => {
-    sdk.preferences.setAutosaveEnabled(!autosaveEnabled)
-    setAutosaveEnabled(!autosaveEnabled)
-  }, [autosaveEnabled])
+    dispatch(setInspectorPreferences({ autosaveEnabled: !preferences.autosaveEnabled }))
+  }, [preferences.autosaveEnabled])
 
-  const FreeCameraInvertRotationIcon = freeCameraInvertRotation ? BiCheckboxChecked : BiCheckbox
-  const AutosaveEnabledIcon = autosaveEnabled ? BiCheckboxChecked : BiCheckbox
+  const FreeCameraInvertRotationIcon = preferences.freeCameraInvertRotation ? BiCheckboxChecked : BiCheckbox
+  const AutosaveEnabledIcon = preferences.autosaveEnabled ? BiCheckboxChecked : BiCheckbox
 
   return (
     <div className="Preferences" ref={ref}>

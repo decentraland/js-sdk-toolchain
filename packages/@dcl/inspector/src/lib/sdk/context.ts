@@ -12,7 +12,7 @@ import { DataLayerRpcClient } from '../data-layer/types'
 import { createOperations } from './operations'
 import { Gizmos } from '../babylon/decentraland/gizmo-manager'
 import { CameraManager } from '../babylon/decentraland/camera'
-import { InspectorPreferencesManager } from '../logic/preferences/manager'
+import { InspectorPreferences } from '../logic/preferences/types'
 
 export type SdkContextEvents = {
   change: { entity: Entity; operation: CrdtMessageType; component?: ComponentDefinition<any>; value?: any }
@@ -29,17 +29,13 @@ export type SdkContextValue = {
   operations: ReturnType<typeof createOperations>
   gizmos: Gizmos
   editorCamera: CameraManager
-  preferences: InspectorPreferencesManager
 }
 
 export async function createSdkContext(
-  dataLayer: DataLayerRpcClient,
   canvas: HTMLCanvasElement,
-  catalog: ITheme[]
+  catalog: ITheme[],
+  preferences: InspectorPreferences
 ): Promise<SdkContextValue> {
-  // fetch user preferences from the data layer
-  const preferences = await dataLayer.getInspectorPreferences({})
-
   const renderer = initRenderer(canvas, preferences)
   const { scene } = renderer
 
@@ -58,7 +54,7 @@ export async function createSdkContext(
   const { engine, components, events, dispose } = createInspectorEngine()
 
   // register some globals for debugging
-  Object.assign(globalThis, { dataLayer, inspectorEngine: engine })
+  Object.assign(globalThis, { inspectorEngine: engine })
 
   return {
     engine,
@@ -69,7 +65,6 @@ export async function createSdkContext(
     dispose,
     operations: createOperations(engine),
     gizmos: ctx.gizmos,
-    editorCamera: renderer.editorCamera,
-    preferences: new InspectorPreferencesManager(preferences, dataLayer)
+    editorCamera: renderer.editorCamera
   }
 }

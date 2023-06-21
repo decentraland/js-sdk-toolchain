@@ -4,6 +4,7 @@ import { useCatalog } from '../catalog/useCatalog'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
 import { getDataLayer, connect as connectDataLayer } from '../../redux/data-layer'
 import { addEngines } from '../../redux/sdk'
+import { getInspectorPreferences } from '../../redux/app'
 
 /**
  *
@@ -11,6 +12,7 @@ import { addEngines } from '../../redux/sdk'
  */
 export const useSdkContext = () => {
   const dataLayer = useAppSelector(getDataLayer)
+  const preferences = useAppSelector(getInspectorPreferences)
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null)
   const [sdk, setSdk] = useState<SdkContextValue | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -23,9 +25,9 @@ export const useSdkContext = () => {
   }, [dispatch])
 
   useEffect(() => {
-    if (!catalog || !canvas || sdk || isLoading || !dataLayer) return
+    if (!catalog || !canvas || sdk || isLoading || !dataLayer || !preferences) return
     setIsLoading(true)
-    createSdkContext(dataLayer, canvas, catalog)
+    createSdkContext(canvas, catalog, preferences)
       .then((ctx) => {
         dispatch(addEngines({ inspector: ctx.engine, babylon: ctx.sceneContext.engine }))
         setSdk(ctx)
@@ -35,7 +37,7 @@ export const useSdkContext = () => {
         setError(e)
       })
       .finally(() => setIsLoading(false))
-  }, [catalog, canvas, sdk, isLoading, dispatch, dataLayer])
+  }, [catalog, canvas, sdk, isLoading, dispatch, dataLayer, preferences])
 
   const renderer = useCallback(
     (ref: React.RefObject<HTMLCanvasElement>) => {

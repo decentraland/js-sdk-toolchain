@@ -1,7 +1,5 @@
 import { IEngine } from '@dcl/ecs'
 
-import { saveEvent } from '../../../hooks/editor/useSave'
-
 import removeEntity from './remove-entity'
 import updateValue from './update-value'
 import addChild from './add-child'
@@ -12,6 +10,8 @@ import addAsset from './add-asset'
 import addComponent from './add-component'
 import removeComponent from './remove-component'
 import duplicateEntity from './duplicate-entity'
+import { updateCanSave } from '../../../redux/app'
+import { store } from '../../../redux/store'
 
 export interface Dispatch {
   dirty?: boolean
@@ -30,8 +30,8 @@ export function createOperations(engine: IEngine) {
     removeSelectedEntities: removeSelectedEntities(engine),
     duplicateEntity: duplicateEntity(engine),
     dispatch: async ({ dirty = true }: Dispatch = {}) => {
+      store.dispatch(updateCanSave({ dirty }))
       await engine.update(1)
-      saveEvent.emit('change', dirty)
     }
   }
 }
