@@ -19,9 +19,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
 
   return (
     <Container label="Settings" className="Scene">
-      <Block label="Base">
-        <TextField label="" {...getInputProps('layout.base')} />
-      </Block>
       <Block label="Parcels">
         <TextField label="" {...getInputProps('layout.parcels')} />
       </Block>
