@@ -10,7 +10,7 @@ export async function createFsCompositeProvider(
   fs: FileSystemInterface,
   dirPath: string = ''
 ): Promise<CompositeManager> {
-  const files = await getFilesInDirectory(fs, dirPath, [], true)
+  const files = await getFilesInDirectory(fs, dirPath, [], true, ['node_modules', 'dist', 'bin', 'src', '.vscode'])
   const compositePaths = files
     .filter((item) => item.endsWith('.composite') || item.endsWith('.composite.bin'))
     .map((item) => fs.join(fs.dirname(item), fs.basename(item).toLowerCase()))
