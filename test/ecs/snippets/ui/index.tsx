@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
   Entity,
   engine,
@@ -5,14 +6,11 @@ import {
   MeshRenderer,
   MeshCollider,
   InputAction,
-  inputSystem,
   PointerEvents,
   PointerEventType
 } from '@dcl/sdk/ecs'
 import { Vector3, Color4, Quaternion } from '@dcl/sdk/math'
 import { ReactEcs, UiEntity, Label, ReactEcsRenderer, Button } from '@dcl/sdk/react-ecs'
-
-let counter = 0
 
 // Cube factory
 function createCube(x: number, y: number, z: number, spawner = true): Entity {
@@ -51,19 +49,9 @@ function circularSystem(dt: number) {
   }
 }
 
-function spawnerSystem() {
-  const clickedCubes = engine.getEntitiesWith(PointerEvents)
-  for (const [entity] of clickedCubes) {
-    if (inputSystem.isTriggered(InputAction.IA_PRIMARY, PointerEventType.PET_DOWN, entity)) {
-      counter++
-    }
-  }
-}
-
 // Init
 createCube(8, 1, 8)
 engine.addSystem(circularSystem)
-engine.addSystem(spawnerSystem)
 
 type GenesisPlazaContent = string
 const sceneThumbnail: GenesisPlazaContent = 'models/Magazinev1.png'
@@ -76,7 +64,7 @@ const uiComponent = () => (
       //  { top: 16, right: 0, bottom: 8 left: 270 },
       margin: '16px 0 8px 270px',
       // { top: 4, bottom: 4, left: 4, right: 4 },
-      padding: 4,
+      padding: 4
     }}
     uiBackground={{ color: Color4.create(0.5, 0.8, 0.1, 0.6) }}
   >
@@ -88,7 +76,7 @@ const uiComponent = () => (
         alignItems: 'center',
         justifyContent: 'space-between'
       }}
-      uiBackground={{ color: Color4.fromHexString("#70ac76ff") }}
+      uiBackground={{ color: Color4.fromHexString('#70ac76ff') }}
     >
       <UiEntity
         uiTransform={{
@@ -99,27 +87,31 @@ const uiComponent = () => (
         uiBackground={{
           textureMode: 'center',
           texture: {
-            src: sceneThumbnail,
-          },
+            src: sceneThumbnail
+          }
         }}
         uiText={{ value: 'SDK7', fontSize: 18 }}
       />
       <Label
-        onMouseDown={() => {console.log('Player Position clicked !')}}
+        onMouseDown={() => {
+          console.log('Player Position clicked !')
+        }}
         value={`Player: ${getPlayerPosition()}`}
         fontSize={18}
-        uiTransform={{ width: '100%', height: 30 } }
+        uiTransform={{ width: '100%', height: 30 }}
       />
       <Label
-        onMouseDown={() => {console.log('# Cubes clicked !')}}
+        onMouseDown={() => {
+          console.log('# Cubes clicked !')
+        }}
         value={`# Cubes: ${[...engine.getEntitiesWith(MeshRenderer)].length}`}
         fontSize={18}
-        uiTransform={{ width: '100%', height: 30 } }
+        uiTransform={{ width: '100%', height: 30 }}
       />
       <Button
         uiTransform={{ width: 100, height: 40, margin: 8 }}
-        value='Spawn cube'
-        variant='primary'
+        value="Spawn cube"
+        variant="primary"
         fontSize={14}
         onMouseDown={() => {
           createCube(1 + Math.random() * 8, Math.random() * 8, 1 + Math.random() * 8, false)

@@ -11,42 +11,33 @@ import { Props } from './types'
 
 import './Tile.css'
 
-export const Tile = withContextMenu<Props>(({
-  valueId,
-  value,
-  getDragContext,
-  onSelect,
-  onRemove,
-  contextMenuId,
-  dndType
-}) => {
-  const { handleAction } = useContextMenu()
+export const Tile = withContextMenu<Props>(
+  ({ valueId, value, getDragContext, onSelect, onRemove, contextMenuId, dndType }) => {
+    const { handleAction } = useContextMenu()
 
-  const [, drag] = useDrag(
-    () => ({ type: dndType, item: { value: valueId, context: getDragContext() } }),
-    [valueId]
-  )
+    const [, drag] = useDrag(() => ({ type: dndType, item: { value: valueId, context: getDragContext() } }), [valueId])
 
-  const handleRemove = useCallback(() => {
-    onRemove(valueId)
-  }, [valueId])
+    const handleRemove = useCallback(() => {
+      onRemove(valueId)
+    }, [valueId])
 
-  if (!value) return null
+    if (!value) return null
 
-  return (
-    <>
-      {/* TODO: support removing folders */}
-      {value.type === 'asset' && (
-        <Menu id={contextMenuId}>
-          <MenuItem id="delete" onClick={handleAction(handleRemove)}>
-            <DeleteIcon /> Delete
-          </MenuItem>
-        </Menu>
-      )}
-      <div ref={drag} className="Tile" key={value.name} onDoubleClick={onSelect} title={value.name}>
-        {value.type === 'folder' ? <FolderIcon /> : <IoIosImage />}
-        <span>{value.name}</span>
-      </div>
-    </>
-  )
-})
+    return (
+      <>
+        {/* TODO: support removing folders */}
+        {value.type === 'asset' && (
+          <Menu id={contextMenuId}>
+            <MenuItem id="delete" onClick={handleAction(handleRemove)}>
+              <DeleteIcon /> Delete
+            </MenuItem>
+          </Menu>
+        )}
+        <div ref={drag} className="Tile" key={value.name} onDoubleClick={onSelect} title={value.name}>
+          {value.type === 'folder' ? <FolderIcon /> : <IoIosImage />}
+          <span>{value.name}</span>
+        </div>
+      </>
+    )
+  }
+)

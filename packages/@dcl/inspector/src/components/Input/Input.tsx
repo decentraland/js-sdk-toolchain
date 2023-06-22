@@ -34,7 +34,7 @@ const Input = ({ value, onCancel, onSubmit, onChange, onBlur, placeholder }: Pro
 
     const onBlurCallback = (e: FocusEvent) => {
       const relatedTarget = e.relatedTarget as HTMLElement | null
-      const { parentRole, role} = getRolesFromTarget(relatedTarget)
+      const { parentRole, role } = getRolesFromTarget(relatedTarget)
       // custom fix for context menu to avoid stealing focus (thus triggering onBlur on input's)
       // when hiding. We check if the relatedTarget's role and it's parent role is in the
       // dismissable targets list. If it is, instead of running the onBlur cb, we focus the input.

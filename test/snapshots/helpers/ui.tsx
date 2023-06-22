@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { UiEntity, Label, Input, Dropdown, Button } from '@dcl/sdk/react-ecs'
 

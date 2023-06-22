@@ -23,14 +23,13 @@ const CameraSpeed = withSdk(({ sdk }) => {
 
     return () => {
       sdk.editorCamera.getSpeedChangeObservable().off('change', onSpeedChange)
-      if (timeoutId)
-        clearTimeout(timeoutId)
+      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [sdk])
 
   return (
-    <div className={classNames('CameraSpeed', {visible: visible, invisible: !visible})}>
-        Camera speed: {speed.toFixed(1)} m/s
+    <div className={classNames('CameraSpeed', { visible: visible, invisible: !visible })}>
+      Camera speed: {speed.toFixed(1)} m/s
     </div>
   )
 })

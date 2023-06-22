@@ -13,9 +13,7 @@ export const Preferences = withSdk(({ sdk }) => {
   const [freeCameraInvertRotation, setFreeCameraInvertRotation] = useState(
     sdk.preferences.data.freeCameraInvertRotation
   )
-  const [autosaveEnabled, setAutosaveEnabled] = useState(
-    sdk.preferences.data.autosaveEnabled
-  )
+  const [autosaveEnabled, setAutosaveEnabled] = useState(sdk.preferences.data.autosaveEnabled)
 
   const togglePanel = useCallback(() => {
     setShowPanel(!showPanel)
@@ -39,7 +37,7 @@ export const Preferences = withSdk(({ sdk }) => {
 
   return (
     <div className="Preferences" ref={ref}>
-      <ToolbarButton className="preferences" onClick={togglePanel} title='Preferences'>
+      <ToolbarButton className="preferences" onClick={togglePanel} title="Preferences">
         <BiCog />
       </ToolbarButton>
       <div className={cx('panel', { visible: showPanel })}>

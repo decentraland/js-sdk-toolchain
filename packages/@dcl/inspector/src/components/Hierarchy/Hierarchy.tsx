@@ -13,17 +13,30 @@ function HierarchyIcon({ value }: { value: Entity }) {
   if (value === ROOT) {
     return <span style={{ marginRight: '4px' }}></span>
   } else {
-    return (
-      <FiHexagon style={{ marginRight: '4px' }}/>
-    )
+    return <FiHexagon style={{ marginRight: '4px' }} />
   }
 }
 
 const EntityTree = Tree<Entity>()
 
 const Hierarchy: React.FC = () => {
-  const { addChild, setParent, remove, rename, select, setOpen, duplicate, getId, getChildren, getLabel, isOpen, isHidden, canRename, canRemove, canDuplicate } =
-    useTree()
+  const {
+    addChild,
+    setParent,
+    remove,
+    rename,
+    select,
+    setOpen,
+    duplicate,
+    getId,
+    getChildren,
+    getLabel,
+    isOpen,
+    isHidden,
+    canRename,
+    canRemove,
+    canDuplicate
+  } = useTree()
   const selectedEntity = useSelectedEntity()
 
   const isSelected = useCallback(
@@ -47,9 +60,7 @@ const Hierarchy: React.FC = () => {
         getId={getId}
         getChildren={getChildren}
         getLabel={getLabel}
-        getIcon={(val: Entity) => (
-          <HierarchyIcon value={val} />
-        )}
+        getIcon={(val: Entity) => <HierarchyIcon value={val} />}
         isOpen={isOpen}
         isSelected={isSelected}
         isHidden={isHidden}

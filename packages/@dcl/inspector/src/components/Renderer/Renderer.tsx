@@ -82,6 +82,7 @@ const Renderer: React.FC = () => {
           const content = await (await fetch(url)).arrayBuffer()
           fileContent[path] = new Uint8Array(content)
         } catch (err) {
+          // eslint-disable-next-line no-console
           console.error('Error fetching an asset import ' + path)
         }
       })

@@ -61,7 +61,7 @@ function testFileSnapshot(fileName: string, _productionBuild: boolean) {
     const jsSizeBytesProd = binContentWitoutSourceMaps.length
     const jsProdSize = (jsSizeBytesProd / 1000).toLocaleString('en', { maximumFractionDigits: 1 })
 
-    const { result: resultFromRun, leaking } = await run(binFile, binContentWitoutSourceMaps)
+    const { result: resultFromRun } = await run(binFile, binContentWitoutSourceMaps)
 
     const results = [`SCENE_COMPILED_JS_SIZE_PROD=${jsProdSize}k bytes`]
 

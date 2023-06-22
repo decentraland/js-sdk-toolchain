@@ -51,7 +51,9 @@ function Assets() {
         </div>
       </div>
       <div className="Assets-content">
-        {tab === AssetsTab.AssetsPack && <AssetsCatalog catalog={catalog} error={catalogError} isLoading={isCatalogLoading} />}
+        {tab === AssetsTab.AssetsPack && (
+          <AssetsCatalog catalog={catalog} error={catalogError} isLoading={isCatalogLoading} />
+        )}
         {tab === AssetsTab.FileSystem && <ProjectAssetExplorer />}
         {tab === AssetsTab.Import && <ImportAsset onSave={handleSave} />}
       </div>
