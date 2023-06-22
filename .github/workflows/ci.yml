@@ -355,7 +355,7 @@ jobs:
         run: mkdir -p test_inspector_s3 && cd test_inspector_s3 && npm init --yes && npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_inspector_s3_bucket_key }}"
   cli_e2e:
     needs: [build]
-    runs-on: ubuntu-latest
+    runs-on: [ubuntu-latest, windows-latest]
     name: CLI E2E
     steps:
       - uses: actions/setup-node@v3
@@ -374,7 +374,7 @@ jobs:
         run: npm install
         working-directory: scene
       - name: npm run build
-        run: npm run build
+        run: npm run start -- --data-layer --no-browser
         working-directory: scene
 
       - name: Set Realm Name

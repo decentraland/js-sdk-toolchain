@@ -7,8 +7,12 @@ import { CliComponents } from '../../../components'
  * We managed posix paths, so for windows we need to normalize it
  */
 function normalizePath(value: string): string {
+  console.log({ value, normalize: path.normalize(value) })
   return path.normalize(value)
 }
+
+console.log('BOEDO: ', normalizePath('assets/scene/main.crdt'))
+console.log('BOEDO2: ', normalizePath('assets\\scene\\main.crdt'))
 
 /**
  * Convert paths to posix stlye
