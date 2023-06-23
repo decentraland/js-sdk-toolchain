@@ -16,7 +16,10 @@ const transformer = useTsJestTransform ?
 module.exports = isE2E ? {
   moduleFileExtensions: ["ts", "js", "jsx", "tsx"],
   testMatch: ["**/e2e/*.spec.(ts)"],
-  preset: "jest-puppeteer"
+  preset: "jest-puppeteer",
+  transform: {
+    "^.+\\.(js|jsx|ts|tsx)$": transformer
+  }
 } : {
   moduleFileExtensions: ["ts", "js", "jsx", "tsx"],
   transform: {

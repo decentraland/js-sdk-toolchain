@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -23,14 +19,8 @@
     "sourceMap": true,
     "rootDir": "src/",
     "incremental": true,
-    "types": [
-       "puppeteer",
-       "jest-environment-puppeteer",
-       "expect-puppeteer"
-     ]
+    "types": ["puppeteer", "jest-environment-puppeteer"]
   },
   "exclude": ["**/*.spec.ts"],
-  "include": [
-    "src"
-, "test/e2e"  ]
+  "include": ["src"]
 }

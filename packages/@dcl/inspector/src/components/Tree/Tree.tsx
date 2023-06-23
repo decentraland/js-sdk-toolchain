@@ -165,7 +165,7 @@ export function Tree<T>() {
       const nodeClassnames = cx({ selected, item: true, hidden })
 
       return (
-        <div ref={ref} className={`Tree ${className || ''}`}>
+        <div ref={ref} className={`Tree ${className || ''}`} data-test-id={id}>
           <div style={getLevelStyles(level)} className={nodeClassnames}>
             <ContextMenu {...controlsProps} />
             <div style={getEditModeStyles(editMode)} className="item-area">
