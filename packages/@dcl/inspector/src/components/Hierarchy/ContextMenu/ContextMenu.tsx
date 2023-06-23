@@ -26,7 +26,7 @@ const ContextMenu = (value: Entity) => {
   return (
     <>
       <Separator />
-      <Submenu label="Add component">
+      <Submenu label="Add component" id="add-component">
         {_components.map(([id, name]) => (
           <Item key={id} id={id.toString()} onClick={handleAction(handleAddComponent)}>
             {getComponentName(name)}
