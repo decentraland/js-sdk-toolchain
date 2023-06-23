@@ -219,6 +219,7 @@ function ProjectView({ folders }: Props) {
             onRemove={handleRemove}
             onRename={noop}
             onSelect={onSelect}
+            onDoubleSelect={noop}
             onSetOpen={onSetOpen}
             onDuplicate={noop}
             getId={(value: string) => value.toString()}

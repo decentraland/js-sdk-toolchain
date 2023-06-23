@@ -1,9 +1,7 @@
 import mitt from 'mitt'
-import { IAxisDragGizmo, Quaternion, Vector3 } from '@babylonjs/core'
+import { Quaternion } from '@babylonjs/core'
 import { EcsEntity } from './EcsEntity'
 import { Entity, TransformType } from '@dcl/ecs'
-import { getLayoutManager } from './layout-manager'
-import { inBounds } from '../../utils/layout'
 import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
 import { SceneContext } from './SceneContext'
 import { GizmoType } from '../../utils/gizmo'
@@ -35,24 +33,6 @@ export function createGizmoManager(context: SceneContext) {
   gizmoManager.scaleGizmoEnabled = false
   gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh = false
   gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = true
-
-  const layoutManager = getLayoutManager(context.scene)
-
-  function dragBehavior(gizmo: IAxisDragGizmo) {
-    gizmo.dragBehavior.validateDrag = function validateDrag(targetPosition: Vector3) {
-      const yIsInBounds = targetPosition.y >= 0 || (!!lastEntity && lastEntity.position.y < targetPosition.y)
-      const layout = layoutManager.getLayout()
-      if (!layout) return true
-      const isAlreadyOutOfBounds = !!lastEntity && !inBounds(layout, lastEntity?.position)
-      const xzIsInBounds = inBounds(layout, targetPosition)
-      // Allow drag if target position is within bounds, or if the gizmo is already out of bounds (it can get there by modifiying the transform values manually)
-      return (yIsInBounds && xzIsInBounds) || isAlreadyOutOfBounds
-    }
-  }
-
-  dragBehavior(gizmoManager.gizmos.positionGizmo!.xGizmo)
-  dragBehavior(gizmoManager.gizmos.positionGizmo!.yGizmo)
-  dragBehavior(gizmoManager.gizmos.positionGizmo!.zGizmo)
 
   let lastEntity: EcsEntity | null = null
   let rotationGizmoAlignmentDisabled = false

@@ -2,12 +2,25 @@ import * as BABYLON from '@babylonjs/core'
 import { Keys, keyState } from './keys'
 import { PARCEL_SIZE } from '../../utils/scene'
 import mitt, { Emitter } from 'mitt'
+import { EcsEntity } from './EcsEntity'
+import { fitSphereIntoCameraFrustum, getWorldMatrix } from '../../logic/math'
+import { Vector3, Quaternion } from '@dcl/ecs-math'
+import { Matrix } from '@dcl/ecs-math/dist/Matrix'
 
 type SpeedChangeEvent = { change: number }
 
 enum SpeedIncrement {
   FASTER = 1,
   SLOWER = -1
+}
+
+type AnimationData = {
+  startPos: Vector3,
+  endPos: Vector3,
+  startQuat: Quaternion,
+  endQuat: Quaternion,
+  timePassed: number,
+  duration: number
 }
 
 export class CameraManager {
@@ -18,10 +31,12 @@ export class CameraManager {
   private zoomSensitivity: number
   private camera: BABYLON.FreeCamera
   private speedChangeObservable: Emitter<SpeedChangeEvent>
+  private getAspectRatio: () => number
+  private animation: AnimationData | null
 
   constructor(
     scene: BABYLON.Scene,
-    inputSource: HTMLElement,
+    inputSource: HTMLCanvasElement,
     speeds: Array<number>,
     initialSpeedIndex: number,
     minY: number,
@@ -32,6 +47,8 @@ export class CameraManager {
     this.minY = minY
     this.zoomSensitivity = zoomSensitivity
     this.speedChangeObservable = mitt<SpeedChangeEvent>()
+    this.getAspectRatio = () => { return inputSource.width / inputSource.height }
+    this.animation = null
 
     this.camera = this.createCamera(scene)
     scene.activeCamera?.detachControl()
@@ -54,6 +71,31 @@ export class CameraManager {
   setFreeCameraInvertRotation(invert: boolean) {
     const sign = invert ? -1 : 1
     this.camera.angularSensibility = sign * CameraManager.ANGULAR_SENSIBILITY
+  }
+
+  centerViewOnEntity(entity: EcsEntity) {
+    // get a bounding sphere from bounding box
+    const {min, max} = entity.getHierarchyBoundingVectors()
+    let center: BABYLON.Vector3
+    let radius: number
+    // Babylon returns (MAX_VALUE, MAX_VALUE, MAX_VALUE), (MIN_VALUE, MIN_VALUE, MIN_VALUE) for empty nodes
+    if (min.x === Number.MAX_VALUE) {
+      center = entity.getWorldMatrix().getTranslation()
+      radius = 1
+    } else {
+      center = min.add(max).scale(0.5)
+      radius = max.subtract(center).length()
+    }
+    const position = fitSphereIntoCameraFrustum(this.camera.position, this.camera.fov, this.getAspectRatio(), this.camera.minZ, this.minY, center, radius)
+
+    this.animation = {
+      startPos: this.camera.position,
+      endPos: position,
+      startQuat: Quaternion.fromLookAt(this.camera.position, this.camera.target),
+      endQuat: Quaternion.fromLookAt(position, center),
+      duration: 0.2,
+      timePassed: 0
+    }
   }
 
   private createCamera(scene: BABYLON.Scene) {
@@ -102,11 +144,7 @@ export class CameraManager {
       }
     })
 
-    scene.registerBeforeRender(() => {
-      if (camera.position.y <= this.minY) {
-        camera.position.y = this.minY
-      }
-    })
+    scene.registerBeforeRender(() => { this.onRenderFrame(scene) })
     return camera
   }
 
@@ -118,5 +156,28 @@ export class CameraManager {
     }
     this.camera.speed = this.speeds[this.speedIndex]
     this.speedChangeObservable.emit('change', this.camera.speed)
+  }
+
+  private onRenderFrame(scene: BABYLON.Scene) {
+    if (this.animation !== null) {
+      const dt = scene.getEngine().getDeltaTime()
+      this.animation.timePassed += dt / 1000
+      this.animation.timePassed = Math.min(this.animation.duration, this.animation.timePassed)
+      const t = this.animation.timePassed / this.animation.duration
+
+      const position = Vector3.lerp(this.animation.startPos, this.animation.endPos, t)
+      this.camera.position = new BABYLON.Vector3(position.x, position.y, position.z)
+
+      const quat = Quaternion.slerp(this.animation.startQuat, this.animation.endQuat, t)
+      const direction = Vector3.rotate(Vector3.create(0, 0, 1), quat)
+      this.camera.target = this.camera.position.add(new BABYLON.Vector3(direction.x, direction.y, direction.z))
+
+      if (this.animation.timePassed >= this.animation.duration)
+        this.animation = null
+    }
+
+    if (this.camera.position.y <= this.minY) {
+      this.camera.position.y = this.minY
+    }
   }
 }

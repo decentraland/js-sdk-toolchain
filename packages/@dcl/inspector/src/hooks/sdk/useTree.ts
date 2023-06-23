@@ -139,6 +139,16 @@ export const useTree = () => {
     [sdk, handleUpdate]
   )
 
+  const centerViewOnEntity = useCallback(
+    (entity: Entity) => {
+      if (!sdk || entity === ROOT) return
+      const babylonEntity = sdk.sceneContext.getEntityOrNull(entity)
+      if (babylonEntity !== null)
+        sdk.editorCamera.centerViewOnEntity(babylonEntity)
+    },
+    [sdk]
+  )
+
   const isNotRoot = useCallback((entity: Entity) => entity !== ROOT, [])
   const canRename = isNotRoot
   const canRemove = isNotRoot
@@ -160,6 +170,7 @@ export const useTree = () => {
     isHidden,
     canRename,
     canRemove,
-    canDuplicate
+    canDuplicate,
+    centerViewOnEntity
   }
 }
