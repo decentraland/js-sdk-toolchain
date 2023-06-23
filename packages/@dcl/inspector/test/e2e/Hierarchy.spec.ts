@@ -1,7 +1,6 @@
 import { App } from './pageObjects/App'
 import { Hierarchy } from './pageObjects/Hierarchy'
 import { installMouseHelper } from './utils/install-mouse-helper'
-import { sleep } from './utils/sleep'
 
 describe('Entity Inspector', () => {
   beforeAll(async () => {
@@ -26,6 +25,7 @@ describe('Entity Inspector', () => {
     await expect(Hierarchy.getLabel(514)).resolves.toBe('new pepe')
     await Hierarchy.remove(514)
     await expect(Hierarchy.exists(514)).resolves.toBe(false)
-    await sleep(5000)
+    await Hierarchy.addComponent(512, 'GltfContainer')
+    await expect(Hierarchy.addComponent(512, 'GltfContainer')).rejects.toThrowError()
   }, 100000)
 })

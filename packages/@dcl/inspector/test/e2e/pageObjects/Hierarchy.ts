@@ -1,5 +1,4 @@
 import { dragAndDrop } from '../utils/drag-and-drop'
-import { sleep } from '../utils/sleep'
 
 class HierarchyPageObject {
   getItemSelector(entityId: number) {
@@ -74,6 +73,21 @@ class HierarchyPageObject {
     } catch (error) {
       return false
     }
+  }
+
+  async addComponent(entityId: number, componentName: string) {
+    const item = await this.getItem(entityId)
+    await item.click({ button: 'right' })
+    const addComponent = await item.$('.contexify_item[itemid="add-component"')
+    if (!addComponent) {
+      throw new Error(`Can't add components on entity with id=${entityId}`)
+    }
+    await addComponent.click()
+    const component = await addComponent.$(`.contexify_item[itemid="${componentName}"`)
+    if (!component) {
+      throw new Error(`Can't add component with componentName=${componentName} on entity with id=${entityId}`)
+    }
+    await component.click()
   }
 }
 
