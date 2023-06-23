@@ -56,7 +56,6 @@ lint-fix: sync-deps
 TESTARGS ?= test/
 test:
 	node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS)
-	make test-inspector
 
 test-inspector:
 	cd ./packages/@dcl/inspector/; TS_JEST_TRANSFORMER=true ./../../../node_modules/.bin/jest --coverage --detectOpenHandles --colors --config ./jest.config.js $(FILES)

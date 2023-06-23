@@ -6,17 +6,17 @@ import { CliComponents } from '../../../components'
  * Convert paths to posix stlye
  * .i.e: scene\\assets\\main.composite -> scene/assets/main.composite
  */
-function pathToPosix(value: string): string {
+export function pathToPosix(value: string): string {
   return value.replace(/\\/g, '/')
 }
 
 export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliComponents, 'fs'>): FileSystemInterface {
   return {
     dirname(value: string): string {
-      return pathToPosix(path.dirname(value))
+      return pathToPosix(path.dirname(pathToPosix(value)))
     },
     basename(value: string): string {
-      return pathToPosix(path.basename(value))
+      return pathToPosix(path.basename(pathToPosix(value)))
     },
     join(...paths: string[]): string {
       return path.join(...paths)
