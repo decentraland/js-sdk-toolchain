@@ -37,16 +37,16 @@ function ContextMenu({
 
   return (
     <Menu id={id}>
-      <Item hidden={!enableEdit} id="rename" onClick={handleAction(onEdit)}>
+      <Item hidden={!enableEdit} itemID="rename" id="rename" onClick={handleAction(onEdit)}>
         <RenameIcon /> Rename
       </Item>
-      <Item hidden={!enableAdd} id="add-child" onClick={handleAction(onAddChild)}>
+      <Item hidden={!enableAdd} itemID="add-child" id="add-child" onClick={handleAction(onAddChild)}>
         <AddChildIcon /> Add child
       </Item>
-      <Item hidden={!enableDuplicate} id="duplicate" onClick={handleAction(onDuplicate)}>
+      <Item hidden={!enableDuplicate} itemID="duplicate" id="duplicate" onClick={handleAction(onDuplicate)}>
         <DuplicateIcon /> Duplicate
       </Item>
-      <Item hidden={!enableRemove} id="delete" onClick={handleAction(onRemove)}>
+      <Item hidden={!enableRemove} itemID="delete" id="delete" onClick={handleAction(onRemove)}>
         <DeleteIcon /> Delete
       </Item>
       {extra}
