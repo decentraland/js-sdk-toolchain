@@ -37,16 +37,29 @@ export function areSRTMatrixesEqualWithEpsilon(m1: Matrix.ReadonlyMatrix, m2: Ma
   1. Cone's axis of rotation is the line between pos and spherePos.
   2. Sphere centered at spherePos with radius sphereRadius is inscribed into the cone.
 */
-export function fitSphereIntoCone(pos: Vector3, coneAngle: number, spherePos: Vector3, sphereRadius: number): Vector3.MutableVector3 {
+export function fitSphereIntoCone(
+  pos: Vector3,
+  coneAngle: number,
+  spherePos: Vector3,
+  sphereRadius: number
+): Vector3.MutableVector3 {
   const direction = Vector3.subtract(spherePos, pos)
   if (Vector3.equalsWithEpsilon(direction, Vector3.Zero()))
     throw new Error(`near equal pos and spherePos: ${JSON.stringify(pos)}`)
-  const t = Vector3.length(direction) - (sphereRadius / Math.tan(coneAngle))
+  const t = Vector3.length(direction) - sphereRadius / Math.tan(coneAngle)
   const normalizedDirection = Vector3.normalize(direction)
   return Vector3.add(pos, Vector3.scale(normalizedDirection, t))
 }
 
-export function fitSphereIntoCameraFrustum(cameraPos: Vector3, verticalFov: number, aspectRatio: number, cameraNearZ: number, cameraMinY: number, spherePos: Vector3, sphereRadius: number): Vector3 {
+export function fitSphereIntoCameraFrustum(
+  cameraPos: Vector3,
+  verticalFov: number,
+  aspectRatio: number,
+  cameraNearZ: number,
+  cameraMinY: number,
+  spherePos: Vector3,
+  sphereRadius: number
+): Vector3 {
   let adjustedCameraPos = cameraPos
   if (Vector3.equalsWithEpsilon(Vector3.subtract(spherePos, cameraPos), Vector3.Zero()))
     adjustedCameraPos = Vector3.add(spherePos, Vector3.create(0, 1, 0))

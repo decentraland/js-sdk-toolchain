@@ -143,8 +143,7 @@ export const useTree = () => {
     (entity: Entity) => {
       if (!sdk || entity === ROOT) return
       const babylonEntity = sdk.sceneContext.getEntityOrNull(entity)
-      if (babylonEntity !== null)
-        sdk.editorCamera.centerViewOnEntity(babylonEntity)
+      if (babylonEntity !== null) sdk.editorCamera.centerViewOnEntity(babylonEntity)
     },
     [sdk]
   )

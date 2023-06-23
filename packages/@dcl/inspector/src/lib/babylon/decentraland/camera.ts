@@ -3,9 +3,8 @@ import { Keys, keyState } from './keys'
 import { PARCEL_SIZE } from '../../utils/scene'
 import mitt, { Emitter } from 'mitt'
 import { EcsEntity } from './EcsEntity'
-import { fitSphereIntoCameraFrustum, getWorldMatrix } from '../../logic/math'
+import { fitSphereIntoCameraFrustum } from '../../logic/math'
 import { Vector3, Quaternion } from '@dcl/ecs-math'
-import { Matrix } from '@dcl/ecs-math/dist/Matrix'
 
 type SpeedChangeEvent = { change: number }
 
@@ -15,11 +14,11 @@ enum SpeedIncrement {
 }
 
 type AnimationData = {
-  startPos: Vector3,
-  endPos: Vector3,
-  startQuat: Quaternion,
-  endQuat: Quaternion,
-  timePassed: number,
+  startPos: Vector3
+  endPos: Vector3
+  startQuat: Quaternion
+  endQuat: Quaternion
+  timePassed: number
   duration: number
 }
 
@@ -47,7 +46,9 @@ export class CameraManager {
     this.minY = minY
     this.zoomSensitivity = zoomSensitivity
     this.speedChangeObservable = mitt<SpeedChangeEvent>()
-    this.getAspectRatio = () => { return inputSource.width / inputSource.height }
+    this.getAspectRatio = () => {
+      return inputSource.width / inputSource.height
+    }
     this.animation = null
 
     this.camera = this.createCamera(scene)
@@ -75,7 +76,7 @@ export class CameraManager {
 
   centerViewOnEntity(entity: EcsEntity) {
     // get a bounding sphere from bounding box
-    const {min, max} = entity.getHierarchyBoundingVectors()
+    const { min, max } = entity.getHierarchyBoundingVectors()
     let center: BABYLON.Vector3
     let radius: number
     // Babylon returns (MAX_VALUE, MAX_VALUE, MAX_VALUE), (MIN_VALUE, MIN_VALUE, MIN_VALUE) for empty nodes
@@ -86,7 +87,15 @@ export class CameraManager {
       center = min.add(max).scale(0.5)
       radius = max.subtract(center).length()
     }
-    const position = fitSphereIntoCameraFrustum(this.camera.position, this.camera.fov, this.getAspectRatio(), this.camera.minZ, this.minY, center, radius)
+    const position = fitSphereIntoCameraFrustum(
+      this.camera.position,
+      this.camera.fov,
+      this.getAspectRatio(),
+      this.camera.minZ,
+      this.minY,
+      center,
+      radius
+    )
 
     this.animation = {
       startPos: this.camera.position,
@@ -144,7 +153,9 @@ export class CameraManager {
       }
     })
 
-    scene.registerBeforeRender(() => { this.onRenderFrame(scene) })
+    scene.registerBeforeRender(() => {
+      this.onRenderFrame(scene)
+    })
     return camera
   }
 
@@ -172,8 +183,7 @@ export class CameraManager {
       const direction = Vector3.rotate(Vector3.create(0, 0, 1), quat)
       this.camera.target = this.camera.position.add(new BABYLON.Vector3(direction.x, direction.y, direction.z))
 
-      if (this.animation.timePassed >= this.animation.duration)
-        this.animation = null
+      if (this.animation.timePassed >= this.animation.duration) this.animation = null
     }
 
     if (this.camera.position.y <= this.minY) {
