@@ -97,7 +97,7 @@ export function setupEngine(engine: BABYLON.Engine, canvas: HTMLCanvasElement, p
   const editorColor = BABYLON.Color3.FromHexString('#17141B')
   const editorEnvHelper = scene.createDefaultEnvironment({
     groundColor: editorColor,
-    skyboxColor: editorColor,
+    skyboxColor: new BABYLON.Color3(0.1, 0.5, 0.99),
     skyboxSize: 1000,
     groundSize: 1000
   })!
