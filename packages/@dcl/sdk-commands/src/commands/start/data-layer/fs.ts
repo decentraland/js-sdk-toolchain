@@ -13,10 +13,10 @@ export function pathToPosix(value: string): string {
 export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliComponents, 'fs'>): FileSystemInterface {
   return {
     dirname(value: string): string {
-      return pathToPosix(path.dirname(pathToPosix(value)))
+      return pathToPosix(path.dirname(value))
     },
     basename(value: string): string {
-      return pathToPosix(path.basename(pathToPosix(value)))
+      return pathToPosix(path.basename(value))
     },
     join(...paths: string[]): string {
       return path.join(...paths)

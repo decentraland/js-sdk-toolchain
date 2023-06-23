@@ -1,3 +1,4 @@
+import path from 'path'
 import {
   createFileSystemInterfaceFromFsComponent,
   pathToPosix
@@ -32,24 +33,31 @@ describe('FsInterface', () => {
     test('[Win] should return the directory name of the given path', () => {
       const input = 'scene\\assets\\main.composite'
       const expectedOutput = 'scene/assets'
+      const dirname = path.dirname
+      path.dirname = path.win32.dirname
       expect(fsInterface.dirname(input)).toEqual(expectedOutput)
+      path.dirname = dirname
     })
 
-    test('should return an empty string if the path is a file name', () => {
+    test('should return a . if the path is a file name', () => {
       const input = 'main.composite'
       const expectedOutput = '.'
       expect(fsInterface.dirname(input)).toEqual(expectedOutput)
     })
   })
 
-  describe.only('basename', () => {
-    test('should return the base name of the given path', () => {
-      const input = 'scene/assets/main.composite'
-      const expectedOutput = 'main.composite'
-      expect(fsInterface.basename(input)).toEqual(expectedOutput)
-    })
+  describe('basename', () => {
     test('[Win] should return the base name of the given path', () => {
       const input = 'scene\\assets\\main.composite'
+      const expectedOutput = 'main.composite'
+      const basename = path.basename
+      path.basename = path.win32.basename
+      expect(fsInterface.basename(input)).toEqual(expectedOutput)
+      path.basename = basename
+    })
+
+    test('should return the base name of the given path', () => {
+      const input = 'scene/assets/main.composite'
       const expectedOutput = 'main.composite'
       expect(fsInterface.basename(input)).toEqual(expectedOutput)
     })

@@ -53,8 +53,12 @@ lint-packages:
 lint-fix: sync-deps
 	node_modules/.bin/eslint . --ext .ts,.tsx --fix
 
-TESTARGS ?= test/
 test:
+	node_modules/.bin/jest --detectOpenHandles --colors test/
+	make test-inspector
+
+TESTARGS ?= test/
+test-ecs:
 	node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS)
 
 test-inspector:
