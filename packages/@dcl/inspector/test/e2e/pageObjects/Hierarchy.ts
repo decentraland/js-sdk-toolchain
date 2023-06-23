@@ -18,7 +18,7 @@ class HierarchyPageObject {
     await dragAndDrop(this.getItemSelector(entityId), this.getItemSelector(parent))
   }
 
-  async isParent(entityId: number, parent: number) {
+  async isAncestor(entityId: number, parent: number) {
     const item = await page.$(`.Hierarchy .Tree[data-test-id="${parent}"] .Tree[data-test-id="${entityId}"] .item`)
     return item !== null
   }
@@ -37,12 +37,43 @@ class HierarchyPageObject {
 
   async getLabel(entityId: number) {
     const item = await this.getItem(entityId)
-    return item.evaluate((el) => el.textContent)
+    const label = await item.evaluate((el) => el.textContent)
+    return label || ''
   }
 
-  async hasLabel(entityId: number, label: string) {
-    const _label = await this.getLabel(entityId)
-    return _label === label
+  async rename(entityId: number, newLabel: string) {
+    const item = await this.getItem(entityId)
+    await item.click({ button: 'right' })
+    const rename = await item.$('.contexify_item[itemid="rename"')
+    if (!rename) {
+      throw new Error(`Can't rename entity with id=${entityId}`)
+    }
+    await rename.click()
+    const label = await this.getLabel(entityId)
+    for (let i = 0; i < label.length; i++) {
+      await page.keyboard.press('Backspace')
+    }
+    await page.keyboard.type(newLabel)
+    await page.keyboard.press('Enter')
+  }
+
+  async remove(entityId: number) {
+    const item = await this.getItem(entityId)
+    await item.click({ button: 'right' })
+    const remove = await item.$('.contexify_item[itemid="delete"')
+    if (!remove) {
+      throw new Error(`Can't delete entity with id=${entityId}`)
+    }
+    await remove.click()
+  }
+
+  async exists(entityId: number) {
+    try {
+      await this.getItem(entityId)
+      return true
+    } catch (error) {
+      return false
+    }
   }
 }
 
