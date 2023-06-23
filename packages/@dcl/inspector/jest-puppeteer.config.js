@@ -1,6 +1,7 @@
 module.exports = {
   launch: {
-    headless: 'new' // Change this to false to run the test on regular Chrome
+    headless: false, // Change this to false to run the test on regular Chrome
+    // slowMo: 100
   },
   server: {
     command: "npm start",
