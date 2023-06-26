@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../store'
-import { InspectorPreferences, getDefaultInspectorPreferences } from '../../lib/logic/preferences/types'
+import { InspectorPreferences } from '../../lib/logic/preferences/types'
 
 export interface AppState {
   canSave: boolean
@@ -30,11 +30,7 @@ export const appState = createSlice({
 
 export const { updateCanSave, updatePreferences } = appState.actions
 export const getCanSave = (state: RootState): boolean => state.app.canSave
-export const getInspectorPreferences = (state: RootState): InspectorPreferences => {
-  if (!state.app.preferences) {
-    // TODO: send to sentry
-    return getDefaultInspectorPreferences()
-  }
+export const getInspectorPreferences = (state: RootState): InspectorPreferences | undefined => {
   return state.app.preferences
 }
 

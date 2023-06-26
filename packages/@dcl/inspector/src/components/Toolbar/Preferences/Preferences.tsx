@@ -24,19 +24,19 @@ export const Preferences = withSdk(({ sdk }) => {
   const toggleFreeCameraInvertRotation = useCallback(() => {
     dispatch(
       setInspectorPreferences({
-        freeCameraInvertRotation: !preferences.freeCameraInvertRotation
+        freeCameraInvertRotation: !preferences?.freeCameraInvertRotation
       })
     )
     // TODO: this should be done by the saga but we dont have the sdk.editorCamera on the store
-    sdk.editorCamera.setFreeCameraInvertRotation(!preferences.freeCameraInvertRotation)
-  }, [preferences.freeCameraInvertRotation])
+    sdk.editorCamera.setFreeCameraInvertRotation(!preferences?.freeCameraInvertRotation)
+  }, [preferences?.freeCameraInvertRotation])
 
   const toggleAutosaveEnabled = useCallback(() => {
-    dispatch(setInspectorPreferences({ autosaveEnabled: !preferences.autosaveEnabled }))
-  }, [preferences.autosaveEnabled])
+    dispatch(setInspectorPreferences({ autosaveEnabled: !preferences?.autosaveEnabled }))
+  }, [preferences?.autosaveEnabled])
 
-  const FreeCameraInvertRotationIcon = preferences.freeCameraInvertRotation ? BiCheckboxChecked : BiCheckbox
-  const AutosaveEnabledIcon = preferences.autosaveEnabled ? BiCheckboxChecked : BiCheckbox
+  const FreeCameraInvertRotationIcon = preferences?.freeCameraInvertRotation ? BiCheckboxChecked : BiCheckbox
+  const AutosaveEnabledIcon = preferences?.autosaveEnabled ? BiCheckboxChecked : BiCheckbox
 
   return (
     <div className="Preferences" ref={ref}>
