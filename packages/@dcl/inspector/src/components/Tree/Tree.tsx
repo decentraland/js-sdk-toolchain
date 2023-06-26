@@ -27,6 +27,7 @@ type Props<T> = {
   canDuplicate?: (value: T) => boolean
   onSetOpen: (value: T, isOpen: boolean) => void
   onSelect: (value: T) => void
+  onDoubleSelect?: (value: T) => void
   onSetParent: (value: T, parent: T) => void
   onRename: (value: T, label: string) => void
   onAddChild: (value: T, label: string) => void
@@ -67,6 +68,7 @@ export function Tree<T>() {
         onAddChild,
         onRemove,
         onDuplicate,
+        onDoubleSelect,
         onSetOpen,
         getDragContext = () => ({}),
         dndType = 'tree'
@@ -108,8 +110,9 @@ export function Tree<T>() {
       const quitEditMode = () => setEditMode(false)
       const quitInsertMode = () => setInsertMode(false)
 
-      const handleSelect = (_: React.MouseEvent) => {
+      const handleSelect = (event: React.MouseEvent) => {
         onSelect(value)
+        if (event.detail > 1 && onDoubleSelect) onDoubleSelect(value)
       }
 
       const handleOpen = (_: React.MouseEvent) => {

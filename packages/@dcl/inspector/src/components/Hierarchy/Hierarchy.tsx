@@ -35,7 +35,8 @@ const Hierarchy: React.FC = () => {
     isHidden,
     canRename,
     canRemove,
-    canDuplicate
+    canDuplicate,
+    centerViewOnEntity
   } = useTree()
   const selectedEntity = useSelectedEntity()
 
@@ -55,6 +56,7 @@ const Hierarchy: React.FC = () => {
         onRemove={remove}
         onRename={rename}
         onSelect={select}
+        onDoubleSelect={centerViewOnEntity}
         onSetOpen={setOpen}
         onDuplicate={duplicate}
         getId={getId}
