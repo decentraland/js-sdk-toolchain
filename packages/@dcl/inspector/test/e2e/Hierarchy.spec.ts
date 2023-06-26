@@ -4,9 +4,8 @@ import { installMouseHelper } from './utils/install-mouse-helper'
 
 describe('Hierarchy', () => {
   beforeAll(async () => {
-    await installMouseHelper(page)
+    await installMouseHelper()
     await page.goto('http://localhost:8000')
-    await page.waitForNetworkIdle()
     await App.waitUntilReady()
   }, 100000)
 
