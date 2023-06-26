@@ -25,7 +25,7 @@ enum DirtyEnum {
 
 async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, path: string): Promise<CompositeManager> {
   if (!(await fs.existFile(path))) {
-    await fs.writeFile(path, Buffer.from(JSON.stringify(getMinimalComposite()), 'utf-8'))
+    await fs.writeFile(path, Buffer.from(JSON.stringify(getMinimalComposite(), null, 2), 'utf-8'))
   }
 
   const compositeProvider = await createFsCompositeProvider(fs)

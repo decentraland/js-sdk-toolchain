@@ -2,13 +2,21 @@ import { FileSystemInterface } from '@dcl/inspector'
 import path from 'path'
 import { CliComponents } from '../../../components'
 
+/**
+ * Convert paths to posix stlye
+ * .i.e: scene\\assets\\main.composite -> scene/assets/main.composite
+ */
+export function pathToPosix(value: string): string {
+  return value.replace(/\\/g, '/')
+}
+
 export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliComponents, 'fs'>): FileSystemInterface {
   return {
-    dirname(_path: string): string {
-      return path.dirname(_path)
+    dirname(value: string): string {
+      return pathToPosix(path.dirname(value))
     },
-    basename(_path: string): string {
-      return path.basename(_path)
+    basename(value: string): string {
+      return pathToPosix(path.basename(value))
     },
     join(...paths: string[]): string {
       return path.join(...paths)
@@ -40,13 +48,13 @@ export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliCompone
       const result = await fs.readdir(resolvedPath)
       return Promise.all(
         result.map(async (name) => ({
-          name: name,
+          name: pathToPosix(name),
           isDirectory: await fs.directoryExists(path.resolve(dirPath, name))
         }))
       )
     },
     cwd(): string {
-      return path.basename(process.cwd())
+      return pathToPosix(path.basename(process.cwd()))
     }
   }
 }
