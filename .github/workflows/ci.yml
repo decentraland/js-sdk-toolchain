@@ -64,6 +64,10 @@ jobs:
         with:
           fail_ci_if_error: false # optional (default = false)
           verbose: true # optional (default = false)
+      - name: test-inspector E2E
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
+        run: make test-inspector-e2e
       - name: prepare releasable packages
         run: make prepare
   build:
