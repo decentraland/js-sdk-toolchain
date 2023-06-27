@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 
 import { AssetCatalogResponse } from '../../tooling-entrypoint'
 import { buildAssetTree } from '../../components/ProjectAssetExplorer/utils'
-import { removeBasePath } from './useFileSystem'
+import { removeBasePath } from '../../lib/logic/remove-base-path'
 
 /* istanbul ignore next */
 export const useAssetTree = (files: AssetCatalogResponse) => {

@@ -2,29 +2,35 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../../redux/store'
 import { DataLayerRpcClient } from '../../lib/data-layer/types'
 import { InspectorPreferences } from '../../lib/logic/preferences/types'
+import { Asset, ImportAssetRequest } from '../../lib/data-layer/remote-data-layer'
 
 export enum ErrorType {
   Disconnected = 'disconnected',
   Reconnecting = 'reconnecting',
   Save = 'save',
   GetPreferences = 'get-preferences',
-  SetPreferences = 'set-preferences'
+  SetPreferences = 'set-preferences',
+  GetAssetCatalog = 'get-asset-catalog',
+  Undo = 'undo',
+  Redo = 'redo',
+  ImportAsset = 'import-asset',
+  RemoveAsset = 'remove-asset'
 }
 
 let dataLayerInterface: DataLayerRpcClient | undefined
 export type IDataLayer = Readonly<DataLayerRpcClient | undefined>
+
+// We cant serialize this Client because it has methods
 export function getDataLayerInterface(): IDataLayer {
   return dataLayerInterface
 }
 
 export interface DataLayerState {
-  dataLayer: DataLayerRpcClient | undefined
   reconnectAttempts: number
   error: ErrorType | undefined
 }
 
 export const initialState: DataLayerState = {
-  dataLayer: undefined,
   reconnectAttempts: 0,
   error: undefined
 }
@@ -40,12 +46,10 @@ export const dataLayer = createSlice({
     reconnect: (state) => {
       console.log('[WS] Reconnecting')
       state.error = ErrorType.Reconnecting
-      state.dataLayer = undefined
       dataLayerInterface = undefined
     },
-    connected: (state, { payload }: PayloadAction<{ dataLayer: DataLayerState['dataLayer'] }>) => {
+    connected: (state, { payload }: PayloadAction<{ dataLayer: IDataLayer }>) => {
       console.log('[WS] Connected')
-      state.dataLayer = payload.dataLayer
       dataLayerInterface = payload.dataLayer
       state.reconnectAttempts = 0
       state.error = undefined
@@ -56,13 +60,34 @@ export const dataLayer = createSlice({
     },
     save: () => {},
     getInspectorPreferences: () => {},
-    setInspectorPreferences: (_state, _payload: PayloadAction<Partial<InspectorPreferences>>) => {}
+    setInspectorPreferences: (_state, _payload: PayloadAction<Partial<InspectorPreferences>>) => {},
+    getAssetCatalog: () => {},
+    undo: () => {},
+    redo: () => {},
+    importAsset: (_state, _payload: PayloadAction<ImportAssetRequest>) => {},
+    removeAsset: (_state, _payload: PayloadAction<Asset>) => {}
   }
 })
-export const { connect, connected, reconnect, error, save, getInspectorPreferences, setInspectorPreferences } =
-  dataLayer.actions
-export const getError = (state: RootState) => state.dataLayer.error
-export const getDataLayer = (state: RootState) => state.dataLayer.dataLayer
-export const getDataLayerReconnectAttempts = (state: RootState) => state.dataLayer.reconnectAttempts
 
+// Actions
+export const {
+  connect,
+  connected,
+  reconnect,
+  error,
+  save,
+  getInspectorPreferences,
+  setInspectorPreferences,
+  getAssetCatalog,
+  undo,
+  redo,
+  importAsset,
+  removeAsset
+} = dataLayer.actions
+
+// Selectors
+export const selectDataLayerError = (state: RootState) => state.dataLayer.error
+export const selectDataLayerReconnectAttempts = (state: RootState) => state.dataLayer.reconnectAttempts
+
+// Reducer
 export default dataLayer.reducer

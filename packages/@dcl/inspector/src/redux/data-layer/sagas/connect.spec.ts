@@ -6,7 +6,7 @@ import { connectSaga, createSocketChannel, createWebSocketConnection, getWsUrl }
 import { WebSocketTransport } from '@dcl/rpc/dist/transports/WebSocket'
 import { RpcClient, RpcClientPort, Transport, createRpcClient } from '@dcl/rpc'
 import { DataLayerRpcClient } from '../../../lib/data-layer/types'
-import reducer, { connected, reconnect } from '..'
+import reducer, { connected, getDataLayerInterface, reconnect } from '..'
 import { createLocalDataLayerRpcClient } from '../../../lib/data-layer/client/local-data-layer'
 import { call } from 'redux-saga/effects'
 
@@ -14,7 +14,7 @@ describe('WebSocket Connection Saga', () => {
   it('Should create LOCAL data-layer if no ws url is provided', async () => {
     const dataLayer = { boedo: 'casla' } as any as DataLayerRpcClient
 
-    return expectSaga(connectSaga)
+    await expectSaga(connectSaga)
       .withReducer(reducer)
       .provide([
         [call(getWsUrl), undefined],
@@ -22,11 +22,11 @@ describe('WebSocket Connection Saga', () => {
       ])
       .put(connected({ dataLayer }))
       .hasFinalState({
-        dataLayer,
         error: undefined,
         reconnectAttempts: 0
       })
       .run()
+    expect(getDataLayerInterface()).toBe(dataLayer)
   })
 
   it('Should create remote data-layer with Ws', async () => {

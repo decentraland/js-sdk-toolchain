@@ -8,15 +8,16 @@ import { Container } from '../Container'
 import { TextField } from '../EntityInspector/TextField'
 import { Block } from '../Block'
 import Button from '../Button'
-import { removeBasePath, useFileSystem } from '../../hooks/catalog/useFileSystem'
+import { removeBasePath } from '../../lib/logic/remove-base-path'
 
 import { GLTFValidation } from '@babylonjs/loaders'
 
 import './ImportAsset.css'
 import classNames from 'classnames'
-import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
-import { getDataLayer } from '../../redux/data-layer'
-import { useAppSelector } from '../../redux/hooks'
+import { DIRECTORY, withAssetDir } from '../../lib/data-layer/host/fs-utils'
+import { importAsset } from '../../redux/data-layer'
+import { useAppDispatch, useAppSelector } from '../../redux/hooks'
+import { selectAssetCatalog } from '../../redux/app'
 
 const ONE_MB_IN_BYTES = 1_048_576
 const ONE_GB_IN_BYTES = ONE_MB_IN_BYTES * 1024
@@ -62,13 +63,14 @@ async function validateGltf(data: ArrayBuffer): Promise<ValidationError> {
 
 const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
   // TODO: multiple files
-  const dataLayer = useAppSelector(getDataLayer)
+  const dispatch = useAppDispatch()
+  const files = useAppSelector(selectAssetCatalog)
 
   const [file, setFile] = useState<File>()
   const [validationError, setValidationError] = useState<ValidationError>(null)
   const [assetName, setAssetName] = useState<string>('')
   const [assetExtension, setAssetExtension] = useState<string>('')
-  const [{ basePath, assets }] = useFileSystem()
+  const { basePath, assets } = files ?? { basePath: '', assets: [] }
 
   const handleDrop = async (acceptedFiles: File[]) => {
     // TODO: handle zip file. GLB with multiple external image references
@@ -103,13 +105,13 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
       const content: Map<string, Uint8Array> = new Map()
       content.set(assetName + '.' + assetExtension, new Uint8Array(binary))
 
-      const basePath = withAssetDir((await dataLayer!.getProjectData({})).path)
-
-      await dataLayer?.importAsset({
-        content,
-        basePath,
-        assetPackageName: ''
-      })
+      dispatch(
+        importAsset({
+          content,
+          basePath: withAssetDir(DIRECTORY.SCENE),
+          assetPackageName: ''
+        })
+      )
       onSave()
     }
     reader.readAsArrayBuffer(file)

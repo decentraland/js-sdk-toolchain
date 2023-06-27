@@ -5,7 +5,6 @@ import { AssetsTab } from './types'
 import { FolderOpen } from '../Icons/Folder'
 import { MdImageSearch } from 'react-icons/md'
 import { HiOutlinePlus } from 'react-icons/hi'
-import { fileSystemEvent } from '../../hooks/catalog/useFileSystem'
 import { useCatalog } from '../../hooks/catalog/useCatalog'
 import { AssetsCatalog } from '../AssetsCatalog'
 import { ProjectAssetExplorer } from '../ProjectAssetExplorer'
@@ -23,12 +22,6 @@ function Assets() {
     },
     [tab]
   )
-
-  const handleSave = useCallback(() => {
-    setTab(AssetsTab.FileSystem)
-    fileSystemEvent.emit('change')
-  }, [])
-
   return (
     <div className="Assets">
       <div className="Assets-buttons">
@@ -55,7 +48,7 @@ function Assets() {
           <AssetsCatalog catalog={catalog} error={catalogError} isLoading={isCatalogLoading} />
         )}
         {tab === AssetsTab.FileSystem && <ProjectAssetExplorer />}
-        {tab === AssetsTab.Import && <ImportAsset onSave={handleSave} />}
+        {tab === AssetsTab.Import && <ImportAsset onSave={handleTabClick(AssetsTab.FileSystem)} />}
       </div>
     </div>
   )

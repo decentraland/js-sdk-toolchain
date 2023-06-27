@@ -3,7 +3,6 @@ import { Entity } from '@dcl/ecs'
 import { IoIosImage } from 'react-icons/io'
 
 import { useSdk } from '../../hooks/sdk/useSdk'
-import { fileSystemEvent } from '../../hooks/catalog/useFileSystem'
 import { Tile } from './Tile'
 import { Tree } from '../Tree'
 import { Modal } from '../Modal'
@@ -13,8 +12,8 @@ import { AssetNode, AssetNodeFolder } from './types'
 import { getFullNodePath } from './utils'
 import Search from '../Search'
 import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
-import { getDataLayer } from '../../redux/data-layer'
-import { useAppSelector } from '../../redux/hooks'
+import { removeAsset } from '../../redux/data-layer'
+import { useAppDispatch } from '../../redux/hooks'
 
 function noop() {}
 
@@ -38,8 +37,7 @@ const FilesTree = Tree<string>()
 
 function ProjectView({ folders }: Props) {
   const sdk = useSdk()
-  const dataLayer = useAppSelector(getDataLayer)
-
+  const dispatch = useAppDispatch()
   const [open, setOpen] = useState(new Set<string>())
   const [modal, setModal] = useState<ModalState | undefined>(undefined)
   const [lastSelected, setLastSelected] = useState<string>()
@@ -143,23 +141,14 @@ function ProjectView({ folders }: Props) {
       if (entitiesWithAsset.length) {
         return setModal({ isOpen: true, value: path, entities: entitiesWithAsset })
       }
-      await removeAsset(path)
+      dispatch(removeAsset({ path }))
     },
     [open, setOpen, selectedTreeNode, lastSelected]
   )
 
-  const removeAsset = useCallback(
-    async (path: string, _: Entity[] = []) => {
-      if (!dataLayer) return
-      await dataLayer.removeAsset({ path })
-      fileSystemEvent.emit('change')
-    },
-    [dataLayer]
-  )
-
   const handleConfirm = useCallback(async () => {
     if (!modal) return
-    await removeAsset(modal.value, modal.entities)
+    dispatch(removeAsset({ path: modal.value }))
     setModal(undefined)
   }, [modal, setModal])
 

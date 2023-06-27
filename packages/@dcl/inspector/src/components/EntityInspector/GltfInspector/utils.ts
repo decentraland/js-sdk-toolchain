@@ -5,7 +5,7 @@ import { TreeNode } from '../../ProjectAssetExplorer/ProjectView'
 import { isAssetNode } from '../../ProjectAssetExplorer/utils'
 import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
 import { AssetCatalogResponse } from '../../../tooling-entrypoint'
-import { removeBasePath } from '../../../hooks/catalog/useFileSystem'
+import { removeBasePath } from '../../../lib/logic/remove-base-path'
 
 export const fromGltf = (base: string) => (value: PBGltfContainer) => {
   return { src: removeBasePath(base, value.src) }

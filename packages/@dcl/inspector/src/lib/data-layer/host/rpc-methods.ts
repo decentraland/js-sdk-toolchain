@@ -118,11 +118,6 @@ export async function initRpcMethods(
       inspectorPreferences = req
       await fs.writeFile(INSPECTOR_PREFERENCES_PATH, serializeInspectorPreferences(req))
       return {}
-    },
-    async getProjectData() {
-      return {
-        path: DIRECTORY.SCENE
-      }
     }
   }
 }

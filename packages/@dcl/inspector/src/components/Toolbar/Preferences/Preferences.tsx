@@ -8,12 +8,12 @@ import { useOutsideClick } from '../../../hooks/useOutsideClick'
 
 import './Preferences.css'
 import { useAppSelector, useAppDispatch } from '../../../redux/hooks'
-import { getInspectorPreferences } from '../../../redux/app'
+import { selectInspectorPreferences } from '../../../redux/app'
 import { setInspectorPreferences } from '../../../redux/data-layer'
 
 export const Preferences = withSdk(({ sdk }) => {
   const [showPanel, setShowPanel] = useState(false)
-  const preferences = useAppSelector(getInspectorPreferences)
+  const preferences = useAppSelector(selectInspectorPreferences)
   const dispatch = useAppDispatch()
   const togglePanel = useCallback(() => {
     setShowPanel(!showPanel)

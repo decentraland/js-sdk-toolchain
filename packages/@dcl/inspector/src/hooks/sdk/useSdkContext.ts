@@ -4,14 +4,14 @@ import { useCatalog } from '../catalog/useCatalog'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
 import { connect as connectDataLayer } from '../../redux/data-layer'
 import { addEngines } from '../../redux/sdk'
-import { getInspectorPreferences } from '../../redux/app'
+import { selectInspectorPreferences } from '../../redux/app'
 
 /**
  *
  * @returns This hook is only meant to be used by the SdkProvider, use useSdk instead
  */
 export const useSdkContext = () => {
-  const preferences = useAppSelector(getInspectorPreferences)
+  const preferences = useAppSelector(selectInspectorPreferences)
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null)
   const [sdk, setSdk] = useState<SdkContextValue | null>(null)
   const [error, setError] = useState<Error | null>(null)

@@ -16,6 +16,7 @@ import { putSceneComponent } from './editorComponents/scene'
 import { createOperations } from '../../sdk/operations'
 import { createGizmoManager } from './gizmo-manager'
 import { store } from '../../../redux/store'
+import { getDataLayerInterface } from '../../../redux/data-layer'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -124,7 +125,8 @@ export class SceneContext {
   async getFile(src: string): Promise<Uint8Array | null> {
     if (!src) return null
     try {
-      const { dataLayer } = store.getState().dataLayer
+      // TODO: how we handle this with redux ?
+      const dataLayer = getDataLayerInterface()
       if (!dataLayer) return null
       const response = await dataLayer.getAssetData({ path: src })
       return response.data
