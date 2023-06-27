@@ -11,7 +11,6 @@ export function connectCrdtToEngine(
   dataLayerStream: DataLayerRpcClient['crdtStream'],
   engineKey: string
 ) {
-  console.log('BOEDO')
   // <HERE BE DRAGONS (TRANSPORT)>
   const outgoingMessagesStream = new AsyncQueue<CrdtStreamMessage>((_, _action) => {})
 
