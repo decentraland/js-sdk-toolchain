@@ -18,12 +18,13 @@ export const useSdkContext = () => {
   const [catalog] = useCatalog()
   const dispatch = useAppDispatch()
   let sdkInitialized = false
+
   useEffect(() => {
     dispatch(connectDataLayer())
   }, [dispatch])
 
   useEffect(() => {
-    if (!catalog.length || !canvas || !preferences || sdkInitialized) return
+    if (!catalog.length || !canvas || !preferences || sdkInitialized || !!sdk) return
     sdkInitialized = true
     createSdkContext(canvas, catalog, preferences)
       .then((ctx) => {
