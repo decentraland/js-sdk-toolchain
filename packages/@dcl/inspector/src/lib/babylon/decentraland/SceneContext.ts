@@ -15,7 +15,6 @@ import { putTransformComponent } from './sdkComponents/transform'
 import { putSceneComponent } from './editorComponents/scene'
 import { createOperations } from '../../sdk/operations'
 import { createGizmoManager } from './gizmo-manager'
-import { store } from '../../../redux/store'
 import { getDataLayerInterface } from '../../../redux/data-layer'
 
 export type LoadableScene = {
