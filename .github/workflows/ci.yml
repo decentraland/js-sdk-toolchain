@@ -64,12 +64,26 @@ jobs:
         with:
           fail_ci_if_error: false # optional (default = false)
           verbose: true # optional (default = false)
+      - name: prepare releasable packages
+        run: make prepare
+  test-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - name: install npm
+        run: npm i -g npm
+      - name: install
+        run: make install
+      - name: build
+        run: make build
       - name: test-inspector E2E
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
         run: make test-inspector-e2e
-      - name: prepare releasable packages
-        run: make prepare
   build:
     runs-on: ubuntu-latest
     permissions:

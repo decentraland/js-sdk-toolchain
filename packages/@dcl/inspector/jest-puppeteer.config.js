@@ -3,9 +3,5 @@ module.exports = {
     headless: 'new', // Change this to false to run the test on a non-headless Chrome
     // slowMo: 100
   },
-  server: {
-    command: "npm start",
-    port: 8000,
-  },
   browserContext: 'default',
 }

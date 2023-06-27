@@ -65,7 +65,7 @@ test-inspector:
 	cd ./packages/@dcl/inspector/; TS_JEST_TRANSFORMER=true ./../../../node_modules/.bin/jest --coverage --detectOpenHandles --colors --config ./jest.config.js $(FILES)
 
 test-inspector-e2e:
-	cd ./packages/@dcl/inspector/; IS_E2E=true ./../../../node_modules/.bin/jest --detectOpenHandles --colors --config ./jest.config.js $(FILES)
+	bash e2e.bash
 
 test-cli:
 	@rm -rf tmp
