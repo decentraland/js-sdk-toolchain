@@ -45,4 +45,16 @@ describe('Hierarchy', () => {
   test('check it\'s not possible to add another GltfContainer to "gltf"', async () => {
     await expect(Hierarchy.addComponent(516, 'GltfContainer')).rejects.toThrowError()
   }, 100_000)
+  test('delete an entity', async () => {
+    await expect(Hierarchy.exists(516)).resolves.toBe(true)
+    await Hierarchy.remove(516)
+    await expect(Hierarchy.exists(516)).resolves.toBe(false)
+  })
+  test('delete the parent entity with its children', async () => {
+    await expect(Hierarchy.exists(514)).resolves.toBe(true)
+    await expect(Hierarchy.exists(515)).resolves.toBe(true)
+    await Hierarchy.remove(514)
+    await expect(Hierarchy.exists(514)).resolves.toBe(false)
+    await expect(Hierarchy.exists(515)).resolves.toBe(false)
+  }, 100_000)
 })
