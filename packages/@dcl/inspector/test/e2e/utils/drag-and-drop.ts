@@ -83,8 +83,6 @@ export async function dragAndDrop(sourceSelector: string, destinationSelector: s
           clientY: destinationY
         })
       )
-
-      console.log('COCOCO')
     },
     sourceSelector,
     destinationSelector,
