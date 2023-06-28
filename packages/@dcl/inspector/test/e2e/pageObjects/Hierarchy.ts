@@ -13,6 +13,16 @@ class HierarchyPageObject {
     return item
   }
 
+  async getId(label: string) {
+    const id = await page.$eval(`.Hierarchy .Tree[data-test-label="${label}"]`, (element) =>
+      element.getAttribute('data-test-id')
+    )
+    if (!id) {
+      throw new Error(`Could not find entity with label="${label}"`)
+    }
+    return +id
+  }
+
   async setParent(entityId: number, parent: number) {
     await dragAndDrop(this.getItemSelector(entityId), this.getItemSelector(parent))
   }
