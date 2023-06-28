@@ -83,8 +83,10 @@ jobs:
           cache: 'npm'
       - name: install npm
         run: npm i -g npm
-      - name: install
-        run: make install
+      - name: install repo
+        run: npm ci
+      - name: install inspector
+        run: cd packages/@dcl/inspector && npm ci && cd ../../../
       - name: test-inspector E2E
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
