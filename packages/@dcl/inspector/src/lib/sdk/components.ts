@@ -14,17 +14,20 @@ export type Component<T = unknown> = ComponentDefinition<T>
 
 export enum EditorComponentNames {
   Selection = 'inspector::Selection',
-  Scene = 'inspector::Scene'
+  Scene = 'inspector::Scene',
+  Order = 'inspector::Order'
 }
 
 export type EditorComponentsTypes = {
   Selection: { gizmo: GizmoType }
   Scene: { layout: Layout }
+  Order: { level: number }
 }
 
 export type EditorComponents = {
   Selection: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Selection']>
   Scene: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Scene']>
+  Order: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Order']>
 }
 
 export type SdkComponents = {
@@ -72,5 +75,9 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     })
   })
 
-  return { Selection, Scene }
+  const Order = engine.defineComponent(EditorComponentNames.Order, {
+    level: Schemas.Int
+  })
+
+  return { Selection, Scene, Order }
 }
