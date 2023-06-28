@@ -1,10 +1,6 @@
 const useTsJestTransform = process.env['TS_JEST_TRANSFORMER'] !== undefined
 const isE2E = process.env['IS_E2E'] !== undefined
 
-if (isE2E) {
-  console.log('Is E2E')
-}
-
 const transformer = useTsJestTransform ?
   ["ts-jest", {
     tsconfig: "test/tsconfig.json",
