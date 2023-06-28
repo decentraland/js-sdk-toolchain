@@ -27,3 +27,4 @@ public/bundle*
 src/lib/data-layer/proto/gen
 
 !jest.config.js
+!jest-puppeteer.config.js

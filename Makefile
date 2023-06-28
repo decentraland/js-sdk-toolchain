@@ -64,6 +64,12 @@ test-ecs:
 test-inspector:
 	cd ./packages/@dcl/inspector/; TS_JEST_TRANSFORMER=true ./../../../node_modules/.bin/jest --coverage --detectOpenHandles --colors --config ./jest.config.js $(FILES)
 
+test-inspector-e2e:
+	cd ./packages/@dcl/inspector/; IS_E2E=true ./../../../node_modules/.bin/jest --detectOpenHandles --colors --config ./jest.config.js
+
+serve-inspector-static-build:
+	npx http-server packages/@dcl/inspector/public -p 8000
+
 test-cli:
 	@rm -rf tmp
 	@mkdir -p tmp/scene

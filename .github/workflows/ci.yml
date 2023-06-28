@@ -66,6 +66,31 @@ jobs:
           verbose: true # optional (default = false)
       - name: prepare releasable packages
         run: make prepare
+  test-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        id: get-cloudflare-url
+        env:
+          BRANCH: ${{ github.head_ref || github.ref }}
+        with:
+          script: return `${process.env.BRANCH.replaceAll('/', '-').substr(0, 28)}.${context.repo.repo}.pages.dev`
+          result-encoding: string
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - name: install npm
+        run: npm i -g npm
+      - name: install repo
+        run: npm ci
+      - name: install inspector
+        run: cd packages/@dcl/inspector && npm ci && cd ../../../
+      - name: test-inspector E2E
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
+        run: E2E_URL=https://${{steps.get-cloudflare-url.outputs.result}}/inspector make test-inspector-e2e
   build:
     runs-on: ubuntu-latest
     permissions:
