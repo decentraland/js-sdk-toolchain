@@ -67,6 +67,7 @@ jobs:
       - name: prepare releasable packages
         run: make prepare
   test-e2e:
+    needs: [notify_deployment]
     runs-on: ubuntu-latest
     if: ${{ github.ref != 'refs/heads/main' }}
     steps:
