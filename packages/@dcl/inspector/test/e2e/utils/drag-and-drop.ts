@@ -86,7 +86,7 @@ export async function dragAndDrop(sourceSelector: string, destinationSelector: s
     },
     sourceSelector,
     destinationSelector,
-    sourceBox!,
-    destinationBox!
+    sourceBox! as any,
+    destinationBox! as any
   )
 }

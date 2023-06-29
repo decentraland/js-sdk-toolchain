@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDrop } from 'react-dnd'
+import cx from 'classnames'
 import { Vector3 } from '@babylonjs/core'
 
 import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
@@ -137,7 +138,7 @@ const Renderer: React.FC = () => {
   drop(canvasRef)
 
   return (
-    <div className="Renderer">
+    <div className={cx('Renderer', { 'is-loaded': !isLoading, 'is-loading': isLoading })}>
       {isLoading && <Loading />}
       <Warnings />
       <CameraSpeed />

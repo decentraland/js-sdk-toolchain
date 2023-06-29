@@ -25,19 +25,19 @@ function Assets() {
   return (
     <div className="Assets">
       <div className="Assets-buttons">
-        <div onClick={handleTabClick(AssetsTab.FileSystem)}>
+        <div className="tab" onClick={handleTabClick(AssetsTab.FileSystem)} data-test-id={AssetsTab.FileSystem}>
           <div className={cx({ underlined: tab === AssetsTab.FileSystem })}>
             <FolderOpen />
             <span>LOCAL ASSETS</span>
           </div>
         </div>
-        <div onClick={handleTabClick(AssetsTab.AssetsPack)}>
+        <div className="tab" onClick={handleTabClick(AssetsTab.AssetsPack)} data-test-id={AssetsTab.AssetsPack}>
           <div className={cx({ underlined: tab === AssetsTab.AssetsPack })}>
             <MdImageSearch />
             <span>BUILDER ASSETS</span>
           </div>
         </div>
-        <div onClick={handleTabClick(AssetsTab.Import)}>
+        <div className="tab" onClick={handleTabClick(AssetsTab.Import)} data-test-id={AssetsTab.Import}>
           <div>
             <HiOutlinePlus />
           </div>
