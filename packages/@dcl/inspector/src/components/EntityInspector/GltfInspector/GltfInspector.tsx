@@ -9,7 +9,6 @@ import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
-import { useFileSystem } from '../../../hooks/catalog/useFileSystem'
 import { ProjectAssetDrop } from '../../../lib/sdk/drag-drop'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
@@ -17,22 +16,27 @@ import { TextField } from '../TextField'
 import { Props } from './types'
 import { fromGltf, toGltf, isValidInput, getModel } from './utils'
 import { withAssetDir } from '../../../lib/data-layer/host/fs-utils'
+import { useAppSelector } from '../../../redux/hooks'
+import { selectAssetCatalog } from '../../../redux/app'
 
 const DROP_TYPES = ['project-asset-gltf']
 
 export default withSdk<Props>(
   withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
-    const [files, init] = useFileSystem()
+    const files = useAppSelector(selectAssetCatalog)
     const { handleAction } = useContextMenu()
     const { GltfContainer } = sdk.components
 
     const hasGltf = useHasComponent(entity, GltfContainer)
-    const handleInputValidation = useCallback(({ src }: { src: string }) => isValidInput(files, src), [files])
+    const handleInputValidation = useCallback(
+      ({ src }: { src: string }) => !!files && isValidInput(files, src),
+      [files]
+    )
     const { getInputProps, isValid } = useComponentInput(
       entity,
       GltfContainer,
-      fromGltf(files.basePath),
-      toGltf(files.basePath),
+      fromGltf(files?.basePath ?? ''),
+      toGltf(files?.basePath ?? ''),
       handleInputValidation,
       [files]
     )
@@ -78,7 +82,7 @@ export default withSdk<Props>(
             <DeleteIcon /> Delete
           </Item>
         </Menu>
-        <Block label="Path" ref={drop} error={init && !isValid}>
+        <Block label="Path" ref={drop} error={files && !isValid}>
           <TextField type="text" {...inputProps} />
         </Block>
       </Container>

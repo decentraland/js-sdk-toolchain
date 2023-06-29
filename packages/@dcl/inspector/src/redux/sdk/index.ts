@@ -24,7 +24,7 @@ export const sdkEngines = createSlice({
 })
 
 export const { addEngines } = sdkEngines.actions
-export const getEngines = (state: RootState) => ({
+export const selectEngines = (state: RootState) => ({
   inspector: state.sdk.inspectorEngine,
   renderer: state.sdk.rendererEngine
 })

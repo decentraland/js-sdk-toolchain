@@ -1,13 +1,10 @@
 import * as BABYLON from '@babylonjs/core'
-import { ComponentDefinition, CrdtMessageType, Engine, Entity, Transport } from '@dcl/ecs'
+import { ComponentDefinition, CrdtMessageType, Engine, Entity } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import * as Schemas from '@dcl/schemas'
-import { AsyncQueue } from '@well-known-components/pushable-channel'
 import future from 'fp-future'
 
-import { CrdtStreamMessage } from '../../data-layer/proto/gen/data-layer.gen'
 import { createEditorComponents } from '../../sdk/components'
-import { serializeCrdtMessages } from '../../sdk/crdt-logger'
 import { ComponentOperation } from './component-operations'
 import { EcsEntity } from './EcsEntity'
 import { putEntitySelectedComponent } from './editorComponents/selection'
@@ -18,7 +15,7 @@ import { putTransformComponent } from './sdkComponents/transform'
 import { putSceneComponent } from './editorComponents/scene'
 import { createOperations } from '../../sdk/operations'
 import { createGizmoManager } from './gizmo-manager'
-import { store } from '../../../redux/store'
+import { getDataLayerInterface } from '../../../redux/data-layer'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -70,25 +67,6 @@ export class SceneContext {
   constructor(public babylon: BABYLON.Engine, public scene: BABYLON.Scene, public loadableScene: LoadableScene) {
     this.rootNode = new EcsEntity(0 as Entity, this.#weakThis, scene)
     Object.assign(globalThis, { babylon: this.engine })
-  }
-
-  addTransport(stream: AsyncQueue<CrdtStreamMessage>) {
-    const engine = this.engine
-    const transport: Transport = {
-      filter() {
-        return !stream.closed
-      },
-      async send(message) {
-        if (stream.closed) return
-        stream.enqueue({ data: message })
-        if (message.byteLength) {
-          Array.from(serializeCrdtMessages('Babylon>Datalayer', message, engine)).forEach(($) => console.log($))
-        }
-      }
-    }
-    Object.assign(transport, { name: 'BabylonTransportClient' })
-    this.engine.addTransport(transport)
-    return transport
   }
 
   private processEcsChange(entityId: Entity, op: CrdtMessageType, component?: ComponentDefinition<any>) {
@@ -146,7 +124,8 @@ export class SceneContext {
   async getFile(src: string): Promise<Uint8Array | null> {
     if (!src) return null
     try {
-      const { dataLayer } = store.getState().dataLayer
+      // TODO: how we handle this with redux ?
+      const dataLayer = getDataLayerInterface()
       if (!dataLayer) return null
       const response = await dataLayer.getAssetData({ path: src })
       return response.data

@@ -3,10 +3,11 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { combineReducers } from '@reduxjs/toolkit'
 import { Engine } from '@dcl/ecs'
 
-import dataLayerReducer, { initialState as dataLayerState, getDataLayer } from '../../data-layer'
-import sdkReducer, { getEngines, initialState as sdkState } from '../'
+import dataLayerReducer, { initialState as dataLayerState, getDataLayerInterface } from '../../data-layer'
+import sdkReducer, { selectEngines, initialState as sdkState } from '../'
 import { connectStream } from './connect-stream'
 import * as connectStreamEngine from '../../../lib/sdk/connect-stream'
+import { call } from 'redux-saga/effects'
 
 describe('SDK Engines crdt stream', () => {
   it('Should not connect  crdt stream if there is no ws', async () => {
@@ -14,8 +15,8 @@ describe('SDK Engines crdt stream', () => {
     await expectSaga(connectStream)
       .withReducer(combineReducers({ dataLayer: dataLayerReducer, sdk: sdkReducer }))
       .withState({ dataLayer: dataLayerState, sdk: sdkState })
-      .select(getEngines)
-      .select(getDataLayer)
+      .select(selectEngines)
+      .call(getDataLayerInterface)
       .run()
     expect(spy).not.toBeCalled()
   })
@@ -34,9 +35,10 @@ describe('SDK Engines crdt stream', () => {
     }
     await expectSaga(connectStream)
       .withReducer(combineReducers({ dataLayer: dataLayerReducer, sdk: sdkReducer }))
+      .provide([[call(getDataLayerInterface), state.dataLayer.dataLayer]])
       .withState(state)
-      .select(getEngines)
-      .select(getDataLayer)
+      .select(selectEngines)
+      .call(getDataLayerInterface)
       .run()
     expect(spy).toBeCalledTimes(2)
   })

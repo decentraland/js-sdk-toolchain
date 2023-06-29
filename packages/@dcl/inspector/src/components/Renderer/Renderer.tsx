@@ -3,12 +3,11 @@ import { useDrop } from 'react-dnd'
 import { Vector3 } from '@babylonjs/core'
 
 import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
-import { useAppSelector } from '../../redux/hooks'
-import { getDataLayer } from '../../redux/data-layer'
+import { useAppDispatch, useAppSelector } from '../../redux/hooks'
+import { importAsset } from '../../redux/data-layer'
 import { BuilderAsset, DROP_TYPES, IDrop, ProjectAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
 import { useRenderer } from '../../hooks/sdk/useRenderer'
 import { useSdk } from '../../hooks/sdk/useSdk'
-import { useFileSystem } from '../../hooks/catalog/useFileSystem'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 import { snapPosition } from '../../lib/babylon/decentraland/snap-manager'
 import { loadGltf, removeGltf } from '../../lib/babylon/decentraland/sdkComponents/gltf-container'
@@ -22,6 +21,7 @@ import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
 
 import './Renderer.css'
+import { selectAssetCatalog } from '../../redux/app'
 
 const fixedNumber = (val: number) => Math.round(val * 1e2) / 1e2
 
@@ -29,11 +29,11 @@ const Renderer: React.FC = () => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
   useRenderer(() => canvasRef)
   const sdk = useSdk()
-  const dataLayer = useAppSelector(getDataLayer)
-
+  const dispatch = useAppDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const isMounted = useIsMounted()
-  const [files, init] = useFileSystem()
+  const files = useAppSelector(selectAssetCatalog)
+  const init = !!files
 
   useEffect(() => {
     if (sdk && init) {
@@ -88,11 +88,14 @@ const Renderer: React.FC = () => {
       })
     )
 
-    await dataLayer?.importAsset({
-      content: new Map(Object.entries(fileContent)),
-      basePath: withAssetDir(destFolder),
-      assetPackageName
-    })
+    // TODO: review this async/await
+    dispatch(
+      importAsset({
+        content: new Map(Object.entries(fileContent)),
+        basePath: withAssetDir(destFolder),
+        assetPackageName
+      })
+    )
 
     if (!isMounted()) return
     setIsLoading(false)

@@ -35,10 +35,6 @@ message InspectorPreferencesMessage {
   bool autosave_enabled = 2;
 }
 
-message ProjectData {
-  string path = 1;
-}
-
 service DataService {
   rpc CrdtStream(stream CrdtStreamMessage) returns (stream CrdtStreamMessage) {}
   rpc Undo(Empty) returns (UndoRedoResponse) {}
@@ -51,5 +47,4 @@ service DataService {
   rpc Save(Empty) returns (Empty) {}
   rpc GetInspectorPreferences(Empty) returns (InspectorPreferencesMessage) {}
   rpc SetInspectorPreferences(InspectorPreferencesMessage) returns (Empty) {}
-  rpc GetProjectData(Empty) returns (ProjectData) {}
 }

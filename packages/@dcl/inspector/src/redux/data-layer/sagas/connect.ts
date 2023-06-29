@@ -5,7 +5,7 @@ import { call, put, take } from 'redux-saga/effects'
 import { createRpcClient, RpcClient, RpcClientPort, Transport } from '@dcl/rpc'
 import { WebSocketTransport } from '@dcl/rpc/dist/transports/WebSocket'
 
-import { connected, DataLayerState, reconnect } from '../'
+import { connected, IDataLayer, reconnect } from '../'
 import { createLocalDataLayerRpcClient } from '../../../lib/data-layer/client/local-data-layer'
 import { DataServiceDefinition } from '../../..//lib/data-layer/proto/gen/data-layer.gen'
 import { DataLayerRpcClient } from '../../../lib/data-layer/types'
@@ -49,7 +49,7 @@ export function* connectSaga() {
   const wsUrl: string | undefined = yield call(getWsUrl)
 
   if (!wsUrl) {
-    const dataLayer: DataLayerState['dataLayer'] = yield call(createLocalDataLayerRpcClient)
+    const dataLayer: IDataLayer = yield call(createLocalDataLayerRpcClient)
     yield put(connected({ dataLayer }))
     return
   }

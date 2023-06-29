@@ -2,20 +2,20 @@ import { useCallback } from 'react'
 import { BiUndo, BiRedo, BiSave, BiBadgeCheck } from 'react-icons/bi'
 import { RiListSettingsLine } from 'react-icons/ri'
 
-import { fileSystemEvent } from '../../hooks/catalog/useFileSystem'
-import { saveEvent, useSave } from '../../hooks/editor/useSave'
 import { withSdk } from '../../hoc/withSdk'
 import { Gizmos } from './Gizmos'
 import { Preferences } from './Preferences'
 import { ToolbarButton } from './ToolbarButton'
 import './Toolbar.css'
-import { getDataLayer } from '../../redux/data-layer'
-import { useAppSelector } from '../../redux/hooks'
-import { DataLayerRpcClient } from '../../lib/data-layer/types'
+import { save, undo, redo } from '../../redux/data-layer'
+import { selectCanSave } from '../../redux/app'
+import { useAppSelector, useAppDispatch } from '../../redux/hooks'
 
 const Toolbar = withSdk(({ sdk }) => {
-  const dataLayer = useAppSelector(getDataLayer)
-  const [save, isDirty] = useSave()
+  const canSave = useAppSelector(selectCanSave)
+  const dispatch = useAppDispatch()
+
+  // TODO: Remove withSdk
   const handleInspector = useCallback(() => {
     const { debugLayer } = sdk.scene
     if (debugLayer.isVisible()) {
@@ -25,27 +25,23 @@ const Toolbar = withSdk(({ sdk }) => {
     }
   }, [])
 
-  const handleUndoRedo = useCallback(
-    (fn?: DataLayerRpcClient['undo']) => async () => {
-      if (!fn) return
-      const { type } = await fn({})
-      if (type === 'file') {
-        fileSystemEvent.emit('change')
-      }
-      saveEvent.emit('change', true)
-    },
-    [dataLayer]
-  )
+  const handleSaveClick = useCallback(() => dispatch(save()), [])
+  const handleUndo = useCallback(() => dispatch(undo()), [])
+  const handleRedo = useCallback(() => dispatch(redo()), [])
 
   return (
     <div className="Toolbar">
-      <ToolbarButton className="save" onClick={save} title={isDirty ? 'Save changes' : 'All changes saved'}>
-        {isDirty ? <BiSave /> : <BiBadgeCheck />}
+      <ToolbarButton
+        className="save"
+        onClick={canSave ? handleSaveClick : undefined}
+        title={canSave ? 'Save changes' : 'All changes saved'}
+      >
+        {canSave ? <BiSave /> : <BiBadgeCheck />}
       </ToolbarButton>
-      <ToolbarButton className="undo" title="Undo" onClick={handleUndoRedo(dataLayer?.undo)}>
+      <ToolbarButton className="undo" title="Undo" onClick={handleUndo}>
         <BiUndo />
       </ToolbarButton>
-      <ToolbarButton className="redo" title="Redo" onClick={handleUndoRedo(dataLayer?.redo)}>
+      <ToolbarButton className="redo" title="Redo" onClick={handleRedo}>
         <BiRedo />
       </ToolbarButton>
       <Gizmos />

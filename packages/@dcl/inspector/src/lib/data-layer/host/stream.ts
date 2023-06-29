@@ -11,7 +11,6 @@ export function stream(
   addUndoCrdt: () => void
 ): AsyncGenerator<{ data: Uint8Array }> {
   const queue = new AsyncQueue<{ data: Uint8Array }>((_) => {})
-
   const engineSerialized = serializeEngine(ctx.engine)
   // first we send the fully serialized state over the wire
   queue.enqueue({ data: engineSerialized })
@@ -29,20 +28,16 @@ export function stream(
   Object.assign(transport, { name: 'DataLayerHost' })
   ctx.engine.addTransport(transport)
 
-  async function processMessage(message: Uint8Array) {
+  function processMessage(message: Uint8Array) {
     transport.onmessage!(message)
-    await ctx.engine.update(1)
+    void ctx.engine.update(1)
     addUndoCrdt()
-  }
-
-  function closeCallback() {
-    if (!queue.closed) queue.close()
   }
 
   // and lastly wire the new messages from the renderer engine
   consumeAllMessagesInto(stream, processMessage).catch((err) => {
-    console.error('x failed: ', err)
-    closeCallback()
+    console.error('Faile to consume stream from data layer ', err)
+    queue.close()
   })
 
   // Send initial message (engineSerialized)
