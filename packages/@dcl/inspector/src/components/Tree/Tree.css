@@ -4,21 +4,35 @@
   width: 100%;
 }
 
-.Tree {
+.Tree,
+.Tree .item-area {
   margin: 0;
   padding: 0;
+  border-top: 2px solid transparent;
+  border-bottom: 2px solid transparent;
 }
 
-.Tree > div:first-child {
-  padding: 5px 10px;
+.Tree.is-parent.inside,
+.Tree.after > .item > .item-area:first-of-type {
+  border-bottom-color: var(--border-focused);
+}
+
+.Tree.is-parent.inside > .item > .item-area:first-of-type {
+  border-color: transparent;
+}
+
+.Tree.before > .item > .item-area:first-of-type {
+  border-top: 2px solid var(--border-focused);
+}
+
+.Tree .item {
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 20px;
 }
 
-.Tree > div:first-child:hover:not(:has(input)),
+.Tree .item:hover:not(:has(input)),
 .Tree .selected:not(:has(input)) {
   background-color: var(--vscode-accent-blue);
 }
@@ -27,7 +41,7 @@
   display: none;
 }
 
-.Tree > div:first-child > div:not(.contexify) {
+.Tree .item > div:not(.contexify) {
   width: 100%;
   display: flex;
   align-items: center;
@@ -43,11 +57,11 @@
   color: var(--black)
 }
 
-.Tree > .item > div > svg:only-child {
+.Tree .item > div > svg:only-child {
   margin-right: 4px;
 }
 
-.Tree > .item > div > svg:nth-child(2) {
+.Tree .item > div > svg:nth-child(2) {
   margin-right: 4px;
 }
 

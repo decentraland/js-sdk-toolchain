@@ -34,6 +34,14 @@ function generateMinimalComposite({ engine, components }: TempEngine) {
   cubeIdComponent.create(entity)
   components.Name.create(entity, { value: 'Magic Cube' })
 
+  // nodes
+  components.Nodes.create(engine.RootEntity, {
+    value: [
+      { entity: engine.RootEntity, children: [entity] },
+      { entity, children: [] }
+    ]
+  })
+
   // scene
   components.Scene.create(engine.RootEntity, {
     layout: {
@@ -58,9 +66,10 @@ export function generateMainComposite({ engine, components }: TempEngine) {
   // custom component
   const cubeIdComponent = engine.defineComponent('cube-id', {})
 
-  // main box
-
+  // entities
   const entity = engine.addEntity()
+  const gltfEntity = engine.addEntity()
+
   components.Transform.create(entity, { position: { x: 8, y: 1, z: 8 } })
   components.MeshRenderer.setBox(entity)
   cubeIdComponent.create(entity)
@@ -87,7 +96,6 @@ export function generateMainComposite({ engine, components }: TempEngine) {
   })
   components.Name.create(entity, { value: 'Magic Cube' })
 
-  const gltfEntity = engine.addEntity()
   components.Transform.create(gltfEntity, {
     position: {
       x: 4,
@@ -98,6 +106,15 @@ export function generateMainComposite({ engine, components }: TempEngine) {
   components.GltfContainer.create(gltfEntity, { src: 'assets/scene/models/test-glb.glb' })
   cubeIdComponent.create(gltfEntity)
   components.Name.create(gltfEntity, { value: 'Gltf Test' })
+
+  // nodes
+  components.Nodes.create(engine.RootEntity, {
+    value: [
+      { entity: engine.RootEntity, children: [entity, gltfEntity] },
+      { entity, children: [] },
+      { entity: gltfEntity, children: [] }
+    ]
+  })
 
   // scene
   components.Scene.create(engine.RootEntity, {

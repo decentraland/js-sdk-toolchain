@@ -13,6 +13,7 @@ import { FileSystemInterface } from '../../types'
 import { CompositeManager, createFsCompositeProvider } from './fs-composite-provider'
 import { getMinimalComposite } from '../../client/feeded-local-fs'
 import { InspectorPreferences } from '../../../logic/preferences/types'
+import { buildNodesHierarchyIfNotExists } from '../utils/migrations/build-nodes-hierarchy'
 
 enum DirtyEnum {
   // No changes
@@ -21,6 +22,12 @@ enum DirtyEnum {
   Dirty,
   // Changes that need to be sync with the composite
   DirtyAndDump
+}
+
+// TODO: version this as proper migrations...
+function runMigrations(engine: IEngine) {
+  // Build Nodes component value if not exists
+  buildNodesHierarchyIfNotExists(engine)
 }
 
 async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, path: string): Promise<CompositeManager> {
@@ -38,6 +45,8 @@ async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, pa
       getCompositeEntity: (entity: number | Entity) => entity as Entity
     }
   })
+
+  runMigrations(engine)
 
   return compositeProvider
 }

@@ -1,12 +1,24 @@
-import { dragAndDrop } from '../utils/drag-and-drop'
+import { Positions, dragAndDrop } from '../utils/drag-and-drop'
 
 class HierarchyPageObject {
-  getItemSelector(entityId: number) {
+  getParentSelectorById(entityId: number) {
+    return `.Hierarchy .Tree.is-parent[data-test-id="${entityId}"]`
+  }
+
+  getItemSelectorById(entityId: number) {
     return `.Hierarchy .Tree[data-test-id="${entityId}"] .item`
   }
 
-  async getItem(entityId: number) {
-    const item = await page.$(this.getItemSelector(entityId))
+  getItemAreaSelectorById(entityId: number) {
+    return `${this.getItemSelectorById(entityId)} .item-area`
+  }
+
+  getTreeSelectorByLabel(label: string) {
+    return `.Hierarchy .Tree[data-test-label="${label}"]`
+  }
+
+  async getItem(entityId: number, selector: (entityId: number) => string) {
+    const item = await page.$(selector(entityId))
     if (!item) {
       throw new Error(`Could not find entity with id=${entityId}`)
     }
@@ -14,26 +26,43 @@ class HierarchyPageObject {
   }
 
   async getId(label: string) {
-    const id = await page.$eval(`.Hierarchy .Tree[data-test-label="${label}"]`, (element) =>
-      element.getAttribute('data-test-id')
-    )
+    const id = await page.$eval(this.getTreeSelectorByLabel(label), (element) => element.getAttribute('data-test-id'))
     if (!id) {
       throw new Error(`Could not find entity with label="${label}"`)
     }
     return +id
   }
 
-  async setParent(entityId: number, parent: number) {
-    await dragAndDrop(this.getItemSelector(entityId), this.getItemSelector(parent))
+  async getChildrenIds(parent: number, selector: string) {
+    const parentNode = await this.getItem(parent, this.getParentSelectorById)
+    const ids = await parentNode.$$eval(selector, (elements) => {
+      return elements.map(($) => +($.getAttribute('data-test-id') || NaN))
+    })
+    return ids
+  }
+
+  async setParent(entityId: number, parent: number, positions: Positions = { x: 'inside', y: 'inside' }) {
+    await dragAndDrop(this.getItemAreaSelectorById(entityId), this.getItemAreaSelectorById(parent), positions)
   }
 
   async isAncestor(entityId: number, parent: number) {
-    const item = await page.$(`.Hierarchy .Tree[data-test-id="${parent}"] .Tree[data-test-id="${entityId}"] .item`)
+    const item = await page.$(
+      `${this.getParentSelectorById(parent)} ${this.getItemSelectorById(entityId).replace('.Hierarchy', '')}`
+    )
     return item !== null
   }
 
+  async hasChildrenInOrder(parent: number, ...childrenIds: number[]) {
+    const ids = await this.getChildrenIds(parent, '.Tree')
+    if (ids.length !== childrenIds.length) return false
+    for (let i = 0; i < ids.length; i++) {
+      if (ids[i] !== childrenIds[i]) return false
+    }
+    return true
+  }
+
   async addChild(entityId: number, label: string) {
-    const item = await this.getItem(entityId)
+    const item = await this.getItem(entityId, this.getItemSelectorById)
     await item.click({ button: 'right' })
     const addChild = await item.$('.contexify_item[itemid="add-child"')
     if (!addChild) {
@@ -45,13 +74,13 @@ class HierarchyPageObject {
   }
 
   async getLabel(entityId: number) {
-    const item = await this.getItem(entityId)
+    const item = await this.getItem(entityId, this.getItemSelectorById)
     const label = await item.evaluate((el) => el.textContent)
     return label || ''
   }
 
   async rename(entityId: number, newLabel: string) {
-    const item = await this.getItem(entityId)
+    const item = await this.getItem(entityId, this.getItemSelectorById)
     await item.click({ button: 'right' })
     const rename = await item.$('.contexify_item[itemid="rename"')
     if (!rename) {
@@ -67,7 +96,7 @@ class HierarchyPageObject {
   }
 
   async remove(entityId: number) {
-    const item = await this.getItem(entityId)
+    const item = await this.getItem(entityId, this.getItemSelectorById)
     await item.click({ button: 'right' })
     const remove = await item.$('.contexify_item[itemid="delete"')
     if (!remove) {
@@ -78,7 +107,7 @@ class HierarchyPageObject {
 
   async exists(entityId: number) {
     try {
-      await this.getItem(entityId)
+      await this.getItem(entityId, this.getItemSelectorById)
       return true
     } catch (error) {
       return false
@@ -86,7 +115,7 @@ class HierarchyPageObject {
   }
 
   async addComponent(entityId: number, componentName: string) {
-    const item = await this.getItem(entityId)
+    const item = await this.getItem(entityId, this.getItemSelectorById)
     await item.click({ button: 'right' })
     const addComponent = await item.$('.contexify_item[itemid="add-component"')
     if (!addComponent) {

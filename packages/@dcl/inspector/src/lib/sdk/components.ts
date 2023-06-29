@@ -1,5 +1,6 @@
 import {
   ComponentDefinition,
+  Entity,
   IEngine,
   LastWriteWinElementSetComponentDefinition,
   MeshRendererComponentDefinitionExtended,
@@ -11,23 +12,24 @@ import { Layout } from '../utils/layout'
 import { GizmoType } from '../utils/gizmo'
 
 export type Component<T = unknown> = ComponentDefinition<T>
+export type Node = { entity: Entity; children: Entity[] }
 
 export enum EditorComponentNames {
   Selection = 'inspector::Selection',
   Scene = 'inspector::Scene',
-  Order = 'inspector::Order'
+  Nodes = 'inspector::Nodes'
 }
 
 export type EditorComponentsTypes = {
   Selection: { gizmo: GizmoType }
   Scene: { layout: Layout }
-  Order: { level: number }
+  Nodes: { value: Node[] }
 }
 
 export type EditorComponents = {
   Selection: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Selection']>
   Scene: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Scene']>
-  Order: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Order']>
+  Nodes: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Nodes']>
 }
 
 export type SdkComponents = {
@@ -75,9 +77,14 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     })
   })
 
-  const Order = engine.defineComponent(EditorComponentNames.Order, {
-    level: Schemas.Int
+  const Nodes = engine.defineComponent(EditorComponentNames.Nodes, {
+    value: Schemas.Array(
+      Schemas.Map({
+        entity: Schemas.Entity,
+        children: Schemas.Array(Schemas.Entity)
+      })
+    )
   })
 
-  return { Selection, Scene, Order }
+  return { Selection, Scene, Nodes }
 }

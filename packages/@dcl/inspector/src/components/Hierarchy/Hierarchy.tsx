@@ -36,6 +36,8 @@ const Hierarchy: React.FC = () => {
     canRename,
     canRemove,
     canDuplicate,
+    canDrag,
+    canReorder,
     centerViewOnEntity
   } = useTree()
   const selectedEntity = useSelectedEntity()
@@ -52,7 +54,7 @@ const Hierarchy: React.FC = () => {
         value={ROOT}
         getExtraContextMenu={ContextMenu}
         onAddChild={addChild}
-        onSetParent={setParent}
+        onDrop={setParent}
         onRemove={remove}
         onRename={rename}
         onSelect={select}
@@ -69,6 +71,8 @@ const Hierarchy: React.FC = () => {
         canRename={canRename}
         canRemove={canRemove}
         canDuplicate={canDuplicate}
+        canDrag={canDrag}
+        canReorder={canReorder}
       />
     </div>
   )

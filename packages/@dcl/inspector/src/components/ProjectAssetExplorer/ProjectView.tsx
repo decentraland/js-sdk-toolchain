@@ -204,7 +204,7 @@ function ProjectView({ folders }: Props) {
             className="editor-assets-tree"
             value={ROOT}
             onAddChild={noop}
-            onSetParent={noop}
+            onDrop={noop}
             onRemove={handleRemove}
             onRename={noop}
             onSelect={onSelect}

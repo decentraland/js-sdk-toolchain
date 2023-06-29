@@ -1,9 +1,10 @@
 import { useCallback, useState, useEffect } from 'react'
 import { Entity } from '@dcl/ecs'
 
-import { getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk/tree'
+import { findParent, getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk/tree'
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
+import { DropType } from '../../components/Tree/utils'
 
 /**
  * Used to get a tree and the functions to work with it
@@ -17,10 +18,9 @@ export const useTree = () => {
     if (sdk) {
       const {
         engine,
-        components: { Transform },
-        operations
+        components: { Nodes }
       } = sdk
-      return getTreeFromEngine(engine, operations, Transform)
+      return getTreeFromEngine(engine, Nodes)
     } else {
       return getEmptyTree()
     }
@@ -33,8 +33,6 @@ export const useTree = () => {
     setTree(getTree())
   }, [sdk])
 
-  // Update tree when a change happens in the engine
-  // TODO: are we sure about this ? It seems too expensive 🤔
   const handleUpdate = useCallback(() => setTree(getTree()), [setTree, getTree])
   useChange(handleUpdate)
 
@@ -42,8 +40,7 @@ export const useTree = () => {
 
   const getChildren = useCallback(
     (entity: Entity): Entity[] => {
-      const children = tree.get(entity)
-      return children ? Array.from(children) : []
+      return Array.from(tree.get(entity) || [])
     },
     [tree]
   )
@@ -79,15 +76,36 @@ export const useTree = () => {
     [sdk, handleUpdate]
   )
 
-  const setParent = useCallback(
-    async (entity: Entity, parent: Entity) => {
-      if (entity === ROOT || !sdk) return
-      sdk.operations.setParent(entity, parent)
-      entitiesToggle.add(parent)
-      await sdk.operations.dispatch()
-      handleUpdate()
+  const getNewParent = useCallback(
+    (target: Entity, type: DropType): Entity => {
+      // case 1: dropped inside another entity, always should reparent
+      if (type === 'inside') return target
+
+      // case 2: dropped after a parent entity (same as case #1)
+      const hasChildren = !!tree.get(target)?.size
+      if (hasChildren && type === 'after') return target
+
+      // case 3: dropped before/after an entity inside a different parent
+      const targetParent = findParent(tree, target)
+      return targetParent
     },
-    [sdk, handleUpdate]
+    [sdk, handleUpdate, tree]
+  )
+
+  const setParent = useCallback(
+    async (source: Entity, target: Entity, type: DropType) => {
+      if (source === ROOT || !sdk) return
+
+      const { setParent, reorder, dispatch } = sdk.operations
+      const newParent = getNewParent(target, type)
+
+      setParent(source, newParent)
+      if (type !== 'inside') reorder(source, target, newParent)
+
+      await dispatch()
+      await setOpen(newParent, true)
+    },
+    [sdk, handleUpdate, tree]
   )
 
   const rename = useCallback(
@@ -152,6 +170,12 @@ export const useTree = () => {
   const canRename = isNotRoot
   const canRemove = isNotRoot
   const canDuplicate = isNotRoot
+  const canDrag = isNotRoot
+  const canReorder = useCallback((source: Entity, target: Entity, type: DropType) => {
+    if (source === ROOT) return false
+    if (target === ROOT && type === 'before') return false
+    return true
+  }, [])
 
   return {
     tree,
@@ -170,6 +194,8 @@ export const useTree = () => {
     canRename,
     canRemove,
     canDuplicate,
+    canDrag,
+    canReorder,
     centerViewOnEntity
   }
 }
