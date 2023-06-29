@@ -4,7 +4,7 @@ import { combineReducers } from '@reduxjs/toolkit'
 import { Engine } from '@dcl/ecs'
 
 import dataLayerReducer, { initialState as dataLayerState, getDataLayerInterface } from '../../data-layer'
-import sdkReducer, { getEngines, initialState as sdkState } from '../'
+import sdkReducer, { selectEngines, initialState as sdkState } from '../'
 import { connectStream } from './connect-stream'
 import * as connectStreamEngine from '../../../lib/sdk/connect-stream'
 import { call } from 'redux-saga/effects'
@@ -15,7 +15,7 @@ describe('SDK Engines crdt stream', () => {
     await expectSaga(connectStream)
       .withReducer(combineReducers({ dataLayer: dataLayerReducer, sdk: sdkReducer }))
       .withState({ dataLayer: dataLayerState, sdk: sdkState })
-      .select(getEngines)
+      .select(selectEngines)
       .call(getDataLayerInterface)
       .run()
     expect(spy).not.toBeCalled()
@@ -37,7 +37,7 @@ describe('SDK Engines crdt stream', () => {
       .withReducer(combineReducers({ dataLayer: dataLayerReducer, sdk: sdkReducer }))
       .provide([[call(getDataLayerInterface), state.dataLayer.dataLayer]])
       .withState(state)
-      .select(getEngines)
+      .select(selectEngines)
       .call(getDataLayerInterface)
       .run()
     expect(spy).toBeCalledTimes(2)

@@ -1,11 +1,11 @@
 import { call, select } from 'redux-saga/effects'
 
-import { getEngines } from '..'
+import { selectEngines } from '..'
 import { connectCrdtToEngine } from '../../../lib/sdk/connect-stream'
 import { IDataLayer, getDataLayerInterface } from '../../data-layer'
 
 export function* connectStream() {
-  const engines: ReturnType<typeof getEngines> = yield select(getEngines)
+  const engines: ReturnType<typeof selectEngines> = yield select(selectEngines)
   const dataLayer: IDataLayer = yield call(getDataLayerInterface)
 
   if (!dataLayer || !engines.inspector || !engines.renderer) return
