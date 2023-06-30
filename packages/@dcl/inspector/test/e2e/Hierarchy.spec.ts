@@ -1,15 +1,12 @@
+import { E2E_URL } from './_config'
 import { App } from './pageObjects/App'
 import { Hierarchy } from './pageObjects/Hierarchy'
 import { installMouseHelper } from './utils/install-mouse-helper'
 
-const url = process.env['E2E_URL'] || 'http://localhost:8000'
-
-console.log('Running E2E test on URL:', url)
-
 describe('Hierarchy', () => {
   beforeAll(async () => {
     await installMouseHelper(page)
-    await page.goto(url)
+    await page.goto(E2E_URL)
     await App.waitUntilReady()
   }, 100_000)
 

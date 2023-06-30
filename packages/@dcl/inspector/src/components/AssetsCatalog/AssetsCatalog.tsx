@@ -43,7 +43,7 @@ function ThemeCell({ value, onClick }: ThemeProps) {
   }
 
   return (
-    <div onClick={handleClick} className="theme">
+    <div onClick={handleClick} className="theme" data-test-id={value.id} data-test-label={value.title}>
       <img src={getThemeThumbnailUrl(value.thumbnail)} alt={value.title} />
       <h4>{value.title}</h4>
       <div></div>
@@ -86,7 +86,7 @@ function AssetCell({ value }: AssetProps) {
   const [, drag] = useDrag(() => ({ type: 'builder-asset', item: { value } }), [value])
 
   return (
-    <div ref={drag}>
+    <div className="asset" ref={drag} data-test-id={value.id} data-test-label={value.name}>
       <img src={getStorageUrl(value.thumbnail)} alt={value.tags.join(', ')} />
     </div>
   )
