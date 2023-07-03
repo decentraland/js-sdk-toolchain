@@ -5,10 +5,10 @@ import { CliError } from '../logic/error'
 /**
  * This file imitates "cargo" logs. The words are aligned with the colon like this:
  *        V
- *   Error: some text provided as argumen
- *    Info: some text provided as argumen
- * Success: some text provided as argumen
- * Warning: some text provided as argumen
+ *   Error: some text provided as argument
+ *    Info: some text provided as argument
+ * Success: some text provided as argument
+ * Warning: some text provided as argument
  *        ^
  */
 
