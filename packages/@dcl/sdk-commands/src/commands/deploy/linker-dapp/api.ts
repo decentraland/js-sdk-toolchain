@@ -31,6 +31,7 @@ export interface SceneInfo {
   title?: string
   description?: string
   skipValidations: boolean
+  isPortableExperience: boolean
 }
 
 export async function runLinkerApp(
@@ -110,7 +111,8 @@ async function getSceneInfo(
 ) {
   const {
     scene: { parcels, base },
-    display
+    display,
+    isPortableExperience
   } = scene
 
   return {
@@ -122,6 +124,7 @@ async function getSceneInfo(
     debug: !!process.env.DEBUG,
     title: display?.title,
     description: display?.description,
-    skipValidations
+    skipValidations,
+    isPortableExperience: !!isPortableExperience
   }
 }
