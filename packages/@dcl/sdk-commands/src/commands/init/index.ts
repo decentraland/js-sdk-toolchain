@@ -8,7 +8,7 @@ import { download, extract, isDirectoryEmpty } from '../../logic/fs'
 import { Result } from 'arg'
 import { installDependencies, needsDependencies } from '../../logic/project-validations'
 import { ScaffoldedProject, existScaffoldedProject, getScaffoldedProjectUrl, scaffoldedProjectOptions } from './repos'
-import { augmentProject } from './project'
+import { createPxSceneJson } from './project'
 
 export interface Options {
   args: Result<typeof args>
@@ -69,8 +69,8 @@ export async function main(options: Options) {
   const url = requestedTemplateZipUrl || getScaffoldedProjectUrl(projectTemplate)
   await downloadAndUnzipUrlContainFolder(url, dir, options)
 
-  // augment project when needed
-  if (!requestedTemplateZipUrl) await augmentProject(projectTemplate, dir, options)
+  // replace scene.json for portable experience template...
+  if (projectTemplate === 'px-template') await createPxSceneJson(dir, options.components.fs)
 
   // npm install
   const shouldInstallDeps = await needsDependencies(options.components, dir)
