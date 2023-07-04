@@ -1,9 +1,8 @@
 import path from 'path'
-
-import { SCENE_FILE } from '../../logic/scene-validations'
-import { Options } from '.'
-import { ScaffoldedProject } from './repos'
 import { Scene } from '@dcl/schemas'
+
+import { CliComponents } from '../../components'
+import { SCENE_FILE } from '../../logic/scene-validations'
 
 export function getMinimalSceneJson(): Partial<Scene> & { ecs7: boolean; runtimeVersion: string } {
   return {
@@ -21,16 +20,14 @@ export function getMinimalSceneJson(): Partial<Scene> & { ecs7: boolean; runtime
   }
 }
 
-export async function augmentProject(project: ScaffoldedProject, dest: string, options: Options) {
-  if (project === 'px-template') {
-    const scene = {
-      ...getMinimalSceneJson(),
-      isPortableExperience: true,
-      display: {
-        title: 'SDK7 Portable Experience Scene Template',
-        description: 'portable experience template scene with SDK7'
-      }
+export async function createPxSceneJson(dir: string, fs: CliComponents['fs']) {
+  const scene = {
+    ...getMinimalSceneJson(),
+    isPortableExperience: true,
+    display: {
+      title: 'SDK7 Portable Experience Scene Template',
+      description: 'portable experience template scene with SDK7'
     }
-    await options.components.fs.writeFile(path.resolve(dest, SCENE_FILE), JSON.stringify(scene, null, 2), 'utf-8')
   }
+  await fs.writeFile(path.resolve(dir, SCENE_FILE), JSON.stringify(scene, null, 2), 'utf-8')
 }

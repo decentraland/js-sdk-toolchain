@@ -13,7 +13,7 @@ import { printProgressInfo, printSuccess } from '../../logic/beautiful-logs'
 import { getPackageJson, b64HashingFunction } from '../../logic/project-files'
 import { Events } from '../../components/analytics'
 import { Result } from 'arg'
-import { getAddressAndSignature, getCatalyst } from './utils'
+import { getAddressAndSignature, getCatalyst, sceneHasWorldCfg } from './utils'
 
 interface Options {
   args: Result<typeof args>
@@ -73,7 +73,7 @@ export async function main(options: Options) {
 
   const sceneJson = await getValidSceneJson(options.components, projectRoot)
   const coords = getBaseCoords(sceneJson)
-  const isWorld = !!Object.keys(sceneJson.worldConfiguration || {}).length
+  const isWorld = sceneHasWorldCfg(sceneJson)
   const trackProps: Events['Scene deploy started'] = {
     projectHash: await b64HashingFunction(projectRoot),
     coords,
