@@ -3,6 +3,9 @@ import { createEngineContext } from './utils/engine'
 import { initRpcMethods } from '../host/rpc-methods'
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
 
+export * from './utils/engine'
+export * from './utils/engine-to-composite'
+
 export type DataLayerHost = {
   rpcMethods: DataLayerRpcServer
   engine: IEngine
