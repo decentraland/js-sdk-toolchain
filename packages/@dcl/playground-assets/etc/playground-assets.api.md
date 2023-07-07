@@ -935,7 +935,7 @@ export const enum Font {
 }
 
 // @public
-export function getComponentEntityTree<T>(engine: IEngine, entity: Entity, component: ComponentDefinition<T & {
+export function getComponentEntityTree<T>(engine: Pick<IEngine, 'getEntitiesWith'>, entity: Entity, component: ComponentDefinition<T & {
     parent?: Entity;
 }>): Generator<Entity>;
 
@@ -1036,6 +1036,7 @@ export interface IEngine {
     // (undocumented)
     removeComponentDefinition(componentId: number | string): void;
     removeEntity(entity: Entity): void;
+    removeEntityWithChildren(entity: Entity): void;
     removeSystem(selector: string | SystemFn): boolean;
     readonly RootEntity: Entity;
     seal(): void;
@@ -3229,7 +3230,7 @@ export namespace Rect {
 }
 
 // @public
-export function removeEntityWithChildren(engine: IEngine, entity: Entity): void;
+export function removeEntityWithChildren(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'removeEntity'>, entity: Entity): void;
 
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
