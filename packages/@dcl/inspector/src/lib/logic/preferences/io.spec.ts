@@ -5,7 +5,8 @@ import {
   serializeInspectorPreferences
 } from './io'
 import { getDefaultInspectorPreferences } from './types'
-import { createFsInMemory } from '../in-memory-storage'
+import { createFileSystemInterface } from '../file-system-interface'
+import { createInMemoryStorage } from '../storage/in-memory'
 
 describe('Parsing inspector preferences', () => {
   it('throws InvalidPreferences on malformed JSON', () => {
@@ -42,10 +43,11 @@ describe('Parsing inspector preferences', () => {
 })
 
 describe('Reading preferences file', () => {
-  const memoryFs = createFsInMemory({
+  const storage = createInMemoryStorage({
     goodFile: Buffer.from('{"version": 1, "data": {"freeCameraInvertRotation": true}}'),
     badFile: Buffer.from('{"value":}')
   })
+  const memoryFs = createFileSystemInterface(storage)
 
   it('returns default preferences if file doesnt exist', async () => {
     const preferences = getDefaultInspectorPreferences()
@@ -67,7 +69,8 @@ describe('Reading preferences file', () => {
 })
 
 describe('Writing preferences file', () => {
-  const memoryFs = createFsInMemory({})
+  const storage = createInMemoryStorage({})
+  const memoryFs = createFileSystemInterface(storage)
 
   it('correctly writes preferences to a file', async () => {
     const preferences = {

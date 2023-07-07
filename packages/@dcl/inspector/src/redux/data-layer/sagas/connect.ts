@@ -9,6 +9,7 @@ import { connected, IDataLayer, reconnect } from '../'
 import { createLocalDataLayerRpcClient } from '../../../lib/data-layer/client/local-data-layer'
 import { DataServiceDefinition } from '../../..//lib/data-layer/proto/gen/data-layer.gen'
 import { DataLayerRpcClient } from '../../../lib/data-layer/types'
+import { createIframeDataLayerRpcClient } from '../../../lib/data-layer/client/iframe-data-layer'
 
 export function getWsUrl() {
   const dataLayerWsByQueryParams = new URLSearchParams(window.location.search).get('ws')
@@ -49,7 +50,7 @@ export function* connectSaga() {
   const wsUrl: string | undefined = yield call(getWsUrl)
 
   if (!wsUrl) {
-    const dataLayer: IDataLayer = yield call(createLocalDataLayerRpcClient)
+    const dataLayer: IDataLayer = yield call(createIframeDataLayerRpcClient)
     yield put(connected({ dataLayer }))
     return
   }
