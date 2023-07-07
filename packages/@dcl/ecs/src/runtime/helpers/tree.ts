@@ -37,7 +37,7 @@ function* genEntityTree<T>(entity: Entity, entities: Map<Entity, T & { parent?: 
  * ```
  */
 export function getComponentEntityTree<T>(
-  engine: IEngine,
+  engine: Pick<IEngine, 'getEntitiesWith'>,
   entity: Entity,
   component: ComponentDefinition<T & { parent?: Entity }>
 ): Generator<Entity> {
@@ -51,7 +51,10 @@ export function getComponentEntityTree<T>(
  * @param firstEntity - the root entity of the tree
  * @public
  */
-export function removeEntityWithChildren(engine: IEngine, entity: Entity) {
+export function removeEntityWithChildren(
+  engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'removeEntity'>,
+  entity: Entity
+) {
   const Transform = components.Transform(engine)
   for (const _entity of getComponentEntityTree(engine, entity, Transform)) {
     engine.removeEntity(_entity)

@@ -16,6 +16,7 @@ import {
   createValueSetComponentDefinitionFromSchema,
   ValueSetOptions
 } from './grow-only-value-set-component-definition'
+import { removeEntityWithChildren as removeEntityWithChildrenEngine } from '../runtime/helpers/tree'
 export * from './input'
 export * from './readonly'
 export * from './types'
@@ -47,6 +48,10 @@ function preEngine(): PreEngine {
     }
 
     return entityContainer.removeEntity(entity)
+  }
+
+  function removeEntityWithChildren(entity: Entity) {
+    return removeEntityWithChildrenEngine({ removeEntity, defineComponentFromSchema, getEntitiesWith }, entity)
   }
 
   function registerComponentDefinition(
@@ -219,6 +224,7 @@ function preEngine(): PreEngine {
   return {
     addEntity,
     removeEntity,
+    removeEntityWithChildren,
     addSystem,
     getSystems,
     removeSystem,
@@ -266,6 +272,7 @@ export function Engine(options?: IEngineOptions): IEngine {
   return {
     addEntity: partialEngine.addEntity,
     removeEntity: partialEngine.removeEntity,
+    removeEntityWithChildren: partialEngine.removeEntityWithChildren,
     addSystem: partialEngine.addSystem,
     removeSystem: partialEngine.removeSystem,
     defineComponent: partialEngine.defineComponent,

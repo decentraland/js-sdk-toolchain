@@ -2,7 +2,6 @@ import {
   cyclicParentingChecker,
   getComponentEntityTree,
   MapResult,
-  removeEntityWithChildren,
   RESERVED_STATIC_ENTITIES
 } from '../../packages/@dcl/ecs/src'
 import { Engine, Entity, LastWriteWinElementSetComponentDefinition } from '../../packages/@dcl/ecs/src/engine'
@@ -585,7 +584,7 @@ describe('Engine tests', () => {
     expect(MeshCollider.getOrNull(e_A3)).not.toBeNull()
     expect(MeshCollider.getOrNull(e_A)).not.toBeNull()
 
-    removeEntityWithChildren(engine, e_A)
+    engine.removeEntityWithChildren(e_A)
 
     expect(MeshCollider.getOrNull(e_A1_3)).toBeNull()
     expect(MeshCollider.getOrNull(e_A1_2)).toBeNull()
@@ -630,7 +629,7 @@ describe('Engine tests', () => {
     expect(MeshCollider.getOrNull(e_A)).not.toBeNull()
     expect(MeshCollider.getOrNull(e_recursive)).not.toBeNull()
 
-    removeEntityWithChildren(engine, e_A)
+    engine.removeEntityWithChildren(e_A)
 
     expect(MeshCollider.getOrNull(e_A1_3)).toBeNull()
     expect(MeshCollider.getOrNull(e_A1_2)).toBeNull()

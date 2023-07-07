@@ -47,6 +47,7 @@ export type PreEngine = Pick<
   IEngine,
   | 'addEntity'
   | 'removeEntity'
+  | 'removeEntityWithChildren'
   | 'addSystem'
   | 'removeSystem'
   | 'defineComponent'
@@ -90,6 +91,12 @@ export interface IEngine {
    * @param entity - entity
    */
   removeEntity(entity: Entity): void
+
+  /**
+   * Remove all components of each entity in the tree made with Transform parenting
+   * @param entity - the root entity of the tree
+   */
+  removeEntityWithChildren(entity: Entity): void
 
   /**
    *
