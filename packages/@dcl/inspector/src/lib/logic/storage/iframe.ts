@@ -59,6 +59,7 @@ namespace IframeStorage {
 }
 
 export function createIframeStorage(): Storage {
+  debugger
   if (!window.parent) {
     throw new Error('To use this storage the webapp needs to be inside an iframe')
   }
@@ -67,3 +68,5 @@ export function createIframeStorage(): Storage {
 
   return client
 }
+
+// .......

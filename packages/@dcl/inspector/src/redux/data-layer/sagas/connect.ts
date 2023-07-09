@@ -50,6 +50,7 @@ export function* connectSaga() {
   const wsUrl: string | undefined = yield call(getWsUrl)
 
   if (!wsUrl) {
+    debugger
     const dataLayer: IDataLayer = yield call(createIframeDataLayerRpcClient)
     yield put(connected({ dataLayer }))
     return

@@ -1,3 +1,3 @@
-export { createInMemoryStorage } from './in-memory'
-export { createIframeStorage } from './iframe'
-export { Storage } from './types'
+export * from './in-memory'
+export * from './iframe'
+export * from './types'
