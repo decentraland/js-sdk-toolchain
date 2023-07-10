@@ -51,7 +51,7 @@ export function* connectSaga() {
 
   if (!wsUrl) {
     debugger
-    const dataLayer: IDataLayer = yield call(createIframeDataLayerRpcClient)
+    const dataLayer: IDataLayer = yield call(createIframeDataLayerRpcClient, 'http://localhost:3000')
     yield put(connected({ dataLayer }))
     return
   }

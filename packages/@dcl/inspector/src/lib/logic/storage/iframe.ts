@@ -1,5 +1,5 @@
 import { RPC } from '../rpc'
-import { WindowTransport } from '../transports'
+import { MessageTransport } from '../transports'
 import { Storage } from './types'
 
 namespace IframeStorage {
@@ -31,11 +31,7 @@ namespace IframeStorage {
     [Method.LIST]: { name: string; isDirectory: boolean }[]
   }
 
-  export class Client extends RPC.AbstractRPC<EventType, EventData, Method, Params, Result> {
-    // abstract overrideå
-    handleRequest: undefined
-
-    // actual client
+  export class Client extends RPC<EventType, EventData, Method, Params, Result> {
     readFile(path: string) {
       return this.request(Method.READ_FILE, { path })
     }
@@ -56,17 +52,17 @@ namespace IframeStorage {
       return this.request(Method.LIST, { path })
     }
   }
+
+  export class Server extends RPC<EventType, EventData, Method, Params, Result> {}
 }
 
-export function createIframeStorage(): Storage {
+export function createIframeStorage(origin: string): Storage {
   debugger
   if (!window.parent) {
     throw new Error('To use this storage the webapp needs to be inside an iframe')
   }
-  const transport = new WindowTransport(window.parent)
+  const transport = new MessageTransport(window.parent, origin)
   const client = new IframeStorage.Client(transport)
 
   return client
 }
-
-// .......

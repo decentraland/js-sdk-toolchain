@@ -1,1 +1,1 @@
-export { WindowTransport } from './window'
+export { MessageTransport } from './message'
