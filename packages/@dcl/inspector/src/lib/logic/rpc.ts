@@ -2,7 +2,7 @@ import mitt from 'mitt'
 import future, { IFuture } from 'fp-future'
 
 /**
- * A class to implement RPC server/client or simple event emitters over a transport
+ * A class to implement RPC server/client or simple event emitters over an abstract transport
  */
 
 export class RPC<
