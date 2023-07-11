@@ -13,71 +13,71 @@ export class RPC<
   Result extends Record<Method, any> = Record<Method, any>
 > {
   private currentId = 0
-  private promises = new Map<number, IFuture<any>>()
   private events = mitt<EventData>()
+  private promises = new Map<number, IFuture<any>>()
   private handlers = new Map<Method, (params: Params[Method]) => Promise<Result[Method]>>()
 
-  // this is used during the dispose()
-  private isDisposed = false
-  private previousHandler = this.transport.handler
+  constructor(public id: string, public transport: RPC.Transport) {
+    this.transport.addEventListener('message', this.handler)
+  }
 
-  constructor(public transport: RPC.Transport) {
-    this.transport.handler = async (message) => {
-      if (this.isMessage(message)) {
-        switch (message.type) {
-          case RPC.MessageType.EVENT: {
-            if (this.isEvent(message.payload)) {
-              const event = message.payload
-              this.events.emit(event.type, event.data)
-            }
-            break
+  private handler = async (message: any) => {
+    if (this.isMessage(message)) {
+      switch (message.type) {
+        case RPC.MessageType.EVENT: {
+          if (this.isEvent(message.payload)) {
+            const event = message.payload
+            this.events.emit(event.type, event.data)
           }
-          case RPC.MessageType.REQUEST: {
-            if (this.isRequest(message.payload)) {
-              const request = message.payload
-              try {
-                const handler = this.handlers.get(request.method)
-                if (!handler) {
-                  throw new Error(`Method "${request.method}" not implemented`)
+          break
+        }
+        case RPC.MessageType.REQUEST: {
+          if (this.isRequest(message.payload)) {
+            const request = message.payload
+            try {
+              const handler = this.handlers.get(request.method)
+              if (!handler) {
+                throw new Error(`Method "${request.method}" not implemented`)
+              }
+              const result = await handler(request.params)
+              this.transport.send({
+                id: this.id,
+                type: RPC.MessageType.RESPONSE,
+                payload: {
+                  id: request.id,
+                  method: request.method,
+                  success: true,
+                  result
                 }
-                const result = await handler(request.params)
-                this.transport.send({
-                  type: RPC.MessageType.RESPONSE,
-                  payload: {
-                    id: request.id,
-                    method: request.method,
-                    success: true,
-                    result
-                  }
-                })
-              } catch (error) {
-                this.transport.send({
-                  type: RPC.MessageType.RESPONSE,
-                  payload: {
-                    id: request.id,
-                    method: request.method,
-                    success: false,
-                    error: (error as Error).message
-                  }
-                })
+              })
+            } catch (error) {
+              this.transport.send({
+                id: this.id,
+                type: RPC.MessageType.RESPONSE,
+                payload: {
+                  id: request.id,
+                  method: request.method,
+                  success: false,
+                  error: (error as Error).message
+                }
+              })
+            }
+          }
+          break
+        }
+        case RPC.MessageType.RESPONSE: {
+          if (this.isResponse(message.payload)) {
+            const response = message.payload
+            if (this.promises.has(response.id)) {
+              const promise = this.promises.get(response.id)!
+              if (response.success) {
+                promise.resolve(response.result)
+              } else {
+                promise.reject(new Error(response.error))
               }
             }
-            break
           }
-          case RPC.MessageType.RESPONSE: {
-            if (this.isResponse(message.payload)) {
-              const response = message.payload
-              if (this.promises.has(response.id)) {
-                const promise = this.promises.get(response.id)!
-                if (response.success) {
-                  promise.resolve(response.result)
-                } else {
-                  promise.reject(new Error(response.error))
-                }
-              }
-            }
-            break
-          }
+          break
         }
       }
     }
@@ -89,10 +89,11 @@ export class RPC<
     const messageTypes = Object.values(RPC.MessageType).filter((value) => typeof value === 'string')
     return (
       value &&
+      value.id === this.id &&
       typeof value.type === 'string' &&
       messageTypes.includes(value.type) &&
       typeof value.payload === 'object' &&
-      typeof value.payload !== null
+      value.payload !== null
     )
   }
 
@@ -118,6 +119,7 @@ export class RPC<
 
   emit<T extends EventType>(type: T, data: EventData[T]) {
     this.transport.send({
+      id: this.id,
       type: RPC.MessageType.EVENT,
       payload: {
         type,
@@ -126,11 +128,12 @@ export class RPC<
     })
   }
 
-  async request<T extends Method>(method: T, params: Params[T]) {
+  async request<T extends Method>(method: `${T}`, params: Params[T]) {
     const promise = future<Result[T]>()
     const id = this.currentId++
     this.promises.set(id, promise)
     this.transport.send({
+      id: this.id,
       type: RPC.MessageType.REQUEST,
       payload: {
         id,
@@ -141,25 +144,43 @@ export class RPC<
     return promise
   }
 
-  handle<T extends Method>(method: T, handler: (params: Params[T]) => Promise<Result[T]>) {
-    this.handlers.set(method, handler as (params: Params[Method]) => Promise<Result[T]>)
+  handle<T extends Method>(method: `${T}`, handler: (params: Params[T]) => Promise<Result[T]>) {
+    this.handlers.set(method as T, handler as (params: Params[Method]) => Promise<Result[T]>)
   }
 
   dispose() {
-    if (!this.isDisposed) {
-      this.isDisposed = true
-      this.transport.handler = this.previousHandler!
-    }
+    this.transport.removeEventListener('message', this.handler)
   }
 }
 
 export namespace RPC {
-  export interface Transport {
-    send: (message: any) => void
-    handler?: (message: any) => void
+  export abstract class Transport {
+    abstract send(message: Message): void
+    abstract dispose(): void
+    private events = mitt<Transport.EventData>()
+    emit(type: `${Transport.EventType}`, message: Message) {
+      this.events.emit(type as Transport.EventType, message)
+    }
+    addEventListener(type: `${Transport.EventType}`, handler: Transport.Handler) {
+      this.events.on(type as Transport.EventType, handler)
+    }
+    removeEventListener(type: `${Transport.EventType}`, handler: Transport.Handler) {
+      this.events.off(type as Transport.EventType, handler)
+    }
   }
 
-  export type Message<T extends string, K extends Record<T, any>> = {
+  export namespace Transport {
+    export enum EventType {
+      MESSAGE = 'message'
+    }
+    export type EventData = {
+      [EventType.MESSAGE]: Message
+    }
+    export type Handler = (message: Message) => void
+  }
+
+  export type Message<T extends string = string, K extends Record<T, any> = Record<T, any>> = {
+    id: string
     type: T
     payload: K[T]
   }
@@ -182,15 +203,15 @@ export namespace RPC {
     [MessageType.RESPONSE]: Response<Method, Result>
   }
 
-  export type Event<T extends string, K extends Record<T, any>> = {
-    type: T
-    data: K[T]
+  export type Event<EventType extends string, EventData extends Record<EventType, any>> = {
+    type: EventType
+    data: EventData[EventType]
   }
 
-  export type Request<T extends string, K extends Record<T, any>> = {
+  export type Request<Method extends string, Params extends Record<Method, any>> = {
     id: number
-    method: T
-    params: K[T]
+    method: Method
+    params: Params[Method]
   }
 
   export type Response<Method extends string, Result extends Record<Method, any>> = {

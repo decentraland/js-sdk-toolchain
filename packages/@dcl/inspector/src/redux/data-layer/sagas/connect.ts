@@ -18,6 +18,13 @@ export function getWsUrl() {
   return dataLayerWsByQueryParams || dataLayerWsByGlobalThis || null
 }
 
+export function getParentUrl() {
+  const dataLayerParentByQueryParams = new URLSearchParams(window.location.search).get('parent')
+  const dataLayerParentByGlobalThis = ((globalThis as any).InspectorConfig?.dataLayerRpcParentUrl as string) || null
+
+  return dataLayerParentByQueryParams || dataLayerParentByGlobalThis || null
+}
+
 export function createWebSocketConnection(url: string): WebSocket {
   return new WebSocket(url)
 }
@@ -50,8 +57,13 @@ export function* connectSaga() {
   const wsUrl: string | undefined = yield call(getWsUrl)
 
   if (!wsUrl) {
-    debugger
-    const dataLayer: IDataLayer = yield call(createIframeDataLayerRpcClient, 'http://localhost:3000')
+    const parentUrl: string | null = yield call(getParentUrl)
+    if (!parentUrl) {
+      const dataLayer: IDataLayer = yield call(createLocalDataLayerRpcClient)
+      yield put(connected({ dataLayer }))
+      return
+    }
+    const dataLayer: IDataLayer = yield call(createIframeDataLayerRpcClient, parentUrl)
     yield put(connected({ dataLayer }))
     return
   }

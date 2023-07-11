@@ -2,7 +2,7 @@ import { RPC } from '../rpc'
 import { MessageTransport } from '../transports'
 import { Storage } from './types'
 
-namespace IframeStorage {
+export namespace IframeStorage {
   export type EventType = string
 
   export type EventData = object
@@ -31,37 +31,47 @@ namespace IframeStorage {
     [Method.LIST]: { name: string; isDirectory: boolean }[]
   }
 
+  export const id = 'IframeStorage'
+
   export class Client extends RPC<EventType, EventData, Method, Params, Result> {
+    constructor(transport: RPC.Transport) {
+      super(id, transport)
+    }
+
     readFile(path: string) {
-      return this.request(Method.READ_FILE, { path })
+      return this.request('read_file', { path })
     }
 
     writeFile(path: string, content: Buffer) {
-      return this.request(Method.WRITE_FILE, { path, content })
+      return this.request('write_file', { path, content })
     }
 
     exists(path: string) {
-      return this.request(Method.EXISTS, { path })
+      return this.request('exists', { path })
     }
 
     delete(path: string) {
-      return this.request(Method.DELETE, { path })
+      return this.request('delete', { path })
     }
 
     list(path: string) {
-      return this.request(Method.LIST, { path })
+      return this.request('list', { path })
     }
   }
 
-  export class Server extends RPC<EventType, EventData, Method, Params, Result> {}
+  export class Server extends RPC<EventType, EventData, Method, Params, Result> {
+    constructor(transport: RPC.Transport) {
+      super(id, transport)
+    }
+  }
 }
 
 export function createIframeStorage(origin: string): Storage {
-  debugger
   if (!window.parent) {
     throw new Error('To use this storage the webapp needs to be inside an iframe')
   }
-  const transport = new MessageTransport(window.parent, origin)
+
+  const transport = new MessageTransport(window, window.parent, origin)
   const client = new IframeStorage.Client(transport)
 
   return client
