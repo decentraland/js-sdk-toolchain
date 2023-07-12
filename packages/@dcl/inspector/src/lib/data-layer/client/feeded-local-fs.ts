@@ -9,7 +9,7 @@ import { createEngineContext } from '../host/utils/engine'
 import { createInMemoryStorage } from '../../logic/storage/in-memory'
 import { downloadAssets } from './builder-utils'
 
-function createTempEngineContext() {
+export function createTempEngineContext() {
   const { engine, components } = createEngineContext()
   return {
     engine,
@@ -23,7 +23,7 @@ function createTempEngineContext() {
 
 type TempEngine = ReturnType<typeof createTempEngineContext>
 
-function generateMinimalComposite({ engine, components }: TempEngine) {
+export function generateMinimalComposite({ engine, components }: TempEngine) {
   // custom component
   const cubeIdComponent = engine.defineComponent('cube-id', {})
 
