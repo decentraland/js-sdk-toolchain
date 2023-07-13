@@ -12,7 +12,7 @@
     "@dcl/inspector": "file:../inspector",
     "@dcl/linker-dapp": "0.7.0",
     "@dcl/mini-comms": "1.0.1-20230216163137.commit-a4c75be",
-    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-5457516564.commit-ffe98c1.tgz",
+    "@dcl/protocol": "1.0.0-5543372274.commit-d0ed9f9",
     "@dcl/rpc": "^1.1.1",
     "@dcl/schemas": "^6.11.1",
     "@segment/analytics-node": "^1.0.0-beta.22",
