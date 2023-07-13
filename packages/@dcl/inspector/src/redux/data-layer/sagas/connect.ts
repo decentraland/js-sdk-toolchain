@@ -9,12 +9,20 @@ import { connected, IDataLayer, reconnect } from '../'
 import { createLocalDataLayerRpcClient } from '../../../lib/data-layer/client/local-data-layer'
 import { DataServiceDefinition } from '../../..//lib/data-layer/proto/gen/data-layer.gen'
 import { DataLayerRpcClient } from '../../../lib/data-layer/types'
+import { createIframeDataLayerRpcClient } from '../../../lib/data-layer/client/iframe-data-layer'
 
 export function getWsUrl() {
   const dataLayerWsByQueryParams = new URLSearchParams(window.location.search).get('ws')
   const dataLayerWsByGlobalThis = ((globalThis as any).InspectorConfig?.dataLayerRpcWsUrl as string) || null
 
   return dataLayerWsByQueryParams || dataLayerWsByGlobalThis || null
+}
+
+export function getParentUrl() {
+  const dataLayerParentByQueryParams = new URLSearchParams(window.location.search).get('parent')
+  const dataLayerParentByGlobalThis = ((globalThis as any).InspectorConfig?.dataLayerRpcParentUrl as string) || null
+
+  return dataLayerParentByQueryParams || dataLayerParentByGlobalThis || null
 }
 
 export function createWebSocketConnection(url: string): WebSocket {
@@ -49,7 +57,13 @@ export function* connectSaga() {
   const wsUrl: string | undefined = yield call(getWsUrl)
 
   if (!wsUrl) {
-    const dataLayer: IDataLayer = yield call(createLocalDataLayerRpcClient)
+    const parentUrl: string | null = yield call(getParentUrl)
+    if (!parentUrl) {
+      const dataLayer: IDataLayer = yield call(createLocalDataLayerRpcClient)
+      yield put(connected({ dataLayer }))
+      return
+    }
+    const dataLayer: IDataLayer = yield call(createIframeDataLayerRpcClient, parentUrl)
     yield put(connected({ dataLayer }))
     return
   }
