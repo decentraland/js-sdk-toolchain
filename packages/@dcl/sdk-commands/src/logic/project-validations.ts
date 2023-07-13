@@ -6,10 +6,11 @@ import { printProgressInfo } from './beautiful-logs'
 import { CliError } from './error'
 import { getSceneFilePath, getValidSceneJson } from './scene-validations'
 import { getInstalledPackageVersion } from './config'
+import { getSmartWearableFile, getValidWearableJson } from './portable-experience-sw-validations'
 
 export type BaseProject = { workingDirectory: string }
 export type SceneProject = { kind: 'scene'; scene: Scene } & BaseProject
-export type WearableProject = { kind: 'wearable'; wearable: any } & BaseProject
+export type WearableProject = { kind: 'wearable'; scene: Scene } & BaseProject
 export type ProjectUnion = SceneProject | WearableProject
 
 /**
@@ -25,11 +26,15 @@ export async function assertValidProjectFolder(
 
   // now we will iterate over different file to evaluate the project kind
   switch (true) {
-    // TODO: case wearable
-    // case scene
+    case await components.fs.fileExists(getSmartWearableFile(workingDirectory)): {
+      await getValidWearableJson(components, workingDirectory)
+      return { kind: 'wearable', scene: await getValidSceneJson(components, workingDirectory), workingDirectory }
+    }
+
     case await components.fs.fileExists(getSceneFilePath(workingDirectory)): {
       return { kind: 'scene', scene: await getValidSceneJson(components, workingDirectory), workingDirectory }
     }
+
     default: {
       throw new CliError(
         `UnknownProjectKind: the kind of project of the folder ${workingDirectory} cannot be identified`

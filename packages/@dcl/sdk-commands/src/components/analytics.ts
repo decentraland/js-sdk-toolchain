@@ -53,6 +53,9 @@ export type Events = {
     isWorld: boolean
     error: string
   }
+  'Pack smart wearable': {
+    projectHash: string
+  }
 }
 
 const noopAnalytics: IAnalyticsComponent = {
