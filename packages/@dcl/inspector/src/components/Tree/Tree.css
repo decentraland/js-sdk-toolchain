@@ -8,8 +8,12 @@
 .Tree .item-area {
   margin: 0;
   padding: 0;
-  border-top: 2px solid transparent;
-  border-bottom: 2px solid transparent;
+  border-top: 2px solid var(--transparent);
+  border-bottom: 2px solid var(--transparent);
+}
+
+.Tree.inside {
+  background-color: var(--border-focused);
 }
 
 .Tree.is-parent.inside,
@@ -18,7 +22,7 @@
 }
 
 .Tree.is-parent.inside > .item > .item-area:first-of-type {
-  border-color: transparent;
+  border-color: var(--transparent);
 }
 
 .Tree.before > .item > .item-area:first-of-type {

@@ -1,4 +1,8 @@
-import { createTempEngineContext, generateMainComposite, generateMinimalComposite } from '../../../client/feeded-local-fs'
+import {
+  createTempEngineContext,
+  generateMainComposite,
+  generateMinimalComposite
+} from '../../../client/feeded-local-fs'
 import { buildNodesHierarchy } from './build-nodes-hierarchy'
 
 describe('Migration: Build Node component hierarchy', () => {

@@ -133,11 +133,10 @@ export function Tree<T>() {
             const rect = ref.current.getBoundingClientRect()
             const dropType = calculateDropType(coords.y, rect)
             const enableReorder = canReorder ? canReorder(item, value, dropType) : true
+            const newDropTypeValue = enableReorder ? dropType : ''
 
-            if (enableReorder) {
-              setDropType(dropType)
-              dropTypeRef.current = dropType
-            }
+            setDropType(newDropTypeValue)
+            dropTypeRef.current = newDropTypeValue
           },
           collect: (monitor) => ({
             isHover: monitor.isOver({ shallow: true })

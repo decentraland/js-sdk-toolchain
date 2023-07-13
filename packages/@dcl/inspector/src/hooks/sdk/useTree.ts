@@ -78,14 +78,11 @@ export const useTree = () => {
 
   const getNewParent = useCallback(
     (target: Entity, type: DropType): Entity => {
-      // case 1: dropped inside another entity, always should reparent
       if (type === 'inside') return target
 
-      // case 2: dropped after a parent entity (same as case #1)
       const hasChildren = !!tree.get(target)?.size
-      if (hasChildren && type === 'after') return target
+      if (hasChildren && type === 'after' && isOpen(target)) return target
 
-      // case 3: dropped before/after an entity inside a different parent
       const targetParent = findParent(tree, target)
       return targetParent
     },
@@ -171,11 +168,18 @@ export const useTree = () => {
   const canRemove = isNotRoot
   const canDuplicate = isNotRoot
   const canDrag = isNotRoot
-  const canReorder = useCallback((source: Entity, target: Entity, type: DropType) => {
-    if (source === ROOT) return false
-    if (target === ROOT && type === 'before') return false
-    return true
-  }, [])
+  const canReorder = useCallback(
+    (source: Entity, target: Entity, type: DropType) => {
+      // can't reorder ROOT entity
+      if (source === ROOT) return false
+      // can't reorder an entity before the ROOT entity
+      if (target === ROOT && type === 'before') return false
+      // can't reorder entity in target "inside" target
+      if (findParent(tree, source) === target && type === 'inside') return false
+      return true
+    },
+    [tree]
+  )
 
   return {
     tree,

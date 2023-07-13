@@ -14,6 +14,7 @@ import { CompositeManager, createFsCompositeProvider } from './fs-composite-prov
 import { getMinimalComposite } from '../../client/feeded-local-fs'
 import { InspectorPreferences } from '../../../logic/preferences/types'
 import { buildNodesHierarchyIfNotExists } from '../utils/migrations/build-nodes-hierarchy'
+import { removeLegacyEntityNodeComponents } from '../utils/migrations/legacy-entity-node'
 
 enum DirtyEnum {
   // No changes
@@ -26,6 +27,8 @@ enum DirtyEnum {
 
 // TODO: version this as proper migrations...
 function runMigrations(engine: IEngine) {
+  // Handle old EntityNode components
+  removeLegacyEntityNodeComponents(engine)
   // Build Nodes component value if not exists
   buildNodesHierarchyIfNotExists(engine)
 }
