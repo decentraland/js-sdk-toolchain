@@ -109,15 +109,15 @@ export class RPC<
     return value && typeof value.method === 'string' && typeof value.id === 'number'
   }
 
-  on<T extends EventType>(type: T, handler: (data: EventData[T]) => void) {
-    this.events.on(type, handler)
+  on<T extends EventType>(type: `${T}`, handler: (data: EventData[T]) => void) {
+    this.events.on(type as T, handler)
   }
 
-  off<T extends EventType>(type: T, handler: (data: EventData[T]) => void) {
-    this.events.off(type, handler)
+  off<T extends EventType>(type: `${T}`, handler: (data: EventData[T]) => void) {
+    this.events.off(type as T, handler)
   }
 
-  emit<T extends EventType>(type: T, data: EventData[T]) {
+  emit<T extends EventType>(type: `${T}`, data: EventData[T]) {
     this.transport.send({
       id: this.id,
       type: RPC.MessageType.EVENT,
@@ -156,7 +156,6 @@ export class RPC<
 export namespace RPC {
   export abstract class Transport {
     abstract send(message: Message): void
-    abstract dispose(): void
     private events = mitt<Transport.EventData>()
     emit(type: `${Transport.EventType}`, message: Message) {
       this.events.emit(type as Transport.EventType, message)
