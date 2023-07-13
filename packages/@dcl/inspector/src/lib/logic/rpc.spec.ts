@@ -18,7 +18,7 @@ namespace Test {
   }
 
   export type Result = {
-    [Method.ADD]: { c: number }
+    [Method.ADD]: number
   }
 
   export class Transport extends RPC.Transport {
@@ -36,15 +36,24 @@ class Client extends RPC<Test.EventType, Test.EventData, Test.Method, Test.Param
     super('test', transport)
   }
   async add(a: number, b: number) {
-    const { c } = await this.request('add', { a, b })
-    return c
+    return this.request('add', { a, b })
+  }
+
+  // this client method exists just to test an unimplemented method error on the server side
+  async unimplemented() {
+    return this.request('unimplemented' as never, {} as never)
   }
 }
 
 class Server extends RPC<Test.EventType, Test.EventData, Test.Method, Test.Params, Test.Result> {
   constructor(transport: RPC.Transport) {
     super('test', transport)
-    this.handle('add', async ({ a, b }) => ({ c: a + b }))
+    this.handle('add', async ({ a, b }) => {
+      if (isNaN(a) || isNaN(b)) {
+        throw new Error('baNaNa 🍌')
+      }
+      return a + b
+    })
   }
 }
 
@@ -58,9 +67,21 @@ const client = new Client(transportA)
 const server = new Server(transportB)
 
 describe('RPC', () => {
-  describe('When requesting a method on the client', () => {
-    it('should be handled by the server', async () => {
-      await expect(client.add(1, 2)).resolves.toBe(3)
+  describe('When requesting a method to the client', () => {
+    describe('and the server response is successful', () => {
+      it("the client request should resolve to the server's response", async () => {
+        await expect(client.add(1, 2)).resolves.toBe(3)
+      })
+    })
+    describe('and the server response is NOT successful', () => {
+      it("the client request should reject with the server's error message", async () => {
+        await expect(client.add(1, NaN)).rejects.toThrow(/NaN/)
+      })
+    })
+    describe('and the server has not implemented the method', () => {
+      it('the client request should reject with an unimplemented method error', async () => {
+        await expect(client.unimplemented()).rejects.toThrow(/not implemented/)
+      })
     })
   })
   describe('When emitting an event on the server', () => {
@@ -79,6 +100,24 @@ describe('RPC', () => {
       client.emit('foo', { bar: 'baz' })
       expect(handler).toHaveBeenCalledTimes(1)
       expect(handler).toHaveBeenCalledWith({ bar: 'baz' })
+    })
+    describe('and the handler has been unbound', () => {
+      it('should not be called', () => {
+        const handler = jest.fn()
+        client.on('foo', handler)
+        client.off('foo', handler)
+        server.emit('foo', { bar: 'baz' })
+        expect(handler).not.toHaveBeenCalled()
+      })
+    })
+    describe('and the rpc has been disposed', () => {
+      it('should not handle the event', () => {
+        const handler = jest.fn()
+        client.on('foo', handler)
+        client.dispose()
+        server.emit('foo', { bar: 'baz' })
+        expect(handler).not.toHaveBeenCalled()
+      })
     })
   })
 })
