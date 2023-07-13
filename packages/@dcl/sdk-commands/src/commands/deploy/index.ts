@@ -1,8 +1,7 @@
 import { resolve } from 'path'
-import { ChainId, getChainName } from '@dcl/schemas'
+import { EntityType, ChainId } from '@dcl/schemas'
 import { Authenticator } from '@dcl/crypto'
 import { DeploymentBuilder } from 'dcl-catalyst-client'
-import { EntityType } from 'dcl-catalyst-client/node_modules/@dcl/schemas'
 
 import { CliComponents } from '../../components'
 import { getBaseCoords, getFiles, getValidSceneJson, validateFilesSizes } from '../../logic/scene-validations'
