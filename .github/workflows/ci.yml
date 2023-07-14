@@ -91,7 +91,7 @@ jobs:
       - name: install repo
         run: npm ci
       - name: install inspector
-        run: cd packages/@dcl/inspector && npm ci && cd ../../../
+        run: cd packages/@dcl/inspector && npm i && cd ../../../
       - name: test-inspector E2E
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
