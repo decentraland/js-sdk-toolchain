@@ -7,7 +7,6 @@ import { FileOperation, initUndoRedo } from './undo-redo'
 import upsertAsset from './upsert-asset'
 import { initSceneProvider } from './scene'
 import { readPreferencesFromFile, serializeInspectorPreferences } from '../../logic/preferences/io'
-import { removeLegacyEntityNodeComponents } from './utils/legacy-entity-node'
 import { compositeAndDirty } from './utils/composite-dirty'
 
 const INSPECTOR_PREFERENCES_PATH = 'inspector-preferences.json'
@@ -20,9 +19,6 @@ export async function initRpcMethods(
   const sceneProvider = await initSceneProvider(fs)
   const currentCompositeResourcePath = getCurrentCompositePath()
   let inspectorPreferences = await readPreferencesFromFile(fs, INSPECTOR_PREFERENCES_PATH)
-
-  // Handle old EntityNode components
-  removeLegacyEntityNodeComponents(engine)
 
   const compositeManager = await compositeAndDirty(
     fs,

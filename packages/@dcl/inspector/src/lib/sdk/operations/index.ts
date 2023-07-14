@@ -5,6 +5,7 @@ import updateValue from './update-value'
 import addChild from './add-child'
 import updateSelectedEntity from './update-selected-entity'
 import setParent from './set-parent'
+import { reorder } from './reorder'
 import removeSelectedEntities from './remove-selected-entities'
 import addAsset from './add-asset'
 import addComponent from './add-component'
@@ -24,6 +25,7 @@ export function createOperations(engine: IEngine) {
     addChild: addChild(engine),
     addAsset: addAsset(engine),
     setParent: setParent(engine),
+    reorder: reorder(engine),
     addComponent: addComponent(engine),
     removeComponent: removeComponent(engine),
     updateSelectedEntity: updateSelectedEntity(engine),

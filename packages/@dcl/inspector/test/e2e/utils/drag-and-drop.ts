@@ -1,6 +1,16 @@
 import { BoundingBox } from 'puppeteer'
 
-export async function dragAndDrop(sourceSelector: string, destinationSelector: string) {
+export type Position = 'after' | 'inside'
+export type Positions = { x: Position; y: Position }
+
+export async function dragAndDrop(
+  sourceSelector: string,
+  destinationSelector: string,
+  destPosition: Positions = {
+    x: 'inside',
+    y: 'inside'
+  }
+) {
   const sourceElement = await page.waitForSelector(sourceSelector)
   const destinationElement = await page.waitForSelector(destinationSelector)
 
@@ -8,14 +18,18 @@ export async function dragAndDrop(sourceSelector: string, destinationSelector: s
   const destinationBox = await destinationElement!.boundingBox()
 
   await page.evaluate(
-    (ss: string, ds: string, sb: BoundingBox, db: BoundingBox) => {
+    (ss: string, ds: string, sb: BoundingBox, db: BoundingBox, dPos: Positions) => {
       const source = document.querySelector(ss)
       const destination = document.querySelector(ds)
+      const midX = (bb: BoundingBox) => bb.x + bb.width / 2
+      const midY = (bb: BoundingBox) => bb.y + bb.height / 2
+      const afterX = (bb: BoundingBox) => midX(bb) + bb.width / 4
+      const afterY = (bb: BoundingBox) => midY(bb) + bb.height / 4
 
-      const sourceX = sb.x + sb.width / 2
-      const sourceY = sb.y + sb.height / 2
-      const destinationX = db.x + db.width / 2
-      const destinationY = db.y + db.height / 2
+      const sourceX = midX(sb)
+      const sourceY = midY(sb)
+      const destinationX = dPos.x === 'after' ? afterX(db) : midX(db)
+      const destinationY = dPos.y === 'after' ? afterY(db) : midY(db)
 
       source!.dispatchEvent(
         new MouseEvent('mousedown', {
@@ -25,6 +39,21 @@ export async function dragAndDrop(sourceSelector: string, destinationSelector: s
           screenY: sourceY,
           clientX: sourceX,
           clientY: sourceY
+        })
+      )
+
+      const dataTransfer = new DataTransfer()
+      dataTransfer.effectAllowed = 'all'
+      dataTransfer.dropEffect = 'move'
+
+      destination!.dispatchEvent(
+        new MouseEvent('pointerdown', {
+          bubbles: true,
+          cancelable: true,
+          screenX: destinationX,
+          screenY: destinationY,
+          clientX: destinationX,
+          clientY: destinationY
         })
       )
 
@@ -47,7 +76,7 @@ export async function dragAndDrop(sourceSelector: string, destinationSelector: s
       )
 
       destination!.dispatchEvent(
-        new MouseEvent('mouseup', {
+        new MouseEvent('mouseenter', {
           bubbles: true,
           cancelable: true,
           screenX: destinationX,
@@ -57,9 +86,40 @@ export async function dragAndDrop(sourceSelector: string, destinationSelector: s
         })
       )
 
-      const dataTransfer = new DataTransfer()
-      dataTransfer.effectAllowed = 'all'
-      dataTransfer.dropEffect = 'move'
+      destination!.dispatchEvent(
+        new MouseEvent('mouseover', {
+          bubbles: true,
+          cancelable: true,
+          screenX: destinationX,
+          screenY: destinationY,
+          clientX: destinationX,
+          clientY: destinationY
+        })
+      )
+
+      destination!.dispatchEvent(
+        new DragEvent('dragenter', {
+          bubbles: true,
+          cancelable: true,
+          screenX: destinationX,
+          screenY: destinationY,
+          clientX: destinationX,
+          clientY: destinationY,
+          dataTransfer
+        })
+      )
+
+      destination!.dispatchEvent(
+        new DragEvent('dragover', {
+          bubbles: true,
+          cancelable: true,
+          screenX: destinationX,
+          screenY: destinationY,
+          clientX: destinationX,
+          clientY: destinationY,
+          dataTransfer
+        })
+      )
 
       destination!.dispatchEvent(
         new DragEvent('drop', {
@@ -70,6 +130,40 @@ export async function dragAndDrop(sourceSelector: string, destinationSelector: s
           clientX: destinationX,
           clientY: destinationY,
           dataTransfer
+        })
+      )
+
+      destination!.dispatchEvent(
+        new DragEvent('dragleave', {
+          bubbles: true,
+          cancelable: true,
+          screenX: destinationX,
+          screenY: destinationY,
+          clientX: destinationX,
+          clientY: destinationY,
+          dataTransfer
+        })
+      )
+
+      destination!.dispatchEvent(
+        new MouseEvent('mouseup', {
+          bubbles: true,
+          cancelable: true,
+          screenX: destinationX,
+          screenY: destinationY,
+          clientX: destinationX,
+          clientY: destinationY
+        })
+      )
+
+      destination!.dispatchEvent(
+        new MouseEvent('mouseleave', {
+          bubbles: true,
+          cancelable: true,
+          screenX: destinationX,
+          screenY: destinationY,
+          clientX: destinationX,
+          clientY: destinationY
         })
       )
 
@@ -87,6 +181,7 @@ export async function dragAndDrop(sourceSelector: string, destinationSelector: s
     sourceSelector,
     destinationSelector,
     sourceBox! as any,
-    destinationBox! as any
+    destinationBox! as any,
+    destPosition
   )
 }

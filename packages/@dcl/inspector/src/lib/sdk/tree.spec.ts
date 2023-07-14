@@ -1,28 +1,14 @@
 import { Engine, Entity, IEngine, getComponentEntityTree } from '@dcl/ecs'
 
-import { SdkComponents, createComponents } from './components'
+import { EditorComponents, SdkComponents, createComponents, createEditorComponents } from './components'
 import { getEmptyTree, getTreeFromEngine, ROOT } from './tree'
-import { Operations, createOperations } from './operations'
+import { createOperations } from './operations'
 
 describe('getTreeFromEngine', () => {
   let engine: IEngine
   let Transform: SdkComponents['Transform']
-  let operations: Operations
-
-  function add(parent?: Entity) {
-    const entity = engine.addEntity()
-    Transform.create(entity, { parent: parent ?? ROOT })
-    return entity
-  }
-
-  function setParent(entity: Entity, newParent: Entity) {
-    Transform.createOrReplace(entity, { parent: newParent })
-    return entity
-  }
-
-  function remove(entity: Entity) {
-    engine.removeEntity(entity)
-  }
+  let Nodes: EditorComponents['Nodes']
+  let operations: ReturnType<typeof createOperations>
 
   function getTreeEntitiesList(entity: Entity) {
     return Array.from(getComponentEntityTree(engine, entity, Transform))
@@ -31,22 +17,24 @@ describe('getTreeFromEngine', () => {
   beforeEach(() => {
     engine = Engine()
     Transform = createComponents(engine).Transform
+    Nodes = createEditorComponents(engine).Nodes
+    Nodes.create(ROOT, { value: [{ entity: ROOT, children: [] }] })
     operations = createOperations(engine)
   })
   describe('when getting a tree from an empty engine', () => {
     it('should return an empty tree', () => {
-      expect(getTreeFromEngine(engine, operations, Transform)).toEqual(getEmptyTree())
+      expect(getTreeFromEngine(engine, Nodes)).toEqual(getEmptyTree())
     })
   })
   describe('when getting a tree from an engine with two sibling entities A and B', () => {
     let A: Entity
     let B: Entity
     beforeEach(() => {
-      A = add()
-      B = add()
+      A = operations.addChild(ROOT, 'A')
+      B = operations.addChild(ROOT, 'B')
     })
     it('should return a tree with entities A and B as children of ROOT', () => {
-      const tree = getTreeFromEngine(engine, operations, Transform)
+      const tree = getTreeFromEngine(engine, Nodes)
       /**
        * ROOT
        * ├─> A
@@ -59,11 +47,11 @@ describe('getTreeFromEngine', () => {
     let A: Entity
     let B: Entity
     beforeEach(() => {
-      A = add()
-      B = add(A)
+      A = operations.addChild(ROOT, 'A')
+      B = operations.addChild(A, 'B')
     })
     it('should return a tree with entity A as children of ROOT, and B as children of A', () => {
-      const tree = getTreeFromEngine(engine, operations, Transform)
+      const tree = getTreeFromEngine(engine, Nodes)
       /**
        * ROOT
        * ├─> A
@@ -76,10 +64,10 @@ describe('getTreeFromEngine', () => {
     describe('and then adding a third entity as sibling of A', () => {
       let C: Entity
       beforeEach(() => {
-        C = add()
+        C = operations.addChild(ROOT, 'C')
       })
       it('should return a tree with entities A and C as children of ROOT, and B as child of A', () => {
-        const tree = getTreeFromEngine(engine, operations, Transform)
+        const tree = getTreeFromEngine(engine, Nodes)
         /**
          * ROOT
          * ├─> A
@@ -91,10 +79,12 @@ describe('getTreeFromEngine', () => {
       })
       describe('and then reparenting C as children of A', () => {
         beforeEach(() => {
-          setParent(C, A)
+          operations.setParent(C, A)
         })
         it('should return a tree with entity A as children of ROOT, and entities B and C as children of A', () => {
-          const tree = getTreeFromEngine(engine, operations, Transform)
+          const tree = getTreeFromEngine(engine, Nodes)
+          console.log(Nodes.get(ROOT).value)
+          console.log(tree)
           /**
            * ROOT
            * └─> A
@@ -108,10 +98,10 @@ describe('getTreeFromEngine', () => {
       })
       describe('and then reparenting C as children of B', () => {
         beforeEach(() => {
-          setParent(C, B)
+          operations.setParent(C, B)
         })
         it('should return a tree with entity A as children of ROOT, entity B as children of A, and entity C as children of B', () => {
-          const tree = getTreeFromEngine(engine, operations, Transform)
+          const tree = getTreeFromEngine(engine, Nodes)
           /**
            * ROOT
            * └─> A
@@ -124,67 +114,46 @@ describe('getTreeFromEngine', () => {
         })
         describe('and then removing entity A', () => {
           beforeEach(() => {
-            remove(A)
+            operations.removeEntity(A)
           })
-          it('should return a tree with entity B as children of ROOT because A does not exist, and entity C as children of B', () => {
-            const tree = getTreeFromEngine(engine, operations, Transform)
+          it('should return a empty tree since A was the parent of all the other entities', () => {
+            const tree = getTreeFromEngine(engine, Nodes)
             /**
              * ROOT
-             * └─> B
-             *     └─> C
+             * └─> ?
              */
-            expect(tree.get(ROOT)).toEqual(new Set([B]))
-            expect(tree.get(B)).toEqual(new Set([C]))
+            expect(tree.get(ROOT)).toEqual(new Set([]))
+            expect(tree.get(A)).not.toBeDefined()
+            expect(tree.get(B)).not.toBeDefined()
+            expect(tree.get(C)).not.toBeDefined()
+            expect(tree.size).toBe(1)
           })
-          describe('and then adding a new entity D as children of C', () => {
+          describe('and then adding a new entity D as children of ROOT', () => {
             let D: Entity
             beforeEach(() => {
-              D = add(C)
+              D = operations.addChild(ROOT, 'D')
             })
-            it('should return a tree with entity B as children of ROOT, entity C as children of B, and entity D as children of C', () => {
-              const tree = getTreeFromEngine(engine, operations, Transform)
+            it('should return a tree with entity D as children of ROOT', () => {
+              const tree = getTreeFromEngine(engine, Nodes)
               /**
                * ROOT
-               * └─> B
-               *     └─> C
-               *         └─> D
+               * └─> D
                */
-              expect(tree.get(ROOT)).toEqual(new Set([B]))
-              expect(tree.get(B)).toEqual(new Set([C]))
-              expect(tree.get(C)).toEqual(new Set([D]))
+              expect(tree.get(ROOT)).toEqual(new Set([D]))
             })
-            describe('and then reparenting B as children of D, thus creating a cycle', () => {
+            describe('and then reparenting B as children of D', () => {
               beforeEach(() => {
-                setParent(B, D)
+                operations.setParent(B, D)
               })
-              it("should return a tree with entity B as children of ROOT (because it can't create a cycle), entity C as children of B, and entity D as children of C", () => {
-                const tree = getTreeFromEngine(engine, operations, Transform)
+              it('should return a tree with entity B as children of D, and entity D as children of ROOT', () => {
+                const tree = getTreeFromEngine(engine, Nodes)
                 /**
                  * ROOT
-                 * └─> B (stays in the same place because it can't create a cycle)
-                 *     └─> C
-                 *         └─> D
+                 * └─> D
+                 *     └─> B
                  */
-                expect(tree.get(ROOT)).toEqual(new Set([B]))
-                expect(tree.get(B)).toEqual(new Set([C]))
-                expect(tree.get(C)).toEqual(new Set([D]))
-              })
-              describe('and then reparenting D as children of ROOT, thus breaking the cycle', () => {
-                beforeEach(() => {
-                  setParent(D, ROOT)
-                })
-                it('should return a tree with entity D as children of ROOT, entity B as children of D, and entity C as children of B', () => {
-                  const tree = getTreeFromEngine(engine, operations, Transform)
-                  /**
-                   * ROOT
-                   * └─> D
-                   *     └─> B (was reparenterd because now it does not create a cylce)
-                   *         └─> C
-                   */
-                  expect(tree.get(ROOT)).toEqual(new Set([D]))
-                  expect(tree.get(D)).toEqual(new Set([B]))
-                  expect(tree.get(B)).toEqual(new Set([C]))
-                })
+                expect(tree.get(ROOT)).toEqual(new Set([D]))
+                expect(tree.get(D)).toEqual(new Set([B]))
               })
             })
           })
