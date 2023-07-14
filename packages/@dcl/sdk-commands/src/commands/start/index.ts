@@ -92,7 +92,7 @@ export async function main(options: Options) {
   const enableWeb3 = options.args['--web3']
 
   // TODO: FIX this hardcoded values ?
-  const hasPortableExperience = false
+  let hasSmartWearable = false
 
   const workspace = await getValidWorkspace(options.components, workingDirectory)
 
@@ -101,7 +101,8 @@ export async function main(options: Options) {
     printWarning(options.components.logger, 'Support for multiple projects is still experimental.')
 
   for (const project of workspace.projects) {
-    if (project.kind === 'scene') {
+    if (project.kind === 'wearable') hasSmartWearable = true
+    if (project.kind === 'scene' || project.kind === 'wearable') {
       printCurrentProjectStarting(options.components.logger, project, workspace)
 
       // first run `npm run build`, this can be disabled with --skip-build
@@ -188,7 +189,7 @@ export async function main(options: Options) {
             if (debug) {
               addr = `${addr}&SCENE_DEBUG_PANEL`
             }
-            if (enableWeb3 || hasPortableExperience) {
+            if (enableWeb3 || hasSmartWearable) {
               addr = `${addr}&ENABLE_WEB3`
             }
 

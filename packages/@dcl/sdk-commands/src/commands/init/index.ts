@@ -67,6 +67,7 @@ export async function main(options: Options) {
   // download and extract template project
   const projectTemplate = (requestedProjectTemplate as ScaffoldedProject) || 'scene-template'
   const url = requestedTemplateZipUrl || getScaffoldedProjectUrl(projectTemplate)
+
   await downloadAndUnzipUrlContainFolder(url, dir, options)
 
   // replace scene.json for portable experience template...
