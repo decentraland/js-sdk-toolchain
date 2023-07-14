@@ -91,7 +91,6 @@ export async function main(options: Options) {
   const withDataLayer = options.args['--data-layer']
   const enableWeb3 = options.args['--web3']
 
-  // TODO: FIX this hardcoded values ?
   let hasSmartWearable = false
 
   const workspace = await getValidWorkspace(options.components, workingDirectory)
