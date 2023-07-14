@@ -42,7 +42,6 @@ describe('utils/commands', () => {
     const result = await commands.getCommands(components)
 
     for (const command of result) {
-      console.log(command)
       try {
         await runSdkCommand(components, command, ['--help'])
       } catch (e: any) {
@@ -50,7 +49,6 @@ describe('utils/commands', () => {
         console.error(e)
         throw e
       }
-      console.log(command)
     }
   })
 })

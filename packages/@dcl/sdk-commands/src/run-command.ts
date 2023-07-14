@@ -58,6 +58,7 @@ export async function runSdkCommand(components: CliComponents, command: string, 
       components.logger.error((e as Error).message)
       return cmd.help({ args: {} as any, components })
     }
+
     if (needsHelp) {
       await cmd.help({ args, components })
     } else {
