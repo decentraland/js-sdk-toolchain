@@ -9,7 +9,7 @@ export const ROOT = engine.RootEntity
  */
 export const getTreeFromEngine = (engine: IEngine, Nodes: EditorComponents['Nodes']): Map<Entity, Set<Entity>> => {
   const tree = getEmptyTree()
-  const rootChildren = Nodes.get(engine.RootEntity).value
+  const rootChildren = Nodes.getOrNull(engine.RootEntity)?.value || []
 
   for (const { entity, children } of rootChildren) {
     tree.set(entity, new Set(children))
