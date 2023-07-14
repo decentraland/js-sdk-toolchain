@@ -488,7 +488,7 @@ export interface ComponentData {
     } | {
         $case: "binary";
         binary: Uint8Array;
-    };
+    } | undefined;
 }
 
 // @public (undocumented)
@@ -2162,7 +2162,7 @@ export interface PBMaterial {
     } | {
         $case: "pbr";
         pbr: PBMaterial_PbrMaterial;
-    };
+    } | undefined;
 }
 
 // @public (undocumented)
@@ -2233,7 +2233,7 @@ export interface PBMeshCollider {
     } | {
         $case: "plane";
         plane: PBMeshCollider_PlaneMesh;
-    };
+    } | undefined;
 }
 
 // @public (undocumented)
@@ -2309,7 +2309,7 @@ export interface PBMeshRenderer {
     } | {
         $case: "plane";
         plane: PBMeshRenderer_PlaneMesh;
-    };
+    } | undefined;
 }
 
 // @public (undocumented)
@@ -2498,7 +2498,7 @@ export interface PBRaycast {
     } | {
         $case: "targetEntity";
         targetEntity: number;
-    };
+    } | undefined;
     maxDistance: number;
     originOffset?: PBVector3 | undefined;
     queryType: RaycastQueryType;
@@ -3445,7 +3445,7 @@ export interface TextureUnion {
     } | {
         $case: "videoTexture";
         videoTexture: VideoTexture;
-    };
+    } | undefined;
 }
 
 // @public (undocumented)

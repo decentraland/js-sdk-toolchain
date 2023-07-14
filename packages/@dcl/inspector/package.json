@@ -27,7 +27,7 @@
     "fp-future": "^1.0.1",
     "jest-environment-jsdom": "^29.5.0",
     "jest-puppeteer": "^9.0.0",
-    "mitt": "^3.0.0",
+    "mitt": "^3.0.1",
     "react": "^18.2.0",
     "react-contexify": "^6.0.0",
     "react-dnd": "^16.0.1",
