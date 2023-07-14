@@ -21,6 +21,7 @@ export type Events = {
     projectHash: string
     coords: { x: number; y: number }
     isWorkspace: boolean
+    isPortableExperience: boolean
   }
   'Build scene': {
     projectHash: string
@@ -44,6 +45,7 @@ export type Events = {
     sceneId: string
     targetContentServer: string
     worldName: string | undefined
+    isPortableExperience: boolean
   }
   'Scene deploy failure': {
     projectHash: string

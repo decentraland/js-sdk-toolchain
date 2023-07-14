@@ -116,7 +116,8 @@ export async function main(options: Options) {
       options.components.analytics.track('Preview started', {
         projectHash: await b64HashingFunction(project.workingDirectory),
         coords: baseCoords,
-        isWorkspace: false
+        isWorkspace: false,
+        isPortableExperience: !!project.scene.isPortableExperience
       })
     }
   }

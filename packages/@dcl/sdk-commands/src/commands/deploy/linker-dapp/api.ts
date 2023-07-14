@@ -6,6 +6,7 @@ import { resolve } from 'path'
 import { getChainName, ChainId, Scene } from '@dcl/schemas'
 import querystring from 'querystring'
 import open from 'open'
+import future from 'fp-future'
 
 import { getPort } from '../../../logic/get-free-port'
 import { IFile } from '../../../logic/scene-validations'
@@ -13,7 +14,7 @@ import { CliComponents } from '../../../components'
 import { printSuccess } from '../../../logic/beautiful-logs'
 import { setRoutes } from './routes'
 import { getEstateRegistry, getLandRegistry } from '../../../logic/config'
-import future from 'fp-future'
+import { sceneHasWorldCfg } from '../utils'
 
 export interface LinkerResponse {
   address: string
@@ -31,6 +32,8 @@ export interface SceneInfo {
   title?: string
   description?: string
   skipValidations: boolean
+  isPortableExperience: boolean
+  isWorld: boolean
 }
 
 export async function runLinkerApp(
@@ -110,7 +113,8 @@ async function getSceneInfo(
 ) {
   const {
     scene: { parcels, base },
-    display
+    display,
+    isPortableExperience
   } = scene
 
   return {
@@ -122,6 +126,8 @@ async function getSceneInfo(
     debug: !!process.env.DEBUG,
     title: display?.title,
     description: display?.description,
-    skipValidations
+    skipValidations,
+    isPortableExperience: !!isPortableExperience,
+    isWorld: sceneHasWorldCfg(scene)
   }
 }

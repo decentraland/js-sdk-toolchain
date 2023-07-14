@@ -51,13 +51,20 @@ export async function runSdkCommand(components: CliComponents, command: string, 
   const cmd = await import(`./commands/${command}`)
 
   if (asserValidCommand(cmd)) {
-    const options = { args: parseArgs(argv, cmd.args), components }
+    let args: ReturnType<typeof parseArgs>
+    try {
+      args = parseArgs(argv, cmd.args)
+    } catch (e) {
+      components.logger.error((e as Error).message)
+      return cmd.help({ args: {} as any, components })
+    }
+
     if (needsHelp) {
-      await cmd.help(options)
+      await cmd.help({ args, components })
     } else {
       printCommand(components.logger, command)
 
-      const ret = await cmd.main(options)
+      const ret = await cmd.main({ args, components })
       // print the result of the evaluation as json in the standard output
       if (needsJson) {
         process.stdout.write(JSON.stringify(ret, null, 2))

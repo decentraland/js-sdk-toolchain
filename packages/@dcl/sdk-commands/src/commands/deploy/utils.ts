@@ -45,3 +45,7 @@ export async function getAddressAndSignature(
   const { linkerPort, ...opts } = linkOptions
   return runLinkerApp(components, scene, files, linkerPort!, messageToSign, opts)
 }
+
+export function sceneHasWorldCfg(scene: Scene) {
+  return !!Object.keys(scene.worldConfiguration || {}).length
+}

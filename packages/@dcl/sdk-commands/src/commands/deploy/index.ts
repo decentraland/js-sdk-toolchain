@@ -1,6 +1,8 @@
 import { resolve } from 'path'
-import { EntityType, ChainId } from '@dcl/schemas'
+import { ChainId } from '@dcl/schemas'
 import { Authenticator } from '@dcl/crypto'
+import { DeploymentBuilder } from 'dcl-catalyst-client'
+import { EntityType } from 'dcl-catalyst-client/node_modules/@dcl/schemas'
 
 import { CliComponents } from '../../components'
 import { getBaseCoords, getFiles, getValidSceneJson, validateFilesSizes } from '../../logic/scene-validations'
@@ -11,8 +13,7 @@ import { printProgressInfo, printSuccess } from '../../logic/beautiful-logs'
 import { getPackageJson, b64HashingFunction } from '../../logic/project-files'
 import { Events } from '../../components/analytics'
 import { Result } from 'arg'
-import { getAddressAndSignature, getCatalyst } from './utils'
-import { DeploymentBuilder } from 'dcl-catalyst-client'
+import { getAddressAndSignature, getCatalyst, sceneHasWorldCfg } from './utils'
 
 interface Options {
   args: Result<typeof args>
@@ -72,7 +73,7 @@ export async function main(options: Options) {
 
   const sceneJson = await getValidSceneJson(options.components, projectRoot)
   const coords = getBaseCoords(sceneJson)
-  const isWorld = !!Object.keys(sceneJson.worldConfiguration || {}).length
+  const isWorld = sceneHasWorldCfg(sceneJson)
   const trackProps: Events['Scene deploy started'] = {
     projectHash: await b64HashingFunction(projectRoot),
     coords,
@@ -152,6 +153,7 @@ export async function main(options: Options) {
     sceneId: entityId,
     targetContentServer: catalyst.getContentUrl(),
     worldName: sceneJson.worldConfiguration?.name,
+    isPortableExperience: !!sceneJson.isPortableExperience,
     dependencies
   })
 }

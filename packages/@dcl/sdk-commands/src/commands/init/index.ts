@@ -8,8 +8,9 @@ import { download, extract, isDirectoryEmpty } from '../../logic/fs'
 import { Result } from 'arg'
 import { installDependencies, needsDependencies } from '../../logic/project-validations'
 import { ScaffoldedProject, existScaffoldedProject, getScaffoldedProjectUrl, scaffoldedProjectOptions } from './repos'
+import { createPxSceneJson } from './project'
 
-interface Options {
+export interface Options {
   args: Result<typeof args>
   components: Pick<CliComponents, 'fetch' | 'fs' | 'logger' | 'analytics' | 'spawner'>
 }
@@ -23,7 +24,22 @@ export const args = declareArgs({
   '--project': String
 })
 
-export async function help() {}
+export function help(options: Options) {
+  options.components.logger.log(`
+  Usage: 'sdk-commands init [options]'
+    Options:'
+      -h, --help                Displays complete help
+      -y, --yes                 Override empty directory check
+      --dir                     Path to directory to init
+      --skip-install            Skip installing dependencies
+      --template                URL to template to init
+      --project                 Project to init (opts: ${scaffoldedProjectOptions().join(', ')})
+
+    Example:
+    - Init your scene:
+      '$ sdk-commands init'
+  `)
+}
 
 export async function main(options: Options) {
   const dir = path.resolve(process.cwd(), options.args['--dir'] || '.')
@@ -52,6 +68,9 @@ export async function main(options: Options) {
   const projectTemplate = (requestedProjectTemplate as ScaffoldedProject) || 'scene-template'
   const url = requestedTemplateZipUrl || getScaffoldedProjectUrl(projectTemplate)
   await downloadAndUnzipUrlContainFolder(url, dir, options)
+
+  // replace scene.json for portable experience template...
+  if (projectTemplate === 'px-template') await createPxSceneJson(dir, options.components.fs)
 
   // npm install
   const shouldInstallDeps = await needsDependencies(options.components, dir)
