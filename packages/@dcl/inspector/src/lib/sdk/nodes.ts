@@ -16,6 +16,16 @@ export function removeNode(engine: IEngine, entity: Entity): Node[] {
   return newValue
 }
 
+export function addNode(engine: IEngine, entity: Entity): Node[] {
+  const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']
+  const nodes = Array.from(Nodes.get(engine.RootEntity).value)
+
+  const alreadyNode = nodes.find(($) => $.entity === entity)
+  if (!alreadyNode) nodes.push({ entity, children: [] })
+
+  return nodes
+}
+
 export function pushChild(engine: IEngine, parent: Entity, child: Entity): Node[] {
   const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']
   const nodes = Nodes.get(engine.RootEntity).value
