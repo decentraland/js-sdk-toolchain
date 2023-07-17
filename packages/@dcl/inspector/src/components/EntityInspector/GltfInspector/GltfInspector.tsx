@@ -1,9 +1,10 @@
 import { useCallback } from 'react'
-import { Menu, Item } from 'react-contexify'
+import { Item } from 'react-contexify'
 import { useDrop } from 'react-dnd'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import cx from 'classnames'
 
+import { ContextMenu as Menu } from '../../ContexMenu'
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
