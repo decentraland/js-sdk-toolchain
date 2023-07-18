@@ -1,5 +1,4 @@
 import { dirname, resolve } from 'path'
-import urlParse from 'url'
 import { Router } from '@well-known-components/http-server'
 import { ChainId } from '@dcl/schemas'
 import future from 'fp-future'
@@ -30,7 +29,9 @@ function getContentType(type: string) {
 export function setRoutes(
   components: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,
   files: IFile[],
-  sceneInfo: SceneInfo
+  sceneInfo: SceneInfo,
+  linkerCallback: (value: LinkerResponse) => Promise<void>,
+  stopServer: () => void
 ) {
   const futureSignature = future<LinkerResponse>()
   const { fs, logger } = components
@@ -82,30 +83,26 @@ export function setRoutes(
     }
   })
 
-  router.get('/api/close', async (ctx) => {
-    const { ok, reason } = urlParse.parse(ctx.url.toString(), true).query
-
-    if (ok === 'true') {
-      const value = JSON.parse(reason?.toString() || '{}') as LinkerResponse
-      deployInfo = { ...deployInfo, linkerResponse: value }
-      futureSignature.resolve(value)
-      return {}
-    }
-
-    futureSignature.reject(new Error(`Failed to link: ${reason}`))
-    return {}
-  })
-
   router.post('/api/deploy', async (ctx) => {
     const value = (await ctx.request.json()) as LinkerResponse
 
     if (!value.address || !value.signature || !value.chainId) {
       logger.error(`Invalid payload: ${Object.keys(value).join(' - ')}`)
-      return {}
+      throw new Error('Invalid payload')
     }
 
     deployInfo = { ...deployInfo, linkerResponse: value, status: 'deploying' }
-    futureSignature.resolve(value)
+    try {
+      await linkerCallback(value)
+      if (sceneInfo.isWorld) {
+        stopServer()
+      }
+      futureSignature.resolve(value)
+    } catch (e) {
+      // stopServer()
+      futureSignature.resolve(value)
+      return { status: 400 }
+    }
     return {}
   })
 

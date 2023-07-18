@@ -33,17 +33,18 @@ export async function getAddressAndSignature(
   messageToSign: string,
   scene: Scene,
   files: IFile[],
-  linkOptions: LinkOptions
+  linkOptions: LinkOptions,
+  deployCallback: (response: LinkerResponse) => Promise<void>
 ): Promise<{ linkerResponse: Promise<LinkerResponse>; program?: Lifecycle.ComponentBasedProgram<unknown> }> {
   if (process.env.DCL_PRIVATE_KEY) {
     const wallet = createWallet(process.env.DCL_PRIVATE_KEY)
     const signature = ethSign(hexToBytes(wallet.privateKey), messageToSign)
-    const linkerResponse = Promise.resolve({ signature, address: wallet.address })
-    return { linkerResponse }
+    const linkerResponse = { signature, address: wallet.address }
+    await deployCallback(linkerResponse)
   }
 
   const { linkerPort, ...opts } = linkOptions
-  return runLinkerApp(components, scene, files, linkerPort!, messageToSign, opts)
+  return await runLinkerApp(components, scene, files, linkerPort!, messageToSign, opts, deployCallback)
 }
 
 export function sceneHasWorldCfg(scene: Scene) {
