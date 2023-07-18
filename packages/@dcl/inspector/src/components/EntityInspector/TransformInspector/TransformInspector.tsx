@@ -1,7 +1,8 @@
 import { useCallback } from 'react'
-import { Menu, Item } from 'react-contexify'
+import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 
+import { ContextMenu as Menu } from '../../ContexMenu'
 import { isValidNumericInput, useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'

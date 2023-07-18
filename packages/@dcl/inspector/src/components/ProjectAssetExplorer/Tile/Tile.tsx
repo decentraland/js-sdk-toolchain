@@ -1,9 +1,10 @@
 import { useCallback } from 'react'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import { IoIosImage } from 'react-icons/io'
-import { Menu, Item as MenuItem } from 'react-contexify'
+import { Item as MenuItem } from 'react-contexify'
 import { useDrag } from 'react-dnd'
 
+import { ContextMenu as Menu } from '../../ContexMenu'
 import FolderIcon from '../../Icons/Folder'
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'

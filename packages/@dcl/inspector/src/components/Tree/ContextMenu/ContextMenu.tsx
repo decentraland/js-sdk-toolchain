@@ -1,8 +1,9 @@
 import React from 'react'
-import { Menu, Item } from 'react-contexify'
+import { Item } from 'react-contexify'
 import { MdOutlineDriveFileRenameOutline as RenameIcon } from 'react-icons/md'
 import { AiFillFileAdd as AddChildIcon, AiFillDelete as DeleteIcon, AiFillCopy as DuplicateIcon } from 'react-icons/ai'
 
+import { ContextMenu as Menu } from '../../ContexMenu'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 
 export interface Props {

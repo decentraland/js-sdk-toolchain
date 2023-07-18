@@ -10,6 +10,7 @@ export const useContextMenu = () => {
     (cb: (...params: any) => void, ...params: any) =>
       ({ id, event }: ItemParams) => {
         event.preventDefault()
+        event.stopPropagation()
         cb(id, ...params)
       },
     []
