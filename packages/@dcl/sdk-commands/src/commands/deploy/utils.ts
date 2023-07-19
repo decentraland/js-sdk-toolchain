@@ -48,7 +48,16 @@ export async function getAddressAndSignature(
   }
 
   const { linkerPort, ...opts } = linkOptions
-  const { program } = await runLinkerApp(components, awaitResponse, scene, files, linkerPort!, messageToSign, opts, deployCallback)
+  const { program } = await runLinkerApp(
+    components,
+    awaitResponse,
+    scene,
+    files,
+    linkerPort!,
+    messageToSign,
+    opts,
+    deployCallback
+  )
   return { program }
 }
 

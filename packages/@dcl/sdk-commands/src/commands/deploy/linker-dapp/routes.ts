@@ -26,7 +26,7 @@ export function setRoutes(
   awaitResponse: IFuture<void>,
   files: IFile[],
   sceneInfo: SceneInfo,
-  linkerCallback: (value: LinkerResponse) => Promise<void>,
+  linkerCallback: (value: LinkerResponse) => Promise<void>
 ) {
   // We need to wait so the linker-dapp can receive the response and show a nice message.
   const resolveLinkerPromise = () => setTimeout(() => awaitResponse.resolve(), 100)
@@ -70,7 +70,7 @@ export function setRoutes(
     const chainId = linkerResponse?.chainId || 1
     const network = chainId === ChainId.ETHEREUM_MAINNET ? 'mainnet' : 'goerli'
     const value = await getPointers(components, pointer, network)
-    const deployedToAll = new Set(value.map(c => c.entityId)).size === 1
+    const deployedToAll = new Set(value.map((c) => c.entityId)).size === 1
 
     // Deployed to every catalyst, close the linker dapp and
     // exit the command automatically so the user dont have to.
@@ -88,11 +88,11 @@ export function setRoutes(
       const errorMessage = `Invalid payload: ${Object.keys(value).join(' - ')}`
       logger.error(errorMessage)
       resolveLinkerPromise()
-      return { status: 400, body: { message: errorMessage} }
+      return { status: 400, body: { message: errorMessage } }
     }
 
     // Store the chainId so we can use it on the catalyst pointers.
-    linkerResponse =  value
+    linkerResponse = value
 
     try {
       await linkerCallback(value)

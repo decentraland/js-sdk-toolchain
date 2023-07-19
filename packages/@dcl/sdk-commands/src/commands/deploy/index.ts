@@ -187,7 +187,6 @@ export async function main(options: Options) {
       if (!isWorld) {
         options.components.logger.info('You can close the terminal now')
       }
-
     } catch (e: any) {
       options.components.logger.error('Could not upload content:')
       options.components.logger.error(e.message)
