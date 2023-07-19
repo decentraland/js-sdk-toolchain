@@ -72,7 +72,7 @@ export async function readPreferencesFromFile(fs: FileSystemInterface, path: str
 
   const fileContent = await fs.readFile(path)
   try {
-    return parseInspectorPreferences(fileContent.toString('utf-8'))
+    return parseInspectorPreferences(new TextDecoder().decode(fileContent))
   } catch (error) {
     if (error instanceof InvalidPreferences) {
       console.log(`bad preferences file: ${error}, returning default preferences`)
