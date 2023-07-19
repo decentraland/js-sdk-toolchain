@@ -74,6 +74,20 @@ describe('Hierarchy', () => {
     await expect(Hierarchy.hasChildrenInOrder(parent, child3, child4, child1)).resolves.toBe(true)
   }, 100_000)
 
+  test('duplicate "new entity"', async () => {
+    const parent = await Hierarchy.getId('new entity')
+    const parentChildrenIds = await Hierarchy.getChildrenIds(parent, '.Tree')
+    await Hierarchy.duplicate(parent)
+    const rootChildrenIds = await Hierarchy.getChildrenIds(ROOT, '.Tree.is-parent')
+    const lastChildId = rootChildrenIds.pop() || NaN
+    const lastChildLabel = await Hierarchy.getLabel(lastChildId)
+    await Hierarchy.toggleOpen(lastChildId)
+    const duplicatedChildrenIds = await Hierarchy.getChildrenIds(lastChildId, '.Tree')
+
+    expect(lastChildLabel).toBe('new entity')
+    expect(duplicatedChildrenIds.length).toBe(parentChildrenIds.length)
+  }, 100_000)
+
   test('rename "child 2" to "gltf', async () => {
     const child2 = await Hierarchy.getId('child 2')
     await Hierarchy.rename(child2, 'gltf')
