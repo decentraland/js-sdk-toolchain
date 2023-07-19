@@ -17,6 +17,12 @@ class HierarchyPageObject {
     return `.Hierarchy .Tree[data-test-label="${label}"]`
   }
 
+  async toggleOpen(entityId: number) {
+    const arrowSelector = (entityId: number) => `${this.getItemAreaSelectorById(entityId)} > svg`
+    const arrow = await this.getItem(entityId, arrowSelector)
+    await arrow.click()
+  }
+
   async getItem(entityId: number, selector: (entityId: number) => string) {
     const item = await page.$(selector(entityId))
     if (!item) {
@@ -61,18 +67,6 @@ class HierarchyPageObject {
     return true
   }
 
-  async addChild(entityId: number, label: string) {
-    const item = await this.getItem(entityId, this.getItemSelectorById)
-    await item.click({ button: 'right' })
-    const addChild = await item.$('.contexify_item[itemid="add-child"')
-    if (!addChild) {
-      throw new Error(`Can't add child to entity with id=${entityId}`)
-    }
-    await addChild.click()
-    await page.keyboard.type(label)
-    await page.keyboard.press('Enter')
-  }
-
   async getLabel(entityId: number) {
     const item = await this.getItem(entityId, this.getItemSelectorById)
     const label = await item.evaluate((el) => el.textContent)
@@ -93,6 +87,28 @@ class HierarchyPageObject {
     }
     await page.keyboard.type(newLabel)
     await page.keyboard.press('Enter')
+  }
+
+  async addChild(entityId: number, label: string) {
+    const item = await this.getItem(entityId, this.getItemSelectorById)
+    await item.click({ button: 'right' })
+    const addChild = await item.$('.contexify_item[itemid="add-child"')
+    if (!addChild) {
+      throw new Error(`Can't add child to entity with id=${entityId}`)
+    }
+    await addChild.click()
+    await page.keyboard.type(label)
+    await page.keyboard.press('Enter')
+  }
+
+  async duplicate(entityId: number) {
+    const item = await this.getItem(entityId, this.getItemSelectorById)
+    await item.click({ button: 'right' })
+    const duplicate = await item.$('.contexify_item[itemid="duplicate"')
+    if (!duplicate) {
+      throw new Error(`Can't duplicate entity with id=${entityId}`)
+    }
+    await duplicate.click()
   }
 
   async remove(entityId: number) {
