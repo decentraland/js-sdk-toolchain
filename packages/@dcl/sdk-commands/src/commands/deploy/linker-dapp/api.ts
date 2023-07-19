@@ -3,15 +3,14 @@ import { Lifecycle } from '@well-known-components/interfaces'
 import { createRecordConfigComponent } from '@well-known-components/env-config-provider'
 import { createConsoleLogComponent } from '@well-known-components/logger'
 import { resolve } from 'path'
-import { getChainName, ChainId, Scene } from '@dcl/schemas'
+import { ChainId, Scene } from '@dcl/schemas'
 import querystring from 'querystring'
 import open from 'open'
-import future from 'fp-future'
+import { IFuture } from 'fp-future'
 
 import { getPort } from '../../../logic/get-free-port'
 import { IFile } from '../../../logic/scene-validations'
 import { CliComponents } from '../../../components'
-import { printSuccess } from '../../../logic/beautiful-logs'
 import { setRoutes } from './routes'
 import { getEstateRegistry, getLandRegistry } from '../../../logic/config'
 import { sceneHasWorldCfg } from '../utils'
@@ -38,18 +37,19 @@ export interface SceneInfo {
 
 export async function runLinkerApp(
   cliComponents: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,
+  awaitResponse: IFuture<void>,
   scene: Scene,
   files: IFile[],
   port: number,
   rootCID: string,
-  { isHttps, skipValidations, openBrowser }: { isHttps: boolean; skipValidations: boolean; openBrowser: boolean }
+  { isHttps, skipValidations, openBrowser }: { isHttps: boolean; skipValidations: boolean; openBrowser: boolean },
+  deployCallback: (linkerResponse: LinkerResponse) => Promise<void>
 ) {
   const resolvedPort = await getPort(port)
   const sceneInfo = await getSceneInfo(cliComponents, scene, rootCID, skipValidations)
   const protocol = isHttps ? 'https' : 'http'
   const queryParams = querystring.stringify(sceneInfo)
   const url = `${protocol}://localhost:${resolvedPort}`
-  const futureResponse = future<LinkerResponse>()
   const program = await Lifecycle.run({
     async initComponents() {
       const config = createRecordConfigComponent({
@@ -65,24 +65,18 @@ export async function runLinkerApp(
 
       return { ...cliComponents, config, logs, server }
     },
-    async main({ components, startComponents }) {
-      const { router, futureSignature } = setRoutes(components, files, sceneInfo)
+    async main(program) {
+      const { components, startComponents } = program
+      const { router } = setRoutes(components, awaitResponse, files, sceneInfo, deployCallback)
       components.server.setContext(components)
       components.server.use(router.allowedMethods())
       components.server.use(router.middleware())
 
       await startComponents()
       if (openBrowser) await browse(components, url, queryParams)
-
-      const value = await futureSignature
-      printSuccess(components.logger, `\nContent successfully signed.`, '')
-      components.logger.info(`Address: ${value.address}`)
-      components.logger.info(`Signature: ${value.signature}`)
-      components.logger.info(`Network: ${getChainName(value.chainId!)}`)
-      futureResponse.resolve(value)
     }
   })
-  return { program, linkerResponse: futureResponse }
+  return { program }
 }
 
 async function browse({ logger }: Pick<CliComponents, 'logger'>, url: string, params: string) {
