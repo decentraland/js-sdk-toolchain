@@ -16,6 +16,7 @@ import { getAddressAndSignature, getCatalyst, sceneHasWorldCfg } from './utils'
 import { buildScene } from '../build'
 import { getValidWorkspace } from '../../logic/workspace-validations'
 import { LinkerResponse } from './linker-dapp/api'
+import future from 'fp-future'
 
 interface Options {
   args: Result<typeof args>
@@ -120,8 +121,12 @@ export async function main(options: Options) {
   // Signing message
   const messageToSign = entityId
 
-  const { linkerResponse, program } = await getAddressAndSignature(
+  // Start the linker dapp and wait for the user to sign in (linker response).
+  // And then close the program
+  const awaitResponse = future<void>()
+  const { program } = await getAddressAndSignature(
     options.components,
+    awaitResponse,
     messageToSign,
     sceneJson,
     files,
@@ -134,10 +139,11 @@ export async function main(options: Options) {
     },
     deployEntity
   )
+
   try {
-    await linkerResponse
+    // Keep the CLI live till the user signs the payload
+    await awaitResponse
   } finally {
-    options.components.logger.info('Termino', { key: (await linkerResponse).address })
     void program?.stop()
   }
 
@@ -157,16 +163,17 @@ export async function main(options: Options) {
     const sceneUrl = `https://play.decentraland.org/?NETWORK=${network}&position=${position}&${worldRealm}`
 
     try {
+      options.components.logger.info(`Address: ${linkerResponse.address}`)
+      options.components.logger.info(`Signature: ${linkerResponse.signature}`)
+      options.components.logger.info(`Network: ${getChainName(linkerResponse.chainId!)}`)
+
       const response = (await catalyst.deploy(deployData, {
         timeout: '10m'
       })) as { message?: string }
       if (response.message) {
         printProgressInfo(options.components.logger, response.message)
       }
-      printSuccess(options.components.logger, 'Content uploaded', sceneUrl)
-      options.components.logger.info(`Address: ${linkerResponse.address}`)
-      options.components.logger.info(`Signature: ${linkerResponse.signature}`)
-      options.components.logger.info(`Network: ${getChainName(linkerResponse.chainId!)}`)
+      printSuccess(options.components.logger, 'Content uploaded successfully', sceneUrl)
 
       options.components.analytics.track('Scene deploy success', {
         ...trackProps,
@@ -176,6 +183,11 @@ export async function main(options: Options) {
         isPortableExperience: !!sceneJson.isPortableExperience,
         dependencies
       })
+
+      if (!isWorld) {
+        options.components.logger.info('You can close the terminal now')
+      }
+
     } catch (e: any) {
       options.components.logger.error('Could not upload content:')
       options.components.logger.error(e.message)

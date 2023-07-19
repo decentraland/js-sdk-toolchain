@@ -8,6 +8,7 @@ import { CliComponents } from '../../components'
 import { IFile } from '../../logic/scene-validations'
 import { runLinkerApp, LinkerResponse } from './linker-dapp/api'
 import { createWallet } from '../../logic/account'
+import { IFuture } from 'fp-future'
 
 export async function getCatalyst(target?: string, targetContent?: string) {
   if (target) {
@@ -30,21 +31,25 @@ interface LinkOptions {
 
 export async function getAddressAndSignature(
   components: CliComponents,
+  awaitResponse: IFuture<void>,
   messageToSign: string,
   scene: Scene,
   files: IFile[],
   linkOptions: LinkOptions,
   deployCallback: (response: LinkerResponse) => Promise<void>
-): Promise<{ linkerResponse: Promise<LinkerResponse>; program?: Lifecycle.ComponentBasedProgram<unknown> }> {
+): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> {
   if (process.env.DCL_PRIVATE_KEY) {
     const wallet = createWallet(process.env.DCL_PRIVATE_KEY)
     const signature = ethSign(hexToBytes(wallet.privateKey), messageToSign)
     const linkerResponse = { signature, address: wallet.address }
     await deployCallback(linkerResponse)
+    awaitResponse.resolve()
+    return {}
   }
 
   const { linkerPort, ...opts } = linkOptions
-  return await runLinkerApp(components, scene, files, linkerPort!, messageToSign, opts, deployCallback)
+  const { program } = await runLinkerApp(components, awaitResponse, scene, files, linkerPort!, messageToSign, opts, deployCallback)
+  return { program }
 }
 
 export function sceneHasWorldCfg(scene: Scene) {

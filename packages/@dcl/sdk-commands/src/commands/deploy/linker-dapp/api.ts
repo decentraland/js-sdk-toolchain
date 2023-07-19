@@ -6,7 +6,7 @@ import { resolve } from 'path'
 import { ChainId, Scene } from '@dcl/schemas'
 import querystring from 'querystring'
 import open from 'open'
-import future from 'fp-future'
+import { IFuture } from 'fp-future'
 
 import { getPort } from '../../../logic/get-free-port'
 import { IFile } from '../../../logic/scene-validations'
@@ -37,6 +37,7 @@ export interface SceneInfo {
 
 export async function runLinkerApp(
   cliComponents: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,
+  awaitResponse: IFuture<void>,
   scene: Scene,
   files: IFile[],
   port: number,
@@ -49,7 +50,6 @@ export async function runLinkerApp(
   const protocol = isHttps ? 'https' : 'http'
   const queryParams = querystring.stringify(sceneInfo)
   const url = `${protocol}://localhost:${resolvedPort}`
-  const futureResponse = future<LinkerResponse>()
   const program = await Lifecycle.run({
     async initComponents() {
       const config = createRecordConfigComponent({
@@ -67,22 +67,20 @@ export async function runLinkerApp(
     },
     async main(program) {
       const { components, startComponents } = program
-      const { router, futureSignature } = setRoutes(components, files, sceneInfo, deployCallback, program.stop)
+      const { router } = setRoutes(components, awaitResponse, files, sceneInfo, deployCallback)
       components.server.setContext(components)
       components.server.use(router.allowedMethods())
       components.server.use(router.middleware())
 
       await startComponents()
       if (openBrowser) await browse(components, url, queryParams)
-      const signature = await futureSignature
-      futureResponse.resolve(signature)
     }
   })
-  return { program, linkerResponse: futureResponse }
+  return { program }
 }
 
 async function browse({ logger }: Pick<CliComponents, 'logger'>, url: string, params: string) {
-  logger.info('You need to sign the content before the deployment sarasa:')
+  logger.info('You need to sign the content before the deployment:')
 
   setTimeout(async () => {
     try {
