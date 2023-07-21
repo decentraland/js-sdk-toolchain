@@ -35,5 +35,7 @@ export const sceneJson = {
     }
   ],
   requiredPermissions: ['ALLOW_TO_TRIGGER_AVATAR_EMOTE', 'ALLOW_TO_MOVE_PLAYER_INSIDE_SCENE'],
-  featureToggles: {}
+  featureToggles: {
+    portableExperiences: 'enabled'
+  } as const
 }

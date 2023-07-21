@@ -25,7 +25,7 @@ export async function createFsCompositeProvider(
           composite
         }
       } else {
-        const compositeContent = (await fs.readFile(itemPath)).toString()
+        const compositeContent = new TextDecoder().decode(await fs.readFile(itemPath))
         const json = JSON.parse(compositeContent)
         const composite = Composite.fromJson(json)
         return {

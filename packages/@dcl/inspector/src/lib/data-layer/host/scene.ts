@@ -17,7 +17,7 @@ export interface SceneProvider {
 }
 
 function bufferToScene(sceneBuffer: Buffer): Scene {
-  return JSON.parse(sceneBuffer.toString())
+  return JSON.parse(new TextDecoder().decode(sceneBuffer))
 }
 
 function sceneToBuffer(scene: Scene): Buffer {

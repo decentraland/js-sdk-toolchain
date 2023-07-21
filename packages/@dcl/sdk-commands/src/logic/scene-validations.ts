@@ -38,7 +38,8 @@ export function assertValidScene(scene: Scene) {
     const errors: string[] = []
     if (Scene.validate.errors) {
       for (const error of Scene.validate.errors) {
-        errors.push(`Error validating scene.json: ${error.message}`)
+        const errorPath = error.instancePath.slice(1).replace(/\//g, ' => ')
+        errors.push(`Error validating scene.json: ${errorPath} ${error.message}`)
       }
     }
     throw new CliError('Invalid scene.json file:\n' + errors.join('\n'))
