@@ -50,7 +50,7 @@ export async function main(options: Options) {
 
   for (const project of workspace.projects) {
     printCurrentProjectStarting(options.components.logger, project, workspace)
-    if (project.kind === 'scene') {
+    if (project.kind === 'scene' || project.kind === 'wearable') {
       await buildScene(options, project)
     }
   }
@@ -84,6 +84,7 @@ export async function buildScene(options: Options, project: SceneProject | Weara
   options.components.analytics.track('Build scene', {
     projectHash: await b64HashingFunction(project.workingDirectory),
     coords,
-    isWorkspace: inputs.length > 1
+    isWorkspace: inputs.length > 1,
+    isPortableExperience: !!sceneJson.isPortableExperience
   })
 }

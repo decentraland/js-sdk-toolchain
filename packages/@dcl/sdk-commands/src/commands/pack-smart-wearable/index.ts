@@ -27,6 +27,7 @@ export function help(options: Options) {
     Options:'
       -h, --help                Displays complete help
       --skip-build              Skip build and use the file defined in scene.json
+      --skip-install            Skip installing dependencies
       --dir                     Path to directory to build
 
     Example:
