@@ -68,7 +68,7 @@ export function setRoutes(
     const { x, y } = getObject(sceneInfo.baseParcel)
     const pointer = `${x},${y}`
     const chainId = linkerResponse?.chainId || 1
-    const network = chainId === ChainId.ETHEREUM_MAINNET ? 'mainnet' : 'goerli'
+    const network = chainId === ChainId.ETHEREUM_MAINNET ? 'mainnet' : 'sepolia'
     const value = await getPointers(components, pointer, network)
     const deployedToAll = new Set(value.map((c) => c.entityId)).size === 1
 

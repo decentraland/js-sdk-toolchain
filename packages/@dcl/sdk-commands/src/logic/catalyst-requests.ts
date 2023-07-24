@@ -14,7 +14,7 @@ type CatalystInfo = {
   entityId: string
 }
 
-export type Network = 'mainnet' | 'sepolia' | 'goerli'
+export type Network = 'mainnet' | 'sepolia'
 
 export async function daoCatalysts(
   components: Pick<CliComponents, 'fetch' | 'config'>,

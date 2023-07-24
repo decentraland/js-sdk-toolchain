@@ -157,7 +157,7 @@ export async function main(options: Options) {
 
     const deployData = { entityId, files: entityFiles, authChain }
     const position = sceneJson.scene.base
-    const network = chainId === ChainId.ETHEREUM_GOERLI ? 'goerli' : 'mainnet'
+    const network = chainId === ChainId.ETHEREUM_SEPOLIA ? 'sepolia' : 'mainnet'
     const worldRealm = isWorld && `realm=${sceneJson.worldConfiguration?.name}`
     const sceneUrl = `https://play.decentraland.org/?NETWORK=${network}&position=${position}&${worldRealm}`
 
