@@ -1,7 +1,7 @@
 import path from 'path'
 import { CliComponents } from '../../components'
 import { declareArgs } from '../../logic/args'
-import { installDependencies, needsDependencies, SceneProject } from '../../logic/project-validations'
+import { installDependencies, needsDependencies, SceneProject, WearableProject } from '../../logic/project-validations'
 import { getBaseCoords } from '../../logic/scene-validations'
 import { b64HashingFunction } from '../../logic/project-files'
 import { bundleProject } from '../../logic/bundle'
@@ -50,13 +50,13 @@ export async function main(options: Options) {
 
   for (const project of workspace.projects) {
     printCurrentProjectStarting(options.components.logger, project, workspace)
-    if (project.kind === 'scene') {
+    if (project.kind === 'scene' || project.kind === 'wearable') {
       await buildScene(options, project)
     }
   }
 }
 
-export async function buildScene(options: Options, project: SceneProject) {
+export async function buildScene(options: Options, project: SceneProject | WearableProject) {
   const shouldInstallDeps = await needsDependencies(options.components, project.workingDirectory)
 
   if (shouldInstallDeps && !options.args['--skip-install']) {
@@ -84,6 +84,7 @@ export async function buildScene(options: Options, project: SceneProject) {
   options.components.analytics.track('Build scene', {
     projectHash: await b64HashingFunction(project.workingDirectory),
     coords,
-    isWorkspace: inputs.length > 1
+    isWorkspace: inputs.length > 1,
+    isPortableExperience: !!sceneJson.isPortableExperience
   })
 }

@@ -27,6 +27,7 @@ export type Events = {
     projectHash: string
     coords: { x: number; y: number }
     isWorkspace: boolean
+    isPortableExperience: boolean
   }
   'Export static': {
     projectHash: string
@@ -52,6 +53,9 @@ export type Events = {
     coords: { x: number; y: number }
     isWorld: boolean
     error: string
+  }
+  'Pack smart wearable': {
+    projectHash: string
   }
 }
 

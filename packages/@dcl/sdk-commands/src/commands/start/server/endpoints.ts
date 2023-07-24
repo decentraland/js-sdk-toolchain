@@ -1,9 +1,11 @@
 import { Router } from '@well-known-components/http-server'
-import { PreviewComponents } from '../types'
 import * as path from 'path'
 import { WearableJson } from '@dcl/schemas/dist/sdk'
 import { Entity, EntityType, Locale, Wearable } from '@dcl/schemas'
 import fetch, { Headers } from 'node-fetch'
+import { v4 as uuidv4 } from 'uuid'
+
+import { PreviewComponents } from '../types'
 import { fetchEntityByPointer } from '../../../logic/catalyst-requests'
 import { CliComponents } from '../../../components'
 import {
@@ -290,6 +292,8 @@ async function getAllPreviewWearables(
   return ret
 }
 
+const wearableCache = new Map<string, string>()
+
 async function serveWearable(
   components: Pick<CliComponents, 'fs' | 'logger'>,
   project: WearableProject,
@@ -316,7 +320,10 @@ async function serveWearable(
   const thumbnail =
     thumbnailFiltered.length > 0 && thumbnailFiltered[0]!.hash && `${baseUrl}/${thumbnailFiltered[0].hash}`
 
-  const wearableId = 'urn:8dc2d7ad-97e3-44d0-ba89-e8305d795a6a'
+  // Set wearable ID.
+  const sceneHash = await b64HashingFunction(JSON.stringify(project.scene))
+  const wearableId = wearableCache.get(sceneHash) ?? `urn:${uuidv4()}`
+  wearableCache.set(sceneHash, wearableId)
 
   const representations = wearableJson.data.representations.map((representation) => ({
     ...representation,
