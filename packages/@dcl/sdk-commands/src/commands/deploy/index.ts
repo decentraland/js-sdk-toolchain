@@ -1,8 +1,7 @@
 import { resolve } from 'path'
-import { ChainId, getChainName } from '@dcl/schemas'
+import { EntityType, ChainId, getChainName } from '@dcl/schemas'
 import { Authenticator } from '@dcl/crypto'
 import { DeploymentBuilder } from 'dcl-catalyst-client'
-import { EntityType } from 'dcl-catalyst-client/node_modules/@dcl/schemas'
 
 import { CliComponents } from '../../components'
 import { getBaseCoords, getFiles, getValidSceneJson, validateFilesSizes } from '../../logic/scene-validations'
@@ -152,13 +151,13 @@ export async function main(options: Options) {
     const authChain = Authenticator.createSimpleAuthChain(entityId, address, signature)
 
     // Uploading data
-    const catalyst = await getCatalyst(options.args['--target'], options.args['--target-content'])
+    const { client, url } = await getCatalyst(options.args['--target'], options.args['--target-content'])
 
-    printProgressInfo(options.components.logger, `Uploading data to: ${catalyst.getContentUrl()}...`)
+    printProgressInfo(options.components.logger, `Uploading data to: ${url}...`)
 
     const deployData = { entityId, files: entityFiles, authChain }
     const position = sceneJson.scene.base
-    const network = chainId === ChainId.ETHEREUM_GOERLI ? 'goerli' : 'mainnet'
+    const network = chainId === ChainId.ETHEREUM_SEPOLIA ? 'sepolia' : 'mainnet'
     const worldRealm = isWorld && `realm=${sceneJson.worldConfiguration?.name}`
     const sceneUrl = `https://play.decentraland.org/?NETWORK=${network}&position=${position}&${worldRealm}`
 
@@ -167,8 +166,8 @@ export async function main(options: Options) {
       options.components.logger.info(`Signature: ${linkerResponse.signature}`)
       options.components.logger.info(`Network: ${getChainName(linkerResponse.chainId!)}`)
 
-      const response = (await catalyst.deploy(deployData, {
-        timeout: '10m'
+      const response = (await client.deploy(deployData, {
+        timeout: 600000
       })) as { message?: string }
       if (response.message) {
         printProgressInfo(options.components.logger, response.message)
@@ -178,7 +177,7 @@ export async function main(options: Options) {
       options.components.analytics.track('Scene deploy success', {
         ...trackProps,
         sceneId: entityId,
-        targetContentServer: catalyst.getContentUrl(),
+        targetContentServer: url,
         worldName: sceneJson.worldConfiguration?.name,
         isPortableExperience: !!sceneJson.isPortableExperience,
         dependencies
