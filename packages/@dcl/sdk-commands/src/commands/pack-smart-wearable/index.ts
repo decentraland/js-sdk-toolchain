@@ -23,7 +23,7 @@ export const args = declareArgs({
 
 export function help(options: Options) {
   options.components.logger.log(`
-  Usage: 'sdk-commands build [options]'
+  Usage: 'sdk-commands pack-smart-wearable [options]'
     Options:'
       -h, --help                Displays complete help
       --skip-build              Skip build and use the file defined in scene.json
