@@ -151,15 +151,17 @@ export async function main(options: Options) {
     const authChain = Authenticator.createSimpleAuthChain(entityId, address, signature)
 
     // Uploading data
-    const { client, url } = await getCatalyst(options.args['--target'], options.args['--target-content'])
+    const { client, url } = await getCatalyst(chainId, options.args['--target'], options.args['--target-content'])
 
     printProgressInfo(options.components.logger, `Uploading data to: ${url}...`)
 
     const deployData = { entityId, files: entityFiles, authChain }
     const position = sceneJson.scene.base
     const network = chainId === ChainId.ETHEREUM_SEPOLIA ? 'sepolia' : 'mainnet'
-    const worldRealm = isWorld && `realm=${sceneJson.worldConfiguration?.name}`
-    const sceneUrl = `https://play.decentraland.org/?NETWORK=${network}&position=${position}&${worldRealm}`
+    const worldRealm = isWorld ? `&realm=${sceneJson.worldConfiguration?.name}` : ''
+    const domain =
+      chainId === ChainId.ETHEREUM_MAINNET ? 'https://play.decentraland.org' : 'https://play.decentraland.zone'
+    const sceneUrl = `${domain}/?NETWORK=${network}&position=${position}${worldRealm}`
 
     try {
       options.components.logger.info(`Address: ${linkerResponse.address}`)
