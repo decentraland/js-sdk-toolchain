@@ -184,7 +184,8 @@ export async function main(options: Options) {
       Object.keys(networkInterfaces).forEach((dev) => {
         ;(networkInterfaces[dev] || []).forEach((details) => {
           if (details.family === 'IPv4') {
-            let addr = `http://${details.address}:${port}?position=${baseCoords.x}%2C${baseCoords.y}`
+            const oldBackpack = 'DISABLE_backpack_editor_v2=&ENABLE_backpack_editor_v1'
+            let addr = `http://${details.address}:${port}?position=${baseCoords.x}%2C${baseCoords.y}&${oldBackpack}`
             if (debug) {
               addr = `${addr}&SCENE_DEBUG_PANEL`
             }
