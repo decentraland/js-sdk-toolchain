@@ -1,4 +1,4 @@
-import { Scene } from '@dcl/schemas'
+import { ChainId, Scene } from '@dcl/schemas'
 import { Lifecycle } from '@well-known-components/interfaces'
 import { createCatalystClient, createContentClient, CatalystClient, ContentClient } from 'dcl-catalyst-client'
 import { getCatalystServersFromCache } from 'dcl-catalyst-client/dist/contracts-snapshots'
@@ -13,8 +13,9 @@ import { createWallet } from '../../logic/account'
 import { IFuture } from 'fp-future'
 
 export async function getCatalyst(
+  chainId: ChainId = ChainId.ETHEREUM_MAINNET,
   target?: string,
-  targetContent?: string
+  targetContent?: string,
 ): Promise<{ client: ContentClient; url: string }> {
   if (target) {
     const catalyst = createCatalystClient({
@@ -34,19 +35,25 @@ export async function getCatalyst(
     return { client: createContentClient({ url: targetContent, fetcher: createFetchComponent() }), url: targetContent }
   }
 
-  const catalysts = getCatalystServersFromCache('mainnet')
-
   let catalystClient: CatalystClient
-  for (const catalyst of catalysts) {
-    const client = createCatalystClient({ url: catalyst.address, fetcher: createFetchComponent() })
 
-    const isHealthy = (await client.fetchAbout()).healthy
+  if (chainId === ChainId.ETHEREUM_SEPOLIA) {
+    catalystClient = createCatalystClient({ url: 'peer.decentraland.zone', fetcher: createFetchComponent() })
+  } else {
+    const catalysts = getCatalystServersFromCache('mainnet')
 
-    if (isHealthy) {
-      catalystClient = client
-      break
+    for (const catalyst of catalysts) {
+      const client = createCatalystClient({ url: catalyst.address, fetcher: createFetchComponent() })
+
+      const isHealthy = (await client.fetchAbout()).healthy
+
+      if (isHealthy) {
+        catalystClient = client
+        break
+      }
     }
   }
+
 
   return {
     client: await catalystClient!.getContentClient(),
