@@ -15,7 +15,7 @@ import { IFuture } from 'fp-future'
 export async function getCatalyst(
   chainId: ChainId = ChainId.ETHEREUM_MAINNET,
   target?: string,
-  targetContent?: string,
+  targetContent?: string
 ): Promise<{ client: ContentClient; url: string }> {
   if (target) {
     const catalyst = createCatalystClient({
@@ -53,7 +53,6 @@ export async function getCatalyst(
       }
     }
   }
-
 
   return {
     client: await catalystClient!.getContentClient(),
