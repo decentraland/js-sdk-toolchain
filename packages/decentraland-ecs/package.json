@@ -28,5 +28,5 @@
     "@dcl/explorer": "1.0.132930-20230725144125.commit-5991944",
     "@dcl/posix": "^1.0.4"
   },
-  "minCliVersion": "3.16.2"
+  "minCliVersion": "3.18.0"
 }
