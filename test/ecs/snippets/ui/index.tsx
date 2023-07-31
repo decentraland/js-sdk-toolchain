@@ -53,8 +53,7 @@ function circularSystem(dt: number) {
 createCube(8, 1, 8)
 engine.addSystem(circularSystem)
 
-type GenesisPlazaContent = string
-const sceneThumbnail: GenesisPlazaContent = 'models/Magazinev1.png'
+const sceneThumbnail = 'models/Magazinev1.png'
 
 const uiComponent = () => (
   <UiEntity
