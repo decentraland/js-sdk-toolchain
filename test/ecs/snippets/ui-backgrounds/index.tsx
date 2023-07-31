@@ -2,9 +2,8 @@ import { engine } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { UiEntity, Label, ReactEcsRenderer, Dropdown } from '@dcl/sdk/react-ecs'
 
-type GenesisPlazaContent = string
-const src: GenesisPlazaContent = 'images/rounded_alpha_square.png'
-const centeredImage: GenesisPlazaContent = 'images/ui_beam_up_bg.png'
+const src = 'images/rounded_alpha_square.png'
+const centeredImage = 'images/ui_beam_up_bg.png'
 
 let dt = 0
 let userId: string | undefined
