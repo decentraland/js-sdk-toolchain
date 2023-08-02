@@ -57,6 +57,10 @@ export class CameraManager {
     scene.activeCamera.attachControl(inputSource, true)
   }
 
+  getCamera() {
+    return this.camera
+  }
+
   getGlobalPosition() {
     return this.camera.globalPosition
   }
