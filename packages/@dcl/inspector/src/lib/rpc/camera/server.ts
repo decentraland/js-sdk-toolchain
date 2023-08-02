@@ -1,8 +1,8 @@
 import { Engine, FreeCamera, ScreenshotTools, Vector3 } from '@babylonjs/core'
-import { RPC } from '../../logic/rpc'
+import { RPC } from '@dcl/mini-rpc'
 import { CameraRPC } from './types'
 
-export class CameraServer extends RPC<string, object, CameraRPC.Method, CameraRPC.Params, CameraRPC.Result> {
+export class CameraServer extends RPC<CameraRPC.Method, CameraRPC.Params, CameraRPC.Result> {
   constructor(transport: RPC.Transport, engine: Engine, camera: FreeCamera) {
     super(CameraRPC.name, transport)
 

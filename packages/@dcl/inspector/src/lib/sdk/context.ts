@@ -1,5 +1,6 @@
 import { Scene } from '@babylonjs/core'
 import { ComponentDefinition, CrdtMessageType, Entity, IEngine } from '@dcl/ecs'
+import { MessageTransport } from '@dcl/mini-rpc'
 import { Emitter } from 'mitt'
 
 import { ITheme } from '../../components/AssetsCatalog'
@@ -13,7 +14,6 @@ import { Gizmos } from '../babylon/decentraland/gizmo-manager'
 import { CameraManager } from '../babylon/decentraland/camera'
 import { InspectorPreferences } from '../logic/preferences/types'
 import { getParentUrl } from '../../redux/data-layer/sagas/connect'
-import { MessageTransport } from '../logic/transports'
 import { CameraServer } from '../rpc/camera/server'
 
 export type SdkContextEvents = {

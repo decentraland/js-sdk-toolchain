@@ -1,7 +1,7 @@
-import { RPC } from '../../logic/rpc'
+import { RPC } from '@dcl/mini-rpc'
 import { CameraRPC } from './types'
 
-export class CameraClient extends RPC<string, object, CameraRPC.Method, CameraRPC.Params, CameraRPC.Result> {
+export class CameraClient extends RPC<CameraRPC.Method, CameraRPC.Params, CameraRPC.Result> {
   constructor(transport: RPC.Transport) {
     super(CameraRPC.name, transport)
   }
