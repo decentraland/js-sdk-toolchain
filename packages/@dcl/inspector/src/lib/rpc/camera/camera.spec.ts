@@ -24,6 +24,7 @@ describe('CameraRPC', () => {
       spy.mockResolvedValue(image)
       await expect(client.takeScreenshot(1024, 1024)).resolves.toBe(image)
       expect(spy).toHaveBeenCalledWith(engine, camera, expect.objectContaining({ width: 1024, height: 1024 }))
+      spy.mockRestore()
     })
   })
   describe('When using the setPosition method of the client', () => {
@@ -31,6 +32,7 @@ describe('CameraRPC', () => {
       const spy = jest.spyOn(camera.position, 'set')
       await expect(client.setPosition(8, 0, 8)).resolves.toBe(undefined)
       expect(spy).toHaveBeenCalledWith(8, 0, 8)
+      spy.mockRestore()
     })
   })
   describe('When using the setTarget method of the client', () => {
@@ -38,6 +40,7 @@ describe('CameraRPC', () => {
       const spy = jest.spyOn(camera, 'setTarget')
       await expect(client.setTarget(8, 0, 8)).resolves.toBe(undefined)
       expect(spy).toHaveBeenCalledWith(new Vector3(8, 0, 8))
+      spy.mockRestore()
     })
   })
 })
