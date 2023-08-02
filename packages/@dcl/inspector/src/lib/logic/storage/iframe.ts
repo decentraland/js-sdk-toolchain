@@ -1,12 +1,7 @@
-import { RPC } from '../rpc'
-import { MessageTransport } from '../transports'
+import { RPC, MessageTransport } from '@dcl/mini-rpc'
 import { Storage } from './types'
 
 export namespace IframeStorage {
-  export type EventType = string
-
-  export type EventData = object
-
   export enum Method {
     READ_FILE = 'read_file',
     WRITE_FILE = 'write_file',
@@ -33,7 +28,7 @@ export namespace IframeStorage {
 
   export const id = 'IframeStorage'
 
-  export class Client extends RPC<EventType, EventData, Method, Params, Result> {
+  export class Client extends RPC<Method, Params, Result> {
     constructor(transport: RPC.Transport) {
       super(id, transport)
     }
@@ -59,7 +54,7 @@ export namespace IframeStorage {
     }
   }
 
-  export class Server extends RPC<EventType, EventData, Method, Params, Result> {
+  export class Server extends RPC<Method, Params, Result> {
     constructor(transport: RPC.Transport) {
       super(id, transport)
     }
