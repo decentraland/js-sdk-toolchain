@@ -9,7 +9,7 @@
     "@babylonjs/materials": "^5.48.0",
     "@dcl/ecs": "file:../ecs",
     "@dcl/ecs-math": "2.0.2",
-    "@dcl/mini-rpc": "^1.0.5",
+    "@dcl/mini-rpc": "^1.0.6",
     "@dcl/rpc": "^1.1.1",
     "@dcl/schemas": "^8.2.3-20230718182824.commit-356025c",
     "@reduxjs/toolkit": "^1.9.5",
