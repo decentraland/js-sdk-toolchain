@@ -1,4 +1,4 @@
-import { RPC, MessageTransport } from '@dcl/mini-rpc'
+import { RPC, MessageTransport, Transport } from '@dcl/mini-rpc'
 import { Storage } from './types'
 
 export namespace IframeStorage {
@@ -29,7 +29,7 @@ export namespace IframeStorage {
   export const id = 'IframeStorage'
 
   export class Client extends RPC<Method, Params, Result> {
-    constructor(transport: RPC.Transport) {
+    constructor(transport: Transport) {
       super(id, transport)
     }
 
@@ -55,7 +55,7 @@ export namespace IframeStorage {
   }
 
   export class Server extends RPC<Method, Params, Result> {
-    constructor(transport: RPC.Transport) {
+    constructor(transport: Transport) {
       super(id, transport)
     }
   }
