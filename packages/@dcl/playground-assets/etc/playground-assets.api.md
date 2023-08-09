@@ -2184,7 +2184,6 @@ export interface PBMaterial_PbrMaterial {
     emissiveColor?: PBColor3 | undefined;
     emissiveIntensity?: number | undefined;
     emissiveTexture?: TextureUnion | undefined;
-    glossiness?: number | undefined;
     metallic?: number | undefined;
     reflectivityColor?: PBColor3 | undefined;
     roughness?: number | undefined;
