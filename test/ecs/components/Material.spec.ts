@@ -59,7 +59,6 @@ describe('Generated Material ProtoBuf', () => {
           }
         },
         castShadows: true,
-        glossiness: 1,
         metallic: 1,
         roughness: 1,
         specularIntensity: 0,
@@ -125,7 +124,6 @@ describe('Generated Material ProtoBuf', () => {
         emissiveColor: { r: 0, g: 0, b: 1 },
         reflectivityColor: { r: 0, g: 0, b: 1 },
         emissiveIntensity: 0,
-        glossiness: 0.5,
         metallic: 1,
         roughness: 1,
         specularIntensity: 0,
