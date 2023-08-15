@@ -5,6 +5,7 @@
 ```ts
 
 import _m0 from 'protobufjs/minimal';
+import { VideoTrackSourceType } from '~system/CommsApi';
 
 // @public (undocumented)
 export type AlignType = 'auto' | 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline' | 'space-between' | 'space-around';
@@ -3827,6 +3828,8 @@ export namespace VideoTexture {
     // (undocumented)
     export function encode(message: VideoTexture, writer?: _m0.Writer): _m0.Writer;
 }
+
+export { VideoTrackSourceType }
 
 // @public (undocumented)
 export const VisibilityComponent: LastWriteWinElementSetComponentDefinition<PBVisibilityComponent>;
