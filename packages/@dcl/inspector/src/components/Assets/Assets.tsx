@@ -1,7 +1,6 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback } from 'react'
 import cx from 'classnames'
 
-import { AssetsTab } from './types'
 import { FolderOpen } from '../Icons/Folder'
 import { MdImageSearch } from 'react-icons/md'
 import { HiOutlinePlus } from 'react-icons/hi'
@@ -9,19 +8,24 @@ import { useCatalog } from '../../hooks/catalog/useCatalog'
 import { AssetsCatalog } from '../AssetsCatalog'
 import { ProjectAssetExplorer } from '../ProjectAssetExplorer'
 import ImportAsset from '../ImportAsset'
+import { AssetsTab } from '../../redux/ui/types'
 
 import './Assets.css'
+import { getSelectedAssetsTab, selectAssetsTab } from '../../redux/ui'
+import { useAppDispatch, useAppSelector } from '../../redux/hooks'
 
 function Assets() {
   const [catalog, catalogError, isCatalogLoading] = useCatalog()
-  const [tab, setTab] = useState<AssetsTab>(AssetsTab.FileSystem)
+  const dispatch = useAppDispatch()
+  const tab = useAppSelector(getSelectedAssetsTab)
 
   const handleTabClick = useCallback(
-    (value: AssetsTab) => () => {
-      setTab(value)
+    (tab: AssetsTab) => () => {
+      dispatch(selectAssetsTab({ tab }))
     },
-    [tab]
+    []
   )
+
   return (
     <div className="Assets">
       <div className="Assets-buttons">

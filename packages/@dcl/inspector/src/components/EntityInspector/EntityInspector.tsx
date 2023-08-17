@@ -11,6 +11,9 @@ import { SceneInspector } from './SceneInspector'
 import { TransformInspector } from './TransformInspector'
 import { GltfInspector } from './GltfInspector'
 import './EntityInspector.css'
+import { EditorComponentNames } from '../../lib/sdk/components'
+import { useAppSelector } from '../../redux/hooks'
+import { getHiddenComponents } from '../../redux/ui'
 
 const getLabel = (sdk: SdkContextValue, entity: Entity | null) => {
   if (entity === null) return null
@@ -25,6 +28,7 @@ const getLabel = (sdk: SdkContextValue, entity: Entity | null) => {
 export const EntityInspector = withSdk(({ sdk }) => {
   const entity = useSelectedEntity()
   const [label, setLabel] = useState<string | null>()
+  const hiddenComponents = useAppSelector(getHiddenComponents)
 
   useEffect(() => {
     setLabel(getLabel(sdk, entity))
@@ -37,12 +41,19 @@ export const EntityInspector = withSdk(({ sdk }) => {
   }
   useChange(handleUpdate, [entity])
 
-  const inspectors = [SceneInspector, TransformInspector, GltfInspector]
+  const inspectors = [
+    { name: EditorComponentNames.Scene, component: SceneInspector },
+    { name: 'core::Transform', component: TransformInspector },
+    { name: 'core::GltfContainer', component: GltfInspector }
+  ]
 
   return (
     <div className="EntityInspector" key={entity}>
       <div className="entity-label">{label}</div>
-      {inspectors.map((Inspector, index) => entity !== null && <Inspector key={index} entity={entity} />)}
+      {inspectors.map(
+        ({ name, component: Inspector }, index) =>
+          entity !== null && !hiddenComponents[name] && <Inspector key={index} entity={entity} />
+      )}
     </div>
   )
 })
