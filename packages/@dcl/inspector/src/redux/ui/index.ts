@@ -40,7 +40,7 @@ export const appState = createSlice({
 })
 
 // Actions
-export const { toggleComponent, togglePanel, selectAssetsTab } = appState.actions
+export const { toggleComponent, togglePanel, toggleGizmos, selectAssetsTab } = appState.actions
 
 // Selectors
 export const getHiddenComponents = (state: RootState): Record<string, boolean> => state.ui.hiddenComponents
