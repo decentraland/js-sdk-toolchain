@@ -37,6 +37,7 @@ export function createGizmoManager(context: SceneContext) {
   let lastEntity: EcsEntity | null = null
   let rotationGizmoAlignmentDisabled = false
   let shouldRestorRotationGizmoAlignment = false
+  let isEnabled = true
 
   function fixRotationGizmoAlignment(value: TransformType) {
     const isProportional =
@@ -132,10 +133,30 @@ export function createGizmoManager(context: SceneContext) {
     return () => events.off('change', cb)
   }
 
+  function unsetEntity() {
+    lastEntity = null
+    gizmoManager.attachToNode(lastEntity)
+    gizmoManager.positionGizmoEnabled = false
+    gizmoManager.rotationGizmoEnabled = false
+    gizmoManager.scaleGizmoEnabled = false
+    events.emit('change')
+  }
+
   return {
     gizmoManager,
+    isEnabled() {
+      return isEnabled
+    },
+    setEnabled(value: boolean) {
+      if (value !== isEnabled) {
+        isEnabled = value
+        if (!isEnabled && lastEntity) {
+          unsetEntity()
+        }
+      }
+    },
     setEntity(entity: EcsEntity | null) {
-      if (entity === lastEntity) return
+      if (entity === lastEntity || !isEnabled) return
       gizmoManager.attachToNode(entity)
       lastEntity = entity
       // fix gizmo rotation if necessary
@@ -147,12 +168,7 @@ export function createGizmoManager(context: SceneContext) {
       return lastEntity
     },
     unsetEntity() {
-      lastEntity = null
-      gizmoManager.attachToNode(lastEntity)
-      gizmoManager.positionGizmoEnabled = false
-      gizmoManager.rotationGizmoEnabled = false
-      gizmoManager.scaleGizmoEnabled = false
-      events.emit('change')
+      unsetEntity()
     },
     getGizmoTypes() {
       return [GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE] as const

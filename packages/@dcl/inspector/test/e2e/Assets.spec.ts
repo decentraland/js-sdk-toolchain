@@ -1,4 +1,4 @@
-import { AssetsTab } from '../../src/components/Assets/types'
+import { AssetsTab } from '../../src/redux/ui/types'
 import { E2E_URL } from './_config'
 import { App } from './pageObjects/App'
 import { Assets } from './pageObjects/Assets'

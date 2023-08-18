@@ -13,6 +13,8 @@ import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 import { snapPosition } from '../../lib/babylon/decentraland/snap-manager'
 import { loadGltf, removeGltf } from '../../lib/babylon/decentraland/sdkComponents/gltf-container'
 import { ROOT } from '../../lib/sdk/tree'
+import { selectAssetCatalog } from '../../redux/app'
+import { areGizmosDisabled } from '../../redux/ui'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { IAsset } from '../AssetsCatalog/types'
 import { Loading } from '../Loading'
@@ -22,7 +24,6 @@ import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
 
 import './Renderer.css'
-import { selectAssetCatalog } from '../../redux/app'
 
 const fixedNumber = (val: number) => Math.round(val * 1e2) / 1e2
 
@@ -35,6 +36,7 @@ const Renderer: React.FC = () => {
   const isMounted = useIsMounted()
   const files = useAppSelector(selectAssetCatalog)
   const init = !!files
+  const gizmosDisabled = useAppSelector(areGizmosDisabled)
 
   useEffect(() => {
     if (sdk && init) {
@@ -50,6 +52,12 @@ const Renderer: React.FC = () => {
       }
     }
   }, [files])
+
+  useEffect(() => {
+    if (sdk) {
+      sdk.gizmos.setEnabled(!gizmosDisabled)
+    }
+  }, [sdk, gizmosDisabled])
 
   const getDropPosition = async () => {
     const pointerCoords = await getPointerCoords(sdk!.scene)

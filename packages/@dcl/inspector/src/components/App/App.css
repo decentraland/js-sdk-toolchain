@@ -67,3 +67,10 @@ code {
 .App .vertical-handle {
   height: 4px;
 }
+.App .Box.no-box,
+.App .Box.no-box .content,
+.App .Box.no-box .content:hover {
+  border: none;
+  margin: 0px;
+  padding: 0px;
+}

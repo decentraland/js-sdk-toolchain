@@ -15,12 +15,16 @@ import { useWindowSize } from '../../hooks/useWindowSize'
 import { useAppSelector } from '../../redux/hooks'
 import { selectDataLayerError } from '../../redux/data-layer'
 import { selectEngines } from '../../redux/sdk'
+import { getHiddenPanels } from '../../redux/ui'
+import { PanelName } from '../../redux/ui/types'
 
 const App = () => {
   const selectedEntity = useSelectedEntity()
   const { height } = useWindowSize()
 
   const sdkInitialized = useAppSelector(selectEngines).inspector
+
+  const hiddenPanels = useAppSelector(getHiddenPanels)
 
   // Footer's height is 48 pixels, so we need to calculate the percentage of the screen that it takes to pass as the minSize prop for the Panel
   const footerMin = (48 / height!) * 100
@@ -33,34 +37,52 @@ const App = () => {
       <PanelGroup direction="vertical" autoSaveId="vertical">
         <Panel>
           <PanelGroup direction="horizontal" autoSaveId="horizontal">
-            <Panel defaultSize={20} minSize={12} order={1}>
-              <Box className="composite-inspector">
-                <Hierarchy />
-              </Box>
-            </Panel>
-            <PanelResizeHandle className="horizontal-handle" />
+            {!hiddenPanels[PanelName.ENTITIES] && (
+              <>
+                <Panel defaultSize={20} minSize={12} order={1}>
+                  <Box className="composite-inspector">
+                    <Hierarchy />
+                  </Box>
+                </Panel>
+                <PanelResizeHandle className="horizontal-handle" />
+              </>
+            )}
+
             <Panel minSize={30} order={2}>
-              <Box className="composite-renderer">
-                <Toolbar />
+              <Box
+                className={cx('composite-renderer', {
+                  'no-box':
+                    !!hiddenPanels[PanelName.ENTITIES] &&
+                    !!hiddenPanels[PanelName.ASSETS] &&
+                    !!hiddenPanels[PanelName.COMPONENTS]
+                })}
+              >
+                {!hiddenPanels[PanelName.TOOLBAR] && <Toolbar />}
                 <Renderer />
               </Box>
             </Panel>
-            <PanelResizeHandle className="horizontal-handle" />
-            {selectedEntity !== null && (
-              <Panel defaultSize={20} minSize={15} order={3}>
-                <Box className="entity-inspector">
-                  <EntityInspector />
-                </Box>
-              </Panel>
+            {!hiddenPanels[PanelName.COMPONENTS] && selectedEntity !== null && (
+              <>
+                <PanelResizeHandle className="horizontal-handle" />
+                <Panel defaultSize={20} minSize={15} order={3}>
+                  <Box className="entity-inspector">
+                    <EntityInspector />
+                  </Box>
+                </Panel>
+              </>
             )}
           </PanelGroup>
         </Panel>
-        <PanelResizeHandle className="vertical-handle" />
-        <Panel minSize={footerMin} defaultSize={30}>
-          <Box className="composite-renderer">
-            <Assets />
-          </Box>
-        </Panel>
+        {!hiddenPanels[PanelName.ASSETS] && (
+          <>
+            <PanelResizeHandle className="vertical-handle" />
+            <Panel minSize={footerMin} defaultSize={30}>
+              <Box className="composite-renderer">
+                <Assets />
+              </Box>
+            </Panel>
+          </>
+        )}
       </PanelGroup>
     </div>
   )
