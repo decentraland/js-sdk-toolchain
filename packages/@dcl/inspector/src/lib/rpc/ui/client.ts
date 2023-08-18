@@ -19,7 +19,7 @@ export class UiClient extends RPC<UiRPC.Method, UiRPC.Params, UiRPC.Result> {
     return this.request('toggle_gizmos', { enabled })
   }
 
-  selectAssetTab = (tab: `${AssetsTab}`) => {
+  selectAssetsTab = (tab: `${AssetsTab}`) => {
     return this.request('select_assets_tab', { tab })
   }
 }

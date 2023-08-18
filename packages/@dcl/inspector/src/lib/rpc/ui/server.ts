@@ -7,19 +7,20 @@ export class UiServer extends RPC<UiRPC.Method, UiRPC.Params, UiRPC.Result> {
     super(UiRPC.name, transport)
 
     this.handle('toggle_component', async ({ component, enabled }) => {
-      store.dispatch({ type: 'toggle_component', payload: { component, enabled } })
+      store.dispatch({ type: 'ui/toggleComponent', payload: { component, enabled } })
     })
 
     this.handle('toggle_panel', async ({ panel, enabled }) => {
-      store.dispatch({ type: 'toggle_panel', payload: { panel, enabled } })
+      store.dispatch({ type: 'ui/togglePanel', payload: { panel, enabled } })
     })
 
     this.handle('toggle_gizmos', async ({ enabled }) => {
-      store.dispatch({ type: 'toggle_gizmos', payload: { enabled } })
+      store.dispatch({ type: 'ui/toggleGizmos', payload: { enabled } })
     })
 
     this.handle('select_assets_tab', async ({ tab }) => {
-      store.dispatch({ type: 'select_assets_tab', payload: { tab } })
+      console.log('tabsss', tab)
+      store.dispatch({ type: 'ui/selectAssetsTab', payload: { tab } })
     })
   }
 }
