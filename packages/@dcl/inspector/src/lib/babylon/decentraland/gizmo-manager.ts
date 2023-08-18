@@ -37,7 +37,7 @@ export function createGizmoManager(context: SceneContext) {
   let lastEntity: EcsEntity | null = null
   let rotationGizmoAlignmentDisabled = false
   let shouldRestorRotationGizmoAlignment = false
-  let isEnabled = false
+  let isEnabled = true
 
   function fixRotationGizmoAlignment(value: TransformType) {
     const isProportional =
@@ -149,7 +149,7 @@ export function createGizmoManager(context: SceneContext) {
     },
     setEnabled(value: boolean) {
       isEnabled = value
-      if (!isEnabled) {
+      if (!isEnabled && lastEntity) {
         unsetEntity()
       }
     },
