@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { Entity } from '@dcl/ecs'
 
@@ -6,14 +6,13 @@ import { useSelectedEntity } from '../../hooks/sdk/useSelectedEntity'
 import { withSdk } from '../../hoc/withSdk'
 import { SdkContextEvents, SdkContextValue } from '../../lib/sdk/context'
 import { useChange } from '../../hooks/sdk/useChange'
+import { useAppSelector } from '../../redux/hooks'
+import { getHiddenComponents } from '../../redux/ui'
 
 import { SceneInspector } from './SceneInspector'
 import { TransformInspector } from './TransformInspector'
 import { GltfInspector } from './GltfInspector'
 import './EntityInspector.css'
-import { EditorComponentNames } from '../../lib/sdk/components'
-import { useAppSelector } from '../../redux/hooks'
-import { getHiddenComponents } from '../../redux/ui'
 
 const getLabel = (sdk: SdkContextValue, entity: Entity | null) => {
   if (entity === null) return null
@@ -41,11 +40,14 @@ export const EntityInspector = withSdk(({ sdk }) => {
   }
   useChange(handleUpdate, [entity])
 
-  const inspectors = [
-    { name: EditorComponentNames.Scene, component: SceneInspector },
-    { name: 'core::Transform', component: TransformInspector },
-    { name: 'core::GltfContainer', component: GltfInspector }
-  ]
+  const inspectors = useMemo(
+    () => [
+      { name: sdk.components.Scene.componentName, component: SceneInspector },
+      { name: sdk.components.Transform.componentName, component: TransformInspector },
+      { name: sdk.components.GltfContainer.componentName, component: GltfInspector }
+    ],
+    [sdk]
+  )
 
   return (
     <div className="EntityInspector" key={entity}>
