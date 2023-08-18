@@ -148,9 +148,11 @@ export function createGizmoManager(context: SceneContext) {
       return isEnabled
     },
     setEnabled(value: boolean) {
-      isEnabled = value
-      if (!isEnabled && lastEntity) {
-        unsetEntity()
+      if (value !== isEnabled) {
+        isEnabled = value
+        if (!isEnabled && lastEntity) {
+          unsetEntity()
+        }
       }
     },
     setEntity(entity: EcsEntity | null) {
