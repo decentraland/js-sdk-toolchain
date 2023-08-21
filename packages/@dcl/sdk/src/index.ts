@@ -1,14 +1,16 @@
 /** @alpha THIS FILE INITIALIZES THE DECENTRALAND RUNTIME. WILL CHANGE SOON */
 import { Composite, engine } from '@dcl/ecs'
-import { crdtGetState, crdtSendToRenderer, sendBatch } from '~system/EngineApi'
+import { crdtGetState, crdtSendToRenderer, sendBatch, crdtSendNetwork } from '~system/EngineApi'
 import { createRendererTransport } from './internal/transports/rendererTransport'
 import { pollEvents } from './observables'
 import { compositeProvider } from './composite-provider'
+import { createNetworkSyncTransport } from './internal/transports/networkSyncronizeTransport'
 
 // Attach CRDT transport
 // @internal
 export const rendererTransport = createRendererTransport({ crdtSendToRenderer })
 engine.addTransport(rendererTransport)
+engine.addTransport(createNetworkSyncTransport({ crdtSendNetwork }))
 
 export async function onUpdate(deltaTime: number) {
   engine.seal()
