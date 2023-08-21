@@ -33,7 +33,6 @@ export type Entity = number & {
 // This type matches with @dcl/crdt entity type.
 
 /**
- * @internal
  * This first 512 entities are reserved by the renderer
  */
 export const RESERVED_STATIC_ENTITIES = 512
