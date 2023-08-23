@@ -14,6 +14,18 @@ import {
   inputSystem
 } from '@dcl/ecs'
 import { Vector3, Quaternion, Color4 } from '@dcl/sdk/math'
+
+// // import { isServer } from '~system/runtime'
+// import { createServerTransport } from '@dcl/sdk/crdt-server'
+
+// if (!isServer()) {
+//   createServerTransport('ws://boedo.com')
+// }
+
+// // if (isServer) {
+
+// // }
+
 export * from '@dcl/sdk'
 
 const Door = engine.defineComponent('door', { open: Schemas.Boolean })
@@ -36,7 +48,9 @@ function createCube(x: number, y: number, z: number): Entity {
   Material.setPbrMaterial(meshEntity, { albedoColor: Color4.fromHexString(getRandomHexColor()) })
 
   Door.create(meshEntity, { open: false })
+
   SyncEntity.create(meshEntity, { componentIds: [Door.componentId, Material.componentId] })
+
   PointerEvents.create(meshEntity, {
     pointerEvents: [
       { eventType: PointerEventType.PET_DOWN, eventInfo: { button: InputAction.IA_POINTER, hoverText: 'Change Color' } }

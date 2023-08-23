@@ -40,6 +40,7 @@ export function createNetworkSyncTransport(engineApi: EngineApiForTransport): Tr
       if ((message as any).componentId === 1063) {
         return false
       }
+
       // filter messages from reserved entities.
       if (message.entityId <= RESERVED_STATIC_ENTITIES) {
         return false
@@ -55,11 +56,6 @@ export function createNetworkSyncTransport(engineApi: EngineApiForTransport): Tr
       if ((message as any).componentId && sync.componentIds.includes((message as any).componentId)) {
         return true
       }
-
-      // if ((message as any).componentId <= MAX_STATIC_COMPONENT) {
-      //   // filter out messages for core components
-      //   return false
-      // }
 
       return false
     }
