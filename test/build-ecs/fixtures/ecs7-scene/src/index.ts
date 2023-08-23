@@ -61,6 +61,7 @@ function createCube(x: number, y: number, z: number): Entity {
 }
 
 function changeColorSystem() {
+  console.log('change color system')
   for (const [entity] of engine.getEntitiesWith(Door, PointerEvents)) {
     if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)) {
       Material.setPbrMaterial(entity, { albedoColor: Color4.fromHexString(getRandomHexColor()) })
