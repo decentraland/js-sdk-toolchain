@@ -4,13 +4,19 @@ import { crdtGetState, crdtSendToRenderer, sendBatch, crdtSendNetwork } from '~s
 import { createRendererTransport } from './internal/transports/rendererTransport'
 import { pollEvents } from './observables'
 import { compositeProvider } from './composite-provider'
-import { createNetworkSyncTransport } from './internal/transports/networkSyncronizeTransport'
+import { createNetworkCommsTransport } from './internal/transports/network/commsTransport'
 
 // Attach CRDT transport
 // @internal
 export const rendererTransport = createRendererTransport({ crdtSendToRenderer })
 engine.addTransport(rendererTransport)
-engine.addTransport(createNetworkSyncTransport({ crdtSendNetwork }))
+
+let commsTransportInitialized = false
+export function addCommsTransport() {
+  if (commsTransportInitialized) return
+  commsTransportInitialized = true
+  engine.addTransport(createNetworkCommsTransport({ crdtSendNetwork }))
+}
 
 export async function onUpdate(deltaTime: number) {
   engine.seal()
