@@ -6,6 +6,11 @@
 
 import _m0 from 'protobufjs/minimal';
 
+// Warning: (ae-missing-release-tag) "addCommsTransport" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function addCommsTransport(): void;
+
 // @public (undocumented)
 export type AlignType = 'auto' | 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline' | 'space-between' | 'space-around';
 
