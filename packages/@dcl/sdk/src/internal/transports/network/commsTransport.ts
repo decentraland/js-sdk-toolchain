@@ -1,28 +1,31 @@
 import { Transport, TransportMessage, SyncEntity, engine } from '@dcl/ecs'
 import { RESERVED_STATIC_ENTITIES } from '@dcl/ecs/dist/engine/entity'
 import type { CrdtSendToRendererRequest, CrdtSendToResponse } from '~system/EngineApi'
-import { serializeCrdtMessages } from './logger'
+import { serializeCrdtMessages } from '../logger'
 
 export type EngineApiForTransport = {
   crdtSendNetwork(body: CrdtSendToRendererRequest): Promise<CrdtSendToResponse>
 }
 
-export function createNetworkSyncTransport(engineApi: EngineApiForTransport): Transport {
+export function createNetworkCommsTransport(engineApi: EngineApiForTransport): Transport {
   async function sendTo(message: Uint8Array) {
+    if (!engineApi.crdtSendNetwork) {
+      return
+    }
     const response = await engineApi.crdtSendNetwork({
       data: new Uint8Array(message)
     })
 
     if (response && response.data && response.data.length) {
-      if (networkSyncTransport.onmessage) {
+      if (commsNetworkSyncTransport.onmessage) {
         for (const byteArray of response.data) {
-          networkSyncTransport.onmessage(byteArray)
+          commsNetworkSyncTransport.onmessage(byteArray)
         }
       }
     }
   }
 
-  const networkSyncTransport: Transport = {
+  const commsNetworkSyncTransport: Transport = {
     async send(message) {
       try {
         const messages = Array.from(serializeCrdtMessages('SyncNetwork', message, engine))
@@ -61,5 +64,5 @@ export function createNetworkSyncTransport(engineApi: EngineApiForTransport): Tr
     }
   }
 
-  return networkSyncTransport
+  return commsNetworkSyncTransport
 }
