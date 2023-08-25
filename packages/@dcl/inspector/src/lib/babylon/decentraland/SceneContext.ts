@@ -12,6 +12,7 @@ import { putBillboardComponent } from './sdkComponents/billboard'
 import { putGltfContainerComponent } from './sdkComponents/gltf-container'
 import { putMeshRendererComponent } from './sdkComponents/mesh-renderer'
 import { putTransformComponent } from './sdkComponents/transform'
+import { putTextShapeComponent } from './sdkComponents/text'
 import { putSceneComponent } from './editorComponents/scene'
 import { createOperations } from '../../sdk/operations'
 import { createGizmoManager } from './gizmo-manager'
@@ -57,6 +58,7 @@ export class SceneContext {
     [this.MeshRenderer.componentId]: putMeshRendererComponent,
     [this.Billboard.componentId]: putBillboardComponent,
     [this.GltfContainer.componentId]: putGltfContainerComponent,
+    [this.TextShape.componentId]: putTextShapeComponent,
     [this.editorComponents.Selection.componentId]: putEntitySelectedComponent,
     [this.editorComponents.Scene.componentId]: putSceneComponent
   }
