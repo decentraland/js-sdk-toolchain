@@ -85,7 +85,7 @@ Please try to remove unneccessary files and/or reduce the files size, you can ig
   try {
     await zipProject(
       options.components.fs,
-      files.map(($) => $.absolutePath.replace(project.workingDirectory + '/', '')),
+      files.map(($) => $.absolutePath.replace(project.workingDirectory + path.sep, '')),
       packDir
     )
   } catch (e) {
@@ -120,6 +120,12 @@ function zipProject(fs: CliComponents['fs'], files: string[], target: string) {
     for (const file of files) {
       if (file === '') continue
       archive.file(file, { name: file })
+      // eslint-disable-next-line no-console
+      console.log(process.cwd())
+      const normalizedFilePath = path.normalize(file)
+      // eslint-disable-next-line no-console
+      console.log(normalizedFilePath)
+      // archive.file(normalizedFilePath, { name: normalizedFilePath })
     }
 
     return archive.finalize()
