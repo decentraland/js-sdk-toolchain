@@ -1,38 +1,28 @@
-.TextField {
+.SelectField {
   padding: 2px 3px;
-  background-color: var(--background-gray);
-  border: 1px solid var(--background-gray);
+  border: 1px solid var(--border-gray);
   display: flex;
   margin-right: 8px;
-  border-radius: 5px;
+  border-radius: 1.6px;
   flex-grow: 1;
   width: 0;
   font-size: 12px;
 }
 
-.TextField:focus-within {
+.SelectField:focus-within {
   border-color: var(--border-focused);
 }
 
-.TextField > label {
+.SelectField>label {
   color: var(--secondary-text);
   display: block;
   margin-right: 8px;
-  flex-shrink: 0;
 }
 
-.TextField > input {
+.SelectField>select {
   width: 100%;
   color: var(--text);
   background-color: var(--transparent);
   outline: none;
   border: none;
-}
-
-.TextField:last-child {
-  margin-right: 0px;
-}
-
-.TextField > input[type=checkbox] {
-  width: auto;
 }

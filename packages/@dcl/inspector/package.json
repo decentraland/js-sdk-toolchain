@@ -15,6 +15,7 @@
     "@dcl/schemas": "^8.2.3-20230718182824.commit-356025c",
     "@reduxjs/toolkit": "^1.9.5",
     "@testing-library/react": "^14.0.0",
+    "@types/earcut": "^2.1.1",
     "@types/jest-environment-puppeteer": "^5.0.3",
     "@types/node": "^18.11.18",
     "@types/node-fetch": "^2.6.4",
@@ -62,5 +63,8 @@
     "start": "npm run copy-bin && node ./build.js --watch"
   },
   "types": "dist/tooling-entrypoint.d.ts",
-  "typings": "dist/tooling-entrypoint.d.ts"
+  "typings": "dist/tooling-entrypoint.d.ts",
+  "dependencies": {
+    "earcut": "^2.2.4"
+  }
 }

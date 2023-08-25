@@ -14,6 +14,8 @@ import { TransformInspector } from './TransformInspector'
 import { GltfInspector } from './GltfInspector'
 import { ActionInspector } from './ActionInspector'
 import { TriggerInspector } from './TriggerInspector'
+import { TextShapeInspector } from './TextShapeInspector'
+
 import './EntityInspector.css'
 
 const getLabel = (sdk: SdkContextValue, entity: Entity | null) => {
@@ -48,7 +50,8 @@ export const EntityInspector = withSdk(({ sdk }) => {
       { name: sdk.components.Transform.componentName, component: TransformInspector },
       { name: sdk.components.GltfContainer.componentName, component: GltfInspector },
       { name: sdk.components.Actions.componentName, component: ActionInspector },
-      { name: sdk.components.Triggers.componentName, component: TriggerInspector }
+      { name: sdk.components.Triggers.componentName, component: TriggerInspector },
+      { name: sdk.components.TextShape.componentName, component: TextShapeInspector }
     ],
     [sdk]
   )

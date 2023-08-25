@@ -5,12 +5,15 @@ import { Component } from '../../lib/sdk/components'
 import { useComponentValue } from './useComponentValue'
 
 type Input = {
-  [key: string]: string | Record<string, string | Input>
+  [key: string]: string | Input | boolean
 }
 
-export function isValidNumericInput(input: Input | string): boolean {
+export function isValidNumericInput(input: Input[keyof Input]): boolean {
   if (typeof input === 'object') {
     return Object.values(input).every((value) => isValidNumericInput(value))
+  }
+  if (typeof input === 'boolean') {
+    return !!input
   }
   return input.length > 0 && !isNaN(Number(input))
 }
@@ -36,9 +39,12 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
     setInput(value)
   }, [])
 
-  const handleUpdate = (path: NestedKey<InputType>) => (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUpdate = (
+    path: NestedKey<InputType>,
+    getter: (event: React.ChangeEvent<HTMLInputElement>) => any = (e) => e.target.value
+  ) => (event: React.ChangeEvent<HTMLInputElement>) => {
     if (input === null) return
-    const newInputs = setValue(input, path, event.target.value as any)
+    const newInputs = setValue(input, path, getter(event))
     updateInputs(newInputs)
   }
 
@@ -77,6 +83,7 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
       // skip sync from state while editing, to avoid overriding the user input
       return
     }
+
     const newInputs = fromComponentValueToInput(componentValue)
     // set "skipSync" to avoid cyclic component value change
     updateInputs(newInputs, true)
@@ -88,13 +95,14 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
 
   const getProps = useCallback(
     (
-      path: NestedKey<InputType>
+      path: NestedKey<InputType>,
+      getter?: (event: React.ChangeEvent<HTMLInputElement>) => any
     ): Pick<InputHTMLAttributes<HTMLElement>, 'value' | 'onChange' | 'onFocus' | 'onBlur'> => {
       const value = getValue(input, path) || ''
 
       return {
         value: value.toString(),
-        onChange: handleUpdate(path),
+        onChange: handleUpdate(path, getter),
         onFocus: handleFocus,
         onBlur: handleBlur
       }

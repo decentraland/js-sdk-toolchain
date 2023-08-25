@@ -31,7 +31,7 @@ type ValidationError = string | null
 async function validateGltf(data: ArrayBuffer): Promise<ValidationError> {
   let result
   try {
-    result = await GLTFValidation.ValidateAsync(data, '', '', (_uri) => {
+    result = await GLTFValidation.ValidateAsync(new Uint8Array(data), '', '', (_uri) => {
       throw new Error('external references are not supported yet')
     })
   } catch (error) {
