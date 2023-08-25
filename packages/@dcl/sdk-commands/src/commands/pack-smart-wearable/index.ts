@@ -120,12 +120,6 @@ function zipProject(fs: CliComponents['fs'], files: string[], target: string) {
     for (const file of files) {
       if (file === '') continue
       archive.file(file, { name: file })
-      // eslint-disable-next-line no-console
-      console.log(process.cwd())
-      const normalizedFilePath = path.normalize(file)
-      // eslint-disable-next-line no-console
-      console.log(normalizedFilePath)
-      // archive.file(normalizedFilePath, { name: normalizedFilePath })
     }
 
     return archive.finalize()
