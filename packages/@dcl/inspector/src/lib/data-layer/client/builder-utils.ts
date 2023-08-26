@@ -3,7 +3,7 @@ export async function downloadAssets(mappings: Record<string, string>) {
 
   async function downloadAndAssignAsset([path, contentHash]: [string, string]) {
     try {
-      const url = `https://builder-api.decentraland.org/v1/storage/contents/${contentHash}`
+      const url = `https://builder-items.decentraland.org/contents/${contentHash}`
       const request = await fetch(url)
       const content = await request.arrayBuffer()
       fileContent[path] = Buffer.from(content)
