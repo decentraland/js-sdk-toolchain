@@ -13,9 +13,10 @@ import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { ProjectAssetDrop } from '../../../lib/sdk/drag-drop'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
+import { SelectField } from '../SelectField'
 import { TextField } from '../TextField'
 import { Props } from './types'
-import { fromGltf, toGltf, isValidInput, getModel } from './utils'
+import { fromGltf, toGltf, isValidInput, getModel, COLLISION_LAYERS } from './utils'
 import { withAssetDir } from '../../../lib/data-layer/host/fs-utils'
 import { useAppSelector } from '../../../redux/hooks'
 import { selectAssetCatalog } from '../../../redux/app'
@@ -74,8 +75,6 @@ export default withSdk<Props>(
 
     if (!hasGltf) return null
 
-    const inputProps = getInputProps('src')
-
     return (
       <Container label="GLTF container" className={cx('Gltf', { hover: isHover })}>
         <Menu id={contextMenuId}>
@@ -84,7 +83,11 @@ export default withSdk<Props>(
           </Item>
         </Menu>
         <Block label="Path" ref={drop} error={files && !isValid}>
-          <TextField type="text" {...inputProps} />
+          <TextField type="text" {...getInputProps('src')} />
+        </Block>
+        <Block label="Collision">
+          <SelectField label="Visible layer" options={COLLISION_LAYERS} {...getInputProps('visibleMeshesCollisionMask')} />
+          <SelectField label="Invisible layer" options={COLLISION_LAYERS} {...getInputProps('invisibleMeshesCollisionMask')} />
         </Block>
       </Container>
     )

@@ -17,6 +17,7 @@
   color: var(--secondary-text);
   display: block;
   margin-right: 8px;
+  flex-shrink: 0;
 }
 
 .SelectField>select {

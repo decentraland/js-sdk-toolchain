@@ -1,4 +1,4 @@
-import { PBTextShape } from '@dcl/ecs'
+import { PBTextShape, Font, TextAlignMode } from '@dcl/ecs'
 
 import { TextShapeInput } from './types'
 
@@ -12,12 +12,12 @@ const toString = (value: unknown, def: number = 0) => (value ?? def).toString()
 export const fromTextShape = (value: PBTextShape): TextShapeInput => {
   return {
     text: value.text,
-    font: toString(value.font, 0),
+    font: toString(value.font, Font.F_SANS_SERIF),
     fontSize: toString(value.fontSize, 10),
     fontAutoSize: !!value.fontAutoSize,
     width: toString(value.width, 100),
     height: toString(value.height, 100),
-    textAlign: toString(value.textAlign, 0),
+    textAlign: toString(value.textAlign, TextAlignMode.TAM_MIDDLE_CENTER),
     textWrapping: !!value.textWrapping,
     paddingTop: toString(value.paddingTop, 0),
     paddingRight: toString(value.paddingRight, 0),
@@ -35,12 +35,12 @@ export const fromTextShape = (value: PBTextShape): TextShapeInput => {
 export const toTextShape = (value: TextShapeInput): PBTextShape => {
   return {
     text: value.text,
-    font: FONTS.find(($) => $.value === Number(value.font))?.value || 0,
+    font: Number(value.font) || Font.F_SANS_SERIF,
     fontSize: toNumber(value.fontSize, 0),
     fontAutoSize: !!value.fontAutoSize,
     width: toNumber(value.width, 0),
     height: toNumber(value.height, 0),
-    textAlign: TEXT_ALIGN_MODES.find(($) => $.value === Number(value.textAlign))?.value || 4,
+    textAlign: Number(value.textAlign) || TextAlignMode.TAM_MIDDLE_CENTER,
     textWrapping: !!value.textWrapping,
     paddingTop: toNumber(value.paddingTop, 0),
     paddingRight: toNumber(value.paddingRight, 0),
@@ -62,41 +62,41 @@ export function isValidInput(): boolean {
 // this interfaces (Font & TextAlignMode) are exported as const, thus not existing at runtime
 // maybe we could enable "preserveConstEnums" ts flag?
 export const FONTS = [{
-  value: 0,
+  value: Font.F_SANS_SERIF,
   label: 'Sans Serif'
 }, {
-  value: 1,
+  value: Font.F_SERIF,
   label: 'Serif'
 }, {
-  value: 2,
+  value: Font.F_MONOSPACE,
   label: 'Monospace'
 }]
 
 export const TEXT_ALIGN_MODES = [{
-  value: 0,
+  value: TextAlignMode.TAM_TOP_LEFT,
   label: 'Top left'
 }, {
-  value: 1,
+  value: TextAlignMode.TAM_TOP_CENTER,
   label: 'Top center'
 }, {
-  value: 2,
+  value: TextAlignMode.TAM_TOP_RIGHT,
   label: 'Top right'
 }, {
-  value: 3,
+  value: TextAlignMode.TAM_MIDDLE_LEFT,
   label: 'Middle left'
 }, {
-  value: 4,
+  value: TextAlignMode.TAM_MIDDLE_CENTER,
   label: 'Middle center'
 }, {
-  value: 5,
+  value: TextAlignMode.TAM_MIDDLE_RIGHT,
   label: 'Middle right'
 }, {
-  value: 6,
+  value: TextAlignMode.TAM_BOTTOM_LEFT,
   label: 'Bottom left'
 }, {
-  value: 7,
+  value: TextAlignMode.TAM_BOTTOM_CENTER,
   label: 'Bottom center'
 }, {
-  value: 8,
+  value: TextAlignMode.TAM_BOTTOM_RIGHT,
   label: 'Bottom Right'
 }]
