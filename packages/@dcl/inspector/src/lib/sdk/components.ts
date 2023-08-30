@@ -8,6 +8,8 @@ import {
   TransformComponentExtended
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
+import { Action, Actions as AvailableActions } from '../../components/EntityInspector/ActionInspector/types'
+import { Trigger, Triggers as AvailableTriggers } from '../../components/EntityInspector/TriggerInspector/types'
 import { Layout } from '../utils/layout'
 import { GizmoType } from '../utils/gizmo'
 
@@ -17,19 +19,25 @@ export type Node = { entity: Entity; children: Entity[] }
 export enum EditorComponentNames {
   Selection = 'inspector::Selection',
   Scene = 'inspector::Scene',
-  Nodes = 'inspector::Nodes'
+  Nodes = 'inspector::Nodes',
+  Actions = 'inspector::Actions',
+  Triggers = 'inspector::Triggers'
 }
 
 export type EditorComponentsTypes = {
   Selection: { gizmo: GizmoType }
   Scene: { layout: Layout }
   Nodes: { value: Node[] }
+  Actions: { value: Action[] }
+  Triggers: { value: Trigger[] }
 }
 
 export type EditorComponents = {
   Selection: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Selection']>
   Scene: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Scene']>
   Nodes: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Nodes']>
+  Actions: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Actions']>
+  Triggers: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>
 }
 
 export type SdkComponents = {
@@ -86,5 +94,26 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     )
   })
 
-  return { Selection, Scene, Nodes }
+  const Actions = engine.defineComponent(EditorComponentNames.Actions, {
+    value: Schemas.Array(
+      Schemas.Map({
+        name: Schemas.String,
+        type: Schemas.EnumString<AvailableActions>(AvailableActions, AvailableActions.PLAY_ANIMATION)
+      })
+    )
+  })
+
+  const Triggers = engine.defineComponent(EditorComponentNames.Triggers, {
+    value: Schemas.Array(
+      Schemas.Map({
+        type: Schemas.EnumString<AvailableTriggers>(AvailableTriggers, AvailableTriggers.ON_CLICK),
+        entity: Schemas.Optional(Schemas.Entity),
+        action: Schemas.Optional(
+          Schemas.EnumString<AvailableActions>(AvailableActions, AvailableActions.PLAY_ANIMATION)
+        )
+      })
+    )
+  })
+
+  return { Selection, Scene, Nodes, Actions, Triggers }
 }
