@@ -8,6 +8,7 @@ import { withContextMenu } from '../../../hoc/withContextMenu'
 import { getComponentValue, useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
+import { useEntitiesWith } from '../../../hooks/sdk/useEntitiesWith'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
 import { Block } from '../../Block'
@@ -19,7 +20,6 @@ import { Action, Actions as AvailableActions } from '../ActionInspector/types'
 import { Trigger, Triggers as AvailableTriggers, Props } from './types'
 
 import './TriggerInspector.css'
-import { useEntitiesWith } from '../../../hooks/sdk/useEntitiesWith'
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity, contextMenuId }) => {

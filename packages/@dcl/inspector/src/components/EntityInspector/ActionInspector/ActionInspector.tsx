@@ -52,11 +52,10 @@ export default withSdk<Props>(
       setComponentValue((prev: EditorComponentsTypes['Actions']) => {
         return { value: [...prev.value, { type: AvailableActions.PLAY_ANIMATION, name: '' }] }
       })
-    }, [])
+    }, [setComponentValue])
 
     const handleChangeAnimation = useCallback(
-      (e: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
-        const { value } = e.target
+      ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
         setComponentValue((prev: EditorComponentsTypes['Actions']) => {
           const data = [...prev.value]
           data[idx].animation = value
