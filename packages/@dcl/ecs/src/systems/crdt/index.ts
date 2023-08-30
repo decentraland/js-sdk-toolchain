@@ -78,7 +78,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             transportId,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
           })
-
           // Unknown message, we skip it
         } else {
           // consume the message

@@ -62,6 +62,8 @@ export type PreEngine = Pick<
   | 'seal'
   | 'entityContainer'
   | 'getEntityOrNullByName'
+  | 'addNetworkManager'
+  | 'getNetworkManager'
 > & {
   getSystems: () => SystemItem[]
 }
@@ -80,10 +82,9 @@ export interface IEngine {
   /**
    * @public
    * Increment the used entity counter and return the next one.
-   * @param dynamic - whether or no the entity should be considered as Dynamic (vs Static)
    * @returns the next entity unused
    */
-  addEntity(dynamic?: boolean): Entity
+  addEntity(): Entity
 
   /**
    * @public
@@ -299,4 +300,11 @@ export interface IEngine {
    * Entity container with custom methods to update their state.
    */
   entityContainer: EntityContainer
+
+  addNetworkManager(
+    reservedLocalEntities: number,
+    range: [number, number]
+  ): { addEntity: IEngine['addEntity']; getConfig: EntityContainer['getConfig'] }
+
+  getNetworkManager(): ReturnType<IEngine['addNetworkManager']>
 }
