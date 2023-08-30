@@ -876,13 +876,18 @@ export type EntityComponents = {
 //
 // @public (undocumented)
 export type EntityContainer = {
-    generateEntity(): Entity;
+    generateEntity(networked?: boolean): Entity;
     removeEntity(entity: Entity): boolean;
     getEntityState(entity: Entity): EntityState;
     getExistingEntities(): Set<Entity>;
     releaseRemovedEntities(): Entity[];
     updateRemovedEntity(entity: Entity): boolean;
     updateUsedEntity(entity: Entity): boolean;
+    setNetworkEntitiesRange(reservedLocalEntities: number, range: [number, number]): void;
+    getConfig(): {
+        reservedLocalEntities: number;
+        reservedStaticEntities: number;
+    };
 };
 
 // @public (undocumented)
@@ -1034,7 +1039,12 @@ export type GSetComponentGetter<T extends GrowOnlyValueSetComponentDefinition<an
 
 // @public (undocumented)
 export interface IEngine {
-    addEntity(dynamic?: boolean): Entity;
+    addEntity(): Entity;
+    // (undocumented)
+    addNetworkManager(reservedLocalEntities: number, range: [number, number]): {
+        addEntity: IEngine['addEntity'];
+        getConfig: EntityContainer['getConfig'];
+    };
     addSystem(system: SystemFn, priority?: number, name?: string): void;
     // @alpha (undocumented)
     addTransport(transport: Transport): void;
@@ -1049,6 +1059,8 @@ export interface IEngine {
     // @alpha
     getEntityOrNullByName(label: string): Entity | null;
     getEntityState(entity: Entity): EntityState;
+    // (undocumented)
+    getNetworkManager(): ReturnType<IEngine['addNetworkManager']>;
     readonly PlayerEntity: Entity;
     registerComponentDefinition<T>(componentName: string, componentDefinition: ComponentDefinition<T>): ComponentDefinition<T>;
     // (undocumented)
@@ -3334,6 +3346,11 @@ export namespace Rect {
 
 // @public
 export function removeEntityWithChildren(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'removeEntity'>, entity: Entity): void;
+
+// Warning: (ae-missing-release-tag) "RESERVED_LOCAL_ENTITIES" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export let RESERVED_LOCAL_ENTITIES: number;
 
 // Warning: (ae-missing-release-tag) "RESERVED_STATIC_ENTITIES" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
