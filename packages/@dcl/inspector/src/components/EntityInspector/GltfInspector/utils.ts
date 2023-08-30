@@ -8,41 +8,6 @@ import { AssetCatalogResponse } from '../../../tooling-entrypoint'
 import { removeBasePath } from '../../../lib/logic/remove-base-path'
 import { GltfContainerInput } from './types'
 
-export const COLLISION_LAYERS = [{
-  value: ColliderLayer.CL_NONE,
-  label: 'None'
-}, {
-  value: ColliderLayer.CL_POINTER,
-  label: 'Pointer'
-}, {
-  value: ColliderLayer.CL_PHYSICS,
-  label: 'Physics'
-}, {
-  value: ColliderLayer.CL_CUSTOM1,
-  label: 'Custom 1'
-}, {
-  value: ColliderLayer.CL_CUSTOM2,
-  label: 'Custom 2'
-}, {
-  value: ColliderLayer.CL_CUSTOM3,
-  label: 'Custom 3'
-}, {
-  value: ColliderLayer.CL_CUSTOM4,
-  label: 'Custom 4'
-}, {
-  value: ColliderLayer.CL_CUSTOM5,
-  label: 'Custom 5'
-}, {
-  value: ColliderLayer.CL_CUSTOM6,
-  label: 'Custom 6'
-}, {
-  value: ColliderLayer.CL_CUSTOM7,
-  label: 'Custom 7'
-}, {
-  value: ColliderLayer.CL_CUSTOM8,
-  label: 'Custom 8'
-}]
-
 const toNumber = (value: string, def?: ColliderLayer) => {
   const num = Number(value)
   return isNaN(num) ? def : num
@@ -85,3 +50,38 @@ export const getModel = memoize((node: TreeNode, tree: Map<string, TreeNode>): A
 
   return null
 })
+
+export const COLLISION_LAYERS = [{
+  value: ColliderLayer.CL_NONE,
+  label: 'None'
+}, {
+  value: ColliderLayer.CL_POINTER,
+  label: 'Pointer'
+}, {
+  value: ColliderLayer.CL_PHYSICS,
+  label: 'Physics'
+}, {
+  value: ColliderLayer.CL_CUSTOM1,
+  label: 'Custom 1'
+}, {
+  value: ColliderLayer.CL_CUSTOM2,
+  label: 'Custom 2'
+}, {
+  value: ColliderLayer.CL_CUSTOM3,
+  label: 'Custom 3'
+}, {
+  value: ColliderLayer.CL_CUSTOM4,
+  label: 'Custom 4'
+}, {
+  value: ColliderLayer.CL_CUSTOM5,
+  label: 'Custom 5'
+}, {
+  value: ColliderLayer.CL_CUSTOM6,
+  label: 'Custom 6'
+}, {
+  value: ColliderLayer.CL_CUSTOM7,
+  label: 'Custom 7'
+}, {
+  value: ColliderLayer.CL_CUSTOM8,
+  label: 'Custom 8'
+}]

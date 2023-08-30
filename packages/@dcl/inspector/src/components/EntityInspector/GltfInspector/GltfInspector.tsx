@@ -76,7 +76,7 @@ export default withSdk<Props>(
     if (!hasGltf) return null
 
     return (
-      <Container label="GLTF container" className={cx('Gltf', { hover: isHover })}>
+      <Container label="GLTF" className={cx('Gltf', { hover: isHover })}>
         <Menu id={contextMenuId}>
           <Item id="delete" onClick={handleAction(handleRemove)}>
             <DeleteIcon /> Delete

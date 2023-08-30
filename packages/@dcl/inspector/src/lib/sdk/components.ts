@@ -3,9 +3,7 @@ import {
   Entity,
   IEngine,
   LastWriteWinElementSetComponentDefinition,
-  MeshRendererComponentDefinitionExtended,
   Schemas,
-  TransformComponentExtended
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import {
@@ -49,8 +47,8 @@ export type EditorComponents = {
 export type SdkComponents = {
   GltfContainer: ReturnType<typeof components.GltfContainer>
   Billboard: ReturnType<typeof components.Billboard>
-  MeshRenderer: MeshRendererComponentDefinitionExtended
-  Transform: TransformComponentExtended
+  MeshRenderer: ReturnType<typeof components.MeshRenderer>
+  Transform: ReturnType<typeof components.Transform>
   TextShape: ReturnType<typeof components.TextShape>
   Name: ReturnType<typeof components.Name>
 }
