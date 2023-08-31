@@ -48,6 +48,7 @@ export type SdkComponents = {
   GltfContainer: ReturnType<typeof components.GltfContainer>
   Billboard: ReturnType<typeof components.Billboard>
   MeshRenderer: ReturnType<typeof components.MeshRenderer>
+  MeshCollider: ReturnType<typeof components.MeshCollider>
   Transform: ReturnType<typeof components.Transform>
   TextShape: ReturnType<typeof components.TextShape>
   Name: ReturnType<typeof components.Name>
@@ -57,6 +58,7 @@ export function createComponents(engine: IEngine): SdkComponents {
   const GltfContainer = components.GltfContainer(engine)
   const Billboard = components.Billboard(engine)
   const MeshRenderer = components.MeshRenderer(engine)
+  const MeshCollider = components.MeshCollider(engine)
   const Transform = components.Transform(engine)
   const TextShape = components.TextShape(engine)
   const Name = components.Name(engine)
@@ -65,6 +67,7 @@ export function createComponents(engine: IEngine): SdkComponents {
     GltfContainer,
     Billboard,
     MeshRenderer,
+    MeshCollider,
     Transform,
     TextShape,
     Name

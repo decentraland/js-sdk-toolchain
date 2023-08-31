@@ -1,8 +1,8 @@
-import { PBMeshCollider } from '@dcl/ecs'
+import { PBMeshRenderer } from '@dcl/ecs'
 import { MeshRendererInput, MeshType } from './types'
 import { mapSelectFieldOptions } from '../SelectField/utils'
 
-export const fromMeshRenderer = (value: PBMeshCollider): MeshRendererInput => {
+export const fromMeshRenderer = (value: PBMeshRenderer): MeshRendererInput => {
   // uvs are not typed for box/plane
   // TODO: add types for them in @dcl/ecs
   switch(value.mesh?.$case) {
@@ -22,7 +22,7 @@ export const fromMeshRenderer = (value: PBMeshCollider): MeshRendererInput => {
   }
 }
 
-export const toMeshRenderer = (value: MeshRendererInput): PBMeshCollider => {
+export const toMeshRenderer = (value: MeshRendererInput): PBMeshRenderer => {
   switch(value.mesh) {
     case MeshType.MT_SPHERE:
       return { mesh: { $case: MeshType.MT_SPHERE, sphere: {} } }
@@ -37,10 +37,10 @@ export const toMeshRenderer = (value: MeshRendererInput): PBMeshCollider => {
         }
       }
     case MeshType.MT_PLANE:
-      return { mesh: { $case: MeshType.MT_PLANE, plane: { uvs: (value.uvs ?? '').split(' ') } } }
+      return { mesh: { $case: MeshType.MT_PLANE, plane: { uvs: (value.uvs ?? '').split(' ').map(Number) } } }
     case MeshType.MT_BOX:
     default:
-      return { mesh: { $case: MeshType.MT_BOX, box: { uvs: (value.uvs ?? '').split(' ') } } }
+      return { mesh: { $case: MeshType.MT_BOX, box: { uvs: (value.uvs ?? '').split(' ').map(Number) } } }
   }
 }
 
@@ -50,7 +50,7 @@ export function isValidInput(): boolean {
 
 export const SHAPES = mapSelectFieldOptions(MeshType)
 
-function getUvs(value?: {} & { uvs?: string[] }) {
+function getUvs(value?: {} & { uvs?: number[] }) {
   return value?.uvs || []
 }
 

@@ -38,7 +38,7 @@ export const putMeshRendererComponent: ComponentOperation = (entity, component) 
         width: 1,
         height: 1,
         sideOrientation: 2,
-        updatable: true
+        updatable: false
       })
 
       setMeshUvs(mesh, newValue.mesh.plane.uvs)
