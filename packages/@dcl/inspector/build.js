@@ -34,7 +34,7 @@ async function main() {
       // prepend hot-reload script to the bundle when in development mode
       js: PRODUCTION ? '' : `;(() => {${fs.readFileSync(path.resolve(__dirname, './hot-reload.js'), 'utf-8')}})();`
     },
-    define: PRODUCTION ? {} : {...getEnvVars()}
+    define: {...getEnvVars()}
   })
 
   if (WATCH_MODE) {
@@ -135,7 +135,7 @@ function getEnvVars() {
   // Initialize process.env to avoid undefined variable error
   const envVars = { 'process.env': JSON.stringify({}) }
 
-  if (fs.existsSync(path.resolve(__dirname, './.env'))) {
+  if (!PRODUCTION && fs.existsSync(path.resolve(__dirname, './.env'))) {
     const envFile = fs.readFileSync(path.resolve(__dirname, './.env'), 'utf-8')
     for (const line of envFile.split('\n')) {
       const [key, value] = line.split('=')
