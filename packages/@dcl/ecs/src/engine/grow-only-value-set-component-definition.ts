@@ -157,8 +157,9 @@ export function createValueSetComponentDefinitionFromSchema<T>(
       }
       return [null, undefined]
     },
-    dumpCrdtStateToBuffer: function (buffer: ByteBuffer): void {
+    dumpCrdtStateToBuffer: function (buffer, filterEntity): void {
       for (const [entity, { raw }] of data) {
+        if (filterEntity && !filterEntity(entity)) continue
         for (const it of raw) {
           const buf = new ReadWriteByteBuffer()
           schema.serialize(it.value, buf)

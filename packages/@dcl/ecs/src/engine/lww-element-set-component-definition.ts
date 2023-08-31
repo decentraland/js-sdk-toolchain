@@ -26,8 +26,9 @@ export function createDumpLwwFunctionFromCrdt(
   schema: Pick<ISchema<any>, 'serialize' | 'deserialize'>,
   data: Map<Entity, unknown>
 ) {
-  return function dumpCrdtState(buffer: ByteBuffer) {
+  return function dumpCrdtState(buffer: ByteBuffer, filterEntity?: (entity: Entity) => boolean) {
     for (const [entity, timestamp] of timestamps) {
+      if (filterEntity && !filterEntity(entity)) continue
       /* istanbul ignore else */
       if (data.has(entity)) {
         const it = data.get(entity)!
@@ -40,6 +41,7 @@ export function createDumpLwwFunctionFromCrdt(
     }
   }
 }
+
 export function createUpdateLwwFromCrdt(
   componentId: number,
   timestamps: Map<Entity, number>,

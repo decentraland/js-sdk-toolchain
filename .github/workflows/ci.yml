@@ -326,7 +326,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
   notify_deployment:
-    needs: [build, cli_e2e]
+    needs: [build]
     if: ${{ github.event.pull_request.number }}
     runs-on: ubuntu-latest
     name: Deployment Notification
