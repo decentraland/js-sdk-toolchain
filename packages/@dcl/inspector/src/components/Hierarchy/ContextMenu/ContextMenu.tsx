@@ -9,7 +9,7 @@ import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent'
 const getEnabledComponents = () => {
   const components = new Set(['core::Transform', 'core::GltfContainer'])
 
-  if (JSON.parse(process.env.ENABLE_INSPECTOR_COMPONENTS || '')) {
+  if (JSON.parse(process.env.ENABLE_INSPECTOR_COMPONENTS || 'false')) {
     for (const component of ['inspector::Actions', 'inspector::Triggers']) {
       components.add(component)
     }
