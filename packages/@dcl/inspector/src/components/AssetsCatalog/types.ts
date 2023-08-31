@@ -1,5 +1,5 @@
 export interface Props {
-  catalog: ITheme[]
+  catalog: AssetPack[]
   error: Error | null
   isLoading: boolean
 }
@@ -17,38 +17,32 @@ export const CATEGORIES = [
   'year of the pig'
 ].sort()
 
-export interface ITheme {
-  id: string
-  title: string
-  thumbnail: string
-  created_at: string
-  updated_at: string
-  assets: IAsset[]
-}
-
-export interface IAsset {
+export type AssetPack = {
   id: string
   name: string
-  main: string
-  type: 'gltf' | 'composite'
   thumbnail: string
-  tags: []
+  assets: Asset[]
+}
+
+export type Asset = {
+  id: string
+  name: string
   category: string
-  contents: { [key: IAsset['main']]: string }
-  created_at: string
-  updated_at: string
+  tags: string[]
+  contents: Record<string, string>
+  components: Record<string, any>
 }
 
 export interface ThemeProps {
-  onClick: (value: ITheme) => void
-  value: ITheme
+  onClick: (value: AssetPack) => void
+  value: AssetPack
 }
 
 export interface CategoriesProps {
   onGoBack: () => void
-  value: ITheme
+  value: AssetPack
 }
 
 export interface AssetProps {
-  value: IAsset
+  value: Asset
 }

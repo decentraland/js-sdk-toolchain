@@ -1,6 +1,6 @@
 import { Identifier } from 'dnd-core'
 
-import { IAsset } from '../../components/AssetsCatalog/types'
+import { Asset } from '../../components/AssetsCatalog/types'
 import { TreeNode } from '../../components/ProjectAssetExplorer/ProjectView'
 
 interface Drop<T, K = object> {
@@ -9,7 +9,7 @@ interface Drop<T, K = object> {
 }
 
 export type ProjectAssetDrop = Drop<string, { tree: Map<string, TreeNode> }>
-export type BuilderAsset = Drop<IAsset>
+export type BuilderAsset = Drop<Asset>
 
 export type IDrop = ProjectAssetDrop | BuilderAsset
 
