@@ -16,12 +16,12 @@ import { ROOT } from '../../lib/sdk/tree'
 import { selectAssetCatalog } from '../../redux/app'
 import { areGizmosDisabled } from '../../redux/ui'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
-import { IAsset } from '../AssetsCatalog/types'
 import { Loading } from '../Loading'
 import { getModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 import { useIsMounted } from '../../hooks/useIsMounted'
 import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
+import { Asset } from '../AssetsCatalog/types'
 
 import './Renderer.css'
 
@@ -71,7 +71,7 @@ const Renderer: React.FC = () => {
     await operations.dispatch()
   }
 
-  const importBuilderAsset = async (asset: IAsset) => {
+  const importBuilderAsset = async (asset: Asset) => {
     const position = await getDropPosition()
     const fileContent: Record<string, Uint8Array> = {}
     const destFolder = 'builder'
@@ -87,7 +87,7 @@ const Renderer: React.FC = () => {
     await Promise.all(
       Object.entries(asset.contents).map(async ([path, contentHash]) => {
         try {
-          const url = `https://builder-api.decentraland.org/v1/storage/contents/${contentHash}`
+          const url = `https://builder-items.decentraland.org/contents/${contentHash}`
           const content = await (await fetch(url)).arrayBuffer()
           fileContent[path] = new Uint8Array(content)
         } catch (err) {

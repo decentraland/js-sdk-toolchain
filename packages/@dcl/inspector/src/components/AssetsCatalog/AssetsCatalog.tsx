@@ -3,14 +3,14 @@ import { useDrag } from 'react-dnd'
 
 import { Loading } from '../Loading'
 
-import { AssetProps, CategoriesProps, ITheme, Props, ThemeProps } from './types'
-import { getStorageUrl, getAssetsByCategory, getThemeThumbnailUrl } from './utils'
+import { AssetProps, CategoriesProps, AssetPack, Props, ThemeProps } from './types'
+import { getContentsUrl, getAssetsByCategory } from './utils'
 
 import './AssetsCatalog.css'
 
 export function AssetsCatalog({ catalog, error, isLoading }: Props) {
-  const [selectedTheme, setSelectedTheme] = useState<ITheme>()
-  const handleThemeChange = (value?: ITheme) => setSelectedTheme(value)
+  const [selectedTheme, setSelectedTheme] = useState<AssetPack>()
+  const handleThemeChange = (value?: AssetPack) => setSelectedTheme(value)
 
   if (error) {
     return (
@@ -43,9 +43,9 @@ function ThemeCell({ value, onClick }: ThemeProps) {
   }
 
   return (
-    <div onClick={handleClick} className="theme" data-test-id={value.id} data-test-label={value.title}>
-      <img src={getThemeThumbnailUrl(value.thumbnail)} alt={value.title} />
-      <h4>{value.title}</h4>
+    <div onClick={handleClick} className="theme" data-test-id={value.id} data-test-label={value.name}>
+      <img src={getContentsUrl(value.thumbnail)} alt={value.name} />
+      <h4>{value.name}</h4>
       <div></div>
     </div>
   )
@@ -62,7 +62,7 @@ function Categories({ onGoBack, value }: CategoriesProps) {
     <div className="categories">
       <div>
         <span onClick={handleGoBack}>&lt;</span>
-        <h3>{value.title}</h3>
+        <h3>{value.name}</h3>
       </div>
       {Array.from(assetsByCategory, ($) => {
         const [category, assets] = $
@@ -87,7 +87,7 @@ function AssetCell({ value }: AssetProps) {
 
   return (
     <div className="asset" ref={drag} data-test-id={value.id} data-test-label={value.name}>
-      <img src={getStorageUrl(value.thumbnail)} alt={value.tags.join(', ')} />
+      <img src={getContentsUrl(value.contents['thumbnail.png'])} alt={value.tags.join(', ')} />
     </div>
   )
 }

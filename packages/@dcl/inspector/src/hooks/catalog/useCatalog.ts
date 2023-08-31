@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { ITheme } from '../../components/AssetsCatalog'
+import { AssetPack } from '../../components/AssetsCatalog/types'
 
-export const CATALOG_URL = 'https://builder-api.decentraland.org/v1/assetPacks'
+export const CATALOG_URL = 'https://builder-items.decentraland.org/catalog.json'
 
 export const useCatalog = () => {
-  const [catalog, setCatalog] = useState<ITheme[]>([])
+  const [catalog, setCatalog] = useState<AssetPack[]>([])
   const [error, setError] = useState<Error | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -13,16 +13,8 @@ export const useCatalog = () => {
     fetch(CATALOG_URL)
       .then((res) => res.json())
       .then((json) => {
-        if (json.ok) {
-          const assetPacks = json.data.map((assetPack: any) => ({
-            ...assetPack,
-            assets: assetPack.assets.map((asset: any) => ({ ...asset, main: asset.model }))
-          }))
-          setCatalog(assetPacks)
-        } else {
-          setCatalog([])
-          setError(new Error(json.message || 'Could not load catalog'))
-        }
+        const assetPacks = json.assetPacks as AssetPack[]
+        setCatalog(assetPacks)
         setIsLoading(false)
       })
       .catch((reason) => {

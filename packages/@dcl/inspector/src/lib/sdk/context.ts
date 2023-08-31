@@ -3,7 +3,6 @@ import { ComponentDefinition, CrdtMessageType, Entity, IEngine } from '@dcl/ecs'
 import { MessageTransport } from '@dcl/mini-rpc'
 import { Emitter } from 'mitt'
 
-import { ITheme } from '../../components/AssetsCatalog'
 import { SceneContext } from '../babylon/decentraland/SceneContext'
 import { initRenderer } from '../babylon/setup/init'
 import { EditorComponents, SdkComponents } from './components'
@@ -15,6 +14,7 @@ import { CameraManager } from '../babylon/decentraland/camera'
 import { InspectorPreferences } from '../logic/preferences/types'
 import { getParentUrl } from '../../redux/data-layer/sagas/connect'
 import { CameraServer } from '../rpc/camera/server'
+import { AssetPack } from '../../components/AssetsCatalog/types'
 
 export type SdkContextEvents = {
   change: { entity: Entity; operation: CrdtMessageType; component?: ComponentDefinition<any>; value?: any }
@@ -35,7 +35,7 @@ export type SdkContextValue = {
 
 export async function createSdkContext(
   canvas: HTMLCanvasElement,
-  catalog: ITheme[],
+  catalog: AssetPack[],
   preferences: InspectorPreferences
 ): Promise<SdkContextValue> {
   const renderer = initRenderer(canvas, preferences)
