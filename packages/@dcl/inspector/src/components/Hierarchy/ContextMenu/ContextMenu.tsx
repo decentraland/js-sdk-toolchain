@@ -6,15 +6,20 @@ import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent'
 
 // TODO: enumerate better the components we want to show...
-const ENABLED_COMPONENTS_SET = new Set([
-  'core::Transform',
-  'core::GltfContainer',
-  'inspector::Actions',
-  'inspector::Triggers'
-])
+const getEnabledComponents = () => {
+  const components = new Set(['core::Transform', 'core::GltfContainer'])
+
+  if (JSON.parse(process.env.ENABLE_INSPECTOR_COMPONENTS || '')) {
+    for (const component of ['inspector::Actions', 'inspector::Triggers']) {
+      components.add(component)
+    }
+  }
+
+  return components
+}
 
 const getComponentName = (value: string) => (value.match(/[^:]*$/) || [])[0]
-const isComponentEnabled = (value: string) => ENABLED_COMPONENTS_SET.has(value)
+const isComponentEnabled = (value: string) => getEnabledComponents().has(value)
 
 const ContextMenu = (value: Entity) => {
   const { getComponents, addComponent } = useEntityComponent()
