@@ -33,7 +33,8 @@ async function main() {
     banner: {
       // prepend hot-reload script to the bundle when in development mode
       js: PRODUCTION ? '' : `;(() => {${fs.readFileSync(path.resolve(__dirname, './hot-reload.js'), 'utf-8')}})();`
-    }
+    },
+    define: PRODUCTION ? {} : {...getEnvVars()}
   })
 
   if (WATCH_MODE) {
@@ -128,4 +129,21 @@ function getNotBundledModules() {
   // now remove the ESM dependencies
   const esmModulesToBundle = ['@dcl/sdk', '@dcl/ecs', '@dcl/mini-rpc']
   return Array.from(externalModules).concat(builtinModules).filter($ => !esmModulesToBundle.includes($))
+}
+
+function getEnvVars() {
+  // Initialize process.env to avoid undefined variable error
+  const envVars = { 'process.env': JSON.stringify({}) }
+
+  if (fs.existsSync(path.resolve(__dirname, './.env'))) {
+    const envFile = fs.readFileSync(path.resolve(__dirname, './.env'), 'utf-8')
+    for (const line of envFile.split('\n')) {
+      const [key, value] = line.split('=')
+      if (key) {
+        envVars[`process.env.${key}`] = JSON.stringify(value ?? true)
+      }
+    }
+  }
+
+  return envVars
 }
