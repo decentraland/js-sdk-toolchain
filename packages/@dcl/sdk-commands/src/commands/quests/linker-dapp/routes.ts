@@ -4,7 +4,7 @@ import { IFuture } from 'fp-future'
 
 import { CliComponents } from '../../../components'
 import { LinkerResponse } from './api'
-import { CreateQuest } from '../types'
+import { CreateQuest, QuestLinkerActionType } from '../types'
 
 function getContentType(type: string) {
   switch (type) {
@@ -22,7 +22,7 @@ export function setRoutes(
   components: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,
   awaitResponse: IFuture<void>,
   info: { messageToSign: string; extraData?: { questName?: string; questId?: string; createQuest?: CreateQuest } },
-  actionType: 'create' | 'list' | 'activate' | 'deactivate',
+  actionType: QuestLinkerActionType,
   linkerCallback: (value: LinkerResponse) => Promise<void>
 ) {
   // We need to wait so the linker-dapp can receive the response and show a nice message.

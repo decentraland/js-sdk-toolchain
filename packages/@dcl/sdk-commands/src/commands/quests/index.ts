@@ -3,7 +3,7 @@ import prompts from 'prompts'
 import fetch from 'node-fetch'
 import { declareArgs } from '../../logic/args'
 import { CliComponents } from '../../components'
-import { createQuest, executeSubcommand, validateCreateQuest } from './utils'
+import { QuestLinkerOptions, createQuest, executeSubcommand, validateCreateQuest } from './utils'
 import { CreateQuest } from './types'
 import { colors } from '../../components/log'
 
@@ -15,6 +15,11 @@ interface Options {
 export const args = declareArgs({
   '--help': Boolean,
   '-h': '--help',
+  '--no-browser': Boolean,
+  '-b': '--no-browser',
+  '--port': Number,
+  '-p': '--port',
+  '--https': Boolean,
   '--list': String,
   '-ls': '--list',
   '--create': Boolean,
@@ -28,22 +33,38 @@ export function help(options: Options) {
     Usage: 'sdk-commands quests [options]'
       Options:
         -h,  --help                                                   Displays complete help
+        -p, --port           [port]                                   Select a custom port for the development server
+        -b, --no-browser                                              Do not open a new browser window
         --create                                                      Creates a new Quest
         --create-from-json   [path]                                   Create a new Quest from absolute path to a JSON file
-        -ls, --list          [your_eth_address]                       Lists all of your quests
-        --deactivate         [quest_id]                               Deactivate your Quest
+        -ls, --list          [your_eth_address]                       Lists all of your quests. 
+        --deactivate         [quest_id]                               Deactivate a Quest that you created
         --activate           [quest_id]                               Activate your Quest that was deactivated
 
-  
+
       Example:
       - Lists all of your quests:
         $ sdk-commands quests --list
       - Creates a new Quest:
         $ sdk-commands quests --create
+      - Creates a new Quest from a JSON file:
+        $ sdk-commands quests --create-from-a-json /Users/nickname/Desktop/my-great-quest.json
+      - List your Quests:
+        $ sdk-commands quests -ls 0xYourAddress
+        $ sdk-commands quests --list 0xYourAddress
+      - Deactivate a Quest:
+        $ sdk-commands quests --deactivate 0001-your-quest-id-2222
+      - Activate a Quest:
+        $ sdk-commands quests --activate 0001-your-quest-id-2222
   `)
 }
 
 export async function main(options: Options) {
+  const linkerPort = options.args['--port']
+  const openBrowser = !options.args['--no-browser']
+  const isHttps = !!options.args['--https']
+  const linkerOpts = { linkerPort, openBrowser, isHttps }
+
   const { logger } = options.components
 
   const { environment } = await prompts({
@@ -65,19 +86,24 @@ export async function main(options: Options) {
       : 'http://localhost:3000'
 
   if (options.args['--create']) {
-    await executeCreateSubcommand(options.components, baseURL)
+    await executeCreateSubcommand(options.components, linkerOpts, baseURL)
   } else if (options.args['--create-from-json'] && options.args['--create-from-json'].length) {
-    await executeCreateSubcommand(options.components, baseURL, options.args[`--create-from-json`])
+    await executeCreateSubcommand(options.components, linkerOpts, baseURL, options.args[`--create-from-json`])
   } else if (options.args['--list']?.length) {
-    await executeListSubcommand(options.components, baseURL, options.args['--list'])
+    await executeListSubcommand(options.components, linkerOpts, baseURL, options.args['--list'])
   } else if (options.args['--activate']?.length) {
-    await executeActivateSubcommand(options.components, baseURL, options.args['--activate'])
+    await executeActivateSubcommand(options.components, linkerOpts, baseURL, options.args['--activate'])
   } else if (options.args['--deactivate']?.length) {
-    await executeDeactivateSubcommand(options.components, baseURL, options.args['--deactivate'])
+    await executeDeactivateSubcommand(options.components, linkerOpts, baseURL, options.args['--deactivate'])
   }
 }
 
-async function executeCreateSubcommand(components: CliComponents, baseURL: string, path?: string) {
+async function executeCreateSubcommand(
+  components: CliComponents,
+  linkerOps: QuestLinkerOptions,
+  baseURL: string,
+  path?: string
+) {
   const { logger, fs } = components
   let quest: CreateQuest | null = null
   if (path) {
@@ -106,6 +132,7 @@ async function executeCreateSubcommand(components: CliComponents, baseURL: strin
 
   await executeSubcommand(
     components,
+    linkerOps,
     {
       url: createURL,
       method: 'POST',
@@ -136,13 +163,19 @@ async function executeCreateSubcommand(components: CliComponents, baseURL: strin
   )
 }
 
-async function executeListSubcommand(components: CliComponents, baseURL: string, address: string) {
+async function executeListSubcommand(
+  components: CliComponents,
+  linkerOpts: QuestLinkerOptions,
+  baseURL: string,
+  address: string
+) {
   const { logger } = components
 
   const getQuests = `${baseURL}/api/creators/${address}/quests`
 
   await executeSubcommand(
     components,
+    linkerOpts,
     { url: getQuests, method: 'GET', metadata: {}, actionType: 'list' },
     async (authchainHeaders) => {
       try {
@@ -168,13 +201,19 @@ async function executeListSubcommand(components: CliComponents, baseURL: string,
   )
 }
 
-async function executeActivateSubcommand(components: CliComponents, baseURL: string, questId: string) {
+async function executeActivateSubcommand(
+  components: CliComponents,
+  linkerOpts: QuestLinkerOptions,
+  baseURL: string,
+  questId: string
+) {
   const { logger } = components
 
   const activateQuest = `${baseURL}/api/quests/${questId}/activate`
 
   await executeSubcommand(
     components,
+    linkerOpts,
     { url: activateQuest, method: 'PUT', metadata: {}, actionType: 'activate', extraData: { questId } },
     async (authchainHeaders) => {
       try {
@@ -197,13 +236,19 @@ async function executeActivateSubcommand(components: CliComponents, baseURL: str
   )
 }
 
-async function executeDeactivateSubcommand(components: CliComponents, baseURL: string, questId: string) {
+async function executeDeactivateSubcommand(
+  components: CliComponents,
+  linkerOpts: QuestLinkerOptions,
+  baseURL: string,
+  questId: string
+) {
   const { logger } = components
 
   const deactivateQuest = `${baseURL}/api/quests/${questId}`
 
   await executeSubcommand(
     components,
+    linkerOpts,
     { url: deactivateQuest, method: 'DELETE', metadata: {}, actionType: 'deactivate', extraData: { questId } },
     async (authchainHeaders) => {
       try {

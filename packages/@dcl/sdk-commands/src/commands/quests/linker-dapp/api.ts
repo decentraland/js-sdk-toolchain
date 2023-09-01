@@ -10,7 +10,7 @@ import { IFuture } from 'fp-future'
 import { getPort } from '../../../logic/get-free-port'
 import { CliComponents } from '../../../components'
 import { setRoutes } from './routes'
-import { CreateQuest } from '../types'
+import { CreateQuest, QuestLinkerActionType } from '../types'
 
 export interface LinkerResponse {
   address: string
@@ -23,13 +23,13 @@ export async function runLinkerApp(
   awaitResponse: IFuture<void>,
   port: number,
   info: { messageToSign: string; extraData?: { questName?: string; questId?: string; createQuest?: CreateQuest } },
-  actionType: 'create' | 'list' | 'activate' | 'deactivate',
+  actionType: QuestLinkerActionType,
   { isHttps, openBrowser }: { isHttps: boolean; openBrowser: boolean },
   deployCallback: (linkerResponse: LinkerResponse) => Promise<void>
 ) {
   const resolvedPort = await getPort(port)
   const protocol = isHttps ? 'https' : 'http'
-  const url = `${protocol}://localhost:${resolvedPort}`
+  const url = `${protocol}://localhost:${resolvedPort}/quests`
   const program = await Lifecycle.run({
     async initComponents() {
       const config = createRecordConfigComponent({
@@ -53,14 +53,20 @@ export async function runLinkerApp(
       components.server.use(router.middleware())
 
       await startComponents()
-      if (openBrowser) await browse(components, url, '')
+      if (openBrowser) {
+        await browse(components, url, '')
+      } else {
+        components.logger.info('You need to sign the quest before executing the command:')
+        components.logger.info('')
+        components.logger.info(`Navigate to:\n ${url}`)
+      }
     }
   })
   return { program }
 }
 
 async function browse({ logger }: Pick<CliComponents, 'logger'>, url: string, params: string) {
-  logger.info('You need to sign the content before the deployment:')
+  logger.info('You need to sign the quest before executing the command:')
 
   setTimeout(async () => {
     try {

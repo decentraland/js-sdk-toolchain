@@ -5,11 +5,11 @@ import { Lifecycle } from '@well-known-components/interfaces'
 import { CliComponents } from '../../components'
 import { createWallet } from '../../logic/account'
 import { LinkerResponse, runLinkerApp } from './linker-dapp/api'
-import { CreateQuest } from './types'
+import { CreateQuest, QuestLinkerActionType } from './types'
 import prompts from 'prompts'
 import { Authenticator } from '@dcl/crypto'
 
-interface LinkOptions {
+export interface QuestLinkerOptions {
   openBrowser: boolean
   linkerPort?: number
   isHttps: boolean
@@ -17,10 +17,11 @@ interface LinkOptions {
 
 export async function getAddressAndSignature(
   components: CliComponents,
+  linkerOpts: QuestLinkerOptions,
   awaitResponse: IFuture<void>,
   info: { messageToSign: string; extraData?: { questName?: string; questId?: string; createQuest?: CreateQuest } },
-  actionType: 'create' | 'list' | 'activate' | 'deactivate',
-  linkOptions: LinkOptions,
+  actionType: QuestLinkerActionType,
+  linkOptions: QuestLinkerOptions,
   callback: (signature: LinkerResponse) => Promise<void>
 ): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> {
   if (process.env.DCL_PRIVATE_KEY) {
@@ -325,11 +326,12 @@ function createAuthchainHeaders(
 
 export async function executeSubcommand(
   components: CliComponents,
+  linkerOptions: QuestLinkerOptions,
   commandData: {
     url: string
     method: 'GET' | 'POST' | 'PUT' | 'DELETE'
     metadata: Record<any, any>
-    actionType: 'create' | 'list' | 'activate' | 'deactivate'
+    actionType: QuestLinkerActionType
     extraData?: {
       questName?: string
       questId?: string
@@ -349,6 +351,7 @@ export async function executeSubcommand(
 
   const { program } = await getAddressAndSignature(
     components,
+    linkerOptions,
     awaitResponse,
     { messageToSign: payload, extraData: commandData.extraData },
     commandData.actionType,

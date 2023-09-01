@@ -38,3 +38,5 @@ interface Task {
   description: string
   actionItems: Action[]
 }
+
+export type QuestLinkerActionType = 'create' | 'list' | 'activate' | 'deactivate'
