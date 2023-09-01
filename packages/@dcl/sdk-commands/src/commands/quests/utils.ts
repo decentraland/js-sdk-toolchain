@@ -73,28 +73,28 @@ export function validateCreateQuest(quest: CreateQuest, components: Pick<CliComp
     return false
   }
 
-  // if (
-  //   !quest.definition.steps.every(
-  //     (step) =>
-  //       step.tasks.length &&
-  //       step.tasks.every(
-  //         (task) =>
-  //           task.actionItems.length &&
-  //           task.actionItems.every(
-  //             (at) =>
-  //               (at.type === 'CUSTOM' || at.type === 'LOCATION' || at.type === 'EMOTE' || at.type === 'JUMP') &&
-  //               Object.keys(at.parameters).length === (2 || 3)
-  //           ) &&
-  //           task.description?.length >= 0 &&
-  //           task.id.length
-  //       ) &&
-  //       step.id.length &&
-  //       step.description?.length >= 0
-  //   )
-  // ) {
-  //   logger.error("> Quest definition's steps must be valid")
-  //   return false
-  // }
+  if (
+    !quest.definition.steps.every(
+      (step) =>
+        step.tasks.length &&
+        step.tasks.every(
+          (task) =>
+            task.actionItems.length &&
+            task.actionItems.every(
+              (at) =>
+                (at.type === 'CUSTOM' || at.type === 'LOCATION' || at.type === 'EMOTE' || at.type === 'JUMP') &&
+                Object.keys(at.parameters).length >= 1
+            ) &&
+            task.description?.length >= 0 &&
+            task.id.length
+        ) &&
+        step.id.length &&
+        step.description?.length >= 0
+    )
+  ) {
+    logger.error("> Quest definition's steps must be valid")
+    return false
+  }
 
   if (quest.reward) {
     if (!quest.reward.hook) {

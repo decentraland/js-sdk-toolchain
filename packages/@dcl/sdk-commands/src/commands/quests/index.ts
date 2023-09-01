@@ -126,7 +126,9 @@ async function executeCreateSubcommand(components: CliComponents, baseURL: strin
         })
         const questsId: { id: string } = await res.json()
         logger.log(' ')
-        logger.log(`${colors.greenBright(`> Your Quest: ${quest!.name} was created successfully - ID:`)} ${questsId}`)
+        logger.log(
+          `${colors.greenBright(`> Your Quest: ${quest!.name} was created successfully - ID:`)} ${questsId.id}`
+        )
         logger.log(' ')
       } catch (error) {
         logger.error('> Error returned by Quests Server: ', error as any)
