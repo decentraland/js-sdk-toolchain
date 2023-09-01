@@ -54,5 +54,5 @@ export async function createServerTransport(): Promise<NetworkEntityFactory> {
 
   // TODO: add this to the server context?
   // This numbers should be fetched by the server
-  return createNetworkEntityFactory(2060, [2061, 2061 + 512])
+  return createNetworkEntityFactory(2560, [2560, 2560 + 512])
 }
