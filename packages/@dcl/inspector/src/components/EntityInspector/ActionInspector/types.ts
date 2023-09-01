@@ -5,11 +5,7 @@ export interface Props {
 }
 
 export enum Actions {
-  PLAY_ANIMATION = 'play_animation',
-  ACTIVATE = 'activate',
-  DEACTIVATE = 'deactivate',
-  GO_TO_END = 'go_to_end',
-  GO_TO_START = 'go_to_start'
+  PLAY_ANIMATION = 'play_animation'
 }
 
 export type Action = {
