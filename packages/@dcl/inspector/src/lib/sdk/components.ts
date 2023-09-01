@@ -108,9 +108,7 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
       Schemas.Map({
         type: Schemas.EnumString<AvailableTriggers>(AvailableTriggers, AvailableTriggers.ON_CLICK),
         entity: Schemas.Optional(Schemas.Entity),
-        action: Schemas.Optional(
-          Schemas.EnumString<AvailableActions>(AvailableActions, AvailableActions.PLAY_ANIMATION)
-        )
+        action: Schemas.Optional(Schemas.String)
       })
     )
   })

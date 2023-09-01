@@ -1,5 +1,4 @@
 import { Entity } from '@dcl/ecs'
-import { Actions } from '../ActionInspector/types'
 
 export interface Props {
   entity: Entity
@@ -12,5 +11,5 @@ export enum Triggers {
 export type Trigger = {
   type: Triggers
   entity?: Entity
-  action?: Actions
+  action?: string
 }
