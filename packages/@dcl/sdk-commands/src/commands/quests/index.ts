@@ -85,7 +85,6 @@ async function executeCreateSubcommand(components: CliComponents, baseURL: strin
       const createQuestJson = await fs.readFile(path, { encoding: 'utf-8' })
       try {
         quest = JSON.parse(createQuestJson) as CreateQuest
-        logger.info('> Quest: ', quest as unknown as any)
         if (!validateCreateQuest(quest, { logger })) return
       } catch (error) {
         logger.error(`> ${path} doesn't contain a valid JSON`)
