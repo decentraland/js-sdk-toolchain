@@ -21,7 +21,6 @@ export async function getAddressAndSignature(
   awaitResponse: IFuture<void>,
   info: { messageToSign: string; extraData?: { questName?: string; questId?: string; createQuest?: CreateQuest } },
   actionType: QuestLinkerActionType,
-  linkOptions: QuestLinkerOptions,
   callback: (signature: LinkerResponse) => Promise<void>
 ): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> {
   if (process.env.DCL_PRIVATE_KEY) {
@@ -33,7 +32,7 @@ export async function getAddressAndSignature(
     return {}
   }
 
-  const { linkerPort, ...opts } = linkOptions
+  const { linkerPort, ...opts } = linkerOpts
   const { program } = await runLinkerApp(components, awaitResponse, linkerPort!, info, actionType, opts, callback)
 
   return { program }
@@ -355,11 +354,6 @@ export async function executeSubcommand(
     awaitResponse,
     { messageToSign: payload, extraData: commandData.extraData },
     commandData.actionType,
-    {
-      isHttps: false,
-      openBrowser: false,
-      linkerPort: 3003
-    },
     async (linkerResponse) => {
       await commandCallback(
         createAuthchainHeaders(
