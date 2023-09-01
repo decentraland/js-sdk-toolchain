@@ -26,6 +26,8 @@ declare global {
         }
       }
     | { type: 'close'; clientId: string }
+  // eslint-disable-next-line no-var
   var updateCRDTState: (crdt: Uint8Array) => void
+  // eslint-disable-next-line no-var
   var registerClientObserver: (fn: (event: ClientEvent) => void) => void
 }
