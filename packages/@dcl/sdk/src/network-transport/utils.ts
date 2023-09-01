@@ -5,7 +5,8 @@ import {
   PointerEventsResult,
   RESERVED_STATIC_ENTITIES,
   RESERVED_LOCAL_ENTITIES,
-  SyncEntity
+  SyncEntity,
+  CrdtMessageType
 } from '@dcl/ecs'
 import { MessageType } from './types'
 import { connected } from '.'
@@ -43,6 +44,9 @@ export function syncFilter(message: Omit<TransportMessage, 'messageBuffer'>) {
     return false
   }
   // Network Entity Always
+  if (message.type === CrdtMessageType.DELETE_ENTITY) {
+    return true
+  }
 
   // TBD: First component
   if ((message as any).timestamp <= 1) {

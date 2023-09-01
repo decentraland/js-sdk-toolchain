@@ -10,6 +10,10 @@ export function* serializeCrdtMessages(prefix: string, data: Uint8Array, engine:
   while ((message = readMessage(buffer))) {
     const ent = `0x${message.entityId.toString(16)}`
     const preface = `${prefix}: ${CrdtMessageType[message.type]} e=${ent}`
+    if (message.type === CrdtMessageType.DELETE_ENTITY) {
+      yield `${preface}`
+    }
+
     if (
       message.type === CrdtMessageType.PUT_COMPONENT ||
       message.type === CrdtMessageType.DELETE_COMPONENT ||
