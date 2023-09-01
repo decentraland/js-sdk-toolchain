@@ -5,6 +5,7 @@ const { future } = require('fp-future')
 const { builtinModules } = require('module')
 const path = require('path')
 const fs = require('fs')
+const dotenv = require('dotenv')
 
 const WATCH_MODE = process.argv.includes('--watch')
 const PRODUCTION = process.argv.includes('--production')
@@ -132,17 +133,11 @@ function getNotBundledModules() {
 }
 
 function getEnvVars() {
-  // Initialize process.env to avoid undefined variable error
-  const envVars = { 'process.env': JSON.stringify({}) }
+  const envVars = {}
+  dotenv.config()
 
-  if (!PRODUCTION && fs.existsSync(path.resolve(__dirname, './.env'))) {
-    const envFile = fs.readFileSync(path.resolve(__dirname, './.env'), 'utf-8')
-    for (const line of envFile.split('\n')) {
-      const [key, value] = line.split('=')
-      if (key) {
-        envVars[`process.env.${key}`] = JSON.stringify(value ?? true)
-      }
-    }
+  for (const env in process.env) {
+    envVars[`process.env.${env}`] = JSON.stringify(process.env[env] ?? true)
   }
 
   return envVars
