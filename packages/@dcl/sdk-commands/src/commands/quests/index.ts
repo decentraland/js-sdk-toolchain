@@ -1,10 +1,11 @@
 import { Result } from 'arg'
 import prompts from 'prompts'
+import fetch from 'node-fetch'
 import { declareArgs } from '../../logic/args'
 import { CliComponents } from '../../components'
-import future from 'fp-future'
-import { createAuthchainHeaders, createQuest, getAddressAndSignature } from './utils'
-import fetch from 'node-fetch'
+import { createQuest, executeSubcommand, validateCreateQuest } from './utils'
+import { CreateQuest } from './types'
+import { colors } from '../../components/log'
 
 interface Options {
   args: Result<typeof args>
@@ -14,19 +15,25 @@ interface Options {
 export const args = declareArgs({
   '--help': Boolean,
   '-h': '--help',
-  '--list': Boolean,
+  '--list': String,
   '-ls': '--list',
-  '--create': Boolean
+  '--create': Boolean,
+  '--create-from-json': String,
+  '--deactivate': String,
+  '--activate': String
 })
 
 export function help(options: Options) {
   options.components.logger.log(`
     Usage: 'sdk-commands quests [options]'
       Options:
-        -h,  --help          Displays complete help
-        -ls, --list          Lists all of your quests
-        --create             Creates a new Quest
-        --create-from-json   Create a new Quest from absolute path to JSON file
+        -h,  --help                                                   Displays complete help
+        --create                                                      Creates a new Quest
+        --create-from-json   [path]                                   Create a new Quest from absolute path to a JSON file
+        -ls, --list          [your_eth_address]                       Lists all of your quests
+        --deactivate         [quest_id]                               Deactivate your Quest
+        --activate           [quest_id]                               Activate your Quest that was deactivated
+
   
       Example:
       - Lists all of your quests:
@@ -59,58 +66,161 @@ export async function main(options: Options) {
 
   if (options.args['--create']) {
     await executeCreateSubcommand(options.components, baseURL)
+  } else if (options.args['--create-from-json'] && options.args['--create-from-json'].length) {
+    await executeCreateSubcommand(options.components, baseURL, options.args[`--create-from-json`])
+  } else if (options.args['--list']?.length) {
+    await executeListSubcommand(options.components, baseURL, options.args['--list'])
+  } else if (options.args['--activate']?.length) {
+    await executeActivateSubcommand(options.components, baseURL, options.args['--activate'])
+  } else if (options.args['--deactivate']?.length) {
+    await executeDeactivateSubcommand(options.components, baseURL, options.args['--deactivate'])
   }
 }
 
-async function executeCreateSubcommand(components: CliComponents, baseURL: string) {
-  const { logger } = components
-  const promptedQuest = await createQuest({ logger })
-  if (!promptedQuest) {
-    logger.error('Quest creation was cancelled')
+async function executeCreateSubcommand(components: CliComponents, baseURL: string, path?: string) {
+  const { logger, fs } = components
+  let quest: CreateQuest | null = null
+  if (path) {
+    if (await fs.fileExists(path)) {
+      const createQuestJson = await fs.readFile(path, { encoding: 'utf-8' })
+      try {
+        quest = JSON.parse(createQuestJson) as CreateQuest
+        logger.info('> Quest: ', quest as unknown as any)
+        if (!validateCreateQuest(quest, { logger })) return
+      } catch (error) {
+        logger.error(`> ${path} doesn't contain a valid JSON`)
+      }
+    } else {
+      logger.error("> File doesn't exist")
+      return
+    }
+  } else {
+    quest = await createQuest({ logger })
+  }
+
+  if (!quest) {
+    logger.error('> Quest creation was cancelled')
     return
   }
 
-  const awaitResponse = future<void>()
-
-  const timestamp = String(Date.now())
-
   const createURL = `${baseURL}/api/quests`
-  const pathname = new URL(createURL).pathname
-  const method = 'POST'
-  const metadata = JSON.stringify(promptedQuest)
-  const payload = [method, pathname, timestamp, metadata].join(':').toLowerCase()
 
-  const { program } = await getAddressAndSignature(
+  await executeSubcommand(
     components,
-    awaitResponse,
-    payload,
     {
-      isHttps: false,
-      openBrowser: false,
-      linkerPort: 3003
+      url: createURL,
+      method: 'POST',
+      metadata: quest,
+      actionType: 'create',
+      extraData: { questName: quest.name, createQuest: quest }
     },
-    async (linkerResponse) => {
-      const { chainId, ...rest } = linkerResponse
+    async (authchainHeaders) => {
       try {
         const res = await fetch(createURL, {
           method: 'POST',
           headers: {
-            ...createAuthchainHeaders(rest.address, rest.signature, payload, timestamp, metadata),
+            ...authchainHeaders,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(promptedQuest)
+          body: JSON.stringify(quest)
         })
         const questsId: { id: string } = await res.json()
-        logger.info(`> Your Quest: ${promptedQuest.name} was created successfully - ID: `, questsId)
+        logger.log(' ')
+        logger.log(`${colors.greenBright(`> Your Quest: ${quest!.name} was created successfully - ID:`)} ${questsId}`)
+        logger.log(' ')
       } catch (error) {
         logger.error('> Error returned by Quests Server: ', error as any)
       }
     }
   )
+}
 
-  try {
-    await awaitResponse
-  } finally {
-    void program?.stop()
-  }
+async function executeListSubcommand(components: CliComponents, baseURL: string, address: string) {
+  const { logger } = components
+
+  const getQuests = `${baseURL}/api/creators/${address}/quests`
+
+  await executeSubcommand(
+    components,
+    { url: getQuests, method: 'GET', metadata: {}, actionType: 'list' },
+    async (authchainHeaders) => {
+      try {
+        const res = await fetch(getQuests, {
+          method: 'GET',
+          headers: {
+            ...authchainHeaders,
+            'Content-Type': 'application/json'
+          }
+        })
+        const { quests }: { quests: { id: string; name: string }[] } = await res.json()
+        logger.log(' ')
+        logger.log(colors.greenBright("Your request has been processed successfully. Your Quests' list is below: "))
+        quests.forEach((quest) => {
+          logger.log(' ')
+          logger.log(`${colors.greenBright('ID: ')} ${quest.id} - ${colors.greenBright('Name: ')} ${quest.name}`)
+        })
+        logger.log(' ')
+      } catch (error) {
+        logger.error('> Error returned by Quests Server: ', error as any)
+      }
+    }
+  )
+}
+
+async function executeActivateSubcommand(components: CliComponents, baseURL: string, questId: string) {
+  const { logger } = components
+
+  const activateQuest = `${baseURL}/api/quests/${questId}/activate`
+
+  await executeSubcommand(
+    components,
+    { url: activateQuest, method: 'PUT', metadata: {}, actionType: 'activate', extraData: { questId } },
+    async (authchainHeaders) => {
+      try {
+        const res = await fetch(activateQuest, {
+          method: 'PUT',
+          headers: {
+            ...authchainHeaders,
+            'Content-Type': 'application/json'
+          }
+        })
+        if (res.status === 202) {
+          logger.log(' ')
+          logger.log(colors.greenBright('Your Quest is active again!'))
+        }
+        logger.log(' ')
+      } catch (error) {
+        logger.error('> Error returned by Quests Server: ', error as any)
+      }
+    }
+  )
+}
+
+async function executeDeactivateSubcommand(components: CliComponents, baseURL: string, questId: string) {
+  const { logger } = components
+
+  const deactivateQuest = `${baseURL}/api/quests/${questId}`
+
+  await executeSubcommand(
+    components,
+    { url: deactivateQuest, method: 'DELETE', metadata: {}, actionType: 'deactivate', extraData: { questId } },
+    async (authchainHeaders) => {
+      try {
+        const res = await fetch(deactivateQuest, {
+          method: 'DELETE',
+          headers: {
+            ...authchainHeaders,
+            'Content-Type': 'application/json'
+          }
+        })
+        if (res.status === 202) {
+          logger.log(' ')
+          logger.log(colors.yellowBright('Your Quest was deactivated'))
+        }
+        logger.log(' ')
+      } catch (error) {
+        logger.error('> Error returned by Quests Server: ', error as any)
+      }
+    }
+  )
 }

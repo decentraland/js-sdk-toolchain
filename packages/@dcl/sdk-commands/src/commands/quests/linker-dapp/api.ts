@@ -10,6 +10,7 @@ import { IFuture } from 'fp-future'
 import { getPort } from '../../../logic/get-free-port'
 import { CliComponents } from '../../../components'
 import { setRoutes } from './routes'
+import { CreateQuest } from '../types'
 
 export interface LinkerResponse {
   address: string
@@ -21,7 +22,8 @@ export async function runLinkerApp(
   cliComponents: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,
   awaitResponse: IFuture<void>,
   port: number,
-  messageToSign: string,
+  info: { messageToSign: string; extraData?: { questName?: string; questId?: string; createQuest?: CreateQuest } },
+  actionType: 'create' | 'list' | 'activate' | 'deactivate',
   { isHttps, openBrowser }: { isHttps: boolean; openBrowser: boolean },
   deployCallback: (linkerResponse: LinkerResponse) => Promise<void>
 ) {
@@ -45,7 +47,7 @@ export async function runLinkerApp(
     },
     async main(program) {
       const { components, startComponents } = program
-      const { router } = setRoutes(components, awaitResponse, messageToSign, deployCallback)
+      const { router } = setRoutes(components, awaitResponse, info, actionType, deployCallback)
       components.server.setContext(components)
       components.server.use(router.allowedMethods())
       components.server.use(router.middleware())
