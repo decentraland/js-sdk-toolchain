@@ -1,11 +1,14 @@
 import { Result } from 'arg'
 import prompts from 'prompts'
 import fetch from 'node-fetch'
+import { isAddress } from 'eth-connect'
+import { validate } from 'uuid'
 import { declareArgs } from '../../logic/args'
 import { CliComponents } from '../../components'
 import { QuestLinkerOptions, createQuest, executeSubcommand, validateCreateQuest } from './utils'
 import { CreateQuest } from './types'
 import { colors } from '../../components/log'
+import { CliError } from '../../logic/error'
 
 interface Options {
   args: Result<typeof args>
@@ -21,7 +24,7 @@ export const args = declareArgs({
   '-p': '--port',
   '--https': Boolean,
   '--list': String,
-  '-ls': '--list',
+  '-l': '--list',
   '--create': Boolean,
   '--create-from-json': String,
   '--deactivate': String,
@@ -35,22 +38,20 @@ export function help(options: Options) {
         -h,  --help                                                   Displays complete help
         -p, --port           [port]                                   Select a custom port for the development server
         -b, --no-browser                                              Do not open a new browser window
-        --create                                                      Creates a new Quest
+        --create                                                      Creates a new Quest by prompts
         --create-from-json   [path]                                   Create a new Quest from absolute path to a JSON file
-        -ls, --list          [your_eth_address]                       Lists all of your quests. 
+        -l, --list           [your_eth_address]                       Lists all of your quests. 
         --deactivate         [quest_id]                               Deactivate a Quest that you created
         --activate           [quest_id]                               Activate your Quest that was deactivated
 
 
       Example:
-      - Lists all of your quests:
-        $ sdk-commands quests --list
       - Creates a new Quest:
         $ sdk-commands quests --create
       - Creates a new Quest from a JSON file:
         $ sdk-commands quests --create-from-a-json /Users/nickname/Desktop/my-great-quest.json
       - List your Quests:
-        $ sdk-commands quests -ls 0xYourAddress
+        $ sdk-commands quests -l 0xYourAddress
         $ sdk-commands quests --list 0xYourAddress
       - Deactivate a Quest:
         $ sdk-commands quests --deactivate 0001-your-quest-id-2222
@@ -59,7 +60,7 @@ export function help(options: Options) {
   `)
 }
 
-export async function main(options: Options) {
+export async function main(options: Options, avoidEnv = false) {
   const linkerPort = options.args['--port']
   const openBrowser = !options.args['--no-browser']
   const isHttps = !!options.args['--https']
@@ -67,12 +68,14 @@ export async function main(options: Options) {
 
   const { logger } = options.components
 
-  const { environment } = await prompts({
-    type: 'select',
-    name: 'environment',
-    message: 'Do you want to use development or production environment?',
-    choices: [{ title: 'dev' }, { title: 'prd' }]
-  })
+  const { environment } = !avoidEnv
+    ? await prompts({
+        type: 'select',
+        name: 'environment',
+        message: 'Do you want to use development or production environment?',
+        choices: [{ title: 'dev' }, { title: 'prd' }]
+      })
+    : { environment: 2 }
 
   const env = environment === 0 ? 'dev' : environment === 1 ? 'prd' : 'local'
 
@@ -111,21 +114,21 @@ async function executeCreateSubcommand(
       const createQuestJson = await fs.readFile(path, { encoding: 'utf-8' })
       try {
         quest = JSON.parse(createQuestJson) as CreateQuest
-        if (!validateCreateQuest(quest, { logger })) return
       } catch (error) {
-        logger.error(`> ${path} doesn't contain a valid JSON`)
+        throw new CliError(`${path} doesn't contain a valid JSON`)
+      }
+
+      if (!validateCreateQuest(quest, { logger })) {
+        throw new CliError('You provided an invalid Quest JSON. Please check the documentation')
       }
     } else {
-      logger.error("> File doesn't exist")
-      return
+      throw new CliError("File doesn't exist")
     }
   } else {
     quest = await createQuest({ logger })
-  }
-
-  if (!quest) {
-    logger.error('> Quest creation was cancelled')
-    return
+    if (!quest) {
+      throw new CliError('Quest creation was cancelled')
+    }
   }
 
   const createURL = `${baseURL}/api/quests`
@@ -173,6 +176,10 @@ async function executeListSubcommand(
 
   const getQuests = `${baseURL}/api/creators/${address}/quests`
 
+  if (!isAddress(address)) {
+    throw new CliError('You should provide a valid EVM address')
+  }
+
   await executeSubcommand(
     components,
     linkerOpts,
@@ -211,6 +218,10 @@ async function executeActivateSubcommand(
 
   const activateQuest = `${baseURL}/api/quests/${questId}/activate`
 
+  if (!validate(questId)) {
+    throw new CliError('You should provide a valid uuid')
+  }
+
   await executeSubcommand(
     components,
     linkerOpts,
@@ -245,6 +256,10 @@ async function executeDeactivateSubcommand(
   const { logger } = components
 
   const deactivateQuest = `${baseURL}/api/quests/${questId}`
+
+  if (!validate(questId)) {
+    throw new CliError('You should provide a valid uuid')
+  }
 
   await executeSubcommand(
     components,

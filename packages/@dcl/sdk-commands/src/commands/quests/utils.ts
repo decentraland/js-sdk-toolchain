@@ -40,6 +40,55 @@ export async function getAddressAndSignature(
 
 const url = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/gm
 
+function validateStepsAndConnections(
+  quest: Pick<CreateQuest, 'definition'>,
+  components: Pick<CliComponents, 'logger'>
+): boolean {
+  const { logger } = components
+
+  if (!quest.definition.connections?.length && Array.isArray(quest.definition.connections)) {
+    logger.error("> Quest's definition must have its connections defined")
+    return false
+  }
+
+  if (!quest.definition.connections.every((connection) => connection.stepFrom?.length && connection.stepTo?.length)) {
+    logger.error("> Quest's definition must have valid connections")
+    return false
+  }
+
+  if (!quest.definition.steps.length && Array.isArray(quest.definition.steps)) {
+    logger.error("> Quest's definition must have its steps defined")
+    return false
+  }
+
+  if (
+    !quest.definition.steps.every(
+      (step) =>
+        step.tasks?.length &&
+        Array.isArray(step.tasks) &&
+        step.tasks?.every(
+          (task) =>
+            task.actionItems?.length &&
+            Array.isArray(task.actionItems) &&
+            task.actionItems?.every(
+              (at) =>
+                (at.type === 'CUSTOM' || at.type === 'LOCATION' || at.type === 'EMOTE' || at.type === 'JUMP') &&
+                Object.keys(at.parameters).length >= 1
+            ) &&
+            task.description?.length >= 0 &&
+            task.id?.length
+        ) &&
+        step.id?.length &&
+        step.description?.length >= 0
+    )
+  ) {
+    logger.error("> Quest definition's steps must be valid")
+    return false
+  }
+
+  return true
+}
+
 export function validateCreateQuest(quest: CreateQuest, components: Pick<CliComponents, 'logger'>): boolean {
   const { logger } = components
 
@@ -58,41 +107,7 @@ export function validateCreateQuest(quest: CreateQuest, components: Pick<CliComp
     return false
   }
 
-  if (!quest.definition.connections.length) {
-    logger.error("> Quest's definition must have its connections defined")
-    return false
-  }
-
-  if (!quest.definition.connections.every((connection) => connection.stepFrom.length && connection.stepTo.length)) {
-    logger.error("> Quest's definition must have valid connections")
-    return false
-  }
-
-  if (!quest.definition.steps.length) {
-    logger.error("> Quest's definition must have its steps defined")
-    return false
-  }
-
-  if (
-    !quest.definition.steps.every(
-      (step) =>
-        step.tasks.length &&
-        step.tasks.every(
-          (task) =>
-            task.actionItems.length &&
-            task.actionItems.every(
-              (at) =>
-                (at.type === 'CUSTOM' || at.type === 'LOCATION' || at.type === 'EMOTE' || at.type === 'JUMP') &&
-                Object.keys(at.parameters).length >= 1
-            ) &&
-            task.description?.length >= 0 &&
-            task.id.length
-        ) &&
-        step.id.length &&
-        step.description?.length >= 0
-    )
-  ) {
-    logger.error("> Quest definition's steps must be valid")
+  if (!validateStepsAndConnections(quest, components)) {
     return false
   }
 
@@ -107,7 +122,7 @@ export function validateCreateQuest(quest: CreateQuest, components: Pick<CliComp
       }
     }
 
-    if (!quest.reward.items || !quest.reward.items.length) {
+    if (!quest.reward.items || !quest.reward.items.length || !Array.isArray(quest.reward.items)) {
       logger.error("> Quest's reward muat have its items defined")
       return false
     }
@@ -121,7 +136,7 @@ export function validateCreateQuest(quest: CreateQuest, components: Pick<CliComp
   return true
 }
 
-export const createQuest = async (_components: Pick<CliComponents, 'logger'>): Promise<CreateQuest | null> => {
+export const createQuest = async (components: Pick<CliComponents, 'logger'>): Promise<CreateQuest | null> => {
   let cancelled = false
 
   const onCancel = {
@@ -170,11 +185,15 @@ export const createQuest = async (_components: Pick<CliComponents, 'logger'>): P
       name: 'definition',
       message: 'Paste the Defintion (Steps & Connections) of your Quest',
       validate: (def) => {
-        const input = JSON.parse(def)
-        if (input.connections.length && input.steps.length) {
-          return true
+        try {
+          const input = JSON.parse(def)
+          if (validateStepsAndConnections({ definition: input }, { logger: components.logger })) {
+            return true
+          }
+          return false
+        } catch (error) {
+          return false
         }
-        return false
       }
     },
     onCancel
