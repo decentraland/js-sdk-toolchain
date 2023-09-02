@@ -1,0 +1,50 @@
+{
+	"name": "Test Quest",
+	"description": "Test Quest Description",
+	"imageUrl": "https://the-image-u-want-to-be-displayed-on-dcl-explorer.com",
+	"definition": {
+		"steps": [
+			{
+				"id": "STEP_1",
+				"description": "First Step",
+				"tasks": [
+					{
+						"id": "STEP_1_1",
+						"description": "First Task of First Step",
+						"actionItems": [
+							{
+								"type": "CUSTOM",
+								"parameters": {
+									"id": "CUSTOM_EVENT_1"
+								}
+							}
+						]
+					}
+				]
+			},
+			{
+				"id": "STEP_2",
+				"description": "Second Step",
+				"tasks": [
+					{
+						"id": "STEP_2_1",
+						"description": "First Task of Second Step",
+						"actionItems": [
+							{
+								"type": "CUSTOM",
+								"parameters": {
+									"id": "CUSTOM_EVENT_2"
+								}
+							}
+						]
+					}
+				]
+			}
+		],
+		"connections": [
+			{
+				"stepFrom": "STEP_1"
+			}
+		]
+	}
+}
