@@ -7,7 +7,8 @@ import { getPointers } from '../../../logic/catalyst-requests'
 import { getObject } from '../../../logic/coordinates'
 import { CliComponents } from '../../../components'
 import { IFile } from '../../../logic/scene-validations'
-import { LinkerResponse, SceneInfo } from './api'
+import { LinkerResponse } from '../../../linker-dapp/api'
+import { SceneInfo } from '../utils'
 
 function getContentType(type: string) {
   switch (type) {

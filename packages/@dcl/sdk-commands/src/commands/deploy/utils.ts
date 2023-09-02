@@ -5,12 +5,15 @@ import { getCatalystServersFromCache } from 'dcl-catalyst-client/dist/contracts-
 import { createFetchComponent } from '@well-known-components/fetch-component'
 import { hexToBytes } from 'eth-connect'
 import { ethSign } from '@dcl/crypto/dist/crypto'
+import querystring from 'querystring'
 
 import { CliComponents } from '../../components'
 import { IFile } from '../../logic/scene-validations'
-import { runLinkerApp, LinkerResponse } from './linker-dapp/api'
+import { runLinkerApp, LinkerResponse, LinkerdAppOptions } from '../../linker-dapp/api'
 import { createWallet } from '../../logic/account'
 import { IFuture } from 'fp-future'
+import { getEstateRegistry, getLandRegistry } from '../../logic/config'
+import { setRoutes } from './linker-dapp/routes'
 
 export async function getCatalyst(
   chainId: ChainId = ChainId.ETHEREUM_MAINNET,
@@ -60,20 +63,14 @@ export async function getCatalyst(
   }
 }
 
-interface LinkOptions {
-  openBrowser: boolean
-  linkerPort?: number
-  isHttps: boolean
-  skipValidations: boolean
-}
-
 export async function getAddressAndSignature(
   components: CliComponents,
   awaitResponse: IFuture<void>,
   messageToSign: string,
   scene: Scene,
   files: IFile[],
-  linkOptions: LinkOptions,
+  skipValidations: boolean,
+  linkOptions: Omit<LinkerdAppOptions, 'uri'>,
   deployCallback: (response: LinkerResponse) => Promise<void>
 ): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> {
   if (process.env.DCL_PRIVATE_KEY) {
@@ -85,20 +82,55 @@ export async function getAddressAndSignature(
     return {}
   }
 
-  const { linkerPort, ...opts } = linkOptions
-  const { program } = await runLinkerApp(
-    components,
-    awaitResponse,
-    scene,
-    files,
-    linkerPort!,
-    messageToSign,
-    opts,
-    deployCallback
-  )
+  const sceneInfo = await getSceneInfo(components, scene, messageToSign, skipValidations)
+  const queryParams = querystring.stringify(sceneInfo)
+  const { router } = setRoutes(components, awaitResponse, files, sceneInfo, deployCallback)
+
+  const { program } = await runLinkerApp(components, router, { ...linkOptions, uri: `/?${queryParams}` })
   return { program }
 }
 
 export function sceneHasWorldCfg(scene: Scene) {
   return !!Object.keys(scene.worldConfiguration || {}).length
+}
+
+export interface SceneInfo {
+  baseParcel: string
+  parcels: string[]
+  rootCID: string
+  landRegistry?: string
+  estateRegistry?: string
+  debug: boolean
+  title?: string
+  description?: string
+  skipValidations: boolean
+  isPortableExperience: boolean
+  isWorld: boolean
+}
+
+export async function getSceneInfo(
+  components: Pick<CliComponents, 'config'>,
+  scene: Scene,
+  rootCID: string,
+  skipValidations: boolean
+) {
+  const {
+    scene: { parcels, base },
+    display,
+    isPortableExperience
+  } = scene
+
+  return {
+    baseParcel: base,
+    parcels,
+    rootCID,
+    landRegistry: await getLandRegistry(components),
+    estateRegistry: await getEstateRegistry(components),
+    debug: !!process.env.DEBUG,
+    title: display?.title,
+    description: display?.description,
+    skipValidations,
+    isPortableExperience: !!isPortableExperience,
+    isWorld: sceneHasWorldCfg(scene)
+  }
 }

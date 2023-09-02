@@ -3,8 +3,8 @@ import { Router } from '@well-known-components/http-server'
 import { IFuture } from 'fp-future'
 
 import { CliComponents } from '../../../components'
-import { LinkerResponse } from './api'
 import { CreateQuest, QuestLinkerActionType } from '../types'
+import { LinkerResponse } from '../../../linker-dapp/api'
 
 function getContentType(type: string) {
   switch (type) {
@@ -21,8 +21,11 @@ function getContentType(type: string) {
 export function setRoutes(
   components: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,
   awaitResponse: IFuture<void>,
-  info: { messageToSign: string; extraData?: { questName?: string; questId?: string; createQuest?: CreateQuest } },
-  actionType: QuestLinkerActionType,
+  info: {
+    messageToSign: string
+    extraData?: { questName?: string; questId?: string; createQuest?: CreateQuest }
+    actionType: QuestLinkerActionType
+  },
   linkerCallback: (value: LinkerResponse) => Promise<void>
 ) {
   // We need to wait so the linker-dapp can receive the response and show a nice message.
@@ -50,7 +53,7 @@ export function setRoutes(
   }))
 
   router.get('/api/quests', async () => ({
-    body: { ...info, actionType }
+    body: info
   }))
 
   router.post('/api/quests', async (ctx) => {

@@ -2,25 +2,24 @@ import future, { IFuture } from 'fp-future'
 import { ethSign } from '@dcl/crypto/dist/crypto'
 import { hexToBytes } from 'eth-connect'
 import { Lifecycle } from '@well-known-components/interfaces'
+import { Authenticator } from '@dcl/crypto'
+import prompts from 'prompts'
+
+import { CreateQuest, QuestLinkerActionType } from './types'
 import { CliComponents } from '../../components'
 import { createWallet } from '../../logic/account'
-import { LinkerResponse, runLinkerApp } from './linker-dapp/api'
-import { CreateQuest, QuestLinkerActionType } from './types'
-import prompts from 'prompts'
-import { Authenticator } from '@dcl/crypto'
+import { LinkerResponse, LinkerdAppOptions, runLinkerApp } from '../../linker-dapp/api'
+import { setRoutes } from './linker-dapp/routes'
 
-export interface QuestLinkerOptions {
-  openBrowser: boolean
-  linkerPort?: number
-  isHttps: boolean
-}
-
-export async function getAddressAndSignature(
+async function getAddressAndSignature(
   components: CliComponents,
-  linkerOpts: QuestLinkerOptions,
+  linkerOpts: Omit<LinkerdAppOptions, 'uri'>,
   awaitResponse: IFuture<void>,
-  info: { messageToSign: string; extraData?: { questName?: string; questId?: string; createQuest?: CreateQuest } },
-  actionType: QuestLinkerActionType,
+  info: {
+    messageToSign: string
+    extraData?: { questName?: string; questId?: string; createQuest?: CreateQuest }
+    actionType: QuestLinkerActionType
+  },
   callback: (signature: LinkerResponse) => Promise<void>
 ): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> {
   if (process.env.DCL_PRIVATE_KEY) {
@@ -32,10 +31,61 @@ export async function getAddressAndSignature(
     return {}
   }
 
-  const { linkerPort, ...opts } = linkerOpts
-  const { program } = await runLinkerApp(components, awaitResponse, linkerPort!, info, actionType, opts, callback)
+  const { router } = setRoutes(components, awaitResponse, info, callback)
+
+  const { program } = await runLinkerApp(components, router, { ...linkerOpts, uri: `/quests` })
 
   return { program }
+}
+
+export async function executeSubcommand(
+  components: CliComponents,
+  linkerOps: Omit<LinkerdAppOptions, 'uri'>,
+  commandData: {
+    url: string
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE'
+    metadata: Record<any, any>
+    actionType: QuestLinkerActionType
+    extraData?: {
+      questName?: string
+      questId?: string
+      createQuest?: CreateQuest
+    }
+  },
+  commandCallback: (authchainHeaders: Record<string, string>) => Promise<void>
+) {
+  const awaitResponse = future<void>()
+
+  const timestamp = String(Date.now())
+
+  const pathname = new URL(commandData.url).pathname
+  const payload = [commandData.method, pathname, timestamp, JSON.stringify(commandData.metadata)]
+    .join(':')
+    .toLowerCase()
+
+  const { program } = await getAddressAndSignature(
+    components,
+    linkerOps,
+    awaitResponse,
+    { messageToSign: payload, extraData: commandData.extraData, actionType: commandData.actionType },
+    async (linkerResponse) => {
+      await commandCallback(
+        createAuthchainHeaders(
+          linkerResponse.address,
+          linkerResponse.signature,
+          payload,
+          timestamp,
+          JSON.stringify(commandData.metadata)
+        )
+      )
+    }
+  )
+
+  try {
+    await awaitResponse
+  } finally {
+    void program?.stop()
+  }
 }
 
 export const urlRegex =
@@ -343,55 +393,4 @@ function createAuthchainHeaders(
   headers[AUTH_METADATA_HEADER] = metadata
 
   return headers
-}
-
-export async function executeSubcommand(
-  components: CliComponents,
-  linkerOptions: QuestLinkerOptions,
-  commandData: {
-    url: string
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE'
-    metadata: Record<any, any>
-    actionType: QuestLinkerActionType
-    extraData?: {
-      questName?: string
-      questId?: string
-      createQuest?: CreateQuest
-    }
-  },
-  commandCallback: (authchainHeaders: Record<string, string>) => Promise<void>
-) {
-  const awaitResponse = future<void>()
-
-  const timestamp = String(Date.now())
-
-  const pathname = new URL(commandData.url).pathname
-  const payload = [commandData.method, pathname, timestamp, JSON.stringify(commandData.metadata)]
-    .join(':')
-    .toLowerCase()
-
-  const { program } = await getAddressAndSignature(
-    components,
-    linkerOptions,
-    awaitResponse,
-    { messageToSign: payload, extraData: commandData.extraData },
-    commandData.actionType,
-    async (linkerResponse) => {
-      await commandCallback(
-        createAuthchainHeaders(
-          linkerResponse.address,
-          linkerResponse.signature,
-          payload,
-          timestamp,
-          JSON.stringify(commandData.metadata)
-        )
-      )
-    }
-  )
-
-  try {
-    await awaitResponse
-  } finally {
-    void program?.stop()
-  }
 }

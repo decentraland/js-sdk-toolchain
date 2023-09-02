@@ -4,10 +4,11 @@ import { isAddress } from 'eth-connect'
 import { validate } from 'uuid'
 import { declareArgs } from '../../logic/args'
 import { CliComponents } from '../../components'
-import { QuestLinkerOptions, createQuest, executeSubcommand, urlRegex, validateCreateQuest } from './utils'
+import { createQuest, executeSubcommand, urlRegex, validateCreateQuest } from './utils'
 import { CreateQuest } from './types'
 import { colors } from '../../components/log'
 import { CliError } from '../../logic/error'
+import { LinkerdAppOptions } from '../../linker-dapp/api'
 
 interface Options {
   args: Result<typeof args>
@@ -97,7 +98,7 @@ export async function main(options: Options) {
 
 async function executeCreateSubcommand(
   components: CliComponents,
-  linkerOps: QuestLinkerOptions,
+  linkerOpts: Omit<LinkerdAppOptions, 'uri'>,
   baseURL: string,
   path?: string
 ) {
@@ -129,7 +130,7 @@ async function executeCreateSubcommand(
 
   await executeSubcommand(
     components,
-    linkerOps,
+    linkerOpts,
     {
       url: createURL,
       method: 'POST',
@@ -162,7 +163,7 @@ async function executeCreateSubcommand(
 
 async function executeListSubcommand(
   components: CliComponents,
-  linkerOpts: QuestLinkerOptions,
+  linkerOpts: Omit<LinkerdAppOptions, 'uri'>,
   baseURL: string,
   address: string
 ) {
@@ -204,7 +205,7 @@ async function executeListSubcommand(
 
 async function executeActivateSubcommand(
   components: CliComponents,
-  linkerOpts: QuestLinkerOptions,
+  linkerOpts: Omit<LinkerdAppOptions, 'uri'>,
   baseURL: string,
   questId: string
 ) {
@@ -243,7 +244,7 @@ async function executeActivateSubcommand(
 
 async function executeDeactivateSubcommand(
   components: CliComponents,
-  linkerOpts: QuestLinkerOptions,
+  linkerOpts: Omit<LinkerdAppOptions, 'uri'>,
   baseURL: string,
   questId: string
 ) {
