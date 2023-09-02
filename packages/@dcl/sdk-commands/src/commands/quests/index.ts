@@ -1,11 +1,10 @@
 import { Result } from 'arg'
-import prompts from 'prompts'
 import fetch from 'node-fetch'
 import { isAddress } from 'eth-connect'
 import { validate } from 'uuid'
 import { declareArgs } from '../../logic/args'
 import { CliComponents } from '../../components'
-import { QuestLinkerOptions, createQuest, executeSubcommand, validateCreateQuest } from './utils'
+import { QuestLinkerOptions, createQuest, executeSubcommand, urlRegex, validateCreateQuest } from './utils'
 import { CreateQuest } from './types'
 import { colors } from '../../components/log'
 import { CliError } from '../../logic/error'
@@ -23,6 +22,8 @@ export const args = declareArgs({
   '--port': Number,
   '-p': '--port',
   '--https': Boolean,
+  '--target': String,
+  '-t': '--target',
   '--list': String,
   '-l': '--list',
   '--create': Boolean,
@@ -36,13 +37,14 @@ export function help(options: Options) {
     Usage: 'sdk-commands quests [options]'
       Options:
         -h,  --help                                                   Displays complete help
-        -p, --port           [port]                                   Select a custom port for the development server
-        -b, --no-browser                                              Do not open a new browser window
         --create                                                      Creates a new Quest by prompts
         --create-from-json   [path]                                   Create a new Quest from absolute path to a JSON file
         -l, --list           [your_eth_address]                       Lists all of your quests. 
         --deactivate         [quest_id]                               Deactivate a Quest that you created
         --activate           [quest_id]                               Activate your Quest that was deactivated
+        -p, --port           [port]                                   Select a custom port for the development server
+        -b, --no-browser                                              Do not open a new browser window
+        -t, --target         [URL]                                    Specifies the target Quests server. Defaults to https://quests.decentraland.org
 
 
       Example:
@@ -60,7 +62,7 @@ export function help(options: Options) {
   `)
 }
 
-export async function main(options: Options, avoidEnv = false) {
+export async function main(options: Options) {
   const linkerPort = options.args['--port']
   const openBrowser = !options.args['--no-browser']
   const isHttps = !!options.args['--https']
@@ -68,25 +70,17 @@ export async function main(options: Options, avoidEnv = false) {
 
   const { logger } = options.components
 
-  const { environment } = !avoidEnv
-    ? await prompts({
-        type: 'select',
-        name: 'environment',
-        message: 'Do you want to use development or production environment?',
-        choices: [{ title: 'dev' }, { title: 'prd' }]
-      })
-    : { environment: 2 }
+  if (options.args['--target']) {
+    if (
+      !new RegExp(urlRegex).test(options.args['--target']) &&
+      !options.args['--target'].includes('http://localhost')
+    ) {
+      throw new CliError('The provided target is not a valid URL')
+    }
+  }
+  const baseURL = options.args['--target'] || 'https://quests.decentraland.org'
 
-  const env = environment === 0 ? 'dev' : environment === 1 ? 'prd' : 'local'
-
-  logger.info(`> You're using ${env} environment`)
-
-  const baseURL =
-    env === 'dev'
-      ? 'https://quests.decentraland.zone'
-      : env === 'prd'
-      ? 'https://quests.decentraland.org'
-      : 'http://localhost:3000'
+  logger.info(`You're using ${baseURL} server`)
 
   if (options.args['--create']) {
     await executeCreateSubcommand(options.components, linkerOpts, baseURL)

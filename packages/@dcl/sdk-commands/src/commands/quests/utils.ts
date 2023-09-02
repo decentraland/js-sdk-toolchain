@@ -38,7 +38,8 @@ export async function getAddressAndSignature(
   return { program }
 }
 
-const url = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/gm
+export const urlRegex =
+  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/gm
 
 function validateStepsAndConnections(
   quest: Pick<CreateQuest, 'definition'>,
@@ -102,7 +103,7 @@ export function validateCreateQuest(quest: CreateQuest, components: Pick<CliComp
     return false
   }
 
-  if (!quest.imageUrl.length || !new RegExp(url).test(quest.imageUrl)) {
+  if (!quest.imageUrl.length || !new RegExp(urlRegex).test(quest.imageUrl)) {
     logger.error("> Quest's image URL must be a valid URL")
     return false
   }
@@ -116,7 +117,7 @@ export function validateCreateQuest(quest: CreateQuest, components: Pick<CliComp
       logger.error("> Quest's reward must have its webhook defined")
       return false
     } else {
-      if (!quest.reward.hook.webhookUrl || !new RegExp(url).test(quest.reward.hook.webhookUrl)) {
+      if (!quest.reward.hook.webhookUrl || !new RegExp(urlRegex).test(quest.reward.hook.webhookUrl)) {
         logger.error("> Quest's reward must have a valid Webhook URL")
         return false
       }
@@ -127,7 +128,9 @@ export function validateCreateQuest(quest: CreateQuest, components: Pick<CliComp
       return false
     }
 
-    if (!quest.reward.items.every((item) => new RegExp(url).test(item.imageLink || '') && item.name?.length >= 3)) {
+    if (
+      !quest.reward.items.every((item) => new RegExp(urlRegex).test(item.imageLink || '') && item.name?.length >= 3)
+    ) {
       logger.error("> Quest's reward muat have valid items")
       return false
     }
@@ -174,7 +177,7 @@ export const createQuest = async (components: Pick<CliComponents, 'logger'>): Pr
       type: 'text',
       name: 'imageUrl',
       message: 'Image URL to display your Quest',
-      validate: (imageUrl) => new RegExp(url).test(imageUrl)
+      validate: (imageUrl) => new RegExp(urlRegex).test(imageUrl)
     },
     onCancel
   )
@@ -221,7 +224,7 @@ export const createQuest = async (components: Pick<CliComponents, 'logger'>): Pr
       type: 'text',
       name: 'webhookUrl',
       message: 'Insert the Webhook URL of your Rewards Server',
-      validate: (webhookUrl) => new RegExp(url).test(webhookUrl)
+      validate: (webhookUrl) => new RegExp(urlRegex).test(webhookUrl)
     },
     onCancel
   )
@@ -295,7 +298,7 @@ export const createQuest = async (components: Pick<CliComponents, 'logger'>): Pr
         type: 'text',
         name: 'itemImage',
         message: `Provide an image link for your ${i} reward`,
-        validate: (image) => new RegExp(url).test(image)
+        validate: (image) => new RegExp(urlRegex).test(image)
       },
       onCancel
     )

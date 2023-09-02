@@ -8,15 +8,23 @@ describe('quests command', () => {
     jest.resetAllMocks()
   })
 
+  it('should throw if target parameter is not a valid URL', async () => {
+    const components = await initComponents()
+
+    await expect(() => quests.main({ args: { _: [], '--target': 'localhost:4000' }, components })).rejects.toThrow(
+      'The provided target is not a valid URL'
+    )
+  })
+
   describe('--create-from-json', () => {
     it('should throw if the file doesnt exist', async () => {
       const components = await initComponents()
       const existSpy = jest.spyOn(components.fs, 'fileExists')
       const executeSubcommand = jest.spyOn(utils, 'executeSubcommand')
 
-      await expect(() =>
-        quests.main({ args: { _: [], '--create-from-json': 'null' }, components }, true)
-      ).rejects.toThrow("File doesn't exist")
+      await expect(() => quests.main({ args: { _: [], '--create-from-json': 'null' }, components })).rejects.toThrow(
+        "File doesn't exist"
+      )
       expect(existSpy).toBeCalled()
       expect(executeSubcommand).not.toBeCalled()
     })
@@ -26,9 +34,9 @@ describe('quests command', () => {
       const executeSubcommand = jest.spyOn(utils, 'executeSubcommand')
       const path = resolve('./test/sdk-commands/commands/quests/invalid_quest.json')
 
-      await expect(() =>
-        quests.main({ args: { _: [], '--create-from-json': path }, components }, true)
-      ).rejects.toThrow('You provided an invalid Quest JSON. Please check the documentation')
+      await expect(() => quests.main({ args: { _: [], '--create-from-json': path }, components })).rejects.toThrow(
+        'You provided an invalid Quest JSON. Please check the documentation'
+      )
       expect(executeSubcommand).not.toBeCalled()
     })
 
@@ -37,9 +45,9 @@ describe('quests command', () => {
       const executeSubcommand = jest.spyOn(utils, 'executeSubcommand')
       const path = resolve('./test/sdk-commands/commands/quests/not_valid_json')
 
-      await expect(() =>
-        quests.main({ args: { _: [], '--create-from-json': path }, components }, true)
-      ).rejects.toThrow(`${path} doesn't contain a valid JSON`)
+      await expect(() => quests.main({ args: { _: [], '--create-from-json': path }, components })).rejects.toThrow(
+        `${path} doesn't contain a valid JSON`
+      )
       expect(executeSubcommand).not.toBeCalled()
     })
 
@@ -50,13 +58,13 @@ describe('quests command', () => {
 
       const createQuestJson = JSON.parse(await components.fs.readFile(path, { encoding: 'utf-8' }))
 
-      await quests.main({ args: { _: [], '--create-from-json': path }, components }, true)
+      await quests.main({ args: { _: [], '--create-from-json': path }, components })
 
       expect(executeSubcommand).toBeCalledWith(
         components,
         { linkerPort: undefined, isHttps: false, openBrowser: true },
         {
-          url: 'http://localhost:3000/api/quests',
+          url: 'https://quests.decentraland.org/api/quests',
           method: 'POST',
           metadata: createQuestJson,
           actionType: 'create',
@@ -74,7 +82,7 @@ describe('quests command', () => {
       const createMock = jest.spyOn(utils, 'createQuest').mockResolvedValueOnce(null)
       const executeSubcommand = jest.spyOn(utils, 'executeSubcommand')
 
-      await expect(() => quests.main({ args: { _: [], '--create': true }, components }, true)).rejects.toThrow(
+      await expect(() => quests.main({ args: { _: [], '--create': true }, components })).rejects.toThrow(
         'Quest creation was cancelled'
       )
       expect(existSpy).not.toBeCalled()
@@ -94,7 +102,7 @@ describe('quests command', () => {
       )
       const createMock = jest.spyOn(utils, 'createQuest').mockResolvedValueOnce(quest)
 
-      await quests.main({ args: { _: [], '--create': true }, components }, true)
+      await quests.main({ args: { _: [], '--create': true }, components })
 
       expect(existSpy).not.toBeCalled()
       expect(createMock).toBeCalledWith({ logger: components.logger })
@@ -102,7 +110,7 @@ describe('quests command', () => {
         components,
         { linkerPort: undefined, isHttps: false, openBrowser: true },
         {
-          url: 'http://localhost:3000/api/quests',
+          url: 'https://quests.decentraland.org/api/quests',
           method: 'POST',
           metadata: quest,
           actionType: 'create',
@@ -118,13 +126,13 @@ describe('quests command', () => {
       const components = await initComponents()
       const executeSubcommand = jest.spyOn(utils, 'executeSubcommand').mockResolvedValueOnce()
 
-      await quests.main({ args: { _: [], '--list': '0xc0ffee254729296a45a3885639AC7E10F9d54979' }, components }, true)
+      await quests.main({ args: { _: [], '--list': '0xc0ffee254729296a45a3885639AC7E10F9d54979' }, components })
 
       expect(executeSubcommand).toBeCalledWith(
         components,
         { linkerPort: undefined, isHttps: false, openBrowser: true },
         {
-          url: 'http://localhost:3000/api/creators/0xc0ffee254729296a45a3885639AC7E10F9d54979/quests',
+          url: 'https://quests.decentraland.org/api/creators/0xc0ffee254729296a45a3885639AC7E10F9d54979/quests',
           method: 'GET',
           metadata: {},
           actionType: 'list'
@@ -137,7 +145,7 @@ describe('quests command', () => {
       const components = await initComponents()
       const executeSubcommand = jest.spyOn(utils, 'executeSubcommand')
 
-      await expect(() => quests.main({ args: { _: [], '--list': '0xA' }, components }, true)).rejects.toThrow(
+      await expect(() => quests.main({ args: { _: [], '--list': '0xA' }, components })).rejects.toThrow(
         'You should provide a valid EVM address'
       )
       expect(executeSubcommand).not.toBeCalled()
@@ -149,13 +157,13 @@ describe('quests command', () => {
       const components = await initComponents()
       const executeSubcommand = jest.spyOn(utils, 'executeSubcommand').mockResolvedValueOnce()
 
-      await quests.main({ args: { _: [], '--activate': '342adfeb-535f-4adb-9d78-975f732808b2' }, components }, true)
+      await quests.main({ args: { _: [], '--activate': '342adfeb-535f-4adb-9d78-975f732808b2' }, components })
 
       expect(executeSubcommand).toBeCalledWith(
         components,
         { linkerPort: undefined, isHttps: false, openBrowser: true },
         {
-          url: 'http://localhost:3000/api/quests/342adfeb-535f-4adb-9d78-975f732808b2/activate',
+          url: 'https://quests.decentraland.org/api/quests/342adfeb-535f-4adb-9d78-975f732808b2/activate',
           method: 'PUT',
           metadata: {},
           actionType: 'activate',
@@ -172,7 +180,7 @@ describe('quests command', () => {
       const executeSubcommand = jest.spyOn(utils, 'executeSubcommand')
 
       await expect(() =>
-        quests.main({ args: { _: [], '--activate': '342adfeb-535f-4adb-9d78-975f7' }, components }, true)
+        quests.main({ args: { _: [], '--activate': '342adfeb-535f-4adb-9d78-975f7' }, components })
       ).rejects.toThrow('You should provide a valid uuid')
       expect(executeSubcommand).not.toBeCalled()
     })
@@ -183,13 +191,13 @@ describe('quests command', () => {
       const components = await initComponents()
       const executeSubcommand = jest.spyOn(utils, 'executeSubcommand').mockResolvedValueOnce()
 
-      await quests.main({ args: { _: [], '--deactivate': '342adfeb-535f-4adb-9d78-975f732808b2' }, components }, true)
+      await quests.main({ args: { _: [], '--deactivate': '342adfeb-535f-4adb-9d78-975f732808b2' }, components })
 
       expect(executeSubcommand).toBeCalledWith(
         components,
         { linkerPort: undefined, isHttps: false, openBrowser: true },
         {
-          url: 'http://localhost:3000/api/quests/342adfeb-535f-4adb-9d78-975f732808b2',
+          url: 'https://quests.decentraland.org/api/quests/342adfeb-535f-4adb-9d78-975f732808b2',
           method: 'DELETE',
           metadata: {},
           actionType: 'deactivate',
@@ -206,7 +214,7 @@ describe('quests command', () => {
       const executeSubcommand = jest.spyOn(utils, 'executeSubcommand')
 
       await expect(() =>
-        quests.main({ args: { _: [], '--deactivate': '342adfeb-535f-4adb-9d78-975f' }, components }, true)
+        quests.main({ args: { _: [], '--deactivate': '342adfeb-535f-4adb-9d78-975f' }, components })
       ).rejects.toThrow('You should provide a valid uuid')
       expect(executeSubcommand).not.toBeCalled()
     })
