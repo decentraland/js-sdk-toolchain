@@ -47,5 +47,19 @@
 				"stepTo": "STEP_2"
 			}
 		]
+	},
+	"reward": {
+		"hook": {
+			"webhookUrl": "https://my-rewards-server.com/quests",
+			"requestBody": {
+				"beneficiary": "{user_address}"
+			}
+		},
+		"items": [
+			{
+				"name": "SunGlass",
+				"imageLink": "https://my-cool-sunglasses-image.com"
+			}
+		]
 	}
 }

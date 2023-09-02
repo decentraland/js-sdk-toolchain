@@ -97,7 +97,12 @@ function validateStepsAndConnections(
 ): boolean {
   const { logger } = components
 
-  if (!quest.definition.connections?.length && Array.isArray(quest.definition.connections)) {
+  if (!quest.definition) {
+    logger.error('> Quest must have a definition')
+    return false
+  }
+
+  if (!quest.definition.connections?.length || !Array.isArray(quest.definition.connections)) {
     logger.error("> Quest's definition must have its connections defined")
     return false
   }
@@ -107,7 +112,7 @@ function validateStepsAndConnections(
     return false
   }
 
-  if (!quest.definition.steps.length && Array.isArray(quest.definition.steps)) {
+  if (!quest.definition.steps?.length || !Array.isArray(quest.definition.steps)) {
     logger.error("> Quest's definition must have its steps defined")
     return false
   }
@@ -153,7 +158,7 @@ export function validateCreateQuest(quest: CreateQuest, components: Pick<CliComp
     return false
   }
 
-  if (!quest.imageUrl.length || !new RegExp(urlRegex).test(quest.imageUrl)) {
+  if (!quest.imageUrl?.length || !new RegExp(urlRegex).test(quest.imageUrl)) {
     logger.error("> Quest's image URL must be a valid URL")
     return false
   }
@@ -167,21 +172,25 @@ export function validateCreateQuest(quest: CreateQuest, components: Pick<CliComp
       logger.error("> Quest's reward must have its webhook defined")
       return false
     } else {
-      if (!quest.reward.hook.webhookUrl || !new RegExp(urlRegex).test(quest.reward.hook.webhookUrl)) {
+      if (
+        !quest.reward.hook.webhookUrl ||
+        !quest.reward.hook.webhookUrl?.length ||
+        !new RegExp(urlRegex).test(quest.reward.hook.webhookUrl)
+      ) {
         logger.error("> Quest's reward must have a valid Webhook URL")
         return false
       }
     }
 
-    if (!quest.reward.items || !quest.reward.items.length || !Array.isArray(quest.reward.items)) {
-      logger.error("> Quest's reward muat have its items defined")
+    if (!quest.reward.items || !quest.reward.items?.length || !Array.isArray(quest.reward.items)) {
+      logger.error("> Quest's reward must have its items defined")
       return false
     }
 
     if (
       !quest.reward.items.every((item) => new RegExp(urlRegex).test(item.imageLink || '') && item.name?.length >= 3)
     ) {
-      logger.error("> Quest's reward muat have valid items")
+      logger.error("> Quest's reward must have valid items")
       return false
     }
   }
