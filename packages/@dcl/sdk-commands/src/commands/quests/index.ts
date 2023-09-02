@@ -4,7 +4,7 @@ import { isAddress } from 'eth-connect'
 import { validate } from 'uuid'
 import { declareArgs } from '../../logic/args'
 import { CliComponents } from '../../components'
-import { createQuest, executeSubcommand, urlRegex, validateCreateQuest } from './utils'
+import { createQuestByPrompting, executeSubcommand, urlRegex, validateCreateQuest } from './utils'
 import { CreateQuest } from './types'
 import { colors } from '../../components/log'
 import { CliError } from '../../logic/error'
@@ -120,7 +120,7 @@ async function executeCreateSubcommand(
       throw new CliError("File doesn't exist")
     }
   } else {
-    quest = await createQuest({ logger })
+    quest = await createQuestByPrompting({ logger })
     if (!quest) {
       throw new CliError('Quest creation was cancelled')
     }

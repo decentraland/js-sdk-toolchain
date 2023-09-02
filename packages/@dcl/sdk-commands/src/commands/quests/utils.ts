@@ -198,7 +198,11 @@ export function validateCreateQuest(quest: CreateQuest, components: Pick<CliComp
   return true
 }
 
-export const createQuest = async (components: Pick<CliComponents, 'logger'>): Promise<CreateQuest | null> => {
+export { prompts }
+
+export const createQuestByPrompting = async (
+  components: Pick<CliComponents, 'logger'>
+): Promise<CreateQuest | null> => {
   let cancelled = false
 
   const onCancel = {
