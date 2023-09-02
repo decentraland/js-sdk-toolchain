@@ -7,20 +7,8 @@ import { getPointers } from '../../../logic/catalyst-requests'
 import { getObject } from '../../../logic/coordinates'
 import { CliComponents } from '../../../components'
 import { IFile } from '../../../logic/scene-validations'
-import { LinkerResponse } from '../../../linker-dapp/api'
+import { LinkerResponse, getContentType } from '../../../linker-dapp/api'
 import { SceneInfo } from '../utils'
-
-function getContentType(type: string) {
-  switch (type) {
-    case 'css':
-      return 'text/css'
-    case 'js':
-      return 'application/js'
-    case 'media':
-    default:
-      return 'text/plain'
-  }
-}
 
 export function setRoutes(
   components: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,

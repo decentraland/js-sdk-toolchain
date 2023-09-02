@@ -4,19 +4,7 @@ import { IFuture } from 'fp-future'
 
 import { CliComponents } from '../../../components'
 import { CreateQuest, QuestLinkerActionType } from '../types'
-import { LinkerResponse } from '../../../linker-dapp/api'
-
-function getContentType(type: string) {
-  switch (type) {
-    case 'css':
-      return 'text/css'
-    case 'js':
-      return 'application/js'
-    case 'media':
-    default:
-      return 'text/plain'
-  }
-}
+import { LinkerResponse, getContentType } from '../../../linker-dapp/api'
 
 export function setRoutes(
   components: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,

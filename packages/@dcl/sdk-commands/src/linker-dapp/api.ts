@@ -76,3 +76,15 @@ async function getCredentials({ fs }: Pick<CliComponents, 'fs' | 'logger'>) {
   const certificate = await fs.readFile(resolve(__dirname, '../../../certs/localhost.crt'), 'utf-8')
   return { key: privateKey, cert: certificate }
 }
+
+export function getContentType(type: string) {
+  switch (type) {
+    case 'css':
+      return 'text/css'
+    case 'js':
+      return 'application/js'
+    case 'media':
+    default:
+      return 'text/plain'
+  }
+}
