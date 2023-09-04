@@ -10,6 +10,7 @@ import { CliComponents } from '../../components'
 import { createWallet } from '../../logic/account'
 import { LinkerResponse, LinkerdAppOptions, runLinkerApp } from '../../linker-dapp/api'
 import { setRoutes } from '../../linker-dapp/routes'
+import { CliError } from '../../logic/error'
 
 async function getAddressAndSignature(
   components: CliComponents,
@@ -117,28 +118,22 @@ export const urlRegex =
 
 function validateStepsAndConnections(
   quest: Pick<CreateQuest, 'definition'>,
-  components: Pick<CliComponents, 'logger'>
+  _components: Pick<CliComponents, 'logger'>
 ): boolean {
-  const { logger } = components
-
   if (!quest.definition) {
-    logger.error('> Quest must have a definition')
-    return false
+    throw new CliError('> Quest must have a definition')
   }
 
   if (!quest.definition.connections?.length || !Array.isArray(quest.definition.connections)) {
-    logger.error("> Quest's definition must have its connections defined")
-    return false
+    throw new CliError("> Quest's definition must have its connections defined")
   }
 
   if (!quest.definition.connections.every((connection) => connection.stepFrom?.length && connection.stepTo?.length)) {
-    logger.error("> Quest's definition must have valid connections")
-    return false
+    throw new CliError("> Quest's definition must have valid connections")
   }
 
   if (!quest.definition.steps?.length || !Array.isArray(quest.definition.steps)) {
-    logger.error("> Quest's definition must have its steps defined")
-    return false
+    throw new CliError("> Quest's definition must have its steps defined")
   }
 
   if (
@@ -153,7 +148,7 @@ function validateStepsAndConnections(
             task.actionItems?.every(
               (at) =>
                 (at.type === 'CUSTOM' || at.type === 'LOCATION' || at.type === 'EMOTE' || at.type === 'JUMP') &&
-                Object.keys(at.parameters).length >= 1
+                Object.keys(at.parameters || {}).length >= 1
             ) &&
             task.description?.length >= 0 &&
             task.id?.length
@@ -162,60 +157,48 @@ function validateStepsAndConnections(
         step.description?.length >= 0
     )
   ) {
-    logger.error("> Quest definition's steps must be valid")
-    return false
+    throw new CliError("> Quest definition's steps must be valid")
   }
 
   return true
 }
 
 export function validateCreateQuest(quest: CreateQuest, components: Pick<CliComponents, 'logger'>): boolean {
-  const { logger } = components
-
   if (!(quest.name.length >= 5)) {
-    logger.error("> Quest's name must be at least 5 chars")
-    return false
+    throw new CliError("> Quest's name must be at least 5 chars")
   }
 
   if (!(quest.description.length >= 5)) {
-    logger.error("> Quest's description must be at least 5 chars")
-    return false
+    throw new CliError("> Quest's description must be at least 5 chars")
   }
 
   if (!quest.imageUrl?.length || !new RegExp(urlRegex).test(quest.imageUrl)) {
-    logger.error("> Quest's image URL must be a valid URL")
-    return false
+    throw new CliError("> Quest's image URL must be a valid URL")
   }
 
-  if (!validateStepsAndConnections(quest, components)) {
-    return false
-  }
+  validateStepsAndConnections(quest, components)
 
   if (quest.reward) {
     if (!quest.reward.hook) {
-      logger.error("> Quest's reward must have its webhook defined")
-      return false
+      throw new CliError("> Quest's reward must have its webhook defined")
     } else {
       if (
         !quest.reward.hook.webhookUrl ||
         !quest.reward.hook.webhookUrl?.length ||
         !new RegExp(urlRegex).test(quest.reward.hook.webhookUrl)
       ) {
-        logger.error("> Quest's reward must have a valid Webhook URL")
-        return false
+        throw new CliError("> Quest's reward must have a valid Webhook URL")
       }
     }
 
     if (!quest.reward.items || !quest.reward.items?.length || !Array.isArray(quest.reward.items)) {
-      logger.error("> Quest's reward must have its items defined")
-      return false
+      throw new CliError("> Quest's reward must have its items defined")
     }
 
     if (
       !quest.reward.items.every((item) => new RegExp(urlRegex).test(item.imageLink || '') && item.name?.length >= 3)
     ) {
-      logger.error("> Quest's reward must have valid items")
-      return false
+      throw new CliError("> Quest's reward must have valid items")
     }
   }
 
