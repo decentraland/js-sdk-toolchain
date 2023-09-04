@@ -20,12 +20,10 @@ describe('quests command', () => {
     )
   })
 
-  it('should not throw if target parameter is a valid URL', async () => {
+  it('should NOT throw if target parameter is a valid URL', async () => {
     const components = await initComponents()
 
-    await expect(() =>
-      quests.main({ args: { _: [], '--target': 'http://aaa.com' }, components })
-    ).resolves.not.toThrow()
+    await expect(quests.main({ args: { _: [], '--target': 'http://aaa.com' }, components })).resolves.not.toThrow()
   })
 
   describe('--create-from-json', () => {
