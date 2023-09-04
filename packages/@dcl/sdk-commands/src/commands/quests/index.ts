@@ -72,10 +72,7 @@ export async function main(options: Options) {
   const { logger } = options.components
 
   if (options.args['--target']) {
-    if (
-      !new RegExp(urlRegex).test(options.args['--target']) &&
-      !options.args['--target'].includes('http://localhost')
-    ) {
+    if (!new RegExp(urlRegex).test(options.args['--target']) && !options.args['--target'].includes('localhost')) {
       throw new CliError('The provided target is not a valid URL')
     }
   }
